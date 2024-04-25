@@ -192,7 +192,6 @@ FEATURES_EXISTING := \
     periph_mcg \
     periph_mcg_lite \
     periph_nvm \
-    periph_pdm \
     periph_pio \
     periph_plic \
     periph_pm \

@@ -53,7 +53,7 @@ def samples_to_fig(samples, output_file):
     plt.ylim(min(samples), max(samples))
     plt.grid(True)
     plt.show()
-    plt.savefig("plot.png")
+    plt.savefig(f"{output_file}.png")
     print(f"Graph saved as {output_file}.png")
 
 
