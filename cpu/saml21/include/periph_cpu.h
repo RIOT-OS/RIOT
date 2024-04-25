@@ -71,6 +71,16 @@ enum {
 /** @} */
 
 /**
+ * @brief   Minimal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MIN KHZ(160)
+
+/**
+ * @brief   Maximal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MAX MHZ(16)
+
+/**
  * @brief   Pins that can be used for ADC input
  */
 static const gpio_t sam0_adc_pins[1][20] = {

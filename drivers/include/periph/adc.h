@@ -55,6 +55,7 @@
  */
 
 #include <limits.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "periph_cpu.h"
@@ -126,6 +127,27 @@ int adc_init(adc_t line);
  * @return                  -1 if resolution is not applicable
  */
 int32_t adc_sample(adc_t line, adc_res_t res);
+
+#ifndef __cplusplus
+/**
+ * @brief   Capture multiple ADC samples from one or multiple ADC lines
+ *
+ * This requires the `periph_adc_multi` feature.
+ *
+ * @experimental    This API may change to accommodate new backends and DMA
+ *                  operation.
+ *
+ * @param[in]  lines        line(s) to sample
+ * @param[in]  lines_numof  number of ADC lines to sample
+ * @param[out] bufs         target buffer(s)
+ * @param[in]  num_samples  number of samples to sample per ADC line
+ * @param[in]  res          resolution to use for conversion
+ * @param[in]  f_adc        frequency to use for conversion, leave 0 for default
+ */
+void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
+                      size_t num_samples, uint16_t bufs[lines_numof][num_samples],
+                      adc_res_t res, uint32_t f_adc);
+#endif
 
 /**
  * @brief   Configure the ADC with a given resolution for continuous sampling

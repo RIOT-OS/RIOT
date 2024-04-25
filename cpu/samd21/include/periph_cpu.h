@@ -77,6 +77,16 @@ enum {
 /** @} */
 
 /**
+ * @brief   Minimal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MIN KHZ(30)
+
+/**
+ * @brief   Maximal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MAX KHZ(2100)
+
+/**
  * @brief   Override SPI hardware chip select macro
  *
  * As of now, we do not support HW CS, so we always set it to a fixed value
