@@ -485,6 +485,112 @@ void adc_continuous_sample_multi(adc_t line, uint16_t *buf, size_t len)
     }
 }
 
+static void _has_adcs(bool *adc0, bool *adc1,
+                      const adc_t *lines, uint8_t lines_numof)
+{
+#ifndef ADC1
+    *adc0 = true;
+    *adc1 = false;
+    return;
+#else
+    *adc0 = false;
+    *adc1 = false;
+    for (unsigned i = 0; i < lines_numof; ++i) {
+        if (_dev(lines[i]) == ADC0) {
+            *adc0 = true;
+        } else if (_dev(lines[i]) == ADC1) {
+            *adc1 = true;
+        }
+    }
+#endif
+}
+
+void adc_sample_multi(const adc_t *lines, uint8_t lines_numof,
+                      uint16_t **bufs, size_t buf_len,
+                      adc_res_t res, uint32_t f_adc)
+{
+    mutex_lock(&_lock);
+
+    _shift = _shift_from_res(res);
+
+    bool adc0, adc1;
+    _has_adcs(&adc0, &adc1, lines, lines_numof);
+
+    if (adc0) {
+        _adc_configure(_adc(0), res, f_adc);
+    }
+    if (adc1) {
+        _adc_configure(_adc(1), res, f_adc);
+    }
+
+    bool lockstep = false;
+    if (lines_numof == 2 &&
+        _dev(lines[0]) != _dev(lines[1])) {
+        /* let ADC0 control ADC1 in lock-step */
+        ADC1->CTRLA.reg = 0;
+        _wait_syncbusy(ADC1);
+
+        ADC1->CTRLA.reg = ADC_CTRLA_SLAVEEN
+                        | ADC_CTRLA_ENABLE;
+        lockstep = true;
+    }
+
+    Adc *dev[lines_numof];
+    bool diffmode[lines_numof];
+    for (unsigned i = 0; i < lines_numof; ++i) {
+        dev[i] = _dev(lines[i]);
+        diffmode[i] = adc_channels[lines[i]].inputctrl & ADC_INPUTCTRL_DIFFMODE;
+    }
+
+    if (lockstep || lines_numof == 1) {
+
+        for (unsigned i = 0; i < lines_numof; ++i) {
+            /* configure ADC line */
+            _config_line(dev[i], lines[i], diffmode[i], 1);
+
+            /* Start the conversion */
+            dev[i]->SWTRIG.reg = ADC_SWTRIG_START;
+        }
+
+        while (buf_len--) {
+
+            /* Wait for the result */
+            while (!(dev[0]->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
+            dev[0]->INTFLAG.reg = ADC_INTFLAG_RESRDY;
+
+            for (unsigned i = 0; i < lines_numof; ++i) {
+                *bufs[i]++ = _sample_dev(dev[i], diffmode[i]) << _shift;
+            }
+        }
+    } else {
+        while (buf_len--) {
+
+            for (unsigned i = 0; i < lines_numof; ++i) {
+                /* configure ADC line */
+                _config_line(dev[i], lines[i], diffmode[i], 1);
+
+                /* Start the conversion */
+                dev[i]->SWTRIG.reg = ADC_SWTRIG_START;
+
+                /* Wait for the result */
+                while (!(dev[i]->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
+                dev[i]->INTFLAG.reg = ADC_INTFLAG_RESRDY;
+                *bufs[i]++ = _sample_dev(dev[i], diffmode[i]) << _shift;
+            }
+        }
+    }
+
+    if (adc0) {
+        _adc_poweroff(_adc(0));
+    }
+    if (adc1) {
+        _adc_poweroff(_adc(1));
+    }
+
+    mutex_unlock(&_lock);
+}
+
+
 #if defined(ADC0) && defined(ADC1)
 void adc_dual_continuous_begin(adc_res_t res, uint32_t f_adc)
 {

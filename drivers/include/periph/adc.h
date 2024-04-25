@@ -129,6 +129,22 @@ int adc_init(adc_t line);
 int32_t adc_sample(adc_t line, adc_res_t res);
 
 /**
+ * @brief   Capture multiple ADC samples from an ADC line
+ *
+ * @note requires the `periph_adc_continuous` feature
+ *
+ * @param[in]  lines        line(s) to sample
+ * @param[in]  lines_numof  number of ADC lines to sample
+ * @param[out] bufs         target buffer(s)
+ * @param[in]  buf_len      number of samples to sample per line
+ * @param[in]  res          resolution to use for conversion
+ * @param[in]  f_adc        frequency to use for conversion, leave 0 for default
+ */
+void adc_sample_multi(const adc_t *lines, uint8_t lines_numof,
+                      uint16_t **bufs, size_t buf_len,
+                      adc_res_t res, uint32_t f_adc);
+
+/**
  * @brief   Configure the ADC with a given resolution for continuous sampling
  *
  * @note requires the `periph_adc_continuous` feature
