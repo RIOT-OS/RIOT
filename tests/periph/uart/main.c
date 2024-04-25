@@ -22,11 +22,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "bitfield.h"
+#include "msg.h"
+#include "periph/uart.h"
+#include "ringbuffer.h"
 #include "shell.h"
 #include "thread.h"
-#include "msg.h"
-#include "ringbuffer.h"
-#include "periph/uart.h"
 #include "ztimer.h"
 
 #ifdef MODULE_STDIO_UART
@@ -85,6 +86,8 @@ static int data_bits_lut_len = ARRAY_SIZE(data_bits_lut);
 static uart_stop_bits_t stop_bits_lut[] = { UART_STOP_BITS_1, UART_STOP_BITS_2 };
 static int stop_bits_lut_len = ARRAY_SIZE(stop_bits_lut);
 #endif
+
+static BITFIELD(uarts_initialized_mask, UART_NUMOF);
 
 static int parse_dev(char *arg)
 {
@@ -180,6 +183,9 @@ static int _self_test(uart_t dev, unsigned baud)
     uart_collision_detect_disable(dev);
 #endif
 
+    uart_poweroff(UART_DEV(dev));
+
+    test_mode = false;
     return 0;
 
 failure:
@@ -248,6 +254,11 @@ static int cmd_init(int argc, char **argv)
     }
     baud = strtol(argv[2], NULL, 0);
 
+    if (bf_isset(uarts_initialized_mask, dev)) {
+        uart_poweroff(UART_DEV(dev));
+        bf_unset(uarts_initialized_mask, dev);
+    }
+
     /* initialize UART */
     res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)(intptr_t)dev);
     if (res == UART_NOBAUD) {
@@ -259,6 +270,8 @@ static int cmd_init(int argc, char **argv)
         return 1;
     }
     printf("Success: Initialized UART_DEV(%i) at BAUD %"PRIu32"\n", dev, baud);
+
+    bf_set(uarts_initialized_mask, dev);
 
     /* also test if poweron() and poweroff() work (or at least don't break
      * anything) */
@@ -395,6 +408,11 @@ static int cmd_test(int argc, char **argv)
     }
 
     puts("[START]");
+
+    if (bf_isset(uarts_initialized_mask, dev)) {
+        uart_poweroff(UART_DEV(dev));
+        bf_unset(uarts_initialized_mask, dev);
+    }
 
     /* run self test with different baud rates */
     test_mode = true;
