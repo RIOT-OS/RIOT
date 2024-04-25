@@ -742,11 +742,19 @@ static char _get_char(unsigned i)
 static void _write_block(int fd, unsigned bs, unsigned i)
 {
     char block[bs];
-    char *buf = block;
 
-    buf += snprintf(buf, bs, "|%03u|", i);
+    int size_wanted = snprintf(block, bs, "|%03u|", i);
 
-    memset(buf, _get_char(i), &block[bs] - buf);
+    if (size_wanted < 0) {
+        assert(0);
+        return;
+    }
+
+    /* Only memset the buffer, if there is space left in the buffer */
+    if ((unsigned) size_wanted < bs) {
+        memset(&block[size_wanted], _get_char(i), bs - size_wanted);
+    }
+
     block[bs - 1] = '\n';
 
     vfs_write(fd, block, bs);
