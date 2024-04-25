@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2023 Lukas R. Jackson, Vanguard Defense International
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @defgroup     lg_reg Logistic Regression
  * @brief        Definitions for logistic regression functions
@@ -14,9 +22,9 @@
 #include <math.h>
 #include "include/lg_reg.h"
 
-#define LEARNING_RATE_FIXED 100 ///< Learning rate for gradient descent (scaled by a factor)
-#define MAX_ITERATIONS 10000    ///< Maximum number of iterations for gradient descent
-#define EPSILON_FIXED 1         ///< Convergence threshold for gradient descent (scaled by a factor)
+#define LEARNING_RATE_FIXED 100 /* Learning rate for gradient descent (scaled by a factor) */
+#define MAX_ITERATIONS 10000    /* Maximum number of iterations for gradient descent */
+#define EPSILON_FIXED 1         /* Convergence threshold for gradient descent (scaled by a factor) */
 
 /**
  * @brief Sigmoid function.
@@ -26,7 +34,7 @@
  */
 int32_t sigmoid(int32_t z)
 {
-    // Scaling factor: 2^16
+    /* Scaling factor: 2^16 */
     const int32_t scale = 65536;
     return scale / (scale + exp(-z));
 }
@@ -53,7 +61,7 @@ int32_t hypothesis(int32_t x, Parameters params)
  */
 int32_t cost_function(Point *data, int num_points, Parameters params)
 {
-    // Scaling factor: 2^16
+    /* Scaling factor: 2^16 */
     const int32_t scale = 65536;
     int32_t cost = 0;
 
@@ -73,7 +81,7 @@ int32_t cost_function(Point *data, int num_points, Parameters params)
  */
 void gradient_descent(Point *data, int num_points, Parameters *params)
 {
-    // Scaling factor: 2^16
+    /* Scaling factor: 2^16 */
     const int32_t scale = 65536;
     int32_t slope_gradient = 0;
     int32_t intercept_gradient = 0;
@@ -96,15 +104,15 @@ void gradient_descent(Point *data, int num_points, Parameters *params)
  */
 Parameters logistic_regression(Point *data, int num_points)
 {
-    Parameters params = { 0, 0 }; // Initial parameters
+    Parameters params = { 0, 0 }; /* Initial parameters */
     int iterations = 0;
-    int32_t prev_cost = INT32_MAX; // Largest positive value for int32_t
+    int32_t prev_cost = INT32_MAX; /* Largest positive value for int32_t */
 
     while (iterations < MAX_ITERATIONS) {
         gradient_descent(data, num_points, &params);
         int32_t current_cost = cost_function(data, num_points, params);
         if (abs(prev_cost - current_cost) < EPSILON_FIXED) {
-            break; // Convergence criteria met
+            break; /* Convergence criteria met */
         }
         prev_cost = current_cost;
         iterations++;
