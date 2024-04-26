@@ -44,7 +44,11 @@ ifeq ($(findstring aarch,$(OS_ARCH)),aarch)
   WAMR_BUILD_TARGET = ARM
 endif
 else ifeq ($(findstring arm,$(CPU_ARCH)),arm)
-  WAMR_BUILD_TARGET = THUMB
+  ifeq ($(findstring cortexm_fpu,$(FEATURES_PROVIDED)),cortexm_fpu)
+    WAMR_BUILD_TARGET = THUMB_VFP
+  else
+    WAMR_BUILD_TARGET = THUMB
+  endif
 else ifeq ($(CPU_ARCH),xtensa)
   WAMR_BUILD_TARGET = XTENSA
 else ifeq ($(CPU_ARCH),rv32)
