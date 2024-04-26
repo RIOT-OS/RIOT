@@ -34,7 +34,6 @@ typedef struct {
 
 /**
  * @brief Sigmoid function.
- * 
  * @param z Input value (scaled by a factor).
  * @return The sigmoid of the input value (scaled by a factor).
  */
@@ -42,7 +41,6 @@ int32_t sigmoid(int32_t z);
 
 /**
  * @brief Hypothesis function.
- * 
  * @param x Input feature value (scaled by a factor).
  * @param params Parameters of the logistic regression model (scaled by a factor).
  * @return The hypothesis value based on the input feature and model parameters (scaled by a factor).
@@ -51,7 +49,6 @@ int32_t hypothesis(int32_t x, Parameters params);
 
 /**
  * @brief Cost function for logistic regression.
- * 
  * @param data Array of points (feature-value pairs).
  * @param num_points Number of points in the dataset.
  * @param params Parameters of the logistic regression model (scaled by a factor).
@@ -61,7 +58,6 @@ int32_t cost_function(Point *data, int num_points, Parameters params);
 
 /**
  * @brief Update parameters using gradient descent.
- * 
  * @param data Array of points (feature-value pairs).
  * @param num_points Number of points in the dataset.
  * @param params Pointer to the parameters of the logistic regression model to be updated (scaled by a factor).
@@ -70,7 +66,6 @@ void gradient_descent(Point *data, int num_points, Parameters *params);
 
 /**
  * @brief Perform logistic regression on the given data.
- * 
  * @param data Array of points (feature-value pairs).
  * @param num_points Number of points in the dataset.
  * @return Parameters of the logistic regression model (scaled by a factor).
