@@ -162,19 +162,19 @@ msp430_usci_prescaler_t msp430_usci_prescale(uint32_t target_hz)
          * be needed. Otherwise the estimation will be good enough.
          */
         switch (target_hz) {
-        case 9600:
+        case 1200:
             result.mctl = 2U << UCBRS_Pos;
             result.br0 = 27;
             return result;
-        case 4800:
+        case 2400:
             result.mctl = 6U << UCBRS_Pos;
             result.br0 = 13;
             return result;
-        case 2400:
+        case 4800:
             result.mctl = 7U << UCBRS_Pos;
             result.br0 = 6;
             return result;
-        case 1200:
+        case 9600:
             result.mctl = 3U << UCBRS_Pos;
             result.br0 = 3;
             return result;
