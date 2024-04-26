@@ -9,14 +9,13 @@
 #define INCLUDE_MATRIX_H
 
 /**
- * @defgroup    matrix multiplication 
- * @brief       Function declarations for matrix multiplication.
+ * @defgroup  matrix multiplication 
+ * @brief  Function declarations for matrix multiplication.
  * @{
  */
-
 /**
- * @file        matrix.h
- * @author      Lukas R. Jackson <LukasJacksonEG@gmail.com>
+ * @file    matrix.h
+ * @author  Lukas R. Jackson <LukasJacksonEG@gmail.com>
  */
 
 /**
@@ -41,10 +40,8 @@
 
 /**
  * @brief Multiply two matrices.
- *
  * This function multiplies two matrices A and B and stores the result in the
  * provided result matrix.
- *
  * @param A The first matrix of size ROWS_A x COLS_A.
  * @param B The second matrix of size ROWS_B x COLS_B.
  * @param result The result matrix of size ROWS_A x COLS_B.
@@ -53,9 +50,7 @@ void matrix_multiply(int A[ROWS_A][COLS_A], int B[ROWS_B][COLS_B], int result[RO
 
 /**
  * @brief Print a matrix.
- *
  * This function prints the elements of the provided matrix to the standard output.
- *
  * @param rows The number of rows in the matrix.
  * @param cols The number of columns in the matrix.
  * @param matrix The matrix to be printed.
