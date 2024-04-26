@@ -18,7 +18,6 @@ ifeq (0,$(LWIP))
   USEMODULE += gnrc_ipv6_default
 else
   USEMODULE += lwip_ipv6
-  USEMODULE += lwip_netdev
 endif
 
 # Add also the shell, some shell commands

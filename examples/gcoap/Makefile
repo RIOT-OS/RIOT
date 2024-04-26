@@ -24,8 +24,6 @@ ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
   # Additional networking modules that can be dropped if not needed
   USEMODULE += gnrc_icmpv6_echo
 else
-  USEMODULE += lwip_netdev
-
   ifeq (1,$(LWIP_IPV4))
     USEMODULE += ipv4_addr
 

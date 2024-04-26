@@ -24,7 +24,6 @@ ifeq (0,$(LWIP))
   USEMODULE += gnrc_icmpv6_echo
 else
   USEMODULE += lwip_ipv6
-  USEMODULE += lwip_netdev
 endif
 
 USEMODULE += netutils
