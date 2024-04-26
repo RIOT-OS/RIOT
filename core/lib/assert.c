@@ -19,6 +19,7 @@
 #include "architecture.h"
 #include "cpu.h"
 #include "debug.h"
+#include "irq.h"
 #include "panic.h"
 #if IS_USED(MODULE_BACKTRACE)
 #include "backtrace.h"
@@ -35,6 +36,12 @@ __NORETURN static inline void _assert_common(void)
 #ifdef DEBUG_ASSERT_BREAKPOINT
     DEBUG_BREAKPOINT(1);
 #endif
+    if (DEBUG_ASSERT_NO_PANIC && !irq_is_in() && irq_is_enabled()) {
+        puts("FAILED ASSERTION.");
+        while (1) {
+            thread_sleep();
+        }
+    }
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 

@@ -157,6 +157,15 @@ __NORETURN void _assert_panic(void);
 #endif
 #endif
 
+/**
+ * @brief   Don't panic on a failed assertion, just halt the running thread.
+ *
+ * If the assertion failed in an interrupt, the system will still panic.
+ */
+#ifndef DEBUG_ASSERT_NO_PANIC
+#define DEBUG_ASSERT_NO_PANIC (1)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
