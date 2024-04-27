@@ -27,8 +27,8 @@ static void tests_read_beyond_buf(void)
 {
     uint8_t source[5] = {0, };
     read_10(&source[0]);
-
 }
+
 Test *tests_asan_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
