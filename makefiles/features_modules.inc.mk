@@ -78,6 +78,10 @@ ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtc_utils
 endif
 
+# select cortexm_stack_limit pseudomodule if the corresponding
+# feature is used
+USEMODULE += $(filter cortexm_stack_limit, $(FEATURES_USED))
+
 # select cortexm_svc pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
 

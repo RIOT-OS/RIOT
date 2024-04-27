@@ -99,6 +99,11 @@ void reset_handler_default(void)
     uint32_t *dst;
     const uint32_t *src = &_etext;
 
+#ifdef __ARM_ARCH_8M_MAIN__
+    /* Set the lower limit of the exception stack into MSPLIM register */
+    __set_MSPLIM((uint32_t)&_sstack);
+#endif
+
     cortexm_init_fpu();
 
 #ifdef MODULE_PUF_SRAM
