@@ -12,11 +12,9 @@ use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_alloc::Heap;
 use embedded_hal::delay::DelayNs as _;
-use log::{debug, info, error, LevelFilter, warn};
+use log::{debug, info, error, LevelFilter, warn, Log, Level, Record, SetLoggerError};
 
 mod dev_att;
-#[allow(unused)]
-mod persist;
 mod utils;
 
 use dev_att::HardCodedDevAtt;
@@ -24,7 +22,9 @@ use utils::initialize_network;
 
 // RIOT OS modules
 extern crate rust_riotmodules;
-use riot_wrappers::{riot_main, static_command};
+extern crate alloc;
+
+use riot_wrappers::{println, riot_main, static_command};
 use riot_wrappers::ztimer;
 use riot_wrappers::thread;
 use riot_wrappers::mutex::Mutex;
@@ -33,7 +33,7 @@ use riot_wrappers::shell::{self, CommandList};
 use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
 
 // the new 'matter' module in riot-wrappers, enabled by 'with_matter' feature
-use riot_wrappers::matter::{init_logger, MatterCompatUdpSocket};
+use riot_wrappers::matter::{VfsDataFetcher, CommissioningDataFetcher, PersistenceManager, MatterCompatUdpSocket};
 
 use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::transport::network::UdpBuffers;
@@ -48,12 +48,34 @@ use rs_matter::data_model::{
     system_model::descriptor,
 };
 use rs_matter::data_model::cluster_on_off::{Commands, OnOffCluster};
+use rs_matter::data_model::sdm::dev_att::{DataType, DevAttDataFetcher};
 use rs_matter::error::Error;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::MDNS_SOCKET_BIND_ADDR;
 use rs_matter::secure_channel::spake2p::VerifierData;
 use rs_matter::tlv::TLVElement;
 use rs_matter::transport::exchange::Exchange;
+
+struct RiotLogger;
+static LOGGER: RiotLogger = RiotLogger;
+impl Log for RiotLogger {
+    fn enabled(&self, metadata: &log::Metadata) -> bool {
+        metadata.level() >= Level::Info
+    }
+
+    fn log(&self, record: &Record) {
+        if self.enabled(record.metadata()) {
+            println!("[{}] {}", record.level(), record.args());
+        }
+    }
+
+    fn flush(&self) {}
+}
+
+pub fn init_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
+    log::set_logger(&LOGGER)
+        .map(|_| log::set_max_level(level))
+}
 
 // Node object with endpoints supporting device type 'On/Off Light'
 const NODE: Node<'static> = Node {
@@ -153,6 +175,9 @@ static MDNS: StaticCell<MdnsService> = StaticCell::new();
 static DEV_ATT: StaticCell<HardCodedDevAtt> = StaticCell::new();
 static MATTER: StaticCell<Matter> = StaticCell::new();
 
+// TODO: Instantiate `VfsDataFetcher` if fully implemented in riot-wrappers
+// static FW_DATA: VfsDataFetcher = VfsDataFetcher;
+
 // Set this to the name of the LED, which should be controlled using SAUL registry
 const ONOFF_LED_NAME: &str = "LD2(blue)";
 
@@ -204,12 +229,11 @@ fn run_matter() -> Result<(), ()> {
         MATTER_PORT,
     ));
 
-    // Get Device attestation (hard-coded atm)
+    // Get Device attestation (hard-coded atm) - TODO: Use VfsDataFetcher if implemented in riot-wrappers
     let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
 
-    // TODO: Provide own epoch and rand functions
     let epoch = utils::sys_epoch;
-    let rand = utils::sys_rand;
+    let rand = riot_wrappers::matter::sys_rand;
 
     let matter: &'static Matter = MATTER.init(Matter::new(
         // vid/pid should match those in the DAC
@@ -247,6 +271,8 @@ fn main() {
     clock.delay_ms(1000);
 
     info!("Hello Matter on RIOT!");
+
+    let _ = utils::init_vfs();
 
     use core::mem::size_of;
     info!("Matter memory usage: UdpBuffers={}, PacketBuffers={}, \
@@ -337,6 +363,9 @@ async fn matter_task(matter: &'static Matter<'_>) {
     let mut matter_udp_buffers = UdpBuffers::new();
     let mut matter_packet_buffers = PacketBuffers::new();
 
+    // TODO: Read commissioning data from VFS if implemented in riot-wrappers
+    //let (discriminator, passcode) = FW_DATA.read_commissioning_data().expect("error while reading commissioning data");
+
     // Finally create the Matter service and run on port 5540/UDP
     let matter_runner = pin!(matter.run(
         &socket,
@@ -366,8 +395,9 @@ async fn matter_task(matter: &'static Matter<'_>) {
 #[embassy_executor::task]
 async fn psm_task(matter: &'static Matter<'_>) {
     info!("Starting Persistence Manager....");
-    // TODO: Develop own 'Persistence Manager' using RIOT OS modules
-    let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
+    // TODO: 'PersistenceManager' is not implemented yet in riot-wrappers
+    let mut psm = PersistenceManager::new(&matter)
+        .expect("Error creating PSM");
     let psm_runner = pin!(psm.run());
     match psm_runner.await {
         Ok(_) => {

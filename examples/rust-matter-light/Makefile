@@ -50,6 +50,8 @@ USEMODULE += ps
 USEMODULE += random
 USEMODULE += periph_hwrng
 USEMODULE += prng_sha256prng
+USEMODULE += vfs_default
+USEMODULE += constfs
 
 # networking
 USEMODULE += netdev_default

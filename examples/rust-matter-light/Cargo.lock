@@ -1155,9 +1155,9 @@ checksum = "b4ce301924b7887e9d637144fdade93f9dfff9b60981d4ac161db09720d39aa5"
 
 [[package]]
 name = "lock_api"
-version = "0.4.11"
+version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c168f8615b12bc01f9c17e2eb0cc07dcae1940121185446edc3744920e8ef45"
+checksum = "07af8b9cdd281b7915f413fa73f29ebd5d55d0d3f0155584dade1ff18cea1b17"
 dependencies = [
  "autocfg",
  "scopeguard",
@@ -1616,7 +1616,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.8.3"
-source = "git+https://github.com/maikerlab/rust-riot-wrappers.git?branch=with_matter#093983d50e9f76be8e810d2f9820761498d00e8e"
+source = "git+https://github.com/maikerlab/rust-riot-wrappers?branch=with_matter#fe1aa078ba72709330e2486c80f54f2b6e9ad19d"
 dependencies = [
  "bare-metal",
  "coap-handler 0.1.6",
@@ -1639,9 +1639,9 @@ dependencies = [
  "embedded-nal-async 0.7.1",
  "heapless 0.7.17",
  "hex",
- "log",
  "mutex-trait",
  "nb 0.1.3",
+ "no-std-net",
  "num-traits",
  "pin-project",
  "pin-utils",
@@ -1785,7 +1785,7 @@ dependencies = [
  "log",
  "rand_core",
  "riot-sys",
- "riot-wrappers 0.8.3 (git+https://github.com/maikerlab/rust-riot-wrappers.git?branch=with_matter)",
+ "riot-wrappers 0.8.3 (git+https://github.com/maikerlab/rust-riot-wrappers?branch=with_matter)",
  "rs-matter",
  "rust_riotmodules",
  "static_cell",
@@ -1874,9 +1874,9 @@ checksum = "92d43fe69e652f3df9bdc2b85b2854a0825b86e4fb76bc44d945137d053639ca"
 
 [[package]]
 name = "serde"
-version = "1.0.198"
+version = "1.0.199"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9846a40c979031340571da2545a4e5b7c4163bdae79b301d5f86d03979451fcc"
+checksum = "0c9f6e76df036c77cd94996771fb40db98187f096dd0b9af39c6c6e452ba966a"
 dependencies = [
  "serde_derive",
 ]
@@ -1893,9 +1893,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.198"
+version = "1.0.199"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e88edab869b01783ba905e7d0153f9fc1a6505a96e4ad3018011eedb838566d9"
+checksum = "11bd257a6541e141e42ca6d24ae26f7714887b47e89aa739099104c7e4d3b7fc"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1994,9 +1994,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "static_cell"
-version = "2.0.0"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa6ba4cf83bf80d3eb25f098ea5e790a0a1fcb5e357442259b231e412c2d3ca0"
+checksum = "d89b0684884a883431282db1e4343f34afc2ff6996fe1f4a1664519b66e14c1e"
 dependencies = [
  "portable-atomic",
 ]
@@ -2283,9 +2283,9 @@ checksum = "d4c87d22b6e3f4a18d4d40ef354e97c90fcb14dd91d7dc0aa9d8a1172ebf7202"
 
 [[package]]
 name = "unicode-width"
-version = "0.1.11"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e51733f11c9c4f72aa0c160008246859e340b00807569a0da0e7a1079b27ba85"
+checksum = "68f5e5f3158ecfd4b8ff6fe086db7c8467a2dfdac97fe420f2b7c4aa97af66d6"
 
 [[package]]
 name = "utf8parse"
