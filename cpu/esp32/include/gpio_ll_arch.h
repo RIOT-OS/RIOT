@@ -32,12 +32,19 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
-#define GPIO_PORT(num)          (num)
-#if GPIO_PORT_NUMOF > 1
-#  define GPIO_PORT_NUM(port)   (port)
-#else
-#  define GPIO_PORT_NUM(port)   0
-#endif
+static inline gpio_port_t gpio_port(uword_t num)
+{
+    return num;
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+    if (GPIO_PORT_NUMOF == 1) {
+        return 0;
+    }
+
+    return port;
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -45,7 +52,7 @@ static inline uword_t gpio_ll_read(gpio_port_t port)
     volatile uword_t *in = (uint32_t *)GPIO_IN_REG;
     /* return 0 for unconfigured pins, the current level at the pin otherwise */
 #if GPIO_PORT_NUM > 1
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
         in = (uint32_t *)GPIO_IN1_REG;
     }
 #endif
@@ -58,7 +65,7 @@ static inline uword_t gpio_ll_read_output(gpio_port_t port)
     static_assert(GPIO_PORT_NUMOF < 3);
     volatile uword_t *out = (uint32_t *)GPIO_OUT_REG;
 #if GPIO_PORT_NUM > 1
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
         out = (uint32_t *)GPIO_OUT1_REG;
     }
 #endif
@@ -70,7 +77,7 @@ static inline void gpio_ll_set(gpio_port_t port, uword_t mask)
 {
     static_assert(GPIO_PORT_NUMOF < 3);
     volatile uword_t *out_w1ts = (uint32_t *)GPIO_OUT_W1TS_REG;
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
 #if GPIO_PORT_NUM > 1
         out_w1ts = (uint32_t)GPIO_OUT1_W1TS;
 #endif
@@ -83,7 +90,7 @@ static inline void gpio_ll_clear(gpio_port_t port, uword_t mask)
 {
     static_assert(GPIO_PORT_NUMOF < 3);
     volatile uword_t *out_w1tc = (uint32_t *)GPIO_OUT_W1TC_REG;
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
 #if GPIO_PORT_NUM > 1
         out_w1tc = (uint32_t)GPIO_OUT1_W1TC;
 #endif
@@ -97,7 +104,7 @@ static inline void gpio_ll_toggle(gpio_port_t port, uword_t mask)
     static_assert(GPIO_PORT_NUMOF < 3);
     volatile uword_t *out = (uint32_t *)GPIO_OUT_REG;
 #if GPIO_PORT_NUM > 1
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
         out = (uint32_t *)GPIO_OUT1_REG;
     }
 #endif
@@ -111,7 +118,7 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
     static_assert(GPIO_PORT_NUMOF < 3);
     volatile uword_t *out = (uint32_t *)GPIO_OUT_REG;
 #if GPIO_PORT_NUM > 1
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
         out = (uint32_t *)GPIO_OUT1_REG;
     }
 #endif
@@ -120,7 +127,7 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
-    return GPIO_PORT(pin >> 5);
+    return gpio_port(pin >> 5);
 }
 
 static inline uint8_t gpio_get_pin_num(gpio_t pin)

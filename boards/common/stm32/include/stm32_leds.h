@@ -23,7 +23,8 @@
 #ifndef STM32_LEDS_H
 #define STM32_LEDS_H
 
-/* GPIO_PORT() macro. This define even works when GPIO LL is not in used */
+/* Using gpio_ll_arch for the gpio_port() function. This even works when
+ * GPIO LL is not in used */
 #include "gpio_ll_arch.h"
 #include "kernel_defines.h"
 
@@ -36,7 +37,7 @@ extern "C" {
  * @{
  */
 #if defined(LED0_PORT_NUM) && defined (LED0_PIN_NUM)
-#  define LED0_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED0_PORT_NUM))
+#  define LED0_PORT           ((GPIO_TypeDef *)gpio_port(LED0_PORT_NUM))
 #  define LED0_PIN            GPIO_PIN(LED0_PORT_NUM, LED0_PIN_NUM)
 #  define LED0_MASK           (1 << LED0_PIN_NUM)
 #  if IS_ACTIVE(LED0_IS_INVERTED)
@@ -50,7 +51,7 @@ extern "C" {
 #endif
 
 #if defined(LED1_PORT_NUM) && defined (LED1_PIN_NUM)
-#  define LED1_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED1_PORT_NUM))
+#  define LED1_PORT           ((GPIO_TypeDef *)gpio_port(LED1_PORT_NUM))
 #  define LED1_PIN            GPIO_PIN(LED1_PORT_NUM, LED1_PIN_NUM)
 #  define LED1_MASK           (1 << LED1_PIN_NUM)
 #  if IS_ACTIVE(LED1_IS_INVERTED)
@@ -64,7 +65,7 @@ extern "C" {
 #endif
 
 #if defined(LED2_PORT_NUM) && defined (LED2_PIN_NUM)
-#  define LED2_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED2_PORT_NUM))
+#  define LED2_PORT           ((GPIO_TypeDef *)gpio_port(LED2_PORT_NUM))
 #  define LED2_PIN            GPIO_PIN(LED2_PORT_NUM, LED2_PIN_NUM)
 #  define LED2_MASK           (1 << LED2_PIN_NUM)
 #  if IS_ACTIVE(LED2_IS_INVERTED)
@@ -78,7 +79,7 @@ extern "C" {
 #endif
 
 #if defined(LED3_PORT_NUM) && defined (LED3_PIN_NUM)
-#  define LED3_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED3_PORT_NUM))
+#  define LED3_PORT           ((GPIO_TypeDef *)gpio_port(LED3_PORT_NUM))
 #  define LED3_PIN            GPIO_PIN(LED3_PORT_NUM, LED3_PIN_NUM)
 #  define LED3_MASK           (1 << LED3_PIN_NUM)
 #  if IS_ACTIVE(LED3_IS_INVERTED)
@@ -92,7 +93,7 @@ extern "C" {
 #endif
 
 #if defined(LED4_PORT_NUM) && defined (LED4_PIN_NUM)
-#  define LED4_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED4_PORT_NUM))
+#  define LED4_PORT           ((GPIO_TypeDef *)gpio_port(LED4_PORT_NUM))
 #  define LED4_PIN            GPIO_PIN(LED4_PORT_NUM, LED4_PIN_NUM)
 #  define LED4_MASK           (1 << LED4_PIN_NUM)
 #  if IS_ACTIVE(LED4_IS_INVERTED)
@@ -106,7 +107,7 @@ extern "C" {
 #endif
 
 #if defined(LED5_PORT_NUM) && defined (LED5_PIN_NUM)
-#  define LED5_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED5_PORT_NUM))
+#  define LED5_PORT           ((GPIO_TypeDef *)gpio_port(LED5_PORT_NUM))
 #  define LED5_PIN            GPIO_PIN(LED5_PORT_NUM, LED5_PIN_NUM)
 #  define LED5_MASK           (1 << LED5_PIN_NUM)
 #  if IS_ACTIVE(LED5_IS_INVERTED)
@@ -120,7 +121,7 @@ extern "C" {
 #endif
 
 #if defined(LED6_PORT_NUM) && defined (LED6_PIN_NUM)
-#  define LED6_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED6_PORT_NUM))
+#  define LED6_PORT           ((GPIO_TypeDef *)gpio_port(LED6_PORT_NUM))
 #  define LED6_PIN            GPIO_PIN(LED6_PORT_NUM, LED6_PIN_NUM)
 #  define LED6_MASK           (1 << LED6_PIN_NUM)
 #  if IS_ACTIVE(LED6_IS_INVERTED)
@@ -134,7 +135,7 @@ extern "C" {
 #endif
 
 #if defined(LED7_PORT_NUM) && defined (LED7_PIN_NUM)
-#  define LED7_PORT           ((GPIO_TypeDef *)GPIO_PORT(LED7_PORT_NUM))
+#  define LED7_PORT           ((GPIO_TypeDef *)gpio_port(LED7_PORT_NUM))
 #  define LED7_PIN            GPIO_PIN(LED7_PORT_NUM, LED7_PIN_NUM)
 #  define LED7_MASK           (1 << LED7_PIN_NUM)
 #  if IS_ACTIVE(LED7_IS_INVERTED)

@@ -23,7 +23,6 @@
 #define GPIO_LL_ARCH_H
 
 #include "architecture.h"
-#include "periph/gpio_ll.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -48,6 +47,36 @@ extern "C" {
 #  define GPIO_IOBUS_BASE GPIO_APB_BASE /* no IOBUS present, fall back to APB */
 #endif
 
+#define GPIO_PORT_NUMBERING_ALPHABETIC  1
+
+#if PORT_GROUPS >= 1
+#  define GPIO_PORT_0   ((uintptr_t)&GPIO_IOBUS_BASE->Group[0])
+#endif
+#if PORT_GROUPS >= 2
+#  define GPIO_PORT_1   ((uintptr_t)&GPIO_IOBUS_BASE->Group[1])
+#endif
+#if PORT_GROUPS >= 3
+#  define GPIO_PORT_2   ((uintptr_t)&GPIO_IOBUS_BASE->Group[2])
+#endif
+#if PORT_GROUPS >= 4
+#  define GPIO_PORT_3   ((uintptr_t)&GPIO_IOBUS_BASE->Group[3])
+#endif
+#if PORT_GROUPS >= 5
+#  define GPIO_PORT_4   ((uintptr_t)&GPIO_IOBUS_BASE->Group[4])
+#endif
+#if PORT_GROUPS >= 5
+#  define GPIO_PORT_4   ((uintptr_t)&GPIO_IOBUS_BASE->Group[4])
+#endif
+#if PORT_GROUPS >= 6
+#  define GPIO_PORT_5   ((uintptr_t)&GPIO_IOBUS_BASE->Group[5])
+#endif
+#if PORT_GROUPS >= 7
+#  define GPIO_PORT_6   ((uintptr_t)&GPIO_IOBUS_BASE->Group[6])
+#endif
+#if PORT_GROUPS >= 8
+#  define GPIO_PORT_7   ((uintptr_t)&GPIO_IOBUS_BASE->Group[7])
+#endif
+
 /**
  * @brief   Get a GPIO port by number
  */
@@ -58,6 +87,16 @@ extern "C" {
  */
 #define GPIO_PORT_NUM(port) \
     (((port) - (uintptr_t)&GPIO_IOBUS_BASE->Group[0]) / sizeof(GPIO_IOBUS_BASE->Group[0]))
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+    return (uintptr_t)&GPIO_IOBUS_BASE->Group[num];
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+    return (port - (uintptr_t)&GPIO_IOBUS_BASE->Group[0]) / sizeof(GPIO_IOBUS_BASE->Group[0]);
+}
 
 static inline PortGroup *sam0_gpio_iobus2ap(PortGroup *iobus)
 {
