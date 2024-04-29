@@ -49,6 +49,9 @@ const long IC_ENABLE = 0x6c;
 const long IC_CON = 0x00;
 const long IC_TAR = 0x04;
 
+//used in transfers to store incoming/outgoing bytes
+uint8_t txbuffer[256];
+
 
 
 typedef struct {
@@ -101,159 +104,6 @@ static inline bool check_received_ack(i2c_t dev){
     return received_ack;
 }
 
-/**
- * @brief transmits len bytes across the i2c pins selected in i2c_config[dev]
-*/
-int i2c_transmit(const void* data, i2c_t dev, uint16_t addr, uint8_t len){
-
-    //fill data buffer with data
-    uint8_t txbuffer[256];
-    memcpy(txbuffer, data, len);
-
-    //if write
-    if(_i2c_bus[dev].cmd == 0){
-
-        //start condition
-        gpio_write(I2C_SDA_PIN, 1);
-        i2c_delay(I2C_DELAY);
-        gpio_write(I2C_SCL_PIN, 0);
-        i2c_delay(I2C_DELAY);
-
-        //transmit slave address
-        for(int i = 6; i >= 0; i--){
-            gpio_write(I2C_SDA_PIN, (addr >> i) & 1);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SCL_PIN, 1);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SCL_PIN, 0);
-        }
-
-        //set write bit
-        gpio_write(I2C_SDA_PIN, 0);
-        i2c_delay(I2C_DELAY);
-        gpio_write(I2C_SCL_PIN, 1);
-        i2c_delay(I2C_DELAY);
-
-        //check that ACK is received from slave
-        //first reinitialise SDA as input
-        
-
-        bool received_ack = check_received_ack(dev);
-
-        if(!received_ack){
-            return -EIO;
-        }
-
-        //transmit each byte
-        for(int i = 0; i < len; i++){
-            for(int j = 7; j >= 0; j--){
-                gpio_write(I2C_SDA_PIN, (txbuffer[i] >> j) & 1);
-                i2c_delay(I2C_DELAY);
-                gpio_write(I2C_SCL_PIN, 1);
-                i2c_delay(I2C_DELAY);
-                gpio_write(I2C_SCL_PIN, 0);
-            }
-
-            //send LSB with set write bit
-            gpio_write(I2C_SDA_PIN, 0);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SCL_PIN, 1);
-            i2c_delay(I2C_DELAY);
-
-            //check to ensure ack received for each byte
-            received_ack = check_received_ack(dev);
-            if(!received_ack){
-                return -EIO;
-            }
-        }
-
-        //stop condition
-        gpio_write(I2C_SDA_PIN, 1);
-        i2c_delay(I2C_DELAY);
-        gpio_write(I2C_SCL_PIN, 1);
-        i2c_delay(I2C_DELAY);
-        gpio_write(I2C_SDA_PIN, 0);
-        i2c_delay(I2C_DELAY); //not necessary but improves signal integrity
-        gpio_write(I2C_SCL_PIN, 0);
-
-        //copy txbuffer into data
-
-
-        return 0;
-    }
-    else if(_i2c_bus[dev].cmd == 1){ //if read
-
-        //start condition
-        gpio_write(I2C_SDA_PIN, 1);
-        i2c_delay(I2C_DELAY);
-        gpio_write(I2C_SCL_PIN, 0);
-        i2c_delay(I2C_DELAY);
-
-        //transmit slave address
-        for(int i = 6; i >= 0; i--){
-            gpio_write(I2C_SDA_PIN, (addr >> i) & 1);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SCL_PIN, 1);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SCL_PIN, 0);
-        }
-
-        //put read bit
-        gpio_write(I2C_SDA_PIN, 1);
-        i2c_delay(I2C_DELAY);
-        gpio_write(I2C_SCL_PIN, 1);
-        i2c_delay(I2C_DELAY);
-
-        //read in each byte
-        for(int i = 0; i < len; i++){
-
-            //initialise byte
-            txbuffer[i] = 0;
-
-            //reinitialise SDA as input for reads
-            gpio_init(I2C_SDA_PIN, GPIO_IN);
-            i2c_delay(I2C_DELAY);
-
-            //read in each bit
-            for(int j = 7; j >= 0; j--){                
-                gpio_write(I2C_SCL_PIN, 1);
-                i2c_delay(I2C_DELAY);
-                txbuffer[i] |= gpio_read(I2C_SDA_PIN) << j;
-                gpio_write(I2C_SCL_PIN, 0);
-                i2c_delay(I2C_DELAY);
-            }
-
-            //reinitalise SDA as output
-            gpio_init(I2C_SDA_PIN, GPIO_OUT);
-            i2c_delay(I2C_DELAY);
-
-            //send ACK except on last byte
-            if(i == len - 1){
-                gpio_write(I2C_SDA_PIN, 1); //sending NACK
-                i2c_delay(I2C_DELAY);
-                gpio_write(I2C_SCL_PIN, 1);
-                i2c_delay(I2C_DELAY);
-                gpio_write(I2C_SCL_PIN, 0);
-            }
-
-            //stop condition
-            gpio_write(I2C_SDA_PIN, 1);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SCL_PIN, 1);
-            i2c_delay(I2C_DELAY);
-            gpio_write(I2C_SDA_PIN, 0);
-            i2c_delay(I2C_DELAY); //not necessary but improves signal integrity
-            gpio_write(I2C_SCL_PIN, 0);
-        }
-        
-        return 0;
-    }
-    else{
-        return -EINVAL;
-    }
-    return 0;
-}
-
 void i2c_init(i2c_t dev)
 {
     // does pico have max i2c dev conns?
@@ -301,17 +151,10 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
     assert(len > 0);
     assert(data != NULL);
 
-    //reset TX/RX FIFO Q ?
-
-
-    //set START cond
-
-    //read bytes off FIFO
-
-    //
-
-    //copy paste guff test
-    //int res;
+    //reset TX/RX FIFO Q
+    for(int i = 0; i < 256; i++){
+        txbuffer[i] = 0;
+    }
 
     _i2c_bus[dev].cmd_op = 0; //I2C_LL_CMD_READ;
     _i2c_bus[dev].cmd = 0;
@@ -347,22 +190,88 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
                in this case 1 to bit 8 to indicate read */
             *(memaddr + IC_DATA_CMD) = *(memaddr + IC_DATA_CMD) & 0x1FFFFF; //consider bit 9,10,11
 
-            
-
-            /*not mine below lol
-            / prepare 10 bit address bytes /
-            uint8_t addr10[2];
-            addr10[0] = 0xf0 | (addr & 0x0300) >> 7 | I2C_MASTER_READ;
-            addr10[1] = addr & 0xff;
-            / send ADDR with read flag /
-            _i2c_write_cmd(dev, addr10, 2);
-            */
         }
-        else {
-            /* send ADDR with read flag */
-            uint8_t addr7 = (addr << 1 | I2C_READ);
-            addr7++;
-            //_i2c_write_cmd(dev, &addr7, 1);
+        else { //if 7bit addressing
+
+            //init pins
+            gpio_init(I2C_SDA_PIN, GPIO_OUT);
+            gpio_init(I2C_SCL_PIN, GPIO_OUT);            
+
+            //start condition
+            gpio_write(I2C_SDA_PIN, 1);
+            i2c_delay(I2C_DELAY);
+            gpio_write(I2C_SCL_PIN, 0);
+            i2c_delay(I2C_DELAY);
+
+            //transmit slave address
+            for(int i = 6; i >= 0; i--){
+                gpio_write(I2C_SDA_PIN, (addr >> i) & 1);
+                i2c_delay(I2C_DELAY);
+                gpio_write(I2C_SCL_PIN, 1);
+                i2c_delay(I2C_DELAY);
+                gpio_write(I2C_SCL_PIN, 0);
+            }
+
+            //put read bit
+            gpio_write(I2C_SDA_PIN, 1);
+            i2c_delay(I2C_DELAY);
+            gpio_write(I2C_SCL_PIN, 1);
+            i2c_delay(I2C_DELAY);
+
+            //read in each byte
+            for(size_t i = 0; i < len; i++){
+
+                //initialise byte
+                txbuffer[i] = 0;
+
+                //reinitialise SDA as input for reads
+                gpio_init(I2C_SDA_PIN, GPIO_IN);
+                i2c_delay(I2C_DELAY);
+
+                //read in each bit
+                for(int j = 7; j >= 0; j--){                
+                    gpio_write(I2C_SCL_PIN, 1);
+                    i2c_delay(I2C_DELAY);
+                    txbuffer[i] |= gpio_read(I2C_SDA_PIN) << j;
+                    gpio_write(I2C_SCL_PIN, 0);
+                    i2c_delay(I2C_DELAY);
+                }
+
+                //reinitalise SDA as output
+                gpio_init(I2C_SDA_PIN, GPIO_OUT);
+                i2c_delay(I2C_DELAY);
+
+                //send ACK except on last byte
+                if(i == len - 1){
+                    gpio_write(I2C_SDA_PIN, 1); //sending NACK
+                    i2c_delay(I2C_DELAY);
+                    gpio_write(I2C_SCL_PIN, 1);
+                    i2c_delay(I2C_DELAY);
+                    gpio_write(I2C_SCL_PIN, 0);
+                }
+
+                //stop condition - set IC_DATA_CMD[9] to 1
+                uint32_t* memaddr = (uint32_t *) I2C_BASE;
+                *(memaddr+IC_DATA_CMD) |= 1 << IC_DATA_CMD_STOP;
+
+                if (!(flags & I2C_NOSTOP)) {
+                    //gpio stop condition ... not needed?
+                    gpio_write(I2C_SDA_PIN, 1);
+                    i2c_delay(I2C_DELAY);
+                    gpio_write(I2C_SCL_PIN, 1);
+                    i2c_delay(I2C_DELAY);
+                    gpio_write(I2C_SDA_PIN, 0);
+                    i2c_delay(I2C_DELAY); //not necessary but improves signal integrity
+                    gpio_write(I2C_SCL_PIN, 0);
+                }
+
+                //copy txbuffer back into data
+                memcpy(data, txbuffer, len);
+
+                return 0;
+            }
+            
+            return 0;
         }
     }
 
@@ -452,16 +361,6 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     dataAddr2[0] = 0xFF;
 
 
-    //
-    //throwaway code
-    uint16_t address = addr;
-    address += 1;
-    uint16_t regist = reg;
-    regist++;
-    size_t length = len;
-    length++;
-    uint8_t flagss = flags;
-    flagss++;
     return 0;
 
 }
@@ -477,7 +376,7 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     
     //write reg address first
     _i2c_bus[dev].cmd = 0;
-    i2c_transmit(reg, dev, addr, sizeof(reg));
+    i2c_write_bytes(dev, addr, &reg, sizeof(reg), 0);
 
     //repeated start to indicate shift to read
     gpio_write(I2C_SDA_PIN, 1);
@@ -490,9 +389,9 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 
     //read reg data
     _i2c_bus[dev].cmd = 1;
-    uint8_t ret_data = i2c_read_bytes(data, dev, addr, sizeof(reg), flags);
+    int status = i2c_read_bytes(dev, addr, data, sizeof(reg), flags);
 
-    return 0;
+    return status;
 }
 
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
@@ -505,6 +404,11 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
         return -EOPNOTSUPP;
     }
 
+    //reset TX/RX FIFO Q
+    for(int i = 0; i < 256; i++){
+        txbuffer[i] = 0;
+    }
+
     DEBUG("i2c write %d bytes", len);
 
     //prepare i2c bus
@@ -513,10 +417,85 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
     _i2c_bus[dev].cmd = 0; // send write cmd ?
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
 
-    //transmit bytes, return value from transmit
-    int status = i2c_transmit(data, dev, addr, len);
 
-    return status;
+    //transmit byte sequence
+    //clear txbuffer and set to data
+    for(int i = 0; i < 256; i++){
+        txbuffer[i] = 0;
+    }
+    memcpy(txbuffer, data, len);
+
+    //init pins
+    gpio_init(I2C_SDA_PIN, GPIO_OUT);
+    gpio_init(I2C_SCL_PIN, GPIO_OUT);     
+
+    //start condition
+    gpio_write(I2C_SDA_PIN, 1);
+    i2c_delay(I2C_DELAY);
+    gpio_write(I2C_SCL_PIN, 0);
+    i2c_delay(I2C_DELAY);
+
+    //transmit slave address
+    for(int i = 6; i >= 0; i--){
+        gpio_write(I2C_SDA_PIN, (addr >> i) & 1);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SCL_PIN, 1);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SCL_PIN, 0);
+    }
+
+    //set write bit
+    gpio_write(I2C_SDA_PIN, 0);
+    i2c_delay(I2C_DELAY);
+    gpio_write(I2C_SCL_PIN, 1);
+    i2c_delay(I2C_DELAY);
+
+    //check that ACK is received from slave
+    //first reinitialise SDA as input
+    bool received_ack = check_received_ack(dev);
+
+    if(!received_ack){
+        return -EIO;
+    }
+
+    //transmit each byte
+    for(size_t i = 0; i < len; i++){
+        for(int j = 7; j >= 0; j--){
+            gpio_write(I2C_SDA_PIN, (txbuffer[i] >> j) & 1);
+            i2c_delay(I2C_DELAY);
+            gpio_write(I2C_SCL_PIN, 1);
+            i2c_delay(I2C_DELAY);
+            gpio_write(I2C_SCL_PIN, 0);
+        }
+
+        //send LSB with set write bit
+        gpio_write(I2C_SDA_PIN, 0);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SCL_PIN, 1);
+        i2c_delay(I2C_DELAY);
+
+        //check to ensure ack received for each byte
+        received_ack = check_received_ack(dev);
+        if(!received_ack){
+            return -EIO;
+        }
+    }
+
+    //stop condition
+    if (!(flags & I2C_NOSTOP)) {
+        gpio_write(I2C_SDA_PIN, 1);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SCL_PIN, 1);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SDA_PIN, 0);
+        i2c_delay(I2C_DELAY); //not necessary but improves signal integrity
+        gpio_write(I2C_SCL_PIN, 0);
+    }
+
+    //copy txbuffer into data
+
+
+    return 0;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -543,10 +522,10 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 
     //copy data into txbuffer after the reg
     memcpy(&tx_buffer[reg_len], data, len);
-    int retval = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
+    int retstatus = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
 
 
-    return retval;
+    return retstatus;
 }
 
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -572,8 +551,8 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     }
 
     tx_buffer[reg_len] = data;
-    int retval = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
+    int retstatus = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
 
 
-    return retval;
+    return retstatus;
 }

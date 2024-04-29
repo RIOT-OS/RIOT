@@ -18,6 +18,8 @@ int useTestDevice(void);
 
 int main(void)
 {
+    //DEBUG("debug message");
+    printf("print message");
     /*if(0){
         return useTestDevice();
     }*/

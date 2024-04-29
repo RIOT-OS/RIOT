@@ -129,8 +129,8 @@ static const i2c_conf_t i2c_config[] = {
     {
         .dev      = (uint64_t *) I2C0_BASE, //type needs looking at
         .speed    = I2C_SPEED_NORMAL,
-        .scl  = GPIO_PIN(0, 1),
-        .sda = GPIO_PIN(0, 2)
+        .scl  = GPIO_PIN(0, 3),
+        .sda = GPIO_PIN(0, 4)
      }
 };
 /** @} */

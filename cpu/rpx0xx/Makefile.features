@@ -10,3 +10,4 @@ FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_uart_reconfigure
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += pio_i2c
+FEATURES_PROVIDED += periph_i2c

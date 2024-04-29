@@ -128,7 +128,7 @@ class SerCmd(cmd.Cmd):
 
         # initialize class members
         cmd.Cmd.__init__(self)
-        self.port = port
+        self.port = "/dev/tty0" #supposed to just be 'port' (no quotes)
         self.baudrate = baudrate
         self.toggle = toggle
         self.set_rts = set_rts
