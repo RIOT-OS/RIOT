@@ -95,36 +95,55 @@ typedef uintptr_t gpio_port_t;
 
 #ifdef DOXYGEN
 /**
- * @brief   Get the @ref gpio_port_t value of the port identified by @p num
+ * @brief   Get the @ref gpio_port_t value of the port labeled 0.
  *
- * @note    If @p num is a compile time constant, this is guaranteed to be
- *          suitable for a constant initializer.
- *
- * Typically this will be something like `(GPIO_BASE_ADDR + num * sizeof(struct
- * vendor_gpio_reg))`
+ * @note    For MCUs that use letters instead of numbers, this will be an alias
+ *          for @ref GPIO_PORT_A
+ * @note    Some MCUs will not start with Port 0 / Port A, but rather with
+ *          Port 1 (e.g. MSP430) or Port B (e.g. ATmega328P). It will be
+ *          undefined when unavailable
+ * @note    There will also be `GPIO_PORT_1`, `GPIO_PORT_2`, etc. when there
+ *          are corresponding GPIO ports in hardware.
  */
-#define GPIO_PORT(num)  implementation_specific
-#endif
-
-#ifdef DOXYGEN
+#define GPIO_PORT_0  implementation_specific
 /**
- * @brief   Get the number of the GPIO port belonging to the given @ref
- *          gpio_port_t value
+ * @brief   Same as @ref GPIO_PORT_0, but only provided on MCUs that do use
+ *          letters to refer to GPIO ports.
  *
- * @note    If @p port is a compile time constant, this is guaranteed to be
- *          suitable for a constant initializer.
- *
- * @pre     @p port is the return value of @ref GPIO_PORT
- *
- * For every supported port number *n* the following `assert()` must not blow
- * up:
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * assert(n == GPIO_PORT_NUM(GPIO_PORT(n)));
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @note    The macro with the numeric naming scheme will always be defined,
+ *          the alphabetic naming scheme only if the MCU does uses this.
  */
-#define GPIO_PORT_NUM(port) implementation_specific
-#endif
+#define GPIO_PORT_A  implementation_specific
+
+/**
+ * @brief       Get the @ref gpio_port_t value of the port number @p num
+ * @param[in]   num     The number of the port to get
+ * @pre         @p num is a valid GPIO port number. An implementation may
+ *              follow the "garbage in, garbage out" philosophy.
+ *
+ * @note        If the MCU uses an alphabetic naming scheme, number 0 refers
+ *              to port A.
+ * @warning     This may involve accessing a lookup table, prefer e.g. using
+ *              `GPIO_PORT_0` over `gpio_port(0)` if the port number is known
+ *              at compile time.
+ */
+gpio_port_t gpio_port(uword_t num);
+
+/**
+ * @brief       Get the number of the GPIO port @p port refers to
+ * @param[in]   port    The port to get the number of
+ *
+ * @pre         @p port is a valid GPIO port. An implementation may follow the
+ *              "garbage in, garbage out" philosophy.
+ * @warning     This may involve iterating over a lookup table, prefer using
+ *              e.g. `0` instead of `gpio_port_num(GPIO_PORT_0)` if the port
+ *              number is known at compile time.
+ *
+ * In other words `n == gpio_port_num(gpio_port(n))` for every `n` that is
+ * a valid port number.
+ */
+uword_t gpio_port_num(gpio_port_t port);
+#endif /* DOXYGEN */
 
 #if !defined(HAVE_GPIO_STATE_T) || defined(DOXYGEN)
 /**
@@ -490,7 +509,7 @@ static const gpio_conf_t gpio_ll_od_pu = {
 #endif
 
 /**
- * @brief   Check if the given number is a valid argument for @ref GPIO_PORT
+ * @brief   Check if the given number is a valid argument for @ref gpio_port
  *
  * @param[in]       num     port number to check
  * @retval          true    the MCU used has a GPIO port with that number

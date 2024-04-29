@@ -32,23 +32,78 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
-/**
- * @brief   Get a GPIO port by number
- */
-#if defined(CPU_FAM_STM32MP1)
-#define GPIO_PORT(num)      (GPIOA_BASE + ((num) << 12))
-#else
-#define GPIO_PORT(num)      (GPIOA_BASE + ((num) << 10))
+#ifdef GPIOA_BASE
+#  define GPIO_PORT_A       GPIOA_BASE
+#  define GPIO_PORT_0       GPIO_PORT_A
 #endif
 
-/**
- * @brief   Get a GPIO port number by gpio_t value
- */
-#if defined(CPU_FAM_STM32MP1)
-#define GPIO_PORT_NUM(port) (((port) - GPIOA_BASE) >> 12)
-#else
-#define GPIO_PORT_NUM(port) (((port) - GPIOA_BASE) >> 10)
+#ifdef GPIOB_BASE
+#  define GPIO_PORT_B       GPIOB_BASE
+#  define GPIO_PORT_1       GPIO_PORT_B
 #endif
+
+#ifdef GPIOC_BASE
+#  define GPIO_PORT_C       GPIOC_BASE
+#  define GPIO_PORT_2       GPIO_PORT_C
+#endif
+
+#ifdef GPIOD_BASE
+#  define GPIO_PORT_D       GPIOD_BASE
+#  define GPIO_PORT_3       GPIO_PORT_D
+#endif
+
+#ifdef GPIOE_BASE
+#  define GPIO_PORT_E       GPIOE_BASE
+#  define GPIO_PORT_4       GPIO_PORT_E
+#endif
+
+#ifdef GPIOF_BASE
+#  define GPIO_PORT_F       GPIOF_BASE
+#  define GPIO_PORT_5       GPIO_PORT_F
+#endif
+
+#ifdef GPIOG_BASE
+#  define GPIO_PORT_G       GPIOG_BASE
+#  define GPIO_PORT_6       GPIO_PORT_G
+#endif
+
+#ifdef GPIOH_BASE
+#  define GPIO_PORT_H       GPIOH_BASE
+#  define GPIO_PORT_7       GPIO_PORT_H
+#endif
+
+#ifdef GPIOI_BASE
+#  define GPIO_PORT_I       GPIOI_BASE
+#  define GPIO_PORT_8       GPIO_PORT_I
+#endif
+
+#ifdef GPIOJ_BASE
+#  define GPIO_PORT_J       GPIOJ_BASE
+#  define GPIO_PORT_9       GPIO_PORT_J
+#endif
+
+#ifdef GPIOK_BASE
+#  define GPIO_PORT_K       GPIOK_BASE
+#  define GPIO_PORT_10      GPIO_PORT_K
+#endif
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+#if defined(CPU_FAM_STM32MP1)
+    return GPIOA_BASE + (num << 12);
+#else
+    return GPIOA_BASE + (num << 10);
+#endif
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+#if defined(CPU_FAM_STM32MP1)
+    return (port - GPIOA_BASE) >> 12;
+#else
+    return (port - GPIOA_BASE) >> 10;
+#endif
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {

@@ -207,7 +207,7 @@ static uint8_t get_exti_port(uint8_t exti_num)
 int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig, gpio_ll_cb_t cb, void *arg)
 {
     unsigned irq_state = irq_disable();
-    int port_num = GPIO_PORT_NUM(port);
+    int port_num = gpio_port_num(port);
 
     /* set callback */
     isr_ctx[pin].cb = cb;
@@ -297,7 +297,7 @@ void isr_exti(void)
         if (level_triggered & (1UL << pin)) {
             /* Trading a couple of CPU cycles to not having to store port connected to EXTI in RAM.
              * A simple look up table would save ~6 instructions for the cost 64 bytes of RAM. */
-            gpio_port_t port = GPIO_PORT(get_exti_port(pin));
+            gpio_port_t port = gpio_port(get_exti_port(pin));
             uint32_t actual_level = gpio_ll_read(port) & (1UL << pin);
             uint32_t trigger_level = EXTI_REG_RTSR & (1UL << pin);
             if (actual_level == trigger_level) {

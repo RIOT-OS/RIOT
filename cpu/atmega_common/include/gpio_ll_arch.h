@@ -57,19 +57,95 @@ extern "C" {
  * whenever the port number is known at compile time.
  */
 
-#ifdef PORTH
-#define GPIO_PORT(num) \
-    ((num >= PORT_H) ? \
-     (ATMEGA_GPIO_BASE_H + ((num) - PORT_H) * ATMEGA_GPIO_SIZE) : \
-     (ATMEGA_GPIO_BASE_A + (num) * ATMEGA_GPIO_SIZE))
-#define GPIO_PORT_NUM(port) \
-    (((port) >= ATMEGA_GPIO_BASE_H) ? \
-     (((port) - ATMEGA_GPIO_BASE_H) / ATMEGA_GPIO_SIZE + PORT_H) : \
-     (((port) - ATMEGA_GPIO_BASE_A) / ATMEGA_GPIO_SIZE))
-#else
-#define GPIO_PORT(num) (ATMEGA_GPIO_BASE_A + (num) * ATMEGA_GPIO_SIZE)
-#define GPIO_PORT_NUM(port) (((port) - ATMEGA_GPIO_BASE_A) / ATMEGA_GPIO_SIZE)
+#ifdef PINA
+/* We sadly cannot use PINA, as PINA is technically (in terms of C spec lingo)
+ * not constant and would trigger:
+ *      initializer element is not constant
+ * Hence, we the defines are a bit more involved to yield proper constants
+ * suitable for initializers.
+ */
+#  define GPIO_PORT_A   (ATMEGA_GPIO_BASE_A)
+#  define GPIO_PORT_0   GPIO_PORT_A
 #endif
+
+#ifdef PINB
+#  define GPIO_PORT_B   (ATMEGA_GPIO_BASE_A + 1 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_1   GPIO_PORT_B
+#endif
+
+#ifdef PINC
+#  define GPIO_PORT_C   (ATMEGA_GPIO_BASE_A + 2 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_2   GPIO_PORT_C
+#endif
+
+#ifdef PIND
+#  define GPIO_PORT_D   (ATMEGA_GPIO_BASE_A + 3 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_3   GPIO_PORT_D
+#endif
+
+#ifdef PINE
+#  define GPIO_PORT_E   (ATMEGA_GPIO_BASE_A + 4 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_4   GPIO_PORT_E
+#endif
+
+#ifdef PINF
+#  define GPIO_PORT_F   (ATMEGA_GPIO_BASE_A + 5 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_5   GPIO_PORT_F
+#endif
+
+#ifdef PING
+#  define GPIO_PORT_G   ATMEGA_GPIO_BASE_A + 6 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_6   GPIO_PORT_G
+#endif
+
+/* There is a larger gap between PING and PINH to allow other peripherals to
+ * also be mapped into the fast I/O memory area. */
+#ifdef PINH
+#  define GPIO_PORT_H   (ATMEGA_GPIO_BASE_H)
+#  define GPIO_PORT_7   GPIO_PORT_H
+#endif
+
+#ifdef PINI
+#  define GPIO_PORT_I   (ATMEGA_GPIO_BASE_H + 1 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_8   GPIO_PORT_I
+#endif
+
+#ifdef PINJ
+#  define GPIO_PORT_J   (ATMEGA_GPIO_BASE_H + 2 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_9   GPIO_PORT_J
+#endif
+
+#ifdef PINK
+#  define GPIO_PORT_K   (ATMEGA_GPIO_BASE_H + 3 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_10  GPIO_PORT_K
+#endif
+
+#ifdef PINL
+#  define GPIO_PORT_L   (ATMEGA_GPIO_BASE_H + 4 * ATMEGA_GPIO_SIZE)
+#  define GPIO_PORT_11  GPIO_PORT_L
+#endif
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+#ifdef PINH
+    if (num >= PORT_H) {
+        return ATMEGA_GPIO_BASE_H + ((num - PORT_H) * ATMEGA_GPIO_SIZE);
+    }
+#endif
+
+    return ATMEGA_GPIO_BASE_A + (num * ATMEGA_GPIO_SIZE);
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+#ifdef PINH
+    if ((port) >= ATMEGA_GPIO_BASE_H) {
+        return (port - ATMEGA_GPIO_BASE_H) / ATMEGA_GPIO_SIZE + PORT_H;
+    }
+#endif
+
+     return (port - ATMEGA_GPIO_BASE_A) / ATMEGA_GPIO_SIZE;
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -158,7 +234,7 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
-    return GPIO_PORT(pin >> 4);
+    return gpio_port(pin >> 4);
 }
 
 static inline uint8_t gpio_get_pin_num(gpio_t pin)
