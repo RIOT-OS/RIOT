@@ -151,8 +151,8 @@ typedef enum {
 #if SOC_GPIO_PIN_COUNT > 32
 
 #define GPIO_PORT_NUMOF         2
-#define GPIO_PORT_0             GPIO_PORT(0)
-#define GPIO_PORT_1             GPIO_PORT(1)
+#define GPIO_PORT_0             0
+#define GPIO_PORT_1             1
 #define GPIO_PORT_0_PIN_NUMOF   (32)
 #define GPIO_PORT_1_PIN_NUMOF   (SOC_GPIO_PIN_COUNT - 32)
 #define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF \
@@ -160,7 +160,7 @@ typedef enum {
 #else
 
 #define GPIO_PORT_NUMOF         1
-#define GPIO_PORT_0             GPIO_PORT(0)
+#define GPIO_PORT_0             0
 #define GPIO_PORT_0_PIN_NUMOF   (SOC_GPIO_PIN_COUNT)
 #define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF : 0)
 

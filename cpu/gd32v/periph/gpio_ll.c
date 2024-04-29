@@ -48,7 +48,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 
     unsigned state = irq_disable();
 
-    periph_clk_en(APB2, (RCU_APB2EN_PAEN_Msk << GPIO_PORT_NUM(port)));
+    periph_clk_en(APB2, (RCU_APB2EN_PAEN_Msk << gpio_port_num(port)));
 
     volatile uint32_t *ctrl = (pin < 8) ? &((GPIO_Type *)port)->CTL0
                                         : &((GPIO_Type *)port)->CTL1;
@@ -60,13 +60,13 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 
     switch (conf.state) {
     case GPIO_DISCONNECT:
-        pin_used[GPIO_PORT_NUM(port)] &= ~(1 << pin);
-        if (pin_used[GPIO_PORT_NUM(port)] == 0) {
-            periph_clk_dis(APB2, (RCU_APB2EN_PAEN_Msk << GPIO_PORT_NUM(port)));
+        pin_used[gpio_port_num(port)] &= ~(1 << pin);
+        if (pin_used[gpio_port_num(port)] == 0) {
+            periph_clk_dis(APB2, (RCU_APB2EN_PAEN_Msk << gpio_port_num(port)));
         }
         break;
     case GPIO_INPUT:
-        pin_used[GPIO_PORT_NUM(port)] |= 1 << pin;
+        pin_used[gpio_port_num(port)] |= 1 << pin;
         if (conf.pull == GPIO_FLOATING) {
             *ctrl |= 0x1 << (pos + 2);
         }
@@ -82,7 +82,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
         break;
     case GPIO_OUTPUT_PUSH_PULL:
     case GPIO_OUTPUT_OPEN_DRAIN:
-        pin_used[GPIO_PORT_NUM(port)] |= 1 << pin;
+        pin_used[gpio_port_num(port)] |= 1 << pin;
         *ctrl |= (conf.slew_rate + 1) << pos;
         *ctrl |= (conf.state == GPIO_OUTPUT_OPEN_DRAIN ? 0x1 : 0x0) << (pos + 2);
         if (conf.initial_value) {
