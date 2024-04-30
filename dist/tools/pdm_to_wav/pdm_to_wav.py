@@ -39,6 +39,7 @@ def samples_to_wav(samples, sample_rate, output_file):
         f.setframerate(sample_rate)
         # Convert list of ints to bytes
         f.writeframes(struct.pack("<" + "h" * len(audio), *audio))
+        print(f"Audio saved as {output_file}.wav")
 
 
 def samples_to_fig(samples, output_file):
@@ -52,7 +53,6 @@ def samples_to_fig(samples, output_file):
     plt.xlim(0, len(samples))
     plt.ylim(min(samples), max(samples))
     plt.grid(True)
-    plt.show()
     plt.savefig(f"{output_file}.png")
     print(f"Graph saved as {output_file}.png")
 

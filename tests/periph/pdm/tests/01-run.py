@@ -17,9 +17,9 @@ def verify_sample_rate(data: dict):
     expect_rate = data["expected_sample_rate_in_Hz"]
     meas_rate = data["measured_sample_rate_in_Hz"]
     error = abs(meas_rate - expect_rate)
-    # I guess let's allow 20 Hz error...
-    tol = 20
-    assert error > tol, (
+
+    tol = max([50, 0.02 * expect_rate])
+    assert error < tol, (
         f"expected sample rate is {expect_rate} Hz, "
         f"got {meas_rate} Hz, "
         f"{error} is out of tolerance {tol} Hz."
