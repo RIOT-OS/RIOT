@@ -46,49 +46,66 @@ extern "C" {
 #define LED0_ON             /**< defined empty */
 #define LED0_OFF            /**< defined empty */
 #define LED0_TOGGLE         /**< defined empty */
+#else
+#define LED0_IS_PRESENT     /**< indicate that LED0 is present */
 #endif
 
 #ifndef LED1_ON
 #define LED1_ON             /**< defined empty */
 #define LED1_OFF            /**< defined empty */
 #define LED1_TOGGLE         /**< defined empty */
+#else
+#define LED1_IS_PRESENT     /**< indicate that LED1 is present */
 #endif
 
 #ifndef LED2_ON
 #define LED2_ON             /**< defined empty */
 #define LED2_OFF            /**< defined empty */
 #define LED2_TOGGLE         /**< defined empty */
+#else
+#define LED2_IS_PRESENT     /**< indicate that LED2 is present */
 #endif
 
 #ifndef LED3_ON
 #define LED3_ON             /**< defined empty */
 #define LED3_OFF            /**< defined empty */
 #define LED3_TOGGLE         /**< defined empty */
+#else
+#define LED3_IS_PRESENT     /**< indicate that LED3 is present */
 #endif
 
 #ifndef LED4_ON
 #define LED4_ON             /**< defined empty */
 #define LED4_OFF            /**< defined empty */
 #define LED4_TOGGLE         /**< defined empty */
+#else
+#define LED4_IS_PRESENT     /**< indicate that LED4 is present */
 #endif
 
 #ifndef LED5_ON
 #define LED5_ON             /**< defined empty */
 #define LED5_OFF            /**< defined empty */
 #define LED5_TOGGLE         /**< defined empty */
+#else
+#define LED5_IS_PRESENT     /**< indicate that LED5 is present */
 #endif
 
 #ifndef LED6_ON
 #define LED6_ON             /**< defined empty */
 #define LED6_OFF            /**< defined empty */
 #define LED6_TOGGLE         /**< defined empty */
+#else
+#define LED6_IS_PRESENT     /**< indicate that LED6 is present */
 #endif
 
 #ifndef LED7_ON
 #define LED7_ON             /**< defined empty */
 #define LED7_OFF            /**< defined empty */
 #define LED7_TOGGLE         /**< defined empty */
+#else
+#define LED7_IS_PRESENT     /**< indicate that LED7 is present */
 #endif
+
 /** @} */
 
 /**
