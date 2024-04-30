@@ -174,10 +174,10 @@ extern "C" {
  * @name    ztimer configuration values
  * @{
  */
-#define CONFIG_ZTIMER_USEC_TYPE     ZTIMER_TYPE_PERIPH_TIMER
-#define CONFIG_ZTIMER_USEC_DEV      (TIMER_DEV(0))
-#define CONFIG_ZTIMER_USEC_FREQ     (230400LU)
-#define CONFIG_ZTIMER_USEC_WIDTH    (16)
+#define CONFIG_ZTIMER_USEC_TYPE         ZTIMER_TYPE_PERIPH_TIMER    /**< Use periph_timer for ZTIMER_USEC */
+#define CONFIG_ZTIMER_USEC_DEV          (TIMER_DEV(0))              /**< Use TIMER_DEV(0) for ZTIMER_USEC */
+#define CONFIG_ZTIMER_USEC_BASE_FREQ    (230400LU)                  /**< Run timer for ZTIMER_USEC at 230,400 Hz */
+#define CONFIG_ZTIMER_USEC_WIDTH        (16)                        /**< TIMER_DEV(0) is 16 bit wide */
 /** @} */
 
 /**
