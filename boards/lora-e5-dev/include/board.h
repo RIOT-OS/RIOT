@@ -46,6 +46,7 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
  * @name    LED pin definitions and handlers
  * @{
  */
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 #define LED0_PIN_NUM        5
 /** @} */

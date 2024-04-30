@@ -36,9 +36,11 @@ extern "C" {
  */
 #if defined(CPU_MODEL_STM32F302R8) || defined(CPU_MODEL_STM32L433RC)
 #define LED0_PIN_NUM        13
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 #else
 #define LED0_PIN_NUM        5
+#define LED0_PORT           GPIO_PORT_A /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_A
 #endif
 /** @} */
