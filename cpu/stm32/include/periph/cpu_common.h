@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 
+#include "cpu_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

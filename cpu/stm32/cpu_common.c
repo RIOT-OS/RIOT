@@ -19,6 +19,8 @@
  * @}
  */
 
+#include "periph/cpu_common.h"
+
 #include <assert.h>
 
 #include "compiler_hints.h"
