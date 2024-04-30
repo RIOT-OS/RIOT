@@ -433,22 +433,36 @@ static int _send(candev_t *candev, const struct can_frame *frame)
     can_mm.put = fifo_queue_put_idx;
     can_mm.get = fifo_queue_get_idx;
 
-    if (frame->can_id & CAN_EFF_FLAG) {
+    struct can_frame _aux_frame = {
+        .can_id = frame->can_id,
+        .can_dlc = frame->can_dlc
+    };
+    for (uint8_t i = 0; i < _aux_frame.can_dlc; i++) {
+        _aux_frame.data[i] = frame->data[i];
+    }
+
+    /* Check if the CAN frame ID to send is extended or standard */
+    if (_aux_frame.can_id > CAN_SFF_MASK) {
+        /* Set the extended ID flag bit */
+        _aux_frame.can_id |= CAN_EFF_FLAG;
+    }
+
+    if (_aux_frame.can_id & CAN_EFF_FLAG) {
         DEBUG_PUTS("Extended ID");
-        dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.ID = frame->can_id & CAN_EFF_MASK;
+        dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.ID = _aux_frame.can_id & CAN_EFF_MASK;
         dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.XTD = 1;
     }
     else {
         DEBUG_PUTS("Standard identifier");
-        dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.ID = (frame->can_id & CAN_SFF_MASK) << 18;
+        dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.ID = (_aux_frame.can_id & CAN_SFF_MASK) << 18;
         dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.XTD = 0;
     }
-    dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.RTR = (frame->can_id & CAN_RTR_FLAG) >> 30;
+    dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.RTR = (_aux_frame.can_id & CAN_RTR_FLAG) >> 30;
     dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_0.bit.ESI = 1;
-    dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_1.bit.DLC = frame->can_dlc;
+    dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_1.bit.DLC = _aux_frame.can_dlc;
     dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_1.bit.EFC = 1;
     dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_1.bit.MM = _form_message_marker(&can_mm);
-    memcpy((void *)dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_DATA, frame->data, frame->can_dlc);
+    memcpy((void *)dev->msg_ram_conf.tx_fifo_queue[can_mm.put].TXBE_DATA, _aux_frame.data, _aux_frame.can_dlc);
 
     /* Request transmission */
     dev->conf->can->TXBAR.reg |= (1 << can_mm.put);
