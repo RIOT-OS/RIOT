@@ -225,6 +225,18 @@ static inline void shell_run(const shell_command_t *commands,
     shell_run_forever(commands, line_buf, len);
 }
 
+/**
+ * @brief           Parse and run a line of text as a shell command with
+ *                  arguments.
+ *
+ * @param[in]       commands    ptr to array of command structs
+ * @param[in]       line        The input line to parse
+ *
+ * @returns         return value of the found command
+ * @returns         -ENOEXEC if no valid command could be found
+ */
+int shell_handle_input_line(const shell_command_t *commands, char *line);
+
 #ifndef __cplusplus
 /**
  * @brief   Define shell command

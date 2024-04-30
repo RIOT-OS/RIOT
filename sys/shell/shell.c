@@ -206,7 +206,7 @@ static void print_help(const shell_command_t *command_list)
  *
  *
  */
-static void handle_input_line(const shell_command_t *command_list, char *line)
+int shell_handle_input_line(const shell_command_t *command_list, char *line)
 {
     /* first we need to calculate the number of arguments */
     int argc = 0;
@@ -297,11 +297,11 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
 
     if (pstate != PARSE_BLANK && pstate != PARSE_UNQUOTED) {
         printf("shell: incorrect quoting\n");
-        return;
+        return -EINVAL;
     }
 
     if (argc == 0) {
-        return;
+        return 0;
     }
 
     /* then we fill the argv array */
@@ -327,19 +327,23 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
             shell_pre_command_hook(argc, argv);
             int res = handler(argc, argv);
             shell_post_command_hook(res, argc, argv);
+            return res;
         }
         else {
-            handler(argc, argv);
+            return handler(argc, argv);
         }
     }
     else {
         if (strcmp("help", argv[0]) == 0) {
             print_help(command_list);
+            return 0;
         }
         else {
             printf("shell: command not found: %s\n", argv[0]);
         }
     }
+
+    return -ENOEXEC;
 }
 
 __attribute__((weak)) void shell_post_readline_hook(void)
@@ -518,7 +522,7 @@ void shell_run_once(const shell_command_t *shell_commands,
                 break;
 
             default:
-                handle_input_line(shell_commands, line_buf);
+                shell_handle_input_line(shell_commands, line_buf);
                 break;
         }
 
