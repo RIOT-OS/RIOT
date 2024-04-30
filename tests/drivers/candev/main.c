@@ -68,7 +68,7 @@ static int _send(int argc, char **argv)
     int ret = 0;
 
     struct can_frame frame = {
-        .can_id = 1,
+        .can_id = 0x0CABCDEF,
         .can_dlc = 3,
         .data[0] = 0xAB,
         .data[1] = 0xCD,
