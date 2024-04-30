@@ -18,7 +18,7 @@ mod dev_att;
 mod utils;
 
 use dev_att::HardCodedDevAtt;
-use utils::initialize_network;
+use utils::{initialize_network, init_vfs};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
@@ -33,6 +33,7 @@ use riot_wrappers::shell::{self, CommandList};
 use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
 
 // the new 'matter' module in riot-wrappers, enabled by 'with_matter' feature
+#[allow(unused_imports)]
 use riot_wrappers::matter::{VfsDataFetcher, CommissioningDataFetcher, PersistenceManager, MatterCompatUdpSocket};
 
 use rs_matter::{CommissioningData, MATTER_PORT};
@@ -48,7 +49,6 @@ use rs_matter::data_model::{
     system_model::descriptor,
 };
 use rs_matter::data_model::cluster_on_off::{Commands, OnOffCluster};
-use rs_matter::data_model::sdm::dev_att::{DataType, DevAttDataFetcher};
 use rs_matter::error::Error;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::MDNS_SOCKET_BIND_ADDR;
@@ -232,7 +232,7 @@ fn run_matter() -> Result<(), ()> {
     // Get Device attestation (hard-coded atm) - TODO: Use VfsDataFetcher if implemented in riot-wrappers
     let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
 
-    let epoch = utils::sys_epoch;
+    let epoch = riot_wrappers::matter::sys_epoch;
     let rand = riot_wrappers::matter::sys_rand;
 
     let matter: &'static Matter = MATTER.init(Matter::new(
@@ -272,7 +272,8 @@ fn main() {
 
     info!("Hello Matter on RIOT!");
 
-    let _ = utils::init_vfs();
+    init_vfs().expect("Error initializing VFS");
+    info!("Virtual File System initialized!");
 
     use core::mem::size_of;
     info!("Matter memory usage: UdpBuffers={}, PacketBuffers={}, \
