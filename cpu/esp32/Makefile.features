@@ -66,9 +66,3 @@ ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CP
     FEATURES_PROVIDED += esp_spi_oct
   endif
 endif
-
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(RIOTCPU)/esp32/esp32.config
-endif

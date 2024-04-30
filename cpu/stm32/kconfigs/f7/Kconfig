@@ -9,29 +9,6 @@ config CPU_FAM_F7
     bool
     select CPU_STM32
     select CPU_CORE_CORTEX_M7
-    select HAS_BACKUP_RAM
-    select HAS_CPU_STM32F7
-    select HAS_CORTEXM_MPU
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_GPIO_LL
-    select HAS_PERIPH_GPIO_LL_IRQ
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW
-    select HAS_PERIPH_HWRNG
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_SDMMC_AUTO_CLK
-    select HAS_PERIPH_SDMMC_CLK
-    select HAS_PERIPH_SDMMC_HS
-    select HAS_PERIPH_SDMMC_MMC
-    select HAS_PERIPH_VBAT
-    select HAS_PERIPH_WDT
-    select HAS_BOOTLOADER_STM32
-    select HAVE_CLOCK_ALT_48MHZ
 
 config CPU_FAM
     default "f7" if CPU_FAM_F7
-
-config HAS_CPU_STM32F7
-    bool
-    help
-        Indicates that the cpu being used belongs to the 'stm32f7' family.

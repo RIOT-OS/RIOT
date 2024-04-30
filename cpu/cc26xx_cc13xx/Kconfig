@@ -7,10 +7,6 @@
 
 config CPU_COMMON_CC26XX_CC13XX
     bool
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_TIMER_QUERY_FREQS
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_MODECFG
 
 config CPU_FAM_CC13XX
     bool
@@ -85,15 +81,3 @@ endif # CC26XX_CC13XX_ROM_BOOTLOADER
 endif # CC26XX_CC13XX_UPDATE_CCFG
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"
-
-config MODULE_CC26XX_CC13XX
-    bool
-    depends on TEST_KCONFIG
-    depends on CPU_COMMON_CC26XX_CC13XX
-    select MODULE_PERIPH_COMMON
-    select MODULE_CC26XX_CC13XX_PERIPH
-    default y
-    help
-      Common code for TI cc26xx/cc13xx family.
-
-rsource "periph/Kconfig"

@@ -55,7 +55,7 @@ ECLIPSE_PROJECT_NAME='RIOT'
 GCCCOMMANDLINE=$(cat)
 
 # Find all includes
-INCLUDES=$(${ECHO} "${GCCCOMMANDLINE}" | sed -e 's/ /\n/g' | egrep '^-I' | cut -c3-)
+INCLUDES=$(${ECHO} "${GCCCOMMANDLINE}" | sed -e 's/ /\n/g' | grep -E '^-I' | cut -c3-)
 
 # Parse and rewrite to project relative paths
 INCLUDES_REL=""
@@ -66,7 +66,7 @@ for p in ${INCLUDES}; do
 done
 
 # Grab macro definitions
-MACROS=$(${ECHO} "${GCCCOMMANDLINE}" | sed -e 's/ /\n/g' | egrep '^-D' | cut -c3-)
+MACROS=$(${ECHO} "${GCCCOMMANDLINE}" | sed -e 's/ /\n/g' | grep -E '^-D' | cut -c3-)
 
 # Output
 ${ECHO} "${XML_HEADER}"

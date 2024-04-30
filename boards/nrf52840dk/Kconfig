@@ -12,20 +12,5 @@ config BOARD_NRF52840DK
     default y
     select BOARDS_COMMON_NRF52XXXDK
     select CPU_MODEL_NRF52840XXAA
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_I2C
-    select HAS_ARDUINO_PINS
-    select HAS_ARDUINO_SHIELD_ISP
-    select HAS_ARDUINO_SHIELD_MEGA
-    select HAS_ARDUINO_SHIELD_UNO
-    select HAS_ARDUINO_SPI
-    select HAS_ARDUINO_UART
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_USBDEV
-    select HAS_TINYUSB_DEVICE
-    select HAS_VDD_LC_FILTER_REG0
-    select HAVE_MTD_SPI_NOR
-
-    select MODULE_BOARDS_COMMON_NRF52XXXDK if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

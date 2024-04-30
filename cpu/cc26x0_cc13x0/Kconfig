@@ -9,18 +9,11 @@ config CPU_FAM_CC26X0
     bool
     select CPU_CORE_CORTEX_M3
     select CPU_COMMON_CC26XX_CC13XX
-    select HAS_CPU_CC26X0_CC13X0
-
-    select MODULE_CC26XX_CC13XX if TEST_KCONFIG
-    select MODULE_CC26X0_DRIVERLIB if TEST_KCONFIG
 
 config CPU_FAM_CC13X0
     bool
     select CPU_CORE_CORTEX_M3
     select CPU_COMMON_CC26XX_CC13XX
-    select HAS_CPU_CC26X0_CC13X0
-
-    select MODULE_CC26XX_CC13XX if TEST_KCONFIG
 
 ## CPU Models
 config CPU_MODEL_CC26X0F128
@@ -30,12 +23,6 @@ config CPU_MODEL_CC26X0F128
 config CPU_MODEL_CC13X0F128
     bool
     select CPU_FAM_CC13X0
-
-## Definition of specific features
-config HAS_CPU_CC26X0_CC13X0
-    bool
-    help
-        Indicates that a 'cc26x0_cc13x0' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM
@@ -50,4 +37,3 @@ config CPU
     default "cc26x0_cc13x0"
 
 source "$(RIOTCPU)/cc26xx_cc13xx/Kconfig"
-rsource "vendor/driverlib/Kconfig"

@@ -32,21 +32,9 @@ export KCONFIG_EXTERNAL_MODULE_CONFIGS = $(GENERATED_DIR)/Kconfig.external_modul
 # This file will contain external package configurations
 export KCONFIG_EXTERNAL_PKG_CONFIGS = $(GENERATED_DIR)/Kconfig.external_pkgs
 
-# Add configurations that only work when running the Kconfig test so far,
-# because they activate modules.
-ifeq (1,$(TEST_KCONFIG))
-  # This file will contain application default configurations
-  KCONFIG_APP_CONFIG = $(APPDIR)/app.config.test
-  # This configuration enables modules that are only available when using Kconfig
-  # module modelling
-  # Bring in all board specific configurations if present
-  ifneq (,$(wildcard $(BOARDDIR)/$(BOARD).config))
-    KCONFIG_BOARD_CONFIG += $(BOARDDIR)/$(BOARD).config
-  endif
-else
-  # This file will contain application default configurations
-  KCONFIG_APP_CONFIG = $(APPDIR)/app.config
-endif
+# This file will contain application default configurations
+KCONFIG_APP_CONFIG = $(APPDIR)/app.config
+
 
 # Default and user overwritten configurations
 KCONFIG_USER_CONFIG = $(APPDIR)/user.config
@@ -92,7 +80,7 @@ $(GENERATED_DIR): $(if $(MAKE_RESTARTS),,$(CLEAN))
 # - A previous configuration file is present (e.g. from a previous call to
 #   menuconfig)
 # - menuconfig is being called
-# - SHOULD_RUN_KCONFIG or TEST_KCONFIG is set
+# - SHOULD_RUN_KCONFIG is set
 #
 # By default SHOULD_RUN_KCONFIG is set if any of the following is true:
 # - A file with '.config' extension is present in the application directory
@@ -118,16 +106,6 @@ ifneq (,$(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))))
     $(warning $(WARNING_MSG))
   endif
   SHOULD_RUN_KCONFIG := 1
-endif
-
-# When testing Kconfig we should always run it
-ifeq (1,$(TEST_KCONFIG))
-  SHOULD_RUN_KCONFIG := 1
-endif
-
-# Expose DEVELHELP to kconfig
-ifeq (1,$(DEVELHELP))
-  RIOT_CONFIG_DEVELHELP ?= y
 endif
 
 # export variable to make it visible in other Makefiles
@@ -158,11 +136,7 @@ menuconfig: $(MENUCONFIG) $(KCONFIG_OUT_CONFIG)
 	$(Q)KCONFIG_CONFIG=$(KCONFIG_OUT_CONFIG) $(MENUCONFIG) $(KCONFIG)
 	$(MAKE) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
 
-# Variable used to conditionally depend on KCONFIG_GENERATED_DEPDENDENCIES
-# When testing Kconfig module modelling this file is not needed
-ifneq (1, $(TEST_KCONFIG))
-  GENERATED_DEPENDENCIES_DEP = $(KCONFIG_GENERATED_DEPENDENCIES)
-endif
+GENERATED_DEPENDENCIES_DEP = $(KCONFIG_GENERATED_DEPENDENCIES)
 
 # These rules are not included when only calling `make clean` in
 # order to keep the $(BINDIR) directory clean.

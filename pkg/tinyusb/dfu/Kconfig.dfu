@@ -5,11 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TINYUSB_CLASS_DFU
-    bool "Device Firmware Update (DFU)"
-    depends on MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_DFU && MODULE_RIOTBOOT_TINYUSB_DFU
-
-if MODULE_TINYUSB_CLASS_DFU
+if USEMODULE_TINYUSB_CLASS_DFU
 
 config TUSBD_DFU_NUMOF
     int
@@ -47,4 +43,4 @@ config TUSBD_DFU_RESET_DELAY
         DFU reset delay is the time before the device is restarted after
         a firmware download.
 
-endif # MODULE_TINYUSB_CLASS_DFU
+endif # USEMODULE_TINYUSB_CLASS_DFU

@@ -30,10 +30,6 @@ ifneq (,$(filter native native64,$(BOARD)))
   ZEP_PORT_BASE ?= 17754
   TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
-  # the same for Kconfig
-  ifeq (1,$(TEST_KCONFIG))
-    KCONFIG_ADD_CONFIG += $(APPDIR)/app.config.test.native
-  endif
 endif
 
 USEMODULE += od

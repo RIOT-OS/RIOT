@@ -23,15 +23,11 @@ config CPU_LINE_STM32F401XE
 config CPU_LINE_STM32F405XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F407XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F410CX
@@ -42,7 +38,6 @@ config CPU_LINE_STM32F410CX
 config CPU_LINE_STM32F410RX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F410TX
@@ -76,28 +71,23 @@ config CPU_LINE_STM32F412VX
 config CPU_LINE_STM32F412ZX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_100MHZ
     select HAVE_CLOCK_ALT_48MHZ
 
 config CPU_LINE_STM32F413XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_100MHZ
     select HAVE_CLOCK_ALT_48MHZ
 
 config CPU_LINE_STM32F415XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F417XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F423XX
@@ -109,48 +99,37 @@ config CPU_LINE_STM32F423XX
 config CPU_LINE_STM32F427XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F429XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F437XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F439XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F446XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
     select CLOCK_MAX_180MHZ
     select HAVE_CLOCK_ALT_48MHZ
 
 config CPU_LINE_STM32F469XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
-    select HAS_PERIPH_HWRNG
     select CLOCK_MAX_180MHZ
     select HAVE_CLOCK_ALT_48MHZ
 
 config CPU_LINE_STM32F479XX
     bool
     select CPU_FAM_F4
-    select HAS_BACKUP_RAM
     select CLOCK_MAX_180MHZ
     select HAVE_CLOCK_ALT_48MHZ

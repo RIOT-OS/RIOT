@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <string.h>
 
 #include "embUnit.h"
@@ -188,46 +189,137 @@ static void test_phydat_fit(void)
     }
 }
 
+static void test_phydat_unit_write(void)
+{
+    char buffer[] = {'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', '\0'};
+
+    /* Regular write, "none" is 4 bytes long */
+    TEST_ASSERT_EQUAL_INT(4, phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_NONE));
+
+    /* Buffer is too small, "none" is 4 bytes long */
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, phydat_unit_write(buffer, 2, UNIT_NONE));
+
+    /* Write but no buffer, ignores buffer size, "time" is 4 bytes long */
+    TEST_ASSERT_EQUAL_INT(4, phydat_unit_write(NULL, 2, UNIT_TIME));
+
+    /* Invalid unit */
+    TEST_ASSERT_EQUAL_INT(-EINVAL, phydat_unit_write(buffer, ARRAY_SIZE(buffer), 0xff));
+
+    /* Should not write null terminator */
+    TEST_ASSERT_EQUAL_STRING("noneAAAAA", buffer);
+}
+
 static void test_unitstr__success(void)
 {
+    char buffer[10];
+    size_t size = 0;
+
     /* test the verbose cases */
-    TEST_ASSERT_EQUAL_STRING("undefined", phydat_unit_to_str_verbose(UNIT_UNDEF));
-    TEST_ASSERT_EQUAL_STRING("none", phydat_unit_to_str_verbose(UNIT_NONE));
-    TEST_ASSERT_EQUAL_STRING("none", phydat_unit_to_str_verbose(UNIT_BOOL));
-    TEST_ASSERT_EQUAL_STRING("time", phydat_unit_to_str_verbose(UNIT_TIME));
-    TEST_ASSERT_EQUAL_STRING("date", phydat_unit_to_str_verbose(UNIT_DATE));
-
-    TEST_ASSERT_EQUAL_STRING("°C", phydat_unit_to_str_verbose(UNIT_TEMP_C));
-    TEST_ASSERT_EQUAL_STRING("°F", phydat_unit_to_str_verbose(UNIT_TEMP_F));
-    TEST_ASSERT_EQUAL_STRING("K", phydat_unit_to_str_verbose(UNIT_TEMP_K));
-    TEST_ASSERT_EQUAL_STRING("lx", phydat_unit_to_str_verbose(UNIT_LUX));
-    TEST_ASSERT_EQUAL_STRING("m", phydat_unit_to_str_verbose(UNIT_M));
-    TEST_ASSERT_EQUAL_STRING("m^2", phydat_unit_to_str_verbose(UNIT_M2));
-    TEST_ASSERT_EQUAL_STRING("m^3", phydat_unit_to_str_verbose(UNIT_M3));
-    TEST_ASSERT_EQUAL_STRING("gₙ", phydat_unit_to_str_verbose(UNIT_G_FORCE));
-    TEST_ASSERT_EQUAL_STRING("dps", phydat_unit_to_str_verbose(UNIT_DPS));
-    TEST_ASSERT_EQUAL_STRING("g", phydat_unit_to_str_verbose(UNIT_GRAM));
-    TEST_ASSERT_EQUAL_STRING("A", phydat_unit_to_str_verbose(UNIT_A));
-    TEST_ASSERT_EQUAL_STRING("V", phydat_unit_to_str_verbose(UNIT_V));
-    TEST_ASSERT_EQUAL_STRING("W", phydat_unit_to_str_verbose(UNIT_W));
-    TEST_ASSERT_EQUAL_STRING("dBm", phydat_unit_to_str_verbose(UNIT_DBM));
-    TEST_ASSERT_EQUAL_STRING("Gs", phydat_unit_to_str_verbose(UNIT_GAUSS));
-    TEST_ASSERT_EQUAL_STRING("T", phydat_unit_to_str_verbose(UNIT_T));
-    TEST_ASSERT_EQUAL_STRING("Bar", phydat_unit_to_str_verbose(UNIT_BAR));
-    TEST_ASSERT_EQUAL_STRING("Pa", phydat_unit_to_str_verbose(UNIT_PA));
-    TEST_ASSERT_EQUAL_STRING("permille", phydat_unit_to_str_verbose(UNIT_PERMILL));
-    TEST_ASSERT_EQUAL_STRING("ppm", phydat_unit_to_str_verbose(UNIT_PPM));
-    TEST_ASSERT_EQUAL_STRING("ppb", phydat_unit_to_str_verbose(UNIT_PPB));
-    TEST_ASSERT_EQUAL_STRING("cd", phydat_unit_to_str_verbose(UNIT_CD));
-    TEST_ASSERT_EQUAL_STRING("%", phydat_unit_to_str_verbose(UNIT_PERCENT));
-    TEST_ASSERT_EQUAL_STRING("cts", phydat_unit_to_str_verbose(UNIT_CTS));
-    TEST_ASSERT_EQUAL_STRING("C", phydat_unit_to_str_verbose(UNIT_COULOMB));
-    TEST_ASSERT_EQUAL_STRING("g/m^3", phydat_unit_to_str_verbose(UNIT_GPM3));
-    TEST_ASSERT_EQUAL_STRING("F", phydat_unit_to_str_verbose(UNIT_F));
-    TEST_ASSERT_EQUAL_STRING("pH", phydat_unit_to_str_verbose(UNIT_PH));
-    TEST_ASSERT_EQUAL_STRING("#/m^3", phydat_unit_to_str_verbose(UNIT_CPM3));
-    TEST_ASSERT_EQUAL_STRING("ohm", phydat_unit_to_str_verbose(UNIT_OHM));
-
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_UNDEF);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("undefined", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_NONE);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("none", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_BOOL);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("none", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_TIME);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("time", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_DATE);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("date", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_TEMP_C);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("°C", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_TEMP_F);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("°F", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_TEMP_K);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("K", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_LUX);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("lx", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_M);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("m", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_M2);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("m^2", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_M3);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("m^3", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_G_FORCE);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("gₙ", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_DPS);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("dps", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_GRAM);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("g", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_A);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("A", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_V);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("V", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_W);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("W", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_DBM);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("dBm", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_GAUSS);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("Gs", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_T);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("T", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_BAR);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("Bar", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_PA);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("Pa", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_PERMILL);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("permille", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_PPM);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("ppm", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_PPB);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("ppb", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_CD);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("cd", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_PERCENT);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("%", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_CTS);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("cts", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_COULOMB);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("C", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_GPM3);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("g/m^3", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_F);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("F", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_PH);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("pH", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_CPM3);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("#/m^3", buffer);
+    size = phydat_unit_write(buffer, ARRAY_SIZE(buffer), UNIT_OHM);
+    buffer[size] = 0;
+    TEST_ASSERT_EQUAL_STRING("ohm", buffer);
 }
 
 static void test_json__success(void)
@@ -275,6 +367,7 @@ Test *tests_phydat_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_phydat_fit),
+        new_TestFixture(test_phydat_unit_write),
         new_TestFixture(test_unitstr__success),
         new_TestFixture(test_json__success),
     };

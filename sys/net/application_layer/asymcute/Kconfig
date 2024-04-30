@@ -4,17 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_ASYMCUTE
-    bool "Configure Asymcute"
+menu "Asymcute"
     depends on USEMODULE_ASYMCUTE
-    help
-        Configure Asymcute using Kconfig.`Asymcute` is a asynchronous MQTT-SN
-        client implementation, aiming at providing the user a high degree of
-        flexibility. It provides a flexible interface that allows users to issue
-        any number of concurrent requests to one or more different gateways
-        simultaneously.
-
-if KCONFIG_USEMODULE_ASYMCUTE
 
 config ASYMCUTE_DEFAULT_PORT
     int "Default UDP port to listen on"
@@ -32,7 +23,7 @@ config ASYMCUTE_TOPIC_MAXLEN
     int "Maximum topic length"
     default 32
     help
-        Configure maximum length for client's topic. The value must be less than
+        Configure maximum length for clients topic. The value must be less than
         (256 - 8) and less than ('CONFIG_ASYMCUTE_BUFSIZE' - 8).
 
 config ASYMCUTE_KEEPALIVE
@@ -88,4 +79,4 @@ config ASYMCUTE_N_RETRY
         information, see MQTT-SN Spec v1.2, section 6.13. For default values,
         see section 7.2 -> Nretry: 3-5.
 
-endif # KCONFIG_USEMODULE_ASYMCUTE
+endmenu # Asymcute

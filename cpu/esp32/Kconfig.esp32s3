@@ -9,18 +9,6 @@ config CPU_FAM_ESP32S3
     bool
     select CPU_COMMON_ESP32X
     select CPU_CORE_XTENSA_LX7
-    select HAS_BLE_ADV_EXT
-    select HAS_BLE_NIMBLE
-    select HAS_BLE_NIMBLE_NETIF
-    select HAS_BLE_PHY_2MBIT
-    select HAS_ESP_BLE
-    select HAS_ESP_BLE_ESP32C3
-    select HAS_PERIPH_SDMMC_AUTO_CLK
-    select HAS_PERIPH_SDMMC_AUTO_CMD12
-    select HAS_PERIPH_SDMMC_HS
-    select HAS_PERIPH_SDMMC_MMC
-    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV
-    select MODULE_USB_BOARD_RESET if MODULE_USBUS_CDC_ACM || MODULE_TINYUSB_CLASS_CDC
 
 config CPU_FAM
     default "esp32s3" if CPU_FAM_ESP32S3
@@ -41,15 +29,12 @@ config CPU_MODEL_ESP32S3_FN8
 config CPU_MODEL_ESP32S3_R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that CPU version ESP32-S3R2 with 2 MB embedded SPI RAM is used.
 
 config CPU_MODEL_ESP32S3_R8
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that CPU version ESP32-S3R8 with 8 MB embedded SPI RAM
         and SPI voltage 3.3 V is used.
@@ -57,8 +42,6 @@ config CPU_MODEL_ESP32S3_R8
 config CPU_MODEL_ESP32S3_R8V
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that CPU version ESP32-S3R8V with 8 MB embedded SPI RAM
         and SPI voltage 1.8 V  is used.
@@ -66,7 +49,6 @@ config CPU_MODEL_ESP32S3_R8V
 config CPU_MODEL_ESP32S3_FH4R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that CPU version ESP32-S3FH4R2 with 4 MB embedded Flash and
         2 MB embedded SPI RAM is used.
@@ -102,7 +84,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_H4
 config CPU_MODEL_ESP32S3_WROOM_1X_N4R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S3-WROOM-1-N4R2 or ESP32-S3-WROOM-1U-N4R2 module
         with 4 MB Flash and 2 MB SPI RAM is used.
@@ -110,7 +91,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_N4R2
 config CPU_MODEL_ESP32S3_WROOM_1X_N8R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S3-WROOM-1-N8R2 or ESP32-S3-WROOM-1U-N8R2 module
         with 8 MB Flash and 2 MB SPI RAM is used.
@@ -118,7 +98,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_N8R2
 config CPU_MODEL_ESP32S3_WROOM_1X_N16R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S3-WROOM-1-N16R2 or ESP32-S3-WROOM-1U-N16R2 module
         with 16 MB Flash and 2 MB SPI RAM is used.
@@ -126,8 +105,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_N16R2
 config CPU_MODEL_ESP32S3_WROOM_1X_N4R8
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that ESP32-S3-WROOM-1-N4R8 or ESP32-S3-WROOM-1U-N4R8 module
         with 4 MB Flash and 8 MB SPI RAM (Octal SPI mode) is used.
@@ -135,8 +112,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_N4R8
 config CPU_MODEL_ESP32S3_WROOM_1X_N8R8
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that ESP32-S3-WROOM-1-N8R8 or ESP32-S3-WROOM-1U-N8R8 module
         with 8 MB Flash and 8 MB SPI RAM (Octal SPI mode) is used.
@@ -144,8 +119,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_N8R8
 config CPU_MODEL_ESP32S3_WROOM_1X_N16R8
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that ESP32-S3-WROOM-1-N16R8 or ESP32-S3-WROOM-1U-N16R8 module
         with 16 MB Flash and 8 MB SPI RAM (Octal SPI mode) is used.
@@ -153,8 +126,6 @@ config CPU_MODEL_ESP32S3_WROOM_1X_N16R8
 config CPU_MODEL_ESP32S3_WROOM_2_N16R8V
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that ESP32-S3-WROOM-2-N16R8V module with 16 MB Flash and
         8 MB SPI RAM (Octal SPI mode) and 1.8 V SPI voltage is used.
@@ -162,8 +133,6 @@ config CPU_MODEL_ESP32S3_WROOM_2_N16R8V
 config CPU_MODEL_ESP32S3_WROOM_2_N32R8V
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
-    select HAS_ESP_SPI_OCT
     help
         Indicates that ESP32-S3-WROOM-2-N16R8V module with 32 MB Flash and
         8 MB SPI RAM (Octal SPI mode) and 1.8 V SPI voltage is used.
@@ -178,7 +147,6 @@ config CPU_MODEL_ESP32S3_MINI_1X_N8
 config CPU_MODEL_ESP32S3_MINI_1X_N4R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S3-MINI-1-N4R2 or ESP32-S3-MINI-1U-N4R2 module
         with 4 MB Flash and 2 MB SPI RAM is used.
@@ -186,7 +154,6 @@ config CPU_MODEL_ESP32S3_MINI_1X_N4R2
 config CPU_MODEL_ESP32S3_MINI_1X_H4R2
     bool
     select CPU_FAM_ESP32S3
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S3-MINI-1-H4R2 or ESP32-S3-MINI-1U-H4R2 module
         with 4 MB Flash and 2 MB SPI RAM is used.
@@ -217,15 +184,7 @@ config CPU_MODEL
 
 if CPU_FAM_ESP32S3
 
-config MODULE_ESP_SPI_OCT
-    bool
-    default y if MODULE_ESP_SPI_RAM
-    depends on HAS_ESP_SPI_OCT
-    help
-        Octal SPI is used for SPI RAM.
-
 menu "ESP32-S3 specific configurations"
-    depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP32
 
     # define configuration menu entries for ESP32-S3 variant (family)

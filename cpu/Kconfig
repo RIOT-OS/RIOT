@@ -51,16 +51,3 @@ config CPU_ARCH
     string
     help
         Architecture of the currently selected CPU.
-
-config MODULE_CPU
-    bool
-    default y
-    depends on TEST_KCONFIG
-    help
-        Module which holds all CPU-specific files.
-
-config MODULE_PERIPH
-    bool
-    depends on TEST_KCONFIG
-    help
-        CPU peripheral implementations module.

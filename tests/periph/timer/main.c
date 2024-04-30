@@ -249,6 +249,8 @@ static void print_supported_frequencies(tim_t dev)
                "    %u: %" PRIu32 "\n",
                (unsigned)(end - 1), timer_query_freqs(dev, end - 1));
     }
+
+    expect(timer_query_freqs(dev, end) == 0);
 }
 
 int main(void)

@@ -1,6 +1,0 @@
-config MODULE_CORTEXM_FPU
-    bool
-    default n
-    depends on TEST_KCONFIG
-    depends on CPU_CORE_CORTEX_M
-    depends on HAS_CORTEXM_FPU

@@ -1,4 +1,0 @@
-config PACKAGE_FIDO2_TESTS
-    bool "FIDO2 tests"
-    help
-        Test suite for FIDO2, U2F, and other security key functions.

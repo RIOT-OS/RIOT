@@ -5,8 +5,8 @@
     <tab type="mainpage" visible="yes" title=""/>
     <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="user" url="@ref boards" title="Supported Boards"/>
-    <tab type="topics" visible="yes" title="" intro=""/>
-    <tab type="modules" visible="yes" title="" intro=""/>
+    <tab type="topics" visible="yes" title="Modules" intro="This is the list of modules in RIOT"/>
+    <tab type="modules" visible="yes" title="Modules" intro="This is the list of modules in RIOT"/>
     <tab type="namespaces" visible="yes" title="">
       <tab type="namespacelist" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>

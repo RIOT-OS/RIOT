@@ -13,24 +13,7 @@ config BOARD_STM32F3DISCOVERY
     default y
     select CPU_MODEL_STM32F303VC
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
     # Clock configuration
     select BOARD_HAS_HSE
-
-    select HAVE_SAUL_GPIO
-    select HAVE_LSM303DLHC
-
-    # L3Gxxxx gyro
-    select HAVE_L3GXXXX_SPI
-    select HAVE_I3G4250D
-    select HAVE_L3GD20
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

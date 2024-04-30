@@ -5,10 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TINYUSB_CLASS_CDC
-    bool "Communication Device Class (CDC)"
-
-if MODULE_TINYUSB_CLASS_CDC && MODULE_TINYUSB_DEVICE
+if USEMODULE_TINYUSB_CLASS_CDC && USEMODULE_TINYUSB_DEVICE
 
 config TUSBD_CDC_NUMOF
     int "Number of CDC interfaces"

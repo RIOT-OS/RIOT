@@ -106,6 +106,7 @@ typedef struct {
  */
 typedef struct {
     lsm6dsxx_params_t params; /**< driver parameters */
+    uint8_t temperature_scaling_factor; /**< temperature scaling factor */
 } lsm6dsxx_t;
 
 /**

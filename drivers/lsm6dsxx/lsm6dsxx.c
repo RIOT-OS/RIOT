@@ -71,7 +71,13 @@ int lsm6dsxx_init(lsm6dsxx_t *dev, const lsm6dsxx_params_t *params)
         return -LSM6DSXX_ERROR_BUS;
     }
 
-    if (tmp != LSM6DSXX_WHO_AM_I) {
+    if (tmp == LSM6DS33_WHO_AM_I) {
+        dev->temperature_scaling_factor = 4;
+    }
+    else if (tmp == LSM6DSL_WHO_AM_I) {
+        dev->temperature_scaling_factor = 8;
+    }
+    else {
         DEBUG("[ERROR] lsm6dsxx_init: WHO_AM_I\n");
         return -LSM6DSXX_ERROR_DEV;
     }
@@ -192,8 +198,8 @@ int lsm6dsxx_read_temp(const lsm6dsxx_t *dev, int16_t *data)
     traw |= (uint16_t)tmp << 8;
     i2c_release(BUS);
     /* convert temperature to degC x 100 */
-    traw += LSM6DSXX_TEMP_OFFSET;
-    *data = (int16_t)(((int32_t)traw * 100) / 256);
+    traw += LSM6DSXX_TEMP_OFFSET << dev->temperature_scaling_factor;
+    *data = (int16_t)(((int32_t)traw * 100) >> dev->temperature_scaling_factor);
 
     return LSM6DSXX_OK;
 }

@@ -5,47 +5,13 @@
 # directory for more details.
 #
 
-menuconfig MODULE_PERIPH_SPI
-    bool "SPI peripheral driver"
-    depends on HAS_PERIPH_SPI
-    select MODULE_PERIPH_COMMON
-
-if MODULE_PERIPH_SPI
-
-config MODULE_PERIPH_INIT_SPI
-    bool "Auto initialize SPI peripheral"
-    default y if MODULE_PERIPH_INIT
-
-config MODULE_PERIPH_SPI_RECONFIGURE
-    bool "Pin reconfiguration support"
-    depends on HAS_PERIPH_SPI_RECONFIGURE
-
-config MODULE_PERIPH_SPI_ON_QSPI
-    bool "Use QSPI peripherial in SPI mode"
-    depends on HAS_PERIPH_SPI_ON_QSPI
-
-config MODULE_PERIPH_SPI_GPIO_MODE
-    bool "Support initializing SPI pins with adapted GPIO modes"
-    depends on HAS_PERIPH_SPI_GPIO_MODE
-    help
-        Say y to call `spi_init_with_gpio_mode`, which allows to initialize the SPI pins in
-        with an specific GPIO mode.
+if USEMODULE_PERIPH_SPI
 
 # TODO: these modules are actually just artifacts from the way periph_init_%
 # modules are handled in Makefile. We need to define them to keep the list the
 # same for now. We should be able to remove them later on.
 
-config MODULE_PERIPH_INIT_SPI_RECONFIGURE
-    bool "Auto initialize SPI pin reconfiguration support"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_SPI_RECONFIGURE
-
-config MODULE_PERIPH_INIT_SPI_GPIO_MODE
-    bool
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_SPI_GPIO_MODE
-
 # Include CPU specific configurations
 osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.spi"
 
-endif # MODULE_PERIPH_SPI
+endif # USEMODULE_PERIPH_SPI

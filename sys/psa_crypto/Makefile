@@ -8,6 +8,10 @@ ifneq (,$(filter psa_key_slot_mgmt,$(USEMODULE)))
   DIRS += psa_key_slot_mgmt
 endif
 
+ifneq (,$(filter psa_persistent_storage,$(USEMODULE)))
+  DIRS += psa_persistent_storage
+endif
+
 ifneq (,$(filter psa_se_mgmt,$(USEMODULE)))
   DIRS += psa_se_mgmt
 endif

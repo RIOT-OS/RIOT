@@ -6,20 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_MOTOR_DRIVER
-    bool "High-level driver for DC motors"
-    depends on HAS_PERIPH_PWM
-    depends on HAS_MOTOR_DRIVER
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_PWM
-
-menuconfig KCONFIG_USEMODULE_MOTOR_DRIVER
-    bool "Configure the DC Motor driver"
+menu "MOTOR_DRIVER: DC Motor driver"
     depends on USEMODULE_MOTOR_DRIVER
-    help
-        Configure the DC Motor driver using Kconfig.
-
-if KCONFIG_USEMODULE_MOTOR_DRIVER
 
 config MOTOR_DRIVER_MAX
     int "Maximum number of motors"
@@ -29,4 +17,4 @@ config MOTOR_DRIVER_MAX
         The value should not exceed the number of PWM channels
         Default value is set to 2.
 
-endif # KCONFIG_USEMODULE_MOTOR_DRIVER
+endmenu # Configure the DC Motor driver

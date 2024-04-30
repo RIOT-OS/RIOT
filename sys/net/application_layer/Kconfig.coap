@@ -5,18 +5,8 @@
 # directory for more details.
 #
 
-config HAS_PROTOCOL_COAP
-    bool
-    help
-        Specifies that CoAP support is present.
-
-menuconfig KCONFIG_COAP
-    bool "Configure CoAP generic options"
-    depends on HAS_PROTOCOL_COAP
-    help
-        Configure CoAP generic options via Kconfig.
-
-if KCONFIG_COAP
+menu "CoAP generic options"
+    depends on USEMODULE_NANOCOAP || USEMODULE_GCOAP
 
 config COAP_ACK_TIMEOUT_MS
     int "Timeout in milliseconds for a response to a confirmable request"
@@ -50,4 +40,4 @@ config COAP_MAX_RETRANSMIT
         of 4 retransmissions is taken from
         [RFC 7252, section 4.8](https://tools.ietf.org/html/rfc7252#section-4.8).
 
-endif # KCONFIG_COAP
+endmenu # CoAP generic options

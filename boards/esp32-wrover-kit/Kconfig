@@ -12,19 +12,5 @@ config BOARD_ESP32_WROVER_KIT
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_WROVER
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_RTC_TIMER_32K
-    select HAS_ESP_JTAG
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SDMMC
-    select HAS_PERIPH_SPI
-    select HAS_SDCARD_SPI
-
-    select HAVE_ILI9341
-    select HAVE_MTD_SDMMC_DEFAULT if !MODULE_SDCARD_SPI
-
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

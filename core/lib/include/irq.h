@@ -91,7 +91,7 @@ MAYBE_INLINE bool irq_is_enabled(void);
 MAYBE_INLINE bool irq_is_in(void);
 
 #else
-#include "irq_arch.h"
+#include "irq_arch.h" /* IWYU pragma: export */
 #endif /* IRQ_API_INLINED */
 
 #ifdef __cplusplus

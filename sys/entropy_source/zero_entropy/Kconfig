@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
-    bool "Configure zero entropy source module"
+menu "zero entropy source module"
     depends on USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
-    help
-        Configure the zero entropy source using Kconfig.
-
-if KCONFIG_USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
 
 config ENTROPY_SOURCE_ZERO_HMIN
     int "Estimated entropy per sample (byte)"
@@ -32,4 +27,4 @@ config ENTROPY_SOURCE_ZERO_COND
         Neumann extractor would never finish and wait for the stop criterion given by
         @ref CONFIG_ENTROPY_SOURCE_NEUMANN_ABORT.
 
-endif # KCONFIG_USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
+endmenu # zero entropy source module

@@ -5,17 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_PROGRESS_BAR
-    bool "A simple CLI progress bar"
-    depends on TEST_KCONFIG
-
-menuconfig KCONFIG_USEMODULE_PROGRESS_BAR
-    bool "Configure progress bar module"
+menu "progress bar module"
     depends on USEMODULE_PROGRESS_BAR
-    help
-        Configure the progress bar module using Kconfig.
-
-if KCONFIG_USEMODULE_PROGRESS_BAR
 
 config PROGRESS_BAR_LENGTH
     int "Progress bar length"
@@ -55,4 +46,4 @@ config PROGRESS_BAR_SUFFIX_MAX_LENGTH
     int "Progress bar suffix max length"
     default 32
 
-endif # KCONFIG_USEMODULE_PROGRESS_BAR
+endmenu # progress bar module

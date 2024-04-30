@@ -8,20 +8,6 @@
 # We will rely on nrf5x_common later when we support more peripherals
 config CPU_FAM_NRF53
     bool
-    select HAS_CPU_NRF53
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    select HAS_PERIPH_FLASHPAGE_PAGEWISE
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_TIMER_POLL
-    select HAS_PERIPH_TIMER_QUERY_FREQS
-    select HAS_PERIPH_UART_MODECFG
-    select HAS_PERIPH_WDT
-    select HAS_PERIPH_WDT_CB
-    select MODULE_NRF_SHARED_SERIAL_IRQ
 
 ## CPU Models
 config CPU_MODEL_NRF5340_APP
@@ -39,13 +25,5 @@ config CPU_MODEL
 
 config CPU
     default "nrf53" if CPU_FAM_NRF53
-
-## Definition of specific features
-config HAS_CPU_NRF53
-    bool
-    help
-        Indicates that the current cpu is 'nrf53'.
-
-rsource "vectors/Kconfig"
 
 source "$(RIOTCPU)/nrf5x_common/Kconfig"

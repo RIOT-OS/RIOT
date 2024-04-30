@@ -13,11 +13,5 @@ config BOARD_ESP32C3_DEVKIT
     default y
     select BOARD_COMMON_ESP32C3
     select CPU_MODEL_ESP32C3_MINI_1X
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_JTAG
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
 
 source "$(RIOTBOARD)/common/esp32c3/Kconfig"

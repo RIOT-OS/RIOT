@@ -73,6 +73,13 @@ ifeq (1,$(USE_ZEP))
   USEMODULE += socket_zep
 endif
 
+# Pass through application configuration to the docker container, if
+# BUILD_IN_DOCKER=1 is used:
+DOCKER_ENV_VARS += LWIP_IPV4
+DOCKER_ENV_VARS += LWIP_IPV6
+DOCKER_ENV_VARS += USE_ZEP
+DOCKER_ENV_VARS += ZEP_PORT_BASE
+
 include $(RIOTBASE)/Makefile.include
 
 # For now this goes after the inclusion of Makefile.include so Kconfig symbols

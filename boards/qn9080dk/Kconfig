@@ -17,15 +17,5 @@ config BOARD_QN9080DK
     # Put defined MCU peripherals here (in alphabetical order)
     select BOARD_HAS_XTAL32K
     select BOARD_HAS_XTAL_32M
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_MODECFG
-
-    select HAVE_SAUL_GPIO
-    select HAVE_MMA8X5X
-    select HAVE_MTD_SPI_NOR
 
 source "$(RIOTBOARD)/common/qn908x/Kconfig"

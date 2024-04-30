@@ -5,13 +5,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_SOCK_DODTLS
-    bool "Configure DNS over DTLS"
+menu "DNS over DTLS"
     depends on USEMODULE_SOCK_DODTLS
-    help
-        Configure DNS over DTLS using Kconfig.
-
-if KCONFIG_USEMODULE_SOCK_DODTLS
 
 config SOCK_DODTLS_RETRIES
     int "Number of DNS over DTLS query retries"
@@ -21,4 +16,4 @@ config SOCK_DODTLS_TIMEOUT_MS
     int "Timeout for DNS over DTLS queries in milliseconds"
     default 1000
 
-endif # KCONFIG_USEMODULE_SOCK_DODTLS
+endmenu # DNS over DTLS

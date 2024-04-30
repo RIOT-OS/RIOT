@@ -20,16 +20,14 @@
  * @}
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "debug.h"
 #include "busy_wait.h"
 #include "macros/math.h"
 #include "macros/units.h"
+#include "modules.h"
 #include "periph_conf.h"
-#include "periph_cpu.h"
 
 #ifdef RSEL3
 #define RSEL_MASK (RSEL0 | RSEL1 | RSEL2 | RSEL3)
@@ -52,8 +50,15 @@ static inline bool is_valid_low_freq(uint32_t freq) {
     return (freq == 32768);
 }
 
-/* As high speed crystal anything between 450 kHz and 8 MHz is allowed */
+/* Valid parameter range for the high speed crystal by family:
+ * MSP430 x1xx: 450 kHz <= f <= 8 MHz
+ * MSP430 F2xx / G2xx: 400 kHz <= f <= 16 MHz
+ */
 static inline bool is_valid_high_freq(uint32_t freq) {
+    if (IS_ACTIVE(CPU_FAM_MSP430_F2XX_G2XX)) {
+        return ((freq >= KHZ(400)) && (freq <= MHZ(16)));
+    }
+
     return ((freq >= KHZ(450)) && (freq <= MHZ(8)));
 }
 
@@ -69,8 +74,7 @@ static inline bool is_valid_high_freq(uint32_t freq) {
 static void check_config(void)
 {
     /* LFXT1 can either be a low frequency 32.768 kHz watch crystal or a
-     * high frequency crustal between 450 kHz and 8 MHz. We cannot function
-     * without this crystal */
+     * high frequency crystal. We cannot function without this crystal */
     if (!is_valid_low_freq(clock_params.lfxt1_frequency)
             && !is_valid_high_freq(clock_params.lfxt1_frequency)) {
         extern void lfxt1_frequency_invalid(void);
@@ -78,7 +82,8 @@ static void check_config(void)
     }
 
     /* XT2 is not required and may be configured as 0 Hz to indicate its
-     * absence. If it is present, we require 450 kHz <= XT <= 8 MHz */
+     * absence. If it is present, it must but a valid frequency for a high
+     * frequency crystal. */
     if ((clock_params.xt2_frequency != 0) &&
             !is_valid_high_freq(clock_params.xt2_frequency)) {
         extern void xt2_frequency_invalid(void);
@@ -319,10 +324,10 @@ void default_clock_init(void)
 
     /* if DCO is not used at all, disable it to preserve power */
     if (clock_params.target_dco_frequency == 0) {
-        /* Setting bit SCG0 in the status register (r2) disables the DCO.
+        /* Setting bit SCG0 in the status register (SR) disables the DCO.
          * We do so in assembly, as r2 is not memory mapped. */
         __asm__ __volatile__ (
-            "bis %[scg0], r2"           "\n\t"
+            "bis %[scg0], SR"           "\n\t"
             : /* no outputs */
             : /* inputs: */
               [scg0]        "i"(SCG0) /* bitmask to set SCGO0 as immediate */

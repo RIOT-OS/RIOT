@@ -7,7 +7,7 @@
 
 The nRF5340DK is a devboard based on nRF5340 MCU which offers a dual core
 Cortex-M33 with one application core and one network core.
-The network core is able to handle Bluetooth 5.3, BLE, mesh, NFC, Thread and
+The network core is able to handle Bluetooth 5.3, BLE, mesh, NFC (only tag emulation, no reader support), Thread and
 Zigbee connectivity.
 Currently only the application core can be used with RIOT-OS.
 

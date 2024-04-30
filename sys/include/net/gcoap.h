@@ -65,7 +65,7 @@
  * reading the request, the callback must use functions provided by gcoap to
  * format the response, as described below. The callback *must* read the request
  * thoroughly before calling the functions, because the response buffer likely
- * reuses the request buffer. See `examples/gcoap/gcoap_cli.c` for a simple
+ * reuses the request buffer. See `examples/gcoap/client.c` for a simple
  * example of a callback.
  *
  * Here is the expected sequence for a callback function:
@@ -105,7 +105,7 @@
  *
  * Client operation includes two phases: creating and sending a request, and
  * handling the response asynchronously in a client supplied callback. See
- * `examples/gcoap/gcoap_cli.c` for a simple example of sending a request and
+ * `examples/gcoap/client.c` for a simple example of sending a request and
  * reading the response.
  *
  * ### Creating a request ###
@@ -260,7 +260,7 @@
  *
  * The client requests a specific blockwise payload from the overall body by
  * writing a Block2 option in the request. See _resp_handler() in the
- * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/gcoap/gcoap_cli.c)
+ * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/gcoap/client.c)
  * example in the RIOT distribution, which implements the sequence described
  * below.
  *
@@ -330,7 +330,8 @@
  * coap_opt_add_proxy_uri(&pdu, uri);
  * unsigned len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
  *
- * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, _resp_handler, NULL);
+ * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, _resp_handler, NULL,
+ *                GCOAP_SOCKET_TYPE_UNDEF);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * See the gcoap example for a sample implementation.
@@ -721,7 +722,7 @@ typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
  * @brief   CoAP socket types
  *
  * May be used as flags for @ref gcoap_listener_t, but must be used numerically
- * with @ref gcoap_req_send_tl().
+ * with @ref gcoap_req_send().
  */
 typedef enum {
     GCOAP_SOCKET_TYPE_UNDEF = 0x0,      /**< undefined */
@@ -960,8 +961,33 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 /**
  * @brief   Sends a buffer containing a CoAP request to the provided endpoint
  *
- * @deprecated Will be an alias for @ref gcoap_req_send after the 2022.01
- *             release. Will be removed after the 2022.04 release.
+ * @param[in] buf           Buffer containing the PDU
+ * @param[in] len           Length of the buffer
+ * @param[in] remote        Destination for the packet
+ * @param[in] resp_handler  Callback when response received, may be NULL
+ * @param[in] context       User defined context passed to the response handler
+ * @param[in] tl_type       The transport type to use for send. When
+ *                          @ref GCOAP_SOCKET_TYPE_UNDEF is selected, the highest
+ *                          available (by value) will be selected. Only single
+ *                          types are allowed, not a combination of them.
+ *
+ * @note The highest supported (by value) gcoap_socket_type_t will be selected
+ *       as transport type.
+ *
+ * @return  length of the packet
+ * @return -ENOTCONN, if DTLS was used and session establishment failed
+ * @return -EINVAL, if @p tl_type is is not supported
+ * @return  0 if cannot send
+ */
+ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
+                       const sock_udp_ep_t *remote,
+                       gcoap_resp_handler_t resp_handler, void *context,
+                       gcoap_socket_type_t tl_type);
+
+/**
+ * @brief   Sends a buffer containing a CoAP request to the provided endpoint
+ *
+ * @deprecated Will be removed after the 2023.10 release. Use alias @ref gcoap_req_send() instead.
  *
  * @param[in] buf           Buffer containing the PDU
  * @param[in] len           Length of the buffer
@@ -978,34 +1004,12 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return -EINVAL, if @p tl_type is is not supported
  * @return  0 if cannot send
  */
-ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
-                          const sock_udp_ep_t *remote,
-                          gcoap_resp_handler_t resp_handler, void *context,
-                          gcoap_socket_type_t tl_type);
-
-/**
- * @brief   Sends a buffer containing a CoAP request to the provided endpoint
- *
- * @param[in] buf           Buffer containing the PDU
- * @param[in] len           Length of the buffer
- * @param[in] remote        Destination for the packet
- * @param[in] resp_handler  Callback when response received, may be NULL
- * @param[in] context       User defined context passed to the response handler
- *
- * @note The highest supported (by value) gcoap_socket_type_t will be selected
- *       as transport type.
- *
- * @return  length of the packet
- * @return -ENOTCONN, if DTLS was used and session establishment failed
- * @return  0 if cannot send
- */
-static inline ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
-                                     const sock_udp_ep_t *remote,
-                                     gcoap_resp_handler_t resp_handler,
-                                     void *context)
+static inline ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
+                                        const sock_udp_ep_t *remote,
+                                        gcoap_resp_handler_t resp_handler, void *context,
+                                        gcoap_socket_type_t tl_type)
 {
-    return gcoap_req_send_tl(buf, len, remote, resp_handler, context,
-                             GCOAP_SOCKET_TYPE_UNDEF);
+    return gcoap_req_send(buf, len, remote, resp_handler, context, tl_type);
 }
 
 /**

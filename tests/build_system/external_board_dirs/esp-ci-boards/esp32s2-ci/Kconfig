@@ -13,30 +13,5 @@ config BOARD_ESP32S2_CI
     default y
     select BOARD_COMMON_ESP32S2
     select CPU_MODEL_ESP32S2_MINI_1X_N4R2
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_JTAG
-    select HAS_ESP_RTC_TIMER_32K
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-
-    select MODULE_BOARD_ESP32S2-CI
-
-config MODULE_BOARD_ESP32S2-CI
-    bool
-
-if TEST_KCONFIG
-
-choice ESP32_I2C_IMPLEMENTATION
-    default MODULE_ESP_I2C_HW
-endchoice
-
-config MODULE_ESP_HW_COUNTER
-    default y
-    depends on MODULE_PERIPH_TIMER
-
-endif # TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/esp32s2/Kconfig"

@@ -12,7 +12,5 @@ config BOARD_ARDUINO_LEONARDO
     default y
     select BOARD_COMMON_ARDUINO_ATMEGA
     select CPU_MODEL_ATMEGA32U4
-    select MODULE_BOARDS_COMMON_ARDUINO-ATMEGA if TEST_KCONFIG
-    select HAS_ARDUINO_SHIELD_UNO
 
 source "$(RIOTBOARD)/common/arduino-atmega/Kconfig"

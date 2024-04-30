@@ -40,14 +40,14 @@
  * of a series of superframes that repeat indefinitely. A superframe consists
  * of a Beacon Slot, a Contention Access Period and Contention Free Period.
  *
- *    BS                 CAP                      CFP        BS
- *   +------------------------------------------------------+----
- *   |   |                                |--|--|--|--|--|--|   | ...
- *   |   |                                |--|--|--|--|--|--|   |
- *   |   |                                |--|--|--|--|--|--|   | ...
- *   |   |                                |--|--|--|--|--|--|   |
- *   +---+--------------------------------+--+--+--+--+--+--+---+
- *   <------------------- Superframe ----------------------->
+ *      BS                 CAP                      CFP        BS
+ *     +------------------------------------------------------+----
+ *     |   |                                |--|--|--|--|--|--|   | ...
+ *     |   |                                |--|--|--|--|--|--|   |
+ *     |   |                                |--|--|--|--|--|--|   | ...
+ *     |   |                                |--|--|--|--|--|--|   |
+ *     +---+--------------------------------+--+--+--+--+--+--+---+
+ *     <------------------- Superframe ----------------------->
  *
  * Each period of the superframe serves a dedicated purpose:
  * - Beacon Slot: Used for beacon transmission. PAN Coordinators and Coordinators

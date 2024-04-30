@@ -9,23 +9,6 @@ config CPU_FAM_L0
     bool
     select CPU_STM32
     select CPU_CORE_CORTEX_M0PLUS
-    select HAS_CPU_STM32L0
-    select HAS_PERIPH_EEPROM
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    select HAS_PERIPH_FLASHPAGE_PAGEWISE
-    select HAS_PERIPH_GPIO_LL
-    select HAS_PERIPH_GPIO_LL_IRQ
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_WDT
-    select HAS_BOOTLOADER_STM32
 
 config CPU_FAM
     default "l0" if CPU_FAM_L0
-
-config HAS_CPU_STM32L0
-    bool
-    help
-        Indicates that the cpu being used belongs to the 'stm32l0' family.

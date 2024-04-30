@@ -9,16 +9,6 @@ config CPU_FAM_EFM32PG12B
     select CPU_CORE_CORTEX_M4F
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES1
-    select HAS_PERIPH_HWRNG
-    select HAS_CORTEXM_MPU
-
-config MODULE_CPU_EFM32PG12B
-    bool
-    depends on CPU_FAM_EFM32PG12B
-    depends on TEST_KCONFIG
-    default y
-    help
-        EFM32PG12B family-specific code.
 
 ## CPU Models
 config CPU_MODEL_EFM32PG12B500F1024IM48

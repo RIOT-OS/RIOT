@@ -6,29 +6,3 @@
 
 config BOARD_COMMON_ARDUINO_ATMEGA
     bool
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    # Various other features (if any)
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_I2C
-    select HAS_ARDUINO_PINS
-    select HAS_ARDUINO_PWM
-    select HAS_ARDUINO_SHIELD_ISP
-    select HAS_ARDUINO_SPI
-    select HAS_ARDUINO_UART
-
-    select HAVE_SAUL_GPIO
-
-config MODULE_BOARDS_COMMON_ARDUINO-ATMEGA
-    bool
-    depends on TEST_KCONFIG
-    select MODULE_BOARDS_COMMON_ATMEGA
-    help
-       Common code of Arduino ATmega boards.
-
-source "$(RIOTBOARD)/common/atmega/Kconfig"

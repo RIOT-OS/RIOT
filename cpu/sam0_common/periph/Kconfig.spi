@@ -6,8 +6,8 @@
 
 config SPI_DMA_THRESHOLD_BYTES
     int "SPI DMA threshold (bytes)"
-    depends on MODULE_PERIPH_DMA
-    depends on MODULE_PERIPH_SPI
+    depends on USEMODULE_PERIPH_DMA
+    depends on USEMODULE_PERIPH_SPI
     default 16
     help
         Threshold in bytes under which no SPI DMA transfer will be performed.

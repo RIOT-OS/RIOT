@@ -11,6 +11,5 @@ config BOARD_PARTICLE_BORON
     bool
     default y
     select BOARD_COMMON_PARTICLE_MESH
-    select MODULE_PERIPH_UART_HW_FC if HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
 
 source "$(RIOTBOARD)/common/particle-mesh/Kconfig"

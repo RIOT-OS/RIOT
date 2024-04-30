@@ -11,14 +11,3 @@ config BOARD_FRDM_KL43Z
     bool
     default y
     select CPU_MODEL_MKL43Z256VLH4
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_MAG3110
-    select HAVE_MMA8X5X
-    select HAVE_SAUL_ADC
-    select HAVE_SAUL_GPIO

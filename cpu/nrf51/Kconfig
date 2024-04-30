@@ -10,7 +10,6 @@ config CPU_FAM_NRF51
     bool
     select CPU_CORE_CORTEX_M0
     select CPU_COMMON_NRF5X
-    select HAS_CPU_NRF51
 
 ## CPU Models
 config CPU_MODEL_NRF51X22XXAA
@@ -37,15 +36,9 @@ config CPU_MODEL
 config CPU
     default "nrf51" if CPU_FAM_NRF51
 
-## Definition of specific features
-config HAS_CPU_NRF51
-    bool
-    help
-        Indicates that the current cpu is 'nrf51'.
-
 ## Platform-specific defaults
 config GNRC_PKTBUF_SIZE
     default 2048
-    depends on KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
+    depends on USEMODULE_GNRC_PKTBUF_STATIC
 
 source "$(RIOTCPU)/nrf5x_common/Kconfig"

@@ -42,25 +42,19 @@
 
 #if defined(EXTI_SWIER_SWI0) || defined(EXTI_SWIER_SWIER0)
 #  define EXTI_REG_SWIER        (EXTI->SWIER)
-#endif
-
-#if defined(EXTI_SWIER1_SWI0) || defined(EXTI_SWIER1_SWIER0)
+#elif defined(EXTI_SWIER1_SWI0) || defined(EXTI_SWIER1_SWIER0)
 #  define EXTI_REG_SWIER        (EXTI->SWIER1)
 #endif
 
 #if defined(EXTI_RTSR_RT0) || defined(EXTI_RTSR_TR0)
 #  define EXTI_REG_RTSR         (EXTI->RTSR)
-#endif
-
-#if defined(EXTI_RTSR1_RT0) || defined(EXTI_RTSR1_TR0)
+#elif defined(EXTI_RTSR1_RT0) || defined(EXTI_RTSR1_TR0)
 #  define EXTI_REG_RTSR         (EXTI->RTSR1)
 #endif
 
 #if defined(EXTI_FTSR_FT0) || defined(EXTI_FTSR_TR0)
 #  define EXTI_REG_FTSR         (EXTI->FTSR)
-#endif
-
-#if defined(EXTI_FTSR1_FT0) || defined (EXTI_FTSR1_TR0)
+#elif defined(EXTI_FTSR1_FT0) || defined (EXTI_FTSR1_TR0)
 #  define EXTI_REG_FTSR         (EXTI->FTSR1)
 #endif
 
@@ -81,44 +75,30 @@
 #  define EXTI_REG_IMR          (EXTI->IMR1)
 #endif
 
-#ifdef RCC_APB2ENR_SYSCFGCOMPEN
+#if defined(RCC_APB2ENR_SYSCFGCOMPEN)
 #  define SYSFG_CLOCK           APB2
 #  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGCOMPEN
 #elif defined(RCC_APB2ENR_SYSCFGEN)
+#  define SYSFG_CLOCK           APB2
 #  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGEN
-#  ifdef APB12
-#    define SYSFG_CLOCK         APB12
-#  else
-#    define SYSFG_CLOCK         APB2
-#  endif
-#endif
-
-#ifdef RCC_APB3ENR_SYSCFGEN
+#elif defined(RCC_APB3ENR_SYSCFGEN)
 #  define SYSFG_CLOCK           APB3
 #  define SYSFG_ENABLE_MASK     RCC_APB3ENR_SYSCFGEN
 #endif
 
-#ifdef EXTI_EXTICR1_EXTI0
+#if defined(EXTI_EXTICR1_EXTI0)
 #  define EXTICR_REG(num)       (EXTI->EXTICR[(num) >> 2])
-#endif
-
-#ifdef SYSCFG_EXTICR1_EXTI0
+#elif defined(SYSCFG_EXTICR1_EXTI0)
 #  define EXTICR_REG(num)       (SYSCFG->EXTICR[(num) >> 2])
-#endif
-
-#ifdef AFIO_EXTICR1_EXTI0
+#elif defined(AFIO_EXTICR1_EXTI0)
 #  define EXTICR_REG(num)       (AFIO->EXTICR[(num) >> 2])
 #endif
 
-#ifdef SYSCFG_EXTICR1_EXTI1_Pos
+#if defined(SYSCFG_EXTICR1_EXTI1_Pos)
 #  define EXTICR_FIELD_SIZE     SYSCFG_EXTICR1_EXTI1_Pos
-#endif
-
-#ifdef EXTI_EXTICR1_EXTI1_Pos
+#elif defined(EXTI_EXTICR1_EXTI1_Pos)
 #  define EXTICR_FIELD_SIZE     EXTI_EXTICR1_EXTI1_Pos
-#endif
-
-#ifdef AFIO_EXTICR1_EXTI1_Pos
+#elif defined(AFIO_EXTICR1_EXTI1_Pos)
 #  define EXTICR_FIELD_SIZE     AFIO_EXTICR1_EXTI1_Pos
 #endif
 

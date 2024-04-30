@@ -11,14 +11,3 @@ config BOARD_MSBA2
     bool
     default y
     select CPU_MODEL_LPC2387
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_LTC4150
-    select HAVE_SHT11
-    select HAVE_MTD_SPI_MCI

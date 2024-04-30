@@ -7,36 +7,12 @@
 
 config BOARD_COMMON_WEACT_F4X1CX
     bool
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select HAS_HIGHLEVEL_STDIO
 
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-    select HAVE_SAUL_GPIO
-    select HAVE_MTD_SPI_NOR
-    select MODULE_BOOTLOADER_STM32 if MODULE_STDIO_CDC_ACM
-    select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG
-
 config CLOCK_HSE
     default 25000000
-
-config MODULE_BOARDS_COMMON_WEACT-F4X1CX
-    bool
-    depends on TEST_KCONFIG
-    help
-       Common code of weact based boards
-
-config FORCE_USB_STDIO
-    default y
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

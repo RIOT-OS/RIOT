@@ -155,7 +155,6 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   endif
   ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
     USEMODULE += gnrc_netif_lorawan
-    USEMODULE += gnrc_nettype_lorawan
   endif
 endif
 

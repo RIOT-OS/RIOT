@@ -5,34 +5,20 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_USEMODULE_DNS
-    bool "Configure DNS"
+menu "DNS"
     depends on USEMODULE_DNS
-    help
-        Configure DNS using Kconfig.
 
-if KCONFIG_USEMODULE_DNS
-menuconfig KCONFIG_USEMODULE_DNS_MSG
-    bool "Configure DNS message parser and composer"
+menu "DNS message parser and composer"
     depends on USEMODULE_DNS_MSG
-    help
-        Configure DNS message parser and composer using Kconfig.
-
-if KCONFIG_USEMODULE_DNS_MSG
 
 config DNS_MSG_LEN
     int "Maximum DNS message length"
     default 128
 
-endif # KCONFIG_USEMODULE_DNS_MSG
+endmenu # DNS message parser and composer
 
-menuconfig KCONFIG_USEMODULE_DNS_CACHE
-    bool "Configure DNS cache"
+menu "DNS cache"
     depends on USEMODULE_DNS_CACHE
-    help
-        Configure DNS cache using Kconfig.
-
-if KCONFIG_USEMODULE_DNS_CACHE
 
 config DNS_CACHE_SIZE
     int "Maximum number of DNS cache entries"
@@ -48,5 +34,5 @@ config DNS_CACHE_AAAA
     default y if USEMODULE_IPV6
     default n
 
-endif # KCONFIG_USEMODULE_DNS_SIZE
-endif # KCONFIG_USEMODULE_DNS
+endmenu # DNS cache
+endmenu # DNS

@@ -12,10 +12,5 @@ config BOARD_ACD52832
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52832XXAA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

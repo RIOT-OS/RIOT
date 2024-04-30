@@ -6,26 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_OPT3001
-    bool "OPT3001 Ambient Light Sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
-
-config HAVE_OPT3001
-    bool
-    select MODULE_OPT3001 if MODULE_SAUL_DEFAULT
-    help
-      Indicates that a OPT3001 Ambient Light Sensor is present.
-
-menuconfig KCONFIG_USEMODULE_OPT3001
-    bool "Configure OPT3001 driver"
+menu "OPT3001 driver"
     depends on USEMODULE_OPT3001
-    help
-        Configure the OPT3001 driver using Kconfig.
-
-if KCONFIG_USEMODULE_OPT3001
 
 config OPT3001_I2C_ADDRESS
     hex "Default I2C address"
@@ -53,4 +35,4 @@ config OPT3001_CONVERSION_TIME_800
 
 endchoice
 
-endif # KCONFIG_USEMODULE_OPT3001
+endmenu # OPT3001 driver

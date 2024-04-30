@@ -5,12 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_USBUS_HID
-    bool "USB HID support"
-    depends on MODULE_USBUS
-    select MODULE_ISRPIPE_READ_TIMEOUT
-
 config USBUS_HID_INTERRUPT_EP_SIZE
     int "Interrupt endpoint size in bytes"
     default 64
-    depends on MODULE_USBUS_HID
+    depends on USEMODULE_USBUS_HID

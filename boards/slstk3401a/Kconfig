@@ -12,18 +12,5 @@ config BOARD_SLSTK3401A
     default y
     select BOARD_COMMON_SILABS
     select CPU_MODEL_EFM32PG1B200F256GM48
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select MODULE_SILABS_AEM if TEST_KCONFIG
-    select MODULE_SILABS_BC if TEST_KCONFIG
-    # additional hardware present in the board
-    select HAVE_SAUL_GPIO
-    select HAVE_SI7021
 
 source "$(RIOTBOARD)/common/silabs/Kconfig"

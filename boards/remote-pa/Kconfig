@@ -11,7 +11,5 @@ config BOARD_REMOTE_PA
     bool
     default y
     select BOARD_COMMON_REMOTE
-    select HAVE_SAUL_GPIO
-    select HAVE_SAUL_ADC
 
 source "$(RIOTBOARD)/common/remote/Kconfig"

@@ -26,42 +26,30 @@ config CPU_LINE_STM32F030XC
 config CPU_LINE_STM32F031X6
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
     select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
 
 config CPU_LINE_STM32F038XX
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F042X6
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
     select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
 
 config CPU_LINE_STM32F048XX
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F051X8
     bool
     select CPU_FAM_F0
     select CLOCK_HAS_NO_MCO_PRE
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F058XX
     bool
     select CPU_FAM_F0
     select CLOCK_HAS_NO_MCO_PRE
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F070X6
     bool
@@ -74,29 +62,19 @@ config CPU_LINE_STM32F070XB
 config CPU_LINE_STM32F071XB
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F072XB
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F078XX
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F091XC
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT
 
 config CPU_LINE_STM32F098XX
     bool
     select CPU_FAM_F0
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_VBAT

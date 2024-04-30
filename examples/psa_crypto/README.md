@@ -29,48 +29,23 @@ for software and hardware backends as well as secure elements, measured on the n
 
 
 ## Configuration of the API
-There are two ways to configure the API: module selection via Kconfig and module selection
-via Makefiles.
+The module selection must be done with Make but the compile-time configuration
+settings can be done with Kconfig and `menuconfig`.
 
-To see which modules should be chosen for each configuration, please read the Makefile and
-the `app.config.test.*` files.
-
-### Kconfig
-> **NOTE:** In this application all the configurations are in separate app.config files
-> for demonstration purposes. You can also write all configs into one file or choose them
-> via `menuconfig`.
-> To access the GUI, run `TEST_KCONFIG=1 BOARD=<your board> make menuconfig`.
-
-When building the application with the `TEST_KCONFIG=1` option, the first config file parsed by the build system is `app.config.test`. This selects the PSA Crypto module and other modules our application needs (e.g. ztimer). If you need cryptographic keys, you can specify the number of key slots needed for key storage (the default is set to 5).
-The graph below shows how the `app.config` files in this application are included.
-Selections in `app.config.test` are always applied.
-The others are only added, if you specify the corresponding build option.
-
-```mermaid
-    flowchart TD;
-        app.config.test -- default --> app.config.test.base;
-        app.config.test.base -- CUSTOM_BACKEND=1 --> app.config.test.custom;
-        app.config.test -- SECURE_ELEMENT=1 --> app.config.test.se;
-        app.config.test -- SECURE_ELEMENT=2 --> app.config.test.multi_se;
-```
-If you build this without specifying anything else, the symbols in `app.config.test.base`
-are added and PSA Crypto will automatically choose a default crypto backend depending on the platform you're building for.
+If you build this without specifying anything, PSA Crypto will automatically
+choose a default crypto backend depending on the platform you're building for.
 For example when your platform is `native`, software implementations are built.
-When you specify `BOARD=nrf52840dk`, the hardware accelerator of the board will be built.
+When you specify `BOARD=nrf52840dk`, the hardware accelerator of the board will
+be built.
 
-If you want to force a custom backend, you can specify that in the Kconfig file. This application already contains the configuration for a custom backend (see `app.config.test.custom`), which will be added to the application build when you define `CUSTOM_BACKEND=1`.
-
-Instead of or in addition to the default and custom implementations you can use a secure element as a backend (see Section [Using Secure Elements](#using-secure-elements]).
+Instead of or in addition to the default and custom implementations you can use
+a secure element as a backend (see Section [Using Secure Elements](#using-secure-elements]).
 Secure elements are independent of the other backends. In this application, when you
 choose secure elements, they are built instead of the other backends.
 
-Please note that the build options `CUSTOM_BACKEND` and `SECURE_ELEMENT` only apply to this specific application and have nothing to do with the PSA implementation.
-
-### Make
-All the configurations in the Kconfig files can also be applied using Make dependency resolution. The Makefile contains all the modules that must be selected when building the different configurations.
-They can all be built as described above, but *without* defining TEST_KCONFIG.
-
-To prevent conflicts when building this application multiple times with different backends, it is best to remove the `bin` directory in between builds.
+Please note that the build options `CUSTOM_BACKEND` and `SECURE_ELEMENT` only
+apply to this specific application and have nothing to do with the PSA
+implementation.
 
 ## Using Secure Elements
 > **NOTE:**

@@ -9,15 +9,10 @@ config CPU_COMMON_SAMD21
     bool
     select CPU_COMMON_SAM0
     select CPU_CORE_CORTEX_M0PLUS
-    select HAS_CPU_SAMD21
-    select HAS_PERIPH_GPIO_FAST_READ
-    select MODULE_ZTIMER_NO_PERIPH_RTT if TEST_KCONFIG && MODULE_ZTIMER
 
 config CPU_FAM_SAMD10
     bool
     select CPU_COMMON_SAMD21
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_UART_COLLISION
 
 config CPU_FAM_SAMD20
     bool
@@ -26,20 +21,10 @@ config CPU_FAM_SAMD20
 config CPU_FAM_SAMD21
     bool
     select CPU_COMMON_SAMD21
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_UART_COLLISION
 
 config CPU_FAM_SAMR21
     bool
     select CPU_COMMON_SAMD21
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_UART_COLLISION
-
-## Definition of specific features
-config HAS_CPU_SAMD21
-    bool
-    help
-        Indicates that a 'samd21' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM
@@ -55,7 +40,5 @@ source "$(RIOTCPU)/samd21/Kconfig.samd10"
 source "$(RIOTCPU)/samd21/Kconfig.samd20"
 source "$(RIOTCPU)/samd21/Kconfig.samd21"
 source "$(RIOTCPU)/samd21/Kconfig.samr21"
-
-source "$(RIOTCPU)/samd21/vectors/Kconfig"
 
 source "$(RIOTCPU)/sam0_common/Kconfig"

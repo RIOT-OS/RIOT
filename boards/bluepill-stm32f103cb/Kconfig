@@ -13,18 +13,5 @@ config BOARD_BLUEPILL_STM32F103CB
     default y
     select BOARD_COMMON_BLXXXPILL
     select CPU_MODEL_STM32F103CB
-    select MODULE_BOARDS_COMMON_BLXXXPILL if TEST_KCONFIG
-
-    select HAS_HIGHLEVEL_STDIO
-
-config FORCE_USB_STDIO
-    default y
-
-# HACK: This is added due to the make resolution
-# make will select timer backend, probably due to the USBUS
-# and kconfig cannot select if something is already selected like make
-choice ZTIMER_MSEC_BACKEND
-    default ZTIMER_MSEC_BACKEND_TIMER if MODULE_PERIPH_RTC
-endchoice
 
 source "$(RIOTBOARD)/common/blxxxpill/Kconfig"

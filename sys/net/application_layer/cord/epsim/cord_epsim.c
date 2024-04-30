@@ -67,7 +67,7 @@ int cord_epsim_register(const sock_udp_ep_t *rd_ep)
     /* finish, we don't have any payload */
     ssize_t len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     _state = CORD_EPSIM_BUSY;
-    if (gcoap_req_send(buf, len, rd_ep, _req_handler, NULL) == 0) {
+    if (gcoap_req_send(buf, len, rd_ep, _req_handler, NULL, GCOAP_SOCKET_TYPE_UNDEF) == 0) {
         return CORD_EPSIM_ERROR;
     }
 

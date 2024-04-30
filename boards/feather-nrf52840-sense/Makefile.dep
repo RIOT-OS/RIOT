@@ -2,9 +2,10 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += apds9960
   USEMODULE += bmp280_i2c
   USEMODULE += lis3mdl
-  USEMODULE += lsm6ds33
+  USEMODULE += lsm6dsxx
   USEMODULE += saul_gpio
   USEMODULE += sht3x
+  USEMODULE += ws281x
 endif
 
 # include common nrf52 dependencies

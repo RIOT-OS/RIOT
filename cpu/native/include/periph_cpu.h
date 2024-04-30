@@ -96,6 +96,52 @@ typedef enum {
 } gpio_flank_t;
 
 /** @} */
+#elif defined(MODULE_PERIPH_GPIO_MOCK)
+
+/**
+ * @brief   Mocked GPIO
+ *
+ * Mocked GPIO representation for simulation.
+ * @{
+ */
+typedef struct {
+    int value;              /**< current value */
+    int mode;               /**< current mode */
+    int flank;              /**< flank to trigger interrupts */
+    void (*cb)(void *arg);  /**< ISR */
+    void *arg;              /**< ISR arg */
+} gpio_mock_t;
+/** @} */
+
+#define GPIO_UNDEF          0
+
+#ifndef GPIO_PORT_MAX
+#define GPIO_PORT_MAX       (16)
+#endif
+
+#ifndef GPIO_PIN_MAX
+#define GPIO_PIN_MAX        (32)
+#endif
+
+/**
+ * @brief Mocked GPIO array
+ */
+extern gpio_mock_t gpio_mock[GPIO_PORT_MAX][GPIO_PIN_MAX];
+
+#define HAVE_GPIO_T
+/**
+ * @brief   Pointer on a mocked GPIO
+ */
+typedef gpio_mock_t* gpio_t;
+
+/**
+ * @brief   Define a custom GPIO_PIN macro for native mocked GPIO framework.
+ *          Get the mocked GPIO object from mocked GPIO array.
+ */
+#define GPIO_PIN(port, pin) \
+    (((port >= 0) && (pin >= 0) && (port < GPIO_PORT_MAX) && (pin < GPIO_PIN_MAX)) \
+     ? &gpio_mock[port][pin] \
+     : GPIO_UNDEF)
 
 #endif /* MODULE_PERIPH_GPIO_LINUX | DOXYGEN */
 

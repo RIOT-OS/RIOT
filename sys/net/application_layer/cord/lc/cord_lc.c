@@ -190,7 +190,7 @@ static ssize_t _lookup_raw(const cord_lc_rd_t *rd, unsigned content_format,
     if (pkt_len < 0) {
         return CORD_LC_ERR;
     }
-    res = gcoap_req_send(reqbuf, pkt_len, rd->remote, _on_lookup, NULL);
+    res = gcoap_req_send(reqbuf, pkt_len, rd->remote, _on_lookup, NULL, GCOAP_SOCKET_TYPE_UNDEF);
     if (res < 0) {
         return CORD_LC_ERR;
     }
@@ -204,6 +204,8 @@ static void _on_rd_init(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     (void)remote;
 
     thread_flags_t flag = FLAG_NORSC;
+    size_t full_buf_len = _result_buf_len;
+    _result_buf_len = 0;
 
     if (memo->state == GCOAP_MEMO_RESP) {
         unsigned ct = coap_get_content_type(pdu);
@@ -211,23 +213,30 @@ static void _on_rd_init(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
             DEBUG("cord_lc: error payload not in link format: %u\n", ct);
             goto end;
         }
-        if (pdu->payload_len == 0) {
+        size_t size = pdu->payload_len;
+
+        if (size == 0) {
             DEBUG("cord_lc: error empty payload\n");
             goto end;
         }
-        memcpy(_result_buf, pdu->payload, pdu->payload_len);
-        _result_buf_len = pdu->payload_len;
-        _result_buf[_result_buf_len] = '\0';
+        if (size >= full_buf_len) {
+            DEBUG("cord_lc: truncating response from %" PRIuSIZE " to %" PRIuSIZE "\n", size, full_buf_len);
+            /* Not setting FLAG_OVERFLOW: There can still be valid
+             * .well-known/core lookup data in the usable area, which will be
+             * used as long as endpoint and resource lookup are both found */
+            size = full_buf_len;
+            memcpy(_result_buf, pdu->payload, full_buf_len);
+        }
+        else {
+            memcpy(_result_buf, pdu->payload, size);
+        }
+        _result_buf_len = size;
         flag = FLAG_SUCCESS;
     } else if (memo->state == GCOAP_MEMO_TIMEOUT) {
         flag = FLAG_TIMEOUT;
     }
 
 end:
-    if (flag != FLAG_SUCCESS) {
-        _result_buf = NULL;
-        _result_buf_len = 0;
-    }
     thread_flags_set(_waiter, flag);
 }
 
@@ -250,7 +259,7 @@ static int _send_rd_init_req(coap_pkt_t *pkt, const sock_udp_ep_t *remote,
         return CORD_LC_ERR;
     }
 
-    if (!gcoap_req_send(buf, pkt_len, remote, _on_rd_init, NULL)) {
+    if (!gcoap_req_send(buf, pkt_len, remote, _on_rd_init, NULL, GCOAP_SOCKET_TYPE_UNDEF)) {
         DEBUG("cord_lc: error gcoap_req_send()\n");
         return CORD_LC_ERR;
     }
@@ -281,7 +290,9 @@ int cord_lc_rd_init(cord_lc_rd_t *rd, void *buf, size_t maxlen,
     clif_attr_t attrs[MAX_EXPECTED_ATTRS];
     unsigned attrs_used = 0;
     size_t parsed_len = 0;
-    while ((!rd->res_lookif || !rd->ep_lookif) ||
+    /* Quitting the loop once everything we are interested in was found allows
+     * us to succeed even if the data was truncated by a too small buffer */
+    while ((!rd->res_lookif || !rd->ep_lookif) &&
            (parsed_len != _result_buf_len)) {
 
         ssize_t ret = clif_decode_link(&lookif, attrs + attrs_used,

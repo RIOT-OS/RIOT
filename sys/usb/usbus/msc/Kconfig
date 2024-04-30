@@ -1,20 +1,4 @@
-# Copyright (c) 2021 Mesotic SAS
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-menuconfig MODULE_USBUS_MSC
-    bool "USBUS Mass Storage Class"
-    depends on MODULE_USBUS
-    select MODULE_MTD
-    select MODULE_MTD_WRITE_PAGE
-    select USEMODULE_USBUS_MSC
-
-    help
-        Configure the USBUS MSC module via Kconfig.
-
-if MODULE_USBUS_MSC
+if USEMODULE_USBUS_MSC
 
 config USBUS_MSC_AUTO_MTD
     bool "Automatically export all MTD devices via USB"
@@ -35,4 +19,4 @@ config USBUS_MSC_PRODUCT_REV
     string "MSC Product Revision"
     default "1.0"
 
-endif # MODULE_USBUS_MSC
+endif # USEMODULE_USBUS_MSC

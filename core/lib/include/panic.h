@@ -29,6 +29,19 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Automatically reboot the system on panic()
+ *
+ * By default this is on when @ref DEVELHELP is disabled.
+ */
+#ifndef CONFIG_CORE_REBOOT_ON_PANIC
+#ifdef DEVELHELP
+#define CONFIG_CORE_REBOOT_ON_PANIC (0)
+#else
+#define CONFIG_CORE_REBOOT_ON_PANIC (1)
+#endif
+#endif
+
+/**
  * @brief Definition of available panic modes
  */
 typedef enum {

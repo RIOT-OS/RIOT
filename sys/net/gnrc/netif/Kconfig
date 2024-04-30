@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_NETIF
-    bool "Configure GNRC network interface"
+menu "GNRC network interface"
     depends on USEMODULE_GNRC_NETIF
-    help
-        Configure GNRC network interface using Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_NETIF
 
 config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
     int "Exponent for the message queue size for network interface threads (as 2^n)"
@@ -27,7 +22,7 @@ config GNRC_NETIF_IPV6_ADDRS_NUMOF
     help
         If you change this, please make sure that
         @ref CONFIG_GNRC_NETIF_IPV6_GROUPS_NUMOF is also large enough to fit the
-        addresses' solicited nodes multicast addresses.
+        addresses solicited nodes multicast addresses.
         Default: 2 (1 link-local + 1 global address).
 
 config GNRC_NETIF_DEFAULT_HL
@@ -49,18 +44,6 @@ config GNRC_NETIF_NONSTANDARD_6LO_MTU
         This is non compliant with RFC 4944 and RFC 7668 and might not be
         supported by other implementations.
 
-config GNRC_NETIF_LORAWAN_NETIF_HDR
-    bool "Encode LoRaWAN port in GNRC netif header"
-    depends on USEMODULE_GNRC_LORAWAN
-    help
-        When set, GNRC Netif will interpret
-        the destination address of the GNRC netif header as
-        the LoRaWAN port. For downlinks, a GNRC netif header
-        with the received port in destination field will be
-        included in the first snip. From Release 2021.10 all
-        GNRC LoRaWAN packets will include the GNRC Netif
-        header. Therefore this parameter will be removed
-
 config GNRC_NETIF_IPV6_BR_AUTO_6CTX
     bool "Automatically add 6LoWPAN compression at border router"
     default y
@@ -69,6 +52,6 @@ config GNRC_NETIF_IPV6_BR_AUTO_6CTX
         When set, 6LoWPAN compression context 0 will be automatically set for the prefix configured
         by prefix deligation at the border router.
 
-endif # KCONFIG_USEMODULE_GNRC_NETIF
+endmenu # GNRC network interface
 
 rsource "pktq/Kconfig"

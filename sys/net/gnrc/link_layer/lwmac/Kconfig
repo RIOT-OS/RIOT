@@ -4,13 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_LWMAC
-    bool "Configure GNRC LWMAC"
-    depends on USEMODULE_GNRC_LWMAC
-    help
-        Configure the GNRC LWMAC using Kconfig.
 
-if KCONFIG_USEMODULE_GNRC_LWMAC
+menu "GNRC LWMAC"
+    depends on USEMODULE_GNRC_LWMAC
 
 config GNRC_LWMAC_WAKEUP_INTERVAL_US
     int "Time between consecutive wake-ups in microseconds"
@@ -56,7 +52,7 @@ config GNRC_LWMAC_WR_PREPARATION_US
         before it can be sent (higher with debugging output).In LWMAC, when a
         sender wants to send a data packet to the receiver, it starts sending
         the WR stream a little bit earlier (advance) to the beginning edge of
-        destination's wake-up phase over time. The idea is not to miss the
+        destinations wake-up phase over time. The idea is not to miss the
         wake-up period of the receiver, otherwise will lead to a long WR
         procedure.
 
@@ -67,7 +63,7 @@ config GNRC_LWMAC_DATA_DELAY_US
         Configure 'CONFIG_GNRC_LWMAC_DATA_DELAY_US', time to wait after a WA
         for data to arrive in microseconds. When a node in LWMAC gets a WR
         during its wake-up period, it immediately replies a WA packet to the
-        sender for acknowledging the sender's transmission request. After
+        sender for acknowledging the senders transmission request. After
         sending the WA, the receiver waits for the data packet from the sender,
         with a timeout of 'CONFIG_GNRC_LWMAC_DATA_DELAY_US' duration. In case
         no data will be received in this period, the receiver regards
@@ -75,7 +71,7 @@ config GNRC_LWMAC_DATA_DELAY_US
         receiver receives other unintended packets, like WR/WA packets from
         other neighbor communication pairs, the receiver resets this timeout
         and continues to wait for the data packet, with the consideration that
-        the sender's data transmission might be delayed due to other ongoing
+        the senders data transmission might be delayed due to other ongoing
         transmissions (the data packet is transmitted with CSMA/CA). This data
         timeout is long enough to catch the beginning of the packet if the
         transceiver supports 'NETDEV_EVENT_RX_STARTED' event (this can be
@@ -138,6 +134,7 @@ config GNRC_LWMAC_TIMEOUT_COUNT
     help
         Configure 'CONFIG_GNRC_LWMAC_TIMEOUT_COUNT', the default value for the
         maximum number of parallel timeouts in LWMAC.
+
 config GNRC_LWMAC_RADIO_REINIT_THRESHOLD
     int "Maximum preamble attempts before re-initialize radio"
     default 10
@@ -150,4 +147,4 @@ config GNRC_LWMAC_RADIO_REINIT_THRESHOLD
         then we re-initialize the radio, trying to re-calibrate the radio for bringing
         it back to normal condition.
 
-endif # KCONFIG_USEMODULE_GNRC_LWMAC
+endmenu # GNRC LWMAC

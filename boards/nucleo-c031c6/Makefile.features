@@ -4,6 +4,7 @@ CPU_MODEL = stm32c031c6
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart

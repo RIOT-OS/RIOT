@@ -67,7 +67,6 @@ export DOCKER_ENV_VARS += \
   SCANBUILD_ARGS \
   SCANBUILD_OUTPUTDIR \
   SIZE \
-  TEST_KCONFIG \
   TOOLCHAIN \
   UNDEF \
   WERROR \
@@ -278,6 +277,10 @@ DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_DIR,,build)
+
+# Prevent recursive invocation of docker by explicitely disabling docker via env variable,
+# overwriting potential default in application Makefile
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_IN_DOCKER,,0)
 
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTPROJECT,,riotproject)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTCPU,,riotcpu)

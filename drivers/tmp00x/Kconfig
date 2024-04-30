@@ -6,53 +6,8 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TMP00X
-    bool
-    prompt "TMP006/TMP007 Infrared Thermopile sensors" if !(HAVE_TMP00X && MODULE_SAUL_DEFAULT)
-    default y if (HAVE_TMP00X && MODULE_SAUL_DEFAULT)
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
-
-choice
-    bool "Sensor variant"
-    default MODULE_TMP006 if HAVE_TMP006
-    default MODULE_TMP007 if HAVE_TMP007
-    depends on MODULE_TMP00X
-
-config MODULE_TMP006
-    bool "TMP006"
-
-config MODULE_TMP007
-    bool "TMP007"
-
-endchoice
-
-config HAVE_TMP006
-    bool
-    select HAVE_TMP00X
-    help
-      Indicates that a tmp006 infrared sensor is present.
-
-config HAVE_TMP007
-    bool
-    select HAVE_TMP00X
-    help
-      Indicates that a tmp007 infrared sensor is present.
-
-config HAVE_TMP00X
-    bool
-    help
-      Indicates that a tmp00x infrared sensor is present.
-
-menuconfig KCONFIG_USEMODULE_TMP00X
-    bool "Configure TMP00X driver"
+menu "TMP00X driver"
     depends on USEMODULE_TMP00X
-    help
-        Configure the TMP00X driver using Kconfig.
-
-if KCONFIG_USEMODULE_TMP00X
 
 config TMP00X_I2C_ADDRESS
     hex "Default I2C Address"
@@ -103,4 +58,4 @@ config TMP00X_USE_RAW_VALUES
         Enable this to return raw ADC readings. By default measurements are
         converted to Celsius.
 
-endif # KCONFIG_USEMODULE_TMP00X
+endmenu # TMP00X driver

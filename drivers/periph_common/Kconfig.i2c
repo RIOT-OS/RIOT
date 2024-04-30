@@ -5,30 +5,12 @@
 # directory for more details.
 #
 
-menuconfig MODULE_PERIPH_I2C
-    bool "I2C peripheral driver"
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_COMMON
-
-if MODULE_PERIPH_I2C
-
-config MODULE_PERIPH_INIT_I2C
-    bool "Auto initialize I2C peripheral"
-    default y if MODULE_PERIPH_INIT
-
-config MODULE_PERIPH_I2C_RECONFIGURE
-    bool "Pin reconfiguration support"
-    depends on HAS_PERIPH_I2C_RECONFIGURE
+if USEMODULE_PERIPH_I2C
 
 # TODO: this module is actually just an artifact from the way periph_init_%
 # modules are handled in Makefile. We need to define it to keep the list the
 # same for now. We should be able to remove it later on.
 
-config MODULE_PERIPH_INIT_I2C_RECONFIGURE
-    bool "Auto initialize I2C pin reconfiguration support"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_I2C_RECONFIGURE
-
-endif # MODULE_PERIPH_I2C
+endif # USEMODULE_PERIPH_I2C
 
 osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.i2c"

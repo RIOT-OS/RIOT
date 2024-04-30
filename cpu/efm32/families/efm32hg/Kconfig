@@ -10,14 +10,6 @@ config CPU_FAM_EFM32HG
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES0
 
-config MODULE_CPU_EFM32HG
-    bool
-    depends on CPU_FAM_EFM32HG
-    depends on TEST_KCONFIG
-    default y
-    help
-        EFM32HG family-specific code.
-
 ## CPU Models
 config CPU_MODEL_EFM32HG210F32
     bool

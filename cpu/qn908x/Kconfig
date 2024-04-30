@@ -8,23 +8,6 @@
 config CPU_FAM_QN908X
     bool
     select CPU_CORE_CORTEX_M4F
-    select HAS_CORTEXM_MPU
-    select HAS_CPU_QN908X
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_I2C_RECONFIGURE
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_SPI_RECONFIGURE
-    select HAS_PERIPH_TIMER_QUERY_FREQS
-    select HAS_PERIPH_WDT
-    select HAS_PERIPH_WDT_CB
-
-    select MODULE_VENDOR if TEST_KCONFIG
-    # The clock functionality is used by most modules, including cpu.c even when
-    # no peripheral module is being used.
-    select MODULE_VENDOR_FSL_CLOCK if TEST_KCONFIG
-    select MODULE_PERIPH_GPIO_MUX if TEST_KCONFIG
 
 ## CPU Models
 # For cpus QN9080CHN (revision C) and QN9080DHN (revision D)
@@ -49,15 +32,7 @@ config CPU_MODEL
 config CPU
     default "qn908x" if CPU_FAM_QN908X
 
-## Definition of specific features
-config HAS_CPU_QN908X
-    bool
-    help
-        Indicates that the current cpu is 'qn908x'.
-
 # Other cpu configuration
 rsource "Kconfig.clk"
-rsource "periph/Kconfig"
-rsource "vendor/Kconfig"
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"

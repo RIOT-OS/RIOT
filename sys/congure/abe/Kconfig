@@ -4,28 +4,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-if !TEST_KCONFIG
-
-menuconfig KCONFIG_USEMODULE_CONGURE_ABE
-    bool "Configure TCP-ABE-like congestion control"
-    depends on USEMODULE_CONGURE_ABE
-    help
-        Configure TCP-ABE-like congestion control via Kconfig.
-
-if KCONFIG_USEMODULE_CONGURE_ABE
+if USEMODULE_CONGURE_ABE
 rsource "Kconfig.config"
-endif # KCONFIG_USEMODULE_CONGURE_ABE
-
-endif # !TEST_KCONFIG
-
-if TEST_KCONFIG
-menuconfig MODULE_CONGURE_ABE
-    bool "CongURE implementation of TCP ABE"
-    depends on MODULE_CONGURE
-    select MODULE_CONGURE_RENO_METHODS
-
-if MODULE_CONGURE_ABE
-rsource "Kconfig.config"
-endif # MODULE_CONGURE_ABE
-
-endif # TEST_KCONFIG
+endif # USEMODULE_CONGURE_ABE

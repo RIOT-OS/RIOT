@@ -8,31 +8,6 @@
 config CPU_FAM_GD32V
     bool
     select CPU_CORE_RV32IMAC
-    select HAS_ARCH_NUCLEI
-    select HAS_CPU_GD32V
-    select HAS_PERIPH_CLIC
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_GPIO_LL
-    select HAS_PERIPH_GPIO_LL_IRQ
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    select HAS_PERIPH_FLASHPAGE_PAGEWISE
-    select HAS_PERIPH_PM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTC_MEM
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_WDT
-
-    select MODULE_PERIPH_CLIC if TEST_KCONFIG
-    select MODULE_PERIPH_WDT if MODULE_PERIPH_PM && HAS_PERIPH_WDT
-    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV
-    select ZTIMER_USEC if MODULE_PERIPH_I2C
-    select PACKAGE_NMSIS_SDK
 
 menu "GD32V configuration"
 
@@ -43,12 +18,6 @@ config CPU_MODEL_GD32VF103CBT6
 config CPU_MODEL_GD32VF103VBT6
     bool
     select CPU_FAM_GD32V
-
-## Definition of specific features
-config HAS_CPU_GD32V
-    bool
-    help
-        Indicates that a 'gd32v' cpu is being used.
 
 config CPU_FAM
     default "gd32v" if CPU_FAM_GD32V

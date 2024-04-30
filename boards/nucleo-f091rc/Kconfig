@@ -13,13 +13,5 @@ config BOARD_NUCLEO_F091RC
     default y
     select BOARD_COMMON_NUCLEO64
     select CPU_MODEL_STM32F091RC
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_SPI
 
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

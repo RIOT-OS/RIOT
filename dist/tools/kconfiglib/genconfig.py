@@ -245,16 +245,9 @@ def check_configs(kconf):
         - A configuration parameter could not be set to value defined by the
           user.
     """
-    test_kconfig = os.getenv("TEST_KCONFIG")
-
-    if (test_kconfig):
-        app_check = check_application_symbol(kconf)
-    else:
-        app_check = True
-
     sym_check = check_config_symbols(kconf)
     choice_check = check_config_choices(kconf)
-    return app_check and sym_check and choice_check
+    return sym_check and choice_check
 
 
 def get_sym_missing_deps(sym):

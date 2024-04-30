@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_CSMA_SENDER
-    bool "Configure CSMA sender"
+menu "CSMA sender"
     depends on USEMODULE_CSMA_SENDER
-    help
-        Configure the CSMA_SENDER using Kconfig.
-
-if KCONFIG_USEMODULE_CSMA_SENDER
 
 config CSMA_SENDER_MIN_BE_DEFAULT
     int "Exponent for minimum CSMA/CA backoff time"
@@ -39,4 +34,4 @@ config CSMA_SENDER_BACKOFF_PERIOD_UNIT
         Configure 'CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT'. Maximum and Minimum
         CSMA backoff time depends on unit times the value of this configuration.
 
-endif # KCONFIG_USEMODULE_CSMA_SENDER
+endmenu # CSMA sender

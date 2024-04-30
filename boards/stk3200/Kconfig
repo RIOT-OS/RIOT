@@ -12,15 +12,5 @@ config BOARD_STK3200
     default y
     select BOARD_COMMON_SILABS
     select CPU_MODEL_EFM32ZG222F32
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO
-    select MODULE_SILABS_BC if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/silabs/Kconfig"

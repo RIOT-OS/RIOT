@@ -123,10 +123,9 @@ The integration of Kconfig into the build system is mainly done in
 ![Output of every step of the build process](kconfig_integration.svg)
 
 ### 0. Module dependency resolution
-Currently, the resolution of module dependencies is performed by the build
+The resolution of module dependencies is performed by the build
 system where all the used modules and packages end up listed in the `USEMODULE`
-make variables. In the next phases of integration we plan to resolve dependencies
-using Kconfig.
+or `USEPKG` make variables.
 
 
 #### Input
@@ -184,13 +183,6 @@ The main `Kconfig` file is used in this step to show the configurable
 parameters of the system. Kconfig will filter inapplicable parameters (i.e.
 parameters exposed by modules that are not being used) based on the file
 `$ (GENERATED_DIR)/Kconfig.dep` generated in step 1.
-
-During the transition phase, the user needs to enable Kconfig explicitly per
-module, by setting the corresponding option. If using `menuconfig` a checkbox
-with a submenu has to be selected, if using `.config` files a
-`CONFIG_KCONFIG_MODULE_` prefixed option has to be set to `y`. For more
-information see
-[Making configuration via Kconfig optional](#kconfig-configuration-optional).
 
 Note that if Kconfig is not used to configure a module, the corresponding
 header files default values will be used.
@@ -255,8 +247,7 @@ These files are defined in `kconfig.mk`.
 
 ## Kconfig symbols in Makefiles
 As '.config' files have Makefile syntax they can be included when building,
-which allows to access the applied configuration from the build system and, in
-the future, to check for enabled modules.
+which allows to access the applied configuration from the build system.
 
 During migration this is also useful, as it gives the ability to check if a
 parameter is being configured via Kconfig or a default value via `CFLAGS` could
@@ -282,48 +273,17 @@ RIOT, the default behavior will be the traditional one: expose configuration
 options in header files and use CFLAGS as inputs. To allow optional
 configuration via Kconfig, a convention will be used when writing Kconfig files.
 
-Modules should be contained in their own `menuconfig` entries, this way the user
+Modules should be contained in their own `menu` entries, this way the user
 can choose to enable the configuration via Kconfig for an specific module.
 These entries should define a dependency on the module they configure (see
 [Appendix A](#kconfig-appendix-a) to see how to check if a module is being
 used).
 
-The module configuration then can be enabled either via the menuconfig
-interface:
+The module configuration must be enabled either via make dependency modelling.
 
-![menuconfig-example](kconfig_menuconfig.png)
-
-or by means of a '.config' file:
-
-```Make
-CONFIG_KCONFIG_MODULE_GCOAP=y
-```
-
-## Modelling CPUs, boards and provided features  {#kconfig-cpu-boards-features}
-During the current migration phase architectures, CPUs, boards and provided
-features are being modelled in Kconfig. The following is a guide on how to
+## Modelling CPUs and boards  {#kconfig-cpu-boards-fekconfig-cpu-boards}
+CPUs and boards  are being modelled in Kconfig. The following is a guide on how to
 organize and name the symbols.
-
-### Features
-Features must be modelled as hidden boolean symbols with the prefix `HAS_`. They
-must contain a `help` attribute clearly specifying what providing that feature
-means. The location of the symbol declaration depends on the type of feature.
-Features that are not platform-specific (e.g. `arch_32bit` or `cpp`) must be
-placed in `/kconfigs/Kconfig.features`. If a feature is specific to a certain
-CPU family or vendor, it should be placed in the correspondent Kconfig file
-(e.g. `esp_wifi_enterprise`). Features related to modules should be placed in
-the Kconfig file of that module.
-
-#### Example
-The feature `arduino_pins` is placed in `/kconfigs/Kconfig.features` and modelled
-like:
-
-```Kconfig
-config HAS_ARDUINO_PINS
-    bool
-    help
-        Indicates that Arduino digital pins mappings are provided.
-```
 
 ### CPUs
 The proposed hierarchy for the classification of CPUs is as follows:
@@ -401,8 +361,6 @@ config CPU_FAM_SAMD21
     bool
     select CPU_COMMON_SAM0
     select CPU_CORE_CORTEX_M0PLUS
-    select HAS_CPU_SAMD21
-    select HAS_PUF_SRAM
 
 # The value of the common value depends on the selected model
 config CPU_MODEL
@@ -449,16 +407,6 @@ config BOARD_SAMR21_XPRO
     bool
     default y
     select CPU_MODEL_SAMR21G18A
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select HAS_RIOTBOOT
 ```
 
 ### Default configurations
@@ -472,7 +420,7 @@ sources added by the CPU or common CPU directories, and `KCONFIG_BOARD_CONFIG`
 for sources added by the board or common board directories. This ensures the
 correct priority of the configurations.
 
-Currently the `Makefile.features` infrastructure is used to populate the
+The `Makefile.features` infrastructure is used to populate the
 configuration sources. As the order in which `.config` files are merged matters,
 configuration sources should be ordered from more generic to more specific.
 Because board's `Makefile.features` is included before CPU's `Makefile.features`
@@ -484,9 +432,7 @@ its configuration after it, and `boards/stm32f769i-disco` after it.
 include $(RIOTCPU)/cortexm_common/Makefile.features
 
 # Add stm32 configs after including cortexm_common so stm32 takes precedence
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_CPU_CONFIG += $(RIOTCPU)/stm32/stm32.config
-endif
+KCONFIG_CPU_CONFIG += $(RIOTCPU)/stm32/stm32.config
 ```
 
 ## Summary of reserved Kconfig prefixes
@@ -503,10 +449,6 @@ reserved for the cases described below:
 | `CPU_CORE_` | Models a CPU core |
 | `CPU_FAM_` | Models a family of CPUs |
 | `CPU_MODEL_` | Models a particular model of CPU |
-| `HAS_` | Models a [feature](build-system-basics.html#features) |
-| `KCONFIG_USEMODULE_` | Used during transition to enable configuration of a module via Kconfig |
-| `KCONFIG_USEPKG_` | Used during transition to enable configuration of a package via Kconfig |
-| `HAVE_` | Models a feature not present in makefiles, will be unified in the future |
 | `USEMODULE_` | Models a [RIOT module](creating-modules.html#creating-modules). Generated from `USEMODULE` variable |
 | `USEPKG_` | Models an [external package](group__pkg.html). Generated from `USEPKG` variable |
 
@@ -516,45 +458,32 @@ reserved for the cases described below:
 ## Appendix A: Check if a module or package is used       {#kconfig-appendix-a}
 In order to show only the relevant configuration parameters to the user with
 respect to a given application and board selection, Kconfig needs knowledge
-about all modules and packages to be used for a compilation. Currently
-dependency handling among modules is performed by the build system (via
+about all modules and packages to be used for a compilation. The dependency
+handling among modules is performed by the build system (via
 `Makefile.dep` files). The interface defined to declared the used modules and
 packages is the `$ (GENERATED_DIR)/Kconfig.dep` file.
 
-`Kconfig.dep` is a Kconfig file that will define symbols of the form:
-```Kconfig
-config MODULE_SOCK_UTIL
-    bool
-    default y
-```
 There will be a symbol for every used module (i.e. every module in
 `USEMODULE` make variable) and package. The names in the symbols will be
 uppercase and separated by `_`. Based on these symbols configurability is
-decided. Modules and packages symbols will have `MODULE_` and `PKG_` prefixes
-respectively.
+decided.
 
 The following is an example of how to use these symbols in Kconfig files to
-enable/disable a configuration menu:
+configure compile-time configurations with `USEMODULE` dependencies:
 
 ```Kconfig
-menuconfig KCONFIG_MODULE_SOCK_UTIL
-    bool "Configure Sock Utilities"
-    depends on MODULE_SOCK_UTIL
-    help
-        "Configure Sock Utilities using Kconfig."
-```
-
-Then, every configuration option for the previous module would be modeled like:
-
-```Kconfig
-if KCONFIG_MODULE_SOCK_UTIL
+menu "Configure Sock Utilities"
+    depends on USEMODULE_SOCK_UTIL
 
 config SOCK_UTIL_SCHEME_MAXLEN
     int "Maximum length of the scheme part for sock_urlsplit"
     default 16
 
-endif # KCONFIG_MODULE_SOCK_UTIL
+...
+
+endmenu # Configure Sock Utilities
 ```
+
 
 ## Appendix B: Difference between 'Kconfig' and '.config' files {#kconfig-appendix-b}
 Kconfig files describe a configuration database, which is a collection of

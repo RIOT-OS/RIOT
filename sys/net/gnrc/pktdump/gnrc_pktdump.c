@@ -70,11 +70,6 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
         }
         break;
 #endif  /* IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) */
-#if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN)
-    case GNRC_NETTYPE_LORAWAN:
-            printf("NETTYPE_LORAWAN (%i)\n", pkt->type);
-        break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) */
 #if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
     case GNRC_NETTYPE_IPV6:
         printf("NETTYPE_IPV6 (%i)\n", pkt->type);

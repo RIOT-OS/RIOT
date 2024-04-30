@@ -4,49 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+if USEMODULE_RN2XX3
 
-if TEST_KCONFIG
-
-choice
-    bool "RN2XX3 LoRa module"
-    optional
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_UART
-
-config MODULE_RN2483
-    bool "RN2483"
-    select MODULE_RN2XX3
-
-config MODULE_RN2903
-    bool "RN2903"
-    select MODULE_RN2XX3
-
-endchoice
-
-config MODULE_RN2XX3
-    bool
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_UART
-    select MODULE_FMT
-    select MODULE_NETDEV_LEGACY_API
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_UART
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
-
-endif # TEST_KCONFIG
-
-config USEMODULE_RN2XX3
-    bool
-    select HAVE_LORAWAN
-
-menuconfig KCONFIG_USEMODULE_RN2XX3
-    bool "Configure RN2XX3 driver"
-    depends on USEMODULE_RN2XX3
-    help
-        Configure the RN2XX3 driver using Kconfig.
-
-if KCONFIG_USEMODULE_RN2XX3
+menu "RN2XX3 driver configuration"
 
 config RN2XX3_DEFAULT_SLEEP
     int "Sleep duration in milliseconds [ms]"
@@ -65,4 +25,6 @@ config RN2XX3_DEFAULT_AR
         Frame Pending bit has been set by the server. Refer RN2483 LoRa™
         Technology Module Command Reference User’s Guide for more information.
 
-endif # KCONFIG_USEMODULE_RN2XX3
+endmenu # RN2XX3 driver configuration
+
+endif # USEMODULE_RN2XX3

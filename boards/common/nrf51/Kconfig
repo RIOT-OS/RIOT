@@ -6,17 +6,3 @@
 
 config BOARD_COMMON_NRF51
     bool
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_TIMER
-
-    select HAVE_SAUL_NRF_TEMPERATURE
-
-config MODULE_BOARDS_COMMON_NRF51
-    bool
-    depends on TEST_KCONFIG
-    help
-       Common code of NRF51 boards
-
-choice NRF5X_RADIO_BACKEND
-    default MODULE_NRFMIN
-endchoice

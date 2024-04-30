@@ -6,24 +6,6 @@
 
 config CPU_FAM_NRF9160
     bool
-    select HAS_CPU_NRF9160
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    select HAS_PERIPH_FLASHPAGE_PAGEWISE
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_GPIO_LL
-    select HAS_PERIPH_GPIO_LL_IRQ
-    select HAS_PERIPH_GPIO_LL_IRQ_UNMASK
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_TIMER_POLL
-    select HAS_PERIPH_TIMER_QUERY_FREQS
-    select HAS_PERIPH_UART_MODECFG
-    select HAS_PERIPH_SPI_GPIO_MODE
-    select HAS_PERIPH_WDT
-    select HAS_PERIPH_WDT_CB
-    select MODULE_NRF_SHARED_SERIAL_IRQ
 
 ## CPU Models
 config CPU_MODEL_NRF9160
@@ -40,14 +22,5 @@ config CPU_MODEL
 
 config CPU
     default "nrf9160" if CPU_FAM_NRF9160
-
-## Definition of specific features
-config HAS_CPU_NRF9160
-    bool
-    help
-        Indicates that the current cpu is 'nrf9160'.
-
-rsource "vectors/Kconfig"
-rsource "periph/Kconfig"
 
 source "$(RIOTCPU)/nrf5x_common/Kconfig"

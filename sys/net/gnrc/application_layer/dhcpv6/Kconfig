@@ -1,12 +1,7 @@
-menuconfig KCONFIG_USEMODULE_GNRC_DHCPV6
-    bool "Configure GNRC-part of DHCPv6"
+menu "GNRC-part of DHCPv6"
     depends on USEMODULE_GNRC_DHCPV6
-    help
-        Configure GNRC-part of DHCPv6 via Kconfig.
+    depends on USEMODULE_GNRC_DHCPV6_CLIENT_6LBR
 
-if KCONFIG_USEMODULE_GNRC_DHCPV6
-
-if USEMODULE_GNRC_DHCPV6_CLIENT_6LBR
 config GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM
     int "Identifier for the upstream interface of the 6LoWPAN border router"
     default 0
@@ -20,7 +15,6 @@ config GNRC_DHCPV6_CLIENT_6LBR_6LO_CTX_MIN
     help
         @see [RFC 6775, section 4.2](https://tools.ietf.org/html/rfc6775#section-4.2)
 
-
 config GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE
     bool "Use static routes to upstream interface"
     help
@@ -29,6 +23,5 @@ config GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE
         that the upstream router can set a static route for the delegated
         prefix via that address. It is recommended to increase at least @ref
         CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF to that end.
-endif # USEMODULE_GNRC_DHCPV6_CLIENT_6LBR
 
-endif # KCONFIG_USEMODULE_GNRC_DHCPV6
+endmenu # GNRC-part of DHCPv6

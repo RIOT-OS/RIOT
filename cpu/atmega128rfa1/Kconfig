@@ -9,15 +9,6 @@
 config CPU_MODEL_ATMEGA128RFA1
     bool
     select CPU_FAM_ATMEGA128
-    select HAS_CPU_ATMEGA128RFA1
-    select HAS_ATMEGA_PCINT1
-    select HAVE_AT86RFA1
-
-## Definition of specific features
-config HAS_CPU_ATMEGA128RFA1
-    bool
-    help
-        Indicates that a 'atmega128rfa1' cpu is being used.
 
 ## Common CPU symbols
 config CPU_MODEL

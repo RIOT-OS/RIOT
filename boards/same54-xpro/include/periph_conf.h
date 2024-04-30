@@ -107,6 +107,27 @@ static const tc32_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @name CAN configuration
+ * @{
+ */
+/** Available CAN interfaces */
+static const can_conf_t candev_conf[] = {
+    {
+        .can = CAN1,
+        .rx_pin = GPIO_PIN(PB, 13),
+        .tx_pin = GPIO_PIN(PB, 12),
+        .gclk_src = SAM0_GCLK_PERIPH,
+    }
+};
+
+/** CAN 1 configuration */
+#define ISR_CAN1    isr_can1
+
+/** Number of CAN interfaces */
+#define CAN_NUMOF         ARRAY_SIZE(candev_conf)
+/** @} */
+
+/**
  * @name UART configuration
  * @{
  */

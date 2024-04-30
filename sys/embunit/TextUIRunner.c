@@ -101,7 +101,8 @@ void TextUIRunner_runTest(TestRef test)
     Outputter_printEndTest(outputterRef_,test);
 }
 
-void TextUIRunner_end(void)
+int TextUIRunner_end(void)
 {
     Outputter_printStatistics(outputterRef_,&result_);
+    return wasfailure_;
 }

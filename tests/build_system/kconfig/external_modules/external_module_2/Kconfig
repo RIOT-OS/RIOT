@@ -11,7 +11,3 @@ config EXTERNAL_MODULE_2_MESSAGE
     default "External Message 2 defined in Kconfig file"
 
 endif # KCONFIG_EXTERNAL_MODULE_2
-
-config MODULE_EXTERNAL_MODULE_2
-    bool "Select external module 2"
-    depends on TEST_KCONFIG

@@ -12,12 +12,5 @@ config BOARD_THINGY52
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52832XXAA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_UART
-    select HAS_VDD_LC_FILTER_REG1
-
-    select HAVE_LPS22HB
-    select HAVE_LIS2DH12_I2C
-    select HAVE_HTS221
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

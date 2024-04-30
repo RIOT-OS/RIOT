@@ -9,16 +9,6 @@ config CPU_FAM_EFR32MG1P
     select CPU_CORE_CORTEX_M4F
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES1
-    select HAS_CORTEXM_MPU
-    select HAS_GECKO_SDK_LIBRAIL_NONFPU
-
-config MODULE_CPU_EFR32MG1P
-    bool
-    depends on CPU_FAM_EFR32MG1P
-    depends on TEST_KCONFIG
-    default y
-    help
-        EFR32MG1P family-specific code.
 
 ## CPU Models
 config CPU_MODEL_EFR32MG1P632F256GM32

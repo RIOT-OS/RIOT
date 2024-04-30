@@ -4,35 +4,21 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GCOAP
-    bool "Configure GCoAP"
+menu "GCoAP"
     depends on USEMODULE_GCOAP
-    help
-        Configure GCoAP module using Kconfig. If not set default values and
-        CFLAGS will be used.
 
-if KCONFIG_USEMODULE_GCOAP
-
-menuconfig KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY
-    bool "Configure forward proxy"
+menu "forward proxy"
     depends on USEMODULE_GCOAP_FORWARD_PROXY
-    help
-        Configure forward proxy of GCoAP using Kconfig.
 
-if KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY
 config GCOAP_FORWARD_PROXY_EMPTY_ACK_MS
     int "Timeout in milliseconds for the forward proxy to send an empty ACK without response"
     default 1500
-endif # KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY
 
-menuconfig KCONFIG_USEMODULE_GCOAP_DNS
-    bool "Configure DNS-over-CoAPS implementation in GCoAP"
+endmenu # forward proxy
+
+menu "DNS-over-CoAPS implementation in GCoAP"
     depends on USEMODULE_GCOAP_DNS
-    help
-        Configure DNS-over-CoAPS submodule of GCoAP using Kconfig. If not set
-        default values and CFLAGS will be used.
 
-if KCONFIG_USEMODULE_GCOAP_DNS
 config GCOAP_DNS_SERVER_URI_LEN
     int "Maximum length of the URI template for the DNS server"
     default 64
@@ -54,9 +40,10 @@ config GCOAP_DNS_BLOCK_SIZE
         Should be less than @ref CONFIG_GCOAP_DNS_PDU_BUF_SIZE or
         @ref CONFIG_GCOAP_PDU_BUF_SIZE and must be a power
 
-endif # KCONFIG_USEMODULE_GCOAP_DNS
+endmenu # DNS-over-CoAPS implementation in GCoAP
 
 menu "DTLS options"
+
 config GCOAP_DTLS_CREDENTIAL_TAG
     int "Credential tag"
     default 5
@@ -191,7 +178,7 @@ config GCOAP_TOKENLEN
     default 2
     range 0 $(gcoap-tokenlen-max)
     help
-        Lenght for a token, expressed in bytes.
+        Length for a token, expressed in bytes.
 
 config GCOAP_NO_AUTO_INIT
     bool "Disable auto-initialization"
@@ -199,4 +186,4 @@ config GCOAP_NO_AUTO_INIT
         Disable gcoap startup during system auto init. If disabled,
         gcoap_init() must be called by some other means.
 
-endif # KCONFIG_USEMODULE_GCOAP
+endmenu # GCoAP

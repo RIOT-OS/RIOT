@@ -9,13 +9,4 @@ config BOARD_COMMON_ESP32S3
     bool
     select BOARD_COMMON_ESP32X
 
-config MODULE_BOARDS_COMMON_ESP32S3
-    bool
-    depends on TEST_KCONFIG
-    depends on BOARD_COMMON_ESP32S3
-    depends on HAS_ARCH_ESP32
-    default y
-    help
-      Common ESP32-S3 boards code.
-
 source "$(RIOTBOARD)/common/esp32x/Kconfig"

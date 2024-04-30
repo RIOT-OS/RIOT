@@ -6,29 +6,12 @@
 # directory for more details.
 #
 
-menuconfig MODULE_AT86RF215
-    bool
-    prompt "AT86RF215 radio" if !(HAVE_AT86RF215 && MODULE_NETDEV_DEFAULT)
-    default (HAVE_AT86RF215 && MODULE_NETDEV_DEFAULT)
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on HAS_PERIPH_SPI
-    select MODULE_NETDEV
-    select MODULE_NETDEV_IEEE802154
-    select MODULE_NETDEV_LEGACY_API
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_SPI
-    select MODULE_XTIMER
-
-if MODULE_AT86RF215
+if USEMODULE_AT86RF215
 
 menu "Modulations"
 
 menuconfig AT86RF215_OQPSK
     bool "O-QPSK support"
-    select MODULE_NETDEV_IEEE802154_OQPSK
     default y
 
 if AT86RF215_OQPSK
@@ -58,7 +41,6 @@ endif # AT86RF215_OQPSK
 
 menuconfig AT86RF215_MR_OQPSK
     bool "MR-O-QPSK support"
-    select MODULE_NETDEV_IEEE802154_MR_OQPSK
     default y
 
 if AT86RF215_MR_OQPSK
@@ -92,7 +74,6 @@ endif # AT86RF215_MR_OQPSK
 
 menuconfig AT86RF215_MR_OFDM
     bool "MR-OFDM support"
-    select MODULE_NETDEV_IEEE802154_MR_OFDM
     default y
 
 if AT86RF215_MR_OFDM
@@ -149,7 +130,6 @@ endif # AT86RF215_MR_OFDM
 
 menuconfig AT86RF215_MR_FSK
     bool "MR-FSK support"
-    select MODULE_NETDEV_IEEE802154_MR_FSK
     default y
 
 if AT86RF215_MR_FSK
@@ -268,21 +248,11 @@ endchoice
 
 endmenu # Modulations
 
-config MODULE_AUTO_INIT_AT86RF215
-    bool "Auto-initialize the driver on startup"
-    depends on MODULE_AUTO_INIT
-    default y
-
-config MODULE_AT86RF215_BATMON
-    bool "Enable battery monitor"
-    select MODULE_SYS_BUS
-    select MODULE_SYS_BUS_POWER
-
 config AT86RF215_BATMON_THRESHOLD
     int "Treshold voltage (in mV) of the battery monitor"
     range 1700 3675
     default 1800
-    depends on MODULE_AT86RF215_BATMON
+    depends on USEMODULE_AT86RF215_BATMON
     help
         If the supply voltage falls below the configured threshold
         a SYS_BUS_POWER_EVENT_LOW_VOLTAGE event is generated on the
@@ -321,30 +291,9 @@ config AT86RF215_RPC_EN
     help
         Reduce Power Consumption in RX IDLE by duty-cycling the RF circuitry.
 
-config MODULE_AT86RF215_TIMESTAMP
-    bool "Enable timestamp frame information"
-
-config MODULE_AT86RF215_BLOCKING_SEND
-    bool "Block while sending"
-
-config MODULE_AT86RF215_SUBGHZ
-    bool
-    prompt "Sub-GHz support" if !HAVE_AT86RF215M
-    default y
-    help
-        Sub-GHz support.
-
-config MODULE_AT86RF215_24GHZ
-    bool
-    prompt "2.4 GHz support"
-    default y
-    help
-        2.4 GHz support.
-
 config AT86RF215_MULTIMODE
     bool "Allow multiple physical layer modes"
     default y
-    select MODULE_NETDEV_IEEE802154_MULTIMODE
 
 config AT86RF215_RESET_PULSE_WIDTH_US
     int "Width of the reset pulse (µs)"
@@ -357,21 +306,4 @@ config AT86RF215_RESET_PULSE_WIDTH_US
 
         If unsure, leave this at the default value of 16 µs.
 
-endif # MODULE_AT86RF215
-
-config HAVE_AT86RF215
-    bool
-    help
-      Indicates that a AT86RF215 radio is present.
-
-config HAVE_AT86RF215IQ
-    bool
-    select HAVE_AT86RF215
-    help
-      Indicates that a AT86RF215IQ radio is present.
-
-config HAVE_AT86RF215M
-    bool
-    select HAVE_AT86RF215
-    help
-      Indicates that a AT86RF215IM radio is present.
+endif # USEMODULE_AT86RF215

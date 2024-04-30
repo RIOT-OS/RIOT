@@ -191,33 +191,6 @@ ssize_t phydat_unit_write(char *dest, size_t max_size, uint8_t unit)
     return len;
 }
 
-const char *phydat_unit_to_str(uint8_t unit)
-{
-#if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
-    /* Yeah, this is as bad as it looks... The function is deprecated for this
-     * reason and it will only affect AVR users, for whom this is a good
-     * trade-off. */
-    static char buf[8];
-    ssize_t pos = phydat_unit_write(buf, sizeof(buf) - 1, unit);
-    assert(pos >= 0);
-    if (pos < 0) {
-        pos = 0;
-    }
-    buf[pos] = '\0';
-    return buf;
-#else
-    if ((unit < ARRAY_SIZE(_unit_to_str)) && (_unit_to_str[unit])) {
-        return _unit_to_str[unit];
-    }
-    return "";
-#endif
-}
-
-const char *phydat_unit_to_str_verbose(uint8_t unit)
-{
-    return phydat_unit_to_str(unit);
-}
-
 void phydat_unit_print(uint8_t unit)
 {
     if ((unit < ARRAY_SIZE(_unit_to_str)) && (_unit_to_str[unit]) != NULL) {

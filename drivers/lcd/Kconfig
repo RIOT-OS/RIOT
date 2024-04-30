@@ -5,80 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_LCD
-    bool "LCD display driver"
-    depends on HAS_PERIPH_GPIO
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_GPIO
-
-if MODULE_LCD
-
-config MODULE_LCD_MULTI_CNTRL
-    bool
-    help
-        The controller-specific driver supports multiple controller variants.
-
-config MODULE_LCD_SPI
-    bool
-    default y if !MODULE_LCD_PARALLEL && !MODULE_LCD_PARALLEL_16BIT
-    default y if HAVE_LCD_SPI
-    depends on HAS_PERIPH_SPI
-    select MODULE_PERIPH_SPI
-    help
-        SPI serial interface is used
-
-config MODULE_LCD_PARALLEL
-    bool
-    default y if HAVE_LCD_PARALLEL || HAVE_LCD_PARALLEL_16BIT
-    help
-        MCU 8080 8-/16-bit parallel interface is used
-
-config MODULE_LCD_PARALLEL_16BIT
-    bool
-    default y if HAVE_LCD_PARALLEL_16BIT
-    help
-        MCU 8080 16-bit paralell interface is used
-
-config MODULE_LCD_PARALLEL_LL_MCU
-    bool
-    default y if HAVE_LCD_PARALLEL_LL_MCU
-    depends on MODULE_LCD_PARALLEL
-    help
-        MCU 8080 8-/16-bit low-level parallel interface is provided by the MCU.
-
-endif
-
-config HAVE_LCD_SPI
-    bool
-    help
-        Indicates that a display with MCU 8080 8-/16-bit parallel interface
-        is present
-
-config HAVE_LCD_PARALLEL
-    bool
-    help
-        Indicates that a display with MCU 8080 8-/16-bit parallel interface
-        is present
-
-config HAVE_LCD_PARALLEL_16BIT
-    bool
-    help
-        Indicates that a display with MCU 8080 16-bit parallel interface
-        is present
-
-config HAVE_LCD_PARALLEL_LL_MCU
-    bool
-    help
-        Indicates that the MCU provides the MCU 8080 8-/16-bit low-level
-        parallel interface implementation.
-
-menuconfig KCONFIG_USEMODULE_LCD
-    bool "Configure LCD driver"
+menu "LCD"
     depends on USEMODULE_LCD
-    help
-        Configure the LCD display driver using Kconfig.
-
-if KCONFIG_USEMODULE_LCD
 
 config LCD_LE_MODE
     bool "Enable little endian to big endian conversion"
@@ -88,4 +16,4 @@ config LCD_LE_MODE
         Enabling this option allows for little endian colors. Enabling this
         however will slow down the driver as it cannot use DMA anymore.
 
-endif # KCONFIG_USEMODULE_LCD
+endmenu # LCD

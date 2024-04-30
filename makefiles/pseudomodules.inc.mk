@@ -38,6 +38,7 @@ PSEUDOMODULES += arduino_serial_stdio
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
+PSEUDOMODULES += can_rx_mailbox
 PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cc2538_rf_obs_sig
 PSEUDOMODULES += conn_can_isotp_multi
@@ -156,6 +157,10 @@ PSEUDOMODULES += gnrc_nettype_ipv6_ext
 
 ## @defgroup 	net_gnrc_nettype_lorawan    gnrc_nettype_lorawan
 ## Enables @ref GNRC_NETTYPE_LORAWAN
+##
+## @deprecated  LoRaWAN payloads do not have a special type anymore and just use
+##              @ref GNRC_NETTYPE_UNDEF. There is no module needed for that.
+##              This module will be removed after 2024.10 release.
 ## @{
 PSEUDOMODULES += gnrc_nettype_lorawan
 ## @}

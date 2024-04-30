@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_PKTDUMP
-    bool "Configure GNRC Packet Dump"
+menu "GNRC Packet Dump"
     depends on USEMODULE_GNRC_PKTDUMP
-    help
-        Configure the GNRC_PKTDUMP using Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_PKTDUMP
 
 config GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP
     int "Exponent for the queue size (resulting in the queue size 2^n)"
@@ -20,4 +15,4 @@ config GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_USEMODULE_GNRC_PKTDUMP
+endmenu # GNRC Packet Dump

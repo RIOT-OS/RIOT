@@ -268,11 +268,6 @@ include $(RIOTMAKE)/scan-build.inc.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
 
-# When testing Kconfig's module modelling we need to run Kconfig
-ifeq (1,$(TEST_KCONFIG))
-  SHOULD_RUN_KCONFIG = 1
-endif
-
 ifeq ($(OS),Darwin)
   OPEN   := open
 else
@@ -425,40 +420,22 @@ include $(RIOTMAKE)/defaultmodules_regular.inc.mk
 # Include Kconfig functionalities
 include $(RIOTMAKE)/kconfig.mk
 
-# For testing, use TEST_KCONFIG as a switch between Makefile.dep and Kconfig
-ifeq (1,$(TEST_KCONFIG))
-  ifneq ($(RIOT_CI_BUILD),1)
-    $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
-  endif
-  KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MODULE_%,%,$(filter CONFIG_MODULE_%,$(.VARIABLES))))
-  USEMODULE := $(KCONFIG_MODULES)
-  KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
-  USEPKG := $(KCONFIG_PACKAGES)
+# always select provided architecture features
+FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
+# always select CPU core features
+FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
 
-  # Locate used packages in $(RIOTPKG) or $(EXTERNAL_PKG_DIRS).
-  PKGDIRS := $(RIOTPKG) $(EXTERNAL_PKG_DIRS)
-  PKG_PATHS := $(sort $(foreach dir,$(PKGDIRS),\
-    $(foreach pkg,$(USEPKG),$(dir $(wildcard $(dir)/$(pkg)/Makefile)))))
+# check if required features are provided and update $(FEATURES_USED)
+include $(RIOTMAKE)/features_check.inc.mk
 
-  EXTERNAL_MODULE_PATHS := $(dir $(EXTERNAL_MODULE_KCONFIGS))
-else
-  # always select provided architecture features
-  FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
-  # always select CPU core features
-  FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
+# handle removal of default modules
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
-  # check if required features are provided and update $(FEATURES_USED)
-  include $(RIOTMAKE)/features_check.inc.mk
+# avoid recursive expansion
+USEMODULE := $(sort $(USEMODULE))
 
-  # handle removal of default modules
-  USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
-
-  # avoid recursive expansion
-  USEMODULE := $(sort $(USEMODULE))
-
-  # process dependencies
-  include $(RIOTMAKE)/dependency_resolution.inc.mk
-endif
+# process dependencies
+include $(RIOTMAKE)/dependency_resolution.inc.mk
 
 # Include dfu-util configuration when using riotboot_dfu bootloader before
 # including the board's Makefile.include which could define dfu-util

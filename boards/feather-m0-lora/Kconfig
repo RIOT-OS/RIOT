@@ -11,6 +11,5 @@ config BOARD_FEATHER_M0_LORA
     bool
     default y
     select BOARD_FEATHER_M0_BASE
-    select HAVE_SX1276
 
 source "$(RIOTBOARD)/feather-m0/Kconfig.feather-m0-base"

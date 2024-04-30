@@ -1,4 +1,0 @@
-config PACKAGE_ARDUINO_API
-    bool "Arduino API package"
-    depends on TEST_KCONFIG
-    depends on MODULE_ARDUINO

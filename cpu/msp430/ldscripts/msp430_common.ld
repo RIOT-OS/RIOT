@@ -6,21 +6,6 @@
  * directory for more details.
  */
 
-SECTIONS
-{
-    /* Populate information about rom size */
-    _srom = ORIGIN(ROM);
-    _erom = ORIGIN(ROM) + LENGTH(ROM);
-
-    .flash_writable (NOLOAD) : {
-        KEEP(*(SORT(.flash_writable.*)))
-    } > ROM
-
-    .end_fw (NOLOAD) : ALIGN(4) {
-        _end_fw = . ;
-    } > ROM
-}
-
 /* provide address for register maps by taking the address of the first
  * register (as provided by the vendor files) */
 

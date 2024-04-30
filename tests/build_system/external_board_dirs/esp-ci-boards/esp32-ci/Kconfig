@@ -12,31 +12,5 @@ config BOARD_ESP32_CI
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_WROVER
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_RTC_TIMER_32K
-    select HAS_ESP_JTAG
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_SDCARD_SPI
-
-    select HAVE_ILI9341
-    select MODULE_BOARD_ESP32-CI
-
-config MODULE_BOARD_ESP32-CI
-    bool
-
-if TEST_KCONFIG
-
-choice ESP32_I2C_IMPLEMENTATION
-    default MODULE_ESP_I2C_HW
-endchoice
-
-config MODULE_ESP_HW_COUNTER
-    default y
-    depends on MODULE_PERIPH_TIMER
-
-endif # TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

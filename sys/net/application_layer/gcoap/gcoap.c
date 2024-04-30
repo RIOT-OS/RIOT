@@ -1612,10 +1612,10 @@ int gcoap_obs_req_forget(const sock_udp_ep_t *remote, const uint8_t *token,
     return res;
 }
 
-ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
-                          const sock_udp_ep_t *remote,
-                          gcoap_resp_handler_t resp_handler, void *context,
-                          gcoap_socket_type_t tl_type)
+ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
+                       const sock_udp_ep_t *remote,
+                       gcoap_resp_handler_t resp_handler, void *context,
+                       gcoap_socket_type_t tl_type)
 {
     gcoap_socket_t socket = { 0 };
     gcoap_request_memo_t *memo = NULL;

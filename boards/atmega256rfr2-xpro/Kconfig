@@ -11,16 +11,3 @@ config BOARD_ATMEGA256RFR2_XPRO
     bool
     default y
     select CPU_MODEL_ATMEGA256RFR2
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO
-    select HAVE_AT30TSE75X
-    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
-
-source "$(RIOTBOARD)/common/atmega/Kconfig"

@@ -239,6 +239,16 @@ serial interface:
 make term BOARD=samr21-xpro PORT=/dev/ttyACM1
 ~~~~~~~~
 
+For flashing and accessing the board via the serial interface, the current user
+needs to have the correct access rights on the serial device.
+The easiest way to ensure this is to add the current user to the group that is
+owning the serial device. For example, this can be achieved on Linux by issuing
+the following line, logging out and logging in again:
+
+~~~~~~~~ {.sh}
+sudo usermod -aG $(stat --format="%G" /dev/ttyACM0) $USER
+~~~~~~~~
+
 Note that the `PORT` macro has a slightly different semantic in `native`. Here
 it is used to provide the name of the TAP interface you want to use for the
 virtualized networking capabilities of RIOT.

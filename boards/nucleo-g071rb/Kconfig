@@ -14,15 +14,4 @@ config BOARD_NUCLEO_G071RB
     select BOARD_COMMON_NUCLEO64
     select CPU_MODEL_STM32G071RB
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_RIOTBOOT
-
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

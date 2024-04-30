@@ -12,8 +12,5 @@ config BOARD_ARDUINO_MEGA2560
     default y
     select CPU_MODEL_ATMEGA2560
     select BOARD_COMMON_ARDUINO_ATMEGA
-    select MODULE_BOARDS_COMMON_ARDUINO-ATMEGA if TEST_KCONFIG
-    select HAS_ARDUINO_SHIELD_MEGA
-    select HAS_ARDUINO_SHIELD_UNO
 
 source "$(RIOTBOARD)/common/arduino-atmega/Kconfig"

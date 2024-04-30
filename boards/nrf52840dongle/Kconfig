@@ -12,22 +12,5 @@ config BOARD_NRF52840DONGLE
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52840XXAA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_USBDEV
-    select HAS_HIGHLEVEL_STDIO
-    select HAS_VDD_LC_FILTER_REG0
-    select HAS_VDD_LC_FILTER_REG1
-
-    select HAVE_SAUL_GPIO
-    select HAVE_SAUL_PWM
-    select HAVE_SAUL_NRF_VDDH
-
-    select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG
-
-config FORCE_USB_STDIO
-    default y
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

@@ -30,6 +30,10 @@
 #include "psa_crypto_location_dispatch.h"
 #include "psa_crypto_algorithm_dispatch.h"
 
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#include "psa_crypto_persistent_storage.h"
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
+
 #include "random.h"
 #include "kernel_defines.h"
 
@@ -394,10 +398,10 @@ static psa_status_t psa_key_policy_permits( const psa_key_policy_t *policy,
  *          @ref PSA_ERROR_NOT_SUPPORTED
  *          @ref PSA_ERROR_CORRUPTION_DETECTED
  */
-static psa_status_t psa_get_and_lock_key_slot_with_policy(  psa_key_id_t id,
-                                                            psa_key_slot_t **p_slot,
-                                                            psa_key_usage_t usage,
-                                                            psa_algorithm_t alg)
+static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
+                                                          psa_key_slot_t **p_slot,
+                                                          psa_key_usage_t usage,
+                                                          psa_algorithm_t alg)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
@@ -1080,11 +1084,13 @@ static psa_status_t psa_validate_key_attributes(const psa_key_attributes_t *attr
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     else {
-        if (!psa_is_valid_key_id(key, 0)) {
+        if (!psa_is_valid_key_id(key, 1)) {
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     status = psa_validate_key_policy(&attributes->policy);
     if (status != PSA_SUCCESS) {
@@ -1152,29 +1158,27 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
  *
  * @param   slot    Pointer to slot that the key is stored in
  * @param   driver  SE driver, in case the key creation took place on a secure element
- * @param   key     Pointer which will contain the key ID assigned to the key
+ * @param   key_id  Pointer which will contain the key ID assigned to the key
  *
  * @return  @ref psa_status_t
  */
 static psa_status_t psa_finish_key_creation(psa_key_slot_t *slot, psa_se_drv_data_t *driver,
-                                            psa_key_id_t *key)
+                                            psa_key_id_t *key_id)
 {
     psa_status_t status = PSA_SUCCESS;
 
-    *key = PSA_KEY_ID_NULL;
-    /* TODO: Finish persistent key storage */
-    /* TODO: Finish SE key storage with transaction */
-
-    if (status == PSA_SUCCESS) {
-        *key = slot->attr.id;
-        status = psa_unlock_key_slot(slot);
+    if (PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
+        *key_id = slot->attr.id;
     }
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     else {
-        (void)slot;
+        status = psa_persist_key_slot_in_storage(slot);
     }
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     (void)driver;
-    return status;
+    psa_status_t unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
 /**
@@ -1217,7 +1221,55 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
         return PSA_ERROR_CORRUPTION_DETECTED;
     }
 
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+    if (!PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
+        status = psa_destroy_persistent_key(key);
+        if (status != PSA_SUCCESS) {
+            DEBUG("PSA destroy key: Persistent key destruction failed: %s\n",
+                                            psa_status_to_humanly_readable(status));
+            return PSA_ERROR_STORAGE_FAILURE;
+        }
+    }
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
+
     return psa_wipe_key_slot(slot);
+}
+
+/**
+ * @brief   Export key that is stored in local memory
+ *
+ *          See @ref psa_export_key
+ *
+ * @param   key_buffer
+ * @param   key_buffer_size
+ * @param   data
+ * @param   data_size
+ * @param   data_length
+ *
+ * @return  @ref PSA_SUCCESS
+ *          @ref PSA_ERROR_INVALID_ARGUMENT
+ */
+static psa_status_t psa_builtin_export_key(const uint8_t *key_buffer,
+                                                size_t key_buffer_size,
+                                                uint8_t *data,
+                                                size_t data_size,
+                                                size_t *data_length)
+{
+    if (!key_buffer || !data || !data_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (key_buffer_size == 0 || data_size == 0) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (data_size < key_buffer_size) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+    memcpy(data, key_buffer, key_buffer_size);
+    *data_length = key_buffer_size;
+
+    return PSA_SUCCESS;
 }
 
 psa_status_t psa_export_key(psa_key_id_t key,
@@ -1225,11 +1277,60 @@ psa_status_t psa_export_key(psa_key_id_t key,
                             size_t data_size,
                             size_t *data_length)
 {
-    (void)key;
-    (void)data;
-    (void)data_size;
-    (void)data_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+    uint8_t *privkey_data = NULL;
+    size_t *privkey_data_len = NULL;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!data || !data_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    *data_length = 0;
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_EXPORT, 0);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    psa_key_lifetime_t lifetime = psa_get_key_lifetime(&slot->attr);
+    if (psa_key_lifetime_is_external(lifetime)) {
+        /* key export from an external device is currently not supported */
+        status = PSA_ERROR_NOT_SUPPORTED;
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    if (!PSA_KEY_TYPE_IS_ECC(slot->attr.type) ||
+            PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_TWISTED_EDWARDS) {
+        /* key export is currently only supported for ed25519 keys */
+        status = PSA_ERROR_NOT_SUPPORTED;
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    psa_get_key_data_from_key_slot(slot, &privkey_data, &privkey_data_len);
+
+    status =
+        psa_builtin_export_key(privkey_data, *privkey_data_len, data, data_size, data_length);
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
 /**
@@ -1260,10 +1361,6 @@ static psa_status_t psa_builtin_export_public_key( const uint8_t *key_buffer,
         DEBUG("PSA Crypto Builtin Export Key: Output buffer too small\n");
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
-    /** Some implementations and drivers can generate a public key from existing private key
-     * material. This implementation does not support the recalculation of a public key, yet.
-     * It requires the key to already exist in local memory and just copies it into the data
-     * output. */
     memcpy(data, key_buffer, key_buffer_size);
     *data_length = key_buffer_size;
 
@@ -1351,8 +1448,6 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
     psa_key_slot_t *slot = NULL;
     psa_se_drv_data_t *driver = NULL;
 
-    *key = PSA_KEY_ID_NULL;
-
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
     }
@@ -1363,6 +1458,10 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
 
     if (psa_get_key_bits(attributes) == 0) {
         return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (PSA_KEY_LIFETIME_IS_VOLATILE(attributes->lifetime)) {
+        *key = PSA_KEY_ID_NULL;
     }
 
     /* Find empty slot */
@@ -1387,7 +1486,6 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
     }
 
     status = psa_finish_key_creation(slot, driver, key);
-
     if (status != PSA_SUCCESS) {
         psa_fail_key_creation(slot, driver);
     }
@@ -1456,8 +1554,10 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
         if (data_length > PSA_EXPORT_PUBLIC_KEY_MAX_SIZE) {
             return PSA_ERROR_NOT_SUPPORTED;
         }
+
         memcpy(key_buffer, data, data_length);
         *key_buffer_length = data_length;
+
         return PSA_SUCCESS;
     }
     return status;
@@ -1485,7 +1585,9 @@ psa_status_t psa_import_key(const psa_key_attributes_t *attributes,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    *key = PSA_KEY_ID_NULL;
+    if (PSA_KEY_LIFETIME_IS_VOLATILE(attributes->lifetime)) {
+        *key = PSA_KEY_ID_NULL;
+    }
 
     /* Find empty slot */
     status = psa_start_key_creation(PSA_KEY_CREATION_IMPORT, attributes, &slot, &driver);

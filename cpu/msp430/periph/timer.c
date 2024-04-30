@@ -97,7 +97,12 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     assume((unsigned)dev < TIMER_NUMOF);
     msp430_timer_t *msptimer = timer_conf[dev].timer;
 
-    /* reset the timer A configuration */
+    static_assert(TACLR == TBCLR, "This driver assumes TIMER A and TIMER B "
+                                   "having the same register layout for the "
+                                   "features exposed by this driver. This "
+                                   "is backed by the datasheet for both "
+                                   "MSP430 x1xx and G2xx / F2xx MCUs.");
+    /* reset the timer configuration */
     msptimer->CTL = TACLR;
     /* save callback */
     isr_ctx[dev].cb = cb;
@@ -187,6 +192,10 @@ uint32_t timer_query_freqs(tim_t dev, uword_t index)
     const msp430_timer_clock_source_t clock_source = timer_conf[dev].clock_source;
     assume((clock_source == TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK) ||
            (clock_source == TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK));
+
+    if (index > TXID_DIV_MAX) {
+        return 0;
+    }
 
     uint32_t clock_freq;
     switch (clock_source) {

@@ -11,7 +11,3 @@ config EXTERNAL_PKG_1_MESSAGE
     default "External package message 1 defined in Kconfig file"
 
 endif # KCONFIG_EXTERNAL_PKG_1
-
-config PACKAGE_EXTERNAL_PKG_1
-    bool "Select external pkg 1"
-    depends on TEST_KCONFIG

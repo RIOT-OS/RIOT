@@ -20,13 +20,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include "thread.h"
+#include "string_utils.h"
+#include "ztimer.h"
 
 #include "architecture.h"
 #include "shell.h"
-
-#if MODULE_STDIO_RTT
-#include "xtimer.h"
-#endif
 
 /* define buffer to be used by the shell. Note: This is intentionally
  * smaller than 64 bytes, as the EDBG integrated UART bridge of the samr21-xpro
@@ -100,12 +101,48 @@ static int print_empty(int argc, char **argv)
     return 0;
 }
 
+static char _stack[THREAD_STACKSIZE_SMALL];
+static struct {
+    uint16_t period_ms;
+    uint16_t reps;
+} _periodic_ctx;
+
+static void *_func(void *arg)
+{
+    (void)arg;
+
+    while (_periodic_ctx.reps--) {
+        ztimer_sleep(ZTIMER_MSEC, _periodic_ctx.period_ms);
+        puts("test");
+    }
+
+    return NULL;
+}
+
+/* test to make sure that waiting for stdin does not block other threads */
+static int print_periodic(int argc, char **argv)
+{
+    if (argc > 1) {
+        _periodic_ctx.reps = atoi(argv[1]);
+    } else {
+        _periodic_ctx.reps = 5;
+    }
+
+    _periodic_ctx.period_ms = 500;
+
+    thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST,
+                  _func, NULL, "periodic");
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "bufsize", "Get the shell's buffer size", print_shell_bufsize },
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
     { "echo", "prints the input command", print_echo },
     { "empty", "print nothing on command", print_empty },
+    { "periodic", "periodically print command", print_periodic },
     { NULL, NULL, NULL }
 };
 

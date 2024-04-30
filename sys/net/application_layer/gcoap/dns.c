@@ -30,6 +30,7 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "random.h"
+#include "string_utils.h"
 #include "uri_parser.h"
 #include "ut_process.h"
 
@@ -316,13 +317,9 @@ ssize_t gcoap_dns_server_proxy_get(char *proxy, size_t proxy_len)
     ssize_t res = 0;
     mutex_lock(&_client_mutex);
     if (_dns_server_uri_isset()) {
-        res = strlen(_uri);
-        if (((size_t)res + 1) > proxy_len) {
-            /* account for trailing \0 */
+        res = strscpy(proxy, _proxy, proxy_len);
+        if (res == -E2BIG) {
             res = -ENOBUFS;
-        }
-        else {
-            strcpy(proxy, _proxy);
         }
     }
     mutex_unlock(&_client_mutex);
@@ -765,6 +762,6 @@ static ssize_t _send(const void *buf, size_t len, const sock_udp_ep_t *remote,
     if (lock_resp_wait) {
         mutex_lock(&context->resp_wait);
     }
-    return gcoap_req_send_tl(buf, len, remote, _resp_handler, context, tl_type);
+    return gcoap_req_send(buf, len, remote, _resp_handler, context, tl_type);
 }
 /** @} */

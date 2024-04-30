@@ -12,20 +12,5 @@ config BOARD_WAVESHARE_NRF52840_EVAL_KIT
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52840XXAA
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAS_ARDUINO_PWM
-    select HAS_ARDUINO_SHIELD_UNO
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select HAS_TINYUSB_DEVICE
-
-    select HAVE_SAUL_GPIO
-
-    select HAVE_MTD_SDCARD_DEFAULT
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

@@ -71,9 +71,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     }
 
     /* Initialize qdec channels */
-    for (uint8_t i = 0; i < QDEC_NUMOF; i++) {
-        qdecs[qdec] = 0;
-    }
+    qdecs[qdec] = 0;
 
     /* Reset counter and start qdec */
     qdec_start(qdec);

@@ -13,25 +13,5 @@ config BOARD_ESP32C3_CI
     default y
     select BOARD_COMMON_ESP32C3
     select CPU_MODEL_ESP32C3_MINI_1X
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_RTC_TIMER_32K
-    select HAS_ESP_JTAG
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select MODULE_BOARD_ESP32C3-CI
-    select MODULE_ESP_IDF_HEAP
-
-config MODULE_BOARD_ESP32C3-CI
-    bool
-
-if TEST_KCONFIG
-
-choice ESP32_I2C_IMPLEMENTATION
-    default MODULE_ESP_I2C_HW
-endchoice
-
-endif # TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/esp32c3/Kconfig"

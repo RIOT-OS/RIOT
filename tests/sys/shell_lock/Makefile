@@ -7,9 +7,9 @@ USEMODULE += shell_cmds_default
 USEMODULE += shell_lock
 USEMODULE += shell_lock_auto_locking
 
-ifneq (1,$(TEST_KCONFIG))
-CFLAGS += -DCONFIG_SHELL_LOCK_PASSWORD=\"password\"
-CFLAGS += -DCONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS=7000
+ifneq (1, $(SHOULD_RUN_KCONFIG))
+  CFLAGS += -DCONFIG_SHELL_LOCK_PASSWORD=\"password\"
+  CFLAGS += -DCONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS=7000
 endif
 
 # test_utils_interactive_sync_shell assumes that the prompt is always '> ' which breaks

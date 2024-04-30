@@ -19,34 +19,42 @@
 #include "architecture.h"
 #include "cpu.h"
 #include "debug.h"
+#include "irq.h"
 #include "panic.h"
 #if IS_USED(MODULE_BACKTRACE)
 #include "backtrace.h"
 #endif
 
-__NORETURN void _assert_failure(const char *file, unsigned line)
+__NORETURN static inline void _assert_common(void)
 {
-    printf("%s:%u => ", file, line);
 #if IS_USED(MODULE_BACKTRACE)
+#ifdef DEBUG_ASSERT_VERBOSE
     printf("failed assertion. Backtrace:\n");
+#endif
     backtrace_print();
 #endif
 #ifdef DEBUG_ASSERT_BREAKPOINT
     DEBUG_BREAKPOINT(1);
 #endif
+    if (DEBUG_ASSERT_NO_PANIC && !irq_is_in() && irq_is_enabled()) {
+        puts("FAILED ASSERTION.");
+        while (1) {
+            thread_sleep();
+        }
+    }
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
+}
+
+__NORETURN void _assert_failure(const char *file, unsigned line)
+{
+    printf("%s:%u => ", file, line);
+    _assert_common();
 }
 
 __NORETURN void _assert_panic(void)
 {
     printf("%" PRIxTXTPTR "\n", cpu_get_caller_pc());
-#if IS_USED(MODULE_BACKTRACE)
-    backtrace_print();
-#endif
-#ifdef DEBUG_ASSERT_BREAKPOINT
-    DEBUG_BREAKPOINT(1);
-#endif
-    core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
+    _assert_common();
 }
 
 /** @} */

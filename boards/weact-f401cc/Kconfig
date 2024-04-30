@@ -13,6 +13,5 @@ config BOARD_WEACT_F401CC
     default y
     select BOARD_COMMON_WEACT_F4X1CX
     select CPU_MODEL_STM32F401CC
-    select MODULE_BOARDS_COMMON_WEACT-F4X1CX if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/weact-f4x1cx/Kconfig"

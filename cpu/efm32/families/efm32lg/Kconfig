@@ -9,15 +9,6 @@ config CPU_FAM_EFM32LG
     select CPU_CORE_CORTEX_M3
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES0
-    select HAS_CORTEXM_MPU
-
-config MODULE_CPU_EFM32LG
-    bool
-    depends on CPU_FAM_EFM32LG
-    depends on TEST_KCONFIG
-    default y
-    help
-        EFM32LG family-specific code.
 
 ## CPU Models
 config CPU_MODEL_EFM32LG990F256

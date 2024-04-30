@@ -207,10 +207,6 @@ SECTIONS
     _sram = ORIGIN(ram);
     _eram = ORIGIN(ram) + LENGTH(ram);
 
-    /* Populate information about rom size */
-    _srom = ORIGIN(rom);
-    _erom = ORIGIN(rom) + LENGTH(rom);
-
     .heap1 ALIGN(4) (NOLOAD) :
     {
         _sheap1 = ORIGIN(ram_ethernet);
@@ -250,8 +246,4 @@ SECTIONS
         _sheap3 = . ;
         _eheap3 = ORIGIN(ram_battery) + LENGTH(ram_battery);
     } > ram_battery
-
-    .end_fw (NOLOAD) : ALIGN(4) {
-        _end_fw = . ;
-    } > rom
 }

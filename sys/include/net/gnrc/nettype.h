@@ -66,10 +66,20 @@ typedef enum {
      * @name Link layer
      */
 #if IS_USED(MODULE_GNRC_NETTYPE_GOMACH) || defined(DOXYGEN)
-    GNRC_NETTYPE_GOMACH,         /**< Protocol is GoMacH */
+    /**
+     * @brief       Protocol is GoMacH
+     * @deprecated  @ref net_gnrc_gomach was deprecated and will be removed after
+     *              the 2024.10 release together with this protocol type.
+     */
+    GNRC_NETTYPE_GOMACH,
 #endif
 #if IS_USED(MODULE_GNRC_NETTYPE_LWMAC) || defined(DOXYGEN)
-    GNRC_NETTYPE_LWMAC,          /**< Protocol is lwMAC */
+    /**
+     * @brief       Protocol is lwMAC
+     * @deprecated  @ref net_gnrc_lwmac was deprecated and will be removed after
+     *              the 2024.10 release together with this protocol type.
+     */
+    GNRC_NETTYPE_LWMAC,
 #endif
 #if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM) || defined(DOXYGEN)
     GNRC_NETTYPE_CUSTOM,         /**< Custom ethertype */
@@ -81,7 +91,12 @@ typedef enum {
 #endif
 
 #if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) || defined(DOXYGEN)
-    GNRC_NETTYPE_LORAWAN,       /**< Protocol is LoRaWAN */
+/**
+ * @brief       Protocol is LoRaWAN
+ * @deprecated  LoRaWAN payloads do not have a special type anymore and just use
+ *              @ref GNRC_NETTYPE_UNDEF. Will be removed after 2024.10 release.
+ */
+#define GNRC_NETTYPE_LORAWAN    GNRC_NETTYPE_UNDEF
 #endif
 
     /**

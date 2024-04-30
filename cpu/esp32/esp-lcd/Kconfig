@@ -5,26 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_ESP_LCD
-    bool "Enable LCD low-level parallel interface driver"
-    depends on MODULE_LCD
-    default y if HAVE_LCD_PARALLEL_LL_MCU
-    help
-        Enabe the MCU-driven low-level MCU 8080 8-/16-bit parallel interface
-        driver.
-
-if MODULE_ESP_LCD
-
-config MODULE_ESP_LCD_GPIO
-    bool "GPIO-driven low-level parallel interface driver"
-    depends on !CPU_FAM_ESP32 && !CPU_FAM_ESP32S2 && !CPU_FAM_ESP32S3
-    default y
-    help
-        The ESP32x SoC variant used does not have a peripheral for the parallel
-        low-level interface. However, it can be emulated with special low-level
-        GPIO operations. It is faster than the GPIO-driven 8-/16-bit parallel
-        interface implemented in the LCD driver, but requires 4 kByte RAM for
-        8-bit data bus width and 8 kByte RAM for 16-bit data bus width.
+if USEMODULE_ESP_LCD
 
 config LCD_WRITE_CLOCK_MHZ
     int "LCD write clock rate in MHz"

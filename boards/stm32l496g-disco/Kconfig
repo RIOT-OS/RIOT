@@ -13,59 +13,7 @@ config BOARD_STM32L496G_DISCO
     default y
     select CPU_MODEL_STM32L496AG
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_FMC
-    select HAS_PERIPH_FMC_NOR_SRAM
-    select HAS_PERIPH_FMC_16BIT
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_LPUART
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SDMMC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_SPI_STMOD
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_HW_FC
-    select HAS_PERIPH_USBDEV
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAS_RIOTBOOT
-    select HAS_TINYUSB_DEVICE
-
     # Clock configuration
     select BOARD_HAS_LSE
 
-    select HAVE_SAUL_GPIO
-    select HAVE_FT5X06
-    select HAVE_MTD_SDMMC_DEFAULT
-    select HAVE_ST7789
-    select HAVE_LCD_PARALLEL_16BIT if MODULE_ST7789
-    select HAVE_LCD_PARALLEL_LL_MCU if MODULE_ST7789
-
-    select MODULE_PERIPH_LPUART if MODULE_PERIPH_UART
-    select MODULE_PERIPH_UART_HW_FC if MODULE_PERIPH_UART && !MODULE_PERIPH_SPI_STMOD && HAS_PERIPH_UART_HW_FC
-
 source "$(RIOTBOARD)/common/stm32/Kconfig"
-
-config HAS_PERIPH_SPI_STMOD
-    bool
-    help
-        Indicates that SPI2 can be connected to STMod+/Pmod connector
-
-config MODULE_PERIPH_SPI_STMOD
-    bool "SPI2 connected to STMod+/Pmod connector"
-    depends on HAS_PERIPH_SPI_MOD
-    default n
-    help
-        By default, solder bridges SB6, SB7, SB8 are closed and USART1 is
-        connected to the Pmod/STMmod+ connector. If these solder bridges are
-        open and solder bridges SB4, SB5 and SB6 are closed instead, SPI2 is
-        connected to the STMmod+/Pmod connector. Say yes to use SPI2 with this
-        board configuration.

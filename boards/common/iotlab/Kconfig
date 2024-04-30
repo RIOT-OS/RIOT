@@ -8,32 +8,12 @@
 config BOARD_COMMON_IOTLAB
     bool
     select CPU_MODEL_STM32F103RE
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_RIOTBOOT
 
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-    select HAVE_AT86RF231
-    select HAVE_SAUL_GPIO
-    select HAVE_L3G4200D_NG
-    select HAVE_LSM303DLHC
-
 config CLOCK_HSE
     default 16000000
-
-config MODULE_BOARDS_COMMON_IOTLAB
-    bool
-    depends on TEST_KCONFIG
-    help
-       Common code of iotlab based boards
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

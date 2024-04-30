@@ -22,10 +22,4 @@ config CLOCK_PLL_MUL
 
     range 2 16
 
-config HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
-    bool
-    help
-        Indicated that this CPU Line has the prediv hardwired to 2, making it
-        unable to change.
-
 endif # CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3

@@ -1,4 +1,3 @@
-warning: end of file with unbalanced grouping commands
 warning: explicit link request to 'esp32_application_specific_board_configuration' could not be resolved
 warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
 warning: explicit link request to 'esp32_heltec_lora32_v2_optional_hardware' could not be resolved
@@ -8424,3 +8423,40 @@ warning: Member LSM6DSXX_PARAM_GYRO_FIFO_DEC (macro definition) of file lsm6dsxx
 warning: Member LSM6DSXX_PARAMS (macro definition) of file lsm6dsxx_params.h is not documented.
 warning: Member LSM6DSXX_SAUL_INFO (macro definition) of file lsm6dsxx_params.h is not documented.
 RIOTDoxygenLayout.xml:8: warning: the type 'topics' is not supported for the entry tag within a navindex! Check your layout file!
+warning: Member LSM6DSL_REG_SENSOR_SYNC_TIME_FRAME (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSOR_SYC_RES_RATIO (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_DRDY_PULSE_CFG_G (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_MASTER_CONFIG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB1_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB2_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB3_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB4_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB5_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB6_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB7_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB8_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB9_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB10_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB11_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB12_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB13_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB14_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB15_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB16_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB17_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENSORHUB18_REG (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_FUNC_SRC_2 (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_WRIST_TILT_IA (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_MASTER_CMD_CODE (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_SENS_SYNC_SPI_ERR_CODE (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_OUT_MAG_RAW_X_L (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_OUT_MAG_RAW_X_H (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_OUT_MAG_RAW_Y_L (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_OUT_MAG_RAW_Y_H (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_OUT_MAG_RAW_Z_L (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_OUT_MAG_RAW_Z_H (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_X_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_Y_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DSL_REG_Z_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member LSM6DS33_REG_ORIENT_CFG_G (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member AT6561_STBY_PIN (macro definition) of file board.h is not documented.

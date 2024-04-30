@@ -182,40 +182,6 @@ static inline uint16_t crc16_ccitt_aug_update(uint16_t crc, const unsigned char 
  */
 uint16_t crc16_ccitt_aug_calc(const unsigned char *buf, size_t len);
 
-/**
- * @brief           Update CRC16-CCITT
- * @deprecated      Use @ref crc16_ccitt_aug_update instead.
- *                  Will be removed after 2023.01 release.
- *
- * @param[in]  crc  A start value for the CRC calculation, usually the
- *                  return value of a previous call to
- *                  crc16_ccitt_calc() or crc16_ccitt_update()
- * @param[in]  buf  Start of the memory area to checksum
- * @param[in]  len  Number of bytes to checksum
- *
- * @return          Checksum of the specified memory area based on the
- *                  given start value
- */
-static inline uint16_t crc16_ccitt_update(uint16_t crc, const unsigned char *buf, size_t len)
-{
-    return crc16_ccitt_false_update(crc, buf, len);
-}
-
-/**
- * @brief           Calculate CRC16-CCITT
- * @deprecated      Use @ref crc16_ccitt_aug_calc instead.
- *                  Will be removed after 2023.01 release.
- *
- * @param[in]  buf  Start of the memory area to checksum
- * @param[in]  len  Number of bytes to checksum
- *
- * @return          Checksum of the specified memory area
- */
-static inline uint16_t crc16_ccitt_calc(const unsigned char *buf, size_t len)
-{
-    return crc16_ccitt_aug_calc(buf, len);
-}
-
 #ifdef __cplusplus
 }
 #endif

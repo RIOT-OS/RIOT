@@ -8,19 +8,3 @@ config BOARD_FEATHER_M0_BASE
     bool
     default y
     select CPU_MODEL_SAMD21G18A
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAS_HIGHLEVEL_STDIO
-
-    select HAVE_SAUL_GPIO
-
-source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"

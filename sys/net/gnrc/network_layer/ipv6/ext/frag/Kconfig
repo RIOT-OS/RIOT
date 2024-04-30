@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_IPV6_EXT_FRAG
-    bool "Configure GNRC IPv6 fragmentation and reassembly"
+menu "GNRC IPv6 fragmentation and reassembly"
     depends on USEMODULE_GNRC_IPV6_EXT_FRAG
-    help
-        Configure GNRC IPv6 fragmentation and reassembly via Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_IPV6_EXT_FRAG
 
 config GNRC_IPV6_EXT_FRAG_SEND_SIZE
     int "Number of entries IPv6 in the send buffer"
@@ -47,4 +42,4 @@ config GNRC_IPV6_EXT_FRAG_RBUF_DO_NOT_OVERRIDE
         entry when a fragment for a new datagram is received. When set to 1, no
         entry will be overwritten (they will still timeout normally)
 
-endif # KCONFIG_USEMODULE_GNRC_IPV6_EXT_FRAG
+endmenu # GNRC IPv6 fragmentation and reassembly

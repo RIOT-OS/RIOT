@@ -13,11 +13,5 @@ config BOARD_STM32F429I_DISCO
     default y
     select CPU_MODEL_STM32F429ZI
 
-    # Put other features for this board (in alphabetical order)
-    select HAS_HIGHLEVEL_STDIO
-
-config FORCE_USB_STDIO
-    default y
-
 source "$(RIOTBOARD)/common/stm32/Kconfig"
 source "$(RIOTBOARD)/stm32f429i-disc1/Kconfig"

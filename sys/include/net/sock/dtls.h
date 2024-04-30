@@ -582,6 +582,20 @@ extern "C" {
 #define SOCK_DTLS_HANDSHAKE     (EXDEV)
 
 /**
+ * @brief Force extended master secret extension
+ */
+#ifndef CONFIG_DTLS_FORCE_EXTENDED_MASTER_SECRET
+#define CONFIG_DTLS_FORCE_EXTENDED_MASTER_SECRET 1
+#endif
+
+/**
+ * @brief Force renegotiation info extension
+ */
+#ifndef CONFIG_DTLS_FORCE_RENEGOTIATION_INFO
+#define CONFIG_DTLS_FORCE_RENEGOTIATION_INFO 1
+#endif
+
+/**
  * @brief DTLS version number
  * @anchor sock_dtls_prot_version
  * @{

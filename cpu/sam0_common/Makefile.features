@@ -48,10 +48,3 @@ FEATURES_CONFLICT += periph_gpio_irq:periph_gpio_ll_irq
 FEATURES_CONFLICT_MSG += "GPIO IRQs can only be managed with one API."
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
-
-# Add sam0 configurations after including cortexm_common so sam0 takes precendence
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_CPU_CONFIG += $(RIOTCPU)/sam0_common/sam0_common.config
-endif

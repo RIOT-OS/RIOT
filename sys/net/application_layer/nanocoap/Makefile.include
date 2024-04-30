@@ -1,4 +1,7 @@
 ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
   CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT := $(or $(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT),2)
-  DTLS_MAX_BUF ?= ((1 << ($(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 3)) + 36)
+  NANOCOAP_BLOCK_FRAME := (1 << ($(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 4)) + 36
+  NANOCOAP_BLOCK_FRAME := $(shell echo $$((${NANOCOAP_BLOCK_FRAME})))
+  # the initial DTLS handshake may exceed the block size
+  DTLS_MAX_BUF ?= $(shell echo $$((${NANOCOAP_BLOCK_FRAME} > 200 ? ${NANOCOAP_BLOCK_FRAME} : 200 )))
 endif

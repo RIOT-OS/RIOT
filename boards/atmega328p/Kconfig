@@ -11,16 +11,3 @@ config BOARD_ATMEGA328P
     bool
     default y
     select CPU_MODEL_ATMEGA328P
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    # Various other features (if any)
-    select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
-
-source "$(RIOTBOARD)/common/atmega/Kconfig"

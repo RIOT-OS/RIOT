@@ -5,24 +5,5 @@
 # directory for more details.
 
 config WDT_WARNING_PERIOD
-    depends on HAS_PERIPH_WDT_WARNING_PERIOD && KCONFIG_USEMODULE_PERIPH_WDT
+    depends on USEMODULE_PERIPH_WDT
     default 1
-
-if TEST_KCONFIG
-
-config MODULE_SAM0_COMMON_PERIPH
-    bool
-    default y
-    help
-        SAM0 common peripheral code.
-
-config MODULE_PERIPH_RTC_RTT
-    bool
-    default y if MODULE_PERIPH_RTT || MODULE_PERIPH_RTC || MODULE_PERIPH_GPIO_TAMPER_WAKE
-
-config MODULE_PERIPH_UART_NONBLOCKING
-    depends on HAS_PERIPH_UART_NONBLOCKING
-    depends on MODULE_PERIPH_UART
-    select MODULE_TSRB
-
-endif # TEST_KCONFIG

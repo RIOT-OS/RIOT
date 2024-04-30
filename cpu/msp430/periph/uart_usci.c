@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2024 Marian Buschsieweke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,111 +16,191 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * @}
  */
 
+#include "compiler_hints.h"
 #include "cpu.h"
-#include "periph_cpu.h"
-#include "periph_conf.h"
+#include "irq.h"
+#include "periph/gpio.h"
 #include "periph/uart.h"
+#include "periph_conf.h"
+#include "periph_cpu.h"
 
-/**
- * @brief   Keep track of the interrupt context
- * @{
- */
-static uart_rx_cb_t ctx_rx_cb;
-static void *ctx_isr_arg;
-/** @} */
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
-static int init_base(uart_t uart, uint32_t baudrate);
+static uart_isr_ctx_t _isr_ctx[UART_NUMOF];
+static msp430_usci_conf_t _confs[UART_NUMOF];
+
+static void uart_rx_isr(uintptr_t uart);
+
+void uart_init_pins(uart_t uart)
+{
+    assume((unsigned)uart < UART_NUMOF);
+
+    const msp430_usci_uart_params_t *params = uart_config[uart].uart;
+
+    gpio_set(params->txd);
+    gpio_init(params->txd, GPIO_OUT);
+    gpio_periph_mode(params->txd, true);
+
+    gpio_init(params->rxd, GPIO_IN);
+    gpio_periph_mode(params->rxd, true);
+}
+
+void uart_deinit_pins(uart_t uart)
+{
+    assume((unsigned)uart < UART_NUMOF);
+
+    const msp430_usci_uart_params_t *params = uart_config[uart].uart;
+
+    gpio_init(params->txd, GPIO_IN);
+    gpio_periph_mode(params->txd, false);
+
+    gpio_init(params->rxd, GPIO_IN);
+    gpio_periph_mode(params->rxd, false);
+}
+
+static void _init(uart_t uart)
+{
+    const msp430_usci_uart_params_t *params = uart_config[uart].uart;
+    const msp430_usci_conf_t *conf = &_confs[uart];
+    uint8_t enable_rx_irq = 0;
+    /* enable RX IRQ, if callback function is set */
+    if (_isr_ctx[uart].rx_cb) {
+        enable_rx_irq = params->usci_params.rx_irq_mask;
+    }
+    /* acquire and configure USCI */
+    msp430_usci_acquire(&params->usci_params, conf);
+    /* reset error stats */
+    params->usci_params.dev->STAT = 0;
+    /* release USCI from reset and enable RX IRQ */
+    params->usci_params.dev->CTL1 &= ~(UCSWRST);
+    /* interrupt enable register is shared between two USCI peripherals, hence
+     * the other may be concurrently be configured */
+    unsigned irq_state = irq_disable();
+    *params->usci_params.interrupt_enable |= enable_rx_irq;
+    irq_restore(irq_state);
+}
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    if (init_base(uart, baudrate) < 0) {
-        return -1;
-    }
+    assume((unsigned)uart < UART_NUMOF);
+
+    /* prepare configuration */
+    _confs[uart] = (msp430_usci_conf_t){
+        .prescaler = msp430_usci_prescale(baudrate),
+        .ctl0 = 0,
+    };
 
     /* save interrupt context */
-    ctx_rx_cb = rx_cb;
-    ctx_isr_arg = arg;
-    /* reset interrupt flags and enable RX interrupt */
-    UART_IF &= ~(UART_IE_RX_BIT);
-    UART_IF |=  (UART_IE_TX_BIT);
-    UART_IE |=  (UART_IE_RX_BIT);
-    UART_IE &= ~(UART_IE_TX_BIT);
-    return 0;
-}
+    _isr_ctx[uart] = (uart_isr_ctx_t){
+        .rx_cb = rx_cb,
+        .arg = arg,
+    };
 
-static int init_base(uart_t uart, uint32_t baudrate)
-{
-    if (uart != 0) {
-        return -1;
+    /* prepare pins */
+    uart_init_pins(uart);
+
+    /* only enable USCI if RX is used, otherwise we enable it on-demand to
+     * allow sharing the USCI and conserve power */
+
+    if (rx_cb) {
+        _init(uart);
     }
 
-    /* get the default UART for now -> TODO: enable for multiple devices */
-    msp430_usci_a_t *dev = UART_BASE;
-
-    /* put device in reset mode while configuration is going on */
-    dev->CTL1 = UCSWRST;
-    /* configure to UART, using SMCLK in 8N1 mode */
-    dev->CTL1 |= UCSSEL_SMCLK;
-    dev->CTL0 = 0;
-    dev->STAT = 0;
-    /* configure baudrate */
-    uint32_t base = ((msp430_submain_clock_freq() << 7)  / baudrate);
-    uint16_t br = (uint16_t)(base >> 7);
-    uint8_t brs = (((base & 0x3f) * 8) >> 7);
-    dev->BR0 = (uint8_t)br;
-    dev->BR1 = (uint8_t)(br >> 8);
-    dev->MCTL = (brs << UCBRS_POS);
-    /* pin configuration -> TODO: move to GPIO driver once implemented */
-    UART_RX_PORT->SEL |= UART_RX_PIN;
-    UART_TX_PORT->SEL |= UART_TX_PIN;
-    UART_RX_PORT->base.DIR &= ~(UART_RX_PIN);
-    UART_TX_PORT->base.DIR |= UART_TX_PIN;
-    /* releasing the software reset bit starts the UART */
-    dev->CTL1 &= ~(UCSWRST);
     return 0;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    (void)uart;
+    assume((unsigned)uart < UART_NUMOF);
 
-    for (size_t i = 0; i < len; i++) {
-        while (!(UART_IF & UART_IE_TX_BIT)) {}
-        UART_BASE->TXBUF = data[i];
+    const msp430_usci_params_t *usci = &uart_config[uart].uart->usci_params;
+    bool tx_only = !_isr_ctx[uart].rx_cb;
+
+    /* in TX-only mode, we enable the USCI on-demand */
+    if (tx_only) {
+        _init(uart);
+    }
+
+    while (len--) {
+        while (!(*usci->interrupt_flag & usci->tx_irq_mask)) { }
+        usci->dev->TXBUF = *data++;
+    }
+
+    while (usci->dev->STAT & UCBUSY) {
+        /* busy wait for completion, e.g. to avoid losing chars/bits
+         * before releasing the USCI in TX only mode. */
+    }
+
+    if (tx_only) {
+        msp430_usci_release(usci);
     }
 }
 
 void uart_poweron(uart_t uart)
 {
-    (void)uart;
-    /* n/a */
+    assume((unsigned)uart < UART_NUMOF);
+
+    if (!_isr_ctx[uart].rx_cb) {
+        /* in TX only mode, the USCI will only be turned on on-demand anyway */
+        return;
+    }
+
+    _init(uart);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    (void)uart;
-    /* n/a */
+    assume((unsigned)uart < UART_NUMOF);
+
+    if (!_isr_ctx[uart].rx_cb) {
+        /* in TX only mode, the USCI will only be turned on on-demand anyway */
+        return;
+    }
+
+    const msp430_usci_params_t *usci = &uart_config[uart].uart->usci_params;
+
+    msp430_usci_release(usci);
 }
 
-ISR(UART_RX_ISR, isr_uart_0_rx)
+static void uart_rx_isr(uintptr_t uart)
 {
-    __enter_isr();
-
-    uint8_t stat = UART_BASE->STAT;
-    uint8_t data = (uint8_t)UART_BASE->RXBUF;
+    assume((unsigned)uart < UART_NUMOF);
+    const msp430_usci_params_t *usci = &uart_config[uart].uart->usci_params;
+    uint8_t stat = usci->dev->STAT;
+    uint8_t data = (uint8_t)usci->dev->RXBUF;
 
     if (stat & (UCFE | UCOE | UCPE | UCBRK)) {
-        /* some error which we do not handle, just do a pseudo read to reset the
-         * status register */
-        (void)data;
+        /* TODO: Add proper error handling */
+        usci->dev->STAT = 0;
+        DEBUG("[uart@%u] Error: %04x\n", (unsigned)uart, (unsigned)stat);
     }
     else {
-        ctx_rx_cb(ctx_isr_arg, data);
+        _isr_ctx[uart].rx_cb(_isr_ctx[uart].arg, data);
     }
 
+}
+
+/* only USCI A0 and USCI A1 can be used for UARTs, so at most two ISRS needed */
+#ifdef UART0_RX_ISR
+ISR(UART0_RX_ISR, isr_uart0)
+{
+    __enter_isr();
+    uart_rx_isr(0);
     __exit_isr();
 }
+#endif
+
+#ifdef UART1_RX_ISR
+ISR(UART1_RX_ISR, isr_uart1)
+{
+    __enter_isr();
+    uart_rx_isr(1);
+    __exit_isr();
+}
+#endif

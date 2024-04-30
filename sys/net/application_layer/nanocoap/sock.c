@@ -60,6 +60,9 @@ typedef struct {
     coap_blockwise_cb_t callback;
     void *arg;
     bool more;
+#if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
+    uint8_t token[4];
+#endif
 } _block_ctx_t;
 
 int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
@@ -601,7 +604,17 @@ static int _fetch_block(nanocoap_sock_t *sock, uint8_t *buf, size_t len,
     };
     uint16_t lastonum = 0;
 
-    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
+    void *token = NULL;
+    size_t token_len = 0;
+
+#if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
+    /* HACK: go-coap always expects a token */
+    /* see https://github.com/plgd-dev/go-coap/issues/512 */
+    token = ctx->token;
+    token_len = sizeof(ctx->token);
+#endif
+
+    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, token, token_len, COAP_METHOD_GET,
                           nanocoap_sock_next_msg_id(sock));
     buf += coap_opt_put_uri_pathquery(buf, &lastonum, path);
     buf += coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2, (num << 4) | blksize);
@@ -673,6 +686,10 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
         .arg = arg,
         .more = true,
     };
+
+#if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
+    random_bytes(ctx.token, sizeof(ctx.token));
+#endif
 
     unsigned num = 0;
     while (ctx.more) {

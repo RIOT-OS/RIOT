@@ -5,11 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TINYUSB_CLASS_DFU_RUNTIME
-    bool "Device Firmware Update Runtime (DFU Runtime)"
-    depends on MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_DFU && !MODULE_RIOTBOOT_TINYUSB_DFU
-
-if MODULE_TINYUSB_CLASS_DFU_RUNTIME
+if USEMODULE_TINYUSB_CLASS_DFU_RUNTIME
 
 config TUSBD_DFU_RT_NUMOF
     int
@@ -27,4 +23,4 @@ config TUSBD_DFU_RT_DETACH_TIMEOUT
     int "DFU detach timeout [ms]"
     default 1000
 
-endif # MODULE_TINYUSB_CLASS_DFU_RUNTIME
+endif # USEMODULE_TINYUSB_CLASS_DFU_RUNTIME

@@ -1,58 +1,5 @@
-menuconfig MODULE_LM75
-    bool
-    prompt "LM75A/TMP1075 Temperatire Sensors" if !(MODULE_SAUL_DEFAULT && HAVE_LM75)
-    default y if (MODULE_SAUL_DEFAULT && HAVE_LM75)
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_I2C
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_I2C
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-
-if MODULE_LM75
-
-choice
-    bool "sensor variant"
-    default MODULE_LM75A if HAVE_LM75A
-    default MODULE_TMP1075 if HAVE_TMP1075
-    help
-        Only the LM75A and TMP1075 temperature sensors are supported at the time.
-
-config MODULE_LM75A
-    bool "LM75A temperature sensor"
-
-config MODULE_TMP1075
-    bool "TMP1075 extended driver"
-
-endchoice
-
-endif # MODULE_LM75
-
-config HAVE_LM75
-    bool
-    help
-        Indicates that a lm75a/tmp1075 sensor is present.
-
-config HAVE_LM75A
-    bool
-    select HAVE_LM75
-    help
-        Indicates that a lm75a sensor is present.
-
-config HAVE_TMP1075
-    bool
-    select HAVE_LM75
-    help
-        Indicates that a tmp1075 sensor is present.
-
-menuconfig KCONFIG_USEMODULE_LM75
-    bool "Configure LM75 driver"
+menu "LM75 driver"
     depends on USEMODULE_LM75
-    help
-        Configure the LM75 driver using Kconfig.
-
-if KCONFIG_USEMODULE_LM75
 
 config LM75_I2C_ADDR
     hex "Default I2C Address"
@@ -139,7 +86,7 @@ config FAULT_6
 endchoice
 
 
-if MODULE_TMP1075
+if USEMODULE_TMP1075
 
 choice
     bool "Conversion rate"
@@ -162,6 +109,6 @@ config TMP1075_CONV_RATE_REG_220
 
 endchoice
 
-endif # MODULE_TMP1075
+endif # USEMODULE_TMP1075
 
-endif # KCONFIG_USEMODULE_LM75
+endmenu # LM75 driver

@@ -7,18 +7,6 @@
 
 config CPU_STM32
     bool
-    select HAS_CPU_STM32
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_TIMER_QUERY_FREQS
-    select HAS_PERIPH_RTT_OVERFLOW
-    select HAS_PERIPH_UART_MODECFG
-    select HAS_PERIPH_UART_NONBLOCKING
-
-    # This CPU requires periph_rtc when periph_rtc_mem
-    select MODULE_PERIPH_RTC if MODULE_PERIPH_RTC_MEM && HAS_PERIPH_RTC
 
 menu "STM32 configuration"
 
@@ -26,28 +14,12 @@ menu "STM32 configuration"
 config CPU
     default "stm32" if CPU_STM32
 
-# Definition of specific features
-config HAS_CPU_STM32
-    bool
-    help
-        Indicates that a 'stm32' cpu is being used.
-
-config HAS_BOOTLOADER_STM32
-    bool
-    help
-        Indicates that the stm32 bootloader is being used.
-
-config MODULE_BOOTLOADER_STM32
-    bool "STM32 DFU/UART/SPI bootloader"
-    depends on HAS_BOOTLOADER_STM32
-    depends on TEST_KCONFIG
-
 
 menu "STM32 clock configuration"
     depends on CPU_STM32
 
 rsource "kconfigs/Kconfig.clk"
-rsource "kconfigs/$(CPU_FAM)/Kconfig.clk"
+orsource "kconfigs/$(CPU_FAM)/Kconfig.clk"
 
 endmenu
 
@@ -75,17 +47,4 @@ config RDP2
     bool "RDP2"
 endchoice
 
-rsource "periph/Kconfig.fmc"
-
-if TEST_KCONFIG
-
-rsource "lcd_fmc/Kconfig"
-rsource "periph/Kconfig"
-rsource "stmclk/Kconfig"
-rsource "vectors/Kconfig"
-
-endif # TEST_KCONFIG
-
 endmenu
-
-source "$(RIOTCPU)/cortexm_common/Kconfig"

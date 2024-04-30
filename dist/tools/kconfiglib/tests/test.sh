@@ -18,8 +18,6 @@ KCONFIGLIB_DIR="$(readlink -f "$(dirname "$0")/..")"
 TESTS_DIR=${KCONFIGLIB_DIR}/tests
 GENCONFIG=${KCONFIGLIB_DIR}/genconfig.py
 
-export TEST_KCONFIG=1
-
 KCONFIG_FILE="${TESTS_DIR}/Kconfig.test"
 CONFIG_FOO_Y="${TESTS_DIR}/foo_y.config"
 CONFIG_BAR_Y="${TESTS_DIR}/bar_y.config"
@@ -90,19 +88,6 @@ function check_files_exist {
     then
         1>&2 echo -n "Missing configuration file ${CONFIG_BAZ_Y}"
         return 1
-    fi
-}
-
-# TEST
-# verifies that when the APPLICATION symbol is present, the script fails when
-# its value is not 'y' because of missing dependencies (e.g. missing features).
-function application_missing_deps_should_fail {
-    if OUT=$(${GENCONFIG} --kconfig-filename "${KCONFIG_FILE}" 2>&1)
-    then
-        1>&2 echo -n "$OUT"
-        return 1
-    else
-        return 0
     fi
 }
 
@@ -178,7 +163,6 @@ function choice_with_deps_should_succeed {
 }
 
 run_test check_files_exist
-run_test application_missing_deps_should_fail
 run_test application_with_deps_should_succeed
 run_test missing_module_should_fail
 run_test module_with_deps_should_succeed

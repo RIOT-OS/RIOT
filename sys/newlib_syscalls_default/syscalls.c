@@ -183,7 +183,9 @@ __attribute__((used)) void _fini(void)
 __attribute__((used)) void _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
+#ifdef MODULE_PERIPH_PM
     pm_off();
+#endif
     while (1) {}
 }
 

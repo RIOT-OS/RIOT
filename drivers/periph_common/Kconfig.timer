@@ -4,47 +4,11 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-if TEST_KCONFIG
-
-menuconfig MODULE_PERIPH_TIMER
-    bool "Timer peripheral driver"
-    depends on HAS_PERIPH_TIMER
-    select MODULE_PERIPH_COMMON
-
-if MODULE_PERIPH_TIMER
-
-# TODO: the 'init' modules are actually just artifacts from the way
-# periph_init_% modules are handled in Makefile. We need to define them to keep
-# the list the same for now. We should be able to remove them later on.
-
-config MODULE_PERIPH_INIT_TIMER
-    bool "Auto initialize Timer peripheral"
-    default y if MODULE_PERIPH_INIT
-
-config MODULE_PERIPH_TIMER_PERIODIC
-    bool "Periodic timeout support"
-    depends on HAS_PERIPH_TIMER_PERIODIC
-
-config MODULE_PERIPH_INIT_TIMER_PERIODIC
-    bool
-    depends on MODULE_PERIPH_TIMER_PERIODIC
-    default y if MODULE_PERIPH_INIT
-
-config MODULE_PERIPH_TIMER_QUERY_FREQS
-    bool "Support for querying supported timer frequencies"
-    depends on HAS_PERIPH_TIMER_QUERY_FREQS
-
-endif # MODULE_PERIPH_TIMER
-
-endif # TEST_KCONFIG
-
-menuconfig KCONFIG_USEMODULE_PERIPH_TIMER
-    bool "Configure timer peripheral driver"
-    depends on USEMODULE_PERIPH_TIMER
-    help
-        Configure Timer peripheral using Kconfig.
-
 # Include CPU specific configurations
-if KCONFIG_USEMODULE_PERIPH_TIMER
+if USEMODULE_PERIPH_TIMER
+menu "timer peripheral driver"
+
 osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.timer"
-endif
+
+endmenu # timer peripheral driver
+endif # USEMODULE_PERIPH_TIMER

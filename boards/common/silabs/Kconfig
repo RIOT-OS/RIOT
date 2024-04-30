@@ -6,17 +6,3 @@
 
 config BOARD_COMMON_SILABS
     bool
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAS_EFM32_CORETEMP
-    select HAS_RIOTBOOT
-
-config MODULE_BOARDS_COMMON_SILABS
-    bool
-    depends on TEST_KCONFIG
-    depends on BOARD_COMMON_SILABS
-    default y
-    help
-        Common silabs board code.
-
-rsource "drivers/Kconfig"

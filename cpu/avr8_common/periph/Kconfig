@@ -1,7 +1,0 @@
-config MODULE_AVR8_COMMON_PERIPH
-    bool
-    depends on TEST_KCONFIG
-    depends on CPU_COMMON_ATXMEGA
-    default y
-    help
-        AVR8 common peripheral drivers.

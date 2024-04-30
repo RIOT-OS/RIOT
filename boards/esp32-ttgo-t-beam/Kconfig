@@ -12,28 +12,5 @@ config BOARD_ESP32_TTGO_T_BEAM
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_D0WD
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_SPI_RAM
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"
-
-menu "ESP32 TTGO T-Beam options"
-    depends on TEST_KCONFIG
-    depends on BOARD_ESP32_TTGO_T_BEAM
-
-config MODULE_ESP32_TTGO_T_BEAM_V1_0
-    bool "Use V1.0 board variant"
-    select MODULE_PERIPH_I2C
-    help
-        There are at least three board types: rev0, rev1, and V1.0. Versions
-        rev0 and rev1 are very similar, the only difference is that rev1 has
-        an additional LED connected to GPIO14. The pinout of V1.0 has more
-        changes.
-
-endmenu

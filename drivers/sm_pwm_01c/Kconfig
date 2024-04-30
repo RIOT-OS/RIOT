@@ -1,40 +1,6 @@
-# Copyright (c) 2021 Inria
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-menuconfig MODULE_SM_PWM_01C
-    bool
-    prompt "SM_PWM_01C Amphenol infrared dust sensor" if !(MODULE_SAUL_DEFAULT && HAVE_SM_PWM_01C)
-    default (MODULE_SAUL_DEFAULT && HAVE_SM_PWM_01C)
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_ZTIMER
-    select ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
 
-config MODULE_SM_PWM_01C_MA
-    bool "Use a moving average for sensor values"
-    depends on MODULE_SM_PWM_01C
-    default y
-
-config HAVE_SM_PWM_01C
-    bool
-    help
-      Indicates that a SM_PWM_01C Amphenol infrared dust sensor is present.
-
-
-menuconfig KCONFIG_USEMODULE_SM_PWM_01C
-    bool "Configure SM_PWM_01C driver"
+menu "SM_PWM_01C driver"
     depends on USEMODULE_SM_PWM_01C
-    help
-        Configure the SM_PWM_01C driver using Kconfig.
-
-if KCONFIG_USEMODULE_SM_PWM_01C
 
 config SM_PWM_01C_WINDOW_TIME
     int "Measuring Window length"
@@ -64,4 +30,4 @@ config SM_PWM_01C_EXP_WEIGHT
 
 endif # USEMODULE_SM_PWM_01C_MA
 
-endif # KCONFIG_USEMODULE_SM_PWM_01C
+endmenu # SM_PWM_01C driver

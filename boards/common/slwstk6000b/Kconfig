@@ -7,24 +7,5 @@
 config BOARD_COMMON_SLWSTK6000B
     bool
     select BOARD_COMMON_SILABS
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    # additional hardware present in the board
-    select HAVE_SAUL_GPIO
-    select HAVE_SI7021
-
-config MODULE_BOARD_COMMON_SLWSTK6000B
-    bool
-    depends on TEST_KCONFIG
-    depends on BOARD_COMMON_SLWSTK6000B
-    select MODULE_SILABS_AEM
-    select MODULE_SILABS_BC
-    help
-        Common code for SLWSTK6000B silabs boards.
 
 source "$(RIOTBOARD)/common/silabs/Kconfig"

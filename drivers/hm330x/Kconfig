@@ -5,44 +5,8 @@
 # directory for more details.
 #
 
-menuconfig MODULE_HM330X
-    bool
-    prompt "HM330x Particulate Matter Sensor" if !(MODULE_SAUL_DEFAULT && HAVE_HM330X)
-    default y if (MODULE_SAUL_DEFAULT && HAVE_HM330x)
-    depends on HAS_PERIPH_I2C
-    depends on HAS_PERIPH_GPIO
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-    select MODULE_PERIPH_GPIO
-    help
-        HM330X Particulate Matter Sensor for HM3301/HM3302. Select a model.
-
-if MODULE_HM330X
-
-choice
-    bool "sensor variant"
-    default MODULE_HM3301 if HAVE_HM3301
-    default MODULE_HM3302 if HAVE_HM3302
-    help
-        Device driver for the HM330X Particulate Matter Sensor.
-
-config MODULE_HM3301
-    bool "HM3301"
-
-config MODULE_HM3302
-    bool "HM3302"
-
-endchoice
-
-endif # MODULE_HM330X
-
-menuconfig KCONFIG_USEMODULE_HM330X
-    bool "Configure HM330X driver"
+menu "HM330X driver"
     depends on USEMODULE_HM330X
-    help
-        Configure the HM330X driver using Kconfig.
-
-if KCONFIG_USEMODULE_HM330X
 
 config HM330X_INDOOR_ENVIRONMENT
     bool "Indoor environment calibration"
@@ -51,19 +15,5 @@ config HM330X_INDOOR_ENVIRONMENT
         The HM330X sensor outputs two set of PM* values, one calibrated for indoor
         environment and another one for atmospheric environment, set this value
         according to your deployment.
-endif # KCONFIG_USEMODULE_HM330X
 
-config HAVE_HM330x
-    bool
-
-config HAVE_HM3301
-    bool
-    select HAVE_HM330X
-    help
-        Indicates that a HM3301 sensor is present.
-
-config HAVE_HM3302
-    bool
-    select HAVE_HM330x
-    help
-        Indicates that a HM3302 sensor is present.
+endmenu # HM330X driver

@@ -4,22 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USB
-    bool "USB device"
-    depends on HAS_PERIPH_USBDEV || HAS_TINYUSB_DEVICE || MODULE_USBDEV_MOCK
-    depends on TEST_KCONFIG
-    help
-        Enable the USB device peripheral.
 
-
-if KCONFIG_USB
-
-choice USB_IMPLEMENTATION
-    bool "USB implementation"
-    help
-        Select the USB implementation.
-
-endchoice
+if USEMODULE_PERIPH_USBDEV || USEMODULE_TINYUSB_DEVICE || USEMODULE_USBDEV_MOCK
 
 rsource "usbus/Kconfig"
 
@@ -41,15 +27,15 @@ endmenu # Power management
 choice
     bool "USB specification version"
 
-config USB_SPEC_BCDVERSION_2_0
-    bool "USB v2.0"
-    help
-        The peripheral acts as an USB version 2.0 device.
+    config USB_SPEC_BCDVERSION_2_0
+        bool "USB v2.0"
+        help
+            The peripheral acts as an USB version 2.0 device.
 
-config USB_SPEC_BCDVERSION_1_1
-    bool "USB v1.1"
-    help
-        The peripheral acts as an USB version 1.1 device.
+    config USB_SPEC_BCDVERSION_1_1
+        bool "USB v1.1"
+        help
+            The peripheral acts as an USB version 1.1 device.
 
 endchoice
 
@@ -64,7 +50,6 @@ config USB_PID
     hex "Product ID"
     depends on CUSTOM_USB_VID_PID
     range 0x0000 0xFFFF
-    # default 0x7D02 if MODULE_RIOTBOOT_DFU
     default 0x7D01
     help
         You must provide your own PID.
@@ -129,4 +114,4 @@ config USB_SERIAL_BYTE_LENGTH
 comment "WARNING: The serial string is empty!"
     depends on USB_SERIAL_STR = "" && USB_CUSTOM_SERIAL_STR
 
-endif # KCONFIG_USB
+endif # KUSEMODULE_PERIPH_USBDEV || USEMODULE_TINYUSB_DEVICE || USEMODULE_USBDEV_MOCK

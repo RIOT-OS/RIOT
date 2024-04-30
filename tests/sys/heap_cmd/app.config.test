@@ -1,7 +1,0 @@
-# this file enables modules defined in Kconfig. Do not use this file for
-# application configuration. This is only needed during migration.
-
-CONFIG_MODULE_PS=y
-CONFIG_MODULE_SHELL=y
-CONFIG_MODULE_SHELL_CMDS_DEFAULT=y
-CONFIG_MODULE_SHELL_CMD_HEAP=y

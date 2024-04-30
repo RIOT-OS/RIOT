@@ -11,8 +11,3 @@ config BOARD_OLIMEX_MSP430_H2618
     bool
     default y
     select CPU_MODEL_MSP430F2618
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART

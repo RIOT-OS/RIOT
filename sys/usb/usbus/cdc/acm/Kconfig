@@ -4,24 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_USBUS_CDC_ACM
-    bool "Configure USBUS CDC ACM"
+
+menu "USBUS CDC ACM"
     depends on USEMODULE_USBUS_CDC_ACM
-    depends on KCONFIG_USEMODULE_USBUS
-    help
-        Configure the USBUS CDC ACM module via Kconfig.
-
-menuconfig MODULE_USBUS_CDC_ACM
-    bool "Configure USBUS CDC ACM"
-    depends on MODULE_USBUS
-    help
-        Configure the USBUS CDC ACM module via Kconfig.
-
-if MODULE_USBUS_CDC_ACM || KCONFIG_USEMODULE_USBUS_CDC_ACM
 
 config USBUS_CDC_ACM_STDIO_BUF_SIZE_EXP
     int "Buffer size for STDIN and STDOUT data (as exponent of 2^n)"
-    depends on USEMODULE_STDIO_CDC_ACM || MODULE_STDIO_CDC_ACM
+    depends on USEMODULE_STDIO_CDC_ACM
     default 7
     range 0 31
     help
@@ -36,32 +25,18 @@ choice
         This configures the maximum amount of bytes (chars) sent per transfer
         over the USB connection.
 
-config USBUS_CDC_ACM_BULK_EP_SIZE_8
-    bool "8"
+    config USBUS_CDC_ACM_BULK_EP_SIZE_8
+        bool "8"
 
-config USBUS_CDC_ACM_BULK_EP_SIZE_16
-    bool "16"
+    config USBUS_CDC_ACM_BULK_EP_SIZE_16
+        bool "16"
 
-config USBUS_CDC_ACM_BULK_EP_SIZE_32
-    bool "32"
+    config USBUS_CDC_ACM_BULK_EP_SIZE_32
+        bool "32"
 
-config USBUS_CDC_ACM_BULK_EP_SIZE_64
-    bool "64"
-
-endchoice
-
-endif # MODULE_USBUS_CDC_ACM
-
-# extend STDIO options
-choice STDIO_IMPLEMENTATION
-
-config MODULE_STDIO_CDC_ACM
-    bool "CDC ACM"
-    depends on MODULE_USBUS || KCONFIG_USEMODULE_USBUS
-    depends on MODULE_USBUS_CDC_ACM && !MODULE_TINYUSB_DEVICE
-    select MODULE_ISRPIPE
-    select MODULE_STDIO_AVAILABLE
-    select USE_STDOUT_BUFFERED
-
+    config USBUS_CDC_ACM_BULK_EP_SIZE_64
+        bool "64"
 
 endchoice
+
+endmenu # USBUS CDC ACM

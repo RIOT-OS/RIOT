@@ -276,6 +276,11 @@ groups:
         - name: cpu_qn908x
           help: The MCU is part of the NXP QN908x family
 
+      - title: Nintendo Grouping
+        features:
+        - name: cpu_arm7tdmi_gba
+          help: The MCU of the Game Boy Advance.
+
       - title: Raspberry Pi Grouping
         features:
         - name: cpu_rpx0xx
@@ -651,6 +656,8 @@ groups:
     features:
     - name: periph_can
       help: A CAN peripheral is present.
+    - name: can_rx_mailbox
+      help: CAN controller RX mailbox is supported
     - name: periph_eth
       help: An Ethernet peripheral is present.
 

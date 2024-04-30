@@ -1,6 +1,15 @@
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += prng_musl_lcg
+  USEMODULE += prng_sha256prng
+endif
+
+ifneq (,$(filter psa_persistent_storage, $(USEMODULE)))
+  USEPKG += nanocbor
+  USEPKG += littlefs2
+  USEMODULE += vfs
+  USEMODULE += vfs_default
+  USEMODULE += vfs_auto_format
+  USEMODULE += vfs_auto_mount
 endif
 
 # Asymmetric

@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEPKG_LIBSCHC
-    bool "Configure libSCHC"
+menu "libSCHC"
     depends on USEPKG_LIBSCHC
-    help
-        Configure libSCHC package via Kconfig.
-
-if KCONFIG_USEPKG_LIBSCHC
 
 config LIBSCHC_STATIC_MEMBUF_LEN
     int "Static memory allocation buffer length"
@@ -36,4 +31,4 @@ config LIBSCHC_MAX_MTU_LEN
 config LIBSCHC_DEBUG
     bool "Enable debug output"
 
-endif # KCONFIG_USEPKG_LIBSCHC
+endmenu # libSCHC

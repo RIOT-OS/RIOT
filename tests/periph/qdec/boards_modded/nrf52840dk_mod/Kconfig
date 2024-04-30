@@ -12,13 +12,5 @@ config BOARD_NRF52840DK
     default y
     select BOARDS_COMMON_NRF52XXXDK
     select CPU_MODEL_NRF52840XXAA
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_QDEC
-    select HAS_PERIPH_USBDEV
-    select HAS_VDD_LC_FILTER_REG0
-    select HAVE_MTD_SPI_NOR
-
-    select MODULE_BOARDS_COMMON_NRF52XXXDK if TEST_KCONFIG
-    select MODULE_BOARD_NRF52840DK_QDEC if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

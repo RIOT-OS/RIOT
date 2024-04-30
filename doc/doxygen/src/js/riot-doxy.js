@@ -47,11 +47,9 @@ function resize_content(sidenav)
 function resize_handler()
 {
     var sidenav = $("#side-nav");
-    if ($(window).width() < 750) {
+    const threshold = 750;
+    if ($(window).width() < threshold) {
         var toc = $(".toc");
-        if (window_before >= 750) {
-            original_sidenav_width = sidenav.width();
-        }
         sidenav.width("0px");
         sidenav.css("padding-right", "0px");
         sidenav.children(".ui-resizable-e").width("0px");
@@ -61,7 +59,9 @@ function resize_handler()
     }
     else {
         var toc = $(".toc-sm");
-        sidenav.width(parseInt(original_sidenav_width)+"px");
+        if (window_before < threshold) {
+            sidenav.width(parseInt(default_sidenav_width)+"px");
+        }
         sidenav.css("padding-right", original_padding);
         sidenav.children(".ui-resizable-e").width(original_padding);
         sidenav.show();
@@ -75,8 +75,8 @@ function resize_handler()
 $(document).ready(function() {
     var sidenav = $("#side-nav");
     original_padding = sidenav.css("padding-right")
-    window_before = $(window).width()
-    original_sidenav_width = (window_before >= 740) ? sidenav.width() : 275;
+    window_before = 0
+    default_sidenav_width = 300;
     resize_handler();
 });
 $(window).resize(resize_handler);

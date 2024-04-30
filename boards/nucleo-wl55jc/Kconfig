@@ -14,26 +14,6 @@ config BOARD_NUCLEO_WL55JC
     select BOARD_COMMON_NUCLEO64
     select CPU_MODEL_STM32WL55JC
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_LPUART
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO_PINS
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_RIOTBOOT
-    select HAVE_SX126X_STM32WL
-
-    # This board must use the MODULE_SX126X_RF_SWITCH module if the on-board
-    # lora module is being used.
-    imply MODULE_SX126X_RF_SWITCH if MODULE_SX126X_STM32WL
-
-    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
-
 config CLOCK_HSE
     default 32000000
 

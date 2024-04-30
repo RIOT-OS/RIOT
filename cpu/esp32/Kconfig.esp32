@@ -9,14 +9,6 @@ config CPU_FAM_ESP32
     bool
     select CPU_COMMON_ESP32X
     select CPU_CORE_XTENSA_LX6
-    select HAS_BLE_NIMBLE
-    select HAS_BLE_NIMBLE_NETIF
-    select HAS_ESP_BLE
-    select HAS_ESP_BLE_ESP32
-    select HAS_PUF_SRAM
-    select HAS_PERIPH_SDMMC_AUTO_CLK
-    select HAS_PERIPH_SDMMC_AUTO_CMD12
-    select HAS_PERIPH_SDMMC_MMC
 
 config CPU_FAM
     default "esp32" if CPU_FAM_ESP32
@@ -29,17 +21,14 @@ config CPU_MODEL_ESP32_WROOM_32
 config CPU_MODEL_ESP32_WROVER
     bool
     select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
 
 config CPU_MODEL_ESP32_WROVER_B
     bool
     select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
 
 config CPU_MODEL_ESP32_WROVER_E
     bool
     select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
 
 config CPU_MODEL_ESP32_D0WD
     bool
@@ -56,7 +45,6 @@ config CPU_MODEL
 if CPU_FAM_ESP32
 
 menu "ESP32 specific configurations"
-    depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP32
 
     # define configuration menu entries for ESP32 variant (family)

@@ -1,6 +1,9 @@
+BOARD ?= feather-nrf52840-sense
 include ../Makefile.drivers_common
 
-DRIVER ?= lsm6ds33
+DISABLE_MODULE += test_utils_interactive_sync
+
+DRIVER ?= lsm6dsxx
 
 USEMODULE += $(DRIVER)
 USEMODULE += ztimer

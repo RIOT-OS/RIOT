@@ -47,36 +47,31 @@ static const msp430_clock_params_t clock_params = {
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+static const uart_conf_t uart_config[] = {
+    {
+        .uart = &usci_a1_as_uart,
+    },
+};
 
-#define UART_BASE           (&USCI_A1)
-#define UART_IE             (UC1IE)
-#define UART_IF             (UC1IFG)
-#define UART_IE_RX_BIT      (1 << 0)
-#define UART_IE_TX_BIT      (1 << 1)
-#define UART_RX_PORT        (&PORT_3)
-#define UART_RX_PIN         (1 << 7)
-#define UART_TX_PORT        (&PORT_3)
-#define UART_TX_PIN         (1 << 6)
-#define UART_RX_ISR         (USCIAB1RX_VECTOR)
-#define UART_TX_ISR         (USCIAB1TX_VECTOR)
+#define UART0_RX_ISR        USCIAB1RX_VECTOR    /**< RX IRQ vector of UART 0 */
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
  * @name    SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
+static const spi_conf_t spi_config[] = {
+    {
+        .spi = &usci_b0_as_spi,
+    },
+    {
+        .spi = &usci_b1_as_spi,
+    },
+};
 
-/* SPI configuration */
-#define SPI_BASE            (&USCI_B0)
-#define SPI_IE              (IE2)
-#define SPI_IF              (IFG2)
-#define SPI_IE_RX_BIT       (1 << 2)
-#define SPI_IE_TX_BIT       (1 << 3)
-#define SPI_PIN_MISO        GPIO_PIN(P3, 2)
-#define SPI_PIN_MOSI        GPIO_PIN(P3, 1)
-#define SPI_PIN_CLK         GPIO_PIN(P3, 3)
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 #ifdef __cplusplus

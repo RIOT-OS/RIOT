@@ -96,7 +96,10 @@ void skald_eddystone_url_adv(skald_ctx_t *ctx,
 {
     assert(url && ctx);
     size_t len = strlen(url);
-    assert(len <= (NETDEV_BLE_PDU_MAXLEN - (URL_HDR_LEN + PREAMBLE_LEN)));
+    if (len <= (NETDEV_BLE_PDU_MAXLEN - (URL_HDR_LEN + PREAMBLE_LEN))) {
+        assert(0);
+        return;
+    }
 
     eddy_url_t *pdu = (eddy_url_t *)ctx->pkt.pdu;
     _init_pre(&pdu->pre, EDDYSTONE_URL, (URL_HDR_LEN + len));

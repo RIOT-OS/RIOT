@@ -6,26 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_SPS30
-    bool "SPS30 Particulate Matter Sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_CHECKSUM
-    select MODULE_PERIPH_I2C
-
-config HAVE_SPS30
-    bool
-    select MODULE_SPS30 if MODULE_SAUL_DEFAULT
-    help
-      Indicates that a SPS30 Particulate Matter Sensor is present.
-
-menuconfig KCONFIG_USEMODULE_SPS30
-    bool "Configure SPS30 driver"
+menu "SPS30 driver"
     depends on USEMODULE_SPS30
-    help
-        Configure the SPS30 driver using Kconfig.
-
-if KCONFIG_USEMODULE_SPS30
 
 config SPS30_ERROR_RETRY
     int "Maximum number of error retries"
@@ -36,4 +18,4 @@ config SPS30_ERROR_RETRY
         The value may be increased if the device is connected over
         suboptimal wiring.
 
-endif # KCONFIG_USEMODULE_SPS30
+endmenu # SPS30 driver

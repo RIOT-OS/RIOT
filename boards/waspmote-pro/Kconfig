@@ -11,15 +11,5 @@ config BOARD_WASPMOTE_PRO
     bool
     default y
     select CPU_MODEL_ATMEGA1281
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_MTD_SDCARD_DEFAULT
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTKCONFIG)/Kconfig.ztimer_only"

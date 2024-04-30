@@ -11,6 +11,8 @@
  * @defgroup    net_gnrc_mac Common MAC module
  * @ingroup     net_gnrc
  * @brief       A MAC module for providing common MAC parameters and helper functions.
+ * @deprecated  This module is deprecated and will be removed after the 2024.10 release.
+ *              As an alternative, you can use @ref pkg_opendsme.
  *
  * @{
  *

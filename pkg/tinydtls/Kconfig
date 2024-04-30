@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEPKG_TINYDTLS
-    bool "Configure tinydtls"
+menu "tinydtls"
     depends on USEPKG_TINYDTLS
-    help
-        Configure tinydtls package via Kconfig.
-
-if KCONFIG_USEPKG_TINYDTLS
 
 # TODO change to multiple choice after DTLS application support enabling more than one types of cypher suites
 choice
@@ -38,7 +33,7 @@ config DTLS_CONTEXT_MAX
 
 config DTLS_PEER_MAX
     int "Max number of peers"
-    default 2 if KCONFIG_USEMODULE_GCOAP_DTLS
+    default 2 if USEMODULE_GCOAP_DTLS
     default 1
     help
         The maximum number of DTLS peers.
@@ -49,4 +44,4 @@ config DTLS_HANDSHAKE_MAX
     help
         The maximum number of concurrent DTLS handshakes.
 
-endif # KCONFIG_USEPKG_TINYDTLS
+endmenu # tinydtls

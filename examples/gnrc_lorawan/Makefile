@@ -47,15 +47,6 @@ include $(RIOTBASE)/Makefile.include
 
 # Check if being configured via Kconfig
 ifndef CONFIG_KCONFIG_USEMODULE_LORAWAN
-
-  # Tell GNRC to encode LoRaWAN port in the GNRC netif header.
-  # This allows us to use `gnrc_txtsnd` to send data from the shell using the
-  # `txtsnd` command.
-  #
-  # Note: From Release 22.01 all GNRC LoRaWAN packets will include the netif
-  # header. Therefore this flag will be removed after that
-  CFLAGS += -DCONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR
-
   CFLAGS += -DCONFIG_LORAMAC_APP_KEY_DEFAULT=\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"
   CFLAGS += -DCONFIG_LORAMAC_NWK_KEY_DEFAULT=\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"
   CFLAGS += -DCONFIG_LORAMAC_APP_EUI_DEFAULT=\"BBBBBBBBBBBBBBBB\"

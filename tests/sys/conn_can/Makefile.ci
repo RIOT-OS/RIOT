@@ -26,5 +26,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     yunjia-nrf51822 \
-    z1 \
     #

@@ -61,7 +61,15 @@ static void _cep_set_in_use(client_ep_t *cep);
 static uint8_t _cep_get_response_type(client_ep_t *cep);
 static void _cep_set_response_type(client_ep_t *cep, uint8_t resp_type);
 static uint8_t _cep_get_req_etag_len(client_ep_t *cep);
-static void _cep_set_req_etag_len(client_ep_t *cep, uint8_t req_etag_len);
+
+/**
+ * @brief   Store the given ETag in the given client endpoint
+ * @param[out]  cep         client endpoint to store the ETag in
+ * @param[in]   etag        ETag to store
+ * @param[in]   etag_len    length of @p etag in bytes
+ */
+static void _cep_set_req_etag(client_ep_t *cep, const void *etag,
+                              uint8_t etag_len);
 
 const coap_resource_t forward_proxy_resources[] = {
     { "/", COAP_IGNORE, _forward_proxy_handler, NULL },
@@ -89,7 +97,7 @@ static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
          cep++) {
         if (!_cep_in_use(cep)) {
             _cep_set_in_use(cep);
-            _cep_set_req_etag_len(cep, 0);
+            _cep_set_req_etag(cep, NULL, 0);
             memcpy(&cep->ep, ep, sizeof(*ep));
             return cep;
         }
@@ -208,10 +216,10 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote)
 {
     /* Yes it's not a request -- but turns out there is nothing in
-     * gcoap_req_send_tl that is actually request specific, especially if we
+     * gcoap_req_send that is actually request specific, especially if we
      * don't assign a callback. */
-    ssize_t res = gcoap_req_send_tl(buf, len, remote, NULL, NULL,
-                                    GCOAP_SOCKET_TYPE_UDP);
+    ssize_t res = gcoap_req_send(buf, len, remote, NULL, NULL,
+                                 GCOAP_SOCKET_TYPE_UDP);
     if (res <= 0) {
         DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", -res);
     }
@@ -346,11 +354,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
             if (IS_USED(MODULE_NANOCOAP_CACHE) && opt.opt_num == COAP_OPT_ETAG) {
                 if (_cep_get_req_etag_len(cep) == 0) {
                     /* TODO: what to do on multiple ETags? */
-                    _cep_set_req_etag_len(cep, (uint8_t)optlen);
-#if IS_USED(MODULE_NANOCOAP_CACHE)
-                    /* req_tag in cep is pre-processor guarded so we need to as well */
-                    memcpy(cep->req_etag, value, optlen);
-#endif
+                    _cep_set_req_etag(cep, value, optlen);
                 }
                 /* skip original ETag of request, otherwise we might accidentally fill the cache
                  * with 2.03 Valid responses which would require additional handling.
@@ -440,7 +444,8 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
 
     len = gcoap_req_send((uint8_t *)pkt.hdr, len,
                          &origin_server_ep,
-                         _forward_resp_handler, (void *)client_ep);
+                         _forward_resp_handler, (void *)client_ep,
+                         GCOAP_SOCKET_TYPE_UNDEF);
     return len;
 }
 
@@ -524,13 +529,20 @@ static uint8_t _cep_get_req_etag_len(client_ep_t *cep)
     return 0;
 }
 
-static void _cep_set_req_etag_len(client_ep_t *cep, uint8_t req_etag_len)
+static void _cep_set_req_etag(client_ep_t *cep, const void *etag,
+                              uint8_t etag_len)
 {
-    if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+    (void)cep;
+    (void)etag;
+    (void)etag_len;
+#if MODULE_NANOCOAP_CACHE
+    if (etag_len <= COAP_ETAG_LENGTH_MAX) {
         cep->flags &= ~CLIENT_EP_FLAGS_ETAG_LEN_MASK;
-        cep->flags |= (req_etag_len << CLIENT_EP_FLAGS_ETAG_LEN_POS)
-                     & CLIENT_EP_FLAGS_ETAG_LEN_MASK;
+        cep->flags |= (etag_len << CLIENT_EP_FLAGS_ETAG_LEN_POS)
+                      & CLIENT_EP_FLAGS_ETAG_LEN_MASK;
+        memcpy(cep->req_etag, etag, etag_len);
     }
+#endif
 }
 
 /** @} */

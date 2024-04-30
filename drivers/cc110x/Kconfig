@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_CC110X
-    bool "Configure CC110X driver"
+menu "CC110X driver"
     depends on USEMODULE_CC110X
-    help
-        Configure the CC110X driver using Kconfig.
-
-if KCONFIG_USEMODULE_CC110X
 
 config CC110X_DEFAULT_CHANNEL
     int "Configure default channel"
@@ -21,4 +16,4 @@ config CC110X_DEFAULT_CHANNEL
         maximum of 8 (0-7) Channels.
         Default channel is 0.
 
-endif # KCONFIG_USEMODULE_CC110X
+endmenu # CC110X driver

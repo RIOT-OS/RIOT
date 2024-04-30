@@ -20,6 +20,8 @@
 #define WS281X_PARAMS_H
 
 #include "board.h"
+#include "saul_reg.h"
+
 #include "ws281x.h"
 
 #ifdef __cplusplus
@@ -104,6 +106,21 @@ static const ws281x_params_t ws281x_params[] =
 #ifndef WS281X_TIMER_FREQ
 #define WS281X_TIMER_FREQ 16000000
 #endif
+
+/**
+ * @brief   SAUL info
+ */
+#ifndef WS281X_SAUL_INFO
+#define WS281X_SAUL_INFO  { .name = "WS281X RGB LED" }
+#endif
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t ws281x_saul_info[] =
+{
+    WS281X_SAUL_INFO
+};
 
 #ifdef __cplusplus
 }

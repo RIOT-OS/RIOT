@@ -9,12 +9,6 @@ config CPU_FAM_ESP32C3
     bool
     select CPU_COMMON_ESP32X
     select CPU_CORE_RV32IMC
-    select HAS_BLE_ADV_EXT
-    select HAS_BLE_NIMBLE
-    select HAS_BLE_NIMBLE_NETIF
-    select HAS_BLE_PHY_2MBIT
-    select HAS_ESP_BLE
-    select HAS_ESP_BLE_ESP32C3
 
 config CPU_FAM
     default "esp32c3" if CPU_FAM_ESP32C3
@@ -51,7 +45,6 @@ config CPU_MODEL
 if CPU_FAM_ESP32C3
 
 menu "ESP32-C3 specific configurations"
-    depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP32
 
     # define configuration menu entries for ESP32-C3 variant (family)

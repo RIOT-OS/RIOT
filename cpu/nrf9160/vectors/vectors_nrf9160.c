@@ -36,7 +36,7 @@ WEAK_DEFAULT void isr_uarte0_spim0_spis0_twim0_twis0(void);
 WEAK_DEFAULT void isr_uarte1_spim1_spis1_twim1_twis1(void);
 WEAK_DEFAULT void isr_uarte2_spim2_spis2_twim2_twis2(void);
 WEAK_DEFAULT void isr_uarte3_spim3_spis3_twim3_twis3(void);
-WEAK_DEFAULT void isr_gpiote(void);
+WEAK_DEFAULT void isr_gpiote0(void);
 WEAK_DEFAULT void isr_saadc(void);
 WEAK_DEFAULT void isr_timer0(void);
 WEAK_DEFAULT void isr_timer1(void);
@@ -70,7 +70,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [9] = isr_uarte1_spim1_spis1_twim1_twis1,
     [10] = isr_uarte2_spim2_spis2_twim2_twis2,
     [11] = isr_uarte3_spim3_spis3_twim3_twis3,
-    [13] = isr_gpiote,             /* gpiote0 */
+    [13] = isr_gpiote0,             /* gpiote0 */
     [14] = isr_saadc,
     [15] = isr_timer0,
     [16] = isr_timer1,

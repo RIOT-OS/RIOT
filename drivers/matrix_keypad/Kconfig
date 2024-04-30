@@ -4,13 +4,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig MODULE_MATRIX_KEYPAD
-    bool "Matrix Keypad"
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO
-
-if MODULE_MATRIX_KEYPAD
+if USEMODULE_MATRIX_KEYPAD
 
 config MATRIX_KEYPAD_NUM_ROWS
     int "Number of rows on the matrix keypad"
@@ -39,9 +33,4 @@ config MATRIX_KEYPAD_ROWS_USE_OPEN_DRAIN
 	using matrix keypad modules without diodes in the switches. When diodes
 	are installed with the switches this can safely be set off.
 
-endif # MODULE_MATRIX_KEYPAD
-
-config HAVE_MATRIX_KEYPAD
-    bool
-    help
-        Indicates that a matrix-style keypad is present.
+endif # USEMODULE_MATRIX_KEYPAD

@@ -414,6 +414,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
+name = "lsm303agr"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4a03acd01d27c9ca96ba8205760673a23ba1914d85cc00e92a6a05963d5fe9b"
+dependencies = [
+ "bitflags 2.5.0",
+ "embedded-hal 1.0.0",
+ "nb 1.1.0",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -557,6 +568,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
+name = "riot-module-lsm303agr"
+version = "0.1.0"
+dependencies = [
+ "lsm303agr",
+ "riot-wrappers",
+]
+
+[[package]]
+name = "riot-module-shell-democommands"
+version = "0.1.0"
+dependencies = [
+ "riot-wrappers",
+]
+
+[[package]]
 name = "riot-sys"
 version = "0.7.11"
 source = "git+https://github.com/RIOT-OS/rust-riot-sys#3fcd2c1ac196795496be9962bc31919743a60d9a"
@@ -573,8 +599,8 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.8.2"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#f17d22a75f7494a39f5b5e8b02e3cddd3b86d3d4"
+version = "0.8.3"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#ea8d7fad95c8cb256ba9bc178f7779d266cc0def"
 dependencies = [
  "bare-metal",
  "coap-handler 0.1.6",
@@ -603,6 +629,10 @@ dependencies = [
 [[package]]
 name = "rust_riotmodules"
 version = "0.1.0"
+dependencies = [
+ "riot-module-lsm303agr",
+ "riot-module-shell-democommands",
+]
 
 [[package]]
 name = "rust_riotmodules_standalone"

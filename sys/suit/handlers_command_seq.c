@@ -424,7 +424,10 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
         return err;
     }
 
-    assert(manifest->urlbuf && url_len < manifest->urlbuf_len);
+    if (!manifest->urlbuf || url_len >= manifest->urlbuf_len) {
+        assert(0);
+        return SUIT_ERR_NO_MEM;
+    }
     memcpy(manifest->urlbuf, url, url_len);
     manifest->urlbuf[url_len] = '\0';
 

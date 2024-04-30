@@ -12,19 +12,5 @@ config BOARD_SLTB001A
     default y
     select BOARD_COMMON_SILABS
     select CPU_MODEL_EFR32MG1P132F256GM48
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select MODULE_SILABS_PIC if TEST_KCONFIG
-
-    # additional hardware present in the board
-    select HAVE_SAUL_GPIO
-    select HAVE_BMP280_I2C
-    select HAVE_CCS811
-    select HAVE_SI7021
 
 source "$(RIOTBOARD)/common/silabs/Kconfig"

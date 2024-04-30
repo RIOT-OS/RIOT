@@ -11,8 +11,3 @@ config BOARD_TEENSY31
     bool
     default y
     select CPU_MODEL_MK20DX256VLH7
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART

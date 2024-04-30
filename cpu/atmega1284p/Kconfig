@@ -8,16 +8,6 @@
 config CPU_MODEL_ATMEGA1284P
     bool
     select CPU_FAM_ATMEGA128
-    select HAS_ATMEGA_PCINT1
-    select HAS_ATMEGA_PCINT2
-    select HAS_ATMEGA_PCINT3
-    select HAS_CPU_ATMEGA1284P
-
-## Definition of specific features
-config HAS_CPU_ATMEGA1284P
-    bool
-    help
-        Indicates that a 'atmega1284p' cpu is being used.
 
 ## Common CPU symbols
 config CPU_MODEL

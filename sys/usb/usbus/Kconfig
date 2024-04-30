@@ -4,39 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-choice USB_IMPLEMENTATION
 
-menuconfig MODULE_USBUS
-    bool "USB Unified Stack (USBUS)"
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_USBDEV || MODULE_USBDEV_MOCK
-    select MODULE_CORE_THREAD_FLAGS
-    select MODULE_EVENT
-    select MODULE_LUID
-    select MODULE_FMT
-    select MODULE_USBUS_CDC_ACM if REQUIRES_USB_STDIO
-    select MODULE_PERIPH_USBDEV if HAS_PERIPH_USBDEV && !MODULE_USBDEV_MOCK
-
-endchoice
-
-if MODULE_USBUS
-
-config MODULE_AUTO_INIT_USBUS
-    bool "Auto initialize USBUS"
-    depends on MODULE_AUTO_INIT
-    default y
-
-endif # MODULE_USBUS
-
-menuconfig KCONFIG_USEMODULE_USBUS
-    bool "Configure USB Unified Stack (USBUS)"
+menu "Configure USB Unified Stack (USBUS)"
     depends on USEMODULE_USBUS
-    depends on KCONFIG_USB
-    help
-        Configure the USBUS module via Kconfig.
-
-if KCONFIG_USEMODULE_USBUS || MODULE_USBUS
-
 config USBUS_AUTO_ATTACH
     bool "Auto attach"
     default y
@@ -53,21 +23,20 @@ choice
         transfer large amount of data often over the control endpoint, a minimal
         size should be sufficient.
 
-config USBUS_EP0_SIZE_8
-    bool "8"
+    config USBUS_EP0_SIZE_8
+        bool "8"
 
-config USBUS_EP0_SIZE_16
-    bool "16"
+    config USBUS_EP0_SIZE_16
+        bool "16"
 
-config USBUS_EP0_SIZE_32
-    bool "32"
+    config USBUS_EP0_SIZE_32
+        bool "32"
 
-config USBUS_EP0_SIZE_64
-    bool "64"
+    config USBUS_EP0_SIZE_64
+        bool "64"
 
 endchoice
-
-endif # KCONFIG_USEMODULE_USBUS || MODULE_USBUS
+endmenu # Configure USB Unified Stack (USBUS)
 
 rsource "cdc/Kconfig"
 rsource "dfu/Kconfig"

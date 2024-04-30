@@ -5,16 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TOUCH_DEV_GESTURES
-    bool "Touch device gesture recognition"
-    depends on TEST_KCONFIG
-    select MODULE_TOUCH_DEV
-    select MODULE_ZTIMER_MSEC
-    help
-        Gesture recognition for touch devices that are accessed using the
-        generic touch device API.
-
-if MODULE_TOUCH_DEV_GESTURES
+if USEMODULE_TOUCH_DEV_GESTURES
 
 config TOUCH_DEV_SWIPE_TRESH
     int "Swipe threshold"

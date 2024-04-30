@@ -6,56 +6,8 @@
 # directory for more details.
 #
 
-menuconfig MODULE_LPSXXX
-    bool
-    prompt "LPSXXX Pressure Sensors" if !(MODULE_SAUL_DEFAULT && HAVE_LPSXXX)
-    default y if (MODULE_SAUL_DEFAULT && HAVE_LPSXXX)
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_I2C
-    help
-        Device driver for the LPSXXX pressure sensor family
-        (LPS331AP/LPS25HB/LPS22HB/LPS22HH/LPS22CH). Select a model.
-
-if MODULE_LPSXXX
-
-choice
-    bool "sensor variant"
-    default MODULE_LPS331AP if HAVE_LPS331AP
-    default MODULE_LPS22HB if HAVE_LPS22HB
-    default MODULE_LPS22HH if HAVE_LPS22HH
-    default MODULE_LPS25HB if HAVE_LPS25HB
-    default MODULE_LPS22CH if HAVE_LPS22CH
-    help
-        Device driver for the LPSXXX pressure sensor family
-        (LPS331AP/LPS25HB/LPS22HB/LPS22HH/LPS22CH). Select a model.
-
-config MODULE_LPS331AP
-    bool "LPS331AP"
-
-config MODULE_LPS22HB
-    bool "LPS22HB"
-
-config MODULE_LPS22HH
-    bool "LPS22HH"
-
-config MODULE_LPS25HB
-    bool "LPS25HB"
-
-config MODULE_LPS22CH
-    bool "LPS22CH"
-
-endchoice
-
-endif # MODULE_LPSXXX
-
-menuconfig KCONFIG_USEMODULE_LPSXXX
-    bool "Configure LPSXXX driver"
+menu "LPSXXX driver"
     depends on USEMODULE_LPSXXX
-    help
-        Configure the LPSXXX driver using Kconfig.
-
-if KCONFIG_USEMODULE_LPSXXX
 
 config LPSXXX_DEFAULT_ADDRESS
     hex "Default I2C address"
@@ -67,37 +19,4 @@ config LPSXXX_DEFAULT_ADDRESS
         information refer to the section 'I2C operation' in the
         datasheet.
 
-endif # KCONFIG_USEMODULE_LPSXXX
-
-config HAVE_LPSXXX
-    bool
-
-config HAVE_LPS331AP
-    bool
-    select HAVE_LPSXXX
-    help
-        Indicates that a LPS331AP sensor is present.
-
-config HAVE_LPS22HB
-    bool
-    select HAVE_LPSXXX
-    help
-        Indicates that a LPS22HB sensor is present.
-
-config HAVE_LPS22HH
-    bool
-    select HAVE_LPSXXX
-    help
-        Indicates that a LPS22HH sensor is present.
-
-config HAVE_LPS25HB
-    bool
-    select HAVE_LPSXXX
-    help
-        Indicates that a LPS25HB sensor is present.
-
-config HAVE_LPS22CH
-    bool
-    select HAVE_LPSXXX
-    help
-        Indicates that a LPS22CH sensor is present.
+endmenu # LPSXXX driver

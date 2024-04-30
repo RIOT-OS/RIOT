@@ -15,12 +15,12 @@
  */
 #include <errno.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "atomic_utils.h"
 #include "embUnit/embUnit.h"
 
 #include "vfs.h"
@@ -72,7 +72,7 @@ static void setup(void)
 static void teardown(void)
 {
     vfs_umount(&_test_vfs_mount_null, false);
-    atomic_store(&_test_vfs_mount_null.open_files, 0);
+    atomic_store_u16(&_test_vfs_mount_null.open_files, 0);
 }
 
 static void test_vfs_null_fs_ops_mount(void)
@@ -96,7 +96,8 @@ static void test_vfs_null_fs_ops_umount(void)
 static void test_vfs_null_fs_ops_umount__EBUSY(void)
 {
     TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
-    atomic_fetch_add(&_test_vfs_mount_null.open_files, 1);
+    uint16_t before = atomic_fetch_add_u16(&_test_vfs_mount_null.open_files, 1);
+    TEST_ASSERT(before < UINT16_MAX);
     int res = vfs_umount(&_test_vfs_mount_null, false);
     TEST_ASSERT_EQUAL_INT(-EBUSY, res);
     /* force unmount */

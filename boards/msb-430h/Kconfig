@@ -10,12 +10,6 @@ config BOARD
 config BOARD_MSB_430H
     bool
     default y
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
     select BOARD_COMMON_MSB_430
-    select HAVE_SHT11
 
 source "$(RIOTBOARD)/common/msb-430/Kconfig"

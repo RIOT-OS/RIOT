@@ -5,64 +5,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-## Definition of specific features
-config HAS_ARCH_ESP32
-    bool
-    help
-        Indicates that the current architecture is any ESP32x SoC architecture.
-
-config HAS_CPU_ESP32
-    bool
-    help
-        Indicates that the current CPU belongs to the ESP32x SoC series.
-
-config HAS_ESP_BLE
-    bool
-    help
-        Indicates that the used ESP32x SoC supports Bluetooth LE.
-
-config HAS_ESP_BLE_ESP32
-    bool
-    help
-        Indicates that the ESP32x SoC uses the SDK Bluetooth LE library
-        for the ESP32 variant.
-
-config HAS_ESP_BLE_ESP32C3
-    bool
-    help
-        Indicates that the ESP32x SoC uses the SDK Bluetooth LE library
-        for the ESP32-C3 or ESP32-S3 variant.
-
-config HAS_ESP_HW_COUNTER
-    bool
-    help
-        Indicates that the used ESP32x SoC supports HW counters that can be
-        used as timers.
-
-config HAS_ESP_RMT
-    bool
-    help
-        Indicates that the ESP32x SoC has a RMT peripheral.
-
-config HAS_ESP_RTC_TIMER_32K
-    bool
-    help
-        Indicates that an external 32.768 kHz crystal is connected to the
-        ESP32x Soc on the board.
-
-config HAS_ESP_SPI_RAM
-    bool
-    help
-        Indicates that an external RAM is connected via the SPI interface to
-        the ESP32x SoC on the board.
-
-config HAS_ESP_SPI_OCT
-    bool
-    help
-        Indicates that Octal SPI mode is used for Flash and SPI RAM. In this
-        case additional GPIOs are used for the SPI interface and cannot be
-        used for other purposes.
-
 config CPU
     default "esp32" if HAS_CPU_ESP32
 
@@ -94,6 +36,5 @@ rsource "Kconfig.esp32"
 rsource "Kconfig.esp32c3"
 rsource "Kconfig.esp32s3"
 rsource "Kconfig.esp32s2"
-rsource "stdio_usb_serial_jtag/Kconfig"
 
 source "$(RIOTCPU)/esp_common/Kconfig"

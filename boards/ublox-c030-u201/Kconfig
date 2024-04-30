@@ -13,22 +13,9 @@ config BOARD_UBLOX_C030_U201
     default y
     select CPU_MODEL_STM32F437VG
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_HW_FC
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
-
-    select HAVE_SAUL_GPIO
-    select MODULE_PERIPH_UART_HW_FC if HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
 
 config CLOCK_HSE
     default 12000000

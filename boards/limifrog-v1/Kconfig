@@ -13,12 +13,4 @@ config BOARD_LIMIFROG_V1
     default y
     select CPU_MODEL_STM32L151RC
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_LIS3MDL
-
 source "$(RIOTBOARD)/common/stm32/Kconfig"

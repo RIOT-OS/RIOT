@@ -5,56 +5,12 @@
 # directory for more details.
 #
 
-menuconfig MODULE_PSA_SECURE_ELEMENT
-    bool "PSA Secure Elements"
-    select MODULE_PSA_KEY_MANAGEMENT
-    select MODULE_PSA_SE_MGMT
-
-if MODULE_PSA_SECURE_ELEMENT
-
-config MODULE_PSA_SECURE_ELEMENT_MULTIPLE
-    bool "Use multiple secure elements"
+if USEMODULE_PSA_SECURE_ELEMENT
 
 config PSA_MAX_SE_COUNT
     int
-    prompt "Maximum number of secure elements" if MODULE_PSA_SECURE_ELEMENT_MULTIPLE
-    range 2 255 if MODULE_PSA_SECURE_ELEMENT_MULTIPLE
+    prompt "Maximum number of secure elements" if USEMODULE_PSA_SECURE_ELEMENT_MULTIPLE
+    range 2 255 if USEMODULE_PSA_SECURE_ELEMENT_MULTIPLE
     range 1 255
 
-menuconfig MODULE_PSA_SECURE_ELEMENT_ATECCX08A
-    bool "Microchip ATECCX08A"
-    select PACKAGE_CRYPTOAUTHLIB
-    select MODULE_PSA_SECURE_ELEMENT_CONFIG
-    depends on HAS_PERIPH_I2C
-    help
-        When using Cryptoauthlib as a backend for elliptic curve operations,
-        please also choose the ECC symbol.
-
-config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
-    bool "Microchip ATECCX08A Elliptic Curve P256"
-    select PSA_KEY_SIZE_256
-    select MODULE_PSA_ASYMMETRIC
-    depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
-
-config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_CIPHER_AES_128
-    bool "Microchip ATECCX08A Cipher AES 128"
-    select PSA_KEY_SIZE_128
-    select MODULE_PSA_CIPHER
-    depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
-
-config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_HMAC_SHA256
-    bool "Microchip ATECCX08A HMAC SHA-256"
-    select PSA_KEY_SIZE_128
-    select MODULE_PSA_MAC
-    depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
-
-config MODULE_PSA_SE_MGMT
-    bool
-
-config MODULE_PSA_SECURE_ELEMENT_CONFIG
-    bool
-    help
-        Indicates that this SE driver defines a configuration structure for
-        persistent driver data.
-
-endif # MODULE_PSA_SECURE_ELEMENT
+endif # USEMODULE_PSA_SECURE_ELEMENT
