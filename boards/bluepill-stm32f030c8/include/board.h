@@ -40,6 +40,7 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        13
+#define LED0_PORT           GPIO_PORT_C /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_C
 #define LED0_IS_INVERTED    1
 /** @} */
