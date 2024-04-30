@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/rpi-pico/Makefile.dep
+include $(RIOTBOARD)/rpi-pico-w/Makefile.dep

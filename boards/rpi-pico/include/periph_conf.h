@@ -127,11 +127,17 @@ static const adc_conf_t adc_config[] = {
  */
 static const i2c_conf_t i2c_config[] = {
     {
-        .dev      = (uint64_t *) I2C0_BASE, //type needs looking at
+        .dev      = (uint32_t *) I2C0_BASE,
         .speed    = I2C_SPEED_NORMAL,
-        .scl  = GPIO_PIN(0, 3),
-        .sda = GPIO_PIN(0, 4)
-     }
+        .sda = GPIO_PIN(0, 16),
+        .scl  = GPIO_PIN(0, 17)
+    },
+    {
+        .dev      = (uint32_t *) I2C1_BASE,
+        .speed    = I2C_SPEED_NORMAL,
+        .sda = GPIO_PIN(0, 14),
+        .scl  = GPIO_PIN(0, 15)
+    }
 };
 /** @} */
 

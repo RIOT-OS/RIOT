@@ -458,7 +458,7 @@ typedef enum {
  * @brief   I2C configuration options
  */
 typedef struct {
-    uint64_t* dev; //device pointer should have better type probably
+    uint32_t* dev; //device pointer should have better type probably
     i2c_speed_t speed;      /**< baudrate used for the bus */
     gpio_t scl;         /**< pin used for SCL */
     gpio_t sda;         /**< pin used for SDA */

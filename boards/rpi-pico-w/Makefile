@@ -1,2 +1,2 @@
-DIRS = $(RIOTBOARD)/rpi-pico
+DIRS = $(RIOTBOARD)/rpi-pico-w
 include $(RIOTBASE)/Makefile.base

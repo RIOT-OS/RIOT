@@ -24,6 +24,7 @@
 #include <string.h> //for memcpy
 
 #include "periph_conf.h"
+#include "periph_cpu.h"
 #include "periph/i2c.h"
 #include "periph/pio/i2c.h"
 #include "periph/gpio.h"
@@ -43,7 +44,8 @@
 #define I2C_DELAY 10 //potentially adjust
 
 /* select i2c base */
-long I2C_BASE = 0x40044000;
+//const uint32_t I2C0_BASE = 0x40044000;
+//const uint32_t I2C1_BASE = 0x40048000;
 const long IC_DATA_CMD = 0x10;
 const long IC_ENABLE = 0x6c;
 const long IC_CON = 0x00;
@@ -64,24 +66,12 @@ typedef struct {
     mutex_t dev_lock;       /* device locking */
 } _i2c_bus_t;
 
-static _i2c_bus_t _i2c_bus[32] = { //no idea if its supposed to be 32 or what I2C_NUMOF is
+static _i2c_bus_t _i2c_bus[32] = {
     {
         .cmd_lock = MUTEX_INIT_LOCKED,
         .dev_lock = MUTEX_INIT,
     }
 };
-
-/*static inline int i2c_delay_timer(){
-    //create timer for timeout, 10* highest transfer speed
-    uint32_t timeoutTime = 10*MHZ(1);
-    uint32_t POLL_COUNT = 0;
-    while(POLL_COUNT < timeoutTime){
-        POLL_COUNT++;
-        //call checking fn ?
-    }
-    return 0;
-
-}*/
 
 /**
  * @brief delay for ms microseconds for line stability
@@ -93,6 +83,11 @@ static inline void i2c_delay(uint16_t us){
     }
 }
 
+/**
+ * @brief checks if ack is received by peripheral
+ * @param dev peripheral device identifier on bus
+ * @return bool true/false whether received ACK or not
+*/
 static inline bool check_received_ack(i2c_t dev){
     gpio_init(I2C_SDA_PIN, GPIO_IN);
     i2c_delay(10);
@@ -104,33 +99,36 @@ static inline bool check_received_ack(i2c_t dev){
     return received_ack;
 }
 
+void i2c_init_pins(i2c_t dev){
+    gpio_init(I2C_SDA_PIN, GPIO_OUT);
+    gpio_init(I2C_SCL_PIN, GPIO_OUT);
+    gpio_set_function_select(i2c_config[dev].scl, FUNCTION_SELECT_I2C);
+    gpio_set_function_select(i2c_config[dev].sda, FUNCTION_SELECT_I2C);
+    return;
+}
+
+void i2c_deinit_pins(i2c_t dev){
+    gpio_set_function_select(i2c_config[dev].scl, FUNCTION_SELECT_NONE);
+    gpio_set_function_select(i2c_config[dev].sda, FUNCTION_SELECT_NONE);
+    return;
+}
+
 void i2c_init(i2c_t dev)
 {
     // does pico have max i2c dev conns?
     assert(I2C_NUMOF < I2C_NUMOF_MAX_MASTER);
-    
-    //start in master mode (slave mode disabled on reset)
 
     //speed supports fast mode plus at max
     assert(i2c_config[dev].speed <= I2C_SPEED_FAST_PLUS);
 
-    /* GPIOs for SCL and SDA signals must not already be used for peripherals /
-    if (((gpio_get_pin_usage(i2c_config[dev].scl) != _I2C) &&
-         (gpio_get_pin_usage(i2c_config[dev].scl) != _GPIO)) ||
-        ((gpio_get_pin_usage(i2c_config[dev].sda) != _I2C) &&
-         (gpio_get_pin_usage(i2c_config[dev].sda) != _GPIO))) {
-        LOG_TAG_ERROR("i2c", "GPIO%u and/or GPIO%u are used for %s/%s and "
-                      "cannot be used as I2C interface\n",
-                       i2c_config[dev].scl, i2c_config[dev].sda,
-                       gpio_get_pin_usage_str(i2c_config[dev].scl),
-                       gpio_get_pin_usage_str(i2c_config[dev].sda));
-        assert(0);
-    } */
 
-    //set pin functions (?)
+    //set pin functions
+    gpio_init(i2c_config[dev].scl, GPIO_OUT);
+    gpio_init(i2c_config[dev].sda, GPIO_OUT);
 
-    gpio_set_function_select(i2c_config[dev].scl, _I2C);
-    gpio_set_function_select(i2c_config[dev].sda, _I2C);
+    //initliase mutex locks
+    mutex_init(&_i2c_bus[dev].dev_lock);
+
 
 }
 
@@ -159,30 +157,26 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
     _i2c_bus[dev].cmd_op = 0; //I2C_LL_CMD_READ;
     _i2c_bus[dev].cmd = 0;
 
-    /* reset TX/RX FIFO queue */
-    //i2c_hal_txfifo_rst(&_i2c_hw[dev]);
-    //i2c_hal_rxfifo_rst(&_i2c_hw[dev]);
 
     /*  if I2C_NOSTART is not set, START condition and ADDR is used */
     if (!(flags & I2C_NOSTART)) {
-        /* send START condition */
-        //_i2c_start_cmd(dev);
+
+        //write IC_ENABLE[0] 0 to disable DW_apb_i2c
+        long* memaddr = (long *) I2C0_BASE;
+        *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) & 0xFFFE;
 
         /* address handling */
         if (flags & I2C_ADDR10) {
-            //write IC_ENABLE[0] 0 to disable DW_apb_i2c
-            long* memaddr = (long *) I2C_BASE;
-            *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) & 0xFFFE;
 
             /* write max speed mode supported to IC_CON (bits 2:1)*/
             uint8_t mode = 0x2; //0x1 = standard, 0x2 = FM/FM+, 0x3 = HSM 
             uint8_t addrmode = 0x1; //0 for 7-bit, 1 for 10-bit
             uint8_t addrdata = 0x41 | (mode << 1) | (addrmode << 4);
-            *(memaddr + IC_CON) = *(memaddr + IC_CON) | (0x57 & (addrdata)); // <-- TODO:  TEST THIS
+            *(memaddr + IC_CON) = *(memaddr + IC_CON) | (0x57 & (addrdata));
 
             /* write target addr for dev */
-            *(memaddr + IC_TAR) = (*(memaddr + IC_TAR) & 0x3FF) | dev; //consider bits 8,9,11,13 for gen call / start cmd gen
-
+            //consider bits 8,9,11,13 for gen call / start cmd gen
+            *(memaddr + IC_TAR) = (*(memaddr + IC_TAR) & 0x3FF) | dev;
             /* enable dw_a2b_i2c */
             *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) | 0x1;
 
@@ -192,6 +186,18 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
 
         }
         else { //if 7bit addressing
+
+            /* write max speed mode supported to IC_CON (bits 2:1)*/
+            uint8_t mode = 0x2; //0x1 = standard, 0x2 = FM/FM+, 0x3 = HSM 
+            uint8_t addrmode = 0x0; //0 for 7-bit, 1 for 10-bit
+            uint8_t addrdata = 0x41 | (mode << 1) | (addrmode << 4);
+            *(memaddr + IC_CON) = *(memaddr + IC_CON) | (0x57 & (addrdata));
+
+            /* write target addr for dev */
+            //consider bits 8,9,11,13 for gen call / start cmd gen
+            *(memaddr + IC_TAR) = (*(memaddr + IC_TAR) & 0x3FF) | dev;
+            /* enable dw_a2b_i2c */
+            *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) | 0x1;
 
             //init pins
             gpio_init(I2C_SDA_PIN, GPIO_OUT);
@@ -251,7 +257,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
                 }
 
                 //stop condition - set IC_DATA_CMD[9] to 1
-                uint32_t* memaddr = (uint32_t *) I2C_BASE;
+                uint32_t* memaddr = (uint32_t *) I2C0_BASE;
                 *(memaddr+IC_DATA_CMD) |= 1 << IC_DATA_CMD_STOP;
 
                 if (!(flags & I2C_NOSTOP)) {
@@ -275,94 +281,54 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
         }
     }
 
-    /* read data bytes in blocks of SOC_I2C_FIFO_LEN bytes */
-    //uint32_t off = 0;
-
-    /* VVV to be sorted VVV
-
-    / if len > SOC_I2C_FIFO_LEN read SOC_I2C_FIFO_LEN bytes at a time 
-    while (len > SOC_I2C_FIFO_LEN) {
-        /read one block of data bytes command 
-        _i2c_bus[dev].len = SOC_I2C_FIFO_LEN;
-        _i2c_read_cmd(dev, SOC_I2C_FIFO_LEN, false);
-        _i2c_end_cmd(dev);
-        _i2c_transfer(dev);
-
-        res = _i2c_status_to_errno(dev);
-        if (res) {
-            return res;
-        }
-
-        / if transfer was successful, fetch the data from I2C RAM
-        i2c_hal_read_rxfifo(&_i2c_hw[dev], data + off, len);
-
-        / reset RX FIFO queue 
-        i2c_hal_rxfifo_rst(&_i2c_hw[dev]);
-
-        len -= SOC_I2C_FIFO_LEN;
-        off += SOC_I2C_FIFO_LEN;
-    }
-
-    
-
-    / read remaining data bytes command with a final NAK 
-    _i2c_bus[dev].len = len;
-    _i2c_read_cmd(dev, len, true);
-
-    / if I2C_NOSTOP flag is not set, send STOP condition is used 
-    if (!(flags & I2C_NOSTOP)) {
-        / send STOP condition 
-        _i2c_stop_cmd(dev);
-    }
-    else {
-        / otherwise place end command in pipeline 
-        _i2c_end_cmd(dev);
-    }
-
-    / finish operation by executing the command pipeline 
-    _i2c_transfer(dev);
-
-    if ((res = _i2c_status_to_errno(dev))) {
-        return res;
-    }
-
-    / fetch the data from RX FIFO 
-    i2c_hal_read_rxfifo(&_i2c_hw[dev], data + off, len);
-
-    / return 0 on success */
+    //return 0 on success
     return 0;
 }
 
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
-{
+{   
+    int status = 0;
     //check validity of args
     if(len < 1 || data == NULL){
         return EINVAL;
     }
     //read regs, len bytes
-    long* baseaddr = (long *) I2C_BASE;
-    for(uint16_t i = 0; i < len; i++){
-        _i2c_bus[dev].len = 8; //?
-        _i2c_bus[dev].cmd = 1; // send read cmd ?
-        //or this sends read cmd ? sets IC_DATA_CMD-CMD to 1 which is read
-        *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
-        uint8_t* dataAddr = (uint8_t *) data;
-        /* set specified target dataAddr to that which occupies the data bits of 
-           IC_DATA_CMD */
-        dataAddr[i] = *(baseaddr + IC_DATA_CMD) & 0xFF;
+    _i2c_bus[dev].len = 8;
+    _i2c_bus[dev].cmd = 1;
 
-        //send stop bit
-        if(i == len-1){
-            *(baseaddr + IC_DATA_CMD) = 0xFF & IC_DATA_CMD_STOP;
+    //check validity of args
+    if(data == NULL){
+        return EINVAL;
+    }
+    
+    //write reg address first
+    _i2c_bus[dev].cmd = 0;
+    i2c_write_bytes(dev, addr, &reg, sizeof(reg), 0);
+
+    //loop to repeat reads from reg
+    for(size_t i = 0; i < len; i++){
+
+        //repeated start to indicate shift to read
+        gpio_write(I2C_SDA_PIN, 1);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SCL_PIN, 1);
+        i2c_delay(I2C_DELAY);
+        gpio_write(I2C_SCL_PIN, 0);
+        gpio_write(I2C_SDA_PIN, 0);
+        i2c_delay(I2C_DELAY);
+
+        //read reg data
+        _i2c_bus[dev].cmd = 1;
+        status = i2c_read_bytes(dev, addr, data, sizeof(reg), flags);
+
+        //make sure if error ran into, report back immediately
+        if(status != 0){
+            return status;
         }
     }
-    uint8_t* dataAddr2 = (uint8_t *) data;
-    dataAddr2[0] = 0xFF;
 
-
-    return 0;
-
+    return status;
 }
 
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -412,10 +378,42 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
     DEBUG("i2c write %d bytes", len);
 
     //prepare i2c bus
-    long* baseaddr = (long *) I2C_BASE;
+    long* baseaddr = (long *) I2C0_BASE;
     _i2c_bus[dev].len = 8; //?
     _i2c_bus[dev].cmd = 0; // send write cmd ?
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
+
+    //write IC_ENABLE[0] 0 to disable DW_apb_i2c until configured
+    long* memaddr = (long *) I2C0_BASE;
+    *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) & 0xFFFE;
+
+    //for 7-bit addressing
+    if(!(flags & I2C_ADDR10)){
+        /* write max speed mode supported to IC_CON (bits 2:1)*/
+        uint8_t mode = 0x2; //0x1 = standard, 0x2 = FM/FM+, 0x3 = HSM 
+        uint8_t addrmode = 0x0; //0 for 7-bit, 1 for 10-bit
+        uint8_t addrdata = 0x41 | (mode << 1) | (addrmode << 4);
+        *(memaddr + IC_CON) = *(memaddr + IC_CON) | (0x57 & (addrdata));
+
+        /* write target addr for dev */
+        //consider bits 8,9,11,13 for gen call / start cmd gen
+        *(memaddr + IC_TAR) = (*(memaddr + IC_TAR) & 0x3FF) | dev;
+        /* enable dw_a2b_i2c */
+        *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) | 0x1;
+    }
+    else{
+        /* write max speed mode supported to IC_CON (bits 2:1)*/
+        uint8_t mode = 0x2; //0x1 = standard, 0x2 = FM/FM+, 0x3 = HSM 
+        uint8_t addrmode = 0x1; //0 for 7-bit, 1 for 10-bit
+        uint8_t addrdata = 0x41 | (mode << 1) | (addrmode << 4);
+        *(memaddr + IC_CON) = *(memaddr + IC_CON) | (0x57 & (addrdata));
+
+        /* write target addr for dev */
+        //consider bits 8,9,11,13 for gen call / start cmd gen
+        *(memaddr + IC_TAR) = (*(memaddr + IC_TAR) & 0x3FF) | dev;
+        /* enable dw_a2b_i2c */
+        *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) | 0x1;
+    }
 
 
     //transmit byte sequence
@@ -502,7 +500,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
     //write reg lol idk what im doing
-    long* baseaddr = (long *) I2C_BASE;
+    long* baseaddr = (long *) I2C0_BASE;
     _i2c_bus[dev].len = 8; //?
     _i2c_bus[dev].cmd = 0; // send write cmd ?
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
@@ -531,10 +529,10 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                   uint8_t data, uint8_t flags)
 {
-    //write reg lol idk what im doing
-    long* baseaddr = (long *) I2C_BASE;
-    _i2c_bus[dev].len = 8; //?
-    _i2c_bus[dev].cmd = 0; // send write cmd ?
+    //write reg
+    long* baseaddr = (long *) I2C0_BASE;
+    _i2c_bus[dev].len = 8;
+    _i2c_bus[dev].cmd = 0; // send write cmd
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
 
     uint8_t tx_buffer[256] = {};
@@ -556,3 +554,16 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 
     return retstatus;
 }
+
+/* not sure why these functions cant exist, linker complains that multiple
+   defns already exist 
+
+int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags){
+    return i2c_write_bytes(dev, addr, &data, 1, flags);
+}
+
+int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags){
+    return i2c_read_bytes(dev, addr, data, 1, flags);
+}
+
+*/

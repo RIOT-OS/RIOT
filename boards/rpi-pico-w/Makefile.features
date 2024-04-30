@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/rpi-pico/Makefile.features
+include $(RIOTBOARD)/rpi-pico-w/Makefile.features
