@@ -317,26 +317,78 @@ int vfs_open(const char *name, int flags, mode_t mode)
     return fd;
 }
 
-ssize_t vfs_read(int fd, void *dest, size_t count)
+static inline int _prep_read(int fd, const void *dest, vfs_file_t **filp)
 {
-    DEBUG("vfs_read: %d, %p, %" PRIuSIZE "\n", fd, dest, count);
     if (dest == NULL) {
         return -EFAULT;
     }
+
     int res = _fd_is_valid(fd);
     if (res < 0) {
         return res;
     }
-    vfs_file_t *filp = &_vfs_open_files[fd];
-    if (((filp->flags & O_ACCMODE) != O_RDONLY) & ((filp->flags & O_ACCMODE) != O_RDWR)) {
+    *filp = &_vfs_open_files[fd];
+
+    if ((((*filp)->flags & O_ACCMODE) != O_RDONLY) &&
+        (((*filp)->flags & O_ACCMODE) != O_RDWR)) {
         /* File not open for reading */
         return -EBADF;
     }
-    if (filp->f_op->read == NULL) {
+    if ((*filp)->f_op->read == NULL) {
         /* driver does not implement read() */
         return -EINVAL;
     }
+
+    return 0;
+}
+
+ssize_t vfs_read(int fd, void *dest, size_t count)
+{
+    DEBUG("vfs_read: %d, %p, %" PRIuSIZE "\n", fd, dest, count);
+    vfs_file_t *filp = NULL;
+
+    int res = _prep_read(fd, dest, &filp);
+    if (res) {
+        DEBUG("vfs_read: can't open file - %d\n", res);
+        return res;
+    }
+
     return filp->f_op->read(filp, dest, count);
+}
+
+ssize_t vfs_readline(int fd, char *dst, size_t len_max)
+{
+    DEBUG("vfs_readline: %d, %p, %" PRIuSIZE "\n", fd, (void *)dst, len_max);
+    vfs_file_t *filp = NULL;
+
+    int res = _prep_read(fd, dst, &filp);
+    if (res) {
+        DEBUG("vfs_readline: can't open file - %d\n", res);
+        return res;
+    }
+
+    const char *start = dst;
+    while (len_max) {
+        int res = filp->f_op->read(filp, dst, 1);
+        if (res < 0) {
+            break;
+        }
+
+        if (*dst == '\r' || *dst == '\n' || res == 0) {
+            *dst = 0;
+            ++dst;
+            break;
+        } else {
+            --len_max;
+            ++dst;
+        }
+    }
+
+    if (len_max == 0) {
+        return -E2BIG;
+    }
+
+    return dst - start;
 }
 
 ssize_t vfs_write(int fd, const void *src, size_t count)
