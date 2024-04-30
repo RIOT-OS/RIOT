@@ -302,6 +302,9 @@ static int _configuration_prepare_sid(const conf_handler_t **next_handler, conf_
 {
     key->offset = 0;
     key->sid_normal = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_KEY_SUBKEY)
+    key->subkey = NULL;
+#endif
 #if IS_USED(MODULE_CONFIGURATION_STRINGS)
     if (key_buf) {
         memset(key_buf, 0, key_buf_len);
@@ -616,12 +619,40 @@ static int _configuration_handler_export_internal(const conf_handler_t *root,
     if (_configuration_prepare_sid(&root, key, _KEY_BUF(key), _KEY_BUF_LEN(key)) < 0) {
         return -ENOENT;
     }
+    const conf_backend_t *be;
+#if IS_USED(MODULE_CONFIGURATION_KEY_SUBKEY)
+    /* if export node has no backend, find first parent node which has a backend */
+    conf_key_range_t subkey = { .sid_lower = key->sid, .sid_upper = key->sid };
+    if (root->conf_flags.handles_array) {
+        if (key->sid == root->array_id->sid_lower) {
+            subkey.sid_upper += (root->array_id->sid_upper - root->array_id->sid_lower);
+        }
+        else {
+            subkey.sid_upper = key->sid + root->array_id->sid_stride - 1;
+        }
+    }
+    else if (!root->conf_flags.handles_primitive) {
+        subkey.sid_upper += (root->node_id->sid_upper - root->node_id->sid_lower);
+    }
+    be = *configuration_get_dst_backend(root);
+    while ((!be || !be->ops || !be->ops->be_store) && root && root->parent) {
+        be = *configuration_get_dst_backend((root = root->parent));
+    }
+    if (!root || !be || !be->ops || !be->ops->be_store) {
+        return -ENOTSUP;
+    }
+    else {
+        key->sid = root->node_id->sid_lower;
+        _configuration_prepare_sid(&root, key, _KEY_BUF(key), _KEY_BUF_LEN(key));
+        key->subkey = &subkey;
+    }
+#endif
     int ret = 0;
     conf_path_iterator_t iter;
     conf_iterator_restore_t restore = _configuration_path_iterator_init(&iter, root, key, _KEY_BUF(key));
     conf_handler_t *handler;
     while ((handler = _configuration_path_sid_iterator_next(&iter, key, &restore.sid))) {
-        const conf_backend_t *be = *configuration_get_dst_backend(handler);
+        be = *configuration_get_dst_backend(handler);
         if (!be || !be->ops || !be->ops->be_store) {
             continue;
         }
@@ -874,6 +905,16 @@ int configuration_encode_internal(conf_path_iterator_t *iter, conf_iterator_rest
     }
     conf_handler_t *handler;
     while ((handler = _configuration_handler_encode_iterator_next(iter, key, &restore->sid))) {
+#if IS_USED(MODULE_CONFIGURATION_KEY_SUBKEY)
+        if (key->subkey) {
+            if (key->sid == key->subkey->sid_lower) {
+                return -ENOBUFS; /* flush encoding buffer */
+            }
+            if (key->sid > key->subkey->sid_upper) {
+                return 0;
+            }
+        }
+#endif
         const conf_backend_t *be = *configuration_get_dst_backend(iter->root);
         /* do not export a subnode which has an own backend set
            because this would export the same data to two backends */

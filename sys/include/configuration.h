@@ -345,6 +345,14 @@ struct {                                                \
 }
 
 /**
+ * @brief   A range of keys, used to select a subkey range to export
+ */
+typedef struct {
+    conf_sid_t sid_lower;       /**< Lower SID of the range */
+    conf_sid_t sid_upper;       /**< Upper SID of the range */
+} conf_key_range_t;
+
+/**
  * @brief   Key buffer type with a static maximum key length
  *
  * @param   len             Buffer length to store a key
@@ -352,6 +360,7 @@ struct {                                                \
 #define CONF_KEY_T(len)                                 \
 struct {                                                \
     _CONF_KEY_BASE_T;                                   \
+    conf_key_range_t *subkey;                           \
     _CONF_KEY_BUF_LEN                                   \
     _CONF_KEY_BUF(len)                                  \
 }

@@ -24,3 +24,6 @@ PSEUDOMODULES += configuration_delta_decoding
 
 # alias for configuration_delta_encoding and configuration_delta_decoding
 PSEUDOMODULES += configuration_delta_encoding_decoding
+
+# be able to export sub items which don't have a backend configured
+PSEUDOMODULES += configuration_key_subkey

@@ -189,6 +189,15 @@ restore_key:
     return 0;
 }
 
+static bool _check_subkey(const conf_key_buf_t *key)
+{
+    (void)key;
+#if IS_USED(MODULE_CONFIGURATION_KEY_SUBKEY)
+    return !key->subkey || key->sid > key->subkey->sid_lower;
+#endif
+    return true;
+}
+
 int configuration_export_handler_default(const conf_handler_t *handler,
                                          conf_key_buf_t *key)
 {
@@ -220,9 +229,11 @@ int configuration_export_handler_default(const conf_handler_t *handler,
             if (err == -ENOBUFS) {
                 /* need to flush */
                 sz = sizeof(_enc_buffer) - enc_size;
-                if ((err = be->ops->be_store(be, key, enc_data, &sz, total, &flg))) {
-                    DEBUG("configuration: backend exporting key %s failed (%d)\n",
-                            configuration_key_buf(key), err);
+                if (_check_subkey(&enc_key)) {
+                    if ((err = be->ops->be_store(be, key, enc_data, &sz, total, &flg))) {
+                        DEBUG("configuration: backend exporting key %s failed (%d)\n",
+                                configuration_key_buf(key), err);
+                    }
                 }
                 total += sz;
                 enc_data = _enc_buffer;

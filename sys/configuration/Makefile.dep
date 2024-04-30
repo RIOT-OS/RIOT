@@ -36,3 +36,7 @@ ifneq (,$(filter configuration_delta_encoding_decoding,$(USEMODULE)))
   USEMODULE += configuration_delta_encoding
   USEMODULE += configuration_delta_decoding
 endif
+
+ifneq (,$(filter configuration_key_subkey,$(USEMODULE)))
+  USEMODULE += configuration_handler_parent
+endif
