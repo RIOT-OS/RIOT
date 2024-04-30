@@ -35,6 +35,7 @@ extern "C" {
  * @name   Macros for controlling the on-board LED.
  * @{
  */
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B  /**< GPIO Port number the LED is connected to */
 #define LED0_PIN_NUM        12      /**< Pin number the LED is connected to */
 /** @} */

@@ -33,6 +33,7 @@ extern "C" {
  * @{
  */
 #ifndef LED0_PORT_NUM
+#define LED0_PORT           GPIO_PORT_C /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_C                                  /**< GPIO Port number the LED is connected to */
 #endif
 #ifndef LED0_PIN_NUM
