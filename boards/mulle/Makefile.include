@@ -8,6 +8,8 @@ PROGRAMMER ?= openocd
 PROGRAMMERS_SUPPORTED += openocd
 OPENOCD_TRANSPORT := jtag
 
+JLINK_DEVICE := MK60DN512XXX10
+
 # Default debug adapter choice is to use the Mulle programmer board
 OPENOCD_DEBUG_ADAPTER ?= mulle
 
