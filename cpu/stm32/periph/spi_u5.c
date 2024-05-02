@@ -36,7 +36,7 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
-#include "stm32u585xx.h"
+#include "cpu_conf.h"
 #include "ztimer.h"
 
 #define ENABLE_DEBUG 0
