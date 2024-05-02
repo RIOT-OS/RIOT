@@ -331,7 +331,7 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len) {
       inbuf[i] = *RXDR;
     }
   } else {
-    volatile uint16_t tx_remainder = len, rx_remainder = len;
+    uint16_t tx_remainder = len, rx_remainder = len;
 
     while ((tx_remainder > 0 || rx_remainder > 0)) {
       if (tx_remainder > 0 && dev(bus)->SR & SPI_SR_TXP) {
