@@ -716,7 +716,12 @@ static void _isr(candev_t *candev)
         else {
             DEBUG_PUTS("Received extended CAN frame");
             frame_received.can_id = dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_0.bit.ID;
+            frame_received.can_id |= CAN_EFF_FLAG;
         }
+        if (dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_0.bit.RTR) {
+            frame_received.can_id |= CAN_RTR_FLAG;
+        }
+
         frame_received.can_dlc = dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_1.bit.DLC;
         memcpy(frame_received.data, (uint32_t *)dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_DATA, frame_received.can_dlc);
 
@@ -747,7 +752,12 @@ static void _isr(candev_t *candev)
         else {
             DEBUG_PUTS("Received extended CAN frame");
             frame_received.can_id = dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_0.bit.ID;
+            frame_received.can_id |= CAN_EFF_FLAG;
         }
+        if (dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_0.bit.RTR) {
+            frame_received.can_id |= CAN_RTR_FLAG;
+        }
+
         frame_received.can_dlc = dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_1.bit.DLC;
         memcpy(frame_received.data, (uint32_t *)dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_DATA, frame_received.can_dlc);
 
