@@ -51,7 +51,7 @@
 #define SPI_CR2_SETTINGS 0
 
 #define SPI_CFG2_SETTINGS (SPI_CFG2_AFCNTR)
-#define SPI_CFG1_SETTINGS (SPI_CFG1_CRCSIZE_Msk | (0x7 << SPI_CFG1_DSIZE_Pos))
+#define SPI_CFG1_SETTINGS ((0x7 << SPI_CFG1_DSIZE_Pos))
 /**
  * @brief   Allocate one lock per SPI device
  */
