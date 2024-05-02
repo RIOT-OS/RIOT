@@ -412,6 +412,9 @@ static uint8_t _form_message_marker(can_mm_t *can_mm)
 
 static int _send(candev_t *candev, const struct can_frame *frame)
 {
+    /* this assertion ensures the EFF-FLAG is set or the id does not exceed the CAN_SFF_MASK*/
+    assert( (frame->can_id & CAN_EFF_FLAG)
+            || ((frame->can_id & CAN_SFF_MASK) == (frame->can_id & CAN_EFF_MASK)) );
     can_t *dev = container_of(candev, can_t, candev);
 
     if (frame->can_dlc > CAN_MAX_DLEN) {
