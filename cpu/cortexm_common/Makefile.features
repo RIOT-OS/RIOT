@@ -9,6 +9,7 @@ FEATURES_PROVIDED += libstdcpp
 FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_flashpage_aux
 FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_systick
 FEATURES_PROVIDED += puf_sram
 FEATURES_PROVIDED += picolibc
 FEATURES_PROVIDED += ssp
