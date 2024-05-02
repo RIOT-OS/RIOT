@@ -220,7 +220,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk) {
   DEBUG("[spi] acquire: requested clock: %" PRIu32
         " Hz, resulting clock: %" PRIu32 " Hz, BR prescaler: %u\n",
         clk, periph_apb_clk(spi_config[bus].apbbus) >> (br + 1), (unsigned)br);
-  uint32_t cfg1 = br << BR_SHIFT;
+  uint32_t cfg1 = SPI_CFG1_SETTINGS | (br << BR_SHIFT);
   uint32_t cr1 = 0;
   /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
   uint32_t cfg2 = SPI_CFG2_SETTINGS;
