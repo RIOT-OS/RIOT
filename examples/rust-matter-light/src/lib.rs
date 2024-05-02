@@ -174,6 +174,7 @@ static DEV_DET: BasicInfoConfig = BasicInfoConfig {
 static MDNS: StaticCell<MdnsService> = StaticCell::new();
 static DEV_ATT: StaticCell<HardCodedDevAtt> = StaticCell::new();
 static MATTER: StaticCell<Matter> = StaticCell::new();
+static PSM: StaticCell<PersistenceManager> = StaticCell::new();
 
 // TODO: Instantiate `VfsDataFetcher` if fully implemented in riot-wrappers
 // static FW_DATA: VfsDataFetcher = VfsDataFetcher;
@@ -231,10 +232,8 @@ fn run_matter() -> Result<(), ()> {
 
     // Get Device attestation (hard-coded atm) - TODO: Use VfsDataFetcher if implemented in riot-wrappers
     let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
-
     let epoch = riot_wrappers::matter::sys_epoch;
     let rand = riot_wrappers::matter::sys_rand;
-
     let matter: &'static Matter = MATTER.init(Matter::new(
         // vid/pid should match those in the DAC
         &DEV_DET,
@@ -245,6 +244,11 @@ fn run_matter() -> Result<(), ()> {
         MATTER_PORT,
     ));
 
+    // TODO: 'PersistenceManager' is not implemented yet in riot-wrappers
+    #[cfg(feature = "psm")]
+    let psm: &'static mut PersistenceManager = PSM.init(PersistenceManager::new(&matter)
+        .expect("Error creating PSM"));
+
     info!("Starting all services...");
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
@@ -254,7 +258,7 @@ fn run_matter() -> Result<(), ()> {
 
         // Run PersistenceManager only if 'psm' feature is activated
         #[cfg(feature = "psm")]
-        spawner.spawn(psm_task(matter)).unwrap();
+        spawner.spawn(psm_task(psm)).unwrap();
     });
 }
 
@@ -365,7 +369,9 @@ async fn matter_task(matter: &'static Matter<'_>) {
     let mut matter_packet_buffers = PacketBuffers::new();
 
     // TODO: Read commissioning data from VFS if implemented in riot-wrappers
-    //let (discriminator, passcode) = FW_DATA.read_commissioning_data().expect("error while reading commissioning data");
+    //let data_fetcher = VfsDataFetcher::new();
+    //let (discriminator, passcode) = data_fetcher.read_commissioning_data().expect("error reading commissioning data from VFS");
+    let (discriminator, passcode) = (DISCRIMINATOR, PASSCODE);
 
     // Finally create the Matter service and run on port 5540/UDP
     let matter_runner = pin!(matter.run(
@@ -375,8 +381,8 @@ async fn matter_task(matter: &'static Matter<'_>) {
         &mut matter_packet_buffers,
         CommissioningData {
             // TODO: Hard-coded for now
-            verifier: VerifierData::new_with_pw(PASSCODE, *matter.borrow()),
-            discriminator: DISCRIMINATOR,
+            verifier: VerifierData::new_with_pw(passcode, *matter.borrow()),
+            discriminator,
         },
         &handler)
     );
@@ -394,11 +400,8 @@ async fn matter_task(matter: &'static Matter<'_>) {
 }
 
 #[embassy_executor::task]
-async fn psm_task(matter: &'static Matter<'_>) {
+async fn psm_task(psm: &'static mut PersistenceManager<'_>) {
     info!("Starting Persistence Manager....");
-    // TODO: 'PersistenceManager' is not implemented yet in riot-wrappers
-    let mut psm = PersistenceManager::new(&matter)
-        .expect("Error creating PSM");
     let psm_runner = pin!(psm.run());
     match psm_runner.await {
         Ok(_) => {
