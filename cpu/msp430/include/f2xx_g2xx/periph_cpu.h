@@ -184,6 +184,16 @@ typedef struct {
 } spi_conf_t;
 
 /**
+ * @brief   Register map of GPIO PORT 7
+ */
+extern msp430_port_p7_p8_t PORT_7;
+
+/**
+ * @brief   Register map of GPIO PORT 8
+ */
+extern msp430_port_p7_p8_t PORT_8;
+
+/**
  * @brief   Acquire and initialize USCI for use a SPI/UART peripheral
  *
  * @param   params      Parameter identifying the USCI to use

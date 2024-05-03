@@ -3,6 +3,8 @@ CPU_CORE = msp430
 
 ifneq (,$(filter msp430f2% msp430g2%,$(CPU_MODEL)))
   CPU_FAM := msp430_f2xx_g2xx
+  FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
+  FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
   FEATURES_PROVIDED += periph_spi_reconfigure
 endif
 
@@ -20,3 +22,6 @@ FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_timer_query_freqs
+
+FEATURES_PROVIDED += periph_gpio_ll
+FEATURES_PROVIDED += periph_gpio_ll_switch_dir

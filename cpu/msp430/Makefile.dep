@@ -5,5 +5,10 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   DEFAULT_MODULE += newlib_nano
 endif
 
+ifneq (,$(filter periph_gpio,$(USEMODULE)))
+  # the legacy periph_gpio driver uses gpio_port from periph_gpio_ll
+  FEATURES_REQUIRED += periph_gpio_ll
+endif
+
 # Make calls to malloc and friends thread-safe
 USEMODULE += malloc_thread_safe
