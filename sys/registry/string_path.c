@@ -34,195 +34,18 @@
 #include "registry.h"
 #include "registry/util.h"
 #include "registry/error.h"
+#include "registry/tree_traversal.h"
 
 #include "registry/string_path.h"
 
+
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
 
-XFA_USE_CONST(registry_namespace_t *, _registry_namespaces_xfa);
-
-static int _namespace_lookup(const char *path, const registry_namespace_t **namespace)
-{
-    assert(path != NULL);
-    assert(namespace != NULL);
-
-    char *ptr = (char *)path;
-
-    /* remove '/' character */
-    ptr++;
-
-    for (size_t i = 0; i < XFA_LEN(registry_namespace_t *, _registry_namespaces_xfa); i++) {
-        const size_t name_length = strlen(_registry_namespaces_xfa[i]->name);
-
-        /* check if length of path and name match */
-        if (strlen(ptr) >= name_length) {
-            if (*(ptr + name_length) == '\0' ||
-                *(ptr + name_length) == '/') {
-                /* check if strings are equal */
-                if (strncmp(ptr, _registry_namespaces_xfa[i]->name, name_length) == 0) {
-                    *namespace = _registry_namespaces_xfa[i];
-                    return name_length + 1; /* name_length + `/` character */
-                }
-            }
-        }
-    }
-
-    return -EINVAL;
-}
-
-static int _schema_lookup(const char *path, const registry_namespace_t *namespace,
-                          const registry_schema_t **schema)
-{
-    assert(path != NULL);
-    assert(namespace != NULL);
-    assert(schema != NULL);
-
-    char *ptr = (char *)path;
-
-    /* remove '/' character */
-    ptr++;
-
-    for (size_t i = 0; i < namespace->schemas_len; i++) {
-        const size_t name_length = strlen(namespace->schemas[i]->name);
-
-        /* check if length of path and name match */
-        if (strlen(ptr) >= name_length) {
-            if (*(ptr + name_length) == '\0' ||
-                *(ptr + name_length) == '/') {
-                /* check if strings are equal */
-                if (strncmp(ptr, namespace->schemas[i]->name, name_length) == 0) {
-                    *schema = (registry_schema_t *)namespace->schemas[i];
-                    return name_length + 1; /* name_length + `/` character */
-                }
-            }
-        }
-    }
-
-    return -EINVAL;
-}
-
-static int _instance_lookup(const char *path, const registry_schema_t *schema,
-                            const registry_instance_t **instance)
-{
-    assert(path != NULL);
-    assert(schema != NULL);
-    assert(instance != NULL);
-
-    char *ptr = (char *)path;
-
-    /* remove '/' character */
-    ptr++;
-
-    clist_node_t *node = schema->instances.next;
-
-    if (!node) {
-        return -REGISTRY_ERROR_INSTANCE_NOT_FOUND;
-    }
-
-    do {
-        node = node->next;
-
-        const size_t name_length = strlen(container_of(node, registry_instance_t, node)->name);
-
-        /* check if length of path and name match */
-        if (strlen(ptr) >= name_length) {
-            if (*(ptr + name_length) == '\0' ||
-                *(ptr + name_length) == '/') {
-                /* check if strings are equal */
-                if (strncmp(ptr, container_of(node, registry_instance_t, node)->name,
-                            name_length) == 0) {
-                    *instance = container_of(node, registry_instance_t, node);
-                    return name_length + 1; /* name_length + `/` character */
-                }
-            }
-        }
-    } while (node != schema->instances.next);
-
-    return -EINVAL;
-}
-
-static int _group_or_parameter_lookup(const char *path, const registry_schema_t *schema,
-                                      registry_node_t *node)
-{
-    assert(path != NULL);
-    assert(schema != NULL);
-    assert(node != NULL);
-
-    char *ptr = (char *)path;
-
-    /* remove '/' character */
-    ptr++;
-
-    /* store the current path position */
-    size_t path_position = 0;
-
-    /* search for matching parameters or groups */
-    bool found_subgroup = true;
-    const registry_parameter_t **parameters = schema->parameters;
-    size_t parameters_len = schema->parameters_len;
-
-    const registry_group_t **groups = schema->groups;
-    size_t groups_len = schema->groups_len;
-
-    while (found_subgroup) {
-        /* check for matching parameter */
-        for (size_t i = 0; i < parameters_len; i++) {
-            const size_t name_length = strlen(parameters[i]->name);
-
-            /* parameter matches => return parameters */
-            if (strlen(ptr + path_position) == name_length &&
-                strncmp(ptr + path_position, parameters[i]->name, name_length) == 0) {
-                node->value.parameter.parameter = parameters[i];
-                node->type = REGISTRY_NODE_PARAMETER;
-                return path_position + name_length + 1;     /* name_length + `/` character */
-            }
-        }
-
-        /* check for matching subgroup */
-        for (size_t i = 0; i < groups_len; i++) {
-            const size_t name_length = strlen(groups[i]->name);
-
-            /* check if remaining path is at least longer than the group name */
-            if (strlen(ptr + path_position) >= name_length) {
-                /* group matches but end of path is not reached => save subgroups and parameters and keep searching them */
-                if (*(ptr + path_position + name_length) == '/' &&
-                    strncmp(ptr + path_position, groups[i]->name, name_length) == 0) {
-                    if (groups[i]->parameters_len > 0) {
-                        found_subgroup = true;
-                        parameters = groups[i]->parameters;
-                        parameters_len = groups[i]->parameters_len;
-                    }
-                    else {
-                        parameters = NULL;
-                        parameters_len = 0;
-                    }
-
-                    if (groups[i]->groups_len > 0) {
-                        found_subgroup = true;
-                        groups = groups[i]->groups;
-                        groups_len = groups[i]->groups_len;
-                    }
-                    else {
-                        groups = NULL;
-                        groups_len = 0;
-                    }
-
-                    path_position += name_length + 1; /* name_length + `/` character */
-                    break;
-                }
-                /* end of path => return group if it matches */
-                else if (*(ptr + path_position + name_length) == '\0' &&
-                         strncmp(ptr + path_position, groups[i]->name, name_length) == 0) {
-                    node->value.group.group = groups[i];
-                    node->type = REGISTRY_NODE_GROUP;
-                    return path_position + name_length + 1; /* name_length + `/` character */
-                }
-            }
-        }
-    }
-
-    return -EINVAL;
-}
+typedef struct {
+    const char **path;
+    size_t path_len;
+    size_t position;
+} _registry_string_comparator_context_t;
 
 static int _internal_registry_to_group_string_path(const registry_group_t *current_group,
                                                    const registry_group_t *group, char *path)
@@ -376,64 +199,56 @@ int registry_node_to_string_path(const registry_node_t *node, char *path)
     return size;
 }
 
-int registry_node_from_string_path(const char *path, const size_t path_len, registry_node_t *node)
-{
-    /* store the current path position */
-    size_t path_position = 0;
+static registry_find_result_type _compare_node_by_string(const registry_node_t *node, const void *context) {
+    _registry_string_comparator_context_t *data = (void*)context;
 
-    /* namespace */
-    const registry_namespace_t *found_namespace;
-    int res = _namespace_lookup(path, &found_namespace);
+    const char *name = NULL;
 
-    if (res >= 0) {
-        node->type = REGISTRY_NODE_NAMESPACE;
-        node->value.namespace = found_namespace;
+    switch (node->type)
+    {
+    case REGISTRY_NODE_NAMESPACE:
+        name = node->value.namespace->name;
+        break;
 
-        path_position += res;
+    case REGISTRY_NODE_SCHEMA:
+        name = node->value.schema->name;
+        break;
 
-        if (path_position < path_len - 1) {
-            /* schema */
-            const registry_schema_t *found_schema;
-            res = _schema_lookup(path + path_position, found_namespace, &found_schema);
+    case REGISTRY_NODE_INSTANCE:
+        name = node->value.instance->name;
+        break;
 
-            if (res >= 0) {
-                node->type = REGISTRY_NODE_SCHEMA;
-                node->value.schema = found_schema;
+    case REGISTRY_NODE_GROUP:
+        name = node->value.group.group->name;
+        break;
 
-                path_position += res;
 
-                if (path_position < path_len - 1) {
-                    /* instance */
-                    const registry_instance_t *found_instance;
-                    res = _instance_lookup(path + path_position, found_schema, &found_instance);
+    case REGISTRY_NODE_PARAMETER:
+        name = node->value.parameter.parameter->name;
+        break;
+    }
 
-                    if (res >= 0) {
-                        node->type = REGISTRY_NODE_INSTANCE;
-                        node->value.instance = found_instance;
-                    
-                        path_position += res;
-
-                        if (path_position < path_len - 1)  {
-                            /* group or parameter */
-                            res = _group_or_parameter_lookup(path + path_position, found_schema, node);
-
-                            if (node->type == REGISTRY_NODE_GROUP) {
-                                node->value.group.instance = found_instance;
-                            } else if (node->type == REGISTRY_NODE_PARAMETER) {
-                                node->value.parameter.instance = found_instance;
-                            }
-                        }
-                    }
-                }
-            }
+    if (strncmp(data->path[data->position], name, strlen(name)) == 0) {
+        if (data->path_len == data->position + 1) {
+            return REGISTRY_FIND_EXACT_MATCH;
         }
-    }
 
-    if (res < 0) {
-        return res;
+        data->position++;
+        return REGISTRY_FIND_PARTIAL_MATCH;
     }
+    
+    return REGISTRY_FIND_NO_MATCH;
+}
 
-    return 0;
+registry_error_t registry_node_from_string_path(const char **path, const size_t path_len, registry_node_t *node)
+{
+    _registry_string_comparator_context_t context = {
+        .path = path,
+        .path_len = path_len,
+        .position = 0,
+    };
+
+    return registry_find(_compare_node_by_string, &context, node);
 }
 
 #endif
