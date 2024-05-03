@@ -37,21 +37,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* (+ NS_PER_SEC - 1): Rounding up, as T1H is the time that needs to distinctly
- * longer than T0H.
- *
- * Then adding +1 extra, because the spin loop adds another layer of jitter. A
- * more correct version would be to add the spin loop time before rounding (and
- * then rounding up), but as that time is not available, spending one more
- * cycle is the next best thing to do. */
-const int ticks_one = ((uint64_t)WS281X_T_DATA_ONE_NS * WS281X_TIMER_FREQ + NS_PER_SEC - 1)
-                    / NS_PER_SEC + 1;
-/* Rounding down, zeros are better shorter */
-const int ticks_zero = (uint64_t)WS281X_T_DATA_ZERO_NS * (uint64_t)WS281X_TIMER_FREQ / NS_PER_SEC;
-/* No particular known requirements, but we're taking longer than that anyway
- * because we don't clock the times between bits. */
-const int ticks_data = (uint64_t)WS281X_T_DATA_NS * (uint64_t)WS281X_TIMER_FREQ / NS_PER_SEC;
-
 static void _systick_start(uint32_t ticks)
 {
     /* disable SysTick, clear value */
