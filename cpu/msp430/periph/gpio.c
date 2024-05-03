@@ -23,6 +23,7 @@
 #include "container.h"
 #include "cpu.h"
 #include "periph/gpio.h"
+#include "periph/gpio_ll.h"
 
 /**
  * @brief   Number of possible interrupt lines: 2 ports * 8 pins
@@ -36,22 +37,7 @@
 
 static msp430_port_t *_port(gpio_t pin)
 {
-    switch (pin >> 8) {
-    case 1:
-        return &PORT_1.base;
-    case 2:
-        return &PORT_2.base;
-    case 3:
-        return &PORT_3.base;
-    case 4:
-        return &PORT_4.base;
-    case 5:
-        return &PORT_5.base;
-    case 6:
-        return &PORT_6.base;
-    default:
-        return NULL;
-    }
+    return (msp430_port_t *)gpio_port(pin >> 8);
 }
 
 static inline uint8_t _pin(gpio_t pin)
