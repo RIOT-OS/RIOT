@@ -365,7 +365,7 @@ A diverse community such as the RIOT community has inherently a diverse set of
 views and opinions. Occasionally those may clash, even with all parties adhering
 to our [code of conduct][code-of-conduct]. In case you seek out help to resolve
 it you may send an email to [mediator email list][email-mediator]. The email
-will be forwarded to a panel of mediators is consisting of trusted RIOT
+will be forwarded to a panel of mediators consisting of trusted RIOT
 community members including both maintainers and non-maintainers.
 
 We see the mediation as a tool to solve conflicts, not as a way to sanction
