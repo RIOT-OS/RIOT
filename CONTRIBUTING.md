@@ -376,7 +376,7 @@ This is a (non-exhaustive) list of reasons you can ask for mediation:
 
 - You are a contributor and feel being treated unfairly by another contributor
   or maintainer
-    - E.g. your PR is rejected/blocked for unjust or non-technical reasons
+    - Your PR is rejected/blocked for unjust or non-technical reasons.
     - A PR is rejected/blocked for valid technical reasons, but without due
       consideration of your arguments
     - A maintainer is asking for disproportionate changes to your PR in order
