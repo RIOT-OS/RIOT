@@ -26,6 +26,7 @@
 #include <inttypes.h>
 #include <errno.h>
 #include "embUnit.h"
+#include "kernel_defines.h"
 #include "fmt.h"
 #include "assert.h"
 #include "vfs.h"
@@ -145,8 +146,8 @@ static void tests_registry_from_parameter_string_path(void)
 {
     registry_node_t node;
 
-    char str[] = "/tests/nested/instance-1/group/parameter";
-    registry_node_from_string_path(str, sizeof(str), &node);
+    const char *str[] = { "tests", "nested", "instance-1", "group", "parameter" };
+    registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_PARAMETER, node.type);
     TEST_ASSERT_EQUAL_STRING("tests", node.value.parameter.parameter->schema->namespace->name);
@@ -159,8 +160,8 @@ static void tests_registry_from_group_string_path(void)
 {
     registry_node_t node;
 
-    char str[] = "/tests/nested/instance-1/group";
-    registry_node_from_string_path(str, sizeof(str), &node);
+    const char *str[] = { "tests", "nested", "instance-1", "group" };
+    registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_GROUP, node.type);
     TEST_ASSERT_EQUAL_STRING("tests", node.value.group.group->schema->namespace->name);
@@ -173,8 +174,8 @@ static void tests_registry_from_instance_string_path(void)
 {
     registry_node_t node;
 
-    char str[] = "/tests/nested/instance-1";
-    registry_node_from_string_path(str, sizeof(str), &node);
+    const char *str[] = { "tests", "nested", "instance-1" };
+    registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_INSTANCE, node.type);
     TEST_ASSERT_EQUAL_STRING("tests", node.value.instance->schema->namespace->name);
@@ -186,8 +187,8 @@ static void tests_registry_from_schema_string_path(void)
 {
     registry_node_t node;
 
-    char str[] = "/tests/nested";
-    registry_node_from_string_path(str, sizeof(str), &node);
+    const char *str[] = { "tests", "nested" };
+    registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_SCHEMA, node.type);
     TEST_ASSERT_EQUAL_STRING("tests", node.value.schema->namespace->name);
@@ -198,8 +199,8 @@ static void tests_registry_from_namespace_string_path(void)
 {
     registry_node_t node;
 
-    char str[] = "/tests";
-    registry_node_from_string_path(str, sizeof(str), &node);
+    const char *str[] = { "tests" };
+    registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_NAMESPACE, node.type);
     TEST_ASSERT_EQUAL_STRING("tests", node.value.namespace->name);
@@ -207,6 +208,17 @@ static void tests_registry_from_namespace_string_path(void)
 
 Test *tests_registry_string_path_tests(void)
 {
+    (void)tests_registry_to_parameter_string_path;
+    (void)tests_registry_to_group_string_path;
+    (void)tests_registry_to_instance_string_path;
+    (void)tests_registry_to_schema_string_path;
+    (void)tests_registry_to_namespace_string_path;
+    (void)tests_registry_from_parameter_string_path;
+    (void)tests_registry_from_group_string_path;
+    (void)tests_registry_from_instance_string_path;
+    (void)tests_registry_from_schema_string_path;
+    (void)tests_registry_from_namespace_string_path;
+
     EMB_UNIT_TESTFIXTURES(fixtures) {
         /* to string_path */
         new_TestFixture(tests_registry_to_parameter_string_path),
@@ -214,7 +226,7 @@ Test *tests_registry_string_path_tests(void)
         new_TestFixture(tests_registry_to_instance_string_path),
         new_TestFixture(tests_registry_to_schema_string_path),
         new_TestFixture(tests_registry_to_namespace_string_path),
-        /* from string_path */
+        // /* from string_path */
         new_TestFixture(tests_registry_from_parameter_string_path),
         new_TestFixture(tests_registry_from_group_string_path),
         new_TestFixture(tests_registry_from_instance_string_path),
