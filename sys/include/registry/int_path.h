@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include "registry.h"
+#include "registry/error.h"
 
 /**
  * @brief Maximum length of a configuration path.
@@ -147,7 +148,7 @@ int registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t *node);
+registry_error_t registry_node_from_int_path(const registry_int_path_t *path, registry_node_t *node);
 
 #ifdef __cplusplus
 }
