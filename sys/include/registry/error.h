@@ -27,7 +27,7 @@ extern "C" {
 /**
  * @brief Registry specific error codes.
  */
-typedef const enum {
+typedef enum {
     REGISTRY_ERROR_NONE = 1,
     REGISTRY_ERROR_NO_DST_STORAGE,
     REGISTRY_ERROR_NAMESPACE_NOT_FOUND,

@@ -1,4 +1,4 @@
-SRC := registry.c init.c
+SRC := registry.c init.c tree_traversal.c
 
 SUBMODULES := 1
 
