@@ -89,21 +89,17 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         }
         break;
     #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_256))
+    #if (IS_USED(MODULE_PSA_HASH_SHA_3))
     case PSA_ALG_SHA3_256:
         status = psa_hashes_sha3_256_setup(&operation->ctx.sha3);
         if (status != PSA_SUCCESS) {
             return status;
         }
-    #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_384))
     case PSA_ALG_SHA3_384:
         status = psa_hashes_sha3_384_setup(&operation->ctx.sha3);
         if (status != PSA_SUCCESS) {
             return status;
         }
-    #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_512))
     case PSA_ALG_SHA3_512:
         status = psa_hashes_sha3_512_setup(&operation->ctx.sha3);
         if (status != PSA_SUCCESS) {
@@ -145,9 +141,7 @@ psa_status_t psa_algorithm_dispatch_hash_update(psa_hash_operation_t *operation,
     case PSA_ALG_SHA_512:
         return psa_hashes_sha512_update(&operation->ctx.sha512, input, input_length);
     #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_256) ||\
-         IS_USED(MODULE_PSA_HASH_SHA_3_384) ||\
-         IS_USED(MODULE_PSA_HASH_SHA_3_512))
+    #if (IS_USED(MODULE_PSA_HASH_SHA_3))
     case PSA_ALG_SHA3_256:
     case PSA_ALG_SHA3_384:
     case PSA_ALG_SHA3_512:
@@ -187,17 +181,13 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
     case PSA_ALG_SHA_512:
         return psa_hashes_sha512_finish(&operation->ctx.sha512, hash, hash_size, hash_length);
     #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_256))
+    #if (IS_USED(MODULE_PSA_HASH_SHA_3))
     case PSA_ALG_SHA3_256:
         return psa_hashes_sha3_256_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
-    #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_384))
     case PSA_ALG_SHA3_384:
         return psa_hashes_sha3_384_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
-    #endif
-    #if (IS_USED(MODULE_PSA_HASH_SHA_3_512))
     case PSA_ALG_SHA3_512:
-        return psa_hashes_sha_3_512_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
+        return psa_hashes_sha3_512_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
     #endif
     default:
         (void)operation;
