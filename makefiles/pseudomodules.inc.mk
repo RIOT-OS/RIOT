@@ -351,6 +351,7 @@ PSEUDOMODULES += psa_riot_hashes_sha_1
 PSEUDOMODULES += psa_riot_hashes_sha_224
 PSEUDOMODULES += psa_riot_hashes_sha_256
 PSEUDOMODULES += psa_riot_hashes_sha_512
+PSEUDOMODULES += psa_riot_hashes_sha_3
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
 PSEUDOMODULES += riotboot_%

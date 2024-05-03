@@ -251,6 +251,31 @@ ifneq (,$(filter psa_hash_sha_512_backend_riot,$(USEMODULE)))
   USEMODULE += psa_riot_hashes
   USEMODULE += psa_riot_hashes_sha_512
 endif
+
+## SHA-3
+ifneq (,$(filter psa_hash_sha_3,$(USEMODULE)))
+  ifeq (,$(filter psa_hash_sha_3_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_hash_sha_3
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_hash_sha_3,$(FEATURES_USED)))
+      USEMODULE += psa_hash_sha_3_backend_periph
+    else
+      USEMODULE += psa_hash_sha_3_backend_riot
+    endif
+  endif
+endif
+
+ifneq (,$(filter psa_hash_sha_3_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_hash_sha_3
+endif
+
+ifneq (,$(filter psa_hash_sha_3_backend_riot,$(USEMODULE)))
+  USEMODULE += hashes
+  USEMODULE += psa_riot_hashes
+  USEMODULE += psa_riot_hashes_sha_3
+endif
+
 # Key Management
 ifneq (,$(filter psa_key_management,$(USEMODULE)))
   USEMODULE += psa_key_slot_mgmt

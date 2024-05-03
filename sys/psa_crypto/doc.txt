@@ -318,6 +318,12 @@
  * - psa_hash_sha_512_custom_backend
  * - psa_hash_sha_512_backend_riot
  *
+ * #### SHA 3
+ * - psa_hash_sha_3
+ * - psa_hash_sha_3_backend_periph
+ * - psa_hash_sha_3_custom_backend
+ * - psa_hash_sha_3_backend_riot
+
  * ### MAC
  * - Base: psa_mac
  *
