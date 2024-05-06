@@ -68,9 +68,6 @@ static registry_storage_instance_t vfs_instance = {
     .data = &_vfs_mount,
 };
 
-REGISTRY_ADD_STORAGE_SOURCE(vfs_instance);
-REGISTRY_SET_STORAGE_DESTINATION(vfs_instance);
-
 static void test_setup(void)
 {
     /* init registry */
@@ -101,7 +98,7 @@ static void tests_load_and_save(void)
     registry_set(&node, &saved_input, sizeof(saved_input));
 
     /* save input to storage */
-    registry_save(NULL);
+    registry_storage_save(&vfs_instance, NULL);
 
     /* override input with the value 20 */
     const uint8_t override_input = 20;
@@ -109,7 +106,7 @@ static void tests_load_and_save(void)
     registry_set(&node, &override_input, sizeof(override_input));
 
     /* load old value from storage */
-    registry_load();
+    registry_storage_load(&vfs_instance);
 
     /* check if the value is set back to 8 and not 20 anymore */
     registry_value_t output_value;
