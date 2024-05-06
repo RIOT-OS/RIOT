@@ -37,6 +37,10 @@ extern psa_status_t example_eddsa(void);
 #endif
 #endif
 
+#if IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3)
+extern psa_status_t example_hmac_sha_3(void);
+#endif
+
 #ifdef MULTIPLE_SE
 #if IS_USED(MODULE_PSA_CIPHER)
 extern psa_status_t example_cipher_aes_128_sec_se(void);
