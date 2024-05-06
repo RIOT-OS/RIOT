@@ -37,7 +37,7 @@
 
 #include "registry/int_path.h"
 
-int registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *path)
+registry_error_t registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *path)
 {
     assert(node != NULL);
     assert(path != NULL);
@@ -79,7 +79,7 @@ int registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *
         break;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
 static registry_find_result_type _compare_node_by_id(const registry_node_t *node, const void *context) {

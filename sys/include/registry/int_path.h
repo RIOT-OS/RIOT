@@ -138,7 +138,7 @@ typedef struct {
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *path);
+registry_error_t registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *path);
 
 /**
  * @brief Converts an integer path to a registry namespace.
