@@ -35,6 +35,16 @@ PSEUDOMODULES += board_software_reset
 
 PSEUDOMODULES += arduino_pwm
 PSEUDOMODULES += arduino_serial_stdio
+## @defgroup pseudomodule_arm_stack_limit arm_stack_limit
+## @{
+## @brief Set MSP/PSP stack lower limit
+##
+## Use PSPLIM and MSPLIM ARM registers to set the lower limit of a stack
+## This is a protection mechanism to catch stack overflow early before it
+## can corrupt adjacent memory. Only available on ARMv8-M architecture.
+PSEUDOMODULES += cortexm_stack_limit
+## @}
+
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw

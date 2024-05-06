@@ -79,6 +79,8 @@ groups:
       - name: cpu_check_address
         help: The @ref cpu_check_address can be used to check if
               accessing a given address would cause a bus fault.
+      - name: cortexm_stack_limit
+        help: ARM Cortex-M PSPLIM/MSPLIM registers are available.
       - name: cortexm_svc
         help: ARM Cortex-M Supervisor Calls are available.
       - name: cortexm_fpu

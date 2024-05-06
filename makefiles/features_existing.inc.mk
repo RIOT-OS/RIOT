@@ -46,6 +46,7 @@ FEATURES_EXISTING := \
     can_rx_mailbox \
     cortexm_fpu \
     cortexm_mpu \
+    cortexm_stack_limit \
     cortexm_svc \
     cpp \
     cpu_arm7tdmi_gba \
