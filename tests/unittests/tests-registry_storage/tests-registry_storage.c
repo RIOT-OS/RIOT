@@ -108,9 +108,6 @@ static registry_error_t save(const registry_storage_instance_t *storage,
     return REGISTRY_ERROR_NONE;
 }
 
-REGISTRY_ADD_STORAGE_SOURCE(storage_test_instance);
-REGISTRY_SET_STORAGE_DESTINATION(storage_test_instance);
-
 static void test_setup(void)
 {
     /* init registry */
@@ -126,7 +123,7 @@ static void test_setup(void)
 static void tests_registry_load(void)
 {
     /* check if the registry_load function gets the correct input values internally */
-    TEST_ASSERT(registry_load() == 0);
+    TEST_ASSERT_EQUAL_INT(registry_storage_load(&storage_test_instance), REGISTRY_ERROR_NONE);
 
     /* check if the load_cb sets the value to the registry */
     registry_value_t output;
@@ -153,7 +150,7 @@ static void tests_registry_save_parameter(void)
         },
     };
 
-    registry_save(&node);
+    registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
 }
@@ -168,7 +165,7 @@ static void tests_registry_save_group(void)
         },
     };
     
-    registry_save(&node);
+    registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
 }
@@ -180,7 +177,7 @@ static void tests_registry_save_instance(void)
         .value.instance = &test_nested_instance,
     };
     
-    registry_save(&node);
+    registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
 }
@@ -192,7 +189,7 @@ static void tests_registry_save_schema(void)
         .value.schema = &registry_tests_nested,
     };
     
-    registry_save(&node);
+    registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
 }
@@ -204,7 +201,7 @@ static void tests_registry_save_namespace(void)
         .value.namespace = &registry_tests,
     };
     
-    registry_save(&node);
+    registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
 }
@@ -212,7 +209,7 @@ static void tests_registry_save_namespace(void)
 static void tests_registry_save_all(void)
 {
     
-    registry_save(NULL);
+    registry_storage_save(&storage_test_instance, NULL);
 
     TEST_ASSERT(successful);
 }
