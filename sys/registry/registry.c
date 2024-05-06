@@ -31,14 +31,13 @@
 
 #include "registry.h"
 #include "registry/util.h"
-#include "registry/error.h"
 
 /* Implementation of the module */
 
 XFA_INIT_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
-int registry_add_schema_instance(const registry_schema_t *schema,
-                                 const registry_instance_t *instance)
+registry_error_t registry_add_schema_instance(const registry_schema_t *schema,
+                                              const registry_instance_t *instance)
 {
     assert(schema != NULL);
     assert(instance != NULL);
@@ -55,10 +54,10 @@ int registry_add_schema_instance(const registry_schema_t *schema,
     /* add instance to schema */
     clist_rpush((clist_node_t *)&schema->instances, (clist_node_t *)&instance->node);
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-int registry_get(const registry_node_t *node, registry_value_t *value)
+registry_error_t registry_get(const registry_node_t *node, registry_value_t *value)
 {
     assert(node != NULL);
     assert(value != NULL);
@@ -80,10 +79,10 @@ int registry_get(const registry_node_t *node, registry_value_t *value)
     value->buf = intern_val;
     value->buf_len = intern_val_len;
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-int registry_set(const registry_node_t *node, const void *buf, const size_t buf_len)
+registry_error_t registry_set(const registry_node_t *node, const void *buf, const size_t buf_len)
 {
     assert(node != NULL);
     assert(buf != NULL);
@@ -101,16 +100,16 @@ int registry_set(const registry_node_t *node, const void *buf, const size_t buf_
     parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
 
     if (buf_len > intern_val_len) {
-        return -EINVAL;
+        return -REGISTRY_ERROR_BUF_LEN_TOO_LARGE;
     }
 
     /* call handler to apply the new value to the correct parameter in the instance of the schema */
     memcpy(intern_val, buf, buf_len);
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int _commit_export_cb(const registry_node_t *node, const void *context) {
+static registry_error_t _commit_export_cb(const registry_node_t *node, const void *context) {
     (void)context;
 
     const registry_instance_t *instance;
@@ -120,7 +119,7 @@ static int _commit_export_cb(const registry_node_t *node, const void *context) {
     /* The commit function is only called for instance and below */
     case REGISTRY_NODE_NAMESPACE:
     case REGISTRY_NODE_SCHEMA:
-        return 0;
+        return REGISTRY_ERROR_NONE;
 
     case REGISTRY_NODE_INSTANCE:
         instance = node->value.instance;
@@ -135,11 +134,11 @@ static int _commit_export_cb(const registry_node_t *node, const void *context) {
         return instance->commit_cb(REGISTRY_COMMIT_PARAMETER, &node->value.parameter.parameter->id, instance->context);
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-int registry_commit(const registry_node_t *node) {
-    int tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(3);
+registry_error_t registry_commit(const registry_node_t *node) {
+    uint8_t tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(3);
 
     if (node != NULL) {
         switch (node->type)
@@ -163,7 +162,7 @@ int registry_commit(const registry_node_t *node) {
     return registry_export(node, _commit_export_cb, tree_traversal_depth, NULL);
 }
 
-static int _registry_export_parameter(const registry_instance_t *instance,
+static registry_error_t _registry_export_parameter(const registry_instance_t *instance,
                               const registry_parameter_t *parameter,
                               const registry_export_cb_t export_cb, const void *context)
 {
@@ -180,7 +179,8 @@ static int _registry_export_parameter(const registry_instance_t *instance,
     return export_cb(&export_node, context);
 }
 
-static int _registry_export_group(const registry_instance_t *instance, const registry_group_t *group,
+static registry_error_t _registry_export_group(const registry_instance_t *instance,
+                          const registry_group_t *group,
                           const registry_export_cb_t export_cb,
                           const uint8_t tree_traversal_depth, const void *context)
 {
@@ -194,36 +194,34 @@ static int _registry_export_group(const registry_instance_t *instance, const reg
             .group = group,
         },
     };
-    int rc = export_cb(&export_node, context);
+    registry_error_t rc = export_cb(&export_node, context);
 
     /* export all children of the given configuration group if available and within tree_traversal_depth bounds */
     if (tree_traversal_depth == 1) {
-        return 0;
+        return REGISTRY_ERROR_NONE;
     }
     else {
-        int new_tree_traversal_depth = tree_traversal_depth;
+        uint8_t new_tree_traversal_depth = tree_traversal_depth;
         if (tree_traversal_depth > 1) {
             new_tree_traversal_depth--;
         }
 
-        int _rc = rc;
-
         /* group */
         for (size_t i = 0; i < group->groups_len; i++) {
-            _rc = _registry_export_group(instance, group->groups[i], export_cb, new_tree_traversal_depth,
+            rc = _registry_export_group(instance, group->groups[i], export_cb, new_tree_traversal_depth,
                                         context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         }
 
         /* parameter */
         for (size_t i = 0; i < group->parameters_len; i++) {
-            _rc = _registry_export_parameter(instance, group->parameters[i], export_cb, context);
+            rc = _registry_export_parameter(instance, group->parameters[i], export_cb, context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         }
     }
@@ -231,9 +229,11 @@ static int _registry_export_group(const registry_instance_t *instance, const reg
     return rc;
 }
 
-static int _registry_export_instance(const registry_instance_t *instance,
-                             const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth,
-                             const void *context)
+static registry_error_t _registry_export_instance(
+    const registry_instance_t *instance,
+    const registry_export_cb_t export_cb,
+    const uint8_t tree_traversal_depth,
+    const void *context)
 {
     assert(instance != NULL);
 
@@ -242,37 +242,35 @@ static int _registry_export_instance(const registry_instance_t *instance,
         .type = REGISTRY_NODE_INSTANCE,
         .value.instance = instance,
     };
-    int rc = export_cb(&export_node, context);
+    registry_error_t rc = export_cb(&export_node, context);
 
     /* export all groups or parameters of the given configuration schema instance if available and within tree_traversal_depth bounds */
     if (tree_traversal_depth == 1) {
-        return 0;
+        return REGISTRY_ERROR_NONE;
     }
     else {
-        int new_tree_traversal_depth = tree_traversal_depth;
+        uint8_t new_tree_traversal_depth = tree_traversal_depth;
         if (tree_traversal_depth > 1) {
             new_tree_traversal_depth--;
         }
 
-        int _rc = rc;
-
         /* groups */
         for (size_t i = 0; i < instance->schema->groups_len; i++) {
-            _rc = _registry_export_group(instance, instance->schema->groups[i], export_cb,
+            rc = _registry_export_group(instance, instance->schema->groups[i], export_cb,
                                         new_tree_traversal_depth, context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         }
 
         /* parameters */
         for (size_t i = 0; i < instance->schema->parameters_len; i++) {
-            _rc = _registry_export_parameter(instance, instance->schema->parameters[i], export_cb,
+            rc = _registry_export_parameter(instance, instance->schema->parameters[i], export_cb,
                                             context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         }
     }
@@ -280,8 +278,10 @@ static int _registry_export_instance(const registry_instance_t *instance,
     return rc;
 }
 
-static int _registry_export_schema(const registry_schema_t *schema, const registry_export_cb_t export_cb,
-                           const uint8_t tree_traversal_depth, const void *context)
+static registry_error_t _registry_export_schema(
+    const registry_schema_t *schema, 
+    const registry_export_cb_t export_cb,
+    const uint8_t tree_traversal_depth, const void *context)
 {
     assert(schema != NULL);
 
@@ -290,14 +290,14 @@ static int _registry_export_schema(const registry_schema_t *schema, const regist
         .type = REGISTRY_NODE_SCHEMA,
         .value.schema = schema,
     };
-    int rc = export_cb(&export_node, context);
+    registry_error_t rc = export_cb(&export_node, context);
 
     /* export all instances of the given configuration schema if available and within tree_traversal_depth bounds */
     if (tree_traversal_depth == 1) {
-        return 0;
+        return REGISTRY_ERROR_NONE;
     }
     else {
-        int new_tree_traversal_depth = tree_traversal_depth;
+        uint8_t new_tree_traversal_depth = tree_traversal_depth;
         if (tree_traversal_depth > 1) {
             new_tree_traversal_depth--;
         }
@@ -305,7 +305,7 @@ static int _registry_export_schema(const registry_schema_t *schema, const regist
         clist_node_t *node = schema->instances.next;
 
         if (!node) {
-            return -EINVAL;
+            return -REGISTRY_ERROR_SCHEMA_HAS_NO_INSTANCE;
         }
 
         do {
@@ -313,13 +313,13 @@ static int _registry_export_schema(const registry_schema_t *schema, const regist
             registry_instance_t *instance = container_of(node, registry_instance_t, node);
 
             if (!instance) {
-                return -EINVAL;
+                return -REGISTRY_ERROR_SCHEMA_HAS_NO_INSTANCE;
             }
 
-            int _rc = _registry_export_instance(instance, export_cb, new_tree_traversal_depth, context);
+            rc = _registry_export_instance(instance, export_cb, new_tree_traversal_depth, context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         } while (node != schema->instances.next);
     }
@@ -327,7 +327,7 @@ static int _registry_export_schema(const registry_schema_t *schema, const regist
     return rc;
 }
 
-static int _registry_export_namespace(const registry_namespace_t *namespace,
+static registry_error_t _registry_export_namespace(const registry_namespace_t *namespace,
                               const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth,
                               const void *context)
 {
@@ -338,14 +338,14 @@ static int _registry_export_namespace(const registry_namespace_t *namespace,
         .type = REGISTRY_NODE_NAMESPACE,
         .value.namespace = namespace,
     };
-    int rc = export_cb(&export_node, context);
+    registry_error_t rc = export_cb(&export_node, context);
 
     /* export all configuration schemas of the given namespace if available and within tree_traversal_depth bounds */
     if (tree_traversal_depth == 1) {
-        return 0;
+        return REGISTRY_ERROR_NONE;
     }
     else {
-        int new_tree_traversal_depth = tree_traversal_depth;
+        uint8_t new_tree_traversal_depth = tree_traversal_depth;
         if (tree_traversal_depth > 1) {
             new_tree_traversal_depth--;
         }
@@ -353,10 +353,10 @@ static int _registry_export_namespace(const registry_namespace_t *namespace,
         for (size_t i = 0; i < namespace->schemas_len; i++) {
             const registry_schema_t *child = namespace->schemas[i];
 
-            int _rc = _registry_export_schema(child, export_cb, new_tree_traversal_depth, context);
+            rc = _registry_export_schema(child, export_cb, new_tree_traversal_depth, context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         }
     }
@@ -364,20 +364,19 @@ static int _registry_export_namespace(const registry_namespace_t *namespace,
     return rc;
 }
 
-int registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context)
+registry_error_t registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context)
 {
-
-    int rc = 0;
+    registry_error_t rc = REGISTRY_ERROR_NONE;
 
     if (node == NULL) {
         /* export all namespaces */
         for (size_t i = 0; i < XFA_LEN(registry_namespace_t *, _registry_namespaces_xfa); i++) {
             registry_namespace_t *namespace = _registry_namespaces_xfa[i];
 
-            int _rc = _registry_export_namespace(namespace, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_namespace(namespace, export_cb, tree_traversal_depth, context);
 
-            if (!_rc) {
-                rc = _rc;
+            if (!rc == REGISTRY_ERROR_NONE) {
+                return rc;
             }
         }
     } else {

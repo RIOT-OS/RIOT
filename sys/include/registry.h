@@ -29,6 +29,7 @@ extern "C" {
 #include "clist.h"
 #include "xfa.h"
 #include "modules.h"
+#include "registry/error.h"
 
 /**
  * @brief Identifier of a configuration namespace.
@@ -184,7 +185,7 @@ typedef const enum {
  *
  * @return 0 on success, non-zero on failure.
  */
-typedef int (*registry_commit_cb_t)(const registry_commit_cb_scope_t scope,
+typedef registry_error_t (*registry_commit_cb_t)(const registry_commit_cb_scope_t scope,
                                     const registry_group_or_parameter_id_t *group_or_parameter_id,
                                     const void *context);
 
@@ -313,7 +314,7 @@ void registry_init(void);
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_add_schema_instance(const registry_schema_t *schema,
+registry_error_t registry_add_schema_instance(const registry_schema_t *schema,
                                  const registry_instance_t *instance);
 
 /**
@@ -325,7 +326,7 @@ int registry_add_schema_instance(const registry_schema_t *schema,
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_get(const registry_node_t *node, registry_value_t *value);
+registry_error_t registry_get(const registry_node_t *node, registry_value_t *value);
 
 /**
  * @brief Sets the value of a configuration parameter that belongs to an instance
@@ -337,7 +338,7 @@ int registry_get(const registry_node_t *node, registry_value_t *value);
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_set(const registry_node_t *node, const void *buf, const size_t buf_len);
+registry_error_t registry_set(const registry_node_t *node, const void *buf, const size_t buf_len);
 
 /**
  * @brief Commits every configuration parameter within the given configuration location (@p node) of the registry configuration tree.
@@ -346,7 +347,7 @@ int registry_set(const registry_node_t *node, const void *buf, const size_t buf_
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_commit(const registry_node_t *node);
+registry_error_t registry_commit(const registry_node_t *node);
 
 /**
  * @brief Callback definition of the @p registry_export function.
@@ -358,7 +359,7 @@ int registry_commit(const registry_node_t *node);
  *
  * @return 0 on success, non-zero on failure.
  */
-typedef int (*registry_export_cb_t)(const registry_node_t *node, const void *context);
+typedef registry_error_t (*registry_export_cb_t)(const registry_node_t *node, const void *context);
 
 #define REGISTRY_EXPORT_ALL 0;
 #define REGISTRY_EXPORT_SELF 1;
@@ -377,7 +378,7 @@ typedef int (*registry_export_cb_t)(const registry_node_t *node, const void *con
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context);
+registry_error_t registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context);
 
 #ifdef __cplusplus
 }
