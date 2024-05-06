@@ -361,9 +361,9 @@ registry_error_t registry_commit(const registry_node_t *node);
  */
 typedef registry_error_t (*registry_export_cb_t)(const registry_node_t *node, const void *context);
 
-#define REGISTRY_EXPORT_ALL 0;
-#define REGISTRY_EXPORT_SELF 1;
-#define REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1);
+#define REGISTRY_EXPORT_ALL 0
+#define REGISTRY_EXPORT_SELF 1
+#define REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1)
 
 /**
  * @brief Exports every configuration parameter within the given configuration location (@p node) of the registry configuration tree.
