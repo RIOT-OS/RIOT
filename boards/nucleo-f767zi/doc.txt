@@ -24,7 +24,7 @@ STM32F767ZI microcontroller with 512KiB of RAM and 2 MiB of Flash.
 | FPU          | yes                 |
 | Ethernet     | 10/100 Mbps         |
 | Timers       | 18 (2x watchdog, 1 SysTick, 2x 32-bit, 13x 16-bit) |
-| ADCs         | 3x 12 bit (up to 24 channels |
+| ADCs         | 3x 12 bit (up to 24 channels) |
 | UARTs        | 4                   |
 | I2cs         | 4                   |
 | SPIs         | 6                   |
