@@ -104,7 +104,7 @@ static int _parse_string_path(const char *string_path,
     return 0;
 }
 
-static int _export_cb(const registry_node_t *node, const void *context)
+static registry_error_t _export_cb(const registry_node_t *node, const void *context)
 {
     (void)context;
 
@@ -300,17 +300,24 @@ static int _registry(int argc, char **argv)
     }
 #if IS_USED(MODULE_REGISTRY_STORAGE) || IS_ACTIVE(DOXYGEN)
     else if (strcmp(argv[1], "load") == 0) {
+        // TODO implement storage selector
+        const registry_storage_instance_t **storage_instances;
+        registry_storage_get_instances(&storage_instances);
+
         if (argc > 2) {
             printf("usage: %s %s\n", argv[0], argv[1]);
             return 1;
         }
 
-        registry_load();
+        registry_storage_load(storage_instances[0]);
 
         return 0;
     }
     else if (strcmp(argv[1], "save") == 0) {
         int res = 0;
+        // TODO implement storage selector
+        const registry_storage_instance_t **storage_instances;
+        registry_storage_get_instances(&storage_instances);
 
         if (argc > 2) {
             if (_parse_string_path(argv[2], &path) < 0) {
@@ -320,12 +327,12 @@ static int _registry(int argc, char **argv)
 
             res = registry_node_from_int_path(&path, &node);
             if (res == 0) {
-                res = registry_save(&node);
+                res = registry_storage_save(storage_instances[0], &node);
             }
         }
         else {
             // save everything
-            res = registry_save(NULL);
+            res = registry_storage_save(storage_instances[0], NULL);
         }
 
         if (res != 0) {
