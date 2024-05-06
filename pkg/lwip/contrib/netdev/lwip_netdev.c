@@ -36,6 +36,8 @@
 #include "netif/etharp.h"
 #include "netif/lowpan6.h"
 #include "thread.h"
+#include "thread_flags.h"
+#include "utlist.h"
 
 #define ENABLE_DEBUG                0
 #include "debug.h"
@@ -43,7 +45,7 @@
 #define LWIP_NETDEV_NAME            "lwip_netdev_mux"
 #define LWIP_NETDEV_PRIO            (THREAD_PRIORITY_MAIN - 4)
 #define LWIP_NETDEV_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
-#define LWIP_NETDEV_MSG_TYPE_EVENT 0x1235
+#define LWIP_NETDEV_MSG_TYPE_EVENT  0x1235
 
 #define ETHERNET_IFNAME1 'E'
 #define ETHERNET_IFNAME2 'T'
@@ -52,6 +54,7 @@
 #define WPAN_IFNAME2 'P'
 
 event_queue_t lwip_event_queue = { 0 };
+#define THREAD_FLAG_LWIP_TX_DONE    (1U << 11)
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static WORD_ALIGNED char _stack[LWIP_NETDEV_STACKSIZE];
@@ -75,6 +78,19 @@ static err_t slip_output6(struct netif *netif, struct pbuf *q, const ip6_addr_t 
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 static void *_event_loop(void *arg);
 static void _isr(event_t *ev);
+
+bool is_netdev_legacy_api(netdev_t *netdev)
+{
+    static_assert(IS_USED(MODULE_NETDEV_NEW_API) || IS_USED(MODULE_NETDEV_LEGACY_API),
+                  "used netdev misses dependency to netdev_legacy_api");
+    if (!IS_USED(MODULE_NETDEV_NEW_API)) {
+        return true;
+    }
+    if (!IS_USED(MODULE_NETDEV_LEGACY_API)) {
+        return false;
+    }
+    return (netdev->driver->confirm_send == NULL);
+}
 
 err_t lwip_netdev_init(struct netif *netif)
 {
@@ -254,6 +270,65 @@ free:
     return res;
 }
 
+#if (IS_USED(MODULE_NETDEV_NEW_API))
+static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t *iolist)
+{
+    lwip_netif_dev_acquire(netif);
+
+    if (is_netdev_legacy_api(netdev)) {
+        err_t res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+        lwip_netif_dev_release(netif);
+        return res;
+    }
+
+    unsigned irq_state;
+    lwip_netif_t *compat_netif = container_of(netif, lwip_netif_t, lwip_netif);
+
+    irq_state = irq_disable();
+    compat_netif->thread_doing_tx = thread_get_active();
+    irq_restore(irq_state);
+
+    if (netdev->driver->send(netdev, iolist) < 0) {
+        lwip_netif_dev_release(netif);
+        irq_state = irq_disable();
+        compat_netif->thread_doing_tx = NULL;
+        irq_restore(irq_state);
+        return ERR_IF;
+    }
+
+    /* block until TX completion is signaled from IRQ */
+    thread_flags_wait_any(THREAD_FLAG_LWIP_TX_DONE);
+
+    irq_state = irq_disable();
+    compat_netif->thread_doing_tx = NULL;
+    irq_restore(irq_state);
+
+    int retval;
+    while (-EAGAIN == (retval = netdev->driver->confirm_send(netdev, NULL))) {
+        /* this should not happen, as the driver really only should emit the
+         * TX done event when it is actually done. But better be safe than
+         * sorry */
+        DEBUG_PUTS("[lwip_netdev] confirm_send() returned -EAGAIN\n");
+    }
+
+    lwip_netif_dev_release(netif);
+
+    if (retval < 0) {
+        return ERR_IF;
+    }
+
+    return ERR_OK;
+}
+#else /* only old API */
+static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t *iolist)
+{
+    lwip_netif_dev_acquire(netif);
+    err_t res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_release(netif);
+    return res;
+}
+#endif
+
 #ifdef MODULE_NETDEV_ETH
 static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
 {
@@ -282,10 +357,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
 #if ETH_PAD_SIZE
     pbuf_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
-    lwip_netif_dev_acquire(netif);
-    err_t res = (netdev->driver->send(netdev, iolist) >= 0) ? ERR_OK : ERR_BUF;
-    lwip_netif_dev_release(netif);
-    return res;
+    return _common_link_output(netif, netdev, iolist);
 }
 #endif
 
@@ -299,10 +371,7 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
         .iol_len = (p->len - IEEE802154_FCS_LEN),   /* FCS is written by driver */
     };
 
-    lwip_netif_dev_acquire(netif);
-    err_t res = (netdev->driver->send(netdev, &pkt) >= 0) ? ERR_OK : ERR_BUF;
-    lwip_netif_dev_release(netif);
-    return res;
+    return _common_link_output(netif, netdev, &pkt);
 }
 #endif
 
@@ -331,10 +400,7 @@ static err_t _slip_link_output(struct netif *netif, struct pbuf *p)
         .iol_len = p->len,
     };
 
-    lwip_netif_dev_acquire(netif);
-    err_t res = (netdev->driver->send(netdev, &pkt) >= 0) ? ERR_OK : ERR_BUF;
-    lwip_netif_dev_release(netif);
-    return res;
+    return _common_link_output(netif, netdev, &pkt);
 }
 #endif
 
@@ -369,9 +435,24 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
     switch (event) {
     case NETDEV_EVENT_ISR:
+        DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_ISR");
         event_post(&lwip_event_queue, &compat_netif->ev_isr);
         break;
+#if (IS_USED(MODULE_NETDEV_NEW_API))
+    case NETDEV_EVENT_TX_COMPLETE:
+        DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_TX_COMPLETE");
+        {
+            unsigned irq_state = irq_disable();
+            thread_t *target = compat_netif->thread_doing_tx;
+            irq_restore(irq_state);
+            if (target) {
+                thread_flags_set(target, THREAD_FLAG_LWIP_TX_DONE);
+            }
+        }
+        break;
+#endif
     case NETDEV_EVENT_RX_COMPLETE:
+        DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_RX_COMPLETE");
         {
             struct pbuf *p = _get_recv_pkt(dev);
             if (p == NULL) {
@@ -385,10 +466,12 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         }
         break;
     case NETDEV_EVENT_LINK_UP:
+        DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_LINK_UP");
         /* Will wake up DHCP state machine */
         netifapi_netif_set_link_up(netif);
         break;
     case NETDEV_EVENT_LINK_DOWN:
+        DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_LINK_DOWN");
         netifapi_netif_set_link_down(netif);
         break;
     default:

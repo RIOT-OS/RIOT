@@ -169,6 +169,10 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
+ifneq (,$(filter netdev_test,$(USEMODULE)))
+  USEMODULE += netdev_legacy_api
+endif
+
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += luid
 endif

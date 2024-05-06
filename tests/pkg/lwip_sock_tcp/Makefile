@@ -16,7 +16,6 @@ ifneq (0, $(LWIP_IPV6))
 endif
 
 USEMODULE += inet_csum
-USEMODULE += lwip_netdev
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += ps
