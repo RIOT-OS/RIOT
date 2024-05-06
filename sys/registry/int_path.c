@@ -33,7 +33,7 @@
 #include "registry.h"
 #include "registry/util.h"
 #include "registry/error.h"
-#include "registry/tree_traversal.h"
+#include "registry/find.h"
 
 #include "registry/int_path.h"
 
