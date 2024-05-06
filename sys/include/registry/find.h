@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    sys_registry_tree_traversal RIOT Registry tree traversal utilities
+ * @defgroup    sys_registry_find RIOT Registry utility to find registry nodes
  * @ingroup     sys
- * @brief       RIOT Registry Tree traversal module providing utility functions to travers the configuration tree
+ * @brief       RIOT Registry Find module for finding specific nodes within the configuration tree
  * @{
  *
  * @file
