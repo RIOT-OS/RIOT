@@ -38,7 +38,7 @@
 
 #if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_FULL) || IS_ACTIVE(DOXYGEN)
 
-static int commit_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t commit_cb(const registry_commit_cb_scope_t scope,
                      const registry_group_or_parameter_id_t *group_or_parameter_id,
                      const void *context)
 {
@@ -46,7 +46,7 @@ static int commit_cb(const registry_commit_cb_scope_t scope,
     (void)group_or_parameter_id;
     (void)context;
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
 static registry_tests_full_instance_t test_full_instance_1_data = {

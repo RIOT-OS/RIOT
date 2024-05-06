@@ -39,7 +39,7 @@ static bool successful = false;
 static registry_group_or_parameter_id_t parameter_id;
 static registry_group_or_parameter_id_t group_id;
 
-static int commit_parameter_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t commit_parameter_cb(const registry_commit_cb_scope_t scope,
                                const registry_group_or_parameter_id_t *group_or_parameter_id,
                                const void *context)
 {
@@ -50,10 +50,10 @@ static int commit_parameter_cb(const registry_commit_cb_scope_t scope,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int commit_group_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t commit_group_cb(const registry_commit_cb_scope_t scope,
                            const registry_group_or_parameter_id_t *group_or_parameter_id,
                            const void *context)
 {
@@ -64,10 +64,10 @@ static int commit_group_cb(const registry_commit_cb_scope_t scope,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int commit_instance_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t commit_instance_cb(const registry_commit_cb_scope_t scope,
                               const registry_group_or_parameter_id_t *group_or_parameter_id,
                               const void *context)
 {
@@ -77,7 +77,7 @@ static int commit_instance_cb(const registry_commit_cb_scope_t scope,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
 static registry_tests_nested_instance_t test_nested_instance_data = {

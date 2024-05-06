@@ -50,7 +50,7 @@ static registry_instance_t test_nested_instance_1 = {
     .commit_cb = NULL,
 };
 
-static int export_parameter_cb(const registry_node_t *node,
+static registry_error_t export_parameter_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
@@ -61,10 +61,10 @@ static int export_parameter_cb(const registry_node_t *node,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int export_group_cb(const registry_node_t *node,
+static registry_error_t export_group_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
@@ -74,10 +74,10 @@ static int export_group_cb(const registry_node_t *node,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int export_instance_cb(const registry_node_t *node,
+static registry_error_t export_instance_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
@@ -86,10 +86,10 @@ static int export_instance_cb(const registry_node_t *node,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int export_schema_cb(const registry_node_t *node,
+static registry_error_t export_schema_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
@@ -99,10 +99,10 @@ static int export_schema_cb(const registry_node_t *node,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int export_namespace_cb(const registry_node_t *node,
+static registry_error_t export_namespace_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
@@ -112,7 +112,7 @@ static int export_namespace_cb(const registry_node_t *node,
         successful = true;
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
 static void test_registry_setup(void)
