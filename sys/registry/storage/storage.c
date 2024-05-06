@@ -31,10 +31,9 @@
 #include "clist.h"
 
 #include "registry/storage.h"
-#include "registry/util.h"
 #include "registry/error.h"
 
-XFA_INIT_CONST(registry_storage_instance_t *, _registry_storage_instances_src_xfa);
+static const registry_storage_instance_t **_storage_instances;
 
 /* registry_load */
 static registry_error_t _registry_load_cb(const registry_node_t *node, const void *buf, const size_t buf_len)
@@ -46,63 +45,58 @@ static registry_error_t _registry_load_cb(const registry_node_t *node, const voi
     return registry_set(node, buf, buf_len);
 }
 
-registry_error_t registry_load(void)
+registry_error_t registry_storage_load(const registry_storage_instance_t *storage_instance)
 {
-    for (size_t i = 0;
-         i < XFA_LEN(registry_storage_instance_t *, _registry_storage_instances_src_xfa); i++) {
-        registry_storage_instance_t *src = _registry_storage_instances_src_xfa[i];
-
-        registry_error_t res = src->storage->load(src, _registry_load_cb);
-
-        if (res != 0) {
-            return res;
-        }
-    }
-
-    return REGISTRY_ERROR_NONE;
+    return storage_instance->storage->load(storage_instance, _registry_load_cb);
 }
 
 /* registry_save */
 static registry_error_t _registry_save_export_cb(const registry_node_t *node, const void *context)
 {
-    (void)context;
+    const registry_storage_instance_t *storage_instance = context;
 
     /* the registry also exports just the namespace or just a schema, but the storage is only interested in configuration parameter values */
     if (node->type != REGISTRY_NODE_PARAMETER) {
         return REGISTRY_ERROR_NONE;
     }
 
-    /* check if a destination storage is registered */
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
-    }
-
     /* get value of configuration parameter */
     registry_value_t value;
     registry_get(node, &value);
 
-    /* save parameter value via the save function of the registered destination storage */
-    return _registry_storage_instance_dst->storage->save(_registry_storage_instance_dst,
-                                                         node, &value);
+    /* save parameter value via the save function of the provided storage instance */
+    return storage_instance->storage->save(storage_instance, node, &value);
 }
 
-registry_error_t registry_save(const registry_node_t *node)
+registry_error_t registry_storage_save(const registry_storage_instance_t *storage_instance, const registry_node_t *node)
 {
-    registry_error_t res;
+    assert(storage_instance != NULL);
 
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
+    if (storage_instance->storage->save_start) {
+        storage_instance->storage->save_start(storage_instance);
     }
 
-    if (_registry_storage_instance_dst->storage->save_start) {
-        _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
-    }
-    
-    res = registry_export(node, _registry_save_export_cb, 0, NULL);
+    registry_error_t res = registry_export(node, _registry_save_export_cb, REGISTRY_EXPORT_ALL, storage_instance);
 
-    if (_registry_storage_instance_dst->storage->save_end) {
-        _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);
+    if (storage_instance->storage->save_end) {
+        storage_instance->storage->save_end(storage_instance);
     }
 
     return res;
+}
+
+registry_error_t registry_storage_set_instances(const registry_storage_instance_t **storage_instances) {
+    assert(storage_instances != NULL);
+
+    _storage_instances = storage_instances;
+
+    return REGISTRY_ERROR_NONE;
+}
+
+registry_error_t registry_storage_get_instances(const registry_storage_instance_t ***storage_instances) {
+    assert(storage_instances != NULL);
+
+    storage_instances = &_storage_instances;
+
+    return REGISTRY_ERROR_NONE;
 }

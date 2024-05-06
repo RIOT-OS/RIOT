@@ -54,7 +54,7 @@ struct _registry_storage_t {
     /**
      * @brief Loads all saved parameters and calls the @p load_cb callback function.
      *
-     * @param[in] storage Storage instance.
+     * @param[in] storage_instance Storage instance to load the configurations from.
      * @param[in] load_cb Callback function to call for every saved parameter.
      *
      * @return 0 on success, non-zero on failure.
@@ -67,7 +67,7 @@ struct _registry_storage_t {
      * need before starting a saving process.
      * NULL if not implemented
      *
-     * @param[in] storage Storage descriptor.
+     * @param[in] storage_instance Storage instance to save the configurations to.
      *
      * @return 0 on success, non-zero on failure.
      */
@@ -76,7 +76,7 @@ struct _registry_storage_t {
     /**
      * @brief Saves a parameter into storage.
      *
-     * @param[in] storage Storage descriptor.
+     * @param[in] storage_instance Storage instance to save the configurations to.
      * @param[in] node A location within the registry configuration tree.
      * @param[in] value Configuration parameter value.
      *
@@ -91,7 +91,7 @@ struct _registry_storage_t {
      * after a saving process.
      * NULL if not implemented
      *
-     * @param[in] storage Storage descriptor.
+     * @param[in] storage_instance Storage instance to save the configurations to.
      *
      * @return 0 on success, non-zero on failure.
      */
@@ -101,48 +101,44 @@ struct _registry_storage_t {
 /**
  * @brief Load all configuration parameters from the storages that are registered
  * using @p REGISTRY_ADD_STORAGE_SOURCE.
+ * 
+ * @param[in] storage_instance Storage instance to load the configurations from.
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_load(void);
+registry_error_t registry_storage_load(const registry_storage_instance_t *storage_instance);
 
 /**
  * @brief Save all configuration parameters that are within 
  * the scope of the to the @p node. to the storage device, that was registered 
  * using @p REGISTRY_SET_STORAGE_DESTINATION.
  * 
+ * @param[in] storage_instance Storage instance to save the configurations to.
  * @param[in] node A location within the registry configuration tree.
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_save(const registry_node_t *node);
+registry_error_t registry_storage_save(const registry_storage_instance_t *storage_instance, const registry_node_t *node);
 
 /**
- * @brief Registers a new storage as a source of configurations. Multiple
- * storages can be configured as sources at the same time. Configurations
- * will be loaded from all of them. If more than one storage contain values
- * for the same key, then only the value of the storage is used, that was
- * registered last.
+ * @brief Set storage instances to expose them to configuration managers such as
+ * the RIOT CLI.
+ * 
+ * @param[in] storage_instances An array of pointers to storage instances.
  *
- * @param[in] src Pointer to the storage to register as source.
+ * @return 0 on success, non-zero on failure.
  */
-#define REGISTRY_ADD_STORAGE_SOURCE(_storage_instance) \
-        XFA_USE_CONST(registry_storage_instance_t *, _registry_storage_instances_src_xfa); \
-        XFA_ADD_PTR(_registry_storage_instances_src_xfa, _storage_instance, _storage_instance, \
-                    &_storage_instance)
-
-extern const registry_storage_instance_t *_registry_storage_instance_dst;
+registry_error_t registry_storage_set_instances(const registry_storage_instance_t **storage_instances);
 
 /**
- * @brief Registers a new storage as a destination for saving configurations
- * Only one storage can be registered as destination at a time. If a
- * previous storage had been registered before it will be replaced by the
- * new one.
+ * @brief Get exposed storage instances to use them in a configuration manager
+ * such as the RIOT CLI.
+ * 
+ * @param[out] storage_instances An array of pointers to storage instances.
  *
- * @param[in] dst Pointer to the storage to register.
+ * @return 0 on success, non-zero on failure.
  */
-#define REGISTRY_SET_STORAGE_DESTINATION(_storage_instance) \
-        const registry_storage_instance_t *_registry_storage_instance_dst = &_storage_instance \
+registry_error_t registry_storage_get_instances(const registry_storage_instance_t ***storage_instances);
 
 /* heap */
 #if IS_USED(MODULE_REGISTRY_STORAGE_HEAP) || IS_ACTIVE(DOXYGEN)
