@@ -471,6 +471,10 @@ ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
   USEMODULE += uri_parser
 endif
 
+ifneq (,$(filter gcoap_forward_proxy_thread,$(USEMODULE)))
+  USEMODULE += gcoap_forward_proxy
+endif
+
 ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
   USEMODULE += gcoap
   USEMODULE += dsm
