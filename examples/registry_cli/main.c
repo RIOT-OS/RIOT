@@ -35,7 +35,7 @@
 #include "registry/string_path.h"
 
 /* this callback is usually implemented drivers such as an RGB LED driver */
-static int shared_commit_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t shared_commit_cb(const registry_commit_cb_scope_t scope,
                             const registry_group_or_parameter_id_t *group_or_parameter_id,
                             const void *context)
 {
@@ -71,11 +71,11 @@ static int shared_commit_cb(const registry_commit_cb_scope_t scope,
         }
     }
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
 /* create instances of a configuration schema, to expose configuration parameters to the registry */
-static int rgb_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t rgb_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context);
 static registry_sys_rgb_led_instance_t rgb_led_instance_0_data = {
@@ -88,7 +88,7 @@ static registry_instance_t rgb_led_instance_0 = {
     .data = &rgb_led_instance_0_data,
     .commit_cb = &rgb_led_instance_0_commit_cb,
 };
-static int rgb_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t rgb_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context) 
 {
@@ -97,7 +97,7 @@ static int rgb_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
 }
 
 /* create an instance for a second RGB LED */
-static int rgb_led_instance_1_commit_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t rgb_led_instance_1_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context);
 static registry_sys_rgb_led_instance_t rgb_led_instance_1_data = {
@@ -110,7 +110,7 @@ static registry_instance_t rgb_led_instance_1 = {
     .data = &rgb_led_instance_1_data,
     .commit_cb = &rgb_led_instance_1_commit_cb,
 };
-static int rgb_led_instance_1_commit_cb(const registry_commit_cb_scope_t scope,
+static registry_error_t rgb_led_instance_1_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context)
 {
@@ -136,12 +136,6 @@ static registry_storage_instance_t vfs_instance = {
     .data = &_vfs_mount,
 };
 
-/* the storage source is where the registry reads parameter values from */
-REGISTRY_ADD_STORAGE_SOURCE(vfs_instance);
-
-/* the storage destination is where the registry writes parameter values to */
-REGISTRY_SET_STORAGE_DESTINATION(vfs_instance);
-
 int main(void)
 {
     /* initialize the riot registry storage for persistent configuration parameters */
@@ -151,6 +145,10 @@ int main(void)
 
     /* initialize the riot registry */
     registry_init();
+
+    /* set storage instances so that the CLI can find them */
+    const registry_storage_instance_t* storage_instances[] = {&vfs_instance};
+    registry_storage_set_instances(storage_instances);
 
     /* add configuration schemas to the registry */
     registry_add_schema_instance(&registry_sys_rgb_led, &rgb_led_instance_0);
