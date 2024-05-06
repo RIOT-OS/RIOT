@@ -360,8 +360,8 @@ int registry_commit(const registry_node_t *node);
  */
 typedef int (*registry_export_cb_t)(const registry_node_t *node, const void *context);
 
-#define REGISTRY_EXPORT_ALL = 0;
-#define REGISTRY_EXPORT_SELF = 1;
+#define REGISTRY_EXPORT_ALL 0;
+#define REGISTRY_EXPORT_SELF 1;
 #define REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1);
 
 /**

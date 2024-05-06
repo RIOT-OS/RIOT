@@ -110,109 +110,57 @@ int registry_set(const registry_node_t *node, const void *buf, const size_t buf_
     return 0;
 }
 
-static int _registry_commit_parameter(const registry_instance_t *instance,
-                              const registry_parameter_t *parameter)
-{
-    return instance->commit_cb(REGISTRY_COMMIT_PARAMETER, &parameter->id, instance->context);
-}
+static int _commit_export_cb(const registry_node_t *node, const void *context) {
+    (void)context;
 
-static int _registry_commit_group(const registry_instance_t *instance, const registry_group_t *group)
-{
-    return instance->commit_cb(REGISTRY_COMMIT_GROUP, &group->id, instance->context);
-}
+    const registry_instance_t *instance;
 
-static int _registry_commit_instance(const registry_instance_t *instance)
-{
-    return instance->commit_cb(REGISTRY_COMMIT_INSTANCE, NULL, instance->context);
-}
+    switch (node->type)
+    {
+    /* The commit function is only called for instance and below */
+    case REGISTRY_NODE_NAMESPACE:
+    case REGISTRY_NODE_SCHEMA:
+        return 0;
 
-static int _registry_commit_schema(const registry_schema_t *schema)
-{
-    assert(schema != NULL);
+    case REGISTRY_NODE_INSTANCE:
+        instance = node->value.instance;
+        return instance->commit_cb(REGISTRY_COMMIT_INSTANCE, NULL, instance->context);
 
-    int rc = 0;
+    case REGISTRY_NODE_GROUP:
+        instance = node->value.group.instance;
+        return instance->commit_cb(REGISTRY_COMMIT_GROUP, &node->value.group.group->id, instance->context);
 
-    /* commit all configuration schema instances of the given configuration schema if available */
-    clist_node_t *node = schema->instances.next;
-
-    if (!node) {
-        return -EINVAL;
+    case REGISTRY_NODE_PARAMETER:
+        instance = node->value.parameter.instance;
+        return instance->commit_cb(REGISTRY_COMMIT_PARAMETER, &node->value.parameter.parameter->id, instance->context);
     }
 
-    do {
-        node = node->next;
-        registry_instance_t *instance = container_of(node, registry_instance_t, node);
-
-        if (!instance) {
-            return -EINVAL;
-        }
-
-        int _rc = _registry_commit_instance(instance);
-
-        if (!_rc) {
-            rc = _rc;
-        }
-    } while (node != schema->instances.next);
-
-    return rc;
-}
-
-static int _registry_commit_namespace(const registry_namespace_t *namespace)
-{
-    assert(namespace != NULL);
-
-    int rc = 0;
-
-    /* commit all configuration schemas of the given namespace if available */
-    for (size_t i = 0; i < namespace->schemas_len; i++) {
-        const registry_schema_t *child = namespace->schemas[i];
-
-        int _rc = _registry_commit_schema(child);
-
-        if (!_rc) {
-            rc = _rc;
-        }
-    }
-
-    return rc;
+    return 0;
 }
 
 int registry_commit(const registry_node_t *node) {
-    int rc = 0;
+    int tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(3);
 
-    if (node == NULL) {
-        /* commit all namespaces */
-        for (size_t i = 0; i < XFA_LEN(registry_namespace_t *, _registry_namespaces_xfa); i++) {
-            registry_namespace_t *namespace = _registry_namespaces_xfa[i];
-
-            int _rc = _registry_commit_namespace(namespace);
-
-            if (!_rc) {
-                rc = _rc;
-            }
-        }
-    } else {
+    if (node != NULL) {
         switch (node->type)
         {
         case REGISTRY_NODE_NAMESPACE:
-            rc = _registry_commit_namespace(node->value.namespace);
+            tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(2);
             break;
+
         case REGISTRY_NODE_SCHEMA:
-            rc = _registry_commit_schema(node->value.schema);
+            tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(1);
             break;
+
         case REGISTRY_NODE_INSTANCE:
-            rc = _registry_commit_instance(node->value.instance);
-            break;
         case REGISTRY_NODE_GROUP:
-            rc = _registry_commit_group(node->value.group.instance, node->value.group.group);
-            break;
         case REGISTRY_NODE_PARAMETER:
-            rc = _registry_commit_parameter(node->value.parameter.instance, node->value.parameter.parameter);
+            tree_traversal_depth = REGISTRY_EXPORT_SELF;
             break;
         }
     }
 
-    return rc;
+    return registry_export(node, _commit_export_cb, tree_traversal_depth, NULL);
 }
 
 static int _registry_export_parameter(const registry_instance_t *instance,
@@ -418,6 +366,7 @@ static int _registry_export_namespace(const registry_namespace_t *namespace,
 
 int registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context)
 {
+
     int rc = 0;
 
     if (node == NULL) {
