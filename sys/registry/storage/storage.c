@@ -96,7 +96,7 @@ registry_error_t registry_storage_set_instances(const registry_storage_instance_
 registry_error_t registry_storage_get_instances(const registry_storage_instance_t ***storage_instances) {
     assert(storage_instances != NULL);
 
-    storage_instances = &_storage_instances;
+    *storage_instances = _storage_instances;
 
     return REGISTRY_ERROR_NONE;
 }
