@@ -39,6 +39,8 @@
 
 #define _TESTS_REGISTRY_LOAD_STORED_VALUE 60
 
+static bool successful = false;
+
 static registry_tests_nested_instance_t test_nested_instance_data = {
     .parameter = 9,
     .group_parameter = 5,
@@ -52,9 +54,9 @@ static registry_instance_t test_nested_instance = {
     .commit_cb = NULL,
 };
 
-static int load(const registry_storage_instance_t *storage,
+static registry_error_t load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb);
-static int save(const registry_storage_instance_t *storage,
+static registry_error_t save(const registry_storage_instance_t *storage,
                 const registry_node_t *node,
                 const registry_value_t *value);
 
@@ -70,7 +72,7 @@ static registry_storage_instance_t storage_test_instance = {
     .data = &storage_test_instance_data,
 };
 
-static int load(const registry_storage_instance_t *storage,
+static registry_error_t load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb)
 {
     if (storage == &storage_test_instance) {
@@ -85,13 +87,14 @@ static int load(const registry_storage_instance_t *storage,
         return load_cb(&node, &buf, sizeof(buf));
     }
 
-    return -EINVAL;
+    return -REGISTRY_ERROR_INVALID_ARGUMENT;
 }
 
-static int save(const registry_storage_instance_t *storage,
+static registry_error_t save(const registry_storage_instance_t *storage,
                 const registry_node_t *node,
                 const registry_value_t *value)
 {
+
     if (storage == &storage_test_instance &&
         node->value.parameter.instance == &test_nested_instance &&
         node->value.parameter.parameter == &registry_tests_nested_group_parameter &&
@@ -99,10 +102,10 @@ static int save(const registry_storage_instance_t *storage,
         value->buf_len == sizeof(uint8_t) &&
         value->type == REGISTRY_TYPE_UINT8) {
 
-        return 0;
+        successful = true;
     }
 
-    return -EINVAL;
+    return REGISTRY_ERROR_NONE;
 }
 
 REGISTRY_ADD_STORAGE_SOURCE(storage_test_instance);
@@ -115,6 +118,9 @@ static void test_setup(void)
 
     /* add schema instances */
     registry_add_schema_instance(&registry_tests_nested, &test_nested_instance);
+
+    /* reset testing variable */
+    successful = false;
 }
 
 static void tests_registry_load(void)
@@ -146,7 +152,10 @@ static void tests_registry_save_parameter(void)
             .parameter = &registry_tests_nested_group_parameter,
         },
     };
-    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
+
+    registry_save(&node);
+
+    TEST_ASSERT(successful);
 }
 
 static void tests_registry_save_group(void)
@@ -158,7 +167,10 @@ static void tests_registry_save_group(void)
             .group = &registry_tests_nested_group,
         },
     };
-    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
+    
+    registry_save(&node);
+
+    TEST_ASSERT(successful);
 }
 
 static void tests_registry_save_instance(void)
@@ -167,7 +179,10 @@ static void tests_registry_save_instance(void)
         .type = REGISTRY_NODE_INSTANCE,
         .value.instance = &test_nested_instance,
     };
-    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
+    
+    registry_save(&node);
+
+    TEST_ASSERT(successful);
 }
 
 static void tests_registry_save_schema(void)
@@ -176,7 +191,10 @@ static void tests_registry_save_schema(void)
         .type = REGISTRY_NODE_SCHEMA,
         .value.schema = &registry_tests_nested,
     };
-    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
+    
+    registry_save(&node);
+
+    TEST_ASSERT(successful);
 }
 
 static void tests_registry_save_namespace(void)
@@ -185,12 +203,18 @@ static void tests_registry_save_namespace(void)
         .type = REGISTRY_NODE_NAMESPACE,
         .value.namespace = &registry_tests,
     };
-    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
+    
+    registry_save(&node);
+
+    TEST_ASSERT(successful);
 }
 
 static void tests_registry_save_all(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save(NULL));
+    
+    registry_save(NULL);
+
+    TEST_ASSERT(successful);
 }
 
 Test *tests_registry_storage_tests(void)
