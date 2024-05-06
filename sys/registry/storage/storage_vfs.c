@@ -35,9 +35,9 @@
 
 #include "registry/storage.h"
 
-static int load(const registry_storage_instance_t *storage,
+static registry_error_t load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb);
-static int save(const registry_storage_instance_t *storage,
+static registry_error_t save(const registry_storage_instance_t *storage,
                 const registry_node_t *node,
                 const registry_value_t *value);
 
@@ -104,7 +104,7 @@ static int _umount(vfs_mount_t *mount)
     return 0;
 }
 
-static int load(const registry_storage_instance_t *storage,
+static registry_error_t load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb)
 {
     vfs_mount_t *mount = storage->data;
@@ -271,12 +271,12 @@ static int load(const registry_storage_instance_t *storage,
     /* umount */
     _umount(mount);
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
 
-static int save(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value)
+static registry_error_t save(const registry_storage_instance_t *storage,
+                             const registry_node_t *node,
+                             const registry_value_t *value)
 {
     assert(node->type == REGISTRY_NODE_PARAMETER);
     assert(node->value.parameter.parameter != NULL);
@@ -289,7 +289,7 @@ static int save(const registry_storage_instance_t *storage,
 
     /* create dir path */
     registry_int_path_t path;
-    int res = registry_node_to_int_path(node, &path);
+    registry_error_t res = registry_node_to_int_path(node, &path);
 
     char string_path[REGISTRY_INT_PATH_STRING_MAX_LEN];
 
@@ -337,5 +337,5 @@ static int save(const registry_storage_instance_t *storage,
     /* umount */
     _umount(mount);
 
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
