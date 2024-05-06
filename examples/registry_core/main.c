@@ -31,7 +31,7 @@
 #include "registry/namespace/sys/board_led.h"
 #include "ztimer.h"
 
-int board_led_instance_commit_cb(const registry_commit_cb_scope_t scope,
+registry_error_t board_led_instance_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context);
 
@@ -46,7 +46,7 @@ registry_instance_t board_led_instance = {
 };
 
 /* this callback is usually implemented drivers such as an RGB LED driver */
-int board_led_instance_commit_cb(const registry_commit_cb_scope_t scope,
+registry_error_t board_led_instance_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context)
 {
