@@ -35,11 +35,11 @@
     #define REGISTRY_STORAGE_HEAP_CAPACITY 100
 #endif
 
-static int load(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb);
-static int save(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value);
+static registry_error_t load(const registry_storage_instance_t *storage,
+                             const load_cb_t load_cb);
+static registry_error_t save(const registry_storage_instance_t *storage,
+                             const registry_node_t *node,
+                             const registry_value_t *value);
 
 typedef struct {
     registry_node_t node;
@@ -57,7 +57,7 @@ registry_storage_t registry_storage_heap = {
     .save = save,
 };
 
-static int load(const registry_storage_instance_t *storage,
+static registry_error_t load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb)
 {
     (void)storage;
@@ -65,10 +65,11 @@ static int load(const registry_storage_instance_t *storage,
     for (size_t i = 0; i < heap_storage_len; i++) {
         load_cb(&heap_storage[i].node, heap_storage[i].buf, heap_storage[i].buf_len);
     }
-    return 0;
+
+    return REGISTRY_ERROR_NONE;
 }
 
-static int save(const registry_storage_instance_t *storage,
+static registry_error_t save(const registry_storage_instance_t *storage,
                 const registry_node_t *node,
                 const registry_value_t *value)
 {
@@ -83,7 +84,7 @@ static int save(const registry_storage_instance_t *storage,
         if (heap_storage[i].node.value.parameter.instance == node->value.parameter.instance &&
             heap_storage[i].node.value.parameter.parameter == node->value.parameter.parameter) {
             memcpy(heap_storage[i].buf, value->buf, value->buf_len);
-            return 0;
+            return REGISTRY_ERROR_NONE;
         }
     }
 
@@ -96,5 +97,5 @@ static int save(const registry_storage_instance_t *storage,
     memcpy(heap_storage[heap_storage_len].buf, value->buf, value->buf_len);
 
     heap_storage_len++;
-    return 0;
+    return REGISTRY_ERROR_NONE;
 }
