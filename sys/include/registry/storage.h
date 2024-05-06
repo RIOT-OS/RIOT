@@ -35,7 +35,7 @@ extern "C" {
  * 
  * @return 0 on success, non-zero on failure.
  */
-typedef int (*load_cb_t)(const registry_node_t *node, const void *buf, const size_t buf_len);
+typedef registry_error_t (*load_cb_t)(const registry_node_t *node, const void *buf, const size_t buf_len);
 
 typedef struct _registry_storage_t registry_storage_t;
 
@@ -59,7 +59,7 @@ struct _registry_storage_t {
      *
      * @return 0 on success, non-zero on failure.
      */
-    int (*load)(const registry_storage_instance_t *storage,
+    registry_error_t (*load)(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb);
 
     /**
@@ -71,7 +71,7 @@ struct _registry_storage_t {
      *
      * @return 0 on success, non-zero on failure.
      */
-    int (*save_start)(const registry_storage_instance_t *storage);
+    registry_error_t (*save_start)(const registry_storage_instance_t *storage);
 
     /**
      * @brief Saves a parameter into storage.
@@ -82,7 +82,7 @@ struct _registry_storage_t {
      *
      * @return 0 on success, non-zero on failure.
      */
-    int (*save)(const registry_storage_instance_t *storage,
+    registry_error_t (*save)(const registry_storage_instance_t *storage,
                 const registry_node_t *node,
                 const registry_value_t *value);
 
@@ -95,7 +95,7 @@ struct _registry_storage_t {
      *
      * @return 0 on success, non-zero on failure.
      */
-    int (*save_end)(const registry_storage_instance_t *storage);
+    registry_error_t (*save_end)(const registry_storage_instance_t *storage);
 };
 
 /**
@@ -104,7 +104,7 @@ struct _registry_storage_t {
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_load(void);
+registry_error_t registry_load(void);
 
 /**
  * @brief Save all configuration parameters that are within 
@@ -115,7 +115,7 @@ int registry_load(void);
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_save(const registry_node_t *node);
+registry_error_t registry_save(const registry_node_t *node);
 
 /**
  * @brief Registers a new storage as a source of configurations. Multiple
