@@ -34,7 +34,7 @@
 #include "registry.h"
 #include "registry/util.h"
 #include "registry/error.h"
-#include "registry/tree_traversal.h"
+#include "registry/find.h"
 
 #include "registry/string_path.h"
 
