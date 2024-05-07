@@ -30,18 +30,17 @@
 #include "registry.h"
 
 #include "tests-registry.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/nested.h"
-
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_NESTED) || IS_ACTIVE(DOXYGEN)
+#include "namespace/tests.h"
+#include "namespace/tests/nested.h"
 
 static bool successful = false;
 static registry_group_or_parameter_id_t parameter_id;
 static registry_group_or_parameter_id_t group_id;
 
 static registry_error_t commit_parameter_cb(const registry_commit_cb_scope_t scope,
-                               const registry_group_or_parameter_id_t *group_or_parameter_id,
-                               const void *context)
+                                            const registry_group_or_parameter_id_t *
+                                            group_or_parameter_id,
+                                            const void *context)
 {
     (void)context;
 
@@ -54,8 +53,9 @@ static registry_error_t commit_parameter_cb(const registry_commit_cb_scope_t sco
 }
 
 static registry_error_t commit_group_cb(const registry_commit_cb_scope_t scope,
-                           const registry_group_or_parameter_id_t *group_or_parameter_id,
-                           const void *context)
+                                        const registry_group_or_parameter_id_t *
+                                        group_or_parameter_id,
+                                        const void *context)
 {
     (void)context;
 
@@ -68,8 +68,9 @@ static registry_error_t commit_group_cb(const registry_commit_cb_scope_t scope,
 }
 
 static registry_error_t commit_instance_cb(const registry_commit_cb_scope_t scope,
-                              const registry_group_or_parameter_id_t *group_or_parameter_id,
-                              const void *context)
+                                           const registry_group_or_parameter_id_t *
+                                           group_or_parameter_id,
+                                           const void *context)
 {
     (void)context;
 
@@ -224,7 +225,5 @@ Test *tests_registry_commit_tests(void)
 
     return (Test *)&registry_tests;
 }
-
-#endif
 
 /** @} */

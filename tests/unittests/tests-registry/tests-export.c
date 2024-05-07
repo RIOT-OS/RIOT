@@ -30,10 +30,8 @@
 #include "registry.h"
 
 #include "tests-registry.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/nested.h"
-
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_NESTED) || IS_ACTIVE(DOXYGEN)
+#include "namespace/tests.h"
+#include "namespace/tests/nested.h"
 
 static bool successful = false;
 
@@ -51,7 +49,7 @@ static registry_instance_t test_nested_instance_1 = {
 };
 
 static registry_error_t export_parameter_cb(const registry_node_t *node,
-                               const void *context)
+                                            const void *context)
 {
     (void)context;
 
@@ -65,7 +63,7 @@ static registry_error_t export_parameter_cb(const registry_node_t *node,
 }
 
 static registry_error_t export_group_cb(const registry_node_t *node,
-                               const void *context)
+                                        const void *context)
 {
     (void)context;
 
@@ -78,7 +76,7 @@ static registry_error_t export_group_cb(const registry_node_t *node,
 }
 
 static registry_error_t export_instance_cb(const registry_node_t *node,
-                               const void *context)
+                                           const void *context)
 {
     (void)context;
 
@@ -90,7 +88,7 @@ static registry_error_t export_instance_cb(const registry_node_t *node,
 }
 
 static registry_error_t export_schema_cb(const registry_node_t *node,
-                               const void *context)
+                                         const void *context)
 {
     (void)context;
 
@@ -103,7 +101,7 @@ static registry_error_t export_schema_cb(const registry_node_t *node,
 }
 
 static registry_error_t export_namespace_cb(const registry_node_t *node,
-                               const void *context)
+                                            const void *context)
 {
     (void)context;
 
@@ -159,6 +157,7 @@ static void tests_registry_export_group(void)
 
     /* check if group gets exported */
     const registry_group_id_t group_id = REGISTRY_TESTS_NESTED_GROUP;
+
     successful = false;
     registry_export(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
@@ -385,7 +384,5 @@ Test *tests_registry_export_tests(void)
 
     return (Test *)&registry_tests;
 }
-
-#endif
 
 /** @} */

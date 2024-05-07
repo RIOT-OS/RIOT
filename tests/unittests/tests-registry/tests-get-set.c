@@ -30,17 +30,15 @@
 #include "registry.h"
 
 #include "tests-registry.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/full.h"
+#include "namespace/tests.h"
+#include "namespace/tests/full.h"
 
 #define FLOAT_MAX_CHAR_COUNT ((FLT_MAX_10_EXP + 1) + 1 + 1 + 6)     // (FLT_MAX_10_EXP + 1) + sign + dot + 6 decimal places
 #define DOUBLE_MAX_CHAR_COUNT ((DBL_MAX_10_EXP + 1) + 1 + 1 + 6)    // (DBL_MAX_10_EXP + 1) + sign + dot + 6 decimal places
 
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_FULL) || IS_ACTIVE(DOXYGEN)
-
 static registry_error_t commit_cb(const registry_commit_cb_scope_t scope,
-                     const registry_group_or_parameter_id_t *group_or_parameter_id,
-                     const void *context)
+                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
+                                  const void *context)
 {
     (void)scope;
     (void)group_or_parameter_id;
@@ -103,6 +101,7 @@ static void tests_registry_min_values(void)
     const registry_tests_full_instance_opaque_t input_opaque = {
         .value = 0,
     };
+
     node.value.parameter.parameter = &registry_tests_full_opaque;
 
     registry_set(&node, &input_opaque, sizeof(input_opaque));
@@ -254,6 +253,7 @@ static void tests_registry_zero_values(void)
     const registry_tests_full_instance_opaque_t input_opaque = {
         .value = 0,
     };
+
     node.value.parameter.parameter = &registry_tests_full_opaque;
 
     registry_set(&node, &input_opaque, sizeof(input_opaque));
@@ -406,6 +406,7 @@ static void tests_registry_max_values(void)
     const registry_tests_full_instance_opaque_t input_opaque = {
         .value = UINT8_MAX,
     };
+
     node.value.parameter.parameter = &registry_tests_full_opaque;
 
     registry_set(&node, &input_opaque, sizeof(input_opaque));
@@ -567,7 +568,5 @@ Test *tests_registry_get_set_tests(void)
 
     return (Test *)&registry_tests;
 }
-
-#endif
 
 /** @} */

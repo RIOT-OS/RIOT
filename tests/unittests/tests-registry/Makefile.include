@@ -1,4 +1,2 @@
-CFLAGS += -DCONFIG_REGISTRY_ENABLE_META_NAME
-
-USEMODULE +=  registry_namespace_tests_full
-USEMODULE +=  registry_namespace_tests_nested
+USEMODULE += registry
+USEMODULE += tests-registry-namespace
