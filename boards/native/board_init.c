@@ -72,12 +72,3 @@ VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, VFS_DEFAULT_NVM(0), 0);
 
 #endif
 #endif /* MODULE_VFS_DEFAULT */
-
-/**
- * Nothing to initialize at the moment.
- * Turns the red LED on and the green LED off.
- */
-void board_init(void)
-{
-    puts("RIOT native board initialized.");
-}

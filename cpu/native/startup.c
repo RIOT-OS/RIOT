@@ -729,7 +729,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 
     register_interrupt(SIGUSR1, _reset_handler);
 
-    puts("RIOT native hardware initialization complete.\n");
+    DEBUG_PUTS("RIOT native hardware initialization complete.\n");
     irq_enable();
     kernel_init();
 }
