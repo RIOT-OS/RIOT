@@ -11,7 +11,7 @@
  * @ingroup     sys
  * @brief       RIOT Registry String Path module
  * @{
- * 
+ *
  * This module provides functions to convert between @ref registry_node_t and
  * a string path representation of it.
  *
@@ -50,7 +50,8 @@ int registry_node_to_string_path(const registry_node_t *node, char *path);
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_node_from_string_path(const char **path, const size_t path_len, registry_node_t *node);
+registry_error_t registry_node_from_string_path(const char **path, const size_t path_len,
+                                                registry_node_t *node);
 
 #ifdef __cplusplus
 }
