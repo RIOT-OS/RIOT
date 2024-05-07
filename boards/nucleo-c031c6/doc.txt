@@ -8,6 +8,10 @@
 The Nucleo-C031C6 is a board from ST's Nucleo family supporting a ARM
 Cortex-M0+ STM32C031C6 microcontroller with 12KiB of RAM and 32KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-c031c6.svg "Pinout for the Nucleo-C031C6 (from STM board manual)" width=50%
+
 ### MCU
 
 | MCU        | STM32C031C6         |
