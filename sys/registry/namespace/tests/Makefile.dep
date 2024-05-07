@@ -1,4 +1,0 @@
-# Enable "registry_namespace_tests" module for all schemas
-ifneq (,$(filter registry_namespace_tests_%,$(USEMODULE)))
-  USEMODULE += registry_namespace_tests
-endif
