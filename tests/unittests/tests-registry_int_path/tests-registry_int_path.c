@@ -33,10 +33,8 @@
 #include "mtd.h"
 #include "registry.h"
 #include "registry/int_path.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/nested.h"
-
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_NESTED) || IS_ACTIVE(DOXYGEN)
+#include "namespace/tests.h"
+#include "namespace/tests/nested.h"
 
 static registry_tests_nested_instance_t test_instance_data = {
     .parameter = 9,
@@ -77,7 +75,8 @@ static void tests_registry_to_parameter_int_path(void)
     TEST_ASSERT_EQUAL_INT(registry_tests.id, path.value.parameter_path.namespace_id);
     TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.value.parameter_path.schema_id);
     TEST_ASSERT_EQUAL_INT(test_instance.id, path.value.parameter_path.instance_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested_parameter.id, path.value.parameter_path.parameter_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested_parameter.id,
+                          path.value.parameter_path.parameter_id);
 }
 
 static void tests_registry_to_group_int_path(void)
@@ -162,7 +161,8 @@ static void tests_registry_from_group_or_parameter_int_path(void)
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_PARAMETER, node.type);
     TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.value.parameter.instance);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter, (int)node.value.parameter.parameter);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter,
+                          (int)node.value.parameter.parameter);
 
 
     /* group */
@@ -203,7 +203,8 @@ static void tests_registry_from_parameter_int_path(void)
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_PARAMETER, node.type);
     TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.value.parameter.instance);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter, (int)node.value.parameter.parameter);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter,
+                          (int)node.value.parameter.parameter);
 }
 
 static void tests_registry_from_group_int_path(void)
@@ -312,7 +313,5 @@ void tests_registry_int_path(void)
 {
     TESTS_RUN(tests_registry_int_path_tests());
 }
-
-#endif
 
 /** @} */
