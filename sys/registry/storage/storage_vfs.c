@@ -36,10 +36,10 @@
 #include "registry/storage.h"
 
 static registry_error_t load(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb);
+                             const load_cb_t load_cb);
 static registry_error_t save(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value);
+                             const registry_node_t *node,
+                             const registry_value_t *value);
 
 registry_storage_t registry_storage_vfs = {
     .load = load,
@@ -105,7 +105,7 @@ static int _umount(vfs_mount_t *mount)
 }
 
 static registry_error_t load(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb)
+                             const load_cb_t load_cb)
 {
     vfs_mount_t *mount = storage->data;
 
@@ -281,7 +281,7 @@ static registry_error_t save(const registry_storage_instance_t *storage,
     assert(node->type == REGISTRY_NODE_PARAMETER);
     assert(node->value.parameter.parameter != NULL);
     assert(node->value.parameter.instance != NULL);
-    
+
     vfs_mount_t *mount = storage->data;
 
     /* mount */
