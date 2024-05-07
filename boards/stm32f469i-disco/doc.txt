@@ -81,7 +81,7 @@ Also provides some system signals and power.
 - 1 User button.
 - 4 LEDs.
 - 3 Digital microphones
-- 1 LCD Color 4"
+- 1 LCD Color 4''
 
 ## Working with this Dev-Kit
 
