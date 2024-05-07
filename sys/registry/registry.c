@@ -72,7 +72,8 @@ registry_error_t registry_get(const registry_node_t *node, registry_value_t *val
 
     const registry_parameter_t *parameter = node->value.parameter.parameter;
 
-    parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
+    parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val,
+                               &intern_val_len);
 
     /* update buf pointer in registry_value_t to point to the value inside the registry and set buf_len */
     value->type = parameter->type;
@@ -97,7 +98,8 @@ registry_error_t registry_set(const registry_node_t *node, const void *buf, cons
 
     const registry_parameter_t *parameter = node->value.parameter.parameter;
 
-    parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
+    parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val,
+                               &intern_val_len);
 
     if (buf_len > intern_val_len) {
         return -REGISTRY_ERROR_BUF_LEN_TOO_LARGE;
@@ -109,13 +111,13 @@ registry_error_t registry_set(const registry_node_t *node, const void *buf, cons
     return REGISTRY_ERROR_NONE;
 }
 
-static registry_error_t _commit_export_cb(const registry_node_t *node, const void *context) {
+static registry_error_t _commit_export_cb(const registry_node_t *node, const void *context)
+{
     (void)context;
 
     const registry_instance_t *instance;
 
-    switch (node->type)
-    {
+    switch (node->type) {
     /* The commit function is only called for instance and below */
     case REGISTRY_NODE_NAMESPACE:
     case REGISTRY_NODE_SCHEMA:
@@ -127,22 +129,24 @@ static registry_error_t _commit_export_cb(const registry_node_t *node, const voi
 
     case REGISTRY_NODE_GROUP:
         instance = node->value.group.instance;
-        return instance->commit_cb(REGISTRY_COMMIT_GROUP, &node->value.group.group->id, instance->context);
+        return instance->commit_cb(REGISTRY_COMMIT_GROUP, &node->value.group.group->id,
+                                   instance->context);
 
     case REGISTRY_NODE_PARAMETER:
         instance = node->value.parameter.instance;
-        return instance->commit_cb(REGISTRY_COMMIT_PARAMETER, &node->value.parameter.parameter->id, instance->context);
+        return instance->commit_cb(REGISTRY_COMMIT_PARAMETER, &node->value.parameter.parameter->id,
+                                   instance->context);
     }
 
     return REGISTRY_ERROR_NONE;
 }
 
-registry_error_t registry_commit(const registry_node_t *node) {
+registry_error_t registry_commit(const registry_node_t *node)
+{
     uint8_t tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(3);
 
     if (node != NULL) {
-        switch (node->type)
-        {
+        switch (node->type) {
         case REGISTRY_NODE_NAMESPACE:
             tree_traversal_depth = REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(2);
             break;
@@ -163,8 +167,9 @@ registry_error_t registry_commit(const registry_node_t *node) {
 }
 
 static registry_error_t _registry_export_parameter(const registry_instance_t *instance,
-                              const registry_parameter_t *parameter,
-                              const registry_export_cb_t export_cb, const void *context)
+                                                   const registry_parameter_t *parameter,
+                                                   const registry_export_cb_t export_cb,
+                                                   const void *context)
 {
     assert(parameter != NULL);
 
@@ -180,9 +185,10 @@ static registry_error_t _registry_export_parameter(const registry_instance_t *in
 }
 
 static registry_error_t _registry_export_group(const registry_instance_t *instance,
-                          const registry_group_t *group,
-                          const registry_export_cb_t export_cb,
-                          const uint8_t tree_traversal_depth, const void *context)
+                                               const registry_group_t *group,
+                                               const registry_export_cb_t export_cb,
+                                               const uint8_t tree_traversal_depth,
+                                               const void *context)
 {
     assert(group != NULL);
 
@@ -208,7 +214,8 @@ static registry_error_t _registry_export_group(const registry_instance_t *instan
 
         /* group */
         for (size_t i = 0; i < group->groups_len; i++) {
-            rc = _registry_export_group(instance, group->groups[i], export_cb, new_tree_traversal_depth,
+            rc = _registry_export_group(instance, group->groups[i], export_cb,
+                                        new_tree_traversal_depth,
                                         context);
 
             if (!rc == REGISTRY_ERROR_NONE) {
@@ -279,7 +286,7 @@ static registry_error_t _registry_export_instance(
 }
 
 static registry_error_t _registry_export_schema(
-    const registry_schema_t *schema, 
+    const registry_schema_t *schema,
     const registry_export_cb_t export_cb,
     const uint8_t tree_traversal_depth, const void *context)
 {
@@ -328,8 +335,9 @@ static registry_error_t _registry_export_schema(
 }
 
 static registry_error_t _registry_export_namespace(const registry_namespace_t *namespace,
-                              const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth,
-                              const void *context)
+                                                   const registry_export_cb_t export_cb,
+                                                   const uint8_t tree_traversal_depth,
+                                                   const void *context)
 {
     assert(namespace != NULL);
 
@@ -364,7 +372,8 @@ static registry_error_t _registry_export_namespace(const registry_namespace_t *n
     return rc;
 }
 
-registry_error_t registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context)
+registry_error_t registry_export(const registry_node_t *node, const registry_export_cb_t export_cb,
+                                 const uint8_t tree_traversal_depth, const void *context)
 {
     registry_error_t rc = REGISTRY_ERROR_NONE;
 
@@ -379,23 +388,28 @@ registry_error_t registry_export(const registry_node_t *node, const registry_exp
                 return rc;
             }
         }
-    } else {
-        switch (node->type)
-        {
+    }
+    else {
+        switch (node->type) {
         case REGISTRY_NODE_NAMESPACE:
-            rc = _registry_export_namespace(node->value.namespace, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_namespace(node->value.namespace, export_cb, tree_traversal_depth,
+                                            context);
             break;
         case REGISTRY_NODE_SCHEMA:
-            rc = _registry_export_schema(node->value.schema, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_schema(node->value.schema, export_cb, tree_traversal_depth,
+                                         context);
             break;
         case REGISTRY_NODE_INSTANCE:
-            rc = _registry_export_instance(node->value.instance, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_instance(node->value.instance, export_cb, tree_traversal_depth,
+                                           context);
             break;
         case REGISTRY_NODE_GROUP:
-            rc = _registry_export_group(node->value.group.instance, node->value.group.group, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_group(node->value.group.instance, node->value.group.group,
+                                        export_cb, tree_traversal_depth, context);
             break;
         case REGISTRY_NODE_PARAMETER:
-            rc = _registry_export_parameter(node->value.parameter.instance, node->value.parameter.parameter, export_cb, context);
+            rc = _registry_export_parameter(node->value.parameter.instance,
+                                            node->value.parameter.parameter, export_cb, context);
             break;
         }
     }

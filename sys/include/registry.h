@@ -141,7 +141,7 @@ typedef enum {
  */
 typedef struct {
     registry_node_type_t type;                      /**< The type of the node */
-    union {                                     
+    union {
         const registry_namespace_t *namespace;      /**< Pointer to the configuration namespace */
         const registry_schema_t *schema;            /**< Pointer to a configuration schema */
         const registry_instance_t *instance;        /**< Pointer to a schema instance */
@@ -186,8 +186,8 @@ typedef const enum {
  * @return 0 on success, non-zero on failure.
  */
 typedef registry_error_t (*registry_commit_cb_t)(const registry_commit_cb_scope_t scope,
-                                    const registry_group_or_parameter_id_t *group_or_parameter_id,
-                                    const void *context);
+                                                 const registry_group_or_parameter_id_t *
+                                                 group_or_parameter_id, const void *context);
 
 /**
  * @brief Instance of a schema containing its configuration parameters values.
@@ -315,7 +315,7 @@ void registry_init(void);
  * @return 0 on success, non-zero on failure.
  */
 registry_error_t registry_add_schema_instance(const registry_schema_t *schema,
-                                 const registry_instance_t *instance);
+                                              const registry_instance_t *instance);
 
 /**
  * @brief Gets the current value of a parameter that belongs to an instance
@@ -353,7 +353,7 @@ registry_error_t registry_commit(const registry_node_t *node);
  * @brief Callback definition of the @p registry_export function.
  * This callback will be called for each location inside of the configuration tree that is
  * within the scope of the registry node passed on to the @p registry_export function.
- * 
+ *
  * @param[in] node A location within the registry configuration tree.
  * @param[in] context Context that is passed by the @p registry_export function.
  *
@@ -378,7 +378,8 @@ typedef registry_error_t (*registry_export_cb_t)(const registry_node_t *node, co
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context);
+registry_error_t registry_export(const registry_node_t *node, const registry_export_cb_t export_cb,
+                                 const uint8_t tree_traversal_depth, const void *context);
 
 #ifdef __cplusplus
 }
