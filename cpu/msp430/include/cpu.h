@@ -37,6 +37,11 @@ extern "C" {
 #define WORDSIZE 16
 
 /**
+ * @brief   MSP430 has power management support
+ */
+#define PROVIDES_PM_SET_LOWEST
+
+/**
  * @brief   Macro for defining interrupt service routines
  */
 #define ISR(a,b)        void __attribute__((naked, interrupt (a))) b(void)
@@ -94,6 +99,14 @@ static inline void __attribute__((always_inline)) __restore_context(void)
  */
 static inline void __attribute__((always_inline)) __enter_isr(void)
 {
+    /* modify state register pushed to stack to not got to power saving
+     * mode right again */
+    __asm__ volatile(
+        "bic %[mask], 0(SP)"            "\n\t"
+        : /* no outputs */
+        : [mask]    "i"(CPUOFF | SCG0 | SCG1 | OSCOFF)
+        : "memory"
+    );
     extern char __stack;    /* defined by linker script to end of RAM */
     __save_context();
     __asm__("mov.w %0,r1" : : "i"(&__stack));

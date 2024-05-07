@@ -8,8 +8,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
-    msb-430 \
-    msb-430h \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \

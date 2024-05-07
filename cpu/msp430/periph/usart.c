@@ -64,15 +64,31 @@ static mutex_t usart_locks[USART_NUMOF] = {
     MUTEX_INIT,
 };
 
+/* store the clock acquired by each USART, so it can be release again */
+static msp430_usart_clk_t _clocks_acquired[USART_NUMOF];
+
 void msp430_usart_acquire(const msp430_usart_params_t *params,
-                       const msp430_usart_conf_t *conf,
-                       uint8_t enable_mask)
+                          const msp430_usart_conf_t *conf,
+                          uint8_t enable_mask)
 {
     assume(params->num < USART_NUMOF);
 
     mutex_lock(&usart_locks[params->num]);
     msp430_usart_t *dev = params->dev;
     msp430_usart_sfr_t *sfr = params->sfr;
+
+    _clocks_acquired[params->num] = conf->prescaler.clk_source;
+    switch (_clocks_acquired[params->num]) {
+    case USART_CLK_SUBMAIN:
+        msp430_clock_acquire(MSP430_CLOCK_SUBMAIN);
+        break;
+    case USART_CLK_AUX:
+        msp430_clock_acquire(MSP430_CLOCK_AUXILIARY);
+        break;
+    default:
+        /* external clock from GPIO, safe to disable internal clocks */
+        break;
+    }
 
     /* first, make sure USART is off before reconfiguring it */
     sfr->ME = 0;
@@ -104,6 +120,18 @@ void msp430_usart_release(const msp430_usart_params_t *params)
     /* disable USART IRQs and clear any spurious IRQ flags */
     sfr->IE = 0;
     sfr->IFG = 0;
+
+    switch (_clocks_acquired[params->num]) {
+    case USART_CLK_SUBMAIN:
+        msp430_clock_release(MSP430_CLOCK_SUBMAIN);
+        break;
+    case USART_CLK_AUX:
+        msp430_clock_release(MSP430_CLOCK_AUXILIARY);
+        break;
+    default:
+        /* external clock from GPIO, not managed here */
+        break;
+    }
 
     /* Release mutex */
     mutex_unlock(&usart_locks[params->num]);

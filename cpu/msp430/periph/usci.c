@@ -93,6 +93,8 @@ static mutex_t _usci_locks[MSP430_USCI_ID_NUMOF] = {
     MUTEX_INIT,
 };
 
+static uint8_t _auxiliary_clock_acquired;
+
 void msp430_usci_acquire(const msp430_usci_params_t *params,
                          const msp430_usci_conf_t *conf)
 {
@@ -100,6 +102,23 @@ void msp430_usci_acquire(const msp430_usci_params_t *params,
 
     mutex_lock(&_usci_locks[params->id]);
     msp430_usci_b_t *dev = params->dev;
+
+    /* We only need to acquire the auxiliary (low frequency) clock domain, as
+     * the subsystem main clock (SMCLK) will be acquired on-demand when activity
+     * is detected on RXD, as per datasheet:
+     *
+     * > The USCI module provides automatic clock activation for SMCLK for use
+     * > with low-power modes.
+     */
+    switch (conf->prescaler.clk_source) {
+    case USCI_CLK_AUX:
+        msp430_clock_acquire(MSP430_CLOCK_AUXILIARY);
+        _auxiliary_clock_acquired |= 1U << params->id;
+        break;
+    default:
+        _auxiliary_clock_acquired &= ~(1U << params->id);
+        break;
+    }
 
     /* put device in disabled/reset state */
     dev->CTL1 = UCSWRST;
@@ -133,6 +152,10 @@ void msp430_usci_release(const msp430_usci_params_t *params)
     unsigned irq_mask = irq_disable();
     *params->interrupt_enable &= clear_irq_mask;
     *params->interrupt_flag &= clear_irq_mask;
+
+    if (_auxiliary_clock_acquired & (1U << params->id)) {
+        msp430_clock_release(MSP430_CLOCK_AUXILIARY);
+    }
     irq_restore(irq_mask);
 
     /* Release mutex */
