@@ -36,7 +36,8 @@
 static const registry_storage_instance_t **_storage_instances;
 
 /* registry_load */
-static registry_error_t _registry_load_cb(const registry_node_t *node, const void *buf, const size_t buf_len)
+static registry_error_t _registry_load_cb(const registry_node_t *node, const void *buf,
+                                          const size_t buf_len)
 {
     assert(node->type == REGISTRY_NODE_PARAMETER);
     assert(node->value.parameter.parameter != NULL);
@@ -68,7 +69,8 @@ static registry_error_t _registry_save_export_cb(const registry_node_t *node, co
     return storage_instance->storage->save(storage_instance, node, &value);
 }
 
-registry_error_t registry_storage_save(const registry_storage_instance_t *storage_instance, const registry_node_t *node)
+registry_error_t registry_storage_save(const registry_storage_instance_t *storage_instance,
+                                       const registry_node_t *node)
 {
     assert(storage_instance != NULL);
 
@@ -76,7 +78,8 @@ registry_error_t registry_storage_save(const registry_storage_instance_t *storag
         storage_instance->storage->save_start(storage_instance);
     }
 
-    registry_error_t res = registry_export(node, _registry_save_export_cb, REGISTRY_EXPORT_ALL, storage_instance);
+    registry_error_t res = registry_export(node, _registry_save_export_cb, REGISTRY_EXPORT_ALL,
+                                           storage_instance);
 
     if (storage_instance->storage->save_end) {
         storage_instance->storage->save_end(storage_instance);
@@ -85,7 +88,9 @@ registry_error_t registry_storage_save(const registry_storage_instance_t *storag
     return res;
 }
 
-registry_error_t registry_storage_set_instances(const registry_storage_instance_t **storage_instances) {
+registry_error_t registry_storage_set_instances(
+    const registry_storage_instance_t **storage_instances)
+{
     assert(storage_instances != NULL);
 
     _storage_instances = storage_instances;
@@ -93,7 +98,9 @@ registry_error_t registry_storage_set_instances(const registry_storage_instance_
     return REGISTRY_ERROR_NONE;
 }
 
-registry_error_t registry_storage_get_instances(const registry_storage_instance_t ***storage_instances) {
+registry_error_t registry_storage_get_instances(
+    const registry_storage_instance_t ***storage_instances)
+{
     assert(storage_instances != NULL);
 
     *storage_instances = _storage_instances;

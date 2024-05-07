@@ -28,14 +28,15 @@ extern "C" {
 
 /**
  * @brief Prototype of a callback function for the load action of a storage interface.
- * 
+ *
  * @param[in] node A location within the registry configuration tree. (In this case it must be a configuration parameter)
  * @param[in] buf The saved value of the configuration parameter.
  * @param[in] buf_len The size of @p buf.
- * 
+ *
  * @return 0 on success, non-zero on failure.
  */
-typedef registry_error_t (*load_cb_t)(const registry_node_t *node, const void *buf, const size_t buf_len);
+typedef registry_error_t (*load_cb_t)(const registry_node_t *node, const void *buf,
+                                      const size_t buf_len);
 
 typedef struct _registry_storage_t registry_storage_t;
 
@@ -60,7 +61,7 @@ struct _registry_storage_t {
      * @return 0 on success, non-zero on failure.
      */
     registry_error_t (*load)(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb);
+                             const load_cb_t load_cb);
 
     /**
      * @brief If implemented, it is used for any preparation the storage may
@@ -83,8 +84,8 @@ struct _registry_storage_t {
      * @return 0 on success, non-zero on failure.
      */
     registry_error_t (*save)(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value);
+                             const registry_node_t *node,
+                             const registry_value_t *value);
 
     /**
      * @brief If implemented, it is used for any tear-down the storage may need
@@ -101,7 +102,7 @@ struct _registry_storage_t {
 /**
  * @brief Load all configuration parameters from the storages that are registered
  * using @p REGISTRY_ADD_STORAGE_SOURCE.
- * 
+ *
  * @param[in] storage_instance Storage instance to load the configurations from.
  *
  * @return 0 on success, non-zero on failure.
@@ -109,36 +110,39 @@ struct _registry_storage_t {
 registry_error_t registry_storage_load(const registry_storage_instance_t *storage_instance);
 
 /**
- * @brief Save all configuration parameters that are within 
- * the scope of the to the @p node. to the storage device, that was registered 
+ * @brief Save all configuration parameters that are within
+ * the scope of the to the @p node. to the storage device, that was registered
  * using @p REGISTRY_SET_STORAGE_DESTINATION.
- * 
+ *
  * @param[in] storage_instance Storage instance to save the configurations to.
  * @param[in] node A location within the registry configuration tree.
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_storage_save(const registry_storage_instance_t *storage_instance, const registry_node_t *node);
+registry_error_t registry_storage_save(const registry_storage_instance_t *storage_instance,
+                                       const registry_node_t *node);
 
 /**
  * @brief Set storage instances to expose them to configuration managers such as
  * the RIOT CLI.
- * 
+ *
  * @param[in] storage_instances An array of pointers to storage instances.
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_storage_set_instances(const registry_storage_instance_t **storage_instances);
+registry_error_t registry_storage_set_instances(
+    const registry_storage_instance_t **storage_instances);
 
 /**
  * @brief Get exposed storage instances to use them in a configuration manager
  * such as the RIOT CLI.
- * 
+ *
  * @param[out] storage_instances An array of pointers to storage instances.
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_storage_get_instances(const registry_storage_instance_t ***storage_instances);
+registry_error_t registry_storage_get_instances(
+    const registry_storage_instance_t ***storage_instances);
 
 /* heap */
 #if IS_USED(MODULE_REGISTRY_STORAGE_HEAP) || IS_ACTIVE(DOXYGEN)
