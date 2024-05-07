@@ -33,10 +33,10 @@
 #include "registry/storage.h"
 
 #include "tests-registry_storage_vfs.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/nested.h"
+#include "namespace/tests.h"
+#include "namespace/tests/nested.h"
 
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_NESTED) || IS_ACTIVE(DOXYGEN)
+#if IS_USED(MODULE_REGISTRY_STORAGE_VFS) || IS_ACTIVE(DOXYGEN)
 
 static registry_tests_nested_instance_t test_nested_instance_data = {
     .parameter = 9,
