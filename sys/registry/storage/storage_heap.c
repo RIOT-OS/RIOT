@@ -58,7 +58,7 @@ registry_storage_t registry_storage_heap = {
 };
 
 static registry_error_t load(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb)
+                             const load_cb_t load_cb)
 {
     (void)storage;
 
@@ -70,8 +70,8 @@ static registry_error_t load(const registry_storage_instance_t *storage,
 }
 
 static registry_error_t save(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value)
+                             const registry_node_t *node,
+                             const registry_value_t *value)
 {
     assert(node->type == REGISTRY_NODE_PARAMETER);
     assert(node->value.parameter.parameter != NULL);
