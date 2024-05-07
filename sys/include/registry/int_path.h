@@ -11,7 +11,7 @@
  * @ingroup     sys
  * @brief       RIOT Registry integer path module
  * @{
- * 
+ *
  * This module provides functions to convert between @ref registry_node_t and
  * @ref registry_int_path_t.
  *
@@ -39,7 +39,7 @@ extern "C" {
 
 /**
  * @brief Maximum length of a configuration path as a string of numbers.
- * 
+ *
  * An int path consists of the following elements:
  * namespace_id:             8 bits corresponds to a max of  3 characters
  * schema_id:               32 bits corresponds to a max of 10 characters
@@ -148,7 +148,8 @@ registry_error_t registry_node_to_int_path(const registry_node_t *node, registry
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_node_from_int_path(const registry_int_path_t *path, registry_node_t *node);
+registry_error_t registry_node_from_int_path(const registry_int_path_t *path,
+                                             registry_node_t *node);
 
 #ifdef __cplusplus
 }
