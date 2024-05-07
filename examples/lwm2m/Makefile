@@ -1,13 +1,11 @@
 # name of your application
-APPLICATION = wakaama
+APPLICATION = lwm2m
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
-
-
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -27,21 +25,34 @@ USEMODULE += ps
 # development process:
 DEVELHELP ?= 1
 
-# Specific the server URI  address (NOTE: Domain names not supported yet)
-SERVER_URI ?= '"coap://[fd00:dead:beef::1]"'
-
 # NOTE: Add the package for wakaama
 USEPKG += wakaama
 USEMODULE += wakaama_objects_light_control
-# Uncomment to enable Wakaama debug log
-#CFLAGS += -DCONFIG_LWM2M_WITH_LOGS=1
 
-# Uncomment to indicate that the server is a LwM2M bootstrap server
-# CFLAGS += -DCONFIG_LWM2M_BOOTSTRAP=1
+# add DTLS support
+USEMODULE += wakaama_client_dtls
+
+# Specify sock DTLS implementation
+USEPKG += tinydtls
+# tinydtls needs crypto secure PRNG
+USEMODULE += prng_sha1prng
+
+## Application-specific Configuration options
+LWM2M_SERVER_URI ?= '"coap://[fd00:dead:beef::1]:5684"'
+LWM2M_SERVER_SHORT_ID ?= 1
+
+CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE='(3*1024)'
 
 include $(RIOTBASE)/Makefile.include
 
-# Configure server via CFLAGS only if not done via Kconfig
+DTLS_MAX_BUF=1024
+
+# Configure via CFLAGS only if not done via Kconfig
 ifndef CONFIG_LWM2M_SERVER_URI
-  CFLAGS += -DCONFIG_LWM2M_SERVER_URI=$(SERVER_URI)
+  CFLAGS += -DCONFIG_LWM2M_SERVER_URI=$(LWM2M_SERVER_URI)
+  CFLAGS += -DCONFIG_LWM2M_SERVER_SHORT_ID=$(LWM2M_SERVER_SHORT_ID)
+  CFLAGS += -DCONFIG_DTLS_PEER_MAX=2
+  CFLAGS += -DCONFIG_MAX_BUF=1024
+  # Uncomment to enable Wakaama debug log
+  #CFLAGS += -DCONFIG_LWM2M_WITH_LOGS=1
 endif
