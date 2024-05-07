@@ -11,7 +11,7 @@
  * @ingroup     sys
  * @brief       RIOT Registry Namespace Sys module
  * @{
- * 
+ *
  * This module provides common sys configuration schemas for the RIOT Registry sys module
  *
  * @file
@@ -36,8 +36,8 @@ extern registry_namespace_t registry_sys;
  * of pointers.
  */
 typedef enum {
-    REGISTRY_SYS_BOARD_LED = 0,
-    REGISTRY_SYS_RGB_LED = 1,
+    REGISTRY_SYS_BOARD_LED  = 0,
+    REGISTRY_SYS_RGB_LED    = 1,
 } registry_sys_indices_t;
 
 #ifdef __cplusplus
