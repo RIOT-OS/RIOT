@@ -57,7 +57,7 @@ static uint8_t _lcd_color_depth(const disp_dev_t *disp_dev)
 
 static void _lcd_set_invert(const disp_dev_t *disp_dev, bool invert)
 {
-    const lcd_t *dev = (lcd_t *)disp_dev;
+    lcd_t *dev = (lcd_t *)disp_dev;
 
     assert(dev);
 

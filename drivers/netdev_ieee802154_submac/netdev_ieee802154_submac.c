@@ -115,6 +115,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
         return res;
     case NETOPT_STATE:
         return _set_submac_state(submac, *((netopt_state_t*) value));
+    case NETOPT_PROMISCUOUSMODE:
+        return ieee802154_radio_set_frame_filter_mode(&submac->dev,
+                                                      *((bool *)value) ? IEEE802154_FILTER_PROMISC
+                                                                       : IEEE802154_FILTER_ACCEPT);
     default:
         break;
     }

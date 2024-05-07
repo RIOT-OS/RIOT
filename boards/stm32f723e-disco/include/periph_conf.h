@@ -42,6 +42,7 @@
 #else
 #include "cfg_usb_otg_fs.h"
 #endif
+#include "lcd_fmc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -325,6 +326,29 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
                            .bus_turnaround = 3, },  /* 3 HCLKs a 4.63 ns */
         },
     },
+    /* bank 1, subbank 2 is used for LCD with asynchronuous
+     * access in Mode 1, i.e. write timings are not used */
+    {
+        .bank = FMC_BANK_1,
+        .mem_type = FMC_SRAM,
+        .data_width = FMC_BUS_WIDTH_16BIT,
+        .address = 0x64000000,  /* Bank 1, subbank 2 is mapped to 0x64000000 */
+        .size = 4,              /* 1 word for command @ 0x64000000 and
+                                     1 word for data @ 0x64000001 */
+        .nor_sram = {
+            .sub_bank = 2,
+            .ext_mode = false,                      /* Mode 1 used, no separate w_timing */
+                                                    /* timing requirements for ST7789H2:
+                                                       - t_AST min 0 ns (Address setup time)
+                                                       - t_DST min 10 ns (Data setup time)
+                                                       - t_WRL min 15 ns (WE LOW time)
+                                                       - t_WRH min 15 ns (WE HIGH time)
+                                                       - t_WRC min 66 ns (WE cycle time) */
+            .r_timing = {  .addr_setup = 2,         /* t_AST = 10 ns (2 HCLKs a 4.63 ns) */
+                           .data_setup = 8,         /* t_DST = 37 ns (8 HCLKs a 4.63 ns) */
+                           .bus_turnaround = 5, },  /* t_WRH = 23 ns (5 HCLKs a 4.63 ns) */
+        },
+    },
 };
 
 /**
@@ -332,6 +356,25 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
  */
 #define FMC_BANK_NUMOF  ARRAY_SIZE(fmc_bank_config)
 /** @} */
+
+/**
+ * @brief   Descriptors of FMC banks used for LCDs
+ */
+static const lcd_fmc_desc_t lcd_fmc_desc[] = {
+    {
+        .bank = FMC_BANK_CONFIG(1), /* second bank (fmc_bank_config[1]) is used */
+        .cmd_offset = 0x0,          /* address 0x64000000 (offset 0x0) used for commands */
+        .data_offset = 0x2,         /* address 0x64000002 (offset 0x2) used for commands */
+    }
+};
+
+/**
+ * @brief   Number of LCDs using FMC banks
+ *
+ * Because it is used by the preprocessor it has to be a number.
+ * The @ref ARRAY_SIZE can't be used here.
+ */
+#define LCD_FMC_NUMOF  1
 
 #ifdef __cplusplus
 }

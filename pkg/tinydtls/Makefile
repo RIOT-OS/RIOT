@@ -19,21 +19,6 @@ ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-format-nonliteral
 endif
 
-ifneq (,$(filter gcoap,$(USEMODULE)))
-    # Configuring the buffer large enough that a full Gcoap packet can be
-    # encrypted or decrypted.
-
-    # This is the default in gcoap.h, which we don't have access to, so it is copied over.
-    CONFIG_GCOAP_PDU_BUF_SIZE := $(or $(CONFIG_GCOAP_PDU_BUF_SIZE),128)
-
-    # If there were another way to set up DTLS_MAX_BUF, we'd need to set the
-    # maximum of these here.
-    #
-    # 29 bytes are the overhead measured with Wireshark on packets exchanged in
-    # default configuration; adding some to be safe against variable size fields.
-    CFLAGS += "-DDTLS_MAX_BUF=($(CONFIG_GCOAP_PDU_BUF_SIZE) + 36)"
-endif
-
 # TinyDTLS emits several messages during connection establishment at the info
 # level; this is way more verbose than common in RIOT.
 TINYDTLS_LOG_LEVEL ?= LOG_WARNING

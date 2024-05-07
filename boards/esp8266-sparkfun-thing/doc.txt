@@ -93,8 +93,8 @@ Since the SparkFun Thing Dev board has an USB to Serial adapter on board,
 this can done directly using the Micro USB. SparkFun Thin board has to be
 connected to the host computer using the FTDI interface and a FTDI USB to
 Serial adapter/cable. For more information on how to program the
-SparkFun Thing board, please refer the [ESP8266 Thing Hookup Guide]
-(https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/programming-the-thing).
+SparkFun Thing board, please refer the
+[ESP8266 Thing Hookup Guide](https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/programming-the-thing).
 
 @note Please make sure the FTDI USB to Serial adapter/cable uses 3.3 V.
 

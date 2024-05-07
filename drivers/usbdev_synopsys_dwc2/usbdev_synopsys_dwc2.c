@@ -667,13 +667,13 @@ static void _wake_periph(const dwc2_usb_otg_fshs_config_t *conf)
 #elif defined(MCU_EFM32)
     pm_block(EFM32_PM_MODE_EM2);
     /* switch USB core clock source either to USHFRCO or HFCLK */
-#if defined(CPU_FAM_EFM32GG12B)
+#if defined(CPU_FAM_EFM32GG12B) || defined(CPU_FAM_EFM32GG11B)
     CMU_ClockSelectSet(cmuClock_USB, cmuSelect_USHFRCO);
 #elif defined(CPU_FAM_EFM32GG) || defined(CPU_FAM_EFM32LG)
     CMU_ClockSelectSet(cmuClock_USB, cmuSelect_HFCLK);
 #else
 #error "EFM32 family not yet supported"
-#endif /* defined(CPU_FAM_EFM32GG12B) */
+#endif /* defined(CPU_FAM_EFM32GG12B) || defined(CPU_FAM_EFM32GG11B) */
 #elif defined(MCU_ESP32)
     pm_block(ESP_PM_LIGHT_SLEEP);
 #elif defined(MCU_GD32V)
@@ -784,7 +784,7 @@ static void _usbdev_init(usbdev_t *dev)
     pm_block(EFM32_PM_MODE_EM3);
     pm_block(EFM32_PM_MODE_EM2);
 
-#if defined(CPU_FAM_EFM32GG12B)
+#if defined(CPU_FAM_EFM32GG12B) || defined(CPU_FAM_EFM32GG11B)
     /* select USHFRCO as USB clock and set the tuning to 48 MHz */
     CMU_ClockSelectSet(cmuClock_USB, cmuSelect_USHFRCO);
     CMU_USHFRCOBandSet(cmuUSHFRCOFreq_48M0Hz);

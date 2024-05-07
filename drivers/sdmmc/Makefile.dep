@@ -1,0 +1,14 @@
+FEATURES_REQUIRED += periph_sdmmc
+FEATURES_OPTIONAL += periph_sdmmc_auto_clk
+FEATURES_OPTIONAL += periph_sdmmc_auto_cmd12
+FEATURES_OPTIONAL += periph_sdmmc_hs
+
+ifneq (,$(filter sdmmc_mmc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_sdmmc_mmc
+endif
+
+ifneq (,$(filter sdmmc_sdhc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_sdmmc_sdhc
+endif
+
+USEMODULE += ztimer_msec

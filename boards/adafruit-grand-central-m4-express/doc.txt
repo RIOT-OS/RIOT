@@ -5,8 +5,7 @@
 
 ### General information
 
-![Adafruit Grand Central M4 Expressboard]
-(https://cdn-learn.adafruit.com/assets/assets/000/068/748/medium800/adafruit_products_grand_central_top_angle.jpg?1546734839)
+![Adafruit Grand Central M4 Expressboard](https://cdn-learn.adafruit.com/assets/assets/000/068/748/medium800/adafruit_products_grand_central_top_angle.jpg?1546734839)
 
 The main features of the board are:
 - ATSAMD51 Cortex M4 running at 120 MHz

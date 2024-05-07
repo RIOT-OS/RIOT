@@ -15,3 +15,5 @@ config PACKAGE_C25519
         enough that they could be reasonably considered for most
         microcontroller applications. In particular, Curve25519 scalar
         multiplication uses less than half a kB of peak stack usage.
+
+rsource "psa_c25519/Kconfig"

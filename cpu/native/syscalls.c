@@ -88,8 +88,6 @@ int (*real_pause)(void);
 int (*real_pipe)(int[2]);
 int (*real_select)(int nfds, ...);
 int (*real_poll)(struct pollfd *fds, ...);
-int (*real_setitimer)(int which, const struct itimerval
-        *restrict value, struct itimerval *restrict ovalue);
 int (*real_setsid)(void);
 int (*real_setsockopt)(int socket, ...);
 int (*real_socket)(int domain, int type, int protocol);
@@ -535,7 +533,6 @@ void _native_init_syscalls(void)
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
     *(void **)(&real_select) = dlsym(RTLD_NEXT, "select");
     *(void **)(&real_poll) = dlsym(RTLD_NEXT, "poll");
-    *(void **)(&real_setitimer) = dlsym(RTLD_NEXT, "setitimer");
     *(void **)(&real_setsid) = dlsym(RTLD_NEXT, "setsid");
     *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
     *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");

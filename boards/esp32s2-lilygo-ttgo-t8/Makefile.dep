@@ -16,9 +16,4 @@ ifneq (,$(filter disp_dev,$(USEMODULE)))
   USEMODULE += st7789
 endif
 
-ifneq (,$(filter st7735,$(USEMODULE)))
-  # use st7789 pseudomodule if st7735 is enabled to indicate that we use a ST7789
-  USEMODULE += st7789
-endif
-
 include $(RIOTBOARD)/common/esp32s2/Makefile.dep

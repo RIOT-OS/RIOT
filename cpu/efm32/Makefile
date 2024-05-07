@@ -7,6 +7,9 @@ DIRS += $(RIOTCPU)/cortexm_common
 ifneq (,$(filter cpu_efm32gg,$(USEMODULE)))
   DIRS += families/efm32gg
 endif
+ifneq (,$(filter cpu_efm32gg11b,$(USEMODULE)))
+  DIRS += families/efm32gg11b
+endif
 ifneq (,$(filter cpu_efm32gg12b,$(USEMODULE)))
   DIRS += families/efm32gg12b
 endif

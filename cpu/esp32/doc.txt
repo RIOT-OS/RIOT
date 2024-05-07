@@ -444,8 +444,7 @@ $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
 During the migration phase from the ESP32 toolchain with GCC 5.2.0, which was
 specially compiled for RIOT, to Espressif's precompiled ESP32 vendor toolchain
 with GCC 8.4.0, the RIOT Docker build image
-[schorcht/riotbuild_esp32_espressif_gcc_8.4.0]
-(https://hub.docker.com/repository/docker/schorcht/riotbuild_esp32_espressif_gcc_8.4.0)
+[schorcht/riotbuild_esp32_espressif_gcc_8.4.0](https://hub.docker.com/repository/docker/schorcht/riotbuild_esp32_espressif_gcc_8.4.0)
 has to be used instead of `riot/riotbuild` as this already contains the
 precompiled ESP32 vendor toolchain from Espressif while `riot/riotbuild`
 does not.
@@ -509,8 +508,8 @@ by the environment variable `$IDF_TOOLS_PATH`. If the environment variable
 
 Using the variable `IDF_TOOLS_PATH` and its default value `$HOME/.espressif` for
 the toolchain installation in RIOT allows to reuse the tools that have already
-been installed according to the section ["Get Started, Step 3. Set up the tools"]
-(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html#get-started-set-up-tools).
+been installed according to the section
+["Get Started, Step 3. Set up the tools"](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html#get-started-set-up-tools).
 if you have already used ESP-IDF directly.
 
 ### Using the toolchain
@@ -777,8 +776,8 @@ list of GPIOs that can be used as ADC channels on the board, for example:
 Thereby the order of the listed GPIOs determines the mapping between the
 ADC lines of the RIOT and the GPIOs. The maximum number of GPIOs in the
 list is #ADC_NUMOF_MAX. The board specific configuration of #ADC_GPIOS
-can be overridden by [Application specific configurations]
-(#esp32_application_specific_configurations).
+can be overridden by
+[Application specific configurations](#esp32_application_specific_configurations).
 
 The number of defined ADC channels #ADC_NUMOF is determined automatically
 from the #ADC_GPIOS definition.
@@ -849,8 +848,8 @@ used as DAC channels on the respective ESP32x SoC.
 #define DAC_GPIOS   { GPIO25, GPIO26 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This configuration can be changed by [application-specific configurations]
-(#esp32_application_specific_configurations).
+This configuration can be changed by
+[application-specific configurations](#esp32_application_specific_configurations).
 
 The order of the listed GPIOs determines the mapping between the RIOT's
 DAC lines and the GPIOs. The maximum number of GPIOs in the list is
@@ -972,8 +971,8 @@ virtual PWM devices PWM_DEV(0) ... PWM_DEV(3) in RIOT, for example:
 #define PWM1_GPIOS  { GPIO27, GPIO32, GPIO33 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This configuration can be changed by [application-specific configurations]
-(#esp32_application_specific_configurations).
+This configuration can be changed by
+[application-specific configurations](#esp32_application_specific_configurations).
 
 The mapping of the GPIOs as channels of the available channel groups and
 channel group timers is organized by the driver automatically as follows:
@@ -1432,8 +1431,8 @@ The RIOT port for ESP32x SoCs also supports:
 
 Dependent on the ESP32x SoC variant (family), external SPI RAM can be
 connected to the SPI interface that is driven by the SPI1 controller
-(`SPI1_HOST`). For example, all boards that use the [ESP32-WROVER modules]
-(https://www.espressif.com/sites/default/files/documentation/esp32-wrover-e_esp32-wrover-ie_datasheet_en.pdf)
+(`SPI1_HOST`). For example, all boards that use the
+[ESP32-WROVER modules](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-e_esp32-wrover-ie_datasheet_en.pdf)
 have already integrated such SPI RAM. The connected SPI RAM is treated
 as PSRAM (pseudo-static RAM) and is integrated into the heap.
 
@@ -1736,8 +1735,8 @@ is the concatenation of the prefix `RIOT_ESP_` with the MAC address of its
 SoftAP WiFi interface. The driver periodically scans all visible ESP32x nodes.
 
 The following parameters are defined for ESP-NOW nodes. These parameters can
-be overridden by [application-specific board configurations]
-(#esp32_application_specific_board_configuration).
+be overridden by
+[application-specific board configurations](#esp32_application_specific_board_configuration).
 
 <center>
 

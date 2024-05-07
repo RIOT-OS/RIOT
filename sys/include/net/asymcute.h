@@ -288,7 +288,7 @@ struct asymcute_con {
  */
 struct asymcute_topic {
     asymcute_con_t *con;        /**< connection used for registration */
-    char name[CONFIG_ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ACSII only) */
+    char name[CONFIG_ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ASCII only) */
     uint8_t flags;              /**< normal, short, or pre-defined */
     uint16_t id;                /**< topic id */
 };

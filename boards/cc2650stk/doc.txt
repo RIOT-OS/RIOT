@@ -54,8 +54,7 @@ The arm-none-eabi toolchain works fine. You can get it
 
 ## Programming and Debugging
 
-You'll need [debugging hardware]
-(https://processors.wiki.ti.com/index.php?title=CC13xx_CC26xx_Tools_Overview#Debuggers).
+You'll need [debugging hardware](https://processors.wiki.ti.com/index.php?title=CC13xx_CC26xx_Tools_Overview#Debuggers).
 So far, the [XDS110 debug probe](https://www.ti.com/tool/CC-DEVPACK-DEBUG) has
 been tested. That bugger requires you to load a firmware onto it each time it
 powers up. The tool is contained in the Uniflash utility or the `CodeComposer

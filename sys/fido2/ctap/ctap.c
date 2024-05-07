@@ -616,7 +616,7 @@ static int _get_assertion(ctap_req_t *req_raw)
         goto done;
     }
 
-    /* find eligble credentials */
+    /* find eligible credentials */
     _assert_state.count = _find_matching_rks(_assert_state.rks,
                                              CTAP_MAX_EXCLUDE_LIST_SIZE,
                                              req.allow_list,
@@ -693,7 +693,7 @@ static int _get_assertion(ctap_req_t *req_raw)
     memcpy(_assert_state.client_data_hash, req.client_data_hash,
            SHA256_DIGEST_LENGTH);
 
-    /* most recently created eligble rk found */
+    /* most recently created eligible rk found */
     rk = &_assert_state.rks[_assert_state.cred_counter++];
 
     /* last moment where transaction can be cancelled */
@@ -780,7 +780,7 @@ static int _get_next_assertion(void)
         goto done;
     }
 
-    /* next eligble rk */
+    /* next eligible rk */
     rk = &_assert_state.rks[_assert_state.cred_counter];
     _assert_state.cred_counter++;
 

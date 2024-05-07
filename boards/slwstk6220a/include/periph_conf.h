@@ -83,6 +83,7 @@ static const adc_chan_conf_t adc_channel_config[] = {
 static const dac_conf_t dac_config[] = {
     {
         .dev = DAC0,
+        .ref = dacRefVDD,
         .cmu = cmuClock_DAC0,
     }
 };
@@ -91,7 +92,6 @@ static const dac_chan_conf_t dac_channel_config[] = {
     {
         .dev = 0,
         .index = 1,
-        .ref = dacRefVDD,
     }
 };
 

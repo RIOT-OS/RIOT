@@ -79,8 +79,9 @@ extern "C" {
  */
 #define FT5X06_PARAM_I2C_DEV            I2C_DEV(1)              /**< I2C device */
 #define FT5X06_PARAM_INT_PIN            GPIO_PIN(PORT_I, 13)    /**< Interrupt pin */
-#define FT5X06_PARAM_XMAX               (480)                   /**< Max width */
-#define FT5X06_PARAM_YMAX               (272)                   /**< Max height */
+#define FT5X06_PARAM_XMAX               LCD_SCREEN_WIDTH        /**< Max width */
+#define FT5X06_PARAM_YMAX               LCD_SCREEN_HEIGHT       /**< Max height */
+#define FT5X06_PARAM_XYCONV             FT5X06_SWAP_XY          /**< Swap X and Y */
 #define FT5X06_PARAM_TYPE               FT5X06_TYPE_FT5336      /**< Device type */
 /** @} */
 

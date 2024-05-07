@@ -64,7 +64,7 @@ void auto_init_sdp3x(void)
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;
 
-        /* differential presure */
+        /* differential pressure */
         saul_entries[se_ix].dev = &sdp3x_devs[i];
         saul_entries[se_ix].name = sdp3x_saul_info[i].name;
         saul_entries[se_ix].driver = &sdp3x_differential_pressure_saul_driver;

@@ -288,6 +288,98 @@ static void test_ztimer_mock_is_set(void)
     TEST_ASSERT(!ztimer_is_set(z, &alarm2));
 }
 
+static uint32_t calc_target_time(ztimer_mock_t *mock, ztimer_t *t)
+{
+    ztimer_base_t *target = &t->base;
+    ztimer_base_t *head = mock->super.list.next;
+
+    uint32_t timeout = mock->now + mock->target;
+
+    if (target == head) {
+        return timeout;
+    }
+
+    for (ztimer_base_t *i = head->next; i != NULL; i = i->next) {
+        timeout += i->offset;
+        if (i == target) {
+            return timeout;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * Testing that removing timers has no unintended site effects on unrelated
+ * timers (e.g. that offsets are correctly updated).
+ */
+static void test_ztimer_mock_remove(void)
+{
+    ztimer_mock_t zmock;
+    ztimer_clock_t *z = &zmock.super;
+
+    /* Basic sanity test of the mock implementation */
+    ztimer_mock_init(&zmock, 32);
+
+    uint32_t count = 0;
+    const uint32_t offset = 1000;
+    ztimer_t alarms[] = {
+        { .callback = cb_incr, .arg = &count },
+        { .callback = cb_incr, .arg = &count },
+        { .callback = cb_incr, .arg = &count },
+        { .callback = cb_incr, .arg = &count },
+    };
+    uint32_t abs_targets[ARRAY_SIZE(alarms)];
+
+    for (unsigned i = 0; i < ARRAY_SIZE(alarms); i++) {
+        ztimer_set(z, &alarms[i], (i + 1) * offset);
+    }
+
+    /* target of first timer should be `offset` and it should be armed */
+    TEST_ASSERT(zmock.armed);
+    TEST_ASSERT_EQUAL_INT(offset, zmock.target - zmock.now);
+
+    /* relative offset from previous timer to alarm should always  be `offset` */
+    for (unsigned i = 0; i < ARRAY_SIZE(alarms); i++) {
+        TEST_ASSERT_EQUAL_INT(offset, alarms[i].base.offset);
+        abs_targets[i] = zmock.now + (i + 1) * offset;
+    }
+
+    /* check order is correct */
+    for (unsigned i = 0; i < ARRAY_SIZE(alarms) - 1; i++) {
+        TEST_ASSERT(alarms[i].base.next == &alarms[i + 1].base);
+    }
+
+    /* ensure target time for 3rd and 4th timer are correct */
+    TEST_ASSERT_EQUAL_INT(abs_targets[2], calc_target_time(&zmock, &alarms[2]));
+    TEST_ASSERT_EQUAL_INT(abs_targets[3], calc_target_time(&zmock, &alarms[3]));
+
+    /* ensure target times are still correct after 2nd timer is removed */
+    ztimer_remove(z, &alarms[1]);
+    TEST_ASSERT_EQUAL_INT(abs_targets[2], calc_target_time(&zmock, &alarms[2]));
+    TEST_ASSERT_EQUAL_INT(abs_targets[3], calc_target_time(&zmock, &alarms[3]));
+
+    /* ensure target times are still correct after 1st timer fired */
+    ztimer_mock_advance(&zmock, offset);
+    TEST_ASSERT_EQUAL_INT(abs_targets[2], calc_target_time(&zmock, &alarms[2]));
+    TEST_ASSERT_EQUAL_INT(abs_targets[3], calc_target_time(&zmock, &alarms[3]));
+    TEST_ASSERT_EQUAL_INT(1, count);
+
+    /* ensure that removing an already fired time does not break things */
+    ztimer_remove(z, &alarms[0]);
+    TEST_ASSERT_EQUAL_INT(abs_targets[2], calc_target_time(&zmock, &alarms[2]));
+    TEST_ASSERT_EQUAL_INT(abs_targets[3], calc_target_time(&zmock, &alarms[3]));
+    TEST_ASSERT_EQUAL_INT(1, count);
+
+    /* ensure target time of 3rd timer is still correct after 4th timer is removed */
+    ztimer_remove(z, &alarms[3]);
+    TEST_ASSERT_EQUAL_INT(abs_targets[2], calc_target_time(&zmock, &alarms[2]));
+
+    /* ensure remaining timer still fires */
+    ztimer_mock_advance(&zmock, 3 * offset);
+    TEST_ASSERT_EQUAL_INT(2, count);
+}
+
 Test *tests_ztimer_mock_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -298,6 +390,7 @@ Test *tests_ztimer_mock_tests(void)
         new_TestFixture(test_ztimer_mock_set32),
         new_TestFixture(test_ztimer_mock_set16),
         new_TestFixture(test_ztimer_mock_is_set),
+        new_TestFixture(test_ztimer_mock_remove),
     };
 
     EMB_UNIT_TESTCALLER(ztimer_tests, NULL, NULL, fixtures);

@@ -311,7 +311,7 @@ int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 *
 * @ note
 * This function sets the payload width for one packet. If the maximum of 32 bytes is
-* exeeded, this value is set to 32.
+* exceeded, this value is set to 32.
 *
 * @param[in] dev    Transceiver device to use.
 * @param[in] pipe   RX pipe to set the payload width.

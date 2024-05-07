@@ -250,7 +250,7 @@ do_debug() {
                            -port '${GDB_PORT}' \
                            -telnetport '${TELNET_PORT}'" &
     # save PID for terminating the server afterwards
-    DBG_PID=$?
+    DBG_PID=$!
     # connect to the GDB server
     ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
     # clean up

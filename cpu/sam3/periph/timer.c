@@ -111,7 +111,12 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
      * channel 1 toggles this line on each timer tick, the actual frequency
      * driving channel 0 is f_ch2 / 2 --> f_ch0/1 = (MCK / 2) / 2 / freq.
      */
-    dev(tim)->TC_CHANNEL[1].TC_RC = (CLOCK_CORECLOCK / 4) / freq;
+    uint32_t tc_rc = (CLOCK_CORECLOCK / 4) / freq;
+    /* the API expects apps to know in advance which frequencies are possible
+     * and only configure with supported frequencies. So aid debugging with
+     * an assert */
+    assert(tc_rc * freq == CLOCK_CORECLOCK / 4);
+    dev(tim)->TC_CHANNEL[1].TC_RC = tc_rc;
 
     /* start channel 1 */
     dev(tim)->TC_CHANNEL[1].TC_CCR = (TC_CCR_CLKEN | TC_CCR_SWTRG);

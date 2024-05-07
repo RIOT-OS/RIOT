@@ -25,20 +25,36 @@
 #include "stmpe811.h"
 #include "stmpe811_params.h"
 
+#if IS_ACTIVE(STMPE811_POLLING_MODE)
+#include "ztimer.h"
+#endif
+
+#ifndef STMPE811_POLLING_PERIOD
+#define STMPE811_POLLING_PERIOD   50
+#endif
+
+#if !IS_ACTIVE(STMPE811_POLLING_MODE)
 static void _touch_event_cb(void *arg)
 {
     mutex_unlock(arg);
 }
+#endif
 
 int main(void)
 {
+#if !IS_ACTIVE(STMPE811_POLLING_MODE)
     mutex_t lock = MUTEX_INIT_LOCKED;
+#endif
     stmpe811_t dev;
 
     puts("STMPE811 test application\n");
 
     printf("+------------Initializing------------+\n");
+#if IS_ACTIVE(STMPE811_POLLING_MODE)
+    int ret = stmpe811_init(&dev, &stmpe811_params[0], NULL, NULL);
+#else
     int ret = stmpe811_init(&dev, &stmpe811_params[0], _touch_event_cb, &lock);
+#endif
     if (ret != 0) {
         puts("[Error] Initialization failed");
         return 1;
@@ -52,8 +68,13 @@ int main(void)
 
     while (1) {
 
+#if IS_ACTIVE(STMPE811_POLLING_MODE)
+        /* polling is used */
+        ztimer_sleep(ZTIMER_MSEC, STMPE811_POLLING_PERIOD);
+#else
         /* wait for touch event */
         mutex_lock(&lock);
+#endif
 
         stmpe811_read_touch_state(&dev, &current_touch_state);
 

@@ -21,21 +21,43 @@
 #include "unaligned.h"
 #include "checksum/fletcher32.h"
 
-uint32_t fletcher32(const uint16_t *data, size_t words)
+static inline void _reduce(fletcher32_ctx_t *ctx)
 {
-    uint32_t sum1 = 0xffff, sum2 = 0xffff;
+    ctx->sum1 = (ctx->sum1 & 0xffff) + (ctx->sum1 >> 16);
+    ctx->sum2 = (ctx->sum2 & 0xffff) + (ctx->sum2 >> 16);
+}
 
+void fletcher32_init(fletcher32_ctx_t *ctx)
+{
+    ctx->sum1 = 0xffff;
+    ctx->sum2 = 0xffff;
+}
+
+uint32_t fletcher32_finish(fletcher32_ctx_t *ctx)
+{
+    /* Second reduction step to reduce sums to 8 bits */
+    _reduce(ctx);
+    return (ctx->sum2 << 16) | ctx->sum1;
+}
+
+void fletcher32_update(fletcher32_ctx_t *ctx, const void *data, size_t words)
+{
+    const uint16_t *u16_data = (const uint16_t*)data;
     while (words) {
         unsigned tlen = words > 359 ? 359 : words;
         words -= tlen;
         do {
-            sum2 += sum1 += unaligned_get_u16(data++);
+            ctx->sum1 += unaligned_get_u16(u16_data++);
+            ctx->sum2 += ctx->sum1;
         } while (--tlen);
-        sum1 = (sum1 & 0xffff) + (sum1 >> 16);
-        sum2 = (sum2 & 0xffff) + (sum2 >> 16);
+        _reduce(ctx);
     }
-    /* Second reduction step to reduce sums to 16 bits */
-    sum1 = (sum1 & 0xffff) + (sum1 >> 16);
-    sum2 = (sum2 & 0xffff) + (sum2 >> 16);
-    return (sum2 << 16) | sum1;
+}
+
+uint32_t fletcher32(const uint16_t *data, size_t words)
+{
+    fletcher32_ctx_t ctx;
+    fletcher32_init(&ctx);
+    fletcher32_update(&ctx, data, words);
+    return fletcher32_finish(&ctx);
 }

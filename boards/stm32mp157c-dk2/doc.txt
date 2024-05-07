@@ -11,8 +11,7 @@ and no ROM Flash.
 
 ## Hardware
 
-![STM32MP157C-DK2]
-(https://www.st.com/bin/ecommerce/api/image.PF267415.en.feature-description-include-personalized-no-cpn-medium.jpg)
+![STM32MP157C-DK2](https://www.st.com/bin/ecommerce/api/image.PF267415.en.feature-description-include-personalized-no-cpn-medium.jpg)
 
 ### MCU
 

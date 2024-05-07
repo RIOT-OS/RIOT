@@ -33,6 +33,7 @@ config MODULE_CRYPTO_AES_UNROLL
 
 endmenu # Crypto AES options
 
+rsource "psa_riot_cipher/Kconfig"
 rsource "modes/Kconfig"
 
 endif # Crypto

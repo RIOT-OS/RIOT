@@ -82,9 +82,6 @@
  * | R8   | <- lowest address (top of stack)
  * --------
  *
- * TODO: Implement handling of FPU registers for Cortex-M4 CPUs
- *
- *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>

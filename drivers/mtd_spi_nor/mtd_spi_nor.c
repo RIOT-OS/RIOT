@@ -27,12 +27,14 @@
 
 #include "byteorder.h"
 #include "kernel_defines.h"
+#include "macros/math.h"
 #include "macros/utils.h"
 #include "mtd.h"
 #include "mtd_spi_nor.h"
+#include "time_units.h"
 #include "thread.h"
 
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #elif IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
@@ -444,19 +446,25 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     switch (power) {
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->params->opcode->wake);
-            /* No sense in trying multiple times if no xtimer to wait between
-               reads */
-            uint8_t retries = 0;
+
+            /* fall back to polling if no timer is used */
+            unsigned retries = MTD_POWER_UP_WAIT_FOR_ID;
+            if (!IS_USED(MODULE_ZTIMER) && !IS_USED(MODULE_XTIMER)) {
+                retries *= dev->params->wait_chip_wake_up * 1000;
+            }
+
             int res = 0;
             do {
 #if IS_USED(MODULE_ZTIMER_USEC)
                 ztimer_sleep(ZTIMER_USEC, dev->params->wait_chip_wake_up);
+#elif IS_USED(MODULE_ZTIMER_MSEC)
+                ztimer_sleep(ZTIMER_MSEC,
+                             DIV_ROUND_UP(dev->params->wait_chip_wake_up, US_PER_MS));
 #elif IS_USED(MODULE_XTIMER)
                 xtimer_usleep(dev->params->wait_chip_wake_up);
 #endif
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
-                retries++;
-            } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
+            } while (res < 0 && --retries);
             if (res < 0) {
                 mtd_spi_release(dev);
                 return -EIO;

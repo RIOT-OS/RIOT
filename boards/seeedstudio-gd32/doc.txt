@@ -7,8 +7,7 @@
 
 ## Overview
 
-The [Seedstudio GD32 RISC-V Dev Board]
-(https://wiki.seeedstudio.com/SeeedStudio-GD32-RISC-V-Dev-Board/) is a
+The [Seedstudio GD32 RISC-V Dev Board](https://wiki.seeedstudio.com/SeeedStudio-GD32-RISC-V-Dev-Board/) is a
 development board for the GigaDevice GD32VF103VBT6 MCU with the following
 on-board components:
 
@@ -147,11 +146,10 @@ All other pins are either not broken out or have no special usage.
 
 ## Flashing the Device
 
-The board is flashed via a JTAG interface with OpenOCD (at least [release version 0.12.0]
-(https://github.com/openocd-org/openocd/tree/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c)).
+The board is flashed via a JTAG interface with OpenOCD (at least
+[release version 0.12.0](https://github.com/openocd-org/openocd/tree/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c)).
 By default, an FTDI adapter according to the configuration defined in
-[`interface/openocd-usb.cfg`]
-(https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
+[`interface/openocd-usb.cfg`](https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
 is assumed.
 ```
 BOARD=seeedstudio-gd32 make -C examples/hello-world flash

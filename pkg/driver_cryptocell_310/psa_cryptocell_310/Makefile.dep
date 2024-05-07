@@ -1,0 +1,30 @@
+USEMODULE += psa_cryptocell_310
+USEMODULE += psa_cryptocell_310_error_conversion
+
+ifneq (,$(filter psa_cryptocell_310_hashes_sha1,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_hashes_common
+endif
+
+ifneq (,$(filter psa_cryptocell_310_hashes_sha224,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_hashes_common
+endif
+
+ifneq (,$(filter psa_cryptocell_310_hashes_sha256,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_hashes_common
+endif
+
+ifneq (,$(filter psa_cryptocell_310_hashes_sha512,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_hashes_common
+endif
+
+ifneq (,$(filter psa_cryptocell_310_aes_cbc,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_aes_common
+endif
+
+ifneq (,$(filter psa_cryptocell_310_ecc_p192,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_ecc_common
+endif
+
+ifneq (,$(filter psa_cryptocell_310_ecc_p256,$(USEMODULE)))
+  USEMODULE += psa_cryptocell_310_ecc_common
+endif

@@ -36,7 +36,7 @@ jobs:
           - riot: dwm1001
             iotlab:
               archi: dwm1001:dw1000
-              site: lille
+              site: toulouse
           - riot: iotlab-m3
             iotlab:
               archi: m3:at86rf231

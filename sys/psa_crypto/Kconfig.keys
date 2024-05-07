@@ -1,0 +1,55 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "PSA Key Management Configuration"
+
+config PSA_KEY_SIZE_128
+    bool "Application uses key of size 128 Bits"
+    help
+      Indicates that the maximum PSA key size should be at least 128 bits.
+
+config PSA_KEY_SIZE_192
+    bool
+    help
+      Indicates that the maximum PSA key size should be at least 192 bits.
+
+config PSA_KEY_SIZE_256
+    bool
+    help
+      Indicates that the maximum PSA key size should be at least 256 bits.
+
+config PSA_KEY_SIZE_512
+    bool
+    help
+      Indicates that the maximum PSA key size should be at least 512 bits.
+
+config PSA_MAX_KEY_SIZE
+    int
+    default 64 if PSA_KEY_SIZE_512
+    default 32 if PSA_KEY_SIZE_256
+    default 24 if PSA_KEY_SIZE_192
+    default 16 if PSA_KEY_SIZE_128
+    default 0
+    help
+      Indicates the maximum PSA key size in bytes.
+
+config PSA_PROTECTED_KEY_COUNT
+    int "Specifies number of allocated protected key slots"
+    default 5 if MODULE_PSA_SECURE_ELEMENT
+    default 0
+
+config PSA_ASYMMETRIC_KEYPAIR_COUNT
+    int "Specifies number of allocated key pair slots"
+    default 5 if MODULE_PSA_ASYMMETRIC
+    default 0
+
+config PSA_SINGLE_KEY_COUNT
+    int "Specifies number of allocated single key slots"
+    default 5 if PSA_MAX_KEY_SIZE != 0
+    default 0
+
+endmenu # PSA Key Management Configuration

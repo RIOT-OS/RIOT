@@ -66,7 +66,7 @@ been tested with Linux kernel 2.4.20 and 2.6.8, and should work with
 almost any linux system.
 
 You must have the "xterm" program installed.  Nearly all linux
-distrubtions provide this, and it is often installed by default.  If
+distributions provide this, and it is often installed by default.  If
 you do not have it, simply install from your linux distribution.
 
 Your serial port device file (usually /dev/ttyS0 or /dev/ttyS1) must

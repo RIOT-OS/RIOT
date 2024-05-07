@@ -63,13 +63,12 @@ RIOT for ESP8266 boards, see \ref esp8266_riot.
 
 ## WEMOS LOLIN D1 mini {#esp8266_wemos_lolin_d1_mini}
 
-[WEMOS LOLIN D1 mini]
-(https://www.wemos.cc/en/latest/d1/d1_mini.html)
+[WEMOS LOLIN D1 mini](https://www.wemos.cc/en/latest/d1/d1_mini.html)
 is a very interesting board series as it offers a stackable ESP8266 platform.
 This board can be easily extended with a large number of compatible peripheral
 shields, e.g. a micro SD card shield, an IR controller shield, a battery
-shield, and various sensor and actuator shields, see [D1 mini shields]
-(https://docs.wemos.cc/en/latest/d1_mini_shield/index.html) for more
+shield, and various sensor and actuator shields, see
+[D1 mini shields](https://docs.wemos.cc/en/latest/d1_mini_shield/index.html) for more
 information. This makes it possible to create different hardware configurations
 without the need for a soldering iron or a breadboard.
 
@@ -88,8 +87,7 @@ microUSB port with flash / boot / reset logic that makes flashing much
 easier. Their peripherals are equal and work with the default ESP8266 ESP-12x
 board definition.
 
-For more information, see [D1 Boards]
-(https://docs.wemos.cc/en/latest/d1/d1_mini.html).
+For more information, see [D1 Boards](https://docs.wemos.cc/en/latest/d1/d1_mini.html).
 
 <center>
 Board        | MCU       | Flash    | Antenna | Remark

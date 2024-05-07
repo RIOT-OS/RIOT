@@ -1,0 +1,2 @@
+USEMODULE += touch_dev
+USEMODULE += ztimer_msec

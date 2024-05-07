@@ -260,10 +260,6 @@ extern "C"
 #include "event.h"
 #endif /* MODULE_PCF857X_IRQ */
 
-#if !IS_USED(MODULE_PCF8574) && !IS_USED(MODULE_PCF8574A) && !IS_USED(MODULE_PCF8575)
-#error "Please provide a list of pcf857x variants used by the application (pcf8574, pcf8574a or pcf8575)"
-#endif
-
 /**
  * @name    PCF857X I2C slave addresses
  *

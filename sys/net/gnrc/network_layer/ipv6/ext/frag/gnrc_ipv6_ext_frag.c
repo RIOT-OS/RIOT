@@ -711,6 +711,7 @@ static gnrc_pktsnip_t *_completed(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
     /* clist: first element is second element ;-) (from next of head) */
     gnrc_ipv6_ext_frag_limits_t *ptr =
             (gnrc_ipv6_ext_frag_limits_t *)rbuf->limits.next->next;
+    /* ptr should not be NULL at this point so it is safe to dereference with ptr->start here */
     if (rbuf->last && (ptr->start == 0)) {
         gnrc_pktsnip_t *res = NULL;
 

@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief   IPv6 address type and helper functions definitions
+ * @brief   IPv4 address type and helper functions definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -121,7 +121,7 @@ ipv4_addr_t *ipv4_addr_from_buf(ipv4_addr_t *result, const char *addr,
 /**
  * @brief Print IPv4 address to stdout
  *
- * @param[in]   addr  Pointer to ipv6_addr_t to print
+ * @param[in]   addr  Pointer to ipv4_addr_t to print
  */
 void ipv4_addr_print(const ipv4_addr_t *addr);
 

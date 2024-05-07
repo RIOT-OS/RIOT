@@ -13,7 +13,7 @@ is identical.
 
 As a result, the main features available on this board are shared with the ones
 provided by the STM32F746G-DISCO:
-- a 4"3 RGB 480×272 color LCD-TFT with capacitive touch screen,
+- a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
 - an ethernet port
 - 2 user USB ports (FS and HS)
 - 2 user digital microphones

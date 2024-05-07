@@ -30,8 +30,9 @@ rsource "dsp0401/Kconfig"
 rsource "hd44780/Kconfig"
 rsource "ili9341/Kconfig"
 rsource "lcd/Kconfig"
-rsource "st7735/Kconfig"
+rsource "st77xx/Kconfig"
 rsource "touch_dev/Kconfig"
+rsource "touch_dev_gestures/Kconfig"
 endmenu # Display Device Drivers
 
 menu "Miscellaneous Device Drivers"
@@ -161,6 +162,7 @@ rsource "mtd_sdcard/Kconfig"
 rsource "nvram/Kconfig"
 rsource "nvram_spi/Kconfig"
 rsource "sdcard_spi/Kconfig"
+rsource "sdmmc/Kconfig"
 endmenu # Storage Device Drivers
 
 endmenu # Drivers

@@ -287,7 +287,7 @@ typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_t len, int more);
 
 /**
- * @brief   Coap equest callback descriptor
+ * @brief   Coap request callback descriptor
  *
  * @param[in] arg      Pointer to be passed as arguments to the callback
  * @param[in] pkt      The received CoAP response.

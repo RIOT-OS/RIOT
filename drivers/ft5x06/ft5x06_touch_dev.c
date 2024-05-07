@@ -37,7 +37,7 @@ uint16_t _ft5x06_height(const touch_dev_t *touch_dev)
     const ft5x06_t *dev = (const ft5x06_t *)touch_dev;
     assert(dev);
 
-    return dev->params.ymax;
+    return dev->params->ymax;
 }
 
 uint16_t _ft5x06_width(const touch_dev_t *touch_dev)
@@ -45,7 +45,7 @@ uint16_t _ft5x06_width(const touch_dev_t *touch_dev)
     const ft5x06_t *dev = (const ft5x06_t *)touch_dev;
     assert(dev);
 
-    return dev->params.xmax;
+    return dev->params->xmax;
 }
 
 uint8_t _ft5x06_touches(const touch_dev_t *touch_dev, touch_t *touches, size_t len)
@@ -69,8 +69,8 @@ void _ft5x06_set_event_callback(const touch_dev_t *touch_dev, touch_event_cb_t c
     ft5x06_t *dev = (ft5x06_t *)touch_dev;
     assert(dev);
 
-    if (gpio_is_valid(dev->params.int_pin)) {
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, cb, arg);
+    if (gpio_is_valid(dev->params->int_pin)) {
+        gpio_init_int(dev->params->int_pin, GPIO_IN, GPIO_RISING, cb, arg);
     }
 }
 

@@ -198,7 +198,7 @@ static unsigned _get_lun(usbus_msc_device_t *msc)
 
     /* Count only registered MTD devices as USB LUN, (using usbus_msc_add_lun)
      * not every MTD devices available on board */
-    for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+    for (unsigned i = 0; i < MTD_NUMOF; i++) {
         if (msc->lun_dev[i].mtd != NULL) {
             count++;
         }
@@ -217,14 +217,14 @@ int usbus_msc_add_lun(usbus_t *usbus, mtd_dev_t *dev)
     }
 
     /* Check if MTD isn't already registered */
-    for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+    for (unsigned i = 0; i < MTD_NUMOF; i++) {
         if (dev == msc->lun_dev[i].mtd) {
             return -EBUSY;
         }
     }
     /* Store new MTD device in first slot available
        Also re alloc internal buffer if needed */
-    for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+    for (unsigned i = 0; i < MTD_NUMOF; i++) {
         if (msc->lun_dev[i].mtd == NULL) {
             int ret = mtd_init(dev);
             if (ret != 0) {
@@ -283,7 +283,7 @@ int usbus_msc_remove_lun(usbus_t *usbus, mtd_dev_t *dev)
     usbus_msc_device_t *msc = _get_msc_handler(usbus);
 
     /* Identify the LUN to unexport */
-    for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+    for (unsigned i = 0; i < MTD_NUMOF; i++) {
         if (dev == msc->lun_dev[i].mtd) {
             /* Wait for any pending transaction to end */
 
@@ -329,7 +329,11 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     msc->block = 0;
     msc->state = WAITING;
 
-    for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+    /* allocate the array holding exported logical unit descriptors */
+    msc->lun_dev = malloc(sizeof(usbus_msc_lun_t) * MTD_NUMOF);
+    assert(msc->lun_dev);
+
+    for (unsigned i = 0; i < MTD_NUMOF; i++) {
         msc->lun_dev[i].mtd = NULL;
         msc->lun_dev[i].block_size = 0;
         msc->lun_dev[i].block_nb = 0;
@@ -369,7 +373,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
 
     /* Auto-configure all MTD devices */
     if (CONFIG_USBUS_MSC_AUTO_MTD) {
-        for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+        for (unsigned i = 0; i < MTD_NUMOF; i++) {
             usbus_msc_add_lun(usbus, mtd_default_get_dev(i));
         }
     }

@@ -35,7 +35,7 @@
  * The RIOT port of MicroPython currently resides in a fork at
  * https://github.com/kaspar030/micropython (in branch add_riot_port). It is
  * based on Micropython's "ports/minimal" with some extra modules enabled.
- * It re-uses the gc_collect code from ports/unix, which has special support
+ * It reuses the gc_collect code from ports/unix, which has special support
  * for i386 and Cortex-M. On other platforms, it uses setjmp() to collect
  * registers.
  *

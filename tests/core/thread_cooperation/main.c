@@ -29,13 +29,13 @@
 #define PROBLEM 12
 #endif
 
-mutex_t mtx = MUTEX_INIT;
-volatile uint32_t storage = 1;
-char stacks[PROBLEM][THREAD_STACKSIZE_DEFAULT];
+static mutex_t mtx = MUTEX_INIT;
+static uint32_t storage = 1;
+static char stacks[PROBLEM][THREAD_STACKSIZE_DEFAULT];
 
-void *run(void *arg)
+static void *run(void *arg)
 {
-    (void) arg;
+    (void)arg;
 
     msg_t m, final;
     kernel_pid_t me = thread_getpid();
@@ -45,6 +45,12 @@ void *run(void *arg)
     msg_receive(&m);
     printf("T-%02d: got arg %" PRIu32 "\n", me, m.content.value);
 
+    /* Accessing shared variable `storage` requires a critical section to avoid
+     * data races. The mutex provides this and `mutex_lock()`/`mutex_unlock()`
+     * are an implicit memory barrier that will ensure that `storage` is read
+     * indeed from memory and the new value is written back to memory within
+     * the critical section. The use of `volatile` is, hence, not needed here
+     * (and in fact incorrect). */
     mutex_lock(&mtx);
     storage *= m.content.value;
     mutex_unlock(&mtx);
@@ -71,9 +77,9 @@ int main(void)
         factorial *= arg;
         printf("MAIN: create thread, arg: %d\n", arg);
         ths = thread_create(stacks[i], sizeof(stacks[i]),
-                               THREAD_PRIORITY_MAIN - 1,
-                               THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                               run, NULL, "thread");
+                            THREAD_PRIORITY_MAIN - 1,
+                            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                            run, NULL, "thread");
 
         if (ths < 0)  {
             puts("[ERROR]");

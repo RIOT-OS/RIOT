@@ -102,7 +102,6 @@ extern "C" {
  */
 extern mtd_dev_t *mtd0;
 #define MTD_0       mtd0
-#define MTD_NUMOF   1
 
 #define BOARD_QSPI_PIN_CS       GPIO_PIN(0, 18)     /**< SPI Flash Chip Select */
 #define BOARD_QSPI_PIN_WP       GPIO_PIN(0, 15)     /**< SPI Flash Write Protect */

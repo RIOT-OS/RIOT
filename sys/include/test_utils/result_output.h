@@ -68,7 +68,7 @@ extern "C" {
 /**
  * @brief   Type for a TURO object
  *
- * @note    API implementors: `struct turo` needs to be defined by
+ * @note    API implementers: `struct turo` needs to be defined by
  *         implementation-specific `result_output_types.h`.
  */
 typedef struct turo turo_t;

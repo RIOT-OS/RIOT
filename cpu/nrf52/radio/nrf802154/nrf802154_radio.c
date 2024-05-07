@@ -566,7 +566,7 @@ void isr_radio(void)
         case STATE_ACK:
             _state = STATE_IDLE;
 
-            /* We disable the radio to avoid unwanted emmissions (see ERRATA
+            /* We disable the radio to avoid unwanted emissions (see ERRATA
              * ID 204, "Switching between TX and RX causes unwanted emissions")
              */
             _disable();

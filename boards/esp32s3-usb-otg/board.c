@@ -20,7 +20,7 @@
 
 void board_init(void)
 {
-#if MODULE_ST7735
+#if MODULE_ST77XX
     gpio_init(LCD_BACKLIGHT, GPIO_OUT);
 #endif
 }

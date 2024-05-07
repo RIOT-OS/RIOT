@@ -26,9 +26,9 @@
 ## Overview {#esp32c3_wemos_mini_overview}
 
 The Wemos ESP32-C3 mini board is an interesting development kit as it uses
-in the stackable Wemos LOLIN D1 Mini format. Thus, all [shields for Wemos D1 mini]
-(https://docs.wemos.cc/en/latest/d1_mini_shield/index.html) for ESP8266
-can also be used with ESP32-C3. Examples for such shields are:
+in the stackable Wemos LOLIN D1 Mini format. Thus, all
+[shields for Wemos D1 mini](https://docs.wemos.cc/en/latest/d1_mini_shield/index.html)
+for ESP8266 can also be used with ESP32-C3. Examples for such shields are:
 
 - Micro SD-Card Shield
 - MRF24J40 IEEE 802.15.4 radio Shield
@@ -45,7 +45,7 @@ the need for a soldering iron or a breadboard.
 This stackable platform was tested in an RIOT application with:
 
 - MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)
-- [BMP180 Pressure Sensor Shield]
+- [BMP180 Pressure Sensor Shield](http://www.esp8266learning.com/wemos-mini-bmp180-shield.php)
 
 This application is a good example how easy it is with this board to create
 different hardware applications.

@@ -21,7 +21,7 @@
 
 void board_init(void)
 {
-    if (IS_USED(MODULE_ST7735)) {
+    if (IS_USED(MODULE_ST77XX)) {
         gpio_init(BACKLIGHT_PIN, GPIO_OUT);
     }
 }

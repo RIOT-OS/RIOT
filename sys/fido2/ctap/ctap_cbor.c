@@ -1557,7 +1557,7 @@ static int _parse_options(CborValue *it, ctap_options_t *options)
         }
         else {
             /* ignore unknown options */
-            DEBUG("Ctap parse options, unknown uption: %s \n", key);
+            DEBUG("Ctap parse options, unknown option: %s \n", key);
         }
 
         cbor_value_advance(&map);

@@ -107,6 +107,18 @@ void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout);
  */
 void event_timeout_clear(event_timeout_t *event_timeout);
 
+/**
+ * @brief   Check if a timeout event is scheduled to be executed in the future
+ *
+ * @param[in]   event_timeout   event_timout context object to use
+ * @return      true if the event is scheduled, false otherwise
+ */
+static inline bool event_timeout_is_pending(const event_timeout_t *event_timeout)
+{
+    return ztimer_is_set(event_timeout->clock, &event_timeout->timer)
+        || event_is_queued(event_timeout->queue, event_timeout->event);
+}
+
 #ifdef __cplusplus
 }
 #endif

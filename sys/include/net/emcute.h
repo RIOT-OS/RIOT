@@ -214,7 +214,7 @@ enum {
  * @brief   MQTT-SN topic
  */
 typedef struct {
-    const char *name;           /**< topic string (currently ACSII only) */
+    const char *name;           /**< topic string (currently ASCII only) */
     uint16_t id;                /**< topic id, as assigned by the gateway */
 } emcute_topic_t;
 

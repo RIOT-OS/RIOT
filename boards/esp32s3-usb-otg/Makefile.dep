@@ -26,7 +26,3 @@ endif
 ifneq (,$(filter disp_dev,$(USEMODULE)))
   USEMODULE += st7789
 endif
-
-ifneq (,$(filter st7735,$(USEMODULE)))
-  USEMODULE += st7789
-endif

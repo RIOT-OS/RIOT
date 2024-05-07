@@ -18,8 +18,7 @@ While the pca10000 contains an on-board J-Link debugger, the pca10005 boards
 have to be flashed/debugged using the (included) external J-Link device.
 
 ## Hardware:
-![Nordic Semiconductor nrF51822 Development Kit]
-(https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF51-Series/nRF51-Dongle-promo.png)
+![Nordic Semiconductor nrF51822 Development Kit](https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF51-Series/nRF51-Dongle-promo.png)
 
 | MCU               | NRF51822QFAA                                                                  |
 |:----------------- |:----------------------------------------------------------------------------- |

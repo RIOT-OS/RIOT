@@ -54,6 +54,10 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
+  USEMODULE += lcd_fmc
+endif
+
 ifneq (,$(filter periph_can,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq

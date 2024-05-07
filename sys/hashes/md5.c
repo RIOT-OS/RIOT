@@ -142,7 +142,7 @@ static void permute(uint32_t abcd[4], const uint8_t block[64] )
     uint32_t keep_abcd[4];
     uint32_t x[16];
 
-    /* Store the current ABCD values for later re-use */
+    /* Store the current ABCD values for later reuse */
     for (int i = 0; i < 4; i++) {
         keep_abcd[i] = abcd[i];
     }

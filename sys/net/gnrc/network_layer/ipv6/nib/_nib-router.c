@@ -86,18 +86,18 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
 
 void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
 {
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
-    _nib_abr_entry_t *abr = NULL;
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) && gnrc_netif_is_6lr(netif)) {
+        _nib_abr_entry_t *abr = NULL;
 
-    DEBUG("nib: Send router advertisements for each border router:\n");
-    while ((abr = _nib_abr_iter(abr))) {
-        DEBUG("    - %s\n", ipv6_addr_to_str(addr_str, &abr->addr,
-                                             sizeof(addr_str)));
-        _snd_ra(netif, dst, final, abr);
+        DEBUG("nib: Send router advertisements for each border router:\n");
+        while ((abr = _nib_abr_iter(abr))) {
+            DEBUG("    - %s\n", ipv6_addr_to_str(addr_str, &abr->addr,
+                                                 sizeof(addr_str)));
+            _snd_ra(netif, dst, final, abr);
+        }
+    } else {
+        _snd_ra(netif, dst, final, NULL);
     }
-#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
-    _snd_ra(netif, dst, final, NULL);
-#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 }
 
 static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,

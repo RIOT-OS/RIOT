@@ -103,8 +103,8 @@ with `EFM32_USE_LEUART=1`.
 
 ### Clock selection
 There are several clock sources that are available for the different
-peripherals. You are advised to read [AN0004.1]
-(https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
+peripherals. You are advised to read
+[AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |

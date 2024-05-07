@@ -75,7 +75,7 @@ class StatelessDHCPv6Test(Automaton):
         """
             The initial state.
 
-            The Automaton waits for an NDP Router Solication.
+            The Automaton waits for an NDP Router Solicitation.
         """
         pass
 

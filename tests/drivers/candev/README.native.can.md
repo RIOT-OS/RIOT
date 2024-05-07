@@ -134,7 +134,7 @@ CFLAGS=-DCAN_DLL_NUMOF=2 BOARD=native PERIPH_CAN_FLAGS="--can 0:vcan1 --can 1:vc
 
 To send or receive bytes from the interface `can-utils` can be used:
 
-- send raw CAN frames: by using `cansend` or altenatively `cangen` to send random can messages:
+- send raw CAN frames: by using `cansend` or alternatively `cangen` to send random can messages:
 
 ```shell
 $ cansend <interface> <can_id>:<hexbytes>

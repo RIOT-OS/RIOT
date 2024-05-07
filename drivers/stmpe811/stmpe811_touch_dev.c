@@ -61,11 +61,8 @@ uint8_t _stmpe811_touches(const touch_dev_t *touch_dev, touch_t *touches, size_t
     if (ret && touches != NULL) {
         stmpe811_touch_position_t pos;
         stmpe811_read_touch_position(dev, &pos);
-        /* STMPE811 driver returns the position with origin at the bottom left
-        corner and portrait orientation, so convert them to use top left corner
-        as origin and landscape orientation. */
-        touches[0].x = pos.y;
-        touches[0].y = dev->params.xmax - pos.x;
+        touches[0].x = pos.x;
+        touches[0].y = pos.y;
 
         DEBUG("X: %i, Y: %i\n", touches[0].x, touches[0].y);
     }

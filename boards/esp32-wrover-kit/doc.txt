@@ -286,8 +286,7 @@ for ESP32 boards, see \ref esp32_riot.
 Since the USB bridge based on FDI FT2232HL provides a JTAG interface for
 debugging through an USB interface, using ESP-WROVER-Kit V3 is the easiest
 and most convenient way for On-Chip debugging. Please refer the
-[ESP-IDF Programming Guide]
-(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
+[ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
 for details on how to setup and how to use ESP-WROVER-Kit V3 and OpenOCD.
 
 To use the JTAG interface, the `esp_jtag` module has to be enabled for
@@ -298,8 +297,8 @@ USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
 
 To flash and debug using OpenOCD, the precompiled version of OpenOCD for
 ESP32 has to be installed using the install script while being in RIOT's
-root directory, see also section [Using Local Toolchain Installation]
-(#esp32_local_toolchain_installation).
+root directory, see also section
+[Using Local Toolchain Installation](#esp32_local_toolchain_installation).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 dist/tools/esptool/install.sh openocd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -333,7 +332,6 @@ method for flashing with `esptool.py` can still be used. In that case, the
 ## Other Documentation Resources  {#esp32_wrover_kit_other-resources}
 
 There is a comprehensive
-[Getting Started Guide]
-(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)
+[Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)
 for the ESP-WROVER-KIT with a lot information about hardware configuration.
  */

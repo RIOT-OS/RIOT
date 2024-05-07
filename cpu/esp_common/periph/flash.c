@@ -57,11 +57,11 @@
 #define ESP_PART_ENTRY_SIZE         0x20
 #define ESP_PART_ENTRY_MAGIC        ESP_PARTITION_MAGIC
 
-/* the external pointer to the system MTD device */
-mtd_dev_t* mtd0 = 0;
-
 static mtd_dev_t  _flash_dev;
 static mtd_desc_t _flash_driver;
+
+/* the external pointer to the system MTD device */
+MTD_XFA_ADD(_flash_dev, 0);
 
 #ifdef MODULE_VFS_DEFAULT
 #include "vfs_default.h"
@@ -204,8 +204,6 @@ void spi_flash_drive_init(void)
 
     _flash_dev.driver = &_flash_driver;
     _flash_dev.sector_count = _flash_size / _flashchip->sector_size;
-
-    mtd0 = &_flash_dev;
 
     _flash_dev.pages_per_sector = _flashchip->sector_size / _flashchip->page_size;
     _flash_dev.page_size = _flashchip->page_size;

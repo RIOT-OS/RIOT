@@ -599,7 +599,7 @@ enum {
 /**
  * @brief   Type for a DTLS sock object
  *
- * @note    API implementors: `struct sock_dtls` needs to be defined by
+ * @note    API implementers: `struct sock_dtls` needs to be defined by
  *          an implementation-specific `sock_dtls_types.h`.
  */
 typedef struct sock_dtls sock_dtls_t;

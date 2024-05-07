@@ -333,6 +333,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
+    if (gpio_config[exti].cb) {
+        DEBUG("gpio: Warning - interrupt line %u already in use\n", exti);
+    }
+
     /* save callback */
     gpio_config[exti].cb = cb;
     gpio_config[exti].arg = arg;

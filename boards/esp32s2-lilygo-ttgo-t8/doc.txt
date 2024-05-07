@@ -125,8 +125,7 @@ definition.
 
 @image html https://ae01.alicdn.com/kf/H4a77f8684c144384a165d7a89476c602q.jpg "LILYGO TTGO T8 ESP32-S2 Pinout" width=900px
 
-The corresponding board schematics can be found [here]
-(https://github.com/Xinyuan-LilyGO/LilyGo-T-Display-S2/raw/master/schematic/ESP32_S2-Display.pdf)
+The corresponding board schematics can be found [here](https://github.com/Xinyuan-LilyGO/LilyGo-T-Display-S2/raw/master/schematic/ESP32_S2-Display.pdf)
 
 [Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
 

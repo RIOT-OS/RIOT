@@ -109,7 +109,7 @@ void test_fips(void);
 void test_entropy(uint32_t samples);
 
 /**
- * @brief   Run the speed test for a given duration. It utillizes xtimer for
+ * @brief   Run the speed test for a given duration. It utilizes xtimer for
  *          setting an alarm.
  *
  * @param[in] duration  Test duration (in seconds)
@@ -118,7 +118,7 @@ void test_speed(uint32_t duration);
 
 /**
  * @brief   Run the speed test for random numbers r with a <= r < b and a given duration.
- *          It utillizes xtimer for setting an alarm.
+ *          It utilizes xtimer for setting an alarm.
  *
  * @param[in] duration  Test duration (in seconds)
  * @param[in] a         Minimum for random number

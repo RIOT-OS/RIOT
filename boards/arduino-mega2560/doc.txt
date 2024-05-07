@@ -72,8 +72,7 @@ to overwrite the bootloader on the MCU. Because of that it is a necessity to use
 an ISP (in system programmer) to do the debugging. This isn't an issue because
 all of the afore mentioned devices have ISP capabilities, but it requires some
 additional steps to get back normal operation after debugging:
- * flash a new arduino bootloader on the device, e.g. [this one]
-(https://raw.githubusercontent.com/arduino/Arduino-stk500v2-bootloader/master/goodHexFiles/stk500boot_v2_mega2560.hex)
+ * flash a new arduino bootloader on the device, e.g. [this one](https://raw.githubusercontent.com/arduino/Arduino-stk500v2-bootloader/master/goodHexFiles/stk500boot_v2_mega2560.hex)
  * restore the fuses to the default state.
 
 

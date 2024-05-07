@@ -144,7 +144,7 @@ int congure_test_call_setup(int argc, char **argv);
  * @param[in] argc  Number of @p argv. Needs to be at least 2.
  * @param[in] argv  Command line arguments. `argv[0]` needs to be the command
  *                  name and `argv[1]` needs to be a hexadecimal integer of
- *                  format 0xXXXX, represending a pointer to the object used as
+ *                  format 0xXXXX, representing a pointer to the object used as
  *                  the `ctx` parameter for `init()`.
  *
  * This function will generate the following JSON objects in STDOUT on error:

@@ -281,7 +281,7 @@ int bme680_force_measurement(bme680_t *dev);
  *
  * @param[in,out]   dev     device descriptor of the sensor
  *
- * @return  duration of one THPG measurement cylce in milliseconds.
+ * @return  duration of one THPG measurement cycle in milliseconds.
  * @return  < 0 on error
  */
 int bme680_get_duration(bme680_t* dev);

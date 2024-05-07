@@ -85,6 +85,20 @@ static void test_checksum_fletcher32_wrap_around(void)
                                           sizeof(wrap_around_data) - 1, expect));
 }
 
+static void test_checksum_fletcher32_wrap_around_piecewise(void)
+{
+    /* XXX: not verified with external implementation yet */
+    uint32_t expect = 0x5bac8c3d;
+    fletcher32_ctx_t ctx;
+    fletcher32_init(&ctx);
+    size_t full_len = sizeof(wrap_around_data) - 1;
+    size_t initial_len = full_len / 2;
+    fletcher32_update(&ctx, wrap_around_data, initial_len / 2);
+    fletcher32_update(&ctx, (wrap_around_data + initial_len), (full_len - initial_len) / 2);
+    uint32_t result = fletcher32_finish(&ctx);
+    TEST_ASSERT_EQUAL_INT(result, expect);
+}
+
 Test *tests_checksum_fletcher32_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -92,6 +106,7 @@ Test *tests_checksum_fletcher32_tests(void)
         new_TestFixture(test_checksum_fletcher32_0to1_undetected),
         new_TestFixture(test_checksum_fletcher32_atof),
         new_TestFixture(test_checksum_fletcher32_wrap_around),
+        new_TestFixture(test_checksum_fletcher32_wrap_around_piecewise),
     };
 
     EMB_UNIT_TESTCALLER(checksum_fletcher32_tests, NULL, NULL, fixtures);

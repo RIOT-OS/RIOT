@@ -289,7 +289,7 @@ extern "C" {
 /**
  * @brief   Type for a raw IPv4/IPv6 sock object
  *
- * @note API implementors: `struct sock_ip` needs to be defined by
+ * @note API implementers: `struct sock_ip` needs to be defined by
  *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_ip sock_ip_t;

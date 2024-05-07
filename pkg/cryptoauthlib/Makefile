@@ -10,7 +10,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 CMAKE_MINIMAL_VERSION = 3.6.0
 
-CFLAGS += $(INCLUDES)
+CFLAGS += $(INCLUDES) # for some reason this is needed by llvm, but not for gcc
 CFLAGS += -DATCA_HAL_I2C
 CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-char-subscripts

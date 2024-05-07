@@ -3,8 +3,7 @@
 @ingroup     boards
 @brief       Support for Eistec Mulle IoT boards
 
-![Mulle]
-(https://web.archive.org/web/20161213064400im_/http://eistec.github.io/images/mulle-small.jpg)
+![Mulle](https://web.archive.org/web/20161213064400im_/http://eistec.github.io/images/mulle-small.jpg)
 
 The Mulle is a miniature wireless Embedded Internet System suitable for
 wireless sensors connected to the Internet of Things, and designed for rapid

@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 #ifdef SOCK_HAS_IPV6
-/* Re-use sock endpoint if sock is available and supporting IPv6. */
+/* Reuse sock endpoint if sock is available and supporting IPv6. */
 typedef struct _sock_tl_ep gnrc_tcp_ep_t;
 
 #else

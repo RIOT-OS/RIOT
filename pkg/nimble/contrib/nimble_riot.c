@@ -142,7 +142,7 @@ void nimble_riot_init(void)
     while (!ble_hs_synced()) {}
 
     /* for reducing code duplication, we read our own address type once here
-     * so it can be re-used later on */
+     * so it can be reused later on */
     res = ble_hs_util_ensure_addr(0);
     assert(res == 0);
     res = ble_hs_id_infer_auto(0, &nimble_riot_own_addr_type);

@@ -32,7 +32,7 @@ mtd_native_dev_t mtd0_dev = {
     .fname = MTD_NATIVE_FILENAME,
 };
 
-mtd_dev_t *mtd0 = &mtd0_dev.base;
+MTD_XFA_ADD(mtd0_dev.base, 0);
 #endif
 
 #ifdef MODULE_VFS_DEFAULT

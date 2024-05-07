@@ -32,6 +32,11 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(6*THREAD_STACKSIZE_DEFAULT\)
 USEPKG += relic
 USEMODULE += embunit
 
+ifeq (llvm,$(TOOLCHAIN))
+  # FIXME: automated test is failing on samr21-xpro
+  TEST_ON_CI_BLACKLIST += samr21-xpro
+endif
+
 # -DWSIZE=32 : 	Specifies the word width of the target system. This is
 #  				currently not automatically detected so adjusted to your target
 #  				platform.

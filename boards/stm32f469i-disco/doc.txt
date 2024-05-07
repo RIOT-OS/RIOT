@@ -38,6 +38,7 @@ The MCU presents a large list of peripherals available, but specifically this de
 | USBs              | 1 Full Speed            |
 | Ethernet MAC      | Yes                     |
 | RNG               | Yes                     |
+| SDRAM             | Yes (16 MByte)          |
 | Vcc               | 1.7V - 3.6V             |
 | Datasheet         | [MCU Datasheet](https://www.st.com/resource/en/datasheet/stm32f469ae.pdf) (pdf) |
 | Reference Manual  | [Dev-Kit Reference Manual](https://www.st.com/resource/en/user_manual/um1932-discovery-kit-with-stm32f469ni-mcu-stmicroelectronics.pdf) (pdf)|

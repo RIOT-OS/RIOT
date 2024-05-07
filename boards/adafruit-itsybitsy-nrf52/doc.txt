@@ -5,7 +5,7 @@
 
 ### General information
 
-This is a small formfactor (only 1.4" long by 0.7" wide) nRF52840 board made by Adafruit.
+This is a small formfactor (only 1.4\" long by 0.7\" wide) nRF52840 board made by Adafruit.
 
 The board features one red LED (LD1), one DotStar / APA102 RGB LED, a user (SW1), a
 reset button as well as 21 configurable external pins(6 of which can be analog in).

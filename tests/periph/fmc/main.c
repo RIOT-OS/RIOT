@@ -94,7 +94,6 @@ int main(void)
     }
     puts("------------------------------------------------------------------------");
 
-
     printf("fill complete memory of %lu kByte, a . represents a 16 kByte block\n",
            fmc_bank_config[FMC_BANK].size >> 10);
 

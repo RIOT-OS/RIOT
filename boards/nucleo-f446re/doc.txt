@@ -10,8 +10,7 @@ STM32F446RE microcontroller with 128KiB of RAM and 512KiB of Flash.
 
 ## Hardware
 
-![Nucleo64 F446RE]
-(http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F446RE](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 ## Pinout
 

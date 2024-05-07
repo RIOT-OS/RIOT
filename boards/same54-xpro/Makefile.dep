@@ -10,7 +10,11 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi_on_qspi
   USEMODULE += mtd_spi_nor
   USEMODULE += mtd_at24cxxx at24mac
-  USEMODULE += sam0_sdhc
+  ifeq (,$(filter sam0_sdhc,$(USEMODULE)))
+    # during a transition period it is possible to use the `sam0_sdhc` MTD
+    # driver instead of the SD/MMC MTD driver
+    USEMODULE += mtd_sdmmc_default
+  endif
 endif
 
 # enables sam0_eth as default network device

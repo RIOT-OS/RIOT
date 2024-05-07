@@ -212,8 +212,8 @@ ifneq (,$(filter stmpe811_%,$(USEMODULE)))
   USEMODULE += stmpe811
 endif
 
-ifneq (,$(filter st7789,$(USEMODULE)))
-  USEMODULE += st7735
+ifneq (,$(filter st77%,$(USEMODULE)))
+  USEMODULE += st77xx
 endif
 
 ifneq (,$(filter sx126%,$(USEMODULE)))

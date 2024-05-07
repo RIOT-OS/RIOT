@@ -29,6 +29,11 @@ extern "C" {
 #include <stdbool.h>
 
 /**
+ * @brief   Invalid touch value
+ */
+#define TOUCH_DEV_VALUE_INVALID         ((touch_t){ UINT16_MAX, UINT16_MAX })
+
+/**
  * @brief   Forward declaration for touch device struct
  */
 typedef struct touch_dev touch_dev_t;
@@ -70,6 +75,18 @@ typedef struct {
      * @return              Width in points
      */
     uint16_t (*width)(const touch_dev_t *dev);
+
+    /**
+     * @brief   Get the maximum number of touches the touch device supports
+     *
+     * This function pointer can be NULL. In this case, the maximum number of
+     * touches is assumed to be 1.
+     *
+     * @param[in] dev       Pointer to the touch device
+     *
+     * @return              number of touches
+     */
+    uint8_t (*max_numof)(const touch_dev_t *dev);
 
     /**
      * @brief   Get the current touches on the touch device
@@ -151,6 +168,19 @@ uint16_t touch_dev_height(const touch_dev_t *dev);
  * @return              Width in points
  */
 uint16_t touch_dev_width(const touch_dev_t *dev);
+
+/**
+ * @brief   Get the maximum number of touches the touch device supports
+ *
+ * @param[in] dev       Pointer to the touch device
+ *
+ * @return              number of touches
+ */
+static inline uint8_t touch_dev_max_numof(const touch_dev_t *dev)
+{
+    assert(dev);
+    return (dev->driver->max_numof) ? dev->driver->max_numof(dev) : 1;
+}
 
 /**
  * @brief   Get the current touches on the touch device

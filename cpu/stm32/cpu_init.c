@@ -219,7 +219,7 @@ static inline uint32_t _multi_read_reg32(volatile uint32_t *addr, bool *glitch)
  * Think of this as a STM32-specific version of the Rowhammer attack.
  *
  * RDP may not be set correctly due to manufacturing error, glitch or
- * intentional attack.  It's done thrice to reduce the probablility of a
+ * intentional attack.  It's done thrice to reduce the probability of a
  * glitch attack succeeding amongst all of the multireads desgned to make it
  * tougher.
  *

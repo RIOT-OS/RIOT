@@ -10,6 +10,10 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   USEMODULE += periph_spi_gpio_mode
 endif
 
+ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
+  USEMODULE += sdmmc_sdhc
+endif
+
 # include sam0 common periph drivers
 USEMODULE += sam0_common_periph
 

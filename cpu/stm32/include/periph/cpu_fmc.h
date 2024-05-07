@@ -65,6 +65,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Gives the configuration of n-th bank
+ *
+ * This macro gives a pointer to the n-th entry of type @ref fmc_bank_conf_t of
+ * the banks configured by the board in the @ref fmc_bank_config array. n is in
+ * the range 0 ... @ref FMC_BANK_NUMOF - 1.
+ */
+#ifndef FMC_BANK_CONFIG
+#define FMC_BANK_CONFIG(n)  (&fmc_bank_config[n])
+#endif
+
+/**
  * @brief   Number of data pins used
  *
  * The number of configured data pins depends on the memory with the maximum
@@ -257,8 +268,7 @@ typedef struct {
  *
  * The GPIOs are defined depending on used memory type according to the
  * FMC pin definition in Table 12 of section 4 in the
- * [Datasheet for STM32F765xx, STM32F767xx, STM32F768Ax, STM32F769xx]
- * (https://www.st.com/resource/en/datasheet/stm32f767zi.pdf).
+ * [Datasheet for STM32F765xx, STM32F767xx, STM32F768Ax, STM32F769xx](https://www.st.com/resource/en/datasheet/stm32f767zi.pdf).
  * Which memory types are used is defined by the pseudomodules
  * `periph_fmc_nor_sram`, `periph_fmc_nand` and `periph_fmc_sdram`
  *

@@ -480,7 +480,7 @@ static int read_frame(can_t *dev, struct can_frame *frame, int mailbox)
         frame->data[j] = (can->sFIFOMailBox[mailbox].RDHR >> ((j - 4) * 8)) & 0xFF;
     }
 
-    /* filter number matching the reveived frame */
+    /* filter number matching the received frame */
     /* filter = (can->sFIFOMailBox[mailbox].RDTR & CAN_RDT0R_FMI) >> CAN_RDTxR_FMI_SHIFT; */
 
     /* Release input mailbox */

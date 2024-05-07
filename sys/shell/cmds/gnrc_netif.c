@@ -29,11 +29,11 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/ipv6/addr.h"
+#include "net/l2util.h"
 #include "net/lora.h"
 #include "net/loramac.h"
 #include "net/netif.h"
 #include "shell.h"
-#include "container.h"
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -196,7 +196,7 @@ static void _link_usage(char *cmd_name)
 static void _set_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> set <key> <value>\n", cmd_name);
-    printf("      Sets an hardware specific specific value\n"
+    printf("      Sets a hardware specific value\n"
          "      <key> may be one of the following\n"
          "       * \"addr\" - sets (short) address\n"
          "       * \"addr_long\" - sets long address\n"
@@ -580,7 +580,7 @@ static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
     return line_thresh;
 }
 
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_IPV6
 static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -600,6 +600,7 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
     else {
         printf("unknown");
     }
+#if MODULE_GNRC_IPV6
     if (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST) {
         printf(" [anycast]");
     }
@@ -620,6 +621,7 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
             break;
         }
     }
+#endif
     _newline(0U, _LINE_THRESHOLD);
 }
 
@@ -636,7 +638,7 @@ static void _netif_list_groups(ipv6_addr_t *addr)
 
 static void _netif_list(netif_t *iface)
 {
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_IPV6
     ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
     ipv6_addr_t ipv6_groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #endif
@@ -658,7 +660,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf(" HWaddr: %s ",
-               gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
+               l2util_addr_to_str(hwaddr, res, hwaddr_str));
     }
     res = netif_get_opt(iface, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
     if (res >= 0) {
@@ -776,17 +778,23 @@ static void _netif_list(netif_t *iface)
         }
     }
 #endif /* MODULE_NETDEV_IEEE802154 */
-    netopt_enable_t link;
-    res = netif_get_opt(iface, NETOPT_LINK, 0, &link, sizeof(netopt_enable_t));
+    netopt_enable_t enabled;
+    res = netif_get_opt(iface, NETOPT_LINK, 0, &enabled, sizeof(enabled));
     if (res >= 0) {
-        printf(" Link: %s ", (link == NETOPT_ENABLE) ? "up" : "down" );
+        printf(" Link: %s ", (enabled == NETOPT_ENABLE) ? "up" : "down" );
     }
+#if IS_USED(MODULE_LWIP_NETIF) /* only supported on lwIP for now */
+    res = netif_get_opt(iface, NETOPT_ACTIVE, 0, &enabled, sizeof(enabled));
+    if (res >= 0) {
+        printf(" State: %s ", (enabled == NETOPT_ENABLE) ? "up" : "down" );
+    }
+#endif /* MODULE_LWIP_NETIF */
     line_thresh = _newline(0U, line_thresh);
     res = netif_get_opt(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s ", gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
+        printf("%s ", l2util_addr_to_str(hwaddr, res, hwaddr_str));
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
@@ -806,9 +814,9 @@ static void _netif_list(netif_t *iface)
     }
     res = netif_get_opt(iface, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
     if (res >= 0) {
-        netopt_enable_t enable = NETOPT_DISABLE;
-        res = netif_get_opt(iface, NETOPT_CSMA, 0, &enable, sizeof(enable));
-        if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        enabled = NETOPT_DISABLE;
+        res = netif_get_opt(iface, NETOPT_CSMA, 0, &enabled, sizeof(enabled));
+        if ((res >= 0) && (enabled == NETOPT_ENABLE)) {
             printf(" CSMA Retries: %u ", (unsigned)u8);
         }
         line_thresh++;
@@ -892,11 +900,11 @@ static void _netif_list(netif_t *iface)
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
-#ifdef MODULE_GNRC_IPV6
     printf("Link type: %s",
            (netif_get_opt(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
            "wired" : "wireless");
     _newline(0U, ++line_thresh);
+#ifdef MODULE_IPV6
     res = netif_get_opt(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                         sizeof(ipv6_addrs));
     if (res >= 0) {
@@ -933,8 +941,8 @@ static void _netif_list(netif_t *iface)
         for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
-                gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
-                                       hwaddr_str);
+                l2util_addr_to_str(filter[i].addr, filter[i].addr_len,
+                                   hwaddr_str);
                 printf("            %2i: %s\n", count++, hwaddr_str);
             }
         }
@@ -1298,7 +1306,7 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_set_addr(netif_t *iface, netopt_t opt, char *addr_str)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif_addr_from_str(addr_str, addr);
+    size_t addr_len = l2util_addr_from_str(addr_str, addr);
 
     if (addr_len == 0) {
         printf("error: unable to parse address.\n"
@@ -1447,7 +1455,7 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif_addr_from_str(val, addr);
+    size_t addr_len = l2util_addr_from_str(val, addr);
 
     if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         printf("error: given address is invalid\n");
@@ -1678,10 +1686,17 @@ static uint8_t _get_prefix_len(char *addr)
 
 static int _netif_link(netif_t *iface, netopt_enable_t en)
 {
+#if IS_USED(MODULE_LWIP_NETIF) /* lwIP sets netif state, not link state */
+    if (netif_set_opt(iface, NETOPT_ACTIVE, 0, &en, sizeof(en)) < 0) {
+        printf("error: unable to set state %s\n", en == NETOPT_ENABLE ? "up" : "down");
+        return 1;
+    }
+#else
     if (netif_set_opt(iface, NETOPT_LINK, 0, &en, sizeof(en)) < 0) {
         printf("error: unable to set link %s\n", en == NETOPT_ENABLE ? "up" : "down");
         return 1;
     }
+#endif
     return 0;
 }
 
@@ -1793,67 +1808,6 @@ static int _netif_del(netif_t *iface, char *addr_str)
 }
 
 /* shell commands */
-#ifdef MODULE_GNRC_TXTSND
-static int _gnrc_netif_send(int argc, char **argv)
-{
-    netif_t *iface;
-    uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len;
-    gnrc_pktsnip_t *pkt, *hdr;
-    gnrc_netif_hdr_t *nethdr;
-    uint8_t flags = 0x00;
-
-    if (argc < 4) {
-        printf("usage: %s <if> [<L2 addr>|bcast] <data>\n", argv[0]);
-        return 1;
-    }
-
-    iface = netif_get_by_name(argv[1]);
-    if (!iface) {
-        printf("error: invalid interface given\n");
-        return 1;
-    }
-
-    /* parse address */
-    addr_len = gnrc_netif_addr_from_str(argv[2], addr);
-
-    if (addr_len == 0) {
-        if (strcmp(argv[2], "bcast") == 0) {
-            flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
-        }
-        else {
-            printf("error: invalid address given\n");
-            return 1;
-        }
-    }
-
-    /* put packet together */
-    pkt = gnrc_pktbuf_add(NULL, argv[3], strlen(argv[3]), GNRC_NETTYPE_UNDEF);
-    if (pkt == NULL) {
-        printf("error: packet buffer full\n");
-        return 1;
-    }
-    hdr = gnrc_netif_hdr_build(NULL, 0, addr, addr_len);
-    if (hdr == NULL) {
-        printf("error: packet buffer full\n");
-        gnrc_pktbuf_release(pkt);
-        return 1;
-    }
-    pkt = gnrc_pkt_prepend(pkt, hdr);
-    nethdr = (gnrc_netif_hdr_t *)hdr->data;
-    nethdr->flags = flags;
-    /* and send it */
-    if (gnrc_netif_send(container_of(iface, gnrc_netif_t, netif), pkt) < 1) {
-        printf("error: unable to send\n");
-        gnrc_pktbuf_release(pkt);
-        return 1;
-    }
-
-    return 0;
-}
-
-SHELL_COMMAND(txtsnd, "Sends a custom string as is over the link layer", _gnrc_netif_send);
-#endif
 
 /* TODO: updated tests/net/gnrc_dhcpv6_client to no longer abuse this shell command
  * and add static qualifier */

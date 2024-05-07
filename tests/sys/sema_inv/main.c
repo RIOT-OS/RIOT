@@ -85,7 +85,7 @@ static void test_counter_mode(void)
     sema_inv_wait(&sync);
     puts("thread synced");
 
-    /* wait for all threads to terminate, we are going to re-use the stack */
+    /* wait for all threads to terminate, we are going to reuse the stack */
     ztimer_sleep(ZTIMER_MSEC, 50);
 }
 
@@ -112,7 +112,7 @@ static void test_mask_mode(void)
     sema_inv_wait(&sync);
     puts("thread synced");
 
-    /* wait for all threads to terminate, we are going to re-use the stack */
+    /* wait for all threads to terminate, we are going to reuse the stack */
     ztimer_sleep(ZTIMER_MSEC, 50);
 }
 

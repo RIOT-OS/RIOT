@@ -16,6 +16,64 @@
  * defines a standardized interface to access MCU peripherals that is not tied
  * to any specific vendor, platform or architecture.
  *
+ * # Initialization and Thread Safety
+ *
+ * Peripheral drivers fall into three categories regarding to their
+ * initialization:
+ *
+ * 1. Drivers that do not need to be initialized
+ *    (e.g. @ref drivers_periph_eeprom)
+ * 2. Drivers that are automatically initialized by the module `periph_init` at boot,
+ *    (see @ref drivers_periph_init for details)
+ * 3. Drivers that require manual initialization (e.g. @ref drivers_periph_uart
+ *    or @ref drivers_periph_adc)
+ *
+ * The initialization code of drivers initialized at boot up is *not* thread
+ * safe. This code is run sequentially anyway and never called by the user, so
+ * the overhead of thread safety would not be justified.
+ *
+ * All other peripheral APIs (including the initialization functions of drivers
+ * that are not initialized with `periph_init`) are fully or partially thread
+ * safe. Partially thread safe drivers require the user to make sure that the
+ * same peripheral entity (e.g. one UART device) is exclusively used by one
+ * thread. So two threads may concurrently use two *distinct* UART devices
+ * without any synchronization, but they *must* synchronize explicitly to access
+ * the same UART device.
+ *
+ * Fully thread safe are all bus peripherals: A call to e.g. @ref spi_acquire
+ * will start a period of exclusive access to the given SPI bus by the calling
+ * thread until that calls @ref spi_release.
+ *
+ * | Peripheral Driver  | Initialized By    | Thread Safety                                                                 |
+ * |:------------------ |:----------------- |:----------------------------------------------------------------------------- |
+ * | `periph_adc`       | user / driver     | Partial (no concurrent use of the same ADC line allowed)                      |
+ * | `periph_can`       | user / driver     | Partial (no concurrent use of the same CAN device allowed)                    |
+ * | `periph_cpuid`     | not needed        | Full Thread Safety                                                            |
+ * | `periph_dac`       | user / driver     | Partial (no concurrent use of the same DAC line allowed)                      |
+ * | `periph_eeprom`    | not needed        | None (no concurrency whatsoever)                                              |
+ * | `periph_flashpage` | not needed        | None (no concurrency whatsoever)                                              |
+ * | `periph_gpio`      | not needed        | Limited (reads are fine, concurrent writes to pins on distinct ports work)    |
+ * | `periph_gpio_ll`   | not needed        | Yes, except for concurrent initialization of the GPIO pin                     |
+ * | `periph_hwrng`     | `periph_init`     | None (no concurrency whatsoever)                                              |
+ * | `periph_i2c`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
+ * | `periph_pio`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
+ * | `periph_pm`        | not needed        | Full Thread Safety                                                            |
+ * | `periph_ptp`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
+ * | `periph_pwm`       | user / driver     | Partial (no concurrent use of the same PWM device)                            |
+ * | `periph_qdec`      | user / driver     | Partial (no concurrent use of the same QDEC device)                           |
+ * | `periph_rtc`       | `periph_init`     | None (no concurrency whatsoever)                                              |
+ * | `periph_rtt`       | `periph_init`     | None (no concurrency whatsoever)                                              |
+ * | `periph_spi`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
+ * | `periph_timer`     | user / driver     | Yes, except for concurrent initialization of the same timer                   |
+ * | `periph_uart`      | user / driver     | Partial (no concurrent use of the same UART device allowed)                   |
+ * | `periph_usbdev`    | user / driver (*) | Full Thread Safety (except for initialization)                                |
+ * | `periph_vbat`      | `periph_init`     | None (no concurrency whatsoever)                                              |
+ * | `periph_wdt`       | `periph_init`     | Only `wdt_kick()` is thread-safe                                              |
+ *
+ * @note    `periph_usbdev` requires a low level initialization
+ *          (@ref usbdev_init_lowlevel) that is done by `periph_init`. A per
+ *          device initialization is needed in addition by the user.
+ *
  * @todo        describe concept in detail
  * @todo        link to driver model
  * @todo        describe/link implementation guide

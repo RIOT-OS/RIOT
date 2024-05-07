@@ -6,9 +6,8 @@
 
 ## Overview
 
-The [Waveshare nRF52840 Eval Kit]
-(https://www.waveshare.com/NRF52840-Eval-Kit.htm) is an evaluation board
-for the nRF52840 SoC with the following on-board components:
+The [Waveshare nRF52840 Eval Kit](https://www.waveshare.com/NRF52840-Eval-Kit.htm)
+is an evaluation board for the nRF52840 SoC with the following on-board components:
 
 1. Arduino headers for connecting Arduino shields
 2. Raspberry Pi GPIO header for connecting Raspberry Pi HATs
@@ -29,8 +28,7 @@ for the nRF52840 SoC with the following on-board components:
 16. TF card slot
 17. CR2032 battery holder
 
-![Waveshare nRF52840 Eval Kit]
-(https://www.waveshare.com/img/devkit/accBoard/NRF52840-Eval-Kit/NRF52840-Eval-Kit-intro.jpg)
+![Waveshare nRF52840 Eval Kit](https://www.waveshare.com/img/devkit/accBoard/NRF52840-Eval-Kit/NRF52840-Eval-Kit-intro.jpg)
 
 Using the onboard Arduino and Raspberry Pi compatible headers, both Arduino
 shields and Raspberry Pi HATs can be used at the same time.

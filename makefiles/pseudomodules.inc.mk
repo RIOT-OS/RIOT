@@ -388,6 +388,16 @@ PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
+PSEUDOMODULES += psa_riot_cipher_aes_common
+PSEUDOMODULES += psa_riot_cipher_aes_128_ecb
+PSEUDOMODULES += psa_riot_cipher_aes_128_cbc
+PSEUDOMODULES += psa_riot_cipher_aes_192_cbc
+PSEUDOMODULES += psa_riot_cipher_aes_256_cbc
+PSEUDOMODULES += psa_riot_hashes_md5
+PSEUDOMODULES += psa_riot_hashes_sha_1
+PSEUDOMODULES += psa_riot_hashes_sha_224
+PSEUDOMODULES += psa_riot_hashes_sha_256
+PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
 ## @defgroup pseudomodule_random_cmd random_cmd
 ## @ingroup sys_shell_commands
@@ -474,9 +484,11 @@ PSEUDOMODULES += shell_cmd_gnrc_pktbuf
 PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats
+PSEUDOMODULES += shell_cmd_gnrc_txtsnd
 PSEUDOMODULES += shell_cmd_gnrc_udp
 PSEUDOMODULES += shell_cmd_heap
 PSEUDOMODULES += shell_cmd_i2c_scan
+PSEUDOMODULES += shell_cmd_iw
 PSEUDOMODULES += shell_cmd_lwip_netif
 PSEUDOMODULES += shell_cmd_mci
 PSEUDOMODULES += shell_cmd_md5sum
@@ -586,6 +598,7 @@ PSEUDOMODULES += vfs_auto_mount
 PSEUDOMODULES += vfs_default
 
 PSEUDOMODULES += wakaama_objects_%
+PSEUDOMODULES += wifi_scan_list
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += xtimer_no_ztimer_default

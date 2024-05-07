@@ -1,2 +1,9 @@
 USEMODULE_INCLUDES_atwinc15x0 := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_atwinc15x0)
+
+# Try to connect to a preknown AP (WIFI_SSID, WIFI_PASS)
+PSEUDOMODULES += atwinc15x0_static_connect
+# Accept connection requests (NETOPT_CONNECT)
+PSEUDOMODULES += atwinc15x0_dynamic_connect
+# Accept scan requests (NETOPT_SCAN)
+PSEUDOMODULES += atwinc15x0_dynamic_scan

@@ -654,7 +654,7 @@ class SerCmd(cmd.Cmd):
                 self.process_line(line)
 
     def serial_connect(self):
-        self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
+        self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0, exclusive=1)
         self.ser.baudrate = self.baudrate
 
         if self.toggle:

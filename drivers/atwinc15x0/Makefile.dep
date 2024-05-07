@@ -1,6 +1,18 @@
 USEMODULE += netdev_eth
 USEMODULE += ztimer_msec
 USEMODULE += netdev_legacy_api
+
+ifeq (,$(filter atwinc15x0_dynamic_%,$(USEMODULE)))
+  # use static connect by default when no dynamic module is loaded
+  USEMODULE += atwinc15x0_static_connect
+endif
+ifneq (,$(filter atwinc15x0_dynamic_scan,$(USEMODULE)))
+  USEMODULE += wifi_scan_list
+endif
+ifneq (,$(filter atwinc15x0_static_connect,$(USEMODULE)))
+  USEMODULE += ztimer
+endif
+
 USEPKG += driver_atwinc15x0
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq

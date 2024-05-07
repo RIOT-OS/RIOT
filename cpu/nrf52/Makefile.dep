@@ -36,5 +36,6 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   USEMODULE += periph_spi_gpio_mode
 endif
 
+include $(RIOTCPU)/nrf52/periph/Makefile.dep
 include $(RIOTCPU)/nrf5x_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep

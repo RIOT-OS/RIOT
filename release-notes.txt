@@ -1442,7 +1442,7 @@ Build System / Tooling
 + .vscode: import initial RIOT-OS style (#18945)
 + build-system: add capability to execute scripts with custom executor (#18770)
 + dist/tools: add "RESET_PIN" value for the dwm1001 (#18815)
-+ examples/gnrc_border_router: add option to re-use existing TAP
++ examples/gnrc_border_router: add option to reuse existing TAP
   interface (#18836)
 + makefiles/tools/serial.inc.mk: add support for bootterm (#18749)
 + tapsetup: add --loss & --delay option (#18885)
@@ -3633,7 +3633,7 @@ Packages
 * pkg/littlefs2: bump version to 2.4.2 (#17837)
 * pkg/lv_drivers: initial commit (#17713)
 * pkg/lvgl: bump to 8.2.0 (#17681)
-* pkg/lvlgl: allow cusomizing LV_MEM_SIZE (#17759)
+* pkg/lvlgl: allow customizing LV_MEM_SIZE (#17759)
 + pkg/mbedtls: initial pkg import to use entropy module (#15671)
 * pkg/mynewt-core: fix semaphore (#17771)
 * pkg/semtech-loramac: enable setting channels mask (#17824)
@@ -5848,7 +5848,7 @@ System Libraries (21)
 + sys/event: add periodic timeout event (#16507)
 + sys/ps: enable runtime_usec output for the ps command (#16470)
 * gnrc_dhcpv6_client_6lbr: choose downstream if as !upstream (#16530)
-* net/emcute: Allow RETAIN flag to be set on incoming PUBLISHs (#16326)
+* net/emcute: Allow RETAIN flag to be set on incoming PUBLISHes (#16326)
 * net/gnrc/rpl: use ztimer_msec if available (#16339)
 * net/grnc/sixlowpan/ctx: use ztimer_msec if available (#16340)
 * sys/arduino: replace xtimer by ztimer as high-level background timer (#15317)
@@ -13615,7 +13615,7 @@ Drivers
 Build System
 ------------
 + Experimental distributed building using Murdock
-+ most makfiles moved from root into makefiles/
++ most makefiles moved from root into makefiles/
 + added submodule support
 
 Special Thanks

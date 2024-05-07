@@ -74,7 +74,7 @@
  * The actual code very much depends on the used `sock` type. Please refer to
  * their documentation for specific examples.
  *
- * Implementor Notes
+ * Implementer Notes
  * =================
  * ### Type definition
  * For simplicity and modularity this API doesn't put any restriction on the
