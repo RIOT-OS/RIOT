@@ -34,10 +34,10 @@
 #include "mtd.h"
 #include "registry.h"
 #include "registry/string_path.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/nested.h"
+#include "namespace/tests.h"
+#include "namespace/tests/nested.h"
 
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_NESTED) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
 
 static registry_tests_nested_instance_t test_instance_data = {
     .parameter = 9,
@@ -147,6 +147,7 @@ static void tests_registry_from_parameter_string_path(void)
     registry_node_t node;
 
     const char *str[] = { "tests", "nested", "instance-1", "group", "parameter" };
+
     registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_PARAMETER, node.type);
@@ -161,6 +162,7 @@ static void tests_registry_from_group_string_path(void)
     registry_node_t node;
 
     const char *str[] = { "tests", "nested", "instance-1", "group" };
+
     registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_GROUP, node.type);
@@ -175,6 +177,7 @@ static void tests_registry_from_instance_string_path(void)
     registry_node_t node;
 
     const char *str[] = { "tests", "nested", "instance-1" };
+
     registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_INSTANCE, node.type);
@@ -188,6 +191,7 @@ static void tests_registry_from_schema_string_path(void)
     registry_node_t node;
 
     const char *str[] = { "tests", "nested" };
+
     registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_SCHEMA, node.type);
@@ -200,6 +204,7 @@ static void tests_registry_from_namespace_string_path(void)
     registry_node_t node;
 
     const char *str[] = { "tests" };
+
     registry_node_from_string_path(str, ARRAY_SIZE(str), &node);
 
     TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_NAMESPACE, node.type);
