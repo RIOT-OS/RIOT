@@ -11,7 +11,7 @@
  * @ingroup     tests
  * @brief       RIOT Registry Namespace Tests module
  * @{
- * 
+ *
  * This module provides common test schemas for the RIOT Registry sys module
  *
  * @file
