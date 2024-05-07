@@ -68,7 +68,7 @@ This extension connector gives access to:
 - USART6 (Tx, Rx)
 - I2S2
 - SPI1
-- 7 timers channels.
+- 7 timers channels
 - Speaker output (1W)
 
 Also provides some system signals and power.
@@ -77,11 +77,11 @@ Also provides some system signals and power.
 
 ## Buttons, LEDS and other devices
 
-- 1 Button for reset.
-- 1 User button.
-- 4 LEDs.
+- 1 Button for reset
+- 1 User button
+- 4 LEDs
 - 3 Digital microphones
-- 1 LCD Color 4''
+- 1 LCD Color 4 inches
 
 ## Working with this Dev-Kit
 
