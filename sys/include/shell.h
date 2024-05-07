@@ -91,7 +91,7 @@ extern "C" {
  *   passing stdin (`isrpipe_t stdin_isrpipe`) does not support backpressure
  *   and overflows silently. As a consequence, commands through such terminals
  *   appear to be truncated at @ref STDIO_RX_BUFSIZE bytes (defaulting to 64)
- *   unless the command is sent in parts (on many terminals, by presing Ctrl-D
+ *   unless the command is sent in parts (on many terminals, by pressing Ctrl-D
  *   half way through the command).
  *
  *   For example, this affects systems with direct USB stdio (@ref
@@ -225,6 +225,17 @@ static inline void shell_run(const shell_command_t *commands,
     shell_run_forever(commands, line_buf, len);
 }
 
+/**
+ * @brief           Searches for a handler function associated with a command
+ *
+ * @param[in]       command_list    ptr to array of command structs
+ * @param[in]       command         the command name to search for
+ *
+ * @returns         handler function associated with @p command
+ *                  NULL if the command could not be found
+ */
+shell_command_handler_t shell_find_handler(const shell_command_t *command_list,
+                                           const char *command);
 /**
  * @brief           Parse and run a line of text as a shell command with
  *                  arguments.
