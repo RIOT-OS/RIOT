@@ -33,8 +33,8 @@ extern "C" {
  * @brief The different return types of @p registry_find_comparator_t callback function.
  */
 typedef enum {
-    REGISTRY_FIND_NO_MATCH = -1,
-    REGISTRY_FIND_EXACT_MATCH = 0,
+    REGISTRY_FIND_NO_MATCH      = -1,
+    REGISTRY_FIND_EXACT_MATCH   = 0,
     REGISTRY_FIND_PARTIAL_MATCH = 1,
 } registry_find_result_type;
 
@@ -47,7 +47,8 @@ typedef enum {
  *
  * @return 0 on exact match, 1 on partial match and -1 on no match.
  */
-typedef registry_find_result_type (*registry_find_comparator_t)(const registry_node_t *node, const void *context);
+typedef registry_find_result_type (*registry_find_comparator_t)(const registry_node_t *node,
+                                                                const void *context);
 
 /**
  * @brief Finds a specific node within the registry configuration tree.
@@ -60,7 +61,7 @@ typedef registry_find_result_type (*registry_find_comparator_t)(const registry_n
  *
  * @return 0 on success, non-zero on failure.
  */
-registry_error_t registry_find(const registry_find_comparator_t compare, 
+registry_error_t registry_find(const registry_find_comparator_t compare,
                                const void *context, registry_node_t *node);
 
 #ifdef __cplusplus

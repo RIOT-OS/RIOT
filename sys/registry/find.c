@@ -37,9 +37,11 @@
 
 XFA_USE_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
-static registry_find_result_type _find_group(const registry_group_t **groups, const size_t groups_len,
-                       const registry_find_comparator_t compare,
-                       const void *context, const registry_group_t **group) {
+static registry_find_result_type _find_group(const registry_group_t **groups,
+                                             const size_t groups_len,
+                                             const registry_find_comparator_t compare,
+                                             const void *context, const registry_group_t **group)
+{
     assert(groups != NULL);
     assert(groups_len > 0);
     assert(compare != NULL);
@@ -57,8 +59,8 @@ static registry_find_result_type _find_group(const registry_group_t **groups, co
         if (res == REGISTRY_FIND_EXACT_MATCH) {
             *group = groups[i];
             return res;
-        } 
-        
+        }
+
         /* if a partial match is found, we need to keep searching for its children, but can break the loop */
         if (res == REGISTRY_FIND_PARTIAL_MATCH) {
             return _find_group(groups[i]->groups, groups[i]->groups_len, compare, context, group);
@@ -106,8 +108,9 @@ static registry_find_result_type _find_parameter_by_group(
 }
 
 static registry_find_result_type _find_parameter_by_schema(
-            const registry_schema_t *schema, const registry_find_comparator_t compare,
-            const void *context, const registry_parameter_t **parameter) {
+    const registry_schema_t *schema, const registry_find_comparator_t compare,
+    const void *context, const registry_parameter_t **parameter)
+{
     assert(schema != NULL);
     assert(compare != NULL);
 
@@ -141,8 +144,9 @@ static registry_find_result_type _find_parameter_by_schema(
     return -REGISTRY_ERROR_PARAMETER_NOT_FOUND;
 }
 
-registry_error_t registry_find(const registry_find_comparator_t compare, 
-                               const void *context, registry_node_t *node) {
+registry_error_t registry_find(const registry_find_comparator_t compare,
+                               const void *context, registry_node_t *node)
+{
     assert(compare != NULL);
     assert(context != NULL);
 
@@ -163,7 +167,7 @@ registry_error_t registry_find(const registry_find_comparator_t compare,
             node->value.namespace = namespace;
             return 0;
         }
-        
+
         /* if a partial match is found, we need to keep searching for its children, but can break the loop */
         if (res == REGISTRY_FIND_PARTIAL_MATCH) {
             break;
@@ -188,8 +192,8 @@ registry_error_t registry_find(const registry_find_comparator_t compare,
             node->type = REGISTRY_NODE_SCHEMA;
             node->value.schema = schema;
             return 0;
-        } 
-        
+        }
+
         /* if a partial match is found, we need to keep searching for its children, but can break the loop */
         if (res == REGISTRY_FIND_PARTIAL_MATCH) {
             break;
@@ -220,8 +224,8 @@ registry_error_t registry_find(const registry_find_comparator_t compare,
                     node->type = REGISTRY_NODE_INSTANCE;
                     node->value.instance = instance;
                     return 0;
-                } 
-                
+                }
+
                 /* if a partial match is found, we need to keep searching for its children, but can break the loop */
                 if (res == REGISTRY_FIND_PARTIAL_MATCH) {
                     break;
@@ -249,7 +253,8 @@ registry_error_t registry_find(const registry_find_comparator_t compare,
             /* if a partial match is found, we need to keep searching for its children */
             if (res == REGISTRY_FIND_PARTIAL_MATCH) {
                 const registry_parameter_t *parameter;
-                res = _find_parameter_by_group(node->value.group.group, compare, context, &parameter);
+                res = _find_parameter_by_group(node->value.group.group, compare, context,
+                                               &parameter);
 
                 if (res == REGISTRY_FIND_EXACT_MATCH) {
                     node->type = REGISTRY_NODE_PARAMETER;
