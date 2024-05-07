@@ -312,7 +312,7 @@ static registry_error_t _registry_export_schema(
         clist_node_t *node = schema->instances.next;
 
         if (!node) {
-            return -REGISTRY_ERROR_SCHEMA_HAS_NO_INSTANCE;
+            return REGISTRY_ERROR_NONE;
         }
 
         do {
