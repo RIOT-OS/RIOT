@@ -1,2 +1,3 @@
 USEMODULE +=  registry_storage
-USEMODULE +=  registry_namespace_tests_nested
+
+USEMODULE += tests-registry-namespace

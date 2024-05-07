@@ -32,10 +32,8 @@
 #include "registry/storage.h"
 
 #include "tests-registry_storage.h"
-#include "registry/namespace/tests.h"
-#include "registry/namespace/tests/nested.h"
-
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_TESTS_NESTED) || IS_ACTIVE(DOXYGEN)
+#include "namespace/tests.h"
+#include "namespace/tests/nested.h"
 
 #define _TESTS_REGISTRY_LOAD_STORED_VALUE 60
 
@@ -55,10 +53,10 @@ static registry_instance_t test_nested_instance = {
 };
 
 static registry_error_t load(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb);
+                             const load_cb_t load_cb);
 static registry_error_t save(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value);
+                             const registry_node_t *node,
+                             const registry_value_t *value);
 
 static registry_storage_t storage_test = {
     .load = load,
@@ -73,7 +71,7 @@ static registry_storage_instance_t storage_test_instance = {
 };
 
 static registry_error_t load(const registry_storage_instance_t *storage,
-                const load_cb_t load_cb)
+                             const load_cb_t load_cb)
 {
     if (storage == &storage_test_instance) {
         registry_node_t node = {
@@ -91,10 +89,9 @@ static registry_error_t load(const registry_storage_instance_t *storage,
 }
 
 static registry_error_t save(const registry_storage_instance_t *storage,
-                const registry_node_t *node,
-                const registry_value_t *value)
+                             const registry_node_t *node,
+                             const registry_value_t *value)
 {
-
     if (storage == &storage_test_instance &&
         node->value.parameter.instance == &test_nested_instance &&
         node->value.parameter.parameter == &registry_tests_nested_group_parameter &&
@@ -164,7 +161,7 @@ static void tests_registry_save_group(void)
             .group = &registry_tests_nested_group,
         },
     };
-    
+
     registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
@@ -176,7 +173,7 @@ static void tests_registry_save_instance(void)
         .type = REGISTRY_NODE_INSTANCE,
         .value.instance = &test_nested_instance,
     };
-    
+
     registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
@@ -188,7 +185,7 @@ static void tests_registry_save_schema(void)
         .type = REGISTRY_NODE_SCHEMA,
         .value.schema = &registry_tests_nested,
     };
-    
+
     registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
@@ -200,7 +197,7 @@ static void tests_registry_save_namespace(void)
         .type = REGISTRY_NODE_NAMESPACE,
         .value.namespace = &registry_tests,
     };
-    
+
     registry_storage_save(&storage_test_instance, &node);
 
     TEST_ASSERT(successful);
@@ -208,7 +205,7 @@ static void tests_registry_save_namespace(void)
 
 static void tests_registry_save_all(void)
 {
-    
+
     registry_storage_save(&storage_test_instance, NULL);
 
     TEST_ASSERT(successful);
@@ -237,7 +234,5 @@ void tests_registry_storage(void)
 {
     TESTS_RUN(tests_registry_storage_tests());
 }
-
-#endif
 
 /** @} */
