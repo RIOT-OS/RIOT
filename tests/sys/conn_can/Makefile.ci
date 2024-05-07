@@ -4,8 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     im880b \
     microbit \
-    msb-430 \
-    msb-430h \
     nrf51dongle \
     nrf6310 \
     nucleo-f030r8 \
@@ -24,6 +22,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32l0538-disco \
-    telosb \
     yunjia-nrf51822 \
     #
