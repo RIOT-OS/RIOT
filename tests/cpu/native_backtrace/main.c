@@ -24,7 +24,10 @@
 
 int main(void)
 {
-    printf("BACKTRACE_SIZE: %u\n", BACKTRACE_SIZE);
+    printf("BACKTRACE_SIZE: %d\n", backtrace_len());
+    printf("\n## backtrace_print: print addresses\n");
     backtrace_print();
+    printf("\n## backtrace_print_symbols: print symbol information\n");
+    backtrace_print_symbols();
     return 0;
 }

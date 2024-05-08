@@ -13,8 +13,12 @@ from testrunner import run
 def testfunc(child):
     child.expect(r"BACKTRACE_SIZE: (\d+)\r\n")
     trace_size = int(child.match.group(1))
+    child.expect("backtrace_print:")
     for i in range(trace_size):
         child.expect(r"0x[0-9a-f]+")
+    child.expect("backtrace_print_symbols:")
+    for i in range(trace_size):
+        child.expect(r".*")
 
     print("All tests successful")
 
