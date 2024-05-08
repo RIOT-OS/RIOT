@@ -52,16 +52,31 @@ static bool _is_dir(const char *url)
 
 static int _resource_cb(char *entry, void *ctx)
 {
-    (void)ctx;
+    bool *too_long = ctx;
+    char *start, *end;
 
-    char *start = strchr(entry, '<');
-    if (start) {
-        char *end = strchr(entry, '>');
-        *end = '\0';
-        entry = start + 1;
+    if (*too_long) {
+        goto find_end;
     }
 
-    puts(entry);
+    start = strchr(entry, '<');
+    if (start == NULL) {
+        return 0;
+    }
+    entry = start + 1;
+
+find_end:
+    end = strchr(entry, '>');
+    if (end == NULL) {
+        *too_long = true;
+        printf("%s", entry);
+    }
+    else {
+        *too_long = false;
+        *end = '\0';
+        puts(entry);
+    }
+
     return 0;
 }
 
@@ -91,7 +106,8 @@ static int _nanocoap_get_handler(int argc, char **argv)
     }
 
     if (_is_dir(url) && argc < 3) {
-        res = nanocoap_link_format_get_url(url, _resource_cb, NULL);
+        bool _ctx = false;
+        res = nanocoap_link_format_get_url(url, _resource_cb, &_ctx);
         if (res) {
             printf("Request failed: %s\n", strerror(-res));
         }
