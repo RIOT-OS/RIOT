@@ -412,6 +412,9 @@ static uint8_t _form_message_marker(can_mm_t *can_mm)
 
 static int _send(candev_t *candev, const struct can_frame *frame)
 {
+    /* this assertion ensures the EFF-FLAG is set or the id does not exceed the CAN_SFF_MASK*/
+    assert( (frame->can_id & CAN_EFF_FLAG)
+            || ((frame->can_id & CAN_SFF_MASK) == (frame->can_id & CAN_EFF_MASK)) );
     can_t *dev = container_of(candev, can_t, candev);
 
     if (frame->can_dlc > CAN_MAX_DLEN) {
@@ -716,7 +719,12 @@ static void _isr(candev_t *candev)
         else {
             DEBUG_PUTS("Received extended CAN frame");
             frame_received.can_id = dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_0.bit.ID;
+            frame_received.can_id |= CAN_EFF_FLAG;
         }
+        if (dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_0.bit.RTR) {
+            frame_received.can_id |= CAN_RTR_FLAG;
+        }
+
         frame_received.can_dlc = dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_1.bit.DLC;
         memcpy(frame_received.data, (uint32_t *)dev->msg_ram_conf.rx_fifo_0[rx_get_idx].RXF0E_DATA, frame_received.can_dlc);
 
@@ -747,7 +755,12 @@ static void _isr(candev_t *candev)
         else {
             DEBUG_PUTS("Received extended CAN frame");
             frame_received.can_id = dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_0.bit.ID;
+            frame_received.can_id |= CAN_EFF_FLAG;
         }
+        if (dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_0.bit.RTR) {
+            frame_received.can_id |= CAN_RTR_FLAG;
+        }
+
         frame_received.can_dlc = dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_1.bit.DLC;
         memcpy(frame_received.data, (uint32_t *)dev->msg_ram_conf.rx_fifo_1[rx_get_idx].RXF1E_DATA, frame_received.can_dlc);
 
