@@ -939,6 +939,9 @@ static void test_switch_dir(void)
     gpio_ll_write(port_out, out_state);
     /* verify we are back at the old config */
     conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    /* since pin as floating, the current input value is random --> clear it */
+    conf.initial_value = false;
+    conf_orig.initial_value = false;
     test_passed = (conf.bits == conf_orig.bits);
     printf_optional("Returning back to input had no side effects on config: %s\n",
                     noyes[test_passed]);
