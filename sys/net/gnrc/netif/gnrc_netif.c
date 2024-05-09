@@ -2061,7 +2061,8 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 #if IS_USED(MODULE_NETDEV_NEW_API)
     else if (gnrc_netif_netdev_new_api(netif)
              && (event == NETDEV_EVENT_TX_COMPLETE)) {
-        event_post(&netif->evq, &netif->event_tx_done);
+        event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW],
+                   &netif->event_tx_done);
     }
 #endif
     else {
