@@ -5,6 +5,8 @@ APPLICATION = example_psa_crypto
 
 BOARD ?= native
 
+DOCKER_ENV_VARS += SECURE_ELEMENT
+
 ifeq (2, $(SECURE_ELEMENT))
   CFLAGS += -DSECURE_ELEMENT # Application specific (not needed by PSA)
   CFLAGS += -DMULTIPLE_SE # Application specific (not needed by PSA)
