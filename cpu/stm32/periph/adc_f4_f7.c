@@ -19,6 +19,7 @@
  * @}
  */
 
+#include "compiler_hints.h"
 #include "cpu.h"
 #include "irq.h"
 #include "mutex.h"
@@ -101,6 +102,7 @@ int adc_init(adc_t line)
             break;
         }
     }
+    assume((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX);
     ADC->CCR = ((clk_div / 2) - 1) << 16;
     /* set sampling time to the maximum */
     unsigned irq_state = irq_disable();

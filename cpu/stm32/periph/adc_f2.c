@@ -20,6 +20,7 @@
  * @}
  */
 
+#include "compiler_hints.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
@@ -92,6 +93,7 @@ int adc_init(adc_t line)
             break;
         }
     }
+    assume((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX);
     ADC->CCR = ((clk_div / 2) - 1) << 16;
 
     /* enable the ADC module */

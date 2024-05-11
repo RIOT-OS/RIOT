@@ -22,6 +22,7 @@
  * @}
  */
 
+#include "compiler_hints.h"
 #include "cpu.h"
 #include "macros/units.h"
 #include "mutex.h"
@@ -128,6 +129,7 @@ int adc_init(adc_t line)
             break;
         }
     }
+    assume((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX);
     RCU->CFG0 &= ~(RCU_CFG0_ADCPSC_2_Msk);
     RCU->CFG0 |= ((clk_div / 2) - 1) << RCU_CFG0_ADCPSC_2_Pos;
 
