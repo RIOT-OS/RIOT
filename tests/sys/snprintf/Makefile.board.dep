@@ -1,0 +1,4 @@
+# newlib's printf is known to be incomplete, despite being bloated
+ifneq (,$(filter newlib,$(USEMODULE)))
+  USEPKG += mpaland-printf
+endif
