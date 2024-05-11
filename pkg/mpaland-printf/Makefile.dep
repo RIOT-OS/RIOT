@@ -1,0 +1,4 @@
+# mpaland's printf does not implement non-standard format specifiers. For
+# AVR MCUs we do need the ability to print from PROGMEM, though. Hence, this
+# is not compatible with AVR MCUs.
+FEATURES_BLACKLIST += arch_avr8

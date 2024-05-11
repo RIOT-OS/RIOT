@@ -1,0 +1,28 @@
+From 81ef21a29faafbdb95800ce40b2e20b533b88ebd Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sat, 11 May 2024 22:42:21 +0200
+Subject: [PATCH 4/4] Fix parsing of `int8_t`
+
+The code assumes that `char` is signed, but the C standard allows
+`char` to be either signed or unsigned. Instead, `singed char` and
+`unsigned char` need to be used for portable code.
+---
+ printf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/printf.c b/printf.c
+index 5266cf7..3f5f66a 100644
+--- a/printf.c
++++ b/printf.c
+@@ -734,7 +734,7 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
+             idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned long)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
+           }
+           else {
+-            const int value = (flags & FLAGS_CHAR) ? (char)va_arg(va, int) : (flags & FLAGS_SHORT) ? (short int)va_arg(va, int) : va_arg(va, int);
++            const int value = (flags & FLAGS_CHAR) ? (signed char)va_arg(va, int) : (flags & FLAGS_SHORT) ? (short int)va_arg(va, int) : va_arg(va, int);
+             idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned int)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
+           }
+         }
+-- 
+2.43.0
+
