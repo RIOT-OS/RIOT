@@ -179,6 +179,7 @@ FEATURES_EXISTING := \
     periph_gpio_tamper_wake \
     periph_hash_md5 \
     periph_hash_sha_1 \
+    periph_hash_sha_3 \
     periph_hash_sha_224 \
     periph_hash_sha_256 \
     periph_hash_sha_512 \

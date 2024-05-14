@@ -38,7 +38,7 @@ extern psa_status_t example_eddsa(void);
 #endif
 
 #if IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3)
-extern psa_status_t example_hmac_sha_3(void);
+extern psa_status_t sha_3_glue_test(void);
 #endif
 
 #ifdef MULTIPLE_SE
@@ -137,6 +137,17 @@ int main(void)
         printf("ECDSA failed: %s\n", psa_status_to_humanly_readable(status));
     }
 #endif /* MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256 */
+
+#if IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3)
+    start = ztimer_now(ZTIMER_USEC);
+    status = sha_3_glue_test();
+    printf("SHA3 glue code test took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("SHA3 glue code failed: %s\n", psa_status_to_humanly_readable(status));
+    }
+#endif
+
 #endif /* MULTIPLE_SE */
 
     ztimer_release(ZTIMER_USEC);

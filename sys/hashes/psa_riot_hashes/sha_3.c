@@ -20,17 +20,17 @@
 #include "psa/crypto.h"
 #include "hashes/psa/riot_hashes.h"
 
-psa_status_t psa_hashes_sha3_256_setup(psa_hashes_sha3_ctx_t *ctx)
-{
-    sha3_256_init((keccak_state_t *)ctx);
-    return PSA_SUCCESS;
-}
-
 psa_status_t psa_hashes_sha3_update(psa_hashes_sha3_ctx_t *ctx,
                                       const uint8_t *input,
                                       size_t input_length)
 {
     sha3_update((keccak_state_t *)ctx, input, input_length);
+    return PSA_SUCCESS;
+}
+
+psa_status_t psa_hashes_sha3_256_setup(psa_hashes_sha3_ctx_t *ctx)
+{
+    sha3_256_init((keccak_state_t *)ctx);
     return PSA_SUCCESS;
 }
 

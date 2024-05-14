@@ -829,6 +829,8 @@ groups:
       help: MD5 hardware acceleration present.
     - name: periph_hash_sha_1
       help: SHA-1 hardware acceleration present.
+    - name: periph_hash_sha_3
+      help: SHA-3 hardware acceleration present.
     - name: periph_hash_sha_224
       help: SHA-224 hardware acceleration present.
     - name: periph_hash_sha_256
