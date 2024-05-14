@@ -103,10 +103,12 @@ void clock_start_lf(void)
     clock_lf_running = true;
 
     /* calibrate the RC LF clock if applicable */
-#if (CLOCK_HFCLK && (CLOCK_LFCLK == 0))
+#if (CLOCK_LFCLK == CLOCK_LFCLKSRC_SRC_RC)
+    clock_hfxo_request();
     NRF_CLOCK->EVENTS_DONE = 0;
     NRF_CLOCK->TASKS_CAL = 1;
     while (NRF_CLOCK->EVENTS_DONE == 0) {}
+    clock_hfxo_release();
 #endif
 }
 
