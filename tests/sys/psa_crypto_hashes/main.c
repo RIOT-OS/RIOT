@@ -22,7 +22,7 @@
 #include "psa/crypto.h"
 #include "ztimer.h"
 
-extern psa_status_t example_hash_sha256(void);
+extern psa_status_t example_hash(void);
 
 int main(void)
 {
@@ -34,11 +34,11 @@ int main(void)
     ztimer_acquire(ZTIMER_USEC);
     ztimer_now_t start = ztimer_now(ZTIMER_USEC);
 
-    status = example_hash_sha256();
-    printf("Hash SHA256 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
+    status = example_hash();
+    printf("Hash took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
     if (status != PSA_SUCCESS) {
         failed = true;
-        printf("Hash SHA256 failed: %s\n", psa_status_to_humanly_readable(status));
+        printf("Hash failed: %s\n", psa_status_to_humanly_readable(status));
     }
 
     ztimer_release(ZTIMER_USEC);
