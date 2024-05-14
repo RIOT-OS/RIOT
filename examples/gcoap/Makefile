@@ -51,6 +51,7 @@ USEMODULE += random
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_cmds_default
+USEMODULE += uri_parser
 USEMODULE += ps
 
 # Comment this out to disable code in RIOT that does safety checking
