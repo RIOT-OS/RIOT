@@ -27,12 +27,9 @@ extern "C" {
 #endif
 
 /**
- * @name    Default CoAP ports
- * @{
+ * @brief   Default CoAP port
  */
-#define COAP_PORT               (5683)  /**< unencrypted CoAP port */
-#define COAPS_PORT              (5684)  /**< CoAP over DTLS port */
-/** @} */
+#define COAP_PORT               (5683)
 
 /**
  * @brief   Default CoAP DTLS port
