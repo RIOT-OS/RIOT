@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = rust_gcoap
+APPLICATION = rust_async
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
