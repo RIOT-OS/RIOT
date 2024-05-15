@@ -51,7 +51,7 @@ endif
 IOTLAB_AUTH ?= $(HOME)/.iotlabrc
 IOTLAB_USER ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 
-ifneq (0,$(shell command -v iotlab-experiment -h > /dev/null 2>&1; echo $$?))
+ifeq (,$(shell command -v iotlab-experiment))
   $(info $(COLOR_RED)'iotlab-experiment' command is not available \
 	        please consider installing it from \
 	        https://pypi.python.org/pypi/iotlabcli$(COLOR_RESET))
@@ -60,7 +60,7 @@ endif
 
 ifeq (iotlab-a8-m3,$(BOARD))
   ifneq (,$(filter flash% reset,$(MAKECMDGOALS)))
-    ifneq (0,$(shell command -v iotlab-ssh -h > /dev/null 2>&1; echo $$?))
+    ifeq (,$(shell command -v iotlab-ssh))
       $(info $(COLOR_RED)'iotlab-ssh' command is not available \
 	          please consider installing it from \
 	          https://pypi.python.org/pypi/iotlabsshcli$(COLOR_RESET))
