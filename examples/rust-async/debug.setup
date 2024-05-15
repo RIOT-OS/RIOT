@@ -1,0 +1,2 @@
+alias mr='./bin/native/rust_async.elf tap1'
+alias nn='make && mr'
