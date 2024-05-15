@@ -114,14 +114,16 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     _callback = cb;
     _cb_arg = arg;
 
-    if (timer_create(CLOCK_MONOTONIC, NULL, &itimer_monotonic) != 0) {
+    //@@if (timer_create(CLOCK_MONOTONIC, NULL, &itimer_monotonic) != 0) {
+    if (0) {//@@
         DEBUG_PUTS("Failed to create a monotonic itimer");
         return -1;
     }
 
     if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
         DEBUG_PUTS("Failed to register SIGALRM handler");
-        timer_delete(itimer_monotonic);
+        //@@timer_delete(itimer_monotonic);
+        (void)itimer_monotonic;//@@
         return -1;
     }
 
@@ -202,7 +204,8 @@ void timer_start(tim_t dev)
     DEBUG("%s\n", __func__);
 
     _native_syscall_enter();
-    if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
+    //@@if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
+    if (0) {//@@
         core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
@@ -215,7 +218,8 @@ void timer_stop(tim_t dev)
 
     _native_syscall_enter();
     struct itimerspec zero = {0};
-    if (timer_settime(itimer_monotonic, 0, &zero, &its) == -1) {
+    //@@if (timer_settime(itimer_monotonic, 0, &zero, &its) == -1) {
+    if (0) {(void)zero;//@@
         core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
