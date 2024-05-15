@@ -842,6 +842,20 @@ int vfs_open(const char *name, int flags, mode_t mode);
 ssize_t vfs_read(int fd, void *dest, size_t count);
 
 /**
+ * @brief Read a line from an open text file
+ *
+ * Reads from a file until a `\r` or `\n` character is found.
+ *
+ * @param[in]  fd       fd number obtained from vfs_open
+ * @param[out] dest     destination buffer to hold the line
+ * @param[in]  count    maximum number of characters to read
+ *
+ * @return number of bytes read on success
+ * @return <0 on error
+ */
+ssize_t vfs_readline(int fd, char *dest, size_t count);
+
+/**
  * @brief Write bytes to an open file
  *
  * @param[in]  fd       fd number obtained from vfs_open

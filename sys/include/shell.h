@@ -225,6 +225,33 @@ static inline void shell_run(const shell_command_t *commands,
     shell_run_forever(commands, line_buf, len);
 }
 
+/**
+ * @brief           Parse and run a line of text as a shell command with
+ *                  arguments.
+ *
+ * @param[in]       commands    ptr to array of command structs
+ * @param[in]       line        The input line to parse
+ *
+ * @returns         return value of the found command
+ * @returns         -ENOEXEC if no valid command could be found
+ */
+int shell_handle_input_line(const shell_command_t *commands, char *line);
+
+/**
+ * @brief           Read shell commands from a file and run them.
+ *
+ * @note            This requires the `vfs` module.
+ *
+ * @param[in]       commands    ptr to array of command structs
+ * @param[in]       filename    file to read shell commands from
+ * @param[out]      line_nr     line on which an error occurred, may be NULL
+ *
+ * @returns         0 if all commands were executed successful
+ *                  error return of failed command otherwise
+ */
+int shell_parse_file(const shell_command_t *commands,
+                     const char *filename, unsigned *line_nr);
+
 #ifndef __cplusplus
 /**
  * @brief   Define shell command
