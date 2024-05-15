@@ -12,6 +12,10 @@ use coap_handler_implementations::{ReportingHandlerBuilder, HandlerBuilder};
 
 extern crate rust_riotmodules;
 
+extern "C" {
+    fn getchar();
+}
+
 riot_main!(main);
 
 fn main() {
@@ -35,9 +39,14 @@ fn main() {
         greg.register(&mut listener);
 
         println!("CoAP server ready; waiting for interfaces to settle before reporting addresses...");
-
-        let sectimer = ztimer::Clock::sec();
-        sectimer.sleep_ticks(2);
+        if 1 == 1 {//@@ ok
+            println!("@@ kludge: using `` instead of `sectimer.sleep_ticks(2)`");
+            unsafe { getchar(); }
+            println!("@@ kludge: `getchar()` returned");
+        } else {//@@ cf. * c56f9de1a7 2024-05-15 | KLUDGE Workaround build failure due to 'cpu/native/periph/timer.c' [j-devel]
+            let sectimer = ztimer::Clock::sec();
+            sectimer.sleep_ticks(2);
+        }
 
         for netif in gnrc::Netif::all() {
             println!("Active interface from PID {:?} ({:?})", netif.pid(), netif.pid().get_name().unwrap_or("unnamed"));
