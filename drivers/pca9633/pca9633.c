@@ -66,8 +66,6 @@ int pca9633_init(pca9633_t *dev, const pca9633_params_t *params)
 
     dev->params = *params;
 
-    i2c_init(dev->params.i2c_dev);
-
     int rc = _write_reg(dev, PCA9633_REG_MODE1, 0x0);
     _write_reg(dev, PCA9633_REG_MODE2, 0x0);
 
