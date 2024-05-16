@@ -7,46 +7,6 @@
 
 menu "PSA Key Management Configuration"
 
-config PSA_KEY_SIZE_128
-    bool "Application uses key of size 128 Bits"
-    default USEMODULE_PSA_CIPHER_AES_128_CBC
-    default USEMODULE_PSA_CIPHER_AES_128_ECB
-    help
-      Indicates that the maximum PSA key size should be at least 128 bits.
-
-config PSA_KEY_SIZE_192
-    bool "Application uses key of size 192 Bits"
-    default USEMODULE_PSA_CIPHER_AES_192_CBC
-    default USEMODULE_PSA_ASYMMETRIC_ECC_P192R1
-    help
-      Indicates that the maximum PSA key size should be at least 192 bits.
-
-config PSA_KEY_SIZE_256
-    bool "Application uses key of size 256 Bits"
-    default USEMODULE_PSA_ASYMMETRIC_ECC_P256R1
-    default USEMODULE_PSA_ASYMMETRIC_ECC_ED25519
-    default USEMODULE_PSA_CIPHER_AES_256_CBC
-    default USEMODULE_PSA_MAC_HMAC_SHA_256
-    default USEMODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
-    help
-      Indicates that the maximum PSA key size should be at least 256 bits.
-
-config PSA_KEY_SIZE_512
-    bool "Application uses key of size 512 Bits"
-    default USEMODULE_PSA_CIPHER_AES_128_CBC
-    help
-      Indicates that the maximum PSA key size should be at least 512 bits.
-
-config PSA_MAX_KEY_SIZE
-    int
-    default 64 if PSA_KEY_SIZE_512
-    default 32 if PSA_KEY_SIZE_256
-    default 24 if PSA_KEY_SIZE_192
-    default 16 if PSA_KEY_SIZE_128
-    default 0
-    help
-      Indicates the maximum PSA key size in bytes.
-
 config PSA_PROTECTED_KEY_COUNT
     int "Specifies number of allocated protected key slots"
     default 5 if USEMODULE_PSA_SECURE_ELEMENT

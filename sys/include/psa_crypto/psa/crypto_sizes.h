@@ -51,13 +51,12 @@ extern "C" {
 #define PSA_BYTES_TO_BITS(bytes) ((bytes) * 8)
 
 /**
- * @brief   Maximum key size determined by the build system.
+ * @brief   Maximum key size in bytes, determined by the build system.
  *
  * @details The maximum key size is set automatically, depending on
  *          the features chosen at compile-time. They should not be
  *          changed manually.
  */
-#ifndef CONFIG_PSA_MAX_KEY_SIZE
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
      IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
      IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
@@ -72,7 +71,6 @@ extern "C" {
 #define CONFIG_PSA_MAX_KEY_SIZE 16
 #else
 #define CONFIG_PSA_MAX_KEY_SIZE 0
-#endif
 #endif
 
 /**
