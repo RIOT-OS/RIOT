@@ -747,14 +747,11 @@ static int _atca(int argc, char **argv)
         }
     }
     else {
-        printf("* set_dev <number> - set and initialize an atca device from\
-        the global atca_params array (defaults to device at index 0)");
+        printf("* set_dev <number> - set and initialize an atca device (defaults to index 0)\n");
         printf("* read - read Microchip CryptoAuth device's config zone\n");
         printf("* read_bin - read config zone and print binary data\n");
-        printf("* lock_c - PERMANENTLY lock Microchip CryptoAuth device's config\
-        zone (cannot be undone!)\n");
-        printf("* lock_d - PERMANENTLY lock Microchip CryptoAuth device's data\
-        zone (cannot be undone!)\n");
+        printf("* lock_c - PERMANENTLY lock Microchip CryptoAuth device's config zone (cannot be undone!)\n");
+        printf("* lock_d - PERMANENTLY lock Microchip CryptoAuth device's data zone (cannot be undone!)\n");
         printf("* check_lc - check if Microchip CryptoAuth device's config zone is locked\n");
         printf("* check_ld - check if Microchip CryptoAuth device's data zone is locked\n");
     }
