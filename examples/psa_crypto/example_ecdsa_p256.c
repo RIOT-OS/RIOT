@@ -88,7 +88,7 @@ psa_status_t example_ecdsa_p256(void)
     psa_set_key_usage_flags(&pubkey_attr, PSA_KEY_USAGE_VERIFY_MESSAGE);
 #endif
     psa_set_key_algorithm(&pubkey_attr, ECC_ALG);
-    psa_set_key_bits(&pubkey_attr, PSA_BYTES_TO_BITS(pubkey_length));
+    psa_set_key_bits(&pubkey_attr, ECC_KEY_SIZE);
     psa_set_key_type(&pubkey_attr, PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1));
 
     status = psa_import_key(&pubkey_attr, public_key, pubkey_length, &pubkey_id);

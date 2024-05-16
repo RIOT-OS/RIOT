@@ -1551,6 +1551,12 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
         return PSA_SUCCESS;
     }
     else if (PSA_KEY_TYPE_IS_ECC_PUBLIC_KEY(type)) {
+        /* key material does not match expected size */
+        if (data_length != PSA_EXPORT_KEY_OUTPUT_SIZE(type, attributes->bits)) {
+            return PSA_ERROR_INVALID_ARGUMENT;
+        }
+
+        /* key material too large to be represented */
         if (data_length > PSA_EXPORT_PUBLIC_KEY_MAX_SIZE) {
             return PSA_ERROR_NOT_SUPPORTED;
         }
@@ -1944,7 +1950,7 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
         return status;
     }
 
-    if (signature_size < PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
+    if (signature_size < PSA_ECDSA_SIGNATURE_SIZE(slot->attr.bits)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -1997,7 +2003,7 @@ psa_status_t psa_sign_message(psa_key_id_t key,
         return status;
     }
 
-    if (signature_size < PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
+    if (signature_size < PSA_ECDSA_SIGNATURE_SIZE(slot->attr.bits)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -2048,7 +2054,7 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
         return status;
     }
 
-    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
+    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(slot->attr.bits)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -2105,7 +2111,7 @@ psa_status_t psa_verify_message(psa_key_id_t key,
         return status;
     }
 
-    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
+    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(slot->attr.bits)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
