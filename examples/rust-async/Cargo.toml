@@ -25,6 +25,11 @@ coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", de
 coap-handler-implementations = "0.5"
 riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs", "saul" ] }
 
+crossbeam-queue = { version = "0.3", default-features = false, features=["alloc"] }
+conquer-once = { version = "0.4", default-features = false }
+heapless = "0.8"
+embassy-executor = { version = "0.3", default-features = false, features=["nightly"] }
+
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has
 # its own top-level Rust crate to include rust_riotmodules from inside

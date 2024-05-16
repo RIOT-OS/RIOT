@@ -4,6 +4,7 @@
 // General Public License v2.1. See the file LICENSE in the top level
 // directory for more details.
 #![no_std]
+#![feature(type_alias_impl_trait)]
 
 use riot_wrappers::{riot_main, println};
 use riot_wrappers::{gcoap, thread, ztimer, gnrc};
@@ -13,16 +14,40 @@ use coap_handler_implementations::{ReportingHandlerBuilder, HandlerBuilder};
 extern crate rust_riotmodules;
 
 extern "C" {
+    fn do_vfs_init();
     fn getchar();
 }
+
+fn blocking_tick() {
+    unsafe { getchar(); }
+    println!("tick");
+}
+
+mod embassy;
 
 riot_main!(main);
 
 fn main() {
-    extern "C" {
-        fn do_vfs_init();
-    }
+    if 1 == 1 {
+        embassy::get_static(&mut embassy::Runtime::new())
+            .run(); // -> !
 
+        // should be never reached
+    } else {
+        sync_main();
+    }
+}
+
+async fn get_number() -> u32 { 42 }
+
+async fn async_main() {
+    println!("async_main(): ^^");
+
+    let number = get_number().await; // ok
+    println!("number: {}", number);
+}
+
+fn sync_main() {
     unsafe { do_vfs_init() };
 
     let handler = coap_message_demos::full_application_tree(None)
@@ -41,7 +66,7 @@ fn main() {
         println!("CoAP server ready; waiting for interfaces to settle before reporting addresses...");
         if 1 == 1 {//@@ ok
             println!("@@ kludge: using `` instead of `sectimer.sleep_ticks(2)`");
-            unsafe { getchar(); }
+            blocking_tick();
             println!("@@ kludge: `getchar()` returned");
         } else {//@@ cf. * c56f9de1a7 2024-05-15 | KLUDGE Workaround build failure due to 'cpu/native/periph/timer.c' [j-devel]
             let sectimer = ztimer::Clock::sec();
