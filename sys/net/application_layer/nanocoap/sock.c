@@ -789,7 +789,7 @@ ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
 
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 {
-    nanocoap_sock_t sock;
+    sock_udp_t sock;
     sock_udp_ep_t remote;
     coap_request_ctx_t ctx = {
         .remote = &remote,
@@ -799,7 +799,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         local->port = COAP_PORT;
     }
 
-    ssize_t res = sock_udp_create(&sock.udp, local, NULL, 0);
+    ssize_t res = sock_udp_create(&sock, local, NULL, 0);
     if (res != 0) {
         return -1;
     }
@@ -814,7 +814,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         aux_in_ptr = &aux_in;
 #endif
 
-        res = sock_udp_recv_aux(&sock.udp, buf, bufsize, SOCK_NO_TIMEOUT,
+        res = sock_udp_recv_aux(&sock, buf, bufsize, SOCK_NO_TIMEOUT,
                                 &remote, aux_in_ptr);
         if (res <= 0) {
             DEBUG("nanocoap: error receiving UDP packet %" PRIdSIZE "\n", res);
@@ -844,7 +844,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
             continue;
         }
 
-        sock_udp_send_aux(&sock.udp, buf, res, &remote, aux_out_ptr);
+        sock_udp_send_aux(&sock, buf, res, &remote, aux_out_ptr);
     }
 
     return 0;
