@@ -1,16 +1,21 @@
-use riot_wrappers::println;
+use riot_wrappers::{println, ztimer};
 
 mod executor;
 use executor::Executor;
 
+async fn async_yield() {
+    println!("tok");
+}
+
 #[embassy_executor::task]
-async fn task_main(_throttle: u32) {
+async fn task_main(throttle: u32) {
     crate::async_main().await;
 
-    //loop { Xbd::async_sleep(1).await;  Xbd::msleep(throttle, false); } // yield && less busy
-    //====
+    let timer = ztimer::Clock::msec();
     loop {
-        crate::blocking_tick(); // kludge (until the `ztimer` issue is resolved)
+        timer.sleep_ticks(throttle);
+        println!("tik");
+        async_yield().await;
     }
 }
 
