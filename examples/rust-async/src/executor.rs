@@ -1,6 +1,6 @@
 use riot_wrappers::println;
 use embassy_executor::{Spawner, raw::Executor as RawExecutor};
-use super::{to_raw, static_from_raw};
+use crate::util::{to_raw, static_from_raw};
 
 #[export_name = "__pender"]
 fn pender(context: *mut ()) {

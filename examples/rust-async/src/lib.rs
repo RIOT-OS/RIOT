@@ -18,13 +18,15 @@ extern "C" {
     //fn getchar();
 }
 
-mod embassy;
+mod util;
+mod executor;
+mod runtime;
 
 riot_main!(main);
 
 fn main() {
     if 1 == 1 {
-        embassy::get_static(&mut embassy::Runtime::new())
+        util::get_static(&mut runtime::Runtime::new())
             .run(); // -> !
 
         // should be never reached

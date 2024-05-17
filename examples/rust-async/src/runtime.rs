@@ -1,7 +1,5 @@
 use riot_wrappers::{println, ztimer};
-
-mod executor;
-use executor::Executor;
+use crate::executor::Executor;
 
 async fn async_yield() {
     println!("tok");
@@ -35,10 +33,6 @@ async fn task_shell_stream() {
     xbd::process_shell_stream().await.unwrap();
 }
 */
-
-fn to_raw<T>(x: &mut T) -> *mut () { x as *mut _ as _ }
-fn static_from_raw<T>(p: *mut ()) -> &'static mut T { unsafe { core::mem::transmute(p) } }
-pub fn get_static<T>(x: &mut T) -> &'static mut T { static_from_raw(to_raw(x)) }
 
 pub struct Runtime(Executor);
 
