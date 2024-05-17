@@ -1,13 +1,12 @@
-use super::stream::{XbdStream, StreamData, stream_uninit, StreamExt};
-use crate::println;
-use mcu_if::c_types::c_void;
+use riot_wrappers::println;
+use crate::stream::{XbdStream, StreamData, stream_uninit, StreamExt};
 
 extern "C" {
-    fn xbd_shell_get_commands() -> *const c_void;
+    fn xbd_shell_get_commands() -> *const ();
     fn xbd_async_shell_init() -> i8;
     fn xbd_async_shell_bufsize() -> usize;
     fn xbd_async_shell_prompt(tag_cstr: *const u8, highlight: bool);
-    fn handle_input_line_minerva(command_list: *const c_void, line: *const u8);
+    fn handle_input_line_minerva(command_list: *const (), line: *const u8);
 }
 
 const SHELL_BUFSIZE: usize = 128;
@@ -87,8 +86,6 @@ pub async fn process_shell_stream() -> Result<(), i8> {
             }
 
             unsafe { handle_input_line_minerva(shell_commands, line.as_ptr()); }
-
-            if 0 == 1 { crate::Xbd::async_sleep(1_000).await; } // debug, ok
         }
 
         prompt();

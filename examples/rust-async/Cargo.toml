@@ -27,6 +27,7 @@ riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-exampl
 
 crossbeam-queue = { version = "0.3", default-features = false, features=["alloc"] }
 conquer-once = { version = "0.4", default-features = false }
+futures-util = { version = "0.3", default-features = false }
 heapless = "0.8"
 embassy-executor = { version = "0.3", default-features = false, features=["nightly"] }
 

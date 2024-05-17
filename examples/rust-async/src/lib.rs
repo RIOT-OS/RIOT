@@ -22,6 +22,10 @@ mod util;
 mod executor;
 mod runtime;
 
+// WIP
+mod stream;
+//mod shell;
+
 riot_main!(main);
 
 fn main() {
