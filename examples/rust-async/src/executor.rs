@@ -17,16 +17,6 @@ pub struct Executor {
 #[derive(Debug)]
 struct Signaler(());
 
-// async fn async_yield() {
-//     println!("tok");
-// }
-    // let timer = ztimer::Clock::msec();
-    // loop {
-    //     timer.sleep_ticks(throttle);
-    //     println!("tik");
-    //     async_yield().await;
-    // }
-
 impl Executor {
     pub fn new(throttle: Option<u32>) -> Self {
         let mut signaler = Signaler(());
@@ -47,7 +37,7 @@ impl Executor {
 
             loop {
                 timer.sleep_ticks(ms);
-                println!("(throttle={}) calling .poll()", ms);
+                println!("(throttle={}) calling `executor.poll()`", ms);
                 unsafe { self.executor.poll() };
             }
         } else {
