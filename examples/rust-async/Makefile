@@ -34,6 +34,9 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# for ztimer to link `timer_*()` syscalls
+LINKFLAGS += -lrt
+
 # Add 8k extra stack: The Rust examples take more of it than gcoap expects,
 # presumably because the example use the standard library's sting formatting
 # instead of one of the more optimized formatters.
