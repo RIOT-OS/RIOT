@@ -40,8 +40,10 @@ async fn get_number() -> u32 { 42 }
 async fn async_main() {
     println!("async_main(): ^^");
 
-    let number = get_number().await; // ok
-    println!("number: {}", number);
+    for _ in 0..3 {
+        let number = get_number().await;
+        println!("number: {}", number);
+    }
 }
 
 fn sync_main() {

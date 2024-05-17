@@ -1,4 +1,4 @@
-use riot_wrappers::println;
+use riot_wrappers::{println, ztimer};
 use embassy_executor::{Spawner, raw::Executor as RawExecutor};
 use crate::util::{to_raw, static_from_raw};
 
@@ -11,26 +11,49 @@ fn pender(context: *mut ()) {
 pub struct Executor {
     executor: RawExecutor,
     _signaler: Signaler,
+    throttle: Option<u32>,
 }
 
 #[derive(Debug)]
 struct Signaler(());
 
+// async fn async_yield() {
+//     println!("tok");
+// }
+    // let timer = ztimer::Clock::msec();
+    // loop {
+    //     timer.sleep_ticks(throttle);
+    //     println!("tik");
+    //     async_yield().await;
+    // }
+
 impl Executor {
-    pub fn new() -> Self {
+    pub fn new(throttle: Option<u32>) -> Self {
         let mut signaler = Signaler(());
 
         Self {
             executor: RawExecutor::new(to_raw(&mut signaler)),
             _signaler: signaler,
+            throttle
         }
     }
 
     pub fn run(&'static mut self, init: impl FnOnce(Spawner)) -> ! {
         init(self.executor.spawner());
 
-        loop {
-            unsafe { self.executor.poll() };
+        if let Some(ms) = self.throttle {
+            println!("Executor::run(): throttle: {:?} ms", ms);
+            let timer = ztimer::Clock::msec();
+
+            loop {
+                timer.sleep_ticks(ms);
+                println!("(throttle={}) calling .poll()", ms);
+                unsafe { self.executor.poll() };
+            }
+        } else {
+            loop {
+                unsafe { self.executor.poll() };
+            }
         }
     }
 }
