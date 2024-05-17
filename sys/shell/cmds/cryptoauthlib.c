@@ -30,6 +30,35 @@
 #define ATCA_KEY_SLOT_COUNT         (15)
 #define ATCA_X509_KEY_COUNT         (4)
 
+#define SERIAL_NO_START_01          (0)
+#define REVISION_NO_START           (4)
+#define SERIAL_NO_START_02          (8)
+#define AES_ENABLE                  (13)
+#define I2C_ENABLE                  (14)
+#define I2C_ADDRESS                 (16)
+#define COUNT_MATCH                 (18)
+#define OTP_MODE                    (18)
+#define CHIP_MODE                   (19)
+#define SLOT_CONFIG_START           (20)
+#define COUNTER_01_START            (52)
+#define COUNTER_02_START            (60)
+#define LAST_KEY_USE_START          (68)
+#define USE_LOCK                    (68)
+#define VOLATILE_KEY_PERMIT         (69)
+#define SECURE_BOOT_START           (70)
+#define KDF_IV_LOC                  (72)
+#define USER_EXTRA                  (84)
+#define USER_EXTRA_ADD              (85)
+#define SELECTOR                    (85)
+#define LOCK_VALUE                  (86)
+#define LOCK_CONFIG                 (87)
+#define SLOT_LOCKED_START           (88)
+#define CHIP_OPTIONS_START          (90)
+#define X509_FORMAT_START           (92)
+#define KEY_CONFIG_START            (96)
+
+int device_index = 0;
+
 /**
  * @brief   Convert one byte into a binary number
  *
@@ -53,22 +82,12 @@ void get_bin(char *result, uint8_t byte)
 static char* _convert_atca_devtype(ATCADeviceType devtype)
 {
     switch(devtype) {
-        case ATSHA204A:
-            return "ATSHA204A";
-        case ATECC108A:
-            return "ATECC108A";
         case ATECC508A:
             return "ATECC508A";
         case ATECC608:
             return "ATECC608";
-        case ATSHA206A:
-            return "ATSHA206A";
-        case ECC204:
-            return "ECC204";
-        case TA100:
-            return "TA100";
         default:
-            return "ATCA_DEV_UNKNOWN";
+            return "Unsupported device";
     }
 }
 
@@ -78,43 +97,38 @@ static char* _convert_atca_devtype(ATCADeviceType devtype)
  *          Reserved bytes that don't mean anything are omitted.
  *
  * @param[in]   data           Pointer to buffer with input data
- * @param       data_size      Size of input buffer
- * @param[in]   data_count     Current data count
- * @param[out]  communications Contains the device communications mode (0 = Single Wire, 1 = I2C)
- * @return      uint8_t        Return updated @p data_count
- * @return                     -1 if there are no bytes left in data
+ * @param       devtype        Type of the device currently used
  */
-static uint8_t _print_dev_info_ro(uint8_t* data, size_t data_size, uint8_t data_count, uint8_t* communications)
+static void _print_dev_info_ro(uint8_t* data, ATCADeviceType devtype)
 {
-    if ((size_t)data_count >= data_size - ATCA_CONFIG_READ_ONLY_BYTES) {
-        return -1;
-    }
-
     printf("Serial No (Pt. 1) | ");
     for (int i = 0; i < 4; i++) {
-        printf("0x%02x ", data[data_count]);
-        data_count++;
+        printf("0x%02x ", data[SERIAL_NO_START_01+i]);
     }
     puts("");
 
     printf("Revision No.      | ");
     for (int i = 0; i < 4; i++) {
-        printf("0x%02x ", data[data_count]);
-        data_count++;
+        printf("0x%02x ", data[REVISION_NO_START+i]);
     }
     puts("");
 
     printf("Serial No (Pt. 2) | ");
     for (int i = 0; i < 5; i++) {
-        printf("0x%02x ", data[data_count]);
-        data_count++;
+        printf("0x%02x ", data[SERIAL_NO_START_02+i]);
     }
     puts("");
 
-    /* Skip reserved byte */
-    data_count++;
-    *communications = data[data_count];
-    if (*communications & 0x01) {
+    if (devtype == ATECC608) {
+        if (data[AES_ENABLE] & 0x01) {
+            printf("AES Enabled       | True\n");
+        }
+        else {
+            printf("AES Enabled       | False\n");
+        }
+    }
+
+    if (data[I2C_ENABLE] & 0x01) {
         printf("I2C Enabled       | True\n");
         printf("Single Wire       | False\n");
     }
@@ -122,10 +136,6 @@ static uint8_t _print_dev_info_ro(uint8_t* data, size_t data_size, uint8_t data_
         printf("I2C Enabled       | False\n");
         printf("Single Wire       | True\n");
     }
-
-    /* Skip reserved byte */
-    data_count += 2;
-    return data_count;
 }
 
 /**
@@ -189,14 +199,23 @@ static void _print_i2c_addr_or_gpio_mode(uint8_t data, uint8_t communications)
 }
 
 /**
- * @brief   Prints the OTP mode.
+ * @brief   Prints the OTP mode or CountMatch, depending on device type.
  *
  * @param   data Byte of data to interprete
  */
-static void _print_otp_mode(uint8_t data)
+static void _print_countmatch_or_otp_mode(uint8_t data, ATCADeviceType devtype)
 {
-    uint8_t otp_mode = data;
-    switch(otp_mode) {
+    if (devtype == ATECC608) {
+        if (data & 0x01) {
+            puts("Counter Match     | Enabled");
+            printf("CountMatchKey stored in slot %d\n", data & 0xF0);
+        }
+        else {
+            puts("Counter Match     | Disabled");
+        }
+    }
+    else {
+        switch(data) {
         case 0xAA:
             printf("OTP Mode          | Read-only\n");
             break;
@@ -205,6 +224,7 @@ static void _print_otp_mode(uint8_t data)
             break;
         default:
             printf("OTP Mode          | None\n");
+        }
     }
 }
 
@@ -213,14 +233,24 @@ static void _print_otp_mode(uint8_t data)
  *
  * @param   data Byte of data to interprete
  */
-static void _print_chip_mode(uint8_t data)
+static void _print_chip_mode(uint8_t data, ATCADeviceType devtype)
 {
     puts("ChipMode:");
-    if (data & 0x01) {
-        puts("SelectorMode      | Only writeable if zero");
+    if (devtype == ATECC608) {
+        if (data & 0x01) {
+            puts("I2C Address       | I2C address was set by user and is stored in UserExtraAdd");
+        }
+        else {
+            puts("I2C Address       | Default address");
+        }
     }
     else {
-        puts("SelectorMode      | Always writeable");
+        if (data & 0x01) {
+            puts("SelectorMode      | Only writeable if zero");
+        }
+        else {
+            puts("SelectorMode      | Always writeable");
+        }
     }
 
     if (data & 0x02) {
@@ -236,127 +266,152 @@ static void _print_chip_mode(uint8_t data)
     else {
         puts("Watchdog          | 1.3 sec (recommended)");
     }
+
+    if (devtype == ATECC608) {
+        printf("Clock Divider     | 0x%02x\n", data & 0xF0);
+    }
 }
 
 /**
  * @brief   Print Key Slot Configurations in hexadecimal and binary format
  *
  * @param[in]   data        Pointer to buffer with input data
- * @param       data_size   Size of input buffer
- * @param[in]   data_count  Current data count
- * @return      uint8_t     Return updated @p data_count
- * @return                  -1 if there are no bytes left in data
  */
-static uint8_t _print_slot_config(uint8_t* data, size_t data_size, uint8_t data_count)
+static void _print_slot_config(uint8_t* data)
 {
-    size_t atca_slot_config_bytes = ATCA_KEY_SLOT_COUNT*2;
-    if ((size_t)data_count >= data_size - atca_slot_config_bytes) {
-        return -1;
-    }
-
     char binary[9];
+
     puts("Slot Config");
     puts("----------------------------------------");
     puts("SlotID  | Hex    | Binary");
     puts("        |        | 7      0 | 15     8");
     puts("--------+--------+----------------------");
-    for (int i = 0; i < 32; i += 2) {
+    for (size_t i = 0; i < ATCA_KEY_SLOT_COUNT*2; i += 2) {
         static int slotcount = 0;
         if (slotcount < 10) {
-            printf("%d       | 0x%02x%02x | ", slotcount, data[data_count], data[data_count+1]);
+            printf("%d       | 0x%02x%02x | ", slotcount, data[SLOT_CONFIG_START+i], data[SLOT_CONFIG_START+i+1]);
         }
         else {
-            printf("%d      | 0x%02x%02x | ", slotcount, data[data_count], data[data_count+1]);
+            printf("%d      | 0x%02x%02x | ", slotcount, data[SLOT_CONFIG_START+i], data[SLOT_CONFIG_START+i+1]);
         }
         for (int j = 0; j < 2; j++) {
-            get_bin(binary, data[data_count]);
+            get_bin(binary, data[i]);
             printf("%s | ", binary);
-            data_count++;
         }
         puts("");
         slotcount++;
     }
     puts("");
-
-    return data_count;
 }
 
 /**
  * @brief       Print lock status of key slots
  *
  * @param[in]   data        Pointer to buffer with input data
- * @param       data_size   Size of input buffer
- * @param[in]   data_count  Current data count
- * @return      uint8_t     Return updated @p data_count
- * @return                  -1 if there are no bytes left in data
  */
-static uint8_t _print_slot_lock(uint8_t* data, size_t data_size, uint8_t data_count)
+static void _print_slot_lock(uint8_t* data)
 {
-    if ((size_t)data_count >= data_size - ATCA_KEY_SLOT_COUNT) {
-        return -1;
-    }
     puts("\nSlotLocked (X = locked, - = unlocked):");
     puts("Slot   |  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15");
     printf("Locked | ");
     for (int j = 0; j < 2; j++) {
         for (int i = 0; i < 8; i++) {
-            if ((data[data_count] >> i) & 0x01) {
-                printf(" X ");
-            }
-            else {
+            if ((data[SLOT_LOCKED_START+j] >> i) & 0x01) {
                 printf(" - ");
             }
-            data_count++;
+            else {
+                printf(" X ");
+            }
         }
     }
     puts("");
-    return data_count;
+}
+
+static void _print_chip_options(uint8_t* data)
+{
+    puts("Chip Options:");
+    if (data[CHIP_OPTIONS_START] & 0x01) {
+        puts("Power On Self Test| Enabled");
+    }
+    else {
+        puts("Power On Self Test| Disabled");
+    }
+
+    if (data[CHIP_OPTIONS_START] & 0x02) {
+        puts("IO Prot Key       | Enabled");
+    }
+    else {
+        puts("IO Prot Key       | Disabled");
+    }
+
+    if (data[CHIP_OPTIONS_START] & 0x04) {
+        puts("AES KDF           | Enabled");
+    }
+    else {
+        puts("AES KDF           | Disabled");
+    }
+
+    uint8_t ecdh_prot = data[CHIP_OPTIONS_START+1] & 0x03;
+    switch(ecdh_prot) {
+        case 0x00:
+            puts("ECDH              | Clear Output on Bus OK");
+            break;
+        case 0x01:
+            puts("ECDH              | Encrypted Output on Bus OK");
+            break;
+        case 0x10:
+            puts("ECDH              | Result stored in TempKey or EEPROM Key Slot");
+            break;
+        default:
+            puts("ECDH              | Usage Not permitted");
+    }
+
+    uint8_t kdf_prot = data[CHIP_OPTIONS_START+1] & 0x0C;
+    switch(kdf_prot) {
+        case 0x00:
+            puts("KDF               | Clear Output on Bus OK");
+            break;
+        case 0x01:
+            puts("KDF               | Encrypted Output on Bus OK");
+            break;
+        case 0x10:
+            puts("KDF               | Result stored in TempKey or EEPROM Key Slot");
+            break;
+        default:
+            puts("KDF               | Usage Not permitted");
+    }
+
+    printf("IO Protection Key stored in slot %d\n", data[CHIP_OPTIONS_START+1] & 0xF0);
 }
 
 /**
  * @brief   Print X509 format restrictions
  *
  * @param[in]   data        Pointer to buffer with input data
- * @param       data_size   Size of input buffer
- * @param[in]   data_count  Current data count
- * @return      uint8_t     Return updated @p data_count
- * @return                  -1 if there are no bytes left in data
  */
-static uint8_t _print_x509_format(uint8_t* data, size_t data_size, uint8_t data_count)
+static void _print_x509_format(uint8_t* data)
 {
-    if ((size_t)data_count >= data_size - ATCA_X509_KEY_COUNT) {
-        return -1;
-    }
-
     puts("\nX509 Format:");
     for (int i = 0; i < 4; i++) {
-        if (data[data_count+i] == 0x00) {
+        if (data[X509_FORMAT_START+i] == 0x00) {
             printf("PubKey %d         | No restrictions\n", i);
         }
         else {
             printf("PubKey %d:\n", i);
-            printf("- PublicPosition  | 0x%02x\n", data[data_count+i] & 0x0F);
-            printf("- TemplateLength  | 0x%02x\n", data[data_count+i] & 0xF0);
+            printf("- PublicPosition  | 0x%02x\n", data[X509_FORMAT_START+i] & 0x0F);
+            printf("- TemplateLength  | 0x%02x\n", data[X509_FORMAT_START+i] & 0xF0);
         }
     }
-    return data_count += 4;
 }
 
 /**
  * @brief   Print key configurations
  *
  * @param[in]   data        Pointer to buffer with input data
- * @param       data_size   Size of input buffer
- * @param[in]   data_count  Current data count
- * @return      uint8_t     Return updated @p data_count
- * @return                  -1 if there are no bytes left in data
  */
-static uint8_t _print_key_config(uint8_t* data, size_t data_size, uint8_t data_count)
+static void _print_key_config(uint8_t* data)
 {
     size_t atca_key_config_bytes = ATCA_KEY_SLOT_COUNT*2;
-    if ((size_t)data_count >= data_size - atca_key_config_bytes) {
-        return -1;
-    }
 
     char binary[9];
     puts("\nKey Config");
@@ -364,32 +419,62 @@ static uint8_t _print_key_config(uint8_t* data, size_t data_size, uint8_t data_c
     puts("SlotID  | Hex    | Binary");
     puts("        |        | 7      0 | 15     8");
     puts("--------+--------+----------------------");
-    for (int i = 0; i < 32; i += 2) {
+    for (size_t i = 0; i < atca_key_config_bytes; i += 2) {
         static int slotcount = 0;
         if (slotcount < 10) {
-            printf("%d       | 0x%02x%02x | ", slotcount, data[data_count], data[data_count+1]);
+            printf("%d       | 0x%02x%02x | ", slotcount, data[KEY_CONFIG_START+i], data[KEY_CONFIG_START+i+1]);
         }
         else {
-            printf("%d      | 0x%02x%02x | ", slotcount, data[data_count], data[data_count+1]);
+            printf("%d      | 0x%02x%02x | ", slotcount, data[KEY_CONFIG_START+i], data[KEY_CONFIG_START+i+1]);
         }
         for (int j = 0; j < 2; j++) {
-            get_bin(binary, data[data_count]);
+            get_bin(binary, data[KEY_CONFIG_START+i]);
             printf("%s | ", binary);
-            data_count++;
         }
         puts("");
         slotcount++;
     }
     puts("");
+}
 
-    return data_count;
+static void _print_secure_boot(uint8_t* data)
+{
+    uint8_t secure_boot_mode = data[SECURE_BOOT_START] & 0x03;
+    switch(secure_boot_mode) {
+        case 0x01:
+            puts("SecureBootMode    | Full");
+            break;
+        case 0x10:
+            puts("SecureBootMode    | Stored signature");
+            break;
+        case 0x11:
+            puts("SecureBootMode    | Stored digest");
+            break;
+        default:
+            puts("SecureBootMode    | Disabled");
+    }
+
+    if (data[SECURE_BOOT_START] & 0x08) {
+        puts("SecureBootPersist | Enabled");
+    }
+    else {
+        puts("SecureBootPersist | Disabled");
+    }
+
+    if (data[SECURE_BOOT_START] & 0x10) {
+        puts("SecureBootNonce   | Required, must use ATECC608 RNG");
+    }
+    else {
+        puts("SecureBootNonce   | Optional, controlled by SecureBootMode");
+    }
+
+    printf("Secure Boot Signature or Digest stored in slot %d\n", data[SECURE_BOOT_START+1] & 0x0F);
+    printf("Secure Boot Public Key stored in slot %d\n", data[SECURE_BOOT_START+1] & 0xF0);
 }
 
 static int _read_config(ATCADevice dev)
 {
     uint8_t data[ATCA_ECC_CONFIG_SIZE];
-    int data_count = 0;
-    uint8_t communications;
 
     memset(data, 0, ATCA_ECC_CONFIG_SIZE);
 
@@ -404,90 +489,91 @@ static int _read_config(ATCADevice dev)
     puts("--------------------------------------------");
     ATCADeviceType devtype = dev->mIface.mIfaceCFG->devtype;
     printf("Device Type       | %s\n", _convert_atca_devtype(devtype));
-    if (devtype == ATECC608) {
-        puts("\n***************************Note***************************");
-        printf("This interpretation is valid for ATECC508A devices.\nIf you have an ATECC608, you'll need to get the datasheet\n(NDA signature required) and interprete it yourself.\nThe config zone is very similar, so you can print it\nin binary format with the 'read_bin' command and\nmatch the corresponding bytes.\n");
-        puts("**********************************************************\n");
-    }
-    data_count = _print_dev_info_ro(data, sizeof(data), data_count, &communications);
-    if (data_count == -1) {
-        printf("Error formatting read-only config zone\n");
-        return 1;
-    }
+
+    _print_dev_info_ro(data, devtype);
     puts("--------------------------------------------\n");
 
     puts("Device Info (Writable)");
     puts("---------------------------------------------");
-    _print_i2c_addr_or_gpio_mode(data[data_count], communications);
-    data_count += 2;
+    _print_i2c_addr_or_gpio_mode(data[I2C_ADDRESS], data[I2C_ENABLE] & 0x01);
 
-    _print_otp_mode(data[data_count]);
-    data_count++;
+    _print_countmatch_or_otp_mode(data[OTP_MODE], devtype);
 
-    _print_chip_mode(data[data_count]);
-    data_count++;
+    _print_chip_mode(data[CHIP_MODE], devtype);
     puts("");
 
-    data_count = _print_slot_config(data, sizeof(data), data_count);
-    if (data_count == -1) {
-        printf("Error formatting read-only config zone\n");
-        return 1;
+    _print_slot_config(data);
+
+    printf("Counter 0         | 0x%02x 0x%02x 0x%02x 0x%02x\n", data[COUNTER_01_START],
+                                                                data[COUNTER_01_START+1],
+                                                                data[COUNTER_01_START+2],
+                                                                data[COUNTER_01_START+3]);
+
+    printf("Counter 1         | 0x%02x 0x%02x 0x%02x 0x%02x\n", data[COUNTER_02_START],
+                                                                data[COUNTER_02_START+1],
+                                                                data[COUNTER_02_START+2],
+                                                                data[COUNTER_02_START+3]);
+
+    if (devtype == ATECC608) {
+        if ((data[USE_LOCK] & 0x0F) == 0x0A) {
+            puts("UseLockEnable     | True");
+            printf("UseLockKey is stored in slot %d\n", data[USE_LOCK] & 0xF0);
+        }
+        else {
+            puts("UseLockEnable     | False");
+        }
+
+        if (data[VOLATILE_KEY_PERMIT] & 0x80) {
+            puts("VolatileKeyPermit | Enabled");
+            printf("Volatile Key Permit key stored in slot %d\n", data[VOLATILE_KEY_PERMIT] & 0x0F);
+        }
+        else {
+            puts("VolatileKeyPermit | Disabled");
+        }
+
+        _print_secure_boot(data);
+
+        printf("KDF IV Loc        | %d\n", data[KDF_IV_LOC]);
+    }
+    else {
+        for (int i = LAST_KEY_USE_START; i < ATCA_KEY_SLOT_COUNT; i++) {
+            printf("LastKeyUse %d     | 0x%02x\n", i, data[i]);
+        }
     }
 
-    printf("Counter 0         | 0x%02x 0x%02x 0x%02x 0x%02x\n", data[data_count],
-                                                                data[data_count+1],
-                                                                data[data_count+2],
-                                                                data[data_count+3]);
-    data_count += 4;
+    printf("UserExtra         | 0x%02x\n", data[USER_EXTRA]);
 
-    printf("Counter 1         | 0x%02x 0x%02x 0x%02x 0x%02x\n", data[data_count],
-                                                                data[data_count+1],
-                                                                data[data_count+2],
-                                                                data[data_count+3]);
-    data_count += 4;
+    if (devtype == ATECC608) {
+        printf("UserExtraAdd (I2C)| 0x%02x\n", data[USER_EXTRA_ADD]);
 
-    printf("LastKeyUse        | 0x%02x\n", data[data_count]);
-    data_count++;
+    }
+    else{
+        printf("Selector          | 0x%02x\n", data[SELECTOR]);
+    }
 
-    printf("UserExtra         | 0x%02x\n", data[data_count]);
-    data_count++;
-
-    printf("Selector          | 0x%02x\n", data[data_count]);
-    data_count++;
-
-    if (data[data_count] == 0x00) {
+    if (data[LOCK_VALUE] == 0x00) {
         puts("LockValue         | Data and OTP Locked");
     }
     else {
         puts("LockValue         | Data and OTP Unlocked");
     }
-    data_count++;
 
-    if (data[data_count] == 0x00) {
+    if (data[LOCK_CONFIG] == 0x00) {
         puts("LockConfig        | Config Zone Locked");
     }
     else {
         puts("LockConfig        | Config Zone Unlocked");
     }
-    data_count++;
 
-    data_count = _print_slot_lock(data, sizeof(data), data_count);
-    if (data_count == -1) {
-        printf("Error formatting read-only config zone\n");
-        return 1;
-    }
+    _print_slot_lock(data);
 
-    data_count = _print_x509_format(data, sizeof(data), data_count);
-    if (data_count == -1) {
-        printf("Error formatting read-only config zone\n");
-        return 1;
+    if (devtype == ATECC608) {
+        _print_chip_options(data);
     }
+    _print_x509_format(data);
 
-    data_count = _print_key_config(data, sizeof(data), data_count);
-    if (data_count == -1) {
-        printf("Error formatting read-only config zone\n");
-        return 1;
-    }
+    _print_key_config(data);
+
     return 0;
 }
 
@@ -703,47 +789,45 @@ static int _lock_data(ATCADevice dev)
     return 0;
 }
 
-static int _set_dev(char* id, ATCADevice dev)
+static int _set_dev(char* id)
 {
     int index = atoi(id);
     if (index > (int)ATCA_NUMOF-1) {
         printf("Invalid ID, can be 0 - %d\n", ATCA_NUMOF-1);
         return 1;
     }
-    atcab_init_ext(&dev, (ATCAIfaceCfg *)&atca_params[index]);
+    device_index = index;
     return 0;
 }
 
 static int _atca(int argc, char **argv)
 {
-    ATCADevice dev;
-    atcab_init_ext(&dev, (ATCAIfaceCfg *)&atca_params[0]);
-
     if (argc > 1) {
         if ((strcmp(argv[1], "set_dev") == 0)) {
             if (argc < 3) {
                 puts("Please enter valid device index number");
                 return 1;
             }
-            return _set_dev(argv[2], dev);
+            return _set_dev(argv[2]);
         }
+
         if ((strcmp(argv[1], "read") == 0)) {
-            return _read_config(dev);
+            return _read_config(atca_devs_ptr[device_index]);
         }
         else if ((strcmp(argv[1], "read_bin") == 0)) {
-            return _read_config_bin(dev);
+            return _read_config_bin(atca_devs_ptr[device_index]);
         }
         else if ((strcmp(argv[1], "lock_c") == 0)) {
-            return _lock_config(dev);
+            return _lock_config(atca_devs_ptr[device_index]);
         }
         else if ((strcmp(argv[1], "lock_d") == 0)) {
-            return _lock_data(dev);
+            return _lock_data(atca_devs_ptr[device_index]);
         }
         else if ((strcmp(argv[1], "check_lc") == 0)) {
-            return _check_lock_config(dev);
+            return _check_lock_config(atca_devs_ptr[device_index]);
         }
         else if ((strcmp(argv[1], "check_ld") == 0)) {
-            return _check_lock_data(dev);
+            return _check_lock_data(atca_devs_ptr[device_index]);
         }
     }
     else {
