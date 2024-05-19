@@ -137,6 +137,17 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                                  int *idx);
 
 /**
+ * @brief Regenerate a temporary address
+ * @param netif Network interface of the temporary address and the SLAAC prefix.
+ * @param addr Current temporary address (or any address in the SLAAC prefix for that matter)
+ * @param retries passed as-is to @ref _generate_temporary_addr
+ * @param caller_description Text detail for logging
+ * @return -1 on failure, 0 on success
+ */
+int _regen_temp_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr, uint8_t retries,
+                     const char *caller_description);
+
+/**
  * @brief Check if the address is a temporary address.
  * (Assuming the provided address is a configured address.
  * This function only checks for prefix existence.)
