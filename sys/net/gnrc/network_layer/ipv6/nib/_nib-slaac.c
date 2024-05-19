@@ -185,6 +185,32 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     return 0;
 }
 
+int _regen_temp_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr, uint8_t retries,
+                     const char *caller_description) {
+    //find associated prefix
+    uint32_t slaac_prefix_pref_until;
+    if (!_get_slaac_prefix_pref_until(netif, addr, &slaac_prefix_pref_until)) {
+        // at least one match is expected,
+        LOG_WARNING("nib: The temporary address smh outlived the SLAAC prefix valid lft.");
+        assert(false);
+        return -1;
+    }
+
+    uint32_t now = evtimer_now_msec();
+    assert(now < slaac_prefix_pref_until);
+    // else the temporary address smh outlived the SLAAC prefix preferred lft
+
+    if (_generate_temporary_addr(netif, addr,
+                                 slaac_prefix_pref_until - now,
+                                 retries,
+                                 NULL) < 0) {
+        LOG_WARNING("nib: Temporary address regeneration failed%s.\n", caller_description);
+        return -1;
+    }
+
+    return 0;
+}
+
 bool is_temporary_addr(const gnrc_netif_t *netif, const ipv6_addr_t *addr) {
     return gnrc_ipv6_nib_pl_has_prefix(netif->pid, addr, IPV6_ADDR_BIT_LEN);
 }
@@ -327,27 +353,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         retries++;
         DEBUG("Trying regeneration of temporary address. (%u/%u)\n", retries, TEMP_IDGEN_RETRIES);
 
-        //find associated prefix
-        uint32_t slaac_prefix_pref_until;
-        if (!_get_slaac_prefix_pref_until(netif, addr, &slaac_prefix_pref_until)) {
-            // at least one match is expected,
-            LOG_WARNING("nib: The temporary address smh outlived the SLAAC prefix valid lft.");
-            assert(false);
-            return;
-        }
-
-        uint32_t now = evtimer_now_msec();
-        assert(now < slaac_prefix_pref_until);
-        // else the temporary address smh outlived the SLAAC prefix preferred lft
-
-        if (_generate_temporary_addr(netif, addr,
-                                     slaac_prefix_pref_until - now,
-                                     retries,
-                                     NULL) < 0) {
-            LOG_WARNING("nib: Temporary address regeneration failed after DAD failure.\n");
-            return;
-        }
-
+        _regen_temp_addr(netif, addr, retries, " after DAD failure");
         return;
     }
 #endif

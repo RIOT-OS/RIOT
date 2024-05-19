@@ -1534,17 +1534,7 @@ static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx) {
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
     assert(netif != NULL);
 
-    uint32_t slaac_prefix_pref_until;
-    if (!_get_slaac_prefix_pref_until(netif, &pfx->pfx, &slaac_prefix_pref_until)) {
-        return;
-    }
-    assert(evtimer_now_msec() < slaac_prefix_pref_until); /*SLAAC prefix still preferred*/
-    if (_generate_temporary_addr(netif, &pfx->pfx,
-                                 slaac_prefix_pref_until - evtimer_now_msec(), /*must be that of SLAAC prefix*/
-                                 0, NULL) < 0) {
-        LOG_WARNING("nib: Temporary address regeneration failed.\n");
-        return;
-    }
+    _regen_temp_addr(netif, &pfx->pfx, 0, "");
 }
 #endif
 
