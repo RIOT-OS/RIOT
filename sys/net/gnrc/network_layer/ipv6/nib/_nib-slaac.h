@@ -129,17 +129,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
  * Optional, leave NULL if not needed.
  *
  * @return -1 on failure
- * @return ta_max_pref_lft on success
- * This value should be used to (re)schedule
- * the @ref GNRC_IPV6_NIB_REGEN_TEMP_ADDR event accordingly,
- * i.e. if direct access to the @ref _nib_offl_entry_t is present,
- * by its @ref regen_temp_addr event,
- * otherwise through @ref gnrc_ipv6_nib_pl_reschedule_regen
- * (This method does not do it by itself
- * because it does not have direct access to the @ref _nib_offl_entry_t
- * but the caller may have)
- * The offset for the event SHOULD be
- * the returned value minus @ref _get_netif_regen_advance(netif)
+ * @return 0 on success
  */
 int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                                  const uint32_t pfx_pref_ltime,

@@ -249,7 +249,7 @@ extern "C" {
  * @brief   Temporary address: regenerate
  *
  * This message type is for the event of a regeneration of a temporary address.
- * The expected message context is a valid off-link entry representing the associated SLAAC prefix.
+ * The expected message context is a valid off-link entry representing the temporary address prefix.
  *
  * @see "REGEN_ADVANCE time units before" - https://www.rfc-editor.org/rfc/rfc8981.html#section-3.6
  */
