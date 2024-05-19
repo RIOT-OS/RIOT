@@ -101,17 +101,6 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
 bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pfx,
                                  const uint8_t pfx_len);
 
-/**
- * @brief Reschedule the regeneration timer for temporary addresses of this prefix.
- * @param[in] iface The interface on which the prefix is present.
- * @param[in] pfx The SLAAC prefix that is to be found.
- * @param[in] offset The offset in milliseconds at which the regeneration event shall occur.
- *                   0 to remove the timer event.
- * @return false if prefix was not found, otherwise true.
- */
-bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr_t *pfx,
-                                       const uint32_t offset);
-
 #endif
 
 /**
