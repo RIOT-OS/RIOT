@@ -24,4 +24,5 @@ FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_timer_query_freqs
 
 FEATURES_PROVIDED += periph_gpio_ll
+FEATURES_PROVIDED += periph_gpio_ll_irq
 FEATURES_PROVIDED += periph_gpio_ll_switch_dir
