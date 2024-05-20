@@ -718,26 +718,31 @@ static void test_irq_edge(void)
     puts_optional("... OK");
 
     puts_optional("Testing both edges on PIN_IN_0");
-    expect(0 == gpio_ll_irq(port_in, PIN_IN_0, GPIO_TRIGGER_EDGE_BOTH,
-                            irq_edge_cb, &irq_mut));
-    /* test for spurious IRQ */
-    expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                                   mutex_timeout));
-    gpio_ll_set(port_out, 1UL << PIN_OUT_0);
-    /* test for IRQ on rising edge */
-    expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                          mutex_timeout));
-    /* test for spurious IRQ */
-    expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                                   mutex_timeout));
-    gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
-    /* test for IRQ on falling edge */
-    expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                          mutex_timeout));
-    /* test for spurious IRQ */
-    expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                                   mutex_timeout));
-    puts_optional("... OK");
+    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_EDGE_TRIGGERED_BOTH)) {
+        expect(0 == gpio_ll_irq(port_in, PIN_IN_0, GPIO_TRIGGER_EDGE_BOTH,
+                                irq_edge_cb, &irq_mut));
+        /* test for spurious IRQ */
+        expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                                       mutex_timeout));
+        gpio_ll_set(port_out, 1UL << PIN_OUT_0);
+        /* test for IRQ on rising edge */
+        expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                              mutex_timeout));
+        /* test for spurious IRQ */
+        expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                                       mutex_timeout));
+        gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
+        /* test for IRQ on falling edge */
+        expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                              mutex_timeout));
+        /* test for spurious IRQ */
+        expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                                       mutex_timeout));
+        puts_optional("... OK");
+    }
+    else {
+        puts_optional("... SKIPPED (not supported)");
+    }
 
     puts_optional("Testing masking of IRQs (still both edges on PIN_IN_0)");
     gpio_ll_irq_mask(port_in, PIN_IN_0);

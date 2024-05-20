@@ -534,6 +534,9 @@ groups:
         help: Level triggered IRQs are supported for level high.
       - name: periph_gpio_ll_irq_level_triggered_low
         help: Level triggered IRQs are supported for level low.
+      - name: periph_gpio_ll_irq_edge_triggered_both
+        help: Edge triggered IRQs are supported with both falling and rising
+              edges as trigger
       - name: periph_gpio_ll_irq_unmask
         help: The GPIO LL driver supports unmasking interrupts without
               clearing pending IRQs that came in while masked.
