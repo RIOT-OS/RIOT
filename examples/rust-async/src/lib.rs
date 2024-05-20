@@ -29,14 +29,9 @@ mod stream;
 riot_main!(main);
 
 fn main() {
-    if 1 == 1 {
-        util::get_static(&mut runtime::Runtime::new())
-            .run(); // -> !
+    if 0 == 1 { sync_main(); return; }
 
-        // should be never reached
-    } else {
-        sync_main();
-    }
+    runtime::Runtime::new().run();
 }
 
 async fn get_number() -> u32 { 42 }
@@ -48,6 +43,9 @@ async fn async_main() {
         let number = get_number().await;
         println!("number: {}", number);
     }
+
+    //stream::foo(); // !!!!
+    panic!("ok");
 }
 
 fn sync_main() {

@@ -1,5 +1,6 @@
 //use riot_wrappers::println;
 use crate::executor::Executor;
+use crate::util::get_static;
 
 #[embassy_executor::task]
 async fn task_main() {
@@ -30,8 +31,8 @@ impl Runtime {
         Self(Executor::new(Some(100)))
     }
 
-    pub fn run(&'static mut self) -> ! {
-        self.0.run(|spawner| {
+    pub fn run(&mut self) -> ! {
+        get_static(self).0.run(|spawner| {
             spawner.spawn(task_main()).unwrap();
             spawner.spawn(task_shell_stream()).unwrap();
             // spawner.spawn(task_gcoap_server_stream()).unwrap();
