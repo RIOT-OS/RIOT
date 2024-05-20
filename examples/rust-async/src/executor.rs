@@ -1,35 +1,52 @@
 use riot_wrappers::{println, ztimer};
-use embassy_executor::{Spawner, raw::Executor as RawExecutor};
-use crate::util::{to_raw, static_from_raw};
+use embassy_executor::{Spawner, raw};
+use crate::util::static_from_raw;
 
 #[export_name = "__pender"]
 fn pender(context: *mut ()) {
     let signaler: &'static Signaler = static_from_raw(context);
-    if 1 == 1 { println!("@@ pender(): signaler: {:?}", signaler); }
+    assert_eq!(signaler.dummy, SIGNALER_DUMMY_DATA);
 }
 
 pub struct Executor {
-    executor: RawExecutor,
-    _signaler: Signaler,
+    inner: raw::Executor,
+    signaler: &'static Signaler,
     throttle: Option<u32>,
 }
 
-#[derive(Debug)]
-struct Signaler(());
+use conquer_once::spin::OnceCell;
+static SIGNALER: OnceCell<Signaler> = OnceCell::uninit();
+
+struct Signaler {
+    dummy: u8,
+}
+
+const SIGNALER_DUMMY_DATA: u8 = 42;
+
+impl Signaler {
+    fn new() -> Self {
+        Self {
+            dummy: SIGNALER_DUMMY_DATA,
+        }
+    }
+}
 
 impl Executor {
     pub fn new(throttle: Option<u32>) -> Self {
-        let mut signaler = Signaler(());
+        SIGNALER.try_init_once(|| Signaler::new()).unwrap();
+        let signaler: &'static Signaler = SIGNALER.get().unwrap();
 
         Self {
-            executor: RawExecutor::new(to_raw(&mut signaler)),
-            _signaler: signaler,
-            throttle
+            inner: raw::Executor::new(signaler as *const Signaler as *mut ()),
+            signaler,
+            throttle,
         }
     }
 
     pub fn run(&'static mut self, init: impl FnOnce(Spawner)) -> ! {
-        init(self.executor.spawner());
+        init(self.inner.spawner());
+
+        assert_eq!(self.signaler.dummy, SIGNALER_DUMMY_DATA);
 
         if let Some(ms) = self.throttle {
             println!("Executor::run(): throttle: {:?} ms", ms);
@@ -37,12 +54,12 @@ impl Executor {
 
             loop {
                 timer.sleep_ticks(ms);
-                println!("(throttle={}) calling `executor.poll()`", ms);
-                unsafe { self.executor.poll() };
+                println!("(throttle={}) calling `.poll()`", ms);
+                unsafe { self.inner.poll() };
             }
         } else {
             loop {
-                unsafe { self.executor.poll() };
+                unsafe { self.inner.poll() };
             }
         }
     }
