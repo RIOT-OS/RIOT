@@ -128,6 +128,7 @@ int adc_init(adc_t line);
  */
 int32_t adc_sample(adc_t line, adc_res_t res);
 
+#ifndef __cplusplus
 /**
  * @brief   Capture multiple ADC samples from one or multiple ADC lines
  *
@@ -146,6 +147,7 @@ int32_t adc_sample(adc_t line, adc_res_t res);
 void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
                       size_t num_samples, uint16_t bufs[lines_numof][num_samples],
                       adc_res_t res, uint32_t f_adc);
+#endif
 
 /**
  * @brief   Configure the ADC with a given resolution for continuous sampling
