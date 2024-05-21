@@ -141,7 +141,7 @@ static void _print_dev_info_ro(uint8_t* data, ATCADeviceType devtype)
 /**
  * @brief   Get authorization mode
  *
- * @param   data    Byte of data to interprete
+ * @param   data    Byte of data to interpret
  * @return  char*   Data interpretation as string
  */
 static char* _get_authorization_mode(uint8_t data)
@@ -154,7 +154,7 @@ static char* _get_authorization_mode(uint8_t data)
  * @brief   Prints the I2C address when I2C is enabled or the
  *          GPIO mode when Single Wire communication is enabled
  *
- * @param   data            Byte of data to interprete
+ * @param   data            Byte of data to interpret
  * @param   communications  Device communications mode (0 = Single Wire, 1 = I2C)
  */
 static void _print_i2c_addr_or_gpio_mode(uint8_t data, uint8_t communications)
@@ -201,7 +201,7 @@ static void _print_i2c_addr_or_gpio_mode(uint8_t data, uint8_t communications)
 /**
  * @brief   Prints the OTP mode or CountMatch, depending on device type.
  *
- * @param   data Byte of data to interprete
+ * @param   data Byte of data to interpret
  */
 static void _print_countmatch_or_otp_mode(uint8_t data, ATCADeviceType devtype)
 {
@@ -231,7 +231,7 @@ static void _print_countmatch_or_otp_mode(uint8_t data, ATCADeviceType devtype)
 /**
  * @brief   Prints the chip mode
  *
- * @param   data Byte of data to interprete
+ * @param   data Byte of data to interpret
  */
 static void _print_chip_mode(uint8_t data, ATCADeviceType devtype)
 {
