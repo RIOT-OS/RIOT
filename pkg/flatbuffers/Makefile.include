@@ -1,11 +1,7 @@
 INCLUDES += -I$(PKGDIRBASE)/flatbuffers/include
 
-FLATC ?= flatc
-
-ifneq (0,$(shell which flatc > /dev/null 2>&1 ; echo $$?))
-  FLATC = $(RIOTTOOLS)/flatc/flatc
-  $(call target-export-variables,all,FLATC)
-endif
+FLATC = $(RIOTTOOLS)/flatc/flatc
+$(call target-export-variables,all,FLATC)
 
 # This package is a header only package, so there's nothing to build
 PSEUDOMODULES += flatbuffers
