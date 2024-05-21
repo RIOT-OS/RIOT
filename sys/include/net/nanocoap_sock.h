@@ -590,6 +590,25 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
                                 coap_blockwise_cb_t callback, void *arg);
 
 /**
+ * @brief    Performs a blockwise coap get request to the specified url, store
+ *           the response in a buffer.
+ *
+ * @param[in]   sock       socket to use for the request
+ * @param[in]   path       Absolute URL pointer to source path
+ * @param[in]   blksize    sender suggested SZX for the COAP block request
+ * @param[in]   offset     Offset in bytes from the start of the resource
+ * @param[in]   dst        Target buffer
+ * @param[in]   len        Target buffer length
+ *
+ * @returns     <0 on error
+ * @returns     -EINVAL    if an invalid url is provided
+ * @returns     size of the response payload on success
+ */
+int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
+                            coap_blksize_t blksize, size_t offset,
+                            void *dst, size_t len);
+
+/**
  * @brief    Performs a blockwise coap get request to the specified url.
  *
  * This function will fetch the content of the specified resource path via
