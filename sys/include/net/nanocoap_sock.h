@@ -222,6 +222,55 @@ typedef struct {
 } coap_block_request_t;
 
 /**
+ * @brief   Context from CoAP request for separate response
+ */
+typedef struct {
+    sock_udp_ep_t remote;           /**< remote to send response to         */
+#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+    sock_udp_ep_t local;            /**< local from which to send response  */
+#endif
+    uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token              */
+    uint8_t tkl;                    /**< request token length               */
+    uint8_t no_response;            /**< no-response bitmap                 */
+} nanocoap_server_response_ctx_t;
+
+/**
+ * @brief   Prepare the context for a separate response
+ *
+ * This function serializes the CoAP request information so that
+ * a separate response can be generated outside the CoAP handler.
+ *
+ * The CoAP handler should then respond with an empty ACK by calling
+ * @ref coap_build_empty_ack
+ *
+ * @param[out]  ctx     Context information for separate response
+ * @param[in]   pkt     CoAP packet to which the response will be generated
+ * @param[in]   req     Context of the CoAP request
+ */
+void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
+                                      coap_pkt_t *pkt, const coap_request_ctx_t *req);
+
+/**
+ * @brief   Send a separate response to a CoAP request
+ *
+ *  This sends a response to a CoAP request outside the CoAP handler
+ *
+ * @pre     @ref nanocoap_server_prepare_separate has been called on @p ctx
+ *          inside the CoAP handler
+ *
+ * @param[in]   ctx     Context information for the CoAP response
+ * @param[in]   code    CoAP response code
+ * @param[in]   type    Response type, may be `COAP_TYPE_NON`
+ * @param[in]   payload Response payload
+ * @param[in]   len     Payload length
+ *
+ * @returns     0 on success
+ *              negative error (see @ref sock_udp_sendv_aux)
+ */
+int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
+                                  unsigned code, unsigned type,
+                                  const void *payload, size_t len);
+/**
  * @brief   Get next consecutive message ID for use when building a new
  *          CoAP request.
  *
