@@ -61,7 +61,11 @@
 #include "sched.h"
 #include "clist.h"
 #include "iolist.h"
+#include "macros/utils.h"
 #include "mtd.h"
+#ifdef MODULE_NANOCOAP_FS
+#include "net/sock/config.h"
+#endif
 #include "xfa.h"
 
 #ifdef __cplusplus
@@ -75,20 +79,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   MAX functions for internal use
- * @{
+ * @brief   MAX6 Function to get the largest of 6 values
  */
-#ifndef _MAX
-#define _MAX(a, b) ((a) > (b) ? (a) : (b))
+#ifndef MAX6
+#define MAX6(a, b, c, d, e, f) MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f))
 #endif
-
-#ifndef MAX5
-/**
- * @brief   MAX5 Function to get the largest of 5 values
- */
-#define MAX5(a, b, c, d, e) _MAX(_MAX(_MAX((a), (b)), _MAX((c),(d))), (e))
-#endif
-/** @} */
 
 /**
  * @brief   VFS parameters for FAT
@@ -208,6 +203,21 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   VFS parameters for nanoCoAP FS
+ * @{
+ */
+#if defined(MODULE_NANOCOAP_FS) || DOXYGEN
+#  define NANOCOAP_FS_VFS_DIR_BUFFER_SIZE  \
+          (4 + CONFIG_SOCK_URLPATH_MAXLEN) /**< sizeof(nanocoap_fs_dir_t) */
+#  define NANOCOAP_FS_VFS_FILE_BUFFER_SIZE \
+          (4 + CONFIG_SOCK_URLPATH_MAXLEN) /**< sizeof(nanocoap_fs_file_t) */
+#else
+#  define NANOCOAP_FS_VFS_DIR_BUFFER_SIZE   (1)
+#  define NANOCOAP_FS_VFS_FILE_BUFFER_SIZE  (1)
+#endif
+/** @} */
+
 #ifndef VFS_MAX_OPEN_FILES
 /**
  * @brief Maximum number of simultaneous open files
@@ -243,11 +253,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
-                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
-                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE,    \
-                                 LWEXT4_VFS_DIR_BUFFER_SIZE     \
+#define VFS_DIR_BUFFER_SIZE MAX6(FATFS_VFS_DIR_BUFFER_SIZE,      \
+                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,   \
+                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE,  \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE,     \
+                                 LWEXT4_VFS_DIR_BUFFER_SIZE,     \
+                                 NANOCOAP_FS_VFS_DIR_BUFFER_SIZE \
                                 )
 #endif
 
@@ -271,11 +282,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX5(FATFS_VFS_FILE_BUFFER_SIZE,    \
-                                  LITTLEFS_VFS_FILE_BUFFER_SIZE, \
-                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE,   \
-                                  LWEXT4_VFS_FILE_BUFFER_SIZE    \
+#define VFS_FILE_BUFFER_SIZE MAX6(FATFS_VFS_FILE_BUFFER_SIZE,      \
+                                  LITTLEFS_VFS_FILE_BUFFER_SIZE,   \
+                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,  \
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE,     \
+                                  LWEXT4_VFS_FILE_BUFFER_SIZE,     \
+                                  NANOCOAP_FS_VFS_FILE_BUFFER_SIZE \
                                  )
 #endif
 
