@@ -34,20 +34,10 @@ USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
 
-include $(RIOTBASE)/tests/Makefile.boards.netif
-ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
-  # Use modules for networking
-  # gnrc is a meta module including all required, basic gnrc networking modules
-  USEMODULE += gnrc
-  # use the default network interface for the board
-  USEMODULE += netdev_default
-  # automatically initialize the network interface
-  USEMODULE += auto_init_gnrc_netif
-  # shell command to send L2 packets with a simple string
-  USEMODULE += gnrc_txtsnd
-  # the application dumps received packets to stdout
-  USEMODULE += gnrc_pktdump
-endif
+# Use a network interface, if available. The handling is done in
+# Makefile.board.dep, which is processed recursively as part of the dependency
+# resolution.
+FEATURES_OPTIONAL += netif
 
 FEATURES_OPTIONAL += periph_rtc
 
@@ -57,15 +47,6 @@ ifneq (,$(filter msba2,$(BOARD)))
 endif
 
 include $(RIOTBASE)/Makefile.include
-
-ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
-  # We use only the lower layers of the GNRC network stack, hence, we can
-  # reduce the size of the packet buffer a bit
-  # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
-  ifndef CONFIG_GNRC_PKTBUF_SIZE
-    CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
-  endif
-endif
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk

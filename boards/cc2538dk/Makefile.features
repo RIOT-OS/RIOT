@@ -11,4 +11,5 @@ FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 FEATURES_PROVIDED += emulator_renode
+FEATURES_PROVIDED += netif
 FEATURES_PROVIDED += riotboot

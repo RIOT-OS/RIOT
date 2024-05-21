@@ -5,3 +5,6 @@ CPU_MODEL = stm32f103cb
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_uart
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += netif

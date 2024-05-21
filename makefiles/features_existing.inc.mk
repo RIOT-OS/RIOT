@@ -132,6 +132,7 @@ FEATURES_EXISTING := \
     highlevel_stdio \
     libstdcpp \
     motor_driver \
+    netif \
     newlib \
     no_idle_thread \
     periph_adc \
