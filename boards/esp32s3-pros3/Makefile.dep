@@ -10,5 +10,9 @@ ifeq (,$(filter stdio_% slipdev_stdio usbus usbus% tinyusb_device,$(USEMODULE)))
   include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
 
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
 include $(RIOTBOARD)/common/esp32s3/Makefile.dep
 include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
