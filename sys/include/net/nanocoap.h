@@ -409,6 +409,7 @@ typedef struct {
     size_t end;                     /**< End offset of the current block    */
     size_t cur;                     /**< Offset of the generated content    */
     uint8_t *opt;                   /**< Pointer to the placed option       */
+    uint8_t obytes;                 /**< size of the placed option          */
 } coap_block_slicer_t;
 
 #if defined(MODULE_NANOCOAP_RESOURCES) || DOXYGEN
