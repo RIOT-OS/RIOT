@@ -377,6 +377,22 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
     }
 }
 
+static void _memo_clear_resend_buffer(gcoap_request_memo_t *memo)
+{
+    uint8_t hdr[GCOAP_HEADER_MAXLEN];
+    if (memo->send_limit >= 0 && memo->msg.data.pdu_buf) {
+        /* store header from retransmission buffer */
+        memcpy(hdr, memo->msg.data.pdu_buf, sizeof(hdr));
+        /* mark referenced retransmission buffer as available again */
+        *memo->msg.data.pdu_buf = 0;
+        /* but store the header to keep the token for Observe notifications */
+        memcpy(memo->msg.hdr_buf, hdr, sizeof(hdr));
+        /* no further retransmissions should be made and
+           gcoap_request_memo_get_hdr() has to know how to get the header for Observe notifications */
+        memo->send_limit = GCOAP_SEND_LIMIT_NON;
+    }
+}
+
 /* Processes and evaluates the coap pdu */
 static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux,
                               uint8_t *buf, size_t len, bool truncated)
@@ -518,9 +534,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                     memo->resp_handler(memo, &pdu, remote);
                 }
 
-                if (memo->send_limit >= 0) {        /* if confirmable */
-                    *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
-                }
+                _memo_clear_resend_buffer(memo);
 
                 /* The memo must be kept if the response is an observe notification.
                  * Non-2.xx notifications indicate that the associated observe entry
@@ -972,9 +986,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
             req.hdr = gcoap_request_memo_get_hdr(memo);
             memo->resp_handler(memo, &req, NULL);
         }
-        if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {
-            *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
-        }
+        _memo_clear_resend_buffer(memo);
         memo->state = GCOAP_MEMO_UNUSED;
     }
     else {
@@ -1357,9 +1369,7 @@ static void _receive_from_cache_cb(void *ctx)
             if (_cache_build_response(ce, &pdu, _listen_buf, sizeof(_listen_buf)) >= 0) {
                 memo->state = (ce->truncated) ? GCOAP_MEMO_RESP_TRUNC : GCOAP_MEMO_RESP;
                 memo->resp_handler(memo, &pdu, &memo->remote_ep);
-                if (memo->send_limit >= 0) {        /* if confirmable */
-                    *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
-                }
+                _memo_clear_resend_buffer(memo);
                 memo->state = GCOAP_MEMO_UNUSED;
             }
         }
@@ -1765,9 +1775,7 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
     }
     if (res <= 0) {
         if (memo != NULL) {
-            if (msg_type == COAP_TYPE_CON) {
-                *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
-            }
+            _memo_clear_resend_buffer(memo);
             if (timeout > 0) {
                 event_timeout_clear(&memo->resp_evt_tmout);
             }
