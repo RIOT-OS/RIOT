@@ -23,6 +23,7 @@
 #include "ztimer.h"
 
 extern psa_status_t example_ecdsa_p256(void);
+extern psa_status_t test_ecdsa_p256_vectors(void);
 
 int main(void)
 {
@@ -30,6 +31,12 @@ int main(void)
     psa_status_t status;
 
     psa_crypto_init();
+
+    status = test_ecdsa_p256_vectors();
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("ECDSA test vectors failed: %s\n", psa_status_to_humanly_readable(status));
+    }
 
     ztimer_acquire(ZTIMER_USEC);
     ztimer_now_t start = ztimer_now(ZTIMER_USEC);
