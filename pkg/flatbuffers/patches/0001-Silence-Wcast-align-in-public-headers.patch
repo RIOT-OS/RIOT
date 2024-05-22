@@ -1,20 +1,39 @@
-From 89ecddee041efc5065b6ec015ac273dff5231b57 Mon Sep 17 00:00:00 2001
+From 2ce377f5a799abce0b6a3c8539857b702efaa5b3 Mon Sep 17 00:00:00 2001
 From: Kasper Hjort Berthelsen <khjo@itu.dk>
-Date: Tue, 21 May 2024 15:07:30 +0200
+Date: Wed, 22 May 2024 13:51:37 +0200
 Subject: [PATCH 1/1] Silence Wcast-align in public headers
 
 ---
- include/flatbuffers/buffer.h             |  3 +++
+ include/flatbuffers/buffer.h             |  9 +++++++++
  include/flatbuffers/flatbuffer_builder.h | 12 ++++++++++++
  include/flatbuffers/table.h              |  6 ++++++
  include/flatbuffers/vector_downward.h    |  6 ++++++
- 4 files changed, 27 insertions(+)
+ 4 files changed, 33 insertions(+)
 
 diff --git a/include/flatbuffers/buffer.h b/include/flatbuffers/buffer.h
-index 94d4f790..4f163f6e 100644
+index 94d4f790..f496b5a5 100644
 --- a/include/flatbuffers/buffer.h
 +++ b/include/flatbuffers/buffer.h
-@@ -119,9 +119,12 @@ struct IndirectHelper<OffsetT<T>> {
+@@ -96,12 +96,18 @@ template<typename T> struct IndirectHelper {
+   static const size_t element_stride = sizeof(T);
+ 
+   static return_type Read(const uint8_t *p, const size_t i) {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     return EndianScalar((reinterpret_cast<const T *>(p))[i]);
++#pragma GCC diagnostic pop
+   }
+   static mutable_return_type Read(uint8_t *p, const size_t i) {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-align"
+     return reinterpret_cast<mutable_return_type>(
+         Read(const_cast<const uint8_t *>(p), i));
+   }
++#pragma GCC diagnostic pop
+ };
+ 
+ // For vector of Offsets.
+@@ -119,9 +125,12 @@ struct IndirectHelper<OffsetT<T>> {
  
      // Then read the scalar value of the offset (which may be 32 or 64-bits) and
      // then determine the relative location from the offset location.
