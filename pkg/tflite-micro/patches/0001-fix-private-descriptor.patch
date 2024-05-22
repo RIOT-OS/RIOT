@@ -1,0 +1,91 @@
+From 8eef2021de2c2051c54cc1d9670f784485c65f13 Mon Sep 17 00:00:00 2001
+From: Kasper Hjort Berthelsen <khjo@itu.dk>
+Date: Tue, 21 May 2024 23:17:43 +0200
+Subject: [PATCH 1/1] fix private descriptor
+
+---
+ tensorflow/lite/micro/memory_planner/greedy_memory_planner.h | 4 ++--
+ tensorflow/lite/micro/memory_planner/linear_memory_planner.h | 4 ++--
+ tensorflow/lite/micro/micro_allocator.h                      | 4 ++--
+ tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h   | 1 -
+ 4 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/tensorflow/lite/micro/memory_planner/greedy_memory_planner.h b/tensorflow/lite/micro/memory_planner/greedy_memory_planner.h
+index b2cdb617..77b9a1cc 100644
+--- a/tensorflow/lite/micro/memory_planner/greedy_memory_planner.h
++++ b/tensorflow/lite/micro/memory_planner/greedy_memory_planner.h
+@@ -112,6 +112,8 @@ class GreedyMemoryPlanner : public MicroMemoryPlanner {
+   // that aren't being used during a phase of invocation are overwritten.
+   bool preserves_all_tensors() const override { return false; }
+ 
++  TF_LITE_REMOVE_VIRTUAL_DELETE
++  
+  private:
+   // Whether a buffer is active in a given time range.
+   bool DoesEntryOverlapInTime(const ListEntry* entry, const int first_time_used,
+@@ -161,8 +163,6 @@ class GreedyMemoryPlanner : public MicroMemoryPlanner {
+ 
+   // Whether buffers have been added since the last plan was calculated.
+   bool need_to_calculate_offsets_;
+-
+-  TF_LITE_REMOVE_VIRTUAL_DELETE
+ };
+ 
+ }  // namespace tflite
+diff --git a/tensorflow/lite/micro/memory_planner/linear_memory_planner.h b/tensorflow/lite/micro/memory_planner/linear_memory_planner.h
+index 9850569f..4fbdf54e 100644
+--- a/tensorflow/lite/micro/memory_planner/linear_memory_planner.h
++++ b/tensorflow/lite/micro/memory_planner/linear_memory_planner.h
+@@ -39,13 +39,13 @@ class LinearMemoryPlanner : public MicroMemoryPlanner {
+   // invocation.
+   bool preserves_all_tensors() const override { return true; }
+ 
++  TF_LITE_REMOVE_VIRTUAL_DELETE
++
+  private:
+   static constexpr int kMaxBufferCount = 1024;
+   size_t buffer_offsets_[kMaxBufferCount];
+   int current_buffer_count_;
+   size_t next_free_offset_;
+-
+-  TF_LITE_REMOVE_VIRTUAL_DELETE
+ };
+ 
+ }  // namespace tflite
+diff --git a/tensorflow/lite/micro/micro_allocator.h b/tensorflow/lite/micro/micro_allocator.h
+index 4eff167d..b7895127 100644
+--- a/tensorflow/lite/micro/micro_allocator.h
++++ b/tensorflow/lite/micro/micro_allocator.h
+@@ -291,6 +291,8 @@ class MicroAllocator {
+                                                           int subgraph_idx,
+                                                           bool allocate_temp);
+ 
++  TF_LITE_REMOVE_VIRTUAL_DELETE
++
+  private:
+   // Commits a memory plan for all non-persistent buffer allocations in the
+   // 'head' section of the memory arena. The eval_tensors pointer is the list of
+@@ -339,8 +341,6 @@ class MicroAllocator {
+   // Holds the byte length of the memory plan with the largest head usage. Used
+   // to ensure that multi-tenant allocations can share the head for buffers.
+   size_t max_head_buffer_usage_ = 0;
+-
+-  TF_LITE_REMOVE_VIRTUAL_DELETE
+ };
+ 
+ }  // namespace tflite
+diff --git a/tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h b/tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h
+index d3702f46..186a226e 100644
+--- a/tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h
++++ b/tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h
+@@ -28,7 +28,6 @@ class MicroErrorReporter : public ErrorReporter {
+   ~MicroErrorReporter() override {}
+   int Report(const char* format, va_list args) override;
+ 
+- private:
+   TF_LITE_REMOVE_VIRTUAL_DELETE
+ };
+ 
+-- 
+2.34.1
+
