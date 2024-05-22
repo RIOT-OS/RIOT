@@ -1,7 +1,6 @@
 include ../Makefile.net_common
-include $(RIOTBASE)/tests/Makefile.boards.netif
 
-BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
+FEATURES_REQUIRED += netif
 
 USEMODULE += shell
 USEMODULE += shell_cmds_default

@@ -30,5 +30,8 @@ ifeq (rv32,$(CPU_ARCH))
   FEATURES_PROVIDED += arch_esp_riscv
 endif
 
+# All ESP* MCUs have a peripheral network interface
+FEATURES_PROVIDED += netif
+
 FEATURES_CONFLICT += esp_wifi_ap:esp_now
 FEATURES_CONFLICT_MSG += "ESP_NOW and ESP_WIFI_AP can not be used at the same time."

@@ -15,3 +15,4 @@ FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
+FEATURES_PROVIDED += netif

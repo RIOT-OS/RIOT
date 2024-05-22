@@ -15,4 +15,7 @@ FEATURES_PROVIDED += periph_wdt
 
 FEATURES_PROVIDED += cortexm_mpu
 
+# MCU has a peripheral network interface
+FEATURES_PROVIDED += netif
+
 include $(RIOTCPU)/cortexm_common/Makefile.features
