@@ -688,7 +688,6 @@ BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)
 BUILDDEPS += pkg-prepare
 BUILDDEPS += $(APPDEPS)
 BUILDDEPS += $(MODULE_LIST_DIR)
-BUILDDEPS += $(BUILD_DIR)/CACHEDIR.TAG
 
 # Build dependencies depend on clean (if a make goal), as clean may wipe them.
 # Without them depending on clean parallel builds occasionally fail due to
@@ -754,11 +753,6 @@ $(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build $(GENSRC)
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
 	$(Q)$(SIZE) $(SIZEFLAGS) $<
-
-$(BUILD_DIR)/CACHEDIR.TAG:
-	$(Q)mkdir -p "$(BUILD_DIR)"
-	$(Q)echo "Signature: 8a477f597d28d172789f06886806bc55" > "$@"
-	$(Q)echo "# This folder contains RIOT's build cache" >> "$@"
 
 %.hex: %.elf
 	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex $< $@

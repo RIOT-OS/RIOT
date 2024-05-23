@@ -82,8 +82,15 @@ PKG_CUSTOM_PREPARED ?=
 # Declare 'all' first to have it being the default target
 all: prepare
 
+BUILD_DIR ?= $(RIOTBASE)/build
+
+$(BUILD_DIR)/CACHEDIR.TAG:
+	$(Q)mkdir -p "$(BUILD_DIR)"
+	$(Q)echo "Signature: 8a477f597d28d172789f06886806bc55" > "$@"
+	$(Q)echo "# This folder contains RIOT's build cache" >> "$@"
+
 # Add noop builtin to avoid "Nothing to be done for prepare" message
-prepare: $(PKG_PREPARED)
+prepare: $(PKG_PREPARED) | $(BUILD_DIR)/CACHEDIR.TAG
 	@:
 
 # Allow packages to add a custom step to be `prepared`.
