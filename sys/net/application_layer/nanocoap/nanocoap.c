@@ -1326,7 +1326,7 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
 }
 
-bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
+int coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
 {
     assert(slicer->opt);
 
@@ -1346,9 +1346,9 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
         /* if the option grew larger, we already corrupted content */
         assert(obytes < slicer->obytes);
         memmove(slicer->opt + obytes, slicer->opt + slicer->obytes,
-                slicer->cur - slicer->obytes);
+                1 + slicer->cur - slicer->obytes);
     }
-    return more;
+    return slicer->obytes - obytes;
 }
 
 ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
