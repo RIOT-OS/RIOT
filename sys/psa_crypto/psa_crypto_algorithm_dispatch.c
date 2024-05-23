@@ -677,4 +677,66 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
     (void)mac_length;
     return PSA_SUCCESS;
 }
+
+psa_status_t psa_algorithm_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
+                                                   const psa_key_attributes_t *attributes,
+                                                   const psa_key_slot_t *slot,
+                                                   psa_algorithm_t alg)
+{
+    (void)operation;
+    (void)attributes;
+    (void)slot;
+    (void)alg;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_algorithm_dispatch_mac_verify_setup(psa_mac_operation_t *operation,
+                                                     const psa_key_attributes_t *attributes,
+                                                     const psa_key_slot_t *slot,
+                                                     psa_algorithm_t alg)
+{
+    (void)operation;
+    (void)attributes;
+    (void)slot;
+    (void)alg;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_algorithm_dispatch_mac_update(psa_mac_operation_t *operation,
+                                               const uint8_t *input,
+                                               size_t input_length)
+{
+    (void)operation;
+    (void)input;
+    (void)input_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_algorithm_dispatch_mac_sign_finish(psa_mac_operation_t *operation,
+                                                    uint8_t *mac,
+                                                    size_t mac_size,
+                                                    size_t *mac_length)
+{
+    (void)operation;
+    (void)mac;
+    (void)mac_size;
+    (void)mac_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_algorithm_dispatch_mac_verify_finish(psa_mac_operation_t *operation,
+                                                      const uint8_t *mac,
+                                                      size_t mac_length)
+{
+    (void)operation;
+    (void)mac;
+    (void)mac_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_algorithm_dispatch_mac_abort(psa_mac_operation_t *operation)
+{
+    (void)operation;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
 #endif /* MODULE_PSA_MAC */
