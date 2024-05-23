@@ -269,7 +269,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     vfs_close(fd);
 
     slicer.cur = slicer.end + more;
-    coap_block2_finish(&slicer);
+    resp_len -= coap_block2_finish(&slicer);
 
     if (read == 0) {
         /* Rewind to clear payload marker */
