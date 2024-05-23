@@ -585,6 +585,29 @@ ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
                                           void *buf, size_t len);
 
 /**
+ * @brief    Performs a blockwise CoAP GET request, store the response
+ *           in a buffer.
+ *
+ * This function will fetch the content of the specified resource path via
+ * block-wise-transfer.
+ * The blocks will be re-assembled into @p buf
+ *
+ * @param[in]   sock       socket to use for the request
+ * @param[in]   path       pointer to source path
+ * @param[in]   blksize    sender suggested SZX for the COAP block request
+ * @param[in]   buf        Target buffer
+ * @param[in]   len        Target buffer length
+ *
+ * @returns     <0 on error
+ * @returns     -EINVAL    if an invalid url is provided
+ * @returns     -ENOBUFS   if the provided buffer was too small
+ * @returns     size of the response payload on success
+ */
+ssize_t nanocoap_get_blockwise_to_buf(nanocoap_sock_t *sock, const char *path,
+                                      coap_blksize_t blksize,
+                                      void *buf, size_t len);
+
+/**
  * @brief   Simple synchronous CoAP request
  *
  * @param[in]       sock    socket to use for the request

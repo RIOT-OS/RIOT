@@ -811,6 +811,17 @@ ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
     return (res < 0) ? (ssize_t)res : (ssize_t)_buf.len;
 }
 
+ssize_t nanocoap_get_blockwise_to_buf(nanocoap_sock_t *sock, const char *path,
+                                      coap_blksize_t blksize,
+                                      void *buf, size_t len)
+{
+    _buf_t _buf = { .ptr = buf, .len = len };
+
+    int res = nanocoap_sock_get_blockwise(sock, path, blksize, _2buf, &_buf);
+
+    return (res < 0) ? (ssize_t)res : (ssize_t)_buf.len;
+}
+
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 {
     nanocoap_sock_t sock;
