@@ -1,5 +1,6 @@
 use riot_wrappers::{println, ztimer};
 use embassy_executor::{Spawner, raw};
+use conquer_once::spin::OnceCell;
 use crate::util::static_from_raw;
 
 #[export_name = "__pender"]
@@ -8,20 +9,12 @@ fn pender(context: *mut ()) {
     assert_eq!(signaler.dummy, SIGNALER_DUMMY_DATA);
 }
 
-pub struct Executor {
-    inner: raw::Executor,
-    signaler: &'static Signaler,
-    throttle: Option<u32>,
-}
-
-use conquer_once::spin::OnceCell;
+const SIGNALER_DUMMY_DATA: u8 = 42;
 static SIGNALER: OnceCell<Signaler> = OnceCell::uninit();
 
 struct Signaler {
     dummy: u8,
 }
-
-const SIGNALER_DUMMY_DATA: u8 = 42;
 
 impl Signaler {
     fn new() -> Self {
@@ -29,6 +22,12 @@ impl Signaler {
             dummy: SIGNALER_DUMMY_DATA,
         }
     }
+}
+
+pub struct Executor {
+    inner: raw::Executor,
+    signaler: &'static Signaler,
+    throttle: Option<u32>,
 }
 
 impl Executor {
@@ -53,9 +52,8 @@ impl Executor {
             let timer = ztimer::Clock::msec();
 
             loop {
-                timer.sleep_ticks(ms);
-                println!("(throttle={}) calling `.poll()`", ms);
                 unsafe { self.inner.poll() };
+                timer.sleep_ticks(ms);
             }
         } else {
             loop {
