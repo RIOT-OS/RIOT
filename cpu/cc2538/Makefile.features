@@ -17,5 +17,7 @@ FEATURES_PROVIDED += cortexm_mpu
 
 # MCU has a peripheral network interface
 FEATURES_PROVIDED += netif
+# the integrated netif is supported by OpenWSN
+FEATURES_PROVIDED += netif_openwsn
 
 include $(RIOTCPU)/cortexm_common/Makefile.features

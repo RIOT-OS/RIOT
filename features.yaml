@@ -881,6 +881,8 @@ groups:
     help: The board has a network interface
   - name: netif_ethernet
     help: The board has an Ethernet network interface
+  - name: netif_openwsn
+    help: The board has a network interface suitable for OpenWSN
   - name: highlevel_stdio
     help: A high-level stdio method (such as CDC ACM) is used. This requires a
           running thread and set-up and will not print during a crash.
