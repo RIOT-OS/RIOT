@@ -25,7 +25,6 @@ coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", de
 coap-handler-implementations = "0.5"
 riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs", "saul" ] }
 
-crossbeam-queue = { version = "0.3", default-features = false, features=["alloc"] }
 conquer-once = { version = "0.4", default-features = false }
 futures-util = { version = "0.3", default-features = false }
 heapless = "0.8"

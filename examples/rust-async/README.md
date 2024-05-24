@@ -1,3 +1,7 @@
+async Rust runtime and applications
+===================================
+
+<!--
 gcoap used with Rust
 ====================
 
@@ -51,3 +55,4 @@ Once that is ready, in a parallel shell, run:
 ```
 $ aiocoap-client 'coap://[2a02:0b18:c13b:8018:1234:56ff:fe78:90ab]/.well-known/core'
 ```
+-->
