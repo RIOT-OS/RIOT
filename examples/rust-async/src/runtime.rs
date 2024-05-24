@@ -24,11 +24,13 @@ async fn task_gcoap_server_stream() {
 }
 */
 
+const RUNTIME_THROTTLE_MS: u32 = 100;
+
 pub struct Runtime(Executor);
 
 impl Runtime {
     pub fn new() -> Self {
-        Self(Executor::new(Some(100)))
+        Self(Executor::new(Some(RUNTIME_THROTTLE_MS)))
     }
 
     pub fn run(&mut self) -> ! {
