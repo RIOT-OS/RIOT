@@ -9,12 +9,12 @@ async fn task_main() {
 
 #[embassy_executor::task]
 async fn task_shell_stream() {
-    //crate::shell::process_shell_stream().await.unwrap();
+    crate::shell::process_shell_stream().await.unwrap();
 }
 
 #[embassy_executor::task]
 async fn task_callback_stream() {
-    //xbd::process_callback_stream().await.unwrap();
+    //crate::callback::process_callback_stream().await.unwrap();
 }
 
 /*

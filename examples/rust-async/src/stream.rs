@@ -30,6 +30,7 @@ impl<T, const N: usize> XStream<T, N> {
         }
     }
 
+    #[allow(dead_code)]
     pub fn empty(&mut self) {
         while let Some(_) = self.queue.dequeue() {}
     }

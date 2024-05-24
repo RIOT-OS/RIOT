@@ -11,7 +11,7 @@ mod executor;
 mod runtime;
 
 mod stream;
-//mod shell; // WIP
+mod shell;
 
 riot_main!(main);
 
