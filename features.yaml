@@ -877,10 +877,10 @@ groups:
 - title: Board Features
   help: These features indicate features of the board
   features:
-  - name: ethernet
-    help: The board has Ethernet connectivity
   - name: netif
     help: The board has a network interface
+  - name: netif_ethernet
+    help: The board has an Ethernet network interface
   - name: highlevel_stdio
     help: A high-level stdio method (such as CDC ACM) is used. This requires a
           running thread and set-up and will not print during a crash.

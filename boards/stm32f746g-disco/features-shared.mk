@@ -17,6 +17,6 @@ FEATURES_PROVIDED += periph_usbdev_hs
 FEATURES_PROVIDED += periph_usbdev_hs_ulpi
 
 # Put other features for this board (in alphabetical order)
-FEATURES_PROVIDED += ethernet
+FEATURES_PROVIDED += netif_ethernet
 FEATURES_PROVIDED += netif
 FEATURES_PROVIDED += tinyusb_device
