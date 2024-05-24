@@ -946,7 +946,7 @@ typedef enum {
 #endif
 
 #ifndef ETH_TX_BUFFER_COUNT
-#define ETH_TX_BUFFER_COUNT (4)
+#define ETH_TX_BUFFER_COUNT (2)
 #endif
 
 #ifndef ETH_RX_BUFFER_SIZE
