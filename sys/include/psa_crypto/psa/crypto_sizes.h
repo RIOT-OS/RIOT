@@ -482,6 +482,36 @@ extern "C" {
 #endif
 
 /**
+ * @brief   A sufficient buffer size for storing the HMAC hash input. This is usually
+            the maximum block length of the supported HMAC hash algorithms.
+ */
+#if (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_224))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_224))       /* 144 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_256))       /* 136 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_384) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_256))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA_512_256))    /* 128 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_384))       /* 104 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_512))       /* 72 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_MD4) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD5) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_RIPEMD160) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_1) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_256))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA_256))        /* 64 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_MD2))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_MD2))            /* 16 */
+#else
+#define PSA_HMAC_BLOCK_MAX_SIZE 0
+#endif
+
+/**
  * @brief   The block size of a block cipher.
  *
  * @note    It is possible to build stream cipher algorithms on top of a block cipher,
