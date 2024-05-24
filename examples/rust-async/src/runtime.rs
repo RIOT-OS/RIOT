@@ -12,12 +12,12 @@ async fn task_shell_stream() {
     //crate::shell::process_shell_stream().await.unwrap();
 }
 
-/*
 #[embassy_executor::task]
-async fn task_api_stream() {
-    xbd::process_api_stream().await.unwrap();
+async fn task_callback_stream() {
+    //xbd::process_callback_stream().await.unwrap();
 }
 
+/*
 #[embassy_executor::task]
 async fn task_gcoap_server_stream() {
     xbd::process_gcoap_server_stream().await.unwrap();
@@ -35,8 +35,8 @@ impl Runtime {
         get_static(self).0.run(|spawner| {
             spawner.spawn(task_main()).unwrap();
             spawner.spawn(task_shell_stream()).unwrap();
+            spawner.spawn(task_callback_stream()).unwrap();
             // spawner.spawn(task_gcoap_server_stream()).unwrap();
-            // spawner.spawn(task_api_stream()).unwrap();
         });
     }
 }

@@ -3,7 +3,6 @@
 
 use riot_wrappers::{riot_main, println};
 
-
 extern crate rust_riotmodules;
 
 mod gcoap;
@@ -11,9 +10,8 @@ mod util;
 mod executor;
 mod runtime;
 
-// WIP
 mod stream;
-//mod shell;
+//mod shell; // WIP
 
 riot_main!(main);
 
@@ -33,6 +31,5 @@ async fn async_main() {
         println!("number: {}", number);
     }
 
-    //stream::foo(); // !!!!
     panic!("ok");
 }
