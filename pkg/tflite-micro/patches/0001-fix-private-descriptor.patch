@@ -19,7 +19,7 @@ index b2cdb617..77b9a1cc 100644
    bool preserves_all_tensors() const override { return false; }
  
 +  TF_LITE_REMOVE_VIRTUAL_DELETE
-+  
++
   private:
    // Whether a buffer is active in a given time range.
    bool DoesEntryOverlapInTime(const ListEntry* entry, const int first_time_used,
