@@ -190,7 +190,8 @@ static ssize_t _lookup_raw(const cord_lc_rd_t *rd, unsigned content_format,
     if (pkt_len < 0) {
         return CORD_LC_ERR;
     }
-    res = gcoap_req_send(reqbuf, pkt_len, rd->remote, _on_lookup, NULL, GCOAP_SOCKET_TYPE_UNDEF);
+    res = gcoap_req_send(reqbuf, pkt_len, rd->remote, NULL,
+                         _on_lookup, NULL, GCOAP_SOCKET_TYPE_UNDEF);
     if (res < 0) {
         return CORD_LC_ERR;
     }
@@ -259,7 +260,7 @@ static int _send_rd_init_req(coap_pkt_t *pkt, const sock_udp_ep_t *remote,
         return CORD_LC_ERR;
     }
 
-    if (!gcoap_req_send(buf, pkt_len, remote, _on_rd_init, NULL, GCOAP_SOCKET_TYPE_UNDEF)) {
+    if (!gcoap_req_send(buf, pkt_len, remote, NULL, _on_rd_init, NULL, GCOAP_SOCKET_TYPE_UNDEF)) {
         DEBUG("cord_lc: error gcoap_req_send()\n");
         return CORD_LC_ERR;
     }

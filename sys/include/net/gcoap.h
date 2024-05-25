@@ -330,7 +330,7 @@
  * coap_opt_add_proxy_uri(&pdu, uri);
  * unsigned len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
  *
- * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, _resp_handler, NULL,
+ * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, NULL, _resp_handler, NULL,
  *                GCOAP_SOCKET_TYPE_UNDEF);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
