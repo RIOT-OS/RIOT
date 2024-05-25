@@ -461,6 +461,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                 memo = _find_req_memo_by_mid(remote, pdu.hdr->id);
                 if ((memo != NULL) && (memo->send_limit != GCOAP_SEND_LIMIT_NON)) {
                     DEBUG("gcoap: empty ACK processed, stopping retransmissions\n");
+                    /* for a separate CON response the memo is deleted because there is no response handler set  */
                     _cease_retransmission(memo);
                 } else {
                     DEBUG("gcoap: empty ACK matches no known CON, ignoring\n");
@@ -472,7 +473,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
         /* normal request */
         else if (coap_get_type(&pdu) == COAP_TYPE_NON
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
-            size_t pdu_len;
+            ssize_t pdu_len;
 
             if (truncated) {
                 /* TBD: Set a Size1 */
@@ -488,6 +489,10 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                 if (bytes <= 0) {
                     DEBUG("gcoap: send response failed: %" PRIdSIZE "\n", bytes);
                 }
+            }
+            else if (!pdu_len && coap_get_type(&pdu) == COAP_TYPE_CON) {
+                messagelayer_emptyresponse_type = COAP_TYPE_ACK;
+                DEBUG_PUTS("gcoap: Suspending CON request with empty ACK");
             }
         }
         else {
@@ -1926,6 +1931,29 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
         return -1;
     }
 
+    pdu->hdr = (coap_hdr_t *)buf;
+    pdu->options_len = 0;
+    pdu->payload     = buf + header_len;
+    pdu->payload_len = len - header_len;
+
+    if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
+        _add_generated_observe_option(pdu);
+    }
+
+    return 0;
+}
+
+int gcoap_separate_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned type, unsigned code)
+{
+    int header_len = coap_build_separate_reply(pdu, type, code, buf, len, 0);
+
+    /* request contained no-response option or not enough space for response */
+    if (header_len <= 0) {
+        return -1;
+    }
+
+    pdu->hdr = (coap_hdr_t *)buf;
+    pdu->hdr->id = gcoap_next_msg_id();
     pdu->options_len = 0;
     pdu->payload     = buf + header_len;
     pdu->payload_len = len - header_len;
@@ -2101,6 +2129,126 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
 void gcoap_forward_proxy_post_event(void *arg)
 {
     event_post(&_queue, arg);
+}
+
+/* separate response API */
+
+int gcoap_resp_prepare_separate(gcoap_separate_response_ctx_t *ctx,
+                                void *req_buf, size_t req_buf_size,
+                                void *resp_buf, size_t resp_buf_size,
+                                const coap_pkt_t *req_pkt,
+                                const coap_request_ctx_t *req_ctx)
+{
+    size_t len = coap_get_total_len(req_pkt);
+    if (req_buf_size < len) {
+        return -ENOSPC;
+    }
+    ctx->tl = req_ctx->tl_type;
+    ctx->req_buf = req_buf;
+    ctx->req_buf_size = req_buf_size;
+    ctx->resp_buf = resp_buf;
+    ctx->resp_buf_size = resp_buf_size;
+    memcpy(ctx->req_buf, req_pkt->hdr, len);
+    memcpy(&ctx->remote, req_ctx->remote, sizeof(ctx->remote));
+#ifdef MODULE_SOCK_AUX_LOCAL
+    assert(req_ctx->local);
+    memcpy(&ctx->local, req_ctx->local, sizeof(ctx->local));
+#endif
+    return 0;
+}
+
+ssize_t gcoap_resp_send_separate(const uint8_t *buf, size_t len,
+                                 const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                                 gcoap_socket_type_t tl_type)
+{
+    /* mostly copied from gcoap_req_send() */
+    gcoap_socket_t socket = { 0 };
+    gcoap_request_memo_t *memo = NULL;
+    unsigned msg_type  = (*buf & 0x30) >> 4;
+    uint32_t timeout   = 0;
+
+    assert(remote != NULL);
+
+    ssize_t res = _tl_init_coap_socket(&socket, tl_type);
+    if (res < 0) {
+        return -1;
+    }
+    if (msg_type == COAP_TYPE_CON) {
+        mutex_lock(&_coap_state.lock);
+        /* Find empty slot in list of open requests. */
+        for (int i = 0; i < CONFIG_GCOAP_REQ_WAITING_MAX; i++) {
+            if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
+                memo = &_coap_state.open_reqs[i];
+                memo->state = GCOAP_MEMO_WAIT;
+                break;
+            }
+        }
+        if (!memo) {
+            mutex_unlock(&_coap_state.lock);
+            DEBUG("gcoap: dropping response; no space for response tracking\n");
+            return 0;
+        }
+        memo->resp_handler = NULL;
+        memo->context = NULL;
+        memcpy(&memo->remote_ep, remote, sizeof(sock_udp_ep_t));
+        memo->socket = socket;
+        /* copy buf to resend_bufs record */
+        memo->msg.data.pdu_buf = NULL;
+        for (int i = 0; i < CONFIG_GCOAP_RESEND_BUFS_MAX; i++) {
+            if (!_coap_state.resend_bufs[i][0]) {
+                memo->msg.data.pdu_buf = &_coap_state.resend_bufs[i][0];
+                memcpy(memo->msg.data.pdu_buf, buf, CONFIG_GCOAP_PDU_BUF_SIZE);
+                memo->msg.data.pdu_len = len;
+                break;
+            }
+        }
+        if (memo->msg.data.pdu_buf) {
+            memo->send_limit  = CONFIG_COAP_MAX_RETRANSMIT;
+            timeout           = (uint32_t)CONFIG_COAP_ACK_TIMEOUT_MS;
+#if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
+            timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END);
+#endif
+            memo->state = GCOAP_MEMO_RETRANSMIT;
+        }
+        else {
+            memo->state = GCOAP_MEMO_UNUSED;
+            DEBUG("gcoap: no space for PDU in resend bufs\n");
+        }
+        mutex_unlock(&_coap_state.lock);
+    }
+
+    _tl_init_coap_socket(&socket, tl_type);
+    /* set response timeout; may be zero for non-confirmable */
+    if (memo) {
+        if (timeout > 0) {
+            event_callback_init(&memo->resp_tmout_cb, _on_resp_timeout, memo);
+            event_timeout_ztimer_init(&memo->resp_evt_tmout, ZTIMER_MSEC, &_queue,
+                                      &memo->resp_tmout_cb.super);
+            event_timeout_set(&memo->resp_evt_tmout, timeout);
+        }
+        else {
+            memset(&memo->resp_evt_tmout, 0, sizeof(event_timeout_t));
+        }
+    }
+
+    sock_udp_aux_tx_t aux = { 0 };
+    if (local) {
+        memcpy(&aux.local, local, sizeof(sock_udp_ep_t));
+        aux.flags = SOCK_AUX_SET_LOCAL;
+    }
+    if ((res = _tl_send(&socket, buf, len, remote, &aux)) <= 0) {
+        if (memo) {
+            if (msg_type == COAP_TYPE_CON) {
+                *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
+            }
+            if (timeout > 0) {
+                event_timeout_clear(&memo->resp_evt_tmout);
+            }
+            memo->state = GCOAP_MEMO_UNUSED;
+        }
+        DEBUG("gcoap: sock send failed: %" PRIdSIZE "\n", res);
+    }
+    return res < 0 ? -1 : res;
 }
 
 /** @} */
