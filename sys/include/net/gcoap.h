@@ -964,6 +964,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] buf           Buffer containing the PDU
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
+ * @param[in] local         Local endpoint to send from, may be NULL
  * @param[in] resp_handler  Callback when response received, may be NULL
  * @param[in] context       User defined context passed to the response handler
  * @param[in] tl_type       The transport type to use for send. When
@@ -980,7 +981,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return  0 if cannot send
  */
 ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
-                       const sock_udp_ep_t *remote,
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
                        gcoap_resp_handler_t resp_handler, void *context,
                        gcoap_socket_type_t tl_type);
 
@@ -1009,7 +1010,7 @@ static inline ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
                                         gcoap_resp_handler_t resp_handler, void *context,
                                         gcoap_socket_type_t tl_type)
 {
-    return gcoap_req_send(buf, len, remote, resp_handler, context, tl_type);
+    return gcoap_req_send(buf, len, remote, NULL, resp_handler, context, tl_type);
 }
 
 /**

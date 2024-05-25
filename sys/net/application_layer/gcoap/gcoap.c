@@ -1613,7 +1613,7 @@ int gcoap_obs_req_forget(const sock_udp_ep_t *remote, const uint8_t *token,
 }
 
 ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
-                       const sock_udp_ep_t *remote,
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
                        gcoap_resp_handler_t resp_handler, void *context,
                        gcoap_socket_type_t tl_type)
 {
@@ -1743,7 +1743,12 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
     }
 
     if (res == 0) {
-        res = _tl_send(&socket, buf, len, remote, NULL);
+        sock_udp_aux_tx_t aux = { 0 };
+        if (local) {
+            memcpy(&aux.local, local, sizeof(sock_udp_ep_t));
+            aux.flags = SOCK_AUX_SET_LOCAL;
+        }
+        res = _tl_send(&socket, buf, len, remote, &aux);
     }
     if (res <= 0) {
         if (memo != NULL) {
