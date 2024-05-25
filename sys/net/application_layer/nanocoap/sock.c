@@ -267,7 +267,6 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 DEBUG("nanocoap: timeout waiting for response\n");
                 timeout *= 2;
                 deadline = _deadline_from_interval(timeout);
-                state = STATE_REQUEST_SEND;
                 continue;
             }
             if (res < 0) {
@@ -302,6 +301,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                     state = STATE_RESPONSE_RCVD;
                     deadline = _deadline_from_interval(CONFIG_COAP_SEPARATE_RESPONSE_TIMEOUT_MS
                                                      * US_PER_MS);
+                    tries_left = 0; /* stop retransmissions */
                     DEBUG("nanocoap: wait for separate response\n");
                     continue;
                 }
