@@ -138,10 +138,6 @@ groups:
     - title: ESP Specific Features
       help: These features are only available on (some) ESP MCUs.
       features:
-      - name: esp_eth
-        help: >
-              An ESP Ethernet peripherals is available.
-              (FIXME: `periph_eth` instead.)
       - name: esp_jtag
         help: The MCU supports JTAG for programming and debugging. Enable this
               feature to expose the interface at the cost of having fewer pins as
