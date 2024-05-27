@@ -8,6 +8,5 @@ FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_qdec
 
 # Put other features for this board (in alphabetical order)
-FEATURES_PROVIDED += netif_ethernet
 FEATURES_PROVIDED += motor_driver
-FEATURES_PROVIDED += netif
+FEATURES_PROVIDED += netif_ethernet
