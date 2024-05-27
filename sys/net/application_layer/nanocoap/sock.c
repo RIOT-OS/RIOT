@@ -27,6 +27,7 @@
 
 #include "atomic_utils.h"
 #include "net/credman.h"
+#include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/util.h"
 #include "net/sock/udp.h"
@@ -52,7 +53,7 @@
 
 enum {
     STATE_REQUEST_SEND,     /**< request was just sent or will be sent again */
-    STATE_RESPONSE_RCVD,    /**< response received but might be invalid      */
+    STATE_STOP_RETRANSMIT,  /**< stop retransmissions due to a matching empty ACK */
     STATE_RESPONSE_OK,      /**< valid response was received                 */
 };
 
@@ -157,12 +158,24 @@ static bool _id_or_token_missmatch(const coap_pkt_t *pkt, unsigned id,
     switch (coap_get_type(pkt)) {
     case COAP_TYPE_RST:
     case COAP_TYPE_ACK:
-        return coap_get_id(pkt) != id;
-    default:
-        if (coap_get_token_len(pkt) != token_len) {
+        /* message ID only has to match for RST and ACK */
+        if (coap_get_id(pkt) != id) {
             return true;
         }
-        return memcmp(coap_get_token(pkt), token, token_len);
+        /* falls through */
+    default:
+        /* token has to match if message is not empty */
+        if (pkt->hdr->code != 0) {
+            if (coap_get_token_len(pkt) != token_len) {
+                return true;
+            }
+            return memcmp(coap_get_token(pkt), token, token_len);
+        }
+        else {
+            /* but only RST and ACK may be empty */
+            return coap_get_type(pkt) != COAP_TYPE_RST &&
+                   coap_get_type(pkt) != COAP_TYPE_ACK;
+        }
     }
 }
 
@@ -212,10 +225,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
     while (1) {
         switch (state) {
         case STATE_REQUEST_SEND:
-            if (tries_left == 0) {
-                DEBUG("nanocoap: maximum retries reached\n");
-                return -ETIMEDOUT;
-            }
+            assert(tries_left > 0);
             --tries_left;
 
             DEBUG("nanocoap: send %u bytes (%u tries left)\n",
@@ -235,7 +245,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             /* ctx must have been released at this point */
             assert(ctx == NULL);
             /* fall-through */
-        case STATE_RESPONSE_RCVD:
+        case STATE_STOP_RETRANSMIT:
         case STATE_RESPONSE_OK:
             if (ctx == NULL) {
                 DEBUG("nanocoap: waiting for response (timeout: %"PRIu32" µs)\n",
@@ -257,17 +267,20 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 /* no more data */
                 /* sock_udp_recv_buf() needs to be called in a loop until ctx is NULL again
                  * to release the buffer */
-                if (state == STATE_RESPONSE_RCVD) {
+                if (state == STATE_STOP_RETRANSMIT) {
                     continue;
                 }
                 return res;
             }
             res = tmp;
             if (res == -ETIMEDOUT) {
+                if (tries_left == 0) {
+                    DEBUG("nanocoap: maximum retries reached\n");
+                    return -ETIMEDOUT;
+                }
                 DEBUG("nanocoap: timeout waiting for response\n");
                 timeout *= 2;
                 deadline = _deadline_from_interval(timeout);
-                state = STATE_REQUEST_SEND;
                 continue;
             }
             if (res < 0) {
@@ -276,7 +289,6 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             }
 
             /* parse response */
-            state = STATE_RESPONSE_RCVD;
             if (coap_parse(pkt, payload, res) < 0) {
                 DEBUG("nanocoap: error parsing packet\n");
                 continue;
@@ -286,27 +298,30 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 continue;
             }
 
-            state = STATE_RESPONSE_OK;
             DEBUG("nanocoap: response code=%i\n", coap_get_code_decimal(pkt));
             switch (coap_get_type(pkt)) {
             case COAP_TYPE_RST:
                 /* TODO: handle different? */
                 res = -EBADMSG;
                 break;
-            case COAP_TYPE_CON:
-                _send_ack(sock, pkt);
-                /* fall-through */
             case COAP_TYPE_ACK:
-                if (cb && coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
+                if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
                     /* empty ACK, wait for separate response */
-                    state = STATE_RESPONSE_RCVD;
+                    state = STATE_STOP_RETRANSMIT;
                     deadline = _deadline_from_interval(CONFIG_COAP_SEPARATE_RESPONSE_TIMEOUT_MS
                                                      * US_PER_MS);
+                    tries_left = 0; /* stop retransmissions */
                     DEBUG("nanocoap: wait for separate response\n");
                     continue;
                 }
                 /* fall-through */
+            case COAP_TYPE_CON:
             case COAP_TYPE_NON:
+                state = STATE_RESPONSE_OK;
+                if (coap_get_type(pkt) == COAP_TYPE_CON) {
+                    /* send ACK */
+                    _send_ack(sock, pkt);
+                }
                 /* call user callback */
                 if (cb) {
                     res = cb(arg, pkt);
