@@ -271,9 +271,7 @@ static inline void _wait_for_end(spi_t bus) {
    * manual(s) -> section 'Disabling the SPI' */
   /* When TSIZE>0, EOT and TXC signals are equal so polling of EOT is reliable
   at whatever SPI communication mode to check end of the bus activity */
-  while (!(dev(bus)->SR & SPI_SR_EOT)) {
-  }
-  while (dev(bus)->SR & SPI_SR_EOT) {
+  while (dev(bus)->CR2 != 0 && dev(bus)->SR & SPI_SR_EOT) {
     dev(bus)->IFCR = SPI_IFCR_EOTC;
   }
   dev(bus)->IFCR = SPI_IFCR_TXTFC;
@@ -288,8 +286,13 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len) {
   // lower 16 bits = TSIZE
   // When these bits are changed by software, the SPI must be disabled. SPE = 0
   assume(len <= UINT16_MAX);
-  dev(bus)->CR2 = SPI_CR2_SETTINGS | (uint16_t)len;
+  dev(bus)->CR2 = SPI_CR2_SETTINGS;
+  // Fully featured interfaces (SPI1,SPI2) exhbit errornous behaviour when TSIZE
+  // is set
+  if (dev(bus) == SPI3)
+    dev(bus)->CR2 |= (uint16_t)len;
 
+  bool check_eot = (dev(bus)->CR2 & SPI_CR2_TSIZE) != 0;
   /* we need to recast the data register to uint_8 to force 8-bit access */
   volatile uint8_t *TXDR = (volatile uint8_t *)&(dev(bus)->TXDR);
   volatile uint8_t *RXDR = (volatile uint8_t *)&(dev(bus)->RXDR);
@@ -339,13 +342,11 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len) {
         *TXDR = outbuf[len - tx_remainder];
         tx_remainder--;
       }
-      if (rx_remainder > 0) {
-        if (!(dev(bus)->SR & SPI_SR_RXP))
-          continue;
+      while (rx_remainder > 0 && (dev(bus)->SR & SPI_SR_RXP)) {
         inbuf[len - rx_remainder] = *RXDR;
         rx_remainder--;
       }
-      if (dev(bus)->SR & SPI_SR_EOT) {
+      if (check_eot && dev(bus)->SR & SPI_SR_EOT) {
         break;
       }
     }
@@ -354,11 +355,11 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len) {
   /* wait until everything is finished and empty the receive buffer */
   // The standard disable procedure is based on polling EOT and/or TXC status to
   // check if a transmission session is (fully) completed
-  while (!(dev(bus)->SR & SPI_SR_EOT)) {
+  while (check_eot && !(dev(bus)->SR & SPI_SR_EOT)) {
   }
 
   while ((dev(bus)->SR & SPI_SR_RXWNE) ||
-         ((dev(bus)->SR & SPI_SR_RXPLVL_Msk) != 0)) {
+         ((dev(bus)->SR & SPI_SR_RXPLVL) != 0)) {
     (void)*RXDR;
   }
 
