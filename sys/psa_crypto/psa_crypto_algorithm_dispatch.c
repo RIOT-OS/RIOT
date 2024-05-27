@@ -95,16 +95,19 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         if (status != PSA_SUCCESS) {
             return status;
         }
+        break;
     case PSA_ALG_SHA3_384:
         status = psa_hashes_sha3_384_setup(&operation->ctx.sha3);
         if (status != PSA_SUCCESS) {
             return status;
         }
+        break;
     case PSA_ALG_SHA3_512:
         status = psa_hashes_sha3_512_setup(&operation->ctx.sha3);
         if (status != PSA_SUCCESS) {
             return status;
         }
+        break;
     #endif
     default:
         (void)status;
@@ -183,11 +186,11 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_3))
     case PSA_ALG_SHA3_256:
-        return psa_hashes_sha3_256_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
+        return psa_hashes_sha3_256_finish(&operation->ctx.sha3, hash);
     case PSA_ALG_SHA3_384:
-        return psa_hashes_sha3_384_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
+        return psa_hashes_sha3_384_finish(&operation->ctx.sha3, hash);
     case PSA_ALG_SHA3_512:
-        return psa_hashes_sha3_512_finish(&operation->ctx.sha3, hash, hash_size, hash_length);
+        return psa_hashes_sha3_512_finish(&operation->ctx.sha3, hash);
     #endif
     default:
         (void)operation;

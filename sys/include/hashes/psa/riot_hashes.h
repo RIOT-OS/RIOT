@@ -59,6 +59,7 @@ typedef sha512_context_t psa_hashes_sha512_ctx_t;
 #include "hashes/sha3.h"
 
 typedef keccak_state_t psa_hashes_sha3_ctx_t;
+#include "../psa_crypto/include/psa_hashes.h"
 #endif
 
 #if (IS_USED(MODULE_PSA_RIOT_HASHES_HMAC_SHA256))

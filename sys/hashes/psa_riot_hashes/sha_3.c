@@ -35,14 +35,9 @@ psa_status_t psa_hashes_sha3_256_setup(psa_hashes_sha3_ctx_t *ctx)
 }
 
 psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha3_ctx_t *ctx,
-                                      uint8_t *hash,
-                                      size_t hash_size,
-                                      size_t *hash_length)
+                                      uint8_t *hash)
 {
     sha3_256_final((keccak_state_t *)ctx, hash);
-
-    (void)hash_size;
-    (void)hash_length;
     return PSA_SUCCESS;
 }
 
@@ -53,14 +48,9 @@ psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha3_ctx_t *ctx)
 }
 
 psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha3_ctx_t *ctx,
-                                      uint8_t *hash,
-                                      size_t hash_size,
-                                      size_t *hash_length)
+                                      uint8_t *hash)
 {
     sha3_384_final((keccak_state_t *)ctx, hash);
-
-    (void)hash_size;
-    (void)hash_length;
     return PSA_SUCCESS;
 }
 
@@ -71,13 +61,8 @@ psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha3_ctx_t *ctx)
 }
 
 psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha3_ctx_t *ctx,
-                                      uint8_t *hash,
-                                      size_t hash_size,
-                                      size_t *hash_length)
+                                      uint8_t *hash)
 {
     sha3_512_final((keccak_state_t *)ctx, hash);
-
-    (void)hash_size;
-    (void)hash_length;
     return PSA_SUCCESS;
 }

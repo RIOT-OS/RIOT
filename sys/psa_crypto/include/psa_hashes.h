@@ -257,10 +257,8 @@ psa_status_t psa_hashes_sha3_update(psa_hashes_sha3_ctx_t *ctx,
  * @param hash_length
  * @return psa_status_t
  */
-psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha512_ctx_t *ctx,
-                                      uint8_t *hash,
-                                      size_t hash_size,
-                                      size_t *hash_length);
+psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha3_ctx_t *ctx,
+                                      uint8_t *hash);
 
 /**
  * @brief   Low level wrapper function to call a driver for a SHA3-384 hash setup
@@ -269,7 +267,7 @@ psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha512_ctx_t *ctx,
  * @param ctx
  * @return psa_status_t
  */
-psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha512_ctx_t *ctx);
+psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha3_ctx_t *ctx);
 
 /**
  * @brief   Low level wrapper function to call a driver for a SHA3-384 hash finish
@@ -281,10 +279,8 @@ psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha512_ctx_t *ctx);
  * @param hash_length
  * @return psa_status_t
  */
-psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha512_ctx_t *ctx,
-                                      uint8_t *hash,
-                                      size_t hash_size,
-                                      size_t *hash_length);
+psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha3_ctx_t *ctx,
+                                      uint8_t *hash);
 
 /**
  * @brief   Low level wrapper function to call a driver for a SHA3-512 hash setup
@@ -293,7 +289,7 @@ psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha512_ctx_t *ctx,
  * @param ctx
  * @return psa_status_t
  */
-psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha512_ctx_t *ctx);
+psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha3_ctx_t *ctx);
 
 /**
  * @brief   Low level wrapper function to call a driver for a SHA3-512 hash finish
@@ -305,10 +301,8 @@ psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha512_ctx_t *ctx);
  * @param hash_length
  * @return psa_status_t
  */
-psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha512_ctx_t *ctx,
-                                      uint8_t *hash,
-                                      size_t hash_size,
-                                      size_t *hash_length);
+psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha3_ctx_t *ctx,
+                                      uint8_t *hash);
 
 #endif
 
