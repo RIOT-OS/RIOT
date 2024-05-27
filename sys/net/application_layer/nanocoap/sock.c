@@ -296,7 +296,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 _send_ack(sock, pkt);
                 /* fall-through */
             case COAP_TYPE_ACK:
-                if (cb && coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
+                if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
                     /* empty ACK, wait for separate response */
                     state = STATE_RESPONSE_RCVD;
                     deadline = _deadline_from_interval(CONFIG_COAP_SEPARATE_RESPONSE_TIMEOUT_MS
