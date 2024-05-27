@@ -9,7 +9,6 @@
  */
 
 #include "cpu.h"
-#include "kernel_init.h"
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"

@@ -60,7 +60,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     assert(is_gpio_port_num_valid(port));
     assert(pin < GPIO_PORT_PIN_NUMOF(port));
 
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     gpio_config_t cfg = {
         .pin_bit_mask = (1ULL << gpio),
@@ -168,7 +168,7 @@ gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
 
     unsigned state = irq_disable();
 
-    result = _gpio_conf[GPIO_PIN(GPIO_PORT_NUM(port), pin)];
+    result = _gpio_conf[GPIO_PIN(gpio_port_num(port), pin)];
     if (result.state == GPIO_INPUT) {
         result.initial_value = (gpio_ll_read(port) >> pin) & 1UL;
     }

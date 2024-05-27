@@ -61,10 +61,10 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
 
     unsigned state = irq_disable();
 
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u trig=%d cb=%p arg=%p\n",
-          __func__, gpio, GPIO_PORT_NUM(port), pin, trig, cb, arg);
+          __func__, gpio, (unsigned)gpio_port_num(port), pin, trig, cb, arg);
 
     /* install GPIO ISR of ESP-IDF if not yet done */
     if (!gpio_isr_service_installed &&
@@ -113,10 +113,10 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
 
 void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 {
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
-          __func__, gpio, GPIO_PORT_NUM(port), pin);
+          __func__, gpio, (unsigned)gpio_port_num(port), pin);
 
     if (esp_idf_gpio_intr_disable(gpio) == ESP_OK) {
         gpio_int_enabled_table[gpio] = false;
@@ -125,7 +125,7 @@ void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 
 void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 {
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
           __func__, gpio, port, pin);
@@ -137,14 +137,14 @@ void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 
 void gpio_ll_irq_unmask_and_clear(gpio_port_t port, uint8_t pin)
 {
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
-          __func__, gpio, GPIO_PORT_NUM(port), pin);
+          __func__, gpio, (unsigned)gpio_port_num(port), pin);
 
     volatile uint32_t *status_w1tc = (uint32_t *)GPIO_STATUS_W1TC_REG;
 #if GPIO_PORT_NUMOF > 1
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
         status_w1tc = (uint32_t *)GPIO_STATUS1_W1TC_REG;
     }
 #endif

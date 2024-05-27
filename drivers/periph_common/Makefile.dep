@@ -1,15 +1,14 @@
 # Always use hardware features, if available
-ifneq (,$(filter periph_gpio_ll%,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_gpio_ll_disconnect
-  FEATURES_OPTIONAL += periph_gpio_ll_input_pull_down
-  FEATURES_OPTIONAL += periph_gpio_ll_input_pull_keep
-  FEATURES_OPTIONAL += periph_gpio_ll_input_pull_up
-  FEATURES_OPTIONAL += periph_gpio_ll_irq_level_triggered_high
-  FEATURES_OPTIONAL += periph_gpio_ll_irq_level_triggered_low
-  FEATURES_OPTIONAL += periph_gpio_ll_irq_unmask
-  FEATURES_OPTIONAL += periph_gpio_ll_open_drain
-  FEATURES_OPTIONAL += periph_gpio_ll_open_drain_pull_up
-  FEATURES_OPTIONAL += periph_gpio_ll_open_source
-  FEATURES_OPTIONAL += periph_gpio_ll_open_source_pull_down
-  FEATURES_OPTIONAL += periph_gpio_ll_switch_dir
-endif
+FEATURES_OPTIONAL += periph_gpio_ll_disconnect
+FEATURES_OPTIONAL += periph_gpio_ll_input_pull_down
+FEATURES_OPTIONAL += periph_gpio_ll_input_pull_keep
+FEATURES_OPTIONAL += periph_gpio_ll_input_pull_up
+FEATURES_OPTIONAL += periph_gpio_ll_irq_edge_triggered_both
+FEATURES_OPTIONAL += periph_gpio_ll_irq_level_triggered_high
+FEATURES_OPTIONAL += periph_gpio_ll_irq_level_triggered_low
+FEATURES_OPTIONAL += periph_gpio_ll_irq_unmask
+FEATURES_OPTIONAL += periph_gpio_ll_open_drain
+FEATURES_OPTIONAL += periph_gpio_ll_open_drain_pull_up
+FEATURES_OPTIONAL += periph_gpio_ll_open_source
+FEATURES_OPTIONAL += periph_gpio_ll_open_source_pull_down
+FEATURES_OPTIONAL += periph_gpio_ll_switch_dir

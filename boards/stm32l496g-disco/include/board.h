@@ -148,12 +148,14 @@ extern "C" {
  * - LD3 green, active LOW (connected to PA5)
  * @{
  */
-#define LED0_PIN_NUM        13      /**< green LED (LD2) pin */
-#define LED0_PORT_NUM       PORT_B  /**< green LED (LD2) port */
+#define LED0_PIN_NUM        13          /**< green LED (LD2) pin */
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of green LED (LD2) */
+#define LED0_PORT_NUM       PORT_B      /**< green LED (LD2) port */
 
-#define LED1_PIN_NUM        5       /**< green LED (LD3) pin */
-#define LED1_PORT_NUM       PORT_A  /**< green LED (LD3) port */
-#define LED1_IS_INVERTED    1       /**< green LED (LD3) is LOW active */
+#define LED1_PIN_NUM        5           /**< green LED (LD3) pin */
+#define LED1_PORT           GPIO_PORT_A /**< GPIO port of green LED (LD3) */
+#define LED1_PORT_NUM       PORT_A      /**< green LED (LD3) port */
+#define LED1_IS_INVERTED    1           /**< green LED (LD3) is LOW active */
 /** @} */
 
 /**

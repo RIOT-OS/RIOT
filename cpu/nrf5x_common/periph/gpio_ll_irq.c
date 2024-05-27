@@ -128,7 +128,7 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin,
 {
     /* param port is not used on nRF5x variants with only one GPIO port */
     (void)port;
-    uint8_t port_num = GPIO_PORT_NUM(port);
+    uint8_t port_num = gpio_port_num(port);
     uint8_t channel = get_channel_for_pin(port_num, pin);
     assert((trig != GPIO_TRIGGER_LEVEL_HIGH) && (trig != GPIO_TRIGGER_LEVEL_LOW));
 
@@ -167,7 +167,7 @@ void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 {
     /* param port is not used on nRF5x variants with only one GPIO port */
     (void)port;
-    uint8_t port_num = GPIO_PORT_NUM(port);
+    uint8_t port_num = gpio_port_num(port);
     unsigned channel = get_channel_of_pin(port_num, pin);
     assert(channel != GPIOTE_CHAN_NUMOF);
     if (channel != GPIOTE_CHAN_NUMOF) {
@@ -179,7 +179,7 @@ void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 {
     /* param port is not used on nRF5x variants with only one GPIO port */
     (void)port;
-    uint8_t port_num = GPIO_PORT_NUM(port);
+    uint8_t port_num = gpio_port_num(port);
     unsigned channel = get_channel_of_pin(port_num, pin);
     assert(channel != GPIOTE_CHAN_NUMOF);
     if (channel != GPIOTE_CHAN_NUMOF) {
@@ -191,7 +191,7 @@ void gpio_ll_irq_unmask_and_clear(gpio_port_t port, uint8_t pin)
 {
     /* param port is not used on nRF5x variants with only one GPIO port */
     (void)port;
-    uint8_t port_num = GPIO_PORT_NUM(port);
+    uint8_t port_num = gpio_port_num(port);
     unsigned channel = get_channel_of_pin(port_num, pin);
     assert(channel != GPIOTE_CHAN_NUMOF);
     if (channel != GPIOTE_CHAN_NUMOF) {
@@ -204,7 +204,7 @@ void gpio_ll_irq_off(gpio_port_t port, uint8_t pin)
 {
     /* param port is not used on nRF5x variants with only one GPIO port */
     (void)port;
-    uint8_t port_num = GPIO_PORT_NUM(port);
+    uint8_t port_num = gpio_port_num(port);
     unsigned channel = get_channel_of_pin(port_num, pin);
     assert(channel != GPIOTE_CHAN_NUMOF);
     if (channel != GPIOTE_CHAN_NUMOF) {

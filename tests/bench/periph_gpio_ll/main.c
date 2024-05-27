@@ -30,7 +30,21 @@
 #define COMPENSATE_OVERHEAD 1
 #endif
 
-static gpio_port_t port_out = GPIO_PORT(PORT_OUT);
+/* On e.g. ATmega328P the smallest available GPIO Port is GPIO_PORT_1 (GPIOB),
+ * on others (e.g. nRF51) the highest available GPIO PORT is GPIO_PORT_0.
+ * So we need the following dance to find a valid GPIO port to allow compile
+ * testing. Extend the dance as needed, when new MCUs are added */
+#if !defined(PORT_OUT)
+#  if defined(GPIO_PORT_0)
+#    define PORT_OUT GPIO_PORT_0
+#    define PORT_OUT_NUM 0
+#  elif defined(GPIO_PORT_1)
+#    define PORT_OUT GPIO_PORT_1
+#    define PORT_OUT_NUM 1
+#  endif
+#endif
+
+static gpio_port_t port_out = PORT_OUT;
 
 static void print_summary_compensated(uint_fast16_t loops, uint32_t duration,
                                       uint32_t duration_uncompensated)
@@ -124,8 +138,8 @@ int main(void)
         puts("\n"
              "periph/gpio: Using 2x gpio_set() and 2x gpio_clear()\n"
              "---------------------------------------------------");
-        gpio_t p0 = GPIO_PIN(PORT_OUT, PIN_OUT_0);
-        gpio_t p1 = GPIO_PIN(PORT_OUT, PIN_OUT_1);
+        gpio_t p0 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_0);
+        gpio_t p1 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_1);
         gpio_init(p0, GPIO_OUT);
         gpio_init(p1, GPIO_OUT);
 
@@ -177,8 +191,8 @@ int main(void)
         puts("\n"
              "periph/gpio: Using 4x gpio_toggle()\n"
              "-----------------------------------");
-        gpio_t p0 = GPIO_PIN(PORT_OUT, PIN_OUT_0);
-        gpio_t p1 = GPIO_PIN(PORT_OUT, PIN_OUT_1);
+        gpio_t p0 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_0);
+        gpio_t p1 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_1);
         gpio_init(p0, GPIO_OUT);
         gpio_init(p1, GPIO_OUT);
 
@@ -230,8 +244,8 @@ int main(void)
         puts("\n"
              "periph/gpio: Using 4x gpio_write()\n"
              "----------------------------------");
-        gpio_t p0 = GPIO_PIN(PORT_OUT, PIN_OUT_0);
-        gpio_t p1 = GPIO_PIN(PORT_OUT, PIN_OUT_1);
+        gpio_t p0 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_0);
+        gpio_t p1 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_1);
         gpio_init(p0, GPIO_OUT);
         gpio_init(p1, GPIO_OUT);
 
