@@ -163,6 +163,27 @@ See `sys/ztimer/Makefile` for an example in code.
 `SUBMODULES` can also be true-pseudomodules, or become one by conditionally excluding
 the source files by adding them to `SUBMODULES_NO_SRC`.
 
+## creating glue-code for existing modules
+
+After creating a new pseudomodule, make sure to add your glue functions. The perfect location would be inside the base-module your glueing to. 
+
+Example:
+When adding glue-code for the PSA_CRYPTO-module, you need to:
+- add your glue-pseudomodule to `makefiles/pseudomodules.inc.mk`
+- add your glue-pseudomodule to `makefiles/features_modules.inc.mk`
+- add your glue-pseudomodule to `makefiles/features_existing.inc.mk`
+- add your gluecode-code ( for example in `sys/hashes/psa_riot_hashes/{your_code}`)
+- add your gluecode-headers ( for example in `sys/psa_crypto/include/psa_hashes.h`)
+- add your gluecode to algorithm-dispatcher (in `sys/psa_crypto/psa_crypto_algorithm_dispatch.c`)
+- add your gluecode to includes (in `sys/include/hashes/psa/riot_hashes.h`, `sys/include/psa_crypto/psa/crypto_contexts.h`)
+- update makefiles in `sys/psa_crypto/` (`Makefile.dep`, `Makefile.include`) -> don't forget to add your methods to the doc.txt
+ 
+Please use [`sys/psa_crypto: sha3 support #20698`](https://github.com/RIOT-OS/RIOT/pull/20698) as a reference.
+
+PS: Don't forget to add tests in `tests/sys/{base_module_of_your_glue_code}` ;-) 
+For the example above, the tests would be placed in: `tests/sys/psa_crypto_hashes` (don't forget to add your Module to the Makefile inside this folder).
+You can call them from `examples/psa_crypto/main.c`.
+
 # Helper tools
 
 To help you start writing a module, the RIOT build system provides the
