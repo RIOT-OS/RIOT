@@ -126,13 +126,13 @@ FEATURES_EXISTING := \
     esp_wifi \
     esp_wifi_ap \
     esp_wifi_enterprise \
-    ethernet \
     gecko_sdk_librail_fpu \
     gecko_sdk_librail_nonfpu \
     highlevel_stdio \
     libstdcpp \
     motor_driver \
     netif \
+    netif_ethernet \
     newlib \
     no_idle_thread \
     periph_adc \
