@@ -14,7 +14,6 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
 
 # Put other features for this board (in alphabetical order)
-FEATURES_PROVIDED += netif_ethernet
 FEATURES_PROVIDED += tinyusb_device
 
 # load the common Makefile.features for Nucleo boards

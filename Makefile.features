@@ -33,6 +33,10 @@ FEATURES_CONFLICT += periph_usbdev:tinyusb_host
 FEATURES_CONFLICT_MSG += "Package tinyUSB is not yet compatible with periph_usbdev."
 
 # Features provided implicitly
+ifneq (,$(filter periph_eth,$(FEATURES_PROVIDED)))
+  FEATURES_PROVIDED += netif_ethernet
+endif
+
 ifneq (,$(filter netif_%,$(FEATURES_PROVIDED)))
   FEATURES_PROVIDED += netif
 endif
