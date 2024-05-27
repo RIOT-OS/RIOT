@@ -27,6 +27,7 @@
 
 #include "atomic_utils.h"
 #include "net/credman.h"
+#include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/util.h"
 #include "net/sock/udp.h"
@@ -157,12 +158,24 @@ static bool _id_or_token_missmatch(const coap_pkt_t *pkt, unsigned id,
     switch (coap_get_type(pkt)) {
     case COAP_TYPE_RST:
     case COAP_TYPE_ACK:
-        return coap_get_id(pkt) != id;
-    default:
-        if (coap_get_token_len(pkt) != token_len) {
+        /* message ID only has to match for RST and ACK */
+        if (coap_get_id(pkt) != id) {
             return true;
         }
-        return memcmp(coap_get_token(pkt), token, token_len);
+        /* falls through */
+    default:
+        /* token has to match if message is not empty */
+        if (pkt->hdr->code != 0) {
+            if (coap_get_token_len(pkt) != token_len) {
+                return true;
+            }
+            return memcmp(coap_get_token(pkt), token, token_len);
+        }
+        else {
+            /* but only RST and ACK may be empty */
+            return coap_get_type(pkt) != COAP_TYPE_RST &&
+                   coap_get_type(pkt) != COAP_TYPE_ACK;
+        }
     }
 }
 
