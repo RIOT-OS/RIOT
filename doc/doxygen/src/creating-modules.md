@@ -165,7 +165,7 @@ the source files by adding them to `SUBMODULES_NO_SRC`.
 
 ## creating glue-code for existing modules
 
-After creating a new pseudomodule, make sure to add your glue functions. The perfect location would be inside the base-module your glueing to. 
+After creating a new pseudomodule, make sure to add your glue functions. The perfect location would be inside the base-module you are glueing to. 
 
 Example:
 When adding glue-code for the PSA_CRYPTO-module, you need to:
