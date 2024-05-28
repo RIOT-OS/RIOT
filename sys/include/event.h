@@ -81,7 +81,7 @@
  *
  * static custom_event_t custom_event = { .super.handler = custom_handler, .text = "CUSTOM EVENT" };
  *
- * [...] event_post(&queue, &custom_event)
+ * [...] event_post(&queue, (event_t *)&custom_event)
  * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
