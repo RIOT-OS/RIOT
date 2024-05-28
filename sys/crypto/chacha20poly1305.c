@@ -27,6 +27,7 @@
 #include "crypto/chacha20poly1305.h"
 #include "crypto/poly1305.h"
 #include "unaligned.h"
+#include "chacha20poly1305.h"
 
 /* Missing operations to convert numbers to little endian prevents this from
  * working on big endian systems */
@@ -166,4 +167,12 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
     /* Number of full blocks */
     _xcrypt(&ctx, key, nonce, cipher, msg, *msglen);
     return 1;
+}
+
+void chacha20_encrypt_decrypt(const uint8_t *input, uint8_t *output,
+                              const uint8_t *key, const uint8_t *nonce, 
+                              size_t inputlen)
+{
+    chacha20poly1305_ctx_t ctx;
+    _xcrypt(&ctx, key, nonce, input, output, inputlen);
 }

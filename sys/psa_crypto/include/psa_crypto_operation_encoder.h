@@ -108,62 +108,6 @@ typedef enum {
      (curve == PSA_ECC_FAMILY_TWISTED_EDWARDS) ? PSA_ENCODE_ECC_KEY_TYPE_EDWARDS(bits) : \
      PSA_INVALID_OPERATION)
 
-/**
- * @brief   Combine algorithm, and key type with a key size of 128 bits.
- *
- * @param   alg     Algorithm of type @ref psa_algorithm_t.
- * @param   type    Key type of type @ref psa_key_type_t
- *
- * @return  @ref psa_cipher_op_t
- * @return  @ref PSA_INVALID_OPERATION  @c alg, and @c type are incompatible with the key size
- */
-#define GET_CIPHER_OPERATION_128(alg, type) \
-    (((alg == PSA_ALG_CBC_NO_PADDING) && (type == PSA_KEY_TYPE_AES)) ? PSA_CBC_NO_PAD_AES_128 : \
-     PSA_INVALID_OPERATION)
-
-/**
- * @brief   Combine algorithm, and key type with a key size of 192 bits.
- *
- * @param   alg     Algorithm of type @ref psa_algorithm_t.
- * @param   type    Key type of type @ref psa_key_type_t
- *
- * @return  @ref psa_cipher_op_t
- * @return  @ref PSA_INVALID_OPERATION  @c alg, and @c type are incompatible with the key size
- */
-#define GET_CIPHER_OPERATION_192(alg, type) \
-    (((alg == PSA_ALG_CBC_NO_PADDING) && (type == PSA_KEY_TYPE_AES)) ? PSA_CBC_NO_PAD_AES_192 : \
-     PSA_INVALID_OPERATION)
-
-/**
- * @brief   Combine algorithm, and key type with a key size of 256 bits.
- *
- * @param   alg     Algorithm of type @ref psa_algorithm_t.
- * @param   type    Key type of type @ref psa_key_type_t
- *
- * @return  @ref psa_cipher_op_t
- * @return  @ref PSA_INVALID_OPERATION  @c alg, and @c type are incompatible with the key size
- */
-#define GET_CIPHER_OPERATION_256(alg, type) \
-    (((alg == PSA_ALG_CBC_NO_PADDING) && (type == PSA_KEY_TYPE_AES)) ? PSA_CBC_NO_PAD_AES_256 : \
-     ((alg == PSA_ALG_CBC_PKCS7) && (type == PSA_KEY_TYPE_AES)) ? PSA_CBC_PKCS7_AES_256 : \
-     PSA_INVALID_OPERATION)
-
-/**
- * @brief   Map algorithm, key size and type to a specific operation.
- *
- * @param   alg     Algorithm of type @ref psa_algorithm_t.
- * @param   bits    Size of the used key of type @ref psa_key_bits_t
- * @param   type    Key type of type @ref psa_key_type_t
- *
- * @return  @ref psa_cipher_op_t
- * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
- */
-#define PSA_ENCODE_CIPHER_OPERATION(alg, bits, type) \
-    ((bits == 128) ? GET_CIPHER_OPERATION_128(alg, type) : \
-     (bits == 192) ? GET_CIPHER_OPERATION_192(alg, type) : \
-     (bits == 256) ? GET_CIPHER_OPERATION_256(alg, type) : \
-     PSA_INVALID_OPERATION)
-
 #ifdef __cplusplus
 }
 #endif
