@@ -206,7 +206,8 @@ static void print_help(const shell_command_t *command_list)
  *
  *
  */
-static void handle_input_line(const shell_command_t *command_list, char *line)
+void handle_input_line(const shell_command_t *command_list, char *line)
+/* needed externally by async Rust shell */
 {
     /* first we need to calculate the number of arguments */
     int argc = 0;
