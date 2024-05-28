@@ -339,11 +339,36 @@
  * ### MAC
  * - Base: psa_mac
  *
+ * #### HMAC MD5
+ * - psa_mac_hmac_md5
+ * - psa_mac_hmac_md5_custom_backend
+ * - psa_mac_hmac_md5_backend_generic
+ *
+ * #### HMAC SHA 1
+ * - psa_mac_hmac_sha_1
+ * - psa_mac_hmac_sha_1_custom_backend
+ * - psa_mac_hmac_sha_1_backend_generic
+ *
+ * #### HMAC SHA 224
+ * - psa_mac_hmac_sha_224
+ * - psa_mac_hmac_sha_224_custom_backend
+ * - psa_mac_hmac_sha_224_backend_generic
+ *
  * #### HMAC SHA 256
  * - psa_mac_hmac_sha_256
  * - psa_mac_hmac_sha_256_backend_periph
  * - psa_mac_hmac_sha_256_custom_backend
- * - psa_mac_hmac_sha_256_backend_riot
+ * - psa_mac_hmac_sha_256_backend_generic
+ *
+ * #### HMAC SHA 384
+ * - psa_mac_hmac_sha_384
+ * - psa_mac_hmac_sha_384_custom_backend
+ * - psa_mac_hmac_sha_384_backend_generic
+ *
+ * #### HMAC SHA 512
+ * - psa_mac_hmac_sha_512
+ * - psa_mac_hmac_sha_512_custom_backend
+ * - psa_mac_hmac_sha_512_backend_generic
  *
  * ### Secure Elements
  * Base:

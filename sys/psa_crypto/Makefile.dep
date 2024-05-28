@@ -334,6 +334,45 @@ ifneq (,$(filter psa_mac,$(USEMODULE)))
   USEMODULE += psa_key_management
 endif
 
+# HMAC MD5
+ifneq (,$(filter psa_mac_hmac_md5,$(USEMODULE)))
+  ifeq (,$(filter psa_mac_hmac_md5_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_mac_hmac_md5_backend_generic
+  endif
+endif
+
+ifneq (,$(filter psa_mac_hmac_md5_backend_generic,$(USEMODULE)))
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_md5
+  USEMODULE += psa_riot_mac_hmac_generic
+endif
+
+# HMAC SHA-1
+ifneq (,$(filter psa_mac_hmac_sha_1,$(USEMODULE)))
+  ifeq (,$(filter psa_mac_hmac_sha_1_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_mac_hmac_sha_1_backend_generic
+  endif
+endif
+
+ifneq (,$(filter psa_mac_hmac_sha_1_backend_generic,$(USEMODULE)))
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_1
+  USEMODULE += psa_riot_mac_hmac_generic
+endif
+
+# HMAC SHA-224
+ifneq (,$(filter psa_mac_hmac_sha_224,$(USEMODULE)))
+  ifeq (,$(filter psa_mac_hmac_sha_224_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_mac_hmac_sha_224_backend_generic
+  endif
+endif
+
+ifneq (,$(filter psa_mac_hmac_sha_224_backend_generic,$(USEMODULE)))
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_224
+  USEMODULE += psa_riot_mac_hmac_generic
+endif
+
 ## HMAC SHA-256
 ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_256_custom_backend,$(USEMODULE)))
@@ -343,7 +382,7 @@ ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
     ifneq (,$(filter periph_hmac_sha_256,$(FEATURES_USED)))
       USEMODULE += psa_mac_hmac_sha_256_backend_periph
     else
-      USEMODULE += psa_mac_hmac_sha_256_backend_riot
+      USEMODULE += psa_mac_hmac_sha_256_backend_generic
     endif
   endif
 endif
@@ -352,10 +391,36 @@ ifneq (,$(filter psa_mac_hmac_sha_256_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hmac_sha_256
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_256_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_sha_256_backend_generic,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += psa_riot_hashes
   USEMODULE += psa_riot_hashes_hmac_sha256
+endif
+
+# HMAC SHA-384
+ifneq (,$(filter psa_mac_hmac_sha_384,$(USEMODULE)))
+  ifeq (,$(filter psa_mac_hmac_sha_384_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_mac_hmac_sha_384_backend_generic
+  endif
+endif
+
+ifneq (,$(filter psa_mac_hmac_sha_384_backend_generic,$(USEMODULE)))
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_384
+  USEMODULE += psa_riot_mac_hmac_generic
+endif
+
+# HMAC SHA-512
+ifneq (,$(filter psa_mac_hmac_sha_512,$(USEMODULE)))
+  ifeq (,$(filter psa_mac_hmac_sha_512_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_mac_hmac_sha_512_backend_generic
+  endif
+endif
+
+ifneq (,$(filter psa_mac_hmac_sha_512_backend_generic,$(USEMODULE)))
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_512
+  USEMODULE += psa_riot_mac_hmac_generic
 endif
 
 # Secure Elements
