@@ -1,11 +1,8 @@
 #![no_std]
 #![feature(type_alias_impl_trait)]
 
-use riot_wrappers::{riot_main, println};
-
 extern crate rust_riotmodules;
 
-mod gcoap;
 mod util;
 mod executor;
 mod runtime;
@@ -13,23 +10,30 @@ mod runtime;
 mod stream;
 mod shell;
 
+mod server;
+
+use riot_wrappers::{riot_main, println};
+use util::get_static;
+
 riot_main!(main);
 
 fn main() {
-    if 0 == 1 { gcoap::sync_main(); panic!("debug gcoap ok"); }
+    server::init_vfs();
+
+    // We can assume that both `handler` and `listener` are never dropped since
+    // `Runtime::run()` is a diverging function.
+    let mut handler = server::new_gcoap_handler();
+    let mut listener = server::new_gcoap_listener(get_static(&mut handler));
+
+    riot_wrappers::gcoap::register(get_static(&mut listener));
+    println!("CoAP server ready");
 
     runtime::Runtime::new().run();
 }
 
-async fn get_number() -> u32 { 42 }
-
 async fn async_main() {
-    println!("async_main(): ^^");
+    use riot_wrappers::ztimer::{Clock, Ticks};
 
-    for _ in 0..3 {
-        let number = get_number().await;
-        println!("number: {}", number);
-    }
-
-    panic!("ok");
+    Clock::msec().sleep_async(Ticks(2_000)).await;
+    server::announce()
 }
