@@ -569,6 +569,7 @@
  * - `psa_hashes_sha224_ctx_t`
  * - `psa_hashes_sha256_ctx_t`
  * - `psa_hashes_sha512_ctx_t`
+ * - `psa_hashes_sha3_ctx_t`
  *
  * #### Ciphers
  * - `psa_cipher_aes_128_ctx_t`
