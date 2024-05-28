@@ -400,6 +400,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
 
     /* copy payload from client_pkt to pkt */
     memcpy(pkt->payload, client_pkt->payload, client_pkt->payload_len);
+    pkt->payload_len = client_pkt->payload_len;
     len += client_pkt->payload_len;
 
     return len;
@@ -460,7 +461,7 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
     /* copy all options from client_pkt to pkt */
     len = _gcoap_forward_proxy_copy_options(&client_ep->pdu, client_pkt, client_ep, urip);
 
-    if (len == -EINVAL) {
+    if (len < 0) {
         _free_client_ep(client_ep);
         return -EINVAL;
     }
