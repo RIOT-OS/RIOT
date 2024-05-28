@@ -28,6 +28,7 @@
 
 #include "stdint.h"
 #include "board.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

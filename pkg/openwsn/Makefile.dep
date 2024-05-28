@@ -1,3 +1,6 @@
+FEATURES_REQUIRED += netif_openwsn
+FEATURES_REQUIRED += periph_uart
+
 ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
   USEMODULE += openwsn_iphc
   USEMODULE += openwsn_ipv6

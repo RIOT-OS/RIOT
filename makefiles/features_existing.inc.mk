@@ -133,6 +133,7 @@ FEATURES_EXISTING := \
     motor_driver \
     netif \
     netif_ethernet \
+    netif_openwsn \
     newlib \
     no_idle_thread \
     periph_adc \
