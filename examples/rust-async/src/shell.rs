@@ -152,7 +152,7 @@ async fn run_function_alias(name: &str) {
     match name {
         "f0" => (|| println!("hello world!"))(),
         "f1" => test_async_sleep().await,
-        "f2" => test_async_gcoap().await,
+        "f2" => test_async_client().await,
         _ => println!("oops, code for function alias [{}] is missing!", name),
     }
 }
