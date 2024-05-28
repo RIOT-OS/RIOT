@@ -1,13 +1,17 @@
-use super::stream::{XStream, XStreamData, StreamExt};
-use crate::{println, static_borrow_mut};
+use crate::{stream::{XStream, XStreamData, StreamExt}, static_borrow_mut};
+use riot_wrappers::{riot_sys::libc, println};
 
 extern "C" {
-    fn xbd_shell_get_commands() -> *const ();
-    fn xbd_async_shell_init() -> i8;
-    fn xbd_async_shell_bufsize() -> usize;
-    fn xbd_async_shell_prompt(tag_cstr: *const u8, highlight: bool);
-    fn handle_input_line_minerva(command_list: *const (), line: *const u8);
+    fn handle_input_line(command_list: *const libc::c_void, line: *const u8);
+    fn async_shell_init() -> i8;
+    fn async_shell_bufsize() -> usize;
+    fn async_shell_prompt(tag_cstr: *const u8, highlight: bool);
+    fn async_shell_user_commands() -> *const libc::c_void;
 }
+
+const ENABLE_RIOT_USER_COMMANDS: bool = true;
+const ENABLE_PROMPT_TAGS: bool = true;
+const ENABLE_PROMPT_HIGHLIGHT: bool = true;
 
 const SHELL_BUFSIZE: usize = 128;
 type ShellBuf = heapless::String<SHELL_BUFSIZE>;
@@ -17,9 +21,7 @@ const SHELL_STREAM_SIZE: usize = 2;
 static mut SD: XStreamData<ShellBuf, SHELL_STREAM_SIZE> = XStream::init();
 
 #[no_mangle]
-pub extern fn xbd_async_shell_on_char(ch: u8) {
-    //println!("@@ xbd_async_shell_on_char(): {}", ch);
-
+pub extern fn async_shell_on_char(ch: u8) {
     if let Some(mut xs) = prompt_is_ready() {
         let ch = ch as char;
         match ch {
@@ -30,7 +32,7 @@ pub extern fn xbd_async_shell_on_char(ch: u8) {
                         null_terminated = SHELL_BUF.clone();
                         SHELL_BUF.clear();
                     } else {
-                        println!("@@ input too long (> {}); to be ignored", SHELL_BUFSIZE - 1);
+                        println!("input too long (> {}); to be ignored", SHELL_BUFSIZE - 1);
                         SHELL_BUF.clear();
                         SHELL_BUF.push(ch).unwrap();
                         null_terminated = SHELL_BUF.clone();
@@ -45,7 +47,7 @@ pub extern fn xbd_async_shell_on_char(ch: u8) {
                     SHELL_BUF
                         .push(ch)
                         .unwrap_or_else(|_| { // input too long
-                            //println!("@@ NOP; input (> SHELL_BUFSIZE={})", SHELL_BUFSIZE);
+                            //println!("NOP; input (> SHELL_BUFSIZE={})", SHELL_BUFSIZE);
                         });
                 }
             },
@@ -54,20 +56,21 @@ pub extern fn xbd_async_shell_on_char(ch: u8) {
 }
 
 pub async fn process_shell_stream() -> Result<(), i8> {
-    assert_eq!(unsafe { xbd_async_shell_bufsize() }, SHELL_BUFSIZE);
+    assert_eq!(unsafe { async_shell_bufsize() }, SHELL_BUFSIZE);
 
-    let ret = unsafe { xbd_async_shell_init() };
-    match ret {
-        0 => (), // ok, continue
-        2 => { // kludge
-            println!("@@ process_shell_stream(): TODO - support non-native board");
-            return Ok(());
+    match riot_wrappers::BOARD {
+        "native" => {
+            let ret = unsafe { async_shell_init() };
+            if ret > 0 { return Err(ret); }
         },
-        _ => return Err(ret),
+        _ => panic!("unsupported board"),
     }
 
-    //let shell_commands = core::ptr::null(); // system commands only
-    let shell_commands = unsafe { xbd_shell_get_commands() };
+    let riot_shell_commands = if ENABLE_RIOT_USER_COMMANDS {
+        unsafe { async_shell_user_commands() }
+    } else {
+        core::ptr::null() // RIOT-c system commands only
+    };
 
     let mut xs = XStream::get(static_borrow_mut!(SD));
     print_aliases();
@@ -76,17 +79,12 @@ pub async fn process_shell_stream() -> Result<(), i8> {
     while let Some(mut line) = xs.next().await {
         assert!(line.ends_with("\0"));
 
-        println!("[async shell] (null terminated) line: {} (len: {} SHELL_BUFSIZE: {})",
-                 line, line.len(), SHELL_BUFSIZE);
-        //println!("  line.as_bytes(): {:?}", line.as_bytes());
-        //println!("  line: {:?}", line);
-
         if line.trim() != "\0" {
             if match_alias(&mut line).await {
                 assert!(line.ends_with("\0"));
             }
 
-            unsafe { handle_input_line_minerva(shell_commands, line.as_ptr()); }
+            unsafe { handle_input_line(riot_shell_commands, line.as_ptr()); }
         }
 
         prompt();
@@ -96,8 +94,9 @@ pub async fn process_shell_stream() -> Result<(), i8> {
 }
 
 fn prompt() {
-    //let tag: Option<&str> = None;
-    let tag = Some("(async)\0");
+    let tag = if ENABLE_PROMPT_TAGS {
+        Some("(async)\0")
+    } else { None };
 
     let tag = if let Some(x) = tag {
         assert!(x.ends_with("\0"));
@@ -106,7 +105,7 @@ fn prompt() {
         core::ptr::null()
     };
 
-    unsafe { xbd_async_shell_prompt(tag, true); }
+    unsafe { async_shell_prompt(tag, ENABLE_PROMPT_HIGHLIGHT); }
 }
 
 fn prompt_is_ready() -> Option<XStream<ShellBuf, SHELL_STREAM_SIZE>> {
@@ -117,27 +116,19 @@ fn prompt_is_ready() -> Option<XStream<ShellBuf, SHELL_STREAM_SIZE>> {
     } else { None }
 }
 
-//
-
 async fn test_async_sleep() {
-    println!("test_async_sleep(): ^^");
-//    crate::Xbd::async_sleep(2_000).await;
-    println!("test_async_sleep(): $$");
-}
+    println!("test_async_sleep():");
 
-async fn test_async_blockwise_get() {
-    println!("test_async_blockwise_get(): ^^");
-/*
-    let mut bs = crate::Xbd::async_gcoap_get_blockwise(
-        "[::1]:5683", "/const/song.txt").unwrap();
-    while let Some(req) = bs.next().await {
-        println!("@@ out: {:?}", req.await);
+    use riot_wrappers::ztimer::{Clock, Ticks};
+    for count in 0..3 {
+        println!("{}", count + 1);
+        Clock::msec().sleep_async(Ticks(1_000)).await;
     }
-*/
-    println!("test_async_blockwise_get(): $$");
 }
 
-//
+async fn test_async_client() {
+    println!("test_async_client(): TODO");
+}
 
 const ARRAY_ALIAS_NAMED: &[(&str, &str)] = &[
     ("a", "alias"),
@@ -147,27 +138,25 @@ const ARRAY_ALIAS_NAMED: &[(&str, &str)] = &[
 const ARRAY_ALIAS_ENUMERATED: &[&str] = &[
     "version",
     "ifconfig",
-    "gcoap get [::1] /riot/board",
-    "gcoap get [::1] /const/song.txt",
+    "ping ::1",
 ];
 
+//---- provably to be refactored like: function_alias!(...)
 const ARRAY_ALIAS_FUNCTION: &[&str] = &[
     "f0",
     "f1",
     "f2",
-    "f3",
-    //"f99", // test undefined
 ];
 
 async fn run_function_alias(name: &str) {
     match name {
         "f0" => (|| println!("hello world!"))(),
         "f1" => test_async_sleep().await,
-        "f2" => test_async_blockwise_get().await,
-//        "f3" => crate::test_blockwise("[::1]:5683").await.unwrap(),
-        _ => println!("function alias [{}] is not defined!", name),
+        "f2" => test_async_gcoap().await,
+        _ => println!("oops, code for function alias [{}] is missing!", name),
     }
 }
+//----
 
 fn print_aliases() {
     println!("---- named alias ----");
