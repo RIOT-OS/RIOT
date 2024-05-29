@@ -40,7 +40,7 @@ active interface from PID KernelPID(6) ("gnrc_netdev_tap")
 (async)>
 ```
 
-Call sync/async Rust functions defined in 'src/alias.rs':
+Call sync/async Rust functions defined in [src/alias.rs](src/alias.rs):
 
 ```
 (async)> f0
