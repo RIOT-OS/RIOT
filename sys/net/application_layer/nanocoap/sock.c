@@ -722,6 +722,107 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
     return 0;
 }
 
+typedef struct {
+    uint8_t *ptr;
+    size_t len;
+    size_t offset;
+    size_t res;
+} _buf_slice_t;
+
+static int _2buf_slice(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
+{
+    _buf_slice_t *ctx = arg;
+
+    if (offset + len < ctx->offset) {
+        return 0;
+    }
+
+    if (offset > ctx->offset + ctx->len) {
+        return 0;
+    }
+
+    if (!ctx->len) {
+        return 0;
+    }
+
+    offset = ctx->offset - offset;
+    len = MIN(len - offset, ctx->len);
+
+    memcpy(ctx->ptr, buf + offset, len);
+
+    ctx->len -= len;
+    ctx->ptr += len;
+    ctx->offset += len;
+    ctx->res += len;
+
+    DEBUG("nanocoap: got %"PRIuSIZE" bytes, %"PRIuSIZE" bytes left (offset: %"PRIuSIZE")\n",
+          len, ctx->len, offset);
+
+    if (!more) {
+        ctx->len = 0;
+    }
+
+    return 0;
+}
+
+static unsigned _num_blks(size_t offset, size_t len, coap_blksize_t szx)
+{
+    uint16_t mask = coap_szx2size(szx) - 1;
+    uint8_t shift = szx + 4;
+    size_t end = offset + len;
+
+    unsigned num_blks = ((end >> shift) + !!(end & mask))
+                      - ((offset >> shift) + !!(offset & mask));
+    return num_blks;
+}
+
+int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
+                            coap_blksize_t blksize, size_t offset,
+                            void *dst, size_t len)
+{
+    uint8_t buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
+
+    /* try to find optimal blocksize */
+    unsigned num_blocks = _num_blks(offset, len, blksize);
+    for (uint8_t szx = 0; szx < blksize; ++szx) {
+        if (_num_blks(offset, len, szx) <= num_blocks) {
+            blksize = szx;
+            break;
+        }
+    }
+
+    _buf_slice_t dst_ctx = {
+        .ptr = dst,
+        .len = len,
+        .offset = offset,
+    };
+
+    _block_ctx_t ctx = {
+        .callback = _2buf_slice,
+        .arg = &dst_ctx,
+        .more = true,
+    };
+
+#if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
+    random_bytes(ctx.token, sizeof(ctx.token));
+#endif
+
+    unsigned num = offset >> (blksize + 4);
+    while (dst_ctx.len) {
+        DEBUG("nanocoap: fetching block %u\n", num);
+
+        int res = _fetch_block(sock, buf, sizeof(buf), path, blksize, num, &ctx);
+        if (res < 0) {
+            DEBUG("nanocoap: error fetching block %u: %d\n", num, res);
+            return res;
+        }
+
+        num += 1;
+    }
+
+    return dst_ctx.res;
+}
+
 int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
 {
     char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];

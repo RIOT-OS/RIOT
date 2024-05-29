@@ -647,14 +647,17 @@ static int _ls_handler(int argc, char **argv)
 
         snprintf(path_name, sizeof(path_name), "%s/%s", path, entry.d_name);
         vfs_stat(path_name, &stat);
+
+        printf("%s", entry.d_name);
         if (stat.st_mode & S_IFDIR) {
-            printf("%s/\n", entry.d_name);
+            printf("/");
         } else if (stat.st_mode & S_IFREG) {
-            printf("%s\t%lu B\n", entry.d_name, stat.st_size);
+            if (stat.st_size) {
+                printf("\t%lu B", stat.st_size);
+            }
             ++nfiles;
-        } else {
-            printf("%s\n", entry.d_name);
         }
+        puts("");
     }
     if (ret == 0) {
         printf("total %u files\n", nfiles);
