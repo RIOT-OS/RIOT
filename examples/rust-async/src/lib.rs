@@ -5,11 +5,15 @@ extern crate rust_riotmodules;
 
 mod util;
 mod timeout;
+mod stream;
+
 mod executor;
 mod runtime;
-mod stream;
-mod shell;
+
 mod server;
+
+mod shell;
+mod alias;
 
 use riot_wrappers::{riot_main, println};
 

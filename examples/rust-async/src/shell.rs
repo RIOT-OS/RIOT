@@ -1,5 +1,7 @@
-use crate::{stream::{XStream, XStreamData, StreamExt}, static_borrow_mut};
 use riot_wrappers::{riot_sys::libc, println};
+use crate::stream::{XStream, XStreamData, StreamExt};
+use crate::static_borrow_mut;
+use crate::alias::*;
 
 extern "C" {
     fn handle_input_line(command_list: *const libc::c_void, line: *const u8);
@@ -116,68 +118,17 @@ fn prompt_is_ready() -> Option<XStream<ShellBuf, SHELL_STREAM_SIZE>> {
     } else { None }
 }
 
-async fn test_async_sleep() {
-    use riot_wrappers::ztimer::*;
-
-    println!("test_async_sleep():");
-    for count in 0..3 {
-        println!("{}", count + 1);
-        Clock::msec().sleep_async(Ticks(1_000)).await;
-    }
-}
-
-async fn test_async_client() {
-    println!("test_async_client(): TODO");
-
-/* ok
-active interface from PID KernelPID(6) ("gnrc_netdev_tap")
-    Address fe80:0000:0000:0000:a4ec:98ff:fe0e:af24
-
-$ libcoap/local/bin/coap-client -m get coap://[fe80:0000:0000:0000:a4ec:98ff:fe0e:af24%tap1]/.well-known/core
-<>;ct=0;title="Landing page"</time>;ct=0;title="Clock"</poem>;sz=1338</cbor>;ct=60</ps/>;title="Process list"</vfs/>;ct=0</saul/>;title="SAUL index"
-*/
-
-}
-
-const ARRAY_ALIAS_NAMED: &[(&str, &str)] = &[
-    ("a", "alias"),
-    ("h", "help"),
-];
-
-const ARRAY_ALIAS_ENUMERATED: &[&str] = &[
-    "version",
-    "ifconfig",
-    "ping ::1",
-];
-
-//---- provably to be refactored like: function_alias!(...)
-const ARRAY_ALIAS_FUNCTION: &[&str] = &[
-    "f0",
-    "f1",
-    "f2",
-];
-
-async fn run_function_alias(name: &str) {
-    match name {
-        "f0" => (|| println!("hello world!"))(),
-        "f1" => test_async_sleep().await,
-        "f2" => test_async_client().await,
-        _ => println!("oops, code for function alias [{}] is missing!", name),
-    }
-}
-//----
-
 fn print_aliases() {
     println!("---- named alias ----");
-    ARRAY_ALIAS_NAMED.iter()
+    TABLE_ALIAS_NAMED.iter()
         .for_each(|(name, cmd)| println!("[{}] {}", name, cmd));
 
     println!("---- function alias ----");
-    ARRAY_ALIAS_FUNCTION.iter()
+    TABLE_ALIAS_FUNCTION.iter()
         .for_each(|name| println!("[{}] <function>", name));
 
     println!("---- enumerated alias ----");
-    ARRAY_ALIAS_ENUMERATED.iter().enumerate()
+    TABLE_ALIAS_ENUMERATED.iter().enumerate()
         .for_each(|(idx, cmd)| println!("[{}] {}", idx, cmd));
 }
 
@@ -197,14 +148,14 @@ async fn match_alias(line: &mut ShellBuf) -> bool {
     if ln == "alias" || ln == "a" {
         print_aliases();
         return expand(line, "");
-    } else if let Some(item) = ARRAY_ALIAS_NAMED.iter().find(|item| item.0 == ln) {
+    } else if let Some(item) = TABLE_ALIAS_NAMED.iter().find(|item| item.0 == ln) {
         return expand(line, item.1);
-    } else if let Some(item) = ARRAY_ALIAS_FUNCTION.iter().find(|item| **item == ln) {
+    } else if let Some(item) = TABLE_ALIAS_FUNCTION.iter().find(|item| **item == ln) {
         run_function_alias(item).await;
         return expand(line, "");
     } else if let Ok(x) = ln.parse::<usize>() {
-        if x < ARRAY_ALIAS_ENUMERATED.len() {
-            return expand(line, ARRAY_ALIAS_ENUMERATED[x]);
+        if x < TABLE_ALIAS_ENUMERATED.len() {
+            return expand(line, TABLE_ALIAS_ENUMERATED[x]);
         }
     }
 
