@@ -6,10 +6,8 @@ extern crate rust_riotmodules;
 mod util;
 mod executor;
 mod runtime;
-
 mod stream;
 mod shell;
-
 mod server;
 
 use riot_wrappers::{riot_main, println};

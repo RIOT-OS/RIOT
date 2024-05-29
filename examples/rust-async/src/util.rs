@@ -14,6 +14,7 @@ pub async fn sleep_msec(ms: u32) {
 pub fn announce_netif() {
     use riot_wrappers::{gnrc, println};
 
+    println!("announce_netif():");
     for netif in gnrc::Netif::all() {
         println!("active interface from PID {:?} ({:?})",
                  netif.pid(), netif.pid().get_name().unwrap_or("unnamed"));
