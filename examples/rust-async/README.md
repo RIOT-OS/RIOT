@@ -9,6 +9,8 @@ Build and run with a tap interface:
 ```
 $ make
 $ sudo ip tuntap add dev tap3 mode tap
+$ sudo ip link set tap3 down
+$ sudo ip link set tap3 up
 $ ./bin/native/rust_async.elf tap3
 RIOT native interrupts/signals initialized.
 RIOT native board initialized.
