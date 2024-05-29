@@ -31,7 +31,7 @@ fn init_vfs() {
 
 pub async fn start() {
     use riot_wrappers::println;
-    use crate::util::{sleep_msec, get_static};
+    use crate::util::{get_static, sleep_forever};
 
     init_vfs();
 
@@ -41,7 +41,7 @@ pub async fn start() {
     println!("CoAP server ready");
 
     // this prevents `handler` and `listener` from dropping
-    loop { sleep_msec(20_000).await; }
+    sleep_forever().await;
 
-    // should be never reached
+    panic!("should be never reached");
 }

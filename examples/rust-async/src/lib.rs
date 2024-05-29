@@ -4,6 +4,7 @@
 extern crate rust_riotmodules;
 
 mod util;
+mod timeout;
 mod executor;
 mod runtime;
 mod stream;

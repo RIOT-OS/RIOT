@@ -11,6 +11,11 @@ pub async fn sleep_msec(ms: u32) {
     Clock::msec().sleep_async(Ticks(ms)).await;
 }
 
+pub async fn sleep_forever() {
+    crate::timeout::Timeout::new().await;
+    panic!("should be never reached");
+}
+
 pub fn announce_netif() {
     use riot_wrappers::{gnrc, println};
 

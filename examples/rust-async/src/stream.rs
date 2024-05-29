@@ -1,7 +1,7 @@
 use core::{pin::Pin, task::{Context, Poll}};
-use heapless::spsc::Queue; // lock-free
 use futures_util::{stream::Stream, task::AtomicWaker};
 pub use futures_util::StreamExt;
+use heapless::spsc::Queue; // lock-free
 
 #[derive(Debug)]
 pub struct XStream<T: 'static, const N: usize> {
