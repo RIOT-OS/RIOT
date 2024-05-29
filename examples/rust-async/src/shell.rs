@@ -6,10 +6,10 @@ extern "C" {
     fn async_shell_init() -> i8;
     fn async_shell_bufsize() -> usize;
     fn async_shell_prompt(tag_cstr: *const u8, highlight: bool);
-    fn async_shell_user_commands() -> *const libc::c_void;
+    fn async_shell_app_commands() -> *const libc::c_void;
 }
 
-const ENABLE_RIOT_USER_COMMANDS: bool = true;
+const ENABLE_RIOT_APP_COMMANDS: bool = true;
 const ENABLE_PROMPT_TAGS: bool = true;
 const ENABLE_PROMPT_HIGHLIGHT: bool = true;
 
@@ -66,8 +66,8 @@ pub async fn process_shell_stream() -> Result<(), i8> {
         _ => panic!("unsupported board"),
     }
 
-    let riot_shell_commands = if ENABLE_RIOT_USER_COMMANDS {
-        unsafe { async_shell_user_commands() }
+    let riot_shell_commands = if ENABLE_RIOT_APP_COMMANDS {
+        unsafe { async_shell_app_commands() }
     } else {
         core::ptr::null() // RIOT-c system commands only
     };
@@ -117,9 +117,9 @@ fn prompt_is_ready() -> Option<XStream<ShellBuf, SHELL_STREAM_SIZE>> {
 }
 
 async fn test_async_sleep() {
-    println!("test_async_sleep():");
+    use riot_wrappers::ztimer::*;
 
-    use riot_wrappers::ztimer::{Clock, Ticks};
+    println!("test_async_sleep():");
     for count in 0..3 {
         println!("{}", count + 1);
         Clock::msec().sleep_async(Ticks(1_000)).await;
@@ -128,6 +128,15 @@ async fn test_async_sleep() {
 
 async fn test_async_client() {
     println!("test_async_client(): TODO");
+
+/* ok
+active interface from PID KernelPID(6) ("gnrc_netdev_tap")
+    Address fe80:0000:0000:0000:a4ec:98ff:fe0e:af24
+
+$ libcoap/local/bin/coap-client -m get coap://[fe80:0000:0000:0000:a4ec:98ff:fe0e:af24%tap1]/.well-known/core
+<>;ct=0;title="Landing page"</time>;ct=0;title="Clock"</poem>;sz=1338</cbor>;ct=60</ps/>;title="Process list"</vfs/>;ct=0</saul/>;title="SAUL index"
+*/
+
 }
 
 const ARRAY_ALIAS_NAMED: &[(&str, &str)] = &[

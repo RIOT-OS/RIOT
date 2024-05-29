@@ -10,3 +10,17 @@ pub async fn sleep_msec(ms: u32) {
 
     Clock::msec().sleep_async(Ticks(ms)).await;
 }
+
+pub fn announce_netif() {
+    use riot_wrappers::{gnrc, println};
+
+    for netif in gnrc::Netif::all() {
+        println!("active interface from PID {:?} ({:?})",
+                 netif.pid(), netif.pid().get_name().unwrap_or("unnamed"));
+        if let Ok(addrs) = netif.ipv6_addrs() {
+            addrs.iter().for_each(|a| println!("    Address {:?}", a));
+        } else {
+            println!("    Does not support IPv6.");
+        }
+    }
+}
