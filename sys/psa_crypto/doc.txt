@@ -532,6 +532,33 @@
  * }
  * @endcode
  *
+ * ## creating glue-code for existing PSA-algorithms {#psa-glue-code}
+ * 
+ * If you plan to add glue code for algorithms already existing in RIOT, you need to create a new 
+ * pseudomodule first. 
+ * Afterwards, you can add your glue-functions. The perfect location would be inside the base-module you are glueing to.
+ * 
+ *
+ * Example:
+ * When adding glue-code for the PSA_CRYPTO-module, you need to:
+ * - add your glue-pseudomodule to `makefiles/pseudomodules.inc.mk`
+ * - add your glue-pseudomodule to `makefiles/features_modules.inc.mk`
+ * - add your glue-pseudomodule to `makefiles/features_existing.inc.mk`
+ * - add your glue-code ( for example in `sys/hashes/psa_riot_hashes/{your_code}`)
+ * - add your glue-headers ( for example in `sys/psa_crypto/include/psa_hashes.h`)
+ * - add your glue-code-calls to algorithm-dispatcher (in `sys/psa_crypto/psa_crypto_algorithm_dispatch.c`)
+ * - add your glue-headers to includes (in `sys/include/hashes/psa/riot_hashes.h`, `sys/include/psa_crypto/psa/crypto_contexts.h`)
+ * - update makefiles in `sys/psa_crypto/` (`Makefile.dep`, `Makefile.include`) -> don't forget to add your methods to the doc.txt
+
+ * Please use [`sys/psa_crypto: sha3 support #20698`](https://github.com/RIOT-OS/RIOT/pull/20698) as a reference.
+
+ * PS: Don't forget to add tests in `tests/sys/{base_module_of_your_glue_code}` ;-) 
+ * For the example above, the tests would be placed in: `tests/sys/psa_crypto_hashes` 
+ * (don't forget to add your Module to the Makefile inside this folder).
+ * You can call them from `tests/sys/psa-psa_crypto_hashes/`. 
+ * Please refer to the corresponding manual about running tests for more details.
+
+
  * ### Operation Contexts
  * Some cryptographic operations use driver specific context to store the operation state in
  * between function calls. These must be defined somewhere. Examples can be found in
