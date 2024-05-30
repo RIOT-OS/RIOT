@@ -559,6 +559,14 @@ extern "C" {
 
 /**
  * @ingroup net_gcoap_conf
+ * @brief   Maximum number of local notifying endpoint addresses
+ */
+#ifndef CONFIG_GCOAP_OBS_NOTIFIERS_MAX
+#define CONFIG_GCOAP_OBS_NOTIFIERS_MAX  (2)
+#endif
+
+/**
+ * @ingroup net_gcoap_conf
  * @brief   Maximum number of registrations for Observable resources
  */
 #ifndef CONFIG_GCOAP_OBS_REGISTRATIONS_MAX
@@ -839,6 +847,7 @@ struct gcoap_request_memo {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    sock_udp_ep_t *notifier;            /**< Local endpoint to send notifications */
     const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     uint16_t last_msgid;                /**< Message ID of last notification */
