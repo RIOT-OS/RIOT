@@ -1,16 +1,43 @@
 async Rust runtime and applications
 ===================================
 
+In this example, we introduce a practical async-Rust runtime empowered by the [embassy-executor](https://github.com/embassy-rs/embassy/tree/main/embassy-executor) crate.  Using this runtime, we demonstrate how to
+
+- write an async RIOT application starting from the provided [`async fn main()`](src/lib.rs) entry point,
+- run the [Rust gcoap server](../rust-gcoap) application as a spawned async task, and
+- use the accompanying [async shell module](src/shell.rs) to interactively test your Rust code within running RIOT.
+
+async shell
+-----------
+
+The runtime comes with an async-Rust compatible shell module that helps you test your Rust code interactively within RIOT.  It is designed as a superset of the conventional RIOT shell.  As such, it allows not only executing your Rust code for testing, but also invoking the existing RIOT system/application shell commands as well.
+
+In addition, the shell supports some rudimentary line-input aliasing features:
+
+- *named alias* for creating shorthand for your shell input (e.g. `h` for `help`),
+- *function alias* for executing Rust functions for testing,
+- *enumerated alias* that could serve as "manually curated" input history,
+
+all of which can be easily customised by editing [src/alias.rs](src/alias.rs).
+
 How to use
 ----------
 
-Build and run with a tap interface:
+Build by
 
 ```
 $ make
+```
+
+and run with a tap interface:
+
+```
 $ sudo ip tuntap add dev tap3 mode tap
 $ sudo ip link set tap3 down
 $ sudo ip link set tap3 up
+```
+
+```
 $ ./bin/native/rust_async.elf tap3
 RIOT native interrupts/signals initialized.
 RIOT native board initialized.
