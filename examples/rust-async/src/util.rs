@@ -11,8 +11,22 @@ pub async fn sleep_msec(ms: u32) {
     Clock::msec().sleep_async(Ticks(ms)).await;
 }
 
+pub async fn set_timeout(msec: u32, cb: impl FnOnce()) {
+    sleep_msec(msec).await;
+    cb();
+}
+
+use core::{future::Future, pin::Pin, task::{Context, Poll}};
+struct Forever;
+impl Future for Forever {
+    type Output = ();
+    fn poll(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<<Self as Future>::Output> {
+        Poll::Pending
+    }
+}
+
 pub async fn sleep_forever() {
-    crate::timeout::Timeout::new().await;
+    (Forever {}).await;
     panic!("should be never reached");
 }
 

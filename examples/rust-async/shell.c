@@ -69,7 +69,7 @@ void async_shell_prompt(char *tag, bool highlight) {
 
 // for RIOT-c app commands
 static const shell_command_t app_commands[] = {
-    //{ "gcoap", "CoAP example", gcoap_cli_cmd },
+    // { "gcoap", "CoAP example", gcoap_cli_cmd }, // for example
     { NULL, NULL, NULL }
 };
 

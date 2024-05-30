@@ -21,21 +21,22 @@ pub async fn run_function_alias(name: &str) {
     match name {
         "f0" => (|| println!("hello world!"))(),
         "f1" => test_async_sleep().await,
-        "f2" => test_async_client().await,
+        "f2" => test_async_timeout().await,
         _ => println!("oops, code for function alias [{}] is missing!", name),
     }
 }
 
 async fn test_async_sleep() {
-    use riot_wrappers::ztimer::*;
-
     println!("test_async_sleep():");
-    for count in 0..3 {
-        println!("{}", count + 1);
-        Clock::msec().sleep_async(Ticks(1_000)).await;
+
+    for count in 1..=3 {
+        println!("{}", count);
+        crate::util::sleep_msec(1000).await;
     }
 }
 
-async fn test_async_client() {
-    println!("test_async_client(): TODO");
+async fn test_async_timeout() {
+    println!("test_async_timeout():");
+
+    crate::util::set_timeout(2000, || println!("it works!")).await;
 }
