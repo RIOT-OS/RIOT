@@ -552,6 +552,10 @@ extern "C" {
 /**
  * @ingroup net_gcoap_conf
  * @brief   Maximum number of Observe clients
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored observer is associated with a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
  */
 #ifndef CONFIG_GCOAP_OBS_CLIENTS_MAX
 #define CONFIG_GCOAP_OBS_CLIENTS_MAX   (2)
@@ -559,7 +563,24 @@ extern "C" {
 
 /**
  * @ingroup net_gcoap_conf
+ * @brief   Maximum number of local notifying endpoint addresses
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored local endpoint alias is associated with an observation context
+ *       of a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
+ */
+#ifndef CONFIG_GCOAP_OBS_NOTIFIERS_MAX
+#define CONFIG_GCOAP_OBS_NOTIFIERS_MAX  (2)
+#endif
+
+/**
+ * @ingroup net_gcoap_conf
  * @brief   Maximum number of registrations for Observable resources
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored observation context is associated with a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
  */
 #ifndef CONFIG_GCOAP_OBS_REGISTRATIONS_MAX
 #define CONFIG_GCOAP_OBS_REGISTRATIONS_MAX     (2)
@@ -839,6 +860,7 @@ struct gcoap_request_memo {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    sock_udp_ep_t *notifier;            /**< Local endpoint to send notifications */
     const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     uint16_t last_msgid;                /**< Message ID of last notification */
