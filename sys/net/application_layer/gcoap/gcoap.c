@@ -29,8 +29,11 @@
 #include "net/coap.h"
 #include "net/gcoap.h"
 #include "net/gcoap/forward_proxy.h"
+#include "net/ipv6/addr.h"
+#include "net/nanocoap.h"
 #include "net/nanocoap/cache.h"
 #include "net/sock/async/event.h"
+#include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "mutex.h"
 #include "random.h"
@@ -102,6 +105,8 @@ static int _request_matcher_default(gcoap_listener_t *listener,
 static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *arg);
 static void _dtls_free_up_session(void *arg);
 #endif
+
+static char _ipv6_addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
@@ -915,15 +920,36 @@ static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote
         gcoap_request_memo_t *memo = &_coap_state.open_reqs[i];
         memo_pdu->hdr = gcoap_request_memo_get_hdr(memo);
 
-        if (coap_get_token_len(memo_pdu) == tkl) {
-            if ((memcmp(token, coap_get_token(memo_pdu), tkl) == 0)
-                    && (sock_udp_ep_equal(&memo->remote_ep, remote)
-                      /* Multicast addresses are not considered in matching responses */
-                      || sock_udp_ep_is_multicast(&memo->remote_ep)
-                    )) {
-                return memo;
+        /* verbose debug to catch bugs with request/response matching */
+        DEBUG("Seeking memo for remote=%s, tkn=0x%02x%02x%02x%02x%02x%02x%02x%02x, tkl=%"PRIuSIZE"\n",
+              ipv6_addr_to_str(_ipv6_addr_str, (ipv6_addr_t *)&remote->addr.ipv6,
+                               IPV6_ADDR_MAX_STR_LEN),
+              token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7],
+              tkl);
+
+        if (coap_get_token_len(memo_pdu) != tkl) {
+            DEBUG("Token length mismatch %u\n", coap_get_token_len(memo_pdu));
+            continue;
+        }
+        const uint8_t *memo_token = coap_get_token(memo_pdu);
+        if (memcmp(token, memo_token, tkl)) {
+            DEBUG("Token mismatch 0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
+                  memo_token[0], memo_token[1], memo_token[2], memo_token[3],
+                  memo_token[4], memo_token[5], memo_token[6], memo_token[7]);
+            continue;
+        }
+        if (!sock_udp_ep_equal(&memo->remote_ep, remote)) {
+            if (sock_udp_ep_is_multicast(&memo->remote_ep)) {
+                DEBUG("matching multicast response\n");
+            }
+            else {
+                DEBUG("Remote address mismatch %s\n",
+                      ipv6_addr_to_str(_ipv6_addr_str, (ipv6_addr_t *)&memo->remote_ep.addr.ipv6,
+                                       IPV6_ADDR_MAX_STR_LEN));
+                continue;
             }
         }
+        return memo;
     }
     return NULL;
 }
