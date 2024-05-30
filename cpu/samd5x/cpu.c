@@ -109,7 +109,7 @@ static void xosc32k_init(void)
                             | OSC32KCTRL_XOSC32K_XTALEN
                             | OSC32KCTRL_XOSC32K_STARTUP(7);
 
-    while (!OSC32KCTRL->STATUS.bit.XOSC32KRDY) {}
+    while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_XOSC32KRDY)) {}
 }
 
 static void xosc_init(uint8_t idx)
@@ -175,12 +175,12 @@ static void dfll_init(void)
     /* workaround for Errata 2.8.3 DFLLVAL.FINE Value When DFLL48M Re-enabled */
     OSCCTRL->DFLLMUL.reg   = 0;   /* Write new DFLLMULL configuration */
     OSCCTRL->DFLLCTRLB.reg = 0;   /* Select Open loop configuration */
-    OSCCTRL->DFLLCTRLA.bit.ENABLE = 1; /* Enable DFLL */
+    OSCCTRL->DFLLCTRLA.reg |= OSCCTRL_DFLLCTRLA_ENABLE; /* Enable DFLL */
     OSCCTRL->DFLLVAL.reg   = OSCCTRL->DFLLVAL.reg; /* Reload DFLLVAL register */
     OSCCTRL->DFLLCTRLB.reg = reg; /* Write final DFLL configuration */
 
     OSCCTRL->DFLLCTRLA.reg = OSCCTRL_DFLLCTRLA_ENABLE;
-    while (!OSCCTRL->STATUS.bit.DFLLRDY) {}
+    while (!(OSCCTRL->STATUS.reg & OSCCTRL_STATUS_DFLLRDY)) {}
 }
 
 static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
@@ -197,7 +197,7 @@ static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
     const uint32_t LDR = (f_cpu >> 10);
 
     /* disable the DPLL before changing the configuration */
-    OSCCTRL->Dpll[idx].DPLLCTRLA.bit.ENABLE = 0;
+    OSCCTRL->Dpll[idx].DPLLCTRLA.reg &= ~OSCCTRL_DPLLCTRLA_ENABLE;
     while (OSCCTRL->Dpll[idx].DPLLSYNCBUSY.reg) {}
 
     /* set DPLL clock source */
@@ -218,8 +218,8 @@ static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
 }
 
 static void fdpll_lock(uint8_t idx) {
-    while (!(OSCCTRL->Dpll[idx].DPLLSTATUS.bit.CLKRDY &&
-             OSCCTRL->Dpll[idx].DPLLSTATUS.bit.LOCK)) {}
+    const uint32_t flags = (OSCCTRL_DPLLSTATUS_CLKRDY | OSCCTRL_DPLLSTATUS_LOCK);
+    while (!((OSCCTRL->Dpll[idx].DPLLSTATUS.reg & flags) == flags)) {}
 }
 
 static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags) {
@@ -346,7 +346,7 @@ void cpu_init(void)
     MCLK->APBDMASK.reg = 0;
 
     /* enable the Cortex M Cache Controller */
-    CMCC->CTRL.bit.CEN = 1;
+    CMCC->CTRL.reg |= CMCC_CTRL_CEN;
 
     /* make sure main clock is not sourced from DPLL */
     dfll_init();
