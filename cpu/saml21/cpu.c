@@ -67,7 +67,7 @@ static void _osc32k_setup(void)
                            | OSC32KCTRL_OSC32K_ENABLE;
 
     /* Wait OSC32K Ready */
-    while (!OSC32KCTRL->STATUS.bit.OSC32KRDY) {}
+    while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_OSC32KRDY)) {}
 #endif /* INTERNAL_OSC32_SOURCE */
 }
 
@@ -81,7 +81,7 @@ static void _xosc32k_setup(void)
                             | OSC32KCTRL_XOSC32K_ENABLE;
 
     /* Wait XOSC32K Ready */
-    while (!OSC32KCTRL->STATUS.bit.XOSC32KRDY) {}
+    while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_XOSC32KRDY)) {}
 #endif
 }
 
@@ -153,8 +153,9 @@ static void _dfll_setup(void)
                              OSCCTRL_DFLLCTRL_ENABLE;
 
     /* Ensure COARSE and FINE are locked */
-    while ((!(OSCCTRL->STATUS.bit.DFLLLCKC)) && (!(OSCCTRL->STATUS.bit.DFLLLCKF))) {}
-    while (!(OSCCTRL->STATUS.bit.DFLLRDY)) {}
+    while ((!(OSCCTRL->STATUS.reg & OSCCTRL_STATUS_DFLLLCKC)) &&
+           (!(OSCCTRL->STATUS.reg & OSCCTRL_STATUS_DFLLLCKF))) {}
+    while (!(OSCCTRL->STATUS.reg & OSCCTRL_STATUS_DFLLRDY)) {}
 
     /* Enable NVMCTRL */
     MCLK->APBBMASK.reg |= MCLK_APBBMASK_NVMCTRL;
@@ -185,12 +186,13 @@ void cpu_pm_cb_enter(int deep)
     /* If you are using saml21 rev. B, switch Main Clock to OSCULP32 during standby
        to work around errata 1.2.1.
        See discussion in #13441  */
-    assert((DSU->DID.bit.REVISION > 1) || ((PM->STDBYCFG.reg & 0x80) == 0));
+    assert(((DSU->DID.reg & DSU_DID_REVISION_Msk) > 1) ||
+           ((PM->STDBYCFG.reg & 0x80) == 0));
 
     /* errata 51.1.5 – When VDDCORE is supplied by the BUCK converter in performance
                        level 0, the chip cannot wake-up from standby mode because the
                        VCORERDY status is stuck at 0. */
-    if (USE_VREG_BUCK && !PM->PLCFG.bit.PLSEL) {
+    if (USE_VREG_BUCK && !(PM->PLCFG.reg & PM_PLCFG_PLSEL_Msk)) {
         sam0_set_voltage_regulator(SAM0_VREG_LDO);
     }
 
@@ -213,14 +215,15 @@ void cpu_pm_cb_leave(int deep)
  */
 void cpu_init(void)
 {
+    uint32_t reg = 0;
     /* disable the watchdog timer */
-    WDT->CTRLA.bit.ENABLE = 0;
+    WDT->CTRLA.reg = 0;
 
     /* Disable the RTC module to prevent synchronization issues during CPU init
        if the RTC was running from a previous boot (e.g wakeup from backup) */
-    if (RTC->MODE2.CTRLA.bit.ENABLE) {
+    if (RTC->MODE2.CTRLA.reg & RTC_MODE2_CTRLA_ENABLE) {
         while (RTC->MODE2.SYNCBUSY.reg) {}
-        RTC->MODE2.CTRLA.bit.ENABLE = 0;
+        RTC->MODE2.CTRLA.reg &= ~RTC_MODE2_CTRLA_ENABLE;
         while (RTC->MODE2.SYNCBUSY.reg) {}
     }
 
@@ -253,24 +256,25 @@ void cpu_init(void)
 
 #if (CLOCK_CORECLOCK > 12000000U)
     PM->PLCFG.reg = PM_PLCFG_PLSEL_PL2;
-    while (!PM->INTFLAG.bit.PLRDY) {}
+    while (!(PM->INTFLAG.reg & PM_INTFLAG_PLRDY)) {}
 #endif
 
     /* set OSC16M according to CLOCK_CORECLOCK */
 #if (CLOCK_CORECLOCK == 48000000U) || (CLOCK_CORECLOCK == 16000000U)
-    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_16_Val;
+    reg = OSCCTRL_OSC16MCTRL_FSEL_16;
 #elif (CLOCK_CORECLOCK == 12000000U)
-    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_12_Val;
+    reg = OSCCTRL_OSC16MCTRL_FSEL_12;
 #elif (CLOCK_CORECLOCK == 8000000U)
-    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_8_Val;
+    reg = OSCCTRL_OSC16MCTRL_FSEL_8;
 #elif (CLOCK_CORECLOCK == 4000000U)
-    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_4_Val;
+    reg = OSCCTRL_OSC16MCTRL_FSEL_4;
 #else
 #error "Please select a valid CPU frequency"
 #endif
 
-    OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 1;
-    OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
+    reg |= OSCCTRL_OSC16MCTRL_ONDEMAND;
+    reg |= OSCCTRL_OSC16MCTRL_ENABLE;
+    OSCCTRL->OSC16MCTRL.reg = reg;
 
     _osc32k_setup();
     _xosc32k_setup();
@@ -291,7 +295,7 @@ void cpu_init(void)
     for (unsigned i = 0; i < 8; i++) {
         if (CLOCK_CORECLOCK / (1 << i) <= 6000000) {
             MCLK->BUPDIV.reg = (1 << i);
-            while (!MCLK->INTFLAG.bit.CKRDY) {}
+            while (!(MCLK->INTFLAG.reg & MCLK_INTFLAG_CKRDY)) {}
             break;
         }
     }
@@ -305,7 +309,7 @@ void cpu_init(void)
     /* disable brownout detection
      * (Caused unexplicable reboots from sleep on saml21. /KS)
      */
-    SUPC->BOD33.bit.ENABLE=0;
+    SUPC->BOD33.reg &= ~SUPC_BOD33_ENABLE;
 #endif
 
 #ifdef MODULE_PERIPH_DMA
