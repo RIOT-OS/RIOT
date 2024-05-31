@@ -57,7 +57,7 @@ static void test_prng_sha1prng_java_u32(void)
     /* seed the generator with 8 bytes similar to the java reference
      * implementation
      */
-    random_init_by_array(seed, sizeof(seed));
+    random_init_by_array(seed, ARRAY_SIZE(seed));
 
     /* request random samples */
     for (unsigned i = 0; i < ARRAY_SIZE(seq_seed1); i++) {
