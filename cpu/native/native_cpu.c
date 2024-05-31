@@ -21,16 +21,22 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-
+/* __USE_GNU for gregs[REG_EIP] access under glibc
+ * _GNU_SOURCE for REG_EIP and strsignal() under musl */
 #define __USE_GNU
-#include <signal.h>
-#undef __USE_GNU
+#define _GNU_SOURCE
 
-#include <ucontext.h>
 #include <err.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if USE_LIBUCONTEXT
+#include <libucontext/libucontext.h>
+#else
+#include <ucontext.h>
+#endif
 
 #ifdef HAVE_VALGRIND_H
 #include <valgrind.h>
@@ -45,11 +51,11 @@
 
 #include <stdlib.h>
 
-#include "irq.h"
-#include "sched.h"
-
 #include "cpu.h"
 #include "cpu_conf.h"
+#include "irq.h"
+#include "sched.h"
+#include "test_utils/expect.h"
 
 #ifdef MODULE_NETDEV_TAP
 #include "netdev_tap.h"
@@ -62,7 +68,6 @@ extern netdev_tap_t netdev_tap;
 #include "debug.h"
 
 ucontext_t end_context;
-char __end_stack[SIGSTKSZ];
 
 /**
  * make the new context assign `_native_in_isr = 0` before resuming
@@ -194,7 +199,7 @@ void cpu_switch_context_exit(void)
         irq_disable();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_size = __isr_stack_size;
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
         if (setcontext(&native_isr_context) == -1) {
@@ -247,7 +252,7 @@ void thread_yield_higher(void)
         _native_in_isr = 1;
         irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_size = __isr_stack_size;
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_thread_yield, 0);
         if (swapcontext(ctx, &native_isr_context) == -1) {
@@ -263,13 +268,16 @@ void native_cpu_init(void)
         err(EXIT_FAILURE, "native_cpu_init: getcontext");
     }
 
-    end_context.uc_stack.ss_sp = __end_stack;
+    end_context.uc_stack.ss_sp = malloc(SIGSTKSZ);
+    expect(end_context.uc_stack.ss_sp != NULL);
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
-    (void) VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
+    (void)VALGRIND_STACK_REGISTER(end_context.uc_stack.ss_sp,
+                                  (char *)end_context.uc_stack.ss_sp + end_context.uc_stack.ss_size);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   (void*)__end_stack, (void*)(__end_stack + sizeof(__end_stack)));
+                   (void*)end_context.uc_stack.ss_sp,
+                   (void*)((char *)end_context.uc_stack.ss_sp + end_context.uc_stack.ss_size));
 
     DEBUG("RIOT native cpu initialized.\n");
 }

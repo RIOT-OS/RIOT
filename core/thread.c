@@ -171,15 +171,18 @@ void thread_add_to_list(list_node_t *list, thread_t *thread)
     list->next = new_node;
 }
 
-uintptr_t thread_measure_stack_free(const char *stack)
+uintptr_t measure_stack_free_internal(const char *stack, size_t size)
 {
     /* Alignment of stack has been fixed (if needed) by thread_create(), so
      * we can silence -Wcast-align here */
     uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
+    uintptr_t end = (uintptr_t)stack + size;
 
-    /* assume that the comparison fails before or after end of stack */
+    /* better be safe than sorry: align end of stack just in case */
+    end &= (sizeof(uintptr_t) - 1);
+
     /* assume that the stack grows "downwards" */
-    while (*stackp == (uintptr_t)stackp) {
+    while (((uintptr_t)stackp < end) && (*stackp == (uintptr_t)stackp)) {
         stackp++;
     }
 
