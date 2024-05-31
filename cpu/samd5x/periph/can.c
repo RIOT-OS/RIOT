@@ -386,6 +386,8 @@ static int _init(candev_t *candev)
     dev->conf->can->IE.reg |= CAN_IE_RF0NE | CAN_IE_RF1NE;
     /* Enable transmission events interrupts */
     dev->conf->can->IE.reg |= CAN_IE_TEFNE;
+    /* Enable errors interrupts */
+    dev->conf->can->IE.reg |= CAN_IE_PEDE | CAN_IE_PEAE | CAN_IE_BOE | CAN_IE_EWE | CAN_IE_EPE;
     /* Enable the interrupt lines */
     dev->conf->can->ILE.reg = CAN_ILE_EINT0 | CAN_ILE_EINT1;
 
@@ -776,6 +778,148 @@ static void _isr(candev_t *candev)
         dev->conf->can->IR.reg |= CAN_IR_TEFN;
         if (dev->candev.event_callback) {
             dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_CONFIRMATION, NULL);
+        }
+    }
+
+    static uint8_t last_error_code = 0;
+    /* Interrupt triggered due to protocol error in data phase */
+    if (irq_reg & CAN_IR_PED) {
+        DEBUG_PUTS("protocol error in data phase");
+        dev->conf->can->IR.reg |= CAN_IR_PED;
+        /* Extract the Tx and Rx error counters */
+        uint8_t tx_err_cnt = (uint8_t)dev->conf->can->ECR.bit.TEC;
+        DEBUG("tx error counter = %u\n", tx_err_cnt);
+        uint8_t rx_err_cnt = (uint8_t)dev->conf->can->ECR.bit.REC;
+        DEBUG("rx error counter = %u\n", rx_err_cnt);
+        /* Check the CAN error type */
+        uint8_t error_code = (uint8_t)dev->conf->can->PSR.bit.LEC;
+        DEBUG("error code = %u\n", error_code);
+        if (error_code == CANDEV_SAMD5X_NO_CHANGE_ERROR) {
+            error_code = last_error_code;
+        }
+
+        switch (error_code) {
+            case CANDEV_SAMD5X_STUFF_ERROR:
+                DEBUG_PUTS("STUFF error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_FORM_ERROR:
+                DEBUG_PUTS("FORM error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_ACK_ERROR:
+                DEBUG_PUTS("ACK error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_BIT1_ERROR:
+                DEBUG_PUTS("BIT1 error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_BIT0_ERROR:
+                DEBUG_PUTS("BIT0 error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_CRC_ERROR:
+                DEBUG_PUTS("CRC error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+                }
+                break;
+            default:
+                break;
+        }
+
+        last_error_code = error_code;
+    }
+
+    /* Interrupt triggered due to protocol error in arbitration phase */
+    if (irq_reg & CAN_IR_PEA) {
+        DEBUG_PUTS("protocol error in arbitration phase");
+        dev->conf->can->IR.reg |= CAN_IR_PEA;
+        /* Extract the Tx and Rx error counters */
+        uint8_t tx_err_cnt = (uint8_t)dev->conf->can->ECR.bit.TEC;
+        DEBUG("tx error counter = %u\n", tx_err_cnt);
+        uint8_t rx_err_cnt = (uint8_t)dev->conf->can->ECR.bit.REC;
+        DEBUG("rx error counter = %u\n", rx_err_cnt);
+        /* Check the CAN error type */
+        uint8_t error_code = (uint8_t)dev->conf->can->PSR.bit.LEC;
+        DEBUG("error code = %u\n", error_code);
+        if (error_code == CANDEV_SAMD5X_NO_CHANGE_ERROR) {
+            error_code = last_error_code;
+        }
+
+        switch (error_code) {
+            case CANDEV_SAMD5X_STUFF_ERROR:
+                DEBUG_PUTS("STUFF error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_FORM_ERROR:
+                DEBUG_PUTS("FORM error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_ACK_ERROR:
+                DEBUG_PUTS("ACK error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_BIT0_ERROR:
+                DEBUG_PUTS("BIT0 error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+                }
+                break;
+            case CANDEV_SAMD5X_CRC_ERROR:
+                DEBUG_PUTS("CRC error");
+                if (dev->candev.event_callback) {
+                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+                }
+                break;
+            default:
+                break;
+        }
+
+        last_error_code = error_code;
+    }
+
+    /* Interrupt triggered due to Bus_Off status */
+    if (irq_reg & CAN_IR_BO) {
+        DEBUG_PUTS("Bus off");
+        dev->conf->can->IR.reg |= CAN_IR_BO;
+        if (dev->candev.event_callback) {
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_BUS_OFF, NULL);
+        }
+    }
+
+    /* Interrupt triggered due to Error warning status */
+    if (irq_reg & CAN_IR_EW) {
+        DEBUG_PUTS("Error warning");
+        dev->conf->can->IR.reg |= CAN_IR_EW;
+        if (dev->candev.event_callback) {
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_ERROR_WARNING, NULL);
+        }
+    }
+
+    /* Interrupt triggered due to Error passive status */
+    if (irq_reg & CAN_IR_EP) {
+        DEBUG_PUTS("Error Passive");
+        dev->conf->can->IR.reg |= CAN_IR_EP;
+        if (dev->candev.event_callback) {
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_ERROR_PASSIVE, NULL);
         }
     }
 

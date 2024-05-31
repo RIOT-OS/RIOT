@@ -115,6 +115,11 @@ void event_timeout_clear(event_timeout_t *event_timeout);
  */
 static inline bool event_timeout_is_pending(const event_timeout_t *event_timeout)
 {
+    if (event_timeout->clock == NULL || event_timeout->queue == NULL ||
+        event_timeout->event == NULL) {
+        return false;
+    }
+
     return ztimer_is_set(event_timeout->clock, &event_timeout->timer)
         || event_is_queued(event_timeout->queue, event_timeout->event);
 }

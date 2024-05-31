@@ -10,3 +10,7 @@ FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += netif
+FEATURES_PROVIDED += netif_openwsn # at86rf2xx is supported by OpenWSN

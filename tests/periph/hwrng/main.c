@@ -24,22 +24,22 @@
 #include "xtimer.h"
 #include "periph/hwrng.h"
 
-#define LIMIT       (20U)
+#define NUM_BYTES   (20U)
 
 int main(void)
 {
-    uint8_t buf[LIMIT];
+    uint8_t buf[NUM_BYTES];
 
     puts("\nHWRNG peripheral driver test\n");
     printf("This test will print from 1 to %u random bytes about every "
-           "second\n\n", LIMIT);
+           "second\n\n", NUM_BYTES);
 
     while (1) {
         /* zero out buffer */
         memset(buf, 0, sizeof(buf));
 
         /* create random numbers */
-        for (unsigned i = 1; i <= LIMIT; i++) {
+        for (unsigned i = 1; i <= NUM_BYTES; i++) {
             printf("generating %u random byte(s)\n", i);
             hwrng_read(buf, i);
 

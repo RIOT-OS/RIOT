@@ -8,4 +8,8 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep

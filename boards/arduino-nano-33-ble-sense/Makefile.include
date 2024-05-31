@@ -1,0 +1,21 @@
+# Bossa is the default programmer
+PROGRAMMER ?= bossa
+
+ifeq ($(PROGRAMMER),bossa)
+  # The preinstalled Arduino bootloader must also be taken into account so
+  # ROM_OFFSET skips the space taken by such bootloader.
+  ROM_OFFSET ?= 0x10000
+
+  # This board requires a BOSSA version from arduino's fork and adapted to
+  # nrf52.
+  BOSSA_VERSION = nrf52
+  BOSSA_ARDUINO_PREFLASH = yes
+  PREFLASH_DELAY = 1
+endif
+
+PROGRAMMERS_SUPPORTED += bossa
+
+TESTRUNNER_CONNECT_DELAY ?= 2
+$(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

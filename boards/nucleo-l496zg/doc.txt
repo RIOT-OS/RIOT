@@ -8,6 +8,10 @@
 The Nucleo-L496ZG is a board from ST's Nucleo family supporting ARM Cortex-M4
 STM32L496ZG ultra-low-pawer microcontroller with 320KiB of RAM and 1 MiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-l496zg.svg "Pinout for the nucleo-l496zg (from STM board manual)" width=55%
+
 ### MCU
 
 | MCU        |   STM32L496ZG      |

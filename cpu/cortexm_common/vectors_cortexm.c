@@ -353,6 +353,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     /* Sanity check stack pointer and give additional feedback about hard fault */
     if (corrupted) {
         puts("Stack pointer corrupted, reset to top of stack");
+        printf("active thread: %"PRIkernel_pid"\n", thread_getpid());
     }
     else {
         uint32_t  r0 = sp[0];

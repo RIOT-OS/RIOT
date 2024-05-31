@@ -425,6 +425,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
         local.family = aux->local.family;
         local.netif = aux->local.netif;
+        src_port = aux->local.port;
         memcpy(&local.addr, &aux->local.addr, sizeof(local.addr));
 
         aux->flags &= ~SOCK_AUX_SET_LOCAL;

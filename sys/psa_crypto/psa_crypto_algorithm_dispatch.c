@@ -81,9 +81,33 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         }
         break;
     #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_384))
+    case PSA_ALG_SHA_384:
+        status = psa_hashes_sha384_setup(&operation->ctx.sha384);
+        if (status != PSA_SUCCESS) {
+            return status;
+        }
+        break;
+    #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512))
     case PSA_ALG_SHA_512:
         status = psa_hashes_sha512_setup(&operation->ctx.sha512);
+        if (status != PSA_SUCCESS) {
+            return status;
+        }
+        break;
+    #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_512_224))
+    case PSA_ALG_SHA_512_224:
+        status = psa_hashes_sha512_224_setup(&operation->ctx.sha512_224);
+        if (status != PSA_SUCCESS) {
+            return status;
+        }
+        break;
+    #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_512_256))
+    case PSA_ALG_SHA_512_256:
+        status = psa_hashes_sha512_256_setup(&operation->ctx.sha512_256);
         if (status != PSA_SUCCESS) {
             return status;
         }
@@ -120,9 +144,21 @@ psa_status_t psa_algorithm_dispatch_hash_update(psa_hash_operation_t *operation,
     case PSA_ALG_SHA_256:
         return psa_hashes_sha256_update(&operation->ctx.sha256, input, input_length);
     #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_384))
+    case PSA_ALG_SHA_384:
+        return psa_hashes_sha384_update(&operation->ctx.sha384, input, input_length);
+    #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512))
     case PSA_ALG_SHA_512:
         return psa_hashes_sha512_update(&operation->ctx.sha512, input, input_length);
+    #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_512_224))
+    case PSA_ALG_SHA_512_224:
+        return psa_hashes_sha512_224_update(&operation->ctx.sha512_224, input, input_length);
+    #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_512_256))
+    case PSA_ALG_SHA_512_256:
+        return psa_hashes_sha512_256_update(&operation->ctx.sha512_256, input, input_length);
     #endif
     default:
         (void)operation;
@@ -154,9 +190,21 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
     case PSA_ALG_SHA_256:
         return psa_hashes_sha256_finish(&operation->ctx.sha256, hash, hash_size, hash_length);
     #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_384))
+    case PSA_ALG_SHA_384:
+        return psa_hashes_sha384_finish(&operation->ctx.sha384, hash, hash_size, hash_length);
+    #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512))
     case PSA_ALG_SHA_512:
         return psa_hashes_sha512_finish(&operation->ctx.sha512, hash, hash_size, hash_length);
+    #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_512_224))
+    case PSA_ALG_SHA_512_224:
+        return psa_hashes_sha512_224_finish(&operation->ctx.sha512_224, hash, hash_size, hash_length);
+    #endif
+    #if (IS_USED(MODULE_PSA_HASH_SHA_512_256))
+    case PSA_ALG_SHA_512_256:
+        return psa_hashes_sha512_256_finish(&operation->ctx.sha512_256, hash, hash_size, hash_length);
     #endif
     default:
         (void)operation;

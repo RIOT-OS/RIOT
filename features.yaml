@@ -835,8 +835,14 @@ groups:
       help: SHA-224 hardware acceleration present.
     - name: periph_hash_sha_256
       help: SHA-256 hardware acceleration present.
+    - name: periph_hash_sha_384
+      help: SHA-384 hardware acceleration present.
     - name: periph_hash_sha_512
       help: SHA-512 hardware acceleration present.
+    - name: periph_hash_sha_512_224
+      help: SHA-512/224 hardware acceleration present.
+    - name: periph_hash_sha_512_256
+      help: SHA-512/256 hardware acceleration present.
     - name: periph_hmac_sha_256
       help: HMAC SHA-256 hardware acceleration present.
     - name: periph_hwrng
@@ -871,8 +877,12 @@ groups:
 - title: Board Features
   help: These features indicate features of the board
   features:
-  - name: ethernet
-    help: The board has Ethernet connectivity
+  - name: netif
+    help: The board has a network interface
+  - name: netif_ethernet
+    help: The board has an Ethernet network interface
+  - name: netif_openwsn
+    help: The board has a network interface suitable for OpenWSN
   - name: highlevel_stdio
     help: A high-level stdio method (such as CDC ACM) is used. This requires a
           running thread and set-up and will not print during a crash.

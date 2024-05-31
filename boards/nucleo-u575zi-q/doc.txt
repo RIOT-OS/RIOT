@@ -27,7 +27,7 @@ ture-description-include-personalized-no-cpn-medium.jpg)
 | TrustZone    | yes                          |
 | Timers       | 17                           |
 | UARTs        | 6 (3xUSART, 2xUART, 1xLPUART)|
-| I2cs         | 4                            |
+| I2Cs         | 4                            |
 | SPIs         | 3                            |
 | CAN          | 1                            |
 | Datasheet    | [Datasheet](https://www.st.com/resource/en/datasheet/stm32u575zi.pdf)|

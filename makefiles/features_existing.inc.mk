@@ -126,12 +126,14 @@ FEATURES_EXISTING := \
     esp_wifi \
     esp_wifi_ap \
     esp_wifi_enterprise \
-    ethernet \
     gecko_sdk_librail_fpu \
     gecko_sdk_librail_nonfpu \
     highlevel_stdio \
     libstdcpp \
     motor_driver \
+    netif \
+    netif_ethernet \
+    netif_openwsn \
     newlib \
     no_idle_thread \
     periph_adc \
@@ -182,7 +184,10 @@ FEATURES_EXISTING := \
     periph_hash_sha_1 \
     periph_hash_sha_224 \
     periph_hash_sha_256 \
+    periph_hash_sha_384 \
     periph_hash_sha_512 \
+    periph_hash_sha_512_224 \
+    periph_hash_sha_512_256 \
     periph_hmac_sha_256 \
     periph_hwrng \
     periph_i2c \
