@@ -143,7 +143,7 @@ fn print_aliases() {
 fn apply_alias(line: &mut ShellBuf) -> Option<impl core::future::Future> {
     assert!(line.ends_with("\0"));
 
-    let expand = |line: &mut ShellBuf, alias| {
+    let update = |line: &mut ShellBuf, alias| {
         line.clear();
         line.push_str(alias).unwrap();
         line.push('\0').unwrap();
@@ -153,15 +153,15 @@ fn apply_alias(line: &mut ShellBuf) -> Option<impl core::future::Future> {
 
     if ln == "alias" || ln == "a" {
         print_aliases();
-        expand(line, "");
+        update(line, "");
     } else if let Some(item) = TABLE_ALIAS_NAMED.iter().find(|item| item.0 == ln) {
-        expand(line, item.1);
+        update(line, item.1);
     } else if let Some(item) = TABLE_ALIAS_FUNCTION.iter().find(|item| **item == ln) {
-        expand(line, "");
+        update(line, "");
         return Some(run_function_alias(item));
     } else if let Ok(x) = ln.parse::<usize>() {
         if x < TABLE_ALIAS_ENUMERATED.len() {
-            expand(line, TABLE_ALIAS_ENUMERATED[x]);
+            update(line, TABLE_ALIAS_ENUMERATED[x]);
         }
     }
 
