@@ -4,7 +4,7 @@ use crate::static_borrow_mut;
 use crate::alias::*;
 
 extern "C" {
-    fn handle_input_line(command_list: *const libc::c_void, line: *const u8);
+    fn shell_handle_input_line(command_list: *const libc::c_void, line: *const u8);
     fn async_shell_init() -> i8;
     fn async_shell_bufsize() -> usize;
     fn async_shell_prompt(tag_cstr: *const u8, highlight: bool);
@@ -49,7 +49,7 @@ pub extern fn async_shell_on_char(ch: u8) {
                     SHELL_BUF
                         .push(ch)
                         .unwrap_or_else(|_| { // input too long
-                            //println!("NOP; input (> SHELL_BUFSIZE={})", SHELL_BUFSIZE);
+                            // println!("NOP; input (> SHELL_BUFSIZE={})", SHELL_BUFSIZE); // debug
                         });
                 }
             },
@@ -78,15 +78,23 @@ pub async fn process_shell_stream() -> Result<(), i8> {
     print_aliases();
     prompt();
 
+    let trim = |line: &mut ShellBuf| {
+        let lc = line.clone();
+        line.clear();
+        line.push_str(lc.trim()).unwrap();
+        assert!(line.ends_with("\0"));
+    };
+
     while let Some(mut line) = xs.next().await {
         assert!(line.ends_with("\0"));
 
-        if line.trim() != "\0" {
-            if match_alias(&mut line).await {
-                assert!(line.ends_with("\0"));
+        trim(&mut line);
+        if line != "\0" {
+            if let Some(fut) = apply_alias(&mut line) {
+                fut.await; // run function alias
             }
 
-            unsafe { handle_input_line(riot_shell_commands, line.as_ptr()); }
+            unsafe { shell_handle_input_line(riot_shell_commands, line.as_ptr()); }
         }
 
         prompt();
@@ -132,32 +140,30 @@ fn print_aliases() {
         .for_each(|(idx, cmd)| println!("[{}] {}", idx, cmd));
 }
 
-async fn match_alias(line: &mut ShellBuf) -> bool {
+fn apply_alias(line: &mut ShellBuf) -> Option<impl core::future::Future> {
     assert!(line.ends_with("\0"));
 
     let expand = |line: &mut ShellBuf, alias| {
         line.clear();
         line.push_str(alias).unwrap();
         line.push('\0').unwrap();
-
-        true // `line` updated
     };
 
     let ln = &line[..line.len() - 1]; // chars that precede '\0'
 
     if ln == "alias" || ln == "a" {
         print_aliases();
-        return expand(line, "");
+        expand(line, "");
     } else if let Some(item) = TABLE_ALIAS_NAMED.iter().find(|item| item.0 == ln) {
-        return expand(line, item.1);
+        expand(line, item.1);
     } else if let Some(item) = TABLE_ALIAS_FUNCTION.iter().find(|item| **item == ln) {
-        run_function_alias(item).await;
-        return expand(line, "");
+        expand(line, "");
+        return Some(run_function_alias(item));
     } else if let Ok(x) = ln.parse::<usize>() {
         if x < TABLE_ALIAS_ENUMERATED.len() {
-            return expand(line, TABLE_ALIAS_ENUMERATED[x]);
+            expand(line, TABLE_ALIAS_ENUMERATED[x]);
         }
     }
 
-    false
+    None
 }
