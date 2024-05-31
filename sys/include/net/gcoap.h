@@ -653,6 +653,7 @@ extern "C" {
                           + sizeof(coap_pkt_t) + GCOAP_DTLS_EXTRA_STACKSIZE \
                           + GCOAP_VFS_EXTRA_STACKSIZE)
 #endif
+#endif
 /** @} */
 
 /**
