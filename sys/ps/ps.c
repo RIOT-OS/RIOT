@@ -98,7 +98,7 @@ void ps(void)
 #ifdef DEVELHELP
             int stacksz = thread_get_stacksize(p);                          /* get stack size */
             overall_stacksz += stacksz;
-            int stack_free = thread_measure_stack_free(thread_get_stackstart(p));
+            int stack_free = thread_measure_stack_free(p);
             stacksz -= stack_free;
             overall_used += stacksz;
 #endif
