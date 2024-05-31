@@ -13,6 +13,15 @@
  * @file
  * @brief       Shell commands for the cryptoauthlib module
  *
+ *              Currently supported devices:
+ *              - ATECC508A
+ *              - ATECC608
+ *
+ *              This relies on a config header file being present in
+ *              pkg/cryptoauthlib/include.
+ *              The present example configuration can be exchanged or
+ *              modified if needed.
+ *
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  * @}
@@ -25,6 +34,8 @@
 #include "atca_params.h"
 #include "cryptoauthlib.h"
 #include "shell.h"
+
+#include "atecc608a_config.h"
 
 #define ATCA_CONFIG_READ_ONLY_BYTES (15)
 #define ATCA_KEY_SLOT_COUNT         (15)
@@ -56,6 +67,8 @@
 #define CHIP_OPTIONS_START          (90)
 #define X509_FORMAT_START           (92)
 #define KEY_CONFIG_START            (96)
+
+uint8_t config_backup[ATCA_NUMOF][ATCA_ECC_CONFIG_SIZE];
 
 int device_index = 0;
 
@@ -286,8 +299,8 @@ static void _print_slot_config(uint8_t* data)
     puts("SlotID  | Hex    | Binary");
     puts("        |        | 7      0 | 15     8");
     puts("--------+--------+----------------------");
+    int slotcount = 0;
     for (size_t i = 0; i < ATCA_KEY_SLOT_COUNT*2; i += 2) {
-        static int slotcount = 0;
         if (slotcount < 10) {
             printf("%d       | 0x%02x%02x | ", slotcount, data[SLOT_CONFIG_START+i], data[SLOT_CONFIG_START+i+1]);
         }
@@ -419,8 +432,8 @@ static void _print_key_config(uint8_t* data)
     puts("SlotID  | Hex    | Binary");
     puts("        |        | 7      0 | 15     8");
     puts("--------+--------+----------------------");
+    int slotcount = 0;
     for (size_t i = 0; i < atca_key_config_bytes; i += 2) {
-        static int slotcount = 0;
         if (slotcount < 10) {
             printf("%d       | 0x%02x%02x | ", slotcount, data[KEY_CONFIG_START+i], data[KEY_CONFIG_START+i+1]);
         }
@@ -800,18 +813,68 @@ static int _set_dev(char* id)
     return 0;
 }
 
+static int _show_dev(void)
+{
+    puts("Set | ID | DevType   | I2C Addr");
+    puts("----|----|-----------|---------");
+    for (size_t i = 0; i < ATCA_NUMOF; i++) {
+        char dev_set = ((size_t)device_index == i ? '*' : ' ');
+        ATCADeviceType devtype = atca_devs_ptr[i]->mIface.mIfaceCFG->devtype;
+        printf("%c   | %d  | %s | 0x%02x\n",
+                dev_set,
+                i,
+                _convert_atca_devtype(devtype),
+                atca_devs_ptr[i]->mIface.mIfaceCFG->atcai2c.address);
+    }
+    return 0;
+}
+
+static int _write_config(ATCADevice dev)
+{
+    ATCA_STATUS status = calib_read_config_zone(dev, config_backup[device_index]);
+    if (status != ATCA_SUCCESS) {
+        printf("Error reading config zone\n");
+        return 1;
+    }
+
+    status = calib_write_config_zone(dev, atecc608a_config);
+    if (status != ATCA_SUCCESS) {
+        printf("Writing config zone failed: 0x%02x\n", status);
+        return 1;
+    }
+    return 0;
+}
+
+static int _restore_config(ATCADevice dev)
+{
+    ATCA_STATUS status = calib_write_config_zone(dev, config_backup[device_index]);
+    if (status != ATCA_SUCCESS) {
+        printf("Restoring config zone failed: 0x%02x\n", status);
+        return 1;
+    }
+    return 0;
+}
+
 static int _atca(int argc, char **argv)
 {
     if (argc > 1) {
-        if ((strcmp(argv[1], "set_dev") == 0)) {
+        if ((strcmp(argv[1], "show_dev") == 0)) {
+            return _show_dev();
+        }
+        else if ((strcmp(argv[1], "set_dev") == 0)) {
             if (argc < 3) {
                 puts("Please enter valid device index number");
                 return 1;
             }
             return _set_dev(argv[2]);
         }
-
-        if ((strcmp(argv[1], "read") == 0)) {
+        else if ((strcmp(argv[1], "write") == 0)) {
+            return _write_config(atca_devs_ptr[device_index]);
+        }
+        else if ((strcmp(argv[1], "restore") == 0)) {
+            return _restore_config(atca_devs_ptr[device_index]);
+        }
+        else if ((strcmp(argv[1], "read") == 0)) {
             return _read_config(atca_devs_ptr[device_index]);
         }
         else if ((strcmp(argv[1], "read_bin") == 0)) {
@@ -831,7 +894,10 @@ static int _atca(int argc, char **argv)
         }
     }
     else {
-        printf("* set_dev <number> - set and initialize an atca device (defaults to index 0)\n");
+        printf("* show_dev - list available devices and IDs\n");
+        printf("* set_dev <number> - set and initialize an atca device (defaults to ID 0)\n");
+        printf("* write - write configuration to config zone (stores backup of current config)\n");
+        printf("* restore - restore device config zone to previous state\n");
         printf("* read - read Microchip CryptoAuth device's config zone\n");
         printf("* read_bin - read config zone and print binary data\n");
         printf("* lock_c - PERMANENTLY lock Microchip CryptoAuth device's config zone (cannot be undone!)\n");
