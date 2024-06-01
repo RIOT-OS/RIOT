@@ -38,6 +38,10 @@ void board_init(void)
     SARA_R4XX_PWR_ON_ON;
     gpio_init(SARA_R4XX_PWR_ON_PIN, GPIO_IN);
 
+    /* The SARA pin V_INT is available as SARA_STATUS_PIN.
+     */
+    gpio_init(SARA_STATUS_PIN, GPIO_IN);
+
     /* Disable GPS by default */
     GPS_ENABLE_OFF;
     gpio_init(GPS_ENABLE_PIN, GPIO_OUT);
