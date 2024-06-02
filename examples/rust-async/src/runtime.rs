@@ -17,7 +17,7 @@ async fn task_server() {
 #[embassy_executor::task]
 async fn task_shell() {
     println!("task_shell(): starting");
-    crate::shell::process_shell_stream().await.unwrap();
+    crate::shell::start().await.unwrap();
 }
 
 const RUNTIME_THROTTLE_MS: u32 = 100;

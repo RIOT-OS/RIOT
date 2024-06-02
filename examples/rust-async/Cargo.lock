@@ -956,6 +956,7 @@ dependencies = [
  "futures-util",
  "heapless 0.8.0",
  "riot-coap-handler-demos",
+ "riot-shell-commands",
  "riot-wrappers",
  "rust_riotmodules",
 ]

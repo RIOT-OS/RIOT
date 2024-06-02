@@ -57,7 +57,26 @@ pub extern fn async_shell_on_char(ch: u8) {
     }
 }
 
-pub async fn process_shell_stream() -> Result<(), i8> {
+mod statics { // add RIOT-wrappers' static command examples
+    use super::*;
+    use riot_wrappers::{static_command, stdio::Stdio, shell::Args};
+    use riot_shell_commands::{ps, sleep as do_sleep};
+
+    fn do_echo(_stdio: &mut Stdio, args: Args) {
+        println!("Running args of run:");
+        for a in args.iter() {
+            println!("{:?}", a);
+        }
+    }
+
+    fn do_ps(stdio: &mut Stdio, _args: Args) { ps(stdio); }
+
+    static_command!(static_echo, "echo.rs", "Print the arguments in separate lines", do_echo);
+    static_command!(static_ps, "ps.rs", "List the processes", do_ps);
+    static_command!(static_sleep, "sleep.rs", "Pause the shell prompt", do_sleep);
+}
+
+pub async fn start() -> Result<(), i8> {
     assert_eq!(unsafe { async_shell_bufsize() }, SHELL_BUFSIZE);
 
     match riot_wrappers::BOARD {
@@ -68,10 +87,10 @@ pub async fn process_shell_stream() -> Result<(), i8> {
         _ => panic!("unsupported board"),
     }
 
-    let riot_shell_commands = if ENABLE_RIOT_APP_COMMANDS {
-        unsafe { async_shell_app_commands() }
+    let riot_c_shell_commands = if ENABLE_RIOT_APP_COMMANDS {
+        unsafe { async_shell_app_commands() } // add RIOT-c app commands
     } else {
-        core::ptr::null() // RIOT-c system commands only
+        core::ptr::null() // use RIOT-c system commands only
     };
 
     let mut xs = XStream::get(static_borrow_mut!(SD));
@@ -85,6 +104,7 @@ pub async fn process_shell_stream() -> Result<(), i8> {
         assert!(line.ends_with("\0"));
     };
 
+    // process line input stream
     while let Some(mut line) = xs.next().await {
         assert!(line.ends_with("\0"));
 
@@ -94,13 +114,12 @@ pub async fn process_shell_stream() -> Result<(), i8> {
                 fut.await; // run function alias
             }
 
-            unsafe { shell_handle_input_line(riot_shell_commands, line.as_ptr()); }
+            unsafe { shell_handle_input_line(riot_c_shell_commands, line.as_ptr()); }
         }
 
         prompt();
     }
-
-    Ok(())
+    panic!("should be never reached");
 }
 
 fn prompt() {

@@ -24,6 +24,7 @@ riot-wrappers = { version = "^0.8", features = [ "set_panic_handler", "panic_han
 coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
 coap-handler-implementations = "0.5"
 riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs", "saul" ] }
+riot-shell-commands = { git = "https://gitlab.com/etonomy/riot-module-examples/", default-features = false, features = [ "ztimer" ] }
 
 coap-handler = "0.2"
 heapless = "0.8"
