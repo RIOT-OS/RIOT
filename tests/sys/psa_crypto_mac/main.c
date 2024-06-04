@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include "psa/crypto.h"
 #include "ztimer.h"
+#include "tests_gen_hmac.h"
 
 extern psa_status_t example_hmac_sha256(void);
 
@@ -30,6 +31,11 @@ int main(void)
     psa_status_t status;
 
     psa_crypto_init();
+
+    TESTS_START();
+    TESTS_RUN(tests_mac_hmac_sha512());
+    TESTS_RUN(tests_mac_hmac_sha384());
+    TESTS_END();
 
     ztimer_acquire(ZTIMER_USEC);
     ztimer_now_t start = ztimer_now(ZTIMER_USEC);
