@@ -480,7 +480,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
         const size_t argc_max = 32;
         size_t cmdlen = 0;
         char *cmdline = malloc(bufsize);
-        argv = calloc(sizeof(char *), argc_max);
+        argv = calloc(argc_max, sizeof(char *));
         argc = 0;
         envp = NULL;
         expect(cmdline != NULL);
