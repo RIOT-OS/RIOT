@@ -593,16 +593,6 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     #endif
-    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20_POLY1305)
-    case PSA_ALG_CHACHA20_POLY1305:
-        if (attributes->type != PSA_KEY_TYPE_CHACHA20) {
-            return PSA_ERROR_INVALID_ARGUMENT;
-        }
-        return psa_cipher_chacha20_poly1305_encrypt(attributes, key_data, 
-                                                    *key_bytes, input, 
-                                                    input_length, output,
-                                                    output_size, output_length);
-    #endif
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
     case PSA_ALG_STREAM_CIPHER:
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
