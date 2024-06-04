@@ -179,7 +179,7 @@ uintptr_t measure_stack_free_internal(const char *stack, size_t size)
     uintptr_t end = (uintptr_t)stack + size;
 
     /* better be safe than sorry: align end of stack just in case */
-    end &= (sizeof(uintptr_t) - 1);
+    end &= ~(sizeof(uintptr_t) - 1);
 
     /* assume that the stack grows "downwards" */
     while (((uintptr_t)stackp < end) && (*stackp == (uintptr_t)stackp)) {
