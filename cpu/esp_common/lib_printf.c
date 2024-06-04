@@ -46,6 +46,16 @@ static int _lib_printf(int level, const char* tag, const char* format, va_list a
 
     int len = vsnprintf(_printf_buf, PRINTF_BUFSIZ - 1, format, arg);
 
+    if (len < 0) {
+        ESP_EARLY_LOGI(tag, "Failed to format print");
+        return 0;
+    }
+
+    /* Did the output get truncated? */
+    if ((unsigned) len > PRINTF_BUFSIZ - 1) {
+        len = PRINTF_BUFSIZ - 1;
+    }
+
     /*
      * Since ESP_EARLY_LOG macros add a line break at the end, a terminating
      * line break in the output must be removed if there is one.

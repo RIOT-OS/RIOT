@@ -59,7 +59,7 @@ externally connected SPI devices.
 |:------------- |:--------------------- |
 | Type       | 2.4GHz IEEE802.15.4 radio |
 | Vendor | Atmel |
-| Datasheet  | [Datasheet](http://www.atmel.com/images/atmel-8351-mcu_wireless-at86rf233_datasheet.pdf) |
+| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8351-MCU_Wireless-AT86RF233_Datasheet.pdf) |
 | Connected to   | SPI_0         |
 | Pin Config:    | |
 | Device | SERCOM4           |
@@ -80,19 +80,18 @@ this.
 
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
-| MCU        | samd21    | partly    | Energy saving modes not fully utilized|
+| MCU        | samd21    | yes| |
 | Low-level driver | GPIO    | yes       | |
 |        | PWM       | yes       | |
-|        | UART      | yes           | two UARTs by now|
+|        | UART      | yes           | |
 |        | I2C       | yes       | |
 |        | SPI       | yes       | |
-|               | ADC           | yes           | PA04 & PA05 disabled by default due to EDBG's use of them for UART, can be enabled from `periph_conf.h`|
-|        | USB       | no        | |
+|        | ADC       | yes       | PA04 & PA05 disabled by default due to EDBG's use of them for UART, can be enabled from `periph_conf.h`|
+|        | USB       | yes       | |
 |        | RTT       | yes       | |
 |        | RTC       | yes       |  |
-|        | RNG       | no        | no HW module |
 |        | Timer     | yes           | |
-| Radio Chip | AT86RF233 | yes       | using at86rf231 driver (this will be renamed to at86rf2xx) |
+| Radio Chip | AT86RF233 | yes       | using at86rf2xx driver |
 
 
 
@@ -100,15 +99,16 @@ this.
 
 Connect the device to your Micro-USB cable using the port labeled as *EDBG*.
 
-The standard method for flashing RIOT to the samr21-xpro is using OpenOCD.
-For this to work properly, **you have to make sure to use a very recent version
-of OpenOCD**. The v0.8.0 release will _not_ work. If this is still the current
-release you'll have to build OpenOCD from source.
+The standard method for flashing RIOT to the samr21-xpro is using [edbg](https://github.com/ataradov/edbg).
+by calling: `make BOARD=samr21-xpro -C tests/leds flash`
 
-Refer to https://github.com/RIOT-OS/RIOT/wiki/OpenOCD for building OpenOCD
-and make sure "cmsis-dap" and "hidapi-libusb" are enabled.
+Note that on Linux, you will need libudev-dev package to be installed.
+
+Users can also use openOCD to flash and/or debug the board using:
+`PROGRAMMER=openocd make BOARD=samr21-xpro -C tests/leds flash`
 
 On Linux you will have to add a **udev** rule for hidraw, like
+
 ```
 bash
 echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev"' \
@@ -119,6 +119,7 @@ sudo service udev restart
 ### Arch Linux
 With yaourt:
 ```
+yaourt -S libudev0
 yaourt -S hidapi-git
 yaourt -S openocd-git
 # edit PKGBUILD, make sure "hidapi-libusb" is in "_features"
@@ -172,14 +173,6 @@ flow control an external FTDI device must be connected to the board's
 rx, tx, cts & rts matching pin headers, eg. for `UART_DEV(0)` to
 `PA5`, `PA4`, `PA6` & `PA7` (respectively) on EXT1 headers.
 
-
-## Supported Toolchains
-
-For using the samr21-xpro board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
-
-
 ## Known Issues / Problems
 
 ### 64 character input limit on EDBG UART
@@ -203,13 +196,6 @@ Tracked in https://github.com/RIOT-OS/RIOT/issues/2228
 ### User Button
 When using the SW0 user button as interrupt source it appears that this is
 triggered when just tipping on the button and not really pressing it.
-
-### Not flashable by OpenOCD anymore
-It can happen that OpenOCD is not able to program the board, because of wrong
-clock configuration or low power modes. In this case you can use
-[this little tool](https://github.com/ataradov/edbg) to erase the flash. Just follow the
-instructions to build it and run `./edbg -e` to erase the flash. Then press the
-reset button and you're able to program via OpenOCD again.
 
 ### Flashing might not work in Virtual Box with macOS as host
 It might happen that flashing through OpenOCD works once inside Virtual Box.

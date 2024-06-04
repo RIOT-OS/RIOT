@@ -4,3 +4,13 @@ include $(RIOTBOARD)/common/esp32/Makefile.dep
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += esp_eth
 endif
+
+# saul_gpio does conflict eth, as the only SAUL enabled GPIO is the boot button.
+# But that GPIO doubles as phy clock input.
+ifneq (,$(filter esp_eth,$(USEMODULE)))
+  DISABLE_MODULE += saul_gpio
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  DEFAULT_MODULE += saul_gpio
+endif

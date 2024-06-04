@@ -74,6 +74,12 @@ check_not_parsing_features() {
     # These two files contain sanity checks using FEATURES_ so are allowed
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
 
+    # We extend FEATURES_PROVIDED in Makefile.features based on what is
+    # already provided to avoid clutter in each boards Makefile.features.
+    # E.g. `periph_eth` will pull in `netif_ethernet`, which
+    # will pull in `netif`.
+    pathspec+=(':!Makefile.features')
+
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/REQUIRED/OPTIONAL'
 }

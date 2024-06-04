@@ -325,7 +325,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
     return at_readline_skip_empty(dev, resp_buf, len, false, timeout);
 }
 
-static ssize_t get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
+ssize_t at_get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
                                     char *resp_buf, size_t len, uint32_t timeout)
 {
     ssize_t res;
@@ -368,7 +368,7 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const c
     if (res) {
         return res;
     }
-    res = get_resp_with_prefix(dev, resp_prefix, resp_buf, len, timeout);
+    res = at_get_resp_with_prefix(dev, resp_prefix, resp_buf, len, timeout);
     if (res < 1) {
         /* error or OK (empty response) */
         return res;
@@ -438,7 +438,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
     return get_lines(dev, resp_buf, len, timeout);
 }
 
-static int wait_prompt(at_dev_t *dev, uint32_t timeout)
+int at_wait_prompt(at_dev_t *dev, uint32_t timeout)
 {
     ssize_t res;
     do {
@@ -467,7 +467,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     if (res) {
         return (int)res;
     }
-    return wait_prompt(dev, timeout);
+    return at_wait_prompt(dev, timeout);
 }
 
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
@@ -665,11 +665,6 @@ ssize_t _emb_read_line_or_echo(at_dev_t *dev, char const *cmd, char *resp_buf,
                         size_t len, uint32_t timeout);
 __attribute__((alias("get_lines")))
 ssize_t _emb_get_lines(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
-__attribute__((alias("get_resp_with_prefix")))
-ssize_t _emb_get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
-                                    char *resp_buf, size_t len, uint32_t timeout);
 __attribute__((alias("wait_echo")))
 int _emb_wait_echo(at_dev_t *dev, char const *command, uint32_t timeout);
-__attribute__((alias("wait_prompt")))
-int _emb_wait_prompt(at_dev_t *dev, uint32_t timeout);
 #endif

@@ -20,6 +20,5 @@ ifneq (0,$(LWIP_IPV6))
 endif
 
 ifneq (0,$(USE_LWIP))
-  USEMODULE += lwip_netdev
   USEMODULE += lwip
 endif

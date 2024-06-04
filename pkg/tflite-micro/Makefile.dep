@@ -6,12 +6,15 @@ USEPKG += ruy
 
 USEMODULE += tflite-c
 USEMODULE += tflite-core-api
+USEMODULE += tflite-core-c
 USEMODULE += tflite-kernels
 USEMODULE += tflite-kernels-internal
 USEMODULE += tflite-kernels-internal-reference
 USEMODULE += tflite-micro
+USEMODULE += tflite-micro-arena_allocator
 USEMODULE += tflite-micro-kernels
 USEMODULE += tflite-micro-memory-planner
+USEMODULE += tflite-micro-tflite_bridge
 USEMODULE += tflite-schema
 
 # This package doesn't work on riscv

@@ -20,9 +20,11 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "atomic_utils.h"
 #include "busy_wait.h"
 #include "macros/math.h"
 #include "macros/units.h"
@@ -38,6 +40,7 @@
 #endif
 
 uint32_t msp430_dco_freq;
+static uint8_t msp430_clock_refcounts[MSP430_CLOCK_NUMOF];
 
 static inline bool is_dco_in_use(const msp430_clock_params_t *params)
 {
@@ -360,4 +363,58 @@ uint32_t PURE msp430_auxiliary_clock_freq(void)
 {
     uint16_t shift = (clock_params.auxiliary_clock_divier >> 4) & 0x3;
     return clock_params.lfxt1_frequency >> shift;
+}
+
+void msp430_clock_acquire(msp430_clock_t clock)
+{
+    assume((unsigned)clock < MSP430_CLOCK_NUMOF);
+    uint8_t before = atomic_fetch_add_u8(&msp430_clock_refcounts[clock], 1);
+    (void)before;
+    assert(before < UINT8_MAX);
+}
+
+void msp430_clock_release(msp430_clock_t clock)
+{
+    assume((unsigned)clock < MSP430_CLOCK_NUMOF);
+    uint8_t before = atomic_fetch_sub_u8(&msp430_clock_refcounts[clock], 1);
+    (void)before;
+    assert(before > 0);
+}
+
+void pm_set_lowest(void)
+{
+    /* disable IRQs, wait two cycles for this to take effect, backup
+     * state register */
+    uint16_t state;
+    __asm__ volatile(
+        "bic %[gie], SR"                    "\n\t"
+        "nop"                               "\n\t"
+        "nop"                               "\n\t"
+        "mov.w SR, %[state]"                "\n\t"
+        : [state]   "=r"(state)
+        : [gie]     "i"(GIE)
+        : "memory"
+    );
+
+    /* When applying the power safe mode, we want to be able to wake up again.
+     * So set global interrupt enable then. */
+    state |= GIE;
+    /* disabling CPU works always, even when keeping the clocks running */
+    state |= CPUOFF | SCG0;
+
+    if (msp430_clock_refcounts[MSP430_CLOCK_SUBMAIN] == 0) {
+        state |= SCG1;
+    }
+
+    if (msp430_clock_refcounts[MSP430_CLOCK_AUXILIARY] == 0) {
+        state |= OSCOFF;
+    }
+
+    /* write new state */
+    __asm__ volatile(
+        "mov.w %[state], SR"                "\n\t"
+        : /* no outputs */
+        : [state]   "r"(state)
+        : "memory"
+    );
 }

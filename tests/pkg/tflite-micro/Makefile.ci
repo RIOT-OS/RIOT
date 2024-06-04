@@ -1,109 +1,29 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    airfy-beacon \
-    arduino-mkr1000 \
-    arduino-mkrfox1200 \
-    arduino-mkrwan1300 \
-    arduino-mkrzero \
-    arduino-nano-33-iot \
-    arduino-zero \
-    b-l072z-lrwan1 \
-    bastwan \
     blackpill-stm32f103c8 \
-    blackpill-stm32f103cb \
     bluepill-stm32f030c8 \
     bluepill-stm32f103c8 \
-    bluepill-stm32f103cb \
-    calliope-mini \
-    cc1350-launchpad \
-    cc2650-launchpad \
-    cc2650stk \
-    e104-bt5010a-tb \
-    e104-bt5011a-tb \
-    e180-zg120b-tb \
-    esp8266-esp-12x \
-    esp8266-olimex-mod \
-    esp8266-sparkfun-thing \
-    feather-m0 \
-    feather-m0-lora \
-    feather-m0-wifi \
-    frdm-kl43z \
-    frdm-kw41z \
-    hamilton \
     i-nucleo-lrwan1 \
-    ikea-tradfri \
-    im880b \
-    lobaro-lorabox \
-    lsn50 \
-    maple-mini \
-    microbit \
-    nrf51dk \
-    nrf51dongle \
-    nrf6310 \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
-    nucleo-f070rb \
-    nucleo-f072rb \
-    nucleo-f091rc \
-    nucleo-f103rb \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
-    nucleo-f410rb \
-    nucleo-g070rb \
-    nucleo-g071rb \
-    nucleo-g431kb \
-    nucleo-g431rb \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
-    nucleo-l073rz \
-    nucleo-l412kb \
-    nucleo-l432kc \
-    nucleo-wl55jc \
-    olimexino-stm32 \
-    opencm904 \
-    openlabs-kw41z-mini-256kib \
-    pba-d-01-kw2x \
-    phynode-kw41z \
     samd10-xmini \
-    samd20-xpro \
-    samd21-xpro \
     saml10-xpro \
     saml11-xpro \
-    saml21-xpro \
-    samr21-xpro \
-    samr30-xpro \
-    samr34-xpro \
-    seeeduino_xiao \
-    sensebox_samd21 \
-    serpente \
     slstk3400a \
-    slstk3401a \
-    sltb001a \
-    slwstk6000b-slwrb4150a \
-    slwstk6220a \
-    sodaq-autonomo \
-    sodaq-explorer \
-    sodaq-one \
-    sodaq-sara-aff \
-    sodaq-sara-sff \
     spark-core \
     stk3200 \
-    stk3600 \
     stm32f030f4-demo \
     stm32f0discovery \
-    stm32f3discovery \
     stm32f7508-dk \
     stm32g0316-disco \
     stm32l0538-disco \
     stm32mp157c-dk2 \
-    teensy31 \
-    usb-kw41z \
-    weact-f401cc \
     weact-g030f6 \
-    wemos-zero \
-    yarm \
-    yunjia-nrf51822 \
     #

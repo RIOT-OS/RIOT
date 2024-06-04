@@ -244,51 +244,14 @@ static bool _tx_ongoing(at86rf215_t *dev)
     return false;
 }
 
-/*
- * As there is no packet queue in RIOT we have to block in send()
- * when the device is busy sending a previous frame.
- *
- * Since both _send() and _isr() are running in the same thread
- * we have to service radio events while waiting in order to
- * advance the previous transmission.
- */
-static void _block_while_busy(at86rf215_t *dev)
-{
-    gpio_irq_disable(dev->params.int_pin);
-
-    do {
-        if (gpio_read(dev->params.int_pin) || dev->timeout) {
-            at86rf215_driver.isr(&dev->netdev.netdev);
-        }
-        /* allow the other interface to process events */
-        thread_yield();
-    } while (_tx_ongoing(dev));
-
-    gpio_irq_enable(dev->params.int_pin);
-}
-
-static void at86rf215_block_while_busy(at86rf215_t *dev)
-{
-    if (!IS_ACTIVE(MODULE_AT86RF215_BLOCKING_SEND)) {
-        return;
-    }
-
-    if (_tx_ongoing(dev)) {
-        DEBUG("[at86rf215] Block while TXing\n");
-        _block_while_busy(dev);
-    }
-}
-
 int at86rf215_tx_prepare(at86rf215_t *dev)
 {
     if (dev->state == AT86RF215_STATE_SLEEP) {
         return -EAGAIN;
     }
 
-    if (!IS_ACTIVE(MODULE_AT86RF215_BLOCKING_SEND) && _tx_ongoing(dev)) {
+    if (_tx_ongoing(dev)) {
         return -EBUSY;
-    } else {
-        at86rf215_block_while_busy(dev);
     }
 
     dev->tx_frame_len = IEEE802154_FCS_LEN;

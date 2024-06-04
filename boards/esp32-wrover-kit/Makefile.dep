@@ -18,4 +18,8 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep

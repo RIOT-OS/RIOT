@@ -22,30 +22,28 @@
 #else
 #include <dlfcn.h>
 #endif
-#include "byteorder.h"
 #include <assert.h>
+#include <err.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <features.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <err.h>
 #include <string.h>
-#include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include "kernel_init.h"
-#include "cpu.h"
+#include "byteorder.h"
 #include "irq.h"
-
-#include "board_internal.h"
+#include "kernel_init.h"
 #include "native_internal.h"
-#include "stdio_base.h"
-#include "tty_uart.h"
-
 #include "periph/init.h"
 #include "periph/pm.h"
+#include "test_utils/expect.h"
+#include "tty_uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -120,6 +118,12 @@ static const char short_opts[] = ":hi:s:deEoc:"
     "w:"
 #endif
     "";
+
+#if __GLIBC__
+static const bool _is_glibc = true;
+#else
+static const bool _is_glibc = false;
+#endif
 
 static const struct option long_opts[] = {
     { "help", no_argument, NULL, 'h' },
@@ -467,6 +471,49 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     _native_init_syscalls();
     /* initialize stdio as early as possible */
     early_init();
+
+    /* Passing argc, argv, and envp to init_fini handlers is a glibc
+     * extension. If we are not running glibc, we parse /proc/self/cmdline
+     * to populate argc and argv by hand */
+    if (!_is_glibc) {
+        const size_t bufsize = 4096;
+        const size_t argc_max = 32;
+        size_t cmdlen = 0;
+        char *cmdline = malloc(bufsize);
+        argv = calloc(sizeof(char *), argc_max);
+        argc = 0;
+        envp = NULL;
+        expect(cmdline != NULL);
+        int cmdfd = real_open("/proc/self/cmdline", O_RDONLY);
+        expect(cmdfd != -1);
+        ssize_t count;
+        do {
+            count = real_read(cmdfd, cmdline + cmdlen, bufsize - cmdlen);
+            if (count < 0) {
+                if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
+                    continue;
+                }
+                expect(0);
+            }
+            cmdlen += count;
+        } while (count > 0);
+        real_close(cmdfd);
+        cmdline = realloc(cmdline, cmdlen);
+
+        char *argpos = cmdline;
+        while ((size_t)argc < argc_max) {
+            if (argpos == cmdline + cmdlen) {
+                argv[argc] = NULL;
+                break;
+            }
+            size_t len = strlen(argpos);
+
+            argv[argc++] = argpos;
+            argpos += len + 1;
+        }
+        expect((size_t)argc < argc_max);
+        argv = realloc(argv, sizeof(char *) * (argc + 1));
+    }
 
     _native_argv = argv;
     _progname = argv[0];

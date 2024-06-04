@@ -79,7 +79,7 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
     /* disable watchdog and all possible sources of interrupts */
     irq_disable();
     panic_arch();
-#if !defined(DEVELHELP) && defined(MODULE_PERIPH_PM)
+#if CONFIG_CORE_REBOOT_ON_PANIC && defined(MODULE_PERIPH_PM)
     /* DEVELHELP not set => reboot system */
     pm_reboot();
 #else

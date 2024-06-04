@@ -79,6 +79,8 @@ groups:
       - name: cpu_check_address
         help: The @ref cpu_check_address can be used to check if
               accessing a given address would cause a bus fault.
+      - name: cortexm_stack_limit
+        help: ARM Cortex-M PSPLIM/MSPLIM registers are available.
       - name: cortexm_svc
         help: ARM Cortex-M Supervisor Calls are available.
       - name: cortexm_fpu
@@ -136,10 +138,6 @@ groups:
     - title: ESP Specific Features
       help: These features are only available on (some) ESP MCUs.
       features:
-      - name: esp_eth
-        help: >
-              An ESP Ethernet peripherals is available.
-              (FIXME: `periph_eth` instead.)
       - name: esp_jtag
         help: The MCU supports JTAG for programming and debugging. Enable this
               feature to expose the interface at the cost of having fewer pins as
@@ -833,8 +831,14 @@ groups:
       help: SHA-224 hardware acceleration present.
     - name: periph_hash_sha_256
       help: SHA-256 hardware acceleration present.
+    - name: periph_hash_sha_384
+      help: SHA-384 hardware acceleration present.
     - name: periph_hash_sha_512
       help: SHA-512 hardware acceleration present.
+    - name: periph_hash_sha_512_224
+      help: SHA-512/224 hardware acceleration present.
+    - name: periph_hash_sha_512_256
+      help: SHA-512/256 hardware acceleration present.
     - name: periph_hmac_sha_256
       help: HMAC SHA-256 hardware acceleration present.
     - name: periph_hwrng
@@ -869,8 +873,12 @@ groups:
 - title: Board Features
   help: These features indicate features of the board
   features:
-  - name: ethernet
-    help: The board has Ethernet connectivity
+  - name: netif
+    help: The board has a network interface
+  - name: netif_ethernet
+    help: The board has an Ethernet network interface
+  - name: netif_openwsn
+    help: The board has a network interface suitable for OpenWSN
   - name: highlevel_stdio
     help: A high-level stdio method (such as CDC ACM) is used. This requires a
           running thread and set-up and will not print during a crash.

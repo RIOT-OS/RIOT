@@ -58,16 +58,21 @@ static int _dirlist_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int m
             }
         }
 
-        if (*c == ',' || ctx->cur == ctx->end) {
-            int res;
+        bool found_end = false;
+        if (*c == ',') {
+            found_end = true;
+        }
+        else {
+            *ctx->cur++ = *c;
+        }
+
+        if (found_end || ctx->cur == ctx->end) {
             *ctx->cur = 0;
-            res = ctx->cb(ctx->buf, ctx->ctx);
+            int res = ctx->cb(ctx->buf, ctx->ctx);
             ctx->cur = ctx->buf;
             if (res < 0) {
                 return res;
             }
-        } else {
-            *ctx->cur++ = *c;
         }
     }
 
@@ -85,7 +90,7 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
     char buffer[CONFIG_NANOCOAP_QS_MAX];
     struct dir_list_ctx ctx = {
         .buf = buffer,
-        .end = buffer + sizeof(buffer) - 1,
+        .end = buffer + sizeof(buffer),
         .cur = buffer,
         .cb = cb,
         .ctx = arg,

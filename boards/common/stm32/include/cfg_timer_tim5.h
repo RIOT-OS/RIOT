@@ -33,8 +33,7 @@ static const timer_conf_t timer_config[] = {
     {
         .dev      = TIM5,
         .max      = 0xffffffff,
-#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5)
+#if defined(RCC_APB1ENR1_TIM5EN)
         .rcc_mask = RCC_APB1ENR1_TIM5EN,
 #else
         .rcc_mask = RCC_APB1ENR_TIM5EN,

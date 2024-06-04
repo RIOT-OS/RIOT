@@ -143,7 +143,7 @@ void _native_syscall_leave(void)
          * stacks are manually word aligned in thread_static_init() */
         _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_size = __isr_stack_size;
         native_isr_context.uc_stack.ss_flags = 0;
         native_interrupts_enabled = 0;
         makecontext(&native_isr_context, native_irq_handler, 0);

@@ -149,7 +149,7 @@ void _random_bytes(uint8_t *bytes, size_t size)
 void random_init_by_array(uint32_t init_key[], int key_length)
 {
     _shax_init(&ctx);
-    _shax_update(&ctx, init_key, key_length);
+    _shax_update(&ctx, init_key, key_length * sizeof(uint32_t));
     _shax_final(&ctx, digestdata);
 
     /* copy SHA digestdata to PRNG state */
@@ -161,7 +161,7 @@ void random_init_by_array(uint32_t init_key[], int key_length)
 
 void random_init(uint32_t seed)
 {
-    random_init_by_array((uint32_t *)&seed, sizeof(seed));
+    random_init_by_array((uint32_t *)&seed, 1);
 }
 
 uint32_t random_uint32(void)

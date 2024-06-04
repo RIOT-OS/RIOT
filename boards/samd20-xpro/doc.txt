@@ -47,11 +47,13 @@ memory.
 Connect the device to your Micro-USB cable using the port labeled as *DEBUG
 USB*.
 
-The standard method for flashing RIOT to the samd20-xpro is using OpenOCD.
+The standard method for flashing RIOT to the samd20-xpro is using [edbg](https://github.com/ataradov/edbg).
+by calling: `make BOARD=samd20-xpro -C tests/leds flash`
 
-Refer to https://github.com/RIOT-OS/RIOT/wiki/OpenOCD for general
-instructions on building OpenOCD and make sure "cmsis-dap" and "hidapi-libusb"
-are enabled.
+Note that on Linux, you will need libudev-dev package to be installed.
+
+Users can also use openOCD to flash and/or debug the board using:
+`PROGRAMMER=openocd make BOARD=samd20-xpro -C tests/leds flash`
 
 On Linux you will have to add a **udev** rule for hidraw, like
 ```
@@ -64,6 +66,7 @@ sudo service udev restart
 ### Arch Linux
 With yaourt:
 ```
+yaourt -S libudev0
 yaourt -S hidapi-git
 yaourt -S openocd-git
 # edit PKGBUILD, add "cmsis-dap hidapi-libusb" to "_features"
@@ -73,12 +76,6 @@ yaourt -S openocd-git
 Although this refers to setting up the SAMR21, this guide is still very
 helpful to understanding how to set up a solid RIOT development environment for
 the SAMD20: http://watr.li/samr21-dev-setup-ubuntu.html
-
-## Supported Toolchains
-
-For using the samd20-xpro board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
 
 ## Known Issues / Problems
 

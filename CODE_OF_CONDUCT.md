@@ -16,9 +16,8 @@ the technical community in general with new knowledge and perspectives by
 allowing everyone to participate.
 
 This code of conduct applies to all spaces managed by the RIOT community. This
-includes IRC, the mailing lists, our GitHub projects, face to face events, and
-any other forums created by the community for communication within the
-community. In addition, violations of this code outside these spaces may also
+includes any communication within the RIOT community, both online and face to
+face. In addition, violations of this code outside these spaces may also
 affect a person's ability to participate within them.
 
 If you believe someone is violating the code of conduct, we ask that you report

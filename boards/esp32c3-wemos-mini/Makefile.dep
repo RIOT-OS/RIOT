@@ -7,4 +7,8 @@ ifeq (,$(filter esp32c3_wemos_mini_v%,$(USEMODULE)))
   USEMODULE += esp32c3_wemos_mini_v2_1_0
 endif
 
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
 include $(RIOTBOARD)/common/esp32c3/Makefile.dep

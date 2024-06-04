@@ -62,15 +62,15 @@ The port defaults to 5683 for the `gcoap` and to 5684 for the `gcoap_dtls` examp
 
 - For IPv6 setup (network interface can be omitted)
 
-    > coap get [fe80::d8b8:65ff:feee:121b%6]:5683 /.well-known/core
+    > coap get coap://[fe80::d8b8:65ff:feee:121b%6]:5683/.well-known/core
 
 - For IPv4 setup
 
-    > coap get 192.168.2.135:5683 /.well-known/core
+    > coap get coap://192.168.2.135:5683/.well-known/core
 
 - When including the module `sock_dns` for domain resolution
 
-    > coap get example.com:5683 /.well-known/core
+    > coap get coap://example.com:5683/.well-known/core
 
 CLI output:
 

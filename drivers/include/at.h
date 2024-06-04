@@ -264,7 +264,7 @@ typedef struct {
  *
  * @retval string containing the error value.
  */
-static inline char const *at_get_err_info(at_dev_t *dev)
+static inline char const *at_get_err_info(at_dev_t const *dev)
 {
     return dev->rp_buf;
 }
@@ -317,6 +317,18 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
+ * Waits for the prompt character (>).
+ *
+ * @param[in]   dev         device to operate on
+ * @param[in]   timeout     timeout (in usec)
+ *
+ * @retval      0 when prompt is received
+ * @retval     -AT_ERR_EXTENDED if failed and a error code can be retrieved with
+ *              @ref at_get_err_info() (i.e. DCE answered with `CMx ERROR`)
+ * @retval     <0 other failures
+ */
+int at_wait_prompt(at_dev_t *dev, uint32_t timeout);
+/**
  * @brief   Send AT command, wait for response
  *
  * This function sends the supplied @p command, then waits and returns one
@@ -340,14 +352,44 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  */
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
                              size_t len, uint32_t timeout);
-
+/**
+ * @brief Wait for a response with a specific prefix.
+ *
+ * If the provided prefix is NULL or empty, this behaves just like
+ * @ref at_readline_skip_empty(). Otherwise, it repeatedly calls @ref
+ * at_readline_skip_empty() and:
+ *  - if the prefix matches: discards the prefix from the response, copies the
+ *    rest to @p resp_buf, stops and returns the resulting response length
+ *  - if the prefix does not match:
+ *    - if the response is OK: stops and returns 0
+ *    - if the response is ERROR/CMx ERROR: stops and returns <0
+ *    - none of the above: handles response as URC and repeats with the next
+ *      line
+ *
+ * @param[in]   dev         device to operate on
+ * @param[in]   resp_prefix expected prefix in the response
+ * @param[out]  resp_buf    buffer for storing response
+ * @param[in]   len         len of @p buffer
+ * @param[in]   timeout     timeout (in usec)
+ *
+ * @retval      n response length if the prefix of the response matches
+ * @retval      0 if the response was OK
+ * @retval     -AT_ERR_EXTENDED if failed and a error code can be retrieved with
+ *              @ref at_get_err_info() (i.e. DCE answered with `CMx ERROR`)
+ *  @retval    <0 on error
+ */
+ssize_t at_get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
+                                char *resp_buf, size_t len, uint32_t timeout);
 /**
  * @brief   Send AT command, wait for response plus OK
  *
  * This function sends the supplied @p command, then waits and returns one
  * line of response. The response is guaranteed null-terminated.
  *
- * A possible empty line will be skipped.
+ * Calls following in order:
+ *  - @ref at_send_cmd()
+ *  - @ref at_get_resp_with_prefix()
+ *  - @ref at_wait_ok()
  *
  * URCs are automatically handled. If no prefix is provided, the response
  * may be an URC. In that case, @ref at_postprocess_urc() can be called with the

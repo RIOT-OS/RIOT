@@ -61,6 +61,7 @@ struct requestoptions {
         bool etag            :1;    /**< Request carries an Etag option */
         bool block2          :1;    /**< Request carries a Block2 option */
         bool block1          :1;    /**< Request carries a Block1 option */
+        bool size2           :1;    /**< Request carries a Size2 option */
     } exists;                       /**< Structure holding flags of present request options */
 };
 
@@ -204,13 +205,15 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                          struct requestdata *request)
 {
     int err;
-    uint32_t etag;
+    uint32_t etag, size_total;
+
     coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX };
     {
         struct stat stat;
         if ((err = vfs_stat(request->namebuf, &stat)) < 0) {
             return _error_handler(pdu, buf, len, err);
         }
+        size_total = stat.st_size;
         stat_etag(&stat, &etag);
     }
     if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
@@ -240,6 +243,11 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                &block2);
     coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
     coap_opt_add_block2(pdu, &slicer, true);
+
+    if (request->options.exists.block2) {
+        coap_opt_add_uint(pdu, COAP_OPT_SIZE2, size_total);
+    }
+
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     err = vfs_lseek(fd, slicer.start, SEEK_SET);
@@ -691,6 +699,9 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                         goto error;
                     }
                     request.options.exists.block1 = true;
+                    break;
+                case COAP_OPT_SIZE2:
+                    request.options.exists.size2 = true;
                     break;
                 default:
                     if (opt.opt_num & 1) {

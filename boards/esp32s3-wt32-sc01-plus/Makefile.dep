@@ -39,3 +39,7 @@ endif
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   USEMODULE += esp_i2c_hw
 endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif

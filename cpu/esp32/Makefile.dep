@@ -32,7 +32,7 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  FEATURES_REQUIRED += esp_eth
+  FEATURES_REQUIRED += periph_eth
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio

@@ -40,6 +40,10 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter netdev_tap,$(USEMODULE)))
+  USEMODULE += netdev_legacy_api
+endif
+
 ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
   USEMODULE += ztimer64_usec
 endif

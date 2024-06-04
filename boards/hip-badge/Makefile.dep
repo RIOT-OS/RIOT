@@ -4,6 +4,7 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += sgp30
+  USEMODULE += saul_gpio
 endif
 
 include $(RIOTBOARD)/common/esp32c3/Makefile.dep

@@ -106,10 +106,7 @@ static void assert_urc_count(unsigned expected)
 int _emb_read_line_or_echo(at_dev_t *dev, char const *cmd, char *resp_buf,
                         size_t len, uint32_t timeout);
 ssize_t _emb_get_lines(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
-ssize_t _emb_get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
-                                    char *resp_buf, size_t len, uint32_t timeout);
 int _emb_wait_echo(at_dev_t *dev, char const *command, uint32_t timeout);
-int _emb_wait_prompt(at_dev_t *dev, uint32_t timeout);
 
 static void inject_resp_str(at_dev_t *dev, char const *str)
 {
@@ -344,7 +341,7 @@ void test_get_resp_with_prefix(void)
                     AT_RECV_EOL
                     "+RESPONSE: 123"
                     AT_RECV_EOL);
-    res = _emb_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
+    res = at_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
     TEST_ASSERT(res > 0);
     res = strcmp("123", resp_buf);
     TEST_ASSERT(res == 0);
@@ -356,7 +353,7 @@ void test_get_resp_with_prefix(void)
                     AT_RECV_EOL
                     "OK"
                     AT_RECV_EOL);
-    res = _emb_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
+    res = at_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
     TEST_ASSERT(res == 0);
 
     inject_resp_str(dev,
@@ -365,7 +362,7 @@ void test_get_resp_with_prefix(void)
                     AT_RECV_EOL
                     AT_RECV_EOL "+CME ERROR: 1"
                     AT_RECV_EOL);
-    res = _emb_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
+    res = at_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
     TEST_ASSERT(res == -AT_ERR_EXTENDED);
     res = strncmp("1", dev->rp_buf, 1);
     TEST_ASSERT(res == 0);
@@ -377,14 +374,14 @@ void test_get_resp_with_prefix(void)
                     AT_RECV_EOL
                     "ERROR"
                     AT_RECV_EOL);
-    res = _emb_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
+    res = at_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
     TEST_ASSERT(res == -1);
 
     inject_resp_str(dev,
                     AT_RECV_EOL
                     UNIT_TEST_SHORT_URC
                     AT_RECV_EOL);
-    res = _emb_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
+    res = at_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
     TEST_ASSERT(res == -ETIMEDOUT);
 
     inject_resp_str(dev,
@@ -392,7 +389,7 @@ void test_get_resp_with_prefix(void)
                     AT_RECV_EOL
                     "+RESPONSE: 123"
                     AT_RECV_EOL);
-    res = _emb_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
+    res = at_get_resp_with_prefix(dev, "+RESPONSE: ", resp_buf, sizeof(resp_buf), 10000);
     TEST_ASSERT(res > 0);
     res = strcmp("123", resp_buf);
     TEST_ASSERT(res == 0);
@@ -500,7 +497,7 @@ void test_wait_prompt(void)
                     AT_RECV_EOL
                     ">"
                     "123");
-    res = _emb_wait_prompt(dev, 1000);
+    res = at_wait_prompt(dev, 1000);
     TEST_ASSERT(res == 0);
     res = isrpipe_read_timeout(&dev->isrpipe, (unsigned char *)resp_buf, sizeof(resp_buf), 1000);
     TEST_ASSERT(res == 3);
@@ -512,7 +509,7 @@ void test_wait_prompt(void)
                     AT_RECV_EOL
                     ">"
                     "456");
-    res = _emb_wait_prompt(dev, 1000);
+    res = at_wait_prompt(dev, 1000);
     TEST_ASSERT(res == 0);
     res = isrpipe_read_timeout(&dev->isrpipe, (unsigned char *)resp_buf, sizeof(resp_buf), 1000);
     TEST_ASSERT(res == 3);
@@ -525,13 +522,13 @@ void test_wait_prompt(void)
                     AT_RECV_EOL
                     "ERROR"
                     AT_RECV_EOL);
-    res = _emb_wait_prompt(dev, 1000);
+    res = at_wait_prompt(dev, 1000);
     TEST_ASSERT(res == -1);
 
     inject_resp_str(dev,
                     ">"
                     "123");
-    res = _emb_wait_prompt(dev, 1000);
+    res = at_wait_prompt(dev, 1000);
     TEST_ASSERT(res == 0);
     res = isrpipe_read_timeout(&dev->isrpipe, (unsigned char *)resp_buf, sizeof(resp_buf), 1000);
     TEST_ASSERT(res == 3);

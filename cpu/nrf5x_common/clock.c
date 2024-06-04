@@ -78,10 +78,18 @@ void clock_hfxo_release(void)
     irq_restore(state);
 }
 
+/**
+ * True if the low frequency clock (LFCLK) has been started by RIOT.
+ * We don't rely on NRF_CLOCK->LFCLKSTAT since that register appears to be latched
+ * for a short amount of time after a soft reset on at least nRF52832 and nRF52840.
+ * @see https://devzone.nordicsemi.com/f/nordic-q-a/35792/nrf_clock--lfclkstat-register-contents-are-not-properly-evaluated-after-a-system-reset-if-rtc-compare-event-1-or-2-are-used/138995
+ */
+static bool clock_lf_running = false;
+
 void clock_start_lf(void)
 {
     /* abort if LF clock is already running */
-    if (NRF_CLOCK->LFCLKSTAT & CLOCK_LFCLKSTAT_STATE_Msk) {
+    if (clock_lf_running) {
         return;
     }
 
@@ -92,12 +100,15 @@ void clock_start_lf(void)
     NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
     NRF_CLOCK->TASKS_LFCLKSTART = 1;
     while (NRF_CLOCK->EVENTS_LFCLKSTARTED == 0) {}
+    clock_lf_running = true;
 
     /* calibrate the RC LF clock if applicable */
-#if (CLOCK_HFCLK && (CLOCK_LFCLK == 0))
+#if (CLOCK_LFCLK == CLOCK_LFCLKSRC_SRC_RC)
+    clock_hfxo_request();
     NRF_CLOCK->EVENTS_DONE = 0;
     NRF_CLOCK->TASKS_CAL = 1;
     while (NRF_CLOCK->EVENTS_DONE == 0) {}
+    clock_hfxo_release();
 #endif
 }
 
@@ -105,4 +116,5 @@ void clock_stop_lf(void)
 {
     NRF_CLOCK->TASKS_LFCLKSTOP = 1;
     while (NRF_CLOCK->LFCLKSTAT & CLOCK_LFCLKSTAT_STATE_Msk) {}
+    clock_lf_running = false;
 }

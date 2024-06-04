@@ -205,8 +205,34 @@ static int _sam0_eth_send(netdev_t *netdev, const iolist_t *iolist)
         /* TODO: use a specific netdev callback here ? */
         return -EOVERFLOW;
     }
-    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     return ret;
+}
+
+static int _sam0_eth_confirm_send(netdev_t *netdev, void *info)
+{
+    (void)netdev;
+    (void)info;
+
+    uint32_t tsr = GMAC->TSR.reg;
+    GMAC->TSR.reg = tsr; /* clear flags */
+
+    /* transmit is active */
+    if (tsr & GMAC_TSR_TXGO) {
+        return -EAGAIN;
+    }
+
+    /* Retry Limit Exceeded */
+    if (tsr & GMAC_TSR_RLE) {
+        return -EBUSY;
+    }
+
+    /* Transmit Frame Corruption, Collision Occurred */
+    if (tsr & (GMAC_TSR_TFC | GMAC_TSR_COL)) {
+        return -EIO;
+    }
+
+    extern unsigned _sam0_eth_get_last_len(void);
+    return _sam0_eth_get_last_len();
 }
 
 static int _sam0_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
@@ -278,6 +304,7 @@ static int _sam0_eth_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
 static const netdev_driver_t _sam0_eth_driver =
 {
     .send = _sam0_eth_send,
+    .confirm_send = _sam0_eth_confirm_send,
     .recv = _sam0_eth_recv,
     .init = _sam0_eth_init,
     .isr  = _sam0_eth_isr,
@@ -301,15 +328,21 @@ void isr_gmac(void)
 {
     uint32_t isr;
     uint32_t rsr;
+    netdev_t* netdev = _sam0_eth_dev.netdev;
 
     isr = GMAC->ISR.reg;
     rsr = GMAC->RSR.reg;
-    (void)isr;
+
+    /* TX done, signal it to netdev */
+    if (isr & GMAC_ISR_TCOMP) {
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    }
 
     /* New frame received, signal it to netdev */
     if (rsr & GMAC_RSR_REC) {
-        netdev_trigger_event_isr(_sam0_eth_dev.netdev);
+        netdev_trigger_event_isr(netdev);
     }
+
     /* Buffers Not Available, this can occur if there is a heavy traffic
        on the network. In this case, disable the GMAC reception, flush
        our internal buffers and re-enable the reception. This will drop

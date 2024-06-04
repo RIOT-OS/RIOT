@@ -55,7 +55,6 @@ int sdp3x_init(sdp3x_t *dev, const sdp3x_params_t *params)
     dev->params = *params;
     dev->continuous_measurement = false;
 
-    i2c_init(DEV_I2C);
     sdp3x_soft_reset(dev);
 
     /* try to read product number to check if sensor is connected and working */

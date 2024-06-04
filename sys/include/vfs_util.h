@@ -20,6 +20,9 @@
 #ifndef VFS_UTIL_H
 #define VFS_UTIL_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -114,6 +117,15 @@ int vfs_file_sha256(const char* file, void *digest,
  * @return > 0 if @p path is a directory
  */
 int vfs_is_dir(const char *path);
+
+/**
+ @brief Checks if @p path is a file and can be read.
+ *
+ * @param[in]   path        Path to check
+ *
+ * @return true if the file exists, false otherwise
+ */
+bool vfs_file_exists(const char *path);
 
 /**
  * @brief    Behaves like `rm -r @p root`.

@@ -22,8 +22,9 @@
 #define GPIO_LL_ARCH_H
 
 #include "gpio_arch.h"
+#include "irq.h"
+#include "soc/gpio_reg.h"
 #include "soc/soc.h"
-#include "soc/gpio_struct.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,64 +32,90 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
-#define GPIO_PORT(num)          ((gpio_port_t)(&_esp32_ports[num]))
-#define GPIO_PORT_NUM(port)     (((_esp32_port_t*)port == _esp32_ports) ? 0 : 1)
-
-/* GPIO port descriptor type */
-typedef struct {
-    volatile uint32_t *out;         /* address of GPIO_OUT/GPIO_OUT1 */
-    volatile uint32_t *out_w1ts;    /* address of GPIO_OUT_W1TS/GPIO_OUT1_W1TC */
-    volatile uint32_t *out_w1tc;    /* address of GPIO_OUT_W1TC/GPIO_OUT1_W1TC */
-    volatile uint32_t *in;          /* address of GPIO_IN/GPIO_IN1 */
-    volatile uint32_t *enable;      /* address of GPIO_ENABLE/GPIO_ENABLE1 */
-    volatile uint32_t *enable_w1ts; /* address of GPIO_ENABLE_W1TS/GPIO_ENABLE1_W1TS */
-    volatile uint32_t *enable_w1tc; /* address of GPIO_ENABLE_W1TC/GPIO_ENABLE1_W1TC */
-    volatile uint32_t *status_w1tc; /* address of GPIO_STATUS_W1TC/GPIO_STATUS1_W1TC */
-}  _esp32_port_t;
-
-/* GPIO port table */
-extern const _esp32_port_t _esp32_ports[];
+#define GPIO_PORT(num)          (num)
+#if GPIO_PORT_NUMOF > 1
+#  define GPIO_PORT_NUM(port)   (port)
+#else
+#  define GPIO_PORT_NUM(port)   0
+#endif
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
+    static_assert(GPIO_PORT_NUMOF < 3);
+    volatile uword_t *in = (uint32_t *)GPIO_IN_REG;
     /* return 0 for unconfigured pins, the current level at the pin otherwise */
-    const _esp32_port_t *p = (_esp32_port_t *)port;
-    return *p->in;
+#if GPIO_PORT_NUM > 1
+    if (GPIO_PORT_NUM(port) != 0) {
+        in = (uint32_t *)GPIO_IN1_REG;
+    }
+#endif
+
+    return *in;
 }
 
 static inline uword_t gpio_ll_read_output(gpio_port_t port)
 {
-    /* return output register bits */
-    const _esp32_port_t *p = (_esp32_port_t *)port;
-    return *p->out;
+    static_assert(GPIO_PORT_NUMOF < 3);
+    volatile uword_t *out = (uint32_t *)GPIO_OUT_REG;
+#if GPIO_PORT_NUM > 1
+    if (GPIO_PORT_NUM(port) != 0) {
+        out = (uint32_t *)GPIO_OUT1_REG;
+    }
+#endif
+
+    return *out;
 }
 
 static inline void gpio_ll_set(gpio_port_t port, uword_t mask)
 {
-    /* set output register bits for configured pins in the mask */
-    const _esp32_port_t *p = (_esp32_port_t *)port;
-    *p->out_w1ts = mask;
+    static_assert(GPIO_PORT_NUMOF < 3);
+    volatile uword_t *out_w1ts = (uint32_t *)GPIO_OUT_W1TS_REG;
+    if (GPIO_PORT_NUM(port) != 0) {
+#if GPIO_PORT_NUM > 1
+        out_w1ts = (uint32_t)GPIO_OUT1_W1TS;
+#endif
+    }
+
+    *out_w1ts = mask;
 }
 
 static inline void gpio_ll_clear(gpio_port_t port, uword_t mask)
 {
-    /* clear output register bits for configured pins in the mask */
-    const _esp32_port_t *p = (_esp32_port_t *)port;
-    *p->out_w1tc = mask;
+    static_assert(GPIO_PORT_NUMOF < 3);
+    volatile uword_t *out_w1tc = (uint32_t *)GPIO_OUT_W1TC_REG;
+    if (GPIO_PORT_NUM(port) != 0) {
+#if GPIO_PORT_NUM > 1
+        out_w1tc = (uint32_t)GPIO_OUT1_W1TC;
+#endif
+    }
+
+    *out_w1tc = mask;
 }
 
 static inline void gpio_ll_toggle(gpio_port_t port, uword_t mask)
 {
-    /* toggle output register bits for configured pins in the mask */
-    const _esp32_port_t *p = (_esp32_port_t *)port;
-    *p->out ^= mask;
+    static_assert(GPIO_PORT_NUMOF < 3);
+    volatile uword_t *out = (uint32_t *)GPIO_OUT_REG;
+#if GPIO_PORT_NUM > 1
+    if (GPIO_PORT_NUM(port) != 0) {
+        out = (uint32_t *)GPIO_OUT1_REG;
+    }
+#endif
+    unsigned irq_state = irq_disable();
+    *out ^= mask;
+    irq_restore(irq_state);
 }
 
 static inline void gpio_ll_write(gpio_port_t port, uword_t value)
 {
-    /* write output register bits for configured pins in the mask */
-    const _esp32_port_t *p = (_esp32_port_t *)port;
-    *p->out = value;
+    static_assert(GPIO_PORT_NUMOF < 3);
+    volatile uword_t *out = (uint32_t *)GPIO_OUT_REG;
+#if GPIO_PORT_NUM > 1
+    if (GPIO_PORT_NUM(port) != 0) {
+        out = (uint32_t *)GPIO_OUT1_REG;
+    }
+#endif
+    *out = value;
 }
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
@@ -108,15 +135,11 @@ static inline gpio_port_t gpio_port_pack_addr(void *addr)
 
 static inline void * gpio_port_unpack_addr(gpio_port_t port)
 {
-    const _esp32_port_t *p = (_esp32_port_t *)port;
+    if (port <= 1) {
+        return NULL;
+    }
 
-    /* return NULL if port is one of the port descriptors in GPIO port table */
-#if GPIO_PORT_NUMOF > 1
-    return ((p == &_esp32_ports[0]) ||
-            (p == &_esp32_ports[1])) ? NULL : (void *)port;
-#else
-    return (p == _esp32_ports) ? NULL : (void *)port;
-#endif
+    return (void *)port;
 }
 
 static inline bool is_gpio_port_num_valid(uint_fast8_t num)

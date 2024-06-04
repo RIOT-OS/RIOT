@@ -10,6 +10,33 @@
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_device Device LwM2M object
  * @brief       Device object implementation for LwM2M client using Wakaama
+ *
+ * | Name                        | ID | Mandatory |   Type  | Range | Units | Implemented |
+ * |-----------------------------|:--:|:---------:|:-------:|:-----:|:-----:|:-----------:|
+ * | Manufacturer                |  0 |     No    |  String |   -   |   -   |     Yes     |
+ * | Model Number                |  1 |     No    |  String |   -   |   -   |     Yes     |
+ * | Serial Number               |  2 |     No    |  String |   -   |   -   |     Yes     |
+ * | Firmware Version            |  3 |     No    |  String |   -   |   -   |     Yes     |
+ * | Reboot                      |  4 |    Yes    |    -    |   -   |   -   |     Yes     |
+ * | Factory Reset               |  5 |     No    |    -    |   -   |   -   |      No     |
+ * | Available Power Sources     |  6 |     No    | Integer |  0-7  |   -   |      No     |
+ * | Power Source Voltage        |  7 |     No    | Integer |   -   |   mV  |      No     |
+ * | Power Source Current        |  8 |     No    | Integer |   -   |   mA  |      No     |
+ * | Battery Level               |  9 |     No    | Integer | 0-100 |   %   |      No     |
+ * | Memory Free                 | 10 |     No    | Integer |   -   |   KB  |      No     |
+ * | Error Code                  | 11 |    Yes    | Integer |  0-8  |   -   |      No     |
+ * | Reset Error Code            | 12 |     No    |    -    |   -   |   -   |      No     |
+ * | Current Time                | 13 |     No    |   Time  |   -   |   -   |      No     |
+ * | UTC Offset                  | 14 |     No    |  String |   -   |   -   |      No     |
+ * | Timezone                    | 15 |     No    |  String |   -   |   -   |      No     |
+ * | Supported Binding and Modes | 16 |    Yes    |  String |   -   |   -   |     Yes     |
+ * | Device Type                 | 17 |     No    |  String |   -   |   -   |     Yes     |
+ * | Hardware Version            | 18 |     No    |  String |   -   |   -   |     Yes     |
+ * | Software Version            | 19 |     No    |  String |   -   |   -   |     Yes     |
+ * | Battery Status              | 20 |     No    | Integer |  0-6  |   -   |      No     |
+ * | Memory Total                | 21 |     No    | Integer |   -   |   -   |      No     |
+ * | ExtDevInfo                  | 22 |     No    |  Objlnk |   -   |   -   |      No     |
+ *
  * @{
  *
  * @file
@@ -29,6 +56,7 @@ extern "C" {
 #include <string.h>
 
 #include "liblwm2m.h"
+#include "lwm2m_client.h"
 #include "lwm2m_client_config.h"
 
 /**
@@ -81,11 +109,153 @@ enum lwm2m_device_error_codes {
 };
 
 /**
- * @brief Frees the memory of @p obj device object
+ * @defgroup lwm2m_objects_device_config LwM2M Device Object configuration
+ * @ingroup lwm2m_client_config
  *
- * @param[in] obj pointer to the device object
+ * @brief Configuration options for the LwM2M Device Object.
+ * @{
  */
-void lwm2m_free_object_device(lwm2m_object_t *obj);
+/**
+ * @brief Device name used to register at the LwM2M server
+ */
+#ifndef CONFIG_LWM2M_DEVICE_NAME
+#define CONFIG_LWM2M_DEVICE_NAME "testRIOTDevice"
+#endif
+
+/**
+ * @brief Device object manufacturer string
+ */
+#ifndef CONFIG_LWM2M_DEVICE_MANUFACTURER
+#define CONFIG_LWM2M_DEVICE_MANUFACTURER "A RIOT maker"
+#endif
+
+/**
+ * @brief Device object model.
+ *
+ * @note Defaults to the board name
+ */
+#ifndef CONFIG_LWM2M_DEVICE_MODEL
+#define CONFIG_LWM2M_DEVICE_MODEL RIOT_BOARD
+#endif
+
+/**
+ * @brief Device object serial number
+ */
+#ifndef CONFIG_LWM2M_DEVICE_SERIAL
+#define CONFIG_LWM2M_DEVICE_SERIAL "undefined"
+#endif
+
+/**
+ * @brief Device object firmware version
+ *
+ * @note Defaults to the running RIOT version
+ */
+#ifndef CONFIG_LWM2M_DEVICE_FW_VERSION
+#define CONFIG_LWM2M_DEVICE_FW_VERSION RIOT_VERSION
+#endif
+
+/**
+ * @{
+ * @name Device bindings and queue modes
+ *
+ * This options are meant to be set either via Kconfig or CFLAGS:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * CFLAGS += -DCONFIG_LWM2M_DEVICE_BINDING_UQ
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @note Only one option should be selected. If more than one is defined the
+ *       priority follows this order. By default
+ *       @ref CONFIG_LWM2M_DEVICE_BINDING_U is assumed.
+ */
+#ifdef DOXYGEN
+/**
+ * @brief UDP binding
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_U
+
+/**
+ * @brief UDP binding with Queue mode
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_UQ
+
+/**
+ * @brief SMS binding
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_S
+
+/**
+ * @brief SMS binding with Queue mode
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_SQ
+
+/**
+ * @brief UDP and SMS bindings
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_US
+
+/**
+ * @brief UDP and SMS bindings with Queue mode
+ */
+#define CONFIG_LWM2M_DEVICE_BINDING_UQS
+#endif
+/** @} */
+
+/**
+ * @brief Device object device type
+ */
+#ifndef CONFIG_LWM2M_DEVICE_TYPE
+#define CONFIG_LWM2M_DEVICE_TYPE "RIOT device"
+#endif
+
+/**
+ * @brief Device object hardware version
+ *
+ * @note Defaults to the board name
+ */
+#ifndef CONFIG_LWM2M_DEVICE_HW_VERSION
+#define CONFIG_LWM2M_DEVICE_HW_VERSION RIOT_BOARD
+#endif
+
+/**
+ * @brief Device object software version
+ *
+ * @note Defaults to the running RIOT version
+ */
+#ifndef CONFIG_LWM2M_DEVICE_SW_VERSION
+#define CONFIG_LWM2M_DEVICE_SW_VERSION RIOT_VERSION
+#endif
+/** @} */
+
+/**
+ * @brief Device binding and queue mode
+ *
+ * @note Select using CONFIG_LWM2M_DEVICE_BINDING_*
+ */
+#if defined(CONFIG_LWM2M_DEVICE_BINDING_U)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "U"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_UQ)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "UQ"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_S)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "S"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_SQ)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "SQ"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_US)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "US"
+#elif defined(CONFIG_LWM2M_DEVICE_BINDING_UQS)
+#define CONFIG_LWM2M_DEVICE_BINDINGS "UQS"
+#else
+#define CONFIG_LWM2M_DEVICE_BINDINGS "U"
+#endif
+
+/**
+ * @brief Initialize the Device object.
+ *
+ * @param[in] client_data  LwM2M client data.
+ *
+ * @return Pointer to the Device object on success
+ */
+lwm2m_object_t *lwm2m_object_device_init(lwm2m_client_data_t *client_data);
 
 /**
  * @brief Determines if a reboot request has been issued to the device by a

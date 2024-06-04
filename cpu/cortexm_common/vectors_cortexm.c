@@ -99,6 +99,11 @@ void reset_handler_default(void)
     uint32_t *dst;
     const uint32_t *src = &_etext;
 
+#ifdef __ARM_ARCH_8M_MAIN__
+    /* Set the lower limit of the exception stack into MSPLIM register */
+    __set_MSPLIM((uint32_t)&_sstack);
+#endif
+
     cortexm_init_fpu();
 
 #ifdef MODULE_PUF_SRAM
@@ -348,6 +353,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     /* Sanity check stack pointer and give additional feedback about hard fault */
     if (corrupted) {
         puts("Stack pointer corrupted, reset to top of stack");
+        printf("active thread: %"PRIkernel_pid"\n", thread_getpid());
     }
     else {
         uint32_t  r0 = sp[0];

@@ -12,6 +12,10 @@ STM32L4R5ZI microcontroller with 640KiB of RAM and 2MiB of ROM Flash.
 
 ![Nucleo144 L4R5ZI](https://www.st.com/bin/ecommerce/api/image.PF264781.en.feature-description-include-personalized-no-cpn-large.jpg)
 
+## Pinout
+
+@image html pinouts/nucleo-l4r5zi.svg "Pinout for the nucleo-l4r5zi (from STM board manual)" width=55%
+
 ### MCU
 
 | MCU          | STM32L4R5ZI                                        |

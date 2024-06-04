@@ -46,8 +46,17 @@ typedef union {
 #if IS_USED(MODULE_PSA_HASH_SHA_256) || defined(DOXYGEN)
     psa_hashes_sha256_ctx_t sha256; /**< SHA-256 context */
 #endif
+#if IS_USED(MODULE_PSA_HASH_SHA_384) || defined(DOXYGEN)
+    psa_hashes_sha384_ctx_t sha384; /**< SHA-384 context */
+#endif
 #if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
     psa_hashes_sha512_ctx_t sha512; /**< SHA-512 context */
+#endif
+#if IS_USED(MODULE_PSA_HASH_SHA_512_224) || defined(DOXYGEN)
+    psa_hashes_sha512_224_ctx_t sha512_224; /**< SHA-512/224 context */
+#endif
+#if IS_USED(MODULE_PSA_HASH_SHA_512_256) || defined(DOXYGEN)
+    psa_hashes_sha512_256_ctx_t sha512_256; /**< SHA-512/256 context */
 #endif
 } psa_hash_context_t;
 #endif

@@ -109,8 +109,6 @@ int aip31068_init(aip31068_t *dev, const aip31068_params_t *params)
     dev->_curr_display_control = 0;
     dev->_curr_entry_mode_set = 0;
 
-    i2c_init(dev->params.i2c_dev);
-
     uint8_t _function_set = 0;
 
     /* configure bit mode */

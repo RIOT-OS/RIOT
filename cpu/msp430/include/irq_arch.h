@@ -44,8 +44,8 @@ __attribute__((always_inline)) static inline unsigned int irq_disable(void)
 {
     unsigned int state;
     __asm__ volatile(
-        "mov.w r2, %[state]"                "\n\t"
-        "bic %[gie], r2"                    "\n\t"
+        "mov.w SR, %[state]"                "\n\t"
+        "bic %[gie], SR"                    "\n\t"
         "nop"                               "\n\t"
         "and %[gie], %[state]"              "\n\t"
         : [state]   "=r"(state)
@@ -60,9 +60,9 @@ __attribute__((always_inline)) static inline unsigned int irq_enable(void)
 {
     unsigned int state;
     __asm__ volatile(
-        "mov.w r2, %[state]"                "\n\t"
+        "mov.w SR, %[state]"                "\n\t"
         "nop"                               "\n\t"
-        "bis %[gie], r2"                    "\n\t"
+        "bis %[gie], SR"                    "\n\t"
         "nop"                               "\n\t"
         "and %[gie], %[state]"              "\n\t"
         : [state]   "=r"(state)
@@ -76,7 +76,7 @@ __attribute__((always_inline)) static inline unsigned int irq_enable(void)
 __attribute__((always_inline)) static inline void irq_restore(unsigned int state)
 {
     __asm__ volatile(
-        "bis %[state], r2"                    "\n\t"
+        "bis %[state], SR"                    "\n\t"
         "nop"                                 "\n\t"
         : /* no outputs */
         : [state]   "r"(state)
@@ -93,7 +93,7 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
 {
     unsigned int state;
     __asm__ volatile(
-        "mov.w r2,%[state]"                   "\n\t"
+        "mov.w SR,%[state]"                   "\n\t"
         : [state]   "=r"(state)
         : /* no inputs */
         : "memory"

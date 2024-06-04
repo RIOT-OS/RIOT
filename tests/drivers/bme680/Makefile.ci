@@ -1,8 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     chronos \
-    msb-430 \
-    msb-430h \
     nucleo-f031k6 \
-    telosb \
     #

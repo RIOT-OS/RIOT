@@ -17,17 +17,11 @@
 
 #include <stdio.h>
 #include "kernel_defines.h"
-#if IS_USED(MODULE_TENSORFLOW_LITE)
-#include "tensorflow/lite/micro/kernels/all_ops_resolver.h"
-#include "tensorflow/lite/micro/micro_error_reporter.h"
-#include "tensorflow/lite/micro/micro_interpreter.h"
-#include "tensorflow/lite/version.h"
-#else
-#include "tensorflow/lite/micro/all_ops_resolver.h"
-#include "tensorflow/lite/micro/micro_error_reporter.h"
+
+#include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/system_setup.h"
-#endif
+
 #include "tensorflow/lite/schema/schema_generated.h"
 
 #include "blob/digit.h"
@@ -37,7 +31,6 @@
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
-    tflite::ErrorReporter* error_reporter = nullptr;
     const tflite::Model* model = nullptr;
     tflite::MicroInterpreter* interpreter = nullptr;
     TfLiteTensor* input = nullptr;
@@ -52,15 +45,6 @@ namespace {
 // The name of this function is important for Arduino compatibility.
 void setup()
 {
-#if IS_USED(MODULE_TFLITE_MICRO)
-    tflite::InitializeTarget();
-#endif
-
-    // Set up logging. Google style is to avoid globals or statics because of
-    // lifetime uncertainty, but since this has a trivial destructor it's okay.
-    // NOLINTNEXTLINE(runtime-global-variables)
-    static tflite::MicroErrorReporter micro_error_reporter;
-    error_reporter = &micro_error_reporter;
 
     // Map the model into a usable data structure. This doesn't involve any
     // copying or parsing, it's a very lightweight operation.
@@ -74,16 +58,23 @@ void setup()
     }
 
     // This pulls in all the operation implementations we need.
-    // NOLINTNEXTLINE(runtime-global-variables)
-#if IS_USED(MODULE_TFLITE_MICRO)
-    static tflite::AllOpsResolver resolver;
-#else
-    static tflite::ops::micro::AllOpsResolver resolver;
-#endif
+    static tflite::MicroMutableOpResolver<4> resolver;
+    if (resolver.AddFullyConnected() != kTfLiteOk) {
+        return;
+    }
+    if (resolver.AddQuantize() != kTfLiteOk) {
+        return;
+    }
+    if (resolver.AddDequantize() != kTfLiteOk) {
+        return;
+    }
+    if (resolver.AddSoftmax() != kTfLiteOk) {
+        return;
+    }
 
     // Build an interpreter to run the model with.
     static tflite::MicroInterpreter static_interpreter(
-        model, resolver, tensor_arena, kTensorArenaSize, error_reporter);
+        model, resolver, tensor_arena, kTensorArenaSize);
     interpreter = &static_interpreter;
 
     // Allocate memory from the tensor_arena for the model's tensors.

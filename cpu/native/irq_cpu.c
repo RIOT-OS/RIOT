@@ -13,10 +13,16 @@
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
+/* __USE_GNU for gregs[REG_EIP] access under glibc
+ * _GNU_SOURCE for REG_EIP and strsignal() under musl */
+#define __USE_GNU
+#define _GNU_SOURCE
+
 #include <err.h>
+#include <signal.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdlib.h>
 
 #ifdef HAVE_VALGRIND_H
 #include <valgrind.h>
@@ -29,16 +35,12 @@
 #define VALGRIND_DEBUG(...)
 #endif
 
-/* __USE_GNU for gregs[REG_EIP] access under Linux */
-#define __USE_GNU
-#include <signal.h>
-#undef __USE_GNU
-
 #include "irq.h"
 #include "cpu.h"
 #include "periph/pm.h"
 
 #include "native_internal.h"
+#include "test_utils/expect.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -50,6 +52,7 @@ volatile int _native_in_syscall;
 static sigset_t _native_sig_set, _native_sig_set_dint;
 
 char __isr_stack[THREAD_STACKSIZE_DEFAULT];
+const size_t __isr_stack_size = sizeof(__isr_stack);
 ucontext_t native_isr_context;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
@@ -58,7 +61,6 @@ volatile int _native_sigpend;
 int _sig_pipefd[2];
 
 static _native_callback_t native_irq_handlers[255];
-char sigalt_stk[SIGSTKSZ];
 
 void *thread_isr_stack_pointer(void)
 {
@@ -523,8 +525,9 @@ void native_interrupt_init(void)
     _native_isr_ctx = &native_isr_context;
 
     static stack_t sigstk;
-    sigstk.ss_sp = sigalt_stk;
-    sigstk.ss_size = sizeof(sigalt_stk);
+    sigstk.ss_sp = malloc(SIGSTKSZ);
+    expect(sigstk.ss_sp != NULL);
+    sigstk.ss_size = SIGSTKSZ;
     sigstk.ss_flags = 0;
 
     if (sigaltstack(&sigstk, NULL) < 0) {

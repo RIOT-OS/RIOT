@@ -78,7 +78,7 @@ void random_init(uint32_t s);
  * slight change for C++, 2004/2/26
  *
  * @param init_key array of keys (seeds) to initialize the PRNG
- * @param key_length number of lements in init_key
+ * @param key_length number of elements in init_key
  */
 void random_init_by_array(uint32_t init_key[], int key_length);
 

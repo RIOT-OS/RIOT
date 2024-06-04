@@ -256,12 +256,15 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
         DEBUG("_can_event: CANDEV_EVENT_RX_ERROR\n");
         break;
     case CANDEV_EVENT_BUS_OFF:
+        DEBUG("_can_event: CANDEV_EVENT_BUS_OFF\n");
         dev->state = CAN_STATE_BUS_OFF;
         break;
     case CANDEV_EVENT_ERROR_PASSIVE:
+        DEBUG("_can_event: CANDEV_EVENT_ERROR_PASSIVE\n");
         dev->state = CAN_STATE_ERROR_PASSIVE;
         break;
     case CANDEV_EVENT_ERROR_WARNING:
+        DEBUG("_can_event: CANDEV_EVENT_ERROR_WARNING\n");
         dev->state = CAN_STATE_ERROR_WARNING;
         break;
     default:

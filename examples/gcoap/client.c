@@ -16,22 +16,21 @@
  * @author      Ken Bannister <kb2ma@runbox.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
+ * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  *
  * @}
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <arpa/inet.h>
-
-#include "fmt.h"
 #include "net/gcoap.h"
 #include "net/sock/util.h"
-#include "net/utils.h"
 #include "od.h"
+#include "uri_parser.h"
 
 #include "gcoap_example.h"
 
@@ -42,15 +41,17 @@
 #include "net/dsm.h"
 #endif
 
-static bool _proxied = false;
-static sock_udp_ep_t _proxy_remote;
-static char proxy_uri[64];
+#ifndef CONFIG_URI_MAX
+#define CONFIG_URI_MAX      128
+#endif
 
-/* Retain request path to re-request if response includes block. User must not
+static sock_udp_ep_t _proxy_remote;
+static char _proxy_uri[CONFIG_URI_MAX];
+
+/* Retain request URI to re-request if response includes block. User must not
  * start a new request (with a new path) until any blockwise transfer
  * completes or times out. */
-#define _LAST_REQ_PATH_MAX (64)
-static char _last_req_path[_LAST_REQ_PATH_MAX];
+static char _last_req_uri[CONFIG_URI_MAX];
 
 /* whether this node is currently observing a resource as a client */
 static bool observing = false;
@@ -62,6 +63,10 @@ static uint8_t obs_req_token[GCOAP_TOKENLEN_MAX];
 static size_t obs_req_tkl = 0;
 
 uint16_t req_count = 0;
+
+static gcoap_socket_type_t _get_tl(const char *uri);
+static ssize_t _send(uint8_t *buf, size_t len, const sock_udp_ep_t *remote,
+                     void *ctx, gcoap_socket_type_t tl);
 
 /*
  * Response callback.
@@ -120,18 +125,19 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     if (coap_get_block2(pdu, &block)) {
         if (block.more) {
             unsigned msg_type = coap_get_type(pdu);
-            if (block.blknum == 0 && !strlen(_last_req_path)) {
+            if (block.blknum == 0 && !strlen(_last_req_uri)) {
                 puts("Path too long; can't complete blockwise");
                 return;
             }
-
-            if (_proxied) {
+            uri_parser_result_t urip;
+            uri_parser_process(&urip, _last_req_uri, strlen(_last_req_uri));
+            if (*_proxy_uri) {
                 gcoap_req_init(pdu, (uint8_t *)pdu->hdr, CONFIG_GCOAP_PDU_BUF_SIZE,
                                COAP_METHOD_GET, NULL);
             }
             else {
                 gcoap_req_init(pdu, (uint8_t *)pdu->hdr, CONFIG_GCOAP_PDU_BUF_SIZE,
-                               COAP_METHOD_GET, _last_req_path);
+                               COAP_METHOD_GET, urip.path);
             }
 
             if (msg_type == COAP_TYPE_ACK) {
@@ -140,14 +146,13 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
             block.blknum++;
             coap_opt_add_block2_control(pdu, &block);
 
-            if (_proxied) {
-                coap_opt_add_proxy_uri(pdu, _last_req_path);
+            if (*_proxy_uri) {
+                coap_opt_add_proxy_uri(pdu, urip.scheme);
             }
 
             int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-            gcoap_req_send((uint8_t *)pdu->hdr, len, remote,
-                           _resp_handler, memo->context,
-                           GCOAP_SOCKET_TYPE_UNDEF);
+            gcoap_socket_type_t tl = _get_tl(*_proxy_uri ? _proxy_uri : _last_req_uri);
+            _send((uint8_t *)pdu->hdr, len, remote, memo->context, tl);
         }
         else {
             puts("--- blockwise complete ---");
@@ -155,12 +160,21 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 }
 
-static size_t _send(uint8_t *buf, size_t len, sock_udp_ep_t *remote)
+static gcoap_socket_type_t _get_tl(const char *uri)
 {
-    size_t bytes_sent;
+    if (!strncmp(uri, "coaps", 5)) {
+        return GCOAP_SOCKET_TYPE_DTLS;
+    }
+    else if (!strncmp(uri, "coap", 4)) {
+        return GCOAP_SOCKET_TYPE_UDP;
+    }
+    return GCOAP_SOCKET_TYPE_UNDEF;
+}
 
-    bytes_sent = gcoap_req_send(buf, len, remote, _resp_handler, NULL,
-                                GCOAP_SOCKET_TYPE_UNDEF);
+static ssize_t _send(uint8_t *buf, size_t len, const sock_udp_ep_t *remote,
+                     void *ctx, gcoap_socket_type_t tl)
+{
+    ssize_t bytes_sent = gcoap_req_send(buf, len, remote, _resp_handler, ctx, tl);
     if (bytes_sent > 0) {
         req_count++;
     }
@@ -169,24 +183,46 @@ static size_t _send(uint8_t *buf, size_t len, sock_udp_ep_t *remote)
 
 static int _print_usage(char **argv)
 {
-    printf("usage: %s <get [-o|-d]|post|put|ping|proxy|info>\n", argv[0]);
+    printf("usage: %s <get [-o|-d]|post|put> [-c] <URI> [data]\n", argv[0]);
+    printf("       %s ping <scheme>://<host>[:port]\n", argv[0]);
+    printf("       %s info\n", argv[0]);
+    printf("       %s proxy set <scheme>://<host>[:port]\n", argv[0]);
+    printf("       %s proxy unset\n", argv[0]);
+    printf("Options\n");
+    printf("    -c  Send confirmably (defaults to non-confirmable)\n");
     return 1;
 }
 
-static int _addrstr2remote(const char *addr_str, sock_udp_ep_t *remote)
+static int _uristr2remote(const char *uri, sock_udp_ep_t *remote, const char **path,
+                          char *buf, size_t buf_len)
 {
-    if (sock_udp_name2ep(remote, addr_str) != 0) {
+    if (strlen(uri) >= buf_len) {
+        DEBUG_PUTS("URI too long");
+        return 1;
+    }
+    uri_parser_result_t urip;
+    if (uri_parser_process(&urip, uri, strlen(uri))) {
+        DEBUG("'%s' is not a valid URI\n", uri);
+        return 1;
+    }
+    memcpy(buf, urip.host, urip.host_len);
+    buf[urip.host_len] = '\0';
+    if (urip.port_str_len) {
+        strcat(buf, ":");
+        strncat(buf, urip.port_str, urip.port_str_len);
+        buf[urip.host_len + 1 + urip.port_str_len] = '\0';
+    }
+    if (sock_udp_name2ep(remote, buf) != 0) {
+        DEBUG("Could not resolve address '%s'\n", buf);
         return -1;
     }
-
     if (remote->port == 0) {
-        if (IS_USED(MODULE_GCOAP_DTLS)) {
-            remote->port = CONFIG_GCOAPS_PORT;
-        }
-        else {
-            remote->port = CONFIG_GCOAP_PORT;
-        }
+        remote->port = !strncmp("coaps", urip.scheme, 5) ? CONFIG_GCOAPS_PORT : CONFIG_GCOAP_PORT;
     }
+    if (path) {
+        *path = urip.path;
+    }
+    strcpy(buf, uri);
     return 0;
 }
 
@@ -202,8 +238,7 @@ int gcoap_cli_cmd(int argc, char **argv)
     sock_udp_ep_t remote;
 
     if (argc == 1) {
-        /* show help for main commands */
-        return _print_usage(argv);
+        goto help;
     }
 
     if (strcmp(argv[1], "info") == 0) {
@@ -222,20 +257,8 @@ int gcoap_cli_cmd(int argc, char **argv)
         printf(" CLI requests sent: %u\n", req_count);
         printf("CoAP open requests: %u\n", open_reqs);
         printf("Configured Proxy: ");
-        if (_proxied) {
-#ifdef SOCK_HAS_IPV6
-            char addrstr[IPV6_ADDR_MAX_STR_LEN];
-#else
-            char addrstr[IPV4_ADDR_MAX_STR_LEN];
-#endif
-            inet_ntop(_proxy_remote.family, &_proxy_remote.addr, addrstr, sizeof(addrstr));
-
-            if (_proxy_remote.family == AF_INET6) {
-                printf("[%s]:%u\n", addrstr, _proxy_remote.port);
-            }
-            else {
-                printf("%s:%u\n", addrstr, _proxy_remote.port);
-            }
+        if (*_proxy_uri) {
+            printf("%s\n", _proxy_uri);
         }
         else {
             puts("None");
@@ -244,42 +267,29 @@ int gcoap_cli_cmd(int argc, char **argv)
     }
     else if (strcmp(argv[1], "proxy") == 0) {
         if ((argc == 4) && (strcmp(argv[2], "set") == 0)) {
-            if (sock_udp_name2ep(&_proxy_remote, argv[3]) != 0) {
+            if (_uristr2remote(argv[3], &_proxy_remote, NULL, _proxy_uri, sizeof(_proxy_uri))) {
                 puts("Could not set proxy");
                 return 1;
             }
-
-            if (_proxy_remote.port == 0) {
-                if (IS_USED(MODULE_GCOAP_DTLS)) {
-                    _proxy_remote.port = CONFIG_GCOAPS_PORT;
-                }
-                else {
-                    _proxy_remote.port = CONFIG_GCOAP_PORT;
-                }
-            }
-
-            _proxied = true;
             return 0;
         }
         if ((argc == 3) && (strcmp(argv[2], "unset") == 0)) {
             memset(&_proxy_remote, 0, sizeof(_proxy_remote));
-            _proxied = false;
+            memset(_proxy_uri, 0, sizeof(_proxy_uri));
             return 0;
         }
-        printf("usage: %s proxy set <host>[:port]\n", argv[0]);
-        printf("       %s proxy unset\n", argv[0]);
-        return 1;
+        goto help;
     }
 
     /* if not 'info' and 'proxy', must be a method code or ping */
     int code_pos = -1;
-    for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(method_codes) && code_pos == -1; i++) {
         if (strcmp(argv[1], method_codes[i]) == 0) {
             code_pos = i;
         }
     }
     if (code_pos == -1) {
-        return _print_usage(argv);
+        goto help;
     }
 
     /* parse options */
@@ -314,50 +324,12 @@ int gcoap_cli_cmd(int argc, char **argv)
         msg_type = COAP_TYPE_CON;
         apos++;
     }
-
-    if (((argc == apos + 1) && (code_pos == 0)) ||    /* ping */
-        ((argc == apos + 2) && (code_pos == 1)) ||    /* get */
-        ((argc == apos + 2 ||
-          argc == apos + 3) && (code_pos > 1))) {     /* post or put */
-
-        /* get unproxied endpoint from address string */
-        if (_addrstr2remote(argv[apos], &remote)) {
-            printf("'%s' is not a valid address\n", argv[apos]);
-            return _print_usage(argv);
+    if (apos < argc) {
+        const char *path;
+        if (_uristr2remote(argv[apos++], &remote, &path, _last_req_uri, sizeof(_last_req_uri))) {
+            puts("Could not parse URI");
+            goto help;
         }
-
-        char *uri = NULL;
-        int uri_len = 0;
-        if (code_pos) {
-            uri = argv[apos+1];
-            uri_len = strlen(argv[apos+1]);
-        }
-
-        if (uri && ((uri_len <= 0) || (uri[0] != '/'))) {
-            puts("ERROR: URI-Path must start with a \"/\"");
-            return _print_usage(argv);
-        }
-
-        if (_proxied) {
-#ifdef SOCK_HAS_IPV6
-            char addrstr[IPV6_ADDR_MAX_STR_LEN];
-#else
-            char addrstr[IPV4_ADDR_MAX_STR_LEN];
-#endif
-            inet_ntop(remote.family, &remote.addr, addrstr, sizeof(addrstr));
-
-            if (remote.family == AF_INET6) {
-                uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coap://[%s]:%d%s",
-                                   addrstr, remote.port, uri);
-            }
-            else {
-                uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coap://%s:%d%s",
-                                   addrstr, remote.port, uri);
-            }
-
-            uri = proxy_uri;
-        }
-
         gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
 
         if (observe) {
@@ -379,32 +351,30 @@ int gcoap_cli_cmd(int argc, char **argv)
             coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, obs_value);
         }
 
-        if (!_proxied) {
-            /* add uri path option separately
+        if (!*_proxy_uri) {
+            /* If the request is not a ping, add uri path option separately
              * (options must be added in order) */
-            coap_opt_add_uri_path(&pdu, uri);
+            if (path) {
+                coap_opt_add_uri_path(&pdu, path);
+            }
         }
 
         coap_hdr_set_type(pdu.hdr, msg_type);
 
-        memset(_last_req_path, 0, _LAST_REQ_PATH_MAX);
-        if (uri_len < _LAST_REQ_PATH_MAX) {
-            memcpy(_last_req_path, uri, uri_len);
-        }
-
-        size_t paylen = (argc == apos + 3) ? strlen(argv[apos+2]) : 0;
-        if (paylen) {
+        size_t paylen = 0;
+        if (apos < argc) {
             coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+            paylen = strlen(argv[apos]);
         }
 
-        if (_proxied) {
-            coap_opt_add_proxy_uri(&pdu, uri);
+        if (*_proxy_uri) {
+            coap_opt_add_proxy_uri(&pdu, _last_req_uri);
         }
 
         if (paylen) {
             len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
             if (pdu.payload_len >= paylen) {
-                memcpy(pdu.payload, argv[apos+2], paylen);
+                memcpy(pdu.payload, argv[apos++], paylen);
                 len += paylen;
             }
             else {
@@ -418,7 +388,13 @@ int gcoap_cli_cmd(int argc, char **argv)
 
         printf("gcoap_cli: sending msg ID %u, %" PRIuSIZE " bytes\n",
                 coap_get_id(&pdu), len);
-        if (!_send(&buf[0], len, _proxied ? &_proxy_remote : &remote)) {
+        gcoap_socket_type_t tl = _get_tl(_last_req_uri);
+        sock_udp_ep_t *rem = &remote;
+        if (*_proxy_uri) {
+            rem = &_proxy_remote;
+            tl = _get_tl(_proxy_uri);
+        }
+        if (_send(&buf[0], len, rem, NULL, tl) <= 0) {
             puts("gcoap_cli: msg send failed");
         }
         else {
@@ -432,14 +408,6 @@ int gcoap_cli_cmd(int argc, char **argv)
         }
         return 0;
     }
-    else {
-        printf("usage: %s <get [-o|-d]|post|put> [-c] <host>[:port] <path> [data]\n",
-               argv[0]);
-        printf("       %s ping <host>[:port]\n", argv[0]);
-        printf("Options\n");
-        printf("    -c  Send confirmably (defaults to non-confirmable)\n");
-        return 1;
-    }
-
+help:
     return _print_usage(argv);
 }

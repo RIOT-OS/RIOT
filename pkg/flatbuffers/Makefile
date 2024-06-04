@@ -1,7 +1,7 @@
 PKG_NAME=flatbuffers
 PKG_URL=https://github.com/google/flatbuffers
-# v2.0.0
-PKG_VERSION=a9a295fecf3fbd5a4f571f53b01f63202a3e2113
+# v23.5.26
+PKG_VERSION=0100f6a5779831fa7a651e4b67ef389a8752bd9b
 PKG_LICENSE=Apache2.0
 
 include $(RIOTBASE)/pkg/pkg.mk

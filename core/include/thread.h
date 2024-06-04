@@ -450,15 +450,20 @@ static inline const char *thread_getname(kernel_pid_t pid)
 #endif
 
 /**
- * @brief Measures the stack usage of a stack
+ * @brief       Measures the stack usage of a stack
+ * @internal    Should not be used externally
  *
- * Only works if the thread was created with the flag THREAD_CREATE_STACKTEST.
+ * Only works if the stack is filled with canaries
+ * (`*((uintptr_t *)ptr) == (uintptr_t)ptr` for naturally aligned `ptr` within
+ * the stack).
  *
- * @param[in] stack the stack you want to measure. Try `thread_get_stackstart(thread_get_active())`
+ * @param[in] stack     the stack you want to measure. Try
+ *                      `thread_get_stackstart(thread_get_active())`
+ * @param[in] size      size of @p stack in bytes
  *
- * @return          the amount of unused space of the thread's stack
+ * @return              the amount of unused space of the thread's stack
  */
-uintptr_t thread_measure_stack_free(const char *stack);
+uintptr_t measure_stack_free_internal(const char *stack, size_t size);
 
 /**
  * @brief   Get the number of bytes used on the ISR stack
@@ -619,6 +624,24 @@ static inline const char *thread_get_name(const thread_t *thread)
     (void)thread;
     return NULL;
 #endif
+}
+
+/**
+ * @brief       Measures the stack usage of a stack
+ *
+ * @pre         Only works if the thread was created with the flag
+ *              `THREAD_CREATE_STACKTEST`.
+ *
+ * @param[in] thread    The thread to measure the stack of
+ *
+ * @return              the amount of unused space of the thread's stack
+ */
+static inline uintptr_t thread_measure_stack_free(const thread_t *thread)
+{
+    /* explicitly casting void pointers is bad code style, but needed for C++
+     * compatibility */
+    return measure_stack_free_internal((const char *)thread_get_stackstart(thread),
+                                       thread_get_stacksize(thread));
 }
 
 #ifdef __cplusplus

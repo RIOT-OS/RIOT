@@ -41,12 +41,19 @@ Router, you might want to specify:
 java -jar ./leshan-server-demo.jar -lh fd00:dead:beef::1
 ```
 
+In the security section click 'Add Security Information', select the security mode
+'Pre-Shared Key', and enter the Client endpoint name and the security information
+(Identity and Key).
+
 #### Bootstrap server
 LwM2M provides a bootstrapping mechanism to provide the clients with information
 to register to one or more servers. To test this mechanism both the previous server and a bootstrap server should be running. Eclipse Leshan also provides a bootstrap server demo.
 
-By default the bootstrap server option is disabled, it can be enabled by defining
-`CONFIG_LWM2M_BOOTSTRAP` as 1 (see the Makefile in this application).
+By default the security instance created in the application assumes that a standard LwM2M Server is
+used. To indicate that the configuration corresponds to a LwM2M Bootstrap Server, set the
+corresponding argument (`is_bootstrap`) to true. Also, bootstrap support needs to be enabled in the
+wakaama package configurations. This can be done via `make menuconfig` or by setting the CFLAG
+`CONFIG_LWM2M_BOOTSTRAP`.
 
 To run the bootstrap server, make sure that the ports it uses are different
 from the ones of previous server (default are 5683 for CoAP, 5684 for CoAPs,
@@ -66,34 +73,34 @@ BS_COAPSPORT=5686
 BS_WEBPORT=8888
 
 # run the server
-java -jar ./leshan-bsserver-demo.jar --coapport ${BS_COAPPORT} \
-            --coapsport ${BS_COAPSPORT} --webport ${BS_WEBPORT}
+java -jar ./leshan-bsserver-demo.jar --coap-port ${BS_COAPPORT} \
+            --coaps-port ${BS_COAPSPORT} --web-port ${BS_WEBPORT}
 ```
 
 To set up the configuration of the node and the server:
 1. Click the `Add new client bootstrap configuration` button.
-2. Fill in the name of the device, it **should** match the one set in
-   `lwm2m.h` as `CONFIG_LWM2M_DEVICE_NAME`.
+2. Fill in the name of the device, it **should** match the one set as `CONFIG_LWM2M_DEVICE_NAME`,
+   in `objects/device.h`.
 3. Using the `LWM2M Server` tab enter the address where the LwM2M server is
-   listening. For now only `No security` mode can be used.
+   listening. Here you can select `No security` or `Pre-Shared Key` modes.
 
 ### Running the client
-The address set as `CONFIG_LWM2M_SERVER_URI` (in `lwm2m.h` or via `menuconfig`)
-should be reachable from the node, e.g. either running on native with a tap
-interface or as a mote connected to a
+The server address is set by the application, during the instantiation of the Security object.
+It can be set via `menuconfig` or the environmental variable `LWM2M_SERVER_URI`. It should be
+reachable from the node, e.g. either running on native with a tap interface or as a mote connected
+to a
 [border router](https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_border_router).
 
-Also, if a bootstrap server is being used the macro `CONFIG_LWM2M_BOOTSTRAP` should be
-defined as 1.
-
-The server URI for the example is being defined using the variable `SERVER_URI`
-in the Makefile, and can be changed when compiling.
+Also, if a bootstrap server is being used, it should be configured in the application via
+`menuconfig` or setting the environmental variable `LWM2M_SERVER_BOOTSTRAP` to 1. This information
+is used in the Security object instance.
 
 #### Configure, compile and run
 
 The Wakaama package can be configured via Kconfig. Its options are placed
-under `Packages > Configure Wakaama LwM2M`. To access the configuration
-interface you can run:
+under `Packages > Configure Wakaama LwM2M`. There is also an application-specific configuration
+menu. There the Server URI and credentials can be set. To access the configuration interface you
+can run:
 ```
 make menuconfig
 ```

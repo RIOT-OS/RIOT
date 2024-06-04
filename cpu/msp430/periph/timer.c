@@ -30,8 +30,6 @@
 #include "compiler_hints.h"
 #include "cpu.h"
 #include "periph/timer.h"
-#include "periph_conf.h"
-#include "periph_cpu.h"
 
 /**
  * @brief   Interrupt context for each configured timer
@@ -114,8 +112,8 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     for (unsigned i = 0; i < timer_query_channel_numof(dev); i++) {
         msptimer->CCTL[i] = 0;
     }
-    /* start the timer in continuous mode */
-    msptimer->CTL = ctl | TXMC_CONT;
+
+    timer_start(dev);
     return 0;
 }
 
@@ -157,6 +155,18 @@ void timer_start(tim_t dev)
 {
     assume((unsigned)dev < TIMER_NUMOF);
     msp430_timer_t *msptimer = timer_conf[dev].timer;
+    /* acquire clock */
+    switch (timer_conf[dev].clock_source) {
+    case TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK:
+        msp430_clock_acquire(MSP430_CLOCK_SUBMAIN);
+        break;
+    case TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK:
+        msp430_clock_acquire(MSP430_CLOCK_AUXILIARY);
+        break;
+    default:
+        /* external clock source, safe to disable internal clocks */
+        break;
+    }
     msptimer->CTL |= TXMC_CONT;
 }
 
@@ -164,7 +174,20 @@ void timer_stop(tim_t dev)
 {
     assume((unsigned)dev < TIMER_NUMOF);
     msp430_timer_t *msptimer = timer_conf[dev].timer;
-    msptimer->CTL &= ~(TXMC_MASK);
+    msptimer->CTL &= ~(TXMC_CONT);
+
+    /* release clock */
+    switch (timer_conf[dev].clock_source) {
+    case TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK:
+        msp430_clock_release(MSP430_CLOCK_SUBMAIN);
+        break;
+    case TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK:
+        msp430_clock_release(MSP430_CLOCK_AUXILIARY);
+        break;
+    default:
+        /* external clock source, nothing to release */
+        break;
+    }
 }
 
 __attribute__((pure))

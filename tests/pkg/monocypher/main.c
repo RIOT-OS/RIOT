@@ -27,7 +27,7 @@
 
 static uint8_t message[] = "0123456789abcdef";
 
-static uint8_t sign_sk[32];
+static uint8_t sign_sk[64];
 static uint8_t sign_pk[32];
 static uint8_t signature[64];
 
@@ -39,15 +39,17 @@ static void setUp(void)
 static void test_monocypher_signverify(void)
 {
     int res;
+    uint8_t seed[32];
+
     /* Creating keypair ... */
-    random_bytes(sign_sk, sizeof(sign_sk));
-    crypto_sign_public_key(sign_pk, sign_sk);
+    random_bytes(seed, sizeof(seed));
+    crypto_eddsa_key_pair(sign_sk, sign_pk, seed);
 
     /* Sign */
-    crypto_sign(signature, sign_sk, sign_pk, message, sizeof(message));
+    crypto_eddsa_sign(signature, sign_sk, message, sizeof(message));
 
     /* Verifying... */
-    res = crypto_check(signature, sign_pk, message, sizeof(message));
+    res = crypto_eddsa_check(signature, sign_pk, message, sizeof(message));
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
@@ -59,7 +61,7 @@ static void test_monocypher_verifynegative(void)
     message[0] = 'A';
 
     /* Verifying... */
-    res = crypto_check(signature, sign_pk, message, sizeof(message));
+    res = crypto_eddsa_check(signature, sign_pk, message, sizeof(message));
     TEST_ASSERT_EQUAL_INT(-1, res);
 }
 

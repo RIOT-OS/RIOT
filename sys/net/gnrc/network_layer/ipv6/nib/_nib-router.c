@@ -244,7 +244,8 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         ext_opts = rdnsso;
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
-    if (gnrc_netif_is_6ln(netif)) {
+    if (gnrc_netif_is_6lr(netif)) {
+        assert(abr != NULL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
         uint16_t ltime_min;
         gnrc_pktsnip_t *abro;
@@ -293,7 +294,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         ext_opts = abro;
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     }
-    else {
+    else if (!gnrc_netif_is_6ln(netif)) {
         (void)abr;
         while ((pfx = _nib_offl_iter(pfx))) {
             if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {

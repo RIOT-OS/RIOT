@@ -117,6 +117,8 @@ static inline void sys_mbox_set_invalid(sys_mbox_t *mbox)
 
 typedef kernel_pid_t sys_thread_t;      /**< Platform specific thread type */
 
+extern kernel_pid_t lwip_tcpip_thread;  /**< PID of the lwIP TCP/IP thread */
+
 /**
  * @name    Functions for locking/unlocking core to assure thread safety.
  * @{

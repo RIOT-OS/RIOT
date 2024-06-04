@@ -32,10 +32,12 @@ extern "C" {
 /**
  * @brief   Activate verbose output for @ref assert() when defined.
  *
- * Without this macro defined the @ref assert() macro will just print the
- * address of the code line the assertion failed in. With the macro defined
- * the macro will also print the file, the code line and the function this macro
- * failed in.
+ * Without this macro defined, @ref assert() will just print the address of the
+ * code line the assertion failed in. With this macro defined, @ref assert()
+ * will also print the file and the code line of the failed assertion.
+ *
+ * Enabling verbose output will on the other hand lead to an increased size of
+ * the binary, since it needs to contain the names of all files with assertions.
  *
  * To define just add it to your `CFLAGS` in your application's Makefile:
  *
@@ -49,7 +51,7 @@ extern "C" {
  * @brief   Activate breakpoints for @ref assert() when defined
  *
  * Without this macro defined the @ref assert() macro will just print some
- * information about the failed assertion, see @ref assert and
+ * information about the failed assertion, see @ref assert() and
  * @ref DEBUG_ASSERT_VERBOSE.
  * If @ref DEBUG_ASSERT_BREAKPOINT is defined, the execution will stop on a
  * failed assertion instead of producing the output. If the architecture
@@ -106,24 +108,21 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  * The purpose of this macro is to help programmers find bugs in their
  * programs.
  *
- * With @ref DEBUG_ASSERT_VERBOSE defined this will print also the file, the
- * line and the function this assertion failed in.
+ * A failed assertion generates output similar to:
  *
- * If `NDEBUG` and @ref DEBUG_ASSERT_VERBOSE are not defined, a failed assertion
- * generates output similar to:
- *
- *     0x89abcdef
- *     *** RIOT kernel panic:
- *     FAILED ASSERTION.
- *
- *     ...
+ *     0x89abcdef => FAILED ASSERTION.
  *
  * Where 0x89abcdef is an address. This address can be used with tools like
  * `addr2line` (or e.g. `arm-none-eabi-addr2line` for ARM-based code), `objdump`,
  * or `gdb` (with the command `info line *(0x89abcdef)`) to identify the line
  * the assertion failed in.
  *
- * If the `backtrace` module is enabled (and implemented for architecture in use)
+ * With @ref DEBUG_ASSERT_VERBOSE defined this will instead directly print the
+ * file and the line the assertion failed in:
+ *
+ *     example/file.c:42 => FAILED ASSERTION.
+ *
+ * If the `backtrace` module is enabled (and implemented for the architecture in use)
  * a backtrace will be printed in addition to the location of the failed assertion.
  *
  * If @ref DEBUG_ASSERT_BREAKPOINT is defined, the execution will stop on a
@@ -155,6 +154,15 @@ __NORETURN void _assert_panic(void);
 #define static_assert(cond, ...) \
     { enum { static_assert_failed_on_div_by_0 = 1 / (!!(cond)) }; }
 #endif
+#endif
+
+/**
+ * @brief   Don't panic on a failed assertion, just halt the running thread.
+ *
+ * If the assertion failed in an interrupt, the system will still panic.
+ */
+#ifndef DEBUG_ASSERT_NO_PANIC
+#define DEBUG_ASSERT_NO_PANIC (1)
 #endif
 
 #ifdef __cplusplus

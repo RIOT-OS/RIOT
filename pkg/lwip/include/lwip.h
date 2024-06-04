@@ -19,9 +19,16 @@
 #ifndef LWIP_H
 #define LWIP_H
 
+#include "event.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief event queue for netdev events
+ */
+extern event_queue_t lwip_event_queue;
 
 /**
  * @brief   Initializes lwIP stack.

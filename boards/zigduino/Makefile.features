@@ -12,3 +12,6 @@ FEATURES_PROVIDED += periph_uart
 # Put defined MCU peripherals here (in alphabetical order)
 # Peripherals are defined in common/arduino-atmega/Makefile.features
 # Add only additional Peripherals
+#
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += netif

@@ -146,6 +146,8 @@ extern "C" {
 #define SARA_R4XX_PWR_ON_OFF    (SARA_R4XX_PWR_ON_PORT.OUTCLR.reg = SARA_R4XX_PWR_ON_MASK)
 /** @} */
 
+#define SARA_STATUS_PIN     GPIO_PIN(PA, 28) /**< This is the V_INT of the board */
+
 /**
  * @name    INT_MAG
  *

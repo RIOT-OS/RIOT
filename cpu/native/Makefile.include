@@ -19,3 +19,10 @@ ifeq ($(OS) $(OS_ARCH),Linux x86_64)
 endif
 
 include $(RIOTMAKE)/arch/native.inc.mk
+
+USE_LIBUCONTEXT := $(shell pkg-config libucontext 2> /dev/null && echo 1 || echo 0)
+
+ifeq ($(USE_LIBUCONTEXT),1)
+  CFLAGS += $(pkg-config libucontext --cflags) -DUSE_LIBUCONTEXT=1
+  LINKFLAGS += $(shell pkg-config libucontext --libs)
+endif

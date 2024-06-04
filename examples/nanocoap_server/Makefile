@@ -47,6 +47,13 @@ endif
 HIGH_MEMORY_BOARDS := native native64 same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
+  # enable separate response
+  USEMODULE += nanocoap_server_separate
+  USEMODULE += event_callback
+  USEMODULE += event_thread
+  USEMODULE += event_timeout_ztimer
+
+  # enable fileserver
   USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_default
 

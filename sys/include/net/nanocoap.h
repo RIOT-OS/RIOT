@@ -338,6 +338,9 @@ void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote);
 struct _coap_request_ctx {
     const coap_resource_t *resource;    /**< resource of the request */
     sock_udp_ep_t *remote;              /**< remote endpoint of the request */
+#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+    sock_udp_ep_t *local;               /**< local endpoint of the request */
+#endif
 #if defined(MODULE_GCOAP) || DOXYGEN
     /**
      * @brief   transport the packet was received over
@@ -1968,6 +1971,22 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
  */
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+
+/**
+ * @brief   Build empty reply to CoAP request
+ *
+ * This function can be used to create an empty ACK so that a later, separate
+ * response can be sent independently.
+ *
+ * If the request was non-confirmable, this will generate nothing.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[out]  ack         buffer to write reply to
+ *
+ * @returns     size of reply packet on success
+ * @returns     -ENOSPC if @p rbuf too small
+ */
+ssize_t coap_build_empty_ack(coap_pkt_t *pkt, coap_hdr_t *ack);
 
 /**
  * @brief   Handle incoming CoAP request

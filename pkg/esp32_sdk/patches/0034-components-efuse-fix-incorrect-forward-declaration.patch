@@ -1,0 +1,25 @@
+From 2957d710a61c11d20e9f9fea10a8fb5d7ef94e15 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Tue, 13 Feb 2024 13:31:10 +0100
+Subject: [PATCH] components/efuse: fix incorrect forward declaration
+
+---
+ components/efuse/private_include/esp_efuse_utility.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/efuse/private_include/esp_efuse_utility.h b/components/efuse/private_include/esp_efuse_utility.h
+index 3016d55d..630a3a32 100644
+--- a/components/efuse/private_include/esp_efuse_utility.h
++++ b/components/efuse/private_include/esp_efuse_utility.h
+@@ -119,7 +119,7 @@ uint32_t esp_efuse_utility_read_reg(esp_efuse_block_t blk, unsigned int num_reg)
+ /**
+  * @brief Writing efuse register with checking of repeated programming of programmed bits.
+  */
+-esp_err_t esp_efuse_utility_write_reg(unsigned int num_reg, esp_efuse_block_t efuse_block, uint32_t reg_to_write);
++esp_err_t esp_efuse_utility_write_reg(esp_efuse_block_t efuse_block, unsigned int num_reg, uint32_t reg_to_write);
+ 
+ /* @brief Reset efuse write registers
+  *
+-- 
+2.43.1
+

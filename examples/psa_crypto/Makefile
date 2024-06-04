@@ -5,6 +5,8 @@ APPLICATION = example_psa_crypto
 
 BOARD ?= native
 
+DOCKER_ENV_VARS += SECURE_ELEMENT
+
 ifeq (2, $(SECURE_ELEMENT))
   CFLAGS += -DSECURE_ELEMENT # Application specific (not needed by PSA)
   CFLAGS += -DMULTIPLE_SE # Application specific (not needed by PSA)
@@ -95,6 +97,14 @@ else
   # a default backend is built depending on the platform capabilities.
   USEMODULE += psa_cipher
   USEMODULE += psa_cipher_aes_128_cbc
+
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_224
+  USEMODULE += psa_hash_sha_256
+  USEMODULE += psa_hash_sha_384
+  USEMODULE += psa_hash_sha_512
+  USEMODULE += psa_hash_sha_512_224
+  USEMODULE += psa_hash_sha_512_256
 
   USEMODULE += psa_mac
   USEMODULE += psa_mac_hmac_sha_256

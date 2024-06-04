@@ -8,6 +8,10 @@
 The Nucleo-L452RE is a board from ST's Nucleo family supporting ARM Cortex-M4
 STM32L452RE microcontroller with 160KiB of RAM and 512KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-l452re.svg "Pinout for the nucleo-l452re (from STM board manual)" width=50%
+
 ### MCU
 
 | MCU        |   STM32L452RE       |

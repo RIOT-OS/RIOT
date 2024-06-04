@@ -4,3 +4,6 @@ include $(RIOTCPU)/atmega_common/Makefile.features
 
 # additional PCINT for atmega256rfr2
 FEATURES_PROVIDED += atmega_pcint1
+
+# MCU has a peripheral network interface
+FEATURES_PROVIDED += netif

@@ -25,6 +25,8 @@
 #include "net/nanocoap/cache.h"
 #include "ztimer.h"
 
+#include "forward_proxy_internal.h"
+
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
@@ -34,16 +36,7 @@
 #define CLIENT_EP_FLAGS_ETAG_LEN_MASK   0x0f
 #define CLIENT_EP_FLAGS_ETAG_LEN_POS    0U
 
-typedef struct {
-    sock_udp_ep_t ep;
-    uint16_t mid;
-    uint8_t flags;
-#if IS_USED(MODULE_NANOCOAP_CACHE)
-    uint8_t req_etag[COAP_ETAG_LENGTH_MAX];
-#endif
-    ztimer_t empty_ack_timer;
-    event_t event;
-} client_ep_t;
+extern kernel_pid_t forward_proxy_pid;
 
 extern uint16_t gcoap_next_msg_id(void);
 extern void gcoap_forward_proxy_post_event(void *arg);
@@ -84,9 +77,23 @@ gcoap_listener_t forward_proxy_listener = {
     _request_matcher_forward_proxy
 };
 
+static void _cep_set_timeout(client_ep_t *cep, ztimer_t *timer, uint32_t timeout_ms,
+                             event_handler_t handler)
+{
+    assert(!ztimer_is_set(ZTIMER_MSEC, timer));
+    timer->callback = gcoap_forward_proxy_post_event;
+    timer->arg = &cep->event;
+    cep->event.handler = handler;
+    ztimer_set(ZTIMER_MSEC, timer, timeout_ms);
+}
+
+
 void gcoap_forward_proxy_init(void)
 {
     gcoap_register_listener(&forward_proxy_listener);
+    if (IS_ACTIVE(MODULE_GCOAP_FORWARD_PROXY_THREAD)) {
+        gcoap_forward_proxy_thread_init();
+    }
 }
 
 static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
@@ -99,6 +106,7 @@ static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
             _cep_set_in_use(cep);
             _cep_set_req_etag(cep, NULL, 0);
             memcpy(&cep->ep, ep, sizeof(*ep));
+            DEBUG("Client_ep is allocated %p\n", (void *)cep);
             return cep;
         }
     }
@@ -108,7 +116,9 @@ static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
 static void _free_client_ep(client_ep_t *cep)
 {
     ztimer_remove(ZTIMER_MSEC, &cep->empty_ack_timer);
-    memset(cep, 0, sizeof(*cep));
+    /* timer removed but event could be queued */
+    cep->flags = 0;
+    DEBUG("Client_ep is freed %p\n", (void *)cep);
 }
 
 static int _request_matcher_forward_proxy(gcoap_listener_t *listener,
@@ -205,6 +215,9 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 
     if (urip->port != 0) {
         remote->port = urip->port;
+    }
+    else if (!strncmp(urip->scheme, "coaps", 5)) {
+        remote->port = COAPS_PORT;
     }
     else {
         remote->port = COAP_PORT;
@@ -390,24 +403,34 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
     return len;
 }
 
+int gcoap_forward_proxy_req_send(client_ep_t *cep)
+{
+    int len;
+    if ((len = gcoap_req_send((uint8_t *)cep->pdu.hdr, coap_get_total_len(&cep->pdu),
+                             &cep->server_ep, _forward_resp_handler, cep,
+                             GCOAP_SOCKET_TYPE_UNDEF)) <= 0) {
+        DEBUG("gcoap_forward_proxy_req_send(): gcoap_req_send failed %d\n", len);
+        _free_client_ep(cep);
+    }
+    return len;
+}
+
 static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
                                          client_ep_t *client_ep,
                                          uri_parser_result_t *urip)
 {
-    coap_pkt_t pkt;
-    sock_udp_ep_t origin_server_ep;
-
     ssize_t len;
     gcoap_request_memo_t *memo = NULL;
 
-    if (!_parse_endpoint(&origin_server_ep, urip)) {
+    if (!_parse_endpoint(&client_ep->server_ep, urip)) {
+        _free_client_ep(client_ep);
         return -EINVAL;
     }
 
     /* do not forward requests if they already exist, e.g., due to CON
        and retransmissions. In the future, the proxy should set an
        empty ACK message to stop the retransmissions of a client */
-    gcoap_forward_proxy_find_req_memo(&memo, client_pkt, &origin_server_ep);
+    gcoap_forward_proxy_find_req_memo(&memo, client_pkt, &client_ep->server_ep);
     if (memo) {
         DEBUG("gcoap_forward_proxy: request already exists, ignore!\n");
         _free_client_ep(client_ep);
@@ -415,37 +438,43 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
     }
 
     if (coap_get_type(client_pkt) == COAP_TYPE_CON) {
-        client_ep->empty_ack_timer.callback = gcoap_forward_proxy_post_event;
-        client_ep->empty_ack_timer.arg = &client_ep->event;
-        client_ep->event.handler = _send_empty_ack;
-        ztimer_set(ZTIMER_MSEC, &client_ep->empty_ack_timer,
-                   CONFIG_GCOAP_FORWARD_PROXY_EMPTY_ACK_MS);
+        _cep_set_timeout(client_ep, &client_ep->empty_ack_timer,
+                         CONFIG_GCOAP_FORWARD_PROXY_EMPTY_ACK_MS, _send_empty_ack);
     }
 
     unsigned token_len = coap_get_token_len(client_pkt);
 
-    coap_pkt_init(&pkt, proxy_req_buf, CONFIG_GCOAP_PDU_BUF_SIZE,
+    coap_pkt_init(&client_ep->pdu, proxy_req_buf, CONFIG_GCOAP_PDU_BUF_SIZE,
                   sizeof(coap_hdr_t) + token_len);
 
-    pkt.hdr->ver_t_tkl = client_pkt->hdr->ver_t_tkl;
-    pkt.hdr->code = client_pkt->hdr->code;
-    pkt.hdr->id = client_pkt->hdr->id;
+    client_ep->pdu.hdr->ver_t_tkl = client_pkt->hdr->ver_t_tkl;
+    client_ep->pdu.hdr->code = client_pkt->hdr->code;
+    client_ep->pdu.hdr->id = client_pkt->hdr->id;
 
     if (token_len) {
-        memcpy(coap_get_token(&pkt), coap_get_token(client_pkt), token_len);
+        memcpy(coap_get_token(&client_ep->pdu), coap_get_token(client_pkt), token_len);
     }
 
     /* copy all options from client_pkt to pkt */
-    len = _gcoap_forward_proxy_copy_options(&pkt, client_pkt, client_ep, urip);
+    len = _gcoap_forward_proxy_copy_options(&client_ep->pdu, client_pkt, client_ep, urip);
 
     if (len == -EINVAL) {
+        _free_client_ep(client_ep);
         return -EINVAL;
     }
+    if (IS_USED(MODULE_GCOAP_FORWARD_PROXY_THREAD)) {
+        /* WORKAROUND: DTLS communication is blocking the gcoap thread,
+         * therefore the communication should be handled in the proxy thread */
 
-    len = gcoap_req_send((uint8_t *)pkt.hdr, len,
-                         &origin_server_ep,
-                         _forward_resp_handler, (void *)client_ep,
-                         GCOAP_SOCKET_TYPE_UNDEF);
+        msg_t msg = {   .type = GCOAP_FORWARD_PROXY_MSG_SEND,
+                        .content.ptr = client_ep
+                    };
+        msg_send(&msg, forward_proxy_pid);
+    }
+    else {
+        len = gcoap_forward_proxy_req_send(client_ep);
+    }
+
     return len;
 }
 
@@ -484,10 +513,11 @@ int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
     }
 
     /* target is using CoAP */
-    if (!strncmp("coap", urip.scheme, urip.scheme_len)) {
+    if (!strncmp("coap", urip.scheme, urip.scheme_len) ||
+        !strncmp("coaps", urip.scheme, urip.scheme_len)) {
+        /* client context ownership is passed to gcoap_forward_proxy_req_send() */
         int res = _gcoap_forward_proxy_via_coap(pkt, cep, &urip);
         if (res < 0) {
-            _free_client_ep(cep);
             return -EINVAL;
         }
     }

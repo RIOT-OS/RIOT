@@ -75,6 +75,16 @@ extern "C" {
 #define CANDEV_SAMD5X_MAX_TX_BUFFER 32
 #define CANDEV_SAMD5X_MSG_RAM_MAX_SIZE 448
 
+/* SAMD5x CAN controller error codes (values from datasheet section 39.8.14) */
+#define CANDEV_SAMD5X_NO_ERROR 0
+#define CANDEV_SAMD5X_STUFF_ERROR 1
+#define CANDEV_SAMD5X_FORM_ERROR 2
+#define CANDEV_SAMD5X_ACK_ERROR 3
+#define CANDEV_SAMD5X_BIT1_ERROR 4
+#define CANDEV_SAMD5X_BIT0_ERROR 5
+#define CANDEV_SAMD5X_CRC_ERROR 6
+#define CANDEV_SAMD5X_NO_CHANGE_ERROR 7
+
 /**
  * @brief CAN device configuration descriptor
  */

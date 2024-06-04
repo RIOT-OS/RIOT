@@ -19,6 +19,7 @@
 
 #include "compiler_hints.h"
 #include "log.h"
+#include "macros/math.h"
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/hdr.h"
@@ -27,7 +28,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/udp.h"
 #include "utlist.h"
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
 #endif
 #if IS_USED(MODULE_XTIMER)
@@ -42,7 +43,7 @@ extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
 gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
 #endif
 
-#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC)
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
 #define _TIMEOUT_MAGIC      (0xF38A0B63U)
 #define _TIMEOUT_MSG_TYPE   (0x8474)
 
@@ -127,6 +128,13 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         timeout_timer.arg = reg;
         ztimer_set(ZTIMER_USEC, &timeout_timer, timeout);
     }
+#elif IS_USED(MODULE_ZTIMER_MSEC)
+    ztimer_t timeout_timer = { .base = { .next = NULL } };
+    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
+        timeout_timer.callback = _callback_put;
+        timeout_timer.arg = reg;
+        ztimer_set(ZTIMER_MSEC, &timeout_timer, DIV_ROUND_INF(timeout, US_PER_MS));
+    }
 #elif IS_USED(MODULE_XTIMER)
     xtimer_t timeout_timer = { .callback = NULL };
 
@@ -162,6 +170,8 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
 #if IS_USED(MODULE_ZTIMER_USEC)
     ztimer_remove(ZTIMER_USEC, &timeout_timer);
+#elif IS_USED(MODULE_ZTIMER_MSEC)
+    ztimer_remove(ZTIMER_MSEC, &timeout_timer);
 #elif IS_USED(MODULE_XTIMER)
     xtimer_remove(&timeout_timer);
 #endif
@@ -169,7 +179,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         case GNRC_NETAPI_MSG_TYPE_RCV:
             pkt = msg.content.ptr;
             break;
-#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC)
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
         case _TIMEOUT_MSG_TYPE:
             if (msg.content.value == _TIMEOUT_MAGIC) {
                 return -ETIMEDOUT;

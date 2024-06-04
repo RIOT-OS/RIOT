@@ -223,7 +223,7 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
     return res;
 }
 
-static kernel_pid_t lwip_tcpip_thread = KERNEL_PID_UNDEF;
+kernel_pid_t lwip_tcpip_thread = KERNEL_PID_UNDEF;
 static kernel_pid_t lwip_lock_thread;
 
 void sys_mark_tcpip_thread(void) {

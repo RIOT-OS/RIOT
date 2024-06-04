@@ -13,3 +13,6 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += riotboot
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += netif

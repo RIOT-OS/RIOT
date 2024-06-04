@@ -1,7 +1,119 @@
 /**
- * @defgroup pkg_wakaama  Wakaama LwM2M implementation
+ * @defgroup pkg_wakaama  LwM2M - Lightweight Machine to Machine
  * @ingroup  pkg
  * @ingroup  net
- * @brief    Provides the Wakaama implementation of LwM2M
- * @see      https://github.com/eclipse/wakaama
+ * @brief    LwM2M implementation based on the Wakaama package
+ *
+ * Lightweight Machine to Machine is a device management protocol designed for sensor networks,
+ * designed for remote management of M2M devices and related service enablement. It defines an
+ * extensible resource and data model and builds top of CoAP. LwM2M has been specified by the
+ * OMA SpecWorks Device Management Working Group. The specification is freely available
+ * [here](http://openmobilealliance.org/wp/index.html).
+ *
+ * For a list of the supported objects see @ref lwm2m_objects.
+ * The client implementation is based on the Eclipse
+ * [Wakaama project](https://github.com/eclipse/wakaama)
+ *
+ *
+ * ## Usage
+ * A LwM2M Client organizes resources as object instances. The LwM2M engine is independent of the
+ * objects that the client exposes, but it needs at least 3 mandatory ones:
+ * @ref lwm2m_objects_device "Device object", @ref lwm2m_objects_security "Security object" and a
+ * Server object.
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include "lwm2m_client.h"
+ * #include "lwm2m_client_objects.h"
+ * #include "objects/security.h"
+ * #include "objects/device.h"
+ * #include "net/credman.h"
+ *
+ * // hold references to object handles
+ * lwm2m_object_t *obj_list[3];
+ *
+ * // LwM2M Client instance
+ * lwm2m_client_data_t client_data;
+ *
+ * // short ID for internal reference of the server
+ * #define CONFIG_LWM2M_SERVER_SHORT_ID 1
+ *
+ * int main(void)
+ * {
+ *
+ *    // initiate the LwM2M Client
+ *    lwm2m_client_init(&client_data);
+ *
+ *    // arguments for instantiating a security object
+ *    lwm2m_obj_security_args_t args = {
+ *        .server_id = CONFIG_LWM2M_SERVER_SHORT_ID,
+ *        .server_uri = "coap://[fd00:dead:beef::1]:5683",
+ *        .security_mode = LWM2M_SECURITY_MODE_NONE,
+ *        .is_bootstrap = false,
+ *        .client_hold_off_time = 5,
+ *        .bootstrap_account_timeout = 0
+ *    };
+ *
+ *    // get the Security object handle
+ *    obj_list[0] = lwm2m_object_security_init(&client_data);
+ *
+ *    // create a new Security object instance
+ *    int res = lwm2m_object_security_instance_create(&args, 1);
+ *    if (res < 0) {
+ *        puts("Could not instantiate the security object");
+ *        return;
+ *    }
+ *
+ *    // get the Server object handle (only single instance for now)
+ *    obj_list[1] = lwm2m_client_get_server_object(&client_data, CONFIG_LWM2M_SERVER_SHORT_ID);
+ *
+ *    // device object has a single instance. All the information for now is defined at compile-time
+ *    obj_list[2] = lwm2m_object_device_get();
+ *
+ *    // run the LwM2M client
+ *    lwm2m_client_run(&client_data, obj_list, ARRAY_SIZE(obj_list);
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The LwM2M Client will connect to the specified LwM2M server and register itself. After that, the
+ * server will be able to perform Read, Write, Create, Delete, Execute and Observe operations on the
+ * resources.
+ *
+ * ### DTLS support
+ * With the configuration above plain CoAP is used. To secure the connection with the LwM2M Server,
+ * a credential is needed in the Security object instance. To enable DTLS support add the module
+ * `wakaama_client_dtls`. This uses the @ref net_sock_dtls, so you will need to select an
+ * implementation of it (e.g. `USEPKG += tinydtls`). Currently Pre-Shared Key (PSK) and Raw Public
+ * Key (RPK) modes are supported.
+ *
+ * To see how to use DTLS credentials, go to the usage section of @ref lwm2m_objects_security.
+ *
+ * ### Using a LwM2M Bootstrap Server
+ * A bootstrap server gives a LwM2M deployment more flexibility. Information on how to connect to the
+ * LwM2M bootstrap server is defined at compile-time in the client (including URI and potentially
+ * needed credentials). The client connects to the bootstrap server on boot, which installs on the
+ * node the information needed to connect to the LwM2M servers.
+ *
+ * To enable bootstrap support, set the `LWM2M_BOOTSTRAP` option on Kconfig or set the CFLAG
+ * `CONFIG_LWM2M_BOOTSTRAP=1`. You will also need to specify during the security object instantiation
+ * that the information corresponds to a bootstrap server. DTLS is also supported for the bootstrap
+ * server:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * lwm2m_obj_security_args_t args = {
+ *     .server_id = 1,
+ *     .server_uri = "coaps://[fd00:dead:beef::1]:5684",
+ *     .security_mode = LWM2M_SECURITY_MODE_PRE_SHARED_KEY,
+ *     .pub_key_or_id = psk_id,
+ *     .pub_key_or_id_len = sizeof(psk_id) - 1,
+ *     .secret_key = psk_key,
+ *     .secret_key_len = sizeof(psk_key) - 1,
+ *     .is_bootstrap = true,
+ *     .client_hold_off_time = 5,
+ *     .bootstrap_account_timeout = 0
+ * };
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Keep into account, that some Sock DTLS implementations may need some extra configuration to handle
+ * multiple connections. See the `example/wakaama` Makefile.
+ *
  */

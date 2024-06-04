@@ -122,14 +122,14 @@ void isr_eth(void)
 
     if (IS_USED(MODULE_STM32_ETH)) {
         extern netdev_t *stm32_eth_netdev;
-        extern mutex_t stm32_eth_tx_completed;
         unsigned tmp = ETH->DMASR;
         ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS | ETH_DMASR_RS;
         DEBUG("[periph_eth_common] DMASR = 0x%x\n", tmp);
 
         if ((tmp & ETH_DMASR_TS)) {
             DEBUG("isr_eth: TX completed\n");
-            mutex_unlock(&stm32_eth_tx_completed);
+            stm32_eth_netdev->event_callback(stm32_eth_netdev,
+                                             NETDEV_EVENT_TX_COMPLETE);
         }
 
         if ((tmp & ETH_DMASR_RS)) {

@@ -45,9 +45,11 @@ static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
+static int _confirm_send(netdev_t *netdev, void *info);
 
 const netdev_driver_t at86rf215_driver = {
     .send = _send,
+    .confirm_send = _confirm_send,
     .recv = _recv,
     .init = _init,
     .isr = _isr,
@@ -177,6 +179,20 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* return the number of bytes that were actually loaded into the frame
      * buffer/send out */
     return (int)len;
+}
+
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)info;
+
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
+
+    if (dev->flags & AT86RF215_OPT_TX_PENDING) {
+        return -EAGAIN;
+    }
+
+    return (int16_t)dev->tx_frame_len;
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
@@ -853,8 +869,13 @@ static void _tx_end(at86rf215_t *dev, netdev_event_t event)
 
     at86rf215_tx_done(dev);
 
+    if (event == NETDEV_EVENT_TX_NOACK) {
+        /* signal error to confirm_send */
+        dev->tx_frame_len = (int16_t)-EIO;
+    }
+
     if (netdev->event_callback) {
-        netdev->event_callback(netdev, event);
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
 
     dev->timeout = 0;
@@ -995,7 +1016,9 @@ static void _handle_edc(at86rf215_t *dev)
         at86rf215_enable_rpc(dev);
         at86rf215_tx_done(dev);
 
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+        /* signal error to confirm_send */
+        dev->tx_frame_len = (int16_t)-EBUSY;
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
 
         DEBUG("CSMA give up");
         /* radio is still in RX mode, tx_done sets IDLE state */

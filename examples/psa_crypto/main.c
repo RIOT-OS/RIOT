@@ -37,6 +37,8 @@ extern psa_status_t example_eddsa(void);
 #endif
 #endif
 
+extern psa_status_t example_hash(void);
+
 #ifdef MULTIPLE_SE
 #if IS_USED(MODULE_PSA_CIPHER)
 extern psa_status_t example_cipher_aes_128_sec_se(void);
@@ -62,6 +64,13 @@ int main(void)
     /* Needed in case only hashes are tested */
     (void)status;
     (void)start;
+
+    status = example_hash();
+    printf("Hash took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("Hash failed: %s\n", psa_status_to_humanly_readable(status));
+    }
 
 #if IS_USED(MODULE_PSA_MAC)
     status = example_hmac_sha256();

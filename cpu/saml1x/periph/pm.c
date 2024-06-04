@@ -43,9 +43,9 @@ void pm_set(unsigned mode)
     }
 
     /* write sleep configuration */
-    PM->SLEEPCFG.bit.SLEEPMODE = _mode;
+    PM->SLEEPCFG.reg = _mode;
     /* make sure value has been set */
-    while (PM->SLEEPCFG.bit.SLEEPMODE != _mode) {}
+    while ((PM->SLEEPCFG.reg & PM_SLEEPCFG_SLEEPMODE_Msk) != _mode) {}
 
     sam0_cortexm_sleep(deep);
 }

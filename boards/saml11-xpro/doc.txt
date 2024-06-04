@@ -79,10 +79,4 @@ flash memory. Such action can be done with the following EDBG command:
 or pass it as argument when calling make:
 EDBG_ARGS="-F w0,194,1" BOARD=saml11-xpro make flash term -C tests/periph/uart
 
-## Supported Toolchains
-
-For using the saml11-xpro board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
-
 */

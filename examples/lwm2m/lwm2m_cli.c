@@ -21,8 +21,13 @@
 #include "lwm2m_client.h"
 #include "lwm2m_client_objects.h"
 #include "lwm2m_platform.h"
-#include "objects/light_control.h"
+
 #include "objects/common.h"
+#include "objects/device.h"
+#include "objects/security.h"
+#include "objects/light_control.h"
+
+#include "credentials.h"
 
 #define LED_COLOR "FFFFFF"
 #define LED_APP_TYPE "LED 0"
@@ -58,12 +63,13 @@ void lwm2m_cli_init(void)
     lwm2m_client_init(&client_data);
 
     /* add objects that will be registered */
-    obj_list[0] = lwm2m_client_get_security_object(&client_data);
-    obj_list[1] = lwm2m_client_get_server_object(&client_data);
-    obj_list[2] = lwm2m_client_get_device_object(&client_data);
+    obj_list[0] = lwm2m_object_security_init(&client_data);
+    obj_list[1] = lwm2m_client_get_server_object(&client_data, CONFIG_LWM2M_SERVER_SHORT_ID);
+    obj_list[2] = lwm2m_object_device_init(&client_data);
     obj_list[3] = lwm2m_object_light_control_init(&client_data);
 
-    lwm2m_obj_light_control_args_t args = {
+    /* create light control object instance */
+    lwm2m_obj_light_control_args_t light_args = {
         .cb = _light_cb,
         .cb_arg = NULL,
         .color = LED_COLOR,
@@ -72,10 +78,52 @@ void lwm2m_cli_init(void)
         .app_type_len = sizeof(LED_APP_TYPE) - 1
     };
 
-    int res = lwm2m_object_light_control_instance_create(&args, 0);
-
+    int res = lwm2m_object_light_control_instance_create(&light_args, 0);
     if (res < 0) {
         puts("Error instantiating light control");
+    }
+
+    /* create security object instance */
+    lwm2m_obj_security_args_t security_args = {
+        .server_id = CONFIG_LWM2M_SERVER_SHORT_ID,
+        .server_uri = CONFIG_LWM2M_SERVER_URI,
+        .security_mode = LWM2M_SECURITY_MODE_RAW_PUBLIC_KEY,
+        .pub_key_or_id = rpk_pub,
+        .pub_key_or_id_len = sizeof(rpk_pub),
+        .secret_key = rpk_priv,
+        .secret_key_len = sizeof(rpk_priv),
+        .server_pub_key = server_rpk_pub,
+        .server_pub_key_len = sizeof(server_rpk_pub),
+        .is_bootstrap = false, /* set to true when using Bootstrap server */
+        .client_hold_off_time = 5,
+        .bootstrap_account_timeout = 0
+    };
+
+    if (IS_ACTIVE(CONFIG_LWM2M_CRED_PSK)) {
+        security_args.security_mode = LWM2M_SECURITY_MODE_PRE_SHARED_KEY;
+        security_args.pub_key_or_id = psk_id;
+        security_args.pub_key_or_id_len = sizeof(psk_id) - 1;
+        security_args.secret_key = psk_key;
+        security_args.secret_key_len = sizeof(psk_key) - 1;
+    }
+    else if (IS_ACTIVE(CONFIG_LWM2M_CRED_RPK)) {
+        security_args.security_mode = LWM2M_SECURITY_MODE_RAW_PUBLIC_KEY;
+        security_args.pub_key_or_id = rpk_pub;
+        security_args.pub_key_or_id_len = sizeof(rpk_pub);
+        security_args.secret_key = rpk_priv;
+        security_args.secret_key_len = sizeof(rpk_priv);
+        security_args.server_pub_key = server_rpk_pub;
+        security_args.server_pub_key_len = sizeof(server_rpk_pub);
+    }
+    else {
+        puts("Error: you must select a credential type");
+        return;
+    }
+
+    res = lwm2m_object_security_instance_create(&security_args, 1);
+    if (res < 0) {
+        puts("Could not instantiate the security object");
+        return;
     }
 
     if (!obj_list[0] || !obj_list[1] || !obj_list[2]) {
@@ -119,7 +167,7 @@ int lwm2m_cli_cmd(int argc, char **argv)
 
     if (!strcmp(argv[1], "start")) {
         /* run the LwM2M client */
-        if (!connected && lwm2m_client_run(&client_data, obj_list, OBJ_COUNT)) {
+        if (!connected && lwm2m_client_run(&client_data, obj_list, ARRAY_SIZE(obj_list))) {
             connected = 1;
         }
         return 0;

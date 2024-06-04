@@ -34,7 +34,7 @@
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "gpio_ll_arch.h"
-#include "soc/gpio_reg.h"
+#include "soc/gpio_struct.h"
 
 #include "esp_idf_api/gpio.h"
 
@@ -55,35 +55,9 @@ extern bool _gpio_pin_pd[GPIO_PIN_NUMOF];
 
 static gpio_conf_t _gpio_conf[GPIO_PIN_NUMOF] = { };
 
-const _esp32_port_t _esp32_ports[GPIO_PORT_NUMOF] = {
-    {
-        .out = (uint32_t *)GPIO_OUT_REG,
-        .out_w1ts = (uint32_t *)GPIO_OUT_W1TS_REG,
-        .out_w1tc = (uint32_t *)GPIO_OUT_W1TC_REG,
-        .in = (uint32_t *)GPIO_IN_REG,
-        .enable = (uint32_t *)GPIO_ENABLE_REG,
-        .enable_w1ts = (uint32_t *)GPIO_ENABLE_W1TS_REG,
-        .enable_w1tc = (uint32_t *)GPIO_ENABLE_W1TC_REG,
-        .status_w1tc = (uint32_t *)GPIO_STATUS_W1TC_REG,
-    },
-#if GPIO_PORT_NUMOF > 1
-    {
-        .out = (uint32_t *)GPIO_OUT1_REG,
-        .out_w1ts = (uint32_t *)GPIO_OUT1_W1TS_REG,
-        .out_w1tc = (uint32_t *)GPIO_OUT1_W1TC_REG,
-        .in = (uint32_t *)GPIO_IN1_REG,
-        .enable = (uint32_t *)GPIO_ENABLE1_REG,
-        .enable_w1ts = (uint32_t *)GPIO_ENABLE1_W1TS_REG,
-        .enable_w1tc = (uint32_t *)GPIO_ENABLE1_W1TC_REG,
-        .status_w1tc = (uint32_t *)GPIO_STATUS1_W1TC_REG,
-    }
-#endif
-};
-
 int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 {
-    assert(port);
-    assert(GPIO_PORT_NUM(port) < GPIO_PORT_NUMOF);
+    assert(is_gpio_port_num_valid(port));
     assert(pin < GPIO_PORT_PIN_NUMOF(port));
 
     gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);

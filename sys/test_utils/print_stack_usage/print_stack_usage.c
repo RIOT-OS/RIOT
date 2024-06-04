@@ -34,7 +34,7 @@
 
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 {
-    unsigned free = thread_measure_stack_free(stack);
+    unsigned free = measure_stack_free_internal(stack, max_size);
 
     if ((LOG_LEVEL >= LOG_INFO) &&
         (thread_get_stacksize(thread_get_active()) >= MIN_SIZE)) {

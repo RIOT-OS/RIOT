@@ -66,7 +66,7 @@ psa_status_t psa_hashes_md5_finish(psa_hashes_md5_ctx_t *ctx,
                                    uint8_t *hash,
                                    size_t hash_size,
                                    size_t *hash_length);
-#endif /* CONFIG_HASHES_MD5 */
+#endif /* MODULE_PSA_HASH_MD5 */
 
 #if IS_USED(MODULE_PSA_HASH_SHA_1) || defined(DOXYGEN)
 /**
@@ -105,7 +105,7 @@ psa_status_t psa_hashes_sha1_finish(psa_hashes_sha1_ctx_t *ctx,
                                     uint8_t *hash,
                                     size_t hash_size,
                                     size_t *hash_length);
-#endif /* CONFIG_HASHES_SHA1 */
+#endif /* MODULE_PSA_HASH_SHA_1 */
 
 #if IS_USED(MODULE_PSA_HASH_SHA_224) || defined(DOXYGEN)
 /**
@@ -144,7 +144,7 @@ psa_status_t psa_hashes_sha224_finish(psa_hashes_sha224_ctx_t *ctx,
                                       uint8_t *hash,
                                       size_t hash_size,
                                       size_t *hash_length);
-#endif /* CONFIG_HASHES_SHA224 */
+#endif /* MODULE_PSA_HASH_SHA_224 */
 
 #if IS_USED(MODULE_PSA_HASH_SHA_256) || defined(DOXYGEN)
 /**
@@ -183,7 +183,46 @@ psa_status_t psa_hashes_sha256_finish(psa_hashes_sha256_ctx_t *ctx,
                                       uint8_t *hash,
                                       size_t hash_size,
                                       size_t *hash_length);
-#endif /* CONFIG_HASHES_SHA256 */
+#endif /* MODULE_PSA_HASH_SHA_256 */
+
+#if IS_USED(MODULE_PSA_HASH_SHA_384) || defined(DOXYGEN)
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA384 hash setup
+ *          See @ref psa_hash_setup()
+ *
+ * @param ctx
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha384_setup(psa_hashes_sha384_ctx_t *ctx);
+
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA384 hash update
+ *          See @ref psa_hash_update()
+ *
+ * @param ctx
+ * @param input
+ * @param input_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha384_update(psa_hashes_sha384_ctx_t *ctx,
+                                      const uint8_t *input,
+                                      size_t input_length);
+
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA384 hash finish
+ *          See @ref psa_hash_finish()
+ *
+ * @param ctx
+ * @param hash
+ * @param hash_size
+ * @param hash_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha384_finish(psa_hashes_sha384_ctx_t *ctx,
+                                      uint8_t *hash,
+                                      size_t hash_size,
+                                      size_t *hash_length);
+#endif /* MODULE_PSA_HASH_SHA_384 */
 
 #if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
 /**
@@ -222,7 +261,85 @@ psa_status_t psa_hashes_sha512_finish(psa_hashes_sha512_ctx_t *ctx,
                                       uint8_t *hash,
                                       size_t hash_size,
                                       size_t *hash_length);
-#endif /* CONFIG_HASHES_SHA512 */
+#endif /* MODULE_PSA_HASH_SHA_512 */
+
+#if IS_USED(MODULE_PSA_HASH_SHA_512_224) || defined(DOXYGEN)
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA512/224 hash setup
+ *          See @ref psa_hash_setup()
+ *
+ * @param ctx
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha512_224_setup(psa_hashes_sha512_224_ctx_t *ctx);
+
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA512/224 hash update
+ *          See @ref psa_hash_update()
+ *
+ * @param ctx
+ * @param input
+ * @param input_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha512_224_update(psa_hashes_sha512_224_ctx_t *ctx,
+                                      const uint8_t *input,
+                                      size_t input_length);
+
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA512/224 hash finish
+ *          See @ref psa_hash_finish()
+ *
+ * @param ctx
+ * @param hash
+ * @param hash_size
+ * @param hash_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha512_224_finish(psa_hashes_sha512_224_ctx_t *ctx,
+                                      uint8_t *hash,
+                                      size_t hash_size,
+                                      size_t *hash_length);
+#endif /* MODULE_PSA_HASH_SHA_512_224 */
+
+#if IS_USED(MODULE_PSA_HASH_SHA_512_256) || defined(DOXYGEN)
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA512/256 hash setup
+ *          See @ref psa_hash_setup()
+ *
+ * @param ctx
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha512_256_setup(psa_hashes_sha512_256_ctx_t *ctx);
+
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA512/256 hash update
+ *          See @ref psa_hash_update()
+ *
+ * @param ctx
+ * @param input
+ * @param input_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha512_256_update(psa_hashes_sha512_256_ctx_t *ctx,
+                                      const uint8_t *input,
+                                      size_t input_length);
+
+/**
+ * @brief   Low level wrapper function to call a driver for an SHA512/256 hash finish
+ *          See @ref psa_hash_finish()
+ *
+ * @param ctx
+ * @param hash
+ * @param hash_size
+ * @param hash_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha512_256_finish(psa_hashes_sha512_256_ctx_t *ctx,
+                                      uint8_t *hash,
+                                      size_t hash_size,
+                                      size_t *hash_length);
+#endif /* MODULE_PSA_HASH_SHA_512_256 */
 
 #ifdef __cplusplus
 }

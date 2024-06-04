@@ -64,7 +64,7 @@ static void _osc32k_setup(void)
                            | OSC32KCTRL_OSC32K_ENABLE;
 
     /* Wait OSC32K Ready */
-    while (!OSC32KCTRL->STATUS.bit.OSC32KRDY) {}
+    while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_OSC32KRDY)) {}
 #endif /* INTERNAL_OSC32_SOURCE */
 }
 
@@ -78,7 +78,7 @@ static void _xosc32k_setup(void)
                             | OSC32KCTRL_XOSC32K_ENABLE;
 
     /* Wait XOSC32K Ready */
-    while (!OSC32KCTRL->STATUS.bit.XOSC32KRDY) {}
+    while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_XOSC32KRDY)) {}
 #endif
 }
 
@@ -145,9 +145,10 @@ void cpu_init(void)
     /* Disable the RTC module to prevent synchronization issues during CPU init
        if the RTC was running from a previous boot (e.g wakeup from backup)
        as the module will be re-init during the boot process */
-    if (RTC->MODE2.CTRLA.bit.ENABLE && IS_ACTIVE(MODULE_PERIPH_RTC_RTT)) {
+    if ((RTC->MODE2.CTRLA.reg & RTC_MODE2_CTRLA_ENABLE) &&
+        IS_ACTIVE(MODULE_PERIPH_RTC_RTT)) {
         while (RTC->MODE2.SYNCBUSY.reg) {}
-        RTC->MODE2.CTRLA.bit.ENABLE = 0;
+        RTC->MODE2.CTRLA.reg &= ~ RTC_MODE2_CTRLA_ENABLE;
         while (RTC->MODE2.SYNCBUSY.reg) {}
     }
     /* Software reset the GCLK module to ensure it is re-initialized correctly */
@@ -156,16 +157,14 @@ void cpu_init(void)
     while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_SWRST) {}
 
     PM->PLCFG.reg = PM_PLCFG_PLSEL_PL2;
-    while (!PM->INTFLAG.bit.PLRDY) {}
+    while (!(PM->INTFLAG.reg & PM_INTFLAG_PLRDY)) {}
 
     MCLK->APBBMASK.reg |= MCLK_APBBMASK_NVMCTRL;
     _NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(1);
     MCLK->APBBMASK.reg &= ~MCLK_APBBMASK_NVMCTRL;
 
     /* set OSC16M to 16MHz */
-    OSCCTRL->OSC16MCTRL.bit.FSEL = 3;
-    OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 0;
-    OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
+    OSCCTRL->OSC16MCTRL.reg = (OSCCTRL_OSC16MCTRL_FSEL_16 | OSCCTRL_OSC16MCTRL_ENABLE);
 
     _osc32k_setup();
     _xosc32k_setup();

@@ -312,6 +312,17 @@ typedef enum {
 } msp430_timer_clock_source_t;
 
 /**
+ * @brief   IDs of the different clock domains on the MSP430
+ *
+ * These can be used as internal clock sources for peripherals
+ */
+typedef enum {
+    MSP430_CLOCK_SUBMAIN,                               /**< Subsystem main clock */
+    MSP430_CLOCK_AUXILIARY,                             /**< Auxiliary clock */
+    MSP430_CLOCK_NUMOF,                                 /**< Number of clock domains */
+} msp430_clock_t;
+
+/**
  * @brief   Timer configuration on an MSP430 timer
  */
 typedef struct {
@@ -366,6 +377,28 @@ uint32_t PURE msp430_submain_clock_freq(void);
  * @note    This is only useful when implementing MSP430 peripheral drivers
  */
 uint32_t PURE msp430_auxiliary_clock_freq(void);
+
+/**
+ * @brief   Increase the refcount of the given clock
+ *
+ * @param[in]   clock       clock domain to acquire
+ *
+ * @warning This is an internal function and must only be called from
+ *          peripheral drivers
+ * @note    An assertion will blow when the count exceeds capacity
+ */
+void msp430_clock_acquire(msp430_clock_t clock);
+
+/**
+ * @brief   Decrease the refcount of the subsystem main clock
+ *
+ * @param[in]   clock       clock domain to acquire
+ *
+ * @warning This is an internal function and must only be called from
+ *          peripheral drivers
+ * @note    An assertion will blow when the count drops below zero
+ */
+void msp430_clock_release(msp430_clock_t clock);
 
 #ifdef __cplusplus
 }

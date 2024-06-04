@@ -25,7 +25,7 @@ stm32f429i-disc1"
 # this configures boards that are available via pifleet
 case "${CI_MURDOCK_PROJECT}" in
     riot)
-        : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+        : ${TEST_BOARDS_AVAILABLE:="samr21-xpro"}
         ;;
     riot-staging)
         : ${TEST_BOARDS_AVAILABLE:=""}
