@@ -1,6 +1,6 @@
-use crate::executor::Executor;
 use crate::util::get_static;
 use riot_wrappers::println;
+use embassy_executor_riot::Executor;
 
 #[embassy_executor::task]
 async fn task_main() {
@@ -20,13 +20,11 @@ async fn task_shell() {
     crate::shell::start().await.unwrap();
 }
 
-const RUNTIME_THROTTLE_MS: u32 = 100;
-
 pub struct Runtime(Executor);
 
 impl Runtime {
     pub fn new() -> Self {
-        Self(Executor::new(Some(RUNTIME_THROTTLE_MS)))
+        Self(Executor::new())
     }
 
     pub fn run(&mut self) -> ! {

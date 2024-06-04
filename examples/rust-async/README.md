@@ -1,7 +1,7 @@
 async Rust runtime and applications
 ===================================
 
-In this example, we introduce a practical async-Rust runtime empowered by the [embassy-executor](https://github.com/embassy-rs/embassy/tree/main/embassy-executor) crate.  Using this runtime, we demonstrate how to
+In this example, we introduce a practical async-Rust runtime empowered by the [embassy-executor-riot](https://gitlab.com/etonomy/riot-module-examples) crate.  Using this runtime, we demonstrate how to
 
 - write an async RIOT application starting from the provided [`async fn main()`](src/lib.rs) entry point,
 - run the [Rust gcoap server](../rust-gcoap) application as a spawned async task, and
@@ -44,7 +44,6 @@ RIOT native board initialized.
 RIOT native hardware initialization complete.
 
 main(): This is RIOT! (Version: 2023.07-devel-2828-g193073-rust-async-wip)
-Executor::run(): throttle: 100 ms
 task_server(): starting
 constfs mounted successfully
 CoAP server ready
