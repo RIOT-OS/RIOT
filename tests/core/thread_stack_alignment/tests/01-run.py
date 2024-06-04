@@ -24,6 +24,7 @@ def testfunc(child):
         child.expect(r"(\{[^\n\r]*\})\r\n")
         stats = json.loads(child.match.group(1))["threads"][0]
         assert stats["name"] == "test"
+        assert stats["stack_used"] < stats["stack_size"]
         if stack_used_max < stats["stack_used"]:
             stack_used_max = stats["stack_used"]
         if stack_used_min > stats["stack_used"]:
