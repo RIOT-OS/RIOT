@@ -596,11 +596,11 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
     case PSA_ALG_STREAM_CIPHER:
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
-            return psa_cipher_chacha20_encrypt_decrypt(key_data, *key_bytes, 
-                                                       input, input_length,
-                                                       output, output_size,
-                                                       output_length);
-        } else if (attributes->type == PSA_KEY_TYPE_ARC4) {
+            return psa_cipher_chacha20_encrypt(key_data, *key_bytes, 
+                                               input, input_length,
+                                               output, output_size,
+                                               output_length);
+        } else {
             (void)slot;
             (void)input;
             (void)input_length;
@@ -672,11 +672,11 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
     case PSA_ALG_STREAM_CIPHER:
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
-            return psa_cipher_chacha20_encrypt_decrypt(key_data, *key_bytes, 
-                                                       input, input_length,
-                                                       output, output_size,
-                                                       output_length);
-        } else if (attributes->type == PSA_KEY_TYPE_ARC4) {
+            return psa_cipher_chacha20_decrypt(key_data, *key_bytes, 
+                                               input, input_length,
+                                               output, output_size,
+                                               output_length);
+        } else {
             (void)slot;
             (void)input;
             (void)input_length;
