@@ -33,11 +33,10 @@ static int set_rgb_led(const void *dev, const phydat_t *res)
         .b = res->val[2]
     };
     for (unsigned idx = 0; idx < ws281x->params.numof; idx++) {
-        puts("Setting LED");
         ws281x_set(ws281x, idx, color);
     }
     ws281x_write(ws281x);
-    return 1;
+    return 3;
 }
 
 const saul_driver_t ws281x_saul_driver = {
