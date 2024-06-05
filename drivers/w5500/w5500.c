@@ -104,10 +104,8 @@ static void extint(void *arg)
     w5500_t *dev = (w5500_t *)arg;
 
     netdev_trigger_event_isr(&dev->netdev);
-    if (!gpio_is_valid(dev->p.irq)) {
-        /* restart timer if we are polling */
-        ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
-    }
+
+    ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
 }
 
 void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index)
@@ -181,12 +179,11 @@ static int init(netdev_t *netdev)
     write_register(dev, REG_SIPR2, 0x00);
     write_register(dev, REG_SIPR3, 0x00);
 
-    if (!gpio_is_valid(dev->p.irq)) {
-        dev->timerInstance.callback = extint;
-        dev->timerInstance.arg = dev;
-        ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
-    }
-    else {
+    dev->timerInstance.callback = extint;
+    dev->timerInstance.arg = dev;
+    ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
+
+    if (gpio_is_valid(dev->p.irq)) {
         /* Configure interrupt pin to trigger on socket 0 events. */
         write_register(dev, REG_SIMR, IMR_S0_INT);
     }
@@ -419,10 +416,6 @@ static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
         res = ETHERNET_ADDR_LEN;
         break;
     case NETOPT_LINK:
-        spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
-        uint8_t tmp = read_register(dev, REG_PHYCFGR);
-        spi_release(dev->p.spi);
-        dev->link_up = ((tmp & PHY_LINK_UP) != 0u);
         *((netopt_enable_t *)value) = dev->link_up ? NETOPT_ENABLE
                                                    : NETOPT_DISABLE;
         res = sizeof(netopt_enable_t);
