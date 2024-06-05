@@ -363,6 +363,7 @@ PSEUDOMODULES += psa_riot_hashes_sha_224
 PSEUDOMODULES += psa_riot_hashes_sha_256
 PSEUDOMODULES += psa_riot_hashes_sha_384
 PSEUDOMODULES += psa_riot_hashes_sha_512
+PSEUDOMODULES += psa_riot_hashes_sha_3
 PSEUDOMODULES += psa_riot_hashes_sha_512_224
 PSEUDOMODULES += psa_riot_hashes_sha_512_256
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
