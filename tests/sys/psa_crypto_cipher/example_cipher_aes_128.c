@@ -81,5 +81,7 @@ psa_status_t example_cipher_aes_128(void)
     if (status == PSA_SUCCESS) {
         return (memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) ? -1 : 0);
     }
+
+    status = psa_destroy_key(key_id);
     return status;
 }
