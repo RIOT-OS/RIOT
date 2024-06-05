@@ -168,7 +168,7 @@ static void sha2xx_transform(uint32_t *state, const unsigned char block[64])
     }
 }
 
-static unsigned char PAD[64] = {
+static const unsigned char PAD[64] = {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
