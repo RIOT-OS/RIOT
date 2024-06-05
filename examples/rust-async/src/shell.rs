@@ -100,8 +100,8 @@ pub async fn start() -> Result<(), i8> {
     let trim = |line: &mut ShellBuf| {
         let lc = line.clone();
         line.clear();
-        line.push_str(lc.trim()).unwrap();
-        assert!(line.ends_with("\0"));
+        line.push_str(lc[..lc.len() - 1].trim()).unwrap();
+        line.push('\0').unwrap();
     };
 
     // process line input stream
