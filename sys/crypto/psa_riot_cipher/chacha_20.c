@@ -35,7 +35,7 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
     DEBUG("RIOT ChaCha20 Cipher encryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (output_length < (input_length + CHACHA20POLY1305_NONCE_BYTES)) {
+    if (output_size < (input_length + CHACHA20POLY1305_NONCE_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -48,7 +48,7 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
     if (status != PSA_SUCCESS)
         return status;
 
-    chacha20_encrypt_decrypt(input, output, key_buffer, &nonce, input_length);
+    chacha20_encrypt_decrypt(input, output, key_buffer, nonce, input_length);
 
     memcpy(&output[input_length], nonce, CHACHA20POLY1305_NONCE_BYTES);
 
@@ -65,7 +65,6 @@ psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
                                          size_t *output_length)
 {
     DEBUG("RIOT ChaCha20 Cipher decryption");
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
     if ((key_buffer_size != CHACHA20POLY1305_KEY_BYTES) || 
         (input_length < CHACHA20POLY1305_NONCE_BYTES)) {
@@ -73,13 +72,14 @@ psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
     }
 
 
-    if (output_length < (input_length - CHACHA20POLY1305_NONCE_BYTES)) {
+    if (output_size < (input_length - CHACHA20POLY1305_NONCE_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    uint8_t nonce[CHACHA20POLY1305_NONCE_BYTES] = &input[input_length - CHACHA20POLY1305_NONCE_BYTES];
+    uint8_t nonce[CHACHA20POLY1305_NONCE_BYTES] = {0};
+    memcpy(&nonce, &input[input_length - CHACHA20POLY1305_NONCE_BYTES], sizeof(nonce));
 
-    chacha20_encrypt_decrypt(input, output, key_buffer, &nonce, input_length - CHACHA20POLY1305_NONCE_BYTES);
+    chacha20_encrypt_decrypt(input, output, key_buffer, nonce, input_length - CHACHA20POLY1305_NONCE_BYTES);
     *output_length = input_length;
     return PSA_SUCCESS;
 }

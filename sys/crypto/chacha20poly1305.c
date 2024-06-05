@@ -27,7 +27,6 @@
 #include "crypto/chacha20poly1305.h"
 #include "crypto/poly1305.h"
 #include "unaligned.h"
-#include "chacha20poly1305.h"
 
 /* Missing operations to convert numbers to little endian prevents this from
  * working on big endian systems */
