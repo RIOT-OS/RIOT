@@ -3,6 +3,7 @@ use riot_wrappers::println;
 pub const TABLE_ALIAS_NAMED: &[(&str, &str)] = &[
     ("a", "alias"),
     ("h", "help"),
+    ("p", "ps.rs"),
 ];
 
 pub const TABLE_ALIAS_ENUMERATED: &[&str] = &[
