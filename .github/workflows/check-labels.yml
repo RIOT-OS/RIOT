@@ -11,7 +11,7 @@ jobs:
     if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     steps:
-    - uses: RIOT-OS/check-labels-action@v1.1.1
+    - uses: RIOT-OS/check-labels-action@v1.1.2
       with:
         access_token: ${{ secrets.GITHUB_TOKEN }}
         unset_labels: 'CI: needs squashing,State: waiting for CI update,State: waiting for other PR,Process: blocked by feature freeze'
