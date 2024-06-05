@@ -24,19 +24,20 @@
 
 #include "psa/crypto.h"
 
-#define AES_128_KEY_SIZE    (16)
-#define AES_256_KEY_SIZE    (32)
-
-static const uint8_t KEY_128[] = {
-    0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-    0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c
+static const uint8_t KEY_CHACHA20[32] = {
+    0x90, 0x6f, 0xdc, 0xf1, 0x72, 0xe6, 0x8a, 0xd1, 0xbb, 0xd0, 0xa3, 0x24,
+    0x2a, 0xda, 0x91, 0xdb, 0x3a, 0x8d, 0xb8, 0xd4, 0x9a, 0x75, 0xc7, 0x14, 
+    0x00, 0x08, 0x9a, 0x8b, 0x86, 0x55, 0x2e, 0x9a
 };
 
-static uint8_t PLAINTEXT[32] = {
-    0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
-    0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
-    0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c,
-    0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51
+static const uint8_t NONCE_CHACHA20[12] {
+    0x16, 0x05, 0x54, 0xd1, 0x37, 0xc1, 0xbc, 0x5a, 0xfb, 0x59, 0x30, 0x60
+}
+
+static uint8_t PLAINTEXT[29] = {
+    0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x52, 0x49, 0x4F, 0x54, 0x21, 0x20, 
+    0x54, 0x68, 0x65, 0x20, 0x41, 0x6E, 0x73, 0x77, 0x65, 0x72, 0x20, 0x69,
+    0x73, 0x20, 0x34, 0x32, 0x2E
 };
 
 /**
@@ -50,31 +51,31 @@ psa_status_t example_cipher_chacha_20(void)
 psa_key_attributes_t attr = psa_key_attributes_init();
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
 
-    size_t encr_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA_20,
-                                                             PSA_ALG_CBC_NO_PADDING, PLAINTEXT_LEN);
+    size_t encr_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+                                                             PSA_ALG_CHACHA20_POLY1305, sizeof(PLAINTEXT));
 
     uint8_t cipher_out[encr_output_size];
     uint8_t plain_out[sizeof(PLAINTEXT)];
     size_t output_len = 0;
 
-    psa_set_key_algorithm(&attr, PSA_ALG_CBC_NO_PADDING);
+    psa_set_key_algorithm(&attr, PSA_ALG_CHACHA20_POLY1305);
     psa_set_key_usage_flags(&attr, usage);
     psa_set_key_bits(&attr, 128);
-    psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
+    psa_set_key_type(&attr, PSA_KEY_TYPE_CHACHA20);
 
-    status = psa_import_key(&attr, KEY_128, AES_128_KEY_SIZE, &key_id);
+    status = psa_import_key(&attr, KEY_128, sizeof(KEY_CHACHA20), &key_id);
     if (status != PSA_SUCCESS) {
         return status;
     }
 
-    status = psa_cipher_encrypt(key_id, PSA_ALG_CBC_NO_PADDING, PLAINTEXT,
-                                PLAINTEXT_LEN, cipher_out, encr_output_size, &output_len);
+    status = psa_cipher_encrypt(key_id, PSA_ALG_CHACHA20_POLY1305, &PLAINTEXT,
+                                sizeof(PLAINTEXT), &cipher_out, encr_output_size, &output_len);
     if (status != PSA_SUCCESS) {
         return status;
     }
 
-    status = psa_cipher_decrypt(key_id, PSA_ALG_CBC_NO_PADDING, cipher_out,
-                                sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
+    status = psa_cipher_decrypt(key_id, PSA_ALG_CHACHA20_POLY1305, &cipher_out,
+                                sizeof(cipher_out), &plain_out, sizeof(plain_out), &output_len);
     if (status == PSA_SUCCESS) {
         return (memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) ? -1 : 0);
     }
