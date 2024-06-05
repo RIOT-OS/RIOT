@@ -23,11 +23,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
+#include "event/periodic_callback.h"
+#include "event/thread.h"
 #include "fmt.h"
 #include "net/gcoap.h"
 #include "net/utils.h"
 #include "od.h"
+#include "periph/rtc.h"
+#include "time_units.h"
 
 #include "gcoap_example.h"
 
@@ -60,11 +65,17 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+#if IS_USED(MODULE_PERIPH_RTC)
+static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+#endif
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
     { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+#if IS_USED(MODULE_PERIPH_RTC)
+    { "/rtc", COAP_GET, _rtc_handler, NULL },
+#endif
 };
 
 static const char *_link_params[] = {
@@ -99,6 +110,53 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
 
     return res;
 }
+
+#if IS_USED(MODULE_PERIPH_RTC)
+static void _rtc_notify_observers(void *arg)
+{
+    (void)arg;
+    struct tm tm_now;
+    if (rtc_get_time(&tm_now)) {
+        DEBUG_PUTS("gcoap_server: RTC error");
+        return;
+    }
+    size_t len;
+    char str_time[20] = "";
+    uint8_t buf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1 + sizeof(str_time)];
+    coap_pkt_t pdu;
+    switch (gcoap_obs_init(&pdu, buf, sizeof(buf), &_resources[2])) {
+        case GCOAP_OBS_INIT_OK:
+            len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
+            memcpy(pdu.payload, str_time, strftime(str_time, sizeof(str_time), "%Y-%m-%d %H:%M:%S", &tm_now));
+            pdu.payload_len = strlen(str_time);
+            len += pdu.payload_len;
+            if (!gcoap_obs_send(buf, len, &_resources[2])) {
+                DEBUG_PUTS("gcoap_server: cannot send /rtc notification");
+            }
+            break;
+        case GCOAP_OBS_INIT_UNUSED:
+            DEBUG_PUTS("gcoap_server: no observer for /rtc");
+            break;
+        case GCOAP_OBS_INIT_ERR:
+            DEBUG_PUTS("gcoap_server: error initializing /rtc notification");
+            break;
+    }
+}
+
+static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
+{
+    (void)ctx;
+    struct tm tm_now;
+    rtc_get_time(&tm_now);
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+    char str_time[20] = "";
+    memcpy(pdu->payload, str_time, strftime(str_time, sizeof(str_time), "%Y-%m-%d %H:%M:%S", &tm_now));
+    pdu->payload_len = strlen(str_time);
+    resp_len += pdu->payload_len;
+    return resp_len;
+}
+#endif
 
 /*
  * Server callback for /cli/stats. Accepts either a GET or a PUT.
@@ -202,4 +260,9 @@ void server_init(void)
 #endif
 
     gcoap_register_listener(&_listener);
+#if IS_USED(MODULE_PERIPH_RTC)
+    static event_periodic_callback_t _ev_pcb_rtc;
+    event_periodic_callback_init(&_ev_pcb_rtc, ZTIMER_MSEC, EVENT_PRIO_MEDIUM, _rtc_notify_observers, NULL);
+    event_periodic_callback_start(&_ev_pcb_rtc, 10 * MS_PER_SEC);
+#endif
 }

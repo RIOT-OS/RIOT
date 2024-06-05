@@ -54,6 +54,9 @@ USEMODULE += shell_cmds_default
 USEMODULE += uri_parser
 USEMODULE += ps
 
+# /rtc resource for regular observe notifications
+FEATURES_OPTIONAL += periph_rtc
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -80,6 +83,13 @@ DOCKER_ENV_VARS += USE_ZEP
 DOCKER_ENV_VARS += ZEP_PORT_BASE
 
 include $(RIOTBASE)/Makefile.include
+
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += event_periodic
+  USEMODULE += event_periodic_callback
+  USEMODULE += event_thread
+  USEMODULE += ztimer_msec
+endif
 
 # For now this goes after the inclusion of Makefile.include so Kconfig symbols
 # are available. Only set configuration via CFLAGS if Kconfig is not being used
