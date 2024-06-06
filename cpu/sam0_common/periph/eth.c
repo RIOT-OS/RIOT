@@ -132,7 +132,7 @@ unsigned sam0_read_phy(uint8_t phy, uint8_t addr)
                   | GMAC_MAN_OP(PHY_READ_OP);
 
     /* Wait for operation completion */
-    while (!GMAC->NSR.bit.IDLE) {}
+    while (!(GMAC->NSR.reg & GMAC_NSR_IDLE)) {}
     /* return content of shift register */
     return (GMAC->MAN.reg & GMAC_MAN_DATA_Msk);
 }
@@ -148,7 +148,7 @@ void sam0_write_phy(uint8_t phy, uint8_t addr, uint16_t data)
                   | GMAC_MAN_CLTTO      | GMAC_MAN_DATA(data);
 
     /* Wait for operation completion */
-    while (!GMAC->NSR.bit.IDLE) {}
+    while (!(GMAC->NSR.reg & GMAC_NSR_IDLE)) {}
 }
 
 void sam0_eth_poweron(void)
