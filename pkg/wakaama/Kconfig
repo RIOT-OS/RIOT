@@ -19,6 +19,8 @@ config LWM2M_DTLS_PORT
 
 endmenu # Remote server
 
+rsource "contrib/objects/Kconfig"
+
 config LWM2M_DEVICE_TTL
     int "Lifetime of the device"
     default 300
@@ -59,7 +61,5 @@ config LWM2M_BOOTSTRAP
     bool "Bootsrap server support"
     help
         Say y to support using a bootstrap server to get server information.
-
-rsource "contrib/objects/Kconfig"
 
 endmenu # Wakaama LwM2M

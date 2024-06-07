@@ -1,0 +1,62 @@
+menu "IPSO sensor objects"
+    depends on USEMODULE_WAKAAMA_OBJECTS_IPSO_SENSOR_BASE
+
+config LWM2M_IPSO_SENSOR_BASE_UNITS_MAX_SIZE
+    int "Maximum size of strings representing units"
+    default 4
+
+menu "IPSO barometer object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_BAROMETER
+
+config LWM2M_BAROMETER_INSTANCES_MAX
+    int "Maximum number of barometer object instances"
+    default 1
+
+endmenu
+
+menu "IPSO current object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_CURRENT
+
+config LWM2M_CURRENT_INSTANCES_MAX
+    int "Maximum number of current object instances"
+    default 1
+
+endmenu
+
+menu "IPSO humidity object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_HUMIDITY
+
+config LWM2M_HUMIDITY_INSTANCES_MAX
+    int "Maximum number of humidity object instances"
+    default 1
+
+endmenu
+
+menu "IPSO illuminance object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_ILLUMINANCE
+
+config LWM2M_ILLUMINANCE_INSTANCES_MAX
+    int "Maximum number of illuminance object instances"
+    default 1
+
+endmenu
+
+menu "IPSO temperature object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_TEMPERATURE
+
+config LWM2M_TEMPERATURE_INSTANCES_MAX
+    int "Maximum number of temperature object instances"
+    default 1
+
+endmenu
+
+menu "IPSO voltage object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_VOLTAGE
+
+config LWM2M_VOLTAGE_INSTANCES_MAX
+    int "Maximum number of voltage object instances"
+    default 1
+
+endmenu
+
+endmenu # "IPSO objects"

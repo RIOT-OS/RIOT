@@ -12,6 +12,31 @@ USEMODULE += wakaama_objects
 USEMODULE += wakaama_objects_device
 USEMODULE += wakaama_objects_security
 
+
+ifneq (,$(filter wakaama_objects_barometer,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
+ifneq (,$(filter wakaama_objects_current,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
+ifneq (,$(filter wakaama_objects_humidity,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
+ifneq (,$(filter wakaama_objects_illuminance,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
+ifneq (,$(filter wakaama_objects_temperature,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
+ifneq (,$(filter wakaama_objects_voltage,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
 USEPKG += tlsf
