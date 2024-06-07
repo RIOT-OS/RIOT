@@ -54,7 +54,7 @@
 enum {
     STATE_REQUEST_SEND,     /**< request was just sent or will be sent again */
     STATE_STOP_RETRANSMIT,  /**< stop retransmissions due to a matching empty ACK */
-    STATE_RESPONSE_OK,      /**< valid response was received                 */
+    STATE_WAIT_RESPONSE,    /**< waiting for a response */
 };
 
 typedef struct {
@@ -234,19 +234,21 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             res = _sock_sendv(sock, &head);
             if (res <= 0) {
                 DEBUG("nanocoap: error sending coap request, %" PRIdSIZE "\n", res);
-                return res;
+                goto release;
             }
 
             /* no response needed and no response handler given */
             if (!confirmable && !cb) {
-                return 0;
+                res = 0;
+                goto release;
             }
 
             /* ctx must have been released at this point */
             assert(ctx == NULL);
+            state = STATE_WAIT_RESPONSE;
             /* fall-through */
-        case STATE_STOP_RETRANSMIT:
-        case STATE_RESPONSE_OK:
+        case STATE_WAIT_RESPONSE:           /* waiting for response, no empty ACK received */
+        case STATE_STOP_RETRANSMIT:         /* waiting for response, empty ACK received */
             if (ctx == NULL) {
                 DEBUG("nanocoap: waiting for response (timeout: %"PRIu32" µs)\n",
                       _deadline_left_us(deadline));
@@ -267,17 +269,15 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 /* no more data */
                 /* sock_udp_recv_buf() needs to be called in a loop until ctx is NULL again
                  * to release the buffer */
-                if (state == STATE_STOP_RETRANSMIT) {
-                    continue;
-                }
-                return res;
+                continue;
             }
             res = tmp;
             if (res == -ETIMEDOUT) {
                 if (tries_left == 0) {
                     DEBUG("nanocoap: maximum retries reached\n");
-                    return -ETIMEDOUT;
+                    goto release;
                 }
+                state = STATE_REQUEST_SEND;
                 DEBUG("nanocoap: timeout waiting for response\n");
                 timeout *= 2;
                 deadline = _deadline_from_interval(timeout);
@@ -285,7 +285,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             }
             if (res < 0) {
                 DEBUG("nanocoap: error receiving CoAP response, %" PRIdSIZE "\n", res);
-                return res;
+                goto release;
             }
 
             /* parse response */
@@ -297,13 +297,8 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 DEBUG("nanocoap: ID mismatch, got %u want %u\n", coap_get_id(pkt), id);
                 continue;
             }
-
             DEBUG("nanocoap: response code=%i\n", coap_get_code_decimal(pkt));
             switch (coap_get_type(pkt)) {
-            case COAP_TYPE_RST:
-                /* TODO: handle different? */
-                res = -EBADMSG;
-                break;
             case COAP_TYPE_ACK:
                 if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
                     /* empty ACK, wait for separate response */
@@ -315,22 +310,32 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                     continue;
                 }
                 /* fall-through */
+            case COAP_TYPE_RST:
             case COAP_TYPE_CON:
             case COAP_TYPE_NON:
-                state = STATE_RESPONSE_OK;
+                if (coap_get_type(pkt) == COAP_TYPE_RST) {
+                    /* think about whether cb should be called on RST as well */
+                    res = -EBADMSG;
+                    goto release;
+                }
                 if (coap_get_type(pkt) == COAP_TYPE_CON) {
-                    /* send ACK */
                     _send_ack(sock, pkt);
                 }
-                /* call user callback */
                 if (cb) {
                     res = cb(arg, pkt);
-                } else {
+                }
+                else {
                     res = _get_error(pkt);
                 }
-                break;
+                goto release;
             }
         }
+    }
+
+release:
+    while (ctx) {
+        /* make sure ctx is really deleted in all cases */
+        _sock_recv_buf(sock, &payload, &ctx, 0);
     }
 
     return res;
