@@ -1898,9 +1898,11 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 {
     gcoap_observe_memo_t *memo = NULL;
 
+    mutex_lock(&_coap_state.lock);
     _find_obs_memo_resource(&memo, resource);
     if (memo == NULL) {
         /* Unique return value to specify there is not an observer */
+        mutex_unlock(&_coap_state.lock);
         return GCOAP_OBS_INIT_UNUSED;
     }
 
@@ -1909,26 +1911,27 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &memo->token[0],
                                     memo->token_len, COAP_CODE_CONTENT, msgid);
 
-    if (hdrlen > 0) {
-        coap_pkt_init(pdu, buf, len, hdrlen);
-
-        _add_generated_observe_option(pdu);
-        /* Store message ID of the last notification sent. This is needed
-         * to match a potential RST returned by a client in order to signal
-         * it does not recognize this notification. */
-        memo->last_msgid = msgid;
-
-        return GCOAP_OBS_INIT_OK;
-    }
-    else {
+    if (hdrlen <= 0) {
         /* reason for negative hdrlen is not defined, so we also are vague */
+        mutex_unlock(&_coap_state.lock);
         return GCOAP_OBS_INIT_ERR;
     }
+
+    coap_pkt_init(pdu, buf, len, hdrlen);
+
+    _add_generated_observe_option(pdu);
+    /* Store message ID of the last notification sent. This is needed
+        * to match a potential RST returned by a client in order to signal
+        * it does not recognize this notification. */
+    memo->last_msgid = msgid;
+
+    return GCOAP_OBS_INIT_OK;
 }
 
 size_t gcoap_obs_send(const uint8_t *buf, size_t len,
                       const coap_resource_t *resource)
 {
+    ssize_t ret = 0;
     gcoap_observe_memo_t *memo = NULL;
     _find_obs_memo_resource(&memo, resource);
 
@@ -1938,12 +1941,10 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
             memcpy(&aux.local, memo->notifier, sizeof(*memo->notifier));
             aux.flags = SOCK_AUX_SET_LOCAL;
         }
-        ssize_t bytes = _tl_send(&memo->socket, buf, len, memo->observer, &aux);
-        return (size_t)((bytes > 0) ? bytes : 0);
+        ret = _tl_send(&memo->socket, buf, len, memo->observer, &aux);
     }
-    else {
-        return 0;
-    }
+    mutex_unlock(&_coap_state.lock);
+    return ret <= 0 ? 0 : (size_t)ret;
 }
 
 uint8_t gcoap_op_state(void)

@@ -1077,6 +1077,9 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
  *
  * First verifies that an observer has been registered for the resource.
  *
+ * @post    If this function returns @see GCOAP_OBS_INIT_OK you have to call
+ *          @ref gcoap_obs_send() afterwards to release a mutex.
+ *
  * @param[out] pdu      Notification metadata
  * @param[out] buf      Buffer containing the PDU
  * @param[in] len       Length of the buffer
