@@ -42,6 +42,7 @@
 typedef TcCount8 Tcc;
 #define TCC_CTRLA_ENABLE TC_CTRLA_ENABLE
 #define TCC_SYNCBUSY_CC0 TC_SYNCBUSY_CC0
+#define TCC_STATUS_SYNCBUSY TC_STATUS_SYNCBUSY
 #ifdef TC_SYNCBUSY_MASK
 #define TCC_SYNCBUSY_MASK TC_SYNCBUSY_MASK
 #endif
@@ -216,8 +217,8 @@ static void poweroff(pwm_t dev)
 static void _tc_init(Tc *tc, pwm_mode_t mode, uint8_t prescaler, uint8_t res)
 {
     /* reset TC module */
-    tc->COUNT8.CTRLA.bit.SWRST = 1;
-    while (tc->COUNT8.CTRLA.bit.SWRST) {}
+    tc->COUNT8.CTRLA.reg |= TC_CTRLA_SWRST;
+    while (tc->COUNT8.CTRLA.reg & TC_CTRLA_SWRST) {}
 
     /* set PWM mode */
     switch (mode) {
@@ -250,7 +251,7 @@ static void _tc_init(Tc *tc, pwm_mode_t mode, uint8_t prescaler, uint8_t res)
     tc->COUNT8.PER.reg = (res - 1);
 
 #ifdef TC_STATUS_SYNCBUSY
-    while (tc->COUNT8.STATUS.bit.SYNCBUSY) {}
+    while (tc->COUNT8.STATUS.reg & TC_STATUS_SYNCBUSY) {}
 #else
     while (tc->COUNT8.SYNCBUSY.reg) {}
 #endif
@@ -361,7 +362,7 @@ static void _tc_set(Tc *tc, uint8_t chan, uint16_t value)
     tc->COUNT8.CC[chan].reg = value;
 
 #ifdef TC_STATUS_SYNCBUSY
-    while (tc->COUNT8.STATUS.bit.SYNCBUSY) {}
+    while (tc->COUNT8.STATUS.reg & TC_STATUS_SYNCBUSY) {}
 #else
     while (tc->COUNT8.SYNCBUSY.reg & (TC_SYNCBUSY_CC0 << chan)) {}
 #endif
@@ -375,7 +376,7 @@ static void _tcc_set(Tcc *tcc, uint8_t chan, uint16_t value)
 #ifdef TCC_SYNCBUSY_MASK
     while (tcc->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
 #else
-    while (tcc->STATUS.bit.SYNCBUSY) {}
+    while (tcc->STATUS.reg & TCC_STATUS_SYNCBUSY) {}
 #endif
 }
 
