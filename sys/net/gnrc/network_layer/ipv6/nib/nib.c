@@ -1458,17 +1458,18 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router)
 {
     if ((router->next_hop != NULL) && (router->next_hop->mode & _DRL)) {
         _nib_offl_entry_t *route = NULL;
-        unsigned iface = _nib_onl_get_if(router->next_hop);
-        ipv6_addr_t addr = router->next_hop->ipv6;
+        _nib_onl_entry_t *next_hop = router->next_hop;
 
         _nib_drl_remove(router);
-        /* also remove all routes to that router */
+        /* The Router Lifetime applies only to
+           the router's usefulness as a default router; it
+           does not apply to information contained in other
+           message fields or options. Options that need time
+           limits for their information include their own
+           lifetime fields.
+           (https://datatracker.ietf.org/doc/html/rfc4861#section-4.2) */
         while ((route = _nib_offl_iter(route))) {
-            if ((route->next_hop != NULL) &&
-                (_nib_onl_get_if(route->next_hop) == iface) &&
-                (ipv6_addr_equal(&route->next_hop->ipv6, &addr))) {
-                route->mode = _EMPTY;
-                route->next_hop->mode &= ~_DST;
+            if (route->next_hop == next_hop) {
                 _nib_offl_clear(route);
                 /* XXX routing protocol gets informed in case NUD
                  * determines ipv6->src (still in neighbor cache) to be

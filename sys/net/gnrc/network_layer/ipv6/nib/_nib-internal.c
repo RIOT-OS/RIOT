@@ -25,6 +25,7 @@
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
+#include "net/ipv6/addr.h"
 #include "random.h"
 
 #include "_nib-internal.h"
@@ -378,6 +379,20 @@ void _nib_drl_remove(_nib_dr_entry_t *nib_dr)
     if (nib_dr->next_hop != NULL) {
         _evtimer_del(&nib_dr->rtr_timeout);
         nib_dr->next_hop->mode &= ~(_DRL);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC)
+        /*  When removing a router from the Default
+            Router list, the node MUST update the Destination Cache in such a way
+            that all entries using the router perform next-hop determination
+            again rather than continue sending traffic to the (deleted) router.
+            (https://datatracker.ietf.org/doc/html/rfc4861#section-6.3.5)
+        */
+        _nib_offl_entry_t *dc = NULL;
+        while ((dc = _nib_offl_iter(dc))) {
+            if ((dc->mode & _DC) && dc->next_hop == nib_dr->next_hop) {
+                _nib_dc_remove(dc);
+            }
+        }
+#endif
         _nib_onl_clear(nib_dr->next_hop);
         memset(nib_dr, 0, sizeof(_nib_dr_entry_t));
     }
@@ -538,20 +553,27 @@ static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 
 void _nib_offl_clear(_nib_offl_entry_t *dst)
 {
-    if (dst->next_hop != NULL) {
-        _nib_offl_entry_t *ptr;
-        for (ptr = _dsts; _in_dsts(ptr); ptr++) {
-            /* there is another dst pointing to next-hop => only remove dst */
-            if ((dst != ptr) && (dst->next_hop == ptr->next_hop)) {
-                break;
+    if (dst->mode == _EMPTY) {
+        if (dst->next_hop != NULL) {
+            _nib_offl_entry_t *ptr;
+            for (ptr = _dsts; _in_dsts(ptr); ptr++) {
+                /* there is another dst pointing to next-hop => only remove dst */
+                if ((dst != ptr) && (dst->next_hop == ptr->next_hop)) {
+                    break;
+                }
+            }
+            /* we iterated and found no further dst pointing to next-hop */
+            if (!_in_dsts(ptr)) {
+                dst->next_hop->mode &= ~(_DST);
+                _nib_onl_clear(dst->next_hop);
             }
         }
-        /* we iterated and found no further dst pointing to next-hop */
-        if (!_in_dsts(ptr)) {
-            dst->next_hop->mode &= ~(_DST);
-            _nib_onl_clear(dst->next_hop);
-        }
         memset(dst, 0, sizeof(_nib_offl_entry_t));
+    }
+    else {
+        DEBUG("nib: offlink entry %s/%u with mode %u not cleared\n",
+              ipv6_addr_to_str(addr_str, &dst->pfx, sizeof(addr_str)),
+              dst->pfx_len, dst->mode);
     }
 }
 
