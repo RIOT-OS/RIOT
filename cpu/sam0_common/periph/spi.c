@@ -73,20 +73,26 @@ static inline bool _is_qspi(spi_t bus)
 #endif
 }
 
-static inline void _qspi_clk(unsigned on)
+static inline void _qspi_clk_enable(void)
 {
 #ifdef QSPI
-    /* enable/disable QSPI clock */
-    MCLK->APBCMASK.bit.QSPI_ = on;
-#else
-    (void)on;
+    /* enable QSPI clock */
+    MCLK->APBCMASK.reg |= MCLK_APBCMASK_QSPI;
+#endif
+}
+
+static inline void _qspi_clk_disable(void)
+{
+#ifdef QSPI
+    /* disable QSPI clock */
+    MCLK->APBCMASK.reg &= ~MCLK_APBCMASK_QSPI;
 #endif
 }
 
 static inline void poweron(spi_t bus)
 {
     if (_is_qspi(bus)) {
-        _qspi_clk(1);
+        _qspi_clk_enable();
     } else {
         sercom_clk_en(dev(bus));
     }
@@ -95,7 +101,7 @@ static inline void poweron(spi_t bus)
 static inline void poweroff(spi_t bus)
 {
     if (_is_qspi(bus)) {
-        _qspi_clk(0);
+        _qspi_clk_disable();
     } else {
         sercom_clk_dis(dev(bus));
     }
@@ -107,9 +113,9 @@ static inline void _reset(SercomSpi *dev)
     while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
 
 #ifdef SERCOM_SPI_STATUS_SYNCBUSY
-    while (dev->STATUS.bit.SYNCBUSY) {}
+    while (dev->STATUS.reg & SERCOM_SPI_STATUS_SYNCBUSY) {}
 #else
-    while (dev->SYNCBUSY.bit.SWRST) {}
+    while (dev->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST) {}
 #endif
 }
 
@@ -118,7 +124,7 @@ static inline void _disable(SercomSpi *dev)
     dev->CTRLA.reg = 0;
 
 #ifdef SERCOM_SPI_STATUS_SYNCBUSY
-    while (dev->STATUS.bit.SYNCBUSY) {}
+    while (dev->STATUS.reg & SERCOM_SPI_STATUS_SYNCBUSY) {}
 #else
     while (dev->SYNCBUSY.reg) {}
 #endif
@@ -126,10 +132,10 @@ static inline void _disable(SercomSpi *dev)
 
 static inline void _enable(SercomSpi *dev)
 {
-    dev->CTRLA.bit.ENABLE = 1;
+    dev->CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
 
 #ifdef SERCOM_SPI_STATUS_SYNCBUSY
-    while (dev->STATUS.bit.SYNCBUSY) {}
+    while (dev->STATUS.reg & SERCOM_SPI_STATUS_SYNCBUSY) {}
 #else
     while (dev->SYNCBUSY.reg) {}
 #endif
@@ -179,7 +185,7 @@ static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile vo
 static void _init_qspi(spi_t bus)
 {
     /* reset the peripheral */
-    QSPI->CTRLA.bit.SWRST = 1;
+    QSPI->CTRLA.reg |= QSPI_CTRLA_SWRST;
 
     QSPI->CTRLB.reg = QSPI_CTRLB_MODE_SPI
                     | QSPI_CTRLB_CSMODE_LASTXFER
@@ -202,13 +208,13 @@ static void _qspi_acquire(spi_mode_t mode, spi_clk_t clk)
                    | (mode << 1);
     _mode &= 0x3;
 
-    QSPI->CTRLA.bit.ENABLE = 1;
+    QSPI->CTRLA.reg |= QSPI_CTRLA_ENABLE;
     QSPI->BAUD.reg = QSPI_BAUD_BAUD(baud) | _mode;
 }
 
 static inline void _qspi_release(void)
 {
-    QSPI->CTRLA.bit.ENABLE = 0;
+    QSPI->CTRLA.reg &= ~QSPI_CTRLA_ENABLE;
 }
 
 static void _qspi_blocking_transfer(const void *out, void *in, size_t len)
@@ -223,7 +229,7 @@ static void _qspi_blocking_transfer(const void *out, void *in, size_t len)
         QSPI->TXDATA.reg = tmp;
 
         /* wait until byte has been sampled on MISO */
-        while (QSPI->INTFLAG.bit.RXC == 0) {}
+        while (!(QSPI->INTFLAG.reg & QSPI_INTFLAG_RXC)) {}
 
         /* consume the byte */
         tmp = QSPI->RXDATA.reg;
@@ -320,7 +326,7 @@ static void _spi_blocking_transfer(spi_t bus, const void *out, void *in, size_t 
         dev(bus)->DATA.reg = tmp;
 
         /* wait until byte has been sampled on MISO */
-        while (dev(bus)->INTFLAG.bit.RXC == 0) {}
+        while (!(dev(bus)->INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC)) {}
 
         /* consume the byte */
         tmp = dev(bus)->DATA.reg;
