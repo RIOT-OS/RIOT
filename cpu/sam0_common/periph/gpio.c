@@ -242,9 +242,9 @@ void gpio_write(gpio_t pin, int value)
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
 #ifdef CPU_COMMON_SAMD21
-#define EIC_SYNC() while (_EIC->STATUS.bit.SYNCBUSY)
+#define EIC_SYNC() while (_EIC->STATUS.reg & EIC_STATUS_SYNCBUSY)
 #else
-#define EIC_SYNC() while (_EIC->SYNCBUSY.bit.ENABLE)
+#define EIC_SYNC() while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE)
 #endif
 
 static int _exti(gpio_t pin)
@@ -349,7 +349,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     GCLK->CLKCTRL.reg = EIC_GCLK_ID
                       | GCLK_CLKCTRL_CLKEN
                       | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #else /* CPU_COMMON_SAML21 */
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
@@ -403,7 +403,7 @@ inline static void reenable_eic(gpio_eic_clock_t clock) {
                           | GCLK_CLKCTRL_CLKEN
                           | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
     }
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #else
     uint32_t ctrla_reg = EIC_CTRLA_ENABLE;
 
@@ -423,7 +423,7 @@ void gpio_pm_cb_enter(int deep)
 {
 #if defined(PM_SLEEPCFG_SLEEPMODE_STANDBY)
     (void) deep;
-    unsigned mode = PM->SLEEPCFG.bit.SLEEPMODE;
+    unsigned mode = PM->SLEEPCFG.reg & PM_SLEEPCFG_SLEEPMODE_Msk;
 
     if (mode == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
         DEBUG_PUTS("gpio: switching EIC to slow clock");
@@ -447,7 +447,7 @@ void gpio_pm_cb_leave(int deep)
 #if defined(PM_SLEEPCFG_SLEEPMODE_STANDBY)
     (void) deep;
 
-    if (PM->SLEEPCFG.bit.SLEEPMODE == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
+    if ((PM->SLEEPCFG.reg & PM_SLEEPCFG_SLEEPMODE_Msk) == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
         DEBUG_PUTS("gpio: switching EIC to fast clock");
         reenable_eic(_EIC_CLOCK_FAST);
     }
