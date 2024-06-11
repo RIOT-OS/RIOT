@@ -466,6 +466,18 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
                                               mac_size, mac_length);
 }
 
+psa_status_t psa_location_dispatch_mac_verify(const psa_key_attributes_t *attributes,
+                                              psa_algorithm_t alg,
+                                              const psa_key_slot_t *slot,
+                                              const uint8_t *input,
+                                              size_t input_length,
+                                              const uint8_t *mac,
+                                              size_t mac_length)
+{
+    return psa_algorithm_dispatch_mac_verify(attributes, alg, slot, input, input_length,
+                                             mac, mac_length);
+}
+
 psa_status_t psa_location_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
                                                   const psa_key_attributes_t *attributes,
                                                   const psa_key_slot_t *slot,
