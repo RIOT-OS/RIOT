@@ -149,6 +149,50 @@ static size_t TEST_4_EXPECTED_LEN = sizeof(TEST_4_EXPECTED);
 
 static uint8_t TEST_4_TAG_LEN = 16;
 
+/* Test 4A:
+
+    Variation of Test 4 to uncover a RIOT specific bug.
+
+    N: BBAA9988776655443322FFFF
+    A:
+    P: 0001020304050607
+    C: 8E4547845BBA5203750B97FC5C97E839B8C346EEA2F6508E
+
+    Test vector generated using PyCryptodome:
+    >>> from Crypto.Cipher import AES
+    >>> key = bytearray.fromhex('000102030405060708090A0B0C0D0E0F')
+    >>> nonce = bytearray.fromhex('BBAA9988776655443322FFFF')
+    >>> plaintext = bytearray.fromhex('0001020304050607')
+    >>> cipher = AES.new(key, AES.MODE_OCB, nonce=nonce)
+    >>> ciphertext,tag = cipher.encrypt_and_digest(plaintext)
+    >>> print((ciphertext+tag).hex())
+*/
+static uint8_t *TEST_4A_KEY = TEST_KEY;
+
+static uint8_t TEST_4A_NONCE[] = {
+    0xBB, 0xAA, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44,
+    0x33, 0x22, 0xFF, 0xFF,
+};
+static size_t TEST_4A_NONCE_LEN = 12;
+
+static uint8_t TEST_4A_INPUT[] = {
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
+};
+static size_t TEST_4A_INPUT_LEN = sizeof(TEST_4A_INPUT);
+
+static uint8_t *TEST_4A_ADATA;
+
+static size_t TEST_4A_ADATA_LEN = 0;
+
+static uint8_t TEST_4A_EXPECTED[] = {
+    0x8E, 0x45, 0x47, 0x84, 0x5B, 0xBA, 0x52, 0x03,
+    0x75, 0x0B, 0x97, 0xFC, 0x5C, 0x97, 0xE8, 0x39,
+    0xB8, 0xC3, 0x46, 0xEE, 0xA2, 0xF6, 0x50, 0x8E
+};
+static size_t TEST_4A_EXPECTED_LEN = sizeof(TEST_4A_EXPECTED);
+
+static uint8_t TEST_4A_TAG_LEN = 16;
+
 /* Test 16:
     N: BBAA9988776655443322110F
     A:
@@ -301,6 +345,7 @@ static void test_crypto_modes_ocb_encrypt(void)
     do_test_encrypt_op(2);
     do_test_encrypt_op(3);
     do_test_encrypt_op(4);
+    do_test_encrypt_op(4A);
     do_test_encrypt_op(16);
     do_test_encrypt_op(17);
 }
@@ -395,6 +440,7 @@ static void test_crypto_modes_ocb_decrypt(void)
     do_test_decrypt_op(2);
     do_test_decrypt_op(3);
     do_test_decrypt_op(4);
+    do_test_decrypt_op(4A);
     do_test_decrypt_op(16);
     do_test_decrypt_op(17);
 }
