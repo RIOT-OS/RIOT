@@ -681,8 +681,13 @@ typedef enum {
 static inline void sam0_set_voltage_regulator(sam0_supc_t src)
 {
 #ifdef REG_SUPC_VREG
-    SUPC->VREG.bit.SEL = src;
-    while (!SUPC->STATUS.bit.VREGRDY) {}
+    if (src == SAM0_VREG_BUCK) {
+        SUPC->VREG.reg |= (1 << SUPC_VREG_SEL_Pos);
+    }
+    else {
+        SUPC->VREG.reg &= ~(1 << SUPC_VREG_SEL_Pos);
+    }
+    while (!(SUPC->STATUS.reg & SUPC_STATUS_VREGRDY)) {}
 #else
     (void) src;
     assert(0);
@@ -867,7 +872,7 @@ static inline void sercom_set_gen(void *sercom, uint8_t gclk)
 static inline bool cpu_woke_from_backup(void)
 {
 #ifdef RSTC_RCAUSE_BACKUP
-    return RSTC->RCAUSE.bit.BACKUP;
+    return RSTC->RCAUSE.reg & RSTC_RCAUSE_BACKUP;
 #else
     return false;
 #endif
