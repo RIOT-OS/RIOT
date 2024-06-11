@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "event.h"
 #include "net/coap.h"
 #include "net/gcoap.h"
 #include "net/gcoap/forward_proxy.h"
@@ -1979,6 +1980,11 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
 void gcoap_forward_proxy_post_event(void *arg)
 {
     event_post(&_queue, arg);
+}
+
+event_queue_t *gcoap_get_event_queue(void)
+{
+    return &_queue;
 }
 
 /* separate response API */
