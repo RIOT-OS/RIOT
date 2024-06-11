@@ -106,14 +106,19 @@ static bool sdio_test_type(sdhc_state_t *state);
 
 static bool _card_detect(sdhc_state_t *state)
 {
-    return state->dev->PSR.bit.CARDINS;
+    return state->dev->PSR.reg & SDHC_PSR_CARDINS;
 }
 
 static inline void _clock_sdcard(sdhc_state_t *state, bool on)
 {
     (void)state;
 
-    SDHC_DEV->CCR.bit.SDCLKEN = on;
+    if (on) {
+        SDHC_DEV->CCR.reg |= SDHC_CCR_SDCLKEN;
+    }
+    else {
+        SDHC_DEV->CCR.reg &= ~SDHC_CCR_SDCLKEN;
+    }
 }
 
 static bool _check_mask(uint32_t val, uint32_t mask)
@@ -230,7 +235,7 @@ static void _init_clocks(sdhc_state_t *state)
                                          | GCLK_PCHCTRL_GEN(SDHC_CLOCK);
         GCLK->PCHCTRL[SDHC0_GCLK_ID_SLOW].reg = GCLK_PCHCTRL_CHEN
                                               | GCLK_PCHCTRL_GEN(SDHC_CLOCK_SLOW);
-        MCLK->AHBMASK.bit.SDHC0_ = 1;
+        MCLK->AHBMASK.reg |= MCLK_AHBMASK_SDHC0;
         isr_ctx_0 = state;
         NVIC_EnableIRQ(SDHC0_IRQn);
     }
@@ -249,7 +254,7 @@ static void _init_clocks(sdhc_state_t *state)
                                          | GCLK_PCHCTRL_GEN(SDHC_CLOCK);
         GCLK->PCHCTRL[SDHC1_GCLK_ID_SLOW].reg = GCLK_PCHCTRL_CHEN
                                               | GCLK_PCHCTRL_GEN(SDHC_CLOCK_SLOW);
-        MCLK->AHBMASK.bit.SDHC1_ = 1;
+        MCLK->AHBMASK.reg |= MCLK_AHBMASK_SDHC1;
         isr_ctx_1 = state;
         NVIC_EnableIRQ(SDHC1_IRQn);
     }
@@ -370,7 +375,7 @@ int sdhc_init(sdhc_state_t *state)
     _set_hc(state);
 
     /* if it is high speed capable, (well it is) */
-    if (IS_USED(SDHC_ENABLE_HS) && SDHC_DEV->CA0R.bit.HSSUP) {
+    if (IS_USED(SDHC_ENABLE_HS) && (SDHC_DEV->CA0R.reg & SDHC_CA0R_HSSUP)) {
         if (!_test_high_speed(state)) {
             res = -EIO;
             goto out;
@@ -441,7 +446,7 @@ bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
         do {
             if (--timeout == 0) {
                 SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD; /* reset command */
-                while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+                while (SDHC_DEV->SRR.reg & SDHC_SRR_SWRSTCMD) {}
                 return false;
             }
         } while (!(SDHC_DEV->PSR.reg & SDHC_PSR_DATLL(1))); /* DAT[0] is busy bit */
@@ -454,7 +459,7 @@ static void _set_speed(sdhc_state_t *state, uint32_t fsdhc)
 {
     (void)state;
 
-    if (SDHC_DEV->CCR.bit.SDCLKEN) {
+    if (SDHC_DEV->CCR.reg & SDHC_CCR_SDCLKEN) {
         /* wait for command/data to go inactive */
         while (SDHC_DEV->PSR.reg & (SDHC_PSR_CMDINHC | SDHC_PSR_CMDINHD)) {}
         /* disable the clock */
@@ -469,8 +474,8 @@ static void _set_speed(sdhc_state_t *state, uint32_t fsdhc)
     /* write the 10 bit clock divider */
     SDHC_DEV->CCR.reg = SDHC_CCR_SDCLKFSEL(div) | SDHC_CCR_USDCLKFSEL(div >> 8)
                       | SDHC_CCR_CLKGSEL | SDHC_CCR_INTCLKEN;
-    while (!SDHC_DEV->CCR.bit.INTCLKS) {}    /* wait for clock to be stable */
-    SDHC_DEV->CCR.bit.SDCLKEN = 1;           /* enable clock to card        */
+    while (!(SDHC_DEV->CCR.reg & SDHC_CCR_INTCLKS)) {}  /* wait for clock to be stable */
+    SDHC_DEV->CCR.reg |= SDHC_CCR_SDCLKEN;   /* enable clock to card        */
 }
 
 /**
@@ -487,7 +492,7 @@ static void _set_hc(sdhc_state_t *state)
     else {
         SDHC_DEV->HC1R.reg &= ~SDHC_HC1R_HSEN;
     }
-    if (!SDHC_DEV->HC2R.bit.PVALEN) {       /* PVALEN is probably always low */
+    if (!(SDHC_DEV->HC2R.reg & SDHC_HC2R_PVALEN)) {  /* PVALEN is probably always low */
         _set_speed(state, state->clock);
     }
     if (state->bus_width == 4) {
@@ -755,7 +760,7 @@ static bool _init_transfer(sdhc_state_t *state, uint32_t cmd, uint32_t arg, uint
         do {
             if (--timeout == 0) {
                 SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD; /* reset command */
-                while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+                while (SDHC_DEV->SRR.reg & SDHC_SRR_SWRSTCMD) {}
                 return false;
             }
         } while (!(SDHC_DEV->PSR.reg & SDHC_PSR_DATLL(1))); /* DAT[0] is busy bit */
@@ -830,7 +835,7 @@ int sdhc_read_blocks(sdhc_state_t *state, uint32_t address, void *dst, uint16_t 
 
     int num_words = (num_blocks * SD_MMC_BLOCK_SIZE) / 4;
     for (int words = 0; words < num_words; words++) {
-        while (!SDHC_DEV->PSR.bit.BUFRDEN) {}
+        while (!(SDHC_DEV->PSR.reg & SDHC_PSR_BUFRDEN)) {}
         *p++ = SDHC_DEV->BDPR.reg;
     }
 
@@ -916,7 +921,7 @@ int sdhc_write_blocks(sdhc_state_t *state, uint32_t address, const void *src,
     /* Write data */
     int num_words = (num_blocks * SD_MMC_BLOCK_SIZE) / 4;
     for (int words = 0; words < num_words; words++) {
-        while (!SDHC_DEV->PSR.bit.BUFWREN) {}
+        while (!(SDHC_DEV->PSR.reg & SDHC_PSR_BUFWREN)) {}
         SDHC_DEV->BDPR.reg = *p++;
     }
 
