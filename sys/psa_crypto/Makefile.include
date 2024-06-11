@@ -221,7 +221,6 @@ ifneq (,$(filter psa_mac_hmac_sha_224,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_mac_hmac_sha_256
-PSEUDOMODULES += psa_mac_hmac_sha_256_backend_periph
 PSEUDOMODULES += psa_mac_hmac_sha_256_backend_generic
 PSEUDOMODULES += psa_mac_hmac_sha_256_custom_backend
 
