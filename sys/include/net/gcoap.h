@@ -897,6 +897,16 @@ typedef struct {
 kernel_pid_t gcoap_init(void);
 
 /**
+ * @brief   Get a pointer to the internal gcoap event queue, to offload tasks to the gcoap thread
+ *          using RIOT's event API
+ *
+ * @warning     Beware to only use the event API on it.
+ *
+ * @return  Event queue pointer
+ */
+event_queue_t *gcoap_get_event_queue(void);
+
+/**
  * @brief   Starts listening for resource paths
  *
  * @pre @p listener is a valid pointer to a single listener (that is,
