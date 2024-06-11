@@ -1744,7 +1744,7 @@ static psa_status_t psa_mac_validate_alg_and_key_and_size(psa_key_attributes_t *
     psa_key_type_t type = psa_get_key_type(attr);
     psa_key_bits_t bits = psa_get_key_bits(attr);
 
-    if (!PSA_ALG_IS_HMAC(alg) || (PSA_ALG_GET_HASH(alg) != PSA_ALG_SHA_256)) {
+    if (!PSA_ALG_IS_HMAC(alg)) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 

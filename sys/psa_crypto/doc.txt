@@ -356,7 +356,6 @@
  *
  * #### HMAC SHA 256
  * - psa_mac_hmac_sha_256
- * - psa_mac_hmac_sha_256_backend_periph
  * - psa_mac_hmac_sha_256_custom_backend
  * - psa_mac_hmac_sha_256_backend_generic
  *

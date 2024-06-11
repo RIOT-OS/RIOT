@@ -376,25 +376,14 @@ endif
 ## HMAC SHA-256
 ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_256_custom_backend,$(USEMODULE)))
-    FEATURES_OPTIONAL += periph_hmac_sha_256
-    include $(RIOTMAKE)/features_check.inc.mk
-    # HACK: Due to kconfig migration, may cause problems
-    ifneq (,$(filter periph_hmac_sha_256,$(FEATURES_USED)))
-      USEMODULE += psa_mac_hmac_sha_256_backend_periph
-    else
-      USEMODULE += psa_mac_hmac_sha_256_backend_generic
-    endif
+    USEMODULE += psa_mac_hmac_sha_256_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_256_backend_periph,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_hmac_sha_256
-endif
-
 ifneq (,$(filter psa_mac_hmac_sha_256_backend_generic,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += psa_riot_hashes
-  USEMODULE += psa_riot_hashes_hmac_sha256
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_256
+  USEMODULE += psa_riot_mac_hmac_generic
 endif
 
 # HMAC SHA-384

@@ -649,34 +649,80 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
                                                 size_t mac_size,
                                                 size_t *mac_length)
 {
-    psa_status_t status = PSA_ERROR_NOT_SUPPORTED;
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    switch (alg) {
-    #if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        status = psa_mac_compute_hmac_sha256(attributes, key_data, *key_bytes, input, input_length,
-                                             mac, mac_size, mac_length);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-    #endif
-    default:
-        (void)status;
-        return PSA_ERROR_NOT_SUPPORTED;
+    if (!key_data || !key_bytes) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    (void)attributes;
-    (void)input;
-    (void)input_length;
-    (void)mac;
-    (void)mac_size;
-    (void)mac_length;
-    return PSA_SUCCESS;
+    switch (alg) {
+#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
+    case PSA_ALG_HMAC(PSA_ALG_MD5):
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+        return psa_generic_hmac_compute(key_data, *key_bytes, alg, input, input_length,
+                                        mac, mac_size, mac_length);
+#else
+        return PSA_ERROR_NOT_SUPPORTED;
+#endif
+#endif
+#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
+    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+        return psa_generic_hmac_compute(key_data, *key_bytes, alg, input, input_length,
+                                        mac, mac_size, mac_length);
+#else
+        return PSA_ERROR_NOT_SUPPORTED;
+#endif
+#endif
+#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
+    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+        return psa_generic_hmac_compute(key_data, *key_bytes, alg, input, input_length,
+                                        mac, mac_size, mac_length);
+#else
+        return PSA_ERROR_NOT_SUPPORTED;
+#endif
+#endif
+#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
+    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+        return psa_generic_hmac_compute(key_data, *key_bytes, alg, input, input_length,
+                                        mac, mac_size, mac_length);
+#else
+        return PSA_ERROR_NOT_SUPPORTED;
+#endif
+#endif
+#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
+    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+        return psa_generic_hmac_compute(key_data, *key_bytes, alg, input, input_length,
+                                        mac, mac_size, mac_length);
+#else
+        return PSA_ERROR_NOT_SUPPORTED;
+#endif
+#endif
+#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
+    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+        return psa_generic_hmac_compute(key_data, *key_bytes, alg, input, input_length,
+                                        mac, mac_size, mac_length);
+#else
+        return PSA_ERROR_NOT_SUPPORTED;
+#endif
+#endif
+    default:
+        (void)attributes;
+        (void)slot;
+        (void)input;
+        (void)input_length;
+        (void)mac;
+        (void)mac_size;
+        (void)mac_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 psa_status_t psa_algorithm_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
