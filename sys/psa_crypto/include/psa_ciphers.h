@@ -185,7 +185,7 @@ psa_status_t psa_cipher_chacha20_poly1305_decrypt(const psa_key_attributes_t *at
                                             size_t *output_length);
 #endif /* CONFIG_CHACHA20_POLY1305 */
 
-#if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
+#if IS_USED(MODULE_PSA_CIPHER_CHACHA_20) || defined(DOXYGEN)
 
 /**
  * @brief   Low level wrapper function to call a driver for ChaCha20 encryption/decryption.

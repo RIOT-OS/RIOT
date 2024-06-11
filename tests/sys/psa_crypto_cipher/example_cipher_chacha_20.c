@@ -49,35 +49,33 @@ psa_status_t example_cipher_chacha_20(void)
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
     size_t encr_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
-                                                             PSA_ALG_CHACHA20_POLY1305, sizeof(PLAINTEXT));
-    printf("output size: %d\n", encr_output_size);
+                                                             PSA_ALG_STREAM_CIPHER, sizeof(PLAINTEXT));
+
     uint8_t cipher_out[encr_output_size];
     uint8_t plain_out[sizeof(PLAINTEXT)];
     size_t output_len = 0;
 
-    psa_set_key_algorithm(&attr, PSA_ALG_CHACHA20_POLY1305);
+    psa_set_key_algorithm(&attr, PSA_ALG_STREAM_CIPHER);
     psa_set_key_usage_flags(&attr, usage);
     psa_set_key_bits(&attr, 256);
     psa_set_key_type(&attr, PSA_KEY_TYPE_CHACHA20);
-    printf("after set key specs\n");
+
     status = psa_import_key(&attr, KEY_CHACHA20, sizeof(KEY_CHACHA20), &key_id);
     if (status != PSA_SUCCESS) {
         return status;
     }
-    printf("after import key \n");
 
-    status = psa_cipher_encrypt(key_id, PSA_ALG_CHACHA20_POLY1305, PLAINTEXT,
+    status = psa_cipher_encrypt(key_id, PSA_ALG_STREAM_CIPHER, PLAINTEXT,
                                 sizeof(PLAINTEXT), cipher_out, encr_output_size, &output_len);
     if (status != PSA_SUCCESS) {
         return status;
     }
 
-    status = psa_cipher_decrypt(key_id, PSA_ALG_CHACHA20_POLY1305, cipher_out,
+    status = psa_cipher_decrypt(key_id, PSA_ALG_STREAM_CIPHER, cipher_out,
                                 sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
     if (status == PSA_SUCCESS) {
         return (memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) ? -1 : 0);
     }
     status = psa_destroy_key(key_id);
     return status;
-
 }

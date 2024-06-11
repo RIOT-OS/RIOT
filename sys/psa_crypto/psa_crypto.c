@@ -1019,6 +1019,11 @@ static psa_status_t psa_validate_unstructured_key_size(psa_key_type_t type, size
             return PSA_ERROR_INVALID_ARGUMENT;
         }
         break;
+    case PSA_KEY_TYPE_CHACHA20:
+        if (bits != 256) {
+            return PSA_ERROR_INVALID_ARGUMENT;
+        }
+        break;
     default:
         (void)bits;
         return PSA_ERROR_NOT_SUPPORTED;
@@ -1539,7 +1544,6 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
 
     if (PSA_KEY_TYPE_IS_UNSTRUCTURED(type)) {
         *bits = PSA_BYTES_TO_BITS(data_length);
-
         status = psa_validate_unstructured_key_size(type, *bits);
         if (status != PSA_SUCCESS) {
             return status;

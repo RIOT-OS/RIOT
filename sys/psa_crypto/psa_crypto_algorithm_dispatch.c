@@ -562,7 +562,8 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     switch (alg) {
     #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)||\
         IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)||\
-        IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
+        IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)||\
+        IS_USED(MODULE_PSA_CIPHER_CHACHA_20)
     case PSA_ALG_CBC_NO_PADDING:
         if (attributes->type != PSA_KEY_TYPE_AES) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -593,7 +594,7 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     #endif
-    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA_20)
     case PSA_ALG_STREAM_CIPHER:
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
             return psa_cipher_chacha20_encrypt(key_data, *key_bytes, 
@@ -669,8 +670,9 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     #endif
-    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA_20)
     case PSA_ALG_STREAM_CIPHER:
+    printf("before glue code");
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
             return psa_cipher_chacha20_decrypt(key_data, *key_bytes, 
                                                input, input_length,
@@ -687,6 +689,7 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
         }
     #endif
     default:
+        printf("got here");
         (void)slot;
         (void)input;
         (void)input_length;
