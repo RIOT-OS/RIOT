@@ -265,6 +265,27 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
                                                 size_t *mac_length);
 
 /**
+ * @brief   Dispatch a mac verification function to a specific backend.
+ *          See @ref psa_mac_verify()
+ *
+ * @param attributes
+ * @param alg
+ * @param slot
+ * @param input
+ * @param input_length
+ * @param mac
+ * @param mac_length
+ * @return @ref psa_status_t
+ */
+psa_status_t psa_algorithm_dispatch_mac_verify(const psa_key_attributes_t *attributes,
+                                               psa_algorithm_t alg,
+                                               const psa_key_slot_t *slot,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               const uint8_t *mac,
+                                               size_t mac_length);
+
+/**
  * @brief   Dispatch call of a mac sign setup function to a specific backend.
  *          See @ref psa_mac_sign_setup()
  *

@@ -1818,6 +1818,47 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
 
 }
 
+psa_status_t psa_mac_verify(psa_key_id_t key,
+                            psa_algorithm_t alg,
+                            const uint8_t *input,
+                            size_t input_length,
+                            const uint8_t *mac,
+                            size_t mac_length)
+{
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_slot_t *slot;
+    psa_status_t status;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !mac || !mac_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_get_key_attributes(key, &attr);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_mac_validate_alg_and_key_and_size(&attr, alg, mac_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_VERIFY_MESSAGE, alg);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_location_dispatch_mac_verify(&slot->attr, alg, slot, input, input_length,
+                                              mac, mac_length);
+    psa_unlock_key_slot(slot);
+
+    return status;
+}
+
 psa_status_t psa_mac_sign_setup(psa_mac_operation_t *operation,
                                 psa_key_id_t key,
                                 psa_algorithm_t alg)
@@ -1952,22 +1993,6 @@ psa_status_t psa_mac_abort(psa_mac_operation_t *operation)
     *operation = psa_mac_operation_init();
 
     return status;
-}
-
-psa_status_t psa_mac_verify(psa_key_id_t key,
-                            psa_algorithm_t alg,
-                            const uint8_t *input,
-                            size_t input_length,
-                            const uint8_t *mac,
-                            size_t mac_length)
-{
-    (void)key;
-    (void)alg;
-    (void)input;
-    (void)input_length;
-    (void)mac;
-    (void)mac_length;
-    return PSA_ERROR_NOT_SUPPORTED;
 }
 
 psa_status_t psa_purge_key(psa_key_id_t key)
