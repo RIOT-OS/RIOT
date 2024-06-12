@@ -177,7 +177,7 @@ typedef enum {
 #endif
 
 /**
- * @brief   Initialize a given UART device
+ * @brief   Initialize and acquire a given UART device
  *
  * The UART device will be initialized with the following configuration:
  * - 8 data bits
@@ -187,6 +187,14 @@ typedef enum {
  *
  * If no callback parameter is given (rx_cb := NULL), the UART will be
  * initialized in TX only mode.
+ *
+ * @pre     The caller is not calling `uart_init()` twice without a call of
+ *          to @ref uart_poweroff in between.
+ *
+ * @note    This may block if the UART is already acquired until it is released.
+ *          This allows sharing the underlying peripheral to provide other
+ *          serial interfaces (e.g. if the peripheral can also provide SPI, I2C,
+ *          etc.)
  *
  * @param[in] uart          UART device to initialize
  * @param[in] baud          desired symbol rate in baud
@@ -401,14 +409,17 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 void uart_write(uart_t uart, const uint8_t *data, size_t len);
 
 /**
- * @brief   Power on the given UART device
+ * @brief   Power on and acquire the given UART device
+ *
+ * The UART will resume with the configuration it was most recently configured
+ * with.
  *
  * @param[in] uart          the UART device to power on
  */
 void uart_poweron(uart_t uart);
 
 /**
- * @brief Power off the given UART device
+ * @brief Power off and release the given UART device
  *
  * @param[in] uart          the UART device to power off
  */
