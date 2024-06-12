@@ -1,0 +1,48 @@
+From 1bb14cb196c0e21c72902fead36748d4ee580bc4 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 8 Apr 2022 17:37:08 +0200
+Subject: [PATCH 4/4] src/csp_conn: do not force outgoing ports
+
+---
+ src/csp_conn.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/src/csp_conn.c b/src/csp_conn.c
+index e9ea014..ce78bfa 100644
+--- a/src/csp_conn.c
++++ b/src/csp_conn.c
+@@ -13,11 +13,7 @@
+ #include <csp/csp_debug.h>
+ #include "csp_rdp_queue.h"
+ #include "csp_rdp.h"
+-
+-#define OUTGOING_PORTS (((1 << (CSP_ID2_PORT_SIZE)) - 1) - CSP_PORT_MAX_BIND)
+-#if OUTGOING_PORTS > CSP_CONN_MAX
+-#error "More connections than available outgoing ports"
+-#endif
++#include "csp_port.h"
+ 
+ /* Connection pool */
+ static csp_conn_t arr_conn[CSP_CONN_MAX] __attribute__((section(".noinit")));
+@@ -52,7 +48,7 @@ void csp_conn_init(void) {
+ 	for (int i = 0; i < CSP_CONN_MAX; i++) {
+ 		csp_conn_t * conn = &arr_conn[i];
+ 
+-		conn->sport_outgoing = CSP_PORT_MAX_BIND + 1 + i;
++		conn->sport_outgoing = CSP_PORT_UNSET;
+ 		conn->state = CONN_CLOSED;
+ 		conn->idin.flags = 0;
+ 		conn->rx_queue = csp_queue_create_static(CSP_CONN_RXQUEUE_LEN, sizeof(csp_packet_t *), conn->rx_queue_static_data, &conn->rx_queue_static);
+@@ -308,7 +304,8 @@ csp_conn_t * csp_connect(uint8_t prio, uint16_t dest, uint8_t dport, uint32_t ti
+ 		return NULL;
+ 	}
+ 
+-	/* Outgoing connections always use pre-defined source port */
++	/* get a port for the outgoing connection */
++	conn->sport_outgoing = csp_port_get_dyn_free();
+ 	conn->idout.sport = conn->sport_outgoing;
+ 	conn->idin.dport = conn->sport_outgoing;
+ 	conn->dest_socket = NULL;
+-- 
+2.32.0
+
