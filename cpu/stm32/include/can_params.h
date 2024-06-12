@@ -30,7 +30,15 @@ extern "C" {
 /** Default STM32 CAN devices config */
 static const can_conf_t candev_conf[] = {
     {
-#if defined(CPU_FAM_STM32F0)
+#if defined(CPU_FAM_STM32G4)
+        .can = FDCAN1,
+        .rcc_mask = RCC_APB1ENR1_FDCANEN,
+        .rx_pin = GPIO_PIN(PORT_A, 11),
+        .tx_pin = GPIO_PIN(PORT_A, 12),
+        .af = GPIO_AF9,
+        .it0_irqn = FDCAN1_IT0_IRQn,
+        .it1_irqn = FDCAN1_IT1_IRQn,
+#elif defined(CPU_FAM_STM32F0)
         .can = CAN,
         .rcc_mask = RCC_APB1ENR_CANEN,
         .rx_pin = GPIO_PIN(PORT_A, 11),
