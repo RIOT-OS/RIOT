@@ -7,6 +7,11 @@
 
 if USEMODULE_PERIPH_RTC
 
+config PERIPH_RTC_SETTER_CALLBACK
+    bool "Support for RTC time change callback"
+    help
+        Provides a time change callback for RTC
+
 endif #MODULE_PERIPH_RTC
 
 # TODO: this module is actually just an artifact from the way periph_init_%

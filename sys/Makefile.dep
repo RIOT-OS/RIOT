@@ -645,6 +645,10 @@ ifneq (,$(filter tiny_strerror_as_strerror,$(USEMODULE)))
   USEMODULE += tiny_strerror
 endif
 
+ifneq (,$(filter sys_bus_rtc, $(USEMODULE)))
+  USEMODULE += periph_rtc_setter_callback
+endif
+
 # include ztimer dependencies
 ifneq (,$(filter ztimer ztimer_% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep

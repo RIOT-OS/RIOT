@@ -13,6 +13,7 @@ from testrunner import run
 
 BOARD = os.getenv('BOARD', 'native')
 DATE_PATTERN = r'\d{4}\-\d{2}\-\d{2} \d{2}\:\d{2}\:\d{2}'
+TIMEDIFF_PATTERN = r'-?\d{1,12}'
 
 
 def testfunc(child):
@@ -27,6 +28,12 @@ def testfunc(child):
     clock_value = child.match.group(1)
     assert clock_set == clock_value
     assert clock_reboot != clock_value
+
+    child.expect(r'Resetting clock to   ({})'.format(DATE_PATTERN))
+    child.expect(r'    Time change of   ({}) milliseconds'.format(TIMEDIFF_PATTERN))
+    time_change_value = child.match.group(1)
+    # some RTC implementations are millisecond accurate
+    assert abs(int(time_change_value) - 42000) < 10
 
     child.expect(r'  Setting alarm to   ({})'.format(DATE_PATTERN))
     alarm_set = child.match.group(1)

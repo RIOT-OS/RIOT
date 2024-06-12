@@ -79,6 +79,10 @@ int rtc_set_time(struct tm *localt)
     /* normalize input */
     rtc_tm_normalize(localt);
 
+    /* reset clock tick counter (CTC) */
+    RTC_CCR |= 0x1UL; /* set CTCRST */
+    RTC_CCR &= ~0x1UL; /* unset CTCRST */
+
     /* set clock */
     RTC_SEC   = localt->tm_sec;
     RTC_MIN   = localt->tm_min;
@@ -113,17 +117,17 @@ int rtc_get_time(struct tm *localt)
 
 int rtc_get_time_ms(struct tm *time, uint16_t *ms)
 {
-    uint16_t ccr_before, ccr_after;
+    uint16_t ctc_before, ctc_after;
 
     /* loop in case of overflow */
     do {
-        ccr_before = RTC_CCR >> 1;
+        ctc_before = RTC_CTC >> 1;
         rtc_get_time(time);
-        ccr_after = RTC_CCR >> 1;
-    } while (ccr_before > ccr_after);
+        ctc_after = RTC_CTC >> 1;
+    } while (ctc_before > ctc_after);
 
     /* CCR is 15-bit counter, increments second with each overflow */
-    *ms = (ccr_after * MS_PER_SEC) >> 15;
+    *ms = (ctc_after * MS_PER_SEC) >> 15;
 
     return 0;
 }
