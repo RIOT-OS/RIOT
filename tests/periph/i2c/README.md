@@ -7,6 +7,16 @@ Background
 ==========
 Test for the low-level I2C driver.  Can be run manually or using python script interface.
 
+Testing Software I2C
+====================
+
+To test the software I2C bus instead of the hardware I2C bus using, say pin
+P0.1 for SCL and P0.2 for SDA, run:
+
+```
+make BOARD=<BOARD-NAME> SOFT_I2C=1 'PIN_SCL=GPIO_PIN(0,1)' 'PIN_SDA=GPIO_PIN(0,2)' flash term
+```
+
 Glossary
 ==========
 DEV - The I2C device number, this is usually 0.
