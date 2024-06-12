@@ -36,14 +36,16 @@ psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha_20_ctx_t *ctx,
                                        psa_cipher_chacha_20_nonce_t nonce,
                                        uint8_t *key,
                                        uint32_t initial_counter,
-                                       CRYS_CHACHA_EncryptMode_t mode)
+                                       psa_encrypt_or_decrypt_t mode)
 {
+    
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA_Init((CRYS_CHACHAUserContext_t *) ctx,
                                                  nonce, 
                                                  CRYS_CHACHA_Nonce96BitSize,
                                                  key,
-                                                 initial_counter, mode);
+                                                 initial_counter,
+                                                 (CRYS_CHACHA_EncryptMode_t) mode);
     cryptocell_310_disable();
     
     if (periph_status != CRYS_OK) {

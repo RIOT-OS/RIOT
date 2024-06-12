@@ -202,7 +202,7 @@ psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha_20_ctx_t *ctx,
                                        psa_cipher_chacha_20_nonce_t nonce,
                                        uint8_t *key,
                                        uint32_t initial_counter,
-                                       CRYS_CHACHA_EncryptMode_t mode);
+                                       psa_encrypt_or_decrypt_t mode);
 
 /**
  * @brief   ChaCha update function, encrypting/decrypting aligned blocks.
