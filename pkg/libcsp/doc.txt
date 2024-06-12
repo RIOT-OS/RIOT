@@ -1,0 +1,14 @@
+/**
+ * @defgroup pkg_libcsp   LibCSP (CubeSat Space Protocol)
+ * @ingroup  pkg
+ * @brief    Cubesat Space Protocol - A small network-layer delivery protocol designed for Cubesats
+ *
+ * # Introduction
+ *
+ *
+ * # License
+ *
+ * Licensed under MIT.
+ *
+ * @see      https://github.com/libcsp/libcsp
+ */
