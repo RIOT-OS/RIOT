@@ -352,27 +352,12 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     return pid;
 }
 
-static const char *state_names[STATUS_NUMOF] = {
-    [STATUS_STOPPED] = "stopped",
-    [STATUS_ZOMBIE] = "zombie",
-    [STATUS_SLEEPING] = "sleeping",
-    [STATUS_MUTEX_BLOCKED] = "bl mutex",
-    [STATUS_RECEIVE_BLOCKED] = "bl rx",
-    [STATUS_SEND_BLOCKED] = "bl send",
-    [STATUS_REPLY_BLOCKED] = "bl reply",
-    [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
-    [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
-    [STATUS_MBOX_BLOCKED] = "bl mbox",
-    [STATUS_COND_BLOCKED] = "bl cond",
-    [STATUS_RUNNING] = "running",
-    [STATUS_PENDING] = "pending",
-};
-
 #define STATE_NAME_UNKNOWN "unknown"
 
 const char *thread_state_to_string(thread_status_t state)
 {
-    const char *name = state_names[state] ? state_names[state] : NULL;
+    assert((unsigned)state < STATUS_NUMOF);
+    const char *name = thread_state_names[state];
 
     assert(name != NULL); /* if compiling with assertions, this is an error that
                              indicates that the table above is incomplete */
