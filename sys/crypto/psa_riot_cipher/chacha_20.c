@@ -24,13 +24,13 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
-                                         uint32_t key_buffer_size,
+psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
+                                         size_t key_buffer_size,
                                          const uint8_t *input,
-                                         uint32_t input_length,
+                                         size_t input_length,
                                          uint8_t *output,
-                                         uint32_t output_size,
-                                         uint32_t *output_length)
+                                         size_t output_size,
+                                         size_t *output_length)
 {
     DEBUG("RIOT ChaCha20 Cipher encryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -56,13 +56,13 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
-                                         uint32_t key_buffer_size,
+psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
+                                         size_t key_buffer_size,
                                          const uint8_t *input,
-                                         uint32_t input_length,
+                                         size_t input_length,
                                          uint8_t *output,
-                                         uint32_t output_size,
-                                         uint32_t *output_length)
+                                         size_t output_size,
+                                         size_t *output_length)
 {
     DEBUG("RIOT ChaCha20 Cipher decryption");
 

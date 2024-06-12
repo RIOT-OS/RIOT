@@ -185,7 +185,7 @@ psa_status_t psa_cipher_chacha20_poly1305_decrypt(const psa_key_attributes_t *at
                                             size_t *output_length);
 #endif /* CONFIG_CHACHA20_POLY1305 */
 
-#if IS_USED(MODULE_PSA_CIPHER_CHACHA__20) || defined(DOXYGEN)
+#if IS_USED(MODULE_PSA_CIPHER_CHACHA_20) || defined(DOXYGEN)
 
 /**
  * @brief   ChaCha setup function
@@ -198,8 +198,8 @@ psa_status_t psa_cipher_chacha20_poly1305_decrypt(const psa_key_attributes_t *at
  * @param   mode            ChaCha mode of type @c CRYS_CHACHA_EncryptMode_t
  * @return  psa_status_t
  */
-psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha20_ctx_t *ctx,
-                                       psa_cipher_chacha20_nonce_t nonce,
+psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha_20_ctx_t *ctx,
+                                       psa_cipher_chacha_20_nonce_t nonce,
                                        uint8_t *key,
                                        uint32_t initial_counter,
                                        CRYS_CHACHA_EncryptMode_t mode);
@@ -213,7 +213,7 @@ psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha20_ctx_t *ctx,
  * @param   output      Output Buffer for the encrypted/decrypted input
  * @return  psa_status_t
  */
-psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
+psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha_20_ctx_t *ctx,
                                         uint8_t *input,
                                         uint32_t inputSize,
                                         uint8_t *output);
@@ -227,7 +227,7 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
  * @param   output      Output Buffer for the encrypted/decrypted input
  * @return  psa_status_t
  */
-psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
+psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha_20_ctx_t *ctx,
                                         uint8_t *input,
                                         uint32_t inputSize,
                                         uint8_t *output);
@@ -246,13 +246,13 @@ psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
  * @param output_length     Actual size of the output (including nonce).
 */
-psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
-                                         uint32_t key_buffer_size,
+psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
+                                         size_t key_buffer_size,
                                          const uint8_t *input,
-                                         uint32_t input_length,
+                                         size_t input_length,
                                          uint8_t *output,
-                                         uint32_t output_size,
-                                         uint32_t *output_length);
+                                         size_t output_size,
+                                         size_t *output_length);
 
 /**
  * @brief   Low level wrapper function to call a driver for ChaCha20 decryption.
@@ -269,13 +269,13 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
  * @param output_length     Actual size of the output.
 */
-psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
-                                         uint32_t key_buffer_size,
+psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
+                                         size_t key_buffer_size,
                                          const uint8_t *input,
-                                         uint32_t input_length,
+                                         size_t input_length,
                                          uint8_t *output,
-                                         uint32_t output_size,
-                                         uint32_t *output_length);
+                                         size_t output_size,
+                                         size_t *output_length);
 
 #endif
 #ifdef __cplusplus

@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 #if IS_USED(MODULE_PERIPH_CIPHER_CHACHA_20)
-#include "psa_periph_chacha20_ctx.h"
+#include "psa_periph_chacha_20_ctx.h"
 #endif
 
 #if IS_USED(MODULE_PERIPH_HASH_SHA_1) || IS_USED(MODULE_PERIPH_HASH_SHA_224) || \

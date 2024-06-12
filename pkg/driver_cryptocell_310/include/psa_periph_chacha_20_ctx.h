@@ -30,12 +30,12 @@ extern "C" {
 /**
  * @brief   Map driver specific ChaCha20 context to PSA context
  */
-typedef CRYS_CHACHAUserContext_t psa_cipher_chacha20_ctx_t;
+typedef CRYS_CHACHAUserContext_t psa_cipher_chacha_20_ctx_t;
 
 /**
  * @brief Map driver specific ChaCha20 nonce to PSA nonce
  */
-typedef CRYS_CHACHA_Nonce_t psa_cipher_chacha20_nonce_t;
+typedef CRYS_CHACHA_Nonce_t psa_cipher_chacha_20_nonce_t;
 #endif
 
 #ifdef __cplusplus

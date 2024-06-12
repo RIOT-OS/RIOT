@@ -26,23 +26,23 @@ extern "C" {
 #include "psa/crypto.h"
 #include "crys_chacha.h"
 #include "cryptocell_310_util.h"
-#include "psa_ciphers.h" //TODO: warum kein include in den anderen gluecodes
+//#include "psa_ciphers.h" //TODO: warum kein include in den anderen gluecodes
 #include "psa_error.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha20_ctx_t *ctx,
-                                       psa_cipher_chacha20_nonce_t nonce,
+psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha_20_ctx_t *ctx,
+                                       psa_cipher_chacha_20_nonce_t nonce,
                                        uint8_t *key,
                                        uint32_t initial_counter,
                                        CRYS_CHACHA_EncryptMode_t mode)
 {
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA_Init((CRYS_CHACHAUserContext_t *) ctx,
-                                                 (CRYS_CHACHA_Nonce_t) nonce, 
+                                                 nonce, 
                                                  CRYS_CHACHA_Nonce96BitSize,
-                                                 (CRYS_CHACHA_Key_t) key,
+                                                 key,
                                                  initial_counter, mode);
     cryptocell_310_disable();
     
@@ -55,7 +55,7 @@ psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha20_ctx_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
+psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha_20_ctx_t *ctx,
                                         uint8_t *input,
                                         uint32_t input_length,
                                         uint8_t *output,
@@ -81,7 +81,7 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
+psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha_20_ctx_t *ctx,
                                         uint8_t *input,
                                         uint32_t input_length,
                                         uint8_t *output,
@@ -104,21 +104,21 @@ psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
         CRYS_CHACHA_Free((CRYS_CHACHAUserContext_t *)ctx);
         return CRYS_to_psa_error(periph_status);
     }
-    return PSA_SUCCESS
+    return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
-                                         uint32_t key_buffer_size,
+psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
+                                         size_t key_buffer_size,
                                          const uint8_t *input,
-                                         uint32_t input_length,
+                                         size_t input_length,
                                          uint8_t *output,
-                                         uint32_t output_size,
-                                         uint32_t *output_length)
+                                         size_t output_size,
+                                         size_t *output_length)
 {
     DEBUG("Peripheral ChaCha20 Cipher encryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (output_length < (input_length + CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
+    if (output_size < (input_length + CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -134,7 +134,7 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,
                                             key_buffer, 0UL,
-                                            CRYS_CHACHA_Encrypt, input,
+                                            CRYS_CHACHA_Encrypt, (uint8_t *)input,
                                             input_length, output);
     cryptocell_310_disable();
     
@@ -149,13 +149,13 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
-                                         uint32_t key_buffer_size,
+psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
+                                         size_t key_buffer_size,
                                          const uint8_t *input,
-                                         uint32_t input_length,
+                                         size_t input_length,
                                          uint8_t *output,
-                                         uint32_t output_size,
-                                         uint32_t *output_length)
+                                         size_t output_size,
+                                         size_t *output_length)
 {
     DEBUG("Peripheral ChaCha20 Cipher decryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -166,16 +166,17 @@ psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
     }
 
 
-    if (output_length < (input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
+    if (output_size < (input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    CRYS_CHACHA_Nonce_t nonce = &input[input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES];
+    CRYS_CHACHA_Nonce_t nonce;
+    memcpy(nonce, &input[input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES], CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
 
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,
                                             key_buffer, 0UL,
-                                            CRYS_CHACHA_Decrypt, input,
+                                            CRYS_CHACHA_Decrypt, (uint8_t *)input,
                                             input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES,
                                             output);
     cryptocell_310_disable();

@@ -28,7 +28,3 @@ endif
 ifneq (,$(filter psa_cryptocell_310_ecc_p256,$(USEMODULE)))
   USEMODULE += psa_cryptocell_310_ecc_common
 endif
-
-ifneq (,$(filter psa_cryptocell_310_cipher_chacha_20,$(USEMODULE)))
-  USE
-endif
