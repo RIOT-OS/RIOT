@@ -414,6 +414,8 @@ typedef struct {
         .type      = TIMER_TYPE_TCC,      }
 #endif
 
+#define PERIPH_TIMER_PROVIDES_SET       1
+
 /**
  * @brief   PWM channel configuration data structure
  */
