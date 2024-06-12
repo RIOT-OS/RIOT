@@ -147,6 +147,13 @@ void nrf5x_spi_acquire(NRF_SPIM_Type *bus, spi_twi_irq_cb_t cb, void *arg);
  */
 void nrf5x_spi_release(NRF_SPIM_Type *bus);
 
+ /**
+ * @brief   Structure for PDM configuration data
+ */
+typedef struct {
+    uint8_t din_pin;         /**< DIN pin */
+    uint8_t clk_pin;         /**< CLK pin */
+} pdm_conf_t;
 #ifdef __cplusplus
 }
 #endif
