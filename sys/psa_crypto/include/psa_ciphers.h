@@ -185,7 +185,52 @@ psa_status_t psa_cipher_chacha20_poly1305_decrypt(const psa_key_attributes_t *at
                                             size_t *output_length);
 #endif /* CONFIG_CHACHA20_POLY1305 */
 
-#if IS_USED(MODULE_PSA_CIPHER_CHACHA_20) || defined(DOXYGEN)
+#if IS_USED(MODULE_PSA_CIPHER_CHACHA__20) || defined(DOXYGEN)
+
+/**
+ * @brief   ChaCha setup function
+ *
+ * @param   ctx             Driver specific ChaCha context of type @c psa_cipher_chacha20_ctx_t
+ * @param   nonce           Nonce used in the ChaCha operation of type @c psa_cipher_chacha20_nonce_t .
+ *                          Must be of size @c CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES .
+ * @param   key             Key used in ChaCha operation. Must be of size @c CRYS_CHACHA_KEY_MAX_SIZE_IN_BYTES .
+ * @param   initialCounter  Initial counter of the ChaCha operation 
+ * @param   mode            ChaCha mode of type @c CRYS_CHACHA_EncryptMode_t
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_setup(psa_cipher_chacha20_ctx_t *ctx,
+                                       psa_cipher_chacha20_nonce_t nonce,
+                                       uint8_t *key,
+                                       uint32_t initial_counter,
+                                       CRYS_CHACHA_EncryptMode_t mode);
+
+/**
+ * @brief   ChaCha update function, encrypting/decrypting aligned blocks.
+ *
+ * @param   ctx         Driver specific ChaCha context of type @c psa_cipher_chacha20_ctx_t
+ * @param   input       Input that is going to be encrypted/decrypted
+ * @param   inputSize   Length of @p input . Must be multiple of @c CRYS_CHACHA_BLOCK_SIZE_IN_BYTES
+ * @param   output      Output Buffer for the encrypted/decrypted input
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
+                                        uint8_t *input,
+                                        uint32_t inputSize,
+                                        uint8_t *output);
+
+/**
+ * @brief   ChaCha finish function, encrypting/decrypting remaining data.
+ *
+ * @param   ctx         Driver specific ChaCha context of type @c psa_cipher_chacha20_ctx_t
+ * @param   input       Input that is going to be encrypted/decrypted
+ * @param   inputSize   Length of @p input . Must be less of @c CRYS_CHACHA_BLOCK_SIZE_IN_BYTES
+ * @param   output      Output Buffer for the encrypted/decrypted input
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
+                                        uint8_t *input,
+                                        uint32_t inputSize,
+                                        uint8_t *output);
 
 /**
  * @brief   Low level wrapper function to call a driver for ChaCha20 encryption/decryption.
@@ -199,15 +244,15 @@ psa_status_t psa_cipher_chacha20_poly1305_decrypt(const psa_key_attributes_t *at
  *                          generated nonce of size CHACHA20POLY1305_NONCE_BYTES.
  * @param output_size       Size of ouput buffer. Must be at least 
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
- * @param output_length     Actual size of the output.
+ * @param output_length     Actual size of the output (including nonce).
 */
 psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
-                                         size_t key_buffer_size,
+                                         uint32_t key_buffer_size,
                                          const uint8_t *input,
-                                         size_t input_length,
+                                         uint32_t input_length,
                                          uint8_t *output,
-                                         size_t output_size,
-                                         size_t *output_length);
+                                         uint32_t output_size,
+                                         uint32_t *output_length);
 
 /**
  * @brief   Low level wrapper function to call a driver for ChaCha20 decryption.
@@ -218,19 +263,19 @@ psa_status_t psa_cipher_chacha20_encrypt(const uint8_t *key_buffer,
  * @param input             Input buffer containing the cipher to be decrypted
  *                          and the nonce used in the encryption of size 
  *                          CHACHA20POLY1305_NONCE_BYTES.
- * @param input_length      Size of input buffer.
+ * @param input_length      Size of input buffer (including nonce).
  * @param output            Output buffer.
  * @param output_size       Size of ouput buffer. Must be at least 
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
  * @param output_length     Actual size of the output.
 */
 psa_status_t psa_cipher_chacha20_decrypt(const uint8_t *key_buffer,
-                                         size_t key_buffer_size,
+                                         uint32_t key_buffer_size,
                                          const uint8_t *input,
-                                         size_t input_length,
+                                         uint32_t input_length,
                                          uint8_t *output,
-                                         size_t output_size,
-                                         size_t *output_length);
+                                         uint32_t output_size,
+                                         uint32_t *output_length);
 
 #endif
 #ifdef __cplusplus
