@@ -1,0 +1,28 @@
+# Copyright (c) 2022 Nicole Faerber, Digitaluhr Manufaktur
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_LPM013M126
+    bool "LPM013M126 display driver"
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+    select LVGL_UPDATE_FULL_LINES_ONLY if PACKAGE_LVGL
+
+config HAVE_LPM013M126
+    bool
+    select MODULE_LPM013M126 if MODULE_DISP_DEV
+    help
+      Indicates that an LPM013M126 display is present.
+
+menuconfig KCONFIG_USEMODULE_LPM013M126
+    bool "Configure LPM013M126 driver"
+    depends on USEMODULE_LPM013M126
+    help
+        Configure the LPM013M126 display driver using Kconfig.
+
