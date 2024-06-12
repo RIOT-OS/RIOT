@@ -57,7 +57,7 @@ int main(void)
     thread_create(_stack,
                   sizeof(_stack),
                   THREAD_PRIORITY_MAIN,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _second_thread,
                   NULL,
                   "second_thread");

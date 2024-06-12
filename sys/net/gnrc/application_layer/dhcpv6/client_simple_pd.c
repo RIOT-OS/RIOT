@@ -154,7 +154,7 @@ void gnrc_dhcpv6_client_simple_pd_init(void)
     /* start DHCPv6 client thread to request prefix for WPAN */
     thread_create(_stack, DHCPV6_CLIENT_STACK_SIZE,
                   DHCPV6_CLIENT_PRIORITY,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _dhcpv6_cl_simple_pd_thread, NULL, "dhcpv6-client");
 }
 

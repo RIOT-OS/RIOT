@@ -85,7 +85,7 @@ int main(void)
 
     thread_create(led_thread_stack, sizeof(led_thread_stack),
                   THREAD_PRIORITY_MAIN + 1,
-                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  THREAD_CREATE_WOUT_YIELD,
                   led_thread_impl, NULL, "led");
 
     if (!IS_USED(MODULE_AUTO_INIT)) {

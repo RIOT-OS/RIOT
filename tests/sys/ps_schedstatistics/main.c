@@ -62,7 +62,7 @@ int main(void)
     for (uintptr_t i = 0; i < NB_THREADS; ++i) {
         pids[i] = thread_create(stacks[i], sizeof(stacks[i]),
                                 THREAD_PRIORITY_MAIN - 1,
-                                THREAD_CREATE_STACKTEST,
+                                0,
                                 _thread_fn, (void *)i, "thread");
     }
     /* sleep for a second, so that `ps` shows some % on idle at the beginning */

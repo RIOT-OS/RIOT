@@ -1024,7 +1024,7 @@ kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local)
         return _coap_server_pid;
     }
     _coap_server_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST, _nanocoap_server_thread,
+                                     0, _nanocoap_server_thread,
                                      (void *)local, "nanoCoAP server");
     return _coap_server_pid;
 }

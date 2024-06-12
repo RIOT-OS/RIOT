@@ -59,7 +59,7 @@ int main(void)
 
     _gnrc_netif_config(0, NULL);
     thread_create(_dhcpv6_client_stack, DHCPV6_CLIENT_STACK_SIZE,
-                  DHCPV6_CLIENT_PRIORITY, THREAD_CREATE_STACKTEST,
+                  DHCPV6_CLIENT_PRIORITY, 0,
                   _dhcpv6_client_thread, NULL, "dhcpv6-client");
     xtimer_sleep(5);
     /* global address should now be configured */
