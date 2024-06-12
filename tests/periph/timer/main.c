@@ -202,7 +202,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         return 0;
     }
 
-    printf("    OK (no spurious IRQs)\n");
+    printf("    [OK] (no spurious IRQs)\n");
 
     return 1;
 }
@@ -249,8 +249,38 @@ static void print_supported_frequencies(tim_t dev)
                "    %u: %" PRIu32 "\n",
                (unsigned)(end - 1), timer_query_freqs(dev, end - 1));
     }
+}
 
-    expect(timer_query_freqs(dev, end) == 0);
+static void test_querying(tim_t dev)
+{
+    uword_t last = query_freq_numof(dev) - 1;
+
+    puts("Testing timer_get_closest_freq()...");
+    for (uword_t i = 0; i <= MIN(last, 255); i++) {
+        uint32_t closest;
+        uint32_t freq = timer_query_freqs(dev, i);
+
+        /* Searching for a supported freq should yield the supported freq: */
+        expect(freq == timer_get_closest_freq(dev, freq));
+
+        /* Testing for 1 Hz below freq.
+         *
+         * Note that freq - 1 is even closer to
+         * freq - 1 than freq, and freq - 2 is equally close. Either may
+         * be supported, so we allow everything with [freq: freq -2]. */
+        closest = timer_get_closest_freq(dev, freq - 1);
+        expect((freq >= closest) && closest >= freq - 2);
+
+        /* Testing for 1 Hz above freq, with the same corner case
+         * handling as above. */
+        closest = timer_get_closest_freq(dev, freq + 1);
+        expect((freq <= closest) && closest <= freq + 2);
+    }
+
+    puts("[OK]\n"
+         "Testing timer_query_freqs() for out of bound index...");
+    expect(timer_query_freqs(dev, last + 1) == 0);
+    puts("[OK]");
 }
 
 int main(void)
@@ -265,6 +295,12 @@ int main(void)
         printf("\nTIMER %u\n"
                  "=======\n\n", i);
         print_supported_frequencies(TIMER_DEV(i));
+
+        /* test querying of frequencies, but only if supported by the driver */
+        if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+            test_querying(TIMER_DEV(i));
+        }
+
         uword_t end = query_freq_numof(TIMER_DEV(i));
 
         /* Test only up to three frequencies and only the fastest once.
