@@ -49,17 +49,25 @@ int main(void)
 
     if (ret != 0) {
         LOG_INFO("init error %d\n", ret);
+        return -1;
     }
 
     ztimer_sleep(ZTIMER_MSEC, 200);
     LOG_INFO("awake\n");
 
     uint32_t fwver;
-    pn532_fw_version(&pn532, &fwver);
+    ret = pn532_fw_version(&pn532, &fwver);
+    if (ret != 0) {
+        LOG_INFO("ver error %d\n", ret);
+        return -1;
+    }
     LOG_INFO("ver %d.%d\n", (unsigned)PN532_FW_VERSION(fwver), (unsigned)PN532_FW_REVISION(fwver));
 
     ret = pn532_sam_configuration(&pn532, PN532_SAM_NORMAL, 1000);
-    LOG_INFO("set sam %d\n", ret);
+    if (ret != 0) {
+        LOG_INFO("set sam error %d\n", ret);
+        return -1;
+    }
 
     while (1) {
         /* Delay not to be always polling the interface */
@@ -73,12 +81,12 @@ int main(void)
 
         if (card.type == ISO14443A_TYPE4) {
             if (pn532_iso14443a_4_activate(&pn532, &card) != 0) {
-                LOG_ERROR("act\n");
+                LOG_ERROR("act error\n");
                 continue;
 
             }
             else if (pn532_iso14443a_4_read(&pn532, data, &card, 0x00, 2) != 0) {
-                LOG_ERROR("len\n");
+                LOG_ERROR("len error\n");
                 continue;
             }
 
@@ -86,7 +94,7 @@ int main(void)
             len = MIN(len, sizeof(data));
 
             if (pn532_iso14443a_4_read(&pn532, data, &card, 0x02, len) != 0) {
-                LOG_ERROR("read\n");
+                LOG_ERROR("read error\n");
                 continue;
             }
 
@@ -105,7 +113,7 @@ int main(void)
                     ret = pn532_mifareclassic_authenticate(&pn532, &card,
                                                            PN532_MIFARE_KEY_A, key, i);
                     if (ret != 0) {
-                        LOG_ERROR("auth\n");
+                        LOG_ERROR("auth error\n");
                         break;
                     }
                 }
@@ -115,14 +123,14 @@ int main(void)
                     printbuff(data, 16);
                 }
                 else {
-                    LOG_ERROR("read\n");
+                    LOG_ERROR("read error\n");
                     break;
                 }
             }
 
         }
         else {
-            LOG_ERROR("unknown\n");
+            LOG_ERROR("unknown card type\n");
         }
     }
 
