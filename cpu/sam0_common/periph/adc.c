@@ -92,7 +92,7 @@ static void _find_presc(uint32_t f_src, uint32_t f_tgt,
 {
     uint32_t _best_match = UINT32_MAX;
 
-#if defined(ADC_CTRLB_PRESCALER_DIV2) || defined(ADC_CTRLB_PRESCALER_DIV2)
+#if defined(ADC_CTRLB_PRESCALER_DIV2)
     uint8_t start = 1;
 #else
     uint8_t start = 2;
