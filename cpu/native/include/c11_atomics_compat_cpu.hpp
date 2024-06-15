@@ -63,24 +63,24 @@
 #define ATOMIC_UINT_FAST8_T_SIZE                        (1U)
 #define ATOMIC_UINT_FAST8_T_SAME_SIZED_TYPE             uint8_t
 #endif
-#ifdef __x86_64__
-#define ATOMIC_INT_FAST16_T_SIZE                        (8U)
-#define ATOMIC_INT_FAST16_T_SAME_SIZED_TYPE             uint64_t
-#define ATOMIC_UINT_FAST16_T_SIZE                       (8U)
-#define ATOMIC_UINT_FAST16_T_SAME_SIZED_TYPE            uint64_t
-#define ATOMIC_INT_FAST32_T_SIZE                        (8U)
-#define ATOMIC_INT_FAST32_T_SAME_SIZED_TYPE             uint64_t
-#define ATOMIC_UINT_FAST32_T_SIZE                       (8U)
-#define ATOMIC_UINT_FAST32_T_SAME_SIZED_TYPE            uint64_t
+#if defined(__x86_64__) && defined(__GLIBC__)
+#  define ATOMIC_INT_FAST16_T_SIZE                     (8U)
+#  define ATOMIC_INT_FAST16_T_SAME_SIZED_TYPE          uint64_t
+#  define ATOMIC_UINT_FAST16_T_SIZE                    (8U)
+#  define ATOMIC_UINT_FAST16_T_SAME_SIZED_TYPE         uint64_t
+#  define ATOMIC_INT_FAST32_T_SIZE                     (8U)
+#  define ATOMIC_INT_FAST32_T_SAME_SIZED_TYPE          uint64_t
+#  define ATOMIC_UINT_FAST32_T_SIZE                    (8U)
+#  define ATOMIC_UINT_FAST32_T_SAME_SIZED_TYPE         uint64_t
 #else
-#define ATOMIC_INT_FAST16_T_SIZE                        (4U)
-#define ATOMIC_INT_FAST16_T_SAME_SIZED_TYPE             uint32_t
-#define ATOMIC_UINT_FAST16_T_SIZE                       (4U)
-#define ATOMIC_UINT_FAST16_T_SAME_SIZED_TYPE            uint32_t
-#define ATOMIC_INT_FAST32_T_SIZE                        (4U)
-#define ATOMIC_INT_FAST32_T_SAME_SIZED_TYPE             uint32_t
-#define ATOMIC_UINT_FAST32_T_SIZE                       (4U)
-#define ATOMIC_UINT_FAST32_T_SAME_SIZED_TYPE            uint32_t
+#  define ATOMIC_INT_FAST16_T_SIZE                     (4U)
+#  define ATOMIC_INT_FAST16_T_SAME_SIZED_TYPE          uint32_t
+#  define ATOMIC_UINT_FAST16_T_SIZE                    (4U)
+#  define ATOMIC_UINT_FAST16_T_SAME_SIZED_TYPE         uint32_t
+#  define ATOMIC_INT_FAST32_T_SIZE                     (4U)
+#  define ATOMIC_INT_FAST32_T_SAME_SIZED_TYPE          uint32_t
+#  define ATOMIC_UINT_FAST32_T_SIZE                    (4U)
+#  define ATOMIC_UINT_FAST32_T_SAME_SIZED_TYPE         uint32_t
 #endif
 #define ATOMIC_INT_FAST64_T_SIZE                        (8U)
 #define ATOMIC_INT_FAST64_T_SAME_SIZED_TYPE             uint64_t
