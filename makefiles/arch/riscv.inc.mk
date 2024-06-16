@@ -45,22 +45,11 @@ ifeq (,$(TARGET_ARCH))
   $(error No RISC-V toolchain detected. Make sure a RISC-V toolchain is installed.)
 endif
 
-ifeq ($(TOOLCHAIN),gnu)
-  GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= $(shell echo "typedef int dont_be_pedantic;" | $(TARGET_ARCH)-gcc -march=rv32imac -mabi=ilp32 -misa-spec=2.2 -E - > /dev/null 2>&1 && echo 1 || echo 0)
-endif
+CFLAGS_CPU := -march=rv32imac_zicsr -mabi=ilp32
 
-GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= 0
-
-CFLAGS_CPU := -march=rv32imac -mabi=ilp32
-
-# Since RISC-V ISA specifications 20191213 instructions previously included in
-# rv32imac have been moved to the ZICSR extension. See
-# https://riscv.org/wp-content/uploads/2019/12/riscv-spec-20191213.pdf
-#
-# Select the oldest ISA spec in which ZICSR was not yet split out into an
-# extension
-ifeq (1,$(GCC_DEFAULTS_TO_NEW_RISCV_ISA))
-  CFLAGS_CPU += -misa-spec=2.2
+# LLVM<17 does not support Zicsr extension in ISA-string
+ifeq ($(TOOLCHAIN),llvm)
+  CFLAGS_CPU := -march=rv32imac -mabi=ilp32
 endif
 
 # Always use riscv32-none-elf as target triple for clang, as some
