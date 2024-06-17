@@ -24,8 +24,8 @@ STM32L476RG microcontroller with 128KiB of RAM and 1MiB of Flash.
 | Frequency  | up to 80MHz       |
 | FPU        | yes               |
 | Timers     | 16 (2x watchdog, 1 SysTick, 6x 16-bit, 2x 32-bit [TIM2])  |
-| ADCs       | 1x 12-bit         |
-| UARTs      | 3 (two UARTs and one Low-Power UART)                 |
+| ADCs       | 3x 12-bit (up to 16 channels) |
+| UARTs      | 6 (three USARTs, two UARTs and one Low-Power UART) |
 | SPIs       | 3                 |
 | I2Cs       | 3                 |
 | RTC        | 1                 |
