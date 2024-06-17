@@ -48,7 +48,7 @@ impl<T, const N: usize> Stream for XStream<T, N> {
             return Poll::Ready(Some(item));
         }
 
-        self.waker.register(&cx.waker());
+        self.waker.register(cx.waker());
         if let Some(item) = self.queue.dequeue() {
             self.waker.take();
             Poll::Ready(Some(item))
