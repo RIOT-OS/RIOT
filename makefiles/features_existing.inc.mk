@@ -183,9 +183,9 @@ FEATURES_EXISTING := \
     periph_hash_sha_1 \
     periph_hash_sha_224 \
     periph_hash_sha_256 \
-    periph_hash_sha_3_256 \
-    periph_hash_sha_3_384 \
-    periph_hash_sha_3_512 \
+    periph_hash_sha3_256 \
+    periph_hash_sha3_384 \
+    periph_hash_sha3_512 \
     periph_hash_sha_384 \
     periph_hash_sha_512 \
     periph_hash_sha_512_224 \
