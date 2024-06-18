@@ -341,22 +341,6 @@ psa_status_t psa_hashes_sha512_256_finish(psa_hashes_sha512_256_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_512_256 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_3_256) || IS_USED(MODULE_PSA_HASH_SHA_3_384) \
-|| IS_USED(MODULE_PSA_HASH_SHA_3_512) || defined(DOXYGEN)
-/**
- * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
- *          See @ref psa_hash_update()
- *
- * @param ctx
- * @param input
- * @param input_length
- * @return psa_status_t
- */
-psa_status_t psa_hashes_sha3_update(psa_hashes_sha3_ctx_t *ctx,
-                                      const uint8_t *input,
-                                      size_t input_length);
-#endif 
-
 #if IS_USED(MODULE_PSA_HASH_SHA_3_256) || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
