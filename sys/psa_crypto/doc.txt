@@ -385,6 +385,21 @@
  * Currently uses the [RIOT Random Module](#sys_random) as a backend.
  * See the documentation for configuration options.
  *
+ * Generic HMAC implementation
+ * ===
+ * RIOT features a generic HMAC implementation which works with all hash algorithms supported
+ * by the PSA crypto API. This minimizes the amount of work necessary to add support for new
+ * HMAC algorithms.
+ *
+ * The following steps are required to add support for a new HMAC algorithm:
+ *
+ * 1. Add support for the hash algorithm to the PSA crypto library.
+ * 2. Extend `PSA_MAC_MAX_SIZE` and `PSA_HMAC_BLOCK_MAX_SIZE` to take new algorithm into account.
+ * 3. Update `CONFIG_PSA_MAX_KEY_SIZE` in `crypto_sizes.h` to be big enough for the new algorithm.
+ * 4. Update `sys/psa_crypto/Makefile.dep` (usually just copy from an existing HMAC algorithm).
+ * 5. Update `sys/psa_crypto/Makefile.include` the same way.
+ * 6. Document the new modules and extend any HMAC unit tests.
+ *
  * Secure Elements {#secure-elements}
  * ===
  *
