@@ -8,12 +8,6 @@
     "files.associations": {
         "Makefile.*": "makefile",
         "*.mk": "makefile",
-        "cstdint": "c",
-        "kernel_defines.h": "c",
-        "modules.h": "c",
-        "riot_version.h": "c",
-        "crypto.h": "c",
-        "riot_hashes.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
