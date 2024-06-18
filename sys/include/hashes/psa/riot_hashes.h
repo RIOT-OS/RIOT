@@ -77,7 +77,9 @@ typedef sha512_256_context_t psa_hashes_sha512_256_ctx_t;
 #include "hashes/sha256.h"
 #endif
 
-#if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3))
+#if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_256)  \
+|| IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_384)    \
+|| IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_512))
 #include "hashes/sha3.h"
 
 typedef keccak_state_t psa_hashes_sha3_ctx_t;

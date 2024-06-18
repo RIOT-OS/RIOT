@@ -16,10 +16,12 @@
  *
  * @}
  */
-
 #include "psa/crypto.h"
-#include "hashes/psa/riot_hashes.h"
+//#include "hashes/psa/riot_hashes.h"
 
+#if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_256)  \
+|| IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_384)    \
+|| IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_512))
 psa_status_t psa_hashes_sha3_update(psa_hashes_sha3_ctx_t *ctx,
                                       const uint8_t *input,
                                       size_t input_length)
@@ -27,7 +29,9 @@ psa_status_t psa_hashes_sha3_update(psa_hashes_sha3_ctx_t *ctx,
     sha3_update((keccak_state_t *)ctx, input, input_length);
     return PSA_SUCCESS;
 }
+#endif
 
+#if IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_256)
 psa_status_t psa_hashes_sha3_256_setup(psa_hashes_sha3_ctx_t *ctx)
 {
     sha3_256_init((keccak_state_t *)ctx);
@@ -40,7 +44,9 @@ psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha3_ctx_t *ctx,
     sha3_256_final((keccak_state_t *)ctx, hash);
     return PSA_SUCCESS;
 }
+#endif 
 
+#if IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_384)
 psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha3_ctx_t *ctx)
 {
     sha3_384_init((keccak_state_t *)ctx);
@@ -53,7 +59,9 @@ psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha3_ctx_t *ctx,
     sha3_384_final((keccak_state_t *)ctx, hash);
     return PSA_SUCCESS;
 }
+#endif
 
+#if IS_USED(MODULE_PSA_RIOT_HASHES_SHA_3_512)
 psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha3_ctx_t *ctx)
 {
     sha3_512_init((keccak_state_t *)ctx);
@@ -66,3 +74,4 @@ psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha3_ctx_t *ctx,
     sha3_512_final((keccak_state_t *)ctx, hash);
     return PSA_SUCCESS;
 }
+#endif
