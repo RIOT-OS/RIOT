@@ -128,15 +128,23 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    CRYS_CHACHA_Nonce_t nonce;
-    status = psa_generate_random(nonce, CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
+    CRYS_CHACHA_Nonce_t nonce = {0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x01};
+    /* status = psa_generate_random(nonce, CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
     if (status != PSA_SUCCESS)
         return status;
+ */
+    /* TODO: avoid this and somehow get the const pointer to work
+    you cannot simply cast the const pointer input, as then the CRYS function will assume an
+    array of 0x00. This only happens with the encrypt function.*/
+    uint8_t *in = malloc(input_length);
+    memcpy(in, input, input_length);
 
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,
                                             key_buffer, 0UL,
-                                            CRYS_CHACHA_Encrypt, (uint8_t *)input,
+                                            CRYS_CHACHA_Encrypt, in,
                                             input_length, output);
     cryptocell_310_disable();
     
@@ -182,7 +190,6 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
                                             input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES,
                                             output);
     cryptocell_310_disable();
-    
     status = CRYS_to_psa_error(periph_status);
     if (status != PSA_SUCCESS) {
         return status;

@@ -33,7 +33,7 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
                                          size_t *output_length)
 {
     DEBUG("RIOT ChaCha20 Cipher encryption");
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    //psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
     if (output_size < (input_length + CHACHA20POLY1305_NONCE_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
@@ -43,11 +43,13 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    uint8_t nonce[CHACHA20POLY1305_NONCE_BYTES];
-    status = psa_generate_random(nonce, CHACHA20POLY1305_NONCE_BYTES);
+    uint8_t nonce[CHACHA20POLY1305_NONCE_BYTES] = {0x00, 0x00, 0x00, 0x00,
+                                                   0x00, 0x00, 0x00, 0x00,
+                                                   0x00, 0x00, 0x00, 0x01};
+    /* status = psa_generate_random(nonce, CHACHA20POLY1305_NONCE_BYTES);
     if (status != PSA_SUCCESS)
         return status;
-
+ */
     chacha20_encrypt_decrypt(input, output, key_buffer, nonce, input_length);
 
     memcpy(&output[input_length], nonce, CHACHA20POLY1305_NONCE_BYTES);

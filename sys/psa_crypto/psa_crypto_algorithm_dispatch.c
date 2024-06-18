@@ -672,7 +672,6 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     #endif
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA_20)
     case PSA_ALG_STREAM_CIPHER:
-    printf("before glue code");
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
             return psa_cipher_chacha20_decrypt(key_data, *key_bytes, 
                                                input, input_length,
