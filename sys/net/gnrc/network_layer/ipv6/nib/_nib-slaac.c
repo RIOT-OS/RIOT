@@ -187,8 +187,17 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 
 int _regen_temp_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr, uint8_t retries,
                      const char *caller_description) {
-    //find associated prefix
+    uint32_t pfx_pref_ltime;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) && !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
+    if (gnrc_netif_is_6ln(netif)) {
+        /* does not store SLAAC prefix -> no lifetime
+         * -> its addresses never expire -> regenerate temp addr unconditionally */
+        pfx_pref_ltime = UINT32_MAX;
+    } else
+#endif
+    {
     uint32_t slaac_prefix_pref_until;
+    //find associated prefix
     if (!_get_slaac_prefix_pref_until(netif, addr, &slaac_prefix_pref_until)) {
         // at least one match is expected,
         LOG_WARNING("nib: The temporary address smh outlived the SLAAC prefix valid lft.");
@@ -200,8 +209,11 @@ int _regen_temp_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr, uint8_t retri
     assert(now < slaac_prefix_pref_until);
     // else the temporary address smh outlived the SLAAC prefix preferred lft
 
+    pfx_pref_ltime = slaac_prefix_pref_until - now;
+    }
+
     if (_generate_temporary_addr(netif, addr,
-                                 slaac_prefix_pref_until - now,
+                                 pfx_pref_ltime,
                                  retries,
                                  NULL) < 0) {
         LOG_WARNING("nib: Temporary address regeneration failed%s.\n", caller_description);
