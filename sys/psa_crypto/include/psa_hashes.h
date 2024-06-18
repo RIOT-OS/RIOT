@@ -374,7 +374,7 @@ psa_status_t psa_hashes_sha3_256_setup(psa_hashes_sha3_ctx_t *ctx);
  */
 psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha3_ctx_t *ctx,
                                       uint8_t *hash);
-#endif /* MODULE_PSA_HASH_SHA_3_256 */
+#endif /* MODULE_PSA_HASH_SHA3_256 */
 
 #if IS_USED(MODULE_PSA_HASH_SHA3_384) || defined(DOXYGEN)/**
  * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
@@ -408,7 +408,7 @@ psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha3_ctx_t *ctx);
  */
 psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha3_ctx_t *ctx,
                                       uint8_t *hash);
-#endif /* MODULE_PSA_HASH_SHA_3_384 */
+#endif /* MODULE_PSA_HASH_SHA3_384 */
 
 #if IS_USED(MODULE_PSA_HASH_SHA3_512) || defined(DOXYGEN)/**
  * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
@@ -442,7 +442,7 @@ psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha3_ctx_t *ctx);
  */
 psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha3_ctx_t *ctx,
                                       uint8_t *hash);
-#endif /* MODULE_PSA_HASH_SHA_3_512 */
+#endif /* MODULE_PSA_HASH_SHA3_512 */
 
 #ifdef __cplusplus
 }
