@@ -240,8 +240,9 @@ psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha_20_ctx_t *ctx,
  *                          Must be of size CHACHA20POLY1305_KEY_BYTES.
  * @param input             Input Buffer containing the message to be encrypted.
  * @param input_length      Size of input buffer.
- * @param output            Output buffer containing the cipher and the 
- *                          generated nonce of size CHACHA20POLY1305_NONCE_BYTES.
+ * @param output            Output buffer containing the generated nonce of size
+ *                          CHACHA20POLY1305_NONCE_BYTES followed by the cipher of
+ *                          the input.
  * @param output_size       Size of ouput buffer. Must be at least 
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
  * @param output_length     Actual size of the output (including nonce).
@@ -260,9 +261,9 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
  * @param key_buffer        Buffer containing the Key.
  * @param key_buffer_size   Size of the key in bytes.
  *                          Must be of size CHACHA20POLY1305_KEY_BYTES.
- * @param input             Input buffer containing the cipher to be decrypted
- *                          and the nonce used in the encryption of size 
- *                          CHACHA20POLY1305_NONCE_BYTES.
+ * @param input             Input buffer containing the nonce used in the 
+ *                          encryption of size CHACHA20POLY1305_NONCE_BYTES followed by 
+ *                          the cipher to be decrypted.
  * @param input_length      Size of input buffer (including nonce).
  * @param output            Output buffer.
  * @param output_size       Size of ouput buffer. Must be at least 

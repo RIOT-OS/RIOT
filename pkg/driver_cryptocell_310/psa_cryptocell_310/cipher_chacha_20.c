@@ -128,32 +128,24 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    CRYS_CHACHA_Nonce_t nonce = {0x00, 0x00, 0x00, 0x00,
-                                 0x00, 0x00, 0x00, 0x00,
-                                 0x00, 0x00, 0x00, 0x01};
-    /* status = psa_generate_random(nonce, CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
+    uint8_t *nonce = output;
+    uint8_t *data_out = &output[CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES];
+    status = psa_generate_random(nonce, CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
     if (status != PSA_SUCCESS)
         return status;
- */
-    /* TODO: avoid this and somehow get the const pointer to work
-    you cannot simply cast the const pointer input, as then the CRYS function will assume an
-    array of 0x00. This only happens with the encrypt function.*/
-    uint8_t *in = malloc(input_length);
-    memcpy(in, input, input_length);
 
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,
                                             key_buffer, 0UL,
-                                            CRYS_CHACHA_Encrypt, in,
-                                            input_length, output);
+                                            CRYS_CHACHA_Encrypt,
+                                            (uint8_t *) input,
+                                            input_length,
+                                            data_out);
     cryptocell_310_disable();
-    
     status = CRYS_to_psa_error(periph_status);
     if (status != PSA_SUCCESS) {
         return status;
     }
-
-    memcpy(&output[input_length], nonce, CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
 
     *output_length = input_length + CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES;
     return PSA_SUCCESS;
@@ -180,14 +172,16 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    CRYS_CHACHA_Nonce_t nonce;
-    memcpy(nonce, &input[input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES], CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
-
+    uint8_t *nonce = (uint8_t *) input;
+    uint8_t *data_in = (uint8_t *) &input[CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES];
+    size_t data_size = input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES;
+    
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,
                                             key_buffer, 0UL,
-                                            CRYS_CHACHA_Decrypt, (uint8_t *)input,
-                                            input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES,
+                                            CRYS_CHACHA_Decrypt, 
+                                            data_in,
+                                            data_size,
                                             output);
     cryptocell_310_disable();
     status = CRYS_to_psa_error(periph_status);
@@ -195,7 +189,7 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
         return status;
     }
 
-    *output_length = input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES;
+    *output_length = data_size;
     return PSA_SUCCESS;
 }
 
