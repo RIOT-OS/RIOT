@@ -107,8 +107,10 @@ void periph_init(void)
     usbdev_init_lowlevel();
 #endif
 
-#if defined(MODULE_PERIPH_INIT_WDT) && WDT_HAS_INIT
-    wdt_init();
+#if defined(MODULE_PERIPH_INIT_WDT)
+    if (WDT_HAS_INIT) {
+        wdt_init();
+    }
 
     if (IS_ACTIVE(MODULE_PERIPH_WDT_AUTO_START)) {
         wdt_setup_reboot(CONFIG_PERIPH_WDT_WIN_MIN_MS, CONFIG_PERIPH_WDT_WIN_MAX_MS);
