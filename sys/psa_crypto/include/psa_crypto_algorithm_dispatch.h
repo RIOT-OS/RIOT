@@ -194,12 +194,6 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 
 #if IS_USED(MODULE_PSA_CIPHER)
 
-//psa_status_t psa_algorithm_dispatch_cipher_setup();
-
-//psa_status_t psa_algorithm_dispatch_cipher_update();
-
-//psa_status_t psa_algorithm_dispatch_cipher_finish();
-
 /**
  * @brief   Dispatch a cipher encrypt function to a specific backend.
  *          See @ref psa_cipher_encrypt()

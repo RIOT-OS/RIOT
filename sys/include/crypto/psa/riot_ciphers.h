@@ -35,11 +35,6 @@ typedef cipher_t psa_cipher_aes_192_ctx_t;
 #if IS_USED(MODULE_PSA_RIOT_CIPHER_AES_256_CBC)
 typedef cipher_t psa_cipher_aes_256_ctx_t;
 #endif
-#if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA_20)
-#include "crypto/chacha20poly1305.h"
-typedef chacha20poly1305_ctx_t psa_cipher_chacha_20_ctx_t;
-typedef uint8_t psa_cipher_chacha_20_nonce_t[CHACHA20POLY1305_NONCE_BYTES];
-#endif
 
 #ifdef __cplusplus
 }

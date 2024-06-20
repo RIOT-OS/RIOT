@@ -104,7 +104,7 @@ static void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
     }
     /* xcrypt remaining bytes */
     if (len - pos) {
-        _keystream(ctx, key, nonce, num_blocks);
+        _keystream(ctx, key, nonce, num_blocks + counter);
         for (size_t j = 0; j < len - pos; j++) {
             out[pos+j] = in[pos+j] ^ ((uint8_t*)ctx->state)[j];
         }
