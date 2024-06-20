@@ -26,7 +26,6 @@ extern "C" {
 #include "psa/crypto.h"
 #include "crys_chacha.h"
 #include "cryptocell_310_util.h"
-//#include "psa_ciphers.h" //TODO: warum kein include in den anderen gluecodes
 #include "psa_error.h"
 
 #define ENABLE_DEBUG    0
