@@ -42,6 +42,12 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
     DEBUG("Peripheral ChaCha20 Cipher encryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
+    if (!CHECK_POINTER_DMA_ACCESS(key_buffer) ||
+        !CHECK_POINTER_DMA_ACCESS(input) ||
+        !CHECK_POINTER_DMA_ACCESS(output)) {
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     if (output_size < (input_length + CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
@@ -84,11 +90,16 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
     DEBUG("Peripheral ChaCha20 Cipher decryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
+    if (!CHECK_POINTER_DMA_ACCESS(key_buffer) ||
+        !CHECK_POINTER_DMA_ACCESS(input) ||
+        !CHECK_POINTER_DMA_ACCESS(output)) {
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     if ((key_buffer_size != CRYS_CHACHA_KEY_MAX_SIZE_IN_BYTES) || 
         (input_length < CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
 
     if (output_size < (input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
