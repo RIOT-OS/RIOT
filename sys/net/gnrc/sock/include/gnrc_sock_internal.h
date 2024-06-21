@@ -94,6 +94,24 @@ typedef struct {
 #define GNRC_SOCK_RECV_AUX_FLAG_RSSI        0x02    /**< RSSI valid */
 
 /**
+ * @brief   Structure to retrieve auxiliary data from @ref gnrc_sock_send
+ *
+ * @details The members of this function depend on the modules used
+ * @internal
+ */
+typedef struct {
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP) || DOXYGEN
+    uint64_t *timestamp;    /**< timestamp PDU was received at in nanoseconds */
+#endif
+    /**
+     * @brief   Flags
+     */
+    uint8_t flags;
+} gnrc_sock_send_aux_t;
+
+#define GNRC_SOCK_SEND_AUX_FLAG_TIMESTAMP   0x01    /**< Timestamp valid */
+
+/**
  * @brief   Internal helper functions for GNRC
  * @internal
  * @{
@@ -163,7 +181,8 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt, uint32_t time
  * @internal
  */
 ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
-                       const sock_ip_ep_t *remote, uint8_t nh);
+                       const sock_ip_ep_t *remote, uint8_t nh,
+                       gnrc_sock_send_aux_t *aux);
 /** @internal
  * @}
  */
