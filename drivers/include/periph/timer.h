@@ -296,6 +296,24 @@ uword_t timer_query_channel_numof(tim_t dev);
  */
 uint32_t timer_query_freqs(tim_t dev, uword_t index);
 
+/**
+ * @brief   Search the frequency supported by the timer that is closest to
+ *          a given target frequency, efficiently
+ *
+ * @param   dev     Timer to get the closest supported frequency for
+ * @param   target  Ideal frequency to match
+ * @return          The frequency supported by the timer @p dev that is
+ *                  closest to @p target
+ *
+ * @note    Add `FEATURES_REQUIRED += periph_timer_query_freqs` to your
+ *          `Makefile`.
+ *
+ * @details This will use binary search internally to have an O(log(n))
+ *          runtime. This can be relevant on hardware with 16 bit or 32 bit
+ *          prescaler registers.
+ */
+uint32_t timer_get_closest_freq(tim_t dev, uint32_t target);
+
 #if defined(DOXYGEN)
 /**
  * @brief Check whether a compare channel has matched

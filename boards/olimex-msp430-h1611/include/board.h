@@ -36,11 +36,18 @@ extern "C" {
 #endif
 
 /**
- * @name    Xtimer configuration
+ * @name    ztimer configuration
  * @{
  */
-#define XTIMER_WIDTH                (16)
-#define XTIMER_BACKOFF              (40)
+#define CONFIG_ZTIMER_USEC_WIDTH        16      /**< running on a 16-bit timer */
+/**
+ * @brief   Configure clock to ~1 MHz.
+ *
+ * HACK: Do not use exactly 1 MHz to force use of ztimer_convert_frac, as the
+ * internal oscillator is not precise enough for time keeping and compensation
+ * based on the actual measured CPU frequency is needed.
+ */
+#define CONFIG_ZTIMER_USEC_BASE_FREQ    (MHZ(1) + 1)
 /** @} */
 
 #ifdef __cplusplus
