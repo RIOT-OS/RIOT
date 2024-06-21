@@ -1180,7 +1180,7 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
                                 "Address was configured by PIO, "
                                 "but A flag was set");
         }
-        if (pio_flags & NDP_OPT_PI_FLAGS_L) {
+        if (pio_flags & (NDP_OPT_PI_FLAGS_A | NDP_OPT_PI_FLAGS_L)) {
             TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
                                 "No prefix list entry found");
             TEST_ASSERT_MESSAGE(ipv6_addr_match_prefix(&_loc_gb,
@@ -1192,7 +1192,7 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
             TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.pref_until);
         }
     }
-    if (!pio || !(pio_flags & NDP_OPT_PI_FLAGS_L)) {
+    if (!pio || !(pio_flags & (NDP_OPT_PI_FLAGS_A | NDP_OPT_PI_FLAGS_L))) {
         if (!pio) {
             TEST_ASSERT_EQUAL_INT(exp_addr_count,
                                   _netif_addr_count(_mock_netif));
