@@ -287,7 +287,7 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len) {
   // When these bits are changed by software, the SPI must be disabled. SPE = 0
   assume(len <= UINT16_MAX);
   dev(bus)->CR2 = SPI_CR2_SETTINGS;
-  // Fully featured interfaces (SPI1,SPI2) exhbit errornous behaviour when TSIZE
+  // Fully featured interfaces (SPI1,SPI2) exhbit erroneous behaviour when TSIZE
   // is set
   if (dev(bus) == SPI3)
     dev(bus)->CR2 |= (uint16_t)len;
