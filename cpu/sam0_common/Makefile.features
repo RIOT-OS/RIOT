@@ -8,6 +8,7 @@ ifeq (,$(filter $(CPU_MODELS_WITHOUT_DMA),$(CPU_MODEL)))
 endif
 
 FEATURES_PROVIDED += periph_adc_continuous
+FEATURES_PROVIDED += periph_adc_multi
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
