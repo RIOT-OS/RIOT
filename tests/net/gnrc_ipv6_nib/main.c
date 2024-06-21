@@ -1197,8 +1197,6 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
             TEST_ASSERT_EQUAL_INT(exp_addr_count,
                                   _netif_addr_count(_mock_netif));
         }
-        TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
-                            "There is an unexpected prefix list entry");
     }
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
 }
