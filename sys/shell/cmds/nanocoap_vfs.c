@@ -169,19 +169,34 @@ static int _nanocoap_put_handler(int argc, char **argv)
     file = argv[1];
     url = argv[2];
 
+    /* append filename to remote dir */
     if (_is_dir(url)) {
         const char *basename = strrchr(file, '/');
         if (basename == NULL) {
-            return -EINVAL;
+            basename = file;
+        } else {
+            ++basename;
         }
+
         if (snprintf(buffer, sizeof(buffer), "%s%s",
-                     url, basename + 1) >= (int)sizeof(buffer)) {
+                     url, basename) >= (int)sizeof(buffer)) {
             puts("Constructed URI too long");
             return -ENOBUFS;
         }
         url = buffer;
     }
 
+    /* relative file path */
+    if (*file != '/') {
+        if (snprintf(work_buf, sizeof(work_buf), "%s%s",
+                     CONFIG_NCGET_DEFAULT_DATA_DIR, file) >= (int)sizeof(work_buf)) {
+            puts("Constructed URI too long");
+            return -ENOBUFS;
+        }
+        file = work_buf;
+    }
+
+    /* read from 'stdin' / 3rd argument */
     if (strcmp(file, "-") == 0) {
         if (argc < 4) {
             printf("Usage: %s - <url> <data>\n", argv[0]);

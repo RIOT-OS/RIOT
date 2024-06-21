@@ -555,6 +555,6 @@ void native_interrupt_init(void)
         err(EXIT_FAILURE, "native_interrupt_init: sigaction");
     }
 
-    puts("RIOT native interrupts/signals initialized.");
+    DEBUG_PUTS("RIOT native interrupts/signals initialized.");
 }
 /** @} */
