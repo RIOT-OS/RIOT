@@ -39,15 +39,19 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        13
+#define LED0_PORT           GPIO_PORT_D /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_D
 
 #define LED1_PIN_NUM        12
+#define LED1_PORT           GPIO_PORT_D /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_D
 
 #define LED2_PIN_NUM        14
+#define LED2_PORT           GPIO_PORT_D /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_D
 
 #define LED3_PIN_NUM        15
+#define LED3_PORT           GPIO_PORT_D /**< GPIO port of LED 3 */
 #define LED3_PORT_NUM       PORT_D
 /** @} */
 

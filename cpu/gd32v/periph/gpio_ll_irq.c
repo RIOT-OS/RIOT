@@ -78,7 +78,7 @@ static void _gpio_isr(unsigned irqn);
 int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig, gpio_ll_cb_t cb, void *arg)
 {
     unsigned irq_state = irq_disable();
-    int port_num = GPIO_PORT_NUM(port);
+    int port_num = gpio_port_num(port);
 
     /* set callback */
     _exti_ctx[pin].cb = cb;
@@ -177,7 +177,7 @@ static void _gpio_isr(unsigned irqn)
         if ((_h_level_triggered & pin_mask) || (_l_level_triggered & pin_mask)) {
             /* determine the port of triggered interrupt */
             volatile uint32_t *afio_exti_ss = &AFIO->EXTISS0 + (pin >> 2);
-            gpio_port_t port = GPIO_PORT(((*afio_exti_ss >> ((pin & 0x03) * 4)) & 0xfUL));
+            gpio_port_t port = gpio_port(((*afio_exti_ss >> ((pin & 0x03) * 4)) & 0xfUL));
 
             /* trigger software interrupt if the pin has the according level */
             uint32_t level = gpio_ll_read(port) & pin_mask;

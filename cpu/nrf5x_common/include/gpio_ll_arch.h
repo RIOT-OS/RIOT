@@ -51,15 +51,36 @@ extern "C" {
 #endif
 
 #if defined(CPU_FAM_NRF51)
-#define GPIO_PORT(num)      ((gpio_port_t)NRF_GPIO)
-#define GPIO_PORT_NUM(port) 0
-#elif defined(NRF_P1)
-#define GPIO_PORT(num)      ((num) ? (gpio_port_t)NRF_P1 : (gpio_port_t)NRF_P0)
-#define GPIO_PORT_NUM(port) ((port == (gpio_port_t)NRF_P1) ? 1 : 0)
+#  define GPIO_PORT_0       ((gpio_port_t)NRF_GPIO)
 #else
-#define GPIO_PORT(num)      ((gpio_port_t)NRF_P0)
-#define GPIO_PORT_NUM(port) 0
+#  if defined(NRF_P1)
+#    define GPIO_PORT_1     ((gpio_port_t)NRF_P1)
+#  endif
+#  define GPIO_PORT_0       ((gpio_port_t)NRF_P0)
 #endif
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+    (void)num;
+#ifdef GPIO_PORT_1
+    if (num == 1) {
+        return GPIO_PORT_1;
+    }
+#endif
+
+    return GPIO_PORT_0;
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+    (void)port;
+#ifdef GPIO_PORT_1
+    if (port == GPIO_PORT_1) {
+        return 1;
+    }
+#endif
+    return 0;
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -102,10 +123,10 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
 #if defined(NRF_P1)
-    return GPIO_PORT(pin >> 5);
+    return gpio_port(pin >> 5);
 #else
     (void)pin;
-    return GPIO_PORT(0);
+    return GPIO_PORT_0;
 #endif
 }
 

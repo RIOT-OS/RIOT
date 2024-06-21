@@ -33,9 +33,11 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        2
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 
 #define LED1_PIN_NUM        8
+#define LED1_PORT           GPIO_PORT_E /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_E
 /** @} */
 

@@ -48,12 +48,72 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
+/* Note: The pin count may be defined as zero to indicate the port not existing.
+ * Hence, don't to `#if defined(foo)` but only `#if foo`
+ */
+#if _GPIO_PORT_A_PIN_COUNT
+#  define GPIO_PORT_A 0
+#  define GPIO_PORT_0 GPIO_PORT_A
+#endif
+
+#if _GPIO_PORT_B_PIN_COUNT
+#  define GPIO_PORT_B 1
+#  define GPIO_PORT_1 GPIO_PORT_B
+#endif
+
+#if _GPIO_PORT_C_PIN_COUNT
+#  define GPIO_PORT_C 2
+#  define GPIO_PORT_2 GPIO_PORT_C
+#endif
+
+#if _GPIO_PORT_D_PIN_COUNT
+#  define GPIO_PORT_D 3
+#  define GPIO_PORT_3 GPIO_PORT_D
+#endif
+
+#if _GPIO_PORT_E_PIN_COUNT
+#  define GPIO_PORT_E 4
+#  define GPIO_PORT_4 GPIO_PORT_E
+#endif
+
+#if _GPIO_PORT_F_PIN_COUNT
+#  define GPIO_PORT_F 6
+#  define GPIO_PORT_6 GPIO_PORT_F
+#endif
+
+#if _GPIO_PORT_G_PIN_COUNT
+#  define GPIO_PORT_G 7
+#  define GPIO_PORT_7 GPIO_PORT_G
+#endif
+
+#if _GPIO_PORT_H_PIN_COUNT
+#  define GPIO_PORT_H 8
+#  define GPIO_PORT_8 GPIO_PORT_H
+#endif
+
+#if _GPIO_PORT_I_PIN_COUNT
+#  define GPIO_PORT_I 9
+#  define GPIO_PORT_9 GPIO_PORT_I
+#endif
+
+#if _GPIO_PORT_J_PIN_COUNT
+#  define GPIO_PORT_J 10
+#  define GPIO_PORT_10 GPIO_PORT_J
+#endif
+
+#if _GPIO_PORT_K_PIN_COUNT
+#  define GPIO_PORT_K 11
+#  define GPIO_PORT_11 GPIO_PORT_K
+#endif
+
 /* We could do
  *
-#define GPIO_PORT(num) (GPIO->P[num])
-#define GPIO_PORT_NUM(port) ((port - &GPIO->P))
+ * static inline gpio_port_t gpio_port(uword_t num)
+ * {
+ *     return GPIO->P[num];
+ * }
  *
- * which forks for some operations, but at latest when _ll_set needs to fan out
+ * which works for some operations, but at latest when _ll_set needs to fan out
  * for some EFM32 families to
  *
 #if defined(_GPIO_P_DOUTSET_MASK)
@@ -78,9 +138,15 @@ extern "C" {
  * an implementation for other EFM32 families. For the time being, the
  * suboptimal-but-works-for-all version is the best we have.
  */
+static inline gpio_port_t gpio_port(uword_t num)
+{
+    return num;
+}
 
-#define GPIO_PORT(num) (num)
-#define GPIO_PORT_NUM(port) (port)
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+    return port;
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
