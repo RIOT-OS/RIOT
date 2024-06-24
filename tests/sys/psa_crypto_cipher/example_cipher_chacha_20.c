@@ -64,18 +64,20 @@ psa_status_t example_cipher_chacha_20(void)
 
     status = psa_import_key(&attr, KEY_CHACHA20, sizeof(KEY_CHACHA20), &key_id);
     if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
         return status;
     }
     status = psa_cipher_encrypt(key_id, PSA_ALG_STREAM_CIPHER, PLAINTEXT,
                                 sizeof(PLAINTEXT), cipher_out, encr_output_size, &output_len);
     if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
         return status;
     }
     status = psa_cipher_decrypt(key_id, PSA_ALG_STREAM_CIPHER, cipher_out,
                                 sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
+    psa_destroy_key(key_id);
     if (status == PSA_SUCCESS) {
         return (memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) ? -1 : 0);
     }
-    status = psa_destroy_key(key_id);
     return status;
 }
