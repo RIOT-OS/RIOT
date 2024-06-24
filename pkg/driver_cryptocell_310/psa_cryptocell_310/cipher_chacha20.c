@@ -59,8 +59,9 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
     uint8_t *nonce = output;
     uint8_t *data_out = &output[CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES];
     status = psa_generate_random(nonce, CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES);
-    if (status != PSA_SUCCESS)
+    if (status != PSA_SUCCESS) {
         return status;
+    }
 
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,

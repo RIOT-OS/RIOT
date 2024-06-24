@@ -44,16 +44,16 @@ static uint8_t PLAINTEXT[] = {
  *
  * @return  psa_status_t
  */
-psa_status_t example_cipher_chacha_20(void)
+psa_status_t example_cipher_chacha20(void)
 {
     psa_status_t status = PSA_ERROR_DOES_NOT_EXIST;
     psa_key_id_t key_id = 0;
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
-    size_t encr_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+    size_t cipher_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
                                                              PSA_ALG_STREAM_CIPHER, sizeof(PLAINTEXT));
 
-    uint8_t cipher_out[encr_output_size];
+    uint8_t cipher_out[cipher_output_size];
     uint8_t plain_out[sizeof(PLAINTEXT)];
     size_t output_len = 0;
 
@@ -68,7 +68,7 @@ psa_status_t example_cipher_chacha_20(void)
         return status;
     }
     status = psa_cipher_encrypt(key_id, PSA_ALG_STREAM_CIPHER, PLAINTEXT,
-                                sizeof(PLAINTEXT), cipher_out, encr_output_size, &output_len);
+                                sizeof(PLAINTEXT), cipher_out, cipher_output_size, &output_len);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
         return status;

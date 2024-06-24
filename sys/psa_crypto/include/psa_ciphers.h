@@ -134,7 +134,7 @@ psa_status_t psa_cipher_cbc_aes_256_encrypt(const psa_key_attributes_t *attribut
                                             size_t *output_length);
 #endif /* CONFIG_CIPHER_CBC_AES_256 */
 
-#if IS_USED(MODULE_PSA_CIPHER_CHACHA_20) || defined(DOXYGEN)
+#if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
 
 /**
  * @brief   Low level wrapper function to call a driver for ChaCha20 encryption/decryption.
