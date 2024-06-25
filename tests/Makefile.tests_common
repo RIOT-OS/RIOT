@@ -1,5 +1,12 @@
 APPLICATION ?= tests_$(notdir $(patsubst %/,%,$(CURDIR)))
 
+# for these boards, enable asan (Address Sanitizer)
+ASAN_BOARDS ?= native native64
+ifneq (, $(filter $(ASAN_BOARDS), $(BOARD)))
+  CFLAGS += $(CFLAGS_ASAN)
+  LINKFLAGS += $(LINKFLAGS_ASAN)
+endif
+
 ifneq (,$(wildcard $(CURDIR)/tests*/.))
   # add interactive test configuration when testing Kconfig
   DEFAULT_MODULE += test_utils_interactive_sync
