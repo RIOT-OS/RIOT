@@ -39,7 +39,9 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	        -e 's/"riscv64-elf"/"riscv32"/g' \
 	  | $(LAZYSPONGE) $@
 
-
+# LLVM<17 does not support RISC-V Zicsr extension in ISA-string, so it must
+# be removed when Rust is used with TOOLCHAIN=gnu
+$(CARGO_LIB): CFLAGS := $(subst -march=rv32imac_zicsr,-march=rv32imac,$(CFLAGS))
 $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
 	@command -v cargo >/dev/null || ($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: `cargo` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
