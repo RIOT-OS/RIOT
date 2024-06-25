@@ -558,7 +558,7 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-    
+
     switch (alg) {
     #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)||\
         IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)||\
@@ -572,7 +572,7 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
         case 128:
             return psa_cipher_cbc_aes_128_encrypt(attributes, key_data,
                                                     *key_bytes, alg, input,
-                                                    input_length, output, 
+                                                    input_length, output,
                                                     output_size, output_length);
         #endif
         #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)
@@ -596,12 +596,13 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
     case PSA_ALG_STREAM_CIPHER:
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
-            return psa_cipher_chacha20_encrypt(key_data, *key_bytes, 
+            return psa_cipher_chacha20_encrypt(key_data, *key_bytes,
                                                input, input_length,
                                                output, output_size,
                                                output_length);
         } else {
             (void)slot;
+            (void)attributes;
             (void)input;
             (void)input_length;
             (void)output;
@@ -612,6 +613,7 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     #endif
     default:
         (void)slot;
+        (void)attributes;
         (void)input;
         (void)input_length;
         (void)output;
@@ -634,7 +636,7 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-    
+
     switch (alg) {
     #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)||\
         IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)||\
@@ -648,7 +650,7 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
         case 128:
             return psa_cipher_cbc_aes_128_decrypt(attributes, key_data,
                                                     *key_bytes, alg, input,
-                                                    input_length, output, 
+                                                    input_length, output,
                                                     output_size, output_length);
         #endif
         #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)
@@ -672,12 +674,13 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
     case PSA_ALG_STREAM_CIPHER:
         if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
-            return psa_cipher_chacha20_decrypt(key_data, *key_bytes, 
+            return psa_cipher_chacha20_decrypt(key_data, *key_bytes,
                                                input, input_length,
                                                output, output_size,
                                                output_length);
         } else {
             (void)slot;
+            (void)attributes;
             (void)input;
             (void)input_length;
             (void)output;
@@ -688,6 +691,7 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     #endif
     default:
         (void)slot;
+        (void)attributes;
         (void)input;
         (void)input_length;
         (void)output;

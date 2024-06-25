@@ -97,7 +97,7 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
         return PSA_ERROR_DATA_INVALID;
     }
 
-    if ((key_buffer_size != CRYS_CHACHA_KEY_MAX_SIZE_IN_BYTES) || 
+    if ((key_buffer_size != CRYS_CHACHA_KEY_MAX_SIZE_IN_BYTES) ||
         (input_length < CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -109,11 +109,11 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
     uint8_t *nonce = (uint8_t *) input;
     uint8_t *data_in = (uint8_t *) &input[CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES];
     size_t data_size = input_length - CRYS_CHACHA_NONCE_MAX_SIZE_IN_BYTES;
-    
+
     cryptocell_310_enable();
     CRYSError_t periph_status = CRYS_CHACHA(nonce, CRYS_CHACHA_Nonce96BitSize,
                                             key_buffer, 0UL,
-                                            CRYS_CHACHA_Decrypt, 
+                                            CRYS_CHACHA_Decrypt,
                                             data_in,
                                             data_size,
                                             output);

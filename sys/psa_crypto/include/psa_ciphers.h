@@ -147,7 +147,7 @@ psa_status_t psa_cipher_cbc_aes_256_encrypt(const psa_key_attributes_t *attribut
  * @param output            Output buffer containing the generated nonce of size
  *                          CHACHA20POLY1305_NONCE_BYTES followed by the cipher of
  *                          the input.
- * @param output_size       Size of ouput buffer. Must be at least 
+ * @param output_size       Size of output buffer. Must be at least
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
  * @param output_length     Actual size of the output (including nonce).
 */
@@ -165,12 +165,12 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
  * @param key_buffer        Buffer containing the Key.
  * @param key_buffer_size   Size of the key in bytes.
  *                          Must be of size CHACHA20POLY1305_KEY_BYTES.
- * @param input             Input buffer containing the nonce used in the 
- *                          encryption of size CHACHA20POLY1305_NONCE_BYTES followed by 
+ * @param input             Input buffer containing the nonce used in the
+ *                          encryption of size CHACHA20POLY1305_NONCE_BYTES followed by
  *                          the cipher to be decrypted.
  * @param input_length      Size of input buffer (including nonce).
  * @param output            Output buffer.
- * @param output_size       Size of ouput buffer. Must be at least 
+ * @param output_size       Size of output buffer. Must be at least
  *                          input_length + CHACHA20POLY1305_NONCE_BYTES bytes long.
  * @param output_length     Actual size of the output.
 */
