@@ -70,6 +70,7 @@ typedef enum {
     MIB_ACTIVATION_METHOD,      /**< type is activation method */
     MIB_DEV_ADDR,               /**< type is dev addr */
     MIB_RX2_DR,                 /**< type is rx2 DR */
+    MIB_ADR,                    /**< type is ADR */
 } mlme_mib_type_t;
 
 /**
@@ -101,6 +102,7 @@ typedef struct {
         mlme_activation_t activation;   /**< holds activation mechanism */
         void *dev_addr;                 /**< pointer to the dev_addr */
         uint8_t rx2_dr;                 /** datarate of second rx window */
+        bool adr;                       /** Adaptive data rate (ADR) */
     };
 } mlme_mib_t;
 
