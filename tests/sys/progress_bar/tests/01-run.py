@@ -24,6 +24,8 @@ def testfunc(child):
         progress_str += EMPTY_CHARACTER * (LENGTH - ratio)
         check_str = 'Progress bar 0 |{}| {:3}%'.format(
             progress_str, i)
+        # todo: temporary printout for debugging this flaky test
+        print("EXPECTS:", check_str)
         child.expect_exact(check_str)
     child.expect_exact("Done!")
 
