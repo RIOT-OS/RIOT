@@ -1,0 +1,24 @@
+From 4b7b0bf06ca01e0bcc4a413f009cb8b2ddbdb5ce Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Thu, 6 Jun 2024 10:10:36 +0100
+Subject: [PATCH 1/1] RIOT: libcoap Release 4.3.5rc1
+
+---
+ examples/riot/pkg_libcoap/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/riot/pkg_libcoap/Makefile b/examples/riot/pkg_libcoap/Makefile
+index 03b3fb30..f3355a4f 100644
+--- a/examples/riot/pkg_libcoap/Makefile
++++ b/examples/riot/pkg_libcoap/Makefile
+@@ -1,6 +1,6 @@
+ PKG_NAME=libcoap
+ PKG_URL=https://github.com/obgm/libcoap
+-PKG_VERSION=e521eab58bbd15de7b9878551e979ce5c442d9b8
++PKG_VERSION=0392d022173516b6d33a95b8285ba3cbc8767bdf
+ PKG_LICENSE=BSD-2-Clause
+ 
+ LIBCOAP_BUILD_DIR=$(BINDIR)/pkg/$(PKG_NAME)
+-- 
+2.34.1
+
