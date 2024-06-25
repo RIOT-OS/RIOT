@@ -125,7 +125,9 @@ static inline void _set_mfrq(tim_t tim)
 #ifdef TC_WAVE_WAVEGEN_MFRQ
     dev(tim)->WAVE.reg = TC_WAVE_WAVEGEN_MFRQ;
 #else
-    dev(tim)->CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_MFRQ_Val;
+    uint32_t reg = dev(tim)->CTRLA.reg;
+    dev(tim)->CTRLA.reg = ((reg & ~TC_CTRLA_WAVEGEN_Msk) |
+                           TC_CTRLA_WAVEGEN(TC_CTRLA_WAVEGEN_MFRQ_Val));
 #endif
 }
 
@@ -135,7 +137,9 @@ static inline void _set_nfrq(tim_t tim)
 #ifdef TC_WAVE_WAVEGEN_NFRQ
     dev(tim)->WAVE.reg = TC_WAVE_WAVEGEN_NFRQ;
 #else
-    dev(tim)->CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
+    uint32_t reg = dev(tim)->CTRLA.reg;
+    dev(tim)->CTRLA.reg = ((reg & ~TC_CTRLA_WAVEGEN_Msk) |
+                           TC_CTRLA_WAVEGEN(TC_CTRLA_WAVEGEN_NFRQ_Val));
 #endif
 }
 
@@ -188,8 +192,8 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     timer_stop(tim);
 
     /* reset the timer */
-    dev(tim)->CTRLA.bit.SWRST = 1;
-    while (dev(tim)->CTRLA.bit.SWRST) {}
+    dev(tim)->CTRLA.reg |= TC_CTRLA_SWRST;
+    while (dev(tim)->CTRLA.reg & TC_CTRLA_SWRST) {}
 
     dev(tim)->CTRLA.reg = cfg->flags
 #ifdef TC_CTRLA_WAVEGEN_NFRQ
@@ -332,12 +336,13 @@ int timer_clear(tim_t tim, int channel)
 unsigned int timer_read(tim_t tim)
 {
     /* WORKAROUND to prevent being stuck there if timer not init */
-    if (!dev(tim)->CTRLA.bit.ENABLE) {
+    if (!(dev(tim)->CTRLA.reg & TC_CTRLA_ENABLE)) {
         return 0;
     }
 
     /* request synchronisation */
 #ifdef TC_CTRLBSET_CMD_READSYNC_Val
+    uint32_t cmd;
     dev(tim)->CTRLBSET.reg = TC_CTRLBSET_CMD_READSYNC;
      /* work around a possible hardware bug where it takes some
         cycles for the timer peripheral to set the SYNCBUSY/READSYNC bit
@@ -345,7 +350,10 @@ unsigned int timer_read(tim_t tim)
 
         The problem was observed on SAME54.
       */
-    while(dev(tim)->CTRLBSET.bit.CMD == TC_CTRLBSET_CMD_READSYNC_Val) {}
+    do {
+        cmd = ((dev(tim)->CTRLBSET.reg & TC_CTRLBSET_CMD_Msk) >> TC_CTRLBSET_CMD_Pos);
+    } while(cmd == TC_CTRLBSET_CMD_READSYNC_Val);
+
 #else
     dev(tim)->READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(TC_COUNT32_COUNT_OFFSET);
 #endif
@@ -359,13 +367,13 @@ void timer_stop(tim_t tim)
 {
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_TIMER_PM_BLOCK)
     /* unblock power mode if the timer is running */
-    if (dev(tim)->CTRLA.bit.ENABLE) {
+    if (dev(tim)->CTRLA.reg & TC_CTRLA_ENABLE) {
         DEBUG("[timer %d] pm_unblock\n", tim);
         pm_unblock(SAM0_TIMER_PM_BLOCK);
     }
 #endif
 
-    dev(tim)->CTRLA.bit.ENABLE = 0;
+    dev(tim)->CTRLA.reg &= ~TC_CTRLA_ENABLE;
     wait_synchronization(tim);
 }
 
@@ -375,13 +383,13 @@ void timer_start(tim_t tim)
 
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_TIMER_PM_BLOCK)
     /* block power mode if the timer is not running, yet */
-    if (!dev(tim)->CTRLA.bit.ENABLE) {
+    if (!(dev(tim)->CTRLA.reg & TC_CTRLA_ENABLE)) {
         DEBUG("[timer %d] pm_block\n", tim);
         pm_block(SAM0_TIMER_PM_BLOCK);
     }
 #endif
 
-    dev(tim)->CTRLA.bit.ENABLE = 1;
+    dev(tim)->CTRLA.reg |= TC_CTRLA_ENABLE;
 }
 
 static inline void timer_isr(tim_t tim)
@@ -392,7 +400,7 @@ static inline void timer_isr(tim_t tim)
     /* Acknowledge all interrupts */
     tc->INTFLAG.reg = status;
 
-    if ((status & TC_INTFLAG_MC0) && tc->INTENSET.bit.MC0) {
+    if ((status & TC_INTFLAG_MC0) && (tc->INTENSET.reg & TC_INTENSET_MC0)) {
 
         if (is_oneshot(tim, 0)) {
             tc->INTENCLR.reg = TC_INTENCLR_MC0;
@@ -403,7 +411,7 @@ static inline void timer_isr(tim_t tim)
         }
     }
 
-    if ((status & TC_INTFLAG_MC1) && tc->INTENSET.bit.MC1) {
+    if ((status & TC_INTFLAG_MC1) && (tc->INTENSET.reg & TC_INTENSET_MC1)) {
 
         if (is_oneshot(tim, 1)) {
             tc->INTENCLR.reg = TC_INTENCLR_MC1;

@@ -179,7 +179,9 @@ static int _bank_set_size(usbdev_ep_t *ep)
     default:
         return -1;
     }
-    bank->PCKSIZE.bit.SIZE = val;
+
+    uint32_t reg = bank->PCKSIZE.reg;
+    bank->PCKSIZE.reg = ((reg & ~USB_DEVICE_PCKSIZE_SIZE_Msk) | USB_DEVICE_PCKSIZE_SIZE(val));
     return val;
 }
 
@@ -210,19 +212,27 @@ static bool _ep_in_flags_set(UsbDeviceEndpoint *ep_reg)
 
 static void _set_address(sam0_common_usb_t *dev, uint8_t addr)
 {
-    dev->config->device->DADD.bit.DADD = addr;
+    uint32_t dadd = dev->config->device->DADD.reg;
     /* Only enable the address if it is nonzero */
-    dev->config->device->DADD.bit.ADDEN = addr ? 1 : 0;
+    if (addr) {
+        dadd |= USB_DEVICE_DADD_ADDEN;
+    }
+    else {
+        dadd &= ~USB_DEVICE_DADD_ADDEN;
+    }
+
+    dev->config->device->DADD.reg = (dadd & ~USB_DEVICE_DADD_DADD_Msk)
+                                  |  USB_DEVICE_DADD_DADD(addr);
 }
 
 static bool _syncbusy_enable(sam0_common_usb_t *dev)
 {
-    return dev->config->device->SYNCBUSY.bit.ENABLE;
+    return dev->config->device->SYNCBUSY.reg & USB_SYNCBUSY_ENABLE;
 }
 
 static bool _syncbusy_swrst(sam0_common_usb_t *dev)
 {
-    return dev->config->device->SYNCBUSY.bit.SWRST;
+    return dev->config->device->SYNCBUSY.reg & USB_SYNCBUSY_SWRST;
 }
 
 static inline void _poweron(sam0_common_usb_t *dev)
@@ -306,7 +316,7 @@ static void _usbdev_init(usbdev_t *dev)
     sam0_common_usb_t *usbdev = (sam0_common_usb_t *)dev;
 
     /* clear previously set pm blockers */
-    if (usbdev->config->device->CTRLA.bit.ENABLE) {
+    if (usbdev->config->device->CTRLA.reg & USB_CTRLA_ENABLE) {
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_IDLE_PM_BLOCK)
         pm_unblock(SAM0_USB_IDLE_PM_BLOCK);
 #endif
@@ -342,7 +352,10 @@ static void _usbdev_init(usbdev_t *dev)
         USB_PADCAL_TRIM((*(uint32_t *)USB_FUSES_TRIM_ADDR >>
                          USB_FUSES_TRIM_Pos));
 
-    usbdev->config->device->CTRLB.bit.SPDCONF = USB_DEVICE_CTRLB_SPDCONF_FS;
+    uint32_t ctrlb = usbdev->config->device->CTRLB.reg;
+    usbdev->config->device->CTRLB.reg = (ctrlb & ~USB_DEVICE_CTRLB_SPDCONF_Msk)
+                                      |  USB_DEVICE_CTRLB_SPDCONF_FS;
+
     _enable_irq(usbdev);
 
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_IDLE_PM_BLOCK)
@@ -437,10 +450,10 @@ static void _ep_disable(usbdev_ep_t *ep)
     UsbDeviceEndpoint *ep_reg = _ep_reg_from_ep(ep);
 
     if (ep->dir == USB_EP_DIR_OUT) {
-        ep_reg->EPCFG.bit.EPTYPE0 = 0;
+        ep_reg->EPCFG.reg &= ~USB_DEVICE_EPCFG_EPTYPE0_Msk;
     }
     else {
-        ep_reg->EPCFG.bit.EPTYPE1 = 0;
+        ep_reg->EPCFG.reg &= ~USB_DEVICE_EPCFG_EPTYPE1_Msk;
     }
 }
 
@@ -450,6 +463,7 @@ static void _ep_enable(usbdev_ep_t *ep)
           ep->dir == USB_EP_DIR_OUT ? "OUT" : "IN");
     UsbDeviceEndpoint *ep_reg = _ep_reg_from_ep(ep);
     uint8_t type = 0;
+    uint32_t epcfg;
 
     switch (ep->type) {
     case USB_EP_TYPE_CONTROL:
@@ -469,10 +483,14 @@ static void _ep_enable(usbdev_ep_t *ep)
         assert(false);
     }
     if (ep->dir == USB_EP_DIR_OUT) {
-        ep_reg->EPCFG.bit.EPTYPE0 = type;
+        epcfg = ep_reg->EPCFG.reg;
+        ep_reg->EPCFG.reg = (epcfg & ~USB_DEVICE_EPCFG_EPTYPE0_Msk)
+                          |  USB_DEVICE_EPCFG_EPTYPE0(type);
     }
     else {
-        ep_reg->EPCFG.bit.EPTYPE1 = type;
+        epcfg = ep_reg->EPCFG.reg;
+        ep_reg->EPCFG.reg = (epcfg & ~USB_DEVICE_EPCFG_EPTYPE1_Msk)
+                          |  USB_DEVICE_EPCFG_EPTYPE1(type);
     }
 }
 
@@ -534,13 +552,13 @@ static void _usbdev_esr(usbdev_t *dev)
     sam0_common_usb_t *usbdev = (sam0_common_usb_t *)dev;
 
     if (usbdev->config->device->INTFLAG.reg) {
-        if (usbdev->config->device->INTFLAG.bit.EORST) {
+        if (usbdev->config->device->INTFLAG.reg & USB_DEVICE_INTFLAG_EORST) {
             /* Clear flag */
             usbdev->config->device->INTFLAG.reg = USB_DEVICE_INTFLAG_EORST;
             usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_RESET);
             usbdev->config->device->INTFLAG.reg = USB_DEVICE_INTFLAG_EORST;
         }
-        else if (usbdev->config->device->INTFLAG.bit.SUSPEND &&
+        else if ((usbdev->config->device->INTFLAG.reg & USB_DEVICE_INTFLAG_SUSPEND) &&
                  !usbdev->suspended) {
             usbdev->config->device->INTFLAG.reg = USB_DEVICE_INTFLAG_WAKEUP |
                                                   USB_DEVICE_INTFLAG_SUSPEND;
@@ -551,7 +569,7 @@ static void _usbdev_esr(usbdev_t *dev)
             pm_unblock(SAM0_USB_ACTIVE_PM_BLOCK);
 #endif
         }
-        else if (usbdev->config->device->INTFLAG.bit.WAKEUP &&
+        else if ((usbdev->config->device->INTFLAG.reg & USB_DEVICE_INTFLAG_WAKEUP) &&
                  usbdev->suspended) {
             usbdev->config->device->INTFLAG.reg = USB_DEVICE_INTFLAG_WAKEUP |
                                                   USB_DEVICE_INTFLAG_SUSPEND;
@@ -619,12 +637,12 @@ usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
     UsbDeviceEndpoint *ep_reg = _ep_reg_from_ep(ep);
 
     if (ep->dir == USB_EP_DIR_IN) {
-        res = ep_reg->EPSTATUSSET.bit.STALLRQ1
+        res = (ep_reg->EPSTATUSSET.reg & USB_DEVICE_EPSTATUSSET_STALLRQ1)
               ? USBOPT_ENABLE
               : USBOPT_DISABLE;
     }
     else {
-        res = ep_reg->EPSTATUSSET.bit.STALLRQ0
+        res = (ep_reg->EPSTATUSSET.reg & USB_DEVICE_EPSTATUSSET_STALLRQ0)
               ? USBOPT_ENABLE
               : USBOPT_DISABLE;
     }
@@ -644,7 +662,8 @@ static void _usbdev_ep_init(usbdev_ep_t *ep)
 
 static size_t _ep_get_available(usbdev_ep_t *ep)
 {
-    return _bank_from_ep(ep)->PCKSIZE.bit.BYTE_COUNT;
+    return ((_bank_from_ep(ep)->PCKSIZE.reg & USB_DEVICE_PCKSIZE_BYTE_COUNT_Msk)
+           >> USB_DEVICE_PCKSIZE_BYTE_COUNT_Pos);
 }
 
 static int _usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
@@ -710,7 +729,9 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
     _bank_from_ep(ep)->ADDR.reg = (uint32_t)(intptr_t)buf;
     if (ep->dir == USB_EP_DIR_IN) {
         _disable_ep_stall_in(ep_reg);
-        _bank_from_ep(ep)->PCKSIZE.bit.BYTE_COUNT = len;
+        uint32_t reg = _bank_from_ep(ep)->PCKSIZE.reg;
+        _bank_from_ep(ep)->PCKSIZE.reg = (reg & ~USB_DEVICE_PCKSIZE_BYTE_COUNT_Msk)
+                                       |  USB_DEVICE_PCKSIZE_BYTE_COUNT(len);
         ep_reg->EPSTATUSSET.reg = USB_DEVICE_EPSTATUSSET_BK1RDY;
     }
     else {
@@ -731,15 +752,15 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
     signed event = -1;
 
     if (ep->dir == USB_EP_DIR_OUT) {
-        if (ep_reg->EPINTFLAG.bit.TRCPT0) {
+        if (ep_reg->EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_TRCPT0) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRCPT0;
             event = USBDEV_EVENT_TR_COMPLETE;
         }
-        else if (ep_reg->EPINTFLAG.bit.RXSTP) {
+        else if (ep_reg->EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_RXSTP) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_RXSTP;
             event = USBDEV_EVENT_TR_COMPLETE;
         }
-        else if (ep_reg->EPINTFLAG.bit.STALL0) {
+        else if (ep_reg->EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_STALL0) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_STALL0;
             event = USBDEV_EVENT_TR_STALL;
         }
@@ -749,12 +770,12 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
         }
     }
     else {
-        if (ep_reg->EPINTFLAG.bit.TRCPT1) {
+        if (ep_reg->EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_TRCPT1) {
             DEBUG("sam_usb: Transfer IN complete\n");
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRCPT1;
             event = USBDEV_EVENT_TR_COMPLETE;
         }
-        else if (ep_reg->EPINTFLAG.bit.STALL1) {
+        else if (ep_reg->EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_STALL1) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_STALL1;
             event = USBDEV_EVENT_TR_STALL;
         }

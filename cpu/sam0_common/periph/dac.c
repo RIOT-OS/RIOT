@@ -59,7 +59,7 @@ static inline void _sync(void)
 #ifdef DAC_SYNCBUSY_MASK
     while (DAC->SYNCBUSY.reg) {}
 #else
-    while (DAC->STATUS.bit.SYNCBUSY) {}
+    while (DAC->STATUS.reg & DAC_STATUS_SYNCBUSY) {}
 #endif
 }
 
@@ -110,7 +110,7 @@ int8_t dac_init(dac_t line)
     _dac_init_clock(line);
 
     /* Settings can only be changed when DAC is disabled */
-    DAC->CTRLA.bit.ENABLE = 0;
+    DAC->CTRLA.reg &= ~DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_DACCTRL_ENABLE
@@ -125,7 +125,7 @@ int8_t dac_init(dac_t line)
 #endif
                    ;
 
-    DAC->CTRLA.bit.ENABLE = 1;
+    DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_STATUS_READY

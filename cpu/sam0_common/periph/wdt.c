@@ -41,26 +41,33 @@
 #define WDT_CONFIG_PER_16K_Val WDT_CONFIG_PER_CYC16384_Val
 #endif
 
-static inline void _set_enable(bool on)
+static inline void _wdt_enable(void)
 {
 /* work around strange watchdog behaviour if IDLE2 is used on samd21 */
 #ifdef CPU_COMMON_SAMD21
-    if (on) {
         pm_block(1);
-    }
 #endif
 
 #ifdef WDT_CTRLA_ENABLE
-    WDT->CTRLA.bit.ENABLE = on;
+    WDT->CTRLA.reg |= WDT_CTRLA_ENABLE;
 #else
-    WDT->CTRL.bit.ENABLE = on;
+    WDT->CTRL.reg |= WDT_CTRL_ENABLE;
+#endif
+}
+
+static inline void _wdt_disable(void)
+{
+#ifdef WDT_CTRLA_ENABLE
+    WDT->CTRLA.reg &= ~WDT_CTRLA_ENABLE;
+#else
+    WDT->CTRL.reg &= ~WDT_CTRL_ENABLE;
 #endif
 }
 
 static inline void _wait_syncbusy(void)
 {
 #ifdef WDT_STATUS_SYNCBUSY
-    while (WDT->STATUS.bit.SYNCBUSY) {}
+    while (WDT->STATUS.reg & WDT_STATUS_SYNCBUSY) {}
 #else
     while (WDT->SYNCBUSY.reg) {}
 #endif
@@ -98,12 +105,12 @@ void wdt_init(void)
 {
     _wdt_clock_setup();
 #ifdef MCLK
-    MCLK->APBAMASK.bit.WDT_ = 1;
+    MCLK->APBAMASK.reg |= MCLK_APBAMASK_WDT;
 #else
-    PM->APBAMASK.bit.WDT_ = 1;
+    PM->APBAMASK.reg |= PM_APBAMASK_WDT;
 #endif
 
-    _set_enable(0);
+    _wdt_disable();
     NVIC_EnableIRQ(WDT_IRQn);
 }
 
@@ -136,16 +143,16 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
         }
 
 #ifdef WDT_CTRLA_WEN
-        WDT->CTRLA.bit.WEN = 1;
+        WDT->CTRLA.reg |= WDT_CTRLA_WEN;
 #else
-        WDT->CTRL.bit.WEN = 1;
+        WDT->CTRL.reg |= WDT_CTRL_WEN;
 #endif
     } else {
         win = 0;
 #ifdef WDT_CTRLA_WEN
-        WDT->CTRLA.bit.WEN = 0;
+        WDT->CTRLA.reg &= ~WDT_CTRLA_WEN;
 #else
-        WDT->CTRL.bit.WEN = 0;
+        WDT->CTRL.reg &= ~WDT_CTRL_WEN;
 #endif
     }
 
@@ -159,13 +166,13 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
 
 void wdt_stop(void)
 {
-    _set_enable(0);
+    _wdt_disable();
     _wait_syncbusy();
 }
 
 void wdt_start(void)
 {
-    _set_enable(1);
+    _wdt_enable();
     _wait_syncbusy();
 }
 
@@ -203,7 +210,9 @@ void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
         }
 
         WDT->INTENSET.reg = WDT_INTENSET_EW;
-        WDT->EWCTRL.bit.EWOFFSET = per - warning_offset;
+        uint32_t reg = WDT->EWCTRL.reg;
+        WDT->EWCTRL.reg = (reg & ~WDT_EWCTRL_EWOFFSET_Msk)
+                        |  WDT_EWCTRL_EWOFFSET(per - warning_offset);
     } else {
         WDT->INTENCLR.reg = WDT_INTENCLR_EW;
     }
