@@ -409,6 +409,7 @@ typedef struct {
     size_t end;                     /**< End offset of the current block    */
     size_t cur;                     /**< Offset of the generated content    */
     uint8_t *opt;                   /**< Pointer to the placed option       */
+    uint8_t obytes;                 /**< size of the placed option          */
 } coap_block_slicer_t;
 
 #if defined(MODULE_NANOCOAP_RESOURCES) || DOXYGEN
@@ -993,10 +994,9 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
  * @param[in]     slicer      Preallocated slicer struct to use
  * @param[in]     option      option number (block1 or block2)
  *
- * @return      true if the `more` bit is set in the block option
- * @return      false if the `more` bit is not set the block option
+ * @return      number of bytes by which the CoAP header shrunk
  */
-bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+int coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
 
 /**
  * @brief Finish a block1 request
@@ -1009,10 +1009,9 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
  *
  * @param[in]     slicer      Preallocated slicer struct to use
  *
- * @return      true if the `more` bit is set in the block option
- * @return      false if the `more` bit is not set the block option
+ * @return      number of bytes by which the CoAP header shrunk
  */
-static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
+static inline int coap_block1_finish(coap_block_slicer_t *slicer)
 {
     return coap_block_finish(slicer, COAP_OPT_BLOCK1);
 }
@@ -1028,10 +1027,9 @@ static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
  *
  * @param[in]     slicer      Preallocated slicer struct to use
  *
- * @return      true if the `more` bit is set in the block option
- * @return      false if the `more` bit is not set the block option
+ * @return      number of bytes by which the CoAP header shrunk
  */
-static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
+static inline int coap_block2_finish(coap_block_slicer_t *slicer)
 {
     return coap_block_finish(slicer, COAP_OPT_BLOCK2);
 }
