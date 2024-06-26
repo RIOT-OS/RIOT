@@ -554,66 +554,42 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
                                                     size_t output_size,
                                                     size_t *output_length)
 {
+    psa_cipher_op_t op = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    switch (alg) {
-    #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)||\
-        IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)||\
-        IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
-    case PSA_ALG_CBC_NO_PADDING:
-        if (attributes->type != PSA_KEY_TYPE_AES) {
-            return PSA_ERROR_INVALID_ARGUMENT;
-        }
-        switch (attributes->bits) {
-        #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
-        case 128:
-            return psa_cipher_cbc_aes_128_encrypt(attributes, key_data,
-                                                    *key_bytes, alg, input,
-                                                    input_length, output,
-                                                    output_size, output_length);
-        #endif
-        #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)
-        case 192:
-            return psa_cipher_cbc_aes_192_encrypt(attributes, key_data,
-                                                  *key_bytes, alg, input,
-                                                  input_length, output,
-                                                  output_size, output_length);
-        #endif
-        #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
-        case 256:
-            return psa_cipher_cbc_aes_256_encrypt(attributes, key_data,
-                                                  *key_bytes, alg, input,
-                                                  input_length, output,
-                                                  output_size, output_length);
-        #endif
-        default:
-            return PSA_ERROR_INVALID_ARGUMENT;
-        }
+    if (op == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (op) {
+    #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
+        case PSA_CBC_NO_PAD_AES_128:
+            return psa_cipher_cbc_aes_128_encrypt(attributes, key_data, *key_bytes, alg, input,
+                                              input_length, output, output_size, output_length);
+    #endif
+    #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)
+        case PSA_CBC_NO_PAD_AES_192:
+            return psa_cipher_cbc_aes_192_encrypt(attributes, key_data, *key_bytes, alg, input,
+                                                input_length, output, output_size, output_length);
+    #endif
+    #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
+        case PSA_CBC_NO_PAD_AES_256:
+            return psa_cipher_cbc_aes_256_encrypt(attributes, key_data, *key_bytes, alg, input,
+                                                input_length, output, output_size, output_length);
     #endif
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
-    case PSA_ALG_STREAM_CIPHER:
-        if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
+        case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_encrypt(key_data, *key_bytes,
                                                input, input_length,
                                                output, output_size,
                                                output_length);
-        } else {
-            (void)slot;
-            (void)attributes;
-            (void)input;
-            (void)input_length;
-            (void)output;
-            (void)output_size;
-            (void)output_length;
-            return PSA_ERROR_NOT_SUPPORTED;
-        }
     #endif
     default:
         (void)slot;
-        (void)attributes;
         (void)input;
         (void)input_length;
         (void)output;
@@ -632,66 +608,42 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
                                                     size_t output_size,
                                                     size_t *output_length)
 {
+    psa_cipher_op_t op = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    switch (alg) {
-    #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)||\
-        IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)||\
-        IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
-    case PSA_ALG_CBC_NO_PADDING:
-        if (attributes->type != PSA_KEY_TYPE_AES) {
-            return PSA_ERROR_INVALID_ARGUMENT;
-        }
-        switch (attributes->bits) {
-        #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
-        case 128:
-            return psa_cipher_cbc_aes_128_decrypt(attributes, key_data,
-                                                    *key_bytes, alg, input,
-                                                    input_length, output,
-                                                    output_size, output_length);
-        #endif
-        #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)
-        case 192:
-            return psa_cipher_cbc_aes_192_decrypt(attributes, key_data,
-                                                  *key_bytes, alg, input,
-                                                  input_length, output,
-                                                  output_size, output_length);
-        #endif
-        #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
-        case 256:
-            return psa_cipher_cbc_aes_256_decrypt(attributes, key_data,
-                                                  *key_bytes, alg, input,
-                                                  input_length, output,
-                                                  output_size, output_length);
-        #endif
-        default:
-            return PSA_ERROR_INVALID_ARGUMENT;
-        }
+    if (op == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (op) {
+    #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
+        case PSA_CBC_NO_PAD_AES_128:
+            return psa_cipher_cbc_aes_128_decrypt(attributes, key_data, *key_bytes, alg, input,
+                                              input_length, output, output_size, output_length);
+    #endif
+    #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC)
+        case PSA_CBC_NO_PAD_AES_192:
+            return psa_cipher_cbc_aes_192_decrypt(attributes, key_data, *key_bytes, alg, input,
+                                                input_length, output, output_size, output_length);
+    #endif
+    #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC)
+        case PSA_CBC_NO_PAD_AES_256:
+            return psa_cipher_cbc_aes_256_decrypt(attributes, key_data, *key_bytes, alg, input,
+                                                input_length, output, output_size, output_length);
     #endif
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
-    case PSA_ALG_STREAM_CIPHER:
-        if (attributes->type == PSA_KEY_TYPE_CHACHA20) {
+        case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_decrypt(key_data, *key_bytes,
                                                input, input_length,
                                                output, output_size,
                                                output_length);
-        } else {
-            (void)slot;
-            (void)attributes;
-            (void)input;
-            (void)input_length;
-            (void)output;
-            (void)output_size;
-            (void)output_length;
-            return PSA_ERROR_NOT_SUPPORTED;
-        }
     #endif
     default:
         (void)slot;
-        (void)attributes;
         (void)input;
         (void)input_length;
         (void)output;
