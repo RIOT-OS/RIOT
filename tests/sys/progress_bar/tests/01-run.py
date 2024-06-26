@@ -18,7 +18,7 @@ EMPTY_CHARACTER = os.getenv('CONFIG_PROGRESS_BAR_EMPTY_CHARACTER')[1:-1]
 
 
 def testfunc(child):
-    for i in range(0, 100, 10):
+    for i in range(0, 101, 10):
         ratio = int(i * LENGTH / 100.0)
         progress_str = FULL_CHARACTER * ratio
         progress_str += EMPTY_CHARACTER * (LENGTH - ratio)
