@@ -21,12 +21,27 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 | UARTs                 | USART1 on PA10 (RX), PA9 (TX)                                                             |
 | SPIs                  | SPI1 on PB5 (MOSI), PB4 (MISO), PB3 (SCLK); SPI2 on PB15 (MOSI), PB14 (MISO), PB13 (SCLK) |
 
-### Flashing the board
+## Flashing the device
+
+### Flashing the board using OpenOCD
 
 The board can be flashed using OpenOCD via the on-board ST-Link adapter.
 Then use the following command:
 
     make BOARD=stm32l0538-disco -C examples/hello-world flash
+
+## Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=stm32l0538-disco PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 ### STDIO
 
