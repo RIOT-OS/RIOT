@@ -18,14 +18,14 @@ EMPTY_CHARACTER = os.getenv('CONFIG_PROGRESS_BAR_EMPTY_CHARACTER')[1:-1]
 
 
 def testfunc(child):
-    for i in range(0, 100, 10):
+    for i in range(0, 101, 10):
         ratio = int(i * LENGTH / 100.0)
         progress_str = FULL_CHARACTER * ratio
         progress_str += EMPTY_CHARACTER * (LENGTH - ratio)
         check_str = 'Progress bar 0 |{}| {:3}%'.format(
             progress_str, i)
         # todo: temporary printout for debugging this flaky test
-        print("EXPECTS:", check_str)
+        print("EXPECTS:", check_str, "LENGTH:", LENGTH, "ratio:", ratio)
         child.expect_exact(check_str)
     child.expect_exact("Done!")
 
