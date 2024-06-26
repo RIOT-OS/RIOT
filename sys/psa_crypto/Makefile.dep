@@ -337,11 +337,11 @@ endif
 # HMAC MD5
 ifneq (,$(filter psa_mac_hmac_md5,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_md5_custom_backend,$(USEMODULE)))
-    USEMODULE += psa_mac_hmac_md5_backend_riot
+    USEMODULE += psa_mac_hmac_md5_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_md5_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_md5_backend_generic,$(USEMODULE)))
   USEMODULE += psa_hash
   USEMODULE += psa_hash_md5
   USEMODULE += psa_riot_mac_hmac_generic
@@ -350,11 +350,11 @@ endif
 # HMAC SHA-1
 ifneq (,$(filter psa_mac_hmac_sha_1,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_1_custom_backend,$(USEMODULE)))
-    USEMODULE += psa_mac_hmac_sha_1_backend_riot
+    USEMODULE += psa_mac_hmac_sha_1_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_1_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_sha_1_backend_generic,$(USEMODULE)))
   USEMODULE += psa_hash
   USEMODULE += psa_hash_sha_1
   USEMODULE += psa_riot_mac_hmac_generic
@@ -363,11 +363,11 @@ endif
 # HMAC SHA-224
 ifneq (,$(filter psa_mac_hmac_sha_224,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_224_custom_backend,$(USEMODULE)))
-    USEMODULE += psa_mac_hmac_sha_224_backend_riot
+    USEMODULE += psa_mac_hmac_sha_224_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_224_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_sha_224_backend_generic,$(USEMODULE)))
   USEMODULE += psa_hash
   USEMODULE += psa_hash_sha_224
   USEMODULE += psa_riot_mac_hmac_generic
@@ -376,11 +376,11 @@ endif
 ## HMAC SHA-256
 ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_256_custom_backend,$(USEMODULE)))
-    USEMODULE += psa_mac_hmac_sha_256_backend_riot
+    USEMODULE += psa_mac_hmac_sha_256_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_256_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_sha_256_backend_generic,$(USEMODULE)))
   USEMODULE += psa_hash
   USEMODULE += psa_hash_sha_256
   USEMODULE += psa_riot_mac_hmac_generic
@@ -389,11 +389,11 @@ endif
 # HMAC SHA-384
 ifneq (,$(filter psa_mac_hmac_sha_384,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_384_custom_backend,$(USEMODULE)))
-    USEMODULE += psa_mac_hmac_sha_384_backend_riot
+    USEMODULE += psa_mac_hmac_sha_384_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_384_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_sha_384_backend_generic,$(USEMODULE)))
   USEMODULE += psa_hash
   USEMODULE += psa_hash_sha_384
   USEMODULE += psa_riot_mac_hmac_generic
@@ -402,11 +402,11 @@ endif
 # HMAC SHA-512
 ifneq (,$(filter psa_mac_hmac_sha_512,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_512_custom_backend,$(USEMODULE)))
-    USEMODULE += psa_mac_hmac_sha_512_backend_riot
+    USEMODULE += psa_mac_hmac_sha_512_backend_generic
   endif
 endif
 
-ifneq (,$(filter psa_mac_hmac_sha_512_backend_riot,$(USEMODULE)))
+ifneq (,$(filter psa_mac_hmac_sha_512_backend_generic,$(USEMODULE)))
   USEMODULE += psa_hash
   USEMODULE += psa_hash_sha_512
   USEMODULE += psa_riot_mac_hmac_generic

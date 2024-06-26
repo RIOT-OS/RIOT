@@ -188,7 +188,7 @@ PSEUDOMODULES += psa_key_management
 ## MAC
 PSEUDOMODULES += psa_mac
 PSEUDOMODULES += psa_mac_hmac_md5
-PSEUDOMODULES += psa_mac_hmac_md5_backend_riot
+PSEUDOMODULES += psa_mac_hmac_md5_backend_generic
 PSEUDOMODULES += psa_mac_hmac_md5_custom_backend
 
 # check that one and only one backend has been selected
@@ -199,7 +199,7 @@ ifneq (,$(filter psa_mac_hmac_md5,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_mac_hmac_sha_1
-PSEUDOMODULES += psa_mac_hmac_sha_1_backend_riot
+PSEUDOMODULES += psa_mac_hmac_sha_1_backend_generic
 PSEUDOMODULES += psa_mac_hmac_sha_1_custom_backend
 
 # check that one and only one backend has been selected
@@ -210,7 +210,7 @@ ifneq (,$(filter psa_mac_hmac_sha_1,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_mac_hmac_sha_224
-PSEUDOMODULES += psa_mac_hmac_sha_224_backend_riot
+PSEUDOMODULES += psa_mac_hmac_sha_224_backend_generic
 PSEUDOMODULES += psa_mac_hmac_sha_224_custom_backend
 
 # check that one and only one backend has been selected
@@ -221,7 +221,7 @@ ifneq (,$(filter psa_mac_hmac_sha_224,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_mac_hmac_sha_256
-PSEUDOMODULES += psa_mac_hmac_sha_256_backend_riot
+PSEUDOMODULES += psa_mac_hmac_sha_256_backend_generic
 PSEUDOMODULES += psa_mac_hmac_sha_256_custom_backend
 
 # check that one and only one backend has been selected
@@ -232,7 +232,7 @@ ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_mac_hmac_sha_384
-PSEUDOMODULES += psa_mac_hmac_sha_384_backend_riot
+PSEUDOMODULES += psa_mac_hmac_sha_384_backend_generic
 PSEUDOMODULES += psa_mac_hmac_sha_384_custom_backend
 
 # check that one and only one backend has been selected
@@ -243,7 +243,7 @@ ifneq (,$(filter psa_mac_hmac_sha_384,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_mac_hmac_sha_512
-PSEUDOMODULES += psa_mac_hmac_sha_512_backend_riot
+PSEUDOMODULES += psa_mac_hmac_sha_512_backend_generic
 PSEUDOMODULES += psa_mac_hmac_sha_512_custom_backend
 
 # check that one and only one backend has been selected
