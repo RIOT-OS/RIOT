@@ -116,6 +116,23 @@ void gnrc_ipv6_nib_init(void)
 static void _add_static_lladdr(gnrc_netif_t *netif)
 {
 #ifdef CONFIG_GNRC_IPV6_STATIC_LLADDR
+#if (CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) > 0
+#ifndef MODULE_NETDEV_REGISTER
+#error "Use of CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK requires MODULE_NETDEV_REGISTER"
+#endif
+    if (! (((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << netif->dev->type)) ||
+           ((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << NETDEV_ANY)))) {
+        DEBUG("nib: interface #%u: not setting static link-local address "
+                "(netdev type %u not included)\n",
+                netif->pid, netif->dev->type);
+        return;
+    }
+#endif
+    DEBUG("nib: interface #%u: adding static link-local address \"%s\"%s\n",
+            netif->pid,
+            CONFIG_GNRC_IPV6_STATIC_LLADDR,
+            IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED) ?
+                " (fixed)" : " (+ interface number)");
     /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address
      * with CONFIG_GNRC_IPV6_STATIC_LLADDR + i

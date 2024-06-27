@@ -182,6 +182,28 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Select interfaces by driver types for setting static link local
+ *          addresses
+ *
+ * This option allows to explicitly include interfaces by matching their
+ * netdev driver types, encoded in a bitmask.
+ * See @ref netdev_type_t for possible values of netdev driver types.
+ * Matching NETDEV_ANY will include all netdev driver types.
+ *
+ * Example usage, includes AT86RF215 and MRF24J40 driver types:
+ *
+ * @code{.c}
+ * #define CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK \
+ *    ((1UL << NETDEV_AT86RF215) | (1UL << NETDEV_MRF24J40))
+ * @endcode
+ *
+ * A value of 0 will switch this selection feature off.
+ */
+#ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK 0ULL
+#endif
+
+/**
  * @brief Message queue size to use for the IPv6 thread.
  */
 #ifndef GNRC_IPV6_MSG_QUEUE_SIZE
