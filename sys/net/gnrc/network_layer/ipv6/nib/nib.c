@@ -115,6 +115,26 @@ void gnrc_ipv6_nib_init(void)
 
 static void _add_static_lladdr(gnrc_netif_t *netif)
 {
+#if defined(CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK) && \
+    CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK > 0
+#ifndef MODULE_NETDEV_REGISTER
+#error "CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK requires MODULE_NETDEV_REGISTER"
+#endif
+    if (CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK & (1ULL << NETDEV_ANY) ||
+            CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK & (1ULL << netif->dev->type)) {
+        DEBUG("nib: Interface %u is of excluded type %u, not adding static link-local address\n",
+              netif->pid, netif->dev->type);
+        return;
+    }
+#endif
+#if defined(CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_IFACE_MASK) && \
+    CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_IFACE_MASK > 0
+    if (CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_IFACE_MASK & (1ULL << netif->pid)) {
+        DEBUG("nib: Interface %u (type %u) in exclude list, not adding static link-local address\n",
+              netif->pid, netif->dev->type);
+        return;
+    }
+#endif
 #ifdef CONFIG_GNRC_IPV6_STATIC_LLADDR
     /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address

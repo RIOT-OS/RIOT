@@ -182,6 +182,42 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Exclude certain driver types when setting static link local
+ *          addresses
+ *
+ * This option allows to exclude netdev driver types via a bitmask.
+ * See @ref netdev_type_t for possible values.
+ * Matching NETDEV_ANY will exclude all netdev driver types.
+ *
+ * Example usage, excludes AT86RF215 and MRF24J40 driver types:
+ *
+ * @code{.c}
+ * #define CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK \
+ *    ((1UL << NETDEV_AT86RF215) | (1UL << NETDEV_MRF24J40))
+ * @endcode
+ */
+#ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_NETDEV_MASK 0UL
+#endif
+
+/**
+ * @brief   Exclude certain interface numbers when setting static link local
+ *          addresses
+ *
+ * This option allows to exclude interface types via a bitmask.
+ *
+ * Example usage, excludes interfaces 6 and 8:
+ *
+ * @code{.c}
+ * #define CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_IFACE_MASK \
+ *    ((1UL << 6) | (1UL << 8))
+ * @endcode
+ */
+#ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_IFACE_MASK
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR_EXCLUDE_IFACE_MASK 0UL
+#endif
+
+/**
  * @brief Message queue size to use for the IPv6 thread.
  */
 #ifndef GNRC_IPV6_MSG_QUEUE_SIZE
