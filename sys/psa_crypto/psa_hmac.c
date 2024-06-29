@@ -44,9 +44,9 @@ static psa_status_t psa_hmac_setup_key(psa_mac_operation_t *operation,
     return PSA_SUCCESS;
 }
 
-static psa_status_t psa_mac_finish(psa_mac_operation_t *operation,
-                                   uint8_t *buffer,
-                                   size_t buffer_size)
+static psa_status_t psa_hmac_finish(psa_mac_operation_t *operation,
+                                    uint8_t *buffer,
+                                    size_t buffer_size)
 {
     psa_algorithm_t hash_alg = PSA_ALG_GET_HASH(operation->alg);
     size_t block_length = PSA_HASH_BLOCK_LENGTH(hash_alg);
@@ -77,7 +77,7 @@ static psa_status_t psa_mac_finish(psa_mac_operation_t *operation,
         return status;
     }
 
-    // Clear key data
+    /* Clear key data */
     explicit_bzero(&operation->block, block_length);
 
     return PSA_SUCCESS;
@@ -159,14 +159,14 @@ psa_status_t psa_hmac_setup(psa_mac_operation_t *operation,
     operation->alg = alg;
     status = psa_hmac_setup_key(operation, key_buffer, key_buffer_size);
     if (status != PSA_SUCCESS) {
-        // Clear key data
+        /* Clear key data */
         explicit_bzero(&operation->block, block_length);
         return status;
     }
 
     status = psa_hash_setup(&operation->hash, hash_alg);
     if (status != PSA_SUCCESS) {
-        // Clear key data
+        /* Clear key data */
         explicit_bzero(&operation->block, block_length);
         return status;
     }
@@ -178,7 +178,7 @@ psa_status_t psa_hmac_setup(psa_mac_operation_t *operation,
     status = psa_hash_update(&operation->hash, operation->block, block_length);
     if (status != PSA_SUCCESS) {
         psa_hash_abort(&operation->hash);
-        // Clear key data
+        /* Clear key data */
         explicit_bzero(&operation->block, block_length);
         return status;
     }
@@ -204,7 +204,7 @@ psa_status_t psa_hmac_sign_finish(psa_mac_operation_t *operation,
 {
     psa_status_t status;
 
-    status = psa_mac_finish(operation, mac, mac_size);
+    status = psa_hmac_finish(operation, mac, mac_size);
     if (status != PSA_SUCCESS) {
         return status;
     }
@@ -219,7 +219,7 @@ psa_status_t psa_hmac_verify_finish(psa_mac_operation_t *operation,
     uint8_t result[PSA_MAC_MAX_SIZE];
     psa_status_t status;
 
-    status = psa_mac_finish(operation, result, sizeof(result));
+    status = psa_hmac_finish(operation, result, sizeof(result));
     if (status != PSA_SUCCESS) {
         return status;
     }
@@ -233,7 +233,7 @@ psa_status_t psa_hmac_abort(psa_mac_operation_t *operation)
     size_t block_length = PSA_HASH_BLOCK_LENGTH(hash_alg);
     psa_status_t status;
 
-    // Clear key data
+    /* Clear key data */
     explicit_bzero(&operation->block, block_length);
     status = psa_hash_abort(&operation->hash);
     if (status != PSA_SUCCESS) {
