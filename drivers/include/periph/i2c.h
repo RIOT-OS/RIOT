@@ -314,7 +314,6 @@ void i2c_release(i2c_t dev);
  * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
  * @return                  -EAGAIN When a lost bus arbitration occurs
  */
-
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags);
 
@@ -367,7 +366,6 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
  * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
  * @return                  -EAGAIN When a lost bus arbitration occurs
  */
-
 int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
 
 /**
@@ -392,7 +390,6 @@ int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
  * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
  * @return                  -EAGAIN When a lost bus arbitration occurs
  */
-
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
                    void *data, size_t len, uint8_t flags);
 

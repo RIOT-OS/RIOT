@@ -120,14 +120,31 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
+
 /**
  * @name    I2C configuration
  * @{
  */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev      = (uint32_t *) I2C0_BASE,
+        .speed    = I2C_SPEED_NORMAL,
+        .sda = GPIO_PIN(0, 16),
+        .scl  = GPIO_PIN(0, 17)
+    },
+    {
+        .dev      = (uint32_t *) I2C1_BASE,
+        .speed    = I2C_SPEED_NORMAL,
+        .sda = GPIO_PIN(0, 14),
+        .scl  = GPIO_PIN(0, 15)
+    }
+};
+/** @} */
+
 /**
  *  @brief  Number of I2C interfaces
  */
-#define I2C_NUMOF       _periph_numof_is_unsigned_0()
+#define I2C_NUMOF       2 //_periph_numof_is_unsigned_0()
 /** @} */
 
 /**
