@@ -187,6 +187,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief Use temporary addresses (rfc8981)
+ * @see [RFC 8981](https://www.rfc-editor.org/rfc/rfc8981.html)
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES
+#define CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES 0
+#endif
+
+/**
  * @brief    handle Redirect Messages
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_REDIRECT
