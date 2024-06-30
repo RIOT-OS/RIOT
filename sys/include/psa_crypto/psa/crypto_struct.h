@@ -205,12 +205,14 @@ static inline struct psa_hash_operation_s psa_hash_operation_init(void)
 #define PSA_MAC_OPERATION_INIT { 0 }
 
 /**
- * @brief   Structure storing a MAC operation context
- *
- * @note    Not yet implemented
+ * @brief   Structure storing a MAC operation context.
  */
 struct psa_mac_operation_s {
-    int dummy;  /**< Not yet implemented */
+    psa_algorithm_t alg;                    /**< Operation algorithm*/
+#if IS_USED(MODULE_PSA_RIOT_MAC_HMAC_GENERIC)
+    psa_hash_operation_t hash;              /**< Hash context*/
+    uint8_t block[PSA_HMAC_BLOCK_MAX_SIZE]; /**< Block buffer*/
+#endif
 };
 
 /**

@@ -33,5 +33,6 @@ void tests_hashes(void)
     TESTS_RUN(tests_hashes_sha512_tests());
     TESTS_RUN(tests_hashes_sha512_224_tests());
     TESTS_RUN(tests_hashes_sha512_256_tests());
-    TESTS_RUN(tests_hashes_sha3_tests());
+    TESTS_RUN(tests_hashes_sha512_hmac_tests());
+    TESTS_RUN(tests_hashes_sha384_hmac_tests());
 }

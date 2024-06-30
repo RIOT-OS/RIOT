@@ -1,2 +1,12 @@
+CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=1
+
 USEMODULE += hashes
+USEMODULE += psa_crypto
+USEMODULE += psa_riot_mac_hmac_generic
 USEMODULE += crypto_aes_128
+USEMODULE += psa_mac
+USEMODULE += psa_hash
+USEMODULE += psa_hash_sha_512
+USEMODULE += psa_mac_hmac_sha_512
+USEMODULE += psa_hash_sha_384
+USEMODULE += psa_mac_hmac_sha_384

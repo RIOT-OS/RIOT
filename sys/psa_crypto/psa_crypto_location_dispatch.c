@@ -432,7 +432,8 @@ psa_status_t psa_location_dispatch_verify_message(  const psa_key_attributes_t *
 #endif /* MODULE_PSA_ASYMMETRIC */
 
 #if IS_USED(MODULE_PSA_MAC)
-psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attributes,
+psa_status_t psa_location_dispatch_mac_compute(const psa_key_id_t key,
+                                               const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
                                                const psa_key_slot_t *slot,
                                                const uint8_t *input,
@@ -462,8 +463,64 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
     (void)key_bytes;
 #endif /* CONFIG_PSA_SECURE_ELEMENT */
 
-    return psa_algorithm_dispatch_mac_compute(attributes, alg, slot, input, input_length, mac,
+    return psa_algorithm_dispatch_mac_compute(key, attributes, alg, slot, input, input_length, mac,
                                               mac_size, mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_verify(const psa_key_id_t key,
+                                              const psa_key_attributes_t *attributes,
+                                              psa_algorithm_t alg,
+                                              const psa_key_slot_t *slot,
+                                              const uint8_t *input,
+                                              size_t input_length,
+                                              const uint8_t *mac,
+                                              size_t mac_length)
+{
+    return psa_algorithm_dispatch_mac_verify(key, attributes, alg, slot, input, input_length,
+                                             mac, mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
+                                                  const psa_key_attributes_t *attributes,
+                                                  const psa_key_slot_t *slot,
+                                                  psa_algorithm_t alg)
+{
+    return psa_algorithm_dispatch_mac_sign_setup(operation, attributes, slot, alg);
+}
+
+psa_status_t psa_location_dispatch_mac_verify_setup(psa_mac_operation_t *operation,
+                                                    const psa_key_attributes_t *attributes,
+                                                    const psa_key_slot_t *slot,
+                                                    psa_algorithm_t alg)
+{
+    return psa_algorithm_dispatch_mac_verify_setup(operation, attributes, slot, alg);
+}
+
+psa_status_t psa_location_dispatch_mac_update(psa_mac_operation_t *operation,
+                                              const uint8_t *input,
+                                              size_t input_length)
+{
+    return psa_algorithm_dispatch_mac_update(operation, input, input_length);
+}
+
+psa_status_t psa_location_dispatch_mac_sign_finish(psa_mac_operation_t *operation,
+                                                   uint8_t *mac,
+                                                   size_t mac_size,
+                                                   size_t *mac_length)
+{
+    return psa_algorithm_dispatch_mac_sign_finish(operation, mac, mac_size, mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_verify_finish(psa_mac_operation_t *operation,
+                                                     const uint8_t *mac,
+                                                     size_t mac_length)
+{
+    return psa_algorithm_dispatch_mac_verify_finish(operation, mac, mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_abort(psa_mac_operation_t *operation)
+{
+    return psa_algorithm_dispatch_mac_abort(operation);
 }
 #endif /* MODULE_PSA_MAC */
 
