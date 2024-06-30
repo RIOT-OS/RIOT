@@ -13,6 +13,26 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 
 ![STM32L0538-DISCO](https://www.st.com/content/ccc/fragment/product_related/rpn_information/board_photo/group0/67/a2/3f/98/6b/24/4a/27/stm32l0538-discovery.jpg/files/stm32l0538-disco.jpg/_jcr_content/translations/en.stm32l0538-disco.jpg)
 
+### MCU
+
+| MCU          | STM32L053C8
+|:-------------|:--------------------|
+| Family       | ARM Cortex-M0+      |
+| Vendor       | ST Microelectronics |
+| RAM          | 8KiB                |
+| Flash        | 64KiB               |
+| Frequency    | up to 32 MHz        |
+| Timers       | 9 (2x watchdog, 1 SysTick, 5x 16-bit, 1x RTC) |
+| ADCs         | 1x 12 bit (up to 16 channels) |
+| UARTs        | 3 (two USARTs and one Low-Power UART) |
+| I2Cs         | 2                   |
+| SPIs         | 4                   |
+| RTC          | 1                   |
+| Datasheet    | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l053c6.pdf)|
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0367-ultralowpower-stm32l0x3-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)|
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0223-stm32-cortexm0-mcus-programming-manual-stmicroelectronics.pdf)|
+| Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um1775-discovery-kit-with-stm32l053c8-mcu-stmicroelectronics.pdf)|
+
 ### Supported features
 
 | Peripheral            | Configuration                                                                             |
