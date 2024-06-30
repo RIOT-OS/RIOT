@@ -40,6 +40,7 @@ typedef struct {
     coap_pkt_t pdu;                         /**< forward CoAP PDU */
     sock_udp_ep_t server_ep;                /**< forward Server endpoint */
     sock_udp_ep_t ep;                       /**< client endpoint */
+    sock_udp_ep_t proxy_ep;                 /**< proxy endpoint */
     uint16_t mid;                           /**< message ID */
     uint8_t flags;                          /**< client flags */
 #if IS_USED(MODULE_NANOCOAP_CACHE)
