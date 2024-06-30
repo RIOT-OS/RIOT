@@ -46,8 +46,7 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
      * Option (ABRO) in a respective Prefix Information Option (PIO)
      * (see https://tools.ietf.org/html/rfc6775#section-8.1.1). */
     while ((offl = _nib_offl_iter(offl))) {
-        if ((offl->mode & _PL) &&
-            (_nib_onl_get_if(offl->next_hop) == (unsigned)netif->pid)) {
+        if ((offl->mode & _PL) && (_nib_offl_get_if(offl) == (unsigned)netif->pid)) {
             _nib_abr_add_pfx(abr, offl);
         }
     }
