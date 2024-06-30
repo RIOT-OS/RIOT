@@ -391,6 +391,16 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx);
 const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx);
 
 /**
+ * @brief   Get the local endpoint on which the request has been received
+ *
+ * @param[in]   ctx The request context
+ *
+ * @return  Local   endpoint to which the request has been received
+ * @return  NULL    The request was not received via UDP
+ */
+const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx);
+
+/**
  * @brief   Block1 helper struct
  */
 typedef struct {
@@ -1971,6 +1981,23 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
  */
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+
+/**
+ * @brief   Initialize a separate response PDU from a request PDU
+ *
+ * @param[in,out]   pkt         Response PDU to initialize
+ * @param[in]       type        Response type (CON or NON)
+ * @param[in]       code        Response code
+ * @param[out]      rbuf        Response buffer
+ * @param[in]       rlen        Size of response buffer
+ * @param[in]       payload_len Response payload length
+ *
+ * @returns     0 if no response should be sent due to a No-Response option in the request
+ * @returns     <0 on error
+ * @returns     -ENOSPC if @p rbuf too small
+ */
+ssize_t coap_build_separate_reply(coap_pkt_t *pkt, unsigned type, unsigned code,
+                                  uint8_t *rbuf, unsigned rlen, unsigned payload_len);
 
 /**
  * @brief   Build empty reply to CoAP request
