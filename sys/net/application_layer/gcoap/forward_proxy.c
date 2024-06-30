@@ -142,8 +142,9 @@ static ssize_t _forward_proxy_handler(coap_pkt_t *pdu, uint8_t *buf,
 {
     int pdu_len;
     const sock_udp_ep_t *remote = coap_request_ctx_get_remote_udp(ctx);
+    const sock_udp_ep_t *local = coap_request_ctx_get_local_udp(ctx);
 
-    pdu_len = gcoap_forward_proxy_request_process(pdu, remote);
+    pdu_len = gcoap_forward_proxy_request_process(pdu, remote, local);
 
     /* Out of memory, reply with 5.00 */
     if (pdu_len == -ENOMEM) {
@@ -226,12 +227,13 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
     return true;
 }
 
-static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote)
+static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote,
+                             const sock_udp_ep_t *local)
 {
     /* Yes it's not a request -- but turns out there is nothing in
      * gcoap_req_send that is actually request specific, especially if we
      * don't assign a callback. */
-    ssize_t res = gcoap_req_send(buf, len, remote, NULL, NULL,
+    ssize_t res = gcoap_req_send(buf, len, remote, local, NULL, NULL,
                                  GCOAP_SOCKET_TYPE_UDP);
     if (res <= 0) {
         DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", -res);
@@ -252,7 +254,7 @@ static void _send_empty_ack(event_t *event)
     /* Flipping byte order as unlike in the other places where mid is
      * used, coap_build_hdr would actually flip it back */
     coap_build_hdr(&buf, COAP_TYPE_ACK, NULL, 0, 0, ntohs(cep->mid));
-    _dispatch_msg(&buf, sizeof(buf), &cep->ep);
+    _dispatch_msg(&buf, sizeof(buf), &cep->ep, &cep->proxy_ep);
 }
 
 static void _set_response_type(coap_pkt_t *pdu, uint8_t resp_type)
@@ -316,7 +318,7 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
     }
     _set_response_type(pdu, _cep_get_response_type(cep));
     /* don't use buf_len here, in case the above `gcoap_resp_init`s changed `pdu` */
-    _dispatch_msg(pdu->hdr, coap_get_total_len(pdu), &cep->ep);
+    _dispatch_msg(pdu->hdr, coap_get_total_len(pdu), &cep->ep, &cep->proxy_ep);
     _free_client_ep(cep);
 }
 
@@ -398,6 +400,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
 
     /* copy payload from client_pkt to pkt */
     memcpy(pkt->payload, client_pkt->payload, client_pkt->payload_len);
+    pkt->payload_len = client_pkt->payload_len;
     len += client_pkt->payload_len;
 
     return len;
@@ -407,7 +410,7 @@ int gcoap_forward_proxy_req_send(client_ep_t *cep)
 {
     int len;
     if ((len = gcoap_req_send((uint8_t *)cep->pdu.hdr, coap_get_total_len(&cep->pdu),
-                             &cep->server_ep, _forward_resp_handler, cep,
+                             &cep->server_ep, NULL, _forward_resp_handler, cep,
                              GCOAP_SOCKET_TYPE_UNDEF)) <= 0) {
         DEBUG("gcoap_forward_proxy_req_send(): gcoap_req_send failed %d\n", len);
         _free_client_ep(cep);
@@ -458,7 +461,7 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
     /* copy all options from client_pkt to pkt */
     len = _gcoap_forward_proxy_copy_options(&client_ep->pdu, client_pkt, client_ep, urip);
 
-    if (len == -EINVAL) {
+    if (len < 0) {
         _free_client_ep(client_ep);
         return -EINVAL;
     }
@@ -479,13 +482,13 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
 }
 
 int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
-                                        const sock_udp_ep_t *client) {
+                                        const sock_udp_ep_t *client, const sock_udp_ep_t *local) {
     char *uri;
     uri_parser_result_t urip;
     ssize_t optlen = 0;
 
     client_ep_t *cep = _allocate_client_ep(client);
-
+    cep->proxy_ep = local ? *local : (sock_udp_ep_t){ 0 };
     if (!cep) {
         return -ENOMEM;
     }

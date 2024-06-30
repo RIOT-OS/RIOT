@@ -391,6 +391,16 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx);
 const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx);
 
 /**
+ * @brief   Get the local endpoint on which the request has been received
+ *
+ * @param[in]   ctx The request context
+ *
+ * @return  Local   endpoint to which the request has been received
+ * @return  NULL    The request was not received via UDP
+ */
+const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx);
+
+/**
  * @brief   Block1 helper struct
  */
 typedef struct {

@@ -1464,3 +1464,13 @@ const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *c
 {
     return ctx->remote;
 }
+
+const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx)
+{
+#if defined(MODULE_SOCK_AUX_LOCAL)
+    return ctx->local;
+#else
+    (void)ctx;
+    return NULL;
+#endif
+}

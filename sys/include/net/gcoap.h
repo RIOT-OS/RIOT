@@ -330,7 +330,7 @@
  * coap_opt_add_proxy_uri(&pdu, uri);
  * unsigned len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
  *
- * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, _resp_handler, NULL,
+ * gcoap_req_send((uint8_t *) pdu->hdr, len, proxy_remote, NULL, _resp_handler, NULL,
  *                GCOAP_SOCKET_TYPE_UNDEF);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
@@ -559,6 +559,14 @@ extern "C" {
 
 /**
  * @ingroup net_gcoap_conf
+ * @brief   Maximum number of local notifying endpoint addresses
+ */
+#ifndef CONFIG_GCOAP_OBS_NOTIFIERS_MAX
+#define CONFIG_GCOAP_OBS_NOTIFIERS_MAX  (2)
+#endif
+
+/**
+ * @ingroup net_gcoap_conf
  * @brief   Maximum number of registrations for Observable resources
  */
 #ifndef CONFIG_GCOAP_OBS_REGISTRATIONS_MAX
@@ -622,7 +630,7 @@ extern "C" {
  * @brief Stack size for module thread
  * @{
  */
-#ifndef GCOAP_STACK_SIZE
+#ifndef GCOAP_DTLS_EXTRA_STACKSIZE
 #if IS_USED(MODULE_GCOAP_DTLS)
 #define GCOAP_DTLS_EXTRA_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
 #else
@@ -639,9 +647,11 @@ extern "C" {
 #define GCOAP_VFS_EXTRA_STACKSIZE   (0)
 #endif
 
+#ifndef GCOAP_STACK_SIZE
 #define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
                           + sizeof(coap_pkt_t) + GCOAP_DTLS_EXTRA_STACKSIZE \
                           + GCOAP_VFS_EXTRA_STACKSIZE)
+#endif
 #endif
 /** @} */
 
@@ -837,6 +847,7 @@ struct gcoap_request_memo {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    sock_udp_ep_t *notifier;            /**< Local endpoint to send notifications */
     const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     uint16_t last_msgid;                /**< Message ID of last notification */
@@ -964,6 +975,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] buf           Buffer containing the PDU
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
+ * @param[in] local         Local endpoint to send from, may be NULL
  * @param[in] resp_handler  Callback when response received, may be NULL
  * @param[in] context       User defined context passed to the response handler
  * @param[in] tl_type       The transport type to use for send. When
@@ -980,7 +992,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return  0 if cannot send
  */
 ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
-                       const sock_udp_ep_t *remote,
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
                        gcoap_resp_handler_t resp_handler, void *context,
                        gcoap_socket_type_t tl_type);
 
@@ -1009,7 +1021,7 @@ static inline ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
                                         gcoap_resp_handler_t resp_handler, void *context,
                                         gcoap_socket_type_t tl_type)
 {
-    return gcoap_req_send(buf, len, remote, resp_handler, context, tl_type);
+    return gcoap_req_send(buf, len, remote, NULL, resp_handler, context, tl_type);
 }
 
 /**
@@ -1051,6 +1063,9 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
  *          observer registered for a resource
  *
  * First verifies that an observer has been registered for the resource.
+ *
+ * @post    If this function returns @ref GCOAP_OBS_INIT_OK you have to call
+ *          @ref gcoap_obs_send() afterwards to release a mutex.
  *
  * @param[out] pdu      Notification metadata
  * @param[out] buf      Buffer containing the PDU
