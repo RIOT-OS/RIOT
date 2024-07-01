@@ -64,9 +64,6 @@
    This specifies the first channel that goes to SMPR2 instead of SMPR1. */
 #define ADC_SMPR2_FIRST_CHAN (10)
 
-#define ADC_CCR_CKMODE_HCLK_1   (ADC_CCR_CKMODE_0)
-#define ADC_CCR_CKMODE_HCLK_2   (ADC_CCR_CKMODE_1)
-
 /**
  * @brief   Default VBAT undefined value
  */
@@ -144,13 +141,14 @@ int adc_init(adc_t line)
     ADC->CCR &= ~(ADC_CCR_PRESC);
 
     ADC->CCR &= ~(ADC_CCR_CKMODE);
+    /* Setting ADC clock to HCLK/1 is only allowed if AHB clock prescaler is 1*/
     if (!(RCC->CFGR & RCC_CFGR_HPRE_3)) {
-        /* set ADC clock to HCLK/1, only allowed if AHB clock prescaler is 1 */
-        ADC->CCR |= ADC_CCR_CKMODE_HCLK_1 << ADC_CCR_CKMODE_Pos;
+        /* set ADC clock to HCLK/1 */
+        ADC->CCR |= (ADC_CCR_CKMODE_0);
     }
     else {
         /* set ADC clock to HCLK/2 otherwise */
-        ADC->CCR |= ADC_CCR_CKMODE_HCLK_2 << ADC_CCR_CKMODE_Pos;
+        ADC->CCR |= (ADC_CCR_CKMODE_1);
     }
 
     /* configure the pin */
