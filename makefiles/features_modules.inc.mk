@@ -27,6 +27,9 @@ PERIPH_IGNORE_MODULES := \
   periph_gpio_ll% \
   periph_gpio_mux \
   periph_hash_sha_1 \
+  periph_hash_sha3_256 \
+  periph_hash_sha3_384 \
+  periph_hash_sha3_512 \
   periph_hash_sha_224 \
   periph_hash_sha_256 \
   periph_hash_sha_384 \

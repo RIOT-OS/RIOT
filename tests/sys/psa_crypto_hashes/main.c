@@ -23,6 +23,7 @@
 #include "ztimer.h"
 
 extern psa_status_t example_hash(void);
+extern psa_status_t example_sha3_glue(void);
 
 int main(void)
 {
@@ -39,6 +40,14 @@ int main(void)
     if (status != PSA_SUCCESS) {
         failed = true;
         printf("Hash failed: %s\n", psa_status_to_humanly_readable(status));
+    }
+
+    start = ztimer_now(ZTIMER_USEC);
+    status = example_sha3_glue();
+    printf("SHA3 glue code test took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("SHA3 glue code failed: %s\n", psa_status_to_humanly_readable(status));
     }
 
     ztimer_release(ZTIMER_USEC);
