@@ -81,3 +81,41 @@ psa_status_t example_cipher_chacha20(void)
     }
     return status;
 }
+
+/**
+ * @brief   Example function to perform an CHACHA20 multipart encryption and decryption
+ *          with the PSA Crypto API.
+ *
+ * @return  psa_status_t
+ */
+psa_status_t example_cipher_chacha20_multipart(void)
+{
+    psa_status_t status = PSA_ERROR_DOES_NOT_EXIST;
+    psa_key_id_t key_id = 0;
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
+    size_t cipher_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+                                                             PSA_ALG_STREAM_CIPHER, sizeof(PLAINTEXT));
+    psa_cipher_operation_t operation = psa_cipher_
+    uint8_t cipher_out[cipher_output_size];
+    uint8_t plain_out[sizeof(PLAINTEXT)];
+    size_t output_len = 0;
+
+    psa_set_key_algorithm(&attr, PSA_ALG_STREAM_CIPHER);
+    psa_set_key_usage_flags(&attr, usage);
+    psa_set_key_bits(&attr, 256);
+    psa_set_key_type(&attr, PSA_KEY_TYPE_CHACHA20);
+
+    status = psa_import_key(&attr, KEY_CHACHA20, sizeof(KEY_CHACHA20), &key_id);
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        return status;
+    }
+
+
+    psa_destroy_key(key_id);
+    if (status == PSA_SUCCESS) {
+        return (memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) ? -1 : 0);
+    }
+    return status;
+}

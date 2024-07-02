@@ -108,7 +108,7 @@ psa_status_t psa_location_dispatch_cipher_encrypt_setup(   psa_cipher_operation_
                                                            const psa_key_slot_t *slot,
                                                            psa_algorithm_t alg)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if IS_USED(MODULE_PSA_SECURE_ELEMENT) || IS_USED(MODULE_PSA_CIPHER_CHACHA20)
     psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
     if (location != PSA_KEY_LOCATION_LOCAL_STORAGE) {
         const psa_drv_se_t *drv;
@@ -146,6 +146,9 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
                                                         const psa_key_slot_t *slot,
                                                         psa_algorithm_t alg)
 {
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+        
+    #endif /* MODULE_PSA_CIPHER_CHACHA20 */
     (void)operation;
     (void)attributes;
     (void)slot;

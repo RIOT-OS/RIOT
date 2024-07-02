@@ -107,9 +107,9 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
  *                          long.
  * @param[in]   inputlen    Length of the input byte array.
 */
-void chacha20_encrypt_decrypt(const uint8_t *input, uint8_t *output,
-                             const uint8_t *key, const uint8_t *nonce,
-                             size_t inputlen);
+void chacha20_encrypt_decrypt(psa_crypto_operation_t *operation, const uint8_t *input, uint8_t *output,
+                             const uint8_t *nonce,
+                             size_t input_length, size_t output_size, uint8_t *output_length);
 
 #ifdef __cplusplus
 }

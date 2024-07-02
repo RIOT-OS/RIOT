@@ -169,10 +169,30 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
     return 1;
 }
 
-void chacha20_encrypt_decrypt(const uint8_t *input, uint8_t *output,
-                              const uint8_t *key, const uint8_t *nonce,
-                              size_t inputlen)
+psa_status_t chacha20_encrypt_decrypt(  psa_cipher_operation_t *operation,
+                                const uint8_t *input,
+                                uint8_t *output,
+                                const uint8_t *nonce,
+                                size_t input_length,
+                                size_t output_size,
+                                uint8_t *output_length)
 {
-    chacha20poly1305_ctx_t ctx;
-    _xcrypt(&ctx, key, nonce, input, output, inputlen, 0);
+    //chacha20poly1305_ctx_t ctx;
+    //_xcrypt(&ctx, key, nonce, input, output, inputlen, 0);
+    status = psa_cipher_update(operation,
+                               input,
+                               input_length,
+                               output,
+                               output_size,
+                               output_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+    status = psa_cipher_finish(operation,
+                               output,
+                               output_size,
+                               output_length);
+        if (status != PSA_SUCCESS) {
+        return status;
+    }
 }
