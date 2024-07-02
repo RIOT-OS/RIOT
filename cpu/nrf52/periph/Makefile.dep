@@ -38,6 +38,11 @@ ifneq (,$(filter periph_cipher_aes_128_cbc,$(USEMODULE)))
   USEMODULE += psa_cryptocell_310_aes_cbc
 endif
 
+ifneq (,$(filter periph_cipher_chacha20,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_cipher_chacha20
+endif
+
 ifneq (,$(filter periph_hmac_sha_256,$(USEMODULE)))
   USEPKG += driver_cryptocell_310
   USEMODULE += psa_cryptocell_310_hmac
