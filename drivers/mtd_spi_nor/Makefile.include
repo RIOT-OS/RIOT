@@ -1,6 +1,0 @@
-# include variants of MTD SPI NOR drivers as pseudo modules
-PSEUDOMODULES += mtd_spi_nor_mx_security
-PSEUDOMODULES += mtd_spi_nor_issi_security
-
-USEMODULE_INCLUDES_mtd_spi_nor := $(LAST_MAKEFILEDIR)/include
-USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_mtd_spi_nor)

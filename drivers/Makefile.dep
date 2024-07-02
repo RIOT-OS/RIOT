@@ -120,10 +120,6 @@ ifneq (,$(filter mtd_%,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
-ifneq (,$(filter mtd_spi_nor_%,$(USEMODULE)))
-  USEMODULE += mtd_spi_nor
-endif
-
 # nrfmin is a concrete module but comes from cpu/nrf5x_common. Due to limitations
 # in the dependency resolution mechanism it's not possible to move its
 # dependency resolution at cpu level.

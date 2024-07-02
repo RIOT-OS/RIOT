@@ -25,14 +25,12 @@
  *
  *      USEMODULE += mtd_spi_nor
  *
- * For ISSI and Macronix devices, some security features are provided
+ * For ISSI and Macronix devices, some data integrity features are provided
  * to check if program or erase operations were successful.
- * These features can be activated with the corresponding pseudomodules in the Makefile
- * of your board or project:
+ * These features can be activated by specifying the manufacturer specific flags in
+ * the mtd_spi_nor_params_t structure.
  *
- *      USEMODULE += mtd_spi_nor_mx_security
- *      or
- *      USEMODULE += mtd_spi_nor_issi_security
+ *      TODO
  *
  * \n
  * Some examples of how to work with the MTD SPI NOR driver can be found in the test for the
@@ -64,6 +62,9 @@ extern "C"
 
 /**
  * @brief   SPI NOR flash opcode table
+ *
+ * Manufacturer specific opcodes have a short form of the manufacturer as a prefix,
+ * for example "MX" for "Macronix".
  */
 typedef struct {
     uint8_t rdid;            /**< Read identification (JEDEC ID) */
@@ -79,13 +80,10 @@ typedef struct {
     uint8_t chip_erase;      /**< Chip erase */
     uint8_t sleep;           /**< Deep power down */
     uint8_t wake;            /**< Release from deep power down */
-#if IS_USED(MODULE_MTD_SPI_NOR_MX_SECURITY)
-    uint8_t rdscur;          /**< Read security register */
-#elif IS_USED(MODULE_MTD_SPI_NOR_ISSI_SECURITY)
-    uint8_t rderp;           /**< Read extended read parameters register */
-    uint8_t clerp;           /**< Clear extended read parameters register */
-    uint8_t wrdi;            /**< Write disable */
-#endif
+    uint8_t mx_rdscur;       /**< Read security register (Macronix specific) */
+    uint8_t issi_rderp;      /**< Read extended read parameters register (ISSI specific) */
+    uint8_t issi_clerp;      /**< Clear extended read parameters register (ISSI specific) */
+    uint8_t issi_wrdi;       /**< Write disable (ISSI specific) */
 } mtd_spi_nor_opcode_t;
 
 /**
@@ -127,6 +125,22 @@ typedef struct __attribute__((packed)) {
  * @brief   Flag to set when the device support 64KiB block erase (block_erase_32k opcode)
  */
 #define SPI_NOR_F_SECT_64K  (4)
+
+/**
+ * @brief Enable data integrity checks after program/erase operations
+ * for devices that support it.
+ */
+#define SPI_NOR_F_CHECK_INTEGRETY (256)
+
+/**
+ * @brief Enable functionality that is specific for Macronix devices.
+ */
+#define SPI_NOR_F_MANUF_MACRONIX    (0xC2)
+
+/**
+ * @brief Enable functionality that is specific for ISSI devices.
+ */
+#define SPI_NOR_F_MANUF_ISSI        (0x9D)
 
 /**
  * @brief Compile-time parameters for a serial flash device
@@ -204,9 +218,9 @@ extern const mtd_desc_t mtd_spi_nor_driver;
  * different devices, as well as in the Linux kernel, so they seem quite
  * sensible for default values.
  *
- * To enable manufacturer specific security functions, the according
- * pseudomodules have to be used which will activate the corresponding
- * opcodes.
+ * To enable manufacturer specific data integrity functions, the according
+ * flags have to be set in the mtd_spi_nor_params_t structure in the
+ * mtd_spi_nor_params_t.manufacturer element.
  */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
 

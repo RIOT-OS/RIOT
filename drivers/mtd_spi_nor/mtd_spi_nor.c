@@ -436,6 +436,49 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     DEBUG("\n");
 }
 
+static inline int check_data_integrity(const mtd_spi_nor_t *dev, int ret)
+{
+    /* skip the test if the device definitiuon does not include the integrity test */
+    if (!(dev->params->flag & SPI_NOR_F_CHECK_INTEGRETY)) {
+        return ret;
+    }
+
+    int new_ret = ret;
+    uint8_t buffer;
+
+    /* read the first byte of the JEDEC ID to distinguish between manufacturers */
+    mtd_spi_cmd_read(dev, dev->params->opcode->rdid, &buffer, sizeof(buffer));
+
+    if (buffer == SPI_NOR_F_MANUF_MACRONIX) {
+        /* Macronix specific: Read security register */
+        mtd_spi_cmd_read(dev, dev->params->opcode->mx_rdscur, &buffer, sizeof(buffer));
+        if (buffer & MX_SECURITY_PFAIL || buffer & MX_SECURITY_EFAIL) {
+            DEBUG("mtd_spi_nor: ERR: program/erase failed! scur = %02x\n", buffer);
+
+            new_ret = -EIO;
+        }
+    } else if (buffer == SPI_NOR_F_MANUF_ISSI) {
+        /* ISSI specific: Read extended read register for data integrity flags */
+        mtd_spi_cmd_read(dev, dev->params->opcode->issi_rderp, &buffer, sizeof(buffer));
+        if (buffer & IS_ERP_P_ERR || buffer & IS_ERP_E_ERR) {
+            DEBUG("mtd_spi_nor: ERR: program/erase failed! erp = %02x\n", buffer);
+
+            new_ret = -EIO;
+
+            /* clear the extended read parameters register manually */
+            mtd_spi_cmd(dev, dev->params->opcode->issi_clerp);
+
+            /* ISSI flashs do not reset the WEL-Flag when an operation was not *completed* */
+            mtd_spi_cmd(dev, dev->params->opcode->issi_wrdi);
+        }
+    } else {
+        DEBUG("mtd_spi_nor: ERR: unknown manufacturer ID = %02x, skip data integrity test\n",
+              buffer);
+    }
+
+    return new_ret;
+}
+
 static void _init_pins(mtd_spi_nor_t *dev)
 {
     DEBUG("mtd_spi_nor_init: init pins\n");
@@ -668,29 +711,8 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
 
-#if IS_USED(MODULE_MTD_SPI_NOR_MX_SECURITY)
-    /* Read security register */
-    uint8_t scur_reg;
-    mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &scur_reg, sizeof(scur_reg));
-    if (scur_reg & MX_SECURITY_PFAIL) {
-        DEBUG("mtd_spi_nor_write: ERR: page program failed! scur = %02x\n", scur_reg);
-        ret = -EIO;
-    }
-#elif IS_USED(MODULE_MTD_SPI_NOR_ISSI_SECURITY)
-    /* Read extended read register for security flags */
-    uint8_t erp_reg;
-    mtd_spi_cmd_read(dev, dev->params->opcode->rderp, &erp_reg, sizeof(erp_reg));
-    if (erp_reg & IS_ERP_P_ERR) {
-        DEBUG("mtd_spi_nor_write: ERR: page program failed! erp = %02x\n", erp_reg);
-        ret = -EIO;
-
-        /* clear the extended read parameters register manually */
-        mtd_spi_cmd(dev, dev->params->opcode->clerp);
-
-        /* ISSI flashs do not reset the WEL-Flag when an operation was not *completed* */
-        mtd_spi_cmd(dev, dev->params->opcode->wrdi);
-    }
-#endif
+    /* (optionally) check if the operation was successful */
+    ret = check_data_integrity(dev, ret);
 
     /* Wait for WEL-Flag to be cleared */
     wait_for_write_enable_cleared(dev);
@@ -775,29 +797,8 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev, us);
 
-#if IS_USED(MODULE_MTD_SPI_NOR_MX_SECURITY)
-        /* Read security register */
-        uint8_t scur_reg;
-        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &scur_reg, sizeof(scur_reg));
-        if (scur_reg & MX_SECURITY_EFAIL) {
-            DEBUG("mtd_spi_nor_write: ERR: erase failed! scur = %02x\n", scur_reg);
-            ret = -EIO;
-        }
-#elif IS_USED(MODULE_MTD_SPI_NOR_ISSI_SECURITY)
-        /* Read extended read register for security flags */
-        uint8_t erp_reg;
-        mtd_spi_cmd_read(dev, dev->params->opcode->rderp, &erp_reg, sizeof(erp_reg));
-        if (erp_reg & IS_ERP_E_ERR) {
-            DEBUG("mtd_spi_nor_write: ERR: erase failed! erp = %02x\n", erp_reg);
-            ret = -EIO;
-
-            /* clear the extended read parameters register manually */
-            mtd_spi_cmd(dev, dev->params->opcode->clerp);
-
-            /* ISSI flashs do not reset the WEL-Flag when an operation was not *completed* */
-            mtd_spi_cmd(dev, dev->params->opcode->wrdi);
-        }
-#endif
+        /* (optionally) check if the operation was successful */
+        ret = check_data_integrity(dev, ret);
 
         /* Wait for WEL-Flag to be cleared */
         wait_for_write_enable_cleared(dev);
