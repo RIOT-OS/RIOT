@@ -10,8 +10,8 @@ This test will destroy the data present on the chip!
 ## nRF52840DK
 The test is designed to work with the built-in MX25F6435F flash of the
 Nordic Semiconductor nRF52840DK development board.
-Currently the nRF52840DK Flash definitions do not have the security options enabled.
-To enable the security features of the built-in flash, the "SPI_NOR_F_MANUF_CHECK_INTEGRITY"
+Currently the nRF52840DK Flash definitions do not have the data integrity options enabled.
+To enable these features for the built-in flash, the "SPI_NOR_F_MANUF_CHECK_INTEGRITY"
 flag has to be added to the NRF52840DK_NOR_FLAGS define in the
 boards/nrf52840dk/include/board.h file.
 
@@ -37,7 +37,7 @@ The Device under Test can be changed with CFLAGS as well:
 ... CFLAGS+="-DTEST_IS25LE01G" ...
 ```
 
-If the Flash supports the security features, it is automatically enabled in the
+If the Flash supports the data integrity features, it is automatically enabled in the
 mtd_spi_nor_params_t in the flash_dut.c file.
 
 A full test call would therefore be for example:
@@ -49,7 +49,7 @@ CFLAGS+="-DFLASH_SPI_DEV=1 -DFLASH_SPI_CS='GPIO_PIN(1,5)' -DTEST_IS25LE01G" make
 
 ## ISSI
 
-- IS25LP128 (no security features)
+- IS25LP128 (no data integrity check features)
 - IS25LE01G
 
 ## Macronix
