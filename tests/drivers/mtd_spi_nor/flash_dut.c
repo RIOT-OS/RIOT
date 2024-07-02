@@ -19,7 +19,7 @@
 
 /* The default CS pin and SPI device is for the built-in flash of the nRF52840DK */
 #ifndef FLASH_SPI_CS
-#define FLASH_SPI_CS    GPIO_PIN(0, 17)
+#define FLASH_SPI_CS    GPIO_PIN(1, 5)
 #endif
 
 #ifndef FLASH_SPI_DEV
@@ -33,7 +33,7 @@
 #define IS25LP128_SECTOR_COUNT      (4096)
 #define IS25LP128_FLAGS             (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K | \
                                      SPI_NOR_F_SECT_64K)
-#define IS25LP128_SPI_CLK           SPI_CLK_100KHZ
+#define IS25LP128_SPI_CLK           SPI_CLK_1MHZ
 #define IS25LP128_SPI_MODE          SPI_MODE_0
 
 static const mtd_spi_nor_params_t _is25lp128_flash_nor_params = {
@@ -69,7 +69,7 @@ MTD_XFA_ADD(_is25lp128_nor_dev, 10);
 #define IS25LE01G_PAGES_PER_SECTOR  (16)
 #define IS25LE01G_SECTOR_COUNT      (32768)
 #define IS25LE01G_FLAGS             (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K | \
-                                     SPI_NOR_F_SECT_64K)
+                                     SPI_NOR_F_SECT_64K | SPI_NOR_F_CHECK_INTEGRETY)
 #define IS25LE01G_SPI_CLK           SPI_CLK_10MHZ
 #define IS25LE01G_SPI_MODE          SPI_MODE_0
 
@@ -106,7 +106,7 @@ MTD_XFA_ADD(_is25le01g_nor_dev, 10);
 #define MX25L12873F_PAGES_PER_SECTOR    (16)
 #define MX25L12873F_SECTOR_COUNT        (4096)
 #define MX25L12873F_FLAGS               (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K | \
-                                         SPI_NOR_F_SECT_64K)
+                                         SPI_NOR_F_SECT_64K | SPI_NOR_F_CHECK_INTEGRETY)
 #define MX25L12873F_SPI_CLK             SPI_CLK_10MHZ
 #define MX25L12873F_SPI_MODE            SPI_MODE_0
 
