@@ -224,7 +224,10 @@ static void test_mtd_block_protect(void)
     ret = mtd_write_page_raw(TEST_MTD, test_data, 0x00000000, 0x00, sizeof(test_data));
     TEST_ASSERT_EQUAL_INT(-EIO, ret);
 
-    busy_wait_us(1000000);
+    /* wait for one second between the tests */
+    for (uint16_t ms = 1000; ms; ms--) {
+        busy_wait_us((unsigned int)US_PER_MS);
+    }
 
     /* Perform an erase test to check if the E_FAIL flag is correctly handled */
     ret = mtd_erase(TEST_MTD, 0x00000000, dev->base.page_size * dev->base.pages_per_sector);
