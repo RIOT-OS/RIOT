@@ -78,7 +78,7 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
                                             uint8_t *output,
                                             size_t output_size,
                                             size_t *output_length);
-#endif /* CONFIG_CIPHER_CBC_AES_128 */
+#endif /* MODULE_PSA_CIPHER_AES_128_CBC */
 
 #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || defined(DOXYGEN)
 /**
@@ -105,7 +105,7 @@ psa_status_t psa_cipher_cbc_aes_192_encrypt(const psa_key_attributes_t *attribut
                                             uint8_t *output,
                                             size_t output_size,
                                             size_t *output_length);
-#endif /* CONFIG_CIPHER_CBC_AES_192 */
+#endif /* MODULE_PSA_CIPHER_AES_192_CBC */
 
 #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || defined(DOXYGEN)
 /**
@@ -132,7 +132,7 @@ psa_status_t psa_cipher_cbc_aes_256_encrypt(const psa_key_attributes_t *attribut
                                             uint8_t *output,
                                             size_t output_size,
                                             size_t *output_length);
-#endif /* CONFIG_CIPHER_CBC_AES_256 */
+#endif /* MODULE_PSA_CIPHER_AES_256_CBC */
 
 #if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
 
@@ -178,7 +178,7 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
                                          size_t output_size,
                                          size_t *output_length);
 
-#endif
+#endif /* MODULE_PSA_CIPHER_CHACHA20 */
 #ifdef __cplusplus
 }
 #endif
