@@ -12,4 +12,7 @@ CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=1
 USEMODULE += psa_asymmetric
 USEMODULE += psa_asymmetric_ecc_ed25519
 
+USEMODULE += psa_hash
+USEMODULE += psa_hash_sha_256
+
 include $(RIOTBASE)/Makefile.include

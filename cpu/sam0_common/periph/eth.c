@@ -132,7 +132,7 @@ unsigned sam0_read_phy(uint8_t phy, uint8_t addr)
                   | GMAC_MAN_OP(PHY_READ_OP);
 
     /* Wait for operation completion */
-    while (!GMAC->NSR.bit.IDLE) {}
+    while (!(GMAC->NSR.reg & GMAC_NSR_IDLE)) {}
     /* return content of shift register */
     return (GMAC->MAN.reg & GMAC_MAN_DATA_Msk);
 }
@@ -148,7 +148,7 @@ void sam0_write_phy(uint8_t phy, uint8_t addr, uint16_t data)
                   | GMAC_MAN_CLTTO      | GMAC_MAN_DATA(data);
 
     /* Wait for operation completion */
-    while (!GMAC->NSR.bit.IDLE) {}
+    while (!(GMAC->NSR.reg & GMAC_NSR_IDLE)) {}
 }
 
 void sam0_eth_poweron(void)
@@ -237,14 +237,16 @@ int sam0_eth_send(const struct iolist *iolist)
     }
     if (len == tx_len) {
         /* Clear and set the frame size */
-        tx_curr->status &= ~DESC_TX_STATUS_LEN_MASK;
-        tx_curr->status |= (len & DESC_TX_STATUS_LEN_MASK);
+        tx_curr->status = (len & DESC_TX_STATUS_LEN_MASK)
         /* Indicate this is the last buffer and the frame is ready */
-        tx_curr->status |= DESC_TX_STATUS_LAST_BUF | DESC_TX_STATUS_USED;
+                        | DESC_TX_STATUS_LAST_BUF;
         /* Prepare next buffer index */
-        tx_idx = (tx_idx < ETH_TX_BUFFER_COUNT-1) ? tx_idx+1 : 0;
-        __DSB();
-        tx_curr->status &= ~DESC_TX_STATUS_USED;
+        if (++tx_idx == ETH_TX_BUFFER_COUNT) {
+            /* Set WRAP flag to indicate last buffer */
+            tx_curr->status |= DESC_TX_STATUS_WRAP;
+            tx_idx = 0;
+        }
+        __DMB();
         /* Start transmission */
         GMAC->NCR.reg |= GMAC_NCR_TSTART;
         /* Set the next buffer */
@@ -254,6 +256,12 @@ int sam0_eth_send(const struct iolist *iolist)
         DEBUG("Mismatch TX len, abort send\n");
     }
     return len;
+}
+
+unsigned _sam0_eth_get_last_len(void)
+{
+    unsigned idx = tx_idx ? tx_idx - 1 : ETH_TX_BUFFER_COUNT - 1;
+    return tx_desc[idx].status & DESC_TX_STATUS_LEN_MASK;
 }
 
 static int _try_receive(char* data, unsigned max_len, int block)
@@ -382,8 +390,10 @@ int sam0_eth_init(void)
     GMAC->IDR.reg = 0xFFFFFFFF;
     /* clear flags */
     GMAC->RSR.reg = GMAC_RSR_HNO | GMAC_RSR_RXOVR | GMAC_RSR_REC | GMAC_RSR_BNA;
+    GMAC->TSR.reg = 0xFFFF;
     /* Enable needed interrupts */
-    GMAC->IER.reg = GMAC_IER_RCOMP;
+    GMAC->IER.reg = GMAC_IER_RCOMP
+                  | GMAC_IER_TCOMP | GMAC_IER_TFC | GMAC_IER_RLEX;
 
     GMAC->NCFGR.reg = GMAC_NCFGR_MTIHEN
                     | GMAC_NCFGR_RXCOEN | GMAC_NCFGR_MAXFS | GMAC_NCFGR_CAF

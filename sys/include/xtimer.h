@@ -55,9 +55,9 @@
 #include "rmutex.h"
 
 #if IS_USED(MODULE_ZTIMER64_XTIMER_COMPAT)
-#include "ztimer64/xtimer_compat.h"
+#include "ztimer64/xtimer_compat.h" /* IWYU pragma: export */
 #elif IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
-#include "ztimer/xtimer_compat.h"
+#include "ztimer/xtimer_compat.h" /* IWYU pragma: export */
 #else
 #include "board.h"
 #if !IS_USED(MODULE_XTIMER_ON_ZTIMER)

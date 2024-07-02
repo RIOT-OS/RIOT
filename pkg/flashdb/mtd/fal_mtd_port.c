@@ -17,13 +17,12 @@
  * @]
  */
 
+#include "macros/utils.h"
 #include "mtd.h"
 
 #include <string.h>
 #include <limits.h>
 #include <fal.h>
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 static mtd_dev_t *_mtd;
 

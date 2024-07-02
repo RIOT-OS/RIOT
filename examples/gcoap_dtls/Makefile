@@ -24,8 +24,6 @@ ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
   # Additional networking modules that can be dropped if not needed
   USEMODULE += gnrc_icmpv6_echo
 else
-  USEMODULE += lwip_netdev
-
   ifeq (1,$(LWIP_IPV4))
     USEMODULE += ipv4_addr
 
@@ -54,6 +52,7 @@ USEMODULE += random
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
+USEMODULE += uri_parser
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

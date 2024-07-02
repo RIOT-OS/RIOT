@@ -647,14 +647,17 @@ static int _ls_handler(int argc, char **argv)
 
         snprintf(path_name, sizeof(path_name), "%s/%s", path, entry.d_name);
         vfs_stat(path_name, &stat);
+
+        printf("%s", entry.d_name);
         if (stat.st_mode & S_IFDIR) {
-            printf("%s/\n", entry.d_name);
+            printf("/");
         } else if (stat.st_mode & S_IFREG) {
-            printf("%s\t%lu B\n", entry.d_name, stat.st_size);
+            if (stat.st_size) {
+                printf("\t%lu B", stat.st_size);
+            }
             ++nfiles;
-        } else {
-            printf("%s\n", entry.d_name);
         }
+        puts("");
     }
     if (ret == 0) {
         printf("total %u files\n", nfiles);
@@ -742,11 +745,19 @@ static char _get_char(unsigned i)
 static void _write_block(int fd, unsigned bs, unsigned i)
 {
     char block[bs];
-    char *buf = block;
 
-    buf += snprintf(buf, bs, "|%03u|", i);
+    int size_wanted = snprintf(block, bs, "|%03u|", i);
 
-    memset(buf, _get_char(i), &block[bs] - buf);
+    if (size_wanted < 0) {
+        assert(0);
+        return;
+    }
+
+    /* Only memset the buffer, if there is space left in the buffer */
+    if ((unsigned) size_wanted < bs) {
+        memset(&block[size_wanted], _get_char(i), bs - size_wanted);
+    }
+
     block[bs - 1] = '\n';
 
     vfs_write(fd, block, bs);

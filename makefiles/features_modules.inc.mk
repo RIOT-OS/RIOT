@@ -29,7 +29,10 @@ PERIPH_IGNORE_MODULES := \
   periph_hash_sha_1 \
   periph_hash_sha_224 \
   periph_hash_sha_256 \
+  periph_hash_sha_384 \
   periph_hash_sha_512 \
+  periph_hash_sha_512_224 \
+  periph_hash_sha_512_256 \
   periph_hmac_sha_256 \
   periph_i2c_hw \
   periph_i2c_sw \
@@ -77,6 +80,10 @@ endif
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtc_utils
 endif
+
+# select cortexm_stack_limit pseudomodule if the corresponding
+# feature is used
+USEMODULE += $(filter cortexm_stack_limit, $(FEATURES_USED))
 
 # select cortexm_svc pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))

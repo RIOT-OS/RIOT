@@ -11,4 +11,7 @@ PROGRAMMER ?= openocd
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # openocd programmer is supported
-PROGRAMMERS_SUPPORTED += openocd
+PROGRAMMERS_SUPPORTED += openocd cpy2remed
+
+#needed by cpy2remed
+DIR_NAME_AT_REMED = "DISCOVERY"

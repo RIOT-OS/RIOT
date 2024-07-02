@@ -190,10 +190,12 @@ static int _adc_configure(Adc *dev, adc_res_t res)
     /* Set ADC resolution */
 #ifdef ADC_CTRLC_RESSEL
     /* Reset resolution bits in CTRLC */
-    dev->CTRLC.bit.RESSEL = res & 0x3;
+    uint32_t ctrlc = dev->CTRLC.reg;
+    dev->CTRLC.reg = ((ctrlc & ~ADC_CTRLC_RESSEL_Msk) | ADC_CTRLC_RESSEL(res));
 #else
     /* Reset resolution bits in CTRLB */
-    dev->CTRLB.bit.RESSEL = res & 0x3;
+    uint32_t ctrlb = dev->CTRLB.reg;
+    dev->CTRLB.reg = ((ctrlb & ~ADC_CTRLB_RESSEL_Msk) | ADC_CTRLB_RESSEL(res));
 #endif
 
     /* Set Voltage Reference */
@@ -317,7 +319,12 @@ static int32_t _sample(adc_t line)
                        | adc_channels[line].inputctrl
                        | (diffmode ? 0 : ADC_NEG_INPUT);
 #ifdef ADC_CTRLB_DIFFMODE
-    dev->CTRLB.bit.DIFFMODE = diffmode;
+    if (diffmode) {
+        dev->CTRLB.reg |= ADC_CTRLB_DIFFMODE;
+    }
+    else {
+        dev->CTRLB.reg &= ~ADC_CTRLB_DIFFMODE;
+    }
 #endif
     _wait_syncbusy(dev);
 

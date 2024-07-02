@@ -18,7 +18,7 @@ ifneq (0, $(LWIP_IPV6))
 endif
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
-USEMODULE += lwip lwip_netdev
+USEMODULE += lwip
 USEMODULE += lwip_udp
 USEMODULE += lwip_tcp
 USEMODULE += sock_async_event

@@ -16,42 +16,30 @@
 : "${RIOTBASE:="$(cd "$(dirname "$0")/../../../" || exit; pwd)"}"
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+: "${RIOTMAKE:=${RIOTBASE}/makefiles}"
+# not running shellcheck with -x in the CI --> disable SC1091
+# shellcheck disable=SC1091
 . "${RIOTTOOLS}"/ci/github_annotate.sh
 
 SCRIPT_PATH=dist/tools/buildsystem_sanity_check/check.sh
 
-
-tab_indent() {
-    # Ident using 'bashism' to to the tab compatible with 'bsd-sed'
-    sed 's/^/\'$'\t/'
-}
-
-prepend() {
-    # 'i' needs 'i\{newline}' and a newline after for 'bsd-sed'
-    sed '1i\
-'"$1"'
-'
-}
-
 error_with_message() {
-    while read INPUT; do
+    while read -r INPUT; do
+        MESSAGE="${1}"
         if github_annotate_is_on; then
-            MESSAGE="${1}"
             FILE=$(echo "${INPUT}" | cut -d: -f1)
             LINE=$(echo "${INPUT}" | cut -d: -f2)
             MATCH=$(echo "${INPUT}" | cut -d: -f3)
-            if [[ $var =~ ^[0-9]+$ ]] || [  -z "$MATCH" ]; then
+            if [[ ! $LINE =~ ^[0-9]+$ ]] || [  -z "$MATCH" ]; then
                 # line is not provided in grep pattern
                 LINE=0
             fi
             github_annotate_error "$FILE" "$LINE" "$MESSAGE"
         fi
-        # We need to generate non GitHub annotations for this script to fail.
-        # Also, the pure annotate output is not very helpful on its own ;-)
-        echo "${INPUT}" | tab_indent | prepend "${1}:"
+
+        printf "%s:\n\t%s\n\n" "${MESSAGE}" "${INPUT}"
     done
 }
-
 
 # Modules should not check the content of FEATURES_PROVIDED/_REQUIRED/OPTIONAL
 # Handling specific behaviors/dependencies should by checking the content of:
@@ -73,6 +61,12 @@ check_not_parsing_features() {
 
     # These two files contain sanity checks using FEATURES_ so are allowed
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
+
+    # We extend FEATURES_PROVIDED in Makefile.features based on what is
+    # already provided to avoid clutter in each boards Makefile.features.
+    # E.g. `periph_eth` will pull in `netif_ethernet`, which
+    # will pull in `netif`.
+    pathspec+=(':!Makefile.features')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/REQUIRED/OPTIONAL'
@@ -172,7 +166,7 @@ check_not_exporting_variables() {
     # Only run if there are patterns, otherwise it matches everything
     if [ ${#patterns[@]} -ne 0 ]; then
         git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
-            | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`'
+            | error_with_message "Variables must only be exported in \`makefiles/vars.inc.mk\`"
     fi
 }
 
@@ -201,9 +195,7 @@ check_board_do_not_include_cpu_features_dep() {
     local patterns=()
     local pathspec=()
 
-    # shellcheck disable=SC2016
-    # Single quotes are used to not expand expressions
-    patterns+=(-e 'include $(RIOTCPU)/.*/Makefile\..*')
+    patterns+=(-e "include \$(RIOTCPU)/.*/Makefile\..*")
 
     pathspec+=('boards/')
 
@@ -287,14 +279,14 @@ check_files_in_boards_not_reference_board_var() {
     local patterns=()
     local pathspec=()
 
-    patterns+=(-e '/$(BOARD)/')
+    patterns+=(-e "/\$(BOARD)/")
 
     pathspec+=('boards/')
     # boards/common/nrf52 uses a hack to resolve dependencies early
     pathspec+=(':!boards/common/nrf52/Makefile.include')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message 'Code in boards/ should not use $(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"'
+        | error_with_message "Code in boards/ should not use \$(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"
 }
 
 check_no_pseudomodules_in_makefile_dep() {
@@ -389,6 +381,28 @@ check_tests_application_path() {
     find tests/ -type f "${patterns[@]}" | error_with_message "Invalid application path in tests/"
 }
 
+check_pinned_docker_version_is_up_to_date() {
+    local pinned_digest
+    local pinned_repo_digest
+    local upstream_digest
+    local upstream_repo_digest
+    pinned_digest="$(awk '/^DOCKER_TESTED_IMAGE_ID := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
+    pinned_repo_digest="$(awk '/^DOCKER_TESTED_IMAGE_REPO_DIGEST := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
+    # not using docker and jq here but a python script to not have to install
+    # more stuff for the static test docker image
+    IFS=' ' read -r upstream_digest upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild")"
+
+    if [ "$pinned_digest" != "$upstream_digest" ]; then
+        git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_ID :=' "$RIOTMAKE/docker.inc.mk" \
+            | error_with_message  "Update docker image SHA256 to ${upstream_digest}"
+    fi
+
+    if [ "$pinned_repo_digest" != "$upstream_repo_digest" ]; then
+        git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_REPO_DIGEST :=' "$RIOTMAKE/docker.inc.mk" \
+            | error_with_message  "Update manifest digest to ${upstream_repo_digest}"
+    fi
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -411,17 +425,13 @@ all_checks() {
     check_no_riot_config
     check_stderr_null
     check_tests_application_path
+    check_pinned_docker_version_is_up_to_date
 }
-
-main() {
-    all_checks | prepend 'Invalid build system patterns found by '"${0}:" | error_on_input >&2
-    exit $?
-}
-
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     github_annotate_setup
-    main
+    all_checks | error_on_input
+    result="$?"
     github_annotate_teardown
-    github_annotate_report_last_run
+    exit "${result}"
 fi

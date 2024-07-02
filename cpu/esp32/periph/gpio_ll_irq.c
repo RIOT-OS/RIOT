@@ -55,9 +55,8 @@ extern void IRAM gpio_int_handler(void* arg);
 int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
                 gpio_ll_cb_t cb, void *arg)
 {
-    assert(port);
+    assert(is_gpio_port_num_valid(port));
     assert(arg);
-    assert(GPIO_PORT_NUM(port) < GPIO_PORT_NUMOF);
     assert(pin < GPIO_PORT_PIN_NUMOF(port));
 
     unsigned state = irq_disable();
@@ -138,13 +137,20 @@ void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 
 void gpio_ll_irq_unmask_and_clear(gpio_port_t port, uint8_t pin)
 {
-    _esp32_port_t *p = (_esp32_port_t *)port;
     gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
           __func__, gpio, GPIO_PORT_NUM(port), pin);
 
-    *p->status_w1tc = BIT(pin);
+    volatile uint32_t *status_w1tc = (uint32_t *)GPIO_STATUS_W1TC_REG;
+#if GPIO_PORT_NUMOF > 1
+    if (GPIO_PORT_NUM(port) != 0) {
+        status_w1tc = (uint32_t *)GPIO_STATUS1_W1TC_REG;
+    }
+#endif
+
+    *status_w1tc = BIT(pin);
+
     if (esp_idf_gpio_intr_enable(gpio) == ESP_OK) {
         gpio_int_enabled_table[gpio] = true;
     }

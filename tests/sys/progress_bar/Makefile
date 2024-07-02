@@ -3,24 +3,10 @@ include ../Makefile.sys_common
 USEMODULE += xtimer
 USEMODULE += progress_bar
 
-CONFIG_PROGRESS_BAR_LENGTH ?= 50
-CONFIG_PROGRESS_BAR_FULL_CHARACTER ?= "█"
-CONFIG_PROGRESS_BAR_EMPTY_CHARACTER ?= " "
-
-# Other nice progress bar characters:
-#CONFIG_PROGRESS_BAR_FULL_CHARACTER ?= "◉"
-#CONFIG_PROGRESS_BAR_EMPTY_CHARACTER ?= "◯"
-#CONFIG_PROGRESS_BAR_FULL_CHARACTER ?= "▣"
-#CONFIG_PROGRESS_BAR_EMPTY_CHARACTER ?= "▢"
-
-CFLAGS += -DCONFIG_PROGRESS_BAR_FULL_CHARACTER=\"$(CONFIG_PROGRESS_BAR_FULL_CHARACTER)\"
-CFLAGS += -DCONFIG_PROGRESS_BAR_EMPTY_CHARACTER=\"$(CONFIG_PROGRESS_BAR_EMPTY_CHARACTER)\"
-CFLAGS += -DCONFIG_PROGRESS_BAR_LENGTH=$(CONFIG_PROGRESS_BAR_LENGTH)
-
 include $(RIOTBASE)/Makefile.include
 
-# Make custom progress bar characters available in Python test script via
-# environment variables
+# Make custom progress bar configuration from app.config
+# available in Python test script via environment variables
 export CONFIG_PROGRESS_BAR_FULL_CHARACTER
 export CONFIG_PROGRESS_BAR_EMPTY_CHARACTER
 export CONFIG_PROGRESS_BAR_LENGTH

@@ -62,8 +62,8 @@ the following steps:
 
   1. Fork the RIOT git repository (if you haven't done this already).
   1. Create a branch for your contribution.
-  1. Make sure your code is in compliance with RIOTs [coding conventions].
-  1. Make commits. Make sure to follow RIOTs [commit conventions].
+  1. Make sure your code is in compliance with RIOT's [coding conventions].
+  1. Make commits. Make sure to follow RIOT's [commit conventions].
   1. Push this branch to your fork on GitHub.
   1. Open a [pull request][open-a-pull-request]. See [pull requests].
   1. RIOT maintainers will set [labels] and provide feedback.

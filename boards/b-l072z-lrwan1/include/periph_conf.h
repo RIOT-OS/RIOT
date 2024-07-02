@@ -14,6 +14,7 @@
  * @brief       Peripheral MCU configuration for the ST B-L072Z-LRWAN1 board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Thibault Tisserand <gzordrai@gmail.com>
  */
 
 #ifndef PERIPH_CONF_H
@@ -145,6 +146,21 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name    ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A, 0), 0 },
+    { GPIO_PIN(PORT_A, 2), 2 },
+    { GPIO_PIN(PORT_A, 3), 3 },
+    { GPIO_PIN(PORT_A, 4), 4 },
+    { GPIO_PIN(PORT_A, 5), 5 }
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

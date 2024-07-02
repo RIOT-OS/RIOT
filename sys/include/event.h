@@ -75,13 +75,13 @@
  *
  * static void custom_handler(event_t *event)
  * {
- *     custom_event_t *custom_event = (custom_event_t *)event;
+ *     custom_event_t *custom_event = container_of(event, custom_event_t, super);
  *     printf("triggered custom event with text: \"%s\"\n", custom_event->text);
  * }
  *
  * static custom_event_t custom_event = { .super.handler = custom_handler, .text = "CUSTOM EVENT" };
  *
- * [...] event_post(&queue, &custom_event)
+ * [...] event_post(&queue, &custom_event.super)
  * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{

@@ -1,0 +1,24 @@
+From a9d2537cb0a3f0967588b625f44a32dcdef2af52 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sat, 1 Jun 2024 09:31:50 +0200
+Subject: [PATCH] components/wpa_supplicant: add missing include
+
+---
+ components/wpa_supplicant/port/include/os.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/wpa_supplicant/port/include/os.h b/components/wpa_supplicant/port/include/os.h
+index d00bd6f6..5a67c4e3 100644
+--- a/components/wpa_supplicant/port/include/os.h
++++ b/components/wpa_supplicant/port/include/os.h
+@@ -18,6 +18,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <time.h>
+ #include "esp_err.h"
+ #include "supplicant_opt.h"
+ 
+-- 
+2.45.1
+

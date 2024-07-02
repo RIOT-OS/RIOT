@@ -22,7 +22,6 @@ endif
 
 USEMODULE += inet_csum
 USEMODULE += l2util
-USEMODULE += lwip_netdev
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += ps

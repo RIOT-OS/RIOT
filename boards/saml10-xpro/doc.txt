@@ -66,10 +66,4 @@ Connect the device to your Micro-USB cable.
 
 The standard method for flashing RIOT to the saml10-xpro is using EDBG.
 
-## Supported Toolchains
-
-For using the saml10-xpro board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
-
  */

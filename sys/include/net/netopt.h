@@ -444,6 +444,7 @@ typedef enum {
     NETOPT_RF_TESTMODE,
 
     /**
+     * @experimental
      * @brief   (@ref l2filter_t) add an address to a link layer filter list
      *
      * Getting this option from a device will return a pointer of type
@@ -454,6 +455,7 @@ typedef enum {
     NETOPT_L2FILTER,
 
     /**
+     * @experimental
      * @brief   (@ref l2filter_t) remove an address from a link layer filter list
      *
      * Getting this value always returns -ENOTSUP.

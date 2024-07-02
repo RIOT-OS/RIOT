@@ -9,5 +9,8 @@ OPENOCD_DEBUG_ADAPTER ?= stlink
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
-# openocd programmer is supported
-PROGRAMMERS_SUPPORTED += openocd
+# openocd and cpy2remed programmer is supported
+PROGRAMMERS_SUPPORTED += openocd cpy2remed
+
+#needed by cpy2remed
+DIR_NAME_AT_REMED = "DIS_L476VG"

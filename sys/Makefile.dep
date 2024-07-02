@@ -169,6 +169,10 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
+ifneq (,$(filter netdev_test,$(USEMODULE)))
+  USEMODULE += netdev_legacy_api
+endif
+
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += luid
 endif
@@ -471,6 +475,10 @@ ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
   USEMODULE += uri_parser
 endif
 
+ifneq (,$(filter gcoap_forward_proxy_thread,$(USEMODULE)))
+  USEMODULE += gcoap_forward_proxy
+endif
+
 ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
   USEMODULE += gcoap
   USEMODULE += dsm
@@ -521,6 +529,11 @@ ifneq (,$(filter nanocoap_server_auto_init,$(USEMODULE)))
   USEMODULE += nanocoap_server
 endif
 
+ifneq (,$(filter nanocoap_server_separate,$(USEMODULE)))
+  USEMODULE += nanocoap_server
+  USEMODULE += sock_aux_local
+endif
+
 ifneq (,$(filter nanocoap_server,$(USEMODULE)))
   USEMODULE += nanocoap_resources
   USEMODULE += nanocoap_sock
@@ -535,6 +548,12 @@ endif
 ifneq (,$(filter nanocoap_cache,$(USEMODULE)))
   USEMODULE += ztimer_sec
   USEMODULE += hashes
+endif
+
+ifneq (,$(filter nanocoap_fs,$(USEMODULE)))
+  USEMODULE += nanocoap_sock
+  USEMODULE += nanocoap_link_format
+  USEMODULE += vfs
 endif
 
 ifneq (,$(filter nanocoap_link_format,$(USEMODULE)))

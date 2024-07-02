@@ -90,7 +90,7 @@ void dma_init(void)
     NVIC_EnableIRQ(DMAC_IRQn);
 #endif
 
-    DMAC->CTRL.bit.DMAENABLE = 1;
+    DMAC->CTRL.reg |= DMAC_CTRL_DMAENABLE;
 }
 
 dma_t dma_acquire_channel(void)
@@ -255,11 +255,11 @@ void dma_start(dma_t dma)
 
 #ifdef REG_DMAC_CHID
     unsigned state = irq_disable();
-    DMAC->CHID.bit.ID = dma;
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
     DMAC->CHCTRLA.reg = DMAC_CHCTRLA_ENABLE;
     irq_restore(state);
 #else
-    DMAC->Channel[dma].CHCTRLA.bit.ENABLE = 1;
+    DMAC->Channel[dma].CHCTRLA.reg |= DMAC_CHCTRLA_ENABLE;
 #endif
 }
 
@@ -274,15 +274,15 @@ void dma_cancel(dma_t dma)
     DEBUG("[DMA]: Cancelling active transfer: %u\n", dma);
 #ifdef REG_DMAC_CHID
     unsigned state = irq_disable();
-    DMAC->CHID.bit.ID = dma;
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
     /* Write zero to the enable bit */
     DMAC->CHCTRLA.reg = 0;
     /* Wait until the active beat is finished */
-    while (DMAC->CHCTRLA.bit.ENABLE) {}
+    while (DMAC->CHCTRLA.reg & DMAC_CHCTRLA_ENABLE) {}
     irq_restore(state);
 #else
-    DMAC->Channel[dma].CHCTRLA.bit.ENABLE = 0;
-    while (DMAC->Channel[dma].CHCTRLA.bit.ENABLE) {}
+    DMAC->Channel[dma].CHCTRLA.reg &= ~DMAC_CHCTRLA_ENABLE;
+    while (DMAC->Channel[dma].CHCTRLA.reg & DMAC_CHCTRLA_ENABLE) {}
 #endif
 }
 

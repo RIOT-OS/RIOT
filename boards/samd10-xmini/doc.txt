@@ -50,19 +50,19 @@ The samd10-xmini is available from various hardware vendors for ~8€ (as of
 Connect the device to your Micro-USB cable using the port labeled as *DEBUG
 USB*.
 
-The standard method for flashing RIOT to the samd10-xmini is using EDBG.
+The standard method for flashing RIOT to the samd10-xmini is using [edbg](https://github.com/ataradov/edbg).
+by calling: `make BOARD=samd10-xmini -C tests/leds flash`
+
+Note that on Linux, you will need libudev-dev package to be installed.
+
+Users can also use openOCD to flash and/or debug the board using:
+`PROGRAMMER=openocd make BOARD=samd10-xmini -C tests/leds flash`
 
 On Linux you will have to add a **udev** rule for hidraw, like
 ```
 echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev"' \
     | sudo tee -a /etc/udev/rules.d/99-usb.rules
 sudo service udev restart
-```
-
-Then you can flash the device as usual
-
-```
-make BOARD=samd10-xmini flash
 ```
 
 ## Known Issues / Problems

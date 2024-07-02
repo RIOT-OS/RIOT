@@ -312,11 +312,29 @@
  * - psa_hash_sha_256_custom_backend
  * - psa_hash_sha_256_backend_riot
  *
+ * #### SHA 384
+ * - psa_hash_sha_384
+ * - psa_hash_sha_384_backend_periph
+ * - psa_hash_sha_384_custom_backend
+ * - psa_hash_sha_384_backend_riot
+ *
  * #### SHA 512
  * - psa_hash_sha_512
  * - psa_hash_sha_512_backend_periph
  * - psa_hash_sha_512_custom_backend
  * - psa_hash_sha_512_backend_riot
+ *
+ * #### SHA 512/224
+ * - psa_hash_sha_512_224
+ * - psa_hash_sha_512_224_backend_periph
+ * - psa_hash_sha_512_224_custom_backend
+ * - psa_hash_sha_512_224_backend_riot
+ *
+ * #### SHA 512/256
+ * - psa_hash_sha_512_256
+ * - psa_hash_sha_512_256_backend_periph
+ * - psa_hash_sha_512_256_custom_backend
+ * - psa_hash_sha_512_256_backend_riot
  *
  * ### MAC
  * - Base: psa_mac
@@ -469,7 +487,7 @@
  * USEMODULE += psa_riot_hashes_sha_256
  *
  * will build the file at `sys/hashes/psa_riot_hashes/sha_256.c`, but none of the other files in
- * the directory).
+ * the directory.
  *
  * To enable submodules for your implementation add the following to the directory makefile:
  * @code
@@ -595,7 +613,10 @@
  * - `psa_hashes_sha1_ctx_t`
  * - `psa_hashes_sha224_ctx_t`
  * - `psa_hashes_sha256_ctx_t`
+ * - `psa_hashes_sha384_ctx_t`
  * - `psa_hashes_sha512_ctx_t`
+ * - `psa_hashes_sha512_224_ctx_t`
+ * - `psa_hashes_sha512_256_ctx_t`
  * - `psa_hashes_sha3_ctx_t`
  *
  * #### Ciphers

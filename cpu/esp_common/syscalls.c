@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdio_ext.h>
 #include <sys/unistd.h>
+#include <sys/reent.h>
 
 #include "irq_arch.h"
 #include "mutex.h"
@@ -49,6 +50,7 @@
  */
 int pthread_setcancelstate(int state, int *oldstate)
 {
+    (void)state;
     if (oldstate) {
         *oldstate = PTHREAD_CANCEL_DISABLE;
     }
@@ -182,7 +184,9 @@ void IRAM_ATTR _lock_acquire(_lock_t *lock)
         assert(*lock != 0);
     }
 
-    mutex_lock((mutex_t*)*lock);
+    /* disable warning about increasing cast alignment from 4 to 8 via
+     * intermediate cast to uintptr_t */
+    mutex_lock((mutex_t *)(uintptr_t)*lock);
 }
 
 void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
@@ -219,7 +223,9 @@ void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
 
     _lock_critical_enter();
 
-    rmutex_lock((rmutex_t*)*lock);
+    /* disable warning about increasing cast alignment from 4 to 8 via
+     * intermediate cast to uintptr_t */
+    rmutex_lock((rmutex_t *)(uintptr_t)*lock);
 
     _lock_critical_exit();
 }
@@ -243,7 +249,9 @@ int IRAM_ATTR _lock_try_acquire(_lock_t *lock)
         assert(*lock != 0);
     }
 
-    return mutex_trylock((mutex_t*)*lock);
+    /* disable warning about increasing cast alignment from 4 to 8 via
+     * intermediate cast to uintptr_t */
+    return mutex_trylock((mutex_t *)(uintptr_t)*lock);
 }
 
 int IRAM_ATTR _lock_try_acquire_recursive(_lock_t *lock)
@@ -267,7 +275,9 @@ int IRAM_ATTR _lock_try_acquire_recursive(_lock_t *lock)
 
     _lock_critical_enter();
 
-    int res = rmutex_trylock((rmutex_t*)*lock);
+    /* disable warning about increasing cast alignment from 4 to 8 via
+     * intermediate cast to uintptr_t */
+    int res = rmutex_trylock((rmutex_t *)(uintptr_t)*lock);
 
     _lock_critical_exit();
 
@@ -284,7 +294,9 @@ void IRAM_ATTR _lock_release(_lock_t *lock)
     /* the locking variable has to be valid and initialized */
     assert(lock != NULL && *lock != 0);
 
-    mutex_unlock((mutex_t*)*lock);
+    /* disable warning about increasing cast alignment from 4 to 8 via
+     * intermediate cast to uintptr_t */
+    mutex_unlock((mutex_t *)(uintptr_t)*lock);
 }
 
 void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
@@ -299,7 +311,9 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
 
     _lock_critical_enter();
 
-    rmutex_unlock((rmutex_t*)*lock);
+    /* disable warning about increasing cast alignment from 4 to 8 via
+     * intermediate cast to uintptr_t */
+    rmutex_unlock((rmutex_t *)(uintptr_t)*lock);
 
     _lock_critical_exit();
 }
@@ -440,22 +454,32 @@ void heap_caps_free(void *ptr, const char *file, size_t line)
 void* _heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
 {
     (void)caps;
+    (void)file;
+    (void)line;
     return malloc(size);
 }
 
 void* _heap_caps_calloc(size_t n, size_t size, uint32_t caps, const char *file, size_t line)
 {
     (void)caps;
+    (void)file;
+    (void)line;
     return calloc(n, size);
 }
 
 void* _heap_caps_realloc(void *ptr, size_t size, uint32_t caps, const char *file, size_t line)
 {
+    (void)caps;
+    (void)file;
+    (void)line;
     return realloc(ptr, size);
 }
 
 void *_heap_caps_zalloc(size_t size, uint32_t caps, const char *file, size_t line)
 {
+    (void)caps;
+    (void)file;
+    (void)line;
     void *ptr = malloc(size);
     if (ptr)  {
         memset(ptr, 0, size);
@@ -490,7 +514,7 @@ unsigned int IRAM_ATTR get_free_heap_size(void)
 {
     struct mallinfo minfo = mallinfo();
     /* cppcheck-suppress comparePointers */
-    unsigned int heap_size = &_eheap - &_sheap;
+    uintptr_t heap_size = (uintptr_t)&_eheap - (uintptr_t)&_sheap;
 #if NUM_HEAPS > 1
     heap_size += &_eheap1 - &_sheap1;
 #endif
@@ -515,6 +539,9 @@ uint32_t esp_get_free_internal_heap_size( void ) __attribute__((alias("get_free_
 
 int _rename_r(struct _reent *r, const char *from, const char *to)
 {
+    (void)r;
+    (void)from;
+    (void)to;
     return 0;
 }
 
@@ -522,14 +549,28 @@ struct _reent* __getreent(void) {
     return _GLOBAL_REENT;
 }
 
+/* in older versions of newlib, the OS has to allocate a reentry structure */
+#ifndef __ATTRIBUTE_IMPURE_DATA__
 static struct _reent s_reent;
+#endif
 
 void syscalls_init(void)
 {
     extern void syscalls_init_arch(void);
     syscalls_init_arch();
 
+    /* _GLOBAL_REENT is a pointer to the reentry structure. In older versions
+     * of newlib, the OS has to allocate a reentry structure and update
+     * _GLOBAL_REENT to point to that. In more recent versions, the allocation
+     * is done by newlib. We use a macro introduced by the commit to detect
+     * which flavor is used:
+     *
+     * See https://github.com/espressif/newlib-esp32/commit/ad51d0006a0aaf17aa61ec34221add09bfe01f0c
+     * for the commit that introduced the change.
+     */
+#ifndef __ATTRIBUTE_IMPURE_DATA__
     _GLOBAL_REENT = &s_reent;
+#endif
 
     environ = malloc(sizeof(char*));
     environ[0] = NULL;

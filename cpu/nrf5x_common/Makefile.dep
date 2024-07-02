@@ -14,3 +14,7 @@ FEATURES_OPTIONAL += vdd_lc_filter_reg0
 ifneq (,$(filter nimble,$(USEPKG)))
   USEPKG += nrfx
 endif
+
+ifneq (,$(filter nrfmin,$(USEMODULE)))
+  USEMODULE += netdev_legacy_api
+endif

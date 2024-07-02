@@ -179,7 +179,7 @@ static void init_ocb(const cipher_t *cipher, uint8_t tag_len,
     memcpy(nonce_padded + 16 - nonce_len, nonce, nonce_len);
 
     /* bottom = str2num(Nonce[123..128])*/
-    uint8_t bottom = (nonce_padded[15] << 2) >> 2;
+    uint8_t bottom = nonce_padded[15] & 0x3F;
     /* Ktop = ENCIPHER(K, Nonce[1..122] || zeros(6)) */
     nonce_padded[15] = nonce_padded[15] & 0xC0;
     uint8_t ktop[16];

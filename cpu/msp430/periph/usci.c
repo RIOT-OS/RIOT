@@ -93,6 +93,8 @@ static mutex_t _usci_locks[MSP430_USCI_ID_NUMOF] = {
     MUTEX_INIT,
 };
 
+static uint8_t _auxiliary_clock_acquired;
+
 void msp430_usci_acquire(const msp430_usci_params_t *params,
                          const msp430_usci_conf_t *conf)
 {
@@ -100,6 +102,23 @@ void msp430_usci_acquire(const msp430_usci_params_t *params,
 
     mutex_lock(&_usci_locks[params->id]);
     msp430_usci_b_t *dev = params->dev;
+
+    /* We only need to acquire the auxiliary (low frequency) clock domain, as
+     * the subsystem main clock (SMCLK) will be acquired on-demand when activity
+     * is detected on RXD, as per datasheet:
+     *
+     * > The USCI module provides automatic clock activation for SMCLK for use
+     * > with low-power modes.
+     */
+    switch (conf->prescaler.clk_source) {
+    case USCI_CLK_AUX:
+        msp430_clock_acquire(MSP430_CLOCK_AUXILIARY);
+        _auxiliary_clock_acquired |= 1U << params->id;
+        break;
+    default:
+        _auxiliary_clock_acquired &= ~(1U << params->id);
+        break;
+    }
 
     /* put device in disabled/reset state */
     dev->CTL1 = UCSWRST;
@@ -133,6 +152,10 @@ void msp430_usci_release(const msp430_usci_params_t *params)
     unsigned irq_mask = irq_disable();
     *params->interrupt_enable &= clear_irq_mask;
     *params->interrupt_flag &= clear_irq_mask;
+
+    if (_auxiliary_clock_acquired & (1U << params->id)) {
+        msp430_clock_release(MSP430_CLOCK_AUXILIARY);
+    }
     irq_restore(irq_mask);
 
     /* Release mutex */
@@ -162,19 +185,19 @@ msp430_usci_prescaler_t msp430_usci_prescale(uint32_t target_hz)
          * be needed. Otherwise the estimation will be good enough.
          */
         switch (target_hz) {
-        case 9600:
+        case 1200:
             result.mctl = 2U << UCBRS_Pos;
             result.br0 = 27;
             return result;
-        case 4800:
+        case 2400:
             result.mctl = 6U << UCBRS_Pos;
             result.br0 = 13;
             return result;
-        case 2400:
+        case 4800:
             result.mctl = 7U << UCBRS_Pos;
             result.br0 = 6;
             return result;
-        case 1200:
+        case 9600:
             result.mctl = 3U << UCBRS_Pos;
             result.br0 = 3;
             return result;

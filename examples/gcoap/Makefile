@@ -24,8 +24,6 @@ ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
   # Additional networking modules that can be dropped if not needed
   USEMODULE += gnrc_icmpv6_echo
 else
-  USEMODULE += lwip_netdev
-
   ifeq (1,$(LWIP_IPV4))
     USEMODULE += ipv4_addr
 
@@ -53,6 +51,7 @@ USEMODULE += random
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_cmds_default
+USEMODULE += uri_parser
 USEMODULE += ps
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -72,6 +71,13 @@ ZEP_PORT_BASE ?= 17754
 ifeq (1,$(USE_ZEP))
   USEMODULE += socket_zep
 endif
+
+# Pass through application configuration to the docker container, if
+# BUILD_IN_DOCKER=1 is used:
+DOCKER_ENV_VARS += LWIP_IPV4
+DOCKER_ENV_VARS += LWIP_IPV6
+DOCKER_ENV_VARS += USE_ZEP
+DOCKER_ENV_VARS += ZEP_PORT_BASE
 
 include $(RIOTBASE)/Makefile.include
 

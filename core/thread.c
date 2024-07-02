@@ -35,6 +35,15 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#if defined(HAVE_VALGRIND_H)
+#  include <valgrind.h>
+#elif defined(HAVE_VALGRIND_VALGRIND_H)
+#  include <valgrind/valgrind.h>
+#else
+#  define   VALGRIND_DISABLE_ERROR_REPORTING    (void)0
+#  define   VALGRIND_ENABLE_ERROR_REPORTING     (void)0
+#endif
+
 thread_status_t thread_getstatus(kernel_pid_t pid)
 {
     thread_t *thread = thread_get(pid);
@@ -171,17 +180,29 @@ void thread_add_to_list(list_node_t *list, thread_t *thread)
     list->next = new_node;
 }
 
-uintptr_t thread_measure_stack_free(const char *stack)
+uintptr_t measure_stack_free_internal(const char *stack, size_t size)
 {
     /* Alignment of stack has been fixed (if needed) by thread_create(), so
      * we can silence -Wcast-align here */
     uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
+    uintptr_t end = (uintptr_t)stack + size;
 
-    /* assume that the comparison fails before or after end of stack */
+    /* HACK: This will affect native/native64 only.
+     *
+     * The dark magic used here is frowned upon by valgrind. E.g. valgrind may
+     * deduce that a specific value was at some point allocated on the stack,
+     * but has gone out of scope. When that value is now read again to
+     * estimate stack usage, it does look a lot like someone passed a pointer
+     * to a stack allocated value, and that pointer is referenced after that
+     * value has gone out of scope. */
+    VALGRIND_DISABLE_ERROR_REPORTING;
+
     /* assume that the stack grows "downwards" */
-    while (*stackp == (uintptr_t)stackp) {
+    while (((uintptr_t)stackp < end) && (*stackp == (uintptr_t)stackp)) {
         stackp++;
     }
+
+    VALGRIND_ENABLE_ERROR_REPORTING;
 
     uintptr_t space_free = (uintptr_t)stackp - (uintptr_t)stack;
 
@@ -285,7 +306,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread->sp = thread_stack_init(function, arg, stack, stacksize);
 
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || \
-    defined(MODULE_MPU_STACK_GUARD)
+    defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT)
     thread->stack_start = stack;
 #endif
 

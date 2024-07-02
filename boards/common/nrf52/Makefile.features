@@ -3,4 +3,7 @@ CPU = nrf52
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_timer
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += netif
 FEATURES_PROVIDED += riotboot

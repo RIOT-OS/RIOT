@@ -1,4 +1,4 @@
-# Copyright (c) 2019 HAW Hamburg
+# Copyright (c) 2021 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -10,95 +10,16 @@ menu "Wakaama LwM2M"
 menu "Remote server"
 
 config LWM2M_STANDARD_PORT
-    string "CoAP default port of the LwM2M server"
+    string "CoAP default port of a LwM2M server"
     default "5683"
 
 config LWM2M_DTLS_PORT
-    string "CoAPS default port of the LwM2M server"
+    string "CoAPS default port of a LwM2M server"
     default "5684"
-
-config LWM2M_SERVER_URI
-    string "LwM2M server URI to register/bootstrap with"
-    default "coap://[fd00:dead:beef::1]"
-    help
-        The host part of the URI MUST be a valid IPv6 address. Host names can
-        not be resolved at this time.
-
-config LWM2M_SERVER_ID
-    int "Numeric ID of the Server URI"
-    default 10
-    help
-        This numeric ID corresponds to the server URI specified in the
-        previous option.
-
-config LWM2M_BOOTSTRAP
-    bool "Is a bootstrap server"
-    help
-        The specified server is a LwM2M bootstrap server.
 
 endmenu # Remote server
 
-menu "Device"
-
-choice
-    bool "Device binding and queue mode"
-    default LWM2M_DEVICE_BINDING_U
-
-config LWM2M_DEVICE_BINDING_U
-    bool "UDP"
-
-config LWM2M_DEVICE_BINDING_UQ
-    bool "UDP with Queue mode"
-
-config LWM2M_DEVICE_BINDING_S
-    bool "SMS"
-
-config LWM2M_DEVICE_BINDING_SQ
-    bool "SMS with Queue mode"
-
-config LWM2M_DEVICE_BINDING_US
-    bool "UDP and SMS"
-
-config LWM2M_DEVICE_BINDING_UQS
-    bool "UDP with Queue mode and SMS"
-
-endchoice
-
-config LWM2M_DEVICE_NAME
-    string "Device name"
-    default "testRIOTDevice"
-    help
-        This is the device name used to register at the LwM2M server.
-
-config LWM2M_DEVICE_MANUFACTURER
-    string "Device manufacturer"
-    default "A RIOT maker"
-
-config LWM2M_DEVICE_MODEL
-    string "Device model"
-    default "$(BOARD)"
-
-config LWM2M_DEVICE_TYPE
-    string "Device type"
-    default "RIOT device"
-
-config LWM2M_DEVICE_SERIAL
-    string "Device serial number"
-    default "undefined"
-
-config LWM2M_DEVICE_FW_VERSION
-    string "Device firmware version"
-    default ""
-
-config LWM2M_DEVICE_HW_VERSION
-    string "Device hardware version"
-    default "$(BOARD)"
-
-config LWM2M_DEVICE_SW_VERSION
-    string "Device software version"
-    default ""
-
-endmenu # Device
+rsource "contrib/objects/Kconfig"
 
 config LWM2M_DEVICE_TTL
     int "Lifetime of the device"
@@ -107,8 +28,12 @@ config LWM2M_DEVICE_TTL
         Lifetime of the device on the LwM2M server, expressed in seconds.
 
 config LWM2M_LOCAL_PORT
-    string "Default port for the local LwM2M instance"
+    string "Port for the local LwM2M CoAP"
     default "5683"
+
+config LWM2M_LOCAL_DTLS_PORT
+    string "Port for the local LwM2M CoAPs server"
+    default "5684"
 
 config LWM2M_ALT_PATH
     string "Alternate path to place LwM2M resources"
@@ -121,6 +46,20 @@ config LWM2M_TLSF_BUFFER
     int "Allocation buffer size"
     default 5120
 
-rsource "contrib/objects/Kconfig"
+config LWM2M_CREDMAN_TAG_BASE
+    int "Credential tag base"
+    default 10
+    help
+        Number to use as base for assigning tags to @ref net_credman
+        credentials.
+
+config LWM2M_URI_MAX_SIZE
+    int "Maximum length of an URI allowed"
+    default 64
+
+config LWM2M_BOOTSTRAP
+    bool "Bootsrap server support"
+    help
+        Say y to support using a bootstrap server to get server information.
 
 endmenu # Wakaama LwM2M

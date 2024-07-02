@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    boards_stm32l476g-disco STM32L476G-DISCO
- * @ingroup     boards
+ * @ingroup    boards_stm32l476g-disco
  * @brief       Support for the STM32L476G-DISCO board
  * @{
  *

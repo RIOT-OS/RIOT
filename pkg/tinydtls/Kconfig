@@ -7,18 +7,11 @@
 menu "tinydtls"
     depends on USEPKG_TINYDTLS
 
-# TODO change to multiple choice after DTLS application support enabling more than one types of cypher suites
-choice
-    bool "Cipher suite to enable"
-    default DTLS_PSK
-
 config DTLS_PSK
     bool "TLS_PSK_WITH_AES_128_CCM_8"
 
 config DTLS_ECC
     bool "TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8"
-
-endchoice
 
 config DTLS_DEBUG
     bool "Enable debug log"

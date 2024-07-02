@@ -10,8 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "event/callback.h"
+#include "event/timeout.h"
+#include "event/thread.h"
 #include "fmt.h"
 #include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
 #include "kernel_defines.h"
 
@@ -181,6 +185,45 @@ NANOCOAP_RESOURCE(ver) {
 NANOCOAP_RESOURCE(sha256) {
     .path = "/sha256", .methods = COAP_POST, .handler = _sha256_handler
 };
+
+/* separate response requires an event thread to execute it */
+#ifdef MODULE_EVENT_THREAD
+static nanocoap_server_response_ctx_t _separate_ctx;
+
+static void _send_response(void *ctx)
+{
+    const char response[] = "This is a delayed response.";
+
+    puts("_separate_handler(): send delayed response");
+    nanocoap_server_send_separate(ctx, COAP_CODE_CONTENT, COAP_TYPE_NON,
+                                response, sizeof(response));
+}
+
+static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+{
+    static event_timeout_t event_timeout;
+    static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
+
+    if (event_timeout_is_pending(&event_timeout) && !sock_udp_ep_equal(context->remote, &_separate_ctx.remote)) {
+        puts("_separate_handler(): response already scheduled");
+        return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
+    }
+
+    puts("_separate_handler(): send ACK, schedule response");
+
+    nanocoap_server_prepare_separate(&_separate_ctx, pkt, context);
+
+    event_timeout_ztimer_init(&event_timeout, ZTIMER_MSEC, EVENT_PRIO_MEDIUM,
+                              &event_timed.super);
+    event_timeout_set(&event_timeout, 1 * MS_PER_SEC);
+
+    return coap_build_empty_ack(pkt, (void *)buf);
+}
+
+NANOCOAP_RESOURCE(separate) {
+    .path = "/separate", .methods = COAP_GET, .handler = _separate_handler,
+};
+#endif /* MODULE_EVENT_THREAD */
 
 /* we can also include the fileserver module */
 #ifdef MODULE_NANOCOAP_FILESERVER

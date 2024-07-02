@@ -49,10 +49,28 @@ typedef sha224_context_t psa_hashes_sha224_ctx_t;
 typedef sha256_context_t psa_hashes_sha256_ctx_t;
 #endif
 
+#if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_384))
+#include "hashes/sha384.h"
+
+typedef sha384_context_t psa_hashes_sha384_ctx_t;
+#endif
+
 #if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_512))
 #include "hashes/sha512.h"
 
 typedef sha512_context_t psa_hashes_sha512_ctx_t;
+#endif
+
+#if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_512_224))
+#include "hashes/sha512_224.h"
+
+typedef sha512_224_context_t psa_hashes_sha512_224_ctx_t;
+#endif
+
+#if (IS_USED(MODULE_PSA_RIOT_HASHES_SHA_512_256))
+#include "hashes/sha512_256.h"
+
+typedef sha512_256_context_t psa_hashes_sha512_256_ctx_t;
 #endif
 
 #if (IS_USED(MODULE_PSA_RIOT_HASHES_HMAC_SHA256))

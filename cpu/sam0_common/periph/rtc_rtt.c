@@ -113,13 +113,13 @@ static void _wait_syncbusy(void)
 #ifdef REG_RTC_MODE0_SYNCBUSY
     while (RTC->MODE0.SYNCBUSY.reg) {}
 #else
-    while (RTC->MODE0.STATUS.bit.SYNCBUSY) {}
+    while (RTC->MODE0.STATUS.reg & RTC_STATUS_SYNCBUSY) {}
 #endif
     } else {
 #ifdef REG_RTC_MODE2_SYNCBUSY
     while (RTC->MODE2.SYNCBUSY.reg) {}
 #else
-    while (RTC->MODE2.STATUS.bit.SYNCBUSY) {}
+    while (RTC->MODE2.STATUS.reg & RTC_STATUS_SYNCBUSY) {}
 #endif
     }
 }
@@ -164,12 +164,23 @@ static void _poweroff(void)
 }
 
 MAYBE_UNUSED
-static inline void _rtc_set_enabled(bool on)
+static inline void _rtc_enable(void)
 {
 #ifdef REG_RTC_MODE2_CTRLA
-    RTC->MODE2.CTRLA.bit.ENABLE = on;
+    RTC->MODE2.CTRLA.reg |= RTC_MODE2_CTRLA_ENABLE;
 #else
-    RTC->MODE2.CTRL.bit.ENABLE = on;
+    RTC->MODE2.CTRL.reg |= RTC_MODE2_CTRL_ENABLE;
+#endif
+    _wait_syncbusy();
+}
+
+MAYBE_UNUSED
+static inline void _rtc_disable(void)
+{
+#ifdef REG_RTC_MODE2_CTRLA
+    RTC->MODE2.CTRLA.reg &= ~RTC_MODE2_CTRLA_ENABLE;
+#else
+    RTC->MODE2.CTRL.reg &= ~RTC_MODE2_CTRL_ENABLE;
 #endif
     _wait_syncbusy();
 }
@@ -178,10 +189,10 @@ static inline void _rtt_reset(void)
 {
 #ifdef RTC_MODE0_CTRL_SWRST
     RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_SWRST;
-    while (RTC->MODE0.CTRL.bit.SWRST) {}
+    while (RTC->MODE0.CTRL.reg & RTC_MODE0_CTRL_SWRST) {}
 #else
     RTC->MODE0.CTRLA.reg = RTC_MODE2_CTRLA_SWRST;
-    while (RTC->MODE0.CTRLA.bit.SWRST) {}
+    while (RTC->MODE0.CTRLA.reg & RTC_MODE0_CTRLA_SWRST) {}
 #endif
 }
 
@@ -193,7 +204,7 @@ static void _rtc_clock_setup(void)
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
                       | GCLK_CLKCTRL_GEN(SAM0_GCLK_1KHZ)
                       | GCLK_CLKCTRL_ID_RTC;
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }
 #endif /* MODULE_PERIPH_RTC */
 
@@ -204,7 +215,7 @@ static void _rtt_clock_setup(void)
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
                       | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ)
                       | GCLK_CLKCTRL_ID_RTC;
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }
 #endif /* MODULE_PERIPH_RTT */
 
@@ -215,12 +226,12 @@ static void _rtc_clock_setup(void)
 {
     /* RTC source clock is external oscillator at 1kHz */
 #if EXTERNAL_OSC32_SOURCE
-    OSC32KCTRL->XOSC32K.bit.EN1K = 1;
+    OSC32KCTRL->XOSC32K.reg |= OSC32KCTRL_XOSC32K_EN1K;
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_XOSC1K;
 
     /* RTC uses internal 32,768KHz Oscillator */
 #elif INTERNAL_OSC32_SOURCE
-    OSC32KCTRL->OSC32K.bit.EN1K = 1;
+    OSC32KCTRL->OSC32K.reg |= OSC32KCTRL_OSC32K_EN1K;
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_OSC1K;
 
     /* RTC uses Ultra Low Power internal 32,768KHz Oscillator */
@@ -238,7 +249,7 @@ static void _rtt_clock_setup(void)
 {
     /* RTC source clock is external oscillator at 32kHz */
 #if EXTERNAL_OSC32_SOURCE
-    OSC32KCTRL->XOSC32K.bit.EN32K = 1;
+    OSC32KCTRL->XOSC32K.reg |= OSC32KCTRL_XOSC32K_EN32K;
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_XOSC32K;
 
     /* RTC uses internal 32,768KHz Oscillator */
@@ -319,8 +330,10 @@ void rtc_mem_write(unsigned offset, void *data, size_t len)
 static void _rtc_init(void)
 {
 #ifdef REG_RTC_MODE2_CTRLA
+    uint32_t mode = ((RTC->MODE2.CTRLA.reg & RTC_MODE2_CTRLA_MODE_Msk)
+                     >> RTC_MODE2_CTRLA_MODE_Pos);
     /* skip reset if already in RTC mode */
-    if (RTC->MODE2.CTRLA.bit.MODE == RTC_MODE2_CTRLA_MODE_CLOCK_Val) {
+    if (mode == RTC_MODE2_CTRLA_MODE_CLOCK_Val) {
         return;
     }
 
@@ -343,7 +356,9 @@ static void _rtc_init(void)
     RTC->MODE2.CTRLB.reg = RTC_MODE2_CTRLB_GP2EN;
 #endif
 #else
-    if (RTC->MODE2.CTRL.bit.MODE == RTC_MODE2_CTRL_MODE_CLOCK_Val) {
+    uint32_t mode = ((RTC->MODE2.CTRL.reg & RTC_MODE2_CTRL_MODE_Msk)
+                     >> RTC_MODE2_CTRL_MODE_Pos);
+    if (mode == RTC_MODE2_CTRL_MODE_CLOCK_Val) {
         return;
     }
 
@@ -371,7 +386,7 @@ void rtc_init(void)
     /* Clear interrupt flags */
     RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
 
-    _rtc_set_enabled(1);
+    _rtc_enable();
 
     NVIC_EnableIRQ(RTC_IRQn);
 }
@@ -443,9 +458,9 @@ static int _rtc_pin(gpio_t pin)
 
 static void _set_tampctrl(uint32_t reg)
 {
-    _rtc_set_enabled(0);
+    _rtc_disable();
     RTC->MODE0.TAMPCTRL.reg = reg;
-    _rtc_set_enabled(1);
+    _rtc_enable();
 }
 
 void rtc_tamper_init(void)
@@ -512,10 +527,10 @@ void rtc_tamper_enable(void)
         NVIC_DisableIRQ(RTC_IRQn);
 
         /* enable tamper detect as wake-up source */
-        RTC->MODE0.INTENSET.bit.TAMPER = 1;
+        RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_TAMPER;
 
         /* wait for first tamper event */
-        while (!RTC->MODE0.INTFLAG.bit.TAMPER && --timeout) {}
+        while (!(RTC->MODE0.INTFLAG.reg & RTC_MODE0_INTFLAG_TAMPER) && --timeout) {}
 
         /* clear tamper flag flag */
         RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_TAMPER;
@@ -524,7 +539,7 @@ void rtc_tamper_enable(void)
         NVIC_EnableIRQ(RTC_IRQn);
     } else {
         /* no spurious event on falling edge */
-        RTC->MODE0.INTENSET.bit.TAMPER = 1;
+        RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_TAMPER;
     }
 
     DEBUG("tamper enabled\n");
@@ -560,17 +575,18 @@ int rtc_get_alarm(struct tm *time)
     /* Read alarm register in one time */
     alarm.reg = RTC->MODE2.Mode2Alarm[0].ALARM.reg;
 
-    time->tm_year = alarm.bit.YEAR + reference_year;
+    time->tm_year = ((alarm.reg & RTC_MODE2_ALARM_YEAR_Msk) >> RTC_MODE2_ALARM_YEAR_Pos)
+                     + reference_year;
     if ((time->tm_year < reference_year) ||
         (time->tm_year > (reference_year + 63))) {
         return -1;
     }
 
-    time->tm_mon = alarm.bit.MONTH - 1;
-    time->tm_mday = alarm.bit.DAY;
-    time->tm_hour = alarm.bit.HOUR;
-    time->tm_min = alarm.bit.MINUTE;
-    time->tm_sec = alarm.bit.SECOND;
+    time->tm_mon = ((alarm.reg & RTC_MODE2_ALARM_MONTH_Msk) >> RTC_MODE2_ALARM_MONTH_Pos) - 1;
+    time->tm_mday = ((alarm.reg & RTC_MODE2_ALARM_DAY_Msk) >> RTC_MODE2_ALARM_DAY_Pos);
+    time->tm_hour = ((alarm.reg & RTC_MODE2_ALARM_HOUR_Msk) >> RTC_MODE2_ALARM_HOUR_Pos);
+    time->tm_min = ((alarm.reg & RTC_MODE2_ALARM_MINUTE_Msk) >> RTC_MODE2_ALARM_MINUTE_Pos);
+    time->tm_sec = ((alarm.reg & RTC_MODE2_ALARM_SECOND_Msk) >> RTC_MODE2_ALARM_SECOND_Pos);
 
     return 0;
 }
@@ -583,18 +599,18 @@ int rtc_get_time(struct tm *time)
     _read_req();
     clock.reg = RTC->MODE2.CLOCK.reg;
 
-    time->tm_year = clock.bit.YEAR + reference_year;
-
+    time->tm_year = ((clock.reg & RTC_MODE2_CLOCK_YEAR_Msk) >> RTC_MODE2_CLOCK_YEAR_Pos)
+                     + reference_year;
     if ((time->tm_year < reference_year) ||
         (time->tm_year > (reference_year + 63))) {
         return -1;
     }
 
-    time->tm_mon = clock.bit.MONTH - 1;
-    time->tm_mday = clock.bit.DAY;
-    time->tm_hour = clock.bit.HOUR;
-    time->tm_min = clock.bit.MINUTE;
-    time->tm_sec = clock.bit.SECOND;
+    time->tm_mon = ((clock.reg & RTC_MODE2_CLOCK_MONTH_Msk) >> RTC_MODE2_CLOCK_MONTH_Pos) - 1;
+    time->tm_mday = ((clock.reg & RTC_MODE2_CLOCK_DAY_Msk) >> RTC_MODE2_CLOCK_DAY_Pos);
+    time->tm_hour = ((clock.reg & RTC_MODE2_CLOCK_HOUR_Msk) >> RTC_MODE2_CLOCK_HOUR_Pos);
+    time->tm_min = ((clock.reg & RTC_MODE2_CLOCK_MINUTE_Msk) >> RTC_MODE2_CLOCK_MINUTE_Pos);
+    time->tm_sec = ((clock.reg & RTC_MODE2_CLOCK_SECOND_Msk) >> RTC_MODE2_CLOCK_SECOND_Pos);
     return 0;
 }
 
@@ -781,7 +797,7 @@ static void _isr_rtc(void)
         return;
     }
 
-    if (RTC->MODE2.INTFLAG.bit.ALARM0) {
+    if (RTC->MODE2.INTFLAG.reg & RTC_MODE2_INTFLAG_ALARM0) {
         /* clear flag */
         RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
 
@@ -797,13 +813,13 @@ static void _isr_rtt(void)
         return;
     }
 
-    if (RTC->MODE0.INTFLAG.bit.OVF) {
+    if (RTC->MODE0.INTFLAG.reg & RTC_MODE0_INTFLAG_OVF) {
         RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_OVF;
         if (overflow_cb.cb) {
             overflow_cb.cb(overflow_cb.arg);
         }
     }
-    if (RTC->MODE0.INTFLAG.bit.CMP0) {
+    if (RTC->MODE0.INTFLAG.reg & RTC_MODE0_INTFLAG_CMP0) {
         /* clear flag */
         RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
         /* disable interrupt */
@@ -818,7 +834,7 @@ static void _isr_rtt(void)
 static void _isr_tamper(void)
 {
 #ifdef RTC_MODE0_INTFLAG_TAMPER
-    if (RTC->MODE0.INTFLAG.bit.TAMPER) {
+    if (RTC->MODE0.INTFLAG.reg & RTC_MODE0_INTFLAG_TAMPER) {
         RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_TAMPER;
         if (tamper_cb.cb) {
             tamper_cb.cb(tamper_cb.arg);

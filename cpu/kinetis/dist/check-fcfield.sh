@@ -12,7 +12,8 @@
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 # @author       Francisco Molina <francisco.molina@inria.fr>
 
-: ${OBJDUMP:=arm-none-eabi-objdump}
+: "${OBJDUMP:=arm-none-eabi-objdump}"
+: "${IMAGE_OFFSET:=0}"
 
 # elf, hex or bin file to flash
 FLASHFILE="$1"
@@ -28,12 +29,12 @@ EXPECTED_FCFIELD="^fffffffffffffffffffffffffe..ffff$"
 
 get_fc_field()
 {
-    if [ ${1##*.} = elf ]; then
+    if [ "${1##*.}" = elf ]; then
         "${OBJDUMP}" -j.fcfield -s "${1}"
-    elif [ ${1##*.} = bin ]; then
-        "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} -bbinary -marm ${1} -s
-    elif [ ${1##*.} = hex ]; then
-        "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} ${1} -s
+    elif [ "${1##*.}" = bin ]; then
+        "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} -bbinary -marm "${1}" -s
+    elif [ "${1##*.}" = hex ]; then
+        "${OBJDUMP}" --start-address=${FCFIELD_START} --stop-address=${FCFIELD_END} "${1}" -s
     else
         echo "Unknown file extension: ${1##*.}"
         exit 1
@@ -51,16 +52,16 @@ if [ $# -ne 1 ]; then
     exit 2
 fi
 
-if [ $(printf '%d' "${IMAGE_OFFSET}") -ge $(printf '%d' "${FCFIELD_END}") ]; then
+if [ "$(printf '%d' "${IMAGE_OFFSET}")" -ge "$(printf '%d' "${FCFIELD_END}")" ]; then
     echo "Value in fcfield is not checked when flashing at \$IMAGE_OFFSET >= 0x410"
     exit 0
-elif [ 0 -lt $(printf '%d' "${IMAGE_OFFSET}") ] && [ $(printf '%d' "${IMAGE_OFFSET}") -lt $(printf '%d' "${FCFIELD_END}") ]; then
+elif [ 0 -lt "$(printf '%d' "${IMAGE_OFFSET}")" ] && [ "$(printf '%d' "${IMAGE_OFFSET}")" -lt "$(printf '%d' "${FCFIELD_END}")" ]; then
     echo "Error: flashing with 0 < \$IMAGE_OFFSET < 0x410 is currently not handled"
     exit 1
-elif ! filter_fc_field ${FLASHFILE} ${FCFIELD_AWK_REGEX} | grep -q "${EXPECTED_FCFIELD}"; then
+elif ! filter_fc_field "${FLASHFILE}" "${FCFIELD_AWK_REGEX}" | grep -q "${EXPECTED_FCFIELD}"; then
     echo "Danger of bricking the device during flash!"
     echo "Flash configuration field of ${FLASHFILE}:"
-    get_fc_field ${FLASHFILE}
+    get_fc_field "${FLASHFILE}"
     echo "Abort flash procedure!"
     exit 1
 fi

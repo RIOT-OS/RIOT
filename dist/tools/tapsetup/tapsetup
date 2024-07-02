@@ -13,6 +13,10 @@ BRIDGE_ROUTES=""
 DEFAULT_PREFIX_LEN=128
 UPLINK=""
 
+# doas uses the DOAS_USER variable instead of SUDO_USER. For compatibility with
+# both, we populate SUDO_USER with DOAS_USER, if SUDO_USER is not existing.
+: "${SUDO_USER:="$DOAS_USER"}"
+
 usage() {
     echo "usage: ${PROGRAM} [arguments]" >&2
     echo "" >&2

@@ -171,6 +171,17 @@ int vfs_is_dir(const char *path)
     return ((stat.st_mode & S_IFMT) == S_IFDIR);
 }
 
+bool vfs_file_exists(const char *path)
+{
+    int res = vfs_open(path, O_RDONLY, 0);
+    if (res < 0) {
+        return false;
+    }
+
+    vfs_close(res);
+    return true;
+}
+
 /**
  * @brief   Removes additional "/" slashes from @p path
  *

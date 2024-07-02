@@ -197,7 +197,7 @@ UBaseType_t uxTaskGetStackHighWaterMark(TaskHandle_t xTask)
     thread_t *thread = thread_get((xTask == NULL) ? (uint32_t)thread_getpid()
                                                   : (uint32_t)xTask);
     assert(thread != NULL);
-    return thread_measure_stack_free(thread->stack_start);
+    return thread_measure_stack_free(thread);
 }
 
 void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,

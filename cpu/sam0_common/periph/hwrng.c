@@ -26,15 +26,16 @@
 void hwrng_init(void)
 {
     /* Enable the MCLK */
-    MCLK->APBCMASK.bit.TRNG_ = 1;
+    MCLK->APBCMASK.reg |= MCLK_APBCMASK_TRNG;
 
     /* Enable the TRNG */
-    TRNG->CTRLA.bit.ENABLE = 1;
+    TRNG->CTRLA.reg |= TRNG_CTRLA_ENABLE;
+
 }
 
 uint32_t hwrand(void)
 {
-    while (!TRNG->INTFLAG.bit.DATARDY) {}
+    while (!(TRNG->INTFLAG.reg & TRNG_INTFLAG_DATARDY)) {}
     return TRNG->DATA.reg;
 }
 

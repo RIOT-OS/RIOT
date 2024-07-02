@@ -30,6 +30,7 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/tcp.h"
+#include "net/sock/config.h"
 
 #ifdef MODULE_SOCK_DTLS
 #include "net/credman.h"
@@ -294,49 +295,6 @@ int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
                                 sock_dtls_session_t *session, credman_tag_t tag,
                                 sock_udp_ep_t *local, const sock_udp_ep_t *remote,
                                 void *work_buf, size_t work_buf_len);
-#endif
-
-/**
- * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
- * @ingroup     net_sock_conf
- * @{
- */
-/**
- * @brief maximum length of the scheme part for sock_urlsplit.
- *
- * Ensures a hard limit on the string iterator
- * */
-#ifndef CONFIG_SOCK_SCHEME_MAXLEN
-#define CONFIG_SOCK_SCHEME_MAXLEN      (16U)
-#endif
-
-/**
- * @brief maximum length of host:port part for sock_urlsplit()
- */
-#ifndef CONFIG_SOCK_HOSTPORT_MAXLEN
-#define CONFIG_SOCK_HOSTPORT_MAXLEN    (64U)
-#endif
-
-/**
- * @brief maximum length path for sock_urlsplit()
- */
-#ifndef CONFIG_SOCK_URLPATH_MAXLEN
-#define CONFIG_SOCK_URLPATH_MAXLEN     (64U)
-#endif
-/** @} */
-
-/**
- * @brief   Timeout in milliseconds for sock_dtls_establish_session()
- */
-#ifndef CONFIG_SOCK_DTLS_TIMEOUT_MS
-#define CONFIG_SOCK_DTLS_TIMEOUT_MS    (1000U)
-#endif
-
-/**
- * @brief   Number of DTLS handshake retries for sock_dtls_establish_session()
- */
-#ifndef CONFIG_SOCK_DTLS_RETRIES
-#define CONFIG_SOCK_DTLS_RETRIES       (2)
 #endif
 
 #ifdef __cplusplus

@@ -142,9 +142,6 @@ static ztimer_t _link_status_timer;
 #endif
 /** @} */
 
-/* Synchronization between IRQ and thread context */
-mutex_t stm32_eth_tx_completed = MUTEX_INIT_LOCKED;
-
 /* Descriptors */
 static edma_desc_t rx_desc[ETH_RX_DESCRIPTOR_COUNT];
 static edma_desc_t tx_desc[ETH_TX_DESCRIPTOR_COUNT];
@@ -586,20 +583,26 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     }
     /* start TX */
     ETH->DMATPDR = 0;
-    /* await completion */
     if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
     }
-    mutex_lock(&stm32_eth_tx_completed);
+
+    return 0;
+}
+
+static int stm32_eth_confirm_send(netdev_t *netdev, void *info)
+{
+    (void)info;
+    (void)netdev;
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
         gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
                       (1U << STM32_ETH_TRACING_TX_PIN_NUM));
     }
-    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
-        DEBUG("[stm32_eth] TX completed\n");
-    }
+    DEBUG("[stm32_eth] TX completed\n");
 
     /* Error check */
+    _debug_tx_descriptor_info(__LINE__);
+    int tx_bytes = 0;
     int error = 0;
     while (1) {
         uint32_t status = tx_curr->status;
@@ -624,6 +627,7 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
             _reset_eth_dma();
         }
         tx_curr = tx_curr->desc_next;
+        tx_bytes += tx_curr->control;
         if (status & TX_DESC_STAT_LS) {
             break;
         }
@@ -631,11 +635,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
 
     _debug_tx_descriptor_info(__LINE__);
 
-    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     if (error) {
         return error;
     }
-    return (int)bytes_to_send;
+    return tx_bytes;
 }
 
 static int get_rx_frame_size(void)
@@ -811,6 +814,7 @@ static void stm32_eth_isr(netdev_t *netdev)
 
 static const netdev_driver_t netdev_driver_stm32f4eth = {
     .send = stm32_eth_send,
+    .confirm_send = stm32_eth_confirm_send,
     .recv = stm32_eth_recv,
     .init = stm32_eth_init,
     .isr = stm32_eth_isr,

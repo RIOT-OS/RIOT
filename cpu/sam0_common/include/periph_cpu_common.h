@@ -681,8 +681,13 @@ typedef enum {
 static inline void sam0_set_voltage_regulator(sam0_supc_t src)
 {
 #ifdef REG_SUPC_VREG
-    SUPC->VREG.bit.SEL = src;
-    while (!SUPC->STATUS.bit.VREGRDY) {}
+    if (src == SAM0_VREG_BUCK) {
+        SUPC->VREG.reg |= (1 << SUPC_VREG_SEL_Pos);
+    }
+    else {
+        SUPC->VREG.reg &= ~(1 << SUPC_VREG_SEL_Pos);
+    }
+    while (!(SUPC->STATUS.reg & SUPC_STATUS_VREGRDY)) {}
 #else
     (void) src;
     assert(0);
@@ -867,7 +872,7 @@ static inline void sercom_set_gen(void *sercom, uint8_t gclk)
 static inline bool cpu_woke_from_backup(void)
 {
 #ifdef RSTC_RCAUSE_BACKUP
-    return RSTC->RCAUSE.bit.BACKUP;
+    return RSTC->RCAUSE.reg & RSTC_RCAUSE_BACKUP;
 #else
     return false;
 #endif
@@ -877,11 +882,7 @@ static inline bool cpu_woke_from_backup(void)
  * @brief ADC Channel Configuration
  */
 typedef struct {
-    union {
-        uint32_t inputctrl; /**< ADC channel pin multiplexer value  */
-        uint32_t muxpos;    /**< ADC channel pin multiplexer value
-                                 @deprecated, use inputctrl instead */
-    };
+    uint32_t inputctrl;     /**< ADC channel pin multiplexer value  */
 #ifdef ADC0
     Adc *dev;               /**< ADC device descriptor */
 #endif
@@ -950,7 +951,7 @@ typedef enum {
 #endif
 
 #ifndef ETH_TX_BUFFER_COUNT
-#define ETH_TX_BUFFER_COUNT (4)
+#define ETH_TX_BUFFER_COUNT (2)
 #endif
 
 #ifndef ETH_RX_BUFFER_SIZE

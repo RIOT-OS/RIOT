@@ -5,4 +5,11 @@
 # directory for more details.
 #
 
+menu "LwM2M objects"
+
+rsource "Kconfig.device"
+rsource "Kconfig.security"
+rsource "Kconfig.ipso"
 rsource "Kconfig.light_control"
+
+endmenu

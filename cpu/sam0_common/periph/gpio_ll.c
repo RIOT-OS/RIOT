@@ -62,12 +62,12 @@ void gpio_ll_mux(gpio_port_t port, uint8_t pin, gpio_mux_t mux)
 
     unsigned irq_state = irq_disable();
     if (mux == GPIO_MUX_DISABLED) {
-        apb->PINCFG[pin].bit.PMUXEN = 0;
+        apb->PINCFG[pin].reg &= ~PORT_PINCFG_PMUXEN;
     }
     else {
         unsigned pmux_reg = pin >> 1;
         unsigned pmux_pos = (pin & 0x01) << 2;
-        apb->PINCFG[pin].bit.PMUXEN = 1;
+        apb->PINCFG[pin].reg |= PORT_PINCFG_PMUXEN;
         unsigned pmux = apb->PMUX[pmux_reg].reg;
         pmux &= ~(PORT_PMUX_PMUXE_Msk << pmux_pos);
         pmux |= (unsigned)mux << pmux_pos;

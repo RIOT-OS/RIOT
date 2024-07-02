@@ -11,7 +11,5 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
-# For riotboot you need an openocd that supports dualbank flashing.
-# The 0.10.0 openocd version in Ubuntu Bionic doesn't work. The change was
-# introduced after Jun 8, 2017 - v0.10.0-1-20170607-2132-dev.
 FEATURES_PROVIDED += riotboot
+FEATURES_PROVIDED += netif

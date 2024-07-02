@@ -121,10 +121,10 @@ static void disable_trigger(unsigned exti_num)
 static void eic_sync(void)
 {
 #ifdef EIC_STATUS_SYNCBUSY
-    while (EIC_SEC->STATUS.bit.SYNCBUSY) { }
+    while (EIC_SEC->STATUS.reg & EIC_STATUS_SYNCBUSY) {}
 #endif
 #ifdef EIC_SYNCBUSY_ENABLE
-    while (EIC_SEC->SYNCBUSY.bit.ENABLE) { }
+    while (EIC_SEC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
 #endif
 }
 
@@ -136,7 +136,7 @@ static void eic_enable_clock(void)
     GCLK->CLKCTRL.reg = EIC_GCLK_ID
                       | GCLK_CLKCTRL_CLKEN
                       | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #endif
 #ifdef MCLK_APBAMASK_EIC
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;

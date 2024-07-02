@@ -35,6 +35,16 @@ PSEUDOMODULES += board_software_reset
 
 PSEUDOMODULES += arduino_pwm
 PSEUDOMODULES += arduino_serial_stdio
+## @defgroup pseudomodule_arm_stack_limit arm_stack_limit
+## @{
+## @brief Set MSP/PSP stack lower limit
+##
+## Use PSPLIM and MSPLIM ARM registers to set the lower limit of a stack
+## This is a protection mechanism to catch stack overflow early before it
+## can corrupt adjacent memory. Only available on ARMv8-M architecture.
+PSEUDOMODULES += cortexm_stack_limit
+## @}
+
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -70,6 +80,7 @@ PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
+PSEUDOMODULES += gcoap_forward_proxy_thread
 PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_dtls
 ## @addtogroup net_gcoap_dns
@@ -350,7 +361,10 @@ PSEUDOMODULES += psa_riot_hashes_md5
 PSEUDOMODULES += psa_riot_hashes_sha_1
 PSEUDOMODULES += psa_riot_hashes_sha_224
 PSEUDOMODULES += psa_riot_hashes_sha_256
+PSEUDOMODULES += psa_riot_hashes_sha_384
 PSEUDOMODULES += psa_riot_hashes_sha_512
+PSEUDOMODULES += psa_riot_hashes_sha_512_224
+PSEUDOMODULES += psa_riot_hashes_sha_512_256
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
 PSEUDOMODULES += riotboot_%

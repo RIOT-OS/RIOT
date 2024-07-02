@@ -58,9 +58,9 @@
 static inline void wait_nvm_is_ready(void)
 {
 #ifdef NVMCTRL_STATUS_READY
-    while (!_NVMCTRL->STATUS.bit.READY) {}
+    while (!(_NVMCTRL->STATUS.reg & NVMCTRL_STATUS_READY)) {}
 #else
-    while (!_NVMCTRL->INTFLAG.bit.READY) {}
+    while (!(_NVMCTRL->INTFLAG.reg & NVMCTRL_INTFLAG_READY)) {}
 #endif
 }
 
@@ -89,7 +89,7 @@ static void _lock(unsigned state)
 
     /* cached flash contents may have changed - invalidate cache */
 #ifdef CMCC
-    CMCC->MAINT0.bit.INVALL = 1;
+    CMCC->MAINT0.reg |= CMCC_MAINT0_INVALL;
 #endif
 
     irq_restore(state);

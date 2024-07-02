@@ -32,7 +32,15 @@ psa_status_t psa_generate_ecc_p192r1_key_pair(  const psa_key_attributes_t *attr
 
     const struct uECC_Curve_t *curve = uECC_secp192r1();
 
-    ret = uECC_make_key(pub_key_buffer, priv_key_buffer, curve);
+    /**
+     * Add 0x04 prefix for SEC 1 encoded uncompressed elliptic curve points.
+     * Micro-ECC represents public keys in SEC 1 uncompressed format without the 0x04 prefix [1].
+     * PSA Crypto uses a standard SEC 1 uncompressed representation [2].
+     * [1] https://github.com/kmackay/micro-ecc/blob/master/README.md#point-representation
+     * [2] https://arm-software.github.io/psa-api/crypto/1.1/api/keys/management.html#key-formats
+     */
+    pub_key_buffer[0] = 0x04;
+    ret = uECC_make_key(pub_key_buffer+1, priv_key_buffer, curve);
     if (!ret) {
         return PSA_ERROR_GENERIC_ERROR;
     }
@@ -90,7 +98,8 @@ psa_status_t psa_ecc_p192r1_verify_hash(const psa_key_attributes_t *attributes,
     int ret = 0;
     const struct uECC_Curve_t *curve = uECC_secp192r1();
 
-    ret = uECC_verify(key_buffer, hash, hash_length, signature, curve);
+    /* Micro-ECC expects uncompressed public key without 0x04 prefix */
+    ret = uECC_verify(key_buffer+1, hash, hash_length, signature, curve);
     if (!ret) {
         return PSA_ERROR_GENERIC_ERROR;
     }

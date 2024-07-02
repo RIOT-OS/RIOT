@@ -3,6 +3,7 @@
 FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
 
 DEFAULT_MODULE += auto_init_lwip
+USEMODULE += event
 
 ifneq (,$(filter sock_async,$(USEMODULE)))
   USEMODULE += lwip_sock_async
@@ -90,7 +91,7 @@ ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += ztimer_msec
   ifneq (,$(filter bhp,$(USEMODULE)))
-    USEMODULE += bhp_msg
+    USEMODULE += bhp_event
   endif
 endif
 
@@ -100,6 +101,11 @@ endif
 
 ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
   USEMODULE += lwip_dhcp
+endif
+
+# if an actual netdev is used, we need lwip_netdev to integrate it
+ifneq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
+  USEMODULE += lwip_netdev
 endif
 
 ifneq (,$(filter netif,$(USEMODULE)))
