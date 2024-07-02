@@ -27,10 +27,8 @@
  *
  * For ISSI and Macronix devices, some data integrity features are provided
  * to check if program or erase operations were successful.
- * These features can be activated by specifying the manufacturer specific flags in
- * the mtd_spi_nor_params_t structure.
- *
- *      TODO
+ * These features can be activated by specifying the "SPI_NOR_F_CHECK_INTEGRITY" flag in
+ * the "flag" parameter of the mtd_spi_nor_params_t structure.
  *
  * \n
  * Some examples of how to work with the MTD SPI NOR driver can be found in the test for the
@@ -130,7 +128,7 @@ typedef struct __attribute__((packed)) {
  * @brief Enable data integrity checks after program/erase operations
  * for devices that support it.
  */
-#define SPI_NOR_F_CHECK_INTEGRETY (256)
+#define SPI_NOR_F_CHECK_INTEGRETY   (256)
 
 /**
  * @brief Enable functionality that is specific for Macronix devices.
@@ -140,7 +138,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief Enable functionality that is specific for ISSI devices.
  */
-#define SPI_NOR_F_MANUF_ISSI        (0x9D)
+#define SPI_NOR_F_MANUF_ISSI    (0x9D)
 
 /**
  * @brief Compile-time parameters for a serial flash device
@@ -217,10 +215,6 @@ extern const mtd_desc_t mtd_spi_nor_driver;
  * be found in Macronix MX25L25735E, and multiple other data sheets for
  * different devices, as well as in the Linux kernel, so they seem quite
  * sensible for default values.
- *
- * To enable manufacturer specific data integrity functions, the according
- * flags have to be set in the mtd_spi_nor_params_t structure in the
- * mtd_spi_nor_params_t.manufacturer element.
  */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
 
