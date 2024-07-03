@@ -7,7 +7,7 @@ BOARD ?= nrf9160dk-ns
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-USEPKG += nrfx
+USEPKG += riot-tee
 
 USEMODULE += cortexm_svc
 

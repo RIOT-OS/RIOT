@@ -16,11 +16,12 @@
 
 #include <stdio.h>
 #include "nrfx.h"
-#include "secure_led.h"
+#include "secure_leds.h"
 
 int main(void)
 {
     puts("Wheeee \\o/");
+
     config_leds();
     while (1)
     {
@@ -31,9 +32,9 @@ int main(void)
 
             // Some delay
             volatile uint32_t j = 1000000;
-            while (j > 0)
+            while (j > 0) {
                 --j;
-
+            }
             led_off(i);
         }
     }
