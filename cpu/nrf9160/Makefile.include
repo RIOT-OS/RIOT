@@ -5,24 +5,12 @@ RAM_LEN ?= 0x40000
 ifneq (,$(filter nrf9160dk-ns,$(BOARD)))
 $(info $$RIOTBOARD is [$(BOARD)])
 
-export SECURE_IMAGE_SIZE = 0x10000
+export SECURE_FLASH_SIZE = 0x10000
 
 RAM_LEN = 0x2a000
 ROM_LEN = 0xF0000
 RAM_START_ADDR ?= 0x20016000
-ROM_OFFSET = $(SECURE_IMAGE_SIZE)
-else
-$(info $$RIOTBOARD is [$(BOARD)])
-# Add search path for linker scripts
-ROM_LEN = 0x10000
-RAM_LEN = 0x10000
-
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
-LINKER_SCRIPT = nrf9160_nsc.ld
-
-CFLAGS += -mcmse
-LINKFLAGS += -Wl,--cmse-implib
-LINKFLAGS += -Wl,--out-implib=$(BINDIR)/nsc_lib.o
+ROM_OFFSET = $(SECURE_FLASH_SIZE)
 endif
 
 FLASHFILE ?= $(BINFILE)

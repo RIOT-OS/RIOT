@@ -5,9 +5,5 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   USEMODULE += periph_spi_gpio_mode
 endif
 
-ifneq (,$(filter nrf9160dk-ns,$(BOARD)))
-ARCHIVES += $(RIOTBASE)/riot_secure/bin/nrf9160dk/nsc_lib.o
-endif
-
 include $(RIOTCPU)/nrf5x_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep
