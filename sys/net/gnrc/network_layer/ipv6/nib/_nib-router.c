@@ -111,8 +111,14 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     uint8_t flags = 0;
     uint32_t valid_ltime = (offl->valid_until == UINT32_MAX) ? UINT32_MAX :
                            ((offl->valid_until - now) / MS_PER_SEC);
-    uint32_t pref_ltime = (offl->pref_until == UINT32_MAX) ? UINT32_MAX :
-                          ((offl->pref_until - now) / MS_PER_SEC);
+    uint32_t pref_ltime = offl->pref_until;
+    if (pref_ltime != UINT32_MAX) { /* reserved for infinite lifetime */
+        if (pref_ltime >= now) { /* avoid overflow */
+            pref_ltime = (pref_ltime - now) / MS_PER_SEC;
+        } else {
+            pref_ltime = 0; /* deprecated */
+        }
+    }
 
     DEBUG("nib: Build PIO for %s/%u\n",
           ipv6_addr_to_str(addr_str, &offl->pfx, sizeof(addr_str)),
