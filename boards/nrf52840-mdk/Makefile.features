@@ -8,6 +8,5 @@ FEATURES_PROVIDED += periph_usbdev
 FEATURES_PROVIDED += vdd_lc_filter_reg1
 
 # Various other features (if any)
-FEATURES_PROVIDED += tinyusb_device
 
 include $(RIOTBOARD)/common/nrf52/Makefile.features
