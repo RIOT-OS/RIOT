@@ -1,11 +1,16 @@
 DIRS += $(RIOTBASE)/pkg/wakaama/contrib
 
 INCLUDES += -I$(RIOTBASE)/pkg/wakaama/include
+INCLUDES += -I$(PKGDIRBASE)/wakaama/include
 INCLUDES += -I$(PKGDIRBASE)/wakaama/core
-INCLUDES += -I$(PKGDIRBASE)/wakaama/core/er-coap-13
+INCLUDES += -I$(PKGDIRBASE)/wakaama/data
+INCLUDES += -I$(PKGDIRBASE)/wakaama/coap/er-coap-13
 
 # NOTE: Use wakaama in client mode
 CFLAGS += -DLWM2M_CLIENT_MODE
+
+# NOTE: "Default CoAP block size; Used if not set on a per-target basis"
+CFLAGS += -DLWM2M_COAP_DEFAULT_BLOCK_SIZE=1024
 
 # Translate 'CONFIG_' options to package specific flags. This checks if the
 # option is being set via Kconfig or CFLAGS
