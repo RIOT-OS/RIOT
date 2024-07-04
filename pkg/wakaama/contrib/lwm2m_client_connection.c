@@ -284,7 +284,6 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         .objectId = LWM2M_SECURITY_URI_ID,
         .instanceId = sec_obj_inst_id,
         .resourceId = LWM2M_SECURITY_URI_ID,
-        .flag = LWM2M_URI_FLAG_OBJECT_ID | LWM2M_URI_FLAG_INSTANCE_ID | LWM2M_URI_FLAG_RESOURCE_ID
     };
 
     int res = lwm2m_get_string(client_data, &resource_uri, uri, &uri_len);
