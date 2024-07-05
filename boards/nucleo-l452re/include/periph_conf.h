@@ -120,6 +120,20 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+static const adc_conf_t adc_config[] = { 
+    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan =  5 }, /* A0  ADC1_IN5  */
+    { .pin = GPIO_PIN(PORT_A, 1), .dev = 0, .chan =  6 }, /* A1  ADC1_IN6  */
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan =  9 }, /* A2  ADC1_IN9  */
+    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 15 }, /* A3 ADC1_IN15  */
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan =  2 }, /* A4  ADC1_IN2  */
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan =  1 }, /* A5  ADC1_IN1  */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 18 },
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
+#define VBAT_ADC            ADC_LINE(6)
+
 #ifdef __cplusplus
 }
 #endif
