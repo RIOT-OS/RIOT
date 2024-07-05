@@ -174,7 +174,7 @@ static gcoap_socket_type_t _get_tl(const char *uri)
 static ssize_t _send(uint8_t *buf, size_t len, const sock_udp_ep_t *remote,
                      void *ctx, gcoap_socket_type_t tl)
 {
-    ssize_t bytes_sent = gcoap_req_send(buf, len, remote, _resp_handler, ctx, tl);
+    ssize_t bytes_sent = gcoap_req_send(buf, len, remote, NULL, _resp_handler, ctx, tl);
     if (bytes_sent > 0) {
         req_count++;
     }
