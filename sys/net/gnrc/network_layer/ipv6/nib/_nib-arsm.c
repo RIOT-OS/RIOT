@@ -391,7 +391,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
         /* send queued packets */
         gnrc_pktqueue_t *ptr;
         DEBUG("nib: Sending queued packets\n");
-        while ((ptr = gnrc_pktqueue_remove_head(&nce->pktqueue)) != NULL) {
+        while ((ptr = _nbr_pop_pkt(nce)) != NULL) {
             if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                            GNRC_NETREG_DEMUX_CTX_ALL,
                                            ptr->pkt)) {
@@ -442,6 +442,9 @@ void _set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce)
 void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                     uint16_t state)
 {
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+    bool was_reachable = _is_reachable(nce);
+#endif
     nce->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     nce->info |= state;
 
@@ -455,6 +458,13 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
 #else   /* CONFIG_GNRC_IPV6_NIB_ROUTER */
     (void)netif;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+    if (was_reachable && !_is_reachable(nce) && nce->pktqueue_len > 0) {
+        _evtimer_add(nce, GNRC_IPV6_NIB_FLUSH_PCK_QUEUE,
+                     &nce->flush_queue_timeout,
+                     CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_LINGER_MS);
+    }
+#endif
 }
 
 bool _is_reachable(_nib_onl_entry_t *entry)

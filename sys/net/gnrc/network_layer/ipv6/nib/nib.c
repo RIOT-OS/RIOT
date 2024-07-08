@@ -51,6 +51,12 @@
 #include "evtimer.h"
 #endif
 
+#if ENABLE_DEBUG
+#define DEBUG_IPV6_ADDR(addr) ipv6_addr_print(addr)
+#else
+#define DEBUG_IPV6_ADDR(addr) (void)NULL
+#endif
+
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
@@ -473,6 +479,12 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
         case GNRC_IPV6_NIB_RDNSS_TIMEOUT:
             _handle_rdnss_timeout(ctx);
+            break;
+#endif
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+        case GNRC_IPV6_NIB_FLUSH_PCK_QUEUE:
+            _nbr_flush_pktqueue(ctx);
+            break;
 #endif
         default:
             break;
@@ -1338,7 +1350,7 @@ static bool _enqueue_for_resolve(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-    gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
+    _nbr_push_pkt(entry, queue_entry);
 #else
     (void)entry;
 #endif
@@ -1732,4 +1744,60 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 
     return route_ltime;
 }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node)
+{
+    if (node->pktqueue_len == 0) {
+        assert(node->pktqueue == NULL);
+        return NULL;
+    }
+    assert(node->pktqueue != NULL);
+
+    node->pktqueue_len--;
+
+    return gnrc_pktqueue_remove_head(&node->pktqueue);
+}
+
+void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
+{
+    assert(node->pktqueue_len <= CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP);
+    if (node->pktqueue_len == CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP) {
+        gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
+        assert(oldest != NULL);
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, oldest->pkt);
+        gnrc_pktbuf_release_error(oldest->pkt, EHOSTUNREACH);
+        oldest->pkt = NULL;
+    }
+
+    gnrc_pktqueue_add(&node->pktqueue, pkt);
+    node->pktqueue_len++;
+
+    if (!_is_reachable(node) &&
+        (_evtimer_lookup(NULL, GNRC_IPV6_NIB_FLUSH_PCK_QUEUE) == UINT32_MAX)) {
+        DEBUG("nib: pushing pck to unreachable (%d) nbr ", _get_nud_state(node));
+        DEBUG_IPV6_ADDR(&node->ipv6);
+        DEBUG("\n");
+        _evtimer_add(node, GNRC_IPV6_NIB_FLUSH_PCK_QUEUE,
+                     &node->flush_queue_timeout,
+                     CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_LINGER_MS);
+    }
+}
+
+void _nbr_flush_pktqueue(_nib_onl_entry_t *node)
+{
+    if (_is_reachable(node)) {
+        return;
+    }
+    DEBUG("nib: flushing pkts for ureachable (%d) nbr ", _get_nud_state(node));
+    DEBUG_IPV6_ADDR(&node->ipv6);
+    DEBUG("\n");
+    gnrc_pktqueue_t *entry;
+    while ((entry = _nbr_pop_pkt(node))) {
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, entry->pkt);
+        gnrc_pktbuf_release_error(entry->pkt, EHOSTUNREACH);
+        entry->pkt = NULL;
+    }
+}
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 /** @} */

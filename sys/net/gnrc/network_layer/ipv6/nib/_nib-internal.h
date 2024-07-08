@@ -100,6 +100,8 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT != 0.
      */
     gnrc_pktqueue_t *pktqueue;
+    evtimer_msg_event_t flush_queue_timeout;   /**< Event for @ref GNRC_IPV6_NIB_FLUSH_PCK_QUEUE */
+    size_t pktqueue_len;                       /**< Number of queued packets */
 #endif
     /**
      * @brief Neighbors IPv6 address
@@ -871,6 +873,38 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
  */
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
                    gnrc_ipv6_nib_ft_t *entry);
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+/**
+ * @brief Event handler for flushing the packet queue of a neighbor
+ *
+ * The queue will only be flushed if the neighbor is unreachable.
+ *
+ * @param node neighbor entry to be flushed
+ */
+void _nbr_flush_pktqueue(_nib_onl_entry_t *node);
+
+/**
+ * @brief Remove oldest packet from the neighbor packet queue.
+ *
+ * @param node neighbor entry
+ *
+ * @retval pointer to the packet entry or NULL if the queue is empty
+ */
+gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
+
+/**
+ * @brief Push packet to the neighbor packet queue.
+ *
+ * @note If the queue size is @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP,
+ *       this will @ref _nbr_pop_pkt() the oldest packet and release it.
+ *
+ * @param node neighbor entry
+ * @param pkt packet to be pushed
+ */
+void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt);
+
+#endif
 
 #ifdef __cplusplus
 }

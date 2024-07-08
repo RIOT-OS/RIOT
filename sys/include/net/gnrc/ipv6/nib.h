@@ -243,6 +243,14 @@ extern "C" {
  * @brief   Interface down event
  */
 #define GNRC_IPV6_NIB_IFACE_DOWN            (0x4fd5U)
+
+/**
+ * @brief   Flush neighbor packet queue.
+ *
+ * Event for flushing the packet queue of a on-link entry. The queue is only
+ * flushed if the neighbor is unreachable.
+ */
+#define GNRC_IPV6_NIB_FLUSH_PCK_QUEUE       (0x4fd6U)
 /** @} */
 
 /**
