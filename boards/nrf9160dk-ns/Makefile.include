@@ -1,5 +1,3 @@
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
 INCLUDES += -I$(RIOTBASE)/build/pkg/riot-tee/ns_api
-
-ARCHIVES += $(BINDIR)/pkg-build/riot-tee/nsc_lib.o
