@@ -54,6 +54,7 @@ class KeaConfig(object):
                 "renew-timer": int(renew_timer),
                 "rebind-timer": int(rebind_timer),
                 "subnet6": [{
+                    "id": 1,
                     "interface": interface,
                     "subnet": "{}/{}".format(prefix, prefix_len),
                     "pd-pools": [{
