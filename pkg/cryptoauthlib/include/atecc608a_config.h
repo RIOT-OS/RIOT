@@ -29,8 +29,16 @@
 #ifndef ATECC608A_CONFIG_H
 #define ATECC608A_CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
+/**
+ * @brief   Example device configuration for the atecc608a.
+ *
+ */
 const uint8_t atecc608a_config[] = {
     0x00, 0x00, 0x00, 0x00, /* Read only serial number */
     0x00, 0x00, 0x00, 0x00, /* Read only revision number */
@@ -100,5 +108,9 @@ const uint8_t atecc608a_config[] = {
     /* SHA Key or other data */
     0x1C, 0x00, 0x1C, 0x00  /* KeyConfig 14, KeyConfig 15 */
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ATECC608A_CONFIG_H */
