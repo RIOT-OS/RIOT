@@ -37,8 +37,7 @@
 
 #include "atecc608a_config.h"
 
-#define ATCA_CONFIG_READ_ONLY_BYTES (15)
-#define ATCA_KEY_SLOT_COUNT         (15)
+#define ATCA_KEY_SLOT_COUNT         (16)
 #define ATCA_X509_KEY_COUNT         (4)
 
 #define SERIAL_NO_START_01          (0)
