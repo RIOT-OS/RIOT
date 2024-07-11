@@ -212,6 +212,8 @@ ifneq (,$(filter psa_hash_sha_256,$(USEMODULE)))
     # HACK: Due to kconfig migration, may cause problems
     ifneq (,$(filter periph_hash_sha_256,$(FEATURES_USED)))
       USEMODULE += psa_hash_sha_256_backend_periph
+    else ifneq (,$(filter riot-tee,$(USEPKG)))
+      USEMODULE += psa_hash_sha_256_backend_tee
     else
       USEMODULE += psa_hash_sha_256_backend_riot
     endif
@@ -220,6 +222,11 @@ endif
 
 ifneq (,$(filter psa_hash_sha_256_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hash_sha_256
+endif
+
+ifneq (,$(filter psa_hash_sha_256_backend_tee,$(USEMODULE)))
+  USEMODULE += psa_tee
+  USEMODULE += psa_tee_hashes_sha256
 endif
 
 ifneq (,$(filter psa_hash_sha_256_backend_riot,$(USEMODULE)))

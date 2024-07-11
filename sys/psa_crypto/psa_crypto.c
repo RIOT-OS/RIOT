@@ -37,7 +37,7 @@
 #include "random.h"
 #include "kernel_defines.h"
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG    1
 #include "debug.h"
 
 /**
@@ -802,7 +802,7 @@ psa_status_t psa_hash_verify(psa_hash_operation_t *operation,
                              size_t hash_length)
 {
     int status = PSA_ERROR_CORRUPTION_DETECTED;
-    uint8_t digest[PSA_HASH_MAX_SIZE];
+    uint8_t digest[PSA_HASH_MAX_SIZE]  = {0};
     size_t actual_hash_length = 0;
 
     if (!lib_initialized) {
@@ -824,6 +824,16 @@ psa_status_t psa_hash_verify(psa_hash_operation_t *operation,
     }
 
     if (constant_time_memcmp(hash, digest, hash_length) != 0) {
+        DEBUG("Hash incorrect\n");
+        puts("Hash:");
+        for (size_t i = 0; i < hash_length; i++) {
+            printf("0x%02x ", hash[i]);
+        }
+
+        puts("Digest:");
+        for (size_t i = 0; i < hash_length; i++) {
+            printf("0x%02x ", digest[i]);
+        }
         return PSA_ERROR_INVALID_SIGNATURE;
     }
 
