@@ -1,3 +1,4 @@
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
 INCLUDES += -I$(RIOTBASE)/build/pkg/riot-tee/ns_api
+INCLUDES += -I$(RIOTBASE)/build/pkg/nrfx/mdk/

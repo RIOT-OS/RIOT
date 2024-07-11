@@ -73,7 +73,7 @@ static const timer_conf_t timer_config[] = {
         .irqn     = TIMER0_IRQn
     },
     {
-        .dev      = NRF_TIMER1_S,
+        .dev      = NRF_TIMER1_NS,
         /* using last channel for timer_read(), so only 5 of 6 channels available */
         .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_08Bit,
