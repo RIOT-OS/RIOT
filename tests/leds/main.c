@@ -22,8 +22,7 @@
 #include <stdint.h>
 
 #include "clk.h"
-#include "board.h"
-#include "periph_conf.h"
+#include "led.h"
 #include "periph/gpio.h"
 
 #define DELAY_SHORT         (coreclk() / 50)
@@ -38,41 +37,11 @@ void dumb_delay(uint32_t delay)
 
 int main(void)
 {
-    int numof = 0;
-
     /* get the number of available LED's and turn them all off*/
-#ifdef LED0_ON
-    ++numof;
-    LED0_OFF;
-#endif
-#ifdef LED1_ON
-    ++numof;
-    LED1_OFF;
-#endif
-#ifdef LED2_ON
-    ++numof;
-    LED2_OFF;
-#endif
-#ifdef LED3_ON
-    ++numof;
-    LED3_OFF;
-#endif
-#ifdef LED4_ON
-    ++numof;
-    LED4_OFF;
-#endif
-#ifdef LED5_ON
-    ++numof;
-    LED5_OFF;
-#endif
-#ifdef LED6_ON
-    ++numof;
-    LED6_OFF;
-#endif
-#ifdef LED7_ON
-    ++numof;
-    LED7_OFF;
-#endif
+    unsigned numof = LED_NUMOF;
+    for (unsigned i = 0; i < numof; i++) {
+        led_off(i);
+    }
 
     puts("On-board LED test\n");
     /* cppcheck-suppress knownConditionTrueFalse
@@ -86,7 +55,7 @@ int main(void)
     }
 
     for (unsigned i = 0; i < 4; ++i) {
-#ifdef LED0_ON
+#ifdef LED0_IS_PRESENT
         LED0_ON;
         dumb_delay(DELAY_LONG);
         LED0_OFF;
@@ -100,7 +69,7 @@ int main(void)
         LED0_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED1_ON
+#ifdef LED1_IS_PRESENT
         LED1_ON;
         dumb_delay(DELAY_LONG);
         LED1_OFF;
@@ -114,7 +83,7 @@ int main(void)
         LED1_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED2_ON
+#ifdef LED2_IS_PRESENT
         LED2_ON;
         dumb_delay(DELAY_LONG);
         LED2_OFF;
@@ -128,7 +97,7 @@ int main(void)
         LED2_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED3_ON
+#ifdef LED3_IS_PRESENT
         LED3_ON;
         dumb_delay(DELAY_LONG);
         LED3_OFF;
@@ -142,7 +111,7 @@ int main(void)
         LED3_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED4_ON
+#ifdef LED4_IS_PRESENT
         LED4_ON;
         dumb_delay(DELAY_LONG);
         LED4_OFF;
@@ -156,7 +125,7 @@ int main(void)
         LED4_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED5_ON
+#ifdef LED5_IS_PRESENT
         LED5_ON;
         dumb_delay(DELAY_LONG);
         LED5_OFF;
@@ -170,7 +139,7 @@ int main(void)
         LED5_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED6_ON
+#ifdef LED6_IS_PRESENT
         LED6_ON;
         dumb_delay(DELAY_LONG);
         LED6_OFF;
@@ -184,7 +153,7 @@ int main(void)
         LED6_TOGGLE;
         dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED7_ON
+#ifdef LED7_IS_PRESENT
         LED7_ON;
         dumb_delay(DELAY_LONG);
         LED7_OFF;
