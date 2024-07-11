@@ -25,6 +25,7 @@
 #include "periph_conf.h"
 #include "periph_cpu.h"
 #include "arduino_pinmap.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
