@@ -10,24 +10,20 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 CMAKE_MINIMAL_VERSION = 3.10.0
 
-export DEBUG=1
-export NRFXPATH = $(RIOTBASE)/build/pkg/nrfx
-export CMSISPATH = $(RIOTBASE)/build/pkg/cmsis/CMSIS
-export BUILDDIR = $(PKG_BUILD_DIR)
-export RIOT_BUILD=1
-
 TEE_CFLAGS += -Wno-strict-prototypes
 TEE_CFLAGS += -Wno-old-style-definition
+# TEE_CFLAGS += -DRIOT_FETCHCONTENT_BASE_DIR=$(PKG_SOURCE_DIR)/build/_deps
 
 TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
 all: $(PKG_BUILD_DIR)/Makefile
 	$(MAKE) -C $(PKG_BUILD_DIR)
-	mkdir $(BINDIR)/riot-tee
+	mkdir -p $(BINDIR)/riot-tee
 	cp $(PKG_BUILD_DIR)/nsc_lib.o $(BINDIR)/riot-tee
 
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 	cmake \
+    -DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_C_FLAGS=$(TEE_CFLAGS) \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		-B$(PKG_BUILD_DIR) \
