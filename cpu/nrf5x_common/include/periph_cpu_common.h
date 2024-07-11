@@ -30,6 +30,12 @@ extern "C" {
  */
 #ifdef NRF_FICR_S
 #ifdef BOARD_NRF9160DK_NS
+
+#if !defined(NRF_FICR_NS)
+    #define NRF_FICR_NS_BASE 0x2003E000
+    #define NRF_FICR_NS ((NRF_FICR_Type*)          NRF_FICR_NS_BASE)
+#endif
+
 #define NRF_FICR NRF_FICR_NS
 #else
 #define NRF_FICR NRF_FICR_S
