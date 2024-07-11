@@ -8,12 +8,8 @@ BOARD ?= nrf9160dk-ns
 RIOTBASE ?= $(CURDIR)/../..
 
 USEPKG += riot-tee
-
-USEMODULE += cortexm_svc
-
 DISABLE_MODULE += core_idle_thread
 DISABLE_MODULE += core_thread
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
