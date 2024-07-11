@@ -166,7 +166,7 @@ class SerCmd(cmd.Cmd):
             self.run_name = defaultrunname
 
         if not self.log_dir_name:
-            self.log_dir_name = self.host
+            self.log_dir_name = self.configdir + os.path.sep + self.host
 
         if not os.path.exists(self.configdir):
             os.makedirs(self.configdir)
@@ -196,7 +196,7 @@ class SerCmd(cmd.Cmd):
         # create formatter
         formatter = logging.Formatter(self.fmt_str)
 
-        directory = self.configdir + os.path.sep + self.log_dir_name
+        directory = self.log_dir_name
         if not os.path.exists(directory):
             os.makedirs(directory)
         logging.basicConfig(filename=directory + os.path.sep + self.run_name +
