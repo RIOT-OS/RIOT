@@ -17,6 +17,11 @@ else
   KCONFIG_ADD_CONFIG += $(APPDIR)/app.config.base
 endif
 
+USEPKG += riot-tee
+DISABLE_MODULE += core_idle_thread
+DISABLE_MODULE += core_thread
+DISABLE_MODULE += core_msg
+
 USEMODULE += ztimer
 USEMODULE += ztimer_usec
 
