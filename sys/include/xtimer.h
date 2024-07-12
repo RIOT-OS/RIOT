@@ -14,6 +14,10 @@
  *              timers, get current system time, and let a thread sleep for
  *              a certain amount of time.
  *
+ * @deprecated use @ref ztimer instead, in fact most examples use ztimer only
+ *             with the xtimer API.
+ *             Will be removed after 2023.04 release.
+ *
  * The implementation takes one low-level timer and multiplexes it.
  *
  * Insertion and removal of timers has O(n) complexity with (n) being the
