@@ -1,0 +1,17 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+@prefix ont: <#>.
+
+ont:doxygroup a rdf:Property;
+  rdfs:comment "The group in RIOT's doxygen that a concept is identified with. This can be turned into a URI with additional information about RIOT's current public documentation base URI and doxygen's name mangling rules.";
+  rdfs:domain skos:Concept;
+  rdfs:range xsd:string.
+
+ont:color a rdf:Property;
+  rdfs:comment "Color the concept (and its narrower concepts, unless overridden) have when represented visually, eg. on GitHub";
+  rdfs:domain skos:Concept;
+  rdfs:range xsd:string. # Is there an XSD data type for these, and if yes, do we have to reiterate it each time the property is used?
