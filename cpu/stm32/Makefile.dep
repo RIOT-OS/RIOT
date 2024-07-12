@@ -85,6 +85,12 @@ ifneq (,$(filter periph_adc,$(FEATURES_USED)))
   endif
 endif
 
+ifneq (,$(filter periph_can,$(FEATURES_USED)))
+  ifneq (,$(filter g4,$(CPU_FAM)))
+	USEMODULE += fdcan
+  endif
+endif
+
 ifneq (,$(filter periph_vbat,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
 endif
