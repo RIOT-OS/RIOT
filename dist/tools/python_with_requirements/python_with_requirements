@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+"""
+Given a Python script accompanied by a requirements.txt, check whether the
+requirements are installed locally. If so, run direclty; otherwise, create a
+.venv next to the script, install any requirements and run through there.
+"""
+
+import os
+import subprocess
+import sys
+import venv
+from pathlib import Path
+import importlib.metadata
+
+# Would be nice but is not universally present
+try:
+    import packaging.requirements
+except ImportError:
+    packaging = None
+
+pythonscript = Path(sys.argv[1])
+requirements = pythonscript.parent / "requirements.txt"
+localvenv = pythonscript.parent / ".venv"
+
+class BadVersion(ValueError):
+    """Package is available but not in the required version"""
+
+try:
+    with requirements.open() as reqfile:
+        # There is no accepted way to parse requirements.txt files
+        #
+        # https://stackoverflow.com/questions/49689880/proper-way-to-parse-requirements-file-after-pip-upgrade-to-pip-10-x-x
+        for line in reqfile:
+            line, _, _ = line.partition("#")
+            line = line.strip()
+            if not line:
+                continue
+
+            if packaging:
+                req = packaging.requirements.Requirement(line)
+                existing = importlib.metadata.version(req.name)
+                if not req.specifier.contains(existing):
+                    raise BadVersion
+            else:
+                req_name = line.split(" ", 1)[0]
+                existing = importlib.metadata.version(req_name)
+                # and as we can't compare versions, we're just disregarding
+                # them and hope they match
+
+            # This is completely disregarding the topic of extras -- but for
+            # our purposes of getting a quick run-or-venv decision, that's good
+            # enough
+except (importlib.metadata.PackageNotFoundError, BadVersion):
+    venv.EnvBuilder(symlinks=True, upgrade=True, with_pip=True).create(localvenv)
+    venvpip = localvenv / "bin" / "pip"
+    subprocess.check_call([venvpip, "install", "--quiet", "-r", requirements])
+    venvpython = localvenv / "bin" / "python"
+    os.execv(venvpython, [venvpython] + sys.argv[1:])
+else:
+    os.execv(sys.executable, [sys.executable] + sys.argv[1:])
