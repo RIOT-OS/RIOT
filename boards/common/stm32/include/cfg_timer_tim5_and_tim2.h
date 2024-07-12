@@ -64,6 +64,68 @@ static const timer_conf_t timer_config[] = {
     },
 };
 
+/**
+ * @brief   Timer capture configuration for above timers
+ */
+static const timer_capture_conf_t timer_capture_config[] = {
+    {
+        .inputs = {
+            {
+                .pin = GPIO_PIN(PORT_A, 0),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF2,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 1),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF2,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 2),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF2,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 3),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF2,
+#endif
+            },
+        }
+    },
+    {
+        .inputs = {
+            {
+                .pin = GPIO_PIN(PORT_A, 0),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 1),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 2),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 3),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+        }
+    }
+};
+
 #define TIMER_0_ISR         isr_tim5    /**< IRQ of timer at idx 0 */
 #define TIMER_1_ISR         isr_tim2    /**< IRQ of timer at idx 1 */
 

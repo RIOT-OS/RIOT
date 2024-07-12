@@ -46,8 +46,7 @@ PERIPH_IGNORE_MODULES := \
   periph_rtt_hw_rtc \
   periph_rtt_hw_sys \
   periph_spi_on_qspi \
-  periph_timer_poll \
-  periph_timer_query_freqs \
+  periph_timer_% \
   periph_uart_collision \
   periph_uart_rxstart_irq \
   periph_wdog \

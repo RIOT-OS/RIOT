@@ -228,6 +228,10 @@ FEATURES_EXISTING := \
     periph_spi_stmod \
     periph_temperature \
     periph_timer \
+    periph_timer_capture \
+    periph_timer_capture_both \
+    periph_timer_capture_falling \
+    periph_timer_capture_rising \
     periph_timer_periodic \
     periph_timer_poll \
     periph_timer_query_freqs \

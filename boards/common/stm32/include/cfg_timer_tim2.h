@@ -49,6 +49,40 @@ static const timer_conf_t timer_config[] = {
     }
 };
 
+/**
+ * @brief   Timer capture configuration for above timer
+ */
+static const timer_capture_conf_t timer_capture_config[] = {
+    {
+        .inputs = {
+            {
+                .pin = GPIO_PIN(PORT_A, 0),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 1),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 2),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+            {
+                .pin = GPIO_PIN(PORT_A, 3),
+#ifndef CPU_FAM_STM32F1
+                .af = GPIO_AF1,
+#endif
+            },
+        }
+    }
+};
+
 #define TIMER_0_ISR         isr_tim2
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)

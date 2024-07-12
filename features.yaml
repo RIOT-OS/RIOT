@@ -769,6 +769,14 @@ groups:
               accuracy busy waiting.
       - name: periph_timer_query_freqs
         help: The timer driver supports querying supported frequencies.
+      - name: periph_timer_capture
+        help: The timer driver supports capture mode
+      - name: periph_timer_capture_rising
+        help: The timer driver supports capture with trigger on rising edge
+      - name: periph_timer_capture_falling
+        help: The timer driver supports capture with trigger on falling edge
+      - name: periph_timer_capture_both
+        help: The timer driver supports capture with trigger on both edges
 
     - title: PTP Timers
       help: These features are related to the hardware requirements to implement

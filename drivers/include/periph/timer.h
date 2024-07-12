@@ -11,6 +11,30 @@
  * @ingroup     drivers_periph
  * @brief       Low-level timer peripheral driver
  *
+ * # Usage
+ *
+ * In order to use timers, the relevant set of features needs to be required by
+ * adding the following to your applications `Makefile`:
+ *
+ * ``` Makefile
+ * # for basic one-shot timers:
+ * FEATURES_REQUIRED += periph_timer
+ *
+ * # to use periodic timers in addition:
+ * FEATURES_REQUIRED += periph_timer_periodic
+ *
+ * # to be able to query supported timer frequencies:
+ * FEATURES_REQUIRED += periph_timer_query_freqs
+ *
+ * # to use timers in capture mode
+ * FEATURES_REQUIRED += periph_timer_capture
+ * ```
+ *
+ * The following headers are needed to use timers:
+ * ``` C
+ * #include "periph/timer.h"
+ * ```
+ *
  * # (Low-) Power Implications
  *
  * After calling timer_init(), the underlying hardware timer **should** be
@@ -38,8 +62,9 @@
 #include <stdbool.h>
 
 #include "architecture.h"
-#include "periph_cpu.h"
+#include "periph/gpio.h"
 #include "periph_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,6 +97,10 @@ typedef uint_fast8_t tim_t;
 #endif
 
 /**
+ * @name    Flags to pass to @ref timer_set_periodic
+ * @{
+ */
+/**
  * @brief   Reset the timer when the set() function is called
  *
  * When set, calling the timer_set_periodic() function resets the timer count value.
@@ -100,6 +129,7 @@ typedef uint_fast8_t tim_t;
 #ifndef TIM_FLAG_SET_STOPPED
 #define TIM_FLAG_SET_STOPPED    (0x04)
 #endif
+/** @} */
 
 /**
  * @brief   Signature of event callback functions triggered from interrupts
@@ -114,13 +144,13 @@ typedef void (*timer_cb_t)(void *arg, int channel);
  */
 #ifndef HAVE_TIMER_ISR_CTX_T
 typedef struct {
-    timer_cb_t cb;          /**< callback executed from timer interrupt */
+    timer_cb_t cb;      /**< callback executed from timer interrupt */
     void *arg;              /**< optional argument given to that callback */
 } timer_isr_ctx_t;
 #endif
 
 /**
- * @brief Initialize the given timer
+ * @brief Initialize the given timer in compare mode (e.g. for timeouts)
  *
  * Each timer device is running with the given speed. Each can contain one or
  * more channels as defined in periph_conf.h. The timer is configured in
@@ -324,6 +354,149 @@ uint32_t timer_query_freqs(tim_t dev, uword_t index);
  * similar. */
 bool timer_poll_channel(tim_t dev, int channel);
 #endif
+
+/**
+ * @defgroup    drivers_periph_timer_capture Timer in capture mode
+ * @ingroup     drivers_periph_timer
+ *
+ * @note    These are only available when the `periph_timer_capture` feature
+ *          is requested (add `FEATURES_REQUIRED += periph_timer_capture` to
+ *          your `Makefile`.
+ *
+ * @warning This API is not stable yet, expect API changes without deprecation!
+ * @{
+ */
+/**
+ * @name    Timer capture flags
+ * @{
+ */
+/**
+ * @brief   Type holding timer capture flags
+ */
+typedef uint_fast8_t timer_capture_flags_t;
+/**
+ * @brief   Capture only a single event, rather than keep capturing
+ */
+#define TIM_CAPTURE_FLAG_ONESHOT    (0x01)
+/** @} */
+
+/**
+ * @brief   Signature of capture callback functions triggered from interrupts
+ *
+ * @param[in] arg       argument passed when setting up timer
+ * @param[in] channel   timer capture/compare channel that triggered the IRQ
+ * @param[in] capture   captured result
+ */
+typedef void (*timer_capture_cb_t)(void *arg, int channel, unsigned capture);
+
+/**
+ * @brief   Default interrupt context entry holding callback and argument
+ */
+#ifndef HAVE_TIMER_CAPTRUE_ISR_CTX_T
+typedef struct {
+    timer_capture_cb_t cb;  /**< callback executed from timer interrupt */
+    void *arg;              /**< optional argument given to that callback */
+} timer_capture_isr_ctx_t;
+#endif
+
+/**
+ * @brief   This sets the callback function and argument for capture events
+ *          on the given timer
+ *
+ * @param[in] dev           the timer to set the callback for
+ * @param[in] cb            this callback is called in interrupt context, the
+ *                          emitting channel and the captured timestamp is
+ *                          passed as argument
+ * @param[in] arg           argument to the callback
+ *
+ * An assertion will blow if @p dev is invalid or capture is not supported
+ * on that timer.
+ */
+void timer_set_capture_cb(tim_t dev, timer_capture_cb_t cb, void *arg);
+
+/**
+ * @brief   Get the first capture channel
+ *
+ * @warning On MCUs that have dedicated input capture channels that cannot be
+ *          used in compare more, the first capture channel will not be 0!
+ *
+ * @note    Some timer peripherals have dedicated input capture channels
+ *          (e.g. ATmega MCUs have a single input capture channel independent
+ *          of the compare channels), some MCUs have channels that can be used
+ *          in either capture or compare mode (e.g. STM32). For given shared
+ *          capture/compare unit the implementation MUST use the same channel
+ *          number in capture and compare mode, so that API users are aware
+ *          of allocation conflicts and can manage them. Similar, for capture
+ *          channels that do not conflict with compare channels, distinct
+ *          numbers MUST be used by the implementation.
+ *
+ * @details While there can be a gap between the last compare channel and the
+ *          first capture channel, there MUST NOT be a gap between the first
+ *          and the last capture channel.
+ *
+ * @return  The number of the first capture channel
+ * @retval  -1      Capture mode is not supported for timer @p dev
+ */
+__attribute__((pure))
+int timer_capture_channel_first(tim_t dev);
+
+/**
+ * @brief   Get the last capture channel
+ *
+ * @see     timer_capture_channel_first
+ *
+ * @return  The number of the last capture channel
+ * @retval  -1      Capture mode is not supported for timer @p dev
+ */
+__attribute__((pure))
+int timer_capture_channel_last(tim_t dev);
+
+/**
+ * @brief   Configures and enables timer capture IRQs
+ *
+ * @pre     The timer has been configured with @ref timer_init and a callback
+ *          has been set up with @ref timer_set_capture_cb
+ *
+ * @param[in]   dev     Timer on which to set up a capture channel
+ * @param[in]   chan    Timer capture channel to set up
+ * @param[in]   flank   Flank on which to capture
+ * @param[in]   flags   Flags modifying how to capture the event, e.g.
+ *                      whether to only capture a single event
+ *
+ * @retval  0           Success
+ * @retval  -ENOTSUP    Given flank or set of flags not supported
+ *
+ * @note    An assertion will blow if the `periph_conf.h` for the used board
+ *          has not set up a trigger for capturing for the given timer and
+ *          channel
+ */
+int timer_capture_enable(tim_t dev, int chan, gpio_flank_t flank,
+                         timer_capture_flags_t flags);
+
+/**
+ * @brief   Get the GPIO pin that is configured to as capture trigger
+ *
+ * @param[in]   dev     Timer to get the capture trigger input of
+ * @param[in]   chan    Channel to get the capture trigger input of
+ *
+ * @return              The GPIO pin used as trigger
+ * @retval  GPIO_UNDEF  An internal trigger is used. Refer to the board
+ *                      documentation for a list of internal capture sources
+ *                      and which channel they are mapped to.
+ *
+ * @note    An assertion will blow if the `periph_conf.h` for the used board
+ *          has not set up a trigger for capturing for the given timer and
+ *          channel
+ */
+__attribute__((pure))
+gpio_t timer_capture_pin(tim_t dev, int chan);
+
+/**
+ * @brief   Disables timer capture IRQs for the given channel on the given
+ *          timer
+ */
+void timer_capture_disable(tim_t dev, int chan);
+/** @} */ /* End of Doxygen group drivers_periph_timer_capture */
 
 #if defined(MODULE_PERIPH_TIMER_POLL)
 #include "timer_arch.h" /* IWYU pragma: export */

@@ -8,6 +8,7 @@ FEATURES_PROVIDED += periph_lpuart
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_timer_capture
 FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
