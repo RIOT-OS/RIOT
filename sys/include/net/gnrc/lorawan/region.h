@@ -71,6 +71,16 @@ uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset);
  */
 bool gnrc_lorawan_validate_dr(uint8_t dr);
 
+/**
+ * @brief Check if a TX power is valid in the current region
+ *
+ * @param[in] tx_power the TX power to be checked
+ *
+ * @retval true if TX power is valid
+ * @retval false otherwise
+ */
+bool gnrc_lorawan_validate_tx_power(uint8_t tx_power);
+
 #ifdef __cplusplus
 }
 #endif
