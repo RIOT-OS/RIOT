@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {

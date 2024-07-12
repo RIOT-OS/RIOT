@@ -21,6 +21,7 @@
 #define BOARD_H
 
 #include "board_common.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
