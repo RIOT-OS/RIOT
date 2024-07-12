@@ -87,6 +87,8 @@ ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
   USEMODULE += gnrc_sock
   ifneq (,$(filter sock_aux_timestamp,$(USEMODULE)))
     USEMODULE += gnrc_netif_timestamp
+    USEMODULE += gnrc_tx_sync
+    USEMODULE += netdev_tx_info_timestamp
   endif
 endif
 

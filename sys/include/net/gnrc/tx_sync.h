@@ -26,6 +26,7 @@
 
 #include "mutex.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +35,8 @@ extern "C" {
 /**
  * @brief   TX synchronization data */
 typedef struct {
-    mutex_t signal;     /**< Mutex used for synchronization */
+    mutex_t signal;             /**< Mutex used for synchronization */
+    netdev_tx_info_t tx_info;   /**< auxiliary data about transmission */
 } gnrc_tx_sync_t;
 
 /**
@@ -96,6 +98,23 @@ static inline int gnrc_tx_sync_append(gnrc_pktsnip_t *pkt,
  * @retval  NULL            @p pkt contains no TX sync snip
  */
 gnrc_pktsnip_t * gnrc_tx_sync_split(gnrc_pktsnip_t *pkt);
+
+/**
+ * @brief   Search the TX sync snip and return the pointer to the
+ *          TX sync structure it holds
+ * @param[in]       pkt     Packet to search in
+ * @return  The TX sync structure found
+ * @retval  NULL            @p pkt contains no TX sync snip
+ * @post    @p pkt remains unmodified
+ */
+static inline gnrc_tx_sync_t * gnrc_tx_sync_search(gnrc_pktsnip_t *pkt)
+{
+    pkt = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TX_SYNC);
+    if (!pkt) {
+        return NULL;
+    }
+    return pkt->data;
+}
 
 /**
  * @brief   Signal TX completion via the given tx sync packet snip
