@@ -72,6 +72,8 @@ ifeq (1,$(GCOAP_ENABLE_DTLS))
   USEMODULE += gcoap_dtls
   # tinydtls needs crypto secure PRNG
   USEMODULE += prng_sha1prng
+  ## Uncomment to use TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8 instead of PSK
+  # CFLAGS += -DCONFIG_DTLS_ECC
 endif
 
 # Instead of simulating an Ethernet connection, we can also simulate
