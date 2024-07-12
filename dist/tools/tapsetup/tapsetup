@@ -63,7 +63,7 @@ unsupported_platform() {
 
 update_uplink() {
     if command -v dhclient > /dev/null; then
-        dhclient $1
+        dhclient -nw $1
     else
         echo "DHCP client \`dhclient\` not found." >&2
         echo "Please reconfigure your DHCP client for interface $1" >&2
