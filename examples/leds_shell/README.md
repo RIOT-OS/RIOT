@@ -2,9 +2,9 @@
 
 ## Description
 
-This basic example allows easy, interactive control of internal board LEDs,
-and basic GPIO for externally connected simple devices (for e.g. additional
-LEDs, relay, motors - via dedicated drivers, etc.).
+The application `leds_shell` is a basic example, which allows easy, interactive
+control of internal board LEDs, and basic GPIO for externally connected simple
+devices (for e.g. additional LEDs, relay, motors - via dedicated drivers, etc.).
 
 In particular, this example shows:
 - on/off and toggle internal board LEDs.
@@ -35,24 +35,24 @@ RIOT native interrupts/signals initialized.
 RIOT native board initialized.
 RIOT native hardware initialization complete.
 
-main(): This is RIOT! (Version: 2021.07-devel-10893-gb2e97-example-LEDs)
-LEDs, version 1.0.0
+main(): This is RIOT! (Version: 2021.07-devel-10893-gb2e97-example-leds_shell)
+leds_shell, version 1.0.0
 >
 ```
 
-Or run it directly without terminal. Go to `RIOT/examples/LEDs` and run
+Or run it directly without terminal. Go to `RIOT/examples/leds_shell` and run
 commands:
 
 ```
 $ make
 [...]
-$ ./bin/native/LEDs.elf
+$ ./bin/native/leds_shell.elf
 RIOT native interrupts/signals initialized.
 RIOT native board initialized.
 RIOT native hardware initialization complete.
 
-main(): This is RIOT! (Version: 2021.07-devel-10893-gb2e97-example-LEDs)
-LEDs, version 1.0.0
+main(): This is RIOT! (Version: 2021.07-devel-10893-gb2e97-example-leds_shell)
+leds_shell, version 1.0.0
 >
 ```
 
@@ -82,14 +82,14 @@ LED_GREEN_ON
 ```
 ## Example on sample board - stm32f469i-disco
 
-- Build and flash `LEDs` example application on sample board, for example
+- Build and flash `leds_shell` example application on sample board, for example
  `stm32f469i-disco` target, which has 4 internal LEDs:
 
 ```
 $ make BOARD=stm32f469i-disco flash term
 [...]
-main(): This is RIOT! (Version: 2021.07-devel-10894-g2ad22b9-example-LEDs)
-LEDs, version 1.0.0
+main(): This is RIOT! (Version: 2021.07-devel-10894-g2ad22b9-example-leds_shell)
+leds_shell, version 1.0.0
 > help
 help
 Command              Description

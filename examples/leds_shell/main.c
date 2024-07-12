@@ -320,7 +320,7 @@ static const shell_command_t commands[] = {
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    printf("LEDs, version 1.0.0\n");
+    printf("leds_shell, version 1.0.0\n");
 
     shell_run(commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 

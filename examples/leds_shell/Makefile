@@ -7,7 +7,7 @@
 ####
 
 # Set the name of your application:
-APPLICATION = LEDs
+APPLICATION = leds_shell
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
