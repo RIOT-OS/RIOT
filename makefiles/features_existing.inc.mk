@@ -180,6 +180,9 @@ FEATURES_EXISTING := \
     periph_gpio_ll_switch_dir \
     periph_gpio_tamper_wake \
     periph_hash_md5 \
+    periph_hash_sha3_256 \
+    periph_hash_sha3_384 \
+    periph_hash_sha3_512 \
     periph_hash_sha_1 \
     periph_hash_sha_224 \
     periph_hash_sha_256 \

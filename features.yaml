@@ -839,6 +839,12 @@ groups:
       help: SHA-512/224 hardware acceleration present.
     - name: periph_hash_sha_512_256
       help: SHA-512/256 hardware acceleration present.
+    - name: periph_hash_sha3_256
+      help: SHA-3/256 hardware acceleration present.
+    - name: periph_hash_sha3_384
+      help: SHA-3/384 hardware acceleration present.
+    - name: periph_hash_sha3_512
+      help: SHA-3/512 hardware acceleration present.
     - name: periph_hmac_sha_256
       help: HMAC SHA-256 hardware acceleration present.
     - name: periph_hwrng

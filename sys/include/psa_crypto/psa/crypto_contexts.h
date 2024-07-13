@@ -52,6 +52,10 @@ typedef union {
 #if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
     psa_hashes_sha512_ctx_t sha512; /**< SHA-512 context */
 #endif
+#if IS_USED(MODULE_PSA_HASH_SHA3_256) || IS_USED(MODULE_PSA_HASH_SHA3_384) \
+|| IS_USED(MODULE_PSA_HASH_SHA3_512) || defined(DOXYGEN)
+    psa_hashes_sha3_ctx_t sha3; /**< SHA-3 context */
+#endif
 #if IS_USED(MODULE_PSA_HASH_SHA_512_224) || defined(DOXYGEN)
     psa_hashes_sha512_224_ctx_t sha512_224; /**< SHA-512/224 context */
 #endif
