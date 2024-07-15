@@ -26,6 +26,9 @@
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 #ifdef MODULE_PERIPH_INIT
 #ifdef MODULE_PERIPH_INIT_I2C
 #include "periph/i2c.h"
@@ -60,6 +63,52 @@
 #ifdef MODULE_PERIPH_INIT_SDMMC
 #include "sdmmc/sdmmc.h"
 #endif
+
+#if IS_USED(MODULE_PERIPH_INIT_I2C)
+#include "periph/gpio.h"
+#include "busy_wait.h"
+
+static void _i2c_sync_devices(i2c_t dev)
+{
+    /* Recover possible bus hangup by clocking peripheral
+     * i2c device state machines into idle.
+     * Hangup can occur if a transaction was interrupted
+     * by a reset of the MCU.
+     * Badly designed hardware can also cause a hangup
+     * due to glitches on the bus during operation which
+     * we do not aim to mitigate here.
+     */
+    gpio_init(i2c_config[dev].sda_pin, GPIO_IN);
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OUT);
+    gpio_set(i2c_config[dev].scl_pin);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (!gpio_read(i2c_config[dev].sda_pin)) {
+            DEBUG("periph_init: i2c bus hangup detected for bus #%u,"
+                " recovering...\n", dev);
+        }
+        else {
+            DEBUG("periph_init: i2c bus #%u is ok\n", dev);
+        }
+    }
+    int max_cycles = 10; /* 9 clock cycles should be enough for making
+                          * any device that holds the SDA line in low
+                          * release the line. Actual number of cyccles may
+                          * vary depending on the device state.
+                          * The 10th cycle was added in case the first cycle
+                          * was not accepted by a device.
+                          */
+    while (gpio_read(i2c_config[dev].sda_pin) == 0 && max_cycles--) {
+        gpio_clear(i2c_config[dev].scl_pin);
+        busy_wait_us(100);
+        gpio_set(i2c_config[dev].scl_pin);
+        busy_wait_us(100);
+    }
+    if (IS_ACTIVE(ENABLE_DEBUG) && gpio_read(i2c_config[dev].sda_pin) == 0) {
+        DEBUG("periph_init: i2c recovery failed for bus #%u\n", dev);
+    }
+}
+#endif /* MODULE_PERIPH_INIT_I2C */
+
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
@@ -73,6 +122,7 @@ void periph_init(void)
     /* initialize configured I2C devices */
 #ifdef MODULE_PERIPH_INIT_I2C
     for (unsigned i = 0; i < I2C_NUMOF; i++) {
+        _i2c_sync_devices(i);
         i2c_init(I2C_DEV(i));
     }
 #endif
