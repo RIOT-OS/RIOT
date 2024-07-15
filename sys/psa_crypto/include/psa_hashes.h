@@ -341,6 +341,111 @@ psa_status_t psa_hashes_sha512_256_finish(psa_hashes_sha512_256_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_512_256 */
 
+#if IS_USED(MODULE_PSA_HASH_SHA3_256) || defined(DOXYGEN)
+/**
+ * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
+ *          See @ref psa_hash_update()
+ *
+ * @param ctx
+ * @param input
+ * @param input_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_256_update(psa_hashes_sha3_ctx_t *ctx,
+                                      const uint8_t *input,
+                                      size_t input_length);
+
+/**
+ * @brief   Low level wrapper function to call a driver for a SHA3-256 hash setup
+ *          See @ref psa_hash_setup()
+ *
+ * @param ctx
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_256_setup(psa_hashes_sha3_ctx_t *ctx);
+
+/**
+ * @brief   Low level wrapper function to call a driver for a SHA3-256 hash finish
+ *          See @ref psa_hash_finish()
+ *
+ * @param ctx
+ * @param hash
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha3_ctx_t *ctx,
+                                      uint8_t *hash);
+#endif /* MODULE_PSA_HASH_SHA3_256 */
+
+#if IS_USED(MODULE_PSA_HASH_SHA3_384) || defined(DOXYGEN)
+/**
+ * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
+ *          See @ref psa_hash_update()
+ *
+ * @param ctx
+ * @param input
+ * @param input_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_384_update(psa_hashes_sha3_ctx_t *ctx,
+                                      const uint8_t *input,
+                                      size_t input_length);
+
+/**
+ * @brief   Low level wrapper function to call a driver for a SHA3-384 hash setup
+ *          See @ref psa_hash_setup()
+ *
+ * @param ctx
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_384_setup(psa_hashes_sha3_ctx_t *ctx);
+
+/**
+ * @brief   Low level wrapper function to call a driver for a SHA3-384 hash finish
+ *          See @ref psa_hash_finish()
+ *
+ * @param ctx
+ * @param hash
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha3_ctx_t *ctx,
+                                      uint8_t *hash);
+#endif /* MODULE_PSA_HASH_SHA3_384 */
+
+#if IS_USED(MODULE_PSA_HASH_SHA3_512) || defined(DOXYGEN)
+/**
+ * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
+ *          See @ref psa_hash_update()
+ *
+ * @param ctx
+ * @param input
+ * @param input_length
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_512_update(psa_hashes_sha3_ctx_t *ctx,
+                                      const uint8_t *input,
+                                      size_t input_length);
+
+/**
+ * @brief   Low level wrapper function to call a driver for a SHA3-512 hash setup
+ *          See @ref psa_hash_setup()
+ *
+ * @param ctx
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_512_setup(psa_hashes_sha3_ctx_t *ctx);
+
+/**
+ * @brief   Low level wrapper function to call a driver for a SHA3-512 hash finish
+ *          See @ref psa_hash_finish()
+ *
+ * @param ctx
+ * @param hash
+ * @return psa_status_t
+ */
+psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha3_ctx_t *ctx,
+                                      uint8_t *hash);
+#endif /* MODULE_PSA_HASH_SHA3_512 */
+
 #ifdef __cplusplus
 }
 #endif
