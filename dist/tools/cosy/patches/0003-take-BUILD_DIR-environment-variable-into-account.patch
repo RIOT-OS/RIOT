@@ -1,0 +1,34 @@
+From 40e6dfb3ba9c50d0bac3931b981822aaa20375a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mikolai=20G=C3=BCtschow?= <mikolai.guetschow@tu-dresden.de>
+Date: Tue, 16 Jul 2024 16:48:49 +0200
+Subject: [PATCH] take BUILD_DIR environment variable into account
+
+---
+ cosy.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/cosy.py b/cosy.py
+index 7a15cc5..5d66f6b 100755
+--- a/cosy.py
++++ b/cosy.py
+@@ -17,7 +17,7 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import sys
+-from os import path
++from os import path, environ
+ from pathlib import Path
+ import argparse
+ import re
+@@ -156,6 +156,8 @@ def parse_elffile(elffile, prefix, appdir, riot_base=None):
+ 
+     rbase.append("RIOT")
+     rbase.append("riotbuild/riotbase")
++    if "BUILD_DIR" in environ:
++        rbase.append(environ["BUILD_DIR"])
+     riot_base = "|".join([f'{p}/build|{p}' for p in rbase])
+ 
+     c = re.compile(r"(?P<addr>[0-9a-f]+) "
+-- 
+2.39.2
+
