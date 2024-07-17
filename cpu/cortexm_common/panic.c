@@ -20,8 +20,8 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
+#include <stdio.h>
 #include "cpu.h"
-#include "log.h"
 
 #ifdef DEVELHELP
 static void print_ipsr(void)
@@ -31,7 +31,7 @@ static void print_ipsr(void)
     if (ipsr) {
         /* if you get here, you might have forgotten to implement the isr
          * for the printed interrupt number */
-        LOG_ERROR("Inside isr %d\n", ((int)ipsr) - 16);
+        printf("Inside isr %d\n", ((int)ipsr) - 16);
     }
 }
 #endif
