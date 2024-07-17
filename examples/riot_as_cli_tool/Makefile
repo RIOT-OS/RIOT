@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = nanocoap_tool
+APPLICATION = riot_as_cli_tool
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native

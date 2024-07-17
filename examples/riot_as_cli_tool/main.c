@@ -29,6 +29,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    /* argv[0] will be the first 'user' argument to native */
     shell_command_handler_t handler = shell_find_handler(NULL, argv[0]);
     if (handler == NULL) {
         return -EINVAL;
