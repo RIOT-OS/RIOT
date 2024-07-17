@@ -118,6 +118,8 @@ shell_command_handler_t shell_find_handler(const shell_command_t *command_list,
 {
     shell_command_handler_t handler = NULL;
 
+    assert(command);
+
     if (command_list != NULL) {
         handler = search_commands(command_list, command);
     }
