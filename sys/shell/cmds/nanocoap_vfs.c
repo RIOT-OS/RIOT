@@ -169,7 +169,7 @@ static int _nanocoap_put_handler(int argc, char **argv)
     file = argv[1];
     url = argv[2];
 
-    /* append filename to remote dir */
+    /* append filename to remote URL */
     if (_is_dir(url)) {
         const char *basename = strrchr(file, '/');
         if (basename == NULL) {
@@ -186,10 +186,10 @@ static int _nanocoap_put_handler(int argc, char **argv)
         url = buffer;
     }
 
-    /* relative file path */
-    if (*file != '/') {
-        if (snprintf(work_buf, sizeof(work_buf), "%s%s",
-                     CONFIG_NCGET_DEFAULT_DATA_DIR, file) >= (int)sizeof(work_buf)) {
+    /* file path is relative to CONFIG_NCGET_DEFAULT_DATA_DIR */
+    if (file[0] != '/') {
+        if ((unsigned)snprintf(work_buf, sizeof(work_buf), "%s%s",
+                     CONFIG_NCGET_DEFAULT_DATA_DIR, file) >= sizeof(work_buf)) {
             puts("Constructed URI too long");
             return -ENOBUFS;
         }
