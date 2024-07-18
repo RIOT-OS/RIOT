@@ -43,10 +43,11 @@
  * In addition to the priority, flags can be used when creating a thread to
  * alter the thread's behavior after creation. The following flags are available:
  *
- *  Flags                         | Description
- *  ----------------------------- | --------------------------------------------------
- *  @ref THREAD_CREATE_SLEEPING   | the thread will sleep until woken up manually
- *  @ref THREAD_CREATE_WOUT_YIELD | the thread might not run immediately after creation
+ *  Flags                          | Description
+ *  ------------------------------ | --------------------------------------------------
+ *  @ref THREAD_CREATE_SLEEPING    | the thread will sleep until woken up manually
+ *  @ref THREAD_CREATE_WOUT_YIELD  | the thread might not run immediately after creation
+ *  @ref THREAD_CREATE_NO_STACKTEST| never measure the stack's memory usage
  *
  * Thread creation
  * ===============
@@ -228,6 +229,13 @@ struct _thread {
  *        thread at any time!
  */
 #define THREAD_CREATE_WOUT_YIELD        (4)
+
+/**
+ * @brief Never write markers into the thread's stack to measure stack usage
+ *
+ * This flag is ignored when DEVELHELP or SCHED_TEST_STACK is not enabled
+ */
+#define THREAD_CREATE_NO_STACKTEST      (8)
 
 /**
  * @brief Legacy flag kept for compatibility.
