@@ -89,21 +89,22 @@ static void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
 }
 
 static void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                    const uint8_t *nonce, const uint8_t *in, uint8_t *out, size_t len)
+                    const uint8_t *nonce, const uint8_t *in, uint8_t *out,
+                    size_t len, size_t counter)
 {
     /* Number of full 64 byte blocks */
     const size_t num_blocks = len >> 6;
     size_t pos = 0;
     /* xcrypt full blocks */
     for (size_t i = 0; i < num_blocks; i++, pos += 64) {
-        _keystream(ctx, key, nonce, i+1);
+        _keystream(ctx, key, nonce, i + counter);
         for (size_t j = 0; j < 64; j++) {
             out[pos+j] = in[pos+j] ^ ((uint8_t*)ctx->state)[j];
         }
     }
     /* xcrypt remaining bytes */
     if (len - pos) {
-        _keystream(ctx, key, nonce, num_blocks+1);
+        _keystream(ctx, key, nonce, num_blocks + counter);
         for (size_t j = 0; j < len - pos; j++) {
             out[pos+j] = in[pos+j] ^ ((uint8_t*)ctx->state)[j];
         }
@@ -142,7 +143,7 @@ void chacha20poly1305_encrypt(uint8_t *cipher, const uint8_t *msg,
                               const uint8_t *key, const uint8_t *nonce)
 {
     chacha20poly1305_ctx_t ctx;
-    _xcrypt(&ctx, key, nonce, msg, cipher, msglen);
+    _xcrypt(&ctx, key, nonce, msg, cipher, msglen, 1);
     crypto_secure_wipe(&ctx, sizeof(ctx));
     /* Generate tag */
     _poly1305_gentag(&cipher[msglen], key, nonce,
@@ -164,6 +165,14 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
     }
     chacha20poly1305_ctx_t ctx;
     /* Number of full blocks */
-    _xcrypt(&ctx, key, nonce, cipher, msg, *msglen);
+    _xcrypt(&ctx, key, nonce, cipher, msg, *msglen, 1);
     return 1;
+}
+
+void chacha20_encrypt_decrypt(const uint8_t *input, uint8_t *output,
+                              const uint8_t *key, const uint8_t *nonce,
+                              size_t inputlen)
+{
+    chacha20poly1305_ctx_t ctx;
+    _xcrypt(&ctx, key, nonce, input, output, inputlen, 0);
 }
