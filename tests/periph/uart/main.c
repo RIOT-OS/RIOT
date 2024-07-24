@@ -86,6 +86,8 @@ static uart_stop_bits_t stop_bits_lut[] = { UART_STOP_BITS_1, UART_STOP_BITS_2 }
 static int stop_bits_lut_len = ARRAY_SIZE(stop_bits_lut);
 #endif
 
+static unsigned uarts_initialized_mask;
+
 static int parse_dev(char *arg)
 {
     unsigned dev = atoi(arg);
@@ -171,6 +173,8 @@ static int _self_test(uart_t dev, unsigned baud)
     uart_collision_detect_disable(dev);
 #endif
 
+    uart_poweroff(UART_DEV(dev));
+
     test_mode = false;
     return 0;
 }
@@ -235,6 +239,11 @@ static int cmd_init(int argc, char **argv)
     }
     baud = strtol(argv[2], NULL, 0);
 
+    if (uarts_initialized_mask & (1U << dev)) {
+        uart_poweroff(UART_DEV(dev));
+        uarts_initialized_mask &= !(1U << dev);
+    }
+
     /* initialize UART */
     res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)(intptr_t)dev);
     if (res == UART_NOBAUD) {
@@ -246,6 +255,8 @@ static int cmd_init(int argc, char **argv)
         return 1;
     }
     printf("Success: Initialized UART_DEV(%i) at BAUD %"PRIu32"\n", dev, baud);
+
+    uarts_initialized_mask |= 1U << dev;
 
     /* also test if poweron() and poweroff() work (or at least don't break
      * anything) */
@@ -382,6 +393,11 @@ static int cmd_test(int argc, char **argv)
     }
 
     puts("[START]");
+
+    if (uarts_initialized_mask & (1U << dev)) {
+        uart_poweroff(UART_DEV(dev));
+        uarts_initialized_mask &= !(1U << dev);
+    }
 
     /* run self test with different baud rates */
     for (unsigned i = 1; i <= 12; ++i) {
