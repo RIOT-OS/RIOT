@@ -1,0 +1,17 @@
+RIOT-2024.07-mlpa-1 - Merge Notes
+=================================
+
+- based on 2024.10-devel-17-gd2fa0c6ce1
+
+ - cherry-pick b82e97164045708a471208f6c59f84cd28c2dcc6 (sam0 ADC hack)
+ - cherry-pick 7646899f72d805f031eda605d2200c43bac0a160 (gcoap_fileserver: bump stack size)
+ - cherry-pick 7eb78f419b24bfa303b7668e73d9dc5ab482af0e (enable debug in MCP2515 driver for better performance)
+ - cherry-pick ca988eaddfc9f07f6135fd50c8be340e6c85e41b (partial revert of #19620)
+ - merge feat/20211108__sys-bus__add_rtc_bus
+ - merge benpicco/drivers/rtt_rtc-no-retain
+ - merge benpicco/pkg/fatfs-threadsafe
+ - merge benpicco/sock-addr_struct
+ - merge hendrikve/stdio_uart_add_flush_rx
+ - merge benpicco/pkg/nanopb-multi
+ - merge fabian18/pr/configuration_riotconf
+ - merge benpicco/cpu/sam0_common-adc_sample_multi
