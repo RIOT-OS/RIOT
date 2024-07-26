@@ -57,6 +57,13 @@ static void _init(void)
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
 }
 
+#if IS_USED(MODULE_STDIO_FLUSH_RX)
+void stdio_flush_rx(void)
+{
+    tsrb_clear(&stdin_isrpipe.tsrb);
+}
+#endif
+
 static ssize_t _write(const void *buffer, size_t len)
 {
     ssize_t result = len;

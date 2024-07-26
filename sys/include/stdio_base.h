@@ -102,6 +102,16 @@ void stdio_init(void);
 int stdio_available(void);
 #endif
 
+#if IS_USED(MODULE_STDIO_FLUSH_RX) || DOXYGEN
+/**
+ * @brief   Clear the input buffer
+ *
+ * @warning This function is only available if the implementation supports
+ *          it and the @c stdio_flush_rx module is enabled.
+ */
+void stdio_flush_rx(void);
+#endif
+
 /**
  * @brief read @p len bytes from stdio uart into @p buffer
  *
