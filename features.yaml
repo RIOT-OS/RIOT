@@ -644,6 +644,8 @@ groups:
     features:
     - name: periph_adc
       help: An ADC peripheral is present.
+    - name: periph_adc_multi
+      help: Multiple ADC lines can be sampled at the same time.
     - name: periph_adc_continuous
       help: The ADC peripheral can be left on between measurements.
     - name: periph_dac
