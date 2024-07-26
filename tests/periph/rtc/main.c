@@ -25,6 +25,7 @@
 #include <time.h>
 #include <string.h>
 
+#include "msg.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/rtc.h"
@@ -123,6 +124,26 @@ static inline void _set_rtc_mem(void) {}
 static inline void _get_rtc_mem(void) {}
 #endif
 
+#ifdef MODULE_PERIPH_RTC_SETTER_CALLBACK
+
+static int64_t _time_diff_us;
+
+void rtc_setter_callback(
+     struct tm *tm_before, uint32_t us_before,
+     struct tm *tm_after, uint32_t us_after)
+{
+    assert(us_before < US_PER_SEC);
+    assert(us_after < US_PER_SEC);
+
+    uint32_t s_before = rtc_mktime(tm_before);
+    uint32_t s_after = rtc_mktime(tm_after);
+
+    _time_diff_us = ((int64_t)s_after * US_PER_SEC + (int64_t)us_after)
+            - ((int64_t)s_before * US_PER_SEC + (int64_t)us_before);
+}
+
+#endif
+
 int main(void)
 {
     struct tm time = (struct tm){0};
@@ -172,6 +193,15 @@ int main(void)
         rtc_get_time(&time);
         print_time("Clock value is now ", &time);
     }
+
+    /* test time change */
+    rtc_get_time(&time);
+    time.tm_sec += 42;
+    rtc_tm_normalize(&time);
+    print_time("Resetting clock to ", &time);
+    rtc_set_time_with_callback(&time);
+    printf("    Time change of   %"PRId32" milliseconds\n",
+            (int32_t)(_time_diff_us / US_PER_MS));
 
     /* set initial alarm */
     inc_secs(&time, PERIOD);

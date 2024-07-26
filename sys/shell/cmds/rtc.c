@@ -129,7 +129,7 @@ static int _rtc_settime(char **argv)
 
     _parse_time(argv, &now);
 
-    if (rtc_set_time(&now) < 0) {
+    if (RTC_SET_TIME(&now) == -1) {
         puts("rtc: error setting time");
         return 1;
     }

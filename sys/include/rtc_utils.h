@@ -92,6 +92,61 @@ void rtc_localtime(uint32_t time, struct tm *t);
  */
 bool rtc_tm_valid(const struct tm *t);
 
+#if defined(MODULE_PERIPH_RTC_SETTER_CALLBACK) || DOXYGEN
+/**
+ * @brief Time change callback for user implementation
+ *
+ * This callback allows an application or module to react
+ * to changes of the RTC. On execution of the callback,
+ * the RTC time has already been changed.
+ *
+ * Available after loading the module `periph_rtc_setter_callback`.
+ * On loading of the module, this callback must be implemented,
+ * either by another module or the user's application.
+ *
+ * The callback will only be executed if the RTC is set
+ * through @ref rtc_set_time_with_callback.
+ *
+ * @param[in] tm_before     Date and time before the update
+ * @param[in] us_before     The microsecond part of the time
+ *                          before the update
+ * @param[in] tm_after      Date and time after the update
+ * @param[in] us_after      The microsecond part of the time
+ *                          after the update
+ *
+ * @return                  The calculated time difference,
+ *                          intended for testing
+ */
+extern void rtc_setter_callback(
+        struct tm *tm_before, uint32_t us_before,
+        struct tm *tm_after, uint32_t us_after);
+
+/**
+ * @brief Wrapper for @ref rtc_set_time, adding a callback execution
+ *
+ * Available after loading the module `periph_rtc_setter_callback`.
+ *
+ * The supplied callback will be executed just after the time
+ * change happened.
+ *
+ * @param[in] time          The input struct to @ref rtc_set_time
+ *
+ * @return                  The return value of @ref rtc_set_time
+ */
+int rtc_set_time_with_callback(struct tm *time);
+
+/**
+ * @brief Automatic choice of @ref rtc_set_time implementation
+ *
+ * @ref rtc_set_time_with_callback will be used when loading
+ * the module `periph_rtc_setter_callback`. @ref rtc_set_time
+ * will be used otherwise.
+ */
+#define RTC_SET_TIME rtc_set_time_with_callback
+#else
+#define RTC_SET_TIME rtc_set_time
+#endif /* MODULE_PERIPH_RTC_SETTER_CALLBACK */
+
 #ifdef __cplusplus
 }
 #endif

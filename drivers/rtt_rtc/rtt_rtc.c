@@ -215,11 +215,26 @@ void rtt_rtc_settimeofday(uint32_t s, uint32_t us)
 {
     /* disable alarm to prevent race condition */
     rtt_clear_alarm();
+
+#ifdef MODULE_PERIPH_RTC_SETTER_CALLBACK
+    struct tm tm_after;
+    rtc_localtime(s, &tm_after);
+    uint32_t s_before;
+    uint32_t us_before;
+    rtt_rtc_gettimeofday(&s_before, &us_before);
+    struct tm tm_before;
+    rtc_localtime(s_before, &tm_before);
+#endif /* MODULE_PERIPH_RTC_SETTER_CALLBACK */
+
     uint32_t now = ((uint64_t)us * RTT_SECOND) / US_PER_SEC;
     rtc_now      = s;
     rtt_set_counter(now);
     /* calculate next wake-up period */
     _update_alarm(0);
+
+#ifdef MODULE_PERIPH_RTC_SETTER_CALLBACK
+    rtc_setter_callback(&tm_before, us_before, &tm_after, us);
+#endif /* MODULE_PERIPH_RTC_SETTER_CALLBACK */
 }
 
 void rtt_rtc_gettimeofday(uint32_t *s, uint32_t *us)
