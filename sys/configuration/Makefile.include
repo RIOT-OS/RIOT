@@ -1,0 +1,29 @@
+USEMODULE_INCLUDES_configuration := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_configuration)
+
+# any backend pseudo module
+PSEUDOMODULES += configuration_backend_%
+
+# Store a parent reference in the configuration handler
+PSEUDOMODULES += configuration_handler_parent
+
+# use if you want to use custom handlers for import, export, delete, encode, decode
+PSEUDOMODULES += configuration_custom_operations
+
+# use if source backend is unequal to destination backend
+PSEUDOMODULES += configuration_destination_backend
+
+# use if you want to construct a string path for a configuration item
+PSEUDOMODULES += configuration_strings
+
+# encode SIDs relative to their parent SID (delta encoding)
+PSEUDOMODULES += configuration_delta_encoding
+
+# decode SIDs relative to their parent SID (delta decoding)
+PSEUDOMODULES += configuration_delta_decoding
+
+# alias for configuration_delta_encoding and configuration_delta_decoding
+PSEUDOMODULES += configuration_delta_encoding_decoding
+
+# be able to export sub items which don't have a backend configured
+PSEUDOMODULES += configuration_key_subkey
