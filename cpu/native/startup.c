@@ -466,6 +466,10 @@ static void _reset_handler(void)
     pm_reboot();
 }
 
+/* allow to pass arguments to the application */
+int _native_argc_main;
+char **_native_argv_main;
+
 __attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
@@ -718,7 +722,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
         netdev_tap_params[taps].tap_name = &argv[optind + i];
         netdev_tap_params[taps].wired = true;
     }
+    optind += taps;
 #endif
+
+    _native_argc_main = argc - optind;
+    _native_argv_main = &argv[optind];
 
 #ifdef MODULE_PERIPH_EEPROM
     eeprom_native_read();
@@ -729,7 +737,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 
     register_interrupt(SIGUSR1, _reset_handler);
 
-    puts("RIOT native hardware initialization complete.\n");
+    DEBUG_PUTS("RIOT native hardware initialization complete.\n");
     irq_enable();
     kernel_init();
 }
