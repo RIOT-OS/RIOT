@@ -112,9 +112,9 @@ int main(void)
     for (size_t i = 0; i < ARRAY_SIZE(funcs); i++) {
         printf("Testing: %s\n", tests[i]);
         t1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN + 1,
-                           THREAD_CREATE_STACKTEST, funcs[i], NULL, "t1");
+                           0, funcs[i], NULL, "t1");
         t2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN + 1,
-                           THREAD_CREATE_STACKTEST, funcs[i], NULL, "t2");
+                           0, funcs[i], NULL, "t2");
         expect((t1 != KERNEL_PID_UNDEF) && (t2 != KERNEL_PID_UNDEF));
 
         for (uint16_t i = 0; i < 2 * MS_PER_SEC; i++) {

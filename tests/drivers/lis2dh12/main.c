@@ -367,7 +367,7 @@ int main(void)
 
     /* processing lis2dh12 acceleration data */
     thread_create(lis2dh12_process_stack, sizeof(lis2dh12_process_stack),
-                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 1, 0,
                   lis2dh12_test_process, NULL, "lis2dh12_process");
 #endif /* MODULE_LIS2DH12_INT */
 

@@ -48,7 +48,7 @@ void uwb_core_riot_init(void)
 #if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
     thread_create(_stack_uwb_core, sizeof(_stack_uwb_core),
                   UWB_CORE_PRIO,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _uwb_core_thread, NULL,
                   "uwb_core_event");
 #endif

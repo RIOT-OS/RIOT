@@ -382,7 +382,7 @@ int _gnrc_tcp_eventloop_init(void)
     evtimer_init_msg(&_tcp_msg_timer);
 
     kernel_pid_t pid = thread_create(_stack, sizeof(_stack), TCP_EVENTLOOP_PRIO,
-                                     THREAD_CREATE_STACKTEST, _eventloop, NULL,
+                                     0, _eventloop, NULL,
                                      "gnrc_tcp");
     TCP_DEBUG_LEAVE;
     return pid;

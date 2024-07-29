@@ -75,7 +75,7 @@ void dhcpv6_relay_auto_init(void)
             }
             else {
                 thread_create(_auto_init_stack, ARRAY_SIZE(_auto_init_stack),
-                              AUTO_INIT_PRIO, THREAD_CREATE_STACKTEST,
+                              AUTO_INIT_PRIO, 0,
                               _dhcpv6_relay_auto_init_thread,
                               (void *)(intptr_t)netif, "dhcpv6_relay");
             }

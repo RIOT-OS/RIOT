@@ -109,7 +109,7 @@ err_t lwip_netdev_init(struct netif *netif)
     /* start multiplexing thread (only one needed) */
     if (_pid <= KERNEL_PID_UNDEF) {
         _pid = thread_create(_stack, LWIP_NETDEV_STACKSIZE, LWIP_NETDEV_PRIO,
-                             THREAD_CREATE_STACKTEST, _event_loop, netif,
+                             0, _event_loop, netif,
                              LWIP_NETDEV_NAME);
         if (_pid <= 0) {
             return ERR_IF;

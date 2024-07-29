@@ -86,7 +86,7 @@ int main(void)
     thread_create(stack,
                   sizeof(stack),
                   THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  THREAD_CREATE_WOUT_YIELD,
                   second_thread,
                   &thread_success,
                   "second_thread");

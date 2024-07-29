@@ -156,7 +156,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
             volatile kernel_pid_t pid = thread_create(pthread_reaper_stack,
                                              PTHREAD_REAPER_STACKSIZE,
                                              0,
-                                             THREAD_CREATE_STACKTEST,
+                                             0,
                                              pthread_reaper,
                                              NULL,
                                              "pthread-reaper");
@@ -176,7 +176,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
                                    stack_size,
                                    THREAD_PRIORITY_MAIN,
                                    THREAD_CREATE_SLEEPING |
-                                   THREAD_CREATE_STACKTEST,
+                                   0,
                                    pthread_start_routine,
                                    pt,
                                    "pthread");

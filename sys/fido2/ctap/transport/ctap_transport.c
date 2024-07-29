@@ -95,7 +95,7 @@ void fido2_ctap_transport_init(void)
 #endif
 
     int ret = thread_create(_ctap_stack, sizeof(_ctap_stack), CTAP_TRANSPORT_PRIO,
-                            THREAD_CREATE_STACKTEST, _event_loop, NULL,
+                            0, _event_loop, NULL,
                             "fido2_ctap_transport_loop");
 
     (void)ret;

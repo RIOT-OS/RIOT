@@ -714,7 +714,7 @@ void gnrc_ipv6_auto_subnets_init(void)
 {
     /* initiate auto_subnets thread */
     _server_pid = thread_create(auto_subnets_stack, sizeof(auto_subnets_stack),
-                                THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                                THREAD_PRIORITY_MAIN - 1, 0,
                                 _eventloop, NULL, "auto_subnets");
 }
 #endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */

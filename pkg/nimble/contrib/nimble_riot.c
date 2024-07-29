@@ -89,7 +89,7 @@ static void *_host_thread(void *arg)
      */
     thread_create(_stack_controller, sizeof(_stack_controller),
                   NIMBLE_CONTROLLER_PRIO,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   (thread_task_func_t)nimble_port_ll_task_func, NULL,
                   "nimble_ctrl");
 
@@ -133,7 +133,7 @@ void nimble_riot_init(void)
     /* and finally initialize and run the host */
     thread_create(_stack_host, sizeof(_stack_host),
                   NIMBLE_HOST_PRIO,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _host_thread, NULL,
                   "nimble_host");
 

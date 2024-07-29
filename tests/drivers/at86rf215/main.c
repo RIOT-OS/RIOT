@@ -169,7 +169,7 @@ int test_init(void)
 {
     /* create battery monitor thread */
     thread_create(batmon_stack, sizeof(batmon_stack), THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST, batmon_thread, NULL, "batmon");
+                  0, batmon_thread, NULL, "batmon");
     return 0;
 }
 
@@ -247,7 +247,7 @@ int main(void)
 
     /* create battery monitor thread */
     thread_create(batmon_stack, sizeof(batmon_stack), THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST, batmon_thread, NULL, "batmon");
+                  0, batmon_thread, NULL, "batmon");
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");

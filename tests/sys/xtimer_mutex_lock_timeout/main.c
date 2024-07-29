@@ -225,7 +225,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
     printf("threads = %d\n", current_thread_count);
     kernel_pid_t test_thread = thread_create(t_stack, sizeof(t_stack),
                                              THREAD_PRIORITY_MAIN + 1,
-                                             THREAD_CREATE_STACKTEST,
+                                             0,
                                              thread_low_prio_test,
                                              (void *)&test_mutex,
                                              "thread_low_prio_test");

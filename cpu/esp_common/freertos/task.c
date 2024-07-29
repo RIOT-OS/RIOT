@@ -82,7 +82,7 @@ BaseType_t xTaskCreatePinnedToCore(TaskFunction_t pvTaskCode,
                                      usStackDepth + sizeof(thread_t),
                                      uxPriority,
                                      THREAD_CREATE_WOUT_YIELD |
-                                     THREAD_CREATE_STACKTEST,
+                                     0,
                                      (void *)pvTaskCode,
                                      pvParameters, pcName);
     DEBUG("pid=%d\n", pid);

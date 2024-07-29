@@ -180,7 +180,7 @@ int main(void)
 
     /* Start the thread that will keep the MCU busy */
     thread_create(busy_thread_stack, sizeof(busy_thread_stack),
-                  THREAD_PRIORITY_MAIN + 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN + 1, 0,
                   busy_thread, NULL, "busy_thread");
 
     print_str("This test will put three levels of load on the MCU:\n"

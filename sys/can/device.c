@@ -364,7 +364,7 @@ kernel_pid_t can_device_init(char *stack, int stacksize, char priority,
     }
 
     /* create new can device thread */
-    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
+    res = thread_create(stack, stacksize, priority, 0,
                          _can_device_thread, (void *)params, name);
     if (res <= 0) {
         return -EINVAL;

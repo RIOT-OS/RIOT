@@ -94,13 +94,13 @@ int main(void)
     timeout = 50000000000U / coreclk();
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN + 1,
-                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread_1_2_3, (void *)t1_name, t1_name);
     p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN + 1,
-                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread_1_2_3, (void *)t2_name, t2_name);
     p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN + 1,
-                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread_1_2_3, (void *)t3_name, t3_name);
     puts("THREADS CREATED\n");
 
