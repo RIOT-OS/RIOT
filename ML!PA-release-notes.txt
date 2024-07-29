@@ -15,3 +15,4 @@ RIOT-2024.07-mlpa-1 - Merge Notes
  - merge benpicco/pkg/nanopb-multi
  - merge fabian18/pr/configuration_riotconf
  - merge benpicco/cpu/sam0_common-adc_sample_multi
+ - merge fabian18/pr/coap_fixes_and_gcoap_sep_resp
