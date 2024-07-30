@@ -1658,6 +1658,9 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
             ssize_t res = _cache_check(buf, len, memo, &cache_hit);
 
             if (res < 0) {
+                DEBUG("gcoap: Error from cache check");
+                memo->state = GCOAP_MEMO_UNUSED;
+                mutex_unlock(&_coap_state.lock);
                 return res;
             }
             len = res;
@@ -1665,13 +1668,22 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
 
         switch (msg_type) {
         case COAP_TYPE_CON:
+            /* Can't store it for retransmission, even though sending it from
+             * the provided buffer once is possible */
+            if (len > CONFIG_GCOAP_PDU_BUF_SIZE) {
+                DEBUG("gcoap: Request too large for retransmit buffer");
+                memo->state = GCOAP_MEMO_UNUSED;
+                mutex_unlock(&_coap_state.lock);
+                return -EINVAL;
+            }
+
             /* copy buf to resend_bufs record */
             memo->msg.data.pdu_buf = NULL;
             for (int i = 0; i < CONFIG_GCOAP_RESEND_BUFS_MAX; i++) {
                 if (!_coap_state.resend_bufs[i][0]) {
                     memo->msg.data.pdu_buf = &_coap_state.resend_bufs[i][0];
                     memcpy(memo->msg.data.pdu_buf, buf,
-                           CONFIG_GCOAP_PDU_BUF_SIZE);
+                           len);
                     memo->msg.data.pdu_len = len;
                     break;
                 }
