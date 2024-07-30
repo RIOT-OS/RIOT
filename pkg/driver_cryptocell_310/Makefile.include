@@ -13,6 +13,7 @@ CFLAGS += -Wno-cast-align
 
 PSEUDOMODULES += psa_cryptocell_310_aes_cbc
 PSEUDOMODULES += psa_cryptocell_310_aes_common
+PSEUDOMODULES += psa_cryptocell_310_cipher_chacha20
 PSEUDOMODULES += psa_cryptocell_310_ecc_common
 PSEUDOMODULES += psa_cryptocell_310_ecc_p192
 PSEUDOMODULES += psa_cryptocell_310_ecc_p256

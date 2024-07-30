@@ -143,6 +143,30 @@ ifneq (,$(filter psa_cipher_aes_192_cbc_backend_riot,$(USEMODULE)))
   USEMODULE += psa_riot_cipher_aes_192_cbc
 endif
 
+## ChaCha20
+ifneq (,$(filter psa_cipher_chacha20,$(USEMODULE)))
+  ifeq (,$(filter psa_cipher_chacha20_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_cipher_chacha20
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_cipher_chacha20,$(FEATURES_USED)))
+      USEMODULE += psa_cipher_chacha20_backend_periph
+    else
+      USEMODULE += psa_cipher_chacha20_backend_riot
+    endif
+  endif
+endif
+
+ifneq (,$(filter psa_cipher_chacha20_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_cipher_chacha20
+endif
+
+ifneq (,$(filter psa_cipher_chacha20_backend_riot,$(USEMODULE)))
+  USEMODULE += crypto
+  USEMODULE += psa_riot_cipher
+  USEMODULE += psa_riot_cipher_chacha20
+endif
+
 # Hash
 
 ## MD5

@@ -139,6 +139,7 @@ FEATURES_EXISTING := \
     periph_adc_continuous \
     periph_can \
     periph_cipher_aes_128_cbc \
+    periph_cipher_chacha20 \
     periph_clic \
     periph_coretimer \
     periph_cpuid \

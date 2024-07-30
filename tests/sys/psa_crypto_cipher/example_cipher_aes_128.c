@@ -67,17 +67,20 @@ psa_status_t example_cipher_aes_128(void)
 
     status = psa_import_key(&attr, KEY_128, AES_128_KEY_SIZE, &key_id);
     if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
         return status;
     }
 
     status = psa_cipher_encrypt(key_id, PSA_ALG_CBC_NO_PADDING, PLAINTEXT,
                                 PLAINTEXT_LEN, cipher_out, encr_output_size, &output_len);
     if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
         return status;
     }
 
     status = psa_cipher_decrypt(key_id, PSA_ALG_CBC_NO_PADDING, cipher_out,
                                 sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
+    psa_destroy_key(key_id);
     if (status == PSA_SUCCESS) {
         return (memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) ? -1 : 0);
     }

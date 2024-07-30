@@ -187,12 +187,89 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
  * @param bits
  * @return psa_status_t
  */
-psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attributes,
-                                               const uint8_t *data, size_t data_length,
-                                               psa_key_slot_t *slot, size_t *bits);
+psa_status_t psa_algorithm_dispatch_import_key( const psa_key_attributes_t *attributes,
+                                                const uint8_t *data, size_t data_length,
+                                                psa_key_slot_t *slot, size_t *bits);
 #endif
 
 #if IS_USED(MODULE_PSA_CIPHER)
+
+/**
+ * @brief   Dispatch call of a cipher encrypt setup function to a location specific backend.
+ *          See psa_cipher_setup()
+ *
+ * @param operation
+ * @param attributes
+ * @param slot
+ * @param alg
+ * @return psa_status_t
+ */
+psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup(   psa_cipher_operation_t *operation,
+                                                            const psa_key_attributes_t *attributes,
+                                                            const psa_key_slot_t *slot,
+                                                            psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a cipher decrypt setup function to a location specific backend.
+ *          See psa_cipher_setup()
+ *
+ * @param operation
+ * @param attributes
+ * @param slot
+ * @param alg
+ * @return psa_status_t
+ */
+psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup(   psa_cipher_operation_t *operation,
+                                                            const psa_key_attributes_t *attributes,
+                                                            const psa_key_slot_t *slot,
+                                                            psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a cipher finish function to a location specific backend.
+ *          See psa_cipher_finish()
+ *
+ * @param operation
+ * @param output
+ * @param output_size
+ * @param output_length
+ */
+psa_status_t psa_algorithm_dispatch_cipher_finish(  psa_cipher_operation_t *operation,
+                                                    uint8_t *output,
+                                                    size_t output_size,
+                                                    size_t *output_length);
+
+/**
+ * @brief   Dispatch call of a cipher update function to a location specific backend.
+ *          See psa_cipher_update()
+ *
+ * @param operation
+ * @param input
+ * @param input_length
+ * @param output
+ * @param output_size
+ * @param output_length
+ */
+psa_status_t psa_algorithm_dispatch_cipher_update(  psa_cipher_operation_t *operation,
+                                                    const uint8_t *input,
+                                                    size_t input_length,
+                                                    uint8_t *output,
+                                                    size_t output_size,
+                                                    size_t *output_length);
+
+/**
+ * @brief   Dispatch call of a function to set a cipher IV to a location specific backend.
+ *          See psa_cipher_set_iv()
+ *
+ * @param operation
+ * @param iv
+ * @param iv_length
+ * @return psa_status_t
+ */
+psa_status_t psa_algorithm_dispatch_cipher_set_iv(  psa_cipher_operation_t *operation,
+                                                    const uint8_t *iv,
+                                                    size_t iv_length);
+
+
 /**
  * @brief   Dispatch a cipher encrypt function to a specific backend.
  *          See @ref psa_cipher_encrypt()
