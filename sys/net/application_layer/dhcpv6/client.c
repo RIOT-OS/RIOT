@@ -654,15 +654,27 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
         }
         switch (byteorder_ntohs(opt->type)) {
             case DHCPV6_OPT_CID:
+                if (_opt_len(opt) < sizeof(dhcpv6_opt_duid_t)) {
+                    return -1;
+                }
                 cid = (dhcpv6_opt_duid_t *)opt;
                 break;
             case DHCPV6_OPT_SID:
+                if (_opt_len(opt) < sizeof(dhcpv6_opt_duid_t)) {
+                    return -1;
+                }
                 sid = (dhcpv6_opt_duid_t *)opt;
                 break;
             case DHCPV6_OPT_STATUS:
+                if (_opt_len(opt) < sizeof(dhcpv6_opt_status_t)) {
+                    return -1;
+                }
                 status = (dhcpv6_opt_status_t *)opt;
                 break;
             case DHCPV6_OPT_PREF:
+                if (_opt_len(opt) < sizeof(dhcpv6_opt_pref_t)) {
+                    return -1;
+                }
                 pref = (dhcpv6_opt_pref_t *)opt;
                 break;
             default:
@@ -686,6 +698,10 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
             *buf = best_adv;
         }
         server.duid_len = byteorder_ntohs(sid->len);
+        if (server.duid_len > DHCPV6_DUID_MAX_LEN) {
+            DEBUG("DHCPv6 client: DUID length is too long.\n");
+            return -1;
+        }
         memcpy(server.duid.u8, sid->duid, server.duid_len);
         server.pref = pref_val;
     }
