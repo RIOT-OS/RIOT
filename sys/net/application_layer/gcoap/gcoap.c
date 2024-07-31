@@ -1068,7 +1068,7 @@ static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t le
 }
 
 /*
- * Find registered observer or notification endpoint for a remote aor local address and port.
+ * Find registered observer or notification endpoint for a remote or local address and port.
  *
  * out[in,out] -- in: endpoint array to scan, out: found endpoint or NULL if not found
  * in[in] -- Endpoint to match
