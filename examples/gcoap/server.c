@@ -145,24 +145,16 @@ static void _rtc_notify_observers(void *arg)
 static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
     (void)ctx;
-
-    unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
-
-    if (method_flag == COAP_METHOD_GET) {
-        struct tm tm_now;
-        rtc_get_time(&tm_now);
-        uint32_t t_now = rtc_mktime(&tm_now);
-        t_now = htonl(t_now);
-        gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-        size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
-        memcpy(pdu->payload, &t_now, sizeof(t_now));
-        pdu->payload_len = sizeof(t_now);
-        resp_len += sizeof(t_now);
-        return resp_len;
-    }
-    else {
-        return gcoap_response(pdu, buf, len, COAP_CODE_METHOD_NOT_ALLOWED);
-    }
+    struct tm tm_now;
+    rtc_get_time(&tm_now);
+    uint32_t t_now = rtc_mktime(&tm_now);
+    t_now = htonl(t_now);
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+    memcpy(pdu->payload, &t_now, sizeof(t_now));
+    pdu->payload_len = sizeof(t_now);
+    resp_len += sizeof(t_now);
+    return resp_len;
 }
 #endif
 
