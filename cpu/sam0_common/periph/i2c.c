@@ -76,7 +76,7 @@ static inline SercomI2cm *bus(i2c_t dev)
 static void _syncbusy(SercomI2cm *dev)
 {
 #ifdef SERCOM_I2CM_STATUS_SYNCBUSY
-    while (dev->STATUS.reg & SERCOM_I2CM_STATUS_SYNCBUSY) {}
+    while (dev->STATUS.bit.SYNCBUSY) {}
 #else
     while (dev->SYNCBUSY.reg) {}
 #endif
@@ -88,9 +88,9 @@ static void _reset(SercomI2cm *dev)
     while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
 
 #ifdef SERCOM_I2CM_STATUS_SYNCBUSY
-    while (dev->STATUS.reg & SERCOM_I2CM_STATUS_SYNCBUSY) {}
+    while (dev->STATUS.bit.SYNCBUSY) {}
 #else
-    while (dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_SWRST) {}
+    while (dev->SYNCBUSY.bit.SWRST) {}
 #endif
 }
 
@@ -311,7 +311,7 @@ void _i2c_poweron(i2c_t dev)
     if (bus(dev) == NULL) {
         return;
     }
-    bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_ENABLE;
+    bus(dev)->CTRLA.bit.ENABLE = 1;
     _syncbusy(bus(dev));
 }
 
@@ -322,7 +322,7 @@ void _i2c_poweroff(i2c_t dev)
     if (bus(dev) == NULL) {
         return;
     }
-    bus(dev)->CTRLA.reg &= ~SERCOM_I2CM_CTRLA_ENABLE;
+    bus(dev)->CTRLA.bit.ENABLE = 0;
     _syncbusy(bus(dev));
 }
 
