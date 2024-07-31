@@ -647,12 +647,12 @@ extern "C" {
 #else
 #define GCOAP_VFS_EXTRA_STACKSIZE   (0)
 #endif
+#endif
 
 #ifndef GCOAP_STACK_SIZE
 #define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
                           + sizeof(coap_pkt_t) + GCOAP_DTLS_EXTRA_STACKSIZE \
                           + GCOAP_VFS_EXTRA_STACKSIZE)
-#endif
 #endif
 /** @} */
 
