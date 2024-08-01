@@ -52,14 +52,14 @@
 #  endif
 #endif
 
-#ifndef STM32_ETH_TRACING_IRQ_PORT_NUM
+#ifndef STM32_ETH_TRACING_IRQ_PORT
 #  if defined(LED0_PORT_NUM) || defined(DOXYGEN)
 /**
  * @brief   port to trace IRQs
  */
-#    define STM32_ETH_TRACING_IRQ_PORT_NUM LED0_PORT_NUM
+#    define STM32_ETH_TRACING_IRQ_PORT  LED0_PORT
 #  else
-#    define STM32_ETH_TRACING_IRQ_PORT_NUM 0
+#    define STM32_ETH_TRACING_IRQ_PORT  GPIO_PORT_0
 #  endif
 #endif
 /** @} */
@@ -93,7 +93,7 @@ void stm32_eth_common_init(void)
     while (ETH->DMABMR & ETH_DMABMR_SR) {}
 
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_IRQ_PORT_NUM),
+        gpio_ll_init(STM32_ETH_TRACING_IRQ_PORT,
                      STM32_ETH_TRACING_IRQ_PIN_NUM,
                      gpio_ll_out);
     }
@@ -108,7 +108,7 @@ void isr_eth(void)
 {
     DEBUG("[periph_eth_common] isr_eth()\n");
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_toggle(GPIO_PORT(STM32_ETH_TRACING_IRQ_PORT_NUM),
+        gpio_ll_toggle(STM32_ETH_TRACING_IRQ_PORT,
                        (1U << STM32_ETH_TRACING_IRQ_PIN_NUM));
     }
 
