@@ -813,6 +813,28 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
     return pdu_len;
 }
 
+static const coap_resource_t *_match_resource_path_iterator(const gcoap_listener_t *listener,
+                                                            const coap_resource_t *last,
+                                                            const uint8_t *uri_path)
+{
+    size_t i;
+    if (!last) {
+        i = 0;
+    }
+    else {
+        assert(listener);
+        assert(last >= listener->resources);
+        assert(last < listener->resources + listener->resources_len);
+        i = (last - listener->resources) + 1;
+    }
+    for (; i < listener->resources_len; i++) {
+        if (!coap_match_path(&listener->resources[i], uri_path)) {
+            return &listener->resources[i];
+        }
+    }
+    return NULL;
+}
+
 static int _request_matcher_default(gcoap_listener_t *listener,
                                     const coap_resource_t **resource,
                                     coap_pkt_t *pdu)
@@ -830,18 +852,10 @@ static int _request_matcher_default(gcoap_listener_t *listener,
     coap_method_flags_t method_flag = coap_method2flag(
         coap_get_code_detail(pdu));
 
-    for (size_t i = 0; i < listener->resources_len; i++) {
-        *resource = &listener->resources[i];
-
-        int res = coap_match_path(*resource, uri);
-
-        /* URI mismatch */
-        if (res != 0) {
-            continue;
-        }
-
+    *resource = NULL;
+    while ((*resource = _match_resource_path_iterator(listener, *resource, uri))) {
         /* potential match, check for method */
-        if (! ((*resource)->methods & method_flag)) {
+        if (!((*resource)->methods & method_flag)) {
             /* record wrong method error for next iteration, in case
              * another resource with the same URI and correct method
              * exists */
@@ -879,7 +893,7 @@ static int _find_resource(gcoap_socket_type_t tl_type,
     gcoap_listener_t *listener = _coap_state.listeners;
 
     while (listener) {
-        const coap_resource_t *resource;
+        const coap_resource_t *resource = NULL;
         int res;
 
         /* only makes sense to check if non-UDP transports are supported,
@@ -1640,6 +1654,24 @@ void gcoap_register_listener(gcoap_listener_t *listener)
     if (!listener->request_matcher) {
         listener->request_matcher = _request_matcher_default;
     }
+}
+
+const coap_resource_t *gcoap_get_resource_by_path_iterator(const gcoap_listener_t **last_listener,
+                                                           const coap_resource_t *last_resource,
+                                                           const char *uri_path)
+{
+    const gcoap_listener_t *listener = *last_listener ? *last_listener : _coap_state.listeners;
+    const coap_resource_t *resource = last_resource;
+
+    while (listener) {
+        if ((resource = _match_resource_path_iterator(listener, resource, (const uint8_t *)uri_path))) {
+            *last_listener = listener;
+            return resource;
+        }
+        listener = listener->next;
+    }
+
+    return NULL;
 }
 
 int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,

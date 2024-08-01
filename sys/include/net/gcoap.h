@@ -897,6 +897,22 @@ kernel_pid_t gcoap_init(void);
 void gcoap_register_listener(gcoap_listener_t *listener);
 
 /**
+ * @brief   Iterate through all registered listeners and check for a resource, matching by @p uri_path
+ *
+ *  This functions returns resources matching a subpath @see COAP_MATCH_SUBTREE.
+ *  If an exact match is required, check with `strncmp()`.
+ *
+ * @param[in, out]  last_listener       A pointer to NULL for the first call, otherwise the last returned listener
+ * @param[in]       last_resource       NULL for the first call, otherwise the last returned resource
+ * @param[in]       uri_path            The URI path to search for
+ *
+ * @return  The resource that matches the URI path
+ */
+const coap_resource_t *gcoap_get_resource_by_path_iterator(const gcoap_listener_t **last_listener,
+                                                           const coap_resource_t *last_resource,
+                                                           const char *uri_path);
+
+/**
  * @brief   Initializes a CoAP request PDU on a buffer.
  *
  * If @p code is COAP_CODE_EMPTY, prepares a complete "CoAP ping" 4 byte empty
