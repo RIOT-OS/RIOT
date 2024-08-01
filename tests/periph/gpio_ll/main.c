@@ -909,6 +909,11 @@ static void test_switch_dir(void)
     expect(conf.state == GPIO_INPUT);
     gpio_conf_t conf_orig = conf;
 
+    /* conf_orig.initial_value contains the current value in query_conf.
+     * Since this is a floating input connected to a floating input, it is
+     * random here. ==> Clear it. */
+    conf_orig.initial_value = false;
+
     /* capture output state before switching from input mode to output mode, so
      * that it can be restored when switching back to input mode */
     uword_t out_state = gpio_ll_read_output(port_out);
@@ -935,6 +940,8 @@ static void test_switch_dir(void)
     gpio_ll_write(port_out, out_state);
     /* verify we are back at the old config */
     conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    /* again, initial_value is random due to floating input ==> clear it */
+    conf.initial_value = false;
     test_passed = (conf.bits == conf_orig.bits);
     printf_optional("Returning back to input had no side effects on config: %s\n",
                     noyes[test_passed]);
