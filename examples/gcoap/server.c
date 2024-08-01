@@ -124,22 +124,31 @@ static void _rtc_notify_observers(void *arg)
     char str_time[20] = "";
     uint8_t buf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1 + sizeof(str_time)];
     coap_pkt_t pdu;
-    switch (gcoap_obs_init(&pdu, buf, sizeof(buf), &_resources[2])) {
-        case GCOAP_OBS_INIT_OK:
-            len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
-            memcpy(pdu.payload, str_time, strftime(str_time, sizeof(str_time), "%Y-%m-%d %H:%M:%S", &tm_now));
-            pdu.payload_len = strlen(str_time);
-            len += pdu.payload_len;
-            if (!gcoap_obs_send(buf, len, &_resources[2])) {
-                DEBUG_PUTS("gcoap_server: cannot send /rtc notification");
-            }
-            break;
-        case GCOAP_OBS_INIT_UNUSED:
-            DEBUG_PUTS("gcoap_server: no observer for /rtc");
-            break;
-        case GCOAP_OBS_INIT_ERR:
-            DEBUG_PUTS("gcoap_server: error initializing /rtc notification");
-            break;
+    const coap_resource_t *rtc_resource = NULL;
+    const gcoap_listener_t *listener = NULL;
+    while ((rtc_resource = gcoap_get_resource_by_path_iterator(&listener, rtc_resource, "/rtc"))) {
+        if (!strcmp(rtc_resource->path, "/rtc")) {
+            break; /* exact match */
+        }
+    }
+    if (rtc_resource) {
+        switch (gcoap_obs_init(&pdu, buf, sizeof(buf), rtc_resource)) {
+            case GCOAP_OBS_INIT_OK:
+                len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
+                memcpy(pdu.payload, str_time, strftime(str_time, sizeof(str_time), "%Y-%m-%d %H:%M:%S", &tm_now));
+                pdu.payload_len = strlen(str_time);
+                len += pdu.payload_len;
+                if (!gcoap_obs_send(buf, len, rtc_resource)) {
+                    DEBUG_PUTS("gcoap_server: cannot send /rtc notification");
+                }
+                break;
+            case GCOAP_OBS_INIT_UNUSED:
+                DEBUG_PUTS("gcoap_server: no observer for /rtc");
+                break;
+            case GCOAP_OBS_INIT_ERR:
+                DEBUG_PUTS("gcoap_server: error initializing /rtc notification");
+                break;
+        }
     }
 }
 
