@@ -731,29 +731,39 @@ static inline uword_t gpio_ll_prepare_write(gpio_port_t port, uword_t mask,
 }
 #endif
 
+#if defined(DOXYGEN) || !defined(HAVE_GPIO_LL_PREPARE_SWITCH_DIR)
 /**
- * @brief       Turn GPIO pins specified by the bitmask @p outputs to outputs
+ * @brief       Prepare bitmask for use with @ref gpio_ll_switch_dir_output
+ *              and @ref gpio_ll_switch_dir_input
+ * @param[in]   mask    bitmask specifying the pins to switch the direction of
+ *
+ * @return      Value to use in @ref gpio_ll_switch_dir_output or
+ *              @ref gpio_ll_switch_dir_input
+ */
+static inline uword_t gpio_ll_prepare_switch_dir(uword_t mask)
+{
+    return mask;
+}
+#endif
+
+/**
+ * @brief       Turn GPIO pins specified by @p pins (obtained from
+ *              @ref gpio_ll_prepare_switch_dir) to outputs
  *
  * @param[in]   port        GPIO port to modify
- * @param[in]   outputs     Bitmask specifying the GPIO pins to set in output
- *                          mode
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_dir
  * @pre         The feature `gpio_ll_switch_dir` is available
  * @pre         Each affected GPIO pin is either configured as input or as
  *              push-pull output.
- *
- * @note        This is a makeshift solution to implement bit-banging of
- *              bidirectional protocols on less sophisticated GPIO peripherals
- *              that do not support open drain mode.
- * @warning     Use open drain mode instead, if supported.
  */
-static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs);
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t pins);
 
 /**
- * @brief       Turn GPIO pins specified by the bitmask @p inputs to inputs
+ * @brief       Turn GPIO pins specified by @p pins (obtained from
+ *              @ref gpio_ll_prepare_switch_dir) to inputs
  *
  * @param[in]   port        GPIO port to modify
- * @param[in]   inputs      Bitmask specifying the GPIO pins to set in input
- *                          mode
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_dir
  * @pre         The feature `gpio_ll_switch_dir` is available
  * @pre         Each affected GPIO pin is either configured as input or as
  *              push-pull output.
@@ -765,12 +775,8 @@ static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs);
  *              resistor is enabled). Hence, the bits in the output
  *              register of the pins switched to input should be restored
  *              just after this call.
- * @note        This is a makeshift solution to implement bit-banging of
- *              bidirectional protocols on less sophisticated GPIO peripherals
- *              that do not support open drain mode.
- * @warning     Use open drain mode instead, if supported.
  */
-static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs);
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t pins);
 
 /**
  * @brief   Perform a masked write operation on the I/O register of the port

@@ -567,9 +567,9 @@ groups:
         help: The GPIO LL driver allows switching the direction between input
               and (push-pull) output in an efficient manner. The main use case
               is bit-banging bidirectional protocols when open-drain / open-source
-              mode is not supported. GPIO LL drivers for peripherals that do
-              support open drain mode typically do not bother implementing this,
-              even if the hardware would allow it.
+              mode is not supported. Another use case is controlling GPIOs
+              at high speed with three output states (high, low, high impedance),
+              as e.g. needed for Charlieplexing
 
   - title: Serial Interfaces
     help: Features related to serial interfaces
