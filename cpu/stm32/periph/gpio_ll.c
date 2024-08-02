@@ -95,7 +95,7 @@ static inline void print_str(const char *str)
 
 static void _init_clock(gpio_port_t port)
 {
-    periph_clk_en(GPIO_BUS, (GPIOAEN << GPIO_PORT_NUM(port)));
+    periph_clk_en(GPIO_BUS, (GPIOAEN << gpio_port_num(port)));
 #ifdef PORTG_REQUIRES_EXTERNAL_POWER
     if (port == (uintptr_t)GPIOG) {
         /* Port G requires external power supply */

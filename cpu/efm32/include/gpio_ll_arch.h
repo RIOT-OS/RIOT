@@ -48,12 +48,63 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
+#define GPIO_PORT_NUMBERING_ALPHABETIC  1
+
+/* Note: The pin count may be defined as zero to indicate the port not existing.
+ * Hence, don't to `#if defined(foo)` but only `#if foo`
+ */
+#if _GPIO_PORT_A_PIN_COUNT
+#  define GPIO_PORT_0   0
+#endif
+
+#if _GPIO_PORT_B_PIN_COUNT
+#  define GPIO_PORT_1   1
+#endif
+
+#if _GPIO_PORT_C_PIN_COUNT
+#  define GPIO_PORT_2   2
+#endif
+
+#if _GPIO_PORT_D_PIN_COUNT
+#  define GPIO_PORT_3   3
+#endif
+
+#if _GPIO_PORT_E_PIN_COUNT
+#  define GPIO_PORT_4   4
+#endif
+
+#if _GPIO_PORT_F_PIN_COUNT
+#  define GPIO_PORT_6   6
+#endif
+
+#if _GPIO_PORT_G_PIN_COUNT
+#  define GPIO_PORT_7   7
+#endif
+
+#if _GPIO_PORT_H_PIN_COUNT
+#  define GPIO_PORT_8   8
+#endif
+
+#if _GPIO_PORT_I_PIN_COUNT
+#  define GPIO_PORT_9   9
+#endif
+
+#if _GPIO_PORT_J_PIN_COUNT
+#  define GPIO_PORT_10  10
+#endif
+
+#if _GPIO_PORT_K_PIN_COUNT
+#  define GPIO_PORT_11  11
+#endif
+
 /* We could do
  *
-#define GPIO_PORT(num) (GPIO->P[num])
-#define GPIO_PORT_NUM(port) ((port - &GPIO->P))
+ * static inline gpio_port_t gpio_port(uword_t num)
+ * {
+ *     return GPIO->P[num];
+ * }
  *
- * which forks for some operations, but at latest when _ll_set needs to fan out
+ * which works for some operations, but at latest when _ll_set needs to fan out
  * for some EFM32 families to
  *
 #if defined(_GPIO_P_DOUTSET_MASK)
@@ -78,9 +129,15 @@ extern "C" {
  * an implementation for other EFM32 families. For the time being, the
  * suboptimal-but-works-for-all version is the best we have.
  */
+static inline gpio_port_t gpio_port(uword_t num)
+{
+    return num;
+}
 
-#define GPIO_PORT(num) (num)
-#define GPIO_PORT_NUM(port) (port)
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+    return port;
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {

@@ -36,9 +36,33 @@
 #define LOW_ROM 0
 #endif
 
+/* On e.g. ATmega328P the smallest available GPIO Port is GPIO_PORT_1 (GPIOB),
+ * on others (e.g. nRF51) the highest available GPIO PORT is GPIO_PORT_0.
+ * So we need the following dance to find a valid GPIO port to allow compile
+ * testing. Extend the dance as needed, when new MCUs are added */
+#if !defined(PORT_OUT)
+#  if defined(GPIO_PORT_0)
+#    define PORT_OUT GPIO_PORT_0
+#    define PORT_OUT_NUM 0
+#  elif defined(GPIO_PORT_1)
+#    define PORT_OUT GPIO_PORT_1
+#    define PORT_OUT_NUM 1
+#  endif
+#endif
+
+#if !defined(PORT_IN)
+#  if defined(GPIO_PORT_0)
+#    define PORT_IN GPIO_PORT_0
+#    define PORT_IN_NUM 0
+#  elif defined(GPIO_PORT_1)
+#    define PORT_IN GPIO_PORT_1
+#    define PORT_IN_NUM 1
+#  endif
+#endif
+
 static const char *noyes[] = { "no", "yes" };
-static gpio_port_t port_out = GPIO_PORT(PORT_OUT);
-static gpio_port_t port_in = GPIO_PORT(PORT_IN);
+static gpio_port_t port_out = PORT_OUT;
+static gpio_port_t port_in = PORT_IN;
 
 static const uint64_t mutex_timeout = US_PER_MS;
 
@@ -75,9 +99,15 @@ static void expect_impl(int val, unsigned line)
 static void print_cabling(unsigned port1, unsigned pin1,
                           unsigned port2, unsigned pin2)
 {
-    printf("  P%u.%u (P%c%u) -- P%u.%u (P%c%u)\n",
-           port1, pin1, 'A' + (char)port1, pin1,
-           port2, pin2, 'A' + (char)port2, pin2);
+    if (GPIO_PORT_NUMBERING_ALPHABETIC) {
+        /* alphabetic naming scheme */
+        printf("  P%c%u -- P%c%u\n", 'A' + (char)port1, pin1,
+                                     'A' + (char)port2, pin2);
+    }
+    else {
+        /* numeric naming scheme */
+        printf("  P%u.%u -- P%u.%u\n", port1, pin1, port2, pin2);
+    }
 }
 
 static void print_details(void)
@@ -86,8 +116,8 @@ static void print_details(void)
                   "========================\n"
                   "Cabling:\n"
                   "(INPUT -- OUTPUT)");
-    print_cabling(PORT_IN, PIN_IN_0, PORT_OUT, PIN_OUT_0);
-    print_cabling(PORT_IN, PIN_IN_1, PORT_OUT, PIN_OUT_1);
+    print_cabling(PORT_IN_NUM, PIN_IN_0, PORT_OUT_NUM, PIN_OUT_0);
+    print_cabling(PORT_IN_NUM, PIN_IN_1, PORT_OUT_NUM, PIN_OUT_1);
     printf("Number of pull resistor values supported: %u\n", GPIO_PULL_NUMOF);
     printf("Number of drive strengths supported: %u\n", GPIO_DRIVE_NUMOF);
     printf("Number of slew rates supported: %u\n", GPIO_SLEW_NUMOF);
@@ -486,8 +516,8 @@ static void test_gpio_ll_init(void)
                   "\n"
                   "Testing is_gpio_port_num_valid() is true for PORT_OUT and "
                   "PORT_IN:");
-    expect(is_gpio_port_num_valid(PORT_IN));
-    expect(is_gpio_port_num_valid(PORT_OUT));
+    expect(is_gpio_port_num_valid(PORT_IN_NUM));
+    expect(is_gpio_port_num_valid(PORT_OUT_NUM));
 
     /* first, iterate through input configurations and test them one by one */
     test_gpio_ll_init_input_configs();
@@ -879,6 +909,11 @@ static void test_switch_dir(void)
     expect(conf.state == GPIO_INPUT);
     gpio_conf_t conf_orig = conf;
 
+    /* conf_orig.initial_value contains the current value in query_conf.
+     * Since this is a floating input connected to a floating input, it is
+     * random here. ==> Clear it. */
+    conf_orig.initial_value = false;
+
     /* capture output state before switching from input mode to output mode, so
      * that it can be restored when switching back to input mode */
     uword_t out_state = gpio_ll_read_output(port_out);
@@ -905,6 +940,8 @@ static void test_switch_dir(void)
     gpio_ll_write(port_out, out_state);
     /* verify we are back at the old config */
     conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    /* again, initial_value is random due to floating input ==> clear it */
+    conf.initial_value = false;
     test_passed = (conf.bits == conf_orig.bits);
     printf_optional("Returning back to input had no side effects on config: %s\n",
                     noyes[test_passed]);

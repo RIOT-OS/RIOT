@@ -62,7 +62,7 @@ static void clear_pending_irqs(uint8_t exti)
 
 void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 {
-    uint8_t exti = atmega_pin2exti(GPIO_PORT_NUM(port), pin);
+    uint8_t exti = atmega_pin2exti(gpio_port_num(port), pin);
 #if defined(EIMSK)
     EIMSK &= ~(1 << exti);
 #elif defined(GICR)
@@ -72,7 +72,7 @@ void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 
 void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 {
-    uint8_t exti = atmega_pin2exti(GPIO_PORT_NUM(port), pin);
+    uint8_t exti = atmega_pin2exti(gpio_port_num(port), pin);
 #if defined(EIMSK)
     EIMSK |= 1 << exti;
 #elif defined(GICR)
@@ -82,7 +82,7 @@ void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 
 void gpio_ll_irq_unmask_and_clear(gpio_port_t port, uint8_t pin)
 {
-    uint8_t exti = atmega_pin2exti(GPIO_PORT_NUM(port), pin);
+    uint8_t exti = atmega_pin2exti(gpio_port_num(port), pin);
     clear_pending_irqs(exti);
 #if defined(EIMSK)
     EIMSK |= 1 << exti;
@@ -118,7 +118,7 @@ static void set_trigger(uint8_t exti, gpio_irq_trig_t trig)
 int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
                 gpio_ll_cb_t cb, void *arg)
 {
-    int port_num = GPIO_PORT_NUM(port);
+    int port_num = gpio_port_num(port);
     assert((trig != GPIO_TRIGGER_LEVEL_HIGH) && cb);
     if (!atmega_has_pin_exti(port_num, pin)) {
         return -ENOTSUP;

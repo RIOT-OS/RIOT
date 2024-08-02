@@ -49,12 +49,15 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
  * @{
  */
 #define LED0_PIN_NUM        15
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 
 #define LED1_PIN_NUM        9
+#define LED1_PORT           GPIO_PORT_B /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_B
 
 #define LED2_PIN_NUM        11
+#define LED2_PORT           GPIO_PORT_B /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_B
 /** @} */
 

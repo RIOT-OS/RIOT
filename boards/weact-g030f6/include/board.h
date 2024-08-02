@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #define LED0_PIN_NUM        4
+#define LED0_PORT           GPIO_PORT_A /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_A
 
 #define BTN0_PIN            GPIO_PIN(PORT_A, 14)

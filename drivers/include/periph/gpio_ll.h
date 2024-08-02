@@ -93,38 +93,63 @@ typedef uintptr_t gpio_port_t;
 #define GPIO_PORT_UNDEF         UINTPTR_MAX
 #endif
 
-#ifdef DOXYGEN
+#if defined(DOXYGEN)
 /**
- * @brief   Get the @ref gpio_port_t value of the port identified by @p num
+ * @brief   Indicates whether GPIO ports are enumerated alphabetically (`1`)
+ *          or numerically (`0`).
  *
- * @note    If @p num is a compile time constant, this is guaranteed to be
- *          suitable for a constant initializer.
- *
- * Typically this will be something like `(GPIO_BASE_ADDR + num * sizeof(struct
- * vendor_gpio_reg))`
+ * @note    You can use both @ref GPIO_PORT_A and @ref GPIO_PORT_0 to refer
+ *          to the first GPIO port in RIOT, regardless of the naming scheme
+ *          used by the MCU the app is compiled for. This macro is useful
+ *          e.g. for pretty-printing.
  */
-#define GPIO_PORT(num)  implementation_specific
+#  define GPIO_PORT_NUMBERING_ALPHABETIC    implementation_specific
 #endif
+
 
 #ifdef DOXYGEN
 /**
- * @brief   Get the number of the GPIO port belonging to the given @ref
- *          gpio_port_t value
+ * @brief   Get the @ref gpio_port_t value of the port labeled 0.
  *
- * @note    If @p port is a compile time constant, this is guaranteed to be
- *          suitable for a constant initializer.
- *
- * @pre     @p port is the return value of @ref GPIO_PORT
- *
- * For every supported port number *n* the following `assert()` must not blow
- * up:
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * assert(n == GPIO_PORT_NUM(GPIO_PORT(n)));
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @note    For MCUs that use letters instead of numbers, this will be an alias
+ *          for @ref GPIO_PORT_A
+ * @note    Some MCUs will not start with Port 0 / Port A, but rather with
+ *          Port 1 (e.g. MSP430) or Port B (e.g. ATmega328P). It will be
+ *          undefined when unavailable
+ * @note    There will also be `GPIO_PORT_1`, `GPIO_PORT_2`, etc. when there
+ *          are corresponding GPIO ports in hardware.
  */
-#define GPIO_PORT_NUM(port) implementation_specific
-#endif
+#define GPIO_PORT_0     implementation_specific
+
+/**
+ * @brief       Get the @ref gpio_port_t value of the port number @p num
+ * @param[in]   num     The number of the port to get
+ * @pre         @p num is a valid GPIO port number. An implementation may
+ *              follow the "garbage in, garbage out" philosophy.
+ *
+ * @note        If the MCU uses an alphabetic naming scheme, number 0 refers
+ *              to port A.
+ * @warning     This may involve accessing a lookup table, prefer e.g. using
+ *              `GPIO_PORT_0` over `gpio_port(0)` if the port number is known
+ *              at compile time.
+ */
+gpio_port_t gpio_port(uword_t num);
+
+/**
+ * @brief       Get the number of the GPIO port @p port refers to
+ * @param[in]   port    The port to get the number of
+ *
+ * @pre         @p port is a valid GPIO port. An implementation may follow the
+ *              "garbage in, garbage out" philosophy.
+ * @warning     This may involve iterating over a lookup table, prefer using
+ *              e.g. `0` instead of `gpio_port_num(GPIO_PORT_0)` if the port
+ *              number is known at compile time.
+ *
+ * In other words `n == gpio_port_num(gpio_port(n))` for every `n` that is
+ * a valid port number.
+ */
+uword_t gpio_port_num(gpio_port_t port);
+#endif /* DOXYGEN */
 
 #if !defined(HAVE_GPIO_STATE_T) || defined(DOXYGEN)
 /**
@@ -490,7 +515,7 @@ static const gpio_conf_t gpio_ll_od_pu = {
 #endif
 
 /**
- * @brief   Check if the given number is a valid argument for @ref GPIO_PORT
+ * @brief   Check if the given number is a valid argument for @ref gpio_port
  *
  * @param[in]       num     port number to check
  * @retval          true    the MCU used has a GPIO port with that number
@@ -867,6 +892,112 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 /* the hardware specific implementation relies on the types such as gpio_port_t
  * to be provided */
 #include "gpio_ll_arch.h" /* IWYU pragma: export */
+
+#if !defined(DOXYGEN) && !defined(GPIO_PORT_NUMBERING_ALPHABETIC)
+#  define GPIO_PORT_NUMBERING_ALPHABETIC    0
+#endif
+
+/**
+ * @name    GPIO port aliases for alphabetic enumeration
+ * @{
+ */
+#if defined(GPIO_PORT_0) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_0`
+ */
+#  define GPIO_PORT_A   GPIO_PORT_0
+#endif
+#if defined(GPIO_PORT_1) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_1`
+ */
+#  define GPIO_PORT_B   GPIO_PORT_1
+#endif
+#if defined(GPIO_PORT_2) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_2`
+ */
+#  define GPIO_PORT_C   GPIO_PORT_2
+#endif
+#if defined(GPIO_PORT_3) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_3`
+ */
+#  define GPIO_PORT_D   GPIO_PORT_3
+#endif
+#if defined(GPIO_PORT_4) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_4`
+ */
+#  define GPIO_PORT_E   GPIO_PORT_4
+#endif
+#if defined(GPIO_PORT_5) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_5`
+ */
+#  define GPIO_PORT_F   GPIO_PORT_5
+#endif
+#if defined(GPIO_PORT_6) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_6`
+ */
+#  define GPIO_PORT_G   GPIO_PORT_6
+#endif
+#if defined(GPIO_PORT_7) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_7`
+ */
+#  define GPIO_PORT_H   GPIO_PORT_7
+#endif
+#if defined(GPIO_PORT_8) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_8`
+ */
+#  define GPIO_PORT_I   GPIO_PORT_8
+#endif
+#if defined(GPIO_PORT_9) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_9`
+ */
+#  define GPIO_PORT_J   GPIO_PORT_9
+#endif
+#if defined(GPIO_PORT_10) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_10`
+ */
+#  define GPIO_PORT_K   GPIO_PORT_10
+#endif
+#if defined(GPIO_PORT_11) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_11`
+ */
+#  define GPIO_PORT_L   GPIO_PORT_11
+#endif
+#if defined(GPIO_PORT_12) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_12`
+ */
+#  define GPIO_PORT_M   GPIO_PORT_12
+#endif
+#if defined(GPIO_PORT_13) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_13`
+ */
+#  define GPIO_PORT_N   GPIO_PORT_13
+#endif
+#if defined(GPIO_PORT_14) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_14`
+ */
+#  define GPIO_PORT_O   GPIO_PORT_14
+#endif
+#if defined(GPIO_PORT_15) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_15`
+ */
+#  define GPIO_PORT_P   GPIO_PORT_15
+#endif
+/** @} */
 
 #endif /* PERIPH_GPIO_LL_H */
 /** @} */

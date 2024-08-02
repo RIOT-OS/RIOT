@@ -73,16 +73,16 @@ typedef uint8_t gpio_t;
 #ifdef GPIO_PORT_DESCENDENT
 #ifdef      _AVR_ATTINY1634_H_INCLUDED
 /*          the only one that requires particular treatment! */
-#define     ATMEGA_GPIO_BASE_A  (0x2F)
+#define     ATMEGA_GPIO_BASE_A  0x2F
 #else
 /*          all other port descendent, including :
              - _AVR_IO8534_ (only have port A but with 0x1B address) ;
              - _AVR_IOAT94K_H_ (only have ports D and E) ;
              - _AVR_IOTN28_H_ (only have ports A and D). */
-#define     ATMEGA_GPIO_BASE_A  (0x39)
+#define     ATMEGA_GPIO_BASE_A  0x39
 #endif /*   _AVR_ATTINY1634_H_INCLUDED */
 #else /* !GPIO_PORT_DESCENDENT */
-#define     ATMEGA_GPIO_BASE_A  (0x20)
+#define     ATMEGA_GPIO_BASE_A  0x20
 #endif /* GPIO_PORT_DESCENDENT */
 /**
  * @brief   Base of the GPIO port G register as memory address
