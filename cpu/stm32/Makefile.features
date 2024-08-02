@@ -16,6 +16,7 @@ FEATURES_PROVIDED += periph_gpio_ll_irq_edge_triggered_both
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_gpio_ll_open_drain
+FEATURES_PROVIDED += periph_gpio_ll_switch_dir
 FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += periph_timer_periodic

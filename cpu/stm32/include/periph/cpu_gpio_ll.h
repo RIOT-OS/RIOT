@@ -31,6 +31,8 @@ extern "C" {
  * public view on type */
 #ifndef DOXYGEN
 
+#define HAVE_GPIO_LL_PREPARE_SWITCH_DIR
+
 #define HAVE_GPIO_PULL_STRENGTH_T
 typedef enum {
     GPIO_PULL_WEAKEST = 0,
