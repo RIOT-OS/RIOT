@@ -25,6 +25,7 @@ FEATURES_PROVIDED += periph_uart_nonblocking
 
 ifneq (f1,$(CPU_FAM))
   FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
+  FEATURES_PROVIDED += periph_gpio_ll_switch_dir
 endif
 
 ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))

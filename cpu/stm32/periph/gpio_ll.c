@@ -361,6 +361,50 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     return 0;
 }
 
+uword_t gpio_ll_prepare_switch_dir_impl(uword_t mask)
+{
+    /* Mask contains a bitmask containing the pins needed to change
+     * the direction of. E.g. for pins 0 to 3 it looks like:
+     *
+     *   3    2    1    0
+     * +----+----+----+----+
+     * | P3 | P2 | P1 | P0 |
+     * +----+----+----+----+
+     *
+     * We need to update the GPIOX->MODER register, which for pins 0 to 3
+     * looks like this:
+     *
+     *   7    6    5    4    3    2    1    0
+     * +---------+---------+---------+---------+
+     * |  MODE3  |  MODE2  |  MODE1  |  MODE0  |
+     * +---------+---------+---------+---------+
+     *
+     * Where each mode field will have the value `0b00` for input or `0b01`
+     * for output (the others two values are for alternate function mode and
+     * analog mode, which are both not relevant here). So, we need a way to
+     * efficiently set and clear every second bit. Specifically, a bitmask
+     * that looks like this is our goal:
+     *
+     *   7    6    5    4    3    2    1    0
+     * +----+----+----+----+----+----+----+----+
+     * | 0  | P3 | 0  | P2 | 0  | P1 | 0  | P0 |
+     * +----+----+----+----+----+----+----+----+
+     *
+     * This is what below bit magic magic does (but for 16 pins instead of
+     * 4).
+     */
+    uword_t output = mask & 0xFFFF;
+    output |= output << 8;
+    output &= 0x00FF00FF;
+    output |= output << 4;
+    output &= 0x0F0F0F0F;
+    output |= output << 2;
+    output &= 0x33333333;
+    output |= output << 1;
+    output &= 0x55555555;
+    return output;
+}
+
 gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
 {
     gpio_conf_t result = { 0 };
