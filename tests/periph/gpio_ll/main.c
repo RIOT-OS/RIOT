@@ -933,8 +933,10 @@ static void test_switch_dir(void)
     expect(test_passed);
 
     gpio_ll_clear(port_out, mask_out);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = (0 == (gpio_ll_read(port_in) & mask_in));
     gpio_ll_set(port_out, mask_out);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = test_passed && (gpio_ll_read(port_in) & mask_in);
     printf_optional("Pin behaves as output after switched to output mode: %s\n",
                     noyes[test_passed]);
@@ -965,8 +967,10 @@ static void test_switch_dir(void)
     expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_out));
 
     gpio_ll_clear(port_in, mask_in);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = (0 == (gpio_ll_read(port_out) & mask_out));
     gpio_ll_set(port_in, mask_in);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = test_passed && (gpio_ll_read(port_out) & mask_out);
     printf_optional("Pin behaves as input after switched back to input mode: %s\n",
                     noyes[test_passed]);
