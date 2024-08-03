@@ -23,6 +23,7 @@
 #include "ztimer.h"
 
 extern psa_status_t example_cipher_aes_128(void);
+extern psa_status_t example_cipher_chacha20(void);
 
 int main(void)
 {
@@ -40,6 +41,14 @@ int main(void)
     if (status != PSA_SUCCESS) {
         failed = true;
         printf("Cipher AES 128 failed: %s\n", psa_status_to_humanly_readable(status));
+    }
+
+    start = ztimer_now(ZTIMER_USEC);
+    status = example_cipher_chacha20();
+    printf("Cipher CHACHA20 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("Cipher CHACHA20 failed: %s\n", psa_status_to_humanly_readable(status));
     }
 
     ztimer_release(ZTIMER_USEC);
