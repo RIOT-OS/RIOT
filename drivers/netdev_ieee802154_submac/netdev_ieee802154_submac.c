@@ -139,13 +139,13 @@ void ieee802154_submac_bh_request(ieee802154_submac_t *submac)
     netdev->event_callback(netdev, NETDEV_EVENT_ISR);
 }
 
-void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac, uint16_t us)
+void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac)
 {
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
                                                              netdev_ieee802154_submac_t,
                                                              submac);
 
-    ztimer_set(ZTIMER_USEC, &netdev_submac->ack_timer, us);
+    ztimer_set(ZTIMER_USEC, &netdev_submac->ack_timer, submac->ack_timeout_us);
 }
 
 void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
