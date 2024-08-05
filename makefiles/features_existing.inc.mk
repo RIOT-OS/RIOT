@@ -170,6 +170,7 @@ FEATURES_EXISTING := \
     periph_gpio_ll_input_pull_keep \
     periph_gpio_ll_input_pull_up \
     periph_gpio_ll_irq \
+    periph_gpio_ll_irq_edge_triggered_both \
     periph_gpio_ll_irq_level_triggered_high \
     periph_gpio_ll_irq_level_triggered_low \
     periph_gpio_ll_irq_unmask \

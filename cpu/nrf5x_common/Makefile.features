@@ -16,6 +16,7 @@ ifeq (,$(filter nrf5340_app,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
   FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
   FEATURES_PROVIDED += periph_gpio_ll_irq
+  FEATURES_PROVIDED += periph_gpio_ll_irq_edge_triggered_both
   FEATURES_PROVIDED += periph_gpio_ll_irq_unmask
   FEATURES_PROVIDED += periph_gpio_ll_open_drain
   FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up

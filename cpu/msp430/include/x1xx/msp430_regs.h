@@ -32,6 +32,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief   GPIO Port 1/2 (with interrupt functionality)
+ */
+typedef struct {
+    msp430_port_t base; /**< common GPIO port registers */
+    REG8    IFG;        /**< interrupt flag */
+    REG8    IES;        /**< interrupt edge select */
+    REG8    IE;         /**< interrupt enable */
+    REG8    SEL;        /**< alternative function select */
+} msp430_port_p1_p2_t;
+
+/**
  * @brief   USART (UART, SPI and I2C) Registers
  */
 typedef struct {

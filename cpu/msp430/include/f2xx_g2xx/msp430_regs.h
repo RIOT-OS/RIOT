@@ -58,6 +58,31 @@ extern "C" {
     ((msp430_usci_b_t *)((uintptr_t)(usci_a) + MSP430_USCI_A_B_OFFSET))
 
 /**
+ * @brief   GPIO Port 1/2 (with interrupt functionality)
+ */
+typedef struct {
+    msp430_port_t base; /**< common GPIO port registers */
+    REG8    IFG;        /**< interrupt flag */
+    REG8    IES;        /**< interrupt edge select */
+    REG8    IE;         /**< interrupt enable */
+    REG8    SEL;        /**< alternative function select */
+    REG8    REN;        /**< pull resistor enable */
+} msp430_port_p1_p2_t;
+
+/**
+ * @brief   GPIO Port 7/8 (different register layout than Ports 1-6)
+ */
+typedef struct {
+    REG8    IN;         /**< input data */
+    uint8_t _padding1;  /**< unrelated I/O */
+    REG8    OD;         /**< output data */
+    uint8_t _padding2;  /**< unrelated I/O */
+    REG8    DIR;        /**< pin direction */
+    uint8_t _padding3;  /**< unrelated I/O */
+    REG8    SEL;        /**< alternative function select */
+} msp430_port_p7_p8_t;
+
+/**
  * @brief   Universal Serial Control Interface Type A (USCI_A) Registers
  */
 typedef struct {
