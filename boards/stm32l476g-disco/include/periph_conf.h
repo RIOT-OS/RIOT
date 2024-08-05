@@ -129,6 +129,15 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
+/**
+ * @name    PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {{}};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
