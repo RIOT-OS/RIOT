@@ -26,10 +26,12 @@
 #include <stdint.h>
 #include <errno.h>
 
+#include "busy_wait.h"
 #include "cpu.h"
 #include "board.h"
 #include "mutex.h"
 #include "periph_conf.h"
+#include "periph/gpio.h"
 #include "periph/i2c.h"
 
 #include "sched.h"
@@ -73,6 +75,17 @@ static inline SercomI2cm *bus(i2c_t dev)
     return i2c_config[dev].dev;
 }
 
+static inline const i2c_conf_t *config(SercomI2cm *dev)
+{
+    for (unsigned i = 0; i < I2C_NUMOF; i++) {
+        if (i2c_config[i].dev == dev) {
+            return &i2c_config[i];
+        }
+    }
+
+    return NULL;
+}
+
 static void _syncbusy(SercomI2cm *dev)
 {
 #ifdef SERCOM_I2CM_STATUS_SYNCBUSY
@@ -94,6 +107,81 @@ static void _reset(SercomI2cm *dev)
 #endif
 }
 
+/**
+ * @brief  Detect and recover a bus hangup
+ *
+ * Recover possible bus hangup by clocking peripheral
+ * i2c device state machines into idle.
+ * Hangup can occur if a transaction was interrupted
+ * by a reset of the MCU.
+ * Badly designed hardware can also cause a hangup
+ * due to glitches on the bus.
+ *
+ * @param dev @ref i2c_t device to unblock
+ * @return true if bus was not blocked or successfully unblocked,
+ *         false otherwise
+ */
+static bool _check_and_unblock_bus(const i2c_conf_t *dev_conf, bool initialized)
+{
+    assert(dev_conf != NULL);
+
+    unsigned dev_num = ((uintptr_t)dev_conf - (uintptr_t)i2c_config) / sizeof(i2c_conf_t);
+    (void) dev_num; /* only required for debug output */
+
+    /* reconfigure pins to gpio for testing */
+    gpio_disable_mux(dev_conf->sda_pin);
+    gpio_disable_mux(dev_conf->scl_pin);
+    gpio_init(dev_conf->sda_pin, GPIO_IN);
+    gpio_set(dev_conf->scl_pin);
+    gpio_init(dev_conf->scl_pin, GPIO_OUT);
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (!gpio_read(dev_conf->sda_pin)) {
+            printf("i2c.c: i2c bus hangup detected for bus #%u"
+                " with configuration at 0x%08"PRIx32", recovering...\n",
+                dev_num, (uint32_t)dev_conf);
+        }
+        else {
+            printf("i2c.c: i2c bus #%u with configuration at"
+                " 0x%08"PRIx32" is ok\n", dev_num, (uint32_t)dev_conf);
+        }
+    }
+
+    /* check & conditionally try to recover bus */
+    int max_cycles = 10; /* 9 clock cycles should be enough for making
+                          * any device that holds the SDA line in low
+                          * release the line. Actual number of cyccles may
+                          * vary depending on the device state.
+                          * The 10th cycle was added in case the first cycle
+                          * was not accepted by a device.
+                          */
+    while (gpio_read(dev_conf->sda_pin) == 0 && max_cycles--) {
+        gpio_clear(dev_conf->scl_pin);
+        busy_wait_us(50);
+        gpio_set(dev_conf->scl_pin);
+        busy_wait_us(50);
+    }
+
+    bool success = !!gpio_read(dev_conf->sda_pin);
+
+    if (IS_ACTIVE(ENABLE_DEBUG) && !success) {
+        DEBUG("i2c.c: i2c recovery failed for bus #%u\n", dev_num);
+    }
+
+    if (initialized) {
+        /* reconfigure pins for i2c */
+        gpio_init_mux(dev_conf->scl_pin, dev_conf->mux);
+        gpio_init_mux(dev_conf->sda_pin, dev_conf->mux);
+
+        /* reset bus state */
+        dev_conf->dev->STATUS.reg = BUSSTATE_IDLE;
+        _syncbusy(dev_conf->dev);
+    }
+
+    return success;
+}
+
+
 void i2c_init(i2c_t dev)
 {
     uint32_t timeout_counter = 0;
@@ -103,6 +191,11 @@ void i2c_init(i2c_t dev)
 
     const uint32_t fSCL = i2c_config[dev].speed;
     const uint32_t fGCLK = sam0_gclk_freq(i2c_config[dev].gclk_src);
+
+    /* initial check if bus is blocked & resolve attempt */
+    if (!_check_and_unblock_bus(&i2c_config[dev], false)) {
+        DEBUG("i2c.c: bus #%u is blocked - init will continue\n", dev);
+    }
 
     /* Initialize mutex */
     mutex_init(&locks[dev]);
@@ -121,12 +214,12 @@ void i2c_init(i2c_t dev)
 
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
-        DEBUG("STATUS_ERR_DENIED\n");
+        DEBUG_PUTS("i2c.c: STATUS_ERR_DENIED");
         return;
     }
     /* Check if reset is in progress. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_SWRST) {
-        DEBUG("STATUS_BUSY\n");
+        DEBUG_PUTS("i2c.c: STATUS_BUSY");
         return;
     }
 
@@ -329,48 +422,105 @@ void _i2c_poweroff(i2c_t dev)
 static int _i2c_start(SercomI2cm *dev, uint16_t addr)
 {
     /* Wait for hardware module to sync */
-    DEBUG("Wait for device to be ready\n");
+    DEBUG_PUTS("i2c.c: Wait for device to be ready");
     _syncbusy(dev);
 
     /* Set action to ACK. */
     dev->CTRLB.reg &= ~SERCOM_I2CM_CTRLB_ACKACT;
 
     /* Send Start | Address | Write/Read */
-    DEBUG("Generate start condition by sending address\n");
+    DEBUG("i2c.c: Generate start condition by sending address 0x%04"PRIu16"\n",
+            addr);
     dev->ADDR.reg = addr;
 
-    /* Wait for response on bus. */
-    if (addr & I2C_READ) {
-        /* Some devices (e.g. SHT2x) can hold the bus while
-        preparing the reply */
-        if (_wait_for_response(dev, 100 * SAMD21_I2C_TIMEOUT) < 0)
-            return -ETIMEDOUT;
-    }
-    else {
-        if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0)
-            return -ETIMEDOUT;
-    }
+    /* Wait for response on bus.
+     * Some devices (e.g. SHT2x) can hold the bus while
+     * preparing the reply. */
+    uint32_t timeout = (addr & I2C_READ) ? 100 * SAMD21_I2C_TIMEOUT : SAMD21_I2C_TIMEOUT;
+    int res = _wait_for_response(dev, timeout);
 
-    /* Check for address response error unless previous error is detected. */
-    /* Check for error and ignore bus-error; workaround for BUSSTATE
-     * stuck in BUSY */
-    if (dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB) {
-        /* Clear write interrupt flag */
-        dev->INTFLAG.reg = SERCOM_I2CM_INTFLAG_SB;
-        /* Check arbitration. */
-        if (dev->STATUS.reg & SERCOM_I2CM_STATUS_ARBLOST) {
-            DEBUG("STATUS_ERR_PACKET_COLLISION\n");
-            return -EAGAIN;
+    /* Ignore dev->INTFLAG.bit.ERROR as it does not seem to get set
+     * in the current configuration of the SERCOM module.
+     */
+    bool any_error = dev->STATUS.reg & (
+            SERCOM_I2CM_STATUS_SEXTTOUT /* XXX: do we need this? */ |
+            SERCOM_I2CM_STATUS_ARBLOST | SERCOM_I2CM_STATUS_BUSERR
+            /* not included as always active (hardware bug?) in the
+             * current configuration:
+             * SERCOM_I2CM_STATUS_MEXTTOUT, SERCOM_I2CM_STATUS_LOWTOUT
+             *
+             * not included as only useful with DMA:
+             * SERCOM_I2CM_STATUS_LENERR
+             */
+        ) || (
+            /* bus state should not be unknown at this point */
+            (dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN
+        ) || (
+            /* we don't handle multi-master layouts and treat this as error */
+            (dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_BUSY
+        ) ||
+        (
+            /* slave busy or address not on bus */
+            dev->STATUS.reg & SERCOM_I2CM_STATUS_RXNACK
+        ) || res;
+
+    /* handle errors */
+    if (any_error) {
+        bool unblock_bus = false;
+
+        DEBUG("i2c.c: error: res=%d, INTFLAG=0x%04"PRIu32", STATUS=0x%04"PRIu32"\n",
+            res,
+            (unsigned long)dev->INTFLAG.reg,
+            (unsigned long)dev->STATUS.reg);
+
+        if (res) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_TIMEOUT");
+            unblock_bus = true;
+        }
+        else if (dev->STATUS.bit.BUSSTATE == BUSSTATE_BUSY) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_BUS_BUSY");
+            unblock_bus = true;
+            res = -EAGAIN;
+        }
+        else if (dev->STATUS.bit.BUSSTATE == BUSSTATE_UNKNOWN) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_BUS_BUSY");
+            unblock_bus = true;
+            res = -EIO;
+        }
+        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSERR) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_BUSERR");
+            unblock_bus = true;
+            res = -EIO;
+        }
+        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_RXNACK) {
+            /* send ack + stop condition to reset bus */
+            dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
+            _syncbusy(dev);
+            DEBUG_PUTS("i2c.c: STATUS_ERR_BUSY_OR_BAD_ADDRESS");
+            res = -ENXIO;
+        }
+        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_ARBLOST) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_ARBLOST");
+            res = -EAGAIN;
+        }
+        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_SEXTTOUT) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_SEXTTOUT");
+            res = -ETIMEDOUT;
+        }
+
+        if (unblock_bus) {
+            _check_and_unblock_bus(config(dev), true);
         }
     }
-    /* Check that slave responded with ack. */
-    else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_RXNACK) {
-        /* Slave busy. Issue ack and stop command. */
-        dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
-        DEBUG("STATUS_ERR_BAD_ADDRESS\n");
-        return -ENXIO;
-    }
-    return 0;
+
+    /* Reset flags */
+    dev->INTFLAG.reg = SERCOM_I2CM_INTFLAG_MB & SERCOM_I2CM_INTFLAG_SB &
+        SERCOM_I2CM_INTFLAG_ERROR;
+    dev->STATUS.reg &= SERCOM_I2CM_STATUS_LENERR | SERCOM_I2CM_STATUS_SEXTTOUT |
+        SERCOM_I2CM_STATUS_MEXTTOUT | SERCOM_I2CM_STATUS_LOWTOUT |
+        SERCOM_I2CM_STATUS_ARBLOST | SERCOM_I2CM_STATUS_BUSERR;
+
+    return res;
 }
 
 static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
@@ -467,13 +617,17 @@ static inline int _wait_for_response(SercomI2cm *dev,
                                      uint32_t max_timeout_counter)
 {
     uint32_t timeout_counter = 0;
-    DEBUG("Wait for response.\n");
+    DEBUG_PUTS("i2c.c: Waiting for MB/SB flag or timeout.");
     while (!(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB)
            && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
         if (++timeout_counter >= max_timeout_counter) {
-            DEBUG("STATUS_ERR_TIMEOUT\n");
+            DEBUG("i2c.c: STATUS_ERR_TIMEOUT");
             return -ETIMEDOUT;
         }
     }
+
+    DEBUG("i2c.c: %s on bus\n",
+            (dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_MB) ? "master" : "slave");
+
     return 0;
 }
