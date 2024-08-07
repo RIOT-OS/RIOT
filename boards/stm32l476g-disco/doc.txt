@@ -13,6 +13,10 @@ ROM Flash.
 
 ![STM32L476G-DISCO](https://www.st.com/bin/ecommerce/api/image.PF261635.en.feature-description-include-personalized-no-cpn-medium.jpg)
 
+## Pinout
+
+@image html pinouts/stm32l476g-disco.svg "Pinout for the stm32l476g-disco (from STM board manual)" width=50%
+
 ### MCU
 
 | MCU        |   STM32L476VG      |
