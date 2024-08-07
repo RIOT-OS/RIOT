@@ -41,6 +41,13 @@ Test *tests_mac_hmac_sha512(void);
  */
 Test *tests_mac_hmac_sha384(void);
 
+/**
+ * @brief   Generates HMAC SHA256 tests for generic HMAC
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_mac_hmac_sha256(void);
+
 #ifdef __cplusplus
 }
 #endif

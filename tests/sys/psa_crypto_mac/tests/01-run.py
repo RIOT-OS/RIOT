@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
-from testrunner import run
-
-
-def testfunc(child):
-    child.expect_exact('All Done')
-    print("[TEST PASSED]")
+from testrunner import run_check_unittests
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    sys.exit(run_check_unittests())
