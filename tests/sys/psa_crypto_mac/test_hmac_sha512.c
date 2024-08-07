@@ -55,7 +55,7 @@ static void test_hmac_sha512(const uint8_t *key, size_t key_len,
     psa_key_id_t key_handle = 0;
 
     psa_set_key_algorithm(&attributes, PSA_ALG_HMAC(PSA_ALG_SHA_512));
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH);
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_bits(&attributes, PSA_BYTES_TO_BITS(key_len));
     psa_set_key_type(&attributes, PSA_KEY_TYPE_HMAC);
 
