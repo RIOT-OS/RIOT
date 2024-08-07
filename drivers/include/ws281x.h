@@ -42,6 +42,15 @@
  * The ESP32 implementation is frequency independent, as frequencies above 80MHz
  * are high enough to support bit banging without assembly.
  *
+ * ## STM32
+ *
+ * The STM32 implementation is frequency dependent and currently only supported
+ * for 84, 100 and 180 MHz MCUs of the STM32f4 family. Support for the STM32f7
+ * family is coming soon... The number of NOPs required was determined using a
+ * saleae logic analyzer.
+ *
+ * @warning Since this is bit banged an interrupt can destroy the timing.
+ *
  * ## Native/VT100
  *
  * The native (VT100) implementation writes the LED state to the console.
@@ -68,6 +77,11 @@
  * * the ESP32 backend:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
  * USEMODULE += ws281x_esp32
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * * the STM32 backend:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
+ * USEMODULE += ws281x_stm32
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * * the native/VT100 backend:
