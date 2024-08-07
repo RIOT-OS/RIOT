@@ -1801,7 +1801,7 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
         return status;
     }
 
-    status = psa_get_and_lock_key_slot_with_policy(key, &slot, attr.policy.usage, alg);
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_SIGN_MESSAGE, alg);
     if (status != PSA_SUCCESS) {
         unlock_status = psa_unlock_key_slot(slot);
         if (unlock_status != PSA_SUCCESS) {
@@ -1847,7 +1847,7 @@ psa_status_t psa_mac_verify(psa_key_id_t key,
         return status;
     }
 
-    status = psa_get_and_lock_key_slot_with_policy(key, &slot, attr.policy.usage, alg);
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_VERIFY_MESSAGE, alg);
     if (status != PSA_SUCCESS) {
         return status;
     }
@@ -1884,7 +1884,7 @@ psa_status_t psa_mac_sign_setup(psa_mac_operation_t *operation,
         return status;
     }
 
-    status = psa_get_and_lock_key_slot_with_policy(key, &slot, attr.policy.usage, alg);
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_SIGN_MESSAGE, alg);
     if (status != PSA_SUCCESS) {
         return status;
     }
@@ -1920,7 +1920,7 @@ psa_status_t psa_mac_verify_setup(psa_mac_operation_t *operation,
         return status;
     }
 
-    status = psa_get_and_lock_key_slot_with_policy(key, &slot, attr.policy.usage, alg);
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_VERIFY_MESSAGE, alg);
     if (status != PSA_SUCCESS) {
         return status;
     }
