@@ -554,7 +554,7 @@ void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
             dev[i]->SWTRIG.reg = ADC_SWTRIG_START;
         }
 
-        for (size_t s = 0; s < buf_len; s += 2) {
+        for (size_t s = 0; s < buf_len; s += 1) {
             /* Wait for the result */
             while (!(dev[0]->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
             dev[0]->INTFLAG.reg = ADC_INTFLAG_RESRDY;
