@@ -179,6 +179,7 @@ FEATURES_EXISTING := \
     periph_gpio_ll_open_source \
     periph_gpio_ll_open_source_pull_down \
     periph_gpio_ll_switch_dir \
+    periph_gpio_ll_switch_pull \
     periph_gpio_tamper_wake \
     periph_hash_md5 \
     periph_hash_sha3_256 \

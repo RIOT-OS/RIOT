@@ -977,6 +977,64 @@ static void test_switch_dir(void)
     expect(test_passed);
 }
 
+static void test_switch_pull(void)
+{
+    puts_optional("\n"
+         "Testing Switching Pull Config\n"
+         "=============================\n");
+
+    uword_t mask_out = 1U << PIN_OUT_0;
+    uword_t switch_mask = gpio_ll_prepare_switch_pull(mask_out);
+    uword_t mask_in = 1U << PIN_IN_0;
+
+    /* floating input must be supported by every MCU */
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
+    expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_in));
+
+    if (IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_UP)) {
+        puts_optional("Checking if switching to pull up works ...");
+        gpio_ll_switch_pull_up(port_out, switch_mask);
+
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        expect(conf.pull == GPIO_PULL_UP);
+
+        ztimer_sleep(ZTIMER_USEC, US_PER_MS);
+
+        /* both connected pins should read high due to the pull up */
+        for (unsigned i = 0; i < 100; i++) {
+            expect(gpio_ll_read(port_in) & mask_in);
+            expect(gpio_ll_read(port_out) & mask_out);
+        }
+
+        puts_optional("[OK]");
+    }
+
+    if (IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_DOWN)) {
+        puts_optional("Checking if switching to pull down works ...");
+        gpio_ll_switch_pull_down(port_out, switch_mask);
+
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        expect(conf.pull == GPIO_PULL_DOWN);
+
+        ztimer_sleep(ZTIMER_USEC, US_PER_MS);
+
+        /* both connected pins should read high low to the pull down */
+        for (unsigned i = 0; i < 100; i++) {
+            expect(!(gpio_ll_read(port_in) & mask_in));
+            expect(!(gpio_ll_read(port_out) & mask_out));
+        }
+        puts_optional("[OK]");
+    }
+
+    puts_optional("Checking if switching to floating works ...");
+    gpio_ll_switch_pull_off(port_out, switch_mask);
+
+    gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    expect(conf.pull == GPIO_FLOATING);
+
+    puts_optional("[OK]");
+}
+
 int main(void)
 {
     print_details();
@@ -989,6 +1047,10 @@ int main(void)
 
     if (IS_USED(MODULE_PERIPH_GPIO_LL_SWITCH_DIR)) {
         test_switch_dir();
+    }
+
+    if (IS_USED(MODULE_PERIPH_GPIO_LL_SWITCH_PULL)) {
+        test_switch_pull();
     }
 
     /* if no expect() didn't blow up until now, the test is passed */

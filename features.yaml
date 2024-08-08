@@ -570,6 +570,9 @@ groups:
               mode is not supported. Another use case is controlling GPIOs
               at high speed with three output states (high, low, high impedance),
               as e.g. needed for Charlieplexing
+      - name: periph_gpio_ll_switch_pull
+        help: The GPIO LL driver allows switching pull resistor configuration
+              in an efficient manner.
 
   - title: Serial Interfaces
     help: Features related to serial interfaces

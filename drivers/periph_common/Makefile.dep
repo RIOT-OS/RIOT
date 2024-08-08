@@ -12,3 +12,4 @@ FEATURES_OPTIONAL += periph_gpio_ll_open_drain_pull_up
 FEATURES_OPTIONAL += periph_gpio_ll_open_source
 FEATURES_OPTIONAL += periph_gpio_ll_open_source_pull_down
 FEATURES_OPTIONAL += periph_gpio_ll_switch_dir
+FEATURES_OPTIONAL += periph_gpio_ll_switch_pull

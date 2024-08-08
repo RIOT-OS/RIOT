@@ -746,6 +746,22 @@ static inline uword_t gpio_ll_prepare_switch_dir(uword_t mask)
 }
 #endif
 
+#if defined(DOXYGEN) || !defined(HAVE_GPIO_LL_PREPARE_SWITCH_PULL)
+/**
+ * @brief       Prepare bitmask for use with @ref gpio_ll_switch_pull_up ,
+ *              @ref gpio_ll_switch_pull_down and @reg gpio_ll_switch_pull_off
+ * @param[in]   mask    bitmask specifying the pins to switch the direction pull
+ *                      configuration
+ *
+ * @return      Value to use in @ref gpio_ll_switch_pull_up ,
+ *              @ref gpio_ll_switch_pull_down and @ref gpio_ll_switch_pull_off
+ */
+static inline uword_t gpio_ll_prepare_switch_pull(uword_t mask)
+{
+    return mask;
+}
+#endif
+
 /**
  * @brief       Turn GPIO pins specified by @p pins (obtained from
  *              @ref gpio_ll_prepare_switch_dir) to outputs
@@ -777,6 +793,55 @@ static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t pins);
  *              just after this call.
  */
 static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t pins);
+
+/**
+ * @brief       Enables the internal pull up resistors for GPIO pins specified
+ *              by @p pins (obtained from @ref gpio_ll_prepare_switch_pull)
+ *
+ * @param[in]   port        GPIO port to modify
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_pull
+ * @pre         The feature `gpio_ll_switch_pull` is available
+ * @pre         The feature `periph_gpio_ll_input_pull_up` is provided and the
+ *              pins are in input mode. Some MCUs that provide the feature
+ *              `periph_gpio_ll_open_drain_pull_up` may also allow
+ *              enabling pull ups on open drain pins with this function.
+ *
+ * If an MCU would allow enabling both pull up and pull down resistors
+ * at the same time, the driver will make sure to disable the pull
+ * down resistors on the pins specified by @p pins.
+ */
+static inline void gpio_ll_switch_pull_up(gpio_port_t port, uword_t pins);
+
+/**
+ * @brief       Enables the internal pull down resistors for GPIO pins specified
+ *              by @p pins (obtained from @ref gpio_ll_prepare_switch_pull)
+ *
+ * @param[in]   port        GPIO port to modify
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_pull
+ * @pre         The feature `gpio_ll_switch_pull` is available
+ * @pre         The feature `periph_gpio_ll_input_pull_down` is provided and
+ *              the pins are in input mode. Some MCUs that provide the feature
+ *              `periph_gpio_ll_open_source_pull_down` may also allow
+ *              enabling pull downs on open source pins with this function.
+ *
+ * If an MCU would allow enabling both pull up and pull down resistors
+ * at the same time, the driver will make sure to disable the pull
+ * up resistors on the pins specified by @p pins.
+ */
+static inline void gpio_ll_switch_pull_down(gpio_port_t port, uword_t pins);
+
+/**
+ * @brief       Disables the internal pull resistors for GPIO pins specified
+ *              by @p pins (obtained from @ref gpio_ll_prepare_switch_pull)
+ *
+ * @param[in]   port        GPIO port to modify
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_pull
+ * @pre         The feature `gpio_ll_switch_pull` is available
+ * @pre         The pins are in input mode. Some MCUs that allow using pull
+ *              resistors with other modes than input mode may also allow
+ *              disabling the pull resistors with this function.
+ */
+static inline void gpio_ll_switch_pull_off(gpio_port_t port, uword_t pins);
 
 /**
  * @brief   Perform a masked write operation on the I/O register of the port
@@ -889,6 +954,31 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 }
 
 #endif /* !MODULE_PERIPH_GPIO_LL_SWITCH_DIR */
+#if !MODULE_PERIPH_GPIO_LL_SWITCH_PULL
+static inline void gpio_ll_switch_pull_up(gpio_port_t port, uword_t pins)
+{
+    (void)port;
+    (void)pins;
+    extern void gpio_ll_switch_pull_up_used_but_feature_gpio_ll_switch_pull_is_not_provided(void);
+    gpio_ll_switch_pull_up_used_but_feature_gpio_ll_switch_pull_is_not_provided();
+}
+
+static inline void gpio_ll_switch_pull_down(gpio_port_t port, uword_t pins)
+{
+    (void)port;
+    (void)pins;
+    extern void gpio_ll_switch_pull_down_used_but_feature_gpio_ll_switch_pull_is_not_provided(void);
+    gpio_ll_switch_pull_down_used_but_feature_gpio_ll_switch_pull_is_not_provided();
+}
+
+static inline void gpio_ll_switch_pull_off(gpio_port_t port, uword_t pins)
+{
+    (void)port;
+    (void)pins;
+    extern void gpio_ll_switch_pull_off_used_but_feature_gpio_ll_switch_pull_is_not_provided(void);
+    gpio_ll_switch_pull_off_used_but_feature_gpio_ll_switch_pull_is_not_provided();
+}
+#endif /* !MODULE_PERIPH_GPIO_LL_SWITCH_PULL */
 #endif /* !DOXYGEN */
 
 #ifdef __cplusplus
