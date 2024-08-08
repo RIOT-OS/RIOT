@@ -142,6 +142,31 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
     p->ODR = value;
 }
 
+#ifdef MODULE_PERIPH_GPIO_LL_SWITCH_DIR
+static inline uword_t gpio_ll_prepare_switch_dir(uword_t mask)
+{
+    /* implementation too large to always inline */
+    extern uword_t gpio_ll_prepare_switch_dir_impl(uword_t mask);
+    return gpio_ll_prepare_switch_dir_impl(mask);
+}
+
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    p->MODER |= pins;
+    irq_restore(irq_state);
+}
+
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    p->MODER &= ~pins;
+    irq_restore(irq_state);
+}
+#endif
+
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
     return pin & 0xfffffff0LU;

@@ -905,6 +905,7 @@ static void test_switch_dir(void)
          "===========================\n");
 
     uword_t mask_out = 1U << PIN_OUT_0;
+    uword_t pins_out = gpio_ll_prepare_switch_dir(mask_out);
     uword_t mask_in = 1U << PIN_IN_0;
 
     /* floating input must be supported by every MCU */
@@ -924,7 +925,7 @@ static void test_switch_dir(void)
     uword_t out_state = gpio_ll_read_output(port_out);
 
     /* now, switch to output mode and verify the switch */
-    gpio_ll_switch_dir_output(port_out, mask_out);
+    gpio_ll_switch_dir_output(port_out, pins_out);
     conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
     test_passed = (conf.state == GPIO_OUTPUT_PUSH_PULL);
     printf_optional("Input pin can be switched to output (push-pull) mode: %s\n",
@@ -932,15 +933,17 @@ static void test_switch_dir(void)
     expect(test_passed);
 
     gpio_ll_clear(port_out, mask_out);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = (0 == (gpio_ll_read(port_in) & mask_in));
     gpio_ll_set(port_out, mask_out);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = test_passed && (gpio_ll_read(port_in) & mask_in);
     printf_optional("Pin behaves as output after switched to output mode: %s\n",
                     noyes[test_passed]);
     expect(test_passed);
 
     /* switch back to input mode */
-    gpio_ll_switch_dir_input(port_out, mask_out);
+    gpio_ll_switch_dir_input(port_out, pins_out);
     /* restore out state from before the switch */
     gpio_ll_write(port_out, out_state);
     /* verify we are back at the old config */
@@ -964,8 +967,10 @@ static void test_switch_dir(void)
     expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_out));
 
     gpio_ll_clear(port_in, mask_in);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = (0 == (gpio_ll_read(port_out) & mask_out));
     gpio_ll_set(port_in, mask_in);
+    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = test_passed && (gpio_ll_read(port_out) & mask_out);
     printf_optional("Pin behaves as input after switched back to input mode: %s\n",
                     noyes[test_passed]);
