@@ -405,6 +405,28 @@ uword_t gpio_ll_prepare_switch_dir_impl(uword_t mask)
     return output;
 }
 
+/*
+ * When changing the pull configuration, we need to update the GPIOX->PUPDR,
+ * which for pins 0 to 3 looks like this:
+ *
+ *   7    6    5    4    3    2    1    0
+ * +---------+---------+---------+---------+
+ * |  PUPD3  |  PUPD2  |  PUPD1  |  PUPD0  |
+ * +---------+---------+---------+---------+
+ *
+ * Now we need to write the values `b00` (pull off), `0b01` (pull up), and
+ * `0b10` (pull down). We can prepare the bitmask the same way as for switching
+ * the direction: We use the bitmask as is to control the low bit and shifted
+ * left by one to control the high bit of the pull config.
+ *
+ * Hence, we just create an alias to not waste ROM.
+ *
+ * (Note: Creating a single function, e.g. named gpio_ll_prepare_switch_impl,
+ * will trigger a c2rust bug.)
+ */
+__attribute__((alias("gpio_ll_prepare_switch_dir_impl")))
+uword_t gpio_ll_prepare_switch_pull_impl(uword_t mask);
+
 gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
 {
     gpio_conf_t result = { 0 };

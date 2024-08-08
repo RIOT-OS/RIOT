@@ -167,6 +167,58 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t pins)
 }
 #endif
 
+#ifdef MODULE_PERIPH_GPIO_LL_SWITCH_PULL
+static inline uword_t gpio_ll_prepare_switch_pull(uword_t mask)
+{
+    /* implementation too large to always inline */
+    extern uword_t gpio_ll_prepare_switch_pull_impl(uword_t mask);
+    return gpio_ll_prepare_switch_pull_impl(mask);
+}
+
+static inline void gpio_ll_switch_pull_up(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    uint32_t pupdr = p->PUPDR;
+    /* clear the high bit in the two-bit PUPDx fields to disable the pull down,
+     * if needed */
+    pupdr &= ~(pins << 1);
+    /* set the low bit in the two-bit PUPDx fields to enable the pull up */
+    pupdr |= pins;
+    p->PUPDR = pupdr;
+    irq_restore(irq_state);
+}
+
+static inline void gpio_ll_switch_pull_down(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    uint32_t pupdr = p->PUPDR;
+    /* clear the low bit in the two-bit PUPDx fields to disable the pull up,
+     * if needed */
+    pupdr &= ~(pins);
+    /* set the high bit in the two-bit PUPDx fields to enable the pull down */
+    pupdr |= (pins << 1);
+    p->PUPDR = pupdr;
+    irq_restore(irq_state);
+}
+
+static inline void gpio_ll_switch_pull_off(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    uint32_t pupdr = p->PUPDR;
+    /* clear the low bit in the two-bit PUPDx fields to disable the pull up,
+     * if needed */
+    pupdr &= ~(pins);
+    /* clear the high bit in the two-bit PUPDx fields to disable the pull down,
+     * if needed */
+    pupdr &= ~(pins << 1);
+    p->PUPDR = pupdr;
+    irq_restore(irq_state);
+}
+#endif
+
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
     return pin & 0xfffffff0LU;
