@@ -13,6 +13,10 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 
 ![STM32L0538-DISCO](https://www.st.com/content/ccc/fragment/product_related/rpn_information/board_photo/group0/67/a2/3f/98/6b/24/4a/27/stm32l0538-discovery.jpg/files/stm32l0538-disco.jpg/_jcr_content/translations/en.stm32l0538-disco.jpg)
 
+## Pinout
+
+@image html pinouts/stm32l0538-disco.svg "Pinout for the stm32l0538-disco (from STM board manual)" width=50%
+
 ### MCU
 
 | MCU          | STM32L053C8
