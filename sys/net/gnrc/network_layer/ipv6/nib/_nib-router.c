@@ -105,9 +105,7 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
 {
     uint32_t now = evtimer_now_msec();
     gnrc_pktsnip_t *pio;
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(
-            _nib_onl_get_if(offl->next_hop)
-        );
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_offl_get_if(offl));
     uint8_t flags = 0;
     uint32_t valid_ltime = (offl->valid_until == UINT32_MAX) ? UINT32_MAX :
                            ((offl->valid_until - now) / MS_PER_SEC);
@@ -185,7 +183,7 @@ static gnrc_pktsnip_t *_add_rio(gnrc_netif_t *netif, gnrc_pktsnip_t *ext_opts, b
     while ((entry = _nib_offl_iter(entry))) {
 
         unsigned id = netif->pid;
-        if (_nib_onl_get_if(entry->next_hop) == id) {
+        if (_nib_offl_get_if(entry) == id) {
             continue;
         }
 
@@ -273,7 +271,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         }
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
         while ((pfx = _nib_abr_iter_pfx(abr, pfx))) {
-            if (_nib_onl_get_if(pfx->next_hop) == id) {
+            if (_nib_offl_get_if(pfx) == id) {
                 if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
                     return NULL;
                 }
