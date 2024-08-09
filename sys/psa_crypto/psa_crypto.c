@@ -641,11 +641,25 @@ psa_status_t psa_cipher_finish(psa_cipher_operation_t *operation,
                                size_t output_size,
                                size_t *output_length)
 {
-    (void)operation;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !output || !output_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (operation->iv_required && !operation->iv_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_cipher_finish(operation, output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        psa_cipher_abort(operation);
+    }
+    return status;
 }
 
 psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
@@ -679,7 +693,6 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
         return status;
     }
 
-    operation->iv_set = 1;
     *iv_length = iv_size;
 
     return status;
@@ -689,10 +702,28 @@ psa_status_t psa_cipher_set_iv(psa_cipher_operation_t *operation,
                                const uint8_t *iv,
                                size_t iv_length)
 {
-    (void)operation;
-    (void)iv;
-    (void)iv_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !iv) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!operation->iv_required || operation->iv_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_cipher_set_iv(operation, iv, iv_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    operation->iv_set = 1;
+
+    return status;
 }
 
 psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
@@ -702,13 +733,28 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
                                size_t output_size,
                                size_t *output_length)
 {
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !input || !output || !output_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (operation->iv_required && !operation->iv_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_cipher_update(operation, input, input_length, output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    operation->iv_set = 1;
+
+    return status;
 }
 
 #endif /* MODULE_PSA_CIPHER */
@@ -1016,6 +1062,11 @@ static psa_status_t psa_validate_unstructured_key_size(psa_key_type_t type, size
         break;
     case PSA_KEY_TYPE_HMAC:
         if (bits % 8 != 0) {
+            return PSA_ERROR_INVALID_ARGUMENT;
+        }
+        break;
+    case PSA_KEY_TYPE_CHACHA20:
+        if (bits != 256) {
             return PSA_ERROR_INVALID_ARGUMENT;
         }
         break;
@@ -1539,7 +1590,6 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
 
     if (PSA_KEY_TYPE_IS_UNSTRUCTURED(type)) {
         *bits = PSA_BYTES_TO_BITS(data_length);
-
         status = psa_validate_unstructured_key_size(type, *bits);
         if (status != PSA_SUCCESS) {
             return status;
