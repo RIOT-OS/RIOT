@@ -1101,6 +1101,30 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
         TEST_ASSERT_EQUAL_INT(exp_netif.cur_hl,
                               _mock_netif->cur_hl);
     }
+    {
+        /*
+         * > The Router Lifetime applies only to
+                 the router's usefulness as a default router; it
+                 does not apply to information contained in other
+                 message fields or options.
+         * - https://datatracker.ietf.org/doc/html/rfc4861#section-4.2
+         * So (after default router list was tested),
+         * send a RA with Router Lifetime value of zero.
+         * to test that _handle_rtr_timeout follows this behavior.
+         * If it doesn't, the following tests for RA options will fail.
+         */
+        icmpv6_len = _set_rtr_adv(&_rem_ll, NDP_HOP_LIMIT, 0U,
+                                  false, 0U,
+                                  _REACH_TIME, _RTR_LTIME,
+                                  NULL, sizeof(_rem_l2),
+                                  0U,
+                                  NULL, _LOC_GB_PFX_LEN,
+                                  0U,
+                                  _PIO_PFX_LTIME, _PIO_PFX_LTIME);
+        ndp_rtr_adv_t *rtr_adv = (ndp_rtr_adv_t *)icmpv6;
+        rtr_adv->ltime = byteorder_htons(0);
+        gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    }
     state = NULL;
     if (sl2ao) {
         TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_nc_iter(0, &state, &nce),
