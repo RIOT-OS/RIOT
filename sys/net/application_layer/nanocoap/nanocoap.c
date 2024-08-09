@@ -1163,8 +1163,9 @@ ssize_t coap_opt_add_block(coap_pkt_t *pkt, coap_block_slicer_t *slicer,
                            bool more, uint16_t option)
 {
     slicer->opt = pkt->payload;
+    slicer->obytes = coap_opt_add_uint(pkt, option, _slicer2blkopt(slicer, more));
 
-    return coap_opt_add_uint(pkt, option, _slicer2blkopt(slicer, more));
+    return slicer->obytes;
 }
 
 ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri)
@@ -1325,7 +1326,7 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
 }
 
-bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
+int coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
 {
     assert(slicer->opt);
 
@@ -1339,8 +1340,15 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
     uint32_t blkopt = _slicer2blkopt(slicer, more);
     size_t olen = _encode_uint(&blkopt);
 
-    coap_put_option(slicer->opt, option - delta, option, (uint8_t *)&blkopt, olen);
-    return more;
+    uint8_t obytes = coap_put_option(slicer->opt, option - delta, option,
+                                     (uint8_t *)&blkopt, olen);
+    if (obytes != slicer->obytes) {
+        /* if the option grew larger, we already corrupted content */
+        assert(obytes < slicer->obytes);
+        memmove(slicer->opt + obytes, slicer->opt + slicer->obytes,
+                1 + slicer->cur - slicer->obytes);
+    }
+    return slicer->obytes - obytes;
 }
 
 ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
