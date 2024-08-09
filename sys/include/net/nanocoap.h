@@ -1983,6 +1983,23 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len);
 
 /**
+ * @brief   Initialize a separate response PDU from a request PDU
+ *
+ * @param[in,out]   pkt         Response PDU to initialize
+ * @param[in]       type        Response type (CON or NON)
+ * @param[in]       code        Response code
+ * @param[out]      rbuf        Response buffer
+ * @param[in]       rlen        Size of response buffer
+ * @param[in]       payload_len Response payload length
+ *
+ * @returns     0 if no response should be sent due to a No-Response option in the request
+ * @returns     <0 on error
+ * @returns     -ENOSPC if @p rbuf too small
+ */
+ssize_t coap_build_separate_reply(coap_pkt_t *pkt, unsigned type, unsigned code,
+                                  uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+
+/**
  * @brief   Build empty reply to CoAP request
  *
  * This function can be used to create an empty ACK so that a later, separate
