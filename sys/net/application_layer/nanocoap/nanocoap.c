@@ -184,7 +184,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     return 0;
 }
 
-int coap_match_path(const coap_resource_t *resource, uint8_t *uri)
+int coap_match_path(const coap_resource_t *resource, const uint8_t *uri)
 {
     assert(resource && uri);
     int res;
