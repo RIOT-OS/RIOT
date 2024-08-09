@@ -47,6 +47,10 @@ void saul_init_devs(void)
         extern void auto_init_nrf_vddh(void);
         auto_init_nrf_vddh();
     }
+    if (IS_USED(MODULE_ABP2)) {
+        extern void auto_init_abp2(void);
+        auto_init_abp2();
+    }
     if (IS_USED(MODULE_AD7746)) {
         extern void auto_init_ad7746(void);
         auto_init_ad7746();
