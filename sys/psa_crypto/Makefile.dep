@@ -1,6 +1,11 @@
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
+ifneq (,$(filter riot-tee,$(USEPKG)))
+  USEMODULE += psa_tee_random
+  USEMODULE += psa_custom_random
+else
   USEMODULE += random
   USEMODULE += prng_sha256prng
+endif
 endif
 
 ifneq (,$(filter psa_persistent_storage, $(USEMODULE)))

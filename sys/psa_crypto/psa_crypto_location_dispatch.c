@@ -25,6 +25,10 @@
 #include "psa_crypto_se_management.h"
 #include "psa_crypto_se_driver.h"
 
+#if IS_USED(MODULE_PSA_CUSTOM_RANDOM)
+#include "psa_crypto_custom_random.h"
+#endif
+
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 #include "psa_crypto_slot_management.h"
 
@@ -470,5 +474,9 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
 psa_status_t psa_location_dispatch_generate_random(uint8_t *output,
                                                    size_t output_size)
 {
+#if IS_USED(MODULE_PSA_CUSTOM_RANDOM)
+    return psa_custom_generate_random(output, output_size);
+#else
     return psa_builtin_generate_random(output, output_size);
+#endif
 }

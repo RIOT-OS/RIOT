@@ -7,6 +7,9 @@ INCLUDES += -I$(RIOTBASE)/sys/include/psa_crypto
 
 backends = $(words $(filter $1_backend_%,$(USEMODULE)))
 
+# Random
+PSEUDOMODULES += psa_custom_random
+
 # Pseudomodules
 ## Asymmetric
 PSEUDOMODULES += psa_asymmetric
