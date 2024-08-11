@@ -46,6 +46,12 @@ ifneq (,$(filter psa_asymmetric_ecc_p192r1_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_ecc_p192r1
 endif
 
+
+ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_tee,$(USEMODULE)))
+  USEMODULE += psa_tee
+  USEMODULE += psa_tee_ecc_p256
+endif
+
 ## ECC_P256R1 backend
 ifneq (,$(filter psa_asymmetric_ecc_p256r1,$(USEMODULE)))
   ifeq (,$(filter psa_asymmetric_ecc_p256r1_custom_backend,$(USEMODULE)))
@@ -54,6 +60,8 @@ ifneq (,$(filter psa_asymmetric_ecc_p256r1,$(USEMODULE)))
     # HACK: Due to kconfig migration, may cause problems
     ifneq (,$(filter periph_ecc_p256r1,$(FEATURES_USED)))
       USEMODULE += psa_asymmetric_ecc_p256r1_backend_periph
+    else ifneq (,$(filter riot-tee,$(USEPKG)))
+      USEMODULE += psa_asymmetric_ecc_p256r1_backend_tee
     else
       USEMODULE += psa_asymmetric_ecc_p256r1_backend_microecc
     endif
