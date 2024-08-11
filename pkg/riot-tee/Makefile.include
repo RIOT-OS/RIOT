@@ -9,8 +9,8 @@ ifneq (,$(filter psa_tee_%, $(USEMODULE)))
   $(info $$INCLUDES is [$(INCLUDES)])
 endif
 
-ARCHIVES += $(BINDIR)/pkg-build/riot-tee/src/crypto/libriot_tee_crypto.a
 ARCHIVES += $(BINDIR)/pkg-build/riot-tee/ns_api/libriot_tee_ns_api.a
 
 PSEUDOMODULES += psa_tee_random
+PSEUDOMODULES += psa_tee_ecc_p256
 PSEUDOMODULES += psa_tee_hashes_sha256
