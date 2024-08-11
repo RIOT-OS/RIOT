@@ -41,10 +41,12 @@ void cpu_init(void)
     /* initialize hf clock */
     clock_init_hf();
 
-// #ifdef NVMC_ICACHECNF_CACHEEN_Msk
-//     /* enable instruction cache */
-//     NRF_NVMC_S->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
-// #endif
+#ifndef BOARD_NRF9160DK_NS
+#ifdef NVMC_ICACHECNF_CACHEEN_Msk
+    /* enable instruction cache */
+    NRF_NVMC_S->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
+#endif
+#endif /* BOARD_NRF9160DK_NS */
 
     /* call cortexm default initialization */
     cortexm_init();

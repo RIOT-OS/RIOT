@@ -22,13 +22,9 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-// #ifdef BOARD_NRF9160DK_NS
-// #include "nrf.h"
-// #else
 #include "vendor/nrf9160.h"
 #include "vendor/nrf9160_bitfields.h"
 #include "vendor/nrf9160_peripherals.h"
-// #endif
 
 #include "cpu_conf_common.h"
 

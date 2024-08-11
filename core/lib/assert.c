@@ -34,14 +34,12 @@ __NORETURN static inline void _assert_common(void)
 #ifdef DEBUG_ASSERT_BREAKPOINT
     DEBUG_BREAKPOINT(1);
 #endif
-#if IS_ACTIVE(MODULE_CORE_THREAD)
     if (DEBUG_ASSERT_NO_PANIC && !irq_is_in() && irq_is_enabled()) {
         puts("FAILED ASSERTION.");
         while (1) {
             thread_sleep();
         }
     }
-#endif
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 
