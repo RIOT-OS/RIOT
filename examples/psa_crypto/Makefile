@@ -113,7 +113,7 @@ else
 
   USEMODULE += psa_asymmetric
   USEMODULE += psa_asymmetric_ecc_p256r1
-  USEMODULE += psa_asymmetric_ecc_ed25519
+  # USEMODULE += psa_asymmetric_ecc_ed25519
 
 endif
 
