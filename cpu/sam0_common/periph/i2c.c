@@ -438,7 +438,8 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
     uint32_t timeout = (addr & I2C_READ) ? 100 * SAMD21_I2C_TIMEOUT : SAMD21_I2C_TIMEOUT;
     int res = _wait_for_response(dev, timeout);
 
-    /* According to section 36.6.2.4.2 of the SAMD51/SAME54 datasheet,
+    /* According to section 36.6.2.4.2 of the SAMD51/SAME54 datasheet
+     * (also confirmed for SAML21),
      * the following flags are meaningful in address transmission
      * and will be checked here:
      *
@@ -447,7 +448,8 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
      *   STATUS.BUSERR should also be set in this case
      *   according to the datasheet.
      * - STATUS.RXNACK: ACK not received after sending the address.
-     *   Addressed device is busy or not present.
+     *   Addressed device is busy or not present. This will also be set
+     *   with INTFLAG.MB.
      *
      * We further generally check for BUSERR and unexpected bus states.
      *
@@ -466,9 +468,10 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
     uint16_t status = dev->STATUS.reg;
     bool any_error = res ||
         (
-            (status & SERCOM_I2CM_STATUS_ARBLOST) && (intflag & SERCOM_I2CM_INTFLAG_MB)
+            (intflag & SERCOM_I2CM_INTFLAG_MB) &&
+            (status & (SERCOM_I2CM_STATUS_ARBLOST | SERCOM_I2CM_STATUS_RXNACK))
         ) || (
-            status & (SERCOM_I2CM_STATUS_BUSERR | SERCOM_I2CM_STATUS_RXNACK)
+            status & SERCOM_I2CM_STATUS_BUSERR
         ) || (
             (status & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN
         ) || (
@@ -496,7 +499,8 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
             unblock_bus = true;
             res = -EIO;
         }
-        else if (status & SERCOM_I2CM_STATUS_ARBLOST) {
+        else if ((intflag & SERCOM_I2CM_INTFLAG_MB) &&
+                (status & SERCOM_I2CM_STATUS_ARBLOST)) {
             DEBUG_PUTS("i2c.c: STATUS_ERR_ARBLOST");
             res = -EAGAIN;
         }
@@ -506,7 +510,8 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
             unblock_bus = true;
             res = -EIO;
         }
-        else if (status & SERCOM_I2CM_STATUS_RXNACK) {
+        else if ((intflag & SERCOM_I2CM_INTFLAG_MB) &&
+                (status & SERCOM_I2CM_STATUS_RXNACK)) {
             /* datasheet recommends: send ack + stop condition */
             dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
             _syncbusy(dev);
