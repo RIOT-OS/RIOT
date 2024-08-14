@@ -181,7 +181,6 @@ static bool _check_and_unblock_bus(const i2c_conf_t *dev_conf, bool initialized)
     return success;
 }
 
-
 void i2c_init(i2c_t dev)
 {
     uint32_t timeout_counter = 0;
@@ -439,73 +438,80 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
     uint32_t timeout = (addr & I2C_READ) ? 100 * SAMD21_I2C_TIMEOUT : SAMD21_I2C_TIMEOUT;
     int res = _wait_for_response(dev, timeout);
 
-    /* Ignore dev->INTFLAG.bit.ERROR as it does not seem to get set
-     * in the current configuration of the SERCOM module.
+    /* According to section 36.6.2.4.2 of the SAMD51/SAME54 datasheet,
+     * the following flags are meaningful in address transmission
+     * and will be checked here:
+     *
+     * - STATUS.ARBLOST: Arbitration lost, which should be
+     *   considered when INTFLAG.MB is set.
+     *   STATUS.BUSERR should also be set in this case
+     *   according to the datasheet.
+     * - STATUS.RXNACK: ACK not received after sending the address.
+     *   Addressed device is busy or not present.
+     *
+     * We further generally check for BUSERR and unexpected bus states.
+     *
+     * We ignore dev->INTFLAG.bit.ERROR altogehter as it does not
+     * seem to get set in the current configuration of the SERCOM module
+     * (this finding applies to SAME54 / SAMD51 devices).
+     *
+     * We ignore the three timeout flags in the status register:
+     * SERCOM_I2CM_STATUS_MEXTTOUT, SERCOM_I2CM_STATUS_LOWTOUT
+     * SERCOM_I2CM_STATUS_SEXTTOUT.
+     *
+     * We further ignore SERCOM_I2CM_STATUS_LENERR (useful in 32 bit
+     * mode and with DMA, not related to address transmission).
      */
-    bool any_error = dev->STATUS.reg & (
-            SERCOM_I2CM_STATUS_SEXTTOUT /* XXX: do we need this? */ |
-            SERCOM_I2CM_STATUS_ARBLOST | SERCOM_I2CM_STATUS_BUSERR
-            /* not included as always active (hardware bug?) in the
-             * current configuration:
-             * SERCOM_I2CM_STATUS_MEXTTOUT, SERCOM_I2CM_STATUS_LOWTOUT
-             *
-             * not included as only useful with DMA:
-             * SERCOM_I2CM_STATUS_LENERR
-             */
-        ) || (
-            /* bus state should not be unknown at this point */
-            (dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN
-        ) || (
-            /* we don't handle multi-master layouts and treat this as error */
-            (dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_BUSY
-        ) ||
+    uint16_t intflag = dev->INTFLAG.reg;
+    uint16_t status = dev->STATUS.reg;
+    bool any_error = res ||
         (
-            /* slave busy or address not on bus */
-            dev->STATUS.reg & SERCOM_I2CM_STATUS_RXNACK
-        ) || res;
+            (status & SERCOM_I2CM_STATUS_ARBLOST) && (intflag & SERCOM_I2CM_INTFLAG_MB)
+        ) || (
+            status & (SERCOM_I2CM_STATUS_BUSERR | SERCOM_I2CM_STATUS_RXNACK)
+        ) || (
+            (status & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN
+        ) || (
+            (status & SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_BUSY
+        );
 
     /* handle errors */
     if (any_error) {
         bool unblock_bus = false;
 
-        DEBUG("i2c.c: error: res=%d, INTFLAG=0x%04"PRIu32", STATUS=0x%04"PRIu32"\n",
-            res,
-            (unsigned long)dev->INTFLAG.reg,
-            (unsigned long)dev->STATUS.reg);
+        DEBUG("i2c.c: error: res=%d, INTFLAG=0x%04"PRIx16", STATUS=0x%04"PRIx16"\n",
+            res, dev->INTFLAG.reg, dev->STATUS.reg);
 
         if (res) {
             DEBUG_PUTS("i2c.c: STATUS_ERR_TIMEOUT");
             unblock_bus = true;
         }
-        else if (dev->STATUS.bit.BUSSTATE == BUSSTATE_BUSY) {
+        else if ((status & SERCOM_I2CM_STATUS_BUSSTATE_Msk) & BUSSTATE_BUSY) {
             DEBUG_PUTS("i2c.c: STATUS_ERR_BUS_BUSY");
             unblock_bus = true;
             res = -EAGAIN;
         }
-        else if (dev->STATUS.bit.BUSSTATE == BUSSTATE_UNKNOWN) {
-            DEBUG_PUTS("i2c.c: STATUS_ERR_BUS_BUSY");
+        else if ((status & SERCOM_I2CM_STATUS_BUSSTATE_Msk) & BUSSTATE_UNKNOWN) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_BUS_STATE_UNKNOWN");
             unblock_bus = true;
             res = -EIO;
         }
-        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSERR) {
+        else if (status & SERCOM_I2CM_STATUS_ARBLOST) {
+            DEBUG_PUTS("i2c.c: STATUS_ERR_ARBLOST");
+            res = -EAGAIN;
+        }
+        else if (status & SERCOM_I2CM_STATUS_BUSERR) {
+            /* a bus error not related to a lost arbitration */
             DEBUG_PUTS("i2c.c: STATUS_ERR_BUSERR");
             unblock_bus = true;
             res = -EIO;
         }
-        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_RXNACK) {
-            /* send ack + stop condition to reset bus */
+        else if (status & SERCOM_I2CM_STATUS_RXNACK) {
+            /* datasheet recommends: send ack + stop condition */
             dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
             _syncbusy(dev);
             DEBUG_PUTS("i2c.c: STATUS_ERR_BUSY_OR_BAD_ADDRESS");
             res = -ENXIO;
-        }
-        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_ARBLOST) {
-            DEBUG_PUTS("i2c.c: STATUS_ERR_ARBLOST");
-            res = -EAGAIN;
-        }
-        else if (dev->STATUS.reg & SERCOM_I2CM_STATUS_SEXTTOUT) {
-            DEBUG_PUTS("i2c.c: STATUS_ERR_SEXTTOUT");
-            res = -ETIMEDOUT;
         }
 
         if (unblock_bus) {
