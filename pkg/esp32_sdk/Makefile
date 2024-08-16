@@ -1,7 +1,7 @@
 PKG_NAME=esp32_sdk
 PKG_URL=https://github.com/espressif/esp-idf
-# v4.4.1
-PKG_VERSION=1329b19fe494500aeb79d19b27cfd99b40c37aec
+# v4.4.2
+PKG_VERSION=1b16ef6cfc2479a08136782f9dc57effefa86f66
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
