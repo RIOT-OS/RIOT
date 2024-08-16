@@ -26,6 +26,7 @@
 #define XFA_H
 
 #include <inttypes.h>
+#include "architecture.h"
 #include "compiler_hints.h"
 
 /*
@@ -45,7 +46,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define _XFA(name, prio) \
     NO_SANITIZE_ARRAY \
-    __attribute__((used, section(".xfa." #name "." #prio)))
+    __attribute__((used, section(".xfa." #name "." #prio), aligned(ARCHITECTURE_WORD_BYTES)))
 
 /**
  * @brief helper macro for other XFA_* macros
@@ -54,7 +55,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define _XFA_CONST(name, prio) \
     NO_SANITIZE_ARRAY \
-    __attribute__((used, section(".roxfa." #name "." #prio)))
+    __attribute__((used, section(".roxfa." #name "." #prio), aligned(ARCHITECTURE_WORD_BYTES)))
 
 /**
  * @brief Define a read-only cross-file array
@@ -138,6 +139,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
+ * @warning The `driver_params_t` struct must be aligned with the word size
+ *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
  */
@@ -151,6 +154,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * Add this to the type in a variable definition, e.g.:
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
+ *
+ * @warning The `driver_params_t` struct must be aligned with the word size
  *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
