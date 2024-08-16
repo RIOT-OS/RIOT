@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.drivers_common
 
 # default expander is MCP23017
 DRIVER ?= mcp23x17_i2c

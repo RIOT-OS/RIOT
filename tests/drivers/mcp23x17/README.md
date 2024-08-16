@@ -2,8 +2,9 @@
 
 ## Overview
 
-This test appliation demonstrates the usage of the MCP23x17 driver interface
-and can be used to test each MCP23x17 expander I/O pin with shell commands.
+This test application demonstrates the usage of the MCP23x17 driver
+interface and can be used to test each MCP23x17 expander I/O pin with shell
+commands.
 
 The application bases on the test application for GPIO peripheral drivers
 which is under following copyright:
@@ -18,7 +19,7 @@ the variable `DRIVER` using the corresponding pseudomodules `mcp23017`,
 `mcp23s17`, `mcp23017_i2c` and/or `mcp23017_spi`, for example:
 
 ```
-DRIVER='mcp23x17_i2c mcp23x17_spi' BOARD=... make -C tests/driver_mcp23x17 flash term
+DRIVER='mcp23x17_i2c mcp23x17_spi' BOARD=... make -C tests/drivers/mcp23x17 flash term
 ```
 
 **Please note:** If `DRIVER` is not defined, `mcp23x17_i2c` is used by default.
@@ -32,7 +33,7 @@ defining them in the `CFLAGS` variable in the make command, for example:
 ```
 CFLAGS="-DMCP23X17_PARAM_RESET_PIN=GPIO_PIN\(0,7\)" \
 USEMODULE=mcp23x17_reset \
-BOARD=... make -C tests/driver_mcp23x17 flash term
+BOARD=... make -C tests/drivers/mcp23x17 flash term
 ```
 
 To use external interrupts for the MCP23x17 I/O expander pins, the MCP23x17
@@ -45,7 +46,7 @@ default parameter `MCP23X17_PARAM_I2C_INT` for the default I2C device or
 ```
 CFLAGS="-DMCP23X17_PARAM_I2C_INT=GPIO_PIN\(0,6\)" \
 USEMODULE=mcp23x17_irq \
-BOARD=... make -C tests/driver_mcp23x17 flash term
+BOARD=... make -C tests/drivers/mcp23x17 flash term
 ```
 
 Using module `mcp23x17_irq` uses by default an event thread with medium
@@ -85,7 +86,7 @@ default. This value can be overridden during compilation, for example:
 
 ```
 CFLAGS="-DMCP23X17_PORT_0=8" \
-BOARD=... make -C tests/driver_mcp23x17 flash term
+BOARD=... make -C tests/drivers/mcp23x17 flash term
 ```
 
 Using the port number defined by `MCP23X17_PORT_0` and following port

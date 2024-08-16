@@ -14,8 +14,9 @@
  *
  * ## Overview
  *
- * This test appliation demonstrates the usage of the MCP23x17 driver interface
- * and can be used to test each MCP23x17 expander I/O pin with shell commands.
+ * This test application demonstrates the usage of the MCP23x17 driver
+ * interface and can be used to test each MCP23x17 expander I/O pin with shell
+ * commands.
  *
  * The application bases on the test application for GPIO peripheral drivers
  * which is under following copyright:
@@ -456,7 +457,7 @@ static int bench(int argc, char **argv)
         puts("\nGPIO driver run-time performance benchmark\n");
         mcp23x17_t* dev = MCP23X17_DEV(po);
         BENCHMARK_FUNC("nop loop", runs, __asm__ volatile("nop"));
-        mcp23x17_gpio_init(dev , pi, GPIO_OUT);
+        mcp23x17_gpio_init(dev, pi, GPIO_OUT);
         BENCHMARK_FUNC("gpio_set", runs, mcp23x17_gpio_set(dev, pi));
         BENCHMARK_FUNC("gpio_clear", runs, mcp23x17_gpio_clear(dev, pi));
         BENCHMARK_FUNC("gpio_toggle", runs, mcp23x17_gpio_toggle(dev, pi));
