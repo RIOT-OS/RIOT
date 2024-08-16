@@ -198,6 +198,10 @@ static const eth_conf_t eth_config = {
 #define ETH_DMA_ISR        isr_dma2_stream0
 /** @} */
 
+static const adc_conf_t adc_config[] = {{}};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
 #ifdef __cplusplus
 }
 #endif
