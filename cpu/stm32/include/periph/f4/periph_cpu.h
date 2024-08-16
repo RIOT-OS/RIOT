@@ -32,8 +32,8 @@ extern "C" {
 #define ADC_DEVS            (1U)
 #elif defined(CPU_LINE_STM32F405xx)  || defined(CPU_LINE_STM32F407xx) \
     || defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F429xx) \
-    || defined(CPU_LINE_STM32F437xx) || defined(CPU_LINE_STM32F446xx) \
-    || defined(CPU_LINE_STM32F469xx)
+    || defined(CPU_LINE_STM32F439xx) || defined(CPU_LINE_STM32F437xx) \
+    || defined(CPU_LINE_STM32F446xx) || defined(CPU_LINE_STM32F469xx)
 #define ADC_DEVS            (3U)
 #endif
 
