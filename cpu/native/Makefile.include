@@ -7,6 +7,11 @@ ifneq (,$(filter periph_can,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  # using timer_settime requires -lrt
+  LINKFLAGS += -lrt
+endif
+
 TOOLCHAINS_SUPPORTED = gnu llvm afl
 
 # Platform triple as used by Rust
