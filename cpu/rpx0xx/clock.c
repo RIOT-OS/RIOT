@@ -130,6 +130,14 @@ void clock_periph_configure(CLOCKS_CLK_PERI_CTRL_AUXSRC_Enum aux)
     io_reg_atomic_set(&CLOCKS->CLK_PERI_CTRL, (1u << CLOCKS_CLK_PERI_CTRL_ENABLE_Pos));
 }
 
+void clock_usb_configure(CLOCKS_CLK_USB_CTRL_AUXSRC_Enum aux)
+{
+    io_reg_atomic_clear(&CLOCKS->CLK_USB_CTRL, (1u << CLOCKS_CLK_USB_CTRL_ENABLE_Pos));
+    io_reg_write_dont_corrupt(&CLOCKS->CLK_USB_CTRL, aux << CLOCKS_CLK_USB_CTRL_AUXSRC_Pos,
+                              CLOCKS_CLK_USB_CTRL_AUXSRC_Msk);
+    io_reg_atomic_set(&CLOCKS->CLK_USB_CTRL, (1u << CLOCKS_CLK_USB_CTRL_ENABLE_Pos));
+}
+
 void clock_gpout0_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_Enum aux)
 {
     assert(f_out <= f_in);

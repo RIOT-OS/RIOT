@@ -66,6 +66,11 @@ static void _cpu_reset(void)
     pll_reset_sys();
     /* start the system PLL (typically takes the 12 MHz XOSC to generate 125 MHz) */
     pll_start_sys(PLL_SYS_REF_DIV, PLL_SYS_VCO_FEEDBACK_SCALE, PLL_SYS_POSTDIV1, PLL_SYS_POSTDIV2);
+    /* start usb PLL if necessary */
+    if (IS_USED(MODULE_USBUS) || IS_USED(MODULE_PERIPH_ADC)) {
+        pll_start_usb(PLL_USB_REF_DIV, PLL_USB_VCO_FEEDBACK_SCALE,
+                      PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
+    }
     /* configure reference clock to run from XOSC (typically 12 MHz) */
     clock_ref_configure_source(CLOCK_XOSC, CLOCK_XOSC,
                                CLOCKS_CLK_REF_CTRL_SRC_xosc_clksrc);
@@ -74,6 +79,10 @@ static void _cpu_reset(void)
                                    CLOCKS_CLK_SYS_CTRL_AUXSRC_clksrc_pll_sys);
     /* configure the peripheral clock to run from the system clock */
     clock_periph_configure(CLOCK_PERIPH_SOURCE);
+    /* configure the usb clock */
+    if (IS_USED(MODULE_USBUS)) {
+        clock_usb_configure(CLOCKS_CLK_USB_CTRL_AUXSRC_clksrc_pll_usb);
+    }
     if (IS_USED(ENABLE_DEBUG)) {
         /* check clk_ref with logic analyzer */
         clock_gpout0_configure(CLOCK_XOSC, CLOCK_XOSC,
@@ -82,8 +91,6 @@ static void _cpu_reset(void)
 
     /* Configure USB PLL to deliver 48MHz needed by ADC */
     if (IS_USED(MODULE_PERIPH_ADC)) {
-        pll_start_usb(PLL_USB_REF_DIV, PLL_USB_VCO_FEEDBACK_SCALE,
-                      PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
         clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_clksrc_pll_usb);
     }
 }
