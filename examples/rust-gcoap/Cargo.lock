@@ -735,7 +735,7 @@ checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.2.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#26a7d27b4c0d518be1d26d07403f57261ee37cd5"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#0994301d597a39d66bcc7de07149c06b59d0e4ba"
 dependencies = [
  "ciborium-io",
  "ciborium-ll",
@@ -760,7 +760,7 @@ dependencies = [
 [[package]]
 name = "riot-shell-commands"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#26a7d27b4c0d518be1d26d07403f57261ee37cd5"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#0994301d597a39d66bcc7de07149c06b59d0e4ba"
 dependencies = [
  "heapless 0.7.17",
  "riot-sys",
