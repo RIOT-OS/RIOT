@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "net/gcoap.h"
+#include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "od.h"
 #include "uri_parser.h"
@@ -53,8 +54,8 @@ static char _proxy_uri[CONFIG_URI_MAX];
  * completes or times out. */
 static char _last_req_uri[CONFIG_URI_MAX];
 
-/* whether this node is currently observing a resource as a client */
-static bool observing = false;
+/* Last remote endpoint where an Observe request has been sent to */
+static sock_udp_ep_t obs_remote;
 
 /* the token used for observing a remote resource */
 static uint8_t obs_req_token[GCOAP_TOKENLEN_MAX];
@@ -300,17 +301,10 @@ int gcoap_cli_cmd(int argc, char **argv)
     if (code_pos == COAP_METHOD_GET) {
         if (argc > apos) {
             if (strcmp(argv[apos], "-o") == 0) {
-                if (observing) {
-                    puts("Only one observe supported");
-                    return 1;
-                }
                 observe = true;
                 apos++;
-            } else if (strcmp(argv[apos], "-d") == 0) {
-                if (!observing) {
-                    puts("Not observing");
-                    return 1;
-                }
+            }
+            else if (strcmp(argv[apos], "-d") == 0) {
                 observe = true;
                 apos++;
                 obs_value = COAP_OBS_DEREGISTER;
@@ -333,21 +327,6 @@ int gcoap_cli_cmd(int argc, char **argv)
         gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
 
         if (observe) {
-            uint8_t *token = coap_get_token(&pdu);
-            if (obs_value == COAP_OBS_REGISTER) {
-                obs_req_tkl = coap_get_token_len(&pdu);
-                /* backup the token of the initial observe registration */
-                memcpy(obs_req_token, token, obs_req_tkl);
-            } else {
-                /* use the token of the registration for deregistration
-                 * (manually replace the token set by gcoap_req_init) */
-                memcpy(token, obs_req_token, obs_req_tkl);
-                if (gcoap_obs_req_forget(&remote, obs_req_token, obs_req_tkl)) {
-                    printf("could not remove observe request\n");
-                    return 1;
-                }
-            }
-
             coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, obs_value);
         }
 
@@ -399,9 +378,14 @@ int gcoap_cli_cmd(int argc, char **argv)
         }
         else {
             if (observe) {
-                /* on successful observe request, store that this node is
-                 * observing / not observing anymore */
-                observing = obs_value == COAP_OBS_REGISTER;
+                /* forget last Observe token, as only one can be stored in this example */
+                gcoap_obs_req_forget(&obs_remote, obs_req_token, obs_req_tkl);
+                if (obs_value == COAP_OBS_REGISTER) {
+                    obs_req_tkl = coap_get_token_len(&pdu);
+                    /* backup the token of the initial observe registration */
+                    memcpy(obs_req_token, coap_get_token(&pdu), obs_req_tkl);
+                    obs_remote = remote;
+                }
             }
             /* send Observe notification for /cli/stats */
             notify_observers();
