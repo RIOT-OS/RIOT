@@ -21,8 +21,7 @@
  * Be careful to configure the device to use a RF frequency allowed in your
  * region.
  * Here is the list of allowed frequencies for your region (see
- * [LoRaWAN regional parameters document available online]
- * (https://www.lora-alliance.org/for-developers)):
+ * [LoRaWAN regional parameters document available online](https://www.lora-alliance.org/for-developers)):
  * - Europe has 2 allowed bands (ETSI):
  *   - EU863-870
  *   - EU433 (from 433.175MHZ to 434.665MHZ exactly)
