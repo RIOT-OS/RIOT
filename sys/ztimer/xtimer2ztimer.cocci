@@ -95,7 +95,7 @@ identifier i;
 @@
 
 - xtimer_now_usec64()
-+ ztimer_now64()
++ ztimer64_now()
 
 @@
 identifier i;
