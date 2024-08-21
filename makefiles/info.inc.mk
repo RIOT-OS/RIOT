@@ -254,3 +254,4 @@ info-rust:
 	@echo "and export these environment variables:"
 	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
 	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
+	@echo "You can also call cargo related commands with \`make cargo-command CARGO_COMMAND="cargo check"\`; beware that the way the profile is passed in is not consistent across cargo commands, and adding \`--profile $(CARGO_PROFILE)\` as part of CARGO_COMMAND may be necessary."
