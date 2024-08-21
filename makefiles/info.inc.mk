@@ -250,8 +250,9 @@ info-rust:
 	cargo version
 	c2rust --version
 	@echo "To use this setup of Rust in an IDE, add these command line arguments to the \`cargo check\` or \`rust-analyzer\`:"
-	@echo "    --target $(RUST_TARGET) --profile $(CARGO_PROFILE)"
+	@echo "    --target $(RUST_TARGET) --profile $(CARGO_PROFILE) $(CARGO_OPTIONS)"
 	@echo "and export these environment variables:"
 	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
 	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
-	@echo "You can also call cargo related commands with \`make cargo-command CARGO_COMMAND="cargo check"\`; beware that the way the profile is passed in is not consistent across cargo commands, and adding \`--profile $(CARGO_PROFILE)\` as part of CARGO_COMMAND may be necessary."
+	@echo "You can also call cargo related commands with \`make cargo-command CARGO_COMMAND=\"cargo check\"\`."
+	@echo "Beware that the way the profile and other flags are passed in is not consistent across cargo commands, so adding \`--profile $(CARGO_PROFILE)\` or other flags from above as part of CARGO_COMMAND may be necessary."
