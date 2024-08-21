@@ -191,6 +191,8 @@ static int _print_usage(char **argv)
     printf("       %s proxy unset\n", argv[0]);
     printf("Options\n");
     printf("    -c  Send confirmably (defaults to non-confirmable)\n");
+    printf("    -o  include Observe registration option\n");
+    printf("    -d  include Observe deregistration option\n");
     return 1;
 }
 
