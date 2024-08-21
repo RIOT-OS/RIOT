@@ -62,9 +62,9 @@ $(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_
 	@# mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
 		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
+		CARGO_BUILD_TARGET="$(RUST_TARGET)" \
 		cargo \
 			build \
-			--target $(RUST_TARGET) \
 			--profile $(CARGO_PROFILE) \
 			$(CARGO_OPTIONS)
 
