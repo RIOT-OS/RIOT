@@ -302,26 +302,12 @@ struct ztimer_base {
 };
 
 /**
- * @defgroup   sys_ztimer_now64 ztimer_now64
- * @brief 64-bit timestamp support
- *
- * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
- *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
- *             Will be removed after 2022.10 release.
- */
-/**
  * @typedef ztimer_now_t
  * @brief type for ztimer_now() result
  *
- * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
- *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
- *             Will be removed after 2022.10 release.
+ * This is always uint32_t.
  */
-#if MODULE_ZTIMER_NOW64
-typedef uint64_t ztimer_now_t;
-#else
 typedef uint32_t ztimer_now_t;
-#endif
 
 /**
  * @brief   ztimer structure
@@ -393,7 +379,7 @@ struct ztimer_clock {
                                          stopped state                      */
     uint16_t users;                 /**< user count of this clock */
 #endif
-#if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
+#if MODULE_ZTIMER_EXTEND || DOXYGEN
     /* values used for checkpointed intervals and 32bit extension */
     uint32_t max_value;             /**< maximum relative timer value       */
     uint32_t lower_last;            /**< timer value at last now() call     */
@@ -570,7 +556,7 @@ void _ztimer_assert_clock_active(ztimer_clock_t *clock);
  *
  * There are several caveats to consider when using values returned by
  * `ztimer_now()` (or comparing those values to results of @ref ztimer_set,
- * which are compatible unless MODULE_ZTMIER_NOW64 is in use):
+ * which are compatible):
  *
  * * A single value has no meaning of its own. Meaningful results are only ever
  *   produced when subtracting values from each other (in the wrapping fashion
@@ -604,7 +590,7 @@ void _ztimer_assert_clock_active(ztimer_clock_t *clock);
  *
  *   If the clock was active, then the difference between the second value and
  *   the first is then the elapsed time in the clock's unit, **modulo 2³²
- *   ticks** (or 2⁶⁴ when using the ZTIMER_NOW64 module).
+ *   ticks**.
  *
  * * A difference between two values (calculated in the usual wrapping way) is
  *   guaranteed to be exactly the elapsed time (not just modulo 2³²) if there
@@ -683,9 +669,7 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
     _ztimer_assert_clock_active(clock);
 #endif
 
-#if MODULE_ZTIMER_NOW64
-    if (1) {
-#elif MODULE_ZTIMER_EXTEND
+#if MODULE_ZTIMER_EXTEND
     if (clock->max_value < UINT32_MAX) {
 #else
     if (0) {

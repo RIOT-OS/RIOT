@@ -424,13 +424,7 @@ static void _ztimer_update(ztimer_clock_t *clock)
             clock->ops->set(clock, clock->list.next->offset);
         }
         else {
-            if (IS_USED(MODULE_ZTIMER_NOW64)) {
-                /* ensure there's at least one ISR per half period */
-                clock->ops->set(clock, clock->max_value >> 1);
-            }
-            else {
-                clock->ops->cancel(clock);
-            }
+            clock->ops->cancel(clock);
         }
     }
 }
@@ -445,8 +439,8 @@ void ztimer_handler(ztimer_clock_t *clock)
         _ztimer_print(clock);
     }
 
-#if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64
-    if (IS_USED(MODULE_ZTIMER_NOW64) || clock->max_value < UINT32_MAX) {
+#if MODULE_ZTIMER_EXTEND
+    if (clock->max_value < UINT32_MAX) {
         /* calling now triggers checkpointing */
         uint32_t now = ztimer_now(clock);
 
