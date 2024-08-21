@@ -39,8 +39,7 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	        -e 's/"riscv64-elf"/"riscv32"/g' \
 	  | $(LAZYSPONGE) $@
 
-
-$(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
+cargo-preflight: FORCE
 	@command -v cargo >/dev/null || ($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: `cargo` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
 		exit 1)
@@ -58,7 +57,9 @@ $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS
 		($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET)\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
 		exit 1)
-	@# finally call out to cargo. mind the "+" to pass down make's jobserver.
+
+$(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
+	@# mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
 		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
 		cargo \
