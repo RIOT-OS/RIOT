@@ -15,7 +15,7 @@ crate-type = ["staticlib"]
 panic = "abort"
 
 [dependencies]
-riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
+riot-wrappers = { version = "0.9.0", features = [ "set_panic_handler" ] }
 
 # While currently this example does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has

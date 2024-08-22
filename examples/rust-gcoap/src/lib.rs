@@ -37,7 +37,7 @@ fn main() {
         println!("CoAP server ready; waiting for interfaces to settle before reporting addresses...");
 
         let sectimer = ztimer::Clock::sec();
-        sectimer.sleep_ticks(2);
+        sectimer.sleep(ztimer::Ticks(2));
 
         for netif in gnrc::Netif::all() {
             println!("Active interface from PID {:?} ({:?})", netif.pid(), netif.pid().get_name().unwrap_or("unnamed"));
