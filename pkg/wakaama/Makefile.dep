@@ -12,7 +12,6 @@ USEMODULE += wakaama_objects
 USEMODULE += wakaama_objects_device
 USEMODULE += wakaama_objects_security
 
-
 ifneq (,$(filter wakaama_objects_barometer,$(USEMODULE)))
     USEMODULE += wakaama_objects_ipso_sensor_base
 endif
@@ -39,6 +38,7 @@ endif
 
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
+USEMODULE += random
 USEPKG += tlsf
 
 # If logs for the package are active, we need fmt
