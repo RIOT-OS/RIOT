@@ -39,8 +39,7 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	        -e 's/"riscv64-elf"/"riscv32"/g' \
 	  | $(LAZYSPONGE) $@
 
-
-$(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
+cargo-preflight: FORCE
 	@command -v cargo >/dev/null || ($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: `cargo` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
 		exit 1)
@@ -58,14 +57,25 @@ $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS
 		($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET)\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
 		exit 1)
-	@# finally call out to cargo. mind the "+" to pass down make's jobserver.
+
+$(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
+	@# mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
 		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
+		CARGO_BUILD_TARGET="$(RUST_TARGET)" \
 		cargo \
 			build \
-			--target $(RUST_TARGET) \
 			--profile $(CARGO_PROFILE) \
 			$(CARGO_OPTIONS)
+
+cargo-command: cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(CARGO_COMPILE_COMMANDS) FORCE
+	@[ x"$(CARGO_COMMAND)" != x"" ] || ($(COLOR_ECHO) "$(COLOR_RED)Error: Running cargo-command requires a CARGO_COMMAND to be set.$(COLOR_RESET) Set CARGO_COMMAND=\"cargo clippy --release --fix\" or any other cargo command to run with the right RIOT environment."; exit 1)
+	@# mind the "+" to pass down make's jobserver.
+	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
+		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
+		CARGO_BUILD_TARGET="$(RUST_TARGET)" \
+		PROFILE="$(CARGO_PROFILE)" \
+		$(CARGO_COMMAND)
 
 $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
 	$(Q)# Ensure no old object files persist. These would lead to duplicate
