@@ -56,8 +56,8 @@ typedef struct lwm2m_obj_light_control_inst {
  * @return COAP_404_NOT_FOUND if the instance was not found
  * @return COAP_500_INTERNAL_SERVER_ERROR otherwise
  */
-static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
-                        lwm2m_object_t *object);
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+                        lwm2m_data_t ** data_array, lwm2m_object_t * object);
 
 /**
  * @brief 'Write' callback for the LwM2M Light Control object implementation.
@@ -72,8 +72,8 @@ static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data
  * @return COAP_400_BAD_REQUEST if a value is not encoded correctly
  * @return COAP_500_INTERNAL_SERVER_ERROR otherwise
  */
-static uint8_t _write_cb(uint16_t instance_id, int num_data, lwm2m_data_t * data_array,
-                         lwm2m_object_t * object);
+static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
+                         lwm2m_data_t * data_array, lwm2m_object_t * object, lwm2m_write_type_t write_type);
 
 /**
  * @brief Gets the current value of a given @p instance.
@@ -154,9 +154,11 @@ static uint8_t _get_value(lwm2m_data_t *data, lwm2m_obj_light_control_inst_t *in
     return COAP_205_CONTENT;
 }
 
-static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
-                        lwm2m_object_t *object)
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+                        lwm2m_data_t ** data_array, lwm2m_object_t * object)
 {
+    (void)context;
+
     lwm2m_obj_light_control_inst_t *instance;
     uint8_t result = COAP_404_NOT_FOUND;
     int i = 0;
@@ -214,9 +216,12 @@ free_out:
     return result;
 }
 
-static uint8_t _write_cb(uint16_t instance_id, int num_data, lwm2m_data_t * data_array,
-                         lwm2m_object_t * object)
+static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
+                         lwm2m_data_t * data_array, lwm2m_object_t * object, lwm2m_write_type_t write_type)
 {
+    (void)context;
+    (void)write_type;
+
     lwm2m_obj_light_control_inst_t *instance;
     uint8_t result = COAP_204_CHANGED;
     bool call_cb = false;
