@@ -23,7 +23,7 @@ fn main() {
 
     let handler = coap_message_demos::full_application_tree(None)
         .below(&["ps"], riot_coap_handler_demos::ps::ps_tree())
-        .below(&["vfs"], riot_coap_handler_demos::vfs::vfs("/const"))
+        .below(&["vfs"], riot_coap_handler_demos::vfs::vfs(""))
         .below(&["saul"], riot_coap_handler_demos::saul::SaulHandler::new(&["saul"]))
         .with_wkc()
         ;
