@@ -46,22 +46,26 @@ extern "C" {
 #define LED1_PIN            GPIO_PIN(5, 2)
 #define LED2_PIN            GPIO_PIN(5, 3)
 
-#define LED_PORT            (GPIO_PORTF_DATA_R)
+/**
+ * @brief Port used for `LED0_ON` and similar implementations
+ * @internal
+ * */
+#define LED_PORT()          (GPIO_PORTF_DATA_R)
 #define LED0_MASK           (1 << 7)
 #define LED1_MASK           (1 << 2)
 #define LED2_MASK           (1 << 1)
 
-#define LED0_ON             (LED_PORT |=  LED0_MASK)
-#define LED0_OFF            (LED_PORT &= ~LED0_MASK)
-#define LED0_TOGGLE         (LED_PORT ^=  LED0_MASK)
+#define LED0_ON             (LED_PORT() |=  LED0_MASK)
+#define LED0_OFF            (LED_PORT() &= ~LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT() ^=  LED0_MASK)
 
-#define LED1_ON             (LED_PORT |=  LED1_MASK)
-#define LED1_OFF            (LED_PORT &= ~LED1_MASK)
-#define LED1_TOGGLE         (LED_PORT ^=  LED1_MASK)
+#define LED1_ON             (LED_PORT() |=  LED1_MASK)
+#define LED1_OFF            (LED_PORT() &= ~LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT() ^=  LED1_MASK)
 
-#define LED2_ON             (LED_PORT |=  LED2_MASK)
-#define LED2_OFF            (LED_PORT &= ~LED2_MASK)
-#define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
+#define LED2_ON             (LED_PORT() |=  LED2_MASK)
+#define LED2_OFF            (LED_PORT() &= ~LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT() ^=  LED2_MASK)
 /** @} */
 
 /**
