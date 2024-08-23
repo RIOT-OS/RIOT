@@ -8,6 +8,10 @@
 The Nucleo-G431RB is a board from ST's Nucleo family supporting a ARM
 Cortex-M4 STM32G431RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-g431rb-and-more.svg "Pinout for the nucleo-g431rg (from STM board manual)" width=50%
+
 ## Flashing the device
 
 ### Flashing the Board Using OpenOCD
