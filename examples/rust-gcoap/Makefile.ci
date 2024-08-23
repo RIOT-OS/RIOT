@@ -17,6 +17,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     hifive1b \
     i-nucleo-lrwan1 \
     im880b \
+    lobaro-lorabox \
     lsn50 \
     maple-mini \
     microbit \
