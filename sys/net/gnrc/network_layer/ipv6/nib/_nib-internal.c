@@ -504,18 +504,23 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
         _nib_offl_entry_t *tmp = &_dsts[i];
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
-        if ((tmp->pfx_len == pfx_len) &&                /* prefix length matches and */
-            (tmp_node != NULL) &&                       /* there is a next hop that */
-            (_nib_onl_get_if(tmp_node) == iface) &&     /* has a matching interface and */
-            _addr_equals(next_hop, tmp_node) &&         /* equal address to next_hop, also */
-            (ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len)) {  /* the prefix matches */
-            /* exact match (or next hop address was previously unset) */
-            DEBUG("  %p is an exact match\n", (void *)tmp);
-            if (next_hop != NULL) {
-                memcpy(&tmp_node->ipv6, next_hop, sizeof(tmp_node->ipv6));
+        if (tmp->mode != _EMPTY) {
+            /* offlink entry not empty */
+            if (tmp->pfx_len == pfx_len && ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len) {
+                /* prefix matches */
+                if (_nib_onl_get_if(tmp_node) == iface && (ipv6_addr_is_unspecified(&tmp_node->ipv6)
+                                                           || _addr_equals(next_hop, tmp_node))) {
+                    /* next hop matches or is unspecified */
+                    DEBUG("  %p is an exact match\n", (void *)tmp);
+                    if (next_hop != NULL) {
+                        /* sets next_hop if it was previously unspecified */
+                        memcpy(&tmp_node->ipv6, next_hop, sizeof(tmp_node->ipv6));
+                    }
+                    /*mark that this NCE is used by an offl_entry*/
+                    tmp->next_hop->mode |= _DST;
+                    return tmp;
+                }
             }
-            tmp->next_hop->mode |= _DST;
-            return tmp;
         }
         if ((dst == NULL) && (tmp_node == NULL)) {
             dst = tmp;
@@ -523,9 +528,7 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
     }
     if (dst != NULL) {
         DEBUG("  using %p\n", (void *)dst);
-        dst->next_hop = _nib_onl_alloc(next_hop, iface);
-
-        if (dst->next_hop == NULL) {
+        if (!dst->next_hop && !(dst->next_hop = _nib_onl_alloc(next_hop, iface))) {
             memset(dst, 0, sizeof(_nib_offl_entry_t));
             return NULL;
         }
