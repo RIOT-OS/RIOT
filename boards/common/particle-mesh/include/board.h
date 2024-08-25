@@ -95,6 +95,18 @@ extern "C" {
 #define LED2_MASK           (1 << 15)
 #define LED_MASK            (LED0_MASK | LED1_MASK | LED2_MASK)
 
+/* The typical SAUL setup for this board uses PWM to make the LEDs (really a
+ * single RGB LED) into a PWM controlled RGB LED entry. As a consequence of the
+ * PWM configuration, toggling the GPIO has no effect any more, and thus we do
+ * not define the macros so that no LEDs get picked up for LEDn_IS_PROVIDED.
+ * (The LEDn_ON etc macros will still be present and no-op as usual, but those
+ * explicitly checking for IS_PROVIDED will get an accurate picture).
+ *
+ * Both conditions are typically true when saul_default is on, but strictly, it
+ * is those two that in combination make LEDs effectively unavailable to users.
+ * */
+#if !(IS_USED(MODULE_AUTO_INIT_SAUL) && IS_USED(MODULE_SAUL_PWM))
+
 #define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT->OUT   ^= LED0_MASK)
@@ -106,6 +118,9 @@ extern "C" {
 #define LED2_ON             (LED_PORT->OUTCLR = LED2_MASK)
 #define LED2_OFF            (LED_PORT->OUTSET = LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT->OUT   ^= LED2_MASK)
+
+#endif /* !(IS_USED(MODULE_AUTO_INIT_SAUL) && IS_USED(MODULE_SAUL_PWM)) */
+
 /** @} */
 
 /**
