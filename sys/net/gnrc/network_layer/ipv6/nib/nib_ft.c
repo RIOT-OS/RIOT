@@ -133,6 +133,7 @@ bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
         while ((offl = _nib_offl_iter(offl))) {
             assert(offl->mode != 0);
             if ((offl->next_hop != NULL) &&
+                (offl->mode != _PL || offl->flags & _PFX_ON_LINK) &&
                 ((iface == 0) || (iface == _nib_onl_get_if(offl->next_hop))) &&
                 ((next_hop == NULL) || ipv6_addr_equal(&offl->next_hop->ipv6,
                                                        next_hop))) {
