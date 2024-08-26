@@ -873,7 +873,7 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
                    gnrc_ipv6_nib_ft_t *entry);
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || DOXYGEN
 /**
  * @brief Flush the packet queue of a on-link neighbor.
  *
