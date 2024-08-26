@@ -1373,19 +1373,20 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         return true;
     }
 
+    /* don't do multicast address resolution on 6lo */
+    if (gnrc_netif_is_6ln(netif)) {
+        /* https://www.rfc-editor.org/rfc/rfc6775.html#section-5.6
+         * A LoWPAN node is not required to maintain a minimum of one buffer
+         * per neighbor as specified in [RFC4861], since packets are never
+         * queued while waiting for address resolution. */
+        gnrc_pktbuf_release(pkt);
+        return false;
+    }
+
     bool reset = false;
     DEBUG("nib: resolve address %s by probing neighbors\n",
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
     if (entry == NULL) {
-        /* don't do multicast address resolution on 6lo */
-        if (gnrc_netif_is_6ln(netif)) {
-            /* https://www.rfc-editor.org/rfc/rfc6775.html#section-5.6
-             * A LoWPAN node is not required to maintain a minimum of one buffer
-             * per neighbor as specified in [RFC4861], since packets are never
-             * queued while waiting for address resolution. */
-            gnrc_pktbuf_release(pkt);
-            return false;
-        }
         entry = _nib_nc_add(dst, netif ? netif->pid : 0,
                             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
         if (entry == NULL) {
@@ -1413,9 +1414,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         return false;
     }
 
-    if (!gnrc_netif_is_6ln(netif)) {
-        _probe_nbr(entry, reset);
-    }
+    _probe_nbr(entry, reset);
 
     return false;
 }
