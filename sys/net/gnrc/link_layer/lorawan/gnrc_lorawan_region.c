@@ -21,7 +21,19 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define GNRC_LORAWAN_DATARATES_NUMOF (6U)
+#define GNRC_LORAWAN_DATARATES_NUMOF        (6U)
+
+#if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
+#define GNRC_LORAWAN_TX_POWER_INDEX_MAX     (7U)
+#elif (IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865))
+#define GNRC_LORAWAN_TX_POWER_INDEX_MAX     (10U)
+#endif
+
+#if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
+#define GNRC_LORAWAN_TX_POWER_MAX           (16)
+#elif (IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865))
+#define GNRC_LORAWAN_TX_POWER_MAX           (30)
+#endif
 
 static uint8_t dr_sf[GNRC_LORAWAN_DATARATES_NUMOF] =
 { LORA_SF12, LORA_SF11, LORA_SF10, LORA_SF9, LORA_SF8, LORA_SF7 };
@@ -44,6 +56,19 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     dev->driver->set(dev, NETOPT_SPREADING_FACTOR, &sf, sizeof(sf));
 
     return 0;
+}
+
+int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint8_t tx_pwr)
+{
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
+    if (!gnrc_lorawan_validate_tx_power(tx_pwr)) {
+        return -EINVAL;
+    }
+    DEBUG("gnrc_lorawan_region: TX Power index: %u \n",tx_pwr);
+
+    int tx_pwr_db = GNRC_LORAWAN_TX_POWER_MAX - (tx_pwr * 2);
+    return dev->driver->set(dev, NETOPT_TX_POWER, &tx_pwr_db, sizeof(tx_pwr_db));
 }
 
 #if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
@@ -142,6 +167,15 @@ bool gnrc_lorawan_validate_dr(uint8_t dr)
         return true;
     }
     DEBUG("gnrc_lorawan_region: Invalid DR.\n");
+    return false;
+}
+
+bool gnrc_lorawan_validate_tx_power(uint8_t tx_power)
+{
+    if (tx_power <= GNRC_LORAWAN_TX_POWER_INDEX_MAX) {
+        return true;
+    }
+    DEBUG("gnrc_lorawan_region: Invalid TX Power index\n");
     return false;
 }
 
