@@ -1337,11 +1337,7 @@ static bool _enqueue_for_resolve(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         queue_entry->pkt = gnrc_pkt_prepend(queue_entry->pkt, netif_hdr);
     }
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
     _nbr_push_pkt(entry, queue_entry);
-#else
-    (void)entry;
-#endif
     return true;
 }
 

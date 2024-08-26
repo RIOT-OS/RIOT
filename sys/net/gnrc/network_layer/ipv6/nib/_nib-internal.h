@@ -902,7 +902,10 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
  * @param pkt packet to be pushed
  */
 void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt);
-
+#else
+#define _nbr_flush_pktqueue(node) ((void)node)
+#define _nbr_pop_pkt(node) ((void)node, NULL)
+#define _nbr_push_pkt(node, pkt) ((void)node, (void)pkt)
 #endif
 
 #ifdef __cplusplus
