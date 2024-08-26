@@ -9,9 +9,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
-    chronos \
+    derfmega128 \
     i-nucleo-lrwan1 \
-    im880b \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-c031c6 \
@@ -26,6 +26,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     olimex-msp430-h1611 \
     olimex-msp430-h2618 \
     samd10-xmini \
+    saml10-xpro \
+    saml11-xpro \
     slstk3400a \
     stk3200 \
     stm32f030f4-demo \
@@ -37,4 +39,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     waspmote-pro \
     weact-g030f6 \
     z1 \
+    zigduino \
     #
