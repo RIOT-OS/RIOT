@@ -26,6 +26,7 @@ fn main() {
         .below(&["led"], riot_coap_handler_demos::led::all_leds())
         .below(&["vfs"], riot_coap_handler_demos::vfs::vfs(""))
         .below(&["saul"], riot_coap_handler_demos::saul::SaulHandler::new(&["saul"]))
+        .below(&["netif"], riot_coap_handler_demos::netif::netif())
         .with_wkc()
         ;
     let mut handler = riot_wrappers::coap_handler::v0_2::GcoapHandler(handler);
