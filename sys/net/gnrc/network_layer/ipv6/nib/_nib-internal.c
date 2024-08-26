@@ -276,18 +276,7 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-    gnrc_pktqueue_t *tmp;
-    for (gnrc_pktqueue_t *ptr = node->pktqueue;
-         (ptr != NULL) && (tmp = (ptr->next), 1);
-         ptr = tmp) {
-        gnrc_pktqueue_t *entry = gnrc_pktqueue_remove(&node->pktqueue, ptr);
-        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
-                                       entry->pkt);
-        gnrc_pktbuf_release_error(entry->pkt, EHOSTUNREACH);
-        entry->pkt = NULL;
-    }
-#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
+    _nbr_flush_pktqueue(node);
     /* remove from cache-out procedure */
     clist_remove(&_next_removable, (clist_node_t *)node);
     _nib_onl_clear(node);
