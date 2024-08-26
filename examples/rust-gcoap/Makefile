@@ -34,10 +34,9 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Add 8k extra stack: The Rust examples take more of it than gcoap expects,
-# presumably because the example use the standard library's sting formatting
-# instead of one of the more optimized formatters.
-CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+8192)'
+# Add 16k extra stack: The Rust examples take more of it than gcoap expects,
+# for reasons that are not fully understood (it's not the string formatter).
+CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+16384)'
 # This thread needs some more stack for printing the addresses, once more being
 # hit by string formatting.
 CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF+2048)'
