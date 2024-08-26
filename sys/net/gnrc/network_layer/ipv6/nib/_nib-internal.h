@@ -893,7 +893,7 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
 /**
  * @brief Push packet to a on-link neighbor's packet queue.
  *
- * @note If the neighbor is UNREACHABLE, the packet will be dropped.
+ * @pre Neighbor is INCOMPLETE.
  *
  * @note If the queue size is @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP,
  *       this will @ref _nbr_pop_pkt() the oldest packet and release it.

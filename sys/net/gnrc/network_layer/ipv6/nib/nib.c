@@ -1758,20 +1758,14 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node)
 
 void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
 {
-    if (_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
-        assert(node->pktqueue_len == 0);
-
-        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, pkt->pkt);
-        gnrc_pktbuf_release_error(pkt->pkt, EHOSTUNREACH);
-        pkt->pkt = NULL;
-
-        return;
-    }
+    assert(_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
 
     assert(node->pktqueue_len <= CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP);
     if (node->pktqueue_len == CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP) {
         gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
+
         assert(oldest != NULL);
+
         gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, oldest->pkt);
         gnrc_pktbuf_release_error(oldest->pkt, ENOBUFS);
         oldest->pkt = NULL;

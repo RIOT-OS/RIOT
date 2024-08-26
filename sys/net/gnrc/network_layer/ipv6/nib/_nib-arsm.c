@@ -442,7 +442,9 @@ void _set_unreachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce)
     DEBUG("nib: set %s to UNREACHABLE\n",
           ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)));
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
     _nbr_flush_pktqueue(nce);
+#endif
     _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE);
 }
 
