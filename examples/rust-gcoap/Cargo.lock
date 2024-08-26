@@ -161,9 +161,9 @@ dependencies = [
 
 [[package]]
 name = "coap-handler-implementations"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2735f53da500caae442466ba2126d62458e86116ec1e273919880410f7e187b"
+checksum = "fbcd2aeab8575ae5b10c04ce5649cd30113c7c2d0d085c393b79a638fd36a854"
 dependencies = [
  "ciborium-io",
  "coap-handler",
@@ -181,9 +181,9 @@ dependencies = [
 
 [[package]]
 name = "coap-message"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e126d86a35f4c5dfcf454da6c9c58a6e703150989e536945ef3813f2bc60565"
+checksum = "5ccab4ff10bcaab1d7f017c34ea598e9f21d187c32f6f086d7abd580b0412096"
 dependencies = [
  "num-traits",
 ]
@@ -205,9 +205,9 @@ dependencies = [
 
 [[package]]
 name = "coap-message-utils"
-version = "0.3.4"
+version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cc625b0d10d99c012e83dfc68265231c2a9ae4f2e02e1a72dfef266133e9a09"
+checksum = "c3ba07600e8cd4a6bf7ee0df249fc66bb89b8c6deedcce5b4e93b192e14b3306"
 dependencies = [
  "coap-message",
  "coap-numbers",
@@ -666,7 +666,7 @@ checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.2.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#5f83cbdb3be5f5a9d74703bcdd0de14fa122fb16"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#ab8e8e596fdbfd89c519e848cc7970b1c8410fea"
 dependencies = [
  "ciborium-io",
  "ciborium-ll",
@@ -675,8 +675,9 @@ dependencies = [
  "coap-message",
  "coap-message-utils",
  "coap-numbers",
+ "document-features",
  "embedded-graphics",
- "embedded-hal 0.2.7",
+ "embedded-hal 1.0.0",
  "heapless 0.7.17",
  "hex",
  "minicbor",
@@ -686,13 +687,15 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_cbor",
+ "switch-hal",
 ]
 
 [[package]]
 name = "riot-shell-commands"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#5f83cbdb3be5f5a9d74703bcdd0de14fa122fb16"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#ab8e8e596fdbfd89c519e848cc7970b1c8410fea"
 dependencies = [
+ "document-features",
  "heapless 0.7.17",
  "riot-sys",
  "riot-wrappers",
@@ -700,8 +703,8 @@ dependencies = [
 
 [[package]]
 name = "riot-sys"
-version = "0.7.12"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#a3752271062299f68c5f6ba3c6e503ac725722c4"
+version = "0.7.13"
+source = "git+https://github.com/RIOT-OS/rust-riot-sys#0b53c15cc171ce2a95b89b1c34e3dfd0ef7e90e2"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -716,7 +719,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.0"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#b8933a2b7c60423a63b614e6f8933c489b46833f"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#3d280a4f453fe655e1cfdeb773dff1972025cd04"
 dependencies = [
  "bare-metal",
  "coap-handler",
