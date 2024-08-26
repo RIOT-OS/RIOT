@@ -1338,7 +1338,7 @@ static bool _enqueue_for_resolve(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-    gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
+    _nbr_push_pkt(entry, queue_entry);
 #else
     (void)entry;
 #endif
@@ -1399,15 +1399,25 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
     }
 #endif
 
+    /* don't do multicast address resolution on 6lo */
+    if (gnrc_netif_is_6ln(netif)) {
+        if (pkt != NULL) {
+            /* https://www.rfc-editor.org/rfc/rfc6775.html#section-5.6
+             * A LoWPAN node is not required to maintain a minimum of one buffer
+             * per neighbor as specified in [RFC4861], since packets are never
+             * queued while waiting for address resolution. */
+            gnrc_pktbuf_release(pkt);
+        }
+
+        return false;
+    }
+
     /* queue packet as we have to do address resolution first */
     if (pkt != NULL && !_enqueue_for_resolve(netif, pkt, entry)) {
         return false;
     }
 
-    /* don't do multicast address resolution on 6lo */
-    if (!gnrc_netif_is_6ln(netif)) {
-        _probe_nbr(entry, reset);
-    }
+    _probe_nbr(entry, reset);
 
     return false;
 }
@@ -1733,4 +1743,54 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 
     return route_ltime;
 }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node)
+{
+    if (node->pktqueue_len == 0) {
+        assert(node->pktqueue == NULL);
+        return NULL;
+    }
+    assert(node->pktqueue != NULL);
+
+    node->pktqueue_len--;
+
+    return gnrc_pktqueue_remove_head(&node->pktqueue);
+}
+
+void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
+{
+    if (_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
+        assert(node->pktqueue_len == 0);
+
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, pkt->pkt);
+        gnrc_pktbuf_release_error(pkt->pkt, EHOSTUNREACH);
+        pkt->pkt = NULL;
+
+        return;
+    }
+
+    assert(node->pktqueue_len <= CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP);
+    if (node->pktqueue_len == CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP) {
+        gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
+        assert(oldest != NULL);
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, oldest->pkt);
+        gnrc_pktbuf_release_error(oldest->pkt, ENOBUFS);
+        oldest->pkt = NULL;
+    }
+
+    gnrc_pktqueue_add(&node->pktqueue, pkt);
+    node->pktqueue_len++;
+}
+
+void _nbr_flush_pktqueue(_nib_onl_entry_t *node)
+{
+    gnrc_pktqueue_t *entry;
+    while ((entry = _nbr_pop_pkt(node))) {
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, entry->pkt);
+        gnrc_pktbuf_release_error(entry->pkt, EHOSTUNREACH);
+        entry->pkt = NULL;
+    }
+}
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 /** @} */
