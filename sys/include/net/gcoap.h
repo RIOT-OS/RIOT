@@ -552,6 +552,10 @@ extern "C" {
 /**
  * @ingroup net_gcoap_conf
  * @brief   Maximum number of Observe clients
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored observer is associated with a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
  */
 #ifndef CONFIG_GCOAP_OBS_CLIENTS_MAX
 #define CONFIG_GCOAP_OBS_CLIENTS_MAX   (2)
@@ -559,7 +563,24 @@ extern "C" {
 
 /**
  * @ingroup net_gcoap_conf
+ * @brief   Maximum number of local notifying endpoint addresses
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored local endpoint alias is associated with an observation context
+ *       of a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
+ */
+#ifndef CONFIG_GCOAP_OBS_NOTIFIERS_MAX
+#define CONFIG_GCOAP_OBS_NOTIFIERS_MAX  (2)
+#endif
+
+/**
+ * @ingroup net_gcoap_conf
  * @brief   Maximum number of registrations for Observable resources
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored observation context is associated with a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
  */
 #ifndef CONFIG_GCOAP_OBS_REGISTRATIONS_MAX
 #define CONFIG_GCOAP_OBS_REGISTRATIONS_MAX     (2)
@@ -839,6 +860,7 @@ struct gcoap_request_memo {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    sock_udp_ep_t *notifier;            /**< Local endpoint to send notifications */
     const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     uint16_t last_msgid;                /**< Message ID of last notification */
@@ -873,6 +895,22 @@ kernel_pid_t gcoap_init(void);
  * @param[in] listener  Listener containing the resources.
  */
 void gcoap_register_listener(gcoap_listener_t *listener);
+
+/**
+ * @brief   Iterate through all registered listeners and check for a resource, matching by @p uri_path
+ *
+ *  This functions returns resources matching a subpath @see COAP_MATCH_SUBTREE.
+ *  If an exact match is required, check with `strncmp()`.
+ *
+ * @param[in, out]  last_listener       A pointer to NULL for the first call, otherwise the last returned listener
+ * @param[in]       last_resource       NULL for the first call, otherwise the last returned resource
+ * @param[in]       uri_path            The URI path to search for
+ *
+ * @return  The resource that matches the URI path
+ */
+const coap_resource_t *gcoap_get_resource_by_path_iterator(const gcoap_listener_t **last_listener,
+                                                           const coap_resource_t *last_resource,
+                                                           const char *uri_path);
 
 /**
  * @brief   Initializes a CoAP request PDU on a buffer.
@@ -1054,6 +1092,9 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
  *          observer registered for a resource
  *
  * First verifies that an observer has been registered for the resource.
+ *
+ * @post    If this function returns @see GCOAP_OBS_INIT_OK you have to call
+ *          @ref gcoap_obs_send() afterwards to release a mutex.
  *
  * @param[out] pdu      Notification metadata
  * @param[out] buf      Buffer containing the PDU

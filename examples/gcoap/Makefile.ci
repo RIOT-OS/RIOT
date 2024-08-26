@@ -8,7 +8,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p-xplained-mini \
     atmega8 \
     atxmega-a3bu-xplained \
+    blackpill-stm32f103c8 \
     bluepill-stm32f030c8 \
+    bluepill-stm32f103c8 \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
@@ -16,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-l011k4 \
