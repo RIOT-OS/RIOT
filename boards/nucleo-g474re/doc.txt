@@ -8,6 +8,10 @@
 The Nucleo-G474RE is a board from ST's Nucleo family supporting a ARM
 Cortex-M4 STM32G474RE microcontroller with 128KiB of RAM and 512KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-g431rb-and-more.svg "Pinout for the nucleo-g4741re (from STM board manual)" width=50%
+
 ## Flashing the device
 
 ### Flashing the Board Using OpenOCD
