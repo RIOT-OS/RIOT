@@ -504,26 +504,29 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
         _nib_offl_entry_t *tmp = &_dsts[i];
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
-        if (tmp->mode != _EMPTY) {
-            /* offlink entry not empty */
-            if (tmp->pfx_len == pfx_len && ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len) {
-                /* prefix matches */
-                if (_nib_onl_get_if(tmp_node) == iface && (ipv6_addr_is_unspecified(&tmp_node->ipv6)
-                                                           || _addr_equals(next_hop, tmp_node))) {
-                    /* next hop matches or is unspecified */
-                    DEBUG("  %p is an exact match\n", (void *)tmp);
-                    if (next_hop != NULL) {
-                        /* sets next_hop if it was previously unspecified */
-                        memcpy(&tmp_node->ipv6, next_hop, sizeof(tmp_node->ipv6));
-                    }
-                    /*mark that this NCE is used by an offl_entry*/
-                    tmp->next_hop->mode |= _DST;
-                    return tmp;
-                }
+        if (tmp->mode == _EMPTY) {
+            if (dst == NULL) {
+                dst = tmp;
             }
+            continue;
         }
-        if ((dst == NULL) && (tmp_node == NULL)) {
-            dst = tmp;
+
+        /* else: offlink entry not empty, potential match */
+        if (tmp->pfx_len == pfx_len && ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len) {
+            /* prefix matches */
+            assert(tmp_node);
+            if (_nib_onl_get_if(tmp_node) == iface && (ipv6_addr_is_unspecified(&tmp_node->ipv6)
+                                                       || _addr_equals(next_hop, tmp_node))) {
+                /* next hop matches or is unspecified */
+                DEBUG("  %p is an exact match\n", (void *)tmp);
+                if (next_hop != NULL) {
+                    /* sets next_hop if it was previously unspecified */
+                    memcpy(&tmp_node->ipv6, next_hop, sizeof(tmp_node->ipv6));
+                }
+                /*mark that this NCE is used by an offl_entry*/
+                tmp->next_hop->mode |= _DST;
+                return tmp;
+            }
         }
     }
     if (dst != NULL) {
