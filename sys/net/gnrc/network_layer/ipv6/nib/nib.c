@@ -1291,8 +1291,8 @@ static _nib_onl_entry_t *_iter_nc_nbr(_nib_onl_entry_t const *last)
     return (_nib_onl_entry_t *)last;
 }
 
-/* This function nevers fail as doing so would force us to drop newer packets
- * instead of older, thus leaving stale packets in the neighbor queues
+/* This function never fails as doing so would force us to drop newer packets
+ * instead of older, thus leaving stale packets in the neighbor queues.
  *
  * https://www.rfc-editor.org/rfc/rfc4861#section-7.2.2
  *
