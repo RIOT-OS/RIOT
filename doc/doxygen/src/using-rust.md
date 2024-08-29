@@ -151,6 +151,12 @@ as this is using some recent fixes, it is best installed as:
 $ cargo install c2rust --git https://github.com/immunant/c2rust
 ```
 
+If multiple versions of LLVM are installed locally, it may be necessary to prefix it with the selected LLVM version:
+
+```
+$ LLVM_CONFIG_PATH=/usr/bin/llvm-config-16 cargo install …
+```
+
 [cargo]: https://doc.rust-lang.org/cargo/
 [**rustup**, installed as described on its website]: https://rustup.rs/
 
