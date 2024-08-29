@@ -54,7 +54,20 @@
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-static gnrc_pktqueue_t _queue_pool[CONFIG_GNRC_IPV6_NIB_NUMOF];
+/* +1 ensures that whenever the pool is empty, there is at least one neighbor
+ * with 2 or more packets, thus we can always pop a packet from that neighbor
+ * without leaving it's queue empty, as required by
+ *
+ * https://www.rfc-editor.org/rfc/rfc4861#section-7.2.2
+ *
+ *  While waiting for address resolution to complete, the sender MUST,
+ *  for each neighbor, retain a small queue of packets waiting for
+ *  address resolution to complete.  The queue MUST hold at least one
+ *  packet, and MAY contain more.  However, the number of queued packets
+ *  per neighbor SHOULD be limited to some small value.  When a queue
+ *  overflows, the new arrival SHOULD replace the oldest entry.  Once
+ *  address resolution completes, the node transmits any queued packets. */
+static gnrc_pktqueue_t _queue_pool[CONFIG_GNRC_IPV6_NIB_NUMOF + 1];
 #endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
@@ -1267,19 +1280,67 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 }
 
+static _nib_onl_entry_t *_iter_nc_nbr(_nib_onl_entry_t const *last)
+{
+    while ((last = _nib_onl_iter(last))) {
+        if (last->mode & _NC) {
+            break;
+        }
+    }
+
+    return (_nib_onl_entry_t *)last;
+}
+
+/* This function nevers fail as doing so would force us to drop newer packets
+ * instead of older, thus leaving stale packets in the neighbor queues
+ *
+ * https://www.rfc-editor.org/rfc/rfc4861#section-7.2.2
+ *
+ *  While waiting for address resolution to complete, the sender MUST,
+ *  for each neighbor, retain a small queue of packets waiting for
+ *  address resolution to complete.  The queue MUST hold at least one
+ *  packet, and MAY contain more.  However, the number of queued packets
+ *  per neighbor SHOULD be limited to some small value.  When a queue
+ *  overflows, the new arrival SHOULD replace the oldest entry.  Once
+ *  address resolution completes, the node transmits any queued packets. */
 static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(_queue_pool); i++) {
         if (_queue_pool[i].pkt == NULL) {
             _queue_pool[i].pkt = pkt;
             return &_queue_pool[i];
         }
     }
+
+    /* We run out of free queue entries. Pop from the nbr with the longest queue */
+    _nib_onl_entry_t *nbr = _iter_nc_nbr(NULL);
+    _nib_onl_entry_t *hoarder = nbr;
+    /* There MUST be at least a neighbor in the NC */
+    assert(hoarder);
+    while ((nbr = _iter_nc_nbr(nbr))) {
+        if (nbr->pktqueue_len > hoarder->pktqueue_len) {
+            hoarder = nbr;
+        }
+    }
+
+    DEBUG("nib: no free pktqueue entries, popping from %s hogging %"PRIuSIZE"\n",
+          ipv6_addr_to_str(addr_str, &hoarder->ipv6, sizeof(addr_str)),
+          hoarder->pktqueue_len);
+
+    /* We have one more pktqueue entries than neighbors in the NC, therefore
+     * there must be a neighbor with two or more packets in its queue */
+    assert(hoarder->pktqueue_len >= 2);
+
+    gnrc_pktqueue_t *qentry = _nbr_pop_pkt(hoarder);
+    gnrc_pktbuf_release(qentry->pkt);
+
+    qentry->pkt = pkt;
+    return qentry;
 #else
     (void)pkt;
-#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
     return NULL;
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 }
 
 static bool _resolve_addr_from_nc(_nib_onl_entry_t *entry, gnrc_netif_t *netif,
@@ -1316,13 +1377,6 @@ static bool _enqueue_for_resolve(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     }
 
     gnrc_pktqueue_t *queue_entry = _alloc_queue_entry(pkt);
-
-    if (queue_entry == NULL) {
-        DEBUG("nib: can't allocate entry for packet queue "
-              "dropping packet\n");
-        gnrc_pktbuf_release(pkt);
-        return false;
-    }
 
     if (netif != NULL) {
         gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
@@ -1754,17 +1808,6 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node)
 void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
 {
     assert(_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
-
-    assert(node->pktqueue_len <= CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP);
-    if (node->pktqueue_len == CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP) {
-        gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
-
-        assert(oldest != NULL);
-
-        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, oldest->pkt);
-        gnrc_pktbuf_release_error(oldest->pkt, ENOBUFS);
-        oldest->pkt = NULL;
-    }
 
     gnrc_pktqueue_add(&node->pktqueue, pkt);
     node->pktqueue_len++;
