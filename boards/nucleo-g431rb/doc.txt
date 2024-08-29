@@ -10,7 +10,7 @@ Cortex-M4 STM32G431RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-g431rb-and-more.svg "Pinout for the nucleo-g431rg (from STM board manual)" width=50%
+@image html pinouts/nucleo-g431rb-and-more.svg "Pinout for the Nucleo-G431RB (from STM user manual UM2505, https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf, page 29)" width=50%
 
 ## Flashing the device
 
