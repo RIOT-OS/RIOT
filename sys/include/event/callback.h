@@ -36,6 +36,7 @@
 #ifndef EVENT_CALLBACK_H
 #define EVENT_CALLBACK_H
 
+#include <assert.h>
 #include "event.h"
 
 #ifdef __cplusplus
@@ -59,6 +60,25 @@ typedef struct {
  * @param[in]   arg             callback argument to set up
  */
 void event_callback_init(event_callback_t *event_callback, void (*callback)(void *), void *arg);
+
+/**
+ * @brief   Queue an event
+ *
+ * The given event will be posted on the given @p queue. If the event is already
+ * queued when calling this function, the event will not be touched and remain
+ * in the previous position on the queue. So reposting an event while it is
+ * already on the queue will have no effect.
+ *
+ * @pre     queue should be initialized
+ *
+ * @param[in]   queue   event queue to queue event in
+ * @param[in]   event   event to queue in event queue
+ */
+static inline void event_callback_post(event_queue_t *queue, event_callback_t *event)
+{
+    assert(event->callback);
+    event_post(queue, &event->super);
+}
 
 /**
  * @brief   Generate a one-shot callback event on @p queue
