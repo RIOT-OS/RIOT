@@ -36,6 +36,7 @@
 void event_post(event_queue_t *queue, event_t *event)
 {
     assert(queue && event);
+    assert(event->handler);
 
     unsigned state = irq_disable();
     if (!event->list_node.next) {
