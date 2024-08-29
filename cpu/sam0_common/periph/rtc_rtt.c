@@ -407,29 +407,31 @@ void rtt_init(void)
     _read_gp(backup);
 #endif
 
-    _rtt_reset();
+    if (!cpu_woke_from_backup()) {
+        _rtt_reset();
 
 #ifdef MODULE_PERIPH_RTC_MEM
 #ifdef RTC_MODE2_CTRLB_GP2EN
-    /* RTC driver does not use COMP[1] or ALARM[1] */
-    /* Use second set of Compare registers as general purpose register */
-    RTC->MODE2.CTRLB.reg = RTC_MODE2_CTRLB_GP2EN;
+        /* RTC driver does not use COMP[1] or ALARM[1] */
+        /* Use second set of Compare registers as general purpose register */
+        RTC->MODE2.CTRLB.reg = RTC_MODE2_CTRLB_GP2EN;
 #endif
-    _write_gp(backup);
+        _write_gp(backup);
 #endif /* MODULE_PERIPH_RTC_MEM */
 
-    /* set 32bit counting mode & enable the RTC */
+        /* set 32bit counting mode & enable the RTC */
 #ifdef REG_RTC_MODE0_CTRLA
-    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0)
-                         | RTC_MODE0_CTRLA_ENABLE
-                         | RTC_MODE0_CTRLA_COUNTSYNC
-                         | RTC_MODE0_PRESCALER;
+        RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0)
+                            | RTC_MODE0_CTRLA_ENABLE
+                            | RTC_MODE0_CTRLA_COUNTSYNC
+                            | RTC_MODE0_PRESCALER;
 #else
-    RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0)
-                        | RTC_MODE0_CTRL_ENABLE
-                        | RTC_MODE0_PRESCALER;
+        RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0)
+                            | RTC_MODE0_CTRL_ENABLE
+                            | RTC_MODE0_PRESCALER;
 #endif
-    _wait_syncbusy();
+        _wait_syncbusy();
+    }
 
     /* initially clear flag */
     RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0
