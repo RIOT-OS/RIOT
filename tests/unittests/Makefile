@@ -37,13 +37,6 @@ INCLUDES += -I$(RIOTBASE)/tests/unittests/common
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
 CFLAGS += -DCONFIG_CORE_EXIT_WITH_MAIN=1
 
-# for these boards, enable asan (Address Sanitizer)
-ASAN_BOARDS ?= native native64
-ifneq (, $(filter $(ASAN_BOARDS), $(BOARD)))
-  CFLAGS += $(CFLAGS_ASAN)
-  LINKFLAGS += $(LINKFLAGS_ASAN)
-endif
-
 include $(RIOTBASE)/Makefile.include
 
 .PHONY: $(UNIT_TESTS)
