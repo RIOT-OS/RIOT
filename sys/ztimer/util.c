@@ -30,11 +30,147 @@
 #include "thread.h"
 #include "ztimer.h"
 
+static list_node_t rooms = {.next = NULL};
+static mutex_t room_lock = MUTEX_INIT;
+
 static void _callback_unlock_mutex(void *arg)
 {
     mutex_t *mutex = (mutex_t *)arg;
 
     mutex_unlock(mutex);
+}
+
+static void _callback_sleep_range(void *arg)
+{
+    callback_sleep_range_arg_t *args = (callback_sleep_range_arg_t *)arg;
+    
+    mutex_lock(&room_lock);
+    list_remove(&rooms, &(args->room->node));
+    mutex_unlock(&room_lock);
+
+    ztimer_release(ZTIMER_USEC);
+    
+    mutex_lock(args->lock);
+    cond_broadcast(args->condition_var);
+    mutex_unlock(args->lock);
+}
+
+// unsure if we really need this.
+static void _add_room_sorted(ztimer_room_t* new_room)
+{
+    if (!new_room || !&(new_room->node)) {
+        return;
+    }
+
+    list_node_t* curr = &rooms;
+    while (curr->next != NULL) {
+        ztimer_room_t* curr_room = (ztimer_room_t *)curr->next;
+        if (curr_room->end > new_room->end) {
+            break;
+        }
+        curr = curr->next;
+    }
+    new_room->node.next = curr->next;
+    mutex_lock(&room_lock);
+    curr->next = &(new_room->node);
+    mutex_unlock(&room_lock);
+}
+
+void ztimer_sleep_range(uint32_t min_time, uint32_t max_time)
+{
+    assert(!irq_is_in());
+    ztimer_now_t start = ztimer_now(ZTIMER_USEC);
+
+    // add this interval to a room
+    bool added_to_existing_room = false;
+    list_node_t* curr = &rooms;
+    
+    // Set relative times based on whether or not there are any rooms currently.
+    // No rooms means there is no guarantee about timer being acquired.
+    ztimer_now_t base;
+    uint32_t relative_min;
+    uint32_t relative_max;
+    if (curr->next != NULL) {
+        base = ztimer_now(ZTIMER_USEC);
+        relative_min = base + min_time;
+        relative_max = base + max_time;
+
+        while (curr->next != NULL) {
+            //ztimer_room_t* curr_room = (ztimer_room_t *)curr->next;
+            ztimer_room_t* curr_room = container_of((clist_node_t*)curr->next, 
+                                                     ztimer_room_t, node);
+            if (!(relative_min > curr_room->end ||
+                  relative_max < curr_room->begin)) {
+                added_to_existing_room = true;
+                if (relative_min > curr_room->begin) {
+                    curr_room->begin = relative_min;
+                }
+                if (relative_max < curr_room->end) {
+                    curr_room->end = relative_max;
+                    ztimer_remove(ZTIMER_USEC, curr_room->room_timer);
+                    ztimer_now_t elapsed = ztimer_now(ZTIMER_USEC) - start;
+                    /* correct board / MCU specific overhead */
+                    if (relative_max > elapsed) {
+                        relative_max -= elapsed;
+                    }
+                    else {
+                        relative_max = 0;
+                    }
+                    ztimer_set(ZTIMER_USEC, curr_room->room_timer, relative_max - base);
+                }
+                mutex_lock(curr_room->cond_lock);
+                cond_wait(curr_room->condition_var, curr_room->cond_lock);
+                mutex_unlock(curr_room->cond_lock);
+                break;
+            }
+            curr = curr->next;
+        }
+    }
+
+    // Create new room
+    if (!added_to_existing_room) {
+        ztimer_acquire(ZTIMER_USEC); // keep this timer as long as the room is in use.
+        base = ztimer_now(ZTIMER_USEC);
+        relative_min = base + min_time;
+        relative_max = base + max_time;
+
+        list_node_t new_node = {.next = NULL};
+        mutex_t new_cond_lock = MUTEX_INIT;
+        cond_t new_condition_var = COND_INIT;
+        callback_sleep_range_arg_t callback_args = {
+            .condition_var = &new_condition_var,
+            .lock = &new_cond_lock
+        };
+        ztimer_t new_timer = {
+            .callback = _callback_sleep_range,
+            .arg = (void *)&callback_args,
+        };
+        ztimer_room_t new_room = {
+            .node = new_node,
+            .begin = relative_min,
+            .end = relative_max,
+            .cond_lock = &new_cond_lock,
+            .condition_var = &new_condition_var,
+            .room_timer = &new_timer
+        };
+        callback_args.room = &new_room;
+        _add_room_sorted(&new_room);
+        mutex_lock(&room_lock);
+        mutex_unlock(&room_lock);
+        ztimer_now_t elapsed = ztimer_now(ZTIMER_USEC) - start;
+        /* correct board / MCU specific overhead */
+        if (max_time > elapsed) {
+            max_time -= elapsed;
+        }
+        else {
+            max_time = 0;
+        }
+        //ztimer_release(ZTIMER_USEC);
+        ztimer_set(ZTIMER_USEC, new_room.room_timer, max_time);
+        mutex_lock(new_room.cond_lock);
+        cond_wait(new_room.condition_var, new_room.cond_lock);
+        mutex_unlock(new_room.cond_lock);
+    }
 }
 
 void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration)
