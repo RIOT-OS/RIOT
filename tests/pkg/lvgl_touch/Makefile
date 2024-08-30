@@ -17,9 +17,6 @@ USEMODULE += lvgl_extra_theme_default
 
 USEMODULE += random
 
-# blacklist native64 until https://github.com/RIOT-OS/riotdocker/pull/241 is resolved
-BOARD_BLACKLIST += native64
-
 include $(RIOTBASE)/Makefile.include
 
 # SDL requires more stack

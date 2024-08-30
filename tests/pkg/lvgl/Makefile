@@ -12,9 +12,6 @@ USEMODULE += lvgl_extra_layout_flex
 USEMODULE += lvgl_extra_theme_default
 USEMODULE += lvgl_extra_theme_default_dark
 
-# blacklist native64 until https://github.com/RIOT-OS/riotdocker/pull/241 is resolved
-BOARD_BLACKLIST += native64
-
 include $(RIOTBASE)/Makefile.include
 
 # SDL requires more stack
