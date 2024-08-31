@@ -46,6 +46,7 @@ typedef struct rpx0xx_usb_dev {
     /* Information about each allocated endpoint. */
     rpx0xx_usb_ep_t hw_ep[2 * USBDEV_NUM_ENDPOINTS];
     usbdev_t dev;
+    uint32_t int_status;
     bool suspended;
     bool connected;
 } rpx0xx_usb_dev_t;
@@ -220,7 +221,11 @@ static void _poweron(void)
     io_reg_atomic_set(&USBCTRL_REGS->MAIN_CTRL,
                       USBCTRL_REGS_MAIN_CTRL_CONTROLLER_EN_Msk);
     io_reg_atomic_set(&USBCTRL_REGS->USB_MUXING,
-                      USBCTRL_REGS_USB_MUXING_TO_PHY_Msk);
+                      USBCTRL_REGS_USB_MUXING_TO_PHY_Msk /*|
+                      USBCTRL_REGS_USB_MUXING_SOFTCON_Msk*/);
+    io_reg_atomic_set(&USBCTRL_REGS->USB_PWR,
+                      USBCTRL_REGS_USB_PWR_VBUS_DETECT_Msk |
+                      USBCTRL_REGS_USB_PWR_VBUS_DETECT_OVERRIDE_EN_Msk);
 }
 
 /*
@@ -248,16 +253,19 @@ static void _enable_irq(void) {
     io_reg_atomic_set(&USBCTRL_REGS->INTE,
                       USBCTRL_REGS_INTE_BUS_RESET_Msk |
                       USBCTRL_REGS_INTE_DEV_SUSPEND_Msk |
-                      USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk);
+                      USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk |
+                      USBCTRL_REGS_INTE_BUFF_STATUS_Msk);
     io_reg_atomic_set(&USBCTRL_REGS->SIE_CTRL,
                       USBCTRL_REGS_SIE_CTRL_EP0_INT_1BUF_Msk);
+    NVIC_EnableIRQ(USBCTRL_IRQ_IRQn);
 }
 
 static void _disable_irq(void) {
     io_reg_atomic_clear(&USBCTRL_REGS->INTE,
                         USBCTRL_REGS_INTE_BUS_RESET_Msk |
                         USBCTRL_REGS_INTE_DEV_SUSPEND_Msk |
-                        USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk);
+                        USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk |
+                        USBCTRL_REGS_INTE_BUFF_STATUS_Msk);
     io_reg_atomic_clear(&USBCTRL_REGS->SIE_CTRL,
                         USBCTRL_REGS_SIE_CTRL_EP0_INT_1BUF_Msk);
 }
@@ -397,7 +405,7 @@ static void _ep_dpram_alloc(rpx0xx_usb_ep_t *ep, size_t size)
         
         _ep_buf_ctrl_reg_write(ep->ep.num, ep->ep.dir, reg, ~0UL);
     } else {
-        assert(ep->ep.type = USB_EP_TYPE_CONTROL);
+        assert(ep->ep.type == USB_EP_TYPE_CONTROL);
         assert(size == 64);
 
         ep->dpram_buf = (uint8_t *)(USBCTRL_DPRAM_BASE + 0x100UL);
@@ -433,6 +441,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
         hw_ep->ep.dir = dir;
         hw_ep->ep.type = type;
         hw_ep->ep.len = size;
+        _ep_dpram_alloc(hw_ep, size);
     }
 
     return &hw_ep->ep;
@@ -464,12 +473,8 @@ static void _disable_ep_irq(usbdev_ep_t *ep) {
 
 static void _usbdev_ep_init(usbdev_ep_t *ep)
 {
-    rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
-
     DEBUG("[rpx0xx usb] Call _usbdev_ep_init(ep.num = %d," 
           "ep.dir = %d)\n", ep->num, ep->dir);
-
-    _ep_dpram_alloc(hw_ep, ep->len);
 
     _enable_ep_irq(ep);
 }
@@ -647,9 +652,8 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 static void _usbdev_esr(usbdev_t *dev)
 {
     (void)dev;
-    uint32_t status = USBCTRL_REGS->INTS;
     
-    if (status & USBCTRL_REGS_INTS_DEV_SOF_Msk) {
+    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_DEV_SOF_Msk) {
         /* Start of frame received */
         uint32_t frame_number = USBCTRL_REGS->SOF_RD;
         /* we have to read the frame number to reset the interrupt,
@@ -657,13 +661,13 @@ static void _usbdev_esr(usbdev_t *dev)
         (void) frame_number;
         _hw_usb_dev.dev.cb(dev, USBDEV_EVENT_SOF);
     }
-    if (status & USBCTRL_REGS_INTS_BUS_RESET_Msk) {
+    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_BUS_RESET_Msk) {
         /* Bus reset received */
         _hw_usb_dev.dev.cb(dev, USBDEV_EVENT_RESET);
         io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
                             USBCTRL_REGS_SIE_STATUS_BUS_RESET_Msk);
     }
-    if (status & USBCTRL_REGS_INTS_DEV_SUSPEND_Msk) {
+    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_DEV_SUSPEND_Msk) {
         /* Bus suspend state has changed */
         if (_hw_usb_dev.suspended) {
             _hw_usb_dev.suspended = false;
@@ -677,7 +681,7 @@ static void _usbdev_esr(usbdev_t *dev)
         io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
                             USBCTRL_REGS_SIE_STATUS_SUSPENDED_Msk);
     }
-    if (status & USBCTRL_REGS_INTS_DEV_CONN_DIS_Msk) {
+    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_DEV_CONN_DIS_Msk) {
         /* Host connected or disconnected */
         if (_hw_usb_dev.connected) {
             _hw_usb_dev.connected = false;
@@ -690,9 +694,9 @@ static void _usbdev_esr(usbdev_t *dev)
                             USBCTRL_REGS_SIE_STATUS_CONNECTED_Msk);
     }
     /* all interrupts should be now cleared */
-    status = USBCTRL_REGS->INTS;
-    if (status) {
-        DEBUG("[rpx0xx usb] Unhandled interrupt, INTS=%lx", status);
+    _hw_usb_dev.int_status = USBCTRL_REGS->INTS;
+    if (_hw_usb_dev.int_status) {
+        DEBUG("[rpx0xx usb] Unhandled interrupt, INTS=%lx", _hw_usb_dev.int_status);
     }
     _enable_irq();
 }
@@ -724,6 +728,7 @@ void isr_usbctrl(void)
     }
     if (USBCTRL_REGS->INTS) {
         /* Device specific interrupt */
+        _hw_usb_dev.int_status = USBCTRL_REGS->INTS;
         _disable_irq();
         _hw_usb_dev.dev.cb(&_hw_usb_dev.dev, USBDEV_EVENT_ESR);
     }
