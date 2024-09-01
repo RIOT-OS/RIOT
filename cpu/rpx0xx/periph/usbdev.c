@@ -253,8 +253,10 @@ static void _enable_irq(void) {
     io_reg_atomic_set(&USBCTRL_REGS->INTE,
                       USBCTRL_REGS_INTE_BUS_RESET_Msk |
                       USBCTRL_REGS_INTE_DEV_SUSPEND_Msk |
-                      USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk |
-                      USBCTRL_REGS_INTE_BUFF_STATUS_Msk);
+                      USBCTRL_REGS_INTE_SETUP_REQ_Msk |
+                      /*USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk |*/
+                      USBCTRL_REGS_INTE_BUFF_STATUS_Msk/* |
+                      USBCTRL_REGS_INTE_DEV_SOF_Msk*/);
     io_reg_atomic_set(&USBCTRL_REGS->SIE_CTRL,
                       USBCTRL_REGS_SIE_CTRL_EP0_INT_1BUF_Msk);
     NVIC_EnableIRQ(USBCTRL_IRQ_IRQn);
@@ -264,8 +266,10 @@ static void _disable_irq(void) {
     io_reg_atomic_clear(&USBCTRL_REGS->INTE,
                         USBCTRL_REGS_INTE_BUS_RESET_Msk |
                         USBCTRL_REGS_INTE_DEV_SUSPEND_Msk |
-                        USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk |
-                        USBCTRL_REGS_INTE_BUFF_STATUS_Msk);
+                        USBCTRL_REGS_INTE_SETUP_REQ_Msk |
+                        /*USBCTRL_REGS_INTE_DEV_CONN_DIS_Msk |*/
+                        USBCTRL_REGS_INTE_BUFF_STATUS_Msk/* |
+                        USBCTRL_REGS_INTE_DEV_SOF_Msk*/);
     io_reg_atomic_clear(&USBCTRL_REGS->SIE_CTRL,
                         USBCTRL_REGS_SIE_CTRL_EP0_INT_1BUF_Msk);
 }
@@ -538,12 +542,13 @@ static bool _ep_buf_is_available(usbdev_ep_t *ep)
     return !(buf_ctrl_reg & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk);
 }
 
+/*
 static bool _ep_buf_is_full(usbdev_ep_t *ep)
 {
     __IOM uint32_t buf_ctrl_reg = *_get_ep_buf_ctrl_reg(ep->num, ep->dir);
     return buf_ctrl_reg & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk;
 }
-
+*/
 
 static size_t _ep_get_available(usbdev_ep_t *ep)
 {
@@ -551,7 +556,7 @@ static size_t _ep_get_available(usbdev_ep_t *ep)
         if (ep->dir == USB_EP_DIR_IN) {
             rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
             return hw_ep->dpram_bufsize;
-        } else if(_ep_buf_is_full(ep)) {
+        } else {
             __IOM uint32_t *reg = _get_ep_buf_ctrl_reg(ep->num, ep->dir);
             return *reg | USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk;
         }
@@ -634,6 +639,9 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 
     size_t available_len = _ep_get_available(ep);
 
+    DEBUG("[rpx0xx usb] call _usbdev_ep_xmit(ep.num=%d, ep.dir=%d, len=%d), available=%d ", 
+          ep->num, ep->dir, len, available_len);
+
     if (available_len < len) {
         len = available_len;
     }
@@ -692,6 +700,13 @@ static void _usbdev_esr(usbdev_t *dev)
         }
         io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
                             USBCTRL_REGS_SIE_STATUS_CONNECTED_Msk);
+    }
+    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_SETUP_REQ_Msk) {
+        /* Setup Request received on EP0 */
+        _hw_usb_dev.dev.epcb(&_get_ep(0, USB_EP_DIR_OUT)->ep, 
+                             USBDEV_EVENT_TR_COMPLETE);
+        io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
+                            USBCTRL_REGS_SIE_STATUS_SETUP_REC_Msk);
     }
     /* all interrupts should be now cleared */
     _hw_usb_dev.int_status = USBCTRL_REGS->INTS;
