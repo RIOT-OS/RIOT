@@ -99,9 +99,8 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
     assert(pfx != NULL);
     _nib_acquire();
     while ((dst = _nib_offl_iter(dst)) != NULL) {
-        assert(dst->next_hop != NULL);
         if ((pfx_len == dst->pfx_len) &&
-            ((iface == 0) || (iface == _nib_onl_get_if(dst->next_hop))) &&
+            ((iface == 0) || (iface == _nib_offl_get_if(dst))) &&
             (ipv6_addr_match_prefix(pfx, &dst->pfx) >= pfx_len)) {
 
             /* notify downstream nodes about the prefix removal */
@@ -127,17 +126,17 @@ bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
 
     _nib_acquire();
     while ((dst = _nib_offl_iter(dst)) != NULL) {
-        const _nib_onl_entry_t *node = dst->next_hop;
-        if ((node != NULL) && (dst->mode & _PL) &&
-            ((iface == 0) || (_nib_onl_get_if(node) == iface))) {
-            entry->pfx_len = dst->pfx_len;
-            ipv6_addr_set_unspecified(&entry->pfx);
-            ipv6_addr_init_prefix(&entry->pfx, &dst->pfx, dst->pfx_len);
-            entry->iface = _nib_onl_get_if(node);
-            entry->valid_until = dst->valid_until;
-            entry->pref_until = dst->pref_until;
-            break;
+        if (!(dst->mode & _PL) ||
+             (iface != 0 && _nib_offl_get_if(dst) != iface)) {
+            continue;
         }
+        entry->pfx_len = dst->pfx_len;
+        ipv6_addr_set_unspecified(&entry->pfx);
+        ipv6_addr_init_prefix(&entry->pfx, &dst->pfx, dst->pfx_len);
+        entry->iface = _nib_offl_get_if(dst);
+        entry->valid_until = dst->valid_until;
+        entry->pref_until = dst->pref_until;
+        break;
     }
     _nib_release();
     *state = dst;

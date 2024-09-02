@@ -258,7 +258,7 @@ static bool _on_link(const ipv6_addr_t *dst, unsigned *iface)
     }
 
     if (match) {
-        *iface = _nib_onl_get_if(match->next_hop);
+        *iface = _nib_offl_get_if(match);
         /* check if prefix is on-link */
         return (match->mode & _PL) && (match->flags & _PFX_ON_LINK);
     }
@@ -1446,7 +1446,7 @@ static void _handle_snd_na(gnrc_pktsnip_t *pkt)
 
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
 {
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_offl_get_if(pfx));
     if (netif == NULL) {
         return;
     }

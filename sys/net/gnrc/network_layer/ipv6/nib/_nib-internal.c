@@ -84,27 +84,30 @@ void _nib_release(void)
 static inline bool _addr_equals(const ipv6_addr_t *addr,
                                 const _nib_onl_entry_t *node)
 {
-    return (addr == NULL) || ipv6_addr_is_unspecified(&node->ipv6) ||
-           (ipv6_addr_equal(addr, &node->ipv6));
+    return (addr == NULL) ?
+    ipv6_addr_is_unspecified(&node->ipv6)
+    : (ipv6_addr_equal(addr, &node->ipv6));
 }
 
 _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
 {
+    assert(addr);
     _nib_onl_entry_t *node = NULL;
-
     DEBUG("nib: Allocating on-link node entry (addr = %s, iface = %u)\n",
-          (addr == NULL) ? "NULL" : ipv6_addr_to_str(addr_str, addr,
-                                                     sizeof(addr_str)), iface);
+          ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), iface);
+
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *tmp = &_nodes[i];
 
-        if ((_nib_onl_get_if(tmp) == iface) && _addr_equals(addr, tmp)) {
-            /* exact match */
-            DEBUG("  %p is an exact match\n", (void *)tmp);
-            node = tmp;
-            break;
+        if (tmp->mode != _EMPTY) {
+            if (_nib_onl_get_if(tmp) == iface && _addr_equals(addr, tmp)) {
+                /* exact match */
+                DEBUG("  %p is an exact match\n", (void *)tmp);
+                node = tmp;
+                break;
+            }
         }
-        if ((node == NULL) && (tmp->mode == _EMPTY)) {
+        else if (node == NULL) {
             DEBUG("  using %p\n", (void *)node);
             node = tmp;
         }
@@ -501,12 +504,18 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
         _nib_offl_entry_t *tmp = &_dsts[i];
         _nib_onl_entry_t *tmp_node = tmp->next_hop;
 
-        if ((tmp->pfx_len == pfx_len) &&                /* prefix length matches and */
-            (tmp_node != NULL) &&                       /* there is a next hop that */
-            (_nib_onl_get_if(tmp_node) == iface) &&     /* has a matching interface and */
-            _addr_equals(next_hop, tmp_node) &&         /* equal address to next_hop, also */
-            (ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len)) {  /* the prefix matches */
-            /* exact match (or next hop address was previously unset) */
+        bool match = false;
+        if (tmp->mode != _EMPTY) {
+            /* match onlink entry by interface and address for DC and FT */
+            bool match = !tmp_node || (_nib_onl_get_if(tmp_node) == iface &&
+                                       _addr_equals(next_hop, tmp_node));
+            /* match offlink entry for PFX, DC and FT */
+            match = match && tmp->pfx_len == pfx_len &&
+                             _nib_offl_get_if(tmp) == iface &&
+                             ipv6_addr_match_prefix(&tmp->pfx, pfx) >= pfx_len;
+
+        }
+        if (match) {
             DEBUG("  %p is an exact match\n", (void *)tmp);
             if (next_hop != NULL) {
                 memcpy(&tmp_node->ipv6, next_hop, sizeof(tmp_node->ipv6));
@@ -520,14 +529,16 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
     }
     if (dst != NULL) {
         DEBUG("  using %p\n", (void *)dst);
-        dst->next_hop = _nib_onl_alloc(next_hop, iface);
-
-        if (dst->next_hop == NULL) {
-            memset(dst, 0, sizeof(_nib_offl_entry_t));
-            return NULL;
+        if (next_hop) {
+            /* PFX do not require an NCE, but DC and FT do */
+            if (!(dst->next_hop = _nib_onl_alloc(next_hop, iface))) {
+                memset(dst, 0, sizeof(_nib_offl_entry_t));
+                return NULL;
+            }
+            _override_node(next_hop, iface, dst->next_hop);
+            dst->next_hop->mode |= _DST;
         }
-        _override_node(next_hop, iface, dst->next_hop);
-        dst->next_hop->mode |= _DST;
+        _nib_offl_set_if(dst, iface);
         ipv6_addr_init_prefix(&dst->pfx, pfx, pfx_len);
         dst->pfx_len = pfx_len;
     }
@@ -614,7 +625,7 @@ static _nib_offl_entry_t *_nib_offl_get_match(const ipv6_addr_t *dst)
                   (entry->mode == _PL) ? "(nil)" :
                   ipv6_addr_to_str(addr_str, &entry->next_hop->ipv6,
                                    sizeof(addr_str)),
-                  _nib_onl_get_if(entry->next_hop), match);
+                  _nib_offl_get_if(entry), match);
             if ((match > best_match) && (match >= entry->pfx_len)) {
                 DEBUG("nib: best match (%u bits)\n", match);
                 res = entry;
@@ -631,7 +642,7 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte)
     memcpy(&fte->dst, &dst->pfx, sizeof(dst->pfx));
     fte->dst_len = dst->pfx_len;
     fte->primary = 0;
-    fte->iface = _nib_onl_get_if(dst->next_hop);
+    fte->iface = _nib_offl_get_if(dst);
     if (dst->mode == _PL) { /* entry is only in prefix list */
         ipv6_addr_set_unspecified(&fte->next_hop);
     }
@@ -711,7 +722,7 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
     evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
 
     /* get interface associated with prefix */
-    netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
+    netif = gnrc_netif_get_by_pid(_nib_offl_get_if(pfx));
 
     if (netif != NULL) {
         uint8_t best_match_len = pfx->pfx_len;
@@ -880,10 +891,9 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
 static void _override_node(const ipv6_addr_t *addr, unsigned iface,
                            _nib_onl_entry_t *node)
 {
+    assert(addr);
     _nib_onl_clear(node);
-    if (addr != NULL) {
-        memcpy(&node->ipv6, addr, sizeof(node->ipv6));
-    }
+    memcpy(&node->ipv6, addr, sizeof(node->ipv6));
     _nib_onl_set_if(node, iface);
 }
 
