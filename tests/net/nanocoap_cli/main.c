@@ -53,6 +53,7 @@ extern int nanotest_client_url_cmd(int argc, char **argv);
 extern int nanotest_server_cmd(int argc, char **argv);
 extern int nanotest_client_put_cmd(int argc, char **argv);
 extern int nanotest_client_put_non_cmd(int argc, char **argv);
+extern int nanotest_client_get_non_cmd(int argc, char **argv);
 static int _list_all_inet6(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
@@ -60,6 +61,7 @@ static const shell_command_t shell_commands[] = {
     { "url", "CoAP client URL request", nanotest_client_url_cmd },
     { "put", "experimental put", nanotest_client_put_cmd },
     { "put_non", "non-confirmable put", nanotest_client_put_non_cmd },
+    { "get_non", "non-confirmable get", nanotest_client_get_non_cmd },
     { "server", "CoAP server", nanotest_server_cmd },
     { "inet6", "IPv6 addresses", _list_all_inet6 },
     { NULL, NULL, NULL }

@@ -322,3 +322,29 @@ int nanotest_client_put_non_cmd(int argc, char **argv)
 
     return res;
 }
+
+int nanotest_client_get_non_cmd(int argc, char **argv)
+{
+    int res;
+
+    uint8_t response[CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT];
+
+    if (argc < 2) {
+        printf("usage: %s <url>\n", argv[0]);
+        return 1;
+    }
+
+    nanocoap_sock_t sock;
+    nanocoap_sock_url_connect(argv[1], &sock);
+
+    res = nanocoap_sock_get_non(&sock, sock_urlpath(argv[1]), response, sizeof(response));
+    nanocoap_sock_close(&sock);
+
+    if (res >= 0) {
+        od_hex_dump(response, res, OD_WIDTH_DEFAULT);
+    }
+    else {
+        printf("error: %d\n", res);
+    }
+    return res;
+}
