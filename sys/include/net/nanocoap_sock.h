@@ -390,6 +390,20 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf,
                           size_t len);
 
 /**
+ * @brief   Simple non-confirmable GET
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path and query
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
+                              void *response, size_t len_max);
+
+/**
  * @brief   Simple synchronous CoAP (confirmable) PUT
  *
  * @param[in]   sock    socket to use for the request
