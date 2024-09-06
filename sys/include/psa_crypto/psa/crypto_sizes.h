@@ -108,6 +108,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Number of required allocated sealed key slots.
+ *
+ * @details These should be defined by the developer to
+ *          fit their requirements. The default number is 5.
+ */
+#ifndef CONFIG_PSA_SEALED_KEY_COUNT
+#define CONFIG_PSA_SEALED_KEY_COUNT  0
+#endif
+
+/**
  * @brief   A sufficient plaintext buffer size for @ref psa_aead_decrypt(),
  *          for any of the supported key types and AEAD algorithms.
  *

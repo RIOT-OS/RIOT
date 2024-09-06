@@ -519,8 +519,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
         case PSA_ECC_P256_R1:
             // todo: support for Weierstrass curves
-            (void)slot;
-            ret = PSA_ERROR_NOT_SUPPORTED;
+            ret = psa_import_ecc_p256r1_key_pair(attributes, data, data_length, key_data, key_data_size, key_bytes, pubkey_data, pubkey_data_len);
             break;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
@@ -533,11 +532,13 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
             ret = PSA_ERROR_NOT_SUPPORTED;
             break;
         }
-        if (ret == PSA_SUCCESS) {
+#ifndef BOARD_NRF9160DK_NS
+        if ((ret == PSA_SUCCESS)){
             /* save private key data */
             memcpy(key_data, data, data_length);
             *key_bytes = data_length;
         }
+#endif
         return ret;
     }
     return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);

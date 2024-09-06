@@ -30,6 +30,11 @@ extern "C" {
 #include "psa_crypto_se_management.h"
 
 /**
+ * @brief   Number of allocated slots for sealed keys.
+ */
+#define PSA_SEALED_KEY_COUNT            (CONFIG_PSA_SEALED_KEY_COUNT)
+
+/**
  * @brief   Number of allocated slots for keys in protected memory or secure elements.
  */
 #define PSA_PROTECTED_KEY_COUNT         (CONFIG_PSA_PROTECTED_KEY_COUNT)
@@ -47,7 +52,8 @@ extern "C" {
 /**
  * @brief   Complete number of available key slots
  */
-#define PSA_KEY_SLOT_COUNT              (PSA_PROTECTED_KEY_COUNT + \
+#define PSA_KEY_SLOT_COUNT              (PSA_SEALED_KEY_COUNT + \
+                                         PSA_PROTECTED_KEY_COUNT + \
                                          PSA_ASYMMETRIC_KEYPAIR_COUNT + \
                                          PSA_SINGLE_KEY_COUNT)
 
@@ -85,6 +91,27 @@ typedef struct {
     } key;                                      /**< Key data structure */
 #endif /* PSA_SINGLE_KEY_COUNT */
 } psa_key_slot_t;
+
+#if PSA_SEALED_KEY_COUNT
+#include "sealed_key.h"
+
+/**
+ * @brief   Structure for a sealed key slot.
+ *
+ *          These slots hold Slot Numbers for keys in protected storage and, if the key type is an
+ *          asymmetric key pair, the public key.
+ */
+typedef struct {
+    clist_node_t node;
+    size_t lock_count;
+    psa_key_attributes_t attr;
+    struct key_data {
+        CYS_PROT_p256_key_t sealed_key;
+        uint8_t pubkey_data[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE];
+        size_t pubkey_data_len;
+    } key;
+} psa_sealed_key_slot_t;
+#endif /* PSA_SEALED_KEY_COUNT */
 
 #if PSA_PROTECTED_KEY_COUNT
 /**
@@ -180,7 +207,8 @@ psa_key_slot_number_t * psa_key_slot_get_slot_number(const psa_key_slot_t *slot)
  */
 static inline int psa_key_lifetime_is_external(psa_key_lifetime_t lifetime)
 {
-    return (PSA_KEY_LIFETIME_GET_LOCATION(lifetime) != PSA_KEY_LOCATION_LOCAL_STORAGE);
+    return (PSA_KEY_LIFETIME_GET_LOCATION(lifetime) != PSA_KEY_LOCATION_LOCAL_STORAGE &&
+            PSA_KEY_LIFETIME_GET_LOCATION(lifetime) != PSA_KEY_LOCATION_LOCAL_SEALED );
 }
 
 /**

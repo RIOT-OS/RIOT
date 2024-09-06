@@ -253,6 +253,8 @@ psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer, uint8_
                                                 size_t *priv_key_buffer_length,
                                                 size_t *pub_key_buffer_length);
 
+psa_status_t psa_import_ecc_p256r1_key_pair(const psa_key_attributes_t *attributes, const uint8_t *key_data, size_t key_data_length, uint8_t *priv_key_buffer, size_t priv_key_size, size_t *priv_key_buffer_length, uint8_t *pub_key_buffer, size_t *pub_key_buffer_length);
+
 /**
  * @brief   Low level wrapper function to call a driver for deriving an ed25519 public key from the private key.
  *
