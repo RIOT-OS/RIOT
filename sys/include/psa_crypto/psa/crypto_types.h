@@ -26,6 +26,8 @@ extern "C" {
 
 #include <stdint.h>
 
+#include "psa/error.h"
+
 /**
  * @brief   For encrypt-decrypt functions, whether the operation is an encryption
  *          or a decryption.
@@ -318,15 +320,6 @@ typedef struct psa_aead_operation_s psa_aead_operation_t;
  *          non-portable.
  */
 typedef struct psa_mac_operation_s psa_mac_operation_t;
-
-/**
- * @brief   Function return status.
- *
- * @details This is either @ref PSA_SUCCESS, which is zero, indicating success; or a small
- *          negative value indicating that an error occurred. Errors are encoded as one of
- *          the @c PSA_ERROR_xxx values defined here.
- */
-typedef int32_t psa_status_t;
 
 /**
  * @brief   The type of the state data structure for multipart hash operations.

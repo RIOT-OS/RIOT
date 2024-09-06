@@ -12,7 +12,8 @@
  * About {#About}
  * =====
  * This module implements the PSA Cryptography API Version 1.1 as specified
- * [here](https://armmbed.github.io/mbed-crypto/html/).
+ * [here](https://armmbed.github.io/mbed-crypto/html/) and the PSA Status code API Version 1.0
+ * as specified [here](https://arm-software.github.io/psa-api/status-code/1.0/).
  * It provides an OS level access to cryptographic operations and supports software and hardware
  * backends as well as the use of secure elements.
  * The API automatically builds a hardware backend for an operation, if there's one available,
