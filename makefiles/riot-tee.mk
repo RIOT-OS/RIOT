@@ -1,7 +1,6 @@
 ifdef SECURE_FLASH_SIZE
 
 SECURE_IMAGE = $(BINDIR)/pkg-build/riot-tee/riot-tee.elf
-# SECURE_IMAGE = ~/work/riot-tee/build/riot-tee.elf
 NON_SECURE_IMAGE = $(BINDIR)/$(APPLICATION).elf
 MERGED_HEX = $(BINDIR)/$(APPLICATION)_merged.hex
 MERGED_BIN = $(BINDIR)/$(APPLICATION)_merged.bin

@@ -8,11 +8,12 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 .PHONY: all..cmake_version_supported
 
-CMAKE_MINIMAL_VERSION = 3.10.0
+CMAKE_MINIMAL_VERSION = 3.30.0
 
 TEE_CFLAGS += -Wno-strict-prototypes
 TEE_CFLAGS += -Wno-old-style-definition
-# TEE_CFLAGS += -DRIOT_FETCHCONTENT_BASE_DIR=$(PKG_SOURCE_DIR)/build/_deps
+TEE_CFLAGS += -DTOOLCHAINPATH=/home/lena/apps/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi/bin
+TEE_CFLAGS += -DRIOT_CRYPTOSERVICE=$(RIOTBASE)/build/pkg/cryptoservice
 
 TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
@@ -23,7 +24,7 @@ all: $(PKG_BUILD_DIR)/Makefile
 
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 	cmake \
-    -DCMAKE_BUILD_TYPE=Debug \
+		-DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_C_FLAGS=$(TEE_CFLAGS) \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		-B$(PKG_BUILD_DIR) \

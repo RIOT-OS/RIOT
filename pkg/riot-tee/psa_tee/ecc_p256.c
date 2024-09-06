@@ -9,7 +9,7 @@ psa_status_t psa_generate_ecc_p256r1_key_pair(  const psa_key_attributes_t *attr
                                                 size_t *pub_key_buffer_length)
 {
     *priv_key_buffer_length = PSA_BITS_TO_BYTES(attributes->bits);
-    *pub_key_buffer_length = PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits) - 1;
+    *pub_key_buffer_length = PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits);
 
     /**
      * Add 0x04 prefix for SEC 1 encoded uncompressed elliptic curve points.
@@ -19,18 +19,34 @@ psa_status_t psa_generate_ecc_p256r1_key_pair(  const psa_key_attributes_t *attr
      * [2] https://arm-software.github.io/psa-api/crypto/1.1/api/keys/management.html#key-formats
      */
     pub_key_buffer[0] = 0x04;
-    psa_status_t status = tee_generate_ecc_p256r1_key_pair(priv_key_buffer, pub_key_buffer+1, priv_key_buffer_length, pub_key_buffer_length);
+    psa_status_t status = tee_generate_ecc_p256r1_key_pair(priv_key_buffer, pub_key_buffer+1, *priv_key_buffer_length, (*pub_key_buffer_length) - 1);
+
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+    return PSA_SUCCESS;
+}
+
+psa_status_t psa_import_ecc_p256r1_key_pair(const psa_key_attributes_t *attributes, const uint8_t *key_data, size_t key_data_length, uint8_t *priv_key_buffer, size_t priv_key_size, size_t *priv_key_buffer_length, uint8_t *pub_key_buffer, size_t *pub_key_buffer_length)
+{
+    *priv_key_buffer_length = PSA_BITS_TO_BYTES(attributes->bits);
+    *pub_key_buffer_length = PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits);
+
+    /**
+     * Add 0x04 prefix for SEC 1 encoded uncompressed elliptic curve points.
+     * Micro-ECC represents public keys in SEC 1 uncompressed format without the 0x04 prefix [1].
+     * PSA Crypto uses a standard SEC 1 uncompressed representation [2].
+     * [1] https://github.com/kmackay/micro-ecc/blob/master/README.md#point-representation
+     * [2] https://arm-software.github.io/psa-api/crypto/1.1/api/keys/management.html#key-formats
+     */
+    pub_key_buffer[0] = 0x04;
+    psa_status_t status = tee_import_ecc_p256r1_key_pair(key_data, key_data_length, priv_key_buffer, pub_key_buffer+1, priv_key_size, (*pub_key_buffer_length) - 1);
 
     if (status != PSA_SUCCESS) {
         return status;
     }
 
-    /* For the secure firmware the public key is 65 Bytes,
-     * but for PSA Crypto it needs to be 65 Bytes because of
-     * the 0x04 prefix.
-     */
-    *pub_key_buffer_length = PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits);
-
+    *priv_key_buffer_length = priv_key_size;
     return PSA_SUCCESS;
 }
 

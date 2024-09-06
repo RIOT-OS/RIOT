@@ -1,4 +1,2 @@
-USEPKG += nrfx
-USEPKG += cmsis
-
+USEPKG += cryptoservice
 USEMODULE += cortexm_svc
