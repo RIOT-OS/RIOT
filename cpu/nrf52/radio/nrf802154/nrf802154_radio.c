@@ -337,10 +337,13 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
             radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
                                        ? UINT8_MAX
                                        : hwlqi * ED_RSSISCALE);
-            /* We calculate RSSI from LQI, since it's already 8-bit
-               saturated (see page 321 of product spec v1.1) */
-            radio_info->rssi = _hwval_to_ieee802154_dbm(radio_info->lqi)
-                               + IEEE802154_RADIO_RSSI_OFFSET;
+            /* Converting the hardware-provided LQI value back to the
+               original RSSI value is not properly documented in the PS.
+               The linear mapping used here has been found empirically
+               through comparison with the RSSI value provided by NRF_RADIO->RSSISAMPLE
+               after enabling the ADDRESS_RSSISTART short. */
+            int8_t rssi_dbm = hwlqi + ED_RSSIOFFS - 1;
+            radio_info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
         }
         memcpy(buf, &rxbuf[1], pktlen);
     }
