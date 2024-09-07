@@ -1339,6 +1339,11 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
     uint32_t blkopt = _slicer2blkopt(slicer, more);
     size_t olen = _encode_uint(&blkopt);
 
+    /* ensure that we overwrite the dummy value set by coap_block2_init() */
+    if (!olen) {
+        olen = 1;
+    }
+
     coap_put_option(slicer->opt, option - delta, option, (uint8_t *)&blkopt, olen);
     return more;
 }
