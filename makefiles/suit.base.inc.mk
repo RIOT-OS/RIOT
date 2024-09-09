@@ -18,10 +18,11 @@ else
   SUIT_KEY_DIR ?= $(XDG_DATA_HOME)/RIOT/keys
 endif
 
-SUIT_SEC ?= $(SUIT_KEY_DIR)/$(SUIT_KEY).pem
+# we may accept multiple keys for the firmware
+SUIT_SEC ?= $(foreach item,$(SUIT_KEY),$(SUIT_KEY_DIR)/$(item).pem)
 
-# Multiple keys can be specified with "key0:pw0 key1:pw1 …" (pw may be empty)
-SUIT_SECS ?= $(SUIT_SEC):$(SUIT_SEC_PASSWORD)
+# generate a list of the public keys
+SUIT_PUBS ?= $(SUIT_SEC:.pem=.pem.pub)
 
 SUIT_PUB_HDR = $(BINDIR)/riotbuild/public_key.h
 SUIT_PUB_HDR_DIR = $(dir $(SUIT_PUB_HDR))
@@ -31,26 +32,24 @@ BUILDDEPS += $(SUIT_PUB_HDR)
 $(SUIT_SEC): | $(CLEAN)
 	$(Q)echo suit: generating key in $(SUIT_KEY_DIR)
 	$(Q)mkdir -p $(SUIT_KEY_DIR)
-	$(Q)$(RIOTBASE)/dist/tools/suit/gen_key.py $(SUIT_SEC) $(SUIT_SEC_PASSWORD)
+	$(Q)$(RIOTBASE)/dist/tools/suit/gen_key.py $@ $(SUIT_SEC_PASSWORD)
 
+%.pem.pub: %.pem
+	$(Q)openssl ec -inform pem -in $< -outform pem -pubout -out $@
+
+# Convert public keys to C headers - only last 32 bytes are key material
+#
 # set FORCE so switching between keys using "SUIT_KEY=foo make ..."
 # triggers a rebuild even if the new key would otherwise not (because the other
 # key's mtime is too far back).
-$(SUIT_PUB_HDR): $(SUIT_SEC) FORCE | $(CLEAN)
+$(SUIT_PUB_HDR): $(SUIT_PUBS) FORCE | $(CLEAN)
 	$(Q)mkdir -p $(SUIT_PUB_HDR_DIR)
 	$(Q)(							\
 		echo "const uint8_t public_key[][32] = {";	\
-		for i in $(SUIT_SECS); do			\
-			key=$${i%:*};				\
-			pw=$${i#*:};				\
-			if [ "$$key" = "$$pw" ]; then		\
-				unset pw;			\
-			fi;					\
-			if [ -z "$$pw" ]; then			\
-				$(SUIT_TOOL) pubkey -f header -k $$key; \
-			else					\
-				$(SUIT_TOOL) pubkey -f header -k $$key -p $$pw; \
-			fi					\
+		for i in $(SUIT_PUBS); do			\
+			echo " {";				\
+			openssl ec -inform pem -pubin -in $$i -outform der | tail -c 32 | xxd -i; \
+			echo " },";				\
 		done;						\
 		echo "};"					\
 	) | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
