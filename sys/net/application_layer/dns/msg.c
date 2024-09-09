@@ -168,6 +168,11 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
         bufpos += RR_TTL_LENGTH;
 
         unsigned addrlen = ntohs(_get_short(bufpos));
+        bufpos += RR_RDLENGTH_LENGTH;
+        if ((bufpos + addrlen) > buflim) {
+            return -EBADMSG;
+        }
+
         /* skip unwanted answers */
         if ((class != DNS_CLASS_IN) ||
                 ((_type == DNS_TYPE_A) && (family == AF_INET6)) ||
@@ -187,10 +192,6 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
             ((addrlen != IN6ADDRSZ) && (family == AF_INET6)) ||
             ((addrlen != IN6ADDRSZ) && (addrlen != INADDRSZ) &&
              (family == AF_UNSPEC))) {
-            return -EBADMSG;
-        }
-        bufpos += RR_RDLENGTH_LENGTH;
-        if ((bufpos + addrlen) > buflim) {
             return -EBADMSG;
         }
 
