@@ -175,13 +175,13 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
         }
         bufpos += RR_TTL_LENGTH;
 
-        unsigned addrlen = ntohs(_get_short(bufpos));
+        unsigned rdlen = ntohs(_get_short(bufpos));
         bufpos += RR_RDLENGTH_LENGTH;
-        if ((bufpos + addrlen) > buflim) {
+        if ((bufpos + rdlen) > buflim) {
             return -EBADMSG;
         }
 
-        DEBUG("dns_msg: type: %u, class: %u, len: %u\n", _type, class, addrlen);
+        DEBUG("dns_msg: type: %u, class: %u, len: %u\n", _type, class, rdlen);
 
         /* skip unwanted answers */
         if ((class != DNS_CLASS_IN) ||
@@ -189,24 +189,24 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
                 ((_type == DNS_TYPE_AAAA) && (family == AF_INET)) ||
                 ! ((_type == DNS_TYPE_A) || ((_type == DNS_TYPE_AAAA))
                     )) {
-            if (addrlen > len) {
+            if (rdlen > len) {
                 /* buffer wraps around memory space */
                 return -EBADMSG;
             }
-            bufpos += addrlen;
+            bufpos += rdlen;
             /* other out-of-bound is checked in `_skip_hostname()` at start of
              * loop */
             continue;
         }
-        if (((addrlen != INADDRSZ) && (family == AF_INET)) ||
-            ((addrlen != IN6ADDRSZ) && (family == AF_INET6)) ||
-            ((addrlen != IN6ADDRSZ) && (addrlen != INADDRSZ) &&
+        if (((rdlen != INADDRSZ)  && (family == AF_INET))  ||
+            ((rdlen != IN6ADDRSZ) && (family == AF_INET6)) ||
+            ((rdlen != IN6ADDRSZ) && (rdlen != INADDRSZ) &&
              (family == AF_UNSPEC))) {
             return -EBADMSG;
         }
 
-        memcpy(addr_out, bufpos, addrlen);
-        return addrlen;
+        memcpy(addr_out, bufpos, rdlen);
+        return rdlen;
     }
 
     return -EBADMSG;
