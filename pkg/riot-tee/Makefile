@@ -1,4 +1,4 @@
-# PKG_SOURCE_LOCAL=~/work/riot-tee
+PKG_SOURCE_LOCAL=~/work/riot-tee
 PKG_NAME=riot-tee
 PKG_URL=https://github.com/Einhornhool/riot-tee
 PKG_VERSION=4b79ef4d339ee789d9520ca46c128be46592454e

@@ -1,2 +1,1 @@
-USEPKG += cryptoservice
 USEMODULE += cortexm_svc

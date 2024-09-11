@@ -1,16 +1,1 @@
-INCLUDES += -I$(PKGDIRBASE)/riot-tee/ns_api/include
-INCLUDES += -I$(PKGDIRBASE)/riot-tee/ns_api/include/crypto
-INCLUDES += -I$(PKGDIRBASE)/riot-tee/src/crypto
-INCLUDES += -I$(PKGDIRBASE)/riot-tee/src/random
-
-ifneq (,$(filter psa_tee_%, $(USEMODULE)))
-  DIRS += $(RIOTPKG)/riot-tee/psa_tee
-  INCLUDES += -I$(RIOTPKG)/riot-tee/psa_tee
-  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
-endif
-
-ARCHIVES += $(BINDIR)/pkg-build/riot-tee/ns_api/libriot_tee_ns_api.a
-
-PSEUDOMODULES += psa_tee_random
-PSEUDOMODULES += psa_tee_ecc_p256
-PSEUDOMODULES += psa_tee_hashes_sha256
+ARCHIVES += $(BINDIR)/pkg-build/riot-tee/api/libriot_tee_api.a
