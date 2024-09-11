@@ -14,7 +14,7 @@ STM32F446ZE microcontroller with 128KiB of RAM and 512KiB of ROM Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-f446ze-and-f722ze.svg "Pinout for the nucleo-f446ze (from STM board manual)" width=50%
+@image html pinouts/nucleo-f446ze-and-f722ze.svg "Pinout for the Nucleo-F446ZE (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 35)" width=50%
 
 ### MCU
 

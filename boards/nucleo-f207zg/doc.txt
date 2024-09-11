@@ -15,7 +15,7 @@ STM32F207ZG microcontroller with 128KiB of SRAM and 1MiB of ROM Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-f207zg-and-more.svg "Pinout for the nucleo-f207zg (from STM board manual)" width=50%
+@image html pinouts/nucleo-f207zg-and-more.svg "Pinout for the Nucleo-F207ZG (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 32)" width=50%
 
 ### MCU
 
