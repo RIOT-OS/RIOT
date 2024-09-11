@@ -6,10 +6,14 @@ SUIT_TOOL ?= $(RIOTBASE)/dist/tools/suit/suit-manifest-generator/bin/suit-tool
 # SUIT encryption keys
 #
 
-# Specify key to use.
+# Specify key(s) to use.
 # Will use $(SUIT_KEY_DIR)/$(SUIT_KEY).pem as combined private/public key
 # files.
+# Multiple keys can be specified, that means that the firmware will accept
+# updates signed with either one of those keys.
+# If the firmware accepts multiple keys, let the first key be the signing key.
 SUIT_KEY ?= default
+SUIT_KEY_SIGN ?= $(word 1, $(SUIT_KEY))
 XDG_DATA_HOME ?= $(HOME)/.local/share
 
 ifeq (1, $(RIOT_CI_BUILD))
@@ -20,6 +24,8 @@ endif
 
 # we may accept multiple keys for the firmware
 SUIT_SEC ?= $(foreach item,$(SUIT_KEY),$(SUIT_KEY_DIR)/$(item).pem)
+# but there can only be one signing key
+SUIT_SEC_SIGN ?= $(SUIT_KEY_DIR)/$(SUIT_KEY_SIGN).pem
 
 # generate a list of the public keys
 SUIT_PUBS ?= $(SUIT_SEC:.pem=.pem.pub)
