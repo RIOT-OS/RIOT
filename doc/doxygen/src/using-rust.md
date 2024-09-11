@@ -148,7 +148,7 @@ In addition to the Rust compiler you'll need to install the C2Rust transpiler;
 as this is using some recent fixes, it is best installed as:
 
 ```shell
-$ cargo install c2rust --git https://github.com/immunant/c2rust
+$ cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0
 ```
 
 [cargo]: https://doc.rust-lang.org/cargo/
