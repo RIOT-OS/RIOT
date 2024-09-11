@@ -4,14 +4,14 @@
 
 psa_status_t psa_hashes_sha256_setup(psa_hashes_sha256_ctx_t *ctx)
 {
-    return CYS_sha256_init(ctx);
+    return CYS_hash_sha256_init(ctx);
 }
 
 psa_status_t psa_hashes_sha256_update(psa_hashes_sha256_ctx_t *ctx,
                                       const uint8_t *input,
                                       size_t input_length)
 {
-    return CYS_sha256_update(ctx, input, input_length);
+    return CYS_hash_sha256_update(ctx, input, input_length);
 }
 
 psa_status_t psa_hashes_sha256_finish(psa_hashes_sha256_ctx_t *ctx,
@@ -19,16 +19,16 @@ psa_status_t psa_hashes_sha256_finish(psa_hashes_sha256_ctx_t *ctx,
                                       size_t hash_size,
                                       size_t *hash_length)
 {
-    if(hash_size < CYS_SHA256_DIGEST_SIZE) {
+    if(hash_size < CYS_HASH_SHA256_DIGEST_SIZE) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     psa_status_t status;
-    status = CYS_sha256_finalize(ctx, hash);
+    status = CYS_hash_sha256_finalize(ctx, hash);
     if(status != PSA_SUCCESS) {
         return status;
     }
 
-    *hash_length = CYS_SHA256_DIGEST_SIZE;
+    *hash_length = CYS_HASH_SHA256_DIGEST_SIZE;
     return PSA_SUCCESS;
 }

@@ -8,14 +8,7 @@ ifneq (,$(filter psa_cryptoservice, $(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
 endif
 
-ifneq (,$(filter psa_secure_element_cryptoservice,$(USEMODULE)))
-  DIRS += $(RIOTPKG)/cryptoservice/psa_cryptoservice_se
-  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
-endif
-
 PSEUDOMODULES += psa_cryptoservice_ecc_p256
 PSEUDOMODULES += psa_cryptoservice_hashes_sha256
-PSEUDOMODULES += psa_cryptoservice_aes_cbc
-
-PSEUDOMODULES += psa_secure_element_cryptoservice
-PSEUDOMODULES += psa_secure_element_cryptoservice_ecc_p256
+PSEUDOMODULES += psa_cryptoservice_aes_128_cbc
+PSEUDOMODULES += psa_cryptoservice_random
