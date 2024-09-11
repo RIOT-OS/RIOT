@@ -32,8 +32,15 @@ int main(void)
 {
     event_periodic_callback_t a, b, c;
 
+    /* event is executed immediately */
     event_callback_t oneshot;
     event_callback_oneshot(&oneshot, EVENT_PRIO_MEDIUM, _event_cb, "event 0");
+
+    /* event is executed after 750 ms */
+    event_periodic_callback_t oneshot_deferred;
+    event_periodic_callback_oneshot(&oneshot_deferred, EVENT_PRIO_MEDIUM,
+                                    ZTIMER_MSEC, 750,
+                                    _event_cb, "event 1");
 
     event_periodic_callback_init(&a, ZTIMER_MSEC, EVENT_PRIO_MEDIUM, _event_cb, "event A");
     event_periodic_callback_init(&b, ZTIMER_MSEC, EVENT_PRIO_MEDIUM, _event_cb, "event B");
