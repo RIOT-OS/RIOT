@@ -115,6 +115,12 @@ static psa_key_id_t key_id_count = PSA_KEY_ID_VOLATILE_MIN;
 static clist_node_t * psa_get_empty_key_slot_list(const psa_key_attributes_t *attr)
 {
     if (!psa_key_lifetime_is_external(attr->lifetime)) {
+#if PSA_SEALED_KEY_COUNT
+        if (PSA_KEY_LIFETIME_GET_LOCATION(attr->lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
+            return &sealed_key_list_empty;
+        }
+#endif /* PSA_SEALED_KEY_COUNT */
+
 #if PSA_ASYMMETRIC_KEYPAIR_COUNT
         if (PSA_KEY_TYPE_IS_KEY_PAIR(attr->type)) {
             return &key_pair_list_empty;
@@ -125,12 +131,6 @@ static clist_node_t * psa_get_empty_key_slot_list(const psa_key_attributes_t *at
         return &single_key_list_empty;
 #endif /* PSA_SINGLE_KEY_COUNT */
     }
-
-#if PSA_SEALED_KEY_COUNT
-    if (PSA_KEY_LIFETIME_GET_LOCATION(attr.lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
-        return &sealed_key_list_empty;
-    }
-#endif /* PSA_SEALED_KEY_COUNT */
 
 #if PSA_PROTECTED_KEY_COUNT
     return &protected_list_empty;
@@ -162,7 +162,7 @@ void psa_init_key_slots(void)
     }
 
     DEBUG("Sealed Slot Count: %d, Size: %" PRIuSIZE "\n", PSA_SEALED_KEY_COUNT,
-          sizeof(psa_prot_key_slot_t));
+          sizeof(psa_sealed_key_slot_t));
     DEBUG("Sealed Slot Array Size: %" PRIuSIZE "\n", sizeof(sealed_key_slots));
     DEBUG("Sealed Slot Empty List Size: %" PRIuSIZE "\n", clist_count(&sealed_key_list_empty));
 #endif /* PSA_SEALED_KEY_COUNT */
@@ -617,7 +617,6 @@ size_t psa_get_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t **key_
     *key_data = NULL;
     *key_bytes = NULL;
 
-
     if (!psa_key_lifetime_is_external(attr.lifetime)) {
         if (!PSA_KEY_TYPE_IS_KEY_PAIR(attr.type)) {
 #if PSA_SINGLE_KEY_COUNT
@@ -629,8 +628,7 @@ size_t psa_get_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t **key_
 
 #if PSA_SEALED_KEY_COUNT
         else if (PSA_KEY_LIFETIME_GET_LOCATION(attr.lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
-            *key_data = (uint8_t *)((psa_sealed_key_slot_t *)slot)->key.sealed_key;
-            *key_bytes = NULL;
+            *key_data = (uint8_t *) &((psa_sealed_key_slot_t *)slot)->key.sealed_key;
             key_data_size = sizeof(((psa_sealed_key_slot_t *)slot)->key.sealed_key);
         }
 #endif /* PSA_SEALED_KEY_COUNT */
@@ -674,7 +672,7 @@ void psa_get_public_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t *
 #endif /* PSA_SINGLE_KEY_COUNT */
         }
 
-#if PSA_SEALED_KEY_SLOT
+#if PSA_SEALED_KEY_COUNT
         else if (PSA_KEY_LIFETIME_GET_LOCATION(attr.lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
             *pubkey_data = ((psa_sealed_key_slot_t *)slot)->key.pubkey_data;
             *pubkey_data_len = &((psa_sealed_key_slot_t *)slot)->key.pubkey_data_len;

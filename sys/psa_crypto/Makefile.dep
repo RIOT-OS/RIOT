@@ -1,6 +1,6 @@
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
-ifneq (,$(filter riot-tee,$(USEPKG)))
-  USEMODULE += psa_tee_random
+ifneq (,$(filter psa_cryptoservice,$(USEMODULE)))
+  USEMODULE += psa_cryptoservice_random
   USEMODULE += psa_custom_random
 else
   USEMODULE += random
@@ -46,12 +46,6 @@ ifneq (,$(filter psa_asymmetric_ecc_p192r1_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_ecc_p192r1
 endif
 
-
-ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_tee,$(USEMODULE)))
-  USEMODULE += psa_tee
-  USEMODULE += psa_tee_ecc_p256
-endif
-
 ## ECC_P256R1 backend
 ifneq (,$(filter psa_asymmetric_ecc_p256r1,$(USEMODULE)))
   ifeq (,$(filter psa_asymmetric_ecc_p256r1_custom_backend,$(USEMODULE)))
@@ -60,12 +54,15 @@ ifneq (,$(filter psa_asymmetric_ecc_p256r1,$(USEMODULE)))
     # HACK: Due to kconfig migration, may cause problems
     ifneq (,$(filter periph_ecc_p256r1,$(FEATURES_USED)))
       USEMODULE += psa_asymmetric_ecc_p256r1_backend_periph
-    else ifneq (,$(filter riot-tee,$(USEPKG)))
-      USEMODULE += psa_asymmetric_ecc_p256r1_backend_tee
     else
       USEMODULE += psa_asymmetric_ecc_p256r1_backend_microecc
     endif
   endif
+endif
+
+ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_ecc_p256
 endif
 
 ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_microecc,$(USEMODULE)))
@@ -225,8 +222,6 @@ ifneq (,$(filter psa_hash_sha_256,$(USEMODULE)))
     # HACK: Due to kconfig migration, may cause problems
     ifneq (,$(filter periph_hash_sha_256,$(FEATURES_USED)))
       USEMODULE += psa_hash_sha_256_backend_periph
-    else ifneq (,$(filter riot-tee,$(USEPKG)))
-      USEMODULE += psa_hash_sha_256_backend_tee
     else
       USEMODULE += psa_hash_sha_256_backend_riot
     endif
@@ -237,9 +232,9 @@ ifneq (,$(filter psa_hash_sha_256_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hash_sha_256
 endif
 
-ifneq (,$(filter psa_hash_sha_256_backend_tee,$(USEMODULE)))
-  USEMODULE += psa_tee
-  USEMODULE += psa_tee_hashes_sha256
+ifneq (,$(filter psa_hash_sha_256_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_hashes_sha256
 endif
 
 ifneq (,$(filter psa_hash_sha_256_backend_riot,$(USEMODULE)))

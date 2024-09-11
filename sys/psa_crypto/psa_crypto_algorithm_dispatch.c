@@ -229,8 +229,6 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
     psa_asym_key_t asym_key = PSA_INVALID_OPERATION;
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
-    uint8_t *pub_key_data = NULL;
-    size_t *pub_key_bytes = NULL;
 
     if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
         asym_key =
@@ -243,15 +241,18 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
+    /* This is a workaround to avoid null pointer dereference when using sealed keys and passing key_bytes to sign function */
+    size_t key_data_len = key_bytes ? *key_bytes : 0;
+
     switch (asym_key) {
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
     case PSA_ECC_P192_R1:
-        return psa_ecc_p192r1_sign_hash(attributes, alg, key_data, *key_bytes, hash, hash_length,
+        return psa_ecc_p192r1_sign_hash(attributes, alg, key_data, key_data_len, hash, hash_length,
                                         signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
     case PSA_ECC_P256_R1:
-        return psa_ecc_p256r1_sign_hash(attributes, alg, key_data, *key_bytes, hash, hash_length,
+        return psa_ecc_p256r1_sign_hash(attributes, alg, key_data, key_data_len, hash, hash_length,
                                         signature, signature_size, signature_length);
 #endif
     default:
@@ -262,8 +263,6 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
         (void)signature;
         (void)signature_size;
         (void)signature_length;
-        (void)pub_key_data;
-        (void)pub_key_bytes;
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }

@@ -93,7 +93,7 @@ typedef struct {
 } psa_key_slot_t;
 
 #if PSA_SEALED_KEY_COUNT
-#include "sealed_key.h"
+#include "CYS/sealed_key.h"
 
 /**
  * @brief   Structure for a sealed key slot.
@@ -105,8 +105,8 @@ typedef struct {
     clist_node_t node;
     size_t lock_count;
     psa_key_attributes_t attr;
-    struct key_data {
-        CYS_PROT_p256_key_t sealed_key;
+    struct sealed_key_data {
+        CYS_PROT_ecc_p256_key_t sealed_key;
         uint8_t pubkey_data[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE];
         size_t pubkey_data_len;
     } key;
