@@ -35,10 +35,30 @@ SUIT_PUB_HDR_DIR = $(dir $(SUIT_PUB_HDR))
 CFLAGS += -I$(SUIT_PUB_HDR_DIR)
 BUILDDEPS += $(SUIT_PUB_HDR)
 
+# OpenSSL leaves an empty file if key generation fails - remove it manually
+# see https://github.com/openssl/openssl/issues/25440
 $(SUIT_SEC): | $(CLEAN)
 	$(Q)echo suit: generating key in $(SUIT_KEY_DIR)
 	$(Q)mkdir -p $(SUIT_KEY_DIR)
-	$(Q)$(RIOTBASE)/dist/tools/suit/gen_key.py $@ $(SUIT_SEC_PASSWORD)
+	$(Q)(										\
+	printf "0) none\n";								\
+	printf "1) aes-256-cbc\n";							\
+	printf "Choose encryption for key file $@: ";					\
+	if [ -z "$(RIOT_CI_BUILD)" ]; then read encryption; else encryption=0; fi;	\
+	case $$encryption in								\
+		0)									\
+			openssl genpkey -algorithm ed25519 -out $@;			\
+			;;								\
+		1)									\
+			openssl genpkey -algorithm ed25519 -aes-256-cbc -out $@ || :;	\
+			;;								\
+		*)									\
+			echo "Invalid choice";						\
+			exit 1;								\
+			;;								\
+	esac;										\
+	)
+	$(Q)if [ ! -s $@ ]; then rm $@; fi
 
 %.pem.pub: %.pem
 	$(Q)openssl ec -inform pem -in $< -outform pem -pubout -out $@
