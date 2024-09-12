@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Frank engelhardt
+ * Copyright (C) 2024 Frank Engelhardt
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -33,13 +33,17 @@
 #define ENABLE_DEBUG 1
 #include "debug.h"
 
-#define USB_BUFFER_SPACE_START ((uint8_t*) USBCTRL_DPRAM + 0x180u)
-#define USB_BUFFER_SPACE_END   ((uint8_t*) USBCTRL_DPRAM + 0x1000u)
+#define USB_SETUP_PKT_LEN 8
+
+#define USB_BUFFER_SETUP_PKT_START ((uint8_t*) USBCTRL_DPRAM + 0x0u)
+#define USB_BUFFER_SPACE_START     ((uint8_t*) USBCTRL_DPRAM + 0x180u)
+#define USB_BUFFER_SPACE_END       ((uint8_t*) USBCTRL_DPRAM + 0x1000u)
 
 typedef struct rpx0xx_usb_ep {
     uint8_t *dpram_buf;
     size_t dpram_bufsize;
     usbdev_ep_t ep;
+    bool next_pid;
 } rpx0xx_usb_ep_t;
 
 typedef struct rpx0xx_usb_dev {
@@ -49,6 +53,7 @@ typedef struct rpx0xx_usb_dev {
     uint32_t int_status;
     bool suspended;
     bool connected;
+    bool setup_req_recvd;
 } rpx0xx_usb_dev_t;
 
 /* Forward declaration for the usb device driver. */
@@ -58,6 +63,8 @@ const usbdev_driver_t driver;
 static rpx0xx_usb_dev_t _hw_usb_dev;
 
 static uint8_t *_dpram_next_buf_ptr = (uint8_t*) USB_BUFFER_SPACE_START;
+
+static void _mark_ep_buf_ready(usbdev_ep_t *ep, size_t len);
 
 static inline __IOM uint32_t * _get_ep_out_ctrl_reg(uint8_t ep_num)
 {
@@ -527,7 +534,7 @@ static void _usbdev_ep0_stall(usbdev_t *dev)
 usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
 {
     __IOM uint32_t reg = *_get_ep_buf_ctrl_reg(ep->num, ep->dir);    
-    return reg | USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_STALL_Msk;
+    return reg & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_STALL_Msk;
 }
 
 static void _usbdev_ep_stall(usbdev_ep_t *ep, bool enable)
@@ -538,8 +545,8 @@ static void _usbdev_ep_stall(usbdev_ep_t *ep, bool enable)
 /* available: is the processor in control of the buffer? */
 static bool _ep_buf_is_available(usbdev_ep_t *ep)
 {
-    __IOM uint32_t buf_ctrl_reg = *_get_ep_buf_ctrl_reg(ep->num, ep->dir);
-    return !(buf_ctrl_reg & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk);
+    uint32_t reg = *_get_ep_buf_ctrl_reg(ep->num, ep->dir);
+    return !(reg & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk);
 }
 
 /*
@@ -552,13 +559,16 @@ static bool _ep_buf_is_full(usbdev_ep_t *ep)
 
 static size_t _ep_get_available(usbdev_ep_t *ep)
 {
-    if (_ep_buf_is_available(ep)) {
+    if (ep->num == 0 && ep->dir == USB_EP_DIR_OUT && _hw_usb_dev.setup_req_recvd) {
+        return USB_SETUP_PKT_LEN;
+    }
+    else if (_ep_buf_is_available(ep)) {
         if (ep->dir == USB_EP_DIR_IN) {
             rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
             return hw_ep->dpram_bufsize;
         } else {
-            __IOM uint32_t *reg = _get_ep_buf_ctrl_reg(ep->num, ep->dir);
-            return *reg | USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk;
+            uint32_t reg = *_get_ep_buf_ctrl_reg(ep->num, ep->dir);
+            return reg & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk;
         }
     }
     return 0UL;
@@ -617,43 +627,78 @@ static int _usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
     return ret;
 }
 
-static void _mark_ep_buf_ready(usbdev_ep_t *ep)
+static void _mark_ep_buf_ready(usbdev_ep_t *ep, size_t len)
 {
     uint32_t buf_filled_bit = 0UL;
     if (ep->dir == USB_EP_DIR_IN) {
         buf_filled_bit = USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk;
     }
     _ep_buf_ctrl_reg_write(ep->num, ep->dir, 
-                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Pos, 
+                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk, 
                            buf_filled_bit);
     _ep_buf_ctrl_reg_write(ep->num, ep->dir, 
-                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Pos, 
+                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk,
                            USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk);
+    _ep_buf_ctrl_reg_write(ep->num, ep->dir, len,
+                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk);
 }
 
-static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
+static int _usbdev_ep_xmit_setup_req(uint8_t *buf, size_t len)
 {
-    rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
+    DEBUG("[rpx0xx usb] call _usbdev_ep_xmit_setup_req(len=%d)", len);
+    assert(len >= USB_SETUP_PKT_LEN);
+    len = USB_SETUP_PKT_LEN;
+    memcpy(buf, USB_BUFFER_SETUP_PKT_START, USB_SETUP_PKT_LEN);
+    _hw_usb_dev.setup_req_recvd = false;
+    return len;
+}
 
-    assert(_ep_buf_is_available(ep));
+static void _set_pid(rpx0xx_usb_ep_t *hw_ep)
+{
+    uint32_t bit = hw_ep->next_pid ? USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_Msk : 0;
+    _ep_buf_ctrl_reg_write(hw_ep->ep.num, hw_ep->ep.dir, bit,
+                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_Msk);
+    hw_ep->next_pid = !hw_ep->next_pid;
+}
 
-    size_t available_len = _ep_get_available(ep);
+static int _usbdev_ep_xmit_regular(rpx0xx_usb_ep_t *hw_ep, uint8_t *buf, size_t len)
+{
+    assert(_ep_buf_is_available(&hw_ep->ep));
 
-    DEBUG("[rpx0xx usb] call _usbdev_ep_xmit(ep.num=%d, ep.dir=%d, len=%d), available=%d ", 
-          ep->num, ep->dir, len, available_len);
+    size_t available_len = _ep_get_available(&hw_ep->ep);
+
+    DEBUG("[rpx0xx usb] call _usbdev_ep_xmit_regular(ep.num=%d, ep.dir=%d, len=%d), available=%d ", 
+          hw_ep->ep.num, hw_ep->ep.dir, len, available_len);
+
+    if (available_len == 0) {
+        _mark_ep_buf_ready(&hw_ep->ep, 0);
+        return 0UL;
+    }
 
     if (available_len < len) {
         len = available_len;
     }
 
-    if (ep->dir == USB_EP_DIR_IN) {
+    if (hw_ep->ep.dir == USB_EP_DIR_IN) {
         memcpy(hw_ep->dpram_buf, buf, len);
     } else {
         memcpy(buf, hw_ep->dpram_buf, len);
     }
-    _ep_set_stall(ep, 0);
-    _mark_ep_buf_ready(ep);
+    _set_pid(hw_ep);
+    _mark_ep_buf_ready(&hw_ep->ep, len);
+    
+    return len;
+}
 
+static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
+{
+    rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
+    if (ep->num == 0 && ep->dir == USB_EP_DIR_OUT && _hw_usb_dev.setup_req_recvd) {
+        len = _usbdev_ep_xmit_setup_req(buf, len);
+    } else {
+        len = _usbdev_ep_xmit_regular(hw_ep, buf, len);
+    }
+    _ep_set_stall(ep, 0);
     return len;
 }
 
@@ -703,6 +748,7 @@ static void _usbdev_esr(usbdev_t *dev)
     }
     if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_SETUP_REQ_Msk) {
         /* Setup Request received on EP0 */
+        _hw_usb_dev.setup_req_recvd = true;
         _hw_usb_dev.dev.epcb(&_get_ep(0, USB_EP_DIR_OUT)->ep, 
                              USBDEV_EVENT_TR_COMPLETE);
         io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
