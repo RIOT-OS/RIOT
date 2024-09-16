@@ -19,6 +19,8 @@ USEMODULE += ztimer_usec
 USEMODULE += ztimer_msec
 USEMODULE += ztimer_sec
 
+USEMODULE += gnrc_netapi_callbacks
+
 # for the "vfs" feature of riot-coap-handler-demos (and vfs.c)
 USEMODULE += vfs
 USEMODULE += constfs
