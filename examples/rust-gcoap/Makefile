@@ -36,12 +36,12 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Add 16k extra stack: The Rust examples take more of it than gcoap expects,
+# Add 12k extra stack: The Rust examples take more of it than gcoap expects,
 # for reasons that are not fully understood (it's not the string formatter).
-CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+16384)'
+CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+12288)'
 # This thread needs some more stack for printing the addresses, once more being
 # hit by string formatting.
-CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF+2048)'
+CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF+1024)'
 
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 APPLICATION_RUST_MODULE = rust_gcoap
