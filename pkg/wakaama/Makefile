@@ -1,6 +1,6 @@
 PKG_NAME=wakaama
 PKG_URL=https://github.com/eclipse/wakaama.git
-PKG_VERSION=ac5bdb51034fdbe5a4411d8fe950d786f0fddc65
+PKG_VERSION=c8d76edf8acb403255caf21cd02949acab3c3e42
 PKG_LICENSE=EDL-1.0,EPL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -13,6 +13,7 @@ CFLAGS += -Wno-cast-align
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90710#c1
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -DLWM2M_SUPPORT_TLV
+CFLAGS += -DLWM2M_LITTLE_ENDIAN
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/core -f $(RIOTBASE)/Makefile.base MODULE=wakaama_core
