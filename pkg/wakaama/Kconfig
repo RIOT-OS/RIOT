@@ -26,12 +26,12 @@ config LWM2M_DEVICE_TTL
     default 300
     help
         Lifetime of the device on the LwM2M server, expressed in seconds.
-        
-config LWM2M_COAP_DEFAULT_BLOCK_SIZE 
-     int "CoAP block size" 
-     range 4 10 
+
+config LWM2M_COAP_DEFAULT_BLOCK_SIZE
+     int "CoAP block size"
+     range 4 10
      default 10
-     help 
+     help
          Block transfer options support only power-of-two block sizes, from 2**4 (16) to 2**10 (1024) bytes.
          This option represents the exponent of 2, which will be used for the block size.
 

@@ -130,7 +130,7 @@ typedef struct lwm2m_obj_security_inst {
  * @retval COAP_404_NOT_FOUND               when resource can't be found
  * @retval COAP_500_INTERNAL_SERVER_ERROR   otherwise
  */
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
                         lwm2m_data_t ** data_array, lwm2m_object_t * object);
 
 /**
@@ -398,11 +398,11 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance)
     return COAP_205_CONTENT;
 }
 
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
                         lwm2m_data_t ** data_array, lwm2m_object_t * object)
 {
     (void)context;
-    
+
     lwm2m_obj_security_inst_t *instance;
     uint8_t result;
     int i = 0;

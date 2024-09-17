@@ -65,7 +65,7 @@ static uint8_t _execute_cb(lwm2m_context_t * context, uint16_t instance_id, uint
  * @return COAP_404_NOT_FOUND               when resource can't be found
  * @return COAP_500_INTERNAL_SERVER_ERROR   otherwise
  */
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
                         lwm2m_data_t ** data_array, lwm2m_object_t * object);
 
 /**
@@ -170,7 +170,7 @@ static uint8_t _discover_cb(lwm2m_context_t * context, uint16_t instance_id, int
     return result;
 }
 
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
                         lwm2m_data_t ** data_array, lwm2m_object_t * object)
 {
     (void)context;

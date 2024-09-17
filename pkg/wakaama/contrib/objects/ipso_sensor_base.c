@@ -28,7 +28,7 @@
 
 /**
  * @brief 'Read' callback for the LwM2M Illuminance Sensor object implementation.
- * 
+ *
  * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to read resource from.
  * @param[in] num_data          Number of elements in @p data_array.
@@ -39,7 +39,7 @@
  * @return COAP_404_NOT_FOUND if the instance was not found
  * @return COAP_500_INTERNAL_SERVER_ERROR otherwise
  */
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
                         lwm2m_data_t ** data_array, lwm2m_object_t * object);
 
 /**
@@ -195,7 +195,7 @@ static uint8_t _get_value(lwm2m_data_t *data, lwm2m_obj_ipso_sensor_base_inst_t 
     return COAP_205_CONTENT;
 }
 
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data, 
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
                         lwm2m_data_t ** data_array, lwm2m_object_t * object)
 {
     (void)context;
