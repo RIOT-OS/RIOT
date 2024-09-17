@@ -57,17 +57,35 @@ extern "C" {
  *          the features chosen at compile-time. They should not be
  *          changed manually.
  */
-#if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
-     IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
-     IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
-     IS_USED(MODULE_PSA_MAC_HMAC_SHA_256) || \
-     IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
+#if (IS_USED(MODULE_PSA_MAC_HMAC_SHA_512) || \
+     IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512))
+#define CONFIG_PSA_MAX_KEY_SIZE 64
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_384) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384))
+#define CONFIG_PSA_MAX_KEY_SIZE 48
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
+       IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
+       IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_256) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_256) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256) || \
+       IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
 #define CONFIG_PSA_MAX_KEY_SIZE 32
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA3_224))
+#define CONFIG_PSA_MAX_KEY_SIZE 28
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || \
        IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
 #define CONFIG_PSA_MAX_KEY_SIZE 24
-#elif (IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)) || \
-      (IS_USED(MODULE_PSA_CIPHER_AES_128_ECB))
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_RIPEMD160) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_1))
+#define CONFIG_PSA_MAX_KEY_SIZE 20
+#elif (IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) || \
+       IS_USED(MODULE_PSA_CIPHER_AES_128_ECB) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD2) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD4) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD5))
 #define CONFIG_PSA_MAX_KEY_SIZE 16
 #else
 #define CONFIG_PSA_MAX_KEY_SIZE 0
@@ -367,7 +385,24 @@ extern "C" {
  *          recognized, return 0. An implementation can return either 0 or the correct size for a
  *          hash algorithm that it recognizes, but does not support.
  */
-#define PSA_HASH_BLOCK_LENGTH(alg) /* implementation-defined value */
+#define PSA_HASH_BLOCK_LENGTH(alg)                                  \
+    (                                                               \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_MD2 ? 16 :            \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_MD4 ? 64 :            \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_MD5 ? 64 :            \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_RIPEMD160 ? 64 :      \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_1 ? 64 :          \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_224 ? 64 :        \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_256 ? 64 :        \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_384 ? 128 :       \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_512 ? 128 :       \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_512_224 ? 128 :   \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA_512_256 ? 128 :   \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_224 ? 144 :      \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_256 ? 136 :      \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_384 ? 104 :      \
+        PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_512 ? 72 :       \
+        0)
 
 /**
  * @brief   The size of the output of @ref psa_hash_compute() and @ref psa_hash_finish(), in bytes.
@@ -439,7 +474,60 @@ extern "C" {
  *
  *          See also @ref PSA_MAC_LENGTH().
  */
-#define PSA_MAC_MAX_SIZE (PSA_HASH_MAX_SIZE)
+#if (IS_USED(MODULE_PSA_MAC_HMAC_SHA_512) || \
+     IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512))
+#define PSA_MAC_MAX_SIZE (PSA_HASH_LENGTH(PSA_ALG_SHA3_512))    /* 64 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_384) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384))
+#define PSA_MAC_MAX_SIZE (PSA_HASH_LENGTH(PSA_ALG_SHA3_384))    /* 48 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_256) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_256) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256))
+#define PSA_MAC_MAX_SIZE (PSA_HASH_LENGTH(PSA_ALG_SHA3_256))    /* 32 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA3_224))
+#define PSA_MAC_MAX_SIZE (PSA_HASH_LENGTH(PSA_ALG_SHA3_224))    /* 28 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_RIPEMD160) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_1))
+#define PSA_MAC_MAX_SIZE (PSA_HASH_LENGTH(PSA_ALG_SHA_1))       /* 20 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_MD2) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD4) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD5))
+#define PSA_MAC_MAX_SIZE (PSA_HASH_LENGTH(PSA_ALG_MD5))         /* 16 */
+#else
+#define PSA_MAC_MAX_SIZE 0
+#endif
+
+/**
+ * @brief   A sufficient buffer size for storing the HMAC hash input. This is usually
+            the maximum block length of the supported HMAC hash algorithms.
+ */
+#if (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_224))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_224))       /* 144 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_256))       /* 136 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA_384) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_512_256))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA_512_256))    /* 128 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_384))       /* 104 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA3_512))       /* 72 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_MD4) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_MD5) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_RIPEMD160) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_1) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_224) || \
+       IS_USED(MODULE_PSA_MAC_HMAC_SHA_256))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA_256))        /* 64 */
+#elif (IS_USED(MODULE_PSA_MAC_HMAC_MD2))
+#define PSA_HMAC_BLOCK_MAX_SIZE (PSA_HASH_BLOCK_LENGTH(PSA_ALG_MD2))            /* 16 */
+#else
+#define PSA_HMAC_BLOCK_MAX_SIZE 0
+#endif
 
 /**
  * @brief   The block size of a block cipher.

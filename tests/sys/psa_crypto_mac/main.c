@@ -21,33 +21,25 @@
 #include <stdio.h>
 #include "psa/crypto.h"
 #include "ztimer.h"
-
-extern psa_status_t example_hmac_sha256(void);
+#include "tests_gen_hmac.h"
 
 int main(void)
 {
-    bool failed = false;
-    psa_status_t status;
+    ztimer_now_t start;
 
     psa_crypto_init();
 
     ztimer_acquire(ZTIMER_USEC);
-    ztimer_now_t start = ztimer_now(ZTIMER_USEC);
+    start = ztimer_now(ZTIMER_USEC);
 
-    status = example_hmac_sha256();
-    printf("HMAC SHA256 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
-    if (status != PSA_SUCCESS) {
-        failed = true;
-        printf("HMAC SHA256 failed: %s\n", psa_status_to_humanly_readable(status));
-    }
+    TESTS_START();
+    TESTS_RUN(tests_mac_hmac_sha512());
+    TESTS_RUN(tests_mac_hmac_sha384());
+    TESTS_RUN(tests_mac_hmac_sha256());
+    TESTS_END();
 
+    printf("HMAC tests took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
     ztimer_release(ZTIMER_USEC);
 
-    if (failed) {
-        puts("Tests failed...");
-    }
-    else {
-        puts("All Done");
-    }
     return 0;
 }
