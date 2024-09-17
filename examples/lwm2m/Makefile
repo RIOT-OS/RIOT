@@ -41,7 +41,7 @@ USEMODULE += prng_sha1prng
 LWM2M_SERVER_URI ?= '"coap://[fd00:dead:beef::1]:5684"'
 LWM2M_SERVER_SHORT_ID ?= 1
 
-CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE='(3*1024)'
+CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE='(4*1024)'
 
 include $(RIOTBASE)/Makefile.include
 
