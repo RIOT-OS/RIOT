@@ -445,7 +445,7 @@ void sock_udp_close(sock_udp_t *sock);
  * @return  0 on success.
  * @return  -EADDRNOTAVAIL, when @p sock has no local end point.
  */
-int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *ep);
+int sock_udp_get_local(const sock_udp_t *sock, sock_udp_ep_t *ep);
 
 /**
  * @brief   Gets the remote end point of a UDP sock object
@@ -457,7 +457,7 @@ int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *ep);
  * @return  0 on success.
  * @return  -ENOTCONN, when @p sock has no remote end point bound to it.
  */
-int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
+int sock_udp_get_remote(const sock_udp_t *sock, sock_udp_ep_t *ep);
 
 /**
  * @brief   Receives a UDP message from a remote end point

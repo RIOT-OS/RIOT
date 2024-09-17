@@ -163,7 +163,7 @@ void sock_udp_close(sock_udp_t *sock)
 #endif
 }
 
-int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *local)
+int sock_udp_get_local(const sock_udp_t *sock, sock_udp_ep_t *local)
 {
     assert(sock && local);
     if (sock->local.family == AF_UNSPEC) {
@@ -173,7 +173,7 @@ int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *local)
     return 0;
 }
 
-int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
+int sock_udp_get_remote(const sock_udp_t *sock, sock_udp_ep_t *remote)
 {
     assert(sock && remote);
     if (sock->remote.family == AF_UNSPEC) {

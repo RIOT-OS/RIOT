@@ -58,14 +58,14 @@ void sock_udp_close(sock_udp_t *sock)
     }
 }
 
-int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *ep)
+int sock_udp_get_local(const sock_udp_t *sock, sock_udp_ep_t *ep)
 {
     assert(sock != NULL);
     return (lwip_sock_get_addr(sock->base.conn, (struct _sock_tl_ep *)ep,
                                1)) ? -EADDRNOTAVAIL : 0;
 }
 
-int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
+int sock_udp_get_remote(const sock_udp_t *sock, sock_udp_ep_t *ep)
 {
     assert(sock != NULL);
     return (lwip_sock_get_addr(sock->base.conn, (struct _sock_tl_ep *)ep,
