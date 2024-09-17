@@ -658,6 +658,9 @@ name = "portable-atomic"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da544ee218f0d287a911e9c99a39a8c9bc8fcad3cb8db5959940044ecfc67265"
+dependencies = [
+ "critical-section",
+]
 
 [[package]]
 name = "proc-macro2"
@@ -777,6 +780,7 @@ dependencies = [
  "coap-handler",
  "coap-message",
  "coap-numbers",
+ "critical-section",
  "cstr",
  "embedded-graphics",
  "embedded-hal 0.2.7",
@@ -802,6 +806,7 @@ version = "0.1.0"
 dependencies = [
  "coap-handler-implementations",
  "coap-message-demos",
+ "portable-atomic",
  "riot-coap-handler-demos",
  "riot-wrappers",
  "rust_riotmodules",
@@ -973,8 +978,10 @@ dependencies = [
 [[package]]
 name = "try-lock"
 version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
+source = "git+https://github.com/seanmonstar/try-lock?rev=45c39685b56a4dba1b71bdbbbe5f731c3c77dc50#45c39685b56a4dba1b71bdbbbe5f731c3c77dc50"
+dependencies = [
+ "portable-atomic",
+]
 
 [[package]]
 name = "typenum"
