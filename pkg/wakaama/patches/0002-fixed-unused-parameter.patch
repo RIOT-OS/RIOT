@@ -1,0 +1,26 @@
+From 139aee9713d7da5de13b6f71cfbeba4e2494c902 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E2=80=9Emoritzholzer=E2=80=9C?= <moritz.holzer@outlook.de>
+Date: Tue, 17 Sep 2024 13:57:03 +0200
+Subject: [PATCH 2/3] fixed unused parameter
+
+---
+ examples/client/object_server.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/examples/client/object_server.c b/examples/client/object_server.c
+index aeb3ad5..a4315ce 100644
+--- a/examples/client/object_server.c
++++ b/examples/client/object_server.c
+@@ -954,6 +954,9 @@ static uint8_t prv_server_execute(lwm2m_context_t *contextP,
+                                   lwm2m_object_t * objectP)
+ 
+ {
++    (void) buffer;
++    (void) length;
++
+     server_instance_t * targetP;
+ 
+     /* unused parameter */
+-- 
+2.46.0
+
