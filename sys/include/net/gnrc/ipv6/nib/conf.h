@@ -64,7 +64,7 @@ extern "C" {
 #      endif
 #      ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
          /* only needs to store default router */
-#        define CONFIG_GNRC_IPV6_NIB_NUMOF           (1)
+#        define CONFIG_GNRC_IPV6_NIB_NUMOF           (1 + IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES))
 #      endif
 #    endif
 #  endif
