@@ -1133,6 +1133,15 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
     slot = *p_slot;
     slot->attr = *attributes;
 
+    /* See 9.5.2. Key usage flags */
+    if (slot->attr.policy.usage & PSA_KEY_USAGE_SIGN_HASH) {
+        slot->attr.policy.usage |= PSA_KEY_USAGE_SIGN_MESSAGE;
+    }
+
+    if (slot->attr.policy.usage & PSA_KEY_USAGE_VERIFY_HASH) {
+        slot->attr.policy.usage |= PSA_KEY_USAGE_VERIFY_MESSAGE;
+    }
+
     if (PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
         slot->attr.id = key_id;
     }

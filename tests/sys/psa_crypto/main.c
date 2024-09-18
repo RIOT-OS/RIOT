@@ -112,6 +112,75 @@ cleanup:
 }
 
 /**
+ * Importing keys with the usage flags PSA_KEY_USAGE_SIGN_HASH/PSA_KEY_USAGE_VERIFY_HASH
+ * should automatically set the usage flags PSA_KEY_USAGE_SIGN_MESSAGE/PSA_KEY_USAGE_VERIFY_MESSAGE
+ * on the key.
+ */
+static void test_key_import_usage_flags(void)
+{
+    psa_key_attributes_t attributes = psa_key_attributes_init();
+    psa_key_attributes_t key_attrs;
+    const uint8_t key[32] = { 0 };
+    psa_key_usage_t key_usage;
+    psa_key_id_t key_id;
+
+    psa_set_key_algorithm(&attributes, PSA_ALG_HMAC(PSA_ALG_SHA_512));
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH);
+    psa_set_key_bits(&attributes, PSA_BYTES_TO_BITS(sizeof(key)));
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_HMAC);
+
+    TEST_ASSERT_PSA_RETURN(psa_crypto_init());
+    TEST_ASSERT_PSA_RETURN(psa_import_key(&attributes, key, sizeof(key), &key_id));
+
+    TEST_ASSERT_PSA_CLEANUP(psa_get_key_attributes(key_id, &key_attrs));
+    key_usage = psa_get_key_usage_flags(&key_attrs);
+
+    TEST_ASSERT_PSA_RETURN(psa_destroy_key(key_id));
+
+    TEST_ASSERT(key_usage & PSA_KEY_USAGE_SIGN_MESSAGE);
+    TEST_ASSERT(key_usage & PSA_KEY_USAGE_VERIFY_MESSAGE);
+
+    return;
+
+cleanup:
+    TEST_ASSERT_PSA_CONTINUE(psa_destroy_key(key_id));
+}
+
+/**
+ * Generating keys with the usage flags PSA_KEY_USAGE_SIGN_HASH/PSA_KEY_USAGE_VERIFY_HASH
+ * should automatically set the usage flags PSA_KEY_USAGE_SIGN_MESSAGE/PSA_KEY_USAGE_VERIFY_MESSAGE
+ * on the key.
+ */
+static void test_key_generate_usage_flags(void)
+{
+    psa_key_attributes_t attributes = psa_key_attributes_init();
+    psa_key_attributes_t key_attrs;
+    psa_key_usage_t key_usage;
+    psa_key_id_t key_id;
+
+    psa_set_key_algorithm(&attributes, PSA_ALG_HMAC(PSA_ALG_SHA_512));
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH);
+    psa_set_key_bits(&attributes, PSA_BYTES_TO_BITS(32));
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_HMAC);
+
+    TEST_ASSERT_PSA_RETURN(psa_crypto_init());
+    TEST_ASSERT_PSA_RETURN(psa_generate_key(&attributes, &key_id));
+
+    TEST_ASSERT_PSA_CLEANUP(psa_get_key_attributes(key_id, &key_attrs));
+    key_usage = psa_get_key_usage_flags(&key_attrs);
+
+    TEST_ASSERT_PSA_RETURN(psa_destroy_key(key_id));
+
+    TEST_ASSERT(key_usage & PSA_KEY_USAGE_SIGN_MESSAGE);
+    TEST_ASSERT(key_usage & PSA_KEY_USAGE_VERIFY_MESSAGE);
+
+    return;
+
+cleanup:
+    TEST_ASSERT_PSA_CONTINUE(psa_destroy_key(key_id));
+}
+
+/**
  * Exporting and re-importing a private Ed25519 key should result in the same public key and signature.
  */
 static void test_exported_key_is_identical_when_imported_again_ed25519(void)
@@ -227,6 +296,8 @@ static Test *tests_psa_crypto(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_init_twice),
         new_TestFixture(test_hash_interleaved),
+        new_TestFixture(test_key_import_usage_flags),
+        new_TestFixture(test_key_generate_usage_flags),
         new_TestFixture(test_exported_key_is_identical_when_imported_again_ed25519),
         new_TestFixture(test_export_public_key_ed25519),
     };
