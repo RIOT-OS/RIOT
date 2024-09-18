@@ -1,5 +1,6 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
+    arduino-mkr1000 \
     b-l072z-lrwan1 \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \
@@ -12,6 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2650stk \
     e104-bt5010a-tb \
     e104-bt5011a-tb \
+    feather-m0-wifi \
     gd32vf103c-start \
     hifive1 \
     hifive1b \
@@ -21,7 +23,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     lsn50 \
     maple-mini \
     microbit \
-    microbit-v2 \
     nrf51dongle \
     nrf6310 \
     nucleo-c031c6 \
@@ -34,10 +35,15 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
+    nucleo-f410rb \
+    nucleo-g070rb \
+    nucleo-g071rb \
+    nucleo-g431rb \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    nucleo-l412kb \
     olimexino-stm32 \
     opencm904 \
     samd10-xmini \
