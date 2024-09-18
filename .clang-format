@@ -11,9 +11,9 @@
 ---
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: true
-AlignCompound: true
-PadOperators: true
+AlignConsecutiveAssignments:
+  PadOperators: true
+  AlignCompound: true
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Left
 AlignOperands: true
