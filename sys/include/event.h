@@ -437,7 +437,21 @@ static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
     event_t *event;
 
     while ((event = event_wait_multi(queues, n_queues))) {
+#if IS_USED(MODULE_EVENT_LOOP_DEBUG)
+        uint32_t now;
+        ztimer_acquire(ZTIMER_USEC);
+        printf("event: executing %p->%p\n",
+               (void *)event, (void *)(uintptr_t)event->handler);
+        now = ztimer_now(ZTIMER_USEC);
+
         event->handler(event);
+
+        printf("event: %p took %" PRIu32 " µs\n",
+               (void *)event, ztimer_now(ZTIMER_USEC) - now);
+        ztimer_release(ZTIMER_USEC);
+#else
+        event->handler(event);
+#endif
     }
 }
 
