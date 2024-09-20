@@ -95,6 +95,7 @@ extern "C" {
  *      }
  */
 #define THREAD_FLAG_MSG_WAITING     (1u << 15)
+
 /**
  * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
  *
