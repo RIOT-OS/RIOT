@@ -104,6 +104,13 @@ extern "C" {
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
 
 /**
+ * @brief Thread flag use to notify available events in an event queue
+ *
+ * This flag is used by the `event` module.
+ */
+#define THREAD_FLAG_EVENT           (1u << 13)
+
+/**
  * @brief Comprehensive set of all predefined flags
  *
  * This bit mask is set for all thread flag bits that are predefined in RIOT.
@@ -114,7 +121,12 @@ extern "C" {
  * When using custom flags, asserting that they are not in this set can help
  * avoid conflict with future additions to the predefined flags.
  */
-#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | THREAD_FLAG_TIMEOUT)
+#define THREAD_FLAG_PREDEFINED_MASK (\
+    THREAD_FLAG_EVENT |\
+    THREAD_FLAG_MSG_WAITING |\
+    THREAD_FLAG_TIMEOUT\
+    )
+
 /** @} */
 
 /**

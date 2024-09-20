@@ -115,13 +115,6 @@
 extern "C" {
 #endif
 
-#ifndef THREAD_FLAG_EVENT
-/**
- * @brief   Thread flag use to notify available events in an event queue
- */
-#define THREAD_FLAG_EVENT   (0x1)
-#endif
-
 /**
  * @brief   event_queue_t static initializer
  */
