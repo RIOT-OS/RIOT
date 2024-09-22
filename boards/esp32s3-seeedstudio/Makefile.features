@@ -1,0 +1,18 @@
+# the board uses a ESP32-S3 with a 16MB QSPI Flash and a 8MB QSPI PSRAM
+CPU_MODEL = esp32s3
+FEATURES_PROVIDED += esp_spi_ram
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32s3/Makefile.features
+
+# peripherals provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_usbdev
+
+# other features provided by the board
+FEATURES_PROVIDED += esp_jtag
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += tinyusb_device

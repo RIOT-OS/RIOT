@@ -1,0 +1,17 @@
+# Copyright (c) 2024 TUDresden
+#               2024 Isikcan 'Jon' Yilmaz - TUDresden
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32s3-seeedstudio" if BOARD_ESP32S3_SEEEDSTUDIO
+
+config BOARD_ESP32S3_SEEEDSTUDIO
+    bool
+    default y
+    select BOARD_COMMON_ESP32S3
+    select CPU_MODEL_ESP32S3
+
+source "$(RIOTBOARD)/common/esp32s3/Kconfig"
