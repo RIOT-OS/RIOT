@@ -364,6 +364,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
+    gnrc_sock_send_aux_t _aux = { .flags = 0 };
 
     assert((sock != NULL) || (remote != NULL));
 
@@ -463,7 +464,14 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
         gnrc_pktbuf_release(payload);
         return -ENOMEM;
     }
-    res = gnrc_sock_send(pkt, &local, rem, PROTNUM_UDP);
+
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if (aux && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
+        _aux.timestamp = &aux->timestamp;
+    }
+#endif
+
+    res = gnrc_sock_send(pkt, &local, rem, PROTNUM_UDP, &_aux);
     if (res > 0) {
         res -= sizeof(udp_hdr_t);
     }
@@ -473,6 +481,12 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
                                sock->reg.async_cb_arg);
     }
 #endif  /* SOCK_HAS_ASYNC */
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if (aux && (aux->flags & SOCK_AUX_GET_TIMESTAMP)
+        && (_aux.flags &GNRC_SOCK_SEND_AUX_FLAG_TIMESTAMP)) {
+        aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
+    }
+#endif
     return res;
 }
 
