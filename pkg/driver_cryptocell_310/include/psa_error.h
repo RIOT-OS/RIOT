@@ -28,6 +28,7 @@ extern "C" {
 #include "crys_ec_mont_edw_error.h"
 #include "crys_hash_error.h"
 #include "ssi_aes_error.h"
+#include "crys_chacha_error.h"
 
 /**
  * @brief   Convert CryptoCell CRYS errors to PSA status values
