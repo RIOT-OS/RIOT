@@ -41,9 +41,13 @@
     #define ADC_NEG_INPUT (0)
 #endif
 
+#ifndef ADC_SAMPLEN
+#define ADC_SAMPLEN (0)
+#endif
+
 /* Prototypes */
 static void _adc_poweroff(Adc *dev);
-static void _setup_clock(Adc *dev, uint32_t f_tgt);
+static void _setup_clock(Adc *dev, uint32_t f_tgt, adc_res_t resolution);
 static void _setup_calibration(Adc *dev);
 static int _adc_configure(Adc *dev, adc_res_t res, uint32_t f_tgt);
 
@@ -90,27 +94,73 @@ static uint32_t _absdiff(uint32_t a, uint32_t b)
     return a > b ? a - b : b - a;
 }
 
-static void _find_presc(uint32_t f_src, uint32_t f_tgt,
-                        uint8_t *prescale, uint8_t *samplen)
+static void _find_prescaler(const uint32_t f_src, const uint32_t f_tgt,
+                            const adc_res_t resolution,
+                            uint8_t * const prescaler, uint8_t * const samplen)
 {
-    uint32_t _best_match = UINT32_MAX;
+    /* datasheet limit */
+    assert(f_src <= 100000000);
+    /* requirements for this piece of code */
+    assert(prescaler);
+    assert(samplen);
+    assert(*samplen <= 32);
 
-#if defined(ADC_CTRLB_PRESCALER_DIV2)
-    uint8_t start = 1;
-#else
-    uint8_t start = 2;
-#endif
-    uint8_t end = start + 8;
-    for (uint8_t i = start; i < end; ++i) {
-        for (uint8_t _samplen = 32; _samplen > 0; --_samplen) {
-            unsigned diff = _absdiff((f_src >> i) / _samplen, f_tgt);
-            if (diff < _best_match) {
-                _best_match = diff;
+    uint32_t cycles_resolution = 0;
+    switch (resolution) {
+        case ADC_RES_8BIT:
+            cycles_resolution = 8;
+            break;
+        case ADC_RES_10BIT:
+            cycles_resolution = 10;
+            break;
+        case ADC_RES_12BIT:
+            cycles_resolution = 12;
+            break;
+        case ADC_RES_16BIT_2SAMPL:
+        case ADC_RES_16BIT_4SAMPL:
+        case ADC_RES_16BIT_8SAMPL:
+        case ADC_RES_16BIT_16SAMPL:
+        case ADC_RES_16BIT_32SAMPL:
+        case ADC_RES_16BIT_64SAMPL:
+        case ADC_RES_16BIT_128SAMPL:
+        case ADC_RES_16BIT_256SAMPL:
+        case ADC_RES_16BIT_512SAMPL:
+        case ADC_RES_16BIT_1024SAMPL:
+            cycles_resolution = 16;
+            break;
+        default:
+            DEBUG("adc.c: resolution not applicable: %d\n", resolution);
+            assert(0);
+            return;
+    }
+
+    /* This assumes that we do not use offset compensation */
+    uint32_t smallest_diff = UINT32_MAX;
+    const int8_t samplen_min = *samplen;
+    const int8_t samplen_max = (1 << 6) - 1;
+    uint32_t f_samp;
+    uint32_t diff;
+    for (uint8_t _prescaler = 0; _prescaler < 8; ++_prescaler) {
+        uint32_t f_clk = f_src / (1 << (1 + _prescaler));
+        if (f_clk < 160000 || f_clk > 16000000) {
+            /* outside datasheet limits */
+            continue;
+        }
+        for (int8_t _samplen = samplen_max; _samplen >= samplen_min; --_samplen) {
+            /* continuous sampling rate according to data sheet */
+            uint32_t cycles_samplen = _samplen + 1;
+            f_samp = f_clk / (cycles_samplen + cycles_resolution);
+            diff = _absdiff(f_samp, f_tgt);
+            if (diff < smallest_diff) {
+                smallest_diff = diff;
                 *samplen  = _samplen;
-                *prescale = i;
+                *prescaler = _prescaler;
             }
         }
     }
+
+    DEBUG("adc.c: f_samp=%"PRIu32", diff=%"PRIu32", prescaler=%"PRIu8", samplen=%"PRIu8"\n",
+            f_samp, diff, *prescaler, *samplen);
 }
 
 #ifdef ADC_CTRLB_PRESCALER_Pos
@@ -119,7 +169,7 @@ static void _find_presc(uint32_t f_src, uint32_t f_tgt,
 #define ADC_PRESCALER_Pos   ADC_CTRLA_PRESCALER_Pos
 #endif
 
-static void _setup_clock(Adc *dev, uint32_t f_tgt)
+static void _setup_clock(Adc *dev, uint32_t f_tgt, adc_res_t resolution)
 {
     /* Enable gclk in case we are the only user */
     sam0_gclk_enable(ADC_GCLK_SRC);
@@ -165,11 +215,11 @@ static void _setup_clock(Adc *dev, uint32_t f_tgt)
 #endif
 
     uint8_t prescaler = ADC_PRESCALER >> ADC_PRESCALER_Pos;
-    uint8_t sampllen  = 0;
+    uint8_t samplen  = ADC_SAMPLEN;
 
     if (f_tgt) {
-        _find_presc(sam0_gclk_freq(ADC_GCLK_SRC), f_tgt,
-                    &prescaler, &sampllen);
+        _find_prescaler(sam0_gclk_freq(ADC_GCLK_SRC), f_tgt, resolution,
+                    &prescaler, &samplen);
     }
 
     /* Configure prescaler */
@@ -178,7 +228,7 @@ static void _setup_clock(Adc *dev, uint32_t f_tgt)
 #else
     dev->CTRLA.reg = prescaler << ADC_CTRLA_PRESCALER_Pos;
 #endif
-    dev->SAMPCTRL.reg = sampllen;
+    dev->SAMPCTRL.reg = samplen;
 }
 
 static void _setup_calibration(Adc *dev)
@@ -231,7 +281,7 @@ static int _adc_configure(Adc *dev, adc_res_t res, uint32_t f_tgt)
         DEBUG("adc: not ready\n");
     }
 
-    _setup_clock(dev, f_tgt);
+    _setup_clock(dev, f_tgt, res);
     _setup_calibration(dev);
 
     /* Set ADC resolution */
