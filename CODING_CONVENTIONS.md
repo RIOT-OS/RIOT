@@ -162,6 +162,89 @@
 * For complex statements it is always good to use more parentheses - or split up
   the statement and simplify it.
 
+## Indentation of Preprocessor Directives
+
+Add two spaces of indent *after* the `#` per level of indent. Increment the
+indent when entering conditional compilation using `#if`/`#ifdef`/`#ifndef`
+(except for the include guard, which does not add to the indent). Treat indent
+for C language statements and C preprocessor directives independently.
+
+```
+/* BAD: */
+#if XOSC1
+#define XOSC XOSC1
+#define XOSC_NUM 1
+#elif XOSC2
+#define XOSC XSOC2
+#define XOSC_NUM 2
+#endif /* XOSC1/XOSC2 */
+```
+
+```
+/* GOOD: */
+#if XOSC1
+#  define XOSC XOSC1
+#  define XOSC_NUM 1
+#elif XOSC2
+#  define XOSC XSOC2
+#  define XOSC_NUM 2
+#endif
+```
+
+```
+/* BAD: */
+void init_foo(uint32_t param)
+{
+    (void)param;
+    #if HAS_FOO
+    switch (param) {
+    case CASE1:
+        do_foo_init_for_case1;
+        break;
+    #if HAS_CASE_2
+    case CASE2:
+        do_foo_init_for_case2;
+        break;
+        #endif
+    #endif
+}
+```
+
+```
+/* GOOD: */
+void init_foo(uint32_t param)
+{
+    (void)param;
+#if HAS_FOO
+    switch (param) {
+    case CASE1:
+        do_foo_init_for_case1;
+        break;
+#  if HAS_CASE_2
+    case CASE2:
+        do_foo_init_for_case2;
+        break;
+#  endif
+#endif
+}
+```
+
+### Reasoning
+
+Adding the indent does improve readability a lot, more than adding comments.
+Hence, we prefer the indent to allow reviewers to quickly grasp the structure
+of the code.
+
+Adding spaces before the `#` is not in compliance with the C standard (even
+though in practice compilers will be just fine with whitespace in front), but
+adding spaces afterwards is standard compliant. In either case, having the `#`
+at the beginning of the line makes it visually stand out from C statements,
+which eases reading the code.
+
+Using an indent width of 2 makes preprocessor directives visually more
+distinctive from C code, which helps to quickly understand the structure
+of code.
+
 ## Includes
 
 * The include of system headers (in <>-brackets) always precedes RIOT specific
@@ -171,7 +254,7 @@
   statement around includes of optional headers:
 ```c
 #ifdef MODULE_ABC
-#include "abc.h"
+#  include "abc.h"
 #endif
 ```
 
