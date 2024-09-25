@@ -40,6 +40,8 @@ extern "C" {
 
 Test* tests_psa_import_key(void);
 Test* tests_psa_generate_sealed_key(void);
+Test* tests_psa_aes_encrypt_with_hw_key(void);
+Test* tests_psa_hash_gen_with_hw(void);
 
 #ifdef __cplusplus
 }

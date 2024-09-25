@@ -9,10 +9,21 @@ USEMODULE += embunit
 USEMODULE += psa_crypto
 USEMODULE += psa_cryptoservice
 
+USEMODULE += psa_cipher
+USEMODULE += psa_cipher_aes_128_ecb
+USEMODULE += psa_cipher_aes_128_ecb_custom_backend
+USEMODULE += psa_cipher_aes_128_ecb_backend_cryptoservice
+USEMODULE += psa_cipher_aes_128_cbc
+USEMODULE += psa_cipher_aes_128_cbc_custom_backend
+USEMODULE += psa_cipher_aes_128_cbc_backend_cryptoservice
+
 USEMODULE += psa_hash
 USEMODULE += psa_hash_sha_256
 USEMODULE += psa_hash_sha_256_custom_backend
 USEMODULE += psa_hash_sha_256_backend_cryptoservice
+
+USEMODULE += psa_cipher
+USEMODULE += psa_cipher_aes_128_cbc
 
 USEMODULE += psa_asymmetric
 USEMODULE += psa_asymmetric_ecc_p256r1

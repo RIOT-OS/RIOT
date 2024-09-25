@@ -43,6 +43,8 @@ static void test_psa_generate_sign_verify_ecc_p256_key(void)
     /* verify on original message with internal hashing operation */
     TEST_ASSERT_PSA_SUCCESS(psa_verify_message(pubkey_id, ECC_ALG, msg, sizeof(msg), signature, sig_length));
 
+    psa_destroy_key(privkey_id);
+    psa_destroy_key(pubkey_id);
 }
 
 Test* tests_psa_generate_sealed_key(void)
