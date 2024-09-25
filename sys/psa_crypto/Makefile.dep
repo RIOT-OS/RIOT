@@ -106,7 +106,9 @@ endif
 
 ## AES-128-ECB backend
 ifneq (,$(filter psa_cipher_aes_128_ecb,$(USEMODULE)))
-  USEMODULE += psa_cipher_aes_128_ecb_backend_riot
+  ifeq (,$(filter psa_cipher_aes_128_ecb_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_cipher_aes_128_ecb_backend_riot
+  endif
 endif
 
 ifneq (,$(filter psa_cipher_aes_128_ecb_backend_riot,$(USEMODULE)))
@@ -114,6 +116,11 @@ ifneq (,$(filter psa_cipher_aes_128_ecb_backend_riot,$(USEMODULE)))
   USEMODULE += cipher_modes
   USEMODULE += psa_riot_cipher
   USEMODULE += psa_riot_cipher_aes_ecb
+endif
+
+ifneq (,$(filter psa_cipher_aes_128_ecb_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_aes_128_ecb
 endif
 
 ## AES-128-CBC
@@ -128,6 +135,11 @@ ifneq (,$(filter psa_cipher_aes_128_cbc,$(USEMODULE)))
       USEMODULE += psa_cipher_aes_128_cbc_backend_riot
     endif
   endif
+endif
+
+ifneq (,$(filter psa_cipher_aes_128_cbc_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_aes_128_cbc
 endif
 
 ifneq (,$(filter psa_cipher_aes_128_cbc_backend_periph,$(USEMODULE)))

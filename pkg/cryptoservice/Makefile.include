@@ -11,4 +11,5 @@ endif
 PSEUDOMODULES += psa_cryptoservice_ecc_p256
 PSEUDOMODULES += psa_cryptoservice_hashes_sha256
 PSEUDOMODULES += psa_cryptoservice_aes_128_cbc
+PSEUDOMODULES += psa_cryptoservice_aes_128_ecb
 PSEUDOMODULES += psa_cryptoservice_random

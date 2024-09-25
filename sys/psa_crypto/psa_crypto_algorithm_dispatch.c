@@ -565,6 +565,11 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     }
 
     switch (op) {
+#if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB)
+    case PSA_ECB_NO_PAD_AES_128:
+        return psa_cipher_ecb_aes_128_encrypt(attributes, key_data, *key_bytes, alg, input,
+                                              input_length, output, output_size, output_length);
+#endif
 #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
     case PSA_CBC_NO_PAD_AES_128:
         return psa_cipher_cbc_aes_128_encrypt(attributes, key_data, *key_bytes, alg, input,
@@ -611,6 +616,11 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     }
 
     switch (op) {
+#if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB)
+    case PSA_ECB_NO_PAD_AES_128:
+        return psa_cipher_ecb_aes_128_decrypt(attributes, key_data, *key_bytes, alg, input,
+                                              input_length, output, output_size, output_length);
+#endif
 #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
     case PSA_CBC_NO_PAD_AES_128:
         return psa_cipher_cbc_aes_128_decrypt(attributes, key_data, *key_bytes, alg, input,

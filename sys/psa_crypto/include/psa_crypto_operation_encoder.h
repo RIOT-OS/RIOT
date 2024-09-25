@@ -42,6 +42,7 @@ extern "C" {
  * @details To be expanded with the development of this implementation.
  */
 typedef enum {
+    PSA_ECB_NO_PAD_AES_128,
     PSA_CBC_NO_PAD_AES_128,
     PSA_CBC_NO_PAD_AES_192,
     PSA_CBC_NO_PAD_AES_256,
@@ -119,6 +120,7 @@ typedef enum {
  */
 #define GET_CIPHER_OPERATION_128(alg, type) \
     (((alg == PSA_ALG_CBC_NO_PADDING) && (type == PSA_KEY_TYPE_AES)) ? PSA_CBC_NO_PAD_AES_128 : \
+     ((alg == PSA_ALG_ECB_NO_PADDING) && (type == PSA_KEY_TYPE_AES)) ? PSA_ECB_NO_PAD_AES_128 : \
      PSA_INVALID_OPERATION)
 
 /**

@@ -54,8 +54,11 @@ endif
 PSEUDOMODULES += psa_cipher
 PSEUDOMODULES += psa_cipher_aes_128_ecb
 PSEUDOMODULES += psa_cipher_aes_128_ecb_backend_riot
+PSEUDOMODULES += psa_cipher_aes_128_ecb_backend_cryptoservice
+PSEUDOMODULES += psa_cipher_aes_128_ecb_custom_backend
 
 PSEUDOMODULES += psa_cipher_aes_128_cbc
+PSEUDOMODULES += psa_cipher_aes_128_cbc_backend_cryptoservice
 PSEUDOMODULES += psa_cipher_aes_128_cbc_backend_periph
 PSEUDOMODULES += psa_cipher_aes_128_cbc_backend_riot
 PSEUDOMODULES += psa_cipher_aes_128_cbc_custom_backend
