@@ -13,6 +13,10 @@
  *
  * Provides access the CPU's serial number
  *
+ * @note This is *distinct* from what is called CPUID in ARM CPUs (which only
+ * covers variation down to silicon revisions, not down to individual instances
+ * of a CPU).
+ *
  * # (Low-) Power Implications
  *
  * The implementation **should** make sure, that calling cpuid_get() does not
