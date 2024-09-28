@@ -26,7 +26,7 @@ CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_LED=1
 # compiled natively (x86-64). Therefore we need to clear the flags set by e.g.
 # BOARD = nrf52840dk
 fido2-test:
-	env -i PATH=$(PATH) $(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests
+	env -i PATH=$(PATH) $(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests standard-tests
 
 # FIDO2 user presence tests.
 #
