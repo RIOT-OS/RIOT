@@ -181,7 +181,7 @@ jobs:
         mkdir test-reports/
         junit2html ${REPORT_XML} ${REPORT_NAME}.html
         cp ${REPORT_XML} ${REPORT_NAME}.xml
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Test Reports
