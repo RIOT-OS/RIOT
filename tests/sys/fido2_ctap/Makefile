@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.sys_common
 
 # same as CTAP_STACKSIZE
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=15000

@@ -26,4 +26,5 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += crypto_aes_256
   USEMODULE += hashes
   USEMODULE += fido2
+  USEMODULE += fmt
 endif
