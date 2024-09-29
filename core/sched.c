@@ -281,6 +281,14 @@ void sched_set_status(thread_t *process, thread_status_t status)
 void sched_switch(uint16_t other_prio)
 {
     thread_t *active_thread = thread_get_active();
+
+    /* If a thread exists and no other thread is runnable, we may end up in
+     * a situation with no active thread. This can not occur if there is an
+     * idle thread, which is always runnable, though */
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD) && unlikely(active_thread == NULL)) {
+        thread_yield_higher();
+    }
+
     uint16_t current_prio = active_thread->priority;
     int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
