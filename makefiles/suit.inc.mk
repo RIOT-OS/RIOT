@@ -56,9 +56,13 @@ $(SUIT_MANIFEST): $(SUIT_MANIFEST_PAYLOADS) $(BINDIR_SUIT)
 $(SUIT_MANIFEST_SIGNED): $(SUIT_MANIFEST) $(SUIT_SEC)
 	$(Q)(											\
 	if grep -q ENCRYPTED $(SUIT_SEC_SIGN); then						\
-		printf "Enter encryption for key file $(SUIT_SEC_SIGN): ";			\
-		read PASSWORD;									\
-		$(SUIT_TOOL) sign -p $$PASSWORD -k $(SUIT_SEC_SIGN) -m $(SUIT_MANIFEST) -o $@;	\
+		if [ -z "$(SUIT_SEC_PASSWORD)" ]; then						\
+			printf "Enter encryption for key file $(SUIT_SEC_SIGN): ";		\
+			read PASSWORD;								\
+		else										\
+			PASSWORD="$(SUIT_SEC_PASSWORD)";					\
+		fi;										\
+		$(SUIT_TOOL) sign -p "$$PASSWORD" -k $(SUIT_SEC_SIGN) -m $(SUIT_MANIFEST) -o $@;\
 	else											\
 		$(SUIT_TOOL) sign -k $(SUIT_SEC_SIGN) -m $(SUIT_MANIFEST) -o $@;		\
 	fi											\
