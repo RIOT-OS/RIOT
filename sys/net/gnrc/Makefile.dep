@@ -208,6 +208,12 @@ ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
+ifneq (,$(filter netdev_new_api,$(USEMODULE)))
+  ifneq (,$(filter gnrc_sixlowpan_frag%,$(USEMODULE)))
+    USEMODULE += gnrc_netif_pktq
+  endif
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_frag_fb
