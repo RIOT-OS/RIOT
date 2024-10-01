@@ -135,6 +135,22 @@
  * @ingroup     drivers_shield
  * @brief       Driver for the Arduino W5100 Ethernet Shield
  *
+ * Overview
+ * ========
+ *
+ * @image html https://docs.arduino.cc/static/61f89cdbee1f4b4d00168ea63d9fbd6a/6aca1/a000072_featured.jpg "Photo of the Arduino Ethernet Shield" width=50%
+ *
+ * | Key                    | Value                                                                 |
+ * |:---------------------- |:--------------------------------------------------------------------- |
+ * | Abstract               | Ethernet Network Card                                                 |
+ * | Product Name           | Arduino Ethernet Shield                                               |
+ * | Vendor                 | Arduino                                                               |
+ * | Vendor Doc             | [Product Homepage][shield_w5100_hp]                                   |
+ * | Attachment Standard    | Arduino UNO Shield (ISP-SPI required)                                 |
+ *
+ * [shield_w5100_hp]: http://web.archive.org/web/20240910190853/https://docs.arduino.cc/retired/shields/arduino-ethernet-shield-without-poe-module/
+ *
+ *
  * Usage
  * =====
  *
