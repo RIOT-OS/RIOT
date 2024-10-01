@@ -131,16 +131,6 @@ int main(void)
     puts("LoRaWAN Class A low-power application");
     puts("=====================================");
 
-    /*
-     * Enable deep sleep power mode (e.g. STOP mode on STM32) which
-     * in general provides RAM retention after wake-up.
-     */
-#if IS_USED(MODULE_PM_LAYERED)
-    for (unsigned i = 1; i < PM_NUM_MODES - 1; ++i) {
-        pm_unblock(i);
-    }
-#endif
-
 #ifdef USE_OTAA /* OTAA activation mode */
     /* Convert identifiers and keys strings to byte arrays */
     fmt_hex_bytes(deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
