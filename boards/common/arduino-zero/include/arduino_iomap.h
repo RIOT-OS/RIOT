@@ -139,6 +139,20 @@ extern "C" {
 #define ARDUINO_PIN_9_PWM_CHAN  1
 /** @} */
 
+/**
+ * @name    Arduino's SPI buses
+ * @{
+ */
+/**
+ * @brief   SPI_DEV(0) is connected to the ISP
+ */
+#define ARDUINO_SPI_ISP         SPI_DEV(0)
+/**
+ * @brief   SPI_DEV(1) is connected to D11/D12/D13
+ */
+#define ARDUINO_SPI_D11D12D13   SPI_DEV(1)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
