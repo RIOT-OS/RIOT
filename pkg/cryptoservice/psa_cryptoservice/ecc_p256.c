@@ -40,6 +40,12 @@ psa_status_t psa_import_ecc_p256r1_key_pair(const psa_key_attributes_t *attribut
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
+    psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
+
+    if (location != PSA_KEY_LOCATION_LOCAL_SEALED) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
     psa_status_t status = CYS_PROT_ecc_p256_seal(key_data, (CYS_PROT_ecc_p256_key_t *) priv_key_buffer);
 
     if (status != PSA_SUCCESS) {
@@ -52,11 +58,11 @@ psa_status_t psa_import_ecc_p256r1_key_pair(const psa_key_attributes_t *attribut
         return status;
     }
 
-    *priv_key_buffer_length = CYS_PROT_ECC_P256_SEALED_KEY_SIZE;
     *pub_key_buffer_length = CYS_ECC_P256_PUB_SIZE;
 
-    (void)attributes;
-    (void)priv_key_size;
+    (void) attributes;
+    (void) priv_key_size;
+    (void) priv_key_buffer_length;
     return PSA_SUCCESS;
 }
 

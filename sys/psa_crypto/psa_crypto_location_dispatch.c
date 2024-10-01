@@ -100,6 +100,8 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
     switch (location) {
     case PSA_KEY_LOCATION_LOCAL_STORAGE:
         return psa_algorithm_dispatch_import_key(attributes, data, data_length, slot, bits);
+    case PSA_KEY_LOCATION_LOCAL_SEALED:
+        return psa_algorithm_dispatch_import_key(attributes, data, data_length, slot, bits);
     default:
         return PSA_ERROR_NOT_SUPPORTED;
     }
