@@ -277,7 +277,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 
 # Python is close enough that we can have Makefile comments starting with `##`
 # that are both recognized by Doxygen and comments to Make
-EXTENSION_MAPPING      = mk=Python
+EXTENSION_MAPPING      = mk=Python in=C
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -785,7 +785,8 @@ INPUT                  = ../../doc.txt \
                          ../../LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
-                         ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c
+                         ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c \
+                         ../../dist/tools/genconfigheader/riotbuild-prefix.h.in
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -807,6 +808,7 @@ INPUT_ENCODING         = UTF-8
 
 FILE_PATTERNS          = *.txt \
                          *.h \
+                         *.h.in \
                          *.hpp
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
