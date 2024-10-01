@@ -19,13 +19,28 @@ static uint8_t PLAINTEXT[] = {
     0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51
 };
 
+static uint8_t TEST_ECB_ONE_BLOCK_KEY[] = {
+    0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
+    0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
+};
+
+static uint8_t TEST_ECB_ONE_BLOCK_INP[] = {
+    0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF,
+    0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7
+};
+
+static uint8_t TEST_ECB_ONE_BLOCK_ENC_AES[] = {
+    0x37, 0x29, 0xa3, 0x6c, 0xaf, 0xe9, 0x84, 0xff,
+    0x46, 0x22, 0x70, 0x42, 0xee, 0x24, 0x83, 0xf6
+};
+
 /**
  * @brief   Example function to perform an AES-128 CBC encryption and decryption
  *          with the PSA Crypto API.
  *
  * @return  psa_status_t
  */
-static void test_psa_aes_cbc_encrypt_with_hw(void)
+static void test_psa_aes_128_cbc_encrypt_decrypt(void)
 {
     psa_key_id_t key_id = 0;
     psa_key_attributes_t attr = psa_key_attributes_init();
@@ -62,7 +77,7 @@ static void test_psa_aes_cbc_encrypt_with_hw(void)
  *
  * @return  psa_status_t
  */
-static void test_psa_aes_ecb_encrypt_with_hw(void)
+static void test_psa_aes_128_ecb_encrypt_decrypt(void)
 {
     psa_key_id_t key_id = 0;
     psa_key_attributes_t attr = psa_key_attributes_init();
@@ -93,15 +108,14 @@ static void test_psa_aes_ecb_encrypt_with_hw(void)
     psa_destroy_key(key_id);
 }
 
-
-Test* tests_psa_aes_encrypt_with_hw_key(void)
+Test* tests_psa_aes_128_encrypt_decrypt(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_psa_aes_cbc_encrypt_with_hw),
-        new_TestFixture(test_psa_aes_ecb_encrypt_with_hw),
+        new_TestFixture(test_psa_aes_128_cbc_encrypt_decrypt),
+        new_TestFixture(test_psa_aes_128_ecb_encrypt_decrypt),
     };
 
-    EMB_UNIT_TESTCALLER(tests_psa_aes_encrypt_hw, NULL, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(tests_psa_aes_128_encrypt_decrypt, NULL, NULL, fixtures);
 
-    return (Test *)&tests_psa_aes_encrypt_hw;
+    return (Test *)&tests_psa_aes_128_encrypt_decrypt;
 }

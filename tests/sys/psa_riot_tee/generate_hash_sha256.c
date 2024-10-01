@@ -16,11 +16,6 @@ static const uint8_t msg[] = {
 };
 static const size_t msg_len = sizeof(msg); // exclude NULL-byte
 
-// static const uint8_t hash_sha256[] = {
-//     0x7f, 0x83, 0xb1, 0x65, 0x7f, 0xf1, 0xfc, 0x53, 0xb9, 0x2d, 0xc1, 0x81, 0x48,
-//     0xa1, 0xd6, 0x5d, 0xfc, 0x2d, 0x4b, 0x1f, 0xa3, 0xd6, 0x77, 0x28, 0x4a, 0xdd,
-//     0xd2, 0x00, 0x12, 0x6d, 0x90, 0x69};
-
 static const uint8_t hash_sha256[] = {
     0x4f, 0x44, 0xc1, 0xc7,
     0xfb, 0xeb, 0xb6, 0xf9,
@@ -32,20 +27,20 @@ static const uint8_t hash_sha256[] = {
     0xac, 0x18, 0x86, 0xa4
 };
 
-static void test_psa_hash_sha256_gen_with_hw(void)
+static void test_psa_hash_sha256_gen(void)
 {
     psa_crypto_init();
 
     TEST_ASSERT_PSA_SUCCESS(psa_hash_compare(PSA_ALG_SHA_256, msg, msg_len, hash_sha256, sizeof(hash_sha256)));
 }
 
-Test* tests_psa_hash_gen_with_hw(void)
+Test* tests_psa_hash_sha256_gen(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_psa_hash_sha256_gen_with_hw),
+        new_TestFixture(test_psa_hash_sha256_gen),
     };
 
-    EMB_UNIT_TESTCALLER(tests_psa_hash_gen_with_hw, NULL, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(tests_psa_hash_sha256_gen, NULL, NULL, fixtures);
 
-    return (Test *)&tests_psa_hash_gen_with_hw;
+    return (Test *)&tests_psa_hash_sha256_gen;
 }

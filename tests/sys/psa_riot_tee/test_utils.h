@@ -38,10 +38,10 @@ extern "C" {
 #define ECC_ALG_HASH    (PSA_ALG_SHA_256)
 #define ECC_ALG         (PSA_ALG_ECDSA(ECC_ALG_HASH))
 
-Test* tests_psa_import_key(void);
+Test* tests_psa_import_and_seal_key(void);
 Test* tests_psa_generate_sealed_key(void);
-Test* tests_psa_aes_encrypt_with_hw_key(void);
-Test* tests_psa_hash_gen_with_hw(void);
+Test* tests_psa_aes_128_encrypt_decrypt(void);
+Test* tests_psa_hash_sha256_gen(void);
 
 #ifdef __cplusplus
 }
