@@ -16,7 +16,7 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG) $(CFLAGS_OPT)
+CFLAGS += -Wall -Wextra $(CFLAGS_DBG) $(CFLAGS_OPT)
 CFLAGS += -U_FORTIFY_SOURCE
 CFLAGS_DBG ?= -g3
 
