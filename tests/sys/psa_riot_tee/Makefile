@@ -22,9 +22,6 @@ USEMODULE += psa_hash_sha_256
 USEMODULE += psa_hash_sha_256_custom_backend
 USEMODULE += psa_hash_sha_256_backend_cryptoservice
 
-USEMODULE += psa_cipher
-USEMODULE += psa_cipher_aes_128_cbc
-
 USEMODULE += psa_asymmetric
 USEMODULE += psa_asymmetric_ecc_p256r1
 USEMODULE += psa_asymmetric_ecc_p256r1_custom_backend

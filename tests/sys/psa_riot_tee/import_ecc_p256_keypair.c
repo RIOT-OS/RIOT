@@ -15,6 +15,8 @@ static void test_psa_import_sign_verify_ecc_p256_key_pair(void)
     psa_key_attributes_t pubkey_attr = psa_key_attributes_init();
 
     psa_key_usage_t usage = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH;
+    psa_key_lifetime_t lifetime = PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+        PSA_KEY_LIFETIME_VOLATILE, PSA_KEY_LOCATION_LOCAL_SEALED);
 
     uint8_t public_key[PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(ECC_KEY_TYPE, ECC_KEY_SIZE)] = { 0 };
     size_t pubkey_length;
@@ -24,6 +26,7 @@ static void test_psa_import_sign_verify_ecc_p256_key_pair(void)
     uint8_t hash[PSA_HASH_LENGTH(ECC_ALG_HASH)];
     size_t hash_length;
 
+    psa_set_key_lifetime(&privkey_attr, lifetime);
     psa_set_key_algorithm(&privkey_attr, ECC_ALG);
     psa_set_key_usage_flags(&privkey_attr, usage);
     psa_set_key_type(&privkey_attr, ECC_KEY_TYPE);
@@ -46,9 +49,12 @@ static void test_psa_import_sign_verify_ecc_p256_key_pair(void)
 
     /* verify on original message with internal hashing operation */
     TEST_ASSERT_PSA_SUCCESS(psa_verify_message(pubkey_id, ECC_ALG, msg, sizeof(msg), signature, sig_length));
+
+    psa_destroy_key(privkey_id);
+    psa_destroy_key(pubkey_id);
 }
 
-Test* tests_psa_import_key(void)
+Test* tests_psa_import_and_seal_key(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_psa_import_sign_verify_ecc_p256_key_pair),
