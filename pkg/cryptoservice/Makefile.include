@@ -3,6 +3,8 @@ PKG_SOURCE_DIR ?= $(PKGDIRBASE)/cryptoservice
 INCLUDES += -I$(PKG_SOURCE_DIR)/api
 INCLUDES += -I$(RIOTPKG)/cryptoservice/include
 
+DIRS += $(RIOTPKG)/cryptoservice/contrib
+
 ifneq (,$(filter psa_cryptoservice, $(USEMODULE)))
   DIRS += $(RIOTPKG)/cryptoservice/psa_cryptoservice
   INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include

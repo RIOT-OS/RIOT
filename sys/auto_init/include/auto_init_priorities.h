@@ -396,6 +396,13 @@ extern "C" {
 #define AUTO_INIT_PRIO_MOD_DRIVER_CRYPTOCELL_310            1570
 #endif
 
+#ifndef AUTO_INIT_PRIO_MOD_CRYPTOSERVICE
+/**
+ * @brief   Cryptoservice priority
+ */
+#define AUTO_INIT_PRIO_MOD_CRYPTOSERVICE               1580
+#endif
+
 #ifdef __cplusplus
 }
 #endif

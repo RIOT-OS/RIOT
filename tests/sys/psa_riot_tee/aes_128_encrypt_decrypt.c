@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "thread.h"
 #include "test_utils.h"
 #include "psa/crypto.h"
 
@@ -18,6 +19,8 @@ static uint8_t PLAINTEXT[] = {
     0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c,
     0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51
 };
+
+char second_thread_stack[THREAD_STACKSIZE_MAIN];
 
 /**
  * @brief   Example function to perform an AES-128 CBC encryption and decryption
@@ -93,11 +96,91 @@ static void test_psa_aes_128_ecb_encrypt_decrypt(void)
     psa_destroy_key(key_id);
 }
 
+static void *_aes_ecb(void *arg)
+{
+    (void)arg;
+    psa_key_id_t key_id = 0;
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
+
+    size_t encr_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
+                                                             PSA_ALG_ECB_NO_PADDING, sizeof(PLAINTEXT));
+
+    uint8_t cipher_out[encr_output_size];
+    uint8_t plain_out[sizeof(PLAINTEXT)];
+    size_t output_len = 0;
+
+    psa_set_key_algorithm(&attr, PSA_ALG_ECB_NO_PADDING);
+    psa_set_key_usage_flags(&attr, usage);
+    psa_set_key_bits(&attr, 128);
+    psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
+
+    psa_import_key(&attr, KEY_128, AES_128_KEY_SIZE, &key_id);
+
+    psa_cipher_encrypt(key_id, PSA_ALG_ECB_NO_PADDING, PLAINTEXT,
+                                sizeof(PLAINTEXT), cipher_out, encr_output_size, &output_len);
+
+    psa_cipher_decrypt(key_id, PSA_ALG_ECB_NO_PADDING, cipher_out,
+                                sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
+
+    if(memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) != 0) {
+        puts("Cipher Failed");
+    }
+
+    psa_destroy_key(key_id);
+
+    return NULL;
+}
+
+/**
+ * @brief   Example function to perform an AES-128 CBC encryption and decryption
+ *          with the PSA Crypto API.
+ *
+ * @return  psa_status_t
+ */
+static void test_psa_aes_128_ecb_encrypt_decrypt_threadsafety(void)
+{
+    thread_create(second_thread_stack, sizeof(second_thread_stack),
+                                     THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                                     _aes_ecb, NULL, "aes_ecb");
+
+    psa_key_id_t key_id = 0;
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
+
+    size_t encr_output_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
+                                                             PSA_ALG_ECB_NO_PADDING, sizeof(PLAINTEXT));
+
+    uint8_t cipher_out[encr_output_size];
+    uint8_t plain_out[sizeof(PLAINTEXT)];
+    size_t output_len = 0;
+
+    psa_set_key_algorithm(&attr, PSA_ALG_ECB_NO_PADDING);
+    psa_set_key_usage_flags(&attr, usage);
+    psa_set_key_bits(&attr, 128);
+    psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
+
+    psa_import_key(&attr, KEY_128, AES_128_KEY_SIZE, &key_id);
+
+    psa_cipher_encrypt(key_id, PSA_ALG_ECB_NO_PADDING, PLAINTEXT,
+                                sizeof(PLAINTEXT), cipher_out, encr_output_size, &output_len);
+
+    psa_cipher_decrypt(key_id, PSA_ALG_ECB_NO_PADDING, cipher_out,
+                                sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
+
+    if(memcmp(PLAINTEXT, plain_out, sizeof(plain_out)) != 0) {
+        puts("Cipher Failed");
+    }
+
+    psa_destroy_key(key_id);
+}
+
 Test* tests_psa_aes_128_encrypt_decrypt(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_psa_aes_128_cbc_encrypt_decrypt),
         new_TestFixture(test_psa_aes_128_ecb_encrypt_decrypt),
+        new_TestFixture(test_psa_aes_128_ecb_encrypt_decrypt_threadsafety),
     };
 
     EMB_UNIT_TESTCALLER(tests_psa_aes_128_encrypt_decrypt, NULL, NULL, fixtures);

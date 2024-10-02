@@ -287,6 +287,11 @@ extern void driver_cryptocell_310_setup(void);
 AUTO_INIT(driver_cryptocell_310_setup,
           AUTO_INIT_PRIO_MOD_DRIVER_CRYPTOCELL_310);
 #endif
+#if IS_USED(MODULE_CRYPTOSERVICE)
+extern void auto_init_cryptoservice(void);
+AUTO_INIT(auto_init_cryptoservice,
+          AUTO_INIT_PRIO_MOD_CRYPTOSERVICE);
+#endif
 #if IS_USED(MODULE_TEST_UTILS_INTERACTIVE_SYNC) && !IS_USED(MODULE_SHELL)
 extern void test_utils_interactive_sync(void);
 AUTO_INIT(test_utils_interactive_sync,

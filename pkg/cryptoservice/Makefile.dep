@@ -1,3 +1,6 @@
+USEMODULE += cryptoservice_contrib
+USEMODULE += auto_init
+
 ifneq (,$(filter trustzone_m,$(FEATURES_PROVIDED)))
 $(info building riot-tee for trustzone_m)
 USEPKG += riot-tee
