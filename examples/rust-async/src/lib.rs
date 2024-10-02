@@ -5,8 +5,8 @@
 // directory for more details.
 #![no_std]
 
-use riot_wrappers::riot_main;
 use riot_wrappers::println;
+use riot_wrappers::riot_main;
 use riot_wrappers::ztimer::{Clock, Ticks};
 
 use static_cell::StaticCell;
@@ -20,7 +20,9 @@ fn main() {
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
     executor.run(|spawner| {
-        spawner.spawn(amain(spawner)).expect("Starting task for the first time");
+        spawner
+            .spawn(amain(spawner))
+            .expect("Starting task for the first time");
     })
 }
 
@@ -28,8 +30,12 @@ fn main() {
 async fn amain(spawner: embassy_executor::Spawner) {
     println!("Running asynchronously:");
 
-    spawner.spawn(fast_messages("A")).expect("Starting task for the first time");
-    spawner.spawn(fast_messages("B")).expect("Task is configured to allow two instances");
+    spawner
+        .spawn(fast_messages("A"))
+        .expect("Starting task for the first time");
+    spawner
+        .spawn(fast_messages("B"))
+        .expect("Task is configured to allow two instances");
 
     let msec = Clock::msec();
 

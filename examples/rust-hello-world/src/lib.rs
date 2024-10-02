@@ -5,8 +5,8 @@
 // directory for more details.
 #![no_std]
 
-use riot_wrappers::riot_main;
 use riot_wrappers::println;
+use riot_wrappers::riot_main;
 
 extern crate rust_riotmodules;
 
