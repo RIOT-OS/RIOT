@@ -51,3 +51,7 @@ Once that is ready, in a parallel shell, run:
 ```
 $ aiocoap-client 'coap://[2a02:0b18:c13b:8018:1234:56ff:fe78:90ab]/.well-known/core'
 ```
+
+Note that no security is enabled by default so far; this is considered a bug.
+To mitigate this, no controls that are expected to be harmful are exposed in this example.
+(For example, while LEDs are exposed, GPIO pins are not, for they might not tolerate driving to some level depending on the hardware connected to them).
