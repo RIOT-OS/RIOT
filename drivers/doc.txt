@@ -135,6 +135,22 @@
  * @ingroup     drivers_shield
  * @brief       Driver for the Arduino W5100 Ethernet Shield
  *
+ * Overview
+ * ========
+ *
+ * @image html https://docs.arduino.cc/static/61f89cdbee1f4b4d00168ea63d9fbd6a/6aca1/a000072_featured.jpg "Photo of the Arduino Ethernet Shield" width=50%
+ *
+ * | Key                    | Value                                                                 |
+ * |:---------------------- |:--------------------------------------------------------------------- |
+ * | Abstract               | Ethernet Network Card                                                 |
+ * | Product Name           | Arduino Ethernet Shield                                               |
+ * | Vendor                 | Arduino                                                               |
+ * | Vendor Doc             | [Product Homepage][shield_w5100_hp]                                   |
+ * | Attachment Standard    | Arduino UNO Shield (ISP-SPI required)                                 |
+ *
+ * [shield_w5100_hp]: http://web.archive.org/web/20240910190853/https://docs.arduino.cc/retired/shields/arduino-ethernet-shield-without-poe-module/
+ *
+ *
  * Usage
  * =====
  *
@@ -149,4 +165,32 @@
  * `arduino_spi`, `arduino_shield_uno` and the `arduino_shield_isp` feature.
  * It should work out of the box for any fully Arduino UNO compatible board
  * (including the ISP header) and correct I/O mapping (`arduino_*`) features.
+ */
+
+/**
+ * @defgroup    drivers_shield_llcc68   LLCC68 Arduino LoRa Shield
+ * @ingroup     drivers_shield
+ * @brief       LLCC68 Arduino LoRa Shield
+ *
+ * # Overview
+ *
+ * @image html https://www.semtech.com/uploads/products/product/LLCC68MB2BAS_image2_horiz_300x300px.jpg "Photo of the LLCC68 Shield" width=50%
+ *
+ * | Key                    | Value                                                                 |
+ * |:---------------------- |:--------------------------------------------------------------------- |
+ * | Abstract               | LoRa Transceiver                                                      |
+ * | Product Name           | LLCC68MB2CAS0                                                         |
+ * | Vendor                 | Semtech                                                               |
+ * | Vendor Doc             | [Product Homepage][shield_llcc68_hp]                                  |
+ * | Attachment Standard    | Arduino UNO Shield (Side SPI used, no ISP-SPI required)               |
+ *
+ * [shield_llcc68_hp]: http://web.archive.org/web/20240528223141/https://www.semtech.com/products/wireless-rf/lora-connect/llcc68mb2cas
+ *
+ * # Usage
+ *
+ * Use the `shield_llcc68` module, e.g. using
+ *
+ * ```
+ * USEMODULE=shield_llcc68 make BOARD=arduino-zero -C examples/lorawan
+ * ```
  */

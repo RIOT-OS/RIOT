@@ -192,6 +192,13 @@ ifneq (,$(filter servo_%,$(USEMODULE)))
   USEMODULE += servo
 endif
 
+ifneq (,$(filter shield_llcc68,$(USEMODULE)))
+  FEATURES_REQUIRED += arduino_pins
+  FEATURES_REQUIRED += arduino_shield_uno
+  FEATURES_REQUIRED += arduino_spi
+  USEMODULE += llcc68
+endif
+
 ifneq (,$(filter shield_w5100,$(USEMODULE)))
   FEATURES_REQUIRED += arduino_pins
   FEATURES_REQUIRED += arduino_shield_isp
