@@ -40,9 +40,9 @@
  * The loop delay in CAN, especially in CAN FD with bitrate switching, affects synchronization due to increased data rates.
  * The unit is nanoseconds.
  */
-#ifndef CAN_DEVICE_DEFAULT_LOOP_DELAY
-#error "CAN_DEVICE_DEFAULT_LOOP_DELAY must be defined in the application's Makefile. This property can be found in the datasheet of the CAN transceiver in use. The unit is nanoseconds."
-#endif /* CAN_DEVICE_DEFAULT_LOOP_DELAY */
+#ifndef CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY
+#error "CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY must be defined. This property can be found in the datasheet of the CAN transceiver in use. The unit is nanoseconds."
+#endif /* CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY */
 #endif /* MODULE_FDCAN */
 
 #ifndef CAN_DEVICE_MSG_QUEUE_SIZE
@@ -248,7 +248,7 @@ static void *_can_device_thread(void *args)
 
 #if defined(MODULE_FDCAN)
     if (candev_dev->loop_delay == 0) {
-        candev_dev->loop_delay = CAN_DEVICE_DEFAULT_LOOP_DELAY;
+        candev_dev->loop_delay = CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY;
     }
     dev->loop_delay = candev_dev->loop_delay;
 #endif

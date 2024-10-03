@@ -47,3 +47,17 @@ ifneq (,$(filter native native64,$(BOARD)))
 else
 	CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
 endif
+
+# Loop delay
+ifneq (,$(filter fdcan,$(USEMODULE)))
+	ifneq (1,$(RIOT_CI_BUILD))
+		# Check your CAN transceiver datasheet to apply the good loop delay in nanoseconds.
+		# This configuration is mandatory if you are using CAN FD with bitrate switching.
+		# Can be configured here or through Kconfig
+		#CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
+
+	# Allow only a default value for CI
+	else
+		KCONFIG_ADD_CONFIG += $(CURDIR)/fdcan-ci.config
+	endif
+endif
