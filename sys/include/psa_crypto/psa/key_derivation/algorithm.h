@@ -74,6 +74,28 @@ extern "C" {
     (((alg) & ~0x000000ff) == 0x08000100)
 
 /**
+ * @brief   Whether the specified algorithm is an HKDF-Extract algorithm.
+ *
+ * @param   alg An algorithm identifier: a value of type @ref psa_algorithm_t.
+ *
+ * @return  1 if alg is an HKDF-Extract algorithm
+ *          0 otherwise
+ */
+#define PSA_ALG_IS_HKDF_EXTRACT(alg) \
+    (((alg) & ~0x000000ff) == 0x08000400)
+
+/**
+ * @brief   Whether the specified algorithm is an HKDF-Expand algorithm.
+ *
+ * @param   alg An algorithm identifier: a value of type @ref psa_algorithm_t.
+ *
+ * @return  1 if alg is an HKDF-Expand algorithm
+ *          0 otherwise
+ */
+#define PSA_ALG_IS_HKDF_EXPAND(alg) \
+    (((alg) & ~0x000000ff) == 0x08000500)
+
+/**
  * @brief   Whether the specified algorithm is a TLS-1.2 PRF algorithm.
  *
  * @param   alg An algorithm identifier: a value of type @ref psa_algorithm_t.
@@ -136,6 +158,59 @@ extern "C" {
  *          Unspecified if @c hash_alg is not a supported hash algorithm.
  */
 #define PSA_ALG_HKDF(hash_alg) ((psa_algorithm_t)(0x08000100 | ((hash_alg) & 0x000000ff)))
+
+/**
+ * @brief   Macro to build an HKDF-Extract algorithm.
+ *
+ * @details This is the Extract step of HKDF as specified by
+ *          HMAC-based Extract-and-Expand Key Derivation Function (HKDF) [RFC5869] §2.2.
+ *
+ *          This key derivation algorithm uses the following inputs:
+ *          -   @ref PSA_KEY_DERIVATION_INPUT_SALT is the salt.
+ *          -   @ref PSA_KEY_DERIVATION_INPUT_SECRET is the input keying material used
+ *              in the “extract” step.
+ *
+ *          The inputs are mandatory and must be passed in the order above.
+ *          Each input may only be passed once.
+ *
+ *          @b Compatible @b key @b types
+ *          - @ref PSA_KEY_TYPE_DERIVE (for the input keying material)
+ *          - @ref PSA_KEY_TYPE_RAW_DATA (for the salt)
+ *
+ * @param   hash_alg    A hash algorithm: a value of type @ref psa_algorithm_t such that
+ *                      @ref PSA_ALG_IS_HASH(@p hash_alg) is true.
+ *
+ * @return  The corresponding HKDF-Extract algorithm. For example,
+ *          @ref PSA_ALG_HKDF_EXTRACT(@ref PSA_ALG_SHA_256) is HKDF-Extract using HMAC-SHA-256.
+ *          Unspecified if @c hash_alg is not a supported hash algorithm.
+ */
+#define PSA_ALG_HKDF_EXTRACT(hash_alg) ((psa_algorithm_t)(0x08000400 | ((hash_alg) & 0x000000ff)))
+
+/**
+ * @brief   Macro to build an HKDF-Expand algorithm.
+ *
+ * @details This is the Expand step of HKDF as specified by
+ *          HMAC-based Extract-and-Expand Key Derivation Function (HKDF) [RFC5869] §2.3.
+ *
+ *          This key derivation algorithm uses the following inputs:
+ *          -   @ref PSA_KEY_DERIVATION_INPUT_SECRET is the pseudoramdom key (PRK).
+ *          -   @ref PSA_KEY_DERIVATION_INPUT_INFO is the info string.
+ *
+ *          The inputs are mandatory and must be passed in the order above.
+ *          Each input may only be passed once.
+ *
+ *          @b Compatible @b key @b types
+ *          - @ref PSA_KEY_TYPE_DERIVE (for the pseudorandom key)
+ *          - @ref PSA_KEY_TYPE_RAW_DATA (for the info string)
+ *
+ * @param   hash_alg    A hash algorithm: a value of type @ref psa_algorithm_t such that
+ *                      @ref PSA_ALG_IS_HASH(@p hash_alg) is true.
+ *
+ * @return  The corresponding HKDF-Expand algorithm. For example,
+ *          @ref PSA_ALG_HKDF_EXPAND(@ref PSA_ALG_SHA_256) is HKDF-Expand using HMAC-SHA-256.
+ *          Unspecified if @c hash_alg is not a supported hash algorithm.
+ */
+#define PSA_ALG_HKDF_EXPAND(hash_alg) ((psa_algorithm_t)(0x08000500 | ((hash_alg) & 0x000000ff)))
 
 /**
  * @brief   Macro to build a TLS-1.2 PRF algorithm.
