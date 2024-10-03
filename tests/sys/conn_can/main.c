@@ -224,7 +224,17 @@ static int _receive(int argc, char **argv)
     }
     for (int i = 0; i < filt_num; i++) {
         filters[thread_nb][i].can_id = strtoul(argv[5 + i], NULL, 16);
-        filters[thread_nb][i].can_mask = 0xffffffff;
+        if (filters[thread_nb][i].can_id > CAN_SFF_MASK) {
+            filters[thread_nb][i].can_mask = CAN_EFF_MASK;
+        }
+        else {
+            filters[thread_nb][i].can_mask = CAN_SFF_MASK;
+        }
+    }
+    if (filt_num <= 0) {
+        filt_num = 1;
+        filters[thread_nb][0].can_id = 0;
+        filters[thread_nb][0].can_mask = 0;
     }
     uint32_t timeout = strtoul(argv[4], NULL, 0);
     msg_t msg;
