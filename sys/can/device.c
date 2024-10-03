@@ -35,12 +35,18 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifdef MODULE_FDCAN
+/**
+ * The loop delay in CAN, especially in CAN FD with bitrate switching, affects synchronization due to increased data rates.
+ * The unit is nanoseconds.
+ */
+#ifndef CAN_DEVICE_DEFAULT_LOOP_DELAY
+#error "CAN_DEVICE_DEFAULT_LOOP_DELAY must be defined in the application's Makefile. This property can be found in the datasheet of the CAN transceiver in use. The unit is nanoseconds."
+#endif /* CAN_DEVICE_DEFAULT_LOOP_DELAY */
+#endif /* MODULE_FDCAN */
+
 #ifndef CAN_DEVICE_MSG_QUEUE_SIZE
 #define CAN_DEVICE_MSG_QUEUE_SIZE 64
-#endif
-
-#ifndef CAN_DEVICE_DEFAULT_LOOP_DELAY
-#define CAN_DEVICE_DEFAULT_LOOP_DELAY 200   /* nanoseconds */
 #endif
 
 #ifdef MODULE_CAN_PM
