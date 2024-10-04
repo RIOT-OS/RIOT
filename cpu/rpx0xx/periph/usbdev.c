@@ -27,6 +27,7 @@
 #include "periph/usbdev.h"
 #include "bitarithm.h"
 #include "panic.h"
+#include "platform.h"
 
 #include "cpu_conf.h"
 
@@ -39,9 +40,14 @@
 #define USB_BUFFER_SPACE_START     ((uint8_t*) USBCTRL_DPRAM + 0x180u)
 #define USB_BUFFER_SPACE_END       ((uint8_t*) USBCTRL_DPRAM + 0x1000u)
 
+#define PRINT_DIR(d) (((d) == USB_EP_DIR_OUT) ? "OUT" : "IN")
+
 typedef struct rpx0xx_usb_ep {
     uint8_t *dpram_buf;
     size_t dpram_bufsize;
+    uint8_t *data_buf;
+    size_t data_buf_size;
+    size_t data_cnt;
     usbdev_ep_t ep;
     bool next_pid;
 } rpx0xx_usb_ep_t;
@@ -53,7 +59,6 @@ typedef struct rpx0xx_usb_dev {
     uint32_t int_status;
     bool suspended;
     bool connected;
-    bool setup_req_recvd;
 } rpx0xx_usb_dev_t;
 
 /* Forward declaration for the usb device driver. */
@@ -200,6 +205,7 @@ static inline void _ep_ctrl_reg_write(uint8_t ep_num, usb_ep_dir_t dir,
 {
     __IOM uint32_t *reg = _get_ep_ctrl_reg(ep_num, dir);
     io_reg_write_dont_corrupt(reg, value, mask);
+    busy_wait_at_least_cycles(12);
 }
 
 /** See @io_reg_write_dont_corrupt() */
@@ -208,6 +214,7 @@ static inline void _ep_buf_ctrl_reg_write(uint8_t ep_num, usb_ep_dir_t dir,
 {
     __IOM uint32_t *reg = _get_ep_buf_ctrl_reg(ep_num, dir);
     io_reg_write_dont_corrupt(reg, value, mask);
+    busy_wait_at_least_cycles(12);
 }
 
 /* Get DPRAM buffer offset. */
@@ -430,7 +437,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
     rpx0xx_usb_ep_t *hw_ep = NULL;
 
     DEBUG("[rpx0xx usb] Call _usbdev_new_ep(dev = ..., type = %d," 
-          "dir = %d, size = %u)\n", type, dir, size);
+          "dir = %s, size = %u)\n", type, PRINT_DIR(dir), size);
 
     /* Always return endpoint 0 for control types */
     if (type == USB_EP_TYPE_CONTROL) {
@@ -485,7 +492,13 @@ static void _disable_ep_irq(usbdev_ep_t *ep) {
 static void _usbdev_ep_init(usbdev_ep_t *ep)
 {
     DEBUG("[rpx0xx usb] Call _usbdev_ep_init(ep.num = %d," 
-          "ep.dir = %d)\n", ep->num, ep->dir);
+          "ep.dir = %s)\n", ep->num, PRINT_DIR(ep->dir));
+
+    rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
+
+    hw_ep->data_buf = NULL;
+    hw_ep->data_buf_size = 0UL;
+    hw_ep->data_cnt = 0UL;
 
     _enable_ep_irq(ep);
 }
@@ -559,10 +572,7 @@ static bool _ep_buf_is_full(usbdev_ep_t *ep)
 
 static size_t _ep_get_available(usbdev_ep_t *ep)
 {
-    if (ep->num == 0 && ep->dir == USB_EP_DIR_OUT && _hw_usb_dev.setup_req_recvd) {
-        return USB_SETUP_PKT_LEN;
-    }
-    else if (_ep_buf_is_available(ep)) {
+    if (_ep_buf_is_available(ep)) {
         if (ep->dir == USB_EP_DIR_IN) {
             rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
             return hw_ep->dpram_bufsize;
@@ -633,24 +643,11 @@ static void _mark_ep_buf_ready(usbdev_ep_t *ep, size_t len)
     if (ep->dir == USB_EP_DIR_IN) {
         buf_filled_bit = USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk;
     }
-    _ep_buf_ctrl_reg_write(ep->num, ep->dir, 
-                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk, 
-                           buf_filled_bit);
-    _ep_buf_ctrl_reg_write(ep->num, ep->dir, 
-                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk,
-                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk);
-    _ep_buf_ctrl_reg_write(ep->num, ep->dir, len,
-                           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk);
-}
-
-static int _usbdev_ep_xmit_setup_req(uint8_t *buf, size_t len)
-{
-    DEBUG("[rpx0xx usb] call _usbdev_ep_xmit_setup_req(len=%d)", len);
-    assert(len >= USB_SETUP_PKT_LEN);
-    len = USB_SETUP_PKT_LEN;
-    memcpy(buf, USB_BUFFER_SETUP_PKT_START, USB_SETUP_PKT_LEN);
-    _hw_usb_dev.setup_req_recvd = false;
-    return len;
+    uint32_t reg = 
+        (len & USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk)
+        | buf_filled_bit
+        | USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk;
+    _ep_buf_ctrl_reg_write(ep->num, ep->dir, reg, ~0x00UL);
 }
 
 static void _set_pid(rpx0xx_usb_ep_t *hw_ep)
@@ -661,45 +658,63 @@ static void _set_pid(rpx0xx_usb_ep_t *hw_ep)
     hw_ep->next_pid = !hw_ep->next_pid;
 }
 
-static int _usbdev_ep_xmit_regular(rpx0xx_usb_ep_t *hw_ep, uint8_t *buf, size_t len)
+static void _usbdev_setup_sync(void)
 {
-    assert(_ep_buf_is_available(&hw_ep->ep));
+    rpx0xx_usb_ep_t *hw_ep = _get_ep(0, USB_EP_DIR_OUT);
+    assert(hw_ep->data_buf);
+    assert(hw_ep->data_buf_size >= USB_SETUP_PKT_LEN);
+    memcpy(hw_ep->data_buf, USB_BUFFER_SETUP_PKT_START, USB_SETUP_PKT_LEN);
+    _hw_usb_dev.dev.epcb(&hw_ep->ep, USBDEV_EVENT_TR_COMPLETE);
+}
 
-    size_t available_len = _ep_get_available(&hw_ep->ep);
-
-    DEBUG("[rpx0xx usb] call _usbdev_ep_xmit_regular(ep.num=%d, ep.dir=%d, len=%d), available=%d ", 
-          hw_ep->ep.num, hw_ep->ep.dir, len, available_len);
-
-    if (available_len == 0) {
-        _mark_ep_buf_ready(&hw_ep->ep, 0);
-        return 0UL;
-    }
-
-    if (available_len < len) {
-        len = available_len;
-    }
-
+static void _usbdev_buffer_sync(usbdev_ep_t *ep)
+{
+    rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
+    DEBUG("[rpx0xx usb] Call _usbdev_buffer_sync(ep.num=%d, ep.dir=%s), buf=%p, len=%u",
+              hw_ep->ep.num, PRINT_DIR(hw_ep->ep.dir), hw_ep->data_buf, hw_ep->data_buf_size);
+    size_t available = _ep_get_available(&hw_ep->ep);
+    assert(hw_ep->data_buf);
+    size_t n = (available < hw_ep->data_cnt) ? available : hw_ep->data_cnt;
+    uint8_t *bufptr = hw_ep->data_buf + hw_ep->data_buf_size - hw_ep->data_cnt;
+    assert(n <= hw_ep->data_cnt);
+    assert(bufptr >= hw_ep->data_buf);
+    assert(bufptr < hw_ep->data_buf + hw_ep->data_buf_size);
     if (hw_ep->ep.dir == USB_EP_DIR_IN) {
-        memcpy(hw_ep->dpram_buf, buf, len);
+        memcpy(hw_ep->dpram_buf, bufptr, n);
     } else {
-        memcpy(buf, hw_ep->dpram_buf, len);
+        memcpy(bufptr, hw_ep->dpram_buf, n);
     }
     _set_pid(hw_ep);
-    _mark_ep_buf_ready(&hw_ep->ep, len);
-    
-    return len;
+    _mark_ep_buf_ready(&hw_ep->ep, n);
+    hw_ep->data_cnt -= n;
+    if (hw_ep->data_cnt == 0) {
+        DEBUG(" complete\n");
+        _hw_usb_dev.dev.epcb(&hw_ep->ep, USBDEV_EVENT_TR_COMPLETE);
+    } else {
+        DEBUG("\n");
+    }
 }
 
 static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
     rpx0xx_usb_ep_t *hw_ep = _get_ep(ep->num, ep->dir);
-    if (ep->num == 0 && ep->dir == USB_EP_DIR_OUT && _hw_usb_dev.setup_req_recvd) {
-        len = _usbdev_ep_xmit_setup_req(buf, len);
-    } else {
-        len = _usbdev_ep_xmit_regular(hw_ep, buf, len);
-    }
+
+    DEBUG("[rpx0xx usb] Call _usbdev_ep_xmit(ep.num=%d, ep.dir=%s, buf=%p, len=%u)\n",
+          ep->num, PRINT_DIR(ep->dir), buf, len);
+
+    /*assert(hw_ep->data_buf == NULL);*/
+    
+    hw_ep->data_buf = buf;
+    hw_ep->data_buf_size = len;
+    hw_ep->data_cnt = len;
+
     _ep_set_stall(ep, 0);
-    return len;
+
+    if (ep->dir == USB_EP_DIR_IN) {
+        _usbdev_buffer_sync(ep);
+    }
+
+    return 0;
 }
 
 static void _usbdev_esr(usbdev_t *dev)
@@ -734,6 +749,13 @@ static void _usbdev_esr(usbdev_t *dev)
         io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
                             USBCTRL_REGS_SIE_STATUS_SUSPENDED_Msk);
     }
+    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_SETUP_REQ_Msk) {
+        /* Setup Request received on EP0 */
+        DEBUG("[rpx0xx usb] Got setup request\n");
+        _usbdev_setup_sync();
+        io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
+                            USBCTRL_REGS_SIE_STATUS_SETUP_REC_Msk);
+    }
     if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_DEV_CONN_DIS_Msk) {
         /* Host connected or disconnected */
         if (_hw_usb_dev.connected) {
@@ -746,18 +768,10 @@ static void _usbdev_esr(usbdev_t *dev)
         io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
                             USBCTRL_REGS_SIE_STATUS_CONNECTED_Msk);
     }
-    if (_hw_usb_dev.int_status & USBCTRL_REGS_INTS_SETUP_REQ_Msk) {
-        /* Setup Request received on EP0 */
-        _hw_usb_dev.setup_req_recvd = true;
-        _hw_usb_dev.dev.epcb(&_get_ep(0, USB_EP_DIR_OUT)->ep, 
-                             USBDEV_EVENT_TR_COMPLETE);
-        io_reg_atomic_clear(&USBCTRL_REGS->SIE_STATUS,
-                            USBCTRL_REGS_SIE_STATUS_SETUP_REC_Msk);
-    }
     /* all interrupts should be now cleared */
     _hw_usb_dev.int_status = USBCTRL_REGS->INTS;
     if (_hw_usb_dev.int_status) {
-        DEBUG("[rpx0xx usb] Unhandled interrupt, INTS=%lx", _hw_usb_dev.int_status);
+        DEBUG("[rpx0xx usb] Unhandled interrupt, INTS=%lx \n", _hw_usb_dev.int_status);
     }
     _enable_irq();
 }
@@ -765,10 +779,12 @@ static void _usbdev_esr(usbdev_t *dev)
 static void _usbdev_ep_esr(usbdev_ep_t *ep)
 {
     if (_reg_get_flag_for_ep(&USBCTRL_REGS->BUFF_STATUS, ep)) {
+        DEBUG("[rpx0xx usb] Buffer ready to sync\n");
         _reg_clear_flag_for_ep(&USBCTRL_REGS->BUFF_STATUS, ep);
-        ep->dev->epcb(ep, USBDEV_EVENT_TR_COMPLETE);
+        _usbdev_buffer_sync(ep);
     }
     if (_reg_get_flag_for_ep(&USBCTRL_REGS->EP_STATUS_STALL_NAK, ep)) {
+        DEBUG("[rpx0xx usb] Got stall nak\n");
         _reg_clear_flag_for_ep(&USBCTRL_REGS->EP_STATUS_STALL_NAK, ep);
         ep->dev->epcb(ep, USBDEV_EVENT_TR_STALL);
     }
@@ -777,11 +793,12 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
 
 void isr_usbctrl(void)
 {
-    if (USBCTRL_REGS->BUFF_STATUS) {
+    if (USBCTRL_REGS->BUFF_STATUS || USBCTRL_REGS->EP_STATUS_STALL_NAK) {
         /* Endpoint specific interrupt */
         for (uint8_t i = 0; i < USBDEV_NUM_ENDPOINTS * 2; i++) {
-            rpx0xx_usb_ep_t* hw_ep = _hw_usb_dev.hw_ep;
-            if (_reg_get_flag_for_ep(&USBCTRL_REGS->BUFF_STATUS, &hw_ep->ep)) {
+            rpx0xx_usb_ep_t* hw_ep = &_hw_usb_dev.hw_ep[i];
+            if (_reg_get_flag_for_ep(&USBCTRL_REGS->BUFF_STATUS, &hw_ep->ep) ||
+                _reg_get_flag_for_ep(&USBCTRL_REGS->EP_STATUS_STALL_NAK, &hw_ep->ep)) {
                 _disable_ep_irq(&hw_ep->ep);
                 _hw_usb_dev.dev.epcb(&hw_ep->ep, USBDEV_EVENT_ESR);
             }
