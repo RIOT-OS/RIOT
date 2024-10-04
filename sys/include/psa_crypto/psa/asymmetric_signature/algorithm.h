@@ -237,7 +237,7 @@ extern "C" {
  *          0 if alg is a non-wildcard algorithm encoding that is suitable for an operation.
  */
 #define PSA_ALG_IS_WILDCARD(alg) \
-    (PSA_ALG_GET_HASH(alg) == PSA_ALG_HASH_ANY)
+    (PSA_ALG_GET_HASH(alg) == PSA_ALG_ANY_HASH)
 
 /**
  * @brief   When setting a hash-and-sign algorithm in a key policy, permit any hash algorithm.
