@@ -128,6 +128,7 @@ run ./dist/tools/buildsystem_sanity_check/check.sh
 run ./dist/tools/feature_resolution/check.sh
 run ./dist/tools/boards_supported/check.sh
 run ./dist/tools/codespell/check.sh
+run ./dist/tools/cargo-checks/check.sh
 if [ -z "${GITHUB_RUN_ID}" ]; then
     run ./dist/tools/uncrustify/uncrustify.sh --check
 else
