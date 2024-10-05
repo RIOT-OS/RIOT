@@ -216,8 +216,6 @@ void mutex_unlock(mutex_t *mutex)
         mutex->queue.next = MUTEX_LOCKED;
     }
 
-    uint16_t process_priority = process->priority;
-
 #if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
     thread_t *owner = thread_get(mutex->owner);
     if ((owner) && (owner->priority != mutex->owner_original_priority)) {
@@ -232,7 +230,7 @@ void mutex_unlock(mutex_t *mutex)
 #endif
 
     irq_restore(irqstate);
-    sched_switch(process_priority);
+    thread_yield_higher();
 }
 
 void mutex_unlock_and_sleep(mutex_t *mutex)
