@@ -286,7 +286,11 @@ void sched_switch(uint16_t other_prio)
      * a situation with no active thread. This can not occur if there is an
      * idle thread, which is always runnable, though */
     if (!IS_USED(MODULE_CORE_IDLE_THREAD) && unlikely(active_thread == NULL)) {
-        thread_yield_higher();
+        /* we are in IRQ context, as `active_thread == NULL` in thread context
+         * makes no sense */
+        DEBUG("sched_switch: setting sched_context_switch_request.\n");
+        sched_context_switch_request = 1;
+        return;
     }
 
     uint16_t current_prio = active_thread->priority;
