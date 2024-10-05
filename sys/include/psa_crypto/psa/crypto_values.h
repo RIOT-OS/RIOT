@@ -32,11 +32,6 @@ extern "C" {
 #include "crypto_types.h"
 
 /**
- * @brief   PSA algorithm category mask
- */
-#define PSA_ALG_CATEGORY_MASK                   ((psa_algorithm_t)0x7f000000)
-
-/**
  * @brief   Category for hash algorithms
  */
 #define PSA_ALG_CATEGORY_HASH                   ((psa_algorithm_t)0x02000000)
@@ -870,13 +865,6 @@ extern "C" {
  */
 #define PSA_ALG_KEY_AGREEMENT_GET_KDF(alg) \
     ((psa_algorithm_t)((alg) & 0xfe00ffff))
-
-/**
- * @brief   An invalid algorithm identifier value.
- *
- * @details Zero is not the encoding of any algorithm.
- */
-#define PSA_ALG_NONE ((psa_algorithm_t)0)
 
 /**
  * @brief   Hash algorithm mask
