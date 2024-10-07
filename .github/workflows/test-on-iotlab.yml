@@ -98,7 +98,7 @@ jobs:
       - name: Configure credentials
         run: echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
       - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.4.1
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
       - name: Fetch host key from IoT-LAB ${{ matrix.boards.iotlab.site }} site
