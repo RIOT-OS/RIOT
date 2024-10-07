@@ -54,9 +54,16 @@ static const can_conf_t candev_conf[] = {
         .rx_pin = GPIO_PIN(PORT_A, 11),
         .tx_pin = GPIO_PIN(PORT_A, 12),
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F4)
+
+#if defined(CPU_MODEL_STM32L432KC)
+        .rx_pin = GPIO_PIN(PORT_A, 11),
+        .tx_pin = GPIO_PIN(PORT_A, 12),
+        .af = GPIO_AF9,
+#else
         .rx_pin = GPIO_PIN(PORT_B, 8),
         .tx_pin = GPIO_PIN(PORT_B, 9),
         .af = GPIO_AF9,
+#endif
 #else
         .rx_pin = GPIO_PIN(PORT_D, 0),
         .tx_pin = GPIO_PIN(PORT_D, 1),
