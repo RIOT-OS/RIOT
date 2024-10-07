@@ -64,7 +64,7 @@ extern "C" {
 #define FDCAN_STM32_NB_EXT_FILTER   8U  /**< Number of extended filters */
 #define FDCAN_STM32_NB_FILTER \
         (FDCAN_STM32_NB_STD_FILTER + FDCAN_STM32_NB_EXT_FILTER) /**< Total number of filters */
-/** @] */
+/** @} */
 
 /**
  * @name    Birates
