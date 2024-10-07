@@ -640,8 +640,8 @@ static inline const char *thread_get_name(const thread_t *thread)
 /**
  * @brief       Measures the stack usage of a stack
  *
- * @pre         Only works if the thread was created with the flag
- *              `THREAD_CREATE_STACKTEST`.
+ * @pre         Does not work if the thread was created with the flag
+ *              `THREAD_CREATE_NO_STACKTEST`.
  *
  * @param[in] thread    The thread to measure the stack of
  *
