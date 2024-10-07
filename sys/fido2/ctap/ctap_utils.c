@@ -44,7 +44,7 @@ static gpio_t _pin;
  */
 static void _gpio_cb(void *arg);
 
-int fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank)
+ctap_status_code_t fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank)
 {
     if (gpio_init_int(pin, mode, flank, _gpio_cb, NULL) < 0) {
         return CTAP1_ERR_OTHER;
@@ -55,7 +55,7 @@ int fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t fl
     return CTAP2_OK;
 }
 
-int fido2_ctap_utils_user_presence_test(void)
+ctap_status_code_t fido2_ctap_utils_user_presence_test(void)
 {
     int ret;
 
