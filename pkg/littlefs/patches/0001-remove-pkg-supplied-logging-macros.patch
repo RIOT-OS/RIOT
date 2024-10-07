@@ -1,0 +1,45 @@
+From 0a1aaadaa6c2e58c7c7e60d28130b77d0e9ac382 Mon Sep 17 00:00:00 2001
+From: Joshua DeWeese <jdeweese@primecontrols.com>
+Date: Mon, 7 Oct 2024 12:20:59 -0400
+Subject: [PATCH] remove pkg supplied logging macros
+
+---
+ lfs_util.h | 22 ----------------------
+ 1 file changed, 22 deletions(-)
+
+diff --git a/lfs_util.h b/lfs_util.h
+index b2dc237..fcc4a00 100644
+--- a/lfs_util.h
++++ b/lfs_util.h
+@@ -44,28 +44,6 @@ extern "C"
+ // macros must not have side-effects as the macros can be removed for a smaller
+ // code footprint
+ 
+-// Logging functions
+-#ifndef LFS_NO_DEBUG
+-#define LFS_DEBUG(fmt, ...) \
+-    printf("lfs debug:%d: " fmt "\n", __LINE__, __VA_ARGS__)
+-#else
+-#define LFS_DEBUG(fmt, ...)
+-#endif
+-
+-#ifndef LFS_NO_WARN
+-#define LFS_WARN(fmt, ...) \
+-    printf("lfs warn:%d: " fmt "\n", __LINE__, __VA_ARGS__)
+-#else
+-#define LFS_WARN(fmt, ...)
+-#endif
+-
+-#ifndef LFS_NO_ERROR
+-#define LFS_ERROR(fmt, ...) \
+-    printf("lfs error:%d: " fmt "\n", __LINE__, __VA_ARGS__)
+-#else
+-#define LFS_ERROR(fmt, ...)
+-#endif
+-
+ // Runtime assertions
+ #ifndef LFS_NO_ASSERT
+ #define LFS_ASSERT(test) assert(test)
+-- 
+2.34.1
+
