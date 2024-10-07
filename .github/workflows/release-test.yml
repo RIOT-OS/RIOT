@@ -106,7 +106,7 @@ jobs:
         fetch-depth: 1
         ref: ${{ github.event.inputs.riot_version }}
     - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
     - name: Install Python dependencies
