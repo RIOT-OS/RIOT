@@ -13,6 +13,7 @@ JERRY_GC_LIMIT ?= 0  # Use default value, e.g. 1/32 of total heap size
 JERRY_GC_MARK_LIMIT ?= 8  # maximum recursion depth during GC mark phase
 
 EXT_CFLAGS := -D__TARGET_RIOT
+EXT_CFLAGS += -Wno-pedantic
 CFLAGS += -Wno-cast-align
 
 # disable warnings when compiling with LLVM for board native
@@ -21,10 +22,6 @@ ifeq ($(TOOLCHAIN)_$(CPU),llvm_native)
   EXT_CFLAGS += -Wno-conversion
 else ifeq ($(OS)_$(CPU),FreeBSD_native)
   EXT_CFLAGS += -Wno-conversion
-else ifeq (esp32,$(CPU))
-  # The ESP-IDF uses #include_next that causes errors when compiling with warnings
-  # that are enabled by jerryscript build system so disable them for these CPUs:
-  EXT_CFLAGS += -Wno-pedantic
 else ifeq (esp8266,$(CPU))
   # The esp8266 C newlib version 3.0.0 has errors when compiling with warnings
   # that are enabled by jerryscript build system so disable them for this cpu:
