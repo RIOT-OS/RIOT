@@ -58,6 +58,6 @@ ifneq (,$(filter fdcan,$(USEMODULE)))
 
 	# Allow only a default value for CI
 	else
-		KCONFIG_ADD_CONFIG += $(CURDIR)/fdcan-ci.config
+		CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
 	endif
 endif

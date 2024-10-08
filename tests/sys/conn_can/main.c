@@ -170,6 +170,8 @@ static int _send(int argc, char **argv, bool rtr, bool is_fd)
         return 1;
     }
 #else
+    (void) is_fd;
+
     if (frame.len > DEFAULT_CAN_MAX_DLEN) {
         puts("Invalid length");
         return 1;
