@@ -10,6 +10,7 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 USEMODULE += gcoap_fileserver
+USEMODULE += gcoap_forward_proxy
 USEMODULE += nanocoap_fileserver_put
 
 USEMODULE += nanocoap_vfs
