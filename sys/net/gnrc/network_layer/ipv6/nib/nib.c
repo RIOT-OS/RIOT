@@ -1280,6 +1280,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
 static _nib_onl_entry_t *_iter_nc_nbr(_nib_onl_entry_t const *last)
 {
     while ((last = _nib_onl_iter(last))) {
@@ -1290,6 +1291,7 @@ static _nib_onl_entry_t *_iter_nc_nbr(_nib_onl_entry_t const *last)
 
     return (_nib_onl_entry_t *)last;
 }
+#endif
 
 /* This function never fails as doing so would force us to drop newer packets
  * instead of older, thus leaving stale packets in the neighbor queues.
