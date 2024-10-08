@@ -36,8 +36,8 @@ extern "C" {
 #define SAM0_DFLL_FREQ_HZ       MHZ(48)
 
 /**
-￼ * @brief   XOSC is used to generate a fixed frequency of 48 MHz
-￼ */
+ * @brief   XOSC is used to generate a fixed frequency of 48 MHz
+ */
 #define SAM0_XOSC_FREQ_HZ       (XOSC0_FREQUENCY ? XOSC0_FREQUENCY : XOSC1_FREQUENCY)
 
 /**
