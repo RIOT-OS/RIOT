@@ -18,6 +18,8 @@ doc: $(DOCUMENTATION_FORMAT)
 .PHONY: html
 html: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
+	@echo ""
+	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
 
 .PHONY: check
 check: src/changelog.md
