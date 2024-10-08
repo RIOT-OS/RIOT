@@ -49,7 +49,8 @@ include makefiles/tools/riotgen.inc.mk
 
 include makefiles/color.inc.mk
 
-welcome:
+# Prints a welcome message
+define welcome_message
 	@echo "Welcome to RIOT - The friendly OS for IoT!"
 	@echo ""
 	@echo "You executed 'make' from the base directory."
@@ -70,3 +71,13 @@ welcome:
 	@echo "==> tl;dr Try running:"
 	@echo "    cd examples/default"
 	@echo "    make BOARD=<INSERT_BOARD_NAME>"
+endef
+
+welcome:
+	$(call welcome_message)
+
+.DEFAULT:
+	@echo '*** ERROR: unrecognized target "$@"'
+	@echo ""
+	$(call welcome_message)
+	@exit 1
