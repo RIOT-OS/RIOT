@@ -895,9 +895,6 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
  *
  * @pre Neighbor is INCOMPLETE.
  *
- * @note If the queue size is @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP,
- *       this will @ref _nbr_pop_pkt() the oldest packet and release it.
- *
  * @param node neighbor entry
  * @param pkt packet to be pushed
  */
