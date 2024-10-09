@@ -1326,7 +1326,7 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
         }
     }
 
-    DEBUG("nib: no free pktqueue entries, popping from %s hogging %"PRIuSIZE"\n",
+    DEBUG("nib: no free pktqueue entries, popping from %s hogging %u\n",
           ipv6_addr_to_str(addr_str, &hoarder->ipv6, sizeof(addr_str)),
           hoarder->pktqueue_len);
 
