@@ -7,6 +7,7 @@
  */
 
 #include <stdint.h>
+#include <inttypes.h>
 #include "matstat.h"
 
 #define ENABLE_DEBUG 0
