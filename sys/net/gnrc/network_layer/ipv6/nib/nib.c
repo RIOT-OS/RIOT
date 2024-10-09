@@ -1811,6 +1811,12 @@ void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
 {
     assert(_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
 
+    if (ARRAY_SIZE(_queue_pool) > UINT8_MAX && node->pktqueue_len == UINT8_MAX) {
+        gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
+        gnrc_pktbuf_release(oldest->pkt);
+        oldest->pkt = NULL;
+    }
+
     gnrc_pktqueue_add(&node->pktqueue, pkt);
     node->pktqueue_len++;
 }

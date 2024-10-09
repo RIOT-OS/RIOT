@@ -100,7 +100,6 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT != 0.
      */
     gnrc_pktqueue_t *pktqueue;
-    size_t pktqueue_len;                       /**< Number of queued packets */
 #endif
     /**
      * @brief Neighbors IPv6 address
@@ -180,6 +179,9 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0.
      */
     uint8_t l2addr_len;
+#endif
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || defined(DOXYGEN)
+    uint8_t pktqueue_len; /**< Number of queued packets (in pktqueue) */
 #endif
 } _nib_onl_entry_t;
 
