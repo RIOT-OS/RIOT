@@ -170,7 +170,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
 }
 
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t num, uint8_t incr)
+                 size_t num, dma_incr_t incr)
 {
     DEBUG("[DMA]: Prepare %u, num: %u\n", dma, (unsigned)num);
     DmacDescriptor *descr = &descriptors[dma];
