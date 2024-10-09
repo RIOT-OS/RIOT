@@ -484,7 +484,7 @@ static int _xfer_prepare(sdmmc_dev_t *dev, sdmmc_xfer_desc_t *xfer)
     /* TODO: at the moment only 32-bit words supported */
     assert((xfer->block_size % sizeof(uint32_t)) == 0);
 
-    /* indicate that a data transfer is perpared */
+    /* indicate that a data transfer is prepared */
     sdhc_dev->data_transfer = true;
 
     uint32_t tmr;

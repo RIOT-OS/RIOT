@@ -49,7 +49,7 @@ The WiFi module ATWINC15x0 is connected via SPI and supports SPI clock speeds
 of up to 48 MHz. Although the module also has an I2C and a UART interface,
 these interfaces are only used for debugging.
 
-The ATWINC15x0 WiFi module implements a complete TCP/IP procotol stack which is
+The ATWINC15x0 WiFi module implements a complete TCP/IP protocol stack which is
 not used in RIOT.
 
 ### Driver Details

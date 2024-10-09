@@ -114,6 +114,6 @@ Pin mapping in RIOT
 The following image shows RIOT's static pin mapping chosen for this board.
 This mapping is completely arbitrary, it can be adjusted in
 `boards/spark-core/include/periph_conf.h`
-![Pin Mappin](http://docs.spark.io/assets/images/spark-pinout.png)
+![Pin Mapping](http://docs.spark.io/assets/images/spark-pinout.png)
 
  */

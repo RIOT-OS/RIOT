@@ -556,7 +556,7 @@ Here are some of the highlights:
 + RIOT boots on two newly added boards:
     + The Nintendo Game Boy Advance (#19519)
     + Native on 64-bit Linux / x86_64 (#20315, #20335, #20339)
-+ The documentation features a new guide to help you set up a RIOT develpoment environment on Windows (#20426)
++ The documentation features a new guide to help you set up a RIOT development environment on Windows (#20426)
 + To accommodate the ever growing RAM sizes in the IoT, RIOT can now monitor your `malloc` usage (#20363)
 - Dependency modelling via Kconfig is no longer part of RIOT. A big step forward towards having only one source of truth for configurations (#20438)
 
@@ -7088,7 +7088,7 @@ FIDO2 support
 -------------
 
 We now have an implementation of the Fast Identity Online 2 (FIDO2) specification.
-With this you can use any RIOT device with USB support as an authenticaton token
+With this you can use any RIOT device with USB support as an authentication token
 similar to the YubiKey.
 
 RPL-over-BLE
