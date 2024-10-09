@@ -239,7 +239,7 @@ extern const ltc4150_recorder_t ltc4150_last_minute;
  * @brief             Initialize the LTC4150 driver
  *
  * @param  dev        Device to initialize
- * @param  params     Information on how the LTC4150 is conntected
+ * @param  params     Information on how the LTC4150 is connected
  *
  * @retval  0         Success
  * @retval -EINVAL    Called with invalid argument(s)

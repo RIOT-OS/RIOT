@@ -91,7 +91,7 @@ extern "C" {
  *   passing stdin (`isrpipe_t stdin_isrpipe`) does not support backpressure
  *   and overflows silently. As a consequence, commands through such terminals
  *   appear to be truncated at @ref STDIO_RX_BUFSIZE bytes (defaulting to 64)
- *   unless the command is sent in parts (on many terminals, by presing Ctrl-D
+ *   unless the command is sent in parts (on many terminals, by pressing Ctrl-D
  *   half way through the command).
  *
  *   For example, this affects systems with direct USB stdio (@ref

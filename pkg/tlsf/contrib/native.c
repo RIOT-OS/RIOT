@@ -15,7 +15,7 @@
  * @brief   Definitions to use tlsf as malloc on native.
  * @author  Juan I Carrano
  *
- * This assumes glibc is bein used.
+ * This assumes glibc is being used.
  * see: https://www.gnu.org/software/libc/manual/html_node/Replacing-malloc.html
  *
  */

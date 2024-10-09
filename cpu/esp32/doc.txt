@@ -577,7 +577,7 @@ For more information on `esptool.py`, please refer to the
 
 Once the toolchain is installed either as RIOT docker build image or as local
 installation, a RIOT application can be compiled and flashed for an ESP32x
-boards. For that purpuse change to RIOT's root directory and execute the make
+boards. For that purpose change to RIOT's root directory and execute the make
 command, for example:
 
 - RIOT Docker build image installation

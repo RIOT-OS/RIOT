@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       TCP finite state maschine declarations.
+ * @brief       TCP finite state machine declarations.
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
@@ -64,7 +64,7 @@ typedef enum {
 } _gnrc_tcp_fsm_event_t;
 
 /**
- * @brief TCP finite state maschine
+ * @brief TCP finite state machine
  *
  * @param[in,out] tcb     TCB holding the connection information.
  * @param[in]     event   Current event that triggers FSM transition.
