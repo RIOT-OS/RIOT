@@ -174,3 +174,15 @@ fram
 
 # MIS (mask interrupt register)
 mis
+
+# assertIn (python test framework method)
+assertIn
+
+# bootup (common spelling of boot-up)
+bootup
+
+# shiftIn (Arduino function name)
+shiftIn
+
+# <b>e</b>lements (used in Congure documentation)
+lements
