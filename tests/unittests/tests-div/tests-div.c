@@ -7,6 +7,7 @@
 */
 
 #include <string.h>
+#include <inttypes.h>
 #include "embUnit.h"
 #include "tests-div.h"
 
@@ -78,7 +79,13 @@ static void test_div_u64_by_15625(void)
     }
 
     for (unsigned i = 0; i < N_U64_VALS; i++) {
+#ifdef PRIu64
         DEBUG("Dividing %12"PRIu64" by 15625...\n", u64_test_values[i]);
+#else
+        DEBUG("Dividing %12"PRIu32"%s by 15625...\n", (uint32_t)u64_test_values[i],
+                ((uint32_t)u64_test_values[i] != u64_test_values[i]) ? "!trunc" : "");
+#endif
+
         TEST_ASSERT_EQUAL_INT(
             (uint64_t)u64_test_values[i] / 15625,
             div_u64_by_15625(u64_test_values[i]));
@@ -105,7 +112,12 @@ static void test_div_u64_by_1000000(void)
     }
 
     for (unsigned i = 0; i < N_U64_VALS; i++) {
+#ifdef PRIu64
         DEBUG("Dividing %"PRIu64" by 1000000...\n", u64_test_values[i]);
+#else
+        DEBUG("Dividing %"PRIu32"%s by 1000000...\n", (uint32_t)u64_test_values[i],
+                ((uint32_t)u64_test_values[i] != u64_test_values[i]) ? "!trunc" : "");
+#endif
         TEST_ASSERT_EQUAL_INT(
             u64_test_values[i] / 1000000lu,
             div_u64_by_1000000(u64_test_values[i]));
@@ -122,7 +134,12 @@ static void test_div_u64_by_15625div512(void)
     }
 
     for (unsigned i = 0; i < N_U64_VALS; i++) {
+#ifdef PRIu64
         DEBUG("Dividing %"PRIu64" by (15625/512)...\n", u64_test_values[i]);
+#else
+        DEBUG("Dividing %"PRIu32"%s by (15625/512)...\n", (uint32_t)u64_test_values[i],
+                ((uint32_t)u64_test_values[i] != u64_test_values[i]) ? "!trunc" : "");
+#endif
         TEST_ASSERT_EQUAL_INT(
             u64_15625_512_expected_values[i],
             div_u64_by_15625div512(u64_test_values[i]));
