@@ -1,7 +1,50 @@
+/*
+ * Copyright (C) 2024 Joshua DeWeese <josh.deweese@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     sys_littlefs
+ * @{
+ *
+ * @file
+ * @brief       littlefs logging macro overrides
+ *
+ * This header provides re-implementations of the logging and debugging macros
+ * used in littlefs. This is to allow the package to make use of RIOT's own
+ * modules for logging and debugging.
+ *
+ * @author      Joshua DeWeese <josh.deweese@gmail.com>
+ *
+ */
+
+#ifndef LFS_LOG_H
+#define LFS_LOG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "log.h"
 
+/**
+ * @brief Private macro for routing littlefs log msgs to RIOT's log module.
+ *
+ * @param[in]  fmt              printf style format string
+ * @param[inout] ...            printf style variadic args
+ */
 #define _LFS_LOG(level, fmt, ...)\
     LOG(level, "lfs: " fmt "%s\n", __VA_ARGS__)
+
+/**  */
+/**
+ * @name littlefs overrides
+ * @{
+ * @brief Re-implementation of littlefs's logging and debugging macros.
+ */
 
 #ifndef LFS_NO_DEBUG
   #define LFS_DEBUG(...) _LFS_LOG(LOG_DEBUG, __VA_ARGS__, "")
@@ -20,3 +63,8 @@
 #else
   #define LFS_ERROR(...)
 #endif
+
+/** @} */
+
+#endif /* LFS_LOG_H */
+/** @} */
