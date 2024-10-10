@@ -1317,24 +1317,29 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 
     /* We run out of free queue entries. Pop from the nbr with the longest queue */
     _nib_onl_entry_t *nbr = _iter_nc_nbr(NULL);
-    _nib_onl_entry_t *hoarder = nbr;
+    _nib_onl_entry_t *hog = nbr;
     /* There MUST be at least a neighbor in the NC */
-    assert(hoarder);
+    assert(hog);
     while ((nbr = _iter_nc_nbr(nbr))) {
-        if (nbr->pktqueue_len > hoarder->pktqueue_len) {
-            hoarder = nbr;
+        if (hog->pktqueue_len == CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP) {
+            break;
+        }
+        assert(hog->pktqueue_len < CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP);
+
+        if (nbr->pktqueue_len > hog->pktqueue_len) {
+            hog = nbr;
         }
     }
 
     DEBUG("nib: no free pktqueue entries, popping from %s hogging %u\n",
-          ipv6_addr_to_str(addr_str, &hoarder->ipv6, sizeof(addr_str)),
-          hoarder->pktqueue_len);
+          ipv6_addr_to_str(addr_str, &hog->ipv6, sizeof(addr_str)),
+          hog->pktqueue_len);
 
     /* We have one more pktqueue entries than neighbors in the NC, therefore
      * there must be a neighbor with two or more packets in its queue */
-    assert(hoarder->pktqueue_len >= 2);
+    assert(hog->pktqueue_len >= 2);
 
-    gnrc_pktqueue_t *qentry = _nbr_pop_pkt(hoarder);
+    gnrc_pktqueue_t *qentry = _nbr_pop_pkt(hog);
     gnrc_pktbuf_release(qentry->pkt);
 
     qentry->pkt = pkt;
@@ -1809,9 +1814,12 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node)
 
 void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
 {
+    static_assert(CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP <= UINT8_MAX,
+                  "nib: nbr queue cap overflows counter");
     assert(_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
 
-    if (ARRAY_SIZE(_queue_pool) > UINT8_MAX && node->pktqueue_len == UINT8_MAX) {
+    if (ARRAY_SIZE(_queue_pool) > CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP &&
+        node->pktqueue_len == CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP) {
         gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
         gnrc_pktbuf_release(oldest->pkt);
         oldest->pkt = NULL;

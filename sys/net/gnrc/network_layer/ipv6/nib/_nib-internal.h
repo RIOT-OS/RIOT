@@ -895,6 +895,9 @@ gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
 /**
  * @brief Push packet to a on-link neighbor's packet queue.
  *
+ * If there are already @ref CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP packets queued,
+ * the oldest will be dropped silently.
+ *
  * @pre Neighbor is INCOMPLETE.
  *
  * @param node neighbor entry
