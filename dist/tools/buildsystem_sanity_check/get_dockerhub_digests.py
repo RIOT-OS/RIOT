@@ -87,5 +87,5 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         sys.exit(f"Usage {sys.argv[0]} <REPO_NAME>")
 
-    digest, repo_digest = get_upstream_digests(sys.argv[1])
-    print(f"{digest} {repo_digest}")
+    _, repo_digest = get_upstream_digests(sys.argv[1])
+    print(f"{repo_digest}")

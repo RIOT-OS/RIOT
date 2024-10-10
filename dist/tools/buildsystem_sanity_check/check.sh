@@ -382,20 +382,12 @@ check_tests_application_path() {
 }
 
 check_pinned_docker_version_is_up_to_date() {
-    local pinned_digest
     local pinned_repo_digest
-    local upstream_digest
     local upstream_repo_digest
-    pinned_digest="$(awk '/^DOCKER_TESTED_IMAGE_ID := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
     pinned_repo_digest="$(awk '/^DOCKER_TESTED_IMAGE_REPO_DIGEST := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
     # not using docker and jq here but a python script to not have to install
     # more stuff for the static test docker image
-    IFS=' ' read -r upstream_digest upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild")"
-
-    if [ "$pinned_digest" != "$upstream_digest" ]; then
-        git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_ID :=' "$RIOTMAKE/docker.inc.mk" \
-            | error_with_message  "Update docker image SHA256 to ${upstream_digest}"
-    fi
+    IFS=' ' read -r upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild")"
 
     if [ "$pinned_repo_digest" != "$upstream_repo_digest" ]; then
         git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_REPO_DIGEST :=' "$RIOTMAKE/docker.inc.mk" \
