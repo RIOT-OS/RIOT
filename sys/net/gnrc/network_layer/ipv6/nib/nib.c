@@ -1322,6 +1322,8 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
     assert(hog);
     while ((nbr = _iter_nc_nbr(nbr))) {
         if (ARRAY_SIZE(_queue_pool) >= CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP &&
+            /* The per-neighbor queue is capped at CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP.
+             * There cannot be a larger hog than that. */
             hog->pktqueue_len == CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP) {
             break;
         }
@@ -1818,7 +1820,17 @@ void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt)
     static_assert(CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP <= UINT8_MAX,
                   "nib: nbr queue cap overflows counter");
     assert(_get_nud_state(node) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
-
+    /* We're capping the per-neighbor queue length out of following reasons:
+     *  - https://www.rfc-editor.org/rfc/rfc4861#section-7.2.2 recommends a
+     *    small queue size
+     *  - for large CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP, a single neighbor could
+     *    otherwise consume the whole entry cache. By capping we rule out this
+     *    case, thus: 1) a hog will just drop from it's own queue and 2) there's
+     *    less likely to deplete the entry cache.
+     *
+     * For small CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP we don't care how the entries
+     * are distributed: if we run out of entries, finding the hog to drop from
+     * there is fast anyway. */
     if (ARRAY_SIZE(_queue_pool) > CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP &&
         node->pktqueue_len == CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP) {
         gnrc_pktqueue_t *oldest = _nbr_pop_pkt(node);
