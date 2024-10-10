@@ -180,6 +180,9 @@ typedef struct _nib_onl_entry {
      */
     uint8_t l2addr_len;
 #endif
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || defined(DOXYGEN)
+    uint8_t pktqueue_len; /**< Number of queued packets (in pktqueue) */
+#endif
 } _nib_onl_entry_t;
 
 /**
@@ -871,6 +874,41 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
  */
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
                    gnrc_ipv6_nib_ft_t *entry);
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || DOXYGEN
+/**
+ * @brief Flush the packet queue of a on-link neighbor.
+ *
+ * @param node neighbor entry to be flushed
+ */
+void _nbr_flush_pktqueue(_nib_onl_entry_t *node);
+
+/**
+ * @brief Remove oldest packet from a on-link neighbor's packet queue.
+ *
+ * @param node neighbor entry
+ *
+ * @retval pointer to the packet entry or NULL if the queue is empty
+ */
+gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
+
+/**
+ * @brief Push packet to a on-link neighbor's packet queue.
+ *
+ * If there are already @ref CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP packets queued,
+ * the oldest will be dropped silently.
+ *
+ * @pre Neighbor is INCOMPLETE.
+ *
+ * @param node neighbor entry
+ * @param pkt packet to be pushed
+ */
+void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt);
+#else
+#define _nbr_flush_pktqueue(node) ((void)node)
+#define _nbr_pop_pkt(node) ((void)node, NULL)
+#define _nbr_push_pkt(node, pkt) ((void)node, (void)pkt)
+#endif
 
 #ifdef __cplusplus
 }

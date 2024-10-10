@@ -228,9 +228,7 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE:
             if (nbr->ns_sent >= NDP_MAX_UC_SOL_NUMOF) {
                 gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
-
-                _set_nud_state(netif, nbr,
-                               GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE);
+                _set_unreachable(netif, nbr);
             }
             /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
@@ -387,11 +385,10 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
         }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) && MODULE_GNRC_IPV6
         /* send queued packets */
         gnrc_pktqueue_t *ptr;
         DEBUG("nib: Sending queued packets\n");
-        while ((ptr = gnrc_pktqueue_remove_head(&nce->pktqueue)) != NULL) {
+        while ((ptr = _nbr_pop_pkt(nce)) != NULL) {
             if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                            GNRC_NETREG_DEMUX_CTX_ALL,
                                            ptr->pkt)) {
@@ -400,7 +397,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             }
             ptr->pkt = NULL;
         }
-#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
+
         if ((icmpv6->type == ICMPV6_NBR_ADV) &&
             !_sflag_set((ndp_nbr_adv_t *)icmpv6) &&
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE) &&
@@ -437,6 +434,15 @@ void _set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce)
     _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE);
     _evtimer_add(nce, GNRC_IPV6_NIB_REACH_TIMEOUT, &nce->nud_timeout,
                  netif->ipv6.reach_time);
+}
+
+void _set_unreachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce)
+{
+    DEBUG("nib: set %s to UNREACHABLE\n",
+          ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)));
+
+    _nbr_flush_pktqueue(nce);
+    _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE);
 }
 
 void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,

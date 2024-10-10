@@ -282,6 +282,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief Per-neighbor packet queue capacity
+ *
+ * If @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT enabled, this is the maximum number
+ * of packets, per neighbor, awaiting packet resolution.
+ *
+ * @attention This MUST be leq UINT8_MAX
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP
+#define CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP          (16)
+#endif
+
+/**
  * @brief   Number of off-link entries in NIB
  *
  * @attention   This number is equal to the maximum number of forwarding table
