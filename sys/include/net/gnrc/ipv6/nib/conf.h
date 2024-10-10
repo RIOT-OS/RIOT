@@ -287,7 +287,7 @@ extern "C" {
  * If @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT enabled, this is the maximum number
  * of packets, per neighbor, awaiting packet resolution.
  *
- * @attention This MUST be leq @ref UINT8_MAX
+ * @attention This MUST be leq UINT8_MAX
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP
 #define CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP          (16)

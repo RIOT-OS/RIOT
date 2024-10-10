@@ -1321,7 +1321,8 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
     /* There MUST be at least a neighbor in the NC */
     assert(hog);
     while ((nbr = _iter_nc_nbr(nbr))) {
-        if (hog->pktqueue_len == CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP) {
+        if (ARRAY_SIZE(_queue_pool) >= CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP &&
+            hog->pktqueue_len == CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP) {
             break;
         }
         assert(hog->pktqueue_len < CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP);
