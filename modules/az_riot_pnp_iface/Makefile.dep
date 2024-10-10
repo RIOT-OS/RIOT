@@ -1,0 +1,5 @@
+ifneq (,$(filter az_riot_pnp_iface,$(USEMODULE))) # if module in USEMODULE
+  USEMODULE += mqtts_riot_iface  
+  USEPKG += azure-sdk
+  USEMODULE += azure-sdk-contrib
+endif
