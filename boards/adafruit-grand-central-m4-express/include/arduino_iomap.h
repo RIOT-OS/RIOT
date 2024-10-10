@@ -85,6 +85,16 @@ extern "C" {
 #define ARDUINO_ANALOG_PIN_LAST 5
 /** @} */
 
+/**
+ * @name    Arduino's default SPI device
+ * @{
+ */
+/**
+ * @brief   SPI_DEV(0) is connected to the ISP header *AND* the SD card reader
+ */
+#define ARDUINO_SPI_ISP         SPI_DEV(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
