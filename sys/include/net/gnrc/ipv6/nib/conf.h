@@ -176,6 +176,23 @@ extern "C" {
 #define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                1
 #endif
 
+#if CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
+/**
+ * @brief    queue capacity for the packets waiting for address resolution,
+ *           per neighbor
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP
+#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_CAP            16
+#endif
+
+/**
+ * @brief   timeout for packets waiting for address resolution
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_LINGER_MS
+#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT_LINGER_MS      (5 * MS_PER_SEC)
+#endif
+#endif /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
+
 /**
  * @brief   handle NDP messages according for stateless address
  *          auto-configuration (if activated on interface)
