@@ -204,7 +204,7 @@ static const tc32_conf_t timer_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
-    {   /* SPI on XIO connector */
+    {   /* SPI on XIO connector *AND* SPI on ISP */
         .dev      = &(SERCOM7->SPI),
         .miso_pin = GPIO_PIN(PD, 11),   /* D50 MISO */
         .mosi_pin = GPIO_PIN(PD, 8),    /* D51 MOSI */
