@@ -46,13 +46,21 @@
 #  define ADC_NEG_INPUT (0)
 #endif
 
+typedef struct {
+    uint32_t f_adc;
+    uint32_t R_src;
+    uint8_t samplen;
+} adc_multi_cfg_t;
+
 /* Prototypes */
 static void _adc_poweroff(Adc *dev);
-static void _setup_clock(Adc *dev, adc_res_t res, uint32_t f_tgt);
+static void _setup_clock(Adc *dev, adc_res_t res, adc_multi_cfg_t *mcfg);
 static void _setup_calibration(Adc *dev);
-static int _adc_configure(Adc *dev, adc_res_t res, uint32_t f_tgt);
+static int _adc_configure(Adc *dev, adc_res_t res, adc_multi_cfg_t *mcfg);
 
 static mutex_t _lock = MUTEX_INIT;
+
+static uint8_t _shift, _bits;
 
 static inline void _wait_syncbusy(Adc *dev)
 {
@@ -105,8 +113,16 @@ static inline uint8_t _res_bits(adc_res_t res)
     }
 }
 
+#define MATH_LN_2   0.693147181f    /**< ln(2) */
+
+static uint8_t _calc_samplen(uint32_t R_src, uint32_t f_adc, uint8_t bits)
+{
+    return (SAM0_ADC_R_SAMPLE + R_src) * SAM0_ADC_C_SAMPLE * (bits + 2) * MATH_LN_2
+           * f_adc;
+}
+
 static void _find_presc(uint32_t f_src, adc_res_t res, uint32_t f_tgt,
-                        uint8_t *prescale, uint8_t *samplen)
+                        uint8_t *prescale, uint8_t *samplen, uint32_t R_src)
 {
     uint32_t _best_match = UINT32_MAX;
     uint32_t diff = UINT32_MAX;
@@ -135,8 +151,11 @@ static void _find_presc(uint32_t f_src, adc_res_t res, uint32_t f_tgt,
         /* SAM D2x counts in half CLK_ADC cycles */
         f_adc <<= 1;
 #endif
+        uint8_t samplen_min = _calc_samplen(R_src, f_adc, bits) + 1;
+        assert(samplen_min <= 32);
+
         /* SAMPLEN register is offset by one (SAMPLEN+1) */
-        for (uint8_t _samplen = 32; _samplen > 0; --_samplen) {
+        for (uint8_t _samplen = 32; _samplen > samplen_min; --_samplen) {
             diff = _absdiff(f_adc / (_samplen + bits), f_tgt);
             if (diff < _best_match) {
                 _best_match = diff;
@@ -156,7 +175,7 @@ static void _find_presc(uint32_t f_src, adc_res_t res, uint32_t f_tgt,
 #define ADC_PRESCALER_Pos   ADC_CTRLA_PRESCALER_Pos
 #endif
 
-static void _setup_clock(Adc *dev, adc_res_t res, uint32_t f_tgt)
+static void _setup_clock(Adc *dev, adc_res_t res, adc_multi_cfg_t *mcfg)
 {
     /* Enable gclk in case we are the only user */
     sam0_gclk_enable(ADC_GCLK_SRC);
@@ -202,11 +221,10 @@ static void _setup_clock(Adc *dev, adc_res_t res, uint32_t f_tgt)
 #endif
 
     uint8_t prescaler = ADC_PRESCALER >> ADC_PRESCALER_Pos;
-    uint8_t sampllen  = 0;
 
-    if (f_tgt) {
-        _find_presc(sam0_gclk_freq(ADC_GCLK_SRC), res, f_tgt,
-                    &prescaler, &sampllen);
+    if (mcfg) {
+        _find_presc(sam0_gclk_freq(ADC_GCLK_SRC), res, mcfg->f_adc,
+                    &prescaler, &mcfg->samplen, mcfg->R_src);
     }
 
     /* Configure prescaler */
@@ -215,7 +233,6 @@ static void _setup_clock(Adc *dev, adc_res_t res, uint32_t f_tgt)
 #else
     dev->CTRLA.reg = prescaler << ADC_CTRLA_PRESCALER_Pos;
 #endif
-    dev->SAMPCTRL.reg = sampllen;
 }
 
 static void _setup_calibration(Adc *dev)
@@ -254,7 +271,7 @@ static void _setup_calibration(Adc *dev)
 #endif
 }
 
-static int _adc_configure(Adc *dev, adc_res_t res, uint32_t f_tgt)
+static int _adc_configure(Adc *dev, adc_res_t res, adc_multi_cfg_t *mcfg)
 {
     if ((res == ADC_RES_6BIT) || (res == ADC_RES_14BIT)) {
         return -1;
@@ -268,7 +285,7 @@ static int _adc_configure(Adc *dev, adc_res_t res, uint32_t f_tgt)
         DEBUG("adc: not ready\n");
     }
 
-    _setup_clock(dev, res, f_tgt);
+    _setup_clock(dev, res, mcfg);
     _setup_calibration(dev);
 
     /* Set ADC resolution */
@@ -319,6 +336,7 @@ static int _adc_configure(Adc *dev, adc_res_t res, uint32_t f_tgt)
     } else {
         dev->AVGCTRL.reg = 0;
     }
+    _bits = _res_bits(res);
 
     /*  Enable ADC Module */
     dev->CTRLA.reg |= ADC_CTRLA_ENABLE;
@@ -424,8 +442,10 @@ static Adc *_adc(uint8_t dev)
 #endif
 }
 
-static inline void _config_line(Adc *dev, adc_t line, bool diffmode, bool freerun)
+static inline void _config_line(Adc *dev, adc_t line, bool diffmode, bool freerun,
+                                uint8_t samplen)
 {
+    dev->SAMPCTRL.reg = samplen;
     dev->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
                        | adc_channels[line].inputctrl
                        | (diffmode ? 0 : ADC_NEG_INPUT);
@@ -480,8 +500,15 @@ static int32_t _sample(adc_t line)
     Adc *dev = _dev(line);
     bool diffmode = adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE;
 
+    /* 0 is DIV2, on MCUs where 0 is DIV4, the formula uses half clock cylces,
+       so it works out the same */
+    uint8_t clock_shift = (ADC_PRESCALER >> ADC_PRESCALER_Pos) + 1;
+    uint32_t f_adc = sam0_gclk_freq(ADC_GCLK_SRC) >> clock_shift;
+
+    uint8_t samplen = _calc_samplen(adc_channels[line].R_src, f_adc, _bits);
+
     /* configure ADC line */
-    _config_line(dev, line, diffmode, 0);
+    _config_line(dev, line, diffmode, 0, samplen);
 
     /* clear stale flag */
     dev->INTFLAG.reg = ADC_INTFLAG_RESRDY;
@@ -524,7 +551,6 @@ static void _get_adcs(bool *adc0, bool *adc1)
 #endif
 }
 
-static uint8_t _shift;
 void adc_continuous_begin(adc_res_t res)
 {
     bool adc0, adc1;
@@ -572,6 +598,21 @@ static void _has_adcs(bool *adc0, bool *adc1,
 #endif
 }
 
+/* when sampling multiple lines, use the largest sample length for all to
+   ensure consistent sample times for all lines */
+static uint8_t _max_R_src(uint8_t lines_numof, const adc_t lines[lines_numof])
+{
+    uint32_t R_src = 0;
+    for (unsigned i = 0; i < lines_numof; ++i) {
+        adc_t line  = lines[i];
+        if (R_src < adc_channels[line].R_src) {
+            R_src = adc_channels[line].R_src;
+        }
+    }
+
+    return R_src;
+}
+
 void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
                       size_t buf_len, uint16_t bufs[lines_numof][buf_len],
                       adc_res_t res, uint32_t f_adc)
@@ -583,11 +624,16 @@ void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
     bool adc0, adc1;
     _has_adcs(&adc0, &adc1, lines, lines_numof);
 
+    adc_multi_cfg_t mcfg = {
+        .f_adc = f_adc,
+        .R_src = _max_R_src(lines_numof, lines),
+    };
+
     if (adc0) {
-        _adc_configure(_adc(0), res, f_adc);
+        _adc_configure(_adc(0), res, &mcfg);
     }
     if (adc1) {
-        _adc_configure(_adc(1), res, f_adc);
+        _adc_configure(_adc(1), res, &mcfg);
     }
 
     bool lockstep = false;
@@ -615,7 +661,7 @@ void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
 
         for (unsigned i = 0; i < lines_numof; ++i) {
             /* configure ADC line */
-            _config_line(dev[i], lines[i], diffmode[i], 1);
+            _config_line(dev[i], lines[i], diffmode[i], 1, mcfg.samplen);
 
             /* Start the conversion */
             dev[i]->SWTRIG.reg = ADC_SWTRIG_START;
@@ -634,7 +680,7 @@ void adc_sample_multi(uint8_t lines_numof, const adc_t lines[lines_numof],
         for (size_t s = 0; s < buf_len; ++s) {
             for (unsigned i = 0; i < lines_numof; ++i) {
                 /* configure ADC line */
-                _config_line(dev[i], lines[i], diffmode[i], 1);
+                _config_line(dev[i], lines[i], diffmode[i], 1, mcfg.samplen);
 
                 /* Start the conversion */
                 dev[i]->SWTRIG.reg = ADC_SWTRIG_START;

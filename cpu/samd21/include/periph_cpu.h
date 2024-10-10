@@ -87,6 +87,16 @@ enum {
 #define SAM0_ADC_CLOCK_FREQ_MAX KHZ(2100)
 
 /**
+ * @brief   ADC Input channel source resistance in Ω
+ */
+#define SAM0_ADC_R_SAMPLE       3500
+
+/**
+ * @brief   ADC Sampling capacitance in F
+ */
+#define SAM0_ADC_C_SAMPLE       3.5E-12
+
+/**
  * @brief   Override SPI hardware chip select macro
  *
  * As of now, we do not support HW CS, so we always set it to a fixed value

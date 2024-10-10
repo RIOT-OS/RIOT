@@ -81,6 +81,16 @@ enum {
 #define SAM0_ADC_CLOCK_FREQ_MAX MHZ(16)
 
 /**
+ * @brief   ADC Input channel source resistance in Ω
+ */
+#define SAM0_ADC_R_SAMPLE       1715
+
+/**
+ * @brief   ADC Sampling capacitance in F
+ */
+#define SAM0_ADC_C_SAMPLE       2.8E-12
+
+/**
  * @brief   Pins that can be used for ADC input
  */
 static const gpio_t sam0_adc_pins[1][20] = {
