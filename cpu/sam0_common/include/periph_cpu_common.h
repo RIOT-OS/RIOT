@@ -886,6 +886,7 @@ typedef struct {
 #ifdef ADC0
     Adc *dev;               /**< ADC device descriptor */
 #endif
+    uint8_t samplen;        /**< Minimal sample length in ADC clocks, see  */
 } adc_conf_chan_t;
 
 /**
