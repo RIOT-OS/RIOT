@@ -1237,5 +1237,5 @@ static inline coap_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_memo_t 
 }
 #endif
 
-#endif /* NET_GCOAP_H */
 /** @} */
+#endif /* NET_GCOAP_H */
