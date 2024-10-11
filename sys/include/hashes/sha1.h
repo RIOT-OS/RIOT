@@ -117,5 +117,5 @@ void sha1_final_hmac(sha1_context *ctx, void *digest);
 }
 #endif
 
-#endif /* HASHES_SHA1_H */
 /** @} */
+#endif /* HASHES_SHA1_H */

@@ -79,5 +79,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LIS2DH12_INTERNAL_H */
 /** @} */
+#endif /* LIS2DH12_INTERNAL_H */

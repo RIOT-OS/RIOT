@@ -80,5 +80,5 @@ static const saul_reg_info_t pir_saul_info[] =
 }
 #endif
 
-#endif /* PIR_PARAMS_H */
 /** @} */
+#endif /* PIR_PARAMS_H */

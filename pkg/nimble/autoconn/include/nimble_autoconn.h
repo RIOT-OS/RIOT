@@ -217,5 +217,5 @@ void nimble_autoconn_disable(void);
 }
 #endif
 
-#endif /* NIMBLE_AUTOCONN_H */
 /** @} */
+#endif /* NIMBLE_AUTOCONN_H */

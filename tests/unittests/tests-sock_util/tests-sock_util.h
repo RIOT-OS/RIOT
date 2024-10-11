@@ -33,5 +33,5 @@ void tests_sockutil(void);
 }
 #endif
 
-#endif /* TESTS_SOCK_UTIL_H */
 /** @} */
+#endif /* TESTS_SOCK_UTIL_H */

@@ -40,5 +40,5 @@ extern "C" {
 }
 #endif
 
-#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */
+#endif /* EUI_PROVIDER_PARAMS_H */

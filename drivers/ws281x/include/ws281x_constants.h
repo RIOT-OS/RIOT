@@ -75,5 +75,5 @@ extern "C" {
 }
 #endif
 
-#endif /* WS281X_CONSTANTS_H */
 /** @} */
+#endif /* WS281X_CONSTANTS_H */

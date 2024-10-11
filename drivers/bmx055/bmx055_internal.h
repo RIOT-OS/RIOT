@@ -82,5 +82,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BMX055_INTERNAL_H */
 /** @} */
+#endif /* BMX055_INTERNAL_H */

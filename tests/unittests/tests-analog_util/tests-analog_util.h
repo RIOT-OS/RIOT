@@ -32,5 +32,5 @@ void tests_adc_util(void);
 }
 #endif
 
-#endif /* TESTS_ANALOG_UTIL_H */
 /** @} */
+#endif /* TESTS_ANALOG_UTIL_H */

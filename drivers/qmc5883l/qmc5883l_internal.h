@@ -72,5 +72,5 @@ extern "C"
 }
 #endif
 
-#endif /* QMC5883L_INTERNAL_H */
 /** @} */
+#endif /* QMC5883L_INTERNAL_H */

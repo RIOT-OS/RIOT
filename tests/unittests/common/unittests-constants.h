@@ -68,5 +68,5 @@ extern "C" {
 }
 #endif
 
-#endif /* UNITTESTS_CONSTANTS_H */
 /** @} */
+#endif /* UNITTESTS_CONSTANTS_H */

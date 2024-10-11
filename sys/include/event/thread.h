@@ -124,5 +124,5 @@ extern event_queue_t event_thread_queues[EVENT_QUEUE_PRIO_NUMOF];
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_THREAD_H */
 /** @} */
+#endif /* EVENT_THREAD_H */

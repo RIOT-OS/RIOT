@@ -42,5 +42,5 @@ extern "C" {
 }
 #endif
 
-#endif /* HM330X_CONSTANTS_H */
 /** @} */
+#endif /* HM330X_CONSTANTS_H */

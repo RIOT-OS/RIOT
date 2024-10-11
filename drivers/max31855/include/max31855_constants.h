@@ -169,5 +169,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MAX31855_CONSTANTS_H */
 /** @} */
+#endif /* MAX31855_CONSTANTS_H */

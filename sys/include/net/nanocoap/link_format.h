@@ -68,5 +68,5 @@ int nanocoap_link_format_get_url(const char *url,
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_LINK_FORMAT_H */
 /** @} */
+#endif /* NET_NANOCOAP_LINK_FORMAT_H */

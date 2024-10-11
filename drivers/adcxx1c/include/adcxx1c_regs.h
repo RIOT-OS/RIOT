@@ -49,5 +49,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ADCXX1C_REGS_H */
 /** @} */
+#endif /* ADCXX1C_REGS_H */

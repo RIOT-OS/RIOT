@@ -88,5 +88,5 @@ typedef struct {
 }
 #endif
 
-#endif /* TINYUSB_NETDEV_H */
 /** @} */
+#endif /* TINYUSB_NETDEV_H */

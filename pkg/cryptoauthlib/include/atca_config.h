@@ -48,5 +48,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ATCA_CONFIG_H */
 /** @} */
+#endif /* ATCA_CONFIG_H */

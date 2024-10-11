@@ -60,5 +60,5 @@ extern "C" {
 }
 #endif
 
-#endif /* RIOT_VERSION_H */
 /** @} */
+#endif /* RIOT_VERSION_H */

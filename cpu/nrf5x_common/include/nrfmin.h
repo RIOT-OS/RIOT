@@ -221,5 +221,5 @@ void nrfmin_set_txpower(int16_t power);
 }
 #endif
 
-#endif /* NRFMIN_H */
 /** @} */
+#endif /* NRFMIN_H */

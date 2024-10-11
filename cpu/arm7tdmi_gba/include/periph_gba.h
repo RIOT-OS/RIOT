@@ -102,5 +102,5 @@ extern "C"
 }
 #endif
 
-#endif /* PERIPH_GBA_H */
 /** @} */
+#endif /* PERIPH_GBA_H */

@@ -29,5 +29,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_H */
 /** @} */
+#endif /* ARDUINO_H */

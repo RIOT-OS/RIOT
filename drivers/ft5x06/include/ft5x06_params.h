@@ -94,5 +94,5 @@ static const uint8_t ft5x06_screen_ids[] =
 }
 #endif
 
-#endif /* FT5X06_PARAMS_H */
 /** @} */
+#endif /* FT5X06_PARAMS_H */

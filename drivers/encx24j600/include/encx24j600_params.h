@@ -58,5 +58,5 @@ static const  encx24j600_params_t encx24j600_params[] = {
 }
 #endif
 
-#endif /* ENCX24J600_PARAMS_H */
 /** @} */
+#endif /* ENCX24J600_PARAMS_H */

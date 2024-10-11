@@ -74,5 +74,5 @@ saul_reg_info_t sds011_saul_info[] =
 }
 #endif
 
-#endif /* SDS011_PARAMS_H */
 /** @} */
+#endif /* SDS011_PARAMS_H */

@@ -72,5 +72,5 @@ static const saul_reg_info_t hsc_saul_info[] =
 }
 #endif
 
-#endif /* HSC_PARAMS_H */
 /** @} */
+#endif /* HSC_PARAMS_H */

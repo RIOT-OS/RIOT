@@ -163,5 +163,5 @@ void lwm2m_client_remove_credential(credman_tag_t tag);
 }
 #endif
 
-#endif /* LWM2M_CLIENT_H */
 /** @} */
+#endif /* LWM2M_CLIENT_H */

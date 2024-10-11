@@ -81,5 +81,5 @@ static const mfrc522_params_t mfrc522_params[] =
 }
 #endif
 
-#endif /* MFRC522_PARAMS_H */
 /** @} */
+#endif /* MFRC522_PARAMS_H */

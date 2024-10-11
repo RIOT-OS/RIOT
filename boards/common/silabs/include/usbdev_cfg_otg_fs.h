@@ -52,5 +52,5 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 }
 #endif
 
-#endif /* USBDEV_CFG_OTG_FS_H */
 /** @} */
+#endif /* USBDEV_CFG_OTG_FS_H */

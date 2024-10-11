@@ -52,5 +52,5 @@ extern const mtd_desc_t mtd_sam0_sdhc_driver;
 }
 #endif
 
-#endif /* MTD_SAM0_SDHC_H */
 /** @} */
+#endif /* MTD_SAM0_SDHC_H */

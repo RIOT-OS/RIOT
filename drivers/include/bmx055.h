@@ -199,5 +199,5 @@ int bmx055_gyro_read(const bmx055_t *dev, int16_t *data);
 }
 #endif
 
-#endif /* BMX055_H */
 /** @} */
+#endif /* BMX055_H */

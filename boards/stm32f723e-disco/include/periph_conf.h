@@ -380,5 +380,5 @@ static const lcd_fmc_desc_t lcd_fmc_desc[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

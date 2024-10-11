@@ -149,5 +149,5 @@ enum {
 }
 #endif
 
-#endif /* HTS221_REGS_H */
 /** @} */
+#endif /* HTS221_REGS_H */

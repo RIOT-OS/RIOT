@@ -48,5 +48,5 @@ extern "C" {
 }
 #endif
 
-#endif /* OPENDSME_DSME_PLATFORM_H */
 /** @} */
+#endif /* OPENDSME_DSME_PLATFORM_H */

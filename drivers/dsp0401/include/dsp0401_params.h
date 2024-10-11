@@ -77,5 +77,5 @@ static const dsp0401_params_t dsp0401_params[] =
 }
 #endif
 
-#endif /* DSP0401_PARAMS_H */
 /** @} */
+#endif /* DSP0401_PARAMS_H */

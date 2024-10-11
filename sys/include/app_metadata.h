@@ -50,5 +50,5 @@ void app_metadata_print_json(void);
 }
 #endif
 
-#endif /* APP_METADATA_H */
 /** @} */
+#endif /* APP_METADATA_H */

@@ -48,5 +48,5 @@ static const adc_conf_t adc_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_ADC_DEFAULT_H */
 /** @} */
+#endif /* CFG_ADC_DEFAULT_H */

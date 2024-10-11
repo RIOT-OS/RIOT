@@ -216,5 +216,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_ESP32_H */
 /** @} */
+#endif /* SDKCONFIG_ESP32_H */

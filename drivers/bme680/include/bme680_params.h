@@ -141,5 +141,5 @@ static const saul_reg_info_t bme680_saul_info[] =
 }
 #endif
 
-#endif /* BME680_PARAMS_H */
 /** @} */
+#endif /* BME680_PARAMS_H */

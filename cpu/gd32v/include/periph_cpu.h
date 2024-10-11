@@ -570,5 +570,5 @@ void gd32v_disable_irc8(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

@@ -522,5 +522,5 @@ const char *senml_unit_to_str(senml_unit_t unit);
 }
 #endif
 
-#endif /* SENML_H */
 /** @} */
+#endif /* SENML_H */

@@ -43,5 +43,5 @@ extern socket_zep_params_t socket_zep_params[SOCKET_ZEP_MAX];
 }
 #endif
 
-#endif /* SOCKET_ZEP_PARAMS_H */
 /** @} */
+#endif /* SOCKET_ZEP_PARAMS_H */

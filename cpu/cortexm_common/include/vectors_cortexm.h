@@ -141,5 +141,5 @@ void dummy_handler_default(void);
 }
 #endif
 
-#endif /* VECTORS_CORTEXM_H */
 /** @} */
+#endif /* VECTORS_CORTEXM_H */

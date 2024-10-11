@@ -33,5 +33,5 @@ void tests_uuid(void);
 }
 #endif
 
-#endif /* TESTS_UUID_H */
 /** @} */
+#endif /* TESTS_UUID_H */

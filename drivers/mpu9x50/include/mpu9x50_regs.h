@@ -100,5 +100,5 @@
 }
 #endif
 
-#endif /* MPU9X50_REGS_H */
 /** @} */
+#endif /* MPU9X50_REGS_H */

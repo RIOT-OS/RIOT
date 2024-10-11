@@ -108,5 +108,5 @@ static const spi_conf_t spi_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

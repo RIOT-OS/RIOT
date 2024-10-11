@@ -79,5 +79,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MPU9X50_INTERNAL_H */
 /** @} */
+#endif /* MPU9X50_INTERNAL_H */

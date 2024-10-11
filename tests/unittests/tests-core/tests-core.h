@@ -110,5 +110,5 @@ Test *tests_core_macros_tests(void);
 }
 #endif
 
-#endif /* TESTS_CORE_H */
 /** @} */
+#endif /* TESTS_CORE_H */

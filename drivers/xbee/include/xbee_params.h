@@ -62,5 +62,5 @@ static const xbee_params_t xbee_params[] =
 }
 #endif
 
-#endif /* XBEE_PARAMS_H */
 /** @} */
+#endif /* XBEE_PARAMS_H */

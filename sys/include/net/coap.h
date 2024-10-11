@@ -629,5 +629,5 @@ typedef enum {
 }
 #endif
 
-#endif /* NET_COAP_H */
 /** @} */
+#endif /* NET_COAP_H */

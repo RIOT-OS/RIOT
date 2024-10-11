@@ -33,5 +33,5 @@ void tests_netreg(void);
 }
 #endif
 
-#endif /* TESTS_NETREG_H */
 /** @} */
+#endif /* TESTS_NETREG_H */

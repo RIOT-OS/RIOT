@@ -86,5 +86,5 @@ static const saul_reg_info_t grove_ledbar_saul_info[] =
 }
 #endif
 
-#endif /* GROVE_LEDBAR_PARAMS_H */
 /** @} */
+#endif /* GROVE_LEDBAR_PARAMS_H */

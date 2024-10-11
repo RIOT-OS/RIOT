@@ -305,5 +305,5 @@ void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
 }
 #endif
 
-#endif /* SX126X_H */
 /** @} */
+#endif /* SX126X_H */

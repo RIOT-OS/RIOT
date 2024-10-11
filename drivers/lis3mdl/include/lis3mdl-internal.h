@@ -150,5 +150,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LIS3MDL_INTERNAL_H */
 /** @} */
+#endif /* LIS3MDL_INTERNAL_H */

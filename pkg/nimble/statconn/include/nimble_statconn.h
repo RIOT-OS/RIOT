@@ -193,5 +193,5 @@ int nimble_statconn_rm(const uint8_t *addr);
 }
 #endif
 
-#endif /* NIMBLE_STATCONN_H */
 /** @} */
+#endif /* NIMBLE_STATCONN_H */

@@ -121,5 +121,5 @@ void print_pmpcfg(uint8_t entry);
 }
 #endif
 
-#endif /* PMP_H */
 /** @} */
+#endif /* PMP_H */

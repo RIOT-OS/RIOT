@@ -37,5 +37,5 @@ extern "C"
 }
 #endif
 
-#endif /* AIP31068_INTERNAL_H */
 /** @} */
+#endif /* AIP31068_INTERNAL_H */

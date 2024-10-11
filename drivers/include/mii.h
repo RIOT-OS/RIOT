@@ -205,5 +205,5 @@ static inline bool mii_can_10_mbps_half_dp(uint16_t bmsr)
 }
 #endif
 
-#endif /* MII_H */
 /** @} */
+#endif /* MII_H */

@@ -507,5 +507,5 @@ void msp430_clock_release(msp430_clock_t clock);
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */
+#endif /* PERIPH_CPU_COMMON_H */

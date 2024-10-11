@@ -186,5 +186,5 @@ bool sys_check_core_locked(void);
 }
 #endif
 
-#endif /* LWIPOPTS_H */
 /** @} */
+#endif /* LWIPOPTS_H */

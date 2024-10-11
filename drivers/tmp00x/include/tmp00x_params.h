@@ -90,5 +90,5 @@ static const saul_reg_info_t tmp00x_saul_info[] =
 }
 #endif
 
-#endif /* TMP00X_PARAMS_H */
 /** @} */
+#endif /* TMP00X_PARAMS_H */

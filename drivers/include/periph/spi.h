@@ -453,5 +453,5 @@ static inline uint16_t spi_transfer_u16_be(spi_t bus, spi_cs_t cs, bool cont, ui
 }
 #endif
 
-#endif /* PERIPH_SPI_H */
 /** @} */
+#endif /* PERIPH_SPI_H */

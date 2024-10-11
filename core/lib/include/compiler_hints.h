@@ -198,5 +198,5 @@ static inline unsigned may_be_zero(unsigned n)
 }
 #endif
 
-#endif /* COMPILER_HINTS_H */
 /** @} */
+#endif /* COMPILER_HINTS_H */

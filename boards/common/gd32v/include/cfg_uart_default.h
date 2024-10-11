@@ -51,5 +51,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* CFG_UART_DEFAULT_H */
 /** @} */
+#endif /* CFG_UART_DEFAULT_H */

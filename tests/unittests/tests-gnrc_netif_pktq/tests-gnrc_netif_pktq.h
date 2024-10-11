@@ -31,5 +31,5 @@ void tests_pktqueue(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_NETIF_PKTQ_H */
 /** @} */
+#endif /* TESTS_GNRC_NETIF_PKTQ_H */

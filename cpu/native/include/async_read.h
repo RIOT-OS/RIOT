@@ -101,5 +101,5 @@ void native_async_read_add_int_handler(int fd, void *arg, native_async_read_call
 }
 #endif
 
-#endif /* ASYNC_READ_H */
 /** @} */
+#endif /* ASYNC_READ_H */

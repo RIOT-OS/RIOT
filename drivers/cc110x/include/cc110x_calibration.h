@@ -44,5 +44,5 @@ int cc110x_recalibrate(cc110x_t *dev);
 }
 #endif
 
-#endif /* CC110X_CALIBRATION_H */
 /** @} */
+#endif /* CC110X_CALIBRATION_H */

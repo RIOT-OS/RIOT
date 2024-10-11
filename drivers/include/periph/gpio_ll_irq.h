@@ -177,5 +177,5 @@ void gpio_ll_irq_off(gpio_port_t port, uint8_t pin);
 }
 #endif
 
-#endif /* PERIPH_GPIO_LL_IRQ_H */
 /** @} */
+#endif /* PERIPH_GPIO_LL_IRQ_H */

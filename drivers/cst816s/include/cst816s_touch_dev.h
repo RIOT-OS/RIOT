@@ -34,5 +34,5 @@ extern const touch_dev_driver_t cst816s_touch_dev_driver;
 }
 #endif
 
-#endif /* CST816S_TOUCH_DEV_H */
 /** @} */
+#endif /* CST816S_TOUCH_DEV_H */

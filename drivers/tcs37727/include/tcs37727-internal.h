@@ -145,5 +145,5 @@ extern "C"
 }
 #endif
 
-#endif /* TCS37727_INTERNAL_H */
 /** @} */
+#endif /* TCS37727_INTERNAL_H */

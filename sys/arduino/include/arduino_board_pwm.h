@@ -160,5 +160,5 @@ static const arduino_pwm_t arduino_pwm_list[] = {
 }
 #endif
 
-#endif /* ARDUINO_BOARD_PWM_H */
 /** @} */
+#endif /* ARDUINO_BOARD_PWM_H */

@@ -32,5 +32,5 @@ void tests_sht1x(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* TESTS_SHT1X_H */
 /** @} */
+#endif /* TESTS_SHT1X_H */

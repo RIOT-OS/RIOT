@@ -33,5 +33,5 @@ void tests_ipv4_addr(void);
 }
 #endif
 
-#endif /* TESTS_IPV4_ADDR_H */
 /** @} */
+#endif /* TESTS_IPV4_ADDR_H */

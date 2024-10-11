@@ -71,5 +71,5 @@ static const  w5100_params_t w5100_params[] = {
 }
 #endif
 
-#endif /* W5100_PARAMS_H */
 /** @} */
+#endif /* W5100_PARAMS_H */

@@ -191,5 +191,5 @@ int tsl4531x_simple_read(tsl4531x_t *dev);
 }
 #endif
 
-#endif /* TSL4531X_H */
 /** @} */
+#endif /* TSL4531X_H */

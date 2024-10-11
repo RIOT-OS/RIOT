@@ -77,5 +77,5 @@ int16_t mq3_read(const mq3_t *dev);
 }
 #endif
 
-#endif /* MQ3_H */
 /** @} */
+#endif /* MQ3_H */

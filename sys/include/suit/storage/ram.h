@@ -101,5 +101,5 @@ typedef struct CONFIG_SUIT_STORAGE_RAM_ATTR {
 }
 #endif
 
-#endif /* SUIT_STORAGE_RAM_H */
 /** @} */
+#endif /* SUIT_STORAGE_RAM_H */

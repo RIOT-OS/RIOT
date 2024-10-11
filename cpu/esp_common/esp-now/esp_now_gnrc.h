@@ -44,5 +44,5 @@ int gnrc_netif_esp_now_create(gnrc_netif_t *netif, char *stack, int stacksize, c
 }
 #endif
 
-#endif /* ESP_NOW_GNRC_H */
 /** @} */
+#endif /* ESP_NOW_GNRC_H */

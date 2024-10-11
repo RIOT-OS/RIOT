@@ -138,5 +138,5 @@ int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, siz
 }
 #endif
 
-#endif /* CAN_CONN_RAW_H */
 /** @} */
+#endif /* CAN_CONN_RAW_H */

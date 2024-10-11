@@ -114,5 +114,5 @@ void usbdev_mock_setup(usbdev_mock_esr_cb_t esr_cb,
 }
 #endif
 
-#endif /* USBDEV_MOCK_H */
 /** @} */
+#endif /* USBDEV_MOCK_H */

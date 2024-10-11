@@ -264,5 +264,5 @@ void soft_spi_transfer_regs(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg,
 }
 #endif
 
-#endif /* SOFT_SPI_H */
 /** @} */
+#endif /* SOFT_SPI_H */

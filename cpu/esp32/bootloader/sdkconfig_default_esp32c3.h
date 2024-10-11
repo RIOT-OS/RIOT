@@ -43,5 +43,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_DEFAULT_ESP32C3_H */
 /** @} */
+#endif /* SDKCONFIG_DEFAULT_ESP32C3_H */

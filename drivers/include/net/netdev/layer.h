@@ -140,5 +140,5 @@ void netdev_event_cb_pass(netdev_t *dev, netdev_event_t event);
 }
 #endif
 
-#endif /* NET_NETDEV_LAYER_H */
 /** @} */
+#endif /* NET_NETDEV_LAYER_H */

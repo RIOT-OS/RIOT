@@ -39,5 +39,5 @@ Test *tests_frac_tests(void);
 }
 #endif
 
-#endif /* TESTS_FRAC_H */
 /** @} */
+#endif /* TESTS_FRAC_H */

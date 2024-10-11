@@ -96,5 +96,5 @@ bool rtc_tm_valid(const struct tm *t);
 }
 #endif
 
-#endif /* RTC_UTILS_H */
 /** @} */
+#endif /* RTC_UTILS_H */

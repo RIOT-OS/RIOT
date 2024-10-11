@@ -91,5 +91,5 @@ saul_gpio_params_t io1_xplained_saul_gpios[] =
 }
 #endif
 
-#endif /* IO1_XPLAINED_PARAMS_H */
 /** @} */
+#endif /* IO1_XPLAINED_PARAMS_H */

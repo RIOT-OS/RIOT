@@ -115,5 +115,5 @@ static inline void ipv6_ext_frag_set_more(ipv6_ext_frag_t *frag)
 }
 #endif
 
-#endif /* NET_IPV6_EXT_FRAG_H */
 /** @} */
+#endif /* NET_IPV6_EXT_FRAG_H */

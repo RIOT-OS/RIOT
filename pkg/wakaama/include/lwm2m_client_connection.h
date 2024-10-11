@@ -86,5 +86,5 @@ int lwm2m_connection_handle_packet(lwm2m_client_connection_t *conn,
 }
 #endif
 
-#endif /* LWM2M_CLIENT_CONNECTION_H */
 /** @} */
+#endif /* LWM2M_CLIENT_CONNECTION_H */

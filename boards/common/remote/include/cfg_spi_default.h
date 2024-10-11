@@ -56,5 +56,5 @@ static const spi_conf_t spi_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_SPI_DEFAULT_H */
 /** @} */
+#endif /* CFG_SPI_DEFAULT_H */

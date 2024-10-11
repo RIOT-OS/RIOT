@@ -238,5 +238,5 @@ void at86rf2xx_aes_cbc_decrypt(at86rf2xx_t *dev,
 }
 #endif
 
-#endif /* AT86RF2XX_AES_H */
 /** @} */
+#endif /* AT86RF2XX_AES_H */

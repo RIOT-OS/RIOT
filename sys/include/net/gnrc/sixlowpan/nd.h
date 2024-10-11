@@ -83,5 +83,5 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_ND_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_ND_H */

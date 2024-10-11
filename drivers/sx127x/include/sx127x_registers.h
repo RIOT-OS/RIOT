@@ -1429,5 +1429,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SX127X_REGISTERS_H */
 /** @} */
+#endif /* SX127X_REGISTERS_H */

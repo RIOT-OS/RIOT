@@ -93,5 +93,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MACROS_UTILS_H */
 /** @} */
+#endif /* MACROS_UTILS_H */

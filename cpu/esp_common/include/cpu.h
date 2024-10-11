@@ -44,5 +44,5 @@ static inline uintptr_t cpu_get_caller_pc(void)
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */
+#endif /* CPU_H */

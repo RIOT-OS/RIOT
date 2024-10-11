@@ -439,5 +439,5 @@ extern const ieee802154_radio_cipher_ops_t ieee802154_radio_cipher_ops;
 }
 #endif
 
-#endif /* NET_IEEE802154_SECURITY_H */
 /** @} */
+#endif /* NET_IEEE802154_SECURITY_H */

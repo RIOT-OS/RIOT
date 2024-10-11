@@ -107,5 +107,5 @@ static inline void dns_cache_add(const char *domain_name, const void *addr,
 }
 #endif
 
-#endif /* NET_DNS_CACHE_H */
 /** @} */
+#endif /* NET_DNS_CACHE_H */

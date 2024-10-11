@@ -60,5 +60,5 @@ typedef enum ina2xx_reg {
 }
 #endif
 
-#endif /* INA2XX_DEFINES_H */
 /** @} */
+#endif /* INA2XX_DEFINES_H */

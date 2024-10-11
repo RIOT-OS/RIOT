@@ -493,5 +493,5 @@ extern const lcd_ll_par_driver_t lcd_ll_par_driver;
 #ifdef __cplusplus
 }
 #endif
-#endif /* LCD_H */
 /** @} */
+#endif /* LCD_H */

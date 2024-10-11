@@ -57,5 +57,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NIMBLE_L2CAP_TEST_CONF_H */
 /** @} */
+#endif /* NIMBLE_L2CAP_TEST_CONF_H */

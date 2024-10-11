@@ -60,5 +60,5 @@ static inline int _eeprom_mac_get_eui64(uint8_t index, eui64_t *addr)
 }
 #endif
 
-#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */
+#endif /* EUI_PROVIDER_PARAMS_H */

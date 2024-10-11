@@ -55,5 +55,5 @@ static const bh1900nux_params_t bh1900nux_params[] =
 }
 #endif
 
-#endif /* BH1900NUX_PARAMS_H */
 /** @} */
+#endif /* BH1900NUX_PARAMS_H */

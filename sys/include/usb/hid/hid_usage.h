@@ -2729,5 +2729,5 @@ extern "C" {
 }
 #endif
 
-#endif /* USB_HID_HID_USAGE_H */
 /** @} */
+#endif /* USB_HID_HID_USAGE_H */

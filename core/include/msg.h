@@ -420,5 +420,5 @@ void msg_queue_print(void);
 }
 #endif
 
-#endif /* MSG_H */
 /** @} */
+#endif /* MSG_H */

@@ -625,5 +625,5 @@ void nrf24l01p_rx_cb(void *arg);
 }
 #endif
 
-#endif /* NRF24L01P_H */
 /** @} */
+#endif /* NRF24L01P_H */

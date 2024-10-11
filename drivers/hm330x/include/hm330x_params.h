@@ -98,5 +98,5 @@ static const saul_reg_info_t hm330x_saul_info[] =
 }
 #endif
 
-#endif /* HM330X_PARAMS_H */
 /** @} */
+#endif /* HM330X_PARAMS_H */

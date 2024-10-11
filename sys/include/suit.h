@@ -329,5 +329,5 @@ int suit_component_name_to_string(const suit_manifest_t *manifest,
 }
 #endif
 
-#endif /* SUIT_H */
 /** @} */
+#endif /* SUIT_H */

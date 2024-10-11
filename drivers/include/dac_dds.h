@@ -160,5 +160,5 @@ void dac_dds_stop(dac_dds_t dac);
 }
 #endif
 
-#endif /* DAC_DDS_H */
 /** @} */
+#endif /* DAC_DDS_H */

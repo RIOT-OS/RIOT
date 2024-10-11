@@ -33,5 +33,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CST816S_INTERNAL_H */
 /** @} */
+#endif /* CST816S_INTERNAL_H */

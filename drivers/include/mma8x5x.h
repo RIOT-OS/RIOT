@@ -222,5 +222,5 @@ void mma8x5x_ack_int(const mma8x5x_t *dev);
 }
 #endif
 
-#endif /* MMA8X5X_H */
 /** @} */
+#endif /* MMA8X5X_H */

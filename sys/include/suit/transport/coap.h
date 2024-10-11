@@ -95,5 +95,5 @@ static inline void suit_coap_trigger(const uint8_t *url, size_t len)
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_COAP_H */
 /** @} */
+#endif /* SUIT_TRANSPORT_COAP_H */

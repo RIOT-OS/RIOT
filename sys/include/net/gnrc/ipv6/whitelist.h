@@ -80,5 +80,5 @@ void gnrc_ipv6_whitelist_print(void);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_WHITELIST_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_WHITELIST_H */

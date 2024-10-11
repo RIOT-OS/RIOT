@@ -153,5 +153,5 @@ void rtc_poweroff(void);
 }
 #endif
 
-#endif /* PERIPH_RTC_H */
 /** @} */
+#endif /* PERIPH_RTC_H */

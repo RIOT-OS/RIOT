@@ -200,5 +200,5 @@ void gnrc_sixlowpan_ctx_reset(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_CTX_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_CTX_H */

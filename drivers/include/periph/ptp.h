@@ -404,5 +404,5 @@ static inline void ptp_timer_set_absolute_u64(uint64_t target)
 }
 #endif
 
-#endif /* PERIPH_PTP_H */
 /** @} */
+#endif /* PERIPH_PTP_H */

@@ -83,5 +83,5 @@ typedef struct {
 }
 #endif
 
-#endif /* OPENWSN_RADIO_H */
 /** @} */
+#endif /* OPENWSN_RADIO_H */

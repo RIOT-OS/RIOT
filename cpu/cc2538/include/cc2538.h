@@ -809,5 +809,5 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 }
 #endif
 
-#endif /* CC2538_H */
 /** @} */
+#endif /* CC2538_H */

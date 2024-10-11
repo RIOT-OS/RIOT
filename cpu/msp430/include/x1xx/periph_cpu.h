@@ -388,5 +388,5 @@ msp430_usart_prescaler_t msp430_usart_prescale(uint32_t clock, uint16_t min_br);
 }
 #endif
 
-#endif /* X1XX_PERIPH_CPU_H */
 /** @} */
+#endif /* X1XX_PERIPH_CPU_H */

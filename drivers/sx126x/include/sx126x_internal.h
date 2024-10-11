@@ -126,5 +126,5 @@ static inline bool sx126x_is_stm32wl(sx126x_t *dev)
 }
 #endif
 
-#endif /* SX126X_INTERNAL_H */
 /** @} */
+#endif /* SX126X_INTERNAL_H */

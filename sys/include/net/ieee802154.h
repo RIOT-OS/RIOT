@@ -664,5 +664,5 @@ static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
 }
 #endif
 
-#endif /* NET_IEEE802154_H */
 /** @} */
+#endif /* NET_IEEE802154_H */

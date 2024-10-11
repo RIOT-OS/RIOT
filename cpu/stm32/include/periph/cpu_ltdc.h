@@ -92,5 +92,5 @@ void ltdc_fill(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, const uint16_
 }
 #endif
 
-#endif /* PERIPH_CPU_LTDC_H */
 /** @} */
+#endif /* PERIPH_CPU_LTDC_H */

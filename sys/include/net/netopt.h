@@ -1085,5 +1085,5 @@ const char *netopt2str(netopt_t opt);
 }
 #endif
 
-#endif /* NET_NETOPT_H */
 /** @} */
+#endif /* NET_NETOPT_H */

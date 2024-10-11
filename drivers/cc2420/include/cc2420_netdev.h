@@ -37,5 +37,5 @@ extern const netdev_driver_t cc2420_driver;
 }
 #endif
 
-#endif /* CC2420_NETDEV_H */
 /** @} */
+#endif /* CC2420_NETDEV_H */

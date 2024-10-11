@@ -1310,5 +1310,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PSA_CRYPTO_SE_DRIVER_H */
 /** @} */
+#endif /* PSA_CRYPTO_SE_DRIVER_H */

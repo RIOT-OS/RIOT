@@ -166,5 +166,5 @@ kernel_pid_t gnrc_sixlowpan_init(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_H */

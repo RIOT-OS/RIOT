@@ -50,5 +50,5 @@ void ztimer_periph_ptp_init(ztimer_periph_ptp_t *clock);
 }
 #endif
 
-#endif /* ZTIMER_PERIPH_PTP_H */
 /** @} */
+#endif /* ZTIMER_PERIPH_PTP_H */

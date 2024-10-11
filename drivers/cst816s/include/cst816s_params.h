@@ -94,5 +94,5 @@ static const uint8_t cst816s_screen_ids[] =
 }
 #endif
 
-#endif /* CST816S_PARAMS_H */
 /** @} */
+#endif /* CST816S_PARAMS_H */

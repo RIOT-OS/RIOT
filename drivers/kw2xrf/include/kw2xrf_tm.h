@@ -56,5 +56,5 @@ int kw2xrf_set_test_mode(kw2xrf_t *dev, uint8_t mode);
 }
 #endif
 
-#endif /* KW2XRF_TM_H */
 /** @} */
+#endif /* KW2XRF_TM_H */

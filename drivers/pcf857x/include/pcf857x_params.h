@@ -119,5 +119,5 @@ static const  pcf857x_saul_gpio_params_t pcf857x_saul_gpio_params[] =
 }
 #endif
 
-#endif /* PCF857X_PARAMS_H */
 /** @} */
+#endif /* PCF857X_PARAMS_H */

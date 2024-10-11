@@ -287,5 +287,5 @@ static inline int nimble_netif_conn_is_adv(void)
 }
 #endif
 
-#endif /* NIMBLE_NETIF_CONN_H */
 /** @} */
+#endif /* NIMBLE_NETIF_CONN_H */

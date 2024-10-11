@@ -40,5 +40,5 @@ Test *tests_libc_tests(void);
 }
 #endif
 
-#endif /* TESTS_LIBC_H */
 /** @} */
+#endif /* TESTS_LIBC_H */

@@ -301,5 +301,5 @@ int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
 }
 #endif
 
-#endif /* NET_SOCK_UTIL_H */
 /** @} */
+#endif /* NET_SOCK_UTIL_H */

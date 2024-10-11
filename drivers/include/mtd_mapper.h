@@ -109,5 +109,5 @@ extern const mtd_desc_t mtd_mapper_driver;
 }
 #endif
 
-#endif /* MTD_MAPPER_H */
 /** @} */
+#endif /* MTD_MAPPER_H */

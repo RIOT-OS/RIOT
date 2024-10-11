@@ -333,5 +333,5 @@ bool timer_poll_channel(tim_t dev, int channel);
 }
 #endif
 
-#endif /* PERIPH_TIMER_H */
 /** @} */
+#endif /* PERIPH_TIMER_H */

@@ -59,5 +59,5 @@ int gnrc_netif_nrf24l01p_ng_create(gnrc_netif_t *netif, char *stack,
 }
 #endif
 
-#endif /* GNRC_NETIF_NRF24L01P_NG_H */
 /** @} */
+#endif /* GNRC_NETIF_NRF24L01P_NG_H */

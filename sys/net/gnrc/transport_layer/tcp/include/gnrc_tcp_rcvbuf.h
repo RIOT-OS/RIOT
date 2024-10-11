@@ -52,5 +52,5 @@ void _gnrc_tcp_rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb);
 }
 #endif
 
-#endif /* GNRC_TCP_RCVBUF_H */
 /** @} */
+#endif /* GNRC_TCP_RCVBUF_H */

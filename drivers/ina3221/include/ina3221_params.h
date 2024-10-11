@@ -140,5 +140,5 @@ static const saul_reg_info_t ina3221_saul_info[] = {
 }
 #endif
 
-#endif /* INA3221_PARAMS_H */
 /** @} */
+#endif /* INA3221_PARAMS_H */

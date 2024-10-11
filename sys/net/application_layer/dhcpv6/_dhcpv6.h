@@ -353,5 +353,5 @@ void dhcpv6_client_dns_rns_conf(const dhcpv6_opt_dns_rns_t *opt,
 }
 #endif
 
-#endif /* PRIV_DHCPV6_H */
 /** @} */
+#endif /* PRIV_DHCPV6_H */

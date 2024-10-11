@@ -179,5 +179,5 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
 }
 #endif
 
-#endif /* SYS_SELECT_H */
 /** @} */
+#endif /* SYS_SELECT_H */

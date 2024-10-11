@@ -65,5 +65,5 @@ saul_reg_t si114x_saul_reg_info[] =
 }
 #endif
 
-#endif /* SI114X_PARAMS_H */
 /** @} */
+#endif /* SI114X_PARAMS_H */

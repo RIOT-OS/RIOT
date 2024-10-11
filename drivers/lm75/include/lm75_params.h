@@ -177,5 +177,5 @@ static const lm75_params_t lm75_params[] =
 }
 #endif
 
-#endif /* LM75_PARAMS_H */
 /** @} */
+#endif /* LM75_PARAMS_H */

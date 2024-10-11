@@ -196,5 +196,5 @@ static inline void netdev_ble_stop(netdev_t *dev)
 }
 #endif
 
-#endif /* NET_NETDEV_BLE_H */
 /** @} */
+#endif /* NET_NETDEV_BLE_H */

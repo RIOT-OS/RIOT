@@ -161,5 +161,5 @@ int uuid_from_string(uuid_t *uuid, const char *str);
 #ifdef __cplusplus
 }
 #endif
-#endif /* UUID_H */
 /** @} */
+#endif /* UUID_H */

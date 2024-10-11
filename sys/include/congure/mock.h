@@ -168,5 +168,5 @@ void congure_mock_snd_setup(congure_mock_snd_t *c,
 }
 #endif
 
-#endif /* CONGURE_MOCK_H */
 /** @} */
+#endif /* CONGURE_MOCK_H */

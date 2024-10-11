@@ -578,5 +578,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CC110X_CONSTANTS_H */
 /** @} */
+#endif /* CC110X_CONSTANTS_H */

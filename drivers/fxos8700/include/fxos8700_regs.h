@@ -206,5 +206,5 @@ extern "C"
 }
 #endif
 
-#endif /* FXOS8700_REGS_H */
 /** @} */
+#endif /* FXOS8700_REGS_H */

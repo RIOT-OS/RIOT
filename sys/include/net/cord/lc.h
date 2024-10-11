@@ -242,5 +242,5 @@ static inline ssize_t cord_lc_ep(cord_lc_rd_t *rd, cord_lc_ep_t *endpoint,
 }
 #endif
 
-#endif /* NET_CORD_LC_H */
 /** @} */
+#endif /* NET_CORD_LC_H */

@@ -137,5 +137,5 @@ void soft_uart_poweroff(soft_uart_t uart);
 }
 #endif
 
-#endif /* SOFT_UART_H */
 /** @} */
+#endif /* SOFT_UART_H */

@@ -91,5 +91,5 @@ static inline void congure_abe_set_mss(congure_abe_snd_t *c, unsigned mss)
 }
 #endif
 
-#endif /* CONGURE_ABE_H */
 /** @} */
+#endif /* CONGURE_ABE_H */

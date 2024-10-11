@@ -109,5 +109,5 @@ bool benchmark_udp_stop(void);
 }
 #endif
 
-#endif /* TEST_UTILS_BENCHMARK_UDP_H */
 /** @} */
+#endif /* TEST_UTILS_BENCHMARK_UDP_H */

@@ -146,5 +146,5 @@ void sx1276_rx_chain_calibration(sx127x_t *dev);
 }
 #endif
 
-#endif /* SX127X_INTERNAL_H */
 /** @} */
+#endif /* SX127X_INTERNAL_H */

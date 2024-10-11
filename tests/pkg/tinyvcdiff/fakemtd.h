@@ -72,5 +72,5 @@ typedef struct {
 }
 #endif
 
-#endif /* FAKEMTD_H */
 /** @} */
+#endif /* FAKEMTD_H */

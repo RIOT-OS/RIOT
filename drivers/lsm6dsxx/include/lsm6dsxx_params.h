@@ -95,5 +95,5 @@ static const saul_reg_info_t lsm6dsxx_saul_info[] =
 }
 #endif
 
-#endif /* LSM6DSXX_PARAMS_H */
 /** @} */
+#endif /* LSM6DSXX_PARAMS_H */

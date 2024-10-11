@@ -701,5 +701,5 @@ void rn2xx3_sys_set_sleep_duration(rn2xx3_t *dev, uint32_t sleep);
 }
 #endif
 
-#endif /* RN2XX3_H */
 /** @} */
+#endif /* RN2XX3_H */

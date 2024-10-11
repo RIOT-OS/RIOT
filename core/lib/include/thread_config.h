@@ -140,5 +140,5 @@ extern "C" {
 }
 #endif
 
-#endif /* THREAD_CONFIG_H */
 /** @} */
+#endif /* THREAD_CONFIG_H */

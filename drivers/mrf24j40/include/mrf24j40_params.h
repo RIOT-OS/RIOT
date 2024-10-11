@@ -69,5 +69,5 @@ static const mrf24j40_params_t mrf24j40_params[] =
 }
 #endif
 
-#endif /* MRF24J40_PARAMS_H */
 /** @} */
+#endif /* MRF24J40_PARAMS_H */

@@ -37,5 +37,5 @@ int tinyusb_hw_init(void);
 }
 #endif
 
-#endif /* TINYUSB_HW_H */
 /** @} */
+#endif /* TINYUSB_HW_H */

@@ -3358,5 +3358,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_VALUES_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_CRYPTO_VALUES_H */

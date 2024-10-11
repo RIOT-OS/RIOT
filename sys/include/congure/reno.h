@@ -308,5 +308,5 @@ void congure_reno_snd_report_ecn_ce(congure_snd_t *c, ztimer_now_t time);
 }
 #endif
 
-#endif /* CONGURE_RENO_H */
 /** @} */
+#endif /* CONGURE_RENO_H */

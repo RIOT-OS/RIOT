@@ -80,5 +80,5 @@ void _handle_valid_addr(const ipv6_addr_t *addr);
 }
 #endif
 
-#endif /* PRIV_NIB_SLAAC_H */
 /** @} */
+#endif /* PRIV_NIB_SLAAC_H */

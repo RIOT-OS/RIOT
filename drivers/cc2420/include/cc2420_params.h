@@ -83,5 +83,5 @@ static const cc2420_params_t cc2420_params[] =
 }
 #endif
 
-#endif /* CC2420_PARAMS_H */
 /** @} */
+#endif /* CC2420_PARAMS_H */

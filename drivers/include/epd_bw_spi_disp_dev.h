@@ -34,5 +34,5 @@ extern const disp_dev_driver_t epd_bw_spi_disp_dev_driver;
 }
 #endif
 
-#endif /* EPD_BW_SPI_DISP_DEV_H */
 /** @} */
+#endif /* EPD_BW_SPI_DISP_DEV_H */

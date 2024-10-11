@@ -47,5 +47,5 @@ int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
 }
 #endif
 
-#endif /* USB_BOARD_RESET_INTERNAL_H */
 /** @} */
+#endif /* USB_BOARD_RESET_INTERNAL_H */

@@ -148,5 +148,5 @@ extern "C"
 }
 #endif
 
-#endif /* VL6180X_REGS_H */
 /** @} */
+#endif /* VL6180X_REGS_H */

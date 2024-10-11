@@ -120,5 +120,5 @@ int jc42_get_temperature(const jc42_t* dev, int16_t* temperature);
 }
 #endif
 
-#endif /* JC42_H */
 /** @} */
+#endif /* JC42_H */

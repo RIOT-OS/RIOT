@@ -104,5 +104,5 @@ extern const mtd_desc_t _mtd_emulated_driver;
 }
 #endif
 
-#endif /* MTD_EMULATED_H */
 /** @} */
+#endif /* MTD_EMULATED_H */

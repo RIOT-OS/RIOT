@@ -68,5 +68,5 @@ extern "C" {
 }
 #endif
 
-#endif /* DS1307_INTERNAL_H */
 /** @} */
+#endif /* DS1307_INTERNAL_H */

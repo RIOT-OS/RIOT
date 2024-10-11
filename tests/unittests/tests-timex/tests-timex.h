@@ -41,5 +41,5 @@ Test *tests_timex_tests(void);
 }
 #endif
 
-#endif /* TESTS_TIMEX_H */
 /** @} */
+#endif /* TESTS_TIMEX_H */

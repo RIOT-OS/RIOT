@@ -69,5 +69,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* PARAMETER_H */
 /** @} */
+#endif /* PARAMETER_H */

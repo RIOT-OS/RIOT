@@ -201,5 +201,5 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state);
 }
 #endif
 
-#endif /* KW2XRF_GETSET_H */
 /** @} */
+#endif /* KW2XRF_GETSET_H */

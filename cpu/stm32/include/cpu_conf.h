@@ -259,5 +259,5 @@ typedef uint16_t stm32_flashpage_block_t;
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */
+#endif /* CPU_CONF_H */

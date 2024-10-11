@@ -54,5 +54,5 @@ static const dcf77_params_t dcf77_params[] =
 }
 #endif
 
-#endif /* DCF77_PARAMS_H */
 /** @} */
+#endif /* DCF77_PARAMS_H */

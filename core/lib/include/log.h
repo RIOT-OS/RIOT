@@ -110,5 +110,5 @@ enum {
 }
 #endif
 
-#endif /* LOG_H */
 /** @} */
+#endif /* LOG_H */

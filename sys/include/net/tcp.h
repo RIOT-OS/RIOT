@@ -87,5 +87,5 @@ void tcp_hdr_print(tcp_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_TCP_H */
 /** @} */
+#endif /* NET_TCP_H */

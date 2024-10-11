@@ -68,5 +68,5 @@ Test* tests_crypto_modes_ctr_tests(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H */
 /** @} */
+#endif /* TESTS_CRYPTO_H */

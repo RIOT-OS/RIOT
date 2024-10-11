@@ -390,5 +390,5 @@ int _gnrc_lwmac_dispatch_defer(gnrc_pktsnip_t * buffer[], gnrc_pktsnip_t * pkt);
 }
 #endif
 
-#endif /* LWMAC_INTERNAL_H */
 /** @} */
+#endif /* LWMAC_INTERNAL_H */

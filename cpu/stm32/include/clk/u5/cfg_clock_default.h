@@ -130,5 +130,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_U5_CFG_CLOCK_DEFAULT_H */
 /** @} */
+#endif /* CLK_U5_CFG_CLOCK_DEFAULT_H */

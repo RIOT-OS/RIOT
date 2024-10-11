@@ -44,5 +44,5 @@ void gnrc_netdev_nrfmin_init(void);
 }
 #endif
 
-#endif /* NRFMIN_GNRC_H */
 /** @} */
+#endif /* NRFMIN_GNRC_H */

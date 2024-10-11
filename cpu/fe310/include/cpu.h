@@ -27,5 +27,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */
+#endif /* CPU_H */

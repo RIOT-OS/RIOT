@@ -245,5 +245,5 @@ touch_dev_gesture_t touch_dev_recognize_gesture(touch_dev_gesture_ctx_t *ctx,
 }
 #endif
 
-#endif /* TOUCH_DEV_GESTURES_H */
 /** @} */
+#endif /* TOUCH_DEV_GESTURES_H */

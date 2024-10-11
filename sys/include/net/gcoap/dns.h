@@ -215,5 +215,5 @@ ssize_t gcoap_dns_server_proxy_get(char *proxy, size_t proxy_len);
 }
 #endif
 
-#endif /* NET_GCOAP_DNS_H */
 /** @} */
+#endif /* NET_GCOAP_DNS_H */

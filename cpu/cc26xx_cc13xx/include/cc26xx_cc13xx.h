@@ -177,5 +177,5 @@ typedef enum IRQn {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_H */
 /** @} */
+#endif /* CC26XX_CC13XX_H */

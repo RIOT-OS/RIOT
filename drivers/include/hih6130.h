@@ -66,5 +66,5 @@ int hih6130_get_humidity_temperature(const hih6130_t *dev,
 }
 #endif
 
-#endif /* HIH6130_H */
 /** @} */
+#endif /* HIH6130_H */

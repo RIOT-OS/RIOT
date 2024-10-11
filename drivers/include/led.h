@@ -208,5 +208,5 @@ static inline void led_toggle(unsigned id)
 }
 #endif
 
-#endif /* LED_H */
 /** @} */
+#endif /* LED_H */

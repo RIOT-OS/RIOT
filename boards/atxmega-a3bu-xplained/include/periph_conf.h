@@ -153,5 +153,5 @@ static const spi_conf_t spi_config[] = {
 
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

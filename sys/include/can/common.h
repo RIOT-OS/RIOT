@@ -158,5 +158,5 @@ typedef struct can_reg_entry {
 }
 #endif
 
-#endif /* CAN_COMMON_H */
 /** @} */
+#endif /* CAN_COMMON_H */

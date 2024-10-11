@@ -245,5 +245,5 @@ void adxl345_set_fifo_mode(const adxl345_t *dev, uint8_t mode,
 }
 #endif
 
-#endif /* ADXL345_H */
 /** @} */
+#endif /* ADXL345_H */

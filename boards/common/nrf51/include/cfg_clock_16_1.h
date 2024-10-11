@@ -46,5 +46,5 @@
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_CLOCK_16_1_H */
 /** @} */
+#endif /* CFG_CLOCK_16_1_H */

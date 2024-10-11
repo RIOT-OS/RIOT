@@ -48,5 +48,5 @@ typedef enum {
 }
 #endif
 
-#endif /* NET_AF_H */
 /** @} */
+#endif /* NET_AF_H */

@@ -105,5 +105,5 @@ static const  mcp47xx_saul_dac_params_t mcp47xx_saul_dac_params[] =
 }
 #endif
 
-#endif /* MCP47XX_PARAMS_H */
 /** @} */
+#endif /* MCP47XX_PARAMS_H */

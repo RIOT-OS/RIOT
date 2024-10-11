@@ -168,5 +168,5 @@ typedef enum {
 }
 #endif
 
-#endif /* PSA_CRYPTO_OPERATION_ENCODER_H */
 /** @} */
+#endif /* PSA_CRYPTO_OPERATION_ENCODER_H */

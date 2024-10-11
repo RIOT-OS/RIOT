@@ -242,5 +242,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_MAC_TYPES_H */
 /** @} */
+#endif /* NET_GNRC_MAC_TYPES_H */

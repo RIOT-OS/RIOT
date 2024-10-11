@@ -427,5 +427,5 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_H */

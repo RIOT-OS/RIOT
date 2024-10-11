@@ -52,6 +52,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ST7735_H */
 /** @} */
+#endif /* ST7735_H */
 #endif /* !DOXYGEN */

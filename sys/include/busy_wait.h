@@ -85,5 +85,5 @@ static inline void busy_wait_us(unsigned usec)
 }
 #endif
 
-#endif /* BUSY_WAIT_H */
 /** @} */
+#endif /* BUSY_WAIT_H */

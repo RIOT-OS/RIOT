@@ -308,5 +308,5 @@ int mpu9x50_set_compass_sample_rate(mpu9x50_t *dev, uint8_t rate);
 }
 #endif
 
-#endif /* MPU9X50_H */
 /** @} */
+#endif /* MPU9X50_H */

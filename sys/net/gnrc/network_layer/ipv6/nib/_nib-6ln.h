@@ -154,5 +154,5 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 }
 #endif
 
-#endif /* PRIV_NIB_6LN_H */
 /** @} */
+#endif /* PRIV_NIB_6LN_H */

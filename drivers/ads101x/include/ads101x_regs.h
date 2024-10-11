@@ -104,5 +104,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ADS101X_REGS_H */
 /** @} */
+#endif /* ADS101X_REGS_H */

@@ -109,5 +109,5 @@ static const sx1280_params_t sx1280_params[] =
 }
 #endif
 
-#endif /* SX1280_PARAMS_H */
 /** @} */
+#endif /* SX1280_PARAMS_H */

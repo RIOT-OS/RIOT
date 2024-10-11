@@ -117,5 +117,5 @@ extern mtd_dev_t *mtd_aux;
 }
 #endif
 
-#endif /* MTD_FLASHPAGE_H */
 /** @} */
+#endif /* MTD_FLASHPAGE_H */

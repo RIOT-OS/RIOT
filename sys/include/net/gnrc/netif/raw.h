@@ -47,5 +47,5 @@ int gnrc_netif_raw_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_RAW_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_RAW_H */

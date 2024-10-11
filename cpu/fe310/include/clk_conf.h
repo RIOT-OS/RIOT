@@ -131,5 +131,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CONF_H */
 /** @} */
+#endif /* CLK_CONF_H */

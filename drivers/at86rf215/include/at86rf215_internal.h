@@ -686,5 +686,5 @@ static inline bool is_subGHz(const at86rf215_t *dev)
 }
 #endif
 
-#endif /* AT86RF215_INTERNAL_H */
 /** @} */
+#endif /* AT86RF215_INTERNAL_H */

@@ -124,5 +124,5 @@ psa_status_t cryptocell_310_common_ecc_verify(const uint8_t *pub_key,
 }
 #endif
 
-#endif /* PSA_CRYPTOCELL_310_ECC_COMMON_H */
 /** @} */
+#endif /* PSA_CRYPTOCELL_310_ECC_COMMON_H */

@@ -117,5 +117,5 @@ typedef struct {
 }
 #endif
 
-#endif /* MSP430_REGS_COMMON_H */
 /** @} */
+#endif /* MSP430_REGS_COMMON_H */

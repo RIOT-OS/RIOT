@@ -68,5 +68,5 @@ Test *tests_gnrc_ipv6_nib_pl_tests(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_IPV6_NIB_H */
 /** @} */
+#endif /* TESTS_GNRC_IPV6_NIB_H */

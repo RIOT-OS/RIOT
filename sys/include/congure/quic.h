@@ -229,5 +229,5 @@ void congure_quic_snd_setup(congure_quic_snd_t *c,
 }
 #endif
 
-#endif /* CONGURE_QUIC_H */
 /** @} */
+#endif /* CONGURE_QUIC_H */

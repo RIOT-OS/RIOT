@@ -242,5 +242,5 @@ int lm75_low_power_mode(lm75_t *dev, uint16_t interval);
 }
 #endif
 
-#endif /* LM75_H */
 /** @} */
+#endif /* LM75_H */

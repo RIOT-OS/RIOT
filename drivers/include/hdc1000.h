@@ -187,5 +187,5 @@ int hdc1000_read_cached(const hdc1000_t *dev, int16_t *temp, int16_t *hum);
 }
 #endif
 
-#endif /* HDC1000_H */
 /** @} */
+#endif /* HDC1000_H */

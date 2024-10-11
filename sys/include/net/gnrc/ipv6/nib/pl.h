@@ -178,5 +178,5 @@ void gnrc_ipv6_nib_pl_print(gnrc_ipv6_nib_pl_t *ple);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_PL_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_PL_H */

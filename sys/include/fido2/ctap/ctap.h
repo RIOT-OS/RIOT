@@ -691,5 +691,5 @@ ctap_state_t *fido2_ctap_get_state(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_H */
 /** @} */
+#endif /* FIDO2_CTAP_CTAP_H */

@@ -226,5 +226,5 @@ void gpio_init_analog(gpio_t pin);
 }
 #endif
 
-#endif /* PERIPH_CPU_GPIO_H */
 /** @} */
+#endif /* PERIPH_CPU_GPIO_H */

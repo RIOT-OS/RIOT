@@ -214,5 +214,5 @@ int isl29125_read_irq_status(const isl29125_t *dev);
 }
 #endif
 
-#endif /* ISL29125_H */
 /** @} */
+#endif /* ISL29125_H */

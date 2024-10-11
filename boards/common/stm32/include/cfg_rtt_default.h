@@ -46,5 +46,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_RTT_DEFAULT_H */
 /** @} */
+#endif /* CFG_RTT_DEFAULT_H */

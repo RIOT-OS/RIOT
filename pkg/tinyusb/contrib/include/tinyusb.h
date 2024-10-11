@@ -63,5 +63,5 @@ int tinyusb_setup(void);
 }
 #endif
 
-#endif /* TINYUSB_H */
 /** @} */
+#endif /* TINYUSB_H */

@@ -105,5 +105,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_CONTEXTS_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_CRYPTO_CONTEXTS_H */

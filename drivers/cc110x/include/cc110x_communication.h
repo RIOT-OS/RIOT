@@ -208,5 +208,5 @@ int cc110x_power_on_and_acquire(cc110x_t *dev);
 }
 #endif
 
-#endif /* CC110X_COMMUNICATION_H */
 /** @} */
+#endif /* CC110X_COMMUNICATION_H */

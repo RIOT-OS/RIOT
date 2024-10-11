@@ -386,5 +386,5 @@ typedef gpio_t adc_conf_t;
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

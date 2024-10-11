@@ -1618,5 +1618,5 @@ static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
 }
 #endif
 
-#endif /* NET_IEEE802154_RADIO_H */
 /** @} */
+#endif /* NET_IEEE802154_RADIO_H */

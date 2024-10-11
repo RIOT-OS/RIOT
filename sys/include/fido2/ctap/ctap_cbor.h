@@ -334,5 +334,5 @@ void fido2_ctap_cbor_init_encoder(uint8_t *buf, size_t len);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_CBOR_H */
 /** @} */
+#endif /* FIDO2_CTAP_CTAP_CBOR_H */

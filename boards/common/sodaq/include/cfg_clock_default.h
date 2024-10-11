@@ -79,5 +79,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_CLOCK_DEFAULT_H */
 /** @} */
+#endif /* CFG_CLOCK_DEFAULT_H */

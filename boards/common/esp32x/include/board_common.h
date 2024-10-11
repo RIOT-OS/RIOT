@@ -139,5 +139,5 @@ void print_board_config(void);
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */
+#endif /* BOARD_COMMON_H */

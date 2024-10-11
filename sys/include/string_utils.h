@@ -107,5 +107,5 @@ const void *memchk(const void *data, uint8_t c, size_t len);
 }
 #endif
 
-#endif /* STRING_UTILS_H */
 /** @} */
+#endif /* STRING_UTILS_H */

@@ -306,5 +306,5 @@ static inline uint8_t gnrc_nettype_to_protnum(gnrc_nettype_t type)
 }
 #endif
 
-#endif /* NET_GNRC_NETTYPE_H */
 /** @} */
+#endif /* NET_GNRC_NETTYPE_H */

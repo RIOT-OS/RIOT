@@ -109,5 +109,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* LWM2M_CLIENT_CONFIG_H */
 /** @} */
+#endif /* LWM2M_CLIENT_CONFIG_H */

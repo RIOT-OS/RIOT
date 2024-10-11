@@ -120,5 +120,5 @@ void nimble_scanlist_print_entry(nimble_scanlist_entry_t *e);
 }
 #endif
 
-#endif /* NIMBLE_SCANLIST_H */
 /** @} */
+#endif /* NIMBLE_SCANLIST_H */

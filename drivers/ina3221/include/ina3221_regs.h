@@ -54,5 +54,5 @@ typedef enum ina3221_reg {
 }
 #endif
 
-#endif /* INA3221_REGS_H */
 /** @} */
+#endif /* INA3221_REGS_H */

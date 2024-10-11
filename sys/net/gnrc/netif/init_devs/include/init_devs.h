@@ -72,5 +72,5 @@ extern "C" {
 }
 #endif
 
-#endif /* INIT_DEVS_H */
 /** @} */
+#endif /* INIT_DEVS_H */

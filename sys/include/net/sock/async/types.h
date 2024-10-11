@@ -176,5 +176,5 @@ typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t flags,
 }
 #endif
 
-#endif /* NET_SOCK_ASYNC_TYPES_H */
 /** @} */
+#endif /* NET_SOCK_ASYNC_TYPES_H */

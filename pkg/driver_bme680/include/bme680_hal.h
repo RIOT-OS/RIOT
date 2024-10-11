@@ -45,5 +45,5 @@ int8_t bme680_spi_write_hal(uint8_t dev_id, uint8_t reg_addr,
 }
 #endif
 
-#endif /* BME680_HAL_H */
 /** @} */
+#endif /* BME680_HAL_H */

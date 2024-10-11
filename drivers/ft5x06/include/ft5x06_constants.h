@@ -138,5 +138,5 @@ extern "C" {
 }
 #endif
 
-#endif /* FT5X06_CONSTANTS_H */
 /** @} */
+#endif /* FT5X06_CONSTANTS_H */

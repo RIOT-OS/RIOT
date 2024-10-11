@@ -336,5 +336,5 @@ int nimble_netif_used_chanmap(int handle, uint8_t map[5]);
 }
 #endif
 
-#endif /* NIMBLE_NETIF_H */
 /** @} */
+#endif /* NIMBLE_NETIF_H */

@@ -94,5 +94,5 @@ struct sock_dtls_session {
 }
 #endif
 
-#endif /* SOCK_DTLS_TYPES_H */
 /** @} */
+#endif /* SOCK_DTLS_TYPES_H */

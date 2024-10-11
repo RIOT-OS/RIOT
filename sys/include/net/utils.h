@@ -62,5 +62,5 @@ int netutils_get_ipv6(ipv6_addr_t *addr, netif_t **netif, const char *hostname);
 }
 #endif
 
-#endif /* NET_UTILS_H */
 /** @} */
+#endif /* NET_UTILS_H */

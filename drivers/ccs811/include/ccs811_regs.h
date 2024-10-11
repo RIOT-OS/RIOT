@@ -77,5 +77,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CCS811_REGS_H */
 /** @} */
+#endif /* CCS811_REGS_H */

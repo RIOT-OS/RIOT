@@ -59,5 +59,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_EDDYSTONE_H */
 /** @} */
+#endif /* NET_EDDYSTONE_H */

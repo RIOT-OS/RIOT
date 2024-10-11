@@ -242,5 +242,5 @@ static inline int cib_put_unsafe(cib_t *cib)
 }
 #endif
 
-#endif /* CIB_H */
 /** @} */
+#endif /* CIB_H */

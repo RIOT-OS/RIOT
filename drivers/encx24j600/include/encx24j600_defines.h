@@ -203,5 +203,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ENCX24J600_DEFINES_H */
 /** @} */
+#endif /* ENCX24J600_DEFINES_H */

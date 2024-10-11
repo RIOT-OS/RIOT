@@ -50,5 +50,5 @@ static inline void atomic_store_u8(volatile uint8_t *dest, uint8_t val)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */
+#endif /* ATOMIC_UTILS_ARCH_H */

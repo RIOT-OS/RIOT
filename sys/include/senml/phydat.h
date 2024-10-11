@@ -94,5 +94,5 @@ void phydat_to_senml_decimal(senml_value_t *senml, const phydat_t *phydat, const
 }
 #endif
 
-#endif /* SENML_PHYDAT_H */
 /** @} */
+#endif /* SENML_PHYDAT_H */

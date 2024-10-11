@@ -141,5 +141,5 @@ extern "C" {
 
 #endif
 
-#endif /* STDIO_H */
 /** @} */
+#endif /* STDIO_H */

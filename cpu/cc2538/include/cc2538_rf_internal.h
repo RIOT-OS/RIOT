@@ -100,5 +100,5 @@ bool RFCORE_ASSERT_failure(const char *expr, const char *func, int line);
 }
 #endif
 
-#endif /* CC2538_RF_INTERNAL_H */
 /** @} */
+#endif /* CC2538_RF_INTERNAL_H */

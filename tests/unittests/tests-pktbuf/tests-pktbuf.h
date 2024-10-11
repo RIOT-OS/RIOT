@@ -33,5 +33,5 @@ void tests_pktbuf(void);
 }
 #endif
 
-#endif /* TESTS_PKTBUF_H */
 /** @} */
+#endif /* TESTS_PKTBUF_H */

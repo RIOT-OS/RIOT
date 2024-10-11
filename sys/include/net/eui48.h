@@ -160,5 +160,5 @@ static inline void eui48_from_ipv6_iid(eui48_t *addr, const eui64_t *iid)
 }
 #endif
 
-#endif /* NET_EUI48_H */
 /** @} */
+#endif /* NET_EUI48_H */

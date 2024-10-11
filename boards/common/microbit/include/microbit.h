@@ -87,5 +87,5 @@ void microbit_matrix_shift_str(const char *str, uint32_t delay);
 }
 #endif
 
-#endif /* MICROBIT_H */
 /** @} */
+#endif /* MICROBIT_H */

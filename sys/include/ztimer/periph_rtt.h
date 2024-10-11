@@ -49,5 +49,5 @@ void ztimer_periph_rtt_init(ztimer_periph_rtt_t *clock);
 }
 #endif
 
-#endif /* ZTIMER_PERIPH_RTT_H */
 /** @} */
+#endif /* ZTIMER_PERIPH_RTT_H */

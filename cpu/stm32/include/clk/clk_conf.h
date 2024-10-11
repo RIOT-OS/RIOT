@@ -50,5 +50,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CLK_CONF_H */
 /** @} */
+#endif /* CLK_CLK_CONF_H */

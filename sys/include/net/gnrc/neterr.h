@@ -88,5 +88,5 @@ static inline int gnrc_neterr_reg(gnrc_pktsnip_t *pkt)
 }
 #endif
 
-#endif /* NET_GNRC_NETERR_H */
 /** @} */
+#endif /* NET_GNRC_NETERR_H */

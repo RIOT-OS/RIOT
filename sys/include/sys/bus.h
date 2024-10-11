@@ -73,5 +73,5 @@ static inline msg_bus_t *sys_bus_get(sys_bus_t bus)
 }
 #endif
 
-#endif /* SYS_BUS_H */
 /** @} */
+#endif /* SYS_BUS_H */

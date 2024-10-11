@@ -275,5 +275,5 @@ enum {
 } /* extern "C" */
 #endif
 
-#endif /* CC2538_RFCORE_H */
 /** @} */
+#endif /* CC2538_RFCORE_H */

@@ -117,5 +117,5 @@ static const uint8_t stmpe811_screen_ids[] =
 }
 #endif
 
-#endif /* STMPE811_PARAMS_H */
 /** @} */
+#endif /* STMPE811_PARAMS_H */

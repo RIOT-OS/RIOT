@@ -205,5 +205,5 @@ static inline int bluetil_ad_init_with_flags(bluetil_ad_t *ad,
 }
 #endif
 
-#endif /* NET_BLUETIL_AD_H */
 /** @} */
+#endif /* NET_BLUETIL_AD_H */

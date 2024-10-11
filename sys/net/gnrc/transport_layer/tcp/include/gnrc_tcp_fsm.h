@@ -101,5 +101,5 @@ _gnrc_tcp_fsm_state_t _gnrc_tcp_fsm_get_state(gnrc_tcp_tcb_t *tcb);
 }
 #endif
 
-#endif /* GNRC_TCP_FSM_H */
 /** @} */
+#endif /* GNRC_TCP_FSM_H */

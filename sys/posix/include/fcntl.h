@@ -73,5 +73,5 @@ int  posix_fallocate(int, off_t, off_t);
 
 #endif /* DOXYGEN */
 
-#endif /* FCNTL_H */
 /** @} */
+#endif /* FCNTL_H */

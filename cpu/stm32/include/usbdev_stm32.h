@@ -128,5 +128,5 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* USBDEV_STM32_H */
 /** @} */
+#endif /* USBDEV_STM32_H */

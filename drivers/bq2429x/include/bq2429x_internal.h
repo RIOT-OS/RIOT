@@ -104,5 +104,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BQ2429X_INTERNAL_H */
 /** @} */
+#endif /* BQ2429X_INTERNAL_H */

@@ -130,5 +130,5 @@ void spidev_linux_teardown(void);
 #endif
 #endif /* defined(__linux__) || defined(DOXYGEN) */
 
-#endif /* SPIDEV_LINUX_H */
 /** @} */
+#endif /* SPIDEV_LINUX_H */

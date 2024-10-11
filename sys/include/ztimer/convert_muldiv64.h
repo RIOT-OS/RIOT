@@ -81,5 +81,5 @@ void ztimer_convert_muldiv64_init(
 }
 #endif
 
-#endif /* ZTIMER_CONVERT_MULDIV64_H */
 /** @} */
+#endif /* ZTIMER_CONVERT_MULDIV64_H */

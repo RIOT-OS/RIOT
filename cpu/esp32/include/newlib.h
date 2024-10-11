@@ -43,5 +43,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* NEWLIB_H */
 /** @} */
+#endif /* NEWLIB_H */

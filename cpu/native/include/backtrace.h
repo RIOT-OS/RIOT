@@ -57,5 +57,5 @@ int backtrace_len(void);
 }
 #endif
 
-#endif /* BACKTRACE_H */
 /** @} */
+#endif /* BACKTRACE_H */

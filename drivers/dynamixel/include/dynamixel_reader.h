@@ -145,5 +145,5 @@ static inline size_t dynamixel_reader_status_get_payload_size(const dynamixel_re
 }
 #endif
 
-#endif /* DYNAMIXEL_READER_H */
 /** @} */
+#endif /* DYNAMIXEL_READER_H */

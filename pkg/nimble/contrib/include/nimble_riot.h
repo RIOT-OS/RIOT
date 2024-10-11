@@ -106,5 +106,5 @@ int nimble_riot_get_phy_hci(uint8_t mode);
 }
 #endif
 
-#endif /* NIMBLE_RIOT_H */
 /** @} */
+#endif /* NIMBLE_RIOT_H */

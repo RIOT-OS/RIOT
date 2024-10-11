@@ -84,5 +84,5 @@ static inline void evtimer_init_msg(evtimer_t *evtimer)
 }
 #endif
 
-#endif /* EVTIMER_MSG_H */
 /** @} */
+#endif /* EVTIMER_MSG_H */

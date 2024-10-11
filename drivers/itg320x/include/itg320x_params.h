@@ -102,5 +102,5 @@ static const saul_reg_info_t itg320x_saul_info[] =
 }
 #endif
 
-#endif /* ITG320X_PARAMS_H */
 /** @} */
+#endif /* ITG320X_PARAMS_H */

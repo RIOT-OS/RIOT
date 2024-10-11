@@ -60,5 +60,5 @@ void init_schedstatistics(void);
 }
 #endif
 
-#endif /* SCHEDSTATISTICS_H */
 /** @} */
+#endif /* SCHEDSTATISTICS_H */

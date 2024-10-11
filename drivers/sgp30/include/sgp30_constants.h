@@ -54,5 +54,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SGP30_CONSTANTS_H */
 /** @} */
+#endif /* SGP30_CONSTANTS_H */

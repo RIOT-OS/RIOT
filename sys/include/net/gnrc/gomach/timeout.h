@@ -96,5 +96,5 @@ static inline void gnrc_gomach_timeout_make_expire(gnrc_gomach_timeout_t *timeou
 }
 #endif
 
-#endif /* NET_GNRC_GOMACH_TIMEOUT_H */
 /** @} */
+#endif /* NET_GNRC_GOMACH_TIMEOUT_H */

@@ -141,5 +141,5 @@ extern "C" {
 }
 #endif
 
-#endif /* DEBUG_H */
 /** @} */
+#endif /* DEBUG_H */

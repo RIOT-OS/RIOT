@@ -179,5 +179,5 @@ static const i2c_timing_param_t timing_params[] = {
 }
 #endif
 
-#endif /* PERIPH_CPU_I2C_H */
 /** @} */
+#endif /* PERIPH_CPU_I2C_H */

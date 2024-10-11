@@ -62,5 +62,5 @@ void _gnrc_tcp_eventloop_unsched(evtimer_msg_event_t *event);
 }
 #endif
 
-#endif /* GNRC_TCP_EVENTLOOP_H */
 /** @} */
+#endif /* GNRC_TCP_EVENTLOOP_H */

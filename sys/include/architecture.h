@@ -229,5 +229,5 @@ typedef uintptr_t   uinttxtptr_t;
 }
 #endif
 
-#endif /* ARCHITECTURE_H */
 /** @} */
+#endif /* ARCHITECTURE_H */

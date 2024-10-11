@@ -69,5 +69,5 @@ psa_status_t cryptocell_310_common_aes_encrypt_decrypt(SaSiAesUserContext_t *ctx
 }
 #endif
 
-#endif /* PSA_CRYPTOCELL_310_AES_COMMON_H */
 /** @} */
+#endif /* PSA_CRYPTOCELL_310_AES_COMMON_H */

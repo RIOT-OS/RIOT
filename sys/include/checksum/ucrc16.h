@@ -78,5 +78,5 @@ uint16_t ucrc16_calc_le(const uint8_t *buf, size_t len, uint16_t poly,
 }
 #endif
 
-#endif /* CHECKSUM_UCRC16_H */
 /** @} */
+#endif /* CHECKSUM_UCRC16_H */

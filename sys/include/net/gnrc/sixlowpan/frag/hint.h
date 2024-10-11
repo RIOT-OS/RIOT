@@ -55,5 +55,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_HINT_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_HINT_H */

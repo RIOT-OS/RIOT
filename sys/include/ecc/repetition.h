@@ -73,5 +73,5 @@ void repetition_decode(unsigned int _dec_msg_len,
 }
 #endif
 
-#endif /* ECC_REPETITION_H */
 /** @} */
+#endif /* ECC_REPETITION_H */

@@ -167,5 +167,5 @@ void candev_samd5x_exit_sleep_mode(candev_t *candev);
 }
 #endif
 
-#endif /* CANDEV_SAMD5X_H */
 /** @} */
+#endif /* CANDEV_SAMD5X_H */

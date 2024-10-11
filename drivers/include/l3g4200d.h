@@ -158,5 +158,5 @@ int l3g4200d_disable(const l3g4200d_t *dev);
 }
 #endif
 
-#endif /* L3G4200D_H */
 /** @} */
+#endif /* L3G4200D_H */

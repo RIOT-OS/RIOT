@@ -143,5 +143,5 @@ int sock_dodtls_set_server(const sock_udp_ep_t *server,
 }
 #endif
 
-#endif /* NET_SOCK_DODTLS_H */
 /** @} */
+#endif /* NET_SOCK_DODTLS_H */

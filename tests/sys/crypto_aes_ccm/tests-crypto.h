@@ -46,5 +46,5 @@ Test *tests_crypto_modes_ccm_tests_256(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H */
 /** @} */
+#endif /* TESTS_CRYPTO_H */

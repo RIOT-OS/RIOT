@@ -89,5 +89,5 @@ typedef keccak_state_t psa_hashes_sha3_ctx_t;
 }
 #endif
 
-#endif /* HASHES_PSA_RIOT_HASHES_H */
 /** @} */
+#endif /* HASHES_PSA_RIOT_HASHES_H */

@@ -69,5 +69,5 @@ event_queue_t *uwb_core_get_eventq(void);
 }
 #endif
 
-#endif /* UWB_CORE_H */
 /** @} */
+#endif /* UWB_CORE_H */

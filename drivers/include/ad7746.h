@@ -331,5 +331,5 @@ int ad7746_set_cap_sr(const ad7746_t *dev, ad7746_cap_sample_rate_t sr);
 }
 #endif
 
-#endif /* AD7746_H */
 /** @} */
+#endif /* AD7746_H */

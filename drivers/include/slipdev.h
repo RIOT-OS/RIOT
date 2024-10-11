@@ -148,5 +148,5 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 }
 #endif
 
-#endif /* SLIPDEV_H */
 /** @} */
+#endif /* SLIPDEV_H */

@@ -88,5 +88,5 @@ uint16_t veml6070_read_uv(const veml6070_t *dev);
 }
 #endif
 
-#endif /* VEML6070_H */
 /** @} */
+#endif /* VEML6070_H */

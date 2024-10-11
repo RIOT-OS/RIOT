@@ -212,5 +212,5 @@ typedef int32_t psa_status_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_ERROR_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_ERROR_H */

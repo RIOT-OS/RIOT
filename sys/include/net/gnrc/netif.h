@@ -773,5 +773,5 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_H */

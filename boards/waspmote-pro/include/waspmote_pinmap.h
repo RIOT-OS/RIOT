@@ -90,5 +90,5 @@ extern "C" {
 }
 #endif
 
-#endif /* WASPMOTE_PINMAP_H */
 /** @} */
+#endif /* WASPMOTE_PINMAP_H */

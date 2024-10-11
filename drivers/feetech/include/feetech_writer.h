@@ -181,5 +181,5 @@ void feetech_writer_sync_write_add_16bits(feetech_writer_t *writer, uint8_t id, 
 }
 #endif
 
-#endif /* FEETECH_WRITER_H */
 /** @} */
+#endif /* FEETECH_WRITER_H */

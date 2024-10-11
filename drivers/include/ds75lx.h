@@ -110,5 +110,5 @@ int ds75lx_shutdown(const ds75lx_t *dev);
 }
 #endif
 
-#endif /* DS75LX_H */
 /** @} */
+#endif /* DS75LX_H */

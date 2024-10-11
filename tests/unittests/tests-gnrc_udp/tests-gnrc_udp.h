@@ -33,5 +33,5 @@ void tests_gnrc_udp(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_UDP_H */
 /** @} */
+#endif /* TESTS_GNRC_UDP_H */

@@ -49,5 +49,5 @@ void pic_write(uint8_t addr, uint8_t value);
 }
 #endif
 
-#endif /* PIC_H */
 /** @} */
+#endif /* PIC_H */

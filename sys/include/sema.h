@@ -253,5 +253,5 @@ int sema_post(sema_t *sema);
 }
 #endif
 
-#endif /* SEMA_H */
 /** @} */
+#endif /* SEMA_H */

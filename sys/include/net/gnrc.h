@@ -306,5 +306,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_H */
 /** @} */
+#endif /* NET_GNRC_H */

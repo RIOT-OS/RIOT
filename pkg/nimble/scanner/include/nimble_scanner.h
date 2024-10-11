@@ -170,5 +170,5 @@ void nimble_scanner_set_scan_duration(int32_t duration_ms);
 }
 #endif
 
-#endif /* NIMBLE_SCANNER_H */
 /** @} */
+#endif /* NIMBLE_SCANNER_H */

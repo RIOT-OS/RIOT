@@ -52,5 +52,5 @@ typedef struct {
 }
 #endif
 
-#endif /* VCDIFF_VFS_H */
 /** @} */
+#endif /* VCDIFF_VFS_H */

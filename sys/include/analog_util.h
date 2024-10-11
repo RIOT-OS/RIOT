@@ -90,5 +90,5 @@ uint16_t dac_util_mapf(float value, float min, float max);
 }
 #endif
 
-#endif /* ANALOG_UTIL_H */
 /** @} */
+#endif /* ANALOG_UTIL_H */

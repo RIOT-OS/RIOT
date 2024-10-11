@@ -50,5 +50,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */
+#endif /* ARDUINO_IOMAP_H */

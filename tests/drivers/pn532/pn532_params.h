@@ -45,5 +45,5 @@ static const pn532_params_t pn532_conf[] = {
 }
 #endif
 
-#endif /* PN532_PARAMS_H */
 /** @} */
+#endif /* PN532_PARAMS_H */

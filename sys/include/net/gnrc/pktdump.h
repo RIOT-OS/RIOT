@@ -88,5 +88,5 @@ kernel_pid_t gnrc_pktdump_init(void);
 }
 #endif
 
-#endif /* NET_GNRC_PKTDUMP_H */
 /** @} */
+#endif /* NET_GNRC_PKTDUMP_H */

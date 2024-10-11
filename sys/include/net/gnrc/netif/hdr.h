@@ -444,5 +444,5 @@ int gnrc_netif_hdr_get_srcaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr);
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_HDR_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_HDR_H */

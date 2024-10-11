@@ -71,5 +71,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SX1280_CONSTANTS_H */
 /** @} */
+#endif /* SX1280_CONSTANTS_H */

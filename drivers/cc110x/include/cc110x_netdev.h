@@ -44,5 +44,5 @@ void cc110x_on_gdo(void *dev);
 }
 #endif
 
-#endif /* CC110X_NETDEV_H */
 /** @} */
+#endif /* CC110X_NETDEV_H */

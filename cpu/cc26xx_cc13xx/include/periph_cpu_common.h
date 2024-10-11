@@ -166,5 +166,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */
+#endif /* PERIPH_CPU_COMMON_H */

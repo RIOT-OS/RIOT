@@ -144,5 +144,5 @@ int vfs_unlink_recursive(const char *root, char *path_buf, size_t max_size);
 }
 #endif
 
-#endif /* VFS_UTIL_H */
 /** @} */
+#endif /* VFS_UTIL_H */

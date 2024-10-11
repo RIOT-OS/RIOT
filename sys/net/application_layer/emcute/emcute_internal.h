@@ -70,5 +70,5 @@ enum {
 }
 #endif
 
-#endif /* EMCUTE_INTERNAL_H */
 /** @} */
+#endif /* EMCUTE_INTERNAL_H */

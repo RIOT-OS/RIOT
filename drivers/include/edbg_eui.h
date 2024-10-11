@@ -43,5 +43,5 @@ int edbg_get_eui64(eui64_t *addr);
 }
 #endif
 
-#endif /* EDBG_EUI_H */
 /** @} */
+#endif /* EDBG_EUI_H */

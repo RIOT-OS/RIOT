@@ -40,5 +40,5 @@ Test *tests_bcd_tests(void);
 }
 #endif
 
-#endif /* TESTS_BCD_H */
 /** @} */
+#endif /* TESTS_BCD_H */

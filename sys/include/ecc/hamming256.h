@@ -64,5 +64,5 @@ uint8_t hamming_verify256x( uint8_t *data, uint32_t size, const uint8_t *code );
 }
 #endif
 
-#endif /* ECC_HAMMING256_H */
 /** @} */
+#endif /* ECC_HAMMING256_H */

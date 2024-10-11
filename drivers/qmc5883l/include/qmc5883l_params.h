@@ -80,5 +80,5 @@ static const saul_reg_info_t qmc5883l_saul_info[] =
 }
 #endif
 
-#endif /* QMC5883L_PARAMS_H */
 /** @} */
+#endif /* QMC5883L_PARAMS_H */

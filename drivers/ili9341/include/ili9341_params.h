@@ -187,5 +187,5 @@ static const uint8_t ili9341_screen_ids[] =
 }
 #endif
 
-#endif /* ILI9341_PARAMS_H */
 /** @} */
+#endif /* ILI9341_PARAMS_H */

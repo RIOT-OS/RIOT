@@ -42,5 +42,5 @@ extern "C" {
 }
 #endif
 
-#endif /* FATFS_DISKIO_MTD_H */
 /** @} */
+#endif /* FATFS_DISKIO_MTD_H */

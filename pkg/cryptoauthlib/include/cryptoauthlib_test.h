@@ -38,5 +38,5 @@ int atca_run_cmd(char *command, size_t len);
 }
 #endif
 
-#endif /* CRYPTOAUTHLIB_TEST_H */
 /** @} */
+#endif /* CRYPTOAUTHLIB_TEST_H */

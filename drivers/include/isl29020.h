@@ -129,5 +129,5 @@ int isl29020_disable(const isl29020_t *dev);
 }
 #endif
 
-#endif /* ISL29020_H */
 /** @} */
+#endif /* ISL29020_H */

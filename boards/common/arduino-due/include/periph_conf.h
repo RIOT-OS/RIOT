@@ -166,5 +166,5 @@ static const pwm_chan_conf_t pwm_chan[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

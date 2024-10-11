@@ -32,5 +32,5 @@ extern char* external_native_board_description;
 }
 #endif
 
-#endif /* EXTERNAL_NATIVE_H */
 /** @} */
+#endif /* EXTERNAL_NATIVE_H */

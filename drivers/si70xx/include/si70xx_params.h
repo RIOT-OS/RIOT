@@ -70,5 +70,5 @@ static const saul_reg_info_t si70xx_saul_info[] =
 }
 #endif
 
-#endif /* SI70XX_PARAMS_H */
 /** @} */
+#endif /* SI70XX_PARAMS_H */

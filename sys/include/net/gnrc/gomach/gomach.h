@@ -374,5 +374,5 @@ int gnrc_netif_gomach_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_GOMACH_GOMACH_H */
 /** @} */
+#endif /* NET_GNRC_GOMACH_GOMACH_H */

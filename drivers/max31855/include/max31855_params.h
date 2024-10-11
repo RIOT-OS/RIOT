@@ -82,5 +82,5 @@ static const saul_reg_info_t max31855_saul_info[] =
 }
 #endif
 
-#endif /* MAX31855_PARAMS_H */
 /** @} */
+#endif /* MAX31855_PARAMS_H */

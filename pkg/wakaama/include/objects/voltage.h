@@ -159,5 +159,5 @@ void lwm2m_object_voltage_update_value(const lwm2m_client_data_t *client_data,
 }
 #endif
 
-#endif /* OBJECTS_VOLTAGE_H */
 /** @} */
+#endif /* OBJECTS_VOLTAGE_H */

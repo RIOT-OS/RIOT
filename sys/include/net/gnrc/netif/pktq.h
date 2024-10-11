@@ -141,5 +141,5 @@ static inline bool gnrc_netif_pktq_empty(gnrc_netif_t *netif)
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_PKTQ_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_PKTQ_H */

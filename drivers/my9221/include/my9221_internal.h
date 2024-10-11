@@ -44,5 +44,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MY9221_INTERNAL_H */
 /** @} */
+#endif /* MY9221_INTERNAL_H */

@@ -83,5 +83,5 @@ static inline uint16_t atmega_port_addr(gpio_t pin)
 }
 #endif
 
-#endif /* ATMEGA_GPIO_H */
 /** @} */
+#endif /* ATMEGA_GPIO_H */

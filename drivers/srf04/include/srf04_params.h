@@ -61,5 +61,5 @@ static const srf04_params_t srf04_params[] = {
 }
 #endif
 
-#endif /* SRF04_PARAMS_H */
 /** @} */
+#endif /* SRF04_PARAMS_H */

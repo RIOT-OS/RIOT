@@ -279,5 +279,5 @@ static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
 }
 #endif
 
-#endif /* KW41ZRF_INTERN_H */
 /** @} */
+#endif /* KW41ZRF_INTERN_H */

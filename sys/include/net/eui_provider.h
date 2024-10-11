@@ -201,5 +201,5 @@ static inline void eui_short_from_eui64(eui64_t *addr_long,
 }
 #endif
 
-#endif /* NET_EUI_PROVIDER_H */
 /** @} */
+#endif /* NET_EUI_PROVIDER_H */

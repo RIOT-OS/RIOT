@@ -269,5 +269,5 @@ static const saul_reg_info_t servo_saul_info[] =
 }
 #endif
 
-#endif /* SERVO_PARAMS_H */
 /** @} */
+#endif /* SERVO_PARAMS_H */

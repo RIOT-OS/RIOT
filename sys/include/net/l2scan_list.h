@@ -83,5 +83,5 @@ unsigned l2scan_list_to_array(const l2scan_list_t *list,
 }
 #endif
 
-#endif /* NET_L2SCAN_LIST_H */
 /** @} */
+#endif /* NET_L2SCAN_LIST_H */

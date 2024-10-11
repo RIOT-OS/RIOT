@@ -57,5 +57,5 @@ const char *cryptocell310_status_to_humanly_readable(uint32_t status);
 }
 #endif
 
-#endif /* PSA_ERROR_H */
 /** @} */
+#endif /* PSA_ERROR_H */

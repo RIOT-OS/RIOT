@@ -131,5 +131,5 @@ void max31855_read_raw(max31855_t *dev, uint32_t *data);
 }
 #endif
 
-#endif /* MAX31855_H */
 /** @} */
+#endif /* MAX31855_H */

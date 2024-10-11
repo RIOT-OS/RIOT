@@ -68,5 +68,5 @@ lwm2m_object_t *lwm2m_client_get_acc_ctrl_object(
 }
 #endif
 
-#endif /* LWM2M_CLIENT_OBJECTS_H */
 /** @} */
+#endif /* LWM2M_CLIENT_OBJECTS_H */

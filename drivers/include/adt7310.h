@@ -177,5 +177,5 @@ float adt7310_read_float(const adt7310_t *dev);
 }
 #endif
 
-#endif /* ADT7310_H */
 /** @} */
+#endif /* ADT7310_H */

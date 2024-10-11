@@ -514,5 +514,5 @@ int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
 }
 #endif
 
-#endif /* NET_FIB_H */
 /** @} */
+#endif /* NET_FIB_H */

@@ -57,5 +57,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_USBDEV_H */
 /** @} */
+#endif /* PERIPH_CPU_USBDEV_H */

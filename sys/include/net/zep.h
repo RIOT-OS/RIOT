@@ -100,5 +100,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_ZEP_H */
 /** @} */
+#endif /* NET_ZEP_H */

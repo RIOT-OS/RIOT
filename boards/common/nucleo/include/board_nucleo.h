@@ -59,5 +59,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_NUCLEO_H */
 /** @} */
+#endif /* BOARD_NUCLEO_H */

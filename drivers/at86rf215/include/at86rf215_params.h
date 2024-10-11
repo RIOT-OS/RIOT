@@ -68,5 +68,5 @@ static const at86rf215_params_t at86rf215_params[] =
 }
 #endif
 
-#endif /* AT86RF215_PARAMS_H */
 /** @} */
+#endif /* AT86RF215_PARAMS_H */

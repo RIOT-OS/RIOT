@@ -108,5 +108,5 @@ int io1_xplained_read_light_level(uint16_t *light);
 }
 #endif
 
-#endif /* IO1_XPLAINED_H */
 /** @} */
+#endif /* IO1_XPLAINED_H */

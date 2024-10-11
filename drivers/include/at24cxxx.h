@@ -240,5 +240,5 @@ int at24cxxx_disable_write_protect(const at24cxxx_t *dev);
 }
 #endif
 
-#endif /* AT24CXXX_H */
 /** @} */
+#endif /* AT24CXXX_H */

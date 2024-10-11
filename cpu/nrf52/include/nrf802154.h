@@ -102,5 +102,5 @@ void nrf802154_setup(nrf802154_t *dev);
 }
 #endif
 
-#endif /* NRF802154_H */
 /** @} */
+#endif /* NRF802154_H */

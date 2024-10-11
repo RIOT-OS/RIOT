@@ -33,5 +33,5 @@ void tests_gnrc_sixlowpan_frag_vrb(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_SIXLOWPAN_FRAG_VRB_H */
 /** @} */
+#endif /* TESTS_GNRC_SIXLOWPAN_FRAG_VRB_H */

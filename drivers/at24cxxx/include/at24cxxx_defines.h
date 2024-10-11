@@ -470,5 +470,5 @@ extern "C" {
 }
 #endif
 
-#endif /* AT24CXXX_DEFINES_H */
 /** @} */
+#endif /* AT24CXXX_DEFINES_H */

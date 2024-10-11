@@ -321,5 +321,5 @@ int bme680_set_ambient_temp(bme680_t* dev, int8_t temp);
 }
 #endif
 
-#endif /* BME680_H */
 /** @} */
+#endif /* BME680_H */

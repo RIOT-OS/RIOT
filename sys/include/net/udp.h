@@ -50,5 +50,5 @@ void udp_hdr_print(udp_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_UDP_H */
 /** @} */
+#endif /* NET_UDP_H */

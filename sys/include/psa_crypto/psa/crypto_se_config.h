@@ -44,5 +44,5 @@ typedef union {
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_SE_CONFIG_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_CRYPTO_SE_CONFIG_H */

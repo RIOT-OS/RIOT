@@ -217,5 +217,5 @@ static inline void gnrc_rpl_netstats_tx_DAO_ACK(netstats_rpl_t *netstats, size_t
 }
 #endif
 
-#endif /* NETSTATS_H */
 /** @} */
+#endif /* NETSTATS_H */

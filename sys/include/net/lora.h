@@ -282,5 +282,5 @@ enum {
 }
 #endif
 
-#endif /* NET_LORA_H */
 /** @} */
+#endif /* NET_LORA_H */

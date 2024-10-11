@@ -294,5 +294,5 @@ static inline int sem_getvalue(sem_t *sem, int *sval)
 }
 #endif
 
-#endif /* SEMAPHORE_H */
 /** @} */
+#endif /* SEMAPHORE_H */

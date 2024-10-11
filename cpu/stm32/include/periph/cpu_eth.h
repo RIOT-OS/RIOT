@@ -161,5 +161,5 @@ void stm32_eth_common_init(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_ETH_H */
 /** @} */
+#endif /* PERIPH_CPU_ETH_H */

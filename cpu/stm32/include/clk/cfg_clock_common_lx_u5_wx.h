@@ -92,5 +92,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CFG_CLOCK_COMMON_LX_U5_WX_H */
 /** @} */
+#endif /* CLK_CFG_CLOCK_COMMON_LX_U5_WX_H */

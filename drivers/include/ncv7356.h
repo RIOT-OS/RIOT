@@ -92,5 +92,5 @@ extern const trx_driver_t ncv7356_driver;
 }
 #endif
 
-#endif /* NCV7356_H */
 /** @} */
+#endif /* NCV7356_H */

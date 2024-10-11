@@ -113,5 +113,5 @@ int can_router_dispatch_tx_error(can_pkt_t *pkt);
 }
 #endif
 
-#endif /* CAN_ROUTER_H */
 /** @} */
+#endif /* CAN_ROUTER_H */

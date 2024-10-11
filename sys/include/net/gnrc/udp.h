@@ -115,5 +115,5 @@ int gnrc_udp_init(void);
 }
 #endif
 
-#endif /* NET_GNRC_UDP_H */
 /** @} */
+#endif /* NET_GNRC_UDP_H */

@@ -79,5 +79,5 @@ const char *tiny_strerror(int errnum);
 }
 #endif
 
-#endif /* TINY_STRERROR_H */
 /** @} */
+#endif /* TINY_STRERROR_H */

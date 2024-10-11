@@ -103,5 +103,5 @@ static const nimble_autoconn_params_t nimble_autoconn_params =
 }
 #endif
 
-#endif /* NIMBLE_AUTOCONN_PARAMS_H */
 /** @} */
+#endif /* NIMBLE_AUTOCONN_PARAMS_H */

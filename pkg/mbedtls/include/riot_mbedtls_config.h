@@ -235,5 +235,5 @@ extern "C" {
 }
 #endif
 
-#endif /* RIOT_MBEDTLS_CONFIG_H */
 /** @} */
+#endif /* RIOT_MBEDTLS_CONFIG_H */

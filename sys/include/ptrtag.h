@@ -122,5 +122,5 @@ static inline uint8_t ptrtag_tag(void *tagged_ptr)
 }
 #endif
 
-#endif /* PTRTAG_H */
 /** @} */
+#endif /* PTRTAG_H */

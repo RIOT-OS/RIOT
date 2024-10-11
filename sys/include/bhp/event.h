@@ -58,5 +58,5 @@ void bhp_event_isr_cb(void *bhp_event_ctx);
 }
 #endif
 
-#endif /* BHP_EVENT_H */
 /** @} */
+#endif /* BHP_EVENT_H */

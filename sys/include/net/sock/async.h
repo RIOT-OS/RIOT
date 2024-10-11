@@ -235,5 +235,5 @@ sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock);
 }
 #endif
 
-#endif /* NET_SOCK_ASYNC_H */
 /** @} */
+#endif /* NET_SOCK_ASYNC_H */

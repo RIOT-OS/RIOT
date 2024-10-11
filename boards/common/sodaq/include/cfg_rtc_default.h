@@ -39,5 +39,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_RTC_DEFAULT_H */
 /** @} */
+#endif /* CFG_RTC_DEFAULT_H */

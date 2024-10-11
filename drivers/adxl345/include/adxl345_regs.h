@@ -188,5 +188,5 @@
 }
 #endif
 
-#endif /* ADXL345_REGS_H */
 /** @} */
+#endif /* ADXL345_REGS_H */

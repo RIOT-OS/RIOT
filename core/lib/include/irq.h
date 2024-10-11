@@ -98,5 +98,5 @@ MAYBE_INLINE bool irq_is_in(void);
 }
 #endif
 
-#endif /* IRQ_H */
 /** @} */
+#endif /* IRQ_H */

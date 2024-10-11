@@ -163,5 +163,5 @@ typedef struct wifi_security_wpa_enterprise {
 }
 #endif
 
-#endif /* NET_WIFI_H */
 /** @} */
+#endif /* NET_WIFI_H */

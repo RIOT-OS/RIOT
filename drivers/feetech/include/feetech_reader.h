@@ -292,5 +292,5 @@ const uint8_t *feetech_reader_sync_write_item_get_payload(const feetech_reader_t
 }
 #endif
 
-#endif /* FEETECH_READER_H */
 /** @} */
+#endif /* FEETECH_READER_H */

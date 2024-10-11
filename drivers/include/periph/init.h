@@ -47,5 +47,5 @@ void periph_init(void);
 }
 #endif
 
-#endif /* PERIPH_INIT_H */
 /** @} */
+#endif /* PERIPH_INIT_H */

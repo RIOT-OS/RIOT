@@ -301,5 +301,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* USB_CDC_H */
 /** @} */
+#endif /* USB_CDC_H */

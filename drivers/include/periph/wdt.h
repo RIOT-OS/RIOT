@@ -367,5 +367,5 @@ void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
 }
 #endif
 
-#endif /* PERIPH_WDT_H */
 /** @} */
+#endif /* PERIPH_WDT_H */

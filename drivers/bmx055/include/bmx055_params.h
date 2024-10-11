@@ -98,5 +98,5 @@ static const saul_reg_info_t bmx055_saul_info[][3] = {
 }
 #endif
 
-#endif /* BMX055_PARAMS_H */
 /** @} */
+#endif /* BMX055_PARAMS_H */

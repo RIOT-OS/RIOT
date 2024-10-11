@@ -37,5 +37,5 @@ void tty_uart_setup(uart_t uart, const char *name);
 }
 #endif
 
-#endif /* TTY_UART_H */
 /** @} */
+#endif /* TTY_UART_H */

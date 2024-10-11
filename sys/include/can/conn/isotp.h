@@ -198,5 +198,5 @@ int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *maste
 }
 #endif
 
-#endif /* CAN_CONN_ISOTP_H */
 /** @} */
+#endif /* CAN_CONN_ISOTP_H */

@@ -165,5 +165,5 @@ _gnrc_tcp_common_tcb_list_t *_gnrc_tcp_common_get_tcb_list(void);
 }
 #endif
 
-#endif /* GNRC_TCP_COMMON_H */
 /** @} */
+#endif /* GNRC_TCP_COMMON_H */

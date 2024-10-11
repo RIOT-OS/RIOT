@@ -47,5 +47,5 @@ static inline int _at24mac_get_eui48(uint8_t index, eui48_t *addr)
 }
 #endif
 
-#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */
+#endif /* EUI_PROVIDER_PARAMS_H */

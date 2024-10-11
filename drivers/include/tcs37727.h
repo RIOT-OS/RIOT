@@ -148,5 +148,5 @@ void tcs37727_read(const tcs37727_t *dev, tcs37727_data_t *data);
 }
 #endif
 
-#endif /* TCS37727_H */
 /** @} */
+#endif /* TCS37727_H */

@@ -1447,5 +1447,5 @@ void sam0_flashpage_aux_write(uint32_t offset, const void *data, size_t len);
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */
+#endif /* PERIPH_CPU_COMMON_H */

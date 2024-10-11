@@ -174,5 +174,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LSM303DLHC_INTERNAL_H */
 /** @} */
+#endif /* LSM303DLHC_INTERNAL_H */

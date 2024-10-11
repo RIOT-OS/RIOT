@@ -90,5 +90,5 @@ static inline bool fido2_ctap_utils_ks_equal(const ctap_resident_key_t *k1,
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_UTILS_H */
 /** @} */
+#endif /* FIDO2_CTAP_CTAP_UTILS_H */

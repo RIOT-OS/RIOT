@@ -66,5 +66,5 @@ static inline uint64_t sntp_get_unix_usec(void)
 }
 #endif
 
-#endif /* NET_SNTP_H */
 /** @} */
+#endif /* NET_SNTP_H */

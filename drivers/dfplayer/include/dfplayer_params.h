@@ -72,5 +72,5 @@ static const dfplayer_params_t dfplayer_params[] =
 }
 #endif
 
-#endif /* DFPLAYER_PARAMS_H */
 /** @} */
+#endif /* DFPLAYER_PARAMS_H */

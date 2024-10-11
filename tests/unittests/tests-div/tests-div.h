@@ -39,5 +39,5 @@ Test *tests_div_tests(void);
 }
 #endif
 
-#endif /* TESTS_DIV_H */
 /** @} */
+#endif /* TESTS_DIV_H */

@@ -68,5 +68,5 @@ bool vbat_is_empty(void);
 }
 #endif
 
-#endif /* PERIPH_VBAT_H */
 /** @} */
+#endif /* PERIPH_VBAT_H */

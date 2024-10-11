@@ -62,5 +62,5 @@ void cpuid_get(void *id);
 }
 #endif
 
-#endif /* PERIPH_CPUID_H */
 /** @} */
+#endif /* PERIPH_CPUID_H */

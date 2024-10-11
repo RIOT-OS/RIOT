@@ -215,5 +215,5 @@ size_t fido2_ctap_reset(ctap_resp_t *resp);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_H */
 /** @} */
+#endif /* FIDO2_CTAP_H */

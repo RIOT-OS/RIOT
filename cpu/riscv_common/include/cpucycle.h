@@ -36,5 +36,5 @@ uint64_t get_cycle_count(void);
 }
 #endif
 
-#endif /* CPUCYCLE_H */
 /** @} */
+#endif /* CPUCYCLE_H */

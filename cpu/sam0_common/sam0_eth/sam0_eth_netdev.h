@@ -53,5 +53,5 @@ void sam0_eth_setup(netdev_t* dev);
 }
 #endif
 
-#endif /* SAM0_ETH_NETDEV_H */
 /** @} */
+#endif /* SAM0_ETH_NETDEV_H */

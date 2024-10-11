@@ -73,5 +73,5 @@ static const saul_reg_info_t sgp30_saul_info[] =
 }
 #endif
 
-#endif /* SGP30_PARAMS_H */
 /** @} */
+#endif /* SGP30_PARAMS_H */

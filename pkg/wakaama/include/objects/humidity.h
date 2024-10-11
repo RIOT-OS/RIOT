@@ -158,5 +158,5 @@ void lwm2m_object_humidity_update_value(const lwm2m_client_data_t *client_data,
 }
 #endif
 
-#endif /* OBJECTS_HUMIDITY_H */
 /** @} */
+#endif /* OBJECTS_HUMIDITY_H */

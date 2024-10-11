@@ -415,5 +415,5 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
 }
 #endif
 
-#endif /* NET_GNRC_NDP_H */
 /** @} */
+#endif /* NET_GNRC_NDP_H */

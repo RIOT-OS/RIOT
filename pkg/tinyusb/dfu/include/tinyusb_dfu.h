@@ -44,5 +44,5 @@ void tinyusb_dfu_init(void);
 }
 #endif
 
-#endif /* TINYUSB_DFU_H */
 /** @} */
+#endif /* TINYUSB_DFU_H */

@@ -60,5 +60,5 @@ static inline void atomic_store_u16(volatile uint16_t *dest, uint16_t val)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */
+#endif /* ATOMIC_UTILS_ARCH_H */

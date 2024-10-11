@@ -611,5 +611,5 @@ static inline int suit_storage_set_seq_no(suit_storage_t *storage,
 }
 #endif
 
-#endif /* SUIT_STORAGE_H */
 /** @} */
+#endif /* SUIT_STORAGE_H */

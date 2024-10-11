@@ -332,5 +332,5 @@ typedef long suseconds_t;
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYS_TYPES_H */
 /** @} */
+#endif /* SYS_TYPES_H */

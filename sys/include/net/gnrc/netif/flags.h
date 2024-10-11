@@ -151,5 +151,5 @@ enum {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_FLAGS_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_FLAGS_H */

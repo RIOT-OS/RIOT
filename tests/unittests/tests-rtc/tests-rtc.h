@@ -33,5 +33,5 @@ void tests_rtc(void);
 }
 #endif
 
-#endif /* TESTS_RTC_H */
 /** @} */
+#endif /* TESTS_RTC_H */

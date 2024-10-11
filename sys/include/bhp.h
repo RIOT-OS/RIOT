@@ -86,5 +86,5 @@ static inline void bhp_set_cb(bhp_t *bhp, bhp_cb_t cb, void *ctx)
 }
 #endif
 
-#endif /* BHP_H */
 /** @} */
+#endif /* BHP_H */

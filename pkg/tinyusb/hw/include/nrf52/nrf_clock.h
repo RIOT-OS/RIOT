@@ -105,5 +105,5 @@ static inline void nrf_clock_task_trigger(NRF_CLOCK_Type *reg,
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* NRF52_NRF_CLOCK_H */
 /** @} */
+#endif /* NRF52_NRF_CLOCK_H */

@@ -99,5 +99,5 @@ static const saul_reg_info_t hmc5883l_saul_info[] =
 }
 #endif
 
-#endif /* HMC5883L_PARAMS_H */
 /** @} */
+#endif /* HMC5883L_PARAMS_H */

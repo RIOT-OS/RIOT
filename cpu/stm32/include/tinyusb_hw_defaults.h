@@ -137,5 +137,5 @@ extern "C" {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TINYUSB_HW_DEFAULTS_H */
 /** @} */
+#endif /* TINYUSB_HW_DEFAULTS_H */

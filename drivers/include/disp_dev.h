@@ -206,5 +206,5 @@ static inline void disp_dev_backlight_off(void)
 }
 #endif
 
-#endif /* DISP_DEV_H */
 /** @} */
+#endif /* DISP_DEV_H */

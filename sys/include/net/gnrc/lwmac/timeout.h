@@ -98,5 +98,5 @@ void gnrc_lwmac_timeout_make_expire(gnrc_lwmac_timeout_t *timeout);
 }
 #endif
 
-#endif /* NET_GNRC_LWMAC_TIMEOUT_H */
 /** @} */
+#endif /* NET_GNRC_LWMAC_TIMEOUT_H */

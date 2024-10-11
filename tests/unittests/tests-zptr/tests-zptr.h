@@ -33,5 +33,5 @@ void tests_zptr(void);
 }
 #endif
 
-#endif /* TESTS_ZPTR_H */
 /** @} */
+#endif /* TESTS_ZPTR_H */

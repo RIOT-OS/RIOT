@@ -33,5 +33,5 @@ void tests_ipv6_hdr(void);
 }
 #endif
 
-#endif /* TESTS_IPV6_HDR_H */
 /** @} */
+#endif /* TESTS_IPV6_HDR_H */

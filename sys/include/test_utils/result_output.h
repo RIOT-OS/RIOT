@@ -353,5 +353,5 @@ void turo_simple_exit_status(turo_t *ctx, int exit_status);
 #ifdef __cplusplus
 }
 #endif
-#endif /* TEST_UTILS_RESULT_OUTPUT_H */
 /** @} */
+#endif /* TEST_UTILS_RESULT_OUTPUT_H */

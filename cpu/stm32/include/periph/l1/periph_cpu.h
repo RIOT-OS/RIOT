@@ -73,5 +73,5 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_L1_PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_L1_PERIPH_CPU_H */

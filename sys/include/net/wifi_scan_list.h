@@ -82,5 +82,5 @@ static inline unsigned wifi_scan_list_to_array(const wifi_scan_list_t *list,
 }
 #endif
 
-#endif /* NET_WIFI_SCAN_LIST_H */
 /** @} */
+#endif /* NET_WIFI_SCAN_LIST_H */

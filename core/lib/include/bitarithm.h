@@ -278,5 +278,5 @@ static inline unsigned bitarithm_test_and_clear(unsigned state, uint8_t *index)
 }
 #endif
 
-#endif /* BITARITHM_H */
 /** @} */
+#endif /* BITARITHM_H */

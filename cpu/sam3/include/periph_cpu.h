@@ -244,5 +244,5 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

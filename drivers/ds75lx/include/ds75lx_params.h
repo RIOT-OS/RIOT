@@ -72,5 +72,5 @@ static const saul_reg_info_t ds75lx_saul_info[] =
 }
 #endif
 
-#endif /* DS75LX_PARAMS_H */
 /** @} */
+#endif /* DS75LX_PARAMS_H */

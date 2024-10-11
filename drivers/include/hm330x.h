@@ -138,5 +138,5 @@ void hm330x_wakeup(hm330x_t *dev);
 }
 #endif
 
-#endif /* HM330X_H */
 /** @} */
+#endif /* HM330X_H */

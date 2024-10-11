@@ -201,5 +201,5 @@ int thread_flags_wake(thread_t *thread);
 }
 #endif
 
-#endif /* THREAD_FLAGS_H */
 /** @} */
+#endif /* THREAD_FLAGS_H */

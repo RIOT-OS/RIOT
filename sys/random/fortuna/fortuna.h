@@ -242,5 +242,5 @@ int fortuna_update_seed(fortuna_state_t *state, fortuna_seed_t *inout);
 }
 #endif
 
-#endif /* FORTUNA_H */
 /** @} */
+#endif /* FORTUNA_H */

@@ -171,5 +171,5 @@ void kinetis_mcg_init(void);
 }
 #endif
 
-#endif /* MCG_H */
 /** @} */
+#endif /* MCG_H */

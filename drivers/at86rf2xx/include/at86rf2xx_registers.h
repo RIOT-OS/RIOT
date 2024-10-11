@@ -549,5 +549,5 @@ extern "C" {
 }
 #endif
 
-#endif /* AT86RF2XX_REGISTERS_H */
 /** @} */
+#endif /* AT86RF2XX_REGISTERS_H */

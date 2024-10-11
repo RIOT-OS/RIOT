@@ -292,5 +292,5 @@ int hmc5883l_power_up(hmc5883l_t *dev);
 }
 #endif
 
-#endif /* HMC5883L_H */
 /** @} */
+#endif /* HMC5883L_H */

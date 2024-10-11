@@ -32,5 +32,5 @@ void *congure_quic_test_get_event_cb_arg(void);
 }
 #endif
 
-#endif /* CONGURE_IMPL_H */
 /** @} */
+#endif /* CONGURE_IMPL_H */

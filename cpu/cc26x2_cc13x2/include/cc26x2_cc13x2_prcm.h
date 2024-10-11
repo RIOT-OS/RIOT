@@ -385,5 +385,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X2_CC13X2_PRCM_H */
 /** @} */
+#endif /* CC26X2_CC13X2_PRCM_H */

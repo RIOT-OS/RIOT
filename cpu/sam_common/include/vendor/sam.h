@@ -86,5 +86,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SAM0_H */
 /** @} */
+#endif /* SAM0_H */

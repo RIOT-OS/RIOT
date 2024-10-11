@@ -150,5 +150,5 @@ void hugemem_write_block(hugemem_ptr_t to, const void *from, size_t size);
 }
 #endif
 
-#endif /* CPU_EBI_H */
 /** @} */
+#endif /* CPU_EBI_H */

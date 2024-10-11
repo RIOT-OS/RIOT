@@ -351,5 +351,5 @@ int gnrc_netif_lwmac_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_LWMAC_LWMAC_H */
 /** @} */
+#endif /* NET_GNRC_LWMAC_LWMAC_H */

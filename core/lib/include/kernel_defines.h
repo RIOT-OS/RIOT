@@ -34,5 +34,5 @@ extern "C" {
 }
 #endif
 
-#endif /* KERNEL_DEFINES_H */
 /** @} */
+#endif /* KERNEL_DEFINES_H */

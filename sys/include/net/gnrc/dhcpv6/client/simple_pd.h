@@ -91,5 +91,5 @@ void gnrc_dhcpv6_client_simple_pd_init(void);
 }
 #endif
 
-#endif /* NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H */
 /** @} */
+#endif /* NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H */

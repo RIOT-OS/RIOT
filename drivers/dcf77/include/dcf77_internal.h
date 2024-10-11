@@ -70,5 +70,5 @@ enum {
 }
 #endif
 
-#endif /* DCF77_INTERNAL_H */
 /** @} */
+#endif /* DCF77_INTERNAL_H */

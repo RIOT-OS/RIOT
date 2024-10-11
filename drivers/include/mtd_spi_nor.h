@@ -184,5 +184,5 @@ extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes;
 }
 #endif
 
-#endif /* MTD_SPI_NOR_H */
 /** @} */
+#endif /* MTD_SPI_NOR_H */

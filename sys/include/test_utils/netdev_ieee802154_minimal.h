@@ -112,5 +112,5 @@ int netdev_ieee802154_minimal_set(struct netdev *dev, netopt_t opt, void *data, 
 }
 #endif
 
-#endif /* TEST_UTILS_NETDEV_IEEE802154_MINIMAL_H */
 /** @} */
+#endif /* TEST_UTILS_NETDEV_IEEE802154_MINIMAL_H */

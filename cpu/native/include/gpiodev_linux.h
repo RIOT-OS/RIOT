@@ -70,5 +70,5 @@ void gpio_linux_teardown(void);
 }
 #endif
 
-#endif /* GPIODEV_LINUX_H */
 /** @} */
+#endif /* GPIODEV_LINUX_H */

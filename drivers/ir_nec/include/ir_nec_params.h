@@ -52,5 +52,5 @@ static const ir_nec_params_t ir_nec_params[] =
 }
 #endif
 
-#endif /* IR_NEC_PARAMS_H */
 /** @} */
+#endif /* IR_NEC_PARAMS_H */

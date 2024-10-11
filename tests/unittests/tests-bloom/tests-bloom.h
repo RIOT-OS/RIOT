@@ -40,5 +40,5 @@ Test *tests_bloom_tests(void);
 }
 #endif
 
-#endif /* TESTS_BLOOM_H */
 /** @} */
+#endif /* TESTS_BLOOM_H */

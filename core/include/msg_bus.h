@@ -264,5 +264,5 @@ static inline int msg_bus_post(msg_bus_t *bus, uint8_t type, const void *arg)
 }
 #endif
 
-#endif /* MSG_BUS_H */
 /** @} */
+#endif /* MSG_BUS_H */

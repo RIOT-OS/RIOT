@@ -146,5 +146,5 @@ static const nrf24l01p_ng_params_t nrf24l01p_ng_params[] = {
 }
 #endif
 
-#endif /* NRF24L01P_NG_PARAMS_H */
 /** @} */
+#endif /* NRF24L01P_NG_PARAMS_H */

@@ -40,5 +40,5 @@ static const candev_params_t candev_params[] = {
 }
 #endif
 
-#endif /* CAN_PARAMS_H */
 /** @} */
+#endif /* CAN_PARAMS_H */

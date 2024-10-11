@@ -278,5 +278,5 @@ static inline uint16_t gnrc_sixlowpan_nd_opt_get_ltime(const sixlowpan_nd_opt_ab
 }
 #endif
 
-#endif /* NET_SIXLOWPAN_ND_H */
 /** @} */
+#endif /* NET_SIXLOWPAN_ND_H */

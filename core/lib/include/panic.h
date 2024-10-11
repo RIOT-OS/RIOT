@@ -102,5 +102,5 @@ void panic_arch(void);
 }
 #endif
 
-#endif /* PANIC_H */
 /** @} */
+#endif /* PANIC_H */

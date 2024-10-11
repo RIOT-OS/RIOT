@@ -84,5 +84,5 @@ void cord_ep_standalone_signal(bool connected);
 }
 #endif
 
-#endif /* NET_CORD_EP_STANDALONE_H */
 /** @} */
+#endif /* NET_CORD_EP_STANDALONE_H */

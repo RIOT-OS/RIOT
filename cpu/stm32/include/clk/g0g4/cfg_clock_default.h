@@ -120,5 +120,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_G0G4_CFG_CLOCK_DEFAULT_H */
 /** @} */
+#endif /* CLK_G0G4_CFG_CLOCK_DEFAULT_H */

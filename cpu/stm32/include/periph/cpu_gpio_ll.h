@@ -195,5 +195,5 @@ union gpio_conf_stm32 {
 }
 #endif
 
-#endif /* PERIPH_CPU_GPIO_LL_H */
 /** @} */
+#endif /* PERIPH_CPU_GPIO_LL_H */

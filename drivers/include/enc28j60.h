@@ -67,5 +67,5 @@ void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params, uint8_t in
 }
 #endif
 
-#endif /* ENC28J60_H */
 /** @} */
+#endif /* ENC28J60_H */

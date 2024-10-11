@@ -140,5 +140,5 @@ size_t uart_half_duplex_recv(const uart_half_duplex_t *dev, size_t size);
 }
 #endif
 
-#endif /* UART_HALF_DUPLEX_H */
 /** @} */
+#endif /* UART_HALF_DUPLEX_H */

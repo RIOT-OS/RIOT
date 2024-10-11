@@ -58,5 +58,5 @@ static const  apa102_params_t apa102_params[] =
 }
 #endif
 
-#endif /* APA102_PARAMS_H */
 /** @} */
+#endif /* APA102_PARAMS_H */

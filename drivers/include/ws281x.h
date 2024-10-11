@@ -252,5 +252,5 @@ static inline void ws281x_write(ws281x_t *dev)
 }
 #endif
 
-#endif /* WS281X_H */
 /** @} */
+#endif /* WS281X_H */

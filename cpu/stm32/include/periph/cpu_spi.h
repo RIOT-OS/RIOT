@@ -135,5 +135,5 @@ gpio_t spi_pin_clk(spi_t bus);
 }
 #endif
 
-#endif /* PERIPH_CPU_SPI_H */
 /** @} */
+#endif /* PERIPH_CPU_SPI_H */

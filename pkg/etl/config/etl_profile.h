@@ -50,5 +50,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ETL_PROFILE_H */
 /** @} */
+#endif /* ETL_PROFILE_H */

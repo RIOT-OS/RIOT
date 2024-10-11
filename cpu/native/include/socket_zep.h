@@ -136,5 +136,5 @@ void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal);
 }
 #endif
 
-#endif /* SOCKET_ZEP_H */
 /** @} */
+#endif /* SOCKET_ZEP_H */

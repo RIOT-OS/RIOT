@@ -198,5 +198,5 @@ cycle or continues on to a repeated START condition
 }
 #endif
 
-#endif /* CC26XX_CC13XX_I2C_H */
 /** @} */
+#endif /* CC26XX_CC13XX_I2C_H */

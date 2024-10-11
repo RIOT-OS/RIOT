@@ -394,5 +394,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MCP2515_DEFINES_H */
 /** @} */
+#endif /* MCP2515_DEFINES_H */

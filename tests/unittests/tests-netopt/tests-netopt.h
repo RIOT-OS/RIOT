@@ -33,5 +33,5 @@ void tests_netopt(void);
 }
 #endif
 
-#endif /* TESTS_NETOPT_H */
 /** @} */
+#endif /* TESTS_NETOPT_H */

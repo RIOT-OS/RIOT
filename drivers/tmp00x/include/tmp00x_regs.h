@@ -104,5 +104,5 @@ extern "C" {
 }
 #endif
 
-#endif /* TMP00X_REGS_H */
 /** @} */
+#endif /* TMP00X_REGS_H */

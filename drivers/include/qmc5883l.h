@@ -303,5 +303,5 @@ int qmc5883l_irq_disable(const qmc5883l_t *dev);
 }
 #endif
 
-#endif /* QMC5883L_H */
 /** @} */
+#endif /* QMC5883L_H */

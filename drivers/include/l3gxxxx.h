@@ -1995,5 +1995,5 @@ int l3gxxxx_reg_read(const l3gxxxx_t *dev,
 }
 #endif
 
-#endif /* L3GXXXX_H */
 /** @} */
+#endif /* L3GXXXX_H */

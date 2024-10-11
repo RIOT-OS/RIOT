@@ -848,5 +848,5 @@ static inline bool sock_udp_ep_is_v6(const sock_udp_ep_t *ep)
 }
 #endif
 
-#endif /* NET_SOCK_UDP_H */
 /** @} */
+#endif /* NET_SOCK_UDP_H */

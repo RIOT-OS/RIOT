@@ -64,5 +64,5 @@ extern "C" {
 }
 #endif
 
-#endif /* WS281X_BACKEND_H */
 /** @} */
+#endif /* WS281X_BACKEND_H */

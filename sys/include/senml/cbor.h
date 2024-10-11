@@ -117,5 +117,5 @@ int senml_encode_data_cbor(nanocbor_encoder_t *enc, const senml_data_value_t *va
 }
 #endif
 
-#endif /* SENML_CBOR_H */
 /** @} */
+#endif /* SENML_CBOR_H */

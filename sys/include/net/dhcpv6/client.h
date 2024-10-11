@@ -317,5 +317,5 @@ uint8_t dhcpv6_client_get_conf_mode(void);
 }
 #endif
 
-#endif /* NET_DHCPV6_CLIENT_H */
 /** @} */
+#endif /* NET_DHCPV6_CLIENT_H */

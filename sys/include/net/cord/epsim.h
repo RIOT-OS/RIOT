@@ -71,5 +71,5 @@ int cord_epsim_state(void);
 }
 #endif
 
-#endif /* NET_CORD_EPSIM_H */
 /** @} */
+#endif /* NET_CORD_EPSIM_H */

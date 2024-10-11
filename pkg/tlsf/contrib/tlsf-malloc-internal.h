@@ -31,5 +31,5 @@ extern tlsf_t tlsf_malloc_gheap;
 }
 #endif
 
-#endif /* TLSF_MALLOC_INTERNAL_H */
 /** @} */
+#endif /* TLSF_MALLOC_INTERNAL_H */

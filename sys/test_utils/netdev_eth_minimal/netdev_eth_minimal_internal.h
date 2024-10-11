@@ -46,5 +46,5 @@ extern device_reg_entry_t _devices[NETDEV_ETH_MINIMAL_NUMOF];
 }
 #endif
 
-#endif /* NETDEV_ETH_MINIMAL_INTERNAL_H */
 /** @} */
+#endif /* NETDEV_ETH_MINIMAL_INTERNAL_H */

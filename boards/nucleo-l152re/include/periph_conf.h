@@ -231,5 +231,5 @@ static const dac_conf_t dac_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

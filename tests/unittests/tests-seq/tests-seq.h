@@ -33,5 +33,5 @@ void tests_seq(void);
 }
 #endif
 
-#endif /* TESTS_SEQ_H */
 /** @} */
+#endif /* TESTS_SEQ_H */

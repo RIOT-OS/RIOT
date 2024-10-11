@@ -157,5 +157,5 @@ extern "C"
 }
 #endif
 
-#endif /* AIP31068_REGS_H */
 /** @} */
+#endif /* AIP31068_REGS_H */

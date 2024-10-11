@@ -263,5 +263,5 @@ void sock_udp_event_init(sock_udp_t *sock, event_queue_t *ev_queue,
 }
 #endif
 
-#endif /* NET_SOCK_ASYNC_EVENT_H */
 /** @} */
+#endif /* NET_SOCK_ASYNC_EVENT_H */

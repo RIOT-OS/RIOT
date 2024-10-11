@@ -66,5 +66,5 @@ int ds3234_pps_init(const ds3234_params_t *params);
 }
 #endif
 
-#endif /* DS3234_H */
 /** @} */
+#endif /* DS3234_H */

@@ -413,5 +413,5 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */
+#endif /* PERIPH_CONF_COMMON_H */

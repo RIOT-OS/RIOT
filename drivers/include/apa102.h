@@ -68,5 +68,5 @@ void apa102_load_rgba(const apa102_t *dev, const color_rgba_t vals[]);
 }
 #endif
 
-#endif /* APA102_H */
 /** @} */
+#endif /* APA102_H */

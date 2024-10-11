@@ -198,5 +198,5 @@ void lwm2m_object_ipso_sensor_base_update_value(const lwm2m_client_data_t *clien
 }
 #endif
 
-#endif /* OBJECTS_IPSO_SENSOR_BASE_H */
 /** @} */
+#endif /* OBJECTS_IPSO_SENSOR_BASE_H */

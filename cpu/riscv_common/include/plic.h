@@ -81,5 +81,5 @@ void plic_isr_handler(void);
 }
 #endif
 
-#endif /* PLIC_H */
 /** @} */
+#endif /* PLIC_H */

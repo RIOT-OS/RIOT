@@ -881,5 +881,5 @@ void gpio_init_port(gpio_t pin, uint32_t pcr);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

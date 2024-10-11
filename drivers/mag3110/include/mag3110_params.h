@@ -73,5 +73,5 @@ static const saul_reg_info_t mag3110_saul_info[] =
 }
 #endif
 
-#endif /* MAG3110_PARAMS_H */
 /** @} */
+#endif /* MAG3110_PARAMS_H */

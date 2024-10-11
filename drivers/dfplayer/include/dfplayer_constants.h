@@ -200,5 +200,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* DFPLAYER_CONSTANTS_H */
 /** @} */
+#endif /* DFPLAYER_CONSTANTS_H */

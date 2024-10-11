@@ -90,5 +90,5 @@ void grove_ledbar_clear(grove_ledbar_t *dev);
 }
 #endif
 
-#endif /* GROVE_LEDBAR_H */
 /** @} */
+#endif /* GROVE_LEDBAR_H */

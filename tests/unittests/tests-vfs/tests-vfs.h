@@ -33,5 +33,5 @@ void tests_vfs(void);
 }
 #endif
 
-#endif /* TESTS_VFS_H */
 /** @} */
+#endif /* TESTS_VFS_H */

@@ -163,5 +163,5 @@ void usbus_cdcecm_init(usbus_t *usbus, usbus_cdcecm_device_t *handler);
 }
 #endif
 
-#endif /* USB_USBUS_CDC_ECM_H */
 /** @} */
+#endif /* USB_USBUS_CDC_ECM_H */

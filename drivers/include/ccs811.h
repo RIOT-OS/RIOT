@@ -403,5 +403,5 @@ int ccs811_set_baseline (const ccs811_t *dev, uint16_t baseline);
 }
 #endif
 
-#endif /* CCS811_H */
 /** @} */
+#endif /* CCS811_H */

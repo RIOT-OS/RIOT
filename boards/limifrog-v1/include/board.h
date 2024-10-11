@@ -58,5 +58,5 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

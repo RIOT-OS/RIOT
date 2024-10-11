@@ -99,5 +99,5 @@ static bq2429x_params_t bq2429x_params[] = {
 }
 #endif
 
-#endif /* BQ2429X_PARAMS_H */
 /** @} */
+#endif /* BQ2429X_PARAMS_H */

@@ -268,5 +268,5 @@ extern const msp430_usci_spi_params_t usci_b1_as_spi;
 }
 #endif
 
-#endif /* F2XX_G2XX_PERIPH_CPU_H */
 /** @} */
+#endif /* F2XX_G2XX_PERIPH_CPU_H */

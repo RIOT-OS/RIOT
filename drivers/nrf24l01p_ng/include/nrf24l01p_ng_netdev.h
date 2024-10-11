@@ -32,5 +32,5 @@ extern const netdev_driver_t nrf24l01p_ng_driver;
 }
 #endif
 
-#endif /* NRF24L01P_NG_NETDEV_H */
 /** @} */
+#endif /* NRF24L01P_NG_NETDEV_H */

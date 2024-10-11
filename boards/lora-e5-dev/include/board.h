@@ -98,5 +98,5 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

@@ -70,5 +70,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LM75_REGS_H */
 /** @} */
+#endif /* LM75_REGS_H */

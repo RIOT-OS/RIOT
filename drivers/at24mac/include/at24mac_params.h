@@ -59,5 +59,5 @@ static const at24mac_params_t at24mac_params[] =
 }
 #endif
 
-#endif /* AT24MAC_PARAMS_H */
 /** @} */
+#endif /* AT24MAC_PARAMS_H */

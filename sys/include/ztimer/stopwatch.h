@@ -98,5 +98,5 @@ static inline void ztimer_stopwatch_stop(ztimer_stopwatch_t *timer)
 }
 #endif
 
-#endif /* ZTIMER_STOPWATCH_H */
 /** @} */
+#endif /* ZTIMER_STOPWATCH_H */

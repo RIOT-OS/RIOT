@@ -77,5 +77,5 @@ static inline uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
 }
 #endif
 
-#endif /* NET_INET_CSUM_H */
 /** @} */
+#endif /* NET_INET_CSUM_H */

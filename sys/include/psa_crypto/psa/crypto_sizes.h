@@ -1080,5 +1080,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_SIZES_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_CRYPTO_SIZES_H */

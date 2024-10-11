@@ -97,5 +97,5 @@ extern can_conf_t candev_conf[CAN_DLL_NUMOF];
 }
 #endif
 
-#endif /* CANDEV_LINUX_H */
 /** @} */
+#endif /* CANDEV_LINUX_H */

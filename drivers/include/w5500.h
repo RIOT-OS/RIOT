@@ -86,5 +86,5 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index);
 }
 #endif
 
-#endif /* W5500_H */
 /** @} */
+#endif /* W5500_H */

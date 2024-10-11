@@ -115,5 +115,5 @@ int seesaw_soil_moisture(const seesaw_soil_t *dev, uint16_t *moist);
 }
 #endif
 
-#endif /* SEESAW_SOIL_H */
 /** @} */
+#endif /* SEESAW_SOIL_H */

@@ -73,5 +73,5 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh, void **err_ptr);
 }
 #endif
 
-#endif /* NET_GNRC_RPL_SRH_H */
 /** @} */
+#endif /* NET_GNRC_RPL_SRH_H */

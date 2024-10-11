@@ -127,5 +127,5 @@ static inline bool event_timeout_is_pending(const event_timeout_t *event_timeout
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_TIMEOUT_H */
 /** @} */
+#endif /* EVENT_TIMEOUT_H */

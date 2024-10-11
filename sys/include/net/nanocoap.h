@@ -2302,5 +2302,5 @@ static inline uint32_t coap_get_observe(coap_pkt_t *pkt)
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_H */
 /** @} */
+#endif /* NET_NANOCOAP_H */

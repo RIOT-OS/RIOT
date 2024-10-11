@@ -1164,5 +1164,5 @@ typedef enum {
 }
 #endif
 
-#endif /* MFRC522_REGS_H */
 /** @} */
+#endif /* MFRC522_REGS_H */

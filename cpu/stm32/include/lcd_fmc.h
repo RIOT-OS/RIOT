@@ -56,5 +56,5 @@ typedef struct {
 }
 #endif
 
-#endif /* LCD_FMC_H */
 /** @} */
+#endif /* LCD_FMC_H */

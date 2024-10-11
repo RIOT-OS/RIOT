@@ -40,5 +40,5 @@ Test *tests_dns_cache_tests(void);
 }
 #endif
 
-#endif /* TESTS_DNS_CACHE_H */
 /** @} */
+#endif /* TESTS_DNS_CACHE_H */

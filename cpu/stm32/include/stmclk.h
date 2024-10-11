@@ -98,5 +98,5 @@ bool stmclk_dbp_is_locked(void);
 }
 #endif
 
-#endif /* STMCLK_H */
 /** @} */
+#endif /* STMCLK_H */

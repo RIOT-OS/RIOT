@@ -132,5 +132,5 @@ void candev_mcp2515_init(candev_mcp2515_t *dev,
 }
 #endif
 
-#endif /* CANDEV_MCP2515_H */
 /** @} */
+#endif /* CANDEV_MCP2515_H */

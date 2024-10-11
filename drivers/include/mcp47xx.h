@@ -345,5 +345,5 @@ uint8_t mcp47xx_dac_channels(mcp47xx_t *dev);
 }
 #endif
 
-#endif /* MCP47XX_H */
 /** @} */
+#endif /* MCP47XX_H */

@@ -52,5 +52,5 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_TIM5_H */
 /** @} */
+#endif /* CFG_TIMER_TIM5_H */

@@ -464,5 +464,5 @@ extern "C" {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TUSB_CONFIG_H */
 /** @} */
+#endif /* TUSB_CONFIG_H */

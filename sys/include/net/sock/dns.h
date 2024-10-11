@@ -114,5 +114,5 @@ extern sock_udp_ep_t sock_dns_server;
 }
 #endif
 
-#endif /* NET_SOCK_DNS_H */
 /** @} */
+#endif /* NET_SOCK_DNS_H */

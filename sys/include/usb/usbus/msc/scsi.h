@@ -291,5 +291,5 @@ void scsi_gen_csw(usbus_handler_t *handler, cbw_info_t *cmd);
 }
 #endif
 
-#endif /* USB_USBUS_MSC_SCSI_H */
 /** @} */
+#endif /* USB_USBUS_MSC_SCSI_H */

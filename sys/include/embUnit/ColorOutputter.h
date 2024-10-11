@@ -41,5 +41,5 @@ void ColorOutputter_printStatistics(OutputterRef self, TestResultRef result);
 }
 #endif
 
-#endif /* EMBUNIT_COLOROUTPUTTER_H */
 /** @} */
+#endif /* EMBUNIT_COLOROUTPUTTER_H */

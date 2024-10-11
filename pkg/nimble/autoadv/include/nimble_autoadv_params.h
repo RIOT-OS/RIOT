@@ -80,5 +80,5 @@ static const nimble_autoadv_cfg_t nimble_autoadv_cfg =
 }
 #endif
 
-#endif /* NIMBLE_AUTOADV_PARAMS_H */
 /** @} */
+#endif /* NIMBLE_AUTOADV_PARAMS_H */

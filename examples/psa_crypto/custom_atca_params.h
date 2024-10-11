@@ -121,5 +121,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CUSTOM_ATCA_PARAMS_H */
 /** @} */
+#endif /* CUSTOM_ATCA_PARAMS_H */

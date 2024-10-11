@@ -252,5 +252,5 @@ bool cpu_check_address(volatile const char *address);
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */
+#endif /* CPU_H */

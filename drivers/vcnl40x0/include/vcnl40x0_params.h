@@ -79,5 +79,5 @@ static const saul_reg_info_t vcnl40x0_saul_reg_info[] =
 }
 #endif
 
-#endif /* VCNL40X0_PARAMS_H */
 /** @} */
+#endif /* VCNL40X0_PARAMS_H */

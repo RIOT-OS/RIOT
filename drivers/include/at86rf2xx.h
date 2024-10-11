@@ -595,5 +595,5 @@ void at86rf2xx_disable_smart_idle(at86rf2xx_t *dev);
 }
 #endif
 
-#endif /* AT86RF2XX_H */
 /** @} */
+#endif /* AT86RF2XX_H */

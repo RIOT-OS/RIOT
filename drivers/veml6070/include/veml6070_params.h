@@ -67,5 +67,5 @@ static const saul_reg_info_t veml6070_saul_info[] =
 }
 #endif
 
-#endif /* VEML6070_PARAMS_H */
 /** @} */
+#endif /* VEML6070_PARAMS_H */

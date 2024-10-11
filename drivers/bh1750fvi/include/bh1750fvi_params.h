@@ -55,5 +55,5 @@ static const bh1750fvi_params_t bh1750fvi_params[] =
 }
 #endif
 
-#endif /* BH1750FVI_PARAMS_H */
 /** @} */
+#endif /* BH1750FVI_PARAMS_H */

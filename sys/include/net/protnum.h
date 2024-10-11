@@ -181,5 +181,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_PROTNUM_H */
 /** @} */
+#endif /* NET_PROTNUM_H */

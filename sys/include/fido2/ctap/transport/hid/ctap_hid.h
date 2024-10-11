@@ -251,5 +251,5 @@ bool fido2_ctap_transport_hid_should_cancel(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_TRANSPORT_HID_CTAP_HID_H */
 /** @} */
+#endif /* FIDO2_CTAP_TRANSPORT_HID_CTAP_HID_H */

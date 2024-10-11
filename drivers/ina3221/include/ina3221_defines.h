@@ -56,5 +56,5 @@ extern "C" {
 }
 #endif
 
-#endif /* INA3221_DEFINES_H */
 /** @} */
+#endif /* INA3221_DEFINES_H */

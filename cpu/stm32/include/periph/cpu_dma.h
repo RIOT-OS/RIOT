@@ -270,5 +270,5 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 }
 #endif
 
-#endif /* PERIPH_CPU_DMA_H */
 /** @} */
+#endif /* PERIPH_CPU_DMA_H */

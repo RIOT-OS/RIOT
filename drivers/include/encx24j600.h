@@ -67,5 +67,5 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params, uint
 #ifdef __cplusplus
 }
 #endif
-#endif /* ENCX24J600_H */
 /** @} */
+#endif /* ENCX24J600_H */

@@ -59,5 +59,5 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */
+#endif /* THREAD_ARCH_H */

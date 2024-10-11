@@ -198,5 +198,5 @@ void pcd8544_riot(const pcd8544_t *dev);
 }
 #endif
 
-#endif /* PCD8544_H */
 /** @} */
+#endif /* PCD8544_H */

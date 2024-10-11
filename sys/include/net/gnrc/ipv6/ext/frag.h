@@ -211,5 +211,5 @@ gnrc_ipv6_ext_frag_stats_t *gnrc_ipv6_ext_frag_stats(void);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_FRAG_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_EXT_FRAG_H */

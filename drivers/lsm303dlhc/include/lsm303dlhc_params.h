@@ -95,5 +95,5 @@ static const saul_reg_info_t lsm303dlhc_saul_info[] =
 }
 #endif
 
-#endif /* LSM303DLHC_PARAMS_H */
 /** @} */
+#endif /* LSM303DLHC_PARAMS_H */

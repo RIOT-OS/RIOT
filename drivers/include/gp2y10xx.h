@@ -124,5 +124,5 @@ int gp2y10xx_read_density(const gp2y10xx_t *dev, uint16_t *density);
 }
 #endif
 
-#endif /* GP2Y10XX_H */
 /** @} */
+#endif /* GP2Y10XX_H */

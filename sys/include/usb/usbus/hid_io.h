@@ -96,5 +96,5 @@ void usb_hid_io_init(usbus_t *usbus, const uint8_t *report_desc, size_t report_d
 }
 #endif
 
-#endif /* USB_USBUS_HID_IO_H */
 /** @} */
+#endif /* USB_USBUS_HID_IO_H */

@@ -40,5 +40,5 @@ typedef cipher_t psa_cipher_aes_256_ctx_t;
 }
 #endif
 
-#endif /* CRYPTO_PSA_RIOT_CIPHERS_H */
 /** @} */
+#endif /* CRYPTO_PSA_RIOT_CIPHERS_H */

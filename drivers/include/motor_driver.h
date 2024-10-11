@@ -235,5 +235,5 @@ void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id);
 }
 #endif
 
-#endif /* MOTOR_DRIVER_H */
 /** @} */
+#endif /* MOTOR_DRIVER_H */

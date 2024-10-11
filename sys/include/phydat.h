@@ -324,5 +324,5 @@ int64_t phydat_unix(int16_t year, int16_t month, int16_t day,
 }
 #endif
 
-#endif /* PHYDAT_H */
 /** @} */
+#endif /* PHYDAT_H */

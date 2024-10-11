@@ -112,5 +112,5 @@ void bluetil_addr_ipv6_l2ll_print(const uint8_t *addr);
 }
 #endif
 
-#endif /* NET_BLUETIL_ADDR_H */
 /** @} */
+#endif /* NET_BLUETIL_ADDR_H */

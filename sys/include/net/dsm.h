@@ -121,5 +121,5 @@ ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session
 }
 #endif
 
-#endif /* NET_DSM_H */
 /** @} */
+#endif /* NET_DSM_H */

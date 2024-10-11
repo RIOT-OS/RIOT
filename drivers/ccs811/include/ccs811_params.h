@@ -95,5 +95,5 @@ static const saul_reg_info_t ccs811_saul_info[] =
 }
 #endif
 
-#endif /* CCS811_PARAMS_H */
 /** @} */
+#endif /* CCS811_PARAMS_H */

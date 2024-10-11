@@ -41,5 +41,5 @@ gnrc_rpl_of_t *gnrc_rpl_get_of_for_ocp(uint16_t ocp);
 }
 #endif
 
-#endif /* NET_GNRC_RPL_OF_MANAGER_H */
 /** @} */
+#endif /* NET_GNRC_RPL_OF_MANAGER_H */

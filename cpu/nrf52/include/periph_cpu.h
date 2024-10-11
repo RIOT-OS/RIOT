@@ -151,5 +151,5 @@ void nrf5x_spi_release(NRF_SPIM_Type *bus);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

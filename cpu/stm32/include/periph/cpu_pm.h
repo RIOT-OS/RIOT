@@ -71,5 +71,5 @@ void pm_backup_regulator_off(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_PM_H */
 /** @} */
+#endif /* PERIPH_CPU_PM_H */

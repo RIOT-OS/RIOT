@@ -242,5 +242,5 @@ enum {
 }
 #endif
 
-#endif /* CC2420_REGISTERS_H */
 /** @} */
+#endif /* CC2420_REGISTERS_H */

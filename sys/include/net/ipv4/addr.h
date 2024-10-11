@@ -141,5 +141,5 @@ void ipv4_addr_print(const ipv4_addr_t *addr);
 }
 #endif
 
-#endif /* NET_IPV4_ADDR_H */
 /** @} */
+#endif /* NET_IPV4_ADDR_H */

@@ -132,5 +132,5 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6
 }
 #endif
 
-#endif /* PRIV_NIB_6LR_H */
 /** @} */
+#endif /* PRIV_NIB_6LR_H */

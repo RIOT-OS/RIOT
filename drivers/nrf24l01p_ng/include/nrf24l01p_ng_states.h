@@ -82,5 +82,5 @@ void nrf24l01p_ng_transition_to_tx_mode(nrf24l01p_ng_t *dev);
 }
 #endif
 
-#endif /* NRF24L01P_NG_STATES_H */
 /** @} */
+#endif /* NRF24L01P_NG_STATES_H */

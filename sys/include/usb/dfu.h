@@ -132,5 +132,5 @@ typedef struct __attribute__((packed))  {
 }
 #endif
 
-#endif /* USB_DFU_H */
 /** @} */
+#endif /* USB_DFU_H */

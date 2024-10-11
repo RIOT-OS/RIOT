@@ -546,5 +546,5 @@ typedef struct {
 }
 #endif
 
-#endif /* OBJECTS_COMMON_H */
 /** @} */
+#endif /* OBJECTS_COMMON_H */

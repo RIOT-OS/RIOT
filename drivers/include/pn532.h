@@ -391,5 +391,5 @@ void pn532_release_passive(pn532_t *dev, unsigned target_id);
 }
 #endif
 
-#endif /* PN532_H */
 /** @} */
+#endif /* PN532_H */

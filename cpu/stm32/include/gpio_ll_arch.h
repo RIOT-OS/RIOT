@@ -283,5 +283,5 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */
+#endif /* GPIO_LL_ARCH_H */

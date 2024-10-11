@@ -75,5 +75,5 @@ static const saul_reg_info_t isl29020_saul_info[] =
 }
 #endif
 
-#endif /* ISL29020_PARAMS_H */
 /** @} */
+#endif /* ISL29020_PARAMS_H */

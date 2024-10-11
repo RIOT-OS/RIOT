@@ -178,5 +178,5 @@ int uri_parser_split_query(const uri_parser_result_t *uri_parsed,
 }
 #endif
 
-#endif /* URI_PARSER_H */
 /** @} */
+#endif /* URI_PARSER_H */

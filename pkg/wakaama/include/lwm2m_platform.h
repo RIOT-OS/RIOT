@@ -50,5 +50,5 @@ void lwm2m_tlsf_status(void);
 }
 #endif
 
-#endif /* LWM2M_PLATFORM_H */
 /** @} */
+#endif /* LWM2M_PLATFORM_H */

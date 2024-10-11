@@ -172,5 +172,5 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
 }
 #endif
 
-#endif /* GNRC_SOCK_INTERNAL_H */
 /** @} */
+#endif /* GNRC_SOCK_INTERNAL_H */

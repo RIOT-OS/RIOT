@@ -44,5 +44,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_CLOCK_32_1_H */
 /** @} */
+#endif /* CFG_CLOCK_32_1_H */

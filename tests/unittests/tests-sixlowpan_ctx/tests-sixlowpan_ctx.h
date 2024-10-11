@@ -33,5 +33,5 @@ void tests_sixlowpan_ctx(void);
 }
 #endif
 
-#endif /* TESTS_SIXLOWPAN_CTX_H */
 /** @} */
+#endif /* TESTS_SIXLOWPAN_CTX_H */

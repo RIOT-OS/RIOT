@@ -105,5 +105,5 @@ static const adc_conf_t adc_config[] = {3, 4, 5, 6};
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

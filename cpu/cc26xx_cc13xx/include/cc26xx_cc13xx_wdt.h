@@ -53,5 +53,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26XX_CC13XX_WDT_H */
 /** @} */
+#endif /* CC26XX_CC13XX_WDT_H */

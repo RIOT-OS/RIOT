@@ -97,5 +97,5 @@ extern "C" {
 }
 #endif
 
-#endif /* HD44780_INTERNAL_H */
 /** @} */
+#endif /* HD44780_INTERNAL_H */

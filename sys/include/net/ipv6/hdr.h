@@ -303,5 +303,5 @@ void ipv6_hdr_print(ipv6_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_IPV6_HDR_H */
 /** @} */
+#endif /* NET_IPV6_HDR_H */

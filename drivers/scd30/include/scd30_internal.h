@@ -58,5 +58,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SCD30_INTERNAL_H */
 /** @} */
+#endif /* SCD30_INTERNAL_H */

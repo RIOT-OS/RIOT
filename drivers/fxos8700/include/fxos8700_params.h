@@ -99,5 +99,5 @@ static const saul_reg_info_t fxos8700_saul_info[] =
 }
 #endif
 
-#endif /* FXOS8700_PARAMS_H */
 /** @} */
+#endif /* FXOS8700_PARAMS_H */

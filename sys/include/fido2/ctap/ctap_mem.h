@@ -170,5 +170,5 @@ int fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_MEM_H */
 /** @} */
+#endif /* FIDO2_CTAP_CTAP_MEM_H */

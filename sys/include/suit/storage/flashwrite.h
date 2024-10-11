@@ -39,5 +39,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SUIT_STORAGE_FLASHWRITE_H */
 /** @} */
+#endif /* SUIT_STORAGE_FLASHWRITE_H */

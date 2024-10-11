@@ -139,5 +139,5 @@ static inline bool gnrc_sixlowpan_frag_fb_send(gnrc_sixlowpan_frag_fb_t *fbuf)
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_FB_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_FB_H */

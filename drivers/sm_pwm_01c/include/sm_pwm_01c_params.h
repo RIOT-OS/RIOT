@@ -76,5 +76,5 @@ static const saul_reg_info_t sm_pwm_01c_saul_info[] =
 }
 #endif
 
-#endif /* SM_PWM_01C_PARAMS_H */
 /** @} */
+#endif /* SM_PWM_01C_PARAMS_H */

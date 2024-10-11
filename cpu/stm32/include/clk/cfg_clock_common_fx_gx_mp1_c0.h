@@ -89,5 +89,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H */
 /** @} */
+#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H */

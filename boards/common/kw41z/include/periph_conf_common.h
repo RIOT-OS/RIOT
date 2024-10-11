@@ -177,5 +177,5 @@ static const uint32_t spi_clk_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */
+#endif /* PERIPH_CONF_COMMON_H */

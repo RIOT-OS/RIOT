@@ -396,5 +396,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_NDP_H */
 /** @} */
+#endif /* NET_NDP_H */

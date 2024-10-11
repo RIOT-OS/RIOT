@@ -85,5 +85,5 @@ int nanocoap_vfs_put(nanocoap_sock_t *sock, const char *path, const char *src,
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_VFS_H */
 /** @} */
+#endif /* NET_NANOCOAP_VFS_H */

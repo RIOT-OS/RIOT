@@ -129,5 +129,5 @@ static inline void event_periodic_stop(event_periodic_t *event_periodic)
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_PERIODIC_H */
 /** @} */
+#endif /* EVENT_PERIODIC_H */

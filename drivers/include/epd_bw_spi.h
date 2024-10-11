@@ -270,5 +270,5 @@ void epd_bw_spi_swreset(epd_bw_spi_t *dev);
 #ifdef __cplusplus
 }
 #endif
-#endif /* EPD_BW_SPI_H */
 /** @} */
+#endif /* EPD_BW_SPI_H */

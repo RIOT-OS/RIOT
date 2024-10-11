@@ -138,5 +138,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_UART_H */
 /** @} */
+#endif /* PERIPH_CPU_UART_H */

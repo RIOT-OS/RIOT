@@ -310,5 +310,5 @@ typedef struct gomach {
 }
 #endif
 
-#endif /* NET_GNRC_GOMACH_TYPES_H */
 /** @} */
+#endif /* NET_GNRC_GOMACH_TYPES_H */

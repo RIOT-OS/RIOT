@@ -39,5 +39,5 @@ Test *tests_base64_tests(void);
 }
 #endif
 
-#endif /* TESTS_BASE64_H */
 /** @} */
+#endif /* TESTS_BASE64_H */

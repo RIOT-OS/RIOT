@@ -184,5 +184,5 @@ int mpl3115a2_read_temp(const mpl3115a2_t *dev, int16_t *temp);
 }
 #endif
 
-#endif /* MPL3115A2_H */
 /** @} */
+#endif /* MPL3115A2_H */

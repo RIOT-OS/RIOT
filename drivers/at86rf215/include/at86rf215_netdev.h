@@ -34,5 +34,5 @@ extern const netdev_driver_t at86rf215_driver;
 }
 #endif
 
-#endif /* AT86RF215_NETDEV_H */
 /** @} */
+#endif /* AT86RF215_NETDEV_H */

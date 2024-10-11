@@ -60,5 +60,5 @@ typedef CRYS_HASHUserContext_t psa_hashes_sha512_ctx_t;
 }
 #endif
 
-#endif /* PSA_PERIPH_HASHES_CTX_H */
 /** @} */
+#endif /* PSA_PERIPH_HASHES_CTX_H */

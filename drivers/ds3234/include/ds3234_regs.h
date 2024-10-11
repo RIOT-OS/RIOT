@@ -71,5 +71,5 @@ enum {
 }
 #endif
 
-#endif /* DS3234_REGS_H */
 /** @} */
+#endif /* DS3234_REGS_H */

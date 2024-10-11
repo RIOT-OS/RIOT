@@ -182,5 +182,5 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_IOC_H */
 /** @} */
+#endif /* CC26XX_CC13XX_IOC_H */

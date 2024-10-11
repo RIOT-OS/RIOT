@@ -281,5 +281,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NRFX_GLUE_H */
 /** @} */
+#endif /* NRFX_GLUE_H */

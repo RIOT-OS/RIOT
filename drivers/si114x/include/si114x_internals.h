@@ -203,5 +203,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SI114X_INTERNALS_H */
 /** @} */
+#endif /* SI114X_INTERNALS_H */

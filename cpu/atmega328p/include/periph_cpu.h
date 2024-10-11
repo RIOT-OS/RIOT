@@ -103,5 +103,5 @@ static inline bool atmega_has_pin_exti(uint8_t port_num, uint8_t pin_num)
 #include "periph_conf.h"
 #include "default_timer_config.h"
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

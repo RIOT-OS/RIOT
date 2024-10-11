@@ -423,5 +423,5 @@ int flashpage_rwwee_write_and_verify(unsigned page, const void *data);
 }
 #endif
 
-#endif /* PERIPH_FLASHPAGE_H */
 /** @} */
+#endif /* PERIPH_FLASHPAGE_H */

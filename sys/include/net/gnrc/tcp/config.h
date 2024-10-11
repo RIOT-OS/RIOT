@@ -211,5 +211,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_TCP_CONFIG_H */
 /** @} */
+#endif /* NET_GNRC_TCP_CONFIG_H */

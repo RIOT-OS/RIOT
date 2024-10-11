@@ -64,5 +64,5 @@ extern int sched_yield(void);
 }
 #endif
 
-#endif /* NATIVE_SCHED_H */
 /** @} */
+#endif /* NATIVE_SCHED_H */

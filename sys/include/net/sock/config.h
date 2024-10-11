@@ -66,5 +66,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_SOCK_CONFIG_H */
 /** @} */
+#endif /* NET_SOCK_CONFIG_H */

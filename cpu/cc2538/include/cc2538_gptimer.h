@@ -88,5 +88,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_GPTIMER_H */
 /** @} */
+#endif /* CC2538_GPTIMER_H */

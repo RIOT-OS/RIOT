@@ -143,5 +143,5 @@ void ztimer_periodic_stop(ztimer_periodic_t *timer);
 }
 #endif
 
-#endif /* ZTIMER_PERIODIC_H */
 /** @} */
+#endif /* ZTIMER_PERIODIC_H */

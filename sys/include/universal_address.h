@@ -170,5 +170,5 @@ void universal_address_print_table(void);
 }
 #endif
 
-#endif /* UNIVERSAL_ADDRESS_H */
 /** @} */
+#endif /* UNIVERSAL_ADDRESS_H */

@@ -54,5 +54,5 @@ static inline size_t _align(size_t size)
 }
 #endif
 
-#endif /* PKTBUF_STATIC_H */
 /** @} */
+#endif /* PKTBUF_STATIC_H */

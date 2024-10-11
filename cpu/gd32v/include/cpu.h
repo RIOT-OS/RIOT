@@ -45,5 +45,5 @@ static inline void cpu_jump_to_image(uint32_t addr)
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */
+#endif /* CPU_H */

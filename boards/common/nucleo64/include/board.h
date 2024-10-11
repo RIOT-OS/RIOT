@@ -121,5 +121,5 @@ static const motor_driver_config_t motor_driver_config[] = {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

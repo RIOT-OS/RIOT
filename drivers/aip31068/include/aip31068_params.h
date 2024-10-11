@@ -68,5 +68,5 @@ static const aip31068_params_t aip31068_params[] =
 }
 #endif
 
-#endif /* AIP31068_PARAMS_H */
 /** @} */
+#endif /* AIP31068_PARAMS_H */

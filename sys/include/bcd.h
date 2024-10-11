@@ -56,5 +56,5 @@ static inline uint8_t bcd_to_byte(uint8_t bcd)
 }
 #endif
 
-#endif /* BCD_H */
 /** @} */
+#endif /* BCD_H */

@@ -46,5 +46,5 @@ int native_cli_get_eui64(uint8_t index, eui64_t *addr);
 }
 #endif
 
-#endif /* NATIVE_CLI_EUI_PROVIDER_H */
 /** @} */
+#endif /* NATIVE_CLI_EUI_PROVIDER_H */

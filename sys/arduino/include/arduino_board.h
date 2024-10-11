@@ -50,5 +50,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_BOARD_H */
 /** @} */
+#endif /* ARDUINO_BOARD_H */

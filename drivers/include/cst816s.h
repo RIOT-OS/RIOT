@@ -157,5 +157,5 @@ int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data);
 }
 #endif
 
-#endif /* CST816S_H */
 /** @} */
+#endif /* CST816S_H */

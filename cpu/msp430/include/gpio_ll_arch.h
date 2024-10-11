@@ -204,5 +204,5 @@ uword_t gpio_port_num(gpio_port_t port);
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */
+#endif /* GPIO_LL_ARCH_H */

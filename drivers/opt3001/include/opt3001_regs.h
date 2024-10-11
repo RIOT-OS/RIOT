@@ -87,5 +87,5 @@
 }
 #endif
 
-#endif /* OPT3001_REGS_H */
 /** @} */
+#endif /* OPT3001_REGS_H */

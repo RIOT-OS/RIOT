@@ -239,5 +239,5 @@ int ata8520e_send_bit(ata8520e_t *dev, bool bit);
 }
 #endif
 
-#endif /* ATA8520E_H */
 /** @} */
+#endif /* ATA8520E_H */

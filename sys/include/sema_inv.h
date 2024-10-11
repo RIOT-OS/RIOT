@@ -147,5 +147,5 @@ static inline int sema_inv_wait_timeout(sema_inv_t *s, uint32_t us)
 }
 #endif
 
-#endif /* SEMA_INV_H */
 /** @} */
+#endif /* SEMA_INV_H */

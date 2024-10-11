@@ -59,5 +59,5 @@ err_t lwip_netdev_init(struct netif *netif);
 }
 #endif
 
-#endif /* LWIP_NETIF_NETDEV_H */
 /** @} */
+#endif /* LWIP_NETIF_NETDEV_H */

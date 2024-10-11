@@ -352,5 +352,5 @@ typedef uint8_t sock_aux_flags_t;
 }
 #endif
 
-#endif /* NET_SOCK_H */
 /** @} */
+#endif /* NET_SOCK_H */

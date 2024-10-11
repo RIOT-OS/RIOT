@@ -41,5 +41,5 @@ extern "C" {
 
 #include "periph_conf_atmega_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

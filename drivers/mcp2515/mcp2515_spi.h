@@ -164,5 +164,5 @@ int mcp2515_spi_bitmod(const candev_mcp2515_t *dev, uint8_t addr, uint8_t mask,
 }
 #endif
 
-#endif /* MCP2515_SPI_H */
 /** @} */
+#endif /* MCP2515_SPI_H */

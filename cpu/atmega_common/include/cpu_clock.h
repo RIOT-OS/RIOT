@@ -78,5 +78,5 @@ static inline void atmega_set_prescaler(uint8_t clk_scale)
 }
 #endif
 
-#endif /* CPU_CLOCK_H */
 /** @} */
+#endif /* CPU_CLOCK_H */

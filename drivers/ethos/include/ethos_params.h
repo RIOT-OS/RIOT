@@ -44,5 +44,5 @@ static const ethos_params_t ethos_params[] = {
 }
 #endif
 
-#endif /* ETHOS_PARAMS_H */
 /** @} */
+#endif /* ETHOS_PARAMS_H */

@@ -868,5 +868,5 @@ do {                                                                            
 }
 #endif
 
-#endif /* UTLIST_H */
 /** @} */
+#endif /* UTLIST_H */

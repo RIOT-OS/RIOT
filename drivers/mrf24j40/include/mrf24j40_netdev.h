@@ -36,5 +36,5 @@ extern const netdev_driver_t mrf24j40_driver;
 }
 #endif
 
-#endif /* MRF24J40_NETDEV_H */
 /** @} */
+#endif /* MRF24J40_NETDEV_H */

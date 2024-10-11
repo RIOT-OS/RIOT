@@ -105,5 +105,5 @@ uuid_t *suit_get_device_id(void);
 }
 #endif
 
-#endif /* SUIT_CONDITIONS_H */
 /** @} */
+#endif /* SUIT_CONDITIONS_H */

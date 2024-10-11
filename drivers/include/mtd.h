@@ -544,5 +544,5 @@ static inline mtd_dev_t *mtd_dev_get(unsigned idx)
 }
 #endif
 
-#endif /* MTD_H */
 /** @} */
+#endif /* MTD_H */

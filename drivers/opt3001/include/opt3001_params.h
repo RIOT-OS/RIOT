@@ -69,5 +69,5 @@ extern "C" {
 }
 #endif
 
-#endif /* OPT3001_PARAMS_H */
 /** @} */
+#endif /* OPT3001_PARAMS_H */

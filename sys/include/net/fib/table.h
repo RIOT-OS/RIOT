@@ -139,5 +139,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_FIB_TABLE_H */
 /** @} */
+#endif /* NET_FIB_TABLE_H */

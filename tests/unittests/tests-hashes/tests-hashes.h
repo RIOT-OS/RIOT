@@ -118,5 +118,5 @@ Test *tests_hashes_sha3_tests(void);
 }
 #endif
 
-#endif /* TESTS_HASHES_H */
 /** @} */
+#endif /* TESTS_HASHES_H */

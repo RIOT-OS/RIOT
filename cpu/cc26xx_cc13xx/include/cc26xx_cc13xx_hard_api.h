@@ -93,5 +93,5 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_HARD_API_H */
 /** @} */
+#endif /* CC26XX_CC13XX_HARD_API_H */

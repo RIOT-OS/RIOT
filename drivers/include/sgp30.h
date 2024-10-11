@@ -251,5 +251,5 @@ int sgp30_read_raw_measurements(sgp30_t *dev, sgp30_raw_data_t *data);
 }
 #endif
 
-#endif /* SGP30_H */
 /** @} */
+#endif /* SGP30_H */

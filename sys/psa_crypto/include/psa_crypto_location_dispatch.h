@@ -278,5 +278,5 @@ psa_status_t psa_location_dispatch_generate_random(uint8_t *output,
 }
 #endif
 
-#endif /* PSA_CRYPTO_LOCATION_DISPATCH_H */
 /** @} */
+#endif /* PSA_CRYPTO_LOCATION_DISPATCH_H */

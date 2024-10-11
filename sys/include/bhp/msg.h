@@ -102,5 +102,5 @@ static inline void bhp_msg_handler(msg_t *msg)
 }
 #endif
 
-#endif /* BHP_MSG_H */
 /** @} */
+#endif /* BHP_MSG_H */

@@ -280,5 +280,5 @@ uint64_t sdcard_spi_get_capacity(sdcard_spi_t *card);
 }
 #endif
 
-#endif /* SDCARD_SPI_H */
 /** @} */
+#endif /* SDCARD_SPI_H */

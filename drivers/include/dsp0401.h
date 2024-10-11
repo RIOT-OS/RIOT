@@ -103,5 +103,5 @@ void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay);
 }
 #endif
 
-#endif /* DSP0401_H */
 /** @} */
+#endif /* DSP0401_H */

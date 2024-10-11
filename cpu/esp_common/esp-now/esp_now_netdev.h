@@ -122,5 +122,5 @@ int esp_now_set_channel(uint8_t channel);
 }
 #endif
 
-#endif /* ESP_NOW_NETDEV_H */
 /** @} */
+#endif /* ESP_NOW_NETDEV_H */

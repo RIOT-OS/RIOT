@@ -66,5 +66,5 @@ uint32_t spin_random_calibrate(tim_t timer_dev, uint32_t spin_max_target);
 }
 #endif
 
-#endif /* SPIN_RANDOM_H */
 /** @} */
+#endif /* SPIN_RANDOM_H */

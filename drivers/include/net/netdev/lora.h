@@ -40,5 +40,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_NETDEV_LORA_H */
 /** @} */
+#endif /* NET_NETDEV_LORA_H */

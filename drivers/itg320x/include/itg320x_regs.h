@@ -71,5 +71,5 @@ extern "C"
 }
 #endif
 
-#endif /* ITG320X_REGS_H */
 /** @} */
+#endif /* ITG320X_REGS_H */

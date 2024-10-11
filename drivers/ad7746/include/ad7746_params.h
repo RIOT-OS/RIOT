@@ -96,5 +96,5 @@ static const saul_reg_info_t ad7746_saul_info[] =
 }
 #endif
 
-#endif /* AD7746_PARAMS_H */
 /** @} */
+#endif /* AD7746_PARAMS_H */

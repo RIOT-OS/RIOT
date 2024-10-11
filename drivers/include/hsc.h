@@ -99,5 +99,5 @@ int hsc_read_pressure(const hsc_t *dev, int32_t *dest);
 }
 #endif
 
-#endif /* HSC_H */
 /** @} */
+#endif /* HSC_H */

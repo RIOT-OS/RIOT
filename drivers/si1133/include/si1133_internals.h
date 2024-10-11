@@ -194,5 +194,5 @@ typedef struct __attribute__((packed)) _si1133_channel_params {
 }
 #endif
 
-#endif /* SI1133_INTERNALS_H */
 /** @} */
+#endif /* SI1133_INTERNALS_H */

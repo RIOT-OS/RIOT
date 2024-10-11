@@ -42,5 +42,5 @@ extern "C" {
 #define LOG_DEBUG(...) printf(__VA_ARGS__)
 /** @} */
 
-#endif /* LOG_H */
 /** @} */
+#endif /* LOG_H */

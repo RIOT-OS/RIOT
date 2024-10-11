@@ -351,5 +351,5 @@ static inline uint64_t volatile_fetch_and_u64(volatile uint64_t *dest,
 }
 #endif
 
-#endif /* VOLATILE_UTILS_H */
 /** @} */
+#endif /* VOLATILE_UTILS_H */

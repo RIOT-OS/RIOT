@@ -158,5 +158,5 @@ void lis3mdl_disable(const lis3mdl_t *dev);
 }
 #endif
 
-#endif /* LIS3MDL_H */
 /** @} */
+#endif /* LIS3MDL_H */

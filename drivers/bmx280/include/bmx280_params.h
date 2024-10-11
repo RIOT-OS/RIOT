@@ -118,5 +118,5 @@ static const saul_reg_info_t bmx280_saul_reg_info[BMX280_NUMOF] =
 }
 #endif
 
-#endif /* BMX280_PARAMS_H */
 /** @} */
+#endif /* BMX280_PARAMS_H */

@@ -74,5 +74,5 @@ static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
 }
 #endif
 
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */
+#endif /* ATOMIC_UTILS_ARCH_H */

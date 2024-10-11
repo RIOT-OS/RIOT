@@ -73,5 +73,5 @@ void hwrng_read(void *buf, unsigned int num);
 }
 #endif
 
-#endif /* PERIPH_HWRNG_H */
 /** @} */
+#endif /* PERIPH_HWRNG_H */

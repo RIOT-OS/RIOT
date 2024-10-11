@@ -328,5 +328,5 @@ int congure_test_call_report(int argc, char **argv);
 }
 #endif
 
-#endif /* CONGURE_TEST_H */
 /** @} */
+#endif /* CONGURE_TEST_H */

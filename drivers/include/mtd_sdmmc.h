@@ -54,5 +54,5 @@ extern const mtd_desc_t mtd_sdmmc_driver;
 }
 #endif
 
-#endif /* MTD_SDMMC_H */
 /** @} */
+#endif /* MTD_SDMMC_H */

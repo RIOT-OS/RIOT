@@ -761,5 +761,5 @@ void gnrc_rpl_configure_root(gnrc_netif_t *netif, const ipv6_addr_t *dodag_id);
 }
 #endif
 
-#endif /* NET_GNRC_RPL_H */
 /** @} */
+#endif /* NET_GNRC_RPL_H */

@@ -85,5 +85,5 @@ static const saul_reg_info_t lpsxxx_saul_info[] =
 }
 #endif
 
-#endif /* LPSXXX_PARAMS_H */
 /** @} */
+#endif /* LPSXXX_PARAMS_H */

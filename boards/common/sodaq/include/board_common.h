@@ -37,5 +37,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */
+#endif /* BOARD_COMMON_H */

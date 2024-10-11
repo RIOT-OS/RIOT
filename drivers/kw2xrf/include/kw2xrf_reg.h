@@ -563,5 +563,5 @@ enum mkw2xdrf_iregister {
 }
 #endif
 
-#endif /* KW2XRF_REG_H */
 /** @} */
+#endif /* KW2XRF_REG_H */

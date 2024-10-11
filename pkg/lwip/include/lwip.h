@@ -42,5 +42,5 @@ void lwip_bootstrap(void);
 }
 #endif
 
-#endif /* LWIP_H */
 /** @} */
+#endif /* LWIP_H */

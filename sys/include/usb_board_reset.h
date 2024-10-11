@@ -38,5 +38,5 @@ void usb_board_reset_in_bootloader(void);
 }
 #endif
 
-#endif /* USB_BOARD_RESET_H */
 /** @} */
+#endif /* USB_BOARD_RESET_H */

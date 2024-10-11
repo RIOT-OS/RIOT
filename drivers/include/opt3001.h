@@ -163,5 +163,5 @@ int opt3001_read_lux(const opt3001_t *dev, uint32_t *convl);
 }
 #endif
 
-#endif /* OPT3001_H */
 /** @} */
+#endif /* OPT3001_H */

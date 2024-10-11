@@ -120,5 +120,5 @@ typedef struct {
 }
 #endif
 
-#endif /* USBDEV_SYNOPSYS_DWC2_H */
 /** @} */
+#endif /* USBDEV_SYNOPSYS_DWC2_H */

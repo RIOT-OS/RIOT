@@ -69,5 +69,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_SOMEIP_H */
 /** @} */
+#endif /* NET_SOMEIP_H */

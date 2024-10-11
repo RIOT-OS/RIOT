@@ -33,5 +33,5 @@ void tests_gnrc_ipv6_hdr(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_IPV6_HDR_H */
 /** @} */
+#endif /* TESTS_GNRC_IPV6_HDR_H */

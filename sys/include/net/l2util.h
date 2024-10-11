@@ -214,5 +214,5 @@ static inline bool l2util_addr_equal(const uint8_t *addr_a, uint8_t addr_a_len,
 }
 #endif
 
-#endif /* NET_L2UTIL_H */
 /** @} */
+#endif /* NET_L2UTIL_H */

@@ -362,5 +362,5 @@ nrf24l01p_ng_rfdr_t nrf24l01p_ng_valtoe_rfdr(uint16_t data_rate)
 }
 #endif
 
-#endif /* NRF24L01P_NG_TYPES_H */
 /** @} */
+#endif /* NRF24L01P_NG_TYPES_H */

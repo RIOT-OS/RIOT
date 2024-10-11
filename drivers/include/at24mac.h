@@ -101,5 +101,5 @@ at24mac_type_t at24mac_get_type(at24mac_t dev);
 }
 #endif
 
-#endif /* AT24MAC_H */
 /** @} */
+#endif /* AT24MAC_H */
