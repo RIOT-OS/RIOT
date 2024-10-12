@@ -56,8 +56,7 @@
  * - `cord_epsim`:  endpoint implementation following the simple registration
  *                  procedure as defined in section 5.3.1
  * - `cord_lc`:     lookup client implementation for querying information from
- *                  an RD using the lookup and group interfaces (**NOT
- *                  YET IMPLEMENTED**)
+ *                  an RD using the lookup and group interfaces
  * - `cord_config`: header file collection (default) configuration values used
  *                  throughout this module
  * - `cord_common`: shared functionality used by the above submodules
