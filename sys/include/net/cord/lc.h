@@ -14,9 +14,9 @@
  * This module implements a CoRE Resource Directory lookup client library, that
  * allows RIOT nodes to lookup resources, endpoints and groups with resource
  * directories.
- * It implements the standard lookup functionality as defined in
- * draft-ietf-core-resource-directory-27.
- * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-27
+ * It implements the standard lookup functionality as defined in RFC 9176.
+ * 
+ * @see https://datatracker.ietf.org/doc/html/rfc9176
  *
  * ## Lookup modes
  *
