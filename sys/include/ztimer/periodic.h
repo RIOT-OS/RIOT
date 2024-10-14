@@ -131,6 +131,19 @@ void ztimer_periodic_init(ztimer_clock_t *clock, ztimer_periodic_t *timer,
 void ztimer_periodic_start(ztimer_periodic_t *timer);
 
 /**
+ * @brief    Start or restart a periodic timer without initial timer delay
+ *
+ * When called on a newly initialized timer, the timer will start.
+ *
+ * When called on an already running timer, the current interval is reset to its
+ * start (thus the next callback will be called after the configured interval
+ * has passed).
+ *
+ * @param[in]   timer   periodic timer object to work on
+ */
+void ztimer_periodic_start_now(ztimer_periodic_t *timer);
+
+/**
  * @brief   Stop a periodic timer
  *
  * The periodic timer will not trigger anymore.
