@@ -236,7 +236,7 @@ static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote,
     ssize_t res = gcoap_req_send(buf, len, remote, local, NULL, NULL,
                                  GCOAP_SOCKET_TYPE_UDP);
     if (res <= 0) {
-        DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", -res);
+        DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", (int)-res);
     }
     return res;
 }
@@ -353,7 +353,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
     bool uri_path_added = false;
     bool etag_added = false;
 
-    for (int i = 0; i < client_pkt->options_len; i++) {
+    for (uint16_t i = 0; i < client_pkt->options_len; i++) {
         ssize_t optlen = coap_opt_get_next(client_pkt, &opt, &value, !i);
         /* wrt to ETag option slack: we always have at least the Proxy-URI option in the client_pkt,
          * so we should hit at least once (and it's opt_num is also >= COAP_OPT_ETAG) */
