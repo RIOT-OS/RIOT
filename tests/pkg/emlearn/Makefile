@@ -4,8 +4,6 @@ USEPKG += emlearn
 
 BLOBS += digit
 
-BUILDDEPS += model.h
-
 include $(RIOTBASE)/Makefile.include
 
 model_head.h:
