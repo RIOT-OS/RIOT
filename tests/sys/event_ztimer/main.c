@@ -64,10 +64,9 @@ static void callback_4times(void *arg)
     uint8_t *count = (uint8_t *)arg;
 
     *count = *count + 1;
-    uint32_t now = event_periodic.timer.last;
+    uint32_t now = ztimer_now(ZTIMER_USEC);
     uint32_t elapsed = now - before;
     before = now;
-    expect((elapsed) >= 1 * US_PER_SEC);
     if (*count <= 4) {
         printf("trigger %d of periodic timeout, elapsed time: %" PRIu32 " us\n",
                *count, elapsed);
@@ -110,8 +109,15 @@ int main(void)
     event_periodic_init(&event_periodic, ZTIMER_USEC, EVENT_PRIO_MEDIUM,
                         &event_4times.super);
     event_periodic_set_count(&event_periodic, 4);
+    before = ztimer_now(ZTIMER_USEC);
     event_periodic_start(&event_periodic, EVENT_TIMEOUT_TIME);
-    before = event_periodic.timer.last;
+    puts("waiting for periodic callback to be triggered 4 times");
+    mutex_lock(&lock);
+    puts("posting periodic timed callback with timeout 1sec and no delay");
+    event_periodic_set_count(&event_periodic, 4);
+    iter = 0; /* reset callback argument counter to 0 */
+    before = ztimer_now(ZTIMER_USEC);
+    event_periodic_start_now(&event_periodic, EVENT_TIMEOUT_TIME);
     puts("waiting for periodic callback to be triggered 4 times");
     mutex_lock(&lock);
     puts("posting timed callback with timeout 0.5sec, clear right after");

@@ -75,6 +75,11 @@ void ztimer_periodic_start(ztimer_periodic_t *timer)
     timer->last = ztimer_set(timer->clock, &timer->timer, timer->interval) + timer->interval;
 }
 
+void ztimer_periodic_start_now(ztimer_periodic_t *timer)
+{
+    timer->last = ztimer_set(timer->clock, &timer->timer, 0);
+}
+
 void ztimer_periodic_stop(ztimer_periodic_t *timer)
 {
     ztimer_remove(timer->clock, &timer->timer);
