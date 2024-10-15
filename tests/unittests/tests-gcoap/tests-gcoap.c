@@ -124,7 +124,7 @@ static void test_gcoap__client_get_resp(void)
     };
     memcpy(buf, pdu_data, sizeof(pdu_data));
 
-    res = coap_parse(&pdu, &buf[0], sizeof(pdu_data));
+    res = coap_parse_udp(&pdu, &buf[0], sizeof(pdu_data));
 
     TEST_ASSERT_EQUAL_INT(sizeof(pdu_data), res);
     TEST_ASSERT_EQUAL_INT(COAP_CLASS_SUCCESS, coap_get_code_class(&pdu));
@@ -155,7 +155,7 @@ static void test_gcoap__client_put_req(void)
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
     memcpy(pdu.payload, payload, 1);
 
-    coap_parse(&pdu, buf, len + 1);
+    coap_parse_udp(&pdu, buf, len + 1);
 
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
@@ -203,7 +203,7 @@ static void test_gcoap__client_get_path_defer(void)
     TEST_ASSERT_EQUAL_INT(len,
                           sizeof(coap_udp_hdr_t) + CONFIG_GCOAP_TOKENLEN + ETAG_SLACK + optlen);
 
-    coap_parse(&pdu, buf, len);
+    coap_parse_udp(&pdu, buf, len);
 
     char uri[CONFIG_NANOCOAP_URI_MAX] = {0};
     coap_get_uri_path(&pdu, (uint8_t *)&uri[0]);
@@ -249,7 +249,7 @@ static ssize_t _read_cli_stats_req(coap_pkt_t *pdu, uint8_t *buf)
     };
     memcpy(buf, pdu_data, sizeof(pdu_data));
 
-    return coap_parse(pdu, buf, sizeof(pdu_data));
+    return coap_parse_udp(pdu, buf, sizeof(pdu_data));
 }
 
 /* Server GET request success case. Validate request example. */
@@ -321,7 +321,7 @@ static ssize_t _read_cli_stats_req_con(coap_pkt_t *pdu, uint8_t *buf)
     };
     memcpy(buf, pdu_data, sizeof(pdu_data));
 
-    return coap_parse(pdu, buf, sizeof(pdu_data));
+    return coap_parse_udp(pdu, buf, sizeof(pdu_data));
 }
 
 /* Server CON GET request success case. Validate request is confirmable. */
