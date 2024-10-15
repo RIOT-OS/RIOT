@@ -131,16 +131,16 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
             uri_parser_result_t urip;
             uri_parser_process(&urip, _last_req_uri, strlen(_last_req_uri));
             if (*_proxy_uri) {
-                gcoap_req_init(pdu, (uint8_t *)pdu->hdr, CONFIG_GCOAP_PDU_BUF_SIZE,
+                gcoap_req_init(pdu, pdu->buf, CONFIG_GCOAP_PDU_BUF_SIZE,
                                COAP_METHOD_GET, NULL);
             }
             else {
-                gcoap_req_init(pdu, (uint8_t *)pdu->hdr, CONFIG_GCOAP_PDU_BUF_SIZE,
+                gcoap_req_init(pdu, pdu->buf, CONFIG_GCOAP_PDU_BUF_SIZE,
                                COAP_METHOD_GET, urip.path);
             }
 
             if (msg_type == COAP_TYPE_ACK) {
-                coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
+                coap_pkt_set_type(pdu, COAP_TYPE_CON);
             }
             block.blknum++;
             coap_opt_add_block2_control(pdu, &block);
@@ -151,7 +151,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 
             int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
             gcoap_socket_type_t tl = _get_tl(*_proxy_uri ? _proxy_uri : _last_req_uri);
-            _send((uint8_t *)pdu->hdr, len, remote, memo->context, tl);
+            _send(pdu->buf, len, remote, memo->context, tl);
         }
         else {
             puts("--- blockwise complete ---");
@@ -344,7 +344,7 @@ static int _cli_cmd(int argc, char **argv)
             }
         }
 
-        coap_hdr_set_type(pdu.hdr, msg_type);
+        coap_pkt_set_type(&pdu, msg_type);
 
         size_t paylen = 0;
         if (apos < argc) {
