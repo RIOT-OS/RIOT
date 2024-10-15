@@ -77,10 +77,10 @@ static size_t _encode_uint(uint32_t *val);
  * |1 1 1 1 1 1 1 1|    Payload (if any) ...
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 {
-    coap_hdr_t *hdr = (coap_hdr_t *)buf;
-    pkt->hdr = hdr;
+    pkt->buf = buf;
+    coap_udp_hdr_t *hdr = (coap_udp_hdr_t *)buf;
 
     uint8_t *pkt_pos = coap_hdr_data_ptr(hdr);
     uint8_t *pkt_end = buf + len;
@@ -90,17 +90,17 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     memset(pkt->opt_crit, 0, sizeof(pkt->opt_crit));
     pkt->snips = NULL;
 
-    if (len < sizeof(coap_hdr_t)) {
+    if (len < sizeof(coap_udp_hdr_t)) {
         DEBUG("msg too short\n");
         return -EBADMSG;
     }
-    else if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_hdr_t))) {
+    else if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_udp_hdr_t))) {
         DEBUG("empty msg too long\n");
         return -EBADMSG;
     }
 
     if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        if ((pkt->hdr->ver_t_tkl & 0xf) == 15) {
+        if ((coap_get_udp_hdr(pkt)->ver_t_tkl & 0xf) == 15) {
             DEBUG("nanocoap: token length is reserved value 15,"
                   "invalid for extended token length field.\n");
             return -EBADMSG;
@@ -182,7 +182,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
           coap_get_code_detail(pkt),
           pkt->payload_len, option_count, hdr->code);
 
-    return 0;
+    return len;
 }
 
 int coap_match_path(const coap_resource_t *resource, const uint8_t *uri)
@@ -209,7 +209,7 @@ uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
         if (optpos->opt_num == opt_num) {
             unsigned idx = index_of(pkt->options, optpos);
             bf_unset(pkt->opt_crit, idx);
-            return (uint8_t*)pkt->hdr + optpos->offset;
+            return pkt->buf + optpos->offset;
         }
         optpos++;
     }
@@ -352,7 +352,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
         opt->opt_num = 0;
         opt->offset = coap_get_total_hdr_len(pkt);
     }
-    uint8_t *start = (uint8_t*)pkt->hdr + opt->offset;
+    uint8_t *start = pkt->buf + opt->offset;
 
     /* Find start of option value and value length. */
     uint16_t delta;
@@ -365,7 +365,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
 
     *value = start;
     opt->opt_num += delta;
-    opt->offset = start + len - (uint8_t*)pkt->hdr;
+    opt->offset = start + len - pkt->buf;
     return len;
 }
 
@@ -642,7 +642,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
     uint8_t *bufpos = buf;
     uint32_t no_response;
     unsigned tkl = coap_get_token_len(pkt);
-    size_t hdr_len = sizeof(coap_hdr_t) + tkl;
+    size_t hdr_len = sizeof(coap_udp_hdr_t) + tkl;
     uint8_t type = coap_get_type(pkt) == COAP_TYPE_CON
                  ? COAP_TYPE_ACK
                  : COAP_TYPE_NON;
@@ -658,8 +658,8 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
         return -ENOBUFS;
     }
 
-    bufpos += coap_build_hdr(buf, type, coap_get_token(pkt), tkl,
-                             code, ntohs(pkt->hdr->id));
+    bufpos += coap_build_udp_hdr(buf, len, type, coap_get_token(pkt), tkl,
+                                 code, coap_get_id(pkt));
 
     if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
         const uint8_t no_response_index = (code >> 5) - 1;
@@ -726,16 +726,14 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     return header_len + payload_len;
 }
 
-ssize_t coap_build_empty_ack(coap_pkt_t *pkt, coap_hdr_t *ack)
+ssize_t coap_build_empty_ack(const coap_pkt_t *pkt, coap_udp_hdr_t *ack)
 {
     if (coap_get_type(pkt) != COAP_TYPE_CON) {
         return 0;
     }
 
-    coap_build_hdr(ack, COAP_TYPE_ACK, NULL, 0,
-                   COAP_CODE_EMPTY, ntohs(pkt->hdr->id));
-
-    return sizeof(*ack);
+    return coap_build_udp_hdr(ack, sizeof(*ack), COAP_TYPE_ACK, NULL, 0,
+                              COAP_CODE_EMPTY, coap_get_id(pkt));
 }
 
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
@@ -753,7 +751,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     else if (coap_get_type(pkt) == COAP_TYPE_CON) {
         type = COAP_TYPE_ACK;
     }
-    unsigned len = sizeof(coap_hdr_t) + tkl;
+    unsigned len = sizeof(coap_udp_hdr_t) + tkl;
 
     if ((len + payload_len) > rlen) {
         return -ENOSPC;
@@ -774,8 +772,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         }
     }
 
-    coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
-                   ntohs(pkt->hdr->id));
+    coap_build_udp_hdr(rbuf, rlen, type, coap_get_token(pkt), tkl, code, coap_get_id(pkt));
     len += payload_len;
 
     /* HACK: many CoAP handlers assume that the pkt buffer is also used for the response */
@@ -784,8 +781,9 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     return len;
 }
 
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
-                       size_t token_len, unsigned code, uint16_t id)
+ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type,
+                           const void *token, size_t token_len,
+                           uint8_t code, uint16_t id)
 {
     assert(!(type & ~0x3));
 
@@ -807,13 +805,21 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
         tkl_ext_len = 0;
     }
 
-    memset(hdr, 0, sizeof(coap_hdr_t));
+    size_t hdr_len = sizeof(coap_udp_hdr_t) + token_len + tkl_ext_len;
+    if (buf_len < hdr_len) {
+        return -EOVERFLOW;
+    }
+
+    memset(buf, 0, sizeof(coap_udp_hdr_t));
+    coap_udp_hdr_t *hdr = buf;
     hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | tkl;
     hdr->code = code;
     hdr->id = htons(id);
+    buf += sizeof(coap_udp_hdr_t);
 
     if (tkl_ext_len) {
-        memcpy(hdr + 1, &tkl_ext, tkl_ext_len);
+        memcpy(buf, &tkl_ext, tkl_ext_len);
+        buf += tkl_ext_len;
     }
 
     /* Some users build a response packet in the same buffer that contained
@@ -828,13 +834,13 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
         memcpy(token_dest, token, token_len);
     }
 
-    return sizeof(coap_hdr_t) + token_len + tkl_ext_len;
+    return hdr_len;
 }
 
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len)
 {
     memset(pkt, 0, sizeof(coap_pkt_t));
-    pkt->hdr = (coap_hdr_t *)buf;
+    pkt->buf = buf;
     pkt->payload = buf + header_len;
     pkt->payload_len = len - header_len;
 }
@@ -1167,7 +1173,7 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const void *val,
     coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
 
     pkt->options[pkt->options_len].opt_num = optnum;
-    pkt->options[pkt->options_len].offset = pkt->payload - (uint8_t *)pkt->hdr;
+    pkt->options[pkt->options_len].offset = pkt->payload - pkt->buf;
     pkt->options_len++;
     pkt->payload += optlen;
     pkt->payload_len -= optlen;
@@ -1289,7 +1295,7 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
         pkt->payload_len = 0;
     }
 
-    return pkt->payload - (uint8_t *)pkt->hdr;
+    return pkt->payload - pkt->buf;
 }
 
 ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
@@ -1313,7 +1319,7 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
             if (opt_count == 0) {
                 /* this is the last option => use payload / end pointer as old start */
                 start_old = (pkt->payload_len) ? pkt->payload - 1 : pkt->payload;
-                start_new = (uint8_t *)pkt->hdr + optpos->offset;
+                start_new = pkt->buf + optpos->offset;
                 break;
             }
 
@@ -1327,12 +1333,12 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
             optpos++;
             opt_count--;
             /* select start of next option */
-            opt_start = (uint8_t *)pkt->hdr + optpos->offset;
+            opt_start = pkt->buf + optpos->offset;
             start_old = _parse_option(pkt, opt_start, &old_delta, &option_len);
             old_hdr_len = start_old - opt_start;
 
             /* select start of to be deleted option and set delta/length of next option */
-            start_new = (uint8_t *)pkt->hdr + prev_opt->offset;
+            start_new = pkt->buf + prev_opt->offset;
             *start_new = 0;
             /* write new_delta value to option header: 4 upper bits of header (shift 4) +
              * 1 or 2 optional bytes depending on delta value) */
@@ -1364,7 +1370,7 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
         }
         pkt->payload -= (start_old - start_new);
     }
-    return (pkt->payload - ((uint8_t *)pkt->hdr)) + pkt->payload_len;
+    return pkt->payload - pkt->buf + pkt->payload_len;
 }
 
 ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len)
@@ -1532,7 +1538,7 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
 
 unsigned coap_get_len(coap_pkt_t *pkt)
 {
-    unsigned pktlen = sizeof(coap_hdr_t) + coap_get_token_len(pkt);
+    unsigned pktlen = sizeof(coap_udp_hdr_t) + coap_get_token_len(pkt);
     if (pkt->payload) {
         pktlen += pkt->payload_len + 1;
     }
@@ -1542,7 +1548,7 @@ unsigned coap_get_len(coap_pkt_t *pkt)
 void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote)
 {
     memset(ctx, 0, sizeof(*ctx));
-    ctx->remote = remote;
+    ctx->remote_udp = remote;
 }
 
 const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx)
@@ -1567,13 +1573,13 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx)
 
 const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx)
 {
-    return ctx->remote;
+    return ctx->remote_udp;
 }
 
 const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx)
 {
 #if defined(MODULE_SOCK_AUX_LOCAL)
-    return ctx->local;
+    return ctx->local_udp;
 #else
     (void)ctx;
     return NULL;
