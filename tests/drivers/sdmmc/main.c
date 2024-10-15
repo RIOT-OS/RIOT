@@ -602,6 +602,7 @@ static int _copy(int argc, char **argv)
 
         if (IS_USED(OUTPUT) && (num_block > 1)) {
             extern ssize_t stdio_write(const void *buffer, size_t len);
+            /* A single-byte write can not be incomplete */
             stdio_write(".", 1); //printf(".");
             if ((num_block % 79) == 79) {
                 printf("\n");
