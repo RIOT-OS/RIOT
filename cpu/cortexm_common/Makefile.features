@@ -47,7 +47,7 @@ else ifeq ($(CPU_CORE),cortex-m4f)
 else ifeq ($(CPU_CORE),cortex-m7)
   CPU_ARCH := armv7m
 else
-  $(error Unkwnown cortexm core: $(CPU_CORE))
+  $(error Unknown cortexm core: $(CPU_CORE))
 endif
 
 ifneq (,$(RUST_TARGET))
