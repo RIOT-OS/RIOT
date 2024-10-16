@@ -30,12 +30,11 @@ extern "C" {
 #endif
 
 /**
- * @brief ATCA device type on SAML11 XPro boards
+ * @brief ATCA device type on SAML1x XPro boards
  * @{
  */
-#ifdef BOARD_SAML11_XPRO
-#define ATCA_DEVTYPE    (ATECC508A)
-#endif
+#define ATCA_DEVTYPE        ATECC508A
+#define ATCA_PARAM_I2C      I2C_DEV(0)      /**< I2C bus device is connected to */
 /** @} */
 
 /**
