@@ -25,7 +25,7 @@ else ifneq (,$(filter esp32s2,$(CPU_FAM)))
   export FLASH_SIZE ?= 4
   BOOTLOADER_POS = 0x1000
 else
-  $(error Unkwnown ESP32x SoC variant (family))
+  $(error No known flash config for ESP32x SoC variant (family): $(CPU_FAM))
 endif
 
 # RAM configuration
@@ -56,7 +56,7 @@ else ifeq (esp32c3,$(CPU_FAM))
   RAM_LEN = 320K
   RAM_START_ADDR = 0x3FC80000
 else
-  $(error Unkwnown ESP32x SoC variant (family))
+  $(error Missing ram configuration for ESP32x SoC variant (family): $(CPU_FAM))
 endif
 
 ifneq (,$(filter periph_flashpage,$(USEMODULE)))
@@ -103,7 +103,7 @@ ifeq (xtensa,$(CPU_ARCH))
 else ifeq (rv32,$(CPU_ARCH))
   TARGET_ARCH ?= riscv32-esp-elf
 else
-  $(error Unkwnown ESP32x SoC architecture)
+  $(error Unknown ESP32x SoC architecture: $(CPU_ARCH))
 endif
 
 PSEUDOMODULES += esp_ble
@@ -286,7 +286,7 @@ else ifeq (esp32s3,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.version.ld
 else
-  $(error Unkwnown ESP32x SoC variant (family))
+  $(error Unknown link flags for ESP32x SoC variant (family): $(CPU_FAM))
 endif
 
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
