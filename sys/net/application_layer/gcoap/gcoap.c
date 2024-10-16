@@ -1045,7 +1045,9 @@ static void _expire_request(gcoap_request_memo_t *memo)
         /* Pass response to handler */
         if (memo->resp_handler) {
             coap_pkt_t req;
-
+            memset(&req, 0, sizeof(req));
+            /* 0 means there is an observe option value */
+            coap_clear_observe(&req);
             req.hdr = gcoap_request_memo_get_hdr(memo);
             memo->resp_handler(memo, &req, NULL);
         }
