@@ -8,7 +8,7 @@ else ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx7
 else
-  $(error Unkwnown ESP32x SoC variant (family))
+  $(error Unknown ESP32x SoC variant (family): $(CPU_FAM))
 endif
 
 # MCU defined features that are provided independent on board definitions
