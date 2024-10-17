@@ -174,3 +174,29 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
     return result;
 }
 #endif
+
+typedef struct {
+    event_t ev;
+    mutex_t synced;
+} sync_ev_t;
+
+static void sync_ev_handler(event_t *ev)
+{
+    sync_ev_t *sync_ev = (sync_ev_t *)ev;
+    mutex_unlock(&sync_ev->synced);
+}
+
+void event_sync(event_queue_t *queue)
+{
+    if (queue->waiter && queue->waiter->pid == thread_getpid()) {
+        /* if we're on the queue, this would block forever */
+        return;
+    }
+
+    sync_ev_t sync_ev = {
+        .ev.handler = sync_ev_handler,
+        .synced = MUTEX_INIT_LOCKED,
+    };
+    event_post(queue, &sync_ev.ev);
+    mutex_lock(&sync_ev.synced);
+}

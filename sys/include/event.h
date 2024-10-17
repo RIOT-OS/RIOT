@@ -465,6 +465,26 @@ static inline void event_loop(event_queue_t *queue)
     event_loop_multi(queue, 1);
 }
 
+/**
+ * @brief Synchronize with the last event on the queue
+ *
+ * Blocks until the last event on the queue at the moment of calling this is
+ * processed. Does nothing if called from the waiter thread.
+ *
+ * @warning If the queue has no waiter, this will block until the queue is
+ *          claimed. See @ref event_queue_claim()
+ *
+ * @param[in] queue event queue to sync with
+ *
+ * Usage example:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * event_post(queue, my_event);
+ * // When event_sync() returns, my_event will have been processed.
+ * event_sync(queue);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+void event_sync(event_queue_t *queue);
+
 #ifdef __cplusplus
 }
 #endif
