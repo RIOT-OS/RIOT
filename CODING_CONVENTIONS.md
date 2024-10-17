@@ -4,6 +4,7 @@
 
 * Code shall be [C11](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf)
   compliant.
+* Language extensions are permissible if they are implemented on all compilers supported by RIOT.
 * Avoid dynamic memory allocation (malloc/free, new, etc.)! It will break
   real-time guarantees, increase code complexity, and make it more likely to use
   more memory than available.
