@@ -13,8 +13,8 @@
  *
  * This module implements a CoRE Resource Directory endpoint library, that
  * allows RIOT nodes to register themselves with resource directories.
- * It implements the standard endpoint functionality as defined in
- * draft-ietf-core-resource-directory-27.
+ * It implements the standard endpoint functionality as defined in RFC 9176.
+ * 
  * @see https://datatracker.ietf.org/doc/html/rfc9176
  *
  * # Design Decisions

@@ -2,8 +2,7 @@ CoRE Resource Directory: Simple Endpoint Example
 ================================================
 
 This example shows how a node can register with a CoRE resource directory using
-the simple registration procedure as described in
-draft-ietf-core-resource-directory-27, section 5.1.
+the simple registration procedure as described in RFC 9176, section 5.1.
 
 When running this example, you **must** define the RD server's IPv6 address
 statically, using the `RD_ADDR` environment variable:

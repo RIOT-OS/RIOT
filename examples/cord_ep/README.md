@@ -4,7 +4,7 @@ CoRE Resource Directory: Endpoint Example
 This example application demonstrates the usage of RIOT's Resource Directory
 (RD) endpoint module, called `cord_ep`. This module supports the registration,
 update, and removal procedures as defined in
-[draft-ietf-core-resource-directory-27](https://tools.ietf.org/html/draft-ietf-core-resource-directory-27).
+[RFC 9176](https://datatracker.ietf.org/doc/html/rfc9176).
 
 Usage
 =====
