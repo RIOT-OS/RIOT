@@ -33,7 +33,7 @@
  * Customized implementation of nanocoap_server() to ignore a count of
  * requests. Allows testing confirmable messaging.
  */
-static int _nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
+static int _nanocoap_server_udp(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
                             int ignore_count)
 {
     sock_udp_t sock;
@@ -62,7 +62,7 @@ static int _nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
         else {
             coap_pkt_t pkt;
             coap_request_ctx_t ctx = {
-                .remote = &remote,
+                .remote_udp = &remote,
             };
 
             if (coap_parse_udp(&pkt, (uint8_t *)buf, res) < 0) {
@@ -85,7 +85,7 @@ static void _start_server(uint16_t port, int ignore_count)
 {
     uint8_t buf[128];
     sock_udp_ep_t local = { .port=port, .family=AF_INET6 };
-    _nanocoap_server(&local, buf, sizeof(buf), ignore_count);
+    _nanocoap_server_udp(&local, buf, sizeof(buf), ignore_count);
 }
 
 static int _cmd_server(int argc, char **argv)
