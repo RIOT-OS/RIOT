@@ -204,6 +204,38 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
                                                         psa_algorithm_t alg);
 
 /**
+ * @brief   Dispatch call of a cipher finish function to a location specific backend.
+ *          See psa_cipher_finish()
+ *
+ * @param operation
+ * @param output
+ * @param output_size
+ * @param output_length
+ */
+psa_status_t psa_location_dispatch_cipher_finish(   psa_cipher_operation_t *operation,
+                                                    uint8_t *output,
+                                                    size_t output_size,
+                                                    size_t *output_length);
+
+/**
+ * @brief   Dispatch call of a cipher update function to a location specific backend.
+ *          See psa_cipher_update()
+ *
+ * @param operation
+ * @param input
+ * @param input_length
+ * @param output
+ * @param output_size
+ * @param output_length
+ */
+psa_status_t psa_location_dispatch_cipher_update(   psa_cipher_operation_t *operation,
+                                                    const uint8_t *input,
+                                                    size_t input_length,
+                                                    uint8_t *output,
+                                                    size_t output_size,
+                                                    size_t *output_length);
+
+/**
  * @brief   Dispatch call of a function to set a cipher IV to a location specific backend.
  *          See psa_cipher_set_iv()
  *

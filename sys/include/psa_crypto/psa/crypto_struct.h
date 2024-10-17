@@ -70,7 +70,7 @@ static inline struct psa_key_attributes_s psa_key_attributes_init(void)
 
     return v;
 }
-#endif /*(MODULE_PSA_KEY_MANAGEMENT */
+#endif /*MODULE_PSA_KEY_MANAGEMENT */
 
 #if IS_USED(MODULE_PSA_AEAD) || defined(DOXYGEN)
 /**
@@ -102,14 +102,29 @@ static inline struct psa_aead_operation_s psa_aead_operation_init(void)
 #endif /* MODULE_PSA_AEAD */
 
 #if IS_USED(MODULE_PSA_CIPHER) || defined(DOXYGEN)
+
+/**
+ * @brief   Enum encoding available cipher operations.
+ *
+ * @details To be expanded with the development of this implementation.
+ */
+typedef enum {
+    PSA_CBC_NO_PAD_AES_128,
+    PSA_CBC_NO_PAD_AES_192,
+    PSA_CBC_NO_PAD_AES_256,
+    PSA_CBC_PKCS7_AES_256,
+    PSA_STREAM_CIPHER_CHACHA20
+} psa_cipher_op_t;
+
 /**
  * @brief   Structure storing a cipher operation context
  */
 struct psa_cipher_operation_s {
-    uint8_t iv_required : 1;        /**< True if algorithm requires IV */
-    uint8_t iv_set : 1;             /**< True if IV was already set */
-    uint8_t default_iv_length;      /**< Default IV length for algorithm */
-    psa_algorithm_t alg;            /**< Operation algorithm*/
+    uint8_t iv_required : 1;            /**< True if algorithm requires IV */
+    uint8_t iv_set : 1;                 /**< True if IV was already set */
+    uint8_t default_iv_length;          /**< Default IV length for algorithm */
+    /** Combination of the psa_algorithm_t and psa_key_type_t for a specific implementation. */
+    psa_cipher_op_t cipher_instance;
     /** Union containing cipher contexts for the executing backend */
     union cipher_context {
         psa_cipher_context_t cipher_ctx;    /**< Cipher context */
