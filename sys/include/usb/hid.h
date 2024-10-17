@@ -513,5 +513,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
-#endif /* USB_HID_H */
 /** @} */
+#endif /* USB_HID_H */

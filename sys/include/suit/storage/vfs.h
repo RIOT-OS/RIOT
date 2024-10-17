@@ -68,5 +68,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SUIT_STORAGE_VFS_H */
 /** @} */
+#endif /* SUIT_STORAGE_VFS_H */

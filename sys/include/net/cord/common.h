@@ -64,5 +64,5 @@ int cord_common_add_qstring(coap_pkt_t *pkt);
 }
 #endif
 
-#endif /* NET_CORD_COMMON_H */
 /** @} */
+#endif /* NET_CORD_COMMON_H */

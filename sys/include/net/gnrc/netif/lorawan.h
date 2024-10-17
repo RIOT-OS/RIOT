@@ -166,5 +166,5 @@ static inline int gnrc_netif_lorawan_set_nwksenckey(gnrc_netif_lorawan_t *lw_net
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_LORAWAN_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_LORAWAN_H */

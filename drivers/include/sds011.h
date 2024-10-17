@@ -313,5 +313,5 @@ int sds011_set_dev_id(sds011_t *dev, uint16_t sens_dev_id);
 }
 #endif
 
-#endif /* SDS011_H */
 /** @} */
+#endif /* SDS011_H */

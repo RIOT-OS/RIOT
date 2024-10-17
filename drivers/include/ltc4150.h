@@ -343,5 +343,5 @@ void ltc4150_pulses2c(const ltc4150_dev_t *dev,
 }
 #endif
 
-#endif /* LTC4150_H */
 /** @} */
+#endif /* LTC4150_H */

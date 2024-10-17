@@ -773,5 +773,5 @@ static inline void dfplayer_source_set_rm(dfplayer_source_set_t *set,
 /* Include implementation of the static inline functions */
 #include "dfplayer_implementation.h"
 
-#endif /* DFPLAYER_H */
 /** @} */
+#endif /* DFPLAYER_H */

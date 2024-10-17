@@ -63,5 +63,5 @@ int flexcomm_instance_from_addr(const FLEXCOMM_Type *dev);
 }
 #endif
 
-#endif /* FLEXCOMM_H */
 /** @} */
+#endif /* FLEXCOMM_H */

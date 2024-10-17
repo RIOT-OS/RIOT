@@ -130,5 +130,5 @@ extern "C"
 }
 #endif
 
-#endif /* MPL3115A2_REG_H */
 /** @} */
+#endif /* MPL3115A2_REG_H */

@@ -140,5 +140,5 @@ void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_ABR_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_ABR_H */

@@ -52,5 +52,5 @@ static const ipv6_addr_t sock_dns_mock_example_com_addr_ipv6 = { {
 }
 #endif
 
-#endif /* NET_DNS_MOCK_H */
 /** @} */
+#endif /* NET_DNS_MOCK_H */

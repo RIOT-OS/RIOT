@@ -33,5 +33,5 @@ void tests_sixlowpan_sfr(void);
 }
 #endif
 
-#endif /* TESTS_SIXLOWPAN_SFR_H */
 /** @} */
+#endif /* TESTS_SIXLOWPAN_SFR_H */

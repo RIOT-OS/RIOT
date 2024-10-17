@@ -100,5 +100,5 @@ static inline int dns_query(const char *domain_name, void *addr_out, int family)
 }
 #endif
 
-#endif /* NET_DNS_H */
 /** @} */
+#endif /* NET_DNS_H */

@@ -199,5 +199,5 @@ void qdec_stop(qdec_t qdec);
 }
 #endif
 
-#endif /* PERIPH_QDEC_H */
 /** @} */
+#endif /* PERIPH_QDEC_H */

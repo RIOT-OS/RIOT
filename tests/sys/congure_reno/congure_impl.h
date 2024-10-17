@@ -32,5 +32,5 @@ void congure_reno_test_set_same_wnd_adv_res(bool value);
 }
 #endif
 
-#endif /* CONGURE_IMPL_H */
 /** @} */
+#endif /* CONGURE_IMPL_H */

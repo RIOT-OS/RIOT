@@ -60,5 +60,5 @@ static inline mtd_dev_t *mtd_default_get_dev(unsigned idx)
 }
 #endif
 
-#endif /* MTD_DEFAULT_H */
 /** @} */
+#endif /* MTD_DEFAULT_H */

@@ -126,5 +126,5 @@ static const saul_reg_info_t ws281x_saul_info[] =
 }
 #endif
 
-#endif /* WS281X_PARAMS_H */
 /** @} */
+#endif /* WS281X_PARAMS_H */

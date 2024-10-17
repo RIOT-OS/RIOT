@@ -358,5 +358,5 @@ int ph_oem_read_ph(const ph_oem_t *dev, uint16_t *ph_value);
 }
 #endif
 
-#endif /* PH_OEM_H */
 /** @} */
+#endif /* PH_OEM_H */

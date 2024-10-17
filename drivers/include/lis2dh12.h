@@ -503,5 +503,5 @@ int lis2dh12_poweroff(const lis2dh12_t *dev);
 }
 #endif
 
-#endif /* LIS2DH12_H */
 /** @} */
+#endif /* LIS2DH12_H */

@@ -117,5 +117,5 @@ void dcf77_set_tick_cb(dcf77_t *dev, dcf77_tick_cb_t cb, void *arg);
 }
 #endif
 
-#endif /* DCF77_H */
 /** @} */
+#endif /* DCF77_H */

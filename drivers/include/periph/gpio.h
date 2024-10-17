@@ -285,5 +285,5 @@ static inline int gpio_is_valid(gpio_t gpio)
 }
 #endif
 
-#endif /* PERIPH_GPIO_H */
 /** @} */
+#endif /* PERIPH_GPIO_H */

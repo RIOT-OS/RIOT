@@ -652,5 +652,5 @@ void cc110x_sleep(cc110x_t *dev);
 }
 #endif
 
-#endif /* CC110X_H */
 /** @} */
+#endif /* CC110X_H */

@@ -96,5 +96,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */
+#endif /* PERIPH_CONF_COMMON_H */

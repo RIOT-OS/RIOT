@@ -62,5 +62,5 @@ void can_init(can_t *dev, const can_conf_t *conf);
 }
 #endif
 
-#endif /* PERIPH_CAN_H */
 /** @} */
+#endif /* PERIPH_CAN_H */

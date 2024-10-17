@@ -33,5 +33,5 @@ void tests_gnrc_ipv6(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_IPV6_H */
 /** @} */
+#endif /* TESTS_GNRC_IPV6_H */

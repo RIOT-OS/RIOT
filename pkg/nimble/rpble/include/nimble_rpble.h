@@ -178,5 +178,5 @@ int nimble_rpble_update(const nimble_rpble_ctx_t *ctx);
 }
 #endif
 
-#endif /* NIMBLE_RPBLE_H */
 /** @} */
+#endif /* NIMBLE_RPBLE_H */

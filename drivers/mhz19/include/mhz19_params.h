@@ -82,5 +82,5 @@ static const saul_reg_info_t mhz19_saul_info[] =
 }
 #endif
 
-#endif /* MHZ19_PARAMS_H */
 /** @} */
+#endif /* MHZ19_PARAMS_H */

@@ -46,5 +46,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYS_FEATURES_H */
 /** @} */
+#endif /* SYS_FEATURES_H */

@@ -203,5 +203,5 @@ void sm_pwm_01c_read_data(sm_pwm_01c_t *dev, sm_pwm_01c_data_t *data);
 }
 #endif
 
-#endif /* SM_PWM_01C_H */
 /** @} */
+#endif /* SM_PWM_01C_H */

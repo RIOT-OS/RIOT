@@ -72,5 +72,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_6LO_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_6LO_H */

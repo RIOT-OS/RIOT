@@ -177,5 +177,5 @@ typedef struct candev_driver {
 }
 #endif
 
-#endif /* CAN_CANDEV_H */
 /** @} */
+#endif /* CAN_CANDEV_H */

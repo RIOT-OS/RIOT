@@ -159,5 +159,5 @@ extern "C" {
 #define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
 #define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
 /** @} */
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

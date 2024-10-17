@@ -1332,5 +1332,5 @@ static inline bool pio_sm_rx_fifo_full(pio_t pio, pio_sm_t sm)
 }
 #endif
 
-#endif /* PIO_PIO_H */
 /** @} */
+#endif /* PIO_PIO_H */

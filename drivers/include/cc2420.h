@@ -302,5 +302,5 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info);
 }
 #endif
 
-#endif /* CC2420_H */
 /** @} */
+#endif /* CC2420_H */

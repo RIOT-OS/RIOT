@@ -292,5 +292,5 @@ gnrc_pktsnip_t *gnrc_pktsnip_search_type(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_PKT_H */
 /** @} */
+#endif /* NET_GNRC_PKT_H */

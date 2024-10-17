@@ -37,5 +37,5 @@ void vbat_disable(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_VBAT_H */
 /** @} */
+#endif /* PERIPH_CPU_VBAT_H */

@@ -72,5 +72,5 @@ size_t senml_saul_encode_cbor(uint8_t *buf, size_t len, saul_reg_t *reg);
 }
 #endif
 
-#endif /* SENML_SAUL_H */
 /** @} */
+#endif /* SENML_SAUL_H */

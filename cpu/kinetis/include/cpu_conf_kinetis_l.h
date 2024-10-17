@@ -41,5 +41,5 @@ extern "C"
 }
 #endif
 
-#endif /* CPU_CONF_KINETIS_L_H */
 /** @} */
+#endif /* CPU_CONF_KINETIS_L_H */

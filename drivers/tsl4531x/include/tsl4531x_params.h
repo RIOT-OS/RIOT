@@ -83,5 +83,5 @@ saul_reg_info_t tsl4531x_saul_info[] =
 }
 #endif
 
-#endif /* TSL4531X_PARAMS_H */
 /** @} */
+#endif /* TSL4531X_PARAMS_H */

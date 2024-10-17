@@ -64,5 +64,5 @@ typedef struct gnrc_sixlowpan_frag_sfr_fb {
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H */

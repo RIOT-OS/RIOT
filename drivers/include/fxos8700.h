@@ -167,5 +167,5 @@ int fxos8700_read_cached(const void* dev, fxos8700_measurement_t* acc, fxos8700_
 }
 #endif
 
-#endif /* FXOS8700_H */
 /** @} */
+#endif /* FXOS8700_H */

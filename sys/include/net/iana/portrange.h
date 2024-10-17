@@ -43,5 +43,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_IANA_PORTRANGE_H */
 /** @} */
+#endif /* NET_IANA_PORTRANGE_H */

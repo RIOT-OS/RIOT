@@ -97,5 +97,5 @@ ssize_t iolist_to_buffer(const iolist_t *iolist, void *dst, size_t len);
 #ifdef __cplusplus
 }
 #endif
-#endif /* IOLIST_H */
 /** @} */
+#endif /* IOLIST_H */

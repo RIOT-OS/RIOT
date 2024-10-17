@@ -173,5 +173,5 @@ void kw2xrf_radio_hal_irq_handler(void *dev);
 }
 #endif
 
-#endif /* KW2XRF_H */
 /** @} */
+#endif /* KW2XRF_H */

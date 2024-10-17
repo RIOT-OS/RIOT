@@ -141,5 +141,5 @@ void gnrc_mac_dispatch(gnrc_mac_rx_t *rx);
 }
 #endif
 
-#endif /* NET_GNRC_MAC_INTERNAL_H */
 /** @} */
+#endif /* NET_GNRC_MAC_INTERNAL_H */

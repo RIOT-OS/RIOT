@@ -244,5 +244,5 @@ static const saul_reg_info_t vl6180x_saul_info[] =
 }
 #endif
 
-#endif /* VL6180X_PARAMS_H */
 /** @} */
+#endif /* VL6180X_PARAMS_H */

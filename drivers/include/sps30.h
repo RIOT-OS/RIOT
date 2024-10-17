@@ -308,5 +308,5 @@ int sps30_wakeup(const sps30_t *dev);
 #ifdef __cplusplus
 }
 #endif
-#endif /* SPS30_H */
 /** @} */
+#endif /* SPS30_H */

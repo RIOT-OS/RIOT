@@ -238,5 +238,5 @@ static const ebi_conf_t ebi_config = {
 
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

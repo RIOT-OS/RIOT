@@ -57,5 +57,5 @@ int suit_transport_mock_fetch(const suit_manifest_t *manifest);
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_MOCK_H */
 /** @} */
+#endif /* SUIT_TRANSPORT_MOCK_H */

@@ -134,5 +134,5 @@ static inline void io_reg_write_dont_corrupt(volatile uint32_t *reg, uint32_t va
 }
 #endif
 
-#endif /* IO_REG_H */
 /** @} */
+#endif /* IO_REG_H */

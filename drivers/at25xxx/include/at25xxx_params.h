@@ -78,5 +78,5 @@ static const at25xxx_params_t at25xxx_params[] =
 }
 #endif
 
-#endif /* AT25XXX_PARAMS_H */
 /** @} */
+#endif /* AT25XXX_PARAMS_H */

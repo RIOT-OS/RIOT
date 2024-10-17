@@ -126,5 +126,5 @@ struct context_switch_frame {
 }
 #endif
 
-#endif /* CONTEXT_FRAME_H */
 /** @} */
+#endif /* CONTEXT_FRAME_H */

@@ -66,5 +66,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_QDEC_H */
 /** @} */
+#endif /* PERIPH_CPU_QDEC_H */

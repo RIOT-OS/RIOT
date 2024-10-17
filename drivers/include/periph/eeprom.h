@@ -120,5 +120,5 @@ size_t eeprom_erase(void);
 }
 #endif
 
-#endif /* PERIPH_EEPROM_H */
 /** @} */
+#endif /* PERIPH_EEPROM_H */

@@ -224,5 +224,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LPSXXX_INTERNAL_H */
 /** @} */
+#endif /* LPSXXX_INTERNAL_H */

@@ -261,5 +261,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_IPV6_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_IPV6_H */

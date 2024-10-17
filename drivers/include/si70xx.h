@@ -150,5 +150,5 @@ uint8_t si70xx_get_revision(const si70xx_t *dev);
 }
 #endif
 
-#endif /* SI70XX_H */
 /** @} */
+#endif /* SI70XX_H */

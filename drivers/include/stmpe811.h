@@ -162,5 +162,5 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
 }
 #endif
 
-#endif /* STMPE811_H */
 /** @} */
+#endif /* STMPE811_H */

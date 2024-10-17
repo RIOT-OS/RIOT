@@ -69,5 +69,5 @@ static const isl29125_params_t isl29125_params[] =
 }
 #endif
 
-#endif /* ISL29125_PARAMS_H */
 /** @} */
+#endif /* ISL29125_PARAMS_H */

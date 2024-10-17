@@ -55,5 +55,5 @@ void pm_set_lowest(void);
 }
 #endif
 
-#endif /* PERIPH_PM_H */
 /** @} */
+#endif /* PERIPH_PM_H */

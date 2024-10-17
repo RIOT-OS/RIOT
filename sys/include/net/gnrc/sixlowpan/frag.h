@@ -71,5 +71,5 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_H */

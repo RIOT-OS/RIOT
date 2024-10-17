@@ -96,5 +96,5 @@ int gnrc_sixlowpan_frag_minfwd_frag_iphc(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H */

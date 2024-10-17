@@ -254,5 +254,5 @@ static const uint8_t st77xx_screen_ids[] =
 }
 #endif
 
-#endif /* ST77XX_PARAMS_H */
 /** @} */
+#endif /* ST77XX_PARAMS_H */

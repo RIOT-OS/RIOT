@@ -193,5 +193,5 @@ int ThreadStart(Thread *thread, void (*fn)(void *), void *arg);
 }
 #endif
 
-#endif /* PAHO_MQTT_H */
 /** @} */
+#endif /* PAHO_MQTT_H */

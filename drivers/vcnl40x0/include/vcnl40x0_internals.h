@@ -134,5 +134,5 @@ extern "C" {
 }
 #endif
 
-#endif /* VCNL40X0_INTERNALS_H */
 /** @} */
+#endif /* VCNL40X0_INTERNALS_H */

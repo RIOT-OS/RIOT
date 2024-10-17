@@ -122,5 +122,5 @@ static const cc110x_params_t cc110x_params[] = {
 #ifdef __cplusplus
 }
 #endif
-#endif /* CC110X_PARAMS_H */
 /** @} */
+#endif /* CC110X_PARAMS_H */

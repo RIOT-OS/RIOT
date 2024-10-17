@@ -82,5 +82,5 @@ static const saul_reg_info_t pulse_counter_saul_info[] =
 }
 #endif
 
-#endif /* PULSE_COUNTER_PARAMS_H */
 /** @} */
+#endif /* PULSE_COUNTER_PARAMS_H */

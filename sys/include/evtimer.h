@@ -121,5 +121,5 @@ static inline uint32_t evtimer_now_msec(void)
 }
 #endif
 
-#endif /* EVTIMER_H */
 /** @} */
+#endif /* EVTIMER_H */

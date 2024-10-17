@@ -207,5 +207,5 @@ extern msp430_usci_b_t USCI_B1;
 }
 #endif
 
-#endif /* F2XX_G2XX_MSP430_REGS_H */
 /** @} */
+#endif /* F2XX_G2XX_MSP430_REGS_H */

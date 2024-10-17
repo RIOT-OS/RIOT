@@ -115,5 +115,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_MP1_CFG_CLOCK_DEFAULT_H */
 /** @} */
+#endif /* CLK_MP1_CFG_CLOCK_DEFAULT_H */

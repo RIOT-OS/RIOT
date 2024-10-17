@@ -68,5 +68,5 @@ int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *in
 }
 #endif
 
-#endif /* CRYPTO_MODES_CBC_H */
 /** @} */
+#endif /* CRYPTO_MODES_CBC_H */

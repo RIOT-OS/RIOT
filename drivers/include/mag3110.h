@@ -224,5 +224,5 @@ int mag3110_read_dtemp(const mag3110_t *dev, int8_t *dtemp);
 }
 #endif
 
-#endif /* MAG3110_H */
 /** @} */
+#endif /* MAG3110_H */

@@ -422,5 +422,5 @@ int aip31068_print_char(aip31068_t *dev, char c);
 }
 #endif
 
-#endif /* AIP31068_H */
 /** @} */
+#endif /* AIP31068_H */

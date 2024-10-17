@@ -34,5 +34,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_PINMAP_H */
 /** @} */
+#endif /* ARDUINO_PINMAP_H */

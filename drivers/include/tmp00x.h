@@ -298,5 +298,5 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to);
 }
 #endif
 
-#endif /* TMP00X_H */
 /** @} */
+#endif /* TMP00X_H */

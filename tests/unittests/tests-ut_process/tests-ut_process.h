@@ -31,5 +31,5 @@ void test_uri_parser(void);
 }
 #endif
 
-#endif /* TESTS_UT_PROCESS_H */
 /** @} */
+#endif /* TESTS_UT_PROCESS_H */

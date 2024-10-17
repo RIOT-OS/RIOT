@@ -216,5 +216,5 @@ typedef struct lwmac {
 }
 #endif
 
-#endif /* NET_GNRC_LWMAC_TYPES_H */
 /** @} */
+#endif /* NET_GNRC_LWMAC_TYPES_H */

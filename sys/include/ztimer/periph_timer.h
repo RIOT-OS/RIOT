@@ -60,5 +60,5 @@ void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
 }
 #endif
 
-#endif /* ZTIMER_PERIPH_TIMER_H */
 /** @} */
+#endif /* ZTIMER_PERIPH_TIMER_H */

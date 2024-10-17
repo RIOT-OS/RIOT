@@ -66,5 +66,5 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* NRFUSB_H */
 /** @} */
+#endif /* NRFUSB_H */

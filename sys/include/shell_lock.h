@@ -85,5 +85,5 @@ void shell_lock_auto_lock_refresh(void);
 }
 #endif
 
-#endif /* SHELL_LOCK_H */
 /** @} */
+#endif /* SHELL_LOCK_H */

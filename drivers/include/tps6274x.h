@@ -83,5 +83,5 @@ void tps6274x_load_ctrl(tps6274x_t *dev, int status);
 #ifdef __cplusplus
 }
 #endif
-#endif /* TPS6274X_H */
 /** @} */
+#endif /* TPS6274X_H */

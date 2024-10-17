@@ -513,5 +513,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MRF24J40_REGISTERS_H */
 /** @} */
+#endif /* MRF24J40_REGISTERS_H */

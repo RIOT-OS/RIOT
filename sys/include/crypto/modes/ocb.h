@@ -112,5 +112,5 @@ int32_t cipher_decrypt_ocb(const cipher_t *cipher,
 }
 #endif
 
-#endif /* CRYPTO_MODES_OCB_H */
 /** @} */
+#endif /* CRYPTO_MODES_OCB_H */

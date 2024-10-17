@@ -111,5 +111,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_GNRC_LWMAC_HDR_H */
 /** @} */
+#endif /* NET_GNRC_LWMAC_HDR_H */

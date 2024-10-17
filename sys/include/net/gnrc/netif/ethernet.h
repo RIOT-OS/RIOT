@@ -46,5 +46,5 @@ int gnrc_netif_ethernet_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_ETHERNET_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_ETHERNET_H */

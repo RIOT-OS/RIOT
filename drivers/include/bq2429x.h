@@ -499,5 +499,5 @@ int bq2429x_get_vreg(const bq2429x_t *dev,
 }
 #endif
 
-#endif /* BQ2429X_H */
 /** @} */
+#endif /* BQ2429X_H */

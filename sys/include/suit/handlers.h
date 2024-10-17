@@ -227,5 +227,5 @@ void suit_param_cbor_to_ref(const suit_manifest_t *manifest,
 }
 #endif
 
-#endif /* SUIT_HANDLERS_H */
 /** @} */
+#endif /* SUIT_HANDLERS_H */

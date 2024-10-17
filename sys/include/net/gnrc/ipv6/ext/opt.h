@@ -56,5 +56,5 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_opt_process(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_OPT_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_EXT_OPT_H */

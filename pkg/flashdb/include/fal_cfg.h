@@ -195,5 +195,5 @@ extern struct fal_flash_dev mtd_flash0;
 #ifdef __cplusplus
 }
 #endif
-#endif /* FAL_CFG_H */
 /** @} */
+#endif /* FAL_CFG_H */

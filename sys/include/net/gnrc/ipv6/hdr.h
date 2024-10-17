@@ -50,5 +50,5 @@ gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_HDR_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_HDR_H */

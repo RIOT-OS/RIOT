@@ -269,5 +269,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SDKCONFIG_H */
 /** @} */
+#endif /* SDKCONFIG_H */

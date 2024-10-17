@@ -93,5 +93,5 @@ void clic_isr_handler(uint32_t irq);
 }
 #endif
 
-#endif /* CLIC_H */
 /** @} */
+#endif /* CLIC_H */

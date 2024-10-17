@@ -221,5 +221,5 @@ struct congure_snd_driver {
 }
 #endif
 
-#endif /* CONGURE_H */
 /** @} */
+#endif /* CONGURE_H */

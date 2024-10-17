@@ -39,5 +39,5 @@ void bc_init(void);
 }
 #endif
 
-#endif /* BC_H */
 /** @} */
+#endif /* BC_H */

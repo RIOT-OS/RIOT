@@ -147,5 +147,5 @@ extern "C" {
 }
 #endif
 
-#endif /* STM32_LEDS_H */
 /** @} */
+#endif /* STM32_LEDS_H */

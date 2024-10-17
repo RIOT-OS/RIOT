@@ -139,5 +139,5 @@ static const  pca9685_saul_pwm_params_t pca9685_saul_pwm_params[] =
 }
 #endif
 
-#endif /* PCA9685_PARAMS_H */
 /** @} */
+#endif /* PCA9685_PARAMS_H */

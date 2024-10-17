@@ -83,5 +83,5 @@ void sched_round_robin_init(void);
 }
 #endif
 
-#endif /* SCHED_ROUND_ROBIN_H */
 /** @} */
+#endif /* SCHED_ROUND_ROBIN_H */

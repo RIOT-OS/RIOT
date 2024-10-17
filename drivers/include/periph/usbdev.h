@@ -687,5 +687,5 @@ static inline int usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 }
 #endif
 
-#endif /* PERIPH_USBDEV_H */
 /** @} */
+#endif /* PERIPH_USBDEV_H */

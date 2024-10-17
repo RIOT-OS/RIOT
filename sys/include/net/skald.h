@@ -114,5 +114,5 @@ void skald_generate_random_addr(uint8_t *buf);
 }
 #endif
 
-#endif /* NET_SKALD_H */
 /** @} */
+#endif /* NET_SKALD_H */

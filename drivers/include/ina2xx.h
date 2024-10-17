@@ -256,5 +256,5 @@ int ina2xx_read_power(const ina2xx_t *dev, uint32_t *power);
 }
 #endif
 
-#endif /* INA2XX_H */
 /** @} */
+#endif /* INA2XX_H */

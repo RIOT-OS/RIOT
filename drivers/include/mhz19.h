@@ -153,5 +153,5 @@ void mhz19_calibrate_zero_point(mhz19_t *dev);
 }
 #endif
 
-#endif /* MHZ19_H */
 /** @} */
+#endif /* MHZ19_H */

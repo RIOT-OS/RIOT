@@ -59,5 +59,5 @@ void usbus_dfu_init(usbus_t *usbus, usbus_dfu_device_t *handler, unsigned mode);
 }
 #endif
 
-#endif /* USB_USBUS_DFU_H */
 /** @} */
+#endif /* USB_USBUS_DFU_H */

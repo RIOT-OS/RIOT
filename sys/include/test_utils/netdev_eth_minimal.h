@@ -63,5 +63,5 @@ int netdev_eth_minimal_init(void);
 }
 #endif
 
-#endif /* TEST_UTILS_NETDEV_ETH_MINIMAL_H */
 /** @} */
+#endif /* TEST_UTILS_NETDEV_ETH_MINIMAL_H */

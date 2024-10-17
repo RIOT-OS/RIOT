@@ -37,5 +37,5 @@ typedef SaSiAesUserContext_t psa_cipher_aes_128_ctx_t;
 }
 #endif
 
-#endif /* PSA_PERIPH_AES_CTX_H */
 /** @} */
+#endif /* PSA_PERIPH_AES_CTX_H */

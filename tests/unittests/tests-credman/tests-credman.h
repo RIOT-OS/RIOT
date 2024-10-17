@@ -40,5 +40,5 @@ Test *tests_credman_tests(void);
 }
 #endif
 
-#endif /* TESTS_CREDMAN_H */
 /** @} */
+#endif /* TESTS_CREDMAN_H */

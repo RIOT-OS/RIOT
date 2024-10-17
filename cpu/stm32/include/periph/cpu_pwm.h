@@ -71,5 +71,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_PWM_H */
 /** @} */
+#endif /* PERIPH_CPU_PWM_H */

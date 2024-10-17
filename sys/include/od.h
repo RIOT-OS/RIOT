@@ -71,5 +71,5 @@ static inline void od_hex_dump(const void *data, size_t data_len, uint8_t width)
 }
 #endif
 
-#endif /* OD_H */
 /** @} */
+#endif /* OD_H */

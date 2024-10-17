@@ -80,5 +80,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LV_DRV_CONF_H */
 /** @} */
+#endif /* LV_DRV_CONF_H */

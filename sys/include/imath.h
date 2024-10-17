@@ -140,5 +140,5 @@ static inline uint32_t powi(unsigned x, unsigned y)
 }
 #endif
 
-#endif /* IMATH_H */
 /** @} */
+#endif /* IMATH_H */

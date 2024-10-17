@@ -55,5 +55,5 @@ void mp_riot_init(char* heap, size_t heap_size);
  */
 void mp_do_str(const char *src, int len);
 
-#endif /* MICROPYTHON_H */
 /** @} */
+#endif /* MICROPYTHON_H */

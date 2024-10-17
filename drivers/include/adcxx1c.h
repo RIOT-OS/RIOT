@@ -181,5 +181,5 @@ int adcxx1c_get_and_clear_alert(const adcxx1c_t *dev);
 }
 #endif
 
-#endif /* ADCXX1C_H */
 /** @} */
+#endif /* ADCXX1C_H */

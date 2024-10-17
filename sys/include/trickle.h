@@ -123,5 +123,5 @@ void trickle_callback(trickle_t *trickle);
 }
 #endif
 
-#endif /* TRICKLE_H */
 /** @} */
+#endif /* TRICKLE_H */

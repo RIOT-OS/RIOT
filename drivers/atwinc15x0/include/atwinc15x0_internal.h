@@ -305,5 +305,5 @@ void atwinc15x0_irq(void);
 }
 #endif
 
-#endif /* ATWINC15X0_INTERNAL_H */
 /** @} */
+#endif /* ATWINC15X0_INTERNAL_H */

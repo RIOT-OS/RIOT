@@ -134,5 +134,5 @@ extern "C"
 }
 #endif
 
-#endif /* APDS99XX_REGS_H */
 /** @} */
+#endif /* APDS99XX_REGS_H */

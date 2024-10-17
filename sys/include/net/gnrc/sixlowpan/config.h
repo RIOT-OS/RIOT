@@ -411,5 +411,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_CONFIG_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_CONFIG_H */

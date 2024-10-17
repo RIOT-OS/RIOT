@@ -66,5 +66,5 @@ void rtc_mem_write(unsigned offset, const void *data, size_t len);
 }
 #endif
 
-#endif /* PERIPH_RTC_MEM_H */
 /** @} */
+#endif /* PERIPH_RTC_MEM_H */

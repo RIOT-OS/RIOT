@@ -84,5 +84,5 @@ void aes128_cmac_final(aes128_cmac_context_t *ctx, void *digest);
 }
 #endif
 
-#endif /* HASHES_AES128_CMAC_H */
 /** @} */
+#endif /* HASHES_AES128_CMAC_H */

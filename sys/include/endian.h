@@ -129,5 +129,5 @@ uint64_t le64toh(uint64_t little_endian_64bits);/**< little endian to host, 64 b
 }
 #endif
 
-#endif /* ENDIAN_H */
 /** @} */
+#endif /* ENDIAN_H */

@@ -50,5 +50,5 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus);
 #ifdef __cplusplus
 }
 #endif
-#endif /* USB_USBUS_FMT_H */
 /** @} */
+#endif /* USB_USBUS_FMT_H */

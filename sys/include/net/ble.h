@@ -496,5 +496,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_BLE_H */
 /** @} */
+#endif /* NET_BLE_H */

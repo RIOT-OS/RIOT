@@ -333,5 +333,5 @@ void pca9633_set_group_control_mode(pca9633_t* dev,
 }
 #endif
 
-#endif /* PCA9633_H */
 /** @} */
+#endif /* PCA9633_H */

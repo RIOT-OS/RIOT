@@ -40,5 +40,5 @@ Test *tests_luid_tests(void);
 }
 #endif
 
-#endif /* TESTS_LUID_H */
 /** @} */
+#endif /* TESTS_LUID_H */

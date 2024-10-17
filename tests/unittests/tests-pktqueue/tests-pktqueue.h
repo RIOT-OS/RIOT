@@ -33,5 +33,5 @@ void tests_pktqueue(void);
 }
 #endif
 
-#endif /* TESTS_PKTQUEUE_H */
 /** @} */
+#endif /* TESTS_PKTQUEUE_H */

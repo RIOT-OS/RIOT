@@ -165,5 +165,5 @@ int kw41zrf_reset(kw41zrf_t *dev);
 }
 #endif
 
-#endif /* KW41ZRF_H */
 /** @} */
+#endif /* KW41ZRF_H */

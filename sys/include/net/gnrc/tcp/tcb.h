@@ -96,5 +96,5 @@ typedef struct sock_tcp_queue {
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_GNRC_TCP_TCB_H */
 /** @} */
+#endif /* NET_GNRC_TCP_TCB_H */

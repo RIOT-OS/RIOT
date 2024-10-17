@@ -33,5 +33,5 @@ void tests_bhp_event(void);
 }
 #endif
 
-#endif /* TESTS_BHP_EVENT_H */
 /** @} */
+#endif /* TESTS_BHP_EVENT_H */

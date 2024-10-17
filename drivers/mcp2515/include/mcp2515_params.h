@@ -94,5 +94,5 @@ static const candev_params_t candev_mcp2515_params[] = {
 }
 #endif
 
-#endif /* MCP2515_PARAMS_H */
 /** @} */
+#endif /* MCP2515_PARAMS_H */

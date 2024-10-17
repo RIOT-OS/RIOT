@@ -126,5 +126,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BMX280_INTERNALS_H */
 /** @} */
+#endif /* BMX280_INTERNALS_H */

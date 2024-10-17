@@ -97,5 +97,5 @@ static const atwinc15x0_params_t atwinc15x0_params[] =
 }
 #endif
 
-#endif /* ATWINC15X0_PARAMS_H */
 /** @} */
+#endif /* ATWINC15X0_PARAMS_H */

@@ -275,5 +275,5 @@ int raw_can_set_trx(int ifnum, can_trx_t *trx);
 }
 #endif
 
-#endif /* CAN_RAW_H */
 /** @} */
+#endif /* CAN_RAW_H */

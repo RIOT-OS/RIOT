@@ -69,5 +69,5 @@ psa_status_t psa_destroy_persistent_key(psa_key_id_t key_id);
 }
 #endif
 
-#endif /* PSA_CRYPTO_PERSISTENT_STORAGE_H */
 /** @} */
+#endif /* PSA_CRYPTO_PERSISTENT_STORAGE_H */

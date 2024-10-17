@@ -100,5 +100,5 @@ extern "C" {
 }
 #endif
 
-#endif /* USB_MSC_H */
 /** @} */
+#endif /* USB_MSC_H */

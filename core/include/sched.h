@@ -385,5 +385,5 @@ static inline int sched_runq_more_than_one(uint8_t prio)
 }
 #endif
 
-#endif /* SCHED_H */
 /** @} */
+#endif /* SCHED_H */

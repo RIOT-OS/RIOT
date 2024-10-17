@@ -151,5 +151,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLIF_INTERNAL_H */
 /** @} */
+#endif /* CLIF_INTERNAL_H */

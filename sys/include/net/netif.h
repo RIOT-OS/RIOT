@@ -265,5 +265,5 @@ void netifs_print_ipv6(const char *separator);
 }
 #endif
 
-#endif /* NET_NETIF_H */
 /** @} */
+#endif /* NET_NETIF_H */

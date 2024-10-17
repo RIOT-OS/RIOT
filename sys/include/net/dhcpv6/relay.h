@@ -75,5 +75,5 @@ void dhcpv6_relay_init(event_queue_t *event_queue, uint16_t listen_netif,
 }
 #endif
 
-#endif /* NET_DHCPV6_RELAY_H */
 /** @} */
+#endif /* NET_DHCPV6_RELAY_H */

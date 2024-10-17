@@ -90,5 +90,5 @@ void poly1305_auth(uint8_t *mac, const uint8_t *data, size_t len,
 #ifdef __cplusplus
 }
 #endif
-#endif /* CRYPTO_POLY1305_H */
 /** @} */
+#endif /* CRYPTO_POLY1305_H */
