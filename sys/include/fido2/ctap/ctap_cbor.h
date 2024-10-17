@@ -212,9 +212,9 @@ extern "C" {
  * @param[in] req_raw   raw request
  * @param[in] len       length of @p req_raw
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
+ctap_status_code_t fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
                                               const uint8_t *req_raw, size_t len);
 
 /**
@@ -226,9 +226,9 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
  * @param[in] req_raw   raw request
  * @param[in] len       length of @p req_raw
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
+ctap_status_code_t fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
                                             const uint8_t *req_raw, size_t len);
 
 /**
@@ -238,10 +238,10 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
  *
  * @param[in] info      information about capabilities
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
 
-int fido2_ctap_cbor_encode_info(const ctap_info_t *info);
+ctap_status_code_t fido2_ctap_cbor_encode_info(const ctap_info_t *info);
 /**
  * @brief Parse ClientPIN method
  *
@@ -251,9 +251,9 @@ int fido2_ctap_cbor_encode_info(const ctap_info_t *info);
  * @param[in] req_raw   raw request
  * @param[in] len       length of @p req_raw
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
+ctap_status_code_t fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
                                          const uint8_t *req_raw, size_t len);
 /**
  * @brief Encode attestation object
@@ -264,9 +264,9 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
  * @param[in] client_data_hash  SHA-256 hash of JSON serialized client data
  * @param[in] rk                resident key
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_encode_attestation_object(const ctap_auth_data_t *auth_data,
+ctap_status_code_t fido2_ctap_cbor_encode_attestation_object(const ctap_auth_data_t *auth_data,
                                               const uint8_t *client_data_hash,
                                               ctap_resident_key_t *rk);
 
@@ -280,9 +280,9 @@ int fido2_ctap_cbor_encode_attestation_object(const ctap_auth_data_t *auth_data,
  * @param[in] rk                resident key
  * @param[in] valid_cred_count  amount of valid credentials found in allow list
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_encode_assertion_object(const ctap_auth_data_header_t *auth_data,
+ctap_status_code_t fido2_ctap_cbor_encode_assertion_object(const ctap_auth_data_header_t *auth_data,
                                             const uint8_t *client_data_hash,
                                             ctap_resident_key_t *rk,
                                             uint8_t valid_cred_count);
@@ -291,9 +291,9 @@ int fido2_ctap_cbor_encode_assertion_object(const ctap_auth_data_header_t *auth_
  *
  * @param[in] key               Public key in COSE format
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_encode_key_agreement(const ctap_public_key_cose_t *key);
+ctap_status_code_t fido2_ctap_cbor_encode_key_agreement(const ctap_public_key_cose_t *key);
 
 /**
  * @brief Encode encrypted pin token
@@ -301,18 +301,18 @@ int fido2_ctap_cbor_encode_key_agreement(const ctap_public_key_cose_t *key);
  * @param[in] token             encrypted pin token
  * @param[in] len               length of @p token
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_encode_pin_token(uint8_t *token, size_t len);
+ctap_status_code_t fido2_ctap_cbor_encode_pin_token(uint8_t *token, size_t len);
 
 /**
  * @brief Encode PIN tries left
  *
  * @param[in] tries_left         amount of tries left
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_cbor_encode_retries(uint8_t tries_left);
+ctap_status_code_t fido2_ctap_cbor_encode_retries(uint8_t tries_left);
 
 /**
  * @brief Get size of CBOR encoded data
