@@ -287,6 +287,12 @@
  * - psa_cipher_aes_256_cbc_custom_backend
  * - psa_cipher_aes_256_cbc_backend_riot
  *
+ * #### CHACHA20
+ * - psa_cipher_chacha20
+ * - psa_cipher_chacha20_backend_periph
+ * - psa_cipher_chacha20_custom_backend
+ * - psa_cipher_chacha20_backend_riot
+ *
  * ### Hashes
  * - Base: psa_hash
  *
