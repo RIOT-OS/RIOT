@@ -688,6 +688,17 @@ static inline void coap_hdr_set_code(coap_hdr_t *hdr, uint8_t code)
 }
 
 /**
+ * @brief   Write the given raw message code to given CoAP pkt
+ *
+ * @param[out]  pkt     CoAP packet to write to
+ * @param[in]   code    raw message code
+ */
+static inline void coap_pkt_set_code(coap_pkt_t *pkt, uint8_t code)
+{
+    coap_hdr_set_code(pkt->hdr, code);
+}
+
+/**
  * @brief   Set the message type for the given CoAP header
  *
  * @pre     (type := [0-3])
