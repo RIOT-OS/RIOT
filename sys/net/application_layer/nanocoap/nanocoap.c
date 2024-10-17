@@ -724,8 +724,16 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
         memcpy(hdr + 1, &tkl_ext, tkl_ext_len);
     }
 
-    if (token_len) {
-        memcpy(coap_hdr_data_ptr(hdr), token, token_len);
+    /* Some users build a response packet in the same buffer that contained
+     * the request. In this case, the argument token already points inside
+     * the target, or more specifically, it is already at the correct place.
+     * Having `src` and `dest` in `memcpy(dest, src, len)` overlap is
+     * undefined behavior, so have to treat this explicitly. We could use
+     * memmove(), but we know that either `src` and `dest` do not overlap
+     * at all, or fully. So we can be a bit more efficient here. */
+    void *token_dest = coap_hdr_data_ptr(hdr);
+    if (token_dest != token) {
+        memcpy(token_dest, token, token_len);
     }
 
     return sizeof(coap_hdr_t) + token_len + tkl_ext_len;
