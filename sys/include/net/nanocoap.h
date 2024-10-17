@@ -1946,6 +1946,11 @@ ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
  * @param[in]    code       CoAP code (e.g., COAP_CODE_204, ...)
  * @param[in]    id         CoAP request id
  *
+ * @pre     @p token is either not overlapping with the memory buffer
+ *          @p hdr points to, or is already at the right offset (e.g.
+ *          when building the response inside the buffer the contained
+ *          the request).
+ *
  * @returns      length of resulting header
  */
 ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
