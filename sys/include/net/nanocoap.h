@@ -78,7 +78,6 @@
 #define NET_NANOCOAP_H
 
 #include <assert.h>
-#include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -196,13 +195,21 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Raw CoAP PDU header structure
+ * @brief   Raw CoAP over UDP PDU header structure
  */
 typedef struct __attribute__((packed)) {
     uint8_t ver_t_tkl;          /**< version, token, token length           */
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */
-} coap_hdr_t;
+} coap_udp_hdr_t;
+
+/**
+ * @brief       Alias for @ref coap_udp_hdr_t for backward compatibility
+ *
+ * @deprecated  Avoid using low level types in your application, but rather use
+ *              the zero overhead wrappers and work on @ref coap_pkt_t instead.
+ */
+typedef coap_udp_hdr_t coap_hdr_t;
 
 /**
  * @brief   CoAP option array entry
@@ -215,9 +222,10 @@ typedef struct {
 /**
  * @brief   CoAP PDU parsing context structure
  *
- * When this struct is used to assemble the header, @p payload is used as the
- * write pointer and @p payload_len contains the number of free bytes left in
- * then packet buffer pointed to by @ref coap_pkt_t::hdr
+ * When this struct is used to assemble the header, @ref coap_pkt_t::payload is
+ * used as the write pointer and @ref coap_pkt_t::payload_len contains the
+ * number of free bytes left in then packet buffer pointed to by @ref
+ * coap_pkt_t::buf
  *
  * When the header was written, @p payload must not be changed, it must remain
  * pointing to the end of the header.
@@ -230,7 +238,26 @@ typedef struct {
  * (or header byte) in the original CoAP packet buffer.
  */
 typedef struct {
-    coap_hdr_t *hdr;                                  /**< pointer to raw packet   */
+    union {
+        /**
+         * @brief pointer to the beginning of the buffer holding the pkt
+         *
+         * In other words: Pointer to the first byte of the header.
+         */
+        uint8_t *buf;
+        /**
+         * @brief   Deprecated alias for @ref coap_pkt_t::buf
+         *
+         * @warning This alias for @ref coap_pkt_t::buf is not available if a
+         *          non-UDP transport for nanocoap is used, as this has the
+         *          assumption baked in that the beginning of the message
+         *          buffer holds a UDP style CoAP header.
+         * @deprecated  Use @ref coap_pkt_t::buf to access the underlying buffer.
+         *              Use helpers such as @ref coap_get_code_raw to parse the
+         *              contents in a transport agnostic way.
+         */
+        coap_udp_hdr_t *hdr;
+    };
     uint8_t *payload;                                 /**< pointer to end of the header */
     iolist_t *snips;                                  /**< payload snips (optional)*/
     uint16_t payload_len;                             /**< length of payload       */
@@ -452,6 +479,27 @@ extern const unsigned coap_resources_numof;
  */
 /**@{*/
 /**
+ * @brief   Get the CoAP header of a CoAP over UDP packet
+ * @param[in]   pkt     The packet to get the header of
+ * @return  A pointer to the header in the packet
+ * @retval  NULL        The packet is not using UDP as transport
+ */
+static inline coap_udp_hdr_t *coap_get_udp_hdr(coap_pkt_t *pkt)
+{
+    /* currently only UDP as transport supported */
+    return (coap_udp_hdr_t *)pkt->buf;
+}
+
+/**
+ * @brief   Same as @ref coap_get_udp_hdr but for `const` memory
+ */
+static inline const coap_udp_hdr_t *coap_get_udp_hdr_const(const coap_pkt_t *pkt)
+{
+    /* currently only UDP as transport supported */
+    return (const coap_udp_hdr_t *)pkt->buf;
+}
+
+/**
  * @brief   Encode given code class and code detail to raw code
  *
  * @param[in]   cls     message code class
@@ -465,6 +513,18 @@ static inline uint8_t coap_code(unsigned cls, unsigned detail)
 }
 
 /**
+ * @brief   Get a message's raw code (class + detail)
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     raw message code
+ */
+static inline unsigned coap_get_code_raw(const coap_pkt_t *pkt)
+{
+    return coap_get_udp_hdr_const(pkt)->code;
+}
+
+/**
  * @brief   Get a message's code class (3 most significant bits of code)
  *
  * @param[in]   pkt   CoAP packet
@@ -473,7 +533,7 @@ static inline uint8_t coap_code(unsigned cls, unsigned detail)
  */
 static inline unsigned coap_get_code_class(const coap_pkt_t *pkt)
 {
-    return pkt->hdr->code >> 5;
+    return coap_get_code_raw(pkt) >> 5;
 }
 
 /**
@@ -485,7 +545,7 @@ static inline unsigned coap_get_code_class(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
 {
-    return pkt->hdr->code & 0x1f;
+    return coap_get_code_raw(pkt) & 0x1f;
 }
 
 /**
@@ -501,18 +561,6 @@ static inline unsigned coap_get_code_decimal(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Get a message's raw code (class + detail)
- *
- * @param[in]   pkt   CoAP packet
- *
- * @returns     raw message code
- */
-static inline unsigned coap_get_code_raw(const coap_pkt_t *pkt)
-{
-    return (unsigned)pkt->hdr->code;
-}
-
-/**
  * @brief   Get a request's method type
  *
  * @param[in]   pkt   CoAP request packet
@@ -521,19 +569,30 @@ static inline unsigned coap_get_code_raw(const coap_pkt_t *pkt)
  */
 static inline coap_method_t coap_get_method(const coap_pkt_t *pkt)
 {
-    return pkt->hdr->code;
+    return coap_get_code_raw(pkt);
 }
 
 /**
  * @brief   Get the message ID of the given CoAP packet
  *
- * @param[in]   pkt   CoAP packet
+ * @param[in]   pkt     CoAP packet to get the ID of
  *
  * @returns     message ID
  */
 static inline unsigned coap_get_id(const coap_pkt_t *pkt)
 {
-    return ntohs(pkt->hdr->id);
+    return ntohs(coap_get_udp_hdr_const(pkt)->id);
+}
+
+/**
+ * @brief   Set the message ID of the given CoAP packet
+ *
+ * @param[out]  pkt     CoAP packet to write the ID to
+ * @param[in]   id      Message ID to write (in host byte order)
+ */
+static inline void coap_set_id(coap_pkt_t *pkt, uint16_t id)
+{
+    coap_get_udp_hdr(pkt)->id = htons(id);
 }
 
 /**
@@ -548,16 +607,16 @@ static inline unsigned coap_get_id(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
-    uint8_t tkl = pkt->hdr->ver_t_tkl & 0xf;
+    uint8_t tkl = coap_get_udp_hdr_const(pkt)->ver_t_tkl & 0xf;
 
     if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
         return tkl;
     }
 
-    void *ext = pkt->hdr + 1;
+    const uint8_t *ext = pkt->buf + sizeof(coap_udp_hdr_t);
     switch (tkl) {
     case 13:
-        return tkl + *(uint8_t *)ext;
+        return tkl + *ext;
     case 14:
         return tkl + 255 + byteorder_bebuftohs(ext);
     case 15:
@@ -568,7 +627,7 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
     }
 }
 
-static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
+static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr);
 
 /**
  * @brief   Get pointer to a message's token
@@ -579,7 +638,7 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
  */
 static inline void *coap_get_token(const coap_pkt_t *pkt)
 {
-    return coap_hdr_data_ptr(pkt->hdr);
+    return coap_hdr_data_ptr(coap_get_udp_hdr_const(pkt));
 }
 
 /**
@@ -591,7 +650,7 @@ static inline void *coap_get_token(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 {
-    return sizeof(coap_hdr_t) + coap_get_token_len(pkt);
+    return sizeof(coap_udp_hdr_t) + coap_get_token_len(pkt);
 }
 
 /**
@@ -605,7 +664,7 @@ static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_total_len(const coap_pkt_t *pkt)
 {
-    return (uintptr_t)pkt->payload - (uintptr_t)pkt->hdr + pkt->payload_len;
+    return (uintptr_t)pkt->payload - (uintptr_t)pkt->buf + pkt->payload_len;
 }
 
 /**
@@ -620,7 +679,7 @@ static inline unsigned coap_get_total_len(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_type(const coap_pkt_t *pkt)
 {
-    return (pkt->hdr->ver_t_tkl & 0x30) >> 4;
+    return (coap_get_udp_hdr_const(pkt)->ver_t_tkl & 0x30) >> 4;
 }
 
 /**
@@ -632,12 +691,14 @@ static inline unsigned coap_get_type(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 {
-    return (pkt->hdr->ver_t_tkl & 0x60) >> 6;
+    return (coap_get_udp_hdr_const(pkt)->ver_t_tkl & 0x60) >> 6;
 }
 
 /**
  * @brief   Get the size of the extended Token length field
  *          (RFC 8974)
+ *
+ * @deprecated  Use @ref coap_pkt_tkl_ext_len instead.
  *
  * @note    This requires the `nanocoap_token_ext` module to be enabled
  *
@@ -645,7 +706,7 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
  *
  * @returns     number of bytes used for extended token length
  */
-static inline uint8_t coap_hdr_tkl_ext_len(const coap_hdr_t *hdr)
+static inline uint8_t coap_hdr_tkl_ext_len(const coap_udp_hdr_t *hdr)
 {
     if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
         return 0;
@@ -665,15 +726,32 @@ static inline uint8_t coap_hdr_tkl_ext_len(const coap_hdr_t *hdr)
 }
 
 /**
+ * @brief   Get the size of the extended Token length field
+ *          (RFC 8974)
+ *
+ * @note    This requires the `nanocoap_token_ext` module to be enabled
+ *
+     * @param[in]   pkt     CoAP packet
+ *
+ * @returns     number of bytes used for extended token length
+ */
+static inline uint8_t coap_pkt_tkl_ext_len(const coap_pkt_t *pkt)
+{
+    return coap_hdr_tkl_ext_len(coap_get_udp_hdr_const(pkt));
+}
+
+/**
  * @brief   Get the start of data after the header
  *
  * @param[in]   hdr   Header of CoAP packet in contiguous memory
  *
+ * @deprecated  Use coap_get_token() instead
+ *
  * @returns     pointer to first byte after the header
  */
-static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
+static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
 {
-    return ((uint8_t *)hdr) + sizeof(coap_hdr_t) + coap_hdr_tkl_ext_len(hdr);
+    return ((uint8_t *)hdr) + sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(hdr);
 }
 
 /**
@@ -681,10 +759,23 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
  *
  * @param[out]  hdr     CoAP header to write to
  * @param[in]   code    raw message code
+ *
+ * @deprecated  Use @ref coap_pkt_set_code instead
  */
-static inline void coap_hdr_set_code(coap_hdr_t *hdr, uint8_t code)
+static inline void coap_hdr_set_code(coap_udp_hdr_t *hdr, uint8_t code)
 {
     hdr->code = code;
+}
+
+/**
+ * @brief   Write the given raw message code to given CoAP pkt
+ *
+ * @param[out]  pkt     CoAP packet to write to
+ * @param[in]   code    raw message code
+ */
+static inline void coap_pkt_set_code(coap_pkt_t *pkt, uint8_t code)
+{
+    coap_hdr_set_code(coap_get_udp_hdr(pkt), code);
 }
 
 /**
@@ -694,14 +785,46 @@ static inline void coap_hdr_set_code(coap_hdr_t *hdr, uint8_t code)
  *
  * @param[out]  hdr     CoAP header to write
  * @param[in]   type    message type as integer value [0-3]
+ *
+ * @deprecated  Use @ref coap_pkt_set_type instead
  */
-static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
+static inline void coap_hdr_set_type(coap_udp_hdr_t *hdr, unsigned type)
 {
     /* assert correct range of type */
     assert(!(type & ~0x3));
 
     hdr->ver_t_tkl &= ~0x30;
     hdr->ver_t_tkl |= type << 4;
+}
+
+/**
+ * @brief   Set the message type for the given CoAP packet
+ *
+ * @pre     (type := [0-3])
+ *
+ * @param[out]  pkt     CoAP packet to write to
+ * @param[in]   type    message type as integer value [0-3]
+ */
+static inline void coap_pkt_set_type(coap_pkt_t *pkt, unsigned type)
+{
+    coap_hdr_set_type(coap_get_udp_hdr(pkt), type);
+}
+
+/**
+ * @brief   Set the message token length for the given CoAP packet
+ *
+ * @pre     `tkl <= 8`
+ *
+ * @param[out]  pkt     CoAP packet to write to
+ * @param[in]   tkl     Token length to write
+ *
+ * @warning This function is internal, no out of tree users please.
+ */
+static inline void coap_pkt_set_tkl(coap_pkt_t *pkt, uint8_t tkl)
+{
+    coap_udp_hdr_t * hdr = coap_get_udp_hdr(pkt);
+    hdr->ver_t_tkl &= 0xf0;
+    hdr->ver_t_tkl |= (tkl & 0x0f);
 }
 /**@}*/
 
@@ -1935,6 +2058,21 @@ ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
                                 coap_block_slicer_t *slicer);
 
 /**
+ * @brief   Build a CoAP over UDP header
+ *
+ * @param[out]   buf        Destination buffer to write to
+ * @param[in]    buf_len    Length of @p buf in bytes
+ * @param[in]    type       CoAP packet type (e.g., COAP_TYPE_CON, ...)
+ * @param[in]    token      token
+ * @param[in]    token_len  length of @p token
+ * @param[in]    code       CoAP code (e.g., COAP_CODE_204, ...)
+ * @param[in]    id         CoAP request id
+ *
+ * @returns      length of resulting header
+ */
+ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type, const void *token,
+                           size_t token_len, uint8_t code, uint16_t id);
+/**
  * @brief   Builds a CoAP header
  *
  * Caller *must* ensure @p hdr can hold the header and the full token!
@@ -1952,9 +2090,22 @@ ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
  *          the request).
  *
  * @returns      length of resulting header
+ *
+ * @deprecated  Use @ref coap_build_udp_hdr instead
  */
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
-                       size_t token_len, unsigned code, uint16_t id);
+static inline ssize_t coap_build_hdr(coap_udp_hdr_t *hdr, unsigned type, const void *token,
+                                     size_t token_len, unsigned code, uint16_t id)
+{
+    size_t fingers_crossed_size = sizeof(*hdr) + token_len;
+
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        /* With RFC 8974, we have an additional extended TKL
+         * field of 0-4 bytes in length */
+        fingers_crossed_size += 4;
+    }
+
+    return coap_build_udp_hdr(hdr, fingers_crossed_size, type, token, token_len, code, id);
+}
 
 /**
  * @brief   Build reply to CoAP request
@@ -2001,7 +2152,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
  * @returns     size of reply packet on success
  * @returns     -ENOSPC if @p rbuf too small
  */
-ssize_t coap_build_empty_ack(coap_pkt_t *pkt, coap_hdr_t *ack);
+ssize_t coap_build_empty_ack(const coap_pkt_t *pkt, coap_hdr_t *ack);
 
 /**
  * @brief   Handle incoming CoAP request
