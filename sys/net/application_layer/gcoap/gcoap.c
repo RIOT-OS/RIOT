@@ -588,7 +588,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
         coap_pkt_set_code(&pdu, COAP_CODE_EMPTY);
         coap_pkt_set_tkl(&pdu, 0);
 
-        ssize_t bytes = _tl_send(sock, buf, sizeof(coap_hdr_t), remote, aux);
+        ssize_t bytes = _tl_send(sock, buf, sizeof(coap_udp_hdr_t), remote, aux);
         if (bytes <= 0) {
             DEBUG("gcoap: empty response failed: %" PRIdSIZE "\n", bytes);
         }
@@ -796,7 +796,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
     coap_request_ctx_t ctx = {
         .resource = resource,
         .tl_type = (uint32_t)sock->type,
-        .remote = remote,
+        .remote_udp = remote,
         .local = aux ? &aux->local : NULL,
     };
 
@@ -1452,7 +1452,7 @@ static void _copy_hdr_from_req_memo(coap_pkt_t *pdu, gcoap_request_memo_t *memo)
 {
     const coap_udp_hdr_t *hdr = gcoap_request_memo_get_hdr(memo);
     size_t hdr_len = coap_hdr_len(hdr);
-    memcpy(pdu->hdr, hdr, hdr_len);
+    memcpy(pdu->buf, hdr, hdr_len);
 }
 
 static void _receive_from_cache_cb(void *ctx)
