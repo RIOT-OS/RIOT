@@ -2,6 +2,7 @@ CPU = stm32
 CPU_MODEL = stm32g431rb
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_can
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_rtc
