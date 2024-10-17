@@ -14,7 +14,7 @@ STM32F410RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-f410rb.svg "Pinout for the nucleo-f410rb" width=50%
+@image html pinouts/nucleo-f410rb.svg "Pinout for the Nucleo-F410RB (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 36)" width=50%
 
 ### MCU
 

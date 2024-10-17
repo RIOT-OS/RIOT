@@ -14,7 +14,7 @@ STM32F411RE microcontroller with 128KiB of RAM and 512KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-f411re.svg "Pinout for the nucleo-f411re" width=50%
+@image html pinouts/nucleo-f411re.svg "Pinout for the Nucleo-F411RE (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 32)" width=50%
 
 ### MCU
 
