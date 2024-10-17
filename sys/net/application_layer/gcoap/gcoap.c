@@ -585,7 +585,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
 
     if (messagelayer_emptyresponse_type != NO_IMMEDIATE_REPLY) {
         coap_hdr_set_type(pdu.hdr, (uint8_t)messagelayer_emptyresponse_type);
-        coap_hdr_set_code(pdu.hdr, COAP_CODE_EMPTY);
+        coap_pkt_set_code(&pdu, COAP_CODE_EMPTY);
         /* Set the token length to 0, preserving the CoAP version as it was and
          * the empty message type that was just set.
          *
