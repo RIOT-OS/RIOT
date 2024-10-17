@@ -144,9 +144,17 @@
 #include "net/nanocoap.h"
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
-#if IS_USED(MODULE_NANOCOAP_DTLS)
-#include "net/credman.h"
-#include "net/sock/dtls.h"
+
+#if MODULE_NANOCOAP_UDP
+#  include "net/sock/udp.h"
+#  include "random.h"
+#endif
+#if MODULE_NANOCOAP_TCP
+#  include "net/sock/tcp.h"
+#endif
+#if MODULE_NANOCOAP_DTLS
+#  include "net/credman.h"
+#  include "net/sock/dtls.h"
 #endif
 
 #ifdef __cplusplus
@@ -158,7 +166,7 @@ extern "C" {
  *          Tag together with the credential type (PSK) needs to be unique
  */
 #ifndef CONFIG_NANOCOAP_SOCK_DTLS_TAG
-#define CONFIG_NANOCOAP_SOCK_DTLS_TAG           (0xc0ab)
+#  define CONFIG_NANOCOAP_SOCK_DTLS_TAG (0xc0ab)
 #endif
 
 /**
@@ -166,15 +174,15 @@ extern "C" {
  *          Used both for RX and TX, needs to hold payload block + header
  */
 #ifndef CONFIG_NANOCOAP_SERVER_BUF_SIZE
-#define CONFIG_NANOCOAP_SERVER_BUF_SIZE         ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
-                                                 + CONFIG_NANOCOAP_URI_MAX + 16)
+#  define CONFIG_NANOCOAP_SERVER_BUF_SIZE \
+      ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) + CONFIG_NANOCOAP_URI_MAX + 16)
 #endif
 
 /**
  * @brief   CoAP server thread stack size
  */
 #ifndef CONFIG_NANOCOAP_SERVER_STACK_SIZE
-#define CONFIG_NANOCOAP_SERVER_STACK_SIZE       THREAD_STACKSIZE_DEFAULT
+#  define CONFIG_NANOCOAP_SERVER_STACK_SIZE THREAD_STACKSIZE_DEFAULT
 #endif
 
 /**
@@ -186,7 +194,14 @@ extern "C" {
  * See https://github.com/plgd-dev/go-coap/issues/512
  */
 #ifndef CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
-#define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN        (0)
+#  define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN (0)
+#endif
+
+#ifndef CONFIG_NANOCOAP_SERVER_TCP_MAX_CLIENTS
+/**
+ * @brief   Maximum number of clients the TCP server can handle concurrently
+ */
+#  define CONFIG_NANOCOAP_SERVER_TCP_MAX_CLIENTS 4
 #endif
 
 /**
@@ -198,25 +213,48 @@ extern "C" {
 
 /**
  * @brief   NanoCoAP socket types
+ *
+ * @details This can be casted to @ref coap_transport_t
  */
 typedef enum {
-    COAP_SOCKET_TYPE_UDP,                   /**< transport is plain UDP */
-    COAP_SOCKET_TYPE_DTLS,                  /**< transport is DTLS      */
+    COAP_SOCKET_TYPE_UDP = COAP_TRANSPORT_UDP,   /**< transport is plain UDP */
+    COAP_SOCKET_TYPE_DTLS = COAP_TRANSPORT_DTLS, /**< transport is DTLS      */
+    COAP_SOCKET_TYPE_TCP = COAP_TRANSPORT_TCP,   /**< transport is TCP       */
 } nanocoap_socket_type_t;
 
 /**
  * @brief   NanoCoAP socket struct
  */
 typedef struct {
-    sock_udp_t udp;                         /**< UDP socket     */
-#if IS_USED(MODULE_NANOCOAP_DTLS) || defined(DOXYGEN)
-    sock_dtls_t dtls;                       /**< DTLS socket    */
-    sock_dtls_session_t dtls_session;       /**< Session object for the stored socket.
-                                                 Used for exchanging a session between
-                                                 functions. */
-    nanocoap_socket_type_t type;            /**< Socket type (UDP, DTLS) */
+    union {
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS || DOXYGEN
+        struct {
+            sock_udp_t udp; /**< UDP socket     */
+            uint16_t msg_id; /**< next CoAP message ID */
+#  if MODULE_NANOCOAP_DTLS || DOXYGEN
+            sock_dtls_t dtls;                 /**< DTLS socket    */
+            /**
+             * @brief   Session object for the stored socket.
+             *          Used for exchanging a session between
+             *          functions.
+             */
+            sock_dtls_session_t dtls_session;
+#  endif
+        };
 #endif
-    uint16_t msg_id;                        /**< next CoAP message ID */
+#if MODULE_NANOCOAP_TCP || DOXYGEN
+        struct {
+            sock_tcp_t tcp;             /**< TCP socket */
+            void *tcp_buf;              /**< recv buffer for TCP socket
+                                         *   (output of malloc()) */
+            uint16_t tcp_buf_fill;      /**< number of bytes in
+                                         *   @ref nanocoap_sock_t::tcp_buf */
+        };
+#endif
+    };
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+    nanocoap_socket_type_t type; /**< Socket type (UDP, DTLS, TCP) */
+#endif
     uint8_t hdr_buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX]; /**< buffer for CoAP header with options,
                                                             token and payload marker */
 } nanocoap_sock_t;
@@ -225,11 +263,11 @@ typedef struct {
  * @brief Blockwise request helper struct
  */
 typedef struct {
-    nanocoap_sock_t *sock;          /**< socket used for the request        */
-    const char *path;               /**< path on the server                 */
-    uint32_t blknum;                /**< current block number               */
-    coap_method_t method;           /**< request method (GET, POST, PUT)    */
-    uint8_t blksize;                /**< CoAP blocksize exponent            */
+    nanocoap_sock_t *sock; /**< socket used for the request        */
+    const char *path;      /**< path on the server                 */
+    uint32_t blknum;       /**< current block number               */
+    coap_method_t method;  /**< request method (GET, POST, PUT)    */
+    uint8_t blksize;       /**< CoAP blocksize exponent            */
 } coap_block_request_t;
 
 /**
@@ -245,12 +283,99 @@ typedef struct {
  * @brief   Context from CoAP request for separate response
  */
 typedef struct {
-    sock_udp_ep_t remote;           /**< remote to send response to         */
-    sock_udp_ep_t local;            /**< local from which to send response  */
-    uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token              */
-    uint8_t tkl;                    /**< request token length               */
-    uint8_t no_response;            /**< no-response bitmap                 */
+    union{
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS || DOXYGEN
+        struct {
+            sock_udp_ep_t remote_udp;       /**< UDP endpoint to send response to */
+            sock_udp_ep_t local_udp;        /**< UDP endpoint from which to send response */
+        };
+#endif
+#if MODULE_NANOCOAP_SERVER_TCP || DOXYGEN
+        sock_tcp_t *sock_tcp;               /**< TCP socket to send the response over */
+#endif
+    };
+    uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token            */
+    uint8_t tkl;                            /**< request token length     */
+    uint8_t no_response;                    /**< no-response bitmap       */
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+    coap_transport_t transport;             /**< transport to use */
+#endif
 } nanocoap_server_response_ctx_t;
+
+#if MODULE_NANOCOAP_SERVER_TCP || DOXYGEN
+/**
+ * @brief   Context to pass to a NanoCoAP TCP server
+ *
+ * @warning All members are for internal use, do not access them.
+ */
+typedef struct {
+    sock_udp_ep_t local;    /**< Local endpoint to listen at */
+    sock_tcp_queue_t queue; /**< TCP queue to use */
+    /**
+     * @brief   TCP sockets to use
+     *
+     * This limits the number of concurrent connections (in other words the
+     * number of clients to serve).
+     */
+    sock_tcp_t socks[CONFIG_NANOCOAP_SERVER_TCP_MAX_CLIENTS];
+    /**
+     * @brief   Number of bytes in the per client RX buf
+     */
+    uint16_t rx_fill[CONFIG_NANOCOAP_SERVER_TCP_MAX_CLIENTS];
+    /**
+     * @brief   Receive buffer, one per client
+     */
+    uint8_t rx_bufs[CONFIG_NANOCOAP_SERVER_TCP_MAX_CLIENTS * CONFIG_NANOCOAP_SERVER_BUF_SIZE];
+    /**
+     * @brief   Send buffer, shared between all connections
+     */
+    uint8_t tx_buf[CONFIG_NANOCOAP_SERVER_BUF_SIZE];
+    event_queue_t *evq; /**< event queue to handle TCP connections in */
+} nanocoap_tcp_server_ctx_t;
+#endif
+
+/**
+ * @brief   Get the type of a given nanocoap socket
+ * @param[in]   sock    Socket to get the type of
+ *
+ * @retval COAP_SOCKET_TYPE_UDP     CoAP over UDP socket
+ * @retval COAP_SOCKET_TYPE_DTLS    CoAP over DTLS socket
+ * @retval COAP_SOCKET_TYPE_TCP     CoAP over TCP socket
+ */
+static inline nanocoap_socket_type_t nanocoap_sock_get_type(const nanocoap_sock_t *sock)
+{
+    (void)sock;
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+    return sock->type;
+#elif MODULE_NANOCOAP_UDP
+    return COAP_SOCKET_TYPE_UDP;
+#elif MODULE_NANOCOAP_DTLS
+    return COAP_SOCKET_TYPE_DTLS;
+#elif MODULE_NANOCOAP_TCP
+    return COAP_SOCKET_TYPE_TCP;
+#else
+#  error "nanocoap: no transport enabled"
+#endif
+}
+
+/**
+ * @brief   Set the nanocoap socket type
+ * @param[in]   sock        Socket to set the type of
+ * @param[in]   type        The socket type to set
+ *
+ * @warning This function is internal. Calls outside of nanocoap's sock
+ *          implementation *will* break things.
+ *
+ */
+static inline void nanocoap_sock_set_type(nanocoap_sock_t *sock,
+                                          nanocoap_socket_type_t type)
+{
+    (void)sock;
+    (void)type;
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+    sock->type = type;
+#endif
+}
 
 /**
  * @brief   Prepare the context for a separate response
@@ -291,6 +416,25 @@ bool nanocoap_server_is_remote_in_response_ctx(const nanocoap_server_response_ct
                                                const coap_request_ctx_t *req);
 
 /**
+ * @brief   Get the transport of the given separate response context
+ * @param[in]   ctx     Context to get the transport of
+ * @return  The transport the response will be send on
+ */
+static inline coap_transport_t nanocoap_server_response_ctx_transport(const nanocoap_server_response_ctx_t *ctx)
+{
+    (void)ctx;
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+    return ctx->transport;
+#elif MODULE_NANOCOAP_UDP
+    return COAP_TRANSPORT_UDP;
+#elif MODULE_NANOCOAP_DTLS
+    return COAP_TRANSPORT_DTLS;
+#elif MODULE_NANOCOAP_TCP
+    return COAP_TRANSPORT_TCP;
+#endif
+}
+
+/**
  * @brief   Build and send a separate response to a CoAP request
  *
  *  This sends a response to a CoAP request outside the CoAP handler
@@ -302,6 +446,9 @@ bool nanocoap_server_is_remote_in_response_ctx(const nanocoap_server_response_ct
  *
  * @warning This function is only available when using the module
  *          `nanocoap_server_separate`
+ *
+ * @pre     The transport used is UDP/DTLS. (There are not separate responses
+ *          in CoAP over TCP / WebSocket.)
  *
  * @param[in]   ctx     Context information for the CoAP response
  * @param[in]   code    CoAP response code
@@ -476,7 +623,7 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
 }
 
 /**
- * @brief   Start a nanoCoAP server instance
+ * @brief   Start a nanoCoAP server instance listening on UDP
  *
  * This function only returns if there's an error binding to @p local.
  *
@@ -486,7 +633,37 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
  *
  * @returns     return code of @see sock_udp_create on error
  */
-int nanocoap_server(sock_udp_ep_t *local, void *buf, size_t bufsize);
+int nanocoap_server_udp(sock_udp_ep_t *local, void *buf, size_t bufsize);
+
+#if MODULE_NANOCOAP_SERVER_TCP
+/**
+ * @brief   Start a nanocoap server instance listening on TCP
+ *
+ * This function only returns if there's an error binding to @p local, or if
+ * listening for TCP connection fails.
+ *
+ * @param[in,out]   ctx     Context to operate on
+ * @param[in]       evq     Event queue to operate on
+ * @param[in]       local   Local endpoint to listen on or `NULL`.
+ *
+ * @retval  0   Success, server set up and connections will be accepted and
+ *              handled from the event thread
+ * @retval  <0  Error setting up server
+ */
+int nanocoap_server_tcp(nanocoap_tcp_server_ctx_t *ctx,
+                        event_queue_t *evq,
+                        const sock_tcp_ep_t *local);
+#endif
+
+/**
+ * @brief   Alias of @ref nanocoap_server_udp
+ *
+ * @deprecated  Call @ref nanocoap_server_udp directly.
+ */
+static inline int nanocoap_server(sock_udp_ep_t *local, void *buf, size_t bufsize)
+{
+    return nanocoap_server_udp(local, buf, bufsize);
+}
 
 /**
  * @brief   Create and start the nanoCoAP server thread
@@ -498,33 +675,73 @@ int nanocoap_server(sock_udp_ep_t *local, void *buf, size_t bufsize);
  *
  * @return pid of the server thread
  */
-kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local);
+kernel_pid_t nanocoap_server_start_udp(const sock_udp_ep_t *local);
 
 /**
- * @brief   Create a CoAP client socket
+ * @brief   Alias for @ref nanocoap_server_start_udp
+ *
+ * @deprecated  Use @ref nanocoap_server_start_udp instead
+ */
+static inline kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local)
+{
+    return nanocoap_server_start_udp(local);
+}
+
+/**
+ * @brief   Create a CoAP over UDP client socket
  *
  * @param[out]  sock    CoAP UDP socket
  * @param[in]   local   Local UDP endpoint, may be NULL
  * @param[in]   remote  remote UDP endpoint
  *
+ * @note    Requires module `nanocoap_udp`
+ *
  * @returns     0 on success
  * @returns     <0 on error
  */
-static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
-                                        const sock_udp_ep_t *local,
-                                        const sock_udp_ep_t *remote)
+static inline int nanocoap_sock_udp_connect(nanocoap_sock_t *sock, const sock_udp_ep_t *local,
+                                            const sock_udp_ep_t *remote)
 {
-#if IS_USED(MODULE_NANOCOAP_DTLS)
-    sock->type = COAP_SOCKET_TYPE_UDP;
-#endif
+#if MODULE_NANOCOAP_UDP
+    nanocoap_sock_set_type(sock, COAP_SOCKET_TYPE_UDP);
     sock->msg_id = random_uint32();
 
     return sock_udp_create(&sock->udp, local, remote, 0);
+#else
+    (void)sock;
+    (void)local;
+    (void)remote;
+    /* We could hide this function altogether if module nanocoap_udp is not
+     * used. But that would mandate more use of the preprocessor. Instead,
+     * we allow this function to be called in dead branches and fail at link
+     * time when this is actually used but UDP support not enabled */
+    extern void nanocoap_sock_udp_connect_called_but_module_nanocoap_udp_not_used(void);
+    nanocoap_sock_udp_connect_called_but_module_nanocoap_udp_not_used();
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief   Create a CoAP over UDP client socket
+ *
+ * @param[out]  sock    CoAP UDP socket
+ * @param[in]   local   Local UDP endpoint, may be NULL
+ * @param[in]   remote  remote UDP endpoint
+ *
+ * @deprecated  Use @ref nanocoap_sock_connect_udp instead
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+static inline int nanocoap_sock_connect(nanocoap_sock_t *sock, const sock_udp_ep_t *local,
+                                        const sock_udp_ep_t *remote)
+{
+    return nanocoap_sock_udp_connect(sock, local, remote);
 }
 
 #if IS_USED(MODULE_NANOCOAP_DTLS) || DOXYGEN
 /**
- * @brief   Create a DTLS secured CoAP client socket
+ * @brief   Create a CoAP over DTLS client socket
  *
  * @param[out]  sock    CoAP UDP socket
  * @param[in]   local   Local UDP endpoint, may be NULL
@@ -538,6 +755,21 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
 int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                                const sock_udp_ep_t *remote, credman_tag_t tag);
 #endif
+
+/**
+ * @brief   Create a CoAP over TCP client socket
+ *
+ * @param[out]  sock        CoAP TCP socket
+ * @param[in]   local_port  local TCP port, may be `0`
+ * @param[in]   remote      remote TCP endpoint
+ *
+ * @note    Requires module `nanocoap_tcp`
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+int nanocoap_sock_tcp_connect(nanocoap_sock_t *sock,
+                              uint16_t local_port, const sock_tcp_ep_t *remote);
 
 /**
  * @brief   Create a CoAP client socket by URL
@@ -557,13 +789,33 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock);
  */
 static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 {
-#if IS_USED(MODULE_NANOCOAP_DTLS)
-    if (sock->type == COAP_SOCKET_TYPE_DTLS) {
+    switch (nanocoap_sock_get_type(sock)) {
+#if MODULE_NANOCOAP_DTLS
+    case COAP_SOCKET_TYPE_DTLS:
         sock_dtls_session_destroy(&sock->dtls, &sock->dtls_session);
         sock_dtls_close(&sock->dtls);
-    }
+        /* always close the UDP connection (see: nanocoap_sock_t) */
+        sock_udp_close(&sock->udp);
+        break;
 #endif
-    sock_udp_close(&sock->udp);
+#if MODULE_NANOCOAP_UDP
+    case COAP_SOCKET_TYPE_UDP:
+        sock_udp_close(&sock->udp);
+        break;
+#endif
+#if MODULE_NANOCOAP_TCP
+    case COAP_SOCKET_TYPE_TCP:
+        if (sock->tcp_buf) {
+            sock_tcp_disconnect(&sock->tcp);
+            free(sock->tcp_buf);
+            sock->tcp_buf = NULL;
+            sock->tcp_buf_fill = 0;
+        }
+        break;
+#endif
+    default:
+        assert(0);
+    }
 }
 
 /**
@@ -601,6 +853,32 @@ ssize_t nanocoap_sock_observe_url(const char *url, coap_observe_client_t *ctx,
 ssize_t nanocoap_sock_unobserve_url(const char *url, coap_observe_client_t *ctx);
 
 /**
+ * @brief   Build a CoAP packet for sending it over the given socket
+ *
+ * @note    This will pick the CoAP format suitable for the transport
+ *          given in @p sock via @ref nanocoap_sock_request_cb
+ *
+ * @param[in]   sock        Socket the packet is intended for
+ * @param[out]  pkt         Write the packet metadata here
+ *                          (may be `NULL` to only write the content)
+ * @param[out]  buf         Write the packet content here
+ * @param[in]   buf_len     Size of @p buf in bytes
+ * @param[in]   type        CoAP packet type (ignored, unless transport is UDP/DTLS)
+ * @param[in]   token       CoAP Token to use
+ * @param[in]   token_len   Length of @p token in bytes
+ * @param[in]   code        Code (e.g. @ref COAP_METHOD_GET etc.)
+ *
+ * @return  The number of bytes written into @p buf on success
+ * @retval  -EOVERFLOW      Required more than @p buf_len bytes in the buffer
+ * @retval  -EINVAL         Called with invalid arguments
+ */
+ssize_t nanocoap_sock_build_pkt(nanocoap_sock_t *sock, coap_pkt_t *pkt,
+                                void *buf, size_t buf_len,
+                                uint8_t type,
+                                const void *token, size_t token_len,
+                                uint8_t code);
+
+/**
  * @brief   Simple synchronous CoAP (confirmable) GET
  *
  * @param[in]   sock    socket to use for the request
@@ -631,8 +909,8 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
-                              void *response, size_t len_max);
+ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path, void *response,
+                              size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) PUT
@@ -650,8 +928,7 @@ ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
-                          const void *request, size_t len,
+ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path, const void *request, size_t len,
                           void *response, size_t len_max);
 
 /**
@@ -670,9 +947,8 @@ ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
-                              const void *request, size_t len,
-                              void *response, size_t len_max);
+ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path, const void *request,
+                              size_t len, void *response, size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) PUT to URL
@@ -686,9 +962,8 @@ ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
  * @returns     length of response payload on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_sock_put_url(const char *url,
-                              const void *request, size_t len,
-                              void *response, size_t len_max);
+ssize_t nanocoap_sock_put_url(const char *url, const void *request, size_t len, void *response,
+                              size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) POST
@@ -707,8 +982,7 @@ ssize_t nanocoap_sock_put_url(const char *url,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
-                           const void *request, size_t len,
+ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path, const void *request, size_t len,
                            void *response, size_t len_max);
 
 /**
@@ -728,9 +1002,8 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
-                               const void *request, size_t len,
-                               void *response, size_t len_max);
+ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path, const void *request,
+                               size_t len, void *response, size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) POST to URL
@@ -744,9 +1017,8 @@ ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
  * @returns     length of response payload on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_sock_post_url(const char *url,
-                               const void *request, size_t len,
-                               void *response, size_t len_max);
+ssize_t nanocoap_sock_post_url(const char *url, const void *request, size_t len, void *response,
+                               size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) FETCH
@@ -765,9 +1037,8 @@ ssize_t nanocoap_sock_post_url(const char *url,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
-                            const void *request, size_t len,
-                            void *response, size_t len_max);
+ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path, const void *request,
+                            size_t len, void *response, size_t len_max);
 
 /**
  * @brief   Simple non-confirmable FETCH
@@ -786,9 +1057,8 @@ ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
-                                const void *request, size_t len,
-                                void *response, size_t len_max);
+ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path, const void *request,
+                                size_t len, void *response, size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) FETCH to URL
@@ -803,9 +1073,8 @@ ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
  * @returns     length of response payload on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_sock_fetch_url(const char *url,
-                                const void *request, size_t len,
-                                void *response, size_t len_max);
+ssize_t nanocoap_sock_fetch_url(const char *url, const void *request, size_t len, void *response,
+                                size_t len_max);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) DELETE
@@ -846,8 +1115,7 @@ ssize_t nanocoap_sock_delete_url(const char *url);
  * @returns     -1         if failed to fetch the url content
  * @returns      0         on success
  */
-int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
-                                coap_blksize_t blksize,
+int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path, coap_blksize_t blksize,
                                 coap_blockwise_cb_t callback, void *arg);
 
 /**
@@ -865,9 +1133,8 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
  * @returns     -EINVAL    if an invalid url is provided
  * @returns     size of the response payload on success
  */
-int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
-                            coap_blksize_t blksize, size_t offset,
-                            void *dst, size_t len);
+int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path, coap_blksize_t blksize,
+                            size_t offset, void *dst, size_t len);
 
 /**
  * @brief    Performs a blockwise coap get request to the specified url.
@@ -886,8 +1153,7 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
  * @returns     -1         if failed to fetch the url content
  * @returns      0         on success
  */
-int nanocoap_get_blockwise_url(const char *url,
-                               coap_blksize_t blksize,
+int nanocoap_get_blockwise_url(const char *url, coap_blksize_t blksize,
                                coap_blockwise_cb_t callback, void *arg);
 
 /**
@@ -909,9 +1175,8 @@ int nanocoap_get_blockwise_url(const char *url,
  * @returns     -ENOBUFS   if the provided buffer was too small
  * @returns     size of the response payload on success
  */
-ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
-                                          coap_blksize_t blksize,
-                                          void *buf, size_t len);
+ssize_t nanocoap_get_blockwise_url_to_buf(const char *url, coap_blksize_t blksize, void *buf,
+                                          size_t len);
 
 /**
  * @brief    Performs a blockwise CoAP GET request, store the response
@@ -933,8 +1198,7 @@ ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
  * @returns     size of the response payload on success
  */
 ssize_t nanocoap_get_blockwise_to_buf(nanocoap_sock_t *sock, const char *path,
-                                      coap_blksize_t blksize,
-                                      void *buf, size_t len);
+                                      coap_blksize_t blksize, void *buf, size_t len);
 
 /**
  * @brief   Simple synchronous CoAP request
@@ -973,8 +1237,8 @@ ssize_t nanocoap_sock_request(nanocoap_sock_t *sock, coap_pkt_t *pkt, size_t len
  * @returns     any error on @see sock_udp_recv_buf or @see sock_dtls_recv_buf
  * @returns     any return value of @p cb for a matching response
  */
-ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
-                                 coap_request_cb_t cb, void *arg);
+ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt, coap_request_cb_t cb,
+                                 void *arg);
 
 /**
  * @brief   Simple synchronous CoAP request
@@ -992,8 +1256,35 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                     @ref nanocoap_sock_request_cb on error for the list of
                     error codes
  */
-ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
-                         const sock_udp_ep_t *remote, size_t len);
+ssize_t nanocoap_request_udp(coap_pkt_t *pkt,
+                             const sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                             size_t len);
+
+/**
+ * @brief   Alias for @ref nanocoap_request_udp
+ *
+ * @param[in,out]   pkt     Packet struct containing the request. Is reused for
+ *                          the response
+ * @param[in]       local   Local UDP endpoint, may be NULL
+ * @param[in]       remote  remote UDP endpoint
+ * @param[in]       len     Total length of the buffer associated with the
+ *                          request
+ *
+ * @deprecated  Use @ref nanocoap_request_udp instead
+ *
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
+ */
+static inline ssize_t nanocoap_request(coap_pkt_t *pkt,
+                                      const sock_udp_ep_t *local,
+                                      const sock_udp_ep_t *remote,
+                                      size_t len)
+{
+    return nanocoap_request_udp(pkt, local, remote, len);
+}
 
 /**
  * @brief   Initialize block request context by URL and connect a socket
@@ -1008,10 +1299,8 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
  * @retval      <0      Error (see @ref nanocoap_sock_url_connect for details)
  */
 static inline int nanocoap_block_request_connect_url(coap_block_request_t *ctx,
-                                                     nanocoap_sock_t *sock,
-                                                     const char *url,
-                                                     coap_method_t method,
-                                                     coap_blksize_t blksize)
+                                                     nanocoap_sock_t *sock, const char *url,
+                                                     coap_method_t method, coap_blksize_t blksize)
 {
     ctx->sock = sock;
     ctx->path = sock_urlpath(url);
@@ -1041,9 +1330,29 @@ static inline int nanocoap_block_request_connect_url(coap_block_request_t *ctx,
  * @return      Number of payload bytes written on success
  *              Negative error on failure
  */
-int nanocoap_sock_block_request(coap_block_request_t *ctx,
-                                const void *data, size_t len, bool more,
+int nanocoap_sock_block_request(coap_block_request_t *ctx, const void *data, size_t len, bool more,
                                 coap_request_cb_t cb, void *arg);
+
+/**
+ * @brief   Send a CoAP-over-TCP CSM message
+ *
+ * @warning This is an internal function. It's API may change as needed without
+ *          deprecation.
+ *
+ * @param[in]   sock        TCP socket to send the CSM message over
+ * @param[out]  buf         Message buffer to assemble the CSM message in before
+ *                          sending it out
+ * @param[in]   buf_size    Size of @p buf in bytes. This will also be reported
+ *                          to the other side as maximum size for messages
+ *                          to receive.
+ *
+ * This will send a CSM message that indicates messages up at most @p buf_size
+ * bytes will be processed (assuming @p buf is also used as receive buffer).
+ * It will also indicate support for block-wise transfer. If and only if
+ * module `nanocoap_token_ext` is used, support for RFC 8974 Extended Tokens
+ * will be indicated.
+ */
+ssize_t nanocoap_send_csm_message(sock_tcp_t *sock, void *_buf, size_t buf_size);
 #ifdef __cplusplus
 }
 #endif

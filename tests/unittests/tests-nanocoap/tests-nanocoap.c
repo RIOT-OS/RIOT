@@ -1268,7 +1268,7 @@ static void test_nanocoap___rst_message(void)
  */
 static void test_nanocoap__out_of_bounds_option(void)
 {
-    uint8_t invalid_msg[] = {
+    uint8_t invalid_msg_udp[] = {
         (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3, /* version = 1, type = CON, Token Len = 3 */
         COAP_METHOD_GET,
         0x13, 0x37, /* Message ID = 0x1337 */
@@ -1281,7 +1281,7 @@ static void test_nanocoap__out_of_bounds_option(void)
     };
 
     coap_pkt_t pkt;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse(&pkt, invalid_msg, sizeof(invalid_msg)));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse_udp(&pkt, invalid_msg_udp, sizeof(invalid_msg_udp)));
 }
 
 Test *tests_nanocoap_tests(void)

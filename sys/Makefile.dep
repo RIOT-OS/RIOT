@@ -114,6 +114,7 @@ ifneq (,$(filter dhcpv6_relay,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_dhcpv6_relay
   USEMODULE += event
   USEMODULE += sock_async_event
+  USEMODULE += sock_async
   USEMODULE += sock_udp
 endif
 
@@ -535,15 +536,28 @@ ifneq (,$(filter nanocoap_server_separate,$(USEMODULE)))
   USEMODULE += sock_aux_local
 endif
 
+ifneq (,$(filter nanocoap_server_tcp,$(USEMODULE)))
+  USEMODULE += nanocoap_server
+  USEMODULE += nanocoap_tcp
+  USEMODULE += sock_async_event
+endif
+
 ifneq (,$(filter nanocoap_server,$(USEMODULE)))
   USEMODULE += nanocoap_resources
   USEMODULE += nanocoap_sock
 endif
 
 ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
-  USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter nanocoap_udp,$(USEMODULE)))
+  USEMODULE += sock_udp
+endif
+
+ifneq (,$(filter nanocoap_tcp,$(USEMODULE)))
+  USEMODULE += sock_tcp
 endif
 
 ifneq (,$(filter nanocoap_cache,$(USEMODULE)))
@@ -573,6 +587,11 @@ ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
+  # default to UDP transport if none is selected
+  ifeq (,$(filter nanocoap_udp nanocoap_tcp nanocoap_dtls,$(USEMODULE)))
+    USEMODULE += nanocoap_udp
+  endif
+
   USEMODULE += nanocoap
 endif
 
