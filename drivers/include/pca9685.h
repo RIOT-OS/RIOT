@@ -318,5 +318,5 @@ static inline uint8_t pca9685_pwm_channels(pca9685_t *dev)
 }
 #endif
 
-#endif /* PCA9685_H */
 /** @} */
+#endif /* PCA9685_H */

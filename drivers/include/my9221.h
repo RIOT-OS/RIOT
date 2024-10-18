@@ -125,5 +125,5 @@ void my9221_toggle_led(my9221_t *dev, const uint8_t led);
 }
 #endif
 
-#endif /* MY9221_H */
 /** @} */
+#endif /* MY9221_H */

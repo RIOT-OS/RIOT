@@ -185,5 +185,5 @@ int ft5x06_read_touch_gesture(const ft5x06_t *dev, ft5x06_touch_gesture_t *gestu
 }
 #endif
 
-#endif /* FT5X06_H */
 /** @} */
+#endif /* FT5X06_H */

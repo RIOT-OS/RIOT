@@ -58,5 +58,5 @@ static const lpd8808_params_t lpd8808_params[] =
 }
 #endif
 
-#endif /* LPD8808_PARAMS_H */
 /** @} */
+#endif /* LPD8808_PARAMS_H */

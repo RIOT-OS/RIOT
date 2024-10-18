@@ -75,5 +75,5 @@ saul_reg_info_t tsl2561_saul_info[] =
 }
 #endif
 
-#endif /* TSL2561_PARAMS_H */
 /** @} */
+#endif /* TSL2561_PARAMS_H */

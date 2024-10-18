@@ -138,5 +138,5 @@ double random_res53(void);
 }
 #endif
 
-#endif /* RANDOM_H */
 /** @} */
+#endif /* RANDOM_H */

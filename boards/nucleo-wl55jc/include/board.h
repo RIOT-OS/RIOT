@@ -90,5 +90,5 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

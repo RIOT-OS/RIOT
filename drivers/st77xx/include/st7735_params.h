@@ -40,6 +40,6 @@ extern "C" {
 }
 #endif
 
-#endif /* ST7735_PARAMS_H */
 /** @} */
+#endif /* ST7735_PARAMS_H */
 #endif /* DOXYGEN */

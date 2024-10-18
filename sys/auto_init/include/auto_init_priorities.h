@@ -400,5 +400,5 @@ extern "C" {
 }
 #endif
 
-#endif /* AUTO_INIT_PRIORITIES_H */
 /** @} */
+#endif /* AUTO_INIT_PRIORITIES_H */

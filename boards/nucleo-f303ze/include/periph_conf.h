@@ -203,5 +203,5 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

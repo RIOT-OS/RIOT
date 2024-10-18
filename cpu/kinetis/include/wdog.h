@@ -53,5 +53,5 @@ void wdog_disable(void);
 }
 #endif
 
-#endif /* WDOG_H */
 /** @} */
+#endif /* WDOG_H */

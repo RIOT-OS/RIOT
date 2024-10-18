@@ -69,5 +69,5 @@ void clock_stop_lf(void);
 }
 #endif
 
-#endif /* NRF_CLOCK_H */
 /** @} */
+#endif /* NRF_CLOCK_H */

@@ -240,5 +240,5 @@ bool crb_chunk_foreach(chunk_ringbuf_t *rb, crb_foreach_callback_t func, void *c
 }
 #endif
 
-#endif /* CHUNKED_RINGBUFFER_H */
 /** @} */
+#endif /* CHUNKED_RINGBUFFER_H */

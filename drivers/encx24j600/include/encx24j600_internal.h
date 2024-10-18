@@ -40,5 +40,5 @@ typedef struct __attribute__((packed)) encx24j600_frame_hdr {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ENCX24J600_INTERNAL_H */
 /** @} */
+#endif /* ENCX24J600_INTERNAL_H */

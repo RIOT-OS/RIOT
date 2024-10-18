@@ -186,5 +186,5 @@ void pwm_poweroff(pwm_t dev);
 }
 #endif
 
-#endif /* PERIPH_PWM_H */
 /** @} */
+#endif /* PERIPH_PWM_H */

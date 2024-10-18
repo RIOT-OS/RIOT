@@ -191,5 +191,5 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

@@ -78,5 +78,5 @@ static inline int cc110x_is_ready_from_status(uint8_t status)
 }
 #endif
 
-#endif /* CC110X_INTERNAL_H */
 /** @} */
+#endif /* CC110X_INTERNAL_H */

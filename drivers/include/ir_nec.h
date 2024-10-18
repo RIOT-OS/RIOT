@@ -84,5 +84,5 @@ int ir_nec_read(ir_nec_t *dev, ir_nec_cmd_t *command);
 }
 #endif
 
-#endif /* IR_NEC_H */
 /** @} */
+#endif /* IR_NEC_H */

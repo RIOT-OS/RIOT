@@ -96,5 +96,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_SDMMC_H */
 /** @} */
+#endif /* PERIPH_CPU_SDMMC_H */

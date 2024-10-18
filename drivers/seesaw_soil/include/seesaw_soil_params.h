@@ -67,5 +67,5 @@ static const saul_reg_info_t seesaw_soil_saul_info[] =
 }
 #endif
 
-#endif /* SEESAW_SOIL_PARAMS_H */
 /** @} */
+#endif /* SEESAW_SOIL_PARAMS_H */

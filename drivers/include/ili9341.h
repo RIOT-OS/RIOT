@@ -104,5 +104,5 @@ extern const lcd_driver_t lcd_ili9341_driver;
 #ifdef __cplusplus
 }
 #endif
-#endif /* ILI9341_H */
 /** @} */
+#endif /* ILI9341_H */

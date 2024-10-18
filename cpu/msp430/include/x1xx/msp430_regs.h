@@ -120,5 +120,5 @@ extern msp430_usart_t USART_1;
 }
 #endif
 
-#endif /* X1XX_MSP430_REGS_H */
 /** @} */
+#endif /* X1XX_MSP430_REGS_H */

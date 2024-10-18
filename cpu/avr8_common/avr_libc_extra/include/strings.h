@@ -78,5 +78,5 @@ static inline void bcopy(const void *src, void *dest, size_t n)
 }
 #endif
 
-#endif /* STRINGS_H */
 /** @} */
+#endif /* STRINGS_H */

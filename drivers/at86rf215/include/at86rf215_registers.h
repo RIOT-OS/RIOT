@@ -612,5 +612,5 @@ static const struct at86rf215_BBC_regs BBC1_regs = {
 }
 #endif
 
-#endif /* AT86RF215_REGISTERS_H */
 /** @} */
+#endif /* AT86RF215_REGISTERS_H */

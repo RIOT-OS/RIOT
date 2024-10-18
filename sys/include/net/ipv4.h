@@ -30,5 +30,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_IPV4_H */
 /** @} */
+#endif /* NET_IPV4_H */

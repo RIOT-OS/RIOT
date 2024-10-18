@@ -162,5 +162,5 @@ void mrf24j40_flush_rx(mrf24j40_t *dev);
 }
 #endif
 
-#endif /* MRF24J40_INTERNAL_H */
 /** @} */
+#endif /* MRF24J40_INTERNAL_H */

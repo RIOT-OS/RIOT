@@ -41,5 +41,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MACROS_XTSTR_H */
 /** @} */
+#endif /* MACROS_XTSTR_H */

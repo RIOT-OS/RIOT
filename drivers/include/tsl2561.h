@@ -109,5 +109,5 @@ uint16_t tsl2561_read_illuminance(const tsl2561_t *dev);
 }
 #endif
 
-#endif /* TSL2561_H */
 /** @} */
+#endif /* TSL2561_H */

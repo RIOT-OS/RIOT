@@ -179,5 +179,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SAUL_PERIPH_H */
 /** @} */
+#endif /* SAUL_PERIPH_H */

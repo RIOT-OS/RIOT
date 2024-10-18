@@ -128,5 +128,5 @@ as shown in the NVM Row Organization figure. */
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */
+#endif /* CPU_CONF_H */

@@ -109,5 +109,5 @@ void rmutex_unlock(rmutex_t *rmutex);
 }
 #endif
 
-#endif /* RMUTEX_H */
 /** @} */
+#endif /* RMUTEX_H */

@@ -80,5 +80,5 @@ extern evtimer_msg_t gnrc_rpl_evtimer;
 }
 #endif
 
-#endif /* GLOBALS_H */
 /** @} */
+#endif /* GLOBALS_H */

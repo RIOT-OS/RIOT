@@ -59,5 +59,5 @@ static const srf08_params_t srf08_params[] = {
 }
 #endif
 
-#endif /* SRF08_PARAMS_H */
 /** @} */
+#endif /* SRF08_PARAMS_H */

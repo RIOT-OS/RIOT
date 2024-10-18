@@ -67,5 +67,5 @@ int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_RH_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_EXT_RH_H */

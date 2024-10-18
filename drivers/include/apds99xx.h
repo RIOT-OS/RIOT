@@ -683,5 +683,5 @@ int apds99xx_int_source(apds99xx_t *dev, apds99xx_int_source_t* src);
 }
 #endif
 
-#endif /* APDS99XX_H */
 /** @} */
+#endif /* APDS99XX_H */

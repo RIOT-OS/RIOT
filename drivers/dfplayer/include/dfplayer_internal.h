@@ -210,5 +210,5 @@ static inline int dfplayer_query(dfplayer_t *dev, uint16_t *resp, uint8_t cmd)
 }
 #endif
 
-#endif /* DFPLAYER_INTERNAL_H */
 /** @} */
+#endif /* DFPLAYER_INTERNAL_H */

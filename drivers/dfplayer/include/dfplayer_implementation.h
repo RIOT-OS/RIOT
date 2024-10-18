@@ -257,5 +257,5 @@ static inline void dfplayer_source_set_rm(dfplayer_source_set_t *set,
 }
 #endif
 
-#endif /* DFPLAYER_IMPLEMENTATION_H */
 /** @} */
+#endif /* DFPLAYER_IMPLEMENTATION_H */

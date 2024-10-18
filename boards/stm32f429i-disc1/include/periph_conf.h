@@ -241,5 +241,5 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

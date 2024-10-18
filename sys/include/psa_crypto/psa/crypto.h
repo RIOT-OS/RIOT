@@ -4078,5 +4078,5 @@ psa_status_t psa_verify_message(psa_key_id_t key,
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_CRYPTO_H */

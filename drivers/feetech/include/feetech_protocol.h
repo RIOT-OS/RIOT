@@ -95,5 +95,5 @@ typedef enum {
 }
 #endif
 
-#endif /* FEETECH_PROTOCOL_H */
 /** @} */
+#endif /* FEETECH_PROTOCOL_H */

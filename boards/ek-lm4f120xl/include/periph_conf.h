@@ -160,5 +160,5 @@ static const spi_conf_t spi_confs[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

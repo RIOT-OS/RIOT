@@ -106,5 +106,5 @@ int srf04_get_distance(const srf04_t *dev);
 }
 #endif
 
-#endif /* SRF04_H */
 /** @} */
+#endif /* SRF04_H */

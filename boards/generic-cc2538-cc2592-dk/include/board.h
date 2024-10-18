@@ -123,5 +123,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

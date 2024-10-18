@@ -87,5 +87,5 @@ static const saul_reg_info_t adxl345_saul_info[] =
 }
 #endif
 
-#endif /* ADXL345_PARAMS_H */
 /** @} */
+#endif /* ADXL345_PARAMS_H */

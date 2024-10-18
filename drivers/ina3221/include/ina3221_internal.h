@@ -129,5 +129,5 @@ static inline int16_t sum_shunt_voltage_uv_to_reg_val(int32_t sum_suv)
 }
 #endif
 
-#endif /* INA3221_INTERNAL_H */
 /** @} */
+#endif /* INA3221_INTERNAL_H */

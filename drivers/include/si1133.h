@@ -206,5 +206,5 @@ si1133_ret_code_t si1133_capture_sensors(si1133_t *dev, int32_t *values,
 }
 #endif
 
-#endif /* SI1133_H */
 /** @} */
+#endif /* SI1133_H */

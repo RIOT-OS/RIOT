@@ -61,5 +61,5 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_TIMER_H */
 /** @} */
+#endif /* PERIPH_CPU_TIMER_H */

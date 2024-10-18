@@ -187,5 +187,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_UART_H */
 /** @} */
+#endif /* CC2538_UART_H */

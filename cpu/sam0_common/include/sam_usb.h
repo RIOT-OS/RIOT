@@ -50,5 +50,5 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* SAM_USB_H */
 /** @} */
+#endif /* SAM_USB_H */

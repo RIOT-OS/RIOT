@@ -71,5 +71,5 @@ static const saul_reg_info_t tcs37727_saul_info[] =
 }
 #endif
 
-#endif /* TCS37727_PARAMS_H */
 /** @} */
+#endif /* TCS37727_PARAMS_H */

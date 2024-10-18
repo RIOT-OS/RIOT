@@ -40,5 +40,5 @@ static inline void test_utils_interactive_sync(void) {}
 #ifdef __cplusplus
 }
 #endif
-#endif /* TEST_UTILS_INTERACTIVE_SYNC_H */
 /** @} */
+#endif /* TEST_UTILS_INTERACTIVE_SYNC_H */

@@ -71,5 +71,5 @@ typedef struct {
 }
 #endif
 
-#endif /* VCDIFF_MTD_H */
 /** @} */
+#endif /* VCDIFF_MTD_H */

@@ -436,5 +436,5 @@ void uart_disable_tx(uart_t uart);
 }
 #endif
 
-#endif /* PERIPH_UART_H */
 /** @} */
+#endif /* PERIPH_UART_H */

@@ -200,5 +200,5 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

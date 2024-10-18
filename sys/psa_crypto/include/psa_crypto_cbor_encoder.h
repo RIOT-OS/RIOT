@@ -145,5 +145,5 @@ psa_status_t psa_decode_key_attributes(psa_key_attributes_t *attr, uint8_t *cbor
 }
 #endif
 
-#endif /* PSA_CRYPTO_CBOR_ENCODER_H */
 /** @} */
+#endif /* PSA_CRYPTO_CBOR_ENCODER_H */

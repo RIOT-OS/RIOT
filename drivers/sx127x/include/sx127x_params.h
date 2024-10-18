@@ -109,5 +109,5 @@ static const sx127x_params_t sx127x_params[] =
 }
 #endif
 
-#endif /* SX127X_PARAMS_H */
 /** @} */
+#endif /* SX127X_PARAMS_H */

@@ -33,5 +33,5 @@ void tests_fmt(void);
 }
 #endif
 
-#endif /* TESTS_FMT_H */
 /** @} */
+#endif /* TESTS_FMT_H */

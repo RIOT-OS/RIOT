@@ -56,5 +56,5 @@ typedef enum ph_oem_reg {
 }
 #endif
 
-#endif /* PH_OEM_REGS_H */
 /** @} */
+#endif /* PH_OEM_REGS_H */

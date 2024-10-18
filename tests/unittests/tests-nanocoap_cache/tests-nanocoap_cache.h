@@ -33,5 +33,5 @@ void tests_nanocoap_cache(void);
 }
 #endif
 
-#endif /* TESTS_NANOCOAP_CACHE_H */
 /** @} */
+#endif /* TESTS_NANOCOAP_CACHE_H */

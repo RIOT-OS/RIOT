@@ -162,5 +162,5 @@ constexpr uint8_t ADDITIONAL_ACK_WAIT_DURATION = 63;
 }
 #endif
 
-#endif /* OPENDSME_DSME_SETTINGS_H */
 /** @} */
+#endif /* OPENDSME_DSME_SETTINGS_H */

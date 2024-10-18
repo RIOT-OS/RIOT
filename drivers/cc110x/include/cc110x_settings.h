@@ -165,5 +165,5 @@ extern const cc110x_config_t cc110x_config_868mhz_250kbps_300khz;
 }
 #endif
 
-#endif /* CC110X_SETTINGS_H */
 /** @} */
+#endif /* CC110X_SETTINGS_H */

@@ -209,5 +209,5 @@ void touch_dev_set_touch_event_callback(const touch_dev_t *dev, touch_event_cb_t
 }
 #endif
 
-#endif /* TOUCH_DEV_H */
 /** @} */
+#endif /* TOUCH_DEV_H */

@@ -112,5 +112,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_180_H */
 /** @} */
+#endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_180_H */

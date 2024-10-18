@@ -32,5 +32,5 @@ extern "C" {
 }
 #endif
 
-#endif /* IR_NEC_CONSTANTS_H */
 /** @} */
+#endif /* IR_NEC_CONSTANTS_H */

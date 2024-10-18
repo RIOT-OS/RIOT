@@ -46,5 +46,5 @@ extern netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 }
 #endif
 
-#endif /* NETDEV_TAP_PARAMS_H */
 /** @} */
+#endif /* NETDEV_TAP_PARAMS_H */

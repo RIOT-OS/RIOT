@@ -138,5 +138,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_GNRC_GOMACH_HDR_H */
 /** @} */
+#endif /* NET_GNRC_GOMACH_HDR_H */

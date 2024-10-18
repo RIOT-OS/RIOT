@@ -318,5 +318,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_CONF_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_CONF_H */

@@ -68,5 +68,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LIBSCHC_CONFIG_H */
 /** @} */
+#endif /* LIBSCHC_CONFIG_H */

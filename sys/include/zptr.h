@@ -135,5 +135,5 @@ static inline void *zptrd(zptr_t zptr) { return (void *)zptr; }
 }
 #endif
 
-#endif /* ZPTR_H */
 /** @} */
+#endif /* ZPTR_H */

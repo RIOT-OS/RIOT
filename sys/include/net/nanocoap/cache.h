@@ -269,5 +269,5 @@ static inline bool nanocoap_cache_entry_is_stale(const nanocoap_cache_entry_t *c
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_CACHE_H */
 /** @} */
+#endif /* NET_NANOCOAP_CACHE_H */

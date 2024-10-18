@@ -38,5 +38,5 @@ static inline bool timer_poll_channel(tim_t tim, int channel)
 }
 #endif
 
-#endif /* TIMER_ARCH_H */
 /** @} */
+#endif /* TIMER_ARCH_H */

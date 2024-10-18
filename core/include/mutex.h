@@ -444,5 +444,5 @@ void mutex_cancel(mutex_cancel_t *mc);
 }
 #endif
 
-#endif /* MUTEX_H */
 /** @} */
+#endif /* MUTEX_H */

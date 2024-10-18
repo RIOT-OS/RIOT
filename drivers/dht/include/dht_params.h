@@ -70,5 +70,5 @@ static const saul_reg_info_t dht_saul_info[] =
 }
 #endif
 
-#endif /* DHT_PARAMS_H */
 /** @} */
+#endif /* DHT_PARAMS_H */

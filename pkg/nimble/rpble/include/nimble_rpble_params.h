@@ -103,5 +103,5 @@ static const nimble_rpble_cfg_t nimble_rpble_params = NIMBLE_RPBLE_PARAMS;
 }
 #endif
 
-#endif /* NIMBLE_RPBLE_PARAMS_H */
 /** @} */
+#endif /* NIMBLE_RPBLE_PARAMS_H */

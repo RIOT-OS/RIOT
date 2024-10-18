@@ -54,5 +54,5 @@ int32_t ztimer_overhead_set(ztimer_clock_t *clock, uint32_t base);
  */
 int32_t ztimer_overhead_sleep(ztimer_clock_t *clock, uint32_t base);
 
-#endif /* ZTIMER_OVERHEAD_H */
 /** @} */
+#endif /* ZTIMER_OVERHEAD_H */

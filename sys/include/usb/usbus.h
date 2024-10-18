@@ -789,5 +789,5 @@ static inline bool usbus_urb_isset_flag(usbus_urb_t *urb,
 #ifdef __cplusplus
 }
 #endif
-#endif /* USB_USBUS_H */
 /** @} */
+#endif /* USB_USBUS_H */

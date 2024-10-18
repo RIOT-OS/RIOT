@@ -211,5 +211,5 @@ void cond_broadcast(cond_t *cond);
 }
 #endif
 
-#endif /* COND_H */
 /** @} */
+#endif /* COND_H */

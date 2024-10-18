@@ -165,5 +165,5 @@
 /* include common board definitions as last step */
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

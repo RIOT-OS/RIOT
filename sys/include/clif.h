@@ -331,5 +331,5 @@ int clif_init_attr(clif_attr_t *attr, clif_attr_type_t type);
 }
 #endif
 
-#endif /* CLIF_H */
 /** @} */
+#endif /* CLIF_H */

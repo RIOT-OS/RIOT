@@ -99,5 +99,5 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
 #ifdef __cplusplus
 }
 #endif
-#endif /* CRYPTO_CHACHA20POLY1305_H */
 /** @} */
+#endif /* CRYPTO_CHACHA20POLY1305_H */

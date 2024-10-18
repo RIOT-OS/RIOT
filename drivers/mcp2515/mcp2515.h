@@ -295,5 +295,5 @@ int mcp2515_set_mask(candev_mcp2515_t *dev, int mailbox, uint32_t mask);
 }
 #endif
 
-#endif /* MCP2515_H */
 /** @} */
+#endif /* MCP2515_H */

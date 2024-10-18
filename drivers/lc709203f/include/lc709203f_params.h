@@ -62,5 +62,5 @@ static const lc709203f_params_t params_default[] = {
 #ifdef __cplusplus
 }
 #endif
-#endif /* LC709203F_PARAMS_H */
 /** @} */
+#endif /* LC709203F_PARAMS_H */

@@ -47,5 +47,5 @@ extern "C" {
 }
 #endif
 
-#endif /* TINYUSB_HW_DEFAULTS_H */
 /** @} */
+#endif /* TINYUSB_HW_DEFAULTS_H */

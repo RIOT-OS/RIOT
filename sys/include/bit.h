@@ -305,5 +305,5 @@ static inline bool bit_check8(volatile uint8_t *ptr, uint8_t bit)
 }
 #endif
 
-#endif /* BIT_H */
 /** @} */
+#endif /* BIT_H */

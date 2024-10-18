@@ -78,5 +78,5 @@ extern const trx_driver_t tja1042_driver;
 }
 #endif
 
-#endif /* TJA1042_H */
 /** @} */
+#endif /* TJA1042_H */

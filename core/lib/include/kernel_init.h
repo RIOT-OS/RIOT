@@ -69,5 +69,5 @@ static inline void early_init(void) {}
 }
 #endif
 
-#endif /* KERNEL_INIT_H */
 /** @} */
+#endif /* KERNEL_INIT_H */

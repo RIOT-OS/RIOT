@@ -65,5 +65,5 @@ static const dac_dds_params_t dac_dds_params[] =
 }
 #endif
 
-#endif /* DAC_DDS_PARAMS_H */
 /** @} */
+#endif /* DAC_DDS_PARAMS_H */

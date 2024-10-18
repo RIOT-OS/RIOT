@@ -64,5 +64,5 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size);
 }
 #endif
 
-#endif /* NVRAM_SPI_H */
 /** @} */
+#endif /* NVRAM_SPI_H */

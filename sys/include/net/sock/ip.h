@@ -707,5 +707,5 @@ static inline ssize_t sock_ip_send(sock_ip_t *sock,
 }
 #endif
 
-#endif /* NET_SOCK_IP_H */
 /** @} */
+#endif /* NET_SOCK_IP_H */

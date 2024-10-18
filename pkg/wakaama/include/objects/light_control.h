@@ -298,5 +298,5 @@ int lwm2m_object_light_control_update_app_type(uint16_t instance_id, const char 
 }
 #endif
 
-#endif /* OBJECTS_LIGHT_CONTROL_H */
 /** @} */
+#endif /* OBJECTS_LIGHT_CONTROL_H */

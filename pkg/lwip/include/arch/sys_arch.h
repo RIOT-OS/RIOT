@@ -140,5 +140,5 @@ void sys_unlock_tcpip_core(void);
 }
 #endif
 
-#endif /* ARCH_SYS_ARCH_H */
 /** @} */
+#endif /* ARCH_SYS_ARCH_H */

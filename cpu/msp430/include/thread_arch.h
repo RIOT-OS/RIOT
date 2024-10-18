@@ -27,5 +27,5 @@ extern "C" {
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */
+#endif /* THREAD_ARCH_H */

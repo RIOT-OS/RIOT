@@ -404,5 +404,5 @@ extern const lcd_driver_t lcd_st77xx_driver;
 #ifdef __cplusplus
 }
 #endif
-#endif /* ST77XX_H */
 /** @} */
+#endif /* ST77XX_H */

@@ -286,5 +286,5 @@ static inline void netdev_ieee802154_setup(netdev_ieee802154_t *dev)
 }
 #endif
 
-#endif /* NET_NETDEV_IEEE802154_H */
 /** @} */
+#endif /* NET_NETDEV_IEEE802154_H */

@@ -77,5 +77,5 @@ void gpio_init_mux(gpio_t pin, uint32_t func);
 }
 #endif
 
-#endif /* GPIO_MUX_H */
 /** @} */
+#endif /* GPIO_MUX_H */

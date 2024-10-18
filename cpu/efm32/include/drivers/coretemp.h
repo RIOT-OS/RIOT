@@ -64,5 +64,5 @@ int16_t coretemp_read(void);
 }
 #endif
 
-#endif /* DRIVERS_CORETEMP_H */
 /** @} */
+#endif /* DRIVERS_CORETEMP_H */

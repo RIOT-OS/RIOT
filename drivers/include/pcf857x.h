@@ -601,5 +601,5 @@ void pcf857x_gpio_irq_disable(pcf857x_t *dev, uint8_t pin);
 }
 #endif
 
-#endif /* PCF857X_H */
 /** @} */
+#endif /* PCF857X_H */

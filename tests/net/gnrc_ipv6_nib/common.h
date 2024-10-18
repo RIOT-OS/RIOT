@@ -45,5 +45,5 @@ void _common_set_up(void);
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */
+#endif /* COMMON_H */

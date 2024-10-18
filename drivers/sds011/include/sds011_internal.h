@@ -95,5 +95,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SDS011_INTERNAL_H */
 /** @} */
+#endif /* SDS011_INTERNAL_H */

@@ -85,5 +85,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDK_CONF_H */
 /** @} */
+#endif /* SDK_CONF_H */

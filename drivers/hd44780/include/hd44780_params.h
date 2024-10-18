@@ -106,5 +106,5 @@ static const hd44780_params_t hd44780_params[] =
 }
 #endif
 
-#endif /* HD44780_PARAMS_H */
 /** @} */
+#endif /* HD44780_PARAMS_H */

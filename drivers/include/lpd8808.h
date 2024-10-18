@@ -79,5 +79,5 @@ void lpd8808_load_rgb(const lpd8808_t *dev, color_rgb_t vals[]);
 }
 #endif
 
-#endif /* LPD8808_H */
 /** @} */
+#endif /* LPD8808_H */

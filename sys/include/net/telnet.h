@@ -119,5 +119,5 @@ void telnet_cb_disconneced(void);
 }
 #endif
 
-#endif /* NET_TELNET_H */
 /** @} */
+#endif /* NET_TELNET_H */

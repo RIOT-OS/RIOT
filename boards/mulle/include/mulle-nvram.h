@@ -40,5 +40,5 @@ extern nvram_t *mulle_nvram;
 }
 #endif
 
-#endif /* MULLE_NVRAM_H */
 /** @} */
+#endif /* MULLE_NVRAM_H */

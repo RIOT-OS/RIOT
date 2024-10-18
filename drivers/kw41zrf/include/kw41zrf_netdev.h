@@ -32,5 +32,5 @@ extern const netdev_driver_t kw41zrf_driver;
 }
 #endif
 
-#endif /* KW41ZRF_NETDEV_H */
 /** @} */
+#endif /* KW41ZRF_NETDEV_H */

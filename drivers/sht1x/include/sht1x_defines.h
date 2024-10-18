@@ -68,5 +68,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SHT1X_DEFINES_H */
 /** @} */
+#endif /* SHT1X_DEFINES_H */

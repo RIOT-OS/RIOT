@@ -132,5 +132,5 @@ void test_speed_range(uint32_t duration, uint32_t a, uint32_t b);
 }
 #endif
 
-#endif /* TEST_H */
 /** @} */
+#endif /* TEST_H */

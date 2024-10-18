@@ -203,5 +203,5 @@ void gnrc_sixlowpan_frag_sfr_stats_get(gnrc_sixlowpan_frag_sfr_stats_t *stats);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_H */

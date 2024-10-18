@@ -173,5 +173,5 @@ extern "C" {
 }
 #endif
 
-#endif /* W5500_REGS_H */
 /** @} */
+#endif /* W5500_REGS_H */

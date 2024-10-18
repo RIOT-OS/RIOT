@@ -162,5 +162,5 @@ uint8_t *usbus_control_get_out_data(usbus_t *usbus, size_t *len);
 #ifdef __cplusplus
 }
 #endif
-#endif /* USB_USBUS_CONTROL_H */
 /** @} */
+#endif /* USB_USBUS_CONTROL_H */

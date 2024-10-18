@@ -376,5 +376,5 @@ typedef uint8_t fmc_bank_id_t;  /**< FMC bank identifier */
 }
 #endif
 
-#endif /* PERIPH_CPU_FMC_H */
 /** @} */
+#endif /* PERIPH_CPU_FMC_H */

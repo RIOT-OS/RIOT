@@ -74,5 +74,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_IPV6_EXT_RH_H */
 /** @} */
+#endif /* NET_IPV6_EXT_RH_H */

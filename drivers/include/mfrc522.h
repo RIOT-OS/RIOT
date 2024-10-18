@@ -874,5 +874,5 @@ bool mfrc522_pcd_perform_self_test(mfrc522_t *dev);
 }
 #endif
 
-#endif /* MFRC522_H */
 /** @} */
+#endif /* MFRC522_H */

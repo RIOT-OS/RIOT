@@ -88,5 +88,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
-#endif /* PKTBUF_INTERNAL_H */
 /** @} */
+#endif /* PKTBUF_INTERNAL_H */

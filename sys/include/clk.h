@@ -45,5 +45,5 @@ static inline uint32_t coreclk(void) {
 }
 #endif
 
-#endif /* CLK_H */
 /** @} */
+#endif /* CLK_H */

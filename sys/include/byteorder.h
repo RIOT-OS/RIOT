@@ -618,5 +618,5 @@ static inline void byteorder_htolebufll(uint8_t *buf, uint64_t val)
 }
 #endif
 
-#endif /* BYTEORDER_H */
 /** @} */
+#endif /* BYTEORDER_H */

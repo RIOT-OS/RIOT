@@ -103,5 +103,5 @@ void _event_callback_handler(event_t *event);
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_CALLBACK_H */
 /** @} */
+#endif /* EVENT_CALLBACK_H */

@@ -33,5 +33,5 @@ void tests_mtd(void);
 }
 #endif
 
-#endif /* TESTS_MTD_H */
 /** @} */
+#endif /* TESTS_MTD_H */

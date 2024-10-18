@@ -48,5 +48,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
-#endif /* NET_ICMP_H */
 /** @} */
+#endif /* NET_ICMP_H */

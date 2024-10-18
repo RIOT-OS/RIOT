@@ -61,5 +61,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BH1750FVI_INTERNAL_H */
 /** @} */
+#endif /* BH1750FVI_INTERNAL_H */

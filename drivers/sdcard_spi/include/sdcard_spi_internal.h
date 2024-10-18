@@ -289,5 +289,5 @@ sd_rw_response_t sdcard_spi_read_sds(sdcard_spi_t *card, sd_status_t *sd_status)
 }
 #endif
 
-#endif /* SDCARD_SPI_INTERNAL_H */
 /** @} */
+#endif /* SDCARD_SPI_INTERNAL_H */

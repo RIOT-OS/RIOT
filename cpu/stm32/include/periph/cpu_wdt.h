@@ -53,5 +53,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CPU_WDT_H */
 /** @} */
+#endif /* PERIPH_CPU_WDT_H */

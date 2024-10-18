@@ -181,5 +181,5 @@ void pio_free_program(pio_t pio, pio_program_t *prog);
 }
 #endif
 
-#endif /* PERIPH_PIO_H */
 /** @} */
+#endif /* PERIPH_PIO_H */

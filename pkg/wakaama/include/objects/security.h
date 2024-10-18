@@ -429,5 +429,5 @@ credman_tag_t lwm2m_object_security_get_credential(uint16_t instance_id);
 }
 #endif
 
-#endif /* OBJECTS_SECURITY_H */
 /** @} */
+#endif /* OBJECTS_SECURITY_H */

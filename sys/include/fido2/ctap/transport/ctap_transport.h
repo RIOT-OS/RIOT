@@ -44,5 +44,5 @@ void fido2_ctap_transport_init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H */
 /** @} */
+#endif /* FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H */

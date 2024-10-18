@@ -44,5 +44,5 @@ extern "C" {
 }
 #endif
 
-#endif /* OPENWSN_DEFS_H */
 /** @} */
+#endif /* OPENWSN_DEFS_H */

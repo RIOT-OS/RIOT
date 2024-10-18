@@ -683,5 +683,5 @@ void sx127x_set_freq_hop(sx127x_t *dev, bool freq_hop_on);
 }
 #endif
 
-#endif /* SX127X_H */
 /** @} */
+#endif /* SX127X_H */

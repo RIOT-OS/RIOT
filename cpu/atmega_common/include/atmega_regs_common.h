@@ -182,5 +182,5 @@ typedef struct {
 }
 #endif
 
-#endif /* ATMEGA_REGS_COMMON_H */
 /** @} */
+#endif /* ATMEGA_REGS_COMMON_H */

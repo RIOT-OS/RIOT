@@ -106,5 +106,5 @@ void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
 }
 #endif
 
-#endif /* NET_GNRC_ICMPV6_ERROR_H */
 /** @} */
+#endif /* NET_GNRC_ICMPV6_ERROR_H */

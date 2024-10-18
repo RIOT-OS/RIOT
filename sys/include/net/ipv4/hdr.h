@@ -190,5 +190,5 @@ static inline uint16_t ipv4_hdr_get_fo(ipv4_hdr_t *hdr)
 }
 #endif
 
-#endif /* NET_IPV4_HDR_H */
 /** @} */
+#endif /* NET_IPV4_HDR_H */

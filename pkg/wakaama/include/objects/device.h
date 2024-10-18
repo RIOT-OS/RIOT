@@ -270,5 +270,5 @@ bool lwm2m_device_reboot_requested(void);
 }
 #endif
 
-#endif /* OBJECTS_DEVICE_H */
 /** @} */
+#endif /* OBJECTS_DEVICE_H */

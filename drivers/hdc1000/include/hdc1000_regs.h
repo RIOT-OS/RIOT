@@ -69,5 +69,5 @@ extern "C"
 }
 #endif
 
-#endif /* HDC1000_REGS_H */
 /** @} */
+#endif /* HDC1000_REGS_H */

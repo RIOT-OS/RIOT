@@ -165,5 +165,5 @@ int hts221_read_temperature(const hts221_t *dev, int16_t *val);
 }
 #endif
 
-#endif /* HTS221_H */
 /** @} */
+#endif /* HTS221_H */

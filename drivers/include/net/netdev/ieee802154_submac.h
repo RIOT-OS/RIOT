@@ -69,5 +69,5 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac);
 }
 #endif
 
-#endif /* NET_NETDEV_IEEE802154_SUBMAC_H */
 /** @} */
+#endif /* NET_NETDEV_IEEE802154_SUBMAC_H */

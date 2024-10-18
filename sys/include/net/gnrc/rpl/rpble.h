@@ -51,5 +51,5 @@ static inline void gnrc_rpl_rpble_update(const gnrc_rpl_dodag_t *dodag)
 }
 #endif
 
-#endif /* NET_GNRC_RPL_RPBLE_H */
 /** @} */
+#endif /* NET_GNRC_RPL_RPBLE_H */

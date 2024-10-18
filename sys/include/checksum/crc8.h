@@ -47,5 +47,5 @@ uint8_t crc8(const uint8_t *data, size_t len, uint8_t poly, uint8_t seed);
 }
 #endif
 
-#endif /* CHECKSUM_CRC8_H */
 /** @} */
+#endif /* CHECKSUM_CRC8_H */

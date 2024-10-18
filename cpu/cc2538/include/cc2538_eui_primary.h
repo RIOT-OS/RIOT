@@ -71,5 +71,5 @@ static inline int cc2538_get_eui64_primary(uint8_t index, eui64_t *addr)
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_EUI_PRIMARY_H */
 /** @} */
+#endif /* CC2538_EUI_PRIMARY_H */

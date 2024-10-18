@@ -33,5 +33,5 @@ void tests_ipv6_addr(void);
 }
 #endif
 
-#endif /* TESTS_IPV6_ADDR_H */
 /** @} */
+#endif /* TESTS_IPV6_ADDR_H */

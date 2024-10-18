@@ -58,5 +58,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SCREEN_DEV_H */
 /** @} */
+#endif /* SCREEN_DEV_H */

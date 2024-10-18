@@ -263,5 +263,5 @@ void sx1280_set_lora_iq_invert(sx1280_t *dev, bool iq_invert);
 }
 #endif
 
-#endif /* SX1280_H */
 /** @} */
+#endif /* SX1280_H */

@@ -205,5 +205,5 @@ typedef void (*wifi_on_disconnect_result_t) (void *netif, const wifi_disconnect_
 }
 #endif
 
-#endif /* NET_NETDEV_WIFI_H */
 /** @} */
+#endif /* NET_NETDEV_WIFI_H */

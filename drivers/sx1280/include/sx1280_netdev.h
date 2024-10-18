@@ -36,5 +36,5 @@ extern const netdev_driver_t sx1280_driver;
 }
 #endif
 
-#endif /* SX1280_NETDEV_H */
 /** @} */
+#endif /* SX1280_NETDEV_H */

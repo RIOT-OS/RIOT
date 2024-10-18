@@ -41,5 +41,5 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */
+#endif /* GPIO_PARAMS_H */

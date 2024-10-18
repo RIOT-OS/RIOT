@@ -48,5 +48,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CONGURE_CONFIG_H */
 /** @} */
+#endif /* CONGURE_CONFIG_H */

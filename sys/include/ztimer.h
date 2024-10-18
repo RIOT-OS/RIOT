@@ -878,5 +878,5 @@ extern ztimer_clock_t *const ZTIMER_MSEC_BASE;
 }
 #endif
 
-#endif /* ZTIMER_H */
 /** @} */
+#endif /* ZTIMER_H */

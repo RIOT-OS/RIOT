@@ -50,5 +50,5 @@ static const ds1307_params_t ds1307_params[] =
 }
 #endif
 
-#endif /* DS1307_PARAMS_H */
 /** @} */
+#endif /* DS1307_PARAMS_H */

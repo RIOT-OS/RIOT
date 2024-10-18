@@ -209,5 +209,5 @@ void hd44780_print(const hd44780_t *dev, const char *data);
 }
 #endif
 
-#endif /* HD44780_H */
 /** @} */
+#endif /* HD44780_H */

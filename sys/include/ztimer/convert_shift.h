@@ -67,5 +67,5 @@ void ztimer_convert_shift_up_init(ztimer_convert_shift_t *clock,
 }
 #endif
 
-#endif /* ZTIMER_CONVERT_SHIFT_H */
 /** @} */
+#endif /* ZTIMER_CONVERT_SHIFT_H */

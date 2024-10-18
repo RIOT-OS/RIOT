@@ -57,5 +57,5 @@ Test* tests_psa_fail_overwrite_existing_key(void);
 }
 #endif
 
-#endif /* TESTS_PSA_PERSISTENT_STORAGE_H */
 /** @} */
+#endif /* TESTS_PSA_PERSISTENT_STORAGE_H */

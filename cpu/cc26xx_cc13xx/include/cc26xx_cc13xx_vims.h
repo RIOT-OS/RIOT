@@ -258,5 +258,5 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_VIMS_H */
 /** @} */
+#endif /* CC26XX_CC13XX_VIMS_H */

@@ -52,5 +52,5 @@ void skald_ibeacon_advertise(skald_ctx_t *ctx, const skald_uuid_t *uuid,
 }
 #endif
 
-#endif /* NET_SKALD_IBEACON_H */
 /** @} */
+#endif /* NET_SKALD_IBEACON_H */

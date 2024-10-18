@@ -496,5 +496,5 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 }
 #endif
 
-#endif /* PERIPH_I2C_H */
 /** @} */
+#endif /* PERIPH_I2C_H */

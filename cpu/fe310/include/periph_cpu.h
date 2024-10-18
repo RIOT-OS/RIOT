@@ -181,5 +181,5 @@ void fe310_clock_init(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

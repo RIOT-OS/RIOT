@@ -44,5 +44,5 @@ void eeprom_native_read(void);
 }
 #endif
 
-#endif /* EEPROM_NATIVE_H */
 /** @} */
+#endif /* EEPROM_NATIVE_H */

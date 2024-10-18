@@ -313,5 +313,5 @@ void gnrc_ipv6_nib_nc_print(gnrc_ipv6_nib_nc_t *nce);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_NC_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_NC_H */

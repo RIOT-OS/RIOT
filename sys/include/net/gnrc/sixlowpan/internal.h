@@ -73,5 +73,5 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_INTERNAL_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_INTERNAL_H */

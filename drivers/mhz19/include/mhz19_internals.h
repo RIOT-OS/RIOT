@@ -96,5 +96,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MHZ19_INTERNALS_H */
 /** @} */
+#endif /* MHZ19_INTERNALS_H */

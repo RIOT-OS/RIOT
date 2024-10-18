@@ -71,5 +71,5 @@ extern void cpu_clock_init(int);
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */
+#endif /* CPU_CONF_H */

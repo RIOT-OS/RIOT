@@ -184,5 +184,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NRF24L01P_SETTINGS_H */
 /** @} */
+#endif /* NRF24L01P_SETTINGS_H */

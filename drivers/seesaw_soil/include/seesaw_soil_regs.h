@@ -45,5 +45,5 @@ extern "C"
 }
 #endif
 
-#endif /* SEESAW_SOIL_REGS_H */
 /** @} */
+#endif /* SEESAW_SOIL_REGS_H */

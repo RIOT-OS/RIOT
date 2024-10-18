@@ -34,5 +34,5 @@ extern const disp_dev_driver_t lcd_disp_dev_driver;
 }
 #endif
 
-#endif /* LCD_DISP_DEV_H */
 /** @} */
+#endif /* LCD_DISP_DEV_H */

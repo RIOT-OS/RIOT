@@ -94,5 +94,5 @@ extern "C"
 }
 #endif
 
-#endif /* PCA9685_REGS_H */
 /** @} */
+#endif /* PCA9685_REGS_H */

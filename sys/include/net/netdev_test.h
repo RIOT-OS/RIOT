@@ -291,5 +291,5 @@ void netdev_test_reset(netdev_test_t *dev);
 }
 #endif
 
-#endif /* NET_NETDEV_TEST_H */
 /** @} */
+#endif /* NET_NETDEV_TEST_H */

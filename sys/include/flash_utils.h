@@ -251,5 +251,5 @@ static inline void flash_print_str(FLASH_ATTR const char *flash)
 }
 #endif
 
-#endif /* FLASH_UTILS_H */
 /** @} */
+#endif /* FLASH_UTILS_H */

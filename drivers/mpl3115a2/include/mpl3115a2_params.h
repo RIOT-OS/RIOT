@@ -74,5 +74,5 @@ static const saul_reg_info_t mpl3115a2_saul_info[] =
 }
 #endif
 
-#endif /* MPL3115A2_PARAMS_H */
 /** @} */
+#endif /* MPL3115A2_PARAMS_H */

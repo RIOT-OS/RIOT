@@ -126,5 +126,5 @@ void TimerLowPowerHandler(void);
 }
 #endif
 
-#endif /* SEMTECH_LORAMAC_TIMER_H */
 /** @} */
+#endif /* SEMTECH_LORAMAC_TIMER_H */

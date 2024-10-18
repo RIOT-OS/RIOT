@@ -36,5 +36,5 @@ extern "C" {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* ESP_BLE_NIMBLE_SYSCFG_SYSCFG_H */
 /** @} */
+#endif /* ESP_BLE_NIMBLE_SYSCFG_SYSCFG_H */

@@ -384,5 +384,5 @@ void lc709203f_set_status_bit(const lc709203f_t *dev, const lc709203f_temp_obtai
 }
 #endif
 
-#endif /* LC709203F_H */
 /** @} */
+#endif /* LC709203F_H */

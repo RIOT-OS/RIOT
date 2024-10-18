@@ -99,5 +99,5 @@ static inline list_node_t *list_remove(list_node_t *list, list_node_t *node)
 }
 #endif
 
-#endif /* LIST_H */
 /** @} */
+#endif /* LIST_H */

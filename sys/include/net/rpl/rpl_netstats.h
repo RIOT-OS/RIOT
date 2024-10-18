@@ -56,5 +56,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_RPL_RPL_NETSTATS_H */
 /** @} */
+#endif /* NET_RPL_RPL_NETSTATS_H */

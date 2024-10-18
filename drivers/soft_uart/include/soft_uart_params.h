@@ -70,5 +70,5 @@ static const soft_uart_conf_t soft_uart_config[] = {
 }
 #endif
 
-#endif /* SOFT_UART_PARAMS_H */
 /** @} */
+#endif /* SOFT_UART_PARAMS_H */
