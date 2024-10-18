@@ -35,7 +35,9 @@
 #endif
 
 #define STACKSIZE               THREAD_STACKSIZE_DEFAULT
-#define PRIO                    (THREAD_PRIORITY_MAIN - 1)
+/* in order to actually test @ref event_sync(), the waiter's prio should be lower
+ * than main s.t. it doesn't start executing right after events are enqueued */
+#define PRIO                    (THREAD_PRIORITY_MAIN + 1)
 #define DELAYED_QUEUES_NUMOF    2
 
 static char stack[STACKSIZE];
@@ -164,6 +166,9 @@ int main(void)
     event_queue_init_detached(&dqs[0]);
     event_queue_init_detached(&dqs[1]);
 
+    printf("running thread that will claim event queues %p\n", (void *)&dqs);
+    thread_create(stack, sizeof(stack), PRIO, 0, claiming_thread, dqs, "ct");
+
     printf("posting %p to delayed queue at index 1\n", (void *)&delayed_event1);
     event_post(&dqs[1], &delayed_event1);
     printf("posting %p to delayed queue at index 1\n", (void *)&delayed_event2);
@@ -171,8 +176,9 @@ int main(void)
     printf("posting %p to delayed queue at index 0\n", (void *)&delayed_event3);
     event_post(&dqs[0], &delayed_event3);
 
-    printf("running thread that will claim event queues %p\n", (void *)&dqs);
-    thread_create(stack, sizeof(stack), PRIO, 0, claiming_thread, dqs, "ct");
+    event_sync(&dqs[1]);
+    expect(order == 3);
+    printf("synced with %p\n", (void *)&delayed_event3);
 
     /* test posting different kind of events in order to a statically
      * initialized queue */
