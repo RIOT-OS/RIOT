@@ -193,15 +193,7 @@ uint32_t ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
 
     timer->base.offset = val;
     _add_entry_to_list(clock, &timer->base);
-    if (clock->list.next == &timer->base) {
-#ifdef MODULE_ZTIMER_EXTEND
-        if (clock->max_value < UINT32_MAX) {
-            val = _min_u32(val, clock->max_value >> 1);
-        }
-        DEBUG("ztimer_set(): %p setting %" PRIu32 "\n", (void *)clock, val);
-#endif
-        clock->ops->set(clock, val);
-    }
+    _ztimer_update(clock);
 
     irq_restore(state);
 
