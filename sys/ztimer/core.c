@@ -470,10 +470,17 @@ void ztimer_handler(ztimer_clock_t *clock)
 #endif
 
     if (clock->list.next) {
-        clock->list.offset += clock->list.next->offset;
-        clock->list.next->offset = 0;
+        _ztimer_update_head_offset(clock);
 
         ztimer_t *entry = _now_next(clock);
+
+        if (!entry && IS_ACTIVE(ENABLE_DEBUG))
+        {
+            DEBUG("ztimer_handler(): called %" PRIu32 " ticks too early\n"
+                , clock->list.next->offset
+                );
+        }
+
         while (entry) {
             DEBUG("ztimer_handler(): trigger %p->%p at %" PRIu32 "\n",
                   (void *)entry, (void *)entry->base.next, clock->ops->now(
