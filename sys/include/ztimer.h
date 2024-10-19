@@ -268,6 +268,7 @@
 #include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
+#include "cond.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -287,6 +288,11 @@ typedef struct ztimer_base ztimer_base_t;
  * @brief ztimer_clock_t forward declaration
  */
 typedef struct ztimer_clock ztimer_clock_t;
+
+/**
+ * @brief ztimer_room_t forward declaration
+ */
+typedef struct ztimer_room ztimer_room_t;
 
 /**
  * @brief Type of callbacks in @ref ztimer_t "timers"
@@ -320,6 +326,31 @@ typedef struct {
     ztimer_callback_t callback;     /**< timer callback function pointer */
     void *arg;                      /**< timer callback argument */
 } ztimer_t;
+
+/**
+ * @brief   ztimer_room_t structure
+ *
+ * This type contains info necessary to implement ztimer_sleep_range() API.
+ */
+struct ztimer_room {
+    list_node_t node;             /**< list of rooms entry */
+    uint32_t begin;                /**< beginning of interval */
+    uint32_t end;                  /**< end of interval */
+    mutex_t* cond_lock;            /**< lock for condition variable */
+    cond_t* condition_var;         /**< for threads to wait on */
+    ztimer_t* room_timer;          /**< timer object */
+};
+
+/**
+ * @brief   callback_sleep_range_arg structure
+ *
+ * Args for callback_sleep_range
+ */
+typedef struct callback_sleep_range_arg {
+    cond_t* condition_var;         /**< room condition var */
+    mutex_t* lock;                 /**< lock for condition var */
+    ztimer_room_t* room;           /**< room corresponding to callback */
+} callback_sleep_range_arg_t;
 
 /**
  * @brief   ztimer backend method structure
@@ -713,6 +744,14 @@ void ztimer_periodic_wakeup(ztimer_clock_t *clock, uint32_t *last_wakeup,
  * @param[in]   duration        duration of sleep, in @p ztimer time units
  */
 void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration);
+
+/**
+ * @brief   
+ *
+ * @param[in]   min_time         minimum time to sleep
+ * @param[in]   max_time         maximum time to sleep
+ */
+void ztimer_sleep_range(uint32_t min_time, uint32_t max_time);
 
 /**
  * @brief   Busy-wait specified duration
