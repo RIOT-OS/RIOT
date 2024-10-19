@@ -21,6 +21,7 @@
  * @}
  */
 
+#include <alloca.h>
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
@@ -394,9 +395,14 @@ static ssize_t _sock_get(nanocoap_sock_t *sock, const char *path,
                          uint8_t type,
                          void *response, size_t max_len)
 {
-    /* buffer for CoAP header */
-    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-    uint8_t *pktpos = buffer;
+    uint8_t *pktpos;
+
+    /* if the response buffer is large enough, use it to build the request */
+    if (len >= CONFIG_NANOCOAP_BLOCK_HEADER_MAX) {
+        pktpos = buf;
+    } else {
+        pktpos = alloca(CONFIG_NANOCOAP_BLOCK_HEADER_MAX);
+    }
 
     coap_pkt_t pkt = {
         .hdr = (void *)pktpos,
