@@ -8,7 +8,7 @@ create_tap() {
     sysctl -w net.ipv6.conf.${TAP}.accept_ra=0
     ip link set ${TAP} up
     ip a a fe80::1/64 dev ${TAP}
-    ip a a fd00:dead:beef::1/128 dev lo
+    ip a a ${HOST_IP} dev ${TAP}
 }
 
 remove_tap() {
@@ -18,7 +18,6 @@ remove_tap() {
 cleanup() {
     echo "Cleaning up..."
     remove_tap
-    ip a d fd00:dead:beef::1/128 dev lo
     if [ -n "${UHCPD_PID}" ]; then
         kill ${UHCPD_PID}
     fi
@@ -70,6 +69,13 @@ else
     ETHOS_ONLY=0
 fi
 
+if [ "$1" = "-i" ] || [ "$1" = "--host-ip" ]; then
+    HOST_IP=$2
+    shift 2
+else
+    HOST_IP="fd00:dead:beef::1/128"
+fi
+
 PORT=$1
 TAP=$2
 PREFIX=$3
@@ -77,7 +83,7 @@ BAUDRATE=115200
 START_ETHOS=1
 
 [ -z "${PORT}" -o -z "${TAP}" -o -z "${PREFIX}" ] && {
-    echo "usage: $0 [-d|--use-dhcp] [-e|--ethos-only] [-r|--use-radvd]" \
+    echo "usage: $0 [-d|--use-dhcpv6] [-r|--use-radvd] [-e|--ethos-only] [-i|--host-ip <ip>]" \
          "<serial-port> <tap-device> <prefix> " \
          "[baudrate]"
     exit 1
