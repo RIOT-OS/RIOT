@@ -272,8 +272,12 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
         return ret;
     }
 
-    *hum = dev->last_val.humidity;
-    *temp = dev->last_val.temperature;
+    if (hum != NULL) {
+        *hum = dev->last_val.humidity;
+    }
+    if (temp != NULL) {
+        *temp = dev->last_val.temperature;
+    }
 
     return 0;
 }

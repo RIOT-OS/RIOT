@@ -52,7 +52,15 @@ int main(void)
         ztimer_sleep(ZTIMER_USEC, DELAY);
 
         if (dht_read(&dev, &temp, &hum) != DHT_OK) {
-            puts("Error reading values");
+            puts("Error reading both values");
+            continue;
+        }
+        if (dht_read(&dev, &temp, NULL) != DHT_OK) {
+            puts("Error reading just temperature");
+            continue;
+        }
+        if (dht_read(&dev, NULL, &hum) != DHT_OK) {
+            puts("Error reading just humidity");
             continue;
         }
 
