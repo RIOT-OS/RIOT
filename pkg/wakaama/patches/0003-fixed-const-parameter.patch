@@ -1,6 +1,6 @@
-From 0fad8946cf1b2b7fdb94ee289111ef302a8de21b Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?=E2=80=9Emoritzholzer=E2=80=9C?= <moritz.holzer@outlook.de>
-Date: Tue, 17 Sep 2024 14:02:47 +0200
+From 5f9f202974a10576afec2ed941b4b2c192ccbc00 Mon Sep 17 00:00:00 2001
+From: Moritz <moritz.holzer@haw-hamburg.de>
+Date: Mon, 21 Oct 2024 13:26:54 +0200
 Subject: [PATCH 3/3] fixed const parameter
 
 ---
@@ -22,10 +22,10 @@ index af70fd6..3cd9c41 100644
      lwm2m_observed_t * targetP;
  
 diff --git a/include/liblwm2m.h b/include/liblwm2m.h
-index ae1460d..d23f59d 100644
+index 58a1a53..3d12e03 100644
 --- a/include/liblwm2m.h
 +++ b/include/liblwm2m.h
-@@ -873,7 +873,7 @@ int lwm2m_remove_object(lwm2m_context_t * contextP, uint16_t id);
+@@ -877,7 +877,7 @@ int lwm2m_remove_object(lwm2m_context_t * contextP, uint16_t id);
  int lwm2m_update_registration(lwm2m_context_t * contextP, uint16_t shortServerID, bool withObjects);
  // send deregistration to all servers connected to client
  void lwm2m_deregister(lwm2m_context_t * context);
@@ -35,5 +35,5 @@ index ae1460d..d23f59d 100644
  #ifndef LWM2M_VERSION_1_0
  // send resources specified by URIs to the server specified by the server short
 -- 
-2.46.0
+2.34.1
 
