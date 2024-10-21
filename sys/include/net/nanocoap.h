@@ -2152,7 +2152,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
  * @returns     size of reply packet on success
  * @returns     -ENOSPC if @p rbuf too small
  */
-ssize_t coap_build_empty_ack(const coap_pkt_t *pkt, coap_hdr_t *ack);
+ssize_t coap_build_empty_ack(const coap_pkt_t *pkt, coap_udp_hdr_t *ack);
 
 /**
  * @brief   Handle incoming CoAP request
