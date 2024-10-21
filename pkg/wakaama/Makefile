@@ -1,6 +1,6 @@
 PKG_NAME=wakaama
 PKG_URL=https://github.com/eclipse/wakaama.git
-PKG_VERSION=c8d76edf8acb403255caf21cd02949acab3c3e42
+PKG_VERSION=ee0c98da7495e1ab43358b49e970dbc97f73ce3b
 PKG_LICENSE=EDL-1.0,EPL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
