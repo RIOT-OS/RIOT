@@ -73,7 +73,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     return GPIO_PinInGet(_port_num(pin), _pin_num(pin));
 }

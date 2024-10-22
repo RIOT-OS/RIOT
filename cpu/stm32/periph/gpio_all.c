@@ -203,7 +203,7 @@ void gpio_irq_disable(gpio_t pin)
     EXTI_REG_IMR &= ~(1 << _pin_num(pin));
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     return (_port(pin)->IDR & (1 << _pin_num(pin)));
 }

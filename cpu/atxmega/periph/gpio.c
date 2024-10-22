@@ -252,7 +252,7 @@ void gpio_irq_disable(gpio_t pin)
     }
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     PORT_t *port = _port_addr(pin);
     uint8_t pin_mask = _pin_mask(pin);

@@ -182,7 +182,7 @@ void gpio_irq_disable(gpio_t pin)
 
 #endif /* defined(MODULE_PERIPH_GPIO_IRQ) */
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     return ((GPIO_T_ADDR(pin)->DATA) >> GPIO_T_PIN(pin)) & 1u;
 }

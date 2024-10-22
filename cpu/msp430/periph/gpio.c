@@ -112,7 +112,7 @@ void gpio_periph_mode(gpio_t pin, bool enable)
     }
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     msp430_port_t *port = _port(pin);
     if (port->DIR & _pin_mask(pin)) {

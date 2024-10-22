@@ -92,7 +92,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     LPC_GPIO_TypeDef *base = _base(pin);
 
