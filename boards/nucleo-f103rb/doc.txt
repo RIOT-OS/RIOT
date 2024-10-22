@@ -14,7 +14,7 @@ STM32F103RB microcontroller with 20KiB of RAM and 128KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-f103rb.svg "Pinout for the nucleo-f103rb" width=50%
+@image html pinouts/nucleo-f103rb.svg "Pinout for the Nucleo-F103RB (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 30)" width=50%
 
 ### MCU
 | MCU        | STM32F103RB       |

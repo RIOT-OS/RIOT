@@ -14,7 +14,7 @@ STM32F072RB microcontroller with 16KiB of RAM and 128KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-f072rb.svg "Pinout for the nucleo-f072rb" width=50%
+@image html pinouts/nucleo-f072rb.svg "Pinout for the Nucleo-F072RB (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 29)" width=50%
 
 ### MCU
 | MCU        | STM32F072RB       |

@@ -11,7 +11,7 @@ STM32L073RZT6 microcontroller with 20KiB of RAM and 192KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-l073rz.svg "Pinout for the nucleo-l073rz" width=50%
+@image html pinouts/nucleo-l073rz.svg "Pinout for the Nucleo-L073RZ (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50%
 
 ## Flashing the Board Using ST-LINK Removable Media
 

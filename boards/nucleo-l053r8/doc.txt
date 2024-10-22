@@ -10,7 +10,7 @@ Cortex-M0+ STM32L053R8 microcontroller with 8KiB of RAM and 32KiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-l053r8.svg "Pinout for the nucleo-l053r8" width=50%
+@image html pinouts/nucleo-l053r8.svg "Pinout for the Nucleo-L053r8 (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50%
 
 ### MCU
 

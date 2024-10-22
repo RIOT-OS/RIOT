@@ -11,7 +11,7 @@ STM32L476RG microcontroller with 128KiB of RAM and 1MiB of Flash.
 
 ## Pinout
 
-@image html pinouts/nucleo-l476rg.svg "Pinout for the nucleo-l476rg" width=50%
+@image html pinouts/nucleo-l476rg.svg "Pinout for the Nucleo-L476RG (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 35)" width=50%
 
 ### MCU
 
