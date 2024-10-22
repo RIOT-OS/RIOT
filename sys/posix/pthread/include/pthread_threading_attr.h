@@ -202,6 +202,33 @@ int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
  */
 int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
 
+/**
+ * @brief           Query set stacksize for new pthread.
+ * @param[in]       attr        Attribute set to query.
+ * @param[out]      stackaddr   Pointer to previously assigned stack, or `NULL` for dynamic allocation.
+ * @param[out]      stacksize   Assigned or default stack size, resp.
+ * @returns         0, this invocation cannot fail
+ */
+int pthread_attr_getstack(pthread_attr_t *attr, void **stackaddr, size_t *stacksize);
+
+/**
+ * @brief           Set address and stack size of the stack to use for the new pthread.
+ * @details         This function requires setting the address as well as the size
+ *                  since only setting the address will make the implementation
+ *                  on some architectures impossible.
+ *                  If `*stackaddr == NULL`, then the stack is dynamically allocated with malloc().
+ *                  No two running threads may operate on the same stack.
+ *                  The stack of a zombie thread (i.e. a non-detached thread that exited but was not yet joined)
+ *                  may in theory be reused even before joining, though there might be problems
+ *                  if the stack was preempted before pthread_exit() completed.
+ * @param[in,out]   attr        Attribute set to operate on.
+ * @param[in]       stackaddr   Static stack to use, or `NULL` for dynamic allocation.
+ * @param[in]       stacksize   Size of the stack of the new thread.
+ *                              Supply `0` to use the default value.
+ * @returns         0, this invocation cannot fail
+ */
+int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+
 #ifdef __cplusplus
 }
 #endif
