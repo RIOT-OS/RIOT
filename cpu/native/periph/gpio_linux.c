@@ -210,7 +210,7 @@ void gpio_toggle(gpio_t pin)
     _set(pin, !gpio_read(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     _set(pin, value);
 }

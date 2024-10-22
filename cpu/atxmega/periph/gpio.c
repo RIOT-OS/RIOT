@@ -306,7 +306,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     DEBUG("gpio_write pin = 0x%04x, value = 0x%02x \n", pin, value);
 

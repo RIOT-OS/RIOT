@@ -93,7 +93,7 @@ void gpio_toggle(gpio_t pin)
     GPIO_PinOutToggle(_port_num(pin), _pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         GPIO_PinOutSet(_port_num(pin), _pin_num(pin));

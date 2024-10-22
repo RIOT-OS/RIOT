@@ -120,7 +120,7 @@ void gpio_toggle(gpio_t pin)
     base->FIOPIN ^= (1 << _pin(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     LPC_GPIO_TypeDef *base = _base(pin);
 

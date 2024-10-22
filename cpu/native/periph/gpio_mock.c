@@ -92,7 +92,7 @@ __attribute__((weak)) void gpio_toggle(gpio_t pin) {
   }
 }
 
-__attribute__((weak)) void gpio_write(gpio_t pin, int value) {
+__attribute__((weak)) void gpio_write(gpio_t pin, bool value) {
   if (pin) {
     pin->value = value;
   }

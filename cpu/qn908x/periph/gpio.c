@@ -232,7 +232,7 @@ void gpio_toggle(gpio_t pin)
     base->OUTENSET = out_clr & dataout;
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         gpio_set(pin);

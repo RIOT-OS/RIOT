@@ -81,7 +81,7 @@ void gpio_toggle(gpio_t pin)
     GPIO->DOUTTGL = (1 << pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         GPIO->DOUTSET = (1 << pin);

@@ -76,6 +76,7 @@
 #define PERIPH_GPIO_H
 
 #include <limits.h>
+#include <stdbool.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -258,7 +259,7 @@ void gpio_toggle(gpio_t pin);
  * @param[in] pin       the pin to set
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
  */
-void gpio_write(gpio_t pin, int value);
+void gpio_write(gpio_t pin, bool value);
 
 /**
  * @brief   Test if a GPIO pin is equal to another GPIO pin
