@@ -180,7 +180,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         _port(pin)->BSRR = (1 << _pin_num(pin));

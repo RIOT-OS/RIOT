@@ -133,13 +133,13 @@ void gpio_toggle(gpio_t dev)
     }
 }
 
-void gpio_write(gpio_t dev, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
-        gpio_set(dev);
+        gpio_set(pin);
     }
     else {
-        gpio_clear(dev);
+        gpio_clear(pin);
     }
 }
 

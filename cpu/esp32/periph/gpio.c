@@ -351,7 +351,7 @@ int gpio_read(gpio_t pin)
     return value;
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     assert(pin < GPIO_PIN_NUMOF);
@@ -412,7 +412,7 @@ int gpio_read(gpio_t pin)
     return value;
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     assert(pin < GPIO_PIN_NUMOF);

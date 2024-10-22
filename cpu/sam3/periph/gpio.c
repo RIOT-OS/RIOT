@@ -225,7 +225,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         _port(pin)->PIO_SODR = (1 << _pin_num(pin));

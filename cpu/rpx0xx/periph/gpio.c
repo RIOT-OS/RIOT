@@ -131,7 +131,7 @@ void gpio_toggle(gpio_t pin)
     SIO->GPIO_OUT_XOR = 1LU << pin;
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         gpio_set(pin);

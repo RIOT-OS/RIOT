@@ -151,7 +151,7 @@ void gpio_toggle(gpio_t pin)
     port(pin)->OUT ^= (1 << pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         port(pin)->OUTSET = (1 << pin_num(pin));

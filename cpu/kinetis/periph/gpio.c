@@ -272,7 +272,7 @@ void gpio_toggle(gpio_t pin)
     gpio(pin)->PTOR = (1 << pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         gpio(pin)->PSOR = (1 << pin_num(pin));

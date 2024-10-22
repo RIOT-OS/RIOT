@@ -249,7 +249,7 @@ int gpio_read (gpio_t pin)
     return (GPIO.IN & BIT(pin)) ? 1 : 0;
 }
 
-void gpio_write (gpio_t pin, int value)
+void gpio_write (gpio_t pin, bool value)
 {
     DEBUG("%s: %d %d\n", __func__, pin, value);
 
