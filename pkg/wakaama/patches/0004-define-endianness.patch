@@ -1,0 +1,29 @@
+From 69cb133c87aca2b48184e5e22880fc312a16616f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E2=80=9Emoritzholzer=E2=80=9C?= <moritz.holzer@outlook.de>
+Date: Wed, 23 Oct 2024 09:25:41 +0200
+Subject: [PATCH] define-endianness
+
+---
+ core/internals.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/core/internals.h b/core/internals.h
+index 6b94c59..2d5dd39 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -75,6 +75,12 @@
+ #include "uri.h"
+ #include "utils.h"
+ 
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++#define LWM2M_LITTLE_ENDIAN
++#else
++#define LWM2M_BIG_ENDIAN
++#endif
++
+ #define LWM2M_DEFAULT_LIFETIME  86400
+ 
+ #ifdef LWM2M_SUPPORT_SENML_CBOR
+-- 
+2.47.0
+

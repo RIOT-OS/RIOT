@@ -13,7 +13,6 @@ CFLAGS += -Wno-cast-align
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90710#c1
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -DLWM2M_SUPPORT_TLV
-CFLAGS += -DLWM2M_LITTLE_ENDIAN
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/core -f $(RIOTBASE)/Makefile.base MODULE=wakaama_core
