@@ -10,14 +10,17 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "event/callback.h"
-#include "event/timeout.h"
-#include "event/thread.h"
 #include "fmt.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
-#include "kernel_defines.h"
+
+#if MODULE_EVENT_THREAD
+#  include "event.h"
+#  include "event/thread.h"
+#  include "event/timeout.h"
+#  include "event/callback.h"
+#endif
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
@@ -158,7 +161,7 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
         return reply_len;
     }
 
-    uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
+    uint8_t *pkt_pos = pkt->buf + reply_len;
     if (blockwise) {
         pkt_pos += coap_opt_put_block1_control(pkt_pos, 0, &block1);
     }
@@ -167,7 +170,7 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
         pkt_pos += fmt_bytes_hex((char *)pkt_pos, digest, sizeof(digest));
     }
 
-    return pkt_pos - (uint8_t*)pkt->hdr;
+    return pkt_pos - pkt->buf;
 }
 
 NANOCOAP_RESOURCE(echo) {
