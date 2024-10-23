@@ -10,7 +10,9 @@ INCLUDES += -I$(PKGDIRBASE)/wakaama/coap/er-coap-13
 CFLAGS += -DLWM2M_CLIENT_MODE
 
 # NOTE: "Default CoAP block size; Used if not set on a per-target basis"
-CFLAGS += -DLWM2M_COAP_DEFAULT_BLOCK_SIZE=1024
+ifneq (,$(CONFIG_LWM2M_COAP_DEFAULT_BLOCK_SIZE))
+  CFLAGS += -DLWM2M_COAP_DEFAULT_BLOCK_SIZE=1024
+endif
 
 # Translate 'CONFIG_' options to package specific flags. This checks if the
 # option is being set via Kconfig or CFLAGS
