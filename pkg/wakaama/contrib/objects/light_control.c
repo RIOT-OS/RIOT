@@ -46,7 +46,8 @@ typedef struct lwm2m_obj_light_control_inst {
 
 /**
  * @brief 'Read' callback for the LwM2M Light Control object implementation.
- *
+ * 
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to read resource from.
  * @param[in] num_data          Number of elements in @p data_array.
  * @param[in, out] data_array   IDs of resources to read. Array of data structures to place values.
@@ -62,6 +63,7 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
 /**
  * @brief 'Write' callback for the LwM2M Light Control object implementation.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to write resource to.
  * @param[in] num_data          Number of elements in @p data_array.
  * @param[in] data_array        IDs of resources to write and values.

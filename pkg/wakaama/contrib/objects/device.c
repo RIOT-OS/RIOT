@@ -36,6 +36,7 @@ static bool reboot;
 /**
  * @brief 'Execute' callback for the Device object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       Instance ID. Should be 0 as a single instance exists.
  * @param[in] resource_id       ID of the resource to execute.
  * @param[in] buffer            Information needed for the execution.
@@ -53,7 +54,7 @@ static uint8_t _execute_cb(lwm2m_context_t * context, uint16_t instance_id, uint
 /**
  * @brief 'Read' callback for the Device object.
  *
- * @param[in] context           Lwm2m Context.
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       Instance ID. Should be 0 as a single instance exists.
  * @param[in, out] num_data     Number of resources requested. 0 means all.
  * @param[in, out] data_array   Initialized data array to output the values,
@@ -70,6 +71,7 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
 /**
  * @brief 'Discover' callback for the Device object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       Instance ID. Should be 0 as a single instance exists.
  * @param[in, out] num_data     Number of resources requested. 0 means all.
  * @param[in, out] data_array   Initialized data array to determine if the resource exists,

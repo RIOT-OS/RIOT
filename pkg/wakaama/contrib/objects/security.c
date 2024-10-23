@@ -119,6 +119,7 @@ typedef struct lwm2m_obj_security_inst {
 /**
  * @brief 'Read' callback for the security object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to read
  * @param[in, out] num_data     Number of resources requested. 0 means all.
  * @param[in, out] data_array   Initialized data array to output the values,
@@ -134,7 +135,8 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
 
 /**
  * @brief 'Write' callback for the security object.
- *
+
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to write to
  * @param[in] num_data          Number of resources to write
  * @param[in] data_array        Array of data to write
@@ -150,6 +152,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
 /**
  * @brief 'Delete' callback for the security object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to delete
  * @param[in] object            Security object pointer
  *
@@ -162,6 +165,7 @@ static uint8_t _delete_cb(lwm2m_context_t * context, uint16_t instance_id,
 /**
  * @brief 'Create' callback for the security object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to create
  * @param[in] num_data          Number of resources to write
  * @param[in] data_array        Array of data to write
