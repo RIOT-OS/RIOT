@@ -615,6 +615,8 @@ static int _block_cb(void *arg, coap_pkt_t *pkt)
 
     int res = _get_error(pkt);
     if (res) {
+        pkt->payload[pkt->payload_len] = 0;
+        DEBUG("nanocoap: %u '%s'\n", coap_get_code_decimal(pkt), (char *)pkt->payload);
         return res;
     }
 
