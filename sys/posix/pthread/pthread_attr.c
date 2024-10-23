@@ -158,3 +158,21 @@ int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)
     attr->ss_size = stacksize;
     return 0;
 }
+
+int pthread_attr_getstack(pthread_attr_t *attr, void **stackaddr, size_t *stacksize)
+{
+    *stackaddr = attr->ss_sp;
+    *stacksize = attr->ss_size;
+    if (*stacksize == 0) {
+        /* FIXME: the standard says that this function should return the default
+        * value if no explicit value was set. */
+    }
+    return 0;
+}
+
+int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize)
+{
+    attr->ss_sp = (char *)stackaddr;
+    attr->ss_size = stacksize;
+    return 0;
+}
