@@ -540,6 +540,7 @@ ifneq (,$(filter nanocoap_server,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
+  USEMODULE += random
   USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += ztimer_msec
