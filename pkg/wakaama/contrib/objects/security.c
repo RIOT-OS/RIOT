@@ -733,7 +733,7 @@ static uint8_t _create_cb(lwm2m_context_t * context, uint16_t instance_id, int n
     object->instanceList = LWM2M_LIST_ADD(object->instanceList, instance);
 
     /* write incoming data to the instance */
-    result = _write_cb(context, instance_id, num_data, data_array, object,LWM2M_WRITE_PARTIAL_UPDATE);
+    result = _write_cb(context, instance_id, num_data, data_array, object, LWM2M_WRITE_PARTIAL_UPDATE);
 
     if (result != COAP_204_CHANGED) {
         _delete_cb(context,instance_id, object);
