@@ -38,7 +38,7 @@ ifneq (,$(filter wakaama_objects_voltage,$(USEMODULE)))
 endif
 
 USEMODULE += ztimer
-USEMODULE += ztimer_sec#
+USEMODULE += ztimer_sec
 USEMODULE += random
 USEPKG += tlsf
 
