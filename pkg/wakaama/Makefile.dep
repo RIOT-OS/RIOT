@@ -40,6 +40,7 @@ endif
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
 USEPKG += tlsf
+USEPKG += random
 
 # If logs for the package are active, we need fmt
 ifneq (,$(filter -DLWM2M_WITH_LOGS,$(CFLAGS)))
