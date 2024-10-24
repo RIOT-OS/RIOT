@@ -119,7 +119,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];

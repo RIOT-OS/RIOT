@@ -99,7 +99,7 @@ int gpio_init_mux(unsigned pin, unsigned mux)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;

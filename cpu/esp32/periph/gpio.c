@@ -338,7 +338,7 @@ static gpio_hal_context_t _gpio_hal_ctx = {
  */
 static BITFIELD(_output, GPIO_PIN_NUMOF);
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     assert(pin < GPIO_PIN_NUMOF);
 
@@ -394,7 +394,7 @@ void gpio_toggle(gpio_t pin)
 
 #else /* IS_USED(MODULE_ESP_IDF_GPIO_HAL) */
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     assert(pin < GPIO_PIN_NUMOF);
 

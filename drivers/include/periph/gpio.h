@@ -227,10 +227,10 @@ void gpio_irq_disable(gpio_t pin);
  *
  * @param[in] pin       the pin to read
  *
- * @return              0 when pin is LOW
- * @return              >0 for HIGH
+ * @retval              false   pin is LOW
+ * @retval              true    pin is HIGH
  */
-int gpio_read(gpio_t pin);
+bool gpio_read(gpio_t pin);
 
 /**
  * @brief   Set the given pin to HIGH

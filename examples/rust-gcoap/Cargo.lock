@@ -774,7 +774,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.1"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#71e854ec4e5e3d187b5f215bd2c8f30ea07b1bd1"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#b531cc9ccb9c3cebc99d626b74b0b84a453fe58c"
 dependencies = [
  "bare-metal",
  "coap-handler",

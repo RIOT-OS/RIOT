@@ -66,7 +66,7 @@ __attribute__((weak)) void gpio_irq_disable(gpio_t pin)
     (void) pin;
 }
 
-__attribute__((weak)) int gpio_read(gpio_t pin) {
+__attribute__((weak)) bool gpio_read(gpio_t pin) {
   if (pin) {
     return pin->value;
   }

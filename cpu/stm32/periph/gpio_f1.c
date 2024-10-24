@@ -145,7 +145,7 @@ void gpio_init_analog(gpio_t pin)
     *(uint32_t *)(&_port(pin)->CRL + (pin_num >= 8)) &= ~(0xfl << (4 * (pin_num - ((pin_num >= 8) * 8))));
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);

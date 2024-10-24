@@ -237,7 +237,7 @@ void gpio_irq_disable (gpio_t pin)
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-int gpio_read (gpio_t pin)
+bool gpio_read (gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
 
