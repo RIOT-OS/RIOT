@@ -38,10 +38,11 @@ void cond_wait(cond_t *cond, mutex_t *mutex)
     irq_disable();
     thread_t *me = thread_get_active();
 
-    mutex_unlock(mutex);
     sched_set_status(me, STATUS_COND_BLOCKED);
     thread_add_to_list(&cond->queue, me);
     irq_enable();
+
+    mutex_unlock(mutex);
     thread_yield_higher();
 
     /*
