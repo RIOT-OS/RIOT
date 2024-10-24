@@ -958,11 +958,19 @@ static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote
         memo_pdu->hdr = gcoap_request_memo_get_hdr(memo);
 
         /* verbose debug to catch bugs with request/response matching */
+#if SOCK_HAS_IPV4
+        DEBUG("Seeking memo for remote=%s, tkn=0x%02x%02x%02x%02x%02x%02x%02x%02x, tkl=%"PRIuSIZE"\n",
+              ipv4_addr_to_str(_ipv6_addr_str, (ipv4_addr_t *)&remote->addr.ipv4,
+                               IPV6_ADDR_MAX_STR_LEN),
+              token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7],
+              tkl);
+#else
         DEBUG("Seeking memo for remote=%s, tkn=0x%02x%02x%02x%02x%02x%02x%02x%02x, tkl=%"PRIuSIZE"\n",
               ipv6_addr_to_str(_ipv6_addr_str, (ipv6_addr_t *)&remote->addr.ipv6,
                                IPV6_ADDR_MAX_STR_LEN),
               token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7],
               tkl);
+#endif
 
         if (coap_get_token_len(memo_pdu) != tkl) {
             DEBUG("Token length mismatch %u\n", coap_get_token_len(memo_pdu));
@@ -980,9 +988,15 @@ static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote
                 DEBUG("matching multicast response\n");
             }
             else {
+#if SOCK_HAS_IPV4
+                DEBUG("Remote address mismatch %s\n",
+                      ipv4_addr_to_str(_ipv6_addr_str, (ipv4_addr_t *)&memo->remote_ep.addr.ipv4,
+                                       IPV6_ADDR_MAX_STR_LEN));
+#else
                 DEBUG("Remote address mismatch %s\n",
                       ipv6_addr_to_str(_ipv6_addr_str, (ipv6_addr_t *)&memo->remote_ep.addr.ipv6,
                                        IPV6_ADDR_MAX_STR_LEN));
+#endif
                 continue;
             }
         }
