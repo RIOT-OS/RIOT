@@ -34,19 +34,19 @@ void cond_init(cond_t *cond)
 
 void cond_wait(cond_t *cond, mutex_t *mutex)
 {
-    unsigned irqstate = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
     thread_t *me = thread_get_active();
 
-    mutex_unlock(mutex);
     sched_set_status(me, STATUS_COND_BLOCKED);
     thread_add_to_list(&cond->queue, me);
-    irq_restore(irqstate);
+    irq_enable();
+    /* mutex_unlock() might reschedule, so it needs to be called with interrupts
+     * enabled. */
+    mutex_unlock(mutex);
     thread_yield_higher();
-
-    /*
-     * Once we reach this point, the condition variable was signalled,
-     * and we are free to continue.
-     */
+    /* Once we reach this point, the condition variable was signaled, and we are
+     * free to continue. */
     mutex_lock(mutex);
 }
 
