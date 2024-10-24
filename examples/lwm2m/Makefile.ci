@@ -2,6 +2,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     arduino-mkr1000 \
     b-l072z-lrwan1 \
+    bastwan \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \
     bluepill-stm32f030c8 \
@@ -9,16 +10,22 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f103cb \
     calliope-mini \
     cc1350-launchpad \
+    cc2538dk \
     cc2650-launchpad \
     cc2650stk \
     e104-bt5010a-tb \
     e104-bt5011a-tb \
+    feather-m0-lora \
     feather-m0-wifi \
+    firefly \
     gd32vf103c-start \
+    generic-cc2538-cc2592-dk \
+    hamilton \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
     im880b \
+    lobaro-lorabox \
     lsn50 \
     maple-mini \
     microbit \
@@ -34,16 +41,29 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
+    nucleo-f410rb \
+    nucleo-g070rb \
+    nucleo-g071rb \
+    nucleo-g431rb \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    nucleo-l412kb \
     olimexino-stm32 \
+    omote \
     opencm904 \
     openmote-b \
+    openmote-cc2538 \
+    pba-d-01-kw2x \
+    remote-pa \
+    remote-reva \
+    remote-revb \
     samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    samr21-xpro \
+    samr30-xpro \
     seeedstudio-gd32 \
     sipeed-longan-nano \
     sipeed-longan-nano-tft \

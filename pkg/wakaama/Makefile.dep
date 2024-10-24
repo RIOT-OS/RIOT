@@ -1,4 +1,4 @@
-USEMODULE += wakaama_core wakaama_core_coap13 wakaama_client
+USEMODULE += wakaama_core wakaama_core_coap wakaama_core_coap13 wakaama_data wakaama_client
 
 # include contrib code (platform adaption and client implementation)
 USEMODULE += wakaama_contrib
@@ -39,7 +39,9 @@ endif
 
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
+USEMODULE += random
 USEPKG += tlsf
+
 
 # If logs for the package are active, we need fmt
 ifneq (,$(filter -DLWM2M_WITH_LOGS,$(CFLAGS)))

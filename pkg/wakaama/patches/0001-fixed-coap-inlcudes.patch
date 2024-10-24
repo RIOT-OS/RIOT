@@ -1,0 +1,53 @@
+From ce1dd5e82e3cff40446217b372324d3599910bd7 Mon Sep 17 00:00:00 2001
+From: Moritz <moritz.holzer@haw-hamburg.de>
+Date: Mon, 21 Oct 2024 13:26:18 +0200
+Subject: [PATCH 1/3] fixed coap inlcudes
+
+---
+ core/bootstrap.h    | 2 +-
+ core/internals.h    | 2 +-
+ core/registration.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/core/bootstrap.h b/core/bootstrap.h
+index 64ff684..97d4594 100644
+--- a/core/bootstrap.h
++++ b/core/bootstrap.h
+@@ -17,7 +17,7 @@
+  *******************************************************************************/
+ #ifndef WAKAAMA_BOOTSTRAP_H
+ #define WAKAAMA_BOOTSTRAP_H
+-#include "er-coap-13/er-coap-13.h"
++#include "er-coap-13.h"
+ #include "internals.h"
+ 
+ void bootstrap_step(lwm2m_context_t *contextP, time_t currentTime, time_t *timeoutP);
+diff --git a/core/internals.h b/core/internals.h
+index 7ad7c52..6b94c59 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -64,7 +64,7 @@
+ 
+ #include "bootstrap.h"
+ #include "discover.h"
+-#include "er-coap-13/er-coap-13.h"
++#include "er-coap-13.h"
+ #include "logging.h"
+ #include "management.h"
+ #include "objects.h"
+diff --git a/core/registration.h b/core/registration.h
+index fe500c6..b05ad49 100644
+--- a/core/registration.h
++++ b/core/registration.h
+@@ -17,7 +17,7 @@
+  *******************************************************************************/
+ #ifndef WAKAAMA_REGISTRATION_H
+ #define WAKAAMA_REGISTRATION_H
+-#include "er-coap-13/er-coap-13.h"
++#include "er-coap-13.h"
+ #include "internals.h"
+ 
+ uint8_t registration_handleRequest(lwm2m_context_t *contextP, lwm2m_uri_t *uriP, void *fromSessionH,
+-- 
+2.34.1
+
