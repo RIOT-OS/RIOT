@@ -49,9 +49,7 @@
  * therefore, beneficial for the majority of applications.
  */
 static inline __attribute__((always_inline))
-void _block(mutex_t *mutex,
-            unsigned irq_state,
-            uinttxtptr_t pc)
+void _block(mutex_t *mutex, uinttxtptr_t pc)
 {
     /* pc is only used when MODULE_CORE_MUTEX_DEBUG */
     (void)pc;
@@ -87,7 +85,7 @@ void _block(mutex_t *mutex,
     }
 #endif
 
-    irq_restore(irq_state);
+    irq_enable();
     thread_yield_higher();
     /* We were woken up by scheduler. Waker removed us from queue. */
 #if IS_USED(MODULE_CORE_MUTEX_DEBUG)
@@ -97,11 +95,12 @@ void _block(mutex_t *mutex,
 
 bool mutex_lock_internal(mutex_t *mutex, bool block)
 {
+    assert(irq_is_enabled());
     uinttxtptr_t pc = 0;
 #if IS_USED(MODULE_CORE_MUTEX_DEBUG)
     pc = cpu_get_caller_pc();
 #endif
-    unsigned irq_state = irq_disable();
+    irq_disable();
 
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock_internal(block=%u).\n",
           thread_getpid(), (unsigned)block);
@@ -122,14 +121,14 @@ bool mutex_lock_internal(mutex_t *mutex, bool block)
 #endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock(): early out.\n",
               thread_getpid());
-        irq_restore(irq_state);
+        irq_enable();
     }
     else {
         if (!block) {
-            irq_restore(irq_state);
+            irq_enable();
             return false;
         }
-        _block(mutex, irq_state, pc);
+        _block(mutex, pc);
     }
 
     return true;
@@ -137,11 +136,12 @@ bool mutex_lock_internal(mutex_t *mutex, bool block)
 
 int mutex_lock_cancelable(mutex_cancel_t *mc)
 {
+    assert(irq_is_enabled());
     uinttxtptr_t pc = 0;
 #if IS_USED(MODULE_CORE_MUTEX_DEBUG)
     pc = cpu_get_caller_pc();
 #endif
-    unsigned irq_state = irq_disable();
+    irq_disable();
 
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable()\n",
           thread_getpid());
@@ -149,7 +149,7 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     if (mc->cancelled) {
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable cancelled "
               "early.\n", thread_getpid());
-        irq_restore(irq_state);
+        irq_enable();
         return -ECANCELED;
     }
 
@@ -171,11 +171,11 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
 #endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() early out.\n",
               thread_getpid());
-        irq_restore(irq_state);
+        irq_enable();
         return 0;
     }
     else {
-        _block(mutex, irq_state, pc);
+        _block(mutex, pc);
         if (mc->cancelled) {
             DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() "
                   "cancelled.\n", thread_getpid());
@@ -186,21 +186,22 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
 
 void mutex_unlock(mutex_t *mutex)
 {
-    unsigned irqstate = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     DEBUG("PID[%" PRIkernel_pid "] mutex_unlock(): queue.next: %p\n",
           thread_getpid(), (void *)mutex->queue.next);
 
     if (mutex->queue.next == NULL) {
         /* the mutex was not locked */
-        irq_restore(irqstate);
+        irq_enable();
         return;
     }
 
     if (mutex->queue.next == MUTEX_LOCKED) {
         mutex->queue.next = NULL;
         /* the mutex was locked and no thread was waiting for it */
-        irq_restore(irqstate);
+        irq_enable();
         return;
     }
 
@@ -231,15 +232,16 @@ void mutex_unlock(mutex_t *mutex)
     mutex->owner_calling_pc = 0;
 #endif
 
-    irq_restore(irqstate);
+    irq_enable();
     sched_switch(process_priority);
 }
 
 void mutex_unlock_and_sleep(mutex_t *mutex)
 {
+    assert(irq_is_enabled());
     DEBUG("PID[%" PRIkernel_pid "] mutex_unlock_and_sleep(): queue.next: %p\n",
           thread_getpid(), (void *)mutex->queue.next);
-    unsigned irqstate = irq_disable();
+    irq_disable();
 
     if (mutex->queue.next) {
         if (mutex->queue.next == MUTEX_LOCKED) {
@@ -261,13 +263,14 @@ void mutex_unlock_and_sleep(mutex_t *mutex)
     DEBUG("PID[%" PRIkernel_pid "] mutex_unlock_and_sleep(): going to sleep.\n",
           thread_getpid());
     sched_set_status(thread_get_active(), STATUS_SLEEPING);
-    irq_restore(irqstate);
+    irq_enable();
     thread_yield_higher();
 }
 
 void mutex_cancel(mutex_cancel_t *mc)
 {
-    unsigned irq_state = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     mc->cancelled = 1;
 
@@ -277,7 +280,7 @@ void mutex_cancel(mutex_cancel_t *mc)
     if (thread_is_active(thread)) {
         /* thread is still running or about to run, so it will check
          * `mc-cancelled` in time */
-        irq_restore(irq_state);
+        irq_enable();
         return;
     }
 
@@ -289,12 +292,12 @@ void mutex_cancel(mutex_cancel_t *mc)
             mutex->queue.next = MUTEX_LOCKED;
         }
         sched_set_status(thread, STATUS_PENDING);
-        irq_restore(irq_state);
+        irq_enable();
         sched_switch(thread->priority);
         return;
     }
 
-    irq_restore(irq_state);
+    irq_enable();
 }
 
 #else /* MAXTHREADS < 2 */

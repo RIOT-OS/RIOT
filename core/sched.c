@@ -334,13 +334,14 @@ void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
 
 void sched_change_priority(thread_t *thread, uint8_t priority)
 {
+    assert(irq_is_enabled());
     assert(thread && (priority < SCHED_PRIO_LEVELS));
 
     if (thread->priority == priority) {
         return;
     }
 
-    unsigned irq_state = irq_disable();
+    irq_disable();
 
     if (thread_is_active(thread)) {
         _runqueue_pop(thread);
@@ -348,7 +349,7 @@ void sched_change_priority(thread_t *thread, uint8_t priority)
     }
     thread->priority = priority;
 
-    irq_restore(irq_state);
+    irq_enable();
 
     thread_t *active = thread_get_active();
 

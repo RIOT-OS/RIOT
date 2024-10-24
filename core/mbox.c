@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void _wake_waiter(thread_t *thread, unsigned irqstate)
+static void _wake_waiter(thread_t *thread)
 {
     sched_set_status(thread, STATUS_PENDING);
 
@@ -37,11 +37,11 @@ static void _wake_waiter(thread_t *thread, unsigned irqstate)
 
     uint16_t process_priority = thread->priority;
 
-    irq_restore(irqstate);
+    irq_enable();
     sched_switch(process_priority);
 }
 
-static void _wait(list_node_t *wait_list, unsigned irqstate)
+static void _wait(list_node_t *wait_list)
 {
     DEBUG("mbox: Thread %" PRIkernel_pid " _wait(): going blocked.\n",
           thread_getpid());
@@ -50,7 +50,7 @@ static void _wait(list_node_t *wait_list, unsigned irqstate)
 
     sched_set_status(me, STATUS_MBOX_BLOCKED);
     thread_add_to_list(wait_list, me);
-    irq_restore(irqstate);
+    irq_enable();
     thread_yield();
 
     DEBUG("mbox: Thread %" PRIkernel_pid " _wait(): woke up.\n",
@@ -59,7 +59,8 @@ static void _wait(list_node_t *wait_list, unsigned irqstate)
 
 int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
 {
-    unsigned irqstate = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     list_node_t *next = list_remove_head(&mbox->readers);
 
@@ -69,17 +70,17 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
         thread_t *thread =
             container_of((clist_node_t *)next, thread_t, rq_entry);
         *(msg_t *)thread->wait_data = *msg;
-        _wake_waiter(thread, irqstate);
+        _wake_waiter(thread);
         return 1;
     }
     else {
         while (cib_full(&mbox->cib)) {
             if (blocking) {
-                _wait(&mbox->writers, irqstate);
-                irqstate = irq_disable();
+                _wait(&mbox->writers);
+                irq_disable();
             }
             else {
-                irq_restore(irqstate);
+                irq_enable();
                 return 0;
             }
         }
@@ -89,14 +90,15 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
         msg->sender_pid = thread_getpid();
         /* copy msg into queue */
         mbox->msg_array[cib_put_unsafe(&mbox->cib)] = *msg;
-        irq_restore(irqstate);
+        irq_enable();
         return 1;
     }
 }
 
 int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
 {
-    unsigned irqstate = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     if (cib_avail(&mbox->cib)) {
         DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIxPTR ": _tryget(): "
@@ -107,21 +109,21 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
         if (next) {
             thread_t *thread = container_of((clist_node_t *)next, thread_t,
                                             rq_entry);
-            _wake_waiter(thread, irqstate);
+            _wake_waiter(thread);
         }
         else {
-            irq_restore(irqstate);
+            irq_enable();
         }
         return 1;
     }
     else if (blocking) {
         thread_get_active()->wait_data = msg;
-        _wait(&mbox->readers, irqstate);
+        _wait(&mbox->readers);
         /* sender has copied message */
         return 1;
     }
     else {
-        irq_restore(irqstate);
+        irq_enable();
         return 0;
     }
 }

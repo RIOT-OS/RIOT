@@ -111,10 +111,11 @@ void thread_sleep(void)
         return;
     }
 
-    unsigned state = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     sched_set_status(thread_get_active(), STATUS_SLEEPING);
-    irq_restore(state);
+    irq_enable();
     thread_yield_higher();
 }
 
@@ -122,7 +123,8 @@ int thread_wakeup(kernel_pid_t pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
-    unsigned old_state = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     thread_t *thread = thread_get(pid);
 
@@ -134,7 +136,7 @@ int thread_wakeup(kernel_pid_t pid)
 
         sched_set_status(thread, STATUS_RUNNING);
 
-        irq_restore(old_state);
+        irq_enable();
         sched_switch(thread->priority);
 
         return 1;
@@ -143,19 +145,20 @@ int thread_wakeup(kernel_pid_t pid)
         DEBUG("thread_wakeup: Thread is not sleeping!\n");
     }
 
-    irq_restore(old_state);
+    irq_enable();
     return (int)STATUS_NOT_FOUND;
 }
 
 void thread_yield(void)
 {
-    unsigned old_state = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
     thread_t *me = thread_get_active();
 
     if (me->status >= STATUS_ON_RUNQUEUE) {
         sched_runq_advance(me->priority);
     }
-    irq_restore(old_state);
+    irq_enable();
 
     thread_yield_higher();
 }
