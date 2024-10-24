@@ -25,6 +25,7 @@
 #ifndef EVENT_PERIODIC_CALLBACK_H
 #define EVENT_PERIODIC_CALLBACK_H
 
+#include <assert.h>
 #include "event/callback.h"
 #include "event/periodic.h"
 
@@ -94,6 +95,7 @@ static inline void event_periodic_callback_init(event_periodic_callback_t *event
 static inline void event_periodic_callback_start(event_periodic_callback_t *event,
                                                  uint32_t interval)
 {
+    assert(event->event.callback);
     event_periodic_start(&event->periodic, interval);
 }
 

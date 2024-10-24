@@ -1858,7 +1858,7 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
             event_callback_init(&_receive_from_cache,
                                 _receive_from_cache_cb,
                                 memo);
-            event_post(&_queue, &_receive_from_cache.super);
+            event_callback_post(&_queue, &_receive_from_cache);
             return len;
         }
     }
