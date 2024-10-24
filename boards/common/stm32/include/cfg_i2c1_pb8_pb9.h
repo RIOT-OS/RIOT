@@ -91,5 +91,5 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* CFG_I2C1_PB8_PB9_H */
 /** @} */
+#endif /* CFG_I2C1_PB8_PB9_H */

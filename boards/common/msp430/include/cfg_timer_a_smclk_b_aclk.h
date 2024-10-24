@@ -57,5 +57,5 @@ static const timer_conf_t timer_conf[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_A_SMCLK_B_ACLK_H */
 /** @} */
+#endif /* CFG_TIMER_A_SMCLK_B_ACLK_H */

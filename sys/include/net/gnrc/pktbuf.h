@@ -313,5 +313,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
-#endif /* NET_GNRC_PKTBUF_H */
 /** @} */
+#endif /* NET_GNRC_PKTBUF_H */

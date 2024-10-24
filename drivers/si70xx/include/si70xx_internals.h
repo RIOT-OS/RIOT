@@ -84,5 +84,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SI70XX_INTERNALS_H */
 /** @} */
+#endif /* SI70XX_INTERNALS_H */

@@ -42,5 +42,5 @@ bool cpu_woke_from_backup(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_BACKUP_RAM_H */
 /** @} */
+#endif /* PERIPH_CPU_BACKUP_RAM_H */

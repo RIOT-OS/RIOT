@@ -172,5 +172,5 @@ static inline void afio_mapr_write(uint32_t new_value)
 }
 #endif
 
-#endif /* PERIPH_F1_PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_F1_PERIPH_CPU_H */

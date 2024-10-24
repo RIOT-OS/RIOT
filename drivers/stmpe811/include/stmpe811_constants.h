@@ -247,5 +247,5 @@ extern "C" {
 }
 #endif
 
-#endif /* STMPE811_CONSTANTS_H */
 /** @} */
+#endif /* STMPE811_CONSTANTS_H */

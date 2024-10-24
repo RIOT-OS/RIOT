@@ -57,5 +57,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_DTLS_H */
 /** @} */
+#endif /* NET_DTLS_H */

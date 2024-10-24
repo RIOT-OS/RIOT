@@ -101,5 +101,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NRF24L01P_NG_CONSTANTS_H */
 /** @} */
+#endif /* NRF24L01P_NG_CONSTANTS_H */

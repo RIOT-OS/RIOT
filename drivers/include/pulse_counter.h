@@ -92,5 +92,5 @@ void pulse_counter_reset(pulse_counter_t *dev);
 }
 #endif
 
-#endif /* PULSE_COUNTER_H */
 /** @} */
+#endif /* PULSE_COUNTER_H */

@@ -63,5 +63,5 @@ static inline void nrfx_dcdc_init(void)
 }
 #endif
 
-#endif /* NRFX_RIOT_H */
 /** @} */
+#endif /* NRFX_RIOT_H */

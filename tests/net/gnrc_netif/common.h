@@ -106,5 +106,5 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */
+#endif /* COMMON_H */

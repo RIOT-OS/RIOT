@@ -96,5 +96,5 @@ void ztimer_mock_init(ztimer_mock_t *self, unsigned width);
 }
 #endif
 
-#endif /* ZTIMER_MOCK_H */
 /** @} */
+#endif /* ZTIMER_MOCK_H */

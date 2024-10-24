@@ -302,5 +302,5 @@ static inline int entropy_source_test(entropy_source_tests_rep_t *state_rep,
 }
 #endif
 
-#endif /* ENTROPY_SOURCE_H */
 /** @} */
+#endif /* ENTROPY_SOURCE_H */

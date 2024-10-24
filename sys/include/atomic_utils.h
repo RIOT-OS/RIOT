@@ -1391,5 +1391,5 @@ static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
 }
 #endif
 
-#endif /* ATOMIC_UTILS_H */
 /** @} */
+#endif /* ATOMIC_UTILS_H */

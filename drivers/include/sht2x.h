@@ -193,5 +193,5 @@ int sht2x_write_userreg(const sht2x_t *dev, uint8_t userreg);
 }
 #endif
 
-#endif /* SHT2X_H */
 /** @} */
+#endif /* SHT2X_H */

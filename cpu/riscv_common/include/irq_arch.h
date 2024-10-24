@@ -114,5 +114,5 @@ static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 }
 #endif
 
-#endif /* IRQ_ARCH_H */
 /** @} */
+#endif /* IRQ_ARCH_H */

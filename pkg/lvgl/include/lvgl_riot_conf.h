@@ -62,5 +62,5 @@ typedef int16_t lv_coord_t;
 }
 #endif
 
-#endif /* LVGL_RIOT_CONF_H */
 /** @} */
+#endif /* LVGL_RIOT_CONF_H */

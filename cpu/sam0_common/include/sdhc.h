@@ -167,5 +167,5 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t block, uint16_t num);
 }
 #endif
 
-#endif /* SDHC_H */
 /** @} */
+#endif /* SDHC_H */

@@ -192,5 +192,5 @@ extern "C"
 }
 #endif
 
-#endif /* L3GXXXX_REGS_H */
 /** @} */
+#endif /* L3GXXXX_REGS_H */

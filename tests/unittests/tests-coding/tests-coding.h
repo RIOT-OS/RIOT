@@ -40,5 +40,5 @@ Test *tests_coding_xor_tests(void);
 }
 #endif
 
-#endif /* TESTS_CODING_H */
 /** @} */
+#endif /* TESTS_CODING_H */

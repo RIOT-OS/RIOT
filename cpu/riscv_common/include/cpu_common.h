@@ -85,5 +85,5 @@ void cpu_reg_disable_bits(volatile uint32_t *reg, uint32_t mask)
 }
 #endif
 
-#endif /* CPU_COMMON_H */
 /** @} */
+#endif /* CPU_COMMON_H */

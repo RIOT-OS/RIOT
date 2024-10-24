@@ -131,5 +131,5 @@ extern "C" {
 }
 #endif
 
-#endif /* AD7746_INTERNAL_H */
 /** @} */
+#endif /* AD7746_INTERNAL_H */

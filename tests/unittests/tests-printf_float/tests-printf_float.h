@@ -34,5 +34,5 @@ void tests_printf_float(void);
 }
 #endif
 
-#endif /* TESTS_PRINTF_FLOAT_H */
 /** @} */
+#endif /* TESTS_PRINTF_FLOAT_H */

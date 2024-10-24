@@ -83,5 +83,5 @@ void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len);
 }
 #endif
 
-#endif /* SLIPDEV_INTERNAL_H */
 /** @} */
+#endif /* SLIPDEV_INTERNAL_H */

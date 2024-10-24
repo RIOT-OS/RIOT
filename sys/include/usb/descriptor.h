@@ -229,5 +229,5 @@ static inline bool usb_setup_is_read(usb_setup_t *pkt)
 }
 #endif
 
-#endif /* USB_DESCRIPTOR_H */
 /** @} */
+#endif /* USB_DESCRIPTOR_H */

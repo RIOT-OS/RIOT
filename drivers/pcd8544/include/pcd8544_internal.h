@@ -72,5 +72,5 @@
 }
 #endif
 
-#endif /* PCD8544_INTERNAL_H */
 /** @} */
+#endif /* PCD8544_INTERNAL_H */

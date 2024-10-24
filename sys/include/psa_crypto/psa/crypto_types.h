@@ -492,5 +492,5 @@ typedef struct psa_cipher_operation_s psa_cipher_operation_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_TYPES_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_CRYPTO_TYPES_H */

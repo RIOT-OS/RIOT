@@ -55,5 +55,5 @@ const uint8_t *mineplex_char(char c);
 }
 #endif
 
-#endif /* MINEPLEX_H */
 /** @} */
+#endif /* MINEPLEX_H */

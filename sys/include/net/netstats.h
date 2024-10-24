@@ -132,5 +132,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_NETSTATS_H */
 /** @} */
+#endif /* NET_NETSTATS_H */

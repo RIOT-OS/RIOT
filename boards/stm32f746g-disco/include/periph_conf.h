@@ -472,5 +472,5 @@ static const sdmmc_conf_t sdmmc_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

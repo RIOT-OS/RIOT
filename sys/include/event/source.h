@@ -114,5 +114,5 @@ static inline void event_source_trigger(event_source_t *source)
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_SOURCE_H */
 /** @} */
+#endif /* EVENT_SOURCE_H */

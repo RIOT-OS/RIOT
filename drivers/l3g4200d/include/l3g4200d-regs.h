@@ -90,5 +90,5 @@
 }
 #endif
 
-#endif /* L3G4200D_REGS_H */
 /** @} */
+#endif /* L3G4200D_REGS_H */

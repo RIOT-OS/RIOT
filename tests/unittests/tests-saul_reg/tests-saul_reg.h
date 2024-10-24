@@ -34,5 +34,5 @@ void tests_saul_reg(void);
 }
 #endif
 
-#endif /* TESTS_SAUL_REG_H */
 /** @} */
+#endif /* TESTS_SAUL_REG_H */

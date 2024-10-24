@@ -87,5 +87,5 @@ static inline void evtimer_init_mbox(evtimer_t *evtimer)
 }
 #endif
 
-#endif /* EVTIMER_MBOX_H */
 /** @} */
+#endif /* EVTIMER_MBOX_H */

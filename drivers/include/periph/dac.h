@@ -133,5 +133,5 @@ void dac_poweroff(dac_t line);
 }
 #endif
 
-#endif /* PERIPH_DAC_H */
 /** @} */
+#endif /* PERIPH_DAC_H */

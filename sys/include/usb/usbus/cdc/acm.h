@@ -226,5 +226,5 @@ void usbus_cdc_acm_set_coding_cb(usbus_cdcacm_device_t *cdcacm,
 }
 #endif
 
-#endif /* USB_USBUS_CDC_ACM_H */
 /** @} */
+#endif /* USB_USBUS_CDC_ACM_H */

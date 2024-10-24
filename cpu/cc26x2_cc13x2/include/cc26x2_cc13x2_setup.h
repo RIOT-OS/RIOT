@@ -117,5 +117,5 @@ void setup_trim_device(void);
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X2_CC13X2_SETUP_H */
 /** @} */
+#endif /* CC26X2_CC13X2_SETUP_H */

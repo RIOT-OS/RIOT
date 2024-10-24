@@ -489,5 +489,5 @@ void event_sync(event_queue_t *queue);
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_H */
 /** @} */
+#endif /* EVENT_H */

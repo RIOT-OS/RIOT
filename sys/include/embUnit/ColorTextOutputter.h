@@ -26,5 +26,5 @@ OutputterRef ColorTextOutputter_outputter(void);
 }
 #endif
 
-#endif /* EMBUNIT_COLORTEXTOUTPUTTER_H */
 /** @} */
+#endif /* EMBUNIT_COLORTEXTOUTPUTTER_H */

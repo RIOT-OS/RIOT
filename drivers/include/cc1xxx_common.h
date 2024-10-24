@@ -145,5 +145,5 @@ void cc1xxx_eui_get(const netdev_t *dev, uint8_t *eui);
 }
 #endif
 
-#endif /* CC1XXX_COMMON_H */
 /** @} */
+#endif /* CC1XXX_COMMON_H */

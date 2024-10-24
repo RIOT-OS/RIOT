@@ -415,5 +415,5 @@ extern "C" {
 }
 #endif
 
-#endif /* VENDOR_CONF_H */
 /** @} */
+#endif /* VENDOR_CONF_H */

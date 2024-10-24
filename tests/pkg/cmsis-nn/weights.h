@@ -1768,5 +1768,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* WEIGHTS_H */
 /** @} */
+#endif /* WEIGHTS_H */

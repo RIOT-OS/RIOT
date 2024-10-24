@@ -110,5 +110,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_CORD_CONFIG_H */
 /** @} */
+#endif /* NET_CORD_CONFIG_H */

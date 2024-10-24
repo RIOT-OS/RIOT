@@ -33,5 +33,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* XTENSA_CONF_H */
 /** @} */
+#endif /* XTENSA_CONF_H */

@@ -61,5 +61,5 @@ uint8_t nvm_read_production_signature_row(uint8_t address);
 }
 #endif
 
-#endif /* CPU_NVM_H */
 /** @} */
+#endif /* CPU_NVM_H */

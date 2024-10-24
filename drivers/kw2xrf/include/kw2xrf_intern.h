@@ -233,5 +233,5 @@ uint32_t kw2xrf_get_timestamp(kw2xrf_t *dev);
 }
 #endif
 
-#endif /* KW2XRF_INTERN_H */
 /** @} */
+#endif /* KW2XRF_INTERN_H */

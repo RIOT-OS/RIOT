@@ -44,5 +44,5 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
 }
 #endif
 
-#endif /* VALIDATION_H */
 /** @} */
+#endif /* VALIDATION_H */

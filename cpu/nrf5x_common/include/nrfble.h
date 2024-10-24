@@ -51,5 +51,5 @@ netdev_t *nrfble_setup(void);
 }
 #endif
 
-#endif /* NRFBLE_H */
 /** @} */
+#endif /* NRFBLE_H */

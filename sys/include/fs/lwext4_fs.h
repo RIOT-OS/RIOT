@@ -54,5 +54,5 @@ extern const vfs_file_system_t lwext4_file_system;
 }
 #endif
 
-#endif /* FS_LWEXT4_FS_H */
 /** @} */
+#endif /* FS_LWEXT4_FS_H */

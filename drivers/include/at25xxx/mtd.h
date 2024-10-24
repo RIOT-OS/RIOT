@@ -52,5 +52,5 @@ extern const mtd_desc_t mtd_at25xxx_driver;
 }
 #endif
 
-#endif /* AT25XXX_MTD_H */
 /** @} */
+#endif /* AT25XXX_MTD_H */

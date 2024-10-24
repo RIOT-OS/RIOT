@@ -57,5 +57,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MACROS_UNITS_H */
 /** @} */
+#endif /* MACROS_UNITS_H */

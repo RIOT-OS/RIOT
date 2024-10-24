@@ -59,5 +59,5 @@ void _lock_release_recursive(_lock_t *lock);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYS_LOCK_H */
 /** @} */
+#endif /* SYS_LOCK_H */

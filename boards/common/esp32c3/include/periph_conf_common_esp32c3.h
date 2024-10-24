@@ -45,5 +45,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_ESP32C3_H */
 /** @} */
+#endif /* PERIPH_CONF_COMMON_ESP32C3_H */

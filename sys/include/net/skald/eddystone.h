@@ -83,5 +83,5 @@ void skald_eddystone_url_adv(skald_ctx_t *ctx,
 }
 #endif
 
-#endif /* NET_SKALD_EDDYSTONE_H */
 /** @} */
+#endif /* NET_SKALD_EDDYSTONE_H */

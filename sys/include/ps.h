@@ -35,5 +35,5 @@ void ps(void);
 }
 #endif
 
-#endif /* PS_H */
 /** @} */
+#endif /* PS_H */

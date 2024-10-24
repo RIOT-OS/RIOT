@@ -205,5 +205,5 @@ enum {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TINYUSB_DESCRIPTORS_H */
 /** @} */
+#endif /* TINYUSB_DESCRIPTORS_H */

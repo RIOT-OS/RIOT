@@ -30,5 +30,5 @@ int congure_test_snd_setup(congure_test_snd_t *c, unsigned id);
 }
 #endif
 
-#endif /* CONGURE_IMPL_H */
 /** @} */
+#endif /* CONGURE_IMPL_H */

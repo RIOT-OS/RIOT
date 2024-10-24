@@ -29,5 +29,5 @@ extern "C" {
 }
 #endif
 
-#endif /* INIT_DEV_H */
 /** @} */
+#endif /* INIT_DEV_H */

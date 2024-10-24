@@ -138,5 +138,5 @@ uint32_t bmp180_sealevel_pressure(const bmp180_t *dev, int16_t altitude);
 }
 #endif
 
-#endif /* BMP180_H */
 /** @} */
+#endif /* BMP180_H */

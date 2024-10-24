@@ -356,5 +356,5 @@ ssize_t saul_class_write(char *dest, size_t max_size, uint8_t class_id);
 }
 #endif
 
-#endif /* SAUL_H */
 /** @} */
+#endif /* SAUL_H */

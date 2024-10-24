@@ -312,5 +312,5 @@ int ds3231_disable_bat(const ds3231_t *dev);
 }
 #endif
 
-#endif /* DS3231_H */
 /** @} */
+#endif /* DS3231_H */

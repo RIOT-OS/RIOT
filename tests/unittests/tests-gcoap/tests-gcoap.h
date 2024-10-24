@@ -36,5 +36,5 @@ void tests_gcoap(void);
 }
 #endif
 
-#endif /* TESTS_GCOAP_H */
 /** @} */
+#endif /* TESTS_GCOAP_H */

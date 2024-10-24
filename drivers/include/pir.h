@@ -141,5 +141,5 @@ int pir_register_thread(pir_t *dev);
 }
 #endif
 
-#endif /* PIR_H */
 /** @} */
+#endif /* PIR_H */

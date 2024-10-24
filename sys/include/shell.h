@@ -298,5 +298,5 @@ int shell_parse_file(const shell_command_t *commands,
 }
 #endif
 
-#endif /* SHELL_H */
 /** @} */
+#endif /* SHELL_H */

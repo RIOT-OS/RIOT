@@ -87,5 +87,5 @@ static const saul_reg_info_t lis3dh_saul_info[] =
 }
 #endif
 
-#endif /* LIS3DH_PARAMS_H */
 /** @} */
+#endif /* LIS3DH_PARAMS_H */

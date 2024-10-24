@@ -33,5 +33,5 @@ void tests_bluetil(void);
 }
 #endif
 
-#endif /* TESTS_BLUETIL_H */
 /** @} */
+#endif /* TESTS_BLUETIL_H */

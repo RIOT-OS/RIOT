@@ -33,5 +33,5 @@ void tests_sixlowpan(void);
 }
 #endif
 
-#endif /* TESTS_SIXLOWPAN_H */
 /** @} */
+#endif /* TESTS_SIXLOWPAN_H */

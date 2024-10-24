@@ -44,5 +44,5 @@ extern const vfs_file_ops_t random_vfs_ops;
 }
 #endif
 
-#endif /* RANDOM_VFS_H */
 /** @} */
+#endif /* RANDOM_VFS_H */

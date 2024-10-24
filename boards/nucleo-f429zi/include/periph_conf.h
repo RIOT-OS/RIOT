@@ -226,5 +226,5 @@ static const eth_conf_t eth_config = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */

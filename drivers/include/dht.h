@@ -134,5 +134,5 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 }
 #endif
 
-#endif /* DHT_H */
 /** @} */
+#endif /* DHT_H */

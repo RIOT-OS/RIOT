@@ -567,5 +567,5 @@ void semtech_loramac_erase_config(void);
 }
 #endif
 
-#endif /* SEMTECH_LORAMAC_H */
 /** @} */
+#endif /* SEMTECH_LORAMAC_H */

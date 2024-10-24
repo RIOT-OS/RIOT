@@ -269,5 +269,5 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
 }
 #endif
 
-#endif /* PSA_CRYPTO_ALGORITHM_DISPATCH_H */
 /** @} */
+#endif /* PSA_CRYPTO_ALGORITHM_DISPATCH_H */

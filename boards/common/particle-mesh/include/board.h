@@ -190,5 +190,5 @@ void board_nrfantenna_select(enum board_nrfantenna_selection choice);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

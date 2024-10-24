@@ -99,5 +99,5 @@ static const at24cxxx_params_t at24cxxx_params[] =
 }
 #endif
 
-#endif /* AT24CXXX_PARAMS_H */
 /** @} */
+#endif /* AT24CXXX_PARAMS_H */

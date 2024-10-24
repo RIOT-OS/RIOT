@@ -185,5 +185,5 @@ int udp_sendto(uint8_t *buf, size_t len, uint8_t *dst, uint16_t dst_port, uhcp_i
 }
 #endif
 
-#endif /* NET_UHCP_H */
 /** @} */
+#endif /* NET_UHCP_H */

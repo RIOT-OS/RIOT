@@ -48,5 +48,5 @@ extern "C" {
 }
 #endif
 
-#endif /* FSL_COMMON_H */
 /** @} */
+#endif /* FSL_COMMON_H */

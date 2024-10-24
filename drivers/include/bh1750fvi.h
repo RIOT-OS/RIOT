@@ -99,5 +99,5 @@ uint16_t bh1750fvi_sample(const bh1750fvi_t *dev);
 }
 #endif
 
-#endif /* BH1750FVI_H */
 /** @} */
+#endif /* BH1750FVI_H */

@@ -45,5 +45,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_C0_PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_C0_PERIPH_CPU_H */

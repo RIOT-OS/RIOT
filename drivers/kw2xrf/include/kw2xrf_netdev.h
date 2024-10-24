@@ -32,5 +32,5 @@ extern const netdev_driver_t kw2xrf_driver;
 }
 #endif
 
-#endif /* KW2XRF_NETDEV_H */
 /** @} */
+#endif /* KW2XRF_NETDEV_H */

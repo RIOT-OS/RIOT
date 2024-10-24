@@ -72,5 +72,5 @@ static const dose_params_t dose_params[] =
 }
 #endif
 
-#endif /* DOSE_PARAMS_H */
 /** @} */
+#endif /* DOSE_PARAMS_H */

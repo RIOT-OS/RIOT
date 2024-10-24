@@ -59,5 +59,5 @@ static const rn2xx3_params_t rn2xx3_params[] =
 }
 #endif
 
-#endif /* RN2XX3_PARAMS_H */
 /** @} */
+#endif /* RN2XX3_PARAMS_H */

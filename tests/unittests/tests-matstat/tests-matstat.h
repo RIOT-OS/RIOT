@@ -38,5 +38,5 @@ Test *tests_matstat_tests(void);
 }
 #endif
 
-#endif /* TESTS_MATSTAT_H */
 /** @} */
+#endif /* TESTS_MATSTAT_H */

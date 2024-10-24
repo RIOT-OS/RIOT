@@ -252,5 +252,5 @@ TU_ATTR_ALWAYS_INLINE static inline bool osal_queue_empty(osal_queue_t qhdl)
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TUSB_OS_CUSTOM_H */
 /** @} */
+#endif /* TUSB_OS_CUSTOM_H */

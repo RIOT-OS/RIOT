@@ -374,5 +374,5 @@ static inline bool sixlowpan_sfr_ack_is(const sixlowpan_sfr_t *hdr)
 }
 #endif
 
-#endif /* NET_SIXLOWPAN_SFR_H */
 /** @} */
+#endif /* NET_SIXLOWPAN_SFR_H */

@@ -174,5 +174,5 @@ int lpsxxx_disable(const lpsxxx_t *dev);
 }
 #endif
 
-#endif /* LPSXXX_H */
 /** @} */
+#endif /* LPSXXX_H */

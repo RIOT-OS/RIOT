@@ -132,5 +132,5 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len);
 }
 #endif
 
-#endif /* NET_L2FILTER_H */
 /** @} */
+#endif /* NET_L2FILTER_H */

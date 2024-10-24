@@ -196,5 +196,5 @@ int tsrb_add(tsrb_t *rb, const uint8_t *src, size_t n);
 }
 #endif
 
-#endif /* TSRB_H */
 /** @} */
+#endif /* TSRB_H */

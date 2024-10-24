@@ -33,5 +33,5 @@ extern const netdev_driver_t sx126x_driver;
 }
 #endif
 
-#endif /* SX126X_NETDEV_H */
 /** @} */
+#endif /* SX126X_NETDEV_H */

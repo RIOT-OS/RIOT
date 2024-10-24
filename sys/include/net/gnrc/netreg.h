@@ -435,5 +435,5 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 }
 #endif
 
-#endif /* NET_GNRC_NETREG_H */
 /** @} */
+#endif /* NET_GNRC_NETREG_H */

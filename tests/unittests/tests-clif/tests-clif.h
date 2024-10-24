@@ -39,5 +39,5 @@ Test *tests_clif_tests(void);
 }
 #endif
 
-#endif /* TESTS_CLIF_H */
 /** @} */
+#endif /* TESTS_CLIF_H */

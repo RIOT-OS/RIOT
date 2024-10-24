@@ -169,5 +169,5 @@ __NORETURN void _assert_panic(void);
 }
 #endif
 
-#endif /* ASSERT_H */
 /** @} */
+#endif /* ASSERT_H */

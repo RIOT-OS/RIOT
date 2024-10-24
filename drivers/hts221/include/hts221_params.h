@@ -77,5 +77,5 @@ static const saul_reg_info_t hts221_saul_info[] =
 }
 #endif
 
-#endif /* HTS221_PARAMS_H */
 /** @} */
+#endif /* HTS221_PARAMS_H */

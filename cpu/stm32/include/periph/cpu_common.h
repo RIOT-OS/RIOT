@@ -268,5 +268,5 @@ void periph_lpclk_dis(bus_t bus, uint32_t mask);
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */
+#endif /* PERIPH_CPU_COMMON_H */

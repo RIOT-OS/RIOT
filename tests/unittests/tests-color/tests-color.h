@@ -33,5 +33,5 @@ void tests_color(void);
 }
 #endif
 
-#endif /* TESTS_COLOR_H */
 /** @} */
+#endif /* TESTS_COLOR_H */

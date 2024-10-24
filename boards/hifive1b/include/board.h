@@ -65,5 +65,5 @@ void board_init_clock(void);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

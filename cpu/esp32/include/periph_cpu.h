@@ -1022,5 +1022,5 @@ typedef struct {
 #include "can_esp.h"
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */
+#endif /* PERIPH_CPU_H */

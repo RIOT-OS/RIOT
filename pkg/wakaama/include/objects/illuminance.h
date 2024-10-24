@@ -154,5 +154,5 @@ void lwm2m_object_illuminance_update_value(const lwm2m_client_data_t *client_dat
 }
 #endif
 
-#endif /* OBJECTS_ILLUMINANCE_H */
 /** @} */
+#endif /* OBJECTS_ILLUMINANCE_H */

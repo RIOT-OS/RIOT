@@ -45,5 +45,5 @@ namespace RIOTTestCPP {
 }
 #endif
 
-#endif /* TESTS_CPP_CTORS_H */
 /** @} */
+#endif /* TESTS_CPP_CTORS_H */

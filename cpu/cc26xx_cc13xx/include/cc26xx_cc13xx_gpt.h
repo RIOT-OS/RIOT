@@ -207,5 +207,5 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_GPT_H */
 /** @} */
+#endif /* CC26XX_CC13XX_GPT_H */

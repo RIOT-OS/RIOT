@@ -188,5 +188,5 @@ static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */
+#endif /* ATOMIC_UTILS_ARCH_H */

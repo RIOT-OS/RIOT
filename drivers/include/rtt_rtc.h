@@ -57,5 +57,5 @@ void rtt_rtc_gettimeofday(uint32_t *s, uint32_t *us);
 }
 #endif
 
-#endif /* RTT_RTC_H */
 /** @} */
+#endif /* RTT_RTC_H */

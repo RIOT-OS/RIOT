@@ -180,5 +180,5 @@ void gnrc_sixlowpan_frag_vrb_reset(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_VRB_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_VRB_H */

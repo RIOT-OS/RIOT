@@ -153,5 +153,5 @@ void gnrc_ipv6_nib_ft_print(const gnrc_ipv6_nib_ft_t *fte);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_FT_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_FT_H */

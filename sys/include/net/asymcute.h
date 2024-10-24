@@ -574,5 +574,5 @@ int asymcute_unsubscribe(asymcute_con_t *con, asymcute_req_t *req,
 }
 #endif
 
-#endif /* NET_ASYMCUTE_H */
 /** @} */
+#endif /* NET_ASYMCUTE_H */

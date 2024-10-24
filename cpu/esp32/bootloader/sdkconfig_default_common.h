@@ -47,5 +47,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_DEFAULT_COMMON_H */
 /** @} */
+#endif /* SDKCONFIG_DEFAULT_COMMON_H */

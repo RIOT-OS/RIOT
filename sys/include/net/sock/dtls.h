@@ -1124,5 +1124,5 @@ void sock_dtls_close(sock_dtls_t *sock);
 }
 #endif
 
-#endif /* NET_SOCK_DTLS_H */
 /** @} */
+#endif /* NET_SOCK_DTLS_H */

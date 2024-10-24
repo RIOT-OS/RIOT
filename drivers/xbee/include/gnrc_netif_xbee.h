@@ -46,5 +46,5 @@ int gnrc_netif_xbee_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* GNRC_NETIF_XBEE_H */
 /** @} */
+#endif /* GNRC_NETIF_XBEE_H */

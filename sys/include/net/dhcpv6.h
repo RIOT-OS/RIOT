@@ -109,5 +109,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_DHCPV6_H */
 /** @} */
+#endif /* NET_DHCPV6_H */

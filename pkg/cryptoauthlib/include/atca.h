@@ -74,5 +74,5 @@ typedef struct {
 }
 #endif
 
-#endif /* ATCA_H */
 /** @} */
+#endif /* ATCA_H */

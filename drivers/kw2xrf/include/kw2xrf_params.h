@@ -70,5 +70,5 @@ static const kw2xrf_params_t kw2xrf_params[] =
 }
 #endif
 
-#endif /* KW2XRF_PARAMS_H */
 /** @} */
+#endif /* KW2XRF_PARAMS_H */

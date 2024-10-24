@@ -307,5 +307,5 @@ uint16_t bme280_read_humidity(bmx280_t *dev);
 }
 #endif
 
-#endif /* BMX280_H */
 /** @} */
+#endif /* BMX280_H */

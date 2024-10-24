@@ -339,5 +339,5 @@ static inline uint32_t at86rf2xx_get_sc(const at86rf2xx_t *dev)
 }
 #endif
 
-#endif /* AT86RF2XX_INTERNAL_H */
 /** @} */
+#endif /* AT86RF2XX_INTERNAL_H */

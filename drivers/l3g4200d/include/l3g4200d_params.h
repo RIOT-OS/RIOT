@@ -83,5 +83,5 @@ static const saul_reg_info_t l3g4200d_saul_info[] =
 }
 #endif
 
-#endif /* L3G4200D_PARAMS_H */
 /** @} */
+#endif /* L3G4200D_PARAMS_H */

@@ -110,5 +110,5 @@ enum {
 }
 #endif
 
-#endif /* NET_MQTTSN_H */
 /** @} */
+#endif /* NET_MQTTSN_H */

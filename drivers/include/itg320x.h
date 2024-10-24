@@ -312,5 +312,5 @@ int itg320x_power_up(itg320x_t *dev);
 }
 #endif
 
-#endif /* ITG320X_H */
 /** @} */
+#endif /* ITG320X_H */

@@ -469,5 +469,5 @@ typedef union {
 }
 #endif
 
-#endif /* LIS2DH12_REGISTERS_H */
 /** @} */
+#endif /* LIS2DH12_REGISTERS_H */

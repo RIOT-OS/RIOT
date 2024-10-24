@@ -57,5 +57,5 @@ void driver_cryptocell_310_terminate(void);
 }
 #endif
 
-#endif /* CRYPTOCELL_310_UTIL_H */
 /** @} */
+#endif /* CRYPTOCELL_310_UTIL_H */

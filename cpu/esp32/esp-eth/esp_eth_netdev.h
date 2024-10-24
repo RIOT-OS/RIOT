@@ -59,5 +59,5 @@ typedef struct {
 }
 #endif
 
-#endif /* ESP_ETH_NETDEV_H */
 /** @} */
+#endif /* ESP_ETH_NETDEV_H */

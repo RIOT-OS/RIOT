@@ -225,5 +225,5 @@ size_t matrix_keypad_scan(matrix_keypad_t *dev);
 }
 #endif
 
-#endif /* MATRIX_KEYPAD_H */
 /** @} */
+#endif /* MATRIX_KEYPAD_H */

@@ -389,5 +389,5 @@ const char *emcute_type_str(uint8_t type);
 }
 #endif
 
-#endif /* NET_EMCUTE_H */
 /** @} */
+#endif /* NET_EMCUTE_H */

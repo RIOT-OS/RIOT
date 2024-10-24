@@ -597,5 +597,5 @@ static inline void ieee802154_submac_tx_done_cb(ieee802154_submac_t *submac)
 }
 #endif
 
-#endif /* NET_IEEE802154_SUBMAC_H */
 /** @} */
+#endif /* NET_IEEE802154_SUBMAC_H */

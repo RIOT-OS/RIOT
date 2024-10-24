@@ -54,5 +54,5 @@ void nimble_addr_sprint(char *buf, const ble_addr_t *addr);
 }
 #endif
 
-#endif /* NIMBLE_ADDR_H */
 /** @} */
+#endif /* NIMBLE_ADDR_H */

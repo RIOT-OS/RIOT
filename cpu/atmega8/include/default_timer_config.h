@@ -42,5 +42,5 @@ extern "C" {
 }
 #endif
 
-#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */
+#endif /* DEFAULT_TIMER_CONFIG_H */

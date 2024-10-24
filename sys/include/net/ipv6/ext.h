@@ -59,5 +59,5 @@ static inline ipv6_ext_t *ipv6_ext_get_next(ipv6_ext_t *ext)
 }
 #endif
 
-#endif /* NET_IPV6_EXT_H */
 /** @} */
+#endif /* NET_IPV6_EXT_H */

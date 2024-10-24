@@ -66,5 +66,5 @@ static const saul_reg_info_t ds18_saul_reg_info[] =
 }
 #endif
 
-#endif /* DS18_PARAMS_H */
 /** @} */
+#endif /* DS18_PARAMS_H */

@@ -133,5 +133,5 @@ int suit_handle_manifest_buf(const uint8_t *buffer, size_t size);
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_WORKER_H */
 /** @} */
+#endif /* SUIT_TRANSPORT_WORKER_H */

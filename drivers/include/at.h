@@ -662,5 +662,5 @@ void at_postprocess_urc_all(at_dev_t *dev, char *buf);
 }
 #endif
 
-#endif /* AT_H */
 /** @} */
+#endif /* AT_H */

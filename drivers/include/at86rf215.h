@@ -682,5 +682,5 @@ void at86rf215_disable_batmon(at86rf215_t *dev);
 }
 #endif
 
-#endif /* AT86RF215_H */
 /** @} */
+#endif /* AT86RF215_H */

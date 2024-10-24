@@ -51,5 +51,5 @@ static const  sdcard_spi_params_t sdcard_spi_params[] = {
 }
 #endif
 
-#endif /* SDCARD_SPI_PARAMS_H */
 /** @} */
+#endif /* SDCARD_SPI_PARAMS_H */

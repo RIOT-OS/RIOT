@@ -64,5 +64,5 @@ static const timer_conf_t timer_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_TIMER_DEFAULT_H */
 /** @} */
+#endif /* CFG_TIMER_DEFAULT_H */

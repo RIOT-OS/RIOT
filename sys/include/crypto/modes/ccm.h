@@ -109,5 +109,5 @@ int cipher_decrypt_ccm(const cipher_t *cipher,
 }
 #endif
 
-#endif /* CRYPTO_MODES_CCM_H */
 /** @} */
+#endif /* CRYPTO_MODES_CCM_H */

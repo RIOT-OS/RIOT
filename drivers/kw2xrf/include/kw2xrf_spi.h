@@ -136,5 +136,5 @@ void kw2xrf_read_fifo(kw2xrf_t *dev, uint8_t *data, uint8_t data_length);
 }
 #endif
 
-#endif /* KW2XRF_SPI_H */
 /** @} */
+#endif /* KW2XRF_SPI_H */

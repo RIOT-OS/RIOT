@@ -200,5 +200,5 @@ struct dfplayer {
 }
 #endif
 
-#endif /* DFPLAYER_TYPES_H */
 /** @} */
+#endif /* DFPLAYER_TYPES_H */

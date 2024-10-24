@@ -39,5 +39,5 @@ Test *tests_fib_tests(void);
 }
 #endif
 
-#endif /* TESTS_FIB_H */
 /** @} */
+#endif /* TESTS_FIB_H */

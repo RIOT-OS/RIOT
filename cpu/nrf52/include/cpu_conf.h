@@ -143,5 +143,5 @@ static inline void nrf52_sleep(void)
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */
+#endif /* CPU_CONF_H */

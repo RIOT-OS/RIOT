@@ -60,5 +60,5 @@ extern "C" {
 }
 #endif
 
-#endif /* DS75LX_INTERNALS_H */
 /** @} */
+#endif /* DS75LX_INTERNALS_H */

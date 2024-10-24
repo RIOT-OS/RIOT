@@ -116,5 +116,5 @@ static const saul_reg_info_t lis2dh12_saul_info[] =
 }
 #endif
 
-#endif /* LIS2DH12_PARAMS_H */
 /** @} */
+#endif /* LIS2DH12_PARAMS_H */

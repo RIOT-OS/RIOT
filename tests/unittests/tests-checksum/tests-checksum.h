@@ -96,5 +96,5 @@ Test *tests_checksum_ucrc16_tests(void);
 }
 #endif
 
-#endif /* TESTS_CHECKSUM_H */
 /** @} */
+#endif /* TESTS_CHECKSUM_H */

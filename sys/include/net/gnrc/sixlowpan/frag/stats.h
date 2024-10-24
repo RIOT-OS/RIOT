@@ -53,5 +53,5 @@ gnrc_sixlowpan_frag_stats_t *gnrc_sixlowpan_frag_stats_get(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_STATS_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_STATS_H */

@@ -45,5 +45,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* SHTCX_REGS_H */
 /** @} */
+#endif /* SHTCX_REGS_H */

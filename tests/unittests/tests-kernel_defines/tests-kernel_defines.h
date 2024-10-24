@@ -33,5 +33,5 @@ void tests_kernel_defines(void);
 }
 #endif
 
-#endif /* TESTS_KERNEL_DEFINES_H */
 /** @} */
+#endif /* TESTS_KERNEL_DEFINES_H */

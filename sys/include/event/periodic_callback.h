@@ -178,5 +178,5 @@ static inline void event_periodic_callback_stop(event_periodic_callback_t *event
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_PERIODIC_CALLBACK_H */
 /** @} */
+#endif /* EVENT_PERIODIC_CALLBACK_H */

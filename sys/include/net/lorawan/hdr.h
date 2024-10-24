@@ -297,5 +297,5 @@ static inline bool lorawan_ja_hdr_get_optneg(lorawan_join_accept_t *ja_hdr)
 }
 #endif
 
-#endif /* NET_LORAWAN_HDR_H */
 /** @} */
+#endif /* NET_LORAWAN_HDR_H */

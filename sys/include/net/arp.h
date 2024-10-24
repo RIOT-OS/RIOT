@@ -40,5 +40,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_ARP_H */
 /** @} */
+#endif /* NET_ARP_H */

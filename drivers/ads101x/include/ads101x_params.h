@@ -100,5 +100,5 @@ static const saul_reg_info_t ads101x_saul_info[] =
 }
 #endif
 
-#endif /* ADS101X_PARAMS_H */
 /** @} */
+#endif /* ADS101X_PARAMS_H */

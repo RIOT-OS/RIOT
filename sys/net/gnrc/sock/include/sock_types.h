@@ -144,5 +144,5 @@ struct sock_udp {
 }
 #endif
 
-#endif /* SOCK_TYPES_H */
 /** @} */
+#endif /* SOCK_TYPES_H */

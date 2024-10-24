@@ -61,5 +61,5 @@ void notify_observers(void);
 }
 #endif
 
-#endif /* GCOAP_EXAMPLE_H */
 /** @} */
+#endif /* GCOAP_EXAMPLE_H */

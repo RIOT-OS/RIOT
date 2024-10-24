@@ -106,5 +106,5 @@ extern const vfs_file_system_t littlefs_file_system;
 }
 #endif
 
-#endif /* FS_LITTLEFS_FS_H */
 /** @} */
+#endif /* FS_LITTLEFS_FS_H */

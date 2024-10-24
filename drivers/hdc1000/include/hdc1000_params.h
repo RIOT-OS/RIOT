@@ -97,5 +97,5 @@ static const saul_reg_info_t hdc1000_saul_info[] =
 }
 #endif
 
-#endif /* HDC1000_PARAMS_H */
 /** @} */
+#endif /* HDC1000_PARAMS_H */

@@ -70,5 +70,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SOCK_ASYNC_CTX_H */
 /** @} */
+#endif /* SOCK_ASYNC_CTX_H */

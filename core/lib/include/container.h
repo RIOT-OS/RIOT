@@ -87,5 +87,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CONTAINER_H */
 /** @} */
+#endif /* CONTAINER_H */

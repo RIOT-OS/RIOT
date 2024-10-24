@@ -61,5 +61,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_SSI_H */
 /** @} */
+#endif /* CC2538_SSI_H */

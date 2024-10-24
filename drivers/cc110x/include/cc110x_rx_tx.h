@@ -42,5 +42,5 @@ void cc110x_enter_rx_mode(cc110x_t *dev);
 }
 #endif
 
-#endif /* CC110X_RX_TX_H */
 /** @} */
+#endif /* CC110X_RX_TX_H */

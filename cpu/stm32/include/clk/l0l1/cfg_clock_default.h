@@ -96,5 +96,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_L0L1_CFG_CLOCK_DEFAULT_H */
 /** @} */
+#endif /* CLK_L0L1_CFG_CLOCK_DEFAULT_H */

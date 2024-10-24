@@ -60,5 +60,5 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque);
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */
+#endif /* COMMON_H */

@@ -61,5 +61,5 @@ kernel_pid_t openwsn_get_pid(void);
 }
 #endif
 
-#endif /* OPENWSN_H */
 /** @} */
+#endif /* OPENWSN_H */

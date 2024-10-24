@@ -72,5 +72,5 @@ extern const mtd_desc_t mtd_sdcard_driver;
 }
 #endif
 
-#endif /* MTD_SDCARD_H */
 /** @} */
+#endif /* MTD_SDCARD_H */

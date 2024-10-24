@@ -1531,5 +1531,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* USBDEV_ESP32_H */
 /** @} */
+#endif /* USBDEV_ESP32_H */

@@ -100,5 +100,5 @@ int udp_cmd(int argc, char **argv);
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */
+#endif /* COMMON_H */

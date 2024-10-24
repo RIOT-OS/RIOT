@@ -181,5 +181,5 @@ int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
 }
 #endif
 
-#endif /* ADS101X_H */
 /** @} */
+#endif /* ADS101X_H */

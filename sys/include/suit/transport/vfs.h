@@ -48,5 +48,5 @@ int suit_transport_vfs_fetch(const suit_manifest_t *manifest, coap_blockwise_cb_
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_VFS_H */
 /** @} */
+#endif /* SUIT_TRANSPORT_VFS_H */

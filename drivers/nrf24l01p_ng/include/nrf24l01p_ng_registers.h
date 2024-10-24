@@ -968,5 +968,5 @@ uint8_t nrf24l01p_ng_reg8_mod(const nrf24l01p_ng_t *dev, uint8_t reg_addr,
 }
 #endif
 
-#endif /* NRF24L01P_NG_REGISTERS_H */
 /** @} */
+#endif /* NRF24L01P_NG_REGISTERS_H */

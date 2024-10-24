@@ -214,5 +214,5 @@ void isotp_free_rx(can_rx_data_t *rx);
 }
 #endif
 
-#endif /* CAN_ISOTP_H */
 /** @} */
+#endif /* CAN_ISOTP_H */

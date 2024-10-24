@@ -274,5 +274,5 @@ void credman_reset(void);
 }
 #endif
 
-#endif /* NET_CREDMAN_H */
 /** @} */
+#endif /* NET_CREDMAN_H */

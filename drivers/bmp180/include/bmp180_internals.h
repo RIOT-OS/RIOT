@@ -57,5 +57,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BMP180_INTERNALS_H */
 /** @} */
+#endif /* BMP180_INTERNALS_H */
