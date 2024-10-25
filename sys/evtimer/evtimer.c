@@ -125,7 +125,7 @@ static void _update_head_offset(evtimer_t *evtimer)
 
 void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
 {
-    irq_disable();
+    unsigned state = irq_disable();
 
     DEBUG("evtimer_add(): adding event with offset %" PRIu32 "\n", event->offset);
 
@@ -134,7 +134,7 @@ void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
     if (evtimer->events == event) {
         _set_timer(evtimer);
     }
-    irq_enable();
+    irq_restore(state);
     if (sched_context_switch_request) {
         thread_yield_higher();
     }
