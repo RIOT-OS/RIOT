@@ -30,7 +30,7 @@ extern "C" {
 
 #ifndef DOXYGEN /* Doxygen is in core/include/thread.h */
 
-static inline __attribute__((always_inline)) void thread_yield_higher(void)
+static inline __attribute__((always_inline)) void thread_yield_higher_arch(void)
 {
     if (irq_is_in()) {
         sched_context_switch_request = 1;

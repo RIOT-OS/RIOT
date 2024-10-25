@@ -24,6 +24,7 @@
 
 #include "list.h"
 #include "cib.h"
+#include "irq.h"
 #include "msg.h"
 
 #ifdef __cplusplus
