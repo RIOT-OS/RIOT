@@ -175,6 +175,29 @@ static inline void event_periodic_callback_stop(event_periodic_callback_t *event
     event_periodic_stop(&event->periodic);
 }
 
+/**
+ * @brief   Initialize and start a periodic callback event that will be executed once
+ *
+ * This is a convenience function that combines @ref event_periodic_callback_init
+ * and @ref event_periodic_callback_start
+ *
+ * @param[out]  event           event_periodic_callback object to initialize
+ * @param[in]   queue           queue that the timed-out event will be added to
+ * @param[in]   clock           the clock to configure this timer on
+ * @param[in]   timeout         time after which the event should be executed
+ * @param[in]   callback        callback to set up
+ * @param[in]   arg             callback argument to set up
+ */
+static inline void event_periodic_callback_oneshot(event_periodic_callback_t *event,
+                                                   event_queue_t *queue,
+                                                   ztimer_clock_t *clock, uint32_t timeout,
+                                                   void (*callback)(void *), void *arg)
+{
+    event_periodic_callback_init(event, clock, queue, callback, arg);
+    event->periodic.count = 1;
+    event_periodic_callback_start(event, timeout);
+}
+
 #ifdef __cplusplus
 }
 #endif
