@@ -41,3 +41,23 @@ include $(RIOTBASE)/Makefile.include
 ifndef CONFIG_GNRC_PKTBUF_SIZE
   CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=4096
 endif
+
+ifneq (,$(filter native native64,$(BOARD)))
+	CFLAGS += -DTHREAD_STACKSIZE_MAIN=8192
+else
+	CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+endif
+
+# Loop delay
+ifneq (,$(filter fdcan,$(USEMODULE)))
+	ifneq (1,$(RIOT_CI_BUILD))
+		# Check your CAN transceiver datasheet to apply the good loop delay in nanoseconds.
+		# This configuration is mandatory if you are using CAN FD with bitrate switching.
+		# Can be configured here or through Kconfig
+		#CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
+
+	# Allow only a default value for CI
+	else
+		CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
+	endif
+endif
