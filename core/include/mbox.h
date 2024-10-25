@@ -110,6 +110,7 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking);
  */
 static inline void mbox_put(mbox_t *mbox, msg_t *msg)
 {
+    assume(irq_is_in() || irq_is_enabled());
     _mbox_put(mbox, msg, BLOCKING);
 }
 
@@ -140,6 +141,7 @@ static inline int mbox_try_put(mbox_t *mbox, msg_t *msg)
  */
 static inline void mbox_get(mbox_t *mbox, msg_t *msg)
 {
+    assume(irq_is_in() || irq_is_enabled());
     _mbox_get(mbox, msg, BLOCKING);
 }
 

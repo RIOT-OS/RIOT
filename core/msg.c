@@ -38,7 +38,8 @@
 #include "debug.h"
 
 static int _msg_receive(msg_t *m, int block);
-static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block);
+static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
+                     unsigned state);
 
 static int queue_msg(thread_t *target, const msg_t *m)
 {
@@ -63,32 +64,28 @@ static int queue_msg(thread_t *target, const msg_t *m)
 
 int msg_send(msg_t *m, kernel_pid_t target_pid)
 {
-    assert(irq_is_enabled());
-
     if (irq_is_in()) {
         return msg_send_int(m, target_pid);
     }
     if (thread_getpid() == target_pid) {
         return msg_send_to_self(m);
     }
-    irq_disable();
-    return _msg_send(m, target_pid, true);
+    return _msg_send(m, target_pid, true, irq_disable());
 }
 
 int msg_try_send(msg_t *m, kernel_pid_t target_pid)
 {
-    assert(irq_is_enabled());
     if (irq_is_in()) {
         return msg_send_int(m, target_pid);
     }
     if (thread_getpid() == target_pid) {
         return msg_send_to_self(m);
     }
-    irq_disable();
-    return _msg_send(m, target_pid, false);
+    return _msg_send(m, target_pid, false, irq_disable());
 }
 
-static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
+static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
+                     unsigned state)
 {
 #ifdef DEVELHELP
     if (!pid_is_valid(target_pid)) {
@@ -102,7 +99,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
 
     if (target == NULL) {
         DEBUG("msg_send(): target thread %d does not exist\n", target_pid);
-        irq_enable();
+        irq_restore(state);
         return -1;
     }
 
@@ -122,7 +119,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
             DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid
                   " has a msg_queue. Queueing message.\n", __FILE__,
                   __LINE__, target_pid);
-            irq_enable();
+            irq_restore(state);
             if (me->status == STATUS_REPLY_BLOCKED
                 || (IS_USED(MODULE_CORE_THREAD_FLAGS) &&
                     sched_context_switch_request)
@@ -135,7 +132,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         if (!block) {
             DEBUG("msg_send: %" PRIkernel_pid ": Receiver not waiting, "
                   "block=%d\n", me->pid, block);
-            irq_enable();
+            irq_restore(state);
             return 0;
         }
 
@@ -162,7 +159,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         thread_flags_wake(target);
 #endif
 
-        irq_enable();
+        irq_restore(state);
         thread_yield_higher();
 
         DEBUG("msg_send: %" PRIkernel_pid ": Back from send block.\n",
@@ -177,7 +174,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
-        irq_enable();
+        irq_restore(state);
         thread_yield_higher();
     }
 
@@ -186,13 +183,12 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
 
 int msg_send_to_self(msg_t *m)
 {
-    assert(irq_is_enabled());
-    irq_disable();
+    unsigned state = irq_disable();
 
     m->sender_pid = thread_getpid();
     int res = queue_msg(thread_get_active(), m);
 
-    irq_enable();
+    irq_restore(state);
     return res;
 }
 
@@ -246,7 +242,6 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 
 int msg_send_bus(msg_t *m, msg_bus_t *bus)
 {
-    assert(irq_is_enabled());
     const bool in_irq = irq_is_in();
     const uint32_t event_mask = (1UL << (m->type & 0x1F));
     int count = 0;
@@ -254,7 +249,7 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
     m->sender_pid = (in_irq ? KERNEL_PID_ISR : thread_getpid())
                     | MSB_BUS_PID_FLAG;
 
-    irq_disable();
+    unsigned state = irq_disable();
 
     for (list_node_t *e = bus->subs.next; e; e = e->next) {
         msg_bus_entry_t *subscriber = container_of(e, msg_bus_entry_t, next);
@@ -268,7 +263,7 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
         }
     }
 
-    irq_enable();
+    irq_restore(state);
 
     if (sched_context_switch_request && !in_irq) {
         thread_yield_higher();
@@ -279,9 +274,8 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
 
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
-    assert(irq_is_enabled());
     assert(thread_getpid() != target_pid);
-    irq_disable();
+    unsigned state = irq_disable();
     thread_t *me = thread_get_active();
 
     sched_set_status(me, STATUS_REPLY_BLOCKED);
@@ -291,13 +285,12 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
      * overwritten if the target is not in RECEIVE_BLOCKED */
     *reply = *m;
     /* msg_send blocks until reply received */
-    return _msg_send(reply, target_pid, true);
+    return _msg_send(reply, target_pid, true, state);
 }
 
 int msg_reply(msg_t *m, msg_t *reply)
 {
-    assert(irq_is_enabled());
-    irq_disable();
+    unsigned state = irq_disable();
 
     thread_t *target = thread_get_unchecked(m->sender_pid);
 
@@ -307,7 +300,7 @@ int msg_reply(msg_t *m, msg_t *reply)
         DEBUG("msg_reply(): %" PRIkernel_pid ": Target \"%" PRIkernel_pid
               "\" not waiting for reply.", thread_getpid(),
               target->pid);
-        irq_enable();
+        irq_restore(state);
         return -1;
     }
 
@@ -320,7 +313,7 @@ int msg_reply(msg_t *m, msg_t *reply)
     sched_set_status(target, STATUS_PENDING);
     uint16_t target_prio = target->priority;
 
-    irq_enable();
+    irq_restore(state);
     sched_switch(target_prio);
 
     return 1;
@@ -360,8 +353,7 @@ int msg_receive(msg_t *m)
 
 static int _msg_receive(msg_t *m, int block)
 {
-    assert(irq_is_enabled());
-    irq_disable();
+    unsigned state = irq_disable();
 
     DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive.\n",
           thread_getpid());
@@ -376,7 +368,7 @@ static int _msg_receive(msg_t *m, int block)
 
     /* no message, fail */
     if ((!block) && ((!me->msg_waiters.next) && (queue_index == -1))) {
-        irq_enable();
+        irq_restore(state);
         return -1;
     }
 
@@ -400,14 +392,14 @@ static int _msg_receive(msg_t *m, int block)
                   "blocked.\n", thread_getpid());
             sched_set_status(me, STATUS_RECEIVE_BLOCKED);
 
-            irq_enable();
+            irq_restore(state);
             thread_yield_higher();
 
             /* sender copied message */
             assert(thread_get_active()->status != STATUS_RECEIVE_BLOCKED);
         }
         else {
-            irq_enable();
+            irq_restore(state);
         }
 
         return 1;
@@ -438,7 +430,7 @@ static int _msg_receive(msg_t *m, int block)
             sender_prio = sender->priority;
         }
 
-        irq_enable();
+        irq_restore(state);
         if (sender_prio < THREAD_PRIORITY_IDLE) {
             sched_switch(sender_prio);
         }
@@ -500,15 +492,14 @@ void msg_init_queue(msg_t *array, int num)
 
 void msg_queue_print(void)
 {
-    assert(irq_is_enabled());
-    irq_disable();
+    unsigned state = irq_disable();
     thread_t *thread = thread_get_active();
 
     unsigned msg_counter = msg_avail();
 
     if (msg_counter < 1) {
         /* no msg queue */
-        irq_enable();
+        irq_restore(state);
         printf("No messages or no message queue\n");
         return;
     }
@@ -525,5 +516,5 @@ void msg_queue_print(void)
                ", content: %" PRIu32 " (%p)\n", i, m->sender_pid, m->type,
                m->content.value, m->content.ptr);
     }
-    irq_enable();
+    irq_restore(state);
 }

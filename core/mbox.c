@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void _wake_waiter(thread_t *thread)
+static void _wake_waiter(thread_t *thread, unsigned irqstate)
 {
     sched_set_status(thread, STATUS_PENDING);
 
@@ -37,7 +37,7 @@ static void _wake_waiter(thread_t *thread)
 
     uint16_t process_priority = thread->priority;
 
-    irq_enable();
+    irq_restore(irqstate);
     sched_switch(process_priority);
 }
 
@@ -59,8 +59,7 @@ static void _wait(list_node_t *wait_list)
 
 int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
 {
-    assert(irq_is_enabled());
-    irq_disable();
+    unsigned irqstate = irq_disable();
 
     list_node_t *next = list_remove_head(&mbox->readers);
 
@@ -70,7 +69,7 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
         thread_t *thread =
             container_of((clist_node_t *)next, thread_t, rq_entry);
         *(msg_t *)thread->wait_data = *msg;
-        _wake_waiter(thread);
+        _wake_waiter(thread, irqstate);
         return 1;
     }
     else {
@@ -80,7 +79,7 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
                 irq_disable();
             }
             else {
-                irq_enable();
+                irq_restore(irqstate);
                 return 0;
             }
         }
@@ -90,15 +89,14 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
         msg->sender_pid = thread_getpid();
         /* copy msg into queue */
         mbox->msg_array[cib_put_unsafe(&mbox->cib)] = *msg;
-        irq_enable();
+        irq_restore(irqstate);
         return 1;
     }
 }
 
 int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
 {
-    assert(irq_is_enabled());
-    irq_disable();
+    unsigned irqstate = irq_disable();
 
     if (cib_avail(&mbox->cib)) {
         DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIxPTR ": _tryget(): "
@@ -109,10 +107,10 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
         if (next) {
             thread_t *thread = container_of((clist_node_t *)next, thread_t,
                                             rq_entry);
-            _wake_waiter(thread);
+            _wake_waiter(thread, irqstate);
         }
         else {
-            irq_enable();
+            irq_restore(irqstate);
         }
         return 1;
     }
@@ -123,7 +121,7 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
         return 1;
     }
     else {
-        irq_enable();
+        irq_restore(irqstate);
         return 0;
     }
 }

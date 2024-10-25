@@ -35,13 +35,14 @@ void cond_init(cond_t *cond)
 void cond_wait(cond_t *cond, mutex_t *mutex)
 {
     assert(irq_is_enabled());
-    irq_disable();
     thread_t *me = thread_get_active();
 
+    irq_disable();
     sched_set_status(me, STATUS_COND_BLOCKED);
     thread_add_to_list(&cond->queue, me);
     irq_enable();
-
+    /* if a higher prio thread blocks on the mutex, mutex_unlock() will
+     * reschedule, so this has to happen after enabling interrupts */
     mutex_unlock(mutex);
     thread_yield_higher();
 

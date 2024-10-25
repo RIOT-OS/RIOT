@@ -334,7 +334,7 @@ void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
 
 void sched_change_priority(thread_t *thread, uint8_t priority)
 {
-    assert(irq_is_enabled());
+    assume(irq_is_in() || irq_is_enabled());
     assert(thread && (priority < SCHED_PRIO_LEVELS));
 
     if (thread->priority == priority) {
