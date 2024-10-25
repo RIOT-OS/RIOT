@@ -146,7 +146,7 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
     if (inst->fctrl != FCNTL_IEEE_RANGE_16 &&
         inst->fctrl != (FCNTL_IEEE_RANGE_16 | UWB_FCTRL_ACK_REQUESTED)) {
         /* on completion of a range request setup an event to keep listening */
-        event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+        event_callback_post(uwb_core_get_eventq(), &_rng_listen_event);
         return false;
     }
 
@@ -163,7 +163,7 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
     if (IS_ACTIVE(CONFIG_TWR_PRINTF_INITIATOR_ONLY) &&
         ((frame->code < UWB_DATA_CODE_DS_TWR && frame->src_address != _udev->uid) ||
          (frame->code >= UWB_DATA_CODE_DS_TWR && frame->dst_address != _udev->uid))) {
-        event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+        event_callback_post(uwb_core_get_eventq(), &_rng_listen_event);
         return true;
     }
 
@@ -183,9 +183,9 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
 #endif
     /* offload range data printing */
     memcpy(&_rng_data, &data, sizeof(uwb_core_rng_data_t));
-    event_post(uwb_core_get_eventq(), &_print_rng_data_event.super);
+    event_callback_post(uwb_core_get_eventq(), &_print_rng_data_event);
     /* on completion of a range request setup an event to keep listening */
-    event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+    event_callback_post(uwb_core_get_eventq(), &_rng_listen_event);
     return true;
 }
 
@@ -201,7 +201,7 @@ static bool _rx_timeout_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
 {
     (void)inst;
     (void)cbs;
-    event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+    event_callback_post(uwb_core_get_eventq(), &_rng_listen_event);
     return true;
 }
 
@@ -238,7 +238,7 @@ void uwb_core_rng_listen_enable(void)
 {
     _status |= TWR_STATUS_RESPONDER;
     /* post event to start listening */
-    event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+    event_callback_post(uwb_core_get_eventq(), &_rng_listen_event);
 }
 
 void uwb_core_rng_listen_disable(void)
