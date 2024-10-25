@@ -41,6 +41,8 @@ typedef struct {
     sock_udp_ep_t server_ep;                /**< forward Server endpoint */
     sock_udp_ep_t ep;                       /**< client endpoint */
     sock_udp_ep_t proxy_ep;                 /**< proxy endpoint */
+    gcoap_socket_type_t server_tl;          /**< forward server socket type */
+    gcoap_socket_type_t client_tl;          /**< client socket type */
     uint16_t mid;                           /**< message ID */
     uint8_t flags;                          /**< client flags */
 #if IS_USED(MODULE_NANOCOAP_CACHE)
