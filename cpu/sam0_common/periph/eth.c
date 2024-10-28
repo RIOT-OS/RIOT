@@ -185,6 +185,7 @@ static void _init_desc_buf(void)
     /* Initialize TX buffer descriptors */
     for (i=0; i < ETH_TX_BUFFER_COUNT; i++) {
         tx_desc[i].address = (uint32_t) tx_buf[i];
+        tx_desc[i].status = DESC_TX_STATUS_USED;
     }
     /* Set WRAP flag to indicate last buffer */
     tx_desc[i-1].status |= DESC_TX_STATUS_WRAP;
@@ -223,6 +224,11 @@ int sam0_eth_send(const struct iolist *iolist)
 
     if (_is_sleeping) {
         return -ENOTSUP;
+    }
+
+    /* wait until the current buffer is no longer in use */
+    while (!(tx_curr->status & DESC_TX_STATUS_USED)) {
+        thread_yield();
     }
 
     /* load packet data into TX buffer */
