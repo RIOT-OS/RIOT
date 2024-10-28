@@ -180,7 +180,7 @@ void luid_netdev_get_eui64(const netdev_t *netdev, eui64_t *addr);
  * @param[in]  len      length of the LUID in bytes
  * @param[in]  gen      custom LUID generator value
  */
-void luid_custom(void *buf, size_t len, int gen);
+void luid_custom(void *buf, size_t len, uint16_t gen);
 
 /**
  * @brief   Get a LUID base value
