@@ -12,6 +12,7 @@ USEMODULE += $(PERIPH_FEATURES)
 # Add all USED periph_% init modules unless they are blacklisted
 PERIPH_IGNORE_MODULES := \
   periph_cipher_aes_128_cbc \
+  periph_cipher_chacha20 \
   periph_clic \
   periph_common \
   periph_coretimer \
