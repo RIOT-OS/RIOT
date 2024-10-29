@@ -28,6 +28,11 @@ extern "C" {
 
 #include "psa/algorithm.h"
 #include "psa/error.h"
+#include "psa/key/bits.h"
+#include "psa/key/id.h"
+#include "psa/key/lifetime.h"
+#include "psa/key/usage.h"
+#include "psa/key/type.h"
 
 /**
  * @brief   For encrypt-decrypt functions, whether the operation is an encryption
@@ -37,30 +42,6 @@ typedef enum {
     PSA_CRYPTO_DRIVER_DECRYPT,
     PSA_CRYPTO_DRIVER_ENCRYPT
 } psa_encrypt_or_decrypt_t;
-
-/**
- * @brief   The type of PSA finite-field Diffie-Hellman group family identifiers.
- *
- * @details The group family identifier is required to create a finite-field Diffie-Hellman
- *          key using the @ref PSA_KEY_TYPE_DH_KEY_PAIR() or @ref PSA_KEY_TYPE_DH_PUBLIC_KEY()
- *          macros.
- *
- *          The specific Diffie-Hellman group within a family is identified by the @c key_bits
- *          attribute of the key.
- */
-typedef uint8_t psa_dh_family_t;
-
-/**
- * @brief   The type of PSA elliptic curve family identifiers.
- *
- * @details The curve identifier is required to create an ECC key using the
- *          @ref PSA_KEY_TYPE_ECC_KEY_PAIR() or @ref PSA_KEY_TYPE_ECC_PUBLIC_KEY()
- *          macros.
- *
- *          The specific ECC curve within a family is identified by the @c key_bits
- *          attribute of the key.
- */
-typedef uint8_t psa_ecc_family_t;
 
 /**
  * @brief   The type of the state object for key derivation operations.
@@ -99,154 +80,6 @@ typedef struct psa_key_derivation_operation_s psa_key_derivation_operation_t;
  * @brief   Encoding of the step of a key derivation.
  */
 typedef uint16_t psa_key_derivation_step_t;
-
-/**
- * @brief   Key identifier.
- *
- * @details A key identifier can be a permanent name for a persistent key, or a transient reference
- *          to volatile key.
- */
-typedef uint32_t psa_key_id_t;
-
-/**
- * @brief   Encoding of key lifetimes.
- *
- * @details The lifetime of a key indicates where it is stored and which application and system
- *          actions will create and destroy it.
- *
- *          Lifetime values have the following structure:
- *          - Bits[7:0]: Persistence level
- *            This value indicates what device management actions can cause it to be destroyed.
- *            In particular, it indicates whether the key is volatile or persistent.
- *            See @ref psa_key_persistence_t for more information.
- *            @ref PSA_KEY_LIFETIME_GET_PERSISTENCE(@p lifetime) returns the persistence level for
- *            a key lifetime value.
- *          - Bits[31:8]: Location indicator
- *            This value indicates where the key material is stored (or at least where it is
- *            accessible in cleartext) and where operations on the key are performed. See
- *            @ref psa_key_location_t for more information.
- *            @ref PSA_KEY_LIFETIME_GET_LOCATION(@p lifetime) returns the location indicator for a
- *            key lifetime value.
- *
- *          Volatile keys are automatically destroyed when the application instance terminates or
- *          on a power reset of the device. Persistent keys are preserved until the application
- *          explicitly destroys them or until an implementation-specific device management event
- *          occurs, for example, a factor reset.
- *
- *          Persistent keys have a key identifier of type @ref psa_key_id_t. This identifier
- *          remains valid throughout the lifetime of the key, even if the application instance
- *          that created the key terminates.
- *
- *          This specification defines two basic lifetime values:
- *          - Keys with the lifetime @ref PSA_KEY_LIFETIME_VOLATILE are volatile. All
- *            implementations should support this lifetime.
- *          - Keys with the lifetime @ref PSA_KEY_LIFETIME_PERSISTENT are persistent. All
- *            implementations that have access to persistent storage with appropriate security
- *            guarantees should support this lifetime.
- */
-typedef uint32_t psa_key_lifetime_t;
-
-/**
- * @brief   Encoding of key location indicators.
- *
- * @details If an implementation of this API can make calls to external cryptoprocessors such as
- *          secure elements, the location of a key indicates which secure element performs the
- *          operations on the key. If the key material is not stored persistently inside the secure
- *          element, it must be stored in a wrapped form such that only the secure element can
- *          access the key material in cleartext.
- *
- * @note    Key location indicators are 24-bit values. Key management interfaces operate on
- *          lifetimes (type @ref psa_key_lifetime_t), and encode the location as the upper 24 bits
- *          of a 32-bit value.
- *
- *          Values for location indicators defined by this specification are shown below:
- *          - @c 0:  Primary local storage.
- *                   All implementations should support this value. The primary local storage is
- *                   typically the same storage area that contains the key metadata.
- *          - @c 1:  Primary secure element.
- *                   @note  As of now, this value is not supported by this implementation.
- *                          Use the vendor-defined location values.
- *
- *                   Implementations should support this value if there is a secure element
- *                   attached to the operating environment. As a guideline, secure elements may
- *                   provide higher resistance against side channel and physical attacks than the
- *                   primary local storage, but may have restrictions on supported key types,
- *                   sizes, policies and operations and may have different performance
- *                   characteristics.
- *          - @c 2–0x7fffff:    Other locations defined by a PSA specification.
- *                              The PSA Cryptography API does not currently assign any meaning to
- *                              these locations, but future versions of this specification or other
- *                              PSA specifications may do so.
- *          - @c 0x800000–0xffffff: Vendor-defined locations. No PSA specification will assign a
- *                                  meaning to locations in this range.
- */
-typedef uint32_t psa_key_location_t;
-
-/**
- * @brief   Encoding of key persistence levels.
- *
- * @details What distinguishes different persistence levels is which device management events can
- *          cause keys to be destroyed. For example, power reset, transfer of device ownership,
- *          or a factory reset are device management events that can affect keys at different
- *          persistence levels. The specific management events which affect persistent keys at
- *          different levels is outside the scope of the PSA Cryptography specification.
- *
- * @note    Key persistence levels are 8-bit values. Key management interfaces operate on lifetimes
- *          (type @ref psa_key_lifetime_t), and encode the persistence value as the lower 8 bits of
- *          a 32-bit value.
- *
- *          Values for persistence levels defined by this specification are shown below:
- *          - @c 0 =    @ref PSA_KEY_PERSISTENCE_VOLATILE : Volatile key.
- *                      A volatile key is automatically destroyed by the implementation when the
- *                      application instance terminates. In particular, a volatile key is
- *                      automatically destroyed on a power reset of the device.
- *          - @c 1 =    @ref PSA_KEY_PERSISTENCE_DEFAULT : Persistent key with a default lifetime.
- *                      Implementations should support this value if they support persistent keys
- *                      at all. Applications should use this value if they have no specific needs
- *                      that are only met by implementation-specific features.
- *          - @c 2–127: Persistent key with a PSA-specified lifetime. The PSA Cryptography
- *                      specification does not define the meaning of these values, but other PSA
- *                      specifications may do so.
- *          - @c 128–254:   Persistent key with a vendor-specified lifetime. No PSA specification
- *                          will define the meaning of these values, so implementations may choose
- *                          the meaning freely. As a guideline, higher persistence levels should
- *                          cause a key to survive more management events than lower levels.
- *          - @c 255 =  @ref PSA_KEY_PERSISTENCE_READ_ONLY : Read-only or write-once key.
- *                      A key with this persistence level cannot be destroyed. Implementations that
- *                      support such keys may either allow their creation through the PSA
- *                      Cryptography API, preferably only to applications with the appropriate
- *                      privilege, or only expose keys created through implementation-specific
- *                      means such as a factory ROM engraving process.
- *                      @note   Keys that are read-only due to policy restrictions rather than
- *                              due to physical limitations should not have this persistence level.
- */
-typedef uint8_t psa_key_persistence_t;
-
-/**
- * @brief   Encoding of a key type.
- *
- * @details This is a structured bitfield that identifies the category and type of key. The range
- *          of key type values is divided as follows:
- *          - @ref PSA_KEY_TYPE_NONE == @c 0:
- *            Reserved as an invalid key type.
- *          - @c 0x0001–0x7fff:
- *            Specification-defined key types. Key types defined by this standard always have bit
- *            15 clear. Unallocated key type values in this range are reserved for future use.
- *          - @c 0x8000–0xffff:
- *            Implementation-defined key types. Implementations that define additional key types
- *            must use an encoding with bit 15 set.
- */
-typedef uint16_t psa_key_type_t;
-
-/**
- * @brief   Encoding of permitted usage on a key.
- */
-typedef uint32_t psa_key_usage_t;
-
-/**
- * @brief   Public interfaces use @c size_t, but internally we use a smaller type.
- */
-typedef uint16_t psa_key_bits_t;
 
 /* These are all temporarily defined as some numeric type to prevent errors at compile time.*/
 /**
