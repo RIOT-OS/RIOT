@@ -583,18 +583,6 @@ static inline void *coap_get_token(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Get the total header length (4-byte header + token length)
- *
- * @param[in]   pkt   CoAP packet
- *
- * @returns     total header length
- */
-static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
-{
-    return sizeof(coap_hdr_t) + coap_get_token_len(pkt);
-}
-
-/**
  * @brief   Get the total length of a CoAP packet in the packet buffer
  *
  * @note This does not include possible payload snips.
@@ -674,6 +662,19 @@ static inline uint8_t coap_hdr_tkl_ext_len(const coap_hdr_t *hdr)
 static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
 {
     return ((uint8_t *)hdr) + sizeof(coap_hdr_t) + coap_hdr_tkl_ext_len(hdr);
+}
+
+/**
+ * @brief   Get the total header length (4-byte header + token length)
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     total header length
+ */
+static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
+{
+    return sizeof(coap_hdr_t) + coap_hdr_tkl_ext_len(pkt->hdr) +
+           coap_get_token_len(pkt);
 }
 
 /**
