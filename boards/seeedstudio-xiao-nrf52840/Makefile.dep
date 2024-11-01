@@ -1,0 +1,17 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
+# default to using littlefs2 on the external flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += mtd
+endif
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
+include $(RIOTBOARD)/common/nrf52/Makefile.dep
