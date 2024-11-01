@@ -12,6 +12,10 @@ Cortex-M4 STM32L433RC microcontroller with 64KiB of RAM and 256KiB of Flash.
 
 ![Nucleo64 L433RC](https://www.st.com/bin/ecommerce/api/image.PF264788.en.feature-description-include-personalized-no-cpn-large.jpg)
 
+### Pinout
+
+@image html pinouts/nucleo-l433rc.svg "Pinout for the Nucleo-L433RC (from STM user manual, UM2206, http://www.st.com/resource/en/user_manual/um2206-stm32-nucleo64p-boards-mb1319-stmicroelectronics.pdf, page 37)" width=50%
+
 ### MCU
 
 | MCU        |   STM32L476RG       |
