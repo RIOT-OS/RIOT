@@ -352,6 +352,10 @@ struct _coap_request_ctx {
 #endif
 };
 
+/* forward declarations */
+static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
+static inline size_t coap_hdr_get_token_len(const coap_hdr_t *hdr);
+
 /**
  * @brief   Get resource path associated with a CoAP request
  *
@@ -548,27 +552,8 @@ static inline unsigned coap_get_id(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
-    uint8_t tkl = pkt->hdr->ver_t_tkl & 0xf;
-
-    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        return tkl;
-    }
-
-    void *ext = pkt->hdr + 1;
-    switch (tkl) {
-    case 13:
-        return tkl + *(uint8_t *)ext;
-    case 14:
-        return tkl + 255 + byteorder_bebuftohs(ext);
-    case 15:
-        assert(0);
-        /* fall-through */
-    default:
-        return tkl;
-    }
+    return coap_hdr_get_token_len(pkt->hdr);
 }
-
-static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
 
 /**
  * @brief   Get pointer to a message's token
@@ -713,6 +698,65 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
 
     hdr->ver_t_tkl &= ~0x30;
     hdr->ver_t_tkl |= type << 4;
+}
+
+/**
+ * @brief       Get the token length of a CoAP over UDP (DTLS) packet
+ * @param[in]   hdr     CoAP over UDP header
+ * @return      The size of the token in bytes
+ *
+ * @warning     This API is super goofy. It assumes that the packet is valid
+ *              and will read more than `sizeof(*hdr)` into the data `hdr`
+ *              points to while crossing fingers hard.
+ *
+ * @deprecated  This function was introduced to keep legacy code alive.
+ *              Introducing new callers should be avoided. In the RX path an
+ *              @ref coap_pkt_t will be available, so that you can call
+ *              @ref coap_get_token instead. In the TX path the token was
+ *              added by us, so we really should know.
+ */
+static inline size_t coap_hdr_get_token_len(const coap_hdr_t *hdr)
+{
+    const uint8_t *buf = (const void *)hdr;
+    /* Regarding use unnamed magic numbers 13 and 269:
+     * - If token length is < 13 it fits into TKL field (4 bit)
+     * - If token length is < 269 it fits into 8-bit extended TKL field
+     * - Otherwise token length goes into 16-bit extended TKL field.
+     *
+     * (Not using named constants here, as RFC 8974 also has no names for those
+     * magic numbers.)
+     *
+     * See: https://www.rfc-editor.org/rfc/rfc8974#name-extended-token-length-tkl-f
+     */
+    switch (coap_hdr_tkl_ext_len(hdr)) {
+    case 0:
+        return hdr->ver_t_tkl & 0xf;
+    case 1:
+        return buf[sizeof(coap_hdr_t)] + 13;
+    case 2:
+        return byteorder_bebuftohs(buf + sizeof(coap_hdr_t)) + 269;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief       Get the header length of a CoAP packet.
+ *
+ * @warning     This API is super goofy. It assumes that the packet is valid
+ *              and will read more than `sizeof(*hdr)` into the data `hdr`
+ *              points to while crossing fingers hard.
+ *
+ * @deprecated  This function was introduced to keep legacy code alive.
+ *              Introducing new callers should be avoided. In the RX path an
+ *              @ref coap_pkt_t will be available, so that you can call
+ *              @ref coap_get_total_hdr_len instead. In the TX path the header
+ *              was created by us (e.g. using @ref coap_build_hdr which returns
+ *              the header size), so we really should know already.
+ */
+static inline size_t coap_hdr_len(const coap_hdr_t *hdr)
+{
+    return sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr) + coap_hdr_get_token_len(hdr);
 }
 /**@}*/
 
