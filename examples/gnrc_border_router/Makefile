@@ -57,6 +57,9 @@ endif
 ifeq (dhcpv6,$(PREFIX_CONF))
   # include DHCPv6 client for 6LoWPAN border router
   USEMODULE += gnrc_dhcpv6_client_6lbr
+  # optionally also request an address via IA_NA in addition to the prefix.
+  # this is not needed when using SLAAC
+  USEMODULE += dhcpv6_client_ia_na
 else ifeq (uhcp,$(PREFIX_CONF))
   # include UHCP client
   USEMODULE += gnrc_uhcpc
