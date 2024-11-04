@@ -258,6 +258,24 @@ of code.
 #endif
 ```
 
+### Include What You Use (IWYU)
+
+`#include` directives that are not actually needed should be removed to reduce
+clutter and improve compilation speed. Similar: Try to add the corresponding
+`#include`s for all the functions, macros, types, etc. used and do not rely on
+`bar.h` to implicitly include `foo.h`, unless this is documented behavior.
+
+Tools such as [clang's Include Cleaner][clangd-include-cleaner] can help with
+that. These tools may show false positives in cases where headers are *expected*
+to be included indirectly: E.g. if `foo.h` is the public header that contains
+common helpers and implementations, but a per platform `foo_arch.h` is included
+from within `foo.h` for platform specific implementations. If in this scenario
+only functions provided by `foo_arch.h` are included, the `#include` of `foo.h`
+is considered as unused. To avoid this, one should add
+[`/* IWYU pragma: export */`](https://github.com/include-what-you-use/include-what-you-use/blob/master/docs/IWYUPragmas.md) after `#include "foo_arch.h"` in `foo.h`.
+
+[clangd-include-cleaner]: https://clangd.llvm.org/design/include-cleaner
+
 ## Header Guards
 
 All files are required to have header guards of the form
