@@ -1,7 +1,8 @@
 # Application Example with Subfolders
 
 This example demonstrates the usage of subfolders in a RIOT application
-show-casing two possible approaches: RIOT modules and simple subfolders.
+(or in a RIOT module in general) show-casing two possible approaches: RIOT
+modules and simple subfolders.
 
 ## Details
 
