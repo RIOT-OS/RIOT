@@ -558,6 +558,13 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
                  ? COAP_TYPE_ACK
                  : COAP_TYPE_NON;
 
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        /* Worst case: 2 byte extended token length field.
+         * See https://www.rfc-editor.org/rfc/rfc8974#name-extended-token-length-tkl-f
+         */
+        hdr_len += 2;
+    }
+
     if (hdr_len > len) {
         return -ENOBUFS;
     }
@@ -583,6 +590,13 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
                 return 0;
             }
         }
+    }
+
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        /* we need to update the header length with the actual one, as we may
+         * have used less bytes for the extended token length fields as our
+         * worst case assumption */
+        hdr_len  = bufpos - (uint8_t *)buf;
     }
 
     if (payload) {

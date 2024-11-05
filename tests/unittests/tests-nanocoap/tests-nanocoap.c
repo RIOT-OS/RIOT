@@ -1099,15 +1099,35 @@ static void test_nanocoap__token_length_ext_16(void)
     uint8_t buf[32];
     coap_hdr_t *hdr = (void *)buf;
 
+    /* build a request with an overlong token (that mandates the use of
+     * an 8 bit extended token length field) */
     TEST_ASSERT_EQUAL_INT(21, coap_build_hdr(hdr, COAP_TYPE_CON,
                                              (void *)token, strlen(token),
-                                             COAP_CODE_204, 23));
+                                             COAP_METHOD_DELETE, 23));
+
+    /* parse the packet build, and verify it parses back as expected */
     coap_pkt_t pkt;
     int res = coap_parse(&pkt, buf, 21);
 
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(21, coap_get_total_hdr_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(204, coap_get_code_decimal(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_DELETE, coap_get_code_raw(&pkt));
+    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
+    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+    TEST_ASSERT_EQUAL_INT(13, hdr->ver_t_tkl & 0xf);
+
+    /* now build the corresponding reply and check that it parses back as
+     * expected */
+    uint8_t rbuf[sizeof(buf)];
+    ssize_t len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
+                                          sizeof(rbuf), 0, NULL, NULL);
+    TEST_ASSERT_EQUAL_INT(21, len);
+    res = coap_parse(&pkt, rbuf, 21);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(21, coap_get_total_hdr_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_DELETED, coap_get_code_raw(&pkt));
     TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
     TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
@@ -1128,15 +1148,36 @@ static void test_nanocoap__token_length_ext_269(void)
     uint8_t buf[280];
     coap_hdr_t *hdr = (void *)buf;
 
+    /* build a request with an overlong token (that mandates the use of
+     * an 16 bit extended token length field) */
     TEST_ASSERT_EQUAL_INT(275, coap_build_hdr(hdr, COAP_TYPE_CON,
                                              (void *)token, strlen(token),
-                                             COAP_CODE_204, 23));
+                                             COAP_METHOD_DELETE, 23));
+
+    /* parse the packet build, and verify it parses back as expected */
     coap_pkt_t pkt;
     int res = coap_parse(&pkt, buf, 275);
 
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(275, coap_get_total_hdr_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(204, coap_get_code_decimal(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_DELETE, coap_get_code_raw(&pkt));
+    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
+    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+    TEST_ASSERT_EQUAL_INT(14, hdr->ver_t_tkl & 0xf);
+
+    /* now build the corresponding reply and check that it parses back as
+     * expected */
+    uint8_t rbuf[sizeof(buf)];
+    ssize_t len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
+                                          sizeof(rbuf), 0, NULL, NULL);
+
+    TEST_ASSERT_EQUAL_INT(275, len);
+    res = coap_parse(&pkt, rbuf, 275);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(275, coap_get_total_hdr_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_DELETED, coap_get_code_raw(&pkt));
     TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
     TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
