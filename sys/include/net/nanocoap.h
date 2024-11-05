@@ -678,6 +678,22 @@ static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get the header length a response to the given packet will have
+ *
+ * @param[in]   pkt     CoAP packet to reply to
+ * @return      Length of the response header including token excluding
+ *              CoAP options and any payload marker
+ *
+ * @note    The main use case is the use of @ref coap_block2_build_reply, which
+ *          is building the CoAP header of the response after options and
+ *          payload have been added.
+ */
+static inline unsigned coap_get_response_hdr_len(const coap_pkt_t *pkt)
+{
+    return coap_get_total_hdr_len(pkt);
+}
+
+/**
  * @brief   Write the given raw message code to given CoAP header
  *
  * @param[out]  hdr     CoAP header to write to
@@ -1938,6 +1954,9 @@ static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
  * @param[in]   rlen        size of @p rbuf
  * @param[in]   payload_len length of payload
  * @param[in]   slicer      slicer to use
+ *
+ * @warning Use @ref coap_get_response_hdr_len to determine the size of the
+ *          header this will write.
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error

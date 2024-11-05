@@ -53,7 +53,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
     (void)context;
     coap_block_slicer_t slicer;
     coap_block2_init(pkt, &slicer);
-    uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
+    uint8_t *payload = buf + coap_get_response_hdr_len(pkt);
 
     uint8_t *bufpos = payload;
 
