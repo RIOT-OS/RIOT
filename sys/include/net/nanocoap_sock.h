@@ -110,10 +110,13 @@
  * Start with coap_block2_init() to read the client request and initialize a
  * coap_slicer_t struct with the size and location for this slice of the
  * overall payload. Then write the block2 option in the response with
- * coap_opt_put_block2(). The option includes an indicator ("more") that a
- * slice completes the overall payload transfer. You may not know the value for
- * _more_ at this point, but you must initialize the space in the packet for
- * the option before writing the payload. The option is rewritten later.
+ * coap_opt_put_block2(). Use @ref coap_get_response_hdr_len to get the length
+ * of the response header: This will be the offset in the buffer where you
+ * should start adding options. The Block2 option includes an indicator
+ * ("more") that a slice completes the overall payload transfer. You may not
+ * know the value for _more_ at this point, but you must initialize the space
+ * in the packet for the option before writing the payload. The option is
+ * rewritten later.
  *
  * Next, use the coap_blockwise_put_xxx() functions to write the payload
  * content. These functions use the coap_block_slicer_t to enable or disable
