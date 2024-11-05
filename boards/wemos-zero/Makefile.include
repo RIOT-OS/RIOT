@@ -5,12 +5,4 @@ include $(RIOTBOARD)/common/arduino-zero/Makefile.include
 # Depending on whether the board is running RIOT or the bootloader, it has
 # registers using a different vendor and model. We try to detect either.
 TTY_BOARD_FILTER := --model $(BOARD) --vendor 'RIOT-os\.org'
-PROG_TTY_BOARD_FILTER := --vendor 'Arduino LLC' --model 'Arduino Zero'
-TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
-                  --most-recent \
-                  --format path serial \
-                  $(TTY_BOARD_FILTER) || \
-                  $(RIOTTOOLS)/usb-serial/ttys.py \
-                  --most-recent \
-                  --format path serial \
-                  $(PROG_TTY_BOARD_FILTER_CLONE)
+PROG_TTY_BOARD_FILTER := --vendor 'Arduino LLC' --model '(Arduino|Genuino) Zero'
