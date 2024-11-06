@@ -302,15 +302,14 @@ int shell_parse_file(const shell_command_t *commands,
  * ```
  */
 #define SHELL_COMMAND(cmd, help, func) \
-    XFA_USE_CONST(shell_command_xfa_t*, shell_commands_xfa); \
+    XFA_USE_CONST(shell_command_xfa_t, shell_commands_xfa_v2); \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_name[] = #cmd; \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_desc[] = help; \
-    static const shell_command_xfa_t _xfa_ ## cmd ## _cmd = { \
+    XFA_CONST(shell_command_xfa_t, shell_commands_xfa_v2, 0) _xfa_ ## cmd ## _cmd = { \
         .name = _xfa_ ## cmd ## _cmd_name, \
         .desc = _xfa_ ## cmd ## _cmd_desc, \
         .handler = &func \
-    }; \
-    XFA_ADD_PTR(shell_commands_xfa, cmd, cmd, &_xfa_ ## cmd ## _cmd)
+    };
 #endif /* __cplusplus */
 
 #ifdef __cplusplus
