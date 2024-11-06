@@ -1,0 +1,44 @@
+# Periodic Wakeup Timer Example
+
+This example demonstrates how to set up a periodic wakeup timer using the RIOT operating system.
+
+## Overview
+
+The application sets up a timer that periodically wakes up the system and performs a specific task. This is useful for applications that need to perform regular actions, such as sensor readings or data transmissions.
+
+## Requirements
+
+- RIOT OS
+- A supported hardware platform
+
+## Setup
+
+1. Clone the RIOT repository:
+    ```sh
+    git clone https://github.com/RIOT-OS/RIOT.git
+    cd RIOT
+    ```
+
+2. Navigate to the example directory:
+    ```sh
+    cd examples/timer_periodic_wakeup
+    ```
+
+3. Build the application for your target hardware:
+    ```sh
+    make BOARD=<your-board>
+    ```
+
+4. Flash the application to your hardware:
+    ```sh
+    make flash
+    ```
+
+5. Connect to the board's serial console to observe the output:
+    ```sh
+    make term
+    ```
+
+## Usage
+
+Once the application is running, you should see periodic messages indicating that the timer has triggered and the system has woken up to perform its task.

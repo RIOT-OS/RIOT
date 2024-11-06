@@ -2,8 +2,7 @@ Thread-Duel
 ============
 
 This is a thread duel application to show RIOTs abilities to run multiple-threads
-concurrently, even if they are neither cooperative nor dividable into different scheduler priorities,
-by using the optional round-robin scheduler module.
+concurrently, even if they are neither cooperative nor dividable into different scheduler priorities, by using the optional round-robin scheduler module.
 
 Every thread will do some work (busy waiting).
 After the work is done it counts up by the amount of work it did and then it rests.
