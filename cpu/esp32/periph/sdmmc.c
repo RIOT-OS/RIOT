@@ -111,9 +111,9 @@ static_assert(SDMMC_CONFIG_NUMOF == ARRAY_SIZE(_sdmmc_devs),
 static_assert(SDMMC_CONFIG_NUMOF <= SOC_SDMMC_NUM_SLOTS,
               "SDMMC_CONFIG_NUMOF is greater than the supported number of slots");
 
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_0 = (sdmmc_dev_t * const)&_sdmmc_devs[0];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_0 = (sdmmc_dev_t * const)&_sdmmc_devs[0];
 #if SDMMC_CONFIG_NUMOF > 1
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_1 = (sdmmc_dev_t * const)&_sdmmc_devs[1];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_1 = (sdmmc_dev_t * const)&_sdmmc_devs[1];
 #endif
 
 /* forward declaration of internal functions */
