@@ -18,6 +18,7 @@ extern "C" {
 typedef struct {
     unsigned val;
     const char *text;
+    char letter;
 } xfatest_t;
 
 #endif /* DOXYGEN */
