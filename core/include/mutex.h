@@ -254,6 +254,17 @@ static inline void mutex_init(mutex_t *mutex)
 }
 
 /**
+ * @brief   Initializes a mutex object in a locked state.
+ * @details For initialization of variables use MUTEX_INIT_LOCKED instead.
+ *          Only use the function call for dynamically allocated mutexes.
+ * @param[out]      mutex   pre-allocated mutex structure, must not be NULL.
+ */
+static inline void mutex_init_locked(mutex_t *mutex)
+{
+    *mutex = (mutex_t)MUTEX_INIT_LOCKED;
+}
+
+/**
  * @brief   Initialize a mutex cancellation structure
  * @param   mutex       The mutex that the calling thread wants to lock
  * @return  The cancellation structure for use with @ref mutex_lock_cancelable
