@@ -144,9 +144,9 @@ static_assert(SDHC_CONFIG_NUMOF < 3, "MCU supports only 2 SDHC peripherals");
 static_assert(SDHC_CONFIG_NUMOF < 2, "MCU supports only 1 SDHC peripheral");
 #endif
 
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_0 = (sdmmc_dev_t * const)&_sdhc_devs[0];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_0 = (sdmmc_dev_t * const)&_sdhc_devs[0];
 #if SDHC_CONFIG_NUMOF > 1
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_1 = (sdmmc_dev_t * const)&_sdhc_devs[1];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_1 = (sdmmc_dev_t * const)&_sdhc_devs[1];
 #endif
 
 static int _set_clock_rate(sdmmc_dev_t *dev, sdmmc_clock_rate_t rate);

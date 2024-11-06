@@ -43,18 +43,18 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * @internal
  */
-#define _XFA(name, prio) \
+#define _XFA(type, name, prio) \
     NO_SANITIZE_ARRAY \
-    __attribute__((used, section(".xfa." #name "." #prio)))
+    __attribute__((used, section(".xfa." #name "." #prio))) _Alignas(type) type
 
 /**
  * @brief helper macro for other XFA_* macros
  *
  * @internal
  */
-#define _XFA_CONST(name, prio) \
+#define _XFA_CONST(type, name, prio) \
     NO_SANITIZE_ARRAY \
-    __attribute__((used, section(".roxfa." #name "." #prio)))
+    __attribute__((used, section(".roxfa." #name "." #prio))) _Alignas(type) type
 
 /**
  * @brief Define a read-only cross-file array
@@ -73,8 +73,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define XFA_INIT_CONST(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    _XFA_CONST(name, 0_) type name [0] = {}; \
-    _XFA_CONST(name, 9_) type name ## _end [0] = {}; \
+    _XFA_CONST(type, name, 0_) name [0] = {}; \
+    _XFA_CONST(type, name, 9_) name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
     extern const unsigned __xfa_dummy
 
@@ -95,8 +95,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define XFA_INIT(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    _XFA(name, 0_) type name [0] = {}; \
-    _XFA(name, 9_) type name ## _end [0] = {}; \
+    _XFA(type, name, 0_) name [0] = {}; \
+    _XFA(type, name, 9_) name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
     extern const unsigned __xfa_dummy
 
@@ -136,12 +136,13 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * Add this to the type in a variable definition, e.g.:
  *
- *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
+ *     XFA(driver_params_t, driver_params, 0) _onboard = { .pin=42 };
  *
+ * @param[in]   type        type of the xfa elements
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
  */
-#define XFA(xfa_name, prio) _XFA(xfa_name, 5_ ## prio)
+#define XFA(type, xfa_name, prio) _XFA(type, xfa_name, 5_ ## prio)
 
 /**
  * @brief Define variable in read-only cross-file array
@@ -150,12 +151,13 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * Add this to the type in a variable definition, e.g.:
  *
- *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
+ *     XFA(driver_params_t, driver_params, 0) _onboard = { .pin=42 };
  *
+ * @param[in]   type        type of the xfa elements
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
  */
-#define XFA_CONST(xfa_name, prio) _XFA_CONST(xfa_name, 5_ ## prio)
+#define XFA_CONST(type, xfa_name, prio) _XFA_CONST(type, xfa_name, 5_ ## prio)
 
 /**
  * @brief Add a pointer to cross-file array
@@ -174,8 +176,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * @param[in]   entry       pointer variable to add to xfa
  */
 #define XFA_ADD_PTR(xfa_name, prio, name, entry) \
-    _XFA_CONST(xfa_name, 5_ ## prio) \
-    __typeof__(entry) xfa_name ## _ ## prio ## _ ## name = entry
+    _XFA_CONST(__typeof__(entry), xfa_name, 5_ ## prio) \
+    xfa_name ## _ ## prio ## _ ## name = entry
 
 /**
  * @brief Calculate number of entries in cross-file array

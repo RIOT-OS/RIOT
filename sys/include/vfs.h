@@ -330,8 +330,8 @@ extern "C" {
 #define VFS_AUTO_MOUNT(type, mtd, path, idx)        \
     static type ## _desc_t fs_desc_ ## idx = mtd;   \
                                                     \
-    XFA(vfs_mountpoints_xfa, 0)                     \
-    vfs_mount_t _mount_mtd_ ## idx = {              \
+    XFA(vfs_mount_t, vfs_mountpoints_xfa, 0)        \
+    _mount_mtd_ ## idx = {                          \
         .fs = &type ## _file_system,                \
         .mount_point = path,                        \
         .private_data = &fs_desc_ ## idx,           \

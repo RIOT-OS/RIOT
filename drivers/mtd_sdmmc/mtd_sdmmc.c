@@ -194,7 +194,7 @@ const mtd_desc_t mtd_sdmmc_driver = {
         .sdmmc_idx = n,                     \
     };                                      \
                                             \
-    XFA_CONST(mtd_dev_xfa, m) mtd_dev_t CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdmmc_dev ## n
+    XFA_CONST(mtd_dev_t, mtd_dev_xfa, m) CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdmmc_dev ## n
 
 #if IS_USED(MODULE_MTD_SDCARD_DEFAULT)
 /* we use /sd1 as default mount point for coexistence with mtd_sdcard */
