@@ -41,6 +41,7 @@ extern "C" {
 #define CC2538_AUTOCRC_LEN          (2)
 #define CC2538_RF_FIFO_SIZE         (128)
 #define CC2538_PACKET_LENGTH_SIZE   (1)
+#define CC2538_LENGTH_BYTE_MASK     (0x7F) /**< Mask for the length byte in the packet */
 
 #define CC2538_RF_MAX_DATA_LEN (CC2538_RF_FIFO_SIZE - CC2538_PACKET_LENGTH_SIZE)
 
