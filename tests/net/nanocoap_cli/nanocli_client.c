@@ -25,15 +25,14 @@
 
 #include "net/coap.h"
 #include "net/gnrc/netif.h"
-#include "net/ipv6.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
-#include "net/sock/udp.h"
 #include "net/sock/util.h"
-
 #include "od.h"
+#include "shell.h"
 
-static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str)
+static ssize_t _send(coap_pkt_t *pkt, size_t len,
+                          char *addr_str, const char *port_str)
 {
     ipv6_addr_t addr;
     sock_udp_ep_t remote;
@@ -81,7 +80,7 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
     return nanocoap_request(pkt, NULL, &remote, len);
 }
 
-int nanotest_client_cmd(int argc, char **argv)
+static int _cmd_client(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = {"get", "post", "put"};
@@ -166,7 +165,10 @@ int nanotest_client_cmd(int argc, char **argv)
     return 1;
 }
 
-static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
+SHELL_COMMAND(client, "CoAP client", _cmd_client);
+
+static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf,
+                         size_t len, int more)
 {
     (void)arg;
     (void)more;
@@ -180,7 +182,7 @@ static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int
     return 0;
 }
 
-int nanotest_client_url_cmd(int argc, char **argv)
+static int _cmd_url(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = { "get", "post", "put", "delete" };
@@ -248,6 +250,8 @@ error:
     return -1;
 }
 
+SHELL_COMMAND(url, "CoAP client URL request", _cmd_url);
+
 static const char song[] =
     "Join us now and share the software;\n"
     "You'll be free, hackers, you'll be free.\n"
@@ -269,7 +273,7 @@ static const char song[] =
     "Join us now and share the software;\n"
     "You'll be free, hackers, you'll be free.\n";
 
-int nanotest_client_put_cmd(int argc, char **argv)
+static int _cmd_put(int argc, char **argv)
 {
     int res;
     nanocoap_sock_t sock;
@@ -304,7 +308,9 @@ int nanotest_client_put_cmd(int argc, char **argv)
     return res;
 }
 
-int nanotest_client_put_non_cmd(int argc, char **argv)
+SHELL_COMMAND(put, "experimental put", _cmd_put);
+
+static int _cmd_put_non(int argc, char **argv)
 {
     int res;
 
@@ -323,7 +329,9 @@ int nanotest_client_put_non_cmd(int argc, char **argv)
     return res;
 }
 
-int nanotest_client_get_non_cmd(int argc, char **argv)
+SHELL_COMMAND(put_non, "non-confirmable put", _cmd_put_non);
+
+static int _cmd_get_non(int argc, char **argv)
 {
     int res;
 
@@ -348,3 +356,5 @@ int nanotest_client_get_non_cmd(int argc, char **argv)
     }
     return res;
 }
+
+SHELL_COMMAND(get_non, "non-confirmable get", _cmd_get_non);
