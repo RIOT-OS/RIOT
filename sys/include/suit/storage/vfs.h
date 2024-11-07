@@ -18,7 +18,7 @@
  * #include "xfa.h"
  *
  * XFA_USE(char*, suit_storage_files_reg);
- * XFA(suit_storage_files_reg, 0) char* _firmware_0 = VFS_DEFAULT_DATA "/FW0.TXT";
+ * XFA(char*, suit_storage_files_reg, 0) _firmware_0 = VFS_DEFAULT_DATA "/FW0.TXT";
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Once registered its content may be securely updated via SUIT by specifying the

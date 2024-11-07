@@ -226,7 +226,7 @@ const mtd_desc_t mtd_sdcard_driver = {
         .params = &sdcard_spi_params[n]     \
     };                                      \
                                             \
-    XFA_CONST(mtd_dev_xfa, m) mtd_dev_t CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdcard_dev ## n
+    XFA_CONST(mtd_dev_t, mtd_dev_xfa, m) CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdcard_dev ## n
 
 #define MTD_SDCARD_DEV_FS(n, m, filesystem) \
     VFS_AUTO_MOUNT(filesystem, VFS_MTD(mtd_sdcard_dev ## n), VFS_DEFAULT_SD(n), m)
