@@ -1280,8 +1280,128 @@ static void test_nanocoap__out_of_bounds_option(void)
         /* End of packet - 4 bytes before the claimed end of option */
     };
 
+    uint8_t invalid_msg_tcp[] = {
+        (5U << 4) | 3, /* Data Length = 5, Token Len = 3 */
+        COAP_METHOD_GET,
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 8 */
+        (COAP_OPT_URI_PATH << 4) | (5),
+        0x13, 0x37, 0x42, 0x42 /* 4 bytes Option Data */
+        /* End of packet - 1 bytes before the claimed end of option */
+    };
+
     coap_pkt_t pkt;
     TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse_udp(&pkt, invalid_msg_udp, sizeof(invalid_msg_udp)));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse_tcp(&pkt, invalid_msg_tcp, sizeof(invalid_msg_tcp)));
+}
+
+/* Test building and parsing a simple TCP header */
+static void test_nanocoap__tcp_basic(void)
+{
+    ssize_t res;
+    size_t shrunk;
+    coap_pkt_t pkt;
+    uint8_t buf[32];
+    const uint8_t token[] = { 0xde, 0xad, 0xbe, 0xef };
+    const uint8_t expected[] = {
+        0x04, /* Len = 0, TKL = 4 */
+        COAP_METHOD_GET, /* Code = 0.01 GET */
+        0xde, 0xad, 0xbe, 0xef, /* Token = deadbeef */
+    };
+
+    res = coap_build_tcp_hdr(buf, sizeof(buf), token, sizeof(token), COAP_METHOD_GET);
+    TEST_ASSERT((ssize_t)sizeof(expected) <= res);
+    shrunk = coap_finalize_tcp_header_in_buf(buf, res);
+    TEST_ASSERT_EQUAL_INT(sizeof(expected), (size_t)res - shrunk);
+    TEST_ASSERT(memcmp(expected, buf + shrunk, sizeof(expected)) == 0);
+
+    /* same, but with coap_pkt_t initialized */
+    res = coap_build_tcp(&pkt, buf, sizeof(buf), token, sizeof(token), COAP_METHOD_GET);
+    TEST_ASSERT((ssize_t)sizeof(expected) <= res);
+    TEST_ASSERT(buf == pkt.buf);
+    TEST_ASSERT_EQUAL_INT((uintptr_t)buf + sizeof(buf) - (uintptr_t)pkt.payload, pkt.payload_len);
+    /* we add no payload and finalize */
+    pkt.payload_len = 0;
+    coap_finalize_tcp(&pkt);
+    TEST_ASSERT(buf <= pkt.buf);
+    TEST_ASSERT_EQUAL_INT(sizeof(expected), (uintptr_t)pkt.payload - (uintptr_t)pkt.buf);
+    TEST_ASSERT(memcmp(expected, pkt.buf, sizeof(expected)) == 0);
+
+    /* now verify that the coap_pkt_t is correctly initialized and that the
+     * getters work */
+    TEST_ASSERT(pkt.payload == pkt.buf + sizeof(expected));
+    TEST_ASSERT_EQUAL_INT(sizeof(token), coap_get_token_len(&pkt));
+    TEST_ASSERT(0 == memcmp(token, coap_get_token(&pkt), sizeof(token)));
+    TEST_ASSERT_EQUAL_INT(COAP_TRANSPORT_TCP, coap_get_transport(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_method(&pkt));
+}
+
+/* Test building and parsing a tiny TCP header */
+static void test_nanocoap__tcp_tiny(void)
+{
+    ssize_t res;
+    coap_pkt_t pkt;
+    uint8_t msg[] = {
+        0x00, /* Len = 0, TKL = 0 */
+        COAP_CODE_404, /* Code = 4.04 Not Found*/
+    };
+
+    res = coap_parse_tcp(&pkt, msg, sizeof(msg));
+    /* now verify that the coap_pkt_t is correctly initialized and that the
+     * getters work */
+    TEST_ASSERT_EQUAL_INT(sizeof(msg), res);
+    TEST_ASSERT(pkt.payload == pkt.buf + sizeof(msg));
+    TEST_ASSERT_EQUAL_INT(0, coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_TRANSPORT_TCP, coap_get_transport(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_404, coap_get_method(&pkt));
+}
+
+/* Test request/response exchange with CoAP over TCP. Doing so while reusing
+ * the request buffer for the response, as often done in our code base. */
+static void test_nanocoap__tcp_request_response(void)
+{
+    ssize_t res;
+    size_t shrunk;
+    coap_pkt_t pkt;
+    uint8_t buf[64];
+    const uint8_t token[] = { 0x13, 0x37, 0x42 };
+    const char path[] = "/some/path";
+    char parsed_path[sizeof(path)];
+
+    /* build request */
+    res = coap_build_tcp_hdr(buf, sizeof(buf), token, sizeof(token), COAP_METHOD_GET);
+    TEST_ASSERT(res > 0);
+    res += coap_opt_put_uri_path(buf + res, 0, path);
+    shrunk = coap_finalize_tcp_header_in_buf(buf, res);
+
+    /* parse request */
+    memset(&pkt, 0, sizeof(pkt));
+    TEST_ASSERT_EQUAL_INT(res - shrunk, coap_parse_tcp(&pkt, buf + shrunk, res - shrunk));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_method(&pkt));
+    TEST_ASSERT_EQUAL_INT(sizeof(token), coap_get_token_len(&pkt));
+    TEST_ASSERT(0 == memcmp(token, coap_get_token(&pkt), sizeof(token)));
+    res = coap_get_uri_path(&pkt, (void *)parsed_path);
+    TEST_ASSERT_EQUAL_INT(sizeof(path), res);
+    TEST_ASSERT(0 == memcmp(path, parsed_path, sizeof(parsed_path)));
+
+    /* build reply */
+    const char *pld = "test";
+    const size_t pld_len = strlen(pld);
+    res = coap_reply_simple(&pkt, COAP_CODE_CONTENT,
+                            buf, sizeof(buf),
+                            COAP_FORMAT_TEXT, pld, pld_len);
+    TEST_ASSERT(res > 0);
+    shrunk = coap_finalize_tcp_header_in_buf(buf, res);
+    /* parse reply */
+    memset(&pkt, 0, sizeof(pkt));
+    TEST_ASSERT_EQUAL_INT(res - shrunk, coap_parse_tcp(&pkt, buf + shrunk, res - shrunk));
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_CONTENT, coap_get_code_raw(&pkt));
+    TEST_ASSERT_EQUAL_INT(sizeof(token), coap_get_token_len(&pkt));
+    TEST_ASSERT(0 == memcmp(token, coap_get_token(&pkt), sizeof(token)));
+    TEST_ASSERT_EQUAL_INT(sizeof(token), coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(pld_len, pkt.payload_len);
+    TEST_ASSERT(0 == memcmp(pld, pkt.payload, pld_len));
 }
 
 Test *tests_nanocoap_tests(void)
@@ -1324,6 +1444,9 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__token_length_ext_269),
         new_TestFixture(test_nanocoap___rst_message),
         new_TestFixture(test_nanocoap__out_of_bounds_option),
+        new_TestFixture(test_nanocoap__tcp_basic),
+        new_TestFixture(test_nanocoap__tcp_tiny),
+        new_TestFixture(test_nanocoap__tcp_request_response),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
