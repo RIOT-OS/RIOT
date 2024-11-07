@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_nucleo-c031c6
+ * @ingroup     boards_nucleo-c071rb
  * @{
  *
  * @file
@@ -88,7 +88,7 @@ static const uart_conf_t uart_config[] = {
  * @name    ADC configuration
  *
  * Note that we do not configure all ADC channels,
- * and not in the STM32C031 order. Instead, we
+ * and not in the STM32C071 order. Instead, we
  * just define 6 ADC channels, for the Nucleo
  * Arduino header pins A0-A5.
  *
@@ -100,7 +100,7 @@ static const uart_conf_t uart_config[] = {
  * [X] - describes used channel - indexed from 1,
  * for example ARD_A5_IN16 is channel 16
  *
- * For Nucleo-C031C6 this information is in board manual,
+ * For Nucleo-C071RB this information is in board manual,
  * Table 11, page 20.
  *
  * @{
@@ -109,9 +109,9 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_A,  0), .dev = 0, .chan =  0 }, /* ARD_A0_IN0  */
     { .pin = GPIO_PIN(PORT_A,  1), .dev = 0, .chan =  1 }, /* ARD_A1_IN1  */
     { .pin = GPIO_PIN(PORT_A,  4), .dev = 0, .chan =  4 }, /* ARD_A2_IN4  */
-    { .pin = GPIO_PIN(PORT_B,  1), .dev = 0, .chan = 18 }, /* ARD_A3_IN18 */
-    { .pin = GPIO_PIN(PORT_A, 11), .dev = 0, .chan = 11 }, /* ARD_A4_IN11 */
-    { .pin = GPIO_PIN(PORT_A, 12), .dev = 0, .chan = 12 }, /* ARD_A5_IN12 */
+    { .pin = GPIO_PIN(PORT_B,  0), .dev = 0, .chan = 17 }, /* ARD_A3_IN17 */
+    { .pin = GPIO_PIN(PORT_C,  4), .dev = 0, .chan = 11 }, /* ARD_A4_IN11 */
+    { .pin = GPIO_PIN(PORT_C,  5), .dev = 0, .chan = 12 }, /* ARD_A5_IN12 */
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
@@ -129,7 +129,7 @@ static const adc_conf_t adc_config[] = {
  * channel 0 in configuration structure (cc_chan - field),
  * Port column in the table describes connected port.
  *
- * For Nucleo-c031c6 this information is in the MCU datasheet, Table 13, page 35.
+ * For Nucleo-c071rb this information is in the MCU datasheet, Table 13, page 35.
  *
  */
 static const pwm_conf_t pwm_config[] = {

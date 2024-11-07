@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BISSELL Homecare, Inc.
+ * Copyright (C) 2024 BISSELL Homecare, Inc.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_stm32g0316-disco
+ * @ingroup     boards_stm32c0316-dk
  * @{
  *
  * @file
- * @brief       Board specific definitions for the STM32G0316-DISCO
+ * @brief       Board specific definitions for the STM32C0316-DK
  *
- * @author      Dave VanKampen <david.vankampen@bissell.com>
+ * @author      Jason Parker <Jason.Parker@bissell.com>
  */
 
 #ifndef BOARD_H
@@ -27,11 +27,11 @@
 extern "C" {
 #endif
 
-#define LED0_PIN_NUM        12
+#define LED0_PIN_NUM        5
 #define LED0_PORT           GPIO_PORT_A /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_A
 
-#define BTN0_PIN            GPIO_PIN(PORT_A, 0)
+#define BTN0_PIN            GPIO_PIN(PORT_A, 4)
 #define BTN0_MODE           GPIO_IN
 
 #ifdef __cplusplus
