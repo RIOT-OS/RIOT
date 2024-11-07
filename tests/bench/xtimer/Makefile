@@ -42,7 +42,6 @@ LOW_MEMORY_BOARDS += \
   msb-430 \
   msb-430h \
   nrf51dongle \
-  nrf6310 \
   nucleo-f030r8 \
   nucleo-f042k6 \
   nucleo-f070rb \
