@@ -1454,10 +1454,9 @@ static ssize_t _cache_build_response(nanocoap_cache_entry_t *ce, coap_pkt_t *pdu
 
 static void _copy_hdr_from_req_memo(coap_pkt_t *pdu, gcoap_request_memo_t *memo)
 {
-    coap_pkt_t req_pdu;
-
-    req_pdu.hdr = gcoap_request_memo_get_hdr(memo);
-    memcpy(pdu->hdr, req_pdu.hdr, coap_get_total_hdr_len(&req_pdu));
+    const coap_hdr_t *hdr = gcoap_request_memo_get_hdr(memo);
+    size_t hdr_len = coap_hdr_len(hdr);
+    memcpy(pdu->hdr, hdr, hdr_len);
 }
 
 static void _receive_from_cache_cb(void *ctx)
