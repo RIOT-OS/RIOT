@@ -51,4 +51,5 @@
   #error Library does not support the specified device.
 #endif
 
+#include "compat_samr34.h"
 #endif /* _SAMR34_ */
