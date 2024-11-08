@@ -118,10 +118,7 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     int sample;
 
     /* check if resolution is applicable */
-    if ( (res != ADC_RES_6BIT) &&
-         (res != ADC_RES_8BIT) &&
-         (res != ADC_RES_10BIT) &&
-         (res != ADC_RES_12BIT)) {
+    if ((res & ADC_CFGR1_RES) != res) {
         return -1;
     }
 

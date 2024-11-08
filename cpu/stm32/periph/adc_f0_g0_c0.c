@@ -201,7 +201,7 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     int sample;
 
     /* check if resolution is applicable */
-    if (res > 0xf0) {
+    if ((res & ADC_CFGR1_RES) != res) {
         return -1;
     }
 
