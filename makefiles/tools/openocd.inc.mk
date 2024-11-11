@@ -34,6 +34,12 @@ $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_CORE)
 # Export OPENOCD_ADAPTER_INIT to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_ADAPTER_INIT)
 
+# Export OPENOCD_EXTRA_INIT to required targets
+$(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_EXTRA_INIT)
+
+# Export OPENOCD_EXTRA_RESET_INIT to required targets
+$(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_EXTRA_RESET_INIT)
+
 # Export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_RESET_USE_CONNECT_ASSERT_SRST)
 
@@ -65,6 +71,11 @@ OPENOCD_FLASH_TARGETS = flash flash-only flashr
 ifneq (,$(IMAGE_OFFSET))
   # Export IMAGE_OFFSET only to the flash/flash-only target
   $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),IMAGE_OFFSET)
+endif
+
+ifneq (,$(OPENOCD_POST_INIT_CMDS))
+  # Export OPENOCD_POST_INIT_CMDS only to the flash/flash-only target
+  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_POST_INIT_CMDS)
 endif
 
 ifneq (,$(OPENOCD_PRE_VERIFY_CMDS))
