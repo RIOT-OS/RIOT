@@ -25,7 +25,6 @@
 
 #include "fmt.h"
 #include "net/nanocoap.h"
-#include "kernel_defines.h"
 
 #define _MAX_PAYLOAD_LEN  (16)
 
@@ -71,6 +70,10 @@ static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_re
     return coap_reply_simple(pkt, code, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
+
+#if !MODULE_NANOCOAP_RESOURCES
+#error "Test"
+#endif
 
 NANOCOAP_RESOURCE(value) {
     .path = "/value", .methods = COAP_GET | COAP_PUT | COAP_POST, .handler = _value_handler,

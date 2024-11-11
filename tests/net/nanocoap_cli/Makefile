@@ -37,6 +37,7 @@ LOW_MEMORY_BOARDS := \
 # Don't enable VFS, DTLS functions on small boards
 ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += nanocoap_dtls
+  USEMODULE += nanocoap_udp
   USEMODULE += prng_sha256prng
 
   USEMODULE += nanocoap_vfs
