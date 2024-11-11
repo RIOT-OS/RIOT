@@ -73,11 +73,11 @@ static void _serial_intr_handler(void *arg)
             }
             USB_SERIAL_JTAG.ep1.rdwr_byte = c;
         }
-        usb_serial_jtag_ll_txfifo_flush();
     }
 
     /* clear all interrupt flags */
-    usb_serial_jtag_ll_clr_intsts_mask(mask);
+    usb_serial_jtag_ll_clr_intsts_mask(USB_SERIAL_JTAG_LL_INTR_MASK);
+    usb_serial_jtag_ll_txfifo_flush();
 
     irq_isr_exit();
 }
