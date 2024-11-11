@@ -1813,6 +1813,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     else {
         /* remove previously held packet */
         gnrc_pktbuf_release(pkt);
+        return;
     }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
