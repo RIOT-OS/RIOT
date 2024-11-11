@@ -79,7 +79,7 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len,
         return 0;
     }
 
-    return nanocoap_request(pkt, NULL, &remote, len);
+    return nanocoap_request_udp(pkt, NULL, &remote, len);
 }
 
 #if MODULE_NANOCOAP_TOKEN_EXT

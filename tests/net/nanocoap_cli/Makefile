@@ -63,6 +63,7 @@ LOW_MEMORY_BOARDS := \
 # Don't enable VFS, DTLS functions on small boards
 ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += nanocoap_dtls
+  USEMODULE += nanocoap_udp
   USEMODULE += prng_sha256prng
 
   USEMODULE += nanocoap_sock_observe
@@ -74,9 +75,10 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   # DTLS and VFS operations require more stack on the main thread
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 
-  # always enable auto-format for native
+  # always enable auto-format and TCP support for native
   ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
+    USEMODULE += nanocoap_tcp
   endif
 endif
 
@@ -85,3 +87,7 @@ USEMODULE += od
 USEMODULE += shell
 
 include $(RIOTBASE)/Makefile.include
+
+# A 2 minutes timeout on e.g. shell command `url get coap+tcp://...` is not
+# acceptable. We reduce this to 2 seconds here.
+CFLAGS += -DCONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS=2000

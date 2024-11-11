@@ -587,12 +587,14 @@ ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
+  USEMODULE += nanocoap
+endif
+
+ifneq (,$(filter nanocoap,$(USEMODULE)))
   # default to UDP transport if none is selected
   ifeq (,$(filter nanocoap_udp nanocoap_tcp nanocoap_dtls,$(USEMODULE)))
     USEMODULE += nanocoap_udp
   endif
-
-  USEMODULE += nanocoap
 endif
 
 # include unicoap dependencies
