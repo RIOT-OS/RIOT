@@ -438,6 +438,10 @@ static void *_pktbuf_alloc(size_t size)
 #endif
         assert(0);
     }
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        /* clear out canary */
+        memset(ptr, ~CANARY, size);
+    }
 
     return (void *)ptr;
 }
@@ -469,6 +473,13 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
     }
 
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        /* check if the data has already been marked as free */
+        size_t chk_len = _align(size) - sizeof(*new);
+        if (chk_len && !memchk((uint8_t *)data + sizeof(*new), CANARY, chk_len)) {
+            printf("pktbuf: double free detected! (at %p, len=%u)\n",
+                   data, (unsigned)_align(size));
+            DEBUG_BREAKPOINT(2);
+        }
         memset(data, CANARY, _align(size));
     }
 
