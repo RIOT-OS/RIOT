@@ -233,6 +233,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
     slipdev_write_byte(dev->config.uart, SLIPDEV_END);
     slipdev_unlock();
+
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    }
+
     return bytes;
 }
 
@@ -322,6 +327,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = NETDEV_TYPE_SLIP;
             return sizeof(uint16_t);
+        case NETOPT_TX_END_IRQ:
+            *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            return sizeof(netopt_enable_t);
 #if IS_USED(MODULE_SLIPDEV_L2ADDR)
         case NETOPT_ADDRESS_LONG:
             assert(max_len == sizeof(eui64_t));
