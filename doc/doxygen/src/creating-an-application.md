@@ -92,6 +92,21 @@ USEMODULE += gnrc_udp
 
 Modules typically pull in all required dependencies.
 
+## Including source files in subfolders
+
+By default, all source files in an application's (or any RIOT module's) directory
+are automatically compiled as part of the application. In order to organize source
+code in a directory structure, two different approaches can be used:
+
+1. Make each subdirectory a separate RIOT module with a unique name inside its
+Makefile, either by adding the directory's path to `DIRS` or with the [out-of-tree
+module support](#external-modules).
+2. Add the source files within subdirectories to `SRC`, either explicitly or with
+Makefile wildcards.
+
+Both approaches are illustrated and explained in `examples/subfolders`.
+
+
 # Helper tools
 
 To help you start writing an application within RIOT, the build system provides
@@ -210,7 +225,7 @@ configuration (e.g. configuring some of the pins configured as ADC as
 additional PWM outputs instead) a copy of the upstream board that is then
 customized to the application needs is the best course of action.
 
-## External Modules
+## External Modules                                         {#external-modules}
 
 Similar to the external boards, external modules can be written in a similar way
 as regular in-tree modules.
