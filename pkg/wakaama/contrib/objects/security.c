@@ -119,6 +119,7 @@ typedef struct lwm2m_obj_security_inst {
 /**
  * @brief 'Read' callback for the security object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to read
  * @param[in, out] num_data     Number of resources requested. 0 means all.
  * @param[in, out] data_array   Initialized data array to output the values,
@@ -129,12 +130,13 @@ typedef struct lwm2m_obj_security_inst {
  * @retval COAP_404_NOT_FOUND               when resource can't be found
  * @retval COAP_500_INTERNAL_SERVER_ERROR   otherwise
  */
-static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t *data_array[],
-                        lwm2m_object_t *object);
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
+                        lwm2m_data_t ** data_array, lwm2m_object_t * object);
 
 /**
  * @brief 'Write' callback for the security object.
- *
+
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to write to
  * @param[in] num_data          Number of resources to write
  * @param[in] data_array        Array of data to write
@@ -143,23 +145,27 @@ static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t *data_
  * @retval COAP_204_CHANGED                 on success
  * @retval COAP_400_BAD_REQUEST             otherwise
  */
-static uint8_t _write_cb(uint16_t instance_id, int num_data, lwm2m_data_t *data_array,
-                         lwm2m_object_t *object);
+static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
+                         lwm2m_data_t * data_array, lwm2m_object_t * object,
+                         lwm2m_write_type_t write_type);
 
 /**
  * @brief 'Delete' callback for the security object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to delete
  * @param[in] object            Security object pointer
  *
  * @retval COAP_202_DELETED                 on success
  * @retval COAP_404_NOT_FOUND               when the instance can't be found
  */
-static uint8_t _delete_cb(uint16_t instance_id, lwm2m_object_t *object);
+static uint8_t _delete_cb(lwm2m_context_t * context, uint16_t instance_id,
+                          lwm2m_object_t * object);
 
 /**
  * @brief 'Create' callback for the security object.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to create
  * @param[in] num_data          Number of resources to write
  * @param[in] data_array        Array of data to write
@@ -168,8 +174,8 @@ static uint8_t _delete_cb(uint16_t instance_id, lwm2m_object_t *object);
  * @retval COAP_201_CREATED                 on success
  * @retval COAP_500_INTERNAL_SERVER_ERROR   otherwise
  */
-static uint8_t _create_cb(uint16_t instance_id, int num_data, lwm2m_data_t *data_array,
-                          lwm2m_object_t *object);
+static uint8_t _create_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
+                          lwm2m_data_t * data_array, lwm2m_object_t * object);
 
 /**
  * @brief Get a value from a security object instance.
@@ -392,9 +398,11 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance)
     return COAP_205_CONTENT;
 }
 
-static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t *data_array[],
-                        lwm2m_object_t *object)
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
+                        lwm2m_data_t ** data_array, lwm2m_object_t * object)
 {
+    (void)context;
+
     lwm2m_obj_security_inst_t *instance;
     uint8_t result;
     int i = 0;
@@ -458,9 +466,12 @@ out:
     return result;
 }
 
-static uint8_t _write_cb(uint16_t instance_id, int num_data, lwm2m_data_t *data_array,
-                         lwm2m_object_t *object)
+static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
+                         lwm2m_data_t * data_array, lwm2m_object_t * object,
+                         lwm2m_write_type_t write_type)
 {
+    (void)context;
+    (void)write_type;
     lwm2m_obj_security_inst_t *instance;
     int64_t value;
     uint8_t result = COAP_404_NOT_FOUND;
@@ -641,8 +652,10 @@ out:
     return result;
 }
 
-static uint8_t _delete_cb(uint16_t instance_id, lwm2m_object_t *object)
+static uint8_t _delete_cb(lwm2m_context_t * context, uint16_t instance_id,
+                          lwm2m_object_t * object)
 {
+    (void)context;
     uint8_t result = COAP_404_NOT_FOUND;
     lwm2m_obj_security_inst_t *instance;
 
@@ -679,9 +692,11 @@ free_out:
     return result;
 }
 
-static uint8_t _create_cb(uint16_t instance_id, int num_data, lwm2m_data_t *data_array,
-                          lwm2m_object_t *object)
+static uint8_t _create_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
+                          lwm2m_data_t * data_array, lwm2m_object_t * object)
 {
+    (void)context;
+
     lwm2m_obj_security_inst_t *instance;
     uint8_t result;
 
@@ -718,10 +733,10 @@ static uint8_t _create_cb(uint16_t instance_id, int num_data, lwm2m_data_t *data
     object->instanceList = LWM2M_LIST_ADD(object->instanceList, instance);
 
     /* write incoming data to the instance */
-    result = _write_cb(instance_id, num_data, data_array, object);
+    result = _write_cb(context, instance_id, num_data, data_array, object, LWM2M_WRITE_PARTIAL_UPDATE);
 
     if (result != COAP_204_CHANGED) {
-        _delete_cb(instance_id, object);
+        _delete_cb(context,instance_id, object);
     }
     else {
         result = COAP_201_CREATED;

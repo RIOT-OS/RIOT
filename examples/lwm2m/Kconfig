@@ -9,7 +9,7 @@ menu "Application configuration"
 
 config LWM2M_SERVER_URI
     string "LwM2M Server URI to register/bootstrap with"
-    default "coap://[fd00:dead:beef::1]:5684"
+    default "coaps://[fd00:dead:beef::1]:5684"
     help
         The host part of the URI MUST be a valid IPv6 address.
 

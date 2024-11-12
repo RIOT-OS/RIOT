@@ -76,7 +76,7 @@ static int _get_resource_data(lwm2m_client_data_t *client_data, const lwm2m_uri_
     data->id = uri->resourceId;
 
     /* read the resource from the specified instance */
-    uint8_t res = object->readFunc(uri->instanceId, &data_num, &data, object);
+    uint8_t res = object->readFunc(client_data->lwm2m_ctx, uri->instanceId, &data_num, &data, object);
     if (res != COAP_205_CONTENT || data->type != expected_type) {
         result = -EINVAL;
         goto out;
@@ -245,7 +245,7 @@ static int _set_resource_data(lwm2m_client_data_t *client_data, const lwm2m_uri_
     }
 
     /* write the resource of the specified instance */
-    uint8_t res = object->writeFunc(uri->instanceId, 1, data, object);
+    uint8_t res = object->writeFunc(client_data->lwm2m_ctx, uri->instanceId, 1, data, object, LWM2M_WRITE_PARTIAL_UPDATE);
     lwm2m_resource_value_changed(client_data->lwm2m_ctx, uri);
 
     if (res != COAP_204_CHANGED) {
