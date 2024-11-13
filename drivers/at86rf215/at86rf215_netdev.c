@@ -176,9 +176,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         at86rf215_tx_exec(dev);
     }
 
-    /* return the number of bytes that were actually loaded into the frame
-     * buffer/send out */
-    return (int)len;
+    /* store successfully sent number of bytes */
+    dev->tx_frame_len = len;
+
+    /* netdev_new just returns 0 on success */
+    return 0;
 }
 
 static int _confirm_send(netdev_t *netdev, void *info)
