@@ -18,6 +18,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [timer_periodic_wakeup](./timer_periodic_wakeup/README.md) | How to set up a periodic wakeup timer using the RIOT operating system. |
 | [ipc_pingpong](./ipc_pingpong/README.md) | This example is to illustrate the usage of RIOTs IPC messaging system. |
 | [filesystem](./filesystem/README.md) | This example showcases ways to interact/manage the filesystem in RIOT. |
+| [subfolders](./subfolders/README.md) | This example demonstrates how to use subfolders in RIOT applications. |
 
 ### RIOT Language Bindings
 
