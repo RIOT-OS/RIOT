@@ -52,6 +52,41 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     return 0;
 }
 
+int send_beacon(int argc, char **argv)
+{
+    (void)argv;
+    (void)argc;
+
+     puts("Testing Beacon Frame Acceptance");
+
+    uint8_t size = 8;
+    uint16_t pan_id = nrf802154.dev.pan;
+    uint8_t buffer[size];
+    memset(buffer, 0, size*sizeof(uint8_t));
+
+    buffer[0] = 0x00; /* Frame Type is Beacon*/
+    buffer[1] = 0x80; /* Source Address Mode is set to 16-Bit Short Address*/
+    buffer[2] = 0x42; /* Arbitrary Sequence Number*/
+    buffer[3] = pan_id & 0xff; /* Little Endian PAN ID*/
+    buffer[4] = (pan_id >> 8);
+
+    iolist_t iol = {
+        .iol_base = buffer,
+        .iol_len = size,
+        .iol_next = NULL,
+    };
+
+    puts("Sending Beacon Frame");
+    netdev_ieee802154_minimal_send(&nrf802154.dev.netdev, &iol);
+
+    return 0;
+}
+
+static const shell_command_t shell_commands[] = {
+    { "send", "sending Beacon", send_beacon},
+    {NULL,NULL,NULL}
+};
+
 int main(void)
 {
     puts("Test application for NRF802154 IEEE 802.15.4 device driver");
@@ -66,7 +101,7 @@ int main(void)
     puts("Initialization successful - starting the shell now");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
