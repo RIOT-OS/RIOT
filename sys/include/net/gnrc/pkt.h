@@ -110,17 +110,18 @@ typedef struct gnrc_pktsnip {
     struct gnrc_pktsnip *next;      /**< next snip in the packet */
     void *data;                     /**< pointer to the data of the snip */
     size_t size;                    /**< the length of the snip in byte */
+    /* end of iolist_t */
+#ifdef MODULE_GNRC_NETERR
+    kernel_pid_t err_sub;           /**< subscriber to errors related to this
+                                     *   packet snip */
+#endif
+    gnrc_nettype_t type;            /**< protocol of the packet snip */
     /**
      * @brief   Counter of threads currently having control over this packet.
      *
      * @internal
      */
-    unsigned int users;
-    gnrc_nettype_t type;            /**< protocol of the packet snip */
-#ifdef MODULE_GNRC_NETERR
-    kernel_pid_t err_sub;           /**< subscriber to errors related to this
-                                     *   packet snip */
-#endif
+    uint8_t users;
 } gnrc_pktsnip_t;
 
 /**
