@@ -33,7 +33,7 @@ int main(void)
 {
     sha5461as_t dev;
     dev.digits = SHA5461AS_MAX_DIGITS;
-    
+
     puts("Initializing SHA5461AS device.");
     if (sha5461as_init(&dev, &sha5461as_params[0]) != 0) {
         puts("[Error] Cannot initialize DSP0401 display.");
@@ -46,13 +46,13 @@ int main(void)
     gpio_set(dev.params.dig2);
     gpio_set(dev.params.dig3);
     gpio_set(dev.params.dig4);
-    gpio_set(dev.params.a);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
-    gpio_set(dev.params.b);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
-    gpio_set(dev.params.c);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
-    gpio_set(dev.params.d);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
-    gpio_set(dev.params.e);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
-    gpio_set(dev.params.f);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
-    gpio_set(dev.params.g);ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.a); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.b); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.c); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.d); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.e); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.f); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
+    gpio_set(dev.params.g); ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
     gpio_set(dev.params.dp);
 
     gpio_clear(dev.params.dig2);
@@ -65,21 +65,23 @@ int main(void)
     uint32_t binary_riot = 0b11101110000011001111110000001110;
     sha5461as_set_all_value(&dev, binary_riot);
 
-    if ( sha5461as_display(&dev) == 0) {
+    if (sha5461as_display(&dev) == 0) {
         puts("Launched...");
-    } else {
+    }
+    else {
         puts("Error");
     }
 
     for (volatile uint32_t i = 0; i < CLOCK_CORECLOCK / 5; ++i) {}
 
-    if ( sha5461as_display(&dev) == 0) {
+    if (sha5461as_display(&dev) == 0) {
         puts("...Stopped");
-    } else {
+    }
+    else {
         puts("Error");
     }
 
-    while(1) {}
-    
+    while (1) {}
+
     return 0;
 }

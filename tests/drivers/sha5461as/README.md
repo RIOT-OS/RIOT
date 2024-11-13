@@ -14,4 +14,3 @@ The display needs to be connected as follows:
 For each digit pin (`DIGX`), you need to use a transistor and link it to `GND`.
 
 ![datasheet image](https://www.datasheetcafe.com/wp-content/uploads/2015/09/SH5461AS.gif)
-
