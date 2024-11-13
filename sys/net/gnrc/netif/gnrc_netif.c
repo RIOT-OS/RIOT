@@ -1810,7 +1810,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         }
         return;
     }
-    else {
+    else if (gnrc_netif_netdev_legacy_api(netif)) {
         /* remove previously held packet */
         gnrc_pktbuf_release(pkt);
         return;
@@ -1882,7 +1882,9 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     }
     /* hold in case device was busy to not having to rewrite *all* the link
      * layer implementations in case `gnrc_netif_pktq` is included */
-    gnrc_pktbuf_hold(pkt, 1);
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        gnrc_pktbuf_hold(pkt, 1);
+    }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
     /* Record send in neighbor statistics if destination is unicast */
