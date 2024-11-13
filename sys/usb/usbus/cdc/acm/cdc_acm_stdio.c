@@ -37,13 +37,13 @@ static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static ssize_t _write(const void* buffer, size_t len)
 {
     const char *start = buffer;
-    do {
+    while (len) {
         size_t n = usbus_cdc_acm_submit(&cdcacm, buffer, len);
         usbus_cdc_acm_flush(&cdcacm);
         /* Use tsrb and flush */
         buffer = (char *)buffer + n;
         len -= n;
-    } while (len);
+    }
     return (char *)buffer - start;
 }
 
