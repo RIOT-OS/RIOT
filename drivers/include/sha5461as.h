@@ -100,18 +100,18 @@ typedef struct {
  * @param[in]  params   Device parameters to use
  *
  * @return              SHA5461AS_OK if everything is good
- * @return              -SHA5461AS_ERR_A_GPIO if an error occured during A GPIO
- * @return              -SHA5461AS_ERR_B_GPIO if an error occured during B GPIO
- * @return              -SHA5461AS_ERR_C_GPIO if an error occured during C GPIO
- * @return              -SHA5461AS_ERR_D_GPIO if an error occured during D GPIO
- * @return              -SHA5461AS_ERR_E_GPIO if an error occured during E GPIO
- * @return              -SHA5461AS_ERR_F_GPIO if an error occured during F GPIO
- * @return              -SHA5461AS_ERR_G_GPIO if an error occured during G GPIO
- * @return              -SHA5461AS_ERR_DP_GPIO if an error occured during DP GPIO
- * @return              -SHA5461AS_ERR_DIG1_GPIO if an error occured during DIG1 GPIO
- * @return              -SHA5461AS_ERR_DIG2_GPIO if an error occured during DIG2 GPIO
- * @return              -SHA5461AS_ERR_DIG3_GPIO if an error occured during DIG3 GPIO
- * @return              -SHA5461AS_ERR_DIG4_GPIO if an error occured during DIG4 GPIO
+ * @return              -SHA5461AS_ERR_A_GPIO if an error occurred during A GPIO
+ * @return              -SHA5461AS_ERR_B_GPIO if an error occurred during B GPIO
+ * @return              -SHA5461AS_ERR_C_GPIO if an error occurred during C GPIO
+ * @return              -SHA5461AS_ERR_D_GPIO if an error occurred during D GPIO
+ * @return              -SHA5461AS_ERR_E_GPIO if an error occurred during E GPIO
+ * @return              -SHA5461AS_ERR_F_GPIO if an error occurred during F GPIO
+ * @return              -SHA5461AS_ERR_G_GPIO if an error occurred during G GPIO
+ * @return              -SHA5461AS_ERR_DP_GPIO if an error occurred during DP GPIO
+ * @return              -SHA5461AS_ERR_DIG1_GPIO if an error occurred during DIG1 GPIO
+ * @return              -SHA5461AS_ERR_DIG2_GPIO if an error occurred during DIG2 GPIO
+ * @return              -SHA5461AS_ERR_DIG3_GPIO if an error occurred during DIG3 GPIO
+ * @return              -SHA5461AS_ERR_DIG4_GPIO if an error occurred during DIG4 GPIO
  */
 int sha5461as_init(sha5461as_t *dev, const sha5461as_params_t *params);
 
