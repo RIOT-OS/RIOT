@@ -19,6 +19,25 @@
  * there is no expectation of security of the system when an attacker gains
  * access to the shell.
  *
+ * ## Usage
+ *
+ * Enable the `shell` module e.g. by adding the following snippet to your
+ * applications `Makefile`.
+ *
+ * ```
+ * USEMODULE += shell
+ * ```
+ *
+ * And run the shell using @ref shell_run_forever e.g. from the `main` thread
+ * after everything is set up. This call will never return.
+ *
+ * ## Builtin Commands
+ *
+ * The commands `help` and `help_json` are builtins that print the list of
+ * available commands: The former prints a human readable table and is always
+ * available, the latter requires module `shell_builtin_cmd_help_json` to be
+ * used and will give the same info machine readable.
+ *
  * @{
  *
  * @file

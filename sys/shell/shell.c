@@ -129,6 +129,38 @@ static shell_command_handler_t find_handler(
     return handler;
 }
 
+static void print_commands_json(const shell_command_t *cmd_list)
+{
+    bool first = true;
+
+    printf("{\"cmds\": [");
+
+    if (cmd_list) {
+        for (const shell_command_t *entry = cmd_list; entry->name != NULL; entry++) {
+            if (first) {
+                first = false;
+            }
+            else {
+                printf(", ");
+            }
+            printf("{\"cmd\": \"%s\", \"desc\": \"%s\"}", entry->name, entry->desc);
+        }
+    }
+
+    unsigned n = XFA_LEN(shell_command_xfa_t*, shell_commands_xfa);
+    for (unsigned i = 0; i < n; i++) {
+        if (first) {
+            first = false;
+        }
+        else {
+            printf(", ");
+        }
+        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        printf("{\"cmd\": \"%s\", \"desc\": \"%s\"}", entry->name, entry->desc);
+    }
+    puts("]}");
+}
+
 static void print_commands(const shell_command_t *entry)
 {
     for (; entry->name != NULL; entry++) {
@@ -342,6 +374,10 @@ int shell_handle_input_line(const shell_command_t *command_list, char *line)
         if (strcmp("help", argv[0]) == 0) {
             print_help(command_list);
             return 0;
+        }
+        else if (IS_USED(MODULE_SHELL_BUILTIN_CMD_HELP_JSON)
+                 && !strcmp("help_json", argv[0])) {
+            print_commands_json(command_list);
         }
         else {
             printf("shell: command not found: %s\n", argv[0]);
