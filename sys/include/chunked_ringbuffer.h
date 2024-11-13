@@ -160,10 +160,10 @@ bool crb_add_bytes(chunk_ringbuf_t *rb, const void *data, size_t len);
  * @param[in] valid     True if the chunk is valid and should be stored
  *                      False if the current chunk should be discarded
  *
- * @return true         If the chunk could be stored in the valid chunk array
- * @return false        If there is no more space in the valid chunk array
+ * @return size of chunk if the chunk could be stored in the valid chunk array
+ * @return 0 if there is no more space in the valid chunk array
  */
-bool crb_end_chunk(chunk_ringbuf_t *rb, bool valid);
+unsigned crb_end_chunk(chunk_ringbuf_t *rb, bool valid);
 
 /**
  * @brief Add a complete chunk to the Ringbuffer
