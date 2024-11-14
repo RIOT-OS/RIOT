@@ -1,0 +1,185 @@
+/*
+ * Copyright (C) 2024 Orange
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+
+@defgroup    drivers_digit7seg Generic 7 segments driver
+@ingroup     drivers_display
+@brief       Device driver for less than 5 digits of 7 segments without IC
+
+## About
+
+This driver was developed to works with [5461AS](http://www.topliteusa.com/uploadfile/2014/0825/A-5461AS.pdf)
+in a way that all 4 digits (and less) with 7 segments without integrated controller
+can be controlled into [RIOT-OS](https://github.com/RIOT-OS/RIOT).
+
+### 7 segments
+
+Each digit contains 7 digit (plus decimal point), if the segment is set high and his
+digit is set high it will be lit.
+Each value is cut into 8 bits (a, b, c, d, e, f, g, dp), if the bit is 1 current is sent otherwise
+not.
+
+To display 0 we will pass the number
+```
+ dp g f e d c b a
+ 0  0 1 1 1 1 1 1
+```
+```
+         --a--
+        |     |
+        f     b
+        |     |
+         --g--
+        |     |
+        e     c
+        |     |
+         --d--    .dp
+```
+
+### 4 digits of 7 segments
+
+To set up a 4 digits of 7 segments display, we need transistors to allow current to pass
+only when the corresponding digit pin digX is high.
+
+All the digits share the same value pins. To display different values on each digit, we shift the value
+and turn on each digit at a rate that is imperceptible to the human eye.
+
+```
+       .----.----.----.----.
+       |    |    |    |    |-- a
+       |    |    |    |    |-- b
+       |    |    |    |    |-- c
+       |    |    |    |    |-- d
+       |    |    |    |    |-- e
+       |    |    |    |    |-- f
+       |    |    |    |    |-- g
+       |    |    |    |    |-- dp
+       '----'----'----'----'
+         |    |    |    |
+         T-------------------- dig1
+         |    |    |    |
+         |    T--------------- dig2
+         |    |    |    |
+         |    |    T---------- dig3
+         |    |    |    |
+         |    |    |    T----- dig4
+         |    |    |    |
+         └──--└──--└──--└──--- GND
+```
+
+@note T represent a NPN transistor
+
+## Error Handling
+
+All driver functions return 0 on success or one of a negative error code defined by
+#digit7seg_error_codes.
+
+## Usage
+
+To use the digit7seg driver, the configuration must be set by including `digit7seg_params.h`
+or defining a `digit7seg_params_t` struct.
+
+The structure of a configuration is defined in #digit7seg_params_t and consists of the following
+parameters:
+
+Parameter                      | Symbol in ```digit7seg_params.h``` | Default
+:------------------------------|:-----------------------------------|:------------------
+Data pin for a segment         | DIGIT7SEG_PARAM_A_PIN              | GPIO_PIN(1, 11)
+Data pin for b segment         | DIGIT7SEG_PARAM_B_PIN              | GPIO_PIN(1, 12)
+Data pin for c segment         | DIGIT7SEG_PARAM_C_PIN              | GPIO_PIN(1, 15)
+Data pin for d segment         | DIGIT7SEG_PARAM_D_PIN              | GPIO_PIN(1, 13)
+Data pin for e segment         | DIGIT7SEG_PARAM_E_PIN              | GPIO_PIN(1, 14)
+Data pin for f segment         | DIGIT7SEG_PARAM_F_PIN              | GPIO_PIN(0, 23)
+Data pin for g segment         | DIGIT7SEG_PARAM_G_PIN              | GPIO_PIN(0, 21)
+Data pin for dp segment        | DIGIT7SEG_PARAM_DP_PIN             | GPIO_PIN(0, 27)
+Pin to on digit 1              | DIGIT7SEG_PARAM_DIG1_PIN           | GPIO_PIN(1, 2)
+Pin to on digit 2              | DIGIT7SEG_PARAM_DIG2_PIN           | GPIO_PIN(1, 1)
+Pin to on digit 3              | DIGIT7SEG_PARAM_DIG3_PIN           | GPIO_PIN(1, 8)
+Pin to on digit 4              | DIGIT7SEG_PARAM_DIG4_PIN           | GPIO_PIN(0, 13)
+Timer for periodic interrupt   | DIGIT7SEG_PARAM_TIMER              | TIMER_DEV(2)
+Number of digits on the periph | DIGIT7SEG_PARAM_DIGITS             | 4
+
+The default configuration can be overwritten by the application.
+
+Example:
+```
+#define DIGIT7SEG_PARAM_TIMER TIMER_DEV(1)
+#define DIGIT7SEG_PARAM_DIGITS (2)
+...
+#include "digit7seg.h"
+#include "digit7seg_param.h"
+```
+
+Another way to override params is to override DIGIT7SEG_PARAMS that will
+be stocked into digit7seg_params.
+
+@note At least all the data_* pin must be defined, depending of the number of digits set, dig4, dig3, dig2 can be set at GPIO_UNDEF.
+
+Example:
+```
+#define DIGIT7SEG_PARAMS              { .data_a = GPIO(1, 14),   \
+                                        .data_b = GPIO(1, 17),   \
+                                        .data_c = GPIO(1, 15),   \
+                                        .data_d = GPIO(1, 13),   \
+                                        .data_e = GPIO(1, 12),   \
+                                        .data_f = GPIO(0, 23),   \
+                                        .data_g = GPIO(0, 21),   \
+                                        .data_dp = GPIO(1, 11), \
+                                        .dig1 = GPIO(0, 13),  \
+                                        .dig2 = GPIO(1, 8),  \
+                                        .dig3 = GPIO_UNDEF,  \
+                                        .dig4 = GPIO_UNDEF,  \
+                                        .timer = TIMER_DEV(2),    \
+                                        .digits = 2 }
+...
+#include "digit7seg.h"
+#include "digit7seg_param.h"
+```
+
+The ::digit7seg_init function initializes a #digit7seg_t and checks if every parameter is correctly set.
+
+Example:
+```
+digit7seg_t dev;
+
+if (digit7seg_init(&dev, &digit7seg_params[0]) != DIGIT7SEG_OK) {
+    ... /* error handling */
+}
+```
+
+Once the device is initialized and configured :
+- ::digit7seg_set_all_value function can be used to set the value for all the digits.
+- ::digit7seg_poweron function starts a periodic timer that cycles through each digit to give the impression that they are all lit simultaneously.
+- ::digit7seg_poweroff function stops this timer.
+
+Example:
+```
+/*    R        I         O       T     */
+/* 11101110 00001100 11111100 00001110 */
+uint32_t binary_riot = 0b11101110000011001111110000001110;
+digit7seg_set_all_value(&dev, binary_riot);
+
+if (digit7seg_poweron(&dev) == 0) {
+    puts("Launched...");
+}
+else {
+    puts("Error");
+}
+
+...
+
+if (digit7seg_poweroff(&dev) == 0) {
+    puts("...Stopped");
+}
+else {
+    puts("Error");
+}
+
+```
+*/

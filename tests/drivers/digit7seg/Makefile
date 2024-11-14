@@ -1,6 +1,6 @@
 include ../Makefile.drivers_common
 
-USEMODULE += sha5461as
+USEMODULE += digit7seg
 USEMODULE += ztimer
 USEMODULE += ztimer_usec
 
