@@ -238,6 +238,7 @@ typedef enum {
     NETDEV_EVENT_RX_COMPLETE,               /**< finished receiving a frame */
     NETDEV_EVENT_TX_STARTED,                /**< started to transfer a frame */
     NETDEV_EVENT_TX_COMPLETE,               /**< transfer frame complete */
+#if IS_USED(MODULE_NETDEV_LEGACY_API) || DOXYGEN
     /**
      * @brief   transfer frame complete and data pending flag
      *
@@ -261,6 +262,7 @@ typedef enum {
      *              `-EBUSY` in netdev_driver_t::confirm_send.
      */
     NETDEV_EVENT_TX_MEDIUM_BUSY,
+#endif
     NETDEV_EVENT_LINK_UP,                   /**< link established */
     NETDEV_EVENT_LINK_DOWN,                 /**< link gone */
     NETDEV_EVENT_TX_TIMEOUT,                /**< timeout when sending */
