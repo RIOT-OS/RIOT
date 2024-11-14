@@ -465,7 +465,12 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
     size_t bytes_at_end;
     _unused_t *new = (_unused_t *)data, *prev = NULL, *ptr = _first_unused;
 
+    if (data == NULL) {
+        return;
+    }
+
     if (!gnrc_pktbuf_contains(data)) {
+        assert(0);
         return;
     }
 
