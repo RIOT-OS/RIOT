@@ -468,10 +468,12 @@ typedef struct netdev_driver {
      *          frame delimiters, etc. May be an estimate for performance
      *          reasons.)
      * @retval  -EAGAIN     Transmission still ongoing. (Call later again!)
-     * @retval  -ECOMM      Any kind of transmission error, such as collision
-     *                      detected, layer 2 ACK timeout, etc.
+     * @retval  -EHOSTUNREACH  Layer 2 ACK timeout
+     * @retval  -EBUSY      Medium is busy. (E.g. Auto-CCA failed / timed out,
+     *                      collision detected)
+     * @retval  -ENETDOWN   Interface is not connected / powered down
+     * @retval  -EIO        Any kind of transmission error
      *                      Use @p info for more details
-     * @retval  -EBUSY      Medium is busy. (E.g. Auto-CCA failed / timed out)
      * @retval  <0          Other error. (Please use a negative errno code.)
      *
      * @warning After netdev_driver_t::send was called and returned zero, this
