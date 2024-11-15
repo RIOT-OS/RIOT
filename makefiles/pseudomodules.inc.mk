@@ -592,6 +592,7 @@ PSEUDOMODULES += pio_autostart_%
 # Submodules provided by Skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
+PSEUDOMODULES += skald_bthome
 
 PSEUDOMODULES += crypto_aes_128
 PSEUDOMODULES += crypto_aes_192
