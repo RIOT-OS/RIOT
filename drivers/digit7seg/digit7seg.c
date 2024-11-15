@@ -81,6 +81,7 @@ int digit7seg_init(digit7seg_t *dev, const digit7seg_params_t *params)
     dev->params = *params;
     dev->current_digit = 0;
     dev->value = 0;
+    dev->status = TIMER_STOPPED;
 
     if (dev->params.digits <= 0 || dev->params.digits > DIGIT7SEG_MAX_DIGITS) {
         DEBUG("[Error] Invalid number of digit.\n");
