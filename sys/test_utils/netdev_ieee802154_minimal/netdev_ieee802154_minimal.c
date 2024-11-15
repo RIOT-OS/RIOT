@@ -177,6 +177,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         puts("Tx complete");
         break;
 
+#if IS_USED(MODULE_NETDEV_LEGACY_API)
     case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
         puts("Tx complete (with pending data)");
         break;
@@ -188,7 +189,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     case NETDEV_EVENT_TX_NOACK:
         puts("No ACK");
         break;
-
+#endif
     default:
         printf("Event: %d\n", event);
         break;
