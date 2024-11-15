@@ -221,13 +221,13 @@ static int _sam0_eth_confirm_send(netdev_t *netdev, void *info)
         return -EAGAIN;
     }
 
-    /* Retry Limit Exceeded */
-    if (tsr & GMAC_TSR_RLE) {
+    /* Retry Limit Exceeded, Collision Occurred */
+    if (tsr & (GMAC_TSR_RLE | GMAC_TSR_COL)) {
         return -EBUSY;
     }
 
-    /* Transmit Frame Corruption, Collision Occurred */
-    if (tsr & (GMAC_TSR_TFC | GMAC_TSR_COL)) {
+    /* Transmit Frame Corruption */
+    if (tsr & GMAC_TSR_TFC) {
         return -EIO;
     }
 
