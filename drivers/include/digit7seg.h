@@ -20,9 +20,9 @@
 
 #include <inttypes.h>
 
+#include "macros/units.h"
 #include "periph/gpio.h"
 #include "periph/timer.h"
-#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,8 +39,6 @@ extern "C" {
  * */
 #   define DIGIT7SEG_DELAY       (DIGIT7SEG_TIMER_HZ / 2600)
 #endif
-#define TIMER_RUNNING         (1)  /**< status when timer is running */
-#define TIMER_STOPPED         (0)  /**< status when timer is stopped */
 
 /**
  * @brief   Return codes for @ref digit7seg_init
@@ -101,26 +99,17 @@ typedef struct {
     digit7seg_params_t params; /**< Device parameters */
     uint32_t value;            /**< Binary value to display */
     uint8_t current_digit;     /**< Displayed digit */
-    uint8_t status;            /**< Status of the timer_periodic for this dev */
 } digit7seg_t;
 
 /**
  * @brief   Initialize the given DIGIT7SEG
  *
- * @param[out] dev      Initialized device descriptor of DIGIT7SEG device
+ * @param[out] dev      DIGIT7SEG device descriptor to initialize
  * @param[in]  params   Device parameters to use
  *
  * @return  0 on success or negative error code, see #digit7seg_error_codes
  */
 int digit7seg_init(digit7seg_t *dev, const digit7seg_params_t *params);
-
-/**
- * @brief   Shift the current digit off and the next one on
- *
- * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
- *
- */
-int digit7seg_shift(digit7seg_t *dev);
 
 /**
  * @brief   Set the value for every digit
@@ -129,7 +118,7 @@ int digit7seg_shift(digit7seg_t *dev);
  * @param[in] value     the value as an uint32_t
  *
  */
-int digit7seg_set_all_value(digit7seg_t *dev, uint32_t value);
+void digit7seg_set_all_value(digit7seg_t *dev, uint32_t value);
 
 /**
  * @brief   Set the value for one digit
@@ -139,6 +128,8 @@ int digit7seg_set_all_value(digit7seg_t *dev, uint32_t value);
  * @param[in] value     the value as an uint8_t, a is equal to the first bit
  *                       b the second.... dp the 8th bit.
  *
+ * @return              0 on success
+ * @return              -1 when an incorrect digit is passed
  */
 int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value);
 
@@ -147,7 +138,8 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value);
  *
  * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
  *
- * @return              -1 if the digit was already power on
+ * @return              0 on success
+ * @return              -1 if the timer was impossible to start
  */
 int digit7seg_poweron(digit7seg_t *dev);
 
@@ -155,10 +147,8 @@ int digit7seg_poweron(digit7seg_t *dev);
  * @brief   Stop an periodic timer event to shift between each 7seg
  *
  * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
- *
- * @return              -1 if the digit was already power off
  */
-int digit7seg_poweroff(digit7seg_t *dev);
+void digit7seg_poweroff(digit7seg_t *dev);
 
 #ifdef __cplusplus
 }

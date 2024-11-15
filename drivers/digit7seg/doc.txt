@@ -77,7 +77,7 @@ and turn on each digit at a rate that is imperceptible to the human eye.
 
 ## Error Handling
 
-All driver functions return 0 on success or one of a negative error code defined by
+Most of driver functions return 0 on success or one of a negative error code defined by
 #digit7seg_error_codes.
 
 ## Usage

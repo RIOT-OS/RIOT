@@ -59,8 +59,8 @@ int main(void)
 
     ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US);
     /*    R        I         O       T     */
-    /* 11101110 00001100 11111100 00001110 */
-    uint32_t binary_riot = 0b11101110000011001111110000001110;
+    /* 01110111 00110000 00111111 01110000 */
+    uint32_t binary_riot = 0b01110111001100000011111101110000;
     digit7seg_set_all_value(&dev, binary_riot);
 
     if (digit7seg_poweron(&dev) == 0) {
@@ -72,12 +72,7 @@ int main(void)
 
     ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
 
-    if (digit7seg_poweroff(&dev) == 0) {
-        puts("...Stopped");
-    }
-    else {
-        puts("Error");
-    }
+    digit7seg_poweroff(&dev);
 
     ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
 

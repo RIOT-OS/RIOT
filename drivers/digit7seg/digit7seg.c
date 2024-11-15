@@ -33,6 +33,7 @@
 
 /** The 7 segments + decimal point + the number of digits */
 #define NB_PIN              (8+dev->params.digits)
+#define BYTE_BITS           (0x08)
 
 static void _set_pin_value(digit7seg_t *dev)
 {
@@ -44,13 +45,13 @@ static void _set_pin_value(digit7seg_t *dev)
     uint8_t mask = 0xFF;
     uint8_t current_value = (uint8_t)(dev->value >> (dev->current_digit * 8) & mask);
 
-    for (int i = 1; i <= 8; i++) {
-        if (current_value & (1 << (8 - i))) {
-            gpio_set(pins[i - 1]);
+    for (int i = 0; i < BYTE_BITS; i++) {
+        if (current_value & (1 << i)) {
+            gpio_set(pins[i]);
             DEBUG("PIN SET\n");
         }
         else {
-            gpio_clear(pins[i - 1]);
+            gpio_clear(pins[i]);
             DEBUG("PIN CLEAR\n");
         }
     }
@@ -81,7 +82,6 @@ int digit7seg_init(digit7seg_t *dev, const digit7seg_params_t *params)
     dev->params = *params;
     dev->current_digit = 0;
     dev->value = 0;
-    dev->status = TIMER_STOPPED;
 
     if (dev->params.digits <= 0 || dev->params.digits > DIGIT7SEG_MAX_DIGITS) {
         DEBUG("[Error] Invalid number of digit.\n");
@@ -119,16 +119,9 @@ int digit7seg_init(digit7seg_t *dev, const digit7seg_params_t *params)
     return DIGIT7SEG_OK;
 }
 
-int digit7seg_shift(digit7seg_t *dev)
-{
-    _shift_display(dev, 0);
-    return 0;
-}
-
-int digit7seg_set_all_value(digit7seg_t *dev, uint32_t value)
+void digit7seg_set_all_value(digit7seg_t *dev, uint32_t value)
 {
     dev->value = value;
-    return 0;
 }
 
 int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
@@ -137,10 +130,10 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
         return -1;
     }
 
-    uint32_t temp_value = value << (index * 8);
-    uint32_t up_value = dev->value >> ((index + 1) * 8);
-    up_value <<= ((index + 1) * 8);
-    uint32_t down_value = ((0b00000001 << (index * 8)) - 1) & dev->value;
+    uint32_t temp_value = value << (index * BYTE_BITS);
+    uint32_t up_value = dev->value >> ((index + 1) * BYTE_BITS);
+    up_value <<= ((index + 1) * BYTE_BITS);
+    uint32_t down_value = ((0b00000001 << (index * BYTE_BITS)) - 1) & dev->value;
 
     dev->value = up_value | temp_value | down_value;
 
@@ -149,31 +142,17 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
 
 int digit7seg_poweron(digit7seg_t *dev)
 {
-    if (dev->status == TIMER_RUNNING) {
-        DEBUG("[Error] Timer is already running.\n");
-        return -1;
-    }
 
     if (timer_init(dev->params.timer, DIGIT7SEG_TIMER_HZ, _shift_display, dev) != 0) {
-        DEBUG("[Error] Impossible to init timer.\n");
+        DEBUG("[Error] Not possible to init timer.\n");
         return -1;
     }
 
     timer_set_periodic(dev->params.timer, 0, DIGIT7SEG_DELAY, TIM_FLAG_RESET_ON_MATCH);
-
-    dev->status = TIMER_RUNNING;
     return 0;
 }
 
-int digit7seg_poweroff(digit7seg_t *dev)
+void digit7seg_poweroff(digit7seg_t *dev)
 {
-    if (dev->status == TIMER_STOPPED) {
-        DEBUG("[Error] Timer is already stopped.\n");
-        return -1;
-    }
-
     timer_stop(dev->params.timer);
-    dev->status = TIMER_STOPPED;
-
-    return 0;
 }
