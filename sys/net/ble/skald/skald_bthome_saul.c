@@ -423,12 +423,14 @@ static void _update_saul_measurements(skald_ctx_t *skald_ctx)
     _reset_hdr(ctx);
     skald_bthome_saul_t *ptr = ctx->devs;
     while (ptr) {
-        int dim;
-        phydat_t data;
+        int dim = 1;
+        phydat_t data = { 0 };
 
-        dim = saul_reg_read(&ptr->saul, &data);
-        if (dim <= 0) {
-            continue;
+        if (ptr->saul.driver) {
+            dim = saul_reg_read(&ptr->saul, &data);
+            if (dim <= 0) {
+                continue;
+            }
         }
         for (uint8_t i = 0; i < dim; i++) {
             if (ptr->add_measurement(ctx, ptr->obj_id, &data, i) < 0) {
@@ -447,22 +449,24 @@ static void _update_saul_measurements(skald_ctx_t *skald_ctx)
 
 int skald_bthome_saul_add(skald_bthome_ctx_t *ctx, skald_bthome_saul_t *saul)
 {
-    int dim;
-    phydat_t sample;
-
-    if ((saul->saul.driver->type & SAUL_CAT_MASK) != SAUL_CAT_SENSE) {
+    if ((saul->saul.driver != NULL) &&
+        (saul->saul.driver->type & SAUL_CAT_MASK) != SAUL_CAT_SENSE) {
         return -ENOTSUP;
     }
 
     if (!ctx->skald.update_pkt) {
         ctx->skald.update_pkt = &_update_saul_measurements;
     }
-    dim = saul_reg_read(&saul->saul, &sample);
-    if (dim <= 0) {
-        return -ENODEV;
-    }
-    if (_saul_sense_to_bthome_id(saul, &sample) < 0) {
-        return -ENOENT;
+    if (!(saul->flags & SKALD_BTHOME_SAUL_FLAGS_CUSTOM)) {
+        phydat_t sample;
+        int dim = saul_reg_read(&saul->saul, &sample);
+
+        if (dim <= 0) {
+            return -ENODEV;
+        }
+        if (_saul_sense_to_bthome_id(saul, &sample) < 0) {
+            return -ENOENT;
+        }
     }
     if (ctx->devs) {
         skald_bthome_saul_t *ptr = ctx->devs;
