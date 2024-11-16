@@ -38,6 +38,7 @@ int main(void)
 {
     saul_reg_t *dev = saul_reg;
     unsigned i = 0;
+    int res;
 
     ztimer_sleep(ZTIMER_MSEC, 2000);
     printf("Skald and the tale of Harald's home\n");
@@ -53,7 +54,6 @@ int main(void)
         return 1;
     }
     while (dev && (i < CONFIG_BTHOME_SAUL_REG_DEVS)) {
-        int res;
         _saul_devs[i].saul = *dev;  /* copy registry entry */
         _saul_devs[i].saul.next = NULL;
         printf("Adding %s (%s) to BTHome.\n", dev->name, saul_class_to_str(dev->driver->type));
@@ -67,6 +67,17 @@ int main(void)
         dev = dev->next;
     }
     assert(!saul_reg || _ctx.devs);
+    if (i < CONFIG_BTHOME_SAUL_REG_DEVS) {
+        memset(&_saul_devs[i].saul, 0, sizeof(_saul_devs[i].saul));
+        _saul_devs[i].obj_id = BTHOME_ID_TEXT;
+        _saul_devs[i].flags = SKALD_BTHOME_SAUL_FLAGS_CUSTOM;
+        _saul_devs[i].add_measurement = _add_text;
+        if ((res = skald_bthome_saul_add(&_ctx, &_saul_devs[i])) < 0) {
+            errno = -res;
+            perror("Unable to add text info to BTHome");
+        };
+        i++;
+    }
     skald_bthome_advertise(&_ctx, BTHOME_ADV_INTERVAL);
     return 0;
 }

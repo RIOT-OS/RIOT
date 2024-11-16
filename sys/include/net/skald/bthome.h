@@ -48,6 +48,16 @@ typedef struct skald_bthome_ctx skald_bthome_ctx_t;
 
 #if IS_USED(MODULE_SKALD_BTHOME_SAUL) || defined(DOXYGEN)
 /**
+ * @brief   Flags for the BTHome-SAUL-adapter
+ */
+typedef enum {
+    /**
+     * @brief   Use custom object ID and add-measurement callback
+     */
+    SKALD_BTHOME_SAUL_FLAGS_CUSTOM = 0x01,
+} skald_bthome_saul_flags_t;
+
+/**
  * @brief   BTHome-SAUL-adapter
  */
 typedef struct {
@@ -63,9 +73,20 @@ typedef struct {
      *
      * @see @ref skald_bthome_id_t
      *
-     * Will be filled by @ref skald_bthome_saul_add().
+     * Will be filled by @ref skald_bthome_saul_add() if
+     * @ref SKALD_BTHOME_SAUL_FLAGS_CUSTOM is unset in
+     * skald_bthome_saul_t::flags. Otherwise, set to the desired
+     * object ID for the measurement.
      */
     skald_bthome_id_t obj_id;
+    /**
+     * @brief   Flags for the BTHome-SAUL-adapter
+     *
+     * @see @ref skald_bthome_saul_flags_t
+     *
+     * May be set before calling @ref skald_bthome_saul_add()
+     */
+    skald_bthome_saul_flags_t flags;
 
     /**
      * @brief   Callback to add measurement from SAUL registry entry
@@ -74,7 +95,10 @@ typedef struct {
      * @ref saul_reg_read() and should ultimately call
      * @ref skald_bthome_add_measurement() * (or one of its wrappers).
      *
-     * Will be filled by @ref skald_bthome_saul_add().
+     * Will be filled by @ref skald_bthome_saul_add() if
+     * @ref SKALD_BTHOME_SAUL_FLAGS_CUSTOM is unset in
+     * skald_bthome_saul_t::flags. Otherwise, set to the desired
+     * object ID for the measurement.
      *
      * @param[in,out] ctx   BTHome advertising context. MUST not be NULL.
      * @param[in] obj_id    The object ID for the measurement.
