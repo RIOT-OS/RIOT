@@ -7,8 +7,9 @@ BOARD ?= nrf52dk
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../../../
 
-# include Skald
-USEMODULE += skald_bthome
+# include Skald using SAUL
+USEMODULE += saul_default
+USEMODULE += skald_bthome_saul
 
 DEVELHELP ?= 1
 
