@@ -28,8 +28,12 @@
  */
 
 #include "byteorder.h"
-
+#include "kernel_defines.h"
 #include "net/skald.h"
+
+#if IS_USED(MODULE_SKALD_BTHOME_SAUL)
+#  include "saul_reg.h"
+#endif
 
 #include "net/skald/bthome/defs.h"
 
@@ -38,9 +42,62 @@ extern "C" {
 #endif
 
 /**
- * @brief   BTHome advertising context holding the advertising data and state
+ * @brief Forward declaration of @ref skald_bthome_ctx_t.
+ */
+typedef struct skald_bthome_ctx skald_bthome_ctx_t;
+
+#if IS_USED(MODULE_SKALD_BTHOME_SAUL) || defined(DOXYGEN)
+/**
+ * @brief   BTHome-SAUL-adapter
  */
 typedef struct {
+    /**
+     * @brief   Copy of the SAUL registry entry.
+     *
+     * Must be initialized when calling @ref skald_bthome_saul_add()
+     * with saul_reg_t::next set to NULL.
+     */
+    saul_reg_t saul;
+    /**
+     * @brief   Object ID for the SAUL registry entry
+     *
+     * @see @ref skald_bthome_id_t
+     *
+     * Will be filled by @ref skald_bthome_saul_add().
+     */
+    skald_bthome_id_t obj_id;
+
+    /**
+     * @brief   Callback to add measurement from SAUL registry entry
+     *
+     * Called directly after the measurement was taken via
+     * @ref saul_reg_read() and should ultimately call
+     * @ref skald_bthome_add_measurement() * (or one of its wrappers).
+     *
+     * Will be filled by @ref skald_bthome_saul_add().
+     *
+     * @param[in,out] ctx   BTHome advertising context. MUST not be NULL.
+     * @param[in] obj_id    The object ID for the measurement.
+     * @param[in] data      The @ref phydat_t to an element from. MUST not be NULL.
+     * @param[in] idx       The index of phydat_t::val to take the measurement from.
+     *                      MUST be lesser than PHYDAT_DIM.
+     *
+     * @return  The result of @ref skald_bthome_add_measurement() or one of its
+     *          wrappers.
+     */
+    int (*add_measurement)(
+        skald_bthome_ctx_t *ctx,
+        uint8_t obj_id,
+        phydat_t *data,
+        uint8_t idx
+    );
+} skald_bthome_saul_t;
+#endif
+
+/**
+ * @brief   BTHome advertising context holding the advertising data and state
+ */
+struct skald_bthome_ctx {
     skald_ctx_t skald;          /**< Skald context */
     /**
      * @brief   Pointer to service data length field
@@ -49,7 +106,15 @@ typedef struct {
      * @ref skald_bthome_init().
      */
     uint8_t *svc_data_len;
-} skald_bthome_ctx_t;
+#if IS_USED(MODULE_SKALD_BTHOME_SAUL) || defined(DOXYGEN)
+    /**
+     * @brief   SAUL devices to take measurements from.
+     *
+     * Fill this using @ref skald_bthome_saul_add().
+     */
+    skald_bthome_saul_t *devs;
+#endif
+};
 
 /**
  * @brief   Initialize the next BTHome advertisement
@@ -302,6 +367,27 @@ static inline int skald_bthome_add_int32_measurement(
     uint32_t le_data = htole32((uint32_t)data);
     return skald_bthome_add_measurement(ctx, obj_id, &le_data, sizeof(data));
 }
+
+#if IS_USED(MODULE_SKALD_BTHOME_SAUL) || defined(DOXYGEN)
+/**
+ * @brief   Add SAUL registry entry to BTHome
+ *
+ * skald_bthome_saul_t::saul of @p saul must be a copy of what is found in @ref sys_saul_reg.
+ *
+ * @see @ref sys_saul_reg
+ *
+ * @param[in,out] ctx       The BTHome context. Must not be NULL and must be initialized with
+ *                          @ref skald_bthome_init().
+ * @param[in] saul          A BTHome-SAUL-adapter.
+ *
+ * @retval 0            on success.
+ * @retval -ENOTSUP     if the SAUL registry entry of @p saul has no driver.
+ * @retval -ENODEV      if reading the SAUL device results in an error.
+ * @retval -ENOENT      if the SAUL device and its result are not convertible to a sensible
+ *                      object ID.
+ */
+int skald_bthome_saul_add(skald_bthome_ctx_t *ctx, skald_bthome_saul_t *saul);
+#endif
 
 /**
  * @brief   Starts periodically advertising the BTHome advertisement

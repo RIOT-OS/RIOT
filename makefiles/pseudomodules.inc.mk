@@ -590,9 +590,11 @@ NO_PSEUDOMODULES += periph_common
 PSEUDOMODULES += pio_autostart_%
 
 # Submodules provided by Skald
+PSEUDOMODULES += skald_update_pkt_cb
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
 PSEUDOMODULES += skald_bthome
+PSEUDOMODULES += skald_bthome_saul
 
 PSEUDOMODULES += crypto_aes_128
 PSEUDOMODULES += crypto_aes_192
