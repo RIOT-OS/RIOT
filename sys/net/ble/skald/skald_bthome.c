@@ -10,9 +10,12 @@
  * @author  Martine S. Lenders <mail@martine-lenders.eu>
  */
 
-#include "random.h"
-
 #include "net/skald/bthome.h"
+
+#if IS_USED(MODULE_SKALD_BTHOME_ENCRYPT)
+#  include "random.h"
+#  include "crypto/modes/ccm.h"
+#endif
 
 #define AD_TYPE_FLAGS               0x01
 #define AD_TYPE_SVC_DATA            0x16
@@ -20,6 +23,7 @@
 #define AD_TYPE_LOCAL_NAME_COMPLETE 0x09
 
 #define BT_HOME_DEV_INFO_MASK       0x01
+#define BT_HOME_DEV_INFO_ENCRYPT    0x01
 #define BT_HOME_DEV_INFO_BTHOME_V2  (2 << 5)
 
 typedef struct __attribute__((packed)) {
@@ -172,6 +176,84 @@ int skald_bthome_add_measurement(
     ctx->skald.pkt.len = offset;
     return ctx->skald.pkt.len;
 }
+
+#if IS_USED(MODULE_SKALD_BTHOME_ENCRYPT)
+static uint32_t _counter = 0;
+
+int skald_bthome_encrypt(skald_bthome_ctx_t *ctx)
+{
+    if (!ctx->encrypt) {
+        return ctx->skald.pkt.len;
+    }
+    uint8_t ciphertext[NETDEV_BLE_PDU_MAXLEN];
+    cipher_t cipher = { 0 };
+    uint8_t *txadd = &ctx->skald.pkt.pdu[0];
+    uint8_t *dev_info = ctx->svc_data_len + 4;
+    uint8_t *uuid = ctx->svc_data_len + 2;
+    uint8_t *data = dev_info + 1;
+    int ciphertext_len;
+    uint8_t nonce[13];
+    uint8_t nonce_len = 0;
+    /* maximum data length - counter */
+    uint8_t max_len = &ctx->skald.pkt.pdu[NETDEV_BLE_PDU_MAXLEN] - data - 4;
+    uint8_t data_len = &ctx->skald.pkt.pdu[ctx->skald.pkt.len] - data;
+
+    if (_counter == 0) {
+        _counter = random_uint32();
+    }
+
+    *dev_info |= BT_HOME_DEV_INFO_ENCRYPT;
+
+    /* set nonce according to spec: MAC Address + UUID + BTHome dev info + counter */
+    memcpy(&nonce[nonce_len], txadd, BLE_ADDR_LEN);
+    nonce_len += BLE_ADDR_LEN;
+    memcpy(&nonce[nonce_len], uuid, 2);
+    nonce_len += 2;
+    nonce[nonce_len++] = *dev_info;
+    nonce[nonce_len++] = (_counter >> 24) & 0xff;
+    nonce[nonce_len++] = (_counter >> 16) & 0xff;
+    nonce[nonce_len++] = (_counter >> 8) & 0xff;
+    nonce[nonce_len++] = _counter & 0xff;
+
+    if (cipher_init(&cipher, CIPHER_AES,
+                    ctx->key, SKALD_BTHOME_KEY_LEN) != CIPHER_INIT_SUCCESS) {
+        return -1;
+    }
+
+    ciphertext_len = cipher_encrypt_ccm(&cipher, NULL, 0, 4, 2,
+                                        nonce, nonce_len,
+                                        data, data_len,
+                                        ciphertext);
+
+    if (ciphertext_len < 0) {
+        return -1;
+    }
+
+    if (ciphertext_len > max_len) {
+        return -ENOBUFS;
+    }
+    /* replace original payload with ciphertext */
+    data_len = 0;
+    /* add ciphertext */
+    memcpy(&data[data_len], ciphertext, ciphertext_len -4);
+    data_len += (ciphertext_len - 4);
+    /* add counter */
+    data[data_len++] = (_counter >> 24) & 0xff;
+    data[data_len++] = (_counter >> 16) & 0xff;
+    data[data_len++] = (_counter >> 8) & 0xff;
+    data[data_len++] = _counter & 0xff;
+    /* add mic */
+    memcpy(&data[data_len], &ciphertext[ciphertext_len - 4], 4);
+    data_len += 4;
+
+    ctx->skald.pkt.len = (dev_info - txadd) + data_len + 1;
+    *ctx->svc_data_len = data_len + 4;
+    /* Progress counter a random step but not too big step */
+    _counter += random_uint32() & 0x1f;
+
+    return ctx->skald.pkt.len;
+}
+#endif
 
 void skald_bthome_advertise(skald_bthome_ctx_t *ctx, uint32_t adv_itvl_ms)
 {

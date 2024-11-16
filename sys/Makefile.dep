@@ -593,6 +593,11 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
 
+ifneq (,$(filter skald_bthome_encrypt,$(USEMODULE)))
+  USEMODULE += cipher_modes
+  USEMODULE += skald_bthome
+endif
+
 ifneq (,$(filter skald_bthome_saul,$(USEMODULE)))
   USEMODULE += skald_bthome
   USEMODULE += skald_update_pkt_cb

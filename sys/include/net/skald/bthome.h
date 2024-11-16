@@ -15,7 +15,9 @@
  *
  * # Implementation state
  * - BTHome v2 is mostly supported
- * - [Encryption](https://bthome.io/encryption/) is not supported
+ * - [Encryption](https://bthome.io/encryption/) is supported and the format is
+ *   confirmed to provide the expected output, but Home Assistant does not
+ *   accept the encryption key to decrypt the message.
  * - [Trigger based devices](https://bthome.io/format/#bthome-data-format) are not supported
  *
  *
@@ -40,6 +42,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Length of the BTHome encryption key
+ *
+ * @see [BTHome Encryption Reference](https://bthome.io/encryption/)
+ */
+#define SKALD_BTHOME_KEY_LEN    16U
 
 /**
  * @brief Forward declaration of @ref skald_bthome_ctx_t.
@@ -137,6 +146,22 @@ struct skald_bthome_ctx {
      * Fill this using @ref skald_bthome_saul_add().
      */
     skald_bthome_saul_t *devs;
+#endif
+#if IS_USED(MODULE_SKALD_BTHOME_ENCRYPT) || defined(DOXYGEN)
+    /**
+     * @brief   The encryption key for BTHome
+     *
+     * @see [BTHome Encryption Reference](https://bthome.io/encryption/)
+     */
+    uint8_t key[SKALD_BTHOME_KEY_LEN];
+    /**
+     * @brief   Enable encryption with BTHome
+     *
+     * @see [BTHome Encryption Reference](https://bthome.io/encryption/)
+     *
+     * A non-zero key should be set in skald_bthome_ctx_t::key in this case.
+     */
+    uint8_t encrypt;
 #endif
 #if IS_USED(MODULE_SKALD_BTHOME_SAUL) || defined(DOXYGEN)
     /**
@@ -429,6 +454,19 @@ static inline int skald_bthome_add_int32_measurement(
  *                      object ID.
  */
 int skald_bthome_saul_add(skald_bthome_ctx_t *ctx, skald_bthome_saul_t *saul);
+#endif
+
+#if IS_USED(MODULE_SKALD_BTHOME_ENCRYPT) || defined(DOXYGEN)
+/**
+ * @brief   Encrypt the packet in the Skald context
+ *
+ * @param[in] ctx   A BTHome Skald context. Must not be NULL.
+ *
+ * @return  The total size of the encrypted packet on success or an error code on failure
+ * @retval  -ENOBUFS if the encrypted packet would not fit into a
+ *          BLE advertisement.
+ */
+int skald_bthome_encrypt(skald_bthome_ctx_t *ctx);
 #endif
 
 /**
