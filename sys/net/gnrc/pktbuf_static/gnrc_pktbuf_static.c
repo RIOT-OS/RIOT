@@ -240,12 +240,13 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 }
 
 #ifdef DEVELHELP
-#ifdef MODULE_OD
 static inline void _print_chunk(void *chunk, size_t size, int num)
 {
     printf("=========== chunk %3i (%-10p size: %4" PRIuSIZE ") ===========\n", num, chunk,
            size);
+#ifdef MODULE_OD
     od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
+#endif
 }
 
 static inline void _print_ptr(_unused_t *ptr)
@@ -266,11 +267,9 @@ static inline void _print_unused(_unused_t *ptr)
     _print_ptr(ptr->next);
     printf(", size: %4u) ~\n", ptr->size);
 }
-#endif
 
 void gnrc_pktbuf_stats(void)
 {
-#ifdef MODULE_OD
     _unused_t *ptr = _first_unused;
     uint8_t *chunk = &_static_buf[0];
     int count = 0;
@@ -306,9 +305,6 @@ void gnrc_pktbuf_stats(void)
     if (chunk <= &_static_buf[CONFIG_GNRC_PKTBUF_SIZE - 1]) {
         _print_chunk(chunk, &_static_buf[CONFIG_GNRC_PKTBUF_SIZE] - chunk, count);
     }
-#else
-    DEBUG("pktbuf: needs od module\n");
-#endif
 }
 #endif
 
@@ -438,6 +434,10 @@ static void *_pktbuf_alloc(size_t size)
 #endif
         assert(0);
     }
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        /* clear out canary */
+        memset(ptr, ~CANARY, size);
+    }
 
     return (void *)ptr;
 }
@@ -469,6 +469,13 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
     }
 
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
+        /* check if the data has already been marked as free */
+        size_t chk_len = _align(size) - sizeof(*new);
+        if (chk_len && !memchk((uint8_t *)data + sizeof(*new), CANARY, chk_len)) {
+            printf("pktbuf: double free detected! (at %p, len=%u)\n",
+                   data, (unsigned)_align(size));
+            DEBUG_BREAKPOINT(2);
+        }
         memset(data, CANARY, _align(size));
     }
 
