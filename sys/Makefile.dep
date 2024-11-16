@@ -599,6 +599,11 @@ ifneq (,$(filter skald_bthome_saul,$(USEMODULE)))
   USEMODULE += saul_reg
 endif
 
+ifneq (,$(filter skald_update_pkt_cb,$(USEMODULE)))
+  USEMODULE += event
+  USEMODULE += skald
+endif
+
 ifneq (,$(filter bluetil_addr,$(USEMODULE)))
   USEMODULE += fmt
 endif
