@@ -12,4 +12,8 @@ ifneq (,$(filter skald_bthome,$(USEMODULE)))
   SRC += skald_bthome.c
 endif
 
+ifneq (,$(filter skald_bthome_saul,$(USEMODULE)))
+  SRC += skald_bthome_saul.c
+endif
+
 include $(RIOTBASE)/Makefile.base

@@ -593,6 +593,12 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
 
+ifneq (,$(filter skald_bthome_saul,$(USEMODULE)))
+  USEMODULE += skald_bthome
+  USEMODULE += skald_update_pkt_cb
+  USEMODULE += saul_reg
+endif
+
 ifneq (,$(filter bluetil_addr,$(USEMODULE)))
   USEMODULE += fmt
 endif
