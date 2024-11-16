@@ -34,6 +34,15 @@
 static skald_bthome_ctx_t _ctx;
 static skald_bthome_saul_t _saul_devs[CONFIG_BTHOME_SAUL_REG_DEVS];
 
+static int _add_text(skald_bthome_ctx_t *ctx, uint8_t obj_id, phydat_t *data, uint8_t idx)
+{
+    static const char info[] = "RIOT";
+
+    (void)data;
+    (void)idx;
+    return skald_bthome_add_measurement(ctx, obj_id, info, strlen(info));
+}
+
 int main(void)
 {
     saul_reg_t *dev = saul_reg;
