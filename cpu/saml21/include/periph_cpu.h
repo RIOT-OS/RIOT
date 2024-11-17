@@ -20,7 +20,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "periph_cpu_common.h"
+#include "periph_cpu_common.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,9 +47,8 @@ extern "C" {
  */
 #define SAM0_GPIO_PM_BLOCK        SAML21_PM_MODE_BACKUP   /**< GPIO IRQs require STANDBY mode */
 #define SAM0_RTCRTT_PM_BLOCK      SAML21_PM_MODE_BACKUP   /**< RTC/TRR require STANDBY mode */
-#define SAM0_SPI_PM_BLOCK         SAML21_PM_MODE_STANDBY  /**< SPI in DMA mode require IDLE mode */
+#define SAM0_SERCOM_PM_BLOCK      SAML21_PM_MODE_STANDBY  /**< SERCOMs require IDLE mode */
 #define SAM0_TIMER_PM_BLOCK       SAML21_PM_MODE_STANDBY  /**< Timers require IDLE mode */
-#define SAM0_UART_PM_BLOCK        SAML21_PM_MODE_STANDBY  /**< UART RX IRQ require IDLE mode */
 #define SAM0_USB_IDLE_PM_BLOCK    SAML21_PM_MODE_BACKUP   /**< Idle USB require STANDBY mode */
 #define SAM0_USB_ACTIVE_PM_BLOCK  SAML21_PM_MODE_STANDBY  /**< Active USB require IDLE mode */
 /** @} */
@@ -169,6 +168,41 @@ struct sam0_aux_cfg_mapping {
     uint64_t nvm_locks                  : 16; /**< NVM Region Lock Bits.                */
 };
 /** @} */
+
+/* these functions are documented in periph_cpu_common.h, but Doxygen
+ * is unable to connect the dots */
+#if !DOXYGEN
+static inline void sercom_apb_enable(sercom_t sercom)
+{
+    if (sercom < 5) {
+        MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom);
+    }
+    else {
+        MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
+    }
+}
+
+static inline void sercom_apb_disable(sercom_t sercom)
+{
+    if (sercom < 5) {
+        MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom);
+    }
+    else {
+        MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
+    }
+}
+
+static inline void sercom_gclk_enable(sercom_t sercom, uint8_t gclk)
+{
+    uint32_t val = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
+    if (sercom < 5) {
+        GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom].reg = val;
+    }
+    else {
+        GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg = val;
+    }
+}
+#endif
 
 #ifdef __cplusplus
 }

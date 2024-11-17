@@ -21,40 +21,40 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
+#include "cpu_conf_common.h" /* IWYU pragma: export */
 
 #if defined(CPU_SAMD10)
-#include "vendor/samd10/include/samd10.h"
+#include "vendor/samd10/include/samd10.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD20)
-#include "vendor/samd20/include/samd20.h"
+#include "vendor/samd20/include/samd20.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD20B)
-#include "vendor/samd20/include_b/samd20.h"
+#include "vendor/samd20/include_b/samd20.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD21A)
-#include "vendor/samd21/include_a/samd21.h"
+#include "vendor/samd21/include_a/samd21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD21B)
-#include "vendor/samd21/include_b/samd21.h"
+#include "vendor/samd21/include_b/samd21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD21C)
-#include "vendor/samd21/include_c/samd21.h"
+#include "vendor/samd21/include_c/samd21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD21D)
-#include "vendor/samd21/include_d/samd21.h"
+#include "vendor/samd21/include_d/samd21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMD51)
-#include "vendor/samd51/include/samd51.h"
+#include "vendor/samd51/include/samd51.h" /* IWYU pragma: export */
 #elif defined(CPU_SAME54)
-#include "vendor/same54/include/same54.h"
+#include "vendor/same54/include/same54.h" /* IWYU pragma: export */
 #elif defined(CPU_SAML10)
-#include "vendor/saml10/include/sam.h"
+#include "vendor/saml10/include/sam.h" /* IWYU pragma: export */
 #elif defined(CPU_SAML11)
-#include "vendor/saml11/include/sam.h"
+#include "vendor/saml11/include/sam.h" /* IWYU pragma: export */
 #elif defined(CPU_SAML21A)
-#include "vendor/saml21/include/saml21.h"
+#include "vendor/saml21/include/saml21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAML21B)
-#include "vendor/saml21/include_b/saml21.h"
+#include "vendor/saml21/include_b/saml21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMR21)
-#include "vendor/samr21/include/samr21.h"
+#include "vendor/samr21/include/samr21.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMR30)
-#include "vendor/samr30/include/samr30.h"
+#include "vendor/samr30/include/samr30.h" /* IWYU pragma: export */
 #elif defined(CPU_SAMR34)
-#include "vendor/samr34/include/samr34.h"
+#include "vendor/samr34/include/samr34.h" /* IWYU pragma: export */
 #endif
 
 #ifdef __cplusplus

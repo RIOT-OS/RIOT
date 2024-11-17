@@ -30,6 +30,7 @@ FEATURES_PROVIDED += periph_sdmmc_auto_cmd12
 FEATURES_PROVIDED += periph_sdmmc_hs
 FEATURES_PROVIDED += periph_sdmmc_mmc
 FEATURES_PROVIDED += periph_sdmmc_sdhc
+FEATURES_PROVIDED += periph_sercom
 FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += periph_spi_gpio_mode
 FEATURES_PROVIDED += periph_spi_reconfigure

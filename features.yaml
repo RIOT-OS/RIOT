@@ -815,6 +815,8 @@ groups:
       help: A RISC-V Core-local Interrupt Controller (CLIC) peripheral is present.
     - name: periph_plic
       help: A RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
+    - name: periph_sercom
+      help: A SAM0 SERial COMmunication peripheral is present.
 
   - title: Cryptographic Features
     help: Hardware acceleration for cryptographic primitives, hardware random

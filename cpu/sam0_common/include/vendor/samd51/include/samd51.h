@@ -14,9 +14,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.
  * You may obtain a copy of the Licence at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,27 +36,27 @@
  */
 
 #if   defined(__SAMD51G18A__) || defined(__ATSAMD51G18A__)
-  #include "samd51g18a.h"
+  #include "samd51g18a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51G19A__) || defined(__ATSAMD51G19A__)
-  #include "samd51g19a.h"
+  #include "samd51g19a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51J18A__) || defined(__ATSAMD51J18A__)
-  #include "samd51j18a.h"
+  #include "samd51j18a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51J19A__) || defined(__ATSAMD51J19A__)
-  #include "samd51j19a.h"
+  #include "samd51j19a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51J19B__) || defined(__ATSAMD51J19B__)
-  #include "samd51j19b.h"
+  #include "samd51j19b.h" /* IWYU pragma: export */
 #elif defined(__SAMD51J20A__) || defined(__ATSAMD51J20A__)
-  #include "samd51j20a.h"
+  #include "samd51j20a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51J20C__) || defined(__ATSAMD51J20C__)
-  #include "samd51j20c.h"
+  #include "samd51j20c.h" /* IWYU pragma: export */
 #elif defined(__SAMD51N19A__) || defined(__ATSAMD51N19A__)
-  #include "samd51n19a.h"
+  #include "samd51n19a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51N20A__) || defined(__ATSAMD51N20A__)
-  #include "samd51n20a.h"
+  #include "samd51n20a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51P19A__) || defined(__ATSAMD51P19A__)
-  #include "samd51p19a.h"
+  #include "samd51p19a.h" /* IWYU pragma: export */
 #elif defined(__SAMD51P20A__) || defined(__ATSAMD51P20A__)
-  #include "samd51p20a.h"
+  #include "samd51p20a.h" /* IWYU pragma: export */
 #else
   #error Library does not support the specified device.
 #endif
