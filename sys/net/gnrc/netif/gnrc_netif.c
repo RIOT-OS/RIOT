@@ -51,7 +51,7 @@
 #include "debug.h"
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
-static void _check_netdev_capabilities(netdev_t *dev);
+static void _check_netdev_capabilities(netdev_t *dev, bool legacy);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
@@ -1491,11 +1491,15 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
-static void _check_netdev_capabilities(netdev_t *dev)
+static void _check_netdev_capabilities(netdev_t *dev, bool legacy)
 {
     /* Check whether RX- and TX-complete interrupts are supported by the driver */
     if (IS_ACTIVE(DEVELHELP)) {
         if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
+            if (!legacy) {
+                /* new API implies TX end event */
+                return;
+            }
             netopt_enable_t enable = NETOPT_ENABLE;
             int res = dev->driver->get(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
             if ((res != sizeof(enable)) || (enable != NETOPT_ENABLE)) {
@@ -1640,7 +1644,7 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
         return res;
     }
     netif_register(&netif->netif);
-    _check_netdev_capabilities(dev);
+    _check_netdev_capabilities(dev, gnrc_netif_netdev_legacy_api(netif));
     _init_from_device(netif);
 #ifdef DEVELHELP
     _test_options(netif);
