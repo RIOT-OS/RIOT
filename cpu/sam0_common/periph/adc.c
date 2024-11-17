@@ -18,27 +18,36 @@
  *
  * @}
  */
+
 #include <stdint.h>
-#include "cpu.h"
-#include "periph/gpio.h"
-#include "periph/adc.h"
-#include "periph_conf.h"
+
 #include "macros/utils.h"
 #include "mutex.h"
+#include "periph/adc.h"
+#include "periph/gpio.h"
+#include "periph_conf.h"
+
+#if CPU_COMMON_SAMD5X && (ADC_REFCTRL_REFSEL_INTREF == ADC_REF_DEFAULT)
+#  if MODULE_ZTIMER_USEC || MODULE_ZTIMER_MSEC
+#    include "ztimer.h"
+#  else
+#    include "busy_wait.h"
+#  endif
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef ADC_GCLK_SRC
-    #define ADC_GCLK_SRC SAM0_GCLK_MAIN
+#  define ADC_GCLK_SRC SAM0_GCLK_MAIN
 #endif
 
 #ifndef ADC_GAIN_FACTOR_DEFAULT
-    #define ADC_GAIN_FACTOR_DEFAULT (0)
+#  define ADC_GAIN_FACTOR_DEFAULT (0)
 #endif
 
 #ifndef ADC_NEG_INPUT
-    #define ADC_NEG_INPUT (0)
+#  define ADC_NEG_INPUT (0)
 #endif
 
 /* Prototypes */
@@ -239,6 +248,36 @@ static int _adc_configure(Adc *dev, adc_res_t res)
     /*  Enable ADC Module */
     dev->CTRLA.reg |= ADC_CTRLA_ENABLE;
     _wait_syncbusy(dev);
+
+#if CPU_COMMON_SAMD5X && (ADC_REFCTRL_REFSEL_INTREF == ADC_REF_DEFAULT)
+    /* From the errata
+     * > 2.1.6 Internal Bandgap Reference
+     * > ================================
+     * >
+     * > If the internal bandgap voltage reference is selected
+     * > (REFCTRL.REFSEL = 0x0), ADC conversions may never complete
+     * > (INTFLAG.RESRDY = 0).
+     * >
+     * > Workaround
+     * > ----------
+     * >
+     * > If CTRLA.ONDEMAND = 0: Add a delay of minimum 40 μs between the
+     * > enable of the ADC (CTRLA.ENABLE) and the start of the first conversion.
+     * > [...]
+     *
+     * We do so using ztimer if used anyway, or busy waiting otherwise.
+     */
+#  if MODULE_ZTIMER_USEC
+    ztimer_sleep(ZTIMER_USEC, 40);
+#  elif MODULE_ZTIMER_MSEC
+    ztimer_sleep(ZTIMER_MSEC, 1);
+#  else
+    /* busy_wait_us() is not super accurate. We just wait for twice the
+     * time to be extra sure the delay is enough. */
+    busy_wait_us(2 * 40);
+#  endif
+#endif
+
     return 0;
 }
 
