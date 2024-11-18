@@ -1760,6 +1760,17 @@ static void _send_queued_pkt(gnrc_netif_t *netif)
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 }
 
+static netstats_nb_result_t _res_to_nb_result(int res)
+{
+    if (res >= 0) {
+        return NETSTATS_NB_SUCCESS;
+    }
+    if (res == -EHOSTUNREACH) {
+        return NETSTATS_NB_NOACK;
+    }
+    return NETSTATS_NB_BUSY;
+}
+
 static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                      gnrc_pktsnip_t *tx_sync, int res, bool push_back)
 {
@@ -1771,12 +1782,23 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_release_error(tx_sync, err);
     }
 
+    if (IS_USED(MODULE_NETSTATS_NEIGHBOR) && gnrc_netif_netdev_new_api(netif)) {
+        int8_t retries = -1;
+        netstats_nb_result_t result = _res_to_nb_result(res);
+        if (result != NETSTATS_NB_BUSY) {
+            netdev_t *dev = netif->dev;
+            retries = dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
+        }
+
+        netstats_nb_update_tx(&netif->netif, result, retries + 1);
+    }
+
     /* no frame was transmitted */
     if (res < 0) {
         DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
               (void *)pkt, res);
 
-        if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+        if (IS_USED(MODULE_NETSTATS_NEIGHBOR) && gnrc_netif_netdev_legacy_api(netif)) {
             netstats_nb_update_tx(&netif->netif, NETSTATS_NB_BUSY, 0);
         }
     }
