@@ -6,13 +6,14 @@
 ## Overview
 
 The WeMos Zero is a cheap clone of Arduino Zero featuring a ATSAMD21G18A.
+These boards either have a silkscreen "WeMos" or "HW-910" label on their back.
 Unlike the original Zero, it does not include an embedded debugger/programmer.
 Instead, the [UF2 Bootloader](https://github.com/microsoft/uf2-samdx1) is
 used to program this board. The SAMD21 is a ARM Cortex-M0+ micro-controller.
 It has 256KiB of flash memory and 32KiB of RAM.
 
-Note: The official Arduino Zero using the native USB port and the Adafruit
-Metro M0 Express should also work with board definition.
+@note The official Arduino Zero using the native USB port and the Adafruit
+      Metro M0 Express should also work with this board definition.
 
 ## Hardware
 
