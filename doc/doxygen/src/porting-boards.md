@@ -178,13 +178,13 @@ PROGRAMMER ?= openocd
 
 ## Timer Configurations                            {#board-timer-configurations}
 
-When using high level timers, i.e. `ztimer` there is an overhead in calling
-for @ref ztimer_sleep and @ref ztimer_set functions. This offset can be
+When using the high level timer `ztimer` there is an overhead in calling
+the @ref ztimer_sleep and @ref ztimer_set functions. This offset can be
 compensated for. It can be measured by running `tests/sys/ztimer_overhead`
 on your board, i.e:
 
 ```shell
-$ BOARD=my-new-board make -C tests/sys/ztimer_overhead
+$ BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
 main(): This is RIOT!
 ZTIMER_USEC auto_adjust params:
     ZTIMER_USEC->adjust_set = xx
@@ -210,6 +210,10 @@ The last two lines can be added as defines to the new board `board.h`:
 #define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   21
 /** @} */
 ```
+
+Alternatively, the pseudomodule @ref pseudomodule_ztimer_auto_adjust can be used
+in an application to enable automatic timer offset compensation at board startup.
+This however incurs overhead both in the text segment and at bootup time.
 
 ## doc.txt                                                          {#board-doc}
 
