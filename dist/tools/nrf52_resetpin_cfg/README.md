@@ -5,6 +5,10 @@ Simply compile, flash, and run this tool on your nRF52x-based board. It will
 program the given `RESET_PIN` into the NRF_UICR->PSELRESET registers, hence
 allowing for hardware resets using a button connected to that pin.
 
+> [!WARNING]
+> This tool only works with early nRF52 chips with build codes before Fxx.
+> Later build codes automatically erase the UICR register on each flashing
+> operation.
 
 Context
 =======
