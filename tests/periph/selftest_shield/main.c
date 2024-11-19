@@ -554,6 +554,9 @@ static bool periph_gpio_irq_test_falling(void)
     brief_delay();
     failed |= TEST(atomic_load(&cnt) == 3);
 
+    /* disable IRQ again to not have side effects */
+    gpio_irq_disable(ARDUINO_PIN_3);
+
     print_result(failed);
     return failed;
 }
@@ -616,6 +619,9 @@ static bool periph_gpio_irq_test_rising(void)
     gpio_set(ARDUINO_PIN_4);
     brief_delay();
     failed |= TEST(atomic_load(&cnt) == 3);
+
+    /* disable IRQ again to not have side effects */
+    gpio_irq_disable(ARDUINO_PIN_3);
 
     print_result(failed);
     return failed;
