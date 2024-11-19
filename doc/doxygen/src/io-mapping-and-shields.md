@@ -90,11 +90,12 @@ mapping. For the official Arduino boards and compatible boards, the
 Please extend the table below to keep naming among boards of the same form
 factor consistent:
 
-| Form Factor   | Macro Name            | Description                       |
-|:------------- |:--------------------- |:--------------------------------- |
-| Arduino Nano  | `ARDUINO_UART_D0D1`   | UART on D0 (RXD) and D1 (TXD)     |
-| Arduino Uno   | `ARDUINO_UART_D0D1`   | UART on D0 (RXD) and D1 (TXD)     |
-| Arduino Mega  | `ARDUINO_UART_D0D1`   | UART on D0 (RXD) and D1 (TXD)     |
+| Form Factor      | Macro Name            | Description                       |
+|:---------------- |:--------------------- |:--------------------------------- |
+| Arduino Nano     | `ARDUINO_UART_D0D1`   | UART on D0 (RXD) and D1 (TXD)     |
+| Arduino Uno      | `ARDUINO_UART_D0D1`   | UART on D0 (RXD) and D1 (TXD)     |
+| Arduino Mega     | `ARDUINO_UART_D0D1`   | UART on D0 (RXD) and D1 (TXD)     |
+| Seeedstudio XIAO | `ARDUINO_UART_DEV`    | UART on D7 (RXD) and D6 (TXD)     |
 
 I²C Buses                                                 {#iomaps-mapping-i2c}
 ---------
@@ -102,13 +103,14 @@ I²C Buses                                                 {#iomaps-mapping-i2c}
 The feature `arduino_i2c` is provided by boards that do provide an I²C bus
 mapping.
 
-| Form Factor   | Macro Name            | Description                       |
-|:------------- |:--------------------- |:--------------------------------- |
-| Arduino Nano  | `ARDUINO_I2C_NANO`    | D18 (SDA) / D19 (SCL)             |
-| Arduino Uno   | `ARDUINO_I2C_UNO`     | D18 (SDA) / D19 (SCL)             |
-| Arduino Mega  | `ARDUINO_I2C_UNO`     | D20 (SDA) / D21 (SCL)             |
-| Arduino Zero  | `ARDUINO_I2C_UNO`     | D20 (SDA) / D21 (SCL)             |
-| Arduino Due   | `ARDUINO_I2C_UNO`     | D70 (SDA) / D71 (SCL)             |
+| Form Factor      | Macro Name            | Description                       |
+|:---------------- |:--------------------- |:--------------------------------- |
+| Arduino Nano     | `ARDUINO_I2C_NANO`    | D18 (SDA) / D19 (SCL)             |
+| Arduino Uno      | `ARDUINO_I2C_UNO`     | D18 (SDA) / D19 (SCL)             |
+| Arduino Mega     | `ARDUINO_I2C_UNO`     | D20 (SDA) / D21 (SCL)             |
+| Arduino Zero     | `ARDUINO_I2C_UNO`     | D20 (SDA) / D21 (SCL)             |
+| Arduino Due      | `ARDUINO_I2C_UNO`     | D70 (SDA) / D71 (SCL)             |
+| Seeedstudio XIAO | `ARDUINO_I2C_DEV`     | D4 (SDA) / D5 (SCL)               |
 
 The `ARDUINO_I2C_UNO` refers to the I²C bus next to the AREF pin (the topmost
 pins on header on the top right) of an Arduino Uno compatible board, e.g.
@@ -123,14 +125,15 @@ SPI Buses                                                 {#iomaps-mapping-spi}
 The feature `arduino_spi` is provided by boards that do provide an SPI bus
 mapping.
 
-| Form Factor   | Macro Name                | Description                           |
-|:------------- |:------------------------- |:------------------------------------- |
-| Arduino Nano  | `ARDUINO_SPI_ISP`         | The SPI on the ISP header             |
-| Arduino Nano  | `ARDUINO_SPI_D11D12D13`   | D11 (MOSI) / D12 (MISO) / D13 (SCK)   |
-| Arduino Uno   | `ARDUINO_SPI_ISP`         | The SPI on the ISP header             |
-| Arduino Uno   | `ARDUINO_SPI_D11D12D13`   | D11 (MOSI) / D12 (MISO) / D13 (SCK)   |
-| Arduino Mega  | `ARDUINO_SPI_ISP`         | The SPI on the ISP header             |
-| Arduino Mega  | `ARDUINO_SPI_D11D12D13`   | D11 (MOSI) / D12 (MISO) / D13 (SCK)   |
+| Form Factor      | Macro Name                | Description                           |
+|:---------------- |:------------------------- |:------------------------------------- |
+| Arduino Nano     | `ARDUINO_SPI_ISP`         | The SPI on the ISP header             |
+| Arduino Nano     | `ARDUINO_SPI_D11D12D13`   | D11 (MOSI) / D12 (MISO) / D13 (SCK)   |
+| Arduino Uno      | `ARDUINO_SPI_ISP`         | The SPI on the ISP header             |
+| Arduino Uno      | `ARDUINO_SPI_D11D12D13`   | D11 (MOSI) / D12 (MISO) / D13 (SCK)   |
+| Arduino Mega     | `ARDUINO_SPI_ISP`         | The SPI on the ISP header             |
+| Arduino Mega     | `ARDUINO_SPI_D11D12D13`   | D11 (MOSI) / D12 (MISO) / D13 (SCK)   |
+| Seeedstudio XIAO | `ARDUINO_SPI_DEV`         | D10 (MOSI) / D9 (MISO) / D8 (SCK)     |
 
 @note   The original AVR based Arduinos only have a single hard SPI bus which
         is only provided via the ISP header. Many modern Arduino compatible
@@ -144,12 +147,12 @@ Modules implementing drivers for extension boards, a.k.a. shields, can express
 their mechanical and electrical requirements by depending on `arduino_shield_...`
 features. The following list of features currently exists:
 
-| Feature Name          | Compatibility Claim                                       |
-|
-| `arduino_shield_nano` | Board has side headers compatible with the Arduino Nano   |
-| `arduino_shield_uno`  | Board has side headers compatible with the Arduino UNO    |
-| `arduino_shield_mega` | Board has side headers compatible with the Arduino MEGA   |
-| `arduino_shield_isp`  | Board has an ISP header                                   |
+| Feature Name          | Compatibility Claim                                           |
+|:--------------------- |:------------------------------------------------------------- |
+| `arduino_shield_nano` | Board has side headers compatible with the Arduino Nano       |
+| `arduino_shield_uno`  | Board has side headers compatible with the Arduino UNO        |
+| `arduino_shield_mega` | Board has side headers compatible with the Arduino MEGA       |
+| `xiao_shield`         | Board has headers compatible with the Seeedstudio XIAO boards |
 
 @note   A board providing `arduino_shield_mega` **MUST** also provide
         `arduino_shield_uno`, as Arduino MEGA boards are backward compatible to
