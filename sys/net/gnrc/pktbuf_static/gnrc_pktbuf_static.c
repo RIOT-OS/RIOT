@@ -38,15 +38,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/**
- * @brief enable use-after-free/out of bounds write detection
- */
-#ifndef CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE
-#define CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE (0)
-#endif
-
-#define CANARY 0x55
-
 static alignas(sizeof(_unused_t)) uint8_t _static_buf[CONFIG_GNRC_PKTBUF_SIZE];
 static_assert((CONFIG_GNRC_PKTBUF_SIZE % sizeof(_unused_t)) == 0,
               "CONFIG_GNRC_PKTBUF_SIZE has to be a multiple of 8");
@@ -79,7 +70,7 @@ void gnrc_pktbuf_init(void)
 {
     mutex_lock(&gnrc_pktbuf_mutex);
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
-        memset(_static_buf, CANARY, sizeof(_static_buf));
+        memset(_static_buf, GNRC_PKTBUF_CANARY, sizeof(_static_buf));
     }
     /* Silence false -Wcast-align: _static_buf has qualifier
      * `alignas(_unused_t)`, so it is guaranteed to be safe */
@@ -227,6 +218,13 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
         mutex_unlock(&gnrc_pktbuf_mutex);
         return NULL;
     }
+
+    if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE &&
+        pkt->users == GNRC_PKTBUF_CANARY) {
+        puts("gnrc_pktbuf: use after free detected\n");
+        DEBUG_BREAKPOINT(3);
+    }
+
     if (pkt->users > 1) {
         gnrc_pktsnip_t *new;
         new = _create_snip(pkt->next, pkt->data, pkt->size, pkt->type);
@@ -426,7 +424,7 @@ static void *_pktbuf_alloc(size_t size)
 
     const void *mismatch;
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE &&
-        (mismatch = memchk(ptr + 1, CANARY, size - sizeof(_unused_t)))) {
+        (mismatch = memchk(ptr + 1, GNRC_PKTBUF_CANARY, size - sizeof(_unused_t)))) {
         printf("[%p] mismatch at offset %"PRIuPTR"/%" PRIuSIZE
                " (ignoring %" PRIuSIZE " initial bytes that were repurposed)\n",
                (void *)ptr, (uintptr_t)mismatch - (uintptr_t)ptr, size, sizeof(_unused_t));
@@ -437,7 +435,7 @@ static void *_pktbuf_alloc(size_t size)
     }
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
         /* clear out canary */
-        memset(ptr, ~CANARY, size);
+        memset(ptr, ~GNRC_PKTBUF_CANARY, size);
     }
 
     return (void *)ptr;
@@ -455,7 +453,7 @@ static inline _unused_t *_merge(_unused_t *a, _unused_t *b)
     a->next = b->next;
     a->size = b->size + ((uint8_t *)b - (uint8_t *)a);
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
-        memset(b, CANARY, sizeof(*b));
+        memset(b, GNRC_PKTBUF_CANARY, sizeof(*b));
     }
     return a;
 }
@@ -465,19 +463,25 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
     size_t bytes_at_end;
     _unused_t *new = (_unused_t *)data, *prev = NULL, *ptr = _first_unused;
 
+    if (data == NULL) {
+        return;
+    }
+
     if (!gnrc_pktbuf_contains(data)) {
+        assert(0);
         return;
     }
 
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE) {
         /* check if the data has already been marked as free */
         size_t chk_len = _align(size) - sizeof(*new);
-        if (chk_len && !memchk((uint8_t *)data + sizeof(*new), CANARY, chk_len)) {
+        if (chk_len &&
+            !memchk((uint8_t *)data + sizeof(*new), GNRC_PKTBUF_CANARY, chk_len)) {
             printf("pktbuf: double free detected! (at %p, len=%u)\n",
                    data, (unsigned)_align(size));
             DEBUG_BREAKPOINT(2);
         }
-        memset(data, CANARY, _align(size));
+        memset(data, GNRC_PKTBUF_CANARY, _align(size));
     }
 
     while (ptr && (((void *)ptr) < data)) {
