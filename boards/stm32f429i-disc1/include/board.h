@@ -57,6 +57,13 @@ extern "C" {
 #define L3GXXXX_INT2_PIN    GPIO_PIN(PORT_A, 2) /**< INT2/DRDY pin used for L3Gxxxx */
 /** @} */
 
+/**
+ * @brief stmpe811 driver parameters
+ * @{
+ */
+#define STMPE811_PARAM_XYCONV (STMPE811_MIRROR_Y | STMPE811_SWAP_XY)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
