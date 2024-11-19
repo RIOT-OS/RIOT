@@ -135,6 +135,8 @@ static int _self_test(uart_t dev, unsigned baud)
     }
 
     uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
+    /* wait 1ms for rx callback to be triggered by HW */
+    ztimer_sleep(ZTIMER_MSEC, 1);
     for (unsigned i = 0; i < sizeof(test_string); ++i) {
         int c = ringbuffer_get_one(&ctx[dev].rx_buf);
         if (c == -1) {
