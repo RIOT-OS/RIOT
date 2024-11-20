@@ -124,19 +124,28 @@ static int _self_test(uart_t dev, unsigned baud)
 {
     const char test_string[] = "Hello UART!";
 
-    if (uart_init(UART_DEV(dev), baud, rx_cb, (void *)(uintptr_t)dev)) {
-        printf("error configuring %u baud\n", baud);
-        return -1;
+    int res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)(uintptr_t)dev);
+    if (res == -ENOTSUP) {
+        printf("warning: unsupported baudrate %u\n", baud);
+        return 0;
+    }
+    else if (res != 0) {
+        puts("error during uart_init");
+        goto failure;
     }
 
-    test_mode = true;
-
     uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
+    /* wait 1ms for rx callback to be triggered by HW */
+    ztimer_sleep(ZTIMER_MSEC, 1);
     for (unsigned i = 0; i < sizeof(test_string); ++i) {
         int c = ringbuffer_get_one(&ctx[dev].rx_buf);
+        if (c == -1) {
+            printf("missing char 0x%x in rx_buf at index %u\n", test_string[i], i);
+            goto failure;
+        }
         if (c != test_string[i]) {
-            printf("mismatch at index %u: %x != %x\n", i, c, test_string[i]);
-            return -1;
+            printf("mismatch at index %u: 0x%x != 0x%x\n", i, c, test_string[i]);
+            goto failure;
         }
     }
 
@@ -150,14 +159,14 @@ static int _self_test(uart_t dev, unsigned baud)
         int c = ringbuffer_get_one(&ctx[dev].rx_buf);
         if (c != STX) {
             printf("expected start condition, got %x\n", c);
-            return -1;
+            goto failure;
         }
 
         c = ringbuffer_get_one(&ctx[dev].rx_buf);
         if (c != test_string[i]) {
             printf("mismatch at index %u: %x != %x, start condition reported\n",
                    i, c, test_string[i]);
-            return -1;
+            goto failure;
         }
     }
     uart_rxstart_irq_disable(dev);
@@ -171,8 +180,12 @@ static int _self_test(uart_t dev, unsigned baud)
     uart_collision_detect_disable(dev);
 #endif
 
-    test_mode = false;
     return 0;
+
+failure:
+    /* flush ringbuffer */
+    ringbuffer_remove(&ctx[dev].rx_buf, UART_BUFSIZE);
+    return -1;
 }
 
 static void *printer(void *arg)
@@ -384,12 +397,14 @@ static int cmd_test(int argc, char **argv)
     puts("[START]");
 
     /* run self test with different baud rates */
+    test_mode = true;
     for (unsigned i = 1; i <= 12; ++i) {
         if (_self_test(dev, 9600 * i)) {
             puts("[FAILURE]");
             return -1;
         }
     }
+    test_mode = false;
 
     puts("[SUCCESS]");
     return 0;
