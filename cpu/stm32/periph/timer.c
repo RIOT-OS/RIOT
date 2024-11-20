@@ -50,7 +50,6 @@ static unsigned channel_numof(tim_t tim)
     return TIMER_CHANNEL_NUMOF;
 }
 
-
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 
 /**
@@ -195,10 +194,12 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     }
 #endif
 
-    /* clear spurious IRQs */
-    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
-
     TIM_CHAN(tim, channel) = value;
+
+    /* clear spurious IRQs
+     * note: This might also clear the IRQ just set, but that is handled below
+     * anyway. */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
 
     /* enable IRQ */
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
@@ -236,7 +237,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
         dev(tim)->CNT = 0;
 
         /* wait for the interrupt & clear it */
-        while(dev(tim)->SR == 0) {}
+        while (dev(tim)->SR == 0) {}
         dev(tim)->SR = 0;
     }
 
@@ -264,7 +265,13 @@ int timer_clear(tim_t tim, int channel)
     }
 
     unsigned irqstate = irq_disable();
+
+    /* disable IRQ */
     dev(tim)->DIER &= ~(TIM_DIER_CC1IE << channel);
+
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
     irq_restore(irqstate);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
