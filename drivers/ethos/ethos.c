@@ -442,6 +442,13 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     return res;
 }
 
+static int _confirm_send(netdev_t *dev, void *info)
+{
+    (void)dev;
+    (void)info;
+    return -EOPNOTSUPP;
+}
+
 /* netdev interface */
 static const netdev_driver_t netdev_driver_ethos = {
     .send = _send,
@@ -449,5 +456,6 @@ static const netdev_driver_t netdev_driver_ethos = {
     .init = _init,
     .isr = _isr,
     .get = _get,
-    .set = netdev_eth_set
+    .set = netdev_eth_set,
+    .confirm_send = _confirm_send,
 };
