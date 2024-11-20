@@ -50,7 +50,6 @@ static unsigned channel_numof(tim_t tim)
     return TIMER_CHANNEL_NUMOF;
 }
 
-
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 
 /**
@@ -238,7 +237,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
         dev(tim)->CNT = 0;
 
         /* wait for the interrupt & clear it */
-        while(dev(tim)->SR == 0) {}
+        while (dev(tim)->SR == 0) {}
         dev(tim)->SR = 0;
     }
 
