@@ -275,8 +275,9 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
 {
     lwip_netif_dev_acquire(netif);
 
+    err_t res;
     if (is_netdev_legacy_api(netdev)) {
-        err_t res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+        res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
         lwip_netif_dev_release(netif);
         return res;
     }
@@ -288,7 +289,8 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
     compat_netif->thread_doing_tx = thread_get_active();
     irq_restore(irq_state);
 
-    if (netdev->driver->send(netdev, iolist) < 0) {
+    res = netdev->driver->send(netdev, iolist);
+    if (res < 0) {
         lwip_netif_dev_release(netif);
         irq_state = irq_disable();
         compat_netif->thread_doing_tx = NULL;
@@ -303,17 +305,19 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
     compat_netif->thread_doing_tx = NULL;
     irq_restore(irq_state);
 
-    int retval;
-    while (-EAGAIN == (retval = netdev->driver->confirm_send(netdev, NULL))) {
-        /* this should not happen, as the driver really only should emit the
-         * TX done event when it is actually done. But better be safe than
-         * sorry */
-        DEBUG_PUTS("[lwip_netdev] confirm_send() returned -EAGAIN\n");
+    if (res == 0) {
+        /* async send */
+        while (-EAGAIN == (res = netdev->driver->confirm_send(netdev, NULL))) {
+            /* this should not happen, as the driver really only should emit the
+             * TX done event when it is actually done. But better be safe than
+             * sorry */
+            DEBUG_PUTS("[lwip_netdev] confirm_send() returned -EAGAIN\n");
+        }
     }
 
     lwip_netif_dev_release(netif);
 
-    if (retval < 0) {
+    if (res < 0) {
         return ERR_IF;
     }
 
