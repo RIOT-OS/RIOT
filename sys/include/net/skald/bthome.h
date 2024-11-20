@@ -138,6 +138,24 @@ struct skald_bthome_ctx {
      */
     skald_bthome_saul_t *devs;
 #endif
+#if IS_USED(MODULE_SKALD_BTHOME_SAUL) || defined(DOXYGEN)
+    /**
+     * @brief   The index of the last device sent in skald_bthome_ctx_t::devs.
+     *
+     * Will be updated on each periodic advertisement to allow for fragmenting
+     * different measurement readings across multiple advertisements (in case all
+     * measurements from skald_bthome_ctx_t::devs are too large for one
+     * advertisement). Is initialized to 0.
+     *
+     * If a single reading is too big to fit into an advertisement,
+     * the skald_ctx_t::update_pkt() callback will just return (i.e. BTHome
+     * payload may be left empty) and skald_bthome_ctx_t::last_dev_sent will
+     * be reset to 0.
+     * This can e.g. happen with a @ref BTHOME_ID_TEXT or @ref BTHOME_ID_RAW record
+     * if the appended bytes are larger than a BLE advertisement.
+     */
+    uint8_t last_dev_sent;
+#endif
 };
 
 /**

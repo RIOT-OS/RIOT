@@ -419,32 +419,50 @@ static void _reset_hdr(skald_bthome_ctx_t *ctx)
 static void _update_saul_measurements(skald_ctx_t *skald_ctx)
 {
     skald_bthome_ctx_t *ctx = container_of(skald_ctx, skald_bthome_ctx_t, skald);
+    uint8_t dev_idx = 0;
+    uint8_t orig_last_dev_sent = ctx->last_dev_sent;
 
     _reset_hdr(ctx);
     skald_bthome_saul_t *ptr = ctx->devs;
     while (ptr) {
-        int dim = 1;
-        phydat_t data = { 0 };
+        if ((ctx->last_dev_sent == 0) ||
+            (dev_idx > ctx->last_dev_sent)) {
+            int dim = 1;
+            int res = 0;
+            phydat_t data = { 0 };
 
-        if (ptr->saul.driver) {
-            dim = saul_reg_read(&ptr->saul, &data);
-            if (dim <= 0) {
-                continue;
+            if (ptr->saul.driver) {
+                dim = saul_reg_read(&ptr->saul, &data);
+                if (dim <= 0) {
+                    continue;
+                }
             }
-        }
-        for (uint8_t i = 0; i < dim; i++) {
-            if (ptr->add_measurement(ctx, ptr->obj_id, &data, i) < 0) {
+            for (uint8_t i = 0; i < dim; i++) {
+                if ((res = ptr->add_measurement(ctx, ptr->obj_id, &data, i)) < 0) {
+                    break;
+                }
+            }
+            if ((res == -EMSGSIZE) && (dev_idx > 0)) {
+                ctx->last_dev_sent = dev_idx - 1;
+            }
+            if (res < 0) {
                 break;
             }
         }
-
         ptr = container_of(
             ptr->saul.next, skald_bthome_saul_t, saul
         );
+        dev_idx++;
     }
 #if IS_USED(MODULE_SKALD_BTHOME_ENCRYPT)
     skald_bthome_encrypt(ctx);
 #endif
+    if ((ptr == NULL) ||
+        /* or value just too big */
+        (orig_last_dev_sent == ctx->last_dev_sent)) {
+        /* reset device train */
+        ctx->last_dev_sent = 0;
+    }
 }
 
 int skald_bthome_saul_add(skald_bthome_ctx_t *ctx, skald_bthome_saul_t *saul)

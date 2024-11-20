@@ -154,8 +154,11 @@ int skald_bthome_add_measurement(
     uint16_t exp_size = ctx->skald.pkt.len + sizeof(obj_id) + data_len + data_contains_length;
     uint8_t offset = ctx->skald.pkt.len;
 
+#ifdef MODULE_SKALD_BTHOME_ENCRYPT
+    exp_size += 8;
+#endif
+
     if (exp_size >= NETDEV_BLE_PDU_MAXLEN) {
-        assert(exp_size < NETDEV_BLE_PDU_MAXLEN);
         return -EMSGSIZE;
     }
     ctx->skald.pkt.pdu[offset++] = (uint8_t)obj_id;
