@@ -166,6 +166,17 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
     return res;
 }
 
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)netdev;
+    (void)info;
+
+    /* confirm_send should not be called with synchronos send */
+    assert(0);
+
+    return -EOPNOTSUPP;
+}
+
 static const netdev_driver_t netdev_driver_tap = {
     .send = _send,
     .recv = _recv,
@@ -173,6 +184,7 @@ static const netdev_driver_t netdev_driver_tap = {
     .isr = _isr,
     .get = _get,
     .set = _set,
+    .confirm_send = _confirm_send,
 };
 
 /* driver implementation */
@@ -293,12 +305,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     unsigned n;
     iolist_to_iovec(iolist, iov, &n);
 
-    int res = _native_writev(dev->tap_fd, iov, n);
-
-    if (netdev->event_callback) {
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-    }
-    return res;
+    return _native_writev(dev->tap_fd, iov, n);
 }
 
 void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int index) {

@@ -41,7 +41,7 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
-  USEMODULE += netdev_legacy_api
+  USEMODULE += netdev_new_api
 endif
 
 ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
