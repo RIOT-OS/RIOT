@@ -1915,7 +1915,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
      * completed. For new netdevs (with confirm_send), TX is async. It is only
      * done if TX failed right away (res < 0).
      */
-    if (gnrc_netif_netdev_legacy_api(netif) || (res < 0)) {
+    if (gnrc_netif_netdev_legacy_api(netif) || (res != 0)) {
         _tx_done(netif, pkt, tx_sync, res, push_back);
     }
 #if IS_USED(MODULE_NETDEV_NEW_API)
