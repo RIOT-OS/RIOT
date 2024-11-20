@@ -217,45 +217,42 @@ void sam0_eth_get_mac(eui48_t *out)
 
 int sam0_eth_send(const struct iolist *iolist)
 {
-    unsigned len = iolist_size(iolist);
     unsigned tx_len = 0;
     tx_curr = &tx_desc[tx_idx];
 
     if (_is_sleeping) {
-        return -ENOTSUP;
+        return -ENETDOWN;
     }
 
     /* load packet data into TX buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (tx_len + iol->iol_len > ETHERNET_MAX_LEN) {
-            return -EBUSY;
+            return -EOVERFLOW;
         }
         if (iol->iol_len) {
             memcpy ((uint32_t*)(tx_curr->address + tx_len), iol->iol_base, iol->iol_len);
             tx_len += iol->iol_len;
         }
     }
-    if (len == tx_len) {
-        /* Clear and set the frame size */
-        tx_curr->status = (len & DESC_TX_STATUS_LEN_MASK)
-        /* Indicate this is the last buffer and the frame is ready */
-                        | DESC_TX_STATUS_LAST_BUF;
-        /* Prepare next buffer index */
-        if (++tx_idx == ETH_TX_BUFFER_COUNT) {
-            /* Set WRAP flag to indicate last buffer */
-            tx_curr->status |= DESC_TX_STATUS_WRAP;
-            tx_idx = 0;
-        }
-        __DMB();
-        /* Start transmission */
-        GMAC->NCR.reg |= GMAC_NCR_TSTART;
-        /* Set the next buffer */
-        tx_curr = &tx_desc[tx_idx];
+
+    /* Clear and set the frame size */
+    tx_curr->status = (tx_len & DESC_TX_STATUS_LEN_MASK)
+    /* Indicate this is the last buffer and the frame is ready */
+                    | DESC_TX_STATUS_LAST_BUF;
+    /* Prepare next buffer index */
+    if (++tx_idx == ETH_TX_BUFFER_COUNT) {
+        /* Set WRAP flag to indicate last buffer */
+        tx_curr->status |= DESC_TX_STATUS_WRAP;
+        tx_idx = 0;
     }
-    else {
-        DEBUG("Mismatch TX len, abort send\n");
-    }
-    return len;
+    __DMB();
+
+    /* Start transmission */
+    GMAC->NCR.reg |= GMAC_NCR_TSTART;
+    /* Set the next buffer */
+    tx_curr = &tx_desc[tx_idx];
+
+    return 0;
 }
 
 unsigned _sam0_eth_get_last_len(void)

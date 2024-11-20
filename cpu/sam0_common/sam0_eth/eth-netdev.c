@@ -197,15 +197,8 @@ static int _sam0_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _sam0_eth_send(netdev_t *netdev, const iolist_t *iolist)
 {
-    int ret;
-
     netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
-    ret = sam0_eth_send(iolist);
-    if (ret == -EOVERFLOW) {
-        /* TODO: use a specific netdev callback here ? */
-        return -EOVERFLOW;
-    }
-    return ret;
+    return sam0_eth_send(iolist);
 }
 
 static int _sam0_eth_confirm_send(netdev_t *netdev, void *info)
