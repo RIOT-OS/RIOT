@@ -1,5 +1,7 @@
 CFLAGS += -DBOOTLOADER_UF2
 
+PROG_TTY_BOARD_FILTER := --vendor 'Adafruit Industries' --model 'Grand Central M4 Express'
+
 # Include all definitions for flashing with bossa other USB
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
 # Include handling of serial and non-bossa programmers (if selected by user)
