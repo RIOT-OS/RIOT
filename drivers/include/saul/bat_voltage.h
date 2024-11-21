@@ -39,7 +39,7 @@ typedef struct {
      *
      * @param[in] adc_sample    The raw ADC sample.
      *
-     * @return Voltage value for phydat.
+     * @return Voltage value in 10^phydat_scale*V for phydat.
      */
     int16_t (*convert)(int32_t adc_sample);
 } saul_bat_voltage_params_t;
