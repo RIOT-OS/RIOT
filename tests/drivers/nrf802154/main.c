@@ -51,39 +51,73 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
 
     return 0;
 }
-
-int send_beacon(int argc, char **argv)
+void send_beacon_usage(char *cmd_name)
 {
-    (void)argv;
-    (void)argc;
+    printf("usage: %s [<16 bit hex source PAN ID>] (uses device PAN ID by default)\n", cmd_name);
+}
+int cmd_send_beacon(int argc, char **argv)
+{
+    uint16_t pan_id;
+    /* evaluating if argument is present */
+    switch (argc) {
+    case 1:
+        pan_id = nrf802154.dev.pan;
+        puts("using device PAN ID as source");
+        break;
+    case 2:
+        if (strlen(argv[1]) != 4) {
+            puts("send: Error parsing PAN ID");
+            send_beacon_usage(argv[0]);
+            return 1;
+        }
+        pan_id = strtoul(argv[1], NULL, 16);
+        break;
+    default:
+        send_beacon_usage(argv[0]);
+        return 1;
+    }
 
-     puts("Testing Beacon Frame Acceptance");
+    printf("PAN ID: %x\n", pan_id);
 
-    uint8_t size = 8;
-    uint16_t pan_id = nrf802154.dev.pan;
-    uint8_t buffer[size];
-    memset(buffer, 0, size*sizeof(uint8_t));
-
-    buffer[0] = 0x00; /* Frame Type is Beacon*/
-    buffer[1] = 0x80; /* Source Address Mode is set to 16-Bit Short Address*/
-    buffer[2] = 0x42; /* Arbitrary Sequence Number*/
-    buffer[3] = pan_id & 0xff; /* Little Endian PAN ID*/
-    buffer[4] = (pan_id >> 8);
-
+    /* preparing the mac header */
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    memset(mhr, 0, IEEE802154_MAX_HDR_LEN*sizeof(uint8_t));
+    le_uint16_t src_pan = byteorder_btols(byteorder_htons(pan_id));
+    le_uint16_t dst_pan = byteorder_htols(0);
+    size_t src_len = 2, dst_len = 0;
+    uint8_t *src = nrf802154.dev.short_addr, *dst = NULL;
+    uint8_t flags = IEEE802154_FCF_TYPE_BEACON;
+    
+    int res = ieee802154_set_frame_hdr(mhr, src, src_len,
+                                        dst, dst_len,
+                                        src_pan, dst_pan,
+                                        flags, nrf802154.dev.seq++);
+    if (res < 0) {
+        puts("send: Error preparing frame");
+        send_beacon_usage(argv[0]);
+        return 1;
+    }
+    /* preparing packet to send */
     iolist_t iol = {
-        .iol_base = buffer,
-        .iol_len = size,
+        .iol_base = mhr,
+        .iol_len = (size_t)res,
         .iol_next = NULL,
     };
 
     puts("Sending Beacon Frame");
-    netdev_ieee802154_minimal_send(&nrf802154.dev.netdev, &iol);
 
+    res = netdev_ieee802154_minimal_send(&nrf802154.dev.netdev, &iol);
+
+    if (res < 0) {
+        puts("send: Error on sending");
+        send_beacon_usage(argv[0]);
+        return 1;
+    }
     return 0;
 }
 
 static const shell_command_t shell_commands[] = {
-    { "send", "sending Beacon", send_beacon},
+    { "beaconsend", "Send an IEEE 802.15.4 beacon frame", cmd_send_beacon},
     {NULL,NULL,NULL}
 };
 
