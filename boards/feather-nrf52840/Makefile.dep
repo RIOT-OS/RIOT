@@ -1,5 +1,6 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
+  USEMODULE += saul_bat_voltage
   USEMODULE += ws281x
 endif
 
