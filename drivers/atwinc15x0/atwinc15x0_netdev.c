@@ -539,11 +539,11 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
     /* send wakes from standby but not from sleep */
     if (_atwinc15x0_is_sleeping(dev)) {
         DEBUG("%s WiFi is in SLEEP state, cannot send\n", __func__);
-        return -ENODEV;
+        return -ENETDOWN;
     }
     if (!_atwinc15x0_is_connected(dev)) {
         DEBUG("%s WiFi is still not connected to AP, cannot send\n", __func__);
-        return -ENODEV;
+        return -ENETDOWN;
     }
     /* atwinc15x0_eth_buf should not be used for incoming packets here */
     assert(dev->rx_buf == NULL);
@@ -570,13 +570,20 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
 
     /* send the the packet */
     if (m2m_wifi_send_ethernet_pkt(atwinc15x0_eth_buf, tx_len) == M2M_SUCCESS) {
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         return tx_len;
     }
     else {
         DEBUG("%s sending WiFi packet failed", __func__);
         return -EIO;
     }
+}
+
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)netdev;
+    (void)info;
+
+    return -EOPNOTSUPP;
 }
 
 static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
@@ -1077,6 +1084,7 @@ const netdev_driver_t atwinc15x0_netdev_driver = {
     .isr = _atwinc15x0_isr,
     .get = _atwinc15x0_get,
     .set = _atwinc15x0_set,
+    .confirm_send = _confirm_send,
 };
 
 void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint8_t idx)
