@@ -2,6 +2,10 @@
 # ztimer's compatibility wrapper
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   PSEUDOMODULES += xtimer
+
+  ifeq (,$(filter ztimer_usec,$(USEMODULE)))
+    $(info $(COLOR_YELLOW)WARNING! xtimer_compat without ztimer_usec may be inaccurate$(COLOR_RESET))
+  endif
 endif
 
 MODULES_ZTIMER_ON_RTT_CONFLICT = rtt_rtc gnrc_lwmac gnrc_gomach
