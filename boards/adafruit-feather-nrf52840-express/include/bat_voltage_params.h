@@ -26,7 +26,7 @@ extern "C" {
  *
  * @param[in] adc_sample    The raw ADC sample.
  *
- * @return Voltage value for phydat.
+ * @return Voltage value in mV for phydat.
  */
 int16_t saul_bat_voltage_convert(int32_t adc_sample);
 
