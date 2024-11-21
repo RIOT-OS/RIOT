@@ -30,7 +30,7 @@
 
 #ifdef BOARD_NATIVE
 #include "mtd_default.h"
-// native mtd is file backed => Start address of flash is 0.
+/* native mtd is file backed => Start address of flash is 0. */
 char *_backing_memory = NULL;
 static mtd_dev_t *_mtd_dev = NULL;
 #else

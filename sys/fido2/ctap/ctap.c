@@ -921,7 +921,6 @@ static int _get_key_agreement(void)
     int ret;
     ctap_public_key_cose_t key = { 0 };
 
-
     /* generate key agreement key */
     ret =
         fido2_ctap_crypto_gen_keypair(&_state.ag_key.pub, _state.ag_key.priv,

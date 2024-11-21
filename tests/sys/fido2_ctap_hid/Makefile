@@ -1,7 +1,11 @@
 BOARD ?= nrf52840dk
 #BOARD ?= nrf52840dongle
 
-include ../Makefile.tests_common
+include ../Makefile.sys_common
+
+BOARD_WHITELIST = \
+  nrf52840dk \
+  nrf52840dongle
 
 USEMODULE += fido2_ctap_transport_hid
 USEPKG += fido2_tests

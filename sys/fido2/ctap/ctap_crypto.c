@@ -44,8 +44,6 @@ static ctap_status_code_t _sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *si
  *
  * wrapper for @ref fido2_ctap_crypto_prng
  */
-static int _RNG(uint8_t *dest, unsigned size);
-
 static int _RNG(uint8_t *dest, unsigned size)
 {
     fido2_ctap_crypto_prng(dest, (size_t)size);
@@ -71,7 +69,8 @@ ctap_status_code_t fido2_ctap_crypto_sha256_init(sha256_context_t *ctx)
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_sha256_update(sha256_context_t *ctx, const void *data, size_t len)
+ctap_status_code_t fido2_ctap_crypto_sha256_update(sha256_context_t *ctx,
+                                                   const void *data, size_t len)
 {
     sha256_update(ctx, data, len);
     return CTAP2_OK;
@@ -97,7 +96,8 @@ ctap_status_code_t fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len)
+ctap_status_code_t fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx,
+                                                        const void *data, size_t len)
 {
     hmac_sha256_update(ctx, data, len);
     return CTAP2_OK;

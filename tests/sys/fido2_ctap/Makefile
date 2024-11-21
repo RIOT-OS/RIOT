@@ -1,4 +1,11 @@
-include ../Makefile.tests_common
+BOARD ?= native
+
+include ../Makefile.sys_common
+
+BOARD_WHITELIST = \
+  native \
+  nrf52840dk \
+  nrf52840dongle
 
 # same as CTAP_STACKSIZE
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=15000

@@ -107,14 +107,16 @@ static ctap_status_code_t _parse_int(CborValue *it, int *num);
 /**
  * @brief Parse credential description
  */
-static ctap_status_code_t _fido2_ctap_cbor_parse_cred_desc(CborValue *arr, ctap_cred_desc_alt_t *cred);
+static ctap_status_code_t _fido2_ctap_cbor_parse_cred_desc(CborValue *arr,
+                                                           ctap_cred_desc_alt_t *cred);
 
 /**
  * @brief Encode public key into COSE_KEY format
  *
  * See https://tools.ietf.org/html/rfc8152#page-34 Section 13.1.1 for details.
  */
-static ctap_status_code_t _encode_public_key_cose(CborEncoder *cose_key, const ctap_public_key_cose_t *key);
+static ctap_status_code_t _encode_public_key_cose(CborEncoder *cose_key,
+                                                  const ctap_public_key_cose_t *key);
 
 /**
  * @brief Encode PublicKeyCredentialDescriptor into CBOR format
@@ -743,7 +745,8 @@ static ctap_status_code_t _encode_user_entity(CborEncoder *encoder,
     return CTAP2_OK;
 }
 
-static ctap_status_code_t _encode_public_key_cose(CborEncoder *cose_key, const ctap_public_key_cose_t *key)
+static ctap_status_code_t _encode_public_key_cose(CborEncoder *cose_key,
+                                                  const ctap_public_key_cose_t *key)
 {
     int ret;
     CborEncoder map;
@@ -1620,7 +1623,8 @@ static ctap_status_code_t _parse_exclude_list(CborValue *it, ctap_cred_desc_alt_
     return CTAP2_OK;
 }
 
-static ctap_status_code_t _fido2_ctap_cbor_parse_cred_desc(CborValue *arr, ctap_cred_desc_alt_t *cred)
+static ctap_status_code_t _fido2_ctap_cbor_parse_cred_desc(CborValue *arr,
+                                                           ctap_cred_desc_alt_t *cred)
 {
     int ret;
     int type;
