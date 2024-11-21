@@ -790,6 +790,9 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate, uint32_t timer_freq)
     failed |= TEST(memcmp(testdata, serial_buf.data, sizeof(serial_buf.data)) == 0);
     failed |= TEST(serial_buf.pos == sizeof(testdata));
 
+    /* disable UART again, in case it is a shared peripheral */
+    uart_poweroff(UART_TEST_DEV);
+
     return failed;
 }
 
