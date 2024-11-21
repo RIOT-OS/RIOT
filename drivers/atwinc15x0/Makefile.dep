@@ -1,6 +1,6 @@
 USEMODULE += netdev_eth
 USEMODULE += ztimer_msec
-USEMODULE += netdev_legacy_api
+USEMODULE += netdev_new_api
 
 ifeq (,$(filter atwinc15x0_dynamic_%,$(USEMODULE)))
   # use static connect by default when no dynamic module is loaded
