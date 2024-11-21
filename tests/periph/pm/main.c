@@ -82,6 +82,7 @@ static void cb_rtc(void *arg)
     int level = (int)arg;
 
     pm_block(level);
+    puts("RTC alarm");
 }
 
 static void cb_rtc_puts(void *arg)
