@@ -24,6 +24,7 @@
 
 #include "architecture.h"
 #include "periph/wdt.h"
+#include "wdt_thread.h"
 #include "ztimer.h"
 
 #ifndef WDT_THREAD_STACKSIZE
@@ -36,6 +37,14 @@
 
 static char WORD_ALIGNED wdt_stack[WDT_THREAD_STACKSIZE];
 
+static bool _wdt_enabled = true;
+
+void wdt_thread_stop(void)
+{
+    _wdt_enabled = false;
+    wdt_stop();
+}
+
 static void *_wdt_thread(void *ctx)
 {
     (void)ctx;
@@ -43,6 +52,9 @@ static void *_wdt_thread(void *ctx)
                       / 2;
     while (1) {
         ztimer_sleep(ZTIMER_MSEC, sleep_ms);
+        if (!_wdt_enabled) {
+            break;
+        }
         wdt_kick();
     }
 
