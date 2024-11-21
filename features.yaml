@@ -796,6 +796,8 @@ groups:
   - title: Platform Specific
     help: Things specific to a single MCU family / MCU vendor
     features:
+    - name: board_bat_voltage
+      help: Measures battery voltage based on ADC sampling.
     - name: periph_ics
       help: An NXP Kinetis Internal Clock Source Controller (ICS peripheral) is
             present.

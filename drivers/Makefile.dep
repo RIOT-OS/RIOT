@@ -264,6 +264,11 @@ ifneq (,$(filter ws281x_%,$(USEMODULE)))
   USEMODULE += ws281x
 endif
 
+ifneq (,$(filter saul_bat_voltage,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+  FEATURES_REQUIRED += board_bat_voltage
+endif
+
 ifneq (,$(filter saul_adc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
 endif

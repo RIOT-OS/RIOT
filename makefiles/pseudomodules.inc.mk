@@ -374,6 +374,7 @@ PSEUDOMODULES += fortuna_reseed
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
+PSEUDOMODULES += saul_bat_voltage
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += saul_nrf_temperature

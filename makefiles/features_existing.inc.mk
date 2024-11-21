@@ -42,6 +42,7 @@ FEATURES_EXISTING := \
     ble_nimble_netif \
     ble_phy_2mbit \
     ble_phy_coded \
+    board_bat_voltage \
     bootloader_stm32 \
     can_rx_mailbox \
     cortexm_fpu \
