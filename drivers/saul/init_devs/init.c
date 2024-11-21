@@ -31,6 +31,10 @@ void saul_init_devs(void)
         extern void auto_init_saul_adc(void);
         auto_init_saul_adc();
     }
+    if (IS_USED(MODULE_SAUL_BAT_VOLTAGE)) {
+        extern void auto_init_saul_bat_voltage(void);
+        auto_init_saul_bat_voltage();
+    }
     if (IS_USED(MODULE_SAUL_GPIO)) {
         extern void auto_init_gpio(void);
         auto_init_gpio();
