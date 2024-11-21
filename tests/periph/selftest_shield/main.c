@@ -55,10 +55,14 @@
 /* In order to run the periph_uart test all of the following needs to be true:
  * - periph_uart needs to be used
  * - an I/O mapping for the UART at D0/D1 needs to be provided
- * - this UART dev is not busy with stdio
+ * - this UART dev is not busy with stdio (either not using `stdio_uart` or a different UART is used for stdio)
  */
 #if defined(ARDUINO_UART_D0D1) && defined(MODULE_PERIPH_UART)
-#  define ENABLE_UART_TEST (STDIO_UART_DEV != ARDUINO_UART_D0D1)
+#  if MODULE_STDIO_UART
+#    define ENABLE_UART_TEST (STDIO_UART_DEV != ARDUINO_UART_D0D1)
+#  else
+#    define ENABLE_UART_TEST 1
+#  endif
 #  define UART_TEST_DEV ARDUINO_UART_D0D1
 #else
 #  define ENABLE_UART_TEST 0
