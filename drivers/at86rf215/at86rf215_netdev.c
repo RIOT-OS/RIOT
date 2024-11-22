@@ -176,9 +176,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         at86rf215_tx_exec(dev);
     }
 
-    /* store successfully sent number of bytes */
-    dev->tx_frame_len = len;
-
     /* netdev_new just returns 0 on success */
     return 0;
 }
