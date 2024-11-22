@@ -247,7 +247,7 @@ static bool _tx_ongoing(at86rf215_t *dev)
 int at86rf215_tx_prepare(at86rf215_t *dev)
 {
     if (dev->state == AT86RF215_STATE_SLEEP) {
-        return -EAGAIN;
+        return -ENETDOWN;
     }
 
     if (_tx_ongoing(dev)) {
