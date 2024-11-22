@@ -936,7 +936,6 @@ include $(RIOTMAKE)/usb-codes.inc.mk
 # Warn if the selected board and drivers don't provide all needed features:
 ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   EXPECT_ERRORS :=
-  EXPECT_CONFLICT :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
@@ -962,12 +961,12 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
 
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
-    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)The following features conflict:$(COLOR_RESET)"\
                           "$(FEATURES_CONFLICTING)" 1>&2)
     ifneq (, $(FEATURES_CONFLICT_MSG))
         $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
     endif
-    EXPECT_CONFLICT := 1
+    EXPECT_ERRORS := 1
   endif
 
   # If there is a whitelist, then test if the board is whitelisted.
@@ -998,10 +997,6 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
       $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is blacklisted:$(COLOR_RESET) $(TOOLCHAINS_BLACKLIST)" 1>&2)
       EXPECT_ERRORS := 1
     endif
-  endif
-
-  ifneq (, $(EXPECT_CONFLICT))
-    $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
   endif
 
   # Fail by default when errors are expected
