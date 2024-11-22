@@ -36,7 +36,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "kernel_defines.h"
 #include "xfa.h"
 #include "shell.h"
 #include "shell_lock.h"
@@ -47,7 +46,7 @@
 #endif
 
 /* define shell command cross file array */
-XFA_INIT_CONST(shell_command_xfa_t*, shell_commands_xfa);
+XFA_INIT_CONST(shell_command_xfa_t, shell_commands_xfa_v2);
 
 #define ETX '\x03'  /** ASCII "End-of-Text", or Ctrl-C */
 #define EOT '\x04'  /** ASCII "End-of-Transmission", or Ctrl-D */
@@ -102,10 +101,10 @@ static shell_command_handler_t search_commands(const shell_command_t *entry,
 
 static shell_command_handler_t search_commands_xfa(char *command)
 {
-    unsigned n = XFA_LEN(shell_command_t*, shell_commands_xfa);
+    unsigned n = XFA_LEN(shell_command_t, shell_commands_xfa_v2);
 
     for (unsigned i = 0; i < n; i++) {
-        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        const volatile shell_command_xfa_t *entry = &shell_commands_xfa_v2[i];
         if (flash_strcmp(command, entry->name) == 0) {
             return entry->handler;
         }
@@ -147,7 +146,7 @@ static void print_commands_json(const shell_command_t *cmd_list)
         }
     }
 
-    unsigned n = XFA_LEN(shell_command_xfa_t*, shell_commands_xfa);
+    unsigned n = XFA_LEN(shell_command_xfa_t, shell_commands_xfa_v2);
     for (unsigned i = 0; i < n; i++) {
         if (first) {
             first = false;
@@ -155,7 +154,7 @@ static void print_commands_json(const shell_command_t *cmd_list)
         else {
             printf(", ");
         }
-        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        const volatile shell_command_xfa_t *entry = &shell_commands_xfa_v2[i];
         printf("{\"cmd\": \"%s\", \"desc\": \"%s\"}", entry->name, entry->desc);
     }
     puts("]}");
@@ -170,9 +169,9 @@ static void print_commands(const shell_command_t *entry)
 
 static void print_commands_xfa(void)
 {
-    unsigned n = XFA_LEN(shell_command_xfa_t*, shell_commands_xfa);
+    unsigned n = XFA_LEN(shell_command_xfa_t, shell_commands_xfa_v2);
     for (unsigned i = 0; i < n; i++) {
-        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        const volatile shell_command_xfa_t *entry = &shell_commands_xfa_v2[i];
         printf("%-20" PRIsflash " %" PRIsflash "\n",
                      entry->name, entry->desc);
     }
