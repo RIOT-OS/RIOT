@@ -427,7 +427,7 @@ void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
  * @param[in]   seq     command sequence of CLP tuples as a sequence of bytes
  * @param[in]   seq_len length of the command sequence
  */
-void lcd_write_cmd_sequence(const lcd_t *dev, const uint8_t *seq, size_t seq_len);
+void lcd_write_cmd_sequence(lcd_t *dev, const uint8_t *seq, size_t seq_len);
 
 /**
  * @brief   Raw read command
