@@ -399,7 +399,7 @@ void lcd_write_cmd_sequence(lcd_t *dev, const uint8_t *seq, size_t seq_len)
     assert(seq_len > 0);
     assert(seq);
 
-    DEBUG("[%s] %p %u\n", __func__, (void *)seq, seq_len);
+    DEBUG("[%s] %p %zu\n", __func__, (void *)seq, seq_len);
 
     lcd_ll_acquire(dev);
 
