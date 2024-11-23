@@ -380,12 +380,11 @@ static void _mark_resource_as_changed(const lwm2m_object_t *object, uint16_t ins
                                       uint16_t resource_id)
 {
     lwm2m_uri_t uri;
+    LWM2M_URI_RESET(&uri);
 
     uri.objectId = object->objID;
     uri.instanceId = instance_id;
     uri.resourceId = resource_id;
-
-    uri.flag = LWM2M_URI_FLAG_OBJECT_ID | LWM2M_URI_FLAG_INSTANCE_ID | LWM2M_URI_FLAG_RESOURCE_ID;
 
     lwm2m_resource_value_changed(lwm2m_client_get_ctx(object->userData), &uri);
 }

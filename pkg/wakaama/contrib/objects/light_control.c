@@ -343,6 +343,7 @@ free_out:
 static void _mark_resource_changed(uint16_t instance_id, uint16_t resource_id)
 {
     lwm2m_uri_t uri;
+    LWM2M_URI_RESET(&uri);
     uri.objectId = LWM2M_LIGHT_CONTROL_OBJECT_ID;
     uri.instanceId = instance_id;
     uri.resourceId = resource_id;
