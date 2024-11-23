@@ -1807,7 +1807,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
             return; /* early return to not release */
         }
         else {
-            LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
+            LOG_ERROR("gnrc_netif: can't queue packet for sending, drop it\n");
             /* If we got here, it means the device was busy and the pkt queue
              * was full. The packet should be dropped here anyway */
             gnrc_pktbuf_release_error(pkt, ENOMEM);
@@ -1880,7 +1880,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             return;
         }
         else {
-            LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
+            LOG_WARNING("gnrc_netif: can't queue packet for sending, try sending\n");
             /* try to send anyway */
         }
     }

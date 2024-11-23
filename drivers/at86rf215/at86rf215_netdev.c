@@ -149,10 +149,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
     at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
-    size_t len = 0;
 
-    if (at86rf215_tx_prepare(dev)) {
-        return -EBUSY;
+    ssize_t len = at86rf215_tx_prepare(dev);
+    if (len) {
+        return len;
     }
 
     /* load packet data into FIFO */
@@ -175,9 +175,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     if (!(dev->flags & AT86RF215_OPT_PRELOADING)) {
         at86rf215_tx_exec(dev);
     }
-
-    /* store successfully sent number of bytes */
-    dev->tx_frame_len = len;
 
     /* netdev_new just returns 0 on success */
     return 0;
