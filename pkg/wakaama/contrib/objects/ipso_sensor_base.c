@@ -257,7 +257,7 @@ out:
 }
 
 static uint8_t _exec_cb(lwm2m_context_t * context, uint16_t instance_id, uint16_t resource_id,
-                        uint8_t * buffer, int length, lwm2m_object_t * object);
+                        uint8_t * buffer, int length, lwm2m_object_t * object)
 {
     (void)context;
     (void)buffer;
