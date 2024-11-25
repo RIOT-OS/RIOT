@@ -6,6 +6,9 @@ USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += ztimer_msec
 
+# JSON help is needed by test script
+USEMODULE += shell_builtin_cmd_help_json
+
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
 
