@@ -60,6 +60,7 @@
 #include "net/netdev/ieee802154.h"
 #include "net/ieee802154/radio.h"
 #include "net/zep.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,6 +77,16 @@ typedef struct {
 } socket_zep_params_t;
 
 /**
+ * @brief   ZEP device RX state
+ */
+typedef enum {
+    ZEPDEV_STATE_IDLE,      /**< ZEP is not doing anything, not receiving frames */
+    ZEPDEV_STATE_RX_ON,     /**< ZEP is able to receive frames */
+    ZEPDEV_STATE_RX_RECV,   /**< unprocessed frame is in RX buffer, rx stopped */
+    ZEPDEV_STATE_TX,        /**< ZEP is currently sending a frame */
+} zepdev_state_t;
+
+/**
  * @brief   ZEP device state
  */
 typedef struct {
@@ -83,6 +94,7 @@ typedef struct {
      * @brief   command line parameters
      */
     const socket_zep_params_t *params;
+    ztimer_t ack_timer;             /**< timer to send delayed ACK */
     int sock_fd;                    /**< socket fd */
     uint32_t seq;                   /**< ZEP sequence number */
     /**
@@ -94,6 +106,7 @@ typedef struct {
      */
     uint8_t snd_buf[sizeof(zep_v2_data_hdr_t) + IEEE802154_FRAME_LEN_MAX];
     uint8_t snd_len;                /**< bytes to send */
+    uint8_t rcv_len;                /**< bytes received */
     uint16_t pan_id;                /**< PAN ID of the ZEP network */
     uint16_t chan;                  /**< virtual radio channel */
     /**
@@ -105,7 +118,7 @@ typedef struct {
      */
     uint8_t addr_long[IEEE802154_LONG_ADDRESS_LEN];
     ieee802154_filter_mode_t filter_mode;   /**< frame filter mode */
-    bool rx;                                /**< whether the radio is listening for packets */
+    zepdev_state_t state;                   /**< device state machine */
     bool send_hello;                        /**< send HELLO packet on connect */
 } socket_zep_t;
 
