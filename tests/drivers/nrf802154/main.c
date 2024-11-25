@@ -87,7 +87,7 @@ int cmd_send_beacon(int argc, char **argv)
     size_t src_len = 2, dst_len = 0;
     uint8_t *src = nrf802154.dev.short_addr, *dst = NULL;
     uint8_t flags = IEEE802154_FCF_TYPE_BEACON;
-    
+
     int res = ieee802154_set_frame_hdr(mhr, src, src_len,
                                         dst, dst_len,
                                         src_pan, dst_pan,
