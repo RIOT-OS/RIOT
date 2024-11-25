@@ -44,7 +44,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     msba2 \
     nrf51dk \
     nrf51dongle \
-    nrf6310 \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
