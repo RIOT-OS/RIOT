@@ -44,19 +44,7 @@ extern "C" {
  * @brief   Return codes for @ref digit7seg_init
  */
 typedef enum {
-    DIGIT7SEG_OK = 0,           /**< All ok */
-    DIGIT7SEG_ERR_A_GPIO,       /**< Something went wrong with A GPIO */
-    DIGIT7SEG_ERR_B_GPIO,       /**< Something went wrong with B GPIO */
-    DIGIT7SEG_ERR_C_GPIO,       /**< Something went wrong with C GPIO */
-    DIGIT7SEG_ERR_D_GPIO,       /**< Something went wrong with D GPIO */
-    DIGIT7SEG_ERR_E_GPIO,       /**< Something went wrong with E GPIO */
-    DIGIT7SEG_ERR_F_GPIO,       /**< Something went wrong with F GPIO */
-    DIGIT7SEG_ERR_G_GPIO,       /**< Something went wrong with G GPIO */
-    DIGIT7SEG_ERR_DP_GPIO,      /**< Something went wrong with DP GPIO */
-    DIGIT7SEG_ERR_DIG1_GPIO,    /**< Something went wrong with DIG1 GPIO */
-    DIGIT7SEG_ERR_DIG2_GPIO,    /**< Something went wrong with DIG2 GPIO */
-    DIGIT7SEG_ERR_DIG3_GPIO,    /**< Something went wrong with DIG3 GPIO */
-    DIGIT7SEG_ERR_DIG4_GPIO,    /**< Something went wrong with DIG4 GPIO */
+    DIGIT7SEG_OK = 0,
     DIGIT7SEG_ERR_DIGITS,       /**< Something went wrong with digits value */
 } digit7seg_error_codes;
 

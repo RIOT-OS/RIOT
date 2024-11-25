@@ -174,12 +174,7 @@ else {
 
 ...
 
-if (digit7seg_poweroff(&dev) == 0) {
-    puts("...Stopped");
-}
-else {
-    puts("Error");
-}
+digit7seg_poweroff(&dev)
 
 ```
 */

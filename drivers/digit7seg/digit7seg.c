@@ -13,6 +13,7 @@
  * @author      Pierre Le Meur <pierre1.lemeur@orange.com>
  */
 
+#include <assert.h>
 #include "digit7seg.h"
 
 #define ENABLE_DEBUG        0
@@ -94,25 +95,8 @@ int digit7seg_init(digit7seg_t *dev, const digit7seg_params_t *params)
         PIN_DIG1, PIN_DIG2, PIN_DIG3, PIN_DIG4
     };
 
-    const int pin_errs[] =
-    {
-        DIGIT7SEG_ERR_A_GPIO, DIGIT7SEG_ERR_B_GPIO, DIGIT7SEG_ERR_C_GPIO, DIGIT7SEG_ERR_D_GPIO,
-        DIGIT7SEG_ERR_E_GPIO, DIGIT7SEG_ERR_F_GPIO, DIGIT7SEG_ERR_G_GPIO, DIGIT7SEG_ERR_DP_GPIO,
-        DIGIT7SEG_ERR_DIG1_GPIO, DIGIT7SEG_ERR_DIG2_GPIO, DIGIT7SEG_ERR_DIG3_GPIO,
-        DIGIT7SEG_ERR_DIG4_GPIO
-    };
-
     for (int i = 0; i < NB_PIN; i++) {
-        if (!gpio_is_valid(pins[i])) {
-            DEBUG("[Error] GPIO isn't valid.\n");
-            return -pin_errs[i];
-        }
-
-        if (gpio_init(pins[i], GPIO_OUT) < 0) {
-            DEBUG("[Error] Initializing gpio error.\n");
-            return -pin_errs[i];
-        }
-
+        assert(gpio_init(pins[i], GPIO_OUT));
         gpio_clear(pins[i]);
     }
 
@@ -142,7 +126,6 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
 
 int digit7seg_poweron(digit7seg_t *dev)
 {
-
     if (timer_init(dev->params.timer, DIGIT7SEG_TIMER_HZ, _shift_display, dev) != 0) {
         DEBUG("[Error] Not possible to init timer.\n");
         return -1;
