@@ -61,6 +61,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    on-board LED (LED1/D25)
+ * @{
+ */
+#define ARDUINO_LED     (24)
+/** @} */
+
+/**
  * @name   Mapping of MCU pins to Arduino pins
  * @{
  */
