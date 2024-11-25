@@ -25,8 +25,9 @@
 // Assign the default LED pin
 int ledPin = ARDUINO_LED;
 
+#define BUF_LEN 64
 // input buffer for receiving chars on the serial port
-int buf[64];
+int buf[BUF_LEN];
 
 // counter that counts the number of received chars
 int count = 0;
@@ -64,7 +65,7 @@ void loop(void)
             count = 0;
         }
         // else we just remember the incoming char
-        else {
+        else if (count < BUF_LEN) {
             buf[count++] = tmp;
         }
     }
