@@ -83,7 +83,7 @@ CMDS = (
     ('echo escaped\\ space', '"echo""escaped space"'),
     ('echo escape within \'\\s\\i\\n\\g\\l\\e\\q\\u\\o\\t\\e\'', '"echo""escape""within""singlequote"'),
     ('echo escape within "\\d\\o\\u\\b\\l\\e\\q\\u\\o\\t\\e"', '"echo""escape""within""doublequote"'),
-    ("""echo "t\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),  # noqa: W605
+    ("""echo "t\\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),  # noqa: W605
 
     # test correct quoting
     ('echo "hello"world', '"echo""helloworld"'),
