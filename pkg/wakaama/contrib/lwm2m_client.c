@@ -117,9 +117,9 @@ static credman_tag_t _get_credential(const sock_udp_ep_t *ep, uint8_t security_m
     }
 
     /* prepare query */
-    lwm2m_uri_t query_uri = {
-        .objectId = LWM2M_SECURITY_OBJECT_ID,
-    };
+    lwm2m_uri_t query_uri;
+    LWM2M_URI_RESET(&query_uri);
+    query_uri.objectId = LWM2M_SECURITY_OBJECT_ID;
 
     lwm2m_list_t *instance = sec->instanceList;
 
@@ -409,9 +409,9 @@ void lwm2m_client_refresh_dtls_credentials(void)
     }
 
     /* prepare query */
-    lwm2m_uri_t query_uri = {
-        .objectId = LWM2M_SECURITY_OBJECT_ID,
-    };
+    lwm2m_uri_t query_uri;
+    LWM2M_URI_RESET(&query_uri);
+    query_uri.objectId = LWM2M_SECURITY_OBJECT_ID;
 
     lwm2m_list_t *instance = sec->instanceList;
     int64_t val;

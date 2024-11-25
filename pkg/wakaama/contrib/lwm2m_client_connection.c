@@ -280,11 +280,11 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     DEBUG("Creating connection\n");
 
     /* prepare Server URI query */
-    lwm2m_uri_t resource_uri = {
-        .objectId = LWM2M_SECURITY_URI_ID,
-        .instanceId = sec_obj_inst_id,
-        .resourceId = LWM2M_SECURITY_URI_ID,
-    };
+    lwm2m_uri_t resource_uri;
+    LWM2M_URI_RESET(&resource_uri);
+    resource_uri.objectId = LWM2M_SECURITY_URI_ID;
+    resource_uri.instanceId = sec_obj_inst_id;
+    resource_uri.resourceId = LWM2M_SECURITY_URI_ID;
 
     int res = lwm2m_get_string(client_data, &resource_uri, uri, &uri_len);
     if (res < 0) {
