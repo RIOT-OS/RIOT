@@ -382,6 +382,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         res = sock_dtls_session_init(&client_data->dtls_sock, &conn->remote, &conn->session);
         if (res <= 0) {
             DEBUG("[lwm2m:client] could not initiate DTLS session\n");
+            sock_dtls_session_destroy(&client_data->dtls_sock, &conn->session);
             goto free_out;
         }
 
@@ -389,6 +390,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         res = sock_dtls_recv(&client_data->dtls_sock, &conn->session, buf, sizeof(buf), US_PER_SEC);
         if (res != -SOCK_DTLS_HANDSHAKE) {
             DEBUG("[lwm2m:client] error creating session: %i\n", res);
+            sock_dtls_session_destroy(&client_data->dtls_sock, &conn->session);
             goto free_out;
         }
         DEBUG("[lwm2m:client] connection to server successful\n");
