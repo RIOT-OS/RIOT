@@ -10,6 +10,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 USEMODULE += arduino
+USEMODULE += stdin
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
