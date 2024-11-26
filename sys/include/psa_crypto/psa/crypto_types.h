@@ -26,6 +26,7 @@ extern "C" {
 
 #include <stdint.h>
 
+#include "psa/algorithm.h"
 #include "psa/error.h"
 
 /**
@@ -36,16 +37,6 @@ typedef enum {
     PSA_CRYPTO_DRIVER_DECRYPT,
     PSA_CRYPTO_DRIVER_ENCRYPT
 } psa_encrypt_or_decrypt_t;
-
-/**
- * @brief   Encoding of a cryptographic algorithm.
- *
- * @details For algorithms that can be applied to multiple key types, this identifier does not
- *          encode the key type. For example, for symmetric ciphers based on a block cipher,
- *          @ref psa_algorithm_t encodes the block cipher mode and the padding mode while the
- *          block cipher itself is encoded via @ref psa_key_type_t.
- */
-typedef uint32_t psa_algorithm_t;
 
 /**
  * @brief   The type of PSA finite-field Diffie-Hellman group family identifiers.
