@@ -181,7 +181,7 @@ static int picolibc_stdout_queued;
 static void _picolibc_flush(void)
 {
     if (picolibc_stdout_queued) {
-        stdio_write(picolibc_stdout, picolibc_stdout_queued);
+        stdio_write_all(picolibc_stdout, picolibc_stdout_queued);
         picolibc_stdout_queued = 0;
     }
 }
@@ -214,6 +214,7 @@ static int picolibc_flush(FILE *file)
 int picolibc_put(char c, FILE *file)
 {
     (void)file;
+    /* A single-byte write can not be incomplete */
     stdio_write(&c, 1);
     return 1;
 }

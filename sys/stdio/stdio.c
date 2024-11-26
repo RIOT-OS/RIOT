@@ -42,7 +42,14 @@ void stdio_init(void)
 ssize_t stdio_write(const void* buffer, size_t len)
 {
     for (unsigned i = 0; i < XFA_LEN(stdio_provider_t, stdio_provider_xfa); ++i) {
-        stdio_provider_xfa[i].write(buffer, len);
+        size_t cursor = 0;
+        while (cursor < len) {
+            ssize_t written = stdio_provider_xfa[i].write(&buffer[written], len);
+            if (written < 0) {
+                break;
+            }
+            cursor += written;
+        }
     }
 
     return len;
@@ -60,6 +67,21 @@ void stdio_close(void) {
 #else
 #define MAYBE_WEAK __attribute__((weak))
 #endif
+
+int stdio_write_all(const void* buffer, size_t len)
+{
+    while (len > 0) {
+        ssize_t written = stdio_write(buffer, len);
+        if (written < 0) {
+            return written;
+            break;
+        }
+        buffer += written;
+        len -= written;
+    }
+
+    return 0;
+}
 
 MAYBE_WEAK
 ssize_t stdio_read(void* buffer, size_t len)

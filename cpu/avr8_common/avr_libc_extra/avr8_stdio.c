@@ -32,6 +32,7 @@ static FILE _uart_stdin = FDEV_SETUP_STREAM(NULL, _uart_getchar, _FDEV_SETUP_REA
 static int _uart_putchar(char c, FILE *stream)
 {
     (void) stream;
+    /* A single-byte write can not be incomplete */
     stdio_write(&c, 1);
     return 0;
 }

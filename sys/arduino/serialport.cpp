@@ -302,6 +302,7 @@ int SerialPort::write(int val)
 {
 #if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
     if (this->dev == UART_UNDEF) {
+        /* A single-byte write can not be incomplete */
         stdio_write((const void *)&val, 1);
         return 1;
     }
@@ -314,7 +315,7 @@ int SerialPort::write(const char *str)
 {
 #if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
     if (this->dev == UART_UNDEF) {
-        stdio_write((const void *)str, strlen(str));
+        stdio_write_all((const void *)str, strlen(str));
         return strlen(str);
     }
 #endif

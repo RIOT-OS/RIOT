@@ -72,10 +72,13 @@ typedef struct {
      * @brief   Write @p len bytes from @p src into stdout
      *
      * @param[in]   src     buffer to read from
-     * @param[in]   len     nr of bytes to write
+     * @param[in]   len     number of bytes to write
      *
-     * @return nr of bytes written
+     * @return number of bytes written
      * @return <0 on error
+     *
+     * @see @ref stdio_write that describes the behavior this function should
+     * follow.
      */
     ssize_t (*write)(const void *src, size_t len);
 } stdio_provider_t;
@@ -116,17 +119,58 @@ ssize_t stdio_read(void* buffer, size_t max_len);
 /**
  * @brief write @p len bytes from @p buffer into STDOUT
  *
- * @note Depending on the stdio backend(s) used, not all bytes might
- * be written to stdout and accounted for if multiple backends are
- * active, as not all stdout backends will do a blocking write.
- *
  * @param[in]   buffer  buffer to read from
- * @param[in]   len     nr of bytes to write
+ * @param[in]   len     number of bytes to write
  *
- * @return nr of bytes written
+ * @return number of bytes written
  * @return <0 on error
+ *
+ * If not all requested bytes were written, the caller should retry with the
+ * remaining bytes in a busy loop. At latest on the second call, the
+ * implementation will likely block.
+ *
+ * This function may depend on other threads to run (depending on the stdio
+ * implementation used). When called from an interrupt or with interrupts off,
+ * implementations of stdio_write should detect this, will just write data on a
+ * best-effort basis. In that case, they still return the full length. Even in
+ * an interrupt, that function may take considerable time (eg. by busy-looping
+ * until every byte has been enqueued).
+ *
+ * This function may block. Some implementations of stdio have options to
+ * switch them into an unreliable mode; then, they will behave as if called
+ * from an ISR (i.e., will just write a subset of the data and still return the
+ * full number of bytes), and beyond that will not block.
+ *
+ * If this function is called concurrently, output may be interspersed
+ * arbitrarily.
+ *
+ * This function may return before the data has been transmitted. When the
+ * function returns successfully, the data will eventually be transmitted,
+ * barring errors.
+ *
+ * If the function returns an error, the caller should not retry the function
+ * call with the data. Typically, this represents absence of the output medium
+ * (e.g. no debugger is connected that could receive the data). When the medium
+ * supports it, late errors (and also immediate errors, if they don't already
+ * represent absence of a medium) should be rendered onto the medium in a way
+ * that the receiver can recognize that there was data lost.
+ *
  */
 ssize_t stdio_write(const void* buffer, size_t len);
+
+/**
+ * @brief write @p len bytes from @p buffer into STDOUT
+ *
+ * @param[in]   buffer  buffer to read from
+ * @param[in]   len     number of bytes to write
+ *
+ * @return 0 after all bytes have been sent
+ * @return <0 on error
+ *
+ * This convenience function calls stdio_write as long as not all bytes have
+ * sent to @ref stdio_write, or until an error was returned.
+ */
+int stdio_write_all(const void* buffer, size_t len);
 
 /**
  * @brief Disable stdio and detach stdio providers
@@ -140,7 +184,7 @@ void stdio_close(void);
  * @param _type     stdio provider type, for identification
  * @param _open     attach / init function
  * @param _close    close / disable function
- * @param _write    write function
+ * @param _write    write function (as described in @ref stdio_write)
  */
 #define STDIO_PROVIDER(_type, _open, _close, _write)        \
     XFA_CONST(stdio_provider_t, stdio_provider_xfa, 0) stdio_ ##_type = { \
