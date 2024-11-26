@@ -87,6 +87,7 @@ int netif_set_opt(const netif_t *iface, netopt_t opt, uint16_t context,
                   void *value, size_t value_len)
 {
     (void)context;
+    (void)value_len;
     int res = -ENOTSUP;
     lwip_netif_t *lwip_netif = (lwip_netif_t*) iface;
     struct netif *netif = &lwip_netif->lwip_netif;
