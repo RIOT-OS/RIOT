@@ -100,14 +100,8 @@ extern "C" {
 
 /**
  * @brief   SPI_DEV(1) is connected to D11/D12/D13
- *
- * The SPI on D11/D12/D13 is only available when `periph_uart` is not used due
- * to a conflicting use of the same SERCOM. If it is available, it is the last
- * SPI bus.
  */
-#if !MODULE_PERIPH_UART
-#  define ARDUINO_SPI_D11D12D13 SPI_DEV(1)
-#endif
+#define ARDUINO_SPI_D11D12D13 SPI_DEV(1)
 /** @} */
 
 /**
