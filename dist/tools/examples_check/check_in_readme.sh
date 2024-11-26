@@ -19,10 +19,10 @@ done
 
 # Report missing entries
 if [ ${#missing_entries[@]} -eq 0 ]; then
-    echo "All directories are listed in the README.md file."
+    echo "All directories are listed in the examples/README.md file."
     exit 0
 else
-    echo "The following directories are missing in the README.md file:"
+    echo "The following directories are missing in the examples/README.md file:"
     for entry in "${missing_entries[@]}"; do
         echo "- $entry"
     done
