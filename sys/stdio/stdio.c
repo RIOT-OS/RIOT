@@ -75,6 +75,9 @@ ssize_t stdio_read(void* buffer, size_t len)
 MAYBE_WEAK
 int stdio_available(void)
 {
+    if (!IS_USED(MODULE_STDIN)) {
+        return 0;
+    }
     return tsrb_avail(&stdin_isrpipe.tsrb);
 }
 #endif
