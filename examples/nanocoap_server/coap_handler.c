@@ -190,7 +190,7 @@ NANOCOAP_RESOURCE(sha256) {
 };
 
 /* separate response requires an event thread to execute it */
-#ifdef MODULE_EVENT_THREAD
+#if MODULE_EVENT_THREAD && (MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS)
 static nanocoap_server_response_ctx_t _separate_ctx;
 
 static void _send_response(void *ctx)
@@ -207,7 +207,17 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
     static event_timeout_t event_timeout;
     static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
 
-    if (event_timeout_is_pending(&event_timeout) && !sock_udp_ep_equal(context->remote, &_separate_ctx.remote)) {
+    switch (coap_get_transport(pkt)) {
+    case COAP_TRANSPORT_DTLS:
+    case COAP_TRANSPORT_UDP:
+        break;
+    default:
+        puts("_separate_handler(): CoAP over TCP has no separate responses");
+        return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
+    }
+
+    if (event_timeout_is_pending(&event_timeout)
+            && !sock_udp_ep_equal(context->remote_udp, &_separate_ctx.remote_udp)) {
         puts("_separate_handler(): response already scheduled");
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
     }
