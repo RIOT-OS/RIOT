@@ -19,3 +19,5 @@ FEATURES_PROVIDED += arduino_pins
 FEATURES_PROVIDED += arduino_shield_isp
 FEATURES_PROVIDED += arduino_shield_uno
 FEATURES_PROVIDED += arduino_spi
+FEATURES_PROVIDED += arduino_i2c
+FEATURES_PROVIDED += arduino_uart

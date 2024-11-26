@@ -106,8 +106,26 @@ extern "C" {
  * SPI bus.
  */
 #if !MODULE_PERIPH_UART
-#  define ARDUINO_SPI_D11D12D13   SPI_DEV(1)
+#  define ARDUINO_SPI_D11D12D13 SPI_DEV(1)
 #endif
+/** @} */
+
+/**
+ * @name    Arduino's UART devices
+ * @{
+ */
+#define ARDUINO_UART_D0D1       UART_DEV(0)
+/** @} */
+
+/**
+ * @name    Arduino's I2C buses
+ * @{
+ */
+/**
+ * @brief   The first I2C bus is where shields for the Arduino UNO/Mega expect
+ *          it
+ */
+#define ARDUINO_I2C_UNO         I2C_DEV(0)
 /** @} */
 
 #ifdef __cplusplus
