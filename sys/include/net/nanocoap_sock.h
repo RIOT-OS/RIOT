@@ -140,10 +140,10 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#include "random.h"
+#include "mutex.h"
 #include "net/nanocoap.h"
-#include "net/sock/udp.h"
 #include "net/sock/util.h"
+#include "xfa.h"
 
 #if MODULE_NANOCOAP_UDP
 #  include "net/sock/udp.h"
@@ -570,6 +570,7 @@ int nanocoap_register_observer(const coap_request_ctx_t *req_ctx, coap_pkt_t *re
 void nanocoap_unregister_observer(const coap_request_ctx_t *req_ctx,
                                   const coap_pkt_t *req_pkt);
 
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS || DOXYGEN
 /**
  * @brief   Unregister a stale observation due to a reset message received
  * @param[in]   ep      Endpoint to wipe from the observer list
@@ -577,6 +578,7 @@ void nanocoap_unregister_observer(const coap_request_ctx_t *req_ctx,
  */
 void nanocoap_unregister_observer_due_to_reset(const sock_udp_ep_t *ep,
                                                uint16_t msg_id);
+#endif
 
 /**
  * @brief   Notify all currently registered observers of the given resource
@@ -622,20 +624,7 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
     return sock->msg_id++;
 }
 
-/**
- * @brief   Start a nanoCoAP server instance listening on UDP
- *
- * This function only returns if there's an error binding to @p local.
- *
- * @param[in]   local   local UDP endpoint to bind to
- * @param[in]   buf     response buffer to use
- * @param[in]   bufsize size of @p buf
- *
- * @returns     return code of @see sock_udp_create on error
- */
-int nanocoap_server_udp(sock_udp_ep_t *local, void *buf, size_t bufsize);
-
-#if MODULE_NANOCOAP_SERVER_TCP
+#if MODULE_NANOCOAP_SERVER_TCP || DOXYGEN
 /**
  * @brief   Start a nanocoap server instance listening on TCP
  *
@@ -654,6 +643,20 @@ int nanocoap_server_tcp(nanocoap_tcp_server_ctx_t *ctx,
                         event_queue_t *evq,
                         const sock_tcp_ep_t *local);
 #endif
+
+#if MODULE_NANOCOAP_UDP || DOXYGEN
+/**
+ * @brief   Start a nanoCoAP server instance listening on UDP
+ *
+ * This function only returns if there's an error binding to @p local.
+ *
+ * @param[in]   local   local UDP endpoint to bind to
+ * @param[in]   buf     response buffer to use
+ * @param[in]   bufsize size of @p buf
+ *
+ * @returns     return code of @see sock_udp_create on error
+ */
+int nanocoap_server_udp(sock_udp_ep_t *local, void *buf, size_t bufsize);
 
 /**
  * @brief   Alias of @ref nanocoap_server_udp
@@ -702,23 +705,10 @@ static inline kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local)
 static inline int nanocoap_sock_udp_connect(nanocoap_sock_t *sock, const sock_udp_ep_t *local,
                                             const sock_udp_ep_t *remote)
 {
-#if MODULE_NANOCOAP_UDP
     nanocoap_sock_set_type(sock, COAP_SOCKET_TYPE_UDP);
     sock->msg_id = random_uint32();
 
     return sock_udp_create(&sock->udp, local, remote, 0);
-#else
-    (void)sock;
-    (void)local;
-    (void)remote;
-    /* We could hide this function altogether if module nanocoap_udp is not
-     * used. But that would mandate more use of the preprocessor. Instead,
-     * we allow this function to be called in dead branches and fail at link
-     * time when this is actually used but UDP support not enabled */
-    extern void nanocoap_sock_udp_connect_called_but_module_nanocoap_udp_not_used(void);
-    nanocoap_sock_udp_connect_called_but_module_nanocoap_udp_not_used();
-    return -ENOTSUP;
-#endif
 }
 
 /**
@@ -738,8 +728,9 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock, const sock_udp_ep
 {
     return nanocoap_sock_udp_connect(sock, local, remote);
 }
+#endif
 
-#if IS_USED(MODULE_NANOCOAP_DTLS) || DOXYGEN
+#if MODULE_NANOCOAP_DTLS || DOXYGEN
 /**
  * @brief   Create a CoAP over DTLS client socket
  *
@@ -756,6 +747,7 @@ int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                                const sock_udp_ep_t *remote, credman_tag_t tag);
 #endif
 
+#if MODULE_NANOCOAP_TCP
 /**
  * @brief   Create a CoAP over TCP client socket
  *
@@ -770,6 +762,7 @@ int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
  */
 int nanocoap_sock_tcp_connect(nanocoap_sock_t *sock,
                               uint16_t local_port, const sock_tcp_ep_t *remote);
+#endif
 
 /**
  * @brief   Create a CoAP client socket by URL
@@ -1240,6 +1233,7 @@ ssize_t nanocoap_sock_request(nanocoap_sock_t *sock, coap_pkt_t *pkt, size_t len
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt, coap_request_cb_t cb,
                                  void *arg);
 
+#if MODULE_NANOCOAP_UDP || DOXYGEN
 /**
  * @brief   Simple synchronous CoAP request
  *
@@ -1285,6 +1279,7 @@ static inline ssize_t nanocoap_request(coap_pkt_t *pkt,
 {
     return nanocoap_request_udp(pkt, local, remote, len);
 }
+#endif
 
 /**
  * @brief   Initialize block request context by URL and connect a socket
@@ -1333,6 +1328,7 @@ static inline int nanocoap_block_request_connect_url(coap_block_request_t *ctx,
 int nanocoap_sock_block_request(coap_block_request_t *ctx, const void *data, size_t len, bool more,
                                 coap_request_cb_t cb, void *arg);
 
+#if MODULE_NANOCOAP_TCP || DOXYGEN
 /**
  * @brief   Send a CoAP-over-TCP CSM message
  *
@@ -1352,7 +1348,21 @@ int nanocoap_sock_block_request(coap_block_request_t *ctx, const void *data, siz
  * module `nanocoap_token_ext` is used, support for RFC 8974 Extended Tokens
  * will be indicated.
  */
-ssize_t nanocoap_send_csm_message(sock_tcp_t *sock, void *_buf, size_t buf_size);
+ssize_t nanocoap_send_csm_message(sock_tcp_t *sock, void *buf, size_t buf_size);
+#endif
+
+/**
+ * @brief   Send a CoAP-over-TCP/CoAP-over-WebSocket Abort Signaling message
+ *
+ * @warning This is an internal function. It's API may change as needed without
+ *          deprecation.
+ *
+ * @param[in]   sock        CoAP TCP/WS socket to send the CSM message over
+ *
+ * @retval 0    Success
+ * @retval <0   Negative errno code indicating the rror
+ */
+int nanocoap_send_abort_signal(nanocoap_sock_t *sock);
 #ifdef __cplusplus
 }
 #endif

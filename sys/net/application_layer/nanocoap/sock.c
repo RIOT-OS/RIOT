@@ -52,10 +52,6 @@
 #  include "net/sock/tcp.h"
 #endif
 
-#if MODULE_NANOCOAP_SERVER_TCP
-#  include "net/sock/async/event.h"
-#endif
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 

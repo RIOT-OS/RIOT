@@ -46,7 +46,21 @@ endif
 USEMODULE += sock_udp
 
 USEMODULE += nanocoap_sock
+USEMODULE += sock_udp
 USEMODULE += nanocoap_resources
+USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_udp
+
+ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
+  USEMODULE += auto_init_gnrc_netif
+  # Specify the mandatory networking modules for IPv6
+  USEMODULE += gnrc_ipv6_default
+  # Additional networking modules that can be dropped if not needed
+  USEMODULE += gnrc_icmpv6_echo
+else
+  USEMODULE += auto_init_lwip_netif
+  USEMODULE += lwip_ipv6 lwip_ipv6_autoconfig
+endif
 
 USEMODULE += ztimer_msec
 
@@ -91,6 +105,17 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
+
+  # async TCP is not supported on GNRC yet
+  ifneq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
+    USEMODULE += nanocoap_server_tcp
+  endif
+endif
+
+# if nanocaop_server_tcp is used: This app makes use of event_thread
+# to run the TCP server
+ifneq (,$(filter nanocoap_server_tcp,$(USEMODULE)))
+  USEMODULE += event_thread
 endif
 
 # Change this to 0 show compiler invocation lines by default:

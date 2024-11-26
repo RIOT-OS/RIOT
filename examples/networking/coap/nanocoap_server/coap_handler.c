@@ -223,12 +223,7 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
                               &event_timed.super);
     event_timeout_set(&event_timeout, 1 * MS_PER_SEC);
 
-    if (coap_get_transport(pkt) == COAP_TRANSPORT_TCP) {
-        /* no empty ACK in TCP needed */
-        return 0;
-    }
-
-    return coap_build_empty_ack(pkt, (void *)buf);
+    return coap_reply_empty_ack(pkt, buf, len);
 }
 
 NANOCOAP_RESOURCE(separate) {
