@@ -15,8 +15,7 @@
 #include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
 
-#if MODULE_EVENT_THREAD
-#  include "event.h"
+#if MODULE_NANOCOAP_SERVER_SEPARATE
 #  include "event/thread.h"
 #  include "event/timeout.h"
 #  include "event/callback.h"
@@ -210,8 +209,8 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
     if (event_timeout_is_pending(&event_timeout)) {
         if (nanocoap_is_duplicate_in_separate_ctx(&_separate_ctx, pkt, context)) {
             /* no need to check transport: Only UDP can have duplicates */
-            puts("_separate_handler(): duplicate --> ACK");
-            return coap_build_empty_ack(pkt, (void *)buf);
+            puts("_separate_handler(): duplicate");
+            return coap_reply_empty_ack(pkt, buf, len);
         }
         puts("_separate_handler(): response already scheduled");
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
@@ -229,12 +228,7 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
                               &event_timed.super);
     event_timeout_set(&event_timeout, 1 * MS_PER_SEC);
 
-    if (coap_get_transport(pkt) == COAP_TRANSPORT_TCP) {
-        /* no empty ACK in TCP needed */
-        return 0;
-    }
-
-    return coap_build_empty_ack(pkt, (void *)buf);
+    return coap_reply_empty_ack(pkt, buf, len);
 }
 
 NANOCOAP_RESOURCE(separate) {
