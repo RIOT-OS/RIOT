@@ -28,50 +28,6 @@ extern "C" {
 #include "crypto_sizes.h"
 #include "crypto_contexts.h"
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT) || defined(DOXYGEN)
-/**
- * @brief   Structure storing the key usage policies
- */
-struct psa_key_policy_s {
-    psa_key_usage_t usage;  /**< Key usage policy */
-    psa_algorithm_t alg;    /**< Algorithm for key usage */
-};
-
-/**
- * @brief   Type for key usage policies.
- */
-typedef struct psa_key_policy_s psa_key_policy_t;
-
-/**
- * @brief   Structure storing key attributes
- */
-struct psa_key_attributes_s {
-    psa_key_type_t type;            /**< Type of key */
-    psa_key_bits_t bits;            /**< Size of key in bits */
-    psa_key_lifetime_t lifetime;    /**< Lifetime of key */
-    psa_key_id_t id;                /**< Key identifier */
-    psa_key_policy_t policy;        /**< Key usage policy */
-};
-
-/**
- * @brief   This macro returns a suitable initializer for a key attribute object of
- *          type @ref psa_key_attributes_t.
- */
-#define PSA_KEY_ATTRIBUTES_INIT { 0 }
-
-/**
- * @brief Return an initial value for a key attribute object.
- *
- * @return struct psa_key_attributes_s
- */
-static inline struct psa_key_attributes_s psa_key_attributes_init(void)
-{
-    const struct psa_key_attributes_s v = PSA_KEY_ATTRIBUTES_INIT;
-
-    return v;
-}
-#endif /*(MODULE_PSA_KEY_MANAGEMENT */
-
 #if IS_USED(MODULE_PSA_AEAD) || defined(DOXYGEN)
 /**
  * @brief   Structure storing an AEAD operation context
