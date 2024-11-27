@@ -9,6 +9,8 @@
 #include "board.h"
 #include "periph/pio.h"
 
+#include <stdio.h>
+
 /* see blink.c */
 pio_program_t pio_blink_export_program(void);
 

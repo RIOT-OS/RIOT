@@ -30,12 +30,10 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdio.h>
-
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
-#include "cpu_conf.h"
+#include "cpu_conf.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {
