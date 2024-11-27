@@ -75,6 +75,12 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   endif
 endif
 
+# if nanocaop_server_tcp is used: This app makes use of event_thread
+# to run the TCP server
+ifneq (,$(filter nanocoap_server_tcp,$(USEMODULE)))
+  USEMODULE += event_thread
+endif
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
