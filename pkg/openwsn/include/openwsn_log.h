@@ -22,6 +22,8 @@
 #ifndef OPENWSN_LOG_H
 #define OPENWSN_LOG_H
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
