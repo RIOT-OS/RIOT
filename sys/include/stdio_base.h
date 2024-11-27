@@ -103,6 +103,15 @@ int stdio_available(void);
 #endif
 
 /**
+ * @brief   Clear the input buffer
+ *
+ * @note    Requires 'USEMODULE += stdin'
+ *
+ * @warning This function does only work if the stdio implementation supports it.
+ */
+void stdio_clear_stdin(void);
+
+/**
  * @brief read @p len bytes from stdio uart into @p buffer
  *
  * @param[out]  buffer  buffer to read into
