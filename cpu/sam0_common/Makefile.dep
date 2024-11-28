@@ -10,6 +10,11 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   USEMODULE += periph_spi_gpio_mode
 endif
 
+ifneq (,$(filter periph_spi periph_uart periph_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_sercom
+  USEMODULE += bitfield
+endif
+
 ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
   USEMODULE += sdmmc_sdhc
 endif

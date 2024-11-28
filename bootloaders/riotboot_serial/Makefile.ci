@@ -2,5 +2,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     frdm-kw41z \
     pba-d-01-kw2x \
     phynode-kw41z \
+    samr21-xpro \
     usb-kw41z \
     #

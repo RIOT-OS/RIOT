@@ -26,11 +26,11 @@
  * @}
  */
 
-#include "cpu.h"
-#include "pm_layered.h"
-
-#include "periph/uart.h"
+#include "bitfield.h"
+#include "modules.h"
 #include "periph/gpio.h"
+#include "periph/uart.h"
+#include "periph_cpu.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -64,20 +64,56 @@ static tsrb_t uart_tx_rb[UART_NUMOF];
 static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
+static uint32_t symbol_rates[UART_NUMOF];
+static BITFIELD(_enabled, UART_NUMOF) = { 0 };
+
+static void uart_isr(void *arg);
+
+static bool _is_txondemand(uart_t uart)
+{
+    if (!IS_USED(MODULE_PERIPH_UART_TX_ONDEMAND)) {
+        return false;
+    }
+
+    return uart_config[uart].flags & UART_FLAG_TX_ONDEMAND;
+}
+
+gpio_t uart_pin_cts(uart_t uart)
+{
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        return uart_config[uart].cts_pin;
+    }
+#endif
+    (void)uart;
+    return GPIO_UNDEF;
+}
+
+gpio_t uart_pin_rts(uart_t uart)
+{
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        return uart_config[uart].rts_pin;
+    }
+#endif
+    (void)uart;
+    return GPIO_UNDEF;
+}
 
 /**
- * @brief   Get the pointer to the base register of the given UART device
+ * @brief   Get the pointer to the base register of the given UART
  *
- * @param[in] dev       UART device identifier
+ * @param[in] uart      UART interface number
  *
  * @return              base register address
  */
-static inline SercomUsart *dev(uart_t dev)
+static SercomUsart *_dev(uart_t uart)
 {
-    return uart_config[dev].dev;
+    return uart_config[uart].dev;
 }
 
-static inline void _syncbusy(SercomUsart *dev)
+MAYBE_UNUSED
+static void _syncbusy(SercomUsart *dev)
 {
 #ifdef SERCOM_USART_SYNCBUSY_MASK
     while (dev->SYNCBUSY.reg) {}
@@ -86,19 +122,7 @@ static inline void _syncbusy(SercomUsart *dev)
 #endif
 }
 
-static inline void _reset(SercomUsart *dev)
-{
-    dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
-    while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
-
-#ifdef SERCOM_USART_SYNCBUSY_MASK
-    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST) {}
-#else
-    while (dev->STATUS.reg & SERCOM_USART_STATUS_SYNCBUSY) {}
-#endif
-}
-
-static void _set_baud(uart_t uart, uint32_t baudrate, uint32_t f_src)
+static uint16_t _calculate_baud(uint32_t baudrate, uint32_t f_src)
 {
 #if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
     /* Asynchronous Fractional */
@@ -106,8 +130,11 @@ static void _set_baud(uart_t uart, uint32_t baudrate, uint32_t f_src)
     /* BAUD * 8 + FP = (8 * f_src) / (S * f_baud) */
     /* S * (BAUD + 8 * FP) = (8 * f_src) / f_baud */
     uint32_t baud = (f_src * 8) / baudrate;
-    dev(uart)->BAUD.FRAC.FP = (baud >> 4) & 0x7; /* baud / 16 */
-    dev(uart)->BAUD.FRAC.BAUD = baud >> 7; /* baud / (8 * 16) */
+    SERCOM_USART_BAUD_Type baudreg = { .FRAC = {
+        .FP = (baud >> 4) & 0x7, /* baud / 16 */
+        .BAUD = baud >> 7, /* baud / (8 * 16) */
+    } };
+    return baudreg.reg;
 #else
     /* Asynchronous Arithmetic */
     /* BAUD = 2^16     * (2^0 - 2^4 * f_baud / f_src)     */
@@ -125,82 +152,106 @@ static void _set_baud(uart_t uart, uint32_t baudrate, uint32_t f_src)
     uint32_t rem = baudrate % f_src;
 
     uint8_t scale = 20 - pow;
-    dev(uart)->BAUD.reg = (tmp << scale) - (rem << scale) / f_src;
+    return (tmp << scale) - (rem << scale) / f_src;
 #endif
+}
+
+static void _attach_pins(uart_t uart)
+{
+    if (gpio_is_valid(uart_config[uart].rx_pin)) {
+        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    }
+
+    if (gpio_is_valid(uart_config[uart].tx_pin) &&
+            !_is_txondemand(uart)) {
+        gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    }
+
+    /* If RTS/CTS needed, enable them */
+    /* Ensure RTS is defined */
+    if (gpio_is_valid(uart_pin_rts(uart))) {
+        gpio_init_mux(uart_pin_rts(uart), uart_config[uart].mux);
+    }
+    /* Ensure CTS is defined */
+    if (gpio_is_valid(uart_pin_cts(uart))) {
+        gpio_init_mux(uart_pin_cts(uart), uart_config[uart].mux);
+    }
+}
+
+static void _detach_pins(uart_t uart)
+{
+    if (gpio_is_valid(uart_config[uart].rx_pin)) {
+        gpio_disable_mux(uart_config[uart].rx_pin);
+    }
+
+    if (gpio_is_valid(uart_config[uart].tx_pin)
+            && !_is_txondemand(uart)) {
+        gpio_disable_mux(uart_config[uart].tx_pin);
+    }
+
+    /* If RTS/CTS needed, enable them */
+    /* Ensure RTS is defined */
+    if (gpio_is_valid(uart_pin_rts(uart))) {
+        gpio_disable_mux(uart_pin_rts(uart));
+    }
+    /* Ensure CTS is defined */
+    if (gpio_is_valid(uart_pin_cts(uart))) {
+        gpio_disable_mux(uart_pin_cts(uart));
+    }
 }
 
 void uart_enable_tx(uart_t uart)
 {
-    /* configure RX pin */
-    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(uart_config[uart].tx_pin)) {
         gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
     }
 }
 
 void uart_disable_tx(uart_t uart)
 {
-    /* configure RX pin */
-    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
-        gpio_init_mux(uart_config[uart].tx_pin, GPIO_MUX_A);
+    if (gpio_is_valid(uart_config[uart].tx_pin)) {
+        gpio_disable_mux(uart_config[uart].tx_pin);
     }
 }
 
 static void _configure_pins(uart_t uart)
 {
     /* configure RX pin */
-    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(uart_config[uart].rx_pin)) {
         gpio_init(uart_config[uart].rx_pin, GPIO_IN);
-        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
     }
 
     /* configure TX pin */
-    if (uart_config[uart].tx_pin != GPIO_UNDEF &&
-        !(uart_config[uart].flags & UART_FLAG_TX_ONDEMAND)) {
+    if (gpio_is_valid(uart_config[uart].tx_pin)) {
         gpio_set(uart_config[uart].tx_pin);
         gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
-        gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
     }
 
-#ifdef MODULE_PERIPH_UART_HW_FC
     /* If RTS/CTS needed, enable them */
-    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
-        /* Ensure RTS is defined */
-        if (uart_config[uart].rts_pin != GPIO_UNDEF) {
-            gpio_init_mux(uart_config[uart].rts_pin, uart_config[uart].mux);
-        }
-        /* Ensure CTS is defined */
-        if (uart_config[uart].cts_pin != GPIO_UNDEF) {
-            gpio_init_mux(uart_config[uart].cts_pin, uart_config[uart].mux);
-        }
+    /* Ensure RTS is defined */
+    if (gpio_is_valid(uart_pin_rts(uart))) {
+        gpio_init(uart_pin_rts(uart), GPIO_OUT);
     }
-#endif
+    /* Ensure CTS is defined */
+    if (gpio_is_valid(uart_pin_cts(uart))) {
+        gpio_init(uart_pin_cts(uart), GPIO_IN);
+    }
 }
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
+int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
 {
+    DEBUG("[uart] init %u\n", (unsigned)uart);
+    /* if UART is still on, we disable it first */
+    if (bf_isset(_enabled, uart)) {
+        uart_poweroff(uart);
+    }
+
     if (uart >= UART_NUMOF) {
         return UART_NODEV;
     }
 
-    /* enable peripheral clock */
-    sercom_clk_en(dev(uart));
-
-#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
-    /* clear previously blocked power modes */
-    if (dev(uart)->CTRLA.reg & SERCOM_USART_CTRLA_ENABLE) {
-        /* RX IRQ is enabled */
-        if (dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_RXC) {
-            pm_unblock(SAM0_UART_PM_BLOCK);
-        }
-        /* data reg empty IRQ is enabled -> sending data was in progress */
-        if (dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_DRE) {
-            pm_unblock(SAM0_UART_PM_BLOCK);
-        }
-    }
-#endif
-
-    /* must disable here first to ensure idempotency */
-    dev(uart)->CTRLA.reg = 0;
+    symbol_rates[uart] = baud;
+    uart_ctx[uart] = (uart_isr_ctx_t){ .rx_cb = rx_cb, .arg = arg };
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
@@ -210,91 +261,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* configure pins */
     _configure_pins(uart);
 
-    /* reset the UART device */
-    _reset(dev(uart));
-
-    /* configure clock generator */
-    sercom_set_gen(dev(uart), uart_config[uart].gclk_src);
-
-    uint32_t f_src = sam0_gclk_freq(uart_config[uart].gclk_src);
-
-#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
-    uint32_t sampr;
-    /* constraint: f_baud ≤ f_src / S */
-    if (baudrate * 16 > f_src) {
-        /* 8x oversampling */
-        sampr = SERCOM_USART_CTRLA_SAMPR(0x3);
-        f_src <<= 1;
-    } else {
-        /* 16x oversampling */
-        sampr = SERCOM_USART_CTRLA_SAMPR(0x1);
-    }
-#endif
-
-    /* set asynchronous mode w/o parity, LSB first, TX and RX pad as specified
-     * by the board in the periph_conf.h, x16 sampling and use internal clock */
-    dev(uart)->CTRLA.reg = SERCOM_USART_CTRLA_DORD
-#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
-    /* enable Asynchronous Fractional mode */
-                         | sampr
-#endif
-                         | SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad)
-                         | SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad)
-                         | SERCOM_USART_CTRLA_MODE(0x1);
-
-    /* Set run in standby mode if enabled */
-    if (uart_config[uart].flags & UART_FLAG_RUN_STANDBY) {
-        dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_RUNSTDBY;
-    }
-
-    /* calculate and set baudrate */
-    _set_baud(uart, baudrate, f_src);
-
-    /* enable transmitter, and configure 8N1 mode */
-    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
-        dev(uart)->CTRLB.reg = SERCOM_USART_CTRLB_TXEN;
-    } else {
-        dev(uart)->CTRLB.reg = 0;
-    }
-
-    /* enable receiver and RX interrupt if configured */
-    if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
-        uart_ctx[uart].rx_cb = rx_cb;
-        uart_ctx[uart].arg = arg;
-#ifdef UART_HAS_TX_ISR
-        /* enable RXNE ISR */
-        NVIC_EnableIRQ(SERCOM0_2_IRQn + (sercom_id(dev(uart)) * 4));
-#else
-        /* enable UART ISR */
-        NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
-#endif /* UART_HAS_TX_ISR */
-        dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_RXEN;
-        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
-#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
-        /* block power mode for rx IRQs */
-        pm_block(SAM0_UART_PM_BLOCK);
-#endif
-        /* set wakeup receive from sleep if enabled */
-        if (uart_config[uart].flags & UART_FLAG_WAKEUP) {
-            dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
-        }
-    }
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
-#ifndef UART_HAS_TX_ISR
-    else {
-        /* enable UART ISR */
-        NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
-    }
-#else
-    /* enable TXE ISR */
-    NVIC_EnableIRQ(SERCOM0_0_IRQn + (sercom_id(dev(uart)) * 4));
-#endif
-#endif /* MODULE_PERIPH_UART_NONBLOCKING */
-
-    _syncbusy(dev(uart));
-
-    /* and finally enable the device */
-    dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    uart_poweron(uart);
 
     return UART_OK;
 }
@@ -320,50 +287,24 @@ void uart_deinit_pins(uart_t uart)
         gpio_disable_mux(uart_config[uart].tx_pin);
     }
 
-#ifdef MODULE_PERIPH_UART_HW_FC
     /* If RTS/CTS needed, enable them */
-    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
-        /* Ensure RTS is defined */
-        if (uart_config[uart].rts_pin != GPIO_UNDEF) {
-            gpio_disable_mux(uart_config[uart].rts_pin);
-        }
-        /* Ensure CTS is defined */
-        if (uart_config[uart].cts_pin != GPIO_UNDEF) {
-            gpio_disable_mux(uart_config[uart].cts_pin);
-        }
+    /* Ensure RTS is defined */
+    if (gpio_is_valid(uart_pin_rts(uart))) {
+        gpio_disable_mux(uart_pin_rts(uart));
     }
-#endif
-}
-
-gpio_t uart_pin_cts(uart_t uart)
-{
-#ifdef MODULE_PERIPH_UART_HW_FC
-    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
-        return uart_config[uart].cts_pin;
+    /* Ensure CTS is defined */
+    if (gpio_is_valid(uart_pin_cts(uart))) {
+        gpio_disable_mux(uart_pin_cts(uart));
     }
-#endif
-    (void)uart;
-    return GPIO_UNDEF;
-}
-
-gpio_t uart_pin_rts(uart_t uart)
-{
-#ifdef MODULE_PERIPH_UART_HW_FC
-    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
-        return uart_config[uart].rts_pin;
-    }
-#endif
-    (void)uart;
-    return GPIO_UNDEF;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    if (uart_config[uart].tx_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(uart_config[uart].tx_pin)) {
         return;
     }
 
-    if (!(dev(uart)->CTRLA.reg & SERCOM_USART_CTRLA_ENABLE)) {
+    if (!(_dev(uart)->CTRLA.reg & SERCOM_USART_CTRLA_ENABLE)) {
         return;
     }
 
@@ -372,8 +313,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         if (irq_is_in() || __get_PRIMASK()) {
             /* if ring buffer is full free up a spot */
             if (tsrb_full(&uart_tx_rb[uart])) {
-                while (!(dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE)) {}
-                dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
+                while (!(_dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE)) {}
+                _dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
             }
             tsrb_add_one(&uart_tx_rb[uart], *data);
         }
@@ -386,70 +327,125 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* tsrb_add_one() is blocking the thread. It may happen that
          * the corresponding ISR has turned off DRE IRQs and, thus,
          * unblocked the corresponding power mode. */
-        if (!(dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_DRE)) {
+        if (!(_dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_DRE)) {
             pm_block(SAM0_UART_PM_BLOCK);
         }
-        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
+        _dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
         irq_restore(state);
 #else
-        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
+        _dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
 #endif
     }
 #else
     for (const void* end = data + len; data != end; ++data) {
-        while (!(dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE)) {}
-        dev(uart)->DATA.reg = *data;
+        while (!(_dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE)) {}
+        _dev(uart)->DATA.reg = *data;
     }
-    while (!(dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC)) {}
+    while (!(_dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC)) {}
 #endif
 }
 
 void uart_poweron(uart_t uart)
 {
-    sercom_clk_en(dev(uart));
+    sercom_t sercom = sercom_id(uart_config[uart].dev);
+    DEBUG("[uart] powering on #%u on SERCOM%u\n", (unsigned)uart, (unsigned)sercom);
+    if (bf_isset(_enabled, uart)) {
+        /* already on, nothing to do */
+        return;
+    }
 
-    /* the enable bit must be read and written atomically */
-    unsigned state = irq_disable();
-#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
-    /* block required power modes */
-    if (!(dev(uart)->CTRLA.reg & SERCOM_USART_CTRLA_ENABLE)) {
-        /* RX IRQ is enabled */
-        if (dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_RXC) {
-            pm_block(SAM0_UART_PM_BLOCK);
-        }
-        /* data reg empty IRQ is enabled -> sending data was in progress */
-        if (dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_DRE) {
-            pm_block(SAM0_UART_PM_BLOCK);
-        }
+    bf_set_atomic(_enabled, uart);
+
+    uint32_t f_src = sam0_gclk_freq(uart_config[uart].gclk_src);
+
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    uint32_t sampr;
+    /* constraint: f_baud ≤ f_src / S */
+    if (symbol_rates[uart] * 16 > f_src) {
+        /* 8x oversampling */
+        sampr = SERCOM_USART_CTRLA_SAMPR(0x3);
+        f_src <<= 1;
+    }
+    else {
+        /* 16x oversampling */
+        sampr = SERCOM_USART_CTRLA_SAMPR(0x1);
     }
 #endif
-    dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
-    irq_restore(state);
 
-    _syncbusy(dev(uart));
+    /* set asynchronous mode w/o parity, LSB first, TX and RX pad as specified
+     * by the board in the periph_conf.h, x16 sampling and use internal clock */
+    uint32_t ctrla = SERCOM_USART_CTRLA_DORD
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    /* enable Asynchronous Fractional mode */
+               | sampr
+#endif
+               | SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad)
+               | SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad)
+               | SERCOM_USART_CTRLA_MODE(0x1);
+
+    /* Set run in standby mode if enabled */
+    if (uart_config[uart].flags & UART_FLAG_RUN_STANDBY) {
+        ctrla |= SERCOM_USART_CTRLA_RUNSTDBY;
+    }
+
+    /* calculate symbol rate */
+    uint16_t baud = _calculate_baud(symbol_rates[uart], f_src);
+
+    uint32_t ctrlb = 0;
+    /* enable transmitter, and configure 8N1 mode */
+    if (gpio_is_valid(uart_config[uart].tx_pin)) {
+        ctrlb = SERCOM_USART_CTRLB_TXEN;
+    }
+
+    sercom_irq_cb_t irq_cb = NULL;
+
+    /* enable receiver and RX interrupt if configured */
+    if ((uart_ctx[uart].rx_cb) && (gpio_is_valid(uart_config[uart].rx_pin))) {
+        irq_cb = uart_isr;
+        ctrlb |= SERCOM_USART_CTRLB_RXEN;
+
+        /* set wakeup receive from sleep if enabled */
+        if (uart_config[uart].flags & UART_FLAG_WAKEUP) {
+            ctrlb |= SERCOM_USART_CTRLB_SFDE;
+        }
+    }
+
+    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        irq_cb = uart_isr;
+    }
+
+    sercom_acquire(sercom, uart_config[uart].gclk_src, irq_cb, (void *)(uintptr_t)uart);
+
+    _attach_pins(uart);
+
+    SercomUsart *dev = _dev(uart);
+    dev->CTRLA.reg = ctrla;
+    dev->CTRLB.reg = ctrlb;
+    dev->BAUD.reg = baud;
+    /* enable RX IRQ, if needed */
+    if ((uart_ctx[uart].rx_cb) && (gpio_is_valid(uart_config[uart].rx_pin))) {
+        dev->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
+    }
+
+    /* and finally enable the device and the IRQs as needed */
+    dev->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    _syncbusy(dev);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    /* the enable bit must be read and written atomically */
-    unsigned state = irq_disable();
-#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
-    /* clear blocked power modes */
-    if (dev(uart)->CTRLA.reg & SERCOM_USART_CTRLA_ENABLE) {
-        /* RX IRQ is enabled */
-        if (dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_RXC) {
-            pm_unblock(SAM0_UART_PM_BLOCK);
-        }
-        /* data reg empty IRQ is enabled -> sending data is in progress */
-        if (dev(uart)->INTENSET.reg & SERCOM_USART_INTENSET_DRE) {
-            pm_unblock(SAM0_UART_PM_BLOCK);
-        }
+    sercom_t sercom = sercom_id(uart_config[uart].dev);
+    DEBUG("[uart] powering off #%u on SERCOM%u\n", (unsigned)uart, (unsigned)sercom);
+    /* If we would release a SERCOM that we do not own, we could e.g. disable
+     * the SERCOM in the middle of an SPI or I2C transfer */
+    if (!bf_isset(_enabled, uart)) {
+        return;
     }
-#endif
-    dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
-    irq_restore(state);
 
-    sercom_clk_dis(dev(uart));
+    bf_unset_atomic(_enabled, uart);
+
+    _detach_pins(uart);
+    sercom_release(sercom);
 }
 
 #ifdef MODULE_PERIPH_UART_COLLISION
@@ -459,33 +455,33 @@ bool uart_collision_detected(uart_t uart)
      * will be in sync during disabling of TX,
      * then the flag will be set.
      */
-    _syncbusy(dev(uart));
+    _syncbusy(_dev(uart));
 
-    bool collision = dev(uart)->STATUS.reg & SERCOM_USART_STATUS_COLL;
-    dev(uart)->STATUS.reg = SERCOM_USART_STATUS_COLL;
+    bool collision = _dev(uart)->STATUS.reg & SERCOM_USART_STATUS_COLL;
+    _dev(uart)->STATUS.reg = SERCOM_USART_STATUS_COLL;
     return collision;
 }
 
 void uart_collision_detect_enable(uart_t uart)
 {
     /* CTRLB is enable protected */
-    dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
-    _syncbusy(dev(uart));
+    _dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
+    _syncbusy(_dev(uart));
 
     /* clear stale collision flag */
-    dev(uart)->STATUS.reg = SERCOM_USART_STATUS_COLL;
+    _dev(uart)->STATUS.reg = SERCOM_USART_STATUS_COLL;
 
     /* enable collision detection */
-    dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_COLDEN;
+    _dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_COLDEN;
 
     /* disable RX interrupt */
-    dev(uart)->INTENCLR.reg = SERCOM_USART_INTENCLR_RXC;
+    _dev(uart)->INTENCLR.reg = SERCOM_USART_INTENCLR_RXC;
 
     /* re-enable UART */
-    dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    _dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
 
     /* wait for config to be applied */
-    _syncbusy(dev(uart));
+    _syncbusy(_dev(uart));
 }
 
 static void _drain_rxbuf(SercomUsart *dev)
@@ -498,7 +494,7 @@ static void _drain_rxbuf(SercomUsart *dev)
 
 void uart_collision_detect_disable(uart_t uart)
 {
-    uint32_t ctrlb = dev(uart)->CTRLB.reg;
+    uint32_t ctrlb = _dev(uart)->CTRLB.reg;
 
     /* re-enable TX after collision */
     ctrlb |= SERCOM_USART_CTRLB_TXEN;
@@ -507,23 +503,23 @@ void uart_collision_detect_disable(uart_t uart)
     ctrlb &= ~SERCOM_USART_CTRLB_COLDEN;
 
     /* CTRLB is enable protected */
-    dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
-    _syncbusy(dev(uart));
+    _dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
+    _syncbusy(_dev(uart));
 
-    dev(uart)->CTRLB.reg = ctrlb;
+    _dev(uart)->CTRLB.reg = ctrlb;
 
     /* re-enable UART */
-    dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    _dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
 
     /* wait for config to be applied */
-    _syncbusy(dev(uart));
+    _syncbusy(_dev(uart));
 
     /* clear bytes from RX buffer */
-    _drain_rxbuf(dev(uart));
+    _drain_rxbuf(_dev(uart));
 
     /* re-enable RX complete IRQ */
     if (uart_ctx[uart].rx_cb) {
-        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
+        _dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
     }
 }
 #endif
@@ -546,16 +542,16 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
     }
 
     /* Disable UART first to remove write protect */
-    dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
-    _syncbusy(dev(uart));
+    _dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
+    _syncbusy(_dev(uart));
 
-    uint32_t ctrlb = dev(uart)->CTRLB.reg;
+    uint32_t ctrlb = _dev(uart)->CTRLB.reg;
 
     if (parity == UART_PARITY_NONE) {
-        dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_FORM_Msk;
+        _dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_FORM_Msk;
     }
     else {
-        dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_FORM(1);
+        _dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_FORM(1);
         if (parity == UART_PARITY_ODD) {
             ctrlb |= SERCOM_USART_CTRLB_PMODE;
         }
@@ -571,12 +567,12 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
         ctrlb |= SERCOM_USART_CTRLB_SBMODE;
     }
 
-    dev(uart)->CTRLB.reg = ((ctrlb & ~SERCOM_USART_CTRLB_CHSIZE_Msk) |
+    _dev(uart)->CTRLB.reg = ((ctrlb & ~SERCOM_USART_CTRLB_CHSIZE_Msk) |
                             SERCOM_USART_CTRLB_CHSIZE(data_bits));
 
     /* Enable UART again */
-    dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
-    _syncbusy(dev(uart));
+    _dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    _syncbusy(_dev(uart));
 
     return UART_OK;
 }
@@ -586,45 +582,45 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 void uart_rxstart_irq_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg)
 {
     /* CTRLB is enable-proteced */
-    dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
+    _dev(uart)->CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
 
     /* set start of frame detection enable */
-    dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
+    _dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
 
     uart_ctx[uart].rxs_cb  = cb;
     uart_ctx[uart].rxs_arg = arg;
 
     /* enable UART again */
-    dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    _dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
 }
 
 void uart_rxstart_irq_enable(uart_t uart)
 {
     /* clear stale interrupt flag */
-    dev(uart)->INTFLAG.reg  = SERCOM_USART_INTFLAG_RXS;
+    _dev(uart)->INTFLAG.reg  = SERCOM_USART_INTFLAG_RXS;
 
     /* enable interrupt */
-    dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXS;
+    _dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXS;
 }
 
 void uart_rxstart_irq_disable(uart_t uart)
 {
-    dev(uart)->INTENCLR.reg = SERCOM_USART_INTENCLR_RXS;
+    _dev(uart)->INTENCLR.reg = SERCOM_USART_INTENCLR_RXS;
 }
 #endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
-static inline void irq_handler_tx(unsigned uartnum)
+static void irq_handler_tx(unsigned uartnum)
 {
     /* workaround for saml1x */
     int c = tsrb_get_one(&uart_tx_rb[uartnum]);
     if (c >= 0) {
-        dev(uartnum)->DATA.reg = c;
+        _dev(uartnum)->DATA.reg = c;
     }
 
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uartnum])) {
-        dev(uartnum)->INTENCLR.reg = SERCOM_USART_INTENSET_DRE;
+        _dev(uartnum)->INTENCLR.reg = SERCOM_USART_INTENSET_DRE;
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
         /* we really should be in IRQ context! */
         assert(irq_is_in());
@@ -634,118 +630,31 @@ static inline void irq_handler_tx(unsigned uartnum)
 }
 #endif
 
-static inline void irq_handler(unsigned uartnum)
+static void uart_isr(void *arg)
 {
-    uint32_t status = dev(uartnum)->INTFLAG.reg;
+    uart_t uart = (uintptr_t)arg;
+    SercomUsart *dev = _dev(uart);
+    uint32_t status = dev->INTFLAG.reg;
     /* TXC is used by uart_write() */
-    dev(uartnum)->INTFLAG.reg = status & ~SERCOM_USART_INTFLAG_TXC;
+    dev->INTFLAG.reg = status & ~SERCOM_USART_INTFLAG_TXC;
 
-#if !defined(UART_HAS_TX_ISR) && defined(MODULE_PERIPH_UART_NONBLOCKING)
+#if MODULE_PERIPH_UART_NONBLOCKING
     if ((status & SERCOM_USART_INTFLAG_DRE) &&
-        (dev(uartnum)->INTENSET.reg & SERCOM_USART_INTENSET_DRE)) {
-        irq_handler_tx(uartnum);
+        (dev->INTENSET.reg & SERCOM_USART_INTENSET_DRE)) {
+        irq_handler_tx(uart);
     }
 #endif
 
 #ifdef MODULE_PERIPH_UART_RXSTART_IRQ
     if ((status & SERCOM_USART_INTFLAG_RXS) &&
-        (dev(uartnum)->INTENSET.reg & SERCOM_USART_INTENSET_RXS)) {
-        uart_ctx[uartnum].rxs_cb(uart_ctx[uartnum].rxs_arg);
+        (dev->INTENSET.reg & SERCOM_USART_INTENSET_RXS)) {
+        uart_ctx[uart].rxs_cb(uart_ctx[uart].rxs_arg);
     }
 #endif
 
     if (status & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
-        uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg,
-                                (uint8_t)(dev(uartnum)->DATA.reg));
+        uart_ctx[uart].rx_cb(uart_ctx[uart].arg, dev->DATA.reg);
     }
 
-    cortexm_isr_end();
 }
-
-#ifdef UART_0_ISR
-void UART_0_ISR(void)
-{
-    irq_handler(0);
-}
-#endif
-
-#ifdef UART_1_ISR
-void UART_1_ISR(void)
-{
-    irq_handler(1);
-}
-#endif
-
-#ifdef UART_2_ISR
-void UART_2_ISR(void)
-{
-    irq_handler(2);
-}
-#endif
-
-#ifdef UART_3_ISR
-void UART_3_ISR(void)
-{
-    irq_handler(3);
-}
-#endif
-
-#ifdef UART_4_ISR
-void UART_4_ISR(void)
-{
-    irq_handler(4);
-}
-#endif
-
-#ifdef UART_5_ISR
-void UART_5_ISR(void)
-{
-    irq_handler(5);
-}
-#endif
-
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
-
-#ifdef UART_0_ISR_TX
-void UART_0_ISR_TX(void)
-{
-    irq_handler_tx(0);
-}
-#endif
-
-#ifdef UART_1_ISR_TX
-void UART_1_ISR_TX(void)
-{
-    irq_handler_tx(1);
-}
-#endif
-
-#ifdef UART_2_ISR_TX
-void UART_2_ISR_TX(void)
-{
-    irq_handler_tx(2);
-}
-#endif
-
-#ifdef UART_3_ISR_TX
-void UART_3_ISR_TX(void)
-{
-    irq_handler_tx(3);
-}
-#endif
-
-#ifdef UART_4_ISR_TX
-void UART_4_ISR_TX(void)
-{
-    irq_handler_tx(4);
-}
-#endif
-
-#ifdef UART_5_ISR_TX
-void UART_5_ISR_TX(void)
-{
-    irq_handler_tx(5);
-}
-#endif
-#endif /* MODULE_PERIPH_UART_NONBLOCKING */

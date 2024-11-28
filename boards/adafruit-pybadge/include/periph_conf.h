@@ -105,10 +105,6 @@ static const uart_conf_t uart_config[] = {
     }
 };
 
-/* interrupt function name mapping */
-#define UART_0_ISR          isr_sercom5_2
-#define UART_0_ISR_TX       isr_sercom5_0
-
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 

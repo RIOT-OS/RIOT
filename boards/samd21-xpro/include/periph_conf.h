@@ -140,8 +140,8 @@ static const tc32_conf_t timer_config[] = {
 static const uart_conf_t uart_config[] = {
     {    /* Virtual COM Port */
         .dev      = &SERCOM3->USART,
-        .rx_pin   = GPIO_PIN(PA,23),
-        .tx_pin   = GPIO_PIN(PA,22),
+        .rx_pin   = GPIO_PIN(PA, 23),
+        .tx_pin   = GPIO_PIN(PA, 22),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
@@ -154,8 +154,8 @@ static const uart_conf_t uart_config[] = {
     },
     {    /* EXT1 */
         .dev      = &SERCOM4->USART,
-        .rx_pin   = GPIO_PIN(PB,9),
-        .tx_pin   = GPIO_PIN(PB,8),
+        .rx_pin   = GPIO_PIN(PB, 9),
+        .tx_pin   = GPIO_PIN(PB, 8),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
@@ -168,8 +168,8 @@ static const uart_conf_t uart_config[] = {
     },
     {    /* EXT2/3 */
         .dev      = &SERCOM4->USART,
-        .rx_pin   = GPIO_PIN(PB,11),
-        .tx_pin   = GPIO_PIN(PB,10),
+        .rx_pin   = GPIO_PIN(PB, 11),
+        .tx_pin   = GPIO_PIN(PB, 10),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
@@ -181,11 +181,6 @@ static const uart_conf_t uart_config[] = {
         .gclk_src = SAM0_GCLK_MAIN,
     }
 };
-
-/* interrupt function name mapping */
-#define UART_0_ISR          isr_sercom3
-#define UART_1_ISR          isr_sercom4
-#define UART_2_ISR          isr_sercom5
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */

@@ -26,19 +26,14 @@
 #include <stdint.h>
 #include <errno.h>
 
-#include "cpu.h"
-#include "board.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 
-#include "sched.h"
-#include "thread.h"
-
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
-#define SAMD21_I2C_TIMEOUT  (65535)
+#define SAM0_I2C_TIMEOUT  (65535)
 
 #define BUSSTATE_UNKNOWN SERCOM_I2CM_STATUS_BUSSTATE(0)
 #define BUSSTATE_IDLE SERCOM_I2CM_STATUS_BUSSTATE(1)
@@ -57,20 +52,24 @@ static inline int _read(SercomI2cm *dev, uint8_t *data, size_t length,
 static inline void _stop(SercomI2cm *dev);
 static inline int _wait_for_response(SercomI2cm *dev,
                                      uint32_t max_timeout_counter);
-static void _i2c_poweron(i2c_t dev);
-static void _i2c_poweroff(i2c_t dev);
+static void _i2c_poweron(SercomI2cm *dev);
 
 /**
- * @brief Array holding one pre-initialized mutex for each I2C device
+ * @brief Array holding one pre-initialized mutex for each pair I2C pins
  */
 static mutex_t locks[I2C_NUMOF];
-
 /**
- * @brief   Shortcut for accessing the used I2C SERCOM device
+ * @brief   Cache the configuration for faster SERCOM initialization
  */
-static inline SercomI2cm *bus(i2c_t dev)
+static struct i2c_sercom_config {
+    uint32_t ctrla; /**< This goes into the CTRLA register */
+    uint32_t ctrlb; /**< This goes into the CTRLB register */
+    uint32_t baud;  /**< This goes into the BAUD register */
+} _configs[I2C_NUMOF];
+
+static SercomI2cm *_dev(i2c_t bus)
 {
-    return i2c_config[dev].dev;
+    return i2c_config[bus].dev;
 }
 
 static void _syncbusy(SercomI2cm *dev)
@@ -82,81 +81,52 @@ static void _syncbusy(SercomI2cm *dev)
 #endif
 }
 
-static void _reset(SercomI2cm *dev)
+static void _attach_pins(i2c_t dev)
 {
-    dev->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
-    while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
-
-#ifdef SERCOM_I2CM_STATUS_SYNCBUSY
-    while (dev->STATUS.reg & SERCOM_I2CM_STATUS_SYNCBUSY) {}
-#else
-    while (dev->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_SWRST) {}
-#endif
-}
-
-void i2c_init(i2c_t dev)
-{
-    uint32_t timeout_counter = 0;
-    int32_t tmp_baud;
-
-    assert(dev < I2C_NUMOF);
-
-    const uint32_t fSCL = i2c_config[dev].speed;
-    const uint32_t fGCLK = sam0_gclk_freq(i2c_config[dev].gclk_src);
-
-    /* Initialize mutex */
-    mutex_init(&locks[dev]);
-
-    /* DISABLE I2C MASTER */
-    _i2c_poweroff(dev);
-
-    /* Reset I2C */
-    _reset(bus(dev));
-
-    /* Turn on power manager for sercom */
-    sercom_clk_en(bus(dev));
-
-    /* I2C using CLK GEN 0 */
-    sercom_set_gen(bus(dev), i2c_config[dev].gclk_src);
-
-    /* Check if module is enabled. */
-    if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
-        DEBUG("STATUS_ERR_DENIED\n");
-        return;
-    }
-    /* Check if reset is in progress. */
-    if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_SWRST) {
-        DEBUG("STATUS_BUSY\n");
-        return;
-    }
-
-    /************ SERCOM PAD0 - SDA and SERCOM PAD1 - SCL *************/
     gpio_init_mux(i2c_config[dev].sda_pin, i2c_config[dev].mux);
     gpio_init_mux(i2c_config[dev].scl_pin, i2c_config[dev].mux);
+}
 
-    /* I2C CONFIGURATION */
-    _syncbusy(bus(dev));
+static void _detach_pins(i2c_t dev)
+{
+    gpio_disable_mux(i2c_config[dev].sda_pin);
+    gpio_disable_mux(i2c_config[dev].scl_pin);
+}
+
+void i2c_init(i2c_t bus)
+{
+    int32_t tmp_baud;
+
+    assert(bus < I2C_NUMOF);
+
+    const uint32_t fSCL = i2c_config[bus].speed;
+    const uint32_t fGCLK = sam0_gclk_freq(i2c_config[bus].gclk_src);
+
+    /* Initialize mutex */
+    mutex_init(&locks[bus]);
 
     /* Set sercom module to operate in I2C master mode and run in Standby
        if user requests it */
-    bus(dev)->CTRLA.reg = SERCOM_I2CM_CTRLA_MODE_I2C_MASTER
-                        | ((i2c_config[dev].flags & I2C_FLAG_RUN_STANDBY) ?
+    _configs[bus].ctrla = SERCOM_I2CM_CTRLA_MODE_I2C_MASTER
+                        | ((i2c_config[bus].flags & I2C_FLAG_RUN_STANDBY) ?
                            SERCOM_I2CM_CTRLA_RUNSTDBY : 0);
 
     /* Enable Smart Mode (ACK is sent when DATA.DATA is read) */
-    bus(dev)->CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
+    _configs[bus].ctrlb = SERCOM_I2CM_CTRLB_SMEN;
 
     /* Set SPEED */
 #ifdef SERCOM_I2CM_CTRLA_SPEED
     /* > 1000 kHz */
     if (fSCL > I2C_SPEED_FAST_PLUS) {
-        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
+        _configs[bus].ctrla |= SERCOM_I2CM_CTRLA_SPEED(2);
     /* > 400 kHz */
-    } else if (fSCL > I2C_SPEED_FAST) {
-        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(1);
+    }
+    else if (fSCL > I2C_SPEED_FAST) {
+        _configs[bus].ctrla |= SERCOM_I2CM_CTRLA_SPEED(1);
     /* ≤ 400 kHz */
-    } else {
-        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
+    }
+    else {
+       _configs[bus].ctrla |= SERCOM_I2CM_CTRLA_SPEED(0);
     }
 #else
     assert(fSCL < I2C_SPEED_FAST_PLUS);
@@ -174,68 +144,74 @@ void i2c_init(i2c_t dev)
 
 #ifdef SERCOM_I2CM_BAUD_HSBAUD
     if (fSCL > I2C_SPEED_FAST_PLUS) {
-        bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_HSBAUD(tmp_baud);
-    } else
+        _configs[bus].baud = SERCOM_I2CM_BAUD_HSBAUD(tmp_baud);
+    }
+    else
 #endif
     {
-        bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
+        _configs[bus].baud = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
     }
+}
 
-    /* ENABLE I2C MASTER */
+void i2c_acquire(i2c_t bus)
+{
+    assert(bus < I2C_NUMOF);
+    sercom_t sercom = sercom_id(i2c_config[bus].dev);
+    SercomI2cm *dev = _dev(bus);
+
+    mutex_lock(&locks[bus]);
+    sercom_acquire(sercom, i2c_config[bus].gclk_src, NULL, NULL);
+    dev->BAUD.reg = _configs[bus].baud;
+    dev->CTRLA.reg = _configs[bus].ctrla;
+    dev->CTRLB.reg = _configs[bus].ctrlb;
+    _attach_pins(bus);
     _i2c_poweron(dev);
 
-    /* Start timeout if bus state is unknown. */
-    while ((bus(dev)->STATUS.reg &
-          SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN) {
-        if (timeout_counter++ >= SAMD21_I2C_TIMEOUT) {
-            /* Timeout, force bus state to idle. */
-            bus(dev)->STATUS.reg = BUSSTATE_IDLE;
-        }
+    /* Force bus to IDLE state: At least on SAMD21 the SERCOM will stick in
+     * unknown state and never recover. Adding a timeout here would make
+     * I2C too slow to be sensible. */
+    while (dev->STATUS.reg != BUSSTATE_IDLE) {
+        dev->STATUS.reg = BUSSTATE_IDLE;
+        _syncbusy(dev);
     }
+
+    DEBUG("[i2c] acquired I2C%u on SERCOM%u: CTRLA=%x, CTRLB=%x, BAUD=%x, STATUS=%x\n",
+          (unsigned)bus, (unsigned)sercom,
+          (unsigned)dev->CTRLA.reg, (unsigned)dev->CTRLB.reg,
+          (unsigned)dev->BAUD.reg, (unsigned)dev->STATUS.reg);
 }
 
-void i2c_acquire(i2c_t dev)
+void i2c_release(i2c_t bus)
 {
-    assert(dev < I2C_NUMOF);
-    mutex_lock(&locks[dev]);
-}
-
-void i2c_release(i2c_t dev)
-{
-    assert(dev < I2C_NUMOF);
-    mutex_unlock(&locks[dev]);
+    assert(bus < I2C_NUMOF);
+    sercom_t sercom = sercom_id(i2c_config[bus].dev);
+    DEBUG("[i2c] releasing #%u on SERCOM%u\n", (unsigned)bus, (unsigned)sercom);
+    _detach_pins(bus);
+    sercom_release(sercom);
+    mutex_unlock(&locks[bus]);
 }
 
 #ifdef MODULE_PERIPH_I2C_RECONFIGURE
-void i2c_init_pins(i2c_t dev)
+void i2c_init_pins(i2c_t bus)
 {
-    assert(dev < I2C_NUMOF);
-
-    _i2c_poweron(dev);
-
-    gpio_init_mux(i2c_config[dev].scl_pin, i2c_config[dev].mux);
-    gpio_init_mux(i2c_config[dev].sda_pin, i2c_config[dev].mux);
-
-    mutex_unlock(&locks[dev]);
+    assert(bus < I2C_NUMOF);
+    mutex_unlock(&locks[bus]);
 }
 
-void i2c_deinit_pins(i2c_t dev)
+void i2c_deinit_pins(i2c_t bus)
 {
-    assert(dev < I2C_NUMOF);
+    assert(bus < I2C_NUMOF);
 
-    mutex_lock(&locks[dev]);
-    _i2c_poweroff(dev);
-
-    gpio_disable_mux(i2c_config[dev].sda_pin);
-    gpio_disable_mux(i2c_config[dev].scl_pin);
+    mutex_lock(&locks[bus]);
 }
 #endif
 
-int i2c_read_bytes(i2c_t dev, uint16_t addr,
+int i2c_read_bytes(i2c_t bus, uint16_t addr,
                    void *data, size_t len, uint8_t flags)
 {
     int ret;
-    assert(dev < I2C_NUMOF);
+    assert(bus < I2C_NUMOF);
+    SercomI2cm *dev = _dev(bus);
 
     /* Check for unsupported operations */
     if (flags & I2C_ADDR10) {
@@ -248,36 +224,37 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr,
 
     if (!(flags & I2C_NOSTART)) {
         /* start transmission and send slave address */
-        ret = _i2c_start(bus(dev), (addr << 1) | I2C_READ);
+        ret = _i2c_start(dev, (addr << 1) | I2C_READ);
         if (ret < 0) {
             DEBUG("Start command failed\n");
             return ret;
         }
     }
     /* read data to register and issue stop if needed */
-    ret = _read(bus(dev), data, len, (flags & I2C_NOSTOP) ? 0 : 1);
+    ret = _read(dev, data, len, (flags & I2C_NOSTOP) ? 0 : 1);
     if (ret < 0) {
         DEBUG("Read command failed\n");
         return ret;
     }
     /* Ensure all bytes has been read */
     if (flags & I2C_NOSTOP) {
-        while ((bus(dev)->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
+        while ((dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
                 != BUSSTATE_OWNER) {}
     }
     else {
-        while ((bus(dev)->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
+        while ((dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
                 != BUSSTATE_IDLE) {}
     }
     /* return number of bytes sent */
     return 0;
 }
 
-int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
+int i2c_write_bytes(i2c_t bus, uint16_t addr, const void *data, size_t len,
                     uint8_t flags)
 {
     int ret;
-    assert(dev < I2C_NUMOF);
+    assert(bus < I2C_NUMOF);
+    SercomI2cm *dev = _dev(bus);
 
     /* Check for unsupported operations */
     if (flags & I2C_ADDR10) {
@@ -289,13 +266,13 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     }
 
     if (!(flags & I2C_NOSTART)) {
-        ret = _i2c_start(bus(dev), (addr<<1));
+        ret = _i2c_start(dev, (addr << 1));
         if (ret < 0) {
             DEBUG("Start command failed\n");
             return ret;
         }
     }
-    ret = _write(bus(dev), data, len, (flags & I2C_NOSTOP) ? 0 : 1);
+    ret = _write(dev, data, len, (flags & I2C_NOSTOP) ? 0 : 1);
     if (ret < 0) {
         DEBUG("Write command failed\n");
         return ret;
@@ -304,26 +281,10 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     return 0;
 }
 
-void _i2c_poweron(i2c_t dev)
+static void _i2c_poweron(SercomI2cm *dev)
 {
-    assert(dev < I2C_NUMOF);
-
-    if (bus(dev) == NULL) {
-        return;
-    }
-    bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_ENABLE;
-    _syncbusy(bus(dev));
-}
-
-void _i2c_poweroff(i2c_t dev)
-{
-    assert(dev < I2C_NUMOF);
-
-    if (bus(dev) == NULL) {
-        return;
-    }
-    bus(dev)->CTRLA.reg &= ~SERCOM_I2CM_CTRLA_ENABLE;
-    _syncbusy(bus(dev));
+    dev->CTRLA.reg |= SERCOM_I2CM_CTRLA_ENABLE;
+    _syncbusy(dev);
 }
 
 static int _i2c_start(SercomI2cm *dev, uint16_t addr)
@@ -343,12 +304,14 @@ static int _i2c_start(SercomI2cm *dev, uint16_t addr)
     if (addr & I2C_READ) {
         /* Some devices (e.g. SHT2x) can hold the bus while
         preparing the reply */
-        if (_wait_for_response(dev, 100 * SAMD21_I2C_TIMEOUT) < 0)
+        if (_wait_for_response(dev, 100 * SAM0_I2C_TIMEOUT) < 0) {
             return -ETIMEDOUT;
+        }
     }
     else {
-        if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0)
+        if (_wait_for_response(dev, SAM0_I2C_TIMEOUT) < 0) {
             return -ETIMEDOUT;
+        }
     }
 
     /* Check for address response error unless previous error is detected. */
@@ -396,7 +359,7 @@ static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
         dev->DATA.reg = data[count++];
 
         /* Wait for response on bus. */
-        if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0) {
+        if (_wait_for_response(dev, SAM0_I2C_TIMEOUT) < 0) {
             return -ETIMEDOUT;
         }
 
@@ -446,8 +409,9 @@ static inline int _read(SercomI2cm *dev, uint8_t *data, size_t length,
 
         /* Wait for response on bus. */
         if (length > 0) {
-            if (_wait_for_response(dev, SAMD21_I2C_TIMEOUT) < 0)
+            if (_wait_for_response(dev, SAM0_I2C_TIMEOUT) < 0) {
                 return -ETIMEDOUT;
+            }
         }
         count++;
     }
