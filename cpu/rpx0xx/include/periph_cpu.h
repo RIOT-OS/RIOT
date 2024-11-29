@@ -622,6 +622,14 @@ void clock_ref_configure_aux_source(uint32_t f_in, uint32_t f_out,
 void clock_periph_configure(CLOCKS_CLK_PERI_CTRL_AUXSRC_Enum aux);
 
 /**
+ * @brief   Configure the usb clock to run from a dedicated auxiliary
+ *          clock source
+ *
+ * @param   aux     Auxiliary clock source
+ */
+void clock_usb_configure(CLOCKS_CLK_USB_CTRL_AUXSRC_Enum aux);
+
+/**
  * @brief   Configure gpio21 as clock output pin
  *
  * @details Can be used as an external clock source for another circuit or
