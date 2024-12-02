@@ -15,7 +15,7 @@
 
 #include <assert.h>
 
-#define ENABLE_DEBUG        0 
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #include "digit7seg.h"
