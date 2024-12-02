@@ -14,10 +14,11 @@
  */
 
 #include <assert.h>
-#include "digit7seg.h"
 
-#define ENABLE_DEBUG        0
+#define ENABLE_DEBUG        0 
 #include "debug.h"
+
+#include "digit7seg.h"
 
 #define PIN_A               (dev->params.data_a)
 #define PIN_B               (dev->params.data_b)
