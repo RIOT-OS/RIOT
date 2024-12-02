@@ -57,30 +57,59 @@ LGPL code.
 
 RIOT provides features including, but not limited to:
 
-* a preemptive, tickless scheduler with priorities
-* flexible memory management
-* high resolution, long-term timers
-* MTD abstraction layer
-* File System integration
-* support 200+ boards based on AVR, MSP430, ESP8266, ESP32, RISC-V,
-  ARM7 and ARM Cortex-M
-* the native port allows to run RIOT as-is on Linux and BSD.
-  Multiple instances of RIOT running on a single machine can also be
-  interconnected via a simple virtual Ethernet bridge or via a simulated
-  IEEE 802.15.4 network (ZEP)
-* IPv6
-* 6LoWPAN (RFC4944, RFC6282, and RFC6775)
-* UDP
-* RPL (storing mode, P2P mode)
-* CoAP
-* OTA updates via SUIT
-* MQTT
-* USB (device mode)
-* Display / Touchscreen support
-* CCN-Lite
-* LoRaWAN
-* UWB
-* Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
+ * Platforms Supported
+    - 200+ boards based on AVR, MSP430, ESP8266, ESP32, RISC-V, ARM7, and ARM Cortex-M
+    - The native port allows to run RIOT as-is on Linux and BSD.
+      Multiple instances of RIOT running on a single machine can also be
+      interconnected via a simple virtual Ethernet bridge or via a simulated
+      IEEE 802.15.4 network (ZEP).
+
+ * Programming Environment
+    - Write native code in C, C++, or Rust
+    - Rely upon POSIX APIs, user friendly hardware abstractions and standard embedded Rust interfaces
+    - Integrate dynamic runtimes such as MicroPython, elm (JavaScript) and WASM
+
+ * Network Features and Protocols
+    - IPv6
+    - IPv4 via lwIP
+    - 6LoWPAN (RFC4944, RFC6282, RFC6775 and RFC7668)
+    - UDP
+    - TCP
+    - RPL (storing mode, P2P mode)
+    - CoAP
+    - MQTT via paho-mqtt and MQTT-SN
+    - LwM2M
+    - Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
+    - LoRaWAN
+    - UWB
+    - CAN
+    - CNN-Lite
+    - LwIP
+    - IEEE 802.15.4
+    - Ethernet (also via USB)
+    - SLIP (or ethos networking via Serial)
+    - Dose (single pair ethernet like networking on serial interface UART)
+
+ * System Features
+    - a preemptive, tickless scheduler with priorities, optional periodic round robin within priorities
+    - flexible memory management
+    - high resolution, long-term timers
+    - MTD abstraction layer for memory devices
+    - File System integration
+
+ * Security Features
+    - OTA updates via SUIT
+    - PSA Cryptographic API
+    - DTLS, EDHOC
+
+ * Device Drivers
+    - SPI, I2C, UART, USB, CAN
+    - RTC, PWM, Timer
+    - ADC, DAC
+    - Various sensors: Environmental sensors, IMUs, magnetometers, particulate matter sensors
+    - Various actuators: Servos, motors, dimmers, switches, RGB LEDs
+    - Displays and touchscreens
+    - GNSS
 
 ## Getting RIOT
 
