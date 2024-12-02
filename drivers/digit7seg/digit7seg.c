@@ -49,11 +49,9 @@ static void _set_pin_value(digit7seg_t *dev)
     for (int i = 0; i < BYTE_BITS; i++) {
         if (current_value & (1 << i)) {
             gpio_set(pins[i]);
-            DEBUG("PIN SET\n");
         }
         else {
             gpio_clear(pins[i]);
-            DEBUG("PIN CLEAR\n");
         }
     }
 }
@@ -72,8 +70,6 @@ static void _shift_display(void *arg, int chan)
     dev->current_digit += 1;
     dev->current_digit = dev->current_digit % dev->params.digits;
     gpio_set(digit_pins[dev->current_digit]);
-
-    DEBUG("[INFO] On display %d\n", dev->current_digit);
 
     _set_pin_value(dev);
 }
@@ -95,9 +91,17 @@ int digit7seg_init(digit7seg_t *dev, const digit7seg_params_t *params)
         PIN_DIG1, PIN_DIG2, PIN_DIG3, PIN_DIG4
     };
 
+    const char* pins_debug[] =
+    {
+        "A", "B", "C", "D", "E", "F", "G", "DP",
+        "DIG1", "DIG2", "DIG3", "DIG4"
+    };
+
     for (int i = 0; i < NB_PIN; i++) {
-        assert(gpio_init(pins[i], GPIO_OUT));
+        DEBUG("[DIGIT7SEG] Trying the pin %s:...", pins_debug[i]);
+        assert(gpio_init(pins[i], GPIO_OUT) == 0);
         gpio_clear(pins[i]);
+        DEBUG("Worked\n");
     }
 
     return DIGIT7SEG_OK;

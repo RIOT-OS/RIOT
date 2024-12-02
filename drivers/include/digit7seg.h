@@ -44,7 +44,7 @@ extern "C" {
  * @brief   Return codes for @ref digit7seg_init
  */
 typedef enum {
-    DIGIT7SEG_OK = 0,
+    DIGIT7SEG_OK = 0,           /**< All ok */
     DIGIT7SEG_ERR_DIGITS,       /**< Something went wrong with digits value */
 } digit7seg_error_codes;
 

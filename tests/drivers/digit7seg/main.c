@@ -74,16 +74,5 @@ int main(void)
 
     digit7seg_poweroff(&dev);
 
-    ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
-
-    if (digit7seg_poweron(&dev) == 0) {
-        puts("Launched.");
-    }
-    else {
-        puts("Error");
-    }
-
-    while (1) {}
-
     return 0;
 }
