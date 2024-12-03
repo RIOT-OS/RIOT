@@ -91,6 +91,12 @@ in Rust following RIOT's goals and [vision](https://doc.riot-os.org/vision.html)
 - [RT-Thread](https://github.com/RT-Thread/rt-thread) is a microcontroller operating system with strong roots in China and a large community there, it has extensive support for MCUs from Chinese vendors, but also for western ones.
 - [Zephyr](https://github.com/zephyrproject-rtos/zephyr) is a general-purpose operating system for microcontrollers, shepherded by the Linux foundation.
 
+For more details on how RIOT compares to other projects, refer to the
+[comparison][faq-riot-vs-others] of RIOT with other operating systems for
+embedded and IoT devices [in our FAQ][faq-riot-vs-others].
+
+[faq-riot-vs-others]: https://www.riot-os.org/#faq-12
+
 ## Getting RIOT
 
 The most convenient way to get RIOT is to clone it via Git
