@@ -96,7 +96,7 @@ typedef struct eth_dma_desc {
  */
 #define RX_DESC_STAT_FL         (0x3FFF0000) /* bits 16-29 */
 #define RX_DESC_STAT_DE         (BIT14) /**< If set, a frame too large to fit buffers given by descriptors was received */
-#define RX_DESC_STAT_ES         (BIT14) /**< If set, an error occurred during RX */
+#define RX_DESC_STAT_ES         (BIT15) /**< If set, an error occurred during RX */
 #define RX_DESC_STAT_OWN        (BIT31) /**< If set, descriptor is owned by DMA, otherwise by CPU */
 /** @} */
 /**
