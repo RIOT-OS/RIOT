@@ -16,17 +16,17 @@ doc: $(DOCUMENTATION_FORMAT)
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
-html: src/changelog.md
+html: src/changelog.md src/maintainers.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
 
 .PHONY: check
-check: src/changelog.md
+check: src/changelog.md src/maintainers.md
 	( cat riot.doxyfile) | doxygen -
 
 .PHONY: man
-man: src/changelog.md
+man: src/changelog.md src/maintainers.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
 
 src/css/riot.css: src/css/riot.less src/css/variables.less
@@ -39,8 +39,12 @@ src/css/variables.less: src/config.json
 src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
 
+src/maintainers.md: ../../dist/tools/maintainer-list/maintainer-list.py ../../dist/tools/maintainer-list/requirements.txt ../../CODEOWNERS
+	-@pip install --upgrade -r ../../dist/tools/maintainer-list/requirements.txt
+	-@../../dist/tools/maintainer-list/maintainer-list.py
+
 .PHONY:
-latex: src/changelog.md
+latex: src/changelog.md src/maintainers.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
 
 clean:
