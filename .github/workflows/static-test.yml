@@ -46,6 +46,7 @@ jobs:
         docker run --rm                             \
           -e CI_BASE_BRANCH                         \
           -e GITHUB_RUN_ID=${GITHUB_RUN_ID}         \
+          -e GITHUB_TOKEN=${GITHUB_TOKEN}           \
           -v $(pwd):/data/riotbuild                 \
           riot/static-test-tools:latest             \
           make static-test
