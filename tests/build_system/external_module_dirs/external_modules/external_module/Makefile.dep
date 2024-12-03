@@ -1,3 +1,1 @@
-USEMODULE += random
-# Set a different prng than the default
-USEMODULE += prng_xorshift
+USEMODULE += transitive
