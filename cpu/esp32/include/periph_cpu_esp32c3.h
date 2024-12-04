@@ -176,5 +176,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CPU_ESP32C3_H */
 /** @} */
+#endif /* PERIPH_CPU_ESP32C3_H */

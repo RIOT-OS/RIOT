@@ -71,5 +71,5 @@ static inline void atxmega_set_prescaler(uint8_t clk_scale, uint8_t bus_scale)
 }
 #endif
 
-#endif /* CPU_CLOCK_H */
 /** @} */
+#endif /* CPU_CLOCK_H */

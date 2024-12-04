@@ -251,5 +251,5 @@ extern "C" {
 }
 #endif
 
-#endif /* TIMER_CONFIG_H */
 /** @} */
+#endif /* TIMER_CONFIG_H */

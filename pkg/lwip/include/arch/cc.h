@@ -107,5 +107,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ARCH_CC_H */
 /** @} */
+#endif /* ARCH_CC_H */

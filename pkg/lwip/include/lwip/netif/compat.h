@@ -82,5 +82,5 @@ static inline void lwip_netif_dev_release(struct netif *netif)
 }
 #endif
 
-#endif /* LWIP_NETIF_COMPAT_H */
 /** @} */
+#endif /* LWIP_NETIF_COMPAT_H */

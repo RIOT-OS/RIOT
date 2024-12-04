@@ -148,5 +148,5 @@ void sock_dtls_set_rpk_cb(sock_dtls_t *sock, sock_dtls_rpk_cb_t cb);
 }
 #endif
 
-#endif /* NET_SOCK_DTLS_CREDS_H */
 /** @} */
+#endif /* NET_SOCK_DTLS_CREDS_H */

@@ -124,5 +124,5 @@ extern ATCADevice atca_devs_ptr[ATCA_NUMOF];
 }
 #endif
 
-#endif /* ATCA_PARAMS_H */
 /** @} */
+#endif /* ATCA_PARAMS_H */

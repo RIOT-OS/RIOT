@@ -511,5 +511,5 @@ int lwm2m_set_objlink_by_path(lwm2m_client_data_t *client_data, const char *path
 }
 #endif
 
-#endif /* OBJECTS_COMMON_H */
 /** @} */
+#endif /* OBJECTS_COMMON_H */

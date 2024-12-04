@@ -57,5 +57,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MACROS_MATH_H */
 /** @} */
+#endif /* MACROS_MATH_H */

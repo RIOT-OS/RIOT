@@ -67,5 +67,5 @@ psa_status_t cryptocell_310_common_hash_finish(CRYS_HASHUserContext_t *ctx,
 }
 #endif
 
-#endif /* PSA_CRYPTOCELL_310_HASHES_COMMON_H */
 /** @} */
+#endif /* PSA_CRYPTOCELL_310_HASHES_COMMON_H */

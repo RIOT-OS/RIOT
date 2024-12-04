@@ -157,5 +157,5 @@ void lwm2m_object_temperature_update_value(const lwm2m_client_data_t *client_dat
 }
 #endif
 
-#endif /* OBJECTS_TEMPERATURE_H */
 /** @} */
+#endif /* OBJECTS_TEMPERATURE_H */

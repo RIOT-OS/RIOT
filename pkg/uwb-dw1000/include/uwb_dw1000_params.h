@@ -92,5 +92,5 @@ static const dw1000_params_t dw1000_params[] =
 }
 #endif
 
-#endif /* UWB_DW1000_PARAMS_H */
 /** @} */
+#endif /* UWB_DW1000_PARAMS_H */

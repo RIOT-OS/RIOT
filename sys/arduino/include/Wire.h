@@ -33,5 +33,5 @@ extern "C" {
 }
 #endif
 
-#endif /* WIRE_H */
 /** @} */
+#endif /* WIRE_H */

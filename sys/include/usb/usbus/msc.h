@@ -131,5 +131,5 @@ int usbus_msc_remove_lun(usbus_t *usbus, mtd_dev_t *dev);
 }
 #endif
 
-#endif /* USB_USBUS_MSC_H */
 /** @} */
+#endif /* USB_USBUS_MSC_H */

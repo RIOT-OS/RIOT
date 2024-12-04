@@ -79,5 +79,5 @@ static const saul_reg_info_t mma8x5x_saul_info[] =
 }
 #endif
 
-#endif /* MMA8X5X_PARAMS_H */
 /** @} */
+#endif /* MMA8X5X_PARAMS_H */

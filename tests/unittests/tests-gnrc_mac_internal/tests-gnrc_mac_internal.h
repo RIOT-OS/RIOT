@@ -33,5 +33,5 @@ void tests_gnrc_mac_internal(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_MAC_INTERNAL_H */
 /** @} */
+#endif /* TESTS_GNRC_MAC_INTERNAL_H */

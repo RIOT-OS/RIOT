@@ -46,5 +46,5 @@ extern const vfs_file_system_t native_file_system;
 }
 #endif
 
-#endif /* FS_NATIVE_FS_H */
 /** @} */
+#endif /* FS_NATIVE_FS_H */

@@ -159,5 +159,5 @@ void adc_continuous_stop(void);
 }
 #endif
 
-#endif /* PERIPH_ADC_H */
 /** @} */
+#endif /* PERIPH_ADC_H */

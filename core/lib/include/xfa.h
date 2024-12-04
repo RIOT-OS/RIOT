@@ -194,5 +194,5 @@ extern "C" {
 }
 #endif
 
-#endif /* XFA_H */
 /** @} */
+#endif /* XFA_H */

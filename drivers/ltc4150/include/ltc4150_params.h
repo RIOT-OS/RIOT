@@ -92,5 +92,5 @@ static const saul_reg_info_t ltc4150_saul_info[] =
 }
 #endif
 
-#endif /* LTC4150_PARAMS_H */
 /** @} */
+#endif /* LTC4150_PARAMS_H */

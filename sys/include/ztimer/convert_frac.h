@@ -88,5 +88,5 @@ void ztimer_convert_frac_change_rate(ztimer_convert_frac_t *self,
 }
 #endif
 
-#endif /* ZTIMER_CONVERT_FRAC_H */
 /** @} */
+#endif /* ZTIMER_CONVERT_FRAC_H */

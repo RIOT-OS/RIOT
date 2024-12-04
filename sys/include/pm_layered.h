@@ -105,5 +105,5 @@ pm_blocker_t pm_get_blocker(void);
 }
 #endif
 
-#endif /* PM_LAYERED_H */
 /** @} */
+#endif /* PM_LAYERED_H */

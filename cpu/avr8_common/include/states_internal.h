@@ -109,5 +109,5 @@ extern uint8_t avr8_state_irq_count_sram;               /**< IRQ state variable.
 }
 #endif
 
-#endif /* STATES_INTERNAL_H */
 /** @} */
+#endif /* STATES_INTERNAL_H */

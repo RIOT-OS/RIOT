@@ -542,5 +542,5 @@ protected:
 }
 #endif
 
-#endif /* OPENDSME_DSMEPLATFORM_H */
 /** @} */
+#endif /* OPENDSME_DSMEPLATFORM_H */

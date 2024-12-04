@@ -88,5 +88,5 @@ static inline void eui64_clear_group(eui64_t *addr)
 }
 #endif
 
-#endif /* NET_EUI64_H */
 /** @} */
+#endif /* NET_EUI64_H */

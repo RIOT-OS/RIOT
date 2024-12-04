@@ -75,5 +75,5 @@ static const saul_reg_info_t sht3x_saul_info[] =
 }
 #endif
 
-#endif /* SHT3X_PARAMS_H */
 /** @} */
+#endif /* SHT3X_PARAMS_H */

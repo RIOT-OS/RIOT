@@ -53,5 +53,5 @@ static const saul_pwm_rgb_params_t saul_pwm_rgb_params[] =
 }
 #endif
 
-#endif /* PWM_PARAMS_H */
 /** @} */
+#endif /* PWM_PARAMS_H */

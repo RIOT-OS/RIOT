@@ -48,5 +48,5 @@ extern "C" {
 }
 #endif
 
-#endif /* JC42_INTERNAL_H */
 /** @} */
+#endif /* JC42_INTERNAL_H */

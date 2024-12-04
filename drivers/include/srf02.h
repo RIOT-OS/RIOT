@@ -136,5 +136,5 @@ int srf02_set_addr(srf02_t *dev, uint8_t new_addr);
 }
 #endif
 
-#endif /* SRF02_H */
 /** @} */
+#endif /* SRF02_H */

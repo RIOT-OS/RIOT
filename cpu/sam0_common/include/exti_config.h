@@ -693,5 +693,5 @@ static const int8_t exti_config[PORT_GROUPS][32] = {
 }
 #endif
 
-#endif /* EXTI_CONFIG_H */
 /** @} */
+#endif /* EXTI_CONFIG_H */

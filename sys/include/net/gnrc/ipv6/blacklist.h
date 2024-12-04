@@ -82,5 +82,5 @@ void gnrc_ipv6_blacklist_print(void);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_BLACKLIST_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_BLACKLIST_H */

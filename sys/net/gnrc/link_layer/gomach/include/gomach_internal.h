@@ -913,5 +913,5 @@ void gnrc_gomach_update_neighbor_pubchan(gnrc_netif_t *netif);
 }
 #endif
 
-#endif /* GOMACH_INTERNAL_H */
 /** @} */
+#endif /* GOMACH_INTERNAL_H */

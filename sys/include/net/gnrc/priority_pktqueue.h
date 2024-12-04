@@ -135,5 +135,5 @@ void gnrc_priority_pktqueue_push(gnrc_priority_pktqueue_t *queue,
 }
 #endif
 
-#endif /* NET_GNRC_PRIORITY_PKTQUEUE_H */
 /** @} */
+#endif /* NET_GNRC_PRIORITY_PKTQUEUE_H */

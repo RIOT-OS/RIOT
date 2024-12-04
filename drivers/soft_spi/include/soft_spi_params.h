@@ -57,5 +57,5 @@ static soft_spi_conf_t soft_spi_config[] = {
 }
 #endif
 
-#endif /* SOFT_SPI_PARAMS_H */
 /** @} */
+#endif /* SOFT_SPI_PARAMS_H */

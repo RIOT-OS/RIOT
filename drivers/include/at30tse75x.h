@@ -300,5 +300,5 @@ int at30tse75x_get_temperature(const at30tse75x_t* dev, float* temperature);
 }
 #endif
 
-#endif /* AT30TSE75X_H */
 /** @} */
+#endif /* AT30TSE75X_H */

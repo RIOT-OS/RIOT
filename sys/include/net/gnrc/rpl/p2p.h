@@ -176,5 +176,5 @@ void gnrc_rpl_p2p_update(void);
 }
 #endif
 
-#endif /* NET_GNRC_RPL_P2P_H */
 /** @} */
+#endif /* NET_GNRC_RPL_P2P_H */

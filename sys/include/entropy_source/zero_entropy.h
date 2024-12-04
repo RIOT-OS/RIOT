@@ -88,5 +88,5 @@ int entropy_source_zero_get(uint8_t *buf, size_t len);
 }
 #endif
 
-#endif /* ENTROPY_SOURCE_ZERO_ENTROPY_H */
 /** @} */
+#endif /* ENTROPY_SOURCE_ZERO_ENTROPY_H */

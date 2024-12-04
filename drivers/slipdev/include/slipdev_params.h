@@ -71,5 +71,5 @@ static const slipdev_params_t slipdev_params[] = {
 }
 #endif
 
-#endif /* SLIPDEV_PARAMS_H */
 /** @} */
+#endif /* SLIPDEV_PARAMS_H */

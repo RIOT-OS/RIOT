@@ -1005,5 +1005,5 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 #endif
 /** @} */
 
-#endif /* PERIPH_GPIO_LL_H */
 /** @} */
+#endif /* PERIPH_GPIO_LL_H */

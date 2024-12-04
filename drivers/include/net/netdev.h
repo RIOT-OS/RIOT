@@ -669,5 +669,5 @@ static inline void netdev_trigger_event_isr(netdev_t *netdev)
 }
 #endif
 
-#endif /* NET_NETDEV_H */
 /** @} */
+#endif /* NET_NETDEV_H */

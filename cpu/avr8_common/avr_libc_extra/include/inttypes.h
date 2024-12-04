@@ -33,5 +33,5 @@ extern "C" {
 }
 #endif
 
-#endif /* INTTYPES_H */
 /** @} */
+#endif /* INTTYPES_H */

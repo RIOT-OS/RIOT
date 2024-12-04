@@ -33,5 +33,5 @@ void tests_ieee802154(void);
 }
 #endif
 
-#endif /* TESTS_IEEE802154_H */
 /** @} */
+#endif /* TESTS_IEEE802154_H */

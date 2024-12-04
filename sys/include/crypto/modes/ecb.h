@@ -65,5 +65,5 @@ int cipher_decrypt_ecb(const cipher_t *cipher, const uint8_t *input,
 }
 #endif
 
-#endif /* CRYPTO_MODES_ECB_H */
 /** @} */
+#endif /* CRYPTO_MODES_ECB_H */

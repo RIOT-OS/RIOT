@@ -158,5 +158,5 @@ diskio_result_t mci_ioctl(unsigned char ctrl, void *buff);
 }
 #endif
 
-#endif /* DISKIO_H */
 /** @} */
+#endif /* DISKIO_H */

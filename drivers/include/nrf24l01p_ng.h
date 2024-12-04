@@ -475,5 +475,5 @@ void nrf24l01p_ng_print_dev_info(const nrf24l01p_ng_t *dev);
 }
 #endif
 
-#endif /* NRF24L01P_NG_H */
 /** @} */
+#endif /* NRF24L01P_NG_H */

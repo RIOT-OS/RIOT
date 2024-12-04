@@ -240,5 +240,5 @@ void rtt_poweroff(void);
 }
 #endif
 
-#endif /* PERIPH_RTT_H */
 /** @} */
+#endif /* PERIPH_RTT_H */

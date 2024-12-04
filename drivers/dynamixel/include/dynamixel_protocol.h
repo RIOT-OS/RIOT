@@ -91,5 +91,5 @@ typedef enum {
 }
 #endif
 
-#endif /* DYNAMIXEL_PROTOCOL_H */
 /** @} */
+#endif /* DYNAMIXEL_PROTOCOL_H */

@@ -74,5 +74,5 @@ static const saul_reg_info_t bmp180_saul_info[] =
 }
 #endif
 
-#endif /* BMP180_PARAMS_H */
 /** @} */
+#endif /* BMP180_PARAMS_H */

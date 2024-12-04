@@ -120,5 +120,5 @@ void rtt_pm_sleep_exit(uint32_t cause);
 }
 #endif
 
-#endif /* RTT_ARCH_H */
 /** @} */
+#endif /* RTT_ARCH_H */

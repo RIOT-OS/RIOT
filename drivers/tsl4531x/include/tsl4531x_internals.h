@@ -101,5 +101,5 @@ extern "C" {
 }
 #endif
 
-#endif /* TSL4531X_INTERNALS_H */
 /** @} */
+#endif /* TSL4531X_INTERNALS_H */

@@ -54,6 +54,6 @@ psa_status_t cbc_aes_common_encrypt_decrypt(cipher_t *ctx,
 }
 #endif
 
-#endif /* AES_COMMON_H */
 /** @} */
+#endif /* AES_COMMON_H */
 /** @endcond */

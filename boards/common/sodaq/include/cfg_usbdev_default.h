@@ -47,5 +47,5 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* CFG_USBDEV_DEFAULT_H */
 /** @} */
+#endif /* CFG_USBDEV_DEFAULT_H */

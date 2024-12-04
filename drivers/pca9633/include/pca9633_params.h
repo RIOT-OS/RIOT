@@ -94,5 +94,5 @@ static const pca9633_params_t pca9633_params[] =
 }
 #endif
 
-#endif /* PCA9633_PARAMS_H */
 /** @} */
+#endif /* PCA9633_PARAMS_H */

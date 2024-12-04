@@ -145,5 +145,5 @@ uint16_t vcnl40x0_read_illuminance(const vcnl40x0_t *dev);
 }
 #endif
 
-#endif /* VCNL40X0_H */
 /** @} */
+#endif /* VCNL40X0_H */

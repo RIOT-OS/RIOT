@@ -139,5 +139,5 @@ uint8_t si114x_read_response(si114x_t *dev);
 }
 #endif
 
-#endif /* SI114X_H */
 /** @} */
+#endif /* SI114X_H */

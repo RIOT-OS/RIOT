@@ -115,5 +115,5 @@ int bh1900nux_read(const bh1900nux_t *dev,  int16_t *temp);
 }
 #endif
 
-#endif /* BH1900NUX_H */
 /** @} */
+#endif /* BH1900NUX_H */

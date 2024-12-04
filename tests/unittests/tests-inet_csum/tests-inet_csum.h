@@ -33,5 +33,5 @@ void tests_inet_csum(void);
 }
 #endif
 
-#endif /* TESTS_INET_CSUM_H */
 /** @} */
+#endif /* TESTS_INET_CSUM_H */

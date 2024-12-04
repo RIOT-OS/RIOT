@@ -79,5 +79,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_CLK_DEFAULT_H */
 /** @} */
+#endif /* CFG_CLK_DEFAULT_H */

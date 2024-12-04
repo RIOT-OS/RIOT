@@ -181,5 +181,5 @@ void avr8_reset_cause(void);
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */
+#endif /* CPU_H */

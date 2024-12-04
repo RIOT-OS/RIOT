@@ -77,5 +77,5 @@ static const saul_reg_info_t mpu9x50_saul_info[] =
 }
 #endif
 
-#endif /* MPU9X50_PARAMS_H */
 /** @} */
+#endif /* MPU9X50_PARAMS_H */

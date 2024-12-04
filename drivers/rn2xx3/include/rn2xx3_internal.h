@@ -113,5 +113,5 @@ int rn2xx3_process_reply(rn2xx3_t *dev);
 }
 #endif
 
-#endif /* RN2XX3_INTERNAL_H */
 /** @} */
+#endif /* RN2XX3_INTERNAL_H */

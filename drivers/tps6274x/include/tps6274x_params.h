@@ -53,5 +53,5 @@ static const tps6274x_params_t tps6274x_params[] =
 }
 #endif
 
-#endif /* TPS6274X_PARAMS_H */
 /** @} */
+#endif /* TPS6274X_PARAMS_H */

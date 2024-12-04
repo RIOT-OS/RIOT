@@ -34,5 +34,5 @@ extern const touch_dev_driver_t ft5x06_touch_dev_driver;
 }
 #endif
 
-#endif /* FT5X06_TOUCH_DEV_H */
 /** @} */
+#endif /* FT5X06_TOUCH_DEV_H */

@@ -115,5 +115,5 @@ void cord_ep_dump_status(void);
 }
 #endif
 
-#endif /* NET_CORD_EP_H */
 /** @} */
+#endif /* NET_CORD_EP_H */

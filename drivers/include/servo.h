@@ -232,5 +232,5 @@ void servo_set(servo_t *dev, uint8_t pos);
 }
 #endif
 
-#endif /* SERVO_H */
 /** @} */
+#endif /* SERVO_H */

@@ -48,5 +48,5 @@ extern "C"
 }
 #endif
 
-#endif /* MMA7660_REG_H */
 /** @} */
+#endif /* MMA7660_REG_H */

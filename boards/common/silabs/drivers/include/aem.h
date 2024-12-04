@@ -60,5 +60,5 @@ void aem_init(void);
 }
 #endif
 
-#endif /* AEM_H */
 /** @} */
+#endif /* AEM_H */

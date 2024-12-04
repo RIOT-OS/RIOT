@@ -245,5 +245,5 @@ uint8_t nrf24l01p_ng_get_status(const nrf24l01p_ng_t *dev);
 }
 #endif
 
-#endif /* NRF24L01P_NG_COMMUNICATION_H */
 /** @} */
+#endif /* NRF24L01P_NG_COMMUNICATION_H */

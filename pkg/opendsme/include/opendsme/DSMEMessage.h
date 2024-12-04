@@ -336,5 +336,5 @@ friend class DSMEMessageBuffer;
 }
 #endif
 
-#endif /* OPENDSME_DSMEMESSAGE_H */
 /** @} */
+#endif /* OPENDSME_DSMEMESSAGE_H */

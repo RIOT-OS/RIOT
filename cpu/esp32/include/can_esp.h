@@ -104,5 +104,5 @@ typedef struct {
 }
 #endif
 
-#endif /* CAN_ESP_H */
 /** @} */
+#endif /* CAN_ESP_H */

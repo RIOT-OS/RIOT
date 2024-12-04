@@ -107,5 +107,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MODULES_H */
 /** @} */
+#endif /* MODULES_H */

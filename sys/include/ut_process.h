@@ -97,5 +97,5 @@ static inline int ut_process_str_expand(const char *ut,
 }
 #endif
 
-#endif /* UT_PROCESS_H */
 /** @} */
+#endif /* UT_PROCESS_H */

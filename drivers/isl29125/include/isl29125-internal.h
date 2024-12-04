@@ -89,5 +89,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ISL29125_INTERNAL_H */
 /** @} */
+#endif /* ISL29125_INTERNAL_H */

@@ -61,5 +61,5 @@ static const  enc28j60_params_t enc28j60_params[] = {
 }
 #endif
 
-#endif /* ENC28J60_PARAMS_H */
 /** @} */
+#endif /* ENC28J60_PARAMS_H */

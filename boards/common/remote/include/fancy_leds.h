@@ -62,5 +62,5 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* FANCY_LEDS_H */
 /** @} */
+#endif /* FANCY_LEDS_H */

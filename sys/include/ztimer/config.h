@@ -202,5 +202,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ZTIMER_CONFIG_H */
 /** @} */
+#endif /* ZTIMER_CONFIG_H */

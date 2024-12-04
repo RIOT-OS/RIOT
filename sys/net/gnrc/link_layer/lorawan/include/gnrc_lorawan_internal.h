@@ -815,5 +815,5 @@ static inline void gnrc_lorawan_mlme_join_set_appkey(mlme_lorawan_join_t *mlme_j
 }
 #endif
 
-#endif /* GNRC_LORAWAN_INTERNAL_H */
 /** @} */
+#endif /* GNRC_LORAWAN_INTERNAL_H */

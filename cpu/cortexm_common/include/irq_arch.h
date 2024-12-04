@@ -129,5 +129,5 @@ bool irq_is_in(void)
 }
 #endif
 
-#endif /* IRQ_ARCH_H */
 /** @} */
+#endif /* IRQ_ARCH_H */

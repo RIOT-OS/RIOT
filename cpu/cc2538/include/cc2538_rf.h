@@ -468,5 +468,5 @@ void cc2538_set_tx_power(int dBm);
 }
 #endif
 
-#endif /* CC2538_RF_H */
 /** @} */
+#endif /* CC2538_RF_H */

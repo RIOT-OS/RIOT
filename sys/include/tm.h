@@ -121,5 +121,5 @@ int tm_is_valid_time(int hour, int min, int sec);
 }
 #endif
 
-#endif /* TM_H */
 /** @} */
+#endif /* TM_H */

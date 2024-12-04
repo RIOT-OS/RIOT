@@ -199,5 +199,5 @@ void luid_base(void *buf, size_t len);
 }
 #endif
 
-#endif /* LUID_H */
 /** @} */
+#endif /* LUID_H */

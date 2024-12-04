@@ -97,5 +97,5 @@ typedef struct {
 }
 #endif
 
-#endif /* AUTO_INIT_UTILS_H */
 /** @} */
+#endif /* AUTO_INIT_UTILS_H */

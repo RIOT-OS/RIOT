@@ -48,5 +48,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_COMMON_ESP32_H */
 /** @} */
+#endif /* BOARD_COMMON_ESP32_H */

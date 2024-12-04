@@ -46,5 +46,5 @@ extern "C" {
 
 #endif /* MODULE_ESP_ETH || DOXYGEN */
 
-#endif /* ESP_ETH_PARAMS_H */
 /** @} */
+#endif /* ESP_ETH_PARAMS_H */

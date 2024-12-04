@@ -298,5 +298,5 @@ ctap_status_code_t fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_CRYPTO_H */
 /** @} */
+#endif /* FIDO2_CTAP_CTAP_CRYPTO_H */

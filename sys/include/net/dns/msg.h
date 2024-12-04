@@ -117,5 +117,5 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
 }
 #endif
 
-#endif /* NET_DNS_MSG_H */
 /** @} */
+#endif /* NET_DNS_MSG_H */

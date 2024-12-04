@@ -124,5 +124,5 @@ void md5(void *digest, const void *data, size_t len);
 }
 #endif
 
-#endif /* HASHES_MD5_H */
 /** @} */
+#endif /* HASHES_MD5_H */

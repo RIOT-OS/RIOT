@@ -79,5 +79,5 @@ extern "C" {
 }
 #endif
 
-#endif /* IO1_XPLAINED_INTERNALS_H */
 /** @} */
+#endif /* IO1_XPLAINED_INTERNALS_H */

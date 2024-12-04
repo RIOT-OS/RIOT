@@ -93,5 +93,5 @@ void ztimer_convert_stop(ztimer_clock_t *clock);
 }
 #endif
 
-#endif /* ZTIMER_CONVERT_H */
 /** @} */
+#endif /* ZTIMER_CONVERT_H */

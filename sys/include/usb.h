@@ -271,5 +271,5 @@ typedef enum {
 }
 #endif
 
-#endif /* USB_H */
 /** @} */
+#endif /* USB_H */

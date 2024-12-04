@@ -76,5 +76,5 @@ static const matrix_keypad_params_t matrix_keypad_params[] =
 }
 #endif
 
-#endif /* MATRIX_KEYPAD_PARAMS_H */
 /** @} */
+#endif /* MATRIX_KEYPAD_PARAMS_H */

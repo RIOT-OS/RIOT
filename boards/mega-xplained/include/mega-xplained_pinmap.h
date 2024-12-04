@@ -74,5 +74,5 @@ extern "C" {
 }
 #endif
 
-#endif /* MEGA_XPLAINED_PINMAP_H */
 /** @} */
+#endif /* MEGA_XPLAINED_PINMAP_H */

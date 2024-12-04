@@ -432,5 +432,5 @@ static const gpio_t arduino_pinmap[] = {
 }
 #endif
 
-#endif /* ARDUINO_BOARD_PINS_H */
 /** @} */
+#endif /* ARDUINO_BOARD_PINS_H */

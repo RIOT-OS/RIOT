@@ -61,5 +61,5 @@ static const ds3234_params_t ds3234_params[] =
 }
 #endif
 
-#endif /* DS3234_PARAMS_H */
 /** @} */
+#endif /* DS3234_PARAMS_H */

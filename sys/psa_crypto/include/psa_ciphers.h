@@ -183,5 +183,5 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
 }
 #endif
 
-#endif /* PSA_CIPHERS_H */
 /** @} */
+#endif /* PSA_CIPHERS_H */

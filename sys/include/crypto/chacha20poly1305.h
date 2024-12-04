@@ -114,5 +114,5 @@ void chacha20_encrypt_decrypt(const uint8_t *input, uint8_t *output,
 #ifdef __cplusplus
 }
 #endif
-#endif /* CRYPTO_CHACHA20POLY1305_H */
 /** @} */
+#endif /* CRYPTO_CHACHA20POLY1305_H */

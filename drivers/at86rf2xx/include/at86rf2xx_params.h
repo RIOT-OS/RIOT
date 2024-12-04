@@ -105,5 +105,5 @@ static const at86rf2xx_params_t at86rf2xx_params[] =
 }
 #endif
 
-#endif /* AT86RF2XX_PARAMS_H */
 /** @} */
+#endif /* AT86RF2XX_PARAMS_H */

@@ -343,5 +343,5 @@ void sixlowpan_print(uint8_t *data, size_t size);
 }
 #endif
 
-#endif /* NET_SIXLOWPAN_H */
 /** @} */
+#endif /* NET_SIXLOWPAN_H */

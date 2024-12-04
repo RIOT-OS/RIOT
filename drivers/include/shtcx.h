@@ -123,5 +123,5 @@ int8_t shtcx_reset(const shtcx_t *dev);
 }
 #endif
 
-#endif /* SHTCX_H */
 /** @} */
+#endif /* SHTCX_H */

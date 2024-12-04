@@ -33,5 +33,5 @@ void tests_ztimer(void);
 }
 #endif
 
-#endif /* TESTS_ZTIMER_H */
 /** @} */
+#endif /* TESTS_ZTIMER_H */

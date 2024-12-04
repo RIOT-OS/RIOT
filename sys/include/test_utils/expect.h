@@ -83,5 +83,5 @@ NORETURN static inline void _expect_failure(const char *file, unsigned line)
 }
 #endif
 
-#endif /* TEST_UTILS_EXPECT_H */
 /** @} */
+#endif /* TEST_UTILS_EXPECT_H */

@@ -53,5 +53,5 @@ static const  saul_adc_params_t saul_adc_params[] =
 }
 #endif
 
-#endif /* ADC_PARAMS_H */
 /** @} */
+#endif /* ADC_PARAMS_H */

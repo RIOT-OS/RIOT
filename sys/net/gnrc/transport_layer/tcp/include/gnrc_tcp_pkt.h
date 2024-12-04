@@ -151,5 +151,5 @@ uint16_t _gnrc_tcp_pkt_calc_csum(const gnrc_pktsnip_t *hdr,
 }
 #endif
 
-#endif /* GNRC_TCP_PKT_H */
 /** @} */
+#endif /* GNRC_TCP_PKT_H */

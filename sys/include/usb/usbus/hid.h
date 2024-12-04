@@ -106,5 +106,5 @@ void usbus_hid_init(usbus_t *usbus, usbus_hid_device_t *hid,
 }
 #endif
 
-#endif /* USB_USBUS_HID_H */
 /** @} */
+#endif /* USB_USBUS_HID_H */

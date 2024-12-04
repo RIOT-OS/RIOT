@@ -108,5 +108,5 @@ static const saul_reg_info_t apds99xx_saul_info[] =
 }
 #endif
 
-#endif /* APDS99XX_PARAMS_H */
 /** @} */
+#endif /* APDS99XX_PARAMS_H */

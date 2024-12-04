@@ -183,5 +183,5 @@ int sht1x_reset(sht1x_dev_t *dev);
 }
 #endif
 
-#endif /* SHT1X_H */
 /** @} */
+#endif /* SHT1X_H */

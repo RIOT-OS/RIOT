@@ -107,5 +107,5 @@ int gnrc_icmpv6_echo_rsp_handle(gnrc_pktsnip_t *pkt, size_t len,
 }
 #endif
 
-#endif /* NET_GNRC_ICMPV6_ECHO_H */
 /** @} */
+#endif /* NET_GNRC_ICMPV6_ECHO_H */

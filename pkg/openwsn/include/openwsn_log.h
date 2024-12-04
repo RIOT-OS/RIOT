@@ -95,5 +95,5 @@ enum {
 }
 #endif
 
-#endif /* OPENWSN_LOG_H */
 /** @} */
+#endif /* OPENWSN_LOG_H */

@@ -145,5 +145,5 @@ void gnrc_mac_reset_timeouts(gnrc_mac_timeout_t *mac_timeout);
 }
 #endif
 
-#endif /* NET_GNRC_MAC_TIMEOUT_H */
 /** @} */
+#endif /* NET_GNRC_MAC_TIMEOUT_H */

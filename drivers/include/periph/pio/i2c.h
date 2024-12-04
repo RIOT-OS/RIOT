@@ -314,5 +314,5 @@ static inline int pio_i2c_write_reg(pio_t pio, pio_sm_t sm, uint16_t addr,
 #ifdef __cplusplus
 }
 #endif
-#endif /* PERIPH_PIO_I2C_H */
 /** @} */
+#endif /* PERIPH_PIO_I2C_H */

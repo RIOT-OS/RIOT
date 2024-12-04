@@ -46,5 +46,5 @@ int gnrc_netif_ieee802154_create(gnrc_netif_t *netif, char *stack, int stacksize
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_IEEE802154_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_IEEE802154_H */

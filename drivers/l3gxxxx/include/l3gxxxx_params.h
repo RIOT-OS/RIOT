@@ -381,5 +381,5 @@ static const saul_reg_info_t l3gxxxx_saul_info[] =
 }
 #endif
 
-#endif /* L3GXXXX_PARAMS_H */
 /** @} */
+#endif /* L3GXXXX_PARAMS_H */

@@ -89,5 +89,5 @@ bool coding_xor_recover(void *data, size_t len, uint8_t *parity,
 }
 #endif
 
-#endif /* CODING_XOR_H */
 /** @} */
+#endif /* CODING_XOR_H */

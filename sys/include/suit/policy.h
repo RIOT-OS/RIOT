@@ -55,5 +55,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SUIT_POLICY_H */
 /** @} */
+#endif /* SUIT_POLICY_H */

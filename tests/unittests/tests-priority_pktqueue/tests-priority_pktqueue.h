@@ -33,5 +33,5 @@ void tests_priority_pktqueue(void);
 }
 #endif
 
-#endif /* TESTS_PRIORITY_PKTQUEUE_H */
 /** @} */
+#endif /* TESTS_PRIORITY_PKTQUEUE_H */

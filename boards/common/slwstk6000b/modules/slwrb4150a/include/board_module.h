@@ -107,5 +107,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_MODULE_H */
 /** @} */
+#endif /* BOARD_MODULE_H */

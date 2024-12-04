@@ -655,5 +655,5 @@ static const clk_cfg_t stm32_mp_clk_cfg[] = {
 }
 #endif
 
-#endif /* CLK_CONF_H */
 /** @} */
+#endif /* CLK_CONF_H */

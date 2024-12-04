@@ -431,5 +431,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ENC28J60_REGS_H */
 /** @} */
+#endif /* ENC28J60_REGS_H */

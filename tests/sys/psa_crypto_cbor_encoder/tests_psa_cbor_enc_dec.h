@@ -67,5 +67,5 @@ Test* tests_psa_crypto_enc_dec_protected_key(void);
 }
 #endif
 
-#endif /* TESTS_PSA_CBOR_ENC_DEC_H */
 /** @} */
+#endif /* TESTS_PSA_CBOR_ENC_DEC_H */

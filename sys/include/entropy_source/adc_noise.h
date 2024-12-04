@@ -154,5 +154,5 @@ static inline uint32_t entropy_source_adc_entropy_per_sample(void)
 }
 #endif
 
-#endif /* ENTROPY_SOURCE_ADC_NOISE_H */
 /** @} */
+#endif /* ENTROPY_SOURCE_ADC_NOISE_H */

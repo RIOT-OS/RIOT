@@ -37,5 +37,5 @@ void pm_periph_power_off(void);
 }
 #endif
 
-#endif /* CPU_PM_H */
 /** @} */
+#endif /* CPU_PM_H */

@@ -33,5 +33,5 @@ void tests_tsrb(void);
 }
 #endif
 
-#endif /* TESTS_TSRB_H */
 /** @} */
+#endif /* TESTS_TSRB_H */

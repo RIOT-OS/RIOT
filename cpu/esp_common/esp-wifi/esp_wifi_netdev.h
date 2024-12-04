@@ -73,5 +73,5 @@ typedef struct
 }
 #endif
 
-#endif /* ESP_WIFI_NETDEV_H */
 /** @} */
+#endif /* ESP_WIFI_NETDEV_H */

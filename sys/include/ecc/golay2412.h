@@ -71,5 +71,5 @@ void golay2412_decode(uint32_t _dec_msg_len,
 }
 #endif
 
-#endif /* ECC_GOLAY2412_H */
 /** @} */
+#endif /* ECC_GOLAY2412_H */

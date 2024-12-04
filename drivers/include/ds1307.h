@@ -157,5 +157,5 @@ int ds1307_get_sqw_mode(const ds1307_t *dev);
 }
 #endif
 
-#endif /* DS1307_H */
 /** @} */
+#endif /* DS1307_H */

@@ -500,5 +500,5 @@ static inline bool clist_more_than_one(clist_node_t *list)
 }
 #endif
 
-#endif /* CLIST_H */
 /** @} */
+#endif /* CLIST_H */

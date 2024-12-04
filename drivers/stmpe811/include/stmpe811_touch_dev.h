@@ -34,5 +34,5 @@ extern const touch_dev_driver_t stmpe811_touch_dev_driver;
 }
 #endif
 
-#endif /* STMPE811_TOUCH_DEV_H */
 /** @} */
+#endif /* STMPE811_TOUCH_DEV_H */

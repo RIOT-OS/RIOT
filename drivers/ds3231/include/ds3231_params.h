@@ -60,5 +60,5 @@ static const ds3231_params_t ds3231_params[] =
 }
 #endif
 
-#endif /* DS3231_PARAMS_H */
 /** @} */
+#endif /* DS3231_PARAMS_H */

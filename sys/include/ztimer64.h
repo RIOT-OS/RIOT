@@ -531,5 +531,5 @@ int64_t ztimer64_overhead(ztimer64_clock_t *clock, uint64_t base);
 }
 #endif
 
-#endif /* ZTIMER64_H */
 /** @} */
+#endif /* ZTIMER64_H */

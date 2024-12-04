@@ -36,5 +36,5 @@ void tests_phydat(void);
 }
 #endif
 
-#endif /* TESTS_PHYDAT_H */
 /** @} */
+#endif /* TESTS_PHYDAT_H */

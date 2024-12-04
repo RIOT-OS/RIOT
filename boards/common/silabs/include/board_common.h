@@ -38,5 +38,5 @@ void board_common_init(void);
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */
+#endif /* BOARD_COMMON_H */

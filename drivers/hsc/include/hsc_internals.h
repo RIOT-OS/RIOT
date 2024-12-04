@@ -60,5 +60,5 @@ enum {
 }
 #endif
 
-#endif /* HSC_INTERNALS_H */
 /** @} */
+#endif /* HSC_INTERNALS_H */

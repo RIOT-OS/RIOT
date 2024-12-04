@@ -316,5 +316,5 @@ static inline bool gnrc_sixlowpan_frag_rb_ints_empty(void)
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_RB_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_RB_H */

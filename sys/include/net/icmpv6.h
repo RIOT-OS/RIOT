@@ -231,5 +231,5 @@ void icmpv6_hdr_print(icmpv6_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_ICMPV6_H */
 /** @} */
+#endif /* NET_ICMPV6_H */

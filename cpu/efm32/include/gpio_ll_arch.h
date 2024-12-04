@@ -203,5 +203,5 @@ static inline void * gpio_port_unpack_addr(gpio_port_t port)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */
+#endif /* GPIO_LL_ARCH_H */

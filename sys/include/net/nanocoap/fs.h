@@ -63,5 +63,5 @@ extern const vfs_file_system_t nanocoap_fs_file_system;
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_FS_H */
 /** @} */
+#endif /* NET_NANOCOAP_FS_H */

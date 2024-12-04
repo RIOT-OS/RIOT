@@ -135,5 +135,5 @@ static inline void gnrc_tx_sync(gnrc_tx_sync_t *sync)
 }
 #endif
 
-#endif /* NET_GNRC_TX_SYNC_H */
 /** @} */
+#endif /* NET_GNRC_TX_SYNC_H */

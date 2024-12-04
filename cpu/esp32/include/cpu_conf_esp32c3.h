@@ -37,5 +37,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_ESP32C3_H */
 /** @} */
+#endif /* CPU_CONF_ESP32C3_H */

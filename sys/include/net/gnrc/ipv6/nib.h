@@ -433,5 +433,5 @@ void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_H */

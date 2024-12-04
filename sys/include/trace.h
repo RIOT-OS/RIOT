@@ -96,5 +96,5 @@ void trace_reset(void);
 }
 #endif
 
-#endif /* TRACE_H */
 /** @} */
+#endif /* TRACE_H */

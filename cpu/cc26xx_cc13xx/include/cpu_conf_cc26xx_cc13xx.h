@@ -534,5 +534,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_CC26XX_CC13XX_H */
 /** @} */
+#endif /* CPU_CONF_CC26XX_CC13XX_H */

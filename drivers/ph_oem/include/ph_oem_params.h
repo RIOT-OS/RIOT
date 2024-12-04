@@ -79,5 +79,5 @@ static const saul_reg_info_t ph_oem_saul_info[] =
 }
 #endif
 
-#endif /* PH_OEM_PARAMS_H */
 /** @} */
+#endif /* PH_OEM_PARAMS_H */

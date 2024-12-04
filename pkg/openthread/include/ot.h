@@ -168,5 +168,5 @@ void ot_random_init(void);
 }
 #endif
 
-#endif /* OT_H */
 /** @} */
+#endif /* OT_H */

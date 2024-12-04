@@ -41,5 +41,5 @@ typedef uint32_t socklen_t;         /**< socket address length */
 }
 #endif
 
-#endif /* SYS_BYTES_H */
 /** @} */
+#endif /* SYS_BYTES_H */

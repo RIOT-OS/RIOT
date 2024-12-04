@@ -82,5 +82,5 @@ static const saul_reg_info_t mma7660_saul_info[] =
 }
 #endif
 
-#endif /* MMA7660_PARAMS_H */
 /** @} */
+#endif /* MMA7660_PARAMS_H */

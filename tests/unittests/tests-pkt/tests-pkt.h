@@ -33,5 +33,5 @@ void tests_pkt(void);
 }
 #endif
 
-#endif /* TESTS_PKT_H */
 /** @} */
+#endif /* TESTS_PKT_H */

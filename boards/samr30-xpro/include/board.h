@@ -101,5 +101,5 @@ void board_antenna_config(uint8_t antenna);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */
+#endif /* BOARD_H */

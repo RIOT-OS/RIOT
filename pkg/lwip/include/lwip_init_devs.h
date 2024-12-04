@@ -73,5 +73,5 @@ typedef void (*lwip_netif_setup_func_t)(void);
 }
 #endif
 
-#endif /* LWIP_INIT_DEVS_H */
 /** @} */
+#endif /* LWIP_INIT_DEVS_H */

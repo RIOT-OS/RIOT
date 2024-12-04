@@ -905,5 +905,5 @@ int lis3dh_get_fifo_level(const lis3dh_t *dev);
 }
 #endif
 
-#endif /* LIS3DH_H */
 /** @} */
+#endif /* LIS3DH_H */

@@ -53,5 +53,5 @@ extern "C" {
 }
 #endif
 
-#endif /* COLORTEXTCOLORS_H */
 /** @} */
+#endif /* COLORTEXTCOLORS_H */
