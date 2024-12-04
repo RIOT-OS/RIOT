@@ -89,7 +89,7 @@ static enum parse_state escape_toggle(enum parse_state s)
 }
 
 static shell_command_handler_t search_commands(const shell_command_t *entry,
-                                               char *command)
+                                               const char *command)
 {
     for (; entry->name != NULL; entry++) {
         if (strcmp(entry->name, command) == 0) {
@@ -99,7 +99,7 @@ static shell_command_handler_t search_commands(const shell_command_t *entry,
     return NULL;
 }
 
-static shell_command_handler_t search_commands_xfa(char *command)
+static shell_command_handler_t search_commands_xfa(const char *command)
 {
     unsigned n = XFA_LEN(shell_command_t, shell_commands_xfa_v2);
 
@@ -112,10 +112,12 @@ static shell_command_handler_t search_commands_xfa(char *command)
     return NULL;
 }
 
-static shell_command_handler_t find_handler(
-        const shell_command_t *command_list, char *command)
+shell_command_handler_t shell_find_handler(const shell_command_t *command_list,
+                                           const char *command)
 {
     shell_command_handler_t handler = NULL;
+
+    assert(command);
 
     if (command_list != NULL) {
         handler = search_commands(command_list, command);
@@ -357,7 +359,7 @@ int shell_handle_input_line(const shell_command_t *command_list, char *line)
     argv[argc] = NULL;
 
     /* then we call the appropriate handler */
-    shell_command_handler_t handler = find_handler(command_list, argv[0]);
+    shell_command_handler_t handler = shell_find_handler(command_list, argv[0]);
     if (handler != NULL) {
         if (IS_USED(MODULE_SHELL_HOOKS)) {
             shell_pre_command_hook(argc, argv);
