@@ -72,7 +72,12 @@ int main(void)
 
     ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
 
+    digit7seg_set_int_all_value(&dev, 9572);
+
+    ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
+
     digit7seg_poweroff(&dev);
+
 
     return 0;
 }
