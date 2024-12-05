@@ -45,6 +45,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml11-xpro \
     slstk3400a \
     stk3200 \
+    stm32c0116-dk \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32f7508-dk \
