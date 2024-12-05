@@ -77,6 +77,7 @@ Here is a quick overview of the examples available in the RIOT:
 |---------|-------------|
 | [skald_eddystone](./skald_eddystone/README.md) | This example demonstrates the usage of `Skald` for creating an Google `Eddystone` beacon. |
 | [skald_ibeacon](./skald_ibeacon/README.md) | This example demonstrates the usage of `Skald` for creating an Apple `iBeacon`. |
+| [skald_bthome](./skald_bthome/README.md) | This example demonstrates the usage of `Skald` for sending SAUL measurements via [`BTHome`](https://bthome.io). |
 
 ### MQTT
 
