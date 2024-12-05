@@ -84,7 +84,7 @@ RIOT provides features including, but not limited to:
 
 ### Related Projects
 
-- [**Ariel OS**](https://github.com/ariel-os/ariel-os) is an offspring of RIOT written
+- [Ariel OS](https://github.com/ariel-os/ariel-os) is an offspring of RIOT written
 in Rust following RIOT's goals and [vision](https://doc.riot-os.org/vision.html).
 - [Contiki(-NG)](https://github.com/contiki-ng/contiki-ng) was an inspiration for starting RIOT, an operating system for constrained devices with a focus on networking.
 - [NuttX](https://github.com/apache/nuttx) is another general purpose microcontroller OS with a focus on bringing POSIX to MCUs
