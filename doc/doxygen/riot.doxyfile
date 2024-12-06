@@ -877,6 +877,10 @@ INPUT                  = ../../doc.txt \
                          src/terminal-programs.md \
                          src/build-in-docker.md \
                          ../../tests/README.md \
+                         src/dev-best-practices.md \
+                         src/ccache.md \
+                         src/comparing-build-sizes.md \
+                         src/static-vs-dynamic-memory.md \
                          src/build-system-basics.md \
                          src/feature_list.md \
                          src/kconfig/kconfig.md \
