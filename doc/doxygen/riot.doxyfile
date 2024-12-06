@@ -878,7 +878,6 @@ INPUT                  = ../../doc.txt \
                          src/build-in-docker.md \
                          ../../tests/README.md \
                          src/dev-best-practices.md \
-                         src/comparing-build-sizes.md \
                          src/static-vs-dynamic-memory.md \
                          src/build-system-basics.md \
                          src/feature_list.md \
