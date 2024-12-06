@@ -1,0 +1,2 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_timer_periodic
