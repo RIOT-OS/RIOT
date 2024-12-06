@@ -889,6 +889,7 @@ INPUT                  = ../../doc.txt \
                          src/release-cycle.md \
                          src/io-mapping-and-shields.md \
                          src/changelog.md \
+                         src/maintainers.md \
                          ../../LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
