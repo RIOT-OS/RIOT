@@ -33,8 +33,8 @@ Do the below actions iteratively, generating new release candidates, until all r
 - [ ] Add [branch protection rules](https://github.com/RIOT-OS/RIOT/settings/branches) for the release branch (if you don't have permissions ask an [admin](https://github.com/orgs/RIOT-OS/teams/admin) or [owner](https://github.com/orgs/RIOT-OS/teams/owners)). :warning: A new rule has to be added manually for each release, since the Github Merge Queue cannot be enabled for branches that are protected with a wildcard rule for some reason.
 - [ ] Open issue in release specs repo for release candidate
 - [ ] Send hard feature freeze email
-- [ ] Co-ordinate testing for release candidate
-- [ ] Co-ordinate bugfixing for release candidate on master
+- [ ] Coordinate testing for release candidate
+- [ ] Coordinate bugfixing for release candidate on master
 - [ ] Backport bugfixes for release candidate to release branch
 
 **Releasing**
@@ -68,7 +68,7 @@ Soft feature freeze is the date after which “high impact” PRs cannot be merg
 
 Hard feature freeze is the date at which the release branch gets created. When hard feature freeze emerges there should be at most bugfix pull requests open with a label for this release. Ideally but not mandatorily, these get merged before the first release candidate goes out. Only bugfixes to address release specification test failures can be merged into the release branch after this date. Any PRs can be merged into RIOT master after this date.
 
-Any bugfixes should be merged into RIOT master and backported into the release branch by creating an identical PR against it. The backport_pr tool in the RIOT repo can be used to do this automatically. To co-ordinate testing, you can use the checkboxes and the discussion in the release candidate's issue, and/or the release tracking spreadsheet, at your discretion. Once all bugfixes addressing test failures have been merged and backported, a new release candidate is generated and testing begins again. This happens iteratively until we get a release candidate which passes all the tests without any further bugfixes. As there are "always" known issues, and deadlines need to be satisfied, it is possible to abstain at some point from backporting and re-testing iteratively, and list the issue as known in the release notes.
+Any bugfixes should be merged into RIOT master and backported into the release branch by creating an identical PR against it. The backport_pr tool in the RIOT repo can be used to do this automatically. To coordinate testing, you can use the checkboxes and the discussion in the release candidate's issue, and/or the release tracking spreadsheet, at your discretion. Once all bugfixes addressing test failures have been merged and backported, a new release candidate is generated and testing begins again. This happens iteratively until we get a release candidate which passes all the tests without any further bugfixes. As there are "always" known issues, and deadlines need to be satisfied, it is possible to abstain at some point from backporting and re-testing iteratively, and list the issue as known in the release notes.
 
 
 ## Automatic freezing and release candidate generation
