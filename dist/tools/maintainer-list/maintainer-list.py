@@ -34,13 +34,6 @@ If a maintainer is marked as "{NO_AREA_TEXT}", they did not have added any owner
 within CODEOWNERS. This does not mean that they do not feel responsible for any part of
 the code base, they just did not declare it.
 
-If a list entry only shows a pattern, it did not resolve to a specific Doxygen group
-that may be referenced. This may be intentional, since the maintainer may feel
-responsible for a large number of modules / groups within files that match that pattern.
-If it is not intentional, please add an `@ingroup` command for an existing Doxygen
-group to a file that matches the pattern; the corresponding group will then be linked
-here.
-
 If you are a maintainer and want to declare ownership for a part of a code base (and
 receive notifications on pull requests against it), please add yourself and the path to
 the part of the code base you want to be responsible for to CODEOWNERS.
