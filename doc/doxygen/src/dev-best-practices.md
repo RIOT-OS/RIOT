@@ -6,7 +6,7 @@
 ## Coding "Dos" and "Don'ts":
 
 ### Dos
- * Use static memory. See also [Static vs. Dynamic Memory](https://github.com/RIOT-OS/RIOT/wiki/Static-vs-Dynamic-Memory).
+ * Use static memory. See also [Static vs. Dynamic Memory](#static-vs-dynamic).
  * Select the priorities carefully.
  * Minimize stack usage with `DEVELHELP` and `CREATE_STACKTEST`.
  * Use threads to increase flexibility, modularity, and robustness by leveraging IPC.
@@ -87,3 +87,30 @@ The below methodology is recommended, using well-known de facto standard tools f
 6. At this stage the implementation has proven bug-free on the native emulator. One can thus finally move on to  hardware-in-the-loop, which means (i) flashing the binary on the targeted IoT hardware, typically using standard flasher **OpenOCD** or **edbg**, and (ii) using the **RIOT shell** running on the target IoT device(s) for easier debugging on the target hardware.
 7. In case the hardware is not available on-site, one can consider remotely flashing and testing the binary on supported open-access testbeds, e.g. [IoT-LAB](https://www.iot-lab.info) hardware is fully supported by RIOT.
 8. In case of failure, after analyzing the failure and attempting to fix the defect, go back to step 1 to make sure the fix did not itself introduce a new defect.
+
+## Static vs. Dynamic Memory                                                    {#static-vs-dynamic}
+
+In your C program you have to decide where the memory you want to use comes from.
+There are two ways to get memory in your C code:
+
+1. Define static memory.
+2. Use dynamic memory (call `malloc()`/`free()` to get memory from the heap).
+
+Both ways have some drawbacks which are listed here.
+If you want to analyze the static memory consumption of your code you can use [otm](https://github.com/LudwigOrtmann/otm) or `make cosy`.
+
+### Static memory
+* Access the memory in one operation O(1) ⇒ real time condition
+* Programmer needs to know the amount of memory on compile time
+  * Leads to over and undersized buffers
+* Forces the programmer to think about the amount of need memory at compile time
+
+### Dynamic memory
+* `malloc()` and `free()` are implemented in your `libc` (RIOT on ARM: `newlib`/`picolib`)
+  * Runtime behavior is not predictable
+* Code can request the amount of memory it needs on runtime
+* On most platforms: the size of the heap is `sizeof(<RAM>)-sizeof(<static memory>)`
+  * If you reduce your usage of static memory your heap gets bigger
+* On some platforms calling  `free()` will not or not always make heap memory available again (see @ref oneway_malloc on MSP430)
+* Programmer needs to handle failed memory allocation calls at runtime
+* Static code analysis is unable to find errors regarding memory management
