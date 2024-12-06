@@ -1,7 +1,7 @@
 # Hints for quicker & better RIOT development
 
 * Use the [methodology](https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming/#methodology-emulator-first-target-iot-hardware-last) described below.
-* Use [[ccache]] to speedup compilation
+* Use [`ccache`](@ref ccache) to speedup compilation
 
 ## Coding "Dos" and "Don'ts":
 
