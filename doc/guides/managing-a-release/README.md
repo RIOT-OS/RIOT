@@ -12,7 +12,7 @@
 
 # 1. Checklist
 
-**Preparation** 
+**Preparation**
 - [ ] Read “Managing a release” wiki
 - [ ] Gather improvements and tips from previous release manager
 - [ ] Decide and announce feature freeze dates
@@ -26,7 +26,7 @@
 - [ ] Check that there are no pending Rust changes (`find -name Cargo.toml -exec cargo update --manifest-path "{}" --package riot-wrappers --package riot-sys ";"` should be a no-op), otherwise poke Rust using maintainers
 - [ ] Familiarise with nearly-merged, high impact PRs, and contact the contributors to ask them to hold
 
-**Hard Feature Freeze**  
+**Hard Feature Freeze**
 
 Do the below actions iteratively, generating new release candidates, until all release specs tests pass.
 - [ ] Generate branch and tag for release candidate
@@ -64,11 +64,11 @@ Also review PRs tagged for the milestone that have not been updated in a long ti
 
 There are two feature freezes: soft and hard.
 
-Soft feature freeze is the date after which “high impact” PRs cannot be merged. What defines “high impact” is at the release manager’s discretion, but typically in the past this has meant large structural changes to common code or API changes to common code, with “common” meaning shared between the majority of boards and application scenarios.  
+Soft feature freeze is the date after which “high impact” PRs cannot be merged. What defines “high impact” is at the release manager’s discretion, but typically in the past this has meant large structural changes to common code or API changes to common code, with “common” meaning shared between the majority of boards and application scenarios.
 
 Hard feature freeze is the date at which the release branch gets created. When hard feature freeze emerges there should be at most bugfix pull requests open with a label for this release. Ideally but not mandatorily, these get merged before the first release candidate goes out. Only bugfixes to address release specification test failures can be merged into the release branch after this date. Any PRs can be merged into RIOT master after this date.
 
-Any bugfixes should be merged into RIOT master and backported into the release branch by creating an identical PR against it. The backport_pr tool in the RIOT repo can be used to do this automatically. To co-ordinate testing, you can use the checkboxes and the discussion in the release candidate's issue, and/or the release tracking spreadsheet, at your discretion. Once all bugfixes addressing test failures have been merged and backported, a new release candidate is generated and testing begins again. This happens iteratively until we get a release candidate which passes all the tests without any further bugfixes. As there are "always" known issues, and deadlines need to be satisfied, it is possible to abstain at some point from backporting and re-testing iteratively, and list the issue as known in the release notes.  
+Any bugfixes should be merged into RIOT master and backported into the release branch by creating an identical PR against it. The backport_pr tool in the RIOT repo can be used to do this automatically. To co-ordinate testing, you can use the checkboxes and the discussion in the release candidate's issue, and/or the release tracking spreadsheet, at your discretion. Once all bugfixes addressing test failures have been merged and backported, a new release candidate is generated and testing begins again. This happens iteratively until we get a release candidate which passes all the tests without any further bugfixes. As there are "always" known issues, and deadlines need to be satisfied, it is possible to abstain at some point from backporting and re-testing iteratively, and list the issue as known in the release notes.
 
 
 ## Automatic freezing and release candidate generation
@@ -102,9 +102,9 @@ Generate the release branch and git tags in the following way:
 
 In the RIOT [Release Specs](https://github.com/RIOT-OS/Release-Specs/issues) repository create a new issue containing checkboxes for all release tests (have a look at closed issues from previous releases). A pointer to the release candidate and the issue for tracking testing efforts should be sent to the mailing lists with a request for help.
 
-When generating a new release candidate, the release candidate needs to be tagged, a new issue needs to be created in the [Release Specs repository](https://github.com/RIOT-OS/Release-Specs/issues) and testing starts from the beginning (as described above). 
+When generating a new release candidate, the release candidate needs to be tagged, a new issue needs to be created in the [Release Specs repository](https://github.com/RIOT-OS/Release-Specs/issues) and testing starts from the beginning (as described above).
 
-# 4. Drafting Release Notes 
+# 4. Drafting Release Notes
 
 
 ## Automatic draft release note generation
@@ -195,10 +195,10 @@ A point release for a critical issue is best limited to a small number of change
 These templates are suggestions, if useful. Whatever the phrasing, emails with similar content should be sent out to all mailing lists at various stages of the release process.
 
 ## Date announcement and feature request
-**Subject**  
-Release [YYYY.MM] - dates and feature requests  
+**Subject**
+Release [YYYY.MM] - dates and feature requests
 
-**Body**  
+**Body**
 ```
 Dear RIOTers,
 
@@ -216,14 +216,14 @@ Could you please send your suggestions for features which you would like to see 
 
 Best regards, and happy hacking!
 
-[Name] 
+[Name]
 ```
 
 ## Soft feature freeze announcement
-**Subject**  
+**Subject**
 Release [YYYY.MM] - Soft feature freeze now effective
 
-**Body**  
+**Body**
 ```
 Dear RIOTers,
 
@@ -236,10 +236,10 @@ Wishing you a happy code/polish/review/merge sprint,
 ```
 
 ## Hard feature freeze announcement
-**Subject**  
+**Subject**
 Release [YYYY.MM] - Hard feature freeze now effective
 
-**Body**  
+**Body**
 ```
 Dear RIOTers,
 
@@ -267,10 +267,10 @@ Best regards,
 ```
 
 ### Release announcement
-**Subject**  
+**Subject**
 Release [YYYY.MM]
 
-**Body**  
+**Body**
 ```
 Dear RIOTers,
 
@@ -296,4 +296,3 @@ Best regards,
 
 [3]:https://github.com/RIOT-OS/RIOT/releases/tag/[YYYY.MM]
 ```
-
