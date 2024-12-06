@@ -8,12 +8,14 @@
 6. [Other Repositories](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#6-Other-repositories)
 7. [Important Fixes after Release](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#7-important-fixes-after-release)
 8. [Resources](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#8-resources)
-9. [Email templates](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#9-email-templates)
+9. [Forum post templates](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#9-forum-post-templates)
 
 # 1. Checklist
 
+Steps marked with a :scroll: icon can also be automated with the release manager script.
+
 **Preparation**
-- [ ] Read “Managing a release” wiki
+- [ ] Read “Managing a release” guide
 - [ ] Gather improvements and tips from previous release manager
 - [ ] Decide and announce feature freeze dates
 - [ ] Create milestone label :scream_cat:, and label PRs that have been already merged
@@ -22,28 +24,29 @@
 - [ ] Familiarise with release specs and tests, incl open issues, deprecations, api changes, and PRs
 
 **Soft feature freeze**
-- [ ] Send soft feature freeze email
+- [ ] Post about soft feature freeze to the forum
 - [ ] Check that there are no pending Rust changes (`find -name Cargo.toml -exec cargo update --manifest-path "{}" --package riot-wrappers --package riot-sys ";"` should be a no-op), otherwise poke Rust using maintainers
 - [ ] Familiarise with nearly-merged, high impact PRs, and contact the contributors to ask them to hold
 
 **Hard Feature Freeze**
 
 Do the below actions iteratively, generating new release candidates, until all release specs tests pass.
-- [ ] Generate branch and tag for release candidate
-- [ ] Add [branch protection rules](https://github.com/RIOT-OS/RIOT/settings/branches) for the release branch (if you don't have permissions ask an [admin](https://github.com/orgs/RIOT-OS/teams/admin) or [owner](https://github.com/orgs/RIOT-OS/teams/owners)). :warning: A new rule has to be added manually for each release, since the Github Merge Queue cannot be enabled for branches that are protected with a wildcard rule for some reason.
-- [ ] Open issue in release specs repo for release candidate
-- [ ] Send hard feature freeze email
+- [ ] Generate branch and tag for release candidate :scroll:
+- [ ] Add [branch protection rules](https://github.com/RIOT-OS/RIOT/settings/branches) for the release branch (if you don't have permissions ask an [admin](https://github.com/orgs/RIOT-OS/teams/admin) or [owner](https://github.com/orgs/RIOT-OS/teams/owners)). :warning: A new rule has to be added manually for each release, since the Github Merge Queue cannot be enabled for branches that are protected with a wildcard rule for some reason. You might need to ask for help from one of the RIOT-OS GitHub admins for that.
+- [ ] Open issue in release specs repo for release candidate :scroll:
+- [ ] Post about hard feature freeze to the forum
 - [ ] Coordinate testing for release candidate
 - [ ] Coordinate bugfixing for release candidate on master
 - [ ] Backport bugfixes for release candidate to release branch
 
 **Releasing**
 - [ ] Create a GPG key and upload it to GitHub
-- [ ] Generate etherpad with list of new features, deprecations, api changes, and known issues, and share
-- [ ] Finalise etherpad and PR it onto release-notes.txt (incl backporting)
-- [ ] Create a VERSION file and raise PR against the release branch
-- [ ] Release either manually or using the release manager script
-- [ ] Inform all lists about the release
+- [ ] Generate changelog PR with list of new features, deprecations, api changes, and known issues, and share :scroll:
+- [ ] Finalise release notes (incl backporting) :scroll:
+- [ ] Create a VERSION file and raise PR against the release branch :scroll:. It is recommended to
+      piggyback it with the release note backport to speed things up.
+- [ ] Release either manually or using the release manager script :scroll:
+- [ ] Inform about the release on the forum
 - [ ] Update the [release statistics](https://github.com/RIOT-OS/RIOT/wiki/release-statistics)
 
 # 2. Preparation
@@ -190,9 +193,9 @@ A point release for a critical issue is best limited to a small number of change
 | Release test tracking spreadsheet | https://drive.google.com/open?id=0B384VtEXbD_HRzJSY1NGdnFpWERxb2JFeGdaS09iUjV0TGhN |
 
 
-# 9. Email templates
+# 9. Forum post templates
 
-These templates are suggestions, if useful. Whatever the phrasing, emails with similar content should be sent out to all mailing lists at various stages of the release process.
+These templates are suggestions, if useful. Whatever the phrasing, posts with similar content should be made to the forum at various stages of the release process.
 
 ## Date announcement and feature request
 **Subject**
