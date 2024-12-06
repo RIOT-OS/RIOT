@@ -39,6 +39,87 @@ You can configure your own files that will be parsed by the build system main
 * Define your custom targets
 * Override default targets
 
+Speed-up builds with ccache                                           {#ccache}
+===========================
+
+[`ccache`](https://ccache.samba.org/) is a compiler cache. It speeds up recompilation by caching previous compilations and detecting when the same compilation is being done again.
+
+Usually, the initial build takes a little (5% - 20%) longer, but repeated builds are up to ten times faster.
+Using `ccache` is safe, as `ccache` tries very hard to not mess up things and falls back to a normal compile if it cannot ensure correct output.
+
+There's one drawback: without further tweaking, `gcc` stops emitting colored output.
+
+Setup
+-----
+
+- Install using the package manager of your distribution, e.g., on Ubuntu or Debian:
+
+~~~~~~~~~~~~~~~~~~~
+# sudo apt-get install ccache
+~~~~~~~~~~~~~~~~~~~
+
+- Set `CCACHE` variable to `ccache`:
+
+~~~~~~~~~~~~~~~~~~~
+# export CCACHE=ccache
+~~~~~~~~~~~~~~~~~~~
+
+- (Optionally) add the above export line to your `~/.profile`
+
+Result
+------
+
+Build without `ccache`:
+
+~~~~~~~~~~~~~~~~~~~
+[kaspar@booze default (master)]$ time BOARD=samr21-xpro make clean all
+Building application "default" for "samr21-xpro" with MCU "samd21".
+
+[...]
+
+   text    data     bss     dec     hex filename
+  37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/default/bin/samr21-xpro/default.elf
+
+real    0m12.321s
+user    0m10.317s
+sys     0m1.170s
+[kaspar@booze default (master)]$
+~~~~~~~~~~~~~~~~~~~
+
+First build with `ccache` enabled:
+
+~~~~~~~~~~~~~~~~~~~
+[kaspar@booze default (master)]$ time BOARD=samr21-xpro make clean all
+Building application "default" for "samr21-xpro" with MCU "samd21".
+
+[...]
+
+text    data     bss     dec     hex filename
+37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/default/bin/samr21-xpro/default.elf
+
+real    0m15.462s
+user    0m12.410s
+sys     0m1.597s
+[kaspar@booze default (master)]$
+~~~~~~~~~~~~~~~~~~~
+
+Subsequent build with `ccache` enabled:
+
+~~~~~~~~~~~~~~~~~~~
+[kaspar@booze default (master)]$ time BOARD=samr21-xpro make clean all
+Building application "default" for "samr21-xpro" with MCU "samd21".
+
+[...]
+
+   text    data     bss     dec     hex filename
+  37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/default/bin/samr21-xpro/default.elf
+
+real    0m2.157s
+user    0m1.213s
+sys     0m0.327s
+[kaspar@booze default (master)]$
+~~~~~~~~~~~~~~~~~~~
+
 Analyze dependency resolution                   {#analyze-depedency-resolution}
 =============================
 
@@ -93,6 +174,31 @@ Out of Tree Cache Directory                            {#out-of-tree-cache-dir}
 By exporting the `BUILD_DIR` environment variable, a custom build / clone cache
 directory can be created. This can be particularly useful when working with
 multiple git work trees or clones of the RIOT repository.
+
+Comparing Build Sizes                                  {#comparing-build-sizes}
+=====================
+There is a make target for build size comparison. You can use it like that:
+
+~~~~~~~~~~~~~~~~~~~
+$ cd RIOT/test/test_something
+
+$ git checkout master
+$ BINDIRBASE=master-bin make buildtest
+
+$ git checkout my-branch
+$ BINDIRBASE=my-branch-bin make buildtest
+
+$ OLDBIN=master-bin NEWBIN=my-branch-bin make info-buildsizes-diff
+text    data    bss     dec     BOARD/BINDIRBASE
+
+0       0       0       0       avsextrem    **← this line contains the diff**
+57356   1532    96769   155657  master-bin
+57356   1532    96769   155657  my-branch-bin
+
+...
+~~~~~~~~~~~~~~~~~~~
+
+Check it out, the output contains colors. ;)
 
 RIOT-aware Completion in zsh                         {#zsh-completion-for-riot}
 ============================
