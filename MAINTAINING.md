@@ -181,8 +181,8 @@ In case of security relevant backports (both bug fixes and reverts), the
 announcement can be skipped and the fix merged once at least two ACKs are
 there.
 
-[list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
-[Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming
-[Comparing build sizes]: https://github.com/RIOT-OS/RIOT/wiki/Comparing-build-sizes
+[list of maintainers]: https://doc.riot-os.org/maintainer-list.html
+[Best Practices]: https://doc.riot-os.org/dev-best-practices.html
+[Comparing build sizes]: https://doc.riot-os.org/advanced-build-system-tricks.html#comparing-build-sizes
 [Coding Conventions]: CODING_CONVENTIONS.md
 [Code of Conduct]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
