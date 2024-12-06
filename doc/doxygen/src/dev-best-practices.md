@@ -1,9 +1,11 @@
-# Hints for quicker & better RIOT development
+# Hints for quicker & better RIOT development                                  {#dev-best-practices}
 
-* Use the [methodology](https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming/#methodology-emulator-first-target-iot-hardware-last) described below.
+[TOC]
+
+* Use the [methodology](#methodology) described below.
 * Use [`ccache`](@ref ccache) to speedup compilation
 
-## Coding "Dos" and "Don'ts":
+## Coding "Dos" and "Don'ts":                                                {#coding-dos-and-donts}
 
 ### Dos
  * Use static memory. See also [Static vs. Dynamic Memory](#static-vs-dynamic).
@@ -74,7 +76,7 @@ int bar(foo_t v) {
  * Don't duplicate code within your own code, unless there is a very good reason to do so. Use internal functions to this end.
  * Don't mix up logical and bitwise operations (`!` vs `~`, or `&&` vs `&`)
 
-## Methodology: emulator first, target IoT hardware last!
+## Methodology: emulator first, target IoT hardware last!                             {#methodology}
 
 The below methodology is recommended, using well-known de facto standard tools from the FLOSS community that are compatible with RIOT. Using the below workflow improves time-to-running-code compared to typical IoT software workflows (which can be as retro as "LED-driven" debugging).
 
