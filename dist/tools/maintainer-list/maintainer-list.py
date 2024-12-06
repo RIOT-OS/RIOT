@@ -105,21 +105,24 @@ def create_maintainer_markdown_file(maintainer_areas, owners, admins):
         RIOTBASE / "doc" / "doxygen" / "src" / "maintainers.md", "w"
     ) as maintainers_file:
         print(MAINTAINER_FILE_BOILERPLATE, file=maintainers_file)
-        for maintainer in sorted(maintainer_areas, key=lambda x: x.lower()):
+        for i, maintainer in enumerate(
+            sorted(maintainer_areas, key=lambda x: x.lower())
+        ):
             github_profile = get_github_user(maintainer)
 
             if (
                 not github_profile["name"]
                 or github_profile["name"] == github_profile["login"]
             ):
-                title = f"[@{github_profile['login']}]({github_profile['html_url']})"
+                title = f"\\@{github_profile['login']}"
             else:
-                title = (
-                    f"[{github_profile['name']} (@{github_profile['login']})]"
-                    f"({github_profile['html_url']})"
-                )
+                title = f"{github_profile['name']} (\\@{github_profile['login']})"
             anchor = urllib.parse.quote(github_profile["login"])
             print(f"## {title}  {{#{anchor}}}", file=maintainers_file)
+            print(
+                f"[GitHub profile]({github_profile['html_url']})",
+                file=maintainers_file,
+            )
 
             if maintainer in owners:
                 print(
@@ -141,7 +144,8 @@ def create_maintainer_markdown_file(maintainer_areas, owners, admins):
             if not maintainer_areas[maintainer]:
                 print("", file=maintainers_file)
                 print(NO_AREA_TEXT, file=maintainers_file)
-            print("", file=maintainers_file)
+            if (i + 1) < len(maintainer_areas):
+                print("", file=maintainers_file)
 
 
 def main():
