@@ -1,0 +1,76 @@
+# Resolve crypto requirements according to the documentation in mbedtls_config.h.
+# Please keep the order.
+
+ifneq (,$(filter mbedtls_ecdsa_deterministic,$(USEMODULE)))
+  USEMODULE += mbedtls_hmac_drbg
+endif
+
+ifneq (,$(filter mbedtls_pkcs1_v15,$(USEMODULE)))
+  USEMODULE += mbedtls_rsa
+endif
+
+ifneq (,$(filter mbedtls_pkcs1_v21,$(USEMODULE)))
+  USEMODULE += mbedtls_rsa
+  USEMODULE += mbedtls_md
+endif
+
+ifneq (,$(filter mbedtls_sha512_no_sha384,$(USEMODULE)))
+  USEMODULE += mbedtls_sha512
+endif
+
+ifneq (,$(filter mbedtls_ccm,$(USEMODULE)))
+  USEMODULE += mbedtls_cipher # this is missing in mbedtls/config.h
+  ifeq (,$(filter mbedtls_aes mbedtls_camellia,$(USEMODULE)))
+    $(info "mbedtls_ccm: using default AES")
+    USEMODULE += mbedtls_aes
+  endif
+endif
+
+ifneq (,$(filter mbedtls_cmac,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_aes mbedtls_des,$(USEMODULE)))
+    $(info "mbedtls_cmac: using default AES")
+    USEMODULE += mbedtls_aes
+  endif
+endif
+
+ifneq (,$(filter mbedtls_ecdsa,$(USEMODULE)))
+  USEMODULE += mbedtls_ecp
+  USEMODULE += mbedtls_asn1_write
+  USEMODULE += mbedtls_asn1_parse
+endif
+
+ifneq (,$(filter mbedtls_ecjpake,$(USEMODULE)))
+  USEMODULE += mbedtls_ecp
+  USEMODULE += mbedtls_md
+endif
+
+ifneq (,$(filter mbedtls_ecp,$(USEMODULE)))
+  USEMODULE += mbedtls_bignum
+endif
+
+ifneq (,$(filter mbedtls_gcm,$(USEMODULE)))
+  USEMODULE += mbedtls_cipher # this is missing in mbedtls/config.h
+  ifeq (,$(filter mbedtls_aes mbedtls_camellia mbedtls_aria,$(USEMODULE)))
+    $(info "mbedtls_gcm: using default AES")
+    USEMODULE += mbedtls_aes
+  endif
+endif
+
+ifneq (,$(filter mbedtls_hkdf,$(USEMODULE)))
+  USEMODULE += mbedtls_md
+endif
+
+ifneq (,$(filter mbedtls_nist_kw,$(USEMODULE)))
+  USEMODULE += mbedtls_aes
+  USEMODULE += mbedtls_cipher
+endif
+
+ifneq (,$(filter mbedtls_rsa,$(USEMODULE)))
+  USEMODULE += mbedtls_bignum
+  USEMODULE += mbedtls_oid
+endif
+
+ifneq (,$(filter mbedtls_sha256,$(USEMODULE)))
+  # we provide alternative implementation in sha256_alt.c
+  USEMODULE += mbedtls_sha256_alt
+endif
