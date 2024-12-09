@@ -209,6 +209,7 @@ Changes to this Governance and its supporting documents require the approval of 
 [draft-ietf-iotops-7228bis]: https://datatracker.ietf.org/doc/draft-ietf-iotops-7228bis/
 [contributing guidelines]: https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md
 [maintainers list]: https://doc.riot-os.org/maintainer-list.html
+[maintainers GitHub team]: https://github.com/orgs/RIOT-OS/teams/maintainers
 [managing a release]: https://github.com/RIOT-OS/RIOT/blob/master/doc/guides/managing-a-release/README.md
 [maintaining guidelines]: https://github.com/RIOT-OS/RIOT/blob/master/MAINTAINING.md
 [Code of Conduct]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
