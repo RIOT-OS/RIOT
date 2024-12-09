@@ -18,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     olimex-msp430-h2618 \
     samd10-xmini \
     stk3200 \
+    stm32c0116-dk \
     stm32f030f4-demo \
     stm32g0316-disco \
     telosb \
