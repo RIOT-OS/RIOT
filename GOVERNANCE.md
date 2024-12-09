@@ -1,7 +1,7 @@
 # Governance of the RIOT Community
 
 The RIOT community is dedicated to creating a free and open source operating system for the constrained Internet of Things [[RFC7228], [draft-ietf-iotops-7228bis]] based on open standards.
-This governance document explains how the project is run.
+This document explains the governance of the project.
 
 <!-- TOC start -->
 <!-- TOC start, TOC end comments are required to generate TOC in Doxygen properly -->
