@@ -83,6 +83,16 @@
  * The upstream network will be automatically chosen as the one that first
  * receives a router advertisement.
  *
+ * If only a single level of downstream routers exists and a sufficiently small
+ * upstream prefix is provided, we can skip the synchronisation and instead derive
+ * the *prefix* from the EUI of the downstream interface.
+ *
+ * e.g. given a prefix `fd12::/16` a router with a downstream interface with the
+ * layer 2 address `12:84:0C:87:1F:B7` would create the prefix `fd12:1284:c87:1fb7::/64`
+ * for the downstream network.
+ *
+ * To enable this behavior, chose the `gnrc_ipv6_auto_subnets_eui` module.
+ *
  * @{
  *
  * @file
@@ -90,6 +100,7 @@
  */
 
 #include "compiler_hints.h"
+#include "macros/utils.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
@@ -305,6 +316,39 @@ static void _init_sub_prefix(ipv6_addr_t *out,
     out->u8[bytes] |= idx << shift;
 }
 
+static uint8_t _init_sub_prefix_eui(ipv6_addr_t *out,
+                                    const ipv6_addr_t *prefix, uint8_t bits,
+                                    const uint8_t *eui, uint8_t eui_len)
+{
+    assert(eui_len <= sizeof(uint64_t));
+
+    /* If the EUI is too large, discard most significant bits as
+       those are typically manufacturer ID */
+    uint64_t mask = UINT64_MAX >> bits;
+
+    union {
+        uint64_t u64;
+        uint8_t u8[8];
+    } eui64 = {};
+    uint64_t pfx = byteorder_ntohll(prefix->u64[0]);
+
+    /* If EUI is small, we want to preserve leftover unused bits at the end */
+    uint8_t bits_total = bits + 8 * eui_len;
+    uint8_t shift = bits_total < 64
+                  ? 64 - bits_total
+                  : 0;
+
+    /* treat EUI as a EUI-64 with unused bytes set to 0 */
+    memcpy(&eui64.u8[sizeof(uint64_t) - eui_len], eui, eui_len);
+    eui64.u64 = ntohll(eui64.u64) & mask;
+
+    /* create downstream prefix from upstream prefix + masked EUI64 */
+    out->u64[0] = byteorder_htonll(pfx | (eui64.u64 << shift));
+
+    /* we don't create prefixes that longer than 64 bits */
+    return MIN(64, bits_total);
+}
+
 /* returns true if a new prefix was added, false if nothing changed */
 static bool _remove_old_prefix(gnrc_netif_t *netif,
                                const ipv6_addr_t *pfx, uint8_t pfx_len,
@@ -393,7 +437,19 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         }
 
         /* create subnet from upstream prefix */
-        _init_sub_prefix(&new_prefix, prefix, prefix_len, ++start_idx, subnet_len);
+        if (IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI)) {
+            uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
+            int hwaddr_len = netif_get_opt(&downstream->netif, NETOPT_ADDRESS, 0,
+                                           hwaddr, sizeof(hwaddr));
+            if (hwaddr_len <= 0) {
+                DEBUG("auto_subnets: can't get l2 address from netif %u\n", downstream->pid);
+                continue;
+            }
+            new_prefix_len = _init_sub_prefix_eui(&new_prefix, prefix, prefix_len, hwaddr, hwaddr_len);
+            new_prefix_len = MAX(new_prefix_len, CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN);
+        } else {
+            _init_sub_prefix(&new_prefix, prefix, prefix_len, ++start_idx, subnet_len);
+        }
 
         DEBUG("auto_subnets: configure prefix %s/%u on %u\n",
               ipv6_addr_to_str(addr_str, &new_prefix, sizeof(addr_str)),
@@ -462,6 +518,7 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
     /* if we are the only router on this bus, we can directly choose a prefix */
     _configure_subnets(subnets, 0, upstream, pio, src);
 #else
+    (void)src;
 
     /* store PIO information for later use */
     if (!_store_pio(pio)) {
