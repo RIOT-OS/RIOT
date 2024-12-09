@@ -185,7 +185,7 @@ The agenda for the VMA is collected before the assembly but may be bashed at the
 
 The Weekly Coordinational Meeting is a closed meeting among maintainers.
 It usually serves as a small communal get-together of maintainers on a regular basis.
-Smaller maintainence decisions are made during these meetings, but also short term admistrative tasks are discussed.
+Smaller maintenance decisions are made during these meetings, but also short term admistrative tasks are discussed.
 The Weekly Coordinational Meeting usually takes place every Friday at 10:00 in a virtual space, such as a video conference.
 A maintainer that feels responsible for it shares the link to the meeting as well as a proposed agenda, which may be amended by other maintainers, usually a day in advance.
 
