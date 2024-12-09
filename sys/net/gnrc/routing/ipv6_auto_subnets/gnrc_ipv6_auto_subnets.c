@@ -83,6 +83,16 @@
  * The upstream network will be automatically chosen as the one that first
  * receives a router advertisement.
  *
+ * If only a single level of downstream routers exists and a sufficiently small
+ * upstream prefix is provided, we can skip the synchronisation and instead derive
+ * the *prefix* from the EUI of the downstream interface.
+ *
+ * e.g. given a prefix `fd12::/16` a router with a downstream interface with the
+ * layer 2 address `12:84:0C:87:1F:B7` would create the prefix `fd12:1284:c87:1fb7::/64`
+ * for the downstream network.
+ *
+ * To enable this behavior, chose the `gnrc_ipv6_auto_subnets_eui` module.
+ *
  * @{
  *
  * @file
@@ -99,6 +109,12 @@
 #include "net/gnrc/rpl.h"
 #include "random.h"
 #include "xtimer.h"
+
+/* If we derive the subnet from the interface's EUI, we have to use all
+   available prefix bits to ensure uniqueness */
+#if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI)
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN (64)
+#endif
 
 /**
  * @brief Port for the custom UDP sync protocol
@@ -305,6 +321,40 @@ static void _init_sub_prefix(ipv6_addr_t *out,
     out->u8[bytes] |= idx << shift;
 }
 
+static void _init_sub_prefix_uid(ipv6_addr_t *out,
+                                 const ipv6_addr_t *prefix, uint8_t bits,
+                                 const uint8_t *uid, uint8_t uid_len)
+{
+    uint8_t out_bytes = 64 / 8;
+    uint8_t bytes = (bits + 7) / 8;
+    uint8_t rem   = bits % 8;
+
+    /* first copy old prefix */
+    memset(out, 0, sizeof(*out));
+    ipv6_addr_init_prefix(out, prefix, bits);
+
+    /* If the UID does not fit, truncate it */
+    if (uid_len > out_bytes - bytes) {
+        /* we can use some bits of the first byte */
+        if (rem) {
+            --bytes;
+        }
+
+        /* calculate by how many bytes the UID is too large */
+        uint8_t uid_overhang = uid_len - (out_bytes - bytes);
+        uid += uid_overhang;
+        uid_len -= uid_overhang;
+
+        if (rem) {
+            uint8_t mask = 0xff >> rem;
+            out->u8[bytes++] |= *uid++ & mask;
+            --uid_len;
+        }
+    }
+
+    memcpy(&out->u8[bytes], uid, uid_len);
+}
+
 /* returns true if a new prefix was added, false if nothing changed */
 static bool _remove_old_prefix(gnrc_netif_t *netif,
                                const ipv6_addr_t *pfx, uint8_t pfx_len,
@@ -393,7 +443,18 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         }
 
         /* create subnet from upstream prefix */
-        _init_sub_prefix(&new_prefix, prefix, prefix_len, ++start_idx, subnet_len);
+        if (IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI)) {
+            uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
+            int res = netif_get_opt(&downstream->netif, NETOPT_ADDRESS, 0,
+                                    hwaddr, sizeof(hwaddr));
+            if (res <= 0) {
+                DEBUG("auto_subnets: can't get l2 address from netif %u\n", downstream->pid);
+                continue;
+            }
+            _init_sub_prefix_uid(&new_prefix, prefix, prefix_len, hwaddr, res);
+        } else {
+            _init_sub_prefix(&new_prefix, prefix, prefix_len, ++start_idx, subnet_len);
+        }
 
         DEBUG("auto_subnets: configure prefix %s/%u on %u\n",
               ipv6_addr_to_str(addr_str, &new_prefix, sizeof(addr_str)),
