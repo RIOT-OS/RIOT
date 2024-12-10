@@ -868,6 +868,10 @@ INPUT                  = ../../doc.txt \
                          src/vision.md \
                          src/community-processes.md \
                          src/roadmap.md \
+                         src/coc-info.md \
+                         src/coc.md \
+                         src/coc-reporting-guide.md \
+                         src/coc-faq.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
                          src/porting-boards.md \
