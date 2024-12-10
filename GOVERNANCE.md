@@ -114,7 +114,7 @@ They have more access rights to the RIOT repositories, such as granting access t
 Release managers might need to contact GitHub admins to configure the branch protection rules for the release branch.
 Beyond those technical duties and access rights, they do not have any special rights among maintainers.
 They are picked by the maintainers, usually based on seniority.
-The maintainers try to take care to spread the admin responsibility over several organizations within the maintainer body.
+The maintainers try to take care to spread the admin responsibility over several project stakeholders within the maintainer body.
 
 There are also admins on the other RIOT discussion platforms. Beyond technical administrative duties they do not have any special rights.
 These admins usually are appointed or self-appointed on merit, i.e., whoever sets up the platform usually is (one of) its admin(s).
@@ -193,7 +193,7 @@ A maintainer that feels responsible for it shares the link to the meeting as wel
 ## Code of Conduct
 
 [Code of Conduct] violations by community members will be discussed and resolved on the conduct@riot-os.org list.
-If one of the appointees to that list (see GA notes for the members of that list) is involved in a Code of Conduct violation, two forum moderators from other organizations than the appointee take their place in the discussions.
+If one of the appointees to that list (see GA notes for the members of that list) is involved in a Code of Conduct violation, two forum moderators from other stakeholders than the appointee take their place in the discussions.
 
 ## Security Response Team
 
@@ -203,7 +203,7 @@ The Security Response Team is responsible for handling all reports of security h
 
 ## Modifying this Charter
 
-Changes to this Governance and its supporting documents require the approval of at least four maintainers who all must be employed by or associated with different organizations.
+Changes to this Governance and its supporting documents require the approval of at least four maintainers who all must be employed by or associated with different stakeholders.
 
 [RFC7228]: https://datatracker.ietf.org/doc/html/rfc7228
 [draft-ietf-iotops-7228bis]: https://datatracker.ietf.org/doc/draft-ietf-iotops-7228bis/
