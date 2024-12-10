@@ -140,7 +140,11 @@ typedef struct eth_dma_desc {
  * | `0b10` | Calculate and insert IPv4 checksum, insert pre-calculated payload checksum    |
  * | `0b11  | Calculated and insert both IPv4 and payload checksum                          |
  */
-#define TX_DESC_STAT_CIC        (BIT22 | BIT23)
+#define TX_DESC_STAT_CIC                    (BIT22 | BIT23)
+#define TX_DESC_STAT_CIC_NO_HW_CHECKSUM     (0)             /**< Do not compute checksums in hardware */
+#define TX_DESC_STAT_CIC_HW_CHECKSUM_IPV4   (BIT22)         /**< Compute the IPv4 header checksum in hardware */
+#define TX_DESC_STAT_CIC_HW_CHECKSUM_BOTH   (BIT22 | BIT32) /**< Compute the IPv4 header and payload checksum in hardware */
+
 #define TX_DESC_STAT_TTSE       (BIT25) /**< If set, an PTP timestamp is added to the descriptor after TX completed */
 #define TX_DESC_STAT_FS         (BIT28) /**< If set, buffer contains first segment of frame to transmit */
 #define TX_DESC_STAT_LS         (BIT29) /**< If set, buffer contains last segment of frame to transmit */
