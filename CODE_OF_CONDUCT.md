@@ -22,7 +22,7 @@ affect a person's ability to participate within them.
 
 If you believe someone is violating the code of conduct, we ask that you report
 it by emailing <conduct@riot-os.org>. For more details please see our [Reporting
-Guidelines](https://github.com/RIOT-OS/RIOT/wiki/CoC:-Reporting-Guidelines).
+Guidelines](https://doc.riot-os.org/coc-reporting-guide.html).
 
 -   **Be friendly and patient.**
 -   **Be welcoming.** We strive to be a community that welcomes and supports
@@ -74,5 +74,5 @@ community](https://www.djangoproject.com/conduct/).
 Questions?
 ----------
 
-If you have questions, please see [the FAQ](https://github.com/RIOT-OS/RIOT/wiki/CoC:-FAQ).
+If you have questions, please see [the FAQ](https://doc.riot-os.org/coc-faq.html).
 If that doesn't answer your questions, feel free to [contact us](mailto:conduct@riot-os.org).
