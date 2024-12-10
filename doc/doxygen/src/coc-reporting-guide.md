@@ -2,8 +2,8 @@
 
 If you believe someone is violating the [code of conduct][CoC] we ask that you
 report it to us by emailing <conduct@riot-os.org>. Currently, the recipients of
-this email address are [@OlegHahm](https://github.com/OlegHahm) (Oleg Hahm) and
-[@miri64](https://github.com/miri64) (Martine Lenders).
+this email address are [\@OlegHahm](https://github.com/OlegHahm) (Oleg Hahm) and
+[\@miri64](https://github.com/miri64) (Martine Lenders).
 
 **All reports will be kept confidential.** In some cases we may determine that a
 public statement will need to be made. If that's the case, the identities of all
