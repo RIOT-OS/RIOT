@@ -1,5 +1,10 @@
-ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
+DEFAULT_MODULE += auto_init_mbedtls
+
+ifneq (,$(filter mbedtls_%,$(USEMODULE)))
   USEMODULE += mbedtls_contrib
+endif
+
+ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
   USEMODULE += hashes
 
   FEATURES_REQUIRED_ANY += periph_adc|periph_hwrng
@@ -18,4 +23,23 @@ ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
   ifneq (,$(filter mbedtls_entropy_source_adc,$(USEMODULE) $(DEFAULT_MODULE)))
     USEMODULE += entropy_source_adc_noise
   endif
+endif
+
+ifneq (,$(filter mbedtls_crypto,$(USEMODULE)))
+  include $(RIOTPKG)/mbedtls/contrib/crypto/Makefile.dep
+endif
+ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
+  include $(RIOTPKG)/mbedtls/contrib/entropy/Makefile.dep
+endif
+ifneq (,$(filter mbedtls_random,$(USEMODULE)))
+  include $(RIOTPKG)/mbedtls/contrib/random/Makefile.dep
+endif
+ifneq (,$(filter mbedtls_ssl,$(USEMODULE)))
+  include $(RIOTPKG)/mbedtls/contrib/ssl/Makefile.dep
+endif
+ifneq (,$(filter mbedtls_threading,$(USEMODULE)))
+  include $(RIOTPKG)/mbedtls/contrib/threading/Makefile.dep
+endif
+ifneq (,$(filter mbedtls_x509,$(USEMODULE)))
+  include $(RIOTPKG)/mbedtls/contrib/x509/Makefile.dep
 endif
