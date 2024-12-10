@@ -156,8 +156,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     prep();
 
     /* mask and set resolution, conversion channel and single read */
-    ADC1->CR1 &= ~ADC_CR1_RES_Msk;
-    ADC1->CR1 |= res & ADC_CR1_RES;
+    ADC1->CR1 = (ADC1->CR1 & ~ADC_CR1_RES_Msk) | (res & ADC_CR1_RES);
     ADC1->SQR1 &= ~ADC_SQR1_L;
     ADC1->SQR5 = adc_config[line].chan;
 
