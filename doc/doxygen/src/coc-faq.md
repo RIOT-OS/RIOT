@@ -42,7 +42,7 @@ participate within them.
 Our intent is that anyone in the community can stand up for this code, and
 direct people who're unaware to this document. If that doesn't work, or if you
 need more help, you can contact <conduct@riot-os.org>. For more details please see
-our [[Reporting Guidelines|CoC: Reporting Guidelines]].
+our [Reporting Guidelines](@ref coc-reporting-guide).
 
 ### Why do we need a Code of Conduct? Everyone knows not to be a jerk.
 
@@ -69,4 +69,4 @@ honor this Code of Conduct in our spaces.
 This FAQ was adapted from the [Django Code of Conduct FAQ](https://www.djangoproject.com/conduct/faq/)
 
 [CoC-question-mail]: mailto:riot@riot-os.org
-[CoC]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
+[CoC]: @ref coc

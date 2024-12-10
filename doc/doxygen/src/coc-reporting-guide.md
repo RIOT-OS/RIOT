@@ -77,4 +77,4 @@ guarantee we'll act on it.
 #### Reference
 These reporting guidelines were adapted from the [Django reporting guidelines](https://www.djangoproject.com/conduct/reporting/)
 
-[CoC]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
+[CoC]: @ref coc
