@@ -1052,11 +1052,22 @@ void auto_init_nanocoap_server(void)
     nanocoap_server_start(&local);
 }
 
-void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
-                                    coap_pkt_t *pkt, const coap_request_ctx_t *req)
+int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
+                                     coap_pkt_t *pkt, const coap_request_ctx_t *req)
 {
-    ctx->tkl = coap_get_token_len(pkt);
-    memcpy(ctx->token, coap_get_token(pkt), ctx->tkl);
+    size_t tkl = coap_get_token_len(pkt);
+    if (tkl > sizeof(ctx->token)) {
+        DEBUG_PUTS("nanocoap: token too long for separate response ctx");
+        /* Legacy code may not check the return value. To still have somewhat
+         * sane behavior, we ask for no response for any response class.
+         * Getting no reply is certainly not ideal, but better than one without
+         * a matching token. */
+        memset(ctx, 0, sizeof(*ctx));
+        ctx->no_response = 0xff;
+        return -EOVERFLOW;
+    }
+    ctx->tkl = tkl;
+    memcpy(ctx->token, coap_get_token(pkt), tkl);
     memcpy(&ctx->remote, req->remote, sizeof(ctx->remote));
 #ifdef MODULE_SOCK_AUX_LOCAL
     assert(req->local);
@@ -1065,6 +1076,8 @@ void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
     uint32_t no_response = 0;
     coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response);
     ctx->no_response = no_response;
+
+    return 0;
 }
 
 int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
