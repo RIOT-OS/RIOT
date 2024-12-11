@@ -377,21 +377,27 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
 
     switch (submac->fsm_state) {
     case IEEE802154_FSM_STATE_RX:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_RX + %s\n", str_ev[ev]);
         new_state = _fsm_state_rx(submac, ev);
         break;
     case IEEE802154_FSM_STATE_IDLE:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_IDLE + %s\n", str_ev[ev]);
         new_state = _fsm_state_idle(submac, ev);
         break;
     case IEEE802154_FSM_STATE_PREPARE:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_PREPARE + %s\n", str_ev[ev]);
         new_state = _fsm_state_prepare(submac, ev);
         break;
     case IEEE802154_FSM_STATE_TX:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_TX + %s\n", str_ev[ev]);
         new_state = _fsm_state_tx(submac, ev);
         break;
     case IEEE802154_FSM_STATE_WAIT_FOR_ACK:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_WAIT_FOR_ACK + %s\n", str_ev[ev]);
         new_state = _fsm_state_wait_for_ack(submac, ev);
         break;
     default:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): INVALID STATE\n");
         new_state = IEEE802154_FSM_STATE_INVALID;
     }
 
@@ -408,6 +414,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     ieee802154_fsm_state_t current_state = submac->fsm_state;
 
     if (current_state != IEEE802154_FSM_STATE_RX && current_state != IEEE802154_FSM_STATE_IDLE) {
+        DEBUG("IEEE802154 submac: ieee802154_send(): Sending aborted, current state is %s\n", str_states[current_state]);
         return -EBUSY;
     }
 
@@ -809,6 +816,8 @@ int ieee802154_set_rx(ieee802154_submac_t *submac)
         }
         break;
     default:
+        DEBUG("IEEE802154 submac: ieee802154_set_rx(): Setting RX failed, currently in %s\n",
+              str_states[current_state]);
         break;
     }
 
