@@ -354,7 +354,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 }
 
 static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t *upstream,
-                               const ndp_opt_pi_t *pio)
+                               const ndp_opt_pi_t *pio, const ipv6_addr_t *src)
 {
     gnrc_netif_t *downstream = NULL;
     gnrc_pktsnip_t *ext_opts = NULL;
@@ -429,13 +429,14 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
 
     /* immediately send an RA with RIO */
     if (ext_opts) {
-        gnrc_ndp_rtr_adv_send(upstream, NULL, NULL, true, ext_opts);
+        gnrc_ndp_rtr_adv_send(upstream, NULL, src, true, ext_opts);
     } else {
         DEBUG("auto_subnets: Options empty, not sending RA\n");
     }
 }
 
-void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pio)
+void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pio,
+                                  const ipv6_addr_t *src)
 {
     /* create a subnet for each downstream interface */
     unsigned subnets = gnrc_netif_numof() - 1;
@@ -454,8 +455,12 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
     }
 
 #if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
+    /* 'don't broadcast RA if we are a 6lo node - unicast allows l2 retransmissions */
+    if (!gnrc_netif_is_6ln(upstream)) {
+        src = NULL;
+    }
     /* if we are the only router on this bus, we can directly choose a prefix */
-    _configure_subnets(subnets, 0, upstream, pio);
+    _configure_subnets(subnets, 0, upstream, pio, src);
 #else
 
     /* store PIO information for later use */
@@ -628,7 +633,7 @@ static void _process_pio_cache(uint8_t subnets, uint8_t idx_start, gnrc_netif_t 
         }
 
         /* use PIO for prefix configuration */
-        _configure_subnets(subnets, idx_start, upstream, &_pio_cache[i]);
+        _configure_subnets(subnets, idx_start, upstream, &_pio_cache[i], NULL);
 
         /* invalidate entry */
         _pio_cache[i].len = 0;

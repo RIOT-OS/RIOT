@@ -849,8 +849,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 /* notify optional PIO consumer */
                 if (IS_USED(MODULE_GNRC_IPV6_NIB_RTR_ADV_PIO_CB)) {
                     extern void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *netif,
-                                                             const ndp_opt_pi_t *pio);
-                    gnrc_ipv6_nib_rtr_adv_pio_cb(netif, (ndp_opt_pi_t *)opt);
+                                                             const ndp_opt_pi_t *pio,
+                                                             const ipv6_addr_t *src);
+                    gnrc_ipv6_nib_rtr_adv_pio_cb(netif, (ndp_opt_pi_t *)opt, &ipv6->src);
                 }
                 break;
             }
