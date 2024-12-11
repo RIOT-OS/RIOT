@@ -197,6 +197,7 @@ struct ieee802154_submac {
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
     uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
+    uint16_t sifs_period_us;            /**< SIFS period in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
     uint8_t channel_page;               /**< IEEE 802.15.4 channel page */
