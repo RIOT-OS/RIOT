@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fmt.h"
 #include "net/coap.h"
 #include "net/gnrc/netif.h"
 #include "net/nanocoap.h"

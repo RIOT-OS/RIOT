@@ -15,6 +15,7 @@ USEMODULE += gnrc_ipv6_default
 
 USEMODULE += nanocoap_sock
 USEMODULE += nanocoap_resources
+USEMODULE += fmt # scn_buf_hex() for shell cmd client_token
 
 # boards where basic nanocoap functionality fits, but no VFS
 LOW_MEMORY_BOARDS := \

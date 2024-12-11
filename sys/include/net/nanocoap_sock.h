@@ -249,9 +249,15 @@ typedef struct {
  * @param[out]  ctx     Context information for separate response
  * @param[in]   pkt     CoAP packet to which the response will be generated
  * @param[in]   req     Context of the CoAP request
+ *
+ * @retval  0           Success
+ * @retval  -EOVERFLOW  Storing context would have overflown buffers in @p ctx
+ *                      (e.g. RFC 8974 (module `nanocoap_token_ext`) is in
+ *                      use and token too long)
+ * @retval  <0          Other error
  */
-void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
-                                      coap_pkt_t *pkt, const coap_request_ctx_t *req);
+int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
+                                     coap_pkt_t *pkt, const coap_request_ctx_t *req);
 
 /**
  * @brief   Send a separate response to a CoAP request
