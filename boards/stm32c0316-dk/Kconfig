@@ -1,0 +1,14 @@
+# Copyright (c) 2024 BISSELL Homecare, Inc.
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "stm32c0316-dk" if BOARD_STM32C0316_DK
+
+config  BOARD_STM32C0316_DK
+    bool
+    default y
+    select CPU_MODEL_STM32C031C6
