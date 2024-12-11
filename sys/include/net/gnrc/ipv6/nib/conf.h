@@ -141,7 +141,7 @@ extern "C" {
  * @brief   activate authoritative border router functionality at interface start-up
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ABR
-#define CONFIG_GNRC_IPV6_NIB_ABR                    CONFIG_GNRC_IPV6_NIB_6LBR
+#  define CONFIG_GNRC_IPV6_NIB_ABR                  CONFIG_GNRC_IPV6_NIB_6LBR
 #endif
 
 /**
@@ -237,6 +237,13 @@ extern "C" {
 #  else
 #    define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C         0
 #  endif
+#endif
+
+/**
+ * @brief   Start sending RAs when a RA has been received
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C_AUTO_ADV
+#  define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C_AUTO_ADV CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C
 #endif
 
 /**

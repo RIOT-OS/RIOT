@@ -933,7 +933,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
-        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)) {
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C_AUTO_ADV)) {
             _set_rtr_adv(netif);
         }
         /* but re-fetch information from router in time */
