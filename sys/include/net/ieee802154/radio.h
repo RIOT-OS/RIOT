@@ -466,6 +466,27 @@ typedef struct {
 } ieee802154_phy_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4 OQPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_oqpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 BPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_bpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 ASK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_ask_conf_t;
+
+/**
  * @brief extension for IEEE 802.15.4g MR-OQPSK PHY
  */
 typedef struct {
