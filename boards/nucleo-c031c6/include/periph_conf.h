@@ -73,7 +73,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin     = GPIO_PIN(PORT_B, 6),
         .rx_af      = GPIO_AF0,
         .tx_af      = GPIO_AF0,
-        .bus        = APB12, //?
+        .bus        = APB12,
         .irqn       = USART1_IRQn,
     },
 };
@@ -103,9 +103,6 @@ static const uart_conf_t uart_config[] = {
  * For Nucleo-C031C6 this information is in board manual,
  * Table 11, page 20.
  *
- * STM32C031C6 do not have internal channel for VBAT, more details provided
- * in the MCU datasheet - section 3.14, page 20.
- *
  * @{
  */
 static const adc_conf_t adc_config[] = {
@@ -124,7 +121,7 @@ static const adc_conf_t adc_config[] = {
  * @name    PWM configuration
  * @{
  *
- * To find appriopate device and channel find in the MCU datasheet table
+ * To find appropriate device and channel find in the MCU datasheet table
  * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y],
  * where:
  * TIM[X] - is device,
