@@ -18,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     microbit \
     nrf51dongle \
     nucleo-c031c6 \
+    nucleo-c071rb \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
