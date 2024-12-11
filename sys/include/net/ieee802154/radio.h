@@ -460,13 +460,34 @@ typedef struct {
 } ieee802154_phy_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4 OQPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_oqpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 BPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_bpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 ASK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_ask_conf_t;
+
+/**
  * @brief extension for IEEE 802.15.4g MR-OQPSK PHY
  */
 typedef struct {
     ieee802154_phy_conf_t super;        /**< common settings */
     ieee802154_mr_oqpsk_chips_t chips;  /**< chip rate       */
     uint8_t rate_mode;                  /**< rate mode       */
-} ieee802154_mr_oqpks_conf_t;
+} ieee802154_mr_oqpsk_conf_t;
 
 /**
  * @brief extension for IEEE 802.15.4g MR-ODFM PHY
@@ -475,7 +496,7 @@ typedef struct {
     ieee802154_phy_conf_t super;        /**< common settings */
     uint8_t option;                     /**< OFDM Option */
     uint8_t scheme;                     /**< Modulation & Coding Scheme */
-} ieee802154_mr_odmf_conf_t;
+} ieee802154_mr_ofdm_conf_t;
 
 /**
  * @brief extension for IEEE 802.15.4g MR-FSK PHY
