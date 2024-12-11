@@ -679,7 +679,10 @@ static void _poweroff(dose_t *ctx, dose_state_t sleep_state)
         return;
     }
 
-    wait_for_state(ctx, DOSE_STATE_IDLE);
+    /* allow powering off without a state transition */
+    if (ctx->state != DOSE_STATE_IDLE) {
+        wait_for_state(ctx, DOSE_STATE_IDLE);
+    }
 
     if (gpio_is_valid(ctx->standby_pin)) {
         gpio_set(ctx->standby_pin);
