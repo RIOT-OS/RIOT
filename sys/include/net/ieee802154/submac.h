@@ -195,7 +195,7 @@ struct ieee802154_submac {
     const ieee802154_submac_cb_t *cb;   /**< pointer to the SubMAC callbacks */
     ieee802154_csma_be_t be;            /**< CSMA-CA backoff exponent params */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
-    uint16_t ack_timeout_us;            /**< ACK timeout in µs */
+    uint32_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
     uint16_t sifs_period_us;            /**< SIFS period in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
@@ -313,7 +313,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  * @brief Set IEEE 802.15.4 PHY configuration (channel, TX power)
  *
  * @param[in] submac pointer to the SubMAC descriptor
- * @param[in] conf   pointer to the PHY configuration
+ * @param[in,out] conf   pointer to the PHY configuration
  *
  * @return 0 on success
  * @return -ENOTSUP if the PHY settings are not supported
@@ -322,7 +322,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  *         @ref ieee802154_submac_cb_t::tx_done
  * @return negative errno on error
  */
-int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_conf_t *conf);
+int ieee802154_set_phy_conf(ieee802154_submac_t *submac, ieee802154_phy_conf_t *conf);
 
 /**
  * @brief Set IEEE 802.15.4 channel number
@@ -342,7 +342,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
 static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
                                                 uint16_t channel_num)
 {
-    const ieee802154_phy_conf_t conf = {
+    ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_NO_OP,
         .channel = channel_num,
         .page = submac->channel_page,
@@ -370,7 +370,7 @@ static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
 static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
                                               uint16_t channel_page)
 {
-    const ieee802154_phy_conf_t conf = {
+    ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_NO_OP,
         .channel = submac->channel_num,
         .page = channel_page,
@@ -398,7 +398,7 @@ static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
 static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
                                           int8_t tx_pow)
 {
-    const ieee802154_phy_conf_t conf = {
+    ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_NO_OP,
         .channel = submac->channel_num,
         .page = submac->channel_page,
