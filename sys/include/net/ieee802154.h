@@ -120,6 +120,77 @@ extern "C" {
 #define IEEE802154_ACK_TIMEOUT_SYMS     (54)
 
 /**
+ * @name    Time in µs per symbol for different OQPSK PHYs depending on frequency band
+ *
+ * @see IEEE 802.15.4-2020, Section 12. O-QPSK PHY
+ *
+ * 8 symbols == 4 octets => 1 symbol == 4 bits
+ * 2450MHz, 915MHz, 780MHz, 2380MHz: 250 kb/s ==> 62.5 ksymbol/s ==> 16 us/symbol
+ * 868MHz: 100 kb/s ==> 25 ksymbol/s ==> 40 us/symbol
+ * @{
+ */
+/**
+ * @brief Symbol time for IEEE 802.15.4 868MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_868_SYMBOL_TIME_US     (40)
+/**
+ * @brief Symbol time for IEEE 802.15.4 2450MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_2450_SYMBOL_TIME_US    (16)
+/**
+ * @brief Symbol time for IEEE 802.15.4 2380MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_2380_SYMBOL_TIME_US    (16)
+/**
+ * @brief Symbol time for IEEE 802.15.4 915MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_915_SYMBOL_TIME_US     (16)
+/**
+ * @brief Symbol time for IEEE 802.15.4 780MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_780_SYMBOL_TIME_US     (16)
+/** @} */
+
+/**
+ * @name    Time in µs per symbol for different BPSK PHYs depending on frequency band
+ *
+ * @see IEEE 802.15.4-2020, Section 13. Binary phase-shift keying (BPSK) PHY
+ *
+ * 32 symbols == 4 octets => 1 symbol = 1 bit
+ * 868 MHz: 20kb/s ==> 50us/symbol
+ * 915 MHz: 40kb/s ==> 25us/symbol
+ * @{
+ */
+/**
+ * @brief Symbol time for IEEE 802.15.4 BPSK PHY in µs
+ */
+#define IEEE802154_BPSK_868_SYMBOL_TIME_US       (50)
+/**
+ * @brief Symbol time for IEEE 802.15.4 BPSK PHY in µs
+ */
+#define IEEE802154_BPSK_915_SYMBOL_TIME_US       (25)
+/** @} */
+
+/**
+ * @name    Time in µs per symbol for different ASK PHYs depending on frequency band
+ *
+ * @see IEEE 802.15.4-2015, Section 14. Amplitude shift keying (ASK) PHY
+ *
+ * 868 MHz: 250 kb/s ==> 12.5 ksymbol/s ==> 80 us/symbol
+ * 915 MHz: 250 kb/s ==> 50 ksymbols/s ==> 20 us/symbol
+ * @{
+ */
+/**
+ * @brief Symbol time for IEEE 802.15.4 ASK 868MHz PHY in µs
+ */
+#define IEEE802154_ASK_868_SYMBOL_TIME_US        (80)
+/**
+ * @brief Symbol time for IEEE 802.15.4 ASK 915MHz PHY in µs
+ */
+#define IEEE802154_ASK_915_SYMBOL_TIME_US        (20)
+/** @} */
+
+/**
  * @brief Symbol time for IEEE 802.15.4 MR-OFDM in µs
  */
 #define IEEE802154_MR_OFDM_SYMBOL_TIME_US   (120)
@@ -188,6 +259,15 @@ extern "C" {
  * [1] all but MR-O-QPSK
  */
 #define IEEE802154_CCA_DURATION_IN_SYMBOLS      (8)
+
+/**
+ * IEEE Std 802.15.4-2020
+ * Table 8-93—MAC sublayer constants: For all PHYs except SUN PHYs
+ * operating in the 920 MHz band, aTurnaroundTime + aCcaTime.
+ * For SUN PHYs operating in the 920 MHz band, aTurnaround-Time + phyCcaDuration.
+ */
+#define IEEE802154_AUNITBACKOFF_PERIOD_IN_SYMBOLS   (IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS + \
+                                                     IEEE802154_CCA_DURATION_IN_SYMBOLS)
 
 /**
  * @brief   802.15.4 PHY modes
