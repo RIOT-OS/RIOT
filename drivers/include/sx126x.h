@@ -25,9 +25,11 @@
 #include_next "sx126x.h"
 
 #include "net/netdev.h"
+#include "net/ieee802154/radio.h"
 
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -168,16 +170,33 @@ typedef struct {
  */
 struct sx126x {
     netdev_t netdev;                        /**< Netdev parent struct */
-    sx126x_params_t *params;                /**< Initialization parameters */
+    const sx126x_params_t *params;          /**< Initialization parameters */
     sx126x_pkt_params_lora_t pkt_params;    /**< Lora packet parameters */
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
-    uint16_t rx_timeout;                    /**< Rx Timeout in terms of symbols */
+    int32_t rx_timeout;                     /**< Rx Timeout in terms of symbols:
+                                                 <0: continuous Rx,
+                                                  0: single Rx,
+                                                 >0: actual timeout */
     bool radio_sleep;                       /**< Radio sleep status */
+#if IS_USED(MODULE_SX126X_IEEE802154)
+    sx126x_cad_params_t cad_params;         /**< Radio Channel Activity Detection parameters */
+    bool cad_detected   : 1;                /**< Channel Activity Detected Flag */
+    bool cad_done       : 1;                /**< Channel Activity Detection Done Flag */
+    bool ack_filter     : 1;                /**< whether the ACK filter is activated or not */
+    bool promisc        : 1;                /**< whether the device is in promiscuous mode or not */
+    bool pending        : 1;                /**< whether there pending bit should be set in the ACK frame or not */
+    sx126x_state_t state;
+    uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];   /**< Short (2 bytes) device address */
+    uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];     /**< Long (8 bytes) device address */
+    uint16_t pan_id;                                    /**< PAN ID */
+#endif
+    void (*event_cb)(void *arg);            /**< IRQ event callback */
+    void *event_arg;                        /**< IRQ event argument */
 };
 
 /**
- * @brief   Setup the radio device
+ * @brief   Setup the radio device for LoRA mode
  *
  * @param[in] dev                       Device descriptor
  * @param[in] params                    Parameters for device initialization
@@ -185,6 +204,20 @@ struct sx126x {
  *                                      If initialized manually, pass a unique identifier instead.
  */
 void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index);
+
+/**
+ * @brief   Setup the radio device for IEEE 802.15.4 HAL layer
+ *
+ * @param[in] dev                       Device descriptor
+ * @param[in] params                    Parameters for device initialization
+ * @param[in] index                     Index of @p params in a global parameter struct array.
+ *                                      If initialized manually, pass a unique identifier instead.
+ * @param[in] hal                       IEEE 802.15.4 HAL layer
+ * @param[in] event_cb                  Event callback function
+ * @param[in] arg                       Event callback argument
+ */
+void sx126x_hal_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index,
+                      ieee802154_dev_t *hal, void (*event_cb)(void *arg), void *arg);
 
 /**
  * @brief   Initialize the given device
@@ -364,6 +397,25 @@ bool sx126x_get_lora_iq_invert(const sx126x_t *dev);
  * @param[in] iq_invert                The LoRa IQ inverted mode
  */
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
+
+/**
+ * @brief   Calculate the time on air in µs for 1 symbol
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ *
+ * @return the time on air in µs for 1 symbol
+ */
+uint32_t sx126x_symbol_time_on_air_us(const sx126x_t *dev);
+
+/**
+ * @brief   Calculate the time on air in µs for a given payload length
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ * @param[in] payload_len              The payload length of a frame to be sent
+ *
+ * @return the time on air in µs of a frame with the given payload length
+ */
+uint32_t sx126x_time_on_air_us(const sx126x_t *dev, uint16_t payload_len);
 
 #ifdef __cplusplus
 }
