@@ -19,14 +19,16 @@
  */
 
 #include <assert.h>
-#include <stdarg.h>
+#include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "kernel_defines.h"
+#include "container.h"
 #include "fmt.h"
+#include "modules.h"
 
 extern ssize_t stdio_write(const void* buffer, size_t len);
 
@@ -510,6 +512,59 @@ uint32_t scn_u32_hex(const char *str, size_t n)
 
     }
     return res;
+}
+
+static bool _get_nibble(uint8_t *dest, char _c)
+{
+    uint8_t c = _c;
+    if (((uint8_t)'0' <= c) && (c <= (uint8_t)'9')) {
+        *dest = c - (uint8_t)'0';
+        return true;
+    }
+
+    if (((uint8_t)'a' <= c) && (c <= (uint8_t)'f')) {
+        *dest = c - (uint8_t)'a' + 10;
+        return true;
+    }
+
+    if (((uint8_t)'A' <= c) && (c <= (uint8_t)'F')) {
+        *dest = c - (uint8_t)'A' + 10;
+        return true;
+    }
+
+    return false;
+}
+
+ssize_t scn_buf_hex(void *_dest, size_t dest_len, const char *hex, size_t hex_len)
+{
+    uint8_t *dest = _dest;
+    assert((dest != NULL) || (dest_len == 0));
+    assert((hex != NULL) || (hex_len == 0));
+
+    if (hex_len & 1) {
+        /* we need to chars per every byte, so odd inputs don't work */
+        return -EINVAL;
+    }
+
+    size_t len = hex_len >> 1;
+    if (len > dest_len) {
+        return -EOVERFLOW;
+    }
+
+    for (size_t pos = 0; pos < len; pos++) {
+        uint8_t high, low;
+        if (!_get_nibble(&high, hex[pos << 1])) {
+            return -EINVAL;
+        }
+
+        if (!_get_nibble(&low, hex[(pos << 1) + 1])) {
+            return -EINVAL;
+        }
+
+        dest[pos] = (high << 4) | low;
+    }
+
+    return len;
 }
 
 /* native gets special treatment as native's stdio code is ... special.

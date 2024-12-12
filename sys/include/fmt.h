@@ -41,8 +41,9 @@
 #ifndef FMT_H
 #define FMT_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -426,6 +427,33 @@ uint32_t scn_u32_dec(const char *str, size_t n);
  * @return  converted uint32_t value
  */
 uint32_t scn_u32_hex(const char *str, size_t n);
+
+/**
+ * @brief   Convert a hex to binary
+ *
+ * @param[out]  dest        Destination buffer to write to
+ * @param[in]   dest_len    Size of @p dest in bytes
+ * @param[in]   hex         Hex string to convert
+ * @param[in]   hex_len     Length of @p hex in bytes
+ *
+ * @return  Number of bytes written
+ * @retval  -EINVAL     @p hex_len is odd or @p hex contains non-hex chars
+ * @retval  -EOVERFLOW  Destination to small
+ *
+ * @pre     If @p dest_len is > 0, @p dest is not a null pointer
+ * @pre     If @p hex_len is > 0, @p hex is not a null pointer
+ *
+ * Examples
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * const char *hex = "deadbeef";
+ * uint8_t binary[sizeof(hex) / 2];
+ * ssize_t len = scn_buf_hex(binary, sizeof(binary), hex, strlen(hex));
+ * if (len >= 0) {
+ *     make_use_of(binary, len);
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+ssize_t scn_buf_hex(void *dest, size_t dest_len, const char *hex, size_t hex_len);
 
 /**
  * @brief Print string to stdout
