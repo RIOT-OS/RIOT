@@ -101,7 +101,8 @@ extern "C" {
 #  define SX126X_TX_PA_MODE
 #endif
 
-#define SX126X_PARAMS             { .spi = SX126X_PARAM_SPI,            \
+#ifndef SX126X_PARAMS
+#  define SX126X_PARAMS           { .spi = SX126X_PARAM_SPI,            \
                                     .nss_pin = SX126X_PARAM_SPI_NSS,    \
                                     .reset_pin = SX126X_PARAM_RESET,    \
                                     .busy_pin = SX126X_PARAM_BUSY,      \
@@ -110,6 +111,7 @@ extern "C" {
                                     .regulator = SX126X_PARAM_REGULATOR, \
                                     SX126X_SET_RF_MODE \
                                     SX126X_TX_PA_MODE}
+#endif
 
 /**@}*/
 
