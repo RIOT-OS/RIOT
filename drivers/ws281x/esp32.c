@@ -54,6 +54,7 @@ static uint32_t _ws281x_one_on;
 static uint32_t _ws281x_one_off;
 static uint32_t _ws281x_zero_on;
 static uint32_t _ws281x_zero_off;
+static uint8_t channel;
 
 static uint8_t _rmt_channel(ws281x_t *dev)
 {
@@ -71,23 +72,6 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     assert(dev);
 
 #ifdef MODULE_WS281X_ESP32_HW
-    /* determine used RMT channel from configured GPIO */
-    uint8_t channel = _rmt_channel(dev);
-
-    /* determine the current clock frequency */
-    uint32_t freq;
-    if (rmt_get_counter_clock(channel, &freq) != ESP_OK) {
-        LOG_ERROR("[ws281x_esp32] Could not get RMT counter clock\n");
-        return;
-    }
-
-    /* compute phase times used in ws2812_rmt_adapter once rmt_write_sample is called */
-    uint32_t total_cycles = freq / (NS_PER_SEC / WS281X_T_DATA_NS);
-    _ws281x_one_on = freq / (NS_PER_SEC / WS281X_T_DATA_ONE_NS);
-    _ws281x_one_off = total_cycles - _ws281x_one_on;
-    _ws281x_zero_on = freq / (NS_PER_SEC / WS281X_T_DATA_ZERO_NS);
-    _ws281x_zero_off = total_cycles - _ws281x_zero_on;
-
     rmt_write_sample(channel, (const uint8_t *)buf, size, false);
 #else
     const uint8_t *pos = buf;
@@ -192,7 +176,7 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
                   "[ws281x_esp32] RMT configuration problem");
 
     /* determine used RMT channel from configured GPIO */
-    uint8_t channel = _rmt_channel(dev);
+    channel = _rmt_channel(dev);
 
     rmt_config_t cfg = RMT_DEFAULT_CONFIG_TX(params->pin, channel);
     cfg.clk_div = 2;
@@ -203,6 +187,21 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
         LOG_ERROR("[ws281x_esp32] RMT initialization failed\n");
         return -EIO;
     }
+
+    /* determine the current clock frequency */
+    uint32_t freq;
+    if (rmt_get_counter_clock(channel, &freq) != ESP_OK) {
+        LOG_ERROR("[ws281x_esp32] Could not get RMT counter clock\n");
+        return -EIO;
+    }
+
+    /* compute phase times used in ws2812_rmt_adapter */
+    uint32_t total_cycles = freq / (NS_PER_SEC / WS281X_T_DATA_NS);
+    _ws281x_one_on = freq / (NS_PER_SEC / WS281X_T_DATA_ONE_NS);
+    _ws281x_one_off = total_cycles - _ws281x_one_on;
+    _ws281x_zero_on = freq / (NS_PER_SEC / WS281X_T_DATA_ZERO_NS);
+    _ws281x_zero_off = total_cycles - _ws281x_zero_on;
+
 #else
     if (gpio_init(dev->params.pin, GPIO_OUT)) {
         return -EIO;
