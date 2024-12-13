@@ -1787,6 +1787,28 @@ static const char *_prio_string(uint8_t prio)
     return "invalid";
 }
 
+static gnrc_pktsnip_t *_build_ctxs(_nib_abr_entry_t *abr)
+{
+    gnrc_pktsnip_t *ext_opts = NULL;
+
+    for (int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
+        gnrc_sixlowpan_ctx_t *ctx;
+        if (bf_isset(abr->ctxs, i) &&
+            ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
+            gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
+                                            ctx->prefix_len, ctx->flags_id,
+                                            ctx->ltime, &ctx->prefix, ext_opts);
+            if (sixco == NULL) {
+                DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
+                return NULL;
+            }
+            ext_opts = sixco;
+        }
+    }
+
+    return gnrc_sixlowpan_nd_opt_abr_build(abr->version, 0, &abr->addr, ext_opts);
+}
+
 static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                             const ndp_opt_ri_t *rio)
 {
@@ -1813,6 +1835,29 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     } else {
         gnrc_ipv6_nib_ft_add(&rio->prefix, rio->prefix_len, &ipv6->src,
                              netif->pid, route_ltime == UINT32_MAX ? 0 : route_ltime);
+    }
+
+    if (IS_ACTIVE(CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX) && gnrc_netif_is_6lbr(netif)) {
+        /* configure compression context */
+        if (gnrc_sixlowpan_ctx_update_6ctx(&rio->prefix, rio->prefix_len, route_ltime)) {
+            DEBUG("nib: add compression context for prefix from RIO\n");
+        }
+
+        gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_addr(&rio->prefix);
+        assert(ctx);
+        uint8_t ctx_id = ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK;
+
+        _nib_abr_entry_t *abr = NULL;
+        DEBUG("nib: Send router advertisements with updated compression contexts\n");
+        while ((abr = _nib_abr_iter(abr))) {
+            if (!route_ltime) {
+                bf_unset(abr->ctxs, ctx_id);
+                continue;
+            }
+            bf_set(abr->ctxs, ctx_id);
+            gnrc_pktsnip_t *ext_opts = _build_ctxs(abr);
+            gnrc_ndp_rtr_adv_send(netif, NULL, &ipv6->src, false, ext_opts);
+        }
     }
 
     return route_ltime;
