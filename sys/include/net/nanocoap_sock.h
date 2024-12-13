@@ -229,9 +229,7 @@ typedef struct {
  */
 typedef struct {
     sock_udp_ep_t remote;           /**< remote to send response to         */
-#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
     sock_udp_ep_t local;            /**< local from which to send response  */
-#endif
     uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token              */
     uint8_t tkl;                    /**< request token length               */
     uint8_t no_response;            /**< no-response bitmap                 */
@@ -245,6 +243,9 @@ typedef struct {
  *
  * The CoAP handler should then respond with an empty ACK by calling
  * @ref coap_build_empty_ack
+ *
+ * @warning This function is only available when using the module
+ *          `nanocoap_server_separate`
  *
  * @param[out]  ctx     Context information for separate response
  * @param[in]   pkt     CoAP packet to which the response will be generated
@@ -266,6 +267,11 @@ int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
  *
  * @pre     @ref nanocoap_server_prepare_separate has been called on @p ctx
  *          inside the CoAP handler
+ * @pre     Synchronization between calls of this function and calls of
+ *          @ref nanocoap_server_prepare_separate is ensured
+ *
+ * @warning This function is only available when using the module
+ *          `nanocoap_server_separate`
  *
  * @param[in]   ctx     Context information for the CoAP response
  * @param[in]   code    CoAP response code

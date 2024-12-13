@@ -1075,6 +1075,7 @@ void auto_init_nanocoap_server(void)
     nanocoap_server_start(&local);
 }
 
+#if MODULE_NANOCOAP_SERVER_SEPARATE
 int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
                                      coap_pkt_t *pkt, const coap_request_ctx_t *req)
 {
@@ -1092,10 +1093,8 @@ int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
     ctx->tkl = tkl;
     memcpy(ctx->token, coap_get_token(pkt), tkl);
     memcpy(&ctx->remote, req->remote, sizeof(ctx->remote));
-#ifdef MODULE_SOCK_AUX_LOCAL
     assert(req->local);
     memcpy(&ctx->local, req->local, sizeof(ctx->local));
-#endif
     uint32_t no_response = 0;
     coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response);
     ctx->no_response = no_response;
@@ -1137,7 +1136,6 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
     }
 
     sock_udp_aux_tx_t *aux_out_ptr = NULL;
-#ifdef MODULE_SOCK_AUX_LOCAL
     /* make sure we reply with the same address that the request was
      * destined for -- except in the multicast case */
     sock_udp_aux_tx_t aux_out = {
@@ -1147,6 +1145,6 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
     if (!sock_udp_ep_is_multicast(&ctx->local)) {
         aux_out_ptr = &aux_out;
     }
-#endif
     return sock_udp_sendv_aux(NULL, &head, &ctx->remote, aux_out_ptr);
 }
+#endif
