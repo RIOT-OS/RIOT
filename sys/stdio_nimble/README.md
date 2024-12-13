@@ -86,7 +86,8 @@ SERVICE e6d54866-0292-4779-b8f8-c52bbec91e71 (Handle: 10): Unknown
 Completed deep scan of 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
 ```
 
-- Create a virtual port and mount it on /tmp/dev_riot_ble
+- Create a virtual port and mount it on /tmp/dev_riot_ble\
+**NOTE:** with `ble-serial` version `>=3.0.0`, the command line option `--write-with-response` has to be added!
 ```
 $ ble-serial -d 6BE8174C-A0F8-4479-AFA6-9828372CAFE9 -p /tmp/dev_riot_ble --write-uuid ccdd113f-40d5-4d68-86ac-a728dd82f4aa --read-uuid 35f28386-3070-4f3b-ba38-27507e991762
 17:44:18.765 | INFO | linux_pty.py: Slave created on /tmp/dev_riot_ble -> /dev/ttys006
