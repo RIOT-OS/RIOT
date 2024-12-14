@@ -130,6 +130,33 @@ static int _handle_fsm_ev_request_tx(ieee802154_submac_t *submac)
     }
 }
 
+static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
+                                                 ieee802154_fsm_ev_t ev);
+
+static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
+                                            ieee802154_fsm_ev_t ev);
+
+static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac)
+{
+    ieee802154_dev_t *dev = &submac->dev;
+
+    /* Set state to TX_ON */
+    int res;
+    if ((res = ieee802154_radio_set_idle(dev, false)) < 0) {
+        return res;
+    }
+    if ((res = ieee802154_radio_write(dev, submac->psdu)) < 0) {
+        return res;
+    }
+    /* skip async Tx request */
+    _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH);
+    /* wait for Tx done */
+    while (_fsm_state_tx(submac, IEEE802154_FSM_EV_TX_DONE) == IEEE802154_FSM_STATE_INVALID) {
+        DEBUG("IEEE802154 submac: wait until ACK sent\n");
+    }
+    return 0;
+}
+
 static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
 {
     ieee802154_dev_t *dev = &submac->dev;
@@ -192,7 +219,16 @@ static ieee802154_fsm_state_t _fsm_state_idle(ieee802154_submac_t *submac, ieee8
 
     switch (ev) {
     case IEEE802154_FSM_EV_REQUEST_TX:
-        if (_handle_fsm_ev_request_tx(submac) < 0) {
+        /* An ACK is sent synchronous to prevent that the upper layer (IPv6)
+           can initiate the next transmission which would fail because the transceiver
+           is still busy. */
+        if (submac->psdu->iol_len == IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN &&
+            (((uint8_t *)submac->psdu->iol_base)[0] & IEEE802154_FCF_TYPE_ACK) &&
+            submac->psdu->iol_next == NULL) {
+            _handle_fsm_ev_tx_ack(submac);
+            return IEEE802154_FSM_STATE_IDLE;
+        }
+        else if (_handle_fsm_ev_request_tx(submac) < 0) {
             return IEEE802154_FSM_STATE_IDLE;
         }
         return IEEE802154_FSM_STATE_PREPARE;
@@ -321,9 +357,10 @@ static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac, ieee802
 
     switch (ev) {
     case IEEE802154_FSM_EV_TX_DONE:
-        res = ieee802154_radio_confirm_transmit(&submac->dev, &info);
-        assert(res >= 0);
-        return _fsm_state_tx_process_tx_done(submac, &info);
+        if ((res = ieee802154_radio_confirm_transmit(&submac->dev, &info)) >= 0) {
+            return _fsm_state_tx_process_tx_done(submac, &info);
+        }
+        break;
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT
@@ -403,7 +440,7 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
 
     if (new_state == IEEE802154_FSM_STATE_INVALID) {
         _print_debug(submac->fsm_state, new_state, ev);
-        assert(false);
+        new_state = submac->fsm_state;
     }
     submac->fsm_state = new_state;
     return submac->fsm_state;
@@ -424,6 +461,8 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 
     uint8_t *buf = iolist->iol_base;
     bool cnf = buf[0] & IEEE802154_FCF_ACK_REQ;
+    bool is_ack = iolist->iol_len == IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN &&
+                  (buf[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK;
 
     submac->wait_for_ack = cnf;
     submac->psdu = iolist;
@@ -431,8 +470,14 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     submac->csma_retries_nb = 0;
     submac->backoff_mask = (1 << submac->be.min) - 1;
 
-    if (ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
+    if (!is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
         != IEEE802154_FSM_STATE_PREPARE) {
+        DEBUG("IEEE802154 submac: ieee802154_send(): Tx frame failed %s\n", str_states[current_state]);
+        return -EBUSY;
+    }
+    if (is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
+             != IEEE802154_FSM_STATE_IDLE) {
+        DEBUG("IEEE802154 submac: ieee802154_send(): Tx ACK failed %s\n", str_states[current_state]);
         return -EBUSY;
     }
     return 0;
