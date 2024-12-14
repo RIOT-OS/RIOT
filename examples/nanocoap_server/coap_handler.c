@@ -209,9 +209,13 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
     }
 
-    puts("_separate_handler(): send ACK, schedule response");
+    if (nanocoap_server_prepare_separate(&_separate_ctx, pkt, context)) {
+        puts("_separate_handler(): failed to prepare context for separate response");
+        /* send a reset message, as we don't support large tokens here */
+        return coap_build_reply(pkt, 0, buf, len, 0);
+    }
 
-    nanocoap_server_prepare_separate(&_separate_ctx, pkt, context);
+    puts("_separate_handler(): send ACK, schedule response");
 
     event_timeout_ztimer_init(&event_timeout, ZTIMER_MSEC, EVENT_PRIO_MEDIUM,
                               &event_timed.super);
