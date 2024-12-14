@@ -258,9 +258,7 @@ static void _isr(netdev_t *netdev)
         /* HACK: the TX_STARTED event is used to indicate a frame was
          * sent during the event callback.
          * If no frame was sent go back to RX */
-        if (netdev_submac->ev != NETDEV_EVENT_TX_STARTED) {
-            ieee802154_set_rx(submac);
-        }
+        ieee802154_set_rx(submac);
     }
     else {
         DEBUG("IEEE802154 submac: no events to dispatch\n");
