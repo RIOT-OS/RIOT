@@ -32,7 +32,7 @@
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 #ifndef SX126X_HAL_CHAN_BASE

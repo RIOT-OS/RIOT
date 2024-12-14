@@ -24,7 +24,7 @@
 #include "kernel_defines.h"
 #include "errno.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)

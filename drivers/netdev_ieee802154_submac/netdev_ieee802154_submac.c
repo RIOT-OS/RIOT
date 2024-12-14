@@ -17,7 +17,7 @@
 #include "net/netdev/ieee802154_submac.h"
 #include "event/thread.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 static const ieee802154_submac_cb_t _cb;
