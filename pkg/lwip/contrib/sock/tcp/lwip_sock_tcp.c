@@ -24,6 +24,9 @@
 #include "lwip/api.h"
 #include "lwip/opt.h"
 
+#define ENABLE_DEBUG    0
+#include "debug.h"
+
 static inline void _tcp_sock_init(sock_tcp_t *sock, struct netconn *conn,
                                   sock_tcp_queue_t *queue)
 {
@@ -293,6 +296,9 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout)
 {
+    DEBUG("sock_tcp_read(sock, data, max_len=%u, timeout=%" PRIu32 ")\n",
+          (unsigned)max_len, timeout);
+
     struct pbuf *buf;
     ssize_t recvd = 0;
     ssize_t res = 0;
@@ -322,6 +328,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
 
     if ((timeout == 0) && !mbox_avail(&sock->base.conn->recvmbox.mbox)) {
         mutex_unlock(&sock->mutex);
+        DEBUG_PUTS("sock_tcp_read(): -EAGAIN");
         return -EAGAIN;
     }
 
@@ -333,6 +340,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         else {
             err_t err;
             if ((err = netconn_recv_tcp_pbuf(sock->base.conn, &buf)) < 0) {
+                DEBUG("sock_tcp_read(): %d", (int)err);
                 switch (err) {
                 case ERR_ABRT:
                     res = -ECONNABORTED;
@@ -400,6 +408,17 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
 #endif
     netconn_set_nonblocking(sock->base.conn, false);
     mutex_unlock(&sock->mutex);
+
+    DEBUG("sock_tcp_read(): %d\n", (int)res);
+    if (ENABLE_DEBUG && (res > 0)) {
+        DEBUG(" ");
+        unsigned bytes_to_print = (res > 8) ? 8 : res;
+        for (unsigned i = 0; i < bytes_to_print; i++) {
+            DEBUG(" %02X", (unsigned)((uint8_t *)data)[i]);
+        }
+        DEBUG_PUTS((res > 8) ? "..." : "");
+    }
+
     return res;
 }
 
@@ -407,6 +426,16 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
 {
     struct netconn *conn;
     int res = 0;
+
+    DEBUG("sock_tcp_write(sock, data, %u)\n", (unsigned)len);
+    if (ENABLE_DEBUG) {
+        DEBUG(" ");
+        unsigned bytes_to_print = (len > 8) ? 8 : len;
+        for (unsigned i = 0; i < bytes_to_print; i++) {
+            DEBUG(" %02X", (unsigned)((uint8_t *)data)[i]);
+        }
+        DEBUG_PUTS((len > 8) ? "..." : "");
+    }
 
     assert(sock != NULL);
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
@@ -422,6 +451,8 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
                                    (lwip_sock_send neither, since it remote is
                                    NULL) so we can leave the mutex */
     res = lwip_sock_send(conn, data, len, 0, NULL, NETCONN_TCP);
+
+    DEBUG("sock_tcp_write(): %d\n", (int)res);
 
     return res;
 }
