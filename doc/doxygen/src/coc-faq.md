@@ -32,8 +32,11 @@ However, we do expect that people will abide by the spirit and words of the CoC
 when in "official" RIOT spaces. This code has been adopted by the RIOT community
 as a whole. That means that it'll apply in all community spaces.
 
-In practice, this means the [RIOT forum](https://forum.riot-os.org), the Matrix chats (e.g., [`#riot-os`](https://matrix.to/#/#riot-os:matrix.org) or [`#riot-os-off-topic`](https://matrix.to/#/#riot-os-off-topic:matrix.org)), mailing lists (e.g., security@riot-os.org), bug tracking and code review tools, and
-"official" RIOT events such as Hack'n'ACKs or RIOT summits. In addition,
+In practice, this means the [RIOT forum](https://forum.riot-os.org), the Matrix
+chats (e.g., [`#riot-os`](https://matrix.to/#/#riot-os:matrix.org) or
+[`#riot-os-off-topic`](https://matrix.to/#/#riot-os-off-topic:matrix.org)),
+mailing lists (e.g., security@riot-os.org), bug tracking and code review tools,
+and "official" RIOT events such as Hack'n'ACKs or RIOT summits. In addition,
 violations of this code outside these spaces may affect a person's ability to
 participate within them.
 
