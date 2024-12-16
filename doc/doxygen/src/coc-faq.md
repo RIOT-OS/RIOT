@@ -1,7 +1,7 @@
 # FAQ  {#coc-faq}
 
 This FAQ attempts to address common questions and concerns around the RIOT
-community's future [Code of Conduct][CoC]. If you still have questions after
+community's [Code of Conduct][CoC]. If you still have questions after
 reading it, please feel free to [contact us][CoC-question-mail].
 
 --------------------------------------------------------------------------------
