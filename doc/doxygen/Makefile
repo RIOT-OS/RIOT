@@ -43,8 +43,8 @@ src/coc.md: ../../CODE_OF_CONDUCT.md
 	awk 'NR == 1 {print $$0,"{#coc}"} NR > 1 {print $$0}' $< > $@
 
 .PHONY:
-latex: src/changelog.md
+latex: src/changelog.md src/coc.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
 
 clean:
-	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md
+	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md src/coc.md
