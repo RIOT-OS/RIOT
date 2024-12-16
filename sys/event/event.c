@@ -90,7 +90,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
     assert(queues && n_queues);
     event_t *result = NULL;
 
-    do {
+    while (1) {
         unsigned state = irq_disable();
         for (size_t i = 0; i < n_queues; i++) {
             assert(queues[i].waiter);
@@ -100,14 +100,16 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
                 break;
             }
         }
-        irq_restore(state);
-        if (result == NULL) {
-            thread_flags_wait_any(THREAD_FLAG_EVENT);
-        }
-    } while (result == NULL);
 
-    result->list_node.next = NULL;
-    return result;
+        if (result != NULL) {
+            result->list_node.next = NULL;
+            irq_restore(state);
+            return result;
+        }
+
+        irq_restore(state);
+        thread_flags_wait_any(THREAD_FLAG_EVENT);
+    }
 }
 
 #if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER)
