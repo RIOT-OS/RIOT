@@ -22,7 +22,7 @@
 
 #include <limits.h>
 
-#include "periph_cpu_common.h"
+#include "periph_cpu_common.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,13 +51,8 @@ extern "C" {
 #define SAMD21_PM_IDLE_2        (1U)    /**< Idle 2 (stops AHB, APB and CPU) */
 #define SAMD21_PM_IDLE_1        (2U)    /**< Idle 1 (stops AHB and CPU)      */
 #define SAMD21_PM_IDLE_0        (3U)    /**< Idle 0 (stops CPU)              */
-/** @} */
 
-/**
- * @name   SPI configuration
- * @{
- */
-#define SAM0_SPI_PM_BLOCK        SAMD21_PM_IDLE_1 /**< Stay in Idle 0 mode */
+#define SAM0_SERCOM_PM_BLOCK    SAMD21_PM_IDLE_1 /**< Stay in Idle 0 mode */
 /** @} */
 
 /**
@@ -98,6 +93,27 @@ static inline int _sercom_id(SercomUsart *sercom)
 {
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
+
+/* these functions are documented in periph_cpu_common.h, but Doxygen
+ * is unable to connect the dots */
+#if !DOXYGEN
+static inline void sercom_apb_enable(sercom_t sercom)
+{
+    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom);
+}
+
+static inline void sercom_apb_disable(sercom_t sercom)
+{
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom);
+}
+
+static inline void sercom_gclk_enable(sercom_t sercom, uint8_t gclk)
+{
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(gclk) |
+                         (SERCOM0_GCLK_ID_CORE + sercom));
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+}
+#endif
 
 /**
  * @brief   Pins that can be used for ADC input

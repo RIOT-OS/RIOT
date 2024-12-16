@@ -317,6 +317,76 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
+ * @name    Common SERCOM Interface
+ * @{
+ */
+/**
+ * @brief   Identifier of a SERCOM
+ */
+typedef uint8_t sercom_t;
+
+/**
+ * @brief   IRQ callback to call on IRQs triggered by the SERCOM
+ *
+ * @param[in]   arg         The argument provided on @ref sercom_acquire
+ */
+typedef void (*sercom_irq_cb_t)(void *arg);
+
+/**
+ * @brief   Acquire exclusive access to the given SERCOM, enable it, and
+ *          configure it as specified
+ * @param[in]   sercom      The SERCOM to acquire
+ * @param[in]   gclk        Generator clock
+ * @param[in]   irq_cb      Function to call on IRQ or `NULL`
+ * @param[in]   irq_arg     Argument to pass to @p irq_cb
+ *
+ * @note    This function may block if the SERCOM is already in use to provide
+ *          another serial interface until it is release.
+ * @warning Beware: UART buses are typically kept acquired and never released.
+ *
+ * @pre     The pins the caller wants to route to the SERCOM are not routed to
+ *          it prior to the call (as the SERCOM may still be active). Only
+ *          after this function returns, pins may be routed to the SERCOM.
+ * @post    The SERCOM is exclusively held by the caller
+ * @post    The SERCOM is configured as asked for in @p conf
+ * @post    If @p irq_cb was `NULL`, the corresponding IRQ(s) is/are disabled
+ *          in the NIVC. Otherwise they are enabled but masked.
+ */
+void sercom_acquire(sercom_t sercom, uint8_t gclk,
+                    sercom_irq_cb_t irq_cb, void *irq_arg);
+
+/**
+ * @brief   Enable the SERCOM APB clock
+ * @param[in]   sercom  The SERCOM to enable the clock of
+ */
+static inline void sercom_apb_enable(sercom_t sercom);
+
+/**
+ * @brief   Disable the SERCOM APB clock
+ * @param[in]   sercom  The SERCOM to disable the clock of
+ */
+static inline void sercom_apb_disable(sercom_t sercom);
+
+/**
+ * @brief   Enable GCLK clock signal to the given SEROM
+ * @param[in]   sercom  The SERCOM to clock
+ * @param[in] gclk      Generator clock
+ */
+static inline void sercom_gclk_enable(sercom_t sercom, uint8_t gclk);
+
+/**
+ * @brief   Release exclusive access to the given SERCOM and disable it
+ *          (low power mode)
+ * @param[in]   sercom  The SERCOM to release
+ *
+ * @pre     The pins that were routed to this SERCOM are no longer routed to it,
+ *          so that other pins can be routed to it right after the SERCOM is
+ *          release to provide other serial buses
+ */
+void sercom_release(sercom_t sercom);
+/** @} */
+
+/**
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
 #ifndef UART_TXBUF_SIZE
@@ -434,6 +504,15 @@ typedef struct {
 } pwm_conf_t;
 
 /**
+ * @brief   Special SERCOM ID to identify the QSPI
+ *
+ * When module `periph_spi_on_qspi` is used, we need to identify in the SPI
+ * config that the SPI is not implemented using a SERCOM but using a QSPI
+ * peripheral. This magic invalid SERCOM id is to be used for that.
+ */
+#define SERCOM_ID_QSPI      0xff
+
+/**
  * @brief   Available values for SERCOM SPI MISO pad selection
  */
 typedef enum {
@@ -505,7 +584,7 @@ typedef struct {
     gpio_mux_t clk_mux;     /**< alternate function for CLK pin (mux) */
     spi_misopad_t miso_pad; /**< pad to use for MISO line */
     spi_mosipad_t mosi_pad; /**< pad to use for MOSI and CLK line */
-    uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
+    uint8_t gclk_src;       /**< GCLK source which supplies SERCOM */
 #ifdef MODULE_PERIPH_DMA
     uint8_t tx_trigger;     /**< DMA trigger */
     uint8_t rx_trigger;     /**< DMA trigger */
@@ -564,7 +643,7 @@ typedef struct {
     gpio_t scl_pin;         /**< used SCL pin */
     gpio_t sda_pin;         /**< used MOSI pin */
     gpio_mux_t mux;         /**< alternate function (mux) */
-    uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
+    uint8_t gclk_src;       /**< GCLK source which suppliess SERCOM */
     uint8_t flags;          /**< allow SERCOM to run in standby mode */
 } i2c_conf_t;
 
@@ -764,66 +843,6 @@ static inline uint8_t sercom_id(const void *sercom)
     assert(false);
 
     return SERCOM_INST_NUM;
-}
-
-/**
- * @brief   Enable peripheral clock for given SERCOM device
- *
- * @param[in] sercom    SERCOM device
- */
-static inline void sercom_clk_en(void *sercom)
-{
-    const uint8_t id = sercom_id(sercom);
-#if defined(CPU_COMMON_SAMD21)
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << id);
-#elif defined (CPU_COMMON_SAMD5X)
-    if (id < 2) {
-        MCLK->APBAMASK.reg |= (1 << (id + 12));
-    } else if (id < 4) {
-        MCLK->APBBMASK.reg |= (1 << (id + 7));
-    } else {
-        MCLK->APBDMASK.reg |= (1 << (id - 4));
-    }
-#else
-    if (id < 5) {
-        MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << id);
-    }
-#if defined(CPU_COMMON_SAML21)
-    else {
-        MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
-    }
-#endif /* CPU_COMMON_SAML21 */
-#endif
-}
-
-/**
- * @brief   Disable peripheral clock for given SERCOM device
- *
- * @param[in] sercom    SERCOM device
- */
-static inline void sercom_clk_dis(void *sercom)
-{
-    const uint8_t id = sercom_id(sercom);
-#if defined(CPU_COMMON_SAMD21)
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << id);
-#elif defined (CPU_COMMON_SAMD5X)
-    if (id < 2) {
-        MCLK->APBAMASK.reg &= ~(1 << (id + 12));
-    } else if (id < 4) {
-        MCLK->APBBMASK.reg &= ~(1 << (id + 7));
-    } else {
-        MCLK->APBDMASK.reg &= ~(1 << (id - 4));
-    }
-#else
-    if (id < 5) {
-        MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << id);
-    }
-#if defined (CPU_COMMON_SAML21)
-    else {
-        MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
-    }
-#endif /* CPU_COMMON_SAML21 */
-#endif
 }
 
 #ifdef CPU_COMMON_SAMD5X
