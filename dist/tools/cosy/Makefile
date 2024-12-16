@@ -1,6 +1,6 @@
 PKG_NAME=cosy
-PKG_URL=https://github.com/haukepetersen/cosy.git
-PKG_VERSION=6131f489dda589c4c19068938f99fae679e97fb0
+PKG_URL=https://github.com/RIOT-OS/cosy/
+PKG_VERSION=ba20ae99a9c136bd3f62089e72c25e9d009ae356
 PKG_LICENSE=GPL-3
 
 include $(RIOTBASE)/pkg/pkg.mk
