@@ -298,14 +298,16 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
         return ERR_IF;
     }
 
-    /* block until TX completion is signaled from IRQ */
-    thread_flags_wait_any(THREAD_FLAG_LWIP_TX_DONE);
-
-    irq_state = irq_disable();
-    compat_netif->thread_doing_tx = NULL;
-    irq_restore(irq_state);
-
+    /* `res > 0` means transmission already completed according to API contract.
+     * ==> only waiting when res == 0 */
     if (res == 0) {
+        /* block until TX completion is signaled from IRQ */
+        thread_flags_wait_any(THREAD_FLAG_LWIP_TX_DONE);
+
+        irq_state = irq_disable();
+        compat_netif->thread_doing_tx = NULL;
+        irq_restore(irq_state);
+
         /* async send */
         while (-EAGAIN == (res = netdev->driver->confirm_send(netdev, NULL))) {
             /* this should not happen, as the driver really only should emit the
