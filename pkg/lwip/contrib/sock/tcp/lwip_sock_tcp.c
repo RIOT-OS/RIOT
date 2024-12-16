@@ -85,6 +85,9 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     queue->array = queue_array;
     queue->len = queue_len;
     queue->used = 0;
+    /* This wipe is important: We cancel pending events in async event API when
+     * reusing the socket. If the memory would be uninitialized, bad things
+     * would happen */
     memset(queue->array, 0, sizeof(sock_tcp_t) * queue_len);
     mutex_unlock(&queue->mutex);
 
@@ -124,6 +127,14 @@ void sock_tcp_disconnect(sock_tcp_t *sock)
             sock->queue = NULL;
         }
     }
+
+#ifdef SOCK_HAS_ASYNC_CTX
+    /* Cancel any pending event in the event queue */
+    if (sock->base.async_ctx.queue) {
+        event_cancel(sock->base.async_ctx.queue,
+                     &sock->base.async_ctx.event.super);
+    }
+#endif
 
     mutex_unlock(&sock->mutex);
     memset(&sock->mutex, 0, sizeof(mutex_t));
@@ -240,6 +251,16 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
             for (unsigned short i = 0; i < queue->len; i++) {
                 sock_tcp_t *s = &queue->array[i];
                 if (s->base.conn == NULL) {
+#ifdef SOCK_HAS_ASYNC_CTX
+                    /* If there still is an event pending, we cannot just wipe
+                     * its memory but have to remove the event from the list
+                     * first. We rely here sock_tcp_listen to zero-initialize
+                     * the sockets. */
+                    if (s->base.async_ctx.queue) {
+                        event_cancel(s->base.async_ctx.queue,
+                                     &s->base.async_ctx.event.super);
+                    }
+#endif
                     _tcp_sock_init(s, tmp, queue);
                     queue->used++;
                     assert(queue->used > 0);
