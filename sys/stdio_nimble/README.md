@@ -87,9 +87,9 @@ Completed deep scan of 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
 ```
 
 - Create a virtual port and mount it on /tmp/dev_riot_ble\
-**NOTE:** with `ble-serial` version `>=3.0.0`, the command line option `--write-with-response` has to be added!
+**NOTE:** for older versions (`<=2.8.0`) of `ble-serial`, the command line option `--write-with-response` is unsupported and has to be removed!
 ```
-$ ble-serial -d 6BE8174C-A0F8-4479-AFA6-9828372CAFE9 -p /tmp/dev_riot_ble --write-uuid ccdd113f-40d5-4d68-86ac-a728dd82f4aa --read-uuid 35f28386-3070-4f3b-ba38-27507e991762
+$ ble-serial -d 6BE8174C-A0F8-4479-AFA6-9828372CAFE9 -p /tmp/dev_riot_ble --write-uuid ccdd113f-40d5-4d68-86ac-a728dd82f4aa --read-uuid 35f28386-3070-4f3b-ba38-27507e991762 --write-with-response
 17:44:18.765 | INFO | linux_pty.py: Slave created on /tmp/dev_riot_ble -> /dev/ttys006
 17:44:18.766 | INFO | ble_interface.py: Receiver set up
 17:44:18.766 | INFO | ble_interface.py: Trying to connect with 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
