@@ -95,9 +95,9 @@
  * test, the device name is `tests/sys/shell_ble`.
  * When you get an `ble-scan: command not found` error you can also run
  * `python -m ble_serial.scan` instead.
- * 
+ *
  * **NOTE:** Windows and Linux use MAC addresses instead of the UUIDs.
- * 
+ *
  * ```
  * $ ble-scan
  * Started BLE scan
