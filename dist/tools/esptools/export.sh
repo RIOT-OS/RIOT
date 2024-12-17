@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ESP32_GCC_RELEASE="esp-12.2.0_20230208"
+ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
 ESP32_OPENOCD_VERSION="v0.12.0-esp32-20230313"
 
@@ -13,6 +14,10 @@ TOOLS_PATH="${IDF_TOOLS_PATH}/tools"
 export_arch()
 {
     case $1 in
+        esp8266)
+            TARGET_ARCH="xtensa-esp8266-elf"
+            ESP32_GCC_RELEASE=${ESP8266_GCC_RELEASE}
+            ;;
         esp32)
             TARGET_ARCH="xtensa-esp32-elf"
             ;;
@@ -130,7 +135,7 @@ if [ -z "$1" ]; then
     echo "<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp32 esp32c3 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         export_arch "$arch"
     done
