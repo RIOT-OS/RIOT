@@ -3,7 +3,7 @@ testing via blueooth instead of UART. You have to set up a virtual serial port
 manually.
 
 For instructions on how to open a virtual serial port to your bluetooth device
-see the documentation of `sys/stdio_nimble` in 
+see the documentation of `sys/stdio_nimble` in
 `System > STDIO abstraction > STDIO over NimBLE`.
 
 **Note:** `make term` and `make test-with-config` will open two different types of terminals.
