@@ -660,6 +660,16 @@ static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
     return val - IEEE802154_RADIO_RSSI_OFFSET;
 }
 
+/**
+ * @brief Get the symbol time for a given PHY channel.
+ *
+ * @param[in] channel_page channel page
+ * @param[in] channel_num channel number
+ *
+ * @return the symbol time in us
+ */
+uint32_t ieee802154_get_symbol_time(uint8_t channel_page, uint16_t channel_num);
+
 #ifdef __cplusplus
 }
 #endif
