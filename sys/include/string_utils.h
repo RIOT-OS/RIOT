@@ -21,6 +21,7 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 /* if explicit_bzero() is provided by standard C lib, it may be defined in
@@ -29,6 +30,7 @@
 #include <strings.h>
 #include <sys/types.h>
 
+#include "flash_utils.h"
 #include "modules.h"
 
 #ifndef STRING_UTILS_H
@@ -36,6 +38,80 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   String Writer structure.
+ *          Helper for writing multiple formatted strings to a buffer
+ */
+typedef struct {
+    const char *start;  /**< start of the target buffer */
+    char *position;     /**< current write pointer      */
+    size_t capacity;    /**< remaining capacity of the buffer */
+} string_writer_t;
+
+/**
+ * @brief   Initialize a string writer structure
+ *
+ * @param[out]  sw      String Writer object to initialize
+ * @param[in]   buffer  destination buffer
+ * @param[in]   len     size of the destination buffer
+ */
+static inline void string_writer_init(string_writer_t *sw, void *buffer, size_t len)
+{
+    assert(buffer && len);
+
+    sw->start = buffer;
+    sw->position = buffer;
+    sw->capacity = len;
+    sw->position[0] = 0;
+}
+
+/**
+ * @brief   Get the size of the string contained by the string writer
+ * @param[in]   sw      String Writer to query
+ * @return      size of the string
+ */
+static inline size_t string_writer_len(const string_writer_t *sw)
+{
+    return sw->position - sw->start;
+}
+
+/**
+ * @brief   Get the string contained by the string writer
+ * @param[in]   sw      String Writer to query
+ * @return      the string assembled by string writer
+ */
+static inline const char *string_writer_str(const string_writer_t *sw)
+{
+    return sw->start;
+}
+
+/**
+ * @brief   internal helper macro
+ */
+#if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
+#define __swprintf flash_swprintf
+#else
+#define __swprintf swprintf
+__attribute__ ((format (printf, 2, 3)))
+#endif
+/**
+ * @brief   Write a formatted string to a buffer
+ *          The string will be truncated if there is not enough space left in
+ *          the destination buffer.
+ *          A terminating `\0` character is always included.
+ *
+ * @param[in]   sw      String Writer to write to
+ * @param[in]   format  format string to write
+ *
+ * @return      number of bytes written on success
+ *              -E2BIG if the string was truncated
+ */
+int __swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...);
+
+#if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
+#define swprintf(sw, fmt, ...) flash_swprintf(sw, TO_FLASH(fmt), ## __VA_ARGS__)
 #endif
 
 /* explicit_bzero is provided if:
