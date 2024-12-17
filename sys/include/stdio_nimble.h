@@ -93,8 +93,11 @@
  * To connect to the device, you have to find out the BLE address. For this
  * example, the device name is `Riot OS device`. For the `tests/sys/shell_ble`
  * test, the device name is `tests/sys/shell_ble`.
- *   When you get `ble-scan: command not found` you can also run
- *   `python -m ble_serial.scan` instead.
+ * When you get an `ble-scan: command not found` error you can also run
+ * `python -m ble_serial.scan` instead.
+ * 
+ * **NOTE:** Windows and Linux use MAC addresses instead of the UUIDs.
+ * 
  * ```
  * $ ble-scan
  * Started BLE scan
