@@ -24,6 +24,9 @@
 #include "lwip/api.h"
 #include "lwip/opt.h"
 
+#define ENABLE_DEBUG    0
+#include "debug.h"
+
 static inline void _tcp_sock_init(sock_tcp_t *sock, struct netconn *conn,
                                   sock_tcp_queue_t *queue)
 {
@@ -85,6 +88,9 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     queue->array = queue_array;
     queue->len = queue_len;
     queue->used = 0;
+    /* This wipe is important: We cancel pending events in async event API when
+     * reusing the socket. If the memory would be uninitialized, bad things
+     * would happen */
     memset(queue->array, 0, sizeof(sock_tcp_t) * queue_len);
     mutex_unlock(&queue->mutex);
 
@@ -124,6 +130,14 @@ void sock_tcp_disconnect(sock_tcp_t *sock)
             sock->queue = NULL;
         }
     }
+
+#ifdef SOCK_HAS_ASYNC_CTX
+    /* Cancel any pending event in the event queue */
+    if (sock->base.async_ctx.queue) {
+        event_cancel(sock->base.async_ctx.queue,
+                     &sock->base.async_ctx.event.super);
+    }
+#endif
 
     mutex_unlock(&sock->mutex);
     memset(&sock->mutex, 0, sizeof(mutex_t));
@@ -240,6 +254,16 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
             for (unsigned short i = 0; i < queue->len; i++) {
                 sock_tcp_t *s = &queue->array[i];
                 if (s->base.conn == NULL) {
+#ifdef SOCK_HAS_ASYNC_CTX
+                    /* If there still is an event pending, we cannot just wipe
+                     * its memory but have to remove the event from the list
+                     * first. We rely here sock_tcp_listen to zero-initialize
+                     * the sockets. */
+                    if (s->base.async_ctx.queue) {
+                        event_cancel(s->base.async_ctx.queue,
+                                     &s->base.async_ctx.event.super);
+                    }
+#endif
                     _tcp_sock_init(s, tmp, queue);
                     queue->used++;
                     assert(queue->used > 0);
@@ -293,6 +317,9 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout)
 {
+    DEBUG("sock_tcp_read(sock, data, max_len=%u, timeout=%" PRIu32 ")\n",
+          (unsigned)max_len, timeout);
+
     struct pbuf *buf;
     ssize_t recvd = 0;
     ssize_t res = 0;
@@ -322,6 +349,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
 
     if ((timeout == 0) && !mbox_avail(&sock->base.conn->recvmbox.mbox)) {
         mutex_unlock(&sock->mutex);
+        DEBUG_PUTS("sock_tcp_read(): -EAGAIN");
         return -EAGAIN;
     }
 
@@ -333,6 +361,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         else {
             err_t err;
             if ((err = netconn_recv_tcp_pbuf(sock->base.conn, &buf)) < 0) {
+                DEBUG("sock_tcp_read(): %d", (int)err);
                 switch (err) {
                 case ERR_ABRT:
                     res = -ECONNABORTED;
@@ -400,6 +429,17 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
 #endif
     netconn_set_nonblocking(sock->base.conn, false);
     mutex_unlock(&sock->mutex);
+
+    DEBUG("sock_tcp_read(): %d\n", (int)res);
+    if (ENABLE_DEBUG && (res > 0)) {
+        DEBUG(" ");
+        unsigned bytes_to_print = (res > 8) ? 8 : res;
+        for (unsigned i = 0; i < bytes_to_print; i++) {
+            DEBUG(" %02X", (unsigned)((uint8_t *)data)[i]);
+        }
+        DEBUG_PUTS((res > 8) ? "..." : "");
+    }
+
     return res;
 }
 
@@ -407,6 +447,16 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
 {
     struct netconn *conn;
     int res = 0;
+
+    DEBUG("sock_tcp_write(sock, data, %u)\n", (unsigned)len);
+    if (ENABLE_DEBUG) {
+        DEBUG(" ");
+        unsigned bytes_to_print = (len > 8) ? 8 : len;
+        for (unsigned i = 0; i < bytes_to_print; i++) {
+            DEBUG(" %02X", (unsigned)((uint8_t *)data)[i]);
+        }
+        DEBUG_PUTS((len > 8) ? "..." : "");
+    }
 
     assert(sock != NULL);
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
@@ -422,6 +472,8 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
                                    (lwip_sock_send neither, since it remote is
                                    NULL) so we can leave the mutex */
     res = lwip_sock_send(conn, data, len, 0, NULL, NETCONN_TCP);
+
+    DEBUG("sock_tcp_write(): %d\n", (int)res);
 
     return res;
 }
