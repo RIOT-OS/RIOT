@@ -542,9 +542,20 @@ ifneq (,$(filter nanocoap_server_tcp,$(USEMODULE)))
   USEMODULE += sock_async_event
 endif
 
+ifneq (,$(filter nanocoap_server_ws,$(USEMODULE)))
+  USEMODULE += nanocoap_server
+  USEMODULE += nanocoap_ws
+  USEMODULE += event
+endif
+
 ifneq (,$(filter nanocoap_server,$(USEMODULE)))
   USEMODULE += nanocoap_resources
   USEMODULE += nanocoap_sock
+endif
+
+ifneq (,$(filter nanocoap_ws_udp_yolo,$(USEMODULE)))
+  USEMODULE += sock_udp
+  USEMODULE += sock_async
 endif
 
 ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
@@ -592,7 +603,7 @@ endif
 
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   # default to UDP transport if none is selected
-  ifeq (,$(filter nanocoap_udp nanocoap_tcp nanocoap_dtls,$(USEMODULE)))
+  ifeq (,$(filter nanocoap_udp nanocoap_tcp nanocoap_dtls nanocoap_ws,$(USEMODULE)))
     USEMODULE += nanocoap_udp
   endif
 endif

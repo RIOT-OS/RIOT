@@ -329,6 +329,44 @@ ssize_t coap_parse_tcp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     return _parse_options(pkt, hdr_len + pkt_data_len);
 }
 
+
+/* https://www.rfc-editor.org/rfc/rfc8323#section-3.2 Figure 10
+ *
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Len=0 |  TKL  |      Code     |    Token (TKL bytes) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Options (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |1 1 1 1 1 1 1 1|    Payload (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+ssize_t coap_parse_ws(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+{
+    *pkt = (coap_pkt_t){
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+        .transport = COAP_TRANSPORT_WS,
+#endif
+        .buf = buf
+    };
+
+    if (len < COAP_WS_HEADER_SIZE) {
+        return -EBADMSG;
+    }
+
+    pkt->token_pos_and_len = _decode_token_pos_and_len(buf, len, COAP_WS_HEADER_SIZE);
+    if (!pkt->token_pos_and_len) {
+        return -EBADMSG;
+    }
+
+    size_t hdr_len = coap_get_total_hdr_len(pkt);
+    pkt->payload = buf + hdr_len;
+    pkt->payload_len = len - hdr_len;
+
+    return _parse_options(pkt, len);
+}
+
 int coap_match_path(const coap_resource_t *resource, const uint8_t *uri)
 {
     assert(resource && uri);
@@ -849,6 +887,10 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
         break;
     case COAP_TRANSPORT_TCP:
         bufpos += coap_build_tcp_hdr(buf, len, coap_get_token(pkt), tkl, code);
+        break;
+    case COAP_TRANSPORT_WS:
+        bufpos += coap_build_ws_hdr(buf, len, coap_get_token(pkt), tkl, code);
+        break;
     }
 
     if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
@@ -930,7 +972,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len)
 {
     unsigned tkl = coap_get_token_len(pkt);
-    unsigned hdr_len = sizeof(coap_udp_hdr_t);
+    unsigned hdr_len;
     unsigned type = COAP_TYPE_NON;
 
     if (!code) {
@@ -943,11 +985,20 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         type = COAP_TYPE_ACK;
     }
 
-    if (coap_get_transport(pkt) == COAP_TRANSPORT_TCP) {
-        hdr_len = COAP_TCP_TENTATIVE_HEADER_SIZE + coap_pkt_tkl_ext_len(pkt);
+    switch (coap_get_transport(pkt)) {
+    default:
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        hdr_len = sizeof(coap_udp_hdr_t);
+        break;
+    case COAP_TRANSPORT_TCP:
+        hdr_len = COAP_TCP_TENTATIVE_HEADER_SIZE;
+        break;
+    case COAP_TRANSPORT_WS:
+        hdr_len = COAP_WS_HEADER_SIZE;
     }
 
-    hdr_len += tkl;
+    hdr_len += tkl + coap_pkt_tkl_ext_len(pkt);
 
     if ((hdr_len + payload_len) > rlen) {
         return -ENOSPC;
@@ -975,6 +1026,9 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         break;
     case COAP_TRANSPORT_TCP:
         coap_build_tcp_hdr(rbuf, rlen, coap_get_token(pkt), tkl, code);
+        break;
+    case COAP_TRANSPORT_WS:
+        coap_build_ws_hdr(rbuf, rlen, coap_get_token(pkt), tkl, code);
         break;
     }
 
@@ -1160,6 +1214,48 @@ size_t coap_finalize_tcp_header_in_buf(uint8_t *buf, size_t buf_len)
 
     size_t data_len = buf_len - hdr_len;
     return coap_finalize_tcp_header(buf, data_len);
+}
+
+ssize_t coap_build_ws(coap_pkt_t *pkt, void *_buf, size_t buf_len,
+                       const void *token, size_t token_len, uint8_t code)
+{
+    uint8_t *buf = _buf;
+
+    static const size_t min_hdr_size = COAP_WS_HEADER_SIZE;
+    uint8_t tkl_ext[2];
+    uint8_t tkl;
+    size_t tkl_ext_len = _tkl_ext_len(&tkl, tkl_ext, token_len);
+    size_t hdr_size = min_hdr_size + tkl_ext_len + token_len;
+
+    if (buf_len < hdr_size) {
+        return -EOVERFLOW;
+    }
+
+    /* We copy the token first and use memmove, as caller may reuse the same
+     * buffer for the reply that was used for the request. Since CoAP over TCP
+     * has a dynamic header size (depending on the length of the message), the
+     * header of the reply might very well be larger than the one of the request.
+     * Worse: Our tentative header uses a worst case estimation and is almost
+     * always larger than the header of the request. So we need to move data
+     * with a bit of care here. */
+    uint16_t token_offset = COAP_WS_HEADER_SIZE + tkl_ext_len;
+    memmove(buf + token_offset, token, token_len);
+
+    buf[0] = tkl;
+    buf[1] = code;
+    memcpy(buf + token_offset, tkl_ext, tkl_ext_len);
+    token_offset += tkl_ext_len;
+
+    if (pkt) {
+        memset(pkt, 0, sizeof(*pkt));
+        pkt->buf = buf;
+        pkt->payload = buf + hdr_size;
+        pkt->payload_len = buf_len - hdr_size;
+        coap_set_transport(pkt, COAP_TRANSPORT_WS);
+        pkt->token_pos_and_len = (token_offset  << 12) | token_len;
+    }
+
+    return hdr_size;
 }
 
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len)

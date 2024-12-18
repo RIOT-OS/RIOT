@@ -22,8 +22,8 @@
  *
  * nanocoap includes the core structs to store message information. It also
  * provides helper functions for use before sending and after receiving a
- * message, such as coap_parse_udp() / coap_parse_tcp() to read an incoming
- * message.
+ * message, such as coap_parse_udp() / coap_parse_tcp() / coap_parse_ws() to
+ * read an incoming message.
  *
  * ## Application APIs
  *
@@ -92,6 +92,7 @@
 #include "macros/utils.h"
 #include "modules.h"
 #include "net/coap.h"
+#include "net/nanocoap_ws.h"
 
 #if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS || DOXYGEN
 #  include "net/sock/udp.h"
@@ -196,13 +197,18 @@ extern "C" {
 #  define MODULE_NANOCOAP_UDP 0
 #endif
 
+#ifndef MODULE_NANOCOAP_DTLS
+#  define MODULE_NANOCOAP_DTLS 0
+#endif
+
 #ifndef MODULE_NANOCOAP_TCP
 #  define MODULE_NANOCOAP_TCP 0
 #  define NANOCOAP_EXPOSE_DEPRECATED_API 0
 #endif
 
-#ifndef MODULE_NANOCOAP_DTLS
-#  define MODULE_NANOCOAP_DTLS 0
+#ifndef MODULE_NANOCOAP_WS
+#  define MODULE_NANOCOAP_WS 0
+#  define NANOCOAP_EXPOSE_DEPRECATED_API 0
 #endif
 
 #ifndef NANOCOAP_EXPOSE_DEPRECATED_API
@@ -213,7 +219,7 @@ extern "C" {
  * @brief   Number of transports enabled at compile-time
  */
 #define NANOCOAP_ENABLED_TRANSPORTS \
-    (MODULE_NANOCOAP_UDP + MODULE_NANOCOAP_TCP + MODULE_NANOCOAP_DTLS)
+    (MODULE_NANOCOAP_UDP + MODULE_NANOCOAP_DTLS + MODULE_NANOCOAP_TCP + MODULE_NANOCOAP_WS)
 
 /**
  *
@@ -231,6 +237,12 @@ extern "C" {
  * Total            = 4 Byte
  */
 #define COAP_TCP_TENTATIVE_HEADER_SIZE  4
+
+/**
+ * @brief   Size of the CoAP over WebSocket header (excluding the Token and
+ *          extended TKL field)
+ */
+#define COAP_WS_HEADER_SIZE 2
 
 /**
  * @brief   Raw CoAP over UDP PDU header structure
@@ -258,6 +270,7 @@ typedef enum {
     COAP_TRANSPORT_UDP,     /**< CoAP over UDP (see RFC 7252) */
     COAP_TRANSPORT_DTLS,    /**< CoAP over DTLS (see RFC 7252) */
     COAP_TRANSPORT_TCP,     /**< CoAP over TCP (see RFC 8323) */
+    COAP_TRANSPORT_WS,      /**< CoAP over WebSocket (see RFC 8323) */
 } coap_transport_t;
 
 /**
@@ -552,6 +565,9 @@ struct _coap_request_ctx {
 #if MODULE_NANOCOAP_TCP
         sock_tcp_t *sock_tcp;           /**< TCP socket the request was received on */
 #endif
+#if MODULE_NANOCOAP_WS
+        coap_ws_conn_t *conn_ws;        /**< WebSocket connection the request was received over */
+#endif
     };
 #if defined(MODULE_GCOAP) || DOXYGEN
     /**
@@ -583,6 +599,8 @@ static inline coap_transport_t coap_get_transport(const coap_pkt_t *pkt)
     return COAP_TRANSPORT_DTLS;
 #elif MODULE_NANOCOAP_TCP
     return COAP_TRANSPORT_TCP;
+#elif MODULE_NANOCOAP_WS
+    return COAP_TRANSPORT_WS;
 #else
     return COAP_TRANSPORT_UDP;
 #endif
@@ -824,7 +842,8 @@ static inline unsigned coap_get_id(const coap_pkt_t *pkt)
     case COAP_TRANSPORT_DTLS:
         return ntohs(coap_get_udp_hdr_const(pkt)->id);
     case COAP_TRANSPORT_TCP:
-        /* there are no message IDs in CoAP over TCP, as TCP is inherently
+    case COAP_TRANSPORT_WS:
+        /* there are no message IDs in CoAP over TCP/WS, they are inherently
          * reliable */
         return 0;
     }
@@ -845,7 +864,8 @@ static inline void coap_set_id(coap_pkt_t *pkt, uint16_t id)
         coap_get_udp_hdr(pkt)->id = ntohs(id);
         break;
     case COAP_TRANSPORT_TCP:
-        /* there are no message IDs in CoAP over TCP, as TCP is inherently
+    case COAP_TRANSPORT_WS:
+        /* there are no message IDs in CoAP over TCP/WS, they are inherently
          * reliable */
         return;
     }
@@ -1014,8 +1034,13 @@ static inline unsigned coap_get_response_hdr_len(const coap_pkt_t *pkt)
     default:
     case COAP_TRANSPORT_UDP:
     case COAP_TRANSPORT_DTLS:
+    case COAP_TRANSPORT_WS:
+        /* header length depends only on token length, which matches between
+         * request and response */
         return coap_get_total_hdr_len(pkt);
     case COAP_TRANSPORT_TCP:
+        /* header length also depends on payload length, which may differ
+         * between request and response */
         break;
     }
 
@@ -1045,15 +1070,19 @@ static inline void coap_hdr_set_code(coap_udp_hdr_t *hdr, uint8_t code)
  */
 static inline void coap_pkt_set_code(coap_pkt_t *pkt, uint8_t code)
 {
-    coap_udp_hdr_t *hdr = coap_get_udp_hdr(pkt);
-
-    if (hdr) {
-        coap_hdr_set_code(hdr, code);
-    }
-    else {
+    switch (coap_get_transport(pkt)) {
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        coap_hdr_set_code(coap_get_udp_hdr(pkt), code);
+        break;
+    case COAP_TRANSPORT_TCP:
         /* the position of the message code is not fixed
-         * when using CoAP over TCP / WebSockets */
+         * when using CoAP over TCP */
         pkt->buf[2 + coap_tcp_get_ext_len(pkt)] = code;
+        break;
+    case COAP_TRANSPORT_WS:
+        pkt->buf[2] = code;
+        break;
     }
 }
 
@@ -2554,6 +2583,41 @@ static inline ssize_t coap_build_tcp_hdr(void *buf, size_t buf_len,
 }
 
 /**
+ * @brief   Build a CoAP over WebSocket packet
+ *
+ * @param[out]   pkt        Destination packet to write to
+ * @param[out]   buf        Destination buffer to write to
+ * @param[in]    buf_len    Length of @p buf in bytes
+ * @param[in]    token      token
+ * @param[in]    token_len  length of @p token
+ * @param[in]    code       CoAP code (e.g., COAP_CODE_204, ...)
+ *
+ * @return       Length of the header written into the packet
+ */
+ssize_t coap_build_ws(coap_pkt_t *pkt, void *buf, size_t buf_len, const void *token,
+                       size_t token_len, uint8_t code);
+
+/**
+ * @brief   Build a CoAP over WebSocket packet
+ *
+ * @param[out]   buf        Destination buffer to write to
+ * @param[in]    buf_len    Length of @p buf in bytes
+ * @param[in]    token      token
+ * @param[in]    token_len  length of @p token
+ * @param[in]    code       CoAP code (e.g., COAP_CODE_204, ...)
+ *
+ * @return       length of resulting header
+ *
+ * @note    You probably want to call @ref coap_build_ws instead.
+ */
+static inline ssize_t coap_build_ws_hdr(void *buf, size_t buf_len,
+                                         const void *token, size_t token_len,
+                                         uint8_t code)
+{
+    return coap_build_ws(NULL, buf, buf_len, token, token_len, code);
+}
+
+/**
  * @brief   Finalize a CoAP over TCP packet
  *
  * This converts the tentative CoAP over TCP header without the length info
@@ -2834,6 +2898,22 @@ static inline ssize_t coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 ssize_t coap_parse_tcp(coap_pkt_t *pkt, uint8_t *buf, size_t len);
 
 /**
+ * @brief   Parse a CoAP PDU in WebSocket format
+ *
+ * This function parses a raw CoAP PDU from @p buf with size @p len and fills
+ * the structure pointed to by @p pkt.
+ * @p pkt must point to a preallocated coap_pkt_t structure.
+ *
+ * @param[out]  pkt     structure to parse into
+ * @param[in]   buf     pointer to raw packet data
+ * @param[in]   len     length of packet at @p buf
+ *
+ * @return      Number of bytes parsed (will match @p len here)
+ * @retval      <0          error
+ */
+ssize_t coap_parse_ws(coap_pkt_t *pkt, uint8_t *buf, size_t len);
+
+/**
  * @brief   Initialize a packet struct, to build a message buffer
  *
  * @pre  buf              UDP CoAP header already initialized
@@ -2985,6 +3065,7 @@ static inline ssize_t coap_reply_empty_ack(coap_pkt_t *pkt,
 {
     switch (coap_get_transport(pkt)) {
     case COAP_TRANSPORT_TCP:
+    case COAP_TRANSPORT_WS:
         return 0;
     case COAP_TRANSPORT_UDP:
         if (len < sizeof(coap_udp_hdr_t)) {

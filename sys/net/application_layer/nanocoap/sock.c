@@ -127,6 +127,8 @@ static _observer_t _observer_pool[CONFIG_NANOCOAP_MAX_OBSERVERS];
 static mutex_t _observer_pool_lock;
 #endif
 
+XFA_INIT_CONST(nanocoap_sock_url_connect_handler_t, nanocoap_sock_url_connect_handlers);
+
 ssize_t nanocoap_sock_build_pkt(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                 void *buf, size_t buf_len,
                                 uint8_t type,
@@ -143,6 +145,8 @@ ssize_t nanocoap_sock_build_pkt(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                               nanocoap_sock_next_msg_id(sock));
     case COAP_SOCKET_TYPE_TCP:
         return coap_build_tcp(pkt, buf, buf_len, token, token_len, code);
+    case COAP_SOCKET_TYPE_WS:
+        return coap_build_ws(pkt, buf, buf_len, token, token_len, code);
     }
 }
 
@@ -170,6 +174,30 @@ static int _get_error(const coap_pkt_t *pkt)
     }
 }
 
+#if MODULE_NANOCOAP_TCP
+/* TODO: Implement sock_tcp_writev() to avoid sending the CoAP header and
+ * payload in separate TCP segments even if they would fit in a single one. */
+static int _tcp_writev(sock_tcp_t *sock, const iolist_t *iol)
+{
+    while (iol) {
+        const uint8_t *data = iol->iol_base;
+        size_t len = iol->iol_len;
+        while (len) {
+            ssize_t tmp = sock_tcp_write(sock, data, len);
+            if (tmp < 0) {
+                return tmp;
+            }
+            data += tmp;
+            len -= tmp;
+        }
+
+        iol = iol->iol_next;
+    }
+
+    return 0;
+}
+#endif
+
 static int _sock_sendv(nanocoap_sock_t *sock, const iolist_t *snips)
 {
     switch (nanocoap_sock_get_type(sock)) {
@@ -184,18 +212,14 @@ static int _sock_sendv(nanocoap_sock_t *sock, const iolist_t *snips)
 #endif
 #if MODULE_NANOCOAP_TCP
     case COAP_SOCKET_TYPE_TCP:
-        {
-            int nbytes = 0;
-            while (snips) {
-                int retval = sock_tcp_write(&sock->tcp, snips->iol_base, snips->iol_len);
-                if (retval < 0) {
-                    return retval;
-                }
-                nbytes += retval;
-                snips = snips->iol_next;
-            }
-            return nbytes;
+        return _tcp_writev(&sock->tcp, snips);
+#endif
+#if MODULE_NANOCOAP_WS
+    case COAP_SOCKET_TYPE_WS:
+        if (!sock->ws_conn) {
+            return -ENOTCONN;
         }
+        return sock->ws_conn->handle->transport->sendv(sock->ws_conn, snips);
 #endif
     default:
         assert(0);
@@ -235,6 +259,7 @@ static int _send_ack(nanocoap_sock_t *sock, coap_pkt_t *pkt)
     default:
         break;
     case COAP_SOCKET_TYPE_TCP:
+    case COAP_SOCKET_TYPE_WS:
         return -ENOTSUP;
     }
 
@@ -448,6 +473,73 @@ release:
     return res;
 }
 
+MAYBE_UNUSED
+static int _tcp_ws_handle_csm(const coap_pkt_t *pkt)
+{
+    /* We don't implement any CSM Option. But we need to fail when stumbling
+     * upon a critical option */
+    if (coap_has_unprocessed_critical_options(pkt)) {
+        return -ENOTSUP;
+    }
+
+    return 0;
+}
+
+int nanocoap_send_abort_signal(nanocoap_sock_t *sock)
+{
+    uint8_t buf[8];
+    ssize_t retval;
+    switch (nanocoap_sock_get_type(sock)) {
+#if MODULE_NANOCOAP_TCP
+    case COAP_SOCKET_TYPE_TCP:
+        retval = coap_build_tcp_hdr(buf, sizeof(buf), NULL, 0, COAP_CODE_SIGNAL_ABORT);
+        break;
+#endif
+#if MODULE_NANOCOAP_WS
+    case COAP_SOCKET_TYPE_WS:
+        retval = coap_build_ws_hdr(buf, sizeof(buf), NULL, 0, COAP_CODE_SIGNAL_ABORT);
+        break;
+#endif
+    default:
+        return -ENOTSUP;
+    }
+
+    if (retval < 0) {
+        return retval;
+    }
+
+    iolist_t msg = {
+        .iol_base = buf,
+        .iol_len = retval,
+        .iol_next = NULL,
+    };
+    (void)msg;
+
+    switch (nanocoap_sock_get_type(sock)) {
+#if MODULE_NANOCOAP_TCP
+    case COAP_SOCKET_TYPE_TCP:
+        {
+            /* data_len = length of packet after after CoAP Token */
+            const size_t data_len = 0;
+            size_t shrunk = coap_finalize_tcp_header(buf, data_len);
+            msg.iol_base = (void *)((uintptr_t)msg.iol_base + shrunk);
+            msg.iol_len -= shrunk;
+            return _tcp_writev(&sock->tcp, &msg);
+        }
+#endif
+#if MODULE_NANOCOAP_WS
+    case COAP_SOCKET_TYPE_WS:
+        if (!sock->ws_conn) {
+            return -ENOTCONN;
+        }
+        return sock->ws_conn->handle->transport->sendv(sock->ws_conn, &msg);
+#endif
+    default:
+        break;
+    }
+    return -ENOTSUP;
+}
+
 #if MODULE_NANOCOAP_TCP
 static int _tcp_send(nanocoap_sock_t *sock, coap_pkt_t *pkt)
 {
@@ -539,6 +631,186 @@ static ssize_t nanocoap_sock_tcp_request_cb(nanocoap_sock_t *sock, coap_pkt_t *p
 }
 #endif
 
+#if MODULE_NANOCOAP_WS
+int nanocoap_send_csm_message_ws(coap_ws_conn_t *conn, void *_buf, size_t buf_size)
+{
+    assert((buf_size >= 16) && (buf_size <= UINT16_MAX));
+    uint8_t *buf = _buf;
+    ssize_t pos = coap_build_ws_hdr(buf, buf_size, NULL, 0, COAP_CODE_SIGNAL_CSM);
+    if (pos < 0) {
+        return pos;
+    }
+
+    pos += coap_opt_put_uint(buf + pos, 0, COAP_SIGNAL_CSM_OPT_MAX_MESSAGE_SIZE,
+                             buf_size);
+    pos += coap_put_option(buf + pos, COAP_SIGNAL_CSM_OPT_MAX_MESSAGE_SIZE,
+                           COAP_SIGNAL_CSM_OPT_BLOCK_WISE_TRANSFER, NULL, 0);
+    /* Indicate support for extended token length, if selected. Allow up to
+     * half of the buffer to be used for the token. */
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        pos += coap_opt_put_uint(buf + pos,
+                                 COAP_SIGNAL_CSM_OPT_BLOCK_WISE_TRANSFER,
+                                 COAP_SIGNAL_CSM_OPT_EXTENDED_TOKEN_LENGTH,
+                                 buf_size / 2);
+    }
+
+    DEBUG("nanocoap_ws: sending %u B of CSM\n", (unsigned)pos);
+    iolist_t out = {
+        .iol_base = buf,
+        .iol_len = pos,
+        .iol_next = NULL,
+    };
+
+    return conn->handle->transport->sendv(conn, &out);
+}
+
+static void _client_ws_conn_recv_cb(coap_ws_conn_t *conn, void *msg, size_t msg_len)
+{
+    nanocoap_sock_t *sock = conn->arg;
+    coap_pkt_t pkt;
+
+    {
+        ssize_t retval = coap_parse_ws(&pkt, msg, msg_len);
+        if (retval < 0) {
+            DEBUG("nanocoap_ws: failed to parse reply: %" PRIdSIZE " \n", retval);
+            conn->handle->transport->close(conn);
+            sock->ws_retval = -EBADMSG;
+            mutex_unlock(&sock->ws_sync);
+            return;
+        }
+    }
+
+    if (coap_get_code_raw(&pkt) == COAP_CODE_SIGNAL_CSM) {
+        DEBUG_PUTS("nanocoap_ws: Got CSM signal message");
+        int retval = _tcp_ws_handle_csm(&pkt);
+        if (retval) {
+            DEBUG("nanocoap_ws: Failed to handle CSM message: %d\n", retval);
+            conn->handle->transport->close(conn);
+            sock->ws_retval = -ECONNABORTED;
+            mutex_unlock(&sock->ws_sync);
+        }
+        return;
+    }
+
+    unsigned irq_state = irq_disable();
+    coap_request_cb_t cb = sock->ws_cb;
+    void *arg = sock->ws_cb_arg;
+    sock->ws_cb = NULL;
+    sock->ws_cb_arg = NULL;
+    sock->ws_retval = msg_len;
+    irq_restore(irq_state);
+
+    if (cb != NULL) {
+        sock->ws_retval = cb(arg, &pkt);
+    }
+    else {
+        sock->ws_retval = _get_error(&pkt);
+    }
+
+    mutex_unlock(&sock->ws_sync);
+}
+
+static bool _client_ws_conn_reclaim_cb(coap_ws_conn_t *conn)
+{
+    nanocoap_sock_t *sock = conn->arg;
+    /* if there still is a reply pending, it won't be received any more */
+    sock->ws_retval = -ENOTCONN;
+    mutex_unlock(&sock->ws_sync);
+
+    /* drop handle */
+    return true;
+}
+
+int nanocoap_sock_ws_connect(nanocoap_sock_t *sock,
+                             const coap_ws_transport_t *transport, void *arg,
+                             const void *remote_ep, const void *local_ep, size_t ep_len)
+{
+    assert(sock && transport && (remote_ep || !ep_len));
+    *sock = (nanocoap_sock_t) {
+        .ws_sync = MUTEX_INIT_LOCKED,
+    };
+    nanocoap_sock_set_type(sock, COAP_SOCKET_TYPE_WS);
+    static const coap_ws_cbs_t cbs = {
+        .conn_recv_cb = _client_ws_conn_recv_cb,
+        .conn_reclaim_cb = _client_ws_conn_reclaim_cb,
+    };
+    coap_ws_handle_t *handle = transport->open_handle(&cbs, arg, local_ep, ep_len);
+    if (!handle) {
+        DEBUG_PUTS("nanocoap_sock_ws_connect: failted to open handle");
+        return -ENETDOWN;
+    }
+
+    sock->ws_conn = transport->connect(handle, remote_ep, ep_len, sock);
+    if (!sock->ws_conn) {
+        transport->close_handle(handle);
+        DEBUG_PUTS("nanocoap_sock_ws_connect: failed to open connection");
+        return -ECONNREFUSED;
+    }
+
+    int retval = nanocoap_send_csm_message_ws(sock->ws_conn, handle->tx_buf,
+                                              sizeof(handle->tx_buf));
+    if (retval) {
+        DEBUG("nanocoap_sock_ws_connect: failed to send csm: %d\n", retval);
+        /* all connections corresponding to the handle are implicitly closed
+         * by the transport */
+        transport->close_handle(handle);
+        return retval;
+    }
+
+    return 0;
+}
+
+static ssize_t nanocoap_sock_ws_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
+                                           coap_request_cb_t cb, void *arg)
+{
+    assume(sock && pkt);
+    DEBUG("nanocoap_ws: sending request over conn %p\n", (void *)sock->ws_conn);
+
+    if (!sock->ws_conn) {
+        return -ENOTCONN;
+    }
+
+    iolist_t iol = {
+        .iol_base = pkt->buf,
+        .iol_len = coap_get_total_len(pkt),
+        .iol_next = pkt->snips,
+    };
+
+    unsigned irq_state = irq_disable();
+    sock->ws_cb = cb;
+    sock->ws_cb_arg = arg;
+    sock->ws_retval = -ETIMEDOUT;
+    irq_restore(irq_state);
+
+    /* make sure we block on the next call to mutex_lock() */
+    (void)mutex_trylock(&sock->ws_sync);
+
+    ssize_t err = sock->ws_conn->handle->transport->sendv(sock->ws_conn, &iol);
+    if (err) {
+        irq_state = irq_disable();
+        sock->ws_cb = NULL;
+        sock->ws_cb_arg = NULL;
+        irq_restore(irq_state);
+        DEBUG("nanocoap_ws: sending request failed: %" PRIdSIZE "\n", err);
+        return err;
+    }
+
+    /* wait for the reply, but at most 5 seconds using ZTIMER_MSEC (preferred)
+     * or ZTIMER_USEC (when ZTIMER_MSEC is not available */
+    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        ztimer_mutex_lock_timeout(ZTIMER_MSEC, &sock->ws_sync, 5 * MS_PER_SEC);
+    }
+    else {
+        ztimer_mutex_lock_timeout(ZTIMER_USEC, &sock->ws_sync, 5 * US_PER_SEC);
+    }
+
+    err = sock->ws_retval;
+    DEBUG("nanocoap_sock_ws_request_cb returns %" PRIdSIZE " for conn %p\n",
+          err, (void *)sock->ws_conn);
+    return err;
+}
+#endif
+
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg)
 {
@@ -550,6 +822,10 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
 #if MODULE_NANOCOAP_TCP
     case COAP_SOCKET_TYPE_TCP:
         return nanocoap_sock_tcp_request_cb(sock, pkt, cb, arg);
+#endif
+#if MODULE_NANOCOAP_WS
+    case COAP_SOCKET_TYPE_WS:
+        return nanocoap_sock_ws_request_cb(sock, pkt, cb, arg);
 #endif
     }
 }
@@ -1181,6 +1457,14 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
 
 int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
 {
+    size_t connectors_numof = XFA_LEN(nanocoap_sock_url_connect_handler_t, nanocoap_sock_url_connect_handlers);
+    for (size_t i = 0; i < connectors_numof; i++) {
+        int retval = nanocoap_sock_url_connect_handlers[i](url, sock);
+        if (retval != -ENOTSUP) {
+            return retval;
+        }
+    }
+
     char hostport[CONFIG_SOCK_HOSTPORT_MAXLEN];
 #if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS || MODULE_NANOCOAP_TCP
     union {
@@ -1292,6 +1576,47 @@ int nanocoap_get_blockwise_url(const char *url,
     nanocoap_sock_close(&sock);
 
     return res;
+}
+
+void nanocoap_sock_close(nanocoap_sock_t *sock)
+{
+    switch (nanocoap_sock_get_type(sock)) {
+#if MODULE_NANOCOAP_DTLS
+    case COAP_SOCKET_TYPE_DTLS:
+        sock_dtls_session_destroy(&sock->dtls, &sock->dtls_session);
+        sock_dtls_close(&sock->dtls);
+        /* always close the UDP connection (see: nanocoap_sock_t) */
+        sock_udp_close(&sock->udp);
+        break;
+#endif
+#if MODULE_NANOCOAP_UDP
+    case COAP_SOCKET_TYPE_UDP:
+        sock_udp_close(&sock->udp);
+        break;
+#endif
+#if MODULE_NANOCOAP_TCP
+    case COAP_SOCKET_TYPE_TCP:
+        if (sock->tcp_buf) {
+            nanocoap_send_abort_signal(sock);
+            sock_tcp_disconnect(&sock->tcp);
+            free(sock->tcp_buf);
+            sock->tcp_buf = NULL;
+            sock->tcp_buf_fill = 0;
+        }
+        break;
+#endif
+#if MODULE_NANOCOAP_WS
+    case COAP_SOCKET_TYPE_WS:
+        if (sock->ws_conn) {
+            nanocoap_send_abort_signal(sock);
+            sock->ws_conn->handle->transport->close(sock->ws_conn);
+            sock->ws_conn = NULL;
+        }
+        break;
+#endif
+    default:
+        assert(0);
+    }
 }
 
 typedef struct {
@@ -1434,17 +1759,6 @@ ssize_t nanocoap_send_csm_message(sock_tcp_t *sock, void *_buf, size_t buf_size)
 #endif
 
 #if MODULE_NANOCOAP_SERVER_TCP
-int _handle_csm(const coap_pkt_t *pkt)
-{
-    /* We don't implement any CSM Option. But we need to fail when stumbling
-     * upon a critical option */
-    if (coap_has_unprocessed_critical_options(pkt)) {
-        return -ENOTSUP;
-    }
-
-    return 0;
-}
-
 static void _server_tcp_data_cb(sock_tcp_t *sock, sock_async_flags_t flags,
                                 void *arg)
 {
@@ -1510,7 +1824,7 @@ static void _server_tcp_data_cb(sock_tcp_t *sock, sock_async_flags_t flags,
              * > recipient. */
             break;
         case COAP_CODE_SIGNAL_CSM:
-            res = _handle_csm(&pkt);
+            res = _tcp_ws_handle_csm(&pkt);
             if (res < 0) {
                 DEBUG("nanocoap_tcp: failed to handle CSM of client #%u: %d\n",
                       idx, res);
@@ -1526,6 +1840,10 @@ static void _server_tcp_data_cb(sock_tcp_t *sock, sock_async_flags_t flags,
             /* We probably did not send a ping as server, but let's just
              * ignore the pong anyway */
             break;
+        case COAP_CODE_SIGNAL_ABORT:
+            DEBUG_PUTS("nanocoap_tcp: got abort signal, closing sock");
+            sock_tcp_disconnect(sock);
+            return;
         default:
             {
                 sock_tcp_ep_t remote;
@@ -1649,6 +1967,132 @@ int nanocoap_server_tcp(nanocoap_tcp_server_ctx_t *ctx,
 }
 #endif
 
+#if MODULE_NANOCOAP_SERVER_WS
+static bool _server_ws_conn_accept_cb(coap_ws_handle_t *handle, coap_ws_conn_t *conn)
+{
+    int retval = nanocoap_send_csm_message_ws(conn, handle->tx_buf, sizeof(handle->tx_buf));
+    if (retval) {
+        DEBUG("nanocoap_server_ws: sending CSM failed: %d\n", retval);
+        handle->transport->close(conn);
+        return true;
+    }
+
+    DEBUG("nanocoap_server_ws: new conn %p on handle %p\n",
+          (void *)conn, (void *)handle);
+
+    return true;
+}
+
+static void _server_ws_conn_recv_cb(coap_ws_conn_t *conn, void *msg, size_t msg_len)
+{
+    coap_pkt_t pkt;
+    ssize_t retval = coap_parse_ws(&pkt, msg, msg_len);
+    if (retval < 0) {
+        DEBUG("nanocoa_server_ws: failed to parse CoAP message on connection "
+              "%p. Closing connection.\n",
+              (void *)conn);
+        conn->handle->transport->close(conn);
+        return;
+    }
+
+    int res;
+    ssize_t reply_len = 0;
+    uint8_t *buf = conn->handle->tx_buf;
+    const size_t buf_size = sizeof(conn->handle->tx_buf);
+    switch (coap_get_code_raw(&pkt)) {
+    case COAP_CODE_EMPTY:
+        /* > In CoAP over reliable transports, Empty messages
+         * > (Code 0.00) can always be sent and MUST be ignored by the
+         * > recipient. */
+        break;
+    case COAP_CODE_SIGNAL_CSM:
+        res = _tcp_ws_handle_csm(&pkt);
+        if (res < 0) {
+            DEBUG("nanocoap_server_ws: failed to handle CSM on connection %p: %d\n",
+                  (void *)conn, res);
+            conn->handle->transport->close(conn);
+            return;
+        }
+
+        /* Hack for CoAP over YOLO: "Connection" may be replaced without us
+         * noticing, so we just reply with a CSM as if this was the initial
+         * handshanke. This is fine, as a CSM message is to be expected at
+         * any point in time. */
+        res = nanocoap_send_csm_message_ws(conn, conn->handle->tx_buf,
+                                           sizeof(conn->handle->tx_buf));
+        if (res < 0) {
+            DEBUG("nanocoap_server_ws: failed to reply CSM on connection %p: %d\n",
+                  (void *)conn, res);
+            conn->handle->transport->close(conn);
+            return;
+        }
+        break;
+    case COAP_CODE_SIGNAL_PING:
+        reply_len = coap_reply_simple(&pkt, COAP_CODE_SIGNAL_PONG,
+                                      buf, buf_size, 0, NULL, 0);
+        break;
+    case COAP_CODE_SIGNAL_PONG:
+        /* We probably did not send a ping as server, but let's just
+         * ignore the pong anyway */
+        break;
+    case COAP_CODE_SIGNAL_ABORT:
+        DEBUG_PUTS("nanocoap_server_ws: got abort signal, closing connection");
+        conn->handle->transport->close(conn);
+        return;
+    default:
+        {
+            coap_request_ctx_t req = {
+                .conn_ws = conn,
+            };
+            reply_len = coap_handle_req(&pkt, buf, buf_size, &req);
+        }
+    }
+
+    if (reply_len) {
+        if (reply_len < 0) {
+            DEBUG("nanocoap_server_ws: error handling request from conn %p: %"
+                  PRIdSIZE "\n", (void *)conn, reply_len);
+            conn->handle->transport->close(conn);
+            return;
+        }
+
+        iolist_t iol = {
+            .iol_base = buf,
+            .iol_len = reply_len,
+            .iol_next = NULL,
+        };
+        res = conn->handle->transport->sendv(conn, &iol);
+
+        if (res) {
+            DEBUG("nanocoap_server_ws: failed to send reply to conn %p: %d\n",
+                  (void *)conn, res);
+            conn->handle->transport->close(conn);
+        }
+    }
+}
+
+int nanocoap_server_ws(const coap_ws_transport_t *transport, void *transport_arg,
+                       const void *local_ep, size_t local_ep_len)
+{
+    assert(transport);
+    static const coap_ws_cbs_t _cbs = {
+        .conn_accept_cb = _server_ws_conn_accept_cb,
+        .conn_recv_cb = _server_ws_conn_recv_cb,
+    };
+    coap_ws_handle_t *handle = transport->open_handle(&_cbs, transport_arg,
+                                                      local_ep, local_ep_len);
+    if (!handle) {
+        DEBUG("nanocoap_server_ws: failed to open handle for transport %p\n",
+              (void *)transport);
+        return -ENETDOWN;
+    }
+
+    DEBUG("nanocoap_server_ws: set up with handle %p\n", (void *)handle);
+
+    return 0;
+}
+#endif
+
 #if MODULE_NANOCOAP_UDP
 int nanocoap_server_udp(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
 {
@@ -1757,6 +2201,11 @@ int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
         ctx->sock_tcp = req->sock_tcp;
         break;
 #endif
+#if MODULE_NANOCOAP_WS
+    case COAP_TRANSPORT_WS:
+        ctx->conn_ws = req->conn_ws;
+        break;
+#endif
     default:
         return -ENOTSUP;
     }
@@ -1815,30 +2264,6 @@ ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx
     }
 }
 
-#  if MODULE_NANOCOAP_SERVER_TCP
-/* TODO: Implement sock_tcp_writev() to avoid sending the CoAP header and
- * payload in separate TCP segments even if they would fit in a single one. */
-static int _tcp_writev(sock_tcp_t *sock, const iolist_t *iol)
-{
-    while (iol) {
-        const uint8_t *data = iol->iol_base;
-        size_t len = iol->iol_len;
-        while (len) {
-            ssize_t tmp = sock_tcp_write(sock, data, len);
-            if (tmp < 0) {
-                return tmp;
-            }
-            data += tmp;
-            len -= tmp;
-        }
-
-        iol = iol->iol_next;
-    }
-
-    return 0;
-}
-#  endif
-
 #  if MODULE_NANOCOAP_UDP
 static int _nanocoap_server_sendv_separate_udp(const nanocoap_server_response_ctx_t *ctx,
                                                const iolist_t *reply)
@@ -1872,7 +2297,12 @@ int nanocoap_server_sendv_separate(const nanocoap_server_response_ctx_t *ctx,
         return _nanocoap_server_sendv_separate_udp(ctx, reply);
 #  endif
 #  if MODULE_NANOCOAP_SERVER_TCP
+    case COAP_TRANSPORT_TCP:
         return _tcp_writev(ctx->sock_tcp, reply);
+#  endif
+#  if MODULE_NANOCOAP_SERVER_WS
+    case COAP_TRANSPORT_WS:
+        return ctx->conn_ws->handle->transport->sendv(ctx->conn_ws, reply);
 #  endif
     default:
         return -ENOTSUP;

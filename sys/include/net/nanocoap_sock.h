@@ -142,6 +142,7 @@
 
 #include "mutex.h"
 #include "net/nanocoap.h"
+#include "net/nanocoap_ws.h"
 #include "net/sock/util.h"
 #include "xfa.h"
 
@@ -220,6 +221,7 @@ typedef enum {
     COAP_SOCKET_TYPE_UDP = COAP_TRANSPORT_UDP,   /**< transport is plain UDP */
     COAP_SOCKET_TYPE_DTLS = COAP_TRANSPORT_DTLS, /**< transport is DTLS      */
     COAP_SOCKET_TYPE_TCP = COAP_TRANSPORT_TCP,   /**< transport is TCP       */
+    COAP_SOCKET_TYPE_WS = COAP_TRANSPORT_WS,     /**< transport is WebSocket */
 } nanocoap_socket_type_t;
 
 /**
@@ -249,6 +251,16 @@ typedef struct {
                                          *   (output of malloc()) */
             uint16_t tcp_buf_fill;      /**< number of bytes in
                                          *   @ref nanocoap_sock_t::tcp_buf */
+        };
+#endif
+#if MODULE_NANOCOAP_WS || DOXYGEN
+        struct {
+            coap_ws_conn_t *ws_conn;    /**< WebSocket connection */
+            coap_request_cb_t ws_cb;    /**< request callback to call */
+            void *ws_cb_arg;            /**< arg for the request callback */
+            mutex_t ws_sync;            /**< unlock this on when a reply is
+                                             ready */
+            ssize_t ws_retval;          /**< return value to pass along */
         };
 #endif
     };
@@ -293,6 +305,9 @@ typedef struct {
 #if MODULE_NANOCOAP_SERVER_TCP || DOXYGEN
         sock_tcp_t *sock_tcp;               /**< TCP socket to send the response over */
 #endif
+#if MODULE_NANOCOAP_WS || DOXYGEN
+        coap_ws_conn_t *conn_ws;            /**< WebSocket connection to send the response over */
+#endif
     };
     uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token            */
     uint8_t tkl;                            /**< request token length     */
@@ -335,6 +350,37 @@ typedef struct {
 #endif
 
 /**
+ * @brief   Signature of an URL based socket connector
+ * @param[in]   url     URL to connect to
+ * @param[out]  sock    Socket to initialize
+ * @retval  -ENOTSUP    URL scheme not matching (keep on trying)
+ * @return  Success or error code when connection
+ */
+typedef int (*nanocoap_sock_url_connect_handler_t)(const char *url, nanocoap_sock_t *sock);
+
+/**
+ * @brief   Cross file array of custom URL connectors.
+ *
+ * @details @ref nanocoap_sock_url_connect will call them in order before
+ *          trying the builtin URL schemes. If one of the custom connectors
+ *          does not return `-ENOTSUP`, @ref nanocoap_sock_url_connect will
+ *          assume the URL to be handled pass through the return value.
+ */
+XFA_USE_CONST(nanocoap_sock_url_connect_handler_t, nanocoap_sock_url_connect_handlers);
+
+#define _NANOCOAP_SOCK_URL_CONNECT_HANDLER(func, prio) \
+    XFA_CONST(nanocoap_sock_url_connect_handler_t, nanocoap_sock_url_connect_handlers, prio) \
+    CONCAT(nanocoap_sock_url_connect_handler_, func) = func
+/**
+ * @brief   Add a new URL connect handler
+ * @param[in]   Function implementing the URL connect handler
+ * @param[in]   Numeric priority (low numeric value --> higher priority) for
+ *              ordering.
+ */
+#define NANOCOAP_SOCK_URL_CONNECT_HANDLER(func, prio) \
+    _NANOCOAP_SOCK_URL_CONNECT_HANDLER(func, prio)
+
+/**
  * @brief   Get the type of a given nanocoap socket
  * @param[in]   sock    Socket to get the type of
  *
@@ -353,6 +399,8 @@ static inline nanocoap_socket_type_t nanocoap_sock_get_type(const nanocoap_sock_
     return COAP_SOCKET_TYPE_DTLS;
 #elif MODULE_NANOCOAP_TCP
     return COAP_SOCKET_TYPE_TCP;
+#elif MODULE_NANOCOAP_WS
+    return COAP_SOCKET_TYPE_WS;
 #else
 #  error "nanocoap: no transport enabled"
 #endif
@@ -431,6 +479,8 @@ static inline coap_transport_t nanocoap_server_response_ctx_transport(const nano
     return COAP_TRANSPORT_DTLS;
 #elif MODULE_NANOCOAP_TCP
     return COAP_TRANSPORT_TCP;
+#elif MODULE_NANOCOAP_WS
+    return COAP_TRANSPORT_WS;
 #endif
 }
 
@@ -621,7 +671,12 @@ void nanocoap_notify_observers_simple(const coap_resource_t *res, uint32_t obs,
  */
 static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
 {
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS
     return sock->msg_id++;
+#else
+    (void)sock;
+    return 0;
+#endif
 }
 
 #if MODULE_NANOCOAP_SERVER_TCP || DOXYGEN
@@ -642,6 +697,23 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
 int nanocoap_server_tcp(nanocoap_tcp_server_ctx_t *ctx,
                         event_queue_t *evq,
                         const sock_tcp_ep_t *local);
+#endif
+
+#if MODULE_NANOCOAP_SERVER_WS || DOXYGEN
+/**
+ * @brief   Setup a nanocoap server instance listening on WebSockets
+ *
+ * @param[in]       transport       WebSocket transport to set up a WebSocket handle on
+ * @param[in,out]   transport_arg   Argument to pass to the transport when opening the handle
+ * @param[in]       local_ep        Local endpoint to listen on
+ * @param[in]       local_ep_len    Length of @p local_ep in bytes
+ *
+ * @retval  0   Success, server set up and connections will be accepted and
+ *              handled from the event thread
+ * @retval  <0  Error setting up server
+ */
+int nanocoap_server_ws(const coap_ws_transport_t *transport, void *transport_arg,
+                       const void *local_ep, size_t local_ep_len);
 #endif
 
 #if MODULE_NANOCOAP_UDP || DOXYGEN
@@ -765,6 +837,27 @@ int nanocoap_sock_tcp_connect(nanocoap_sock_t *sock,
 #endif
 
 /**
+ * @brief   Create a CoAP over WebSocket client socket
+ *
+ * @param[out]      sock        CoAP WebSocket socket
+ * @param[in]       transport   WebSocket transport to use
+ * @param[in,out]   arg         Argument to pass to @p transport when opening a
+ *                              WebSocket handle
+ * @param[in]       local_ep    Local WebSocket endpoint
+ * @param[in]       remote_ep   Remote WebSocket endpoint
+ * @param[in]       ep_len      Length of @p remote_ep and @p local_ep in bytes
+ *
+ * @note    Requires module `nanocoap_ws`
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+int nanocoap_sock_ws_connect(nanocoap_sock_t *sock,
+                             const coap_ws_transport_t *transport, void *arg,
+                             const void *local_ep, const void *remote_ep,
+                             size_t ep_len);
+
+/**
  * @brief   Create a CoAP client socket by URL
  *
  * @param[in]   url     URL with server information to connect to
@@ -780,36 +873,7 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock);
  *
  * @param[in]  sock     CoAP UDP socket
  */
-static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
-{
-    switch (nanocoap_sock_get_type(sock)) {
-#if MODULE_NANOCOAP_DTLS
-    case COAP_SOCKET_TYPE_DTLS:
-        sock_dtls_session_destroy(&sock->dtls, &sock->dtls_session);
-        sock_dtls_close(&sock->dtls);
-        /* always close the UDP connection (see: nanocoap_sock_t) */
-        sock_udp_close(&sock->udp);
-        break;
-#endif
-#if MODULE_NANOCOAP_UDP
-    case COAP_SOCKET_TYPE_UDP:
-        sock_udp_close(&sock->udp);
-        break;
-#endif
-#if MODULE_NANOCOAP_TCP
-    case COAP_SOCKET_TYPE_TCP:
-        if (sock->tcp_buf) {
-            sock_tcp_disconnect(&sock->tcp);
-            free(sock->tcp_buf);
-            sock->tcp_buf = NULL;
-            sock->tcp_buf_fill = 0;
-        }
-        break;
-#endif
-    default:
-        assert(0);
-    }
-}
+void nanocoap_sock_close(nanocoap_sock_t *sock);
 
 /**
  * @brief   Observe a CoAP resource behind a URL (via GET)
@@ -1350,6 +1414,30 @@ int nanocoap_sock_block_request(coap_block_request_t *ctx, const void *data, siz
  */
 ssize_t nanocoap_send_csm_message(sock_tcp_t *sock, void *buf, size_t buf_size);
 #endif
+
+/**
+ * @brief   Send a CoAP-over-WebSocket CSM message
+ *
+ * @warning This is an internal function. It's API may change as needed without
+ *          deprecation.
+ *
+ * @param[in,out]   conn        Connection to send the date over
+ * @param[out]      buf         Message buffer to assemble the CSM message in before
+ *                              sending it out
+ * @param[in]       buf_size    Size of @p buf in bytes. This will also be reported
+ *                              to the other side as maximum size for messages
+ *                              to receive.
+ *
+ * @retval          0           Success
+ * @retval          <0          Error
+ *
+ * This will send a CSM message that indicates messages up at most @p buf_size
+ * bytes will be processed (assuming @p buf is also used as receive buffer).
+ * It will also indicate support for block-wise transfer. If and only if
+ * module `nanocoap_token_ext` is used, support for RFC 8974 Extended Tokens
+ * will be indicated.
+ */
+int nanocoap_send_csm_message_ws(coap_ws_conn_t *conn, void *buf, size_t buf_size);
 
 /**
  * @brief   Send a CoAP-over-TCP/CoAP-over-WebSocket Abort Signaling message
