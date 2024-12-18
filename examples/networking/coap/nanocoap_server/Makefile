@@ -107,6 +107,8 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
     USEMODULE += vfs_auto_format
   endif
 
+  USEMODULE += nanocoap_server_ws
+
   # async TCP is not supported on GNRC yet
   ifeq ($(NETWORK_STACK),lwip)
     USEMODULE += nanocoap_server_tcp
