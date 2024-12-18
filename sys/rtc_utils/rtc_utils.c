@@ -177,7 +177,7 @@ void rtc_tm_normalize(struct tm *t)
 #endif
 }
 
-uint32_t rtc_mktime(struct tm *t)
+uint32_t rtc_mktime(const struct tm *t)
 {
     unsigned year = t->tm_year + 1900;
     uint32_t time = t->tm_sec
