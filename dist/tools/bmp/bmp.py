@@ -14,13 +14,13 @@
 import argparse
 import os
 import re
+import shutil
 import sys
 
 import humanize
 import serial.tools.list_ports
 from progressbar import Bar, Percentage, ProgressBar
 from pygdbmi.gdbcontroller import GdbController
-import distutils.spawn
 
 parser = argparse.ArgumentParser(description='Black Magic Tool helper script.')
 parser.add_argument('--jtag', action='store_true', help='use JTAG transport')
@@ -43,11 +43,11 @@ TIMEOUT = 100  # seconds
 
 # find a suitable gdb executable, falling back to defaults if needed
 def find_suitable_gdb(gdb_path):
-    if distutils.spawn.find_executable(gdb_path):
+    if shutil.which(gdb_path):
         return gdb_path
     else:
         for p in ['arm-none-eabi-gdb', 'gdb-multiarch']:
-            p = distutils.spawn.find_executable(p)
+            p = shutil.which(p)
             if p:
                 print("GDB EXECUTABLE NOT FOUND! FALLING BACK TO %s" % p, file=sys.stderr)
                 return p
