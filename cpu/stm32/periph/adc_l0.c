@@ -128,9 +128,6 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     /* lock and power on the ADC device  */
     prep();
 
-    /* Enable ADC */
-    _enable_adc();
-
     /* Reactivate VREFINT and temperature sensor if necessary */
     if (adc_config[line].chan == 17) {
         ADC->CCR |= ADC_CCR_VREFEN;
@@ -144,6 +141,9 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     ADC1->CFGR1 &= ~ADC_CFGR1_RES;
     ADC1->CFGR1 |= res & ADC_CFGR1_RES;
     ADC1->CHSELR = (1 << adc_config[line].chan);
+
+    /* Enable ADC */
+    _enable_adc();
 
     /* clear flag */
     ADC1->ISR |= ADC_ISR_EOC;
