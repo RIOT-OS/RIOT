@@ -69,7 +69,7 @@ int rtc_tm_compare(const struct tm *a, const struct tm *b);
  *
  * @return            elapsed seconds since `RIOT_EPOCH`
  */
-uint32_t rtc_mktime(struct tm *t);
+uint32_t rtc_mktime(const struct tm *t);
 
 /**
  * @brief Converts an RTC timestamp into a  time struct.
