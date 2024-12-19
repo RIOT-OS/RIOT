@@ -1,0 +1,9 @@
+DEFAULT_MODULE += xipfs_fs
+
+# require xipfs_fs dependencies if this module isn't disabled
+ifeq (,$(filter xipfs_fs,$(DISABLE_MODULE)))
+  # xipfs only makes sense if the flash memory is addressable
+  FEATURES_REQUIRED += periph_flashpage_in_address_space
+  USEMODULE += periph_flashpage
+  USEMODULE += vfs
+endif
