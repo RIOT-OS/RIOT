@@ -22,22 +22,6 @@ import serial.tools.list_ports
 from progressbar import Bar, Percentage, ProgressBar
 from pygdbmi.gdbcontroller import GdbController
 
-parser = argparse.ArgumentParser(description='Black Magic Tool helper script.')
-parser.add_argument('--jtag', action='store_true', help='use JTAG transport')
-parser.add_argument('--swd', action='store_true', help='use SWD transport (default)')
-parser.add_argument('--connect-srst', action='store_true', help='reset target while connecting')
-parser.add_argument('--tpwr', action='store_true', help='enable target power')
-parser.add_argument('--serial', help='choose specific probe by serial number')
-parser.add_argument('--port', help='choose specific probe by port')
-parser.add_argument('--attach', help='choose specific target by number', default='1')
-parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
-parser.add_argument('--term-cmd', help='serial terminal command',
-                    default='picocom --nolock --imap lfcrlf --baud 115200 %s')
-parser.add_argument('action', help='choose a task to perform', nargs='?',
-                    choices=['list', 'flash', 'erase', 'debug', 'term', 'reset'],
-                    default='list')
-parser.add_argument('file', help='file to load to target (hex or elf)', nargs='?')
-
 TIMEOUT = 100  # seconds
 
 
@@ -171,7 +155,7 @@ def check_flash(gdbmi):
         res = gdbmi.get_gdb_response(timeout_sec=TIMEOUT)
 
 
-def choose_bmp_port(gdb_ports):
+def choose_bmp_port(args, gdb_ports):
     print("found following Black Magic GDB servers:")
     for i, s in enumerate(gdb_ports):
         print("\t[%s]" % s.device, end=' ')
@@ -191,7 +175,7 @@ def choose_bmp_port(gdb_ports):
 
 
 # terminal mode, opens TTY program
-def term_mode(uart_ports):
+def term_mode(args, uart_ports):
     port = uart_ports[0].device
     if args.port:
         port = args.port
@@ -203,7 +187,7 @@ def term_mode(uart_ports):
 
 
 # debug mode, opens GDB shell with options
-def debug_mode(port):
+def debug_mode(args, port):
     gdb_args = ['-ex \'target extended-remote %s\'' % port]
     if args.tpwr:
         gdb_args.append('-ex \'monitor tpwr enable\'')
@@ -217,7 +201,7 @@ def debug_mode(port):
     os.system(" ".join(['\"' + args.gdb_path + '\"'] + gdb_args + [args.file]))
 
 
-def connect_to_target(port):
+def connect_to_target(args, port):
     # open GDB in machine interface mode
     try:
         # try old API first
@@ -248,26 +232,48 @@ def connect_to_target(port):
     return gdbmi
 
 
-if __name__ == '__main__':
-    args = parser.parse_args()
+def parse_args():
+    parser = argparse.ArgumentParser(description='Black Magic Tool helper script.')
+
+    parser.add_argument('--jtag', action='store_true', help='use JTAG transport')
+    parser.add_argument('--swd', action='store_true', help='use SWD transport (default)')
+    parser.add_argument('--connect-srst', action='store_true', help='reset target while connecting')
+    parser.add_argument('--tpwr', action='store_true', help='enable target power')
+    parser.add_argument('--serial', help='choose specific probe by serial number')
+    parser.add_argument('--port', help='choose specific probe by port')
+    parser.add_argument('--attach', help='choose specific target by number', default='1')
+    parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
+    parser.add_argument('--term-cmd', help='serial terminal command',
+                        default='picocom --nolock --imap lfcrlf --baud 115200 %s')
+
+    parser.add_argument('action', help='choose a task to perform', nargs='?',
+                        choices=['list', 'flash', 'erase', 'debug', 'term', 'reset'],
+                        default='list')
+    parser.add_argument('file', help='file to load to target (hex or elf)', nargs='?')
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
     assert not (args.swd and args.jtag), "you may only choose one protocol"
     assert not (args.serial and args.port), "you may only specify the probe by port or by serial"
     g, u = detect_probes()
     assert len(g) > 0, "no Black Magic Probes found 😔"
 
     if args.action == 'term':
-        term_mode(u)
+        term_mode(args, u)
     else:
-        port = choose_bmp_port(g)
+        port = choose_bmp_port(args, g)
 
         args.file = args.file if args.file else ''
         args.gdb_path = find_suitable_gdb(args.gdb_path)
 
         if args.action == 'debug':
-            debug_mode(port)
+            debug_mode(args, port)
             sys.exit(0)
 
-        gdbmi = connect_to_target(port)
+        gdbmi = connect_to_target(args, port)
 
         if args.action == 'list':
             sys.exit(0)
@@ -290,3 +296,7 @@ if __name__ == '__main__':
 
             # kill and reset
             assert gdb_write_and_wait_for_result(gdbmi, 'kill', 'killing')
+
+
+if __name__ == '__main__':
+    main()
