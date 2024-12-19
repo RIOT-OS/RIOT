@@ -289,16 +289,11 @@ ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
 #if defined(__FreeBSD__)
 #undef putchar
 #endif
+#ifndef MODULE_STDIO_NULL
 int putchar(int c)
 {
     char tmp = c;
     return _native_write(STDOUT_FILENO, &tmp, sizeof(tmp));
-}
-
-int putc(int c, FILE *fp)
-{
-    char tmp = c;
-    return _native_write(fileno(fp), &tmp, sizeof(tmp));
 }
 
 int puts(const char *s)
@@ -307,6 +302,13 @@ int puts(const char *s)
     r = _native_write(STDOUT_FILENO, (char*)s, strlen(s));
     putchar('\n');
     return r;
+}
+#endif
+
+int putc(int c, FILE *fp)
+{
+    char tmp = c;
+    return _native_write(fileno(fp), &tmp, sizeof(tmp));
 }
 
 int fgetc(FILE *fp)
@@ -371,6 +373,7 @@ char *make_message(const char *format, va_list argp)
     }
 }
 
+#ifndef MODULE_STDIO_NULL
 int printf(const char *format, ...)
 {
     int r;
@@ -387,6 +390,7 @@ int vprintf(const char *format, va_list argp)
 {
     return vfprintf(stdout, format, argp);
 }
+#endif
 
 int fprintf(FILE *fp, const char *format, ...)
 {
