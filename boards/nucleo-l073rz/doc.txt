@@ -13,6 +13,28 @@ STM32L073RZT6 microcontroller with 20KiB of RAM and 192KiB of Flash.
 
 @image html pinouts/nucleo-l073rz.svg "Pinout for the Nucleo-L073RZ (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50%
 
+### MCU
+
+| MCU        |    STM32L073RZ      |
+|:---------- |:------------------- |
+| Family     | ARM Cortex-M0+      |
+| Vendor     | ST Microelectronics |
+| RAM        | 20KiB               |
+| Flash      | 192KiB              |
+| EEPROM     | 6KB                 |
+| Frequency  | up to 32MHz         |
+| FPU        | no                  |
+| Timers     | 11 (7x 16-bit, 1x RTC, 1x Systick, 2x Watchdog) |
+| ADCs       | 1x 12-bit (16 channels) |
+| UARTs      | 5 (four USARTs and one Low-Power UART) |
+| SPIs       | 6                   |
+| I2Cs       | 3                   |
+| Vcc        | 1.65V - 3.6V        |
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l073rz.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0367-ultralowpower-stm32l0x3-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0223-stm32-cortexm0-mcus-programming-manual-stmicroelectronics.pdf) |
+| Board Manual | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf) |
+
 ## Flashing the Board Using ST-LINK Removable Media
 
 On-board ST-LINK programmer provides via composite USB device removable media.
