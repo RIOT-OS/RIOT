@@ -126,6 +126,10 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += evtimer
 endif
 
+ifneq (,$(filter gnrc_ipv6_auto_subnets_eui,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_auto_subnets_simple
+endif
+
 ifneq (,$(filter gnrc_ipv6_auto_subnets_simple,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_auto_subnets
 endif
