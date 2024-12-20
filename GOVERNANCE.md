@@ -98,7 +98,9 @@ Maintainers may resign at any time if they feel that they will not be able to
 continue fulfilling their project duties.
 
 Maintainers may also be removed after being inactive, upon failure to fulfill their
-Maintainer responsibilities, because of violating the Code of Conduct, or for other reasons.
+Maintainer responsibilities or because of violating the Code of Conduct.
+This also includes actively, persistently, and intentionally trying to harm or successfully harming the code base of RIOT.
+Especially, but not limited to, endangering the security or safety of RIOT.
 Inactivity is defined as a period of very low or no activity in the project.
 A yearly maintainer ping, an e-mail sent to inactive maintainers, determines if the maintainer is still willing to fulfill their project duties.
 On failure to reply to the maintainer ping within the specified amount of time (usually a month), the maintainer will be removed.
@@ -109,7 +111,7 @@ Release managers make sure the quarterly release comes out in time.
 They are one or more maintainers which were appointed for a specific release by the Virtual Maintainer Assembly (VMA).
 Their duties include setting the dates for feature freeze for the release, enforcing the feature freeze, coordinating the (mostly automated) tests of a release, writing the release notes and creating the tags defining the release and its release candidates.
 The full set of tasks can be found in the document [Managing a Release].
-Their duties end once the release is out or if all bug-fixing point releases are out.
+Their duties end once the release after the release they managed is out and all bug-fixing point releases to their release are finished.
 
 ### Admins
 
