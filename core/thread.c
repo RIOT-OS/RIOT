@@ -187,7 +187,7 @@ uintptr_t measure_stack_free_internal(const char *stack, size_t size)
     uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
     uintptr_t end = (uintptr_t)stack + size;
 
-    /* HACK: This will affect native/native64 only.
+    /* HACK: This will affect native/native32 only.
      *
      * The dark magic used here is frowned upon by valgrind. E.g. valgrind may
      * deduce that a specific value was at some point allocated on the stack,
