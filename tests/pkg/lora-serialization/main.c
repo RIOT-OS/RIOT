@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "lora_serialization.h"
 
-#if defined(BOARD_NATIVE)
+#if defined(BOARD_NATIVE32)
 #define TEST_01_EXPECTED    { 0x1f, 0x4c, 0x0e, 0x27 }
 #define TEST_02_EXPECTED    { 0x65, 0xa6, 0xfa, 0xfd, \
                               0x6a, 0x24, 0x04, 0x09, \
