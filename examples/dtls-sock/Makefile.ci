@@ -30,7 +30,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     msb-430 \
     msb-430h \
     nrf51dongle \
-    nrf6310 \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
