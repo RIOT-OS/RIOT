@@ -7,7 +7,7 @@ export TAP ?= tap0
 CFLAGS += -DOUTPUT=TEXT
 
 # use Ethernet as link-layer protocol
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200

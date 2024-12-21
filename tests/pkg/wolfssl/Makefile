@@ -19,10 +19,10 @@ USEMODULE += wolfcrypt-benchmark
 
 USEMODULE += xtimer
 
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32,$(BOARD)))
   CFLAGS += -DBENCH_EMBEDDED
 endif
 
-TEST_ON_CI_WHITELIST += native native64
+TEST_ON_CI_WHITELIST += native native32
 
 include $(RIOTBASE)/Makefile.include

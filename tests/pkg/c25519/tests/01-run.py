@@ -18,7 +18,7 @@ BOARD = os.environ['BOARD']
 # Increase timeout on "real" hardware
 # 170 seconds on `arduino-mega2560`
 # ~300 seconds on `z1`
-TIMEOUT = 320 if BOARD not in ['native', 'native64'] else DEFAULT_TIMEOUT
+TIMEOUT = 320 if BOARD not in ['native', 'native32'] else DEFAULT_TIMEOUT
 
 
 if __name__ == "__main__":

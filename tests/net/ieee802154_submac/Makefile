@@ -13,7 +13,7 @@ USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
 USEMODULE += ztimer_usec
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   USE_ZEP = 1
   USEMODULE += socket_zep
 endif
