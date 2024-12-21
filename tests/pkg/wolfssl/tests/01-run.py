@@ -12,10 +12,10 @@ BOARD = os.environ.get("BOARD", "native")
 # ED25519 takes +160s on samr21-xpro
 # ED25519 takes +230s on nucleo-l073rz
 # ED25519 takes +500s on nrf51dk
-TEST_TIMEOUT = 600 if BOARD not in ['native', 'native64'] else DEFAULT_TIMEOUT
+TEST_TIMEOUT = 600 if BOARD not in ['native', 'native32'] else DEFAULT_TIMEOUT
 # ECDSA 256 takes +30s on samr21-xpro
 # ECDSA 256 takes +40s on nrf51dk
-BENCH_TIMEOUT = 40 if BOARD not in ['native', 'native64'] else 20
+BENCH_TIMEOUT = 40 if BOARD not in ['native', 'native32'] else 20
 
 
 def _wait_for_test(child):

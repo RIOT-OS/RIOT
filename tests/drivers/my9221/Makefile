@@ -3,7 +3,7 @@ include ../Makefile.drivers_common
 USEMODULE += my9221
 
 # disable native GPIOs for automatic test
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   USEMODULE += periph_gpio_mock
 endif
 

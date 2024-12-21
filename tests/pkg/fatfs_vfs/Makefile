@@ -10,7 +10,7 @@ CFLAGS += -DCONFIG_FATFS_FORMAT_ALLOC_STATIC=1
 
 FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   USEMODULE += mtd_native
 
   #overwrite default mtd_native-config to use fat image as flash device

@@ -13,7 +13,7 @@ USEMODULE += dhcpv6_client_ia_na
 USEMODULE += gnrc_dhcpv6_client
 USEMODULE += gnrc_ipv6_default
 USEMODULE += xtimer
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   # Has to be provided here and not in Makefile.dep, so TERMFLAGS are properly
   # configured
   USEMODULE += netdev_default
@@ -50,7 +50,7 @@ dhcpv6_server:
 dhcpv6_server:
 	$(CURDIR)/dhcpv6_server.sh $(DHCPV6_SERVER_PORT) $(CURDIR)/kea-dhcp6.conf
 
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32,$(BOARD)))
 .PHONY: ethos
 
 ethos:

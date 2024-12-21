@@ -27,7 +27,7 @@ CFLAGS += -DHAS_SOCK_DNS_MOCK=1
 
 include $(RIOTBASE)/Makefile.include
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
 test: PORT=
 $(call target-export-variables,test,PORT)
 endif

@@ -12,7 +12,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 DEVELHELP ?= 1
 
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32,$(BOARD)))
 # Set stack size to something (conservatively) enormous
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=9092
 endif

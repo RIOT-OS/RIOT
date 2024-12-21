@@ -32,7 +32,7 @@ FEATURES_OPTIONAL += periph_spi
 TESTRUNNER_RESET_AFTER_TERM ?= 1
 
 # failing on native with floating point exception (#15870)
-TEST_ON_CI_BLACKLIST += native native64
+TEST_ON_CI_BLACKLIST += native native32
 
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=

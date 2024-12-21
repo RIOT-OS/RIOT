@@ -1,9 +1,9 @@
-BOARD ?= native
+BOARD ?= native32
 
 include ../Makefile.sys_common
 
 BOARD_WHITELIST = \
-  native \
+  native32 \
   nrf52840dk \
   nrf52840dongle
 

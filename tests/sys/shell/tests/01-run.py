@@ -250,7 +250,7 @@ def check_erase_long_line(child, longline):
     # FIXME: this only works on native, due to #10634 combined with socat
     # insisting in line-buffering the terminal.
 
-    if BOARD in ['native', 'native64']:
+    if BOARD in ['native', 'native32']:
         longline_erased = longline + "\b"*len(longline) + "echo"
         child.sendline(longline_erased)
         child.expect_exact('"echo"')
@@ -264,7 +264,7 @@ def check_control_d(child):
     # The current shell instance was initiated by shell_run(). The shell will respawn
     # automatically except on native. On native, RIOT is shut down completely,
     # therefore exclude this part.
-    if BOARD not in ['native', 'native64']:
+    if BOARD not in ['native', 'native32']:
         child.sendline(CONTROL_D)
         child.expect_exact(PROMPT)
 
@@ -283,7 +283,7 @@ def check_preempt(child):
 
 def testfunc(child):
     # avoid sending an extra empty line on native.
-    if BOARD in ['native', 'native64']:
+    if BOARD in ['native', 'native32']:
         child.crlf = '\n'
 
     bufsize = check_and_get_bufsize(child)

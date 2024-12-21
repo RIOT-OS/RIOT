@@ -234,7 +234,7 @@ def generate_port_number():
 
 
 def sudo_guard(uses_scapy=False):
-    sudo_required = uses_scapy or (not os.environ.get("BOARD", "") in ["native", "native64"])
+    sudo_required = uses_scapy or (not os.environ.get("BOARD", "") in ["native", "native32"])
     if sudo_required and os.geteuid() != 0:
         print("\x1b[1;31mThis test requires root privileges.\n"
               "It uses `./dist/tools/ethos/start_networking.sh` as term" +

@@ -7,8 +7,8 @@ USEMODULE += ztimer64_usec
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit
 
-# native / native64 may fail under load with:
+# native / native32 may fail under load with:
 #    first: waited too long <NUM> usec => FAILED
-TEST_ON_CI_BLACKLIST += native native64
+TEST_ON_CI_BLACKLIST += native native32
 
 include $(RIOTBASE)/Makefile.include

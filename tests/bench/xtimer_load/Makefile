@@ -10,6 +10,6 @@ CFLAGS += -DTEST_HZ=$(TEST_HZ)LU
 TEST_ON_CI_BLACKLIST += microbit
 
 # This test randomly fails on `native` so disable it from CI
-TEST_ON_CI_BLACKLIST += native native64
+TEST_ON_CI_BLACKLIST += native native32
 
 include $(RIOTBASE)/Makefile.include

@@ -14,7 +14,7 @@ from testrunner import run, check_unittests
 def testfunc(child):
     board = os.environ['BOARD']
     # Increase timeout on "real" hardware
-    timeout = 120 if board not in ['native', 'native64'] else -1
+    timeout = 120 if board not in ['native', 'native32'] else -1
     check_unittests(child, timeout=timeout)
 
 

@@ -14,7 +14,7 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 # use Ethernet as link-layer protocol
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   TERMFLAGS += -z [::1]:17754
 else
   ETHOS_BAUDRATE ?= 115200
@@ -44,7 +44,7 @@ ifeq (1,$(STATIC_ROUTES))
 endif
 endif
 
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32,$(BOARD)))
 .PHONY: ethos
 
 ethos:

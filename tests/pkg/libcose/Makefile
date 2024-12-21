@@ -1,6 +1,6 @@
 include ../Makefile.pkg_common
 
-TEST_ON_CI_WHITELIST += native native64
+TEST_ON_CI_WHITELIST += native native32
 
 USEPKG += libcose
 # By default we use hacl as crypto backend, uncomment to use a different
