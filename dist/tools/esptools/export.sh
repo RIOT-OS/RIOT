@@ -38,10 +38,19 @@ export_arch()
     TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP32_GCC_RELEASE}/${TARGET_ARCH}"
     TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
 
-    if [ -e "${TOOLS_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
+    if [ ! -e "${TOOLS_DIR}" ]; then
+        echo "${TOOLS_DIR} does not exist - please run"
+        echo $(echo $0 | sed 's/export/install/') $1
+        exit 1
+    fi
+
+    if [ -z "${TOOLS_DIR_IN_PATH}" ]; then
         echo "Extending PATH by ${TOOLS_DIR}/bin"
         export PATH="${TOOLS_DIR}/bin:${PATH}"
     fi
+
+    echo "To make this permanent, add this line to your ~/.bashrc or ~/.profile:"
+    echo PATH="\$PATH:${TOOLS_DIR}/bin"
 
     unset TOOLS_DIR
 }
