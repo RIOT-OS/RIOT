@@ -7,6 +7,7 @@
 # directory for more details.
 #
 # @author   Maximilian Deubel <maximilian.deubel@ovgu.de>
+# @author   Bas Stottelaar <basstottelaar@gmail.com>
 
 # Black Magic Probe helper script
 # This script can detect connected Black Magic Probes and can be used as a flashloader and much more
