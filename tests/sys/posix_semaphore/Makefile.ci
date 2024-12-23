@@ -11,7 +11,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     mbed_lpc1768 \
     msb-430 \
     msb-430h \
-    nrf6310 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
