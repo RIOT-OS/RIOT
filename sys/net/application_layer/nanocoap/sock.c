@@ -2259,6 +2259,8 @@ ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx
                               code, msg_id);
     case COAP_TRANSPORT_TCP:
         return coap_build_tcp_hdr(buf, buf_len, ctx->token, ctx->tkl, code);
+    case COAP_TRANSPORT_WS:
+        return coap_build_ws_hdr(buf, buf_len, ctx->token, ctx->tkl, code);
     default:
         return -ENOTSUP;
     }
