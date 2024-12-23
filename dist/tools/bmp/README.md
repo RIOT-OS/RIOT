@@ -32,6 +32,8 @@ options:
                         selection)
   --attach ATTACH       choose specific target by number
   --gdb-path GDB_PATH   path to GDB
+  --bmp-version BMP_VERSION
+                        choose specific firmware version
   --term-cmd TERM_CMD   serial terminal command
 ```
 
@@ -50,6 +52,12 @@ The probe is auto discovered based on the USB VID (0x1D50) and PID (0x6018,
 
 If `--port` is provided, then that port will be used as the GDB port for all
 actions, except for the `term` action.
+
+## Supported firmwares
+This tool assumes firmware version 1.10 of the Black Magic debugger.
+
+Compatibility for older versions is limited, but can be selected by providing
+`--bmp-version x.y.z`.
 
 ## Examples (tested with BluePill STM32F103F8C6)
 * test connection:

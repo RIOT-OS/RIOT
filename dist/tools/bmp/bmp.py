@@ -19,6 +19,7 @@ import sys
 
 import humanize
 import serial.tools.list_ports
+from packaging.version import Version
 from progressbar import Bar, Percentage, ProgressBar
 from pygdbmi.gdbcontroller import GdbController
 
@@ -195,11 +196,17 @@ def debug_mode(args, port):
     if args.tpwr:
         gdb_args.append('-ex \'monitor tpwr enable\'')
     if args.connect_srst:
-        gdb_args.append('-ex \'monitor connect_srst enable\'')
+        if args.bmp_version >= Version('1.9.0'):
+            gdb_args.append('-ex \'monitor connect_rst enable\'')
+        else:
+            gdb_args.append('-ex \'monitor connect_srst enable\'')
     if args.jtag:
         gdb_args.append('-ex \'monitor jtag_scan\'')
     else:
-        gdb_args.append('-ex \'monitor swdp_scan\'')
+        if args.bmp_version >= Version('1.10.0'):
+            gdb_args.append('-ex \'monitor swd_scan\'')
+        else:
+            gdb_args.append('-ex \'monitor swdp_scan\'')
     gdb_args.append('-ex \'attach %s\'' % args.attach)
     os.system(" ".join(['\"' + args.gdb_path + '\"'] + gdb_args + [args.file]))
 
@@ -216,13 +223,19 @@ def connect_to_target(args, port):
                                          expected_result='connected')
     # set options
     if args.connect_srst:
-        gdbmi.write('monitor connect_srst enable', timeout_sec=TIMEOUT)
+        if args.bmp_version >= Version('1.9.0'):
+            gdbmi.write('monitor connect_rst enable', timeout_sec=TIMEOUT)
+        else:
+            gdbmi.write('monitor connect_srst enable', timeout_sec=TIMEOUT)
     if args.tpwr:
         gdbmi.write('monitor tpwr enable', timeout_sec=TIMEOUT)
     # scan for targets
     if not args.jtag:
         print("scanning using SWD...")
-        res = gdbmi.write('monitor swdp_scan', timeout_sec=TIMEOUT)
+        if args.bmp_version >= Version('1.10.0'):
+            res = gdbmi.write('monitor swd_scan', timeout_sec=TIMEOUT)
+        else:
+            res = gdbmi.write('monitor swdp_scan', timeout_sec=TIMEOUT)
     else:
         print("scanning using JTAG...")
         res = gdbmi.write('monitor jtag_scan', timeout_sec=TIMEOUT)
@@ -246,6 +259,7 @@ def parse_args():
     parser.add_argument('--port', help='choose specific probe by port (overrides auto selection)')
     parser.add_argument('--attach', help='choose specific target by number', default='1')
     parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
+    parser.add_argument('--bmp-version', help='choose specific firmware version', default='1.10.0')
     parser.add_argument('--term-cmd', help='serial terminal command',
                         default='picocom --nolock --imap lfcrlf --baud 115200 %s')
 
@@ -271,6 +285,7 @@ def main():
         port = choose_port(args, g)
 
         args.file = args.file if args.file else ''
+        args.bmp_version = Version(args.bmp_version)
         args.gdb_path = find_suitable_gdb(args.gdb_path)
 
         if args.action == 'debug':
@@ -287,7 +302,10 @@ def main():
         # reset mode: reset device using reset pin
         if args.action == 'reset':
             print('resetting...')
-            assert gdb_write_and_wait_for_result(gdbmi, 'monitor hard_srst', 'resetting target')
+            if args.bmp_version >= Version('1.9.0'):
+                assert gdb_write_and_wait_for_result(gdbmi, 'monitor reset', 'resetting target')
+            else:
+                assert gdb_write_and_wait_for_result(gdbmi, 'monitor hard_srst', 'resetting target')
             sys.exit(0)
         # erase mode
         elif args.action == 'erase':
