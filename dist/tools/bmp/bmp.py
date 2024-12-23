@@ -282,6 +282,7 @@ def main():
 
         # reset mode: reset device using reset pin
         if args.action == 'reset':
+            print('resetting...')
             assert gdb_write_and_wait_for_result(gdbmi, 'monitor hard_srst', 'resetting target')
             sys.exit(0)
         # erase mode
@@ -291,6 +292,7 @@ def main():
             sys.exit(0)
         # flashloader mode: flash, check and restart
         elif args.action == 'flash':
+            print('flashing...')
             download_to_flash(gdbmi)
             check_flash(gdbmi)
 
