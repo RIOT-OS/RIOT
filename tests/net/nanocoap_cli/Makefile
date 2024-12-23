@@ -79,6 +79,8 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
     USEMODULE += nanocoap_tcp
+    USEMODULE += nanocoap_ws
+    USEMODULE += nanocoap_ws_udp_yolo
   endif
 endif
 
