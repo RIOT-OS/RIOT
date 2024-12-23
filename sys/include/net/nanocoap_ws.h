@@ -34,8 +34,11 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#include "net/sock/udp.h"
 #include "iolist.h"
+
+#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#  include "net/sock/udp.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -189,6 +192,7 @@ struct coap_ws_transport {
     int (*sendv)(coap_ws_conn_t *conn, const iolist_t *iol);
 };
 
+#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
 typedef struct {
     coap_ws_conn_t conn;
     sock_udp_ep_t remote;
@@ -219,6 +223,7 @@ typedef struct coap_ws_over_udp_yolo_init_arg {
  * Using it for anything but testing has a high chance of foot-shooting.
  */
 extern const coap_ws_transport_t coap_ws_over_udp_yolo;
+#endif
 
 #ifdef __cplusplus
 }
