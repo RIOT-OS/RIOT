@@ -56,6 +56,18 @@ def detect_probes():
     return gdb_ports, uart_ports
 
 
+# print all found ports to console.
+def enumerate_probes(ports):
+    print("found following Black Magic GDB servers:")
+    for i, s in enumerate(ports):
+        print("\t[%s]" % s.device, end=' ')
+        if len(s.serial_number) > 1:
+            print("Serial:", s.serial_number, end=' ')
+        if i == 0:
+            print("<- default", end=' ')
+        print('')
+
+
 # search device with specific serial number <snr> in a list of ports <ports>
 def search_serial(snr, ports):
     for port in ports:
@@ -155,34 +167,25 @@ def check_flash(gdbmi):
         res = gdbmi.get_gdb_response(timeout_sec=TIMEOUT)
 
 
-def choose_bmp_port(args, gdb_ports):
-    print("found following Black Magic GDB servers:")
-    for i, s in enumerate(gdb_ports):
-        print("\t[%s]" % s.device, end=' ')
-        if len(s.serial_number) > 1:
-            print("Serial:", s.serial_number, end=' ')
-        if i == 0:
-            print("<- default", end=' ')
-        print('')
-    port = gdb_ports[0].device
+# choose GDB or UART port, based on available ports and application arguments
+def choose_port(args, ports):
     if args.port:
         port = args.port
-    elif args.serial:
-        port = search_serial(args.serial, gdb_ports)
-        assert port, "no BMP with this serial found"
+    else:
+        enumerate_probes(ports)
+        if args.serial:
+            port = search_serial(args.serial, ports)
+            assert port, "no BMP with this serial found"
+        else:
+            assert len(ports) > 0, "no ports found"
+            port = ports[0].device
     print('connecting to [%s]...' % port)
     return port
 
 
 # terminal mode, opens TTY program
-def term_mode(args, uart_ports):
-    port = uart_ports[0].device
-    if args.port:
-        port = args.port
-    elif args.serial:
-        port = search_serial(args.serial, uart_ports)
-        assert port, "no BMP with this serial found"
-    os.system(args.term_cmd % port)
+def term_mode(args, uart_port):
+    os.system(args.term_cmd % uart_port)
     sys.exit(0)
 
 
@@ -240,7 +243,7 @@ def parse_args():
     parser.add_argument('--connect-srst', action='store_true', help='reset target while connecting')
     parser.add_argument('--tpwr', action='store_true', help='enable target power')
     parser.add_argument('--serial', help='choose specific probe by serial number')
-    parser.add_argument('--port', help='choose specific probe by port')
+    parser.add_argument('--port', help='choose specific probe by port (overrides auto selection)')
     parser.add_argument('--attach', help='choose specific target by number', default='1')
     parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
     parser.add_argument('--term-cmd', help='serial terminal command',
@@ -259,12 +262,13 @@ def main():
     assert not (args.swd and args.jtag), "you may only choose one protocol"
     assert not (args.serial and args.port), "you may only specify the probe by port or by serial"
     g, u = detect_probes()
-    assert len(g) > 0, "no Black Magic Probes found 😔"
 
     if args.action == 'term':
-        term_mode(args, u)
+        port = choose_port(args, u)
+
+        term_mode(args, port)
     else:
-        port = choose_bmp_port(args, g)
+        port = choose_port(args, g)
 
         args.file = args.file if args.file else ''
         args.gdb_path = find_suitable_gdb(args.gdb_path)
