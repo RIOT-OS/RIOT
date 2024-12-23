@@ -251,7 +251,7 @@ typedef enum {
      * @brief   ACK requested but not received
      *
      * @deprecated  Issue an NETDEV_EVENT_TX_COMPLETE event instead and return
-     *              `-ECOMM` in netdev_driver_t::confirm_send. Via the `info`
+     *              `-EHOSTUNREACH` in netdev_driver_t::confirm_send. Via the `info`
      *              parameter additional details about the error can be passed
      */
     NETDEV_EVENT_TX_NOACK,
