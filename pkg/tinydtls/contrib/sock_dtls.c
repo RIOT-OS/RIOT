@@ -1063,13 +1063,13 @@ void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb, void *cb_arg)
 {
     sock->async_cb = cb;
     sock->async_cb_arg = cb_arg;
-    if (IS_USED(MODULE_SOCK_ASYNC_EVENT)) {
-        sock_async_ctx_t *ctx = sock_dtls_get_async_ctx(sock);
-        if (ctx->queue) {
-            sock_udp_event_init(sock->udp_sock, ctx->queue, _udp_cb, sock);
-            return;
-        }
+#if MODULE_SOCK_ASYNC_EVENT
+    sock_async_ctx_t *ctx = sock_dtls_get_async_ctx(sock);
+    if (ctx->queue) {
+        sock_udp_event_init(sock->udp_sock, ctx->queue, _udp_cb, sock);
+        return;
     }
+#endif
     sock_udp_set_cb(sock->udp_sock, _udp_cb, sock);
 }
 
