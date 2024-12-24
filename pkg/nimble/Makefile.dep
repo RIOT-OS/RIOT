@@ -42,6 +42,7 @@ endif
 ifeq (,$(filter nimble_host nimble_controller,$(USEMODULE)))
   USEMODULE += nimble_host
   USEMODULE += nimble_controller
+  USEMODULE += random
 endif
 
 # include host dependencies
