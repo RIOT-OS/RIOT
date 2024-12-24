@@ -1,0 +1,24 @@
+From 734dc3dece986b63078bd133d6eec69cae7d6a0b Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Tue, 24 Dec 2024 02:53:56 +0100
+Subject: [PATCH] porting: Add missing include
+
+---
+ porting/npl/riot/include/nimble/nimble_npl_os_log.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/porting/npl/riot/include/nimble/nimble_npl_os_log.h b/porting/npl/riot/include/nimble/nimble_npl_os_log.h
+index 5fcce6ae..24315a21 100644
+--- a/porting/npl/riot/include/nimble/nimble_npl_os_log.h
++++ b/porting/npl/riot/include/nimble/nimble_npl_os_log.h
+@@ -21,6 +21,7 @@
+ #define _NIMBLE_NPL_OS_LOG_H_
+ 
+ #include <stdarg.h>
++#include <stdio.h>
+ 
+ /* Example on how to use macro to generate module logging functions */
+ #define BLE_NPL_LOG_IMPL(lvl) \
+-- 
+2.45.2
+
