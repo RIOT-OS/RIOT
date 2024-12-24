@@ -78,6 +78,8 @@ nimble_controller:
 
 nimble_drivers_nrf5x:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/drivers/nrf5x/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+
+nimble_drivers_nrf5x_specific:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/drivers/nrf5x/src/$(CPU_FAM)/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # additional, RIOT specific nimble modules
