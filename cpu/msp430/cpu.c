@@ -33,7 +33,7 @@
  * execution at the call site using reti.
  *
  */
-void thread_yield_higher(void)
+void thread_yield_higher_arch(void)
 {
     if (irq_is_in()) {
         sched_context_switch_request = 1;
