@@ -24,7 +24,7 @@ ifneq (,$(filter nimble_controller,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
   endif
   ifneq (,$(filter nimble_drivers_nrf5x,$(USEMODULE)))
-    INCLUDES += $(NIMIBASE)/nimble/drivers/$(CPU_FAM)/include
+    INCLUDES += $(NIMIBASE)/nimble/drivers/nrf5x/include -I$(PKGDIRBASE)/nrfx/hal/
   endif
 
   # Enable additional PHY modes if requested by the build

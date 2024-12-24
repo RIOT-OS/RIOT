@@ -54,7 +54,7 @@ endif
 # nimble controller dependencies
 ifneq (,$(filter nimble_controller,$(USEMODULE)))
   ifneq (,$(filter nrf51 nrf52,$(CPU_FAM)))
-    USEMODULE += nimble_drivers_nrf5x
+    USEMODULE += nimble_drivers_nrf5x nimble_drivers_nrf5x_specific
   endif
 endif
 
