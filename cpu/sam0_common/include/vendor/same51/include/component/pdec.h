@@ -361,12 +361,12 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  VLC:1;            /*!< bit:      3  Velocity                           */
     __I uint8_t  MC0:1;            /*!< bit:      4  Channel 0 Compare Match            */
     __I uint8_t  MC1:1;            /*!< bit:      5  Channel 1 Compare Match            */
-    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  6.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    __I uint8_t  :4;               /*!< bit:  0.. 3  Reserved                           */
+    uint8_t  :4;                   /*!< bit:  0.. 3  Reserved                           */
     __I uint8_t  MC:2;             /*!< bit:  4.. 5  Channel x Compare Match            */
-    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  6.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } PDEC_INTFLAG_Type;
