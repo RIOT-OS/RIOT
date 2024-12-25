@@ -80,7 +80,7 @@ typedef union {
 typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t  CKRDY:1;          /*!< bit:      0  Clock Ready                        */
-    __I uint8_t  :7;               /*!< bit:  1.. 7  Reserved                           */
+    uint8_t  :7;                   /*!< bit:  1.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } MCLK_INTFLAG_Type;

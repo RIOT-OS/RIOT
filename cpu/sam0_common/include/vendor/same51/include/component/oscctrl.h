@@ -235,28 +235,28 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t XOSCRDY1:1;       /*!< bit:      1  XOSC 1 Ready                       */
     __I uint32_t XOSCFAIL0:1;      /*!< bit:      2  XOSC 0 Clock Failure Detector      */
     __I uint32_t XOSCFAIL1:1;      /*!< bit:      3  XOSC 1 Clock Failure Detector      */
-    __I uint32_t :4;               /*!< bit:  4.. 7  Reserved                           */
+    uint32_t :4;                   /*!< bit:  4.. 7  Reserved                           */
     __I uint32_t DFLLRDY:1;        /*!< bit:      8  DFLL Ready                         */
     __I uint32_t DFLLOOB:1;        /*!< bit:      9  DFLL Out Of Bounds                 */
     __I uint32_t DFLLLCKF:1;       /*!< bit:     10  DFLL Lock Fine                     */
     __I uint32_t DFLLLCKC:1;       /*!< bit:     11  DFLL Lock Coarse                   */
     __I uint32_t DFLLRCS:1;        /*!< bit:     12  DFLL Reference Clock Stopped       */
-    __I uint32_t :3;               /*!< bit: 13..15  Reserved                           */
+    uint32_t :3;                   /*!< bit: 13..15  Reserved                           */
     __I uint32_t DPLL0LCKR:1;      /*!< bit:     16  DPLL0 Lock Rise                    */
     __I uint32_t DPLL0LCKF:1;      /*!< bit:     17  DPLL0 Lock Fall                    */
     __I uint32_t DPLL0LTO:1;       /*!< bit:     18  DPLL0 Lock Timeout                 */
     __I uint32_t DPLL0LDRTO:1;     /*!< bit:     19  DPLL0 Loop Divider Ratio Update Complete */
-    __I uint32_t :4;               /*!< bit: 20..23  Reserved                           */
+    uint32_t :4;                   /*!< bit: 20..23  Reserved                           */
     __I uint32_t DPLL1LCKR:1;      /*!< bit:     24  DPLL1 Lock Rise                    */
     __I uint32_t DPLL1LCKF:1;      /*!< bit:     25  DPLL1 Lock Fall                    */
     __I uint32_t DPLL1LTO:1;       /*!< bit:     26  DPLL1 Lock Timeout                 */
     __I uint32_t DPLL1LDRTO:1;     /*!< bit:     27  DPLL1 Loop Divider Ratio Update Complete */
-    __I uint32_t :4;               /*!< bit: 28..31  Reserved                           */
+    uint32_t :4;                   /*!< bit: 28..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint32_t XOSCRDY:2;        /*!< bit:  0.. 1  XOSC x Ready                       */
     __I uint32_t XOSCFAIL:2;       /*!< bit:  2.. 3  XOSC x Clock Failure Detector      */
-    __I uint32_t :28;              /*!< bit:  4..31  Reserved                           */
+    uint32_t :28;                  /*!< bit:  4..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } OSCCTRL_INTFLAG_Type;

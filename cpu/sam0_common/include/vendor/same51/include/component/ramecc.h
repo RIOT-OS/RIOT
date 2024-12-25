@@ -87,7 +87,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t  SINGLEE:1;        /*!< bit:      0  Single Bit ECC Error Interrupt     */
     __I uint8_t  DUALE:1;          /*!< bit:      1  Dual Bit ECC Error Interrupt       */
-    __I uint8_t  :6;               /*!< bit:  2.. 7  Reserved                           */
+    uint8_t  :6;                   /*!< bit:  2.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } RAMECC_INTFLAG_Type;

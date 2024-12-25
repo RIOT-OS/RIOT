@@ -569,7 +569,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  RESRDY:1;         /*!< bit:      0  Result Ready Interrupt Flag        */
     __I uint8_t  OVERRUN:1;        /*!< bit:      1  Overrun Interrupt Flag             */
     __I uint8_t  WINMON:1;         /*!< bit:      2  Window Monitor Interrupt Flag      */
-    __I uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
+    uint8_t  :5;                   /*!< bit:  3.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } ADC_INTFLAG_Type;

@@ -282,11 +282,11 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t DRE:1;            /*!< bit:      1  Transmit Data Register Empty       */
     __I uint32_t TXC:1;            /*!< bit:      2  Transmission Complete              */
     __I uint32_t ERROR:1;          /*!< bit:      3  Overrun Error                      */
-    __I uint32_t :4;               /*!< bit:  4.. 7  Reserved                           */
+    uint32_t :4;                   /*!< bit:  4.. 7  Reserved                           */
     __I uint32_t CSRISE:1;         /*!< bit:      8  Chip Select Rise                   */
-    __I uint32_t :1;               /*!< bit:      9  Reserved                           */
+    uint32_t :1;                   /*!< bit:      9  Reserved                           */
     __I uint32_t INSTREND:1;       /*!< bit:     10  Instruction End                    */
-    __I uint32_t :21;              /*!< bit: 11..31  Reserved                           */
+    uint32_t :21;                  /*!< bit: 11..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } QSPI_INTFLAG_Type;

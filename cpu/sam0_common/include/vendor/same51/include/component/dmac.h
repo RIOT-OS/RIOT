@@ -1143,7 +1143,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  TERR:1;           /*!< bit:      0  Channel Transfer Error             */
     __I uint8_t  TCMPL:1;          /*!< bit:      1  Channel Transfer Complete          */
     __I uint8_t  SUSP:1;           /*!< bit:      2  Channel Suspend                    */
-    __I uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
+    uint8_t  :5;                   /*!< bit:  3.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } DMAC_CHINTFLAG_Type;
