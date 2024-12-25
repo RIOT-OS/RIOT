@@ -39,6 +39,8 @@
 #include "vendor/samd21/include_d/samd21.h"
 #elif defined(CPU_SAMD51)
 #include "vendor/samd51/include/samd51.h"
+#elif defined(CPU_SAME51)
+#include "vendor/same51/include/same51.h"
 #elif defined(CPU_SAME54)
 #include "vendor/same54/include/same54.h"
 #elif defined(CPU_SAML10)
