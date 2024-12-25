@@ -364,6 +364,7 @@ static const char *state_names[STATUS_NUMOF] = {
     [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
     [STATUS_MBOX_BLOCKED] = "bl mbox",
     [STATUS_COND_BLOCKED] = "bl cond",
+    [STATUS_WQ_BLOCKED] = "bl wq",
     [STATUS_RUNNING] = "running",
     [STATUS_PENDING] = "pending",
 };
