@@ -1,6 +1,9 @@
 ifneq (,$(filter samd51%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAMD51
 endif
+ifneq (,$(filter same51%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAME51
+endif
 ifneq (,$(filter same54%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAME54
 endif
