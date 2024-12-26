@@ -157,76 +157,15 @@ typedef struct {
 
 #define WAIT_QUEUE_TAIL ((void *)(-1))
 
+/**
+ * @brief Init a wait queue
+ */
 #define WAIT_QUEUE_INIT { .list = WAIT_QUEUE_TAIL }
 
-static inline bool _is_in_wq(wait_queue_entry_t *entry)
-{
-    return entry->next != NULL;
-}
-
-static inline void _wq_add_to_list(wait_queue_t *wq, wait_queue_entry_t *entry)
-{
-    if (_is_in_wq(entry)) {
-        DEBUG("wq: thread %d already queued\n", entry->thread->pid);
-        /* This can happen if the condition expression blocks. The thread
-         * is then waken up, so thread_yield_higher() in QUEUE_WAIT() will
-         * return immediately. The thread is then added back into the wait
-         * queue, although it was never removed. */
-        return;
-    }
-
-    wait_queue_entry_t **curr_pp = &wq->list;
-    while ((*curr_pp != WAIT_QUEUE_TAIL) &&
-           (*curr_pp)->thread->priority <= entry->thread->priority) {
-        curr_pp = &(*curr_pp)->next;
-    }
-
-    entry->next = *curr_pp;
-    *curr_pp = entry;
-}
-
-static inline void _wq_del_from_list(wait_queue_t *wq, wait_queue_entry_t *entry)
-{
-    wait_queue_entry_t **curr_pp = &wq->list;
-    while (*curr_pp != WAIT_QUEUE_TAIL) {
-        if (*curr_pp == entry) {
-            *curr_pp = (*curr_pp)->next;
-            entry->next = NULL;
-            break;
-        }
-        curr_pp = &(*curr_pp)->next;
-    }
-}
-
-static inline void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
-{
-    _wq_add_to_list(wq, entry);
-    irq_restore(irq_state);
-}
-
-static inline void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
-{
-    irq_disable();
-    _wq_del_from_list(wq, entry);
-    irq_restore(irq_state);
-}
-
-static inline void _maybe_yield(wait_queue_entry_t *entry)
-{
-    irq_disable();
-    if (!_is_in_wq(entry)) {
-        /* In the rare case the thread will get woken up just between the
-         * condition check and yielding, don't go to sleep but do another
-         * condition check. */
-        return;
-    }
-
-    sched_set_status(entry->thread, STATUS_WQ_BLOCKED);
-
-    irq_enable();
-    thread_yield_higher();
-    irq_disable();
-}
+void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
+void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
+void _maybe_yield(wait_queue_entry_t *entry);
+void _queue_wake_common(wait_queue_t *wq, bool const all);
 
 #define queue_wait(wq, cond)                                                   \
   do {                                                                         \
@@ -237,42 +176,11 @@ static inline void _maybe_yield(wait_queue_entry_t *entry)
     int irq_state = irq_disable();                                             \
     _wait_enqueue(wq, &me, irq_state);                                         \
     while (!(cond)) {                                                          \
-      _maybe_yield(&me);                                                        \
+      _maybe_yield(&me);                                                       \
       _wait_enqueue(wq, &me, irq_state);                                       \
     }                                                                          \
     _wait_dequeue(wq, &me, irq_state);                                         \
   } while (0)
-
-static inline void _queue_wake_common(wait_queue_t *wq, bool const all)
-{
-    int irq_state = irq_disable();
-    wait_queue_entry_t *head;
-    while ((head = wq->list) != WAIT_QUEUE_TAIL) {
-        /* Wake the thread only if it blocks on the queue. Otherwise it blocks
-         * on something else during the condition check, or is already running.
-         * We remove the thread from the wait queue but we don't wake it up,
-         * as this would conflict with the current blocking. Once the thread
-         * leaves the condition check, it will exit the wait loop. */
-        if (head->thread->status == STATUS_WQ_BLOCKED) {
-            sched_set_status(head->thread, STATUS_PENDING);
-            DEBUG("wq: woke up thread %d\n", head->thread->pid);
-        }
-        else {
-            DEBUG("wq: won't wake thread %d in state `%s`\n",
-                  head->thread->pid,
-                  thread_state_to_string(head->thread->status));
-
-        }
-
-        wq->list = head->next;
-        head->next = NULL;
-
-        if (!all) {
-            break;
-        }
-    }
-    irq_restore(irq_state);
-}
 
 static inline void queue_wake(wait_queue_t *wq)
 {
