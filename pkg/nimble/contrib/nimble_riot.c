@@ -120,7 +120,7 @@ void nimble_riot_init(void)
      * code generated from yaml files.
      *
      * We do need to call this, otherwise we get panics quickly from
-     * `g_ble_ll_data.ll_evq` bein uninitialized. */
+     * `g_ble_ll_data.ll_evq` being uninitialized. */
     extern void ble_ll_init(void);
     ble_ll_init();
 
