@@ -118,9 +118,9 @@ ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_MULTI_ADV_INSTANCES=$(BLE_MULTI_ADV_INSTANCES)
   endif
 else
-  # when only using non-extended advertisements the maximum HCI event size is
-  # 45 bytes
-  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_SIZE=45
+  # Messages of size 70 were observed starting between 1.5.0 and 1.8.0; this is
+  # consistent with syscfg.h values in nimble.
+  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_SIZE=70
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
