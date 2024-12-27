@@ -38,19 +38,19 @@ ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += esp_hw_counter
 endif
 
-ifeq (esp32,$(CPU_FAM))
-  FEATURES_PROVIDED += ble_nimble
-  FEATURES_PROVIDED += ble_nimble_netif
-  FEATURES_PROVIDED += esp_ble
-  FEATURES_PROVIDED += esp_ble_esp32
-else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
-  FEATURES_PROVIDED += ble_adv_ext
-  FEATURES_PROVIDED += ble_nimble
-  FEATURES_PROVIDED += ble_nimble_netif
-  FEATURES_PROVIDED += ble_phy_2mbit
-  FEATURES_PROVIDED += esp_ble
-  FEATURES_PROVIDED += esp_ble_esp32c3
-endif
+# ifeq (esp32,$(CPU_FAM))
+#   FEATURES_PROVIDED += ble_nimble
+#   FEATURES_PROVIDED += ble_nimble_netif
+#   FEATURES_PROVIDED += esp_ble
+#   FEATURES_PROVIDED += esp_ble_esp32
+# else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+#   FEATURES_PROVIDED += ble_adv_ext
+#   FEATURES_PROVIDED += ble_nimble
+#   FEATURES_PROVIDED += ble_nimble_netif
+#   FEATURES_PROVIDED += ble_phy_2mbit
+#   FEATURES_PROVIDED += esp_ble
+#   FEATURES_PROVIDED += esp_ble_esp32c3
+# endif
 
 ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += periph_sdmmc_auto_clk
