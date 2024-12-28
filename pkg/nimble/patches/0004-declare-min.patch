@@ -3,6 +3,8 @@ From: chrysn <chrysn@fsfe.org>
 Date: Fri, 27 Dec 2024 22:48:57 +0100
 Subject: [PATCH] Consistently declare min() macro before using it
 
+Forwarded: https://github.com/apache/mynewt-nimble/pull/1950
+
 ---
  apps/blemesh/src/main.c                  | 4 ++++
  apps/blestress/src/rx_stress.c           | 4 ++++
