@@ -3,6 +3,8 @@ From: chrysn <chrysn@fsfe.org>
 Date: Tue, 24 Dec 2024 02:53:56 +0100
 Subject: [PATCH] porting: Add missing include
 
+Forwarded: https://github.com/apache/mynewt-nimble/pull/1950
+
 ---
  porting/npl/riot/include/nimble/nimble_npl_os_log.h | 1 +
  1 file changed, 1 insertion(+)
