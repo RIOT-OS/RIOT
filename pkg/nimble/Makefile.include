@@ -30,9 +30,11 @@ ifneq (,$(filter nimble_controller,$(USEMODULE)))
   # Enable additional PHY modes if requested by the build
   ifneq (,$(filter ble_phy_2mbit,$(FEATURES_USED)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_2M_PHY=1
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_PHY=1
   endif
   ifneq (,$(filter ble_phy_coded,$(FEATURES_USED)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LE_CODED_PHY=1
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_PHY=1
   endif
 endif
 
