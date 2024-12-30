@@ -28,36 +28,16 @@
 #include "net/ipv6/hdr.h"
 #include "net/udp.h"
 #include "utlist.h"
-#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
-#include "ztimer.h"
-#endif
-#if IS_USED(MODULE_XTIMER)
-#include "xtimer.h"
-#endif
-
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
+
+#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
+#  include "ztimer.h"
+#endif
 
 #ifdef MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
 gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
-#endif
-
-#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
-#define _TIMEOUT_MAGIC      (0xF38A0B63U)
-#define _TIMEOUT_MSG_TYPE   (0x8474)
-
-static void _callback_put(void *arg)
-{
-    msg_t timeout_msg = { .sender_pid = KERNEL_PID_UNDEF,
-                          .type = _TIMEOUT_MSG_TYPE,
-                          .content = { .value = _TIMEOUT_MAGIC } };
-    gnrc_sock_reg_t *reg = arg;
-
-    /* should be safe, because otherwise if mbox were filled this callback is
-     * senseless */
-    mbox_try_put(&reg->mbox, &timeout_msg);
-}
 #endif
 
 #ifdef SOCK_HAS_ASYNC
@@ -121,71 +101,51 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     if (mbox_size(&reg->mbox) != GNRC_SOCK_MBOX_SIZE) {
         return -EINVAL;
     }
-#if IS_USED(MODULE_ZTIMER_USEC)
-    ztimer_t timeout_timer = { .base = { .next = NULL } };
-    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
-        timeout_timer.callback = _callback_put;
-        timeout_timer.arg = reg;
-        ztimer_set(ZTIMER_USEC, &timeout_timer, timeout);
-    }
-#elif IS_USED(MODULE_ZTIMER_MSEC)
-    ztimer_t timeout_timer = { .base = { .next = NULL } };
-    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
-        timeout_timer.callback = _callback_put;
-        timeout_timer.arg = reg;
-        ztimer_set(ZTIMER_MSEC, &timeout_timer, DIV_ROUND_INF(timeout, US_PER_MS));
-    }
-#elif IS_USED(MODULE_XTIMER)
-    xtimer_t timeout_timer = { .callback = NULL };
 
-    /* xtimer_spin would make this never receive anything.
-     * Avoid that by setting the minimal not spinning timeout. */
-    if (timeout < XTIMER_BACKOFF && timeout > 0) {
-        timeout = XTIMER_BACKOFF;
-    }
-
-    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
-        timeout_timer.callback = _callback_put;
-        timeout_timer.arg = reg;
-        xtimer_set(&timeout_timer, timeout);
-    }
-#else
-    assume((timeout == SOCK_NO_TIMEOUT) || (timeout == 0));
-#endif
-    if (timeout != 0) {
 #if defined(DEVELHELP) && IS_ACTIVE(SOCK_HAS_ASYNC)
-        if (reg->async_cb.generic) {
-            /* this warning is a false positive when sock_*_recv() was not called from
-             * the asynchronous handler */
-            LOG_WARNING("gnrc_sock: timeout != 0 within the asynchronous callback lead "
-                        "to unexpected delays within the asynchronous handler.\n");
-        }
+    if ((timeout != 0) && (reg->async_cb.generic)) {
+        /* this warning is a false positive when sock_*_recv() was not called from
+         * the asynchronous handler */
+        LOG_WARNING("gnrc_sock: timeout != 0 within the asynchronous callback lead "
+                    "to unexpected delays within the asynchronous handler.\n");
+    }
 #endif
+
+    if (timeout == SOCK_NO_TIMEOUT) {
         mbox_get(&reg->mbox, &msg);
     }
-    else {
+    else if (timeout == 0) {
         if (!mbox_try_get(&reg->mbox, &msg)) {
             return -EAGAIN;
         }
     }
-#if IS_USED(MODULE_ZTIMER_USEC)
-    ztimer_remove(ZTIMER_USEC, &timeout_timer);
-#elif IS_USED(MODULE_ZTIMER_MSEC)
-    ztimer_remove(ZTIMER_MSEC, &timeout_timer);
-#elif IS_USED(MODULE_XTIMER)
-    xtimer_remove(&timeout_timer);
-#endif
+    else {
+        /* Preferring low power over us precision here if both options are
+         * possible. This is typically the better trade-off, as even on fast
+         * networks round-trip-times are typically measured in ms rather than
+         * in us */
+        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+            /* rounding up seems more sensible here */
+            uint32_t timeout_ms = (timeout + US_PER_MS - 1) / US_PER_MS;
+            if (ztimer_mbox_get_timeout(ZTIMER_MSEC, &reg->mbox, &msg, timeout_ms)) {
+                return -ETIMEDOUT;
+            }
+        }
+        else if (IS_USED(MODULE_ZTIMER_USEC)) {
+            if (ztimer_mbox_get_timeout(ZTIMER_USEC, &reg->mbox, &msg, timeout)) {
+                return -ETIMEDOUT;
+            }
+        }
+        else {
+            /* cannot do timeout without a timer */
+            assert(0);
+            return -ENOTSUP;
+        }
+    }
     switch (msg.type) {
         case GNRC_NETAPI_MSG_TYPE_RCV:
             pkt = msg.content.ptr;
             break;
-#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
-        case _TIMEOUT_MSG_TYPE:
-            if (msg.content.value == _TIMEOUT_MAGIC) {
-                return -ETIMEDOUT;
-            }
-#endif
-            /* Falls Through. */
         default:
             return -EINVAL;
     }
