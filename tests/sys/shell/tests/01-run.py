@@ -201,7 +201,7 @@ def check_help(child):
     # we can detect duplicates
     while len(cmds_actual) > 0:
         # parse line into command and description
-        child.expect(r"([a-z0-9_-]*)[ \t]*(.*)\r\n")
+        child.expect(r"([a-z0-9_-]*)[ \t]*([^\r\n]*)\r\n")
         cmd = child.match.group(1)
         desc = child.match.group(2)
 
