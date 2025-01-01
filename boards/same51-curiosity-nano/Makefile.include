@@ -1,0 +1,8 @@
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of the embedded EDBG CMSIS-DAP
+# debugger.
+TTY_BOARD_FILTER := --model 'nEDBG CMSIS-DAP'
+
+PROGRAMMER ?= openocd
+
+include $(RIOTMAKE)/boards/sam0.inc.mk
