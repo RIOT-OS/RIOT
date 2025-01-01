@@ -805,12 +805,12 @@ static void test_netapi_get__IPV6_IID(void)
 
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ethernet_netif.pid,
                 NETOPT_IPV6_IID,
-                0, &value, sizeof(value)));
+                NETOPT_IPV6_IID_HWADDR, &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ethernet_ipv6_ll.u64[1],
                 sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ieee802154_netif.pid,
                 NETOPT_IPV6_IID,
-                0, &value, sizeof(value)));
+                NETOPT_IPV6_IID_HWADDR, &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_ipv6_ll_long.u64[1],
                 sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
@@ -820,7 +820,7 @@ static void test_netapi_get__IPV6_IID(void)
                 sizeof(ieee802154_l2addr_len)));
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ieee802154_netif.pid,
                 NETOPT_IPV6_IID,
-                0, &value,
+                NETOPT_IPV6_IID_HWADDR, &value,
                 sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_eui64_short,
                 sizeof(value)));
@@ -833,7 +833,7 @@ static void test_netapi_get__IPV6_IID(void)
                 sizeof(ieee802154_l2addr_len)));
     TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netapi_get(netifs[0].pid,
                 NETOPT_IPV6_IID,
-                0, &value, sizeof(value)));
+                NETOPT_IPV6_IID_HWADDR, &value, sizeof(value)));
 }
 
 static void test_netapi_get__MAX_PACKET_SIZE(void)
