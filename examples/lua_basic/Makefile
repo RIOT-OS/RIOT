@@ -14,7 +14,7 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32,$(BOARD)))
   # This stack size is large enough to run Lua print() functions of
   # various lengths. Other functions untested.
   CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'

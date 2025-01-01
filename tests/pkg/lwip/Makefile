@@ -33,12 +33,12 @@ USEMODULE += od
 USEMODULE += netdev_default
 USEMODULE += ztimer_usec
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   USEMODULE += lwip_ethernet
 endif
 
 # Test only implemented for native
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32,$(BOARD)))
   TESTS=
 endif
 

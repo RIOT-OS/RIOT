@@ -1,4 +1,4 @@
-BOARD_WHITELIST = native native64
+BOARD_WHITELIST = native native32
 
 include ../Makefile.build_system_common
 include $(RIOTBASE)/Makefile.include
