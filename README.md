@@ -136,6 +136,12 @@ help. Our Forum provides an archive of prior questions and answers.
 - [GitHub Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
 with the code and documentation.
 
+### Governance
+
+For how our community is structured and governed, please see our [governance document].
+
+[governance document]: GOVERNANCE.md
+
 ### How to Ask
 
 Please include as much detail as you can that is relevant to your question, not
