@@ -10,14 +10,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "event/callback.h"
-#include "event/timeout.h"
-#include "event/thread.h"
 #include "fmt.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
-#include "kernel_defines.h"
+
+#if MODULE_NANOCOAP_SERVER_SEPARATE
+#  include "event/thread.h"
+#  include "event/timeout.h"
+#  include "event/callback.h"
+#endif
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
@@ -158,7 +160,7 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
         return reply_len;
     }
 
-    uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
+    uint8_t *pkt_pos = pkt->buf + reply_len;
     if (blockwise) {
         pkt_pos += coap_opt_put_block1_control(pkt_pos, 0, &block1);
     }
@@ -167,7 +169,7 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
         pkt_pos += fmt_bytes_hex((char *)pkt_pos, digest, sizeof(digest));
     }
 
-    return pkt_pos - (uint8_t*)pkt->hdr;
+    return pkt_pos - pkt->buf;
 }
 
 NANOCOAP_RESOURCE(echo) {
@@ -186,8 +188,8 @@ NANOCOAP_RESOURCE(sha256) {
     .path = "/sha256", .methods = COAP_POST, .handler = _sha256_handler
 };
 
-/* separate response requires an event thread to execute it */
-#ifdef MODULE_EVENT_THREAD
+/* separate response is an optional feature */
+#ifdef MODULE_NANOCOAP_SERVER_SEPARATE
 static nanocoap_server_response_ctx_t _separate_ctx;
 
 static void _send_response(void *ctx)
@@ -204,7 +206,12 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
     static event_timeout_t event_timeout;
     static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
 
-    if (event_timeout_is_pending(&event_timeout) && !sock_udp_ep_equal(context->remote, &_separate_ctx.remote)) {
+    if (event_timeout_is_pending(&event_timeout)) {
+        if (nanocoap_is_duplicate_in_separate_ctx(&_separate_ctx, pkt, context)) {
+            /* no need to check transport: Only UDP can have duplicates */
+            puts("_separate_handler(): duplicate");
+            return coap_reply_empty_ack(pkt, buf, len);
+        }
         puts("_separate_handler(): response already scheduled");
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
     }
@@ -221,13 +228,13 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
                               &event_timed.super);
     event_timeout_set(&event_timeout, 1 * MS_PER_SEC);
 
-    return coap_build_empty_ack(pkt, (void *)buf);
+    return coap_reply_empty_ack(pkt, buf, len);
 }
 
 NANOCOAP_RESOURCE(separate) {
     .path = "/separate", .methods = COAP_GET, .handler = _separate_handler,
 };
-#endif /* MODULE_EVENT_THREAD */
+#endif /* MODULE_NANOCOAP_SERVER_SEPARATE */
 
 /* we can also include the fileserver module */
 #ifdef MODULE_NANOCOAP_FILESERVER
