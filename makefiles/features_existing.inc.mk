@@ -227,6 +227,7 @@ FEATURES_EXISTING := \
     periph_sdmmc_hs \
     periph_sdmmc_mmc \
     periph_sdmmc_sdhc \
+    periph_sercom \
     periph_spi \
     periph_spi_gpio_mode \
     periph_spi_on_qspi \

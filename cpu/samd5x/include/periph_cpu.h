@@ -23,7 +23,7 @@
 #include <limits.h>
 
 #include "macros/units.h"
-#include "periph_cpu_common.h"
+#include "periph_cpu_common.h" /* IWYU pragma: export */
 
 #include "candev_samd5x.h"
 #ifdef __cplusplus
@@ -295,6 +295,41 @@ struct sam0_aux_cfg_mapping {
 #define SAM0_SDHC1_PIN_SDDAT3   GPIO_PIN(PB, 21)    /**< DATA3          */
 #define SAM0_SDHC1_PIN_SDCK     GPIO_PIN(PA, 21)    /**< Clock          */
 /** @} */
+
+/* these functions are documented in periph_cpu_common.h, but Doxygen
+ * is unable to connect the dots */
+#if !DOXYGEN
+static inline void sercom_apb_enable(sercom_t sercom)
+{
+    if (sercom < 2) {
+        MCLK->APBAMASK.reg |= (1 << (sercom + 12));
+    }
+    else if (sercom < 4) {
+        MCLK->APBBMASK.reg |= (1 << (sercom + 7));
+    }
+    else {
+        MCLK->APBDMASK.reg |= (1 << (sercom - 4));
+    }
+}
+
+static inline void sercom_apb_disable(sercom_t sercom)
+{
+    if (sercom < 2) {
+        MCLK->APBAMASK.reg &= ~(1 << (sercom + 12));
+    }
+    else if (sercom < 4) {
+        MCLK->APBBMASK.reg &= ~(1 << (sercom + 7));
+    }
+    else {
+        MCLK->APBDMASK.reg &= ~(1 << (sercom - 4));
+    }
+}
+
+static inline void sercom_gclk_enable(sercom_t sercom, uint8_t gclk)
+{
+    GCLK->PCHCTRL[_sercom_gclk_id_core(sercom)].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
+}
+#endif
 
 #ifdef __cplusplus
 }

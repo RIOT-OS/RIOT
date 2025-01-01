@@ -140,11 +140,11 @@ static const tc32_conf_t timer_config[] = {
 static const uart_conf_t uart_config[] = {
     {
         .dev      = &SERCOM0->USART,
-        .rx_pin   = GPIO_PIN(PA,5),
-        .tx_pin   = GPIO_PIN(PA,4),
+        .rx_pin   = GPIO_PIN(PA, 5),
+        .tx_pin   = GPIO_PIN(PA, 4),
 #ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_PIN(PA,6),
-        .cts_pin  = GPIO_PIN(PA,7),
+        .rts_pin  = GPIO_PIN(PA, 6),
+        .cts_pin  = GPIO_PIN(PA, 7),
 #endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
@@ -158,11 +158,11 @@ static const uart_conf_t uart_config[] = {
     },
     {
         .dev      = &SERCOM5->USART,
-        .rx_pin   = GPIO_PIN(PA,23),
-        .tx_pin   = GPIO_PIN(PA,22),
+        .rx_pin   = GPIO_PIN(PA, 23),
+        .tx_pin   = GPIO_PIN(PA, 22),
 #ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_PIN(PB,22),
-        .cts_pin  = GPIO_PIN(PB,23),
+        .rts_pin  = GPIO_PIN(PB, 22),
+        .cts_pin  = GPIO_PIN(PB, 23),
 #endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
@@ -175,10 +175,6 @@ static const uart_conf_t uart_config[] = {
         .gclk_src = SAM0_GCLK_MAIN,
     }
 };
-
-/* interrupt function name mapping */
-#define UART_0_ISR          isr_sercom0
-#define UART_1_ISR          isr_sercom5
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */

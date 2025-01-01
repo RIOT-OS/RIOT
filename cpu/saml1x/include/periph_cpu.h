@@ -20,7 +20,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "periph_cpu_common.h"
+#include "periph_cpu_common.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,7 +136,8 @@ struct sam0_aux_cfg_mapping {
     uint32_t reserved_2                 : 19; /**< Reserved                             */
     /* config word 2 */
     uint32_t secure_flash_as_size       :  8; /**< Secure Flash (AS region) Size = AS*0x100 */
-    uint32_t nsc_size                   :  6; /**< Non-Secure Callable Flash (APPLICATION region) Size = ANSC*0x20 */
+    uint32_t nsc_size                   :  6; /**< Non-Secure Callable Flash
+                                               *   (APPLICATION region) Size = ANSC*0x20 */
     uint32_t reserved_3                 :  2; /**< Reserved                             */
     uint32_t secure_flash_data_size     :  4; /**< Secure Data Flash Size = DS*0x100    */
     uint32_t reserved_4                 :  4; /**< Reserved                             */
@@ -154,6 +155,25 @@ struct sam0_aux_cfg_mapping {
     /* config word 7 */
     uint32_t user_crc;            /**< CRC of NVM User Row bits 223:64 (words 2…6)      */
 };
+
+/* these functions are documented in periph_cpu_common.h, but Doxygen
+ * is unable to connect the dots */
+#if !DOXYGEN
+static inline void sercom_apb_enable(sercom_t sercom)
+{
+    MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom);
+}
+
+static inline void sercom_apb_disable(sercom_t sercom)
+{
+    MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom);
+}
+
+static inline void sercom_gclk_enable(sercom_t sercom, uint8_t gclk)
+{
+    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
+}
+#endif
 
 #ifdef __cplusplus
 }

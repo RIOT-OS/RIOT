@@ -58,8 +58,8 @@ static const uart_conf_t uart_config[] = {
     },
     {
         .dev      = &SERCOM0->USART,
-        .rx_pin   = GPIO_PIN(PA,5),
-        .tx_pin   = GPIO_PIN(PA,6),
+        .rx_pin   = GPIO_PIN(PA, 5),
+        .tx_pin   = GPIO_PIN(PA, 6),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
@@ -71,10 +71,6 @@ static const uart_conf_t uart_config[] = {
         .gclk_src = SAM0_GCLK_MAIN,
     },
 };
-
-/* interrupt function name mapping */
-#define UART_0_ISR          isr_sercom5
-#define UART_1_ISR          isr_sercom0
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
