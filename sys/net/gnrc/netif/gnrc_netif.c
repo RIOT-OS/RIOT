@@ -304,6 +304,15 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+        case NETOPT_6LO_ABR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)
+                                            ? NETOPT_ENABLE
+                                            : NETOPT_DISABLE;
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         default:
             break;
     }
@@ -409,6 +418,28 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+        case NETOPT_6LO_ABR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+
+            extern void _start_search_rtr(gnrc_netif_t *netif);
+            extern void _stop_search_rtr(gnrc_netif_t *netif);
+
+            if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+                netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
+                if (!(netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)) {
+                    _stop_search_rtr(netif);
+                }
+            }
+            else {
+                if (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) {
+                    _start_search_rtr(netif);
+                }
+                netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ABR;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         case NETOPT_RAWMODE:
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
                 netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
