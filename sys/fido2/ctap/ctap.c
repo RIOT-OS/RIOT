@@ -15,6 +15,7 @@
  * @}
  */
 
+#include "fido2/ctap/ctap.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -35,7 +36,7 @@
 #include "fido2/ctap/transport/hid/ctap_hid.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /**
@@ -424,10 +425,12 @@ static uint32_t get_id(void)
 
 static int _reset(void)
 {
-    int ret = fido2_ctap_mem_erase_flash();
+    if (_state.initialized_marker == CTAP_INITIALIZED_MARKER) {
+        int ret = fido2_ctap_mem_erase_flash(&_state);
 
-    if (ret != CTAP2_OK) {
-        return ret;
+        if (ret != CTAP2_OK) {
+            return ret;
+        }
     }
 
     _state.initialized_marker = CTAP_INITIALIZED_MARKER;
@@ -535,8 +538,7 @@ static int _make_credential(ctap_req_t *req_raw)
         uv = true;
     }
     /* CTAP specification (version 20190130) section 5.5.8.1 */
-    else if (!fido2_ctap_pin_is_set() && req.pin_auth_present
-             && req.pin_auth_len == 0) {
+    else if (!fido2_ctap_pin_is_set() && req.pin_auth_present && req.pin_auth_len == 0) {
         if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
             fido2_ctap_utils_user_presence_test();
         }
@@ -659,8 +661,7 @@ static int _get_assertion(ctap_req_t *req_raw)
         _assert_state.uv = true;
     }
     /* CTAP specification (version 20190130) section 5.5.8.2 */
-    else if (!fido2_ctap_pin_is_set() && req.pin_auth_present
-             && req.pin_auth_len == 0) {
+    else if (!fido2_ctap_pin_is_set() && req.pin_auth_present && req.pin_auth_len == 0) {
         if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
             fido2_ctap_utils_user_presence_test();
         }
@@ -1414,9 +1415,9 @@ static int _find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
     }
 
     ctap_resident_key_t rk = { 0 };
-    uint32_t addr = 0x0;
+    uint32_t off = 0x0;
 
-    while (fido2_ctap_mem_read_rk_from_flash(&rk, rp_id_hash, &addr) == CTAP2_OK) {
+    while (fido2_ctap_mem_read_rk_from_flash(&rk, rp_id_hash, &off) == CTAP2_OK) {
         if (allow_list_len == 0) {
             memcpy(&rks[index], &rk, sizeof(rk));
             index++;
