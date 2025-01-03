@@ -115,6 +115,15 @@ void nimble_riot_init(void)
     int res;
     (void)res;
 
+    /* This function is documented to need to be called exactly once, but not
+     * part of any headers; it seems that in mynewt it is brought up through
+     * code generated from yaml files.
+     *
+     * We do need to call this, otherwise we get panics quickly from
+     * `g_ble_ll_data.ll_evq` being uninitialized. */
+    extern void ble_ll_init(void);
+    ble_ll_init();
+
 #if !IS_USED(MODULE_MYNEWT_CORE) && IS_ACTIVE(NIMBLE_CFG_CONTROLLER)
     /* in mynewt-nimble and uwb-core OS_CPUTIMER_TIMER_NUM == 5 is NRF_RTC0,
        for nimble this must be used for the BLE stack and must go through
