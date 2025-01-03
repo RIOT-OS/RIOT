@@ -19,6 +19,32 @@
 
 #include "net/ieee802154.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+#define CHANNEL_868MHZ          (0U) /**< channel associated to the 868 MHz band */
+
+/**
+ * @brief O-QPSK symbol time definition
+ * @see IEEE 802.15.4-2015 standard, section 12.3.3
+ */
+#define SYMTIME_OQPSK_868MHZ    (40U) /**< 25 ksymbols/s */
+#define SYMTIME_OQPSK_COMMON    (16U) /**< 62.5 ksymbols/s */
+
+/**
+ * @brief BPSK symbol time definition
+ * @see IEEE 802.15.4-2015 standard, section 13.3.3
+ */
+#define SYMTIME_BPSK_868MHZ     (50U) /**< 20 ksymbols/s */
+#define SYMTIME_BPSK_COMMON     (25U) /**< 40 ksymbols/s */
+
+/**
+ * @brief ASK symbol time definition
+ * @see IEEE 802.15.4-2015 standard, section 14.4.3
+ */
+#define SYMTIME_ASK_868MHZ      (80U) /**< 12.5 ksymbols/s */
+#define SYMTIME_ASK_COMMON      (20U) /**< 50 ksymbols/s */
+
 const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN] = IEEE802154_ADDR_BCAST;
 
 size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len,
@@ -279,6 +305,60 @@ int ieee802154_dst_filter(const uint8_t *mhr, uint16_t pan,
     }
 
     return 1;
+}
+
+static inline uint8_t _get_oqpsk_symbol_time(uint16_t channel)
+{
+    if (channel == CHANNEL_868MHZ) {
+        return SYMTIME_OQPSK_868MHZ;
+    }
+    return SYMTIME_OQPSK_COMMON;
+}
+
+static inline uint8_t _get_ask_symbol_time(uint16_t channel)
+{
+    if (channel == CHANNEL_868MHZ) {
+        return SYMTIME_ASK_868MHZ;
+    }
+    return SYMTIME_ASK_COMMON;
+}
+
+static inline uint8_t _get_bpsk_symbol_time(uint16_t channel)
+{
+    if (channel == CHANNEL_868MHZ) {
+        return SYMTIME_BPSK_868MHZ;
+    }
+    return SYMTIME_BPSK_COMMON;
+}
+
+uint32_t ieee802154_get_symbol_time(uint8_t channel_page, uint16_t channel_num)
+{
+    /* BPSK for SubGHZ, O-QPSK for 2.4 GHz (see IEEE 802.15.4-2015 standard, section 10.1.2.2) */
+    if (channel_page == 0) {
+        if (channel_num <= IEEE802154_CHANNEL_MAX_SUBGHZ) {
+            return _get_bpsk_symbol_time(channel_num);
+        }
+        else {
+            return _get_oqpsk_symbol_time(channel_num);
+        }
+    }
+    /* ASK for SubGHZ (see IEEE 802.15.4-2015 standard, section 10.1.2.2) */
+    else if (channel_page == 1) {
+        if (channel_num <= IEEE802154_CHANNEL_MAX_SUBGHZ) {
+            return _get_ask_symbol_time(channel_num);
+        }
+    }
+    /* O-QPSK for SubGHZ (see IEEE 802.15.4-2015 standard, section 10.1.2.2) */
+    else if (channel_page == 2) {
+        if (channel_num <= IEEE802154_CHANNEL_MAX_SUBGHZ) {
+            return _get_oqpsk_symbol_time(channel_num);
+        }
+    }
+    /* add more channel pages as needed */
+
+    DEBUG("[ieee802154]: ieee802154_get_symbol_time: invalid PHY config or PHY not implemented");
+    assert(false);
+    return 0;
 }
 
 /** @} */
