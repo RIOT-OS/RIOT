@@ -7,6 +7,7 @@
 # directory for more details.
 #
 # @author   Maximilian Deubel <maximilian.deubel@ovgu.de>
+# @author   Bas Stottelaar <basstottelaar@gmail.com>
 
 # Black Magic Probe helper script
 # This script can detect connected Black Magic Probes and can be used as a flashloader and much more
@@ -14,40 +15,25 @@
 import argparse
 import os
 import re
+import shutil
 import sys
 
 import humanize
 import serial.tools.list_ports
+from packaging.version import Version
 from progressbar import Bar, Percentage, ProgressBar
 from pygdbmi.gdbcontroller import GdbController
-import distutils.spawn
-
-parser = argparse.ArgumentParser(description='Black Magic Tool helper script.')
-parser.add_argument('--jtag', action='store_true', help='use JTAG transport')
-parser.add_argument('--swd', action='store_true', help='use SWD transport (default)')
-parser.add_argument('--connect-srst', action='store_true', help='reset target while connecting')
-parser.add_argument('--tpwr', action='store_true', help='enable target power')
-parser.add_argument('--serial', help='choose specific probe by serial number')
-parser.add_argument('--port', help='choose specific probe by port')
-parser.add_argument('--attach', help='choose specific target by number', default='1')
-parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
-parser.add_argument('--term-cmd', help='serial terminal command',
-                    default='picocom --nolock --imap lfcrlf --baud 115200 %s')
-parser.add_argument('action', help='choose a task to perform', nargs='?',
-                    choices=['list', 'flash', 'erase', 'debug', 'term', 'reset'],
-                    default='list')
-parser.add_argument('file', help='file to load to target (hex or elf)', nargs='?')
 
 TIMEOUT = 100  # seconds
 
 
 # find a suitable gdb executable, falling back to defaults if needed
 def find_suitable_gdb(gdb_path):
-    if distutils.spawn.find_executable(gdb_path):
+    if shutil.which(gdb_path):
         return gdb_path
     else:
         for p in ['arm-none-eabi-gdb', 'gdb-multiarch']:
-            p = distutils.spawn.find_executable(p)
+            p = shutil.which(p)
             if p:
                 print("GDB EXECUTABLE NOT FOUND! FALLING BACK TO %s" % p, file=sys.stderr)
                 return p
@@ -70,6 +56,18 @@ def detect_probes():
             else:
                 uart_ports.append(p)
     return gdb_ports, uart_ports
+
+
+# print all found ports to console.
+def enumerate_probes(ports):
+    print("found following Black Magic GDB servers:")
+    for i, s in enumerate(ports):
+        print("\t[%s]" % s.device, end=' ')
+        if len(s.serial_number) > 1:
+            print("Serial:", s.serial_number, end=' ')
+        if i == 0:
+            print("<- default", end=' ')
+        print('')
 
 
 # search device with specific serial number <snr> in a list of ports <ports>
@@ -171,53 +169,50 @@ def check_flash(gdbmi):
         res = gdbmi.get_gdb_response(timeout_sec=TIMEOUT)
 
 
-def choose_bmp_port(gdb_ports):
-    print("found following Black Magic GDB servers:")
-    for i, s in enumerate(gdb_ports):
-        print("\t[%s]" % s.device, end=' ')
-        if len(s.serial_number) > 1:
-            print("Serial:", s.serial_number, end=' ')
-        if i == 0:
-            print("<- default", end=' ')
-        print('')
-    port = gdb_ports[0].device
+# choose GDB or UART port, based on available ports and application arguments
+def choose_port(args, ports):
     if args.port:
         port = args.port
-    elif args.serial:
-        port = search_serial(args.serial, gdb_ports)
-        assert port, "no BMP with this serial found"
+    else:
+        enumerate_probes(ports)
+        if args.serial:
+            port = search_serial(args.serial, ports)
+            assert port, "no BMP with this serial found"
+        else:
+            assert len(ports) > 0, "no ports found"
+            port = ports[0].device
     print('connecting to [%s]...' % port)
     return port
 
 
 # terminal mode, opens TTY program
-def term_mode(uart_ports):
-    port = uart_ports[0].device
-    if args.port:
-        port = args.port
-    elif args.serial:
-        port = search_serial(args.serial, uart_ports)
-        assert port, "no BMP with this serial found"
-    os.system(args.term_cmd % port)
+def term_mode(args, uart_port):
+    os.system(args.term_cmd % uart_port)
     sys.exit(0)
 
 
 # debug mode, opens GDB shell with options
-def debug_mode(port):
+def debug_mode(args, port):
     gdb_args = ['-ex \'target extended-remote %s\'' % port]
     if args.tpwr:
         gdb_args.append('-ex \'monitor tpwr enable\'')
     if args.connect_srst:
-        gdb_args.append('-ex \'monitor connect_srst enable\'')
+        if args.bmp_version >= Version('1.9.0'):
+            gdb_args.append('-ex \'monitor connect_rst enable\'')
+        else:
+            gdb_args.append('-ex \'monitor connect_srst enable\'')
     if args.jtag:
         gdb_args.append('-ex \'monitor jtag_scan\'')
     else:
-        gdb_args.append('-ex \'monitor swdp_scan\'')
+        if args.bmp_version >= Version('1.10.0'):
+            gdb_args.append('-ex \'monitor swd_scan\'')
+        else:
+            gdb_args.append('-ex \'monitor swdp_scan\'')
     gdb_args.append('-ex \'attach %s\'' % args.attach)
     os.system(" ".join(['\"' + args.gdb_path + '\"'] + gdb_args + [args.file]))
 
 
-def connect_to_target(port):
+def connect_to_target(args, port):
     # open GDB in machine interface mode
     try:
         # try old API first
@@ -229,13 +224,19 @@ def connect_to_target(port):
                                          expected_result='connected')
     # set options
     if args.connect_srst:
-        gdbmi.write('monitor connect_srst enable', timeout_sec=TIMEOUT)
+        if args.bmp_version >= Version('1.9.0'):
+            gdbmi.write('monitor connect_rst enable', timeout_sec=TIMEOUT)
+        else:
+            gdbmi.write('monitor connect_srst enable', timeout_sec=TIMEOUT)
     if args.tpwr:
         gdbmi.write('monitor tpwr enable', timeout_sec=TIMEOUT)
     # scan for targets
     if not args.jtag:
         print("scanning using SWD...")
-        res = gdbmi.write('monitor swdp_scan', timeout_sec=TIMEOUT)
+        if args.bmp_version >= Version('1.10.0'):
+            res = gdbmi.write('monitor swd_scan', timeout_sec=TIMEOUT)
+        else:
+            res = gdbmi.write('monitor swdp_scan', timeout_sec=TIMEOUT)
     else:
         print("scanning using JTAG...")
         res = gdbmi.write('monitor jtag_scan', timeout_sec=TIMEOUT)
@@ -248,26 +249,51 @@ def connect_to_target(port):
     return gdbmi
 
 
-if __name__ == '__main__':
-    args = parser.parse_args()
+def parse_args():
+    parser = argparse.ArgumentParser(description='Black Magic Tool helper script.')
+
+    parser.add_argument('--jtag', action='store_true', help='use JTAG transport')
+    parser.add_argument('--swd', action='store_true', help='use SWD transport (default)')
+    parser.add_argument('--connect-srst', action='store_true', help='reset target while connecting')
+    parser.add_argument('--tpwr', action='store_true', help='enable target power')
+    parser.add_argument('--serial', help='choose specific probe by serial number')
+    parser.add_argument('--port', help='choose specific probe by port (overrides auto selection)')
+    parser.add_argument('--attach', help='choose specific target by number', default='1')
+    parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
+    parser.add_argument('--bmp-version', help='choose specific firmware version', default='1.10.0')
+    parser.add_argument('--term-cmd', help='serial terminal command',
+                        default='picocom --nolock --imap lfcrlf --baud 115200 %s')
+
+    parser.add_argument('action', help='choose a task to perform', nargs='?',
+                        choices=['list', 'flash', 'erase', 'debug', 'term', 'reset'],
+                        default='list')
+    parser.add_argument('file', help='file to load to target (hex or elf)', nargs='?')
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
     assert not (args.swd and args.jtag), "you may only choose one protocol"
     assert not (args.serial and args.port), "you may only specify the probe by port or by serial"
     g, u = detect_probes()
-    assert len(g) > 0, "no Black Magic Probes found 😔"
 
     if args.action == 'term':
-        term_mode(u)
+        port = choose_port(args, u)
+
+        term_mode(args, port)
     else:
-        port = choose_bmp_port(g)
+        port = choose_port(args, g)
 
         args.file = args.file if args.file else ''
+        args.bmp_version = Version(args.bmp_version)
         args.gdb_path = find_suitable_gdb(args.gdb_path)
 
         if args.action == 'debug':
-            debug_mode(port)
+            debug_mode(args, port)
             sys.exit(0)
 
-        gdbmi = connect_to_target(port)
+        gdbmi = connect_to_target(args, port)
 
         if args.action == 'list':
             sys.exit(0)
@@ -276,7 +302,11 @@ if __name__ == '__main__':
 
         # reset mode: reset device using reset pin
         if args.action == 'reset':
-            assert gdb_write_and_wait_for_result(gdbmi, 'monitor hard_srst', 'resetting target')
+            print('resetting...')
+            if args.bmp_version >= Version('1.9.0'):
+                assert gdb_write_and_wait_for_result(gdbmi, 'monitor reset', 'resetting target')
+            else:
+                assert gdb_write_and_wait_for_result(gdbmi, 'monitor hard_srst', 'resetting target')
             sys.exit(0)
         # erase mode
         elif args.action == 'erase':
@@ -285,8 +315,13 @@ if __name__ == '__main__':
             sys.exit(0)
         # flashloader mode: flash, check and restart
         elif args.action == 'flash':
+            print('flashing...')
             download_to_flash(gdbmi)
             check_flash(gdbmi)
 
             # kill and reset
             assert gdb_write_and_wait_for_result(gdbmi, 'kill', 'killing')
+
+
+if __name__ == '__main__':
+    main()
