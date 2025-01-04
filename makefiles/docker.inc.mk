@@ -87,6 +87,8 @@ export DOCKER_ENV_VARS += \
   TOOLCHAIN \
   UNDEF \
   WERROR \
+  WIFI_PASS \
+  WIFI_SSID \
   #
 
 # List of all exported environment variables that shall be passed on to the
