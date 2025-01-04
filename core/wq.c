@@ -6,10 +6,21 @@ static inline bool _is_in_wq(wait_queue_entry_t *entry)
 }
 
 /* @pre  interrupts disabled
- * @post interrupts restored to user state */
+ * @post interrupts restored to @p irq_state */
 void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
 {
-    assert(!_is_in_wq(entry));
+    if (_is_in_wq(entry)) {
+        /* This can happen for nested wait queues, i.e. the condition
+         * expression for a wait queue blocks on some other wait queue. We are
+         * now enqueuing for the inner queue while executing the condition
+         * expression for the outer wait queue, because that outer wait queue
+         * got signaled. We got woken up "by mistake", as _queue_wake_common()
+         * sees STATUS_WQ_BLOCKED but doesn't know on which queue the thread is
+         * blocked. But this is fine, as this will only force another round of
+         * condition expression check. */
+        irq_restore(irq_state);
+        return;
+    }
 
     wait_queue_entry_t **curr_pp = &wq->list;
     while ((*curr_pp != WAIT_QUEUE_TAIL) &&
@@ -23,6 +34,8 @@ void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
     irq_restore(irq_state);
 }
 
+/* @pre  interrupts disabled
+ * @post interrupts restored to @p irq_state */
 void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
 {
     irq_disable();
@@ -56,19 +69,23 @@ void _maybe_yield(wait_queue_entry_t *entry)
     irq_disable();
 }
 
-void _queue_wake_common(wait_queue_t *wq, bool const all)
+void _queue_wake_common(wait_queue_t *wq, bool all)
 {
     int irq_state = irq_disable();
 
     wait_queue_entry_t *head;
     while ((head = wq->list) != WAIT_QUEUE_TAIL) {
-        /* Wake the thread only if it blocks on the queue, otherwise:
-         *  - it is already on the runqueue, in which case there is nothing
+        /* Wake the thread only if it blocks on some queue, otherwise:
+         *  - it is already on the run queue, in which case there is nothing
          *    to be done, or
          *  - it blocks on something else (e.g. a mutex) while evaluating the
-         *    condition expression. We may not wake it up in this case, as this
-         *    would violate the current locking. */
+         *    condition expression, in which case we may not wake it up, as
+         *    RIOT's locking primitives don't expect spurious wake-ups. */
         if (head->thread->status == STATUS_WQ_BLOCKED) {
+            /* It is possible that the thread is blocked on some queue other
+             * than the one we're signaling right now. This can happen when
+             * the condition expression itself blocks on a wait queue. But
+             * this is fine and will only force another condition check. */
             sched_set_status(head->thread, STATUS_PENDING);
             DEBUG("wq: woke up thread %d\n", head->thread->pid);
         }
@@ -79,8 +96,8 @@ void _queue_wake_common(wait_queue_t *wq, bool const all)
 
         }
         /* We remove the thread from the wait queue in all cases s.t.
-         *  _maybe_yield() sees the state change and forces another condition
-         *  check instead of going to sleep. */
+         * _maybe_yield() sees the state change and forces another condition
+         * check instead of going to sleep. */
         wq->list = head->next;
         head->next = NULL;
 

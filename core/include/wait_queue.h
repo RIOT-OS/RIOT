@@ -162,16 +162,18 @@ typedef struct {
  */
 #define WAIT_QUEUE_INIT { .list = WAIT_QUEUE_TAIL }
 
+/* For internal use only */
 void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
 void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
 void _maybe_yield(wait_queue_entry_t *entry);
-void _queue_wake_common(wait_queue_t *wq, bool const all);
+void _queue_wake_common(wait_queue_t *wq, bool all);
 
 #define queue_wait(wq, cond)                                                   \
   do {                                                                         \
     if (cond) {                                                                \
       break;                                                                   \
     }                                                                          \
+                                                                               \
     wait_queue_entry_t me = {.thread = thread_get_active()};                   \
     int irq_state = irq_disable();                                             \
     _wait_enqueue(wq, &me, irq_state);                                         \
@@ -179,15 +181,16 @@ void _queue_wake_common(wait_queue_t *wq, bool const all);
       _maybe_yield(&me);                                                       \
       _wait_enqueue(wq, &me, irq_state);                                       \
     }                                                                          \
+                                                                               \
     _wait_dequeue(wq, &me, irq_state);                                         \
   } while (0)
 
-static inline void queue_wake(wait_queue_t *wq)
+static inline void queue_wake_exclusive(wait_queue_t *wq)
 {
     _queue_wake_common(wq, false);
 }
 
-static inline void queue_broadcast(wait_queue_t *wq)
+static inline void queue_wake(wait_queue_t *wq)
 {
     _queue_wake_common(wq, true);
 }
