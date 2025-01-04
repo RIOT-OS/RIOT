@@ -1,0 +1,31 @@
+From e2e940c4e996c1c3da78948b08974a93aa69ddac Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Sat, 4 Jan 2025 14:26:23 +0100
+Subject: [PATCH] port: Call ble_ll_init
+
+Forwarded: https://github.com/apache/mynewt-nimble/pull/1956
+
+---
+ porting/nimble/src/nimble_port.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/porting/nimble/src/nimble_port.c b/porting/nimble/src/nimble_port.c
+index bb26f22a..cd0cd004 100644
+--- a/porting/nimble/src/nimble_port.c
++++ b/porting/nimble/src/nimble_port.c
+@@ -31,10 +31,12 @@ static struct ble_npl_eventq g_eventq_dflt;
+ 
+ extern void os_msys_init(void);
+ extern void os_mempool_module_init(void);
++extern void ble_ll_init(void);
+ 
+ void
+ nimble_port_init(void)
+ {
++    ble_ll_init();
+     /* Initialize default event queue */
+     ble_npl_eventq_init(&g_eventq_dflt);
+     /* Initialize the global memory pool */
+-- 
+2.45.2
+
