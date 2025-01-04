@@ -48,43 +48,16 @@
  *  2. ISR fires, sets measurement = THRESHOLD
  *  3. thread calls cond_wait() and goes to sleep, possibly forever
  *
- * The above example can be fixed by using a initially-locked mutex instead
- * of a condition variable:
- *
- * ```
- * static uint64_t measurement;
- * mutex_t cond_mutex = MUTEX_INIT_LOCKED;
- *
- * void measurement_irq(void)
- * {
- *     measurement = measure();
- *     mutex_unlock(&cond_mutex);
- * }
- *
- * void wait_for_critical_value(void)
- * {
- *     while (atomic_load_u64(&measurement) < THRESHOLD) {
- *         mutex_lock(&cond_mutex);
- *     }
- *     mutex_unlock(&cond_mutex);
- * }
- * ```
- *
- * The mutex_unlock() at the end of wait_for_critical_value() is there to wake
- * up any other waiters that might be queued, as mutex_unlock() signals only
- * one. At this point it's pretty obvious that we're abusing the mutex
- * semantics.
- *
  * Using a wait queue, we can do this:
  *
  * ```
  * static uint8_t measurement;
- * mutex_t wq = WAIT_QUEUE_INIT;
+ * wait_queue_t wq = WAIT_QUEUE_INIT;
  *
  * void measurement_irq(void)
  * {
  *     measurement = measure();
- *     queue_broadcast(&wq);
+ *     queue_wake(&wq);
  * }
  *
  * void wait_for_critical_value(void)
@@ -106,30 +79,20 @@
  *        thread_yield()
  * ```
  *
- * This way, if cond evaluates to false then we know that we could not have
- * possibly missed the wake-up event, as the wake-up event is triggered AFTER
- * setting the condition true, which we just checked.
+ * This way, if the condition expression evaluates to false then we know that we
+ * could not have possibly missed the wake-up event, as the wake-up event is
+ * triggered AFTER setting the condition true, which we just checked.
  *
- * Limitations
+ * When to use?
  *
- * There are two main drawbacks when using the wait queue:
- *  1. Setting/checking the wake-up condition is not atomic. While the condition
- *     variable semantics force the use of a mutex, in the case of wait queues
- *     the locking is left to the user. This is why int the example above the
- *     condition is checked with atomic_load_u64().
- *  2. queue_wait() is a macro and comes with the additional code size cost of
- *     inlining.
- *
- * So when to use?
- *
- * If you're not synchronizing with an ISR then go for condition variables as
- * they're enforcing atomic condition setting/checking through their semantics
- * and should produce smaller code. Wait queues only make sense if the signaler
- * (or one of multiple) is in ISR context.
+ * queue_wait() is a macro and comes with the additional code size cost of
+ * inlining. If you're not synchronizing with an ISR then go for condition
+ * variables. Wait queues only make sense if the signaler (or one of multiple)
+ * might be in ISR context.
  *
  * @{
  *
- * @file
+ * @file        wait_queue.h
  * @brief       Linux-like wait queue for condition signaling
  *
  * @author      Mihai Renea <mihairenea@gmail.com>
@@ -139,11 +102,7 @@
 #define WAIT_QUEUE_H
 
 #include "irq.h"
-#include "sched.h"
 #include "thread.h"
-
-#define ENABLE_DEBUG 1
-#include "debug.h"
 
 typedef struct wait_queue_entry wait_queue_entry_t;
 struct wait_queue_entry {
@@ -168,6 +127,14 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
 void _maybe_yield(wait_queue_entry_t *entry);
 void _queue_wake_common(wait_queue_t *wq, bool all);
 
+/**
+ * @brief Wait for a condition to become true.
+ *
+ * @note
+ *
+ * @param[in] wq    wait queue to wait on
+ * @param[in] cond  condition expression to be evaluated
+ */
 #define queue_wait(wq, cond)                                                   \
   do {                                                                         \
     if (cond) {                                                                \
