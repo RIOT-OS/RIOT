@@ -5,6 +5,7 @@
 
 static inline bool _is_in_wq(wait_queue_entry_t *entry)
 {
+    /* A queued entry will either point to the next or to QUEUE_WAIT_TAIL. */
     return entry->next != NULL;
 }
 
@@ -35,6 +36,7 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
     while (*curr_pp != WAIT_QUEUE_TAIL) {
         if (*curr_pp == entry) {
             *curr_pp = (*curr_pp)->next;
+            /* mark as not queued */
             entry->next = NULL;
             break;
         }
@@ -44,27 +46,30 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
     irq_restore(irq_state);
 }
 
-/* @post interrupts disabled, de-queued */
-void _maybe_yield(wait_queue_entry_t *entry)
+/* @post interrupts restored to user state, entry queued */
+void _maybe_yield_and_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry)
 {
-    irq_disable();
+    int irq_state = irq_disable();
     if (!_is_in_wq(entry)) {
-        /* Queue got signaled while evaluating the condition expression or right
-         * afterwards. Don't go to sleep but re-evaluate the condition. */
+        /* Queue got signaled while evaluating the condition expression. Don't
+         * go to sleep but re-evaluate the condition. */
+        _wait_enqueue(wq, entry, irq_state);
         return;
     }
 
     sched_set_status(entry->thread, STATUS_WQ_BLOCKED);
     /* _queue_wake_common(wq) can't tell whether the thread is sleeping on wq
-     * or on some other queue during the condition expression evaluation. But
-     * we can "mark" the thread with the queue it's actually sleeping on by
-     * having the thread's linked list slot (which we don't use otherwise) point
-     * back to this entry. */
+     * or on some other queue, which is possible during the condition expression
+     * evaluation. But we can "mark" the thread with the queue it's actually
+     * sleeping on by having the thread's linked list slot (which we don't use
+     * otherwise) point back to this entry. */
     entry->thread->rq_entry.next = (void *)entry;
 
     irq_enable();
     thread_yield_higher();
     irq_disable();
+
+    _wait_enqueue(wq, entry, irq_state);
 }
 
 void _queue_wake_common(wait_queue_t *wq, bool all)
@@ -83,7 +88,7 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
          *    also be another wait queue, which is why we check if the thread
          *    points back to this wait-queue entry (see _maybe_yield()) */
         if (thread->status == STATUS_WQ_BLOCKED &&
-            thread->rq_entry.next == (void *)head) {
+            (wait_queue_entry_t *)thread->rq_entry.next == head) {
             sched_set_status(thread, STATUS_PENDING);
             /* un-mark the thread */
             thread->rq_entry.next = NULL;

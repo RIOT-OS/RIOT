@@ -62,15 +62,15 @@
  *
  * void wait_for_critical_value(void)
  * {
- *     queue_wait(&wq, atomic_load_u64(&measurement) >= THRESHOLD);
+ *     QUEUE_WAIT(&wq, atomic_load_u64(&measurement) >= THRESHOLD);
  * }
  * ```
  *
- * This is free of the race condition above because queue_wait() is a macro
+ * This is free of the race condition above because QUEUE_WAIT() is a macro
  * that checks the condition AFTER queueing the current thread to be waken up:
  *
  * ```
- * queue_wait(wq, cond):
+ * QUEUE_WAIT(wq, cond):
  *     loop:
  *        enqueue_current_thread(wq)
  *        if (cond):
@@ -85,7 +85,7 @@
  *
  * When to use?
  *
- * queue_wait() is a macro and comes with the additional code size cost of
+ * QUEUE_WAIT() is a macro and comes with the additional code size cost of
  * inlining. If you're not synchronizing with an ISR then go for condition
  * variables. Wait queues only make sense if the signaler (or one of multiple)
  * might be in ISR context.
@@ -104,6 +104,11 @@
 #include "irq.h"
 #include "thread.h"
 
+/* Wait queue entry, which is always allocated on the stack. We can't use the
+ * linked list node in thread_t because while evaluating the condition
+ * expression the thread may:
+ *  - queue on some other wait queue
+ *  - block on something else, e.g. a mutex */
 typedef struct wait_queue_entry wait_queue_entry_t;
 struct wait_queue_entry {
     wait_queue_entry_t *next;
@@ -127,36 +132,78 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
 void _maybe_yield(wait_queue_entry_t *entry);
 void _queue_wake_common(wait_queue_t *wq, bool all);
 
+
+/**
+ * @brief Enable @ref QUEUE_WAIT() early exit optimization if the condition
+ *        evaluates true.
+ *
+ * This optimization is turned off to faciliate the testing of some edge cases.
+ * There's no good reason to disable this other than to save a few bytes.
+ */
+#ifndef CONFIG_QUEUE_WAIT_EARLY_EXIT
+#  define CONFIG_QUEUE_WAIT_EARLY_EXIT 1
+#endif
+
+#if CONFIG_QUEUE_WAIT_EARLY_EXIT
+#  define BREAK_IF_TRUE(cond)                                                  \
+    if (cond) {                                                                \
+        break;                                                                 \
+    }
+#else
+#  define BREAK_IF_TRUE(cond) (void)(0)
+#endif
+
 /**
  * @brief Wait for a condition to become true.
  *
- * @note
+ * Will not return for as long as the condition expression @p cond evaluates to
+ * false.
+ *
+ * @note @p cond may get evaluated mutiple times.
+ *
+ * @note The interrupt state will be maintained during condition expression
+ *       execution and restored upon return, but interrupts will get enabled if
+ *       the condition evaluates false, as the thread will have to go to sleep.
+ *
+ * @warning @p cond is NOT executed atomically. If that is a requirement, you
+ *          can:
+ *           - lock within the expression, e.g. lock a mutex, disable interrupts.
+ *           - call this with interrupts disabled. Interrupts will be kept
+ *             disabled during the condition evaluation.
  *
  * @param[in] wq    wait queue to wait on
  * @param[in] cond  condition expression to be evaluated
  */
-#define queue_wait(wq, cond)                                                   \
-  do {                                                                         \
-    if (cond) {                                                                \
-      break;                                                                   \
-    }                                                                          \
+#define QUEUE_WAIT(wq, cond)                                                   \
+    do {                                                                       \
+        BREAK_IF_TRUE(cond);                                                   \
                                                                                \
-    wait_queue_entry_t me = {.thread = thread_get_active()};                   \
-    int irq_state = irq_disable();                                             \
-    _wait_enqueue(wq, &me, irq_state);                                         \
-    while (!(cond)) {                                                          \
-      _maybe_yield(&me);                                                       \
-      _wait_enqueue(wq, &me, irq_state);                                       \
-    }                                                                          \
+        wait_queue_entry_t me = { .thread = thread_get_active() };             \
                                                                                \
-    _wait_dequeue(wq, &me, irq_state);                                         \
-  } while (0)
+        int irq_state = irq_disable();                                         \
+        _wait_enqueue(wq, &me, irq_state);                                     \
+        while (!(cond)) {                                                      \
+            _maybe_yield_and_enqueue(wq, &me);                                 \
+        }                                                                      \
+                                                                               \
+        _wait_dequeue(wq, &me, irq_state);                                     \
+    } while (0)
 
+/**
+ * @brief Wake one thread queued on the wait queue.
+ *
+ * @param wq wait queue to signal
+ */
 static inline void queue_wake_exclusive(wait_queue_t *wq)
 {
     _queue_wake_common(wq, false);
 }
 
+/**
+ * @brief Wake all threads queued on the wait queue.
+ *
+ * @param wq wait queue to signal
+ */
 static inline void queue_wake(wait_queue_t *wq)
 {
     _queue_wake_common(wq, true);
