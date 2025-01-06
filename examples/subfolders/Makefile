@@ -13,7 +13,7 @@ USEMODULE += my_module # name as defined in module/Makefile
 
 # Add source files in subfolders manually
 SRC += main.c
-SRC += folder/a.c folder/subfolder/b.c
+SRC += folder/a.c folder/subfolder/b.c folder/subfolder/c.c
 
 # Alternative method to add files in subfolders using wildcards
 # SRC += $(wildcard *.c folder/*.c folder/**/*.c)

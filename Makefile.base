@@ -112,7 +112,7 @@ ifneq (,$(SUBDIRS_IN_DIRS))
     $(patsubst $(CURDIR)/%,./%, $(SUBDIRS_IN_DIRS)). \
     Please select a single approach for each subfolder to prevent linking errors.)
 endif
-SUBDIRS := $(filter-out $(BINDIR)/$(MODULE)/, $(dir $(OBJ)))
+SUBDIRS := $(sort $(filter-out $(BINDIR)/$(MODULE)/, $(dir $(OBJ))))
 
 include $(RIOTMAKE)/blob.inc.mk
 include $(RIOTMAKE)/tools/fixdep.inc.mk

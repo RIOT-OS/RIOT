@@ -24,6 +24,7 @@ void module_a(void);
 void module_b(void);
 void folder_a(void);
 void folder_b(void);
+void folder_c(void);
 
 int main(void)
 {
@@ -34,6 +35,7 @@ int main(void)
     // call functions from subfolder
     folder_a();
     folder_b();
+    folder_c();
 
     return 0;
 }
