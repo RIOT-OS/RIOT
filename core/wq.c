@@ -11,7 +11,7 @@ static inline bool _is_in_wq(wait_queue_entry_t *entry)
 
 /* @pre  interrupts disabled, de-queued
  * @post interrupts restored to @p irq_state */
-void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
+static void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
 {
     assert(!_is_in_wq(entry));
 
@@ -27,10 +27,21 @@ void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
     irq_restore(irq_state);
 }
 
-/* @post interrupts restored to @p irq_state */
-void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
+void _prepare_to_wait(wait_queue_t *wq, wait_queue_entry_t *entry)
 {
-    irq_disable();
+    int irq_state = irq_disable();
+
+    *entry = (wait_queue_entry_t) {
+        .thread = thread_get_active(),
+        .next   = NULL,
+    };
+
+    _wait_enqueue(wq, entry, irq_state);
+}
+
+void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry)
+{
+    int irq_state = irq_disable();
 
     wait_queue_entry_t **curr_pp = &wq->list;
     while (*curr_pp != WAIT_QUEUE_TAIL) {
@@ -46,7 +57,6 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state)
     irq_restore(irq_state);
 }
 
-/* @post interrupts restored to user state, entry queued */
 void _maybe_yield_and_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry)
 {
     int irq_state = irq_disable();
@@ -76,6 +86,8 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
 {
     int irq_state = irq_disable();
 
+    int waiter_prio = THREAD_PRIORITY_MIN + 1;
+
     wait_queue_entry_t *head;
     while ((head = wq->list) != WAIT_QUEUE_TAIL) {
         thread_t *thread = head->thread;
@@ -90,8 +102,13 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
         if (thread->status == STATUS_WQ_BLOCKED &&
             (wait_queue_entry_t *)thread->rq_entry.next == head) {
             sched_set_status(thread, STATUS_PENDING);
-            /* un-mark the thread */
-            thread->rq_entry.next = NULL;
+            if (waiter_prio == THREAD_PRIORITY_MIN + 1) {
+                /* First thread to be waken up. We don't care about the
+                 * priorities of subsequent threads - they must be equal or
+                 * lower. */
+                waiter_prio = thread->priority;
+            }
+
             DEBUG("wq: woke up thread %d\n", head->thread->pid);
         }
         else {
@@ -110,6 +127,10 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
             break;
         }
     }
+
+    irq_enable();
+
+    sched_switch(waiter_prio);
 
     irq_restore(irq_state);
 }

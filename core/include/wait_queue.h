@@ -126,13 +126,6 @@ typedef struct {
  */
 #define WAIT_QUEUE_INIT { .list = WAIT_QUEUE_TAIL }
 
-/* For internal use only */
-void _wait_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
-void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry, int irq_state);
-void _maybe_yield(wait_queue_entry_t *entry);
-void _queue_wake_common(wait_queue_t *wq, bool all);
-
-
 /**
  * @brief Enable @ref QUEUE_WAIT() early exit optimization if the condition
  *        evaluates true.
@@ -153,6 +146,12 @@ void _queue_wake_common(wait_queue_t *wq, bool all);
 #  define BREAK_IF_TRUE(cond) (void)(0)
 #endif
 
+/* For internal use within the @ref QUEUE_WAIT() macro only. Not the most
+ * intuitive decomposition, but we want to keep the macro tight. */
+void _prepare_to_wait(wait_queue_t *wq, wait_queue_entry_t *entry);
+void _maybe_yield_and_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry);
+void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry);
+
 /**
  * @brief Wait for a condition to become true.
  *
@@ -161,9 +160,10 @@ void _queue_wake_common(wait_queue_t *wq, bool all);
  *
  * @note @p cond may get evaluated mutiple times.
  *
- * @note The interrupt state will be maintained during condition expression
- *       execution and restored upon return, but interrupts will get enabled if
- *       the condition evaluates false, as the thread will have to go to sleep.
+ * @note The interrupt state at the moment of calling this macro will be
+ *       restored before executing the condition expression and before
+ *       returning, but interrupts will get enabled if the condition evaluates
+ *       false, as the thread will have to go to sleep.
  *
  * @warning @p cond is NOT executed atomically. If that is a requirement, you
  *          can:
@@ -178,16 +178,16 @@ void _queue_wake_common(wait_queue_t *wq, bool all);
     do {                                                                       \
         BREAK_IF_TRUE(cond);                                                   \
                                                                                \
-        wait_queue_entry_t me = { .thread = thread_get_active() };             \
-                                                                               \
-        int irq_state = irq_disable();                                         \
-        _wait_enqueue(wq, &me, irq_state);                                     \
+        wait_queue_entry_t me;                                                 \
+        _prepare_to_wait(wq, &me);                                             \
         while (!(cond)) {                                                      \
             _maybe_yield_and_enqueue(wq, &me);                                 \
         }                                                                      \
-                                                                               \
-        _wait_dequeue(wq, &me, irq_state);                                     \
+        _wait_dequeue(wq, &me);                                                \
     } while (0)
+
+/* For internal use only. */
+void _queue_wake_common(wait_queue_t *wq, bool all);
 
 /**
  * @brief Wake one thread queued on the wait queue.
