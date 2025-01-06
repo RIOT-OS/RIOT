@@ -27,7 +27,6 @@
 extern "C" {
 #endif
 
-
 #define LED0_PIN_NUM        12
 #define LED0_PORT           GPIO_PORT_A /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_A
