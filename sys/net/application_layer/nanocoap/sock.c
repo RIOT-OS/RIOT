@@ -195,6 +195,12 @@ static uint32_t _deadline_left_us(uint32_t deadline)
     return deadline - now;
 }
 
+static void _sock_flush(nanocoap_sock_t *sock)
+{
+    void *payload, *ctx = NULL;
+    while (_sock_recv_buf(sock, &payload, &ctx, 0) > 0 || ctx) {}
+}
+
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg)
 {
@@ -222,6 +228,9 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
         .iol_base = pkt->hdr,
         .iol_len  = coap_get_total_len(pkt),
     };
+
+    /* clear out stale responses from previous requests */
+    _sock_flush(sock);
 
     while (1) {
         switch (state) {
