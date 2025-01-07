@@ -13,11 +13,11 @@
  * implementation is inspired from the Linux Kernel.
  *
  * Wait queues have similar semantics to condition variables, but don't require
- * setting the condition + signaling to be atomic, hence no mutex is needed to
- * function properly. In turn, one may safely call queue_wake() from an ISR.
- * Note, while cond_signal() and cond_broadcast() are safe to call from an ISR
- * context too, doing so will very probably cause a race condition elsewhere.
- * Consider the following scenario using condition variables:
+ * setting the condition + signaling to be atomic, hence no mutex is needed. In
+ * turn, one may safely call queue_wake() from an ISR. Note, while cond_signal()
+ * and cond_broadcast() are safe to call from an ISR context too, doing so will
+ * very probably cause a race condition elsewhere. Consider the following
+ * scenario using condition variables:
  *
  * ```
  * static uint64_t measurement;
@@ -45,13 +45,13 @@
  * something isn't right and indeed, the following sequence of events is
  * possible:
  *  1. thread sees measurement < THRESHOLD, and is about to call cond_wait()
- *  2. ISR fires, sets measurement = THRESHOLD
+ *  2. ISR fires, sets measurement = THRESHOLD, and signals the condition
  *  3. thread calls cond_wait() and goes to sleep, possibly forever
  *
  * Using a wait queue, we can do this:
  *
  * ```
- * static uint8_t measurement;
+ * static uint64_t measurement;
  * wait_queue_t wq = WAIT_QUEUE_INIT;
  *
  * void measurement_irq(void)
@@ -67,28 +67,20 @@
  * ```
  *
  * This is free of the race condition above because QUEUE_WAIT() is a macro
- * that checks the condition AFTER queueing the current thread to be waken up:
- *
- * ```
- * QUEUE_WAIT(wq, cond):
- *     loop:
- *        enqueue_current_thread(wq)
- *        if (cond):
- *            break
- *
- *        thread_yield()
- * ```
- *
- * This way, if the condition expression evaluates to false then we know that we
- * could not have possibly missed the wake-up event, as the wake-up event is
- * triggered AFTER setting the condition true, which we just checked.
+ * that checks the condition AFTER queueing the current thread to be waken up.
  *
  * When to use?
  *
- * QUEUE_WAIT() is a macro and comes with the additional code size cost of
- * inlining. If you're not synchronizing with an ISR then go for condition
- * variables. Wait queues only make sense if the signaler (or one of multiple)
- * might be in ISR context.
+ * QUEUE_WAIT() is a macro and might come with some additional code size cost
+ * due to inlining. If you're not synchronizing with an ISR and care very much
+ * about code size then go for condition variables, otherwise there is no
+ * reason not to use the wait queue.
+ *
+ * Can't I just use a mutex?
+ *
+ * You can abuse a mutex by locking it in a loop in the thread context and
+ * unlocking from the ISR context. But this will only work for a single waiter
+ * and makes improper use of the mutex semantics.
  *
  * @{
  *
@@ -146,8 +138,8 @@ typedef struct {
 #  define BREAK_IF_TRUE(cond) (void)(0)
 #endif
 
-/* For internal use within the @ref QUEUE_WAIT() macro only. Not the most
- * intuitive decomposition, but we want to keep the macro tight. */
+/* For internal use within the @ref QUEUE_WAIT() macro only. Not the cleanest
+ * decomposition, but we want to keep the macro tight. */
 void _prepare_to_wait(wait_queue_t *wq, wait_queue_entry_t *entry);
 void _maybe_yield_and_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry);
 void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry);
@@ -162,8 +154,8 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry);
  *
  * @note The interrupt state at the moment of calling this macro will be
  *       restored before executing the condition expression and before
- *       returning, but interrupts will get enabled if the condition evaluates
- *       false, as the thread will have to go to sleep.
+ *       returning, but interrupts MAY get enabled if the condition evaluates
+ *       false, as the thread MAY have to go to sleep.
  *
  * @warning @p cond is NOT executed atomically. If that is a requirement, you
  *          can:

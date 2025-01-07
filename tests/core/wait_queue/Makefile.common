@@ -3,4 +3,5 @@ USEMODULE += ztimer_msec
 USEMODULE += sema
 
 DEVELHELP ?= 0
+ASSERT_VERBOSE ?= 0
 # CFLAGS_OPT += -Og -g

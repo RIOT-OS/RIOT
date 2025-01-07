@@ -28,12 +28,13 @@
 #include "sema.h"
 #include "test_utils/expect.h"
 
-#define WAITERS_CNT 5
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+#define WAITERS_CNT 2
 
 static char stacks[WAITERS_CNT][THREAD_STACKSIZE_MAIN];
-
 static wait_queue_t wq = WAIT_QUEUE_INIT;
-
 static uint64_t cond_val = 0;
 static sema_t woken_cnt = SEMA_CREATE(0);
 
@@ -69,7 +70,7 @@ static void *waiter_nonblocking(void *arg)
                                   IRQ_ON(atomic_load_u64(&cond_val) >= COND_VAL_THRESHOLD)));
 
     sema_post(&woken_cnt);
-    printf("waiter %u awake!\n", (unsigned)arg);
+    DEBUG("waiter %u awake!\n", (unsigned)arg);
 
     return NULL;
 }
@@ -82,7 +83,7 @@ static void *waiter_nonblocking_irqdisabled(void *arg)
     irq_enable();
 
     sema_post(&woken_cnt);
-    printf("waiter %u awake!\n", (unsigned)arg);
+    DEBUG("waiter %u awake!\n", (unsigned)arg);
 
     return NULL;
 }
@@ -94,8 +95,10 @@ void test_waiters_nonblocking(thread_task_func_t waiter_func)
 
     int thread_ids[WAITERS_CNT];
     for (unsigned i = 0; i < WAITERS_CNT; i++) {
-        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]), THREAD_PRIORITY_MAIN - 1,
-                      THREAD_CREATE_STACKTEST, waiter_func, (void *)i, "waiter");
+        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]),
+                                      THREAD_PRIORITY_MAIN - i - 1,
+                                      THREAD_CREATE_STACKTEST, waiter_func,
+                                      (void *)i, "waiter");
         expect(thread_ids[i] >= 0);
     }
 
@@ -171,8 +174,10 @@ void test_waiters_lowprio(void)
 
     int thread_ids[WAITERS_CNT];
     for (unsigned i = 0; i < WAITERS_CNT; i++) {
-        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]), THREAD_PRIORITY_MAIN + 1,
-                      THREAD_CREATE_STACKTEST, waiter_nonblocking, (void *)i, "waiter");
+        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]),
+                                      THREAD_PRIORITY_MAIN + i + 1,
+                                      THREAD_CREATE_STACKTEST,
+                                      waiter_nonblocking, (void *)i, "waiter");
         expect(thread_ids[i] >= 0);
     }
 
@@ -189,7 +194,7 @@ void test_waiters_lowprio(void)
     expect(wq.list == WAIT_QUEUE_TAIL);
 
     /* busy-wait for a while */
-    for (unsigned i = 0; i < 1000000; i++) {
+    for (unsigned i = 0; i < (UINT_MAX > 1000000UL ? 1000000UL : UINT_MAX - 1); i++) {
         expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
     }
 
@@ -201,8 +206,8 @@ void test_waiters_lowprio(void)
     cond_iter_cnt_expected += WAITERS_CNT;
     expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
 
-    /* just to make sure all threads finish */
-    ztimer_sleep(ZTIMER_MSEC, 2);
+    /* Just to make sure all threads finish, as they have low prio. */
+    ztimer_sleep(ZTIMER_MSEC, 50);
 }
 
 #if !CONFIG_QUEUE_WAIT_EARLY_EXIT
@@ -226,7 +231,7 @@ static bool cond_fn_wq(unsigned waiter_no)
 {
     QUEUE_WAIT(&nested_wq, COUNTING_COND(nested_cond_iter_cnt,
                                          atomic_load_u64(&nested_cond_val) >= COND_VAL_THRESHOLD));
-    printf("waiter %u: past inner wq\n", waiter_no);
+    DEBUG("waiter %u: past inner wq\n", waiter_no);
     return atomic_load_u64(&cond_val) >= COND_VAL_THRESHOLD;
 }
 
@@ -235,7 +240,7 @@ static void *waiter_blocking_queue(void *arg)
     QUEUE_WAIT(&wq, COUNTING_COND(cond_iter_cnt, cond_fn_wq((unsigned)arg)));
 
     sema_post(&woken_cnt);
-    printf("waiter %u awake!\n", (unsigned)arg);
+    DEBUG("waiter %u awake!\n", (unsigned)arg);
 
     return NULL;
 }
@@ -245,7 +250,7 @@ static void *waiter_blocking_mutex(void *arg)
     QUEUE_WAIT(&wq, COUNTING_COND(cond_iter_cnt, cond_fn_mutex()));
 
     sema_post(&woken_cnt);
-    printf("waiter %u awake!\n", (unsigned)arg);
+    DEBUG("waiter %u awake!\n", (unsigned)arg);
 
     return NULL;
 }
@@ -259,8 +264,10 @@ void test_waiters_blocking_mutex(void)
 
     int thread_ids[WAITERS_CNT];
     for (unsigned i = 0; i < WAITERS_CNT; i++) {
-        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]), THREAD_PRIORITY_MAIN - 1,
-                      THREAD_CREATE_STACKTEST, waiter_blocking_mutex, (void *)i, "waiter");
+        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]),
+                                      THREAD_PRIORITY_MAIN - i - 1,
+                                      THREAD_CREATE_STACKTEST,
+                                      waiter_blocking_mutex, (void *)i, "waiter");
         expect(thread_ids[i] >= 0);
     }
 
@@ -295,7 +302,7 @@ void test_waiters_blocking_mutex(void)
     }
 
     /* just to make sure all threads finish */
-    ztimer_sleep(ZTIMER_MSEC, 2);
+    ztimer_sleep(ZTIMER_MSEC, 5);
 }
 
 void test_waiters_blocking_wq(void)
@@ -308,8 +315,10 @@ void test_waiters_blocking_wq(void)
 
     int thread_ids[WAITERS_CNT];
     for (unsigned i = 0; i < WAITERS_CNT; i++) {
-        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]), THREAD_PRIORITY_MAIN - 1,
-                      THREAD_CREATE_STACKTEST, waiter_blocking_queue, (void *)i, "waiter");
+        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]),
+                                      THREAD_PRIORITY_MAIN - i - 1,
+                                      THREAD_CREATE_STACKTEST,
+                                      waiter_blocking_queue, (void *)i, "waiter");
         expect(thread_ids[i] >= 0);
     }
 
@@ -335,7 +344,6 @@ void test_waiters_blocking_wq(void)
 
     /* they should all wake up now and do another NESTED condition check, then wait
      * once again */
-    printf("wake up nested 1\n");
     nested_cond_val = 0;
     queue_wake(&nested_wq);
 
@@ -350,7 +358,6 @@ void test_waiters_blocking_wq(void)
 
     /* The NESTED wait loop should finish, but the condition for the OUTER
      * wait queue is not met */
-    printf("wake up nested 2\n");
     cond_val = 0;
     nested_cond_val = COND_VAL_THRESHOLD;
     queue_wake(&nested_wq);

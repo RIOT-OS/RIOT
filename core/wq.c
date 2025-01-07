@@ -1,6 +1,6 @@
 #include "wait_queue.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static inline bool _is_in_wq(wait_queue_entry_t *entry)
@@ -86,14 +86,14 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
 {
     int irq_state = irq_disable();
 
-    int waiter_prio = THREAD_PRIORITY_MIN + 1;
+    int highest_prio = THREAD_PRIORITY_MIN + 1;
 
     wait_queue_entry_t *head;
     while ((head = wq->list) != WAIT_QUEUE_TAIL) {
         thread_t *thread = head->thread;
         /* Wake the thread only if it blocks on THIS queue, otherwise:
-         *  - it is already on the run queue, in which case there is nothing
-         *    to be done, or
+         *  - it is already on the run queue, dead or whatever, in which case
+         *    there is nothing to be done, or
          *  - it blocks on something else (e.g. a mutex) while evaluating the
          *    condition expression, in which case we may not wake it up, as
          *    RIOTs locking primitives don't expect spurious wake-ups. This can
@@ -102,11 +102,11 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
         if (thread->status == STATUS_WQ_BLOCKED &&
             (wait_queue_entry_t *)thread->rq_entry.next == head) {
             sched_set_status(thread, STATUS_PENDING);
-            if (waiter_prio == THREAD_PRIORITY_MIN + 1) {
+            if (highest_prio == THREAD_PRIORITY_MIN + 1) {
                 /* First thread to be waken up. We don't care about the
                  * priorities of subsequent threads - they must be equal or
                  * lower. */
-                waiter_prio = thread->priority;
+                highest_prio = thread->priority;
             }
 
             DEBUG("wq: woke up thread %d\n", head->thread->pid);
@@ -129,8 +129,6 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
     }
 
     irq_enable();
-
-    sched_switch(waiter_prio);
-
+    sched_switch(highest_prio);
     irq_restore(irq_state);
 }
