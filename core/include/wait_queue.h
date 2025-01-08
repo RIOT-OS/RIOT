@@ -127,7 +127,7 @@ struct wait_queue_entry {
  * @brief Wait queue struct
  */
 typedef struct {
-    wait_queue_entry_t *list;
+    wait_queue_entry_t *list; /*<< next thread, has lower or equal priority */
 } wait_queue_t;
 
 /**
