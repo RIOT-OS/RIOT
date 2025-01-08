@@ -97,22 +97,44 @@
 
 #include "sched.h"
 
-/* Wait queue entry, which is always allocated on the stack. We can't use the
- * linked list node in thread_t because while evaluating the condition
- * expression the thread may:
- *  - queue on some other wait queue
- *  - block on something else, e.g. a mutex */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct wait_queue_entry wait_queue_entry_t;
+
+/**
+ * @cond INTERNAL
+ * @brief Wait queue entry
+ *
+ * Always allocated on the stack. We can't use the linked list node in thread_t
+ * because while evaluating the condition expression the thread may:
+ *  - queue on some other wait queue
+ *  - block on something else, e.g. a mutex
+ */
 struct wait_queue_entry {
     wait_queue_entry_t *next;
     thread_t *thread;
 };
+/**
+ * @endcond
+ */
 
+/**
+ * @brief Wait queue struct
+ */
 typedef struct {
     wait_queue_entry_t *list;
 } wait_queue_t;
 
+/**
+ * @cond INTERNAL
+ * @brief List terminator for the wait queue
+ */
 #define WAIT_QUEUE_TAIL ((void *)(-1))
+/**
+ * @endcond
+ */
 
 /**
  * @brief Init a wait queue
@@ -130,6 +152,9 @@ typedef struct {
 #  define CONFIG_QUEUE_WAIT_EARLY_EXIT 1
 #endif
 
+/**
+ * @cond INTERNAL
+ */
 #if CONFIG_QUEUE_WAIT_EARLY_EXIT
 #  define BREAK_IF_TRUE(cond)                                                  \
     if (cond) {                                                                \
@@ -145,13 +170,19 @@ void _prepare_to_wait(wait_queue_t *wq, wait_queue_entry_t *entry);
 void _maybe_yield_and_enqueue(wait_queue_t *wq, wait_queue_entry_t *entry);
 void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry);
 
+/* For internal use only in queue_wake() and queue_wake_exclusive(). */
+void _queue_wake_common(wait_queue_t *wq, bool all);
+/**
+ * @endcond
+ */
+
 /**
  * @brief Wait for a condition to become true.
  *
  * Will not return for as long as the condition expression @p cond evaluates to
  * false.
  *
- * @note @p cond may get evaluated mutiple times.
+ * @note @p cond may get evaluated multiple times.
  *
  * @note The interrupt state at the moment of calling this macro will be
  *       restored before executing the condition expression and before
@@ -179,8 +210,6 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry);
         _wait_dequeue(wq, &me);                                                \
     } while (0)
 
-/* For internal use only. */
-void _queue_wake_common(wait_queue_t *wq, bool all);
 
 /**
  * @brief Wake one thread queued on the wait queue.
@@ -201,6 +230,10 @@ static inline void queue_wake(wait_queue_t *wq)
 {
     _queue_wake_common(wq, true);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* WAIT_QUEUE_H */
 /** @} */
