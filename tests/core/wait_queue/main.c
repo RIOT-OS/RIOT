@@ -133,6 +133,8 @@ void test_waiters_nonblocking(thread_task_func_t waiter_func)
 
     cond_iter_cnt_expected += 1;
     expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
+    /* last thread had highest prio */
+    expect(thread_get(thread_ids[WAITERS_CNT - 1]) == NULL);
 
     ztimer_sleep(ZTIMER_MSEC, 10);
 
@@ -189,21 +191,33 @@ void test_waiters_lowprio(void)
     expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
 
     cond_val = COND_VAL_THRESHOLD;
-    queue_wake(&wq);
+    queue_wake_exclusive(&wq);
 
-    expect(wq.list == WAIT_QUEUE_TAIL);
+    expect(wq.list != WAIT_QUEUE_TAIL);
 
     /* busy-wait for a while */
     for (unsigned i = 0; i < (UINT_MAX > 1000000UL ? 1000000UL : UINT_MAX - 1); i++) {
         expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
     }
 
-    for (unsigned i = 0; i < WAITERS_CNT; i++) {
-        int ret = sema_wait_timed_ztimer(&woken_cnt, ZTIMER_MSEC, 11);
+    int ret = sema_wait(&woken_cnt);
+    expect(ret == 0);
+
+    cond_iter_cnt_expected += 1;
+    expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
+
+    /* Just to make sure the thread finishes, as it has lower prio. */
+    ztimer_sleep(ZTIMER_MSEC, 10);
+    expect(thread_get(thread_ids[0]) == NULL);
+
+    queue_wake(&wq);
+
+    for (unsigned i = 0; i < WAITERS_CNT - 1; i++) {
+        ret = sema_wait(&woken_cnt);
         expect(ret == 0);
     }
 
-    cond_iter_cnt_expected += WAITERS_CNT;
+    cond_iter_cnt_expected += WAITERS_CNT - 1;
     expect(atomic_load_u32(&cond_iter_cnt) == cond_iter_cnt_expected);
 
     /* Just to make sure all threads finish, as they have low prio. */
