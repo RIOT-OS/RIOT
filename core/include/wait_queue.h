@@ -116,8 +116,8 @@ typedef struct wait_queue_entry wait_queue_entry_t;
  *  - block on something else, e.g. a mutex
  */
 struct wait_queue_entry {
-    wait_queue_entry_t *next; /*<< linked list head */
-    thread_t *thread; /*<< thread blocking on the queue */
+    wait_queue_entry_t *next; /**< linked list head */
+    thread_t *thread; /**< thread blocking on the queue */
 };
 /**
  * @endcond
@@ -127,7 +127,7 @@ struct wait_queue_entry {
  * @brief Wait queue struct
  */
 typedef struct {
-    wait_queue_entry_t *list; /*<< next thread, has lower or equal priority */
+    wait_queue_entry_t *list; /**< next thread, has lower or equal priority */
 } wait_queue_t;
 
 /**
