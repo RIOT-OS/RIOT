@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2025 Mihai Renea <mihai.renea@ml-pa.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     core_sync
+ * @{
+ *
+ * @file
+ * @brief       Wait queue implementation
+ *
+ * @author      Mihai Renea <mihai.renea@ml-pa.com>
+ *
+ * @}
+ */
+
+#include "irq.h"
 #include "wait_queue.h"
 
 #define ENABLE_DEBUG 0
@@ -48,8 +69,8 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry)
         if (*curr_pp == entry) {
             *curr_pp = (*curr_pp)->next;
 #ifndef NDEBUG
-            /* Mark as not queued only for debugging, as the entry is going out
-             * of scope immediately anyway. */
+            /* Mark as not queued only for debugging, as the entry is about to
+             * go out of scope anyway. */
             entry->next = NULL;
 #endif
             break;
@@ -91,7 +112,7 @@ void _queue_wake_common(wait_queue_t *wq, bool all)
 {
     int irq_state = irq_disable();
 
-    int highest_prio = THREAD_PRIORITY_MIN + 1;
+    uint16_t highest_prio = THREAD_PRIORITY_MIN + 1;
 
     wait_queue_entry_t *head;
     while ((head = wq->list) != WAIT_QUEUE_TAIL) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Mihai Renea
+ * Copyright (C) 2025 Mihai Renea <mihai.renea@ml-pa.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for wait queues
  *
- * @author      Mihai Renea <mihairenea@gmail.com>
+ * @author      Mihai Renea <mihai.renea@ml-pa.com>
  * @}
  */
 
@@ -243,8 +243,9 @@ static uint64_t nested_cond_val = 0;
 
 static bool cond_fn_wq(unsigned waiter_no)
 {
-    QUEUE_WAIT(&nested_wq, COUNTING_COND(nested_cond_iter_cnt,
-                                         atomic_load_u64(&nested_cond_val) >= COND_VAL_THRESHOLD));
+    QUEUE_WAIT(&nested_wq,
+               COUNTING_COND(nested_cond_iter_cnt,
+                             atomic_load_u64(&nested_cond_val) >= COND_VAL_THRESHOLD));
     DEBUG("waiter %u: past inner wq\n", waiter_no);
     return atomic_load_u64(&cond_val) >= COND_VAL_THRESHOLD;
 }
@@ -360,7 +361,6 @@ void test_waiters_blocking_wq(void)
      * once again */
     nested_cond_val = 0;
     queue_wake(&nested_wq);
-
 
     nested_cond_iter_cnt_expected += WAITERS_CNT;
     expect(nested_wq.list != WAIT_QUEUE_TAIL);

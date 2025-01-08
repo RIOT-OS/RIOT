@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2025 Mihai Renea
+# Copyright (C) 2025 Mihai Renea <mihai.renea@ml-pa.com>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-# Author: Mihai Renea <mihairenea@gmail.com>
+# Author: Mihai Renea <mihai.renea@ml-pa.com>
 
 import sys
 from testrunner import run

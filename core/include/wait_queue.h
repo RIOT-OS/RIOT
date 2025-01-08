@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2025 Mihai Renea <mihai.renea@ml-pa.com>
+ *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
@@ -87,14 +89,13 @@
  * @file        wait_queue.h
  * @brief       Linux-like wait queue for condition signaling
  *
- * @author      Mihai Renea <mihairenea@gmail.com>
+ * @author      Mihai Renea <mihai.renea@ml-pa.com>
  */
 
 #ifndef WAIT_QUEUE_H
 #define WAIT_QUEUE_H
 
-#include "irq.h"
-#include "thread.h"
+#include "sched.h"
 
 /* Wait queue entry, which is always allocated on the stack. We can't use the
  * linked list node in thread_t because while evaluating the condition
