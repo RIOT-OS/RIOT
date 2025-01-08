@@ -101,6 +101,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Forward declaration for @ref wait_queue_entry_t
+ */
 typedef struct wait_queue_entry wait_queue_entry_t;
 
 /**
@@ -113,8 +116,8 @@ typedef struct wait_queue_entry wait_queue_entry_t;
  *  - block on something else, e.g. a mutex
  */
 struct wait_queue_entry {
-    wait_queue_entry_t *next;
-    thread_t *thread;
+    wait_queue_entry_t *next; /*<< linked list head */
+    thread_t *thread; /*<< thread blocking on the queue */
 };
 /**
  * @endcond
