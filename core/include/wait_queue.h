@@ -122,7 +122,7 @@ typedef struct {
  * @brief Enable @ref QUEUE_WAIT() early exit optimization if the condition
  *        evaluates true.
  *
- * This optimization is turned off to faciliate the testing of some edge cases.
+ * This optimization is turned off to facilitate the testing of some edge cases.
  * There's no good reason to disable this other than to save a few bytes.
  */
 #ifndef CONFIG_QUEUE_WAIT_EARLY_EXIT

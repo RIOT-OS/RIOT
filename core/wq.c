@@ -47,12 +47,17 @@ void _wait_dequeue(wait_queue_t *wq, wait_queue_entry_t *entry)
     while (*curr_pp != WAIT_QUEUE_TAIL) {
         if (*curr_pp == entry) {
             *curr_pp = (*curr_pp)->next;
-            /* mark as not queued */
+#ifndef NDEBUG
+            /* Mark as not queued only for debugging, as the entry is going out
+             * of scope immediately anyway. */
             entry->next = NULL;
+#endif
             break;
         }
         curr_pp = &(*curr_pp)->next;
     }
+
+    assert(entry->next == NULL);
 
     irq_restore(irq_state);
 }
