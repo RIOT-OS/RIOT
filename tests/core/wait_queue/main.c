@@ -224,6 +224,32 @@ void test_waiters_lowprio(void)
     ztimer_sleep(ZTIMER_MSEC, 50);
 }
 
+void test_cond_already_true(void)
+{
+    cond_val = COND_VAL_THRESHOLD;
+    /* cond expression will always get executed only once */
+    cond_iter_cnt = 0;
+
+    int thread_ids[WAITERS_CNT];
+    for (unsigned i = 0; i < WAITERS_CNT; i++) {
+        thread_ids[i] = thread_create(stacks[i], sizeof(stacks[0]),
+                                      THREAD_PRIORITY_MAIN - i - 1,
+                                      THREAD_CREATE_STACKTEST, waiter_nonblocking,
+                                      (void *)i, "waiter");
+        expect(thread_ids[i] >= 0);
+    }
+
+    expect(wq.list == WAIT_QUEUE_TAIL);
+    expect(atomic_load_u32(&cond_iter_cnt) == WAITERS_CNT);
+
+    for (unsigned i = 0; i < WAITERS_CNT; i++) {
+        int ret = sema_wait(&woken_cnt);
+        expect(ret == 0);
+    }
+
+    ztimer_sleep(ZTIMER_MSEC, 2);
+}
+
 #if !CONFIG_QUEUE_WAIT_EARLY_EXIT
 
 static mutex_t cond_mutex = MUTEX_INIT;
@@ -409,6 +435,9 @@ int main(void)
 
     test_waiters_lowprio();
     puts("tested non-blocking condition expression (waiters have low prio)");
+
+    test_cond_already_true();
+    puts("tested condition already true");
 
 #if !CONFIG_QUEUE_WAIT_EARLY_EXIT
     test_waiters_blocking_mutex();
