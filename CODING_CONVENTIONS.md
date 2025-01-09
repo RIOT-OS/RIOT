@@ -452,8 +452,8 @@ not a string literal`.
 
 ## Python coding convention
 
-* Code shall be compliant with Python 3.5 minimum because this is the default
-  Python 3 version in Ubuntu 16.04 (used as the reference system for CI)
+* Code shall be compliant with Python 3.10 minimum because this is the default
+  Python 3 version in Ubuntu 22.04 (used as the reference system for CI)
 * Code shall report no error when running the
   [Flake8](http://flake8.pycqa.org/en/latest/) tool, e.g:
     * for style checks described in
