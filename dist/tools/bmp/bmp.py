@@ -35,7 +35,7 @@ def find_suitable_gdb(gdb_path):
         for p in ['arm-none-eabi-gdb', 'gdb-multiarch']:
             p = shutil.which(p)
             if p:
-                print("GDB EXECUTABLE NOT FOUND! FALLING BACK TO %s" % p, file=sys.stderr)
+                print(f"GDB EXECUTABLE NOT FOUND! FALLING BACK TO {p}", file=sys.stderr)
                 return p
     print("CANNOT LOCATE SUITABLE GDB EXECUTABLE!", file=sys.stderr)
     sys.exit(-1)
@@ -62,9 +62,9 @@ def detect_probes():
 def enumerate_probes(ports):
     print("found following Black Magic GDB servers:")
     for i, s in enumerate(ports):
-        print("\t[%s]" % s.device, end=' ')
+        print(f"\t[{s.device}]", end=' ')
         if len(s.serial_number) > 1:
-            print("Serial:", s.serial_number, end=' ')
+            print(f"Serial: {s.serial_number}", end=' ')
         if i == 0:
             print("<- default", end=' ')
         print('')
@@ -131,7 +131,7 @@ def download_to_flash(gdbmi):
     while True:
         for msg in res:
             if msg['type'] == 'result':
-                assert msg['message'] == 'done', "download failed: %s" % str(msg)
+                assert msg['message'] == 'done', f"download failed: {msg}"
                 if pbar.start_time:
                     pbar.finish()
                 print("downloading finished")
@@ -141,14 +141,12 @@ def download_to_flash(gdbmi):
                 if section_name:
                     if first:
                         first = False
-                        print("downloading... total size: %s"
-                              % humanize.naturalsize(total_size, gnu=True))
+                        print(f"downloading... total size: {humanize.naturalsize(total_size, gnu=True)}")
                     if section_name != current_sec:
                         if pbar.start_time:
                             pbar.finish()
                         current_sec = section_name
-                        print("downloading section [%s] (%s)" % (
-                            section_name, humanize.naturalsize(section_size, gnu=True)))
+                        print(f"downloading section [{section_name}] ({humanize.naturalsize(section_size, gnu=True)})")
                         pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=section_size).start()
                     if section_sent:
                         pbar.update(section_sent)
@@ -160,12 +158,12 @@ def check_flash(gdbmi):
     while True:
         for msg in res:
             if msg['type'] == 'result':
-                assert msg['message'] == 'done', "checking failed: %s" % str(msg)
+                assert msg['message'] == 'done', f"checking failed: {msg}"
                 print("checking successful")
                 return
             elif msg['type'] == 'console':
                 assert 'matched' in msg['payload'] and 'MIS-MATCHED' not in msg['payload'], \
-                    "checking failed: %s" % str(msg)
+                    f"checking failed: {msg}"
         res = gdbmi.get_gdb_response(timeout_sec=TIMEOUT)
 
 
@@ -181,7 +179,7 @@ def choose_port(args, ports):
         else:
             assert len(ports) > 0, "no ports found"
             port = ports[0].device
-    print('connecting to [%s]...' % port)
+    print(f'connecting to [{port}]...')
     return port
 
 
@@ -193,7 +191,7 @@ def term_mode(args, uart_port):
 
 # debug mode, opens GDB shell with options
 def debug_mode(args, port):
-    gdb_args = ['-ex \'target extended-remote %s\'' % port]
+    gdb_args = [f'-ex \'target extended-remote {port}\'']
     if args.tpwr:
         gdb_args.append('-ex \'monitor tpwr enable\'')
     if args.connect_srst:
@@ -208,8 +206,8 @@ def debug_mode(args, port):
             gdb_args.append('-ex \'monitor swd_scan\'')
         else:
             gdb_args.append('-ex \'monitor swdp_scan\'')
-    gdb_args.append('-ex \'attach %s\'' % args.attach)
-    os.system(" ".join(['\"' + args.gdb_path + '\"'] + gdb_args + [args.file]))
+    gdb_args.append(f'-ex \'attach {args.attach}\'')
+    os.system(" ".join([f'\"{args.gdb_path}\"'] + gdb_args + [args.file]))
 
 
 def connect_to_target(args, port):
@@ -220,7 +218,7 @@ def connect_to_target(args, port):
     except TypeError:
         # and then new API
         gdbmi = GdbController(command=[args.gdb_path, "--nx", "--quiet", "--interpreter=mi2", args.file])
-    assert gdb_write_and_wait_for_result(gdbmi, '-target-select extended-remote %s' % port, 'connecting',
+    assert gdb_write_and_wait_for_result(gdbmi, f'-target-select extended-remote {port}', 'connecting',
                                          expected_result='connected')
     # set options
     if args.connect_srst:
@@ -244,7 +242,7 @@ def connect_to_target(args, port):
     assert len(targets) > 0, "no targets found"
     print("found following targets:")
     for t in targets:
-        print("\t%s" % t)
+        print(f"\t{t}")
     print("")
     return gdbmi
 
@@ -298,7 +296,7 @@ def main():
         if args.action == 'list':
             sys.exit(0)
 
-        assert gdb_write_and_wait_for_result(gdbmi, '-target-attach %s' % args.attach, 'attaching to target')
+        assert gdb_write_and_wait_for_result(gdbmi, f'-target-attach {args.attach}', 'attaching to target')
 
         # reset mode: reset device using reset pin
         if args.action == 'reset':
