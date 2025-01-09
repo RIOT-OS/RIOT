@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ESP32_GCC_RELEASE="esp-12.2.0_20230208"
+ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
 ESP32_OPENOCD_VERSION="v0.12.0-esp32-20230313"
 
@@ -13,6 +14,10 @@ TOOLS_PATH="${IDF_TOOLS_PATH}/tools"
 export_arch()
 {
     case $1 in
+        esp8266)
+            TARGET_ARCH="xtensa-esp8266-elf"
+            ESP32_GCC_RELEASE=${ESP8266_GCC_RELEASE}
+            ;;
         esp32)
             TARGET_ARCH="xtensa-esp32-elf"
             ;;
@@ -33,10 +38,19 @@ export_arch()
     TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP32_GCC_RELEASE}/${TARGET_ARCH}"
     TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
 
-    if [ -e "${TOOLS_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
+    if [ ! -e "${TOOLS_DIR}" ]; then
+        echo "${TOOLS_DIR} does not exist - please run"
+        echo $(echo $0 | sed 's/export/install/') $1
+        exit 1
+    fi
+
+    if [ -z "${TOOLS_DIR_IN_PATH}" ]; then
         echo "Extending PATH by ${TOOLS_DIR}/bin"
         export PATH="${TOOLS_DIR}/bin:${PATH}"
     fi
+
+    echo "To make this permanent, add this line to your ~/.bashrc or ~/.profile:"
+    echo PATH="\$PATH:${TOOLS_DIR}/bin"
 
     unset TOOLS_DIR
 }
@@ -130,7 +144,7 @@ if [ -z "$1" ]; then
     echo "<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp32 esp32c3 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         export_arch "$arch"
     done
