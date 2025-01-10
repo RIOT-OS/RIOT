@@ -452,17 +452,18 @@ not a string literal`.
 
 ## Python coding convention
 
-* Code shall be compliant with Python 3.5 minimum because this is the default
-  Python 3 version in Ubuntu 16.04 (used as the reference system for CI)
+* Code shall be compliant with Python 3.10 at minimum, because this is the
+  default Python 3 version in Ubuntu 22.04 (used as the reference system for
+  CI).
 * Code shall report no error when running the
   [Flake8](http://flake8.pycqa.org/en/latest/) tool, e.g:
     * for style checks described in
-      [PEP8](https://www.python.org/dev/peps/pep-0008/),
+      [PEP 8](https://www.python.org/dev/peps/pep-0008/),
     * for lint checks provided by
       [Pyflakes](https://pypi.python.org/pypi/pyflakes),
     * for complexity checks provided by the
       [McCabe project](https://pypi.python.org/pypi/mccabe)
-* A line length of maximum of 120 is allowed instead of the pep8 79: this
+* A line length of maximum of 120 is allowed instead of 79 as per PEP 8. This
   increases tests readability as they can expects long line of output.
 * Only runnable scripts shall start with `#!/usr/bin/env python3`
 * Runnable scripts shall use the following scheme:
