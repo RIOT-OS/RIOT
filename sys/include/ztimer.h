@@ -264,10 +264,11 @@
 
 #include <stdint.h>
 
-#include "sched.h"
+#include "mbox.h"
 #include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -529,6 +530,22 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 
 /* created with dist/tools/define2u16.py */
 #define MSG_ZTIMER 0xc83e   /**< msg type used by ztimer_msg_receive_timeout */
+
+/**
+ * @brief Get message from mailbox, blocking with a timeout
+ *
+ * If the mailbox is empty, this function will block until a message becomes
+ * available or the timeout triggers
+ *
+ * @param[in]   clock           ztimer clock to operate on
+ * @param[in]   mbox            ptr to mailbox to operate on
+ * @param[in]   msg             ptr to storage for retrieved message
+ * @param[in]   timeout         relative timeout, in @p clock time units
+ *
+ * @retval  0           Got a message
+ * @retval -ETIMEDOUT   Timeout triggered before a message was obtained
+ */
+int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *msg, uint32_t timeout);
 
 /**
  * @brief ztimer_now() for extending timers
