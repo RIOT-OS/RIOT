@@ -63,6 +63,10 @@ unless the probe is accessed remotely (e.g. `--port` is a network address). If
 the firmware version cannot be determined, it will assume version 1.10.2. This
 can be overridden using the `--bmp-version` flag.
 
+As of firmware version 2.0.0 of the Black Magic debugger, support for targets
+depend on the 'flavor' of firmware selected. This tool will indicate if that
+is the case.
+
 ## Examples (tested with BluePill STM32F103F8C6)
 * test connection:
 ```

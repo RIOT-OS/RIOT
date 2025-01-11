@@ -105,9 +105,11 @@ def detect_targets(gdbmi, res):
     while True:
         for msg in res:
             if msg['type'] == 'target':
-                m = re.fullmatch(pattern=r"\s*(\d+)\s*(.*)\s*", string=msg['payload'])
+                m = re.fullmatch(pattern=r"([\s\*]*)(\d+)\s*(.*)\s*", string=msg['payload'])
                 if m:
-                    targets.append(m.group(2))
+                    supported = "***" not in m.group(1)
+                    description = m.group(3)
+                    targets.append((supported, description))
             elif msg['type'] == 'result':
                 assert msg['message'] == 'done', str(msg)
                 return targets
@@ -284,10 +286,13 @@ def connect_to_target(args, port):
     targets = detect_targets(gdbmi, res)
     assert len(targets) > 0, "no targets found"
     print("found following targets:")
-    for t in targets:
-        print(f"\t{t}")
+    for s, t in targets:
+        if not s:
+            print(f"\t{t} (unsupported)")
+        else:
+            print(f"\t{t}")
     print("")
-    return gdbmi
+    return (gdbmi, targets)
 
 
 def parse_args():
@@ -334,10 +339,13 @@ def main():
             debug_mode(args, port)
             sys.exit(0)
 
-        gdbmi = connect_to_target(args, port)
+        (gdbmi, targets) = connect_to_target(args, port)
 
         if args.action == 'list':
             sys.exit(0)
+
+        assert len(targets) >= args.attach, "attach greater than number of targets"
+        assert targets[args.attach - 1][0], "target unsupported by probe"
 
         assert gdb_write_and_wait_for_result(gdbmi, f'-target-attach {args.attach}', 'attaching to target')
 
