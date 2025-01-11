@@ -174,7 +174,7 @@ static int _parse_lwm2m_light_cmd(int argc, char **argv)
 
 static int _parse_lwm2m_switch_cmd(int argc, char **argv)
 {
-    if (argc < 3) {
+    if (argc != 3) {
         printf("usage: %s switch <on|off>\n", argv[0]);
         return 1;
     }
@@ -189,7 +189,6 @@ static int _parse_lwm2m_switch_cmd(int argc, char **argv)
 
     return 0;
 }
-
 
 int lwm2m_cli_cmd(int argc, char **argv)
 {
