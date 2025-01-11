@@ -158,7 +158,7 @@ lwm2m_object_t *lwm2m_object_on_off_switch_init(lwm2m_client_data_t *client_data
 /**
  * @brief   Create a new on/off switch instance and add it to the @p object list.
  *
- * @param[in]      args             Initialize structure with the parameter for the instance. May
+ * @param[in]      args             Initialize structure with the parameter for the instance. Must
  *                                  not be NULL.
  * @param[in]      instance_id      ID for the new instance. It must be between 0 and
  *                                  (UINT16_MAX - 1), if -1 the next available ID will be used.
@@ -185,12 +185,13 @@ int lwm2m_object_on_off_switch_update_status(uint16_t instance_id, bool status);
  * @brief Update the application type of a on/off switch instance.
  *
  * @param[in] instance_id  ID of the instance to update.
- * @param[in] app_type     New application type.
- * @param[in] len          Length of the app_type string.
+ * @param[in] app_type     String representing new application type. Must be NULL terminated, must
+ *                         not be NULL.
+ * @param[in] len          Length of the @p app_type string.
  *
  * @return 0 on success
  * @return -EINVAL if the instance does not exist
- * @return -ENOBUFS if the app_type string is too long
+ * @return -ENOBUFS if the app_type string is too long (size > @ref CONFIG_LWM2M_ON_OFF_SWITCH_APP_TYPE_MAX_SIZE)
  */
 int lwm2m_object_on_off_switch_update_app_type(uint16_t instance_id, const char *app_type,
                                                size_t len);

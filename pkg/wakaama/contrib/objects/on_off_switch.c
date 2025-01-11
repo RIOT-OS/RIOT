@@ -24,7 +24,7 @@
 #include "ztimer.h"
 #include "ztimer/stopwatch.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 #define _USED_INSTANCES(_obj) (_obj.wakaama_object.instanceList)
@@ -34,11 +34,11 @@
  * @brief LwM2M On/off switch object instance
  */
 typedef struct lwm2m_obj_on_off_switch_inst {
-    lwm2m_list_t list;                                              /**< list handle */
-    bool status;                                                    /**< digital input status */
-    uint32_t counter;                                               /**< counter for the digital input */
-    ztimer_stopwatch_t stopwatch;                                   /**< stopwatch for time periods */
-    char app_type[CONFIG_LWM2M_ON_OFF_SWITCH_APP_TYPE_MAX_SIZE];    /**< application type */
+    lwm2m_list_t list;               /**< list handle */
+    bool status;                     /**< digital input status (ON/OFF) */
+    uint32_t counter;                /**< ON-transitions counter of the digital input*/
+    ztimer_stopwatch_t stopwatch;    /**< stopwatch to count ON/OFF time periods */
+    char app_type[CONFIG_LWM2M_ON_OFF_SWITCH_APP_TYPE_MAX_SIZE]; /**< application type */
 } lwm2m_obj_on_off_switch_inst_t;
 
 /**
@@ -75,15 +75,27 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                          lwm2m_data_t * data_array, lwm2m_object_t * object, lwm2m_write_type_t write_type);
 
 /**
- * @brief Gets the current value of a given @p instance.
+ * @brief Gets the current value of a resource from a given On/off switch object @p instance.
  *
- * @param[in, out] data     Initialized data structure.
+ * @param[in, out] data     Initialized resource data structure.
  * @param[in] instance      Pointer to the instance to get the value from.
  *
  * @return COAP_205_CONTENT on success
  * @return COAP_404_NOT_FOUND if the value is not found
  */
 static uint8_t _get_value(lwm2m_data_t *data, lwm2m_obj_on_off_switch_inst_t *instance);
+
+/**
+ * @brief Sets the value of a resource in a given On/off switch object @p instance.
+ *
+ * @param[in] data          Data structure containing the new value.
+ * @param[in] instance      Pointer to the instance to set the value.
+ *
+ * @return COAP_204_CHANGED on success
+ * @return COAP_400_BAD_REQUEST if the value is not encoded correctly
+ * @return COAP_404_NOT_FOUND if the value is not found
+ */
+static uint8_t _set_value(lwm2m_data_t *data, lwm2m_obj_on_off_switch_inst_t *instance);
 
 /**
  * @brief Mark a resource as changed on the LwM2M engine.
@@ -125,6 +137,10 @@ static uint8_t _get_value(lwm2m_data_t *data, lwm2m_obj_on_off_switch_inst_t *in
         lwm2m_data_encode_bool(instance->status, data);
         break;
 
+    case LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_COUNTER_ID:
+        lwm2m_data_encode_int(instance->counter, data);
+        break;
+
     case LWM2M_ON_OFF_SWITCH_ON_TIME_ID:
         if (instance->status) {
             int64_t time = (int64_t) ztimer_stopwatch_measure(&instance->stopwatch);
@@ -156,13 +172,13 @@ static uint8_t _get_value(lwm2m_data_t *data, lwm2m_obj_on_off_switch_inst_t *in
 }
 
 static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
-                        lwm2m_data_t ** data_array, lwm2m_object_t * object)
+                        lwm2m_data_t ** p_data_array, lwm2m_object_t * object)
 {
     (void)context;
 
     lwm2m_obj_on_off_switch_inst_t *instance;
+    lwm2m_data_t * data_array = *p_data_array;
     uint8_t result = COAP_404_NOT_FOUND;
-    int i = 0;
 
     mutex_lock(&_on_off_switch_object.lock);
 
@@ -180,6 +196,7 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
 
         uint16_t res_list[] = {
             LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID,
+            LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_COUNTER_ID,
             LWM2M_ON_OFF_SWITCH_ON_TIME_ID,
             LWM2M_ON_OFF_SWITCH_OFF_TIME_ID,
             LWM2M_ON_OFF_SWITCH_APP_TYPE_ID
@@ -187,9 +204,12 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
 
         /* allocate structures to return resources */
         int res_num = ARRAY_SIZE(res_list);
-        *data_array = lwm2m_data_new(res_num);
+        data_array = lwm2m_data_new(res_num);
 
-        if (NULL == *data_array) {
+        /* make sure to update the returned pointer */
+        *p_data_array = data_array;
+
+        if (NULL == data_array) {
             result = COAP_500_INTERNAL_SERVER_ERROR;
             goto free_out;
         }
@@ -198,22 +218,115 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
         *num_data = res_num;
 
         /* set the IDs of the resources in the data structures */
-        for (i = 0; i < res_num; i++) {
-            (*data_array)[i].id = res_list[i];
+        for (int i = 0; i < res_num; i++) {
+            data_array[i].id = res_list[i];
         }
     }
 
     /* now get the values */
-    i = 0;
-    do {
-        DEBUG("[lwm2m:on_off_switch:read]: reading resource %" PRId16 "\n", (*data_array)[i].id);
-        result = _get_value(&(*data_array)[i], instance);
-        i++;
-    } while (i < *num_data && COAP_205_CONTENT == result);
+    for (int i = 0; i < *num_data; i++) {
+        result = _get_value(&data_array[i], instance);
+
+        if (COAP_205_CONTENT != result) {
+            break;
+        }
+    }
 
 free_out:
     mutex_unlock(&_on_off_switch_object.lock);
     return result;
+}
+
+static uint8_t _set_value(lwm2m_data_t *data, lwm2m_obj_on_off_switch_inst_t *instance)
+{
+    assert(data);
+    assert(instance);
+
+    switch (data->id) {
+    case LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID: {
+        bool previous_status = instance->status;
+
+        int decode_result = lwm2m_data_decode_bool(data, &instance->status);
+        if (!decode_result) {
+            DEBUG("[lwm2m:on_off_switch:write]: invalid value for digital_input_state\n");
+            return COAP_400_BAD_REQUEST;
+        }
+
+        /* reset timer on transitions */
+        if (instance->status != previous_status) {
+            ztimer_stopwatch_reset(&instance->stopwatch);
+
+            if (instance->status) {
+                instance->counter++;
+            }
+        }
+
+        _mark_resource_changed(instance->list.id, LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID);
+        return COAP_204_CHANGED;
+    }
+
+    case LWM2M_ON_OFF_SWITCH_ON_TIME_ID:
+    {
+        int64_t value;
+
+        int decode_result = lwm2m_data_decode_int(data, &value);
+        if (!decode_result) {
+            DEBUG("[lwm2m:on_off_switch:write]: invalid on_time value\n");
+            return COAP_400_BAD_REQUEST;
+        }
+
+        if (value != 0) {
+            DEBUG("[lwm2m:on_off_switch:write]: invalid on_time value, only can write 0\n");
+            return COAP_400_BAD_REQUEST;
+        }
+
+        ztimer_stopwatch_reset(&instance->stopwatch);
+        _mark_resource_changed(instance->list.id, LWM2M_ON_OFF_SWITCH_ON_TIME_ID);
+        return COAP_204_CHANGED;
+    }
+
+    case LWM2M_ON_OFF_SWITCH_OFF_TIME_ID:
+    {
+        int64_t value;
+        int decode_result = lwm2m_data_decode_int(data, &value);
+        if (!decode_result) {
+            DEBUG("[lwm2m:on_off_switch:write]: invalid off_time value\n");
+            return COAP_400_BAD_REQUEST;
+        }
+
+        if (value != 0) {
+            DEBUG("[lwm2m:on_off_switch:write]: invalid off_time value, only can write 0\n");
+            return COAP_400_BAD_REQUEST;
+        }
+
+        ztimer_stopwatch_reset(&instance->stopwatch);
+        _mark_resource_changed(instance->list.id, LWM2M_ON_OFF_SWITCH_OFF_TIME_ID);
+        return COAP_204_CHANGED;
+    }
+
+    case LWM2M_ON_OFF_SWITCH_APP_TYPE_ID:
+        if (data->type != LWM2M_TYPE_STRING && data->type != LWM2M_TYPE_OPAQUE) {
+            DEBUG("[lwm2m:on_off_switch:write]: invalid type for app_type"
+                    "(%" PRId8 ")\n", (uint8_t)(data->type));
+            return COAP_400_BAD_REQUEST;
+        }
+
+        if (data->value.asBuffer.length >
+            CONFIG_LWM2M_ON_OFF_SWITCH_APP_TYPE_MAX_SIZE - 1) {
+            DEBUG("[lwm2m:on_off_switch:write]: value too big for app_type\n");
+            return COAP_500_INTERNAL_SERVER_ERROR;
+        }
+
+        memcpy(instance->app_type, data->value.asBuffer.buffer,
+                data->value.asBuffer.length);
+        instance->app_type[data->value.asBuffer.length] = '\0';
+        _mark_resource_changed(instance->list.id, LWM2M_ON_OFF_SWITCH_APP_TYPE_ID);
+        return COAP_204_CHANGED;
+
+    default:
+        return COAP_404_NOT_FOUND;
+    }
+
 }
 
 static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int num_data,
@@ -223,7 +336,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
     (void)write_type;
 
     lwm2m_obj_on_off_switch_inst_t *instance;
-    uint8_t result = COAP_204_CHANGED;
+    uint8_t result = COAP_404_NOT_FOUND;
 
     mutex_lock(&_on_off_switch_object.lock);
 
@@ -235,74 +348,13 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
         goto free_out;
     }
 
-    for (int i = 0; i < num_data && result == COAP_204_CHANGED; i++) {
-        switch (data_array[i].id) {
-        case LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID: {
-            bool prev_status = instance->status;
+    for (int i = 0; i < num_data; i++) {
+        result = _set_value(&data_array[i], instance);
 
-            lwm2m_data_decode_bool(&data_array[i], &instance->status);
-
-            /* reset timer on transitions */
-            if (instance->status != prev_status) {
-                ztimer_stopwatch_reset(&instance->stopwatch);
-
-                if (instance->status) {
-                    instance->counter++;
-                }
-            }
-
-            _mark_resource_changed(instance_id, LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID);
-            break;
-        }
-
-        case LWM2M_ON_OFF_SWITCH_ON_TIME_ID:
-        {
-            int64_t val;
-            lwm2m_data_decode_int(&data_array[i], &val);
-            if (val != 0) {
-                DEBUG("[lwm2m:on_off_switch:write]: invalid on_time value, only can write 0\n");
-                result = COAP_400_BAD_REQUEST;
-            } else {
-                ztimer_stopwatch_reset(&instance->stopwatch);
-                _mark_resource_changed(instance_id, LWM2M_ON_OFF_SWITCH_ON_TIME_ID);
-            }
-            break;
-        }
-
-        case LWM2M_ON_OFF_SWITCH_OFF_TIME_ID:
-        {
-            int64_t val;
-            lwm2m_data_decode_int(&data_array[i], &val);
-            if (val != 0) {
-                DEBUG("[lwm2m:on_off_switch:write]: invalid off_time value, only can write 0\n");
-                result = COAP_400_BAD_REQUEST;
-            } else {
-                ztimer_stopwatch_reset(&instance->stopwatch);
-                _mark_resource_changed(instance_id, LWM2M_ON_OFF_SWITCH_OFF_TIME_ID);
-            }
-            break;
-        }
-
-        case LWM2M_ON_OFF_SWITCH_APP_TYPE_ID:
-            if (data_array[i].type != LWM2M_TYPE_STRING && data_array[i].type != LWM2M_TYPE_OPAQUE) {
-                DEBUG("[lwm2m:on_off_switch:write]: invalid type for app_type"
-                      "(%" PRId8 ")\n", (uint8_t)(data_array[i].type));
-                result = COAP_400_BAD_REQUEST;
-                break;
-            }
-
-            if (data_array[i].value.asBuffer.length >
-                CONFIG_LWM2M_ON_OFF_SWITCH_APP_TYPE_MAX_SIZE - 1) {
-                DEBUG("[lwm2m:on_off_switch:write]: value too big for app_type\n");
-                result = COAP_500_INTERNAL_SERVER_ERROR;
-                break;
-            }
-
-            memcpy(instance->app_type, data_array[i].value.asBuffer.buffer,
-                   data_array[i].value.asBuffer.length);
-            instance->app_type[data_array[i].value.asBuffer.length] = '\0';
-            _mark_resource_changed(instance_id, LWM2M_ON_OFF_SWITCH_APP_TYPE_ID);
-            break;
+        if (result != COAP_204_CHANGED) {
+            DEBUG("[lwm2m:on_off_switch:write]: error writing resource %" PRId16 "\n",
+                  data_array[i].id);
+            goto free_out;
         }
     }
 
@@ -321,12 +373,15 @@ static void _mark_resource_changed(uint16_t instance_id, uint16_t resource_id)
 
     lwm2m_client_data_t *client_data;
     client_data = (lwm2m_client_data_t *)_on_off_switch_object.wakaama_object.userData;
+    assert(client_data);
     lwm2m_resource_value_changed(client_data->lwm2m_ctx, &uri);
 }
 
 
 lwm2m_object_t *lwm2m_object_on_off_switch_init(lwm2m_client_data_t *client_data)
 {
+    assert(client_data);
+
     /* initialize the instances */
     for (unsigned i = 0; i < CONFIG_LWM2M_ON_OFF_SWITCH_INSTANCES_MAX; i++) {
         _on_off_switch_object.instances[i].list.next = NULL;
@@ -437,16 +492,17 @@ int lwm2m_object_on_off_switch_update_status(uint16_t instance_id, bool status)
         goto free_out;
     }
 
-    if (status != instance->status) {
-        if (status) {
-            instance->counter++;
-        }
+    lwm2m_data_t data = {
+        .type = LWM2M_TYPE_BOOLEAN,
+        .id = LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID,
+        .value.asBoolean = status
+    };
 
-        ztimer_stopwatch_start(&instance->stopwatch);
+    int set_result = _set_value(&data, instance);
+    if (set_result != COAP_204_CHANGED) {
+        DEBUG("[lwm2m:on_off_switch]: error updating status\n");
+        goto free_out;
     }
-
-    instance->status = status;
-    _mark_resource_changed(instance_id, LWM2M_ON_OFF_SWITCH_DIGITAL_INPUT_STATE_ID);
 
     result = 0;
 
@@ -458,16 +514,12 @@ free_out:
 int lwm2m_object_on_off_switch_update_app_type(uint16_t instance_id, const char *app_type,
                                                size_t len)
 {
+    assert(app_type);
+
     int result = -EINVAL;
     lwm2m_obj_on_off_switch_inst_t *instance;
 
     mutex_lock(&_on_off_switch_object.lock);
-
-    if (len > CONFIG_LWM2M_ON_OFF_SWITCH_APP_TYPE_MAX_SIZE - 1) {
-        DEBUG("[lwm2m:on_off_switch]: app_type string too long\n");
-        result = -ENOBUFS;
-        goto free_out;
-    }
 
     instance = (lwm2m_obj_on_off_switch_inst_t *)LWM2M_LIST_FIND(
         _USED_INSTANCES(_on_off_switch_object),
@@ -479,10 +531,18 @@ int lwm2m_object_on_off_switch_update_app_type(uint16_t instance_id, const char 
         goto free_out;
     }
 
-    memcpy(instance->app_type, app_type, len);
-    instance->app_type[len] = '\0';
+    lwm2m_data_t data = {
+        .type = LWM2M_TYPE_STRING,
+        .id = LWM2M_ON_OFF_SWITCH_APP_TYPE_ID,
+        .value.asBuffer.buffer = (uint8_t *)app_type,
+        .value.asBuffer.length = len
+    };
 
-    _mark_resource_changed(instance_id, LWM2M_ON_OFF_SWITCH_APP_TYPE_ID);
+    int set_result = _set_value(&data, instance);
+    if (set_result != COAP_204_CHANGED) {
+        DEBUG("[lwm2m:on_off_switch]: error updating app_type\n");
+        goto free_out;
+    }
 
     result = 0;
 
