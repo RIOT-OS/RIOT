@@ -28,6 +28,7 @@ DEVELHELP ?= 1
 # NOTE: Add the package for wakaama
 USEPKG += wakaama
 USEMODULE += wakaama_objects_light_control
+USEMODULE += wakaama_objects_on_off_switch
 
 # add DTLS support
 USEMODULE += wakaama_client_dtls
