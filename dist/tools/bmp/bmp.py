@@ -25,6 +25,7 @@ from progressbar import Bar, Percentage, ProgressBar
 from pygdbmi.gdbcontroller import GdbController
 
 TIMEOUT = 100  # seconds
+DEFAULT_VERSION = Version('1.10.2')
 
 
 # find a suitable gdb executable, falling back to defaults if needed
@@ -41,12 +42,24 @@ def find_suitable_gdb(gdb_path):
     sys.exit(-1)
 
 
+# detect the firmware version by parsing the product description for something like v1.10.2
+def detect_firmware_version(port):
+    matches = re.search(r"v[0-9]+.[0-9]+.[0-9]+", port.product)
+
+    if not matches:
+        return None
+
+    return Version(matches.group(0)[1:])
+
+
 # find all connected BMPs and store both GDB and UART interfaces
 def detect_probes():
     gdb_ports = []
     uart_ports = []
     for p in serial.tools.list_ports.comports():
         if p.vid == 0x1D50 and p.pid in {0x6018, 0x6017}:
+            p.firmware_version = detect_firmware_version(p)
+
             if re.fullmatch(r'COM\d\d', p.device):
                 p.device = '//./' + p.device
             if 'GDB' in str(p.interface) \
@@ -65,6 +78,8 @@ def enumerate_probes(ports):
         print(f"\t[{s.device}]", end=' ')
         if len(s.serial_number) > 1:
             print(f"Serial: {s.serial_number}", end=' ')
+        if s.firmware_version:
+            print(f"Firmware: {s.firmware_version}", end=' ')
         if i == 0:
             print("<- default", end=' ')
         print('')
@@ -74,7 +89,14 @@ def enumerate_probes(ports):
 def search_serial(snr, ports):
     for port in ports:
         if snr in port.serial_number:
-            return port.device
+            return port
+
+
+# search device with specific port number <prt> in a list of ports <ports>
+def search_port(prt, ports):
+    for port in ports:
+        if prt == port.device:
+            return port
 
 
 # parse GDB output for targets
@@ -167,20 +189,41 @@ def check_flash(gdbmi):
         res = gdbmi.get_gdb_response(timeout_sec=TIMEOUT)
 
 
-# choose GDB or UART port, based on available ports and application arguments
-def choose_port(args, ports):
-    if args.port:
-        port = args.port
+# choose GDB or UART port, based on available ports and application arguments.
+def choose_probe(args, ports):
+    if args.serial:
+        descriptor = search_serial(args.serial, ports)
+        assert descriptor, "no BMP with this serial found"
+    elif args.port:
+        descriptor = search_port(args.port, ports)
+
+        # bail out if no descriptor found, because port could be a network address, a pipe or
+        # something else.
+        if not descriptor:
+            return (args.port, None)
     else:
-        enumerate_probes(ports)
-        if args.serial:
-            port = search_serial(args.serial, ports)
-            assert port, "no BMP with this serial found"
+        assert len(ports) > 0, "no ports found"
+        descriptor = ports[0]
+
+    enumerate_probes(ports)
+    print(f'connecting to [{descriptor.device}]...')
+    return (descriptor.device, descriptor)
+
+
+# choose firmware version, based on available descriptors and application arguments.
+def choose_firmware_version(args, descriptor):
+    if args.bmp_version == "auto":
+        if descriptor and descriptor.firmware_version:
+            version = descriptor.firmware_version
+            print(f"auto-detected firmware version {version}")
         else:
-            assert len(ports) > 0, "no ports found"
-            port = ports[0].device
-    print(f'connecting to [{port}]...')
-    return port
+            version = DEFAULT_VERSION
+            print(f"unable to detect firmware version, assuming {version} or later")
+    else:
+        version = Version(args.bmp_version)
+        print(f"using firmware version {version}")
+
+    return version
 
 
 # terminal mode, opens TTY program
@@ -258,7 +301,7 @@ def parse_args():
     parser.add_argument('--port', help='choose specific probe by port (overrides auto selection)')
     parser.add_argument('--attach', help='choose specific target by number', type=int, default=1)
     parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
-    parser.add_argument('--bmp-version', help='choose specific firmware version', default='1.10.0')
+    parser.add_argument('--bmp-version', help='choose specific firmware version', default='auto')
     parser.add_argument('--term-cmd', help='serial terminal command',
                         default='picocom --nolock --imap lfcrlf --baud 115200 %s')
 
@@ -277,14 +320,14 @@ def main():
     g, u = detect_probes()
 
     if args.action == 'term':
-        port = choose_port(args, u)
+        (port, _) = choose_probe(args, u)
 
         term_mode(args, port)
     else:
-        port = choose_port(args, g)
+        (port, descriptor) = choose_probe(args, g)
 
         args.file = args.file if args.file else ''
-        args.bmp_version = Version(args.bmp_version)
+        args.bmp_version = choose_firmware_version(args, descriptor)
         args.gdb_path = find_suitable_gdb(args.gdb_path)
 
         if args.action == 'debug':
