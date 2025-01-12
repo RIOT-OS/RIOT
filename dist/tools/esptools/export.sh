@@ -16,32 +16,36 @@ export_arch()
     case $1 in
         esp8266)
             TARGET_ARCH="xtensa-esp8266-elf"
-            ESP32_GCC_RELEASE=${ESP8266_GCC_RELEASE}
+            ESP_GCC_RELEASE="${ESP8266_GCC_RELEASE}"
             ;;
         esp32)
             TARGET_ARCH="xtensa-esp32-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32c3)
             TARGET_ARCH="riscv32-esp-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32s2)
             TARGET_ARCH="xtensa-esp32s2-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32s3)
             TARGET_ARCH="xtensa-esp32s3-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         *)
             echo "Unknown architecture $1"
             return
     esac
 
-    TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP32_GCC_RELEASE}/${TARGET_ARCH}"
+    TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}/${TARGET_ARCH}"
     TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
 
     if [ ! -e "${TOOLS_DIR}" ]; then
         echo "${TOOLS_DIR} does not exist - please run"
         echo $(echo $0 | sed 's/export/install/') $1
-        exit 1
+        return
     fi
 
     if [ -z "${TOOLS_DIR_IN_PATH}" ]; then
