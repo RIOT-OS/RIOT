@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S pipx run
 
 # Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
 #
@@ -8,6 +8,17 @@
 #
 # @author   Maximilian Deubel <maximilian.deubel@ovgu.de>
 # @author   Bas Stottelaar <basstottelaar@gmail.com>
+
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "humanize",
+#   "packaging",
+#   "progressbar",
+#   "pygdbmi",
+#   "pyserial"
+# ]
+# ///
 
 # Black Magic Probe helper script
 # This script can detect connected Black Magic Probes and can be used as a flashloader and much more
