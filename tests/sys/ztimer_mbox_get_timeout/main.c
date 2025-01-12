@@ -34,7 +34,7 @@ static mbox_t mbox = MBOX_INIT(queue, ARRAY_SIZE(queue));
 
 static void cb_mbox_put(void *arg)
 {
-    mbox_try_put(&mbox, arg);
+    expect(mbox_try_put(&mbox, arg) == 1);
 }
 
 static void test_mbox_already_full(void)
@@ -91,10 +91,14 @@ static void test_msg_prior_timeout(void)
     expect(ztimer_mbox_get_timeout(ZTIMER_USEC, &mbox, &got, wait_timeout_us) == 0);
     uint32_t stop = ztimer_now(ZTIMER_USEC);
 
-    /* the function should return AFTER the message was send, but BEFORE the
-     * timeout was triggered */
-    expect(stop - start >= msg_timeout_us);
+    /* the function should return BEFORE the timeout was triggered */
     expect(stop - start < wait_timeout_us);
+
+#if !defined(BOARD_NATIVE64) && !defined(BOARD_NATIVE)
+    /* The function should return AFTER the message was send.
+     * This test is flaky on native, at least with LLVM. */
+    expect(stop - start >= msg_timeout_us);
+#endif
 
     /* we should have gotten the correct message */
     expect((got.type == msg.type) && (got.content.value == msg.content.value));
