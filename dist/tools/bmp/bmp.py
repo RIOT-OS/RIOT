@@ -304,7 +304,7 @@ def parse_args():
     parser.add_argument('--tpwr', action='store_true', help='enable target power')
     parser.add_argument('--serial', help='choose specific probe by serial number')
     parser.add_argument('--port', help='choose specific probe by port (overrides auto selection)')
-    parser.add_argument('--attach', help='choose specific target by number', type=int, default='1')
+    parser.add_argument('--attach', help='choose specific target by number', type=int, default=1)
     parser.add_argument('--gdb-path', help='path to GDB', default='gdb-multiarch')
     parser.add_argument('--bmp-version', help='choose specific firmware version', default='auto')
     parser.add_argument('--term-cmd', help='serial terminal command',
