@@ -88,33 +88,37 @@ install_arch()
     case "$1" in
         esp8266)
             TARGET_ARCH="xtensa-esp8266-elf"
-            ESP32_GCC_RELEASE=${ESP8266_GCC_RELEASE}
+            ESP_GCC_RELEASE="${ESP8266_GCC_RELEASE}"
             ;;
         esp32)
             TARGET_ARCH="xtensa-esp32-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32c3)
             TARGET_ARCH="riscv32-esp-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32s2)
             TARGET_ARCH="xtensa-esp32s2-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32s3)
             TARGET_ARCH="xtensa-esp32s3-elf"
+            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         *)
             echo "error: Unknown architecture $1"
             exit 1
     esac
 
-    TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP32_GCC_RELEASE}"
+    TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}"
 
     if [ "$1" = "esp8266" ]; then
         git clone https://github.com/gschorcht/xtensa-esp8266-elf ${TOOLS_DIR}/${TARGET_ARCH}
     else
         URL_PATH="https://github.com/espressif/crosstool-NG/releases/download"
         URL_TGZ="${TARGET_ARCH}-${ESP32_GCC_VERSION_DOWNLOAD}-${OS}.tar.xz"
-        URL="${URL_PATH}/${ESP32_GCC_RELEASE}/${URL_TGZ}"
+        URL="${URL_PATH}/${ESP_GCC_RELEASE}/${URL_TGZ}"
 
         echo "Creating directory ${TOOLS_DIR} ..." && \
         mkdir -p "${TOOLS_DIR}" && \
