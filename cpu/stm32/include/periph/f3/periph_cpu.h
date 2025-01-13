@@ -61,12 +61,12 @@ extern "C" {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT  = (ADC_CFGR_RES),   /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = (ADC_CFGR_RES_1), /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = (ADC_CFGR_RES_0), /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = (0x0),            /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = (0x1),            /**< not applicable */
-    ADC_RES_16BIT = (0x2)             /**< not applicable */
+    ADC_RES_6BIT  = (ADC_CFGR_RES),     /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = (ADC_CFGR_RES_1),   /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = (ADC_CFGR_RES_0),   /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = (0x00),             /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0xfe),     /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = (0xff)      /**< ADC resolution: 16 bit (not supported) */
 } adc_res_t;
 /** @} */
 
