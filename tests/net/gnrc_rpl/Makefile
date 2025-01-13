@@ -9,7 +9,7 @@ USEMODULE += gnrc_rpl
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   USEMODULE += socket_zep
   USEMODULE += socket_zep_hello
   USEMODULE += netdev
@@ -28,6 +28,6 @@ host-tools:
 TEST_DEPS += host-tools
 
 # Test is flaky and regularly derails unrelated merge trains
-TEST_ON_CI_BLACKLIST += native native64
+TEST_ON_CI_BLACKLIST += native native32
 
 include $(RIOTBASE)/Makefile.include

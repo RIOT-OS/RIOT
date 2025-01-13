@@ -140,7 +140,7 @@ def get_reachable_addr(child):
     # Give some time for the network interface to be configured
     time.sleep(1)
     # Get address
-    if BOARD in ["native", "native64"]:
+    if BOARD in ["native", "native32"]:
         iface_addr = get_iface_addr(IFACE)
         network = IPv6Network(iface_addr, strict=False)
         client_addr = iface_addr
@@ -212,7 +212,7 @@ def _test_successful_update(child, client, app_ver):
         child.expect_exact("Install correct payload")
 
         # Wait for reboot on non-native BOARDs
-        if BOARD not in ["native", "native64"]:
+        if BOARD not in ["native", "native32"]:
             child.expect_exact(REBOOTING_MSG)
             # Verify client is reachable and get address
             client = get_reachable_addr(child)
