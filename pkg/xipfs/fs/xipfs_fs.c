@@ -14,6 +14,7 @@
  * @brief       xipfs integration with vfs
  *
  * @author      Damien Amara <damien.amara@univ-lille.fr>
+ * @author      Gregory Guche <gregory.guche@univ-lille.fr>
  *
  * @}
  */
@@ -205,20 +206,22 @@ static int get_xipfs_mp(const char *path, xipfs_mount_t *xipfs_mp)
     }
     fd = ret;
 
-    count = 0;
-    while (count < sizeof(*xipfs_mp)) {
-        ret = vfs_read(fd, xipfs_mp, sizeof(*xipfs_mp));
+    count = sizeof(*xipfs_mp);
+    while (count > 0) {
+        ret = vfs_read(fd, xipfs_mp, count);
         if (ret < 0) {
             /* error */
             return ret;
         }
+
+        count -= ret;
+        xipfs_mp += ret;
         if (ret == 0) {
             /* EOF */
             break;
         }
-        count += ret;
     }
-    assert(count == sizeof(*xipfs_mp));
+    assert(count == 0);
 
     (void)vfs_close(fd);
 
@@ -284,7 +287,7 @@ static int _close(vfs_file_t *filp)
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_close(mp, descp);
@@ -300,7 +303,7 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_fstat(mp, descp, buf);
@@ -316,7 +319,7 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_lseek(mp, descp, off, whence);
@@ -333,7 +336,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags,
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_open(mp, descp, name, flags, mode);
@@ -349,7 +352,7 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_read(mp, descp, dest, nbytes);
@@ -365,7 +368,7 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_write(mp, descp, src, nbytes);
@@ -381,7 +384,7 @@ static int _fsync(vfs_file_t *filp)
     int ret;
 
     mp = _get_xipfs_mount_t(filp->mp);
-    descp = filp->private_data.ptr;
+    descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_fsync(mp, descp, filp->pos);
@@ -401,7 +404,7 @@ static int _opendir(vfs_DIR *dirp, const char *dirname)
     int ret;
 
     mp = _get_xipfs_mount_t(dirp->mp);
-    descp = dirp->private_data.ptr;
+    descp = (xipfs_dir_desc_t *)(uintptr_t)&dirp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_opendir(mp, descp, dirname);
@@ -418,7 +421,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     int ret;
 
     mp = _get_xipfs_mount_t(dirp->mp);
-    descp = dirp->private_data.ptr;
+    descp = (xipfs_dir_desc_t *)(uintptr_t)&dirp->private_data.ptr;
     direntp = (xipfs_dirent_t *)(uintptr_t)entry->d_name;
 
     mutex_lock(&xipfs_mutex);
@@ -435,7 +438,7 @@ static int _closedir(vfs_DIR *dirp)
     int ret;
 
     mp = _get_xipfs_mount_t(dirp->mp);
-    descp = dirp->private_data.ptr;
+    descp = (xipfs_dir_desc_t *)(uintptr_t)&dirp->private_data.ptr;
 
     mutex_lock(&xipfs_mutex);
     ret = xipfs_closedir(mp, descp);
@@ -586,7 +589,7 @@ static int _statvfs(vfs_mount_t *vfs_mp, const char *restrict path,
  * xipfs-specific functions
  */
 
-int _new_file(const char *full_path, uint32_t size, uint32_t exec)
+int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_t exec)
 {
     xipfs_mount_t mp;
     const char *path;
@@ -609,7 +612,7 @@ int _new_file(const char *full_path, uint32_t size, uint32_t exec)
     return ret;
 }
 
-int _execv(const char *full_path, char *const argv[])
+int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
 {
     xipfs_mount_t mp;
     const char *path;

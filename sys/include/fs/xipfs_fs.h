@@ -17,6 +17,7 @@
  * @brief       xipfs integration with vfs
  *
  * @author      Damien Amara <damien.amara@univ-lille.fr>
+ * @author      Gregory Guche <gregory.guche@univ-lille.fr>
  */
 
 #ifndef FS_XIPFS_FS_H
@@ -61,15 +62,19 @@ extern "C" {
  * @brief xipfs descriptor for vfs integration
  */
 typedef struct vfs_xipfs_mount_s {
-    vfs_mount_t vfs_mp;      /**< VFS mount point         */
-    unsigned magic;          /**< xipfs magic number      */
-    const char *mount_path;  /**< mount point path        */
-    size_t page_num;         /**< number of flash page    */
-    void *page_addr;         /**< first flas page address */
+    vfs_mount_t vfs_mp;      /**< VFS mount point          */
+    unsigned magic;          /**< xipfs magic number       */
+    const char *mount_path;  /**< mount point path         */
+    size_t page_num;         /**< number of flash page     */
+    void *page_addr;         /**< first flash page address */
 } vfs_xipfs_mount_t;
 
 /** The xipfs vfs driver */
 extern const vfs_file_system_t xipfs_file_system;
+
+/** Extended driver handling executables */
+int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_t exec);
+int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
 
 #ifdef __cplusplus
 }
