@@ -526,6 +526,11 @@ ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
   USEPKG += tinydtls
 endif
 
+ifneq (,$(filter nanocoap_proxy,$(USEMODULE)))
+  USEMODULE += nanocoap_server_separate
+  USEMODULE += nanocoap_sock
+endif
+
 ifneq (,$(filter nanocoap_server_auto_init,$(USEMODULE)))
   USEMODULE += nanocoap_server
 endif
