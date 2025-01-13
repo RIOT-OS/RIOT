@@ -41,6 +41,13 @@ extern "C" {
  */
 #undef _POSIX_THREADS
 
+/*
+ * To avoid type conflicts between the `pthread_rwlockattr_t` definition
+ * in RIOT's `pthread` implementation and newlibc's `sys/_pthreadtypes.h`,
+ * the macro `_POSIX_READER_WRITER_LOCKS` must be undefined.
+ */
+#undef _POSIX_READER_WRITER_LOCKS
+
 #ifdef __cplusplus
 }
 #endif
