@@ -5,6 +5,8 @@ ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
 ESP32_OPENOCD_VERSION="v0.12.0-esp32-20230313"
 
+GDB_VERSION="14.2_20240403"
+
 if [ -z "${IDF_TOOLS_PATH}" ]; then
     IDF_TOOLS_PATH="${HOME}/.espressif"
 fi
@@ -120,8 +122,6 @@ export_gdb()
             echo "error: Unknown platform $1, use xtensa or riscv"
             return
     esac
-
-    GDB_VERSION="12.1_20221002"
 
     TOOLS_DIR="${TOOLS_PATH}/${GDB_ARCH}/${GDB_VERSION}/${GDB_ARCH}"
     TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
