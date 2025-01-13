@@ -1,8 +1,8 @@
 #!/bin/sh
 
-ESP32_GCC_RELEASE="esp-12.2.0_20230208"
-ESP32_GCC_VERSION_DIR="12.2.0"
-ESP32_GCC_VERSION_DOWNLOAD="12.2.0_20230208"
+ESP32_GCC_RELEASE="esp-14.2.0_20241119"
+ESP32_GCC_VERSION_DIR="14.2.0"
+ESP32_GCC_VERSION_DOWNLOAD="14.2.0_20241119"
 
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
@@ -56,7 +56,7 @@ case "${PLATFORM}" in
         OS_OCD="linux-armhf"
         ;;
     linux-i686|linux32|Linux-i686|FreeBSD-i386|i586-linux-gnu|i686-linux-gnu)
-        OS="i686-linux-gnu"
+        OS="i586-linux-gnu"
         ;;
     macos|osx|darwin|Darwin-x86_64|x86_64-apple-darwin)
         OS="x86_64-apple-darwin"
@@ -90,20 +90,12 @@ install_arch()
             TARGET_ARCH="xtensa-esp8266-elf"
             ESP_GCC_RELEASE="${ESP8266_GCC_RELEASE}"
             ;;
-        esp32)
-            TARGET_ARCH="xtensa-esp32-elf"
+        esp32|esp32s2|esp32s3)
+            TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32c3)
             TARGET_ARCH="riscv32-esp-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
-        esp32s2)
-            TARGET_ARCH="xtensa-esp32s2-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
-        esp32s3)
-            TARGET_ARCH="xtensa-esp32s3-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         *)

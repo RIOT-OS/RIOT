@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ESP32_GCC_RELEASE="esp-12.2.0_20230208"
+ESP32_GCC_RELEASE="esp-14.2.0_20241119"
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
 ESP32_OPENOCD_VERSION="v0.12.0-esp32-20230313"
@@ -18,20 +18,12 @@ export_arch()
             TARGET_ARCH="xtensa-esp8266-elf"
             ESP_GCC_RELEASE="${ESP8266_GCC_RELEASE}"
             ;;
-        esp32)
-            TARGET_ARCH="xtensa-esp32-elf"
+        esp32|esp32s2|esp32s3)
+            TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32c3)
             TARGET_ARCH="riscv32-esp-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
-        esp32s2)
-            TARGET_ARCH="xtensa-esp32s2-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
-        esp32s3)
-            TARGET_ARCH="xtensa-esp32s3-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         *)
