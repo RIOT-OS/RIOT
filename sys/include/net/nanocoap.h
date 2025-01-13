@@ -355,6 +355,7 @@ struct _coap_request_ctx {
 /* forward declarations */
 static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
 static inline size_t coap_hdr_get_token_len(const coap_hdr_t *hdr);
+static inline const void * coap_hdr_get_token(const coap_hdr_t *hdr);
 
 /**
  * @brief   Get resource path associated with a CoAP request
@@ -755,6 +756,28 @@ static inline size_t coap_hdr_get_token_len(const coap_hdr_t *hdr)
     }
 
     return 0;
+}
+
+/**
+ * @brief       Get the Token of a CoAP over UDP (DTLS) packet
+ * @param[in]   hdr     CoAP over UDP header
+ * @return      The CoAP Token inside the packet that @p hdr belongs to
+ *
+ * @warning     This API is super goofy. It assumes that the packet is valid
+ *              and will read more than `sizeof(*hdr)` into the data `hdr`
+ *              points to while crossing fingers hard.
+ *
+ * @deprecated  This function was introduced to keep legacy code alive.
+ *              Introducing new callers should be avoided. In the RX path an
+ *              @ref coap_pkt_t will be available, so that you can call
+ *              @ref coap_get_token instead. In the TX path the token was
+ *              added by us, so we really should know.
+ */
+static inline const void * coap_hdr_get_token(const coap_hdr_t *hdr)
+{
+    uint8_t *token = (void *)hdr;
+    token += sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr);
+    return token;
 }
 
 /**
