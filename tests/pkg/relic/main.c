@@ -114,7 +114,7 @@ static void tests_relic_ecdh(void)
 #endif
 
         /* The secrets should be the same now */
-        TEST_ASSERT_EQUAL_INT(RLC_EQ, util_cmp_const(sharedKeyA, sharedKeyB, RLC_MD_LEN));
+        TEST_ASSERT_EQUAL_INT(RLC_EQ, util_cmp_sec(sharedKeyA, sharedKeyB, RLC_MD_LEN));
 
         bn_free(privateA);
         ec_free(publicA);

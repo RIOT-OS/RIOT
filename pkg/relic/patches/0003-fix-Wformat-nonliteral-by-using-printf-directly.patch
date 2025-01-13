@@ -1,7 +1,7 @@
-From be6a8c76f021a2cba3d371c16bfb84a8264f51fe Mon Sep 17 00:00:00 2001
+From 49e5e3576572ebcaefab7fe996c89789c5476073 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
-Date: Sat, 20 May 2023 21:41:32 +0200
-Subject: [PATCH] fix -Wformat-nonliteral by using printf() directly
+Date: Mon, 13 Jan 2025 14:13:25 +0100
+Subject: [PATCH 3/3] fix -Wformat-nonliteral by using printf() directly
 
 ---
  include/relic_util.h |  2 +-
@@ -9,10 +9,10 @@ Subject: [PATCH] fix -Wformat-nonliteral by using printf() directly
  2 files changed, 1 insertion(+), 37 deletions(-)
 
 diff --git a/include/relic_util.h b/include/relic_util.h
-index 0dd1744..74e3216 100644
+index cdca0dc..379aa25 100644
 --- a/include/relic_util.h
 +++ b/include/relic_util.h
-@@ -296,7 +296,7 @@ int util_cmp_const(const void *a, const void *b, int n);
+@@ -316,7 +316,7 @@ void util_perm(uint_t p[], size_t n);
   * @param[in] format		- the format.
   * @param[in] ...			- the list of arguments matching the format.
   */
@@ -22,11 +22,11 @@ index 0dd1744..74e3216 100644
  /**
   * Prints a digit.
 diff --git a/src/relic_util.c b/src/relic_util.c
-index 3bb369d..133153d 100644
+index c69fb5c..8207a41 100644
 --- a/src/relic_util.c
 +++ b/src/relic_util.c
-@@ -151,42 +151,6 @@ int util_cmp_const(const void *a, const void *b, int size) {
- 	return (result == 0 ? RLC_EQ : RLC_NE);
+@@ -162,42 +162,6 @@ void util_perm(uint_t p[], size_t n) {
+ 	}
  }
  
 -#ifndef QUIET
@@ -69,5 +69,5 @@ index 3bb369d..133153d 100644
  #if RLC_DIG == 64
  	if (pad) {
 -- 
-2.40.1
+2.39.5
 
