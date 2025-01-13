@@ -70,16 +70,20 @@ extern "C" {
 #define GNRC_LORAWAN_BACKOFF_BUDGET_3   (8700000LL)     /**< budget of time on air every 24 hours */
 
 #define GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ  (1 << 0) /**< Internal Link Check request flag */
-#define GNRC_LORAWAN_MLME_OPTS_REKEY_IND_REQ   (1 << 1) /**< Internal Rekey Indication flag */
+#define GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS    (1 << 1) /**< Internal Link ADR Answer flag */
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS_SIZE (2U)         /**< size of Link ADR Answer CID in FOps */
+
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
+#define GNRC_LORAWAN_CID_LINK_ADR_REQ   (0x03)          /**< Link ADR Request CID */
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS   (0x03)          /**< Link ADR Answer CID */
 
 #define GNCR_LORAWAN_REKEY_IND_SIZE (1U)                /**< RekeyInd MAC command size */
 #define GNCR_LORAWAN_CID_REKEY_CONF (0x0B)              /**< Reykey Confirmation CID */
 
 #define GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE (3U)      /**< size of Link check answer */
-#define GNRC_LORAWAN_FOPT_REKEY_CONF_SIZE (2U)          /**< size of Rekey confirmation */
+#define GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE   (5U)      /**< size of Link ADR Request (LinkADRReq) */
 
 #define GNRC_LORAWAN_JOIN_DELAY_U32_MASK (0x1FFFFF)     /**< mask for detecting overflow in frame counter */
 
@@ -194,11 +198,15 @@ typedef struct {
  */
 typedef struct {
     uint8_t activation;     /**< Activation mechanism of the MAC layer */
+    bool adr;               /**< Whether adr is enabled or not */
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
     int32_t backoff_budget; /**< remaining Time On Air budget */
     uint8_t dev_nonce[2];   /**< Device Nonce */
     uint8_t backoff_state;  /**< state in the backoff state machine */
+    uint16_t adr_ack_cnt;   /**< ADR ACK counter */
+    uint8_t adr_req_cnt;    /**< LINK ADR REQ counter */
+    uint8_t adr_flags;      /**< Flags to denote the status of ADR_REQ */
 } gnrc_lorawan_mlme_t;
 
 /**
@@ -335,6 +343,18 @@ void gnrc_lorawan_generate_lifetime_session_keys(const uint8_t *deveui,
  * @return -EINVAL if datarate is not available in the current region
  */
 int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate);
+
+/**
+ * @brief Set TX power (PHY parameter) for the next transmission
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] tx_pwr desired TX power index
+ *
+ * @return 0 on success
+ * @return -EINVAL if TX power is not available in the current region
+ * @return negative number on error
+ */
+int gnrc_lorawan_set_tx_power(gnrc_lorawan_t *mac, uint8_t tx_pwr);
 
 /**
  * @brief build uplink frame
@@ -594,12 +614,34 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
 }
 
 /**
+ * @brief Check if ADRACKReq should be set
+ *
+ * @param[in] adr_ack_cnt ADR ACK counter
+ * @param[in] dr datarate
+ */
+static inline bool gnrc_lorawan_should_set_ack_req(uint16_t adr_ack_cnt, uint8_t dr)
+{
+    return adr_ack_cnt >= CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT && dr;
+}
+
+/**
  * @brief Set the datarate of the second reception window
  *
  * @param[in] mac pointer to the MAC descriptor
  * @param[in] rx2_dr datarate of RX2
  */
 void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
+
+/**
+ * @brief Set the datarate of the second reception window
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] adr set ADR status
+`
+ * @retval -EALREADY if current state is same as the requested state.
+ * @retval GNRC_LORAWAN_REQ_STATUS_SUCCESS if success
+ */
+int gnrc_lorawan_set_adr(gnrc_lorawan_t *mac, bool adr);
 
 /**
  * @brief Trigger the transmission of the Join Request packet.
