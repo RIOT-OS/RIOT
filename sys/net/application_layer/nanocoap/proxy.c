@@ -157,11 +157,11 @@ static void _forward_request_handler(event_t *ev)
     _disconnect(conn);
 }
 
-static bool _is_duplicate(nanocoap_rproxy_ctx_t *ctx, coap_pkt_t *pkt, const coap_request_ctx_t *req)
+static bool _is_duplicate(nanocoap_rproxy_ctx_t *ctx, const coap_request_ctx_t *req)
 {
     for (unsigned i = 0; i < CONFIG_NANOCOAP_RPROXY_PARALLEL_FORWARDS; i++) {
         if (bf_isset(ctx->forwards_used, i)) {
-            if (nanocoap_is_duplicate_in_separate_ctx(&ctx->forwards[i].response_ctx, pkt, req)) {
+            if (nanocoap_server_is_remote_in_response_ctx(&ctx->forwards[i].response_ctx, req)) {
                 return true;
             }
         }
@@ -226,7 +226,7 @@ ssize_t nanocoap_rproxy_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 {
     nanocoap_rproxy_ctx_t *proxy = coap_request_ctx_get_context(ctx);
 
-    if (_is_duplicate(proxy, pkt, ctx)) {
+    if (_is_duplicate(proxy, ctx)) {
         DEBUG_PUTS("[reverse proxy] Got duplicate --> empty ACK (if needed)");
         return coap_reply_empty_ack(pkt, buf, len);
     }
