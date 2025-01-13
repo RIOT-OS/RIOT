@@ -44,7 +44,7 @@ case "${PLATFORM}" in
         OS_OCD="linux-amd64"
         ;;
     linux-arm64|Linux-arm64|Linux-aarch64|Linux-armv8l|aarch64)
-        OS="aarch64-linux"
+        OS="aarch64-linux-gnu"
         OS_OCD="linux-arm64"
         ;;
     linux-armel|Linux-arm|Linux-armv7l|arm-linux-gnueabi)
