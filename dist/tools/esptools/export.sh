@@ -36,7 +36,7 @@ export_arch()
 
     if [ ! -e "${TOOLS_DIR}" ]; then
         echo "${TOOLS_DIR} does not exist - please run"
-        echo $(echo $0 | sed 's/export/install/') $1
+        echo "\${RIOTBASE}/dist/tools/esptools/install.sh $1"
         return
     fi
 
