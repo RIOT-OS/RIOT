@@ -212,7 +212,7 @@ install_gdb()
     URL_PATH="https://github.com/espressif/binutils-gdb/releases/download"
     URL_TGZ="${GDB_ARCH}-${GDB_VERSION}-${OS}.tar.gz"
     URL="${URL_PATH}/esp-gdb-v${GDB_VERSION}/${URL_TGZ}"
-echo $URL_GET $URL
+
     echo "Creating directory ${TOOLS_DIR} ..." && \
     mkdir -p "${TOOLS_DIR}" && \
     cd "${TOOLS_DIR}" && \
