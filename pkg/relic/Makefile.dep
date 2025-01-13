@@ -1,2 +1,1 @@
 USEMODULE += random
-USEMODULE += prng_xorshift
