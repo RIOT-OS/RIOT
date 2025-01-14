@@ -241,7 +241,7 @@ void isr_thread_yield(void)
     }
 }
 
-void thread_yield_higher(void)
+void thread_yield_higher_arch(void)
 {
     sched_context_switch_request = 1;
 

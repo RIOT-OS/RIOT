@@ -121,6 +121,7 @@
 
 #include "clist.h"
 #include "cib.h"
+#include "irq.h"
 #include "msg.h"
 #include "sched.h"
 #include "thread_config.h"
@@ -341,6 +342,11 @@ static inline void thread_yield(void)
 #endif
 
 /**
+ * @brief Arch-specific implementation of @ref thread_yield_higher()
+ */
+THREAD_MAYBE_INLINE void thread_yield_higher_arch(void);
+
+/**
  * @brief   Lets current thread yield in favor of a higher prioritized thread.
  *
  * @details The current thread will resume operation immediately,
@@ -352,7 +358,21 @@ static inline void thread_yield(void)
  *
  * @see     thread_yield()
  */
-THREAD_MAYBE_INLINE void thread_yield_higher(void);
+#ifdef DEBUG_THREAD_YIELD_HIGHER
+/* A failed assertion will reveal where this was called at the expense of
+ * increased binary size. */
+#define thread_yield_higher() do {                  \
+    assume(irq_is_in() || irq_is_enabled());        \
+    thread_yield_higher_arch();                     \
+} while (0)
+
+#else
+static inline void thread_yield_higher(void)
+{
+    assume(irq_is_in() || irq_is_enabled());
+    thread_yield_higher_arch();
+}
+#endif
 
 /**
  * @brief   Puts the current thread into zombie state.

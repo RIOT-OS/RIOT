@@ -30,7 +30,7 @@ extern "C" {
 
 #ifndef DOXYGEN /* Doxygen is in core/include/thread.h */
 
-static inline __attribute__((always_inline)) void thread_yield_higher(void)
+static inline __attribute__((always_inline)) void thread_yield_higher_arch(void)
 {
     /* trigger the PENDSV interrupt to run scheduler and schedule new thread if
      * applicable */
