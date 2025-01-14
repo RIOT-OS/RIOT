@@ -1,7 +1,7 @@
-From ce1cd836aafefa92c3138f3e923147a42e95c886 Mon Sep 17 00:00:00 2001
+From e2f067469fb02535f8cf773a3b9de1c2cd8543af Mon Sep 17 00:00:00 2001
 From: Kaspar Schleiser <kaspar@schleiser.de>
 Date: Mon, 8 Nov 2021 22:37:38 +0100
-Subject: [PATCH 2/2] add RIOT random support to cmake and relic_conf.h
+Subject: [PATCH 2/3] add RIOT random support to cmake and relic_conf.h
 
 ---
  cmake/rand.cmake        | 1 +
@@ -9,7 +9,7 @@ Subject: [PATCH 2/2] add RIOT random support to cmake and relic_conf.h
  2 files changed, 3 insertions(+)
 
 diff --git a/cmake/rand.cmake b/cmake/rand.cmake
-index ed90c769..9f79fd6d 100644
+index ed90c76..9f79fd6 100644
 --- a/cmake/rand.cmake
 +++ b/cmake/rand.cmake
 @@ -12,6 +12,7 @@ message("   SEED=LIBC      Use rand()/random() functions. (insecure!)")
@@ -21,10 +21,10 @@ index ed90c769..9f79fd6d 100644
  # Choose the pseudo-random number generator.
  set(RAND "HASHD" CACHE STRING "Pseudo-random number generator")
 diff --git a/include/relic_conf.h.in b/include/relic_conf.h.in
-index 1245edc0..4e807621 100644
+index f9bb79a..33db9d7 100644
 --- a/include/relic_conf.h.in
 +++ b/include/relic_conf.h.in
-@@ -656,6 +656,8 @@
+@@ -669,6 +669,8 @@
  #define UDEV     3
  /** Use Windows' CryptGenRandom. */
  #define WCGR     4
@@ -34,5 +34,5 @@ index 1245edc0..4e807621 100644
  #cmakedefine SEED     @SEED@
  
 -- 
-2.33.1
+2.39.5
 
