@@ -4,11 +4,15 @@
 EXAMPLES_DIR="$(dirname "$0")/../../../examples"
 
 # Get a list of all directories in the examples directory
-directories=$(find "$EXAMPLES_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
+directories=$(find "$EXAMPLES_DIR" -maxdepth 2 -mindepth 1 -type d -exec basename {} \;)
 
 # Check each directory
 missing_entries=()
 for dir in $directories; do
+    if [ ! -f "$EXAMPLES_DIR/$dir/main.c" ]; then
+        continue
+    fi
+
     if [ ! -f "$EXAMPLES_DIR/$dir/README.md" ]; then
         missing_entries+=("$dir")
     fi

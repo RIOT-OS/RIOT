@@ -1,1 +1,0 @@
-../gcoap/gcoap_example.h
