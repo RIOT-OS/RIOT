@@ -86,7 +86,7 @@ static const uint8_t minus_sign = 0b01000000;
 /**
  * @brief Delays the transmission to the display
  */
-static void delay(void)
+inline static void delay(void)
 {
     ztimer_sleep(ZTIMER_MSEC, BIT_TIME_MS);
 }
@@ -123,8 +123,8 @@ static void stop(const tm1637_t *dev)
 /**
  * @brief Transmits a single byte to the display
  *
- * @param[in] dev device descriptor of the display
- * @param[in] byte byte to transmit
+ * @param[in] dev   device descriptor of the display
+ * @param[in] byte  byte to transmit
  */
 static void transmit_byte(const tm1637_t *dev, uint8_t byte)
 {
@@ -151,8 +151,8 @@ static void transmit_byte(const tm1637_t *dev, uint8_t byte)
 /**
  * @brief Transmits the segments array of length 4 to the display
  *
- * @param[in] dev device descriptor of the display
- * @param[in] segments array of length 4 encoding the display's segments
+ * @param[in] dev       device descriptor of the display
+ * @param[in] segments  array of length 4 encoding the display's segments
  */
 static void transmit_segments(const tm1637_t *dev,
                               const uint8_t *segments,
@@ -189,7 +189,7 @@ static void transmit_segments(const tm1637_t *dev,
  *
  * @param[in,out] segments  segments to enable the colon on
  */
-static void enable_colon(uint8_t *segments)
+inline static void enable_colon(uint8_t *segments)
 {
     /* the second digit uses the colon */
     segments[1] |= DOT_BIT_MASK;
@@ -231,7 +231,7 @@ void tm1637_write_number(const tm1637_t *dev, int16_t number,
     assert(number <= 9999);
     assert(number >= -999);
 
-    uint8_t segments[DIGIT_COUNT] = { 0, 0, 0, 0 };
+    uint8_t segments[DIGIT_COUNT] = { 0 };
 
     if (number == 0) {
         segments[DIGIT_COUNT - 1] = segments_array[0];
