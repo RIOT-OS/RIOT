@@ -7,7 +7,7 @@ EXAMPLES_DIR="$(dirname "$0")/../../../examples"
 README_FILE="$EXAMPLES_DIR/README.md"
 
 # Get a list of all directories in the examples directory
-directories=$(find "$EXAMPLES_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
+directories=$(find "$EXAMPLES_DIR" -maxdepth 2 -mindepth 1 -type d -exec basename {} \;)
 
 # Check each directory
 missing_entries=()
