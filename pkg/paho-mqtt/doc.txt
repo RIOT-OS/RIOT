@@ -1,9 +1,23 @@
 /**
- * @defgroup pkg_paho_mqtt   PAHO MQTT framework
- * @ingroup  pkg
- * @brief    The Eclipse Paho project provides open-source client implementations of MQTT for embedded systems
- * @see      https://github.com/eclipse/paho.mqtt.embedded-c
- *
- * The Eclipse Paho project provides open-source client
- * implementations of MQTT.
+ @defgroup pkg_paho_mqtt   PAHO MQTT framework
+ @ingroup  pkg
+ @brief    The Eclipse Paho project provides open-source client implementations of MQTT for embedded systems
+ @see      https://github.com/eclipse/paho.mqtt.embedded-c
+ 
+ The Eclipse Paho project provides open-source client
+ implementations of MQTT.
+
+  # Supported MQTT Protocol Version
+
+  The supported protocol version of the used paho.mqtt.embedded-c stack is
+    - MQTT-Version = 3.1 (MQTTVersion struct member of MQTTPacket_connectData = 3)
+	  - MQTT-Version = 3.1.1 (MQTTVersion struct member of MQTTPacket_connectData = 4)
+	
+  # Implementation specific information
+
+  - The Main-Loop is running in the Task mqtt_riot_run() with a default-cyclus of 30ms (MQTT_YIELD_POLLING_MS) 
+    and an default duration of 10ms (PAHO_MQTT_YIELD_MS)
+  - During publish a topic with MQTTPublish() and QoS>0, the functions blocks until 
+    it receive des One Acknowledge (QoS=1) or two Acknowledges (Qos=2).
+
  */
