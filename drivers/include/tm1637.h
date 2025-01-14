@@ -59,8 +59,7 @@ typedef struct {
 /**
  * @brief Brightness level enum for the display
  *
- * @note The brightness is defined as a fraction of
- * the pulse width and must be on of the given values.
+ * @note The brightness must be one of the given values.
  */
 typedef enum {
     TM1637_PW_1_16 = 0x00,
@@ -76,8 +75,8 @@ typedef enum {
 /**
  * @brief Initializes the tm1637 device
  *
- * @param[out] dev device descriptor of the display
- * @param[in] params configuration parameters
+ * @param[out]  dev     device descriptor of the display
+ * @param[in]   params  configuration parameters
  * @return 0 on success, error otherwise
  */
 int tm1637_init(tm1637_t *dev, const tm1637_params_t *params);
@@ -87,17 +86,18 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params);
  *
  * @note The integer can't be bigger than 9999 or smaller than
  * -999 as only 4 digits can be displayed at a time.
- * With the leading zeros enabled, the display is padded with zeros.
+ * When leading zeros are enabled, the display is padded with zeros.
  * For negative integers the leading zeros are added between the minus sign
  * and the number.
  *
- * @param[in] dev device descriptor of the display
- * @param[in] number number to write, in the range of 9999 to -999
- * @param[in] brightness brightness of the display according to @ref tm1637_brightness_t
- * @param[in] colon If enabled, displays a colon in the middle
+ * @param[in] dev           device descriptor of the display
+ * @param[in] number        number to write, in the range of -999 to 9999
+ * @param[in] brightness    brightness of the display according to @ref tm1637_brightness_t
+ * @param[in] colon         If enabled, displays a colon in the middle
  * @param[in] leading_zeros If enabled, displays leading zeros
  */
-void tm1637_write_number(const tm1637_t *dev, int16_t number, tm1637_brightness_t brightness, bool colon, bool leading_zeros);
+void tm1637_write_number(const tm1637_t *dev, int16_t number, tm1637_brightness_t brightness,
+                         bool colon, bool leading_zeros);
 
 /**
  * @brief Clear the display
