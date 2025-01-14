@@ -5,6 +5,8 @@ ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
 ESP32_OPENOCD_VERSION="v0.12.0-esp32-20241016"
 
+ESP32_QEMU_VERSION="esp-develop-9.0.0-20240606"
+
 GDB_VERSION="14.2_20240403"
 
 if [ -z "${IDF_TOOLS_PATH}" ]; then
@@ -87,10 +89,17 @@ export_qemu()
             ;;
     esac
 
+    case $1 in
+        riscv)
+            QEMU_ARCH="qemu-riscv32-softmmu"
+            ;;
+        *)
+            QEMU_ARCH="qemu-xtensa-softmmu"
+            ;;
+    esac
+
     # qemu version depends on the version of ncurses lib
-    if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
-        ESP32_QEMU_VERSION="esp-develop-20220203"
-    else
+    if [ "$(ldconfig -p | grep -c libncursesw.so.6)" == "0" ]; then
         ESP32_QEMU_VERSION="esp-develop-20210220"
     fi
 
@@ -98,7 +107,7 @@ export_qemu()
         IDF_TOOLS_PATH="${HOME}/.espressif"
     fi
 
-    TOOLS_DIR="${TOOLS_PATH}/qemu-esp32/${ESP32_QEMU_VERSION}/qemu"
+    TOOLS_DIR="${TOOLS_PATH}/${QEMU_ARCH}/${ESP32_QEMU_VERSION}/qemu"
     TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
 
     if [ -e "${TOOLS_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
@@ -137,7 +146,8 @@ export_gdb()
 if [ -z "$1" ]; then
     echo "Usage: export.sh <tool>"
     echo "       export.sh gdb <platform>"
-    echo "<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
+    echo "       export.sh qemu <platform>"
+    echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
     ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
@@ -147,7 +157,8 @@ elif [ "$1" = "all" ]; then
     export_gdb xtensa
     export_gdb riscv
     export_openocd
-    export_qemu
+    export_qemu xtensa
+    export_qemu riscv
     export_gdb xtensa
     export_gdb riscv
 elif [ "$1" = "gdb" ]; then
@@ -159,7 +170,7 @@ elif [ "$1" = "gdb" ]; then
 elif [ "$1" = "openocd" ]; then
     export_openocd
 elif [ "$1" = "qemu" ]; then
-    export_qemu
+    export_qemu $2
 else
     export_arch $1
 fi

@@ -489,7 +489,7 @@ install Espressif's precompiled versions of the following tools:
 - ESP32 vendor toolchain (for ESP8266, ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
 - GDB for ESP32x SoCs based on Xtensa or RISC-V
 - OpenOCD for ESP32 (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
-- QEMU for ESP32 (only for ESP32)
+- QEMU for ESP32x SoCs (for ESP32, ESP32-S3 and ESP32-C3)
 
 `$RIOTBASE` defines the root directory of the RIOT repository. The shell
 script takes an argument that specifies which tools to download and install:
@@ -499,6 +499,7 @@ $ dist/tools/esptools/install.sh
 
 Usage: install.sh <tool>
        install.sh gdb <platform>
+       install.sh qemu <platform>
 <tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -528,7 +529,8 @@ $ . dist/tools/esptools/export.sh
 
 Usage: export.sh <tool>
        export.sh gdb <platform>
-<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
+       export.sh qemu <platform>
+<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2106,18 +2108,18 @@ ESP32x SoC variant (family) can be found in ESP-IDF Programming Guide:
 
 RIOT applications that do not require interaction with real hardware such as
 GPIOs, I2C or SPI devices, WiFi interface, etc. can also be debugged using
-QEMU for ESP32. For this purpose, either QEMU for ESP32 must be installed,
+QEMU. For this purpose, either QEMU for ESP32x SoCs must be installed,
 see section [Local Toolchain Installation](#esp32_local_toolchain_installation)
-or the RIOT Docker build image has to be used in which QEMU for ESP32 is already
+or the RIOT Docker build image has to be used in which QEMU for ESP32x SoCs is already
 installed.
 
-To use QEMU for ESP32, an application has to be built with `esp_qemu` module
+To use QEMU for ESP32x SoCs, an application has to be built with `esp_qemu` module
 enabled, for example with local toolchain installation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 or with RIOT Docker build image
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
   USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2125,23 +2127,37 @@ $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
 Instead of flashing the image to the target hardware, a binary image named
 `qemu_flash_image.bin` is created in the target directory. In addition, two ROM
 files `rom.bin` and `rom1.bin` are copied to the target directory. These
-files can then be used with QEMU for ESP32 to debug the application in GDB
+files can then be used with QEMU for ESP32x SoCs to debug the application in GDB
 without having the hardware. The binary image `qemu_flash_image.bin`
 represents a 4 MByte Flash image.
 
-QEMU for ESP32 can then be started with command:
+To start QEMU for ESP32x SoCs, the following command has to be used.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
+$ qemu-system-<arch> \
+    -s -machine <esp32x_variant> \
+    -display none \
+    -drive file=<path_to_image>/qemu_flash_image.bin,if=mtd,format=raw \
+    -serial tcp::5555,server,nowait
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+with
+
+- `arch` = `xtensa` | `riscv32` and
+- `esp32x_variant` = `esp32` | `esp32s3` | `esp32c3`.
+
+For example, for an ESP32, QEMU can be started with command:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ qemu-system-xtensa \
     -s -machine esp32 \
-    -drive file=tests/sys/shell//bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
+    -display none \
+    -drive file=tests/sys/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To interact with the application on the emulated ESP32 in QEMU, a second
+To interact with the application on the emulated ESP32x SoC in QEMU, a second
 terminal is required in which the `telnet` command is used to communicate
 with the application on `localhost` using TCP port 5555:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ telnet localhost 5555
 
 Trying 127.0.0.1...
@@ -2160,8 +2176,9 @@ start_test           starts a test
 ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To debug the application in QEMU for ESP32, another terminal is required:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To debug the application in QEMU for a ESP32x SoC, another terminal is required
+in which the corresponding GDB hast to be started:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
 
 GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
@@ -2176,23 +2193,24 @@ pm_set (mode=2) at cpu/esp32/periph/pm.c:117
 (gdb)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-QEMU for ESP32 can also be used in RIOT Docker build image. For that purpose
-QEMU has to be started in the Docker container.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QEMU for ESP32x SoCs can also be used in RIOT Docker build image. For that purpose
+QEMU has to be started in the Docker container, for example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
 riotbuild@container-id:~$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 riotbuild@container-id:~$ qemu-system-xtensa \
     -s -machine esp32 \
-    -drive file=tests/sys/shell//bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
+    -display none \
+    -drive file=tests/sys/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In a second and a third terminal, you need to execute a shell in the same RIOT
-Docker container where QEMU for ESP32 was started. The required container ID
-`<container-id>` is shown in the prompt of the terminal in which QEMU for ESP32
+Docker container where QEMU was started. The required container ID
+`<container-id>` is shown in the prompt of the terminal in which QEMU
 was started.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ sudo docker docker exec -it <container-id> bash
 riotbuild@container-id:~$telnet localhost 5555
 
@@ -2205,7 +2223,7 @@ test_shell.
 >
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
 $ sudo docker docker exec -it <container-id> bash
 riotbuild@container-id:~$ xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
 
