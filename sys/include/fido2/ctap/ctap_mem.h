@@ -22,10 +22,11 @@
 #ifndef FIDO2_CTAP_CTAP_MEM_H
 #define FIDO2_CTAP_CTAP_MEM_H
 
+#include "assert.h"
 #include <stdint.h>
+#include <stddef.h>
 
 #include "fido2/ctap/ctap.h"
-#include "periph/flashpage.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,23 +42,20 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Default amount of flashpages to use
+ * @brief Ensure CONFIG_SLOT_AUX_LEN is defined
  */
-#ifndef CONFIG_FIDO2_CTAP_NUM_FLASHPAGES
-#define CONFIG_FIDO2_CTAP_NUM_FLASHPAGES 4
-#endif
-
-#if CONFIG_FIDO2_CTAP_NUM_FLASHPAGES < 2
-#error "ctap_mem.h: Configured number of flashpages is invalid"
+#ifndef CONFIG_SLOT_AUX_LEN
+    #define CONFIG_SLOT_AUX_LEN 0
 #endif
 
 /**
  * @brief Calculate padding needed to align struct size for saving to flash
  */
-#define CTAP_FLASH_ALIGN_PAD(x) (sizeof(x) % FLASHPAGE_WRITE_BLOCK_SIZE == \
-                                 0 ? \
-                                 0 : FLASHPAGE_WRITE_BLOCK_SIZE - \
-                                 sizeof(x) % FLASHPAGE_WRITE_BLOCK_SIZE)
+#define CTAP_FLASH_ALIGN_PAD(x) (sizeof(x) % FLASHPAGE_WRITE_BLOCK_ALIGNMENT == \
+                                 0 ?                               \
+                                 0 :                                   \
+                                 FLASHPAGE_WRITE_BLOCK_ALIGNMENT -          \
+                                 sizeof(x) % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)
 
 /**
  * @brief Resident key size with alignment padding
@@ -70,32 +68,15 @@ extern "C" {
  */
 #define CTAP_FLASH_STATE_SZ (sizeof(ctap_state_t) + \
                              CTAP_FLASH_ALIGN_PAD(ctap_state_t))
-
 /**
  * @brief Max amount of resident keys that can be stored on device
  */
-#define CTAP_FLASH_MAX_NUM_RKS ((CONFIG_FIDO2_CTAP_NUM_FLASHPAGES - 1) * \
-                                FLASHPAGE_SIZE / CTAP_FLASH_RK_SZ)
+#define CTAP_FLASH_MAX_NUM_RKS ((CONFIG_SLOT_AUX_LEN - CTAP_FLASH_STATE_SZ) / \
+                                CTAP_FLASH_RK_SZ)
 
-/**
- * @brief Minimum flash sector size needed to hold CTAP related data
- *
- * This is needed to ensure that the MTD work_area buffer is big enough
- */
-#define CTAP_FLASH_MIN_SECTOR_SZ _MAX(CTAP_FLASH_STATE_SZ, CTAP_FLASH_RK_SZ)
-
-/**
- * @brief Pages per sector needed
- */
-#define CTAP_FLASH_PAGES_PER_SECTOR ((CTAP_FLASH_MIN_SECTOR_SZ / FLASHPAGE_SIZE) + 1)
-
-/**
- * Offset of flashpage for storing resident keys
- *
- * The offset is in units of flashpages from the beginning of the flash memory
- * area dedicated for storing CTAP data.
- */
-#define CTAP_FLASH_RK_OFF 0x1
+/* SLOT_AUX_LEN must be large enough to store at least one resident key and the CTAP state */
+static_assert(CONFIG_SLOT_AUX_LEN >= (CTAP_FLASH_RK_SZ + CTAP_FLASH_STATE_SZ),
+              "SLOT_AUX_LEN is too small or not configured");
 
 /**
  * @brief Initialize memory helper
@@ -119,9 +100,11 @@ ctap_status_code_t fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset
 /**
  * @brief Erase all flashpages containing CTAP data
  *
+ * @param[in]  state       pointer to authenticator state
+ *
  * @return @ref ctap_status_code_t
  */
-ctap_status_code_t fido2_ctap_mem_erase_flash(void);
+ctap_status_code_t fido2_ctap_mem_erase_flash(ctap_state_t *state);
 
 /**
  * @brief Read authenticator state from flash
@@ -142,21 +125,28 @@ ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state);
 ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
 
 /**
- * @brief Find resident credential for @p rp_id_hash in flash
+ * @brief Find resident credential for @p rp_id_hash in flash memory
  *
- * The function stores the flash address of the next credential in @p addr.
- * This allows for consecutive calls of the function in order to find all
- * stored credentials stored for the relying party identified by
- * @p rp_id_hash.
+ * This function searches for a resident credential associated with the
+ * relying party identifier hash ( @p rip_id_hash ) in the flash memory region
+ * used by the FIDO2 implementation. The function updates the @p absolute_offset
+ * parameter to indicate the total offset from the beginning of the flash
+ * memory region where the next credential is stored. This allows for consecutive
+ * calls of the function in order to find all credentials stored for the
+ * relying party.
  *
  * @param[in]  key       pointer to authenticator state
  * @param[in]   rp_id_hash pointer to hash of rp domain string
- * @param[in] addr pointer to address where to read from
+ * @param[in] absolute_offset pointer to a variable holding the total offset from the
+ *                            start of the flash memory region used by the FIDO2
+ *                            implementation. Updated by the function to indicate
+ *                            the location of the next credential.
  *
  * @return @ref ctap_status_code_t
  */
-ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash,
-                                                     uint32_t *addr);
+ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key,
+                                                     const uint8_t *rp_id_hash,
+                                                     uint32_t *absolute_offset);
 
 /**
  * @brief Write resident credential to flash
