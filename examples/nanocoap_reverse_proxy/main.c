@@ -20,7 +20,8 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
-#include "xtimer.h"
+#include "time_units.h"
+#include "ztimer.h"
 
 #if MODULE_NANOCOAP_SERVER_TCP
 #  include "event/thread.h"
@@ -47,7 +48,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_USEC, 3 * US_PER_SEC);
 
     /* print network addresses */
     printf("{\"IPv6 addresses\": [\"");
