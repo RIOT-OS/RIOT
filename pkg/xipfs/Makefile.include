@@ -3,6 +3,7 @@ INCLUDES += -I$(PKGDIRBASE)/xipfs/boards/$(BOARD)
 
 ifneq (,$(filter xipfs_fs,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/xipfs/fs
+  USEMODULE += shell_cmd_xipfs
 endif
 
 # include archive

@@ -288,6 +288,10 @@ ifneq (,$(filter shell_cmd_vfs,$(USEMODULE)))
   USEMODULE += tiny_strerror
 endif
 
+ifneq (,$(filter shell_cmd_xipfs,$(USEMODULE)))
+  USEMODULE += xipfs
+endif
+
 ifneq (,$(filter shell_democommands,$(USEMODULE)))
   USEMODULE += rust_riotmodules
   USEMODULE += shell

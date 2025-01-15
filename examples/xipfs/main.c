@@ -58,7 +58,17 @@ XIPFS_NEW_PARTITION(nvme0p0, "/dev/nvme0p0", NVME0P0_PAGE_NUM);
  */
 XIPFS_NEW_PARTITION(nvme0p1, "/dev/nvme0p1", NVME0P1_PAGE_NUM);
 
-
+/**
+ * @brief hello-world.bin data blob.
+ *
+ * This is the byte version of hello-world.bin.
+ *
+ * To create a *.bin file, you will need to clone the master branch of
+ * xipfs_format, that can be found at https://github.com/2xs/XiPFS_Format .
+ *
+ * Then modify the Makefile to suit your needs/sources and call make.
+ * You should end up with a *.bin file ready to be uploaded.
+ */
 const unsigned char hello_world_bin[896] = {
     0x2d,0xe9,0x80,0x48,0x1,0x68,0x75,0x4a,0x43,0x68,0x8d,0xb0,0x0,0x93,0x5,0x90,
     0x83,0x68,0x88,0x18,0x1,0x90,0x40,0x68,0x4,0x90,0x1,0x98,0x8a,0x58,0x0,0x69,
@@ -121,12 +131,59 @@ const unsigned char hello_world_bin[896] = {
 #define FILENAME_OF_HELLO_WORLD_BIN  "/dev/nvme0p0/hello-world.bin"
 #define SIZEOF_HELLO_WORLD_BIN       (sizeof(hello_world_bin) / sizeof(hello_world_bin[0]))
 
+/**
+ * @brief Execution in-place demonstrator.
+ *
+ * This shell command handler will create a file hello-world.bin on /dev/nvme0p0,
+ * if none exists yet from the data blob above.
+ * Then, it will execute this file.
+ *
+ * Once the file has been created, execute command can be used to rerun
+ * the executable file as many times as wanted.
+ *
+ * ```bash
+ * 2025-01-14 09:48:36,303 # main(): This is RIOT! (Version: 2024.10)
+ * 2025-01-14 09:48:36,307 # vfs_mount: "/dev/nvme0p0": OK
+ * 2025-01-14 09:48:36,313 # vfs_mount: "/dev/nvme0p1": OK
+ * > help
+ * 2025-01-14 09:48:42,300 # help
+ * 2025-01-14 09:48:42,302 # Command              Description
+ * 2025-01-14 09:48:42,305 # ---------------------------------------
+ * 2025-01-14 09:48:42,309 # exec                 Execute Hello World
+ * 2025-01-14 09:48:42,314 # create_executable    Create an XIPFS executable file
+ * 2025-01-14 09:48:42,317 # execute              Execute an XIPFS file
+ * 2025-01-14 09:48:42,320 # ls                   list files
+ * 2025-01-14 09:48:42,325 # pm                   interact with layered PM subsystem
+ * 2025-01-14 09:48:42,331 # ps                   Prints information about running threads.
+ * 2025-01-14 09:48:42,334 # reboot               Reboot the node
+ * 2025-01-14 09:48:42,338 # version              Prints current RIOT_VERSION
+ * 2025-01-14 09:48:42,343 # vfs                  virtual file system operations
+ * > exec
+ * 2025-01-14 09:48:49,572 # exec
+ * 2025-01-14 09:48:49,573 # Hello World!
+ * > ls /dev/nvme0p0
+ * 2025-01-14 09:48:59,997 # ls /dev/nvme0p0
+ * 2025-01-14 09:48:59,999 # hello-world.bin       896 B
+ * 2025-01-14 09:49:00,000 # total 1 files
+ * > vfs df
+ * 2025-01-14 09:49:04,957 # vfs df
+ * 2025-01-14 09:49:04,962 # Mountpoint              Total         Used    Available     Use%
+ * 2025-01-14 09:49:04,968 # /dev/nvme0p0           40 KiB        4 KiB       36 KiB      10%
+ * 2025-01-14 09:49:04,974 # /dev/nvme0p1           60 KiB          0 B       60 KiB       0%
+ * execute /dev/nvme0p0/hello-world.bin ipsum dolores it
+ * 2025-01-14 09:49:14,223 # execute /dev/nvme0p0/hello-world.bin Lorem ipsum dolor sit amet
+ * 2025-01-14 09:49:14,225 # Hello World!
+ * 2025-01-14 09:49:14,225 # Lorem
+ * 2025-01-14 09:49:14,226 # ipsum
+ * 2025-01-14 09:49:14,226 # dolor
+ * 2025-01-14 09:49:14,227 # sit
+ * 2025-01-14 09:49:14,227 # amet
+ * ```
+ */
 int execution_handler(int argc, char **argv) {
 
     (void)argc;
     (void)argv;
-
-
 
     int file_handle = vfs_open(FILENAME_OF_HELLO_WORLD_BIN, O_RDONLY, 0);
     if (file_handle < 0) {
@@ -141,7 +198,8 @@ int execution_handler(int argc, char **argv) {
             return EXIT_FAILURE;
         }
 
-        /** Fill it with blob data
+        /**
+         * Fill it with blob data
          * Take care : vfs does not support O_APPEND with vfs_write, only O_WRONLY or O_RDWR
          */
         file_handle = vfs_open(FILENAME_OF_HELLO_WORLD_BIN, O_WRONLY, 0);
