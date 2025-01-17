@@ -21,6 +21,7 @@
 #include "psa/crypto.h"
 #include "psa_error.h"
 
+#include "cryptocell_310_util.h"
 #include "crys_hmac.h"
 #include "crys_hmac_error.h"
 
@@ -39,6 +40,12 @@ psa_status_t psa_mac_compute_hmac_sha256(const psa_key_attributes_t *attributes,
     CRYSError_t ret;
     size_t required_mac_length =
         PSA_MAC_LENGTH(attributes->type, attributes->bits, PSA_ALG_SHA_256);
+
+    if (!cryptocell_310_data_within_ram(key_buffer) ||
+        !cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
 
     if (mac_size < required_mac_length) {
         return PSA_ERROR_BUFFER_TOO_SMALL;

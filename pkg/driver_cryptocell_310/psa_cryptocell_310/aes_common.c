@@ -40,6 +40,12 @@ psa_status_t cryptocell_310_common_aes_setup(SaSiAesUserContext_t *ctx,
 {
     SaSiAesUserKeyData_t key;
 
+    if (!cryptocell_310_data_within_ram(iv) ||
+        !cryptocell_310_data_within_ram(key_buffer)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     SaSiStatus ret = SaSi_AesInit(ctx, direction, mode, padding);
     if (ret != SASI_OK) {
         DEBUG("SaSi_AesInit failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
@@ -76,6 +82,11 @@ psa_status_t cryptocell_310_common_aes_encrypt_decrypt(SaSiAesUserContext_t *ctx
     size_t size;
     size_t length = input_length;
     *output_length = output_size;
+
+    if (!cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
 
     do {
         if (length > CC310_MAX_AES_INPUT_BLOCK) {
