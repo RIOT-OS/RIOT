@@ -1,9 +1,7 @@
 BOARD ?= nrf52840dk
-include ../Makefile.sys_common
+include ../Makefile.net_common
 
-# this needs to be outsourced to the respective makefiles
 USEMODULE += nfc_nfct
-USEMODULE += nfc_ndef
 USEMODULE += ztimer_sec
 USEMODULE += ztimer
 USEMODULE += event

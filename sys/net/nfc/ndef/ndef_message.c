@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
+#include <inttypes.h>
 
 
 #define SHORT_RECORD_PAYLOAD_LENGTH 255
@@ -75,7 +76,7 @@ size_t ndef_get_size(ndef_t const *ndef) {
 void ndef_pretty_print(ndef_t const *ndef) {
     printf("----------------\n");
     printf("NDEF Printing\n");
-    printf("NDEF message records: %lu\n", ndef->record_count);
+    printf("NDEF message records: %" PRIu32 "\n", ndef->record_count);
     printf("\n");
     for (size_t i = 0; i < (size_t) ndef->record_count; ++i) {
         ndef_record_desc_t const *record = &ndef->records[i];
@@ -103,7 +104,7 @@ void ndef_pretty_print(ndef_t const *ndef) {
             payload_length = record->payload_length[0] << 24 | record->payload_length[1] << 16 | record->payload_length[2] << 8 | record->payload_length[3]; 
         }
         
-        printf("Payload length: %lu\n", payload_length);
+        printf("Payload length: %" PRIu32 "\n", payload_length);
         printf("Payload: ");
         for (size_t j = 0; j < (size_t) payload_length; ++j) {
             printf("0x%02x ", record->payload[j]);

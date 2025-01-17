@@ -16,7 +16,7 @@ int ndef_add_uri_record(ndef_t *message, ndef_uri_identifier_code_t identifier_c
     /* the payload will be written later */
     ndef_add_record(message, ndef_uri_record_type, sizeof(ndef_uri_record_type), NULL, 0, NULL, payload_length, TNF_WELL_KNOWN);
 
-    ndef_write_to_buffer(message, &identifier_code, IDENTIFIER_CODE_LENGTH);
+    ndef_write_to_buffer(message, (uint8_t*) &identifier_code, IDENTIFIER_CODE_LENGTH);
     ndef_write_to_buffer(message, (uint8_t*) uri, uri_length);
 
     return 0;
