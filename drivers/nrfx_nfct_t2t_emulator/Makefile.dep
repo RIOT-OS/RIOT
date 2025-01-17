@@ -1,0 +1,3 @@
+USEPKG += nrfx
+USEMODULE += nrfx_nfct
+USEMODULE += nfc_t2t
