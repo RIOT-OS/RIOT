@@ -12,6 +12,28 @@ STM32F412ZG microcontroller with 256KiB of RAM and 1MiB of Flash.
 
 @image html pinouts/nucleo-f412zg-and-f413zh.svg "Pinout for the Nucleo-F412ZG (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 34)" width=50%
 
+### MCU
+
+| MCU          |     STM32F412ZG
+|:-------------|:--------------------|
+| Family       | ARM Cortex-M4       |
+| Vendor       | ST Microelectronics |
+| RAM          | 256KiB              |
+| Flash        | 1MiB                |
+| Frequency    | up to 100 MHz       |
+| FPU          | yes                 |
+| Timers       | 17 (2x watchdog, 1 SysTick, 2x 32-bit, 12x 16-bit) |
+| ADC          | 1x 12 bit (up to 16 channels) |
+| UARTs        | 4 (four USARTs)     |
+| I2Cs         | 4                   |
+| SPIs         | 5                   |
+| CAN          | 2                   |
+| RTC          | 1                   |
+| Datasheet    | [Datasheet](https://www.st.com/resource/en/datasheet/stm32f412zg.pdf)|
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0402-stm32f412-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)|
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0214-stm32-cortexm4-mcus-and-mpus-programming-manual-stmicroelectronics.pdf)|
+| Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/dm00244518-stm32-nucleo-144-boards-stmicroelectronics.pdf)|
+
 ## Flashing the Board Using ST-LINK Removable Media
 
 On-board ST-LINK programmer provides via composite USB device removable media.
