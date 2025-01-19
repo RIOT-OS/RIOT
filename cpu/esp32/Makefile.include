@@ -270,6 +270,7 @@ LINKFLAGS += -T$(BINDIR)/sections.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/ld/$(CPU_FAM).peripherals.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.api.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libgcc.ld
 
 ifneq (,$(filter esp32 esp32s2,$(CPU_FAM)))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-data.ld
