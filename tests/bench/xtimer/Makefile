@@ -68,7 +68,6 @@ LOW_MEMORY_BOARDS += \
   stm32f0discovery \
   stm32l0538-disco \
   telosb \
-  waspmote-pro \
   wemos-zero \
   yarm \
   yunjia-nrf51822 \

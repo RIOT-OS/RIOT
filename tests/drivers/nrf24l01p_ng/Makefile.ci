@@ -27,5 +27,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32l0538-disco \
     telosb \
-    waspmote-pro \
     #

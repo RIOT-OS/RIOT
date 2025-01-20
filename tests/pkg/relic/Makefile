@@ -26,7 +26,6 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     stm32f0discovery \
                     stm32f3discovery \
                     telosb \
-                    waspmote-pro \
                     z1 \
                     #
 
