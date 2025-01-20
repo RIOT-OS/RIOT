@@ -120,7 +120,6 @@ DEFAULT_BOARDS = [
     'slwstk6220a',
     'stm32f723e-disco',
     'stm32mp157c-dk2',
-    'waspmote-pro',
     'waveshare-nrf52840-eval-kit',
     'weact-f401ce',
     'z1'

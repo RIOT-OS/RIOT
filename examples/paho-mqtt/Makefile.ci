@@ -53,7 +53,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     stm32mp157c-dk2 \
     telosb \
-    waspmote-pro \
     weact-g030f6 \
     yunjia-nrf51822 \
     z1 \
