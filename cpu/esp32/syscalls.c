@@ -278,32 +278,6 @@ extern struct __lock __attribute__((alias("s_shared_mutex"))) __lock___arc4rando
 
 void IRAM syscalls_init_arch(void)
 {
-#if defined(_RETARGETABLE_LOCKING)
-    /* initialization of static locking variables in ROM, different ROM
-     * versions of newlib use different locking variables */
-#if defined(CPU_FAM_ESP32)
-    extern _lock_t __sfp_lock;
-    extern _lock_t __sinit_lock;
-    extern _lock_t __env_lock_object;
-    extern _lock_t __tz_lock_object;
-
-    __sfp_lock = (_lock_t)&s_shared_rmutex;
-    __sinit_lock = (_lock_t)&s_shared_rmutex;
-    __env_lock_object = (_lock_t)&s_shared_mutex;
-    __tz_lock_object = (_lock_t)&s_shared_rmutex;
-#elif defined(CPU_FAM_ESP32S2)
-    extern _lock_t __sinit_recursive_mutex;
-    extern _lock_t __sfp_recursive_mutex;
-
-    __sinit_recursive_mutex = (_lock_t)&s_shared_rmutex;
-    __sfp_recursive_mutex = (_lock_t)&s_shared_rmutex;
-#else
-    /* TODO: Other platforms don't provide access to these ROM variables.
-     * It could be necessary to call `esp_rom_newlib_init_common_mutexes`. For
-     * the moment it doesn't seems to be necessary to call this function. */
-#endif
-#endif /* _RETARGETABLE_LOCKING */
-
     /* initialize and enable the system timer in us (TMG0 is enabled by default) */
     timer_hal_init(&sys_timer, TIMER_SYSTEM_GROUP, TIMER_SYSTEM_INDEX);
     timer_hal_set_divider(&sys_timer, rtc_clk_apb_freq_get() / MHZ);
