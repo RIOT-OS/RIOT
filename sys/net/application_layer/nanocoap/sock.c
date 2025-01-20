@@ -25,16 +25,13 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "atomic_utils.h"
 #include "net/credman.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
-#include "net/sock/util.h"
 #include "net/sock/udp.h"
-#include "net/iana/portrange.h"
+#include "net/sock/util.h"
 #include "random.h"
-#include "sys/uio.h"
-#include "timex.h"
+#include "sys/uio.h" /* IWYU pragma: keep (exports struct iovec) */
 #include "ztimer.h"
 
 #define ENABLE_DEBUG 0
@@ -48,7 +45,7 @@
  * if mode or key-size change especially if certificates instead of PSK are used.
  */
 #ifndef CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE
-#define CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE (160)
+#  define CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE (160)
 #endif
 
 enum {
@@ -1111,13 +1108,22 @@ int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
     return 0;
 }
 
-int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
-                                unsigned code, unsigned type,
-                                const void *payload, size_t len)
+bool nanocoap_server_is_remote_in_response_ctx(const nanocoap_server_response_ctx_t *ctx,
+                                               const coap_request_ctx_t *req)
 {
-    uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+    return sock_udp_ep_equal(&ctx->remote, req->remote);
+}
+
+ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx,
+                                       void *buf, size_t buf_len,
+                                       unsigned code, unsigned type,
+                                       uint16_t msg_id)
+{
     assert(type != COAP_TYPE_ACK);
     assert(type != COAP_TYPE_CON); /* TODO: add support */
+    if ((sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1) > buf_len) {
+        return -EOVERFLOW;
+    }
 
     const uint8_t no_response_index = (code >> 5) - 1;
     /* If the handler code misbehaved here, we'd face UB otherwise */
@@ -1125,25 +1131,15 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
 
     const uint8_t mask = 1 << no_response_index;
     if (ctx->no_response & mask) {
-        return 0;
+        return -ECANCELED;
     }
 
-    iolist_t data = {
-        .iol_base = (void *)payload,
-        .iol_len  = len,
-    };
+    return coap_build_hdr(buf, type, ctx->token, ctx->tkl, code, msg_id);
+}
 
-    iolist_t head = {
-        .iol_next = &data,
-        .iol_base = rbuf,
-    };
-    head.iol_len = coap_build_hdr((coap_hdr_t *)rbuf, type,
-                                  ctx->token, ctx->tkl,
-                                  code, random_uint32());
-    if (len) {
-        rbuf[head.iol_len++] = 0xFF;
-    }
-
+int nanocoap_server_sendv_separate(const nanocoap_server_response_ctx_t *ctx,
+                                   const iolist_t *reply)
+{
     sock_udp_aux_tx_t *aux_out_ptr = NULL;
     /* make sure we reply with the same address that the request was
      * destined for -- except in the multicast case */
@@ -1154,6 +1150,37 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
     if (!sock_udp_ep_is_multicast(&ctx->local)) {
         aux_out_ptr = &aux_out;
     }
-    return sock_udp_sendv_aux(NULL, &head, &ctx->remote, aux_out_ptr);
+    return sock_udp_sendv_aux(NULL, reply, &ctx->remote, aux_out_ptr);
+}
+
+int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
+                                  unsigned code, unsigned type,
+                                  const void *payload, size_t len)
+{
+    uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+
+    ssize_t hdr_len = nanocoap_server_build_separate(ctx, rbuf, sizeof(rbuf),
+                                                     code, type, random_uint32());
+    if (hdr_len < 0) {
+        return hdr_len;
+    }
+
+    /* add payload marker if needed */
+    if (len) {
+        rbuf[hdr_len++] = 0xFF;
+    }
+
+    iolist_t data = {
+        .iol_base = (void *)payload,
+        .iol_len  = len,
+    };
+
+    iolist_t head = {
+        .iol_next = &data,
+        .iol_base = rbuf,
+        .iol_len = hdr_len,
+    };
+
+    return nanocoap_server_sendv_separate(ctx, &head);
 }
 #endif

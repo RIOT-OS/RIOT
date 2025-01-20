@@ -204,7 +204,12 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
     static event_timeout_t event_timeout;
     static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
 
-    if (event_timeout_is_pending(&event_timeout) && !sock_udp_ep_equal(context->remote, &_separate_ctx.remote)) {
+    if (event_timeout_is_pending(&event_timeout)) {
+        if (nanocoap_server_is_remote_in_response_ctx(&_separate_ctx, context)) {
+            /* duplicate of the request a separate response is already scheduled
+             * for --> resending the ACK */
+            return coap_build_empty_ack(pkt, (void *)buf);
+        }
         puts("_separate_handler(): response already scheduled");
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
     }
