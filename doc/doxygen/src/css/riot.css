@@ -519,3 +519,6 @@ dl.todo > dt {
 table.retval > tbody > tr > td.paramname {
   padding-right: 2em;
 }
+blockquote {
+  background-color: #eadde1;
+}
