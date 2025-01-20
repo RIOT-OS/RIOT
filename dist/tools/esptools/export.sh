@@ -30,10 +30,6 @@ export_arch()
             TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
-        esp32s3)
-            TARGET_ARCH="xtensa-esp32s3-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
         *)
             echo "Unknown architecture $1"
             return
