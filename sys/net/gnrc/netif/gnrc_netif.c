@@ -1381,6 +1381,14 @@ static void _netif_bus_msg_global(gnrc_netif_t *netif, msg_t* m, bool *has_globa
     }
 }
 
+static void _unset_arg(void *arg)
+{
+    ztimer_t *timer = arg;
+    if (timer) {
+        timer->arg = NULL;
+    }
+}
+
 bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
                                              uint32_t timeout_ms)
 {
@@ -1396,6 +1404,7 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 
     if (netif != NULL) {
         if (_has_global_addr(netif)) {
+            DEBUG("gnrc_netif: %u already has a global address\n", netif->pid);
             return true;
         }
 
@@ -1406,6 +1415,7 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
              (netif = gnrc_netif_iter(netif));
              count++) {
             if (_has_global_addr(netif)) {
+                DEBUG("gnrc_netif: %u already has a global address\n", netif->pid);
                 has_global = true;
             }
 
@@ -1415,15 +1425,22 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 
     /* wait for global address */
     msg_t m;
-    ztimer_now_t t_stop = ztimer_now(ZTIMER_MSEC) + timeout_ms;
+    ztimer_t _timeout = { .callback = _unset_arg, .arg = &_timeout };
+    if (timeout_ms != UINT32_MAX) {
+        ztimer_set(ZTIMER_MSEC, &_timeout, timeout_ms);
+    }
+
     while (!has_global) {
         /* stop if timeout reached */
-        if (ztimer_now(ZTIMER_MSEC) > t_stop) {
+        if (!_timeout.arg) {
             DEBUG_PUTS("gnrc_netif: timeout reached");
             break;
         }
+
         /* waiting for any message */
-        if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
+        if (timeout_ms == UINT32_MAX) {
+            msg_receive(&m);
+        } else if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
             DEBUG_PUTS("gnrc_netif: timeout waiting for prefix");
             break;
         }
@@ -1438,6 +1455,8 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
             }
         }
     }
+
+    ztimer_remove(ZTIMER_MSEC, &_timeout);
 
     /* called with a given interface */
     if (netif != NULL) {

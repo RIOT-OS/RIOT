@@ -762,6 +762,7 @@ static inline msg_bus_t* gnrc_netif_get_bus(gnrc_netif_t *netif,
  *                      May be NULL, then this checks for a global address
  *                      on *any* interface.
  * @param timeout_ms    Time to wait for an address to become available, in ms.
+ *                      Use `UINT32_MAX` to wait indefinitely.
  *
  * @return              true if a global address is configured
  */
