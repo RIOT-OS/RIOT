@@ -239,16 +239,6 @@ static bool _accept_remote(const sock_udp_t *sock, const udp_hdr_t *hdr,
     return true;
 }
 
-static uint32_t _now_us(void)
-{
-#ifdef MODULE_ZTIMER_USEC
-    return ztimer_now(ZTIMER_USEC);
-#endif
-#ifdef MODULE_ZTIMER_MSEC
-    return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
-#endif
-}
-
 ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
                               uint32_t timeout, sock_udp_ep_t *remote,
                               sock_udp_aux_rx_t *aux)
@@ -286,26 +276,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         _aux.rssi = &aux->rssi;
     }
 #endif
-    unsigned now = _now_us();
-    while (1) {
-        res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
-
-        if (res != -ETIMEDOUT) {
-            break;
-        }
-
-        /* HACK: gnrc_sock_recv() sometimes returns -ETIMEDOUT too early */
-        uint32_t time_elapsed = _now_us() - now;
-        if (time_elapsed < (timeout - timeout/10))  {
-            DEBUG("gnrc_sock_udp: timeout happened  %"PRIu32" µs early\n",
-                  timeout - time_elapsed);
-            timeout -= time_elapsed;
-            now = _now_us();
-            continue;
-        }
-        break;
-    }
-
+    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
     if (res < 0) {
         return res;
     }
