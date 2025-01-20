@@ -184,5 +184,5 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: Test Reports
+        name: Test-Reports-${{ matrix.pytest_mark }}
         path: test-reports/*
