@@ -20,7 +20,7 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += nanocoap_sock
 USEMODULE += nanocoap_resources
 
-USEMODULE += xtimer
+USEMODULE += ztimer_msec
 
 # include this for nicely formatting the returned internal value
 USEMODULE += fmt
@@ -48,10 +48,12 @@ HIGH_MEMORY_BOARDS := native native64 same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   # enable separate response
-  USEMODULE += nanocoap_server_separate
   USEMODULE += event_callback
+  USEMODULE += event_periodic
   USEMODULE += event_thread
   USEMODULE += event_timeout_ztimer
+  USEMODULE += nanocoap_server_observe
+  USEMODULE += nanocoap_server_separate
 
   # enable fileserver
   USEMODULE += nanocoap_fileserver

@@ -20,12 +20,14 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define COAP_INBUF_SIZE (256U)
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
+extern void setup_observe_event(void);
 
 int main(void)
 {
@@ -35,7 +37,11 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_MSEC, 3 * MS_PER_SEC);
+
+    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE)) {
+        setup_observe_event();
+    }
 
     /* print network addresses */
     printf("{\"IPv6 addresses\": [\"");

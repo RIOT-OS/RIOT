@@ -1791,6 +1791,22 @@ static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum
 }
 
 /**
+ * @brief   Insert an CoAP Observe Option into the buffer
+ *
+ * @param[out]  buf         Buffer to write to
+ * @param[in]   lastonum    last option number (must be < 6)
+ * @param[in]   obs         observe number to write
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_observe(uint8_t *buf, uint16_t lastonum,
+                                          uint32_t obs)
+{
+    obs &= COAP_OBS_MAX_VALUE_MASK; /* trim obs down to 24 bit */
+    return coap_opt_put_uint(buf, lastonum, COAP_OPT_OBSERVE, obs);
+}
+
+/**
  * @brief   Encode the given string as multi-part option into buffer
  *
  * @param[out]  buf         buffer to write to

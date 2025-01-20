@@ -28,6 +28,7 @@
 
 #include "bitarithm.h"
 #include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -493,6 +494,11 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
                         coap_request_ctx_t *ctx)
 {
     assert(ctx);
+
+    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE) && (coap_get_type(pkt) == COAP_TYPE_RST)) {
+        nanocoap_unregister_observer_due_to_reset(coap_request_ctx_get_remote_udp(ctx),
+                                                  coap_get_id(pkt));
+    }
 
     if (coap_get_code_class(pkt) != COAP_REQ) {
         DEBUG("coap_handle_req(): not a request.\n");
