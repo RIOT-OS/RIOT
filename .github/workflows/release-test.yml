@@ -73,13 +73,13 @@ jobs:
         ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
     - name: Fetch host keys from IoT-LAB sites
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      # lille is not being used in the most recent release specs but kept in for
+      # lille and saclay are not being used in the most recent release specs but kept in for
       # backwords compatibility
       run: |
         IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        for site in saclay lille strasbourg; do
+        for site in grenoble saclay lille strasbourg; do
           ssh -oStrictHostKeyChecking=accept-new \
-            "${IOTLAB_USER}@${site}.iot-lab.info exit"
+            "${IOTLAB_USER}@${site}.iot-lab.info" exit
         done
     - name: Checkout Release-Specs
       uses: actions/checkout@main
