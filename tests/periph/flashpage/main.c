@@ -18,12 +18,12 @@
  * @}
  */
 
-#include <assert.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
+#include <inttypes.h>
+#include <stdalign.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "architecture.h"
 #include "od.h"
@@ -43,7 +43,7 @@
 #endif
 
 /* When writing raw bytes on flash, data must be correctly aligned. */
-#define ALIGNMENT_ATTR __attribute__((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+#define ALIGNMENT_ATTR alignas(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)
 
 /* We must not write chunks smaller than FLASHPAGE_WRITE_BLOCK_SIZE */
 #if FLASHPAGE_WRITE_BLOCK_SIZE > 64
@@ -55,7 +55,7 @@
 /*
  * @brief   Allocate an aligned buffer for raw writings
  */
-static uint8_t raw_buf[RAW_BUF_SIZE] ALIGNMENT_ATTR;
+static ALIGNMENT_ATTR uint8_t raw_buf[RAW_BUF_SIZE];
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 /**
@@ -66,7 +66,7 @@ static uint8_t raw_buf[RAW_BUF_SIZE] ALIGNMENT_ATTR;
  *          32 bit alignment implicitly and there are cases (stm32l4) that
  *          requires 64 bit alignment.
  */
-static uint8_t page_mem[FLASHPAGE_SIZE] ALIGNMENT_ATTR;
+static ALIGNMENT_ATTR uint8_t page_mem[FLASHPAGE_SIZE];
 
 #ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
 /**

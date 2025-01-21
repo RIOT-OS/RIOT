@@ -19,6 +19,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include <stdalign.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "sdkconfig.h"
@@ -726,7 +727,7 @@ typedef struct {
 /**
  * @brief  SDIO/SDMMC buffer instantiation requirement for SDHC
  */
-#define SDMMC_CPU_DMA_REQUIREMENTS  __attribute__((aligned(SDMMC_CPU_DMA_ALIGNMENT)))
+#define SDMMC_CPU_DMA_REQUIREMENTS  alignas(SDMMC_CPU_DMA_ALIGNMENT)
 
 /**
  * @brief  SDIO/SDMMC buffer alignment for SDHC because of DMA/FIFO buffer restrictions

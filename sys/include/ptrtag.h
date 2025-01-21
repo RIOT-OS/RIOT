@@ -63,6 +63,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdalign.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -74,7 +75,7 @@ extern "C" {
  *
  * @details This will ensure a minimum alignment of 4 bytes
  */
-#define PTRTAG  __attribute__((aligned(4)))
+#define PTRTAG  alignas(4)
 
 /**
  * @brief   Create a tagged pointer

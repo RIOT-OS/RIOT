@@ -21,6 +21,8 @@
 #ifndef PERIPH_CPU_COMMON_H
 #define PERIPH_CPU_COMMON_H
 
+#include <stdalign.h>
+
 #include "cpu.h"
 #include "exti_config.h"
 #include "timer_config.h"
@@ -992,7 +994,7 @@ typedef struct {
 /**
  * @brief USBDEV buffer instantiation requirement
  */
-#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+#define USBDEV_CPU_DMA_REQUIREMENTS    alignas(USBDEV_CPU_DMA_ALIGNMENT)
 
 /**
  * @brief USB peripheral parameters
@@ -1015,7 +1017,7 @@ typedef struct {
 /**
  * @brief SDIO/SDMMC buffer instantiation requirement for SDHC
  */
-#define SDMMC_CPU_DMA_REQUIREMENTS  __attribute__((aligned(SDMMC_CPU_DMA_ALIGNMENT)))
+#define SDMMC_CPU_DMA_REQUIREMENTS  alignas(SDMMC_CPU_DMA_ALIGNMENT)
 
 /**
  * @brief SDHC peripheral configuration

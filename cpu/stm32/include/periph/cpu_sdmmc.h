@@ -19,6 +19,7 @@
 #ifndef PERIPH_CPU_SDMMC_H
 #define PERIPH_CPU_SDMMC_H
 
+#include <stdalign.h>
 #include <stdint.h>
 
 #include "periph/cpu_dma.h"
@@ -45,7 +46,7 @@ extern "C" {
 /**
  * @brief SDIO/SDMMC buffer instantiation requirement for STM32
  */
-#define SDMMC_CPU_DMA_REQUIREMENTS  __attribute__((aligned(SDMMC_CPU_DMA_ALIGNMENT)))
+#define SDMMC_CPU_DMA_REQUIREMENTS  alignas(SDMMC_CPU_DMA_ALIGNMENT)
 
 /**
  * @brief SDIO/SDMMC pin structure for STM32
