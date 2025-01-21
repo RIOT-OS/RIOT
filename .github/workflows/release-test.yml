@@ -71,26 +71,16 @@ jobs:
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
-    - name: Fetch host key from IoT-LAB saclay site
+    - name: Fetch host keys from IoT-LAB sites
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      run: |
-        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        ssh -oStrictHostKeyChecking=accept-new \
-          ${IOTLAB_USER}@saclay.iot-lab.info exit
-    - name: Fetch host key from IoT-LAB lille site
-      # Not being used in the most recent release specs but kept in for
+      # lille is not being used in the most recent release specs but kept in for
       # backwords compatibility
-      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
       run: |
         IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        ssh -oStrictHostKeyChecking=accept-new \
-          ${IOTLAB_USER}@lille.iot-lab.info exit
-    - name: Fetch host key from IoT-LAB strasbourg site
-      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      run: |
-        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        ssh -oStrictHostKeyChecking=accept-new \
-          ${IOTLAB_USER}@strasbourg.iot-lab.info exit
+        for site in saclay lille strasbourg; do
+          ssh -oStrictHostKeyChecking=accept-new \
+            "${IOTLAB_USER}@${site}.iot-lab.info exit"
+        done
     - name: Checkout Release-Specs
       uses: actions/checkout@main
       with:
