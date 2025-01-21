@@ -287,7 +287,7 @@ Author(s):
 Reason for removal:
 - Hardware not available so can't be tested
 
-### boards/waspmote-pro [2b8a0d48940517f7df4e78c7a0b16024f46a8694]:
+### boards/waspmote-pro [2b8a0d48940517f7df4e78c7a0b16024f46a8694]
 Author(s):
 - Hinnerk van Bruinehsen
 - Kaspar Schleiser <kaspar@schleiser.de>
@@ -302,6 +302,7 @@ therefore, have no interest in supporting this board. As result, none of the
 RIOT core contributors has access to the hardware, preventing us from doing the
 necessary testing for maintaining this board.
 
+[6cad5d24771ba6199228351a11b5062cd2e9b36d]: https://github.com/RIOT-OS/RIOT/commit/6cad5d24771ba6199228351a11b5062cd2e9b36d
 [d83d08f0995a88f399e70a7d07b44dd780082436]: https://github.com/RIOT-OS/RIOT/commit/d83d08f0995a88f399e70a7d07b44dd780082436
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
