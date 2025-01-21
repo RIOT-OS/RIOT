@@ -48,6 +48,7 @@
  *
  */
 
+#include <stdalign.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -171,7 +172,7 @@ enum {
  * @param[in] size size of the array in unit of @ref FLASHPAGE_SIZE
  */
 #define FLASH_WRITABLE_INIT(name, size) \
-    __attribute__((aligned(FLASHPAGE_SIZE))) \
+    alignas(FLASHPAGE_SIZE) \
     __attribute__((section(".flash_writable." #name))) \
     static const uint8_t name [size * FLASHPAGE_SIZE]
 #endif

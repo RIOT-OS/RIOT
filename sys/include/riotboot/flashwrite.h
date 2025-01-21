@@ -59,6 +59,8 @@
 #ifndef RIOTBOOT_FLASHWRITE_H
 #define RIOTBOOT_FLASHWRITE_H
 
+#include <stdalign.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,7 +96,7 @@ extern "C" {
  * @brief Extra attributes required for the firmware intermediate buffer
  */
 #define RIOTBOOT_FLASHPAGE_BUFFER_ATTRS \
-    __attribute__((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+    alignas(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)
 
 /**
  * @brief   firmware update state structure

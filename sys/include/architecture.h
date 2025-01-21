@@ -24,9 +24,10 @@
 #ifndef ARCHITECTURE_H
 #define ARCHITECTURE_H
 
-#include <stdint.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <stdalign.h>
+#include <stdint.h>
 
 #include "architecture_arch.h" /* IWYU pragma: export */
 
@@ -203,7 +204,7 @@ typedef uintptr_t   uinttxtptr_t;
  * char WORD_ALIGNED thread_stack[THREAD_STACKSIZE_DEFAULT];
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-#define WORD_ALIGNED __attribute__((aligned(ARCHITECTURE_WORD_BYTES)))
+#define WORD_ALIGNED alignas(ARCHITECTURE_WORD_BYTES)
 
 /**
  * @brief       Check if @p addr is alignment to @p alignment

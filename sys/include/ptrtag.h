@@ -63,6 +63,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdalign.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -72,7 +73,11 @@ extern "C" {
 /**
  * @brief   Pointers to data marked with this attribute will be tag-able.
  *
- * @details This will ensure a minimum alignment of 4 bytes
+ * @details We cannot use `alignas()` here, as we need to define a minimum
+ *          alignment. We cannot lower the alignment of something that must be
+ *          aligned to e.g. 8 or 16 bytes, but this is what `alignas()` would
+ *          (try to) do, which in turn results in a compilation error.
+ * @note    This will ensure a minimum alignment of 4 bytes
  */
 #define PTRTAG  __attribute__((aligned(4)))
 
