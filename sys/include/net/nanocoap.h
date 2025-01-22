@@ -2067,29 +2067,60 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
  * will create the reply packet header based on parameters from the request
  * (e.g., id, token).
  *
- * Passing a non-zero @p payload_len will ensure the payload fits into the
- * buffer along with the header. For this validation, payload_len must include
- * any options, the payload marker, as well as the payload proper.
+ * Passing a non-zero @p max_data_len will ensure the remaining data fits into
+ * the buffer along with the header. For this validation, @p max_data_len must
+ * include any CoAP Options, the payload marker, as well as the payload proper.
  *
- * @param[in]   pkt         packet to reply to
- * @param[in]   code        reply code (e.g., COAP_CODE_204)
- * @param[out]  rbuf        buffer to write reply to
- * @param[in]   rlen        size of @p rbuf
- * @param[in]   payload_len length of payload
+ * @param[in]   pkt             packet to reply to
+ * @param[in]   code            reply code (e.g., COAP_CODE_204)
+ * @param[out]  rbuf            buffer to write reply to
+ * @param[in]   rlen            size of @p rbuf
+ * @param[in]   max_data_len    Length of additional CoAP options, the payload marker and payload
  *
- * @returns     size of reply packet on success
+ * @warning     CoAP request handlers *must* check the return value for being
+ *              negative. If it is, they must stop further processing of the
+ *              request and pass on the return value unmodified.
  *
- *              Note that this size can be severely shortened if due to a No-Response option there
- *              is only an empty ACK to be sent back. The caller may just continue populating the
- *              payload (the space was checked to suffice), but may also skip that needless step
- *              if the returned length is less than the requested payload length.
+ * @return      @p max_data_len + size of the header written in bytes
  *
- * @returns     0 if no response should be sent due to a No-Response option in the request
- * @returns     <0 on error
- * @returns     -ENOSPC if @p rbuf too small
+ * @retval      -ECANCELED          No-Response Option present and matching
+ * @retval      -ENOSPC             @p rbuf too small
+ * @retval      <0                  other error
+ *
+ * Usage:
+ *
+ * ```C
+ * static ssize_t _foo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+ *                             coap_request_ctx_t *context)
+ * {
+ *     static const char *payload = "Hello World";
+ *     const payload_len = strlen(payload);
+ *     // Worst case estimation of the data to add:
+ *     size_t max_data_len = COAP_OPT_FOO_MAX_LEN + COAP_OPT_BAR_MAX_LEN
+ *                         + COAP_PAYLOAD_MARKER_SIZE + payload_len;
+ *     ssize_t hdr_len = coap_build_reply(pkt, COAP_CODE_CONTENT, buf, len, max_data_len);
+ *
+ *     if (hdr_len < 0) {
+ *         return hdr_len; // pass through error
+ *     }
+ *
+ *     // This step is needed due to an API design flaw
+ *     hdr_len -= max_data_len;
+ *
+ *     uint8_t *pos = buf + hdr_len;
+ *     uint16_t lastonum = 0;
+ *     pos += coap_opt_put_uint(buf, lastonum, COAP_OPT_FOO, 42);
+ *     lastonum = COAP_OPT_FOO;
+ *     pos += coap_opt_put_uint(buf, lastonum, COAP_OPT_BAR, 1337);
+ *     *pos++ = COAP_PAYLOAD_MARKER;
+ *     memcpy(pos, payload, payload_len);
+ *     pos += payload_len;
+ *     return (uintptr_t)pos - (uintptr_t)buf;
+ * }
+ * ```
  */
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
-                         uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+                         uint8_t *rbuf, unsigned rlen, unsigned max_data_len);
 
 /**
  * @brief   Build empty reply to CoAP request
@@ -2286,9 +2317,10 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  * @param[out]  payload_len_max max length of payload left in @p buf
  *
  * @returns     size of reply header on success
- * @returns     0 if no reply should be sent
- * @returns     <0 on error
- * @returns     -ENOSPC if @p buf too small
+ * @retval      -ECANCELED  reply should be sent due to no-reply option
+ *                          (pass this error through, server will handle this)
+ * @retval      -ENOSPC     @p buf too small
+ * @retval      <0          other error
  */
 ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
                                 void *buf, size_t len, uint16_t ct,
@@ -2312,8 +2344,10 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
  * @param[in]   payload_len length of payload
  *
  * @returns     size of reply packet on success
- * @returns     <0 on error
- * @returns     -ENOSPC if @p buf too small
+ * @retval      -ECANCELED  reply should be sent due to no-reply option
+ *                          (pass this error through, server will handle this)
+ * @retval      -ENOSPC     @p buf too small
+ * @retval      <0          other error
  */
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
