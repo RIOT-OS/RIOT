@@ -40,6 +40,7 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += nanocoap_dtls
   USEMODULE += prng_sha256prng
 
+  USEMODULE += nanocoap_sock_observe
   USEMODULE += nanocoap_vfs
   USEMODULE += vfs_default
   # USEMODULE += vfs_auto_format
