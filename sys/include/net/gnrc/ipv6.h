@@ -174,6 +174,10 @@ extern "C" {
 /**
  * @brief   Use the same static IPv6 link local address on every network interface
  *
+ * @deprecated  Will be removed after release 2025.07 - after this the static link-local
+ *              address will always be fixed unless a use-case for the auto-increment
+ *              can be found.
+ *
  * When CONFIG_GNRC_IPV6_STATIC_LLADDR is used, to not add the interface pid to the
  * set static address but use the same static link local address for all interfaces.
  */
