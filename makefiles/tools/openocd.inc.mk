@@ -18,6 +18,10 @@ ifneq (,$(OPENOCD_DEBUG_ADAPTER))
   endif
 endif
 
+ifeq (1, $(FAST_FLASH))
+  OPENOCD_SKIP_VERIFY = 1
+endif
+
 OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
 
 OPENOCD_TARGETS = debug% flash% reset

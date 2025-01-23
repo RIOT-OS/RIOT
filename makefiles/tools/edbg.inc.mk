@@ -28,7 +28,11 @@ $(call target-export-variables,$(EDBG_TARGETS),EDBG_ARGS)
 
 # Set flasher and reset for the RIOT build system
 FLASHER ?= $(RIOTTOOLS)/edbg/edbg.sh
-FFLAGS ?= flash $(FLASHFILE)
+ifeq (1, $(FAST_FLASH))
+  FFLAGS ?= flash $(FLASHFILE)
+else
+  FFLAGS ?= flash_verify $(FLASHFILE)
+endif
 
 RESET ?= $(RIOTTOOLS)/edbg/edbg.sh
 RESET_FLAGS ?= reset
