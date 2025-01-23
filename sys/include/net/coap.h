@@ -540,6 +540,7 @@ typedef enum {
  * @brief   Marks the boundary between header and payload
  */
 #define COAP_PAYLOAD_MARKER      (0xFF)
+#define COAP_PAYLOAD_MARKER_SIZE (1U)   /**< Size of the payload marker */
 
 /**
  * @defgroup net_coap_conf    CoAP compile configurations
