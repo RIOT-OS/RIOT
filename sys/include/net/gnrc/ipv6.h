@@ -178,7 +178,7 @@ extern "C" {
  * set static address but use the same static link local address for all interfaces.
  */
 #ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED
-#define CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED 0
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED 1
 #endif
 
 /**
