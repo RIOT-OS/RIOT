@@ -43,6 +43,8 @@ cachegrind.out*
 tags
 # GDB initialization scripts
 .gdbinit
+# GDB history (when using gdb-dashboard)
+.gdb_history
 
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
