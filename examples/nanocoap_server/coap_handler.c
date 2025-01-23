@@ -11,13 +11,13 @@
 #include <string.h>
 
 #include "event/callback.h"
-#include "event/timeout.h"
+#include "event/periodic.h"
 #include "event/thread.h"
+#include "event/timeout.h"
 #include "fmt.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
-#include "kernel_defines.h"
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
@@ -59,7 +59,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
 
     bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_TEXT);
     bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
-    *bufpos++ = 0xff;
+    *bufpos++ = COAP_PAYLOAD_MARKER;
 
     /* Add actual content */
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_intro, sizeof(block2_intro)-1);
@@ -196,7 +196,7 @@ static void _send_response(void *ctx)
 
     puts("_separate_handler(): send delayed response");
     nanocoap_server_send_separate(ctx, COAP_CODE_CONTENT, COAP_TYPE_NON,
-                                response, sizeof(response));
+                                  response, sizeof(response));
 }
 
 static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
@@ -204,7 +204,12 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
     static event_timeout_t event_timeout;
     static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
 
-    if (event_timeout_is_pending(&event_timeout) && !sock_udp_ep_equal(context->remote, &_separate_ctx.remote)) {
+    if (event_timeout_is_pending(&event_timeout)) {
+        if (nanocoap_server_is_remote_in_response_ctx(&_separate_ctx, context)) {
+            /* duplicate of the request a separate response is already scheduled
+             * for --> resending the ACK */
+            return coap_build_empty_ack(pkt, (void *)buf);
+        }
         puts("_separate_handler(): response already scheduled");
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
     }
@@ -228,6 +233,107 @@ NANOCOAP_RESOURCE(separate) {
     .path = "/separate", .methods = COAP_GET, .handler = _separate_handler,
 };
 #endif /* MODULE_EVENT_THREAD */
+
+#ifdef MODULE_NANOCOAP_SERVER_OBSERVE
+static ssize_t _time_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+{
+    uint32_t obs;
+    bool registered = false;
+    if (coap_opt_get_uint(pkt, COAP_OPT_OBSERVE, &obs)) {
+        /* No (valid) observe option present */
+        obs = UINT32_MAX;
+    }
+
+    uint32_t now = ztimer_now(ZTIMER_MSEC);
+
+    switch (obs) {
+    case 0:
+        /* register */
+        if (nanocoap_register_observer(context, pkt) == 0) {
+            registered = true;
+        }
+        break;
+    case 1:
+        /* unregister */
+        nanocoap_unregister_observer(context, pkt);
+        break;
+    default:
+        /* No (valid) observe option present --> ignore observe and handle
+         * as regular GET */
+        break;
+    }
+
+    const size_t estimated_data_len =
+        4       /* Max Observe Option size */
+        + 1     /* payload marker */
+        + 10    /* strlen("4294967295"), 4294967295 == UINT32_MAX */
+        + 1;    /* '\n' */
+    ssize_t hdr_len = coap_build_reply(pkt, COAP_CODE_CONTENT, buf, len, estimated_data_len);
+
+    if (hdr_len < 0) {
+        /* we undo any potential registration if we cannot reply */
+        nanocoap_unregister_observer(context, pkt);
+        return len;
+    }
+
+    if (hdr_len == 0) {
+        /* no response required, probably because of no-response option matching
+         * the response class */
+        return 0;
+    }
+
+    /* coap_build_reply() is a bit goofy: It returns the size of the written
+     * header + `estiamted_data_len`, so we have to subtract it again to obtain
+     * the size of data written. */
+    uint8_t *pos = buf + hdr_len - estimated_data_len;
+
+    if (registered) {
+        uint16_t last_opt = 0;
+        pos += coap_opt_put_observe(pos, last_opt, now);
+    }
+    *pos++ = COAP_PAYLOAD_MARKER;
+    pos += fmt_u32_dec((void *)pos, now);
+    *pos++ = '\n';
+
+    return (uintptr_t)pos - (uintptr_t)buf;
+}
+
+NANOCOAP_RESOURCE(time) {
+    .path = "/time", .methods = COAP_GET, .handler = _time_handler,
+};
+
+static void _notify_observer_handler(event_t *ev)
+{
+    (void)ev;
+    uint32_t now = ztimer_now(ZTIMER_MSEC);
+    uint8_t buf[32];
+    uint8_t *pos = buf;
+    uint16_t last_opt = 0;
+    pos += coap_opt_put_observe(pos, last_opt, now);
+    *pos++ = COAP_PAYLOAD_MARKER;
+    pos += fmt_u32_dec((void *)pos, now);
+    *pos++ = '\n';
+    iolist_t data = {
+        .iol_base = buf,
+        .iol_len = (uintptr_t)pos - (uintptr_t)buf,
+    };
+
+    /* `NANOCOAP_RESOURCE(time)` expends to XFA magic adding an entry named
+     * `coap_resource_time`. */
+    nanocoap_notify_observers(&coap_resource_time, &data);
+}
+
+void setup_observe_event(void)
+{
+    static event_t ev = {
+        .handler = _notify_observer_handler
+    };
+    static event_periodic_t pev;
+
+    event_periodic_init(&pev, ZTIMER_MSEC, EVENT_PRIO_MEDIUM, &ev);
+    event_periodic_start(&pev, MS_PER_SEC);
+}
+#endif /* MODULE_NANOCOAP_SERVER_OBSERVE */
 
 /* we can also include the fileserver module */
 #ifdef MODULE_NANOCOAP_FILESERVER
