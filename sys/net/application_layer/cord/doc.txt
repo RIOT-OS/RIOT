@@ -52,9 +52,9 @@
  * different roles described in `RFC 9176`:
  *
  * - `cord_ep`:     standard endpoint implementation following the rules as
- *                  defined i.a. in sections 5.2, 5.3, A.1, and A.2
+ *                  defined i.a. in sections 4.3 and 5
  * - `cord_epsim`:  endpoint implementation following the simple registration
- *                  procedure as defined in section 5.3.1
+ *                  procedure as defined in section 5.1
  * - `cord_lc`:     lookup client implementation for querying information from
  *                  an RD using the lookup interfaces
  * - `cord_config`: header file collection (default) configuration values used
