@@ -508,8 +508,20 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     if (pkt->hdr->code == 0) {
         return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
     }
-    return coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
-                             coap_resources, coap_resources_numof);
+
+    ssize_t retval =  coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
+                                        coap_resources, coap_resources_numof);
+
+    if (retval == -ECANCELED) {
+        DEBUG_PUTS("nanocoap: No-Reponse Option present and matching");
+        /* ==> reply with empty ACK, if needed */
+        if (coap_get_type(pkt) == COAP_TYPE_CON) {
+            return coap_build_empty_ack(pkt, (void *)resp_buf);
+        }
+        return 0;
+    }
+
+    return retval;
 }
 
 ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
