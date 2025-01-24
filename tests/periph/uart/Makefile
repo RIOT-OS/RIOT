@@ -6,6 +6,7 @@ FEATURES_OPTIONAL += periph_uart_collision
 FEATURES_OPTIONAL += periph_uart_modecfg
 FEATURES_OPTIONAL += periph_uart_rxstart_irq
 
+USEMODULE += bitfield
 USEMODULE += shell
 USEMODULE += ztimer_msec
 
