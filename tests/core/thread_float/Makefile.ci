@@ -13,7 +13,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     mbed_lpc1768 \
     microbit \
     nrf51dongle \
-    nrf6310 \
     nucleo-c031c6 \
     nucleo-f031k6 \
     nucleo-f042k6 \
