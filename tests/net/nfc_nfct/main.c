@@ -64,10 +64,10 @@ static bool test_nfct(void)
 
     nfc_t2t_t t2t;
     t2t_create_type_2_tag(&t2t, NULL, NULL, NULL, NFC_T2T_STATIC_MEMORY_SIZE, t2t_mem);
-    nfct_create_type_2_tag_with_ndef(&DEFAULT_T2T_EMULATOR_DEV, &t2t, &ndef_message, TYPE_2_TAG);
+    nfct_start_type_2_tag_with_ndef(&DEFAULT_T2T_EMULATOR_DEV, &t2t, &ndef_message);
     /* sleep for 10 seconds, then disable the tag */
     ztimer_sleep(ZTIMER_SEC, 10);
-    nfct_delete_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
+    nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
     return true;
 }
 
@@ -75,16 +75,16 @@ static bool test_convenience_functions(void)
 {
     puts("Starting convenience tests");
     nfc_t2t_t t2t;
-    nfct_create_type_2_tag_with_text(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, "Hallo Welt", "de", UTF8);
+    nfct_start_type_2_tag_with_text(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, "Hallo Welt", "de", UTF8);
     /* sleep for 10 seconds, then disable the tag */
     ztimer_sleep(ZTIMER_SEC, 10);
-    nfct_delete_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
+    nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
 
-    nfct_create_type_2_tag_with_uri(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, NDEF_URI_HTTPS_WWW, "riot-os.org");
+    nfct_start_type_2_tag_with_uri(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, NDEF_URI_HTTPS_WWW, "riot-os.org");
     test_utils_print_stack_usage();
     /* sleep for 10 seconds, then disable the tag */
     ztimer_sleep(ZTIMER_SEC, 10);
-    nfct_delete_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
+    nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
     return 0;
 }
 
