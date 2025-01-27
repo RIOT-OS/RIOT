@@ -88,12 +88,12 @@ void rtt_clear_alarm(void)
 
 void rtt_poweron(void)
 {
-    PMC->PMC_PCER0 |= (1 << ID_RTT);
+    PMC->PMC_PCER0 = (1 << ID_RTT);
 }
 
 void rtt_poweroff(void)
 {
-    PMC->PMC_PCER0 &= ~(1 << ID_RTT);
+    PMC->PMC_PCDR0 = (1 << ID_RTT);
 }
 
 void isr_rtt(void)
