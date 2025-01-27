@@ -494,16 +494,40 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 {
     assert(ctx);
 
-    if (coap_get_code_class(pkt) != COAP_REQ) {
-        DEBUG("coap_handle_req(): not a request.\n");
+    switch (coap_get_type(pkt)) {
+    case COAP_TYPE_CON:
+    case COAP_TYPE_NON:
+        /* could be a request ==> proceed */
+        break;
+    default:
+        DEBUG_PUTS("coap_handle_req(): ignoring RST/ACK");
         return -EBADMSG;
     }
 
-    if (pkt->hdr->code == 0) {
-        return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+    if (coap_get_code_class(pkt) != COAP_REQ) {
+        DEBUG_PUTS("coap_handle_req(): not a request --> ignore");
+        return -EBADMSG;
     }
-    return coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
-                             coap_resources, coap_resources_numof);
+
+    if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
+        /* we are not able to process a CON/NON message with an empty code,
+         * so we reply with a RST, unless we got a multicast message */
+        if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
+            return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+        }
+    }
+
+    ssize_t retval = coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
+                                       coap_resources, coap_resources_numof);
+    if (retval < 0) {
+        /* handlers were not able to process this, so we reply with a RST,
+         * unless we got a multicast message */
+        if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
+            return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+        }
+    }
+
+    return retval;
 }
 
 ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
