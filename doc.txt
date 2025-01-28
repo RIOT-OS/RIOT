@@ -60,6 +60,18 @@
 #endif
 
 /**
+ * @def RIOT_FILE_RELATIVE
+ * @brief   Provides the current filename relative to the RIOT base directory (RIOTBASE)
+ * @warning This only works within `*.c` and `*.cpp` files. For `*.h`/`*.hpp` files the
+ *          source compiles, however, the including `*.c`/`*.cpp` file will be
+ *          substituted.
+ * @see     `__FILE__` for absolute filenames that also work with *.h files
+ */
+#if DOXYGEN
+#   define RIOT_FILE_RELATIVE
+#endif
+
+/**
  * @def CONFIG_THREAD_NAMES
  * @brief   This global macro enable storage of thread names to help developers.
  *
