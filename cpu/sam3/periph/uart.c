@@ -89,12 +89,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
-    PMC->PMC_PCER0 |= (1 << uart_config[uart].pmc_id);
+    PMC->PMC_PCER0 = (1 << uart_config[uart].pmc_id);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    PMC->PMC_PCER0 &= ~(1 << uart_config[uart].pmc_id);
+    PMC->PMC_PCDR0 = (1 << uart_config[uart].pmc_id);
 }
 
 static inline void isr_handler(int num)
