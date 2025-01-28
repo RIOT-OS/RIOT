@@ -66,9 +66,23 @@
  *          source compiles, however, the including `*.c`/`*.cpp` file will be
  *          substituted.
  * @see     `__FILE__` for absolute filenames that also work with *.h files
+ * @see     @ref RIOT_FILE_NOPATH
  */
 #if DOXYGEN
 #   define RIOT_FILE_RELATIVE
+#endif
+
+/**
+ * @def RIOT_FILE_NOPATH
+ * @brief   Provides the current filename without the parent directory path
+ * @warning This only works within `*.c` and `*.cpp` files. For `*.h`/`*.hpp` files the
+ *          source compiles, however, the including `*.c`/`*.cpp` file will be
+ *          substituted.
+ * @see     `__FILE__` for absolute filenames that also work with *.h files
+ * @see     @ref RIOT_FILE_RELATIVE
+ */
+#if DOXYGEN
+#   define RIOT_FILE_NOPATH
 #endif
 
 /**
