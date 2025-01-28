@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TM1637_PARAMS_H
+#define TM1637_PARAMS_H
+
 /**
  * @ingroup     drivers_tm1637
  *
@@ -15,8 +18,6 @@
  *
  * @author      Nico Behrens <nifrabe@outlook.de>
  */
-#ifndef TM1637_PARAMS_H
-#define TM1637_PARAMS_H
 
 #include "board.h"
 #include "periph/gpio.h"
@@ -29,22 +30,22 @@ extern "C" {
 /**
  * @brief see @ref tm1637_params_t
  */
-#define TM1637_PARAM_CLK GPIO_PIN(0, 0)
+#  define TM1637_PARAM_CLK GPIO_UNDEF
 #endif
 
 #ifndef TM1637_PARAM_DIO
 /**
  * @brief see @ref tm1637_params_t
  */
-#define TM1637_PARAM_DIO GPIO_PIN(0, 1)
+#  define TM1637_PARAM_DIO GPIO_UNDEF
 #endif
 
 #ifndef TM1637_PARAMS
 /**
  * @brief see @ref tm1637_params_t
  */
-#define TM1637_PARAMS { .clk = TM1637_PARAM_CLK, \
-                        .dio = TM1637_PARAM_DIO }
+#  define TM1637_PARAMS { .clk = TM1637_PARAM_CLK, \
+                          .dio = TM1637_PARAM_DIO }
 #endif
 
 /**
@@ -58,5 +59,5 @@ static const tm1637_params_t tm1637_params[] = {
 }
 #endif
 
-#endif /* TM1637_PARAMS_H */
 /** @} */
+#endif /* TM1637_PARAMS_H */

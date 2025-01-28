@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TM1637_H
+#define TM1637_H
+
 /**
  * @defgroup    drivers_tm1637 TM1637 display
  * @ingroup     drivers_display
@@ -19,15 +22,11 @@
  *
  */
 
-#ifndef TM1637_H
-#define TM1637_H
-
 #include "board.h"
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /**
@@ -51,7 +50,6 @@ typedef struct {
 typedef struct {
     /**
      * @brief Configuration parameters
-     *
      */
     tm1637_params_t params;
 } tm1637_t;
@@ -59,7 +57,8 @@ typedef struct {
 /**
  * @brief Brightness level enum for the display
  *
- * @note The brightness must be one of the given values.
+ * @note The brightness must be one of the given values according to the specification.
+ * It is expressed as a fraction of the full pulse width. The value has a size of 3 bits.
  */
 typedef enum {
     TM1637_PW_1_16 = 0x00,
@@ -77,7 +76,9 @@ typedef enum {
  *
  * @param[out]  dev     device descriptor of the display
  * @param[in]   params  configuration parameters
- * @return 0 on success, error otherwise
+ *
+ * @retval 0    on success
+ * @retval -1   on error
  */
 int tm1637_init(tm1637_t *dev, const tm1637_params_t *params);
 
@@ -110,5 +111,5 @@ void tm1637_clear(const tm1637_t *dev);
 }
 #endif
 
-#endif /* TM1637_H */
 /** @} */
+#endif /* TM1637_H */
