@@ -10,6 +10,14 @@ RIOTBASE ?= $(CURDIR)/../..
 # Default to using ethos for providing the uplink when not on native
 UPLINK ?= ethos
 
+# If enabled will configure a default DNS resolver and propagate it via the
+# RDNSS option to the hosts
+ENABLE_DNS ?= 1
+# If the above setting is active this setting will also enable DNS caching,
+# consequently dedicating some more memory space in order to reduce DNS
+# requests
+ENABLE_DNS_CACHING ?= 1
+
 # Check if the selected Uplink is valid
 ifeq (,$(filter ethos slip cdc-ecm wifi ethernet,$(UPLINK)))
   $(error Supported uplinks are `ethos`, `slip`, `cdc-ecm`, `ethernet` and `wifi`)
@@ -39,8 +47,14 @@ USEMODULE += ps
 # Optionally include DNS support. This includes resolution of names at an
 # upstream DNS server and the handling of RDNSS options in Router Advertisements
 # to auto-configure that upstream DNS server.
-#USEMODULE += sock_dns              # include DNS client
-#USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
+ifneq (0,$(ENABLE_DNS))
+  USEMODULE += sock_dns              # include DNS client
+  USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
+  USEMODULE += auto_init_sock_dns    # configure default DNS resolver
+  ifneq (0,$(ENABLE_DNS_CACHING))
+    USEMODULE += dns_cache             # cache DNS responses
+  endif
+endif
 
 # When using a regular network uplink we should use DHCPv6
 ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK))$(REUSE_TAP))
