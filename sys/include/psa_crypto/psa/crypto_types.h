@@ -29,6 +29,8 @@ extern "C" {
 #include "psa/error.h"
 #include "psa/key/attributes.h"
 
+#include "hash/types.h"
+
 /**
  * @brief   For encrypt-decrypt functions, whether the operation is an encryption
  *          or a decryption.
@@ -139,38 +141,6 @@ typedef struct psa_aead_operation_s psa_aead_operation_t;
  *          non-portable.
  */
 typedef struct psa_mac_operation_s psa_mac_operation_t;
-
-/**
- * @brief   The type of the state data structure for multipart hash operations.
- *
- * @details Before calling any function on a hash operation object, the application must
- *          initialize it by any of the following means:
- *          - Set the structure to all-bits-zero, for example:
- *            @code
- *            @ref psa_hash_operation_t operation;
- *            memset(&operation, 0, sizeof(operation));
- *            @endcode
- *          - Initialize the structure to logical zero values, for example:
- *            @code
- *            @ref psa_hash_operation_t operation = {0};
- *            @endcode
- *          - Initialize the structure to the initializer @ref PSA_HASH_OPERATION_INIT,
- *            for example:
- *            @code
- *            @ref psa_hash_operation_t operation = @ref PSA_HASH_OPERATION_INIT;
- *            @endcode
- *          - Assign the result of the function @ref psa_hash_operation_init()
- *            to the structure, for example:
- *            @code
- *            @ref psa_hash_operation_t operation;
- *            operation = @ref psa_hash_operation_init();
- *            @endcode
- *
- *          This is an implementation-defined struct. Applications should not
- *          make any assumptions about the content of this structure except
- *          as directed by the documentation of a specific implementation.
- */
-typedef struct psa_hash_operation_s psa_hash_operation_t;
 
 /**
  * @brief   The type of the state object for multi-part cipher operations.

@@ -27,6 +27,8 @@ extern "C" {
 #include "crypto_sizes.h"
 #include "crypto_contexts.h"
 
+#include "hash/types.h"
+
 #if IS_USED(MODULE_PSA_AEAD) || defined(DOXYGEN)
 /**
  * @brief   Structure storing an AEAD operation context
@@ -121,36 +123,6 @@ static inline struct psa_key_derivation_operation_s psa_key_derivation_operation
     return v;
 }
 #endif /* MODULE_PSA_KEY_DERIVATION */
-
-#if IS_USED(MODULE_PSA_HASH) || defined(DOXYGEN)
-/**
- * @brief   Structure containing a hash context and algorithm
- */
-struct psa_hash_operation_s {
-    psa_algorithm_t alg;        /**< Operation algorithm */
-#if IS_USED(MODULE_PSA_HASH)
-    psa_hash_context_t ctx;     /**< Operation hash context */
-#endif
-};
-
-/**
- * @brief   This macro returns a suitable initializer for a hash operation object of type
- *          @ref psa_hash_operation_t.
- */
-#define PSA_HASH_OPERATION_INIT { 0 }
-
-/**
- * @brief   Return an initial value for a hash operation object.
- *
- * @return  struct psa_hash_operation_s
- */
-static inline struct psa_hash_operation_s psa_hash_operation_init(void)
-{
-    const struct psa_hash_operation_s v = PSA_HASH_OPERATION_INIT;
-
-    return v;
-}
-#endif /* MODULE_PSA_HASH */
 
 #if IS_USED(MODULE_PSA_MAC) || defined(DOXYGEN)
 /**
