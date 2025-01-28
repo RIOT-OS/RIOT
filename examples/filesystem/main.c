@@ -91,11 +91,8 @@ static int _tee(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "cat", "print the content of a file", _cat },
-    { "tee", "write a string in a file", _tee },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(cat, "print the content of a file", _cat);
+SHELL_COMMAND(tee, "write a string in a file", _tee);
 
 /* constfs example */
 #include "fs/constfs.h"
@@ -142,7 +139,7 @@ int main(void)
     }
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

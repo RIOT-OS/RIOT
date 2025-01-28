@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "log.h"
+#include "shell.h"
 
 #define SERVER_PORT 11111
 #define DEBUG 1
@@ -83,7 +84,7 @@ static inline unsigned int my_psk_server_cb(WOLFSSL* ssl, const char* identity,
 
 #define APP_DTLS_BUF_SIZE 64
 
-int dtls_server(int argc, char **argv)
+static int _server_cmd(int argc, char **argv)
 {
     char buf[APP_DTLS_BUF_SIZE];
     int ret;
@@ -160,3 +161,5 @@ int dtls_server(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(dtlss, "Start and stop a DTLS server", _server_cmd);

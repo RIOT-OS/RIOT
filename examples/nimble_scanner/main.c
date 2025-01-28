@@ -60,10 +60,7 @@ int _cmd_scan(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t _commands[] = {
-    { "scan", "trigger a BLE scan", _cmd_scan },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(scan, "trigger a BLE scan", _cmd_scan);
 
 int main(void)
 {
@@ -88,7 +85,7 @@ int main(void)
 
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

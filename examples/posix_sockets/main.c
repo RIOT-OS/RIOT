@@ -26,13 +26,6 @@
 #define MAIN_MSG_QUEUE_SIZE (4)
 static msg_t main_msg_queue[MAIN_MSG_QUEUE_SIZE];
 
-extern int udp_cmd(int argc, char **argv);
-
-static const shell_command_t shell_commands[] = {
-    { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
-    { NULL, NULL, NULL }
-};
-
 int main(void)
 {
     /* a sendto() call performs an implicit bind(), hence, a message queue is
@@ -42,7 +35,7 @@ int main(void)
     /* start shell */
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should be never reached */
     return 0;

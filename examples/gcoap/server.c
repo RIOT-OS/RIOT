@@ -32,6 +32,7 @@
 #include "net/utils.h"
 #include "od.h"
 #include "periph/rtc.h"
+#include "shell.h"
 #include "time_units.h"
 
 #include "gcoap_example.h"

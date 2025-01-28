@@ -23,8 +23,9 @@
 
 #include "net/gnrc.h"
 #include "net/gnrc/mac/types.h"
+#include "shell.h"
 
-int mac_cmd(int argc, char **argv)
+static int _mac_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         printf("usage: %s duty\n", argv[0]);
@@ -50,3 +51,5 @@ int mac_cmd(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(mac, "get MAC protocol's internal information", _mac_cmd);

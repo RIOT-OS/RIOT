@@ -28,6 +28,7 @@
 
 #include "net/gnrc/netif.h"
 #include "log.h"
+#include "shell.h"
 
 #define SERVER_PORT 11111
 #define APP_DTLS_BUF_SIZE 64
@@ -83,7 +84,7 @@ static inline unsigned int my_psk_client_cb(WOLFSSL* ssl, const char* hint,
 }
 #endif
 
-int dtls_client(int argc, char **argv)
+static int _client_cmd(int argc, char **argv)
 {
     int ret = 0;
     char buf[APP_DTLS_BUF_SIZE] = "Hello from DTLS client!";
@@ -191,3 +192,5 @@ int dtls_client(int argc, char **argv)
     sock_dtls_close(sk);
     return 0;
 }
+
+SHELL_COMMAND(dtlsc, "Start a DTLS client", _client_cmd);

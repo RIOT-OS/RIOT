@@ -110,6 +110,8 @@ static int cmd_con(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(con, "connect to MQTT broker", cmd_con);
+
 static int cmd_discon(int argc, char **argv)
 {
     (void)argc;
@@ -127,6 +129,8 @@ static int cmd_discon(int argc, char **argv)
     puts("Disconnect successful");
     return 0;
 }
+
+SHELL_COMMAND(discon, "disconnect from the current broker", cmd_discon);
 
 static int cmd_pub(int argc, char **argv)
 {
@@ -165,6 +169,8 @@ static int cmd_pub(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(pub, "publish something", cmd_pub);
+
 static int cmd_sub(int argc, char **argv)
 {
     unsigned flags = EMCUTE_QOS_0;
@@ -202,6 +208,8 @@ static int cmd_sub(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(sub, "subscribe topic", cmd_sub);
+
 static int cmd_unsub(int argc, char **argv)
 {
     if (argc < 2) {
@@ -228,6 +236,8 @@ static int cmd_unsub(int argc, char **argv)
     return 1;
 }
 
+SHELL_COMMAND(unsub, "unsubscribe from topic", cmd_unsub);
+
 static int cmd_will(int argc, char **argv)
 {
     if (argc < 3) {
@@ -248,15 +258,7 @@ static int cmd_will(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "con", "connect to MQTT broker", cmd_con },
-    { "discon", "disconnect from the current broker", cmd_discon },
-    { "pub", "publish something", cmd_pub },
-    { "sub", "subscribe topic", cmd_sub },
-    { "unsub", "unsubscribe from topic", cmd_unsub },
-    { "will", "register a last will", cmd_will },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(will, "register a last will", cmd_will);
 
 int main(void)
 {
@@ -276,7 +278,7 @@ int main(void)
 
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should be never reached */
     return 0;

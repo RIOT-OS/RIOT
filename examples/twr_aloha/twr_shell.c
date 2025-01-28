@@ -42,7 +42,7 @@
 #define DW1000_TX_POWER_COARSE_STEP         (30)        /* 3dbM * 10 */
 #define DW1000_TX_POWER_FINE_STEP           (5)         /* 0.5dbM * 10 */
 
-int _twr_ifconfig(int argc, char **argv)
+static int _twr_ifconfig(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -78,6 +78,8 @@ int _twr_ifconfig(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(ifconfig, "Network interface information", _twr_ifconfig);
+
 static void _print_usage(void)
 {
     puts("Usage:");
@@ -92,7 +94,7 @@ static void _print_usage(void)
     puts("\ttwr lst off: stop listening for ranging requests");
 }
 
-int _twr_handler(int argc, char **argv)
+static int _twr_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _print_usage();
@@ -218,3 +220,5 @@ int _twr_handler(int argc, char **argv)
     _print_usage();
     return -1;
 }
+
+SHELL_COMMAND(twr, "Two-way-ranging (TWR) cli", _twr_handler);

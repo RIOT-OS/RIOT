@@ -25,7 +25,7 @@
 #include "led.h"
 #include <periph/gpio.h>
 
-static int gpio_command(int argc, char **argv)
+static int _gpio_cmd(int argc, char **argv)
 {
     if (argc < 4) {
         printf("usage: %s <init/set/clear> <port no.> <pin no.>\n", argv[0]);
@@ -64,7 +64,9 @@ static int gpio_command(int argc, char **argv)
     return 0;
 }
 
-static int led_command(int argc, char **argv)
+SHELL_COMMAND(gpio, "GPIO pin initialization and set port state HIGH/LOW", _gpio_cmd);
+
+static int _led_cmd(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <id> <on|off|toggle>\n", argv[0]);
@@ -94,18 +96,14 @@ static int led_command(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t commands[] = {
-    { "gpio", "GPIO pin initialization and set port state HIGH/LOW", gpio_command },
-    { "led", "Switch on/off or toggle on-board LEDs", led_command},
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(led, "Switch on/off or toggle on-board LEDs", _led_cmd);
 
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     printf("This board has %d LEDs\n", LED_NUMOF);
 
-    shell_run(commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

@@ -88,6 +88,8 @@ static int cmd_print_riotboot_hdr(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(riotboot_hdr, "Print current slot header", cmd_print_riotboot_hdr);
+
 static int cmd_print_current_slot(int argc, char **argv)
 {
     (void)argc;
@@ -101,6 +103,9 @@ static int cmd_print_current_slot(int argc, char **argv)
     irq_restore(state);
     return 0;
 }
+
+SHELL_COMMAND(current_slot, "Print current slot number", cmd_print_current_slot);
+
 #endif
 
 static int cmd_print_slot_content(int argc, char **argv)
@@ -141,6 +146,8 @@ static int cmd_print_slot_content(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(storage_content, "Print the slot content", cmd_print_slot_content);
+
 static int cmd_lsstorage(int argc, char **argv)
 {
     (void)argc;
@@ -165,15 +172,7 @@ static int cmd_lsstorage(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
-    { "current-slot", "Print current slot number", cmd_print_current_slot },
-    { "riotboot-hdr", "Print current slot header", cmd_print_riotboot_hdr },
-#endif
-    { "storage_content", "Print the slot content", cmd_print_slot_content },
-    { "lsstorage", "Print the available storage paths", cmd_lsstorage },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(lsstorage, "Print the available storage paths", cmd_lsstorage);
 
 int main(void)
 {
@@ -197,7 +196,7 @@ int main(void)
 
     puts("Starting the shell");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

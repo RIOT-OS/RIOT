@@ -112,6 +112,8 @@ static int _cmd_discon(int argc, char **argv)
     return res;
 }
 
+SHELL_COMMAND(discon, "disconnect from the current broker", _cmd_discon);
+
 static int _cmd_con(int argc, char **argv)
 {
     if (argc < 2) {
@@ -189,6 +191,8 @@ static int _cmd_con(int argc, char **argv)
     return (ret > 0) ? 0 : 1;
 }
 
+SHELL_COMMAND(con, "connect to MQTT broker", _cmd_con);
+
 static int _cmd_pub(int argc, char **argv)
 {
     enum QoS qos = QOS0;
@@ -219,6 +223,8 @@ static int _cmd_pub(int argc, char **argv)
 
     return rc;
 }
+
+SHELL_COMMAND(pub, "publish something", _cmd_pub);
 
 static int _cmd_sub(int argc, char **argv)
 {
@@ -261,6 +267,8 @@ static int _cmd_sub(int argc, char **argv)
     return ret;
 }
 
+SHELL_COMMAND(sub, "subscribe topic", _cmd_sub);
+
 static int _cmd_unsub(int argc, char **argv)
 {
     if (argc < 2) {
@@ -281,15 +289,7 @@ static int _cmd_unsub(int argc, char **argv)
     return ret;
 }
 
-static const shell_command_t shell_commands[] =
-{
-    { "con",    "connect to MQTT broker",             _cmd_con    },
-    { "discon", "disconnect from the current broker", _cmd_discon },
-    { "pub",    "publish something",                  _cmd_pub    },
-    { "sub",    "subscribe topic",                    _cmd_sub    },
-    { "unsub",  "unsubscribe from topic",             _cmd_unsub  },
-    { NULL,     NULL,                                 NULL        }
-};
+SHELL_COMMAND(unsub, "unsubscribe from topic", _cmd_unsub);
 
 static unsigned char buf[BUF_SIZE];
 static unsigned char readbuf[BUF_SIZE];
@@ -314,6 +314,6 @@ int main(void)
     MQTTStartTask(&client);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

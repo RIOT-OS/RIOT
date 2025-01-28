@@ -269,6 +269,8 @@ static int _cmd_connect(int argc, char **argv)
     return _ok(req);
 }
 
+SHELL_COMMAND(connect, "connect to MQTT-SN gateway", _cmd_connect);
+
 static int _cmd_disconnect(int argc, char **argv)
 {
     (void)argc;
@@ -287,6 +289,8 @@ static int _cmd_disconnect(int argc, char **argv)
     }
     return _ok(req);
 }
+
+SHELL_COMMAND(disconnect, "disconnect from MQTT-SN gateway", _cmd_disconnect);
 
 static int _cmd_reg(int argc, char **argv)
 {
@@ -330,6 +334,8 @@ static int _cmd_reg(int argc, char **argv)
     return _ok(req);
 }
 
+SHELL_COMMAND(reg, "register a given topic", _cmd_reg);
+
 static int _cmd_unreg(int argc, char **argv)
 {
     if (argc < 2) {
@@ -354,6 +360,8 @@ static int _cmd_unreg(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(unreg, "remove a topic registration [locally]", _cmd_unreg);
 
 static int _cmd_pub(int argc, char **argv)
 {
@@ -398,6 +406,8 @@ static int _cmd_pub(int argc, char **argv)
     }
     return _ok(req);
 }
+
+SHELL_COMMAND(pub, "publish data", _cmd_pub);
 
 static int _cmd_sub(int argc, char **argv)
 {
@@ -469,6 +479,8 @@ static int _cmd_sub(int argc, char **argv)
     return _ok(req);
 }
 
+SHELL_COMMAND(sub, "subscribe to topic", _cmd_sub);
+
 static int _cmd_unsub(int argc, char **argv)
 {
     if (argc < 2) {
@@ -498,6 +510,8 @@ static int _cmd_unsub(int argc, char **argv)
 
     return _ok(req);
 }
+
+SHELL_COMMAND(unsub, "unsubscribe from topic", _cmd_unsub);
 
 static int _cmd_info(int argc, char **argv)
 {
@@ -536,17 +550,7 @@ static int _cmd_info(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "connect", "connect to MQTT-SN gateway", _cmd_connect },
-    { "disconnect", "disconnect from MQTT-SN gateway", _cmd_disconnect },
-    { "reg", "register a given topic", _cmd_reg },
-    { "unreg", "remove a topic registration [locally]", _cmd_unreg },
-    { "pub", "publish data", _cmd_pub },
-    { "sub", "subscribe to topic", _cmd_sub },
-    { "unsub", "unsubscribe from topic", _cmd_unsub },
-    { "info", "print state information", _cmd_info },
-    { NULL, NULL, NULL },
-};
+SHELL_COMMAND(info, "print state information", _cmd_info);
 
 int main(void)
 {
@@ -559,7 +563,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should be never reached */
     return 0;

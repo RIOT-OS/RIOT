@@ -24,6 +24,7 @@
 #include "fmt.h"
 #include "hashes/sha256.h"
 #include "net/gcoap.h"
+#include "shell.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -135,7 +136,7 @@ static ssize_t _sha256_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_r
     return pdu_len;
 }
 
-int gcoap_cli_cmd(int argc, char **argv)
+static int _cli_cmd(int argc, char **argv)
 {
     if (argc == 1) {
         /* show help for main commands */
@@ -154,6 +155,8 @@ int gcoap_cli_cmd(int argc, char **argv)
     printf("usage: %s <info>\n", argv[0]);
     return 1;
 }
+
+SHELL_COMMAND(coap, "CoAP example", _cli_cmd);
 
 void gcoap_cli_init(void)
 {

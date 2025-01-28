@@ -28,6 +28,7 @@
 #include "timex.h"
 #include "net/gnrc/netif.h"
 #include "net/sock/udp.h"
+#include "shell.h"
 #include "tinydtls_keys.h"
 
 /* TinyDTLS */
@@ -485,7 +486,7 @@ static void client_send(char *addr_str, char *data)
     return;
 }
 
-int udp_client_cmd(int argc, char **argv)
+static int _client_cmd(int argc, char **argv)
 {
     if (argc != 3) {
         printf("usage: %s <addr> <data> \n", argv[0]);
@@ -495,3 +496,5 @@ int udp_client_cmd(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(dtlsc, "Start a DTLS client", _client_cmd);
