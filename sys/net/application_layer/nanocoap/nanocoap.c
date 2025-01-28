@@ -603,10 +603,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
                 payload = NULL;
             }
 
-            /* no-response requested, only send empty ACK or nothing */
-            if (type != COAP_TYPE_ACK) {
-                return 0;
-            }
+            return -ECANCELED;
         }
     }
 
