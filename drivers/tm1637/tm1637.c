@@ -138,7 +138,12 @@ static void transmit_byte(const tm1637_t *dev, uint8_t byte)
         delay();
     }
 
-    /* we do not read the ACK as it is not necessary for normal functionality */
+    /**
+     * We do not read the ACK as it is not necessary for the display's functionality.
+     * According to the specification the display sends an ACK via the DIO pin but
+     * this would require us to set the pin into input mode and read the value, then set it
+     * back to write mode. This would take too long and therefore the ACK check is omitted.
+     */
     gpio_write(dev->params.clk, false);
     gpio_write(dev->params.dio, true);
     delay();
@@ -199,6 +204,8 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
 {
     assert(params != NULL);
     assert(dev != NULL);
+    assert(params->clk != GPIO_UNDEF);
+    assert(params->dio != GPIO_UNDEF);
 
     /* set the parameters */
     dev->params = *params;
@@ -219,7 +226,7 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
 
 void tm1637_clear(const tm1637_t *dev)
 {
-    uint8_t segments[DIGIT_COUNT] = { 0, 0, 0, 0 };
+    uint8_t segments[DIGIT_COUNT] = { 0 };
     transmit_segments(dev, segments, TM1637_PW_1_16);
 }
 
