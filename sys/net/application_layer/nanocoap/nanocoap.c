@@ -702,18 +702,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 
         /* option contains bitmap of disinterest */
         if (no_response & mask) {
-            switch (coap_get_type(pkt)) {
-            case COAP_TYPE_NON:
-                /* no response and no ACK */
-                return 0;
-            default:
-                 /* There is an immediate ACK response, but it is an empty response */
-                code = COAP_CODE_EMPTY;
-                len = sizeof(coap_hdr_t);
-                tkl = 0;
-                payload_len = 0;
-                break;
-            }
+            return -ECANCELED;
         }
     }
 
