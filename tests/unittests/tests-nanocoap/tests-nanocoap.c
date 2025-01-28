@@ -1227,6 +1227,29 @@ static void test_nanocoap___rst_message(void)
     TEST_ASSERT_EQUAL_INT(0x55, buf[sizeof(rst_expected)]);
 }
 
+/*
+ * Test that invalid encoding of CoAP option is caught early, so that
+ * later access to CoAP option does indeed not need to perform bound
+ * checking.
+ */
+static void test_nanocoap__out_of_bounds_option(void)
+{
+    uint8_t invalid_msg[] = {
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3, /* version = 1, type = CON, Token Len = 3 */
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 8 */
+        (COAP_OPT_URI_PATH << 4) | (8),
+        0x13, 0x37, 0x42, 0x42 /* 4 bytes Option Data */
+        /* End of packet - 4 bytes before the claimed end of option */
+    };
+
+    coap_pkt_t pkt;
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse(&pkt, invalid_msg, sizeof(invalid_msg)));
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1266,6 +1289,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__token_length_ext_16),
         new_TestFixture(test_nanocoap__token_length_ext_269),
         new_TestFixture(test_nanocoap___rst_message),
+        new_TestFixture(test_nanocoap__out_of_bounds_option),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
