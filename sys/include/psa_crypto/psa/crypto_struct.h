@@ -27,6 +27,7 @@ extern "C" {
 #include "crypto_sizes.h"
 #include "crypto_contexts.h"
 
+#include "cipher/types.h"
 #include "hash/types.h"
 
 #if IS_USED(MODULE_PSA_AEAD) || defined(DOXYGEN)
@@ -57,43 +58,6 @@ static inline struct psa_aead_operation_s psa_aead_operation_init(void)
     return v;
 }
 #endif /* MODULE_PSA_AEAD */
-
-#if IS_USED(MODULE_PSA_CIPHER) || defined(DOXYGEN)
-/**
- * @brief   Structure storing a cipher operation context
- */
-struct psa_cipher_operation_s {
-    uint8_t iv_required : 1;        /**< True if algorithm requires IV */
-    uint8_t iv_set : 1;             /**< True if IV was already set */
-    uint8_t default_iv_length;      /**< Default IV length for algorithm */
-    psa_algorithm_t alg;            /**< Operation algorithm*/
-    /** Union containing cipher contexts for the executing backend */
-    union cipher_context {
-        psa_cipher_context_t cipher_ctx;    /**< Cipher context */
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
-        psa_se_cipher_context_t se_ctx;     /**< SE Cipher context */
-#endif
-    } backend_ctx;  /**< Backend specific cipher context */
-};
-
-/**
- * @brief   This macro returns a suitable initializer for a cipher operation
- *          object of type @ref psa_cipher_operation_t.
- */
-#define PSA_CIPHER_OPERATION_INIT { 0 }
-
-/**
- * @brief   Return an initial value for a cipher operation object.
- *
- * @return  psa_cipher_operation_s
- */
-static inline struct psa_cipher_operation_s psa_cipher_operation_init(void)
-{
-    const struct psa_cipher_operation_s v = PSA_CIPHER_OPERATION_INIT;
-
-    return v;
-}
-#endif /* MODULE_PSA_CIPHER */
 
 #if IS_USED(MODULE_PSA_KEY_DERIVATION) || defined(DOXYGEN)
 /**

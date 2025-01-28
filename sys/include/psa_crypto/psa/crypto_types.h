@@ -29,16 +29,8 @@ extern "C" {
 #include "psa/error.h"
 #include "psa/key/attributes.h"
 
+#include "cipher/types.h"
 #include "hash/types.h"
-
-/**
- * @brief   For encrypt-decrypt functions, whether the operation is an encryption
- *          or a decryption.
- */
-typedef enum {
-    PSA_CRYPTO_DRIVER_DECRYPT,
-    PSA_CRYPTO_DRIVER_ENCRYPT
-} psa_encrypt_or_decrypt_t;
 
 /**
  * @brief   The type of the state object for key derivation operations.
@@ -141,38 +133,6 @@ typedef struct psa_aead_operation_s psa_aead_operation_t;
  *          non-portable.
  */
 typedef struct psa_mac_operation_s psa_mac_operation_t;
-
-/**
- * @brief   The type of the state object for multi-part cipher operations.
- *
- * @details Before calling any function on a cipher operation object, the application must
- *          initialize it by any of the following means:
- *          - Set the object to all-bits-zero, for example:
- *            @code
- *            @ref psa_cipher_operation_t operation;
- *            memset(&operation, 0, sizeof(operation));
- *            @endcode
- *          - Initialize the object to logical zero values by declaring the object as static or
- *            global without an explicit initializer, for example:
- *            @code
- *            static @ref psa_cipher_operation_t operation;
- *            @endcode
- *          - Initialize the object to the initializer @ref PSA_CIPHER_OPERATION_INIT, for example:
- *            @code
- *            @ref psa_cipher_operation_t operation = @ref PSA_CIPHER_OPERATION_INIT;
- *            @endcode
- *          - Assign the result of the function @ref psa_cipher_operation_init() to the object,
- *            for example:
- *            @code
- *            @ref psa_cipher_operation_t operation;
- *            operation = @ref psa_cipher_operation_init();
- *            @endcode
- *
- *          This is an implementation-defined type. Applications that make assumptions about the
- *          content of this object will result in in implementation-specific behavior, and are
- *          non-portable.
- */
-typedef struct psa_cipher_operation_s psa_cipher_operation_t;
 
 #ifdef __cplusplus
 }
