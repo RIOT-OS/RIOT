@@ -28,6 +28,7 @@ extern "C" {
 
 #include "hash/types.h"
 #include "cipher/types.h"
+#include "mac/types.h"
 
 #ifdef __cplusplus
 }
