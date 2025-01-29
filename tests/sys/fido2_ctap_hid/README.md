@@ -37,23 +37,22 @@ Unit testing is based on the `fido2_tests` package.
 There are two test targets (fido2-test, fido2-test-up). The former requires no user
 interaction the latter does.
 
-Note:
-* The tests require python 3.6+.
-* The tests require [swig](http://www.swig.org/) to be installed on your host computer.
-* Running the tests for the first time will setup a virtual python environment (venv) and install python dependencies of the tests. To check the dependencies please refer to the `requirements.txt` of the [fido2-tests repository](https://github.com/solokeys/fido2-tests).
-* The unit tests will require you to reboot the authenticator multiple times. Be patient before continuing as it takes a few seconds for the connection between OS and authenticator to be re-established.
-* If you keep getting errors while trying to run the tests try changing to another git branch and back e.g. `git checkout branch1 && git checkout -` in order to remove build artifacts. Then re-flash the device with `make flash term` and try to run the tests again with `make fido2-test` or `make fido2-test-up`.
+Before running the tests, you need to first flash the device with this test application. The tests communicate with the authenticator via USB. Therefore, when using a board like the nrf52840dk, you **must** use two USB cables: one for programming the SoC and receiving output and another for direct USB communication with the authenticator through the second USB port.
 
-fido2-test
+**fido2-test:**
 
-1. To make benchmarking faster disable user presence tests by enabling the CFLAG
-   `CONFIG_FIDO2_CTAP_DISABLE_UP` in the Makefile or through KConfig.
-2. Flash the device with `make flash`.
-3. Run the unit tests by running `make fido2-test`.
+1. Flash the device with `make flash`.
+2. Run the unit tests by running `make fido2-test`.
 
-fido2-test-up
+**fido2-test-up:**
 
-1. Make sure that the CFLAG `CONFIG_FIDO2_CTAP_DISABLE_UP` is disabled as this test target
-  requires user interaction.
+1. Make sure to enable user interaction by setting `CONFIG_FIDO2_CTAP_DISABLE_UP=0` in the Makefile.
 2. Flash the device with `make flash`.
 3. Run the unit tests by running `make fido2-test-up` and follow the instructions. E.g. when `.ACTIVATE UP ONCE` is displayed, press the configured UP button (default button 1) once.
+
+Note:
+* Running the tests for the first time will setup a virtual python environment (venv) and install python dependencies of the tests. To check the dependencies please refer to the requirements.txt of the fido2-tests repository.
+* The tests require python 3.6+.
+* The tests require [swig](http://www.swig.org/) to be installed on your host computer.
+* The unit tests will require you to reboot the authenticator multiple times. Be patient before continuing as it takes a few seconds for the connection between OS and authenticator to be re-established.
+* If you keep getting errors while trying to run the tests try changing to another git branch and back e.g. `git checkout branch1 && git checkout -` in order to remove build artifacts. Then re-flash the device with `make flash term` and try to run the tests again with `make fido2-test` or `make fido2-test-up`.
