@@ -23,10 +23,6 @@
 extern "C" {
 #endif
 
-#ifdef CPU_NRF52
-#define CHECK_POINTER_DMA_ACCESS(p) ((unsigned int)p >= 0x20000000 ? (unsigned int)p < 0x40000000 : 0)
-#endif
-
 /**
  * @brief   Enable CryptoCell module and IRQs.
  *
@@ -42,6 +38,17 @@ void cryptocell_310_enable(void);
  *          CryptoCell peripheral will be disabled after this call.
  */
 void cryptocell_310_disable(void);
+
+/**
+ * @brief   Check whether the given data resides in RAM
+ *
+ *          Should be called on every const input that will be passed
+ *          on to the CryptoCell peripheral.
+ */
+static inline bool cryptocell_310_data_within_ram(const uint8_t* data)
+{
+    return ((int)data >= CPU_RAM_BASE && (int)data < CPU_RAM_BASE + CPU_RAM_SIZE);
+}
 
 /**
  * @brief   Enables CryptoCell module, IRQs and crypto libraries on nrf52840.

@@ -42,9 +42,8 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
     DEBUG("Peripheral ChaCha20 Cipher encryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!CHECK_POINTER_DMA_ACCESS(key_buffer) ||
-        !CHECK_POINTER_DMA_ACCESS(input) ||
-        !CHECK_POINTER_DMA_ACCESS(output)) {
+    if (!cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
         return PSA_ERROR_DATA_INVALID;
     }
 
@@ -91,9 +90,8 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
     DEBUG("Peripheral ChaCha20 Cipher decryption");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!CHECK_POINTER_DMA_ACCESS(key_buffer) ||
-        !CHECK_POINTER_DMA_ACCESS(input) ||
-        !CHECK_POINTER_DMA_ACCESS(output)) {
+    if (!cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
         return PSA_ERROR_DATA_INVALID;
     }
 

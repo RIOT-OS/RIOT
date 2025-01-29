@@ -85,6 +85,12 @@ psa_status_t cryptocell_310_common_ecc_sign(const uint8_t *priv_key,
     CRYS_ECPKI_UserPrivKey_t user_priv_key;
     CRYSError_t ret = 0;
 
+    if (!cryptocell_310_data_within_ram(priv_key) ||
+        !cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     rndGenerateVectFunc = CRYS_RND_GenerateVector;
     pDomain = (CRYS_ECPKI_Domain_t *)CRYS_ECPKI_GetEcDomain(domain);
 
@@ -121,6 +127,13 @@ psa_status_t cryptocell_310_common_ecc_verify(const uint8_t *pub_key,
     CRYS_ECDSA_VerifyUserContext_t VerifyUserContext;
     CRYS_ECPKI_UserPublKey_t user_pub_key;
     CRYSError_t ret = 0;
+
+    if (!cryptocell_310_data_within_ram(pub_key) ||
+        !cryptocell_310_data_within_ram(input) ||
+        !cryptocell_310_data_within_ram(signature)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
 
     pDomain = (CRYS_ECPKI_Domain_t *)CRYS_ECPKI_GetEcDomain(domain);
 

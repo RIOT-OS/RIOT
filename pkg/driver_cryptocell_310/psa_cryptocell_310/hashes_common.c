@@ -48,6 +48,11 @@ psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
     size_t offset = 0;
     size_t size;
 
+    if (!cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     do {
         if (input_length > CC310_MAX_HASH_INPUT_BLOCK) {
             size = CC310_MAX_HASH_INPUT_BLOCK;

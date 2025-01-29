@@ -67,6 +67,11 @@ psa_status_t psa_derive_ecc_ed25519_public_key( const uint8_t *priv_key_buffer, 
     CRYS_ECEDW_TempBuff_t tmp;
     CRYSError_t ret;
 
+    if (!cryptocell_310_data_within_ram(priv_key_buffer)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     /* contains seed (private key), concatenated with public key */
     uint8_t secret_key[CRYS_ECEDW_ORD_SIZE_IN_BYTES + CRYS_ECEDW_MOD_SIZE_IN_BYTES] = { 0x0 };
     size_t secret_key_size = sizeof(secret_key);
@@ -99,6 +104,13 @@ psa_status_t psa_ecc_ed25519_sign_message(const uint8_t *priv_key_buffer,
 {
     CRYS_ECEDW_TempBuff_t tmp;
     CRYSError_t ret;
+
+    if (!cryptocell_310_data_within_ram(priv_key_buffer) ||
+        !cryptocell_310_data_within_ram(pub_key_buffer) ||
+        !cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
 
     if (input_length > (CRYS_HASH_UPDATE_DATA_MAX_SIZE_IN_BYTES - CRYS_ECEDW_SIGNATURE_BYTES)) {
         return PSA_ERROR_NOT_SUPPORTED;
@@ -139,6 +151,13 @@ psa_status_t psa_ecc_ed25519_verify_message(const uint8_t *key_buffer,
 {
     CRYS_ECEDW_TempBuff_t tmp;
     CRYSError_t ret;
+
+    if (!cryptocell_310_data_within_ram(key_buffer) ||
+        !cryptocell_310_data_within_ram(input) ||
+        !cryptocell_310_data_within_ram(signature)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        return PSA_ERROR_DATA_INVALID;
+    }
 
     if (input_length > (CRYS_HASH_UPDATE_DATA_MAX_SIZE_IN_BYTES - CRYS_ECEDW_SIGNATURE_BYTES)) {
         return PSA_ERROR_NOT_SUPPORTED;
