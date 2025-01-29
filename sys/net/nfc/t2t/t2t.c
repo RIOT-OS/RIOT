@@ -341,9 +341,9 @@ int t2t_handle_write(nfc_t2t_t *tag, uint8_t block_no, uint8_t const *buf){
         return -1;
     }
     uint8_t *block_address = block_no_to_address(block_no, tag);
-    printf("address: %p\n",block_address);
+    LOG_DEBUG("Translated block_no %d to address: %p\n", block_no, block_address);
     if((uint32_t) block_address >= ((uint32_t) tag->memory + tag->memory_size)){
-        LOG_ERROR("Block number too high, outside of valid memory region, aborting write\n");
+        LOG_ERROR("Block number %d too high, outside of valid memory region, aborting write\n", block_no);
         return -1;
     }
     if(tag->current_sector == 0x0){
