@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2024 Technische Universität Dresden
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     drivers_nrfx_nfct_t2t_emulator
+ * @{
+ * @file
+ * @brief       NFCT Type 2 Tag Emulator for the NRFX boards
+ *
+ * @author      Nico Behrens <nifrabe@outlook.de>
+ *
+ * @}
+ */
+
 #include "nrfx_nfct_t2t_emulator.h"
 
 #include "nrfx_nfct.h"
@@ -491,7 +510,7 @@ void uninitialize_t2t(void)
 void disable_t2t(void)
 {
     if (!enabled) {
-        LOG_WARNING("T2T is not enabled\n");
+        LOG_ERROR("T2T is not enabled\n");
         return;
     }
 

@@ -1,5 +1,27 @@
+/*
+ * Copyright (C) 2024 Technische Universität Dresden
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 #ifndef NFCT_T2T_EMULATOR_H
 #define NFCT_T2T_EMULATOR_H
+
+/**
+ * @defgroup    drivers_t2t_emulator T2T Emulator Interface
+ * @ingroup     drivers_netdev
+ * @{
+ *
+ * @file
+ * @brief       Generic interface for NFCT Type 2 Tag emulators
+ *
+ * @note        Every NFCT T2T emulator needs to provide the functions inside of
+ *              @ref nfct_t2t_emulator_t.
+ *
+ * @author      Nico Behrens <nifrabe@outlook.de>
+ */
 
 #include <stdint.h>
 #include "net/nfc/t2t/t2t.h"
@@ -17,10 +39,10 @@ typedef enum {
 } t2t_response_t;
 
 typedef struct {
-    void (*init) (nfc_t2t_t *t2t);
-    void (*enable) (void);
-    void (*disable) (void);
-    void (*uninit) (void);
+    void (*init)(nfc_t2t_t *t2t);
+    void (*enable)(void);
+    void (*disable)(void);
+    void (*uninit)(void);
 } nfct_t2t_emulator_t;
 
 #endif

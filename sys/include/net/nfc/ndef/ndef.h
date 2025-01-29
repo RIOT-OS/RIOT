@@ -13,10 +13,7 @@
  * @file
  * @brief       Typedefs and function definitions for the NFC Data Exchange Format.
  *
- * Typedefs and function definitions for the NFC Data Exchange Format.
- *
  * @author      Nico Behrens <nifrabe@outlook.de>
- *
  */
 
 #ifndef NDEF_H
