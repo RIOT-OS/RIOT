@@ -86,4 +86,5 @@ void enable_t2t(void);
  */
 void disable_t2t(void);
 
-#endif
+/** @} */
+#endif /* NRFX_NFCT_T2T_EMULATOR_H */

@@ -6,18 +6,18 @@
  * details.
  */
 
+#ifndef NDEF_H
+#define NDEF_H
+
 /**
  * @ingroup     sys/net/nfc
  * @{
  *
  * @file
- * @brief       Typedefs and function definitions for the NFC Data Exchange Format.
+ * @brief       Typedefs and function definitions for the NFC Data Exchange Format
  *
  * @author      Nico Behrens <nifrabe@outlook.de>
  */
-
-#ifndef NDEF_H
-#define NDEF_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -211,9 +211,9 @@ size_t ndef_get_size(const ndef_t *ndef);
  * @note This writes the data of the given buffer and
  * shifts the cursor of the NDEF buffer by the length of the data.
  *
- * @param[in,out] ndef 		The NDEF message that gets the data written to its memory
- * @param[in] data 			Data to write
- * @param[in] data_length 	Length of the data
+ * @param[in,out]   ndef 		    The NDEF message that gets the data written to its memory
+ * @param[in]       data 			Data to write
+ * @param[in]       data_length 	Length of the data
  * @retval Pointer to the memory cursor before the write
  * @retval NULL if the data is too long
  */
@@ -258,7 +258,7 @@ size_t ndef_get_size(const ndef_t *message);
 /**
  * @brief Removes the last record from the NDEF message
  *
- * @param message
+ * @param[in,out] message Message to remove the record from
  * @return 0 if successful, error otherwise
  */
 int ndef_remove_record(ndef_t *message);
@@ -266,11 +266,12 @@ int ndef_remove_record(ndef_t *message);
 /**
  * @brief Removes all records from the NDEF message
  *
- * @param message Message to clear
+ * @param[in,out] message Message to clear
  */
 void ndef_clear(ndef_t *message);
 
 #include "net/nfc/ndef/ndef_text_payload.h"
 #include "net/nfc/ndef/ndef_uri_payload.h"
 
+/** }@ */
 #endif

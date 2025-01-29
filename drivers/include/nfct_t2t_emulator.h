@@ -45,4 +45,5 @@ typedef struct {
     void (*uninit)(void);
 } nfct_t2t_emulator_t;
 
+/** @} */
 #endif

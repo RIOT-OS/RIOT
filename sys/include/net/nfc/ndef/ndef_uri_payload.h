@@ -1,5 +1,23 @@
+/*
+ * Copyright (C) 2024 Technische Universität Dresden
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 #ifndef NDEF_URI_PAYLOAD_H
 #define NDEF_URI_PAYLOAD_H
+
+/**
+ * @ingroup     sys/net/nfc
+ * @{
+ *
+ * @file
+ * @brief       Typedefs and function definitions for the NDEF URI payload
+ *
+ * @author      Nico Behrens <nifrabe@outlook.de>
+ */
 
 #include "net/nfc/ndef/ndef.h"
 
@@ -44,4 +62,5 @@ typedef enum {
 
 int ndef_add_uri_record(ndef_t *message, ndef_uri_identifier_code_t identifier_code, const char *uri, uint32_t uri_length);
 
-#endif 
+/** @} */
+#endif
