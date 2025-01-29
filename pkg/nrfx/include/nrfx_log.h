@@ -61,7 +61,7 @@ extern "C" {
  * @param format printf-style format string, optionally followed by arguments
  *               to be formatted and inserted in the resulting string.
  */
-#define NRFX_LOG_ERROR(format, ...) printf(format, ##__VA_ARGS__); puts("");
+#define NRFX_LOG_ERROR(format, ...) LOG_ERROR("[NRFX] ");LOG_ERROR(format, ##__VA_ARGS__);LOG_ERROR("\n");
 
 /**
  * @brief Macro for logging a message with the severity level WARNING.
@@ -69,7 +69,7 @@ extern "C" {
  * @param format printf-style format string, optionally followed by arguments
  *               to be formatted and inserted in the resulting string.
  */
-#define NRFX_LOG_WARNING(format, ...) printf(format, ##__VA_ARGS__); puts("");
+#define NRFX_LOG_WARNING(format, ...) LOG_WARNING("[NRFX] ");LOG_WARNING(format, ##__VA_ARGS__); LOG_WARNING("\n");
 
 /**
  * @brief Macro for logging a message with the severity level INFO.
@@ -77,7 +77,7 @@ extern "C" {
  * @param format printf-style format string, optionally followed by arguments
  *               to be formatted and inserted in the resulting string.
  */
-#define NRFX_LOG_INFO(format, ...) printf(format, ##__VA_ARGS__); puts("");
+#define NRFX_LOG_INFO(format, ...) LOG_INFO("[NRFX] ");LOG_INFO(format, ##__VA_ARGS__);LOG_INFO("\n");
 
 /**
  * @brief Macro for logging a message with the severity level DEBUG.
@@ -85,7 +85,7 @@ extern "C" {
  * @param format printf-style format string, optionally followed by arguments
  *               to be formatted and inserted in the resulting string.
  */
-#define NRFX_LOG_DEBUG(format, ...) printf(format, ##__VA_ARGS__); puts("");
+#define NRFX_LOG_DEBUG(format, ...) LOG_DEBUG("[NRFX] ");LOG_DEBUG(format, ##__VA_ARGS__);LOG_DEBUG("\n");
 
 /**
  * @brief Macro for logging a memory dump with the severity level ERROR.
