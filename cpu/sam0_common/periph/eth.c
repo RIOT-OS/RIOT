@@ -134,7 +134,7 @@ unsigned sam0_read_phy(uint8_t phy, uint8_t addr)
     /* Wait for operation completion */
     while (!(GMAC->NSR.reg & GMAC_NSR_IDLE)) {}
     /* return content of shift register */
-    return (GMAC->MAN.reg & GMAC_MAN_DATA_Msk);
+    return GMAC->MAN.reg & GMAC_MAN_DATA_Msk;
 }
 
 void sam0_write_phy(uint8_t phy, uint8_t addr, uint16_t data)
@@ -158,8 +158,14 @@ void sam0_eth_poweron(void)
 
     /* enable PHY */
     gpio_set(sam_gmac_config[0].rst_pin);
-    _is_sleeping = false;
 
+    /* if the PHY is not idle, it's likely broken */
+    if (!(GMAC->NSR.reg & GMAC_NSR_IDLE)) {
+        DEBUG_PUTS("sam0_eth: PHY not IDLE, likely broken.");
+        return;
+    }
+
+    _is_sleeping = false;
     while (MII_BMCR_RESET & sam0_read_phy(0, MII_BMCR)) {}
 }
 
