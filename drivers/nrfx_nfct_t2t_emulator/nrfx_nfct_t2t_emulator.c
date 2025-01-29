@@ -67,9 +67,9 @@ static void configure_autocolres(uint8_t *nfctid1, uint8_t nfctid1_size)
 static void print_bytes_as_hex(const uint8_t *bytes, uint32_t size)
 {
     for (uint32_t i = 0; i < size; i++) {
-        printf("%02X ", bytes[i]);
+        LOG_DEBUG("%02X ", bytes[i]);
     }
-    printf("\n");
+    LOG_DEBUG("\n");
 }
 
 /**
