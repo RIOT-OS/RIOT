@@ -26,12 +26,13 @@
 #include "objects/device.h"
 #include "objects/security.h"
 #include "objects/light_control.h"
+#include "objects/on_off_switch.h"
 
 #include "credentials.h"
 
 #define LED_COLOR "FFFFFF"
 #define LED_APP_TYPE "LED 0"
-# define OBJ_COUNT (4)
+# define OBJ_COUNT (5)
 
 uint8_t connected = 0;
 lwm2m_object_t *obj_list[OBJ_COUNT];
@@ -67,6 +68,7 @@ void lwm2m_cli_init(void)
     obj_list[1] = lwm2m_client_get_server_object(&client_data, CONFIG_LWM2M_SERVER_SHORT_ID);
     obj_list[2] = lwm2m_object_device_init(&client_data);
     obj_list[3] = lwm2m_object_light_control_init(&client_data);
+    obj_list[4] = lwm2m_object_on_off_switch_init(&client_data);
 
     /* create light control object instance */
     lwm2m_obj_light_control_args_t light_args = {
@@ -81,6 +83,17 @@ void lwm2m_cli_init(void)
     int res = lwm2m_object_light_control_instance_create(&light_args, 0);
     if (res < 0) {
         puts("Error instantiating light control");
+    }
+
+    /* create on/off switch object instance */
+    lwm2m_obj_on_off_switch_args_t switch_args = {
+        .app_type = "Switch 0",
+        .app_type_len = sizeof("Switch 0") - 1
+    };
+
+    res = lwm2m_object_on_off_switch_instance_create(&switch_args, 0);
+    if (res < 0) {
+        puts("Error instantiating on/off switch");
     }
 
     /* create security object instance */
@@ -131,10 +144,17 @@ void lwm2m_cli_init(void)
     }
 }
 
+static void _print_usage_lwm2m_light_cmd(const char *cmd)
+{
+    assert(cmd);
+    printf("usage: %s light <on|off> <dimmer> [color]\n", cmd);
+}
+
 static int _parse_lwm2m_light_cmd(int argc, char **argv)
 {
-    if (argc < 4) {
-        printf("usage: %s light <on|off> <dimmer> [color]\n", argv[0]);
+    if (argc < 4 || argc > 5) {
+        printf("Error: invalid number of arguments\n");
+        _print_usage_lwm2m_light_cmd(argv[0]);
         return 1;
     }
 
@@ -143,7 +163,19 @@ static int _parse_lwm2m_light_cmd(int argc, char **argv)
         return 1;
     }
 
-    bool status = !strcmp(argv[2], "on");
+    bool status;
+    if (!strcmp(argv[2], "on")) {
+        status = true;
+    }
+    else if (!strcmp(argv[2], "off")) {
+        status = false;
+    }
+    else {
+        printf("Error: light status can only be 'on' or 'off'\n");
+        _print_usage_lwm2m_light_cmd(argv[0]);
+        return 1;
+    }
+
     uint8_t dimmer = atoi(argv[3]);
 
     if (argc > 4) {
@@ -155,6 +187,24 @@ static int _parse_lwm2m_light_cmd(int argc, char **argv)
 
     /* call the callback now to actually update the light */
     lwm2m_object_light_control_update_dimmer(0, dimmer, true);
+
+    return 0;
+}
+
+static int _parse_lwm2m_switch_cmd(int argc, char **argv)
+{
+    if (argc != 3) {
+        printf("usage: %s switch <on|off>\n", argv[0]);
+        return 1;
+    }
+
+    if (!connected) {
+        puts("LwM2M client not connected");
+        return 1;
+    }
+
+    bool status = !strcmp(argv[2], "on");
+    lwm2m_object_on_off_switch_update_status(0, status);
 
     return 0;
 }
@@ -182,12 +232,16 @@ int lwm2m_cli_cmd(int argc, char **argv)
         return _parse_lwm2m_light_cmd(argc, argv);
     }
 
+    if (!strcmp(argv[1], "switch")) {
+        return _parse_lwm2m_switch_cmd(argc, argv);
+    }
+
 help_error:
     if (IS_ACTIVE(DEVELHELP)) {
-        printf("usage: %s <start|mem|light>\n", argv[0]);
+        printf("usage: %s <start|mem|light|switch>\n", argv[0]);
     }
     else {
-        printf("usage: %s <start|light>\n", argv[0]);
+        printf("usage: %s <start|light|switch>\n", argv[0]);
     }
 
     return 1;
