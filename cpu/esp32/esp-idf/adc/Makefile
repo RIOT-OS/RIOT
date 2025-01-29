@@ -14,7 +14,11 @@ ifneq (,$(filter esp32c3 esp32s2,$(CPU_FAM)))
 endif
 
 ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
-  ESP32_SDK_SRC += components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c
+  ESP32_SDK_SRC += components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c \
+									 components/driver/gdma.c \
+									 components/soc/$(CPU_FAM)/gdma_periph.c \
+									 components/hal/gdma_hal.c \
+	#
 endif
 
 ifneq (,$(filter esp32s2,$(CPU_FAM)))
