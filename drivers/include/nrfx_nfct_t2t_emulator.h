@@ -10,7 +10,7 @@
 #define NRFX_NFCT_T2T_EMULATOR_H
 
 /**
- * @defgroup    drivers_nrfx_t2t_emulator NRFX NFCT T2T Emulator
+ * @defgroup    drivers_nrfx_nfct_t2t_emulator NRFX NFCT T2T Emulator
  * @ingroup     drivers_netdev
  * @{
  *
@@ -32,17 +32,26 @@
 #include "nrfx_nfct.h"
 #include "net/nfc/t2t/t2t.h"
 
+/**
+ * @brief Contains the size of the received data
+ */
 typedef struct {
     event_t super;
     uint32_t size;
 } nrfx_t2t_receive_event_t;
 
+/**
+ * @brief Contains the size of the transmitted data
+ */
 typedef struct {
     event_t super;
     uint32_t size;
 } nrfx_t2t_transmit_event_t;
 
 #ifndef DEFAULT_T2T_EMULATOR_DEV
+/**
+ * @brief Contains the default emulator struct for this module.
+ */
 #  define DEFAULT_T2T_EMULATOR_DEV   \
       (nfct_t2t_emulator_t)          \
       {                              \
@@ -81,7 +90,7 @@ void enable_t2t(void);
 
 /**
  * @brief Disables the Type 2 Tag emulator
- * 
+ *
  * @note The emulator has to be enabled.
  */
 void disable_t2t(void);

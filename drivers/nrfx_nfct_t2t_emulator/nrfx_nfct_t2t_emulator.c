@@ -32,14 +32,38 @@ static ztimer_now_t last_read = 0;
 
 #define BUFFER_SIZE 256
 
+/**
+ * @brief pointer to the tag
+ */
 static nfc_t2t_t *tag;
+
+/**
+ * @brief event queue managed by the event thread
+ */
 static event_queue_t event_queue;
 
 static char thread_stack[THREAD_STACKSIZE_MAIN];
+
+/**
+ * @brief PID of the thread that handles the events
+ */
 static uint16_t thread_pid = 0;
 
+/**
+ * @brief driver state
+ */
 static bool initialized = false;
+
+/**
+ * @brief driver state
+ */
 static bool enabled = false;
+
+/**
+ * @brief driver state
+ * 
+ * @note Is set to true after a succesful autocollision resolution
+ */
 static bool selected = false;
 
 static uint8_t data_buffer_rx[BUFFER_SIZE];
