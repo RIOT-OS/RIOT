@@ -15,7 +15,6 @@
  * @}
  */
 
-#include "fido2/ctap/ctap.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -26,6 +25,7 @@
 #include "string_utils.h"
 #include "ztimer.h"
 
+#include "fido2/ctap/ctap.h"
 #include "fido2/ctap/transport/ctap_transport.h"
 #include "fido2/ctap.h"
 #include "fido2/ctap/ctap_utils.h"
@@ -36,7 +36,7 @@
 #include "fido2/ctap/transport/hid/ctap_hid.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -425,6 +425,7 @@ static uint32_t get_id(void)
 
 static int _reset(void)
 {
+    // If CTAP is initialized (marker is set), erase existing FIDO2 data from flash
     if (_state.initialized_marker == CTAP_INITIALIZED_MARKER) {
         int ret = fido2_ctap_mem_erase_flash(&_state);
 

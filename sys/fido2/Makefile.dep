@@ -5,6 +5,7 @@ ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
       USEMODULE += ztimer64_msec
       USEMODULE += usbus_hid
       DISABLE_MODULE += auto_init_usbus
+      FEATURES_REQUIRED += periph_flashpage_aux
   endif
 endif
 
