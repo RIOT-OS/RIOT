@@ -21,6 +21,8 @@ QUIET ?= 1
 
 # Modules to include:
 USEMODULE += shell
+USEMODULE += shell_cmd_cat
+USEMODULE += shell_cmd_tee
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 
