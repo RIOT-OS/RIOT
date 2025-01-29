@@ -27,8 +27,7 @@
 #include "event.h"
 
 #ifdef NRFX_NFCT_T2T_EMULATOR_TIMING
-ztimer_now_t start;
-ztimer_now_t end;
+static ztimer_now_t last_read = 0;
 #endif
 
 #define BUFFER_SIZE 256
@@ -171,13 +170,11 @@ static void *nrfx_event_loop(void *arg)
 static void process_read_command(uint8_t block_no)
 {
 #ifdef NRFX_NFCT_T2T_EMULATOR_TIMING
-    if (block_no == 0) {
-        start = ztimer_now(ZTIMER_MSEC);
+    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
+    if (last_read != 0) {
+        printf("Time between this and last read: %" PRIu32 " ms\n", now - last_read);
     }
-    else if (block_no == 1) {
-        end = ztimer_now(ZTIMER_MSEC);
-        printf("Time between two read commands: %" PRIu32 "\n", end - start);
-    }
+    last_read = now;
 #endif
     t2t_handle_read(tag, block_no, data_buffer_tx);
 
