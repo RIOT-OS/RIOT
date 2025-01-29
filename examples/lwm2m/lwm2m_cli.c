@@ -164,17 +164,17 @@ static int _parse_lwm2m_light_cmd(int argc, char **argv)
     }
 
     bool status;
-     if (!strcmp(argv[2], "on")) {
+    if (!strcmp(argv[2], "on")) {
         status = true;
-     }
-     else if (!strcmp(argv[2], "off")) {
+    }
+    else if (!strcmp(argv[2], "off")) {
         status = false;
-     }
-     else {
+    }
+    else {
         printf("Error: light status can only be 'on' or 'off'\n");
         _print_usage_lwm2m_light_cmd(argv[0]);
         return 1;
-     }
+    }
 
     uint8_t dimmer = atoi(argv[3]);
 
