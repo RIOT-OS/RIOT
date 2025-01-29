@@ -26,6 +26,11 @@
 #include "net/nfc/t2t/t2t.h"
 #include "event.h"
 
+#ifdef NRFX_NFCT_T2T_EMULATOR_TIMING
+ztimer_now_t start;
+ztimer_now_t end;
+#endif
+
 #define BUFFER_SIZE 256
 
 static nfc_t2t_t *tag;
@@ -165,6 +170,15 @@ static void *nrfx_event_loop(void *arg)
  */
 static void process_read_command(uint8_t block_no)
 {
+#ifdef NRFX_NFCT_T2T_EMULATOR_TIMING
+    if (block_no == 0) {
+        start = ztimer_now(ZTIMER_MSEC);
+    }
+    else if (block_no == 1) {
+        end = ztimer_now(ZTIMER_MSEC);
+        printf("Time between two read commands: %" PRIu32 "\n", end - start);
+    }
+#endif
     t2t_handle_read(tag, block_no, data_buffer_tx);
 
     /* Set up the data descriptor for the response */
