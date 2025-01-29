@@ -144,10 +144,17 @@ void lwm2m_cli_init(void)
     }
 }
 
+static void _print_usage_lwm2m_light_cmd(const char *cmd)
+{
+    assert(cmd);
+    printf("usage: %s light <on|off> <dimmer> [color]\n", cmd);
+}
+
 static int _parse_lwm2m_light_cmd(int argc, char **argv)
 {
-    if (argc < 4) {
-        printf("usage: %s light <on|off> <dimmer> [color]\n", argv[0]);
+    if (argc < 4 || argc > 5) {
+        printf("Error: invalid number of arguments\n");
+        _print_usage_lwm2m_light_cmd(argv[0]);
         return 1;
     }
 
@@ -156,7 +163,19 @@ static int _parse_lwm2m_light_cmd(int argc, char **argv)
         return 1;
     }
 
-    bool status = !strcmp(argv[2], "on");
+    bool status;
+     if (!strcmp(argv[2], "on")) {
+        status = true;
+     }
+     else if (!strcmp(argv[2], "off")) {
+        status = false;
+     }
+     else {
+        printf("Error: light status can only be 'on' or 'off'\n");
+        _print_usage_lwm2m_light_cmd(argv[0]);
+        return 1;
+     }
+
     uint8_t dimmer = atoi(argv[3]);
 
     if (argc > 4) {
