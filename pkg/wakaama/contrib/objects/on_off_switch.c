@@ -24,7 +24,7 @@
 #include "ztimer.h"
 #include "ztimer/stopwatch.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define _USED_INSTANCES(_obj) (_obj.wakaama_object.instanceList)
@@ -376,7 +376,6 @@ static void _mark_resource_changed(uint16_t instance_id, uint16_t resource_id)
     assert(client_data);
     lwm2m_resource_value_changed(client_data->lwm2m_ctx, &uri);
 }
-
 
 lwm2m_object_t *lwm2m_object_on_off_switch_init(lwm2m_client_data_t *client_data)
 {
