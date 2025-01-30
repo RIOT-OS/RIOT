@@ -38,6 +38,7 @@
 #include "net/netif.h"         /* for resolving ipv6 scope */
 #endif /* SOCK_HAS_IPV6 */
 
+#include "shell.h"
 #include "thread.h"
 
 #define SERVER_MSG_QUEUE_SIZE   (8)
@@ -163,7 +164,7 @@ static int udp_start_server(char *port_str)
     return 0;
 }
 
-int udp_cmd(int argc, char **argv)
+static int _udp_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         printf("usage: %s [send|server]\n", argv[0]);
@@ -208,5 +209,7 @@ int udp_cmd(int argc, char **argv)
         return 1;
     }
 }
+
+SHELL_COMMAND(udp, "send data over UDP and listen on UDP ports", _udp_cmd);
 
 /** @} */

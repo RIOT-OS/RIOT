@@ -28,6 +28,7 @@
 #include "net/credman.h"
 #include "net/sock/util.h"
 #include "net/utils.h"
+#include "shell.h"
 
 #include "dtls_client_credentials.h"
 
@@ -235,7 +236,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     return 0;
 }
 
-int dtls_client_cmd(int argc, char **argv)
+static int _client_cmd(int argc, char **argv)
 {
     if (argc != 3) {
         printf("usage %s <addr> <data>\n", argv[0]);
@@ -252,3 +253,5 @@ int dtls_client_cmd(int argc, char **argv)
 
     return client_send(argv[1], argv[2], strlen(argv[2]));
 }
+
+SHELL_COMMAND(dtlsc, "Start a DTLS client", _client_cmd);

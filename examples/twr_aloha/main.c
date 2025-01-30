@@ -23,21 +23,12 @@
 
 #include "control.h"
 
-extern int _twr_handler(int argc, char **argv);
-extern int _twr_ifconfig(int argc, char **argv);
-
-static const shell_command_t shell_commands[] = {
-    { "twr", "Two-way-ranging (TWR) cli", _twr_handler },
-    { "ifconfig", "Network interface information", _twr_ifconfig},
-    { NULL, NULL, NULL }
-};
-
 int main(void)
 {
     /* this should start ranging... */
     uwb_core_rng_init();
     /* define buffer to be used by the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 1;
 }

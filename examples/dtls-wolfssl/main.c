@@ -44,16 +44,8 @@ static int wolftest(int argc, char **argv)
     wolfcrypt_test(NULL);
     return 0;
 }
+SHELL_COMMAND(wolftest, "Perform wolfcrypt porting test", wolftest);
 #endif
-
-static const shell_command_t shell_commands[] = {
-    { "dtlsc", "Start a DTLS client", dtls_client },
-    { "dtlss", "Start and stop a DTLS server", dtls_server },
-#ifdef MODULE_WOLFCRYPT_TEST
-    { "wolftest", "Perform wolfcrypt porting test", wolftest },
-#endif
-    { NULL, NULL, NULL }
-};
 
 int main(void)
 {
@@ -67,7 +59,7 @@ int main(void)
     /* start shell */
     LOG(LOG_INFO, "All up, running the shell now\n");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should be never reached */
     return 0;

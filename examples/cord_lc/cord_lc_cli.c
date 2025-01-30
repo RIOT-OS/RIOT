@@ -26,6 +26,7 @@
 #include "net/gnrc/netif.h"
 #include "net/gcoap.h"
 #include "net/sock/util.h"
+#include "shell.h"
 
 static cord_lc_rd_t rd;
 static sock_udp_ep_t remote;
@@ -91,7 +92,7 @@ static void _print_usage(void) {
          "example: cord_lc [2001:db8:3::dead:beef]:5683 endpoint");
 }
 
-int cord_lc_cli_cmd(int argc, char **argv) {
+static int _cli_cmd(int argc, char **argv) {
     char bufpool[1024] = {0};
     int raw_mode = 0;
 
@@ -175,3 +176,5 @@ int cord_lc_cli_cmd(int argc, char **argv) {
     }
     return 0;
 }
+
+SHELL_COMMAND(cord_lc, "Cord LC example", _cli_cmd);

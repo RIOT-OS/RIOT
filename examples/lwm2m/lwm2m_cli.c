@@ -22,6 +22,8 @@
 #include "lwm2m_client_objects.h"
 #include "lwm2m_platform.h"
 
+#include "shell.h"
+
 #include "objects/common.h"
 #include "objects/device.h"
 #include "objects/security.h"
@@ -159,7 +161,7 @@ static int _parse_lwm2m_light_cmd(int argc, char **argv)
     return 0;
 }
 
-int lwm2m_cli_cmd(int argc, char **argv)
+static int _cli_cmd(int argc, char **argv)
 {
     if (argc == 1) {
         goto help_error;
@@ -192,3 +194,5 @@ help_error:
 
     return 1;
 }
+
+SHELL_COMMAND(lwm2m, "Start LwM2M client", _cli_cmd);

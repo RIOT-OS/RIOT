@@ -28,6 +28,7 @@
 
 #include "net/sock/udp.h"
 #include "msg.h"
+#include "shell.h"
 #include "timex.h"
 #include "tinydtls_keys.h"
 
@@ -419,7 +420,7 @@ static void stop_server(void)
     puts("Success: DTLS server stopped");
 }
 
-int udp_server_cmd(int argc, char **argv)
+static int _server_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         printf("usage: %s start|stop\n", argv[0]);
@@ -436,3 +437,5 @@ int udp_server_cmd(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(dtlss, "Start and stop a DTLS server", _server_cmd);

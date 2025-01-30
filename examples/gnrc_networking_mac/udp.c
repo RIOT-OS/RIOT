@@ -28,6 +28,7 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
+#include "shell.h"
 #include "timex.h"
 #include "utlist.h"
 #include "xtimer.h"
@@ -149,7 +150,7 @@ static void stop_server(void)
     puts("Success: stopped UDP server");
 }
 
-int udp_cmd(int argc, char **argv)
+static int _udp_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         printf("usage: %s [send|server]\n", argv[0]);
@@ -196,3 +197,5 @@ int udp_cmd(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(udp, "send data over UDP and listen on UDP ports", _udp_cmd);

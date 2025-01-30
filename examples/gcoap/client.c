@@ -31,6 +31,7 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "od.h"
+#include "shell.h"
 #include "uri_parser.h"
 
 #include "gcoap_example.h"
@@ -229,7 +230,7 @@ static int _uristr2remote(const char *uri, sock_udp_ep_t *remote, const char **p
     return 0;
 }
 
-int gcoap_cli_cmd(int argc, char **argv)
+static int _cli_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     char *method_codes[] = {"ping", "get", "post", "put"};
@@ -397,3 +398,5 @@ int gcoap_cli_cmd(int argc, char **argv)
 help:
     return _print_usage(argv);
 }
+
+SHELL_COMMAND(coap, "CoAP example", _cli_cmd);

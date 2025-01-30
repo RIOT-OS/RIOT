@@ -25,6 +25,7 @@
 #include "net/sock/util.h"
 #include "net/credman.h"
 #include "msg.h"
+#include "shell.h"
 #include "thread.h"
 #include "timex.h"
 
@@ -283,7 +284,7 @@ void _print_usage(const char *cmd)
     }
 }
 
-int dtls_server_cmd(int argc, char **argv)
+static int _server_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         _print_usage(argv[0]);
@@ -326,3 +327,5 @@ int dtls_server_cmd(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(dtlss, "Start and stop a DTLS server", _server_cmd);

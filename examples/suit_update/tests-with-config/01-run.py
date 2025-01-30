@@ -172,7 +172,7 @@ def seq_no(child):
 def running_slot(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
 
-    child.sendline("current-slot")
+    child.sendline("current_slot")
     child.expect(r"Running from slot (\d+)\r\n")
     slot = int(child.match.group(1))
     return slot
