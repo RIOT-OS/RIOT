@@ -263,7 +263,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
         len = (pos + topic_len + 2);
         tbuf[pos++] = WILLTOPIC;
         tbuf[pos++] = will_flags;
-        memcpy(&tbuf[pos], will_topic, strlen(will_topic));
+        memcpy(&tbuf[pos], will_topic, topic_len);
 
         res = syncsend(WILLMSGREQ, len, false);
         if (res != EMCUTE_OK) {
@@ -381,19 +381,33 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (strlen(sub->topic.name) > CONFIG_EMCUTE_TOPIC_MAXLEN) {
+    if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_NORMAL) {
+        topic_len=strlen(sub->topic.name);
+    }
+    else if((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_PREDEF) {
+        topic_len=2;
+    }
+    else {
+        return EMCUTE_NOTSUP;
+    }
+    if (topic_len > CONFIG_EMCUTE_TOPIC_MAXLEN) {
         return EMCUTE_OVERFLOW;
     }
 
     mutex_lock(&txlock);
 
-    tbuf[0] = (strlen(sub->topic.name) + 5);
+    tbuf[0] = (uint8_t)(5 + topic_len);
     tbuf[1] = SUBSCRIBE;
-    tbuf[2] = flags;
+    tbuf[2] = flags;  
     byteorder_htobebufs(&tbuf[3], id_next);
     waitonid = id_next++;
-    memcpy(&tbuf[5], sub->topic.name, strlen(sub->topic.name));
-
+    if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_NORMAL) {
+        memcpy(&tbuf[5], sub->topic.name, topic_len);
+    }
+    if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_PREDEF) {
+        byteorder_htobebufs(&tbuf[5], sub->topic.id);
+    }
+  
     int res = syncsend(SUBACK, (size_t)tbuf[0], false);
     if (res > 0) {
         DEBUG("[emcute] sub: success, topic id is %i\n", res);
