@@ -113,6 +113,7 @@ int main(void)
         LED1_ON;
         ztimer_sleep(ZTIMER_SEC, 5);
         test_utils_print_stack_usage();
+        t2t_dump_tag_memory(&tag);
 
         /*Stop tag emulation*/
         nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);

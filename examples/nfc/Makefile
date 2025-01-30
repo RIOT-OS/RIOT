@@ -1,7 +1,6 @@
 APPLICATION = NFC_SAMPLE
 BOARD ?= nrf52840dk
 RIOTBASE ?= $(CURDIR)/../..
-LTO=1
 
 USEMODULE += nfc_nfct
 USEMODULE += ztimer_sec
@@ -21,7 +20,7 @@ CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=1024*2
 CFLAGS += -Wno-error=cast-align
 CFLAGS += -Wno-error=unused-variable
 CFLAGS += -DLOG_LEVEL=LOG_DEBUG
-CFLAGS += -DNRFX_NFCT_T2T_EMULATOR_TIMING=1
+CFLAGS += -DNRFX_NFCT_T2T_EMULATOR_TIMING
 
 
 include $(RIOTBASE)/Makefile.include

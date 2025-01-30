@@ -193,13 +193,6 @@ static void *nrfx_event_loop(void *arg)
  */
 static void process_read_command(uint8_t block_no)
 {
-#ifdef NRFX_NFCT_T2T_EMULATOR_TIMING
-    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
-    if (last_read != 0) {
-        printf("Time between this and last read: %" PRIu32 " ms\n", now - last_read);
-    }
-    last_read = now;
-#endif
     t2t_handle_read(tag, block_no, data_buffer_tx);
 
     /* Set up the data descriptor for the response */
@@ -211,6 +204,14 @@ static void process_read_command(uint8_t block_no)
     /* Transmit the response */
     nrfx_err_t error = nrfx_nfct_tx(&data_desc_tx, NRF_NFCT_FRAME_DELAY_MODE_WINDOWGRID);
     assert(error == NRFX_SUCCESS);
+
+#ifdef NRFX_NFCT_T2T_EMULATOR_TIMING
+    ztimer_now_t now = ztimer_now(ZTIMER_MSEC);
+    if (last_read != 0) {
+        printf("Time between this and last read: %" PRIu32 " ms\n", now - last_read);
+    }
+    last_read = now;
+#endif
 }
 
 /**
@@ -403,16 +404,28 @@ static void irq_event_handler(const nrfx_nfct_evt_t *event)
         LOG_DEBUG("Received frame of size %lu\n", event->params.rx_frameend.rx_data.data_size);
         receive_event.super.handler = receive_handler;
         receive_event.size = event->params.rx_frameend.rx_data.data_size;
+        if (event_is_queued(&event_queue, (event_t *)&receive_event)) {
+            LOG_WARNING("Event already in queue\n");
+            return;
+        }
         event_post(&event_queue, (event_t *)&receive_event);
     }
     else if (event->evt_id == NRFX_NFCT_EVT_TX_FRAMEEND) {
         LOG_DEBUG("End of transmission\n");
         end_of_transmission_event.handler = end_of_tx_handler;
+        if (event_is_queued(&event_queue, &end_of_transmission_event)) {
+            LOG_WARNING("Event already in queue\n");
+            return;
+        }
         event_post(&event_queue, &end_of_transmission_event);
     }
     else if (event->evt_id == NRFX_NFCT_EVT_SELECTED) {
         LOG_DEBUG("Field has been selected\n");
         select_event.handler = select_handler;
+        if (event_is_queued(&event_queue, &select_event)) {
+            LOG_WARNING("Event already in queue\n");
+            return;
+        }
         event_post(&event_queue, &select_event);
     }
     else if (event->evt_id == NRFX_NFCT_EVT_TX_FRAMESTART) {
@@ -420,6 +433,10 @@ static void irq_event_handler(const nrfx_nfct_evt_t *event)
     }
     else if (event->evt_id == NRFX_NFCT_EVT_RX_FRAMESTART) {
         start_of_rx_event.handler = start_of_rx_handler;
+        if (event_is_queued(&event_queue, &start_of_rx_event)) {
+            LOG_WARNING("Event already in queue\n");
+            return;
+        }
         event_post(&event_queue, &start_of_rx_event);
     }
     else if (event->evt_id == NRFX_NFCT_EVT_ERROR) {
@@ -433,6 +450,10 @@ static void irq_event_handler(const nrfx_nfct_evt_t *event)
     else if (event->evt_id == NRFX_NFCT_EVT_FIELD_DETECTED) {
         LOG_DEBUG("Field detected\n");
         field_detected_event.handler = field_detected_handler;
+        if (event_is_queued(&event_queue, &field_detected_event)) {
+            LOG_WARNING("Event already in queue\n");
+            return;
+        }
         event_post(&event_queue, &field_detected_event);
     }
     else if (event->evt_id == NRFX_NFCT_EVT_FIELD_LOST) {
