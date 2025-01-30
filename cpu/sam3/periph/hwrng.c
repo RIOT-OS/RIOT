@@ -39,9 +39,9 @@ void hwrng_read(void *buf, unsigned int num)
     uint8_t *b = (uint8_t *)buf;
 
     /* enable clock signal for TRNG module */
-    PMC->PMC_PCER1 |= PMC_PCER1_PID41;
+    PMC->PMC_PCER1 = PMC_PCER1_PID41;
     /* enable the generation of random numbers */
-    TRNG->TRNG_CR |= (KEY | TRNG_CR_ENABLE);
+    TRNG->TRNG_CR = (KEY | TRNG_CR_ENABLE);
 
     while (count < num) {
         /* wait until new value is generated -> takes up to 84 cycles */
@@ -56,7 +56,7 @@ void hwrng_read(void *buf, unsigned int num)
     }
 
     /* disable the generation of random numbers */
-    TRNG->TRNG_CR &= ~(KEY | TRNG_CR_ENABLE);
+    TRNG->TRNG_CR = KEY;
     /* disable clock signal for TRNG module */
-    PMC->PMC_PCER1 &= ~(PMC_PCER1_PID41);
+    PMC->PMC_PCDR1 = PMC_PCER1_PID41;
 }
