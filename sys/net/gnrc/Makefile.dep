@@ -78,6 +78,12 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter gnrc_dns_default,$(USEMODULE)))
+	USEMODULE += gnrc_ipv6_nib_dns
+	USEMODULE += sock_dns
+	USEMODULE += dns_cache
+endif
+
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
