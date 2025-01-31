@@ -198,14 +198,6 @@ typedef struct {
 void ndef_pretty_print(const ndef_t *ndef);
 
 /**
- * @brief Get the NDEF message size
- *
- * @param[in] ndef NDEF messgae
- * @return size_t
- */
-size_t ndef_get_size(const ndef_t *ndef);
-
-/**
  * @brief Writes the data buffer to the given NDEF message.
  *
  * @note This writes the data of the given buffer and
@@ -246,6 +238,16 @@ void ndef_init(ndef_t *message, uint8_t *buffer, uint32_t buffer_size);
  * @return 			error otherwise
  */
 int ndef_add_record(ndef_t *message, const uint8_t *type, uint8_t type_length, const uint8_t *id, uint8_t id_length, const uint8_t *payload, uint32_t payload_length, ndef_record_tnf_t tnf);
+
+/**
+ * @brief Calculates the expected size of an NDEF record
+ * 
+ * @param[in] type_length       Length of type field
+ * @param[in] id_length         Length of ID field
+ * @param[in] payload_length    Length of payload field
+ * @return size_t Size of the record
+ */
+size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32_t payload_length);
 
 /**
  * @brief Returns the size of the NDEF message

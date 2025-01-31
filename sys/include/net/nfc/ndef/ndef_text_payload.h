@@ -27,16 +27,11 @@ typedef enum {
     UTF16 = 1
 } ndef_text_encoding_t;
 
-typedef struct {
-    uint8_t *start;
-
-    uint8_t *status_byte;
-    uint8_t *language_code;
-    uint8_t *text;
-} ndef_record_text_payload_desc_t;
-
 int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length,
-                         const char *lang_code, uint8_t lang_code_length, ndef_text_encoding_t encoding);
+                         const char *lang_code, uint8_t lang_code_length,
+                         ndef_text_encoding_t encoding);
+
+size_t ndef_calculate_text_record_size(uint32_t text_length, uint8_t lang_code_length);
 
 /** @} */
 #endif

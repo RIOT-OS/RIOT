@@ -5,20 +5,22 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#define ENCODING_POSITION 7
-#define ENCODING_MASK (1 << ENCODING_POSITION)
+#define ENCODING_POSITION            7
+#define ENCODING_MASK                (1 << ENCODING_POSITION)
 
-#define STATUS_SIZE 1
+#define STATUS_SIZE                  1
 
 #define LENGTH_OF_LANG_CODE_POSITION 0
-#define LENGTH_OF_LANG_CODE_MASK 0x3F // 0011 1111
+#define LENGTH_OF_LANG_CODE_MASK     0x3F // 0011 1111
 
-#define MAXIMUM_LANG_CODE_LENGTH LENGTH_OF_LANG_CODE_MASK
+#define MAXIMUM_LANG_CODE_LENGTH     LENGTH_OF_LANG_CODE_MASK
 
-uint8_t const ndef_text_record_type[] = {'T'};
+const uint8_t ndef_text_record_type[] = { 'T' };
 
-int ndef_add_text_record(ndef_t *message, char const *text, uint32_t text_length, 
-char const *lang_code, uint8_t lang_code_length, ndef_text_encoding_t encoding) {
+int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length,
+                         const char *lang_code,
+                         uint8_t lang_code_length, ndef_text_encoding_t encoding)
+{
     uint32_t payload_length = STATUS_SIZE + lang_code_length + text_length;
     assert(payload_length <= 65535);
 
@@ -32,7 +34,6 @@ char const *lang_code, uint8_t lang_code_length, ndef_text_encoding_t encoding) 
     // S-LL LLLL
     status_byte |= (lang_code_length << LENGTH_OF_LANG_CODE_POSITION);
     status_byte |= encoding << ENCODING_POSITION;
-    
 
     /*
     bool mb;
@@ -52,13 +53,26 @@ char const *lang_code, uint8_t lang_code_length, ndef_text_encoding_t encoding) 
 
     /* the payload will be written later */
     ndef_add_record(message, ndef_text_record_type, sizeof(ndef_text_record_type), NULL, 0, NULL,
-    payload_length, TNF_WELL_KNOWN);
+                    payload_length, TNF_WELL_KNOWN);
 
     ndef_write_to_buffer(message, &status_byte, 1);
-    ndef_write_to_buffer(message, (uint8_t*) lang_code, lang_code_length);
-    ndef_write_to_buffer(message, (uint8_t*) text, text_length);
+    ndef_write_to_buffer(message, (uint8_t *)lang_code, lang_code_length);
+    ndef_write_to_buffer(message, (uint8_t *)text, text_length);
 
     return 0;
+}
+
+/**
+ * @brief Calculates the size of an NDEF text record
+ * 
+ * @param text_length       Length of the text
+ * @param lang_code_length  Length of the language code
+ * @return size_t Size of the text record
+ */
+size_t ndef_calculate_text_record_size(uint32_t text_length, uint8_t lang_code_length)
+{
+    size_t payload_size = STATUS_SIZE + lang_code_length + text_length;
+    return ndef_calculate_record_size(sizeof(ndef_text_record_type), 0, payload_size);
 }
 
 /*

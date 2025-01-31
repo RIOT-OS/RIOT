@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <assert.h>
 
 static void print_ndef_as_hex(const ndef_t *message)
 {
@@ -74,12 +75,24 @@ static bool test_ndef_remove(void)
     return true;
 }
 
+static bool test_ndef_calculate_size(void)
+{
+    puts("NDEF calculate size test");
+    uint8_t buffer[1024];
+    ndef_t message;
+    ndef_init(&message, buffer, 1024);
+    ndef_add_text_record(&message, "Hello World", 11, "en", 2, UTF8);
+    assert(message.buffer.cursor == ndef_calculate_text_record_size(11, 2));
+    return true;
+}
+
 int main(void)
 {
     puts("Starting NDEF test");
     test_ndef_text_record();
     test_ndef_uri_record();
     test_two_ndef_records();
+    test_ndef_calculate_size();
     test_ndef_remove();
     puts("Ending NDEF test");
     return 0;

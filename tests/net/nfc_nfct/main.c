@@ -39,7 +39,7 @@ static bool test_convenience_functions(void)
     nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
 
     nfct_start_type_2_tag_with_uri(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, NDEF_URI_HTTPS_WWW, "riot-os.org");
-    test_utils_print_stack_usage();
+    // test_utils_print_stack_usage();
     /* sleep for 10 seconds, then disable the tag */
     ztimer_sleep(ZTIMER_SEC, 10);
     nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
