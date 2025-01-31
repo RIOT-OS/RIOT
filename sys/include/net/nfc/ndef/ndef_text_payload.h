@@ -22,15 +22,38 @@
 #include <stdint.h>
 #include "net/nfc/ndef/ndef.h"
 
+/**
+ * @brief NDEF text encoding
+ */
 typedef enum {
     UTF8 = 0,
     UTF16 = 1
 } ndef_text_encoding_t;
 
+/**
+ * @brief Adds an NDEF text record to the NDEF message
+ * 
+ * @note The text record is added to the end of the NDEF message.
+ * 
+ * @param[in,out]   message             NDEF message
+ * @param[in]       text                Text to add
+ * @param[in]       text_length         Length of the text
+ * @param[in]       lang_code           Language code
+ * @param[in]       lang_code_length    Length of the language code
+ * @param[in]       encoding            Encoding of the text
+ * @return int 
+ */
 int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length,
                          const char *lang_code, uint8_t lang_code_length,
                          ndef_text_encoding_t encoding);
 
+/**
+ * @brief Calculates the size of an NDEF text record
+ * 
+ * @param[in] text_length       Length of the text
+ * @param[in] lang_code_length  Length of the language code
+ * @return size_t Size of the text record
+ */
 size_t ndef_calculate_text_record_size(uint32_t text_length, uint8_t lang_code_length);
 
 /** @} */
