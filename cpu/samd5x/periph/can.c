@@ -20,9 +20,10 @@
 #include <assert.h>
 #include <string.h>
 
+#include "can/device.h"
 #include "periph/can.h"
 #include "periph/gpio.h"
-#include "can/device.h"
+#include "pm_layered.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -107,6 +108,30 @@ static const struct can_bittiming_const bittiming_const = {
 
 static int _power_on(can_t *dev)
 {
+    /* CAN required CLK_CANx_APB and GCLK_CANx to be running and will not
+     * request any clock by itself. We can ensure both clocks to be running
+     * by preventing the MCU from entering IDLE state.
+     *
+     * The SAMD5x/SAME5x Family Data Sheet says in Section
+     * "39.6.9 Sleep Mode Operation" says:
+     *
+     * > The CAN can be configured to operate in any idle sleep mode. The CAN
+     * > cannot operate in Standby sleep mode.
+     * >
+     * > [...]
+     * >
+     * > To leave low power mode, CLK_CANx_APB and GCLK_CANx must be active
+     * > before writing CCCR.CSR to '0'. The CAN will acknowledge this by
+     * > resetting CCCR.CSA = 0. Afterwards, the application can restart CAN
+     * > communication by resetting bit CCCR.INIT.
+     *
+     * tl;dr: At most SAM0_PM_IDLE is allowed while not shutting down the CAN
+     * controller, but even that will pause communication (including RX).
+     */
+    if (IS_USED(MODULE_PM_LAYERED)) {
+        pm_block(SAM0_PM_IDLE);
+    }
+
     if (dev->conf->can == CAN0) {
         DEBUG_PUTS("CAN0 controller is used");
         MCLK->AHBMASK.reg |= MCLK_AHBMASK_CAN0;
@@ -125,6 +150,10 @@ static int _power_on(can_t *dev)
 
 static int _power_off(can_t *dev)
 {
+    if (IS_USED(MODULE_PM_LAYERED)) {
+        pm_unblock(SAM0_PM_IDLE);
+    }
+
     if (dev->conf->can == CAN0) {
         DEBUG_PUTS("CAN0 controller is used");
         MCLK->AHBMASK.reg &= ~MCLK_AHBMASK_CAN0;
