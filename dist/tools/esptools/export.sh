@@ -147,7 +147,7 @@ if [ -z "$1" ]; then
     echo "Usage: export.sh <tool>"
     echo "       export.sh gdb <platform>"
     echo "       export.sh qemu <platform>"
-    echo "<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
+    echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
     ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
