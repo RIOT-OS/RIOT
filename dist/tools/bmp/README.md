@@ -51,13 +51,21 @@ The probe is auto discovered based on the USB VID (0x1D50) and PID (0x6018,
 `--serial` is provided.
 
 If `--port` is provided, then that port will be used as the GDB port for all
-actions, except for the `term` action.
+actions, except for the `term` action. `--port` also accepts values such as
+network addresses.
 
 ## Supported firmwares
-This tool assumes firmware version 1.10 of the Black Magic debugger.
+There are minor differences in the available firmwares of the Black Magic
+debugger. Compatibility has been tested with version 1.8+.
 
-Compatibility for older versions is limited, but can be selected by providing
-`--bmp-version x.y.z`.
+This tool will try to determine which version of the firmware is installed,
+unless the probe is accessed remotely (e.g. `--port` is a network address). If
+the firmware version cannot be determined, it will assume version 1.10.2. This
+can be overridden using the `--bmp-version` flag.
+
+As of firmware version 2.0.0 of the Black Magic debugger, support for targets
+depend on the 'flavor' of firmware selected. This tool will indicate if that
+is the case.
 
 ## Examples (tested with BluePill STM32F103F8C6)
 * test connection:
