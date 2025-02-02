@@ -266,12 +266,14 @@ static void _send_ack(void *arg)
     uint8_t ack[3];
     zep_v2_data_hdr_t hdr;
 
+    /* sending ACK should only happen if we received a frame */
     assert(zepdev->state == ZEPDEV_STATE_RX_RECV);
+    /* ACK request bit should be set if we get here */
     assert((rxbuf[0] & IEEE802154_FCF_ACK_REQ) != 0);
 
     DEBUG("socket_zep::send_ack: seq_no: %u\n", rxbuf[2]);
 
-    _zep_hdr_fill(zepdev, &hdr.hdr, sizeof(ack) + 2);
+    _zep_hdr_fill(zepdev, &hdr.hdr, sizeof(ack) + IEEE802154_FCF_LEN);
 
     ack[0] = IEEE802154_FCF_TYPE_ACK; /* FCF */
     ack[1] = 0; /* FCF */
@@ -581,12 +583,12 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
                  ieee802154_rx_info_t *info)
 {
     socket_zep_t *zepdev = dev->priv;
-    int res = 0;
+    size_t res;
 
     DEBUG("socket_zep::read: reading up to %zu bytes into %p\n", max_size, buf);
 
     if (buf == NULL || zepdev->rcv_len == 0) {
-        goto out;
+        return 0;
     }
 
     DEBUG("socket_zep::read: %zu/%zu bytes into %p\n",
@@ -594,8 +596,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
 
     if (max_size != zepdev->rcv_len - sizeof(zep_v2_data_hdr_t) - IEEE802154_FCS_LEN) {
         DEBUG("socket_zep::read: size mismatch!\n");
-        res = -EINVAL;
-        goto out;
+        return -EINVAL;
     }
 
     zep_v2_data_hdr_t *zep = (zep_v2_data_hdr_t *)zepdev->rcv_buf;
@@ -609,9 +610,12 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
 
     /* return payload size without frame checksum */
     res = zep->length - IEEE802154_FCS_LEN;
+    if (res > max_size) {
+        return -ENOBUFS;
+    }
+
     /* skip the ZEP header, just copy payload without FCS */
     memcpy(buf, zep + 1, res);
-out:
     return res;
 }
 
