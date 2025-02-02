@@ -8405,6 +8405,26 @@ warning: Member LSM6DSL_REG_Y_OFS_USR (macro definition) of file lsm6dsxx_intern
 warning: Member LSM6DSL_REG_Z_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member LSM6DS33_REG_ORIENT_CFG_G (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member AT6561_STBY_PIN (macro definition) of file board.h is not documented.
+warning: Member GP8211S_INFO_CHANNELS (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8211S_INFO_RANGE (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8211S_INFO_RESOLUTION (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8302_INFO_CHANNELS (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8302_INFO_RANGE (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8302_INFO_RESOLUTION (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8403_INFO_CHANNELS (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8403_INFO_RANGE (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8403_INFO_RESOLUTION (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8413_INFO_CHANNELS (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8413_INFO_RANGE (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8413_INFO_RESOLUTION (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8503_INFO_CHANNELS (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8503_INFO_RANGE (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8503_INFO_RESOLUTION (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8512_INFO_CHANNELS (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8512_INFO_RANGE (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8512_INFO_RESOLUTION (macro definition) of file gp8xxx_info.h is not documented.
+warning: Member GP8XXX_REG_CHANNEL (macro definition) of file gp8xxx_constants.h is not documented.
+warning: Member GP8XXX_REG_OUTPUT (macro definition) of file gp8xxx_constants.h is not documented.
 cpu/sam0_common/include/sdhc.h:167: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 14
 cpu/sam0_common/include/sdhc.h:167: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 8)
 cpu/sam0_common/include/sdhc.h:23: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
