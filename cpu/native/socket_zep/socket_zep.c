@@ -347,7 +347,7 @@ static void _socket_isr(int fd, void *arg)
     zep_v2_data_hdr_t *zep = (zep_v2_data_hdr_t *)tmp;
 
     if (zep->chan != zepdev->chan) {
-        DEBUG("socket_zep::read: wrong channel\n");
+        DEBUG("socket_zep::read: wrong channel %d but expected %d\n", zep->chan, zepdev->chan);
         goto out;
     }
 
