@@ -32,6 +32,8 @@ static FLASH_ATTR const char _act_id_servo[] = "ACT_SERVO";
 static FLASH_ATTR const char _act_id_motor[] = "ACT_MOTOR";
 static FLASH_ATTR const char _act_id_switch[] = "ACT_SWITCH";
 static FLASH_ATTR const char _act_id_dimmer[] = "ACT_DIMMER";
+static FLASH_ATTR const char _act_id_voltage[] = "ACT_VOLTAGE";
+static FLASH_ATTR const char _act_id_current[] = "ACT_CURRENT";
 
 static FLASH_ATTR const char * FLASH_ATTR const actuators[] = {
     [SAUL_ACT_ID_ANY]           = _act_id_any,
@@ -40,6 +42,8 @@ static FLASH_ATTR const char * FLASH_ATTR const actuators[] = {
     [SAUL_ACT_ID_MOTOR]         = _act_id_motor,
     [SAUL_ACT_ID_SWITCH]        = _act_id_switch,
     [SAUL_ACT_ID_DIMMER]        = _act_id_dimmer,
+    [SAUL_ACT_ID_VOLTAGE]       = _act_id_voltage,
+    [SAUL_ACT_ID_CURRENT]       = _act_id_current,
 };
 
 static FLASH_ATTR const char _sense_any[] = "SENSE_ANY";
