@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <byteorder.h>
 
 #define SHORT_RECORD_PAYLOAD_LENGTH      255
 #define LONG_RECORD_PAYLOAD_LENGTH       65535
@@ -165,7 +166,13 @@ int ndef_add_record(ndef_t *message, const uint8_t *type, uint8_t type_length, c
         record.payload_length = ndef_write_to_buffer(message, (uint8_t *)&payload_length_single_byte, SHORT_RECORD_PAYLOAD_LENGTH_SIZE);
     }
     else {
-        record.payload_length = ndef_write_to_buffer(message, (uint8_t *)&payload_length, LONG_RECORD_PAYLOAD_LENGTH_SIZE);
+        #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+            // payload length shall be MSB first or Big Endian - need to reverse if LE
+            uint32_t payload_length_multi_byte = htonl(payload_length);
+            record.payload_length = ndef_write_to_buffer(message, (uint8_t*) &payload_length_multi_byte, LONG_RECORD_PAYLOAD_LENGTH_SIZE);
+        #else        
+            record.payload_length = ndef_write_to_buffer(message, (uint8_t *)&payload_length, LONG_RECORD_PAYLOAD_LENGTH_SIZE);
+        #endif
     }
 
     if (id) {
