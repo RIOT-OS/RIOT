@@ -45,7 +45,14 @@ extern "C" {
  * @brief Ensure CONFIG_SLOT_AUX_LEN is defined
  */
 #ifndef CONFIG_SLOT_AUX_LEN
-    #define CONFIG_SLOT_AUX_LEN 0
+#define CONFIG_SLOT_AUX_LEN 0
+#endif
+
+/**
+ * @brief Ensure CONFIG_FIDO2_MTD_DEV is defined
+ */
+#ifndef CONFIG_FIDO2_MTD_DEV
+#error "Please configure the MTD device to be used by setting CONFIG_FIDO2_MTD_DEV in the Makefile."
 #endif
 
 /**

@@ -20,6 +20,8 @@ CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_UP=1
 # Disable user LED animation
 CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_LED=1
 
+FEATURES_REQUIRED += periph_flashpage_aux
+CFLAGS += -DCONFIG_FIDO2_MTD_DEV=mtd_aux
 # Size of flash memory used to store persistent FIDO2-related data
 SLOT_AUX_LEN := 0x1000
 

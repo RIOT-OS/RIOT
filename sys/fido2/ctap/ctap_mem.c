@@ -18,6 +18,7 @@
 
 #include "fido2/ctap/ctap_mem.h"
 #include "fido2/ctap/ctap_utils.h"
+#include "macros/math.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -35,16 +36,11 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t page, uint32_t 
 
 ctap_status_code_t fido2_ctap_mem_init(void)
 {
-#ifdef BOARD_NATIVE
-    _mtd_dev = mtd_default_get_dev(0);
-#else
-    _mtd_dev = mtd_aux;
-#endif
-
+    _mtd_dev = CONFIG_FIDO2_MTD_DEV;
     int ret = mtd_init(_mtd_dev);
 
     if (ret < 0) {
-        DEBUG("%s, %d: mtd_init failed\n", RIOT_FILE_RELATIVE,
+        DEBUG("%s, %d: Failed to initialize MTD device\n", RIOT_FILE_RELATIVE,
               __LINE__);
         return ret;
     }
@@ -85,8 +81,8 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t page, uint32_t 
 ctap_status_code_t fido2_ctap_mem_erase_flash(ctap_state_t *state)
 {
     /* Calculate total pages needed, rounding up */
-    uint32_t used_pages = (CTAP_FLASH_STATE_SZ + state->rk_amount_stored * CTAP_FLASH_RK_SZ +
-                           _mtd_dev->page_size - 1) / _mtd_dev->page_size;
+    uint32_t used_pages = DIV_ROUND_UP(CTAP_FLASH_STATE_SZ + state->rk_amount_stored * \
+                                       CTAP_FLASH_RK_SZ, _mtd_dev->page_size);
     /* Calculate the number of sectors needed, rounding up */
     uint32_t sector_cnt = (used_pages + _mtd_dev->pages_per_sector - 1) /
                           _mtd_dev->pages_per_sector;
@@ -174,19 +170,22 @@ ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key,
     uint16_t end;
     uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
 
-    /* some error checks for weird offsets that indicate something went wrong */
-    if (*off != 0x0 && *off < CTAP_FLASH_STATE_SZ) {
-        DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
-              __LINE__);
+    /* If not the initial call, validate offset */
+    if (*off != 0) {
+        /* Must skip ctap_state_t */
+        if (*off < CTAP_FLASH_STATE_SZ) {
+            DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
+                  __LINE__);
 
-        return CTAP1_ERR_OTHER;
-    }
+            return CTAP1_ERR_OTHER;
+        }
+        /* Must be aligned to CTAP_FLASH_RK_SZ */
+        if ((*off - CTAP_FLASH_STATE_SZ) % CTAP_FLASH_RK_SZ != 0) {
+            DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
+                  __LINE__);
 
-    if (*off > CTAP_FLASH_STATE_SZ && (*off - CTAP_FLASH_STATE_SZ) % CTAP_FLASH_RK_SZ != 0) {
-        DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
-              __LINE__);
-
-        return CTAP1_ERR_OTHER;
+            return CTAP1_ERR_OTHER;
+        }
     }
 
     if (*off == 0x0) {
