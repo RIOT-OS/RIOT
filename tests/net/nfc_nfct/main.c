@@ -38,9 +38,16 @@ static bool test_convenience_functions(void)
     ztimer_sleep(ZTIMER_SEC, 10);
     nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
 
+    // run a test for long content > 0xFF byte
+    static char *content = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem "
+        "accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo "
+        "inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. "
+        "Nemo enim ipsam voluptatem quia voluptas sit\0";
+    nfct_start_type_2_tag_with_text(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, content, "de", UTF8);
+    ztimer_sleep(ZTIMER_SEC, 10);
+    nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
+
     nfct_start_type_2_tag_with_uri(&DEFAULT_T2T_EMULATOR_DEV, &t2t, t2t_mem, BUFFER_SIZE, NDEF_URI_HTTPS_WWW, "riot-os.org");
-    // test_utils_print_stack_usage();
-    /* sleep for 10 seconds, then disable the tag */
     ztimer_sleep(ZTIMER_SEC, 10);
     nfct_stop_type_2_tag(&DEFAULT_T2T_EMULATOR_DEV);
     return 0;

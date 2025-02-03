@@ -7,7 +7,6 @@
 #include "string.h"
 
 #if IS_USED(MODULE_NFC_T2T)
-
 void nfct_start_type_2_tag(nfct_t2t_emulator_t *dev, nfc_t2t_t *tag)
 {
     assert(dev != NULL);
@@ -43,8 +42,12 @@ static void add_text_message_to_type_2_tag(nfc_t2t_t *tag,
         lang_code_size = 2;
     }
 
-    size_t message_size = content_size + lang_code_size + 7; // headers + large payload
-    uint8_t buffer[message_size];
+    size_t message_size = ndef_calculate_text_record_size(content_size, lang_code_size);
+    uint8_t *buffer = t2t_reserve_ndef_space(tag, message_size);
+    if (buffer == NULL){
+        LOG_ERROR("Could not allocate memory for text in tag\n");
+        return;
+    }
 
     ndef_init(&message, buffer, message_size);
     ndef_add_text_record(&message, content, content_size, lang_code, lang_code_size, encoding);
@@ -65,15 +68,20 @@ void nfct_start_type_2_tag_with_text(nfct_t2t_emulator_t *dev, nfc_t2t_t *tag,
 }
 
 /**
- * @brief Temporarily creates NDEF message to add text URI to given tag
+ * @brief Temporarily creates NDEF message to add URI to given tag
  */
 static void add_uri_message_to_type_2_tag(nfc_t2t_t *tag,
                                           ndef_uri_identifier_code_t identifier_code, const char *uri)
 {
     ndef_t message;
     size_t uri_length = strlen(uri);
-    size_t message_size = uri_length + 8; // headers + large payload + uri identfifier
-    uint8_t buffer[message_size];
+    
+    size_t message_size = ndef_calculate_uri_record_size(uri_length);
+    uint8_t *buffer = t2t_reserve_ndef_space(tag, message_size);
+    if (buffer == NULL){
+        LOG_ERROR("Could not allocate memory for URI in tag\n");
+        return;
+    }
 
     ndef_init(&message, buffer, message_size);
     ndef_add_uri_record(&message, identifier_code, uri, uri_length);
