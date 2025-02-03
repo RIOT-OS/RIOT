@@ -195,3 +195,14 @@ https://www.riot-os.org
 [mastodon-link]: https://fosstodon.org/@RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
 [wiki-link]: https://github.com/RIOT-OS/RIOT/wiki
+## AI-generated ProductMaps
+
+
+
+| Github file | ProductMap |
+|-------------|------------|
+| [lib_printf.c](https://github.com/RIOT-OS/RIOT/blob/master/cpu/esp_common/lib_printf.c) | [Link to Map](https://product-map.ai/app/public?url=https://github.com/RIOT-OS/RIOT/blob/master/cpu/esp_common/lib_printf.c) |
+
+Contact ProductMap if you have any questions at [juan@product-map.ai](juan@product-map.ai).
+
+Last updated on Mon Feb 03 22:54:12 UTC 2025.
