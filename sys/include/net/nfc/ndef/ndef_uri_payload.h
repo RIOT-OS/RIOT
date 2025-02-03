@@ -62,5 +62,7 @@ typedef enum {
 
 int ndef_add_uri_record(ndef_t *message, ndef_uri_identifier_code_t identifier_code, const char *uri, uint32_t uri_length);
 
+size_t ndef_calculate_uri_record_size(uint32_t uri_length);
+
 /** @} */
 #endif
