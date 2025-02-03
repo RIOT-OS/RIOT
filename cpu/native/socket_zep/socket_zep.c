@@ -322,7 +322,8 @@ static void _socket_isr(int fd, void *arg)
     DEBUG("socket_zep::_socket_isr: %d bytes on %d\n", res, fd);
 
     if (res < (int)sizeof(zep_v2_data_hdr_t)) {
-        DEBUG("socket_zep::_socket_isr: frame is shorter than the header, %d < %zu\n", res, sizeof(zep_v2_data_hdr_t));
+        DEBUG("socket_zep::_socket_isr: frame is shorter than the header, %d < %zu\n",
+              res, sizeof(zep_v2_data_hdr_t));
         goto out;
     }
 
