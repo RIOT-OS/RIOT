@@ -356,6 +356,22 @@ int t2t_create_null_tlv(nfc_t2t_t *tag);
  */
 int t2t_create_terminator_tlv(nfc_t2t_t *tag);
 
+/**
+ * @brief Reserves the requested amount of space for a ndef message
+ * 
+ * This method can be used if a NDEF message shall be written directly
+ * into the tag memory. It will create an TLV header for a message of the 
+ * requested size and move the cursor behind the expected message 
+ * and will create a terminator TLV.
+ * A pointer to the beginning of the reserved area (i.e. the V section
+ * of the TLV block) will be returned.
+ * 
+ * @param tag the type 2 tag in which the message shall be written
+ * @param msg_size the size of the ndef message
+ * @return uint8_t* pointer to the memory or NULL if not enough space
+ */
+uint8_t* t2t_reserve_ndef_space(nfc_t2t_t *tag, size_t msg_size);
+
 //misc
 uint32_t t2t_get_size(nfc_t2t_t *tag); //returns size of tag
 bool t2t_is_writeable(nfc_t2t_t *tag); // true if tag is writeable

@@ -514,6 +514,34 @@ int t2t_add_empty_ndef_tlv(nfc_t2t_t *tag){
     return 0;
 }
 
+uint8_t* t2t_reserve_ndef_space(nfc_t2t_t *tag, size_t msg_size){
+    uint8_t *ret = NULL;
+    int error = 0;
+    size_t total_message_size = msg_size + 2; // Header + 1 byte size field
+    if(msg_size > 0xFF){ // Header + 3 byte size field
+        total_message_size = msg_size + 4;
+    }
+
+    if(free_space_in_data_area(tag) < total_message_size){
+        LOG_ERROR("Only %ld bytes space left in tag\n", free_space_in_data_area(tag));
+        return NULL;
+    }
+
+    error = t2t_test_and_remove_terminator_tlv(tag);
+    if(error) return NULL;
+    error = t2t_create_ndef_tlv(tag, msg_size);
+    if(error < 2) return NULL;
+    
+    ret = tag->data_area_cursor;
+    
+    //move cursor behind buffer end
+    tag->data_area_cursor += msg_size;
+    //place terminator behind buffer
+    error = t2t_create_terminator_tlv(tag);
+    if(error) return NULL;
+    return ret;
+}
+
 void t2t_dump_tag_memory(nfc_t2t_t *tag){
     for(uint32_t i=0; i < tag->memory_size; i++){
         if(tag->memory[i] >= 65 && tag->memory[i] <= 122){
