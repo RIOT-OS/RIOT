@@ -23,9 +23,6 @@
  * this example does not check any return values...):
  *
  * @code{c}
- * // initialize the bus (this is normally done during boot time)
- * i2c_init(dev);
- * ...
  * // before accessing the bus, we need to acquire it
  * i2c_acquire(dev);
  * // next we write the register address, but create no STOP condition when done
@@ -40,9 +37,6 @@
  * 7-bit device addressing:
  *
  * @code{c}
- * // initialize the bus
- * i2c_init(dev);
- * ...
  * // first, acquire the shared bus again
  * i2c_acquire(dev);
  * // write the 16-bit register address to the device and prevent STOP condition
@@ -204,6 +198,11 @@ typedef enum {
  *
  * The bus MUST not be acquired before initializing it, as this is handled
  * internally by the i2c_init function!
+ *
+ * @warning     This function **MUST NOT** be called by the user unless you add
+ *              `DISABLE_MODULE += periph_init_i2c` to your `Makefile`. If you
+ *              do so, call this function before any call to `i2c_acquire()`,
+ *              and call no more than **once**.
  *
  * @param[in] dev       the device to initialize
  */
