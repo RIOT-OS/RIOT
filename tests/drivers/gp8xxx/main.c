@@ -88,9 +88,9 @@ static int _calibrate(int argc, char **argv)
         return 1;
     }
 
-    unsigned dev = atoi(argv[1]);
-    int calibration_4ma = atoi(argv[2]);
-    int calibration_20ma = atoi(argv[3]);
+    unsigned dev = strtoul(argv[1], NULL, 10);
+    unsigned calibration_4ma = strtoul(argv[2], NULL, 10);
+    unsigned calibration_20ma = strtoul(argv[3], NULL, 10);
 
     if (dev >= ARRAY_SIZE(gp8xxx_params)) {
         puts("Invalid device.");
@@ -119,9 +119,9 @@ static int _set_current(int argc, char **argv)
         return 1;
     }
 
-    unsigned dev = atoi(argv[1]);
-    int channel = atoi(argv[2]);
-    int current = atoi(argv[3]);
+    unsigned dev = strtoul(argv[1], NULL, 10);
+    unsigned channel = strtoul(argv[2], NULL, 10);
+    unsigned current = strtoul(argv[3], NULL, 10);
 
     if (dev >= ARRAY_SIZE(gp8xxx_devs)) {
         puts("Invalid device.");
@@ -156,9 +156,9 @@ static int _set_dac(int argc, char **argv)
         return 1;
     }
 
-    unsigned dev = atoi(argv[1]);
-    int channel = atoi(argv[2]);
-    int value = atoi(argv[3]);
+    unsigned dev = strtoul(argv[1], NULL, 10);
+    unsigned channel = strtoul(argv[2], NULL, 10);
+    unsigned value = strtoul(argv[3], NULL, 10);
 
     if (channel != GP8XXX_CHANNEL_ALL && channel >= gp8xxx_devs[dev].params.info->channels) {
         puts("Invalid channel.");
@@ -188,9 +188,9 @@ static int set_voltage(int argc, char **argv)
         return 1;
     }
 
-    unsigned dev = atoi(argv[1]);
-    int channel = atoi(argv[2]);
-    int voltage = atoi(argv[3]);
+    unsigned dev = strtoul(argv[1], NULL, 10);
+    unsigned channel = strtoul(argv[2], NULL, 10);
+    unsigned voltage = strtoul(argv[3], NULL, 10);
 
     if (dev >= ARRAY_SIZE(gp8xxx_devs)) {
         puts("Invalid device.");
@@ -224,8 +224,8 @@ static int _set_range(int argc, char **argv)
         return 1;
     }
 
-    unsigned dev = atoi(argv[1]);
-    int range = atoi(argv[2]);
+    unsigned dev = strtoul(argv[1], NULL, 10);
+    unsigned range = strtoul(argv[2], NULL, 10);
 
     if (dev >= ARRAY_SIZE(gp8xxx_devs)) {
         puts("Invalid device.");
@@ -261,7 +261,7 @@ static int _sweep(int argc, char **argv)
         return 1;
     }
 
-    unsigned dev = atoi(argv[1]);
+    unsigned dev = strtoul(argv[1], NULL, 10);
 
     if (dev >= ARRAY_SIZE(gp8xxx_devs)) {
         puts("Invalid device.");
@@ -272,7 +272,7 @@ static int _sweep(int argc, char **argv)
 
     printf("Sweeping channel(s) from 0 - %d.\n", resolution);
 
-    for (int i = 0; i < resolution; i++) {
+    for (uint16_t i = 0; i < resolution; i++) {
         if (gp8xxx_set_dac(&gp8xxx_devs[dev], GP8XXX_CHANNEL_ALL, i) != GP8XXX_OK) {
             printf("Sweep failed at value %d.\n", i);
             return 1;
