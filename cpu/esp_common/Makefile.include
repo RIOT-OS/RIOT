@@ -157,14 +157,16 @@ $(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
 	$(Q)printf "flashpage, data, phy, $(FLASHPAGE_ADDR_START), $(FLASHPAGE_CAP)\n" >> $@
 	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
-	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+	# append size of $(FLASHFILE)
+	$(Q)wc -c < $< >> $@
 else
 $(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)printf "\n" > $(BINDIR)/partitions.csv
 	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
 	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
 	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
-	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+	# append size of $(FLASHFILE)
+	$(Q)wc -c < $< >> $@
 endif
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
