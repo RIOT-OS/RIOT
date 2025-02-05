@@ -32,6 +32,8 @@ static ztimer_now_t last_read = 0;
 
 #define BUFFER_SIZE 256
 
+#define STACK_SIZE  1024
+
 /**
  * @brief pointer to the tag
  */
@@ -42,7 +44,7 @@ static nfc_t2t_t *tag;
  */
 static event_queue_t event_queue;
 
-static char thread_stack[THREAD_STACKSIZE_MAIN];
+static char thread_stack[STACK_SIZE];
 
 /**
  * @brief PID of the thread that handles the events
