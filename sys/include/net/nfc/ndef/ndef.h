@@ -274,6 +274,7 @@ void ndef_clear(ndef_t *message);
 
 #include "net/nfc/ndef/ndef_text_payload.h"
 #include "net/nfc/ndef/ndef_uri_payload.h"
+#include "net/nfc/ndef/ndef_mime_payload.h"
 
 /** }@ */
 #endif

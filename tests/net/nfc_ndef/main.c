@@ -45,6 +45,20 @@ static bool test_ndef_uri_record(void)
     return true;
 }
 
+static bool test_ndef_mime_record(void)
+{
+    puts("NDEF MIME record test");
+    ndef_t message;
+    uint8_t buffer[1024];
+
+    ndef_init(&message, buffer, 1024);
+
+    ndef_add_mime_record(&message, "text/plain", 10, "Hello World", 11);
+    print_ndef_as_hex(&message);
+
+    return true;
+}
+
 static bool test_two_ndef_records(void)
 {
     puts("Two NDEF records test");
@@ -91,6 +105,7 @@ int main(void)
     puts("Starting NDEF test");
     test_ndef_text_record();
     test_ndef_uri_record();
+    test_ndef_mime_record();
     test_two_ndef_records();
     test_ndef_calculate_size();
     test_ndef_remove();
