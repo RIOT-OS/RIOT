@@ -61,3 +61,9 @@ ifeq (, $(UNIT_TESTS))
 else
   CFLAGS += -DTEST_SUITES='$(subst $() $(),$(comma),$(UNIT_TESTS:tests-%=%))'
 endif
+
+# Hack: If GNRC is not used, still provide access to sock_types.h to allow
+# building nanocoap
+ifeq (,$(filter gnrc_sock,$(USEMODULE)))
+  CFLAGS +=-I$(RIOTBASE)/sys/net/gnrc/sock/include
+endif
