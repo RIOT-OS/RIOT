@@ -27,14 +27,12 @@
 
 #include "shell.h"
 
-#ifdef MODULE_NETIF
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
-#endif
 
 int main(void)
 {
-#ifdef MODULE_NETIF
+#ifdef MODULE_GNRC_PKTDUMP
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                           gnrc_pktdump_pid);
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
