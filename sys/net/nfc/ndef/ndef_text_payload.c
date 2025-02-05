@@ -31,25 +31,9 @@ int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length
         return -EINVAL;
     }
 
-    // S-LL LLLL
+    /* this is how the status byte is constructed S0LL LLLL */
     status_byte |= (lang_code_length << LENGTH_OF_LANG_CODE_POSITION);
     status_byte |= encoding << ENCODING_POSITION;
-
-    /*
-    bool mb;
-    if (message->record_count == 0) {
-        mb = true;
-    } else {
-        mb = false;
-    }
-
-    bool sr;
-    if (payload_length <= 255) {
-        sr = true;
-    } else {
-        sr = false;
-    }
-    */
 
     /* the payload will be written later */
     ndef_add_record(message, ndef_text_record_type, sizeof(ndef_text_record_type), NULL, 0, NULL,

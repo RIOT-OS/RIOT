@@ -47,14 +47,14 @@ static bool test_ndef_uri_record(void)
 
 static bool test_ndef_mime_record(void)
 {
-    puts("NDEF MIME record test");
+    puts("\tNDEF MIME record test");
     ndef_t message;
     uint8_t buffer[1024];
 
     ndef_init(&message, buffer, 1024);
 
-    ndef_add_mime_record(&message, "text/plain", 10, "Hello World", 11);
-    print_ndef_as_hex(&message);
+    ndef_add_mime_record(&message, "text/plain", 10, (uint8_t *)"Hello World", 11);
+    ndef_pretty_print(&message);
 
     return true;
 }

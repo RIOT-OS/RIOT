@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-int ndef_add_mime_record(ndef_t *message, const char *mime_type, uint32_t mime_type_length, const char *mime_payload, uint32_t mime_payload_length)
+int ndef_add_mime_record(ndef_t *message, const char *mime_type, uint32_t mime_type_length, const uint8_t *mime_payload, uint32_t mime_payload_length)
 {
     assert(mime_payload_length <= 65535);
 

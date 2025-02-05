@@ -21,8 +21,10 @@
 
 #include "net/nfc/ndef/ndef.h"
 
-int ndef_add_mime_record(ndef_t *message, const char *mime_type, uint32_t mime_type_length, const char *mime_payload, uint32_t mime_payload_length);
+int ndef_add_mime_record(ndef_t *message, const char *mime_type, uint32_t mime_type_length,
+                         const uint8_t *mime_payload, uint32_t mime_payload_length);
 
 size_t ndef_calculate_mime_record_size(uint32_t mime_type_length, uint32_t mime_payload_length);
 
+/** @} */
 #endif
