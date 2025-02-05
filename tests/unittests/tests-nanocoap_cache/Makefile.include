@@ -1,2 +1,1 @@
 USEMODULE += nanocoap_cache
-USEMODULE += gnrc_sock # for sock_types.h a network stack is needed
