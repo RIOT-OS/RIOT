@@ -333,19 +333,19 @@ extern "C" {
 /**
  * @brief   DHCPv6 client priority
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT                1470
+#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT                1480
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_DHCPV6_RELAY
 /**
  * @brief   DHCPv6 relay priority
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_RELAY                 1480
+#define AUTO_INIT_PRIO_MOD_DHCPV6_RELAY                 1490
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD
 /**
  * @brief   DHCPv6 client simple PD priority
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD      1490
+#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD      1470
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_AUTO_SUBNETS
 /**
