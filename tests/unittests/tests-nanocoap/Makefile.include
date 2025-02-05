@@ -1,2 +1,3 @@
 USEMODULE += nanocoap
 USEMODULE += nanocoap_token_ext
+USEMODULE += gnrc_sock # for sock_types.h a network stack is needed
