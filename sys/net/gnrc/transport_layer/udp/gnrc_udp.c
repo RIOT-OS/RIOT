@@ -34,6 +34,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* this allows testing sock_udp on GNRC without having IPv6 enabled */
+#ifndef GNRC_NETTYPE_IPV6
+#  define GNRC_NETTYPE_IPV6 GNRC_NETTYPE_TEST
+#endif
+
 /**
  * @brief   Save the UDP's thread PID for later reference
  */

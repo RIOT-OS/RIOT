@@ -10,7 +10,7 @@ USEMODULE += od
 USEMODULE += xtimer
 
 # mock IPv6 gnrc_nettype
-CFLAGS += -DTEST_SUITES -DGNRC_NETTYPE_IPV6=GNRC_NETTYPE_TEST
+CFLAGS += -DTEST_SUITES
 
 include $(RIOTBASE)/Makefile.include
 
