@@ -108,6 +108,16 @@ typedef struct __attribute__((packed)) {
 
 #if defined(MODULE_AUTO_INIT_DHCPV6_CLIENT) || defined(DOXYGEN)
 /**
+ * @brief   Configure a hook function to be executed during dhcpv6 client's
+ *          auto init.
+ *
+ * @param[in] _hook     The hook function to be called during auto init.
+ * @param[in] netif         The network interface the client should listen on.
+ *                          SOCK_ADDR_ANY_NETIF for any interface
+ */
+void dhcpv6_client_set_init_hook(void (*_hook)(void), uint16_t netif);
+
+/**
  * @brief   Auto-initializes the client in its own thread
  *
  * @note    Only available with (and called by) the `dhcpv6_client_auto_init`
