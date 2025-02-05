@@ -85,24 +85,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef RIOT_VERSION
 #include "bitarithm.h"
 #include "bitfield.h"
 #include "byteorder.h"
 #include "iolist.h"
 #include "macros/utils.h"
-#include "net/coap.h"
 #include "modules.h"
-#else
-#include "coap.h"
-#include <arpa/inet.h>
-#endif
-
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#include "net/coap.h"
 #include "net/sock/udp.h"
-#else
-typedef void sock_udp_ep_t;
-#endif
 
 #if defined(MODULE_NANOCOAP_RESOURCES)
 #include "xfa.h"
