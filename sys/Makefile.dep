@@ -433,6 +433,14 @@ ifneq (,$(filter sock_dodtls,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
 
+ifneq (,$(filter sock_udp,$(USEMODULE)))
+  # sock_udp needs some network stack. Default to GNRC if nothing else is
+  # specified
+  ifeq (,$(filter openwsn% lwip%,$(USEPKG) $(USEMODULE)))
+    USEMODULE += gnrc_sock
+  endif
+endif
+
 ifneq (,$(filter dns_cache,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += checksum
@@ -571,6 +579,10 @@ endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
+endif
+
+ifneq (,$(filter nanocoap%,$(USEMODULE)))
+  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter skald_%,$(USEMODULE)))
