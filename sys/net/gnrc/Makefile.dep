@@ -96,7 +96,6 @@ endif
 
 ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
-  USEMODULE += gnrc_ipv6
   USEMODULE += random     # to generate random ports
 endif
 
