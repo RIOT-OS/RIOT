@@ -513,7 +513,6 @@ static ssize_t at_readline_stop_at_str(at_dev_t *dev, char *resp_buf, size_t len
         }
 
         resp_pos++;
-        len--;
 
         if ((size_t)(resp_pos - resp_buf) >= strlen(AT_RECV_EOL)) {
             char *const eol_begin = resp_pos - strlen(AT_RECV_EOL);
@@ -534,8 +533,10 @@ static ssize_t at_readline_stop_at_str(at_dev_t *dev, char *resp_buf, size_t len
                 substr_p++;
             }
         }
+
+        len--;
     }
-    if (len <= 1) {
+    if (len == 1) {
         return -ENOBUFS;
     }
     if (res < 0) {
