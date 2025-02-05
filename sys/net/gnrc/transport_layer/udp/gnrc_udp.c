@@ -25,6 +25,7 @@
 #include "msg.h"
 #include "thread.h"
 #include "utlist.h"
+#include "modules.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc.h"
@@ -35,7 +36,7 @@
 #include "debug.h"
 
 /* this allows testing sock_udp on GNRC without having IPv6 enabled */
-#ifndef GNRC_NETTYPE_IPV6
+#if !IS_USED(MODULE_GNRC_NETTYPE_IPV6)
 #  define GNRC_NETTYPE_IPV6 GNRC_NETTYPE_TEST
 #endif
 
