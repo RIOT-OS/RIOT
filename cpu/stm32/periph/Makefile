@@ -69,4 +69,12 @@ ifneq (,$(filter periph_wdt,$(USEMODULE)))
     since values can deviate up to 50% from reference)
 endif
 
+# Select the correct implementation for `periph_spi`
+ifneq (,$(filter periph_spi,$(USEMODULE)))
+  ifeq (u5,$(CPU_FAM))
+    SRC += spi_$(CPU_FAM).c
+  else
+    SRC += spi_all.c
+  endif
+endif
 include $(RIOTMAKE)/periph.mk
