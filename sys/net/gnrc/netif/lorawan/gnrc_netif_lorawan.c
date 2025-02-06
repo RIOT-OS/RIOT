@@ -462,17 +462,25 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         mlme_request.type = MLME_GET;
         mlme_request.mib.type = MIB_DEV_ADDR;
 
-        gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
-                                  &mlme_confirm);
-        tmp = *((uint32_t *)mlme_confirm.mib.dev_addr);
-        tmp = byteorder_swapl(tmp);
-        memcpy(opt->data, &tmp, sizeof(uint32_t));
-        res = sizeof(uint32_t);
-        break;
-    default:
-        res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
-                                      opt->data_len);
-        break;
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
+            tmp = *((uint32_t *)mlme_confirm.mib.dev_addr);
+            tmp = byteorder_swapl(tmp);
+            memcpy(opt->data, &tmp, sizeof(uint32_t));
+            res = sizeof(uint32_t);
+            break;
+        case NETOPT_LORAWAN_ADR:
+            mlme_request.type = MLME_GET;
+            mlme_request.mib.type = MIB_ADR;
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
+            *((bool *)opt->data) = mlme_confirm.mib.adr;
+            res = sizeof(bool);
+            break;
+        default:
+            res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
+                                          opt->data_len);
+            break;
     }
     return res;
 }
@@ -485,11 +493,88 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
-    case NETOPT_LORAWAN_DR:
-        assert(opt->data_len == sizeof(uint8_t));
-        if (!gnrc_lorawan_validate_dr(*((uint8_t *)opt->data))) {
-            DEBUG("gnrc_netif_lorawan: Invalid datarate\n");
-            res = -EINVAL;
+        case NETOPT_LORAWAN_ADR:
+            assert(opt->data_len == sizeof(bool));
+            mlme_request.type = MLME_SET;
+            mlme_request.mib.type = MIB_ADR;
+            mlme_request.mib.adr = *((bool *)opt->data);
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
+            break;
+        case NETOPT_LORAWAN_DR:
+            assert(opt->data_len == sizeof(uint8_t));
+            if (!gnrc_lorawan_validate_dr(*((uint8_t *)opt->data))) {
+                DEBUG("gnrc_netif_lorawan: Invalid datarate\n");
+                res = -EINVAL;
+                break;
+            }
+            netif->lorawan.datarate = *((uint8_t *)opt->data);
+            break;
+        case NETOPT_LORAWAN_TX_PORT:
+            assert(opt->data_len == sizeof(uint8_t));
+            netif->lorawan.port = *((uint8_t *)opt->data);
+            break;
+        case NETOPT_ACK_REQ:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            netif->lorawan.ack_req = *((netopt_enable_t *)opt->data);
+            break;
+        case NETOPT_LORAWAN_APPKEY:
+            assert(opt->data_len == LORAMAC_APPKEY_LEN);
+            memcpy(netif->lorawan.appkey, opt->data, LORAMAC_APPKEY_LEN);
+            break;
+        case NETOPT_ADDRESS_LONG:
+            assert(opt->data_len == LORAMAC_DEVEUI_LEN);
+            _memcpy_reversed(netif->lorawan.deveui, opt->data,
+                             LORAMAC_DEVEUI_LEN);
+            break;
+        case NETOPT_LORAWAN_APPEUI:
+            assert(opt->data_len == LORAMAC_APPEUI_LEN);
+            _memcpy_reversed(netif->lorawan.appeui, opt->data,
+                             LORAMAC_APPEUI_LEN);
+            break;
+        case NETOPT_OTAA:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            netif->lorawan.otaa = *((netopt_enable_t *)opt->data);
+            break;
+        case NETOPT_LORAWAN_APPSKEY:
+            assert(opt->data_len >= LORAMAC_APPSKEY_LEN);
+            memcpy(netif->lorawan.appskey, opt->data, LORAMAC_APPSKEY_LEN);
+            break;
+        case NETOPT_LORAWAN_NWKSKEY:
+            assert(opt->data_len >= LORAMAC_NWKSKEY_LEN);
+            memcpy(netif->lorawan.nwkskey, opt->data, LORAMAC_NWKSKEY_LEN);
+            break;
+        case NETOPT_LINK:
+        {
+            netopt_enable_t en = *((netopt_enable_t *)opt->data);
+            if (en) {
+                if (netif->lorawan.otaa) {
+                    mlme_request.type = MLME_JOIN;
+                    mlme_request.join.deveui = netif->lorawan.deveui;
+                    mlme_request.join.appeui = netif->lorawan.appeui;
+                    mlme_request.join.appkey = netif->lorawan.appkey;
+                    mlme_request.join.dr = netif->lorawan.datarate;
+                    gnrc_lorawan_mlme_request(&netif->lorawan.mac,
+                                              &mlme_request, &mlme_confirm);
+                }
+                else {
+                    mlme_request.type = MLME_SET;
+                    mlme_request.mib.type = MIB_ACTIVATION_METHOD;
+                    mlme_request.mib.activation = MLME_ACTIVATION_ABP;
+                    gnrc_lorawan_mlme_request(&netif->lorawan.mac,
+                                              &mlme_request, &mlme_confirm);
+                }
+            }
+            else {
+                mlme_request.type = MLME_RESET;
+                gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                          &mlme_confirm);
+                res = mlme_confirm.status;
+                if (mlme_confirm.status == 0) {
+                    /* reset netif as well */
+                    _reset(netif);
+                }
+            }
             break;
         }
         netif->lorawan.datarate = *((uint8_t *)opt->data);

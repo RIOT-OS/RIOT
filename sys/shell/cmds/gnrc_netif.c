@@ -83,6 +83,7 @@ static const struct {
     { "checksum", NETOPT_CHECKSUM },
     { "otaa", NETOPT_OTAA },
     { "link_check", NETOPT_LINK_CHECK },
+    { "adr", NETOPT_LORAWAN_ADR },
 };
 
 /* utility functions */
@@ -490,6 +491,10 @@ static void _print_netopt(netopt_t opt)
 
     case NETOPT_LORAWAN_RX2_DR:
         printf("RX2 datarate");
+        break;
+
+    case NETOPT_LORAWAN_ADR:
+        printf("ADR");
         break;
 
     default:
