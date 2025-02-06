@@ -1,0 +1,22 @@
+INCLUDES += -I$(PKGDIRBASE)/libcsp/include \
+            -I$(PKGDIRBASE)/libcsp/src \
+            -I$(RIOTBASE)/pkg/libcsp/include
+
+CFLAGS += -DCSP_RIOT=1
+CFLAGS += -DCSP_ENABLE_CSP_PRINT=1
+
+ifneq (,$(filter libcsp_contrib,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/libcsp/contrib
+endif
+
+ifneq (,$(filter libcsp_drivers_can,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/libcsp/drivers/can
+endif
+
+ifneq (,$(filter auto_init_csp,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/libcsp/init
+endif
+
+PSEUDOMODULES += libcsp_shell \
+                 libcsp_shell_server \
+                 #
