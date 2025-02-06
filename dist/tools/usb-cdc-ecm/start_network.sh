@@ -33,12 +33,12 @@ setup_interface() {
     sysctl -w net.ipv6.conf."${INTERFACE}".accept_ra=0
     ip link set "${INTERFACE}" up
     ip a a fe80::1/64 dev "${INTERFACE}"
-    ip a a fd00:dead:beef::1/128 dev lo
+    ip a a ${HOST_IP} dev "${INTERFACE}"
 }
 
 cleanup_interface() {
     ip a d fe80::1/64 dev "${INTERFACE}"
-    ip a d fd00:dead:beef::1/128 dev lo
+    ip a d ${HOST_IP} dev "${INTERFACE}"
     ip route del "${PREFIX}" via fe80::2 dev "${INTERFACE}"
 }
 
@@ -89,9 +89,16 @@ else
     USE_RADVD=0
 fi
 
+if [ "$1" = "-i" ] || [ "$1" = "--host-ip" ]; then
+    HOST_IP=$2
+    shift 2
+else
+    HOST_IP="fd00:dead:beef::1/128"
+fi
+
 PREFIX=$1
 [ -z "${PREFIX}" ] && {
-    echo "usage: $0 [-d|--use-dhcpv6] [-r|--use-radvd ] <prefix> [<serial-port>]"
+    echo "usage: $0 [-d|--use-dhcpv6] [-r|--use-radvd ] [-i|--host-ip <ip>] <prefix> [<serial-port>]"
     exit 1
 }
 
