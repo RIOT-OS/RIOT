@@ -25,7 +25,9 @@
 #ifndef SUIT_TRANSPORT_WORKER_H
 #define SUIT_TRANSPORT_WORKER_H
 
-#include "net/nanocoap.h"
+#if MODULE_NANOCOAP
+#  include "net/nanocoap.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
