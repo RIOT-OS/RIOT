@@ -4,6 +4,28 @@ APPLICATION = gnrc_border_router
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
+# Things that'll stay on the build command line for sure
+BOARD = nrf52840dongle
+# Same, but I'd eventually like to change the defaults (but getting the info here in the build system is tricky)
+UPLINK=cdc-ecm
+# Don't know any more why I needed them increased, possibly ULA related; also possibly we don't need that many leases if ULA filtering is in there (but see questions there)
+CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=6 -DCONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX=4
+# Things that really should just work out of the box (maybe they do by now)
+# the "nrf802154" thread, which is the radio ifconfig thread
+CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=7
+
+# Better debugging, and also helpful for reviewing https://github.com/RIOT-OS/RIOT/pull/14623
+USEMODULE += netstats_l2
+USEMODULE += netstats_ipv6
+USEMODULE += netstats_rpl
+
+USEMODULE += netstats_neighbor_etx
+USEMODULE += netstats_neighbor_count
+USEMODULE += netstats_neighbor_rssi
+USEMODULE += netstats_neighbor_lqi
+USEMODULE += netstats_neighbor_tx_time
+
+
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -35,6 +57,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_sixlowpan_border_router_default
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
+USEMODULE += gnrc_icmpv6_error # as tracrouting is a common debugging operation too
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_cmds_default
@@ -42,7 +65,7 @@ USEMODULE += ps
 
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
 # configure the node as a RPL DODAG root when receiving a prefix.
-#USEMODULE += gnrc_rpl
+USEMODULE += gnrc_rpl
 
 # Optionally include DNS support. This includes resolution of names at an
 # upstream DNS server and the handling of RDNSS options in Router Advertisements

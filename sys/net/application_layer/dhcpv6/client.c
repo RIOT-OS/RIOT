@@ -927,6 +927,13 @@ static bool _parse_ia_pd_option(dhcpv6_opt_ia_pd_t *ia_pd)
         if (lease->parent.ia_id.id != ia_id) {
             continue;
         }
+        // Is taking the routable one(s) really *better* than taking the ULA?
+        // The ULA might be what is more stable, or what persists through
+        // renumberings ... but probably picking routable *is* best, and when
+        // that prefix becomes unavailable we'll just wait for a network
+        // reconfiguration to bring everyone up on ULAs instead. (If of course
+        // we had the capacity for multiple prefixes on all devices...).
+        bool take_only_routable = true;
         /* check for status */
         for (dhcpv6_opt_t *ia_pd_opt = (dhcpv6_opt_t *)(ia_pd + 1);
              ia_pd_len > 0;
@@ -946,6 +953,10 @@ static bool _parse_ia_pd_option(dhcpv6_opt_ia_pd_t *ia_pd)
                 }
                 case DHCPV6_OPT_IAPFX: {
                     dhcpv6_opt_iapfx_t *this_iapfx = (dhcpv6_opt_iapfx_t *)ia_pd_opt;
+                    if (take_only_routable && (this_iapfx->pfx.u8[0] & 0xfe) == 0xfc) {
+                        // It's a ULA, look for something better to come
+                        continue;
+                    }
                     if ((!lease->leased) ||
                         (iapfx == NULL) ||
                         ((this_iapfx->pfx_len == lease->pfx_len) &&
