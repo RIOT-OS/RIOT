@@ -56,7 +56,15 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_WS281X_TIMER_GPIO_LL
-#define WS281X_HAVE_INIT                    (1)
+#define WS281X_HAVE_INIT (1)
+#endif
+/** @} */
+
+/**
+ * @name    Properties of the ARM backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_ARM
 #endif
 /** @} */
 
