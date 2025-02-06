@@ -7,9 +7,27 @@ all: welcome
 	@exit 1
 
 doc:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
-		--output-md doc/doxygen/src/feature_list.md
+		--output-md doc/doxygen/src/feature_list.md \
+		--output-ttl doc/rdf/features.ttl
+	@# The BUILD_IN_DOCKER is a workaround for the RISC-V
+	@# architecture tests otherwise triggering when building eg. in murdock
+	@# ("No RISC-V toolchain detected. Make sure a RISC-V toolchain is
+	@# installed."). If I had a penny for every time I refused to let
+	@# BUILD_IN_DOCKER be the simple workaround, I wouldn't get a penny
+	@# today (but I'd still be proud of my small collection so far).
+	unset BOARDS; \
+	BUILD_IN_DOCKER=1 \
+	./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/rdf/info_to_rdf.py \
+		doc/rdf/info.ttl
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/rdf/doxygen_to_rdf.py \
+		doc/rdf/doxygen.ttl
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/rdf/build_board_feature_table.py > doc/doxygen/src/feature_table.html
 	"$(MAKE)" -BC doc/doxygen
 
 doc-man:
@@ -37,7 +55,8 @@ print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh
 
 generate-features:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
 		--output-makefile makefiles/features_existing.inc.mk
 

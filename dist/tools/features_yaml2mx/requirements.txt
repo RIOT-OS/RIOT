@@ -1,0 +1,7 @@
+pyyaml == 6.0.0
+
+rdflib == 7.0.0
+
+pycddl == 0.6.1
+cbor2 == 5.6.2
+zcbor == 0.8.1

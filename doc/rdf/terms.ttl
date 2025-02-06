@@ -1,0 +1,58 @@
+@prefix terms: <https://ns.riot-os.org/by-version/main/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <https://schema.org/> .
+
+terms:Board a rdfs:Class .
+
+terms:CPU a rdfs:Class ;
+    rdfs:label "CPU"@en ;
+    rdfs:comment "A microprocessor, classified by whichever granularity the platform maintainers see fit to use a common `cpu/...` directory for."@en .
+
+terms:identifier a rdf:Property ;
+    rdfs:label "identifier"@en ;
+    schema:domainIncludes terms:CPU, terms:Board ;
+    rdfs:comment "Identifier assigned within the RIOT build system to a variable dependent on the entity's type (for example, a CPU's identifier is the value of the CPU variable)"@en .
+
+terms:Feature a rdfs:Class .
+
+terms:providesFeature a rdf:Property ;
+    rdfs:label "provides feature"@en ;
+    rdfs:comment "The subject, when part of a RIOT build, makes some feature available (not necessarily active) in the build."@en ;
+    schema:domainIncludes terms:Board ;
+    rdfs:range terms:Feature .
+
+terms:cpu a rdf:Property ;
+    rdfs:label "uses CPU"@en ;
+    rdfs:comment "The CPU that is part of a board definition"@en ;
+    rdfs:domain terms:Board ;
+    rdfs:range terms:MCU .
+
+terms:cpu a rdf:Property ;
+    rdfs:label "uses CPU"@en ;
+    rdfs:comment "The CPU that is part of a board definition"@en ;
+    rdfs:domain terms:Board ;
+    rdfs:range terms:MCU .
+
+terms:cpu_model a rdf:Property ;
+    rdfs:label "uses CPU model"@en ;
+    rdfs:comment "The CPU model that is part of a board definition. Unlike CPUs those are not comprehensively enumerated, may be processed in a string splitting manner by the CPU's makefiles, and may technically not even be unique between CPUs (although they usually are)."@en ;
+    rdfs:domain terms:Board ;
+    rdfs:range rdfs:Literal .
+
+terms:ram a rdf:Property ;
+    rdfs:label "available RAM"@en ;
+    # Once we start modelling CPUs in more detail than just the RIOT CPU variabl, we can start moving this information into CPU models. (In theory this could be external, but I haven't seen that in use with RIOT yet).
+    rdfs:comment "RAM size available on a board"@en ;
+    rdfs:domain terms:Board ;
+    rdfs:range rdfs:Literal .
+
+terms:rom a rdf:Property ;
+    rdfs:label "available ROM"@en ;
+    # Once we start modelling CPUs in more detail than just the RIOT CPU variabl, we can start moving this information into CPU models unless the CPU uses external ROM (in which case it stays a property of the board).
+    rdfs:comment "ROM size available on a board"@en ;
+    rdfs:domain terms:Board ;
+    rdfs:range rdfs:Literal .
+
+terms:doc a rdf:Property ;
+    rdfs:label "documentation at"@en .

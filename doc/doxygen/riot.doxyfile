@@ -884,6 +884,7 @@ INPUT                  = ../../doc.txt \
                          src/dev-best-practices.md \
                          src/build-system-basics.md \
                          src/feature_list.md \
+                         src/feature_table.md \
                          src/kconfig/kconfig.md \
                          src/using-cpp.md \
                          src/using-rust.md \
