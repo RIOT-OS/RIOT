@@ -99,6 +99,13 @@ void _native_LED_RED_TOGGLE(void);
 #endif
 /** @} */
 
+/**
+ * @brief   The mountpoint at which the native fs gets mounted
+ */
+#ifndef CONFIG_NATIVE_MOUNTPOINT
+#define CONFIG_NATIVE_MOUNTPOINT    VFS_DEFAULT_NVM(0)
+#endif
+
 #if defined(MODULE_SPIFFS) || DOXYGEN
 /**
  * @name    SPIFFS default configuration

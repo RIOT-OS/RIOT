@@ -66,7 +66,7 @@ void pm_set(unsigned mode)
 
 void pm_off(void)
 {
-    puts("\nnative: exiting");
+    DEBUG_PUTS("\nnative: exiting");
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
 #endif

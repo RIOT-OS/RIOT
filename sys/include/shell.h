@@ -245,6 +245,17 @@ static inline void shell_run(const shell_command_t *commands,
 }
 
 /**
+ * @brief           Searches for a handler function associated with a command
+ *
+ * @param[in]       command_list    ptr to array of command structs
+ * @param[in]       command         the command name to search for
+ *
+ * @returns         handler function associated with @p command
+ *                  NULL if the command could not be found
+ */
+shell_command_handler_t shell_find_handler(const shell_command_t *command_list,
+                                           const char *command);
+/**
  * @brief           Parse and run a line of text as a shell command with
  *                  arguments.
  *

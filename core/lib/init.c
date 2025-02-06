@@ -43,8 +43,6 @@
     RIOT_VERSION ")"
 #endif
 
-extern int main(void);
-
 static char main_stack[THREAD_STACKSIZE_MAIN];
 static char idle_stack[THREAD_STACKSIZE_IDLE];
 
@@ -60,7 +58,15 @@ static void *main_trampoline(void *arg)
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
     }
 
+#ifdef CPU_NATIVE
+    extern int _native_argc_main;
+    extern char **_native_argv_main;
+    extern int main(int argc, char **argv);
+    int res = main(_native_argc_main, _native_argv_main);
+#else
+    extern int main(void);
     int res = main();
+#endif
 
     if (IS_USED(MODULE_TEST_UTILS_MAIN_EXIT_CB)) {
         void test_utils_main_exit_cb(int res);
