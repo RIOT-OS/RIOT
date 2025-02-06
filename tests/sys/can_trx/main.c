@@ -40,12 +40,22 @@ ncv7356_trx_t ncv7356 ={ .trx.driver = &ncv7356_driver,
 };
 #endif
 
+#ifdef MODULE_AT6561
+#include "at6561.h"
+at6561_trx_t at6561 = { .stby_pin = AT6561_STBY_PIN,
+                        .trx.driver = &at6561_driver
+};
+#endif
+
 static can_trx_t *devs[] = {
 #ifdef MODULE_TJA1042
     (can_trx_t *)&tja1042,
 #endif
 #ifdef MODULE_NCV7356
     (can_trx_t *)&ncv7356,
+#endif
+#ifdef MODULE_AT6561
+    &at6561.trx,
 #endif
     NULL,
 };
