@@ -1,0 +1,5 @@
+FEATURES_OPTIONAL += periph_can
+include $(RIOTMAKE)/features_check.inc.mk
+ifeq (,$(filter periph_can,$(FEATURES_USED)))
+  USEMODULE += mcp2515
+endif
