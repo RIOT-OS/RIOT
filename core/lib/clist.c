@@ -51,7 +51,7 @@
 
 clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
 {
-    clist_node_t *p, *q, *e;
+    clist_node_t *p, *q, *e = NULL;
     int insize, psize, qsize, i;
 
     /*
@@ -77,14 +77,9 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
             /* step `insize' places along from p */
             q = p;
             psize = 0;
-            for (i = 0; i < insize; i++) {
+            for (i = 0; i < insize && q; i++) {
                 psize++;
                 q = (q->next == oldhead) ? NULL : q->next;
-                /* cppcheck-suppress nullPointer
-                 * (reason: possible bug in cppcheck 1.6x) */
-                if (!q) {
-                    break;
-                }
             }
 
             /* if q hasn't fallen off end, we have two lists to merge */
@@ -101,14 +96,14 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
                         q = NULL;
                     }
                 }
-                else if (qsize == 0 || !q) {
+                else if (p && (qsize == 0 || !q)) {
                     /* q is empty; e must come from p. */
                     e = p; p = p->next; psize--;
                     if (p == oldhead) {
                         p = NULL;
                     }
                 }
-                else if (cmp(p, q) <= 0) {
+                else if (p && cmp(p, q) <= 0) {
                     /* First element of p is lower (or same);
                      * e must come from p. */
                     e = p; p = p->next; psize--;
@@ -116,7 +111,7 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
                         p = NULL;
                     }
                 }
-                else {
+                else if (q) {
                     /* First element of q is lower; e must come from q. */
                     e = q; q = q->next; qsize--;
                     if (q == oldhead) {
@@ -138,9 +133,9 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
             p = q;
         }
 
-        /* cppcheck-suppress nullPointer
-         * (reason: tail cannot be NULL at this point, because list != NULL) */
-        tail->next = list;
+        if (tail) {
+            tail->next = list;
+        }
 
         /* If we have done only one merge, we're finished. */
         if (nmerges <= 1) { /* allow for nmerges==0, the empty list case */
