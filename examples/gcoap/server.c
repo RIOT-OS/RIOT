@@ -48,6 +48,21 @@
 /* Example credential tag for credman. Tag together with the credential type needs to be unique. */
 #define GCOAP_DTLS_CREDENTIAL_TAG 10
 
+#ifdef CONFIG_DTLS_ECC
+static const credman_credential_t credential = {
+    .type = CREDMAN_TYPE_ECDSA,
+    .tag = GCOAP_DTLS_CREDENTIAL_TAG,
+    .params = {
+        .ecdsa = {
+            .private_key = ecdsa_priv_key,
+            .public_key = {
+                .x = ecdsa_pub_key_x,
+                .y = ecdsa_pub_key_y,
+            },
+        },
+    },
+};
+#else /* use PSK if not configured for ECC */
 static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
 static const credman_credential_t credential = {
@@ -60,7 +75,8 @@ static const credman_credential_t credential = {
         }
     },
 };
-#endif
+#endif /* CONFIG_DTLS_ECC */
+#endif /* IS_USED(MODULE_GCOAP_DTLS) */
 
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
