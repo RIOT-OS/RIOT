@@ -14,7 +14,7 @@
  * @brief       An application for testing xipfs
  *
  * @author      Damien Amara <damien.amara@univ-lille.fr>
- *
+ * @author      Gregory Guche <gregory.guche@univ-lille.fr>
  * @}
  */
 
@@ -40,6 +40,14 @@
  */
 #define NVME0P0_PAGE_NUM 20
 
+#define XIPFS_ASSERT(condition)  \
+do {                             \
+    if (!(condition)) {          \
+        printf("Line %d ", __LINE__); \
+    }                            \
+    assert((condition));           \
+}while(0)
+
 /*
  * Allocate a new contiguous space for the nvme0p0 file system
  */
@@ -61,6 +69,7 @@ static void test_xipfs_fstat_ebadbf_descp(void);
 static void test_xipfs_fstat_efault_buf(void);
 static void test_xipfs_fstat_ebadbf_xipfs_infos(void);
 static void test_xipfs_fstat_ok(void);
+static void test_xipfs_lseek_einval_descp(void);
 static void test_xipfs_lseek_ebadf_descp(void);
 static void test_xipfs_lseek_einval_whence(void);
 static void test_xipfs_lseek_einval_new_pos(void);
@@ -187,15 +196,17 @@ int main(void)
 {
     int ret;
 
+    printf("Tests started, awaiting for normal termination or assertion...\n");
+
     /* Should not fail unless there is a corrupted data
      * structure or a flash memory failure. */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* Should not fail unless there is a corrupted data
      * structure or a flash memory failure. */
     ret = xipfs_mount(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* xipfs_close */
     test_xipfs_close_ebadf_descp();
@@ -208,6 +219,7 @@ int main(void)
     test_xipfs_fstat_ok();
 
     /* xipfs_lseek */
+    test_xipfs_lseek_einval_descp();
     test_xipfs_lseek_ebadf_descp();
     test_xipfs_lseek_einval_whence();
     test_xipfs_lseek_einval_new_pos();
@@ -241,7 +253,7 @@ int main(void)
 
     /* xipfs_fsync */
     test_xipfs_fsync_ebadf_descp();
-    test_xipfs_fsync_eacces_flags();
+    test_xipfs_fsync_eacces_flags();;
     test_xipfs_fsync_ok();
 
     /* xipfs_opendir */
@@ -359,7 +371,9 @@ int main(void)
     /* Should not fail unless there is a corrupted data
      * structure or a flash memory failure. */
     ret = xipfs_umount(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
+
+    printf("Tests finished.\n");
 
     for (;;);
 }
@@ -375,7 +389,7 @@ static void test_xipfs_close_ebadf_descp(void)
 
     /* test */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EINVAL);
 }
 
 static void test_xipfs_close_ok(void)
@@ -384,16 +398,16 @@ static void test_xipfs_close_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_fstat_ebadbf_descp(void)
@@ -404,7 +418,7 @@ static void test_xipfs_fstat_ebadbf_descp(void)
 
     /* test */
     ret = xipfs_fstat(xipfs_nvme0p0, &desc, &buf);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EINVAL);
 }
 
 static void test_xipfs_fstat_efault_buf(void)
@@ -413,20 +427,20 @@ static void test_xipfs_fstat_efault_buf(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_RDONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_fstat(xipfs_nvme0p0, &desc, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_fstat_ebadbf_xipfs_infos(void)
@@ -436,20 +450,20 @@ static void test_xipfs_fstat_ebadbf_xipfs_infos(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, ".xipfs_infos",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/.xipfs_infos",
             O_RDONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_fstat(xipfs_nvme0p0, &desc, &buf);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_fstat_ok(void)
@@ -459,20 +473,30 @@ static void test_xipfs_fstat_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_RDONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_fstat(xipfs_nvme0p0, &desc, &buf);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
+}
+
+static void test_xipfs_lseek_einval_descp(void)
+{
+    xipfs_file_desc_t desc;
+    int ret;
+
+    /* test */
+    ret = xipfs_lseek(xipfs_nvme0p0, &desc, 0, SEEK_SET);
+    XIPFS_ASSERT(ret == -EINVAL);
 }
 
 static void test_xipfs_lseek_ebadf_descp(void)
@@ -480,9 +504,18 @@ static void test_xipfs_lseek_ebadf_descp(void)
     xipfs_file_desc_t desc;
     int ret;
 
+    /* initialization */
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
+            O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
+
+    /* clean up */
+    ret = xipfs_close(xipfs_nvme0p0, &desc);
+    XIPFS_ASSERT(ret == 0);
+
     /* test */
     ret = xipfs_lseek(xipfs_nvme0p0, &desc, 0, SEEK_SET);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 }
 
 static void test_xipfs_lseek_einval_whence(void)
@@ -491,20 +524,20 @@ static void test_xipfs_lseek_einval_whence(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_lseek(xipfs_nvme0p0, &desc, 0, 0xffffffff);
-    assert(ret == -EINVAL);
+    XIPFS_ASSERT(ret == -EINVAL);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_lseek_einval_new_pos(void)
@@ -513,21 +546,21 @@ static void test_xipfs_lseek_einval_new_pos(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_lseek(xipfs_nvme0p0, &desc, 0xffffffff,
             SEEK_SET);
-    assert(ret == -EINVAL);
+    XIPFS_ASSERT(ret == -EINVAL);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_lseek_ok(void)
@@ -536,20 +569,20 @@ static void test_xipfs_lseek_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_lseek(xipfs_nvme0p0, &desc, 0, SEEK_SET);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_open_efault_name(void)
@@ -559,7 +592,7 @@ static void test_xipfs_open_efault_name(void)
 
     /* test */
     ret = xipfs_open(xipfs_nvme0p0, &desc, NULL, O_CREAT, 0);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_open_einval_flags(void)
@@ -568,9 +601,9 @@ static void test_xipfs_open_einval_flags(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             0xffffffff, 0);
-    assert(ret == -EINVAL);
+    XIPFS_ASSERT(ret == -EINVAL);
 }
 
 static void test_xipfs_open_enametoolong_name(void)
@@ -579,11 +612,12 @@ static void test_xipfs_open_enametoolong_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "totoooooooooooooooo"
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/totoooooooooooooooo"
             "ooooooooooooooooooooooooooooooooooooooooooooo",
             O_CREAT, 0);
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
+
 
 static void test_xipfs_open_eexist_xipfs_infos_flags(void)
 {
@@ -591,9 +625,9 @@ static void test_xipfs_open_eexist_xipfs_infos_flags(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, ".xipfs_infos",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/.xipfs_infos",
             O_CREAT | O_EXCL, 0);
-    assert(ret == -EEXIST);
+    XIPFS_ASSERT(ret == -EEXIST);
 }
 
 static void test_xipfs_open_eacces_xipfs_infos_flags(void)
@@ -602,17 +636,17 @@ static void test_xipfs_open_eacces_xipfs_infos_flags(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, ".xipfs_infos",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/.xipfs_infos",
             O_WRONLY, 0);
-    assert(ret == -EACCES);
+    XIPFS_ASSERT(ret == -EACCES);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, ".xipfs_infos",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/.xipfs_infos",
             O_APPEND, 0);
-    assert(ret == -EACCES);
+    XIPFS_ASSERT(ret == -EACCES);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, ".xipfs_infos",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/.xipfs_infos",
             O_RDWR, 0);
-    assert(ret == -EACCES);
+    XIPFS_ASSERT(ret == -EACCES);
 }
 
 static void test_xipfs_open_eexist_name(void)
@@ -621,21 +655,21 @@ static void test_xipfs_open_eexist_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_EXCL, 0);
-    assert(ret == -EEXIST);
+    XIPFS_ASSERT(ret == -EEXIST);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_open_eisdir_name(void)
@@ -644,17 +678,17 @@ static void test_xipfs_open_eisdir_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_RDONLY, 0);
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_open_enotdir_name(void)
@@ -663,21 +697,21 @@ static void test_xipfs_open_enotdir_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto/"
-            "toto", O_CREAT, 0);
-    assert(ret == -ENOTDIR);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto/toto",
+                     O_CREAT, 0);
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_open_enoent_flags(void)
@@ -686,9 +720,9 @@ static void test_xipfs_open_enoent_flags(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_RDONLY, 0);
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_open_eisdir_name_trailing_slash(void)
@@ -697,9 +731,9 @@ static void test_xipfs_open_eisdir_name_trailing_slash(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto/",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto/",
             O_CREAT | O_RDONLY, 0);
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 }
 
 static void test_xipfs_open_edquot(void)
@@ -711,24 +745,24 @@ static void test_xipfs_open_edquot(void)
 
     /* initialization */
     for (i = 0; i < NVME0P0_PAGE_NUM; i++) {
-        (void)sprintf(path, "%d", i);
+        (void)sprintf(path, "/%d", i);
 
         ret = xipfs_open(xipfs_nvme0p0, &desc, path,
                 O_CREAT, 0);
-        assert(ret == 0);
+        XIPFS_ASSERT(ret == 0);
 
         ret = xipfs_close(xipfs_nvme0p0, &desc);
-        assert(ret == 0);
+        XIPFS_ASSERT(ret == 0);
     }
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == -EDQUOT);
+    XIPFS_ASSERT(ret == -EDQUOT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_open_ok(void)
@@ -737,13 +771,13 @@ static void test_xipfs_open_ok(void)
     int ret;
 
     /* test */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_read_ebadf_descp(void)
@@ -754,7 +788,7 @@ static void test_xipfs_read_ebadf_descp(void)
 
     /* test */
     ret = xipfs_read(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 }
 
 static void test_xipfs_read_efault_dest(void)
@@ -763,20 +797,20 @@ static void test_xipfs_read_efault_dest(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_RDONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_read(xipfs_nvme0p0, &desc, NULL, 0);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_read_eacces_flags(void)
@@ -786,20 +820,20 @@ static void test_xipfs_read_eacces_flags(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
-            O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
+            O_CREAT | O_WRONLY, 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_read(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    assert(ret == -EACCES);
+    XIPFS_ASSERT(ret == -EACCES);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_read_ok(void)
@@ -809,20 +843,20 @@ static void test_xipfs_read_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_RDONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_read(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_write_ebadf_descp(void)
@@ -833,7 +867,7 @@ static void test_xipfs_write_ebadf_descp(void)
 
     /* test */
     ret = xipfs_write(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 }
 
 static void test_xipfs_write_efault_src(void)
@@ -842,20 +876,20 @@ static void test_xipfs_write_efault_src(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_WRONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_write(xipfs_nvme0p0, &desc, NULL, 0);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_write_eacces_flags(void)
@@ -865,20 +899,20 @@ static void test_xipfs_write_eacces_flags(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_write(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    assert(ret == -EACCES);
+    XIPFS_ASSERT(ret == -EACCES);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_write_ok(void)
@@ -888,20 +922,20 @@ static void test_xipfs_write_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_WRONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_write(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 1);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_fsync_ebadf_descp(void)
@@ -911,7 +945,7 @@ static void test_xipfs_fsync_ebadf_descp(void)
 
     /* test */
     ret = xipfs_fsync(xipfs_nvme0p0, &desc, 0);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 }
 
 static void test_xipfs_fsync_eacces_flags(void)
@@ -920,20 +954,20 @@ static void test_xipfs_fsync_eacces_flags(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_RDONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_fsync(xipfs_nvme0p0, &desc, 0);
-    assert(ret == -EACCES);
+    XIPFS_ASSERT(ret == -EACCES);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_fsync_ok(void)
@@ -942,20 +976,20 @@ static void test_xipfs_fsync_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT | O_WRONLY, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_fsync(xipfs_nvme0p0, &desc, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_opendir_efault_dirname(void)
@@ -965,7 +999,7 @@ static void test_xipfs_opendir_efault_dirname(void)
 
     /* test */
     ret = xipfs_opendir(xipfs_nvme0p0, &desc, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_opendir_enoent_dirname_null_char(void)
@@ -975,7 +1009,7 @@ static void test_xipfs_opendir_enoent_dirname_null_char(void)
 
     /* test */
     ret = xipfs_opendir(xipfs_nvme0p0, &desc, "");
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_opendir_enametoolong_dirname(void)
@@ -984,10 +1018,10 @@ static void test_xipfs_opendir_enametoolong_dirname(void)
     int ret;
 
     /* test */
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "totooooo"
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "/totooooo"
             "oooooooooooooooooooooooooooooooooooooooooooooooooo"
             "ooooo/");
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_opendir_enotdir_dirname(void)
@@ -997,20 +1031,20 @@ static void test_xipfs_opendir_enotdir_dirname(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc_file, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc_file, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc_file);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc_dir, "toto/");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc_dir, "/toto");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_opendir_enoent_dirname(void)
@@ -1019,8 +1053,8 @@ static void test_xipfs_opendir_enoent_dirname(void)
     int ret;
 
     /* test */
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "toto/");
-    assert(ret == -ENOENT);
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "/toto/");
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_opendir_ok(void)
@@ -1029,19 +1063,19 @@ static void test_xipfs_opendir_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "toto/");
-    assert(ret == 0);
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "/toto/");
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_closedir(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_readdir_efault_direntp(void)
@@ -1050,22 +1084,22 @@ static void test_xipfs_readdir_efault_direntp(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "toto/");
-    assert(ret == 0);
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "/toto/");
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_readdir(xipfs_nvme0p0, &desc, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 
     /* clean up */
     ret = xipfs_closedir(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_readdir_ebadf_descp(void)
@@ -1076,7 +1110,7 @@ static void test_xipfs_readdir_ebadf_descp(void)
 
     /* test */
     ret = xipfs_readdir(xipfs_nvme0p0, &desc, &dirent);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 }
 
 static void test_xipfs_readdir_ok(void)
@@ -1086,22 +1120,22 @@ static void test_xipfs_readdir_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "toto/");
-    assert(ret == 0);
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "/toto/");
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_readdir(xipfs_nvme0p0, &desc, &dirent);
-    assert(ret >= 0);
+    XIPFS_ASSERT(ret >= 0);
 
     /* clean up */
     ret = xipfs_closedir(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_closedir_ebadf_descp(void)
@@ -1112,7 +1146,7 @@ static void test_xipfs_closedir_ebadf_descp(void)
 
     /* test */
     ret = xipfs_readdir(xipfs_nvme0p0, &desc, &dirent);
-    assert(ret == -EBADF);
+    XIPFS_ASSERT(ret == -EBADF);
 }
 
 static void test_xipfs_closedir_ok(void)
@@ -1121,19 +1155,19 @@ static void test_xipfs_closedir_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "toto/");
-    assert(ret == 0);
+    ret = xipfs_opendir(xipfs_nvme0p0, &desc, "/toto/");
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
     ret = xipfs_closedir(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_unlink_efault_name(void)
@@ -1142,7 +1176,7 @@ static void test_xipfs_unlink_efault_name(void)
 
     /* test */
     ret = xipfs_unlink(xipfs_nvme0p0, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_unlink_enoent_name_null_char(void)
@@ -1151,7 +1185,7 @@ static void test_xipfs_unlink_enoent_name_null_char(void)
 
     /* test */
     ret = xipfs_unlink(xipfs_nvme0p0, "");
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_unlink_eisdir_name_root(void)
@@ -1160,7 +1194,7 @@ static void test_xipfs_unlink_eisdir_name_root(void)
 
     /* test */
     ret = xipfs_unlink(xipfs_nvme0p0, "/");
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 }
 
 static void test_xipfs_unlink_enametoolong_name(void)
@@ -1168,9 +1202,9 @@ static void test_xipfs_unlink_enametoolong_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_unlink(xipfs_nvme0p0, "totooooooooooooo"
+    ret = xipfs_unlink(xipfs_nvme0p0, "/totooooooooooooo"
             "oooooooooooooooooooooooooooooooooooooooooooooooo");
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_unlink_eisdir_name(void)
@@ -1178,16 +1212,16 @@ static void test_xipfs_unlink_eisdir_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_unlink(xipfs_nvme0p0, "toto");
-    assert(ret == -EISDIR);
+    ret = xipfs_unlink(xipfs_nvme0p0, "/toto");
+    XIPFS_ASSERT(ret == -EISDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_unlink_enotdir_name(void)
@@ -1196,20 +1230,20 @@ static void test_xipfs_unlink_enotdir_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_unlink(xipfs_nvme0p0, "toto/toto");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_unlink(xipfs_nvme0p0, "/toto/toto");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_unlink_enoent_name(void)
@@ -1217,12 +1251,12 @@ static void test_xipfs_unlink_enoent_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_unlink(xipfs_nvme0p0, "toto");
-    assert(ret == -ENOENT);
+    ret = xipfs_unlink(xipfs_nvme0p0, "/toto");
+    XIPFS_ASSERT(ret == -ENOENT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_unlink_ok(void)
@@ -1231,20 +1265,20 @@ static void test_xipfs_unlink_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_unlink(xipfs_nvme0p0, "toto");
-    assert(ret == 0);
+    ret = xipfs_unlink(xipfs_nvme0p0, "/toto");
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_mkdir_efault_name(void)
@@ -1253,7 +1287,7 @@ static void test_xipfs_mkdir_efault_name(void)
 
     /* test */
     ret = xipfs_mkdir(xipfs_nvme0p0, NULL, 0);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_mkdir_enoent_name_null_char(void)
@@ -1262,7 +1296,7 @@ static void test_xipfs_mkdir_enoent_name_null_char(void)
 
     /* test */
     ret = xipfs_mkdir(xipfs_nvme0p0, "", 0);
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_mkdir_eexist_name_root(void)
@@ -1271,7 +1305,7 @@ static void test_xipfs_mkdir_eexist_name_root(void)
 
     /* test */
     ret = xipfs_mkdir(xipfs_nvme0p0, "/", 0);
-    assert(ret == -EEXIST);
+    XIPFS_ASSERT(ret == -EEXIST);
 }
 
 static void test_xipfs_mkdir_enametoolong_name(void)
@@ -1279,9 +1313,9 @@ static void test_xipfs_mkdir_enametoolong_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "totoooooooooooooo"
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/totoooooooooooooo"
             "oooooooooooooooooooooooooooooooooooooooooooooo/", 0);
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_mkdir_eexist_name(void)
@@ -1289,16 +1323,16 @@ static void test_xipfs_mkdir_eexist_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == -EEXIST);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == -EEXIST);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_mkdir_enotdir_name(void)
@@ -1307,20 +1341,20 @@ static void test_xipfs_mkdir_enotdir_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto",
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto",
             O_CREAT, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/toto/", 0);
-    assert(ret == -ENOTDIR);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/toto/", 0);
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_mkdir_enoent_name(void)
@@ -1328,8 +1362,8 @@ static void test_xipfs_mkdir_enoent_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/toto/", 0);
-    assert(ret == -ENOENT);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/toto/", 0);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_mkdir_enametoolong_name_trailing_slash(void)
@@ -1337,9 +1371,9 @@ static void test_xipfs_mkdir_enametoolong_name_trailing_slash(void)
     int ret;
 
     /* test */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "totoooooooooooooo"
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/totoooooooooooooo"
             "ooooooooooooooooooooooooooooooooooooooooooooooo", 0);
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_mkdir_ok(void)
@@ -1347,12 +1381,12 @@ static void test_xipfs_mkdir_ok(void)
     int ret;
 
     /* test */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rmdir_efault_name(void)
@@ -1361,7 +1395,7 @@ static void test_xipfs_rmdir_efault_name(void)
 
     /* test */
     ret = xipfs_rmdir(xipfs_nvme0p0, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_rmdir_enoent_name_null_char(void)
@@ -1370,7 +1404,7 @@ static void test_xipfs_rmdir_enoent_name_null_char(void)
 
     /* test */
     ret = xipfs_rmdir(xipfs_nvme0p0, "");
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_rmdir_ebusy_name_root(void)
@@ -1379,7 +1413,7 @@ static void test_xipfs_rmdir_ebusy_name_root(void)
 
     /* test */
     ret = xipfs_rmdir(xipfs_nvme0p0, "/");
-    assert(ret == -EBUSY);
+    XIPFS_ASSERT(ret == -EBUSY);
 }
 
 static void test_xipfs_rmdir_enametoolong_name(void)
@@ -1387,9 +1421,9 @@ static void test_xipfs_rmdir_enametoolong_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_rmdir(xipfs_nvme0p0, "totoooooooooooooooooooooo"
+    ret = xipfs_rmdir(xipfs_nvme0p0, "/totoooooooooooooooooooooo"
         "oooooooooooooooooooooooooooooooooooooo/");
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_rmdir_einval_name(void)
@@ -1398,7 +1432,7 @@ static void test_xipfs_rmdir_einval_name(void)
 
     /* test */
     ret = xipfs_rmdir(xipfs_nvme0p0, ".");
-    assert(ret == -EINVAL);
+    XIPFS_ASSERT(ret == -EINVAL);
 }
 
 static void test_xipfs_rmdir_enotdir_name(void)
@@ -1407,19 +1441,19 @@ static void test_xipfs_rmdir_enotdir_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rmdir(xipfs_nvme0p0, "toto/");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rmdir(xipfs_nvme0p0, "/toto");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rmdir_enotempty_name(void)
@@ -1427,19 +1461,19 @@ static void test_xipfs_rmdir_enotempty_name(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rmdir(xipfs_nvme0p0, "toto/");
-    assert(ret == -ENOTEMPTY);
+    ret = xipfs_rmdir(xipfs_nvme0p0, "/toto/");
+    XIPFS_ASSERT(ret == -ENOTEMPTY);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rmdir_enoent_name(void)
@@ -1447,8 +1481,8 @@ static void test_xipfs_rmdir_enoent_name(void)
     int ret;
 
     /* test */
-    ret = xipfs_rmdir(xipfs_nvme0p0, "toto/toto/");
-    assert(ret == -ENOENT);
+    ret = xipfs_rmdir(xipfs_nvme0p0, "/toto/toto/");
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_rmdir_ok(void)
@@ -1456,16 +1490,16 @@ static void test_xipfs_rmdir_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rmdir(xipfs_nvme0p0, "toto/");
-    assert(ret == 0);
+    ret = xipfs_rmdir(xipfs_nvme0p0, "/toto/");
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_efault_from_path(void)
@@ -1473,8 +1507,8 @@ static void test_xipfs_rename_efault_from_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, NULL, "to/");
-    assert(ret == -EFAULT);
+    ret = xipfs_rename(xipfs_nvme0p0, NULL, "/to/");
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_rename_efault_to_path(void)
@@ -1482,8 +1516,8 @@ static void test_xipfs_rename_efault_to_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", NULL);
-    assert(ret == -EFAULT);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", NULL);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_rename_enoent_from_path_null_char(void)
@@ -1491,8 +1525,8 @@ static void test_xipfs_rename_enoent_from_path_null_char(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "", "to/");
-    assert(ret == -ENOENT);
+    ret = xipfs_rename(xipfs_nvme0p0, "", "/to/");
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_rename_enoent_to_path_null_char(void)
@@ -1500,8 +1534,8 @@ static void test_xipfs_rename_enoent_to_path_null_char(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "");
-    assert(ret == -ENOENT);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "");
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_rename_enametoolong_from_path(void)
@@ -1509,9 +1543,9 @@ static void test_xipfs_rename_enametoolong_from_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "frommmmmmmmmmmmmmmmmmmmm"
-            "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm/", "to/");
-    assert(ret == -ENAMETOOLONG);
+    ret = xipfs_rename(xipfs_nvme0p0, "/frommmmmmmmmmmmmmmmmmmmm"
+            "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm/", "/to/");
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_rename_enametoolong_to_path(void)
@@ -1519,9 +1553,9 @@ static void test_xipfs_rename_enametoolong_to_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "toooooooooooooo"
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/tooooooooooooo"
             "oooooooooooooooooooooooooooooooooooooooooooooooo/");
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_rename_eisdir_from_path_file_to_path_dirs(void)
@@ -1530,22 +1564,22 @@ static void test_xipfs_rename_eisdir_from_path_file_to_path_dirs(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from", "to/");
-    assert(ret == -EISDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from", "/to/");
+    XIPFS_ASSERT(ret == -EISDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_file_to_path_not_dirs(void)
@@ -1554,25 +1588,25 @@ static void test_xipfs_rename_enotdir_from_path_file_to_path_not_dirs(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "to", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/to", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from", "to/from");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from", "/to/from");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enoent_from_path_file_to_path_not_found(void)
@@ -1581,19 +1615,19 @@ static void test_xipfs_rename_enoent_from_path_file_to_path_not_found(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from", "to/from");
-    assert(ret == -ENOENT);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from", "/to/from");
+    XIPFS_ASSERT(ret == -ENOENT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_file_to_path_creatable_trailing_slash(void)
@@ -1602,19 +1636,19 @@ static void test_xipfs_rename_enotdir_from_path_file_to_path_creatable_trailing_
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from", "to/");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from", "/to/");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_empty_dir_to_path_file(void)
@@ -1623,22 +1657,22 @@ static void test_xipfs_rename_enotdir_from_path_empty_dir_to_path_file(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "to", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/to", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotempty_from_path_empty_dir_to_path_nonempty_dir(void)
@@ -1646,22 +1680,22 @@ static void test_xipfs_rename_enotempty_from_path_empty_dir_to_path_nonempty_dir
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == -ENOTEMPTY);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == -ENOTEMPTY);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_empty_dir_to_path_not_dirs(void)
@@ -1670,22 +1704,22 @@ static void test_xipfs_rename_enotdir_from_path_empty_dir_to_path_not_dirs(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "to", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/to", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/from/");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/from/");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enoent_from_path_empty_dir_to_path_not_found(void)
@@ -1693,16 +1727,16 @@ static void test_xipfs_rename_enoent_from_path_empty_dir_to_path_not_found(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/from/");
-    assert(ret == -ENOENT);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/from/");
+    XIPFS_ASSERT(ret == -ENOENT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_creatable_trailing_slash(void)
@@ -1710,17 +1744,17 @@ static void test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_creatable
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "tooooooooooooooooooo"
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/toooooooooooooooooo"
         "oooooooooooooooooooooooooooooooooooooooooooo");
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_einval_from_path_empty_dir_to_path_creatable_subdir_itself(void)
@@ -1728,16 +1762,16 @@ static void test_xipfs_rename_einval_from_path_empty_dir_to_path_creatable_subdi
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "from/from/");
-    assert(ret == -EINVAL);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/from/from/");
+    XIPFS_ASSERT(ret == -EINVAL);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_file(void)
@@ -1746,25 +1780,25 @@ static void test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_file(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "to", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/to", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_einval_from_path_nonempty_dir_to_path_empty_dir_subdir_itself(void)
@@ -1772,19 +1806,19 @@ static void test_xipfs_rename_einval_from_path_nonempty_dir_to_path_empty_dir_su
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "from/from/from/");
-    assert(ret == -EINVAL);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/from/from/from/");
+    XIPFS_ASSERT(ret == -EINVAL);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotempty_from_path_nonempty_dir_to_path_nonempty_dir(void)
@@ -1792,25 +1826,25 @@ static void test_xipfs_rename_enotempty_from_path_nonempty_dir_to_path_nonempty_
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == -ENOTEMPTY);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == -ENOTEMPTY);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_not_dirs(void)
@@ -1819,22 +1853,22 @@ static void test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_not_dirs(vo
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "to", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/to", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/from/");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/from/");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enoent_from_path_nonempty_dir_to_path_not_found(void)
@@ -1842,19 +1876,19 @@ static void test_xipfs_rename_enoent_from_path_nonempty_dir_to_path_not_found(vo
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/from/");
-    assert(ret == -ENOENT);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/from/");
+    XIPFS_ASSERT(ret == -ENOENT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_creatable_trailing_slash(void)
@@ -1862,20 +1896,20 @@ static void test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_creata
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "tooooooooooooooooooo"
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/toooooooooooooooooo"
         "oooooooooooooooooooooooooooooooooooooooooooo");
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enotdir_from_path_not_dirs(void)
@@ -1884,19 +1918,19 @@ static void test_xipfs_rename_enotdir_from_path_not_dirs(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/from", "to");
-    assert(ret == -ENOTDIR);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/from", "/to");
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_enoent_from_path_not_found(void)
@@ -1904,12 +1938,12 @@ static void test_xipfs_rename_enoent_from_path_not_found(void)
     int ret;
 
     /* test */
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == -ENOENT);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == -ENOENT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_rename_ok(void)
@@ -1919,93 +1953,93 @@ static void test_xipfs_rename_ok(void)
 
     /* file to file */
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "to", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/to", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_rename(xipfs_nvme0p0, "from", "to");
-    assert(ret == 0);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from", "/to");
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* file to creatable */
 
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "from", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/from", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_rename(xipfs_nvme0p0, "from", "to");
-    assert(ret == 0);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from", "/to");
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* empty directory to empty directory */
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == 0);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* empty directory to creatable */
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == 0);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* non empty directory to empty directory */
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "to/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/to/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == 0);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* non empty directory to creatable */
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_mkdir(xipfs_nvme0p0, "from/from/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/from/from/", 0);
+    XIPFS_ASSERT(ret == 0);
 
-    ret = xipfs_rename(xipfs_nvme0p0, "from/", "to/");
-    assert(ret == 0);
+    ret = xipfs_rename(xipfs_nvme0p0, "/from/", "/to/");
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_stat_efault_path(void)
@@ -2015,7 +2049,7 @@ static void test_xipfs_stat_efault_path(void)
 
     /* test */
     ret = xipfs_stat(xipfs_nvme0p0, NULL, &buf);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_stat_efault_buf(void)
@@ -2024,19 +2058,19 @@ static void test_xipfs_stat_efault_buf(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_stat(xipfs_nvme0p0, "toto", NULL);
-    assert(ret == -EFAULT);
+    ret = xipfs_stat(xipfs_nvme0p0, "/toto", NULL);
+    XIPFS_ASSERT(ret == -EFAULT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_stat_enoent_path_null_char(void)
@@ -2046,7 +2080,7 @@ static void test_xipfs_stat_enoent_path_null_char(void)
 
     /* test */
     ret = xipfs_stat(xipfs_nvme0p0, "", &buf);
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_stat_enametoolong_path(void)
@@ -2055,9 +2089,9 @@ static void test_xipfs_stat_enametoolong_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_stat(xipfs_nvme0p0, "totooooooooooooooooooooooo"
-            "ooooooooooooooooooooooooooooooooooo", &buf);
-    assert(ret == -ENAMETOOLONG);
+    ret = xipfs_stat(xipfs_nvme0p0, "/totooooooooooooooooooooooo"
+            "ooooooooooooooooooooooooooooooooooooo", &buf);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_stat_enotdir_path(void)
@@ -2067,19 +2101,19 @@ static void test_xipfs_stat_enotdir_path(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_stat(xipfs_nvme0p0, "toto/toto", &buf);
-    assert(ret == -ENOTDIR);
+    ret = xipfs_stat(xipfs_nvme0p0, "/toto/toto", &buf);
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_stat_enoent_path(void)
@@ -2088,8 +2122,8 @@ static void test_xipfs_stat_enoent_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_stat(xipfs_nvme0p0, "toto", &buf);
-    assert(ret == -ENOENT);
+    ret = xipfs_stat(xipfs_nvme0p0, "/toto", &buf);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_stat_ok(void)
@@ -2099,19 +2133,19 @@ static void test_xipfs_stat_ok(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_stat(xipfs_nvme0p0, "toto", &buf);
-    assert(ret == 0);
+    ret = xipfs_stat(xipfs_nvme0p0, "/toto", &buf);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_statvfs_efault_buf(void)
@@ -2120,7 +2154,7 @@ static void test_xipfs_statvfs_efault_buf(void)
 
     /* test */
     ret = xipfs_statvfs(xipfs_nvme0p0, NULL, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_statvfs_ok(void)
@@ -2130,7 +2164,7 @@ static void test_xipfs_statvfs_ok(void)
 
     /* test */
     ret = xipfs_statvfs(xipfs_nvme0p0, NULL, &buf);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_new_file_efault_path(void)
@@ -2140,7 +2174,7 @@ static void test_xipfs_new_file_efault_path(void)
     /* test */
     ret = xipfs_new_file(xipfs_nvme0p0, NULL,
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_new_file_enoent_path_null_char(void)
@@ -2150,7 +2184,7 @@ static void test_xipfs_new_file_enoent_path_null_char(void)
     /* test */
     ret = xipfs_new_file(xipfs_nvme0p0, "",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_new_file_eisdir_path_root(void)
@@ -2160,7 +2194,7 @@ static void test_xipfs_new_file_eisdir_path_root(void)
     /* test */
     ret = xipfs_new_file(xipfs_nvme0p0, "/",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 }
 
 static void test_xipfs_new_file_enametoolong_path(void)
@@ -2168,10 +2202,10 @@ static void test_xipfs_new_file_enametoolong_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "totooooooooooooooooooo"
-            "ooooooooooooooooooooooooooooooooooooooo",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/totooooooooooooooooooo"
+            "ooooooooooooooooooooooooooooooooooooooooo",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -ENAMETOOLONG);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_new_file_einval_exec(void)
@@ -2179,9 +2213,9 @@ static void test_xipfs_new_file_einval_exec(void)
     int ret;
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto",
             XIPFS_NVM_PAGE_SIZE, 0xffffffff);
-    assert(ret == -EINVAL);
+    XIPFS_ASSERT(ret == -EINVAL);
 }
 
 static void test_xipfs_new_file_eexist_path(void)
@@ -2190,20 +2224,20 @@ static void test_xipfs_new_file_eexist_path(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -EEXIST);
+    XIPFS_ASSERT(ret == -EEXIST);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_new_file_eisdir_path(void)
@@ -2211,17 +2245,17 @@ static void test_xipfs_new_file_eisdir_path(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_new_file_enotdir_path(void)
@@ -2230,20 +2264,20 @@ static void test_xipfs_new_file_enotdir_path(void)
     int ret;
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto/toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto/toto",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -ENOTDIR);
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_new_file_enoent_path(void)
@@ -2251,9 +2285,9 @@ static void test_xipfs_new_file_enoent_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto/toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto/toto",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_new_file_eisdir_trailing_slash(void)
@@ -2261,9 +2295,9 @@ static void test_xipfs_new_file_eisdir_trailing_slash(void)
     int ret;
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto/",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto/",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 }
 
 static void test_xipfs_new_file_edquot(void)
@@ -2274,20 +2308,20 @@ static void test_xipfs_new_file_edquot(void)
 
     /* initialization */
     for (i = 0; i < NVME0P0_PAGE_NUM; i++) {
-        (void)sprintf(path, "%d", i);
+        (void)sprintf(path, "/%d", i);
         ret = xipfs_new_file(xipfs_nvme0p0, path,
                 XIPFS_NVM_PAGE_SIZE, 0);
-        assert(ret == 0);
+        XIPFS_ASSERT(ret == 0);
     }
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == -EDQUOT);
+    XIPFS_ASSERT(ret == -EDQUOT);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_new_file_ok(void)
@@ -2295,13 +2329,13 @@ static void test_xipfs_new_file_ok(void)
     int ret;
 
     /* test */
-    ret = xipfs_new_file(xipfs_nvme0p0, "toto",
+    ret = xipfs_new_file(xipfs_nvme0p0, "/toto",
             XIPFS_NVM_PAGE_SIZE, 0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_execv_efault_path(void)
@@ -2310,7 +2344,7 @@ static void test_xipfs_execv_efault_path(void)
 
     /* test */
     ret = xipfs_execv(xipfs_nvme0p0, NULL, NULL);
-    assert(ret == -EFAULT);
+    XIPFS_ASSERT(ret == -EFAULT);
 }
 
 static void test_xipfs_execv_enoent_path_null_char(void)
@@ -2319,7 +2353,7 @@ static void test_xipfs_execv_enoent_path_null_char(void)
 
     /* test */
     ret = xipfs_execv(xipfs_nvme0p0, "", NULL);
-    assert(ret == -ENOENT);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
 
 static void test_xipfs_execv_eisdir_path_root(void)
@@ -2328,7 +2362,7 @@ static void test_xipfs_execv_eisdir_path_root(void)
 
     /* test */
     ret = xipfs_execv(xipfs_nvme0p0, "/", NULL);
-    assert(ret == -EISDIR);
+    XIPFS_ASSERT(ret == -EISDIR);
 }
 
 static void test_xipfs_execv_enametoolong_path(void)
@@ -2336,54 +2370,64 @@ static void test_xipfs_execv_enametoolong_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "totoooooooooooooooooooooo"
-            "oooooooooooooooooooooooooooooooooooo", NULL);
-    assert(ret == -ENAMETOOLONG);
+    ret = xipfs_execv(xipfs_nvme0p0, "/totoooooooooooooooooooooo"
+            "oooooooooooooooooooooooooooooooooooooo", NULL);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
 
 static void test_xipfs_execv_eisdir_path(void)
 {
     int ret;
 
+    char *argv[2] = {
+        "/toto/", NULL
+    };
+
     /* initialization */
-    ret = xipfs_mkdir(xipfs_nvme0p0, "toto/", 0);
-    assert(ret == 0);
+    ret = xipfs_mkdir(xipfs_nvme0p0, "/toto/", 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "toto", NULL);
-    assert(ret == -EISDIR);
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto/", argv);
+    XIPFS_ASSERT(ret == -EISDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_execv_enotdir_path(void)
 {
     xipfs_file_desc_t desc;
     int ret;
+    char *argv[2] = {
+        "/toto/toto", NULL
+    };
 
     /* initialization */
-    ret = xipfs_open(xipfs_nvme0p0, &desc, "toto", O_CREAT, 0);
-    assert(ret == 0);
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "toto/toto", NULL);
-    assert(ret == -ENOTDIR);
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto/toto", argv);
+    XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
-    assert(ret == 0);
+    XIPFS_ASSERT(ret == 0);
 }
 
 static void test_xipfs_execv_enoent_path(void)
 {
     int ret;
+    char *argv[2] = {
+        "/toto", NULL
+    };
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "toto", NULL);
-    assert(ret == -ENOENT);
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto", argv);
+    XIPFS_ASSERT(ret == -ENOENT);
 }
