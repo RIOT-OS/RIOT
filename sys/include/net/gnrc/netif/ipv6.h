@@ -68,6 +68,18 @@ extern "C" {
  * @brief   Address is an anycast address
  */
 #define GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST                (0x20U)
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
+/**
+ * @brief Number of address generation retries
+ * Used for temporary addresses, where the upper limit is defined by @ref TEMP_IDGEN_RETRIES
+ */
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES          (0xC0U)
+/**
+ * @brief Shift position of address generation retries
+ */
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS      (6)
+#endif
 /** @} */
 
 /**
