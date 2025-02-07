@@ -398,7 +398,7 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
 
     tbuf[0] = (uint8_t)(5 + topic_len);
     tbuf[1] = SUBSCRIBE;
-    tbuf[2] = flags;  
+    tbuf[2] = flags;
     byteorder_htobebufs(&tbuf[3], id_next);
     waitonid = id_next++;
     if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_NORMAL) {
