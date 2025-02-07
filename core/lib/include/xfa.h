@@ -26,6 +26,8 @@
 #define XFA_H
 
 #include <inttypes.h>
+#include <stdalign.h>
+
 #include "compiler_hints.h"
 
 /*
@@ -45,7 +47,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define _XFA(type, name, prio) \
     NO_SANITIZE_ARRAY \
-    __attribute__((used, section(".xfa." #name "." #prio))) _Alignas(type) type
+    __attribute__((used, section(".xfa." #name "." #prio))) alignas(type) type
 
 /**
  * @brief helper macro for other XFA_* macros
@@ -54,7 +56,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define _XFA_CONST(type, name, prio) \
     NO_SANITIZE_ARRAY \
-    __attribute__((used, section(".roxfa." #name "." #prio))) _Alignas(type) type
+    __attribute__((used, section(".roxfa." #name "." #prio))) alignas(type) type
 
 /**
  * @brief Define a read-only cross-file array

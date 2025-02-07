@@ -21,9 +21,10 @@
  * @}
  */
 
-#include <string.h>
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
+#include <stdalign.h>
+#include <string.h>
 
 #include "architecture.h"
 #include "cpu.h"
@@ -114,8 +115,7 @@ static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t 
 
     if ((addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) || (size < FLASHPAGE_WRITE_BLOCK_SIZE) ||
         ((uintptr_t)buf % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)) {
-        uint8_t tmp[FLASHPAGE_WRITE_BLOCK_SIZE]
-                __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
+        uint8_t alignas(FLASHPAGE_WRITE_BLOCK_ALIGNMENT) tmp[FLASHPAGE_WRITE_BLOCK_SIZE];
 
         offset = addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT;
         size = MIN(size, FLASHPAGE_WRITE_BLOCK_SIZE - offset);

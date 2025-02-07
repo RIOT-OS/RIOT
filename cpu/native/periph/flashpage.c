@@ -19,6 +19,7 @@
  */
 
 #include <assert.h>
+#include <stdalign.h>
 #include <string.h>
 
 #include "cpu.h"
@@ -27,7 +28,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-__attribute__((aligned(FLASHPAGE_SIZE * FLASHPAGE_NUMOF)))
+alignas(FLASHPAGE_SIZE * FLASHPAGE_NUMOF)
 char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
 
 void flashpage_erase(unsigned page)

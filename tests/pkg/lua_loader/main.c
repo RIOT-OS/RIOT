@@ -25,6 +25,7 @@
  */
 
 #include <stdio.h>
+#include <stdalign.h>
 #include <string.h>
 
 #include "lua_run.h"
@@ -74,7 +75,7 @@ const size_t lua_riot_builtin_c_table_len =
 #else
 #define LUA_MEM_SIZE (11000)
 #endif
-static char lua_mem[LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIGNMENT__)));
+static alignas(__BIGGEST_ALIGNMENT__) char lua_mem[LUA_MEM_SIZE];
 
 #define LINEBUF_SZ (32)
 static char linebuf[LINEBUF_SZ];
