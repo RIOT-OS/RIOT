@@ -934,7 +934,7 @@ include $(RIOTMAKE)/tools/targets.inc.mk
 include $(RIOTMAKE)/usb-codes.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
-ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
+ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
   EXPECT_ERRORS :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
