@@ -384,7 +384,7 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
     if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_NORMAL) {
         topic_len=strlen(sub->topic.name);
     }
-    else if((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_PREDEF) {
+    else if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_PREDEF) {
         topic_len=2;
     }
     else {
