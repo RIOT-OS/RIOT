@@ -1,0 +1,27 @@
+# Copyright (c) 2025 Mesotic SAS
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_SAM4S
+    bool
+    select CPU_CORE_CORTEX_M4
+
+## CPU Models
+config CPU_MODEL_SAM4SD32C
+    bool
+    select CPU_FAM_SAM4S
+
+## Common CPU symbols
+config CPU_FAM
+    default "sam4s" if CPU_FAM_SAM4S
+
+config CPU_MODEL
+    default "sam4sd32c" if CPU_MODEL_SAM4SD32C
+
+config CPU
+    default "sam4s" if CPU_FAM_SAM4s
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"

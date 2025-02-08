@@ -246,6 +246,10 @@ groups:
           features:
           - name: cpu_sam3
             help: The MCU has an Atmel/Microchip SAM 3 CPU
+        - title: SAM4S Grouping
+          features:
+          - name: cpu_sam4s
+            help: The MCU has an Atmel/Microchip SAM 4S CPU
 
       - title: GigaDevice Semiconductor Inc Grouping
         features:
