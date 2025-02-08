@@ -252,6 +252,9 @@ static ssize_t _time_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_req
         if (nanocoap_register_observer(context, pkt) == 0) {
             registered = true;
         }
+        else {
+            puts("_time_handler: can't register observer");
+        }
         break;
     case 1:
         /* unregister */
