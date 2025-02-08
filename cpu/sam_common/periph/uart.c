@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_sam3
+ * @ingroup     cpu_sam_common
  * @ingroup     drivers_periph_uart
  * @{
  *
