@@ -29,11 +29,10 @@ USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
 
-# Optionally include DNS support. This includes resolution of names at an
-# upstream DNS server and the handling of RDNSS options in Router Advertisements
-# to auto-configure that upstream DNS server.
-# USEMODULE += sock_dns              # include DNS client
-# USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
+# Include DNS support. This includes resolution of names at an upstream DNS
+# server, caching of the results, and the handling of RDNSS options in Router
+# Advertisements to auto-configure that upstream DNS server.
+USEMODULE += gnrc_dns_default
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

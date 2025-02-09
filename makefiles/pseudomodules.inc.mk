@@ -106,6 +106,7 @@ PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
 PSEUDOMODULES += gnrc_dhcpv6_client_simple_pd
 ## @}
 ## @}
+PSEUDOMODULES += gnrc_dns_default
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_eui
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_simple
