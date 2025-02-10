@@ -19,10 +19,15 @@
  */
 
 #include "board.h"
+#include "can/device.h"
+#include "container.h"
+#include "periph/can.h"
 #include "periph/gpio.h"
-#include "timex.h"
+#include "periph_conf.h"
+#include "time_units.h"
+
 #ifdef MODULE_VFS_DEFAULT
-#include "vfs_default.h"
+#  include "vfs_default.h"
 #endif
 
 #ifdef MODULE_MTD_SPI_NOR
@@ -97,3 +102,21 @@ VFS_AUTO_MOUNT(lwext4, VFS_MTD(sdhc_dev), VFS_DEFAULT_SD(0), 1);
 #endif
 #endif /* MODULE_VFS_DEFAULT */
 #endif /* MODULE_SAM0_SDHC */
+
+
+void board_candev_set_power(candev_t *dev, bool active)
+{
+    can_t *periph_can = candev2periph(dev);
+    if (periph_can && periph_can->conf->can == CAN1) {
+        /* This is the peripheral CAN controller connected to the
+         * AT6561 CAN transceiver ==> Control the standby pin as requested */
+        gpio_write(AT6561_STBY_PIN, !active);
+    }
+}
+
+void board_init(void)
+{
+    /* disable CAN transceiver to safe power */
+    gpio_init(AT6561_STBY_PIN, GPIO_OUT);
+    gpio_set(AT6561_STBY_PIN);
+}
