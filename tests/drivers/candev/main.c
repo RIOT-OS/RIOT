@@ -67,9 +67,9 @@ static int _send(int argc, char **argv)
 {
     int ret = 0;
 
-    struct can_frame frame = {
+    can_frame_t frame = {
         .can_id = 1,
-        .can_dlc = 3,
+        .len = 3,
         .data[0] = 0xAB,
         .data[1] = 0xCD,
         .data[2] = 0xEF,
@@ -83,7 +83,7 @@ static int _send(int argc, char **argv)
         for (int i = 1; i < argc; i++) {
             frame.data[i - 1] = atoi(argv[i]);
         }
-        frame.can_dlc = argc - 1;
+        frame.len = argc - 1;
     }
 
     ret = candev->driver->send(candev, &frame);
@@ -110,17 +110,17 @@ static int _receive(int argc, char **argv)
     }
 
     for (int i = 0; i < n; i++) {
-        struct can_frame frame;
+        can_frame_t frame;
 
         puts("Reading from Rxbuf...");
         isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_id), sizeof(frame.can_id));
         frame.can_id &= 0x1FFFFFFF; /* clear invalid bits */
-        isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_dlc), 1);
-        printf("id: %" PRIx32 " dlc: %" PRIx8, frame.can_id, frame.can_dlc);
-        if (frame.can_dlc > 0) {
+        isrpipe_read(&rxbuf, (uint8_t *)&(frame.len), 1);
+        printf("id: %" PRIx32 " dlc: %" PRIx8, frame.can_id, frame.len);
+        if (frame.len > 0) {
             printf(" data: ");
-            isrpipe_read(&rxbuf, frame.data, frame.can_dlc); /* data */
-            for (int i = 0; i < frame.can_dlc; i++) {
+            isrpipe_read(&rxbuf, frame.data, frame.len); /* data */
+            for (int i = 0; i < frame.len; i++) {
                 printf("0x%X ", frame.data[i]);
             }
         }
@@ -218,7 +218,7 @@ static const shell_command_t shell_commands[] = {
 static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
 {
     (void)arg;
-    struct can_frame *frame;
+    can_frame_t *frame;
 
     switch (event) {
     case CANDEV_EVENT_ISR:
@@ -237,19 +237,19 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
     case CANDEV_EVENT_RX_INDICATION:
         DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
 
-        frame = (struct can_frame *)arg;
+        frame = (can_frame_t *)arg;
 
         DEBUG("            id: %" PRIx32 " dlc: %u data: ", frame->can_id & 0x1FFFFFFF,
-              frame->can_dlc);
-        for (uint8_t i = 0; i < frame->can_dlc; i++) {
+              frame->len);
+        for (uint8_t i = 0; i < frame->len; i++) {
             DEBUG("0x%X ", frame->data[i]);
         }
         DEBUG_PUTS("");
 
         /* Store in buffer until user requests the data */
         isrpipe_write(&rxbuf, (uint8_t *)&(frame->can_id), sizeof(frame->can_id));
-        isrpipe_write_one(&rxbuf, frame->can_dlc);
-        isrpipe_write(&rxbuf, frame->data, frame->can_dlc);
+        isrpipe_write_one(&rxbuf, frame->len);
+        isrpipe_write(&rxbuf, frame->data, frame->len);
 
         break;
     case CANDEV_EVENT_RX_ERROR:

@@ -7,6 +7,7 @@
 menu "System"
 
 rsource "auto_init/Kconfig"
+rsource "can/Kconfig"
 rsource "chunked_ringbuffer/Kconfig"
 rsource "congure/Kconfig"
 rsource "debug_irq_disable/Kconfig"

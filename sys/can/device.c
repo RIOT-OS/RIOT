@@ -35,6 +35,16 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifdef MODULE_FDCAN
+/**
+ * The loop delay in CAN, especially in CAN FD with bitrate switching, affects synchronization due to increased data rates.
+ * The unit is nanoseconds.
+ */
+#ifndef CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY
+#error "CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY must be defined. This property can be found in the datasheet of the CAN transceiver in use. The unit is nanoseconds."
+#endif /* CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY */
+#endif /* MODULE_FDCAN */
+
 #ifndef CAN_DEVICE_MSG_QUEUE_SIZE
 #define CAN_DEVICE_MSG_QUEUE_SIZE 64
 #endif
@@ -52,7 +62,7 @@ static int power_down(candev_dev_t *candev_dev);
 static void _can_event(candev_t *dev, candev_event_t event, void *arg)
 {
     msg_t msg;
-    struct can_frame *frame;
+    can_frame_t *frame;
     can_pkt_t *pkt;
     candev_dev_t *candev_dev = dev->isr_arg;
 
@@ -78,13 +88,13 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
     case CANDEV_EVENT_TX_CONFIRMATION:
         DEBUG("_can_event: CANDEV_EVENT_TX_CONFIRMATION\n");
         /* frame pointer in arg */
-        pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
+        pkt = container_of((can_frame_t *)arg, can_pkt_t, frame);
         can_dll_dispatch_tx_conf(pkt);
         break;
     case CANDEV_EVENT_TX_ERROR:
         DEBUG("_can_event: CANDEV_EVENT_TX_ERROR\n");
         /* frame pointer in arg */
-        pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
+        pkt = container_of((can_frame_t *)arg, can_pkt_t, frame);
         can_dll_dispatch_tx_error(pkt);
         break;
     case CANDEV_EVENT_RX_INDICATION:
@@ -93,7 +103,7 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
         /* received frame in arg */
-        frame = (struct can_frame *) arg;
+        frame = (can_frame_t *) arg;
         can_dll_dispatch_rx_frame(frame, candev_dev->pid);
         break;
     case CANDEV_EVENT_RX_ERROR:
@@ -235,6 +245,13 @@ static void *_can_device_thread(void *args)
     dev->isr_arg = candev_dev;
 
     candev_dev->ifnum = can_dll_register_candev(candev_dev);
+
+#if defined(MODULE_FDCAN)
+    if (candev_dev->loop_delay == 0) {
+        candev_dev->loop_delay = CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY;
+    }
+    dev->loop_delay = candev_dev->loop_delay;
+#endif
 
     dev->driver->init(dev);
     power_up(candev_dev);

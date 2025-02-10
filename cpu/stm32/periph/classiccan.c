@@ -412,14 +412,14 @@ static int _send(candev_t *candev, const struct can_frame *frame)
     else {
         can->sTxMailBox[mailbox].TIR = (frame->can_id & CAN_SFF_MASK) << CAN_TIxR_SFF_SHIFT;
     }
-    can->sTxMailBox[mailbox].TDTR = frame->can_dlc & CAN_TDT0R_DLC;
+    can->sTxMailBox[mailbox].TDTR = frame->len & CAN_TDT0R_DLC;
 
     can->sTxMailBox[mailbox].TDLR = 0;
     can->sTxMailBox[mailbox].TDHR = 0;
-    for (int j = 0; j < 4 && frame->can_dlc > j; j++) {
+    for (int j = 0; j < 4 && frame->len > j; j++) {
         can->sTxMailBox[mailbox].TDLR |= (uint32_t)(frame->data[j] << (8 * j));
     }
-    for (int j = 4; j < 8 && frame->can_dlc > j; j++) {
+    for (int j = 4; j < 8 && frame->len > j; j++) {
         can->sTxMailBox[mailbox].TDHR |= (uint32_t)(frame->data[j] << (8 * (j - 4)));
     }
 
@@ -470,7 +470,7 @@ static int read_frame(can_t *dev, struct can_frame *frame, int mailbox)
     }
 
     /* Get DLC */
-    frame->can_dlc = can->sFIFOMailBox[mailbox].RDTR & CAN_RDT0R_DLC;
+    frame->len = can->sFIFOMailBox[mailbox].RDTR & CAN_RDT0R_DLC;
 
     /* Get Data */
     for (int j = 0; j < 4; j++) {
