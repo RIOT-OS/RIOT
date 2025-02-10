@@ -156,19 +156,19 @@ int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision)
     if (value < 0 || value > 999.9) return -1;
     if (precision != 10 && precision != 100 && precision != 1000) return -1;
 
-    double log_val = log(precision);
+    double log_val = log10(precision);
     int dp_pos = (int)log_val;
     int int_value = value * precision;
     int_value = int_value % 10000;
-    
+
     int res = digit7seg_set_int_all_value(dev, int_value);
     if (res != 0) {
+        DEBUG("[Error] Not possible to set float value.\n");
         return res;
     }
 
     /* Set the decimal point on the precision */
-    int shift = dp_pos - 1;
-    dev->value |= (0b10000000 << (BYTE_BITS * shift));
+    dev->value |= (0b10000000 << (BYTE_BITS * dp_pos));
     return 0;
 }
 #endif

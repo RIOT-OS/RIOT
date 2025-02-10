@@ -21,6 +21,10 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#define DIGIT7SEG_PARAM_DIG2_PIN GPIO_PIN(0, 3)
+#define DIGIT7SEG_PARAM_DIG3_PIN GPIO_PIN(0, 28)
+#define DIGIT7SEG_PARAM_DIG4_PIN GPIO_PIN(0, 2)
+
 #include "digit7seg_params.h"
 #include "digit7seg.h"
 #include "timex.h"
@@ -76,7 +80,9 @@ int main(void)
 
     ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
 
-    digit7seg_set_float_value(&dev, 234.15, 100);
+    digit7seg_set_float_value(&dev, 234.15, 1000);
+
+    ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
 
     digit7seg_poweroff(&dev);
 
