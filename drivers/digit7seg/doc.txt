@@ -199,7 +199,7 @@ on the display
 
 You can pass float directly to the function ::digit7seg_set_float_value to set a float on the display.
 
-This function take the value and the precision. E.g. for the value 234.15:
+This function takes the value and the precision. For example, for the value 234.15 :
 Precision  | Displayed |
 :----------|:----------|
 10         | 234.1     |
