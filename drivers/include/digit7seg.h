@@ -24,6 +24,10 @@
 #include "periph/gpio.h"
 #include "periph/timer.h"
 
+#ifdef MODULE_DIGIT7SEG_FLOAT
+#  include <math.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -152,7 +156,7 @@ int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value);
  *                       will be displayed as 234,1 but with
  *                       precision = 100 it will be 34,15
  */
-float digit7seg_set_float_value(digit7seg_t *dev, float value, int precision);
+int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision);
 #endif
 
 

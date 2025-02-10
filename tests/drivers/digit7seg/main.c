@@ -76,6 +76,8 @@ int main(void)
 
     ztimer_sleep(ZTIMER_USEC, TEST_DELAY_US * 3);
 
+    digit7seg_set_float_value(&dev, 234.15, 100);
+
     digit7seg_poweroff(&dev);
 
 

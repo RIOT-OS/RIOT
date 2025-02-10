@@ -153,20 +153,22 @@ int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value)
 #ifdef MODULE_DIGIT7SEG_FLOAT
 int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision)
 {
-    if (value < 0 || value > 999,9) return -1;
-    double log_val = log(precision);
-    if (log_val != 1.0 || log_val != 2.0 || log_val != 3.0) return -1;
+    if (value < 0 || value > 999.9) return -1;
+    if (precision != 10 && precision != 100 && precision != 1000) return -1;
 
+    double log_val = log(precision);
     int dp_pos = (int)log_val;
     int int_value = value * precision;
+    int_value = int_value % 10000;
     
     int res = digit7seg_set_int_all_value(dev, int_value);
     if (res != 0) {
         return res;
     }
 
-    int shift = log_val - 1;
-    dev->value |= (0b10000000 << (BYTE_BITS * shift)) 
+    /* Set the decimal point on the precision */
+    int shift = dp_pos - 1;
+    dev->value |= (0b10000000 << (BYTE_BITS * shift));
     return 0;
 }
 #endif
