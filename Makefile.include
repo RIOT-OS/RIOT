@@ -1012,7 +1012,8 @@ endif
 
 help:
   # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
-	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
+  # inspired by: https://stackoverflow.com/a/26339924
+	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
