@@ -377,6 +377,7 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
 int emcute_sub(emcute_sub_t *sub, unsigned flags)
 {
     assert(sub && (sub->cb) && (sub->topic.name) && !(flags & ~SUB_FLAGS));
+    size_t topic_len;
 
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
