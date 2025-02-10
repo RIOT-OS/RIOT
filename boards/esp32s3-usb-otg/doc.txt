@@ -32,7 +32,7 @@ it is equipped with two USB type A ports:
 - `USB_DEV` male port that is used to connect the board as a USB device to a host.
 - `USB_HOST` female port that is used to connect other USB devices to the board.
 
-\image html "https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/_images/pic_board_top_lable.png" "Espressif ESP32-S3-USB-OTG" width=600px
+\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/_images/pic_board_top_lable.png" "Espressif ESP32-S3-USB-OTG" width=600px
 
 @note RIOT-OS does only support the `USB_DEV` port, that is the board can only
       be used as USB device.
