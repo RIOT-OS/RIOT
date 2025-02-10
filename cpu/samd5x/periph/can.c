@@ -106,6 +106,17 @@ static const struct can_bittiming_const bittiming_const = {
     .brp_inc = 1,
 };
 
+can_t *candev2periph(candev_t *candev)
+{
+    if (candev && (candev->driver == &candev_samd5x_driver)) {
+        /* this is an SAMD5x peripheral CAN, as opposed to e.g. an external SPI
+         * attached one */
+        return container_of(candev, can_t, candev);
+    }
+
+    return NULL;
+}
+
 static int _power_on(can_t *dev)
 {
     /* CAN required CLK_CANx_APB and GCLK_CANx to be running and will not
@@ -145,6 +156,8 @@ static int _power_on(can_t *dev)
         assert(0);
     }
 
+    board_candev_set_power(&dev->candev, true);
+
     return 0;
 }
 
@@ -153,6 +166,8 @@ static int _power_off(can_t *dev)
     if (IS_USED(MODULE_PM_LAYERED)) {
         pm_unblock(SAM0_PM_IDLE);
     }
+
+    board_candev_set_power(&dev->candev, false);
 
     if (dev->conf->can == CAN0) {
         DEBUG_PUTS("CAN0 controller is used");

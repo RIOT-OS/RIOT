@@ -118,6 +118,18 @@ kernel_pid_t can_device_init(char *stack, int stacksize, char priority,
 int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *timing_const,
                               struct can_bittiming *bittiming);
 
+/**
+ * @brief   Function to provide by the board specification to enable the CAN
+ *          transceiver for the given CAN device to the given power state
+ *
+ * @param[in]   dev     CAN device to enable/disable the transceiver of
+ * @param[in]   active  `true` means set to active state, `false` means power
+ *                      off
+ * @note    A default no-op implementation is provided as `weak` symbol. On
+ *          boards that actually can enable/disable the transceiver need to
+ *          provide this.
+ */
+void board_candev_set_power(candev_t *dev, bool active)
 #ifdef __cplusplus
 }
 #endif

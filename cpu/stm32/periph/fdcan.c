@@ -1122,6 +1122,9 @@ static void turn_off(can_t *dev)
 
     DEBUG("%s: FDCAN%u turn off (%p)\n", __func__, get_channel_id(can), (void *)dev);
 
+    /* request board to power off CAN transceiver */
+    board_candev_set_power(&dev->candev, false);
+
     unsigned irq = irq_disable();
 
     if (_status[get_channel(dev->conf->can)] != STATUS_SLEEP) {
@@ -1162,6 +1165,9 @@ static void turn_on(can_t *dev)
     _status[get_channel(dev->conf->can)] = STATUS_ON;
 
     irq_restore(irq);
+
+    /* request board to power on CAN transceiver */
+    board_candev_set_power(&dev->candev, true);
 }
 
 static int _wake_up(can_t *dev)
@@ -1475,6 +1481,17 @@ static void tx_conf(can_t *dev, int mailbox)
         dev->candev.event_callback(candev, CANDEV_EVENT_TX_CONFIRMATION,
                                    (void *) frame);
     }
+}
+
+can_t *candev2periph(candev_t *candev)
+{
+    if (candev && (candev->driver == &candev_stm32_driver)) {
+        /* this is an STM32 peripheral CAN, as opposed to e.g. an external SPI
+         * attached one */
+        return container_of(candev, can_t, candev);
+    }
+
+    return NULL;
 }
 
 static void tx_irq_handler(can_t *dev)
