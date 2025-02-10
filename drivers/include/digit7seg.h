@@ -24,6 +24,10 @@
 #include "periph/gpio.h"
 #include "periph/timer.h"
 
+#ifdef MODULE_DIGIT7SEG_FLOAT
+#  include <math.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -121,6 +125,41 @@ void digit7seg_set_all_value(digit7seg_t *dev, uint32_t value);
  */
 int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value);
 
+#if MODULE_DIGIT7SEG_INT || DOXYGEN
+/**
+ * @brief   Set the value for every digit from an int
+ * 
+ * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
+ * @param[in] value     the value between [0, 9999]
+ *
+ */
+int digit7seg_set_int_all_value(digit7seg_t *dev, uint16_t value);
+
+/**
+ * @brief   Set the value for one digit from an int
+ * 
+ * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
+ * @param[in] index     the digit number between [0, DIGIT7SEG_MAX_DIGITS[
+ * @param[in] value     the value between [0, 9]
+ *
+ */
+int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value);
+#endif
+
+#if MODULE_DIGIT7SEG_FLOAT || DOXYGEN
+/**
+ * @brief   Set a float value dispatched between every display
+ * 
+ * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
+ * @param[in] value     A float value between [0, 999,9]
+ * @param[in] precision The multiplier factor ex: value = 234,15, precision = 10
+ *                       will be displayed as 234,1 but with
+ *                       precision = 100 it will be 34,15
+ */
+int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision);
+#endif
+
+
 /**
  * @brief   Start an periodic timer event to shift between each 7seg
  *
@@ -137,6 +176,24 @@ int digit7seg_poweron(digit7seg_t *dev);
  * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
  */
 void digit7seg_poweroff(digit7seg_t *dev);
+
+#if MODULE_DIGIT7SEG_INT || MODULE_DIGIT7SEG_FLOAT || DOXYGEN
+/**
+ * @brief   Display bitfield for numbers between [0, 9]
+ */
+static const uint8_t digit7seg_bitfield[] = {
+    0b00111111, /**< 0 */
+    0b00000110, /**< 1 */
+    0b01011011, /**< 2 */
+    0b01001111, /**< 3 */
+    0b01100110, /**< 4 */
+    0b01101101, /**< 5 */
+    0b01111101, /**< 6 */
+    0b00000111, /**< 7 */
+    0b01111111, /**< 8 */
+    0b01101111  /**< 9 */
+};
+#endif
 
 #ifdef __cplusplus
 }

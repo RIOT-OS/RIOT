@@ -136,12 +136,56 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
     uint32_t temp_value = value << (index * BYTE_BITS);
     uint32_t up_value = dev->value >> ((index + 1) * BYTE_BITS);
     up_value <<= ((index + 1) * BYTE_BITS);
-    uint32_t down_value = ((0b00000001 << (index * BYTE_BITS)) - 1) & dev->value;
+    uint32_t down_value = ((1 << (index * BYTE_BITS)) - 1) & dev->value;
 
     dev->value = up_value | temp_value | down_value;
 
     return 0;
 }
+
+#ifdef MODULE_DIGIT7SEG_INT
+int digit7seg_set_int_all_value(digit7seg_t *dev, uint16_t value)
+{
+    if (value > 9999) return -1;
+
+    for (int i = 0; i < 4 && value > 0; i++) {
+        digit7seg_set_value(dev, i, digit7seg_bitfield[value % 10]);
+        value = value / 10;
+    }
+
+    return 0;
+}
+
+int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value)
+{
+    if (value > 9) return -1;
+
+    return digit7seg_set_value(dev, index, digit7seg_bitfield[value]);
+}
+#endif
+
+#ifdef MODULE_DIGIT7SEG_FLOAT
+int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision)
+{
+    if (value < 0 || value > 999.9) return -1;
+    if (precision != 10 && precision != 100 && precision != 1000) return -1;
+
+    double log_val = log10(precision);
+    int dp_pos = (int)log_val;
+    int int_value = value * precision;
+    int_value = int_value % 10000;
+
+    int res = digit7seg_set_int_all_value(dev, int_value);
+    if (res != 0) {
+        DEBUG("[Error] Not possible to set float value.\n");
+        return res;
+    }
+
+    /* Set the decimal point on the precision */
+    dev->value |= (0b10000000 << (BYTE_BITS * dp_pos));
+    return 0;
+}
+#endif
 
 int digit7seg_poweron(digit7seg_t *dev)
 {

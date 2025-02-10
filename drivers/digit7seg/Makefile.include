@@ -1,2 +1,5 @@
 USEMODULE_INCLUDES_digit7seg := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_digit7seg)
+
+PSEUDOMODULES += digit7seg_int
+PSEUDOMODULES += digit7seg_float
