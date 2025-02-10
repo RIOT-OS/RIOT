@@ -19,7 +19,6 @@
  */
 
 #include "board.h"
-#include "can/device.h"
 #include "container.h"
 #include "periph/can.h"
 #include "periph/gpio.h"
