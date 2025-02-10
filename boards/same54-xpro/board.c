@@ -22,7 +22,6 @@
 #include "container.h"
 #include "periph/can.h"
 #include "periph/gpio.h"
-#include "periph_conf.h"
 #include "time_units.h"
 
 #ifdef MODULE_VFS_DEFAULT
