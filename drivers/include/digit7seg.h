@@ -128,7 +128,7 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value);
 #if MODULE_DIGIT7SEG_INT || DOXYGEN
 /**
  * @brief   Set the value for every digit from an int
- * 
+ *
  * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
  * @param[in] value     the value between [0, 9999]
  *
@@ -137,7 +137,7 @@ int digit7seg_set_int_all_value(digit7seg_t *dev, uint16_t value);
 
 /**
  * @brief   Set the value for one digit from an int
- * 
+ *
  * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
  * @param[in] index     the digit number between [0, DIGIT7SEG_MAX_DIGITS[
  * @param[in] value     the value between [0, 9]
@@ -149,7 +149,7 @@ int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value);
 #if MODULE_DIGIT7SEG_FLOAT || DOXYGEN
 /**
  * @brief   Set a float value dispatched between every display
- * 
+ *
  * @param[in] dev       Initialized device descriptor of DIGIT7SEG device
  * @param[in] value     A float value between [0, 999,9]
  * @param[in] precision The multiplier factor ex: value = 234,15, precision = 10
@@ -158,7 +158,6 @@ int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value);
  */
 int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision);
 #endif
-
 
 /**
  * @brief   Start an periodic timer event to shift between each 7seg

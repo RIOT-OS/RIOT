@@ -86,6 +86,5 @@ int main(void)
 
     digit7seg_poweroff(&dev);
 
-
     return 0;
 }

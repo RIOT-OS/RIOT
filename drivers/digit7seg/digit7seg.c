@@ -146,7 +146,9 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
 #ifdef MODULE_DIGIT7SEG_INT
 int digit7seg_set_int_all_value(digit7seg_t *dev, uint16_t value)
 {
-    if (value > 9999) return -1;
+    if (value > 9999) {
+        return -1;
+    }
 
     for (int i = 0; i < 4 && value > 0; i++) {
         digit7seg_set_value(dev, i, digit7seg_bitfield[value % 10]);
@@ -158,7 +160,9 @@ int digit7seg_set_int_all_value(digit7seg_t *dev, uint16_t value)
 
 int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value)
 {
-    if (value > 9) return -1;
+    if (value > 9) {
+        return -1;
+    }
 
     return digit7seg_set_value(dev, index, digit7seg_bitfield[value]);
 }
@@ -167,8 +171,12 @@ int digit7seg_set_int_value(digit7seg_t *dev, int index, uint8_t value)
 #ifdef MODULE_DIGIT7SEG_FLOAT
 int digit7seg_set_float_value(digit7seg_t *dev, float value, int precision)
 {
-    if (value < 0 || value > 999.9) return -1;
-    if (precision != 10 && precision != 100 && precision != 1000) return -1;
+    if (value < 0 || value > 999.9) {
+        return -1;
+    }
+    if (precision != 10 && precision != 100 && precision != 1000) {
+        return -1;
+    }
 
     double log_val = log10(precision);
     int dp_pos = (int)log_val;

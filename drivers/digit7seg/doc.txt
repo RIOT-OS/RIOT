@@ -185,4 +185,24 @@ else {
 digit7seg_poweroff(&dev)
 
 ```
+
+### Int support
+
+> The pseudomodule `digit7seg_int` need to be added
+
+You can pass integer directly to the function ::digit7seg_set_int_all_value to set directly an int
+on the display
+
+### Float support
+
+> The pseudomodule `digit7seg_float` need to be added
+
+You can pass float directly to the function ::digit7seg_set_float_value to set a float on the display.
+
+This function take the value and the precision. E.g. for the value 234.15:
+Precision  | Displayed |
+:----------|:----------|
+10         | 234.1     |
+100        | 34.15     |
+1000       | 4.150     |
 */
