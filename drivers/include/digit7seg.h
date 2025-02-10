@@ -30,14 +30,14 @@ extern "C" {
 
 #define DIGIT7SEG_MAX_DIGITS  (4)     /**< Max pin number, can be below or equal */
 #ifndef DIGIT7SEG_TIMER_HZ
-#   define DIGIT7SEG_TIMER_HZ    MHZ(1)  /**< default timer hz */
+#  define DIGIT7SEG_TIMER_HZ    MHZ(1)  /**< default timer hz */
 #endif
 #ifndef DIGIT7SEG_DELAY
 /**
  * With 1MHz and a cycle as 2600 we got 2.6ms each shift,
  * so undetectable frequency by human eyes
  * */
-#   define DIGIT7SEG_DELAY       (DIGIT7SEG_TIMER_HZ / 2600)
+#  define DIGIT7SEG_DELAY       (DIGIT7SEG_TIMER_HZ / 2600)
 #endif
 
 /**
@@ -117,7 +117,7 @@ void digit7seg_set_all_value(digit7seg_t *dev, uint32_t value);
  *                       b the second.... dp the 8th bit.
  *
  * @return              0 on success
- * @return              -1 when an incorrect digit is passed
+ * @return              -1 when an invalid index is passed
  */
 int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value);
 

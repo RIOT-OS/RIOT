@@ -10,18 +10,25 @@
 
 @defgroup    drivers_digit7seg Generic 7 segments driver
 @ingroup     drivers_display
-@brief       Device driver for less than 5 digits of 7 segments without IC
+@brief       Device driver for up to 4 digits with 7 segments without integrated controller
 
 ## About
 
-This driver was developed to works with [5461AS](http://www.topliteusa.com/uploadfile/2014/0825/A-5461AS.pdf)
-in a way that all 4 digits (and less) with 7 segments without integrated controller
-can be controlled into [RIOT-OS](https://github.com/RIOT-OS/RIOT).
+This driver was developed to work with [5461AS](http://www.topliteusa.com/uploadfile/2014/0825/A-5461AS.pdf)
+in a way that up to 4 digits with 7 segments without integrated controller
+can be controlled from RIOT-OS.
+
+### Prerequisite
+
+#### MCU
+
+- 12 pins available (depending of the 7 segments)
+- Hardware timer
 
 ### 7 segments
 
-Each digit contains 7 digit (plus decimal point), if the segment is set high and his
-digit is set high it will be lit.
+Each digit contains 7 segments (plus decimal point), if the segment is set high
+and his digit is set high it will be lit.
 Each value is cut into 8 bits (a, b, c, d, e, f, g, dp), if the bit is 1 current is sent otherwise
 not.
 
@@ -98,10 +105,10 @@ Data pin for e segment         | DIGIT7SEG_PARAM_E_PIN              | GPIO_PIN(1
 Data pin for f segment         | DIGIT7SEG_PARAM_F_PIN              | GPIO_PIN(0, 23)
 Data pin for g segment         | DIGIT7SEG_PARAM_G_PIN              | GPIO_PIN(0, 21)
 Data pin for dp segment        | DIGIT7SEG_PARAM_DP_PIN             | GPIO_PIN(0, 27)
-Pin to on digit 1              | DIGIT7SEG_PARAM_DIG1_PIN           | GPIO_PIN(1, 2)
-Pin to on digit 2              | DIGIT7SEG_PARAM_DIG2_PIN           | GPIO_PIN(1, 1)
-Pin to on digit 3              | DIGIT7SEG_PARAM_DIG3_PIN           | GPIO_PIN(1, 8)
-Pin to on digit 4              | DIGIT7SEG_PARAM_DIG4_PIN           | GPIO_PIN(0, 13)
+Pin to digit 1                 | DIGIT7SEG_PARAM_DIG1_PIN           | GPIO_PIN(1, 2)
+Pin to digit 2                 | DIGIT7SEG_PARAM_DIG2_PIN           | GPIO_PIN(1, 1)
+Pin to digit 3                 | DIGIT7SEG_PARAM_DIG3_PIN           | GPIO_PIN(1, 8)
+Pin to digit 4                 | DIGIT7SEG_PARAM_DIG4_PIN           | GPIO_PIN(0, 13)
 Timer for periodic interrupt   | DIGIT7SEG_PARAM_TIMER              | TIMER_DEV(2)
 Number of digits on the periph | DIGIT7SEG_PARAM_DIGITS             | 4
 
@@ -154,7 +161,8 @@ if (digit7seg_init(&dev, &digit7seg_params[0]) != DIGIT7SEG_OK) {
 ```
 
 Once the device is initialized and configured :
-- ::digit7seg_set_all_value function can be used to set the value for all the digits.
+- ::digit7seg_set_value function is used to define a value for one digit.
+- ::digit7seg_set_all_value function can be used to set the same value to all digits.
 - ::digit7seg_poweron function starts a periodic timer that cycles through each digit to give the impression that they are all lit simultaneously.
 - ::digit7seg_poweroff function stops this timer.
 

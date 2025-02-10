@@ -9,7 +9,7 @@
 /**
  * @ingroup     drivers_digit7seg
  * @file
- * @brief       Device driver for less than 5 digits of 7 segments without IC
+ * @brief       Device driver for up to 4 digits of 7 segments without IC
  * @author      Pierre Le Meur <pierre1.lemeur@orange.com>
  */
 
@@ -119,6 +119,20 @@ int digit7seg_set_value(digit7seg_t *dev, int index, uint8_t value)
         return -1;
     }
 
+    /*
+     * the 7 segments are represented by groups of 8 bits e.g.:
+     *  01110111 00110000 00111111 01110000
+     *
+     * If the index is 2, the dev value will be divide into 3 groups:
+     *  01110111 00110000 00111111 01110000
+     *     ↑         ↑        ↖       ↗
+     *  up_value temp_value  down_value
+     *
+     * The choice was between this or make the value given as the same
+     * size as the current dev value and do a OR with it.
+     *
+     * one being as good as the other I choose the first one.
+     * */
     uint32_t temp_value = value << (index * BYTE_BITS);
     uint32_t up_value = dev->value >> ((index + 1) * BYTE_BITS);
     up_value <<= ((index + 1) * BYTE_BITS);

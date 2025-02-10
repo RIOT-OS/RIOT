@@ -31,86 +31,86 @@ extern "C" {
 /**
  * @brief   digit 7 seg a pin
  */
-#   define DIGIT7SEG_PARAM_A_PIN            GPIO_PIN(1, 11)  /* D2 */
+#  define DIGIT7SEG_PARAM_A_PIN            GPIO_PIN(1, 11)  /* D2 */
 #endif
 #ifndef DIGIT7SEG_PARAM_B_PIN
 /**
  * @brief   digit 7 seg b pin
  */
-#   define DIGIT7SEG_PARAM_B_PIN            GPIO_PIN(1, 12)  /* D3 */
+#  define DIGIT7SEG_PARAM_B_PIN            GPIO_PIN(1, 12)  /* D3 */
 #endif
 #ifndef DIGIT7SEG_PARAM_C_PIN
 /**
  * @brief   digit 7 seg c pin
  */
-#   define DIGIT7SEG_PARAM_C_PIN            GPIO_PIN(1, 15)  /* D4 */
+#  define DIGIT7SEG_PARAM_C_PIN            GPIO_PIN(1, 15)  /* D4 */
 #endif
 #ifndef DIGIT7SEG_PARAM_D_PIN
 /**
  * @brief   digit 7 seg d pin
  */
-#   define DIGIT7SEG_PARAM_D_PIN            GPIO_PIN(1, 13)  /* D5 */
+#  define DIGIT7SEG_PARAM_D_PIN            GPIO_PIN(1, 13)  /* D5 */
 #endif
 #ifndef DIGIT7SEG_PARAM_E_PIN
 /**
  * @brief   digit 7 seg e pin
  */
-#   define DIGIT7SEG_PARAM_E_PIN            GPIO_PIN(1, 14)  /* D6 */
+#  define DIGIT7SEG_PARAM_E_PIN            GPIO_PIN(1, 14)  /* D6 */
 #endif
 #ifndef DIGIT7SEG_PARAM_F_PIN
 /**
  * @brief   digit 7 seg f pin
  */
-#   define DIGIT7SEG_PARAM_F_PIN            GPIO_PIN(0, 23)  /* D7 */
+#  define DIGIT7SEG_PARAM_F_PIN            GPIO_PIN(0, 23)  /* D7 */
 #endif
 #ifndef DIGIT7SEG_PARAM_G_PIN
 /**
  * @brief   digit 7 seg g pin
  */
-#   define DIGIT7SEG_PARAM_G_PIN            GPIO_PIN(0, 21)  /* D8 */
+#  define DIGIT7SEG_PARAM_G_PIN            GPIO_PIN(0, 21)  /* D8 */
 #endif
 #ifndef DIGIT7SEG_PARAM_DP_PIN
 /**
  * @brief  digit 7 seg dp pin
  */
-#   define DIGIT7SEG_PARAM_DP_PIN           GPIO_PIN(0, 27)  /* D9 */
+#  define DIGIT7SEG_PARAM_DP_PIN           GPIO_PIN(0, 27)  /* D9 */
 #endif
 
 #ifndef DIGIT7SEG_PARAM_DIG1_PIN
 /**
  * @brief   digit 7 seg first digit pin
  */
-#   define DIGIT7SEG_PARAM_DIG1_PIN         GPIO_PIN(1, 2)   /* D10 */
+#  define DIGIT7SEG_PARAM_DIG1_PIN         GPIO_PIN(1, 2)   /* D10 */
 #endif
 #ifndef DIGIT7SEG_PARAM_DIG2_PIN
 /**
  * @brief   digit 7 seg second digit pin
  */
-#   define DIGIT7SEG_PARAM_DIG2_PIN         GPIO_PIN(1, 1)   /* D11 */
+#  define DIGIT7SEG_PARAM_DIG2_PIN         GPIO_PIN(1, 1)   /* D11 */
 #endif
 #ifndef DIGIT7SEG_PARAM_DIG3_PIN
 /**
  * @brief   digit 7 seg third digit pin
  */
-#   define DIGIT7SEG_PARAM_DIG3_PIN         GPIO_PIN(1, 8)   /* D12 */
+#  define DIGIT7SEG_PARAM_DIG3_PIN         GPIO_PIN(1, 8)   /* D12 */
 #endif
 #ifndef DIGIT7SEG_PARAM_DIG4_PIN
 /**
  * @brief   digit 7 seg fourth digit pin
  */
-#   define DIGIT7SEG_PARAM_DIG4_PIN         GPIO_PIN(0, 13)   /* D13 */
+#  define DIGIT7SEG_PARAM_DIG4_PIN         GPIO_PIN(0, 13)   /* D13 */
 #endif
 #ifndef DIGIT7SEG_PARAM_TIMER
 /**
  * @brief   digit 7 seg timer to use
  */
-#   define DIGIT7SEG_PARAM_TIMER            TIMER_DEV(2)
+#  define DIGIT7SEG_PARAM_TIMER            TIMER_DEV(2)
 #endif
 #ifndef DIGIT7SEG_PARAM_DIGITS
 /**
  * @brief   digit 7 seg number of digits
  */
-#   define DIGIT7SEG_PARAM_DIGITS           (4)
+#  define DIGIT7SEG_PARAM_DIGITS           (4)
 #endif
 
 #ifndef DIGIT7SEG_PARAMS
