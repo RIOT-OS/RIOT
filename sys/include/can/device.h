@@ -129,7 +129,7 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
  *          boards that actually can enable/disable the transceiver need to
  *          provide this.
  */
-void board_candev_set_power(candev_t *dev, bool active)
+void board_candev_set_power(candev_t *dev, bool active);
 #ifdef __cplusplus
 }
 #endif
