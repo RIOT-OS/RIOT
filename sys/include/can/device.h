@@ -126,8 +126,8 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
  * @param[in]   active  `true` means set to active state, `false` means power
  *                      off
  * @note    A default no-op implementation is provided as `weak` symbol. On
- *          boards that actually can enable/disable the transceiver need to
- *          provide this.
+ *          boards that actually can enable/disable the transceiver. This function
+ *          needs to be provided at board level (e.g board.c file).
  */
 void board_candev_set_power(candev_t *dev, bool active);
 #ifdef __cplusplus
