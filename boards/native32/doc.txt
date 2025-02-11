@@ -1,27 +1,14 @@
 /**
-@defgroup    boards_native Native Board
+@defgroup    boards_native32 Native32 Board
 @ingroup     boards
-@brief       Support for running RIOT in native
+@brief       Support for running RIOT in native32
 
 [Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
-# Overview
-![Terminal running RIOT native](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
-
-# Hardware
-- CPU: Host CPU
-- RAM: Host RAM
-- Flash:
-    - for program execution: Host file system
-    - for the @ref drivers_periph_flashpage : emulated in RAM
-- Network: Tap Interface
-- UART: Runtime configurable - `/dev/tty*` are supported
-- Timers: Host timer
-- LEDs: One red and one green LED - state changes are printed to the UART
-- PWM: Dummy PWM
-- QDEC: Emulated according to PWM
-- SPI: Runtime configurable - `/dev/spidev*` are supported (Linux host only)
-- GPIO: Runtime configurable - `/dev/gpiochip*` are supported (Linux host only)
+Same board as \ref boards_native "native", but compiled for 32-bit instead of 64-bit.
+Currently only Linux x86 and ARM32 are supported.
+Otherwise, everything works the same as for the 64-bit version.
+For more information on this board, see the \ref boards_native "native board" documentation.
 
 # Required packages
 
