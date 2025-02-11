@@ -19,14 +19,13 @@
  *
  * @note         'stdio_read' blocks until at least one character was read.
  *
- * @note         'stdio_write' is considered non-blocking even though it uses a mutex to protect the
- *               write buffer since only 'stdio_write' uses this mutex. Characters will be written
- *               in FIFO mode. Characters that do not fit in the buffer will be dropped.
+ * @note         'stdio_write' is non-blocking. Characters are written in FIFO mode. Characters
+ *               that do not fit in the buffer will be dropped.
  *
  * This module uses NimBLE for stdio. The bluetooth characteristic for
  * stdin is writable and the characteristic for stdout uses the indicate
  * mechanism to publish the system's output to a connected device. Data will be
- * sent out asynchronously via callout functions.
+ * sent out asynchronously and automatically split into BLE packets.
  *
  * To use this module, add
  * ```

@@ -44,9 +44,6 @@
 
 #define NIMBLE_MAX_PAYLOAD  MYNEWT_VAL(BLE_LL_MAX_PKT_SIZE)
 
-/* Nimble uses ZTIMER_MSEC => 1 tick equals 1 ms */
-#define CALLOUT_TICKS_MS    1
-
 enum {
     STDIO_NIMBLE_DISCONNECTED,
     STDIO_NIMBLE_CONNECTED,
@@ -69,7 +66,6 @@ static uint16_t _val_handle_stdout;
 static volatile uint8_t _status = STDIO_NIMBLE_DISCONNECTED;
 
 /* nimble related structs */
-static struct ble_npl_callout _send_stdout_callout;
 static struct ble_gap_event_listener _gap_event_listener;
 
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
@@ -87,7 +83,7 @@ static char _debug_printf_buf[DEBUG_PRINTF_BUFSIZE];
         int rc = snprintf(_debug_printf_buf, DEBUG_PRINTF_BUFSIZE, __VA_ARGS__); \
         uart_write(STDIO_UART_DEV, (const uint8_t *)_debug_printf_buf, rc); \
         irq_restore(state); \
-    } while(0)
+    } while (0)
 #else
 #define _debug_printf(...) (void)0
 #endif
@@ -181,13 +177,8 @@ static void _purge_buffer(void)
     tsrb_clear(&_tsrb_stdout);
 }
 
-static void _send_stdout(struct ble_npl_event *ev)
+static void _send_stdout(void)
 {
-    (void)ev;
-
-    /* rearm callout */
-    ble_npl_callout_reset(&_send_stdout_callout, CALLOUT_TICKS_MS);
-
     if (_status == STDIO_NIMBLE_SUBSCRIBED) {
         _status = STDIO_NIMBLE_SENDING;
         int to_send = tsrb_peek(&_tsrb_stdout, _stdout_write_buf, NIMBLE_MAX_PAYLOAD);
@@ -212,6 +203,11 @@ static void _send_stdout(struct ble_npl_event *ev)
         else {
             _status = STDIO_NIMBLE_SUBSCRIBED;
         }
+    }
+
+    if (tsrb_avail(&_tsrb_stdout) > 0 && _status == STDIO_NIMBLE_SUBSCRIBED) {
+        /* retry sending data for anything left in the ringbuffer */
+        _send_stdout();
     }
 }
 
@@ -258,13 +254,15 @@ static int _gap_event_cb(struct ble_gap_event *event, void *arg)
         break;
 
     case BLE_GAP_EVENT_NOTIFY_TX:
-        _debug_printf("BLE_GAP_EVENT_NOTIFY_TX %d\n", event->notify_tx.conn_handle);
+        _debug_printf("BLE_GAP_EVENT_NOTIFY_TX %d: Status: %d\n", event->notify_tx.conn_handle,
+                      event->notify_tx.status);
         if (event->notify_tx.indication == 1 && (event->notify_tx.conn_handle == _conn_handle)) {
-            if (event->notify_tx.status == BLE_HS_EDONE) {
+            if (event->notify_tx.status != 0) {
+                /* Status 0 indicates the command was sent, but only the response is relevant */
                 _status = STDIO_NIMBLE_SUBSCRIBED;
-            }
-            else if (event->notify_tx.status != 0) {
-                _status = STDIO_NIMBLE_SUBSCRIBED;
+
+                /* retrigger transmission in case more data is in the buffer */
+                _send_stdout();
             }
         }
         break;
@@ -300,30 +298,25 @@ static void _init(void)
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, NULL, NULL);
 #endif
-
-    ble_npl_callout_init(&_send_stdout_callout, nimble_port_get_dflt_eventq(),
-                         _send_stdout, NULL);
 }
 
 static ssize_t _write(const void *buffer, size_t len)
 {
+#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
     unsigned state = irq_disable();
 
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
     uart_write(STDIO_UART_DEV, (const uint8_t *)PREFIX_STDOUT, strlen(PREFIX_STDOUT));
     uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
     uart_write(STDIO_UART_DEV, (const uint8_t *)"\n", 1);
-#endif
 
     irq_restore(state);
+#endif
 
     unsigned int consumed = tsrb_add(&_tsrb_stdout, buffer, len);
 
     if (_status == STDIO_NIMBLE_SUBSCRIBED || _status == STDIO_NIMBLE_SENDING) {
-        if (!ble_npl_callout_is_active(&_send_stdout_callout)) {
-            /* bootstrap callout */
-            ble_npl_callout_reset(&_send_stdout_callout, CALLOUT_TICKS_MS);
-        }
+        /* start the transmission process immediately */
+        _send_stdout();
     }
 
     return consumed;
