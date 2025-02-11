@@ -18,4 +18,5 @@
         "editor.tabSize": 2,
         "editor.insertSpaces": true,
     },
+    "cmake.sourceDirectory": "C:/_Projekte/_GitHub/RIOT/pkg/wamr",
 }

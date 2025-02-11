@@ -408,7 +408,7 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
     if ((flags & EMCUTE_TIT_MASK) == EMCUTE_TIT_PREDEF) {
         byteorder_htobebufs(&tbuf[5], sub->topic.id);
     }
-  
+
     int res = syncsend(SUBACK, (size_t)tbuf[0], false);
     if (res > 0) {
         DEBUG("[emcute] sub: success, topic id is %i\n", res);
