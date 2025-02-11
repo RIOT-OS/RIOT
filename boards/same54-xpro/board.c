@@ -114,7 +114,7 @@ void board_candev_set_power(candev_t *dev, bool active)
 
 void board_init(void)
 {
-    /* disable CAN transceiver to safe power */
+    /* disable CAN transceiver to save power */
     gpio_init(AT6561_STBY_PIN, GPIO_OUT);
     gpio_set(AT6561_STBY_PIN);
 }
