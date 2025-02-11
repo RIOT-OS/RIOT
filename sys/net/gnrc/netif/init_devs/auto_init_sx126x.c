@@ -90,6 +90,7 @@ void auto_init_sx126x(void)
                                          "sx126x", &sx126x_netdev[i].dev.netdev);
         }
         else {
+            sx126x_setup(&sx126x_devs[i], &sx126x_params[i], i);
             gnrc_netif_raw_create(&_netif[i], sx126x_stacks[i],
                                   SX126X_STACKSIZE, SX126X_PRIO,
                                   "sx126x", &sx126x_devs[i].netdev);

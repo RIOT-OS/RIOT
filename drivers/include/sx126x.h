@@ -121,7 +121,10 @@ struct sx126x {
     sx126x_pkt_params_lora_t pkt_params;    /**< Lora packet parameters */
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
-    uint16_t rx_timeout;                    /**< Rx Timeout in terms of symbols */
+    int32_t rx_timeout;                     /**< Rx Timeout in terms of symbols:
+                                                 <0: continuous Rx,
+                                                  0: single Rx,
+                                                 >0: actual timeout */
     bool radio_sleep;                       /**< Radio sleep status */
 #if IS_USED(MODULE_SX126X_IEEE802154)
     sx126x_cad_params_t cad_params;         /**< Radio Channel Activity Detection parameters */

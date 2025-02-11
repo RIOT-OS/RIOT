@@ -21,8 +21,11 @@
 #include <stdio.h>
 
 #include "macros/utils.h"
+#include "modules.h"
+#if IS_USED(MODULE_SX126X_IEEE802154)
 #include "net/ieee802154/radio.h"
 #include "net/ieee802154/submac.h"
+#endif
 #include "od.h"
 
 #include "sx126x.h"
@@ -71,6 +74,8 @@
 #define SX126X_BUFFER_SIZE              (256)
 #define SX126X_RX_BUFFER_OFFSET         (0)
 #define SX126X_TX_BUFFER_OFFSET         ((SX126X_BUFFER_SIZE) / 2)
+
+#if IS_USED(MODULE_SX126X_IEEE802154)
 
 static int _set_state(sx126x_t *dev, sx126x_state_t state);
 static int _get_state(sx126x_t *dev, void  *val);
@@ -144,12 +149,19 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
         }
 #endif
         sx126x_cfg_rx_boosted(dev, true);
-        int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
-        if (timeout != 0) {
-            sx126x_set_rx(dev, timeout);
+        if (dev->rx_timeout >= 0) {
+            int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
+            sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
+            if (timeout > 0) {
+                sx126x_set_rx(dev, timeout);
+            }
+            else {
+                sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
+            }
         }
         else {
-            sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
+            sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_FS);
+            sx126x_set_rx_with_timeout_in_rtc_step(dev, SX126X_RX_CONTINUOUS);
         }
         break;
 
@@ -570,10 +582,18 @@ static const ieee802154_radio_ops_t _sx126x_ops = {
     .set_frame_filter_mode = _set_frame_filter_mode,
 };
 
+#endif /* IS_USED(MODULE_SX126X_IEEE802154) */
+
 void sx126x_hal_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index,
                       ieee802154_dev_t *hal, void (*event_cb)(void *arg), void *arg)
 {
+    (void)dev;
+    (void)params;
+    (void)hal;
     (void)index;
+    (void)event_cb;
+    (void)arg;
+#if IS_USED(MODULE_SX126X_IEEE802154)
     dev->params = (sx126x_params_t *)params;
     dev->ack_filter = false;
     dev->pending = false;
@@ -584,6 +604,7 @@ void sx126x_hal_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t inde
 #if IS_USED(MODULE_SX126X_STM32WL)
 #if SX126X_NUMOF == 1
     extern sx126x_t *sx126x_stm32wl = dev;
+#endif
 #endif
 #endif
 }

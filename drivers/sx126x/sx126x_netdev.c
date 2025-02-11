@@ -18,6 +18,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <errno.h>
 
@@ -306,12 +307,20 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         }
 #endif
         sx126x_cfg_rx_boosted(dev, true);
-        int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
-        if (_timeout != 0) {
-            sx126x_set_rx(dev, _timeout);
+        if (dev->rx_timeout >= 0) {
+            int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
+            printf("timeout: %d\n", timeout);
+            sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
+            if (timeout > 0) {
+                sx126x_set_rx(dev, timeout);
+            }
+            else {
+                sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
+            }
         }
         else {
-            sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
+            sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_FS);
+            sx126x_set_rx_with_timeout_in_rtc_step(dev, SX126X_RX_CONTINUOUS);
         }
         break;
 
@@ -367,6 +376,17 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         sx126x_set_channel(dev, *((const uint32_t *)val));
         return sizeof(uint32_t);
 
+    case NETOPT_SINGLE_RECEIVE:
+        assert(len <= sizeof(netopt_enable_t));
+        netopt_enable_t single_rx = *((const netopt_enable_t *)val);
+        if (single_rx) {
+            dev->rx_timeout = 0;
+        }
+        else {
+            dev->rx_timeout = -1;
+        }
+        return sizeof(netopt_enable_t);
+
     case NETOPT_BANDWIDTH:
         assert(len <= sizeof(uint8_t));
         uint8_t bw = *((const uint8_t *)val);
@@ -411,9 +431,16 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         return sizeof(netopt_enable_t);
 
     case NETOPT_RX_SYMBOL_TIMEOUT:
-        assert(len <= sizeof(uint16_t));
-        dev->rx_timeout = *(const uint16_t *)val;
-        return sizeof(uint16_t);
+        assert(len <= sizeof(int32_t));
+        int32_t timeout = *((const int32_t *)val);
+        if (timeout >= 0) {
+            dev->rx_timeout = *(const int32_t *)val;
+            return sizeof(int32_t);
+        }
+        else {
+            res = -EINVAL;
+            break;
+        }
 
     case NETOPT_TX_POWER:
         assert(len <= sizeof(int16_t));
