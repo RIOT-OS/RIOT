@@ -32,7 +32,7 @@ the following modules:
 - ESP32-S3-WROOM-1x module (ESP32-S3-DevKitC-1 board)
 - ESP32-S3-WROOM-2 module (ESP32-S3-DevKitC-1 board)
 
-\image html "https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/ESP32-S3-DevKitC-1_v2-annotated-photo.png" "Espressif ESP32-S3-DevKitM-1" width=600px
+\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/_images/ESP32-S3-DevKitC-1_v2-annotated-photo.png" "Espressif ESP32-S3-DevKitM-1" width=600px
 
 <br>
 Due to the different modules used, the available versions of the
@@ -179,8 +179,8 @@ boards, see section \ref esp32_peripherals "Common Peripherals".
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/ESP32-S3_DevKitC-1_pinlayout.jpg "ESP32-S3-DevKitC-1 Pinout" width=900px
-@image html https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/ESP32-S3_DevKitM-1_pinlayout.jpg "ESP32-S3-DevKitM-1 Pinout" width=900px
+@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/_images/ESP32-S3_DevKitC-1_pinlayout_v1.1.jpg" "ESP32-S3-DevKitC-1 Pinout" width=900px
+@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/_images/ESP32-S3_DevKitM-1_pinlayout.jpg" "ESP32-S3-DevKitM-1 Pinout" width=900px
 
 The corresponding board schematics can be found:
 

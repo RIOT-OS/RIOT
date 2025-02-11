@@ -36,7 +36,7 @@ limited, the ESP32-C3-DevKit should also work for most other ESP32-C3 boards.
 Any modifications required for specific applications could be overridden by
 \ref esp32_application_specific_configurations "application-specific board configuration".
 
-\image html "https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/_images/esp32-c3-devkitm-1-v1-annotated-photo.png" "Espressif ESP32-C3-DevKitM-1" width=800px
+\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c3/_images/esp32-c3-devkitm-1-v1-annotated-photo.png" "Espressif ESP32-C3-DevKitM-1" width=800px
 
 [Back to table of contents](#esp32c3_devkit_toc)
 
