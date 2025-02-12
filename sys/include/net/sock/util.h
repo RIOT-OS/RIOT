@@ -28,19 +28,60 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "net/sock/udp.h"
-#include "net/sock/tcp.h"
 #include "net/sock/config.h"
 
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || DOXYGEN
+#  include "net/sock/udp.h"
+#endif
+#if MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
+#  include "net/sock/tcp.h"
+#endif
 #ifdef MODULE_SOCK_DTLS
-#include "net/credman.h"
-#include "net/sock/dtls.h"
+#  include "net/credman.h"
+#  include "net/sock/dtls.h"
+#endif
+
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP ||MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
+#  define HAVE_SOCK_TL_EP   1 /**< Indicates presence of `struct _sock_tl_ep` */
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief    Split url to host:port and url path
+ *
+ * Will split e.g., "https://host.name:1234/url/path" into
+ * "host.name:1234" and "/url/path".
+ *
+ * @note Caller has to make sure hostport and urlpath can hold the results!
+ *       Make sure to provide space for @ref CONFIG_SOCK_HOSTPORT_MAXLEN respectively
+ *       @ref CONFIG_SOCK_URLPATH_MAXLEN bytes, if pointers are not NULL.
+ *       Scheme part of the URL is limited to @ref CONFIG_SOCK_SCHEME_MAXLEN length.
+ *
+ * @pre `url != NULL`
+ *
+ * @param[in]   url         URL to split. Must not be NULL.
+ * @param[out]  hostport    where to write host:port. Can be NULL.
+ * @param[out]  urlpath     where to write url path. Can be NULL.
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+int sock_urlsplit(const char *url, char *hostport, char *urlpath);
+
+/**
+ * @brief   Returns a pointer to the path component in @p url
+ *
+ * @param[in]   url         URL to examine. Must not be NULL.
+ *
+ * @returns     pointer to the start of the path component in @p url
+ * @returns     NULL if @p url is invalid
+ */
+const char *sock_urlpath(const char *url);
+
+#if HAVE_SOCK_TL_EP
 /**
  * @brief   Format common IP-based transport layer endpoint to string and port
  *
@@ -85,38 +126,6 @@ static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
 {
     return sock_tl_ep_fmt(endpoint, addr_str, port);
 }
-
-/**
- * @brief    Split url to host:port and url path
- *
- * Will split e.g., "https://host.name:1234/url/path" into
- * "host.name:1234" and "/url/path".
- *
- * @note Caller has to make sure hostport and urlpath can hold the results!
- *       Make sure to provide space for @ref CONFIG_SOCK_HOSTPORT_MAXLEN respectively
- *       @ref CONFIG_SOCK_URLPATH_MAXLEN bytes, if pointers are not NULL.
- *       Scheme part of the URL is limited to @ref CONFIG_SOCK_SCHEME_MAXLEN length.
- *
- * @pre `url != NULL`
- *
- * @param[in]   url         URL to split. Must not be NULL.
- * @param[out]  hostport    where to write host:port. Can be NULL.
- * @param[out]  urlpath     where to write url path. Can be NULL.
- *
- * @returns     0 on success
- * @returns     <0 otherwise
- */
-int sock_urlsplit(const char *url, char *hostport, char *urlpath);
-
-/**
- * @brief   Returns a pointer to the path component in @p url
- *
- * @param[in]   url         URL to examine. Must not be NULL.
- *
- * @returns     pointer to the start of the path component in @p url
- * @returns     NULL if @p url is invalid
- */
-const char *sock_urlpath(const char *url);
 
 /**
  * @brief    Convert string to common IP-based transport layer endpoint
@@ -273,6 +282,7 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
+#endif
 
 #if defined(MODULE_SOCK_DTLS) || DOXYGEN
 /**
