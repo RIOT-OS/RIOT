@@ -52,9 +52,11 @@
 #define NFC_T2T_SIZE_UID 10
 #define NFC_T2T_SIZE_STATIC_LOCK_BYTES 2
 #define NFC_T2T_SIZE_STATIC_DATA_AREA 48
-#define NFC_T2T_START_STATIC_DATA_AREA NFC_T2T_SIZE_UID + NFC_T2T_SIZE_STATIC_LOCK_BYTES + NFC_T2T_SIZE_CC
+#define NFC_T2T_START_STATIC_DATA_AREA (NFC_T2T_SIZE_UID + NFC_T2T_SIZE_STATIC_LOCK_BYTES + NFC_T2T_SIZE_CC)
 #define NFC_T2T_SIZE_CC 4
 #define NFC_T2T_READ_RETURN_BYTES 16
+#define NFC_T2T_MEM_SIZE_LARGEST_POSSIBLE_TAG 2088 //0xff data area + 32 lock bytes + reserved
+#define NFC_T2T_SIZE_RESERVED_AREA 16 //Size of the first four blocks
 
 //selfmade defaults - TODO check how a reader interprets that
 #define NFC_T2T_4_BYTE_DEFAULT_UID {NFC_ISO14443A_UID_SINGLE_SIZE, {0x09, 0x01, 0x02, 0x03}} //ISO-14443-3 6.4.4 Table 10
@@ -134,6 +136,7 @@ typedef struct{
 typedef struct{
     uint8_t *memory;
     uint32_t memory_size;
+    size_t usable_memory;
     bool dynamic_layout;
     uint8_t current_sector;
     t2t_sn_t sn; //this is not part of the t2t mem layout - reflected as uid

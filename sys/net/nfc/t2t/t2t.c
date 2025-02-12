@@ -4,6 +4,72 @@
 #include "log.h"
 
 /**
+ * @brief Find portion of usable memory in given memory blob
+ * 
+ * We need space for the reserved data, the data area and the possible
+ * default dynamic lock bytes in the data blob reserved by the user.
+ * This function finds the usable portion of mem needed for all three.
+ * It might be that not all of the given memory will be used.
+ * @param tag the type 2 tag struct
+ * @return int 0 in case of success
+ */
+static int evaluate_usable_mem(nfc_t2t_t *tag){
+    size_t total_mem = tag->memory_size;
+    if(total_mem > NFC_T2T_MEM_SIZE_LARGEST_POSSIBLE_TAG){
+        LOG_WARNING("Largest possible tag size is %d, using only that\n",
+            NFC_T2T_MEM_SIZE_LARGEST_POSSIBLE_TAG);
+        total_mem = NFC_T2T_MEM_SIZE_LARGEST_POSSIBLE_TAG;
+    }
+    size_t max_data_area = total_mem - NFC_T2T_SIZE_RESERVED_AREA;
+    printf("total_mem: %d, max_data_area: %d\n", total_mem, max_data_area);
+    //need at least 57 byte for the first extra 8 bytes + lock byte
+    if(max_data_area <= 56){
+        LOG_INFO("Using Static Memory layout\n");
+        tag->dynamic_layout = false;
+        tag->data_area_size = NFC_T2T_SIZE_STATIC_DATA_AREA;
+        tag->usable_memory = NFC_T2T_STATIC_MEMORY_SIZE;
+        return 0;
+    }
+    /*data area must be multiple of 8 for CC byte
+    * integer division and following multiplication will yield
+    * smaller value if remainder is not 0 */
+    size_t data_area = (max_data_area / 8) * 8;
+    size_t free_mem = max_data_area % 8;
+    size_t dyn_data_area = data_area - NFC_T2T_SIZE_STATIC_DATA_AREA;
+    size_t lock_bytes = dyn_data_area / 64;
+    if((dyn_data_area % 64) != 0){
+        lock_bytes++;
+    }
+    //shrink dyn data area until lock bytes fit in freed mem
+    //shrink in steps of 8 byte to keep CC calculation working
+    while(lock_bytes > free_mem){
+        dyn_data_area -=8;
+        free_mem +=8;
+        lock_bytes = dyn_data_area / 64;
+        if((dyn_data_area % 64) != 0){
+            lock_bytes++;
+        }
+    }
+    //while we're here also calculate lock bits
+    size_t lock_bits = dyn_data_area / 8;
+    if(dyn_data_area % 8 != 0 ){
+        lock_bits++;
+    }
+    //lock bytes do now fit in free mem
+    data_area = dyn_data_area + NFC_T2T_SIZE_STATIC_DATA_AREA;
+    tag->dynamic_layout = true;
+    tag->data_area_size = data_area;
+    tag->extra.default_lock_bytes = lock_bytes;
+    tag->extra.default_lock_bits = lock_bits;
+    tag->usable_memory = NFC_T2T_SIZE_RESERVED_AREA + data_area + lock_bytes;
+    if(tag->usable_memory != tag->memory_size){
+        LOG_WARNING("Using %d of total %ld bytes - %ld data area, %d lock bytes\n",
+                    tag->usable_memory, tag->memory_size, tag->data_area_size, lock_bytes);
+    }
+    return 0;
+}
+
+/**
  * @brief Sets dynamic lock bits and decreases data area.
  *
  * Sets the dynamic lock bits to 0x0 at the end of the data area as defined
