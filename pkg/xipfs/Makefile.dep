@@ -6,4 +6,5 @@ ifeq (,$(filter xipfs_fs,$(DISABLE_MODULE)))
   FEATURES_REQUIRED += periph_flashpage_in_address_space
   USEMODULE += periph_flashpage
   USEMODULE += vfs
+  USEMODULE += shell_cmd_xipfs
 endif
