@@ -8,7 +8,7 @@
 # Overview
 ![Terminal running RIOT native](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
 
-Currently only Linux x86-64 is supported.
+Currently only Linux x86-64 is supported. For x86 (32 bit) and ARM32 see \ref boards_native32.
 
 # Hardware
 - CPU: Host CPU
