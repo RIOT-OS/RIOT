@@ -27,6 +27,7 @@
 #include "byteorder.h"
 #include "net/eui64.h"
 #include "modules.h"
+#include "time_units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,6 +121,89 @@ extern "C" {
 #define IEEE802154_ACK_TIMEOUT_SYMS     (54)
 
 /**
+ * @name    Time in µs per symbol for different OQPSK PHYs depending on frequency band
+ *
+ * @see IEEE 802.15.4-2020, Section 12. O-QPSK PHY
+ *
+ * 8 symbols == 4 octets => 1 symbol == 4 bits
+ * 2450MHz, 915MHz, 780MHz, 2380MHz: 250 kb/s ==> 62.5 ksymbol/s ==> 16 us/symbol
+ * 868MHz: 100 kb/s ==> 25 ksymbol/s ==> 40 us/symbol
+ * @{
+ */
+/**
+ * @brief Symbol time for IEEE 802.15.4 868MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_868_SYMBOL_TIME_US     (40)
+/**
+ * @brief Symbol time for IEEE 802.15.4 2450MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_2450_SYMBOL_TIME_US    (16)
+/**
+ * @brief Symbol time for IEEE 802.15.4 2380MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_2380_SYMBOL_TIME_US    (16)
+/**
+ * @brief Symbol time for IEEE 802.15.4 915MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_915_SYMBOL_TIME_US     (16)
+/**
+ * @brief Symbol time for IEEE 802.15.4 780MHz OQPSK PHY in µs
+ */
+#define IEEE802154_OQPSK_780_SYMBOL_TIME_US     (16)
+/** @} */
+
+/**
+ * @name    Time in µs per symbol for different BPSK PHYs depending on frequency band
+ *
+ * @see IEEE 802.15.4-2020, Section 13. Binary phase-shift keying (BPSK) PHY
+ *
+ * 32 symbols == 4 octets => 1 symbol = 1 bit
+ * 868 MHz: 20kb/s ==> 50us/symbol
+ * 915 MHz: 40kb/s ==> 25us/symbol
+ * @{
+ */
+/**
+ * @brief Symbol time for IEEE 802.15.4 BPSK PHY in µs
+ */
+#define IEEE802154_BPSK_868_SYMBOL_TIME_US       (50)
+/**
+ * @brief Symbol time for IEEE 802.15.4 BPSK PHY in µs
+ */
+#define IEEE802154_BPSK_915_SYMBOL_TIME_US       (25)
+/** @} */
+
+/**
+ * @name    Time in µs per symbol for different ASK PHYs depending on frequency band
+ *
+ * @see IEEE 802.15.4-2015, Section 14. Amplitude shift keying (ASK) PHY
+ *
+ * 868 MHz: 250 kb/s ==> 12.5 ksymbol/s ==> 80 us/symbol
+ * 915 MHz: 250 kb/s ==> 50 ksymbols/s ==> 20 us/symbol
+ * @{
+ */
+/**
+ * @brief Symbol time for IEEE 802.15.4 ASK 868MHz PHY in µs
+ */
+#define IEEE802154_ASK_868_SYMBOL_TIME_US        (80)
+/**
+ * @brief Symbol time for IEEE 802.15.4 ASK 915MHz PHY in µs
+ */
+#define IEEE802154_ASK_915_SYMBOL_TIME_US        (20)
+/** @} */
+
+/**
+ * @brief Symbol time for IEEE 802.15.4 MR-OFDM in µs
+ */
+#define IEEE802154_MR_OFDM_SYMBOL_TIME_US   (120)
+
+/**
+ * @brief Symbol time for IEEE 802.15.4 MR-FSK in µs
+ *
+ * symbol time is always 20 µs for MR-FSK (table 0, pg. 7)
+ */
+#define IEEE802154_MR_FSK_SYMBOL_TIME_US    (20)
+
+/**
  * @brief value of measured power when RSSI is zero.
  *
  * This value is defined in the IEEE 802.15.4 standard
@@ -167,6 +251,15 @@ extern "C" {
 #define IEEE802154_CCA_DURATION_IN_SYMBOLS      (8)
 
 /**
+ * IEEE Std 802.15.4-2020
+ * Table 8-93—MAC sublayer constants: For all PHYs except SUN PHYs
+ * operating in the 920 MHz band, aTurnaroundTime + aCcaTime.
+ * For SUN PHYs operating in the 920 MHz band, aTurnaround-Time + phyCcaDuration.
+ */
+#define IEEE802154_AUNITBACKOFF_PERIOD_IN_SYMBOLS   (IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS + \
+                                                     IEEE802154_CCA_DURATION_IN_SYMBOLS)
+
+/**
  * @brief   802.15.4 PHY modes
  */
 typedef enum {
@@ -176,17 +269,67 @@ typedef enum {
     IEEE802154_PHY_OQPSK,           /**< Offset Quadrature Phase-Shift Keying */
     IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
     IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
-    IEEE802154_PHY_MR_FSK           /**< Multi-Rate Frequency Shift Keying */
+    IEEE802154_PHY_MR_FSK,          /**< Multi-Rate Frequency Shift Keying */
+
+    IEEE802154_PHY_NO_OP,           /**< don't change PHY configuration */
 } ieee802154_phy_mode_t;
 
 /**
  * @brief   802.15.4 forward error correction schemes
  */
-enum {
+typedef enum {
     IEEE802154_FEC_NONE,            /**< no forward error correction */
     IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
     IEEE802154_FEC_RSC              /**< recursive and systematic code */
-};
+} ieee802154_mr_fsk_fec_t;
+
+/**
+ * @brief   802.15.4 MR-FSK symbol rates
+ */
+typedef enum {
+    IEEE802154_MR_FSK_SRATE_50K,    /**< 50k Symbols/s  */
+    IEEE802154_MR_FSK_SRATE_100K,   /**< 100k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_150K,   /**< 150k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_200K,   /**< 200k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_300K,   /**< 300k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_400K,   /**< 400k Symbols/s */
+} ieee802154_mr_fsk_srate_t;
+
+/**
+ * @brief   802.15.4 MR-OQPSK chip rates
+ */
+typedef enum {
+    IEEE802154_MR_OQPSK_CHIPS_100,  /**< 100 kChip/s  */
+    IEEE802154_MR_OQPSK_CHIPS_200,  /**< 200 kChip/s  */
+    IEEE802154_MR_OQPSK_CHIPS_1000, /**< 1000 kChip/s */
+    IEEE802154_MR_OQPSK_CHIPS_2000, /**< 2000 kChip/s */
+} ieee802154_mr_oqpsk_chips_t;
+
+/**
+ * @brief Get the minimum pramble length for a given symbol rate
+ *
+ * From IEEE 802.15.4g Table 6-64
+ *
+ * @param[in] srate     symbol rate
+ * @return    preamble length in bytes
+ */
+static inline uint8_t ieee802154_mr_fsk_plen(ieee802154_mr_fsk_srate_t srate)
+{
+    switch (srate) {
+    case IEEE802154_MR_FSK_SRATE_50K:
+        return 2;
+    case IEEE802154_MR_FSK_SRATE_100K:
+        return 3;
+    case IEEE802154_MR_FSK_SRATE_150K:
+    case IEEE802154_MR_FSK_SRATE_200K:
+    case IEEE802154_MR_FSK_SRATE_300K:
+        return 8;
+    case IEEE802154_MR_FSK_SRATE_400K:
+        return 10;
+    }
+
+    return 0;
+}
 
 /**
  * @brief   Special address definitions
@@ -254,6 +397,62 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  */
 #ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
 #define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OQPSK default chip rate
+ */
+#ifndef CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS
+#define CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS    IEEE802154_MR_OQPSK_CHIPS_1000
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OQPSK default rate mode
+ */
+#ifndef CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE
+#define CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE     (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OFDM default modulation option
+ */
+#ifndef CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION
+#define CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION    (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OFDM default Modulation & Coding Scheme
+ */
+#ifndef CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME
+#define CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME    (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default symbol rate
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE      IEEE802154_MR_FSK_SRATE_200K
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default modulation index, fraction of 64
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX    (64U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default modulation order
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD    (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default error correction mode
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC        IEEE802154_FEC_NONE
 #endif
 
 /**
