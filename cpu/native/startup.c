@@ -689,7 +689,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
      */
     init_func_t *init_array_ptr = &__init_array_start;
     DEBUG("__init_array_start: %p\n", (void *)init_array_ptr);
-    while (init_array_ptr != &__init_array_end) {
+    while (init_array_ptr < &__init_array_end) {
         /* Skip everything which has already been run */
         if ((*init_array_ptr) == startup) {
             /* Found ourselves, move on to calling the rest of the constructors */
@@ -700,7 +700,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
         DEBUG("%18p - skip\n", (void *)init_array_ptr);
         ++init_array_ptr;
     }
-    while (init_array_ptr != &__init_array_end) {
+    while (init_array_ptr < &__init_array_end) {
         /* call all remaining constructors */
         DEBUG("%18p - call\n", (void *)init_array_ptr);
         (*init_array_ptr)(argc, argv, envp);
