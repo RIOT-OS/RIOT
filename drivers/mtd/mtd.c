@@ -76,9 +76,11 @@ int mtd_init(mtd_dev_t *mtd)
 
 #ifdef MODULE_MTD_WRITE_PAGE
     if ((mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) == 0) {
-        mtd->work_area = malloc(mtd->pages_per_sector * mtd->page_size);
-        if (mtd->work_area == NULL) {
-            res = -ENOMEM;
+        if (!mtd->work_area) {
+            mtd->work_area = malloc(mtd->pages_per_sector * mtd->page_size);
+            if (mtd->work_area == NULL) {
+                res = -ENOMEM;
+            }
         }
     }
 #endif
