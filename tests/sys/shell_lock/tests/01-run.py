@@ -31,7 +31,7 @@ BOARD = os.environ['BOARD']
 def testfunc(child):
 
     # avoid sending an extra empty line on native.
-    if BOARD in ['native', 'native64']:
+    if BOARD in ['native', 'native32']:
         child.crlf = '\n'
 
     # unlock

@@ -41,7 +41,7 @@ def expect_some(child, size, avail, range_start):
 
 def expect_content(child, counter):
     if counter == 0:
-        if os.environ.get('BOARD') in ['native', 'native64']:
+        if os.environ.get('BOARD') in ['native', 'native32']:
             child.expect_exact('type: 0x0000, content: 0 ((nil))')
         else:
             child.expect(r'type: 0x0000, content: 0 \((0x)?0+\)')

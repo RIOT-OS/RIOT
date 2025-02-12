@@ -9,7 +9,7 @@ USEMODULE += sock_dns
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_ipv6_nib_dns
 # use Ethernet as link-layer protocol
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32,$(BOARD)))
   PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200

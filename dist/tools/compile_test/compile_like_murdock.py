@@ -92,7 +92,7 @@ DEFAULT_BOARDS = [
     'microbit',
     'mulle',
     'native',
-    'native64',
+    'native32',
     'nrf52840dk',
     'nrf9160dk',
     'nucleo-f072rb',

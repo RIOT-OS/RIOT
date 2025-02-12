@@ -7,9 +7,9 @@ DEVELHELP ?= 1
 
 ifneq (,$(wildcard $(CURDIR)/tests*/.))
   # add interactive test configuration when automated testing is available,
-  # except for `native` and `native64` where we control when the RIOT app is
+  # except for `native` and `native32` where we control when the RIOT app is
   # started
-  ifeq (,$(filter native native64,$(BOARD)))
+  ifeq (,$(filter native native32,$(BOARD)))
     DEFAULT_MODULE += test_utils_interactive_sync
   endif
   # print stack usage by default when automated testing is available
