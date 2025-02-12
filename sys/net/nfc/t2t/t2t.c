@@ -69,57 +69,40 @@ static int evaluate_usable_mem(nfc_t2t_t *tag){
     return 0;
 }
 
+
 /**
- * @brief Sets dynamic lock bits and decreases data area.
- *
- * Sets the dynamic lock bits to 0x0 at the end of the data area as defined
- * for the default behavior in Type 2 Tag Specification 2.2.2
- *
- * @param tag the type 2 tag to be altered
- * @return 0 in case of success, negative number in case of problems
+ * @brief Sets default dynamic lock bytes to read_only or read_write
+ * 
  */
-static int create_default_dynamic_memory_layout(nfc_t2t_t *tag, bool read_only){
-// calculate size of dynamic lock bytes and amnt of lock bits
-    LOG_DEBUG("Creating default lock bytes\n");
-    if(tag->memory_size <= NFC_T2T_STATIC_MEMORY_SIZE){
-        LOG_ERROR("Tag size too small to add dynamic memory layout\n");
-        return -1;
+
+static int set_default_dynamic_lock_bytes(nfc_t2t_t *tag, bool read_only){
+    if(!tag->dynamic_layout || tag->extra.default_lock_bytes == 0 
+        || tag->extra.default_lock_bits == 0){
+        LOG_DEBUG("Can't set dynamic lock bytes in static memory tag\n");
+        return 1;
     }
-    uint32_t dyn_lock_bytes;
-    uint32_t dyn_lock_bits; // only needed if setting to 1 needed
-    if(((tag->data_area_size - NFC_T2T_SIZE_STATIC_DATA_AREA) % 8) > 0){
-        dyn_lock_bytes= ((tag->data_area_size - 48) / 64) + 1;
-        dyn_lock_bits= ((tag->data_area_size - 48) / 8) + 1;  
+
+    if(read_only){
+        LOG_DEBUG("Setting dynamic lock bits to read only\n");
     }else{
-        dyn_lock_bytes = (tag->data_area_size - 48) / 64;
-        dyn_lock_bits = (tag->data_area_size - 48) / 8;
+        LOG_DEBUG("Setting dynamic lock bits to read write\n");
     }
-    // calculate position of dynamic lock bits -> new end of user usable data area
-    uint32_t start_lock_bits = tag->data_area_size - 1 - dyn_lock_bytes;
-    // write lock bits to data area
-    for(uint32_t i = 0; i < dyn_lock_bytes; i++){
+
+    for(uint32_t i = 0; i < tag->extra.default_lock_bytes; i++){
         if(read_only){
-            tag->data_area_start[start_lock_bits + i] = 0xFF; //initiate to read_only
+            tag->memory[tag->data_area_size + i] = 0xFF; //initiate to read_only
         }else{
-            tag->data_area_start[start_lock_bits + i] = 0x00; //initiate to read_write
+            tag->memory[tag->data_area_size + i] = 0x00; //initiate to read_write
         } 
     }
-    // in case last byte is just partially filled with lock bits
-    if(read_only && dyn_lock_bits % 8 != 0){
+    // last byte only partially used
+    uint8_t remaining_bits = (uint8_t) tag->extra.default_lock_bits % 8;
+    if(read_only && remaining_bits != 0){
         // only as many bits shall be set to 1 as there are lock bits - remaining bits to 0x0
         // e.g. 70 Byte data area -> 22 byte dyn -> ceil(22/8) = 3bit -> 1110 0000 --> 1111 1111 << (8-3=5) 
-        tag->data_area_start[start_lock_bits + dyn_lock_bytes] = (uint8_t) 0xFF << (8-(dyn_lock_bits %8));
+        tag->memory[tag->data_area_size + tag->extra.default_lock_bytes -1] = 
+            (uint8_t) 0xFF << (8 - remaining_bits);
     }
-    tag->data_area_size = tag->data_area_size - dyn_lock_bytes; //I think this is necessary
-    tag->cc->memory_size = (uint8_t) (tag->data_area_size / 8); //TODO what if data_area % 8 != 0?
-    tag->extra.default_lock_bits_set = true;
-    tag->extra.default_lock_bits = dyn_lock_bits;
-    tag->extra.default_lock_bytes = dyn_lock_bytes;
-    tag->extra.custom_lock_bytes = 0;
-    tag->extra.custom_reserved_bytes = 0;
-
-    LOG_DEBUG("Wrote %ld lock bits in %ld lock bytes\n", dyn_lock_bits, dyn_lock_bytes);
-    
     return 0;
 }
 
@@ -271,17 +254,14 @@ int t2t_create_type_2_tag(nfc_t2t_t *tag, t2t_sn_t *sn, t2t_cc_t *cc, t2t_static
     LOG_DEBUG("Creating type 2 tag\n");
     tag->memory = memory;
     tag->memory_size = memory_size;
-    memset(tag->memory, 0x00, tag->memory_size);
-    if(memory_size > 64){ 
-        tag->dynamic_layout = true;
-        tag->data_area_size = memory_size-(NFC_T2T_SIZE_UID+NFC_T2T_SIZE_STATIC_LOCK_BYTES+NFC_T2T_SIZE_CC);
-        tag->extra.bytes_per_page = calculate_bytes_per_page(memory_size);
-        LOG_DEBUG("Using dynamic memory layout\n");
-    }else{
-        tag->dynamic_layout = false;
-        tag->data_area_size = NFC_T2T_SIZE_STATIC_DATA_AREA;
-        LOG_DEBUG("Using static memory layout\n");
+    if(memory_size < 64){
+        LOG_ERROR("Need at least 64 byte of memory for smallest tag layout\n");
+        return -1;
     }
+    memset(tag->memory, 0x00, tag->memory_size);
+    int error = 0;
+    error = evaluate_usable_mem(tag);
+    if(error) return error;
     tag->data_area_start = memory + NFC_T2T_START_STATIC_DATA_AREA;
     tag->data_area_cursor = tag->data_area_start;
     //initialize to sector 0
@@ -294,7 +274,6 @@ int t2t_create_type_2_tag(nfc_t2t_t *tag, t2t_sn_t *sn, t2t_cc_t *cc, t2t_static
         tag->sn = *sn;
     }
     //create uid
-    int error = 0;
     error = t2t_create_uid(tag);
     if(error) return error;
     //create lock_bytes
@@ -311,9 +290,9 @@ int t2t_create_type_2_tag(nfc_t2t_t *tag, t2t_sn_t *sn, t2t_cc_t *cc, t2t_static
         error = t2t_set_cc(cc, tag);
     }
     if(error) return error;
-    if(tag->dynamic_layout){
-        create_default_dynamic_memory_layout(tag, false); //sets dynamic lock bits at end of data area and lowers data_area_size
-    }
+
+    tag->extra.custom_lock_bytes = 0;
+    tag->extra.custom_reserved_bytes = 0;
 
     LOG_DEBUG("Created tag with %ld bytes data area\n", tag->data_area_size);
 
