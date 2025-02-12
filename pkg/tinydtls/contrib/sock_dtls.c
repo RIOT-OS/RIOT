@@ -939,6 +939,9 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
 void sock_dtls_close(sock_dtls_t *sock)
 {
     dtls_free_context(sock->dtls_ctx);
+#ifdef SOCK_HAS_ASYNC_CTX
+    sock_event_close(sock_dtls_get_async_ctx(sock));
+#endif
 }
 
 void sock_dtls_init(void)
