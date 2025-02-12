@@ -46,9 +46,11 @@ static int _init(mtd_dev_t *dev)
 
 #if IS_USED(MODULE_MTD_WRITE_PAGE)
     /* TODO: move to MTD layer */
-    dev->work_area = malloc(SD_MMC_BLOCK_SIZE);
-    if (dev->work_area == NULL) {
-        return -ENOMEM;
+    if (!dev->work_area) {
+        dev->work_area = malloc(SD_MMC_BLOCK_SIZE);
+        if (dev->work_area == NULL) {
+            return -ENOMEM;
+        }
     }
     dev->write_size = 1;
 #endif
