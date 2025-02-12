@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if defined BOARD_NATIVE || defined BOARD_NATIVE32
+#ifdef CPU_NATIVE
 #include "mtd_default.h"
 /* native mtd is file backed => Start address of flash is 0. */
 char *_backing_memory = NULL;
@@ -62,7 +62,7 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t le
 
 ctap_status_code_t fido2_ctap_mem_init(void)
 {
-#if defined BOARD_NATIVE || defined BOARD_NATIVE32
+#ifdef CPU_NATIVE
     _mtd_dev = mtd_default_get_dev(0);
 #endif
 
@@ -123,7 +123,7 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t le
 
 static bool _flash_is_erased(uint32_t addr, size_t len)
 {
-#if defined BOARD_NATIVE || defined BOARD_NATIVE32
+#ifdef CPU_NATIVE
     return true;
 #else
     for (size_t i = 0; i < len; i++) {
