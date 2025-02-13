@@ -179,7 +179,14 @@ static void _purge_buffer(void)
 
 static void _send_stdout(void)
 {
-    if (_status == STDIO_NIMBLE_SUBSCRIBED) {
+    if (_status != STDIO_NIMBLE_SUBSCRIBED) {
+        return;
+    }
+
+    int retry = 20;
+
+    /* retry sending data until the ring buffer is empty or the status changed */
+    while (tsrb_avail(&_tsrb_stdout) > 0 && _status == STDIO_NIMBLE_SUBSCRIBED && retry > 0) {
         _status = STDIO_NIMBLE_SENDING;
         int to_send = tsrb_peek(&_tsrb_stdout, _stdout_write_buf, NIMBLE_MAX_PAYLOAD);
 
@@ -203,11 +210,8 @@ static void _send_stdout(void)
         else {
             _status = STDIO_NIMBLE_SUBSCRIBED;
         }
-    }
 
-    if (tsrb_avail(&_tsrb_stdout) > 0 && _status == STDIO_NIMBLE_SUBSCRIBED) {
-        /* retry sending data for anything left in the ringbuffer */
-        _send_stdout();
+        retry--;
     }
 }
 
