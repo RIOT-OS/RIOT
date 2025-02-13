@@ -111,10 +111,11 @@ void thread_sleep(void)
         return;
     }
 
-    unsigned state = irq_disable();
+    assert(irq_is_enabled());
+    irq_disable();
 
     sched_set_status(thread_get_active(), STATUS_SLEEPING);
-    irq_restore(state);
+    irq_enable();
     thread_yield_higher();
 }
 
@@ -149,13 +150,14 @@ int thread_wakeup(kernel_pid_t pid)
 
 void thread_yield(void)
 {
-    unsigned old_state = irq_disable();
+    assume(irq_is_in() || irq_is_enabled());
+    irq_disable();
     thread_t *me = thread_get_active();
 
     if (me->status >= STATUS_ON_RUNQUEUE) {
         sched_runq_advance(me->priority);
     }
-    irq_restore(old_state);
+    irq_enable();
 
     thread_yield_higher();
 }

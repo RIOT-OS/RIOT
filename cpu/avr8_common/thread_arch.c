@@ -258,7 +258,7 @@ void NORETURN avr8_enter_thread_mode(void)
     UNREACHABLE();
 }
 
-void thread_yield_higher(void)
+void thread_yield_higher_arch(void)
 {
     if (!IS_USED(MODULE_CORE_THREAD)) {
         return;

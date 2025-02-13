@@ -70,7 +70,7 @@ static thread_flags_t _thread_flags_clear_atomic(thread_t *thread,
 }
 
 static void _thread_flags_wait(thread_flags_t mask, thread_t *thread,
-                               unsigned threadstate, unsigned irqstate)
+                               unsigned threadstate)
 {
     DEBUG(
         "_thread_flags_wait: me->flags=0x%08x me->mask=0x%08x. going blocked.\n",
@@ -78,7 +78,7 @@ static void _thread_flags_wait(thread_flags_t mask, thread_t *thread,
 
     thread->wait_data = (void *)(uintptr_t)mask;
     sched_set_status(thread, threadstate);
-    irq_restore(irqstate);
+    irq_enable();
     thread_yield_higher();
 }
 
@@ -94,14 +94,15 @@ thread_flags_t thread_flags_clear(thread_flags_t mask)
 
 static void _thread_flags_wait_any(thread_flags_t mask)
 {
+    assume(irq_is_in() || irq_is_enabled());
     thread_t *me = thread_get_active();
-    unsigned state = irq_disable();
+    irq_disable();
 
     if (!(me->flags & mask)) {
-        _thread_flags_wait(mask, me, STATUS_FLAG_BLOCKED_ANY, state);
+        _thread_flags_wait(mask, me, STATUS_FLAG_BLOCKED_ANY);
     }
     else {
-        irq_restore(state);
+        irq_enable();
     }
 }
 
@@ -126,17 +127,18 @@ thread_flags_t thread_flags_wait_one(thread_flags_t mask)
 
 thread_flags_t thread_flags_wait_all(thread_flags_t mask)
 {
-    unsigned state = irq_disable();
+    assume(irq_is_in() || irq_is_enabled());
+    irq_disable();
     thread_t *me = thread_get_active();
 
     if (!((me->flags & mask) == mask)) {
         DEBUG(
             "thread_flags_wait_all(): pid %" PRIkernel_pid " waiting for %08x\n",
             thread_getpid(), (unsigned)mask);
-        _thread_flags_wait(mask, me, STATUS_FLAG_BLOCKED_ALL, state);
+        _thread_flags_wait(mask, me, STATUS_FLAG_BLOCKED_ALL);
     }
     else {
-        irq_restore(state);
+        irq_enable();
     }
 
     return _thread_flags_clear_atomic(me, mask);
@@ -144,16 +146,17 @@ thread_flags_t thread_flags_wait_all(thread_flags_t mask)
 
 void thread_flags_set(thread_t *thread, thread_flags_t mask)
 {
+    assume(irq_is_in() || irq_is_enabled());
     DEBUG("thread_flags_set(): setting 0x%08x for pid %" PRIkernel_pid "\n",
           mask, thread->pid);
-    unsigned state = irq_disable();
+    irq_disable();
 
     thread->flags |= mask;
     if (_thread_flags_wake(thread)) {
-        irq_restore(state);
+        irq_enable();
         thread_yield_higher();
     }
     else {
-        irq_restore(state);
+        irq_enable();
     }
 }
