@@ -55,7 +55,9 @@
 #include "include/flash.h"
 #include "include/fs.h"
 #include "include/path.h"
+#ifndef RIOT_OS
 #include "include/xipfs.h"
+#endif
 
 /*
  * The eXecute In Place File System only makes sense if the

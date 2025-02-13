@@ -23,4 +23,6 @@ USEMODULE += ps
 # Use the default file system
 USEMODULE += xipfs
 
+CFLAGS +=-DRIOT_OS
+
 include $(RIOTBASE)/Makefile.include
