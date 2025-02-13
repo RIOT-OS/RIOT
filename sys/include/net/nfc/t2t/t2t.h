@@ -376,11 +376,12 @@ int t2t_create_terminator_tlv(nfc_t2t_t *tag);
 uint8_t* t2t_reserve_ndef_space(nfc_t2t_t *tag, size_t msg_size);
 
 //misc
-uint32_t t2t_get_size(nfc_t2t_t *tag); //returns size of tag
+uint32_t t2t_get_size(nfc_t2t_t *tag); //returns size of used memory
+uint32_t t2t_get_reserved_size(nfc_t2t_t *tag); //returns size of reserved memory
 bool t2t_is_writeable(nfc_t2t_t *tag); // true if tag is writeable
 int t2t_set_writeable(nfc_t2t_t *tag); // sets tag writable in CC
 int t2t_set_read_only(nfc_t2t_t *tag); // sets tag read only in CC
-int t2t_clear_mem(nfc_t2t_t *tag); // clears complete tag memory
+int t2t_clear_mem(nfc_t2t_t *tag); // clears complete reserved tag memory
 int t2t_clear_data_area(nfc_t2t_t *tag); //clears data area of tag
 void t2t_dump_tag_memory(nfc_t2t_t *tag); //dumps the tags memory to stdout
 

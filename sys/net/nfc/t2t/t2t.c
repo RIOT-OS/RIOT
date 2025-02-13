@@ -24,7 +24,7 @@ static int evaluate_usable_mem(nfc_t2t_t *tag){
     printf("total_mem: %d, max_data_area: %d\n", total_mem, max_data_area);
     //need at least 57 byte for the first extra 8 bytes + lock byte
     if(max_data_area <= 56){
-        LOG_INFO("Using Static Memory layout\n");
+        LOG_DEBUG("Using Static Memory layout\n");
         tag->dynamic_layout = false;
         tag->data_area_size = NFC_T2T_SIZE_STATIC_DATA_AREA;
         tag->usable_memory = NFC_T2T_STATIC_MEMORY_SIZE;
@@ -63,7 +63,7 @@ static int evaluate_usable_mem(nfc_t2t_t *tag){
     tag->extra.default_lock_bits = lock_bits;
     tag->usable_memory = NFC_T2T_SIZE_RESERVED_AREA + data_area + lock_bytes;
     if(tag->usable_memory != tag->memory_size){
-        LOG_WARNING("Using %d of total %ld bytes - %ld data area, %d lock bytes\n",
+        LOG_DEBUG("Using %d of total %ld bytes - %ld data area, %d lock bytes\n",
                     tag->usable_memory, tag->memory_size, tag->data_area_size, lock_bytes);
     }
     return 0;
@@ -237,6 +237,7 @@ int t2t_set_cc(t2t_cc_t * cap_cont, nfc_t2t_t *tag){
  * @param mem_size total tag memory size
  * @return uint8_t exponent for bytes/page
  */
+/*
 static uint8_t calculate_bytes_per_page(uint32_t mem_size){
     for(uint8_t i = 3; i <= 0xF; i++){
         if ((uint32_t) (2 << (i-1)) >= (uint32_t) ((mem_size-15) / 15)){
@@ -246,6 +247,7 @@ static uint8_t calculate_bytes_per_page(uint32_t mem_size){
     //should not happen
     return -1;
 }
+*/
 
 
 int t2t_create_type_2_tag(nfc_t2t_t *tag, t2t_sn_t *sn, t2t_cc_t *cc, t2t_static_lock_bytes_t *lb, 
@@ -291,6 +293,8 @@ int t2t_create_type_2_tag(nfc_t2t_t *tag, t2t_sn_t *sn, t2t_cc_t *cc, t2t_static
     }
     if(error) return error;
 
+    set_default_dynamic_lock_bytes(tag, false);
+
     tag->extra.custom_lock_bytes = 0;
     tag->extra.custom_reserved_bytes = 0;
 
@@ -335,6 +339,7 @@ int t2t_create_tag_from_given_memory(nfc_t2t_t *tag, uint32_t memory_size, uint8
     }
     tag->memory = memory;
     tag->memory_size = memory_size;
+    tag->usable_memory = memory_size;
     if(memory_size > NFC_T2T_STATIC_MEMORY_SIZE){ 
         tag->dynamic_layout = true;
     }else{
@@ -364,13 +369,13 @@ int t2t_create_tag_from_given_memory(nfc_t2t_t *tag, uint32_t memory_size, uint8
 
 int t2t_handle_read(nfc_t2t_t *tag, uint8_t block_no, uint8_t *buf){
     uint8_t *block_address = block_no_to_address(block_no, tag);
-    if((uint32_t) block_address >= ((uint32_t) tag->memory + tag->memory_size)){
+    if((uint32_t) block_address >= ((uint32_t) tag->memory + tag->usable_memory)){
         LOG_DEBUG("Block number too large, outside of valid memory region\n");
         return -1;
-    }else if(((uint32_t) block_address + 16) > ((uint32_t) tag->memory + tag->memory_size)){
+    }else if(((uint32_t) block_address + 16) > ((uint32_t) tag->memory + tag->usable_memory)){
         LOG_DEBUG("End of region outside of tag memory, filling up with %#x\n", NFC_TLV_TYPE_TERMINATOR);
         memset(buf, NFC_TLV_TYPE_TERMINATOR, NFC_T2T_READ_RETURN_BYTES);
-        memcpy(buf, block_address, (((uint32_t) tag->memory + tag->memory_size) - (uint32_t) block_address));
+        memcpy(buf, block_address, (((uint32_t) tag->memory + tag->usable_memory) - (uint32_t) block_address));
 
     }else{
         LOG_DEBUG("Reading 4 blocks beginning at block %d\n", block_no);
@@ -387,7 +392,7 @@ int t2t_handle_write(nfc_t2t_t *tag, uint8_t block_no, uint8_t const *buf){
     }
     uint8_t *block_address = block_no_to_address(block_no, tag);
     LOG_DEBUG("Translated block_no %d to address: %p\n", block_no, block_address);
-    if((uint32_t) block_address >= ((uint32_t) tag->memory + tag->memory_size)){
+    if((uint32_t) block_address >= ((uint32_t) tag->memory + tag->usable_memory)){
         LOG_ERROR("Block number %d too high, outside of valid memory region, aborting write\n", block_no);
         return -1;
     }
@@ -417,7 +422,7 @@ int t2t_handle_write(nfc_t2t_t *tag, uint8_t block_no, uint8_t const *buf){
 }
 
 int t2t_handle_sector_select(nfc_t2t_t *tag, uint8_t sector){
-    if(sector > (tag->memory_size /NFC_T2T_BLOCKS_PER_SECTOR)){
+    if(sector > (tag->usable_memory /NFC_T2T_BLOCKS_PER_SECTOR)){
         LOG_ERROR("Sector number too high\n");
         return -1;
     }
@@ -437,6 +442,7 @@ int t2t_create_null_tlv(nfc_t2t_t *tag){
     
 }
 
+// TODO - should this fail silently? 
 int t2t_create_terminator_tlv(nfc_t2t_t *tag){
     if((uint32_t)tag->data_area_cursor < ((uint32_t)tag->data_area_start+tag->data_area_size)){
         tag->data_area_cursor[0] = NFC_TLV_TYPE_TERMINATOR;
@@ -448,6 +454,7 @@ int t2t_create_terminator_tlv(nfc_t2t_t *tag){
     }
 }
 
+//TODO
 int t2t_create_memory_control_tlv(nfc_t2t_t *tag, uint8_t * data, uint32_t size){
     LOG_DEBUG("Creating memory control TLV\n");
     if(size > tag->data_area_size){
@@ -588,7 +595,11 @@ uint8_t* t2t_reserve_ndef_space(nfc_t2t_t *tag, size_t msg_size){
 }
 
 void t2t_dump_tag_memory(nfc_t2t_t *tag){
-    for(uint32_t i=0; i < tag->memory_size; i++){
+    if(tag-> usable_memory < tag->memory_size){
+        LOG_DEBUG("Showing only used mem, omiting reserved but unused part (%d/%ld byte)\n",
+            tag->usable_memory, tag->memory_size);
+    }
+    for(uint32_t i=0; i < tag->usable_memory; i++){
         if(tag->memory[i] >= 65 && tag->memory[i] <= 122){
             printf("%c\t", tag->memory[i]);
         }else{
@@ -622,5 +633,9 @@ int t2t_clear_mem(nfc_t2t_t *tag){
 }
 
 uint32_t t2t_get_size(nfc_t2t_t *tag){
+    return tag->usable_memory;
+}
+
+uint32_t t2t_get_reserved_size(nfc_t2t_t *tag){
     return tag->memory_size;
 }
