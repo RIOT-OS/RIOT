@@ -58,6 +58,17 @@ typedef int can_conf_t;
  */
 void can_init(can_t *dev, const can_conf_t *conf);
 
+/**
+ * @brief   Convert a `candev_t *` to `can_t`
+ * @param[in]   candev      `candev_t` pointer to convert
+ * @return  The matching equivalent `can_t` pointer
+ * @retval  NULL    Argument @p candev is not a `can_t` pointers
+ *
+ * @note    Implementations **MUST** check that @ref candev_t::driver indeed
+ *          points to the peripheral CAN driver, before casting to `can_t *`.
+ */
+can_t *candev2periph(candev_t *candev);
+
 #ifdef __cplusplus
 }
 #endif

@@ -283,10 +283,6 @@ int main(void)
     puts("Initializing CAN periph device");
     can_init(&periph_dev, &(candev_conf[0]));
     candev = &(periph_dev.candev);
-#if defined(BOARD_SAME54_XPRO)
-    gpio_init(AT6561_STBY_PIN, GPIO_OUT);
-    gpio_clear(AT6561_STBY_PIN);
-#endif
 #elif defined(MODULE_MCP2515)
     puts("Initializing MCP2515");
     candev_mcp2515_init(&mcp2515_dev, &candev_mcp2515_conf[0]);

@@ -614,6 +614,9 @@ static void _esp_can_power_up(can_t *dev)
     /* initialize used GPIOs */
     _esp_can_init_pins();
 
+    /* request board to power on CAN transceiver */
+    board_candev_set_power(&dev->candev, true);
+
     dev->powered_up = true;
 
     critical_exit();
@@ -628,6 +631,9 @@ static void _esp_can_power_down(can_t *dev)
     if (!dev->powered_up) {
         return;
     }
+
+    /* request board to power off CAN transceiver */
+    board_candev_set_power(&dev->candev, false);
 
     /* deinitialize used GPIOs */
     _esp_can_deinit_pins();
@@ -937,6 +943,17 @@ void can_init(can_t *dev, const can_conf_t *conf)
 void can_print_config(void)
 {
     printf("\tCAN_DEV(0)\ttxd=%d rxd=%d\n", CAN_TX, CAN_RX);
+}
+
+can_t *candev2periph(candev_t *candev)
+{
+    if (candev && (candev->driver == &_esp_can_driver)) {
+        /* this is an ESP peripheral CAN, as opposed to e.g. an external SPI
+         * attached one */
+        return container_of(candev, can_t, candev);
+    }
+
+    return NULL;
 }
 
 /**@}*/

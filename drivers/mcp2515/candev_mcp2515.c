@@ -336,6 +336,7 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
             case CANOPT_STATE_OFF:
             case CANOPT_STATE_SLEEP:
                 if (mutex_trylock(&_mcp_mutex)) {
+                    board_candev_set_power(&dev->candev, false);
                     res = mcp2515_set_mode(dev, MODE_SLEEP);
                     mutex_unlock(&_mcp_mutex);
                 }
@@ -348,6 +349,7 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
                 if (mutex_trylock(&_mcp_mutex)) {
                     res = mcp2515_set_mode(dev, MODE_NORMAL);
                     mutex_unlock(&_mcp_mutex);
+                    board_candev_set_power(&dev->candev, true);
                 }
                 else {
                     DEBUG("set3_Failed to lock mutex\n");
@@ -718,4 +720,15 @@ static void _send_event(const candev_mcp2515_t *dev, candev_event_t event,
     if (candev->event_callback) {
         candev->event_callback(candev, event, arg);
     }
+}
+
+candev_mcp2515_t *candev2mcp2515(candev_t *candev)
+{
+    if (candev && (candev->driver == &candev_mcp2515_driver)) {
+        /* this is an ESP peripheral CAN, as opposed to e.g. an external SPI
+         * attached one */
+        return container_of(candev, candev_mcp2515_t, candev);
+    }
+
+    return NULL;
 }
