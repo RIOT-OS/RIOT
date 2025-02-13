@@ -42,10 +42,10 @@
  *
  * **NOTE:** These values must be a power of two!
  *
- * By default, stdin and stdout buffers are cleared on a connect event. To keep the
- * content add the following to your makefile:
+ * By default, stdin and stdout buffers are not cleared on a connect event.
+ * To discard the buffer content add the following line to your makefile:
  * ```
- * CFLAGS += -DCONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT=0
+ * CFLAGS += -DCONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT=1
  * ```
  *
  * For automatic bluetooth advertising a module is provided: *nimble_autoadv*.
@@ -170,10 +170,10 @@ extern "C" {
 
 /**
  * @brief Whether to clear the buffers when establishing a new connection or
- *        not. Defaults to true.
+ *        not. Defaults to false.
  */
 #ifndef CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT
-#define CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT 1
+#define CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT 0
 #endif
 
 /**
