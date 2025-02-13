@@ -60,79 +60,97 @@ NANOCOAP_RESOURCE(well_known_core) COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER;
 #define coap_resources_numof XFA_LEN(coap_resource_t, coap_resources_xfa)
 #endif
 
+#if !MODULE_NANOCOAP_UDP && \
+    !MODULE_NANOCOAP_DTLS && \
+    !MODULE_NANOCOAP_TCP && \
+    !MODULE_NANOCOAP_WS
+#  error "At least one nanocoap transport needs to be selected"
+#endif
+
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
 static size_t _encode_uint(uint32_t *val);
 
-/* http://tools.ietf.org/html/rfc7252#section-3
- *  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |Ver| T |  TKL  |      Code     |          Message ID           |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   Token (if any, TKL bytes) ...
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   Options (if any) ...
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |1 1 1 1 1 1 1 1|    Payload (if any) ...
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/**
+ * @brief   Decode the CoAP Token position and length and encode as needed
+ *          for @ref coap_pkt_t::token_pos_and_len
+ *
+ * @param[in]   buf     Message buffer (first byte of CoAP UDP/TCP/WebSocket header)
+ * @param[in]   pos     Position of the token when no extended token length field is
+ *                      present (e.g. 4 for UDP)
+ *
+ * @return  The position and length of the Token
+ * @retval  0   Invalid message
  */
-int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+static uint16_t _decode_token_pos_and_len(const uint8_t *buf, size_t buf_len, uint8_t token_pos)
 {
-    coap_hdr_t *hdr = (coap_hdr_t *)buf;
-    pkt->hdr = hdr;
+    uint8_t tkl = buf[0] & 0xf;
+    uint16_t token_length = tkl;
 
-    uint8_t *pkt_pos = coap_hdr_data_ptr(hdr);
-    uint8_t *pkt_end = buf + len;
-
-    pkt->payload = NULL;
-    pkt->payload_len = 0;
-    memset(pkt->opt_crit, 0, sizeof(pkt->opt_crit));
-    pkt->snips = NULL;
-
-    if (len < sizeof(coap_hdr_t)) {
-        DEBUG("msg too short\n");
-        return -EBADMSG;
-    }
-    else if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_hdr_t))) {
-        DEBUG("empty msg too long\n");
-        return -EBADMSG;
+    /* Both token_length and token_pos may not be final yet. But if we go past
+     * this line, we at least have enough data to safely decode them without
+     * overflowing buf. */
+    if (buf_len < token_length + token_pos) {
+        DEBUG_PUTS("nanocoap: token longer than packet.");
+        return 0;
     }
 
     if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        if ((pkt->hdr->ver_t_tkl & 0xf) == 15) {
-            DEBUG("nanocoap: token length is reserved value 15,"
-                  "invalid for extended token length field.\n");
-            return -EBADMSG;
+        switch (tkl) {
+        case 15:
+            DEBUG_PUTS("nanocoap: token length is reserved value 15,"
+                       "invalid for extended token length field.");
+            return 0;
+        case 14:
+            token_length = byteorder_bebuftohs(buf + token_pos) + 269;
+            if (token_length > 0xfff) {
+                DEBUG_PUTS("nanocoap: CoAP Tokens >= 4 KiB not implemented");
+                return 0;
+            }
+            token_pos += 2;
+            break;
+        case 13:
+            token_length = buf[token_pos] + 13;
+            token_pos += 1;
+            break;
         }
-    } else if (coap_get_token_len(pkt) > COAP_TOKEN_LENGTH_MAX) {
-        DEBUG("nanocoap: token length invalid\n");
-        return -EBADMSG;
-    }
-    /* pkt_pos range is validated after options parsing loop below */
-    pkt_pos += coap_get_token_len(pkt);
 
+        /* testing again: token_length + token_pos may now be larger */
+        if (buf_len < token_length + token_pos) {
+            DEBUG_PUTS("nanocoap: token longer than packet.");
+            return 0;
+        }
+    }
+
+    return (token_pos << 12) | token_length;
+}
+
+static ssize_t _parse_options(coap_pkt_t *pkt, size_t len)
+{
     coap_optpos_t *optpos = pkt->options;
     unsigned option_count = 0;
     unsigned option_nr = 0;
 
+    /* Packet end may be before buf + len in case of CoAP over TCP.
+     * But pkt->payload_len is pointing to the end no matter what. */
+    uint8_t *pkt_end = pkt->payload + pkt->payload_len;
+
     /* parse options */
-    while (pkt_pos < pkt_end) {
-        uint8_t *option_start = pkt_pos;
-        uint8_t option_byte = *pkt_pos++;
+    while (pkt->payload < pkt_end) {
+        uint8_t *option_start = pkt->payload;
+        uint8_t option_byte = *pkt->payload++;
         if (option_byte == COAP_PAYLOAD_MARKER) {
-            pkt->payload = pkt_pos;
-            pkt->payload_len = buf + len - pkt_pos;
+            pkt->payload_len = pkt->buf + len - pkt->payload;
             DEBUG("payload len = %u\n", pkt->payload_len);
             break;
         }
         else {
-            int option_delta = _decode_value(option_byte >> 4, &pkt_pos, pkt_end);
+            int option_delta = _decode_value(option_byte >> 4, &pkt->payload, pkt_end);
             if (option_delta < 0) {
                 DEBUG("bad op delta\n");
                 return -EBADMSG;
             }
-            int option_len = _decode_value(option_byte & 0xf, &pkt_pos, pkt_end);
+            int option_len = _decode_value(option_byte & 0xf, &pkt->payload, pkt_end);
             if (option_len < 0) {
                 DEBUG("bad op len\n");
                 return -EBADMSG;
@@ -151,24 +169,25 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
                     bf_set(pkt->opt_crit, option_count);
                 }
                 optpos->opt_num = option_nr;
-                optpos->offset = (uintptr_t)option_start - (uintptr_t)hdr;
+                optpos->offset = (uintptr_t)option_start - (uintptr_t)pkt->buf;
                 DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
                 optpos++;
                 option_count++;
             }
 
-            pkt_pos += option_len;
+            pkt->payload += option_len;
         }
     }
 
-    if (pkt_pos > pkt_end) {
-        DEBUG("nanocoap: bad packet length\n");
+    if (pkt->payload > pkt_end) {
         return -EBADMSG;
     }
 
+    pkt->payload_len = (uintptr_t)pkt_end - (uintptr_t)pkt->payload;
+
     pkt->options_len = option_count;
     if (!pkt->payload) {
-        pkt->payload = pkt_pos;
+        pkt->payload = pkt->payload;
     }
 
 #ifdef MODULE_GCOAP
@@ -177,12 +196,174 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     }
 #endif
 
-    DEBUG("coap pkt parsed. code=%u detail=%u payload_len=%u, nopts=%u, 0x%02x\n",
+    DEBUG("coap pkt parsed. code=%u.%02u payload_len=%u, nopts=%u\n",
           coap_get_code_class(pkt),
           coap_get_code_detail(pkt),
-          pkt->payload_len, option_count, hdr->code);
+          pkt->payload_len, option_count);
 
-    return 0;
+    return len;
+}
+
+/* http://tools.ietf.org/html/rfc7252#section-3
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |Ver| T |  TKL  |      Code     |          Message ID           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Token (if any, TKL bytes) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Options (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |1 1 1 1 1 1 1 1|    Payload (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+{
+    *pkt = (coap_pkt_t){
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+        .transport = COAP_TRANSPORT_UDP,
+#endif
+        .buf = buf
+    };
+
+    if (len < sizeof(coap_udp_hdr_t)) {
+        DEBUG("msg too short\n");
+        return -EBADMSG;
+    }
+    else if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_udp_hdr_t))) {
+        DEBUG("empty msg too long\n");
+        return -EBADMSG;
+    }
+
+    pkt->token_pos_and_len = _decode_token_pos_and_len(buf, len, sizeof(coap_udp_hdr_t));
+    if (!pkt->token_pos_and_len) {
+        return -EBADMSG;
+    }
+
+    pkt->payload = buf + coap_get_total_hdr_len(pkt);
+    pkt->payload_len = len - coap_get_total_hdr_len(pkt);
+
+    return _parse_options(pkt, len);
+}
+
+/* https://www.rfc-editor.org/rfc/rfc8323#section-3.2 Figure 4
+ *
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |  Len  |  TKL  | Extended Length (if any, as chosen by Len) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      Code     | Token (if any, TKL bytes) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |  Options (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |1 1 1 1 1 1 1 1|    Payload (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+ssize_t coap_parse_tcp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+{
+    *pkt = (coap_pkt_t){
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+        .transport = COAP_TRANSPORT_TCP,
+#endif
+        .buf = buf
+    };
+    size_t hdr_len = 2;
+
+    /* Check if the current chunk of the TCP stream already contains a full
+     * CoAP packet. We return -EAGAIN if the packet is incomplete */
+    if (len < hdr_len) {
+        return -EAGAIN;
+    }
+
+    size_t pkt_data_len = buf[0] >> 4;
+
+    /* For the special cases pkt_data_len == 13/14/15, pkt_data_len is not
+     * actually final. But if go past this point we have at least 13 bytes of
+     * the packet, which is enough to get the final length */
+    if (hdr_len + pkt_data_len > len) {
+        return -EAGAIN;
+    }
+
+
+    switch (pkt_data_len) {
+    case 13:
+        pkt_data_len = buf[1] + 13;
+        hdr_len += sizeof(uint8_t);
+        break;
+    case 14:
+        pkt_data_len = byteorder_bebuftohs(&buf[1]) + 269;
+        hdr_len += sizeof(uint16_t);
+        break;
+    case 15:
+        pkt_data_len = byteorder_bebuftohl(&buf[1]) + 65805;
+        hdr_len += sizeof(uint32_t);
+        break;
+    }
+
+    uint8_t token_pos = hdr_len;
+    hdr_len += (buf[0] & 0xf);
+
+    if (len < pkt_data_len + hdr_len) {
+        return -EAGAIN;
+    }
+
+    pkt->token_pos_and_len = _decode_token_pos_and_len(buf, len, token_pos);
+    if (!pkt->token_pos_and_len) {
+        return -EBADMSG;
+    }
+
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        /* hdr_len may have grown due to RFC 8974 extended token length */
+        hdr_len = coap_get_total_hdr_len(pkt);
+
+        if (len < pkt_data_len + hdr_len) {
+            return -EAGAIN;
+        }
+    }
+
+    pkt->payload = buf + hdr_len;
+    pkt->payload_len = pkt_data_len;
+
+    return _parse_options(pkt, hdr_len + pkt_data_len);
+}
+
+
+/* https://www.rfc-editor.org/rfc/rfc8323#section-3.2 Figure 10
+ *
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Len=0 |  TKL  |      Code     |    Token (TKL bytes) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Options (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |1 1 1 1 1 1 1 1|    Payload (if any) ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+ssize_t coap_parse_ws(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+{
+    *pkt = (coap_pkt_t){
+#if NANOCOAP_ENABLED_TRANSPORTS > 1
+        .transport = COAP_TRANSPORT_WS,
+#endif
+        .buf = buf
+    };
+
+    if (len < COAP_WS_HEADER_SIZE) {
+        return -EBADMSG;
+    }
+
+    pkt->token_pos_and_len = _decode_token_pos_and_len(buf, len, COAP_WS_HEADER_SIZE);
+    if (!pkt->token_pos_and_len) {
+        return -EBADMSG;
+    }
+
+    size_t hdr_len = coap_get_total_hdr_len(pkt);
+    pkt->payload = buf + hdr_len;
+    pkt->payload_len = len - hdr_len;
+
+    return _parse_options(pkt, len);
 }
 
 int coap_match_path(const coap_resource_t *resource, const uint8_t *uri)
@@ -209,7 +390,7 @@ uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
         if (optpos->opt_num == opt_num) {
             unsigned idx = index_of(pkt->options, optpos);
             bf_unset(pkt->opt_crit, idx);
-            return (uint8_t*)pkt->hdr + optpos->offset;
+            return pkt->buf + optpos->offset;
         }
         optpos++;
     }
@@ -352,7 +533,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
         opt->opt_num = 0;
         opt->offset = coap_get_total_hdr_len(pkt);
     }
-    uint8_t *start = (uint8_t*)pkt->hdr + opt->offset;
+    uint8_t *start = pkt->buf + opt->offset;
 
     /* Find start of option value and value length. */
     uint16_t delta;
@@ -365,7 +546,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
 
     *value = start;
     opt->opt_num += delta;
-    opt->offset = start + len - (uint8_t*)pkt->hdr;
+    opt->offset = start + len - pkt->buf;
     return len;
 }
 
@@ -495,10 +676,20 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 {
     assert(ctx);
 
-    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE) && (coap_get_type(pkt) == COAP_TYPE_RST)) {
-        nanocoap_unregister_observer_due_to_reset(coap_request_ctx_get_remote_udp(ctx),
-                                                  coap_get_id(pkt));
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS
+    switch (coap_get_transport(pkt)) {
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE) && (coap_get_type(pkt) == COAP_TYPE_RST)) {
+            nanocoap_unregister_observer_due_to_reset(coap_request_ctx_get_remote_udp(ctx),
+                                                      coap_get_id(pkt));
+        }
+        break;
+    default:
+        /* reliable transports have no RST messages */
+        break;
     }
+#endif
 
     switch (coap_get_type(pkt)) {
     case COAP_TYPE_CON:
@@ -515,23 +706,43 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
         return -EBADMSG;
     }
 
-    if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
-        /* we are not able to process a CON/NON message with an empty code,
-         * so we reply with a RST, unless we got a multicast message */
-        if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
-            return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS
+    switch (coap_get_transport(pkt)) {
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
+            /* we are not able to process a CON/NON message with an empty code,
+             * so we reply with a RST, unless we got a multicast message */
+            if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
+                return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+            }
         }
+        break;
+    default:
+        /* reliable transports have no RST */
+        break;
     }
+#endif
 
     ssize_t retval = coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
                                        coap_resources, coap_resources_numof);
-    if (retval < 0) {
-        /* handlers were not able to process this, so we reply with a RST,
-         * unless we got a multicast message */
-        if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
-            return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+#if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS
+    switch (coap_get_transport(pkt)) {
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        if (retval < 0) {
+            /* handlers were not able to process this, so we reply with a RST,
+             * unless we got a multicast message */
+            if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
+                return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+            }
         }
+        break;
+    default:
+        /* reliable transports have no RST messages */
+        break;
     }
+#endif
 
     return retval;
 }
@@ -583,7 +794,11 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
     uint8_t *bufpos = buf;
     uint32_t no_response;
     unsigned tkl = coap_get_token_len(pkt);
-    size_t hdr_len = sizeof(coap_hdr_t) + tkl;
+    static_assert(sizeof(coap_udp_hdr_t) == COAP_TCP_TENTATIVE_HEADER_SIZE,
+                  "Implementation assumption that CoAP over UDP header and "
+                  "tentative CoAP over TCP header are of the same size does "
+                  "not hold, code needs fixing");
+    size_t hdr_len = sizeof(coap_udp_hdr_t) + tkl;
     uint8_t type = coap_get_type(pkt) == COAP_TYPE_CON
                  ? COAP_TYPE_ACK
                  : COAP_TYPE_NON;
@@ -599,8 +814,20 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
         return -ENOBUFS;
     }
 
-    bufpos += coap_build_hdr(buf, type, coap_get_token(pkt), tkl,
-                             code, ntohs(pkt->hdr->id));
+    switch (coap_get_transport(pkt)) {
+    default:
+    case COAP_TRANSPORT_DTLS:
+    case COAP_TRANSPORT_UDP:
+        bufpos += coap_build_udp_hdr(buf, len, type, coap_get_token(pkt), tkl,
+                                     code, coap_get_id(pkt));
+        break;
+    case COAP_TRANSPORT_TCP:
+        bufpos += coap_build_tcp_hdr(buf, len, coap_get_token(pkt), tkl, code);
+        break;
+    case COAP_TRANSPORT_WS:
+        bufpos += coap_build_ws_hdr(buf, len, coap_get_token(pkt), tkl, code);
+        break;
+    }
 
     if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
         const uint8_t no_response_index = (code >> 5) - 1;
@@ -670,22 +897,21 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     return header_len + payload_len;
 }
 
-ssize_t coap_build_empty_ack(coap_pkt_t *pkt, coap_hdr_t *ack)
+ssize_t coap_build_empty_ack(const coap_pkt_t *pkt, coap_udp_hdr_t *ack)
 {
     if (coap_get_type(pkt) != COAP_TYPE_CON) {
         return 0;
     }
 
-    coap_build_hdr(ack, COAP_TYPE_ACK, NULL, 0,
-                   COAP_CODE_EMPTY, ntohs(pkt->hdr->id));
-
-    return sizeof(*ack);
+    return coap_build_udp_hdr(ack, sizeof(*ack), COAP_TYPE_ACK, NULL, 0,
+                              COAP_CODE_EMPTY, coap_get_id(pkt));
 }
 
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len)
 {
     unsigned tkl = coap_get_token_len(pkt);
+    unsigned hdr_len;
     unsigned type = COAP_TYPE_NON;
 
     if (!code) {
@@ -697,9 +923,23 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     else if (coap_get_type(pkt) == COAP_TYPE_CON) {
         type = COAP_TYPE_ACK;
     }
-    unsigned len = sizeof(coap_hdr_t) + tkl;
 
-    if ((len + payload_len) > rlen) {
+    switch (coap_get_transport(pkt)) {
+    default:
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        hdr_len = sizeof(coap_udp_hdr_t);
+        break;
+    case COAP_TRANSPORT_TCP:
+        hdr_len = COAP_TCP_TENTATIVE_HEADER_SIZE;
+        break;
+    case COAP_TRANSPORT_WS:
+        hdr_len = COAP_WS_HEADER_SIZE;
+    }
+
+    hdr_len += tkl + coap_pkt_tkl_ext_len(pkt);
+
+    if ((hdr_len + payload_len) > rlen) {
         return -ENOSPC;
     }
 
@@ -714,6 +954,10 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 
         /* option contains bitmap of disinterest */
         if (no_response & mask) {
+            if (coap_get_transport(pkt) == COAP_TRANSPORT_TCP) {
+                return 0;
+            }
+
             switch (coap_get_type(pkt)) {
             case COAP_TYPE_NON:
                 /* no response and no ACK */
@@ -721,7 +965,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
             default:
                  /* There is an immediate ACK response, but it is an empty response */
                 code = COAP_CODE_EMPTY;
-                len = sizeof(coap_hdr_t);
+                hdr_len = sizeof(coap_udp_hdr_t);
                 tkl = 0;
                 payload_len = 0;
                 break;
@@ -729,43 +973,72 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         }
     }
 
-    coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
-                   ntohs(pkt->hdr->id));
-    len += payload_len;
+    switch (coap_get_transport(pkt)) {
+    case COAP_TRANSPORT_UDP:
+    case COAP_TRANSPORT_DTLS:
+        coap_build_udp_hdr(rbuf, rlen, type, coap_get_token(pkt), tkl, code, coap_get_id(pkt));
+        break;
+    case COAP_TRANSPORT_TCP:
+        coap_build_tcp_hdr(rbuf, rlen, coap_get_token(pkt), tkl, code);
+        break;
+    case COAP_TRANSPORT_WS:
+        coap_build_ws_hdr(rbuf, rlen, coap_get_token(pkt), tkl, code);
+        break;
+    }
 
-    return len;
+    return hdr_len + payload_len;
 }
 
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
-                       size_t token_len, unsigned code, uint16_t id)
+static size_t _tkl_ext_len(uint8_t *tkl, uint8_t tkl_ext[2], size_t token_len)
+{
+    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        assume(token_len <= 8);
+        *tkl = token_len;
+        return 0;
+    }
+
+    if (token_len > 268) {
+        *tkl = 14;
+        uint16_t tmp = htons(token_len - 269);/* 269 = 255 + 14 */
+        tkl_ext[0] = tmp >> 8;
+        tkl_ext[1] = tmp;
+        return 2;
+    }
+
+    if (token_len > 12) {
+        *tkl = 13;
+        tkl_ext[0] = token_len - 13;
+        return 1;
+    }
+
+    *tkl = token_len;
+    return 0;
+}
+
+ssize_t coap_build_udp(coap_pkt_t *pkt, void *buf, size_t buf_len, uint8_t type,
+                       const void *token, size_t token_len, uint8_t code, uint16_t id)
 {
     assert(!(type & ~0x3));
 
-    uint16_t tkl_ext;
-    uint8_t tkl_ext_len, tkl;
+    uint8_t tkl_ext[2];
+    uint8_t tkl;
+    size_t tkl_ext_len = _tkl_ext_len(&tkl, tkl_ext, token_len);
 
-    if (token_len > 268 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        tkl_ext_len = 2;
-        tkl_ext = htons(token_len - 269); /* 269 = 255 + 14 */
-        tkl = 14;
-    }
-    else if (token_len > 12 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        tkl_ext_len = 1;
-        tkl_ext = token_len - 13;
-        tkl = 13;
-    }
-    else {
-        tkl = token_len;
-        tkl_ext_len = 0;
+    size_t hdr_len = sizeof(coap_udp_hdr_t) + token_len + tkl_ext_len;
+    if (buf_len < hdr_len) {
+        return -EOVERFLOW;
     }
 
-    memset(hdr, 0, sizeof(coap_hdr_t));
+    memset(buf, 0, sizeof(coap_udp_hdr_t));
+    coap_udp_hdr_t *hdr = buf;
     hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | tkl;
     hdr->code = code;
     hdr->id = htons(id);
+    uint16_t token_offset = sizeof(coap_udp_hdr_t);
 
     if (tkl_ext_len) {
-        memcpy(hdr + 1, &tkl_ext, tkl_ext_len);
+        memcpy(buf + token_offset, tkl_ext, tkl_ext_len);
+        token_offset += tkl_ext_len;
     }
 
     /* Some users build a response packet in the same buffer that contained
@@ -775,20 +1048,182 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
      * undefined behavior, so have to treat this explicitly. We could use
      * memmove(), but we know that either `src` and `dest` do not overlap
      * at all, or fully. So we can be a bit more efficient here. */
-    void *token_dest = coap_hdr_data_ptr(hdr);
+    void *token_dest = buf + token_offset;
     if (token_dest != token) {
         memcpy(token_dest, token, token_len);
     }
 
-    return sizeof(coap_hdr_t) + token_len + tkl_ext_len;
+    if (pkt) {
+        memset(pkt, 0, sizeof(*pkt));
+        pkt->buf = buf;
+        pkt->payload = buf + hdr_len;
+        pkt->payload_len = buf_len - hdr_len;
+        coap_set_transport(pkt, COAP_TRANSPORT_UDP);
+        pkt->token_pos_and_len = (token_offset << 12) | token_len;
+    }
+
+    return hdr_len;
+}
+
+ssize_t coap_build_tcp(coap_pkt_t *pkt, void *_buf, size_t buf_len,
+                       const void *token, size_t token_len, uint8_t code)
+{
+    uint8_t *buf = _buf;
+
+    static const size_t min_hdr_size = COAP_TCP_TENTATIVE_HEADER_SIZE;
+    uint8_t tkl_ext[2];
+    uint8_t tkl;
+    size_t tkl_ext_len = _tkl_ext_len(&tkl, tkl_ext, token_len);
+    size_t hdr_size = min_hdr_size + tkl_ext_len + token_len;
+
+    if (buf_len < hdr_size) {
+        return -EOVERFLOW;
+    }
+
+    /* We copy the token first and use memmove, as caller may reuse the same
+     * buffer for the reply that was used for the request. Since CoAP over TCP
+     * has a dynamic header size (depending on the length of the message), the
+     * header of the reply might very well be larger than the one of the request.
+     * Worse: Our tentative header uses a worst case estimation and is almost
+     * always larger than the header of the request. So we need to move data
+     * with a bit of care here. */
+    uint16_t token_offset = COAP_TCP_TENTATIVE_HEADER_SIZE + tkl_ext_len;
+    memmove(buf + token_offset, token, token_len);
+
+    buf[0] = (14U << 4) | tkl;
+    buf[1] = 0;
+    buf[2] = 0;
+    buf[3] = code;
+    memcpy(buf + token_offset, tkl_ext, tkl_ext_len);
+    token_offset += tkl_ext_len;
+
+    if (pkt) {
+        memset(pkt, 0, sizeof(*pkt));
+        pkt->buf = buf;
+        pkt->payload = buf + hdr_size;
+        pkt->payload_len = buf_len - hdr_size;
+        coap_set_transport(pkt, COAP_TRANSPORT_TCP);
+        pkt->token_pos_and_len = (token_offset  << 12) | token_len;
+    }
+
+    return hdr_size;
+}
+
+void coap_finalize_tcp(coap_pkt_t *pkt)
+{
+    assume(pkt);
+    size_t data_len = coap_get_total_len(pkt) - coap_get_total_hdr_len(pkt);
+    uint16_t shrunk = coap_finalize_tcp_header(pkt->buf, data_len);
+    pkt->buf += shrunk;
+    uint16_t token_pos = pkt->token_pos_and_len >> 12;
+    pkt->token_pos_and_len &= 0x0fff;
+    token_pos -= shrunk;
+    pkt->token_pos_and_len |= token_pos << 12;
+}
+
+size_t coap_finalize_tcp_header(uint8_t *hdr, size_t data_len)
+{
+#if SIZE_MAX > 65805
+    assume(data_len < 65805);
+#endif
+
+    /* Not using named constants, as RFC 8323 also uses the magic numbers
+     * without names.
+     *
+     * - If data_len < 13, the four bit Len field is used.
+     * - If 13 <= data_len < 269, the four-bit Len field is set to 13
+     *   and data_len - 13 is stored into the 8-bit extended Len field.
+     * - If 269 <= data_len < 65805, the four-bit Len field is set to 14 and
+     *   data_len - 269 is stored into the 16-bit extended Len field.
+     */
+    if (data_len >= 269) {
+        byteorder_htobebufs(hdr + 1, data_len - 269);
+        return 0;
+    }
+
+    if (data_len >= 13) {
+        hdr[1] = (13U << 4) | (hdr[0] & 0xf);
+        hdr[2] = data_len - 13;
+        return 1;
+    }
+
+    hdr[2] = (data_len << 4) | (hdr[0] & 0xf);
+    return 2;
+}
+
+size_t coap_finalize_tcp_header_in_buf(uint8_t *buf, size_t buf_len)
+{
+    uint16_t tmp = _decode_token_pos_and_len(buf, buf_len, COAP_TCP_TENTATIVE_HEADER_SIZE);
+    size_t token_offset = tmp >> 12U;
+    size_t token_len = tmp & 0xfff;
+    size_t hdr_len = token_offset + token_len;
+
+    if (buf_len < hdr_len) {
+        assert(0);
+        return buf_len;
+    }
+
+    size_t data_len = buf_len - hdr_len;
+    return coap_finalize_tcp_header(buf, data_len);
+}
+
+ssize_t coap_build_ws(coap_pkt_t *pkt, void *_buf, size_t buf_len,
+                       const void *token, size_t token_len, uint8_t code)
+{
+    uint8_t *buf = _buf;
+
+    static const size_t min_hdr_size = COAP_WS_HEADER_SIZE;
+    uint8_t tkl_ext[2];
+    uint8_t tkl;
+    size_t tkl_ext_len = _tkl_ext_len(&tkl, tkl_ext, token_len);
+    size_t hdr_size = min_hdr_size + tkl_ext_len + token_len;
+
+    if (buf_len < hdr_size) {
+        return -EOVERFLOW;
+    }
+
+    /* We copy the token first and use memmove, as caller may reuse the same
+     * buffer for the reply that was used for the request. Since CoAP over TCP
+     * has a dynamic header size (depending on the length of the message), the
+     * header of the reply might very well be larger than the one of the request.
+     * Worse: Our tentative header uses a worst case estimation and is almost
+     * always larger than the header of the request. So we need to move data
+     * with a bit of care here. */
+    uint16_t token_offset = COAP_WS_HEADER_SIZE + tkl_ext_len;
+    memmove(buf + token_offset, token, token_len);
+
+    buf[0] = tkl;
+    buf[1] = code;
+    memcpy(buf + token_offset, tkl_ext, tkl_ext_len);
+    token_offset += tkl_ext_len;
+
+    if (pkt) {
+        memset(pkt, 0, sizeof(*pkt));
+        pkt->buf = buf;
+        pkt->payload = buf + hdr_size;
+        pkt->payload_len = buf_len - hdr_size;
+        coap_set_transport(pkt, COAP_TRANSPORT_WS);
+        pkt->token_pos_and_len = (token_offset  << 12) | token_len;
+    }
+
+    return hdr_size;
 }
 
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len)
 {
+    assert((buf[0] >> 6) == COAP_V1);
     memset(pkt, 0, sizeof(coap_pkt_t));
-    pkt->hdr = (coap_hdr_t *)buf;
+    pkt->buf = buf;
     pkt->payload = buf + header_len;
     pkt->payload_len = len - header_len;
+    coap_set_transport(pkt, COAP_TRANSPORT_UDP);
+
+    /* Parsing the CoAP header we just generated is a bit stupid. The
+     * API did not anticipate CoAP over TCP/WebSocket and
+     * RFC 8974 extend token length, which both cause the token field
+     * to no longer be at a fixed offset. */
+    pkt->token_pos_and_len = _decode_token_pos_and_len(buf, len,
+                                                       sizeof(coap_udp_hdr_t));
 }
 
 /*
@@ -1119,7 +1554,7 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, const void *val,
     coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
 
     pkt->options[pkt->options_len].opt_num = optnum;
-    pkt->options[pkt->options_len].offset = pkt->payload - (uint8_t *)pkt->hdr;
+    pkt->options[pkt->options_len].offset = pkt->payload - pkt->buf;
     pkt->options_len++;
     pkt->payload += optlen;
     pkt->payload_len -= optlen;
@@ -1241,7 +1676,7 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
         pkt->payload_len = 0;
     }
 
-    return pkt->payload - (uint8_t *)pkt->hdr;
+    return pkt->payload - pkt->buf;
 }
 
 ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
@@ -1265,7 +1700,7 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
             if (opt_count == 0) {
                 /* this is the last option => use payload / end pointer as old start */
                 start_old = (pkt->payload_len) ? pkt->payload - 1 : pkt->payload;
-                start_new = (uint8_t *)pkt->hdr + optpos->offset;
+                start_new = pkt->buf + optpos->offset;
                 break;
             }
 
@@ -1279,12 +1714,12 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
             optpos++;
             opt_count--;
             /* select start of next option */
-            opt_start = (uint8_t *)pkt->hdr + optpos->offset;
+            opt_start = pkt->buf + optpos->offset;
             start_old = _parse_option(pkt, opt_start, &old_delta, &option_len);
             old_hdr_len = start_old - opt_start;
 
             /* select start of to be deleted option and set delta/length of next option */
-            start_new = (uint8_t *)pkt->hdr + prev_opt->offset;
+            start_new = pkt->buf + prev_opt->offset;
             *start_new = 0;
             /* write new_delta value to option header: 4 upper bits of header (shift 4) +
              * 1 or 2 optional bytes depending on delta value) */
@@ -1316,7 +1751,7 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t opt_num)
         }
         pkt->payload -= (start_old - start_new);
     }
-    return (pkt->payload - ((uint8_t *)pkt->hdr)) + pkt->payload_len;
+    return pkt->payload - pkt->buf + pkt->payload_len;
 }
 
 ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len)
@@ -1484,18 +1919,35 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
 
 unsigned coap_get_len(coap_pkt_t *pkt)
 {
-    unsigned pktlen = sizeof(coap_hdr_t) + coap_get_token_len(pkt);
+    unsigned pktlen = sizeof(coap_udp_hdr_t) + coap_get_token_len(pkt);
     if (pkt->payload) {
         pktlen += pkt->payload_len + 1;
     }
     return pktlen;
 }
 
-void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote)
+#if MODULE_NANOCOAP_UDP
+void coap_request_ctx_init_udp(coap_request_ctx_t *ctx, sock_udp_ep_t *remote)
 {
     memset(ctx, 0, sizeof(*ctx));
-    ctx->remote = remote;
+    ctx->remote_udp = remote;
 }
+
+const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx)
+{
+    return ctx->remote_udp;
+}
+
+const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx)
+{
+#if defined(MODULE_SOCK_AUX_LOCAL)
+    return ctx->local_udp;
+#else
+    (void)ctx;
+    return NULL;
+#endif
+}
+#endif
 
 const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx)
 {
@@ -1514,20 +1966,5 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx)
 #else
     (void)ctx;
     return 0;
-#endif
-}
-
-const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx)
-{
-    return ctx->remote;
-}
-
-const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx)
-{
-#if defined(MODULE_SOCK_AUX_LOCAL)
-    return ctx->local;
-#else
-    (void)ctx;
-    return NULL;
 #endif
 }
