@@ -98,7 +98,7 @@ inline static void delay(void)
  */
 static void start(const tm1637_t *dev)
 {
-    gpio_write(dev->params.dio, false);
+    gpio_write(dev->params->dio, false);
     delay();
 }
 
@@ -112,11 +112,11 @@ static void start(const tm1637_t *dev)
  */
 static void stop(const tm1637_t *dev)
 {
-    gpio_write(dev->params.dio, false);
+    gpio_write(dev->params->dio, false);
     delay();
-    gpio_write(dev->params.clk, true);
+    gpio_write(dev->params->clk, true);
     delay();
-    gpio_write(dev->params.dio, true);
+    gpio_write(dev->params->dio, true);
     delay();
 }
 
@@ -130,11 +130,11 @@ static void transmit_byte(const tm1637_t *dev, uint8_t byte)
 {
     for (int i = 0; i < 8; ++i) {
         bool value = (byte >> i) & 0x01;
-        gpio_write(dev->params.clk, false);
+        gpio_write(dev->params->clk, false);
         delay();
-        gpio_write(dev->params.dio, value);
+        gpio_write(dev->params->dio, value);
         delay();
-        gpio_write(dev->params.clk, true);
+        gpio_write(dev->params->clk, true);
         delay();
     }
 
@@ -144,12 +144,12 @@ static void transmit_byte(const tm1637_t *dev, uint8_t byte)
      * this would require us to set the pin into input mode and read the value, then set it
      * back to write mode. This would take too long and therefore the ACK check is omitted.
      */
-    gpio_write(dev->params.clk, false);
-    gpio_write(dev->params.dio, true);
+    gpio_write(dev->params->clk, false);
+    gpio_write(dev->params->dio, true);
     delay();
-    gpio_write(dev->params.clk, true);
+    gpio_write(dev->params->clk, true);
     delay();
-    gpio_write(dev->params.clk, false);
+    gpio_write(dev->params->clk, false);
     delay();
 }
 
@@ -208,18 +208,18 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
     assert(params->dio != GPIO_UNDEF);
 
     /* set the parameters */
-    dev->params = *params;
+    dev->params = params;
 
-    if (gpio_init(dev->params.clk, GPIO_OUT)) {
+    if (gpio_init(dev->params->clk, GPIO_OUT)) {
         return -1;
     }
 
-    if (gpio_init(dev->params.dio, GPIO_OUT)) {
+    if (gpio_init(dev->params->dio, GPIO_OUT)) {
         return -1;
     }
 
-    gpio_write(dev->params.clk, false);
-    gpio_write(dev->params.dio, false);
+    gpio_write(dev->params->clk, false);
+    gpio_write(dev->params->dio, false);
 
     return 0;
 }
