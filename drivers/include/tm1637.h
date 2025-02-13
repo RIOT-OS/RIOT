@@ -51,7 +51,7 @@ typedef struct {
     /**
      * @brief Configuration parameters
      */
-    tm1637_params_t params;
+    const tm1637_params_t *params;
 } tm1637_t;
 
 /**
