@@ -341,7 +341,10 @@ int t2t_add_empty_ndef_tlv(nfc_t2t_t *tag);
  * @param size 
  * @return int 
  */
+/*
+commenting this function as it currently does not work - see explanation in t2t.c
 int t2t_create_memory_control_tlv(nfc_t2t_t *tag, uint8_t * data, uint32_t size);
+*/
 
 /**
  * @brief Adds a NULL TLV to the current end of the data area.

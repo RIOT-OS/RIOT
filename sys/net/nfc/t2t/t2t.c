@@ -454,7 +454,48 @@ int t2t_create_terminator_tlv(nfc_t2t_t *tag){
     }
 }
 
-//TODO
+/*
+TODO
+This is not working properly and is thus commented for now.
+Two problems: 
+I)
+The current workings of tag creation try to use as much
+of the given memory for the data area as possible, ensuring that it is dividable
+by 8 and that there is the right amount of default dynamic lock bytes
+that means there is no space in the reserved space left to create reserved mem
+behind it and we don't have more memory to work with.
+One can shrink the data area by multiples of 8 and adjust the cc byte
+as well as the amount of dynamic lock bits/bytes accordingly. 
+II)
+However, the second problem with memory control is the byte addressing.
+The formula byte_address = page_address * 2^(bytes/page) + offset
+(as taken from Type2Tag Specs (v1.1) 2.3.3)
+with the limitations of 0 <= page address, bytes/page, offset <= 15
+limits the possible addresses. E.g. assume a tag with the maximum data area of
+0xff * 8 bytes + 16 byte reserved + 32 lock bytes = 2088 bytes memory size for
+tag data alone. Assume we want to write reserved mem behind that.
+Byte address 2089 would be 1 * 2^11 + 41, which is impossible due to the offset
+size limitations. Shrinking the bytes/page nibble doesn't bring any effect since
+we'd need a value of 2^(bytes/page) < 41 which would be fulfilled by 32 = 2^5.
+2089 = 65 * 2^5 + 9. That however makes the page_address too large (65 > 15).
+Generally the byte_address can only address exact bytes until bytes/page = 4.
+2^4 = 16 since only then all bytes within a page are addressable by adding a max
+offset of 15. And this ends with the upper limit of page addresses of 15
+making 15 * 2^4 + 15 = 255 the last exactly addressable byte.
+Another example as 2089 above: 272 = 8 * 2^5 + _16_ = _17_ * 2^4 + 0
+If above understanding of problem II is correct (which it might not be) the 
+addressable reserved mem blocks are limited to properly addressable bytes.
+
+What one can do is write the reserved mem block(s) in the data area to fully. 
+addressable bytes. Accd. to 2.2.3 a writing device shall jump over reserved 
+memory areas. But accd. to the NOTE in 2.2 the reserved data must also be in 
+blocks beginning from 16, meaning that the smallest address would be 16 *4 = 64.
+That, however, is generally tricky to incorporate to the current 
+cursor approach. I.e. the memory ctrl TLV info would need to be memorized and 
+not just written to the tag in order to later skip reserved areas when writing 
+ndef message data.
+*/
+/*
 int t2t_create_memory_control_tlv(nfc_t2t_t *tag, uint8_t * data, uint32_t size){
     LOG_DEBUG("Creating memory control TLV\n");
     if(size > tag->data_area_size){
@@ -476,13 +517,13 @@ int t2t_create_memory_control_tlv(nfc_t2t_t *tag, uint8_t * data, uint32_t size)
     uint32_t byte_address = (uint32_t) start_address - (uint32_t)tag->memory;
     uint8_t offset = byte_address % (2 << (tag->extra.bytes_per_page-1));
     uint8_t page_address = byte_address / (2 << (tag->extra.bytes_per_page-1));
-    //printf("start_address: %d, byte address: %d, page_address: %d, offset: %d, bytes/page: %d\n"
+    //LOG_DEBUG("start_address: %d, byte address: %d, page_address: %d, offset: %d, bytes/page: %d\n"
     //    ,start_address, byte_address, page_address, offset, tag->extra.bytes_per_page);
     uint8_t b1 = 0x00 | page_address;
     b1 = (b1 << 4) | offset; 
     uint8_t b2 = size;
     uint8_t b3 = 0x00 | tag->extra.bytes_per_page;
-    //printf("%#4x %#4x %#4x\n",b1, b2, b3);
+    //LOG_DEBUG("%#4x %#4x %#4x\n",b1, b2, b3);
     tag->data_area_cursor[2] = b1;
     tag->data_area_cursor[3] = b2;
     tag->data_area_cursor[4] = b3;
@@ -496,6 +537,7 @@ int t2t_create_memory_control_tlv(nfc_t2t_t *tag, uint8_t * data, uint32_t size)
 
     return 0;
 }
+*/
 
 static int t2t_test_and_remove_terminator_tlv(nfc_t2t_t *tag){
     if(tag->data_area_cursor <= tag->data_area_start){

@@ -129,12 +129,6 @@ static int test_t2t_dynamic_mem(void){
     }
     t2t_create_null_tlv(&tag);
     t2t_create_null_tlv(&tag);
-    uint8_t reserved_buf[] = {'R', 'E', 'S', 'E', 'R', 'V', 'E', 'D'};
-    error = t2t_create_memory_control_tlv(&tag, reserved_buf, sizeof(reserved_buf));
-    if(error){
-        printf("FAIL: Could not create memory control block with reserved data\n");
-        return error;
-    }
     
     ndef_t ndef_msg;
     ndef_init(&ndef_msg, ndef_buf, NDEF_BUF_SIZE);
