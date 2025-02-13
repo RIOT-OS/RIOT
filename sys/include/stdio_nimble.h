@@ -156,6 +156,26 @@
  * >
  * ```
  *
+ * ## Debugging
+ *
+ * The `stdio_nimble` module provides a pseudomodule for debugging called `stdio_nimble_debug`.
+ * It can be used by adding the following line to the Makefile:
+ * ```make
+ * USEMODULE += stdio_nimble_debug
+ * ```
+ *
+ * The debug module will output all data going out through `STDOUT` and all data coming in from
+ * `STDIN` to the `stdio` UART. It also prints BLE GAP events such as
+ * `BLE_GAP_EVENT_CONNECT` and `BLE_GAP_EVENT_SUBSCRIBE`, which can be used to debug the
+ * establishing of a BLE connection.
+ *
+ * On most boards, the `stdio` UART is `UART(0)`. For example for the Nordic Semiconductor
+ * nRF52840DK development board, this is the UART connected to the built-in J-Link
+ * programmer and can be used with the `make term` target.
+ *
+ * **NOTE:** The debug module uses `printf` and therefore might require more stack. If you
+ * experience unexpected behavior or crashes, try increasing the stack size.
+ *
  * @{
  * @file
  *
