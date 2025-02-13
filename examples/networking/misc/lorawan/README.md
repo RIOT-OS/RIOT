@@ -83,21 +83,21 @@ for that device.
 
 1. flash device with appropriate keys and test
 
-    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> make -C examples/lorawan/ flash test
+    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> make -C examples/networking/misc/lorawan/ flash test
 
 #### With iotlab
 
 1. setup the iotlab experiment:
 
-    $ make -C examples/lorawan/ iotlab-exp
+    $ make -C examples/networking/misc/lorawan/ iotlab-exp
 
 2. flash device, set appropriate keys and test
 
-    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> IOTLAB_NODE=auto make -C examples/lorawan/ flash test
+    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> IOTLAB_NODE=auto make -C examples/networking/misc/lorawan/ flash test
 
 3. stop the iotlab experiment:
 
-    $ make -C examples/lorawan/ iotlab-stop
+    $ make -C examples/networking/misc/lorawan/ iotlab-stop
 
 _note_: if you have multiple running experiments you will need to set `IOTLAB_EXP_ID`
         to the appropriate experiment, when using the `iotlab-exp` you will see a:

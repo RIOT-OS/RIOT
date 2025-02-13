@@ -49,7 +49,7 @@ _RATIOS = [
 ]
 
 DEFAULT_APPS = [
-    "examples/hello-world",
+    "examples/essentials/hello-world",
     "tests/drivers/mtd_mapper",
     "tests/drivers/saul",
     "tests/pkg/tinyusb_cdc_msc",

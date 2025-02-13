@@ -41,7 +41,7 @@ CC26xx/CC13xx MCUs. It can be done through Kconfig using `make menuconfig`.
 For example:
 
 ```
-make -C examples/hello-world menuconfig BOARD=cc1350-launchpad
+make -C examples/essentials/hello-world menuconfig BOARD=cc1350-launchpad
 ```
 
 It will open the Kconfig terminal configuration utility, you may see the
@@ -55,7 +55,7 @@ device.
 For example:
 
 ```
-make -C examples/hello-world flash BOARD=cc1350-launchpad
+make -C examples/essentials/hello-world flash BOARD=cc1350-launchpad
 ```
 
 @note Once flashed, there's no need to flash it again, unless the configuration

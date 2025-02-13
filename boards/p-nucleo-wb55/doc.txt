@@ -56,7 +56,7 @@ flashed using OpenOCD (use version 0.11.0 at least).
 To flash this board, just use the following command:
 
 ```
-make BOARD=p-nucleo-wb55 flash -C examples/hello-world
+make BOARD=p-nucleo-wb55 flash -C examples/essentials/hello-world
 ```
 
 ### Flashing the Board Using ST-LINK Removable Media
@@ -85,7 +85,7 @@ The default baud rate is 115 200.
 
 Use the `term` target to open a terminal:
 ```
-make BOARD=p-nucleo-wb55 -C examples/hello-world term
+make BOARD=p-nucleo-wb55 -C examples/essentials/hello-world term
 ```
 
 ## User Interface

@@ -24,7 +24,7 @@
  * To flash this board, just use the following command:
  *
  * ```
- * make BOARD=stm32g0316-disco flash -C examples/hello-world
+ * make BOARD=stm32g0316-disco flash -C examples/essentials/hello-world
  * ```
  *
  * ### UART Terminal Interaction

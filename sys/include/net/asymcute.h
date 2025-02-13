@@ -71,7 +71,7 @@ extern "C" {
  */
 /**
  * @brief   Default UDP port to listen on. Usage can be found in
- *          examples/asymcute_mqttsn. Application code is expected to use this
+ *          examples/networking/mqtt/asymcute_mqttsn. Application code is expected to use this
  *          macro to assign the default port.
  */
 #ifndef CONFIG_ASYMCUTE_DEFAULT_PORT

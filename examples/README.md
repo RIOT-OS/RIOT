@@ -134,7 +134,7 @@ Here is a quick overview of the examples available in the RIOT:
 |---------|-------------|
 | [bindist](./advanced_examples/bindist/README.md) | RIOT allows for creating a "binary distribution", which can be used to ship proprietary, compiled objects in a way that makes it possible to re-link them against a freshly compiled RIOT. This application serves as a simple example. |
 | [usbus_minimal](./advanced_examples/usbus_minimal/README.md) | This is a minimalistic example for RIOT's USB stack. |
-| [suit_update](./advanced_examples/suit_update/README.md) | This example shows how to integrate SUIT-compliant firmware updates into a RIOT application. |
+| [suit_update](./advanced_examples/advanced_examples/suit_update/README.md) | This example shows how to integrate SUIT-compliant firmware updates into a RIOT application. |
 | [thread_duel](./advanced_examples/thread_duel/README.md) | This is a thread duel application to show RIOTs abilities to run multiple-threads concurrently, even if they are neither cooperative nor dividable into different scheduler priorities, by using the optional round-robin scheduler module. |
 | [posix_select](./advanced_examples/posix_select/README.md) | This example is a showcase for RIOT's POSIX select support |
 | [psa_crypto](./advanced_examples/psa_crypto/README.md) | Basic functions of the PSA Crypto API |

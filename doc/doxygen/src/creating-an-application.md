@@ -104,7 +104,7 @@ module support](#external-modules).
 2. Add the source files within subdirectories to `SRC`, either explicitly or with
 Makefile wildcards.
 
-Both approaches are illustrated and explained in `examples/subfolders`.
+Both approaches are illustrated and explained in `examples/essentials/subfolders`.
 
 
 # Helper tools

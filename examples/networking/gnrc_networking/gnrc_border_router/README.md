@@ -123,7 +123,7 @@ This is done through the same serial interface.
 By typing `help` you will get the list of available shell commands.
 
 At this point you should be able to ping motes using their global address.
-For instance, if you use the [`gnrc_networking`](https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking) example on the mote, you can
+For instance, if you use the [`gnrc_networking`](https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc_networking) example on the mote, you can
 ping it from your machine with:
 
 ```

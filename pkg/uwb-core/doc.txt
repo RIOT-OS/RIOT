@@ -90,7 +90,7 @@ is considered awake.
 The following can be wrapped into a timer callback to setup a blinking tag.
 
 For more examples check the [uwb-apps](https://github.com/Decawave/uwb-apps)
-repository as well as [examples/twr_aloha](https://github.com/RIOT-OS/RIOT/tree/master/examples/twr-aloha)
+repository as well as [examples/advanced_examples/twr_aloha](https://github.com/RIOT-OS/RIOT/tree/master/examples/twr-aloha)
 
 ## Watchout!
 

@@ -12,7 +12,7 @@
  * @{
  *
  * @brief       Tests the PSA hash configurations
- *              Contents have been copied from `examples/psa_crypto`
+ *              Contents have been copied from `examples/advanced_examples/psa_crypto`
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>

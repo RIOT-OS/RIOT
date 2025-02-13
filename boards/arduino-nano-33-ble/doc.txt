@@ -19,7 +19,7 @@ This board provides 802.15.4 and BLE connectivity.
 Use `BOARD=arduino-nano-33-ble` with the `make` command.<br/>
 Example with `hello-world` application:
 ```
-    make BOARD=arduino-nano-33-ble -C examples/hello-world flash
+    make BOARD=arduino-nano-33-ble -C examples/essentials/hello-world flash
 ```
 
 ### Accessing STDIO via UART
@@ -29,6 +29,6 @@ generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
 ```
-    make BOARD=arduino-nano-33-ble -C examples/hello-world term
+    make BOARD=arduino-nano-33-ble -C examples/essentials/hello-world term
 ```
  */

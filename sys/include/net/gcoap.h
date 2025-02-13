@@ -65,7 +65,7 @@
  * reading the request, the callback must use functions provided by gcoap to
  * format the response, as described below. The callback *must* read the request
  * thoroughly before calling the functions, because the response buffer likely
- * reuses the request buffer. See `examples/gcoap/client.c` for a simple
+ * reuses the request buffer. See `examples/networking/coap/gcoap/client.c` for a simple
  * example of a callback.
  *
  * Here is the expected sequence for a callback function:
@@ -105,7 +105,7 @@
  *
  * Client operation includes two phases: creating and sending a request, and
  * handling the response asynchronously in a client supplied callback. See
- * `examples/gcoap/client.c` for a simple example of sending a request and
+ * `examples/networking/coap/gcoap/client.c` for a simple example of sending a request and
  * reading the response.
  *
  * ### Creating a request ###
@@ -260,7 +260,7 @@
  *
  * The client requests a specific blockwise payload from the overall body by
  * writing a Block2 option in the request. See _resp_handler() in the
- * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/gcoap/client.c)
+ * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/networking/coap/gcoap/client.c)
  * example in the RIOT distribution, which implements the sequence described
  * below.
  *

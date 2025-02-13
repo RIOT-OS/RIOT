@@ -24,7 +24,7 @@
  * without exposing them to applications. To learn how to use keys with PSA,
  * read [Using Keys](#using-keys).
  *
- * A basic usage and configuration example can be found in `examples/psa_crypto`.
+ * A basic usage and configuration example can be found in `examples/advanced_examples/psa_crypto`.
  * For more usage instructions, please read the documentation.
  *
  * If you want to add your own crypto backend, see [Porting Guide](#porting-guide).
@@ -143,7 +143,7 @@
  * Configuration {#configuration}
  * ===
  * Currently there are two ways to configure PSA Crypto: Kconfig and Makefiles. An example for both
- * can be found in `RIOT/examples/psa_crypto`.
+ * can be found in `RIOT/examples/advanced_examples/psa_crypto`.
  *
  * ## Kconfig
  * We recommend using Kconfig and choosing your features in `menuconfig`.
@@ -164,7 +164,7 @@
  * configurations.
  *
  * Alternatively you can create an `app.config.test` file in your application folder
- * and choose your symbols there (see `examples/psa_crypto`).
+ * and choose your symbols there (see `examples/advanced_examples/psa_crypto`).
  *
  * In the `app.config.test` file, modules can be chosen with the following syntax:
  * `CONFIG_MODULE_<MODULENAME>=y`, as shown below.
@@ -389,7 +389,7 @@
  * Secure Elements {#secure-elements}
  * ===
  *
- * An example showing the use of SEs can be found in `examples/psa_crypto`.
+ * An example showing the use of SEs can be found in `examples/advanced_examples/psa_crypto`.
  *
  * To use secure elements, you first need to assign a static location value to each device,
  * so PSA can find it. If you only use one device, you can use

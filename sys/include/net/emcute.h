@@ -106,7 +106,7 @@ extern "C" {
  */
 /**
  * @brief   Default UDP port to listen on (also used as SRC port). Usage can be
- *          found in examples/emcute_mqttsn. Application code is expected to use
+ *          found in examples/networking/mqtt/emcute_mqttsn. Application code is expected to use
  *          this macro to assign the default port.
  */
 #ifndef CONFIG_EMCUTE_DEFAULT_PORT

@@ -18,7 +18,7 @@ Additional resources may be found on [RT-Thread bsp support page](https://gitee.
 To flash the board, use the on board ST-Link programmer/debugger.
 Input the following command:
 
-    make BOARD=alientek-pandora -C examples/hello-world flash
+    make BOARD=alientek-pandora -C examples/essentials/hello-world flash
 
 The NRST pin is connected to the on board debugger, so users do not need to reset manually
 every time it requires to flash.
@@ -33,7 +33,7 @@ Before you begin, check that the both the jumper caps marked as 'USART1' is conn
 
 Use the `term` target to open a terminal:
 
-    make BOARD=alientek-pandora -C examples/hello-world term
+    make BOARD=alientek-pandora -C examples/essentials/hello-world term
 
 An on-board ST-Link compatible debugger is used to transport serial STDIO message.
 

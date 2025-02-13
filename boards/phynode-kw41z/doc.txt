@@ -31,7 +31,7 @@ To flash the board using OpenOCD:
 1. Use `BOARD=phynode-kw41z` with the `make` command.<br/>
    Example with `hello-world` application:
 ```
-     make BOARD=phynode-kw41z -C examples/hello-world flash term
+     make BOARD=phynode-kw41z -C examples/essentials/hello-world flash term
 ```
 
 ### Current support
