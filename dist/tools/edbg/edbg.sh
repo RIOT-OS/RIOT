@@ -18,6 +18,17 @@ do_flash() {
     test_imagefile
 
     # Configure edbg flash flags
+    local _fflags="${EDBG_ARGS} --verbose --file ${IMAGE_FILE}"
+
+    # flash device
+    sh -c "${EDBG} ${_fflags} --program" && echo 'Done flashing'
+}
+
+do_flash_verify() {
+    IMAGE_FILE=$1
+    test_imagefile
+
+    # Configure edbg flash flags
     local _fflags="${EDBG_ARGS} --verbose --file ${IMAGE_FILE} --verify"
 
     # flash device
@@ -36,8 +47,12 @@ shift # pop $1 from $@
 
 case "${ACTION}" in
   flash)
-    echo "### Flashing Target ###"
+    echo "### Flashing Target (quick) ###"
     do_flash "$@"
+    ;;
+  flash_verify)
+    echo "### Flashing Target ###"
+    do_flash_verify "$@"
     ;;
   reset)
     echo "### Resetting Target ###"
