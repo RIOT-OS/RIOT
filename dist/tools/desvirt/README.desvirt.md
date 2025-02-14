@@ -85,16 +85,16 @@ lossnet        : line4: New link from line4_2 to line4_3, rate=100mbit, loss=0.0
 lossnet        : line4: New link from line4_3 to line4_2, rate=100mbit, loss=0.0, delay=0.0
 vnet           : Network Name: line4
 vm             : Defining RIOT native process line4_1
-riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/gnrc_networking/bin/native/gnrc_networking.elf line4_1',end-close,stderr,pty TCP-L:4711,reuseaddr,fork
+riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/networking/gnrc_networking/gnrc_networking/bin/native/gnrc_networking.elf line4_1',end-close,stderr,pty TCP-L:4711,reuseaddr,fork
 riotnative     : PID: 18235
 vm             : Defining RIOT native process line4_0
-riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/gnrc_networking/bin/native/gnrc_networking.elf line4_0',end-close,stderr,pty TCP-L:4712,reuseaddr,fork
+riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/networking/gnrc_networking/gnrc_networking/bin/native/gnrc_networking.elf line4_0',end-close,stderr,pty TCP-L:4712,reuseaddr,fork
 riotnative     : PID: 18236
 vm             : Defining RIOT native process line4_3
-riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/gnrc_networking/bin/native/gnrc_networking.elf line4_3',end-close,stderr,pty TCP-L:4713,reuseaddr,fork
+riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/networking/gnrc_networking/gnrc_networking/bin/native/gnrc_networking.elf line4_3',end-close,stderr,pty TCP-L:4713,reuseaddr,fork
 riotnative     : PID: 18237
 vm             : Defining RIOT native process line4_2
-riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/gnrc_networking/bin/native/gnrc_networking.elf line4_2',end-close,stderr,pty TCP-L:4714,reuseaddr,fork
+riotnative     : Start the RIOT: socat EXEC:'/home/pschmerzl/RIOT/examples/networking/gnrc_networking/gnrc_networking/bin/native/gnrc_networking.elf line4_2',end-close,stderr,pty TCP-L:4714,reuseaddr,fork
 riotnative     : PID: 18238
 
 ```

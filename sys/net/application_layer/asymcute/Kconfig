@@ -13,7 +13,7 @@ config ASYMCUTE_DEFAULT_PORT
     help
         Default UDP port to listen on (also used as SRC port). This will write
         to macro 'CONFIG_ASYMCUTE_DEFAULT_PORT'. Usage can be found in
-        examples/asymcute_mqttsn
+        examples/networking/mqtt/asymcute_mqttsn
 
 config ASYMCUTE_BUFSIZE
     int "Size of buffer used for receive and request buffers"

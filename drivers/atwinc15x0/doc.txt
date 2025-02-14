@@ -168,7 +168,7 @@ CFLAGS='-DWIFI_SSID=\"ssid\" -DWIFI_PASS=\"pass\" \
         -DATWINC15X0_PARAM_SSN_PIN=GPIO_PIN\(1,6\) \
         -DATWINC15X0_PARAM_RESET_PIN=GPIO_PIN\(1,4\) \
         -DATWINC15X0_PARAM_IRQ_PIN=GPIO_PIN\(0,8\)' \
-make BOARD=... -C examples/gnrc_networking flash term
+make BOARD=... -C examples/networking/gnrc_networking/gnrc_networking flash term
 ```
 
 */

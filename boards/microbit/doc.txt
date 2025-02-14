@@ -92,7 +92,7 @@ fail.
 
 Use it like this:
 
-    $ cd examples/hello-world
+    $ cd examples/essentials/hello-world
     $ BOARD=microbit make clean all -j4
     $ EMULATE=1 BOARD=microbit make term
 

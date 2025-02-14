@@ -52,7 +52,7 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 The board can be flashed using OpenOCD via the on-board ST-Link adapter.
 Then use the following command:
 
-    make BOARD=stm32l0538-disco -C examples/hello-world flash
+    make BOARD=stm32l0538-disco -C examples/essentials/hello-world flash
 
 ## Flashing the Board Using ST-LINK Removable Media
 
@@ -72,7 +72,7 @@ could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 STDIO is connected to pins PA9 (TX) and PA10 (RX) so an USB to UART adapter is
 required. Use the `term` target to open a terminal:
 
-    make BOARD=stm32l0538-disco -C examples/hello-world term
+    make BOARD=stm32l0538-disco -C examples/essentials/hello-world term
 
 If an external ST-Link adapter is used, RX and TX pins can be directly connected
 to it. In this case, STDIO is available on /dev/ttyACMx (Linux case).

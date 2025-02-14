@@ -69,7 +69,7 @@ define welcome_message
 	@echo " doc doc-{man,latex}"
 	@echo ""
 	@echo "==> tl;dr Try running:"
-	@echo "    cd examples/default"
+	@echo "    cd examples/essentials/default"
 	@echo "    make BOARD=<INSERT_BOARD_NAME>"
 endef
 

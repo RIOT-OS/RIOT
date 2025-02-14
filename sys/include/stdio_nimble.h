@@ -10,7 +10,7 @@
  * @defgroup     sys_stdio_nimble STDIO over NimBLE
  * @ingroup      sys_stdio
  *
- * @experimental This feature is experimental as some use-cases, such as examples/twr_aloha, show
+ * @experimental This feature is experimental as some use-cases, such as examples/advanced_examples/twr_aloha, show
  *               unexpected behaviour.
  *
  * @brief        Standard input/output backend using NimBLE.

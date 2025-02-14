@@ -12,7 +12,7 @@ otherwise change cmdline2xml.sh accordingly (ECLIPSE_PROJECT_NAME=RIOT).
 
 In the shell:
 
-    cd to application directory (e.g. examples/hello-world)
+    cd to application directory (e.g. examples/essentials/hello-world)
     make eclipsesym
 
 In Eclipse:

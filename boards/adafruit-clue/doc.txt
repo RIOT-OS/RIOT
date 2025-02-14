@@ -26,7 +26,7 @@ The board is flashed using the `adafruit-nrfutil` Python package:
 
 Example with `hello-world` application:
 ```
-    make BOARD=adafruit-clue -C examples/hello-world flash
+    make BOARD=adafruit-clue -C examples/essentials/hello-world flash
 ```
 
 ### Accessing STDIO via UART
@@ -36,7 +36,7 @@ generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
 ```
-    make BOARD=adafruit-clue -C examples/hello-world term
+    make BOARD=adafruit-clue -C examples/essentials/hello-world term
 ```
 
 The `TERM_DELAY` environment variable can be used to add a delay (in second)

@@ -215,7 +215,7 @@ sudo apt install make gcc-multilib python3-serial wget unzip git openocd gdb-mul
   Just wait for this to complete.)
 - Type `git clone https://github.com/RIOT-OS/RIOT` and confirm with the return-key
 - This may take some time. Eventually, it will print `done.` when it completed
-- Type `cd RIOT/examples/hello-world` and confirm with the return-key to enter
+- Type `cd RIOT/examples/essentials/hello-world` and confirm with the return-key to enter
   the folder `hello-world` example app in the RIOT repo
 - Type `make` and confirm with the return key to build the app for the board
   `native`
@@ -239,12 +239,12 @@ sudo apt install make gcc-multilib python3-serial wget unzip git openocd gdb-mul
 ![Ubuntu terminal running `make compile-commands` in the `hello-world` app](img/06-Use_VS_Code-00.png)
 
 - If not already open, open the Ubuntu terminal
-- Confirm that the terminal is pointed to the folder `~/RIOT/examples/hello-world`
+- Confirm that the terminal is pointed to the folder `~/RIOT/examples/essentials/hello-world`
     - The blue part left of the prompt (the `$` sign in the terminal) shows
       the current working directory for the terminal
-    - If the blue string is not `~/RIOT/examples/hello-world`, type
-      `cd ~/RIOT/examples/hello-world` to enter that path
-- Inside `~/RIOT/examples/hello-world` run the command `make compile-commands`
+    - If the blue string is not `~/RIOT/examples/essentials/hello-world`, type
+      `cd ~/RIOT/examples/essentials/hello-world` to enter that path
+- Inside `~/RIOT/examples/essentials/hello-world` run the command `make compile-commands`
 - The output should look like above
 
 ![Launching VS Code from Ubuntu](img/06-Use_VS_Code-01.png)
@@ -307,7 +307,7 @@ sudo apt install make gcc-multilib python3-serial wget unzip git openocd gdb-mul
   in the source code
 - Save the modified source code (e.g. `Ctrl`+`S`)
 - Open the integrated terminal by clicking on the terminal tab at the bottom
-- Navigate to `~/RIOT/examples/hello-world` using `cd ~/RIOT/examples/hello-world`
+- Navigate to `~/RIOT/examples/essentials/hello-world` using `cd ~/RIOT/examples/essentials/hello-world`
 - Run the `make` command to build the code
 - Run make `make term` to launch the application
 - The result should look like:
@@ -415,7 +415,7 @@ been attached to WSL and VS Code has been launched from within WSL by running
 2. Open the `default` folder within `examples`
 3. Open the `main.c` file in the `default` folder
 4. Select the "Terminal" tab at the bottom
-5. Enter `cd ~/RIOT/examples/default` to enter the `default` folder also in the terminal
+5. Enter `cd ~/RIOT/examples/essentials/default` to enter the `default` folder also in the terminal
 6. Run `make BOARD=esp32-mh-et-live-minikit compile-commands`
     - You can replace `esp32-mh-et-live-minikit` with the name of any other supported board
 

@@ -78,7 +78,7 @@ Building application "default" for "samr21-xpro" with MCU "samd21".
 [...]
 
    text    data     bss     dec     hex filename
-  37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/default/bin/samr21-xpro/default.elf
+  37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/essentials/default/bin/samr21-xpro/default.elf
 
 real    0m12.321s
 user    0m10.317s
@@ -95,7 +95,7 @@ Building application "default" for "samr21-xpro" with MCU "samd21".
 [...]
 
 text    data     bss     dec     hex filename
-37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/default/bin/samr21-xpro/default.elf
+37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/essentials/default/bin/samr21-xpro/default.elf
 
 real    0m15.462s
 user    0m12.410s
@@ -112,7 +112,7 @@ Building application "default" for "samr21-xpro" with MCU "samd21".
 [...]
 
    text    data     bss     dec     hex filename
-  37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/default/bin/samr21-xpro/default.elf
+  37016     180    6008   43204    a8c4 /home/kaspar/src/riot/examples/essentials/default/bin/samr21-xpro/default.elf
 
 real    0m2.157s
 user    0m1.213s
