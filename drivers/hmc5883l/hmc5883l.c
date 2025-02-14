@@ -59,7 +59,7 @@ int hmc5883l_init(hmc5883l_t *dev, const hmc5883l_params_t *params)
 
     assert(dev != NULL);
     assert(params != NULL);
-    DEBUG_DEV("params=%p", dev, params);
+    DEBUG_DEV("params=%p", dev, (void *)params);
 
     /* init sensor data structure */
     dev->dev = params->dev;
@@ -138,7 +138,7 @@ int hmc5883l_read(const hmc5883l_t *dev, hmc5883l_data_t *data)
 {
     assert(dev != NULL);
     assert(data != NULL);
-    DEBUG_DEV("data=%p", dev, data);
+    DEBUG_DEV("data=%p", dev, (void *)data);
 
     int res = HMC5883L_OK;
 
@@ -161,7 +161,7 @@ int hmc5883l_read_raw(const hmc5883l_t *dev, hmc5883l_raw_data_t *raw)
 {
     assert(dev != NULL);
     assert(raw != NULL);
-    DEBUG_DEV("raw=%p", dev, raw);
+    DEBUG_DEV("raw=%p", dev, (void *)raw);
 
     int res = HMC5883L_OK;
 

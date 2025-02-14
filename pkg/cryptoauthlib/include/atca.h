@@ -20,6 +20,7 @@
 #ifndef ATCA_H
 #define ATCA_H
 
+#include "kernel_defines.h"
 #include "periph/i2c.h"
 #include "cryptoauthlib.h"
 
