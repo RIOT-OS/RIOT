@@ -5,7 +5,7 @@ APPLICATION = skald_ibeacon
 BOARD ?= nrf52dk
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../../..
+RIOTBASE ?= $(CURDIR)/../../../../..
 
 # include Skald
 USEMODULE += skald_ibeacon

@@ -21,4 +21,4 @@ riot-wrappers = { version = "0.9.0", features = [ "set_panic_handler" ] }
 # Rust, that may change; it is best practice for any RIOT application that has
 # its own top-level Rust crate to include rust_riotmodules from inside
 # RIOTBASE.
-rust_riotmodules = { path = "../../sys/rust_riotmodules/" }
+rust_riotmodules = { path = "../../../../sys/rust_riotmodules/" }

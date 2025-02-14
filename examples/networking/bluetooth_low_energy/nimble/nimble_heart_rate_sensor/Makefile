@@ -5,7 +5,7 @@ APPLICATION = nimble_heart_rate_sensor
 BOARD ?= nrf52dk
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../../..
+RIOTBASE ?= $(CURDIR)/../../../../..
 
 # Some RIOT modules needed for this example
 USEMODULE += event_timeout_ztimer

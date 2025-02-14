@@ -5,7 +5,7 @@ APPLICATION = gnrc_lorawan
 DEVELHELP ?= 1
 
 BOARD ?= b-l072z-lrwan1
-RIOTBASE ?= ../../
+RIOTBASE ?= $(CURDIR)/../../../..
 
 # Include board's default network devices and auto-initialization of GNRC
 # interfaces
