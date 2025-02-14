@@ -5,7 +5,7 @@ APPLICATION = nimble_gatt
 BOARD ?= nrf52dk
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../../..
+RIOTBASE ?= $(CURDIR)/../../../../..
 
 # Include NimBLE
 USEPKG += nimble

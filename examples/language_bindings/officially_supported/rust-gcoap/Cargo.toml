@@ -30,7 +30,7 @@ riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-exampl
 # Rust, that may change; it is best practice for any RIOT application that has
 # its own top-level Rust crate to include rust_riotmodules from inside
 # RIOTBASE.
-rust_riotmodules = { path = "../../sys/rust_riotmodules/" }
+rust_riotmodules = { path = "../../../../sys/rust_riotmodules/" }
 static_cell = "2.1.0"
 
 [patch.crates-io]
