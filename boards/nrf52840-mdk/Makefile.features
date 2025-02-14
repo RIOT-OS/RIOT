@@ -5,6 +5,7 @@ FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += periph_nfct
 FEATURES_PROVIDED += vdd_lc_filter_reg1
 
 # Various other features (if any)

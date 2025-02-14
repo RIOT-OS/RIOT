@@ -41,7 +41,6 @@ FEATURES_PROVIDED += cortexm_mpu
 
 FEATURES_PROVIDED += periph_i2c_reconfigure
 FEATURES_PROVIDED += periph_spi_gpio_mode
-FEATURES_PROVIDED += periph_nfct
 
 # On top of the default 1Mbit PHY mode, all nrf52 support the 2MBit PHY mode,
 # and the 52840 does further support the coded PHYs
