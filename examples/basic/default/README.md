@@ -1,4 +1,4 @@
-examples/essentials/default
+examples/basic/default
 ================
 This application is a showcase for RIOT's hardware support. Using it
 for your board, you should be able to interactively use any hardware

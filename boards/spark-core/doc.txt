@@ -97,7 +97,7 @@ Build and flash
 ===============
 
 1. clone RIOT-OS
-2. cd to e.g. `examples/essentials/hello-world`
+2. cd to e.g. `examples/basic/hello-world`
 3. enter `BOARD=spark-core make clean all flash`
 
 Use the UART

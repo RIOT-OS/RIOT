@@ -27,7 +27,7 @@ To flash the board, just call `make` from an application directory with the
 `flash` target:
 
 ```
-make BOARD=atmega256rfr2-xpro -C examples/essentials/hello-world flash
+make BOARD=atmega256rfr2-xpro -C examples/basic/hello-world flash
 ```
 
 ### Accessing STDIO via UART
@@ -36,7 +36,7 @@ STDIO can be accessed through the USB connector. The on-board UART-USB
 adapter is not affected by flashing. It shows up as /dev/ttyACM0 on Linux.
 It will be used automatically with `make term`:
 ```
-make BOARD=atmega256rfr2-xpro -C examples/essentials/hello-world term
+make BOARD=atmega256rfr2-xpro -C examples/basic/hello-world term
 ```
 
 */

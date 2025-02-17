@@ -21,7 +21,7 @@ SenseBox board is based on the Atmel SAMD21G18A microcontroller. See
 2. Use `BOARD=sensebox_samd21` with the `make` command.<br/>
     Example with `hello-world` application:
 ```
-    make BOARD=sensebox_samd21 -C examples/essentials/hello-world flash
+    make BOARD=sensebox_samd21 -C examples/basic/hello-world flash
 ```
 
 ### Accessing STDIO via UART

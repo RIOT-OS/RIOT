@@ -3,7 +3,7 @@
 # uncomment and change this to limit builds, e.g.,
 #export BOARDS="samr21-xpro native"
 # and / or
-#export APPS="examples/essentials/hello-world tests/unittests"
+#export APPS="examples/basic/hello-world tests/unittests"
 
 QUICKBUILD_BOARDS="
 adafruit-itsybitsy-m4
@@ -43,7 +43,7 @@ esac
 # on LLVM.
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
-: ${TEST_WITH_CONFIG_SUPPORTED:="examples/advanced_examples/suit_update tests/drivers/at86rf2xx_aes"}
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/advanced/suit_update tests/drivers/at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1

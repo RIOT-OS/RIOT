@@ -58,7 +58,7 @@ running OpenOCD.
 
 # build and flash the gnrc_networking example
 
-    cd RIOT/examples/networking/gnrc_networking/gnrc_networking
+    cd RIOT/examples/networking/gnrc/gnrc_networking
     BOARD=openlabs-kw41z-mini CFLAGS+="-DKW41ZRF_ENABLE_LEDS=1" make -j4 flash
 
 ### Debug Uart Pinout

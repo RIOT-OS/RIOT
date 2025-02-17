@@ -164,7 +164,7 @@ STDIO is available through the edbg debugger.
 
 Use the `term` target to open a terminal:
 
-    make BOARD=samr21-xpro -C examples/essentials/hello-world term
+    make BOARD=samr21-xpro -C examples/basic/hello-world term
 
 RTS / CTS hardware flow control is available on `UART_DEV(0)` and
 `UART_DEV(1)`. This is unavailable when using STDIO directly through
