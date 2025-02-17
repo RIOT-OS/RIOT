@@ -26,16 +26,18 @@ CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_LED=1
 # compiled natively (x86-64). Therefore we need to clear the flags set by e.g.
 # BOARD = nrf52840dk
 fido2-test:
-	env -i PATH=$(PATH) $(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests standard-tests
+	env -i PATH=$(PATH) $(MAKE) -C $(PKGDIRBASE)/fido2_tests standard-tests
 
 # FIDO2 user presence tests.
 #
-# Make sure to enable user presence tests by uncommenting CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_UP=1
+# Make sure to enable user presence tests by setting CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_UP=0.
+# It is also recommended to set CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_LED=0 to have
+# an indicator that signals when to press the button.
 #
 # Use env -i because fido2-test has a depedency (pyscard) that needs to be
 # compiled natively (x86-64). Therefore we need to clear the flags set by e.g.
 # BOARD = nrf52840dk
 fido2-test-up:
-	env -i PATH=$(PATH) $(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests up-tests
+	env -i PATH=$(PATH) $(MAKE) -C $(PKGDIRBASE)/fido2_tests up-tests
 
 include $(RIOTBASE)/Makefile.include
