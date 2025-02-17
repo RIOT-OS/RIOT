@@ -23,7 +23,7 @@ To flash the board, use `BOARD=<board name>` (with board name in {particle-argon
 particle-boron, particle-xenon}) with the `make` command.<br/>
 Example with `hello-world` application:
 ```
-    make BOARD=particle-xenon -C examples/essentials/hello-world flash
+    make BOARD=particle-xenon -C examples/basic/hello-world flash
 ```
 
 In this case, OpenOCD can also be used. For the moment, the latest stable
@@ -32,7 +32,7 @@ built against the actual development version can be used.
 
 To flash the board with OpenOCD, use the `PROGRAMMER` variable:
 ```
-    PROGRAMMER=openocd make BOARD=<board name> -C examples/essentials/hello-world flash
+    PROGRAMMER=openocd make BOARD=<board name> -C examples/basic/hello-world flash
 ```
 
 #### Alternative flashing procedure: Particle bootloader and DFU-Util
@@ -72,7 +72,7 @@ Then, the checksum is only calculated over the memory region that contains the i
 The on-board reset button doesn't work, so to trigger a reset of the board, use
 the `reset` target with `make`:
 ```
-    make BOARD=<board name> -C examples/essentials/hello-world reset
+    make BOARD=<board name> -C examples/basic/hello-world reset
 ```
 
 ### STDIO configuration

@@ -1,1 +1,1 @@
-../../../examples/advanced_examples/psa_crypto/custom_atca_params.h
+../../../examples/advanced/psa_crypto/custom_atca_params.h

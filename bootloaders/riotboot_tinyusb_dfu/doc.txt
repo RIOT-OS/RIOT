@@ -58,7 +58,7 @@ When the device is attached and in DFU mode (or the current firmware uses the
 `tinyusb_dfu` module), new firmware can be flashed to slot 0 using:
 
 ```
-$ FEATURES_REQUIRED+=riotboot USEMODULE+=tinyusb_dfu make -C examples/essentials/saul BOARD=particle-xenon \
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=tinyusb_dfu make -C examples/basic/saul BOARD=particle-xenon \
   PROGRAMMER=dfu-util USB_VID=1209 USB_PID=7d02 all riotboot/flash-slot0
 ```
 
@@ -66,7 +66,7 @@ Instead of setting `USB_VID` and `USB_PID`, the variable `DFU_USB_ID` could also
 be used to specify the DFU device to be used.
 
 ```
-$ FEATURES_REQUIRED+=riotboot USEMODULE+=tinyusb_dfu make -C examples/essentials/saul BOARD=particle-xenon \
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=tinyusb_dfu make -C examples/basic/saul BOARD=particle-xenon \
   PROGRAMMER=dfu-util DFU_USB_ID=1209:7d02 all riotboot/flash-slot0
 ```
 

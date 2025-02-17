@@ -102,13 +102,13 @@ debug` - assuming that the current directory is your application directory. It
 establishes an openocd connection to the device and starts gdb connected to the
 openocd instance. For example, it should look something like this
 ```
-[user@host RIOT]$ cd examples/essentials/default/
+[user@host RIOT]$ cd examples/basic/default/
 [user@host default]$ BOARD=iotlab-m3 make
 Building application default for iotlab-m3 w/ MCU stm32f1.
 ...
 [user@hostdefault]$ BOARD=iotlab-m3 make debug
 RIOT/boards/hikob-common/dist/debug.sh RIOT/boards/iotlab-m3/dist/gdb.conf
-RIOT/examples/essentials/default/bin/iotlab-m3/default.elf
+RIOT/examples/basic/default/bin/iotlab-m3/default.elf
 Open On-Chip Debugger 0.8.0 (2014-07-27-20:18)
 Licensed under GNU GPL v2
 For bug reports, read
@@ -123,7 +123,7 @@ This GDB was configured as "--host=x86_64-apple-darwin10 --target=arm-none-
 eabi".
 For bug reporting instructions, please see:
 <http://www.gnu.org/software/gdb/bugs/>...
-Reading symbols from RIOT/examples/essentials/default/bin/iotlab-m3/default.elf...done.
+Reading symbols from RIOT/examples/basic/default/bin/iotlab-m3/default.elf...done.
 idle_thread (arg=<optimized out>) at RIOT/core/kernel_init.c:67
 67               lpm_set(LPM_IDLE);
 JTAG tap: stm32f1x.cpu tap/device found: 0x3ba00477 (mfg: 0x23b, part:

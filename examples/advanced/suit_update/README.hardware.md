@@ -45,7 +45,7 @@ properly.
 
 In order to get a SUIT capable firmware onto the node, run
 
-    $ BOARD=samr21-xpro make -C examples/advanced_examples/suit_update clean flash -j4
+    $ BOARD=samr21-xpro make -C examples/advanced/suit_update clean flash -j4
 
 This command also generates the cryptographic keys (private/public) used to
 sign and verify the manifest and images. See the "Key generation" section in
@@ -58,7 +58,7 @@ interface:
 
 In another terminal, run:
 
-    $ BOARD=samr21-xpro make -C examples/advanced_examples/suit_update/ term
+    $ BOARD=samr21-xpro make -C examples/advanced/suit_update/ term
 
 ### Alternative: Setup a wireless device behind a border router
 [setup-wireless]: #Setup-a-wireless-device-behind-a-border-router
@@ -107,11 +107,11 @@ First un-comment L28 in the application [Makefile](Makefile) so `netdev_default`
 is included in the build. In this scenario the node will be connected through a border
 router. Ethos must be disabled in the firmware when building and flashing the firmware:
 
-    $ USE_ETHOS=0 BOARD=samr21-xpro make -C examples/advanced_examples/suit_update clean flash -j4
+    $ USE_ETHOS=0 BOARD=samr21-xpro make -C examples/advanced/suit_update clean flash -j4
 
 Open a serial terminal on the device to get its global address:
 
-    $ USE_ETHOS=0 BOARD=samr21-xpro make -C examples/advanced_examples/suit_update term
+    $ USE_ETHOS=0 BOARD=samr21-xpro make -C examples/advanced/suit_update term
 
 If the Border Router is already set up when opening the terminal you should get
 
@@ -150,13 +150,13 @@ the prefix (`2001:db8::`) and the EUI64 suffix, in this case `7b7e:3255:1313:8d9
 - Provision the wireless ble device:
 
 ```
-    $ CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1 USEMODULE+=nimble_autoconn_ipsp USE_ETHOS=0 BOARD=nrf52dk make -C examples/advanced_examples/suit_update clean flash -j4
+    $ CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1 USEMODULE+=nimble_autoconn_ipsp USE_ETHOS=0 BOARD=nrf52dk make -C examples/advanced/suit_update clean flash -j4
 ```
 
 - Open a serial terminal on the device to get its local address:
 
 ```
-    $ USE_ETHOS=0 BOARD=nrf52dk make -C examples/advanced_examples/suit_update term
+    $ USE_ETHOS=0 BOARD=nrf52dk make -C examples/advanced/suit_update term
 ```
 
     ...
@@ -294,20 +294,20 @@ For this example, aiocoap-fileserver serves the files via CoAP.
 
 - To publish an update for a node in wired mode (behind ethos):
 
-      $ BOARD=samr21-xpro SUIT_COAP_SERVER=[2001:db8::1] make -C examples/advanced_examples/suit_update suit/publish
+      $ BOARD=samr21-xpro SUIT_COAP_SERVER=[2001:db8::1] make -C examples/advanced/suit_update suit/publish
 
 - To publish an update for a node in wireless mode (behind a border router):
 
-      $ BOARD=samr21-xpro USE_ETHOS=0 SUIT_COAP_SERVER=[2001:db8::1] make -C examples/advanced_examples/suit_update suit/publish
+      $ BOARD=samr21-xpro USE_ETHOS=0 SUIT_COAP_SERVER=[2001:db8::1] make -C examples/advanced/suit_update suit/publish
 
 This publishes into the server a new firmware for a samr21-xpro board. You should
 see 6 pairs of messages indicating where (filepath) the file was published and
 the corresponding coap resource URI
 
     ...
-    published "${RIOTBASE}/examples/advanced_examples/suit_update/bin/samr21-xpro/suit_files/riot.suit.1632124156.bin"
+    published "${RIOTBASE}/examples/advanced/suit_update/bin/samr21-xpro/suit_files/riot.suit.1632124156.bin"
        as "coap://[2001:db8::1]/fw/suit_update/samr21-xpro/riot.suit.1632124156.bin"
-    published "${RIOTBASE}/examples/advanced_examples/suit_update/bin/samr21-xpro/suit_files/riot.suit.latest.bin"
+    published "${RIOTBASE}/examples/advanced/suit_update/bin/samr21-xpro/suit_files/riot.suit.latest.bin"
        as "coap://[2001:db8::1]/fw/suit_update/samr21-xpro/riot.suit.latest.bin"
     ...
 
@@ -357,11 +357,11 @@ SUIT_CLIENT=[2001:db8::7b7e:3255:1313:8d96].
 
 - In wired mode:
 
-      $ SUIT_COAP_SERVER=[2001:db8::1] SUIT_CLIENT=[fe80::7b7e:3255:1313:8d96%riot] BOARD=samr21-xpro make -C examples/advanced_examples/suit_update suit/notify
+      $ SUIT_COAP_SERVER=[2001:db8::1] SUIT_CLIENT=[fe80::7b7e:3255:1313:8d96%riot] BOARD=samr21-xpro make -C examples/advanced/suit_update suit/notify
 
 - In wireless mode:
 
-      $ SUIT_COAP_SERVER=[2001:db8::1] SUIT_CLIENT=[2001:db8::7b7e:3255:1313:8d96] BOARD=samr21-xpro make -C examples/advanced_examples/suit_update suit/notify
+      $ SUIT_COAP_SERVER=[2001:db8::1] SUIT_CLIENT=[2001:db8::7b7e:3255:1313:8d96] BOARD=samr21-xpro make -C examples/advanced/suit_update suit/notify
 
 
 This notifies the node of a new available manifest. Once the notification is
@@ -455,7 +455,7 @@ The flash memory will be divided in the following way:
 The riotboot part of the flash will not be changed during suit_updates but
 be flashed a first time with at least one slot with suit_capable fw.
 
-    $ BOARD=samr21-xpro make -C examples/advanced_examples/suit_update clean flash
+    $ BOARD=samr21-xpro make -C examples/advanced/suit_update clean flash
 
 When calling make with the `flash` argument it will flash the bootloader
 and then to slot0 a copy of the firmware you intend to build.
@@ -504,7 +504,7 @@ updatable RIOT image with `riotboot` or `suit/publish` make targets.
 
 This is simply done using the `suit/genkey` make target:
 
-    $ BOARD=samr21-xpro make -C examples/advanced_examples/suit_update suit/genkey
+    $ BOARD=samr21-xpro make -C examples/advanced/suit_update suit/genkey
 
 You will get this message in the terminal:
 
@@ -637,7 +637,7 @@ To run the test,
 - compile and flash the application and bootloader:
 
 ```
-    $ make -C examples/advanced_examples/suit_update clean all flash -j4
+    $ make -C examples/advanced/suit_update clean all flash -j4
 ```
 
 - [set up the network][setup-wired-network] (in another shell):
@@ -649,5 +649,5 @@ To run the test,
 - run the test:
 
 ```
-    $ make -C examples/advanced_examples/suit_update test-with-config
+    $ make -C examples/advanced/suit_update test-with-config
 ```

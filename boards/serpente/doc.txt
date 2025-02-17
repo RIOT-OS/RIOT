@@ -26,7 +26,7 @@ and dirty, yet flexible, prototyping tools.
 Use `BOARD=serpente` with the `make` command.<br/>
 Example with `micropython` application:
 ```
-     make BOARD=serpente -C examples/language_bindings/community_supported/micropython flash
+     make BOARD=serpente -C examples/lang_support/community/micropython flash
 ```
 
 RIOT will automatically trigger a reset to the bootloader, but this only works if RIOT is still

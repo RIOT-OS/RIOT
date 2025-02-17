@@ -17,7 +17,7 @@ flashed using OpenOCD.
 To flash this board, just use the following command:
 
 ```
-make BOARD=stm32f723e-disco flash -C examples/essentials/hello-world
+make BOARD=stm32f723e-disco flash -C examples/basic/hello-world
 ```
 
 ### STDIO
@@ -26,12 +26,12 @@ STDIO is available via the ST-Link programmer.
 
 Use the `term` target to open a terminal:
 
-    make BOARD=stm32f723e-disco -C examples/essentials/hello-world term
+    make BOARD=stm32f723e-disco -C examples/basic/hello-world term
 
 ### USB OTG Peripheral Device Driver
 
 By default, the USB OTG FS port is used. To use the USB OTG HS port with the
 internal UTMI+ HS PHY, enable the module `periph_usbdev_hs_utmi`:
 
-    make BOARD=stm32f723e-disco USEMODULE=periph_usbdev_hs_utmi -C examples/advanced_examples/usbus_minimal
+    make BOARD=stm32f723e-disco USEMODULE=periph_usbdev_hs_utmi -C examples/advanced/usbus_minimal
  */

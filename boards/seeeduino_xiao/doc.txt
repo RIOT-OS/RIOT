@@ -21,7 +21,7 @@ Use `BOARD=seeeduino_xiao` with the `make` command.<br/>
 
 Example with `default` application:
 ```
-     make BOARD=seeeduino_xiao -C examples/essentials/default flash
+     make BOARD=seeeduino_xiao -C examples/basic/default flash
 ```
 
 RIOT will automatically trigger a reset to the bootloader, but this only works if RIOT is still

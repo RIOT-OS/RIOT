@@ -17,7 +17,7 @@ def test_reset():
         application_directory=os.path.normpath(os.path.join(
             os.path.abspath(__file__),
             '..', '..', '..', '..', '..',
-            'examples', 'essentials', 'hello-world'
+            'examples', 'basic', 'hello-world'
         )),
         env=env,
     )

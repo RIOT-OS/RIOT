@@ -96,7 +96,7 @@ Besides the SAMD21 the board has the following features:
 Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
 Example with `hello-world` application:
 ```
-     make BOARD=sodaq-autonomo -C examples/essentials/hello-world flash
+     make BOARD=sodaq-autonomo -C examples/basic/hello-world flash
 ```
 
 @note     If the application crashes, automatic reflashing via USB, as explained
