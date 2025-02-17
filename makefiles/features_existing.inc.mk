@@ -87,6 +87,7 @@ FEATURES_EXISTING := \
     cpu_qn908x \
     cpu_rpx0xx \
     cpu_sam3 \
+    cpu_sam4s \
     cpu_samd21 \
     cpu_samd5x \
     cpu_saml1x \

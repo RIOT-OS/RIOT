@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_sam3
+ * @ingroup     cpu_sam_common
  * @ingroup     drivers_periph_timer
  * @{
  *
@@ -81,6 +81,11 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     if (tim >= TIMER_NUMOF) {
         return -1;
     }
+
+    /* SAM4s requires this WPKEY for enabling peripheral access */
+#ifdef TC_WPMR_WPKEY_PASSWD
+    dev(tim)->TC_WPMR = TC_WPMR_WPKEY_PASSWD;
+#endif
 
     /* enable the device clock */
     clk_en(tim);

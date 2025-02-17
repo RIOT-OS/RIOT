@@ -1,3 +1,3 @@
-DIRS = periph
+MODULE = board
 
 include $(RIOTBASE)/Makefile.base

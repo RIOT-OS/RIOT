@@ -1,0 +1,6 @@
+# export this module and its includes
+INCLUDES  += -I$(RIOTBOARD)/sam4s-xpro/include
+
+# setup flasher (using openOCD)
+PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd edbg
