@@ -53,6 +53,19 @@ indirect business models around the free open-source software platform
 provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
+## Why RIOT-OS?
+
+RIOT-OS is designed to address the unique challenges of resource-constrained embedded systems, specifically for IoT applications. It provides:
+
+- **Real-time capabilities** with a fully preemptive, microkernel-based architecture.
+- **Low power consumption** for battery-powered devices.
+- **Full IPv6 support**, making it ideal for modern connected applications.
+- **Modular and highly portable** codebase that runs on a wide range of microcontrollers.
+- **Open-source and community-driven**, ensuring continuous improvements.
+
+If you need an OS that brings **real-time performance, energy efficiency, and open-source flexibility** to IoT, RIOT-OS is the right choice.
+
+
 ## RIOT-OS is structured into several key components:
 
 - **Core:** Handles threading, scheduling, and system initialization.
