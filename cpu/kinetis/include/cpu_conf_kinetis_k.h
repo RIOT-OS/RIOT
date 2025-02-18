@@ -123,7 +123,7 @@
 /**
  * @name Hardware random number generator module configuration
  *
- *       For K64F SCG3 or SCG6 can be used depending on if the the
+ *       For K64F SCG3 or SCG6 can be used depending on if the
  *       peripheral is accessed through AIPS-lite0 or AIPS-lite1.
  *       For K64F RNGA is only mapped to SCG6.
  * @{

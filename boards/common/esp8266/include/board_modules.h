@@ -41,7 +41,7 @@ extern "C" {
  *
  * Configuration for the ENC28J60 interface when module ```enc28j60``` is used.
  *
- * SPI_DEV(0) is always used for the the module. The only configurations that
+ * SPI_DEV(0) is always used for the module. The only configurations that
  * can be overridden by \ref esp8266_application_specific_board_configuration
  * "Application Specific Board Configuration" are the CS, INT and RESET signals.
  *
@@ -70,7 +70,7 @@ extern "C" {
  *
  * Configuration for the MRF24J40 interface when module ```mrf24j40``` is used.
  *
- * SPI_DEV(0) is always used for the the module. The only configurations that
+ * SPI_DEV(0) is always used for the module. The only configurations that
  * can be overridden by \ref esp8266_application_specific_board_configuration
  * "Application Specific Board Configuration" are the CS, INT and RESET signals.
  *

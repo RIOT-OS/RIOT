@@ -86,7 +86,7 @@ static const dma_conf_t dma_config[] = {
  * channel 0.
  *
  * The V_REF+ pin is not connected to an external reference voltage on the
- * board by default. Instead the the VREFBUF must be used (`VREFBUF_ENABLE=1`).
+ * board by default. Instead the VREFBUF must be used (`VREFBUF_ENABLE=1`).
  * The output voltage of VREF is around 2.048 V in this case.
  *
  * If an external reference voltage is used as V_REF+, either by soldering
@@ -146,7 +146,7 @@ static const adc_conf_t adc_config[] = {
  * @name    DAC configuration
  *
  * The V_REF+ pin is not connected to an external reference voltage on the
- * board by default. Instead the the VREFBUF must be used (`VREFBUF_ENABLE=1`).
+ * board by default. Instead the VREFBUF must be used (`VREFBUF_ENABLE=1`).
  * The output voltage of VREF is around 2.048 V in this case.
  *
  * @{

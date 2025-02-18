@@ -89,7 +89,7 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
  * @brief   encrypts one plainBlock-block and saves the result in cipherblock.
  *          encrypts one blocksize long block of plaintext pointed to by
  *          plainBlock to one blocksize long block of ciphertext which will be
- *          written to the the memory-area pointed to by cipherBlock
+ *          written to the memory-area pointed to by cipherBlock
  *
  * @param       context       the cipher_context_t-struct to use for this
  *                            encryption

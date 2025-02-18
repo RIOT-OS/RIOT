@@ -568,7 +568,7 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
         }
     }
 
-    /* send the the packet */
+    /* send the packet */
     if (m2m_wifi_send_ethernet_pkt(atwinc15x0_eth_buf, tx_len) == M2M_SUCCESS) {
         return tx_len;
     }

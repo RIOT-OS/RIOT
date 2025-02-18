@@ -493,7 +493,7 @@ off_t lseek(int fd, _off_t off, int whence)
 }
 
 /**
- * @brief Sets the file position indicator to the the beginning of the file.
+ * @brief Sets the file position indicator to the beginning of the file.
  *
  * @param[in]  stream   open file descriptor obtained from @c fopen()
  */

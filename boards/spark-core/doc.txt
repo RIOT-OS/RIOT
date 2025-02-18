@@ -66,7 +66,7 @@ now replug the usb cable and flash.
 To flash RIOT to the spark core you need to install `dfu-util` (tested with
 0.7 and 0.8).
 
-Power the device and press the the `mode` button until the LED flashes
+Power the device and press the `mode` button until the LED flashes
 yellow/orange: now the device is ready to get flashed.
 
 # Firmware upgrade

@@ -663,7 +663,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 #ifdef MODULE_ESP_WIFI_AP
     if (esp_wifi_internal_tx(WIFI_IF_AP, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #else /* MODULE_ESP_WIFI_AP */
-    /* send the the packet to the peer(s) mac address */
+    /* send the packet to the peer(s) mac address */
     if (esp_wifi_internal_tx(WIFI_IF_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #endif
 #ifndef CPU_ESP8266
