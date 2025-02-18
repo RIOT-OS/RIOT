@@ -53,6 +53,14 @@ indirect business models around the free open-source software platform
 provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
+## RIOT-OS is structured into several key components:
+
+- **Core:** Handles threading, scheduling, and system initialization.
+- **Board Support Packages (BSPs):** Drivers and hardware abstractions.
+- **Networking:** IPv6, 6LoWPAN, and other IoT protocols.
+- **File System & Storage:** Support for flash memory and SD cards.
+- **Applications:** User programs that run on RIOT-OS.
+
 ## Features
 
 RIOT provides features including, but not limited to:
