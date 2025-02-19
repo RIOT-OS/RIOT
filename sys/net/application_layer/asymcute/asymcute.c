@@ -86,14 +86,14 @@ static size_t _len_set(uint8_t *buf, size_t len)
 static ssize_t _len_get(uint8_t *buf, size_t pkt_len, size_t *len)
 {
     if (buf[0] != 0x01) {
-        *len = (uint16_t)buf[0];
+        *len = (size_t)buf[0];
         return 1;
     }
     else {
         if (pkt_len < 3) {
             return -1;
         }
-        *len = byteorder_bebuftohs(&buf[1]);
+        *len = (size_t)byteorder_bebuftohs(&buf[1]);
         return 3;
     }
 }
@@ -134,7 +134,7 @@ static asymcute_req_t *_req_preprocess(asymcute_con_t *con,
     if (iter == NULL) {
         return NULL;
     }
-    if (iter->msg_id == msg_id) {
+    if ((iter->msg_id == msg_id) && (_req_type(iter) == rtype)) {
         res = iter;
         con->pending = iter->next;
     }
@@ -318,8 +318,9 @@ static unsigned _on_suback_timeout(asymcute_con_t *con, asymcute_req_t *req)
 
     /* reset the subscription context */
     asymcute_sub_t *sub = req->arg;
+    /* Should not be zero, otherwise critical error! */
     if (sub == NULL) {
-        return ASYMCUTE_REJECTED;
+        return ASYMCUTE_CRITICAL;
     }
     sub->topic = NULL;
     return ASYMCUTE_TIMEOUT;
@@ -429,8 +430,12 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
     if (data[6] == MQTTSN_ACCEPTED) {
         /* finish the registration by applying the topic id */
         asymcute_topic_t *topic = req->arg;
+        /* Should not be zero, otherwise critical error! */
         if (topic == NULL) {
+            mutex_unlock(&req->lock);
             mutex_unlock(&con->lock);
+            /* for shutdown due to critical error */
+            con->user_cb(req, ASYMCUTE_CRITICAL);
             return;
         }
 
@@ -479,6 +484,8 @@ static void _on_publish(asymcute_con_t *con, uint8_t *data,
     if (sub) {
         sub->cb(sub, ASYMCUTE_PUBLISHED,
                 &data[pos + 6], (len - (pos + 6)), sub->arg);
+        /* Flags (data[pos + 1]) should also be passed to callers due to DUP
+           (indicates whether message is sent for the first time or not) */
     }
 }
 
@@ -490,6 +497,10 @@ static void _on_puback(asymcute_con_t *con, const uint8_t *data, size_t len)
                                           MQTTSN_PUBLISH);
     if (req == NULL) {
         mutex_unlock(&con->lock);
+        /* Acknowledge due to an invalid QoS level 0 packet? */
+        if((data[6] != MQTTSN_ACCEPTED) && (data[4] == 0) && (data[5]==0)) {
+            con->user_cb(NULL, ASYMCUTE_REJECTED);        
+        }
         return;
     }
 
@@ -514,8 +525,12 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     unsigned ret = ASYMCUTE_REJECTED;
     /* parse and apply assigned topic id */
     asymcute_sub_t *sub = req->arg;
+    /* Should not be zero, otherwise critical error! */
     if (sub == NULL) {
+        mutex_unlock(&req->lock);
         mutex_unlock(&con->lock);
+        /* for shutdown due to critical error */
+        con->user_cb(req, ASYMCUTE_CRITICAL);
         return;
     }
 
@@ -553,8 +568,12 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
 
     /* remove subscription from list */
     asymcute_sub_t *sub = req->arg;
+    /* Should not be zero, otherwise critical error! */
     if (sub == NULL) {
+        mutex_unlock(&req->lock);
         mutex_unlock(&con->lock);
+        /* for shutdown due to critical error */
+        con->user_cb(req, ASYMCUTE_CRITICAL);
         return;
     } else if (con->subscriptions == sub) {
         con->subscriptions = sub->next;
@@ -591,6 +610,10 @@ void _on_pkt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
     asymcute_con_t *con = (asymcute_con_t *)arg;
 
     if (type & SOCK_ASYNC_MSG_RECV) {
+        /* _on_pkt() assumes that an MQTT packet is sent in a UDP packet. 
+           The cases where an MQTT packet is sent in two UDP packets or 
+           where a UDP packet contains two MQTT packets 
+           are not taken into account here! */
         ssize_t pkt_len = sock_udp_recv(sock, con->rxbuf,
                                         CONFIG_ASYMCUTE_BUFSIZE, 0, NULL);
         if (pkt_len >= MIN_PKT_LEN) {
@@ -746,6 +769,7 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
     if (sock_udp_create(&con->sock, &local, server, 0) != 0) {
         con->state = NOTCON;
         ret = ASYMCUTE_GWERR;
+        mutex_unlock(&req->lock);
         goto end;
     }
     sock_udp_event_init(&con->sock, &_queue, _on_pkt, con);
