@@ -432,7 +432,7 @@
  * CONFIG_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256=y
  * @endcode
  *
- * or added to the the Makefile:
+ * or added to the Makefile:
  * @code
  * USEMODULE += psa_secure_element
  * USEMODULE += psa_secure_element_ateccx08a        // device example

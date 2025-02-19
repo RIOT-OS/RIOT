@@ -59,7 +59,7 @@ extern msg_bus_t _sys_bus[SYS_BUS_NUMOF];
 /**
  * @brief Get a System Bus for a category of events.
  *
- * @param[in] bus           The event category of the the user
+ * @param[in] bus           The event category of the user
  *                          is interested in
  *
  * @return                  The message bus for those events

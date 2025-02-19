@@ -531,7 +531,7 @@ Finally when:
     $ sudo ip address add 2001:db8::1/128 dev riot0
 
 We are adding a routable address to the riot0 tap interface. The device can
-now send messages to the the coap server through the riot0 tap interface. You could
+now send messages to the coap server through the riot0 tap interface. You could
 use a different address for the coap server as long as you also add a routable
 address, so:
 

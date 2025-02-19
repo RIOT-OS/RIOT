@@ -15,7 +15,7 @@
  * The driver implements basic polling mode. The application can use
  * different approaches to get new data, either
  *
- * - using the #hmc5883l_read function at a lower rate than the the DOR, or
+ * - using the #hmc5883l_read function at a lower rate than the DOR, or
  * - using the data-ready interrupt (**DRDY**), see #hmc5883l_init_int.
  *
  * The data-ready interrupt (**DRDY**) is only be available when module

@@ -727,7 +727,7 @@ ESP-IDF SDK provides a complex heap implementation that supports multiple heap
 segments in different memory areas such as DRAM, IRAM, and PSRAM. Whenever you
 want to use these memory areas as heap, you have to use the heap implementation
 from the ESP-IDF SDK. ESP-IDF heap is not used by default. To use it, it has to
-be enabled by the the makefile of the application:
+be enabled by the makefile of the application:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_heap
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
