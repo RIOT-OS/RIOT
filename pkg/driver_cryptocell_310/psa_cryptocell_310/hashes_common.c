@@ -40,7 +40,7 @@ psa_status_t cryptocell_310_common_hash_setup(CRYS_HASHUserContext_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t cryptocell_310_common_hash_update_continue(CRYS_HASHUserContext_t *ctx,
+static psa_status_t _hash_update_from_ram(CRYS_HASHUserContext_t *ctx,
                                 const uint8_t *input,
                                 size_t input_length)
 {
