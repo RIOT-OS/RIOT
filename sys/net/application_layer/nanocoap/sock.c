@@ -1990,6 +1990,7 @@ int nanocoap_server_udp(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
     sock_udp_ep_t remote;
     coap_request_ctx_t ctx = {
         .remote_udp = &remote,
+        .sock_udp = &sock,
     };
 
     if (!local->port) {
@@ -2073,8 +2074,10 @@ int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
 #if MODULE_NANOCOAP_UDP
     case COAP_TRANSPORT_UDP:
         memcpy(&ctx->remote_udp, req->remote_udp, sizeof(ctx->remote_udp));
-        assert(req->local);
+#    if MODULE_SOCK_AUX_LOCAL
         memcpy(&ctx->local_udp, req->local_udp, sizeof(ctx->local_udp));
+#    endif
+        ctx->sock_udp = req->sock_udp;
         break;
 #endif
 #if MODULE_NANOCOAP_SERVER_TCP
@@ -2152,6 +2155,7 @@ static int _nanocoap_server_sendv_separate_udp(const nanocoap_server_response_ct
                                                const iolist_t *reply)
 {
     sock_udp_aux_tx_t *aux_out_ptr = NULL;
+#    if MODULE_SOCK_AUX_LOCAL
     /* make sure we reply with the same address that the request was
      * destined for -- except in the multicast case */
     sock_udp_aux_tx_t aux_out = {
@@ -2161,11 +2165,14 @@ static int _nanocoap_server_sendv_separate_udp(const nanocoap_server_response_ct
     if (!sock_udp_ep_is_multicast(&ctx->local_udp)) {
         aux_out_ptr = &aux_out;
     }
-    ssize_t retval = sock_udp_sendv_aux(NULL, reply, &ctx->remote_udp, aux_out_ptr);
+#    endif
+    ssize_t retval = sock_udp_sendv_aux(ctx->sock_udp, reply, &ctx->remote_udp, aux_out_ptr);
 
     if (retval < 0) {
         return retval;
     }
+
+    DEBUG("nanocoap: Sent %u B of separate response\n", (unsigned)retval);
 
     return 0;
 }
