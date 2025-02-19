@@ -24,14 +24,7 @@
 #include <limits.h>
 
 #include "fs/xipfs_fs.h"
-
-#ifdef RIOT_OS
 #include "include/xipfs.h"
-#else /* RIOT_OS */
-#include "xipfs_config.h"
-#endif /* RIOT_OS */
-
-
 #include "shell.h"
 
 static char *execute_file_handler_args[XIPFS_EXEC_ARGC_MAX];

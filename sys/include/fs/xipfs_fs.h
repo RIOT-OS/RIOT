@@ -24,13 +24,7 @@
 #define FS_XIPFS_FS_H
 
 #include "vfs.h"
-
-#ifdef RIOT_OS
 #include "include/xipfs.h"
-#else
-#include "xipfs_config.h"
-#endif /* RIOT_OS */
-
 
 #ifdef __cplusplus
 extern "C" {
