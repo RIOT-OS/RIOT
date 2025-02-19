@@ -93,7 +93,7 @@ psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
 
             offset += PSA_HASH_MAX_SIZE;
 
-        }while((offset < input_length) && (ret == CRYS_OK));
+        } while ((offset < input_length) && (ret == CRYS_OK));
 
     }
     else{
