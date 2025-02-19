@@ -74,7 +74,6 @@ psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
 {
     CRYSError_t ret = 0;
     if (!cryptocell_310_data_within_ram(input)) {
-        DEBUG("%s : cryptocell_310 data no longer required to be in RAM.\n", RIOT_FILE_RELATIVE);
 
         uint8_t input_buf[PSA_HASH_MAX_SIZE];
         size_t buf_size;
