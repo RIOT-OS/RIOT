@@ -96,7 +96,7 @@ psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
         } while ((offset < input_length) && (ret == CRYS_OK));
 
     }
-    else{
+    else {
         ret = cryptocell_310_common_hash_update_continue(ctx, input, input_length);
     }
 
