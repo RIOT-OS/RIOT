@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_xipfs   xipfs file system
+ * @ingroup  pkg
+ * @ingroup  sys_fs
+ * @brief    The eXecute In-Place File System
+ * @see      https://github.com/2xs/xipfs
+ */
