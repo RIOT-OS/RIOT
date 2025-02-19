@@ -560,6 +560,7 @@ struct _coap_request_ctx {
                 sock_udp_ep_t *local;           /**< deprecated alias for local_udp */
             };
 #  endif
+            sock_udp_t *sock_udp;       /** UDP socket the request was received on */
         };
 #endif
 #if MODULE_NANOCOAP_TCP
