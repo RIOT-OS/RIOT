@@ -528,7 +528,8 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     if (retval < 0) {
         /* handlers were not able to process this, so we reply with a RST,
          * unless we got a multicast message */
-        if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
+        const sock_udp_ep_t *local = coap_request_ctx_get_local_udp(ctx);
+        if (!local || !sock_udp_ep_is_multicast(local)) {
             return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
         }
     }
