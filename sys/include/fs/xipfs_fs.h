@@ -40,9 +40,9 @@ extern "C" {
  * @param id Identifier name for the mount point used by
  * functions that manipulate xipfs file systems
  *
- * @param mp The mount point of the file system in the VFS tree
+ * @param path The mount point of the file system in the VFS tree
  *
- * @param npage The total number of pages allocated for the
+ * @param num The total number of pages allocated for the
  * partition
  */
 #define XIPFS_NEW_PARTITION(id, path, num)           \
