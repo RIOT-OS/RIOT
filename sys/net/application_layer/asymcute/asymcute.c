@@ -499,7 +499,7 @@ static void _on_puback(asymcute_con_t *con, const uint8_t *data, size_t len)
         mutex_unlock(&con->lock);
         /* Acknowledge due to an invalid QoS level 0 packet? */
         if((data[6] != MQTTSN_ACCEPTED) && (data[4] == 0) && (data[5]==0)) {
-            con->user_cb(NULL, ASYMCUTE_REJECTED);        
+            con->user_cb(NULL, ASYMCUTE_REJECTED);
         }
         return;
     }
@@ -610,9 +610,9 @@ void _on_pkt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
     asymcute_con_t *con = (asymcute_con_t *)arg;
 
     if (type & SOCK_ASYNC_MSG_RECV) {
-        /* _on_pkt() assumes that an MQTT packet is sent in a UDP packet. 
-           The cases where an MQTT packet is sent in two UDP packets or 
-           where a UDP packet contains two MQTT packets 
+        /* _on_pkt() assumes that an MQTT packet is sent in a UDP packet.
+           The cases where an MQTT packet is sent in two UDP packets or
+           where a UDP packet contains two MQTT packets
            are not taken into account here! */
         ssize_t pkt_len = sock_udp_recv(sock, con->rxbuf,
                                         CONFIG_ASYMCUTE_BUFSIZE, 0, NULL);
