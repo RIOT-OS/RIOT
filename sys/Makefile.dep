@@ -543,7 +543,6 @@ endif
 
 ifneq (,$(filter nanocoap_server_separate,$(USEMODULE)))
   USEMODULE += nanocoap_server
-  USEMODULE += sock_aux_local
 endif
 
 ifneq (,$(filter nanocoap_server_tcp,$(USEMODULE)))

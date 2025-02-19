@@ -299,7 +299,10 @@ typedef struct {
 #if MODULE_NANOCOAP_UDP || MODULE_NANOCOAP_DTLS || DOXYGEN
         struct {
             sock_udp_ep_t remote_udp;       /**< UDP endpoint to send response to */
-            sock_udp_ep_t local_udp;        /**< UDP endpoint from which to send response */
+#  if MODULE_SOCK_AUX_LOCAL
+            sock_udp_ep_t local_udp;        /**< UDP endpoint to send response from */
+#  endif
+            sock_udp_t *sock_udp;           /**< UDP socket to send from */
         };
 #endif
 #if MODULE_NANOCOAP_SERVER_TCP || DOXYGEN
