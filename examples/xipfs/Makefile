@@ -15,12 +15,14 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+BLOBS += hello-world.fae
+
 # Modules to include:
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 
-# Use the default file system
+# Use xipfs file system
 USEMODULE += xipfs
 
 CFLAGS +=-DRIOT_OS
