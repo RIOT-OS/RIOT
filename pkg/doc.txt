@@ -79,7 +79,7 @@
  * if one is working on new packages that aren't ready to be committed to
  * upstream or if an application needs its own unique packages. For this, one
  * can use the `EXTERNAL_PKG_DIRS` make variable. It works similar to the way
- * [external modules](src/creating-modules.html#modules-outside-of-riotbase) are
+ * [external modules](@ref modules-outside-of-riotbase) are
  * handled. In your application's Makefile, in addition to adding the package
  * name to `USEPKG` as shown above, add the path to a folder that contains your
  * external packages:
