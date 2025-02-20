@@ -71,6 +71,9 @@ static mutex_t _status_mutex;
 /* nimble related structs */
 static struct ble_gap_event_listener _gap_event_listener;
 
+/* ztimers for internal delays */
+static ztimer_t _send_stdout_timer = { 0 };
+
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
 #define DEBUG_PRINTF_BUFSIZE  512
 #define PREFIX_STDIN    "\nSTDIN: "
@@ -180,8 +183,12 @@ static void _purge_buffer(void)
     tsrb_clear(&_tsrb_stdout);
 }
 
-static void _send_stdout(void)
+static void _send_stdout(void* arg)
 {
+    (void)(arg);
+
+    _debug_printf("[_send_stdout] ISR_STACKSIZE: %d\n", ISR_STACKSIZE); /* TODO: REMOVE!*/
+
     uint8_t tmp_status = _status;
 
     if (tmp_status != STDIO_NIMBLE_SUBSCRIBED) {
@@ -273,6 +280,12 @@ static int _gap_event_cb(struct ble_gap_event *event, void *arg)
                 mutex_unlock(&_status_mutex);
 
                 _conn_handle = event->subscribe.conn_handle;
+
+                /* NimBLE is not actually done with the configuration at this point,
+                   so a delay has to be introduced */
+                if (!ztimer_is_set(ZTIMER_MSEC, &_send_stdout_timer)) {
+                    ztimer_set(ZTIMER_MSEC, &_send_stdout_timer, 500);
+                }
             }
             else {
                 mutex_lock(&_status_mutex);
@@ -294,8 +307,11 @@ static int _gap_event_cb(struct ble_gap_event *event, void *arg)
                 _status = STDIO_NIMBLE_SUBSCRIBED;
                 mutex_unlock(&_status_mutex);
 
-                /* retrigger transmission in case more data is in the buffer */
-                _send_stdout();
+                /* retrigger transmission immediately in case more data is in the buffer */
+                if (ztimer_is_set(ZTIMER_MSEC, &_send_stdout_timer)) {
+                    ztimer_remove(ZTIMER_MSEC, &_send_stdout_timer);
+                }
+                _send_stdout(NULL);
             }
         }
         break;
@@ -333,6 +349,10 @@ static void _init(void)
 #endif
 
     mutex_init(&_status_mutex);
+
+    _send_stdout_timer.callback = _send_stdout;
+
+    _debug_printf("[_init] ISR_STACKSIZE: %d\n", ISR_STACKSIZE); /* TODO: REMOVE!*/
 }
 
 static ssize_t _write(const void *buffer, size_t len)
@@ -349,9 +369,11 @@ static ssize_t _write(const void *buffer, size_t len)
 
     unsigned int consumed = tsrb_add(&_tsrb_stdout, buffer, len);
 
-    if (_status == STDIO_NIMBLE_SUBSCRIBED || _status == STDIO_NIMBLE_SENDING) {
-        /* start the transmission process immediately */
-        _send_stdout();
+    if (_status == STDIO_NIMBLE_SUBSCRIBED) {
+        /* start the transmission process as quickly as possible without blocking */
+        if (!ztimer_is_set(ZTIMER_MSEC, &_send_stdout_timer)) {
+            ztimer_set(ZTIMER_MSEC, &_send_stdout_timer, 1);
+        }
     }
 
     return consumed;
