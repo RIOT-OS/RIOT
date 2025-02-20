@@ -172,6 +172,7 @@ typedef enum {
     STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask       */
     STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox              */
     STATUS_COND_BLOCKED,            /**< waiting for a condition variable         */
+    STATUS_WQ_BLOCKED,              /**< waiting in a wait queue                  */
     STATUS_RUNNING,                 /**< currently running                        */
     STATUS_PENDING,                 /**< waiting to be scheduled to run           */
     STATUS_NUMOF                    /**< number of supported thread states        */
