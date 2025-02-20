@@ -16,7 +16,7 @@
  * Use `BOARD=sodaq-one` with the `make` command.<br/>
  * Example with `hello-world` application:
  * ```
- *      make BOARD=sodaq-one -C examples/essentials/hello-world flash
+ *      make BOARD=sodaq-one -C examples/basic/hello-world flash
  * ```
  *
  * @note     If the application crashes, automatic reflashing via USB, as explained

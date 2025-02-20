@@ -24,7 +24,7 @@ The rest of the process is automated in the usual way with `BOARD=feather-nrf528
 
 Example with `hello-world` application:
 ```
-     make BOARD=feather-nrf52840 -C examples/essentials/hello-world flash term
+     make BOARD=feather-nrf52840 -C examples/basic/hello-world flash term
 ```
 
 If RIOT is already running on the board, it will automatically reset the CPU and enter

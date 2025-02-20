@@ -44,7 +44,7 @@ printf("Bat: %dV\n", vbat);
 Use `BOARD=feather-m0` with the `make` command.<br/>
 Example with `hello-world` application:
 ```
-     make BOARD=feather-m0 -C examples/essentials/hello-world flash
+     make BOARD=feather-m0 -C examples/basic/hello-world flash
 ```
 
 @note     If the application crashes, automatic reflashing via USB, as explained
@@ -59,7 +59,7 @@ automatically for networking applications, use `feather-m0-wifi` as board
 and define the required WiFi parameters, for example:
 ```
      CFLAGS='-DWIFI_SSID=\"<ssid>\" -DWIFI_PASS=\"<pass>\"' \
-     make BOARD=feather-m0-wifi -C examples/networking/gnrc_networking/gnrc_networking
+     make BOARD=feather-m0-wifi -C examples/networking/gnrc/gnrc_networking
 ```
 
 For detailed information about the parameters, see section
@@ -73,7 +73,7 @@ variant of the board automatically for LoRa applications,
 use `feather-m0-lora` as board:
 
 ```
-make BOARD=feather-m0-lora -C examples/networking/gnrc_networking/gnrc_lorawan
+make BOARD=feather-m0-lora -C examples/networking/gnrc/gnrc_lorawan
 ```
 
 For detailed information about the parameters, see section

@@ -18,7 +18,7 @@ At startup, the DFU mode is entered when either
 
 # Prerequisites
 
-- The board must have functional USB support, easily tested using the `examples/advanced_examples/usbus_minimal/` example.
+- The board must have functional USB support, easily tested using the `examples/advanced/usbus_minimal/` example.
 
 - The board must have functional riotboot support, see @ref bootloader_riotboot.
 
@@ -51,7 +51,7 @@ When the device is attached and in DFU mode (or the current firmware uses the `u
 new firmware can be flashed to slot 0 using:
 
 ```
-$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/essentials/saul BOARD=particle-xenon \
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/basic/saul BOARD=particle-xenon \
   PROGRAMMER=dfu-util all riotboot/flash-slot0
 ```
 
@@ -61,7 +61,7 @@ the variable `DFU_USB_ID`, e.g. if the RIOT DFU bootloader was compiled for
 a different VID/PID pair.
 
 ```
-$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/essentials/saul BOARD=particle-xenon \
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/basic/saul BOARD=particle-xenon \
   PROGRAMMER=dfu-util DFU_USB_ID=1209:7d02 all riotboot/flash-slot0
 ```
 

@@ -30,7 +30,7 @@
  *
  * WASM files can be linked to use just a part of the first page.
  * In this case the VM can be run with less ram.
- * (see `wasm_sample/Makefile` in `examples/language_bindings/community_supported/wasm` for linker options to help with this)
+ * (see `wasm_sample/Makefile` in `examples/lang_support/community/wasm` for linker options to help with this)
  * While running the example configured with 8KiB Heap and 8KiB Stack,
  * ~24KiB of System Heap are used.
  * The thread, the WAMR interpreter (iwasm) is executed in,
@@ -40,7 +40,7 @@
  * ## building wasm-bytecode
  *
  * `clang` and `wasm-ld` of the *same version* must be used
- * The Makefile in `examples/language_bindings/community_supported/wasm/wasm_sample/Makefile` will try to guess
+ * The Makefile in `examples/lang_support/community/wasm/wasm_sample/Makefile` will try to guess
  * a matching clang, wasm-ld pair, if they do not match linking will fail.
  *
  * ## Configuration
@@ -55,7 +55,7 @@
  * WAMR should be used using the functions provided by the WAMR project their API-headers
  * they can be found in `<RIOT>/build/pkg/wamr/core/iwasm/include/`.
  * pkg/wamr adds no RIOT specific API to that.
- * For simple usages like in the example `iwasm.c` in `examples/language_bindings/community_supported/wasm` might be useful and
+ * For simple usages like in the example `iwasm.c` in `examples/lang_support/community/wasm` might be useful and
  * if used should be copied and adapt to the application need.
  *
  * While WebAssembly does not define a set native functions. WAMR provides its own builtin-libc.

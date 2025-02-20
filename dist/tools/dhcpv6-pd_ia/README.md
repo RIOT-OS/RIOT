@@ -22,4 +22,4 @@ the script
 [DHCPv6]: https://tools.ietf.org/html/rfc8415
 [prefix delegation]: https://en.wikipedia.org/wiki/Prefix_delegation
 [Kea]: http://kea.isc.org
-[`gnrc_border_router` example]: ../../../examples/networking/gnrc_networking/gnrc_borader_router
+[`gnrc_border_router` example]: ../../../examples/networking/gnrc/gnrc_border_router
