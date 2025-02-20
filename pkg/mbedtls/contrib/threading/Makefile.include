@@ -1,0 +1,8 @@
+
+ifneq (,$(filter mbedtls_threading_alt,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_THREADING_ALT=1
+endif
+
+ifneq (,$(filter mbedtls_threading,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_THREADING=1
+endif
