@@ -99,6 +99,10 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
+static const adc_conf_t adc_config[] = {{}};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
 #ifdef __cplusplus
 }
 #endif
