@@ -564,6 +564,13 @@ typedef enum {
     NETOPT_6LO_IPHC,
 
     /**
+     * @brief   (@ref netopt_enable_t) authoritative border router
+     *
+     * @see [RFC 6775](https://datatracker.ietf.org/doc/html/rfc6775#section-4.3)
+     */
+    NETOPT_6LO_ABR,
+
+    /**
      * @brief   (uint8_t) retry amount from missing ACKs of the last transmission
      *
      * This retrieves the number of retries needed for the last transmission.
