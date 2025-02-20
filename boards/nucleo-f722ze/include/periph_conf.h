@@ -99,7 +99,19 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
-static const adc_conf_t adc_config[] = {{}};
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 3),  .dev = 2, .chan = 3},  /* ADC123_IN3 */
+    {GPIO_PIN(PORT_C, 0),  .dev = 2, .chan = 10}, /* ADC123_IN10 */
+    {GPIO_PIN(PORT_C, 3),  .dev = 2, .chan = 13}, /* ADC123_IN13 */
+    {GPIO_PIN(PORT_F, 3),  .dev = 2, .chan = 9},  /* ADC3_IN9    */
+    {GPIO_PIN(PORT_F, 5),  .dev = 2, .chan = 15}, /* ADC3_IN15   */
+    {GPIO_PIN(PORT_F, 10), .dev = 2, .chan = 8},  /* ADC3_IN8    */
+    {GPIO_UNDEF,           .dev = 0, .chan = 18}, /* VBAT */
+};
+
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
+
+#define ADC_CLK_MAX         MHZ(36)     /**< Use a faster than default ADC clock */
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 
