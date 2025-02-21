@@ -4,7 +4,7 @@ PREFIX=2001:db8::/60
 
 SCRIPTPATH=$(dirname $(realpath "$0"))
 
-RIOTBASE=$SCRIPTPATH/../..
+RIOTBASE=$SCRIPTPATH/../../../..
 RIOTTOOLS=$RIOTBASE/dist/tools
 TOPOLOGY=$SCRIPTPATH/tapology.txt
 
