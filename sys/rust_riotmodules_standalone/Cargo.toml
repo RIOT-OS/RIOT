@@ -12,7 +12,6 @@ crate-type = [ "staticlib" ]
 lto = true
 opt-level = "s"
 debug = true
-panic = "abort"
 codegen-units = 1
 
 [dependencies]
