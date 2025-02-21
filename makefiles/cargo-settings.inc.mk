@@ -37,6 +37,13 @@ CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/$(patsubst test,debug,$(patsubst 
 # to apply LTO and profile configuration to the core library.
 CARGO_OPTIONS ?=
 
+# Rust on RIOT runs without unwinding.
+#
+# The panic handlers which riot-wrappers set already ensure that, but building
+# on native without declaring this "officially" would require setting the
+# eh_personality lang item, which is not stable.
+RUSTFLAGS += -Cpanic=abort
+
 # If there is a Rust module in the application, build it, and then Rust is needed too.
 ifneq (,${APPLICATION_RUST_MODULE})
     # The addition to BASELIBS used to happen in the application Makefile.
