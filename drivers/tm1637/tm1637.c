@@ -58,9 +58,9 @@
 #define BIT_MASK_DOT                0x80
 
 /**
- * @brief Delay between bits in milliseconds
+ * @brief Delay between bits in microseconds
  */
-#define BIT_TIME_MS                 1
+#define BIT_TIME_US                 1
 
 /**
  * @brief Array encoding the segments for the digits from 0 to 9
@@ -88,7 +88,7 @@ static const uint8_t minus_sign = 0b01000000;
  */
 inline static void _tm1637_delay(void)
 {
-    ztimer_sleep(ZTIMER_MSEC, BIT_TIME_MS);
+    ztimer_sleep(ZTIMER_USEC, BIT_TIME_US);
 }
 
 /**
