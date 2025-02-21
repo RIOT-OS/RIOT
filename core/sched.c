@@ -71,6 +71,27 @@ const uint8_t max_threads = ARRAY_SIZE(sched_threads);
 FORCE_USED_SECTION
 const uint8_t _tcb_name_offset = offsetof(thread_t, name);
 #endif
+
+FORCE_USED_SECTION
+static const char * const _thread_state_names[STATUS_NUMOF] = {
+    [STATUS_STOPPED] = "stopped",
+    [STATUS_ZOMBIE] = "zombie",
+    [STATUS_SLEEPING] = "sleeping",
+    [STATUS_MUTEX_BLOCKED] = "bl mutex",
+    [STATUS_RECEIVE_BLOCKED] = "bl rx",
+    [STATUS_SEND_BLOCKED] = "bl send",
+    [STATUS_REPLY_BLOCKED] = "bl reply",
+    [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
+    [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
+    [STATUS_MBOX_BLOCKED] = "bl mbox",
+    [STATUS_COND_BLOCKED] = "bl cond",
+    [STATUS_RUNNING] = "running",
+    [STATUS_PENDING] = "pending",
+};
+FORCE_USED_SECTION
+const char * const * const thread_state_names = _thread_state_names;
+FORCE_USED_SECTION
+const uint8_t thread_state_names_numof = ARRAY_SIZE(_thread_state_names);
 /** @} */
 
 volatile thread_t *sched_active_thread;
