@@ -149,6 +149,10 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
+static const adc_conf_t adc_config[] = {{}};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
 #ifdef __cplusplus
 }
 #endif
