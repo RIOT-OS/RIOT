@@ -19,7 +19,7 @@ CARGO_PROFILE ?= release
 # * Switching back and forth between two boards of the same CPU requires
 #   riot-sys rebuilds. (On its own, this would be outweighed by the shared
 #   compilation of other modules).
-CARGO_TARGET_DIR = $(BINDIR)/target
+CARGO_TARGET_DIR ?= $(BINDIR)/target
 
 # The single Rust library to be built.
 #
