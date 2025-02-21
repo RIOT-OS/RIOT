@@ -69,7 +69,7 @@ static inline void done(void)
     mutex_unlock(&lock);
 }
 
-int _enable_adc(void)
+static int _enable_adc(void)
 {
     /* check if the ADC is not already enabled */
     if (ADC1->CR & ADC_CR_ADEN) {
@@ -94,12 +94,12 @@ int _enable_adc(void)
     return 0;
 }
 
-void _disable_adc(void)
+static int _disable_adc(void)
 {
     /* check if disable is going on or ADC is disabled already */
     if ((ADC1->CR & ADC_CR_ADDIS) || !(ADC1->CR & ADC_CR_ADEN)) {
         while (ADC1->CR & ADC_CR_ADDIS) {}
-        return;
+        return 0;
     }
 
     /* make sure no conversion is going on and stop it if it is */
@@ -112,6 +112,8 @@ void _disable_adc(void)
     /* disable the ADC and wait until is is disabled*/
     ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADDIS;
     while (!(ADC1->CR & ADC_CR_ADEN)) {}
+
+    return 0;
 }
 
 int adc_init(adc_t line)
@@ -130,55 +132,60 @@ int adc_init(adc_t line)
         gpio_init_analog(adc_config[line].pin);
     }
 
-    /* reset configuration, including ADC_CFGR1_DMAEN | ADC_CFGR1_DMACFG | ADC_CFGR1_AUTOFF */
-    ADC1->CFGR1 = 0;
-    ADC1->CFGR2 = 0;
+    /* init ADC only if it wasn't already initialized. Check a register
+     * set by the initialization which has a reset value of 0 */
+    if (ADC1->SMPR != 3) {
 
-    /* Calibration procedure according to:
-     * - RM0360 section 12.3.2 for the STM32F0
-     * - RM0454 section 14.3.3 for the STM32G0
-     * - RM0490 section 16.4.3 for the STM32C0 */
+        /* reset configuration, including ADC_CFGR1_DMAEN | ADC_CFGR1_DMACFG | ADC_CFGR1_AUTOFF */
+        ADC1->CFGR1 = 0;
+        ADC1->CFGR2 = 0;
 
-    /* only enable the ADC voltage regulator if the chip has one (STM32F0 does not) */
+        /* Calibration procedure according to:
+        * - RM0360 section 12.3.2 for the STM32F0
+        * - RM0454 section 14.3.3 for the STM32G0
+        * - RM0490 section 16.4.3 for the STM32C0 */
+
+        /* only enable the ADC voltage regulator if the chip has one (STM32F0 does not) */
 #if defined(ADC_CR_ADVREGEN)
-    ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADVREGEN;
+        ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADVREGEN;
 
-    /* wait for t_ADCVREG_STUP = 20us with some headroom due to busy_wait_us being inaccurate */
-    busy_wait_us(100);
+        /* wait for t_ADCVREG_STUP = 20us with some headroom due to busy_wait_us being inaccurate */
+        busy_wait_us(100);
 #endif
 
-    /* the STM32C0 requires an averaging of eight calibration values */
+        /* the STM32C0 requires an averaging of eight calibration values */
 #ifdef CPU_FAM_STM32C0
-    uint32_t calfact = 0;
+        uint32_t calfact = 0;
 
-    for (uint32_t i = 8; i > 0; i--) {
+        for (uint32_t i = 8; i > 0; i--) {
+            /* perform a calibration and wait for the flag to clear */
+            ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADCAL;
+            while (ADC1->CR & ADC_CR_ADCAL) {}
+
+            calfact += ADC1->CALFACT;
+        }
+        /* round up to the nearest integer */
+        calfact = (calfact + 4) / 8;
+
+        /* enable the ADC to write the calibration factor and wait before writing and disabling */
+        if (_enable_adc() == -1) {
+            return -1;
+        }
+        busy_wait_us(100);
+
+        /* apply the calibration factor and mask it in case it is bigger than 0x7F */
+        ADC1->CALFACT = calfact & ADC_CALFACT_CALFACT;
+
+        _disable_adc();
+#else
         /* perform a calibration and wait for the flag to clear */
         ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADCAL;
         while (ADC1->CR & ADC_CR_ADCAL) {}
-
-        calfact += ADC1->CALFACT;
-    }
-    /* round up to the nearest integer */
-    calfact = (calfact + 4) / 8;
-
-    /* enable the ADC to write the calibration factor and wait before writing and disabling */
-    if (_enable_adc() == -1) {
-        return -1;
-    }
-    busy_wait_us(100);
-
-    /* apply the calibration factor and mask it in case it is bigger than 0x7F */
-    ADC1->CALFACT = calfact & ADC_CALFACT_CALFACT;
-
-    _disable_adc();
-#else
-    /* perform a calibration and wait for the flag to clear */
-    ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADCAL;
-    while (ADC1->CR & ADC_CR_ADCAL) {}
 #endif
 
-    /* configure sampling time to safe value */
-    ADC1->SMPR = 0x3;       /* 28.5 ADC clock cycles */
+        /* configure sampling time to safe value */
+        ADC1->SMPR = 0x3;       /* 28.5 ADC clock cycles */
+    }
 
     /* power off an release device for now */
     done();
@@ -209,11 +216,12 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
 
     /* check if the ADC was enabled successfully */
     if (_enable_adc() == -1) {
+        done();
         return -1;
     }
 
     /* start conversion and wait for results */
-    ADC1->CR |= ADC_CR_ADSTART;
+    ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADSTART;
     while (!(ADC1->ISR & ADC_ISR_EOC)) {}
 
     /* read result */
@@ -225,8 +233,12 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     }
 
     /* disable, unlock and power off device again */
-    _disable_adc();
+    int ret = _disable_adc();
     done();
 
-    return sample;
+    if (ret == -1) {
+        return -1;
+    } else {
+        return sample;
+    }
 }
