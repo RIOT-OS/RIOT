@@ -31,31 +31,31 @@
 /**
  * @brief Signals data transmission
  */
-#define DATA_COMMAND                0x40
+#define COMMAND_DATA                0x40
 
 /**
  * @brief Sets the brightness and display state to on/off
  */
-#define DISPLAY_AND_CONTROL_COMMAND 0x80
+#define COMMAND_DISPLAY_AND_CONTROL 0x80
 
 /**
  * @brief Sets the address where data is written
  */
-#define ADDRESS_COMMAND             0xC0
+#define COMMAND_ADDRESS             0xC0
 
 /**
  * @brief Bit mask for turning the display on/off
  *
- * @note This bit is part of the DISPLAY_AND_CONTROL_COMMAND
+ * @note This bit is part of the COMMAND_DISPLAY_AND_CONTROL
  */
-#define ON_BIT_MASK                 0x08
+#define BIT_MASK_ON                 0x08
 
 /**
  * @brief Bit mask for the dot/colon to the right of a digit
  *
  * @note This bit is part of a digit's segment data
  */
-#define DOT_BIT_MASK                0x80
+#define BIT_MASK_DOT                0x80
 
 /**
  * @brief Delay between bits in milliseconds
@@ -86,7 +86,7 @@ static const uint8_t minus_sign = 0b01000000;
 /**
  * @brief Delays the transmission to the display
  */
-inline static void delay(void)
+inline static void _tm1637_delay(void)
 {
     ztimer_sleep(ZTIMER_MSEC, BIT_TIME_MS);
 }
@@ -96,10 +96,10 @@ inline static void delay(void)
  *
  * @param[in] dev device descriptor of the display
  */
-static void start(const tm1637_t *dev)
+static void _tm1637_start(const tm1637_t *dev)
 {
     gpio_write(dev->params->dio, false);
-    delay();
+    _tm1637_delay();
 }
 
 /**
@@ -110,14 +110,14 @@ static void start(const tm1637_t *dev)
  *
  * @param[in] dev device descriptor of the display
  */
-static void stop(const tm1637_t *dev)
+static void _tm1637_stop(const tm1637_t *dev)
 {
     gpio_write(dev->params->dio, false);
-    delay();
+    _tm1637_delay();
     gpio_write(dev->params->clk, true);
-    delay();
+    _tm1637_delay();
     gpio_write(dev->params->dio, true);
-    delay();
+    _tm1637_delay();
 }
 
 /**
@@ -126,16 +126,16 @@ static void stop(const tm1637_t *dev)
  * @param[in] dev   device descriptor of the display
  * @param[in] byte  byte to transmit
  */
-static void transmit_byte(const tm1637_t *dev, uint8_t byte)
+static void _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
 {
     for (int i = 0; i < 8; ++i) {
         bool value = (byte >> i) & 0x01;
         gpio_write(dev->params->clk, false);
-        delay();
+        _tm1637_delay();
         gpio_write(dev->params->dio, value);
-        delay();
+        _tm1637_delay();
         gpio_write(dev->params->clk, true);
-        delay();
+        _tm1637_delay();
     }
 
     /**
@@ -146,11 +146,11 @@ static void transmit_byte(const tm1637_t *dev, uint8_t byte)
      */
     gpio_write(dev->params->clk, false);
     gpio_write(dev->params->dio, true);
-    delay();
+    _tm1637_delay();
     gpio_write(dev->params->clk, true);
-    delay();
+    _tm1637_delay();
     gpio_write(dev->params->clk, false);
-    delay();
+    _tm1637_delay();
 }
 
 /**
@@ -159,34 +159,34 @@ static void transmit_byte(const tm1637_t *dev, uint8_t byte)
  * @param[in] dev       device descriptor of the display
  * @param[in] segments  array of length 4 encoding the display's segments
  */
-static void transmit_segments(const tm1637_t *dev,
-                              const uint8_t *segments,
-                              tm1637_brightness_t brightness)
+static void _tm1637_transmit_segments(const tm1637_t *dev,
+                                      const uint8_t segments[DIGIT_COUNT],
+                                      tm1637_brightness_t brightness)
 {
     /* transmit the data command first */
-    start(dev);
-    transmit_byte(dev, DATA_COMMAND);
-    stop(dev);
+    _tm1637_start(dev);
+    _tm1637_transmit_byte(dev, COMMAND_DATA);
+    _tm1637_stop(dev);
 
     /**
      * set the address using the auto increment mode for addresses and
      * start at zero
      */
-    start(dev);
-    transmit_byte(dev, ADDRESS_COMMAND);
+    _tm1637_start(dev);
+    _tm1637_transmit_byte(dev, COMMAND_ADDRESS);
 
     /* transmit each bit indiviudally */
     for (int i = 0; i < DIGIT_COUNT; ++i) {
-        transmit_byte(dev, segments[i]);
+        _tm1637_transmit_byte(dev, segments[i]);
     }
-    stop(dev);
+    _tm1637_stop(dev);
 
     /* transmit the display state and the brightness */
-    start(dev);
-    transmit_byte(dev, DISPLAY_AND_CONTROL_COMMAND |
-                           brightness | ON_BIT_MASK);
+    _tm1637_start(dev);
+    _tm1637_transmit_byte(dev, COMMAND_DISPLAY_AND_CONTROL |
+                                   brightness | BIT_MASK_ON);
 
-    stop(dev);
+    _tm1637_stop(dev);
 }
 
 /**
@@ -194,10 +194,10 @@ static void transmit_segments(const tm1637_t *dev,
  *
  * @param[in,out] segments  segments to enable the colon on
  */
-inline static void enable_colon(uint8_t *segments)
+inline static void _enable_colon(uint8_t *segments)
 {
     /* the second digit uses the colon */
-    segments[1] |= DOT_BIT_MASK;
+    segments[1] |= BIT_MASK_DOT;
 }
 
 int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
@@ -227,7 +227,7 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
 void tm1637_clear(const tm1637_t *dev)
 {
     uint8_t segments[DIGIT_COUNT] = { 0 };
-    transmit_segments(dev, segments, TM1637_PW_1_16);
+    _tm1637_transmit_segments(dev, segments, TM1637_PW_1_16);
 }
 
 void tm1637_write_number(const tm1637_t *dev, int16_t number,
@@ -279,8 +279,8 @@ void tm1637_write_number(const tm1637_t *dev, int16_t number,
     }
 
     if (colon) {
-        enable_colon(segments);
+        _enable_colon(segments);
     }
 
-    transmit_segments(dev, segments, brightness);
+    _tm1637_transmit_segments(dev, segments, brightness);
 }
