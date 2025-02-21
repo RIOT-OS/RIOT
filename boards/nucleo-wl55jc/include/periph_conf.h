@@ -149,6 +149,31 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
+/**
+ * @name   ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32WL55JC order. Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5 and the internal VBAT channel.
+ *
+ * The appropriate ADC device and channel for each pin
+ * can be found in the board manual in the pin assignment
+ * table. The format of the entries is ADC1_IN[Y], where
+ * [Y] - describes the used channel - indexed from 1.
+ * For example: ADC1_IN10 is channel 10
+ *
+ * For Nucleo-WL55JC this information is in the board manual:
+ * Table 17.
+ *
+ * VBAT is connected ADC1_IN14 internal line and a voltage divider
+ * is used, so that only 1/3 of the actual VBAT is measured. This
+ * allows for a supply voltage higher than the reference voltage.
+ *
+ * For STM32WL55JC more information is provided in the MCU datasheet,
+ * in section 3.20.3 - Vbat battery voltage monitoring.
+ * @{
+ */
 static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_B, 1),  .chan = 5},  /* ADC1_IN5 */
     {GPIO_PIN(PORT_B, 2),  .chan = 4},  /* ADC1_IN4 */
@@ -162,6 +187,7 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 
 #define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
+/** @} */
 
 #ifdef __cplusplus
 }
