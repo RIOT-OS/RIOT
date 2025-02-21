@@ -1,6 +1,12 @@
 # name of your application
 APPLICATION = rust_gcoap
 
+# The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
+#
+# The presence of this triggers building Rust code contained in this
+# application in addition to any C code.
+APPLICATION_RUST_MODULE = rust_gcoap
+
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
@@ -42,11 +48,5 @@ CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+si
 # This thread needs some more stack for printing the addresses, once more being
 # hit by string formatting.
 CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF+1024)'
-
-# The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
-APPLICATION_RUST_MODULE = rust_gcoap
-BASELIBS += $(APPLICATION_RUST_MODULE).module
-
-FEATURES_REQUIRED += rust_target
 
 include $(RIOTBASE)/Makefile.include
