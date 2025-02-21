@@ -31,7 +31,7 @@ $ aiocoap-fileserver coaproot
 
 3. Build and start the native instance:
 ```
-$ BOARD=native make -C examples/advanced_examples/suit_update all term
+$ BOARD=native make -C examples/advanced/suit_update all term
 ```
    and add an address from the same range to the interface in RIOT
 ```console
@@ -135,13 +135,13 @@ Before the natice instance can be started, it must be compiled first.
 Compilation can be started from the root of your RIOT directory with:
 
 ```
-$ BOARD=native make -C examples/advanced_examples/suit_update
+$ BOARD=native make -C examples/advanced/suit_update
 ```
 
 Then start the example with:
 
 ```console
-$ BOARD=native make -C examples/advanced_examples/suit_update term
+$ BOARD=native make -C examples/advanced/suit_update term
 ```
 
 This starts an instance of the suit_update example as a process on your

@@ -6,7 +6,7 @@
 ### Quick start
 
 - Plug into a USB port.
-- `$ make BOARD=nrf52840dongle -C examples/essentials/saul flash term`
+- `$ make BOARD=nrf52840dongle -C examples/basic/saul flash term`
   - See [Flash the board](#nrf52840dongle_flash) if anything goes wrong.
 - `> saul write 2 10 40 10`
   - The LED glows in a soft turquise.

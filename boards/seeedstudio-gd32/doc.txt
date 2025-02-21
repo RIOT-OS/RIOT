@@ -152,17 +152,17 @@ By default, an FTDI adapter according to the configuration defined in
 [`interface/openocd-usb.cfg`](https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
 is assumed.
 ```
-BOARD=seeedstudio-gd32 make -C examples/essentials/hello-world flash
+BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
 To use an FTDI adapter with a different configuration, the configuration can be
 defined using the variable `OPENOCD_FTDI_ADAPTER`, for example:
 ```
-OPENOCD_FTDI_ADAPTER=tigar BOARD=seeedstudio-gd32 make -C examples/essentials/hello-world flash
+OPENOCD_FTDI_ADAPTER=tigar BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
 If another adapter is used, it can be specified using variable
 `OPENOCD_DEBUG_ADAPTER`, for example for a Segger J-Link adapter:
 ```
-OPENOCD_DEBUG_ADAPTER=jlink BOARD=seeedstudio-gd32 make -C examples/essentials/hello-world flash
+OPENOCD_DEBUG_ADAPTER=jlink BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
 
 ## Accessing STDIO
@@ -174,7 +174,7 @@ the index of the CDC ACM interface, which is 0 by default.
 To use the first UART interface for `stdio` instead, the `stdio_uart` module
 has to be enabled:
 ```
-USEMODULE=stdio_uart BOARD=seeedstudio-gd32 make -C examples/essentials/hello-world flash
+USEMODULE=stdio_uart BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
 
 The `stdio` is then directly accessible through the first UART interface. If an
@@ -184,11 +184,11 @@ interface, which is 0 by default.
 
 Use the `term` target to connect to the board using `/dev/ttyUSB0`:
 ```
-BOARD=seeedstudio-gd32 make -C examples/essentials/hello-world term PORT=/dev/ttyUSB0
+BOARD=seeedstudio-gd32 make -C examples/basic/hello-world term PORT=/dev/ttyUSB0
 ```
 If the UART interface index of the USB-to-UART interface is not 0, use
 the following command to connect:
 ```
-BOARD=seeedstudio-gd32 make -C examples/essentials/hello-world term PORT=/dev/ttyUSB<n>
+BOARD=seeedstudio-gd32 make -C examples/basic/hello-world term PORT=/dev/ttyUSB<n>
 ```
  */

@@ -157,7 +157,7 @@
  * The driver is enabled by using the module `shield_w5100`, e.g. with:
  *
  * ```
- * USEMODULE=shield_w5100 make BOARD=arduino-due -C examples/networking/gnrc_networking/gnrc_networking
+ * USEMODULE=shield_w5100 make BOARD=arduino-due -C examples/networking/gnrc/gnrc_networking
  * ```
  *
  * It depends on @ref drivers_w5100 and provides nothing more than the providing

@@ -25,7 +25,7 @@ generally mapped to `/dev/ttyUSB0`.
 
 Use the `term` target to connect to the board serial port<br/>
 ```
-    make BOARD=e104-bt5010a-tb -C examples/essentials/hello-world term
+    make BOARD=e104-bt5010a-tb -C examples/basic/hello-world term
 ```
 
  */

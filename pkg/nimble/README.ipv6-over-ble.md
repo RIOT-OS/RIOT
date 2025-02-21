@@ -25,7 +25,7 @@ following:
 
 ## Preparing the RIOT node
 
-First, you compile and flash the `examples/networking/gnrc_networking/gnrc_networking` application to your
+First, you compile and flash the `examples/networking/gnrc/gnrc_networking` application to your
 RIOT device. When doing this, make sure to enable SLAAC
 (`CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1`), see note above.
 

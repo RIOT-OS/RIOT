@@ -1,7 +1,7 @@
-examples/advanced_examples/bindist/
-examples/advanced_examples/pio_blink/
-examples/essentials/subfolders/
-examples/language_bindings/community_supported/wasm/
+examples/advanced/bindist/
+examples/advanced/pio_blink/
+examples/basic/subfolders/
+examples/lang_support/community/wasm/
 tests/build_system/blob/
 tests/build_system/cpp_exclude/external_modules/
 tests/build_system/cpp_ext/external_modules/
