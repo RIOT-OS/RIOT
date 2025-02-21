@@ -149,9 +149,19 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
-static const adc_conf_t adc_config[] = {{}};
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_B, 1),  .chan = 5},  /* ADC1_IN5 */
+    {GPIO_PIN(PORT_B, 2),  .chan = 4},  /* ADC1_IN4 */
+    {GPIO_PIN(PORT_A, 10), .chan = 6},  /* ADC1_IN6 */
+    {GPIO_PIN(PORT_B, 4),  .chan = 3},  /* ADC1_IN3 */
+    {GPIO_PIN(PORT_B, 14), .chan = 1},  /* ADC1_IN1 */
+    {GPIO_PIN(PORT_B, 13), .chan = 0},  /* ADC1_IN0 */
+    {GPIO_UNDEF,           .chan = 14}, /* VBAT see datasheet point 3.20.3 */
+};
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 
 #ifdef __cplusplus
 }
