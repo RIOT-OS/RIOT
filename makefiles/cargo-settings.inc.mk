@@ -36,3 +36,17 @@ CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/$(patsubst test,debug,$(patsubst 
 # options added by the user are `-Zbuild-std=core` (only available on nightly)
 # to apply LTO and profile configuration to the core library.
 CARGO_OPTIONS ?=
+
+# If there is a Rust module in the application, build it, and then Rust is needed too.
+ifneq (,${APPLICATION_RUST_MODULE})
+    # The addition to BASELIBS used to happen in the application Makefile.
+    # While applications are around that add it to BASELIBS, let's not
+    # duplicate it and thus break the application. (To remove this check, a
+    # deprecation should be introduced, or at least a clean error that tells
+    # users to remove the BASELIBS+= line from their application Makefile).
+    ifeq (,$(filter ${APPLICATION_RUST_MODULE}.module,${BASELIBS}))
+        BASELIBS += $(APPLICATION_RUST_MODULE).module
+    endif
+
+    FEATURES_REQUIRED += rust_target
+endif
