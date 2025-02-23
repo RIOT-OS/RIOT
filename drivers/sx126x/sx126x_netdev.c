@@ -309,7 +309,6 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         sx126x_cfg_rx_boosted(dev, true);
         if (dev->rx_timeout >= 0) {
             int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
-            printf("timeout: %d\n", timeout);
             sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
             if (timeout > 0) {
                 sx126x_set_rx(dev, timeout);
