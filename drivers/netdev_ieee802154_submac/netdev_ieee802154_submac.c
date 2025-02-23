@@ -207,35 +207,40 @@ static void _isr(netdev_t *netdev)
 
     uint32_t flags;
     do {
-        if ((flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_CRC_ERROR)) & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
+        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_CRC_ERROR);
+        if (flags & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
             DEBUG("IEEE802154 submac:c NETDEV_SUBMAC_FLAGS_CRC_ERROR\n");
             ieee802154_submac_crc_error_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_CRC_ERROR;
             continue;
         }
 
-        if ((flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT)) & NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT) {
+        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT);
+        if (flags & NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT\n");
             ieee802154_submac_ack_timeout_fired(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT;
             continue;
         }
 
-        if ((flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_BH_REQUEST)) & NETDEV_SUBMAC_FLAGS_BH_REQUEST) {
+        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_BH_REQUEST);
+        if (flags & NETDEV_SUBMAC_FLAGS_BH_REQUEST) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_BH_REQUEST\n");
             ieee802154_submac_bh_process(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_BH_REQUEST;
             continue;
         }
 
-        if ((flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_RX_DONE)) & NETDEV_SUBMAC_FLAGS_RX_DONE) {
+        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_RX_DONE);
+        if (flags & NETDEV_SUBMAC_FLAGS_RX_DONE) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_RX_DONE\n");
             ieee802154_submac_rx_done_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_RX_DONE;
             /* dispatch to netif */
         }
 
-        if ((flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_TX_DONE)) & NETDEV_SUBMAC_FLAGS_TX_DONE) {
+        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_TX_DONE);
+        if (flags & NETDEV_SUBMAC_FLAGS_TX_DONE) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_TX_DONE\n");
             ieee802154_submac_tx_done_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_TX_DONE;
