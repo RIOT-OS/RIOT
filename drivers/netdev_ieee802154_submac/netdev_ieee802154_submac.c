@@ -40,7 +40,6 @@ static void _isr_flags_set(netdev_ieee802154_submac_t *netdev_submac, uint32_t s
     irq_restore(state);
 }
 
-
 static void _ack_timeout(void *arg)
 {
     netdev_ieee802154_submac_t *netdev_submac = arg;
