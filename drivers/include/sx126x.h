@@ -85,7 +85,7 @@ typedef enum {
  * @brief   Internal sx126x device states
  */
 typedef enum {
-    SX126X_STATE_IDLE,
+    SX126X_STATE_STANDBY,
     SX126X_STATE_TX,
     SX126X_STATE_ACK,
     SX126X_STATE_RX,

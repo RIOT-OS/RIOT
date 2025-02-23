@@ -134,7 +134,7 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
 static int _set_state(sx126x_t *dev, sx126x_state_t state)
 {
     switch (state) {
-    case SX126X_STATE_IDLE:
+    case SX126X_STATE_STANDBY:
         DEBUG("[sx126x] hal: set STATE_STANDBY\n");
         sx126x_set_standby(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
@@ -205,7 +205,7 @@ static int _get_state(sx126x_t *dev, void *val)
         break;
 
     default:
-        state = SX126X_STATE_IDLE;
+        state = SX126X_STATE_STANDBY;
         break;
     }
     memcpy(val, &state, sizeof(sx126x_state_t));
@@ -344,13 +344,13 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         break;
 
     case IEEE802154_HAL_OP_SET_IDLE:
-        _set_state(dev, SX126X_STATE_IDLE);
+        _set_state(dev, SX126X_STATE_STANDBY);
         break;
 
     case IEEE802154_HAL_OP_CCA:
         DEBUG("[sx126x] hal: HAL_OP_CCA (CAD Detection state)\n");
         dev->cad_detected = false;
-        _set_state(dev, SX126X_STATE_IDLE);
+        _set_state(dev, SX126X_STATE_STANDBY);
         sx126x_set_cad(dev);
         break;
     }
@@ -380,7 +380,7 @@ static int _confirm_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         break;
 
     case IEEE802154_HAL_OP_SET_IDLE:
-        eagain = (state != SX126X_STATE_IDLE);
+        eagain = (state != SX126X_STATE_STANDBY);
         break;
 
     case IEEE802154_HAL_OP_CCA:
@@ -488,7 +488,7 @@ static int _request_on(ieee802154_dev_t *hal)
 {
     (void)hal;
     sx126x_t *dev = hal->priv;
-    _set_state(dev, SX126X_STATE_IDLE);
+    _set_state(dev, SX126X_STATE_STANDBY);
     return 0;
 }
 
