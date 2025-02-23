@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023
+ * Copyright (C) 2023-2025
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -95,6 +95,7 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
             return true;
         }
     }
+
     /* filter PAN ID */
     /* Will only work on little endian platform (all?) */
 
