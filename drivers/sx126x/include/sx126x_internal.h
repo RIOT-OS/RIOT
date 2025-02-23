@@ -147,7 +147,7 @@ static inline sx126x_lora_bw_t _sx126x_lora_bw_from(int lora_bw)
  *
  * @param[in]   bw      sx126x_lora_bw_t
  *
- * @return  Corresponding LoRa bandwith
+ * @return  Corresponding LoRa bandwidth
  */
 static inline int _sx126x_lora_bw_to(sx126x_lora_bw_t bw)
 {
