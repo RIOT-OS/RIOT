@@ -85,12 +85,12 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
     sx126x_t *dev = hal->priv;
     uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN];
     le_uint16_t dst_pan;
-    uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
+    le_uint16_t pan_bcast = { .u8 = IEEE802154_PANID_BCAST };
 
     int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
 
     if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
-        if ((memcmp(&dev->pan_id, pan_bcast, 2) == 0)) {
+        if (dev->pan_id ==  pan_bcast.u16) {
             DEBUG("[sx126x] hal: beacon\n");
             return true;
         }
@@ -99,7 +99,7 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
     /* filter PAN ID */
     /* Will only work on little endian platform (all?) */
 
-    if (pan_bcast != byteorder_ltohs(dst_pan) &&
+    if (pan_bcast.u16 != byteorder_ltohs(dst_pan) &&
         dev->pan_id != byteorder_ltohs(dst_pan)) {
         DEBUG("[sx126x] hal: PAN ID mismatch\n");
         return false;
