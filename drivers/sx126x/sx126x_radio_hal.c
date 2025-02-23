@@ -99,9 +99,9 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
     /* filter PAN ID */
     /* Will only work on little endian platform (all?) */
 
-    if ((memcmp(pan_bcast, dst_pan.u8, 2) != 0) &&
-        (memcmp(&dev->pan_id, dst_pan.u8, 2) != 0)) {
-        DEBUG("[]sx126x] hal: PAN ID mismatch\n");
+    if (pan_bcast != byteorder_ltohs(dst_pan) &&
+        dev->pan_id != byteorder_ltohs(dst_pan)) {
+        DEBUG("[sx126x] hal: PAN ID mismatch\n");
         return false;
     }
 
@@ -116,8 +116,6 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
                   dst_addr[0], dst_addr[1]);
             return false;
         }
-
-
     }
     else if (addr_len == IEEE802154_LONG_ADDRESS_LEN) {
         if (memcmp(dev->long_addr, dst_addr, addr_len) == 0) {
