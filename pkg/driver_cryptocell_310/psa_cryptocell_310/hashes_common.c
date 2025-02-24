@@ -40,18 +40,13 @@ psa_status_t cryptocell_310_common_hash_setup(CRYS_HASHUserContext_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
+static psa_status_t _hash_update_from_ram(CRYS_HASHUserContext_t *ctx,
                                 const uint8_t *input,
                                 size_t input_length)
 {
     CRYSError_t ret = 0;
     size_t offset = 0;
     size_t size;
-
-    if (!cryptocell_310_data_within_ram(input)) {
-        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
-        return PSA_ERROR_DATA_INVALID;
-    }
 
     do {
         if (input_length > CC310_MAX_HASH_INPUT_BLOCK) {
@@ -69,6 +64,40 @@ psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
 
         offset += size;
     } while ((input_length > 0) && (ret == CRYS_OK));
+
+    return ret;
+}
+
+psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
+                                const uint8_t *input,
+                                size_t input_length)
+{
+    CRYSError_t ret = 0;
+    if (!cryptocell_310_data_within_ram(input)) {
+        /* copy input chuckwise into RAM until the end of input is reached */
+        uint8_t input_buf[PSA_HASH_MAX_SIZE];
+        size_t buf_size;
+        size_t offset = 0;
+
+        do {
+
+            memset(&input_buf, 0, PSA_HASH_MAX_SIZE);
+
+            buf_size = input_length - offset;
+            buf_size = buf_size < PSA_HASH_MAX_SIZE ? buf_size : PSA_HASH_MAX_SIZE;
+
+            memcpy(&input_buf, input + offset, buf_size);
+
+            ret = _hash_update_from_ram(ctx, input_buf, buf_size);
+
+            offset += PSA_HASH_MAX_SIZE;
+
+        } while ((offset < input_length) && (ret == CRYS_OK));
+
+    }
+    else {
+        ret = _hash_update_from_ram(ctx, input, input_length);
+    }
 
     if (ret != CRYS_OK) {
         DEBUG("CRYS_HASH_Update failed with %s\n", cryptocell310_status_to_humanly_readable(ret));

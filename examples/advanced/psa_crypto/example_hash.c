@@ -22,10 +22,8 @@
 
 #include "psa/crypto.h"
 
-/* certain PSA backends require the data to be in RAM rather than ROM
- * so these values cannot be `const` */
-static uint8_t msg[] = "Hello World!";
-static size_t msg_len = sizeof(msg)-1; // exclude NULL-byte
+static const uint8_t msg[] = "Hello World!";
+static const size_t msg_len = sizeof(msg)-1; // exclude NULL-byte
 
 static const uint8_t hash_sha224[] = {
     0x45, 0x75, 0xbb, 0x4e, 0xc1, 0x29, 0xdf, 0x63, 0x80, 0xce, 0xdd, 0xe6, 0xd7,
