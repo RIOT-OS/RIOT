@@ -147,8 +147,9 @@ This encompass both components needed for riot-sys and for the later installatio
 In addition to the Rust compiler you'll need to install the C2Rust transpiler;
 as this is using some recent fixes, it is best installed as:
 
+<!-- The locked works around <https://github.com/dtolnay/proc-macro2/issues/475> as closed in <https://github.com/immunant/c2rust/pull/1197>; there is no newer release that could be tested. -->
 ```shell
-$ cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0
+$ cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0 --locked
 ```
 
 If multiple versions of LLVM are installed locally, it may be necessary to prefix it with the selected LLVM version:

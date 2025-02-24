@@ -71,7 +71,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */
-    PMC->PMC_PCER0 |= (1 << spi_config[bus].id);
+    PMC->PMC_PCER0 = (1 << spi_config[bus].id);
     /* set mode and speed */
     dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(CLOCK_CORECLOCK / clk) | mode);
     dev(bus)->SPI_MR = (SPI_MR_MSTR | SPI_MR_MODFDIS);
@@ -82,7 +82,7 @@ void spi_release(spi_t bus)
 {
     /* disable device and turn off clock signal */
     dev(bus)->SPI_CR = 0;
-    PMC->PMC_PCER0 &= ~(1 << spi_config[bus].id);
+    PMC->PMC_PCDR0 = (1 << spi_config[bus].id);
     /* release device lock */
     mutex_unlock(&locks[bus]);
 }

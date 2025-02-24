@@ -14,7 +14,7 @@ powered by an Atmel SAMD21 microcontroller.
 Use `BOARD=arduino-nano-33-iot` with the `make` command.<br/>
 Example with `hello-world` application:
 ```
-     make BOARD=arduino-nano-33-iot -C examples/hello-world flash
+     make BOARD=arduino-nano-33-iot -C examples/basic/hello-world flash
 ```
 
 ### Accessing STDIO via UART

@@ -233,6 +233,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
     slipdev_write_byte(dev->config.uart, SLIPDEV_END);
     slipdev_unlock();
+
     return bytes;
 }
 
@@ -333,12 +334,20 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     }
 }
 
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)netdev;
+    (void)info;
+    return -EOPNOTSUPP;
+}
+
 static const netdev_driver_t slip_driver = {
     .send = _send,
     .recv = _recv,
     .init = _init,
     .isr = _isr,
     .get = _get,
+    .confirm_send = _confirm_send,
 #if IS_USED(MODULE_SLIPDEV_STDIO)
     .set = netdev_set_notsup,
 #else

@@ -51,7 +51,7 @@ must be built from source to be able to flash this board.
 To flash this board, just use the following command:
 
 ```
-make BOARD=nucleo-l4r5zi flash -C examples/hello-world
+make BOARD=nucleo-l4r5zi flash -C examples/basic/hello-world
 ```
 
 ### Flashing the Board Using ST-LINK Removable Media
@@ -77,6 +77,6 @@ The default baud rate is 115 200.
 
 Use the `term` target to open a terminal:
 
-    make BOARD=nucleo-l4r5zi -C examples/hello-world term
+    make BOARD=nucleo-l4r5zi -C examples/basic/hello-world term
 
  */

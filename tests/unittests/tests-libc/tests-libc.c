@@ -30,6 +30,41 @@ static void test_libc_strscpy(void)
     TEST_ASSERT_EQUAL_INT(strscpy(buffer, "empty", 0), -E2BIG);
 }
 
+static void test_libc_swprintf(void)
+{
+    string_writer_t sw;
+    char buffer[32];
+    int res;
+
+    string_writer_init(&sw, buffer, sizeof(buffer));
+
+    /* check that string can be written completely */
+    res = swprintf(&sw, "Hello World!");
+    TEST_ASSERT_EQUAL_INT(res, 12);
+    TEST_ASSERT_EQUAL_INT(string_writer_len(&sw), 12);
+    TEST_ASSERT_EQUAL_INT(strcmp("Hello World!", string_writer_str(&sw)), 0);
+
+    /* check that we can add to the string */
+    /* Writing 10 characters, returns 10 bytes written */
+    res = swprintf(&sw, "0123456789");
+    TEST_ASSERT_EQUAL_INT(res, 10);
+    TEST_ASSERT_EQUAL_INT(strcmp("Hello World!0123456789", string_writer_str(&sw)), 0);
+
+    /* The string does not fit completely into the buffer, so it gets truncated */
+    res = swprintf(&sw, "01234567891");
+    TEST_ASSERT_EQUAL_INT(res, -E2BIG);
+    TEST_ASSERT_EQUAL_INT(strcmp("Hello World!0123456789012345678", string_writer_str(&sw)), 0);
+
+    /* You can't write to a full buffer */
+    res = swprintf(&sw, "###");
+    TEST_ASSERT_EQUAL_INT(res, -E2BIG);
+
+    /* check if string was truncated as expected */
+    TEST_ASSERT_EQUAL_INT(string_writer_len(&sw), 32);
+    TEST_ASSERT_EQUAL_INT(strcmp("Hello World!0123456789012345678",
+                                 string_writer_str(&sw)), 0);
+}
+
 static void test_libc_memchk(void)
 {
     char buffer[32];
@@ -101,6 +136,7 @@ Test *tests_libc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_libc_strscpy),
+        new_TestFixture(test_libc_swprintf),
         new_TestFixture(test_libc_memchk),
         new_TestFixture(test_libc_endian),
     };

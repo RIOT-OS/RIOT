@@ -63,4 +63,6 @@
   #error Library does not support the specified device.
 #endif
 
+#include "compat_saml21b.h"
+
 #endif /* _SAML21_ */

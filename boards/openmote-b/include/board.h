@@ -122,6 +122,12 @@
 #define AT86RF215_PARAM_CS         GPIO_PIN(0, 3) /* A3 */
 #define AT86RF215_PARAM_INT        GPIO_PIN(3, 0) /* D0 */
 #define AT86RF215_PARAM_RESET      GPIO_PIN(3, 1) /* D1 */
+
+/**
+ * @brief board requires unusually long reset */
+#ifndef CONFIG_AT86RF215_RESET_PULSE_WIDTH_US
+#define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US   (50000u)
+#endif
 /** @} */
 
 /**

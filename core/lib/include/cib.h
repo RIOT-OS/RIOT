@@ -135,7 +135,7 @@ static inline int cib_get(cib_t *__restrict cib)
  * @return index of item
  * @retval -1 if no item at @p offset exists in the buffer
  */
-static inline int cib_peek_at_unsafe(cib_t *__restrict cib, unsigned offset)
+static inline int cib_peek_at_unsafe(const cib_t *__restrict cib, unsigned offset)
 {
     return (cib->read_count + offset) & cib->mask;
 }
@@ -153,7 +153,7 @@ static inline int cib_peek_at_unsafe(cib_t *__restrict cib, unsigned offset)
  * @return index of item
  * @retval -1 if no item at @p offset exists in the buffer
  */
-static inline int cib_peek_at(cib_t *__restrict cib, unsigned offset)
+static inline int cib_peek_at(const cib_t *__restrict cib, unsigned offset)
 {
     if (offset < cib_avail(cib)) {
         return cib_peek_at_unsafe(cib, offset);
@@ -172,7 +172,7 @@ static inline int cib_peek_at(cib_t *__restrict cib, unsigned offset)
  * @return index of next item
  * @retval -1 if the buffer is empty
  */
-static inline int cib_peek_unsafe(cib_t *__restrict cib)
+static inline int cib_peek_unsafe(const cib_t *__restrict cib)
 {
     return cib_peek_at_unsafe(cib, 0);
 }
@@ -185,7 +185,7 @@ static inline int cib_peek_unsafe(cib_t *__restrict cib)
  * @return index of next item
  * @retval -1 if the buffer is empty
  */
-static inline int cib_peek(cib_t *__restrict cib)
+static inline int cib_peek(const cib_t *__restrict cib)
 {
     return cib_peek_at(cib, 0);
 }

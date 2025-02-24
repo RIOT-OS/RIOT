@@ -85,7 +85,7 @@
  * superframes per multisuperframe.
  *
  * Joining devices scan for beacons and perform the association procedure with
- * the the (PAN) coordinator. On success, the device is ready to communicate with
+ * the (PAN) coordinator. On success, the device is ready to communicate with
  * other devices in the DSME network.
  * To extend the network, coordinator devices can associate to any other
  * coordinator (including the PAN coordinator) and start emitting beacons in a

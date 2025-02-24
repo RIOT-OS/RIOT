@@ -204,6 +204,7 @@ ifneq (,$(filter shell_cmd_iw,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_lwip_netif,$(USEMODULE)))
   USEMODULE += lwip_netif
+  USEMODULE += posix_inet
 endif
 ifneq (,$(filter shell_cmd_mci,$(USEMODULE)))
   USEMODULE += mci

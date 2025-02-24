@@ -208,7 +208,7 @@ typedef struct __attribute__((packed)){
 typedef struct {
     bool taken;                             /**< is cid taken? */
     uint32_t cid;                           /**< channel identifier */
-    uint64_t last_used;                     /**< timestamp of last usage */
+    uint32_t last_used;                     /**< timestamp of last usage */
 } ctap_hid_cid_t;
 
 /**

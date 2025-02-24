@@ -32,7 +32,7 @@ debugging.
 2. Use `BOARD=usb-kw41z` with the `make` command.<br/>
    Example with `hello-world` application:
 ```
-     make BOARD=usb-kw41z -C examples/hello-world flash term
+     make BOARD=usb-kw41z -C examples/basic/hello-world flash term
 ```
 
 [quick-start-guide]: https://www.nxp.com/products/wireless/bluetooth-low-energy-ble/bluetooth-low-energy-ieee-802.15.4-packet-sniffer-usb-dongle:USB-KW41Z?&tab=In-Depth_Tab&tid=van/usb-kw41z/startnow

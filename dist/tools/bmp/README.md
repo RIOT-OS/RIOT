@@ -21,26 +21,51 @@ positional arguments:
                         choose a task to perform
   file                  file to load to target (hex or elf)
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --jtag                use JTAG transport
   --swd                 use SWD transport (default)
   --connect-srst        reset target while connecting
   --tpwr                enable target power
   --serial SERIAL       choose specific probe by serial number
-  --port PORT           choose specific probe by port
+  --port PORT           choose specific probe by port (overrides auto
+                        selection)
   --attach ATTACH       choose specific target by number
   --gdb-path GDB_PATH   path to GDB
+  --bmp-version BMP_VERSION
+                        choose specific firmware version
   --term-cmd TERM_CMD   serial terminal command
 ```
 
-## Available Actions
+## Available actions
 * `list` lists connected targets (default action)
 * `flash` load file to target
 * `erase` erase target flash
 * `debug` start GDB shell that is attached to target
 * `term` start TTY emulator program to look into connected UART
 * `reset` reset target (using RST line)
+
+## Probe selection
+The probe is auto discovered based on the USB VID (0x1D50) and PID (0x6018,
+0x6017). The first discovered probe will be selected, unless `--port` or
+`--serial` is provided.
+
+If `--port` is provided, then that port will be used as the GDB port for all
+actions, except for the `term` action. `--port` also accepts values such as
+network addresses.
+
+## Supported firmwares
+There are minor differences in the available firmwares of the Black Magic
+debugger. Compatibility has been tested with version 1.8+.
+
+This tool will try to determine which version of the firmware is installed,
+unless the probe is accessed remotely (e.g. `--port` is a network address). If
+the firmware version cannot be determined, it will assume version 1.10.2. This
+can be overridden using the `--bmp-version` flag.
+
+As of firmware version 2.0.0 of the Black Magic debugger, support for targets
+depend on the 'flavor' of firmware selected. This tool will indicate if that
+is the case.
 
 ## Examples (tested with BluePill STM32F103F8C6)
 * test connection:

@@ -61,14 +61,14 @@ git checkout <LATEST_RELEASE>
 sudo ./dist/tools/tapsetup/tapsetup         # create virtual Ethernet
                                             # interfaces to connect multiple
                                             # RIOT instances
-cd examples/default/
+cd examples/basic/default/
 make all
 make term
 ~~~~~~~
 
 ... and you are in the RIOT shell!
 Type `help` to discover available commands. For further information see the
-[README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/master/examples/default).
+[README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/master/examples/basic/default).
 
 To use RIOT directly on your embedded platform, and for more hands-on details
 with RIOT, see @ref getting-started.

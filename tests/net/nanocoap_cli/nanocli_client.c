@@ -23,17 +23,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fmt.h"
 #include "net/coap.h"
 #include "net/gnrc/netif.h"
-#include "net/ipv6.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
-#include "net/sock/udp.h"
 #include "net/sock/util.h"
-
 #include "od.h"
+#include "shell.h"
 
-static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str)
+static ssize_t _send(coap_pkt_t *pkt, size_t len,
+                          char *addr_str, const char *port_str)
 {
     ipv6_addr_t addr;
     sock_udp_ep_t remote;
@@ -81,7 +81,15 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len, char *addr_str, char *port_str
     return nanocoap_request(pkt, NULL, &remote, len);
 }
 
-int nanotest_client_cmd(int argc, char **argv)
+#if MODULE_NANOCOAP_TOKEN_EXT
+#  define CLIENT_TOKEN_LENGTH_MAX   16
+#else
+#  define CLIENT_TOKEN_LENGTH_MAX   COAP_TOKEN_LENGTH_MAX
+#endif
+static uint8_t _client_token[CLIENT_TOKEN_LENGTH_MAX] = {0xDA, 0xEC};
+static uint8_t _client_token_len = 2;
+
+static int _cmd_client(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = {"get", "post", "put"};
@@ -89,7 +97,6 @@ int nanotest_client_cmd(int argc, char **argv)
     uint8_t buf[buflen];
     coap_pkt_t pkt;
     size_t len;
-    uint8_t token[2] = {0xDA, 0xEC};
 
     if (argc == 1) {
         /* show help for commands */
@@ -110,7 +117,8 @@ int nanotest_client_cmd(int argc, char **argv)
 
     /* parse options */
     if (argc == 5 || argc == 6) {
-        ssize_t hdrlen = coap_build_hdr(pkt.hdr, COAP_TYPE_CON, &token[0], 2,
+        ssize_t hdrlen = coap_build_hdr(pkt.hdr, COAP_TYPE_CON,
+                                        _client_token, _client_token_len,
                                         code_pos+1, 1);
         coap_pkt_init(&pkt, &buf[0], buflen, hdrlen);
         coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, argv[4], '/');
@@ -165,8 +173,35 @@ int nanotest_client_cmd(int argc, char **argv)
            argv[0]);
     return 1;
 }
+SHELL_COMMAND(client, "CoAP client", _cmd_client);
 
-static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
+static int _cmd_client_token(int argc, char **argv){
+    if (argc != 2) {
+        printf("Usage: %s <TOKEN_HEX>\n", argv[0]);
+        return 1;
+    }
+
+    ssize_t tkl = scn_buf_hex(_client_token, sizeof(_client_token),
+                              argv[1], strlen(argv[1]));
+
+    if (tkl == -EOVERFLOW) {
+        puts("Token too long");
+        return 1;
+    }
+
+    if (tkl < 0) {
+        puts("Failed to parse token");
+        return 1;
+    }
+
+    _client_token_len = tkl;
+
+    return 0;
+}
+SHELL_COMMAND(client_token, "Set Token for CoAP client", _cmd_client_token);
+
+static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf,
+                         size_t len, int more)
 {
     (void)arg;
     (void)more;
@@ -180,7 +215,7 @@ static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int
     return 0;
 }
 
-int nanotest_client_url_cmd(int argc, char **argv)
+static int _cmd_url(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = { "get", "post", "put", "delete" };
@@ -248,6 +283,8 @@ error:
     return -1;
 }
 
+SHELL_COMMAND(url, "CoAP client URL request", _cmd_url);
+
 static const char song[] =
     "Join us now and share the software;\n"
     "You'll be free, hackers, you'll be free.\n"
@@ -269,7 +306,7 @@ static const char song[] =
     "Join us now and share the software;\n"
     "You'll be free, hackers, you'll be free.\n";
 
-int nanotest_client_put_cmd(int argc, char **argv)
+static int _cmd_put(int argc, char **argv)
 {
     int res;
     nanocoap_sock_t sock;
@@ -304,7 +341,9 @@ int nanotest_client_put_cmd(int argc, char **argv)
     return res;
 }
 
-int nanotest_client_put_non_cmd(int argc, char **argv)
+SHELL_COMMAND(put, "experimental put", _cmd_put);
+
+static int _cmd_put_non(int argc, char **argv)
 {
     int res;
 
@@ -323,11 +362,13 @@ int nanotest_client_put_non_cmd(int argc, char **argv)
     return res;
 }
 
-int nanotest_client_get_non_cmd(int argc, char **argv)
+SHELL_COMMAND(put_non, "non-confirmable put", _cmd_put_non);
+
+static int _cmd_get_non(int argc, char **argv)
 {
     int res;
 
-    uint8_t response[CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT];
+    uint8_t response[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT)];
 
     if (argc < 2) {
         printf("usage: %s <url>\n", argv[0]);
@@ -348,3 +389,5 @@ int nanotest_client_get_non_cmd(int argc, char **argv)
     }
     return res;
 }
+
+SHELL_COMMAND(get_non, "non-confirmable get", _cmd_get_non);

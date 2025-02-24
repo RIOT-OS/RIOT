@@ -1,4 +1,4 @@
-USEMODULE += wakaama_core wakaama_core_coap13 wakaama_client
+USEMODULE += wakaama_core wakaama_core_coap wakaama_core_coap13 wakaama_data wakaama_client
 
 # include contrib code (platform adaption and client implementation)
 USEMODULE += wakaama_contrib
@@ -11,7 +11,6 @@ USEMODULE += wakaama_objects
 # include mandatory objects
 USEMODULE += wakaama_objects_device
 USEMODULE += wakaama_objects_security
-
 
 ifneq (,$(filter wakaama_objects_barometer,$(USEMODULE)))
     USEMODULE += wakaama_objects_ipso_sensor_base
@@ -39,6 +38,7 @@ endif
 
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
+USEMODULE += random
 USEPKG += tlsf
 
 # If logs for the package are active, we need fmt

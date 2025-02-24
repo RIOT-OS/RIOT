@@ -9,6 +9,9 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     atmega256rfr2-xpro \
                     atmega328p \
                     atmega328p-xplained-mini \
+                    atxmega-a1-xplained \
+                    atxmega-a1u-xpro \
+                    atxmega-a3bu-xplained \
                     derfmega128 \
                     derfmega256 \
                     f4vi1 \
@@ -23,7 +26,6 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     stm32f0discovery \
                     stm32f3discovery \
                     telosb \
-                    waspmote-pro \
                     z1 \
                     #
 

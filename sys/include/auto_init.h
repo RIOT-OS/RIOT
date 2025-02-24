@@ -44,7 +44,7 @@
  *  - by passing them via the `CFLAGS` variable on the build command line:
  *
  * ```
- * CFLAGS=-DBMP180_PARAM_OVERSAMPLING=1 USEMODULE=bmp180 make BOARD=arduino-zero -C examples/default
+ * CFLAGS=-DBMP180_PARAM_OVERSAMPLING=1 USEMODULE=bmp180 make BOARD=arduino-zero -C examples/basic/default
  * ```
  *
  * - by setting the `CFLAGS` variable in the application `Makefile`:

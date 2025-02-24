@@ -25,16 +25,14 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "atomic_utils.h"
+#include "container.h"
 #include "net/credman.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
-#include "net/sock/util.h"
 #include "net/sock/udp.h"
-#include "net/iana/portrange.h"
+#include "net/sock/util.h"
 #include "random.h"
-#include "sys/uio.h"
-#include "timex.h"
+#include "sys/uio.h" /* IWYU pragma: keep (exports struct iovec) */
 #include "ztimer.h"
 
 #define ENABLE_DEBUG 0
@@ -48,7 +46,11 @@
  * if mode or key-size change especially if certificates instead of PSK are used.
  */
 #ifndef CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE
-#define CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE (160)
+#  define CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE (160)
+#endif
+
+#ifndef CONFIG_NANOCOAP_MAX_OBSERVERS
+#  define CONFIG_NANOCOAP_MAX_OBSERVERS 4
 #endif
 
 enum {
@@ -66,6 +68,35 @@ typedef struct {
     uint8_t token[4];
 #endif
 } _block_ctx_t;
+
+/**
+ * @brief   Structure to track the state of an observation
+ */
+typedef struct {
+    /**
+     * @brief   Context needed to build notifications (e.g. Token, endpoint
+     *          to send to)
+     *
+     * @details To safe ROM, we reuse the separate response code to also
+     *          send notifications, as the functionality is almost identical.
+     */
+    nanocoap_server_response_ctx_t response;
+    /**
+     * @brief   The resource the client has subscribed to
+     *
+     * @details This is `NULL` when the slot is free
+     */
+    const coap_resource_t *resource;
+    /**
+     * @brief   Message ID used in the last notification
+     */
+    uint16_t msg_id;
+} _observer_t;
+
+#if MODULE_NANOCOAP_SERVER_OBSERVE
+static _observer_t _observer_pool[CONFIG_NANOCOAP_MAX_OBSERVERS];
+static mutex_t _observer_pool_lock;
+#endif
 
 int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                                const sock_udp_ep_t *remote, credman_tag_t tag)
@@ -195,6 +226,12 @@ static uint32_t _deadline_left_us(uint32_t deadline)
     return deadline - now;
 }
 
+static void _sock_flush(nanocoap_sock_t *sock)
+{
+    void *payload, *ctx = NULL;
+    while (_sock_recv_buf(sock, &payload, &ctx, 0) > 0 || ctx) {}
+}
+
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg)
 {
@@ -222,6 +259,9 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
         .iol_base = pkt->hdr,
         .iol_len  = coap_get_total_len(pkt),
     };
+
+    /* clear out stale responses from previous requests */
+    _sock_flush(sock);
 
     while (1) {
         switch (state) {
@@ -1075,28 +1115,49 @@ void auto_init_nanocoap_server(void)
     nanocoap_server_start(&local);
 }
 
-void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
-                                    coap_pkt_t *pkt, const coap_request_ctx_t *req)
+#if MODULE_NANOCOAP_SERVER_SEPARATE
+int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
+                                     coap_pkt_t *pkt, const coap_request_ctx_t *req)
 {
-    ctx->tkl = coap_get_token_len(pkt);
-    memcpy(ctx->token, coap_get_token(pkt), ctx->tkl);
+    size_t tkl = coap_get_token_len(pkt);
+    if (tkl > sizeof(ctx->token)) {
+        DEBUG_PUTS("nanocoap: token too long for separate response ctx");
+        /* Legacy code may not check the return value. To still have somewhat
+         * sane behavior, we ask for no response for any response class.
+         * Getting no reply is certainly not ideal, but better than one without
+         * a matching token. */
+        memset(ctx, 0, sizeof(*ctx));
+        ctx->no_response = 0xff;
+        return -EOVERFLOW;
+    }
+    ctx->tkl = tkl;
+    memcpy(ctx->token, coap_get_token(pkt), tkl);
     memcpy(&ctx->remote, req->remote, sizeof(ctx->remote));
-#ifdef MODULE_SOCK_AUX_LOCAL
     assert(req->local);
     memcpy(&ctx->local, req->local, sizeof(ctx->local));
-#endif
     uint32_t no_response = 0;
     coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response);
     ctx->no_response = no_response;
+
+    return 0;
 }
 
-int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
-                                unsigned code, unsigned type,
-                                const void *payload, size_t len)
+bool nanocoap_server_is_remote_in_response_ctx(const nanocoap_server_response_ctx_t *ctx,
+                                               const coap_request_ctx_t *req)
 {
-    uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+    return sock_udp_ep_equal(&ctx->remote, req->remote);
+}
+
+ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx,
+                                       void *buf, size_t buf_len,
+                                       unsigned code, unsigned type,
+                                       uint16_t msg_id)
+{
     assert(type != COAP_TYPE_ACK);
     assert(type != COAP_TYPE_CON); /* TODO: add support */
+    if ((sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1) > buf_len) {
+        return -EOVERFLOW;
+    }
 
     const uint8_t no_response_index = (code >> 5) - 1;
     /* If the handler code misbehaved here, we'd face UB otherwise */
@@ -1104,7 +1165,49 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
 
     const uint8_t mask = 1 << no_response_index;
     if (ctx->no_response & mask) {
-        return 0;
+        return -ECANCELED;
+    }
+
+    return coap_build_hdr(buf, type, ctx->token, ctx->tkl, code, msg_id);
+}
+
+int nanocoap_server_sendv_separate(const nanocoap_server_response_ctx_t *ctx,
+                                   const iolist_t *reply)
+{
+    sock_udp_aux_tx_t *aux_out_ptr = NULL;
+    /* make sure we reply with the same address that the request was
+     * destined for -- except in the multicast case */
+    sock_udp_aux_tx_t aux_out = {
+        .flags = SOCK_AUX_SET_LOCAL,
+        .local = ctx->local,
+    };
+    if (!sock_udp_ep_is_multicast(&ctx->local)) {
+        aux_out_ptr = &aux_out;
+    }
+    ssize_t retval = sock_udp_sendv_aux(NULL, reply, &ctx->remote, aux_out_ptr);
+
+    if (retval < 0) {
+        return retval;
+    }
+
+    return 0;
+}
+
+int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
+                                  unsigned code, unsigned type,
+                                  const void *payload, size_t len)
+{
+    uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+
+    ssize_t hdr_len = nanocoap_server_build_separate(ctx, rbuf, sizeof(rbuf),
+                                                     code, type, random_uint32());
+    if (hdr_len < 0) {
+        return hdr_len;
+    }
+
+    /* add payload marker if needed */
+    if (len) {
+        rbuf[hdr_len++] = 0xFF;
     }
 
     iolist_t data = {
@@ -1115,25 +1218,126 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
     iolist_t head = {
         .iol_next = &data,
         .iol_base = rbuf,
+        .iol_len = hdr_len,
     };
-    head.iol_len = coap_build_hdr((coap_hdr_t *)rbuf, type,
-                                  ctx->token, ctx->tkl,
-                                  code, random_uint32());
-    if (len) {
-        rbuf[head.iol_len++] = 0xFF;
+
+    return nanocoap_server_sendv_separate(ctx, &head);
+}
+#endif
+
+#if MODULE_NANOCOAP_SERVER_OBSERVE
+int nanocoap_register_observer(const coap_request_ctx_t *req_ctx, coap_pkt_t *req_pkt)
+{
+    mutex_lock(&_observer_pool_lock);
+
+    _observer_t *free = NULL;
+    const coap_resource_t *resource = req_ctx->resource;
+
+    for (size_t i = 0; i < CONFIG_NANOCOAP_MAX_OBSERVERS; i++) {
+        if (_observer_pool[i].resource == NULL) {
+            free = &_observer_pool[i];
+        }
+        if ((_observer_pool[i].resource == resource)
+                && sock_udp_ep_equal(&_observer_pool[i].response.remote,
+                                     coap_request_ctx_get_remote_udp(req_ctx)))
+        {
+            /* Deviation from the standard: Subscribing twice makes no
+             * sense with our CoAP implementation, so either this is a
+             * reaffirmation of an existing subscription (same token) or the
+             * client lost state (different token). We just update the
+             * subscription in either case */
+            DEBUG("nanocoap: observe slot %" PRIuSIZE " reused\n", i);
+            uint8_t tkl = coap_get_token_len(req_pkt);
+            _observer_pool[i].response.tkl = tkl;
+            memcpy(_observer_pool[i].response.token, coap_get_token(req_pkt), tkl);
+            mutex_unlock(&_observer_pool_lock);
+            return 0;
+        }
     }
 
-    sock_udp_aux_tx_t *aux_out_ptr = NULL;
-#ifdef MODULE_SOCK_AUX_LOCAL
-    /* make sure we reply with the same address that the request was
-     * destined for -- except in the multicast case */
-    sock_udp_aux_tx_t aux_out = {
-        .flags = SOCK_AUX_SET_LOCAL,
-        .local = ctx->local,
-    };
-    if (!sock_udp_ep_is_multicast(&ctx->local)) {
-        aux_out_ptr = &aux_out;
+    if (!free) {
+        DEBUG_PUTS("nanocoap: observe registration failed, no free slot");
+        mutex_unlock(&_observer_pool_lock);
+        return -ENOMEM;
     }
-#endif
-    return sock_udp_sendv_aux(NULL, &head, &ctx->remote, aux_out_ptr);
+
+    int retval = nanocoap_server_prepare_separate(&free->response, req_pkt, req_ctx);
+    if (retval) {
+        DEBUG("nanocoap: observe registration failed: %d\n", retval);
+        mutex_unlock(&_observer_pool_lock);
+        return retval;
+    }
+    free->resource = req_ctx->resource;
+    free->msg_id = random_uint32();
+    mutex_unlock(&_observer_pool_lock);
+    DEBUG("nanocoap: new observe registration at slot %" PRIuSIZE "\n",
+          index_of(_observer_pool, free));
+    return 0;
 }
+
+void nanocoap_unregister_observer(const coap_request_ctx_t *req_ctx,
+                                  const coap_pkt_t *req_pkt)
+{
+    mutex_lock(&_observer_pool_lock);
+    for (size_t i = 0; i < CONFIG_NANOCOAP_MAX_OBSERVERS; i++) {
+        if ((_observer_pool[i].resource == req_ctx->resource)
+                && (_observer_pool[i].response.tkl == coap_get_token_len(req_pkt))
+                && !memcmp(_observer_pool[i].response.token, coap_get_token(req_pkt),
+                           _observer_pool[i].response.tkl)
+                && sock_udp_ep_equal(&_observer_pool[i].response.remote, coap_request_ctx_get_remote_udp(req_ctx))) {
+            DEBUG("nanocoap: observer at index %" PRIuSIZE " unregistered\n", i);
+            _observer_pool[i].resource = NULL;
+        }
+    }
+    mutex_unlock(&_observer_pool_lock);
+}
+
+void nanocoap_unregister_observer_due_to_reset(const sock_udp_ep_t *ep,
+                                               uint16_t msg_id)
+{
+    mutex_lock(&_observer_pool_lock);
+    for (size_t i = 0; i < CONFIG_NANOCOAP_MAX_OBSERVERS; i++) {
+        if ((_observer_pool[i].resource != NULL)
+                && (_observer_pool[i].msg_id == msg_id)
+                && sock_udp_ep_equal(&_observer_pool[i].response.remote, ep)) {
+            DEBUG("nanocoap: observer at index %" PRIuSIZE " unregistered due to RST\n", i);
+            _observer_pool[i].resource = NULL;
+            return;
+        }
+    }
+    mutex_unlock(&_observer_pool_lock);
+}
+
+void nanocoap_notify_observers(const coap_resource_t *res, const iolist_t *iol)
+{
+    mutex_lock(&_observer_pool_lock);
+    for (size_t i = 0; i < CONFIG_NANOCOAP_MAX_OBSERVERS; i++) {
+        if (_observer_pool[i].resource == res) {
+            uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+
+            ssize_t hdr_len = nanocoap_server_build_separate(&_observer_pool[i].response, rbuf, sizeof(rbuf),
+                                                             COAP_CODE_CONTENT, COAP_TYPE_NON,
+                                                             ++_observer_pool[i].msg_id);
+            if (hdr_len < 0) {
+                /* no need to keep the observer in the pool, if we cannot
+                 * send anyway */
+                _observer_pool[i].resource = NULL;
+                continue;
+            }
+
+            const iolist_t msg = {
+                .iol_base = rbuf,
+                .iol_len = hdr_len,
+                .iol_next = (iolist_t *)iol
+            };
+
+            if (nanocoap_server_sendv_separate(&_observer_pool[i].response, &msg)) {
+                /* no need to keep the observer in the pool, if we cannot
+                 * send anyway */
+                _observer_pool[i].resource = NULL;
+            }
+        }
+    }
+    mutex_unlock(&_observer_pool_lock);
+}
+#endif

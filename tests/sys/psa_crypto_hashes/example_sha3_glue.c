@@ -20,6 +20,8 @@
 
 #include "psa/crypto.h"
 
+/* certain PSA backends require the data to be in RAM rather than ROM
+ * so these values cannot be `const` */
 static const uint8_t msg[] = "Hello World!";
 static const size_t msg_len = sizeof(msg)-1; // exclude NULL-byte
 

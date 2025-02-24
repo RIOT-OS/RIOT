@@ -33,7 +33,7 @@
  * pin can thus be described by its port/pin tuple. To access a pin, the
  * @p GPIO_PIN(port, pin) macro should be used. For example: If your platform has
  * a pin PB22, it will be port=1 and pin=22. The @p GPIO_PIN macro should be
- * overridden by a MCU, to allow for efficient encoding of the the port/pin tuple.
+ * overridden by a MCU, to allow for efficient encoding of the port/pin tuple.
  * For example, on many platforms it is possible to `OR` the pin number with the
  * corresponding ports base register address. This allows for efficient decoding
  * of pin number and base address without the need of any address lookup.

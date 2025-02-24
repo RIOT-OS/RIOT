@@ -17,7 +17,7 @@ flashed using OpenOCD.
 To flash this board, just use the following command:
 
 ```
-make BOARD=p-l496g-cell02 flash -C examples/hello-world
+make BOARD=p-l496g-cell02 flash -C examples/basic/hello-world
 ```
 
 ### STDIO
@@ -26,6 +26,6 @@ STDIO is available via the ST-Link programmer.
 
 Use the `term` target to open a terminal:
 
-    make BOARD=p-l496g-cell02 -C examples/hello-world term
+    make BOARD=p-l496g-cell02 -C examples/basic/hello-world term
 
  */

@@ -27,7 +27,7 @@
  *
  * Example on the command line:
  * ```
- * MP_RIOT_HEAPSIZE=2048 make -C examples/micropython
+ * MP_RIOT_HEAPSIZE=2048 make -C examples/lang_support/community/micropython
  * ```
  *
  * ## Implementation details
@@ -45,8 +45,8 @@
  *
  * Steps:
  *
- * 1. make -Cexamples/micropython flash
- * 2. cd examples/micropython/bin/pkg/${BOARD}/micropython
+ * 1. make -C examples/lang_support/community/micropython flash
+ * 2. cd examples/lang_support/community/micropython/bin/pkg/${BOARD}/micropython
  * 3. git apply ports/riot/slow_uart_writes.patch
  * 4. cd tests
  * 5. ./run-tests --target pyboard --device ${PORT}
@@ -82,6 +82,6 @@
  *
  * ## How to use
  *
- * See examples/micropython for example code.
+ * See examples/lang_support/community/micropython for example code.
  *
  */

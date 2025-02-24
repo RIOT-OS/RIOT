@@ -240,7 +240,7 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
     /* prepare the frame as expected by ESP32 */
     twai_hal_frame_t esp_frame = { };
 
-    esp_frame.dlc = frame->can_dlc;
+    esp_frame.dlc = frame->len;
     esp_frame.rtr = (frame->can_id & CAN_RTR_FLAG);
     esp_frame.frame_format = (frame->can_id & CAN_EFF_FLAG);
 
@@ -825,7 +825,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
                 }
                 frame.can_id |= esp_frame.rtr ? CAN_RTR_FLAG : 0;
                 frame.can_id |= esp_frame.frame_format ? CAN_EFF_FLAG : 0;
-                frame.can_dlc = esp_frame.dlc;
+                frame.len = esp_frame.dlc;
 
                 /* apply acceptance filters only if they are set */
                 unsigned f_id = 0;

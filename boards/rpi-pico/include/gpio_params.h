@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     boards_rpi_pico
+ * @ingroup     boards_rpi_pico_w
  * @{
  *
  * @file

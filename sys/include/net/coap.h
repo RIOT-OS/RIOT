@@ -519,6 +519,7 @@ typedef enum {
  */
 #define COAP_OBS_REGISTER        (0)
 #define COAP_OBS_DEREGISTER      (1)
+#define COAP_OBS_MAX_VALUE_MASK  (0xffffff) /**< observe value is 24 bits */
 /** @} */
 
 /**

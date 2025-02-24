@@ -119,14 +119,22 @@ static void _power_off(void)
 static bool _l2filter(uint8_t *mhr)
 {
     uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN];
+    uint8_t src_addr[IEEE802154_LONG_ADDRESS_LEN];
     le_uint16_t dst_pan;
+    le_uint16_t src_pan;
     uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
 
-    int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
+    int dst_addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
+
+    int src_addr_len = ieee802154_get_src(mhr, src_addr, &src_pan);
 
     if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
-        if ((memcmp(&nrf802154_pan_id, pan_bcast, 2) == 0)) {
-            return true;
+        if (src_addr_len == IEEE802154_SHORT_ADDRESS_LEN ||
+            src_addr_len == IEEE802154_LONG_ADDRESS_LEN){
+            if ((memcmp(&nrf802154_pan_id, src_pan.u8, 2) == 0) ||
+                (memcmp(&nrf802154_pan_id, pan_bcast, 2) == 0)) {
+                return true;
+            }
         }
     }
     /* filter PAN ID */
@@ -138,11 +146,11 @@ static bool _l2filter(uint8_t *mhr)
     }
 
     /* check destination address */
-    if (((addr_len == IEEE802154_SHORT_ADDRESS_LEN) &&
-          (memcmp(nrf802154_short_addr, dst_addr, addr_len) == 0 ||
-           memcmp(ieee802154_addr_bcast, dst_addr, addr_len) == 0)) ||
-        ((addr_len == IEEE802154_LONG_ADDRESS_LEN) &&
-          (memcmp(nrf802154_long_addr, dst_addr, addr_len) == 0))) {
+    if (((dst_addr_len == IEEE802154_SHORT_ADDRESS_LEN) &&
+          (memcmp(nrf802154_short_addr, dst_addr, dst_addr_len) == 0 ||
+           memcmp(ieee802154_addr_bcast, dst_addr, dst_addr_len) == 0)) ||
+        ((dst_addr_len == IEEE802154_LONG_ADDRESS_LEN) &&
+          (memcmp(nrf802154_long_addr, dst_addr, dst_addr_len) == 0))) {
         return true;
     }
 

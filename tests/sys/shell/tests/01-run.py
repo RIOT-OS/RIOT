@@ -6,28 +6,30 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import sys
+import json
 import os
+import sys
 from testrunner import run
 
 
-EXPECTED_HELP = (
-    'Command              Description',
-    '---------------------------------------',
-    'bufsize              Get the shell\'s buffer size',
-    'start_test           starts a test',
-    'end_test             ends a test',
-    'echo                 prints the input command',
-    'empty                print nothing on command',
-    'periodic             periodically print command',
-    'app_metadata         Returns application metadata',
-    'pm                   interact with layered PM subsystem',
-    'ps                   Prints information about running threads.',
-    'reboot               Reboot the node',
-    'version              Prints current RIOT_VERSION',
-    'xfa_test1            xfa test command 1',
-    'xfa_test2            xfa test command 2'
-)
+# This is the minimum subset of commands expected to be available on all
+# boards. The test will still pass if additional commands are present, as
+# `shell_cmds_default` may pull in board specific commands.
+EXPECTED_CMDS = {
+    'bufsize': 'Get the shell\'s buffer size',
+    'start_test': 'starts a test',
+    'end_test': 'ends a test',
+    'echo': 'prints the input command',
+    'empty': 'print nothing on command',
+    'periodic': 'periodically print command',
+    'app_metadata': 'Returns application metadata',
+    'pm': 'interact with layered PM subsystem',
+    'ps': 'Prints information about running threads.',
+    'reboot': 'Reboot the node',
+    'version': 'Prints current RIOT_VERSION',
+    'xfa_test1': 'xfa test command 1',
+    'xfa_test2': 'xfa test command 2',
+}
 
 EXPECTED_PS = (
     '\tpid | state    Q | pri',
@@ -83,7 +85,7 @@ CMDS = (
     ('echo escaped\\ space', '"echo""escaped space"'),
     ('echo escape within \'\\s\\i\\n\\g\\l\\e\\q\\u\\o\\t\\e\'', '"echo""escape""within""singlequote"'),
     ('echo escape within "\\d\\o\\u\\b\\l\\e\\q\\u\\o\\t\\e"', '"echo""escape""within""doublequote"'),
-    ("""echo "t\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),  # noqa: W605
+    ("""echo "t\\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),  # noqa: W605
 
     # test correct quoting
     ('echo "hello"world', '"echo""helloworld"'),
@@ -103,7 +105,6 @@ CMDS = (
 
     # test default commands
     ('ps', EXPECTED_PS),
-    ('help', EXPECTED_HELP),
 
     # test commands added to shell_commands_xfa
     ('xfa_test1', '[XFA TEST 1 OK]'),
@@ -149,6 +150,68 @@ def check_cmd(child, cmd, expected):
             child.expect(line)
         else:
             child.expect_exact(line)
+
+
+def check_help(child):
+    """
+    Runs the `help_json` and `help` command to check if the list of commands
+    and descriptions match and contain a list of expected commands.
+    """
+
+    # Run help_json to get the list of commands present
+    child.expect(PROMPT)
+    child.sendline('help_json')
+    # expect JSON object as response the covers the whole line
+    child.expect(r"(\{[^\n\r]*\})\r\n")
+
+    # use a set to track which expected commands were already covered
+    cmds_expected = set(EXPECTED_CMDS)
+
+    # record actually present commands (which may be more than the expected
+    # ones) and their descriptions in here
+    cmds_actual = set()
+    desc_actual = {}
+
+    # parse the commands and iterate over the list
+    cmdlist = json.loads(child.match.group(1))["cmds"]
+    for item in cmdlist:
+        # for expected commands, validate the description and ensure they
+        # are listed exactly once
+        if item['cmd'] in EXPECTED_CMDS:
+            assert item['cmd'] in cmds_expected, f"command {item['cmd']} listed twice"
+            assert item['desc'] == EXPECTED_CMDS[item['cmd']], f"description of {item['cmd']} not expected"
+            cmds_expected.remove(item['cmd'])
+
+        # populate the list of actually present commands and their description
+        cmds_actual.add(item['cmd'])
+        desc_actual[item['cmd']] = item['desc']
+
+    assert len(cmds_expected) == 0, f"commands {cmds_expected} missing"
+
+    # Now: Run regular help and expect the same commands as help_json
+    child.expect(PROMPT)
+    child.sendline('help')
+
+    # expect the header first
+    child.expect_exact('Command              Description\r\n')
+    child.expect_exact('---------------------------------------\r\n')
+
+    # loop until the set of actually present commands assembled from the JSON
+    # is empty. We remove each command from the set when we process it, so that
+    # we can detect duplicates
+    while len(cmds_actual) > 0:
+        # parse line into command and description
+        child.expect(r"([a-z0-9_-]*)[ \t]*([^\r\n]*)\r\n")
+        cmd = child.match.group(1)
+        desc = child.match.group(2)
+
+        # expect the command to be in the set got from the JSON. Then remove
+        # it, so that a duplicated line would trigger the assert
+        assert cmd in cmds_actual, f"Command \"{cmd}\" unexpected or listed twice in help"
+        cmds_actual.remove(cmd)
+
+        # description should match the one got from JSON
+        assert desc == desc_actual[cmd], f"Description for \"{cmd}\" not matching"
 
 
 def check_startup(child):
@@ -246,6 +309,8 @@ def testfunc(child):
             continue
 
         check_cmd(child, cmd, expected)
+
+    check_help(child)
 
     if RIOT_TERMINAL in CLEANTERMS:
         for cmd, expected in CMDS_CLEANTERM:

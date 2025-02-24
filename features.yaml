@@ -246,6 +246,10 @@ groups:
           features:
           - name: cpu_sam3
             help: The MCU has an Atmel/Microchip SAM 3 CPU
+        - title: SAM4S Grouping
+          features:
+          - name: cpu_sam4s
+            help: The MCU has an Atmel/Microchip SAM 4S CPU
 
       - title: GigaDevice Semiconductor Inc Grouping
         features:
@@ -796,6 +800,8 @@ groups:
   - title: Platform Specific
     help: Things specific to a single MCU family / MCU vendor
     features:
+    - name: board_bat_voltage
+      help: Measures battery voltage based on ADC sampling.
     - name: periph_ics
       help: An NXP Kinetis Internal Clock Source Controller (ICS peripheral) is
             present.

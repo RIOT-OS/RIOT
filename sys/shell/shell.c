@@ -36,7 +36,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "kernel_defines.h"
 #include "xfa.h"
 #include "shell.h"
 #include "shell_lock.h"
@@ -47,7 +46,7 @@
 #endif
 
 /* define shell command cross file array */
-XFA_INIT_CONST(shell_command_xfa_t*, shell_commands_xfa);
+XFA_INIT_CONST(shell_command_xfa_t, shell_commands_xfa_v2);
 
 #define ETX '\x03'  /** ASCII "End-of-Text", or Ctrl-C */
 #define EOT '\x04'  /** ASCII "End-of-Transmission", or Ctrl-D */
@@ -102,10 +101,10 @@ static shell_command_handler_t search_commands(const shell_command_t *entry,
 
 static shell_command_handler_t search_commands_xfa(char *command)
 {
-    unsigned n = XFA_LEN(shell_command_t*, shell_commands_xfa);
+    unsigned n = XFA_LEN(shell_command_t, shell_commands_xfa_v2);
 
     for (unsigned i = 0; i < n; i++) {
-        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        const volatile shell_command_xfa_t *entry = &shell_commands_xfa_v2[i];
         if (flash_strcmp(command, entry->name) == 0) {
             return entry->handler;
         }
@@ -129,6 +128,38 @@ static shell_command_handler_t find_handler(
     return handler;
 }
 
+static void print_commands_json(const shell_command_t *cmd_list)
+{
+    bool first = true;
+
+    printf("{\"cmds\": [");
+
+    if (cmd_list) {
+        for (const shell_command_t *entry = cmd_list; entry->name != NULL; entry++) {
+            if (first) {
+                first = false;
+            }
+            else {
+                printf(", ");
+            }
+            printf("{\"cmd\": \"%s\", \"desc\": \"%s\"}", entry->name, entry->desc);
+        }
+    }
+
+    unsigned n = XFA_LEN(shell_command_xfa_t, shell_commands_xfa_v2);
+    for (unsigned i = 0; i < n; i++) {
+        if (first) {
+            first = false;
+        }
+        else {
+            printf(", ");
+        }
+        const volatile shell_command_xfa_t *entry = &shell_commands_xfa_v2[i];
+        printf("{\"cmd\": \"%s\", \"desc\": \"%s\"}", entry->name, entry->desc);
+    }
+    puts("]}");
+}
+
 static void print_commands(const shell_command_t *entry)
 {
     for (; entry->name != NULL; entry++) {
@@ -138,9 +169,9 @@ static void print_commands(const shell_command_t *entry)
 
 static void print_commands_xfa(void)
 {
-    unsigned n = XFA_LEN(shell_command_xfa_t*, shell_commands_xfa);
+    unsigned n = XFA_LEN(shell_command_xfa_t, shell_commands_xfa_v2);
     for (unsigned i = 0; i < n; i++) {
-        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        const volatile shell_command_xfa_t *entry = &shell_commands_xfa_v2[i];
         printf("%-20" PRIsflash " %" PRIsflash "\n",
                      entry->name, entry->desc);
     }
@@ -342,6 +373,10 @@ int shell_handle_input_line(const shell_command_t *command_list, char *line)
         if (strcmp("help", argv[0]) == 0) {
             print_help(command_list);
             return 0;
+        }
+        else if (IS_USED(MODULE_SHELL_BUILTIN_CMD_HELP_JSON)
+                 && !strcmp("help_json", argv[0])) {
+            print_commands_json(command_list);
         }
         else {
             printf("shell: command not found: %s\n", argv[0]);

@@ -71,26 +71,16 @@ jobs:
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
-    - name: Fetch host key from IoT-LAB saclay site
+    - name: Fetch host keys from IoT-LAB sites
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      run: |
-        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        ssh -oStrictHostKeyChecking=accept-new \
-          ${IOTLAB_USER}@saclay.iot-lab.info exit
-    - name: Fetch host key from IoT-LAB lille site
-      # Not being used in the most recent release specs but kept in for
+      # lille and saclay are not being used in the most recent release specs but kept in for
       # backwords compatibility
-      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
       run: |
         IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        ssh -oStrictHostKeyChecking=accept-new \
-          ${IOTLAB_USER}@lille.iot-lab.info exit
-    - name: Fetch host key from IoT-LAB strasbourg site
-      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      run: |
-        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        ssh -oStrictHostKeyChecking=accept-new \
-          ${IOTLAB_USER}@strasbourg.iot-lab.info exit
+        for site in grenoble saclay lille strasbourg; do
+          ssh -oStrictHostKeyChecking=accept-new \
+            "${IOTLAB_USER}@${site}.iot-lab.info" exit
+        done
     - name: Checkout Release-Specs
       uses: actions/checkout@main
       with:
@@ -184,5 +174,5 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: Test Reports
+        name: Test-Reports-${{ matrix.pytest_mark }}
         path: test-reports/*

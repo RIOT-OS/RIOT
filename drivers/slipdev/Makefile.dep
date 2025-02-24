@@ -1,6 +1,6 @@
 USEMODULE += chunked_ringbuffer
 USEMODULE += eui_provider
-USEMODULE += netdev_legacy_api
+USEMODULE += netdev_new_api
 USEMODULE += netdev_register
 FEATURES_REQUIRED += periph_uart
 

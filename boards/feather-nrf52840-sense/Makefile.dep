@@ -4,6 +4,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lis3mdl
   USEMODULE += lsm6dsxx
   USEMODULE += saul_gpio
+  USEMODULE += saul_bat_voltage
   USEMODULE += sht3x
   USEMODULE += ws281x
 endif

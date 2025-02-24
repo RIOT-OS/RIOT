@@ -1185,6 +1185,71 @@ static void test_nanocoap__token_length_ext_269(void)
     TEST_ASSERT_EQUAL_INT(14, hdr->ver_t_tkl & 0xf);
 }
 
+/*
+ * Test that a RST message can be generated and parsed
+ */
+static void test_nanocoap___rst_message(void)
+{
+    static const uint8_t rst_expected[4] = {
+        0x70, /* Version = 0b01, Type = 0b11 (RST), Token Length = 0b0000 */
+        0x00, /* Code = 0x00 */
+        0x13, 0x37 /* Message ID = 0x1337 */
+    };
+
+    uint8_t buf[16];
+    /* trivial case: build a reset message */
+    memset(buf, 0x55, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(rst_expected),
+                          coap_build_hdr((void *)buf, COAP_TYPE_RST, NULL, 0,
+                                         0, 0x1337));
+    TEST_ASSERT(0 == memcmp(rst_expected, buf, sizeof(rst_expected)));
+    /* did it write past the expected bytes? */
+    TEST_ASSERT_EQUAL_INT(0x55, buf[sizeof(rst_expected)]);
+
+    /* now check that parsing it back works */
+    coap_pkt_t pkt;
+    TEST_ASSERT_EQUAL_INT(0, coap_parse(&pkt, buf, sizeof(rst_expected)));
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_RST, coap_get_type(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, coap_get_code_raw(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, coap_get_token_len(&pkt));
+
+    /* now check that generating a RST reply works */
+    static uint8_t con_request[8] = {
+        0x44, /* Version = 0b01, Type = 0b00 (CON), Token Length = 0b0100 */
+        0x01, /* Code = 0.01 (GET) */
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xde, 0xed, 0xbe, 0xef, /* Token = 0xdeadbeef */
+    };
+    memset(buf, 0x55, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(0, coap_parse(&pkt, con_request, sizeof(con_request)));
+    TEST_ASSERT_EQUAL_INT(sizeof(rst_expected), coap_build_reply(&pkt, 0, buf, sizeof(buf), 0));
+    TEST_ASSERT(0 == memcmp(rst_expected, buf, sizeof(rst_expected)));
+    TEST_ASSERT_EQUAL_INT(0x55, buf[sizeof(rst_expected)]);
+}
+
+/*
+ * Test that invalid encoding of CoAP option is caught early, so that
+ * later access to CoAP option does indeed not need to perform bound
+ * checking.
+ */
+static void test_nanocoap__out_of_bounds_option(void)
+{
+    uint8_t invalid_msg[] = {
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3, /* version = 1, type = CON, Token Len = 3 */
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 8 */
+        (COAP_OPT_URI_PATH << 4) | (8),
+        0x13, 0x37, 0x42, 0x42 /* 4 bytes Option Data */
+        /* End of packet - 4 bytes before the claimed end of option */
+    };
+
+    coap_pkt_t pkt;
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse(&pkt, invalid_msg, sizeof(invalid_msg)));
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1223,6 +1288,8 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__token_length_over_limit),
         new_TestFixture(test_nanocoap__token_length_ext_16),
         new_TestFixture(test_nanocoap__token_length_ext_269),
+        new_TestFixture(test_nanocoap___rst_message),
+        new_TestFixture(test_nanocoap__out_of_bounds_option),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);

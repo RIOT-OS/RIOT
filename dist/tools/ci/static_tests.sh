@@ -129,6 +129,8 @@ run ./dist/tools/feature_resolution/check.sh
 run ./dist/tools/boards_supported/check.sh
 run ./dist/tools/codespell/check.sh
 run ./dist/tools/cargo-checks/check.sh
+run ./dist/tools/examples_check/check_has_readme.sh
+run ./dist/tools/examples_check/check_in_readme.sh
 if [ -z "${GITHUB_RUN_ID}" ]; then
     run ./dist/tools/uncrustify/uncrustify.sh --check
 else

@@ -19,7 +19,6 @@ BOARD_BLACKLIST += \
                    stm32f429i-disco \
                    stm32f4discovery \
                    thingy52 \
-                   waspmote-pro  \
                    weact-f401cc \
                    weact-f401ce \
                    weact-f411ce \

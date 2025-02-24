@@ -207,7 +207,7 @@ Building and executing an example           {#building-and-executing-an-example}
 ---------------------------------
 RIOT provides a number of examples in the `examples/` directory. Every example
 has a README that documents its usage and its purpose. You can build them by
-opening a shell, navigating to an example (e.g. `examples/default`), and
+opening a shell, navigating to an example (e.g. `examples/basic/default`), and
 running:
 
 ~~~~~~~~ {.sh}
@@ -258,7 +258,7 @@ the `dist/tools/pyterm/` directory. If you choose to use another terminal
 program you can set `TERMPROG` (and if need be the `TERMFLAGS`) macros:
 
 ~~~~~~~~ {.sh}
-make -C examples/gnrc_networking/ term \
+make -C examples/networking/gnrc/gnrc_networking/ term \
     BOARD=samr21-xpro \
     TERMPROG=gtkterm \
     TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
@@ -335,7 +335,7 @@ Usage
 
 The RIOT build system provides support for using the Docker container to build RIOT projects, so you do not need to type the long docker command line every time:
 
-(**from the directory you would normally run make, e.g. examples/default**)
+(**from the directory you would normally run make, e.g. examples/basic/default**)
 
 ```console
 $ make BUILD_IN_DOCKER=1
@@ -403,4 +403,4 @@ To create a bridge and two (or `count` at your option) tap interfaces:
     sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
 ~~~~~~~
 
-A detailed example can be found in `examples/gnrc_networking`.
+A detailed example can be found in `examples/networking/gnrc/gnrc_networking`.

@@ -287,6 +287,34 @@ Author(s):
 Reason for removal:
 - Hardware not available so can't be tested
 
+### boards/waspmote-pro [2b8a0d48940517f7df4e78c7a0b16024f46a8694]
+Author(s):
+- Hinnerk van Bruinehsen
+- Kaspar Schleiser <kaspar@schleiser.de>
+- Francisco Acosta
+- J. David Ibáñez <jdavid.ibp@gmail.com>
+
+Reason for removal:
+- This board is sold only B2B, so that our community members from the
+DIY/hobbyist community and academia do not have access to the board. Our
+community members from the industry mostly develop their own hardware and,
+therefore, have no interest in supporting this board. As result, none of the
+RIOT core contributors has access to the hardware, preventing us from doing the
+necessary testing for maintaining this board.
+
+### boards/nrf6310 [4953ba8e6759d2b1a1a1ea497a4ad1e71489195a]
+Author(s):
+- Christian Kühling <kuehling@zedat.fu-berlin.de>
+- Timo Ziegler <timo.ziegler@fu-berlin.de>
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+
+Reason for removal:
+- this was an early development board by Nordic which was discontinued
+ (successor: `nrf51dk`)
+- also for a `BLE DEVKIT.N` board from Mommosoft, which was discontinued as well
+- no hardware available anymore for testing, many exclusions from CI
+
+[6cad5d24771ba6199228351a11b5062cd2e9b36d]: https://github.com/RIOT-OS/RIOT/commit/6cad5d24771ba6199228351a11b5062cd2e9b36d
 [d83d08f0995a88f399e70a7d07b44dd780082436]: https://github.com/RIOT-OS/RIOT/commit/d83d08f0995a88f399e70a7d07b44dd780082436
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
@@ -317,3 +345,5 @@ Reason for removal:
 [cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9]: https://github.com/RIOT-OS/RIOT/commit/cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9
 [fe941ac9fe3f81c0f08ff3b8564cf439639abcda]: https://github.com/RIOT-OS/RIOT/commit/fe941ac9fe3f81c0f08ff3b8564cf439639abcda
 [81458c8eed8949c686d5ded652dbee10748e860b]: https://github.com/RIOT-OS/RIOT/commit/81458c8eed8949c686d5ded652dbee10748e860b
+[2b8a0d48940517f7df4e78c7a0b16024f46a8694]: https://github.com/RIOT-OS/RIOT/commit/2b8a0d48940517f7df4e78c7a0b16024f46a8694
+[4953ba8e6759d2b1a1a1ea497a4ad1e71489195a]: https://github.com/RIOT-OS/RIOT/commit/4953ba8e6759d2b1a1a1ea497a4ad1e71489195a

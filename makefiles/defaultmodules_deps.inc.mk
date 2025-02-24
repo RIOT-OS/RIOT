@@ -22,6 +22,13 @@ ifneq (,$(filter auto_init_libcose_crypt,$(USEMODULE)))
   USEMODULE += libcose_crypt_init
 endif
 
+ifneq (,$(filter random,$(USEMODULE)))
+  # select default prng if no prng is selected
+  ifeq (,$(filter prng_%,$(USEMODULE)))
+    USEMODULE += prng_musl_lcg
+  endif
+endif
+
 ifneq (,$(filter xtimer,$(USEMODULE)))
   ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     USEMODULE += div

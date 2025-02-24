@@ -66,6 +66,23 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Enable use-after-free/out of bounds write detection in gnrc_pktbuf
+ */
+#ifndef CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE
+#define CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE (0)
+#endif
+
+/**
+ * @brief   Canary value for free pktbuf memory when
+ *          @see CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE is enabled.
+ *
+ *          Unallocated pktbuf memory is filled with this value and overwritten
+ *          with `~GNRC_PKTBUF_CANARY` when handed out.
+ *          This way we can try to detect when unallocated memory was used.
+ */
+#define GNRC_PKTBUF_CANARY          (0x55)
+
+/**
  * @brief   Initializes packet buffer module.
  */
 void gnrc_pktbuf_init(void);

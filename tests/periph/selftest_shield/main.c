@@ -55,10 +55,14 @@
 /* In order to run the periph_uart test all of the following needs to be true:
  * - periph_uart needs to be used
  * - an I/O mapping for the UART at D0/D1 needs to be provided
- * - this UART dev is not busy with stdio
+ * - this UART dev is not busy with stdio (either not using `stdio_uart` or a different UART is used for stdio)
  */
 #if defined(ARDUINO_UART_D0D1) && defined(MODULE_PERIPH_UART)
-#  define ENABLE_UART_TEST (STDIO_UART_DEV != ARDUINO_UART_D0D1)
+#  if MODULE_STDIO_UART
+#    define ENABLE_UART_TEST (STDIO_UART_DEV != ARDUINO_UART_D0D1)
+#  else
+#    define ENABLE_UART_TEST 1
+#  endif
 #  define UART_TEST_DEV ARDUINO_UART_D0D1
 #else
 #  define ENABLE_UART_TEST 0
@@ -554,6 +558,9 @@ static bool periph_gpio_irq_test_falling(void)
     brief_delay();
     failed |= TEST(atomic_load(&cnt) == 3);
 
+    /* disable IRQ again to not have side effects */
+    gpio_irq_disable(ARDUINO_PIN_3);
+
     print_result(failed);
     return failed;
 }
@@ -616,6 +623,9 @@ static bool periph_gpio_irq_test_rising(void)
     gpio_set(ARDUINO_PIN_4);
     brief_delay();
     failed |= TEST(atomic_load(&cnt) == 3);
+
+    /* disable IRQ again to not have side effects */
+    gpio_irq_disable(ARDUINO_PIN_3);
 
     print_result(failed);
     return failed;
@@ -731,7 +741,7 @@ static void uart_rx_cb(void *arg, uint8_t data)
     serial_buf.pos++;
 }
 
-static bool periph_uart_rxtx_test(uint32_t symbolrate)
+static bool periph_uart_rxtx_test(uint32_t symbolrate, uint32_t timer_freq)
 {
     bool failed = 0;
     uint16_t duration_ticks = 0;
@@ -742,7 +752,7 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate)
     ASSERT_NO_ERROR(uart_init(UART_TEST_DEV, symbolrate, uart_rx_cb, NULL));
 
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        bit_ticks = TIMER_FREQ_UART_TEST / symbolrate;
+        bit_ticks = timer_freq / symbolrate;
         duration_ticks = 9ULL * sizeof(testdata) * bit_ticks;
     }
 
@@ -784,23 +794,26 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate)
     failed |= TEST(memcmp(testdata, serial_buf.data, sizeof(serial_buf.data)) == 0);
     failed |= TEST(serial_buf.pos == sizeof(testdata));
 
+    /* disable UART again, in case it is a shared peripheral */
+    uart_poweroff(UART_TEST_DEV);
+
     return failed;
 }
 
-static bool periph_uart_test_slow(void)
+static bool periph_uart_test_slow(uint32_t timer_freq)
 {
     bool failed = false;
     print_start("UART", "slow");
-    failed |= periph_uart_rxtx_test(9600);
+    failed |= periph_uart_rxtx_test(9600, timer_freq);
     print_result(failed);
     return failed;
 }
 
-static bool periph_uart_test_fast(void)
+static bool periph_uart_test_fast(uint32_t timer_freq)
 {
     bool failed = false;
     print_start("UART", "fast");
-    failed |= periph_uart_rxtx_test(115200);
+    failed |= periph_uart_rxtx_test(115200, timer_freq);
     print_result(failed);
     return failed;
 }
@@ -809,19 +822,35 @@ static bool periph_uart_test(void)
 {
     bool failed = false;
 
+    uint32_t timer_freq = TIMER_FREQ_UART_TEST;
+
+    /* Select a frequency >= TIMER_FREQ_UART_TEST that is closest to it. If no
+     * such exists, select the highest supported frequency instead. */
+    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        timer_freq = timer_query_freqs(TIMER, 0);
+        for (uword_t i = 0; i < timer_query_freqs_numof(TIMER); i++) {
+            uint32_t tmp = timer_query_freqs(TIMER, i);
+            if (tmp < TIMER_FREQ_UART_TEST) {
+                break;
+            }
+            timer_freq = tmp;
+        }
+    }
+
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        ASSERT_NO_ERROR(timer_init(TIMER, TIMER_FREQ_UART_TEST, NULL, NULL));
+        ASSERT_NO_ERROR(timer_init(TIMER, timer_freq, NULL, NULL));
         timer_start(TIMER);
     }
 
-    failed |= periph_uart_test_slow();
-    failed |= periph_uart_test_fast();
+    failed |= periph_uart_test_slow(timer_freq);
+    failed |= periph_uart_test_fast(timer_freq);
     return failed;
 }
 
 static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
                                  uint32_t clk_hz, gpio_t clk_check, bool idle_level,
-                                 const char *test_in_detail)
+                                 const char *test_in_detail,
+                                 uint32_t timer_freq)
 {
     (void)test_in_detail;
     bool failed = false;
@@ -831,7 +860,7 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
     memset(&serial_buf, 0, sizeof(serial_buf));
 
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        byte_transfer_ticks = 8ULL * TIMER_FREQ_SPI_TEST / clk_hz;
+        byte_transfer_ticks = 8ULL * timer_freq / clk_hz;
     }
 
     /* D10 is C̅S̅, D7 is connected to C̅S̅ */
@@ -917,8 +946,24 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
 
 static bool periph_spi_test(void)
 {
+
+    uint32_t timer_freq = TIMER_FREQ_SPI_TEST;
+
+    /* Select a frequency >= TIMER_FREQ_SPI_TEST that is closest to it. If no
+     * such exists, select the highest supported frequency instead. */
+    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        timer_freq = timer_query_freqs(TIMER, 0);
+        for (uword_t i = 0; i < timer_query_freqs_numof(TIMER); i++) {
+            uint32_t tmp = timer_query_freqs(TIMER, i);
+            if (tmp < TIMER_FREQ_SPI_TEST) {
+                break;
+            }
+            timer_freq = tmp;
+        }
+    }
+
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        ASSERT_NO_ERROR(timer_init(TIMER, TIMER_FREQ_SPI_TEST, NULL, NULL));
+        ASSERT_NO_ERROR(timer_init(TIMER, timer_freq, NULL, NULL));
         timer_start(TIMER);
     }
 
@@ -943,10 +988,10 @@ static bool periph_spi_test(void)
             if (DETAILED_OUTPUT) {
                 printf("SPI CLK %" PRIu32 " Hz\n", clk_hz);
             }
-            failed |= periph_spi_rxtx_test(bus, SPI_MODE_0, clk, clk_hz, clk_check, false, "mode 0");
-            failed |= periph_spi_rxtx_test(bus, SPI_MODE_1, clk, clk_hz, clk_check, false, "mode 1");
-            failed |= periph_spi_rxtx_test(bus, SPI_MODE_2, clk, clk_hz, clk_check, true, "mode 2");
-            failed |= periph_spi_rxtx_test(bus, SPI_MODE_3, clk, clk_hz, clk_check, true, "mode 3");
+            failed |= periph_spi_rxtx_test(bus, SPI_MODE_0, clk, clk_hz, clk_check, false, "mode 0", timer_freq);
+            failed |= periph_spi_rxtx_test(bus, SPI_MODE_1, clk, clk_hz, clk_check, false, "mode 1", timer_freq);
+            failed |= periph_spi_rxtx_test(bus, SPI_MODE_2, clk, clk_hz, clk_check, true, "mode 2", timer_freq);
+            failed |= periph_spi_rxtx_test(bus, SPI_MODE_3, clk, clk_hz, clk_check, true, "mode 3", timer_freq);
         }
     }
     return failed;

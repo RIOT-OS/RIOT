@@ -146,7 +146,7 @@
  *
  * DTLS Client and Server Example
  * DTLS example over GNRC UDP/IP stack.
- * See documentation in `examples/dtls-wolfssl/README.md`
+ * See documentation in `examples/networking/dtls/dtls-wolfssl/README.md`
  *
  * QUESTIONS / CONCERNS / FEEDBACK:
  *

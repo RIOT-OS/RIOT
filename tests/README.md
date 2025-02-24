@@ -127,7 +127,8 @@ As some board can't be reset without a manual trigger tests should be implemente
 with some kind of `synchronization`. This can be done in two ways:
 
 - use `test_utils_interactive_sync` when uart input/output does not need to be
-  disabled for the test. This is enabled by default.
+  disabled for the test. This is enabled by default, except for `native` and
+  `native64`.
 - set up the test in a loop so the test script will be able so sync with some kind
   of start condition in the test.
 

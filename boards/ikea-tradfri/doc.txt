@@ -90,7 +90,7 @@ Pin 1 is on the top-left side with only 6 contacts.
 |                  | SPI        | partially | Only master mode                                               |
 |                  | Timer      | yes       |                                                                |
 |                  | UART       | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
-| SPI NOR Flash    | IS25LQ020B | yes       | 2MBit flash. Can be used with the the MTD API.                 |
+| SPI NOR Flash    | IS25LQ020B | yes       | 2MBit flash. Can be used with the MTD API.                     |
 
 ## Board configuration
 

@@ -34,8 +34,9 @@
  * low-power mode to save energy.
  *
  * The SPI unit's initialization is split into 3 parts:
- * 1. `spi_init()` should be called once for each SPI unit defined by a board
- *    during system initialization.
+ * 1. The SPI buses are automatically initialized during boot according to the
+ *    specification in board's `periph_conf.h`. (The exact format depends on the
+ *    MCU used.) See @ref spi_init for details.
  * 2. `spi_init_cs()` should be called during device driver initialization, as
  *    each chip select pin/line is used uniquely by a specific device, i.e. chip
  *    select lines are no shared resource.
@@ -198,14 +199,17 @@ typedef enum {
  * MISO, MOSI, and CLK pins. After initialization, the given device should be
  * in power down state.
  *
- * This function is intended to be called by the board initialization code
- * during system startup to prepare the (shared) SPI device for further usage.
- * It uses the board specific initialization parameters as defined in the
- * board's `periph_conf.h`.
+ * This function is called internally during system startup to prepare the
+ * (shared) SPI device for further usage. It uses the board specific
+ * initialization parameters as defined in the board's `periph_conf.h`.
  *
  * Errors (e.g. invalid @p bus parameter) are not signaled through a return
  * value, but should be signaled using the assert() function internally.
  *
+ * @warning     This function **MUST NOT** be called by the user unless you add
+ *              `DISABLE_MODULE += periph_init_spi` to your `Makefile`. If you
+ *              do so, call this function before any call to `spi_acquire()`,
+ *              and call no more than **once**.
  * @note    This function MUST not be called more than once per bus!
  *
  * @param[in] bus       SPI device to initialize

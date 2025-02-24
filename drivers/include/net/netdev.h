@@ -238,6 +238,7 @@ typedef enum {
     NETDEV_EVENT_RX_COMPLETE,               /**< finished receiving a frame */
     NETDEV_EVENT_TX_STARTED,                /**< started to transfer a frame */
     NETDEV_EVENT_TX_COMPLETE,               /**< transfer frame complete */
+#if IS_USED(MODULE_NETDEV_LEGACY_API) || DOXYGEN
     /**
      * @brief   transfer frame complete and data pending flag
      *
@@ -261,6 +262,7 @@ typedef enum {
      *              `-EBUSY` in netdev_driver_t::confirm_send.
      */
     NETDEV_EVENT_TX_MEDIUM_BUSY,
+#endif
     NETDEV_EVENT_LINK_UP,                   /**< link established */
     NETDEV_EVENT_LINK_DOWN,                 /**< link gone */
     NETDEV_EVENT_TX_TIMEOUT,                /**< timeout when sending */
@@ -438,13 +440,19 @@ typedef struct netdev_driver {
      * @retval  -ENETDOWN   Device is powered down
      * @retval  <0          Other error
      * @retval  0           Transmission successfully started
-     * @retval  >0          Number of bytes transmitted (deprecated!)
+     * @retval  >0          Number of bytes transmitted (transmission already complete)
      *
      * This function will cause the driver to start the transmission in an
      * async fashion. The driver will "own" the `iolist` until a subsequent
      * call to @ref netdev_driver_t::confirm_send returns something different
      * than `-EAGAIN`. The driver must signal completion using the
      * NETDEV_EVENT_TX_COMPLETE event, regardless of success or failure.
+     *
+     * If the driver implements blocking send (e.g. because it writes out the
+     * frame byte-by-byte over a serial line) it can also return the number of bytes
+     * transmitted here directly. In this case it MUST NOT emit a NETDEV_EVENT_TX_COMPLETE
+     * event, netdev_driver_t::confirm_send will never be called but should still be
+     * implemented to signal conformance to the new API.
      *
      * Old drivers might not be ported to the new API and have
      * netdev_driver_t::confirm_send set to `NULL`. In that case the driver
@@ -468,10 +476,12 @@ typedef struct netdev_driver {
      *          frame delimiters, etc. May be an estimate for performance
      *          reasons.)
      * @retval  -EAGAIN     Transmission still ongoing. (Call later again!)
-     * @retval  -ECOMM      Any kind of transmission error, such as collision
-     *                      detected, layer 2 ACK timeout, etc.
+     * @retval  -EHOSTUNREACH  Layer 2 ACK timeout
+     * @retval  -EBUSY      Medium is busy. (E.g. Auto-CCA failed / timed out,
+     *                      collision detected)
+     * @retval  -ENETDOWN   Interface is not connected / powered down
+     * @retval  -EIO        Any kind of transmission error
      *                      Use @p info for more details
-     * @retval  -EBUSY      Medium is busy. (E.g. Auto-CCA failed / timed out)
      * @retval  <0          Other error. (Please use a negative errno code.)
      *
      * @warning After netdev_driver_t::send was called and returned zero, this

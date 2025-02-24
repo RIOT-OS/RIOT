@@ -56,7 +56,7 @@ extern "C"
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the the bitfield, in bits
+ * @param[in]  width Width of the bitfield, in bits
  *
  * @return   bitfield address as an uintptr_t
  */
@@ -76,7 +76,7 @@ static inline volatile void *bme_bf_addr(volatile void *ptr, uintptr_t bit, uint
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the the bitfield, in bits
+ * @param[in]  width Width of the bitfield, in bits
  *
  * @return bitfield extracted as a (modifiable) lvalue
  */
@@ -96,7 +96,7 @@ static inline volatile uint32_t *bme_bitfield32(volatile uint32_t *ptr, uint8_t 
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the the bitfield, in bits
+ * @param[in]  width Width of the bitfield, in bits
  *
  * @return bitfield extracted as a (modifiable) lvalue
  */
@@ -116,7 +116,7 @@ static inline volatile uint16_t *bme_bitfield16(volatile uint16_t *ptr, uint8_t 
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the the bitfield, in bits
+ * @param[in]  width Width of the bitfield, in bits
  *
  * @return bitfield extracted as a (modifiable) lvalue
  */

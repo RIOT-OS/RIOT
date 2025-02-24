@@ -412,8 +412,10 @@ void cc2538_irq_handler(void)
 
     if (flags_f0 & RXPKTDONE) {
         handled_f0 |= RXPKTDONE;
-        /* CRC check */
-        uint8_t pkt_len = rfcore_peek_rx_fifo(0);
+        /* CRC_OK bit is located in the last byte of the packet.
+         * The radio masks the length byte before filling the FIFO with the
+         * corresponding number of bytes. */
+        uint8_t pkt_len = (rfcore_peek_rx_fifo(0) & CC2538_LENGTH_BYTE_MASK);
         if (rfcore_peek_rx_fifo(pkt_len) & CC2538_CRC_BIT_MASK) {
             /* Disable RX while the frame has not been processed */
             _disable_rx();

@@ -281,7 +281,7 @@ uword_t timer_query_channel_numof(tim_t dev);
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
  * uint32_t freq:
- * for (uword_t i; (freq = timer_query_freqs(dev, i)); i++) {
+ * for (uword_t i = 0; (freq = timer_query_freqs(dev, i)); i++) {
  *     work_with_frequency(freq);
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -289,7 +289,7 @@ uword_t timer_query_channel_numof(tim_t dev);
  * Or alternatively:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * for (uword_t i; i < timer_query_freqs_numof(dev); i++) {
+ * for (uword_t i = 0; i < timer_query_freqs_numof(dev); i++) {
  *     work_with_frequency(timer_query_freqs(dev, i));
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

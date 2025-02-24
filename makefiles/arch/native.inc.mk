@@ -72,7 +72,7 @@ LINKFLAGS += -T$(RIOTBASE)/cpu/native/ldscripts/xfa.ld
 
 # fix this warning:
 # ```
-# /usr/bin/ld: examples/hello-world/bin/native/cpu/tramp.o: warning: relocation against `_native_saved_eip' in read-only section `.text'
+# /usr/bin/ld: examples/basic/hello-world/bin/native/cpu/tramp.o: warning: relocation against `_native_saved_eip' in read-only section `.text'
 # /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
 # ```
 LINKFLAGS += -no-pie

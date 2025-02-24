@@ -215,7 +215,7 @@ respective board name.
 ### Compiling
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/hello-world$ BOARD=msbiot
+fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot
 make
 Building application "hello-world" for "msbiot" with MCU "stm32f4".
 
@@ -229,14 +229,14 @@ Building application "hello-world" for "msbiot" with MCU "stm32f4".
 "make" -C /home/fabian/myriot/RIOT/sys/auto_init
    text     data     bss     dec     hex filename
   11116      116    6444   17676    450c
-/home/fabian/myriot/RIOT/examples/hello-world/bin/msbiot/hello-world.elf
+/home/fabian/myriot/RIOT/examples/basic/hello-world/bin/msbiot/hello-world.elf
 ```
 
 
 ### Flashing
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/hello-world$ BOARD=msbiot
+fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot
 make flash
 Building application "hello-world" for "msbiot" with MCU "stm32f4".
 
@@ -250,7 +250,7 @@ Building application "hello-world" for "msbiot" with MCU "stm32f4".
 "make" -C /home/fabian/myriot/RIOT/sys/auto_init
    text     data     bss     dec     hex filename
   11116      116    6444   17676    450c
-/home/fabian/myriot/RIOT/examples/hello-world/bin/msbiot/hello-world.elf
+/home/fabian/myriot/RIOT/examples/basic/hello-world/bin/msbiot/hello-world.elf
 /home/fabian/myriot/RIOT/dist/tools/openocd/openocd.sh flash
 ### Flashing Target ###
 Open On-Chip Debugger 0.8.0 (2015-03-01-08:19)
@@ -305,7 +305,7 @@ Done flashing
 ### Debugging
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/hello-world$ BOARD=msbiot
+fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot
 make debug
 /home/fabian/myriot/RIOT/dist/tools/openocd/openocd.sh debug
 ### Starting Debugging ###

@@ -28,6 +28,7 @@
 
 #include "bitarithm.h"
 #include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -494,16 +495,46 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 {
     assert(ctx);
 
-    if (coap_get_code_class(pkt) != COAP_REQ) {
-        DEBUG("coap_handle_req(): not a request.\n");
+    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE) && (coap_get_type(pkt) == COAP_TYPE_RST)) {
+        nanocoap_unregister_observer_due_to_reset(coap_request_ctx_get_remote_udp(ctx),
+                                                  coap_get_id(pkt));
+    }
+
+    switch (coap_get_type(pkt)) {
+    case COAP_TYPE_CON:
+    case COAP_TYPE_NON:
+        /* could be a request ==> proceed */
+        break;
+    default:
+        DEBUG_PUTS("coap_handle_req(): ignoring RST/ACK");
         return -EBADMSG;
     }
 
-    if (pkt->hdr->code == 0) {
-        return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+    if (coap_get_code_class(pkt) != COAP_REQ) {
+        DEBUG_PUTS("coap_handle_req(): not a request --> ignore");
+        return -EBADMSG;
     }
-    return coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
-                             coap_resources, coap_resources_numof);
+
+    if (coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
+        /* we are not able to process a CON/NON message with an empty code,
+         * so we reply with a RST, unless we got a multicast message */
+        if (!sock_udp_ep_is_multicast(coap_request_ctx_get_local_udp(ctx))) {
+            return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+        }
+    }
+
+    ssize_t retval = coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
+                                       coap_resources, coap_resources_numof);
+    if (retval < 0) {
+        /* handlers were not able to process this, so we reply with a RST,
+         * unless we got a multicast message */
+        const sock_udp_ep_t *local = coap_request_ctx_get_local_udp(ctx);
+        if (!local || !sock_udp_ep_is_multicast(local)) {
+            return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
+        }
+    }
+
+    return retval;
 }
 
 ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
@@ -656,21 +687,21 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len)
 {
     unsigned tkl = coap_get_token_len(pkt);
+    unsigned type = COAP_TYPE_NON;
+
+    if (!code) {
+        /* if code is COAP_CODE_EMPTY (zero), assume Reset (RST) type.
+         * RST message have no token */
+        type = COAP_TYPE_RST;
+        tkl = 0;
+    }
+    else if (coap_get_type(pkt) == COAP_TYPE_CON) {
+        type = COAP_TYPE_ACK;
+    }
     unsigned len = sizeof(coap_hdr_t) + tkl;
 
     if ((len + payload_len) > rlen) {
         return -ENOSPC;
-    }
-
-    /* if code is COAP_CODE_EMPTY (zero), assume Reset (RST) type */
-    unsigned type = COAP_TYPE_RST;
-    if (code) {
-        if (coap_get_type(pkt) == COAP_TYPE_CON) {
-            type = COAP_TYPE_ACK;
-        }
-        else {
-            type = COAP_TYPE_NON;
-        }
     }
 
     uint32_t no_response;

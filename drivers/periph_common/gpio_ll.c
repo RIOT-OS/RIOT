@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#include <stdio.h>
-
 #include "periph/gpio_ll.h"
 
 /* Optimizing for low stack usage by not using printf(), which on newlib is
@@ -19,8 +17,9 @@
  * printf().
  */
 #ifdef MODULE_FMT
-#include "fmt.h"
+#  include "fmt.h"
 #else
+#  include <stdio.h>
 static inline void print_str(const char *str)
 {
     fputs(str, stdout);

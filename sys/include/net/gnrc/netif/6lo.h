@@ -30,7 +30,7 @@ extern "C" {
  * @anchor  net_gnrc_netif_6lo_local_flags
  * @see     gnrc_netif_6lo_t::local_flags
  *
- * Like the the capability flags in the [6LoWPAN Capability Indication Option
+ * Like the capability flags in the [6LoWPAN Capability Indication Option
  * (6CIO)](https://tools.ietf.org/html/rfc7400#section-3.3) are less about
  * hardware capabilities than about the implementation status within the
  * network. For the flags in this group it is currently undefined how to

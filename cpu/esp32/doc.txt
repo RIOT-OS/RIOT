@@ -486,7 +486,7 @@ toolchain (Debian/Ubuntu package names):
 The shell script `$RIOTBASE/dist/tools/esptools/install.sh` is used to
 install Espressif's precompiled versions of the following tools:
 
-- ESP32 vendor toolchain (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
+- ESP32 vendor toolchain (for ESP8266, ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
 - GDB for ESP32x SoCs based on Xtensa or RISC-V
 - OpenOCD for ESP32 (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
 - QEMU for ESP32 (only for ESP32)
@@ -499,7 +499,7 @@ $ dist/tools/esptools/install.sh
 
 Usage: install.sh <tool>
        install.sh gdb <platform>
-<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
+<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -727,7 +727,7 @@ ESP-IDF SDK provides a complex heap implementation that supports multiple heap
 segments in different memory areas such as DRAM, IRAM, and PSRAM. Whenever you
 want to use these memory areas as heap, you have to use the heap implementation
 from the ESP-IDF SDK. ESP-IDF heap is not used by default. To use it, it has to
-be enabled by the the makefile of the application:
+be enabled by the makefile of the application:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE += esp_heap
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1637,7 +1637,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\"' \
-make -C examples/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -1694,7 +1694,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_enterprise \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_EAP_ID=\"anonymous\" -DWIFI_EAP_USER=\"MyUserName\" -DWIFI_EAP_PASS=\"MyPassphrase\"' \
-make -C examples/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -1746,7 +1746,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
-make -C examples/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note

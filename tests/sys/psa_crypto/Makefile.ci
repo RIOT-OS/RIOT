@@ -22,6 +22,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32g0316-disco \
     stm32l0538-disco \
-    waspmote-pro \
     weact-g030f6 \
     #

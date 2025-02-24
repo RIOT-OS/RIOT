@@ -869,6 +869,34 @@ static void test_scn_u32_hex(void)
     TEST_ASSERT_EQUAL_INT(0xab, scn_u32_hex("aB", 9));
 }
 
+static void test_scn_buf_hex(void)
+{
+    uint8_t buf[8];
+    const char *input_invalid = "hallo";
+    const char *input_valid = "deadbeef";
+    const uint8_t expected[] = { 0xde, 0xad, 0xbe, 0xef };
+    const size_t len_valid = strlen(input_valid);
+    const size_t len_invalid = strlen(input_invalid);
+    const size_t len_expected = sizeof(expected);
+
+    /* invalid due to odd length */
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_buf_hex(buf, sizeof(buf),
+                                               input_valid, len_valid - 1));
+    /* invalid due to non-hex chars */
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_buf_hex(buf, sizeof(buf),
+                                               input_invalid, len_invalid));
+    /* overflow */
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, scn_buf_hex(buf, 2,
+                                                  input_valid, len_valid));
+
+    memset(buf, 0x55, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(len_expected, scn_buf_hex(buf, sizeof(buf),
+                                                    input_valid, len_valid));
+    TEST_ASSERT(0 == memcmp(expected, buf, len_expected));
+    /* did not overwrite */
+    TEST_ASSERT_EQUAL_INT(0x55, buf[len_expected]);
+}
+
 static void test_fmt_lpad(void)
 {
     const char base[] = "abcd";
@@ -935,6 +963,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
         new_TestFixture(test_scn_u32_hex),
+        new_TestFixture(test_scn_buf_hex),
         new_TestFixture(test_fmt_lpad),
     };
 

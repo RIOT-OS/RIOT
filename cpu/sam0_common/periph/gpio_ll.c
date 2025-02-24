@@ -45,8 +45,9 @@
 #include "periph/gpio_ll.h"
 
 #ifdef MODULE_FMT
-#include "fmt.h"
+#  include "fmt.h"
 #else
+#  include <stdio.h>
 static inline void print_str(const char *str)
 {
     fputs(str, stdout);
@@ -204,7 +205,12 @@ gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
         }
     }
 
-    result.initial_value = iobus->OUT.reg & pin_mask;
+    if (result.state == GPIO_INPUT) {
+        result.initial_value = (gpio_ll_read(port) >> pin) & 1UL;
+    }
+    else {
+        result.initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
+    }
 
     return result;
 }

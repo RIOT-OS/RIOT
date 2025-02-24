@@ -94,6 +94,7 @@ int netif_set_opt(const netif_t *iface, netopt_t opt, uint16_t context,
     switch (opt) {
     case NETOPT_ACTIVE: {
             assert(value_len >= sizeof(netopt_enable_t));
+            (void)value_len; /* Eliminates compilation unused parameter error, when DEVELHELP = 0*/
             netopt_enable_t *state = value;
             if (*state == NETOPT_ENABLE) {
                 netifapi_netif_set_up(netif);

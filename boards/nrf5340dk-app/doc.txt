@@ -32,7 +32,7 @@ generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
 ```
-    make BOARD=nrf5340dk-app -C examples/hello-world term
+    make BOARD=nrf5340dk-app -C examples/basic/hello-world term
 ```
 
  */

@@ -42,6 +42,7 @@ FEATURES_EXISTING := \
     ble_nimble_netif \
     ble_phy_2mbit \
     ble_phy_coded \
+    board_bat_voltage \
     bootloader_stm32 \
     can_rx_mailbox \
     cortexm_fpu \
@@ -86,6 +87,7 @@ FEATURES_EXISTING := \
     cpu_qn908x \
     cpu_rpx0xx \
     cpu_sam3 \
+    cpu_sam4s \
     cpu_samd21 \
     cpu_samd5x \
     cpu_saml1x \

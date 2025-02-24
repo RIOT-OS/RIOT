@@ -19,13 +19,13 @@ To program this board, plug it to your computer via USB and run the following
 command:
 
 ```
-make BOARD=dwm1001 -C examples/hello-world flash
+make BOARD=dwm1001 -C examples/basic/hello-world flash
 ```
 
 To program the board with OpenOCD, use:
 
 ```
-PROGRAMMER=openocd make BOARD=dwm1001 -C examples/hello-world flash
+PROGRAMMER=openocd make BOARD=dwm1001 -C examples/basic/hello-world flash
 ```
 
 ## Accessing STDIO via UART
@@ -35,6 +35,6 @@ generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
 ```
-make BOARD=dwm1001 -C examples/hello-world term
+make BOARD=dwm1001 -C examples/basic/hello-world term
 ```
  */

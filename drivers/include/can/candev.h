@@ -80,6 +80,10 @@ struct candev {
     void *isr_arg;                         /**< argument to pass on isr event */
     struct can_bittiming bittiming;        /**< device bittimings */
     enum can_state state;                  /**< device state */
+#ifdef MODULE_FDCAN
+    struct can_bittiming fd_data_bittiming;/**< device bittimings for FD CAN only */
+    uint16_t loop_delay;                   /**< CAN FD transceiver loop delay */
+#endif
 };
 
 /**
@@ -95,7 +99,7 @@ typedef struct candev_driver {
      * @return < 0 on error
      * @return mailbox id >= 0 if OK
      */
-    int (*send)(candev_t *dev, const struct can_frame *frame);
+    int (*send)(candev_t *dev, const can_frame_t *frame);
 
     /**
      * @brief Abort a packet sending
@@ -106,7 +110,7 @@ typedef struct candev_driver {
      * @return < 0 on error
      * @return 0 on OK
      */
-    int (*abort)(candev_t *dev, const struct can_frame *frame);
+    int (*abort)(candev_t *dev, const can_frame_t *frame);
 
     /**
      * @brief the driver's initialization function

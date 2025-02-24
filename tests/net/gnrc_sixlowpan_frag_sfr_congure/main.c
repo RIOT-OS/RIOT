@@ -802,6 +802,10 @@ int main(void)
 {
     _tests_init();
 
+    /* work around issue in _check_congure_snd_msg(): the assert for
+     * time > o will not work when the time is 0 */
+    while (xtimer_now_usec() / US_PER_MS == 0) { }
+
     TESTS_START();
     TESTS_RUN(tests_gnrc_sixlowpan_frag_sfr_congure_integration());
     TESTS_END();

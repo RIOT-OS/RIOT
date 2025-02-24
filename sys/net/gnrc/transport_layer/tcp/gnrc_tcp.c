@@ -28,7 +28,9 @@
 #include "net/af.h"
 #include "net/tcp.h"
 #include "net/gnrc.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/tcp.h"
+#include "net/sock.h"
 #include "include/gnrc_tcp_common.h"
 #include "include/gnrc_tcp_fsm.h"
 #include "include/gnrc_tcp_pkt.h"
@@ -394,6 +396,24 @@ int gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint16_t loc
             return -EINVAL;
         }
         tcb->ll_iface = remote->netif;
+
+        /* When the target is a link-local address and no netif is specified,
+         * this would otherwise not send out any data and timeout. If only
+         * a single netif is there, we can just take that. */
+        if (ipv6_addr_is_link_local((const ipv6_addr_t *)tcb->peer_addr)
+                && tcb->ll_iface == SOCK_ADDR_ANY_NETIF) {
+            const gnrc_netif_t *first_netif = gnrc_netif_iter(NULL);
+            if (!first_netif) {
+                /* There is no netif at all */
+                return -EINVAL;
+            }
+            if (!gnrc_netif_highlander() && gnrc_netif_iter(first_netif)) {
+                /* There is at least one other netif present. We are forcing
+                 * the use to pick one */
+                return -EINVAL;
+            }
+            tcb->ll_iface = first_netif->pid;
+        }
     }
 #endif
 

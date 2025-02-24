@@ -866,8 +866,12 @@ INPUT                  = ../../doc.txt \
                          src/ \
                          src/mainpage.md \
                          src/vision.md \
-                         src/community-processes.md \
+                         src/governance.md \
                          src/roadmap.md \
+                         src/coc-info.md \
+                         src/coc.md \
+                         src/coc-reporting-guide.md \
+                         src/coc-faq.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
                          src/porting-boards.md \
@@ -877,6 +881,7 @@ INPUT                  = ../../doc.txt \
                          src/terminal-programs.md \
                          src/build-in-docker.md \
                          ../../tests/README.md \
+                         src/dev-best-practices.md \
                          src/build-system-basics.md \
                          src/feature_list.md \
                          src/kconfig/kconfig.md \
@@ -2299,8 +2304,7 @@ PREDEFINED             = DOXYGEN \
                          MODULE_GNRC_SIXLOWPAN \
                          MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
                          MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER \
-                         MODULE_GNRC_UDP \
-                         RIOT_FILE_RELATIVE
+                         MODULE_GNRC_UDP
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

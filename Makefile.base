@@ -104,20 +104,30 @@ ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)/$(MODULE)/%.o)
 OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ) $(GENOBJC)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
+SRC_ALL := $(SRC) $(SRCXX) $(ASMSRC) $(ASSMSRC)
+SUBDIRS_IN_DIRS := $(filter $(DIRS), $(abspath $(sort $(dir $(SRC_ALL)))))
+ifneq (,$(SUBDIRS_IN_DIRS))
+  $(warning Files of the following subdirectories are selected \
+    both as RIOT modules (using DIRS) and directly as sourcefiles (using SRC): \
+    $(patsubst $(CURDIR)/%,./%, $(SUBDIRS_IN_DIRS)). \
+    Please select a single approach for each subfolder to prevent linking errors.)
+endif
+SUBDIRS := $(sort $(filter-out $(BINDIR)/$(MODULE)/, $(dir $(OBJ))))
+
 include $(RIOTMAKE)/blob.inc.mk
 include $(RIOTMAKE)/tools/fixdep.inc.mk
 
-$(BINDIR)/$(MODULE)/:
+$(BINDIR)/$(MODULE)/ $(SUBDIRS):
 	$(Q)mkdir -p $@
 
-OLD_OBJECTS = $(wildcard $(BINDIR)/$(MODULE)/*.o)
+OLD_OBJECTS = $(wildcard $(BINDIR)/$(MODULE)/*.o $(BINDIR)/$(MODULE)/**/*.o)
 
 # do not clean objects from bindist modules
 ifeq (,$(filter $(MODULE),$(BIN_USEMODULE)))
   OBJECTS_TO_REMOVE = $(filter-out $(OBJ),$(OLD_OBJECTS))
 endif
 
-$(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/
+$(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/ $(SUBDIRS)
 
 $(MODULE).module: $(OBJ) $(if $(OBJECTS_TO_REMOVE),$(MODULE).cleanup) | $(DIRS:%=ALL--%)
 

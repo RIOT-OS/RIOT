@@ -64,11 +64,22 @@ extern "C" {
  * @name    Mapping of MCU pins to Arduino pins
  * @{
  */
+
+/* The WeMos Zero / HW-819 has D2 and D4 swapped compared to official Arduino
+ * Zero, so we have to handle D2 and D4 differently depending on board */
+#ifdef BOARD_WEMOS_ZERO
+#  define ARDUINO_PIN_2         GPIO_PIN(PA, 8)
+#  define ARDUINO_PIN_4         GPIO_PIN(PA, 14)
+#else /* Official Arduino Zero or fully compatible: */
+#  define ARDUINO_PIN_2         GPIO_PIN(PA, 14)
+#  define ARDUINO_PIN_4         GPIO_PIN(PA, 8)
+#endif
+
+/* all other pins are identical for all currently supported Arduino Zero
+ * compatible boards */
 #define ARDUINO_PIN_0           GPIO_PIN(PA, 11)
 #define ARDUINO_PIN_1           GPIO_PIN(PA, 10)
-#define ARDUINO_PIN_2           GPIO_PIN(PA, 14)
 #define ARDUINO_PIN_3           GPIO_PIN(PA, 9)
-#define ARDUINO_PIN_4           GPIO_PIN(PA, 8)
 #define ARDUINO_PIN_5           GPIO_PIN(PA, 15)
 #define ARDUINO_PIN_6           GPIO_PIN(PA, 20)
 #define ARDUINO_PIN_7           GPIO_PIN(PA, 21)

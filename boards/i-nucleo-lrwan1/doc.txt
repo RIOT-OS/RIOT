@@ -48,7 +48,7 @@ index c59a1939a2..0c359e438c 100755
 ```
 - Run make flash:
 ```sh
-make BOARD=i-nucleo-lrwan1 -C examples/hello-world flash
+make BOARD=i-nucleo-lrwan1 -C examples/basic/hello-world flash
 ```
   The command will fail but after that the memory will be unlocked after a
   power cycle. The line added above in `openocd.sh` can also be removed.

@@ -73,7 +73,7 @@ int can_router_unregister(can_reg_entry_t *entry, canid_t can_id, canid_t mask, 
  * @return 0 on success
  * @return < 0 on error
  */
-int can_router_free_frame(struct can_frame *frame);
+int can_router_free_frame(can_frame_t *frame);
 
 /**
  * @brief Dispatch a RX indication to subscribers threads

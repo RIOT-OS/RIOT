@@ -91,12 +91,6 @@ enum {
 #define GNRC_NETIF_FLAGS_IPV6_ADV_O_FLAG           (0x00000080U)
 
 /**
- * @brief   Used when module gnrc_netif_pktq is used to indicate that
- *          @ref gnrc_netif_t::tx_pkt is from the packet queue.
- */
-#define GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE          (0x00000100U)
-
-/**
  * @brief   This interface uses 6Lo header compression
  *
  * @see [RFC 6282](https://tools.ietf.org/html/rfc6282)
@@ -145,6 +139,13 @@ enum {
  * @brief   Network interface is configured in raw mode
  */
 #define GNRC_NETIF_FLAGS_RAWMODE                   (0x00010000U)
+
+/**
+ * @brief   Used when module gnrc_netif_pktq is used to indicate that
+ *          @ref gnrc_netif_t::tx_pkt is from the packet queue.
+ */
+#define GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE          (0x00020000U)
+
 /** @} */
 
 #ifdef __cplusplus

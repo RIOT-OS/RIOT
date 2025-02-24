@@ -26,7 +26,7 @@ Both use the same flasher, bootloader, and terminal settings.
 
 Example with `hello-world` application:
 ```
-     make BOARD=feather-nrf52840-sense -C examples/hello-world flash term
+     make BOARD=feather-nrf52840-sense -C examples/basic/hello-world flash term
 ```
 
 On "fresh" boards the

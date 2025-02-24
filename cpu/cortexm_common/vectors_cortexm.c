@@ -197,12 +197,15 @@ void reset_handler_default(void)
     dbgpin_init();
 #endif
 
+#if !DISABLE_CPU_INIT
     /* initialize the CPU */
     extern void cpu_init(void);
     cpu_init();
-
-    /* initialize the board (which also initiates CPU initialization) */
+#endif
+#if !DISABLE_BOARD_INIT
+    /* initialize the board */
     board_init();
+#endif
 
 #if MODULE_NEWLIB || MODULE_PICOLIBC
     /* initialize std-c library (this must be done after board_init) */

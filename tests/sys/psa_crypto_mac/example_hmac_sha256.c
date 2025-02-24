@@ -11,7 +11,7 @@
  * @{
  *
  * @brief       Tests the PSA HMAC SHA256 configurations
- *              Contents have been copied from `examples/psa_crypto`
+ *              Contents have been copied from `examples/advanced/psa_crypto`
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
@@ -32,7 +32,9 @@ static const uint8_t HMAC_KEY[] = {
 };
 static size_t HMAC_KEY_LEN = 32;
 
-static const uint8_t HMAC_MSG[] = {
+/* certain PSA backends require the data to be in RAM rather than ROM
+ * so these values cannot be `const` */
+static uint8_t HMAC_MSG[] = {
     0x54, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
     0x61, 0x20, 0x74, 0x65, 0x73, 0x74, 0x73, 0x74,
     0x72, 0x69, 0x6e, 0x67, 0x20, 0x66, 0x6f, 0x72,

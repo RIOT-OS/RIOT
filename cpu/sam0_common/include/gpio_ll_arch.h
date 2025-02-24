@@ -159,7 +159,15 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
-    return (gpio_port_t)(pin & ~(0x1f));
+    /* GPIO LL and legacy GPIO API may disagree on what is the GPIO base
+     * address if one is using the IOBUS and the other is using the APB for
+     * access. In this case, we need to do impedance matching by adding the
+     * offset. */
+    const uintptr_t gpio_ll_base = GPIO_PORT_0;
+    const uintptr_t gpio_legacy_base = GPIO_PIN(0, 0) & ~(0x1f);
+    uintptr_t addr = (pin & ~(0x1f));
+
+    return addr + (gpio_ll_base - gpio_legacy_base);
 }
 
 static inline uint8_t gpio_get_pin_num(gpio_t pin)

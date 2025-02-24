@@ -196,6 +196,16 @@ int main(void)
 
     event_timeout_t event_timeout;
 
+    /* uninitialied event_timeout_t should return false */
+    event_timeout_ztimer_init(&event_timeout, NULL, &queue, (event_t *)&event_callback);
+    expect(!event_timeout_is_pending(&event_timeout));
+
+    event_timeout_ztimer_init(&event_timeout, ZTIMER_USEC, NULL, (event_t *)&event_callback);
+    expect(!event_timeout_is_pending(&event_timeout));
+
+    event_timeout_ztimer_init(&event_timeout, ZTIMER_USEC, &queue, NULL);
+    expect(!event_timeout_is_pending(&event_timeout));
+
     puts("posting timed callback with timeout 1sec");
     event_timeout_init(&event_timeout, &queue, (event_t *)&event_callback);
 #if IS_USED(MODULE_ZTIMER_USEC)

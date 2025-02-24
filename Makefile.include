@@ -720,6 +720,7 @@ COMPILE_COMMANDS_FLAGS ?= --clangd
 compile-commands: $(COMPILE_COMMANDS_PATH)
 %/compile_commands.json: $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
+    APPLICATION_SRC="$(SRC)" APPLICATION_SRCXX="$(SRCXX)" APPLICATION_ASMSRC="$(ASMSRC)" APPLICATION_ASSMSRC="$(ASSMSRC)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk compile-commands
 	$(Q)$(RIOTTOOLS)/compile_commands/compile_commands.py $(COMPILE_COMMANDS_FLAGS) $(BINDIR) \
 	  > $@
@@ -744,6 +745,7 @@ $(ELFFILE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 
 $(APPLICATION_MODULE).module: pkg-build $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
+    APPLICATION_SRC="$(SRC)" APPLICATION_SRCXX="$(SRCXX)" APPLICATION_ASMSRC="$(ASMSRC)" APPLICATION_ASSMSRC="$(ASSMSRC)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(APPLICATION_MODULE).module: FORCE
 
@@ -932,9 +934,8 @@ include $(RIOTMAKE)/tools/targets.inc.mk
 include $(RIOTMAKE)/usb-codes.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
-ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
+ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
   EXPECT_ERRORS :=
-  EXPECT_CONFLICT :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
@@ -960,12 +961,12 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
 
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
-    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)The following features conflict:$(COLOR_RESET)"\
                           "$(FEATURES_CONFLICTING)" 1>&2)
     ifneq (, $(FEATURES_CONFLICT_MSG))
         $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
     endif
-    EXPECT_CONFLICT := 1
+    EXPECT_ERRORS := 1
   endif
 
   # If there is a whitelist, then test if the board is whitelisted.
@@ -998,10 +999,6 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     endif
   endif
 
-  ifneq (, $(EXPECT_CONFLICT))
-    $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
-  endif
-
   # Fail by default when errors are expected
   CONTINUE_ON_EXPECTED_ERRORS ?= 0
   ifneq (, $(EXPECT_ERRORS))
@@ -1015,7 +1012,8 @@ endif
 
 help:
   # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
-	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
+  # inspired by: https://stackoverflow.com/a/26339924
+	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))

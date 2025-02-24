@@ -55,11 +55,11 @@ extern "C" {
  * @brief Address of the DNS server
  */
 #ifndef CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR
-    /* Default to Google Public DNS */
+    /* Default to Quad9 Public DNS */
     #if CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 6
-        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "2001:4860:4860::8888"
+        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "2620:fe::fe"
     #elif CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 4
-        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "8.8.8.8"
+        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "9.9.9.9"
     #endif
 #endif
 

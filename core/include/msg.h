@@ -412,7 +412,16 @@ unsigned msg_queue_capacity(kernel_pid_t pid);
 void msg_init_queue(msg_t *array, int num);
 
 /**
+ * @brief Number of messages to be maximally printed through @ref msg_queue_print
+ */
+#ifndef CONFIG_MSG_QUEUE_PRINT_MAX
+#  define CONFIG_MSG_QUEUE_PRINT_MAX 16U
+#endif
+
+/**
  * @brief   Prints the message queue of the current thread.
+ *
+ * @note    Prints at most CONFIG_MSG_QUEUE_PRINT_MAX messages.
  */
 void msg_queue_print(void);
 

@@ -24,9 +24,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
-#include <string.h>
 
-#include "log.h"
 #include "irq.h"
 #include "periph/gpio_ll.h"
 
@@ -39,8 +37,9 @@
 #include "esp_idf_api/gpio.h"
 
 #ifdef MODULE_FMT
-#include "fmt.h"
+#  include "fmt.h"
 #else
+#  include <stdio.h>
 static inline void print_str(const char *str)
 {
     fputs(str, stdout);

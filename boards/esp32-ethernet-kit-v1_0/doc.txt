@@ -26,7 +26,7 @@
 
 ## Overview {#esp32_ethernet_kit_v1_0_overview}
 
-The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit-v1.0.html) is a development board that uses the ESP32-WROVER-B module. Most important features of the board are
+The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-ethernet-kit/user_guide.html) is a development board that uses the ESP32-WROVER-B module. Most important features of the board are
 
 - 100 Mbps Ethernet via IP101G PHY
 - USB bridge with JTAG interface
@@ -34,7 +34,7 @@ The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/e
 Furthermore, some GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 For flashing and debugging the board, see \ref boards_esp32_esp-ethernet-kit common board documentation.
 
-@image html "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/esp32-ethernet-kit-v1.0.png" "ESP32-Ethernet-Kit V1.0" width=500
+@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/_images/esp32-ethernet-kit-v1.0.png" "ESP32-Ethernet-Kit V1.0" width=500
 
 [Back to table of contents](#esp32_ethernet_kit_v1_0_toc)
 

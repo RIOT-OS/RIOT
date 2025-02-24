@@ -264,10 +264,11 @@
 
 #include <stdint.h>
 
-#include "sched.h"
+#include "mbox.h"
 #include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -403,7 +404,7 @@ void ztimer_handler(ztimer_clock_t *clock);
 /**
  * @brief   Acquire a clock
  *
- * This will indicate the the underlying clock is required to be running.
+ * This will indicate the underlying clock is required to be running.
  * If time differences are measured using @ref ztimer_now this will make
  * sure ztimer won't turn of the clock source.
  *
@@ -424,7 +425,7 @@ static inline bool ztimer_acquire(ztimer_clock_t *clock)
 /**
  * @brief   Release a clock
  *
- * This will indicate the the underlying clock isn't required to be running
+ * This will indicate the underlying clock isn't required to be running
  * anymore and may be turned off.
  *
  * @param[in]   clock       ztimer clock to operate on
@@ -529,6 +530,22 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 
 /* created with dist/tools/define2u16.py */
 #define MSG_ZTIMER 0xc83e   /**< msg type used by ztimer_msg_receive_timeout */
+
+/**
+ * @brief Get message from mailbox, blocking with a timeout
+ *
+ * If the mailbox is empty, this function will block until a message becomes
+ * available or the timeout triggers
+ *
+ * @param[in]   clock           ztimer clock to operate on
+ * @param[in]   mbox            ptr to mailbox to operate on
+ * @param[in]   msg             ptr to storage for retrieved message
+ * @param[in]   timeout         relative timeout, in @p clock time units
+ *
+ * @retval  0           Got a message
+ * @retval -ETIMEDOUT   Timeout triggered before a message was obtained
+ */
+int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *msg, uint32_t timeout);
 
 /**
  * @brief ztimer_now() for extending timers

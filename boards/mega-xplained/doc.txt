@@ -39,12 +39,12 @@ square pin on the adapter connecting with the square pin on the board.
 
    If using the Buspirate:
 ```
-     BOARD=mega-xplained make -C examples/hello-world flash
+     BOARD=mega-xplained make -C examples/basic/hello-world flash
 ```
 
    If using the Atmel-ICE:
 ```
-     BOARD=mega-xplained PROGRAMMER=atmelice make -C examples/hello-world flash
+     BOARD=mega-xplained PROGRAMMER=atmelice make -C examples/basic/hello-world flash
 ```
 
 ### Accessing STDIO via UART
@@ -53,7 +53,7 @@ STDIO can be accessed through the USB connector. The on-board UART-USB
 adapter is not affected by flashing. It shows up as /dev/ttyACM0 on Linux.
 It will be used automatically with `make term`:
 ```
-     BOARD=mega-xplained make -C examples/hello-world term
+     BOARD=mega-xplained make -C examples/basic/hello-world term
 ```
 
 ### Pin Change Interrupts

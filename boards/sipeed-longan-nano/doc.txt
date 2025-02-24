@@ -160,7 +160,7 @@ The board is flashed via the in-ROM DFU bootloader by default.
 To enter bootloader mode, hold the BOOT0 button while pressing the RESET button.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano make -C examples/hello-world flash
+BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After flashing you need to leave bootloader mode again by pressing the RESET button.
@@ -168,7 +168,7 @@ After flashing you need to leave bootloader mode again by pressing the RESET but
 @note For the Sipeed Longan Nano board version with TFT display, the
       `sipeed-longan-nano-tft` board definition has to be used.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano-tft make -C examples/hello-world flash
+BOARD=sipeed-longan-nano-tft make -C examples/basic/hello-world flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Using an external debug adapter
@@ -179,18 +179,18 @@ By default, an FTDI adapter according to the configuration defined in
 [`interface/openocd-usb.cfg`](https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
 is assumed.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-PROGRAMMER=openocd BOARD=sipeed-longan-nano make -C examples/hello-world flash
+PROGRAMMER=openocd BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use an FTDI adapter with a different configuration, the configuration can be
 defined using the variable `OPENOCD_FTDI_ADAPTER`, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-PROGRAMMER=openocd OPENOCD_FTDI_ADAPTER=tigard BOARD=sipeed-longan-nano make -C examples/hello-world flash
+PROGRAMMER=openocd OPENOCD_FTDI_ADAPTER=tigard BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If another adapter is used, it can be specified using variable
 `OPENOCD_DEBUG_ADAPTER`, for example for a Segger J-Link adapter:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=jlink BOARD=sipeed-longan-nano make -C examples/hello-world flash
+PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=jlink BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Using the TFT Display
@@ -210,7 +210,7 @@ the index of the CDC ACM interface, which is 0 by default.
 To use the first UART interface for `stdio` instead, the `stdio_uart` module
 has to be enabled:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE=stdio_uart BOARD=sipeed-longan-nano make -C examples/hello-world flash
+USEMODULE=stdio_uart BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The `stdio` is then directly accessible through the first UART interface. If an
@@ -220,11 +220,11 @@ interface, which is 0 by default.
 
 Use the `term` target to connect to the board using `/dev/ttyUSB0`:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano make -C examples/hello-world term PORT=/dev/ttyUSB0
+BOARD=sipeed-longan-nano make -C examples/basic/hello-world term PORT=/dev/ttyUSB0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If the UART interface index of the USB-to-UART interface is not 0, use
 the following command to connect:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano make -C examples/hello-world term PORT=/dev/ttyUSB<n>
+BOARD=sipeed-longan-nano make -C examples/basic/hello-world term PORT=/dev/ttyUSB<n>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */

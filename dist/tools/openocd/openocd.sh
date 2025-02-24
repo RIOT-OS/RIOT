@@ -346,6 +346,7 @@ do_flash() {
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
             -c 'init' \
+            ${OPENOCD_POST_INIT_CMDS} \
             -c 'targets' \
             ${OPENOCD_CMD_RESET_HALT} \
             ${OPENOCD_PRE_FLASH_CMDS} \

@@ -245,7 +245,7 @@ static inline bool gnrc_netif_netdev_legacy_api(gnrc_netif_t *netif)
 {
     if (!IS_USED(MODULE_NETDEV_NEW_API) && !IS_USED(MODULE_NETDEV_LEGACY_API)) {
         /* this should only happen for external netdevs or when no netdev is
-         * used (e.g. examples/gcoap can be used without any netdev, as still
+         * used (e.g. examples/networking/coap/gcoap can be used without any netdev, as still
          * CoAP requests to ::1 can be send */
         return true;
     }
@@ -762,6 +762,7 @@ static inline msg_bus_t* gnrc_netif_get_bus(gnrc_netif_t *netif,
  *                      May be NULL, then this checks for a global address
  *                      on *any* interface.
  * @param timeout_ms    Time to wait for an address to become available, in ms.
+ *                      Use `UINT32_MAX` to wait indefinitely.
  *
  * @return              true if a global address is configured
  */

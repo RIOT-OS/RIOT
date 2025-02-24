@@ -37,7 +37,7 @@ Since the board is
 [open source hardware](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series),
 a number of clones are available.
 
-@image html "https://heltec.org/wp-content/uploads/2020/04/SAM_0748_800X800.png" "Heltec WiFi Lora 32 V2" width=400px
+@image html "https://heltec.org/wp-content/uploads/2024/07/wifi-lora-32-v2-1.png" "Heltec WiFi Lora 32 V2" width=400px
 
 [Back to table of contents](#esp32_heltec_lora32_v2_toc)
 

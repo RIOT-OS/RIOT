@@ -19,6 +19,25 @@
  * there is no expectation of security of the system when an attacker gains
  * access to the shell.
  *
+ * ## Usage
+ *
+ * Enable the `shell` module e.g. by adding the following snippet to your
+ * applications `Makefile`.
+ *
+ * ```
+ * USEMODULE += shell
+ * ```
+ *
+ * And run the shell using @ref shell_run_forever e.g. from the `main` thread
+ * after everything is set up. This call will never return.
+ *
+ * ## Builtin Commands
+ *
+ * The commands `help` and `help_json` are builtins that print the list of
+ * available commands: The former prints a human readable table and is always
+ * available, the latter requires module `shell_builtin_cmd_help_json` to be
+ * used and will give the same info machine readable.
+ *
  * @{
  *
  * @file
@@ -283,15 +302,14 @@ int shell_parse_file(const shell_command_t *commands,
  * ```
  */
 #define SHELL_COMMAND(cmd, help, func) \
-    XFA_USE_CONST(shell_command_xfa_t*, shell_commands_xfa); \
+    XFA_USE_CONST(shell_command_xfa_t, shell_commands_xfa_v2); \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_name[] = #cmd; \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_desc[] = help; \
-    static const shell_command_xfa_t _xfa_ ## cmd ## _cmd = { \
+    XFA_CONST(shell_command_xfa_t, shell_commands_xfa_v2, 0) _xfa_ ## cmd ## _cmd = { \
         .name = _xfa_ ## cmd ## _cmd_name, \
         .desc = _xfa_ ## cmd ## _cmd_desc, \
         .handler = &func \
-    }; \
-    XFA_ADD_PTR(shell_commands_xfa, cmd, cmd, &_xfa_ ## cmd ## _cmd)
+    };
 #endif /* __cplusplus */
 
 #ifdef __cplusplus

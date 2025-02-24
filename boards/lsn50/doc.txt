@@ -30,7 +30,7 @@ exposed with v1.0).
 Ensure SW1 is on `flash` position.
 Then use the following command:
 
-    make BOARD=lsn50 -C examples/hello-world flash
+    make BOARD=lsn50 -C examples/basic/hello-world flash
 
 On the v1.0 version of the board, no NRST pin is exposed so one has to press the
 reset button during flash and release it when OpenOCD prints `adapter speed: 240 kHz`
@@ -43,7 +43,7 @@ application.
 STDIO is connected to pins PA9 (TX) and PA10 (RX) so an USB to UART adapter is
 required. Use the `term` target to open a terminal:
 
-    make BOARD=lsn50 -C examples/hello-world term
+    make BOARD=lsn50 -C examples/basic/hello-world term
 
 If an external ST-Link adapter is used, RX and TX pins can be directly connected
 to it. In this case, STDIO is available on /dev/ttyACMx (Linux case).

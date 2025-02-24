@@ -138,12 +138,12 @@ the index of the UART interface which is 0 by default.
 
 Use the `term` target to connect to the board serial port using `/dev/ttyUSB0`:
 ```
-    make BOARD=waveshare-nrf52840-eval-kit -C examples/hello-world term
+    make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world term
 ```
 If the UART interface index of board's USB to UART bridge is not 0, use
 the following command to connect to the board serial port:
 ```
-    make BOARD=waveshare-nrf52840-eval-kit -C examples/hello-world PORT=/dev/ttyUSB<n> term
+    make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world PORT=/dev/ttyUSB<n> term
 ```
 
 ## RESET Pin Configuration

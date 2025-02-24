@@ -30,7 +30,7 @@ extern "C" {
  * usage, we define the default stack size values here centrally for all CPU
  * implementations.
  *
- * If needed, you can overwrite these values the the `cpu_conf.h` file of the
+ * If needed, you can overwrite these values the `cpu_conf.h` file of the
  * specific CPU implementation.
  *
  * @todo Adjust values for Cortex-M4F with FPU?

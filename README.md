@@ -123,12 +123,37 @@ Using Windows? Use [this guide][dev-setup-windows] to
 
 [dev-setup-windows]: doc/guides/setup-windows
 
-## Forum
-Do you have a question, want to discuss a new feature, or just want to present
-your latest project using RIOT? Come over to our [forum] and post to your hearts
-content.
+## Community
 
-[forum]: https://forum.riot-os.org
+You can ask for help on the Forum or on Matrix. Please send bug reports and
+feature requests to our [GitHub issue tracker](https://github.com/RIOT-OS/RIOT/issues)
+
+- [forum](https://forum.riot-os.org) is the default place to start asking for
+help. Our Forum provides an archive of prior questions and answers.
+- For chat, we use
+  [#riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org) on the
+  [Matrix](https://matrix.org/) chat network.
+- [GitHub Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
+with the code and documentation.
+
+### Governance
+
+For how our community is structured and governed, please see our [governance document].
+
+[governance document]: GOVERNANCE.md
+
+### How to Ask
+
+Please include as much detail as you can that is relevant to your question, not
+only "this isn't working". These details include:
+
+1. What you want to achieve.
+2. What have you tried so far (for example the commands you typed).
+3. What happened so far.
+
+### Collaboration
+
+RIOT closely collaborates with and inspires other open source projects, e.g., [Ariel OS](https://ariel-os.org/), an IoT OS written in Rust. We are more than happy to collaborate with those who share our [vision](https://doc.riot-os.org/vision.html).
 
 ## Contribute
 

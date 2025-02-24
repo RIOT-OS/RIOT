@@ -308,7 +308,7 @@ system using the `BUILD_IN_DOCKER` variable:
 
 ## Manual Toolchain Installation {#esp8266_manual_toolchain_installation}
 
-A more difficult way to install the toolchain is the manual installation of
+A more simple way to install the toolchain is the manual installation of
 all required components as described below.
 
 @note To install the toolchain manually, a 64-bit Linux system is required.
@@ -325,17 +325,18 @@ The Xtensa GCC compiler for ESP8266 configured for use with RIOT-OS can
 be downloaded and installed as precompiled binary archive from
 [GitHub](https://github.com/gschorcht/xtensa-esp8266-elf):
 
+The shell script `$RIOTBASE/dist/tools/esptools/install.sh` is used to
+install the custom ESP8266 toolchain:
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mkdir -p $HOME/esp
-cd $HOME/esp
-git clone https://github.com/gschorcht/xtensa-esp8266-elf
+$ dist/tools/esptools/install.sh esp8266
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the compiler is installed, you have to expand your `PATH` variable by
 the directory with Xtensa GCC binaries:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export PATH=$HOME/esp/xtensa-esp8266-elf/bin:$PATH
+$ . dist/tools/esptools/export.sh esp8266
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp8266_toc)
@@ -730,7 +731,7 @@ line, e.g.:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\"' \
-make -C examples/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -781,7 +782,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
-make -C examples/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note

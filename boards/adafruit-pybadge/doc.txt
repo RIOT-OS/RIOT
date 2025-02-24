@@ -26,7 +26,7 @@ Connect the board via USB and use `BOARD=adafruit-pybadge` with the `make` comma
 this uses the Arduino style bootloader preprogrammed on the board.<br/>
 Example with `hello-world` application:
 ```
-     make BOARD=adafruit-pybadge -C examples/hello-world flash
+     make BOARD=adafruit-pybadge -C examples/basic/hello-world flash
 ```
 
 In case of a crash of the firmware, one has to manually reset the board in

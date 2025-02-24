@@ -28,3 +28,6 @@ endif
 
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+# The Black Magic Probe has tested to work fine on SAML21
+PROGRAMMERS_SUPPORTED += bmp

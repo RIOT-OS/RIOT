@@ -945,17 +945,13 @@ static int _find_resource(gcoap_socket_type_t tl_type,
 static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote,
                                                      const uint8_t *token, size_t tkl)
 {
-    /* no need to initialize struct; we only care about buffer contents below */
-    coap_pkt_t memo_pdu_data;
-    coap_pkt_t *memo_pdu = &memo_pdu_data;
-
     for (int i = 0; i < CONFIG_GCOAP_REQ_WAITING_MAX; i++) {
         if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
             continue;
         }
 
         gcoap_request_memo_t *memo = &_coap_state.open_reqs[i];
-        memo_pdu->hdr = gcoap_request_memo_get_hdr(memo);
+        coap_hdr_t *hdr = gcoap_request_memo_get_hdr(memo);
 
         /* verbose debug to catch bugs with request/response matching */
 #if SOCK_HAS_IPV4
@@ -972,11 +968,12 @@ static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote
               tkl);
 #endif
 
-        if (coap_get_token_len(memo_pdu) != tkl) {
-            DEBUG("Token length mismatch %u\n", coap_get_token_len(memo_pdu));
+        size_t memo_tkl = coap_hdr_get_token_len(hdr);
+        if (memo_tkl != tkl) {
+            DEBUG("Token length mismatch %" PRIuSIZE "\n", memo_tkl);
             continue;
         }
-        const uint8_t *memo_token = coap_get_token(memo_pdu);
+        const uint8_t *memo_token = coap_hdr_get_token(hdr);
         if (memcmp(token, memo_token, tkl)) {
             DEBUG("Token mismatch 0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
                   memo_token[0], memo_token[1], memo_token[2], memo_token[3],
@@ -1454,10 +1451,9 @@ static ssize_t _cache_build_response(nanocoap_cache_entry_t *ce, coap_pkt_t *pdu
 
 static void _copy_hdr_from_req_memo(coap_pkt_t *pdu, gcoap_request_memo_t *memo)
 {
-    coap_pkt_t req_pdu;
-
-    req_pdu.hdr = gcoap_request_memo_get_hdr(memo);
-    memcpy(pdu->hdr, req_pdu.hdr, coap_get_total_hdr_len(&req_pdu));
+    const coap_hdr_t *hdr = gcoap_request_memo_get_hdr(memo);
+    size_t hdr_len = coap_hdr_len(hdr);
+    memcpy(pdu->hdr, hdr, hdr_len);
 }
 
 static void _receive_from_cache_cb(void *ctx)

@@ -241,13 +241,6 @@ warning: Member AES_KEY_SIZE_256 (macro definition) of file aes.h is not documen
 warning: Member AES_MAXNR (macro definition) of file aes.h is not documented.
 warning: Member AIP31068_PARAMS (macro definition) of file aip31068_params.h is not documented.
 warning: Member ALL_INT_MASK (macro definition) of file nrf24l01p_settings.h is not documented.
-warning: Member ANA0 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member ANA1 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member ANA2 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member ANA3 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member ANA4 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member ANA5 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member ANA6 (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member AON_IOC_CLK32KCTL_OEN (macro definition) of file cc26xx_cc13xx_ioc.h is not documented.
 warning: Member AON_PMCTL_RESETCTL_BOOT_DET_0_CLR_m (macro definition) of file cc26x2_cc13x2_prcm.h is not documented.
 warning: Member AON_PMCTL_RESETCTL_BOOT_DET_0_m (macro definition) of file cc26x2_cc13x2_prcm.h is not documented.
@@ -630,8 +623,6 @@ warning: Member AUX_SYSIF_OPMODEREQ_REQ_PDA (macro definition) of file cc26x2_cc
 warning: Member BACKLIGHT_MASK (macro definition) of file board.h is not documented.
 warning: Member BACKLIGHT_OFF (macro definition) of file board.h is not documented.
 warning: Member BACKLIGHT_ON (macro definition) of file board.h is not documented.
-warning: Member BAT_MONITOR (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member BAT_MONITOR_PW (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member BATTERY_ADC (macro definition) of file board.h is not documented.
 warning: Member BBC0_regs (variable) of file at86rf215_registers.h is not documented.
 warning: Member BBC1_regs (variable) of file at86rf215_registers.h is not documented.
@@ -1768,15 +1759,6 @@ warning: Member DHT_PARAM_PULL (macro definition) of file dht_params.h is not do
 warning: Member DHT_PARAMS (macro definition) of file dht_params.h is not documented.
 warning: Member DHT_PARAM_TYPE (macro definition) of file dht_params.h is not documented.
 warning: Member DHT_SAULINFO (macro definition) of file dht_params.h is not documented.
-warning: Member DIGITAL0 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL1 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL2 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL3 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL4 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL5 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL6 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL7 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member DIGITAL8 (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member DISABLE_INTERRUPTS() (macro definition) of file board_info.h is not documented.
 warning: Member DISK_GET_BLOCK_SIZE (macro definition) of group sys_shell_commands is not documented.
 warning: Member DISK_GET_SECTOR_COUNT (macro definition) of group sys_shell_commands is not documented.
@@ -2460,14 +2442,11 @@ warning: Member GPIO_PIN(x, y) (macro definition) of file periph_cpu_common.h is
 warning: Member GPIO_PIN(x, y) (macro definition) of file periph_cpu.h is not documented.
 warning: Member gpio_t (typedef) of file periph_cpu_common.h is not documented.
 warning: Member gpio_t (typedef) of file periph_cpu.h is not documented.
-warning: Member GPRS_PIN (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member GPRS_PW (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member GPS_ENABLE_MASK (macro definition) of file board.h is not documented.
 warning: Member GPS_ENABLE_OFF (macro definition) of file board.h is not documented.
 warning: Member GPS_ENABLE_ON (macro definition) of file board.h is not documented.
 warning: Member GPS_ENABLE_PIN (macro definition) of file board.h is not documented.
 warning: Member GPS_ENABLE_PORT (macro definition) of file board.h is not documented.
-warning: Member GPS_PW (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member GPS_RST_PIN (macro definition) of group boards_ublox-c030-u201 is not documented.
 warning: Member GPS_TIMEPULSE_MODE (macro definition) of file board.h is not documented.
 warning: Member GPS_TIMEPULSE_PIN (macro definition) of file board.h is not documented.
@@ -2663,7 +2642,6 @@ warning: Member HDC1010_PARAM_ADDR (macro definition) of file board.h is not doc
 warning: Member HDC1010_PARAM_I2C (macro definition) of file board.h is not documented.
 warning: Member HDC1010_PIN_DRDY (macro definition) of file board.h is not documented.
 warning: Member HFXO_FREQ (macro definition) of file periph_conf.h is not documented.
-warning: Member HIB_PIN (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member HMC5883L_PARAM_DEV (macro definition) of file hmc5883l_params.h is not documented.
 warning: Member HMC5883L_PARAM_DOR (macro definition) of file hmc5883l_params.h is not documented.
 warning: Member HMC5883L_PARAM_GAIN (macro definition) of file hmc5883l_params.h is not documented.
@@ -2757,9 +2735,7 @@ warning: Member I2C_PIN_MASK (macro definition) of file periph_cpu.h is not docu
 warning: Member i2c_pin_scl(dev) (macro definition) of file periph_cpu.h is not documented.
 warning: Member i2c_pin_sda(dev) (macro definition) of file periph_cpu.h is not documented.
 warning: Member I2C_PORT_REG (macro definition) of file periph_cpu.h is not documented.
-warning: Member I2C_SCL (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member I2C_SCL_PIN (macro definition) of file periph_conf.h is not documented.
-warning: Member I2C_SDA (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member I2C_SDA_PIN (macro definition) of file periph_conf.h is not documented.
 warning: Member i2c_speed_t (enumeration) of file periph_cpu.h is not documented.
 warning: Member IANA_DYNAMIC_PORTRANGE_MAX (macro definition) of group net_iana_portrange is not documented.
@@ -3112,12 +3088,10 @@ warning: Member LED0_ACTIVE (macro definition) of file board.h is not documented
 warning: Member LED0_BIT (macro definition) of file board.h is not documented.
 warning: Member LED0B_PIN (macro definition) of file board.h is not documented.
 warning: Member LED0G_PIN (macro definition) of file board.h is not documented.
-warning: Member LED0 (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member LED0R_PIN (macro definition) of file board.h is not documented.
 warning: Member LED1_BIT (macro definition) of file board.h is not documented.
 warning: Member LED1B_PIN (macro definition) of file board.h is not documented.
 warning: Member LED1G_PIN (macro definition) of file board.h is not documented.
-warning: Member LED1 (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member LED1R_PIN (macro definition) of file board.h is not documented.
 warning: Member LED2_BIT (macro definition) of file board.h is not documented.
 warning: Member LED_ALL_OFF (macro definition) of file board.h is not documented.
@@ -3330,7 +3304,6 @@ warning: Member LORA_RESET_ON (macro definition) of file board.h is not document
 warning: Member LORA_RESET_PIN (macro definition) of file board.h is not documented.
 warning: Member LORA_RESET_PORT (macro definition) of file board.h is not documented.
 warning: Member LORA_RESET_TOGGLE (macro definition) of file board.h is not documented.
-warning: Member LOW_BAT_MON (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member LPD8808_PARAM_LED_CNT (macro definition) of file lpd8808_params.h is not documented.
 warning: Member LPD8808_PARAM_PIN_CLK (macro definition) of file lpd8808_params.h is not documented.
 warning: Member LPD8808_PARAM_PIN_DAT (macro definition) of file lpd8808_params.h is not documented.
@@ -4194,7 +4167,6 @@ warning: Member MEAS_OSRS_P_POS (macro definition) of file bmx280_internals.h is
 warning: Member MEAS_OSRS_T_POS (macro definition) of file bmx280_internals.h is not documented.
 warning: Member MEM_ALIGNMENT (macro definition) of group pkg_lwip_opts is not documented.
 warning: Member MEMP_MEM_MALLOC (macro definition) of group pkg_lwip_opts is not documented.
-warning: Member MEM_PW (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member MEM_SIZE (macro definition) of group pkg_lwip_opts is not documented.
 warning: Member M_GPIO2_PIN (macro definition) of group boards_ublox-c030-u201 is not documented.
 warning: Member M_GPIO3_PIN (macro definition) of group boards_ublox-c030-u201 is not documented.
@@ -5149,27 +5121,21 @@ warning: Member MULLE_VBAT_ADC_LINE (macro definition) of file board.h is not do
 warning: Member MULLE_VCHR_ADC_LINE (macro definition) of file board.h is not documented.
 warning: Member MULTIPLY_DATA(data_raw, integration_time) (macro definition) of file tsl4531x_internals.h is not documented.
 warning: Member MUX0_ENABLE_PORT (macro definition) of file board.h is not documented.
-warning: Member MUX_0 (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member MUX0_OFF (macro definition) of file board.h is not documented.
 warning: Member MUX0_ON (macro definition) of file board.h is not documented.
 warning: Member MUX0_PIN (macro definition) of file board.h is not documented.
 warning: Member MUX0_PORT (macro definition) of file board.h is not documented.
 warning: Member MUX1_ENABLE_PORT (macro definition) of file board.h is not documented.
-warning: Member MUX_1 (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member MUX1_OFF (macro definition) of file board.h is not documented.
 warning: Member MUX1_ON (macro definition) of file board.h is not documented.
 warning: Member MUX1_PIN (macro definition) of file board.h is not documented.
 warning: Member MUX1_PORT (macro definition) of file board.h is not documented.
 warning: Member MUX_PW_ENABLE_PORT (macro definition) of file board.h is not documented.
-warning: Member MUX_PW (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member MUX_PW_OFF (macro definition) of file board.h is not documented.
 warning: Member MUX_PW_ON (macro definition) of file board.h is not documented.
 warning: Member MUX_PW_PIN (macro definition) of file board.h is not documented.
 warning: Member MUX_PW_PORT (macro definition) of file board.h is not documented.
-warning: Member MUX_RX (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member MUX_TX (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member MUX_USB_XBEE_ENABLE_PORT (macro definition) of file board.h is not documented.
-warning: Member MUX_USB_XBEE (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member MUX_USB_XBEE_OFF (macro definition) of file board.h is not documented.
 warning: Member MUX_USB_XBEE_ON (macro definition) of file board.h is not documented.
 warning: Member MUX_USB_XBEE_PIN (macro definition) of file board.h is not documented.
@@ -5619,7 +5585,6 @@ warning: Member RADIO_TCXO_VCC_PIN (macro definition) of file board.h is not doc
 warning: Member RANDOM_NUMOF (macro definition) of file periph_conf.h is not documented.
 warning: Member ra_OFFSET (macro definition) of file context_frame.h is not documented.
 warning: Member R_COEF_IF (macro definition) of file tcs37727-internal.h is not documented.
-warning: Member RDY_ACC (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member RECHARGECFG_ADAPTIVE_EN (macro definition) of file cc26x0_cc13x0_prcm.h is not documented.
 warning: Member RECHARGECFG_C1_mask (macro definition) of file cc26x0_cc13x0_prcm.h is not documented.
 warning: Member RECHARGECFG_C2_mask (macro definition) of file cc26x0_cc13x0_prcm.h is not documented.
@@ -5914,11 +5879,8 @@ warning: Member RR_RDLENGTH_LENGTH (macro definition) of group net_dns is not do
 warning: Member RR_TTL_LENGTH (macro definition) of group net_dns is not documented.
 warning: Member RR_TYPE_LENGTH (macro definition) of group net_dns is not documented.
 warning: Member _RS(list) (macro definition) of group sys_ut is not documented.
-warning: Member RST_RTC (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member RTC_DEV (macro definition) of file cfg_rtc_default.h is not documented.
 warning: Member RTC_LOAD_CAP_BITS (macro definition) of file periph_conf.h is not documented.
-warning: Member RTC_PW (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member RTC_SLEEP (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member RTT_CLOCK_FREQUENCY (macro definition) of file cfg_rtt_default.h is not documented.
 warning: Member RTT_CLOCK_FREQUENCY (macro definition) of file periph_cpu.h is not documented.
 warning: Member RTT_DEV (macro definition) of file cfg_rtt_default.h is not documented.
@@ -6060,8 +6022,6 @@ warning: Member SD_DATA_TOKEN_CMD_25_STOP (macro definition) of file sdcard_spi_
 warning: Member SDEFAULT (macro definition) of file ColorTextColors.h is not documented.
 warning: Member SD_GET_CSD_STRUCTURE(CSD_RAW_DATA) (macro definition) of file sdcard_spi_internal.h is not documented.
 warning: Member SD_INVALID_R1_RESPONSE (macro definition) of file sdcard_spi_internal.h is not documented.
-warning: Member SD_MISO (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member SD_MOSI (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member SDP31_PRODUCT_NO_BYTE_0 (macro definition) of file sdp3x_params.h is not documented.
 warning: Member SDP31_PRODUCT_NO_BYTE_1 (macro definition) of file sdp3x_params.h is not documented.
 warning: Member SDP31_PRODUCT_NO_BYTE_3 (macro definition) of file sdp3x_params.h is not documented.
@@ -6076,7 +6036,6 @@ warning: Member SDP3X_PARAM_IRQ_PIN (macro definition) of file sdp3x_params.h is
 warning: Member SDP3X_PARAMS (macro definition) of file sdp3x_params.h is not documented.
 warning: Member SDP3X_SAUL_INFO (macro definition) of file sdp3x_params.h is not documented.
 warning: Member SD_POWERSEQUENCE_CLOCK_COUNT (macro definition) of file sdcard_spi_internal.h is not documented.
-warning: Member SD_PRESENT (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member SD_R1_RESPONSE_ADDR_ERROR (macro definition) of file sdcard_spi_internal.h is not documented.
 warning: Member SD_R1_RESPONSE_CMD_CRC_ERROR (macro definition) of file sdcard_spi_internal.h is not documented.
 warning: Member SD_R1_RESPONSE_ERASE_RESET (macro definition) of file sdcard_spi_internal.h is not documented.
@@ -6123,10 +6082,8 @@ warning: Member SDS011_PARAM_UART_DEV (macro definition) of file sds011_params.h
 warning: Member SDS011_RCMDID_DATA (macro definition) of file sds011_internal.h is not documented.
 warning: Member SDS011_RCMDID_REPLY (macro definition) of file sds011_internal.h is not documented.
 warning: Member SDS011_SAUL_INFO (macro definition) of file sds011_params.h is not documented.
-warning: Member SD_SCK (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member SD_SIZE_OF_CID_AND_CSD_REG (macro definition) of file sdcard_spi_internal.h is not documented.
 warning: Member SD_SIZE_OF_SD_STATUS (macro definition) of file sdcard_spi_internal.h is not documented.
-warning: Member SD_SS (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member SEESAW_SOIL_MANUFACTURER_ID (macro definition) of file seesaw_soil_regs.h is not documented.
 warning: Member SEESAW_SOIL_MID_VALUE (macro definition) of file seesaw_soil_regs.h is not documented.
 warning: Member SEESAW_SOIL_MOISTURE (macro definition) of file seesaw_soil_regs.h is not documented.
@@ -6137,8 +6094,6 @@ warning: Member SEESAW_SOIL_RST (macro definition) of file seesaw_soil_regs.h is
 warning: Member SEESAW_SOIL_SAUL_INFO (macro definition) of file seesaw_soil_params.h is not documented.
 warning: Member SEESAW_SOIL_TEMPERATURE (macro definition) of file seesaw_soil_regs.h is not documented.
 warning: Member sem_spi (variable) of file uwb_dw1000_params.h is not documented.
-warning: Member SENS_PW_3V3 (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member SENS_PW_5V (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member SERPENTE_NOR_FLAGS (macro definition) of file board.h is not documented.
 warning: Member SERPENTE_NOR_PAGE_SIZE (macro definition) of file board.h is not documented.
 warning: Member SERPENTE_NOR_PAGES_PER_SECTOR (macro definition) of file board.h is not documented.
@@ -6465,7 +6420,6 @@ warning: Member SOC_ADC_ADCCON3_EREF (macro definition) of file periph_conf.h is
 warning: Member SOCK_DNS_MAX_NAME_LEN (macro definition) of group net_sock_dns is not documented.
 warning: Member SOCK_DNS_PORT (macro definition) of group net_sock_dns is not documented.
 warning: Member SOCK_DNS_RETRIES (macro definition) of group net_sock_dns is not documented.
-warning: Member SOCKET0_SS (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member SOFT_SPI_PARAM_CLK (macro definition) of file soft_spi_params.h is not documented.
 warning: Member SOFT_SPI_PARAM_MISO (macro definition) of file soft_spi_params.h is not documented.
 warning: Member SOFT_SPI_PARAM_MOSI (macro definition) of file soft_spi_params.h is not documented.
@@ -8112,8 +8066,6 @@ warning: Member USB_HID_REQUEST_SET_PROTOCOL (macro definition) of group usb_hid
 warning: Member USB_HID_REQUEST_SET_REPORT (macro definition) of group usb_hid is not documented.
 warning: Member USB_HID_SUBCLASS_BOOT (macro definition) of group usb_hid is not documented.
 warning: Member USB_HID_SUBCLASS_NONE (macro definition) of group usb_hid is not documented.
-warning: Member USB_XBEE_RX (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member USB_XBEE_TX (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member UUID_VERSION_MASK (macro definition) of group sys_uuid is not documented.
 warning: Member VCC33 (macro definition) of file board.h is not documented.
 warning: Member VCNL40X0_AMBIENT_MASK_PARA_AUTO_OFFSET (macro definition) of file vcnl40x0_internals.h is not documented.
@@ -8251,14 +8203,11 @@ warning: Member XBEE2_EN_MODE (macro definition) of file board.h is not document
 warning: Member XBEE2_EN_PIN (macro definition) of file board.h is not documented.
 warning: Member XBEE2_EN_PORT (macro definition) of file board.h is not documented.
 warning: Member XBEE2_INT_PIN (macro definition) of file board.h is not documented.
-warning: Member XBEE_MON (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member XBEE_PARAM_BR (macro definition) of file xbee_params.h is not documented.
 warning: Member XBEE_PARAM_PIN_RESET (macro definition) of file xbee_params.h is not documented.
 warning: Member XBEE_PARAM_PIN_SLEEP (macro definition) of file xbee_params.h is not documented.
 warning: Member XBEE_PARAMS (macro definition) of file xbee_params.h is not documented.
 warning: Member XBEE_PARAM_UART (macro definition) of file xbee_params.h is not documented.
-warning: Member XBEE_PW (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member XBEE_SLEEP (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member xl320_baudrate_t (enumeration) of file dynamixel_protocol.h is not documented.
 warning: Member xl320_register16_t (enumeration) of file dynamixel_protocol.h is not documented.
 warning: Member xl320_register8_t (enumeration) of file dynamixel_protocol.h is not documented.
