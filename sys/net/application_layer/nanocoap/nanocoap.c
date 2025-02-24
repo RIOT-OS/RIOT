@@ -578,7 +578,7 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_
 
 ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
                                 void *buf, size_t len,
-                                int ct,
+                                uint16_t ct,
                                 void **payload, size_t *payload_len_max)
 {
     uint8_t *bufpos = buf;
@@ -631,7 +631,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
     }
 
     if (payload) {
-        if (ct >= 0) {
+        if (ct != COAP_FORMAT_NONE) {
             bufpos += coap_put_option_ct(bufpos, 0, ct);
         }
         *bufpos++ = COAP_PAYLOAD_MARKER;
@@ -649,7 +649,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
-                          unsigned ct,
+                          uint16_t ct,
                           const void *payload, size_t payload_len)
 {
     void *payload_start;

@@ -2278,8 +2278,7 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
  * @param[out]  buf         buffer to write reply to
  * @param[in]   len         size of @p buf
- * @param[in]   ct          content type of payload
- *                          if ct < 0 this will be ignored
+ * @param[in]   ct          content type of payload or @ref COAP_FORMAT_NONE
  * @param[out]  payload     Will be set to the start of the payload inside
  *                          @p buf.
  *                          May be set to NULL if no payload response is
@@ -2292,8 +2291,7 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  * @returns     -ENOSPC if @p buf too small
  */
 ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
-                                void *buf, size_t len,
-                                int ct,
+                                void *buf, size_t len, uint16_t ct,
                                 void **payload, size_t *payload_len_max);
 
 /**
@@ -2309,7 +2307,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
  * @param[out]  buf         buffer to write reply to
  * @param[in]   len         size of @p buf
- * @param[in]   ct          content type of payload
+ * @param[in]   ct          content type of payload or @ref COAP_FORMAT_NONE
  * @param[in]   payload     ptr to payload
  * @param[in]   payload_len length of payload
  *
@@ -2320,7 +2318,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
-                          unsigned ct,
+                          uint16_t ct,
                           const void *payload, size_t payload_len);
 
 /**
