@@ -7,7 +7,7 @@ USEMODULE += benchmark
 ifeq (llvm,$(TOOLCHAIN))
   # the floating point exception bug is more likely to trigger when build
   # with LLVM, so we just disable LLVM on native as a work around
-  TEST_ON_CI_BLACKLIST += native native64
+  TEST_ON_CI_BLACKLIST += native32 native64
 endif
 
 include $(RIOTBASE)/Makefile.include
