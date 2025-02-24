@@ -11,7 +11,7 @@ USEMODULE += shell_cmds_default
 USEMODULE += benchmark
 
 # disable native GPIOs for automatic test
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
   USEMODULE += periph_gpio_mock
 endif
 

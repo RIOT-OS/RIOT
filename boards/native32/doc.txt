@@ -1,12 +1,12 @@
 /**
-@defgroup    boards_native Native Board
+@defgroup    boards_native32 Native Board
 @ingroup     boards
 @brief       Support for running RIOT in native
 
 [Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
 # Overview
-![Terminal running RIOT native](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
+![Terminal running RIOT native32](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
 
 # Hardware
 - CPU: Host CPU

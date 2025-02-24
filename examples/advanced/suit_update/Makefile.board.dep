@@ -1,4 +1,4 @@
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
   USEMODULE += suit_storage_ram
   USEMODULE += netdev_default
   # Use VFS storage for native

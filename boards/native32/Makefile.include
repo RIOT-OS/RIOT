@@ -1,4 +1,4 @@
-NATIVEINCLUDES += -I$(RIOTBOARD)/native/include/
+NATIVEINCLUDES += -I$(RIOTBOARD)/native32/include/
 
 # only use pyterm wrapper if term target is requested
 ifeq (,$(filter term,$(MAKECMDGOALS)))
@@ -7,7 +7,7 @@ else
   RIOT_TERMINAL ?= pyterm
 endif
 
-RESET ?= $(RIOTBOARD)/native/dist/reset.sh
+RESET ?= $(RIOTBOARD)/native32/dist/reset.sh
 FLASHER ?=
 FLASHFILE ?= $(ELFFILE)
 

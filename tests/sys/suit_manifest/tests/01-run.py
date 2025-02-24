@@ -16,7 +16,7 @@ def testfunc(child):
     # Increase timeout on "real" hardware
     # 16 seconds on `samr21-xpro`
     # >50 seconds on `nrf51dk`
-    timeout = 60 if board not in ['native', 'native64'] else -1
+    timeout = 60 if board not in ['native', 'native32', 'native64'] else -1
     child.expect(r"OK \(\d+ tests\)", timeout=timeout)
 
 

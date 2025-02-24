@@ -4,6 +4,6 @@ ifneq (,$(filter arch_esp,$(FEATURES_USED)))
   USEMODULE += esp_wifi
 endif
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
   USEMODULE += netdev_default
 endif
