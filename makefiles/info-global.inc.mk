@@ -19,7 +19,9 @@ DEFAULT_MODULE_GLOBAL := $(DEFAULT_MODULE)
 FEATURES_BLACKLIST_GLOBAL := $(FEATURES_BLACKLIST)
 
 define board_unsatisfied_features
-  BOARD             := $(1)
+  # BOARD might have been overwritten by `board_alias.ink.mk`
+  # To be able to re-set it here, we need to use override again
+  override BOARD    := $(1)
   USEMODULE         := $(USEMODULE_GLOBAL)
   USEPKG            := $(USEPKG_GLOBAL)
   DISABLE_MODULE    := $(DISABLE_MODULE_GLOBAL)

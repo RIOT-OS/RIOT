@@ -15,7 +15,7 @@ APP_SHELL_FMT ?= NONE
 TEST_ON_CI_BLACKLIST += microbit
 
 # requires #19005
-TEST_ON_CI_BLACKLIST += native native64
+TEST_ON_CI_BLACKLIST += native32 native64
 
 include $(RIOTBASE)/Makefile.include
 
