@@ -144,3 +144,8 @@ export RUST_TARGET           # Rust's own version of the target triple / quadrup
                              #
                              # It is set by the architecture (and thus eventually the CPU), and exported to
                              # be available when building Rust modules.
+export RUSTFLAGS             # Like CFLAGS but for Rust.
+                             #
+                             # We influence those to set useful defaults that
+                             # would otherwise need to be reiterated in Cargo
+                             # files.
