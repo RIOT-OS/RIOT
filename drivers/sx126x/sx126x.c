@@ -26,6 +26,8 @@
 #include "periph/spi.h"
 
 #include "sx126x.h"
+#include "sx126x_driver.h"
+#include "sx126x_driver_regs.h"
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
 
@@ -190,20 +192,83 @@ int sx126x_init(sx126x_t *dev)
     sx126x_init_default_config(dev);
 
     /* Configure available IRQs */
-    const uint16_t irq_mask = (
-        SX126X_IRQ_TX_DONE |
-        SX126X_IRQ_RX_DONE |
-        SX126X_IRQ_PREAMBLE_DETECTED |
-        SX126X_IRQ_SYNC_WORD_VALID |
-        SX126X_IRQ_HEADER_VALID |
-        SX126X_IRQ_HEADER_ERROR |
-        SX126X_IRQ_CRC_ERROR |
-        SX126X_IRQ_CAD_DONE |
-        SX126X_IRQ_CAD_DETECTED |
-        SX126X_IRQ_TIMEOUT
-        );
+    uint16_t irq_mask_dio1 = dev->params->dio1_irq_mask;
+    uint16_t irq_mask_dio2 = 0;
+    uint16_t irq_mask_dio3 = 0;
 
-    sx126x_set_dio_irq_params(dev, irq_mask, irq_mask, 0, 0);
+#if IS_USED(MODULE_SX126X_DIO2)
+    if (dev->params->dio2_mode == SX126X_DIO2_IRQ) {
+        if (gpio_is_valid(dev->params->u_dio2_arg.dio2_pin)) {
+            res = gpio_init_int(dev->params->u_dio2_arg.dio2_pin, GPIO_IN, GPIO_RISING,
+                                dev->event_cb, dev->event_arg);
+            if (res < 0) {
+                DEBUG("[sx126x] error: failed to initialize DIO2 pin\n");
+                return res;
+            }
+            irq_mask_dio2 = dev->params->u_dio2_arg.dio2_irq_mask;
+        }
+    }
+    else if (dev->params->dio2_mode == SX126X_DIO2_RF_SWITCH) {
+        if (gpio_is_valid(dev->params->u_dio2_arg.rf_switch_pin)) {
+            res = gpio_init(dev->params->u_dio2_arg.rf_switch_pin, GPIO_IN);
+            if (res < 0) {
+                DEBUG("[sx126x] error: failed to initialize RF switch pin\n");
+                return res;
+            }
+        }
+        sx126x_set_dio2_as_rf_sw_ctrl(dev, true);
+    }
+#endif
+#if IS_USED(MODULE_SX126X_DIO3)
+    if (dev->params->dio3_mode == SX126X_DIO3_IRQ) {
+        if (gpio_is_valid(dev->params->u_dio3_arg.dio3_pin)) {
+            res = gpio_init_int(dev->params->u_dio3_arg.dio3_pin, GPIO_IN, GPIO_RISING,
+                                dev->event_cb, dev->event_arg);
+            if (res < 0) {
+                DEBUG("[sx126x] error: failed to initialize DIO3 pin\n");
+                return res;
+            }
+            irq_mask_dio3 = dev->params->u_dio3_arg.dio3_irq_mask;
+        }
+    }
+    else if (dev->params->dio3_mode == SX126X_DIO3_TCX0) {
+        sx126x_set_dio3_as_tcxo_ctrl(dev, dev->params->u_dio3_arg.tcxo_volt,
+                                     dev->params->u_dio3_arg.tcx0_timeout);
+
+        /* Once the command SetDIO3AsTCXOCtrl(...) is sent to the device,
+           the register controlling the internal cap on XTA will be automatically
+           changed to 0x2F (33.4 pF) to filter any spurious which could occur
+           and be propagated to the PLL.- Verify that. */
+        uint8_t trimming_capacitor_values[2] = { 0 };
+        sx126x_read_register(dev, SX126X_REG_XTATRIM,
+                             trimming_capacitor_values,
+                             sizeof(trimming_capacitor_values));
+        /* 11.3 pF + x * 0.47pF  = 33.4pF | x = 0x2f*/
+        if (trimming_capacitor_values[0] != 0x2f) {
+            DEBUG("[sx126x] warning: failed to set TCXO control: SX126X_REG_XTATRIM=%02x\n",
+                  trimming_capacitor_values[0]);
+        }
+        DEBUG("[sx126x] XTA capacitor ~ %upF\n",
+              (unsigned)(0.5f + (11.3f + trimming_capacitor_values[0] * 0.47f)));
+        DEBUG("[sx126x] XTB capacitor ~ %upF\n",
+              (unsigned)(0.5f + (11.3f + trimming_capacitor_values[1] * 0.47f)));
+
+        /* When the 32 MHz clock is coming from a TCXO, the calibration will fail
+           and the user should request a complete calibration after calling the function
+           SetDIO3AsTcxoCtrl(...). */
+        sx126x_cal(dev, SX126X_CAL_ALL);
+    }
+#endif
+    /* The user can specify the use of DC-DC by using the command SetRegulatorMode(...).
+       This operation must be carried out in STDBY_RC mode only.*/
+    sx126x_set_reg_mode(dev, dev->params->regulator);
+
+    /* Initialize radio with the default parameters */
+    sx126x_init_default_config(dev);
+
+    sx126x_set_standby(dev, SX126X_STANDBY_CFG_XOSC);
+
+    sx126x_set_dio_irq_params(dev, SX126X_IRQ_MASK_ALL, irq_mask_dio1, irq_mask_dio2, irq_mask_dio3);
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         sx126x_pkt_type_t pkt_type;
