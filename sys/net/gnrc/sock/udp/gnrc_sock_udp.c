@@ -28,6 +28,10 @@
 #include "net/udp.h"
 #include "random.h"
 
+#ifdef SOCK_HAS_ASYNC_CTX
+#include "net/sock/async/event.h"
+#endif
+
 #include "gnrc_sock_internal.h"
 
 #define ENABLE_DEBUG 0
@@ -155,6 +159,9 @@ void sock_udp_close(sock_udp_t *sock)
 {
     assert(sock != NULL);
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &sock->reg.entry);
+#ifdef SOCK_HAS_ASYNC_CTX
+    sock_event_close(sock_udp_get_async_ctx(sock));
+#endif
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
     if (_udp_socks != NULL) {
         gnrc_sock_reg_t *head = (gnrc_sock_reg_t *)_udp_socks;
