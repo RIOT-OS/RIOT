@@ -1091,7 +1091,7 @@ static void _isr(netdev_t *netdev)
 
     /* check if the received packet has the ACK request bit set */
     bool rx_ack_req;
-    if (bb_irq_mask & BB_IRQ_RXFE) {
+    if ((bb_irq_mask & BB_IRQ_RXFE) && (dev->flags & AT86RF215_OPT_AUTOACK)) {
         rx_ack_req = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS) & IEEE802154_FCF_ACK_REQ;
     } else {
         rx_ack_req = 0;
