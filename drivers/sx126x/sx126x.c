@@ -232,20 +232,52 @@ int sx126x_init(sx126x_t *dev)
     sx126x_init_default_config(dev);
 
     /* Configure available IRQs */
-    const uint16_t irq_mask = (
-        SX126X_IRQ_TX_DONE |
-        SX126X_IRQ_RX_DONE |
-        SX126X_IRQ_PREAMBLE_DETECTED |
-        SX126X_IRQ_SYNC_WORD_VALID |
-        SX126X_IRQ_HEADER_VALID |
-        SX126X_IRQ_HEADER_ERROR |
-        SX126X_IRQ_CRC_ERROR |
-        SX126X_IRQ_CAD_DONE |
-        SX126X_IRQ_CAD_DETECTED |
-        SX126X_IRQ_TIMEOUT
-        );
+    uint16_t irq_mask_dio1 = dev->params->dio1_irq_mask;
+    uint16_t irq_mask_dio2 = 0;
+    uint16_t irq_mask_dio3 = 0;
 
-    sx126x_set_dio_irq_params(dev, irq_mask, irq_mask, 0, 0);
+#if IS_USED(MODULE_SX126X_DIO2)
+        if (dev->params->dio2_mode == SX126X_DIO2_IRQ) {
+            if (gpio_is_valid(dev->params->u_dio2_arg.dio2_pin)) {
+                res = gpio_init_int(dev->params->u_dio2_arg.dio2_pin, GPIO_IN, GPIO_RISING,
+                                    dev->event_cb, dev->event_arg);
+                if (res < 0) {
+                    DEBUG("[sx126x] error: failed to initialize DIO2 pin\n");
+                    return res;
+                }
+                irq_mask_dio2 = dev->params->u_dio2_arg.dio2_irq_mask;
+            }
+        }
+        else if (dev->params->dio2_mode == SX126X_DIO2_RF_SWITCH) {
+            if (gpio_is_valid(dev->params->u_dio2_arg.rf_switch_pin)) {
+                res = gpio_init(dev->params->u_dio2_arg.rf_switch_pin, GPIO_IN);
+                if (res < 0) {
+                    DEBUG("[sx126x] error: failed to initialize RF switch pin\n");
+                    return res;
+                }
+                sx126x_set_dio2_as_rf_sw_ctrl(dev, true);
+            }
+        }
+#endif
+#if IS_USED(MODULE_SX126X_DIO3)
+        if (dev->params->dio3_mode == SX126X_DIO3_IRQ) {
+            if (gpio_is_valid(dev->params->u_dio3_arg.dio3_pin)) {
+                res = gpio_init_int(dev->params->u_dio3_arg.dio3_pin, GPIO_IN, GPIO_RISING,
+                                    dev->event_cb, dev->event_arg);
+                if (res < 0) {
+                    DEBUG("[sx126x] error: failed to initialize DIO3 pin\n");
+                    return res;
+                }
+                irq_mask_dio3 = dev->params->u_dio3_arg.dio3_irq_mask;
+            }
+        }
+        else if (dev->params->dio3_mode == SX126X_DIO3_TCX0) {
+            sx126x_set_dio3_as_tcxo_ctrl(dev, dev->params->u_dio3_arg.tcxo_volt,
+                                         dev->params->u_dio3_arg.tcx0_timeout);
+        }
+#endif
+
+    sx126x_set_dio_irq_params(dev, SX126X_IRQ_MASK_ALL, irq_mask_dio1, irq_mask_dio2, irq_mask_dio3);
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         sx126x_pkt_type_t pkt_type;
