@@ -295,6 +295,15 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
 static int _set_state(sx126x_t *dev, netopt_state_t state)
 {
+    /* check for errors */
+    sx126x_errors_mask_t error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_DEBUG(dev, "netdev set state: device error 0x%04x before setting state\n", error);
+    }
+    sx126x_clear_device_errors(dev);
+    int ret = sizeof(netopt_state_t);
+
     switch (state) {
     case NETOPT_STATE_STANDBY:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_STANDBY state\n");
@@ -347,9 +356,17 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         break;
 
     default:
-        return -ENOTSUP;
+        ret = -ENOTSUP;
     }
-    return sizeof(netopt_state_t);
+
+    error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_DEBUG(dev, "netdev set state: device error 0x%04x\n", error);
+    }
+    sx126x_clear_device_errors(dev);
+
+    return ret;
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)

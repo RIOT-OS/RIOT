@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#include "log.h"
 #include "macros/math.h"
 #include "macros/utils.h"
 #include "net/lora.h"
@@ -207,11 +208,13 @@ int sx126x_init(sx126x_t *dev)
     /* Reset the device */
     sx126x_reset(dev);
 
-    /* Configure the power regulator mode */
-    sx126x_set_reg_mode(dev, dev->params->regulator);
-
-    /* Initialize radio with the default parameters */
-    sx126x_init_default_config(dev);
+    /* check for errors */
+    sx126x_errors_mask_t error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_LOG_INFO(dev, "startup: device errors 0x%04x\n", error);
+    }
+    sx126x_clear_device_errors(dev);
 
     /* Configure available IRQs */
     uint16_t irq_mask_dio1 = dev->params->dio1_irq_mask;
@@ -281,6 +284,16 @@ int sx126x_init(sx126x_t *dev)
         sx126x_cal(dev, SX126X_CAL_ALL);
     }
 #endif
+    error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_LOG_ERROR(dev, "error: device error 0x%04x\n", error);
+    }
+    else {
+        SX126X_LOG_INFO(dev, "startup successful\n");
+    }
+    sx126x_clear_device_errors(dev);
+
     /* The user can specify the use of DC-DC by using the command SetRegulatorMode(...).
        This operation must be carried out in STDBY_RC mode only.*/
     sx126x_set_reg_mode(dev, dev->params->regulator);
