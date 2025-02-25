@@ -405,11 +405,13 @@ int sx126x_init(sx126x_t *dev)
         sx126x_cfg_tx_clamp(dev);
     }
 
-    /* Configure the power regulator mode */
-    sx126x_set_reg_mode(dev, dev->params->regulator);
-
-    /* Initialize radio with the default parameters */
-    sx126x_init_default_config(dev);
+    /* check for errors */
+    sx126x_errors_mask_t error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_LOG_ERROR(dev, "startup: device errors 0x%04x\n", error);
+    }
+    sx126x_clear_device_errors(dev);
 
 #if IS_USED(MODULE_SX126X_DIO2)
     if (dev->params->dio2_mode == SX126X_DIO2_RF_SWITCH) {
@@ -444,6 +446,16 @@ int sx126x_init(sx126x_t *dev)
         sx126x_cal(dev, SX126X_CAL_ALL);
     }
 #endif
+    error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_LOG_ERROR(dev, "error: device error 0x%04x\n", error);
+    }
+    else {
+        SX126X_LOG_INFO(dev, "startup successful\n");
+    }
+    sx126x_clear_device_errors(dev);
+
     /* The user can specify the use of DC-DC by using the command SetRegulatorMode(...).
        This operation must be carried out in STDBY_RC mode only.*/
     sx126x_set_reg_mode(dev, dev->params->regulator);
@@ -481,6 +493,14 @@ sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev)
 
 void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
 {
+    /* check for errors */
+    sx126x_errors_mask_t error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_DEBUG(dev, "before set state: device error 0x%04x before setting state\n", error);
+    }
+    sx126x_clear_device_errors(dev);
+
     switch (state) {
     case SX126X_CHIP_MODE_TX:
         sx126x_set_tx(dev, 0); /* no TX frame timeout */
@@ -513,6 +533,13 @@ void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
     default:
         break;
     }
+
+    error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_DEBUG(dev, "after set state: device error 0x%04x before setting state\n", error);
+    }
+    sx126x_clear_device_errors(dev);
 }
 
 uint32_t sx126x_get_channel(const sx126x_t *dev)
@@ -557,10 +584,17 @@ static void _cal_img(sx126x_t *dev, uint32_t freq)
 
 void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
 {
+    sx126x_clear_device_errors(dev);
     SX126X_DEBUG(dev, "sx126x_set_channel %" PRIu32 "Hz \n", freq);
     dev->channel = freq;
     sx126x_set_rf_freq(dev, dev->channel);
     _cal_img(dev, freq);
+    sx126x_errors_mask_t error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_DEBUG(dev, "sx126x_set_channel: device errors 0x%04x\n", error);
+    }
+    sx126x_clear_device_errors(dev);
 }
 
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
