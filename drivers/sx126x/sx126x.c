@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#include "log.h"
 #include "macros/math.h"
 #include "macros/utils.h"
 #include "net/lora.h"
@@ -222,6 +223,8 @@ int sx126x_init(sx126x_t *dev)
     }
 #endif
 
+    sx126x_clear_device_errors(dev);
+
     /* Reset the device */
     sx126x_reset(dev);
 
@@ -292,6 +295,12 @@ int sx126x_init(sx126x_t *dev)
 
     /* Radio Rx timeout timer stopped on preamble detection */
     sx126x_stop_timer_on_preamble(dev, true);
+
+    sx126x_errors_mask_t error;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        LOG_ERROR("[sx126x]: error: device error 0x%04x\n", error);
+    }
 
     return res;
 }
