@@ -18,6 +18,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <errno.h>
 
@@ -37,19 +38,6 @@
 
 const uint8_t llcc68_max_sf = LORA_SF11;
 const uint8_t sx126x_max_sf = LORA_SF12;
-
-#if IS_USED(MODULE_SX126X_STM32WL)
-static netdev_t *_dev;
-
-void isr_subghz_radio(void)
-{
-    /* Disable NVIC to avoid ISR conflict in CPU. */
-    NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
-    NVIC_ClearPendingIRQ(SUBGHZ_Radio_IRQn);
-    netdev_trigger_event_isr(_dev);
-    cortexm_isr_end();
-}
-#endif
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
@@ -127,12 +115,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static int _init(netdev_t *netdev)
 {
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
-
-    if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
-        _dev = netdev;
-#endif
-    }
 
     /* Launch initialization of driver and device */
     DEBUG("[sx126x] netdev: initializing driver...\n");
@@ -372,6 +354,17 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         sx126x_set_channel(dev, *((const uint32_t *)val));
         return sizeof(uint32_t);
 
+    case NETOPT_SINGLE_RECEIVE:
+        assert(len <= sizeof(netopt_enable_t));
+        netopt_enable_t single_rx = *((const netopt_enable_t *)val);
+        if (single_rx) {
+            dev->rx_timeout = 0;
+        }
+        else {
+            dev->rx_timeout = -1;
+        }
+        return sizeof(netopt_enable_t);
+
     case NETOPT_BANDWIDTH:
         assert(len <= sizeof(uint8_t));
         uint8_t bw = *((const uint8_t *)val);
@@ -416,18 +409,25 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         return sizeof(netopt_enable_t);
 
     case NETOPT_RX_SYMBOL_TIMEOUT:
-        assert(len <= sizeof(uint16_t));
-        dev->rx_timeout = *(const uint16_t *)val;
-        return sizeof(uint16_t);
+        assert(len <= sizeof(int32_t));
+        int32_t timeout = *((const int32_t *)val);
+        if (timeout >= 0) {
+            dev->rx_timeout = *(const int32_t *)val;
+            return sizeof(int32_t);
+        }
+        else {
+            res = -EINVAL;
+            break;
+        }
 
     case NETOPT_TX_POWER:
         assert(len <= sizeof(int16_t));
         int16_t power = *((const int16_t *)val);
-        if ((power < INT8_MIN) || (power > INT8_MAX)) {
+        if ((power < SX126X_POWER_MIN) || (power > SX126X_POWER_MAX)) {
             res = -EINVAL;
             break;
         }
-        sx126x_set_tx_power(dev, power, SX126X_RAMP_10_US);
+        sx126x_set_tx_power(dev, power, CONFIG_SX126X_RAMP_TIME_DEFAULT);
         return sizeof(int16_t);
 
     case NETOPT_FIXED_HEADER:
@@ -465,3 +465,24 @@ const netdev_driver_t sx126x_driver = {
     .get = _get,
     .set = _set,
 };
+
+static void _event_cb(void *arg)
+{
+    netdev_trigger_event_isr(arg);
+}
+
+void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
+{
+    memset((uint8_t *)dev + sizeof(dev->netdev), 0, sizeof(*dev) - sizeof(dev->netdev));
+    netdev_t *netdev = &dev->netdev;
+    netdev->driver = &sx126x_driver;
+    dev->params = (sx126x_params_t *)params;
+    dev->event_cb = _event_cb;
+    dev->event_arg = netdev;
+    netdev_register(&dev->netdev, NETDEV_SX126X, index);
+#if IS_USED(MODULE_SX126X_STM32WL)
+#if SX126X_NUMOF == 1
+    extern sx126x_t *sx126x_stm32wl = dev;
+#endif
+#endif
+}
