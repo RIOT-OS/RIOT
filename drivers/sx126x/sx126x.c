@@ -258,8 +258,8 @@ int sx126x_init(sx126x_t *dev)
                     DEBUG("[sx126x] error: failed to initialize RF switch pin\n");
                     return res;
                 }
-                sx126x_set_dio2_as_rf_sw_ctrl(dev, true);
             }
+            sx126x_set_dio2_as_rf_sw_ctrl(dev, true);
         }
 #endif
 #if IS_USED(MODULE_SX126X_DIO3)

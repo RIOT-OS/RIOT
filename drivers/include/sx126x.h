@@ -96,6 +96,7 @@ typedef enum {
  * @brief   Dio2 pin purpose
  */
 typedef enum {
+    SX126X_DIO2_UNUSED,     /**< Not used */
     SX126X_DIO2_IRQ,        /**< IRQ pin */
     SX126X_DIO2_RF_SWITCH,  /**< RF switch control pin */
 } sx126x_dio2_mode_t;
@@ -104,6 +105,7 @@ typedef enum {
  * @brief   Dio3 pin purpose
  */
 typedef enum {
+    SX126X_DIO3_UNUSED,     /**< Not used */
     SX126X_DIO3_IRQ,        /**< IRQ pin */
     SX126X_DIO3_TCX0,       /**< TCXO control pin */
 } sx126x_dio3_mode_t;
