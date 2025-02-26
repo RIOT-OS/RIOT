@@ -1,21 +1,12 @@
-/*
- * Copyright (C) 2013 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+@defgroup    boards Boards
+@brief       Board specific definitions and implementations
 
-/**
- * @defgroup    boards Boards
- * @brief       Board specific definitions and implementations
- *
- * The boards module contains all definitions and implementations that are
- * specific to a certain board. Generally, boards consist of a fixed
- * configuration of a controller and some external devices such as sensors or
- * radios. All aspects concerning configuration of GPIO pins, MCU clock and
- * device drivers should go into this module.
- *
+The boards module contains all definitions and implementations that are
+specific to a certain board. Generally, boards consist of a fixed
+configuration of a controller and some external devices such as sensors or
+radios. All aspects concerning configuration of GPIO pins, MCU clock and
+device drivers should go into this module.
+
 
 Board Selection Guide {#board-selection-guide}
 =====================
@@ -133,4 +124,3 @@ physically located it is recommended to search
 using either `PA_10` or `UART1_RX` and the tx_pin can be found on CN5-1
 using either `PA_9` or `UART1_TX`, it is recommended to use the GPIO pin as
 sometimes the peripheral may be using an alternate pin
- */
