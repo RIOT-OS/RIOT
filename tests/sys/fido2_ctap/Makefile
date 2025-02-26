@@ -15,10 +15,15 @@ USEMODULE += embunit
 
 USEMODULE += fido2_ctap
 
+# Size of flash memory used to store persistent FIDO2-related data
+SLOT_AUX_LEN := 0x1000
+
 # Disable user presence tests
 CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_UP=1
 
 # Disable user LED animation
 CFLAGS += -DCONFIG_FIDO2_CTAP_DISABLE_LED=1
+
+CFLAGS += -DCONFIG_FIDO2_MTD_DEV=MTD_0
 
 include $(RIOTBASE)/Makefile.include
