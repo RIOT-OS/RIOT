@@ -72,8 +72,34 @@ typedef struct vfs_xipfs_mount_s {
 /** The xipfs vfs driver */
 extern const vfs_file_system_t xipfs_file_system;
 
-/** Extended driver handling executables */
+/* Extended driver handling executables */
+
+/**
+ * @brief Executable or regular new file.
+ *
+ * Allows to create a regular or executable new file within XiPFS.
+ *
+ * @param full_path A full path such as `/dev/nvme0p0/my_new_file`
+ *
+ * @param size The file size in bytes.
+ *
+ * @param exec 0 for regular files, 1 for executable files.
+ *
+ * @retval Less than 0 on errors.
+ * @retval 0 on success.
+ */
 int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_t exec);
+
+/**
+ * @brief Executes an executable file with arguments.
+ *
+ * @param full_path A full path such as `/dev/nvme0p0/my_executable_file`
+ *
+ * @param argv Executable arguments. Cannot be NULL, at least argv[0] contains the executable filename.
+ *
+ * @retval Less than 0 on errors.
+ * @retval 0 on success.
+ */
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
 
 #ifdef __cplusplus
