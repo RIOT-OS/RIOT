@@ -39,7 +39,7 @@ DTLS sock acts as a wrapper for the underlying DTLS stack and as such, the
 constraints that applies specifically to the stack are also applied here.
 For tinydtls, please refer to [dtls-echo README][1].
 
-[1]: https://github.com/RIOT-OS/RIOT/blob/master/examples/dtls-echo/README.md
+[1]: https://github.com/RIOT-OS/RIOT/blob/master/examples/networking/dtls/dtls-echo/README.md
 
 ### Cipher suite
 You can select between `TLS_PSK_WITH_AES_128_CCM_8` (Pre-Shared Key) and
