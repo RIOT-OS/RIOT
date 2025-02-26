@@ -1,7 +1,7 @@
-From 0647c9d01c3e433d1b3abaf4774523ac0ef90a3c Mon Sep 17 00:00:00 2001
+From f1703a742dc3c5ee251cd5bae46197d8bbcfb603 Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
 Date: Thu, 2 Jun 2022 23:45:01 +0200
-Subject: [PATCH] compilation: include missing header files
+Subject: [PATCH 06/27] compilation: include missing header files
 
 ---
  components/efuse/src/esp_efuse_api.c                 | 1 +
@@ -11,7 +11,7 @@ Subject: [PATCH] compilation: include missing header files
  4 files changed, 4 insertions(+)
 
 diff --git a/components/efuse/src/esp_efuse_api.c b/components/efuse/src/esp_efuse_api.c
-index a89205fc..1b90deaf 100644
+index 968d9543..bb11377d 100644
 --- a/components/efuse/src/esp_efuse_api.c
 +++ b/components/efuse/src/esp_efuse_api.c
 @@ -19,6 +19,7 @@ const static char *TAG = "efuse";
@@ -35,7 +35,7 @@ index 6ce93cc5..a40b821e 100644
  #include "esp_attr.h"
  #include <stdint.h>
 diff --git a/components/esp_hw_support/sleep_modes.c b/components/esp_hw_support/sleep_modes.c
-index f5a6b292..6f9fd2b1 100644
+index 9ef2c72c..a0550389 100644
 --- a/components/esp_hw_support/sleep_modes.c
 +++ b/components/esp_hw_support/sleep_modes.c
 @@ -26,6 +26,7 @@
@@ -47,16 +47,16 @@ index f5a6b292..6f9fd2b1 100644
  #include "soc/soc_caps.h"
  #include "regi2c_ctrl.h"
 diff --git a/components/nvs_flash/src/nvs_encrypted_partition.cpp b/components/nvs_flash/src/nvs_encrypted_partition.cpp
-index 26e8a331..4de077b9 100644
+index 653fbefa..d614fa61 100644
 --- a/components/nvs_flash/src/nvs_encrypted_partition.cpp
 +++ b/components/nvs_flash/src/nvs_encrypted_partition.cpp
-@@ -13,6 +13,7 @@
- // limitations under the License.
- 
+@@ -7,6 +7,7 @@
  #include <cstring>
-+#include "nvs.hpp"
  #include "nvs_encrypted_partition.hpp"
  #include "nvs_types.hpp"
++#include "nvs.hpp"
+ 
+ namespace nvs {
  
 -- 
 2.34.1
