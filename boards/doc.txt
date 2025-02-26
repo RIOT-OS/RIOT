@@ -134,3 +134,11 @@
  * using either `PA_9` or `UART1_TX`, it is recommended to use the GPIO pin as
  * sometimes the peripheral may be using an alternate pin
  */
+
+ /**
+ * @defgroup    boards_native Native Board
+ * @ingroup     boards
+ * @brief       Support for running RIOT in native
+ *
+ * This is currently a simple board alias for the @ref boards_native32 "native32 board".
+ */
