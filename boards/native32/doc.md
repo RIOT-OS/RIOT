@@ -1,5 +1,4 @@
-/**
-@defgroup    boards_native32 Native Board
+@defgroup    boards_native32 Native32 Board
 @ingroup     boards
 @brief       Support for running RIOT in native
 
@@ -37,5 +36,3 @@ On Debian/Ubuntu you can install the required libraries with
 ```
 sudo apt install lib32asan5
 ```
-
- */
