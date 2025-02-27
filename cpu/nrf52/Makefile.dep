@@ -17,6 +17,10 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter nrfble,$(USEMODULE)))
+  FEATURES_REQUIRED += radio_nrfble
+endif
+
 # The nrf52832 requires gpio IRQ with SPI to work around errata 58
 ifneq (,$(filter nrf52832xxaa,$(CPU_MODEL)))
   ifneq (,$(filter periph_spi,$(USEMODULE)))
