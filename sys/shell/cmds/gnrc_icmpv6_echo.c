@@ -56,7 +56,7 @@
 #define DEFAULT_DATALEN         (sizeof(uint32_t))
 #define DEFAULT_ID              (0x53)
 #define DEFAULT_INTERVAL_USEC   (1U * US_PER_SEC)
-#define DEFAULT_TIMEOUT_USEC    (1U * US_PER_SEC)
+#define DEFAULT_TIMEOUT_USEC    (30U * US_PER_SEC)
 
 typedef struct {
     gnrc_netreg_entry_t netreg;
