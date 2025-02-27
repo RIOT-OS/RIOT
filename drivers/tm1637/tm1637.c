@@ -22,6 +22,7 @@
 
 #include "periph/gpio.h"
 #include "ztimer.h"
+#include "log.h"
 
 /**
  * @brief Amount of digits
@@ -60,7 +61,7 @@
 /**
  * @brief Delay between bits in microseconds
  */
-#define BIT_TIME_US                 1
+#define BIT_TIME_US                 10
 
 /**
  * @brief Array encoding the segments for the digits from 0 to 9
@@ -125,8 +126,11 @@ static void _tm1637_stop(const tm1637_t *dev)
  *
  * @param[in] dev   device descriptor of the display
  * @param[in] byte  byte to transmit
+ *
+ * @retval 0        if the transmission was successful
+ * @retval -1       if the transmission failed
  */
-static void _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
+static int _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
 {
     for (int i = 0; i < 8; ++i) {
         bool value = (byte >> i) & 0x01;
@@ -138,19 +142,28 @@ static void _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
         _tm1637_delay();
     }
 
-    /**
-     * We do not read the ACK as it is not necessary for the display's functionality.
-     * According to the specification the display sends an ACK via the DIO pin but
-     * this would require us to set the pin into input mode and read the value, then set it
-     * back to write mode. This would take too long and therefore the ACK check is omitted.
-     */
     gpio_write(dev->params->clk, false);
     gpio_write(dev->params->dio, true);
+    gpio_init(dev->params->dio, GPIO_IN_PU);
     _tm1637_delay();
+
     gpio_write(dev->params->clk, true);
+
+    /* the transmission is successful if the GPIO reads LOW */
+    bool ack = gpio_read(dev->params->dio);
     _tm1637_delay();
+
+    gpio_init(dev->params->dio, GPIO_OUT);
+    gpio_write(dev->params->dio, false);
     gpio_write(dev->params->clk, false);
     _tm1637_delay();
+
+    if (ack) {
+        return -1;
+    }
+    else {
+        return 0;
+    }
 }
 
 /**
@@ -158,35 +171,45 @@ static void _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
  *
  * @param[in] dev       device descriptor of the display
  * @param[in] segments  array of length 4 encoding the display's segments
+ *
+ * @retval 0            if the transmission was successful
+ * @retval -1           if the transmission failed
  */
-static void _tm1637_transmit_segments(const tm1637_t *dev,
-                                      const uint8_t segments[DIGIT_COUNT],
-                                      tm1637_brightness_t brightness)
+static int _tm1637_transmit_segments(const tm1637_t *dev,
+                                     const uint8_t segments[DIGIT_COUNT],
+                                     tm1637_brightness_t brightness)
 {
+    int error = 0;
     /* transmit the data command first */
     _tm1637_start(dev);
-    _tm1637_transmit_byte(dev, COMMAND_DATA);
+    error += _tm1637_transmit_byte(dev, COMMAND_DATA);
     _tm1637_stop(dev);
 
     /**
-     * set the address using the auto increment mode for addresses and
-     * start at zero
-     */
+         * set the address using the auto increment mode for addresses and
+         * start at zero
+         */
     _tm1637_start(dev);
-    _tm1637_transmit_byte(dev, COMMAND_ADDRESS);
+    error += _tm1637_transmit_byte(dev, COMMAND_ADDRESS);
 
-    /* transmit each bit indiviudally */
+    /* transmit each byte indiviudally */
     for (int i = 0; i < DIGIT_COUNT; ++i) {
-        _tm1637_transmit_byte(dev, segments[i]);
+        error += _tm1637_transmit_byte(dev, segments[i]);
     }
     _tm1637_stop(dev);
 
     /* transmit the display state and the brightness */
     _tm1637_start(dev);
-    _tm1637_transmit_byte(dev, COMMAND_DISPLAY_AND_CONTROL |
-                                   brightness | BIT_MASK_ON);
-
+    error += _tm1637_transmit_byte(dev, COMMAND_DISPLAY_AND_CONTROL |
+                                            brightness | BIT_MASK_ON);
     _tm1637_stop(dev);
+
+    if (error <= -1) {
+        return -1;
+    }
+    else {
+        return 0;
+    }
 }
 
 /**
@@ -221,18 +244,21 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
     gpio_write(dev->params->clk, false);
     gpio_write(dev->params->dio, false);
 
+    _tm1637_start(dev);
+    _tm1637_stop(dev);
+
     return 0;
 }
 
-void tm1637_clear(const tm1637_t *dev)
+int tm1637_clear(const tm1637_t *dev)
 {
     uint8_t segments[DIGIT_COUNT] = { 0 };
-    _tm1637_transmit_segments(dev, segments, TM1637_PW_1_16);
+    return _tm1637_transmit_segments(dev, segments, TM1637_PW_1_16);
 }
 
-void tm1637_write_number(const tm1637_t *dev, int16_t number,
-                         tm1637_brightness_t brightness, bool colon,
-                         bool leading_zeros)
+int tm1637_write_number(const tm1637_t *dev, int16_t number,
+                        tm1637_brightness_t brightness, bool colon,
+                        bool leading_zeros)
 {
     /* with only 4 digits available, this range can't be exceeded */
     assert(number <= 9999);
@@ -282,5 +308,5 @@ void tm1637_write_number(const tm1637_t *dev, int16_t number,
         _enable_colon(segments);
     }
 
-    _tm1637_transmit_segments(dev, segments, brightness);
+    return _tm1637_transmit_segments(dev, segments, brightness);
 }
