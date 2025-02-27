@@ -34,16 +34,21 @@
  */
 static void test_number(const tm1637_t *dev, int16_t number)
 {
-    tm1637_write_number(dev, number, TM1637_PW_14_16, false, false);
+    int error = 0;
+    error += tm1637_write_number(dev, number, TM1637_PW_14_16, false, false);
     ztimer_sleep(ZTIMER_SEC, 1);
-    tm1637_write_number(dev, number, TM1637_PW_14_16, false, true);
+    error += tm1637_write_number(dev, number, TM1637_PW_14_16, false, true);
     ztimer_sleep(ZTIMER_SEC, 1);
-    tm1637_write_number(dev, number, TM1637_PW_14_16, true, false);
+    error += tm1637_write_number(dev, number, TM1637_PW_14_16, true, false);
     ztimer_sleep(ZTIMER_SEC, 1);
-    tm1637_write_number(dev, number, TM1637_PW_14_16, true, true);
+    error += tm1637_write_number(dev, number, TM1637_PW_14_16, true, true);
     ztimer_sleep(ZTIMER_SEC, 1);
-    tm1637_clear(dev);
+    error += tm1637_clear(dev);
     ztimer_sleep(ZTIMER_SEC, 1);
+
+    if (error) {
+        puts("Number test failed");
+    }
 }
 
 /**
@@ -53,11 +58,16 @@ static void test_number(const tm1637_t *dev, int16_t number)
  */
 static void test_all_digits(const tm1637_t *dev)
 {
+    int error = 0;
     for (int i = 0; i < 10; i++) {
-        tm1637_write_number(dev, i, TM1637_PW_14_16, false, false);
+        error += tm1637_write_number(dev, i, TM1637_PW_14_16, false, false);
         ztimer_sleep(ZTIMER_SEC, 1);
     }
-    tm1637_clear(dev);
+    error += tm1637_clear(dev);
+
+    if (error) {
+        puts("All digits test failed");
+    }
 }
 
 /**
@@ -69,12 +79,18 @@ static void test_all_digits(const tm1637_t *dev)
 static void test_brightness(const tm1637_t *dev, uint16_t number)
 {
     /* the brightness goes from 0 to 7 */
+    int error = 0;
+
     for (int i = 0; i <= 7; i++) {
-        tm1637_write_number(dev, number, i, false, false);
+        error += tm1637_write_number(dev, number, i, false, false);
         ztimer_sleep(ZTIMER_SEC, 1);
     }
-    tm1637_clear(dev);
+    error += tm1637_clear(dev);
     ztimer_sleep(ZTIMER_SEC, 1);
+
+    if (error) {
+        puts("Brightness test failed");
+    }
 }
 
 int main(void)

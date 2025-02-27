@@ -96,16 +96,22 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params);
  * @param[in] brightness    brightness of the display according to @ref tm1637_brightness_t
  * @param[in] colon         If enabled, displays a colon in the middle
  * @param[in] leading_zeros If enabled, displays leading zeros
+ *
+ * @retval 0                on success
+ * @retval -1               on error
  */
-void tm1637_write_number(const tm1637_t *dev, int16_t number, tm1637_brightness_t brightness,
-                         bool colon, bool leading_zeros);
+int tm1637_write_number(const tm1637_t *dev, int16_t number, tm1637_brightness_t brightness,
+                        bool colon, bool leading_zeros);
 
 /**
  * @brief Clear the display
  *
  * @param[in] dev device descriptor of the display
+ *
+ * @retval 0    on success
+ * @retval -1   on error
  */
-void tm1637_clear(const tm1637_t *dev);
+int tm1637_clear(const tm1637_t *dev);
 
 #ifdef __cplusplus
 }
