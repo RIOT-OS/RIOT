@@ -35,15 +35,13 @@ Installing the dependencies:
 
 General usage:
 
-1.  Flash an applicable RIOT node with the sniffer application (insert path to
-    RIOT source and board name), as follows:
+1.  Flash an applicable RIOT node with the sniffer application (residing in the
+    parent directory, insert proper board name), as follows:
 ```
-$ git clone https://github.com/RIOT-OS/applications/
-$ cd applications/sniffer
-$ BOARD=<name> make clean all flash
+$ BOARD=<name> -C ../ make clean all flash
 ```
 
-2.  Run the `sniffer.py` script (change to subfolder `tools/`) as follows :
+2.  Run the `sniffer.py` script (from this directory) as follows :
     For serial port:
 ```
 $ ./sniffer.py [-b baudrate] <tty> <channel> [outfile]
