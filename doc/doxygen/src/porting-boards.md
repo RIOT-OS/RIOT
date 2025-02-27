@@ -227,24 +227,24 @@ any browser.
 
 ```
 /**
-@defgroup    boards_foo FooBoard
-@ingroup     boards
-@brief       Support for the foo board
-@author      FooName BarName <foo.bar@baz.com>
-
-### User Interface
-
-  ....
-
-### Using UART
-
-  ...
-
-### Flashing the device
-
-  ...
-
-*/
+ * @defgroup    boards_foo FooBoard
+ * @ingroup     boards
+ * @brief       Support for the foo board
+ * @author      FooName BarName <foo.bar@baz.com>
+ *
+ * ### User Interface
+ *
+ *  ...
+ *
+ * ### Using UART
+ *
+ *  ...
+ *
+ * ### Flashing the device
+ *
+ *  ...
+ *
+ */
 ```
 
 # Helper tools
