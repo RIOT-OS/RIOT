@@ -30,6 +30,10 @@
 #define CONFIG_STDIO_UDP_PORT       2323
 #endif
 
+#ifndef CONFIG_STDIO_UDP_NETIF
+#define CONFIG_STDIO_UDP_NETIF      SOCK_ADDR_ANY_NETIF
+#endif
+
 #ifndef EOT
 #define EOT 0x4
 #endif
@@ -64,7 +68,7 @@ static void _init(void)
 {
     const sock_udp_ep_t local = {
         .family = AF_INET6,
-        .netif = SOCK_ADDR_ANY_NETIF,
+        .netif = CONFIG_STDIO_UDP_NETIF,
         .port = CONFIG_STDIO_UDP_PORT,
     };
 
