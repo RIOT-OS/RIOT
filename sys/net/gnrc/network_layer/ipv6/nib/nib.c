@@ -775,9 +775,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
     else {
         dr = _nib_drl_get(&ipv6->src, netif->pid);
-
-        DEBUG("nib: router lifetime was 0. Removing router and routes via it.");
         if (dr != NULL) {
+            DEBUG("nib: router lifetime was 0. Removing router and routes via it.\n");
             _handle_rtr_timeout(dr);
         }
         dr = NULL;
