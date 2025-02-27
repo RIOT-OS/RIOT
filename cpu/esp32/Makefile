@@ -1,7 +1,7 @@
 # Define the module that is built:
 MODULE = cpu
 
-SRC = irq_arch.c startup.c syscalls.c
+SRC = irq_arch.c startup.c stdatomic.c syscalls.c
 
 # Add a list of subdirectories, that should also be built:
 DIRS += $(RIOTCPU)/esp_common
