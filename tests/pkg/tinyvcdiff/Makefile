@@ -3,7 +3,7 @@ include ../Makefile.pkg_common
 BLOBS += source.bin delta.bin target.bin
 
 # Only run on native ...
-TEST_ON_CI_WHITELIST += native native64
+TEST_ON_CI_WHITELIST += native32 native64
 
 USEMODULE += embunit
 
