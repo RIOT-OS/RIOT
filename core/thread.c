@@ -182,7 +182,7 @@ void thread_yield(void)
  *  |    + |   | 4  + |   | 6  + |
  *  +----|-+   +----|-+   +----|-+
  *       +-----/\   +-----/\   +-->NULL
-*/
+ */
 void thread_add_to_list(list_node_t *list, thread_t *thread)
 {
     assert(thread->status < STATUS_ON_RUNQUEUE);
