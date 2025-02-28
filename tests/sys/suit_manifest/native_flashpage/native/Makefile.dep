@@ -1,1 +1,0 @@
-include $(RIOTBOARD)/native/Makefile.dep
