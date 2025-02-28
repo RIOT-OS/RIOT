@@ -19,13 +19,8 @@
 
 #include <stdbool.h>
 
-#if (__GNUC__ == 14) && (__GNUC_MINOR__ == 2)
-
-#if defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32C3)
+__attribute__((weak))
 bool __atomic_test_and_set(volatile void *ptr, int memorder)
 {
     return __atomic_exchange_1(ptr, true, memorder);
 }
-#endif /* defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32C3) */
-
-#endif /* (__GNUC__ == 14) && (__GNUC_MINOR__ == 2) */
