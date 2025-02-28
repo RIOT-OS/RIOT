@@ -179,12 +179,12 @@ int sx126x_init(sx126x_t *dev)
     int res = spi_init_cs(dev->params->spi, dev->params->nss_pin);
 
     if (res != SPI_OK) {
-        DEBUG("[sx126x] error: failed to initialize SPI_%i device (code %i)\n",
-              dev->params->spi, res);
+        SX126X_DEBUG(dev, "error: failed to initialize SPI_%i device (code %i)\n",
+                     dev->params->spi, res);
         return -1;
     }
 
-    DEBUG("[sx126x] init: SPI_%i initialized with success\n", dev->params->spi);
+    SX126X_DEBUG(dev, "init: SPI_%i initialized with success\n", dev->params->spi);
 
 #if IS_ACTIVE(SX126X_SPI)
     gpio_init(dev->params->reset_pin, GPIO_OUT);
@@ -195,12 +195,12 @@ int sx126x_init(sx126x_t *dev)
         res = gpio_init_int(dev->params->dio1_pin, GPIO_IN, GPIO_RISING,
                             dev->event_cb, dev->event_arg);
         if (res < 0) {
-            DEBUG("[sx126x] error: failed to initialize DIO1 pin\n");
+            SX126X_DEBUG(dev, "error: failed to initialize DIO1 pin\n");
             return res;
         }
     }
     else {
-        DEBUG("[sx126x] error: no DIO1 pin defined\n");
+        SX126X_DEBUG(dev, "error: no DIO1 pin defined\n");
         return -EIO;
     }
 #endif
@@ -227,7 +227,7 @@ int sx126x_init(sx126x_t *dev)
             res = gpio_init_int(dev->params->u_dio2_arg.dio2_pin, GPIO_IN, GPIO_RISING,
                                 dev->event_cb, dev->event_arg);
             if (res < 0) {
-                DEBUG("[sx126x] error: failed to initialize DIO2 pin\n");
+                SX126X_DEBUG(dev, "error: failed to initialize DIO2 pin\n");
                 return res;
             }
             irq_mask_dio2 = dev->params->u_dio2_arg.dio2_irq_mask;
@@ -237,7 +237,7 @@ int sx126x_init(sx126x_t *dev)
         if (gpio_is_valid(dev->params->u_dio2_arg.rf_switch_pin)) {
             res = gpio_init(dev->params->u_dio2_arg.rf_switch_pin, GPIO_IN);
             if (res < 0) {
-                DEBUG("[sx126x] error: failed to initialize RF switch pin\n");
+                SX126X_DEBUG(dev, "error: failed to initialize RF switch pin\n");
                 return res;
             }
         }
@@ -250,7 +250,7 @@ int sx126x_init(sx126x_t *dev)
             res = gpio_init_int(dev->params->u_dio3_arg.dio3_pin, GPIO_IN, GPIO_RISING,
                                 dev->event_cb, dev->event_arg);
             if (res < 0) {
-                DEBUG("[sx126x] error: failed to initialize DIO3 pin\n");
+                SX126X_DEBUG(dev, "error: failed to initialize DIO3 pin\n");
                 return res;
             }
             irq_mask_dio3 = dev->params->u_dio3_arg.dio3_irq_mask;
@@ -270,13 +270,13 @@ int sx126x_init(sx126x_t *dev)
                              sizeof(trimming_capacitor_values));
         /* 11.3 pF + x * 0.47pF  = 33.4pF | x = 0x2f*/
         if (trimming_capacitor_values[0] != 0x2f) {
-            DEBUG("[sx126x] warning: failed to set TCXO control: SX126X_REG_XTATRIM=%02x\n",
-                  trimming_capacitor_values[0]);
+            SX126X_DEBUG(dev, "warning: failed to set TCXO control: SX126X_REG_XTATRIM=%02x\n",
+                    trimming_capacitor_values[0]);
         }
-        DEBUG("[sx126x] XTA capacitor ~ %upF\n",
-              (unsigned)(0.5f + (11.3f + trimming_capacitor_values[0] * 0.47f)));
-        DEBUG("[sx126x] XTB capacitor ~ %upF\n",
-              (unsigned)(0.5f + (11.3f + trimming_capacitor_values[1] * 0.47f)));
+        SX126X_DEBUG(dev, "XTA capacitor ~ %upF\n",
+                     (unsigned)(0.5f + (11.3f + trimming_capacitor_values[0] * 0.47f)));
+        SX126X_DEBUG(dev, "XTB capacitor ~ %upF\n",
+                     (unsigned)(0.5f + (11.3f + trimming_capacitor_values[1] * 0.47f)));
 
         /* When the 32 MHz clock is coming from a TCXO, the calibration will fail
            and the user should request a complete calibration after calling the function
@@ -308,12 +308,12 @@ int sx126x_init(sx126x_t *dev)
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         sx126x_pkt_type_t pkt_type;
         sx126x_get_pkt_type(dev, &pkt_type);
-        DEBUG("[sx126x] init radio: pkt type: %d\n", pkt_type);
+        SX126X_DEBUG(dev, "init radio: pkt type: %d\n", pkt_type);
 
         sx126x_chip_status_t radio_status;
         sx126x_get_status(dev, &radio_status);
-        DEBUG("[sx126x] init: chip mode %d\n", radio_status.chip_mode);
-        DEBUG("[sx126x] init: cmd status %d\n", radio_status.cmd_status);
+        SX126X_DEBUG(dev, "init: chip mode %d\n", radio_status.chip_mode);
+        SX126X_DEBUG(dev, "init: cmd status %d\n", radio_status.cmd_status);
     }
 
     /* Radio Rx timeout timer stopped on preamble detection */
@@ -324,26 +324,27 @@ int sx126x_init(sx126x_t *dev)
 
 uint32_t sx126x_get_channel(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_radio_status \n");
+    SX126X_DEBUG(dev, "sx126x_get_radio_status \n");
     return dev->channel;
 }
 
 void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
 {
-    DEBUG("[sx126x]: sx126x_set_channel %" PRIu32 "Hz \n", freq);
+    SX126X_DEBUG(dev, "sx126x_set_channel %" PRIu32 "Hz \n", freq);
     dev->channel = freq;
     sx126x_set_rf_freq(dev, dev->channel);
+    sx126x_cal_img(dev, dev->channel);
 }
 
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_bandwidth \n");
+    SX126X_DEBUG(dev, "sx126x_get_bandwidth \n");
     return _sx126x_lora_bw_to(dev->mod_params.bw);
 }
 
 void sx126x_set_bandwidth(sx126x_t *dev, uint8_t bandwidth)
 {
-    DEBUG("[sx126x]: sx126x_set_bandwidth %02x\n", bandwidth);
+    SX126X_DEBUG(dev, "sx126x_set_bandwidth %02x\n", bandwidth);
     dev->mod_params.bw = _sx126x_lora_bw_from(bandwidth);
     dev->mod_params.ldro = _ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
@@ -351,13 +352,13 @@ void sx126x_set_bandwidth(sx126x_t *dev, uint8_t bandwidth)
 
 uint8_t sx126x_get_spreading_factor(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_spreading_factor \n");
+    SX126X_DEBUG(dev, "sx126x_get_spreading_factor \n");
     return _sx126x_lora_sf_to(dev->mod_params.sf);
 }
 
 void sx126x_set_spreading_factor(sx126x_t *dev, uint8_t sf)
 {
-    DEBUG("[sx126x]: sx126x_set_spreading_factor : %02x\n", sf);
+    SX126X_DEBUG(dev, "sx126x_set_spreading_factor : %02x\n", sf);
     dev->mod_params.sf = _sx126x_lora_sf_from(sf);
     dev->mod_params.ldro = _ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
@@ -365,20 +366,20 @@ void sx126x_set_spreading_factor(sx126x_t *dev, uint8_t sf)
 
 uint8_t sx126x_get_coding_rate(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_coding_rate \n");
+    SX126X_DEBUG(dev, "sx126x_get_coding_rate \n");
     return _sx126x_lora_cr_to(dev->mod_params.cr);
 }
 
 void sx126x_set_coding_rate(sx126x_t *dev, uint8_t cr)
 {
-    DEBUG("[sx126x]: sx126x_set_coding_rate %01x\n", cr);
+    SX126X_DEBUG(dev, "sx126x_set_coding_rate %01x\n", cr);
     dev->mod_params.cr = _sx126x_lora_cr_from(cr);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 }
 
 uint8_t sx126x_get_lora_payload_length(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_lora_payload_length \n");
+    SX126X_DEBUG(dev, "sx126x_get_lora_payload_length \n");
     sx126x_rx_buffer_status_t rx_buffer_status;
 
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
@@ -387,59 +388,59 @@ uint8_t sx126x_get_lora_payload_length(const sx126x_t *dev)
 
 void sx126x_set_lora_payload_length(sx126x_t *dev, uint8_t len)
 {
-    DEBUG("[sx126x]: sx126x_set_lora_payload_length %d\n", len);
+    SX126X_DEBUG(dev, "sx126x_set_lora_payload_length %d\n", len);
     dev->pkt_params.pld_len_in_bytes = len;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 bool sx126x_get_lora_crc(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_lora_crc \n");
+    SX126X_DEBUG(dev, "sx126x_get_lora_crc \n");
     return dev->pkt_params.crc_is_on;
 }
 
 void sx126x_set_lora_crc(sx126x_t *dev, bool crc)
 {
-    DEBUG("[sx126x]: sx126x_set_lora_crc %d\n", crc);
+    SX126X_DEBUG(dev, "sx126x_set_lora_crc %d\n", crc);
     dev->pkt_params.crc_is_on = crc;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 bool sx126x_get_lora_implicit_header(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_lora_implicit_header \n");
+    SX126X_DEBUG(dev, "sx126x_get_lora_implicit_header \n");
     return dev->pkt_params.header_type == SX126X_LORA_PKT_IMPLICIT;
 }
 
 void sx126x_set_lora_implicit_header(sx126x_t *dev, bool mode)
 {
-    DEBUG("[sx126x]: sx126x_set_lora_implicit_header %d\n", mode);
+    SX126X_DEBUG(dev, "sx126x_set_lora_implicit_header %d\n", mode);
     dev->pkt_params.header_type = (mode ? SX126X_LORA_PKT_IMPLICIT : SX126X_LORA_PKT_EXPLICIT);
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 uint16_t sx126x_get_lora_preamble_length(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_lora_preamble_length \n");
+    SX126X_DEBUG(dev, "sx126x_get_lora_preamble_length \n");
     return dev->pkt_params.preamble_len_in_symb;
 }
 
 void sx126x_set_lora_preamble_length(sx126x_t *dev, uint16_t preamble)
 {
-    DEBUG("[sx126x]: sx126x_set_lora_preamble_length %" PRIu16 "\n", preamble);
+    SX126X_DEBUG(dev, "sx126x_set_lora_preamble_length %" PRIu16 "\n", preamble);
     dev->pkt_params.preamble_len_in_symb = preamble;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 bool sx126x_get_lora_iq_invert(const sx126x_t *dev)
 {
-    DEBUG("[sx126x]: sx126x_get_lora_iq_invert \n");
+    SX126X_DEBUG(dev, "sx126x_get_lora_iq_invert \n");
     return dev->pkt_params.invert_iq_is_on;
 }
 
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert)
 {
-    DEBUG("[sx126x]: sx126x_set_lora_iq_invert %d\n", iq_invert);
+    SX126X_DEBUG(dev, "sx126x_set_lora_iq_invert %d\n", iq_invert);
     dev->pkt_params.invert_iq_is_on = iq_invert;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
