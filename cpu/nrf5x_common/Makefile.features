@@ -37,4 +37,7 @@ ifeq (,$(filter nrf9160 nrf5340_app,$(CPU_MODEL)))
   FEATURES_PROVIDED += netif
 endif
 
+FEATURES_CONFLICT += radio_nrf802154:radio_nrfble radio_nrf802154:radio_nrfmin radio_nrfble:radio_nrfmin
+FEATURES_CONFLICT_MSG += "Multiplexing the nRF radio between different radio modes is not supported."
+
 include $(RIOTCPU)/cortexm_common/Makefile.features
