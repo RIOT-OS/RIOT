@@ -268,7 +268,8 @@ struct _thread {
  *
  * @return              PID of newly created task on success
  * @return              -EINVAL, if @p priority is greater than or equal to
- *                      @ref SCHED_PRIO_LEVELS
+ *                      @ref SCHED_PRIO_LEVELS or
+ *                      @p stacksize is too small
  * @return              -EOVERFLOW, if there are too many threads running already
  */
 kernel_pid_t thread_create(char *stack,
