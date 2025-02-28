@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_stm32l496g-disco STM32L496G-DISCO
- * @ingroup     boards
- * @brief       Support for the STM32L496G-DISCO board.
+@defgroup    boards_stm32l496g-disco STM32L496G-DISCO
+@ingroup     boards
+@brief       Support for the STM32L496G-DISCO board.
 
 ## Overview
 
@@ -163,5 +162,3 @@ make BOARD=stm32l496g-disco debug
 For using the STM32L496G-DISCO board we recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
-
- */

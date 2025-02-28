@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_stm32f469i-disco STM32F469I-DISCO
 @ingroup     boards
 @brief       Support for the STM32F469I-DISCO board
@@ -116,6 +115,3 @@ make BOARD=stm32f469i-disco PROGRAMMER=cpy2remed flash
 s
 could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 w-link007.html).
-
-
-*/
