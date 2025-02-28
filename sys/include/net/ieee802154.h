@@ -171,6 +171,17 @@ extern "C" {
 #define IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS   (12)
 
 /**
+ * O-QPSK Symbol time for 2.4 GHz:
+ *
+ * IEEE Std 802.15.4-2006
+ * 6.5.2.3: Each data symbol shall be mapped into a 32-chip PN sequence
+ * 6.5.2.4: Chip rate is nominally 2.0 Mchip/s on the 2.4 GHz O-QPSK band
+ *
+ * -> 32 Chip/symbol / 2MChip/s = 16 µs/symbol
+ */
+#define IEEE802154_SYMBOL_TIME_US               (16)
+
+/**
  * IEEE Std 802.15.4-2020
  * Table 11-1—PHY constants: For all other PHYs¹, the duration of
  * 8 symbol periods.
