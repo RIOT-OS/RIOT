@@ -73,8 +73,8 @@ exclude_filter() {
 
 # Check groups are correctly defined (e.g. no undefined groups and no group
 # defined multiple times)
-ALL_RAW_DEFGROUP=$(git grep -n @defgroup -- '*.h' '*.hpp' '*.txt' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
-ALL_RAW_INGROUP=$(git grep -n '@ingroup' -- '*.h' '*.hpp' '*.txt' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
+ALL_RAW_DEFGROUP=$(git grep -n @defgroup -- '*.h' '*.hpp' '*.txt' '*/doc.md' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
+ALL_RAW_INGROUP=$(git grep -n '@ingroup' -- '*.h' '*.hpp' '*.txt' '*/doc.md' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
 DEFINED_GROUPS=$(echo "${ALL_RAW_DEFGROUP}" | \
                     grep -oE '@defgroup[ ]+[^ ]+' | \
                     grep -oE '[^ ]+$' | \

@@ -927,6 +927,7 @@ INPUT_ENCODING         = UTF-8
 # *.ucf, *.qsf and *.ice.
 
 FILE_PATTERNS          = *.txt \
+                         doc.md \
                          *.h \
                          *.h.in \
                          *.hpp
