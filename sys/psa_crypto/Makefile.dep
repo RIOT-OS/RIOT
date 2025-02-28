@@ -432,6 +432,9 @@ endif
 
 ## HMAC SHA-256
 ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
+  # Keys longer than PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA_256) need to be hashed first
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_256
   ifeq (,$(filter psa_mac_hmac_sha_256_custom_backend,$(USEMODULE)))
     FEATURES_OPTIONAL += periph_hmac_sha_256
     include $(RIOTMAKE)/features_check.inc.mk
