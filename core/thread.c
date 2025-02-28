@@ -182,7 +182,7 @@ void thread_yield(void)
  *  |    + |   | 4  + |   | 6  + |
  *  +----|-+   +----|-+   +----|-+
  *       +-----/\   +-----/\   +-->NULL
-*/                                                          
+*/
 void thread_add_to_list(list_node_t *list, thread_t *thread)
 {
     assert(thread->status < STATUS_ON_RUNQUEUE);
@@ -402,5 +402,5 @@ const char *thread_state_to_string(thread_status_t state)
     assert(name != NULL); /* if compiling with assertions, this is an error that
                              indicates that the table above is incomplete */
 
-    return ((state < STATUS_NUMOF) && (name != NULL)) ? name : STATE_NAME_UNKNOWN;	
+    return ((state < STATUS_NUMOF) && (name != NULL)) ? name : STATE_NAME_UNKNOWN;
 }
