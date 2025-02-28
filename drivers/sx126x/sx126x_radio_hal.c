@@ -66,7 +66,7 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
 
     if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
         if (dev->pan_id ==  pan_bcast.u16) {
-            DEBUG("[sx126x] hal: beacon\n");
+            SX126X_DEBUG(dev, "hal: beacon\n");
             return true;
         }
     }
@@ -76,7 +76,7 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
 
     if (pan_bcast.u16 != byteorder_ltohs(dst_pan) &&
         dev->pan_id != byteorder_ltohs(dst_pan)) {
-        DEBUG("[sx126x] hal: PAN ID mismatch\n");
+        SX126X_DEBUG(dev, "hal: PAN ID mismatch\n");
         return false;
     }
 
@@ -87,8 +87,8 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
             return true;
         }
         else {
-            DEBUG("[sx126x] hal: short address mismatch 0x%02x:0x%02x\n",
-                  dst_addr[0], dst_addr[1]);
+            SX126X_DEBUG(dev, "hal: short address mismatch 0x%02x:0x%02x\n",
+                         dst_addr[0], dst_addr[1]);
             return false;
         }
     }
@@ -97,8 +97,8 @@ static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
             return true;
         }
         else {
-            DEBUG("[sx126x] hal: long address mismatch 0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x\n",
-                  dst_addr[0], dst_addr[1], dst_addr[2], dst_addr[3], dst_addr[4], dst_addr[5], dst_addr[6], dst_addr[7]);
+            SX126X_DEBUG(dev, "hal: long address mismatch 0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x\n",
+                         dst_addr[0], dst_addr[1], dst_addr[2], dst_addr[3], dst_addr[4], dst_addr[5], dst_addr[6], dst_addr[7]);
             return false;
         }
     }
@@ -110,12 +110,12 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
 {
     switch (state) {
     case SX126X_STATE_STANDBY:
-        DEBUG("[sx126x] hal: set STATE_STANDBY\n");
+        SX126X_DEBUG(dev, "hal: set STATE_STANDBY\n");
         sx126x_set_state(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
     case SX126X_STATE_RX:
-        DEBUG("[sx126x] hal: set STATE_RX\n");
+        SX126X_DEBUG(dev, "hal: set STATE_RX\n");
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         /* Refer Section 4.2 RF Switch in Application Note (AN5406) */
         if (dev->params->set_rf_mode) {
@@ -126,7 +126,7 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
         break;
 
     case SX126X_STATE_TX:
-        DEBUG("[sx126x] hal: set STATE_TX\n");
+        SX126X_DEBUG(dev, "hal: set STATE_TX\n");
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
@@ -136,7 +136,7 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
         break;
 
     case SX126X_STATE_CAD:
-        DEBUG("[sx126x] hal: set STATE_CCA\n");
+        SX126X_DEBUG(dev, "hal: set STATE_CCA\n");
         dev->cad_done = false;
         sx126x_set_cad(dev);
         break;
@@ -151,7 +151,7 @@ static int _get_state(sx126x_t *dev, void *val)
 {
     sx126x_state_t state;
     sx126x_chip_modes_t mode = sx126x_get_state(dev);
-    DEBUG("[sx126x] hal: state %d\n", mode);
+    SX126X_DEBUG(dev, "hal: state %d\n", mode);
     switch (mode) {
     case SX126X_CHIP_MODE_TX:
         state = SX126X_STATE_TX;
@@ -175,18 +175,18 @@ void sx126x_hal_event_handler(ieee802154_dev_t *hal)
     sx126x_irq_mask_t irq_mask;
 
     sx126x_get_and_clear_irq_status(dev, &irq_mask);
-    DEBUG("sx126x_hal_event_handler(): 0x%"PRIx16"\n", irq_mask);
+    SX126X_DEBUG(dev, "sx126x_hal_event_handler(): 0x%"PRIx16"\n", irq_mask);
     if (sx126x_is_stm32wl(dev)) {
 #if IS_USED(MODULE_SX126X_STM32WL)
         NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
 #endif
     }
     if (irq_mask & SX126X_IRQ_TX_DONE) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_TX_DONE\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_TX_DONE\n");
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
     }
     else if (irq_mask & SX126X_IRQ_RX_DONE) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_RX_DONE\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_RX_DONE\n");
         uint8_t mhdr[IEEE802154_MAX_HDR_LEN];
         sx126x_rx_buffer_status_t rx_buffer_status;
         sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
@@ -201,57 +201,57 @@ void sx126x_hal_event_handler(ieee802154_dev_t *hal)
          * directly or if the driver should send an ACK frame before the indication */
         if (is_ack || (!ackf && (match = _l2filter(hal, mhdr)))) {
             if (is_data && (mhdr[0] & IEEE802154_FCF_ACK_REQ)) {
-                DEBUG("Received valid frame, need to send ack\n");
+                SX126X_DEBUG(dev, "hal: Received valid frame, need to send ack\n");
             }
-            DEBUG("[sx126x] RX (%s) frame\n", is_ack ? "ACK" : (is_data ? "DATA" : "UNKNOWN"));
+            SX126X_DEBUG(dev, "hal: RX (%s) frame\n", is_ack ? "ACK" : (is_data ? "DATA" : "UNKNOWN"));
             hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         /* If radio is in promiscuos mode, indicate packet and
          * don't event think of sending an ACK frame :) */
         else if (dev->promisc) {
-            DEBUG("[sx126x] Promiscuous mode is enabled.\n");
+            SX126X_DEBUG(dev, "hal: Promiscuous mode is enabled.\n");
             hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         /* If all failed, simply drop the frame and continue listening
          * to incoming frames */
         else {
-            DEBUG("[sx126x] ACK filter %s.\n", ackf ? "enabled" : "disabled");
-            DEBUG("[sx126x] L2 filter %s.\n", match ? "passed" : "failed");
+            SX126X_DEBUG(dev, "hal: ACK filter %s.\n", ackf ? "enabled" : "disabled");
+            SX126X_DEBUG(dev, "hal: L2 filter %s.\n", match ? "passed" : "failed");
             _set_state(dev, SX126X_STATE_RX);
         }
     }
     else if (irq_mask & SX126X_IRQ_PREAMBLE_DETECTED) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_PREAMBLE_DETECTED\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_PREAMBLE_DETECTED\n");
     }
     else if (irq_mask & SX126X_IRQ_SYNC_WORD_VALID) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_SYNC_WORD_VALID\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_SYNC_WORD_VALID\n");
     }
     else if (irq_mask & SX126X_IRQ_HEADER_VALID) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_HEADER_VALID\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_HEADER_VALID\n");
         hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_START);
     }
     else if (irq_mask & SX126X_IRQ_HEADER_ERROR) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_HEADER_ERROR\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_HEADER_ERROR\n");
     }
     else if (irq_mask & SX126X_IRQ_CRC_ERROR) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_CRC_ERROR\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_CRC_ERROR\n");
         hal->cb(hal, IEEE802154_RADIO_INDICATION_CRC_ERROR);
     }
     else if (irq_mask & SX126X_IRQ_CAD_DONE) {
         if (irq_mask & SX126X_IRQ_CAD_DETECTED){
-            DEBUG("[sx126x] hal: SX126X_IRQ_CAD_DETECTED \n");
+            SX126X_DEBUG(dev, "hal: SX126X_IRQ_CAD_DETECTED \n");
             dev->cad_detected = true;
         }
-        DEBUG("[sx126x] hal: SX126X_IRQ_CAD_DONE\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_CAD_DONE\n");
         dev->cad_done = true;
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_CCA);
         _set_state(dev, SX126X_STATE_RX);
     }
     else if (irq_mask & SX126X_IRQ_TIMEOUT) {
-        DEBUG("[sx126x] hal: SX126X_IRQ_TIMEOUT\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_TIMEOUT\n");
     }
     else {
-        DEBUG("[sx126x] hal: SX126X_IRQ_NONE\n");
+        SX126X_DEBUG(dev, "hal: SX126X_IRQ_NONE\n");
     }
 }
 
@@ -264,12 +264,12 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *iolist)
     /* Write payload buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (pos + iol->iol_len > SX126X_BUFFER_SIZE - SX126X_TX_BUFFER_OFFSET - IEEE802154_FCS_LEN) {
-            DEBUG("[sx126] hal: no buffer space to write payload\n");
+            SX126X_DEBUG(dev, "hal: no buffer space to write payload\n");
             return -E2BIG;
         }
         if (iol->iol_len > 0) {
             sx126x_write_buffer(dev, SX126X_TX_BUFFER_OFFSET + pos, iol->iol_base, iol->iol_len);
-            DEBUG("[sx126x] hal: wrote data to payload buffer\n");
+            SX126X_DEBUG(dev, "hal: wrote data to payload buffer\n");
             pos += iol->iol_len;
 #if IS_ACTIVE(ENABLE_DEBUG)
             od_hex_dump(iol->iol_base, iol->iol_len, OD_WIDTH_DEFAULT);
@@ -281,7 +281,7 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *iolist)
     sx126x_write_buffer(dev, SX126X_TX_BUFFER_OFFSET + pos, (uint8_t *)&chksum, sizeof(chksum));
     pos += sizeof(chksum);
     sx126x_set_lora_payload_length(dev, pos);
-    DEBUG("[sx126x] writing (size: %d)\n", (pos));
+    SX126X_DEBUG(dev, "hal: writing (size: %d)\n", (pos));
     return 0;
 }
 
@@ -305,7 +305,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         break;
 
     case IEEE802154_HAL_OP_CCA:
-        DEBUG("[sx126x] hal: HAL_OP_CCA (CAD Detection state)\n");
+        SX126X_DEBUG(dev, "hal: HAL_OP_CCA (CAD Detection state)\n");
         dev->cad_detected = false;
         _set_state(dev, SX126X_STATE_STANDBY);
         sx126x_set_cad(dev);
@@ -366,10 +366,10 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
 
     if (info) {
         /* scale int8_t LoRa SNR into uint8_t IEEE 802.15.4 LQI */
-        DEBUG("[sx126x] hal: SNR %"PRId8"db\n", pkt_status.snr_pkt_in_db);
+        SX126X_DEBUG(dev, "hal: SNR %"PRId8"db\n", pkt_status.snr_pkt_in_db);
         info->lqi = (-INT8_MIN) + pkt_status.snr_pkt_in_db;
         /* scale into IEEE 802.15.4 RSSI [-174,80] dbm */
-        DEBUG("[sx126x] hal: RSSI %"PRId8"dbm\n", pkt_status.rssi_pkt_in_dbm);
+        SX126X_DEBUG(dev, "hal: RSSI %"PRId8"dbm\n", pkt_status.rssi_pkt_in_dbm);
         info->rssi = ieee802154_dbm_to_rssi(pkt_status.rssi_pkt_in_dbm);
     }
     /* Put PSDU to the output buffer */
@@ -455,7 +455,7 @@ static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
 {
     (void)mode;
     sx126x_t* dev = hal->priv;
-    DEBUG("[sx126x] hal: set_cca_mode \n");
+    SX126X_DEBUG(dev, "hal: set_cca_mode \n");
     sx126x_cad_params_t cad_params = {
         .cad_exit_mode = SX126X_CAD_ONLY,
         .cad_detect_min = 10,
@@ -486,14 +486,14 @@ static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
 
     switch (mode) {
     case IEEE802154_FILTER_ACCEPT:
-        DEBUG("[sx126x] hal: Filter accept all\n");
+        SX126X_DEBUG(dev, "hal: Filter accept all\n");
         break;
     case IEEE802154_FILTER_PROMISC:
         promisc = true;
         break;
     case IEEE802154_FILTER_ACK_ONLY:
         ackf = true;
-        DEBUG("[sx126x] hal: Filter ACK only\n");
+        SX126X_DEBUG(dev, "hal: Filter ACK only\n");
         break;
     default:
         return -ENOTSUP;
@@ -518,7 +518,7 @@ static int _get_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
     else {
         *mode = IEEE802154_FILTER_ACCEPT;
     }
-    DEBUG("[sx126x] hal: get_frame_filter_mode %d\n", *mode);
+    SX126X_DEBUG(dev, "hal: get_frame_filter_mode %d\n", *mode);
     return 0;
 }
 

@@ -47,7 +47,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     netdev->driver->get(netdev, NETOPT_STATE, &state, sizeof(uint8_t));
     if (state == NETOPT_STATE_TX) {
-        DEBUG("[sx126x] netdev: cannot send packet, radio is already transmitting.\n");
+        SX126X_DEBUG(dev, "netdev: cannot send packet, radio is already transmitting.\n");
         return -ENOTSUP;
     }
 
@@ -57,7 +57,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (iol->iol_len > 0) {
             sx126x_write_buffer(dev, pos, iol->iol_base, iol->iol_len);
-            DEBUG("[sx126x] netdev: send: wrote data to payload buffer.\n");
+            SX126X_DEBUG(dev, "netdev: send: wrote data to payload buffer.\n");
             pos += iol->iol_len;
         }
     }
@@ -67,23 +67,21 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         return 0;
     }
 
-    DEBUG("[sx126x] netdev: sending packet now (size: %" PRIuSIZE ").\n", pos);
+    SX126X_DEBUG(dev, "netdev: sending packet now (size: %" PRIuSIZE ").\n", pos);
     sx126x_set_lora_payload_length(dev, pos);
 
     state = NETOPT_STATE_TX;
     netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(uint8_t));
-    DEBUG("[sx126x] netdev: send: transmission in progress.\n");
+    SX126X_DEBUG(dev, "netdev: send: transmission in progress.\n");
 
     return 0;
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    DEBUG("[sx126x] netdev: read received data.\n");
-
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
+    SX126X_DEBUG(dev, "netdev: read received data.\n");
     uint8_t size = 0;
-
     netdev_lora_rx_info_t *packet_info = info;
 
     if (packet_info) {
@@ -117,13 +115,13 @@ static int _init(netdev_t *netdev)
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
 
     /* Launch initialization of driver and device */
-    DEBUG("[sx126x] netdev: initializing driver...\n");
+    SX126X_DEBUG(dev, "netdev: initializing driver...\n");
     if (sx126x_init(dev) != 0) {
-        DEBUG("[sx126x] netdev: initialization failed\n");
+        SX126X_DEBUG(dev, "netdev: initialization failed\n");
         return -1;
     }
 
-    DEBUG("[sx126x] netdev: initialization successful\n");
+    SX126X_DEBUG(dev, "netdev: initialization successful\n");
 
     /* signal link UP */
     netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
@@ -146,43 +144,43 @@ static void _isr(netdev_t *netdev)
     }
 
     if (irq_mask & SX126X_IRQ_TX_DONE) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_TX_DONE\n");
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
     else if (irq_mask & SX126X_IRQ_RX_DONE) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_RX_DONE\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_RX_DONE\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
     else if (irq_mask & SX126X_IRQ_PREAMBLE_DETECTED) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_PREAMBLE_DETECTED\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_PREAMBLE_DETECTED\n");
     }
     else if (irq_mask & SX126X_IRQ_SYNC_WORD_VALID) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_SYNC_WORD_VALID\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_SYNC_WORD_VALID\n");
     }
     else if (irq_mask & SX126X_IRQ_HEADER_VALID) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_HEADER_VALID\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_HEADER_VALID\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
     }
     else if (irq_mask & SX126X_IRQ_HEADER_ERROR) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_HEADER_ERROR\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_HEADER_ERROR\n");
     }
     else if (irq_mask & SX126X_IRQ_CRC_ERROR) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_CRC_ERROR\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_CRC_ERROR\n");
         netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
     }
     else if (irq_mask & SX126X_IRQ_CAD_DONE) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_CAD_DONE\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_CAD_DONE\n");
         netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
     }
     else if (irq_mask & SX126X_IRQ_CAD_DETECTED) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_CAD_DETECTED\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_CAD_DETECTED\n");
     }
     else if (irq_mask & SX126X_IRQ_TIMEOUT) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_TIMEOUT\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_TIMEOUT\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_TIMEOUT);
     }
     else {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_NONE\n");
+        SX126X_DEBUG(dev, "netdev: SX126X_IRQ_NONE\n");
     }
 }
 
@@ -190,6 +188,7 @@ static int _get_state(sx126x_t *dev, void *val)
 {
     netopt_state_t state;
     sx126x_chip_modes_t mode = sx126x_get_state(dev);
+    SX126X_DEBUG(dev, "netdev: state: %d\n", mode);
     switch (mode) {
     case SX126X_CHIP_MODE_FS:
         state = NETOPT_STATE_IDLE;
@@ -286,13 +285,13 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
 {
     switch (state) {
     case NETOPT_STATE_STANDBY:
-        DEBUG("[sx126x] netdev: set NETOPT_STATE_STANDBY state\n");
+        SX126X_DEBUG(dev, "netdev: set NETOPT_STATE_STANDBY state\n");
         sx126x_set_state(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
     case NETOPT_STATE_IDLE:
     case NETOPT_STATE_RX:
-        DEBUG("[sx126x] netdev: set NETOPT_STATE_RX state\n");
+        SX126X_DEBUG(dev, "netdev: set NETOPT_STATE_RX state\n");
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         /* Refer Section 4.2 RF Switch in Application Note (AN5406) */
         if (dev->params->set_rf_mode) {
@@ -303,7 +302,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         break;
 
     case NETOPT_STATE_TX:
-        DEBUG("[sx126x] netdev: set NETOPT_STATE_TX state\n");
+        SX126X_DEBUG(dev, "netdev: set NETOPT_STATE_TX state\n");
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
@@ -313,7 +312,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         break;
 
     case NETOPT_STATE_RESET:
-        DEBUG("[sx126x] netdev: set NETOPT_STATE_RESET state\n");
+        SX126X_DEBUG(dev, "netdev: set NETOPT_STATE_RESET state\n");
         sx126x_reset(dev);
         break;
 

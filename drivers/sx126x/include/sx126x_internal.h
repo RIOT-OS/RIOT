@@ -22,8 +22,10 @@
 
 #include <assert.h>
 
+#include "log.h"
 #include "net/lora.h"
 #include "sx126x.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -260,6 +262,33 @@ static inline int _sx126x_lora_cr_to(sx126x_lora_cr_t cr)
             return -1;
     }
 }
+
+/**
+ * @name    Internal debug macros for sx126x identification
+ * @{
+ */
+/**
+ * @brief   Get sx126x device ID to distinguish between multiple devices when printing
+ *          debug messages.
+ */
+#define SX126X_ID(d)                    thread_getpid()
+/**
+ * @brief   Internal device driver DEBUG() macro
+ */
+#define SX126X_DEBUG(d, msg, ...)       DEBUG("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/**
+ * @brief   Internal device driver LOG_INFO() macro
+ */
+#define SX126X_LOG_INFO(d, msg, ...)    LOG_INFO("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/**
+ * @brief   Internal device driver LOG_WARNING() macro
+ */
+#define SX126X_LOG_WARNING(d, msg, ...) LOG_WARNING("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/**
+ * @brief   Internal device driver LOG_ERROR() macro
+ */
+#define SX126X_LOG_ERROR(d, msg, ...)   LOG_ERROR("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/** @} */
 
 #ifdef __cplusplus
 }
