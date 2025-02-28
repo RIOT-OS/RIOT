@@ -1078,11 +1078,13 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
              *  (so don't consider tentative addresses for source address
              *  selection) */
             gnrc_netif_ipv6_addr_dad_trans(netif, i)) {
+            DEBUG(" -> skip tentative address\n");
             continue;
         }
         /* Check if we only want link local addresses */
         if (ll_only && !ipv6_addr_is_link_local(tmp)) {
-            continue;
+           DEBUG(" -> skip non link-local address\n");
+           continue;
         }
         /* "For all multicast and link-local destination addresses, the set of
          *  candidate source addresses MUST only include addresses assigned to
@@ -1745,12 +1747,10 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 
         /* First drain the queues before blocking the thread */
         /* Events will be handled before messages */
-        DEBUG("gnrc_netif: handling events\n");
         event_t *evp;
         /* We can not use event_loop() or event_wait() because then we would not
          * wake up when a message arrives */
         while ((evp = _gnrc_netif_fetch_event(netif))) {
-            DEBUG("gnrc_netif: event %p\n", (void *)evp);
             if (evp->handler) {
                 evp->handler(evp);
             }
@@ -1760,7 +1760,6 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         if (msg_waiting > 0) {
             return;
         }
-        DEBUG("gnrc_netif: waiting for events\n");
         /* Block the thread until something interesting happens */
         thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
     }
