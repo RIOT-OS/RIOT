@@ -1633,7 +1633,8 @@ static void _test_options(gnrc_netif_t *netif)
         default:
             /* device type not supported yet, please amend case above when
              * porting new device type */
-            assert(false);
+            DEBUG("gnrc_netif: device type not supported yet: %u\n", netif->device_type);
+            break;
     }
     /* These functions only apply to network devices having link-layers */
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
@@ -2080,7 +2081,10 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt)
 static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
     gnrc_netif_t *netif = (gnrc_netif_t *)dev->context;
-
+#if 0
+    /* evil printf */
+    DEBUG("gnrc_netif: _event_cb(): %d\n", event);
+#endif
     if (event == NETDEV_EVENT_ISR) {
         event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_isr);
     }
