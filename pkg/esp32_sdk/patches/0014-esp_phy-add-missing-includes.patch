@@ -1,0 +1,24 @@
+From a1a7998e4905862ed8a9e22c4bc704877bbf23ac Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 18:02:34 +0100
+Subject: [PATCH 14/28] esp_phy: add missing includes
+
+---
+ components/esp_phy/src/phy_init.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp_phy/src/phy_init.c b/components/esp_phy/src/phy_init.c
+index bc8d28bf3f..5d6d3cc525 100644
+--- a/components/esp_phy/src/phy_init.c
++++ b/components/esp_phy/src/phy_init.c
+@@ -32,6 +32,7 @@
+ #include "esp_private/wifi.h"
+ #include "esp_rom_crc.h"
+ #include "esp_rom_sys.h"
++#include "esp_system.h"
+ 
+ #include "soc/rtc_periph.h"
+ 
+-- 
+2.34.1
+
