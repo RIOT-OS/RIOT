@@ -31,7 +31,20 @@
 #endif
 
 #include "periph/gpio.h"
+
 #include "sdkconfig.h"
+
+#if defined(CPU_FAM_ESP32)
+#  include "board_common_esp32.h"
+#elif defined(CPU_FAM_ESP32C3)
+#  include "board_common_esp32c3.h"
+#elif defined(CPU_FAM_ESP32S2)
+#  include "board_common_esp32s2.h"
+#elif defined(CPU_FAM_ESP32S3)
+#  include "board_common_esp32s3.h"
+#else
+#  error "ESP32x SoC family not supported"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

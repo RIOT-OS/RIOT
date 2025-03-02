@@ -22,8 +22,6 @@
  * @{
  */
 
-#include "board_common.h"
-
 /**
  * @brief   External clock crystal frequency (MHz)
  *
@@ -38,6 +36,23 @@
 #ifndef ESP32_XTAL_FREQ
 #define ESP32_XTAL_FREQ             (40)
 #endif
+
+#if !DOXYGEN
+
+/**
+ * @name    ztimer Configuration valid for all ESP32 boards
+ * @{
+ */
+#if CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ <= 80
+#  define CONFIG_ZTIMER_USEC_ADJUST_SET   (880/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
+#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP ((CONFIG_ZTIMER_USEC_ADJUST_SET >> 2) * 5)
+#else
+#  define CONFIG_ZTIMER_USEC_ADJUST_SET   (960/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
+#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP (CONFIG_ZTIMER_USEC_ADJUST_SET + 1)
+#endif
+/** @} */
+
+#endif /* !DOXYGEN */
 
 #ifdef __cplusplus
 extern "C" {
