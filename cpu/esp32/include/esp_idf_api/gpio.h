@@ -21,6 +21,7 @@
 
 #include "esp_err.h"
 #include "hal/gpio_types.h"
+#include "driver/gpio.h"
 
 #ifndef DOXYGEN     /* Hide implementation details from doxygen */
 

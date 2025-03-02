@@ -2,8 +2,9 @@ MODULE = esp_idf_api
 
 # ESP-IDF header files must be found first in this module. Therefore,
 # the ESP-IDF include paths must come before the RIOT include paths.
-PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include
 PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_common/include
+PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_gpio/include
+PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_uart/include
 PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
 PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
 PRE_INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/include

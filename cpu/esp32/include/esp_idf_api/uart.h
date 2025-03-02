@@ -27,6 +27,8 @@ extern "C" {
 
 void esp_idf_uart_set_wakeup_threshold(unsigned uart_num, uint32_t threshold);
 
+void esp_idf_esp_rom_output_tx_wait_idle(unsigned uart_num);
+
 #ifdef __cplusplus
 }
 #endif
