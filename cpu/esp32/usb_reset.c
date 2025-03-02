@@ -22,7 +22,7 @@
  * @}
  */
 
-#include "driver/periph_ctrl.h"
+#include "esp_private/periph_ctrl.h"
 #include "rom/usb/chip_usb_dw_wrapper.h"
 #include "rom/usb/usb_persist.h"
 #include "soc/rtc_cntl_reg.h"
