@@ -21,8 +21,7 @@
 #include "irq_arch.h"
 
 #include "esp_attr.h"
-#include "hal/interrupt_controller_types.h"
-#include "hal/interrupt_controller_ll.h"
+#include "esp_cpu.h"
 #include "soc/periph_defs.h"
 
 #define ENABLE_DEBUG 0

@@ -304,8 +304,11 @@ static NORETURN void IRAM system_init (void)
     extern void board_init(void);
     board_init();
 
-    /* route a software interrupt source to CPU as trigger for thread yields */
+#ifndef __XTENSA__
+    /* route a software interrupt source to CPU as trigger for thread yields,
+     * we use an internal software interrupt on Xtensa-based ESP32x SoCs */
     intr_matrix_set(PRO_CPU_NUM, ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE);
+#endif
     /* set thread yield handler and enable the software interrupt */
     intr_cntrl_ll_set_int_handler(CPU_INUM_SOFTWARE, thread_yield_isr, NULL);
     intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_SOFTWARE));
