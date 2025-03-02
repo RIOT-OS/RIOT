@@ -128,7 +128,7 @@ int adc_init(adc_t line)
 
     /* init ADC line only if it wasn't already initialized. Check a register
      * set by the initialization which has a reset value of 0 */
-    if (ADC->SMPR != 0x0101) {
+    if (ADC->SMPR == 0) {
 
         /* set prescaler to 0 to let the ADC run with maximum speed */
         ADC_COMMON->CCR &= ~(ADC_CCR_PRESC);
@@ -148,8 +148,8 @@ int adc_init(adc_t line)
         /* set sequence length to 1 conversion */
         ADC->CFGR1 &= ~ADC_CFGR1_CONT;
 
-        /* Sampling time of 3.5 ADC clocks for all channels*/
-        ADC->SMPR = 0x0101;
+        /* Sampling time of 39.5 ADC clocks for all channels*/
+        ADC->SMPR = ADC_SMPR_SMP1_2 | ADC_SMPR_SMP1_0;
     }
 
     /* free the device again */
