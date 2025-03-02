@@ -1,0 +1,34 @@
+From 9bb7d4820132d756a37aab8a4a4ea5228d6bf134 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Mar 2025 10:27:20 +0100
+Subject: [PATCH 22/28] esp_system: conditional define of
+ esp_get_free_heap_size
+
+Define the function `esp_get_free_heap_size` in ESP-IDF only if the heap implementation of ESP-IDF is used, that is if module `esp_idf_heap` is enabled. Otherwise, this function is defined in `cpu/esp_common/syscalls.c`.
+---
+ components/esp_system/port/esp_system_chip.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/esp_system/port/esp_system_chip.c b/components/esp_system/port/esp_system_chip.c
+index 864c2e4c23..dff4a1bd83 100644
+--- a/components/esp_system/port/esp_system_chip.c
++++ b/components/esp_system/port/esp_system_chip.c
+@@ -67,6 +67,7 @@ void IRAM_ATTR esp_restart_noos_dig(void)
+ }
+ #endif
+ 
++#ifdef MODULE_ESP_IDF_HEAP
+ uint32_t esp_get_free_heap_size(void)
+ {
+     return heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+@@ -76,6 +77,7 @@ uint32_t esp_get_free_internal_heap_size(void)
+ {
+     return heap_caps_get_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+ }
++#endif
+ 
+ uint32_t esp_get_minimum_free_heap_size(void)
+ {
+-- 
+2.34.1
+

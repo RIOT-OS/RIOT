@@ -1,0 +1,24 @@
+From 83210f57c6d79b124b0644969f6aec92f04c1189 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 17:59:14 +0100
+Subject: [PATCH 13/28] esp_hw_support: add missing includes
+
+---
+ components/esp_hw_support/sleep_modes.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp_hw_support/sleep_modes.c b/components/esp_hw_support/sleep_modes.c
+index 3a5944bc23..207c173449 100644
+--- a/components/esp_hw_support/sleep_modes.c
++++ b/components/esp_hw_support/sleep_modes.c
+@@ -11,6 +11,7 @@
+ #include <inttypes.h>
+ 
+ #include "esp_attr.h"
++#include "esp_cpu.h"
+ #include "esp_rom_caps.h"
+ #include "esp_macros.h"
+ #include "esp_memory_utils.h"
+-- 
+2.34.1
+
