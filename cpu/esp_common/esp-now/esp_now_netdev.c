@@ -32,6 +32,8 @@
 #include "esp_event_loop.h"
 #else
 #include "esp_event.h"
+#include "esp_event_legacy.h"
+#include "esp_mac.h"
 #endif
 #include "esp_now.h"
 #include "esp_system.h"
@@ -201,7 +203,11 @@ static const uint8_t _esp_now_mac[6] = { 0x82, 0x73, 0x79, 0x84, 0x79, 0x83 }; /
 
 static bool _in_recv_cb = false;
 
+#ifdef CPU_ESP8266
 static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, int len)
+#else
+static IRAM_ATTR void esp_now_recv_cb(const esp_now_recv_info_t *mac, const uint8_t *data, int len)
+#endif
 {
 #if ESP_NOW_UNICAST
     if (!_esp_now_scan_peers_done) {
@@ -241,7 +247,11 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
         return;
     }
 
+#ifdef CPU_ESP8266
     _esp_now_dev.rx_mac = (uint8_t*)mac;
+#else
+    _esp_now_dev.rx_mac = mac->src_addr;
+#endif
     _esp_now_dev.rx_data = (uint8_t*)data;
     _esp_now_dev.rx_len = len;
 
@@ -275,7 +285,7 @@ static void IRAM_ATTR esp_now_send_cb(const uint8_t *mac, esp_now_send_status_t 
  */
 static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *event)
 {
-    switch(event->event_id) {
+    switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
             DEBUG("%s WiFi started\n", __func__);
             break;
@@ -322,14 +332,14 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
 
     esp_err_t result;
 
-#if CONFIG_ESP32_WIFI_NVS_ENABLED
+#if CONFIG_ESP_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "nfs_flash_init failed with return value %d\n", result);
         return NULL;
     }
-#endif /* CONFIG_ESP32_WIFI_NVS_ENABLED */
+#endif /* CONFIG_ESP_WIFI_NVS_ENABLED */
 
     /* initialize the WiFi driver with default configuration */
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
