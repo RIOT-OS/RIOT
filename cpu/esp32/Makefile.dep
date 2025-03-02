@@ -44,6 +44,7 @@ endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   # add additional modules and packages used for any WiFi interface
+  USEPKG += esp32_sdk_lib_coexist
   USEPKG += esp32_sdk_lib_phy
   USEPKG += esp32_sdk_lib_wifi
   USEMODULE += esp_idf_event
