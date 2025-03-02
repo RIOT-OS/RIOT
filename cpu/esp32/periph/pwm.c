@@ -28,8 +28,9 @@
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 
-#include "driver/periph_ctrl.h"
+#include "esp_cpu.h"
 #include "esp_common.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "hal/ledc_hal.h"
 #include "soc/ledc_struct.h"
@@ -53,7 +54,7 @@
 #define SOC_LEDC_CLK_DIV_INT_BIT_NUM    10  /* integral part of CLK divider */
 #define SOC_LEDC_CLK_DIV_FRAC_BIT_NUM   8   /* fractional part of CLK divider */
 
-#define PWM_HW_RES_MAX  ((uint32_t)1 << SOC_LEDC_TIMER_BIT_WIDE_NUM)
+#define PWM_HW_RES_MAX  ((uint32_t)1 << SOC_LEDC_TIMER_BIT_WIDTH)
 #define PWM_HW_RES_MIN  ((uint32_t)1 << 1)
 
 #define _DEV     _pwm_dev[pwm]      /* shortcut for PWM device descriptor */
@@ -121,7 +122,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
      * next power of two, which covers the desired resolution
      */
     ledc_timer_bit_t hw_res_bit = bitarithm_msb(res - 1);
-    if (hw_res_bit < SOC_LEDC_TIMER_BIT_WIDE_NUM) {
+    if (hw_res_bit < SOC_LEDC_TIMER_BIT_WIDTH) {
         hw_res_bit++;
     }
 
@@ -129,7 +130,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     uint32_t hw_ticks_max = rtc_clk_apb_freq_get();
     uint32_t hw_ticks_min = hw_ticks_max / (1 << SOC_LEDC_CLK_DIV_INT_BIT_NUM);
-    uint32_t hw_freq_min = hw_ticks_min / (1 << SOC_LEDC_TIMER_BIT_WIDE_NUM) + 1;
+    uint32_t hw_freq_min = hw_ticks_min / (1 << SOC_LEDC_TIMER_BIT_WIDTH) + 1;
 
     if (freq < hw_freq_min) {
         LOG_TAG_ERROR("pwm", "Frequency of %"PRIu32" Hz is too less, minimum "
@@ -255,7 +256,9 @@ void pwm_poweron(pwm_t pwm)
     periph_module_enable(_CFG.module);
     ledc_hal_init(&_DEV.hw, _CFG.group);
     ledc_hal_set_slow_clk_sel(&_DEV.hw, LEDC_SLOW_CLK_APB);
+#if SOC_LEDC_HAS_TIMER_SPECIFIC_MUX
     ledc_hal_set_clock_source(&_DEV.hw, _CFG.timer, LEDC_APB_CLK);
+#endif
 
     /* update the timer according to determined parameters */
     ledc_hal_set_clock_divider(&_DEV.hw, _CFG.timer, _DEV.hw_clk_div);
@@ -266,10 +269,7 @@ void pwm_poweron(pwm_t pwm)
     critical_enter();
     for (unsigned i = 0; i < _CFG.ch_numof; i++) {
         /* static configuration of the channel, no fading */
-        ledc_hal_set_duty_direction(&_DEV.hw, _DEV.ch[i].ch, 1);
-        ledc_hal_set_duty_num(&_DEV.hw, _DEV.ch[i].ch, 1);
-        ledc_hal_set_duty_cycle(&_DEV.hw, _DEV.ch[i].ch, 1);
-        ledc_hal_set_duty_scale(&_DEV.hw, _DEV.ch[i].ch, 0);
+        ledc_hal_set_fade_param(&_DEV.hw, _DEV.ch[i].ch, 0, 1, 1, 0, 1);
         ledc_hal_set_fade_end_intr(&_DEV.hw, _DEV.ch[i].ch, 0);
 
         /* bind the channel to the timer and disable the output for now */
