@@ -122,6 +122,8 @@ static void _isr_cd_pin(void *arg);
 
 static void _init(sdmmc_dev_t *sdmmc_dev)
 {
+    DEBUG("[sdmmc] %s", __func__);
+
     esp32_sdmmc_dev_t *dev = container_of(sdmmc_dev, esp32_sdmmc_dev_t, sdmmc_dev);
     assert(dev);
 
@@ -217,8 +219,6 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
     else {
         sdmmc_dev->present = true;
     }
-
-    sdmmc_dev->bus_width = SDMMC_BUS_WIDTH_1BIT; // SDMMC_BUS_WIDTH_4BIT;
 }
 
 static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
