@@ -155,10 +155,10 @@ I2C_DEV(0) SDA  | GPIO8  | | \ref esp32_i2c_interfaces "I2C Interfaces"
 PWM_DEV(0)      | GPIO11, GPIO12, GPIO13, GPIO14 | - | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(1)      | GPIO15, GPIO16 | if module `esp_rtc_timer_32k` is not used | \ref esp32_pwm_channels "PWM Channels"
 RGB-LED         | GPIO18 | supported by driver module `ws281x` | |
-SPI_DEV(0) CLK  | GPIO12 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0) MISO | GPIO13 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0) MOSI | GPIO11 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0) CS0  | GPIO10 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0) CLK  | GPIO36 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0) MISO | GPIO37 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0) MOSI | GPIO35 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0) CS0  | GPIO34 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
 UART_DEV(0) TxD | GPIO43 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0) RxD | GPIO44 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
@@ -175,7 +175,7 @@ The following figures show the pinouts as configured by default board
 definition.
 
 @image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitm-1-v1-pin-layout.png" "ESP32-S2-DevKitM-1x Pinout" width=900px
-@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitm-1-v1-pin-layout.png" "ESP32-S2-DevKitC-1x Pinout" width=900px
+@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitc-1-v1-pinout.png" "ESP32-S2-DevKitC-1x Pinout" width=900px
 @image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2_saola1-pinout.jpg" "ESP32-S2-Saola-1x Pinout" width=900px
 
 The corresponding board schematics can be found:
