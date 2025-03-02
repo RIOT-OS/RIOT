@@ -217,8 +217,6 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
     else {
         sdmmc_dev->present = true;
     }
-
-    sdmmc_dev->bus_width = SDMMC_BUS_WIDTH_1BIT; // SDMMC_BUS_WIDTH_4BIT;
 }
 
 static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
