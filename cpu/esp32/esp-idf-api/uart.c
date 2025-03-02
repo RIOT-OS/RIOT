@@ -20,31 +20,23 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "driver/uart.h"
-#include "hal/uart_hal.h"
+#include "esp_private/uart_share_hw_ctrl.h"
+#include "esp_rom_uart.h"
+#include "hal/uart_ll.h"
 
 #include "esp_idf_api/uart.h"
 
-static uart_hal_context_t _uart_hal_ctx[] = {
-#if UART_NUM_MAX >= 1
-    {
-        .dev = UART_LL_GET_HW(0),
-    },
-#endif
-#if UART_NUM_MAX >= 2
-    {
-        .dev = UART_LL_GET_HW(1),
-    },
-#endif
-#if UART_NUM_MAX >= 3
-    {
-        .dev = UART_LL_GET_HW(2),
-    },
-#endif
-};
-
 void esp_idf_uart_set_wakeup_threshold(unsigned uart_num, uint32_t threshold)
 {
-    assert(uart_num < ARRAY_SIZE(_uart_hal_ctx));
-    uart_hal_set_wakeup_thrd(&_uart_hal_ctx[uart_num], threshold);
+    assert(uart_num < SOC_UART_NUM);
+
+    HP_UART_PAD_CLK_ATOMIC() {
+        uart_ll_set_wakeup_thrd(UART_LL_GET_HW(uart_num), threshold);
+        uart_ll_enable_pad_sleep_clock(UART_LL_GET_HW(uart_num), true);
+    }
+}
+
+void esp_idf_esp_rom_output_tx_wait_idle(unsigned uart_num)
+{
+    esp_rom_output_tx_wait_idle(uart_num);
 }
