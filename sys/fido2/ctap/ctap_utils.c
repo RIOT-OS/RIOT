@@ -15,8 +15,6 @@
  * @}
  */
 
-#include <string.h>
-
 #include "ztimer.h"
 
 #include "fido2/ctap.h"
@@ -84,36 +82,36 @@ void fido2_ctap_utils_wait_for_user_presence(void)
     uint32_t delay = 500;
 
     while (!_user_present && diff < CTAP_UP_TIMEOUT) {
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)
-    #ifdef led0_toggle
-        LED0_TOGGLE;
+        if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)) {
+    #ifdef LED0_TOGGLE
+            LED0_TOGGLE;
     #endif
     #ifdef LED1_TOGGLE
-        LED1_TOGGLE;
+            LED1_TOGGLE;
     #endif
     #ifdef LED2_TOGGLE
-        LED2_TOGGLE;
+            LED2_TOGGLE;
     #endif
     #ifdef LED3_TOGGLE
-        LED3_TOGGLE;
+            LED3_TOGGLE;
     #endif
-#endif
+        }
         ztimer_sleep(ZTIMER_MSEC, delay);
         diff = ztimer_now(ZTIMER_MSEC) - start;
     }
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)
+    if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_LED)) {
     #ifdef LED0_TOGGLE
-    LED0_OFF;
+        LED0_OFF;
     #endif
     #ifdef LED1_TOGGLE
-    LED1_OFF;
-    #endif
-    #ifdef LED3_TOGGLE
-    LED3_OFF;
+        LED1_OFF;
     #endif
     #ifdef LED2_TOGGLE
-    LED2_OFF;
+        LED2_OFF;
     #endif
-#endif
+    #ifdef LED3_TOGGLE
+        LED3_OFF;
+    #endif
+    }
 }

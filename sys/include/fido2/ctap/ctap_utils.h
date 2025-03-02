@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 #include "fido2/ctap/ctap.h"
-#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
