@@ -13,3 +13,41 @@ config CPU_COMMON_ESP32X
     help
         Selects all features, modules and packages that are common for
         all ESP32x SoC variants.
+
+    choice
+        bool "CPU clock frequency"
+        default ESP_DEFAULT_CPU_FREQ_MHZ_80
+        help
+            CPU clock frequency used (default 80 MHz).
+            Please note that peripherals such as I2C or SPI might not work at
+            the specified clock frequency if the selected CPU clock frequency
+            is too low. These peripherals are clocked by the APB clock, which
+            has a clock rate of 80 MHz for CPU clock frequencies greater than
+            or equal to 80 MHz, but is equal to the CPU clock frequency for
+            CPU clock frequencies less than 80 MHz. Thus, for SPI, the APB
+            clock rate must be at least five times the SPI clock rate. For the
+            I2C hardware implementation, the APB clock rate must be at least
+            40 times the I2C clock rate. For the I2C software implementation,
+            the maximum I2C clock rate is 1/200 times the CPU clock rate.
+
+        config ESP_DEFAULT_CPU_FREQ_MHZ_2
+            bool "2 MHz"
+        config ESP_DEFAULT_CPU_FREQ_MHZ_5
+            bool "5 MHz"
+        config ESP_DEFAULT_CPU_FREQ_MHZ_10
+            bool "10 MHz"
+        config ESP_DEFAULT_CPU_FREQ_MHZ_20
+            bool "20 MHz"
+        config ESP_DEFAULT_CPU_FREQ_MHZ_40
+            bool "40 MHz"
+        config ESP_DEFAULT_CPU_FREQ_MHZ_80
+            bool "80 MHz"
+        config ESP_DEFAULT_CPU_FREQ_MHZ_160
+            bool "160 MHz"
+
+        if !CPU_FAM_ESP32C3
+            config ESP_DEFAULT_CPU_FREQ_MHZ_240
+                bool "240 MHz"
+        endif
+
+    endchoice
