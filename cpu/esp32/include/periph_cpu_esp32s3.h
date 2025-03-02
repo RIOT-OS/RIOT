@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 /** Mapping configured ESP32-S3 default clock to CLOCK_CORECLOCK define */
-#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ)
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
 
 /**
  * @brief   CPU cycles per busy wait loop
