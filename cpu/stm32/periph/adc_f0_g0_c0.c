@@ -134,7 +134,7 @@ int adc_init(adc_t line)
 
     /* init ADC only if it wasn't already initialized. Check a register
      * set by the initialization which has a reset value of 0 */
-    if (ADC1->SMPR != 3) {
+    if (ADC1->SMPR == 0) {
 
         /* reset configuration, including ADC_CFGR1_DMAEN | ADC_CFGR1_DMACFG | ADC_CFGR1_AUTOFF */
         ADC1->CFGR1 = 0;
@@ -154,7 +154,7 @@ int adc_init(adc_t line)
 #endif
 
         /* the STM32C0 requires an averaging of eight calibration values */
-#ifdef CPU_FAM_STM32C0
+#if defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32G0)
         uint32_t calfact = 0;
 
         for (uint32_t i = 8; i > 0; i--) {
@@ -177,14 +177,17 @@ int adc_init(adc_t line)
         ADC1->CALFACT = calfact & ADC_CALFACT_CALFACT;
 
         _disable_adc();
+
+        /* configure sampling time to a safe value */
+        ADC1->SMPR = ADC_SMPR_SMP1_2 | ADC_SMPR_SMP1_0; /* 39.5 ADC clock cycles */
 #else
         /* perform a calibration and wait for the flag to clear */
         ADC1->CR = (ADC1->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADCAL;
         while (ADC1->CR & ADC_CR_ADCAL) {}
-#endif
 
         /* configure sampling time to safe value */
-        ADC1->SMPR = 0x3;       /* 28.5 ADC clock cycles */
+        ADC1->SMPR = ADC_SMPR_SMP_1 | ADC_SMPR1_SMPR_0; /* 28.5 ADC clock cycles */
+#endif
     }
 
     /* power off an release device for now */
