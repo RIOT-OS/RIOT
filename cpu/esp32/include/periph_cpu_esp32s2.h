@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /** Mapping configured ESP32-S2 default clock to CLOCK_CORECLOCK define */
-#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ)
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
 
 /**
  * @brief   CPU cycles per busy wait loop
@@ -269,7 +269,6 @@ extern "C" {
  */
 #define USBDEV_NUM_ENDPOINTS            DWC2_USB_OTG_FS_NUM_EP
 /** @} */
-
 
 #ifdef __cplusplus
 }
