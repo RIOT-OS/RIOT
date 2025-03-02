@@ -130,7 +130,13 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
   # of its own implementation. There does not seem to be any differences in
   # the implementations of TLSF with the exception of heap poisoning, which
   # is not configured.
-  USEPKG += tlsf
+  # TODO: replace esp32_sdk_tlsf by tlsf after upgrading tlsf package
+  # USEPKG += tlsf
+  ifneq (,$(filter tlsf,$(USEPKG)))
+    # we don't allow to use the tlsf package together with esp_idf_heap for now
+    $(error "Package tlsf and esp_idf_heap can't be used together")
+  endif
+  USEPKG += esp32_sdk_tlsf
 endif
 
 ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
