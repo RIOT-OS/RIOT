@@ -184,13 +184,20 @@ typedef enum {
     GPIO_PULL_STRONGEST = 0
 } gpio_pull_strength_t;
 
+/*
+ * This include is placed here by intention to avoid type name conflicts.
+ * Having the macros HAVE_GPIO_* defined before including this file allows to
+ * use these macros in `hal/gpio_types.h` to decide whether to use the
+ * ESP-IDF types when compiling ESP-IDF modules or to use the RIOT types
+ * when compiling RIOT source code.
+ */
+#include "hal/gpio_types.h"
+
 #define HAVE_GPIO_PULL_T
-typedef enum {
-    GPIO_FLOATING = 0,
-    GPIO_PULL_UP = 1,
-    GPIO_PULL_DOWN = 2,
-    GPIO_PULL_KEEP = 3   /*< not supported */
-} gpio_pull_t;
+typedef gpio_pull_mode_t gpio_pull_t;
+#define GPIO_PULL_UP    GPIO_PULLUP_ONLY
+#define GPIO_PULL_DOWN  GPIO_PULLDOWN_ONLY
+#define GPIO_PULL_KEEP  GPIO_PULLUP_PULLDOWN
 
 /**
  * @brief   Current an output pin can drive in active and sleep modes
