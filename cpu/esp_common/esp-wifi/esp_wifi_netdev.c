@@ -32,6 +32,7 @@
 #include "esp_event_loop.h"
 #else
 #include "esp_event.h"
+#include "esp_event_legacy.h"
 #endif
 #ifndef MODULE_ESP_WIFI_AP
 #include "esp_now.h"
@@ -47,7 +48,7 @@
 #include "nvs_flash.h"
 
 #ifdef MODULE_ESP_WIFI_ENTERPRISE
-#include "esp_wpa2.h"
+#include "esp_eap_client.h"
 #endif
 
 #include "esp_wifi_params.h"
@@ -927,13 +928,13 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     mutex_init(&g_intr_lock_mux);
 #endif
 
-#if CONFIG_ESP32_WIFI_NVS_ENABLED
+#if CONFIG_ESP_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
         ESP_WIFI_LOG_ERROR("nfs_flash_init failed with return value %d", result);
         return;
     }
-#endif /* CONFIG_ESP32_WIFI_NVS_ENABLED */
+#endif /* CONFIG_ESP_WIFI_NVS_ENABLED */
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
@@ -1010,20 +1011,20 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #endif
 
 #ifdef WIFI_EAP_ID
-    esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)WIFI_EAP_ID,
-                                       strlen(WIFI_EAP_ID));
+    esp_eap_client_set_identity((const unsigned char *)WIFI_EAP_ID,
+                                strlen(WIFI_EAP_ID));
 #endif /* WIFI_EAP_ID */
 #if defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS)
     ESP_WIFI_DEBUG("eap_user=%s eap_pass=%s\n",
                    WIFI_EAP_USER, WIFI_EAP_PASS);
-    esp_wifi_sta_wpa2_ent_set_username((const unsigned char *)WIFI_EAP_USER,
-                                       strlen(WIFI_EAP_USER));
-    esp_wifi_sta_wpa2_ent_set_password((const unsigned char *)WIFI_EAP_PASS,
-                                       strlen(WIFI_EAP_PASS));
+    esp_eap_client_set_username((const unsigned char *)WIFI_EAP_USER,
+                                strlen(WIFI_EAP_USER));
+    esp_eap_client_set_password((const unsigned char *)WIFI_EAP_PASS,
+                                strlen(WIFI_EAP_PASS));
 #else /* defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS) */
 #error "WIFI_EAP_USER and WIFI_EAP_PASS have to be defined for EAP phase 2 authentication"
 #endif /* defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS) */
-    esp_wifi_sta_wpa2_ent_enable();
+    esp_wifi_sta_enterprise_enable();
 #endif /* defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP) */
 
     /* start the WiFi driver */
