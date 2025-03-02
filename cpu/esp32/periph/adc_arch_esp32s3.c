@@ -37,7 +37,7 @@
  *          RTCIO GPIO number.
  */
 const _adc_hw_desc_t _adc_hw[] = {
-    /* rtcio,          gpio,                    adc_ctrl,   adc_channel,   pad_name */
+    /* rtcio,          gpio,                    adc_ctrl,     adc_channel,     pad_name */
     {  RTCIO_GPIO(0),  GPIO0,                   ADC_UNIT_MAX, ADC_CHANNEL_MAX, "GPIO0" },
     {  RTCIO_GPIO(1),  ADC1_CHANNEL_0_GPIO_NUM, ADC_UNIT_1,   ADC_CHANNEL_0,   "TOUCH1" },
     {  RTCIO_GPIO(2),  ADC1_CHANNEL_1_GPIO_NUM, ADC_UNIT_1,   ADC_CHANNEL_1,   "TOUCH2" },
