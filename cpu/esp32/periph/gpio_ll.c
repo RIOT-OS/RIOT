@@ -110,7 +110,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     }
 
 #ifdef ESP_PM_WUP_PINS
-/* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
+    /* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
     _gpio_pin_pu[pin] = cfg.pull_up_en;
     _gpio_pin_pd[pin] = cfg.pull_down_en;
 #endif
