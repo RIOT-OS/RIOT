@@ -132,28 +132,15 @@ ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state);
 ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
 
 /**
- * @brief Find resident credential for @p rp_id_hash in flash memory
+ * @brief Iterates over all resident credentials in flash memory
  *
- * This function searches for a resident credential associated with the
- * relying party identifier hash ( @p rip_id_hash ) in the flash memory region
- * used by the FIDO2 implementation. The function updates the @p absolute_offset
- * parameter to indicate the total offset from the beginning of the flash
- * memory region where the next credential is stored. This allows for consecutive
- * calls of the function in order to find all credentials stored for the
- * relying party.
- *
- * @param[in]  key       pointer to authenticator state
- * @param[in]   rp_id_hash pointer to hash of rp domain string
- * @param[in] absolute_offset pointer to a variable holding the total offset from the
- *                            start of the flash memory region used by the FIDO2
- *                            implementation. Updated by the function to indicate
- *                            the location of the next credential.
+ * @param[in] key           pointer to authenticator state
+ * @param[in, out] state    iteration state of resident credential. Must point to a NULL
+ *                          pointer to start iteration.
  *
  * @return @ref ctap_status_code_t
  */
-ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key,
-                                                     const uint8_t *rp_id_hash,
-                                                     uint32_t *absolute_offset);
+ctap_status_code_t fido2_ctap_mem_rk_iter(ctap_resident_key_t *key, void** state);
 
 /**
  * @brief Write resident credential to flash

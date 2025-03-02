@@ -1416,9 +1416,12 @@ static int _find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
     }
 
     ctap_resident_key_t rk = { 0 };
-    uint32_t off = 0x0;
+    void *state = NULL;
 
-    while (fido2_ctap_mem_read_rk_from_flash(&rk, rp_id_hash, &off) == CTAP2_OK) {
+    while (fido2_ctap_mem_rk_iter(&rk, &state) == CTAP2_OK) {
+        if (memcmp(rk.rp_id_hash, rp_id_hash, sizeof(rp_id_hash)) != 0) {
+            continue;
+        }
         if (allow_list_len == 0) {
             memcpy(&rks[index], &rk, sizeof(rk));
             index++;
@@ -1455,7 +1458,7 @@ static int _find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
      * Sort in descending order based on id. Credential with the
      * highest (most recent) id will be first in list.
      */
-    if (index > 0) {
+    if (index > 1) {
         qsort(rks, index, sizeof(ctap_resident_key_t), fido2_ctap_utils_cred_cmp);
     }
 

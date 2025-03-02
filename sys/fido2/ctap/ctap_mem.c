@@ -14,6 +14,9 @@
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  * @}
  */
+#include "fido2/ctap.h"
+#include "fido2/ctap/ctap.h"
+#include "mtd.h"
 #include "mtd_flashpage.h"
 
 #include "fido2/ctap/ctap_mem.h"
@@ -29,10 +32,27 @@ static mtd_dev_t *_mtd_dev;
 #include "mtd_default.h"
 #endif
 
+typedef struct {
+    uint32_t off;
+    ctap_resident_key_t rk;
+} _rk_flash_entry_t;
+
+static _rk_flash_entry_t _rk_iter_state;
+
 /**
  * @brief Write to flash memory
  */
-static ctap_status_code_t _flash_write(const void *buf, uint32_t page, uint32_t off, size_t len);
+static ctap_status_code_t _flash_write(const void *buf, uint32_t off, size_t len);
+
+/**
+ * @brief Advance resident key iterator by one
+ */
+static _rk_flash_entry_t * _flash_rk_iter_next(const _rk_flash_entry_t *last);
+
+/**
+ * @brief Sanity check resident key flash offset
+ */
+static bool _flash_rk_check_offset(uint32_t off);
 
 ctap_status_code_t fido2_ctap_mem_init(void)
 {
@@ -62,12 +82,34 @@ ctap_status_code_t fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset
     return CTAP2_OK;
 }
 
-static ctap_status_code_t _flash_write(const void *buf, uint32_t page, uint32_t off, size_t len)
+static bool _flash_rk_check_offset(uint32_t off)
+{
+    /* Offset must skip ctap_state_t */
+    if (off < CTAP_FLASH_STATE_SZ) {
+        DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
+              __LINE__);
+
+        return false;
+    }
+    /* Must be aligned to CTAP_FLASH_RK_SZ */
+    if ((off - CTAP_FLASH_STATE_SZ) % CTAP_FLASH_RK_SZ != 0) {
+        DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
+              __LINE__);
+
+        return false;
+    }
+
+    return true;
+}
+
+static ctap_status_code_t _flash_write(const void *buf, uint32_t off, size_t len)
 {
     assert(buf);
-    int ret;
 
-    ret = mtd_write_page(_mtd_dev, buf, page, off, len);
+    uint32_t page = off / _mtd_dev->page_size;
+    uint32_t page_off = off % _mtd_dev->page_size;
+
+    int ret = mtd_write_page(_mtd_dev, buf, page, page_off, len);
 
     if (ret < 0) {
         DEBUG("%s, %d: mtd_write_page failed\n", RIOT_FILE_RELATIVE,
@@ -103,6 +145,47 @@ ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
     return ret == 0 ? CTAP2_OK : CTAP1_ERR_OTHER;
 }
 
+static ctap_status_code_t _flash_read_rk(_rk_flash_entry_t *entry)
+{
+    if (!entry) {
+        return CTAP1_ERR_OTHER;
+    }
+
+    uint32_t page = entry->off / _mtd_dev->page_size;
+    uint32_t page_off = entry->off % _mtd_dev->page_size;
+
+    int ret = mtd_read_page(_mtd_dev, &entry->rk, page, page_off, sizeof(ctap_resident_key_t));
+    if (ret < 0) {
+        DEBUG("%s, %d: mtd_read failed\n", RIOT_FILE_RELATIVE,
+              __LINE__);
+        return CTAP1_ERR_OTHER;
+    }
+
+    return CTAP2_OK;
+}
+
+static _rk_flash_entry_t * _flash_rk_iter_next(const _rk_flash_entry_t *last_entry)
+{
+    uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
+    /**
+     * If last_entry == NULL, skip ctap_state_t struct since this function only deals
+     * with resident keys. Otherwise, continue iterating from the current resident
+     * key offset.
+     */
+    uint32_t off = (last_entry) ? last_entry->off + CTAP_FLASH_RK_SZ : CTAP_FLASH_STATE_SZ;
+    uint32_t page = off / _mtd_dev->page_size;
+    uint32_t page_off = off % _mtd_dev->page_size;
+
+    uint16_t rks_read = (off - CTAP_FLASH_STATE_SZ) / CTAP_FLASH_RK_SZ;
+
+    if (rks_read > amt_stored) {
+        return NULL;
+    }
+
+    _rk_iter_state.off = off;
+    return &_rk_iter_state;
+}
+
 /**
  * overwrite existing key if equal, else find free space.
  *
@@ -112,115 +195,66 @@ ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
  */
 ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
 {
-    int ret;
     uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
-    ctap_resident_key_t tmp = { 0 };
-    bool equal = false;
+    _rk_flash_entry_t *rk_iter = NULL;
 
-    /* skip ctap_state_t struct */
-    uint32_t off = CTAP_FLASH_STATE_SZ;
-    uint32_t page = off / _mtd_dev->page_size;
-    uint32_t page_off = off % _mtd_dev->page_size;
-
-    for (uint16_t i = 0; i < amt_stored; i++) {
-        ret = mtd_read_page(_mtd_dev, &tmp, page, page_off, sizeof(ctap_resident_key_t));
-
-        if (ret < 0) {
-            DEBUG("%s, %d: mtd_read failed\n", RIOT_FILE_RELATIVE,
-                  __LINE__);
-            return false;
+    while ((rk_iter = _flash_rk_iter_next(rk_iter)) != NULL) {
+        int ret = _flash_read_rk(rk_iter);
+        if (ret != CTAP2_OK) {
+            return ret;
         }
 
-        if (fido2_ctap_utils_ks_equal(&tmp, rk)) {
-            equal = true;
+        if (fido2_ctap_utils_ks_equal(&rk_iter->rk, rk)) {
             break;
         }
-
-        off += CTAP_FLASH_RK_SZ;
-        page = off / _mtd_dev->page_size;
-        page_off = off % _mtd_dev->page_size;
     }
 
-    if (!equal) {
-        if (amt_stored >= CTAP_FLASH_MAX_NUM_RKS) {
+    uint32_t off = (rk_iter) ? rk_iter->off : amt_stored * CTAP_FLASH_RK_SZ + CTAP_FLASH_STATE_SZ;
+
+    /* Write new resident key to flash */
+    if (!rk_iter) {
+        if (amt_stored > CTAP_FLASH_MAX_NUM_RKS) {
             return CTAP2_ERR_KEY_STORE_FULL;
         }
 
         ctap_state_t *state = fido2_ctap_get_state();
         state->rk_amount_stored++;
-        ret = fido2_ctap_mem_write_state_to_flash(state);
+        int ret = fido2_ctap_mem_write_state_to_flash(state);
 
         if (ret != CTAP2_OK) {
             return ret;
         }
+
+        return _flash_write(rk, off, CTAP_FLASH_RK_SZ);
     }
 
-    return _flash_write(rk, page, page_off, CTAP_FLASH_RK_SZ);
+    /* Overwrite existing resident key */
+    return _flash_write(rk, off, CTAP_FLASH_RK_SZ);
 }
 
 ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state)
 {
-    return _flash_write(state, 0, 0, CTAP_FLASH_STATE_SZ);
+    return _flash_write(state, 0, CTAP_FLASH_STATE_SZ);
 }
 
-ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key,
-                                                     const uint8_t *rp_id_hash,
-                                                     uint32_t *off)
+ctap_status_code_t fido2_ctap_mem_rk_iter(ctap_resident_key_t *key, void **state)
 {
-    uint16_t end;
-    uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
+    _rk_flash_entry_t *rk_iter = *state;
 
-    /* If not the initial call, validate offset */
-    if (*off != 0) {
-        /* Must skip ctap_state_t */
-        if (*off < CTAP_FLASH_STATE_SZ) {
-            DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
-                  __LINE__);
-
-            return CTAP1_ERR_OTHER;
-        }
-        /* Must be aligned to CTAP_FLASH_RK_SZ */
-        if ((*off - CTAP_FLASH_STATE_SZ) % CTAP_FLASH_RK_SZ != 0) {
-            DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
-                  __LINE__);
-
-            return CTAP1_ERR_OTHER;
-        }
+    if (rk_iter && !_flash_rk_check_offset(rk_iter->off)) {
+        return CTAP1_ERR_OTHER;
     }
 
-    if (*off == 0x0) {
-        end = amt_stored;
-        /* skip ctap_state_t struct */
-        *off = CTAP_FLASH_STATE_SZ;
-    }
-    else {
-        uint16_t rks_read = (*off - CTAP_FLASH_STATE_SZ) / CTAP_FLASH_RK_SZ;
-
-        if (rks_read > amt_stored) {
-            return CTAP1_ERR_OTHER;
+    if ((rk_iter = _flash_rk_iter_next(rk_iter)) != NULL) {
+        int ret = _flash_read_rk(rk_iter);
+        if (ret != CTAP2_OK) {
+            return ret;
         }
 
-        end = amt_stored - rks_read;
+        memcpy(key, &rk_iter->rk, sizeof(ctap_resident_key_t));
+        *state = rk_iter;
+        return CTAP2_OK;
     }
 
-    for (uint16_t i = 0; i < end; i++) {
-        uint32_t page = *off / _mtd_dev->page_size;
-        uint32_t page_off = *off % _mtd_dev->page_size;
-
-        int ret = mtd_read_page(_mtd_dev, key, page, page_off, sizeof(ctap_resident_key_t));
-
-        if (ret < 0) {
-            DEBUG("%s, %d: mtd_read failed", RIOT_FILE_RELATIVE,
-                  __LINE__);
-            return CTAP1_ERR_OTHER;
-        }
-
-        *off += CTAP_FLASH_RK_SZ;
-
-        if (memcmp(key->rp_id_hash, rp_id_hash, SHA256_DIGEST_LENGTH) == 0) {
-            return CTAP2_OK;
-        }
-    }
-
-    return CTAP1_ERR_OTHER;
+    return CTAP2_ERR_NO_CREDENTIALS;
 }
