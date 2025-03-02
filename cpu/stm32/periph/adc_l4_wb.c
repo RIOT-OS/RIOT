@@ -21,12 +21,12 @@
  * @}
  */
 
+#include "busy_wait.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
 #include "periph/vbat.h"
-#include "ztimer.h"
 
 /**
  * @brief Not all STM32 L4 boards have 3 ADC devices
@@ -54,8 +54,14 @@
    works on all channels.
    TCONV = Sampling time + 12.5 ADC clock cycles (RM section 18.4.12)
    At 80MHz this means we need to set SMP to 001 (6.5 ADC clock cycles) to
-   stay within specs. (80000000/(6.5+12.5)) = 4210526 */
-#define ADC_SMP_MIN_VAL      (0x1)
+   stay within specs. (80000000/(6.5+12.5)) = 4210526.
+   Reading the battery voltage V_BAT is much slower and requires 92.5
+   ADC clock cycles. */
+#if IS_USED(MODULE_PERIPH_VBAT)
+#  define ADC_SMP_MIN_VAL    (0x5)
+#else
+#  define ADC_SMP_MIN_VAL    (0x2)
+#endif
 
 /* The sampling time width is 3 bit */
 #define ADC_SMP_BIT_WIDTH    (3)
@@ -171,13 +177,7 @@ int adc_init(adc_t line)
 
         /* enable ADC internal voltage regulator and wait for startup period */
         dev(line)->ADC_CR_REG |= (ADC_CR_ADVREGEN);
-#if IS_USED(MODULE_ZTIMER_USEC)
-        ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
-#else
-        /* to avoid using ZTIMER_USEC unless already included round up the
-           internal voltage regulator start up to 1ms */
-        ztimer_sleep(ZTIMER_MSEC, 1);
-#endif
+        busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
 
         /* configure calibration for single ended input */
         dev(line)->ADC_CR_REG &= ~(ADC_CR_ADCALDIF);

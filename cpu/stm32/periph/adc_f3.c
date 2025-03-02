@@ -19,15 +19,21 @@
  * @}
  */
 
+#include "busy_wait.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
-#include "ztimer.h"
 #include "periph/vbat.h"
 
-#define SMP_MIN         (0x2) /*< Sampling time for slow channels
+#if IS_USED(MODULE_PERIPH_VBAT)
+#  define SMP_MIN       (0x5) /*< Sampling time when the VBat channel
+                                  is read (0x5 = 61.5 ADC clock cycles) */
+#else
+#  define SMP_MIN       (0x2) /*< Sampling time for slow channels
                                   (0x2 = 4.5 ADC clock cycles) */
+#endif
+
 #ifdef ADC1_COMMON
 #define ADC_INSTANCE    ADC1_COMMON
 #else
@@ -143,13 +149,7 @@ int adc_init(adc_t line)
     if (!(dev(line)->CR & ADC_CR_ADEN)) {
         /* Enable ADC internal voltage regulator and wait for startup period */
         dev(line)->CR |= ADC_CR_ADVREGEN;
-#if IS_USED(MODULE_ZTIMER_USEC)
-        ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
-#else
-        /* to avoid using ZTIMER_USEC unless already included round up the
-           internal voltage regulator start up to 1ms */
-        ztimer_sleep(ZTIMER_MSEC, 1);
-#endif
+        busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
 
         if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
             /* Configure calibration for differential inputs */
