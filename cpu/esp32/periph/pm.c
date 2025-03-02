@@ -85,8 +85,10 @@ static inline void pm_set_lowest_normal(void)
 void IRAM_ATTR pm_off(void)
 {
     /* disable remaining power domains */
+#if ESP_PD_DOMAIN_RTC_SLOW_MEM && ESP_PD_DOMAIN_RTC_FAST_MEM
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+#endif
 
     /* enter hibernate mode without any enabled wake-up sources */
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
@@ -137,6 +139,7 @@ void pm_set(unsigned mode)
     /* flush stdout */
     fflush(stdout);
 
+#if SOC_PM_SUPPORT_RTC_SLOW_MEM_PD
     /* Labels for RTC slow memory that are defined in the linker script */
     extern int _rtc_bss_rtc_start;
     extern int _rtc_bss_rtc_end;
@@ -151,6 +154,7 @@ void pm_set(unsigned mode)
     if (&_rtc_bss_rtc_end > &_rtc_bss_rtc_start) {
         esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_ON);
     }
+#endif
 
     /* first disable all wake-up sources */
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
