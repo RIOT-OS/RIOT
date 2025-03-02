@@ -986,6 +986,38 @@ typedef struct {
     gpio_t rxd;             /**< GPIO used as RxD pin */
 } uart_conf_t;
 
+#ifndef DOXYGEN
+/**
+ * @brief   Override UART stop bits
+ */
+typedef enum {
+    UART_STOP_BITS_1   = 0x1,  /*!< stop bit: 1bit*/
+    UART_STOP_BITS_1_5 = 0x2,  /*!< stop bit: 1.5bits*/
+    UART_STOP_BITS_2   = 0x3,  /*!< stop bit: 2bits*/
+} uart_stop_bits_t;
+
+#define HAVE_UART_STOP_BITS_T
+
+/**
+ * @brief   Marker for unsupported UART parity modes
+ */
+#define UART_MODE_UNSUPPORTED 0xf0
+
+/**
+ * @brief   Override UART parity values
+ */
+typedef enum {
+    UART_PARITY_NONE  = 0x0,
+    UART_PARITY_EVEN  = 0x2,
+    UART_PARITY_ODD   = 0x3,
+    UART_PARITY_MARK  = UART_MODE_UNSUPPORTED | 0,
+    UART_PARITY_SPACE = UART_MODE_UNSUPPORTED | 1,
+} uart_parity_t;
+
+#define HAVE_UART_PARITY_T
+
+#endif /* !DOXYGEN */
+
 /**
  * @brief   Maximum number of UART interfaces
  */
