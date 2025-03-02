@@ -8,7 +8,6 @@ ESP32_SDK_SRC = \
   components/wpa_supplicant/src/tls/pkcs5.c \
   components/wpa_supplicant/src/tls/pkcs8.c \
   components/wpa_supplicant/src/tls/rsa.c \
-  components/wpa_supplicant/src/tls/tls_internal.c \
   components/wpa_supplicant/src/tls/tlsv1_client.c \
   components/wpa_supplicant/src/tls/tlsv1_client_read.c \
   components/wpa_supplicant/src/tls/tlsv1_client_write.c \

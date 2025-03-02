@@ -31,18 +31,18 @@
 
 #include "mtd.h"
 
-#include "esp_partition.h"
-
 #ifndef CPU_ESP8266
 
+#include "esp_flash.h"
+#include "esp_flash_internal.h"
 #include "esp_flash_partitions.h"
-#include "esp_spi_flash.h"
 #include "rom/cache.h"
-#include "rom/spi_flash.h"
+#include "esp_rom_spiflash.h"
 #include "soc/soc.h"
 
 #else /* !CPU_ESP8266 */
 
+#include "esp_partition.h"
 #include "esp_flash_data_types.h"
 #include "rom_functions.h"
 #include "spi_flash.h"
@@ -77,6 +77,35 @@ VFS_AUTO_MOUNT(littlefs2, { .dev = &_flash_dev }, VFS_DEFAULT_NVM(0), 0);
 /* defined in vendor/esp-idf/spi_flash.c */
 extern esp_spi_flash_chip_t flashchip;
 extern uint32_t spi_flash_get_id(void);
+
+#else
+
+static inline esp_err_t spi_flash_erase_range(size_t start_address, size_t size)
+{
+    esp_err_t res;
+    uint32_t state = irq_disable();
+    res = esp_flash_erase_region(esp_flash_default_chip, start_address, size);
+    irq_restore(state);
+    return res;
+}
+
+static inline esp_err_t spi_flash_write(size_t dest_addr, const void *src, size_t size)
+{
+    esp_err_t res;
+    uint32_t state = irq_disable();
+    res = esp_flash_write(esp_flash_default_chip, src, dest_addr, size);
+    irq_restore(state);
+    return res;
+}
+
+static inline esp_err_t spi_flash_read(size_t src_addr, void *dest, size_t size)
+{
+    esp_err_t res;
+    uint32_t state = irq_disable();
+    res = esp_flash_read(esp_flash_default_chip, dest, src_addr, size);
+    irq_restore(state);
+    return res;
+}
 
 #endif /* CPU_ESP8266 */
 
@@ -149,7 +178,7 @@ void spi_flash_drive_init(void)
     esp_partition_info_t* part = (esp_partition_info_t*)(uintptr_t)part_buf;
 
     while (part_read && part_addr < ESP_PART_TABLE_ADDR + ESP_PART_TABLE_SIZE) {
-        spi_flash_read (part_addr, (void*)part_buf, ESP_PART_ENTRY_SIZE);
+        spi_flash_read(part_addr, (void*)part_buf, ESP_PART_ENTRY_SIZE);
 
         if (part->magic == ESP_PART_ENTRY_MAGIC) {
             DEBUG("%s partition @%08"PRIx32" size=%08"PRIx32" label=%s\n", __func__,

@@ -2,10 +2,12 @@ MODULE = esp_idf_rmt
 
 # source files to be compiled for this module
 ESP32_SDK_SRC = \
-  components/driver/rmt.c \
+  components/driver/deprecated/rmt_legacy.c \
   components/soc/$(CPU_FAM)/rmt_periph.c \
   components/hal/rmt_hal.c \
   #
+
+INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/deprecated
 
 include $(RIOTBASE)/Makefile.base
 

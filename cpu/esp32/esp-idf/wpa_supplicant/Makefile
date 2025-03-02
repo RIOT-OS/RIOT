@@ -9,7 +9,7 @@ DIRS += src/common
 DIRS += src/crypto
 DIRS += src/eap_peer
 DIRS += src/rsn_supp
-DIRS += src/tls
+#DIRS += src/tls
 DIRS += src/utils
 DIRS += src/wps
 

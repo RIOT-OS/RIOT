@@ -1,0 +1,25 @@
+From 673cf4978a576478c07be0990ea1fbfc2e28178d Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Mar 2025 10:21:03 +0100
+Subject: [PATCH 20/26] nvs_flash: extern declaration of strlcpy
+
+---
+ components/nvs_flash/src/nvs_storage.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/nvs_flash/src/nvs_storage.cpp b/components/nvs_flash/src/nvs_storage.cpp
+index e5db0caefe..4db36cec91 100644
+--- a/components/nvs_flash/src/nvs_storage.cpp
++++ b/components/nvs_flash/src/nvs_storage.cpp
+@@ -7,6 +7,8 @@
+ #if __has_include(<bsd/string.h>)
+ // for strlcpy
+ #include <bsd/string.h>
++#else
++extern size_t strlcpy(char *, const char *, size_t);
+ #endif
+ 
+ #ifndef ESP_PLATFORM
+-- 
+2.34.1
+
