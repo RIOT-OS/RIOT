@@ -71,8 +71,15 @@ endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   # add additional modules required by esp_idf_nvs_flash
+  # TODO: replace esp32_sdk_mbedtls package by mbedtls package
+  ifneq (,$(filter mbedtls,$(USEPKG)))
+    # we don't allow to use the mbedtls package together with esp32_sdk_mbedtls for now
+    $(error "Package tlsf and esp_idf_heap can't be used together")
+  else
+    USEPKG += esp32_sdk_mbedtls
+  endif
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += pthread
-  USEMODULE += mtd
 endif
 
 ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
