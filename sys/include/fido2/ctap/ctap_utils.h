@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 #include "fido2/ctap/ctap.h"
-#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +32,7 @@ extern "C" {
 /**
  * @brief LED animation to indicate that user action is required
  */
-void fido2_ctap_utils_led_animation(void);
+void fido2_ctap_utils_wait_for_user_presence(void);
 
 /**
  * @brief Initialize button to be used for user presence test

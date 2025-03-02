@@ -1,17 +1,16 @@
-From 445c1fe93f6d0edbd1c59f318703b070c8ee445f Mon Sep 17 00:00:00 2001
+From 21f07dc85160512086c5836214f396f2e334d7df Mon Sep 17 00:00:00 2001
 From: Ollrogge <nils-ollrogge@outlook.de>
-Date: Tue, 7 Sep 2021 19:12:31 +0200
-Subject: [PATCH] Adaptions for RIOT FIDO2 CTAP
+Date: Fri, 27 Sep 2024 18:16:53 +0200
+Subject: [PATCH] [PATCH] Adaptions for RIOT FIDO2 CTAP
 
 ---
  Makefile                                      | 15 ++++++------
  tests/conftest.py                             |  2 +-
  tests/standard/fido2/pin/test_pin.py          | 24 ++++++++++++++++---
  tests/standard/fido2/test_reset.py            |  5 ++++
- tests/standard/fido2/test_resident_key.py     |  4 ++--
  .../fido2/user_presence/test_user_presence.py | 10 +++++++-
  tests/standard/transport/test_hid.py          | 11 +++++++++
- 7 files changed, 57 insertions(+), 14 deletions(-)
+ 6 files changed, 55 insertions(+), 12 deletions(-)
 
 diff --git a/Makefile b/Makefile
 index 85aa451..c101826 100644
@@ -137,28 +136,6 @@ index 508d755..adb2818 100644
      assert e.value.code == CtapError.ERR.NOT_ALLOWED
 +'''
 \ No newline at end of file
-diff --git a/tests/standard/fido2/test_resident_key.py b/tests/standard/fido2/test_resident_key.py
-index 2c5bece..32fe534 100644
---- a/tests/standard/fido2/test_resident_key.py
-+++ b/tests/standard/fido2/test_resident_key.py
-@@ -45,7 +45,7 @@ class TestResidentKeyPersistance(object):
-     @pytest.mark.parametrize("do_reboot", [False, True])
-     def test_user_info_returned_when_using_allowlist(self, device, MC_RK_Res, GA_RK_Res, do_reboot):
-         assert "id" in GA_RK_Res.user.keys()
--        
-+
-         allow_list = [
-             {
-                 "id": MC_RK_Res.auth_data.credential_data.credential_id[:],
-@@ -66,7 +66,7 @@ class TestResidentKeyPersistance(object):
- class TestResidentKeyAfterReset(object):
-     def test_with_allow_list_after_reset(self, device, MC_RK_Res, GA_RK_Res):
-         assert "id" in GA_RK_Res.user.keys()
--        
-+
-         allow_list = [
-             {
-                 "id": MC_RK_Res.auth_data.credential_data.credential_id[:],
 diff --git a/tests/standard/fido2/user_presence/test_user_presence.py b/tests/standard/fido2/user_presence/test_user_presence.py
 index c9904b2..0b74d24 100644
 --- a/tests/standard/fido2/user_presence/test_user_presence.py
@@ -222,5 +199,5 @@ index c79c933..6203a00 100644
      def test_timeout(self, device):
          device.send_data(CTAPHID.INIT, "\x11\x22\x33\x44\x55\x66\x77\x88")
 -- 
-2.33.0
+2.46.1
 
