@@ -34,7 +34,7 @@ extern "C" {
 #include "periph/gpio.h"
 
 #include "driver/adc.h"
-#include "hal/adc_types.h"
+#include "driver/adc_types_legacy.h"
 
 /**
  * @brief  Attenuations that can be set for ADC lines
@@ -47,15 +47,22 @@ typedef enum {
     ADC_ATTENUATION_0_DB = ADC_ATTEN_DB_0,    /**< full-range is about 1.1 V (Vref) */
     ADC_ATTENUATION_3_DB = ADC_ATTEN_DB_2_5,  /**< full-range is about 1.5 V */
     ADC_ATTENUATION_6_DB = ADC_ATTEN_DB_6,    /**< full-range is about 2.2 V */
-    ADC_ATTENUATION_11_DB = ADC_ATTEN_DB_11,  /**< full-range is about 3.3 V */
+    ADC_ATTENUATION_12_DB = ADC_ATTEN_DB_12,  /**< full-range is about 3.3 V */
 } adc_attenuation_t;
+
+/**
+ * @brief   Attenuation of 11 dB is depcricated and has to be mapped
+ *
+ * The define ensures the compatibility with older versions.
+ */
+#define ADC_ATTENUATION_11_DB   ADC_ATTENUATION_12_DB
 
 /**
  * @brief   Set the attenuation for the ADC line. Default attenuation is 11 dB.
  *
  * For each ADC line, an attenuation of the input signal can be defined
  * separately. This results in different full ranges of the measurable voltage
- * at the input. The attenuation can be set to 0 dB, 3 dB, 6 dB and 11 dB,
+ * at the input. The attenuation can be set to 0 dB, 3 dB, 6 dB and 12 dB,
  * with 11 dB being the standard attenuation. Since an ADC input is measured
  * against a reference voltage Vref of 1.1 V, approximately the following
  * measurement ranges are given when using a corresponding attenuation:
@@ -67,7 +74,7 @@ typedef enum {
  *  0 dB           | 0 ... 1.1V (Vref) | ADC_ATTEN_DB_0
  *  2.5 dB         | 0 ... 1.5V        | ADC_ATTEN_DB_2_5
  *  6 dB           | 0 ... 2.2V        | ADC_ATTEN_DB_6
- * 11 dB (default) | 0 ... 3.3V        | ADC_ATTEN_DB_11
+ * 12 dB (default) | 0 ... 3.3V        | ADC_ATTEN_DB_12
  *
  * </center>
  *

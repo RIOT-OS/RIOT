@@ -69,14 +69,14 @@ _adc_esp_res_map_t _adc_esp_res_map[] =  {
     { .res = ADC_WIDTH_BIT_12, .shift = 0 },    /* ADC_RES_12BIT */
     { .res = ADC_WIDTH_MAX },                   /* ADC_RES_14BIT */
     { .res = ADC_WIDTH_MAX },                   /* ADC_RES_16BIT */
-#elif SOC_ADC_MAX_BITWIDTH == 12
+#elif SOC_ADC_RTC_MAX_BITWIDTH == 12
     { .res = ADC_WIDTH_BIT_12, .shift = 6 },    /* ADC_RES_6BIT  */
     { .res = ADC_WIDTH_BIT_12, .shift = 4 },    /* ADC_RES_8BIT  */
     { .res = ADC_WIDTH_BIT_12, .shift = 2 },    /* ADC_RES_10BIT */
     { .res = ADC_WIDTH_BIT_12, .shift = 0 },    /* ADC_RES_12BIT */
     { .res = ADC_WIDTH_MAX },                   /* ADC_RES_14BIT */
     { .res = ADC_WIDTH_MAX },                   /* ADC_RES_16BIT */
-#elif SOC_ADC_MAX_BITWIDTH == 13
+#elif SOC_ADC_RTC_MAX_BITWIDTH == 13
     { .res = ADC_WIDTH_BIT_13, .shift = 7 },    /* ADC_RES_6BIT  */
     { .res = ADC_WIDTH_BIT_13, .shift = 5 },    /* ADC_RES_8BIT  */
     { .res = ADC_WIDTH_BIT_13, .shift = 3 },    /* ADC_RES_10BIT */
@@ -137,7 +137,7 @@ int adc_init(adc_t line)
         _adc1_ctrl_init();
         /* set the attenuation and configure its associated GPIO pin mux */
         adc1_config_channel_atten((adc1_channel_t)_adc_hw[rtcio].adc_channel,
-                                  ADC_ATTEN_DB_11);
+                                  ADC_ATTEN_DB_12);
     }
     else if (_adc_hw[rtcio].adc_ctrl == ADC_UNIT_2) {
         /* ensure compatibility of given adc_channel_t with adc2_channel_t */
@@ -146,7 +146,7 @@ int adc_init(adc_t line)
         _adc2_ctrl_init();
         /* set the attenuation and configure its associated GPIO pin mux */
         adc2_config_channel_atten((adc2_channel_t)_adc_hw[rtcio].adc_channel,
-                                  ADC_ATTEN_DB_11);
+                                  ADC_ATTEN_DB_12);
     }
     else {
         return -1;
