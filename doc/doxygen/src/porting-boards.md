@@ -29,7 +29,7 @@ makefiles. Usually a `BOARD` directory has the following structure
   |----dist/
       |----scripts
   |----board.c
-  |----doc.txt
+  |----doc.md
   |----include/
       |----periph_conf.h
       |----board.h
@@ -215,7 +215,7 @@ Alternatively, the pseudomodule @ref pseudomodule_ztimer_auto_adjust can be used
 in an application to enable automatic timer offset compensation at board startup.
 This however incurs overhead both in the text segment and at bootup time.
 
-## doc.txt                                                          {#board-doc}
+## doc.md                                                           {#board-doc}
 
 Although not explicitly needed, if upstreamed and as a general good
 practice, this file holds all `BOARD` documentation. This can include
@@ -225,8 +225,7 @@ The documentation must be under the proper doxygen group, you can compile the
 documentation by calling `make doc` and then open the generated html file on
 any browser.
 
-```
-/**
+```md
 @defgroup    boards_foo FooBoard
 @ingroup     boards
 @brief       Support for the foo board
@@ -234,7 +233,7 @@ any browser.
 
 ### User Interface
 
-  ....
+  ...
 
 ### Using UART
 
@@ -243,8 +242,18 @@ any browser.
 ### Flashing the device
 
   ...
+```
 
-*/
+Previously documentation was contained in `doc.txt` files with C-style comment
+blocks. This style has been deprecated in favor of using `doc.md` files in
+Markdown format, which eliminates formatting and interpretation issues.
+Old style files will continually be replaced by the new format.
+
+Up to version `0.9.2` the [riotgen](https://pypi.org/project/riotgen/) tool
+will generate `doc.txt` files instead of `doc.md` files. You can upgrade it to
+the latest version with
+```sh
+pip install --upgrade riotgen
 ```
 
 # Helper tools
@@ -341,7 +350,7 @@ specify multiple directories separated by spaces.
         |----dist/
             |----scripts
         |----board.c
-        |----doc.txt
+        |----doc.md
         |----include/
             |----periph_conf.h
             |----board.h
