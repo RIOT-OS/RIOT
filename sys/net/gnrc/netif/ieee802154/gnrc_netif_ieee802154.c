@@ -211,6 +211,22 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                 gnrc_netif_hdr_set_timestamp(hdr, rx_info.timestamp);
             }
 #endif
+            if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
+                (mhr[0] & IEEE802154_FCF_ACK_REQ)) {
+                netopt_enable_t auto_ack;
+                dev->driver->get(dev, NETOPT_AUTOACK, &auto_ack, sizeof(auto_ack));
+                if (auto_ack != NETOPT_ENABLE) {
+                    uint8_t ack[IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN]
+                        = { IEEE802154_FCF_TYPE_ACK, 0x00, ieee802154_get_seq(mhr) };
+                    iolist_t io = {
+                        .iol_base = ack,
+                        .iol_len = sizeof(ack),
+                        .iol_next = NULL
+                    };
+                    DEBUG("_recv_ieee802154: Sending ACK\n");
+                    dev->driver->send(dev, &io);
+                }
+            }
             gnrc_netif_hdr_set_netif(hdr, netif);
             dev->driver->get(dev, NETOPT_PROTO, &pkt->type, sizeof(pkt->type));
             if (IS_ACTIVE(ENABLE_DEBUG)) {
