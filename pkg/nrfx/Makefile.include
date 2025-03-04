@@ -25,4 +25,5 @@ endif
 
 INCLUDES += -I$(PKGDIRBASE)/nrfx
 INCLUDES += -I$(PKGDIRBASE)/nrfx/mdk
+INCLUDES += -I$(PKGDIRBASE)/nrfx/drivers/include
 INCLUDES += -I$(RIOTPKG)/nrfx/include
