@@ -36,10 +36,8 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += netdev_eth
   USEMODULE += netopt
-  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
@@ -50,7 +48,6 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_wifi
   USEMODULE += esp_idf_wpa_supplicant
   USEMODULE += esp_idf_wpa_supplicant_esp_supplicant
@@ -71,9 +68,12 @@ ifneq (,$(filter esp_hw_counter,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
+  # NVS flash uses MBed TLS for encryption
+  USEPKG += mbedtls
+  USEMODULE += mbedtls_contrib
   # add additional modules required by esp_idf_nvs_flash
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += pthread
-  USEMODULE += mtd
 endif
 
 ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
@@ -116,7 +116,6 @@ ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_OPTIONAL += esp_spi_oct
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_heap
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_spi_ram
 endif
 
@@ -138,6 +137,10 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
     $(error "Package tlsf and esp_idf_heap can't be used together")
   endif
   USEPKG += esp32_sdk_tlsf
+endif
+
+ifneq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_jtag
 endif
 
 ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
@@ -199,11 +202,11 @@ ifneq (,$(filter tinyusb_portable_espressif,$(USEMODULE)))
   USEMODULE += esp_idf_usb
 endif
 
-ifneq (,$(filter esp_jtag,$(USEMODULE)))
-  FEATURES_REQUIRED += esp_jtag
-endif
-
 # enable bootloader reset over USB, requires CDC ACM to be used
 ifneq (,$(filter usbus_cdc_acm tinyusb_class_cdc,$(USEMODULE)))
   USEMODULE += usb_board_reset
+endif
+
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_auto_adjust
 endif
