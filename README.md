@@ -53,6 +53,27 @@ indirect business models around the free open-source software platform
 provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
+## Why RIOT-OS?
+
+RIOT-OS is designed to address the unique challenges of resource-constrained embedded systems, specifically for IoT applications. It provides:
+
+- **Real-time capabilities** with a fully preemptive, microkernel-based architecture.
+- **Low power consumption** for battery-powered devices.
+- **Full IPv6 support**, making it ideal for modern connected applications.
+- **Modular and highly portable** codebase that runs on a wide range of microcontrollers.
+- **Open-source and community-driven**, ensuring continuous improvements.
+
+If you need an OS that brings **real-time performance, energy efficiency, and open-source flexibility** to IoT, RIOT-OS is the right choice.
+
+
+## RIOT-OS is structured into several key components:
+
+- **Core:** Handles threading, scheduling, and system initialization.
+- **Board Support Packages (BSPs):** Drivers and hardware abstractions.
+- **Networking:** IPv6, 6LoWPAN, and other IoT protocols.
+- **File System & Storage:** Support for flash memory and SD cards.
+- **Applications:** User programs that run on RIOT-OS.
+
 ## Features
 
 RIOT provides features including, but not limited to:
@@ -157,7 +178,28 @@ RIOT closely collaborates with and inspires other open source projects, e.g., [A
 
 ## Contribute
 
-To contribute something to RIOT, please refer to our
+We welcome contributors of all experience levels! Here’s how you can help:
+
+### 📌 Quickstart Guide for New Contributors  
+1. **Fork & Clone** the repository:
+   Install required dependencies (compiler, build tools)
+   ```sh
+   git clone https://github.com/YOUR-USERNAME/RIOT.git
+   cd RIOT
+2. Setup Development Environment
+   Test your exam
+   ```sh
+   cd examples/hello-world
+   make all flash term BOARD=native
+3. Make and Submit Changes
+   ```sh
+   git checkout -b my-feature
+   git commit -m "Describe your change"
+   git push origin my-feature
+
+Open a Pull Request (PR) on GitHub
+
+For detailed guidelines on coding style, documentation, and testing, check the
 [contributing document](CONTRIBUTING.md).
 
 ## Mailing Lists
