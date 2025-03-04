@@ -36,10 +36,8 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += netdev_eth
   USEMODULE += netopt
-  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
@@ -50,7 +48,6 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_wifi
   USEMODULE += esp_idf_wpa_supplicant
   USEMODULE += esp_idf_wpa_supplicant_esp_supplicant
@@ -71,9 +68,12 @@ ifneq (,$(filter esp_hw_counter,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
+  # NVS flash uses MBed TLS for encryption
+  USEPKG += mbedtls
+  USEMODULE += mbedtls_contrib
   # add additional modules required by esp_idf_nvs_flash
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += pthread
-  USEMODULE += mtd
 endif
 
 ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
@@ -116,7 +116,6 @@ ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_OPTIONAL += esp_spi_oct
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_heap
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_spi_ram
 endif
 
@@ -125,19 +124,12 @@ ifneq (,$(filter esp_spi_oct,$(FEATURES_USED)))
 endif
 
 ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
-  # The ESP-IDF heap component uses the TLSF implementation that is part of
-  # the component. To avoid conflicts with modules and packages that use the
-  # RIOT package `tlsf`, this package is also used for the ESP-IDF heap instead
-  # of its own implementation. There does not seem to be any differences in
-  # the implementations of TLSF with the exception of heap poisoning, which
-  # is not configured.
-  # TODO: replace esp32_sdk_tlsf by tlsf after upgrading tlsf package
-  # USEPKG += tlsf
-  ifneq (,$(filter tlsf,$(USEPKG)))
-    # we don't allow to use the tlsf package together with esp_idf_heap for now
-    $(error "Package tlsf and esp_idf_heap can't be used together")
-  endif
+  # ESP-IDF heap component uses its own and modified TLSF implementation
   USEPKG += esp32_sdk_tlsf
+endif
+
+ifneq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_jtag
 endif
 
 ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
@@ -197,10 +189,6 @@ endif
 
 ifneq (,$(filter tinyusb_portable_espressif,$(USEMODULE)))
   USEMODULE += esp_idf_usb
-endif
-
-ifneq (,$(filter esp_jtag,$(USEMODULE)))
-  FEATURES_REQUIRED += esp_jtag
 endif
 
 # enable bootloader reset over USB, requires CDC ACM to be used
