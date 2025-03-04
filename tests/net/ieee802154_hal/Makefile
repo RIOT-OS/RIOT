@@ -1,6 +1,6 @@
 include ../Makefile.net_common
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   ZEP_PORT_BASE ?= 17754
   TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
