@@ -513,10 +513,6 @@ static int _xfer_execute(sdmmc_dev_t *dev, sdmmc_xfer_desc_t *xfer,
     assert(xfer);
     assert((xfer->write && data_wr) || (!xfer->write && data_rd));
 
-    /* check the alignment required for the buffers */
-    assert(HAS_ALIGNMENT_OF(data_wr, SDMMC_CPU_DMA_ALIGNMENT));
-    assert(HAS_ALIGNMENT_OF(data_rd, SDMMC_CPU_DMA_ALIGNMENT));
-
     sdhc_dev_t *sdhc_dev = container_of(dev, sdhc_dev_t, sdmmc_dev);
 
     assert(sdhc_dev);
