@@ -409,6 +409,10 @@ groups:
             Indicates that the board is mechanically and electrically compatible
             with shields developed for the Arduino Nano. (Note: Except the
             ISP header, that requires `arduino_shield_isp` in addition.)
+    - name: xiao_shield
+      help: >
+            Indicates that the board is mechanically and electrically compatible
+            with shields developed for the Seeed Studio XIAO board family.
 
 - title: RAM Related Features
   help: These features indicate presence of special RAM regions or features
