@@ -186,6 +186,7 @@ enum {
     ASYMCUTE_PUBLISHED,             /**< data was published */
     ASYMCUTE_SUBSCRIBED,            /**< client was subscribed to topic */
     ASYMCUTE_UNSUBSCRIBED,          /**< client was unsubscribed from topic */
+    ASYMCUTE_CRITICAL,              /**< invalid internal data  */
 };
 
 /**
@@ -221,7 +222,7 @@ typedef struct asymcute_will asymcute_will_t;
  *                      may be NULL of unsolicited events
  * @param[in] evt_type  type of the event
  */
-typedef void(*asymcute_evt_cb_t)(asymcute_req_t *req, unsigned evt_type);
+typedef void (*asymcute_evt_cb_t)(asymcute_req_t *req, unsigned evt_type);
 
 /**
  * @brief   Callback triggered on events for active subscriptions
@@ -232,8 +233,8 @@ typedef void(*asymcute_evt_cb_t)(asymcute_req_t *req, unsigned evt_type);
  * @param[in] len       length of @p data in bytes
  * @param[in] arg       user supplied argument
  */
-typedef void(*asymcute_sub_cb_t)(const asymcute_sub_t *sub, unsigned evt_type,
-                                 const void *data, size_t len, void *arg);
+typedef void (*asymcute_sub_cb_t)(const asymcute_sub_t *sub, unsigned evt_type,
+                                  const void *data, size_t len, void *arg);
 
 /**
  * @brief   Context specific timeout callback, only used internally
@@ -245,41 +246,41 @@ typedef void(*asymcute_sub_cb_t)(const asymcute_sub_t *sub, unsigned evt_type,
  *
  * @return  Event type to communicate to the user
  */
-typedef unsigned(*asymcute_to_cb_t)(asymcute_con_t *con, asymcute_req_t *req);
+typedef unsigned (*asymcute_to_cb_t)(asymcute_con_t *con, asymcute_req_t *req);
 
 /**
  * @brief   Asymcute request context
  */
 struct asymcute_req {
-    mutex_t lock;                   /**< synchronization lock */
-    struct asymcute_req *next;      /**< the requests list entry */
-    asymcute_con_t *con;            /**< connection the request is using */
-    asymcute_to_cb_t cb;            /**< internally used callback */
-    void *arg;                      /**< internally used additional state */
-    event_callback_t to_evt;        /**< timeout event */
-    event_timeout_t to_timer;       /**< timeout timer */
-    uint8_t data[CONFIG_ASYMCUTE_BUFSIZE]; /**< buffer holding the request's data */
-    size_t data_len;                /**< length of the request packet in byte */
-    uint16_t msg_id;                /**< used message id for this request */
-    uint8_t retry_cnt;              /**< retransmission counter */
+    mutex_t lock;                           /**< synchronization lock */
+    struct asymcute_req *next;              /**< the requests list entry */
+    asymcute_con_t *con;                    /**< connection the request is using */
+    asymcute_to_cb_t cb;                    /**< internally used callback */
+    void *arg;                              /**< internally used additional state */
+    event_callback_t to_evt;                /**< timeout event */
+    event_timeout_t to_timer;               /**< timeout timer */
+    uint8_t data[CONFIG_ASYMCUTE_BUFSIZE];  /**< buffer holding the request's data */
+    size_t data_len;                        /**< length of the request packet in byte */
+    uint16_t msg_id;                        /**< used message id for this request */
+    uint8_t retry_cnt;                      /**< retransmission counter */
 };
 
 /**
  * @brief   Asymcute connection context
  */
 struct asymcute_con {
-    mutex_t lock;                       /**< synchronization lock */
-    sock_udp_t sock;                    /**< socket used by a connections */
-    asymcute_req_t *pending;            /**< list holding pending requests */
-    asymcute_sub_t *subscriptions;      /**< list holding active subscriptions */
-    asymcute_evt_cb_t user_cb;          /**< event callback provided by user */
-    event_callback_t keepalive_evt;     /**< keep alive event */
-    event_timeout_t keepalive_timer;    /**< keep alive timer */
-    uint16_t last_id;                   /**< last used message ID for this
-                                         *   connection */
-    uint8_t keepalive_retry_cnt;        /**< keep alive transmission counter */
-    uint8_t state;                      /**< connection state */
-    uint8_t rxbuf[CONFIG_ASYMCUTE_BUFSIZE];    /**< connection specific receive buf */
+    mutex_t lock;                           /**< synchronization lock */
+    sock_udp_t sock;                        /**< socket used by a connections */
+    asymcute_req_t *pending;                /**< list holding pending requests */
+    asymcute_sub_t *subscriptions;          /**< list holding active subscriptions */
+    asymcute_evt_cb_t user_cb;              /**< event callback provided by user */
+    event_callback_t keepalive_evt;         /**< keep alive event */
+    event_timeout_t keepalive_timer;        /**< keep alive timer */
+    uint16_t last_id;                       /**< last used message ID for this
+                                             *   connection */
+    uint8_t keepalive_retry_cnt;            /**< keep alive transmission counter */
+    uint8_t state;                          /**< connection state */
+    uint8_t rxbuf[CONFIG_ASYMCUTE_BUFSIZE]; /**< connection specific receive buf */
     char cli_id[MQTTSN_CLI_ID_MAXLEN + 1];  /**< buffer to store client ID */
 };
 
@@ -287,10 +288,10 @@ struct asymcute_con {
  * @brief   Data-structure for holding topics and their registration status
  */
 struct asymcute_topic {
-    asymcute_con_t *con;        /**< connection used for registration */
-    char name[CONFIG_ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ASCII only) */
-    uint8_t flags;              /**< normal, short, or pre-defined */
-    uint16_t id;                /**< topic id */
+    asymcute_con_t *con;                            /**< connection used for registration */
+    char name[CONFIG_ASYMCUTE_TOPIC_MAXLEN + 1];    /**< topic string (ASCII only) */
+    uint8_t flags;                                  /**< normal, short, or pre-defined */
+    uint16_t id;                                    /**< topic id */
 };
 
 /**
