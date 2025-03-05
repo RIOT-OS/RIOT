@@ -1,0 +1,22 @@
+From eddadbce5415d2b8dced029ff8698e0cd2cf246e Mon Sep 17 00:00:00 2001
+From: RIOT buildsystem <buildsystem@riot>
+Date: Thu, 27 Mar 2025 14:34:12 +0100
+Subject: [PATCH] Fatal error if LibUSB is not found
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 999b9a0..df6a5ec 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -219,6 +219,10 @@ else()
+     set(OTP_EXE no_otp.cpp)
+ endif()
+ 
++if (NOT LIBUSB_FOUND)
++    message(FATAL_ERROR "No LibUSB found, please install libusb-1.0-dev to build picotool with USB support.")
++endif()
++
+ add_subdirectory(${PICO_SDK_PATH}/src/common/pico_binary_info pico_binary_info)
+ add_subdirectory(${PICO_SDK_PATH}/src/common/boot_uf2_headers boot_uf2_headers)
+ add_subdirectory(${PICO_SDK_PATH}/src/common/boot_picoboot_headers boot_picoboot_headers)
