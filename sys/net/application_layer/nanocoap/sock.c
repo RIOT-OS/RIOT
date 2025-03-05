@@ -435,9 +435,7 @@ static ssize_t _sock_get(nanocoap_sock_t *sock, const char *path,
                          uint8_t type,
                          void *response, size_t max_len)
 {
-    /* buffer for CoAP header */
-    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-    uint8_t *pktpos = buffer;
+    uint8_t *pktpos = sock->hdr_buf;
 
     coap_pkt_t pkt = {
         .hdr = (void *)pktpos,
@@ -451,6 +449,7 @@ static ssize_t _sock_get(nanocoap_sock_t *sock, const char *path,
     pktpos += coap_build_hdr(pkt.hdr, type, NULL, 0, COAP_METHOD_GET,
                              nanocoap_sock_next_msg_id(sock));
     pktpos += coap_opt_put_uri_pathquery(pktpos, NULL, path);
+    assert(pktpos < (uint8_t *)sock->hdr_buf + sizeof(sock->hdr_buf));
 
     pkt.payload = pktpos;
     pkt.payload_len = 0;
@@ -458,18 +457,17 @@ static ssize_t _sock_get(nanocoap_sock_t *sock, const char *path,
     return nanocoap_sock_request_cb(sock, &pkt, _get_put_cb, &ctx);
 }
 
-ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, size_t len)
+ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
+                          void *response, size_t len_max)
 {
-    return _sock_get(sock, path, COAP_TYPE_CON, buf, len);
+    return _sock_get(sock, path, COAP_TYPE_CON, response, len_max);
 }
 
 ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
                        uint8_t type, const void *request, size_t len,
                        void *response, size_t max_len)
 {
-    /* buffer for CoAP header */
-    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-    uint8_t *pktpos = buffer;
+    uint8_t *pktpos = sock->hdr_buf;
 
     iolist_t payload = {
         .iol_base = (void *)request,
@@ -477,7 +475,7 @@ ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
     };
 
     coap_pkt_t pkt = {
-        .hdr = (void *)buffer,
+        .hdr = (void *)pktpos,
         .snips = &payload,
     };
 
@@ -500,6 +498,7 @@ ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
         /* set payload marker */
         *pktpos++ = 0xFF;
     }
+    assert(pktpos < (uint8_t *)sock->hdr_buf + sizeof(sock->hdr_buf));
 
     pkt.payload = pktpos;
     pkt.payload_len = 0;
@@ -601,9 +600,7 @@ ssize_t nanocoap_sock_fetch_url(const char *url,
 
 ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
 {
-    /* buffer for CoAP header */
-    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-    uint8_t *pktpos = buffer;
+    uint8_t *pktpos = sock->hdr_buf;
 
     coap_pkt_t pkt = {
         .hdr = (void *)pktpos,
@@ -612,6 +609,7 @@ ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
     pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_DELETE,
                              nanocoap_sock_next_msg_id(sock));
     pktpos += coap_opt_put_uri_pathquery(pktpos, NULL, path);
+    assert(pktpos < (uint8_t *)sock->hdr_buf + sizeof(sock->hdr_buf));
 
     pkt.payload = pktpos;
 
@@ -720,14 +718,13 @@ int nanocoap_sock_block_request(coap_block_request_t *req,
     }
 
     int res;
-    uint8_t buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
     iolist_t snip = {
         .iol_base = (void *)data,
         .iol_len  = len,
     };
 
     coap_pkt_t pkt = {
-        .hdr = (void *)buf,
+        .hdr = (void *)req->sock->hdr_buf,
         .snips = &snip,
     };
 
@@ -743,6 +740,7 @@ int nanocoap_sock_block_request(coap_block_request_t *req,
         /* set payload marker */
         *pktpos++ = 0xFF;
     }
+    assert(pktpos < (uint8_t *)req->sock->hdr_buf + sizeof(req->sock->hdr_buf));
 
     pkt.payload = pktpos;
     pkt.payload_len = 0;
@@ -760,8 +758,6 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
                                 coap_blksize_t blksize,
                                 coap_blockwise_cb_t callback, void *arg)
 {
-    uint8_t buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-
     _block_ctx_t ctx = {
         .callback = callback,
         .arg = arg,
@@ -776,7 +772,7 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
     while (ctx.more) {
         DEBUG("nanocoap: fetching block %"PRIu32"\n", ctx.blknum);
 
-        int res = _fetch_block(sock, buf, sizeof(buf), path, blksize, &ctx);
+        int res = _fetch_block(sock, sock->hdr_buf, sizeof(sock->hdr_buf), path, blksize, &ctx);
         if (res == -EAGAIN) {
             if (--retries) {
                 continue;
@@ -853,8 +849,6 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
                             coap_blksize_t blksize, size_t offset,
                             void *dst, size_t len)
 {
-    uint8_t buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-
     /* try to find optimal blocksize */
     unsigned num_blocks = _num_blks(offset, len, blksize);
     for (uint8_t szx = 0; szx < blksize; ++szx) {
@@ -885,7 +879,7 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
     while (dst_ctx.len) {
         DEBUG("nanocoap: fetching block %"PRIu32"\n", ctx.blknum);
 
-        int res = _fetch_block(sock, buf, sizeof(buf), path, blksize, &ctx);
+        int res = _fetch_block(sock, sock->hdr_buf, sizeof(sock->hdr_buf), path, blksize, &ctx);
         if (res == -EAGAIN) {
             if (--retries) {
                 continue;
