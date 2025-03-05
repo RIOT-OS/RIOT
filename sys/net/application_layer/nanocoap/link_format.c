@@ -85,13 +85,13 @@ static int _dirlist_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int m
 }
 
 int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
-                             coap_link_format_handler_t cb, void *arg)
+                             coap_link_format_handler_t cb, void *arg,
+                             char response[CONFIG_NANOCOAP_QS_MAX])
 {
-    char buffer[CONFIG_NANOCOAP_QS_MAX];
     struct dir_list_ctx ctx = {
-        .buf = buffer,
-        .end = buffer + sizeof(buffer),
-        .cur = buffer,
+        .buf = response,
+        .end = response + CONFIG_NANOCOAP_QS_MAX,
+        .cur = response,
         .cb = cb,
         .ctx = arg,
     };
@@ -99,7 +99,8 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
                                        _dirlist_cb, &ctx);
 }
 
-int nanocoap_link_format_get_url(const char *url, coap_link_format_handler_t cb, void *arg)
+int nanocoap_link_format_get_url(const char *url, coap_link_format_handler_t cb, void *arg,
+                                 char response[CONFIG_NANOCOAP_QS_MAX])
 {
     nanocoap_sock_t sock;
     int res = nanocoap_sock_url_connect(url, &sock);
@@ -107,7 +108,7 @@ int nanocoap_link_format_get_url(const char *url, coap_link_format_handler_t cb,
         return res;
     }
 
-    res = nanocoap_link_format_get(&sock, sock_urlpath(url), cb, arg);
+    res = nanocoap_link_format_get(&sock, sock_urlpath(url), cb, arg, response);
     nanocoap_sock_close(&sock);
 
     return res;

@@ -45,12 +45,14 @@ typedef int (*coap_link_format_handler_t)(char *entry, void *ctx);
  * @param[in]   path    path of the resource
  * @param[in]   cb      Callback to execute for each resource entry
  * @param[in]   arg     Optional callback argument
+ * @param[out]  response Response buffer
  *
  * @returns     0 on success
  * @returns     <0 on error
  */
 int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
-                             coap_link_format_handler_t cb, void *arg);
+                             coap_link_format_handler_t cb, void *arg,
+                             char response[CONFIG_NANOCOAP_QS_MAX]);
 
 /**
  * @brief   Downloads the resource behind @p url via blockwise GET
@@ -58,12 +60,14 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
  * @param[in]   url     URL to the resource
  * @param[in]   cb      Callback to execute for each resource entry
  * @param[in]   arg     Optional callback argument
+ * @param[out]  response Response buffer
  *
  * @returns     0 on success
  * @returns     <0 on error
  */
 int nanocoap_link_format_get_url(const char *url,
-                                 coap_link_format_handler_t cb, void *arg);
+                                 coap_link_format_handler_t cb, void *arg,
+                                 char response[CONFIG_NANOCOAP_QS_MAX]);
 
 #ifdef __cplusplus
 }
