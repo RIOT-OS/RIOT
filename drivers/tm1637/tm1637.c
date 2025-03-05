@@ -181,8 +181,9 @@ static int _tm1637_transmit_segments(const tm1637_t *dev,
     /* transmit the data command first */
     _tm1637_start(dev);
     int res = _tm1637_transmit_byte(dev, COMMAND_DATA);
-    if (res < 0)
+    if (res < 0) {
         return -1;
+    }
 
     _tm1637_stop(dev);
 
@@ -192,14 +193,16 @@ static int _tm1637_transmit_segments(const tm1637_t *dev,
      */
     _tm1637_start(dev);
     res = _tm1637_transmit_byte(dev, COMMAND_ADDRESS);
-    if (res < 0)
+    if (res < 0) {
         return -1;
+    }
 
     /* transmit each byte indiviudally */
     for (int i = 0; i < DIGIT_COUNT; ++i) {
         res = _tm1637_transmit_byte(dev, segments[i]);
-        if (res < 0)
+        if (res < 0) {
             return -1;
+        }
     }
     _tm1637_stop(dev);
 
@@ -207,8 +210,9 @@ static int _tm1637_transmit_segments(const tm1637_t *dev,
     _tm1637_start(dev);
     res = _tm1637_transmit_byte(dev, COMMAND_DISPLAY_AND_CONTROL |
                                          brightness | BIT_MASK_ON);
-    if (res < 0)
+    if (res < 0) {
         return -1;
+    }
     _tm1637_stop(dev);
 
     return 0;
