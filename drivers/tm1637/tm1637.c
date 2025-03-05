@@ -61,7 +61,7 @@
 /**
  * @brief Delay between bits in microseconds
  */
-#define BIT_TIME_US                 10
+#define BIT_TIME_US                 1
 
 /**
  * @brief Array encoding the segments for the digits from 0 to 9
@@ -132,6 +132,7 @@ static void _tm1637_stop(const tm1637_t *dev)
  */
 static int _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
 {
+    /* transmit each bit */
     for (int i = 0; i < 8; ++i) {
         bool value = (byte >> i) & 0x01;
         gpio_write(dev->params->clk, false);
@@ -144,26 +145,24 @@ static int _tm1637_transmit_byte(const tm1637_t *dev, uint8_t byte)
 
     gpio_write(dev->params->clk, false);
     gpio_write(dev->params->dio, true);
+
+    /* set the DIO pin to input to later receive the ACK */
     gpio_init(dev->params->dio, GPIO_IN_PU);
     _tm1637_delay();
 
     gpio_write(dev->params->clk, true);
 
     /* the transmission is successful if the GPIO reads LOW */
-    bool ack = gpio_read(dev->params->dio);
+    bool nack = gpio_read(dev->params->dio);
     _tm1637_delay();
 
+    /* set the DIO pin back to output */
     gpio_init(dev->params->dio, GPIO_OUT);
     gpio_write(dev->params->dio, false);
     gpio_write(dev->params->clk, false);
     _tm1637_delay();
 
-    if (ack) {
-        return -1;
-    }
-    else {
-        return 0;
-    }
+    return nack ? -1 : 0;
 }
 
 /**
@@ -179,37 +178,40 @@ static int _tm1637_transmit_segments(const tm1637_t *dev,
                                      const uint8_t segments[DIGIT_COUNT],
                                      tm1637_brightness_t brightness)
 {
-    int error = 0;
     /* transmit the data command first */
     _tm1637_start(dev);
-    error += _tm1637_transmit_byte(dev, COMMAND_DATA);
+    int res = _tm1637_transmit_byte(dev, COMMAND_DATA);
+    if (res < 0)
+        return -1;
+
     _tm1637_stop(dev);
 
     /**
-         * set the address using the auto increment mode for addresses and
-         * start at zero
-         */
+     * set the address using the auto increment mode for addresses and
+     * start at zero
+     */
     _tm1637_start(dev);
-    error += _tm1637_transmit_byte(dev, COMMAND_ADDRESS);
+    res = _tm1637_transmit_byte(dev, COMMAND_ADDRESS);
+    if (res < 0)
+        return -1;
 
     /* transmit each byte indiviudally */
     for (int i = 0; i < DIGIT_COUNT; ++i) {
-        error += _tm1637_transmit_byte(dev, segments[i]);
+        res = _tm1637_transmit_byte(dev, segments[i]);
+        if (res < 0)
+            return -1;
     }
     _tm1637_stop(dev);
 
     /* transmit the display state and the brightness */
     _tm1637_start(dev);
-    error += _tm1637_transmit_byte(dev, COMMAND_DISPLAY_AND_CONTROL |
-                                            brightness | BIT_MASK_ON);
+    res = _tm1637_transmit_byte(dev, COMMAND_DISPLAY_AND_CONTROL |
+                                         brightness | BIT_MASK_ON);
+    if (res < 0)
+        return -1;
     _tm1637_stop(dev);
 
-    if (error <= -1) {
-        return -1;
-    }
-    else {
-        return 0;
-    }
+    return 0;
 }
 
 /**
@@ -219,8 +221,8 @@ static int _tm1637_transmit_segments(const tm1637_t *dev,
  */
 inline static void _enable_colon(uint8_t *segments)
 {
-    /* the second digit uses the colon */
-    segments[1] |= BIT_MASK_DOT;
+    /* the digit to the left of the middle uses the colon */
+    segments[DIGIT_COUNT / 2 - 1] |= BIT_MASK_DOT;
 }
 
 int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
@@ -244,6 +246,11 @@ int tm1637_init(tm1637_t *dev, const tm1637_params_t *params)
     gpio_write(dev->params->clk, false);
     gpio_write(dev->params->dio, false);
 
+    /**
+     * This is necessary as the display needs to warm-up to the clock speed.
+     * If the following lines are omitted, the display will generate a NACK after the first
+     * byte transmission.
+     */
     _tm1637_start(dev);
     _tm1637_stop(dev);
 
@@ -270,6 +277,7 @@ int tm1637_write_number(const tm1637_t *dev, int16_t number,
         segments[DIGIT_COUNT - 1] = segments_array[0];
     }
     else if (number < 0) {
+        /* for a negative number invert the signedness */
         number = -number;
         for (int i = 0; i < DIGIT_COUNT; ++i) {
             if (number != 0) {
@@ -277,10 +285,15 @@ int tm1637_write_number(const tm1637_t *dev, int16_t number,
                 number /= 10;
             }
             else if (!leading_zeros) {
+                /**
+                 * without leading zeros, the minus sign is to the left of the most
+                 * significant digit
+                 */
                 segments[DIGIT_COUNT - 1 - i] = minus_sign;
                 break;
             }
             else {
+                /* with leading zeros, the minus sign is always at the leftmost position */
                 segments[0] = minus_sign;
                 break;
             }

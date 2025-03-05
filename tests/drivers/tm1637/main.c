@@ -23,86 +23,85 @@
 
 #include "periph/gpio.h"
 #include "ztimer.h"
+#include "embUnit.h"
 
 #include <stdio.h>
 
 /**
- * @brief Display a number with different settings
- *
- * @param[in] dev device descriptor of the display
- * @param[in] number number to display
+ * @brief device descriptor of the display
  */
-static void test_number(const tm1637_t *dev, int16_t number)
-{
-    int error = 0;
-    error += tm1637_write_number(dev, number, TM1637_PW_14_16, false, false);
-    ztimer_sleep(ZTIMER_SEC, 1);
-    error += tm1637_write_number(dev, number, TM1637_PW_14_16, false, true);
-    ztimer_sleep(ZTIMER_SEC, 1);
-    error += tm1637_write_number(dev, number, TM1637_PW_14_16, true, false);
-    ztimer_sleep(ZTIMER_SEC, 1);
-    error += tm1637_write_number(dev, number, TM1637_PW_14_16, true, true);
-    ztimer_sleep(ZTIMER_SEC, 1);
-    error += tm1637_clear(dev);
-    ztimer_sleep(ZTIMER_SEC, 1);
+static tm1637_t dev;
 
-    if (error) {
-        puts("Number test failed");
-    }
+static void test_setup(void)
+{
+    tm1637_init(&dev, &tm1637_params[0]);
+}
+
+/**
+ * @brief Display a number with different settings
+ */
+static void test_number(void)
+{
+    int number = -42;
+    TEST_ASSERT_EQUAL_INT(0, tm1637_write_number(&dev, number, TM1637_PW_14_16, false, false));
+    ztimer_sleep(ZTIMER_SEC, 1);
+    TEST_ASSERT_EQUAL_INT(0, tm1637_write_number(&dev, number, TM1637_PW_14_16, false, true));
+    ztimer_sleep(ZTIMER_SEC, 1);
+    TEST_ASSERT_EQUAL_INT(0, tm1637_write_number(&dev, number, TM1637_PW_14_16, true, false));
+    ztimer_sleep(ZTIMER_SEC, 1);
+    TEST_ASSERT_EQUAL_INT(0, tm1637_write_number(&dev, number, TM1637_PW_14_16, true, true));
+    ztimer_sleep(ZTIMER_SEC, 1);
+    TEST_ASSERT_EQUAL_INT(0, tm1637_clear(&dev));
+    ztimer_sleep(ZTIMER_SEC, 1);
 }
 
 /**
  * @brief Shows all digits on the display
- *
- * @param[in] dev device descriptor of the display
  */
-static void test_all_digits(const tm1637_t *dev)
+static void test_all_digits(void)
 {
-    int error = 0;
     for (int i = 0; i < 10; i++) {
-        error += tm1637_write_number(dev, i, TM1637_PW_14_16, false, false);
+        TEST_ASSERT_EQUAL_INT(0, tm1637_write_number(&dev, i, TM1637_PW_14_16, false, false));
         ztimer_sleep(ZTIMER_SEC, 1);
     }
-    error += tm1637_clear(dev);
-
-    if (error) {
-        puts("All digits test failed");
-    }
+    TEST_ASSERT_EQUAL_INT(0, tm1637_clear(&dev));
 }
 
 /**
  * @brief Test all brightness levels
- *
- * @param[in] dev device descriptor of the display
- * @param[in] number number to display
  */
-static void test_brightness(const tm1637_t *dev, uint16_t number)
+static void test_brightness(void)
 {
+    int number = 8888;
     /* the brightness goes from 0 to 7 */
-    int error = 0;
-
     for (int i = 0; i <= 7; i++) {
-        error += tm1637_write_number(dev, number, i, false, false);
+        TEST_ASSERT_EQUAL_INT(0, tm1637_write_number(&dev, number, i, false, false));
         ztimer_sleep(ZTIMER_SEC, 1);
     }
-    error += tm1637_clear(dev);
+    TEST_ASSERT_EQUAL_INT(0, tm1637_clear(&dev));
     ztimer_sleep(ZTIMER_SEC, 1);
+}
 
-    if (error) {
-        puts("Brightness test failed");
-    }
+static Test *tests_tm1637_tests(void)
+{
+    EMB_UNIT_TESTFIXTURES(fixtures){
+        new_TestFixture(test_number),
+        new_TestFixture(test_all_digits),
+        new_TestFixture(test_brightness),
+    };
+
+    EMB_UNIT_TESTCALLER(tm1637_tests, test_setup, NULL, fixtures);
+
+    return (Test *)&tm1637_tests;
 }
 
 int main(void)
 {
     puts("Starting TM1637 driver test application");
 
-    tm1637_t dev;
-    tm1637_init(&dev, &tm1637_params[0]);
-
-    test_number(&dev, 42);
-    test_all_digits(&dev);
-    test_brightness(&dev, 1111);
+    TESTS_START();
+    TESTS_RUN(tests_tm1637_tests());
+    TESTS_END();
 
     puts("Ending TM1637 driver test application");
 
