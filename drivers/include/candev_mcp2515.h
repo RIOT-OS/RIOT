@@ -128,6 +128,20 @@ struct candev_mcp2515 {
 void candev_mcp2515_init(candev_mcp2515_t *dev,
                          const candev_mcp2515_conf_t *conf);
 
+/**
+ * @brief   Get the @ref candev_mcp2515_t for the given @p candev
+ *
+ * @param[in]   candev      CAN device to get the @ref candev_mcp2515_t from
+ *
+ * @return  The corresponding `candev_mcp2515_t` pointer to @p candev
+ * @retval  NULL        This is not an MCP2515 CAN device
+ *
+ * @note    It is safe to call this on any initialized @p candev regardless of
+ *          driver, as the implementation will check that the driver actually
+ *          is an MCP2515 before doing the cast.
+ */
+candev_mcp2515_t *candev2mcp2515(candev_t *candev);
+
 #ifdef __cplusplus
 }
 #endif

@@ -59,6 +59,13 @@ static void pm_reset(candev_dev_t *candev_dev, uint32_t value);
 static int power_up(candev_dev_t *candev_dev);
 static int power_down(candev_dev_t *candev_dev);
 
+__attribute__((weak))
+void board_candev_set_power(candev_t *dev, bool active)
+{
+    (void)dev;
+    (void)active;
+}
+
 static void _can_event(candev_t *dev, candev_event_t event, void *arg)
 {
     msg_t msg;
