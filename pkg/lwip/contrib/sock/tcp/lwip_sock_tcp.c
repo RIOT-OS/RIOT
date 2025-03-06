@@ -24,6 +24,10 @@
 #include "lwip/api.h"
 #include "lwip/opt.h"
 
+#ifdef SOCK_HAS_ASYNC_CTX
+#include "net/sock/async/event.h"
+#endif
+
 static inline void _tcp_sock_init(sock_tcp_t *sock, struct netconn *conn,
                                   sock_tcp_queue_t *queue)
 {
@@ -124,6 +128,10 @@ void sock_tcp_disconnect(sock_tcp_t *sock)
             sock->queue = NULL;
         }
     }
+
+#ifdef SOCK_HAS_ASYNC_CTX
+    sock_event_close(sock_tcp_get_async_ctx(sock));
+#endif
 
     mutex_unlock(&sock->mutex);
     memset(&sock->mutex, 0, sizeof(mutex_t));
