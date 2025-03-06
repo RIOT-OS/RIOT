@@ -92,7 +92,21 @@ enum {
 #define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)      /**< log an error */
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)  /**< log a warning */
 #define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)        /**< for the curious */
-#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)      /**< teach some ignorance */
+/**
+ * @brief   Print a log message, if `LOG_LEVEL` is defined to be at least
+ *          `LOG_DEBUG`
+ *
+ * @note    This looks similar to the @ref DEBUG function. However, it is
+ *          enabled *globally*. Prefer @ref DEBUG (which can be enabled on a
+ *          per-file granularity) for debug output relevant for debugging
+ *          a module in RIOT. Prefer this for debug output relevant for
+ *          application developers using your module (e.g. to hint potentially
+ *          incorrect / inefficient use of your library).
+ * @details If a variable is only accessed by `LOG_DEBUG()`, the compiler will
+ *          not warn about unused variables even when the log level is lower
+ *          than `LOG_DEBUG`.
+ */
+#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
 /** @} */
 
 #ifdef MODULE_LOG
