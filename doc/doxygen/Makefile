@@ -1,4 +1,6 @@
-RIOTBASE=$(shell git rev-parse --show-toplevel)
+RIOTBASE  = $(shell git rev-parse --show-toplevel)
+RIOTMAKE ?= $(RIOTBASE)/makefiles
+
 # Generate list of quoted absolute include paths. Evaluated in riot.doxyfile.
 export STRIP_FROM_INC_PATH_LIST=$(shell \
     git ls-tree -dr --full-tree --name-only HEAD core drivers sys |\
@@ -9,10 +11,35 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
 # It can also be installed in ubuntu with the `node-less` package
 LESSC ?= lessc
 
-DOCUMENTATION_FORMAT ?= html
+# Extract the documentation type that is to be generated and export it for
+# the doxygen Makefile
+ifneq (,$(filter doc,$(MAKECMDGOALS)))
+  DOCUMENTATION_FORMAT := html
+else ifneq (,$(filter doc-%,$(MAKECMDGOALS)))
+  DOCUMENTATION_FORMAT := $(patsubst doc-%,%,$(filter doc-%, $(MAKECMDGOALS)))
+endif
 
-.PHONY: doc
-doc: $(DOCUMENTATION_FORMAT)
+# Check that the doxygen version is not too old to avoid
+# certain bugs that were fixed in later revisions. Especially
+# Debian-based distributions tend to have very old versions.
+DOXYGEN_MIN_VERSION = 1.14.0
+
+# Strip the commit hash that is sometimes present after the
+# version number.
+DOXYGEN_VERSION = $(shell doxygen --version | cut -d ' ' -f1)
+
+# include color echo macros
+include $(RIOTMAKE)/utils/ansi.mk
+include $(RIOTMAKE)/color.inc.mk
+
+.PHONY: doc doc-man doc-latex
+doc doc-man doc-latex: $(DOCUMENTATION_FORMAT)
+	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_VERSION)"; } | \
+		sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
+		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_VERSION) is too old." \
+		"It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
+		"to avoid incorrectly formatted output.$(COLOR_RESET)"; \
+	fi
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
@@ -28,6 +55,8 @@ check: src/changelog.md src/coc.md src/governance.md
 .PHONY: man
 man: src/changelog.md src/coc.md src/governance.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
+	@echo ""
+	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/man/man3"
 
 src/css/riot.css: src/css/riot.less src/css/variables.less
 	@$(LESSC) $< $@
@@ -48,6 +77,8 @@ src/governance.md: ../../GOVERNANCE.md
 .PHONY:
 latex: src/changelog.md src/coc.md src/governance.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
+	@echo ""
+	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/latex/index.tex"
 
 clean:
 	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md src/coc.md src/governance.md
