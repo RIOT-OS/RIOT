@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "bitarithm.h"
 #include "irq.h"
 #include "thread.h"
 #include "thread_flags_group.h"
@@ -30,17 +31,15 @@ void thread_flags_group_set(tfg_t *group, thread_flags_t mask)
 
     for (unsigned i = 0; i < ARRAY_SIZE(group->members); i++) {
         /* Make a PID block copy to prevent unnecessary value reloading. */
-        uint8_t pid_block = group->members[i];
-        if (!pid_block) {
-            continue;
-        }
+        tfg_int_t pid_block = group->members[i];
+        while (pid_block) {
+            unsigned const bit = bitarithm_lsb(pid_block);
 
-        for (unsigned j = 0; j < 8; j++) {
-            if (pid_block & (1 << j)) {
-                thread_t *thread = thread_get(i * 8 + j);
-                assert(thread);
-                thread_flags_set(thread, mask);
-            }
+            thread_t *thread = thread_get(i * TFG_INT_BITS + bit);
+            assert(thread);
+            thread_flags_set(thread, mask);
+
+            pid_block &= ~(1 << bit);
         }
     }
 

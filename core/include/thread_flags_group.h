@@ -54,16 +54,60 @@
 #include "atomic_utils.h"
 #include "thread.h"
 #include "thread_flags.h"
+#include "limits.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @internal
+ * @{
+ */
+
+/**
+ * @name Integer type used for the thread membership bitfield
+ * @{
+ */
+typedef unsigned tfg_int_t; /**< integer type for the bitfield */
+#define TFG_INT_MAX UINT_MAX /**< tfg_int_t max value */
+#define TFG_INT_BITS (sizeof(tfg_int_t) * 8) /**< Number of bits in tfg_int_t */
+/** @} */
+
+/**
+ * @name Atomic bit manipulation using native integer size
+ *
+ * With "native integer size" we mean whatever unsigned int is, because this is
+ * what the bit manipulation in bitarithm.h uses.
+ *
+ * @{
+ */
+#if TFG_INT_MAX == UINT32_MAX
+#define ATOMIC_SET_BIT_UINT(bit) atomic_set_bit_u32(bit)     /**< set */
+#define ATOMIC_CLEAR_BIT_UINT(bit) atomic_clear_bit_u32(bit) /**< clear */
+#define ATOMIC_BIT_UINT(dest, bit) atomic_bit_u32(dest, bit) /**< get bit */
+#elif TFG_INT_MAX == UINT16_MAX
+#define ATOMIC_SET_BIT_UINT(bit) atomic_set_bit_u16(bit)     /**< set */
+#define ATOMIC_CLEAR_BIT_UINT(bit) atomic_clear_bit_u16(bit) /**< clear */
+#define ATOMIC_BIT_UINT(dest, bit) atomic_bit_u16(dest, bit) /**< get bit */
+#else
+static_assert(0, "unsigned size unsupported!");
+#endif
+/** @} */
+
+/**
+ * @internal
+ * @}
+ */
+
+/**
  * @brief Thread flags group.
  */
 typedef struct {
-    uint8_t members[MAXTHREADS / 8 + !!(MAXTHREADS % 8)]; /**< members bit field */
+    /**
+     * Member bitfield.
+     */
+    tfg_int_t members[MAXTHREADS / TFG_INT_BITS + !!(MAXTHREADS % TFG_INT_BITS)];
 } tfg_t;
 
 /**
@@ -83,7 +127,10 @@ typedef struct {
 static inline void thread_flags_group_join(tfg_t *group)
 {
     kernel_pid_t pid = thread_getpid();
-    atomic_set_bit_u8(atomic_bit_u8(&group->members[pid / 8], pid % 8));
+    /* this also optimizes away the bit arithmetic below if MAXTHREADS <= 32 */
+    assume(pid < MAXTHREADS);
+    ATOMIC_SET_BIT_UINT(ATOMIC_BIT_UINT(&group->members[pid / TFG_INT_BITS],
+                                        pid % TFG_INT_BITS));
 }
 
 /**
@@ -97,7 +144,10 @@ static inline void thread_flags_group_join(tfg_t *group)
 static inline void thread_flags_group_leave(tfg_t *group)
 {
     kernel_pid_t pid = thread_getpid();
-    atomic_clear_bit_u8(atomic_bit_u8(&group->members[pid / 8], pid % 8));
+    /* this also optimizes away the bit arithmetic below if MAXTHREADS <= 32 */
+    assume(pid < MAXTHREADS);
+    ATOMIC_CLEAR_BIT_UINT(ATOMIC_BIT_UINT(&group->members[pid / TFG_INT_BITS],
+                                          pid % TFG_INT_BITS));
 }
 
 /**

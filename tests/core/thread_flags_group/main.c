@@ -38,8 +38,6 @@ static tfg_t group = THREAD_FLAGS_GROUP_INIT;
 
 static void *waiter(void *arg)
 {
-    // tfg_entry_t entry;
-
     thread_flags_group_join(&group);
 
     printf("waiter %u waiting...\n", (unsigned)arg);
@@ -47,7 +45,7 @@ static void *waiter(void *arg)
 
     printf("waiter %u woken up!\n", (unsigned)arg);
 
-    expect(atomic_load_u8(&last_prio) < thread_get_active()->priority);
+    expect(atomic_load_u8(&last_prio) <= thread_get_active()->priority);
 
     atomic_store_u8(&last_prio, thread_get_active()->priority);
     atomic_fetch_add_u8(&woken_up, 1);
@@ -59,10 +57,13 @@ int main(void)
 {
     puts("START");
     for (unsigned i = 0; i < WAITERS_CNT; i++) {
+        int prio = (int)THREAD_PRIORITY_MAIN - i - 1;
+        if (prio < 0) {
+            prio = 0;
+        }
         int res = thread_create(stacks[i], THREAD_STACKSIZE_MAIN,
-                                THREAD_PRIORITY_MAIN - i - 1,
-                                THREAD_CREATE_STACKTEST, waiter, (void *)i,
-                                "waiter");
+                                prio, THREAD_CREATE_STACKTEST, waiter,
+                                (void *)i, "waiter");
         expect(res >= 0);
     }
 
