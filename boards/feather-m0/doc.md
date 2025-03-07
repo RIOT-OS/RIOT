@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_feather-m0 Adafruit Feather M0
 @ingroup     boards
 @brief       Support for the Adafruit Feather M0.
@@ -52,6 +51,14 @@ Example with `hello-world` application:
           bootloader mode by double tapping the reset button before running the
           flash command.
 
+@note     Adafruit changed the bootloader from the old BOSSA bootloader to the
+          more modern UF2 bootloader around 2018. If you have a very old board,
+          it is recommended to upgrade the bootloader to the new UF2
+          bootloader. Otherwise the bootloader has to be enabled by double
+          tapping the reset button.<br/>
+          Upgrade instructions can be found at Adafruit:
+          https://learn.adafruit.com/installing-circuitpython-on-samd21-boards/installing-the-uf2-bootloader
+
 ### Using the WiFi interface
 
 To enable the WiFi interface of the Feather M0 WiFi variant of the board
@@ -86,4 +93,3 @@ STDIO of RIOT is directly available over the USB port.
 The `TERM_DELAY` environment variable can be used to add a delay (in second)
 before opening the serial terminal. The default value is 2s which should be
 enough in most of the situation.
- */
