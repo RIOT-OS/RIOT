@@ -39,6 +39,7 @@
 # include "time_units.h"
 # include "ztimer64.h"
 #endif
+
 #include "stdio_base.h"
 
 #include "kernel_defines.h"
@@ -80,15 +81,10 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        /* Use intermediate cast to uintptr_t to silence -Wcast-align.
-         * stacks are manually word aligned in thread_static_init() */
-        _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
-        native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = __isr_stack_size;
-        native_isr_context.uc_stack.ss_flags = 0;
-        native_interrupts_enabled = 0;
-        makecontext(&native_isr_context, native_irq_handler, 0);
-        if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
+        _native_interrupts_enabled = false;
+
+        _native_isr_context_make(_native_call_sig_handlers_and_switch);
+        if (swapcontext(_native_user_context(), _native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
     }

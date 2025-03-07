@@ -237,7 +237,29 @@ extern ucontext_t *_native_isr_context;
  */
 extern void _native_isr_leave(void);
 
+/**
+ * @brief Makes ISR context so that execution continues at `func` when the context is applied
+ *
+ * @param func Function executed when `_native_isr_context` is applied
+ */
+static inline void _native_isr_context_make(void (*func)(void)) {
+    _native_isr_context->uc_stack.ss_sp = _isr_stack;
+    _native_isr_context->uc_stack.ss_size = sizeof(_isr_stack);
+    _native_isr_context->uc_stack.ss_flags = 0;
 
+    /* Create the ISR context, will execute _isr_schedule_and_switch */
+    makecontext(_native_isr_context, func, 0);
+}
+
+/**
+ * @brief Retrieves user context
+ * @returns `ucontext_t`
+ */
+static inline ucontext_t* _native_user_context(void) {
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+     * stacks are manually word aligned in thread_static_init() */
+    return (ucontext_t *)(uintptr_t)thread_get_active()->sp;
+}
 /** @} */
 
 /* MARK: - Native Process State */

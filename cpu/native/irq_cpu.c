@@ -323,36 +323,22 @@ void native_signal_action(int sig, siginfo_t *info, void *context)
         return;
     }
 
-    native_isr_context.uc_stack.ss_sp = __isr_stack;
-    native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
-    native_isr_context.uc_stack.ss_flags = 0;
-    makecontext(&native_isr_context, native_irq_handler, 0);
-    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
-     * stacks are manually word aligned in thread_stack_init() */
-    _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
+    /* We will switch to the ISR context with ISR stack */
+    _native_isr_context_make(_native_call_sig_handlers_and_switch);
+
+    /* Current user thread context */
+    _native_current_context = _native_user_context();
 
     DEBUG_IRQ("\n\n\t\tnative_signal_action: return to _native_sig_leave_tramp\n\n");
     /* disable interrupts in context */
-    isr_set_sigmask((ucontext_t *)context);
+    _set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
-#if defined(__FreeBSD__)
-    _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
-    ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
-#else /* Linux */
-#if defined(__arm__)
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.arm_pc;
-    ((ucontext_t *)context)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_tramp;
-#else /* Linux/x86 */
-  #ifdef __x86_64__
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP];
-    ((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP] = (uintptr_t)&_native_sig_leave_tramp;
-  #else
-    //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
-    ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
-  #endif
-#endif
-#endif
+
+    /* Get PC/LR. This is where we will resume execution on the userspace thread. */
+    _native_user_fptr = (uintptr_t)_context_get_fptr((ucontext_t *)context);
+
+    /* Now we want to go to _native_sig_leave_tramp before resuming execution at _native_user_fptr. */
+    _context_set_fptr(context, (uintptr_t)_native_sig_leave_tramp);
 }
 
 static void _set_signal_handler(int sig, bool add)
@@ -487,10 +473,7 @@ void native_interrupt_init(void)
         err(EXIT_FAILURE, "native_interrupt_init: getcontext");
     }
 
-    native_isr_context.uc_stack.ss_sp = __isr_stack;
-    native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
-    native_isr_context.uc_stack.ss_flags = 0;
-    _native_isr_ctx = &native_isr_context;
+    _native_isr_context_make(_native_call_sig_handlers_and_switch);
 
     static stack_t sigstk;
     sigstk.ss_sp = malloc(SIGSTKSZ);
