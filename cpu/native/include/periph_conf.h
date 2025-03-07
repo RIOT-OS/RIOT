@@ -30,8 +30,8 @@ extern "C" {
  *
  *  1GHz is an arbitrary value used for compatibility with other platforms.
  */
-#ifndef CLOCK_CORECLOCK
-#define CLOCK_CORECLOCK     GHZ(1)
+#if !defined(CLOCK_CORECLOCK) || defined(DOXYGEN)
+#  define CLOCK_CORECLOCK     GHZ(1)
 #endif
 
 /**
@@ -69,22 +69,22 @@ extern "C" {
 /**
  * @brief UART configuration
  */
-#ifndef UART_NUMOF
-#define UART_NUMOF (1U)
+#if !defined(UART_NUMOF) || defined(DOXYGEN)
+#  define UART_NUMOF (1U)
 #endif
 
 /**
  * @brief PWM configuration
  */
-#ifndef PWM_NUMOF
-#define PWM_NUMOF (8U)
+#if !defined(PWM_NUMOF) || defined(DOXYGEN)
+#  define PWM_NUMOF (8U)
 #endif
 
 /**
  * @brief QDEC configuration
  */
-#ifndef QDEC_NUMOF
-#define QDEC_NUMOF (8U)
+#if !defined(QDEC_NUMOF) || defined(DOXYGEN)
+#  define QDEC_NUMOF (8U)
 #endif
 
 /* MARK: - SPI configuration (Linux host only) */
@@ -102,7 +102,7 @@ extern "C" {
  *
  * Can be overridden during compile time with a `-DSPI_NUMOF=n` flag.
  */
-#define SPI_NUMOF (1U)
+#  define SPI_NUMOF (1U)
 #endif
 
 #if !defined(SPI_MAXCS) || defined(DOXYGEN)
@@ -112,7 +112,7 @@ extern "C" {
  * Allows up to SPI_MAXCS hardware cable select lines per SPI device. The n-th
  * hardware select line can be used with the SPI_HWCS macro.
  */
-#define SPI_MAXCS (4U)
+#  define SPI_MAXCS (4U)
 #endif
 
 /**

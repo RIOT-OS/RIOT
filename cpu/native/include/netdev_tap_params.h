@@ -31,8 +31,8 @@ extern "C" {
  * @note    This was decided to only be configurable on compile-time to be
  *          more similar to actual boards
  */
-#ifndef NETDEV_TAP_MAX
-#define NETDEV_TAP_MAX              (1)
+#if !defined(NETDEV_TAP_MAX) || defined(DOXYGEN)
+#  define NETDEV_TAP_MAX              (1)
 #endif
 
 /**

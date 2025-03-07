@@ -34,14 +34,14 @@
 #include "byteorder.h"
 
 #if defined(__FreeBSD__)
-# include <sys/socket.h>
-# include <net/if.h>
-# include <ifaddrs.h>
-# include <net/if_dl.h>
+#  include <sys/socket.h>
+#  include <net/if.h>
+#  include <ifaddrs.h>
+#  include <net/if_dl.h>
 #else
-# include <net/if.h>
-# include <linux/if_tun.h>
-# include <linux/if_ether.h>
+#  include <net/if.h>
+#  include <linux/if_tun.h>
+#  include <linux/if_ether.h>
 #endif
 
 #include "native_internal.h"

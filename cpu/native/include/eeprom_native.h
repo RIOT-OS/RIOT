@@ -26,8 +26,11 @@
 extern "C" {
 #endif
 
-#ifndef EEPROM_FILEPATH_MAX_LEN
-#define EEPROM_FILEPATH_MAX_LEN     (128U) /**< Maximum path len to store the EEPROM filepath */
+#if !defined(EEPROM_FILEPATH_MAX_LEN) || defined(DOXYGEN)
+/**
+ * @brief Maximum path len to store the EEPROM filepath
+ */
+#  define EEPROM_FILEPATH_MAX_LEN     (128U)
 #endif
 
 /**
