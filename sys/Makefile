@@ -119,6 +119,9 @@ endif
 ifneq (,$(filter netif,$(USEMODULE)))
     DIRS += net/netif
 endif
+ifneq (,$(filter nfc_ndef,$(USEMODULE)))
+  DIRS += net/nfc/ndef
+endif
 ifneq (,$(filter netopt,$(USEMODULE)))
   DIRS += net/crosslayer/netopt
 endif
