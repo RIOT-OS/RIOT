@@ -1,4 +1,4 @@
-/**
+/*
  * Native CPU configuration
  *
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -6,12 +6,6 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup cpu_native
- * @{
- * @file
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @}
  */
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
@@ -21,7 +15,13 @@ extern "C" {
 #endif
 
 /**
- * @brief   CPU specific default stack sizes
+ * @addtogroup cpu_native
+ * @{
+ */
+
+/* MARK: - CPU-specific default stack sizes */
+/**
+ * @brief CPU-specific default stack sizes
  *
  * TODO: tighten stack sizes
  *
@@ -53,6 +53,11 @@ extern "C" {
 #endif
 /** @} */
 
+/* MARK: - Networking constants */
+/**
+ * @name Networking constants
+ * @{
+ */
 /**
  * @brief   Native internal Ethernet protocol number
  */
@@ -62,10 +67,12 @@ extern "C" {
 #   undef  CONFIG_GNRC_PKTBUF_SIZE
 #   define CONFIG_GNRC_PKTBUF_SIZE     (2048)
 #endif
+/** @} */
 
+/* MARK: - Native flash emulation */
 /**
- * @brief   Native Flash emulation
- *          Use unusual parameters to trigger edge cases
+ * @name Native flash emulation
+ * Use unusual parameters to trigger edge cases
  * @{
  */
 #ifndef FLASHPAGE_SIZE
@@ -87,6 +94,8 @@ extern "C" {
 extern char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
 
 #define CPU_FLASH_BASE ((uintptr_t)_native_flash)
+/** @} */
+
 /** @} */
 
 #ifdef __cplusplus

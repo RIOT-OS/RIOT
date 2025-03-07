@@ -17,8 +17,6 @@
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
 
-#define _GNU_SOURCE
-
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/gpio.h>
