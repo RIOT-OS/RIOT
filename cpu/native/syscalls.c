@@ -1,5 +1,4 @@
-/**
- * Native CPU syscall managing
+/* Native CPU syscall managing
  *
  * Wrap system calls and system call invoking library calls to make
  * sure no context switches happen during a system call.
@@ -9,20 +8,9 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup cpu_native
- * @{
- * @file
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
 #include <dlfcn.h>
-#else
-#include <dlfcn.h>
-#endif
-
 #include <err.h>
 #include <errno.h>
 #include <poll.h>
@@ -32,7 +20,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #ifdef MODULE_LIBC_GETTIMEOFDAY
-#include <sys/time.h>
+# include <sys/time.h>
 #endif
 #include <ifaddrs.h>
 #include <sys/stat.h>
@@ -40,8 +28,8 @@
 #include "cpu.h"
 #include "irq.h"
 #ifdef MODULE_LIBC_GETTIMEOFDAY
-#include "time_units.h"
-#include "ztimer64.h"
+# include "time_units.h"
+# include "ztimer64.h"
 #endif
 #include "stdio_base.h"
 
@@ -61,7 +49,7 @@
 
 void _native_syscall_enter(void)
 {
-    _native_in_syscall++;
+    _native_pending_syscalls_up();
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         real_write(STDERR_FILENO, _SYSCALL_ENTER_MESSAGE, sizeof(_SYSCALL_ENTER_MESSAGE) - 1);
@@ -74,12 +62,12 @@ void _native_syscall_leave(void)
         real_write(STDERR_FILENO, _SYSCALL_LEAVE_MESSAGE, sizeof(_SYSCALL_LEAVE_MESSAGE) - 1);
     }
 
-    _native_in_syscall--;
+    _native_pending_syscalls_down();
     if (
-            (_native_sigpend > 0)
+            (_native_pending_signals > 0)
             && (_native_in_isr == 0)
-            && (_native_in_syscall == 0)
-            && (native_interrupts_enabled == 1)
+            && (_native_pending_syscalls == 0)
+            && (_native_interrupts_enabled)
             && (thread_get_active() != NULL)
        )
     {
@@ -454,9 +442,6 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp)
 }
 #endif
 
-/**
- * set up native internal syscall symbols
- */
 void _native_init_syscalls(void)
 {
     *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
