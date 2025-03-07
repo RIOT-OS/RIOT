@@ -56,30 +56,6 @@ extern netdev_tap_t netdev_tap;
 static ucontext_t _end_context;
 
 /**
- * make the new context assign `_native_in_isr = 0` before resuming
- */
-static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
-{
-#if defined(__FreeBSD__)
-    _native_saved_eip = ((struct sigcontext *)ctx)->sc_eip;
-    ((struct sigcontext *)ctx)->sc_eip = (unsigned int)&_native_sig_leave_handler;
-#else /* Linux */
-#if defined(__arm__)
-    _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext.arm_pc;
-    ((ucontext_t *)ctx)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_handler;
-#else /* Linux/x86 */
-  #ifdef __x86_64__
-    _native_saved_eip = ctx->uc_mcontext.gregs[REG_RIP];
-    ctx->uc_mcontext.gregs[REG_RIP] = (unsigned long)&_native_sig_leave_handler;
-  #else
-    _native_saved_eip = ctx->uc_mcontext.gregs[REG_EIP];
-    ctx->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_handler;
-  #endif
-#endif
-#endif
-}
-
-/**
  * TODO: implement
  */
 void thread_print_stack(void)
