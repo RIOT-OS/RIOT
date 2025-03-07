@@ -50,7 +50,7 @@ static ucontext_t _end_context;
  */
 void thread_print_stack(void)
 {
-    CPU_DEBUG("thread_print_stack\n");
+    DEBUG_CPU("thread_print_stack\n");
     return;
 }
 
@@ -65,6 +65,161 @@ void native_breakpoint(void)
 {
     raise(SIGTRAP);
 }
+
+/* ========================================= */
+/* ISR -> user  switch function */
+
+void _isr_switch_to_user(void) {
+    DEBUG_CPU("... ISR: switching to user thread, calling setcontext(PID %" PRIkernel_pid ")\n\n", thread_getpid());
+
+    ucontext_t *context = _native_user_context();
+    _native_interrupts_enabled = true;
+
+    /* Get PC/LR. This is where we will resume execution on the userspace thread. */
+    _native_user_fptr = (uintptr_t)_context_get_fptr(context);
+
+    /* Now we want to go to _native_isr_leave before resuming execution at _native_user_fptr. */
+    _context_set_fptr(context, (uintptr_t)_native_isr_leave);
+
+    if (setcontext(context) == -1) {
+        err(EXIT_FAILURE, "_isr_schedule_and_switch: setcontext");
+    }
+    errx(EXIT_FAILURE, "2 this should have never been reached!!");
+}
+
+/* ========================================= */
+
+void _isr_context_switch_exit(void)
+{
+    DEBUG_CPU("_isr_schedule_and_switch\n");
+    /* Schedule thread job if no active thread */
+    if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
+        && IS_USED(MODULE_CORE_THREAD)) {
+        /* Schedule active thread */
+        sched_run();
+    }
+
+    /* Switch to active userspace thread */
+    _isr_switch_to_user();
+}
+
+/*               ^
+ *               |
+ *               |
+ * cpu_switch_context_exit continues
+ * in ISR context in _isr_context_switch_exit
+ */
+
+void cpu_switch_context_exit(void)
+{
+# ifdef NATIVE_AUTO_EXIT
+    if (sched_num_threads <= 1) {
+        extern unsigned _native_retval;
+        DEBUG_CPU("cpu_switch_context_exit: last task has ended. exiting.\n");
+        real_exit(_native_retval);
+    }
+# endif
+
+    if (_native_in_isr == 0) {
+        /* Disable interrupts while switching */
+        irq_disable();
+        _native_in_isr = 1;
+
+        _native_isr_context_make(_isr_context_switch_exit);
+        if (setcontext(_native_isr_context) == -1) {
+            err(EXIT_FAILURE, "cpu_switch_context_exit: setcontext");
+        }
+        errx(EXIT_FAILURE, "1 this should have never been reached!!");
+    }
+    else {
+        _isr_context_switch_exit();
+    }
+    errx(EXIT_FAILURE, "3 this should have never been reached!!");
+}
+
+/* ========================================= */
+
+
+void _isr_thread_yield(void)
+{
+    DEBUG_CPU("... ISR: switched to ISR context, scheduling\n");
+
+    if (_native_pending_signals > 0) {
+        DEBUG_CPU("... ISR: pending signals, handling signals\n\n");
+        _native_call_sig_handlers_and_switch();
+    }
+
+    if (!IS_USED(MODULE_CORE_THREAD)) {
+        return;
+    }
+
+    /* Set active thread */
+    sched_run();
+
+    /* Switch to active userspace thread */
+    _isr_switch_to_user();
+}
+
+/*               ^
+ *               |
+ *               |
+ * thread_yield_higher continues
+ * in ISR context in _isr_thread_yield
+ */
+
+void thread_yield_higher(void)
+{
+    sched_context_switch_request = 1;
+
+    if (_native_in_isr == 0 && _native_interrupts_enabled) {
+        DEBUG_CPU("yielding higher priority thread, switching to ISR context ...\n");
+
+        _native_in_isr = 1;
+        irq_disable();
+
+        /* Create the ISR context, will execute isr_thread_yield */
+        _native_isr_context_make(_isr_thread_yield);
+        if (swapcontext(_native_user_context(), _native_isr_context) == -1) {
+            err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
+        }
+        irq_enable();
+    }
+}
+
+/* ========================================= */
+
+void native_cpu_init(void)
+{
+    if (getcontext(&_end_context) == -1) {
+        err(EXIT_FAILURE, "native_cpu_init: getcontext");
+    }
+
+    /* The _end_context allows RIOT to execute code after a thread task func returns.
+     * This works as follows (explanation based on libplatform)
+     *  - In thread_stack_init, we call makecontext with the thread task func
+     *    and uc_link = _end_context.
+     *  - makecontext modifies the ucontext so that _ctx_start (in the libc/libplatform impl)
+     *    is called when setcontext is executed. The thread task func resides in a register.
+     *  - When the thread is started using setcontext, _ctx_start branches and links to the
+     *    the task func. After the task func returns, _ctx_start would normally call exit.
+     *    However, if _end_context is set, it calls setcontext on th bespoke _end_context.
+     */
+    _end_context.uc_stack.ss_sp = malloc(SIGSTKSZ);
+    expect(_end_context.uc_stack.ss_sp != NULL);
+    _end_context.uc_stack.ss_size = SIGSTKSZ;
+    _end_context.uc_stack.ss_flags = 0;
+    makecontext(&_end_context, sched_task_exit, 0);
+
+    (void)VALGRIND_STACK_REGISTER(_end_context.uc_stack.ss_sp,
+                                  (char *)_end_context.uc_stack.ss_sp + _end_context.uc_stack.ss_size);
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
+                   (void*)_end_context.uc_stack.ss_sp,
+                   (void*)((char *)_end_context.uc_stack.ss_sp + _end_context.uc_stack.ss_size));
+
+    DEBUG_CPU("RIOT native cpu initialized.\n");
+}
+
+/* ========================================= */
 
 static inline void *align_stack(uintptr_t start, int *stacksize)
 {
@@ -83,17 +238,18 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     ucontext_t *p;
 
     stack_start = align_stack((uintptr_t)stack_start, &stacksize);
-    DEBUG_CPU("... ISR: switching to user thread, calling setcontext(PID %" PRIkernel_pid ")\n\n", thread_getpid());
 
     (void) VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
                    stack_start, (void*)((char *)stack_start + stacksize));
 
-    DEBUG("thread_stack_init\n");
+    DEBUG_CPU("thread_stack_init\n");
 
     /* Use intermediate cast to uintptr_t to silence -Wcast-align. The stack
      * is aligned to word size above. */
     p = (ucontext_t *)(uintptr_t)((uint8_t *)stack_start + (stacksize - sizeof(ucontext_t)));
+    /* Stack guards might be in the way. */
+    memset(p, 0, sizeof(ucontext_t));
     stacksize -= sizeof(ucontext_t);
 
     if (getcontext(p) == -1) {
@@ -103,135 +259,13 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     p->uc_stack.ss_sp = stack_start;
     p->uc_stack.ss_size = stacksize;
     p->uc_stack.ss_flags = 0;
-    p->uc_link = &end_context;
+    p->uc_link = &_end_context;
 
     if (sigemptyset(&(p->uc_sigmask)) == -1) {
         err(EXIT_FAILURE, "thread_stack_init: sigemptyset");
     }
 
-    makecontext(p, (void (*)(void)) task_func, 1, arg);
+    makecontext(p, (void (*)(void))task_func, 1, arg);
 
     return (char *) p;
-}
-
-void isr_cpu_switch_context_exit(void)
-{
-    ucontext_t *ctx;
-
-    DEBUG_CPU("_isr_schedule_and_switch\n");
-    if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
-        && IS_USED(MODULE_CORE_THREAD)) {
-        sched_run();
-    }
-
-    DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", thread_getpid());
-    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
-     * stacks are manually word aligned in thread_static_init() */
-    ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
-
-    native_interrupts_enabled = 1;
-    _native_mod_ctx_leave_sigh(ctx);
-
-    if (setcontext(ctx) == -1) {
-        err(EXIT_FAILURE, "isr_cpu_switch_context_exit: setcontext");
-    }
-    errx(EXIT_FAILURE, "2 this should have never been reached!!");
-}
-
-void cpu_switch_context_exit(void)
-{
-#ifdef NATIVE_AUTO_EXIT
-    if (sched_num_threads <= 1) {
-        extern unsigned _native_retval;
-        DEBUG_CPU("cpu_switch_context_exit: last task has ended. exiting.\n");
-        real_exit(_native_retval);
-    }
-#endif
-
-    if (_native_in_isr == 0) {
-        irq_disable();
-        _native_in_isr = 1;
-        native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = __isr_stack_size;
-        native_isr_context.uc_stack.ss_flags = 0;
-        makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
-        if (setcontext(&native_isr_context) == -1) {
-            err(EXIT_FAILURE, "cpu_switch_context_exit: setcontext");
-        }
-        errx(EXIT_FAILURE, "1 this should have never been reached!!");
-    }
-    else {
-        isr_cpu_switch_context_exit();
-    }
-    errx(EXIT_FAILURE, "3 this should have never been reached!!");
-}
-
-void isr_thread_yield(void)
-{
-    DEBUG_CPU("... ISR: switched to ISR context, scheduling\n");
-
-    if (_native_sigpend > 0) {
-        native_irq_handler();
-        DEBUG_CPU("... ISR: pending signals, handling signals\n\n");
-    }
-
-    if (!IS_USED(MODULE_CORE_THREAD)) {
-        return;
-    }
-    sched_run();
-
-    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
-     * stacks are manually word aligned in thread_static_init() */
-    ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
-    DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n",
-          thread_getpid());
-
-    native_interrupts_enabled = 1;
-    _native_mod_ctx_leave_sigh(ctx);
-
-    if (setcontext(ctx) == -1) {
-        err(EXIT_FAILURE, "isr_thread_yield: setcontext");
-    }
-}
-
-void thread_yield_higher(void)
-{
-    sched_context_switch_request = 1;
-
-    if (_native_in_isr == 0 && native_interrupts_enabled) {
-        /* Use intermediate cast to uintptr_t to silence -Wcast-align.
-         * stacks are manually word aligned in thread_static_init() */
-        ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
-        DEBUG_CPU("yielding higher priority thread, switching to ISR context ...\n");
-        _native_in_isr = 1;
-        irq_disable();
-        native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = __isr_stack_size;
-        native_isr_context.uc_stack.ss_flags = 0;
-        makecontext(&native_isr_context, isr_thread_yield, 0);
-        if (swapcontext(ctx, &native_isr_context) == -1) {
-            err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
-        }
-        irq_enable();
-    }
-}
-
-void native_cpu_init(void)
-{
-    if (getcontext(&end_context) == -1) {
-        err(EXIT_FAILURE, "native_cpu_init: getcontext");
-    }
-
-    end_context.uc_stack.ss_sp = malloc(SIGSTKSZ);
-    expect(end_context.uc_stack.ss_sp != NULL);
-    end_context.uc_stack.ss_size = SIGSTKSZ;
-    end_context.uc_stack.ss_flags = 0;
-    makecontext(&end_context, sched_task_exit, 0);
-    (void)VALGRIND_STACK_REGISTER(end_context.uc_stack.ss_sp,
-                                  (char *)end_context.uc_stack.ss_sp + end_context.uc_stack.ss_size);
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   (void*)end_context.uc_stack.ss_sp,
-                   (void*)((char *)end_context.uc_stack.ss_sp + end_context.uc_stack.ss_size));
-
-    DEBUG("RIOT native cpu initialized.\n");
 }
