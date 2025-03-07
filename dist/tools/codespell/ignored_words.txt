@@ -186,3 +186,6 @@ shiftIn
 
 # <b>e</b>lements (used in Congure documentation)
 lements
+
+# EMAC (ESP32 EMAC layer) => EMACS
+EMAC
