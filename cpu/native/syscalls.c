@@ -46,73 +46,13 @@
 #include "stdio_base.h"
 
 #include "kernel_defines.h"
+/* This header defines the system call function pointers */
+#define NATIVE_SYSCALLS_DEFINITION 1
 #include "native_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-ssize_t (*real_read)(int fd, void *buf, size_t count);
-ssize_t (*real_write)(int fd, const void *buf, size_t count);
-size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
-ssize_t (*real_recv)(int sockfd, void *buf, size_t len, int flags);
-void (*real_clearerr)(FILE *stream);
-__attribute__((noreturn)) void (*real_exit)(int status);
-void (*real_free)(void *ptr);
-void* (*real_malloc)(size_t size);
-void* (*real_calloc)(size_t nmemb, size_t size);
-void* (*real_realloc)(void *ptr, size_t size);
-void (*real_freeaddrinfo)(struct addrinfo *res);
-void (*real_freeifaddrs)(struct ifaddrs *ifa);
-void (*real_srandom)(unsigned int seed);
-int (*real_accept)(int socket, ...);
-int (*real_bind)(int socket, ...);
-int (*real_connect)(int socket, ...);
-int (*real_printf)(const char *format, ...);
-int (*real_getaddrinfo)(const char *node, ...);
-int (*real_getifaddrs)(struct ifaddrs **ifap);
-int (*real_gettimeofday)(struct timeval *t, ...);
-int (*real_getpid)(void);
-int (*real_chdir)(const char *path);
-int (*real_close)(int);
-int (*real_fcntl)(int, int, ...);
-int (*real_creat)(const char *path, ...);
-int (*real_dup2)(int, int);
-int (*real_execve)(const char *, char *const[], char *const[]);
-int (*real_fork)(void);
-int (*real_feof)(FILE *stream);
-int (*real_ferror)(FILE *stream);
-int (*real_listen)(int socket, int backlog);
-int (*real_ioctl)(int fildes, unsigned long request, ...);
-int (*real_open)(const char *path, int oflag, ...);
-int (*real_pause)(void);
-int (*real_pipe)(int[2]);
-int (*real_select)(int nfds, ...);
-int (*real_poll)(struct pollfd *fds, ...);
-int (*real_setsid)(void);
-int (*real_setsockopt)(int socket, ...);
-int (*real_socket)(int domain, int type, int protocol);
-int (*real_unlink)(const char *);
-long int (*real_random)(void);
-const char* (*real_gai_strerror)(int errcode);
-FILE* (*real_fopen)(const char *path, const char *mode);
-int (*real_fclose)(FILE *stream);
-int (*real_fseek)(FILE *stream, long offset, int whence);
-long (*real_ftell)(FILE *stream);
-int (*real_fputc)(int c, FILE *stream);
-int (*real_fgetc)(FILE *stream);
-mode_t (*real_umask)(mode_t cmask);
-ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
-ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
-off_t (*real_lseek)(int fd, off_t offset, int whence);
-off_t (*real_fstat)(int fd, struct stat *statbuf);
-int (*real_fsync)(int fd);
-int (*real_mkdir)(const char *pathname, mode_t mode);
-int (*real_rmdir)(const char *pathname);
-DIR *(*real_opendir)(const char *name);
-struct dirent *(*real_readdir)(DIR *dirp);
-int (*real_closedir)(DIR *dirp);
-int (*real_rename)(const char *, const char *);
-int (*real_statvfs)(const char *restrict path, struct statvfs *restrict buf);
 
 void _native_syscall_enter(void)
 {
