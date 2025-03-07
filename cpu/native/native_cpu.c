@@ -20,21 +20,11 @@
 #include <err.h>
 #include <stdio.h>
 #include <unistd.h>
-
-#ifdef HAVE_VALGRIND_H
-#include <valgrind.h>
-#define VALGRIND_DEBUG DEBUG
-#elif defined(HAVE_VALGRIND_VALGRIND_H)
-#include <valgrind/valgrind.h>
-#define VALGRIND_DEBUG DEBUG
-#else
-#define VALGRIND_STACK_REGISTER(...) (0)
-#define VALGRIND_DEBUG(...)
-#endif
-
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
+
+#include "util/valgrind.h"
 
 #include "cpu.h"
 #include "cpu_conf.h"
