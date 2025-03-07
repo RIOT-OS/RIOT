@@ -47,6 +47,7 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#define DEBUG_STARTUP(...) DEBUG("[native] startup: " __VA_ARGS__)
 
 typedef enum {
     _STDIOTYPE_STDIO = 0,   /**< leave intact */
@@ -693,20 +694,20 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
         /* Skip everything which has already been run */
         if ((*init_array_ptr) == startup) {
             /* Found ourselves, move on to calling the rest of the constructors */
-            DEBUG("%18p - myself\n", (void *)init_array_ptr);
+            DEBUG_STARTUP("%18p - myself\n", (void *)init_array_ptr);
             ++init_array_ptr;
             break;
         }
-        DEBUG("%18p - skip\n", (void *)init_array_ptr);
+        DEBUG_STARTUP("%18p - skip\n", (void *)init_array_ptr);
         ++init_array_ptr;
     }
     while (init_array_ptr != &__init_array_end) {
         /* call all remaining constructors */
-        DEBUG("%18p - call\n", (void *)init_array_ptr);
+        DEBUG_STARTUP("%18p - call\n", (void *)init_array_ptr);
         (*init_array_ptr)(argc, argv, envp);
         ++init_array_ptr;
     }
-    DEBUG("done, __init_array_end: %p\n", (void *)init_array_ptr);
+    DEBUG_STARTUP("done, __init_array_end: %p\n", (void *)init_array_ptr);
 
     native_cpu_init();
     native_interrupt_init();

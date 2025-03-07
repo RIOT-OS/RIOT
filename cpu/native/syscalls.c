@@ -53,20 +53,25 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define _DEBUG_PREFIX "[native] syscalls: "
+#define DEBUG_SYSCALLS(...) DEBUG(_DEBUG_PREFIX __VA_ARGS__)
+
+#define _SYSCALL_ENTER_MESSAGE _DEBUG_PREFIX "> _native_pending_syscalls\n"
+#define _SYSCALL_LEAVE_MESSAGE _DEBUG_PREFIX "< _native_pending_syscalls\n"
 
 void _native_syscall_enter(void)
 {
     _native_in_syscall++;
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
-        real_write(STDERR_FILENO, "> _native_in_syscall\n", 21);
+        real_write(STDERR_FILENO, _SYSCALL_ENTER_MESSAGE, sizeof(_SYSCALL_ENTER_MESSAGE) - 1);
     }
 }
 
 void _native_syscall_leave(void)
 {
     if (IS_ACTIVE(ENABLE_DEBUG)) {
-        real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);
+        real_write(STDERR_FILENO, _SYSCALL_LEAVE_MESSAGE, sizeof(_SYSCALL_LEAVE_MESSAGE) - 1);
     }
 
     _native_in_syscall--;
