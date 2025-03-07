@@ -31,50 +31,47 @@ extern "C" {
  *
  * @{
  */
-#ifndef THREAD_STACKSIZE_DEFAULT
-#if (__SIZEOF_POINTER__ == 8)
-/**
- * @brief Default size of a thread stack on 64-bit platforms
- */
-#define THREAD_STACKSIZE_DEFAULT            (16384)
-#else
+#if !defined(THREAD_STACKSIZE_DEFAULT) || defined(DOXYGEN)
 /**
  * @brief Default size of a thread stack
  */
-#define THREAD_STACKSIZE_DEFAULT            (8192)
-#endif
+#  if (__SIZEOF_POINTER__ == 8)
+#    define THREAD_STACKSIZE_DEFAULT            (16384)
+#  else
+#    define THREAD_STACKSIZE_DEFAULT            (8192)
+#  endif
 #endif
 /**
  * @brief Default size of idle thread stack
  */
-#ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
+#if !defined(THREAD_STACKSIZE_IDLE) || defined(DOXYGEN)
+#  define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
 #endif
 /**
  * @brief Extra stack buffer capacity needed for `printf`
  */
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF       (4096)
+#if !defined(THREAD_EXTRA_STACKSIZE_PRINTF) || defined(DOXYGEN)
+#  define THREAD_EXTRA_STACKSIZE_PRINTF       (4096)
 #endif
 /**
  * @brief Extra stack buffer capacity needed for `printf` in floating-point operations
  */
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (4096)
+#if !defined(THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT) || defined(DOXYGEN)
+#  define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (4096)
 #endif
 /* for core/include/thread.h */
 /**
  * @brief Minimum thread size
  */
-#ifndef THREAD_STACKSIZE_MINIMUM
-#define THREAD_STACKSIZE_MINIMUM            (THREAD_STACKSIZE_DEFAULT)
+#if !defined(THREAD_STACKSIZE_MINIMUM) || defined(DOXYGEN)
+#  define THREAD_STACKSIZE_MINIMUM            (THREAD_STACKSIZE_DEFAULT)
 #endif
 /* native internal */
 /**
  * @brief Size of stack used in ISR context
  */
-#ifndef ISR_STACKSIZE
-#define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
+#if !defined(ISR_STACKSIZE) || defined(DOXYGEN)
+#  define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
 #endif
 /** @} */
 
@@ -103,15 +100,15 @@ extern "C" {
 /**
  * @brief Size of a single emulated flash page
  */
-#ifndef FLASHPAGE_SIZE
-# define FLASHPAGE_SIZE                      (512)
+#if !defined(FLASHPAGE_SIZE) || defined(DOXYGEN)
+#  define FLASHPAGE_SIZE                      (512)
 #endif
 
 /**
  * @brief Total number of emulated flash pages
  */
-#ifndef FLASHPAGE_NUMOF
-# define FLASHPAGE_NUMOF                     (32)
+#if !defined(FLASHPAGE_NUMOF) || defined(DOXYGEN)
+#  define FLASHPAGE_NUMOF                     (32)
 #endif
 
 /**
@@ -119,8 +116,8 @@ extern "C" {
  *
  * The address passed to @ref flashpage_write must be a multiple of this constant.
  */
-#ifndef FLASHPAGE_WRITE_BLOCK_ALIGNMENT
-# define FLASHPAGE_WRITE_BLOCK_ALIGNMENT     (8)
+#if !defined(FLASHPAGE_WRITE_BLOCK_ALIGNMENT) || defined(DOXYGEN)
+#  define FLASHPAGE_WRITE_BLOCK_ALIGNMENT     (8)
 #endif
 /**
  * @brief Flashpage block size
@@ -129,8 +126,8 @@ extern "C" {
  *
  * @see @ref flashpage_write
  */
-#ifndef FLASHPAGE_WRITE_BLOCK_SIZE
-# define FLASHPAGE_WRITE_BLOCK_SIZE          (16)
+#if !defined(FLASHPAGE_WRITE_BLOCK_SIZE) || defined(DOXYGEN)
+#  define FLASHPAGE_WRITE_BLOCK_SIZE          (16)
 #endif
 
 /**
@@ -138,8 +135,8 @@ extern "C" {
  *
  * The flash is set to this constant when you call @ref flashpage_erase.
  */
-#ifndef FLASHPAGE_ERASE_STATE
-# define FLASHPAGE_ERASE_STATE               (0x0)
+#if !defined(FLASHPAGE_ERASE_STATE) || defined(DOXYGEN)
+#  define FLASHPAGE_ERASE_STATE               (0x0)
 #endif
 
 /**

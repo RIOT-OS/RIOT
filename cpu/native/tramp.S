@@ -7,145 +7,205 @@
  * directory for more details.
  */
 
+/**
+ * @brief Generates platform-dependent symbol name
+ */
+#define SYMBOL(name) name
+
+/**
+ * @brief Defines new global symbol
+ */
+.macro GLOBAL_SYMBOL name
+    .globl SYMBOL(\name)
+    SYMBOL(\name):
+.endm
+
+/**
+ * @brief Loads address immediate and then memory contents into register
+ * @param register Register to load memory contents in
+ * @param symbol Symbol whose memory contents to load
+ */
+.macro LOADMEM register, symbol
+    ldr     \register, =\symbol
+    ldr     \register, [\register]
+.endm
+
+/**
+ * @brief Write register contents into memory
+ * @param value Register containing value to write
+ * @param register Helper register to use for loading address
+ * @param symbol Symbol pointing to memory location to write to
+ */
+.macro STOREMEM value, register, symbol
+    ldr     \register, =\symbol
+    str     \value, [\register]
+.endm
+
 .text
 
-#ifdef __arm__
+#if defined(__arm__)
 
-.globl _native_sig_leave_tramp
-_native_sig_leave_tramp:
-    /* save _native_saved_eip and registers */
-    stmdb   sp!, {r0}
-    ldr     r0, =_native_saved_eip
-    ldr     r0, [r0]
-    stmdb   sp!, {r0-r12}
-    stmdb   sp!, {lr}
+GLOBAL_SYMBOL _native_sig_leave_tramp
+    /* save _native_user_fptr and registers */
+    stmdb     sp!, {r0}
+    LOADMEM   r0, SYMBOL(_native_user_fptr)
+    stmdb     sp!, {r0-r12}
+    stmdb     sp!, {lr}
 
-    /* exchange r0 and _native_saved_eip */
-    ldr     r0, [sp,#56]
-    ldr     r1, [sp,#4 ]
-    str     r0, [sp,#4 ]
-    str     r1, [sp,#56]
+    /* exchange r0 and _native_user_fptr */
+    ldr       r0, [sp,#56]
+    ldr       r1, [sp,#4 ]
+    str       r0, [sp,#4 ]
+    str       r1, [sp,#56]
 
-    /* call swapcontext ( _native_cur_ctx, _native_isr_ctx ) */
-    ldr     r2, =_native_cur_ctx
-    ldr     r0, [r2]
-    ldr     r2, =_native_isr_ctx
-    ldr     r1, [r2]
-    bl      swapcontext
+    /* call swapcontext(_native_current_context, _native_isr_context) */
+    LOADMEM   r0, SYMBOL(_native_current_context)
+    LOADMEM   r1, SYMBOL(_native_isr_context)
+    bl        SYMBOL(swapcontext)
 
     /* reeanble interrupts */
-    bl      irq_enable
+    bl        SYMBOL(irq_enable)
 
     /* _native_in_isr = 0 */
-    eor     r0, r0, r0
-    ldr     r2, =_native_in_isr
-    str     r0, [r2]
+    eor       r0, r0, r0
+    STOREMEM  r0, r1, SYMBOL(_native_in_isr)
 
-    /* restore registers, jump to (saved) _native_saved_eip */
-    ldmia   sp!, {lr}
-    ldmia   sp!, {r0-r12}
-    ldmia   sp!, {pc}
+    /* restore registers, jump to (saved) _native_user_fptr */
+    ldmia     sp!, {lr}
+    ldmia     sp!, {r0-r12}
+    ldmia     sp!, {pc}
 
-.globl _native_sig_leave_handler
-_native_sig_leave_handler:
-    stmdb sp!, {r0}
-    ldr r0, =_native_saved_eip
-    ldr r0, [r0]
-    stmdb sp!, {r0-r12}
-    stmdb sp!, {lr}
-    /* exchange r0 and _native_saved_eip */
-    ldr     r0, [sp,#56]
-    ldr     r1, [sp,#4 ]
-    str     r0, [sp,#4 ]
-    str     r1, [sp,#56]
+GLOBAL_SYMBOL _native_isr_leave
+    stmdb     sp!, {r0}
+    LOADMEM   r0, SYMBOL(_native_user_fptr)
+    stmdb     sp!, {r0-r12}
+    stmdb     sp!, {lr}
+
+    /* exchange r0 and _native_user_fptr */
+    ldr       r0, [sp,#56]
+    ldr       r1, [sp,#4 ]
+    str       r0, [sp,#4 ]
+    str       r1, [sp,#56]
+
     /* _native_in_isr = 0 */
-    eor     r0, r0, r0
-    ldr     r1, =_native_in_isr
-    str     r0, [r1]
-    ldmia sp!, {lr}
-    ldmia sp!, {r0-r12}
-    ldmia sp!, {pc}
+    eor       r0, r0, r0
+    STOREMEM  r0, r1, SYMBOL(_native_in_isr)
+    ldmia     sp!, {lr}
+    ldmia     sp!, {r0-r12}
+    ldmia     sp!, {pc}
 
-#else
-.globl _native_sig_leave_tramp
+#elif defined(__x86_64__)
 
-#ifdef __x86_64__
-_native_sig_leave_tramp:
-    pushq _native_saved_eip(%rip)
+GLOBAL_SYMBOL _native_sig_leave_tramp
+    /* Push (relative) return address onto stack */
+    pushq   SYMBOL(_native_user_fptr)(%rip)
+    /* Push RFLAGS register onto stack */
     pushfq
+    /* Preserve general-purpose registers */
+    pushq   %rax
+    pushq   %rcx
+    pushq   %rdx
+    pushq   %rbx
+    pushq   %rbp
+    pushq   %rsi
+    pushq   %rdi
+    pushq   %r8
+    pushq   %r9
+    pushq   %r10
+    pushq   %r11
+    pushq   %r12
+    pushq   %r13
+    pushq   %r14
+    pushq   %r15
 
-    pushq %rax
-    pushq %rcx
-    pushq %rdx
-    pushq %rbx
-    pushq %rbp
-    pushq %rsi
-    pushq %rdi
-    pushq %r8
-    pushq %r9
-    pushq %r10
-    pushq %r11
-    pushq %r12
-    pushq %r13
-    pushq %r14
-    pushq %r15
+    /* Push swapcontext arguments onto stack (relative) */
+    mov     SYMBOL(_native_isr_context)(%rip), %rsi
+    mov     SYMBOL(_native_current_context)(%rip), %rdi
+    /* call swapcontext(_native_current_context (RDI), _native_isr_context (RSI)) */
+    call    SYMBOL(swapcontext)
 
-    mov _native_isr_ctx(%rip), %rsi
-    mov _native_cur_ctx(%rip), %rdi
+    /* reeanble interrupts */
+    call    SYMBOL(irq_enable)
 
-    call swapcontext
+    /* _native_in_isr = 0 */
+    movl    $0x0, SYMBOL(_native_in_isr)(%rip)
 
-    call irq_enable
-
-    movl $0x0, _native_in_isr(%rip)
-    popq %r15
-    popq %r14
-    popq %r13
-    popq %r12
-    popq %r11
-    popq %r10
-    popq %r9
-    popq %r8
-    popq %rdi
-    popq %rsi
-    popq %rbp
-    popq %rbx
-    popq %rdx
-    popq %rcx
-    popq %rax
-
+    /* Restore general-purpose registers */
+    popq    %r15
+    popq    %r14
+    popq    %r13
+    popq    %r12
+    popq    %r11
+    popq    %r10
+    popq    %r9
+    popq    %r8
+    popq    %rdi
+    popq    %rsi
+    popq    %rbp
+    popq    %rbx
+    popq    %rdx
+    popq    %rcx
+    popq    %rax
+    /* Restore RFLAGS register*/
     popfq
+
+    /* Pop and jump to _native_user_fptr */
     ret
-#else
-_native_sig_leave_tramp:
-    pushl _native_saved_eip
+
+GLOBAL_SYMBOL _native_isr_leave
+    /* Push (relative) return address onto stack */
+    pushq   SYMBOL(_native_user_fptr)(%rip)
+
+    /* _native_in_isr = 0 */
+    movl    $0x0, SYMBOL(_native_in_isr)(%rip)
+
+    /* Pop and jump to _native_user_fptr */
+    ret
+
+#elif defined(__i386__)
+
+GLOBAL_SYMBOL _native_sig_leave_tramp
+    /* Push return address onto stack */
+    pushl   SYMBOL(_native_user_fptr)
+    /* Push eflags register onto stack */
     pushfl
+    /* Push all general-purpose registers */
     pushal
 
-    pushl _native_isr_ctx
-    pushl _native_cur_ctx
-    call swapcontext
-    addl $8, %esp
+    /* Push swapcontext arguments onto stack */
+    pushl   SYMBOL(_native_isr_context)
+    pushl   SYMBOL(_native_current_context)
+    /* call swapcontext(_native_current_context, _native_isr_context) */
+    call    SYMBOL(swapcontext)
+    /* Remove swapcontext arguments from stack */
+    addl    $8, %esp
 
-    call irq_enable
+    /* reeanble interrupts */
+    call    SYMBOL(irq_enable)
 
-    movl $0x0, _native_in_isr
+    /* _native_in_isr = 0 */
+    movl    $0x0, SYMBOL(_native_in_isr)
+
+    /* Pop all general-purpose registers */
     popal
+    /* Pop eflags register */
     popfl
 
+    /* Pop and jump to _native_user_fptr */
     ret
-#endif
 
-.globl _native_sig_leave_handler
-_native_sig_leave_handler:
-#ifdef __x86_64__
-    pushq _native_saved_eip(%rip)
-    movl $0x0, _native_in_isr(%rip)
-#else
-    pushl _native_saved_eip
-    movl $0x0, _native_in_isr
-#endif
+GLOBAL_SYMBOL _native_isr_leave
+    /* Push return address onto stack */
+    pushl   SYMBOL(_native_user_fptr)
+
+    /* _native_in_isr = 0 */
+    movl    $0x0, SYMBOL(_native_in_isr)
+
+    /* Pop and jump to _native_user_fptr*/
     ret
+
+#else
+# error "Unsupported architecture"
 #endif
 
 #if defined(__linux__) && defined(__ELF__)

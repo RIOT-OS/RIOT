@@ -31,8 +31,8 @@ extern "C" {
  * @note    This was decided to only be confiruable on compile-time to be
  *          more similar to actual boards
  */
-#ifndef SOCKET_ZEP_MAX
-#define SOCKET_ZEP_MAX              (1)
+#if !defined(SOCKET_ZEP_MAX) || defined(DOXYGEN)
+#  define SOCKET_ZEP_MAX              (1)
 #endif
 
 /**

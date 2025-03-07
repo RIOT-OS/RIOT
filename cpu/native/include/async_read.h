@@ -30,7 +30,7 @@ extern "C" {
  * @brief   Maximum number of file descriptors
  */
 #ifndef ASYNC_READ_NUMOF
-#define ASYNC_READ_NUMOF 2
+#  define ASYNC_READ_NUMOF 2
 #endif
 
 /**

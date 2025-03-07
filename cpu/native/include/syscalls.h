@@ -21,9 +21,9 @@
 
 #ifndef DOXYGEN
 #  if NATIVE_SYSCALLS_DEFINITION
-#   define __SPECIFIER
+#    define __SPECIFIER
 #  else
-#   define __SPECIFIER extern
+#    define __SPECIFIER extern
 #  endif
 #endif
 

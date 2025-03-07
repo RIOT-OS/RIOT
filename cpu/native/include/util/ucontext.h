@@ -11,9 +11,9 @@
 #define UTIL_UCONTEXT_H
 
 #if USE_LIBUCONTEXT
-# include <libucontext/libucontext.h>
+#  include <libucontext/libucontext.h>
 #else
-# include <ucontext.h>
+#  include <ucontext.h>
 #endif /* USE_LIBUCONTEXT */
 
 #include <stdint.h>

@@ -40,7 +40,7 @@
  * @brief   Time source of the native RTC
  */
 #ifndef NATIVE_RTC_SOURCE
-#define NATIVE_RTC_SOURCE CLOCK_REALTIME
+#  define NATIVE_RTC_SOURCE CLOCK_REALTIME
 #endif
 
 static int _native_rtc_initialized = 0;

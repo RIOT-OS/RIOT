@@ -32,7 +32,7 @@ extern "C" {
  * @brief   Maximum number of return addresses to print
  */
 #ifndef BACKTRACE_SIZE
-#define BACKTRACE_SIZE  (4U)
+#  define BACKTRACE_SIZE  (4U)
 #endif
 
 /**
