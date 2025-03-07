@@ -203,6 +203,7 @@ FEATURES_EXISTING := \
     periph_ltdc \
     periph_mcg \
     periph_mcg_lite \
+    periph_nfct \
     periph_nvm \
     periph_pio \
     periph_plic \
