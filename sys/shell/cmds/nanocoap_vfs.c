@@ -38,6 +38,9 @@
 #define CONFIG_NCGET_DEFAULT_DATA_DIR VFS_DEFAULT_DATA
 #endif
 
+static char _uri[CONFIG_NANOCOAP_URI_MAX];
+static char _response[CONFIG_NANOCOAP_QS_MAX];
+
 struct dir_list_ctx {
     char *buf;
     char *cur;
@@ -96,7 +99,6 @@ static int _print_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int mor
 static int _nanocoap_get_handler(int argc, char **argv)
 {
     int res;
-    char buffer[CONFIG_NANOCOAP_URI_MAX];
     char *dst, *url = argv[1];
 
     if (argc < 2) {
@@ -107,7 +109,8 @@ static int _nanocoap_get_handler(int argc, char **argv)
 
     if (_is_dir(url) && argc < 3) {
         bool _ctx = false;
-        res = nanocoap_link_format_get_url(url, _resource_cb, &_ctx);
+        res = nanocoap_link_format_get_url(url, _resource_cb, &_ctx,
+                                           _response, sizeof(_response));
         if (res) {
             printf("Request failed: %s\n", strerror(-res));
         }
@@ -120,22 +123,22 @@ static int _nanocoap_get_handler(int argc, char **argv)
             printf("invalid url: '%s'\n", url);
             return -EINVAL;
         }
-        if (snprintf(buffer, sizeof(buffer), "%s%s",
-                     CONFIG_NCGET_DEFAULT_DATA_DIR, dst) >= (int)sizeof(buffer)) {
+        if (snprintf(_uri, sizeof(_uri), "%s%s",
+                     CONFIG_NCGET_DEFAULT_DATA_DIR, dst) >= (int)sizeof(_uri)) {
             printf("Output file path too long\n");
             return -ENOBUFS;
         }
-        dst = buffer;
+        dst = _uri;
     } else {
         char *filename = strrchr(url, '/');
         dst = argv[2];
         if (vfs_is_dir(dst) > 0 && filename) {
-            if (snprintf(buffer, sizeof(buffer), "%s%s",
-                         dst, filename) >= (int)sizeof(buffer)) {
+            if (snprintf(_uri, sizeof(_uri), "%s%s",
+                         dst, filename) >= (int)sizeof(_uri)) {
                 printf("Output file path too long\n");
                 return -ENOBUFS;
             }
-            dst = buffer;
+            dst = _uri;
         }
     }
 
@@ -158,8 +161,7 @@ static int _nanocoap_put_handler(int argc, char **argv)
 {
     int res;
     char *file, *url;
-    char buffer[CONFIG_NANOCOAP_URI_MAX];
-    char work_buf[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 1];
+    static char work_buf[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 1];
 
     if (argc < 3) {
         printf("Usage: %s <file> <url>\n", argv[0]);
@@ -174,12 +176,12 @@ static int _nanocoap_put_handler(int argc, char **argv)
         if (basename == NULL) {
             return -EINVAL;
         }
-        if (snprintf(buffer, sizeof(buffer), "%s%s",
-                     url, basename + 1) >= (int)sizeof(buffer)) {
+        if (snprintf(_uri, sizeof(_uri), "%s%s",
+                     url, basename + 1) >= (int)sizeof(_uri)) {
             puts("Constructed URI too long");
             return -ENOBUFS;
         }
-        url = buffer;
+        url = _uri;
     }
 
     if (strcmp(file, "-") == 0) {
