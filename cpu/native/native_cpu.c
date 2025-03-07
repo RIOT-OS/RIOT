@@ -1,42 +1,30 @@
 /*
+ * Native CPU kernel_intern.h and sched.h implementation
+ *
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
  *               2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ *
+ * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * Author: Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 /**
- * @ingroup cpu_native
- * @{
- *
  * @file
  * @brief Native CPU kernel_intern.h and sched.h implementation
- *
- * in-process preemptive context switching utilizes POSIX ucontexts.
- * (ucontext provides for architecture independent stack handling)
- *
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * In-process preemptive context switching utilizes POSIX ucontexts.
+ * (ucontext provides for architecture independent stack handling)
  */
 
-/* __USE_GNU for gregs[REG_EIP] access under glibc
- * _GNU_SOURCE for REG_EIP and strsignal() under musl */
-#define __USE_GNU
-#define _GNU_SOURCE
-
 #include <err.h>
-#include <signal.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-
-#if USE_LIBUCONTEXT
-#include <libucontext/libucontext.h>
-#else
-#include <ucontext.h>
-#endif
 
 #ifdef HAVE_VALGRIND_H
 #include <valgrind.h>
@@ -50,6 +38,8 @@
 #endif
 
 #include <stdlib.h>
+#include <signal.h>
+#include <string.h>
 
 #include "cpu.h"
 #include "cpu_conf.h"
@@ -68,7 +58,7 @@ extern netdev_tap_t netdev_tap;
 #include "debug.h"
 #define DEBUG_CPU(...) DEBUG("[native] CPU: " __VA_ARGS__)
 
-ucontext_t end_context;
+static ucontext_t _end_context;
 
 /**
  * make the new context assign `_native_in_isr = 0` before resuming
@@ -99,7 +89,7 @@ static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
  */
 void thread_print_stack(void)
 {
-    DEBUG("thread_print_stack\n");
+    CPU_DEBUG("thread_print_stack\n");
     return;
 }
 

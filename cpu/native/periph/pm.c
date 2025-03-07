@@ -40,12 +40,12 @@ unsigned _native_retval = EXIT_SUCCESS;
 
 static void _native_sleep(void)
 {
-    _native_in_syscall++; /* no switching here */
+    _native_pending_syscalls_up(); /* no switching here */
     real_pause();
-    _native_in_syscall--;
+    _native_pending_syscalls_down();
 
-    if (_native_sigpend > 0) {
-        _native_in_syscall++;
+    if (_native_pending_signals > 0) {
+        _native_pending_syscalls_up();
         _native_syscall_leave();
     }
 }

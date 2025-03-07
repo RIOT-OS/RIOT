@@ -7,15 +7,11 @@
  */
 
 /**
- * @ingroup cpu_native
- * @{
- *
  * @file
- * @brief       Crash handling functions implementation for 'native' port
- *
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @brief  Crash handling functions implementation for 'native' port
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <errno.h>

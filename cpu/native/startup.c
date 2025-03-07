@@ -1,5 +1,4 @@
-/**
- * Native CPU entry code
+/* Native CPU entry code
  *
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2017 Freie Universität Berlin
@@ -8,24 +7,16 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup cpu_native
- * @{
- * @file
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
- * @}
+ * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * Author: Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
 #include <dlfcn.h>
-#else
-#include <dlfcn.h>
-#endif
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <features.h>
 #include <getopt.h>
 #include <stdbool.h>
@@ -728,7 +719,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     periph_init();
     board_init();
 
-    register_interrupt(SIGUSR1, _reset_handler);
+    native_register_interrupt(SIGUSR1, _reset_handler);
 
     puts("RIOT native hardware initialization complete.\n");
     irq_enable();
