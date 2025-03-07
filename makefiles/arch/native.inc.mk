@@ -57,6 +57,12 @@ ifeq ($(OS),Darwin)
   CFLAGS += -Wno-deprecated-declarations
 endif
 
+ifneq ($(filter $(OS),Darwin FreeBSD),)
+  CFLAGS += -D_XOPEN_SOURCE
+else
+  CFLAGS += -D_GNU_SOURCE
+endif
+
 # unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
 CXXUWFLAGS +=
 CXXEXFLAGS +=
