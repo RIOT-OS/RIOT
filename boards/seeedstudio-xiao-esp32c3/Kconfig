@@ -1,0 +1,16 @@
+# Copyright (c) 2025 David Picard
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "seeedstudio-xiao-esp32c3" if BOARD_SEEEDSTUDIO_XIAO_ESP32C3
+
+config BOARD_SEEEDSTUDIO_XIAO_ESP32C3
+    bool
+    default y
+    select BOARD_COMMON_ESP32C3
+    select CPU_MODEL_ESP32C3_FH4
+
+source "$(RIOTBOARD)/common/esp32c3/Kconfig"
