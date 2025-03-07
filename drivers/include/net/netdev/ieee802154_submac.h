@@ -49,7 +49,7 @@ typedef struct {
     netdev_ieee802154_t dev;            /**< IEEE 802.15.4 netdev descriptor */
     ieee802154_submac_t submac;         /**< IEEE 802.15.4 SubMAC descriptor */
     ztimer_t ack_timer;                 /**< ztimer descriptor for the ACK timeout timer */
-    int isr_flags;                      /**< netdev submac @ref NETDEV_EVENT_ISR flags */
+    uint32_t isr_flags;                 /**< netdev submac @ref NETDEV_EVENT_ISR flags */
     int8_t retrans;                     /**< number of frame retransmissions of the last TX */
     bool dispatch;                      /**< whether an event should be dispatched or not */
     netdev_event_t ev;                  /**< event to be dispatched */
