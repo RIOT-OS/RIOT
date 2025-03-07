@@ -19,7 +19,6 @@
  */
 
 #include <errno.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
@@ -40,7 +39,7 @@
 #endif
 
 static char _uri[CONFIG_NANOCOAP_URI_MAX];
-static uint8_t _response[CONFIG_NANOCOAP_QS_MAX];
+static char _response[CONFIG_NANOCOAP_QS_MAX];
 
 struct dir_list_ctx {
     char *buf;
@@ -101,7 +100,6 @@ static int _nanocoap_get_handler(int argc, char **argv)
 {
     int res;
     char *dst, *url = argv[1];
-    char *response = (char *)_response;
 
     if (argc < 2) {
         printf("Usage: %s <url> [destination]\n", argv[0]);
@@ -112,7 +110,7 @@ static int _nanocoap_get_handler(int argc, char **argv)
     if (_is_dir(url) && argc < 3) {
         bool _ctx = false;
         res = nanocoap_link_format_get_url(url, _resource_cb, &_ctx,
-                                           response);
+                                           _response, sizeof(_response));
         if (res) {
             printf("Request failed: %s\n", strerror(-res));
         }
