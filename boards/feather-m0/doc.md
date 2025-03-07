@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_feather-m0 Adafruit Feather M0
 @ingroup     boards
 @brief       Support for the Adafruit Feather M0.
@@ -94,4 +93,3 @@ STDIO of RIOT is directly available over the USB port.
 The `TERM_DELAY` environment variable can be used to add a delay (in second)
 before opening the serial terminal. The default value is 2s which should be
 enough in most of the situation.
- */
