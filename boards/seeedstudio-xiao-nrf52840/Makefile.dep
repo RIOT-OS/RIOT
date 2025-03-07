@@ -12,6 +12,8 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+# include common Adafruit nRF52 Bootloader dependencies
+include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep
+
 # include common nrf52 dependencies
-include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
