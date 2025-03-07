@@ -1,1 +1,2 @@
-../feather-nrf52840/Makefile.include
+# Include the common definitions for the Adafruit nRF52 Bootloader
+include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.include
