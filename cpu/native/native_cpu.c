@@ -66,6 +66,7 @@ extern netdev_tap_t netdev_tap;
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#define DEBUG_CPU(...) DEBUG("[native] CPU: " __VA_ARGS__)
 
 ucontext_t end_context;
 
@@ -131,6 +132,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     ucontext_t *p;
 
     stack_start = align_stack((uintptr_t)stack_start, &stacksize);
+    DEBUG_CPU("... ISR: switching to user thread, calling setcontext(PID %" PRIkernel_pid ")\n\n", thread_getpid());
 
     (void) VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
@@ -165,7 +167,7 @@ void isr_cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
 
-    DEBUG("isr_cpu_switch_context_exit\n");
+    DEBUG_CPU("_isr_schedule_and_switch\n");
     if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
         && IS_USED(MODULE_CORE_THREAD)) {
         sched_run();
@@ -190,7 +192,7 @@ void cpu_switch_context_exit(void)
 #ifdef NATIVE_AUTO_EXIT
     if (sched_num_threads <= 1) {
         extern unsigned _native_retval;
-        DEBUG("cpu_switch_context_exit: last task has ended. exiting.\n");
+        DEBUG_CPU("cpu_switch_context_exit: last task has ended. exiting.\n");
         real_exit(_native_retval);
     }
 #endif
@@ -215,11 +217,11 @@ void cpu_switch_context_exit(void)
 
 void isr_thread_yield(void)
 {
-    DEBUG("isr_thread_yield\n");
+    DEBUG_CPU("... ISR: switched to ISR context, scheduling\n");
 
     if (_native_sigpend > 0) {
-        DEBUG("isr_thread_yield(): handling signals\n\n");
         native_irq_handler();
+        DEBUG_CPU("... ISR: pending signals, handling signals\n\n");
     }
 
     if (!IS_USED(MODULE_CORE_THREAD)) {
@@ -249,6 +251,7 @@ void thread_yield_higher(void)
         /* Use intermediate cast to uintptr_t to silence -Wcast-align.
          * stacks are manually word aligned in thread_static_init() */
         ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
+        DEBUG_CPU("yielding higher priority thread, switching to ISR context ...\n");
         _native_in_isr = 1;
         irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
