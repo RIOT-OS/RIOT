@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_feather-nrf52840 Adafruit Feather nRF52840 Express
 @ingroup     boards
 @brief       Support for the Adafruit Feather nRF52840 Express
@@ -36,4 +35,3 @@ You have several alternative possibilities to connect to the board.
    USEMODULE += stdio_rtt
    ~~~~~~~~~~~~~~~~~~~~~
    you can use the Segger J-Link Programmer as a serial interface to the device.
-*/
