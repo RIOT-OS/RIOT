@@ -1,20 +1,8 @@
-/**
-@defgroup    boards_feather-nrf52840 Adafruit Feather nRF52840 Express
-@ingroup     boards
-@brief       Support for the Adafruit Feather nRF52840 Express
+@defgroup  boards_common_adafruit-nrf52-bootloader Adafruit nRF52 Bootloader Common
+@ingroup   boards_common
+@brief     Common Flashing Description for the Adafruit nRF52 Bootloader
 
-### General information
-
-The [Feather nRF52840 Express][feather-nrf52840] is a development board
-from Adafruits Feather board family. It provides native USB support, Bluetooth
-Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
-
-<img src="https://cdn-learn.adafruit.com/assets/assets/000/068/578/medium800/circuitpython_Screenshot_2019-01-02_at_12.04.27.png"
-     alt="top-down view on feather-nrf52840" width="50%"/>
-
-[feather-nrf52840]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/
-
-### Flash the board
+## Flashing the Board
 
 The board is flashed using its on-board UF2 boot loader by default.
 The boot loader will present a mass storage device that has to be mounted to /media/MDK-DONGLE so
@@ -37,9 +25,9 @@ use an external Segger J-Link Programmer connected to the [SWD Connector].
 
 [SWD Connector]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/pinouts#swd-connector-3-12
 
-#### Flashing the uf2 bootloader
+## (Re-)Flashing the UF2 Bootloader
 
-To flash the uf2 bootloader (if it is no longer present on your BOARD),
+To flash the UF2 bootloader (if it is no longer present on your board),
 you need to have [`nrfjprog`][nrfjprog] installed,
 connect a jlink to your BOARD and execute the following commands:
 
@@ -58,21 +46,24 @@ make BOARD=feather_nrf52840_express flash
 
 [nrfjprog]: https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
 
-### Terminal
-To connect a terminal to the Feather, RIOT chooses `stdio_cdc_acm` per default.
-This lets you access the Feather directly over USB.
+## Updating Old Bootloaders
 
-You have several alternative possibilities to connect to the board.
+In some cases the bootloader may be too old to even mount on startup.
+Double tap the reset button to get into bootloader mode and check the
+`INFO_UF2.TXT` for bootloader information.
+If the version is less than `0.4.0` then one can use the
+[Adafruit_nRF52_Bootloader](https://github.com/adafruit/Adafruit_nRF52_Bootloader)
+tool to update.
 
-1. With
-   ~~~~~~~~~~~~~~~~~~~~~ {.mk}
-   USEMODULE += stdio_uart
-   ~~~~~~~~~~~~~~~~~~~~~
-   and an FTDI adapter connected to the Feather's RX and TX ports you can use
-   UART-based terminals to connect to the feather
-2. With
-   ~~~~~~~~~~~~~~~~~~~~~ {.mk}
-   USEMODULE += stdio_rtt
-   ~~~~~~~~~~~~~~~~~~~~~
-   you can use the Segger J-Link Programmer as a serial interface to the device.
-*/
+For example, one can run the following if `arm-none-eabi-gcc` and
+`adafruit-nrfutil` are installed. Make sure to select the correct board for your
+application.
+```
+git clone https://github.com/adafruit/Adafruit_nRF52_Bootloader.git
+cd Adafruit_nRF52_Bootloader
+git submodule update --init
+make BOARD=feather_nrf52840_sense SERIAL=/dev/ttyACM0 flash-dfu
+```
+
+Further information can be found on the
+[Adafruit Website](https://learn.adafruit.com/adafruit-feather-sense/update-bootloader).
