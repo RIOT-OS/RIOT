@@ -7,10 +7,8 @@
  */
 
 /**
- * @{
- *
  * @file
- * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
+ * @author Martine S. Lenders <m.lenders@fu-berlin.de>
  */
 
 #include "kernel_defines.h"
@@ -31,5 +29,3 @@ ssize_t stdio_write(const void* buffer, size_t len)
 {
     return real_write(STDOUT_FILENO, buffer, len);
 }
-
-/** @} */

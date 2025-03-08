@@ -1,14 +1,17 @@
-/* Native CPU entry code
- *
+/*
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * Author: Martine Lenders <m.lenders@fu-berlin.de>
+ */
+
+/**
+ * @file    Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @brief   Native CPU entry code
+ * @ingroup cpu_native
+ * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include <dlfcn.h>

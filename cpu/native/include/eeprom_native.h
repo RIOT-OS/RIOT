@@ -7,17 +7,16 @@
  */
 
 /**
- * @defgroup    drivers_eeprom_native Native extra API for EEPROM
- * @ingroup     cpu_native
- * @brief       Implementation of EEPROM buffer persistence in file.
- *
+ * @defgroup drivers_eeprom_native Native extra API for EEPROM
+ * @ingroup  cpu_native
+ * @brief    Implementation of EEPROM buffer persistence in file.
  * @{
- *
- * @file
- *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
+/**
+ * @file
+ * @author Alexandre Abadie <alexandre.abadie@inria.fr>
+ */
 #ifndef EEPROM_NATIVE_H
 #define EEPROM_NATIVE_H
 

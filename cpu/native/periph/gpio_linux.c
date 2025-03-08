@@ -7,14 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_gpio
- * @{
- *
  * @file
- * @brief       native GPIO implementation
- *
- * @author      Benjamin Valentin <benpicco@googlemail.com>
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_gpio
+ * @brief   native GPIO implementation
+ * @author  Benjamin Valentin <benpicco@googlemail.com>
  */
 
 #include <errno.h>
@@ -312,5 +309,3 @@ void gpio_irq_disable(gpio_t pin)
 }
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */
-
-/** @} */

@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     sys_fs_native
- * @{
- *
  * @file
- * @brief       native integration with vfs
- *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- *
- * @}
+ * @ingroup sys_fs_native
+ * @brief   Native integration with virtual filesystem (VFS)
+ * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <assert.h>

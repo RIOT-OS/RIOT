@@ -7,12 +7,10 @@
  */
 
 /**
- * @{
- * @brief       mtd flash emulation for native
- *
  * @file
- *
- * @author      Vincent Dupont <vincent@otakeys.com>
+ * @ingroup drivers_mtd_native
+ * @brief   MTD flash emulation for native
+ * @author  Vincent Dupont <vincent@otakeys.com>
  */
 
 #include <errno.h>
@@ -156,5 +154,3 @@ const mtd_desc_t native_flash_driver = {
     .erase = _erase,
     .init = _init,
 };
-
-/** @} */

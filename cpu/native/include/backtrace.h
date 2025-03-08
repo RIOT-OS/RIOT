@@ -7,19 +7,19 @@
  */
 
 /**
- * @defgroup    backtrace       Stack backtrace (only under native)
- * @ingroup     core_util
- * @brief       Backtrace functionalitry
+ * @defgroup backtrace       Stack backtrace (only under native)
+ * @ingroup  core_util
+ * @brief    Backtrace functionalitry
+ * @{
  *
  * If you call the @ref backtrace_print() function a stack backtrace of all return
  * addresses up to @ref BACKTRACE_SIZE will be printed from the point of execution.
- *
- * @{
- *
+ */
+
+/**
  * @file
- * @brief
- *
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @brief Backtrace functionalitry
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 #ifndef BACKTRACE_H
 #define BACKTRACE_H

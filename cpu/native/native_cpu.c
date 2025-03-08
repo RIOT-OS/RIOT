@@ -1,22 +1,17 @@
 /*
- * Native CPU kernel_intern.h and sched.h implementation
- *
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
  *               2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * Author: Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 /**
  * @file
- * @brief Native CPU kernel_intern.h and sched.h implementation
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief  Native CPU kernel_intern.h and sched.h implementation
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  *
  * In-process preemptive context switching utilizes POSIX ucontexts.
  * (ucontext provides for architecture independent stack handling)
@@ -274,4 +269,3 @@ void native_cpu_init(void)
 
     DEBUG("RIOT native cpu initialized.\n");
 }
-/** @} */

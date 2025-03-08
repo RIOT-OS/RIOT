@@ -7,9 +7,9 @@
  */
 
 /**
- * @{
- *
  * @file
+ * @ingroup cpu_native
+ * @brief   Backtrace implementation for native CPU
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
@@ -55,5 +55,3 @@ int backtrace_len(void)
 
     return backtrace(array, BACKTRACE_SIZE + 1) - 1;
 }
-
-/** @} */
