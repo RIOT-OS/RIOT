@@ -1,17 +1,16 @@
-/**
- * Native CPU EUI provider
- *
+/*
  * Copyright (C) 2020 Benjamin Valentin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup cpu_native
- * @{
+ */
+
+/**
  * @file
+ * @ingroup cpu_native
+ * @brief   Native CPU EUI provider
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
  */
 
 #include <assert.h>

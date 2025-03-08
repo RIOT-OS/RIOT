@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
@@ -8,12 +8,13 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_timer
- * @{
- *
  * @file
- * @brief       Native CPU periph/timer.h implementation
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_timer
+ * @brief   Native CPU periph/timer.h implementation
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @{
  *
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  * This is done with the timer_settime(3), timer_create(3)  interfaces, which are
@@ -21,9 +22,6 @@
  *
  * This is based on native's hwtimer implementation by Ludwig Knüpfer.
  * I removed the multiplexing, as ztimer does the same. (kaspar)
- *
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */

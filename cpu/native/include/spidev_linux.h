@@ -7,9 +7,10 @@
  */
 
 /**
- * @defgroup    drivers_spidev_linux Linux User Mode SPI Driver
- * @ingroup     cpu_native
- * @brief       Implementation of SPI access from Linux User Space
+ * @defgroup drivers_spidev_linux Linux User Mode SPI Driver
+ * @ingroup  cpu_native
+ * @brief    Implementation of SPI access from Linux User Space
+ * @{
  *
  * This module allows to connect a RIOT application that runs on a Linux host to
  * the physical SPI bus(ses) of that host. To do so, the application has to be
@@ -50,15 +51,13 @@
  * select the file descriptor with the lowest HWCS id for that bus, but the
  * actual CS line will not be pulled low (if the hardware supports this). This
  * would (in principle) allow to control CS manually.
- *
- * @{
- *
- * @file
- * @brief       Implementation of SPI access from Linux User Space
- *
- * @author      Frank Hessel <frank@fhessel.de>
  */
 
+/**
+ * @file
+ * @brief  Implementation of SPI access from Linux User Space
+ * @author Frank Hessel <frank@fhessel.de>
+ */
 #ifndef SPIDEV_LINUX_H
 #define SPIDEV_LINUX_H
 

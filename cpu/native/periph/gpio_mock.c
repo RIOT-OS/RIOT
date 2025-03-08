@@ -7,14 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_gpio
- * @{
- *
  * @file
- * @brief       empty GPIO implementation
- *
- * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_gpio
+ * @brief   empty GPIO implementation
+ * @author  Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
 #include "periph/gpio.h"
@@ -97,5 +94,3 @@ __attribute__((weak)) void gpio_write(gpio_t pin, bool value) {
     pin->value = value;
   }
 }
-
-/** @} */

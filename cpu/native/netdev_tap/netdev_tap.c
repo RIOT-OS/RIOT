@@ -9,12 +9,11 @@
  * more details.
  */
 
-/*
+/**
+ * @file
  * @ingroup drivers_netdev
- * @{
  * @brief   Low-level ethernet driver for tap interfaces
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
- * @}
  */
 
 #include <assert.h>

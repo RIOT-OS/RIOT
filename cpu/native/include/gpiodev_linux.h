@@ -7,9 +7,10 @@
  */
 
 /**
- * @defgroup    drivers_gpio_linux Linux User Mode GPIO Driver
- * @ingroup     cpu_native
- * @brief       Implementation of GPIO access from Linux User Space
+ * @defgroup drivers_gpio_linux Linux User Mode GPIO Driver
+ * @ingroup  cpu_native
+ * @brief    Implementation of GPIO access from Linux User Space
+ * @{
  *
  * This module allows to connect a RIOT application that runs on a Linux host to
  * the physical GPIO pins of that host. To do so, the application has to be
@@ -34,15 +35,13 @@
  * port would be PIN(0,1) and so on.
  *
  * Please refer to your board's documentation for the mapping of the pins.
- *
- * @{
- *
- * @file
- * @brief       Implementation of GPIO access from Linux User Space
- *
- * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
 
+/**
+ * @file
+ * @brief  Implementation of GPIO access from Linux User Space
+ * @author Benjamin Valentin <benpicco@googlemail.com>
+ */
 #ifndef GPIODEV_LINUX_H
 #define GPIODEV_LINUX_H
 

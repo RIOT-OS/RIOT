@@ -1,11 +1,16 @@
 /*
- * Native CPU irq.h implementation
- *
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ */
+
+/**
+ * @file
+ * @brief   Native CPU irq.h implementation
+ * @ingroup cpu_native
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #include <err.h>
@@ -518,4 +523,3 @@ void native_interrupt_init(void)
 
     puts("RIOT native interrupts/signals initialized.");
 }
-/** @} */

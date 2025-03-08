@@ -7,14 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_pm
- * @{
- *
  * @file
- * @brief       native Power Management implementation
- *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_pm
+ * @brief   Native Power Management implementation
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <err.h>

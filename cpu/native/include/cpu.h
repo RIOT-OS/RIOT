@@ -5,6 +5,23 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+/**
+ * @defgroup cpu_native  Native CPU
+ * @ingroup  cpu
+ * @brief    CPU implementation for running RIOT on a Linux and BSD
+ * @author   Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ *
+ * The native CPU uses system calls to simulate hardware access.
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief Native CPU header
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ */
 #ifndef CPU_H
 #define CPU_H
 
@@ -15,17 +32,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @defgroup cpu_native  Native CPU
- * @ingroup cpu
- * @brief CPU implementation for running RIOT on a Linux and BSD
- * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * The native CPU uses system calls to simulate hardware access.
- *
- * @{
- */
 
 /* MARK: - Basics */
 /**
@@ -50,10 +56,9 @@ __attribute__((always_inline)) static inline uintptr_t cpu_get_caller_pc(void)
 }
 /** @} */
 
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CPU_H */
+/** @} */

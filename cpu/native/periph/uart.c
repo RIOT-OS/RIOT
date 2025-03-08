@@ -7,16 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_uart
- * @{
- *
  * @file
- * @brief       UART implementation based on /dev/tty devices on host
- *
- * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
- *
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_uart
+ * @brief   UART implementation based on /dev/tty devices on host
+ * @author  Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
 #include <errno.h>
