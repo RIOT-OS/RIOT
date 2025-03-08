@@ -267,4 +267,5 @@ FEATURES_EXISTING := \
     tinyusb_device \
     vdd_lc_filter_reg0 \
     vdd_lc_filter_reg1 \
+    xiao_shield \
     #
