@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_feather-nrf52840-sense Adafruit Feather nRF52840 Sense
 @ingroup     boards
 @brief       Support for the Adafruit Feather nRF52840 Sense
@@ -29,5 +28,3 @@ Example with `hello-world` application:
 ```
      make BOARD=feather-nrf52840-sense -C examples/basic/hello-world flash term
 ```
-
-*/
