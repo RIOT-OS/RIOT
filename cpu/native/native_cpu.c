@@ -265,7 +265,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
         err(EXIT_FAILURE, "thread_stack_init: sigemptyset");
     }
 
-    makecontext(p, (void (*)(void))task_func, 1, arg);
+    makecontext64(p, (void (*)(void))task_func, arg);
 
     return (char *) p;
 }
