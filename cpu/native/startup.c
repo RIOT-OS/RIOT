@@ -6,9 +6,12 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * Author: Martine Lenders <m.lenders@fu-berlin.de>
+ */
+
+/**
+ * @file    Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @ingroup cpu\_native
+ * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include <dlfcn.h>

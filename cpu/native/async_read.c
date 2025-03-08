@@ -10,8 +10,12 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * Author: Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ */
+
+/**
+ * @file
+ * @ingroup cpu\_native
+ * @author  Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
 #include <err.h>

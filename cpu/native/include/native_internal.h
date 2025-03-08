@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013, 2014 Ludwig Knüpfer
+ * Copyright (C) 2025 carl-tud
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,20 +8,29 @@
  */
 
 /**
- * Native CPU internal declarations
- */
-
-/**
- * @defgroup `cpu_native_stdio`  STDIO for native
- * @ingroup `sys_stdio`
+ * @defgroup cpu\_native\_stdio STDIO for native
+ * @ingroup sys\_stdio
  * @brief Standard input/output backend for native
+ * @{
  *
  * This will hook up RIOT's stdio to the host's stdio fds. It is the default
  * stdio implementation of the board `native`.
  *
  * @see @ref cpu\_native
+ * @}
  */
 
+/**
+ * @addtogroup cpu\_native
+ * @{
+ */
+
+/**
+ * @file
+ * @brief Native CPU internal symbols
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author carl-tud
+ */
 #ifndef NATIVE_INTERNAL_H
 #define NATIVE_INTERNAL_H
 
@@ -48,11 +58,6 @@ extern "C" {
 #endif
 
 #include "syscalls.h"
-
-/**
- * @addtogroup cpu\_native
- * @{
- */
 
 /* MARK: - Internal native CPU API */
 /**
@@ -202,7 +207,9 @@ void _native_init_syscalls(void);
  * @{
  */
 
-// TODO: do we still need to expose this?
+/**
+ * @brief Points to instruction in userspace where RIOT left off and switched to ISR context
+ */
 extern volatile uintptr_t _native_user_fptr;
 
 /**
@@ -298,11 +305,9 @@ ssize_t _native_write(int fd, const void *buf, size_t count);
 ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 /** @} */
 
-
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* NATIVE_INTERNAL_H */
+/** @} */

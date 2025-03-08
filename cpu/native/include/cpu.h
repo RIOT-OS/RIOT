@@ -5,16 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-#ifndef CPU_H
-#define CPU_H
-
-#include <stdint.h>
-#include <stdio.h>
-#include "cpu_conf.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @defgroup cpu\_native  Native CPU
@@ -26,6 +16,22 @@ extern "C" {
  *
  * @{
  */
+
+/**
+ * @file
+ * @brief Native CPU header
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ */
+#ifndef CPU_H
+#define CPU_H
+
+#include <stdint.h>
+#include <stdio.h>
+#include "cpu_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* MARK: - Basics */
 /**
@@ -50,10 +56,9 @@ __attribute__((always_inline)) static inline uintptr_t cpu_get_caller_pc(void)
 }
 /** @} */
 
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CPU_H */
+/** @} */

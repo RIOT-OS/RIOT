@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     drivers_netdev
- * @brief
+ * @addtogroup drivers\_netdev
  * @{
- *
+ */
+
+/**
  * @file
- * @brief       Default configuration for the netdev_tap driver
- *
+ * @brief Default configuration for the netdev\_tap driver
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 #ifndef NETDEV_TAP_PARAMS_H

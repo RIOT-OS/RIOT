@@ -1,5 +1,4 @@
-/*
- * Crash handling functions implementation for 'native' port
+/* Crash handling functions implementation for 'native' port
  *
  * Copyright (C) 2014, 2015 Freie Universitaet Berlin (FUB) and INRIA
  *
@@ -10,6 +9,15 @@
  * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * Author: Kévin Roussel <Kevin.Roussel@inria.fr>
  * Author: Oliver Hahm <oliver.hahm@inria.fr>
+ */
+
+/**
+ * @file
+ * @ingroup cpu\_native
+ * @brief   Crash handling functions implementation for 'native' port
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author  Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <errno.h>

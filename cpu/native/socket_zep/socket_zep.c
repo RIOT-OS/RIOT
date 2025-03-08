@@ -7,8 +7,6 @@
  */
 
 /**
- * @{
- *
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
@@ -640,5 +638,3 @@ void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal)
     hal->driver = &socket_zep_rf_ops;
     hal->priv = dev;
 }
-
-/** @} */

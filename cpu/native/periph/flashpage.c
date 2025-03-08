@@ -7,15 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_flashpage
- * @{
- *
  * @file
- * @brief       Low-level flashpage driver emulation
- *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
+ * @ingroup cpu\_native
+ * @ingroup drivers\_periph\_flashpage
+ * @brief   Low-level flashpage driver emulation
+ * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <assert.h>

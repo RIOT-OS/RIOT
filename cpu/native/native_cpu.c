@@ -1,5 +1,4 @@
-/*
- * Native CPU kernel_intern.h and sched.h implementation
+/* Native CPU kernel_intern.h and sched.h implementation
  *
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
  *               2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -7,9 +6,13 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * Author: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * Author: Kaspar Schleiser <kaspar@schleiser.de>
+ */
+
+/**
+ * @file
+ * @ingroup cpu\_native
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <err.h>
@@ -264,4 +267,3 @@ void native_cpu_init(void)
 
     DEBUG("RIOT native cpu initialized.\n");
 }
-/** @} */

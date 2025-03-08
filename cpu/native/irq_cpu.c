@@ -8,6 +8,12 @@
  * directory for more details.
  */
 
+/**
+ * @file
+ * @ingroup cpu\_native
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ */
+
 #include <err.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -518,4 +524,3 @@ void native_interrupt_init(void)
 
     puts("RIOT native interrupts/signals initialized.");
 }
-/** @} */

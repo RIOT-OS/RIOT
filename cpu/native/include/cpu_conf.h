@@ -1,11 +1,20 @@
 /*
- * Native CPU configuration
- *
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ */
+
+/**
+ * @addtogroup cpu\_native
+ * @{
+ */
+
+/**
+ * @file
+ * @brief Native CPU configuration
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
@@ -14,16 +23,11 @@
 extern "C" {
 #endif
 
-/**
- * @addtogroup cpu\_native
- * @{
- */
-
 /* MARK: - CPU-specific default stack sizes */
 /**
  * @brief CPU-specific default stack sizes
  *
- * TODO: tighten stack sizes
+ * @todo TODO: tighten stack sizes
  *
  * @{
  */
@@ -96,10 +100,9 @@ extern char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
 #define CPU_FLASH_BASE ((uintptr_t)_native_flash)
 /** @} */
 
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* CPU_CONF_H */
+/** @} */
