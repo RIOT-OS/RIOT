@@ -7,19 +7,19 @@
  */
 
 /**
- * @defgroup    drivers_candev_linux SocketCAN driver
- * @ingroup     drivers_can
- * @brief       Implementation of simulated CAN controller driver using SocketCAN on Linux
+ * @defgroup drivers\_candev\_linux SocketCAN driver
+ * @ingroup  drivers\_can
+ * @brief    Implementation of simulated CAN controller driver using SocketCAN on Linux
  * @{
- *
- * @file
- * @brief       Implementation of simulated CAN controller driver using SocketCAN on Linux
- *
- * @author      Hermann Lelong <hermann@otakeys.com>
- * @author      Aurelien Gonce <aurelien.gonce@altran.com>
- * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
+/**
+ * @file
+ * @brief  Implementation of simulated CAN controller driver using SocketCAN on Linux
+ * @author Hermann Lelong <hermann@otakeys.com>
+ * @author Aurelien Gonce <aurelien.gonce@altran.com>
+ * @author Vincent Dupont <vincent@otakeys.com>
+ */
 #ifndef CANDEV_LINUX_H
 #define CANDEV_LINUX_H
 

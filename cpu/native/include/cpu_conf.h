@@ -1,17 +1,20 @@
-/**
- * Native CPU configuration
- *
+/*
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup cpu_native
+ */
+
+/**
+ * @addtogroup cpu\_native
  * @{
+ */
+
+/**
  * @file
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @}
+ * @brief Native CPU configuration
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
@@ -20,39 +23,45 @@
 extern "C" {
 #endif
 
+/* MARK: - CPU-specific default stack sizes */
 /**
- * @brief   CPU specific default stack sizes
+ * @brief CPU-specific default stack sizes
  *
- * TODO: tighten stack sizes
+ * @todo TODO: tighten stack sizes
  *
  * @{
  */
 #ifndef THREAD_STACKSIZE_DEFAULT
-#if (__SIZEOF_POINTER__ == 8)
-#define THREAD_STACKSIZE_DEFAULT            (16384)
-#else
-#define THREAD_STACKSIZE_DEFAULT            (8192)
-#endif
+# if (__SIZEOF_POINTER__ == 8)
+#  define THREAD_STACKSIZE_DEFAULT            (16384)
+# else
+#  define THREAD_STACKSIZE_DEFAULT            (8192)
+# endif
 #endif
 #ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
+# define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
 #endif
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF       (4096)
+# define THREAD_EXTRA_STACKSIZE_PRINTF       (4096)
 #endif
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (4096)
+# define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (4096)
 #endif
 /* for core/include/thread.h */
 #ifndef THREAD_STACKSIZE_MINIMUM
-#define THREAD_STACKSIZE_MINIMUM            (THREAD_STACKSIZE_DEFAULT)
+# define THREAD_STACKSIZE_MINIMUM            (THREAD_STACKSIZE_DEFAULT)
 #endif
 /* native internal */
 #ifndef ISR_STACKSIZE
-#define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
+# define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
 #endif
 /** @} */
 
+/* MARK: - Networking constants */
+/**
+ * @name Networking constants
+ * @{
+ */
 /**
  * @brief   Native internal Ethernet protocol number
  */
@@ -62,10 +71,12 @@ extern "C" {
 #   undef  CONFIG_GNRC_PKTBUF_SIZE
 #   define CONFIG_GNRC_PKTBUF_SIZE     (2048)
 #endif
+/** @} */
 
+/* MARK: - Native flash emulation */
 /**
- * @brief   Native Flash emulation
- *          Use unusual parameters to trigger edge cases
+ * @name Native flash emulation
+ * Use unusual parameters to trigger edge cases
  * @{
  */
 #ifndef FLASHPAGE_SIZE
@@ -94,3 +105,4 @@ extern char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
 #endif
 
 #endif /* CPU_CONF_H */
+/** @} */

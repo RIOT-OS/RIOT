@@ -7,14 +7,14 @@
  */
 
 /**
- * @defgroup    sys_fs_native native fs integration
- * @ingroup     cpu_native
- * @brief       Access to the host fs from RIOT native
+ * @defgroup sys\_fs\_native Native FS Integration
+ * @ingroup cpu\_native
+ * @brief Access to the host filesystem from RIOT native
  *
  * @{
  *
  * @file
- * @brief       native integration with vfs
+ * @brief       Native integration with virtual filesystem (VFS)
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */

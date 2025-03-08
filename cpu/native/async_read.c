@@ -1,4 +1,4 @@
-/**
+/*
  * Multiple asynchronous read on file descriptors
  *
  * Copyright (C) 2015 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>,
@@ -10,10 +10,11 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup cpu_native
- * @{
+ */
+
+/**
  * @file
+ * @ingroup cpu\_native
  * @author  Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
@@ -45,11 +46,11 @@ static void _async_io_isr(void) {
 }
 
 void native_async_read_setup(void) {
-    register_interrupt(SIGIO, _async_io_isr);
+    native_register_interrupt(SIGIO, _async_io_isr);
 }
 
 void native_async_read_cleanup(void) {
-    unregister_interrupt(SIGIO);
+    native_unregister_interrupt(SIGIO);
 
     for (int i = 0; i < _next_index; i++) {
         real_close(_fds[i].fd);
@@ -115,12 +116,12 @@ void native_async_read_remove_handler(int fd)
         return;
     }
 
-    unregister_interrupt(SIGIO);
+    native_unregister_interrupt(SIGIO);
     for (; i < (unsigned)_next_index - 1; i++) {
         _fds[i] = _fds[i + 1];
     }
     _next_index--;
-    register_interrupt(SIGIO, _async_io_isr);
+    native_register_interrupt(SIGIO, _async_io_isr);
 
     _fds[_next_index] = (struct pollfd){ 0 };
 }
@@ -179,4 +180,3 @@ static void _sigio_child(int index)
         sigwait(&sigmask, &sig);
     }
 }
-/** @} */
