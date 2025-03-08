@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840
+ * @ingroup     boards_common
  * @{
  * @file
  * @brief       Implementation for managing the nrfutil bootloader
