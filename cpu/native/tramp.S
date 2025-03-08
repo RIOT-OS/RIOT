@@ -151,6 +151,15 @@ GLOBAL_SYMBOL _native_isr_leave
     movl    $0x0, SYMBOL(_native_in_isr)(%rip)
     ret
 
+GLOBAL_SYMBOL _start_task_func64
+    /* Use r14 and r15 as scratch registers. */
+    /* r8, r9 / r12 are used by glibc / libplatform on arm64 */
+    /* This is the 64-bit function argument. RIOT threads can only receive one argument. */
+    /* System V ABI says: first argument in RDI. */
+    mov     %r15, %rdi
+    /* Call user thread func. */
+    jmp     *%r14
+
 #elif defined(__i386__)
 
 GLOBAL_SYMBOL _native_sig_leave_tramp
