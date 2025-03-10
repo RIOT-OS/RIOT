@@ -43,7 +43,9 @@ static inline uintptr_t _context_get_fptr(ucontext_t *context) {
 # if defined(__FreeBSD__) /* FreeBSD */
     return (uintptr_t)((struct sigcontext *)context)->sc_eip;
 # elif defined(__linux__) /* Linux */
-#  if defined(__arm__)
+#  if defined(__arm64__) || defined(__aarch64__)
+    return (uintptr_t)((ucontext_t *)context)->uc_mcontext.pc;
+#  elif defined(__arm__)
     return (uintptr_t)((ucontext_t *)context)->uc_mcontext.arm_pc;
 #  elif defined(__x86_64__)
     return (uintptr_t)((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP];
@@ -66,7 +68,9 @@ static inline void _context_set_fptr(ucontext_t *context, uintptr_t func) {
 # if defined(__FreeBSD__) /* FreeBSD */
     ((struct sigcontext *)context)->sc_eip = (unsigned int)func;
 # elif defined(__linux__) /* Linux */
-#  if defined(__arm__)
+#  if defined(__arm64__) || defined(__aarch64__)
+    ((ucontext_t *)context)->uc_mcontext.pc = func;
+#  elif defined(__arm__)
     ((ucontext_t *)context)->uc_mcontext.arm_lr = func;
     ((ucontext_t *)context)->uc_mcontext.arm_pc = func;
 #  elif defined(__x86_64__)
@@ -117,6 +121,11 @@ static inline void makecontext64(ucontext_t *context, void (*func)(void), void* 
 #   if defined(__linux__)
      context->uc_mcontext.gregs[REG_R14] = (greg_t)func;
      context->uc_mcontext.gregs[REG_R15] = (greg_t)arg;
+#   endif
+#  elif defined(__arm64__) || defined(__aarch64__)
+#   if defined(__linux__)
+     context->uc_mcontext.regs[27] = (greg_t)func;
+     context->uc_mcontext.regs[28] = (greg_t)arg;
 #   endif
 #  endif
 
