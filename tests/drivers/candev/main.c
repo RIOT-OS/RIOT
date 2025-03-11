@@ -71,8 +71,6 @@ static candev_mcp2515_conf_t *mcp2515_conf = &candev_mcp2515_conf[CONFIG_CAN_DEV
 #else
 static candev_mcp2515_conf_t *mcp2515_conf = NULL;
 #endif
-
-
 static int _send(int argc, char **argv)
 {
     int ret = 0;
