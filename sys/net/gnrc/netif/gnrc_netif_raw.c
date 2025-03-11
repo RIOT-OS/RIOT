@@ -94,15 +94,17 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_pktbuf_realloc_data(pkt, nread);
     }
 
-    switch (_get_version(pkt->data)) {
+    if (!(netif->flags & GNRC_NETIF_FLAGS_RAWMODE)) {
+        switch (_get_version(pkt->data)) {
 #ifdef MODULE_GNRC_IPV6
-    case IP_VERSION6:
-        pkt->type = GNRC_NETTYPE_IPV6;
-        break;
+        case IP_VERSION6:
+            pkt->type = GNRC_NETTYPE_IPV6;
+            break;
 #endif
-    default:
-        /* leave UNDEF */
-        break;
+        default:
+            /* leave UNDEF */
+            break;
+        }
     }
     return pkt;
 }
