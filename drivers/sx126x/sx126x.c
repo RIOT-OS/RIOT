@@ -54,19 +54,35 @@
 #endif
 
 #ifndef CONFIG_SX126X_RAMP_TIME_DEFAULT
-#  define CONFIG_SX126X_RAMP_TIME_DEFAULT       (SX126X_RAMP_10_US)
+#  define CONFIG_SX126X_RAMP_TIME_DEFAULT                   (SX126X_RAMP_10_US)
 #endif
 
 #ifndef CONFIG_SX126X_LORA_BW_DEFAULT
-#  define CONFIG_SX126X_LORA_BW_DEFAULT         (CONFIG_LORA_BW_DEFAULT)
+#  define CONFIG_SX126X_LORA_BW_DEFAULT                     (CONFIG_LORA_BW_DEFAULT)
 #endif
 
 #ifndef CONFIG_SX126X_LORA_SF_DEFAULT
-#  define CONFIG_SX126X_LORA_SF_DEFAULT         (CONFIG_LORA_SF_DEFAULT)
+#  define CONFIG_SX126X_LORA_SF_DEFAULT                     (CONFIG_LORA_SF_DEFAULT)
 #endif
 
 #ifndef CONFIG_SX126X_LORA_CR_DEFAULT
-#  define CONFIG_SX126X_LORA_CR_DEFAULT         (CONFIG_LORA_CR_DEFAULT)
+#  define CONFIG_SX126X_LORA_CR_DEFAULT                     (CONFIG_LORA_CR_DEFAULT)
+#endif
+
+#ifndef CONFIG_SX126X_LORA_PAYLOAD_CRC_OFF_DEFAULT
+#  define CONFIG_SX126X_LORA_PAYLOAD_CRC_OFF_DEFAULT        (CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT)
+#endif
+
+#ifndef CONFIG_SX126X_LORA_FIXED_HEADER_LEN_MODE_DEFAULT
+#  define CONFIG_SX126X_LORA_FIXED_HEADER_LEN_MODE_DEFAULT  (CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT)
+#endif
+
+#ifndef CONFIG_SX126X_LORA_PREAMBLE_LENGTH_DEFAULT
+#  define CONFIG_SX126X_LORA_PREAMBLE_LENGTH_DEFAULT        (CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT)
+#endif
+
+#ifndef CONFIG_SX126X_LORA_IQ_INVERTED_DEFAULT
+#  define CONFIG_SX126X_LORA_IQ_INVERTED_DEFAULT            (CONFIG_LORA_IQ_INVERTED_DEFAULT)
 #endif
 
 const sx126x_pa_cfg_params_t sx1268_pa_cfg = {
@@ -196,11 +212,11 @@ static void sx126x_init_default_config(sx126x_t *dev)
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 
     dev->pkt_params.pld_len_in_bytes = 0;
-    dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT);
-    dev->pkt_params.header_type = IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT)
+    dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_SX126X_LORA_PAYLOAD_CRC_OFF_DEFAULT);
+    dev->pkt_params.header_type = IS_ACTIVE(CONFIG_SX126X_LORA_FIXED_HEADER_LEN_MODE_DEFAULT)
                                     ? SX126X_LORA_PKT_IMPLICIT : SX126X_LORA_PKT_EXPLICIT;
-    dev->pkt_params.preamble_len_in_symb = CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT;
-    dev->pkt_params.invert_iq_is_on = IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT);
+    dev->pkt_params.preamble_len_in_symb = CONFIG_SX126X_LORA_PREAMBLE_LENGTH_DEFAULT;
+    dev->pkt_params.invert_iq_is_on = IS_ACTIVE(CONFIG_SX126X_LORA_IQ_INVERTED_DEFAULT);
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
     sx126x_cfg_rx_boosted(dev, false);
 }
