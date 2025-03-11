@@ -77,13 +77,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name ATA6561 STANDBY pin definition
- * @{
- */
-#define AT6561_STBY_PIN            GPIO_PIN(PC, 13)
-/** @} */
-
-/**
  * @name MTD configuration
  * @{
  */
