@@ -1,0 +1,33 @@
+name: preview-documentation
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - master
+
+jobs:
+  create-documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: OlegHahm/docker-doxygen
+          ref: master
+
+      - name: Build Docker image
+        run: docker build -t doxygen-image .
+
+      - name: Create documenation foder
+        run: mkdir docs
+
+      - name: Run Docker container
+        run: docker run -v ./docs:/var/data/html -e GIT_REPO="--branch $GITHUB_BASE_REF $GITHUB_SERVER_URL/$GITHUB_REPOSITORY" --rm doxygen-image /bin/sh -c 'echo $GIT_REPO > /var/data/config/git_repo && cat /var/data/config/git_repo && gen-doxygen'
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: docs
