@@ -161,7 +161,6 @@ To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
 ## Mailing Lists
-* RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
 ## License

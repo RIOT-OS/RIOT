@@ -163,7 +163,7 @@ maintainers reasonable time to ACK before dismissing their review.
 
 Before the official release of a new RIOT version, two feature freeze periods
 are announced on the
-[RIOT development email list](https://lists.riot-os.org/mailman/listinfo/devel):
+[RIOT maintainer forum](https://forum.riot-os.org/c/maintainer/6):
 The soft feature freeze and the hard feature freeze. During the soft feature
 freeze only PRs with minor impact should be merged into master. The hard feature
 freeze begins when the release manager creates a new release branch. Therefore,
