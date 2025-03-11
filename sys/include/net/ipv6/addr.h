@@ -763,6 +763,14 @@ void ipv6_addr_print(const ipv6_addr_t *addr);
 void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
                       const char *separator);
 
+/**
+ * @brief Print IPv6 prefix to stdout
+ *
+ * @param[in]   prefix  Pointer to ipv6_addr_t to print
+ * @param[in]   bits    IPv6 prefix bits
+ */
+void ipv6_prefix_print(const ipv6_addr_t *prefix, uint8_t bits);
+
 #ifdef __cplusplus
 }
 #endif
