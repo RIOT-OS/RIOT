@@ -95,8 +95,21 @@ typedef struct {
     gpio_t rx_pin;
     /** CAN Tx pin */
     gpio_t tx_pin;
+    /** CAN transceiver enable pin */
+    gpio_t enable_pin;
+    /** GPIO mode to use for @ref can_conf_t::enable_pin */
+    gpio_mode_t enable_pin_mode;
     /** GCLK source supplying the CAN controller */
     uint8_t gclk_src;
+    /**
+     * @brief Whether @ref can_conf_t::enable_pin is active-low
+     *
+     * If `true`, @ref can_conf_t::enable_pin is active-low will be set to
+     * LOW when active and HIGH when inactive. If `false`,
+     *  @ref can_conf_t::enable_pin will be set HIGH when active and LOW when
+     * inactive.
+     */
+     bool enable_pin_active_low;
 } can_conf_t;
 #define HAVE_CAN_CONF_T
 

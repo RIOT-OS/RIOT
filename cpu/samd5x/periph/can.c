@@ -132,6 +132,10 @@ static int _power_on(can_t *dev)
         pm_block(SAM0_PM_IDLE);
     }
 
+    if (gpio_is_valid(dev->conf->enable_pin)) {
+        gpio_write(dev->conf->enable_pin, !dev->conf->enable_pin_active_low);
+    }
+
     if (dev->conf->can == CAN0) {
         DEBUG_PUTS("CAN0 controller is used");
         MCLK->AHBMASK.reg |= MCLK_AHBMASK_CAN0;
@@ -165,6 +169,10 @@ static int _power_off(can_t *dev)
     else {
         DEBUG_PUTS("Unsupported CAN channel");
         return -1;
+    }
+
+    if (gpio_is_valid(dev->conf->enable_pin)) {
+        gpio_write(dev->conf->enable_pin, dev->conf->enable_pin_active_low);
     }
 
     return 0;
@@ -331,6 +339,14 @@ void can_init(can_t *dev, const can_conf_t *conf)
 
     memcpy(&dev->candev.bittiming, &timing, sizeof(timing));
     dev->conf = conf;
+
+    if (gpio_is_valid(conf->enable_pin)) {
+        /* In case conf->enable_pin is not initialized aid debugging with a
+         * blown assertion */
+        assert((uint32_t)conf->enable_pin);
+        gpio_init(conf->enable_pin, conf->enable_pin_mode);
+        gpio_write(conf->enable_pin, conf->enable_pin_active_low);
+    }
 }
 
 static void _dump_msg_ram_section(can_t *dev)
@@ -375,18 +391,18 @@ static int _init(candev_t *candev)
 
     /*Configure the start addresses of the RAM message sections */
     dev->conf->can->SIDFC.reg = CAN_SIDFC_FLSSA((uint32_t)(dev->msg_ram_conf.std_filter))
-                            | CAN_SIDFC_LSS((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.std_filter)));
+                              | CAN_SIDFC_LSS((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.std_filter)));
     dev->conf->can->XIDFC.reg = CAN_XIDFC_FLESA((uint32_t)(dev->msg_ram_conf.ext_filter))
-                            | CAN_XIDFC_LSE((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.ext_filter)));
+                              | CAN_XIDFC_LSE((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.ext_filter)));
     dev->conf->can->RXF0C.reg = CAN_RXF0C_F0SA((uint32_t)(dev->msg_ram_conf.rx_fifo_0))
-                            | CAN_RXF0C_F0S((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_0)));
+                              | CAN_RXF0C_F0S((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_0)));
     dev->conf->can->RXF1C.reg = CAN_RXF1C_F1SA((uint32_t)(dev->msg_ram_conf.rx_fifo_1))
-                            | CAN_RXF1C_F1S((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_1)));
+                              | CAN_RXF1C_F1S((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_1)));
     dev->conf->can->RXBC.reg = CAN_RXBC_RBSA((uint32_t)(dev->msg_ram_conf.rx_buffer));
     dev->conf->can->TXEFC.reg = CAN_TXEFC_EFSA((uint32_t)(dev->msg_ram_conf.tx_event_fifo))
-                            | CAN_TXEFC_EFS((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_event_fifo)));
+                              | CAN_TXEFC_EFS((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_event_fifo)));
     dev->conf->can->TXBC.reg = CAN_TXBC_TBSA((uint32_t)(dev->msg_ram_conf.tx_fifo_queue))
-                            | CAN_TXBC_TFQS((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_fifo_queue)));
+                              | CAN_TXBC_TFQS((uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_fifo_queue)));
 
     /* In the vendor file, the data field size in CanMramTxbe is set to 64 bytes
         although it can be configurable. That's why 64 bytes is used here by default */
