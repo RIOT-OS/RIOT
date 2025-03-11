@@ -53,53 +53,56 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     gnrc_pktsnip_t *pkt = NULL;
 
-    if (bytes_expected > 0) {
-        gnrc_pktsnip_t *hdr;
-        int nread;
+    if (bytes_expected <= 0) {
+        return NULL;
+    }
 
-        pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
+    gnrc_pktsnip_t *hdr;
+    int nread;
 
-        if (!pkt) {
-            DEBUG("gnrc_netif_raw: cannot allocate pktsnip.\n");
-            /* drop packet */
-            dev->driver->recv(dev, NULL, bytes_expected, NULL);
-            return pkt;
-        }
-        nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
-        if (nread <= 1) {   /* we need at least 1 byte to identify IP version */
-            DEBUG("gnrc_netif_raw: read error.\n");
-            gnrc_pktbuf_release(pkt);
-            return NULL;
-        }
-        hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-        if (!hdr) {
-            DEBUG("gnrc_netif_raw: cannot allocate pktsnip.\n");
-            gnrc_pktbuf_release(pkt);
-            return NULL;
-        }
-        gnrc_netif_hdr_set_netif(hdr->data, netif);
-        LL_APPEND(pkt, hdr);
+    pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
+
+    if (!pkt) {
+        DEBUG("gnrc_netif_raw: cannot allocate pktsnip.\n");
+        /* drop packet */
+        dev->driver->recv(dev, NULL, bytes_expected, NULL);
+        return pkt;
+    }
+    nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
+    if (nread <= 1) {   /* we need at least 1 byte to identify IP version */
+        DEBUG("gnrc_netif_raw: read error.\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
+    hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (!hdr) {
+        DEBUG("gnrc_netif_raw: cannot allocate pktsnip.\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
+    gnrc_netif_hdr_set_netif(hdr->data, netif);
+    LL_APPEND(pkt, hdr);
 #ifdef MODULE_NETSTATS_L2
-        netif->stats.rx_count++;
-        netif->stats.rx_bytes += nread;
+    netif->stats.rx_count++;
+    netif->stats.rx_bytes += nread;
 #endif
 
-        if (nread < bytes_expected) {
-            /* we've got less then the expected packet size,
-             * so free the unused space.*/
-            DEBUG("gnrc_netif_raw: reallocating.\n");
-            gnrc_pktbuf_realloc_data(pkt, nread);
-        }
-        switch (_get_version(pkt->data)) {
+    if (nread < bytes_expected) {
+        /* we've got less then the expected packet size,
+         * so free the unused space.*/
+        DEBUG("gnrc_netif_raw: reallocating.\n");
+        gnrc_pktbuf_realloc_data(pkt, nread);
+    }
+
+    switch (_get_version(pkt->data)) {
 #ifdef MODULE_GNRC_IPV6
-            case IP_VERSION6:
-                pkt->type = GNRC_NETTYPE_IPV6;
-                break;
+    case IP_VERSION6:
+        pkt->type = GNRC_NETTYPE_IPV6;
+        break;
 #endif
-            default:
-                /* leave UNDEF */
-                break;
-        }
+    default:
+        /* leave UNDEF */
+        break;
     }
     return pkt;
 }
