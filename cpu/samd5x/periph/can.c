@@ -352,20 +352,27 @@ void can_init(can_t *dev, const can_conf_t *conf)
 static void _dump_msg_ram_section(can_t *dev)
 {
     puts("start address|\tsize of section");
-    printf("Standard filters|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.std_filter),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.std_filter)));
-    printf("Extended filters|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.ext_filter),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.ext_filter)));
-    printf("Rx FIFO 0|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.rx_fifo_0),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_0)));
-    printf("Rx FIFO 1|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.rx_fifo_1),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_1)));
-    printf("Rx buffer|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.rx_buffer),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_buffer)));
-    printf("Tx event FIFO|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.tx_event_fifo),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_event_fifo)));
-    printf("Tx buffer|\t0x%08lx|\t%lu\n", (uint32_t)(dev->msg_ram_conf.tx_fifo_queue),
-                                        (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_fifo_queue)));
+    printf("Standard filters|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+           (uint32_t)(dev->msg_ram_conf.std_filter),
+           (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.std_filter)));
+    printf("Extended filters|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+           (uint32_t)(dev->msg_ram_conf.ext_filter),
+           (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.ext_filter)));
+    printf("Rx FIFO 0|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+           (uint32_t)(dev->msg_ram_conf.rx_fifo_0),
+           (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_0)));
+    printf("Rx FIFO 1|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+           (uint32_t)(dev->msg_ram_conf.rx_fifo_1),
+           (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_fifo_1)));
+    printf("Rx buffer|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+            (uint32_t)(dev->msg_ram_conf.rx_buffer),
+            (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.rx_buffer)));
+    printf("Tx event FIFO|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+            (uint32_t)(dev->msg_ram_conf.tx_event_fifo),
+            (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_event_fifo)));
+    printf("Tx buffer|\t0x%08" PRIx32 "|\t%" PRIu32 "\n",
+            (uint32_t)(dev->msg_ram_conf.tx_fifo_queue),
+            (uint32_t)(ARRAY_SIZE(dev->msg_ram_conf.tx_fifo_queue)));
 }
 
 static int _init(candev_t *candev)
@@ -592,9 +599,9 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
         dev->msg_ram_conf.ext_filter[idx].XIDFE_1.reg |= CAN_XIDFE_1_EFT(CANDEV_SAMD5X_CLASSIC_FILTER);
         dev->msg_ram_conf.ext_filter[idx].XIDFE_0.reg |= CAN_XIDFE_0_EFID1(filter->can_id);
         dev->msg_ram_conf.ext_filter[idx].XIDFE_1.reg |= CAN_XIDFE_1_EFID2(filter->can_mask & CAN_EFF_MASK);
-        DEBUG("Extended filter element N°%d: F0 = 0x%08lx, F1 = 0x%08lx\n", idx,
-                                    (uint32_t)(dev->msg_ram_conf.ext_filter[idx].XIDFE_0.reg),
-                                    (uint32_t)(dev->msg_ram_conf.ext_filter[idx].XIDFE_1.reg));
+        DEBUG("Extended filter element N°%d: F0 = 0x%08" PRIx32 ", F1 = 0x%08" PRIx32 "\n",
+              idx, (uint32_t)(dev->msg_ram_conf.ext_filter[idx].XIDFE_0.reg),
+              (uint32_t)(dev->msg_ram_conf.ext_filter[idx].XIDFE_1.reg));
         _set_mode(dev->conf->can, MODE_INIT);
         /* Reject all extended frames that are not matching the filters applied */
         dev->conf->can->GFC.reg |= CAN_GFC_ANFE((uint32_t)CAN_REJECT);
@@ -632,8 +639,8 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
                                                       | CAN_SIDFE_0_SFID1(filter->can_id & CAN_SFF_MASK)
                                                       | CAN_SIDFE_0_SFID2(filter->can_mask & CAN_SFF_MASK);
 
-        DEBUG("Standard filter element N°%d: S0 = 0x%08lx\n", idx,
-                                    (uint32_t)(dev->msg_ram_conf.std_filter[idx].SIDFE_0.reg));
+        DEBUG("Standard filter element N°%d: S0 = 0x%08" PRIx32 "\n",
+              (int)idx, (uint32_t)(dev->msg_ram_conf.std_filter[idx].SIDFE_0.reg));
         _set_mode(dev->conf->can, MODE_INIT);
         /* Reject all standard frames that are not matching the filters applied */
         dev->conf->can->GFC.reg |= CAN_GFC_ANFS((uint32_t)CAN_REJECT);
@@ -760,7 +767,7 @@ static void _isr(candev_t *candev)
     can_t *dev = container_of(candev, can_t, candev);
 
     uint32_t irq_reg = dev->conf->can->IR.reg;
-    DEBUG("isr: IR reg = 0x%08lx\n", irq_reg);
+    DEBUG("isr: IR reg = 0x%08" PRIx32 "\n", irq_reg);
 
     /* Interrupt triggered due to reception of CAN frame on Rx_FIFO_0 */
     if (irq_reg & CAN_IR_RF0N) {
