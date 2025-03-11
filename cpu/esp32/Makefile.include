@@ -229,7 +229,7 @@ ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ws281x_esp32_hw,$(USEMODULE)))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/deprecated
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_rmt/include
   CFLAGS += -DCONFIG_RMT_SUPPRESS_DEPRECATE_WARN
 endif
 
