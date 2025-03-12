@@ -134,14 +134,6 @@ ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
   CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
 endif
 
-# clumsy way to enable building native on osx:
-BUILDOSXNATIVE = 0
-ifeq ($(CPU),native)
-  ifeq ($(OS),Darwin)
-    BUILDOSXNATIVE = 1
-  endif
-endif
-
 all: # do not override first target
 
 all-gprof: all
