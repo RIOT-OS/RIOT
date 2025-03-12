@@ -100,9 +100,9 @@ LINKFLAGS += -ffunction-sections
 
 ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
-  DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
+  DEBUGGER_FLAGS = -- $(EXECUTABLE) $(TERMFLAGS)
 else
-  DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
+  DEBUGGER_FLAGS = -q --args $(EXECUTABLE) $(TERMFLAGS)
 endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \
@@ -113,7 +113,7 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--leak-check=full --track-origins=yes --fullpath-after=$(RIOTBASE) \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
-term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
+term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(EXECUTABLE)
 all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
 all-valgrind: NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-gprof: CFLAGS += -pg
@@ -153,10 +153,10 @@ all-valgrind: all
 all-cachegrind: all
 
 term-valgrind:
-	$(VALGRIND) $(VALGRIND_FLAGS) $(ELFFILE) $(PORT)
+	$(VALGRIND) $(VALGRIND_FLAGS) $(EXECUTABLE) $(PORT)
 
 debug-valgrind-server:
-	$(VALGRIND) $(VALGRIND_FLAGS) $(ELFFILE) $(PORT)
+	$(VALGRIND) $(VALGRIND_FLAGS) $(EXECUTABLE) $(PORT)
 
 debug-valgrind:
 	$(eval VALGRIND_PID ?= $(shell pgrep -n memcheck-x86-li -u $(USER) | cut -d" " -f1))
@@ -164,12 +164,12 @@ debug-valgrind:
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 term-cachegrind:
-	$(VALGRIND) $(CACHEGRIND_FLAGS) $(ELFFILE) $(PORT)
+	$(VALGRIND) $(CACHEGRIND_FLAGS) $(EXECUTABLE) $(PORT)
 
 term-gprof: term
 
 eval-gprof:
-	$(GPROF) $(ELFFILE) $(shell ls -rt gmon.out* | tail -1)
+	$(GPROF) $(EXECUTABLE) $(shell ls -rt gmon.out* | tail -1)
 
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)

@@ -2,7 +2,7 @@ INCLUDES += -I$(RIOTBOARD)/common/atxmega/include
 
 # Use JTAG as default protocol for debugging
 DEBUGPROTO ?= -x
-FLASHFILE ?= $(ELFFILE)
+FLASHFILE ?= $(EXECUTABLE)
 
 # Use avrdude programmer with Atmel ICE as default flash/debug system
 PROGRAMMER ?= avrdude

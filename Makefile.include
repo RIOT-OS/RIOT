@@ -386,8 +386,8 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 # be done in makefile.iotlab.single.inc.mk which is included after.
 ifneq (,$(IOTLAB_NODE))
   PROGRAMMER ?= iotlab
-  # iotlab uses ELFFILE by default for flashing boards.
-  FLASHFILE ?= $(ELFFILE)
+  # iotlab uses EXECUTABLE by default for flashing boards.
+  FLASHFILE ?= $(EXECUTABLE)
   # Disable IOTLAB_NODE if inside Docker to avoid including the
   # iotlab.single.inc.mk file which is useless there: it's only useful for
   # flashing and this is done outside of Docker.
@@ -602,7 +602,7 @@ include $(RIOTMAKE)/modules.inc.mk
 
 
 .PHONY: all link clean flash flash-only termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
+.PHONY: print-size executable lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -636,7 +636,7 @@ endif
 EXECUTABLE_EXTENSION ?= elf
 _EXECUTABLE_BASE = $(BINDIR)/$(APPLICATION)
 
-ELFFILE ?= $(_EXECUTABLE_BASE).$(EXECUTABLE_EXTENSION)
+EXECUTABLE ?= $(_EXECUTABLE_BASE).$(EXECUTABLE_EXTENSION)
 HEXFILE ?= $(_EXECUTABLE_BASE).hex
 BINFILE ?= $(_EXECUTABLE_BASE).bin
 HASHFILE ?= $(BINFILE)
@@ -658,15 +658,15 @@ ifneq (,$(filter suit,$(USEMODULE)))
 endif
 
 # elf file used for the debugger, must include bootloader offset
-DEBUG_ELFFILE ?= $(ELFFILE)
+DEBUG_EXECUTABLE ?= $(EXECUTABLE)
 
 # Targets to get given file
-elffile: $(ELFFILE)
+executable: $(EXECUTABLE)
 hexfile: $(HEXFILE)
 binfile: $(BINFILE)
 lstfile: $(LSTFILE)
 # FLASHFILE is the file used by the flasher
-# Usually set to $(ELFFILE), $(HEXFILE) or $(BINFILE) in the board/flasher
+# Usually set to $(EXECUTABLE), $(HEXFILE) or $(BINFILE) in the board/flasher
 # or application specific files
 flashfile: $(FLASHFILE)
 
@@ -674,7 +674,7 @@ ifeq (,$(FLASHFILE))
   $(error FLASHFILE is not defined for this board: $(BOARD))
 endif
 
-BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
+BUILD_FILES += $(EXECUTABLE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
 
 # variables used to compile and link c++
 ifneq (,$(filter cpp,$(USEMODULE)))
@@ -711,7 +711,7 @@ _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 # Only use --start-group when archives are defined
 ARCHIVES_GROUP = $(if $(ARCHIVES),$(LINKFLAGPREFIX)--start-group $(ARCHIVES) -lm $(LINKFLAGPREFIX)--end-group, -lm)
 
-$(ELFFILE): FORCE
+$(EXECUTABLE): FORCE
 ifeq ($(BUILDOSXNATIVE),1)
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
@@ -738,7 +738,7 @@ else
 link: ..compiler-check ..build-message $(BASELIBS) $(ARCHIVES) ..module-check
 endif # RIOTNOLINK
 
-$(ELFFILE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
+$(EXECUTABLE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 	$(Q)$(_LINK) -o $@
 
 .PHONY: $(APPLICATION_MODULE).module
@@ -758,7 +758,7 @@ _SUBMAKE_LIBS = $(filter-out $(APPLICATION_MODULE).module $(APPDEPS), $(BASELIBS
 $(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build $(GENSRC)
 
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
-print-size: $(ELFFILE)
+print-size: $(EXECUTABLE)
 	$(Q)$(SIZE) $(SIZEFLAGS) $<
 
 %.hex: %.$(EXECUTABLE_EXTENSION)
@@ -858,8 +858,8 @@ preflash: $(BUILD_BEFORE_FLASH)
 # graphical memory usage analyzer
 COSY_TOOL ?= $(PKGDIRBASE)/cosy/cosy.py
 COSY_PORT ?= 12345
-cosy: $(ELFFILE) $(COSY_TOOL)
-	$(COSY_TOOL) --port $(COSY_PORT) --riot-base $(RIOTBASE) $(APPDIR) $(BOARD) $(ELFFILE) $(MAPFILE)
+cosy: $(EXECUTABLE) $(COSY_TOOL)
+	$(COSY_TOOL) --port $(COSY_PORT) --riot-base $(RIOTBASE) $(APPDIR) $(BOARD) $(EXECUTABLE) $(MAPFILE)
 
 ifneq (,$(TERMLOG)$(TERMTEE))
   TERMTEE ?= | tee -a $(TERMLOG)
@@ -925,7 +925,7 @@ OBJDUMPFLAGS ?= -S -D -h
 
 objdump:
 	$(call check_cmd,$(OBJDUMP),Objdump program)
-	$(OBJDUMP) $(OBJDUMPFLAGS) $(ELFFILE) | less
+	$(OBJDUMP) $(OBJDUMPFLAGS) $(EXECUTABLE) | less
 
 # inlcude clang-tidy
 include $(RIOTMAKE)/clang_tidy.inc.mk

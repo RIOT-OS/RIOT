@@ -42,7 +42,7 @@ desvirt-stop: desvirt-check-topo-file
 
 desvirt-topology: desvirt-check-topo-args all
 	cd $(TOOL_DIR) && \
-	./topology_creator -e $(ELFFILE) -n riot_native -r ieee802154 -s$(TOPO_SIZE) -t$(TOPO_TYPE) -f $(TOPO_TYPE)$(TOPO_SIZE)
+	./topology_creator -e $(EXECUTABLE) -n riot_native -r ieee802154 -s$(TOPO_SIZE) -t$(TOPO_TYPE) -f $(TOPO_TYPE)$(TOPO_SIZE)
 
 desvirt-list: desvirt-check
 	cd $(TOOL_DIR) && ./vnet -l

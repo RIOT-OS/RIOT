@@ -13,4 +13,4 @@ DEBUGSERVER = st-util
 # define st-flash parameters
 FLASHFILE ?= $(BINFILE)
 FFLAGS = write $(FLASHFILE) 0x8000000
-DEBUGGER_FLAGS = $(RIOTBOARD)/f4vi1/dist/gdb.conf $(DEBUG_ELFFILE)
+DEBUGGER_FLAGS = $(RIOTBOARD)/f4vi1/dist/gdb.conf $(DEBUG_EXECUTABLE)
