@@ -38,6 +38,11 @@
 #  include <net/if.h>
 #  include <ifaddrs.h>
 #  include <net/if_dl.h>
+#elif defined(__APPLE__)
+#  include <net/if.h>
+#  include <sys/types.h>
+#  include <ifaddrs.h>
+#  include <net/if_dl.h>
 #else
 #  include <net/if.h>
 #  include <linux/if_tun.h>
@@ -334,6 +339,11 @@ static void _tap_isr(int fd, void *arg) {
 static int _init(netdev_t *netdev)
 {
     DEBUG("%s:%s:%u\n", __FILE__, __func__, __LINE__);
+    
+# ifdef __APPLE__
+    DEBUG("tuntap is not supported on macOS.\n")
+    return -ENOTSUP;
+# endif
 
     netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
@@ -368,6 +378,9 @@ static int _init(netdev_t *netdev)
         }
         real_freeifaddrs(iflist);
     }
+# elif defined(__APPLE__) /* Darwin */
+    (void)name;
+    (void)ifr;
 # else /* Linux */
     memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;

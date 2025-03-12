@@ -110,6 +110,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     speed_t speed;
 
+# ifdef __APPLE__
+    if (baudrate > 230400) {
+        DEBUG("baudrate %" PRIu32 " is not supported on macOS\n", baudrate);
+    }
+# endif
+
     switch (baudrate) {
     case 0: speed = B0; break;
     case 50: speed = B50; break;
@@ -130,6 +136,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     case 57600: speed = B57600; break;
     case 115200: speed = B115200; break;
     case 230400: speed = B230400; break;
+
+# ifndef __APPLE__
     case 460800 : speed =  B460800; break;
     case 500000 : speed =  B500000; break;
     case 576000 : speed =  B576000; break;
@@ -142,6 +150,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     case 3000000: speed =  B3000000; break;
     case 3500000: speed =  B3500000; break;
     case 4000000: speed =  B4000000; break;
+# endif
 
     default:
         return UART_NOBAUD;

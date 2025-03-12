@@ -23,6 +23,11 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
+/* Prevent <uuid/uuid.h> from being imported. Fixes redefinition of uuid_t. */
+#if defined(__APPLE__) && !defined(_UUID_T)
+#  define _UUID_T
+#endif
+
 #ifndef UUID_H
 #define UUID_H
 
@@ -55,6 +60,10 @@ extern "C" {
  * @name Version part of the time_hi field
  */
 #define UUID_VERSION_MASK   (0xF000)
+
+#ifdef __APPLE__
+#  undef uuid_t
+#endif
 
 /**
  * @brief UUID layout

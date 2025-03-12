@@ -24,7 +24,12 @@
 /**
  * @brief Generates platform-dependent symbol name
  */
-#define SYMBOL(name) name
+#if defined(__APPLE__)
+/* https://clang.llvm.org/docs/AttributeReference.html#asm */
+#  define SYMBOL(name) _##name
+#else
+#  define SYMBOL(name) name
+#endif
 
 /**
  * @brief Defines new global symbol
@@ -40,8 +45,15 @@
  * @param symbol Symbol whose memory contents to load
  */
 .macro LOADMEM register, symbol
+# if defined(__APPLE__) /* Mach-O on Darwin on Apple Silicon (64-bit ARM) */
+    /* Read more about loading possibly nonlocal data here:
+     * https://github.com/below/HelloSilicon#chapter-4-controlling-program-flow */
+    adrp    \register, \symbol@PAGE
+    ldr     \register, [\register, \symbol@PAGEOFF]
+# else /* ELF on GNU/Linux */
     ldr     \register, =\symbol
     ldr     \register, [\register]
+# endif
 .endm
 
 /**
@@ -51,8 +63,15 @@
  * @param symbol Symbol pointing to memory location to write to
  */
 .macro STOREMEM value, register, symbol
+# if defined(__APPLE__) /* Mach-O on Darwin on Apple Silicon (64-bit ARM) */
+    /* Read more about loading possibly nonlocal data here:
+     * https://github.com/below/HelloSilicon#chapter-4-controlling-program-flow */
+    adrp    \register, \symbol@PAGE
+    str     \value, [\register, \symbol@PAGEOFF]
+# else /* ELF on GNU/Linux */
     ldr     \register, =\symbol
     str     \value, [\register]
+# endif
 .endm
 
 .text
