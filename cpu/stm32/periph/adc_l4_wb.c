@@ -54,8 +54,11 @@
    works on all channels.
    TCONV = Sampling time + 12.5 ADC clock cycles (RM section 18.4.12)
    At 80MHz this means we need to set SMP to 001 (6.5 ADC clock cycles) to
-   stay within specs. (80000000/(6.5+12.5)) = 4210526 */
-#define ADC_SMP_MIN_VAL      (0x1)
+   stay within specs. (80000000/(6.5+12.5)) = 4210526. */
+#define ADC_SMP_MIN_VAL    (0x2)
+/* Reading the battery voltage V_BAT is much slower and requires 92.5
+   ADC clock cycles. */
+#define ADC_SMP_VBAT_VAL    (0x5)
 
 /* The sampling time width is 3 bit */
 #define ADC_SMP_BIT_WIDTH    (3)
@@ -191,15 +194,21 @@ int adc_init(adc_t line)
         dev(line)->SQR1 &= ~ADC_SQR1_L_Msk;
     }
 
+    /* determine the right sampling time */
+    uint32_t smp_time = ADC_SMP_MIN_VAL;
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        smp_time = ADC_SMP_VBAT_VAL;
+    }
+
     /* configure sampling time for the given channel */
     if (adc_config[line].chan < ADC_SMPR2_FIRST_CHAN) {
-        dev(line)->SMPR1 =  (ADC_SMP_MIN_VAL << (adc_config[line].chan *
-                                                 ADC_SMP_BIT_WIDTH));
+        dev(line)->SMPR1 =  (smp_time << (adc_config[line].chan
+                                         * ADC_SMP_BIT_WIDTH));
     }
     else {
-        dev(line)->SMPR2 =  (ADC_SMP_MIN_VAL << ((adc_config[line].chan -
-                                                  ADC_SMPR2_FIRST_CHAN)
-                                                 * ADC_SMP_BIT_WIDTH));
+        dev(line)->SMPR2 =  (smp_time << ((adc_config[line].chan
+                                         - ADC_SMPR2_FIRST_CHAN)
+                                         * ADC_SMP_BIT_WIDTH));
     }
 
     /* free the device again */

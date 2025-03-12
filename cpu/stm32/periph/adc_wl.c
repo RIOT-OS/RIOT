@@ -148,8 +148,14 @@ int adc_init(adc_t line)
         /* set sequence length to 1 conversion */
         ADC->CFGR1 &= ~ADC_CFGR1_CONT;
 
-        /* Sampling time of 3.5 ADC clocks for all channels*/
+        /* Set Sampling Time Register 1 to 3.5 ADC Cycles for all GPIO-Channels
+         * and Sampling Time Register 2 to 39.5 ADC Cycles for VBat. Set the
+         * VBat channel to use Sampling Time Register 2. */
         ADC->SMPR = ADC_SMPR_SMP1_0;
+        if (IS_USED(MODULE_PERIPH_VBAT)) {
+            ADC->SMPR |= ADC_SMPR_SMP2_2 | ADC_SMPR_SMP2_0 |
+                         (1 << (adc_config[VBAT_ADC].chan+ ADC_SMPR_SMPSEL_Pos));
+        }
     }
 
     /* free the device again */

@@ -26,8 +26,18 @@
 #include "periph_conf.h"
 #include "periph/vbat.h"
 
-#define SMP_MIN         (0x2) /*< Sampling time for slow channels
-                                  (0x2 = 4.5 ADC clock cycles) */
+#define ADC_SMP_MIN_VAL     (0x2) /*< Sampling time for slow channels
+                                      (0x2 = 4.5 ADC clock cycles) */
+#define ADC_SMP_VBAT_VAL    (0x5) /*< Sampling time when the VBat channel
+                                      is read (0x5 = 61.5 ADC clock cycles) */
+
+/* The sampling time width is 3 bit */
+#define ADC_SMP_BIT_WIDTH    (3)
+
+/* The sampling time can be specified for each channel over SMPR1 and SMPR2.
+   This specifies the first channel that goes to SMPR2 instead of SMPR1. */
+#define ADC_SMPR2_FIRST_CHAN (10)
+
 #ifdef ADC1_COMMON
 #define ADC_INSTANCE    ADC1_COMMON
 #else
@@ -169,12 +179,21 @@ int adc_init(adc_t line)
         dev(line)->SQR1 |= (0 & ADC_SQR1_L);
     }
 
+    /* determine the right sampling time */
+    uint32_t smp_time = ADC_SMP_MIN_VAL;
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        smp_time = ADC_SMP_VBAT_VAL;
+    }
+
     /* Configure sampling time for the given channel */
     if (adc_config[line].chan < 10) {
-        dev(line)->SMPR1 =  (SMP_MIN << (adc_config[line].chan * 3));
+        dev(line)->SMPR1 = (smp_time << (adc_config[line].chan
+                                        * ADC_SMP_BIT_WIDTH));
     }
     else {
-        dev(line)->SMPR2 =  (SMP_MIN << ((adc_config[line].chan - 10) * 3));
+        dev(line)->SMPR2 = (smp_time << ((adc_config[line].chan
+                                        - ADC_SMPR2_FIRST_CHAN)
+                                        * ADC_SMP_BIT_WIDTH));
     }
 
     /* Power off and unlock device again */
