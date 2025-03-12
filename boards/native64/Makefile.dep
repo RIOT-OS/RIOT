@@ -1,1 +1,3 @@
-include $(RIOTBOARD)/native32/Makefile.dep
+USEMODULE += boards_common_native
+
+include $(RIOTBOARD)/common/native/Makefile.dep

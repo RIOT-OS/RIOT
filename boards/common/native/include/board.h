@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     boards_native32
+ * @ingroup     boards_common_native
  *
- * The native32 board uses call level hardware simulation
+ * The native boards use call level hardware simulation
  *
  * @{
  *
  * @file
- * @brief       Basic definitions for the native32 board
+ * @brief       Basic definitions for the native boards
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
@@ -95,7 +95,7 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef FS_NATIVE_DIR
-#define FS_NATIVE_DIR           "native32"  /**< Folder on the host fs exported to RIOT */
+#define FS_NATIVE_DIR           "native"  /**< Folder on the host fs exported to RIOT */
 #endif
 /** @} */
 
@@ -210,7 +210,7 @@ static const motor_driver_config_t motor_driver_config[] = {
  */
 #define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
 #define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
-/* on native32, anything can happen... */
+/* on native, anything can happen... */
 #define CONFIG_ZTIMER_USEC_MIN     (64)
 /** @} */
 
