@@ -7,15 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_spidev_linux
- * @{
- *
  * @file
- * @brief       Implementation of SPI access from Linux User Space
- *
- * @author      Frank Hessel <frank@fhessel.de>
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_spidev_linux
+ * @brief   Implementation of SPI access from Linux User Space
+ * @author  Frank Hessel <frank@fhessel.de>
  */
 
 #ifdef MODULE_PERIPH_SPIDEV_LINUX

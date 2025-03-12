@@ -7,15 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_pwm
- * @{
- *
  * @file
- * @brief       Low-level PWM driver implementation
- *
- * @author      Gilles DOFFE <g.doffe@gmail.com>
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_pwm
+ * @brief   Low-level PWM driver implementation
+ * @author  Gilles DOFFE <g.doffe@gmail.com>
  */
 
 #include <assert.h>

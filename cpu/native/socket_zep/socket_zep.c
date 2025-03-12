@@ -7,11 +7,9 @@
  */
 
 /**
- * @{
- *
  * @file
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
- * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
+ * @author Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <assert.h>
@@ -20,6 +18,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -88,19 +87,19 @@ static void _continue_reading(socket_zep_t *dev)
     FD_ZERO(&rfds);
     FD_SET(dev->sock_fd, &rfds);
 
-    _native_in_syscall++; /* no switching here */
+    _native_pending_syscalls_up(); /* no switching here */
 
     if (real_select(dev->sock_fd + 1, &rfds, NULL, NULL, &t) == 1) {
         int sig = SIGIO;
-        extern int _sig_pipefd[2];
-        real_write(_sig_pipefd[1], &sig, sizeof(sig));
-        _native_sigpend++;
+        extern int _signal_pipe_fd[2];
+        real_write(_signal_pipe_fd[1], &sig, sizeof(sig));
+        _native_pending_signals++;
     }
     else {
         native_async_read_continue(dev->sock_fd);
     }
 
-    _native_in_syscall--;
+    _native_pending_syscalls_down();
 }
 
 static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
@@ -640,5 +639,3 @@ void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal)
     hal->driver = &socket_zep_rf_ops;
     hal->priv = dev;
 }
-
-/** @} */

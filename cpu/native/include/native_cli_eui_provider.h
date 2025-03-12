@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_native
+ * @addtogroup cpu_native
  * @{
- *
- * @file
- * @brief       Command-line EUI provider for native
- *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
+/**
+ * @file
+ * @brief  Command-line EUI provider for native
+ * @author Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ */
 #ifndef NATIVE_CLI_EUI_PROVIDER_H
 #define NATIVE_CLI_EUI_PROVIDER_H
 
@@ -26,17 +26,17 @@ extern "C" {
 #endif
 
 /**
- * @name    parse a string as an EUI-64 and add it to the list of EUI-64s
+ * @brief    parse a string as an EUI-64 and add it to the list of EUI-64s
  *
- * @param s[in]     EUI-64 as hexadecimal string representation
+ * @param[in] s     EUI-64 as hexadecimal string representation
  */
 void native_cli_add_eui64(const char *s);
 
 /**
- * @name    Get a command-line provided EUI-64
+ * @brief    Get a command-line provided EUI-64
  *
  * @param index     index of ZEP device
- * @param addr[out] user supplied EUI-64
+ * @param[out] addr user supplied EUI-64
  *
  * @return 0 on success, negatvie if no more EUIs are available.
  */

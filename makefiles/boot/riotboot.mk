@@ -45,7 +45,7 @@ $(BINDIR_RIOTBOOT)/slot0.elf: ROM_OFFSET=$(SLOT0_IMAGE_OFFSET)
 $(BINDIR_RIOTBOOT)/slot1.elf: FW_ROM_LEN=$$((SLOT1_LEN - $(RIOTBOOT_HDR_LEN)))
 $(BINDIR_RIOTBOOT)/slot1.elf: ROM_OFFSET=$(SLOT1_IMAGE_OFFSET)
 SLOT_RIOT_ELFS = $(BINDIR_RIOTBOOT)/slot0.elf $(BINDIR_RIOTBOOT)/slot1.elf
-DEBUG_ELFFILE ?= $(BINDIR_RIOTBOOT)/slot0.elf
+DEBUG_EXECUTABLE ?= $(BINDIR_RIOTBOOT)/slot0.elf
 
 # ensure both slot elf files are always linked
 # this ensures that both "make test" and "make test-murdock" can rely on them

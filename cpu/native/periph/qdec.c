@@ -7,16 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_qdec
- * @{
- *
  * @file
- * @brief       Low-level QDEC driver implementation
- *
- * @author      Gilles DOFFE <g.doffe@gmail.com>
- *
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_qdec
+ * @brief   Low-level QDEC driver implementation
+ * @author  Gilles DOFFE <g.doffe@gmail.com>
  */
 
 #include <time.h>

@@ -24,6 +24,10 @@
 #include <endian.h>
 #include "unaligned.h"
 
+#ifdef __APPLE__
+#  include <machine/endian.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -339,6 +343,7 @@ static inline void byteorder_htobebufl(uint8_t *buf, uint32_t val);
  */
 static inline void byteorder_htobebufll(uint8_t *buf, uint64_t val);
 
+#if !defined(__APPLE__) || defined(DOXYGEN)
 /**
  * @brief          Convert from host byte order to network byte order, 16 bit.
  * @see            byteorder_htons()
@@ -386,6 +391,8 @@ static inline uint32_t ntohl(uint32_t v);
  * @returns        Converted integer.
  */
 static inline uint64_t ntohll(uint64_t v);
+
+#endif /* !defined(__APPLE__) || defined(DOXYGEN) */
 
 /* **************************** IMPLEMENTATION ***************************** */
 
@@ -518,6 +525,8 @@ static inline uint64_t byteorder_ntohll(network_uint64_t v)
     return be64toh(v.u64);
 }
 
+#if !defined(__APPLE__) || defined(DOXYGEN)
+
 static inline uint16_t htons(uint16_t v)
 {
     return htobe16(v);
@@ -547,6 +556,8 @@ static inline uint64_t ntohll(uint64_t v)
 {
     return be64toh(v);
 }
+
+#endif /* !defined(__APPLE__) || defined(DOXYGEN) */
 
 static inline uint16_t byteorder_bebuftohs(const uint8_t *buf)
 {

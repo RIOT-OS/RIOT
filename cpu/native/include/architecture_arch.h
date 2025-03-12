@@ -7,16 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_native
+ * @addtogroup cpu_native
  * @{
- *
- * @file
- * @brief       Architecture details
- *
- * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- *
  */
 
+/**
+ * @file
+ * @brief Architecture details
+ * @author Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ */
 #ifndef ARCHITECTURE_ARCH_H
 #define ARCHITECTURE_ARCH_H
 
@@ -33,17 +32,17 @@ void native_breakpoint(void);
 
 /* Doc is provided centrally in architecture.h, hide this from Doxygen */
 #ifndef DOXYGEN
-#if (__SIZEOF_POINTER__ == 8)
-#define ARCHITECTURE_WORD_BITS      (64U)
-#else
-#define ARCHITECTURE_WORD_BITS      (32U)
-#endif
-#define ARCHITECTURE_BREAKPOINT(v)  native_breakpoint()
+#  if (__SIZEOF_POINTER__ == 8)
+#    define ARCHITECTURE_WORD_BITS      (64U)
+#  else
+#    define ARCHITECTURE_WORD_BITS      (32U)
+#  endif
+#  define ARCHITECTURE_BREAKPOINT(v)  native_breakpoint()
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */
 #endif /* ARCHITECTURE_ARCH_H */
+/** @} */

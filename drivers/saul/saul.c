@@ -31,5 +31,9 @@ int saul_write_notsup(const void *dev, const phydat_t *dat)
 
 /* No need to consume ROM for a second implementation, just create an
  * alias symbol to saul_write_notsup */
+#if defined(__APPLE__)
+#  pragma weak saul_write_notsup = saul_read_notsup
+#else
 __attribute__((alias("saul_write_notsup")))
+#endif
 int saul_read_notsup(const void *dev, phydat_t *dat);

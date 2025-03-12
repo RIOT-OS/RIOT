@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup     drivers_netdev
- * @brief       Low-level ethernet driver for native tap interfaces
+ * @addtogroup drivers_netdev
  * @{
- *
+ */
+
+/**
  * @file
- * @brief       Definitions for @ref netdev ethernet driver for host system's
- *              TAP interfaces
- *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief  Definitions for @ref netdev ethernet driver for host system's
+ *         TAP interfaces
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  */
 #ifndef NETDEV_TAP_H
 #define NETDEV_TAP_H
@@ -30,8 +30,17 @@ extern "C" {
 
 #include "net/ethernet/hdr.h"
 
-#include "net/if.h"
+#if defined(__APPLE__)
+#  include "net/if_var.h"
+#else
+#  include "net/if.h"
+#endif
 
+/* MARK: - Low-level ethernet driver for native tap interfaces */
+/**
+ * @name Low-level ethernet driver for native tap interfaces
+ * @{
+ */
 /**
  * @brief tap interface state
  */
@@ -63,9 +72,11 @@ typedef struct {
  *                  If initialized manually, pass a unique identifier instead.
  */
 void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int index);
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
-/** @} */
+
 #endif /* NETDEV_TAP_H */
+/** @} */

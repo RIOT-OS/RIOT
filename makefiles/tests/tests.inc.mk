@@ -88,7 +88,7 @@ test-with-config/check-config:
 
 RIOT_TEST_HASH_DIR ?= $(BINDIR)
 
-# this target only makes sense if an ELFFILE is actually created, thus guard by
+# this target only makes sense if an EXECUTABLE is actually created, thus guard by
 # RIOTNOLINK="".
 ifeq (,$(RIOTNOLINK))
   ifeq (,$(HASHFILE))

@@ -34,7 +34,7 @@ ifeq (,$(filter iotlab-exp,$(MAKECMDGOALS)))
 endif
 
 ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
-  BINARY := $(ELFFILE)
+  BINARY := $(EXECUTABLE)
 else
   BINARY := $(HEXFILE)
 endif

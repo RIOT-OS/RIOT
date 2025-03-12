@@ -7,16 +7,16 @@
  */
 
 /**
- * @ingroup    drivers_mtd
+ * @addtogroup drivers_mtd
  * @defgroup   drivers_mtd_native Native MTD
+ * @brief      MTD flash emulation for native
  * @{
- * @brief       mtd flash emulation for native
- *
- * @file
- *
- * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
+/**
+ * @file
+ * @author Vincent Dupont <vincent@otakeys.com>
+ */
 #ifndef MTD_NATIVE_H
 #define MTD_NATIVE_H
 
@@ -42,5 +42,4 @@ extern const mtd_desc_t native_flash_driver;
 #endif
 
 #endif /* MTD_NATIVE_H */
-
 /** @} */

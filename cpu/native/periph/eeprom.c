@@ -7,15 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_eeprom
- * @{
- *
  * @file
- * @brief       Low-level EEPROM driver implementation for native
- *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_eeprom
+ * @brief   Low-level EEPROM driver implementation for native
+ * @author  Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #include <stdio.h>

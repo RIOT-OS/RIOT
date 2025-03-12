@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
@@ -8,12 +8,13 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_timer
- * @{
- *
  * @file
- * @brief       Native CPU periph/timer.h implementation
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_timer
+ * @brief   Native CPU periph/timer.h implementation
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @{
  *
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  * This is done with the timer_settime(3), timer_create(3)  interfaces, which are
@@ -22,11 +23,18 @@
  * This is based on native's hwtimer implementation by Ludwig Knüpfer.
  * I removed the multiplexing, as ztimer does the same. (kaspar)
  *
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- *
  * @}
  */
+
+#ifdef __APPLE__
+#  include <mach/clock.h>
+#  include <mach/mach_init.h>
+#  include <mach/mach_port.h>
+#  include <mach/mach_host.h>
+
+/* HACK: Both macOS and RIOT typedef thread_t. timer.c does not use either thread_t. */
+#  define thread_t riot_thread_t
+#endif
 
 #include <signal.h>
 #include <stdint.h>
@@ -35,10 +43,15 @@
 #include <sys/time.h>
 #include <time.h>
 
+
+
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "native_internal.h"
 #include "panic.h"
+#ifdef __APPLE__
+#  include "timer_darwin.h"
+#endif
 #include "periph/timer.h"
 #include "time_units.h"
 
@@ -121,7 +134,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
         return -1;
     }
 
-    if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
+    if (native_register_interrupt(SIGALRM, native_isr_timer) != 0) {
         DEBUG_PUTS("Failed to register SIGALRM handler");
         timer_delete(itimer_monotonic);
         return -1;
