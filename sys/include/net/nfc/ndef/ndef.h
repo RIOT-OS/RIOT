@@ -10,7 +10,7 @@
 #define NDEF_H
 
 /**
- * @ingroup     sys/net/nfc
+ * @ingroup     nfc
  * @{
  *
  * @file
@@ -50,7 +50,7 @@
  */
 #define NDEF_RECORD_LONG_PAYLOAD_LENGTH_SIZE  4
 
-#ifndef MAX_NDEF_RECORD_COUNT
+#ifndef CONFIG_NDEF_MAX_RECORD_COUNT
 /**
  * @brief Specifies how many NDEF records can be stored in one NDEF message
  */
@@ -67,16 +67,16 @@ typedef struct {
     uint8_t *memory;
 
     /**
-     * @brief Size of the memory buffer that can't be exceeded
+     * @brief Pointer to the end of the memory
+     *
+     * @note The end is the last byte of the memory buffer
      */
-    uint32_t memory_size;
+    uint8_t *memory_end;
 
     /**
-     * @brief Index to the last byte + 1 of the memory buffer
-	 *
-	 * @note It is identical to the length of the data
+     * @brief Pointer to the next free memory location
      */
-    uint32_t cursor;
+    uint8_t *cursor;
 } ndef_buffer_t;
 
 /**
@@ -88,85 +88,78 @@ typedef enum {
 } ndef_record_type_t;
 
 /**
- * @brief Describes a NDEF record
+ * @brief Describes an NDEF record
  *
- * @note This descritor struct contains only pointers to the correct
+ * @note This descriptor struct contains only pointers to the correct
  * positions in the NDEF message.
  */
 typedef struct {
     /**
-	 * @brief Points to the start of the record in the NDEF message
-	 */
-    uint8_t *start;
-
-    /**
-	 * @brief Points to the header of the record
-	 */
+     * @brief Points to the header of the record
+     */
     uint8_t *header;
 
     /**
-	 * @brief Points to the type length field
-	 */
+     * @brief Points to the type length field
+     */
     uint8_t *type_length;
 
     /**
-	 * @brief Points to the type field
-	 */
+     * @brief Points to the type field
+     */
     uint8_t *type;
 
     /**
-	 * @brief Points to the ID length field
-	 */
+     * @brief Points to the ID length field
+     */
     uint8_t *id_length;
 
     /**
-	 * @brief Points to the ID field
-	 */
+     * @brief Points to the ID field
+     */
     uint8_t *id;
 
     /**
-	 * @brief Record type of this record
-	 */
+     * @brief Record type of this record
+     */
     ndef_record_type_t record_type;
 
     /**
-	 * @brief Points to the payload length field
-	 */
+     * @brief Points to the payload length field
+     */
     uint8_t *payload_length;
 
     /**
-	 * @brief Points to the payload field
-	 */
+     * @brief Points to the payload field
+     */
     uint8_t *payload;
 } ndef_record_desc_t;
 
+/**
+ * @brief Enum for the Type Name Format (TNF) of an NDEF record
+ *
+ * @note The TNF specifies the structure of the type field of the record.
+ */
 typedef enum {
     /** The value indicates that there is no type or payload. */
-    TNF_EMPTY = 0x00,
+    NDEF_TNF_EMPTY = 0x00,
     /** NFC Forum well-known type [NFC RTD]. */
-    TNF_WELL_KNOWN = 0x01,
+    NDEF_TNF_WELL_KNOWN = 0x01,
     /** Media-type as defined in RFC 2046 [RFC 2046]. */
-    TNF_MEDIA_TYPE = 0x02,
+    NDEF_TNF_MEDIA_TYPE = 0x02,
     /** Absolute URI as defined in RFC 3986 [RFC 3986]. */
-    TNF_ABSOLUTE_URI = 0x03,
+    NDEF_TNF_ABSOLUTE_URI = 0x03,
     /** NFC Forum external type [NFC RTD]. */
-    TNF_EXTERNAL_TYPE = 0x04,
+    NDEF_TNF_EXTERNAL_TYPE = 0x04,
     /** The value indicates that there is no type associated with this
-	 *  record.
-	 */
-    TNF_UNKNOWN_TYPE = 0x05,
+     *  record.
+     */
+    NDEF_TNF_UNKNOWN_TYPE = 0x05,
     /** The value is used for the record chunks used in chunked payload. */
-    TNF_UNCHANGED = 0x06,
+    NDEF_TNF_UNCHANGED = 0x06,
     /** The value is reserved for future use. */
-    TNF_RESERVED = 0x07,
+    NDEF_TNF_RESERVED = 0x07,
 } ndef_record_tnf_t;
-
-typedef enum {
-    NDEF_FIRST_RECORD = 0x80,  /** First record. */
-    NDEF_MIDDLE_RECORD = 0x00, /** Middle record. */
-    NDEF_LAST_RECORD = 0x40,   /** Last record. */
-    NDEF_LONE_RECORD = 0xC0    /** Only one record in the message. */
-} ndef_record_location_t;
 
 /**
  * @brief NDEF struct
@@ -175,23 +168,23 @@ typedef enum {
  */
 typedef struct {
     /**
-	 * @brief Buffer containing the data
-	 */
+     * @brief Buffer containing the data
+     */
     ndef_buffer_t buffer;
 
     /**
-	 * @brief Array of NDEF record descriptors
-	 */
+     * @brief Array of NDEF record descriptors
+     */
     ndef_record_desc_t records[MAX_NDEF_RECORD_COUNT];
 
     /**
-	 * @brief Number of records in the NDEF message
-	 */
+     * @brief Number of records in the NDEF message
+     */
     uint32_t record_count;
 } ndef_t;
 
 /**
- * @brief Pretty prints the NDEF message in human readable format.
+ * @brief Pretty prints the NDEF message in human-readable format.
  *
  * @param[in] ndef NDEF message to print
  */
@@ -237,11 +230,13 @@ void ndef_init(ndef_t *message, uint8_t *buffer, uint32_t buffer_size);
  * @return 			0 if successful
  * @return 			error otherwise
  */
-int ndef_add_record(ndef_t *message, const uint8_t *type, uint8_t type_length, const uint8_t *id, uint8_t id_length, const uint8_t *payload, uint32_t payload_length, ndef_record_tnf_t tnf);
+int ndef_add_record(ndef_t *message, const uint8_t *type, uint8_t type_length, const uint8_t *id,
+                    uint8_t id_length, const uint8_t *payload,
+                    uint32_t payload_length, ndef_record_tnf_t tnf);
 
 /**
  * @brief Calculates the expected size of an NDEF record
- * 
+ *
  * @param[in] type_length       Length of type field
  * @param[in] id_length         Length of ID field
  * @param[in] payload_length    Length of payload field
@@ -250,7 +245,7 @@ int ndef_add_record(ndef_t *message, const uint8_t *type, uint8_t type_length, c
 size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32_t payload_length);
 
 /**
- * @brief Returns the size of the NDEF message
+ * @brief Returns the current size of the NDEF message
  *
  * @param[in] message NDEF message
  * @return size_t Size of the message
@@ -260,10 +255,10 @@ size_t ndef_get_size(const ndef_t *message);
 /**
  * @brief Removes the last record from the NDEF message
  *
- * @param[in,out] message Message to remove the record from
+ * @param[in,out] message Message to remove the last record from
  * @return 0 if successful, error otherwise
  */
-int ndef_remove_record(ndef_t *message);
+int ndef_remove_last_record(ndef_t *message);
 
 /**
  * @brief Removes all records from the NDEF message
@@ -272,9 +267,113 @@ int ndef_remove_record(ndef_t *message);
  */
 void ndef_clear(ndef_t *message);
 
-#include "net/nfc/ndef/ndef_text_payload.h"
-#include "net/nfc/ndef/ndef_uri_payload.h"
-#include "net/nfc/ndef/ndef_mime_payload.h"
+/**
+ * @brief NDEF text encoding
+ */
+typedef enum {
+    UTF8 = 0,
+    UTF16 = 1
+} ndef_text_encoding_t;
+
+/**
+ * @brief Adds an NDEF text record to the NDEF message
+ *
+ * @note The text record is added to the end of the NDEF message.
+ *
+ * @param[in,out]   message             NDEF message
+ * @param[in]       text                Text to add
+ * @param[in]       text_length         Length of the text
+ * @param[in]       lang_code           Language code
+ * @param[in]       lang_code_length    Length of the language code
+ * @param[in]       encoding            Encoding of the text
+ * @return int
+ */
+int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length,
+                         const char *lang_code, uint8_t lang_code_length,
+                         ndef_text_encoding_t encoding);
+
+/**
+ * @brief Calculates the size of an NDEF text record
+ *
+ * @param[in] text_length       Length of the text
+ * @param[in] lang_code_length  Length of the language code
+ * @return size_t Size of the text record
+ */
+size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang_code_length);
+
+/**
+ * @brief NDEF URI types
+ */
+typedef enum {
+    NDEF_URI_NA = 0x00,
+    NDEF_URI_HTTP_WWW = 0x01,
+    NDEF_URI_HTTPS_WWW = 0x02,
+    NDEF_URI_HTTP = 0x03,
+    NDEF_URI_HTTPS = 0x04,
+    NDEF_URI_TEL = 0x05,
+    NDEF_URI_MAILTO = 0x06,
+    NDEF_URI_FTP_ANONYMOUS = 0x07,
+    NDEF_URI_FTP_FTP = 0x08,
+    NDEF_URI_FTPS = 0x09,
+    NDEF_URI_SFTP = 0x0A,
+    NDEF_URI_SMB = 0x0B,
+    NDEF_URI_NFS = 0x0C,
+    NDEF_URI_FTP = 0x0D,
+    NDEF_URI_DAV = 0x0E,
+    NDEF_URI_NEWS = 0x0F,
+    NDEF_URI_TELNET = 0x10,
+    NDEF_URI_IMAP = 0x11,
+    NDEF_URI_RTSP = 0x12,
+    NDEF_URI_URN = 0x13,
+    NDEF_URI_POP = 0x14,
+    NDEF_URI_SIP = 0x15,
+    NDEF_URI_SIPS = 0x16,
+    NDEF_URI_TFTP = 0x17,
+    NDEF_URI_BTSPP = 0x18,
+    NDEF_URI_BTL2CAP = 0x19,
+    NDEF_URI_BTGOEP = 0x1A,
+    NDEF_URI_TCPOBEX = 0x1B,
+    NDEF_URI_IRDAOBEX = 0x1C,
+    NDEF_URI_FILE = 0x1D,
+    NDEF_URI_URN_EPC_ID = 0x1E,
+    NDEF_URI_URN_EPC_TAG = 0x1F,
+    NDEF_URI_URN_EPC_PAT = 0x20,
+    NDEF_URI_URN_EPC_RAW = 0x21,
+    NDEF_URI_URN_EPC = 0x22,
+    NDEF_URI_URN_NFC = 0x23
+} ndef_uri_identifier_code_t;
+
+/**
+ * @brief Adds an NDEF URI record to the NDEF message
+ *
+ * @param[in,out]   message             NDEF message
+ * @param[in]       identifier_code
+ * @param[in]       uri
+ * @param[in]       uri_length
+ * @return int
+ */
+int ndef_record_add_uri(ndef_t *message, ndef_uri_identifier_code_t identifier_code,
+                        const char *uri, uint32_t uri_length);
+
+/**
+ * @brief Calculates the size of an NDEF URI record
+ *
+ * @param[in] uri_length Length of the URI
+ * @return size_t
+ */
+size_t ndef_record_calculate_uri_size(uint32_t uri_length);
+
+int ndef_record_add_mime(ndef_t *message, const char *mime_type, uint32_t mime_type_length,
+                         const uint8_t *mime_payload, uint32_t mime_payload_length);
+
+/**
+ * @brief Calculates the size of an NDEF mime record
+ *
+ * @param[in] mime_type_length      Length of the MIME type
+ * @param[in] mime_payload_length   Lenght of the MIME payload
+ * @return size_t
+ */
+size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, uint32_t mime_payload_length);
 
 /** }@ */
 #endif

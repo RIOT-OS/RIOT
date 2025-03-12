@@ -17,7 +17,7 @@
 
 const uint8_t ndef_text_record_type[] = { 'T' };
 
-int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length,
+int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length,
                          const char *lang_code,
                          uint8_t lang_code_length, ndef_text_encoding_t encoding)
 {
@@ -37,7 +37,7 @@ int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length
 
     /* the payload will be written later */
     ndef_add_record(message, ndef_text_record_type, sizeof(ndef_text_record_type), NULL, 0, NULL,
-                    payload_length, TNF_WELL_KNOWN);
+                    payload_length, NDEF_TNF_WELL_KNOWN);
 
     ndef_write_to_buffer(message, &status_byte, 1);
     ndef_write_to_buffer(message, (uint8_t *)lang_code, lang_code_length);
@@ -46,7 +46,7 @@ int ndef_add_text_record(ndef_t *message, const char *text, uint32_t text_length
     return 0;
 }
 
-size_t ndef_calculate_text_record_size(uint32_t text_length, uint8_t lang_code_length)
+size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang_code_length)
 {
     size_t payload_size = STATUS_SIZE + lang_code_length + text_length;
     return ndef_calculate_record_size(sizeof(ndef_text_record_type), 0, payload_size);
