@@ -78,15 +78,36 @@ else
   LINKFLAGS += -ldl
 endif
 
-# XFA (cross file array) support
-LINKFLAGS += -T$(RIOTBASE)/cpu/native/ldscripts/xfa.ld
+ifeq ($(OS),Darwin)
+  # XFA (cross file array) support
+  LD_SCRIPTS  += xfa-darwin
 
-# fix this warning:
-# ```
-# /usr/bin/ld: examples/basic/hello-world/bin/native/cpu/tramp.o: warning: relocation against `_native_saved_eip' in read-only section `.text'
-# /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
-# ```
-LINKFLAGS += -no-pie
+  _XFA_DIR     = $(BINDIR)/core/xfa
+
+  # This file defines an alias for the first element of each array
+  # These are the XFAs themselves (names passed to XFA_INIT/XFA_USE)
+  _XFA_ASM     = $(_XFA_DIR)/aliases.s
+
+  # This is the object generated from the assembly file above
+  _XFA_OBJ     = $(_XFA_DIR)/aliases.o
+
+  # This is a list of symbols starting with __xfa__ extracted from all objects
+  # During the build, we sort this list of symbols
+  _XFA_SYMBOLS = $(_XFA_DIR)/symbols.txt
+
+  # The order_file ensures the priorities are respected
+	LINKFLAGS += $(LINKFLAGPREFIX)-order_file $(LINKFLAGPREFIX)$(_XFA_SYMBOLS)
+else
+  # XFA (cross file array) support
+  LINKFLAGS += -T$(RIOTBASE)/cpu/native/ldscripts/xfa.ld
+  
+	# fix this warning:
+	# ```
+	# /usr/bin/ld: examples/basic/hello-world/bin/native/cpu/tramp.o: warning: relocation against `_native_saved_eip' in read-only section `.text'
+	# /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+	# ```
+	LINKFLAGS += -no-pie
+endif
 
 # clean up unused functions
 CFLAGS += -ffunction-sections -fdata-sections
@@ -165,3 +186,29 @@ eval-gprof:
 
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
+
+# On macOS, cross-file arrays cannot be built using __attribute__((section("..."))) annotations
+# that are later sorted using a linker script as linker scripts aren't supported by the macOS
+# linker. Additionally, section names cannot exceed a certain length, preventing us from using
+# cross-file array names as section names. Instead, we redefine the name of each cross-file array
+# with the redefine_extname pragma. Each XFA definition contributes an __xfa__$...$__end__ symbol.
+# We collect these end symbols from each binary and create a corresponding __start__ symbol (alias)
+# that points to the first element of the cross-file array. If no elements are defined,
+# __start__ automatically refers to __end__. __start__ is an alias, __end__ takes up space.
+xfa-darwin: $(BASELIBS) $(ARCHIVES)
+	$(Q)mkdir -p $(_XFA_DIR)
+	$(Q)echo "" > $(_XFA_SYMBOLS)
+	$(Q)echo "" > $(_XFA_ASM)
+	$(Q)for obj in $(ALL_OBJS); do \
+		nm -g $$obj | awk '{print $$3}' | grep -E '^(__xfa__|__roxfa__)' >> $(_XFA_SYMBOLS) || true; \
+	done
+	$(Q)sort $(_XFA_SYMBOLS) -o $(_XFA_SYMBOLS) || true
+	$(Q)for prefix in $$(grep -E '^(__xfa__|__roxfa__)\$$.*\$$__end__$$' $(_XFA_SYMBOLS) | sed -E 's/(^[^$$]+\$$[^$$]+).*$$/\1/'); do \
+		first_symbol=$$(grep -m 1 "^$$prefix" $(_XFA_SYMBOLS)); \
+		echo ".section __DATA,__data" >> $(_XFA_ASM); \
+		echo ".globl $${prefix}\$$0\$$__start__" >> $(_XFA_ASM); \
+		echo "$${prefix}\$$0\$$__start__ = $$first_symbol" >> $(_XFA_ASM); \
+		echo "$${prefix}\$$0\$$__start__" >> $(_XFA_SYMBOLS); \
+	done
+	$(Q)sort $(_XFA_SYMBOLS) -o $(_XFA_SYMBOLS) || true
+	$(Q)$(AS) $(ASFLAGS) -o $(_XFA_OBJ) $(_XFA_ASM)
