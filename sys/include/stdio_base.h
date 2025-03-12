@@ -152,7 +152,7 @@ void stdio_close(void);
  * @param _write    write function
  */
 #define STDIO_PROVIDER(_type, _open, _close, _write)        \
-    XFA_CONST(stdio_provider_t, stdio_provider_xfa, 0) stdio_ ##_type = { \
+    XFA_CONST(stdio_provider_t, stdio_provider_xfa, 0, stdio_ ##_type) = { \
         .open = _open,                                      \
         .close = _close,                                    \
         .write = _write,                                    \

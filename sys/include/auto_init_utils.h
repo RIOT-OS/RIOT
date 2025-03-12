@@ -75,15 +75,13 @@ typedef struct {
  * @param   priority    Priority level @ref auto_init_prio_t
  */
 #define AUTO_INIT(function, priority)                                                   \
-    XFA_CONST(auto_init_module_t, auto_init_xfa, priority)                              \
-    auto_init_xfa_ ## function                                                          \
+    XFA_CONST(auto_init_module_t, auto_init_xfa, priority, auto_init_xfa_ ## function)  \
         = { .init = (auto_init_fn_t)function,                                           \
             .prio = priority,                                                           \
             .name = XTSTR(function) }
 #else
 #define AUTO_INIT(function, priority)                                                   \
-    XFA_CONST(auto_init_module_t, auto_init_xfa, priority)                              \
-    auto_init_xfa_ ## function                                                          \
+    XFA_CONST(auto_init_module_t, auto_init_xfa, priority, auto_init_xfa_ ## function)  \
         = { .init = (auto_init_fn_t)function }
 #endif
 
