@@ -26,6 +26,16 @@
  * @}
  */
 
+#ifdef __APPLE__
+#  include <mach/clock.h>
+#  include <mach/mach_init.h>
+#  include <mach/mach_port.h>
+#  include <mach/mach_host.h>
+
+/* HACK: Both macOS and RIOT typedef thread_t. timer.c does not use either thread_t. */
+#  define thread_t riot_thread_t
+#endif
+
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -33,10 +43,15 @@
 #include <sys/time.h>
 #include <time.h>
 
+
+
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "native_internal.h"
 #include "panic.h"
+#ifdef __APPLE__
+#  include "timer_darwin.h"
+#endif
 #include "periph/timer.h"
 #include "time_units.h"
 
