@@ -525,7 +525,15 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 
     ssize_t retval = coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
                                        coap_resources, coap_resources_numof);
+
     if (retval < 0) {
+        if (retval == -ECANCELED) {
+            DEBUG_PUTS("nanocoap: No-Response Option present and matching");
+            if (coap_get_type(pkt) == COAP_TYPE_CON) {
+                return coap_build_empty_ack(pkt, (void *)resp_buf);
+            }
+            return 0;
+        }
         /* handlers were not able to process this, so we reply with a RST,
          * unless we got a multicast message */
         const sock_udp_ep_t *local = coap_request_ctx_get_local_udp(ctx);
@@ -616,10 +624,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
                 payload = NULL;
             }
 
-            /* no-response requested, only send empty ACK or nothing */
-            if (type != COAP_TYPE_ACK) {
-                return 0;
-            }
+            return -ECANCELED;
         }
     }
 
@@ -715,18 +720,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 
         /* option contains bitmap of disinterest */
         if (no_response & mask) {
-            switch (coap_get_type(pkt)) {
-            case COAP_TYPE_NON:
-                /* no response and no ACK */
-                return 0;
-            default:
-                 /* There is an immediate ACK response, but it is an empty response */
-                code = COAP_CODE_EMPTY;
-                len = sizeof(coap_hdr_t);
-                tkl = 0;
-                payload_len = 0;
-                break;
-            }
+            return -ECANCELED;
         }
     }
 
