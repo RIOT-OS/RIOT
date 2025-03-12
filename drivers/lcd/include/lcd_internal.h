@@ -77,6 +77,8 @@ extern "C" {
 #define LCD_PIXSET_16BIT        0x55    /**< MCU and RGB 16 bit interface */
 #define LCD_PIXSET_18BIT        0x66    /**< MCU and RGB 18 bit interface (not implemented) */
 
+#define LCD_DELAY               0x80    /**< Driver delay command */
+
 #ifdef __cplusplus
 }
 #endif
