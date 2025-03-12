@@ -46,16 +46,16 @@ endif
 # checksum in one of the "reserved" fields. We don't generate this checksum when
 # compiling and linking the code, instead this make target computes the checksum
 # in another ELF file and we set it as the FLASHFILE.
-ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
-ELFFILE_CHECKSUM ?= $(ELFFILE:.elf=-checksum.elf)
-ELFFILE_SHADOW ?= $(ELFFILE:.elf=-shadow.elf)
+EXECUTABLE ?= $(BINDIR)/$(APPLICATION).elf
+EXECUTABLE_CHECKSUM ?= $(EXECUTABLE:.elf=-checksum.elf)
+EXECUTABLE_SHADOW ?= $(EXECUTABLE:.elf=-shadow.elf)
 
-$(ELFFILE_SHADOW): $(ELFFILE)
-	$(Q)cp $(ELFFILE) $(ELFFILE_SHADOW)
+$(EXECUTABLE_SHADOW): $(EXECUTABLE)
+	$(Q)cp $(EXECUTABLE) $(EXECUTABLE_SHADOW)
 
-$(ELFFILE_CHECKSUM): $(ELFFILE_SHADOW)
+$(EXECUTABLE_CHECKSUM): $(EXECUTABLE_SHADOW)
 	$(Q)$(OBJCOPY) --dump-section .vectors=$<.vectors $<
 	$(Q)$(RIOTBOARD)/common/qn908x/dist/nxp_checksum.py $(if $(Q),--quiet) \
 	  $<.vectors
 	$(Q)$(OBJCOPY) --update-section .vectors=$<.vectors $< $@
-FLASHFILE ?= $(ELFFILE_CHECKSUM)
+FLASHFILE ?= $(EXECUTABLE_CHECKSUM)

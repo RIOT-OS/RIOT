@@ -88,7 +88,7 @@ export OBJDUMP               # The command used to create the assembly listing.
 export OBJDUMPFLAGS          # The parameter for OBJDUMP.
 export SIZE                  # The command to read to size of the ELF sections.
 export SIZEFLAGS             # The optional size flags.
-export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
+export UNDEF                 # Object files that the linker must include in the EXECUTABLE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
 export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
 # EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is stored
@@ -105,7 +105,7 @@ export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMLOG                    # Optional file to log "make term" output to.
 # TERMTEE                    # Optional pipe to redirect "make term" output. Default: '| tee -a ${TERMLOG}' when TERMLOG is defined else undefined.
 # PORT                       # The port to connect the TERMPROG to.
-export ELFFILE               # The unstripped result of the compilation.
+export EXECUTABLE               # The unstripped result of the compilation.
 export HEXFILE               # The 'intel hex' stripped result of the compilation.
 # BINFILE                    # The 'binary' stripped result of the compilation.
 # FLASHFILE                  # The output file used for flashing

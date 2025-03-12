@@ -50,8 +50,8 @@ ROM_LEN_BYTES = $(shell printf "0x%x\n" $$(($(ROM_LEN:%K=%*1024))))
 
 
 # test-elffile-overflow depends on $(BINFILE) to prevent:
-# * ROM_LEN to be passed to $(ELFFILE) generation
-# * dummy error message of wc not finding the .bin file (ELFFILE is not enough)
+# * ROM_LEN to be passed to $(EXECUTABLE) generation
+# * dummy error message of wc not finding the .bin file (EXECUTABLE is not enough)
 test-elffile-overflow: $(BINFILE) _test-elffile-overflow-runtest
 
 .PHONY: _test-elffile-overflow-runtest
@@ -64,7 +64,7 @@ _test-elffile-overflow-runtest: $(BINFILE)
 
 
 # Test `ROM_OFFSET` is removed from firmware rom length if the board defines it
-test-elffile-fw_rom_length: $(ELFFILE)
+test-elffile-fw_rom_length: $(EXECUTABLE)
 	$(Q)echo -n "Test rom offset subtracted from rom length in elffile: "
 	$(Q)\
 	if test -n "$(ROM_OFFSET)"; then \
@@ -80,12 +80,12 @@ test-elffile-fw_rom_length: $(ELFFILE)
 	fi
 
 
-# Test elffiles must not have $(ELFFILE) prerequisite as target specific
+# Test elffiles must not have $(EXECUTABLE) prerequisite as target specific
 # variables are used for configuration and they also apply to prerequisites.
 #
 # https://www.gnu.org/software/make/manual/make.html#Target_002dspecific
 
-ELFFILES_DEPS = $(BASELIBS) FORCE
+EXECUTABLES_DEPS = $(BASELIBS) FORCE
 
 
 # Compile elf files with different ROM_OFFSET
@@ -112,7 +112,7 @@ test-offset_%: $(BINDIR)/$(APPLICATION)_offset_%.elf
 	$(Q)echo [OK]
 
 $(BINDIR)/$(APPLICATION)_offset_%.elf: ROM_OFFSET=$*
-$(BINDIR)/$(APPLICATION)_offset_%.elf: $(ELFFILES_DEPS)
+$(BINDIR)/$(APPLICATION)_offset_%.elf: $(EXECUTABLES_DEPS)
 	$(Q)$(_LINK) -o $@
 .PRECIOUS: $(BINDIR)/$(APPLICATION)_offset_%.elf
 
@@ -135,7 +135,7 @@ test-fw_len_half_rom: $(BINDIR)/$(APPLICATION)_fw_len_half_rom.elf
 	fi
 	$(Q)echo [OK]
 $(BINDIR)/$(APPLICATION)_fw_len_half_rom.elf: FW_ROM_LEN=$$(($(ROM_LEN_BYTES)/2))
-$(BINDIR)/$(APPLICATION)_fw_len_half_rom.elf: $(ELFFILES_DEPS)
+$(BINDIR)/$(APPLICATION)_fw_len_half_rom.elf: $(EXECUTABLES_DEPS)
 	$(Q)$(_LINK) -o $@
 .PRECIOUS: $(BINDIR)/$(APPLICATION)_fw_len_half_rom.elf
 
@@ -154,7 +154,7 @@ test-assert_overflow_offset_and_romlen: ROM_OFFSET=0x1000
 test-assert_overflow_offset_and_romlen: FW_ROM_LEN=$(ROM_LEN_BYTES)
 
 .PHONY: test-assert_overflow_%
-test-assert_overflow_%: $(ELFFILES_DEPS)
+test-assert_overflow_%: $(EXECUTABLES_DEPS)
 	$(Q) echo -n "Test ROM overflow detection ($*): "
 	$(Q)\
 	{ $(_LINK) -o /dev/null 2>&1 | grep -q 'Specified firmware size does not fit in ROM' ; } \

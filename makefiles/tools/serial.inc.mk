@@ -101,5 +101,5 @@ else ifeq (${RIOT_TERMINAL},bootterm)
   TERMFLAGS = $(BOOTTERMFLAGS) -a -b $(BAUD) $(PORT)
   TERMDEPS += $(TERMPROG)
 else ifeq (${RIOT_TERMINAL},native)
-  TERMPROG ?= $(ELFFILE)
+  TERMPROG ?= $(EXECUTABLE)
 endif
