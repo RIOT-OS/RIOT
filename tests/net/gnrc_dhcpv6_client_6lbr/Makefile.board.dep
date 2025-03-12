@@ -1,5 +1,5 @@
 # Put board specific dependencies here
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   USEMODULE += netdev_tap
   USEMODULE += socket_zep
 else

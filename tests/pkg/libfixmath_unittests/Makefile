@@ -2,7 +2,7 @@ include ../Makefile.pkg_common
 
 USEMODULE += libfixmath-unittests
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   LINKFLAGS += -lm
 endif
 
@@ -13,6 +13,6 @@ CFLAGS += -Wno-error=strict-prototypes
 CFLAGS += -Wno-error=old-style-definition
 CFLAGS += -Wno-error=format
 
-TEST_ON_CI_WHITELIST += native native64
+TEST_ON_CI_WHITELIST += native32 native64
 
 include $(RIOTBASE)/Makefile.include

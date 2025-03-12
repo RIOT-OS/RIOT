@@ -42,7 +42,7 @@ ifndef CONFIG_GNRC_PKTBUF_SIZE
   CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=4096
 endif
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
 	CFLAGS += -DTHREAD_STACKSIZE_MAIN=8192
 else
 	CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048

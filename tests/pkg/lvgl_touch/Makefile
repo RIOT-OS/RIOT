@@ -20,7 +20,7 @@ USEMODULE += random
 include $(RIOTBASE)/Makefile.include
 
 # SDL requires more stack
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=64*1024
 else ifneq (,$(filter esp%,$(CPU_FAM)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=4*1024

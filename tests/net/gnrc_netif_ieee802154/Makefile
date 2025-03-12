@@ -1,8 +1,8 @@
-BOARD_WHITELIST = native native64 derfmega256 avr-rss2 atmega256rfr2-xpro nrf52840dongle
+BOARD_WHITELIST = native32 native64 derfmega256 avr-rss2 atmega256rfr2-xpro nrf52840dongle
 
 include ../Makefile.net_common
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   USEMODULE += socket_zep
   TERMFLAGS ?= -z "0.0.0.0:17755,localhost:17754"
   USEMODULE += netdev
@@ -29,6 +29,6 @@ USEMODULE += gnrc_netif_ieee802154
 # the application dumps received packets to stdout
 USEMODULE += gnrc_pktdump
 
-TEST_ON_CI_WHITELIST += native native64
+TEST_ON_CI_WHITELIST += native32 native64
 
 include $(RIOTBASE)/Makefile.include
