@@ -493,9 +493,11 @@ ifeq (,$(filter native native32 native64,$(BOARD)))
   endif
 endif
 
-# Append ldscript path after importing CPU and board makefiles to allow
-# overriding the core ldscripts
-LINKFLAGS += -L$(RIOTBASE)/core/ldscripts
+ifneq ($(OS),Darwin)
+  # Append ldscript path after importing CPU and board makefiles to allow
+  # overriding the core ldscripts
+  LINKFLAGS += -L$(RIOTBASE)/core/ldscripts
+endif
 
 # include undefined behaviour sanitizer (UBSAN) support
 include $(RIOTMAKE)/ubsan.inc.mk
@@ -711,13 +713,6 @@ _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 # Only use --start-group when archives are defined
 ARCHIVES_GROUP = $(if $(ARCHIVES),$(LINKFLAGPREFIX)--start-group $(ARCHIVES) -lm $(LINKFLAGPREFIX)--end-group, -lm)
 
-$(EXECUTABLE): FORCE
-ifeq ($(BUILDOSXNATIVE),1)
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
-else
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
-endif # BUILDOSXNATIVE
-
 COMPILE_COMMANDS_PATH ?= $(if $(findstring $(RIOTBASE),$(APPDIR)),$(RIOTBASE)/compile_commands.json, $(APPDIR)/compile_commands.json)
 COMPILE_COMMANDS_FLAGS ?= --clangd
 .PHONY: compile-commands
@@ -737,6 +732,15 @@ link: ..compiler-check ..build-message $(BUILD_FILES) print-size ..module-check
 else
 link: ..compiler-check ..build-message $(BASELIBS) $(ARCHIVES) ..module-check
 endif # RIOTNOLINK
+
+$(EXECUTABLE): FORCE
+
+ifneq ($(OS) $(CPU),Darwin native)
+  _LINKFLAGS = $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
+endif
+
+ALL_OBJS = $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort)
+_LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(ALL_OBJS) $(ARCHIVES_GROUP) $(LINKFLAGS) $(_LINKFLAGS)
 
 $(EXECUTABLE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 	$(Q)$(_LINK) -o $@

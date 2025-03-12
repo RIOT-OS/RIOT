@@ -20,8 +20,10 @@ ifneq (,$(filter can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter periph_timer,$(USEMODULE)))
-  # using timer_settime requires -lrt
-  LINKFLAGS += -lrt
+  ifneq ($(OS),Darwin)
+		# using timer_settime requires -lrt
+		LINKFLAGS += -lrt
+	endif
 endif
 
 TOOLCHAINS_SUPPORTED = gnu llvm afl
