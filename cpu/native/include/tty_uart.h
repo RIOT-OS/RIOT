@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_native
+ * @addtogroup cpu_native
  * @{
- *
- * @file
- * @brief       UART implementation based on /dev/tty devices on host
- *
- * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
+/**
+ * @file
+ * @brief  UART implementation based on /dev/tty devices on host
+ * @author Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ */
 #ifndef TTY_UART_H
 #define TTY_UART_H
 

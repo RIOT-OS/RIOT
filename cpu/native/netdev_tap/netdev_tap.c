@@ -9,13 +9,13 @@
  * more details.
  */
 
-/*
+/**
+ * @file
  * @ingroup drivers_netdev
- * @{
  * @brief   Low-level ethernet driver for tap interfaces
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
- * @}
  */
+
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
@@ -28,19 +28,20 @@
 #include <sys/ioctl.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <signal.h>
 
 /* needs to be included before native's declarations of ntohl etc. */
 #include "byteorder.h"
 
-#ifdef __FreeBSD__
-#include <sys/socket.h>
-#include <net/if.h>
-#include <ifaddrs.h>
-#include <net/if_dl.h>
+#if defined(__FreeBSD__)
+#  include <sys/socket.h>
+#  include <net/if.h>
+#  include <ifaddrs.h>
+#  include <net/if_dl.h>
 #else
-#include <net/if.h>
-#include <linux/if_tun.h>
-#include <linux/if_ether.h>
+#  include <net/if.h>
+#  include <linux/if_tun.h>
+#  include <linux/if_ether.h>
 #endif
 
 #include "native_internal.h"
@@ -209,14 +210,14 @@ static void _continue_reading(netdev_tap_t *dev)
     FD_ZERO(&rfds);
     FD_SET(dev->tap_fd, &rfds);
 
-    _native_in_syscall++; /* no switching here */
+    _native_pending_syscalls_up(); /* no switching here */
 
     if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
         int sig = SIGIO;
-        extern int _sig_pipefd[2];
+        extern int _signal_pipe_fd[2];
         extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
-        real_write(_sig_pipefd[1], &sig, sizeof(int));
-        _native_sigpend++;
+        real_write(_signal_pipe_fd[1], &sig, sizeof(int));
+        _native_pending_signals++;
         DEBUG("netdev_tap: sigpend++\n");
     }
     else {
@@ -224,7 +225,7 @@ static void _continue_reading(netdev_tap_t *dev)
         native_async_read_continue(dev->tap_fd);
     }
 
-    _native_in_syscall--;
+    _native_pending_syscalls_down();
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
@@ -342,20 +343,20 @@ static int _init(netdev_t *netdev)
     }
 
     char *name = dev->tap_name;
-#ifdef __FreeBSD__
+# ifdef __FreeBSD__
     char clonedev[255] = "/dev/"; /* XXX bad size */
     strncpy(clonedev + 5, name, 250);
-#else /* Linux */
+# else /* Linux */
     struct ifreq ifr;
     const char *clonedev = "/dev/net/tun";
-#endif
+# endif
     /* initialize device descriptor */
     dev->promiscuous = 0;
     /* implicitly create the tap interface */
     if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
-#if __FreeBSD__ /* FreeBSD */
+# if __FreeBSD__ /* FreeBSD */
     struct ifaddrs *iflist;
     if (real_getifaddrs(&iflist) == 0) {
         for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
@@ -367,12 +368,12 @@ static int _init(netdev_t *netdev)
         }
         real_freeifaddrs(iflist);
     }
-#else /* Linux */
+# else /* Linux */
     memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
     strncpy(ifr.ifr_name, name, IFNAMSIZ);
     if (real_ioctl(dev->tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
-        _native_in_syscall++;
+        _native_pending_syscalls_up();
         warn("ioctl TUNSETIFF");
         warnx("probably the tap interface (%s) does not exist or is already in use", name);
         real_exit(EXIT_FAILURE);
@@ -382,7 +383,7 @@ static int _init(netdev_t *netdev)
     memset(&ifr, 0, sizeof(ifr));
     snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", name);
     if (real_ioctl(dev->tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
-        _native_in_syscall++;
+        _native_pending_syscalls_up();
         warn("ioctl SIOCGIFHWADDR");
         if (real_close(dev->tap_fd) == -1) {
             warn("close");
@@ -393,7 +394,7 @@ static int _init(netdev_t *netdev)
 
     /* change mac addr so it differs from what the host is using */
     dev->addr[5]++;
-#endif
+# endif
     DEBUG("gnrc_tapnet_init(): dev->addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
             dev->addr[0], dev->addr[1], dev->addr[2],
             dev->addr[3], dev->addr[4], dev->addr[5]);

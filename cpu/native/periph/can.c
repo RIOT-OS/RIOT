@@ -7,16 +7,12 @@
  */
 
 /**
- * @ingroup     drivers_candev_linux
- * @{
- *
  * @file
- * @brief       Implementation of simulated CAN controller driver using SocketCAN on Linux
- *
- * @author      Hermann Lelong <hermann@otakeys.com>
- * @author      Aurelien Gonce <aurelien.gonce@altran.com>
- * @author      Vincent Dupont <vincent@otakeys.com>
- * @}
+ * @ingroup drivers_candev_linux
+ * @brief   Implementation of simulated CAN controller driver using SocketCAN on Linux
+ * @author  Hermann Lelong <hermann@otakeys.com>
+ * @author  Aurelien Gonce <aurelien.gonce@altran.com>
+ * @author  Vincent Dupont <vincent@otakeys.com>
  */
 
 #if !defined(__linux__)

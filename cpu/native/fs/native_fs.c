@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup     sys_fs_native
- * @{
- *
  * @file
- * @brief       native integration with vfs
- *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- *
- * @}
+ * @ingroup sys_fs_native
+ * @brief   Native integration with virtual filesystem (VFS)
+ * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <assert.h>
@@ -35,7 +30,7 @@
  * @brief Assign each native instance a sub-sirectory based on `_native_id`
  */
 #ifndef CONFIG_NATIVE_ISOLATE_FS
-#define CONFIG_NATIVE_ISOLATE_FS 0
+#  define CONFIG_NATIVE_ISOLATE_FS 0
 #endif
 
 /* Not using static inline functions here because they are also assigned to. */
@@ -58,14 +53,14 @@ static void _do_prefix(vfs_mount_t *mountp, const char *name, char *buffer, size
         res = snprintf(buffer, len, "%s%s", fs_desc->hostpath, name);
     }
 
-#ifdef NDEBUG
+#  ifdef NDEBUG
     if (res > len) {
         puts("fs_native: path larger than PATH_MAX");
         exit(ENOBUFS);
     }
-#else
+#  else
     assert(res <= len);
-#endif
+#  endif
 }
 
 static char *_prefix_path(vfs_mount_t *mountp, const char *name)

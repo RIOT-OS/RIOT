@@ -7,16 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_cpuid
- * @{
- *
  * @file
- * @brief       Implementation
- *
- * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_cpuid
+ * @brief   CPUID implementation
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #include <string.h>

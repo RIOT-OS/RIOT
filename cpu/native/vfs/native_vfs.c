@@ -7,13 +7,10 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @{
- *
  * @file
- * @brief       VFS wrappers for POSIX file I/O functions
- *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @ingroup cpu_native
+ * @brief   VFS wrappers for POSIX file I/O functions
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <errno.h>
@@ -145,5 +142,3 @@ int unlink(const char *path)
     }
     return 0;
 }
-
-/** @} */

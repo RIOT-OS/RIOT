@@ -8,14 +8,11 @@
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_hwrng
- * @{
- *
  * @file
- * @brief       HWRNG interface implementation
- *
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_hwrng
+ * @brief   HWRNG interface implementation
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #include <string.h>
@@ -35,9 +32,7 @@
 static int initialized = 0;
 static int dev_random = -1;
 
-/**********************************************************************
- * internal API declaration
- **********************************************************************/
+/* MARK: - Internal API declaration */
 
 /**
  * seed host random module with @ref _native_rng_seed
@@ -47,9 +42,7 @@ void _native_rng_init_hq(void);
 unsigned _native_rng_read_det(uint8_t *buf, unsigned num);
 unsigned _native_rng_read_hq(uint8_t *buf, unsigned num);
 
-/**********************************************************************
- * public API implementation
- **********************************************************************/
+/* MARK: - Public API implementation */
 
 void hwrng_init(void)
 {
@@ -94,9 +87,7 @@ void hwrng_read(void *buf, unsigned int num)
     }
 }
 
-/**********************************************************************
- * internal API implementation
- **********************************************************************/
+/* MARK: - Internal API implementation */
 
 void _native_rng_init_det(void)
 {
@@ -152,7 +143,3 @@ unsigned _native_rng_read_hq(uint8_t *buf, unsigned num)
 
     return offset;
 }
-
-/**
- * @}
- */

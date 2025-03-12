@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup drivers_socket_zep
+ * @addtogroup drivers_socket_zep
  * @{
- *
+ */
+
+/**
  * @file
- * @brief   Configuration parameters for the @ref drivers_socket_zep driver
- *
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @brief  Configuration parameters for the @ref drivers_socket_zep driver
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 #ifndef SOCKET_ZEP_PARAMS_H
 #define SOCKET_ZEP_PARAMS_H
@@ -30,8 +31,8 @@ extern "C" {
  * @note    This was decided to only be confiruable on compile-time to be
  *          more similar to actual boards
  */
-#ifndef SOCKET_ZEP_MAX
-#define SOCKET_ZEP_MAX              (1)
+#if !defined(SOCKET_ZEP_MAX) || defined(DOXYGEN)
+#  define SOCKET_ZEP_MAX              (1)
 #endif
 
 /**
