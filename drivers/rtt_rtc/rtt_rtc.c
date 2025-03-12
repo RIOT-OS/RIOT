@@ -50,7 +50,11 @@
    This means the date is undefined at cold boot, but will likely still
    survive a reboot. */
 #ifndef BACKUP_RAM
-#define BACKUP_RAM      __attribute__((section(".noinit")))
+#  ifdef __APPLE__
+#    define BACKUP_RAM      __attribute__((section("__DATA,noinit")))
+#  else
+#    define BACKUP_RAM      __attribute__((section(".noinit")))
+#  endif
 #endif
 
 static uint32_t rtc_now BACKUP_RAM;         /**< The RTC timestamp when the last RTT alarm triggered */

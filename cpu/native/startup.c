@@ -20,7 +20,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <features.h>
+#ifndef __APPLE__
+#  include <features.h>
+#endif
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -113,7 +115,7 @@ static const char short_opts[] = ":hi:s:deEoc:"
 #endif
     "";
 
-#if __GLIBC__
+#if __GLIBC__ || defined(__APPLE__)
 /* glibc and Apple's libSystem pass argc, argv, and envp to init_fini handlers */
 # define _HAVE_INIT_FINIT_PROGRAM_ARGUMENTS 1
 #else
