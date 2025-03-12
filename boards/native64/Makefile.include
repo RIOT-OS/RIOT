@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/native32/Makefile.include
+include $(RIOTBOARD)/common/native/Makefile.include
