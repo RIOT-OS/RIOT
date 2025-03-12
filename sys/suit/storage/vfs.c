@@ -272,4 +272,4 @@ suit_storage_vfs_t suit_storage_vfs = {
     },
 };
 
-XFA(suit_storage_t *, suit_storage_reg, 0) suit_storage_vfs_ptr = &suit_storage_vfs.storage;
+XFA(suit_storage_t *, suit_storage_reg, 0, suit_storage_vfs_ptr) = &suit_storage_vfs.storage;

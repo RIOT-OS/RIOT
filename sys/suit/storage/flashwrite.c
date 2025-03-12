@@ -244,4 +244,4 @@ static suit_storage_flashwrite_t suit_storage_flashwrite = {
     },
 };
 
-XFA(suit_storage_t *, suit_storage_reg, 0) suit_storage_flashwrite_ptr = &suit_storage_flashwrite.storage;
+XFA(suit_storage_t *, suit_storage_reg, 0, suit_storage_flashwrite_ptr) = &suit_storage_flashwrite.storage;
