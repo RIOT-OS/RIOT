@@ -1,3 +1,5 @@
-DIRS = $(RIOTBOARD)/native32
+MODULE = board
+
+DIRS += $(RIOTBOARD)/common/native
 
 include $(RIOTBASE)/Makefile.base
