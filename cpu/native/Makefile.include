@@ -1,5 +1,11 @@
 NATIVEINCLUDES += -I$(RIOTCPU)/native/include/
 
+ifeq ($(OS),Darwin)
+	EXECUTABLE_EXTENSION ?= macho
+else
+	EXECUTABLE_EXTENSION ?= elf
+endif
+
 ifneq (,$(filter periph_can,$(USEMODULE)))
   ifeq (,$(filter libsocketcan,$(USEPKG)))
     # link system libsocketcan if not using the provided package

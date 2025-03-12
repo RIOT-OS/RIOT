@@ -631,12 +631,17 @@ ifneq (,$(IOTLAB_NODE))
   endif
 endif
 
-ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
-HEXFILE ?= $(ELFFILE:.elf=.hex)
-BINFILE ?= $(ELFFILE:.elf=.bin)
+# Use .elf by default.
+# On native, EXECUTABLE_EXTENSION will have already been set to .macho or .elf
+EXECUTABLE_EXTENSION ?= elf
+_EXECUTABLE_BASE = $(BINDIR)/$(APPLICATION)
+
+ELFFILE ?= $(_EXECUTABLE_BASE).$(EXECUTABLE_EXTENSION)
+HEXFILE ?= $(_EXECUTABLE_BASE).hex
+BINFILE ?= $(_EXECUTABLE_BASE).bin
 HASHFILE ?= $(BINFILE)
-MAPFILE ?= $(ELFFILE:.elf=.map)
-LSTFILE ?= $(ELFFILE:.elf=.lst)
+MAPFILE ?= $(_EXECUTABLE_BASE).map
+LSTFILE ?= $(_EXECUTABLE_BASE).lst
 
 ifneq (,$(filter suit,$(USEMODULE)))
   include $(RIOTMAKE)/suit.base.inc.mk
@@ -756,13 +761,13 @@ $(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build $(GENSRC)
 print-size: $(ELFFILE)
 	$(Q)$(SIZE) $(SIZEFLAGS) $<
 
-%.hex: %.elf
+%.hex: %.$(EXECUTABLE_EXTENSION)
 	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex $< $@
 
-%.bin: %.elf
+%.bin: %.$(EXECUTABLE_EXTENSION)
 	$(Q)$(OBJCOPY) $(OFLAGS) -Obinary $< $@
 
-%.lst: %.elf
+%.lst: %.$(EXECUTABLE_EXTENSION)
 	$(Q)$(OBJDUMP) --disassemble-all --file-headers --file-offsets \
   --section-headers --line-numbers --private-headers --source --wide \
   --disassemble-zeroes $< > $@
@@ -816,7 +821,7 @@ ifndef MAKE_RESTARTS
 	-@rm -rf $(SCANBUILD_OUTPUTDIR)
 endif
 
-# Remove intermediates, but keep the .elf, .hex and .map etc.
+# Remove intermediates, but keep the .elf/.macho, .hex and .map etc.
 clean-intermediates:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
 	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
