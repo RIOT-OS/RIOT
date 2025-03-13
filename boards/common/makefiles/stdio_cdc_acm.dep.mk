@@ -1,4 +1,4 @@
-ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))
+ifneq (,$(filter stdio_default,$(USEMODULE)))
   ifneq (,$(filter tinyusb_device,$(USEMODULE))$(filter tinyusb,$(USEPKG)))
     # Use stdio_tinyusb_cdc_acm only if no other stdio is requested explicitly
     # and tinyusb_device is used for any other reason

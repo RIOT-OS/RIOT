@@ -14,6 +14,6 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 # Use Segger's RTT unless another stdio_% is already used
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+ifneq (,$(filter stdio_default,$(USEMODULE)))
   USEMODULE += stdio_rtt
 endif
