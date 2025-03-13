@@ -34,6 +34,9 @@ USEMODULE += ps
 # Include the telnet server
 USEMODULE += stdio_telnet
 
+# select a 2nd stdio method
+USEMODULE += stdio_default
+
 # Enable faster re-connects
 CFLAGS += -DCONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN=1
 
