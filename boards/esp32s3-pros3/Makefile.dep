@@ -1,20 +1,6 @@
-ifneq (,$(filter stdio_default,$(USEMODULE)))
-  ifeq (,$(filter usbus usbus% tinyusb_device,$(USEMODULE)))
-    # Use stdio_usb_serial_jtag if no other stdio is requested explicitly
-    # and neither USBUS nor tinyusb_device are used
-    USEMODULE += stdio_usb_serial_jtag
-    # Even if only stdio_usb_serial_jtag is enabled, usb_board_reset is enabled
-    # since there should be a CDC ACM interface in any case. This is necessary,
-    # for example, to reset the board if stdio_cdc_acm or stdio_tinyusb_cdc_acm
-    # was previously used.
-    USEMODULE += usb_board_reset
-    include $(RIOTMAKE)/tools/usb_board_reset.mk
-  endif
-endif
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
+include $(RIOTBOARD)/common/esp32s3/stdio_esp32s3_default.dep.mk
 include $(RIOTBOARD)/common/esp32s3/Makefile.dep
-include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
