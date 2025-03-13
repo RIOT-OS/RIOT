@@ -178,7 +178,7 @@ To select ethos as the serial driver, be sure that the `Makefile`
 has the following:
 
 ```make
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native32 native64,$(BOARD)))
 USEMODULE += stdio_ethos
 CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200
 FEATURES_REQUIRED += periph_uart

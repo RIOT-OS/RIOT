@@ -6,9 +6,9 @@
 #
 
 config BOARD
-    default "native" if BOARD_NATIVE
+    default "native32" if BOARD_NATIVE
 
-config BOARD_NATIVE
+config BOARD_NATIVE32
     bool
     default y
     select CPU_MODEL_NATIVE

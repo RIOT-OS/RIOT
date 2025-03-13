@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/native/Makefile.features
+include $(RIOTBOARD)/native64/Makefile.features

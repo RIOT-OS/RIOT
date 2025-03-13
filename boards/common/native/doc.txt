@@ -1,0 +1,5 @@
+/**
+ * @defgroup    boards_native Native Board
+ * @ingroup     boards
+ * @brief       Shared files and configuration for native.
+ */

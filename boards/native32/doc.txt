@@ -1,0 +1,28 @@
+/**
+@defgroup    boards_native32 Native32 Board
+@ingroup     boards
+@brief       Support for running RIOT in native32
+
+[Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
+
+Same board as \ref boards_native "native", but compiled for 32-bit instead of 64-bit.
+Currently only Linux x86 and ARM32 are supported.
+Otherwise, everything works the same as for the 64-bit version.
+For more information on this board, see the \ref boards_native "native board" documentation.
+
+# Required packages
+
+On Debian/Ubuntu you can install the required libraries with
+
+```
+sudo apt install gcc-multilib
+```
+
+Likewise, for the unittest execution, `libasan5` is needed for 32 bit binaries.
+On Debian/Ubuntu you can install the required libraries with
+
+```
+sudo apt install lib32asan5
+```
+
+ */
