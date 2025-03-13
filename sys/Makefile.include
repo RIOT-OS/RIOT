@@ -199,3 +199,7 @@ endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/nanocoap/Makefile.include
 endif
+
+ifneq (,$(filter stdio_nimble,$(USEMODULE)))
+  include $(RIOTBASE)/sys/stdio_nimble/Makefile.include
+endif
