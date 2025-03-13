@@ -362,7 +362,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
                     uint8_t flags)
 {
     /* The write transfer should technically only use a const uint8_t* buffer
-     * but we are re-using the same function to save on code here. It will not
+     * but we are reusing the same function to save on code here. It will not
      * be written to in the I2C write case. */
 #if ENABLE_DEBUG
     DEBUG("[i2c] W a=%.2x len=%2u f=%.2x, data:", addr, (unsigned)len, flags);

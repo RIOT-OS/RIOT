@@ -342,7 +342,7 @@ bool gpio_read(gpio_t pin)
 {
     assert(pin < GPIO_PIN_NUMOF);
 
-    /* if the pin is not an input, it alsways returns 0 */
+    /* if the pin is not an input, it always returns 0 */
     /* TODO: not really clear whether it should return the last written value
      *       in this case. */
     int value = gpio_hal_get_level(&_gpio_hal_ctx, pin);

@@ -186,3 +186,9 @@ shiftIn
 
 # <b>e</b>lements (used in Congure documentation)
 lements
+
+# Ethernet MAC, used in ESPs
+emac
+
+# For some reason it looked at some binary dump and found this to be a word...
+joo

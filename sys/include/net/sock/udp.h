@@ -633,7 +633,7 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
 }
 
 /**
- * @brief   Sends a UDP message to remote end point with non-continous payload
+ * @brief   Sends a UDP message to remote end point with non-continuous payload
  *
  * @pre `((sock != NULL || remote != NULL))`
  *
@@ -759,7 +759,7 @@ static inline ssize_t sock_udp_send(sock_udp_t *sock,
 }
 
 /**
- * @brief   Sends a UDP message to remote end point with non-continous payload
+ * @brief   Sends a UDP message to remote end point with non-continuous payload
  *
  * @pre `((sock != NULL || remote != NULL))`
  *
