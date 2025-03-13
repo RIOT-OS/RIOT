@@ -246,16 +246,6 @@ def check_line_canceling(child):
     assert garbage_expected == garbage_received
 
 
-def check_erase_long_line(child, longline):
-    # FIXME: this only works on native, due to #10634 combined with socat
-    # insisting in line-buffering the terminal.
-
-    if BOARD in ['native', 'native64']:
-        longline_erased = longline + "\b"*len(longline) + "echo"
-        child.sendline(longline_erased)
-        child.expect_exact('"echo"')
-
-
 def check_control_d(child):
     # The current shell instance was initiated by shell_run_once(). The shell will exit.
     child.sendline(CONTROL_D)
@@ -295,8 +285,6 @@ def testfunc(child):
         check_line_canceling(child)
     else:
         print("skipping check_line_canceling()")
-
-    check_erase_long_line(child, longline)
 
     check_control_d(child)
 

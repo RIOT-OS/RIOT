@@ -9,23 +9,40 @@
 /**
  * @file
  * @author Martine S. Lenders <m.lenders@fu-berlin.de>
+ * @author Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
+#include "async_read.h"
 #include "kernel_defines.h"
 #include "native_internal.h"
 
 #include "stdio_base.h"
 
-void stdio_init(void)
-{
+static void _async_read_wrapper(int fd, void *arg) {
+    uint8_t buf[STDIO_RX_BUFSIZE];
+
+    int res = real_read(fd, &buf, sizeof(buf));
+    if (res > 0) {
+        isrpipe_write(arg, buf, res);
+    }
+
+    native_async_read_continue(fd);
 }
 
-ssize_t stdio_read(void* buffer, size_t max_len)
+static void _init(void)
 {
-    return real_read(STDIN_FILENO, buffer, max_len);
+    native_async_read_setup();
+    if (IS_USED(MODULE_STDIN)) {
+        native_async_read_add_int_handler(STDIN_FILENO, &stdin_isrpipe,
+                                          _async_read_wrapper);
+    }
 }
 
-ssize_t stdio_write(const void* buffer, size_t len)
+static ssize_t _write(const void* buffer, size_t len)
 {
     return real_write(STDOUT_FILENO, buffer, len);
 }
+
+STDIO_PROVIDER(STDIO_NATIVE, _init, NULL, _write)
+
+/** @} */
