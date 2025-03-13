@@ -921,7 +921,7 @@ static inline ssize_t sock_dtls_recv_buf(sock_dtls_t *sock,
 }
 
 /**
- * @brief Encrypts and sends a message to a remote peer with non-continous payload
+ * @brief Encrypts and sends a message to a remote peer with non-continuous payload
  *
  * @param[in]   sock    DTLS sock to use
  * @param[in]   remote  DTLS session to use. A new session will be created
@@ -1055,7 +1055,7 @@ static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
 }
 
 /**
- * @brief Encrypts and sends a message to a remote peer with non-continous payload
+ * @brief Encrypts and sends a message to a remote peer with non-continuous payload
  *
  * @param[in] sock      DTLS sock to use
  * @param[in] remote    DTLS session to use. A new session will be created

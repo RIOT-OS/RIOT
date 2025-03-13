@@ -52,7 +52,7 @@ $ iotlab-experiment  --jmespath="items[*].network_address | sort(@)" get --nodes
 ```
 
 When flashing the devices set `IOTLAB_NODE` to one of the above values, e.g. for
-the firs node: `IOTLAB_NODE=dwm1001-2.saclay.iot-lab.info`.
+the first node: `IOTLAB_NODE=dwm1001-2.saclay.iot-lab.info`.
 
 ##### Free up the resources
 

@@ -60,7 +60,7 @@ static int _write(const pcf857x_t *dev, pcf857x_data_t data);
 
 #if IS_USED(MODULE_PCF857X_IRQ)
 
-/* interrutp service routine for IRQs */
+/* interrupt service routine for IRQs */
 static void _irq_isr(void *arg);
 
 /* declaration of IRQ handler function */

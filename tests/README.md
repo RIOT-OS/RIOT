@@ -113,7 +113,7 @@ If you would like to clean intermediate files for all boards go to main RIOT
 directory and use this command.
 
 @warning This command cleans all local files, for example, pkg downloads and
-locally generared docs.
+locally generated docs.
 
 
     make distclean
