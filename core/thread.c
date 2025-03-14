@@ -373,10 +373,14 @@ static const char *state_names[STATUS_NUMOF] = {
 
 const char *thread_state_to_string(thread_status_t state)
 {
-    const char *name = state_names[state] ? state_names[state] : NULL;
+    const char *name =  NULL;
+    if (state < STATUS_NUMOF) {
+        name = state_names[state];
+    }
 
-    assert(name != NULL); /* if compiling with assertions, this is an error that
-                             indicates that the table above is incomplete */
+    /* if compiling with assertions, this is an error
+     * that indicates that the table above is incomplete */
+    assert(name != NULL);
 
     return (name != NULL) ? name : STATE_NAME_UNKNOWN;
 }
