@@ -2,4 +2,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += sht11
 endif
 
-USEMODULE += boards_common_msb_430
+USEMODULE += boards_common_msb-430

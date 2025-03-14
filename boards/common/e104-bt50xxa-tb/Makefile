@@ -1,3 +1,3 @@
-MODULE = boards_common_e104_bt50xxa_tb
+MODULE = boards_common_e104-bt50xxa-tb
 
 include $(RIOTBASE)/Makefile.base

@@ -1,3 +1,3 @@
-MODULE = boards_common_arduino_zero
+MODULE = boards_common_arduino-zero
 
 include $(RIOTBASE)/Makefile.base
