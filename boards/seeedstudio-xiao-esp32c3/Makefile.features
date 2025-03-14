@@ -1,0 +1,17 @@
+CPU_MODEL = esp32c3_fh4
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32c3/Makefile.features
+
+# additional features provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+
+# unique features provided by the board
+FEATURES_PROVIDED += esp_jtag
+
+# Various other features (if any)
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += xiao_shield
