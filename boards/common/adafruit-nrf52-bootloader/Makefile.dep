@@ -1,4 +1,1 @@
 include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
-
-# make sure the bootloader module is used for reset to work
-USEMODULE += boards_common_adafruit-nrf52-bootloader

@@ -9,6 +9,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += ws281x
 endif
 
+USEMODULE += boards_common_adafruit-nrf52-bootloader
+
 # include common Adafruit nRF52 Bootloader dependencies
 include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep
 
