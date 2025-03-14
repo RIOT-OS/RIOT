@@ -267,9 +267,9 @@ struct _thread {
  * @param[in] name      a human readable descriptor for the thread
  *
  * @return              PID of newly created task on success
- * @return              -EINVAL, if @p priority is greater than or equal to
- *                      @ref SCHED_PRIO_LEVELS
- * @return              -EOVERFLOW, if there are too many threads running already
+ * @retval  -EINVAL     @p priority is greater than or equal to
+ *                      @ref SCHED_PRIO_LEVELS or @p stacksize is too small
+ * @retval  -EOVERFLOW  there are too many threads running already
  */
 kernel_pid_t thread_create(char *stack,
                            int stacksize,
