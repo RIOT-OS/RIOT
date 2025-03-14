@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_native64 Native64 Board
 @ingroup     boards
 @brief       Support for running RIOT in native64
@@ -9,5 +8,3 @@ Same board as \ref boards_native32 "native32", but compiled for 64-bit instead o
 Currently only Linux x86-64 is supported.
 Otherwise, everything works the same as for the 32-bit version.
 For more information on this board, see the \ref boards_native32 "native32 board" documentation.
-
- */
