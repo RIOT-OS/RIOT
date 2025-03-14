@@ -240,6 +240,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
     if (stacksize < 0) {
         DEBUG("thread_create: stacksize is too small!\n");
+        return -EINVAL;
     }
     /* allocate our thread control block at the top of our stackspace. Cast to
      * (uintptr_t) intermediately to silence -Wcast-align. (We manually made
