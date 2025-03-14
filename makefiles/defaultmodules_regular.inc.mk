@@ -3,7 +3,7 @@
 # These DEFAULT_MODULEs MUST only be disabled at application level or
 # in BOARD/CPU Makefile.default
 
-DEFAULT_MODULE += board board_common_init \
+DEFAULT_MODULE += board boards_common_init \
                   cpu \
                   core core_init core_lib core_msg core_panic core_thread \
                   sys libc
