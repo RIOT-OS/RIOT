@@ -132,7 +132,7 @@ int thread_wakeup(kernel_pid_t pid)
     else if (thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
-        sched_set_status(thread, STATUS_RUNNING);
+        sched_set_status(thread, STATUS_PENDING);
 
         irq_restore(old_state);
         sched_switch(thread->priority);
