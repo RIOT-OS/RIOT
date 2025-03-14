@@ -1,5 +1,9 @@
-# todo: use native64 on 64-bit systems (also update info below)
-BOARD_ALIAS += native:native32
+# define board aliases as follows
+# BOARD_ALIAS += alias-name:real-name
+
+# default to native32 or native64 depending on host platform
+_platform_bits := $(shell getconf LONG_BIT)
+BOARD_ALIAS += native:native$(_platform_bits)
 
 # if board is a known alias, have _BOARD_ALIAS_USED hold alias and board
 _BOARD_ALIAS_USED := $(strip $(subst :, , $(filter $(BOARD):%, $(BOARD_ALIAS))))
@@ -17,7 +21,7 @@ ifneq (, $(_BOARD_ALIAS_USED))
   TEST_ON_CI_BLACKLIST += $(if $(filter $(_alias),$(_test_blacklist)), $(_board))
   # inform the user about the alias
   ifeq (native,$(_alias))
-    $(shell echo 'using BOARD="$(_board)" as "$(_alias)" on a 32-bit system' 1>&2)
+    $(shell echo 'using BOARD="$(_board)" as "$(_alias)" on a $(_platform_bits)-bit system' 1>&2)
   else
     $(shell echo 'warning: BOARD="$(_alias)" is a deprecated alias. Consider using BOARD="$(_board)" instead.' 1>&2)
   endif
