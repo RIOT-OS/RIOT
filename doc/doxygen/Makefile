@@ -1,5 +1,7 @@
-RIOTBASE  = $(shell git rev-parse --show-toplevel)
-RIOTMAKE ?= $(RIOTBASE)/makefiles
+RIOTBASE  ?= $(shell git rev-parse --show-toplevel)
+RIOTMAKE  ?= $(RIOTBASE)/makefiles
+RIOTTOOLS ?= $(RIOTBASE)/dist/tools
+
 
 # Generate list of quoted absolute include paths. Evaluated in riot.doxyfile.
 export STRIP_FROM_INC_PATH_LIST=$(shell \
@@ -22,11 +24,19 @@ endif
 # Check that the doxygen version is not too old to avoid
 # certain bugs that were fixed in later revisions. Especially
 # Debian-based distributions tend to have very old versions.
-DOXYGEN_MIN_VERSION = 1.14.0
+DOXYGEN_MIN_VERSION = 1.13.2
+
+# Set the Doxygen binary if not already set
+DOXYGEN ?= doxygen
 
 # Strip the commit hash that is sometimes present after the
 # version number.
-DOXYGEN_VERSION = $(shell doxygen --version | cut -d ' ' -f1)
+DOXYGEN_CUR_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
+
+# for the `doc-ci` target, we can choose which Doxygen version should be built.
+# If nothing has been chosen, select the minimum version.
+# Valid options are `latest` and version numbers such as `1.13.2`.
+DOXYGEN_VERSION ?= $(DOXYGEN_MIN_VERSION)
 
 # include color echo macros
 include $(RIOTMAKE)/utils/ansi.mk
@@ -34,27 +44,32 @@ include $(RIOTMAKE)/color.inc.mk
 
 .PHONY: doc doc-man doc-latex
 doc doc-man doc-latex: $(DOCUMENTATION_FORMAT)
-	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_VERSION)"; } | \
+	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
 		sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
-		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_VERSION) is too old." \
+		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
 		"It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
 		"to avoid incorrectly formatted output.$(COLOR_RESET)"; \
 	fi
 
+.PHONY: doc-ci
+doc-ci: $(RIOTTOOLS)/doxygen/Makefile
+	@PKG_VERSION=$(DOXYGEN_VERSION) $(MAKE) -C $(RIOTTOOLS)/doxygen all --no-print-directory
+	@$(MAKE) -BC $(CURDIR) DOXYGEN=$(RIOTTOOLS)/doxygen/doxygen doc
+
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
 html: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
+	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
 
 .PHONY: check
 check: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile) | doxygen -
+	( cat riot.doxyfile) | $(DOXYGEN) -
 
 .PHONY: man
 man: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
+	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/man/man3"
 
@@ -76,9 +91,10 @@ src/governance.md: ../../GOVERNANCE.md
 
 .PHONY:
 latex: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
+	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/latex/index.tex"
 
 clean:
 	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md src/coc.md src/governance.md
+	@$(MAKE) -C $(RIOTTOOLS)/doxygen clean
