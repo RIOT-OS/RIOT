@@ -2,6 +2,6 @@ CFLAGS += -DTHIS_BOARD_IS='"external_native"'
 
 # We must duplicate the include done by $(RIOTBASE)/Makefile.include
 # to also include the main board header
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/native/include))
+INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/native32/include))
 
-include $(RIOTBOARD)/native/Makefile.include
+include $(RIOTBOARD)/native32/Makefile.include
