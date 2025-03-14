@@ -1,4 +1,4 @@
-USEMODULE += boards_common_e104_bt50xxa_tb
+USEMODULE += boards_common_e104-bt50xxa-tb
 
 # use nrfmin for GNRC as nimble is too large for the board
 ifneq (,$(filter netdev_default,$(USEMODULE)))
