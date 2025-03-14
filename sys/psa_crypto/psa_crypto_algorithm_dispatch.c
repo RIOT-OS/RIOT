@@ -588,7 +588,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
         }
         return ret;
     }
-    else if(attributes->type == PSA_KEY_TYPE_HMAC && PSA_ALG_IS_HMAC(attributes->policy.alg) &&
+    else if (attributes->type == PSA_KEY_TYPE_HMAC && PSA_ALG_IS_HMAC(attributes->policy.alg) &&
             data_length > PSA_HASH_BLOCK_LENGTH(attributes->policy.alg)){
         psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
 #if IS_USED(MODULE_PSA_HASH)
