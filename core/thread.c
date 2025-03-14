@@ -160,6 +160,29 @@ void thread_yield(void)
     thread_yield_higher();
 }
 
+/*
+ * Example of insertion operations in the linked list
+ *   thread_add_to_list(list,new_node) //Prio4
+ *   list         list      new_node
+ *  +------+     +------+   +------+
+ *  |    + | ->  |    + |   | 4  + |
+ *  +----|-+     +----|-+   +----|-+
+ *       +-->NULL     +-----/\   +-->NULL
+ *  thread_add_to_list(list,higher_node) //Prio2(Higher)
+ *  list       new_node   higher_node
+ *  +------+   +------+   +------+
+ *  |    + |   | 4  + |   | 2  + |
+ *  +----|-+   +----|-+   +----|-+
+ *       |          +-->NULL   |
+ *       |      /\-------------+
+ *       +----------------/\
+ *  thread_add_to_list(list,lower_node) //Prio6(Lower)
+ *  list       new_node   lower_node
+ *  +------+   +------+   +------+
+ *  |    + |   | 4  + |   | 6  + |
+ *  +----|-+   +----|-+   +----|-+
+ *       +-----/\   +-----/\   +-->NULL
+ */
 void thread_add_to_list(list_node_t *list, thread_t *thread)
 {
     assert(thread->status < STATUS_ON_RUNQUEUE);
