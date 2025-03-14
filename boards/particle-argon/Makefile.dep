@@ -1,4 +1,4 @@
-USEMODULE += boards_common_particle_mesh
+USEMODULE += boards_common_particle-mesh
 ifneq (,$(filter periph_uart,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart_hw_fc
 endif
