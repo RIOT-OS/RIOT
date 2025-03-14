@@ -251,8 +251,8 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
     if (gnrc_netif_is_6lr(netif)) {
-        assert(abr != NULL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
+        assert(abr != NULL);
         uint16_t ltime_min;
         gnrc_pktsnip_t *abro;
 
