@@ -29,6 +29,8 @@ static void setUp(void)
 {
     /* Initialize RELIC */
     TEST_ASSERT_EQUAL_INT(RLC_OK, core_init());
+
+    pc_param_set_any();
 }
 
 static void tearDown(void)
@@ -128,10 +130,80 @@ static void tests_relic_ecdh(void)
 
 }
 
+static void tests_relic_paillier_encryption(void)
+{
+    /*  The following is an example for doing Paillier key pair generation
+        and simple data encryption.
+    */
+    bn_t priv, pub, plain, enc, dec;
+
+    bn_null(priv);
+    bn_new(priv);
+
+    bn_null(pub);
+    bn_new(pub);
+
+    bn_null(plain);
+    bn_new(plain);
+
+    bn_null(enc);
+    bn_new(enc);
+
+    bn_null(dec);
+    bn_new(dec);
+
+    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_gen(pub, priv, 512));
+
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
+    printf("RELIC Paillier - key pair generation successeful\n");
+    printf("private key: ");
+    bn_print(priv);
+    printf("\n");
+    printf("public key:  ");
+    bn_print(pub);
+    printf("\n");
+#endif
+
+    bn_rand(plain, RLC_POS, 510);
+
+    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_enc(enc, plain, pub, 1));
+
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
+    printf("RELIC Paillier -  data encryption successful\n");
+    printf("plain text: ");
+    bn_print(plain);
+    printf("\n");
+    printf("encrypted data:  ");
+    bn_print(enc);
+    printf("\n");
+#endif
+
+    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_dec(dec, enc, pub, priv, 1));
+
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
+    printf("decrypted data: ");
+    bn_print(dec);
+    printf("\n");
+#endif
+
+    TEST_ASSERT_EQUAL_INT(RLC_EQ, bn_cmp(plain, dec));
+
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
+    printf("\nRELIC Paillier encryption test successful\n");
+#endif
+
+    bn_free(pub);
+    bn_free(priv);
+    bn_free(plain);
+    bn_free(enc);
+    bn_free(dec);
+}
+
 TestRef tests_relic(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(tests_relic_ecdh)
+        new_TestFixture(tests_relic_ecdh),
+        new_TestFixture(tests_relic_paillier_encryption)
     };
 
     EMB_UNIT_TESTCALLER(RELICTest, setUp, tearDown, fixtures);
