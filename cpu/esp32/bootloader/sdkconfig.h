@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 iosabi
+ * Copyright (C) 2024 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +23,7 @@
  * bootloader.
  *
  * @author      iosabi <iosabi@protonmail.com>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
 #ifndef SDKCONFIG_H
@@ -49,8 +51,10 @@
 extern "C" {
 #endif
 
+#define CONFIG_BOOTLOADER_PROJECT_VER   1
+
 #if MODULE_ESP_LOG_COLORED
-#define CONFIG_LOG_COLORS   1
+#define CONFIG_BOOTLOADER_LOG_COLORS    1
 #endif
 
 #ifndef CONFIG_BOOTLOADER_LOG_LEVEL
@@ -104,6 +108,10 @@ extern "C" {
 #else
 #define CONFIG_ESP_CONSOLE_UART_NUM         0
 #endif
+
+#define CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM CONFIG_ESP_CONSOLE_UART_NUM
+
+#define CONFIG_LOG_TAG_LEVEL_IMPL_CACHE_AND_LINKED_LIST 1
 
 #ifdef __cplusplus
 }

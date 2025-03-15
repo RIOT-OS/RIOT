@@ -1,0 +1,64 @@
+From b668dbb014752261500f8fcb0703295fba20b5d8 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 11 Mar 2025 02:10:23 +0100
+Subject: [PATCH 2/2] add prefix esp_ to file names to avoid conflicts with
+ tlsf package
+
+---
+ tlsf.c => esp_tlsf.c                                     | 6 +++---
+ tlsf_block_functions.h => esp_tlsf_block_functions.h     | 0
+ tlsf_control_functions.h => esp_tlsf_control_functions.h | 2 +-
+ include/{tlsf.h => esp_tlsf.h}                           | 0
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+ rename tlsf.c => esp_tlsf.c (96%)
+ rename tlsf_block_functions.h => esp_tlsf_block_functions.h (100%)
+ rename tlsf_control_functions.h => esp_tlsf_control_functions.h (99%)
+ rename include/{tlsf.h => esp_tlsf.h} (100%)
+
+diff --git a/tlsf.c b/esp_tlsf.c
+similarity index 96%
+rename from tlsf.c
+rename to esp_tlsf.c
+index 1866a61..0793373 100644
+--- a/tlsf.c
++++ b/esp_tlsf.c
+@@ -7,9 +7,9 @@
+ #include <string.h>
+ #include <limits.h>
+ #include <stdio.h>
+-#include "tlsf.h"
+-#include "tlsf_block_functions.h"
+-#include "tlsf_control_functions.h"
++#include "esp_tlsf.h"
++#include "esp_tlsf_block_functions.h"
++#include "esp_tlsf_control_functions.h"
+ 
+ /*
+ ** Static assertion mechanism.
+diff --git a/tlsf_block_functions.h b/esp_tlsf_block_functions.h
+similarity index 100%
+rename from tlsf_block_functions.h
+rename to esp_tlsf_block_functions.h
+diff --git a/tlsf_control_functions.h b/esp_tlsf_control_functions.h
+similarity index 99%
+rename from tlsf_control_functions.h
+rename to esp_tlsf_control_functions.h
+index ff2ad90..a0dfa14 100644
+--- a/tlsf_control_functions.h
++++ b/esp_tlsf_control_functions.h
+@@ -5,7 +5,7 @@
+  */
+ 
+ #pragma once
+-#include "tlsf_block_functions.h"
++#include "esp_tlsf_block_functions.h"
+ 
+ #if defined(__cplusplus)
+ extern "C" {
+diff --git a/include/tlsf.h b/include/esp_tlsf.h
+similarity index 100%
+rename from include/tlsf.h
+rename to include/esp_tlsf.h
+-- 
+2.34.1
+
