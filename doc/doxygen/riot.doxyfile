@@ -928,6 +928,8 @@ INPUT_ENCODING         = UTF-8
 
 FILE_PATTERNS          = *.txt \
                          doc.md \
+                         doxy.md \
+                         *.doxy.md \
                          *.h \
                          *.h.in \
                          *.hpp
