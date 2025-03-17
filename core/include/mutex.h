@@ -8,8 +8,7 @@
  */
 
 /**
- * @defgroup    core_sync_mutex Mutex
- * @ingroup     core_sync
+ * @ingroup     core_sync_mutex
  *
  * @{
  *
