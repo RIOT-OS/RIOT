@@ -530,3 +530,9 @@ li:has(> .item a[class^="md_"][class$="doc.html"]),
 tr:has(> .entry a[href^="md_"][href$="doc.html"]) {
     display: none;
 }
+
+/* HACK: doe the same for doxy.md files*/
+li:has(> .item a[class^="md_"][class$="doxy.html"]),
+tr:has(> .entry a[href^="md_"][href$="doxy.html"]) {
+    display: none;
+}
