@@ -39,7 +39,9 @@
 
 #include "kernel_defines.h"
 
+#include "assert.h"
 #include "board.h"
+#include "compiler_hints.h"
 #include "ztimer.h"
 #include "ztimer/convert_frac.h"
 #include "ztimer/convert_shift.h"
@@ -290,8 +292,11 @@ void ztimer_init(void)
         "ztimer_init(): ZTIMER_TIMER using periph timer %u, freq %lu, width %u\n",
         CONFIG_ZTIMER_USEC_DEV, ZTIMER_TIMER_FREQ,
         CONFIG_ZTIMER_USEC_WIDTH);
-    ztimer_periph_timer_init(&ZTIMER_TIMER, CONFIG_ZTIMER_USEC_DEV,
-                             ZTIMER_TIMER_FREQ, WIDTH_TO_MAXVAL(CONFIG_ZTIMER_USEC_WIDTH));
+    MAYBE_UNUSED
+    uint32_t periph_timer_freq =
+        ztimer_periph_timer_init(&ZTIMER_TIMER, CONFIG_ZTIMER_USEC_DEV,
+                                 ZTIMER_TIMER_FREQ,
+                                 WIDTH_TO_MAXVAL(CONFIG_ZTIMER_USEC_WIDTH));
 #  if MODULE_PM_LAYERED && !MODULE_ZTIMER_ONDEMAND
     LOG_DEBUG("ztimer_init(): ZTIMER_TIMER setting block_pm_mode to %i\n",
               CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE);
@@ -337,17 +342,21 @@ void ztimer_init(void)
 #if MODULE_ZTIMER_USEC
 #  if ZTIMER_TIMER_FREQ != FREQ_1MHZ
 #    if ZTIMER_TIMER_FREQ == FREQ_250KHZ
+    /* 250 kHz ± 5% */
+    assert((periph_timer_freq > 237500) && (periph_timer_freq < 262500));
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %lu to 1000000\n",
-              ZTIMER_TIMER_FREQ);
+              periph_timer_freq);
     ztimer_convert_shift_up_init(&_ztimer_convert_shift_usec,
                                  ZTIMER_USEC_BASE, 2);
 #    else
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_frac %lu to 1000000\n",
               ZTIMER_TIMER_FREQ);
     ztimer_convert_frac_init(&_ztimer_convert_frac_usec, ZTIMER_USEC_BASE,
-                             FREQ_1MHZ, ZTIMER_TIMER_FREQ);
+                             FREQ_1MHZ, periph_timer_freq);
 #    endif
 #  else
+    /* 1 MHz ± 5% */
+    assert((periph_timer_freq > 950000) && (periph_timer_freq < 1050000));
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC without conversion\n");
 #  endif
 
