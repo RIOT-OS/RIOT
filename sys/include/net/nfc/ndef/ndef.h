@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Technische Universität Dresden
+ * Copyright (C) 2024 TU Dresden
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -10,7 +10,9 @@
 #define NDEF_H
 
 /**
- * @ingroup     nfc
+ * @defgroup    ndef NDEF
+ * @ingroup     net
+ * @brief       Serialization for the NFC Data Exchange Format 
  * @{
  *
  * @file
@@ -22,6 +24,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+/**
+ * @brief Maximum payload length for a short NDEF record
+ */
+#define NDEF_SHORT_RECORD_PAYLOAD_LENGTH      255
+
+/**
+ * @brief Maximum payload length for a long NDEF record
+ */
+#define NDEF_LONG_RECORD_PAYLOAD_LENGTH       65535
 
 /**
  * @brief The size of the NDEF record header
@@ -210,7 +222,7 @@ uint8_t *ndef_write_to_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_l
  * @note The buffer needs to be allocated by the user and has to stay valid for the entire lifetime
  * of the NDEF message struct.
  *
- * @param[out] 	message 		Message to initilaize
+ * @param[out] 	ndef 		    Message to initilaize
  * @param[in] 	buffer 			Empty buffer that is used by the NDEF message
  * @param[in] 	buffer_size 	Buffer size
  */
@@ -219,7 +231,7 @@ void ndef_init(ndef_t *message, uint8_t *buffer, uint32_t buffer_size);
 /**
  * @brief Adds an NDEF record to the end of the NDEF message
  *
- * @param[in,out] 	message 		NDEF message
+ * @param[in,out] 	ndef     		NDEF message
  * @param[in] 		type 			Type of the record
  * @param[in] 		type_length 	Length of the type
  * @param[in] 		id 				ID of the record
@@ -230,7 +242,7 @@ void ndef_init(ndef_t *message, uint8_t *buffer, uint32_t buffer_size);
  * @return 			0 if successful
  * @return 			error otherwise
  */
-int ndef_add_record(ndef_t *message, const uint8_t *type, uint8_t type_length, const uint8_t *id,
+int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, const uint8_t *id,
                     uint8_t id_length, const uint8_t *payload,
                     uint32_t payload_length, ndef_record_tnf_t tnf);
 
@@ -247,25 +259,25 @@ size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32
 /**
  * @brief Returns the current size of the NDEF message
  *
- * @param[in] message NDEF message
+ * @param[in] ndef NDEF message
  * @return size_t Size of the message
  */
-size_t ndef_get_size(const ndef_t *message);
+size_t ndef_get_size(const ndef_t *ndef);
 
 /**
  * @brief Removes the last record from the NDEF message
  *
- * @param[in,out] message Message to remove the last record from
+ * @param[in,out] ndef Message to remove the last record from
  * @return 0 if successful, error otherwise
  */
-int ndef_remove_last_record(ndef_t *message);
+int ndef_remove_last_record(ndef_t *ndef);
 
 /**
  * @brief Removes all records from the NDEF message
  *
- * @param[in,out] message Message to clear
+ * @param[in,out] ndef Message to clear
  */
-void ndef_clear(ndef_t *message);
+void ndef_clear(ndef_t *ndef);
 
 /**
  * @brief NDEF text encoding
@@ -280,15 +292,16 @@ typedef enum {
  *
  * @note The text record is added to the end of the NDEF message.
  *
- * @param[in,out]   message             NDEF message
+ * @param[in,out]   ndef                NDEF message
  * @param[in]       text                Text to add
  * @param[in]       text_length         Length of the text
  * @param[in]       lang_code           Language code
  * @param[in]       lang_code_length    Length of the language code
  * @param[in]       encoding            Encoding of the text
- * @return int
+ * @retval 0                            on success
+ * @retval -1                           if writing the payload failed
  */
-int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length,
+int ndef_record_add_text(ndef_t *ndef, const char *text, uint32_t text_length,
                          const char *lang_code, uint8_t lang_code_length,
                          ndef_text_encoding_t encoding);
 
@@ -297,7 +310,7 @@ int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length
  *
  * @param[in] text_length       Length of the text
  * @param[in] lang_code_length  Length of the language code
- * @return size_t Size of the text record
+ * @return Size of the text record
  */
 size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang_code_length);
 
@@ -346,24 +359,36 @@ typedef enum {
 /**
  * @brief Adds an NDEF URI record to the NDEF message
  *
- * @param[in,out]   message             NDEF message
- * @param[in]       identifier_code
- * @param[in]       uri
- * @param[in]       uri_length
- * @return int
+ * @param[in,out]   ndef                NDEF message
+ * @param[in]       identifier_code     URI identifier code
+ * @param[in]       uri                 URI
+ * @param[in]       uri_length          Length of the URI
+ * @retval 0                            on success
+ * @retval -1                           if writing the payload failed
  */
-int ndef_record_add_uri(ndef_t *message, ndef_uri_identifier_code_t identifier_code,
+int ndef_record_add_uri(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code,
                         const char *uri, uint32_t uri_length);
 
 /**
  * @brief Calculates the size of an NDEF URI record
  *
  * @param[in] uri_length Length of the URI
- * @return size_t
+ * @return Size of the URI record
  */
 size_t ndef_record_calculate_uri_size(uint32_t uri_length);
 
-int ndef_record_add_mime(ndef_t *message, const char *mime_type, uint32_t mime_type_length,
+/**
+ * @brief 
+ * 
+ * @param ndef                  NDEF message
+ * @param mime_type             MIME type
+ * @param mime_type_length      Length of the MIME type
+ * @param mime_payload          MIME payload
+ * @param mime_payload_length   Length of the MIME payload
+ * @retval 0                    on success
+ * @retval -1                   if writing the payload failed
+ */
+int ndef_record_add_mime(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
                          const uint8_t *mime_payload, uint32_t mime_payload_length);
 
 /**
@@ -371,7 +396,7 @@ int ndef_record_add_mime(ndef_t *message, const char *mime_type, uint32_t mime_t
  *
  * @param[in] mime_type_length      Length of the MIME type
  * @param[in] mime_payload_length   Lenght of the MIME payload
- * @return size_t
+ * @return Size of the MIME record
  */
 size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, uint32_t mime_payload_length);
 

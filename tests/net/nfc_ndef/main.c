@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2024 TU Dresden
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 #include "net/nfc/ndef/ndef.h"
 
 #include <stddef.h>
@@ -7,10 +15,15 @@
 #include <inttypes.h>
 #include <assert.h>
 
-static void print_ndef_as_hex(const ndef_t *message)
+#include "embUnit.h"
+
+// static uint8_t ndef_with_two_records = {};
+
+static void
+print_ndef_as_hex(const ndef_t *message)
 {
     size_t size = message->buffer.cursor - message->buffer.memory;
-    printf("NDEF message size: %" PRIu32 "\n", size);
+    printf("NDEF message size: %" PRIu16 "\n", size);
     for (uint8_t i = 0; i < size; ++i) {
         if (i % 4 == 0 && i != 0) {
             printf("\n");

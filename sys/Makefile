@@ -119,9 +119,6 @@ endif
 ifneq (,$(filter netif,$(USEMODULE)))
     DIRS += net/netif
 endif
-ifneq (,$(filter nfc_ndef,$(USEMODULE)))
-  DIRS += net/nfc/ndef
-endif
 ifneq (,$(filter netopt,$(USEMODULE)))
   DIRS += net/crosslayer/netopt
 endif
@@ -130,6 +127,9 @@ ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
 endif
 ifneq (,$(filter netutils,$(USEMODULE)))
   DIRS += net/netutils
+endif
+ifneq (,$(filter nfc_ndef,$(USEMODULE)))
+  DIRS += net/nfc/ndef
 endif
 ifneq (,$(filter sema,$(USEMODULE)))
   DIRS += sema

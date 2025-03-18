@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2024 TU Dresden
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     ndef
+ * @{
+ *
+ * @file
+ * @brief       Implementation of the NDEF URI payload
+ *
+ * @author      Nico Behrens <nifrabe@outlook.de>
+ *
+ * @}
+ */
+
 #include "net/nfc/ndef/ndef.h"
 
 #include "errno.h"
@@ -9,17 +29,21 @@
 
 const uint8_t ndef_uri_record_type[] = { 'U' };
 
-int ndef_record_add_uri(ndef_t *message, ndef_uri_identifier_code_t identifier_code, const char *uri, uint32_t uri_length)
+int ndef_record_add_uri(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code, const char *uri, uint32_t uri_length)
 {
     uint32_t payload_length = IDENTIFIER_CODE_LENGTH + uri_length;
     assert(payload_length <= 65535);
 
     /* the payload will be written later */
-    ndef_add_record(message, ndef_uri_record_type, sizeof(ndef_uri_record_type),
-                    NULL, 0, NULL, payload_length, NDEF_TNF_WELL_KNOWN);
+    int res = ndef_add_record(ndef, ndef_uri_record_type, sizeof(ndef_uri_record_type),
+                              NULL, 0, NULL, payload_length, NDEF_TNF_WELL_KNOWN);
+    if (res < 0) {
+        return res;
+    }
 
-    ndef_write_to_buffer(message, (uint8_t *)&identifier_code, IDENTIFIER_CODE_LENGTH);
-    ndef_write_to_buffer(message, (uint8_t *)uri, uri_length);
+    /* write the payload here */
+    ndef_write_to_buffer(ndef, (uint8_t *)&identifier_code, IDENTIFIER_CODE_LENGTH);
+    ndef_write_to_buffer(ndef, (uint8_t *)uri, uri_length);
 
     return 0;
 }
