@@ -254,7 +254,7 @@ psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer, uint8_
                                                 size_t *pub_key_buffer_length);
 
 /**
- * @brief   Low level wrapper function to call a driver for deriving an ed25519 public key from the private key.
+ * @brief   Low level wrapper function for deriving an ed25519 public key from the private key.
  *
  * @param[in]       priv_key_buffer
  * @param[out]      pub_key_buffer
