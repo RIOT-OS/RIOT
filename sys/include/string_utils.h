@@ -179,6 +179,14 @@ ssize_t strscpy(char *dest, const char *src, size_t count);
  */
 const void *memchk(const void *data, uint8_t c, size_t len);
 
+/**
+ * @brief   Reverse the order of bytes in a buffer
+ *
+ * @param[in, out]  buf     The buffer to reverse
+ * @param[in]       len     Size of the buffer
+ */
+void reverse_buf(void *buf, size_t len);
+
 #ifdef __cplusplus
 }
 #endif

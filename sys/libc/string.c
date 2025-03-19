@@ -80,4 +80,15 @@ int __swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...)
     return res;
 }
 
+void reverse_buf(void *buf, size_t len)
+{
+    uint8_t *cur = buf;
+    uint8_t *end = cur + len - 1;
+    while (cur < end) {
+        uint8_t tmp = *cur;
+        *cur++ = *end;
+        *end-- = tmp;
+    }
+}
+
 /** @} */
