@@ -8,6 +8,10 @@
 The Nucleo-F746ZG is a board from ST's Nucleo family supporting ARM Cortex-M7
 STM32F746ZG microcontroller with 320KiB of RAM and 1 MiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-f207zg-and-more.svg "Pinout for the Nucleo-F746ZG (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 32)" width=50%
+
 ## Flashing the Board Using ST-LINK Removable Media
 
 On-board ST-LINK programmer provides via composite USB device removable media.
