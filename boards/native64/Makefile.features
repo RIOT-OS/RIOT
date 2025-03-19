@@ -3,4 +3,4 @@ CPU = native
 FEATURES_PROVIDED += arch_64bit
 NATIVE_ARCH_BIT = 64
 
-include $(RIOTBOARD)/native/common_features.inc.mk
+include $(RIOTBOARD)/common/native/common_features.inc.mk
