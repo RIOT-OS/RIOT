@@ -152,7 +152,7 @@ static void tests_relic_paillier_encryption(void)
     bn_null(dec);
     bn_new(dec);
 
-    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_gen(pub, priv, 512));
+    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_gen(pub, priv, 256));
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
     printf("RELIC Paillier - key pair generation successeful\n");
@@ -164,7 +164,7 @@ static void tests_relic_paillier_encryption(void)
     printf("\n");
 #endif
 
-    bn_rand(plain, RLC_POS, 510);
+    bn_rand(plain, RLC_POS, 254);
 
     TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_enc(enc, plain, pub, 1));
 
@@ -230,7 +230,7 @@ static void tests_relic_paillier_encrypted_addition(void)
     bn_null(dec);
     bn_new(dec);
 
-    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_gen(pub, priv, 512));
+    TEST_ASSERT_EQUAL_INT(RLC_OK, cp_ghpe_gen(pub, priv, 256));
 
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
     printf("\n");
