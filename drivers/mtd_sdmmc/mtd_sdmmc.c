@@ -41,8 +41,7 @@ static int mtd_sdmmc_init(mtd_dev_t *dev)
     /* get the SDMMC device descriptor from SDMMC peripheral index */
     mtd_sd->sdmmc = sdmmc_get_dev(mtd_sd->sdmmc_idx);
 
-    if ((mtd_sd->sdmmc->init_done == true) ||
-        (sdmmc_card_init(mtd_sd->sdmmc) == 0)) {
+    if (sdmmc_card_init(mtd_sd->sdmmc) == 0) {
         /* erasing whole sectors is handled internally by the card so you can
            delete single blocks (i.e. pages) */
         dev->pages_per_sector = 1;
