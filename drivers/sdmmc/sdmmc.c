@@ -338,6 +338,8 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
     assert(dev);
     assert(dev->driver);
 
+    dev->init_done = false;
+
     /* use driver's card_init function if it defines its own */
     if (dev->driver->card_init) {
         return dev->driver->card_init(dev);
