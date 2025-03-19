@@ -844,7 +844,8 @@ extern "C" {
 #define PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits)                  \
     (size_t)\
     (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? PSA_BITS_TO_BYTES(key_bits) : \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? \
+     PSA_BITS_TO_BYTES(key_bits) : \
      0))
 
 /**
@@ -884,9 +885,11 @@ extern "C" {
  *          Unspecified if the parameters are not valid.
  */
 #define PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, key_bits) \
-    (PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type) ? PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits) : \
-    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) : \
-     0))
+    (PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type) ? \
+     PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits) : \
+     (PSA_KEY_TYPE_IS_ECC(key_type) ? \
+      PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) :   \
+      0))
 
 /**
  * @brief   Check whether the key size is a valid ECC size for key type.

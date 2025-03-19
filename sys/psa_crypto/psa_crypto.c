@@ -1974,8 +1974,8 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
 
     psa_key_attributes_t attributes = slot->attr;
 
-    status = psa_location_dispatch_sign_hash(&attributes, alg, slot, hash, hash_length, signature,
-                                             signature_size, signature_length);
+    status = psa_location_dispatch_sign_hash(&attributes, alg, slot, hash, hash_length,
+                                             signature, signature_size, signature_length);
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
@@ -2027,8 +2027,8 @@ psa_status_t psa_sign_message(psa_key_id_t key,
 
     psa_key_attributes_t attributes = slot->attr;
 
-    status = psa_location_dispatch_sign_message(&attributes, alg, slot, input, input_length, signature,
-                                             signature_size, signature_length);
+    status = psa_location_dispatch_sign_message(&attributes, alg, slot, input, input_length,
+                                                signature, signature_size, signature_length);
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
@@ -2084,8 +2084,8 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
 
     psa_key_attributes_t attributes = slot->attr;
 
-    status = psa_location_dispatch_verify_hash(&attributes, alg, slot, hash, hash_length, signature,
-                                               signature_length);
+    status = psa_location_dispatch_verify_hash(&attributes, alg, slot, hash, hash_length,
+                                               signature, signature_length);
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
@@ -2141,8 +2141,8 @@ psa_status_t psa_verify_message(psa_key_id_t key,
 
     psa_key_attributes_t attributes = slot->attr;
 
-    status = psa_location_dispatch_verify_message(&attributes, alg, slot, input, input_length, signature,
-                                               signature_length);
+    status = psa_location_dispatch_verify_message(&attributes, alg, slot, input, input_length,
+                                                  signature, signature_length);
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);

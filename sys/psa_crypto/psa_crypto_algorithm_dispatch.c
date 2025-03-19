@@ -236,11 +236,13 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512_224))
     case PSA_ALG_SHA_512_224:
-        return psa_hashes_sha512_224_finish(&operation->ctx.sha512_224, hash, hash_size, hash_length);
+        return psa_hashes_sha512_224_finish(&operation->ctx.sha512_224, hash,
+                                            hash_size, hash_length);
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512_256))
     case PSA_ALG_SHA_512_256:
-        return psa_hashes_sha512_256_finish(&operation->ctx.sha512_256, hash, hash_size, hash_length);
+        return psa_hashes_sha512_256_finish(&operation->ctx.sha512_256, hash,
+                                            hash_size, hash_length);
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA3_256))
     case PSA_ALG_SHA3_256:
@@ -282,7 +284,8 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
 
     if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
+                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -333,7 +336,8 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
 
     if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
+                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -345,19 +349,22 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
     switch (asym_key) {
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
     case PSA_ECC_P192_R1:
-        return psa_ecc_p192r1_sign_message(attributes, alg, key_data, *key_bytes, input, input_length,
-                                        signature, signature_size, signature_length);
+        return psa_ecc_p192r1_sign_message(attributes, alg, key_data, *key_bytes, input,
+                                           input_length,
+                                           signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
     case PSA_ECC_P256_R1:
-        return psa_ecc_p256r1_sign_message(attributes, alg, key_data, *key_bytes, input, input_length,
-                                        signature, signature_size, signature_length);
+        return psa_ecc_p256r1_sign_message(attributes, alg, key_data, *key_bytes, input,
+                                           input_length,
+                                           signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
     case PSA_ECC_ED25519:
         psa_get_public_key_data_from_key_slot(slot, &pub_key_data, &pub_key_bytes);
-        return psa_ecc_ed25519_sign_message(key_data, *key_bytes, pub_key_data, *pub_key_bytes, input, input_length,
-                                    signature, signature_size, signature_length);
+        return psa_ecc_ed25519_sign_message(key_data, *key_bytes, pub_key_data, *pub_key_bytes,
+                                            input, input_length,
+                                            signature, signature_size, signature_length);
 #endif
     default:
         (void)alg;
@@ -387,7 +394,8 @@ psa_status_t psa_algorithm_dispatch_verify_hash(  const psa_key_attributes_t *at
 
     if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
+                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -432,7 +440,8 @@ psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *a
 
     if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
+                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -512,7 +521,8 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            return psa_generate_ecc_ed25519_key_pair(key_data, pubkey_data, key_bytes, pubkey_data_len);
+            return psa_generate_ecc_ed25519_key_pair(key_data, pubkey_data,
+                                                     key_bytes, pubkey_data_len);
 #endif
         default:
             (void)status;
@@ -573,7 +583,8 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data, data_length, pubkey_data_len);
+            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data,
+                                                    data_length, pubkey_data_len);
             break;
 #endif
         default:
@@ -588,7 +599,8 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
         }
         return ret;
     }
-    return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);
+    return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size,
+                                  key_bytes, bits);
 }
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
