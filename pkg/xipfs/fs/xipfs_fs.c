@@ -674,3 +674,23 @@ const vfs_file_system_t xipfs_file_system = {
     .f_op = &xipfs_file_ops,
     .d_op = &xipfs_dir_ops,
 };
+
+
+int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path, vfs_xipfs_mount_t *vfs_xipfs_mount) {
+
+    if ( (flashpage == NULL) || (path == NULL) || (path[0] == '\0') )
+        return -EINVAL;
+
+    vfs_xipfs_mount->vfs_mp.fs          = &xipfs_file_system;
+    vfs_xipfs_mount->vfs_mp.mount_point = path;
+
+    vfs_xipfs_mount->magic      = XIPFS_MAGIC;
+    vfs_xipfs_mount->mount_path = path;
+    vfs_xipfs_mount->page_num   = flashpage->base.sector_count;
+    vfs_xipfs_mount->page_addr  = (void *)(
+          (unsigned char *)XIPFS_NVM_BASE
+        + (flashpage->offset * XIPFS_NVM_PAGE_SIZE)
+        );
+
+    return 0;
+}

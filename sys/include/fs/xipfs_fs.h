@@ -24,6 +24,7 @@
 #define FS_XIPFS_FS_H
 
 #include "vfs.h"
+#include "mtd_flashpage.h"
 #include "include/xipfs.h"
 
 #ifdef __cplusplus
@@ -58,6 +59,7 @@ extern "C" {
         .page_addr = (void *)xipfs_part_##id,        \
     }
 
+
 /**
  * @brief xipfs descriptor for vfs integration
  */
@@ -71,6 +73,23 @@ typedef struct vfs_xipfs_mount_s {
 
 /** The xipfs vfs driver */
 extern const vfs_file_system_t xipfs_file_system;
+
+
+/**
+ * @brief vfs_xipfs_mount_t constructor from a mtd_flashpage_t.
+ *
+ * This function constructs an xipfs mount point from a mtd_flashpage_t such as mtd_flash_aux_slot.
+ * It allows to use XIPFS with the RIOT AUX slot mechanism.
+ *
+ * @param flashpage A valid mtd_flashpage_t pointer such as &mtd_flash_aux_slot.
+ * @param path A valid mounting point path.
+ * @param vfs_xipfs_mount A valid vfs xipfs mount point pointer.
+ *
+ * @retval -EINVAL when one of the parameters is NULL or when path is an empty string.
+ * @retval 0 on success.
+ */
+int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path, vfs_xipfs_mount_t *vfs_xipfs_mount);
+
 
 /* Extended driver handling executables */
 

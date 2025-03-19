@@ -4,7 +4,9 @@ DEFAULT_MODULE += xipfs_fs
 ifeq (,$(filter xipfs_fs,$(DISABLE_MODULE)))
   # xipfs only makes sense if the flash memory is addressable
   FEATURES_REQUIRED += periph_flashpage_in_address_space
+  FEATURES_OPTIONAL += periph_flashpage_aux
   USEMODULE += periph_flashpage
+  USEMODULE += mtd_flashpage
   USEMODULE += vfs
   USEMODULE += shell_cmd_xipfs
 endif

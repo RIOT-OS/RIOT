@@ -24,6 +24,7 @@
 #include "periph/flashpage.h"
 #include "shell.h"
 #include "vfs.h"
+#include  "mtd_flashpage.h"
 #include "include/xipfs.h"
 
 /**
@@ -56,7 +57,7 @@ XIPFS_NEW_PARTITION(nvme0p0, "/dev/nvme0p0", NVME0P0_PAGE_NUM);
 /*
  * Get a pointer to an xipfs_mount_t from a vfs_xipfs_mount_t
  */
-xipfs_mount_t *xipfs_nvme0p0 = (xipfs_mount_t *)&nvme0p0.magic;
+xipfs_mount_t *xipfs_nvme0p0 = NULL; //(xipfs_mount_t *)&nvme0p0.magic;
 
 
 /*
@@ -188,15 +189,16 @@ static void test_xipfs_execv_eisdir_path(void);
 static void test_xipfs_execv_enotdir_path(void);
 static void test_xipfs_execv_enoent_path(void);
 
-/*
- * Entry point
- */
 
-int main(void)
-{
+
+void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     int ret;
 
-    printf("Tests started, awaiting for normal termination or assertion...\n");
+    printf( "Tests started with vfs_xipfs_mount %p, "
+            "awaiting for normal termination or assertion...\n",
+           vfs_xipfs_mount);
+
+    xipfs_nvme0p0 = (xipfs_mount_t *)&(vfs_xipfs_mount->magic);
 
     /* Should not fail unless there is a corrupted data
      * structure or a flash memory failure. */
@@ -374,6 +376,36 @@ int main(void)
     XIPFS_ASSERT(ret == 0);
 
     printf("Tests finished.\n");
+}
+
+
+
+/*
+ * Entry point
+ */
+
+int main(void)
+{
+    test_xipfs_suite(&nvme0p0);
+
+    {
+        printf("Constructing vfs_xipfs_mount from mtd_flash_aux_slot...");
+
+        vfs_xipfs_mount_t  vfs_xipfs_mount;
+
+        int ret = xipfs_construct_from_flashpage(&mtd_flash_aux_slot, "/dev/nvme0p0", &vfs_xipfs_mount);
+        XIPFS_ASSERT(ret == 0);
+        printf("Done.\n");
+
+        printf("mtd_flash_aux_slot.offset : %lu, mtd_flash_aux_slot.base.sector_count : %lu\n",
+               mtd_flash_aux_slot.offset, mtd_flash_aux_slot.base.sector_count);
+
+        printf("vfs_xipfs_mount.page_num : %u, vfs_xipfs_mount.page_addr : %p\n",
+               vfs_xipfs_mount.page_num, vfs_xipfs_mount.page_addr);
+
+        test_xipfs_suite(&vfs_xipfs_mount);
+    }
+
 
     for (;;);
 }
@@ -744,7 +776,7 @@ static void test_xipfs_open_edquot(void)
     int ret;
 
     /* initialization */
-    for (i = 0; i < NVME0P0_PAGE_NUM; i++) {
+    for (i = 0; i < xipfs_nvme0p0->page_num; i++) {
         (void)sprintf(path, "/%d", i);
 
         ret = xipfs_open(xipfs_nvme0p0, &desc, path,
@@ -2307,7 +2339,7 @@ static void test_xipfs_new_file_edquot(void)
     int ret;
 
     /* initialization */
-    for (i = 0; i < NVME0P0_PAGE_NUM; i++) {
+    for (i = 0; i < xipfs_nvme0p0->page_num; i++) {
         (void)sprintf(path, "/%d", i);
         ret = xipfs_new_file(xipfs_nvme0p0, path,
                 XIPFS_NVM_PAGE_SIZE, 0);
