@@ -460,6 +460,35 @@ static void _dump_tcp(const tcp_hdr_t *hdr, size_t payload_len)
     print_str(" bytes)\n");
 }
 
+static bool _is_extopt(uint8_t next_header)
+{
+    switch (next_header) {
+    case PROTNUM_IPV6_EXT_HOPOPT:
+        print_str(" hopopt");
+        return true;
+    case PROTNUM_IPV6_EXT_RH:
+        print_str(" rh");
+        return true;
+    case PROTNUM_IPV6_EXT_FRAG:
+        print_str(" frag");
+        return true;
+    case PROTNUM_IPV6_EXT_ESP:
+        print_str(" esp");
+        return true;
+    case PROTNUM_IPV6_EXT_AH:
+        print_str(" ah");
+        return true;
+    case PROTNUM_IPV6_EXT_DST:
+        print_str(" dst");
+        return true;
+    case PROTNUM_IPV6_EXT_MOB:
+        print_str(" mob");
+        return true;
+    }
+
+    return false;
+}
+
 static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
 {
     const ipv6_addr_t *me = rx ? &hdr->dst : &hdr->src;
@@ -475,7 +504,7 @@ static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
         uint8_t next_header = hdr->nh;
 
         /* skip IPv6 extension headers */
-        while (next_header == PROTNUM_IPV6_EXT_HOPOPT) {
+        while (_is_extopt(next_header)) {
             const struct {
                 uint8_t nh;
                 uint8_t opt_len;
