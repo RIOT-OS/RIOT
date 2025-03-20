@@ -80,4 +80,50 @@ int __swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...)
     return res;
 }
 
+void reverse_buf(void *buf, size_t len)
+{
+    uint8_t *cur = buf;
+    uint8_t *end = cur + len - 1;
+    while (cur < end) {
+        uint8_t tmp = *cur;
+        *cur++ = *end;
+        *end-- = tmp;
+    }
+}
+
+static inline uint8_t swap_nibbles(uint8_t b)
+{
+    return (b << 4) | (b >> 4);
+}
+
+int dec_as_hex(uint32_t val, void *dst, size_t len)
+{
+    uint8_t *tgt = dst;
+    uint8_t hex = 0;
+    uint8_t idx = 0;
+
+    memset(dst, 0, len);
+    len *= 2;
+
+    do {
+        hex <<= 4;
+        hex += val % 10;
+        val /= 10;
+        if (++idx % 2 == 0) {
+            *tgt++ = swap_nibbles(hex);
+            hex = 0;
+        }
+    } while (val && idx <= len);
+
+    if (idx > len) {
+        return -ENOBUFS;
+    }
+
+    if (idx % 2) {
+        *tgt++ = hex;
+    }
+
+    return (uintptr_t)tgt - (uintptr_t)dst;
+}
+
 /** @} */
