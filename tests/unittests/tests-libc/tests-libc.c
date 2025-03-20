@@ -75,6 +75,22 @@ static void test_libc_memchk(void)
     TEST_ASSERT(memchk(buffer, 0xff, sizeof(buffer)) == &buffer[5]);
 }
 
+static void test_libc_reverse_buf3(void)
+{
+    const char expected[3] = { 3, 2, 1 };
+    char buffer[3] = { 1, 2, 3 };
+    reverse_buf(buffer, sizeof(buffer));
+    TEST_ASSERT(!memcmp(buffer, expected, sizeof(buffer)));
+}
+
+static void test_libc_reverse_buf4(void)
+{
+    const char expected[4] = { 4, 3, 2, 1 };
+    char buffer[4] = { 1, 2, 3, 4 };
+    reverse_buf(buffer, sizeof(buffer));
+    TEST_ASSERT(!memcmp(buffer, expected, sizeof(buffer)));
+}
+
 /**
  * @name    Unit test ensuring `<endian.h>` is provided and correct across
  *          all platforms
@@ -138,6 +154,8 @@ Test *tests_libc_tests(void)
         new_TestFixture(test_libc_strscpy),
         new_TestFixture(test_libc_swprintf),
         new_TestFixture(test_libc_memchk),
+        new_TestFixture(test_libc_reverse_buf3),
+        new_TestFixture(test_libc_reverse_buf4),
         new_TestFixture(test_libc_endian),
     };
 
