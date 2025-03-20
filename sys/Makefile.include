@@ -199,3 +199,7 @@ endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/nanocoap/Makefile.include
 endif
+
+ifneq (,$(filter configuration configuration_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/configuration/Makefile.include
+endif
