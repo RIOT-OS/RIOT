@@ -21,7 +21,7 @@ USEMODULE += periph_gpio
 
 # Prevents native and native64 program from segfault when gpio set/clear are
 # used without a gpiochip
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
  USEMODULE += periph_gpio_mock
 endif
 
