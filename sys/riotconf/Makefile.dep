@@ -1,0 +1,3 @@
+USEMODULE += checksum
+USEMODULE += mtd_write_page
+USEMODULE += od
