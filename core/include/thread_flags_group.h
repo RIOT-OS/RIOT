@@ -78,16 +78,22 @@ extern "C" {
  * @{
  */
 #if UINT_MAX == UINT32_MAX
-typedef uint32_t tfg_int_t; /**< integer type for the bitfield */
-#define ATOMIC_SET_BIT_UINT(bit) atomic_set_bit_u32(bit)        /**< set */
-#define ATOMIC_CLEAR_BIT_UINT(bit) atomic_clear_bit_u32(bit)    /**< clear */
-#define ATOMIC_BIT_UINT(dest, bit) atomic_bit_u32(dest, bit)    /**< get bit */
+/**
+ * @brief Integer type for the bitfield.
+ */
+typedef uint32_t tfg_int_t;
+#define ATOMIC_SET_BIT_UINT(bit) atomic_set_bit_u32(bit)        /**< @brief set */
+#define ATOMIC_CLEAR_BIT_UINT(bit) atomic_clear_bit_u32(bit)    /**< @brief clear */
+#define ATOMIC_BIT_UINT(dest, bit) atomic_bit_u32(dest, bit)    /**< @brief get bit */
 
 #elif UINT_MAX == UINT16_MAX
-typedef uint16_t tfg_int_t; /**< integer type for the bitfield */
-#define ATOMIC_SET_BIT_UINT(bit) atomic_set_bit_u16(bit)        /**< set */
-#define ATOMIC_CLEAR_BIT_UINT(bit) atomic_clear_bit_u16(bit)    /**< clear */
-#define ATOMIC_BIT_UINT(dest, bit) atomic_bit_u16(dest, bit)    /**< get bit */
+/**
+ * @brief Integer type for the bitfield.
+ */
+typedef uint16_t tfg_int_t;
+#define ATOMIC_SET_BIT_UINT(bit) atomic_set_bit_u16(bit)        /**< @brief set */
+#define ATOMIC_CLEAR_BIT_UINT(bit) atomic_clear_bit_u16(bit)    /**< @brief clear */
+#define ATOMIC_BIT_UINT(dest, bit) atomic_bit_u16(dest, bit)    /**< @brief get bit */
 
 #else
 /* Technically, 8-bit-sized unsigned int is possible (e.g. by setting AVR's

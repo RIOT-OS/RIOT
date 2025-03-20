@@ -30,19 +30,21 @@ void thread_flags_group_set(tfg_t *group, thread_flags_t mask)
     int irq_state = irq_disable();
 
     for (unsigned i = 0; i < ARRAY_SIZE(group->members); i++) {
-        /* Make a PID block copy to prevent unnecessary value reloading. */
         tfg_int_t pid_block = group->members[i];
+        kernel_pid_t pid = i * TFG_INT_BITS;
+
         while (pid_block) {
             static_assert(sizeof(tfg_int_t) == sizeof(unsigned),
                           "sizeof(tfg_int_t) != sizeof(unsigned)");
-
+            /* Just clearing the LSB is inefficient on architectures not
+             * supporting LSB. Although bitarithm_lsb() is inlined, the compiler
+             * isn't smart enough to understand that leading bits are always
+             * cleared on each loop run, so it iterates over all leading zeroes.
+             * Therefore we shift. */
             unsigned const bit = bitarithm_lsb((unsigned)pid_block);
-
-            thread_t *thread = thread_get(i * TFG_INT_BITS + bit);
-            assert(thread);
-            thread_flags_set(thread, mask);
-
-            pid_block &= ~(1 << bit);
+            pid += bit;
+            pid_block >>= bit + 1;
+            thread_flags_set(thread_get(pid++), mask);
         }
     }
 

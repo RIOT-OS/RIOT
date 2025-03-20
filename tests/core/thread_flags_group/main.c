@@ -25,9 +25,11 @@
 #include "thread.h"
 #include "thread_flags_group.h"
 
-#define WAITERS_CNT 2
+#ifndef WAITER_THREADS_CNT
+#  define WAITER_THREADS_CNT 3
+#endif
 
-static char stacks[WAITERS_CNT][THREAD_STACKSIZE_MAIN];
+static char stacks[WAITER_THREADS_CNT][THREAD_STACKSIZE_MAIN];
 
 #define GOOD_FLAG 0x2
 #define BAD_FLAG  0x4
@@ -35,6 +37,13 @@ static char stacks[WAITERS_CNT][THREAD_STACKSIZE_MAIN];
 static uint8_t woken_up = 0;
 static uint8_t last_prio = 0;
 static tfg_t group = THREAD_FLAGS_GROUP_INIT;
+
+static void *forever_waiter(void *arg)
+{
+    printf("non-waiter %u waiting...\n", (unsigned)(uintptr_t)arg);
+    thread_flags_wait_any(GOOD_FLAG | BAD_FLAG);
+    expect(false);
+}
 
 static void *waiter(void *arg)
 {
@@ -56,13 +65,16 @@ static void *waiter(void *arg)
 int main(void)
 {
     puts("START");
-    for (unsigned i = 0; i < WAITERS_CNT; i++) {
+    unsigned waiters_cnt = 0;
+    for (unsigned i = 0; i < WAITER_THREADS_CNT; i++) {
         int prio = (int)THREAD_PRIORITY_MAIN - i - 1;
         if (prio < 0) {
             prio = 0;
         }
+
+        thread_task_func_t handler = i % 3 ? (waiters_cnt++, waiter) : forever_waiter;
         int res = thread_create(stacks[i], THREAD_STACKSIZE_MAIN,
-                                prio, THREAD_CREATE_STACKTEST, waiter,
+                                prio, THREAD_CREATE_STACKTEST, handler,
                                 (void *)(uintptr_t)i, "waiter");
         expect(res >= 0);
     }
@@ -76,7 +88,8 @@ int main(void)
     thread_flags_group_set(&group, GOOD_FLAG);
 
     /* waiters have higher prio, so they must have finished */
-    expect(atomic_load_u8(&woken_up) == WAITERS_CNT);
+    printf("%u, %u\n", atomic_load_u8(&woken_up), waiters_cnt);
+    expect(atomic_load_u8(&woken_up) == waiters_cnt);
 
     puts("SUCCESS");
 
