@@ -27,6 +27,10 @@
 #include "lwip/sys.h"
 #include "lwip/udp.h"
 
+#ifdef SOCK_HAS_ASYNC_CTX
+#include "net/sock/async/event.h"
+#endif
+
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags)
 {
@@ -56,6 +60,9 @@ void sock_udp_close(sock_udp_t *sock)
         netconn_delete(sock->base.conn);
         sock->base.conn = NULL;
     }
+#ifdef SOCK_HAS_ASYNC_CTX
+    sock_event_close(sock_udp_get_async_ctx(sock));
+#endif
 }
 
 int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *ep)
