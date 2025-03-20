@@ -527,7 +527,7 @@ static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
             break;
         default:
             print_str("\tunknown next header type ");
-            print_u32_dec(hdr->nh);
+            print_u32_dec(next_header);
             print_str("\n");
         }
     }
