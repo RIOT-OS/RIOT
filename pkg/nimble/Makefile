@@ -62,6 +62,9 @@ nimble_host_store_ram:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # service implementations
+nimble_svc_bas:
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/services/bas/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+
 nimble_svc_gap:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
