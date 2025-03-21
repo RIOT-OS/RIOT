@@ -19,6 +19,7 @@
 #ifndef CPU_ESP8266
 #include "esp_heap_caps.h"
 #include "esp_timer.h"
+#include "soc/soc.h"
 #endif
 
 #include "mutex.h"

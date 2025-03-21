@@ -1,0 +1,2 @@
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_tlsf
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_tlsf/include

@@ -21,12 +21,14 @@
 #include "irq_arch.h"
 
 #include "esp_attr.h"
+#include "esp_bit_defs.h"
+#include "esp_cpu.h"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
-#include "hal/interrupt_controller_types.h"
-#include "hal/interrupt_controller_ll.h"
 #include "rom/ets_sys.h"
+#include "soc/interrupts.h"
 #include "soc/periph_defs.h"
+#include "soc/soc.h"
 #include "esp_intr_alloc.h"
 
 #define ENABLE_DEBUG 0
@@ -49,9 +51,6 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTT, 1 },
 #if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_TG0_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#endif
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2)
-    { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
 #if !defined(CPU_FAM_ESP32C2)
     { ETS_TG1_T0_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
@@ -76,10 +75,20 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN, 1 },
     { ETS_TIMER2_INTR_SOURCE, CPU_INUM_FRC2, 2 },
 #endif
-#if !defined(CPU_FAM_ESP32)
+#if defined(CPU_FAM_ESP32)
+    { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
+#elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
     { ETS_SYSTIMER_TARGET2_EDGE_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
+#else
+#error "Platform implementation is missing"
 #endif
-    { ETS_INTERNAL_SW1_INTR_SOURCE, CPU_INUM_BLE, 2 },
+#if SOC_BLE_SUPPORTED
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+    { ETS_RWBLE_INTR_SOURCE, CPU_INUM_BLE, 2 },
+#else
+#error "Platform implementation is missing"
+#endif
+#endif /* SOC_BLE_SUPPORTED */
 #if defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_USB_INTR_SOURCE, CPU_INUM_USB, 1 },
 #endif
@@ -108,19 +117,19 @@ void esp_irq_init(void)
 #ifdef SOC_CPU_HAS_FLEXIBLE_INTC
     /* to avoid to do it in every component, we initialize levels here once */
     for (unsigned i = 0; i < IRQ_DATA_TABLE_SIZE; i++) {
-        intr_cntrl_ll_set_int_level(_irq_data_table[i].intr, _irq_data_table[i].level);
+        esp_cpu_intr_set_priority(_irq_data_table[i].intr, _irq_data_table[i].level);
     }
 #endif
 }
 
 void esp_intr_enable_source(int inum)
 {
-    intr_cntrl_ll_enable_interrupts(BIT(inum));
+    esp_cpu_intr_enable(BIT(inum));
 }
 
 void esp_intr_disable_source(int inum)
 {
-    intr_cntrl_ll_disable_interrupts(BIT(inum));
+    esp_cpu_intr_disable(BIT(inum));
 }
 
 esp_err_t esp_intr_enable(intr_handle_t handle)
@@ -150,6 +159,8 @@ esp_err_t esp_intr_disable(intr_handle_t handle)
 esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
                          void *arg, intr_handle_t *ret_handle)
 {
+    DEBUG("%s source=%d flags=0x%04"PRIx16" handler=%p arg=%p\n",
+          __func__, source, (uint16_t)flags, handler, arg);
     unsigned i;
     for (i = 0; i < IRQ_DATA_TABLE_SIZE; i++) {
         if (_irq_data_table[i].src == source) {
@@ -158,6 +169,8 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
     }
 
     if (i == IRQ_DATA_TABLE_SIZE) {
+        DEBUG("%s source=%d not found in interrupt allocation table\n",
+              __func__, source);
         return ESP_ERR_NOT_FOUND;
     }
 
@@ -165,16 +178,16 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
     intr_matrix_set(PRO_CPU_NUM, _irq_data_table[i].src, _irq_data_table[i].intr);
 
     /* set the interrupt handler */
-    intr_cntrl_ll_set_int_handler(_irq_data_table[i].intr, handler, arg);
+    esp_cpu_intr_set_handler(_irq_data_table[i].intr, handler, arg);
 
 #ifdef SOC_CPU_HAS_FLEXIBLE_INTC
     /* set interrupt level given by flags */
-    intr_cntrl_ll_set_int_level(_irq_data_table[i].intr, esp_intr_flags_to_level(flags));
+    esp_cpu_intr_set_priority(_irq_data_table[i].intr, esp_intr_flags_to_level(flags));
 #endif
 
     /* enable the interrupt if ESP_INTR_FLAG_INTRDISABLED is not set */
     if ((flags & ESP_INTR_FLAG_INTRDISABLED) == 0) {
-        intr_cntrl_ll_enable_interrupts(BIT(_irq_data_table[i].intr));
+        esp_cpu_intr_enable(BIT(_irq_data_table[i].intr));
     }
 
     if (ret_handle) {
@@ -203,4 +216,25 @@ esp_err_t esp_intr_free(intr_handle_t handle)
 int esp_intr_get_cpu(intr_handle_t handle)
 {
     return PRO_CPU_NUM;
+}
+
+static volatile uint32_t esp_intr_noniram_state;
+static uint32_t esp_intr_noniram_call_counter = 0;
+
+void IRAM_ATTR esp_intr_noniram_disable(void)
+{
+    if (esp_intr_noniram_call_counter == 0) {
+        esp_intr_noniram_state = irq_disable();
+    }
+    esp_intr_noniram_call_counter++;
+}
+
+void IRAM_ATTR esp_intr_noniram_enable(void)
+{
+    if (esp_intr_noniram_call_counter) {
+        esp_intr_noniram_call_counter--;
+        if (esp_intr_noniram_call_counter == 0) {
+            irq_restore(esp_intr_noniram_state);
+        }
+    };
 }
