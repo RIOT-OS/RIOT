@@ -19,7 +19,7 @@
 #ifndef ASYNC_READ_H
 #define ASYNC_READ_H
 
-#include <stdlib.h>
+#include <sys/types.h>
 #include <poll.h>
 
 #ifdef __cplusplus
