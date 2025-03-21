@@ -33,7 +33,7 @@ ifneq (,$(filter stdin,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
 
-ifneq (1, $(words $(filter $(STDIO_MODULES),$(USEMODULE))))
+ifneq (1, $(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))))
   USEMODULE += stdio_dispatch
 endif
 

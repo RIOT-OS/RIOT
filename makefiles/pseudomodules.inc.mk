@@ -488,6 +488,13 @@ PSEUDOMODULES += soft_uart_modecfg
 PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_available
 PSEUDOMODULES += stdio_cdc_acm
+## @defgroup sys_stdio_default	Default STDIO provider
+## @ingroup sys_stdio
+## @{
+## This module selects the default STDIO method of a given board.
+## It will be enabled by default if no other stdio method is selected.
+PSEUDOMODULES += stdio_default
+## @}
 PSEUDOMODULES += stdio_dispatch
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_nimble_debug
