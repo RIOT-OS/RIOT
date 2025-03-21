@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f746zg STM32 Nucleo-F746ZG
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-F746ZG
@@ -47,5 +46,3 @@ make BOARD=nucleo-f746zg PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
       can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */
