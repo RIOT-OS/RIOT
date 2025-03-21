@@ -1,5 +1,7 @@
-RIOTBASE  = $(shell git rev-parse --show-toplevel)
-RIOTMAKE ?= $(RIOTBASE)/makefiles
+RIOTBASE  ?= $(shell git rev-parse --show-toplevel)
+RIOTMAKE  ?= $(RIOTBASE)/makefiles
+RIOTTOOLS ?= $(RIOTBASE)/dist/tools
+
 
 # Generate list of quoted absolute include paths. Evaluated in riot.doxyfile.
 export STRIP_FROM_INC_PATH_LIST=$(shell \
@@ -22,11 +24,14 @@ endif
 # Check that the doxygen version is not too old to avoid
 # certain bugs that were fixed in later revisions. Especially
 # Debian-based distributions tend to have very old versions.
-DOXYGEN_MIN_VERSION = 1.14.0
+DOXYGEN_MIN_VERSION = 1.13.1
+
+# Set the Doxygen binary if not already set
+DOXYGEN ?= doxygen
 
 # Strip the commit hash that is sometimes present after the
 # version number.
-DOXYGEN_VERSION = $(shell doxygen --version | cut -d ' ' -f1)
+DOXYGEN_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
 
 # include color echo macros
 include $(RIOTMAKE)/utils/ansi.mk
@@ -41,20 +46,25 @@ doc doc-man doc-latex: $(DOCUMENTATION_FORMAT)
 		"to avoid incorrectly formatted output.$(COLOR_RESET)"; \
 	fi
 
+.PHONY: doc-ci
+doc-ci: $(RIOTTOOLS)/doxygen/Makefile
+	@MAKEFLAGS= PKG_VERSION=$(DOXYGEN_MIN_VERSION) $(MAKE) -wC $(RIOTTOOLS)/doxygen all
+	$(MAKE) -BC $(CURDIR) DOXYGEN=$(RIOTTOOLS)/doxygen/doxygen doc
+
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
 html: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
+	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
 
 .PHONY: check
 check: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile) | doxygen -
+	( cat riot.doxyfile) | $(DOXYGEN) -
 
 .PHONY: man
 man: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
+	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/man/man3"
 
@@ -76,9 +86,10 @@ src/governance.md: ../../GOVERNANCE.md
 
 .PHONY:
 latex: src/changelog.md src/coc.md src/governance.md
-	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
+	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/latex/index.tex"
 
 clean:
 	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md src/coc.md src/governance.md
+	@$(MAKE) -C $(RIOTTOOLS)/doxygen clean
