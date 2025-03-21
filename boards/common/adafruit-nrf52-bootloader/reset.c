@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840
+ * @ingroup     boards_common_adafruit-nrf52-bootloader
  * @{
  * @file
- * @brief       Implementation for managing the nrfutil bootloader
+ * @brief       Reset Logic for the Adafruit nRF52 Bootloader
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
