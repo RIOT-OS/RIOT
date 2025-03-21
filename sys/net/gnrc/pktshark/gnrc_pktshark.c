@@ -38,6 +38,7 @@
 #include "net/udp.h"
 #include "net/sixlowpan.h"
 #include "net/nanocoap.h"
+#include "net/ipv4/hdr.h"
 #include "od.h"
 #include "shell.h"
 
@@ -489,12 +490,37 @@ static bool _is_extopt(uint8_t next_header)
     return false;
 }
 
+static void _dump_ipv4(const ipv4_hdr_t *hdr, size_t payload_len, bool rx)
+{
+    const ipv4_addr_t *me = rx ? &hdr->dst : &hdr->src;
+    const ipv4_addr_t *they = rx ? &hdr->src : &hdr->dst;
+    const void *payload = hdr + 1;
+
+    ipv4_addr_print(me);
+    print_str(rx ? " ⇐ " : " ⇒ ");
+    ipv4_addr_print(they);
+
+    switch (hdr->protocol) {
+    case PROTNUM_UDP:
+        _dump_udp(payload, payload_len - sizeof(udp_hdr_t), NULL);
+        break;
+    case PROTNUM_TCP:
+        _dump_tcp(payload, payload_len - sizeof(tcp_hdr_t));
+        break;
+    default:
+        print_str("\tunknown protocol ");
+        print_u32_dec(hdr->protocol);
+        printf(" (");
+        print_u32_dec(payload_len);
+        print_str(" bytes)\n");
+    }
+}
+
 static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
 {
     const ipv6_addr_t *me = rx ? &hdr->dst : &hdr->src;
     const ipv6_addr_t *they = rx ? &hdr->src : &hdr->dst;
 
-    print_str("\n");
     ipv6_addr_print(me);
     print_str(rx ? " ⇐ " : " ⇒ ");
     ipv6_addr_print(they);
@@ -516,6 +542,11 @@ static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
         }
 
         switch (next_header) {
+        case PROTNUM_IPV4:
+            /* 4in6 */
+            print_str("\n\t");
+            _dump_ipv4(payload, payload_len - sizeof(ipv4_hdr_t), rx);
+            break;
         case PROTNUM_ICMPV6:
             _dump_icmpv6(payload, payload_len);
             break;
@@ -569,6 +600,14 @@ static void _dump_snip(gnrc_pktsnip_t *pkt, bool rx)
 static void _dump(gnrc_pktsnip_t *pkt, bool rx)
 {
     gnrc_pktsnip_t *snip = pkt;
+    gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+
+    print_str("\n");
+    if (netif) {
+        gnrc_netif_hdr_t *hdr = netif->data;
+        print_u32_dec(hdr->if_pid);
+        print_str(") ");
+    }
 
     while (snip != NULL) {
         _dump_snip(snip, rx);

@@ -468,6 +468,7 @@ ifneq (,$(filter auto_init_gnrc_pktshark,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += ipv4_addr
   USEMODULE += fmt
   USEMODULE += gnrc_pktbuf
   USEMODULE += nanocoap
