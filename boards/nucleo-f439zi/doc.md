@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f439zi STM32 Nucleo-F439ZI
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-F439ZI
@@ -57,5 +56,3 @@ provided by integrated ST-LINK programmer. ST-LINK is connected to the
 microcontroller USART3.
 
 The default baud rate is 115200.
-
- */

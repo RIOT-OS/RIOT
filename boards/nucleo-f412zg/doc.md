@@ -1,4 +1,3 @@
-/**
  @defgroup    boards_nucleo-f412zg STM32 Nucleo-F412ZG
  @ingroup     boards_common_nucleo144
  @brief       Support for the STM32 Nucleo-F412ZG
@@ -47,5 +46,3 @@ make BOARD=nucleo-f412zg PROGRAMMER=cpy2remed flash
 @note This PROGRAMMER requires ST-LINK firmware 2.37.26 or newer. Firmware updates
 could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw
 -link007.html).
-
-*/

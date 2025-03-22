@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f429zi STM32 Nucleo-F429ZI
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-F429ZI
@@ -67,5 +66,3 @@ PD8 (USART3 TX) and PD9 (USART3 RX).
 
 @note Accordingly to the [MCU Datasheet](https://www.st.com/resource/en/datasheet/stm32f429zi.pdf)
 PD8 and PD9 pins are 5V tolerant (see table 10, page 62).
-
- */
