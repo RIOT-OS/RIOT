@@ -46,7 +46,7 @@ static const credman_credential_t credential = {
 #endif
 
 /* _list_all_inet6() and _print_addr() derived from sc_gnrc_netif.c */
-
+#ifdef MODULE_GNRC_IPV6
 static void _print_addr(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -116,6 +116,7 @@ static int _cmd_inet6(int argc, char **argv)
 }
 
 SHELL_COMMAND(inet6, "IPv6 addresses", _cmd_inet6);
+#endif
 
 int main(void)
 {
