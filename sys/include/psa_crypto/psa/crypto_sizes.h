@@ -57,12 +57,13 @@ extern "C" {
  *          the features chosen at compile-time. They should not be
  *          changed manually.
  */
-#if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
-     IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
-     IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
-     IS_USED(MODULE_PSA_MAC_HMAC_SHA_256) || \
-     IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256) || \
-     IS_USED(MODULE_PSA_CIPHER_CHACHA20))
+#if   (IS_USED(MODULE_PSA_MAC_HMAC_SHA_256))
+#define CONFIG_PSA_MAX_KEY_SIZE 64
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
+       IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
+       IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
+       IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256) || \
+       IS_USED(MODULE_PSA_CIPHER_CHACHA20))
 #define CONFIG_PSA_MAX_KEY_SIZE 32
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || \
        IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
@@ -351,6 +352,31 @@ extern "C" {
  *          See also @ref PSA_HASH_LENGTH().
  */
 #define PSA_HASH_MAX_SIZE   (64)
+
+/**
+ * @brief   Maximum size of a hash block supported by this implementation, in bytes.
+ *
+ *          See also @ref PSA_HASH_BLOCK_LENGTH().
+ */
+#if   (IS_USED(MODULE_PSA_HASH_SHA3_256))
+#define PSA_HASH_MAX_BLOCK_SIZE 136
+#elif (IS_USED(MODULE_PSA_HASH_SHA_512) || \
+       IS_USED(MODULE_PSA_HASH_SHA_384) || \
+       IS_USED(MODULE_PSA_HASH_SHA_512_224) || \
+       IS_USED(MODULE_PSA_HASH_SHA_512_256))
+#define PSA_HASH_MAX_BLOCK_SIZE 128
+#elif (IS_USED(MODULE_PSA_HASH_SHA3_384))
+#define PSA_HASH_MAX_BLOCK_SIZE 104
+#elif (IS_USED(MODULE_PSA_HASH_SHA3_512))
+#define PSA_HASH_MAX_BLOCK_SIZE 72
+#elif (IS_USED(MODULE_PSA_HASH_MD5) || \
+       IS_USED(MODULE_PSA_HASH_SHA_1) || \
+       IS_USED(MODULE_PSA_HASH_SHA_224) || \
+       IS_USED(MODULE_PSA_HASH_SHA_256))
+#define PSA_HASH_MAX_BLOCK_SIZE 64
+#else
+#define PSA_HASH_MAX_BLOCK_SIZE 0
+#endif
 
 /**
  * @brief   The input block size of a hash algorithm, in bytes.
