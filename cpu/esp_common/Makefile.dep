@@ -44,7 +44,7 @@ ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
 endif
 
 ifneq (,$(filter netdev_default,$(USEMODULE)))
-  ifneq (,$(filter lwip,$(USEMODULE)))
+  ifneq (,$(filter lwip_arp,$(USEMODULE)))
     # for lwip, use esp_wifi as default netdev if no other netdev is enabled
     ifeq (,$(filter esp_eth,$(USEMODULE)))
       USEMODULE += esp_wifi
