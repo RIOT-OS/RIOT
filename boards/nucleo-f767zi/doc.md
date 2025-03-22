@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f767zi STM32 Nucleo-F767ZI
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-F767ZI
@@ -47,5 +46,3 @@ make BOARD=nucleo-f767zi PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
       can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */

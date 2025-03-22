@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f722ze STM32 Nucleo-F722ZE
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-F722ZE
@@ -55,5 +54,3 @@ provided by integrated ST-LINK programmer. ST-LINK is connected to the
 microcontroller USART3.
 
 The default baud rate is 115200.
-
- */
