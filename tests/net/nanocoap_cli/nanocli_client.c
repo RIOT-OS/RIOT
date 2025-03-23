@@ -32,6 +32,7 @@
 #include "od.h"
 #include "shell.h"
 
+#ifdef MODULE_GNRC_IPV6
 static ssize_t _send(coap_pkt_t *pkt, size_t len,
                           char *addr_str, const char *port_str)
 {
@@ -199,6 +200,7 @@ static int _cmd_client_token(int argc, char **argv){
     return 0;
 }
 SHELL_COMMAND(client_token, "Set Token for CoAP client", _cmd_client_token);
+#endif
 
 static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf,
                          size_t len, int more)
