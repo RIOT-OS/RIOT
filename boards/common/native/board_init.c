@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup boards_native32
+ * @ingroup boards_common_native
  * @{
  * @file
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -39,10 +39,10 @@ MTD_XFA_ADD(mtd0_dev.base, 0);
 #include "vfs_default.h"
 
 /*
- * On `native32` we define auto-mounts for every file system.
+ * On `native` we define auto-mounts for every file system.
  *
  * A 'real' board would typically always use the same file system to avoid
- * data loss when re-formatting, but since `native32` is for testing only we
+ * data loss when re-formatting, but since `native` is for testing only we
  * provide all file system definitions here.
  */
 
@@ -79,5 +79,5 @@ VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, VFS_DEFAULT_NVM(0), 0);
  */
 void board_init(void)
 {
-    puts("RIOT native32 board initialized.");
+    puts("RIOT " RIOT_BOARD " board initialized.");
 }
