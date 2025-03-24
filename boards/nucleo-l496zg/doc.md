@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l496zg STM32 Nucleo-L496ZG
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-l496zg
@@ -46,5 +45,3 @@ make BOARD=nucleo-l496zg PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
       can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html
-
- */

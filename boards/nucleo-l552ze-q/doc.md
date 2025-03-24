@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l552ze-q STM32 Nucleo-L552ZE-Q
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-L552ZE-Q
@@ -99,4 +98,3 @@ PG7 and PG8 pins are 5V tolerant (see table 21, page 108).
 For using the ST Nucleo-L552ZE-Q board we recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

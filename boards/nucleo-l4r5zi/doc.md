@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_nucleo144-l4r5 STM32 Nucleo-L4R5ZI
- * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo-L4R5ZI
+@defgroup    boards_nucleo144-l4r5 STM32 Nucleo-L4R5ZI
+@ingroup     boards_common_nucleo144
+@brief       Support for the STM32 Nucleo-L4R5ZI
 
 ## Overview
 
@@ -78,5 +77,3 @@ The default baud rate is 115 200.
 Use the `term` target to open a terminal:
 
     make BOARD=nucleo-l4r5zi -C examples/basic/hello-world term
-
- */
