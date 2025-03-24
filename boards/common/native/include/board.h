@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_native32
+ * @ingroup     boards_common_native
  *
  * The native32 board uses call level hardware simulation
  *
