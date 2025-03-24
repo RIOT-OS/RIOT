@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-u575zi-q STM32 Nucleo-U575ZI-Q
 @ingroup     boards_common_nucleo144
 @brief       Support for the STM32 Nucleo-U575ZI-Q
@@ -61,4 +60,3 @@ microcontroller USART1.
 The default baud rate is 115 200.
 
 If a physical connection to USART1 is needed, connect UART interface to pins PA9 (USART1 TX) and PA10 (USART1 RX).
-*/
