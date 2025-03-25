@@ -47,4 +47,14 @@ bool xPortCanYield(void)
     return irq_is_enabled();
 }
 
+void vPortEnterCritical(void)
+{
+    vTaskEnterCritical(0);
+}
+
+void vPortExitCritical(void)
+{
+    vTaskExitCritical(0);
+}
+
 #endif /* DOXYGEN */
