@@ -1014,6 +1014,7 @@ typedef enum {
     UART_PARITY_SPACE = UART_MODE_UNSUPPORTED | 1,
 } uart_parity_t;
 
+#define UART_PARITY_DISABLE UART_PARITY_NONE
 #define HAVE_UART_PARITY_T
 
 #endif /* !DOXYGEN */
