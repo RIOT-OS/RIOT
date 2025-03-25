@@ -13,12 +13,12 @@
  * @ingroup     sys
  * @brief       Auto initialize modules
  *
- * This feature can be enabled in any application by adding the `auto_init`
- * module to the application's `Makefile`:
+ * This feature is automatically enabled and can be disabled in any application
+ * by disabling the `auto_init` module in the application's `Makefile`:
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * USEMODULE += auto_init
- * ~~~~~~~~~~~~~~~~~~~~~~~
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * DISABLE_MODULE += auto_init
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * `auto_init` initializes any included module that provides
  * auto-initialization capabilities.
