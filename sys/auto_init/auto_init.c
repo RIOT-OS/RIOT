@@ -262,6 +262,10 @@ extern void auto_init_gnrc_rpl(void);
 AUTO_INIT(auto_init_gnrc_rpl,
           AUTO_INIT_PRIO_MOD_GNRC_RPL);
 #endif
+#if IS_USED(MODULE_ZBOSS)
+extern void zboss_init(void);
+AUTO_INIT(zboss_init, AUTO_INIT_PRIO_MOD_ZBOSS);
+#endif
 #if IS_USED(MODULE_AUTO_INIT_CAN)
 extern void auto_init_candev(void);
 AUTO_INIT(auto_init_candev,
