@@ -134,8 +134,8 @@ ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
 /**
  * @brief Iterates over all resident credentials in flash memory
  *
- * @param[in] key           pointer to authenticator state
- * @param[in, out] state    iteration state of resident credential. Must point to a NULL
+ * @param[out] key          pointer to resident credential
+ * @param[inout] state      iteration state of resident credential. Must point to a NULL
  *                          pointer to start iteration.
  *
  * @return @ref ctap_status_code_t

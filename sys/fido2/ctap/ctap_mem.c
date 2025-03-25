@@ -28,10 +28,6 @@
 
 static mtd_dev_t *_mtd_dev;
 
-#ifdef BOARD_NATIVE
-#include "mtd_default.h"
-#endif
-
 typedef struct {
     uint32_t off;
     ctap_resident_key_t rk;
@@ -60,7 +56,7 @@ ctap_status_code_t fido2_ctap_mem_init(void)
     int ret = mtd_init(_mtd_dev);
 
     if (ret < 0) {
-        DEBUG("%s, %d: Failed to initialize MTD device\n", RIOT_FILE_RELATIVE,
+        DEBUG("%s:%d: Failed to initialize MTD device\n", __FILE__,
               __LINE__);
         return ret;
     }
@@ -86,14 +82,14 @@ static bool _flash_rk_check_offset(uint32_t off)
 {
     /* Offset must skip ctap_state_t */
     if (off < CTAP_FLASH_STATE_SZ) {
-        DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
+        DEBUG("%s:%d: Incorrect offset detected\n", __FILE__,
               __LINE__);
 
         return false;
     }
     /* Must be aligned to CTAP_FLASH_RK_SZ */
     if ((off - CTAP_FLASH_STATE_SZ) % CTAP_FLASH_RK_SZ != 0) {
-        DEBUG("%s, %d: Incorrect offset detected\n", RIOT_FILE_RELATIVE,
+        DEBUG("%s:%d: Incorrect offset detected\n", __FILE__,
               __LINE__);
 
         return false;
@@ -112,7 +108,7 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t off, size_t len
     int ret = mtd_write_page(_mtd_dev, buf, page, page_off, len);
 
     if (ret < 0) {
-        DEBUG("%s, %d: mtd_write_page failed\n", RIOT_FILE_RELATIVE,
+        DEBUG("%s:%d: mtd_write_page failed\n", __FILE__,
               __LINE__);
         return CTAP1_ERR_OTHER;
     }
@@ -156,7 +152,7 @@ static ctap_status_code_t _flash_read_rk(_rk_flash_entry_t *entry)
 
     int ret = mtd_read_page(_mtd_dev, &entry->rk, page, page_off, sizeof(ctap_resident_key_t));
     if (ret < 0) {
-        DEBUG("%s, %d: mtd_read failed\n", RIOT_FILE_RELATIVE,
+        DEBUG("%s:%d: mtd_read failed\n", __FILE__,
               __LINE__);
         return CTAP1_ERR_OTHER;
     }
