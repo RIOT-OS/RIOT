@@ -26,6 +26,7 @@ extern "C" {
 #include "kernel_defines.h"
 #include "psa/crypto_includes.h"
 
+#include "aead/types.h"
 #include "hash/types.h"
 #include "cipher/types.h"
 #include "mac/types.h"

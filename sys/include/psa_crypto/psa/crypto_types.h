@@ -29,6 +29,7 @@ extern "C" {
 #include "psa/error.h"
 #include "psa/key/attributes.h"
 
+#include "aead/types.h"
 #include "cipher/types.h"
 #include "hash/types.h"
 #include "mac/types.h"
@@ -70,39 +71,6 @@ typedef struct psa_key_derivation_operation_s psa_key_derivation_operation_t;
  * @brief   Encoding of the step of a key derivation.
  */
 typedef uint16_t psa_key_derivation_step_t;
-
-/* These are all temporarily defined as some numeric type to prevent errors at compile time.*/
-/**
- * @brief   The type of the state object for multi-part AEAD operations.
- *
- * @details Before calling any function on an AEAD operation object, the application must
- *          initialize it by any of the following means:
- *          - Set the object to all-bits-zero, for example:
- *            @code
- *            @ref psa_aead_operation_t operation;
- *            memset(&operation, 0, sizeof(operation));
- *            @endcode
- *          - Initialize the object to logical zero values by declaring the object as static
- *            or global without an explicit initializer, for example:
- *            @code
- *            static @ref psa_aead_operation_t operation;
- *            @endcode
- *          - Initialize the object to the initializer @ref PSA_AEAD_OPERATION_INIT, for example:
- *            @code
- *            @ref psa_aead_operation_t operation = @ref PSA_AEAD_OPERATION_INIT;
- *            @endcode
- *          - Assign the result of the function @ref psa_aead_operation_init() to the object,
- *            for example:
- *            @code
- *            @ref psa_aead_operation_t operation;
- *            operation = @ref psa_aead_operation_init();
- *            @endcode
- *
- *          This is an implementation-defined type. Applications that make assumptions about the
- *          content of this object will result in in implementation-specific behavior, and are
- *          non-portable.
- */
-typedef struct psa_aead_operation_s psa_aead_operation_t;
 
 #ifdef __cplusplus
 }
