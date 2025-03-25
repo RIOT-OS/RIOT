@@ -39,19 +39,6 @@ extern "C" {
 #include "psa/asymmetric_encryption/algorithm.h"
 #include "psa/asymmetric_signature/algorithm.h"
 
-/**
- * @brief   A sufficient signature buffer size for @ref psa_sign_message() and
- *          @ref psa_sign_hash(), for any of the supported key types and asymmetric signature
- *          algorithms.
- *
- * @details If the size of the signature buffer is at least this large, it is guaranteed that
- *          @ref psa_sign_message() and @ref psa_sign_hash() will not fail due to an insufficient
- *          buffer size.
- *
- *          See also @ref PSA_SIGN_OUTPUT_SIZE().
- */
-#define PSA_SIGNATURE_MAX_SIZE /* implementation-defined value */
-
 #ifdef __cplusplus
 }
 #endif
