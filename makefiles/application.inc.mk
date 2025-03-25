@@ -1,8 +1,10 @@
 MODULE = $(APPLICATION_MODULE)
 
 DIRS += $(RIOTCPU)/$(CPU) $(BOARDDIR)
-DIRS += $(COMMON_BOARD_DIRS)
-DIRS += $(RIOTBASE)/core $(RIOTBASE)/core/lib $(RIOTBASE)/drivers $(RIOTBASE)/sys
+DIRS += $(RIOTBASE)/boards
+DIRS += $(RIOTBASE)/core $(RIOTBASE)/core/lib
+DIRS += $(RIOTBASE)/drivers
+DIRS += $(RIOTBASE)/sys
 
 # For regular modules, adding files to BLOBS, SRC, SRCXX, ASMSRC or ASSMSRC
 # in their Makefile is sufficient to explicitely set the variables.

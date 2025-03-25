@@ -1,5 +1,3 @@
-MODULE = board_common_slwstk6000b
-
-DIRS = $(RIOTBOARD)/common/silabs
+MODULE = boards_common_slwstk6000b
 
 include $(RIOTBASE)/Makefile.base

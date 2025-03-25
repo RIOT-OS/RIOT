@@ -15,5 +15,7 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_sdcard_default
 endif
 
+USEMODULE += boards_common_samdx1-arduino-bootloader
+
 # setup the samd21 arduino bootloader related dependencies
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.dep

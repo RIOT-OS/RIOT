@@ -5,9 +5,10 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 # add board common drivers
-USEMODULE += boards_common_silabs
 USEMODULE += silabs_aem
 USEMODULE += silabs_bc
+
+USEMODULE += boards_common_silabs
 
 # include board common dependencies
 include $(RIOTBOARD)/common/silabs/Makefile.dep

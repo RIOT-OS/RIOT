@@ -3,4 +3,6 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   DISABLE_MODULE += periph_init_led0
 endif
 
+USEMODULE += boards_common_sodaq
+
 include $(RIOTBOARD)/common/sodaq/Makefile.dep

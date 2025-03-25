@@ -602,16 +602,6 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-# find modules that require a common board folder to be included
-COMMON_BOARD_MODULES := $(strip $(foreach mod, $(USEMODULE), \
-                        $(if $(findstring boards_common_,$(mod)), $(mod)) ))
-
-# Replace the underscores in `_common_` with slashes to create a path
-# and make the path absolute
-COMMON_BOARD_DIRS := $(subst _common_,/common/,$(COMMON_BOARD_MODULES))
-COMMON_BOARD_DIRS := $(addprefix $(RIOTBASE)/,$(COMMON_BOARD_DIRS))
-
-
 .PHONY: all link clean flash flash-only termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container

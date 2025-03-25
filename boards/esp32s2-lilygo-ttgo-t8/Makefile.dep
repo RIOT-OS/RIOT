@@ -20,4 +20,6 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
+USEMODULE += boards_common_esp32s2
+
 include $(RIOTBOARD)/common/esp32s2/Makefile.dep

@@ -7,3 +7,7 @@ endif
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_spi_nor
 endif
+
+USEMODULE += boards_common_qn908x
+
+include $(RIOTBOARD)/common/qn908x/Makefile.dep

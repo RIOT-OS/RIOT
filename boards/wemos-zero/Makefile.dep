@@ -1,3 +1,6 @@
+USEMODULE += boards_common_arduino-zero
+USEMODULE += boards_common_samdx1-arduino-bootloader
+
 include $(RIOTBOARD)/common/arduino-zero/Makefile.dep
 
 # setup the samd21 arduino bootloader related dependencies

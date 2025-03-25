@@ -12,5 +12,7 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEMODULE += mtd
 endif
 
+USEMODULE += boards_common_samdx1-arduino-bootloader
+
 # setup the samd21 arduino bootloader related dependencies
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.dep
