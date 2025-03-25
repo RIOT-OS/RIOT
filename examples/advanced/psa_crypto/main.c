@@ -56,8 +56,6 @@ int main(void)
     bool failed = false;
     psa_status_t status;
 
-    psa_crypto_init();
-
     ztimer_acquire(ZTIMER_USEC);
     ztimer_now_t start = ztimer_now(ZTIMER_USEC);
 
