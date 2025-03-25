@@ -32,6 +32,7 @@ extern "C" {
 #include "crypto_values.h"
 
 #include "aead/sizes.h"
+#include "asymmetric_encryption/sizes.h"
 #include "cipher/sizes.h"
 #include "hash/sizes.h"
 #include "key_agreement/sizes.h"
@@ -117,73 +118,6 @@ extern "C" {
 #define CONFIG_PSA_PROTECTED_KEY_COUNT  0
 #endif
 #endif
-
-/**
- * @brief   A sufficient output buffer size for @ref psa_asymmetric_decrypt(),
- *          for any of the supported key types and asymmetric encryption algorithms.
- *
- * @details If the size of the output buffer is at least this large, it is guaranteed that
- *          @ref psa_asymmetric_decrypt() will not fail due to an insufficient buffer size.
- *
- *          See also @ref PSA_ASYMMETRIC_DECRYPT_OUTPUT_SIZE().
- */
-#define PSA_ASYMMETRIC_DECRYPT_OUTPUT_MAX_SIZE \
-/* implementation-defined value */
-
-/**
- * @brief   Sufficient output buffer size for @ref psa_asymmetric_decrypt().
- *
- * @details If the size of the output buffer is at least this large, it is guaranteed that
- *          @ref psa_asymmetric_decrypt() will not fail due to an insufficient buffer size.
- *          The actual size of the output might be smaller in any given call.
- *
- *          See also @ref PSA_ASYMMETRIC_DECRYPT_OUTPUT_MAX_SIZE.
- *
- * @param   key_type    An asymmetric key type, either a key pair or a public key.
- * @param   key_bits    The size of the key in bits.
- * @param   alg         An asymmetric encryption algorithm: a value of type psa_algorithm_t such
- *                      that @ref PSA_ALG_IS_ASYMMETRIC_ENCRYPTION(@p alg) is true.
- *
- * @return  A sufficient output buffer size for the specified asymmetric encryption algorithm
- *          and key parameters.
- *          0 if the asymmetric encryption algorithm and key parameters are not supported.
- *          Unspecified if the parameters are not valid.
- */
-#define PSA_ASYMMETRIC_DECRYPT_OUTPUT_SIZE(key_type, key_bits, alg) \
-/* implementation-defined value */
-
-/**
- * @brief   A sufficient output buffer size for @ref psa_asymmetric_encrypt(),
- *          for any of the supported key types and asymmetric encryption algorithms.
- *
- * @details If the size of the output buffer is at least this large, it is guaranteed that
- *          @ref psa_asymmetric_encrypt() will not fail due to an insufficient buffer size.
- *
- *          See also @ref PSA_ASYMMETRIC_ENCRYPT_OUTPUT_SIZE().
- */
-#define PSA_ASYMMETRIC_ENCRYPT_OUTPUT_MAX_SIZE /* implementation-defined value */
-
-/**
- * @brief   Sufficient output buffer size for @ref psa_asymmetric_encrypt().
- *
- * @details If the size of the output buffer is at least this large, it is guaranteed that
- *          @ref psa_asymmetric_encrypt() will not fail due to an insufficient buffer size.
- *          The actual size of the output might be smaller in any given call.
- *
- *          See also @ref PSA_ASYMMETRIC_ENCRYPT_OUTPUT_MAX_SIZE.
- *
- * @param   key_type    An asymmetric key type, either a key pair or a public key.
- * @param   key_bits    The size of the key in bits.
- * @param   alg         An asymmetric encryption algorithm: a value of type psa_algorithm_t
- *                      such that @ref PSA_ALG_IS_ASYMMETRIC_ENCRYPTION(@p alg) is true.
- *
- * @return  A sufficient output buffer size for the specified asymmetric encryption algorithm
- *          and key parameters.
- *          0 if the asymmetric encryption algorithm and key parameters are not supported.
- *          Unspecified if the parameters are not valid.
- */
-#define PSA_ASYMMETRIC_ENCRYPT_OUTPUT_SIZE(key_type, key_bits, alg) \
-/* implementation-defined value */
 
 /**
  * @brief   Maximum size of the export encoding of an ECC keypair.
