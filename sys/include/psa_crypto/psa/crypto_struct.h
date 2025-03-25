@@ -30,36 +30,8 @@ extern "C" {
 #include "aead/types.h"
 #include "cipher/types.h"
 #include "hash/types.h"
+#include "key_derivation/types.h"
 #include "mac/types.h"
-
-#if IS_USED(MODULE_PSA_KEY_DERIVATION) || defined(DOXYGEN)
-/**
- * @brief   This macro returns a suitable initializer for a key derivation operation object of
- *          type @ref psa_key_derivation_operation_t.
- */
-#define PSA_KEY_DERIVATION_OPERATION_INIT { 0 }
-
-/**
- * @brief   Structure storing a key derivation context
- *
- * @note    Not yet implemented
- */
-struct psa_key_derivation_operation_s {
-    int dummy;  /**< Not implemented yet */
-};
-
-/**
- * @brief   Return an initial value for a key derivation operation object.
- *
- * @return  psa_key_derivation_operation_s
- */
-static inline struct psa_key_derivation_operation_s psa_key_derivation_operation_init(void)
-{
-    const struct psa_key_derivation_operation_s v = PSA_KEY_DERIVATION_OPERATION_INIT;
-
-    return v;
-}
-#endif /* MODULE_PSA_KEY_DERIVATION */
 
 #ifdef __cplusplus
 }
