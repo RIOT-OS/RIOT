@@ -58,6 +58,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
+
+/**
  * @name    WS281x RGB LEDs configuration
  * @{
  */
