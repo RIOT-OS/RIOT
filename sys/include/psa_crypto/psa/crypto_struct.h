@@ -27,38 +27,10 @@ extern "C" {
 #include "crypto_sizes.h"
 #include "crypto_contexts.h"
 
+#include "aead/types.h"
 #include "cipher/types.h"
 #include "hash/types.h"
 #include "mac/types.h"
-
-#if IS_USED(MODULE_PSA_AEAD) || defined(DOXYGEN)
-/**
- * @brief   Structure storing an AEAD operation context
- *
- * @note    Not implemented, yet
- */
-struct psa_aead_operation_s {
-    int dummy;  /**< Not implemented, yet */
-};
-
-/**
- * @brief   This macro returns a suitable initializer for an AEAD operation object of type
- *          @ref psa_aead_operation_t.
- */
-#define PSA_AEAD_OPERATION_INIT { 0 }
-
-/**
- * @brief   Return an initial value for an AEAD operation object.
- *
- * @return  psa_aead_operation_s
- */
-static inline struct psa_aead_operation_s psa_aead_operation_init(void)
-{
-    const struct psa_aead_operation_s v = PSA_AEAD_OPERATION_INIT;
-
-    return v;
-}
-#endif /* MODULE_PSA_AEAD */
 
 #if IS_USED(MODULE_PSA_KEY_DERIVATION) || defined(DOXYGEN)
 /**
