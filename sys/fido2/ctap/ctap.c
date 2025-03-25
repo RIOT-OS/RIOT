@@ -705,6 +705,11 @@ static int _get_assertion(ctap_req_t *req_raw)
         goto done;
     }
 
+    /* CTAP specification (version 20190130) section 5.2, step 9 */
+    if (req.allow_list_len > 0 && _assert_state.count > 1) {
+        _assert_state.count = 1;
+    }
+
     memcpy(_assert_state.client_data_hash, req.client_data_hash,
            SHA256_DIGEST_LENGTH);
 
@@ -749,8 +754,13 @@ static int _get_assertion(ctap_req_t *req_raw)
         }
     }
 
-    /* save current time for get_next_assertion timeout */
-    _assert_state.timer = ztimer_now(ZTIMER_MSEC);
+    /**
+       if more than 1 eligible credential found and no allow list, save current time for
+       get_next_assertion timeout
+     */
+    if (_assert_state.count > 1 && req.allow_list_len == 0) {
+        _assert_state.timer = ztimer_now(ZTIMER_MSEC);
+    }
 
     ret = CTAP2_OK;
 
