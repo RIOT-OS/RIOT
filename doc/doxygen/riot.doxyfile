@@ -2305,7 +2305,8 @@ PREDEFINED             = DOXYGEN \
                          MODULE_GNRC_SIXLOWPAN \
                          MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
                          MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER \
-                         MODULE_GNRC_UDP
+                         MODULE_GNRC_UDP \
+                         RIOT_FILE_RELATIVE
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
