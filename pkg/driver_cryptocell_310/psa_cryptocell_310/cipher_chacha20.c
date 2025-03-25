@@ -43,7 +43,7 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
     if (!cryptocell_310_data_within_ram(input)) {
-        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", __FILE__);
         return PSA_ERROR_DATA_INVALID;
     }
 
@@ -91,7 +91,7 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
     if (!cryptocell_310_data_within_ram(input)) {
-        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", __FILE__);
         return PSA_ERROR_DATA_INVALID;
     }
 
