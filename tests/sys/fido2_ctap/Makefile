@@ -5,7 +5,8 @@ include ../Makefile.sys_common
 BOARD_WHITELIST = \
   native \
   nrf52840dk \
-  nrf52840dongle
+  nrf52840dongle \
+  feather-nrf52840-sense
 
 # same as CTAP_STACKSIZE
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=15000
