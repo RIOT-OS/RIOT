@@ -34,6 +34,7 @@ extern "C" {
 #include "aead/sizes.h"
 #include "cipher/sizes.h"
 #include "hash/sizes.h"
+#include "key_derivation/sizes.h"
 #include "mac/sizes.h"
 
 /**
