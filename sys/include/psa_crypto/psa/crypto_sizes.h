@@ -36,44 +36,11 @@ extern "C" {
 #include "cipher/sizes.h"
 #include "hash/sizes.h"
 #include "key/sizes.h"
+#include "key/values.h"
 #include "key_agreement/sizes.h"
 #include "key_derivation/sizes.h"
 #include "mac/sizes.h"
 #include "sizes.h"
-
-/**
- * @brief   Number of required allocated asymmetric key pair slots.
- *
- * @details These should be defined by the developer to
- *          fit their requirements. The default number is 0.
- */
-#ifndef CONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT
-#define CONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT  0
-#endif
-
-/**
- * @brief   Number of required allocated single key slots.
- *
- * @details These should be defined by the developer to
- *          fit their requirements. The default number is 0.
- */
-#ifndef CONFIG_PSA_SINGLE_KEY_COUNT
-#define CONFIG_PSA_SINGLE_KEY_COUNT  0
-#endif
-
-/**
- * @brief   Number of required allocated protected key slots.
- *
- * @details These should be defined by the developer to
- *          fit their requirements. The default number is 5.
- */
-#ifndef CONFIG_PSA_PROTECTED_KEY_COUNT
-#if (IS_USED(MODULE_PSA_SECURE_ELEMENT))
-#define CONFIG_PSA_PROTECTED_KEY_COUNT 5
-#else
-#define CONFIG_PSA_PROTECTED_KEY_COUNT  0
-#endif
-#endif
 
 /**
  * @brief   ECDSA signature size for a given curve bit size
