@@ -11,6 +11,9 @@
 
 include $(BOARDDIR)/Makefile.features
 
+# include global Makefile.features for `boards` modules
+include $(RIOTBOARD)/Makefile.features
+
 # Sanity check
 ifeq (,$(CPU))
   $(error $(BOARD): CPU must be defined by board / board_common Makefile.features)
