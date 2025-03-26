@@ -6,6 +6,7 @@ CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
 DISABLE_MODULE += auto_init auto_init_%
 DISABLE_MODULE += test_utils_interactive_sync
 DISABLE_MODULE += test_utils_print_stack_usage
+DISABLE_MODULE += core_thread
 
 USEMODULE += stdio_null
 
