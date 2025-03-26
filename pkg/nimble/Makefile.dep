@@ -42,6 +42,7 @@ endif
 ifeq (,$(filter nimble_host nimble_controller,$(USEMODULE)))
   USEMODULE += nimble_host
   USEMODULE += nimble_controller
+  USEMODULE += random
 endif
 
 # include host dependencies
@@ -54,7 +55,7 @@ endif
 # nimble controller dependencies
 ifneq (,$(filter nimble_controller,$(USEMODULE)))
   ifneq (,$(filter nrf51 nrf52,$(CPU_FAM)))
-    USEMODULE += nimble_drivers_nrf5x
+    USEMODULE += nimble_drivers_nrf5x nimble_drivers_nrf5x_specific
   endif
 endif
 
