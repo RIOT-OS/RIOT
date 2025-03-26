@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 
 #include "cpu.h"
@@ -34,7 +35,13 @@
 /**
  * @brief   Interrupt context for each configured qdec
  */
-static qdec_isr_ctx_t isr_ctx[QDEC_NUMOF];
+static qdec_rollover_isr_ctx_t _rollover_ctx[QDEC_NUMOF];
+
+/**
+ * @brief   TODO
+ */
+//TODO: don't use TIMER_CHANNEL_NUMOF
+static qdec_alarm_isr_ctx_t _alarm_ctx[QDEC_NUMOF][TIMER_CHANNEL_NUMOF];
 
 /**
  * @brief Read the current value of the given qdec device. Internal use.
@@ -51,7 +58,7 @@ static inline TIM_TypeDef *dev(qdec_t qdec)
     return qdec_config[qdec].dev;
 }
 
-int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
+int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_rollover_cb_t cb, void *arg)
 {
     /* Control variables */
     uint8_t i = 0;
@@ -123,8 +130,8 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     dev(qdec)->CNT = dev(qdec)->ARR / 2;
 
     /* Remember the interrupt context */
-    isr_ctx[qdec].cb = cb;
-    isr_ctx[qdec].arg = arg;
+    _rollover_ctx[qdec].cb = cb;
+    _rollover_ctx[qdec].arg = arg;
 
     /* Enable the qdec's interrupt only if there is a callback provided */
     if (cb) {
@@ -181,6 +188,64 @@ static int32_t _qdec_read(qdec_t qdec, uint8_t reset)
     return count;
 }
 
+int qdec_alarm_set(qdec_t qdec, unsigned alarm, int32_t signed_offset,
+                    qdec_alarm_cb_t cb, void* arg)
+{
+    //TODO: assert qdec_config[qdec].max is power of 2?
+
+    //TODO: explain
+    uint32_t offset = signed_offset;
+    static_assert(sizeof(offset) == sizeof(signed_offset));
+
+    unsigned value = (dev(qdec)->CNT + offset) & qdec_config[qdec].max;
+
+    //TODO: use QDEC_ALARM_NUMOF
+    if (alarm >= TIMER_CHANNEL_NUMOF) {
+        return -1; //TODO: use errno?
+    }
+
+    unsigned irqstate = irq_disable();
+
+    _alarm_ctx[qdec][alarm].cb = cb;
+    _alarm_ctx[qdec][alarm].arg = arg;
+
+    /* clear spurious IRQs */
+    dev(qdec)->SR &= ~(TIM_SR_CC1IF << alarm);
+
+    TIM_CHAN(qdec, alarm) = value;
+
+    /* enable IRQ */
+    NVIC_EnableIRQ(qdec_config[qdec].irqn);//TODO: do in init?
+    dev(qdec)->DIER |= (TIM_DIER_CC1IE << alarm);
+
+    /* calculate time till offset */
+    value = (value - dev(qdec)->CNT) & qdec_config[qdec].max;
+
+    if (value > offset) {
+        /* time till offset is larger than requested --> timer already expired
+         * ==> let's make sure we have an IRQ pending :) */
+        dev(qdec)->EGR |= (TIM_EGR_CC1G << alarm);
+    }
+
+    irq_restore(irqstate);
+
+    return 0;
+}
+
+int qdec_alarm_clear(qdec_t qdec, unsigned alarm)
+{
+    //TODO: use QDEC_ALARM_NUMOF
+    if (alarm >= TIMER_CHANNEL_NUMOF) {
+        return -1; //TODO: use errno?
+    }
+
+    unsigned irqstate = irq_disable();
+    dev(qdec)->DIER &= ~(TIM_DIER_CC1IE << alarm);
+    irq_restore(irqstate);
+
+    return 0;
+}
+
 void qdec_start(qdec_t qdec)
 {
     dev(qdec)->CR1 |= TIM_CR1_CEN;
@@ -193,12 +258,52 @@ void qdec_stop(qdec_t qdec)
 
 static inline void irq_handler(qdec_t qdec)
 {
+    uint32_t top = dev(qdec)->ARR;
     uint32_t status = (dev(qdec)->SR & dev(qdec)->DIER);
 
-    if (status & (TIM_SR_UIF)) {
-        dev(qdec)->SR &= ~(TIM_SR_UIF);
-        isr_ctx[qdec].cb(isr_ctx[qdec].arg);
+    /* clear interrupts which we are about to service */
+    /* Note, the flags in the SR register can be cleared by software, but
+     * setting them has no effect on the register. Only the hardware can set
+     * them. */
+    dev(qdec)->SR = ~status;
+
+    /* handle timer update event - the timer rolled over */
+    if (status & (TIM_SR_UIF) && _rollover_ctx[qdec].cb) {
+        status &= ~(TIM_SR_UIF);
+        _rollover_ctx[qdec].cb(_rollover_ctx[qdec].arg);
     }
+
+    /* handle capture compare events */
+    for (unsigned int i = 0; status; i++) {
+        uint32_t msk = TIM_SR_CC1IF << i;
+
+        /* check if interrupt flag is set */
+        if ((status & msk) == 0) {
+            continue;
+        }
+        status &= ~msk;
+
+        /* interrupt flag gets set for all channels > ARR, ignore those */
+        if (TIM_CHAN(qdec, i) > top) {
+            continue;
+        }
+
+        /* disable interrupt */
+        /* Note, we disable it, then re-enable it if requested. This way if the
+         * callback sets a new alarm on the same channel, but returns false, we
+         * don't clobber the enable flag that was set somewhere else. */
+        //TODO: test for this in unit-test
+        dev(qdec)->DIER &= ~msk;
+
+        /* call the channel's callback */
+        bool rearm = _alarm_ctx[qdec][i].cb(_alarm_ctx[qdec][i].arg);
+
+        /* re-enable interrupt, if requested */
+        if (rearm) {
+            dev(qdec)->DIER |= msk;
+        }
+    }
+
     cortexm_isr_end();
 }
 
