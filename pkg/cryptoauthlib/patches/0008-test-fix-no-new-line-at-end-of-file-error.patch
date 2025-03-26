@@ -1,0 +1,50 @@
+From 1503d22010bbdc04c491c3f4bea94635a1c44d21 Mon Sep 17 00:00:00 2001
+From: Gilles DOFFE <gilles.doffe@rtone.fr>
+Date: Thu, 29 Feb 2024 09:28:21 +0100
+Subject: [PATCH] test: fix no new line at end of file error
+
+---
+ test/api_atcab/atca_tests_helper.c | 3 ++-
+ test/jwt/atca_jwt_test.c           | 3 ++-
+ test/tng/tng_atca_test.c           | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/test/api_atcab/atca_tests_helper.c b/test/api_atcab/atca_tests_helper.c
+index 56591ca..a9d0c21 100644
+--- a/test/api_atcab/atca_tests_helper.c
++++ b/test/api_atcab/atca_tests_helper.c
+@@ -660,4 +660,5 @@ t_test_case_info helper_basic_test_info[] =
+     { REGISTER_TEST_CASE(atca_helper, transform_reversal),                 ATCA_TESTS_HELPER_DEVICES},
+     { (fp_test_case)NULL,             (uint8_t)0 },                        /* Array Termination element*/
+ };
+-// *INDENT-ON*
+\ No newline at end of file
++// *INDENT-ON*
++
+diff --git a/test/jwt/atca_jwt_test.c b/test/jwt/atca_jwt_test.c
+index 72efc3c..5be1954 100644
+--- a/test/jwt/atca_jwt_test.c
++++ b/test/jwt/atca_jwt_test.c
+@@ -368,4 +368,5 @@ t_test_case_info jwt_unit_test_info[] =
+ 
+     { (fp_test_case)NULL,                 (uint8_t)0 },                               /* Array Termination element*/
+ };
+-// *INDENT-ON*
+\ No newline at end of file
++// *INDENT-ON*
++
+diff --git a/test/tng/tng_atca_test.c b/test/tng/tng_atca_test.c
+index 63b30ae..bbf655f 100644
+--- a/test/tng/tng_atca_test.c
++++ b/test/tng/tng_atca_test.c
+@@ -70,4 +70,5 @@ t_test_case_info tng_atca_unit_test_info[] =
+     { REGISTER_TEST_CASE(tng_atca, tng_get_device_pubkey), DEVICE_MASK(ATECC608)},
+     { (fp_test_case)NULL,                                  (uint8_t)0 },
+ };
+-// *INDENT-ON*
+\ No newline at end of file
++// *INDENT-ON*
++
+-- 
+2.37.0
+

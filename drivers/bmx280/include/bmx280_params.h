@@ -23,6 +23,7 @@
 #ifndef BMX280_PARAMS_H
 #define BMX280_PARAMS_H
 
+#include "kernel_defines.h"
 #include "board.h"
 #include "bmx280.h"
 #include "saul_reg.h"

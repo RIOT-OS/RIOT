@@ -46,7 +46,7 @@ typedef struct {
  * @brief Shortcut initializer for @ref mtd_at24cxxx_t
  */
 #define MTD_AT24CXXX_INIT(dev_p, params_p)          \
-(mtd_at24cxxx_t) {                                  \
+{                                                   \
     .base = {                                       \
         .driver = &mtd_at24cxxx_driver              \
     },                                              \

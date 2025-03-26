@@ -18,12 +18,14 @@
  * @}
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <inttypes.h>
 
 #include "si1133.h"
 #include "si1133_params.h"
 #include "board.h"
+#include "container.h"
 
 /* Helper macro to define _si1133_strerr */
 #define CASE_SI1133_ERROR_STRING(X)                                            \

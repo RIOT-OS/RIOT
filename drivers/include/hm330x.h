@@ -33,6 +33,7 @@
 #ifndef HM330X_H
 #define HM330X_H
 
+#include "kernel_defines.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
