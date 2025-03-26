@@ -2,5 +2,9 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += mma8x5x
 endif
 
-include $(RIOTBOARD)/common/microbit/Makefile.dep
+# only include the Microbit Support Library when needed
+ifneq (,$(filter boards_common_microbit,$(USEMODULE)))
+  include $(RIOTBOARD)/common/microbit/Makefile.dep
+endif
+
 include $(RIOTBOARD)/common/nrf51/Makefile.dep

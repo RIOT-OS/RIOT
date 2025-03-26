@@ -6,6 +6,6 @@ include ../Makefile.tests_common
 BOARD_WHITELIST := microbit microbit-v2 calliope-mini
 
 # We want to test the microbit support module
-USEMODULE += microbit
+USEMODULE += boards_common_microbit
 
 include $(RIOTBASE)/Makefile.include

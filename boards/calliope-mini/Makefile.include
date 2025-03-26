@@ -9,8 +9,8 @@ OPENOCD_DEBUG_ADAPTER = dap
 # be passed explicitly
 PYOCD_FLASH_TARGET_TYPE ?= -t nrf51
 
-ifneq (,$(filter microbit,$(USEMODULE)))
-  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+ifneq (,$(filter boards_common_microbit,$(USEMODULE)))
+  include $(RIOTBOARD)/common/microbit/Makefile.include
 endif
 
 # include nrf51 boards common configuration

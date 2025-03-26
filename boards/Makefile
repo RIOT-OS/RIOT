@@ -47,6 +47,9 @@ endif
 ifneq (,$(filter boards_common_particle-mesh,$(USEMODULE)))
   DIRS += $(RIOTBOARD)/common/particle-mesh
 endif
+ifneq (,$(filter boards_common_qn908x,$(USEMODULE)))
+  DIRS += $(RIOTBOARD)/common/qn908x
+endif
 ifneq (,$(filter boards_common_remote,$(USEMODULE)))
   DIRS += $(RIOTBOARD)/common/remote
 endif

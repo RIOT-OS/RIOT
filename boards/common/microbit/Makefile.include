@@ -1,0 +1,2 @@
+# Add board common includes
+INCLUDES += -I$(RIOTBOARD)/common/microbit/include

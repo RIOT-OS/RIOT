@@ -16,8 +16,8 @@ DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1
 PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
 OPENOCD_DEBUG_ADAPTER = dap
 
-ifneq (,$(filter microbit,$(USEMODULE)))
-  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+ifneq (,$(filter boards_common_microbit,$(USEMODULE)))
+  include $(RIOTBOARD)/common/microbit/Makefile.include
 endif
 
 # include nrf52 boards common configuration

@@ -1,8 +1,6 @@
-ifneq (,$(filter microbit,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
-  USEMODULE += mineplex
-endif
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
+USEMODULE += mineplex
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio

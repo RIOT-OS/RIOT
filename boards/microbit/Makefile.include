@@ -10,8 +10,8 @@ OPENOCD_DEBUG_ADAPTER = dap
 # QEMU 4.0 added microbit system emulation.
 RIOT_EMULATOR ?= qemu
 
-ifneq (,$(filter microbit,$(USEMODULE)))
-  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+ifneq (,$(filter boards_common_microbit,$(USEMODULE)))
+  include $(RIOTBOARD)/common/microbit/Makefile.include
 endif
 
 ifeq (1,$(EMULATE))
