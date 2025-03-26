@@ -20,7 +20,7 @@ USEMODULE += shell_cmds_default
 USEPKG += tinydtls
 
 # use Ethernet as link-layer protocol
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200

@@ -50,7 +50,7 @@ then
 
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
-        make -C ./tests/unittests all test BOARD=native TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
+        make -C ./tests/unittests all test BOARD=native32 TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
         set_result $?
     fi
 
