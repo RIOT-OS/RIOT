@@ -20,9 +20,9 @@
  * @}
  */
 
-#include "cpu.h"
-#include "log.h"
 #include "assert.h"
+#include "atomic_utils.h"
+#include "cpu.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 #include "pm_layered.h"
@@ -31,6 +31,9 @@
 #include "em_timer.h"
 #include "em_timer_utils.h"
 #include "em_letimer.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /**
  * @brief   These power modes will be blocked while the timer is running
@@ -42,10 +45,84 @@
 #define EFM32_LETIMER_PM_BLOCKER    0
 #endif
 
+#define CHAN_INVALID                0xff
+
 /**
  * @brief   Timer state memory
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
+
+/* Bitmask storing which channel are periodic and which not. Only use
+ * getter/setter functions to access */
+static uint8_t is_periodic_mask[TIMER_NUMOF];
+
+/* Number of the channel that modified the top value, or CHAN_INVALID.
+ * Only one channel is allowed to use `TIM_FLAG_RESET_ON_MATCH` per
+ * timer (this is enforced by this driver) here. */
+static uint8_t chan_num_that_modified_top_value[TIMER_NUMOF];
+
+/* Check if the given channel on the given timer is periodic */
+static bool is_periodic(tim_t dev, int chan)
+{
+    /* We have one channel bitmask per timer, currently `uint8_t` per timer.
+     * Make sure that this is large enough to store all channels. For current
+     * hardware this is safe, but let's rather have this failing noisy. */
+    assume((unsigned)chan < 8 * sizeof(is_periodic_mask[0]));
+    assume((unsigned)dev < TIMER_NUMOF);
+
+    return is_periodic_mask[dev] & (1U << chan);
+}
+
+/* Mark the given channel on the given timer as periodic */
+static void mark_periodic(tim_t dev, int chan)
+{
+    assume((unsigned)chan < 8);
+    assume((unsigned)dev < TIMER_NUMOF);
+
+    atomic_fetch_or_u8(&is_periodic_mask[dev], 1U << chan);
+}
+
+/* Mark the given channel on the given timer as on-shot timer */
+static void mark_one_shot(tim_t dev, int chan)
+{
+    assume((unsigned)chan < 8);
+    assume((unsigned)dev < TIMER_NUMOF);
+
+    atomic_fetch_and_u8(&is_periodic_mask[dev], ~(1U << chan));
+}
+
+/* Return the number of the channel that modified the top value of the given
+ * timer, or -1 if the top value is MAX */
+static int get_chan_which_modified_top_value(tim_t dev)
+{
+    assume((unsigned)dev < TIMER_NUMOF);
+    if (chan_num_that_modified_top_value[dev] == CHAN_INVALID) {
+        return -1;
+    }
+
+    return chan_num_that_modified_top_value[dev];
+}
+
+/* Mark the top value of the given timer as modified by the given channel */
+static void set_chan_which_modified_top_value(tim_t dev, int channel)
+{
+    assume((unsigned)dev < TIMER_NUMOF);
+    chan_num_that_modified_top_value[dev] = channel;
+}
+
+/* Check if the top value of the given timer is modified */
+static bool is_top_value_modified(tim_t dev)
+{
+    assume((unsigned)dev < TIMER_NUMOF);
+    return chan_num_that_modified_top_value[dev] != 0;
+}
+
+/* Mark the top value of the given timer as unmodified */
+static void clear_top_value_modified(tim_t dev)
+{
+    assume((unsigned)dev < TIMER_NUMOF);
+    chan_num_that_modified_top_value[dev] = CHAN_INVALID;
+}
 
 /**
  * @brief   Check whether device is a using a WTIMER device (32-bit)
@@ -141,6 +218,8 @@ static void _timer_init(tim_t dev, uint32_t freq)
     /* enable interrupts for the channels */
     TIMER_IntClear(tim, TIMER_IFC_CC0 | TIMER_IFC_CC1 | TIMER_IFC_CC2);
     TIMER_IntEnable(tim, TIMER_IEN_CC0 | TIMER_IEN_CC1 | TIMER_IEN_CC2);
+
+    clear_top_value_modified(dev);
 }
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t callback, void *arg)
@@ -177,12 +256,15 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             return -1;
         }
 
-        if (TIMER_TopGet(tim) == 0xFFFF) {
+        /* if given timer is 16 bit (== !_is_wtimer()), drop leading bits
+         * so that timer can actually be triggered */
+        if (!_is_wtimer(dev)) {
             value &= 0xFFFF;
         }
 
         tim->CC[channel].CCV = (uint32_t) value;
         tim->CC[channel].CTRL = TIMER_CC_CTRL_MODE_OUTPUTCOMPARE;
+        mark_one_shot(dev, channel);
     }
     else {
 #if LETIMER_COUNT
@@ -212,11 +294,71 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     return 0;
 }
 
+int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags)
+{
+    if (_is_letimer(dev)) {
+        /* periodic timer not implemented on le timers */
+        return -1;
+    }
+
+    if (channel < 0 || channel >= timer_config[dev].channel_numof) {
+        return -1;
+    }
+
+    /* if given timer is 16 bit (== !_is_wtimer()), drop leading bits
+     * so that timer can actually be triggered */
+    if (!_is_wtimer(dev)) {
+        value &= 0xFFFF;
+    }
+
+    TIMER_TypeDef *tim = timer_config[dev].timer.dev;
+
+    if ((flags & TIM_FLAG_RESET_ON_MATCH)
+            && is_top_value_modified(dev)
+            && (get_chan_which_modified_top_value(dev) != channel)) {
+        DEBUG("[tim %u] cannot use TIM_FLAG_RESET_ON_MATCH for chan %d: "
+              "chan %d already set top value\n",
+              (unsigned)dev, channel, get_chan_which_modified_top_value(dev));
+        return -1;
+    }
+
+    unsigned state = irq_disable();
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        TIMER_Enable(timer_config[dev].timer.dev, false);
+        TIMER_Enable(timer_config[dev].prescaler.dev, false);
+    }
+
+    if (flags & TIM_FLAG_RESET_ON_SET) {
+        TIMER_CounterSet(tim, 0);
+    }
+
+    if (flags & TIM_FLAG_RESET_ON_MATCH) {
+        TIMER_TopSet(tim, value);
+        set_chan_which_modified_top_value(dev, channel);
+        DEBUG("[tim %u] New top value = %u\n", (unsigned)dev, value);
+    }
+
+    tim->CC[channel].CCV = (uint32_t) value;
+    tim->CC[channel].CTRL = TIMER_CC_CTRL_MODE_OUTPUTCOMPARE;
+    mark_periodic(dev, channel);
+    irq_restore(state);
+
+    return 0;
+}
+
 int timer_clear(tim_t dev, int channel)
 {
     if (!_is_letimer(dev)) {
+        unsigned state = irq_disable();
         TIMER_TypeDef *tim = timer_config[dev].timer.dev;
         tim->CC[channel].CTRL = _TIMER_CC_CTRL_MODE_OFF;
+
+        if (get_chan_which_modified_top_value(dev) == channel) {
+            TIMER_TopSet(tim, _is_wtimer(dev) ? 0xffffffff : 0xffff);
+            clear_top_value_modified(dev);
+            DEBUG("[tim %u] Reset top value\n", (unsigned)dev);
+        }
+        irq_restore(state);
     }
     else {
 #if LETIMER_COUNT
@@ -314,7 +456,9 @@ static void _timer_isr(tim_t dev)
 
         for (int i = 0; i < timer_config[dev].channel_numof; i++) {
             if (tim->IF & (TIMER_IF_CC0 << i)) {
-                tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
+                if (!is_periodic(dev, i)) {
+                    tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
+                }
                 tim->IFC = (TIMER_IFC_CC0 << i);
                 isr_ctx[dev].cb(isr_ctx[dev].arg, i);
             }
