@@ -40,10 +40,10 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_ipv6_nib
   endif
   ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
-    USEMODULE += shell_cmd_whitelist
+    USEMODULE += shell_cmd_gnrc_ipv6_whitelist
   endif
   ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
-    USEMODULE += shell_cmd_blacklist
+    USEMODULE += shell_cmd_gnrc_ipv6_blacklist
   endif
   ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_icmpv6_echo

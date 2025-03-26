@@ -29,6 +29,7 @@
 #include "utlist.h"
 
 #include "net/gnrc/ipv6/nib.h"
+#include "net/gnrc/ipv6/firewall.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/whitelist.h"
 #include "net/gnrc/ipv6/blacklist.h"
@@ -869,6 +870,17 @@ static void _receive(gnrc_pktsnip_t *pkt)
         DEBUG("ipv6: packet destination not this host\n");
 
 #ifdef MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
+
+#ifdef MODULE_GNRC_IPV6_FIREWALL
+        /* check if firewall permits forwarding */
+        if (gnrc_ipv6_firewall_is_blocked(hdr)) {
+            DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+#endif
+
         /* redirect to next hop */
         DEBUG("ipv6: decrement hop limit to %u\n", (uint8_t) (hdr->hl - 1));
 
