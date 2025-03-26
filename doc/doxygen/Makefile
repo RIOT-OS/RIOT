@@ -24,14 +24,19 @@ endif
 # Check that the doxygen version is not too old to avoid
 # certain bugs that were fixed in later revisions. Especially
 # Debian-based distributions tend to have very old versions.
-DOXYGEN_MIN_VERSION = 1.13.1
+DOXYGEN_MIN_VERSION = 1.13.2
 
 # Set the Doxygen binary if not already set
 DOXYGEN ?= doxygen
 
 # Strip the commit hash that is sometimes present after the
 # version number.
-DOXYGEN_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
+DOXYGEN_CUR_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
+
+# for the `doc-ci` target, we can choose which Doxygen version should be built.
+# If nothing has been chosen, select the minimum version.
+# Valid options are `latest` and version numbers such as `1.13.2`.
+DOXYGEN_VERSION ?= $(DOXYGEN_MIN_VERSION)
 
 # include color echo macros
 include $(RIOTMAKE)/utils/ansi.mk
@@ -39,9 +44,9 @@ include $(RIOTMAKE)/color.inc.mk
 
 .PHONY: doc doc-man doc-latex
 doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT)
-	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_VERSION)"; } | \
+	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
 		sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
-		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_VERSION) is too old." \
+		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
 		"It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
 		"to avoid incorrectly formatted output.$(COLOR_RESET)"; \
 	fi
@@ -57,7 +62,7 @@ graphviz-check:
 
 .PHONY: doc-ci
 doc-ci: $(RIOTTOOLS)/doxygen/Makefile
-	@MAKEFLAGS= PKG_VERSION=$(DOXYGEN_MIN_VERSION) $(MAKE) -wC $(RIOTTOOLS)/doxygen all
+	@MAKEFLAGS= PKG_VERSION=$(DOXYGEN_VERSION) $(MAKE) -wC $(RIOTTOOLS)/doxygen all
 	$(MAKE) -BC $(CURDIR) DOXYGEN=$(RIOTTOOLS)/doxygen/doxygen doc
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
