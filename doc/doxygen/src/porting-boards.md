@@ -315,6 +315,27 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 ```
 
+## New Style Common Code                                {#new-style-common-code}
+
+The common board definitions of RIOT are currently being reworked to make the
+usage of common code easier and less error prone. For example, if you want
+to use the common code for the Adafruit nRF52 Bootloader that is used
+by many of the nRF52 based boards from Adafruit, you simply have to add the
+following line to the `Makefile.dep` of your board. Everything else
+will be automatically included by the build system.
+
+```mk
+USEMODULE += boards_common_adafruit-nrf52-bootloader
+```
+
+Not all common code is migrated to the new style yet, so if you are unsure
+whether it is or not, you can check if the `boards/Makefile` already
+includes a reference to the common code you want to use. If you are still
+unsure, you can still use the @ref old-style-common-code or ask the
+community.
+
+## Old Style Common Code                                {#old-style-common-code}
+
 If you want to use common makefiles, include them at the end of the specific
 `Makefile`, e.g. for a `Makefile.features`:
 
@@ -329,6 +350,20 @@ FEATURES_PROVIDED += periph_uart
 
 include $(RIOTBOARD)/common/foo_common/Makefile.features
 ```
+
+If the common code includes source files, it might be necessary
+to explicitly include the directory in your `Makefile` so the Make system
+finds all the necessary files:
+
+```mk
+MODULE = board
+
+DIRS += $(RIOTBOARD)/common/myCommonFolder
+
+include $(RIOTBASE)/Makefile.base
+```
+
+If possible, you should use the @ref new-style-common-code though.
 
 # Boards outside of RIOTBASE                       {#boards-outside-of-riotbase}
 
