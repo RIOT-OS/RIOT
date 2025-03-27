@@ -36,5 +36,5 @@ $(PICOSDK_DIR)/.prepared:
 
 all: $(CURDIR)/picotool
 
-clean:
+clean::
   rm picotool
