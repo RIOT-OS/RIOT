@@ -87,7 +87,7 @@ psa_status_t cryptocell_310_common_ecc_sign(const uint8_t *priv_key,
 
     if (!cryptocell_310_data_within_ram(priv_key) ||
         !cryptocell_310_data_within_ram(input)) {
-        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", __FILE__);
         return PSA_ERROR_DATA_INVALID;
     }
 
@@ -131,7 +131,7 @@ psa_status_t cryptocell_310_common_ecc_verify(const uint8_t *pub_key,
     if (!cryptocell_310_data_within_ram(pub_key) ||
         !cryptocell_310_data_within_ram(input) ||
         !cryptocell_310_data_within_ram(signature)) {
-        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", __FILE__);
         return PSA_ERROR_DATA_INVALID;
     }
 

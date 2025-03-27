@@ -43,7 +43,7 @@ psa_status_t psa_mac_compute_hmac_sha256(const psa_key_attributes_t *attributes,
 
     if (!cryptocell_310_data_within_ram(key_buffer) ||
         !cryptocell_310_data_within_ram(input)) {
-        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", RIOT_FILE_RELATIVE);
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", __FILE__);
         return PSA_ERROR_DATA_INVALID;
     }
 
