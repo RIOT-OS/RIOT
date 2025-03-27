@@ -14,7 +14,7 @@ PICO_SDK_PATH ?= $(PICOSDK_DIR)/picosdk
 USEPKG += picosdk
 
 PKG_SOURCE_DIR = $(CURDIR)/source
-PKG_BUILD_DIR = $(PKG_SOURCE_DIR)
+PKG_BUILD_DIR = $(PKG_SOURCE_DIR)/build
 
 # Include pkg.mk after setting RIOTBASE otherwise it is not found when this
 # Makefile is called stand-alone
