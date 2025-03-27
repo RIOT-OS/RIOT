@@ -65,8 +65,9 @@
  * @warning This only works within `*.c` and `*.cpp` files. For `*.h`/`*.hpp` files the
  *          source compiles, however, the including `*.c`/`*.cpp` file will be
  *          substituted.
- * @see     `__FILE__` for absolute filenames that also work with *.h files
  * @see     @ref RIOT_FILE_NOPATH
+ * @deprecated  This macro will be removed after the 2025.10 release.
+ *              Use the compiler builtin `__FILE__` instead (GCC 8+, clang 10+)
  */
 #if DOXYGEN
 #   define RIOT_FILE_RELATIVE
@@ -78,8 +79,9 @@
  * @warning This only works within `*.c` and `*.cpp` files. For `*.h`/`*.hpp` files the
  *          source compiles, however, the including `*.c`/`*.cpp` file will be
  *          substituted.
- * @see     `__FILE__` for absolute filenames that also work with *.h files
  * @see     @ref RIOT_FILE_RELATIVE
+ * @deprecated  This macro will be removed after the 2025.10 release.
+ *              Use the compiler builtin `__FILE_NAME__` instead (GCC 12+, clang 9+)
  */
 #if DOXYGEN
 #   define RIOT_FILE_NOPATH
