@@ -7,7 +7,8 @@ UF2FILE="${UF2FILE:-${ELFFILE%%.elf}.uf2}"
 
 udev_warning='[WARNING] Picotool udev rules are not set yet. You won`t be able to '\
 'run picotool without sudo. See: '\
-'https://github.com/raspberrypi/picotool/tree/master?tab=readme-ov-file#linux--macos'
+'https://github.com/raspberrypi/picotool/tree/master?tab=readme-ov-file#linux--macos\n'\
+'The udev rule file can be found in '$(dirname "$0")'/source/udev'
 
 if ! [ -e /etc/udev/rules.d/99-picotool.rules ]
 then
