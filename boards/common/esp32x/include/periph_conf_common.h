@@ -24,15 +24,17 @@
  */
 
 #if defined(CPU_FAM_ESP32)
-#include "periph_conf_common_esp32.h"
+#  include "periph_conf_common_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
-#include "periph_conf_common_esp32c3.h"
+#  include "periph_conf_common_esp32c3.h"
+#elif defined(CPU_FAM_ESP32H2)
+#  include "periph_conf_common_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)
-#include "periph_conf_common_esp32s2.h"
+#  include "periph_conf_common_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
-#include "periph_conf_common_esp32s3.h"
+#  include "periph_conf_common_esp32s3.h"
 #else
-#error "ESP32x SoC family not supported"
+#  error "ESP32x SoC family not supported"
 #endif
 
 /* include periph_cpu.h to make it visible in any case */
