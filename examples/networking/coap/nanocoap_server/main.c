@@ -22,6 +22,10 @@
 #include "net/nanocoap_sock.h"
 #include "ztimer.h"
 
+#ifdef MODULE_LWIP_IPV4
+#include "lwip/netif.h"
+#endif
+
 #define COAP_INBUF_SIZE (256U)
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -43,15 +47,35 @@ int main(void)
         setup_observe_event();
     }
 
+#ifdef MODULE_LWIP_IPV4
+#define _TEST_ADDR4_LOCAL  (0x9664a8c0U)   /* 192.168.100.150 */
+#define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
+
+    sys_lock_tcpip_core();
+    struct netif *iface = netif_find("ET0aa");
+    ip4_addr_t ip, subnet;
+    ip.addr = _TEST_ADDR4_LOCAL;
+    subnet.addr = _TEST_ADDR4_MASK;
+    netif_set_addr(iface, &ip, &subnet, NULL);
+    sys_unlock_tcpip_core();
+
+    printf("{\"IPv4 addresses\": [\"192.168.100.150\"]}\n");
+
+    /* initialize nanocoap server instance for IPv4*/
+    uint8_t buf[COAP_INBUF_SIZE];
+    sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET };
+    nanocoap_server(&local, buf, sizeof(buf));
+#else
     /* print network addresses */
     printf("{\"IPv6 addresses\": [\"");
     netifs_print_ipv6("\", \"");
     puts("\"]}");
 
-    /* initialize nanocoap server instance */
+    /* initialize nanocoap server instance for IPv6*/
     uint8_t buf[COAP_INBUF_SIZE];
     sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
     nanocoap_server(&local, buf, sizeof(buf));
+#endif
 
     /* should be never reached */
     return 0;
