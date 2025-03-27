@@ -1,4 +1,1 @@
 UF2_SOFTDEV ?= SD730
-
-# Include the common definitions for the Adafruit nRF52 Bootloader
-include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.include

@@ -17,9 +17,10 @@ endif
 # processed before RIOT ones to be evaluated before the 'default' rules.
 -include $(EXTERNAL_MODULE_PATHS:%=%Makefile.dep)
 
-# pull dependencies from sys and drivers
+# pull dependencies from sys, drivers and (common) boards
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
+include $(RIOTBASE)/boards/Makefile.dep
 
 # pull Makefile.dep of each driver modules if they exist
 -include $(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))

@@ -448,6 +448,9 @@ include $(BOARDDIR)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
+# include global Makefile.include for `boards` modules
+include $(RIOTBASE)/boards/Makefile.include
+
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
 # the content of RIOT_TERMINAL
 include $(RIOTMAKE)/tools/serial.inc.mk
@@ -568,10 +571,8 @@ BASELIBS += $(APPDEPS)
 # add extra include paths for packages in $(USEMODULE)
 USEMODULE_INCLUDES =
 
+# include global Makefile.include for `sys` modules
 include $(RIOTBASE)/sys/Makefile.include
-
-# add default board_init()
-DIRS += $(RIOTBASE)/boards/common/init
 
 # include Makefile.includes of each driver modules if they exist
 -include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)

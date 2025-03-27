@@ -1,6 +1,7 @@
 MODULE = $(APPLICATION_MODULE)
 
 DIRS += $(RIOTCPU)/$(CPU) $(BOARDDIR)
+DIRS += $(RIOTBASE)/boards
 DIRS += $(RIOTBASE)/core $(RIOTBASE)/core/lib $(RIOTBASE)/drivers $(RIOTBASE)/sys
 
 # For regular modules, adding files to BLOBS, SRC, SRCXX, ASMSRC or ASSMSRC
