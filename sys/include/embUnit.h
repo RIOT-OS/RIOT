@@ -22,7 +22,7 @@
 #ifndef EMBUNIT_H
 #define EMBUNIT_H
 
-#include "embUnit/embUnit.h"
+#include "embUnit/embUnit.h" /* IWYU pragma: export */
 
 #ifdef OUTPUT
 #   define OUTPUT_XML       (1)
