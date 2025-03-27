@@ -12,5 +12,5 @@ include $(RIOTBASE)/pkg/pkg.mk
 all: $(CURDIR)/picosdk
 
 $(CURDIR)/picosdk: $(PKG_PREPARED)
-	echo "[INFO] updating submodules"
-	cd $(PKG_SOURCE_DIR) && git submodule update --init lib/mbedtls
+	@echo "[INFO] updating submodules"
+	@cd $(PKG_SOURCE_DIR) && git submodule update --init lib/mbedtls
