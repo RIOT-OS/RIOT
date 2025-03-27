@@ -1,10 +1,14 @@
 DEVELHELP ?= 0
-include ../Makefile.tests_common
+
+# Allow including this Makefile from other apps, as done by
+# tests/build_system/external_unittests
+UNIT_TESTS_DIR ?= $(CURDIR)
+include $(UNIT_TESTS_DIR)/../Makefile.tests_common
 
 USEMODULE += embunit
 
 # Search for unit tests both in-tree and, if configured, out-of-tree
-UNIT_TEST_SEARCH_DIRS := $(RIOTBASE)/tests/unittests $(EXTERNAL_UNIT_TEST_DIRS)
+UNIT_TEST_SEARCH_DIRS := $(CURDIR) $(EXTERNAL_UNITTEST_DIRS)
 # Canonicalize test search dirs: Add a single solidus at the end:
 UNIT_TEST_SEARCH_DIRS := $(addsuffix /,$(abspath $(UNIT_TEST_SEARCH_DIRS)))
 

@@ -331,10 +331,10 @@ The following assertion macros are available via *embUnit*
 
 ## Out of Tree Unit Tests
 
-Export the environment variable `EXTERNAL_UNIT_TEST_DIRS` that contains a space
+Export the environment variable `EXTERNAL_UNITTEST_DIRS` that contains a space
 separated list of out-of-tree unit tests to also include in the test. The tests
 will be treated the exact same way as tests in this folder and must follow the
-same naming convention (each folder in `EXTERNAL_UNIT_TEST_DIRS` should have
+same naming convention (each folder in `EXTERNAL_UNITTEST_DIRS` should have
 `tests-<name>` folders containing the unit tests).
 
 This feature works best with `EXTERNAL_MODULE_DIRS` that contain the code the
