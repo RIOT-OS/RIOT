@@ -44,6 +44,9 @@
 #if IS_USED(MODULE_LWEXT4)
 #include "fs/lwext4_fs.h"
 #endif
+#if IS_USED(MODULE_XIPFS)
+#include "fs/xipfs_fs.h"
+#endif
 #if IS_USED(MODULE_FS_NATIVE)
 #include "fs/native_fs.h"
 #endif
