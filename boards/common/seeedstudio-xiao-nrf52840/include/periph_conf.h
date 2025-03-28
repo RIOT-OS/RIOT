@@ -8,10 +8,12 @@
 
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
+ * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
  * @{
  *
  * @file
  * @brief       Peripheral configuration for the Seeed Studio XIAO nRF52840
+ *              and Seeed Studio XIAO nRF52840 Sense
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *

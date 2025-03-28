@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
+ * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
  * @{
  *
  * @file
