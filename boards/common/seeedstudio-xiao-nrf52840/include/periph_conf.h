@@ -85,7 +85,15 @@ static const i2c_conf_t i2c_config[] = {
         .scl = GPIO_PIN(0, 5),
         .sda = GPIO_PIN(0, 4),
         .speed = I2C_SPEED_NORMAL
+    },
+#ifdef BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE
+    {   /* internal I2C bus for the IMU */
+        .dev = NRF_TWIM0,
+        .scl = GPIO_PIN(0, 27),
+        .sda = GPIO_PIN(0, 7),
+        .speed = I2C_SPEED_NORMAL
     }
+#endif
 };
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
