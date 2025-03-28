@@ -60,6 +60,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0   mtd_dev_get(0)      /**< MTD device for the external 2MB flash */
+/** @} */
+
+/**
  * @name    BMP280 sensor configuration
  * @{
  */
@@ -86,8 +93,8 @@ extern "C" {
  * @name    LSM6DSXX accelerometer sensor configuration
  * @{
  */
-#define LSM6DSXX_PARAM_I2C I2C_DEV(0)
-#define LSM6DSXX_PARAM_ADDR (0x6A)
+#define LSM6DSXX_PARAM_I2C      I2C_DEV(0)  /**< I2C device */
+#define LSM6DSXX_PARAM_ADDR     (0x6A)      /**< I2C address */
 /** @} */
 
 /**
@@ -95,7 +102,10 @@ extern "C" {
  * @{
  */
 #ifndef WS281X_PARAM_PIN
-#define WS281X_PARAM_PIN    GPIO_PIN(0, 16) /**< GPIO pin connected to the data pin of the first LED */
+/**
+ * @brief GPIO pin connected to the data pin of the first LED
+ */
+#define WS281X_PARAM_PIN    GPIO_PIN(0, 16)
 #endif
 #ifndef WS281X_PARAM_NUMOF
 #define WS281X_PARAM_NUMOF  (1U)      /**< Number of LEDs chained */

@@ -61,9 +61,15 @@ static const uart_conf_t uart_config[] = {
 static const spi_conf_t spi_config[] = {
     {
         .dev  = NRF_SPIM0,
-        .sclk = 14,
-        .mosi = 13,
-        .miso = 15,
+        .sclk = GPIO_PIN(0, 14),
+        .mosi = GPIO_PIN(0, 13),
+        .miso = GPIO_PIN(0, 15),
+    },
+    {
+        .dev  = NRF_SPIM1,
+        .sclk = GPIO_PIN(0, 19),
+        .mosi = GPIO_PIN(0, 17),
+        .miso = GPIO_PIN(0, 22),
     }
 };
 

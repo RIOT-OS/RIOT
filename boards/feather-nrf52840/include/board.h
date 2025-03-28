@@ -58,6 +58,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0   mtd_dev_get(0)      /**< MTD device for the external 2MB flash */
+/** @} */
+
+/**
  * @name    WS281x RGB LEDs configuration
  * @{
  */
