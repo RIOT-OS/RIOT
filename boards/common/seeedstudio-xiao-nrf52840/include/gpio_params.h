@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef GPIO_PARAMS_H
+#define GPIO_PARAMS_H
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
  * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
@@ -16,9 +18,6 @@
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
-
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -56,5 +55,5 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */
+#endif /* GPIO_PARAMS_H */
