@@ -1,1 +1,4 @@
 # SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+ifneq (,$(filter boards_common_seeedstudio-xiao-nrf52840,$(USEMODULE)))
+  include $(RIOTBOARD)/common/seeedstudio-xiao-nrf52840/Makefile.features
+endif
