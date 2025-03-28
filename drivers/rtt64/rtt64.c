@@ -79,6 +79,7 @@
 #endif
 
 static uint32_t overflows BACKUP_RAM;
+static uint32_t alarm_rtt BACKUP_RAM;
 static uint32_t alarm_overflows BACKUP_RAM;
 static rtt_cb_t alarm_cb;
 static void *alarm_cb_arg;
@@ -88,10 +89,12 @@ static void _overflow_cb(void *arg)
     (void)arg;
     ++overflows;
 
-    if (alarm_overflows && --alarm_overflows == 0) {
-        rtt_cb_t cb = alarm_cb;
-        alarm_cb = NULL;
-        cb(alarm_cb_arg);
+    if (alarm_cb && alarm_overflows == overflows) {
+        if (alarm_rtt) {
+            rtt_set_alarm(alarm_rtt, alarm_cb, alarm_cb_arg);
+        } else {
+            alarm_cb(alarm_cb_arg);
+        }
     }
 }
 
@@ -136,30 +139,32 @@ void rtt64_set_alarm_counter(rtt64_t alarm, rtt_cb_t cb, void *arg)
 
     unsigned state = irq_disable();
 
+    alarm_rtt = alarm & RTT_MAX_VALUE;
+    alarm_overflows = alarm >> RTT_SHIFT;
+
+    rtt_clear_alarm();
+
     alarm_cb = cb;
     alarm_cb_arg = arg;
 
-    rtt_set_alarm(alarm, cb, arg);
-    alarm_overflows = alarm >> RTT_SHIFT;
-
+    if (alarm_overflows == overflows) {
+        if (rtt_get_counter() > alarm_rtt) {
+            /* alarm is in the past */
+            goto out;
+        }
+        rtt_set_alarm(alarm_rtt, cb, arg);
+    }
+out:
     irq_restore(state);
 }
 
 rtt64_t rtt64_get_alarm_counter(void)
 {
-    unsigned state = irq_disable();
-
-    rtt64_t alarm = (rtt64_t)(overflows + alarm_overflows)
-                   << (RTT_SHIFT + 16 - RTT_SUBSEC_BITS);
-    alarm |= (rtt64_t)rtt_get_alarm() << (16 - RTT_SUBSEC_BITS);
-
-    irq_restore(state);
-    return alarm;
+    return (((rtt64_t)alarm_overflows << RTT_SHIFT) | alarm_rtt) << (16 - RTT_SUBSEC_BITS);
 }
 
 void rtt64_clear_alarm(void)
 {
     rtt_clear_alarm();
     alarm_cb = NULL;
-    alarm_overflows = 0;
 }
