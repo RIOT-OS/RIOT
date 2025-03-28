@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HTS221_H
+#define HTS221_H
+
 /**
  * @defgroup    drivers_hts221 ST HTS221 digital Humidity Sensor
  * @ingroup     drivers_sensors
@@ -20,9 +23,6 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef HTS221_H
-#define HTS221_H
 
 #include <stdint.h>
 
@@ -165,5 +165,5 @@ int hts221_read_temperature(const hts221_t *dev, int16_t *val);
 }
 #endif
 
-#endif /* HTS221_H */
 /** @} */
+#endif /* HTS221_H */

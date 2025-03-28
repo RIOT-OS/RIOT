@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SHTCX_H
+#define SHTCX_H
+
 /**
  * @defgroup    drivers_shtcx SHTCX Temperature and humidity sensor
  * @ingroup     drivers_sensors
@@ -20,9 +23,6 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
-
-#ifndef SHTCX_H
-#define SHTCX_H
 
 #include <stdint.h>
 #include "saul.h"
@@ -123,5 +123,5 @@ int8_t shtcx_reset(const shtcx_t *dev);
 }
 #endif
 
-#endif /* SHTCX_H */
 /** @} */
+#endif /* SHTCX_H */

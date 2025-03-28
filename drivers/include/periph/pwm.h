@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_PWM_H
+#define PERIPH_PWM_H
+
 /**
  * @defgroup    drivers_periph_pwm PWM
  * @ingroup     drivers_periph
@@ -57,9 +60,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_PWM_H
-#define PERIPH_PWM_H
 
 #include <stdint.h>
 #include <limits.h>
@@ -186,5 +186,5 @@ void pwm_poweroff(pwm_t dev);
 }
 #endif
 
-#endif /* PERIPH_PWM_H */
 /** @} */
+#endif /* PERIPH_PWM_H */

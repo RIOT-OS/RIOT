@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef MQ3_H
+#define MQ3_H
+
 /**
  * @defgroup    drivers_mq3 MQ-3 Alcohol Tester
  * @ingroup     drivers_sensors
@@ -17,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef MQ3_H
-#define MQ3_H
 
 #include "periph/adc.h"
 
@@ -77,5 +77,5 @@ int16_t mq3_read(const mq3_t *dev);
 }
 #endif
 
-#endif /* MQ3_H */
 /** @} */
+#endif /* MQ3_H */

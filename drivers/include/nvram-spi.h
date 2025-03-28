@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef NVRAM_SPI_H
+#define NVRAM_SPI_H
+
 /**
  * @ingroup     drivers_nvram
  * @{
@@ -19,9 +22,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef NVRAM_SPI_H
-#define NVRAM_SPI_H
 
 #include <stdint.h>
 #include "nvram.h"
@@ -64,5 +64,5 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size);
 }
 #endif
 
-#endif /* NVRAM_SPI_H */
 /** @} */
+#endif /* NVRAM_SPI_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_QDEC_H
+#define PERIPH_QDEC_H
+
 /**
  * @defgroup    drivers_periph_qdec Quadrature Decoder (QDEC)
  * @ingroup     drivers_periph
@@ -73,9 +76,6 @@
  *
  * @author      Gilles DOFFE <gdoffe@gmail.com>
  */
-
-#ifndef PERIPH_QDEC_H
-#define PERIPH_QDEC_H
 
 #include <stdint.h>
 #include <limits.h>
@@ -199,5 +199,5 @@ void qdec_stop(qdec_t qdec);
 }
 #endif
 
-#endif /* PERIPH_QDEC_H */
 /** @} */
+#endif /* PERIPH_QDEC_H */

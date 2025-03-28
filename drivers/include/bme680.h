@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef BME680_H
+#define BME680_H
+
 /**
  * @defgroup    drivers_bme680 BME680 Temperature/Humidity/Pressure/Gas sensor
  * @ingroup     drivers_sensors
@@ -104,9 +107,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BME680_H
-#define BME680_H
 
 #include "periph/i2c.h"
 #include "periph/spi.h"
@@ -321,5 +321,5 @@ int bme680_set_ambient_temp(bme680_t* dev, int8_t temp);
 }
 #endif
 
-#endif /* BME680_H */
 /** @} */
+#endif /* BME680_H */

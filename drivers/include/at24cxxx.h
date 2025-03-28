@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef AT24CXXX_H
+#define AT24CXXX_H
+
 /**
  * @defgroup    drivers_at24cxxx AT24CXXX EEPROM unit
  * @ingroup     drivers_misc
@@ -64,9 +67,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  *
  */
-
-#ifndef AT24CXXX_H
-#define AT24CXXX_H
 
 #include <stdint.h>
 
@@ -240,5 +240,5 @@ int at24cxxx_disable_write_protect(const at24cxxx_t *dev);
 }
 #endif
 
-#endif /* AT24CXXX_H */
 /** @} */
+#endif /* AT24CXXX_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SCREEN_DEV_H
+#define SCREEN_DEV_H
+
 /**
  * @defgroup    drivers_screen_dev Screen device generic API
  * @ingroup     drivers_display
@@ -31,9 +34,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef SCREEN_DEV_H
-#define SCREEN_DEV_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -58,5 +58,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SCREEN_DEV_H */
 /** @} */
+#endif /* SCREEN_DEV_H */

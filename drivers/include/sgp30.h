@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SGP30_H
+#define SGP30_H
+
 /**
  * @defgroup    drivers_sgp30 SGP30 Gas Sensor
  * @ingroup     drivers_sensors
@@ -42,9 +45,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef SGP30_H
-#define SGP30_H
 
 #include "periph/i2c.h"
 #include "ztimer.h"
@@ -251,5 +251,5 @@ int sgp30_read_raw_measurements(sgp30_t *dev, sgp30_raw_data_t *data);
 }
 #endif
 
-#endif /* SGP30_H */
 /** @} */
+#endif /* SGP30_H */

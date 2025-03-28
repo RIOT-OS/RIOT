@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_ADC_H
+#define PERIPH_ADC_H
+
 /**
  * @defgroup    drivers_periph_adc ADC
  * @ingroup     drivers_periph
@@ -51,9 +54,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_ADC_H
-#define PERIPH_ADC_H
 
 #include <limits.h>
 #include <stdint.h>
@@ -159,5 +159,5 @@ void adc_continuous_stop(void);
 }
 #endif
 
-#endif /* PERIPH_ADC_H */
 /** @} */
+#endif /* PERIPH_ADC_H */

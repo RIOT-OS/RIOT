@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef DS3231_H
+#define DS3231_H
+
 /**
  * @defgroup    drivers_ds3231 DS3231 Real Time Clock
  * @ingroup     drivers_sensors
@@ -27,9 +30,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef DS3231_H
-#define DS3231_H
 
 #include <time.h>
 #include <errno.h>
@@ -312,5 +312,5 @@ int ds3231_disable_bat(const ds3231_t *dev);
 }
 #endif
 
-#endif /* DS3231_H */
 /** @} */
+#endif /* DS3231_H */

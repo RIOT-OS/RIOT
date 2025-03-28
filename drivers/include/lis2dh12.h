@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef LIS2DH12_H
+#define LIS2DH12_H
+
 /**
  * @defgroup    drivers_lis2dh12 LIS2DH12 Accelerometer
  * @ingroup     drivers_sensors
@@ -32,9 +35,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef LIS2DH12_H
-#define LIS2DH12_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -503,5 +503,5 @@ int lis2dh12_poweroff(const lis2dh12_t *dev);
 }
 #endif
 
-#endif /* LIS2DH12_H */
 /** @} */
+#endif /* LIS2DH12_H */

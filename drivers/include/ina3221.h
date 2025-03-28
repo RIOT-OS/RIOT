@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef INA3221_H
+#define INA3221_H
+
 /**
  * @defgroup    drivers_ina3221 INA3221 current/power monitor
  * @ingroup     drivers_sensors
@@ -66,9 +69,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef INA3221_H
-#define INA3221_H
 
 #include <assert.h>
 #include <errno.h>
@@ -1103,5 +1103,5 @@ void ina3221_calculate_power_uw(ina3221_ch_t ch,
 }
 #endif
 
-#endif /* INA3221_H */
 /** @} */
+#endif /* INA3221_H */

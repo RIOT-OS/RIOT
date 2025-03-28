@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef ATWINC15X0_H
+#define ATWINC15X0_H
+
 /**
  * @ingroup     drivers_netdev
  * @brief       Netdev Driver for the Microchip ATWINC15x0 WiFi Module
@@ -16,9 +19,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ATWINC15X0_H
-#define ATWINC15X0_H
 
 #include "bsp/include/nm_bsp.h"
 #include "net/ethernet.h"
@@ -113,5 +113,5 @@ void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint
 }
 #endif
 
-#endif /* ATWINC15X0_H */
 /** @} */
+#endif /* ATWINC15X0_H */

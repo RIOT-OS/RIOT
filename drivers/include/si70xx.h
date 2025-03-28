@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SI70XX_H
+#define SI70XX_H
+
 /**
  * @defgroup    drivers_si70xx Si7006/13/20/21/5x temperature and humidity sensors
  * @ingroup     drivers_sensors
@@ -29,9 +32,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef SI70XX_H
-#define SI70XX_H
 
 #include "periph/i2c.h"
 
@@ -150,5 +150,5 @@ uint8_t si70xx_get_revision(const si70xx_t *dev);
 }
 #endif
 
-#endif /* SI70XX_H */
 /** @} */
+#endif /* SI70XX_H */

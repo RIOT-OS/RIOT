@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef LC709203F_H
+#define LC709203F_H
+
 /**
  * @defgroup    drivers_lc709203f LC709203F
  * @ingroup     drivers_sensors
@@ -18,9 +21,6 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
-
-#ifndef LC709203F_H
-#define LC709203F_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -384,5 +384,5 @@ void lc709203f_set_status_bit(const lc709203f_t *dev, const lc709203f_temp_obtai
 }
 #endif
 
-#endif /* LC709203F_H */
 /** @} */
+#endif /* LC709203F_H */

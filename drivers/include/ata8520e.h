@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef ATA8520E_H
+#define ATA8520E_H
+
 /**
  * @defgroup    drivers_ata8520e Microchip ATA8520E transceiver
  * @ingroup     drivers_netdev
@@ -21,9 +24,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef ATA8520E_H
-#define ATA8520E_H
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -239,5 +239,5 @@ int ata8520e_send_bit(ata8520e_t *dev, bool bit);
 }
 #endif
 
-#endif /* ATA8520E_H */
 /** @} */
+#endif /* ATA8520E_H */

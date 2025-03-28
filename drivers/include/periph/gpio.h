@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_GPIO_H
+#define PERIPH_GPIO_H
+
 /**
  * @defgroup    drivers_periph_gpio GPIO
  * @ingroup     drivers_periph
@@ -71,9 +74,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_GPIO_H
-#define PERIPH_GPIO_H
 
 #include <limits.h>
 #include <stdbool.h>
@@ -286,5 +286,5 @@ static inline int gpio_is_valid(gpio_t gpio)
 }
 #endif
 
-#endif /* PERIPH_GPIO_H */
 /** @} */
+#endif /* PERIPH_GPIO_H */

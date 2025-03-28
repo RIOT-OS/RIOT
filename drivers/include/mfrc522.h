@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MFRC522_H
+#define MFRC522_H
+
 /**
  * @defgroup drivers_mfrc522 MFRC522 RFID controller
  * @ingroup  drivers_actuators
@@ -34,9 +37,6 @@
  * @author   Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
-
-#ifndef MFRC522_H
-#define MFRC522_H
 
 #ifdef __cplusplus
 extern "C"
@@ -874,5 +874,5 @@ bool mfrc522_pcd_perform_self_test(mfrc522_t *dev);
 }
 #endif
 
-#endif /* MFRC522_H */
 /** @} */
+#endif /* MFRC522_H */

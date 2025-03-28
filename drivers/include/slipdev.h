@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef SLIPDEV_H
+#define SLIPDEV_H
 /**
  * @defgroup    drivers_slipdev_stdio   STDIO via SLIP
  * @ingroup     sys_stdio
@@ -33,8 +35,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef SLIPDEV_H
-#define SLIPDEV_H
 
 #include <stdint.h>
 
@@ -148,5 +148,5 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 }
 #endif
 
-#endif /* SLIPDEV_H */
 /** @} */
+#endif /* SLIPDEV_H */

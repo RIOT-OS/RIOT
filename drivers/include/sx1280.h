@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef SX1280_H
+#define SX1280_H
+
 /**
  * @defgroup    drivers_sx1280 LoRa radio driver
  * @ingroup     drivers_netdev
@@ -20,9 +23,6 @@
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
  *
  */
-
-#ifndef SX1280_H
-#define SX1280_H
 
 #include <assert.h>
 
@@ -263,5 +263,5 @@ void sx1280_set_lora_iq_invert(sx1280_t *dev, bool iq_invert);
 }
 #endif
 
-#endif /* SX1280_H */
 /** @} */
+#endif /* SX1280_H */

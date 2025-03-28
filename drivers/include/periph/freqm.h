@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_FREQM_H
+#define PERIPH_FREQM_H
+
 /**
  * @defgroup    drivers_periph_freqm FREQM
  * @ingroup     drivers_periph
@@ -24,9 +27,6 @@
  *
  * @author      Urs Gompper <urs.gompper@ml-pa.com>
  */
-
-#ifndef PERIPH_FREQM_H
-#define PERIPH_FREQM_H
 
 #include <errno.h>
 #include <mutex.h>

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef LTC4150_H
+#define LTC4150_H
+
 /**
  * @defgroup    drivers_ltc4150 LTC4150 coulomb counter
  * @ingroup     drivers_sensors
@@ -58,9 +61,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef LTC4150_H
-#define LTC4150_H
 
 #include <stdint.h>
 
@@ -343,5 +343,5 @@ void ltc4150_pulses2c(const ltc4150_dev_t *dev,
 }
 #endif
 
-#endif /* LTC4150_H */
 /** @} */
+#endif /* LTC4150_H */

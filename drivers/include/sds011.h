@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SDS011_H
+#define SDS011_H
+
 /**
  * @defgroup    drivers_sds011 SDS011 Laser Dust Sensor
  * @ingroup     drivers_sensors
@@ -17,9 +20,6 @@
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef SDS011_H
-#define SDS011_H
 
 #include <stdbool.h>
 
@@ -313,5 +313,5 @@ int sds011_set_dev_id(sds011_t *dev, uint16_t sens_dev_id);
 }
 #endif
 
-#endif /* SDS011_H */
 /** @} */
+#endif /* SDS011_H */

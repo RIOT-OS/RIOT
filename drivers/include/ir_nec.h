@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef IR_NEC_H
+#define IR_NEC_H
+
 /**
  * @defgroup    drivers_ir_nec IR NEC Remote receiver
  * @ingroup     drivers_misc
@@ -17,9 +20,6 @@
  *
  * @author      Dario Petrillo <dario.pk1@gmail.com>
  */
-
-#ifndef IR_NEC_H
-#define IR_NEC_H
 
 #include <stdint.h>
 
@@ -84,5 +84,5 @@ int ir_nec_read(ir_nec_t *dev, ir_nec_cmd_t *command);
 }
 #endif
 
-#endif /* IR_NEC_H */
 /** @} */
+#endif /* IR_NEC_H */

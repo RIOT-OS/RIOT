@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_PM_H
+#define PERIPH_PM_H
+
 /**
  * @defgroup    drivers_periph_pm Power Management
  * @ingroup     drivers_periph
@@ -20,9 +23,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef PERIPH_PM_H
-#define PERIPH_PM_H
 
 #include "periph_cpu.h"
 
@@ -55,5 +55,5 @@ void pm_set_lowest(void);
 }
 #endif
 
-#endif /* PERIPH_PM_H */
 /** @} */
+#endif /* PERIPH_PM_H */

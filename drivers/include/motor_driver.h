@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MOTOR_DRIVER_H
+#define MOTOR_DRIVER_H
+
 /**
  * @defgroup    drivers_motor DC Motor Driver
  * @ingroup     drivers_actuators
@@ -80,9 +83,6 @@
  *
  * @author      Gilles DOFFE <g.doffe@gmail.com>
  */
-
-#ifndef MOTOR_DRIVER_H
-#define MOTOR_DRIVER_H
 
 #include "periph/pwm.h"
 #include "periph/gpio.h"
@@ -235,5 +235,5 @@ void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id);
 }
 #endif
 
-#endif /* MOTOR_DRIVER_H */
 /** @} */
+#endif /* MOTOR_DRIVER_H */

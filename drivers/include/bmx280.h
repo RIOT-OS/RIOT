@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef BMX280_H
+#define BMX280_H
+
 /**
  * @defgroup    drivers_bmx280 BMP280/BME280 temperature, pressure and humidity sensor
  * @ingroup     drivers_sensors
@@ -69,9 +72,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BMX280_H
-#define BMX280_H
 
 #include <stdint.h>
 #include "saul.h"
@@ -307,5 +307,5 @@ uint16_t bme280_read_humidity(bmx280_t *dev);
 }
 #endif
 
-#endif /* BMX280_H */
 /** @} */
+#endif /* BMX280_H */

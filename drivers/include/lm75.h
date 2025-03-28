@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef LM75_H
+#define LM75_H
+
 /**
  * @ingroup     drivers_lm75
  *
@@ -22,9 +25,6 @@
  * @ingroup     drivers_sensors
  * @brief       Driver for the lm75 temperature sensors.
  */
-
-#ifndef LM75_H
-#define LM75_H
 
 #include <stdbool.h>
 #include "periph/i2c.h"
@@ -242,5 +242,5 @@ int lm75_low_power_mode(lm75_t *dev, uint16_t interval);
 }
 #endif
 
-#endif /* LM75_H */
 /** @} */
+#endif /* LM75_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PCD8544_H
+#define PCD8544_H
+
 /**
  * @defgroup    drivers_pcd8544 PCD8544 LCD driver
  * @ingroup     drivers_display
@@ -18,9 +21,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PCD8544_H
-#define PCD8544_H
 
 #include <stdint.h>
 
@@ -198,5 +198,5 @@ void pcd8544_riot(const pcd8544_t *dev);
 }
 #endif
 
-#endif /* PCD8544_H */
 /** @} */
+#endif /* PCD8544_H */

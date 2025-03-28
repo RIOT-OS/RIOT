@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef VL6180X_H
+#define VL6180X_H
+
 /**
  * @defgroup    drivers_vl6180x VL6180X Ranging and Ambient Light Sensing (ALS) module
  * @ingroup     drivers_sensors
@@ -389,9 +392,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-
-#ifndef VL6180X_H
-#define VL6180X_H
 
 #ifdef __cplusplus
 extern "C"
@@ -1072,5 +1072,5 @@ int vl6180x_reg_read(const vl6180x_t *dev,
 }
 #endif
 
-#endif /* VL6180X_H */
 /** @} */
+#endif /* VL6180X_H */

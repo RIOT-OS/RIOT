@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef MTD_EMULATED_H
+#define MTD_EMULATED_H
 /**
  * @defgroup    drivers_mtd_emulated MTD wrapper for emulated MTD devices
  * @ingroup     drivers_mtd
@@ -16,8 +18,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-#ifndef MTD_EMULATED_H
-#define MTD_EMULATED_H
 
 #include <stdbool.h>
 
@@ -104,5 +104,5 @@ extern const mtd_desc_t _mtd_emulated_driver;
 }
 #endif
 
-#endif /* MTD_EMULATED_H */
 /** @} */
+#endif /* MTD_EMULATED_H */

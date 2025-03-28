@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef DOSE_H
+#define DOSE_H
+
 /**
  * @defgroup    drivers_dose Differentially Operated Serial Ethernet
  * @ingroup     drivers_netdev
@@ -70,9 +73,6 @@
  *
  * @author      Juergen Fitschen <me@jue.yt>
  */
-
-#ifndef DOSE_H
-#define DOSE_H
 
 #include "chunked_ringbuffer.h"
 #include "periph/uart.h"
@@ -233,5 +233,5 @@ void dose_setup(dose_t *dev, const dose_params_t *params, uint8_t index);
 #ifdef __cplusplus
 }
 #endif
-#endif /* DOSE_H */
 /** @} */
+#endif /* DOSE_H */

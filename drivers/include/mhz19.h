@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef MHZ19_H
+#define MHZ19_H
+
 /**
  * @defgroup    drivers_mhz19 MH-Z19 CO2 sensor
  * @ingroup     drivers_sensors
@@ -34,9 +37,6 @@
  * @author      Christian Manal <manal@uni-bremen.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef MHZ19_H
-#define MHZ19_H
 
 #include <stdbool.h>
 
@@ -153,5 +153,5 @@ void mhz19_calibrate_zero_point(mhz19_t *dev);
 }
 #endif
 
-#endif /* MHZ19_H */
 /** @} */
+#endif /* MHZ19_H */

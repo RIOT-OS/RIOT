@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef W5100_H
+#define W5100_H
+
 /**
  * @defgroup    drivers_w5100 W5100 ethernet driver
  * @ingroup     drivers_netdev
@@ -30,9 +33,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef W5100_H
-#define W5100_H
 
 #include <stdint.h>
 
@@ -86,5 +86,5 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params, uint8_t index);
 }
 #endif
 
-#endif /* W5100_H */
 /** @} */
+#endif /* W5100_H */

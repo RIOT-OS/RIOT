@@ -7,6 +7,9 @@
  * details.
  */
 
+#ifndef MRF24J40_H
+#define MRF24J40_H
+
 /**
  * @defgroup    drivers_mrf24j40 MRF24J40 based drivers
  * @ingroup     drivers_netdev
@@ -66,9 +69,6 @@
  * @author      Neo Nenaco <neo@nenaco.de>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef MRF24J40_H
-#define MRF24J40_H
 
 #include <stdint.h>
 
@@ -404,5 +404,5 @@ int mrf24j40_init(mrf24j40_t *dev, const mrf24j40_params_t *params, ieee802154_d
 }
 #endif
 
-#endif /* MRF24J40_H */
 /** @} */
+#endif /* MRF24J40_H */

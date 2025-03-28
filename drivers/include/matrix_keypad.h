@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MATRIX_KEYPAD_H
+#define MATRIX_KEYPAD_H
+
 /**
  * @defgroup    drivers_matrix_keypad Matrix Keypad
  * @ingroup     drivers_sensors
@@ -48,9 +51,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef MATRIX_KEYPAD_H
-#define MATRIX_KEYPAD_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -225,5 +225,5 @@ size_t matrix_keypad_scan(matrix_keypad_t *dev);
 }
 #endif
 
-#endif /* MATRIX_KEYPAD_H */
 /** @} */
+#endif /* MATRIX_KEYPAD_H */

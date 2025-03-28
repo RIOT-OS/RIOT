@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef DHT_H
+#define DHT_H
+
 /**
  * @defgroup    drivers_dht DHT Family of Humidity and Temperature Sensors
  * @ingroup     drivers_sensors
@@ -27,9 +30,6 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef DHT_H
-#define DHT_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -134,5 +134,5 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 }
 #endif
 
-#endif /* DHT_H */
 /** @} */
+#endif /* DHT_H */

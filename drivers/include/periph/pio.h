@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_PIO_H
+#define PERIPH_PIO_H
+
 /**
  * @defgroup    drivers_periph_pio Programmable IO (PIO)
  * @ingroup     drivers_periph
@@ -40,9 +43,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef PERIPH_PIO_H
-#define PERIPH_PIO_H
 
 #include <stdbool.h>
 
@@ -181,5 +181,5 @@ void pio_free_program(pio_t pio, pio_program_t *prog);
 }
 #endif
 
-#endif /* PERIPH_PIO_H */
 /** @} */
+#endif /* PERIPH_PIO_H */

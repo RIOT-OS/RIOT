@@ -5,6 +5,9 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
+#ifndef PERIPH_USBDEV_H
+#define PERIPH_USBDEV_H
+
 /**
  * @defgroup    drivers_periph_usbdev usbdev - USB Device Driver API
  * @ingroup     drivers_periph
@@ -71,9 +74,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef PERIPH_USBDEV_H
-#define PERIPH_USBDEV_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -687,5 +687,5 @@ static inline int usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 }
 #endif
 
-#endif /* PERIPH_USBDEV_H */
 /** @} */
+#endif /* PERIPH_USBDEV_H */

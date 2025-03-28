@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MAX31855_H
+#define MAX31855_H
+
 /**
  * @defgroup    drivers_max31855 MAX31855 Thermocouple-to-Digital Converter driver
  * @ingroup     drivers_sensors
@@ -31,9 +34,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef MAX31855_H
-#define MAX31855_H
 
 /* Add header includes here */
 
@@ -131,5 +131,5 @@ void max31855_read_raw(max31855_t *dev, uint32_t *data);
 }
 #endif
 
-#endif /* MAX31855_H */
 /** @} */
+#endif /* MAX31855_H */

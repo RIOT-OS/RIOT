@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_GPIO_UTIL_H
+#define PERIPH_GPIO_UTIL_H
+
 /**
  * @defgroup   gpio_util GPIO I/O Utils
  * @ingroup    drivers_periph_gpio
@@ -18,9 +21,6 @@
  *
  * @author     Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
-
-#ifndef PERIPH_GPIO_UTIL_H
-#define PERIPH_GPIO_UTIL_H
 
 #include "gpio.h"
 
@@ -43,5 +43,5 @@ uint8_t gpio_util_shiftin(gpio_t data_pin, gpio_t clock_pin);
 #ifdef __cplusplus
 }
 #endif
-#endif /* PERIPH_GPIO_UTIL_H */
 /** @} */
+#endif /* PERIPH_GPIO_UTIL_H */

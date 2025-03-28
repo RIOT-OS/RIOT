@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef SI1133_H
+#define SI1133_H
+
 /**
  * @defgroup    drivers_si1133 Si1133 UV Index/Ambient Light Sensor with I2C
  * @ingroup     drivers_sensors
@@ -27,9 +30,6 @@
  *
  * @author      iosabi <iosabi@protonmail.com>
  */
-
-#ifndef SI1133_H
-#define SI1133_H
 
 #include "periph/i2c.h"
 
@@ -206,5 +206,5 @@ si1133_ret_code_t si1133_capture_sensors(si1133_t *dev, int32_t *values,
 }
 #endif
 
-#endif /* SI1133_H */
 /** @} */
+#endif /* SI1133_H */

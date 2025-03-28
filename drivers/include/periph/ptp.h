@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_PTP_H
+#define PERIPH_PTP_H
+
 /**
  * @defgroup    drivers_periph_ptp  PTP-Clock
  * @ingroup     drivers_periph
@@ -52,9 +55,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef PERIPH_PTP_H
-#define PERIPH_PTP_H
 
 #include <stdint.h>
 
@@ -404,5 +404,5 @@ static inline void ptp_timer_set_absolute_u64(uint64_t target)
 }
 #endif
 
-#endif /* PERIPH_PTP_H */
 /** @} */
+#endif /* PERIPH_PTP_H */

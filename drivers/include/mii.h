@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef MII_H
+#define MII_H
+
 /**
  * @defgroup    drivers_mii     Ethernet Media-Independent Interface (MII)
  *                              Utilities
@@ -22,9 +25,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef MII_H
-#define MII_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -205,5 +205,5 @@ static inline bool mii_can_10_mbps_half_dp(uint16_t bmsr)
 }
 #endif
 
-#endif /* MII_H */
 /** @} */
+#endif /* MII_H */

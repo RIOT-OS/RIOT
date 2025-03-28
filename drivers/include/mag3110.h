@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef MAG3110_H
+#define MAG3110_H
+
 /**
  * @defgroup    drivers_mag3110 MAG3110 3-Axis Digital Magnetometer
  * @ingroup     drivers_sensors
@@ -31,9 +34,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef MAG3110_H
-#define MAG3110_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -224,5 +224,5 @@ int mag3110_read_dtemp(const mag3110_t *dev, int8_t *dtemp);
 }
 #endif
 
-#endif /* MAG3110_H */
 /** @} */
+#endif /* MAG3110_H */

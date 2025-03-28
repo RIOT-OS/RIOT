@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PH_OEM_H
+#define PH_OEM_H
+
 /**
  * @defgroup    drivers_ph_oem pH OEM sensor device driver
  * @ingroup     drivers_sensors
@@ -46,9 +49,6 @@
 
  * @author      Igor Knippenberg <igor.knippenberg@gmail.com>
  */
-
-#ifndef PH_OEM_H
-#define PH_OEM_H
 
 #ifdef __cplusplus
 extern "C"
@@ -358,5 +358,5 @@ int ph_oem_read_ph(const ph_oem_t *dev, uint16_t *ph_value);
 }
 #endif
 
-#endif /* PH_OEM_H */
 /** @} */
+#endif /* PH_OEM_H */

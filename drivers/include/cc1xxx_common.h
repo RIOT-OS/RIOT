@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#ifndef CC1XXX_COMMON_H
+#define CC1XXX_COMMON_H
 /**
  * @defgroup    drivers_cc1xxx CC1100/CC1100e/CC1101/CC1200 common code
  * @ingroup     drivers_netdev
@@ -55,8 +57,6 @@
  * more users of this adaption layer are added, this behaviour might needs to be
  * more generalized.
  */
-#ifndef CC1XXX_COMMON_H
-#define CC1XXX_COMMON_H
 
 #include "net/gnrc/netif.h"
 
@@ -145,5 +145,5 @@ void cc1xxx_eui_get(const netdev_t *dev, uint8_t *eui);
 }
 #endif
 
-#endif /* CC1XXX_COMMON_H */
 /** @} */
+#endif /* CC1XXX_COMMON_H */

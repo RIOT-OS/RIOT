@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef KW41ZRF_H
+#define KW41ZRF_H
+
 /**
  * @defgroup    drivers_kw41zrf KW41Z radio-driver
  * @ingroup     drivers_netdev
@@ -17,9 +20,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef KW41ZRF_H
-#define KW41ZRF_H
 
 #include <stdint.h>
 
@@ -165,5 +165,5 @@ int kw41zrf_reset(kw41zrf_t *dev);
 }
 #endif
 
-#endif /* KW41ZRF_H */
 /** @} */
+#endif /* KW41ZRF_H */

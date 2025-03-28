@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef L3G4200D_H
+#define L3G4200D_H
+
 /**
  * @defgroup    drivers_l3g4200d L3G4200D gyroscope
  * @ingroup     drivers_sensors
@@ -23,9 +26,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef L3G4200D_H
-#define L3G4200D_H
 
 #include <stdint.h>
 
@@ -158,5 +158,5 @@ int l3g4200d_disable(const l3g4200d_t *dev);
 }
 #endif
 
-#endif /* L3G4200D_H */
 /** @} */
+#endif /* L3G4200D_H */

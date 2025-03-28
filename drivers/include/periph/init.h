@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_INIT_H
+#define PERIPH_INIT_H
+
 /**
  * @defgroup    drivers_periph_init Common peripheral initialization
  * @ingroup     drivers_periph
@@ -21,9 +24,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_INIT_H
-#define PERIPH_INIT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,5 +47,5 @@ void periph_init(void);
 }
 #endif
 
-#endif /* PERIPH_INIT_H */
 /** @} */
+#endif /* PERIPH_INIT_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MTD_SDCARD_H
+#define MTD_SDCARD_H
+
 /**
  * @defgroup    drivers_mtd_sdcard MTD wrapper for SPI SD Cards
  * @ingroup     drivers_storage
@@ -18,9 +21,6 @@
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef MTD_SDCARD_H
-#define MTD_SDCARD_H
 
 #include <stdint.h>
 
@@ -72,5 +72,5 @@ extern const mtd_desc_t mtd_sdcard_driver;
 }
 #endif
 
-#endif /* MTD_SDCARD_H */
 /** @} */
+#endif /* MTD_SDCARD_H */
