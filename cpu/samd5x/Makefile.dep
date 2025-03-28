@@ -6,4 +6,9 @@ ifneq (,$(filter periph_can,$(USEMODULE)))
   FEATURES_REQUIRED += can_rx_mailbox
 endif
 
+ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+  USEMODULE += lwip_ethernet
+  USEMODULE += netdev_legacy_api
+endif
+
 include $(RIOTCPU)/sam0_common/Makefile.dep
