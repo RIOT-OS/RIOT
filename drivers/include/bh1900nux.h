@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef BH1900NUX_H
+#define BH1900NUX_H
+
 /**
  * @defgroup    drivers_bh1900nux BH1900NUX Temperature sensor
  * @ingroup     drivers_sensors
@@ -17,9 +20,6 @@
  *
  * @author      Wouter Symons <wsymons@nalys-group.com>
  */
-
-#ifndef BH1900NUX_H
-#define BH1900NUX_H
 
 #include "periph/i2c.h"
 
@@ -115,5 +115,5 @@ int bh1900nux_read(const bh1900nux_t *dev,  int16_t *temp);
 }
 #endif
 
-#endif /* BH1900NUX_H */
 /** @} */
+#endif /* BH1900NUX_H */

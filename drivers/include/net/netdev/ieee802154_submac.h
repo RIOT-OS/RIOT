@@ -6,6 +6,8 @@
  * details.
  */
 
+#ifndef NET_NETDEV_IEEE802154_SUBMAC_H
+#define NET_NETDEV_IEEE802154_SUBMAC_H
 /**
  * @defgroup     drivers_netdev_ieee802154_submac IEEE802.15.4 SubMAC netdev layer
  * @ingroup      drivers_netdev_api
@@ -19,8 +21,6 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef NET_NETDEV_IEEE802154_SUBMAC_H
-#define NET_NETDEV_IEEE802154_SUBMAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,5 +69,5 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac);
 }
 #endif
 
-#endif /* NET_NETDEV_IEEE802154_SUBMAC_H */
 /** @} */
+#endif /* NET_NETDEV_IEEE802154_SUBMAC_H */

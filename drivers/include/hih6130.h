@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HIH6130_H
+#define HIH6130_H
+
 /**
  * @defgroup    drivers_hih6130 HIH6130 humidity and temperature sensor
  * @ingroup     drivers_sensors
@@ -19,9 +22,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef HIH6130_H
-#define HIH6130_H
 
 #include <stdint.h>
 
@@ -66,5 +66,5 @@ int hih6130_get_humidity_temperature(const hih6130_t *dev,
 }
 #endif
 
-#endif /* HIH6130_H */
 /** @} */
+#endif /* HIH6130_H */

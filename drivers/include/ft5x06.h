@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FT5X06_H
+#define FT5X06_H
+
 /**
  * @defgroup    drivers_ft5x06 FocalTech FT5x06 touch panel driver
  * @ingroup     drivers_sensors
@@ -20,9 +23,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef FT5X06_H
-#define FT5X06_H
 
 #include <stdint.h>
 
@@ -185,5 +185,5 @@ int ft5x06_read_touch_gesture(const ft5x06_t *dev, ft5x06_touch_gesture_t *gestu
 }
 #endif
 
-#endif /* FT5X06_H */
 /** @} */
+#endif /* FT5X06_H */

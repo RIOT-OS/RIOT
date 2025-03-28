@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef XBEE_H
+#define XBEE_H
+
 /**
  * @defgroup    drivers_xbee XBee driver
  * @ingroup     drivers_netdev
@@ -19,9 +22,6 @@
  * @author      Kévin Roussel <kevin.roussel@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef XBEE_H
-#define XBEE_H
 
 #include <stdint.h>
 
@@ -218,5 +218,5 @@ int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr);
 }
 #endif
 
-#endif /* XBEE_H */
 /** @} */
+#endif /* XBEE_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SAUL_PERIPH_H
+#define SAUL_PERIPH_H
+
 /**
  * @ingroup     drivers_saul
  * @{
@@ -15,9 +18,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef SAUL_PERIPH_H
-#define SAUL_PERIPH_H
 
 #if MODULE_SAUL_GPIO || DOXYGEN
 #include "periph/gpio.h"
@@ -179,5 +179,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SAUL_PERIPH_H */
 /** @} */
+#endif /* SAUL_PERIPH_H */

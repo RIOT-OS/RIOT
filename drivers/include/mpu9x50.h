@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef MPU9X50_H
+#define MPU9X50_H
+
 /**
  * @defgroup    drivers_mpu9x50 MPU-9X50 (MPU9150 and MPU9250) accelerometer/magnetometer/gyroscope
  * @ingroup     drivers_sensors
@@ -22,9 +25,6 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
-
-#ifndef MPU9X50_H
-#define MPU9X50_H
 
 #include "periph/i2c.h"
 
@@ -308,5 +308,5 @@ int mpu9x50_set_compass_sample_rate(mpu9x50_t *dev, uint8_t rate);
 }
 #endif
 
-#endif /* MPU9X50_H */
 /** @} */
+#endif /* MPU9X50_H */

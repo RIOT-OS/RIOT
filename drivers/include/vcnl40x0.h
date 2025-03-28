@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef VCNL40X0_H
+#define VCNL40X0_H
+
 /**
  * @defgroup    drivers_vcnl40x0 VCNL4010/VCNL4020/VCNL4040 Proximity and Ambient Light Sensors
  * @ingroup     drivers_sensors
@@ -19,9 +22,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef VCNL40X0_H
-#define VCNL40X0_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -145,5 +145,5 @@ uint16_t vcnl40x0_read_illuminance(const vcnl40x0_t *dev);
 }
 #endif
 
-#endif /* VCNL40X0_H */
 /** @} */
+#endif /* VCNL40X0_H */

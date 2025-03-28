@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PULSE_COUNTER_H
+#define PULSE_COUNTER_H
+
 /**
  * @defgroup    drivers_pulse_counter Pulse counter
  * @ingroup     drivers_sensors
@@ -21,9 +24,6 @@
  *
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
-
-#ifndef PULSE_COUNTER_H
-#define PULSE_COUNTER_H
 
 #include <stdint.h>
 #ifdef __cplusplus
@@ -92,5 +92,5 @@ void pulse_counter_reset(pulse_counter_t *dev);
 }
 #endif
 
-#endif /* PULSE_COUNTER_H */
 /** @} */
+#endif /* PULSE_COUNTER_H */

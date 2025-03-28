@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef OPT3001_H
+#define OPT3001_H
+
 /**
  * @defgroup    drivers_opt3001 OPT3001 Ambient Light Sensor
  * @ingroup     drivers_sensors
@@ -38,9 +41,6 @@
  *
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
-
-#ifndef OPT3001_H
-#define OPT3001_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -163,5 +163,5 @@ int opt3001_read_lux(const opt3001_t *dev, uint32_t *convl);
 }
 #endif
 
-#endif /* OPT3001_H */
 /** @} */
+#endif /* OPT3001_H */

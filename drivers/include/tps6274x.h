@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TPS6274X_H
+#define TPS6274X_H
+
 /**
  * @defgroup    drivers_tps6274x TPS6274x
  * @ingroup     drivers_power
@@ -18,9 +21,6 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
-
-#ifndef TPS6274X_H
-#define TPS6274X_H
 
 #ifdef __cplusplus
 extern "C"
@@ -83,5 +83,5 @@ void tps6274x_load_ctrl(tps6274x_t *dev, int status);
 #ifdef __cplusplus
 }
 #endif
-#endif /* TPS6274X_H */
 /** @} */
+#endif /* TPS6274X_H */

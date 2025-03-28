@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef CC2420_H
+#define CC2420_H
+
 /**
  * @defgroup    drivers_cc2420 CC2420 radio driver
  * @ingroup     drivers_netdev
@@ -17,9 +20,6 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef CC2420_H
-#define CC2420_H
 
 #include <stdint.h>
 
@@ -302,5 +302,5 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info);
 }
 #endif
 
-#endif /* CC2420_H */
 /** @} */
+#endif /* CC2420_H */

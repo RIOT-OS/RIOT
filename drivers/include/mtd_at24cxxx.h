@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MTD_AT24CXXX_H
+#define MTD_AT24CXXX_H
+
 /**
  * @defgroup    drivers_mtd_at24cxxx MTD wrapper for AT24cxxx family of I2C-EEPROMs
  * @ingroup     drivers_storage
@@ -19,9 +22,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef MTD_AT24CXXX_H
-#define MTD_AT24CXXX_H
 
 #include "at24cxxx.h"
 #include "mtd.h"
@@ -63,5 +63,5 @@ extern const mtd_desc_t mtd_at24cxxx_driver;
 }
 #endif
 
-#endif /* MTD_AT24CXXX_H */
 /** @} */
+#endif /* MTD_AT24CXXX_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef HD44780_H
+#define HD44780_H
 /**
  * @defgroup    drivers_hd44780 HD44780 LCD driver
  * @ingroup     drivers_display
@@ -20,8 +22,6 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
-#ifndef HD44780_H
-#define HD44780_H
 
 #include <stdint.h>
 
@@ -209,5 +209,5 @@ void hd44780_print(const hd44780_t *dev, const char *data);
 }
 #endif
 
-#endif /* HD44780_H */
 /** @} */
+#endif /* HD44780_H */

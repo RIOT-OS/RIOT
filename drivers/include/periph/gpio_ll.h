@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_GPIO_LL_H
+#define PERIPH_GPIO_LL_H
+
 /**
  * @defgroup    drivers_periph_gpio_ll GPIO Low-Level API
  * @ingroup     drivers_periph
@@ -65,9 +68,6 @@
  * @warning     This API is not stable yet and intended for internal use only as
  *              of now.
  */
-
-#ifndef PERIPH_GPIO_LL_H
-#define PERIPH_GPIO_LL_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -1005,5 +1005,5 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 #endif
 /** @} */
 
-#endif /* PERIPH_GPIO_LL_H */
 /** @} */
+#endif /* PERIPH_GPIO_LL_H */

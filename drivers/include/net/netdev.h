@@ -9,6 +9,9 @@
  * more details.
  */
 
+#ifndef NET_NETDEV_H
+#define NET_NETDEV_H
+
 /**
  * @defgroup    drivers_netdev_api Netdev - Network Device Driver API
  * @ingroup     drivers_netdev
@@ -186,9 +189,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_NETDEV_H
-#define NET_NETDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -669,5 +669,5 @@ static inline void netdev_trigger_event_isr(netdev_t *netdev)
 }
 #endif
 
-#endif /* NET_NETDEV_H */
 /** @} */
+#endif /* NET_NETDEV_H */

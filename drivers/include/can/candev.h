@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef CAN_CANDEV_H
+#define CAN_CANDEV_H
+
 /**
  * @defgroup    drivers_candev CAN device driver interface
  * @ingroup     drivers_can
@@ -20,9 +23,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-
-#ifndef CAN_CANDEV_H
-#define CAN_CANDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -177,5 +177,5 @@ typedef struct candev_driver {
 }
 #endif
 
-#endif /* CAN_CANDEV_H */
 /** @} */
+#endif /* CAN_CANDEV_H */

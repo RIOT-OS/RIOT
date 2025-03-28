@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_DAC_H
+#define PERIPH_DAC_H
+
 /**
  * @defgroup    drivers_periph_dac DAC
  * @ingroup     drivers_periph
@@ -46,9 +49,6 @@
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_DAC_H
-#define PERIPH_DAC_H
 
 #include <stdint.h>
 #include <limits.h>
@@ -133,5 +133,5 @@ void dac_poweroff(dac_t line);
 }
 #endif
 
-#endif /* PERIPH_DAC_H */
 /** @} */
+#endif /* PERIPH_DAC_H */

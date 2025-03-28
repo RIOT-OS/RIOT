@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef VEML6070_H
+#define VEML6070_H
+
 /**
  * @defgroup    drivers_veml6070 VEML6070 UV sensor
  * @ingroup     drivers_sensors
@@ -20,9 +23,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef VEML6070_H
-#define VEML6070_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -88,5 +88,5 @@ uint16_t veml6070_read_uv(const veml6070_t *dev);
 }
 #endif
 
-#endif /* VEML6070_H */
 /** @} */
+#endif /* VEML6070_H */

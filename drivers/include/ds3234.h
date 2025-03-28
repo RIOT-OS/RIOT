@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef DS3234_H
+#define DS3234_H
+
 /**
  * @defgroup    drivers_ds3234  DS3234 Extremely Accurate SPI RTC
  * @ingroup     drivers_sensors
@@ -20,9 +23,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef DS3234_H
-#define DS3234_H
 
 #include <periph/gpio.h>
 #include <periph/spi.h>
@@ -66,5 +66,5 @@ int ds3234_pps_init(const ds3234_params_t *params);
 }
 #endif
 
-#endif /* DS3234_H */
 /** @} */
+#endif /* DS3234_H */

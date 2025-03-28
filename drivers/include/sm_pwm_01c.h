@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SM_PWM_01C_H
+#define SM_PWM_01C_H
+
 /**
  * @defgroup    drivers_sm_pwm_01c SM_PWM_01C dust sensor
  * @ingroup     drivers_sensors
@@ -34,9 +37,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef SM_PWM_01C_H
-#define SM_PWM_01C_H
 
 #include <inttypes.h>
 
@@ -203,5 +203,5 @@ void sm_pwm_01c_read_data(sm_pwm_01c_t *dev, sm_pwm_01c_data_t *data);
 }
 #endif
 
-#endif /* SM_PWM_01C_H */
 /** @} */
+#endif /* SM_PWM_01C_H */

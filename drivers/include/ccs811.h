@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CCS811_H
+#define CCS811_H
+
 /**
  * @ingroup     drivers_ccs811
  * @brief       Device Driver for AMS CCS811 digital gas sensor
@@ -13,9 +16,6 @@
  * @file
  * @{
  */
-
-#ifndef CCS811_H
-#define CCS811_H
 
 #include <stdint.h>
 #include "periph/gpio.h"
@@ -403,5 +403,5 @@ int ccs811_set_baseline (const ccs811_t *dev, uint16_t baseline);
 }
 #endif
 
-#endif /* CCS811_H */
 /** @} */
+#endif /* CCS811_H */

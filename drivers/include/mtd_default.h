@@ -5,6 +5,8 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+#ifndef MTD_DEFAULT_H
+#define MTD_DEFAULT_H
 /**
  * @ingroup     drivers_mtd
  * @{
@@ -14,8 +16,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef MTD_DEFAULT_H
-#define MTD_DEFAULT_H
 
 #include "board.h"
 #include "modules.h"
@@ -60,5 +60,5 @@ static inline mtd_dev_t *mtd_default_get_dev(unsigned idx)
 }
 #endif
 
-#endif /* MTD_DEFAULT_H */
 /** @} */
+#endif /* MTD_DEFAULT_H */

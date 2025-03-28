@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HMC5883L_H
+#define HMC5883L_H
+
 /**
  * @defgroup    drivers_hmc5883l HMC5883L 3-axis digital compass
  * @ingroup     drivers_sensors
@@ -28,9 +31,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-
-#ifndef HMC5883L_H
-#define HMC5883L_H
 
 #ifdef __cplusplus
 extern "C"
@@ -292,5 +292,5 @@ int hmc5883l_power_up(hmc5883l_t *dev);
 }
 #endif
 
-#endif /* HMC5883L_H */
 /** @} */
+#endif /* HMC5883L_H */

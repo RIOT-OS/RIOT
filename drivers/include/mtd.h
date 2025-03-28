@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MTD_H
+#define MTD_H
+
 /**
  * @defgroup    drivers_mtd Memory Technology Device
  * @ingroup     drivers_storage
@@ -69,9 +72,6 @@
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef MTD_H
-#define MTD_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -544,5 +544,5 @@ static inline mtd_dev_t *mtd_dev_get(unsigned idx)
 }
 #endif
 
-#endif /* MTD_H */
 /** @} */
+#endif /* MTD_H */

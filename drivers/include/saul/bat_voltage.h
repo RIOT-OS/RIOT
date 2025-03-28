@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SAUL_BAT_VOLTAGE_H
+#define SAUL_BAT_VOLTAGE_H
+
 /**
  * @ingroup     drivers_saul
  * @{
@@ -15,9 +18,6 @@
  *
  * @author      Martine S. Lenders <martine.lenders@tu-dresden.de>
  */
-
-#ifndef SAUL_BAT_VOLTAGE_H
-#define SAUL_BAT_VOLTAGE_H
 
 #include <stdint.h>
 
@@ -49,5 +49,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SAUL_BAT_VOLTAGE_H */
 /** @} */
+#endif /* SAUL_BAT_VOLTAGE_H */

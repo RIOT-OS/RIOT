@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_TIMER_H
+#define PERIPH_TIMER_H
+
 /**
  * @defgroup    drivers_periph_timer Timer
  * @ingroup     drivers_periph
@@ -29,9 +32,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_TIMER_H
-#define PERIPH_TIMER_H
 
 #include <limits.h>
 #include <stdint.h>
@@ -333,5 +333,5 @@ bool timer_poll_channel(tim_t dev, int channel);
 }
 #endif
 
-#endif /* PERIPH_TIMER_H */
 /** @} */
+#endif /* PERIPH_TIMER_H */

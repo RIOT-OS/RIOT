@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef AT86RF2XX_H
+#define AT86RF2XX_H
+
 /**
  * @defgroup    drivers_at86rf2xx AT86RF2xx based drivers
  * @ingroup     drivers_netdev
@@ -25,9 +28,6 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef AT86RF2XX_H
-#define AT86RF2XX_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -595,5 +595,5 @@ void at86rf2xx_disable_smart_idle(at86rf2xx_t *dev);
 }
 #endif
 
-#endif /* AT86RF2XX_H */
 /** @} */
+#endif /* AT86RF2XX_H */

@@ -9,6 +9,9 @@
  * details.
  */
 
+#ifndef CC110X_H
+#define CC110X_H
+
 /**
  * @defgroup    drivers_cc110x CC1100/CC1100e/CC1101 Sub-GHz transceiver driver
  * @ingroup     drivers_netdev
@@ -190,9 +193,6 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef CC110X_H
-#define CC110X_H
 
 #include <stdint.h>
 
@@ -652,5 +652,5 @@ void cc110x_sleep(cc110x_t *dev);
 }
 #endif
 
-#endif /* CC110X_H */
 /** @} */
+#endif /* CC110X_H */

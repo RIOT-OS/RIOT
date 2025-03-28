@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_CPUID_H
+#define PERIPH_CPUID_H
+
 /**
  * @defgroup    drivers_periph_cpuid CPUID
  * @ingroup     drivers_periph
@@ -30,9 +33,6 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-
-#ifndef PERIPH_CPUID_H
-#define PERIPH_CPUID_H
 
 #include "periph_cpu.h"
 
@@ -62,5 +62,5 @@ void cpuid_get(void *id);
 }
 #endif
 
-#endif /* PERIPH_CPUID_H */
 /** @} */
+#endif /* PERIPH_CPUID_H */

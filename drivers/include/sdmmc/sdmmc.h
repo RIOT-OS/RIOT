@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SDMMC_SDMMC_H
+#define SDMMC_SDMMC_H
+
 /**
  * @defgroup    drivers_sdmmc    SDIO/SD/MMC Device API (SDMMC)
  * @ingroup     drivers_periph
@@ -123,9 +126,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef SDMMC_SDMMC_H
-#define SDMMC_SDMMC_H
 
 #include <errno.h>
 

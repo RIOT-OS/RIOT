@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef HDC1000_H
+#define HDC1000_H
+
 /**
  * @defgroup    drivers_hdc1000 HDC1000 Humidity and Temperature Sensor
  * @ingroup     drivers_sensors
@@ -37,9 +40,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef HDC1000_H
-#define HDC1000_H
 
 #include <stdint.h>
 
@@ -187,5 +187,5 @@ int hdc1000_read_cached(const hdc1000_t *dev, int16_t *temp, int16_t *hum);
 }
 #endif
 
-#endif /* HDC1000_H */
 /** @} */
+#endif /* HDC1000_H */

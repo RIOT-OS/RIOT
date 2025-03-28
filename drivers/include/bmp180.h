@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef BMP180_H
+#define BMP180_H
+
 /**
  * @defgroup    drivers_bmp180 BMP180 temperature and pressure sensor
  * @ingroup     drivers_sensors
@@ -20,9 +23,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef BMP180_H
-#define BMP180_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -138,5 +138,5 @@ uint32_t bmp180_sealevel_pressure(const bmp180_t *dev, int16_t altitude);
 }
 #endif
 
-#endif /* BMP180_H */
 /** @} */
+#endif /* BMP180_H */

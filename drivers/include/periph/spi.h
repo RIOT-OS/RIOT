@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_SPI_H
+#define PERIPH_SPI_H
+
 /**
  * @defgroup    drivers_periph_spi SPI
  * @ingroup     drivers_periph
@@ -62,9 +65,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_SPI_H
-#define PERIPH_SPI_H
 
 #include <endian.h>
 #include <errno.h>
@@ -453,5 +453,5 @@ static inline uint16_t spi_transfer_u16_be(spi_t bus, spi_cs_t cs, bool cont, ui
 }
 #endif
 
-#endif /* PERIPH_SPI_H */
 /** @} */
+#endif /* PERIPH_SPI_H */

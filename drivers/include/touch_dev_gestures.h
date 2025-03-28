@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TOUCH_DEV_GESTURES_H
+#define TOUCH_DEV_GESTURES_H
+
 /**
  * @defgroup    drivers_touch_dev_gestures Touch device gesture recognition
  * @ingroup     drivers_misc
@@ -140,9 +143,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef TOUCH_DEV_GESTURES_H
-#define TOUCH_DEV_GESTURES_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -245,5 +245,5 @@ touch_dev_gesture_t touch_dev_recognize_gesture(touch_dev_gesture_ctx_t *ctx,
 }
 #endif
 
-#endif /* TOUCH_DEV_GESTURES_H */
 /** @} */
+#endif /* TOUCH_DEV_GESTURES_H */
