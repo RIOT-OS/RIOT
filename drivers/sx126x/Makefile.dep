@@ -4,3 +4,8 @@ USEPKG += driver_sx126x
 FEATURES_REQUIRED += periph_gpio_irq
 
 USEMODULE += lora
+
+ifneq (,$(filter sx126x_ieee802154,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154_submac
+  USEMODULE += bhp_event
+endif
