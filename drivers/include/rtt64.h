@@ -45,7 +45,7 @@ typedef uint64_t rtt64_t;
  *
  * @return Second part of the timestamp
  */
-static inline uint64_t rtt64_sec(rtt64_t time)
+static inline uint64_t rtt64_get_sec(rtt64_t time)
 {
     return time >> 16;
 }
@@ -57,7 +57,7 @@ static inline uint64_t rtt64_sec(rtt64_t time)
  *
  * @return Microsecond part of the timestamp
  */
-static inline uint32_t rtt64_usec(rtt64_t time)
+static inline uint32_t rtt64_get_usec(rtt64_t time)
 {
     return ((uint64_t)US_PER_SEC * (time & 0xFFFF)) >> 16;
 }
@@ -70,7 +70,7 @@ static inline uint32_t rtt64_usec(rtt64_t time)
  *
  * @return Timestamp in RTT64 format
  */
-static inline rtt64_t rtt64_counter(uint64_t secs, uint32_t us)
+static inline rtt64_t rtt64_time_to_counter(uint64_t secs, uint32_t us)
 {
     uint64_t now = secs << 16;
     now += ((uint64_t)us * 0xFFFF) / US_PER_SEC;
@@ -138,7 +138,7 @@ void rtt64_clear_alarm(void);
  */
 static inline void rtt64_set_time(uint64_t secs, uint32_t us)
 {
-    rtt64_t now = rtt64_counter(secs, us);
+    rtt64_t now = rtt64_time_to_counter(secs, us);
     rtt64_set_counter(now);
 }
 
@@ -153,10 +153,10 @@ static inline void rtt64_get_time(uint64_t *secs, uint32_t *us)
     rtt64_t now = rtt64_get_counter();
 
     if (secs) {
-        *secs = rtt64_sec(now);
+        *secs = rtt64_get_sec(now);
     }
     if (us) {
-        *us = rtt64_usec(now);
+        *us = rtt64_get_usec(now);
     }
 }
 
@@ -170,7 +170,7 @@ static inline void rtt64_get_time(uint64_t *secs, uint32_t *us)
  */
 static inline void rtt64_set_alarm_time(uint64_t secs, uint32_t us, rtt_cb_t cb, void *arg)
 {
-    rtt64_t alarm = rtt64_counter(secs, us);
+    rtt64_t alarm = rtt64_time_to_counter(secs, us);
     rtt64_set_alarm_counter(alarm, cb, arg);
 }
 
@@ -185,10 +185,10 @@ static inline void rtt64_get_alarm_time(uint64_t *secs, uint32_t *us)
     rtt64_t alarm = rtt64_get_alarm_counter();
 
     if (secs) {
-        *secs = rtt64_sec(alarm);
+        *secs = rtt64_get_sec(alarm);
     }
     if (us) {
-        *us = rtt64_usec(alarm);
+        *us = rtt64_get_usec(alarm);
     }
 }
 
