@@ -179,6 +179,29 @@ ssize_t strscpy(char *dest, const char *src, size_t count);
  */
 const void *memchk(const void *data, uint8_t c, size_t len);
 
+/**
+ * @brief   Reverse the order of bytes in a buffer
+ *
+ * @param[in, out]  buf     The buffer to reverse
+ * @param[in]       len     Size of the buffer
+ */
+void reverse_buf(void *buf, size_t len);
+
+/**
+ * @brief   Convert a decimal value into a byte string that
+ *          looks like the integer value when printed as hex
+ *
+ * This will e.g. turn the value 123 -> 0x123 (decimal: 291)
+ *
+ * @param[in]  val  Decimal value to print
+ * @param[out] dst  Destination buffer
+ * @param[in]  len  Size of the destination buffer
+ *
+ * @return number of bytes written
+ * @return -ENOBUFS if @p dst is not large enough
+ */
+int dec_as_hex(uint32_t val, void *dst, size_t len);
+
 #ifdef __cplusplus
 }
 #endif
