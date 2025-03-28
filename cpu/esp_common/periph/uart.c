@@ -59,11 +59,10 @@
 
 #else /* defined(CPU_ESP8266) */
 
-#include "driver/periph_ctrl.h"
+#include "esp_cpu.h"
+#include "esp_idf_api/uart.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
-#include "esp_rom_uart.h"
-#include "hal/interrupt_controller_types.h"
-#include "hal/interrupt_controller_ll.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
@@ -189,7 +188,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_set_pin_usage(uart_config[uart].txd, _UART);
         gpio_set_pin_usage(uart_config[uart].rxd, _UART);
 
-        esp_rom_uart_tx_wait_idle(uart);
+        esp_idf_esp_rom_output_tx_wait_idle(uart);
         esp_rom_gpio_connect_out_signal(uart_config[uart].txd,
                                         _uarts[uart].signal_txd, false, false);
         esp_rom_gpio_connect_in_signal(uart_config[uart].rxd,
@@ -276,7 +275,7 @@ void uart_print_config(void)
 
 static void IRAM _uart_intr_handler(void *arg)
 {
-    /* to satisfy the compiler */
+   /* to satisfy the compiler */
     (void)arg;
 
     irq_isr_enter();
@@ -416,11 +415,11 @@ static void _uart_config(uart_t uart)
         /* route all UART interrupt sources to same the CPU interrupt */
         intr_matrix_set(PRO_CPU_NUM, _uarts[uart].int_src, CPU_INUM_UART);
         /* we have to enable therefore the CPU interrupt here */
-        intr_cntrl_ll_set_int_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
-        intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_UART));
+        esp_cpu_intr_set_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
+        esp_cpu_intr_enable(BIT(CPU_INUM_UART));
 #ifdef SOC_CPU_HAS_FLEXIBLE_INTC
         /* set interrupt level */
-        intr_cntrl_ll_set_int_level(CPU_INUM_UART, 1);
+        esp_cpu_intr_set_priority(CPU_INUM_UART, 1);
 #endif
 #endif /* CPU_ESP8266 */
     }

@@ -540,8 +540,8 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
     }
     else {
         DEBUG("[sdmmc] send CMD3 to get RCA\n");
-        /* for SD cards, the card selects RCA and sends it back in R3 */
-        res = _send_cmd(dev, SDMMC_CMD3, SDMMC_CMD_NO_ARG, SDMMC_R3, response);
+        /* for SD cards, the card selects RCA and sends it back in R6 */
+        res = _send_cmd(dev, SDMMC_CMD3, SDMMC_CMD_NO_ARG, SDMMC_R6, response);
         dev->rca = response[0] >> 16;
     }
     if (res) {

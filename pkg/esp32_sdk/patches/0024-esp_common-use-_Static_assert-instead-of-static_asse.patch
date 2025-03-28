@@ -1,0 +1,28 @@
+From 3b4b1002368d54fb7b4e7539fa7636a1b15a43d7 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Mar 2025 10:40:35 +0100
+Subject: [PATCH 24/27] esp_common: use _Static_assert instead of static_assert
+
+---
+ components/esp_common/include/esp_assert.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/components/esp_common/include/esp_assert.h b/components/esp_common/include/esp_assert.h
+index fa54fdbedb..e6a77ae046 100644
+--- a/components/esp_common/include/esp_assert.h
++++ b/components/esp_common/include/esp_assert.h
+@@ -10,7 +10,11 @@
+ 
+ /* Since IDF v5.0, C17 standard is used, which supports both _Static_assert and static_assert syntax */
+ /* Please do not use `_Static_assert` for C++ compatibility */
++#ifndef RIOT_VERSION
+ #define ESP_STATIC_ASSERT static_assert
++#else
++#define ESP_STATIC_ASSERT _Static_assert
++#endif
+ 
+ /* Assert at compile time if possible, runtime otherwise */
+ #ifndef __cplusplus
+-- 
+2.34.1
+
