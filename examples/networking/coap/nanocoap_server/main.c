@@ -24,6 +24,7 @@
 
 #ifdef MODULE_LWIP_IPV4
 #include "lwip/netif.h"
+#include <arpa/inet.h>
 #endif
 
 #define COAP_INBUF_SIZE (256U)
@@ -51,15 +52,26 @@ int main(void)
 #define _TEST_ADDR4_LOCAL  (0x9664a8c0U)   /* 192.168.100.150 */
 #define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
 
+#ifdef MODULE_LWIP_DHCP_AUTO
+printf("Aqq DHCP\n");
+#endif
+
     sys_lock_tcpip_core();
     struct netif *iface = netif_find("ET0aa");
+
+#ifndef MODULE_LWIP_DHCP_AUTO
     ip4_addr_t ip, subnet;
     ip.addr = _TEST_ADDR4_LOCAL;
     subnet.addr = _TEST_ADDR4_MASK;
     netif_set_addr(iface, &ip, &subnet, NULL);
+#endif
     sys_unlock_tcpip_core();
 
-    printf("{\"IPv4 addresses\": [\"192.168.100.150\"]}\n");
+    /* print network addresses */
+    printf("{\"IPv4 addresses\": [\"");
+    char buffer[16];
+    inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
+    printf("%s\"]}\n", buffer);
 
     /* initialize nanocoap server instance for IPv4*/
     uint8_t buf[COAP_INBUF_SIZE];
