@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
  * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
@@ -18,9 +20,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
@@ -46,11 +45,11 @@ static const uart_conf_t uart_config[] = {
 #endif
         .irqn       = UARTE0_UART0_IRQn,
     },
-};
+};                                                  /**< UART Peripheral Configuration Structure */
 
-#define UART_0_ISR          (isr_uart0)
+#define UART_0_ISR          (isr_uart0)             /**< Interrupt Service Routing for UART 0 */
 
-#define UART_NUMOF          ARRAY_SIZE(uart_config)
+#define UART_NUMOF          ARRAY_SIZE(uart_config) /**< Number of (preconfigured) UARTs */
 /** @} */
 
 /**
@@ -70,9 +69,9 @@ static const spi_conf_t spi_config[] = {
         .mosi = GPIO_PIN(0, 20),
         .miso = GPIO_PIN(0, 24),
     }
-};
+};                                                  /**< SPI Peripheral Configuration Structure */
 
-#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)  /**< Number of (preconfigured) SPI Buses */
 /** @} */
 
 /**
@@ -94,13 +93,14 @@ static const i2c_conf_t i2c_config[] = {
         .speed = I2C_SPEED_NORMAL
     }
 #endif
-};
-#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+};                                                  /**< I2C Peripheral Configuration Structure */
+
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)  /**< Number of (preconfigured) I2C Buses */
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
+#endif /* PERIPH_CONF_H */
