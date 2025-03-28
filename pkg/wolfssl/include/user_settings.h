@@ -60,7 +60,7 @@ extern "C" {
 #define HAVE_TLS_EXTENSIONS
 #endif
 
-/* Align on 32-bit (exc. native,
+/* Align on 32-bit (exc. native32,
  * don't modify default alignment.)
  */
 #ifndef BOARD_NATIVE32
