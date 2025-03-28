@@ -4,15 +4,15 @@
 # variables in their Makefile.features.
 # This makes them available when setting features based on CPU_MODEL in the cpu
 # Makefile.features and also during dependency resolution.
+#
+# Board features defined by common code in `boards/common` are processed
+# during the dependency resolution, since they depend on the USEMODULE.
 
 # Transition:
 #   Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
 #   reflect the state of all boards for the moment.
 
 include $(BOARDDIR)/Makefile.features
-
-# include global Makefile.features for `boards` modules
-include $(RIOTBOARD)/Makefile.features
 
 # Sanity check
 ifeq (,$(CPU))
