@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     boards_native
+ * @ingroup     boards_common_native
  *
- * The native board uses call level hardware simulation
+ * The native boards use call level hardware simulation
  *
  * @{
  *
  * @file
- * @brief       Basic definitions for the native board
+ * @brief       Basic definitions for the native boards
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
@@ -95,7 +95,7 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef FS_NATIVE_DIR
-#define FS_NATIVE_DIR           "native"  /**< Folder on the host fs exported to RIOT */
+#define FS_NATIVE_DIR           "native32"  /**< Folder on the host fs exported to RIOT */
 #endif
 /** @} */
 

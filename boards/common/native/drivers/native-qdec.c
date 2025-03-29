@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup boards_native
+ * @ingroup boards_common_native
  * @{
  * @file
  * @author  Gilles DOFFE <g.doffe@gmail.com>
