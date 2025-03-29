@@ -7,6 +7,9 @@
 The Nucleo-L152RE is a board from ST's Nucleo family supporting a ARM
 Cortex-M3 STM32L152RE microcontroller with 80KiB of RAM and 512KiB of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Hardware
 
 ![Nucleo64 L152RE](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
@@ -51,32 +54,11 @@ Cortex-M3 STM32L152RE microcontroller with 80KiB of RAM and 512KiB of Flash.
 | Color  | green |
 | Pin    | PA5   |
 
+## Flashing the Board
 
-## Supported Toolchains
-
-For using the Nucleo-L152RE board we strongly recommend the usage of the [GNU
-Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
-
-## Flashing the device
-
-### Flashing the Board Using OpenOCD
-
-Please use an OpenOCD version checked out after Jan. 26th 2015. Building
-instructions can be found [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD).
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-l152re PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-L152RE is `nucleo-l152re`.
 
 ## Using UART
 

@@ -10,6 +10,9 @@ Bluetooth® Low Energy (BLE) SIG specification v5.0 and with IEEE
 802.15.4-2011 board. It integrates an ARM Cortex-M4 STM32WB55RG microcontroller
 with 256KB of RAM and 1MB of ROM Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Hardware
 
 ![st-nucleo-wb55](https://miro.medium.com/max/700/1*9OG-4Ix4EzHX9uBpMve2IA.jpeg)
@@ -45,47 +48,11 @@ with 256KB of RAM and 1MB of ROM Flash.
 [Reference Manual]: https://www.st.com/resource/en/reference_manual/rm0434-multiprotocol-wireless-32bit-mcu-armbased-cortexm4-with-fpu-bluetooth-lowenergy-and-802154-radio-solution-stmicroelectronics.pdf
 [User Manual]: https://www.st.com/content/ccc/resource/technical/document/user_manual/group1/13/58/22/1a/f2/ff/43/5c/DM00517423/files/DM00517423.pdf/jcr:content/translations/en.DM00517423.pdf
 
-## Flashing the device
+## Flashing the Board
 
-### Flashing the Board Using OpenOCD
-
-The ST p-nucleo-wb55 board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD (use version 0.11.0 at least).
-
-To flash this board, just use the following command:
-
-```
-make BOARD=p-nucleo-wb55 flash -C examples/basic/hello-world
-```
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task could be
-performed manually; however, the cpy2remed (copy to removable media) PROGRAMMER
-script does this automatically. To program board in this manner, use the command:
-
-```
-make BOARD=p-nucleo-wb55 PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
--link007.html).
-
-
-## Accessing RIOT shell
-
-Default RIOT shell access utilize VCP (Virtual COM Port) via USB interface,
-provided by integrated ST-LINK programmer. In default configuration ST-LINK
-is connected to the microcontroller USART1. For more details See table 7,
-page 33 in board User Manual.
-
-The default baud rate is 115 200.
-
-Use the `term` target to open a terminal:
-```
-make BOARD=p-nucleo-wb55 -C examples/basic/hello-world term
-```
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the P-Nucleo-WB55 is `p-nucleo-wb55`.
 
 ## User Interface
 

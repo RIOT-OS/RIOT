@@ -7,6 +7,9 @@
 The Nucleo-C071RB is a board from ST's Nucleo family supporting a ARM
 Cortex-M0+ STM32C071RB microcontroller with 24KiB of RAM and 128KiB of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Pinout
 
 See Board Manual referenced below, section 7 pages 19-21.
