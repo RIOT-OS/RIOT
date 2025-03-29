@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f401re STM32 Nucleo-F401RE
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-F401RE
@@ -103,4 +102,3 @@ manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf), section
 6.7.1.
 The other issue is, that revision `C-01` also has no 32kHz oscillator, so the
 RTC module of RIOT cannot be used.
- */

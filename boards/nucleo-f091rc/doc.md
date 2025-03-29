@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f091rc STM32 Nucleo-F091RC
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-F091RC
@@ -103,4 +102,3 @@ could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 For using the ST Nucleo-F091RC board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

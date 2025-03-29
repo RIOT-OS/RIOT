@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l433rc STM32 Nucleo-L433RC
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-L433RC
@@ -51,5 +50,3 @@ make BOARD=nucleo-l433rc PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
 could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */
