@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l452re STM32 Nucleo-L452RE
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-L452RE
@@ -47,5 +46,3 @@ make BOARD=nucleo-l452re PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
 can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */

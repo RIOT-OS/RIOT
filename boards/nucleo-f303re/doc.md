@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f303re STM32 Nucleo-F303RE
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-F303RE
@@ -89,4 +88,3 @@ could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 For using the ST Nucleo-F303RE board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

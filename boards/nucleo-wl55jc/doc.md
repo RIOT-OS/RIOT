@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-wl55jc STM32 Nucleo-WL55JC
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-W55JC
@@ -70,4 +69,3 @@ could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 For using the ST Nucleo-wl55jc board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

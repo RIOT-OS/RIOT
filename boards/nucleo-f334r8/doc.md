@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f334r8 STM32 Nucleo-F334R8
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-F334R8
@@ -97,4 +96,3 @@ The default baud rate is 115200.
 For using the ST Nucleo-F334R8 board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

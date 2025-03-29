@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l152re STM32 Nucleo-L152RE
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-L152RE
@@ -91,4 +90,3 @@ external UART adapter.
 1. connect your usb tty to the st-link header as marked
 ![st-link-header](https://cloud.githubusercontent.com/assets/56618/5190200/f36aafe0-74e3-11e4-96bd-f755dd2a8b01.png)
 2. done
- */
