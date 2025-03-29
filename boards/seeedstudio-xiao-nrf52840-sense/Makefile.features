@@ -1,5 +1,3 @@
-CPU_MODEL = nrf52840xxaa
-
 # the board initialization requires low level GPIO configuration
 FEATURES_REQUIRED += periph_gpio_ll
 
