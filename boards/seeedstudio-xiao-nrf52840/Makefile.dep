@@ -1,4 +1,1 @@
 USEMODULE += boards_common_seeedstudio-xiao-nrf52840
-
-# include common nrf52 dependencies
-include $(RIOTBOARD)/common/nrf52/Makefile.dep
