@@ -2,7 +2,7 @@ nanocoap server example
 =======================
 
 This application is meant to get you started with implementing a CoAP server on RIOT.
-It uses the GNRC network stack through RIOT's
+It uses the GNRC or LWIP (including IPv4) network stack through RIOT's
 [sock API](http://doc.riot-os.org/group__net__sock.html).
 
 Usage
@@ -31,34 +31,36 @@ The application is now listening on all it's configured IP addresses.
 
 Now find out its link\_layer address:
 
-
 ```
 $ make term
-/home/aabadie/riot/examples/nanocoap_server/bin/native/nanocoapcoap_server.elf tap0
 RIOT native interrupts/signals initialized.
-LED_GREEN_OFF
-LED_RED_ON
 RIOT native board initialized.
 RIOT native hardware initialization complete.
 
-main(): This is RIOT! (Version: 2015.12-devel-632-g8f451-booze-master)
+main(): This is RIOT! (Version: 2024.04-devel-2305-g5f08f5-examples-nanocoap-lwip)
 RIOT nanocoap example application
 Waiting for address autoconfiguration...
-Configured network interfaces:
-Iface  5   HWaddr: 96:3c:18:1e:26:f7
-
-           MTU:1500  HL:64  RTR  RTR_ADV
-           Source address length: 6
-           Link type: wired
-           inet6 addr: ff02::1/128  scope: local [multicast]
-           inet6 addr: fe80::e42a:1aff:feca:10ec/64  scope: local
-           inet6 addr: ff02::1:ffca:10ec/128  scope: local [multicast]
-           inet6 addr: ff02::2/128  scope: local [multicast]
-           inet6 addr: 2001:db8:1:0:e42a:1aff:feca:10ec/64  scope: global
+{"IPv6 addresses": ["fe80::8c9d:7dff:fea1:fdcd"]}
 ```
 
-The link-layer address in this case is "fe80::e42a:1aff:feca:10ec", the only
-"scope: local" address set.
+The link-layer address in this case is "fe80::8c9d:7dff:fea1:fdcd".
+
+Usage - IPv4
+============
+Enable LWIP IPv4 setting `LWIP_IPV4 ?= 1` in `Makefile`.
+
+Run program and set IPv4 will be presented in the output:
+
+```
+RIOT native interrupts/signals initialized.
+RIOT native board initialized.
+RIOT native hardware initialization complete.
+
+main(): This is RIOT! (Version: 2024.04-devel-2305-g5f08f5-examples-nanocoap-lwip)
+RIOT nanocoap example application
+Waiting for address autoconfiguration...
+{"IPv4 addresses": ["192.168.100.150"]}
+```
 
 Testing
 =======

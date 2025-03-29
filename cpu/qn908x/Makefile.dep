@@ -19,4 +19,9 @@ ifneq (,$(filter periph_adc,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
+ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+  USEMODULE += lwip_ethernet
+  USEMODULE += netdev_legacy_api
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

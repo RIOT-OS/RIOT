@@ -7,4 +7,8 @@ ifneq (,$(filter mci,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
+ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+  USEMODULE += lwip_ethernet
+endif
+
 include $(RIOTCPU)/arm7_common/Makefile.dep
