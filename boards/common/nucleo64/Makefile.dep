@@ -1,6 +1,15 @@
+# include color echo macros
+include $(RIOTMAKE)/utils/ansi.mk
+include $(RIOTMAKE)/color.inc.mk
+
 ifneq (,$(filter periph_spi,$(USEMODULE)))
-  # The LED pin is also used for SPI
-  DISABLE_MODULE += periph_init_led0
+  # The LED pin is also used for SPI, disable the LED0 module (once)
+  ifeq (,$(filter periph_init_led0,$(DISABLE_MODULE)))
+    DISABLE_MODULE += periph_init_led0
+
+    MSG="Warning: Using periph_spi on Nucleo64 boards will disable LED0 due to pin conflicts."
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)$(MSG)$(COLOR_RESET)" 1>&2)
+  endif
 endif
 
 include $(RIOTBOARD)/common/nucleo/Makefile.dep
