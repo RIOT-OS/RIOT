@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l476rg STM32 Nucleo-L476RG
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-L476RG
@@ -72,4 +71,3 @@ could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 For using the ST Nucleo-L476RG board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

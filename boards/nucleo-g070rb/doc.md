@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-g070rb STM32 Nucleo-G070RB
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-G070RB
@@ -46,5 +45,3 @@ make BOARD=nucleo-g070rb PROGRAMMER=cpy2remed flash
 
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
 could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
-*/

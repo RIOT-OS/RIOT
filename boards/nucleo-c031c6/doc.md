@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-c031c6 STM32 Nucleo-C031C6
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-C031C6
@@ -48,5 +47,3 @@ make BOARD=nucleo-c031c6 PROGRAMMER=cpy2remed flash
 
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
 could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */
