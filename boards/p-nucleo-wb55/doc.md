@@ -1,6 +1,6 @@
-@defgroup    boards_p-nucleo-wb55 STM32 p-nucleo-wb55
-@ingroup     boards
-@brief       Support for the STM32 p-nucleo-wb55
+@defgroup    boards_p-nucleo-wb55 STM32 P-Nucleo-WB55
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 P-Nucleo-WB55
 
 ## Overview
 
