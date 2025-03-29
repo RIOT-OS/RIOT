@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f070rb STM32 Nucleo-F070RB
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-F070RB
@@ -88,4 +87,3 @@ could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
 For using the ST Nucleo-F070RB board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */
