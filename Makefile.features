@@ -40,3 +40,11 @@ endif
 ifneq (,$(filter netif_%,$(FEATURES_PROVIDED)))
   FEATURES_PROVIDED += netif
 endif
+
+# tinyUSB stack is supported on nRF52 w/ USB peripheral.
+# If the board has usb support, the user can choose to use tinyusb instead of usbus.
+ifeq (nrf52,$(CPU))
+  ifneq (,$(filter periph_usbdev,$(FEATURES_PROVIDED)))
+    FEATURES_PROVIDED += tinyusb_device
+  endif
+endif

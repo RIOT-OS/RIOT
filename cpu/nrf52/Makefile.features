@@ -12,12 +12,6 @@ ifneq (,$(filter nrf52811xxaa nrf52820xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL
   FEATURES_PROVIDED += netif_openwsn
 endif
 
-# tinyUSB stack is supported on nRF52 w/ USB peripheral.
-# If the board has usb support, the user can choose to use tinyusb instead of usbus.
-ifneq (,$(filter periph_usbdev,$(FEATURES_PROVIDED)))
-	FEATURES_PROVIDED += tinyusb_device
-endif
-
 # crypto features
 ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hash_sha_1
