@@ -17,9 +17,8 @@ Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
 
 ### Flashing, Bootloader, and Terminal
 
-Refer to the [Feather nRF52840 Express
-documentation](https://doc.riot-os.org/group__boards__feather-nrf52840.html) for further details.
-Both use the same flasher, bootloader, and terminal settings.
+Refer to the [Adafruit nRF52 Bootloader](@ref boards_common_adafruit-nrf52-bootloader)
+documentation for further details on the flashing process.
 
 Example with `hello-world` application:
 ```shell
