@@ -33,17 +33,8 @@ Cortex-M0+ STM32C031C6 microcontroller with 12KiB of RAM and 32KiB of Flash.
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0223-stm32-cortexm0-mcus-programming-manual-stmicroelectronics.pdf) |
 | Board Manual   | [Board Manual](https://www.st.com/resource/en/user_manual/um2953-stm32-nucleo64-board-mb1717-stmicroelectronics.pdf) |
 
-## Flashing the Board Using ST-LINK Removable Media
+## Flashing the Board
 
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-
-```
-make BOARD=nucleo-c031c6 PROGRAMMER=cpy2remed flash
-```
-
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+A detailed description about the flashing process can be found at the
+common [Flashing the Nucleo](@ref boards_common_nucleo_flashing) page.
+The board name for the Nucleo-C031C3 is `nucleo-c031c6`.
