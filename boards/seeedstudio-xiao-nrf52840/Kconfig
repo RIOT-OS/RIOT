@@ -5,9 +5,9 @@
 # directory for more details.
 
 config BOARD
-    default "seeedstudio-xiao-nrf52840" if BOARD_XIAO_NRF52840
+    default "seeedstudio-xiao-nrf52840" if BOARD_SEEEDSTUDIO_XIAO_NRF52840
 
-config BOARD_XIAO_NRF52840
+config BOARD_SEEEDSTUDIO_XIAO_NRF52840
     bool
     default y
     select BOARD_COMMON_NRF52
