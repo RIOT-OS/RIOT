@@ -114,7 +114,7 @@ support multiple platforms are given in section
 
 ### RP2040
 
-- `elf2uf2`
+- `picotool`
 
 ### SAM
 
