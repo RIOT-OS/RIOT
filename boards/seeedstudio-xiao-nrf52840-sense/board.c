@@ -24,18 +24,18 @@
 
 #include "board.h"
 #include "periph/gpio.h"
-
-#include "hal/nrf_gpio.h"
+#include "periph/gpio_ll.h"
 
 void board_init(void)
 {
     /* The IMU is supplied through a GPIO Pin (P1.08), so it has to be set
      * to high power mode. */
-    NRF_P1->PIN_CNF[8] = ((uint32_t)NRF_GPIO_PIN_DIR_OUTPUT << GPIO_PIN_CNF_DIR_Pos)
-    | ((uint32_t)NRF_GPIO_PIN_INPUT_DISCONNECT << GPIO_PIN_CNF_INPUT_Pos)
-    | ((uint32_t)NRF_GPIO_PIN_NOPULL << GPIO_PIN_CNF_PULL_Pos)
-    | ((uint32_t)NRF_GPIO_PIN_H0H1 << GPIO_PIN_CNF_DRIVE_Pos)
-    | ((uint32_t)NRF_GPIO_PIN_NOSENSE << GPIO_PIN_CNF_SENSE_Pos);
+    gpio_conf_t lsm6ds3_pwr_pin_conf;
 
-    gpio_set(LSM6DS3_PWR_PIN);
+    lsm6ds3_pwr_pin_conf.state = GPIO_OUTPUT_PUSH_PULL;      /* Set the output to push pull */
+    lsm6ds3_pwr_pin_conf.drive_strength = GPIO_DRIVE_STRONG; /* enable high drive strength H0H1 */
+    lsm6ds3_pwr_pin_conf.initial_value = 1;                  /* enable the power for the IMU */
+
+    gpio_ll_init(gpio_get_port(LSM6DS3_PWR_PIN),
+                 gpio_get_pin_num(LSM6DS3_PWR_PIN), lsm6ds3_pwr_pin_conf);
 }

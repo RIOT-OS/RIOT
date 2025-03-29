@@ -88,12 +88,14 @@ extern "C" {
 #ifdef BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE
 /**
  * @name    LSM6DS3TR-C IMU sensor configuration
+ *
+ * The IMU is directly supplied by GPIO Pin P1.08
  * @{
  */
-#define LSM6DSXX_PARAM_I2C I2C_DEV(1)   /**< I2C device of the IMU */
-#define LSM6DSXX_PARAM_ADDR (0x6A)      /**< I2C address of the IMU  */
+#define LSM6DSXX_PARAM_I2C  I2C_DEV(1)      /**< I2C device of the IMU */
+#define LSM6DSXX_PARAM_ADDR (0x6A)          /**< I2C address of the IMU  */
 
-#define LSM6DS3_PWR_PIN GPIO_PIN(1, 8)  /**< The IMU is directly supplied by P1.08 */
+#define LSM6DS3_PWR_PIN     GPIO_PIN(1, 8)  /**< Pin of the IMU supply pin */
 /** @} */
 #endif
 

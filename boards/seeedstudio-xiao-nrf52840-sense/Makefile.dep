@@ -2,9 +2,6 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lsm6dsxx
 endif
 
-# Use the NRFX package for the board initialization
-USEPKG += nrfx
-
 USEMODULE += boards_common_seeedstudio-xiao-nrf52840
 
 # include common nrf52 dependencies
