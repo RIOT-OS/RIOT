@@ -1,0 +1,3 @@
+ifneq (,$(filter periph_timer,$(FEATURES_USED)))
+  USEMODULE += ztimer_usec
+endif
