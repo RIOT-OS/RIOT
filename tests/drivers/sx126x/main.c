@@ -116,7 +116,7 @@ void *_recv_thread(void *arg)
 
 static void _get_usage(const char *cmd)
 {
-    printf("Usage: %s get <type|freq|bw|sf|cr|random>\n", cmd);
+    printf("Usage: %s get <type|freq|bw|sf|cr|power|integrity|invert_iq|preamble|random>\n", cmd);
 }
 
 static int sx126x_get_cmd(netdev_t *netdev, int argc, char **argv)
@@ -165,6 +165,26 @@ static int sx126x_get_cmd(netdev_t *netdev, int argc, char **argv)
         netdev->driver->get(netdev, NETOPT_CODING_RATE, &cr, sizeof(uint8_t));
         printf("Coding rate: %d\n", cr);
     }
+    else if (!strcmp("power", argv[2])) {
+        int16_t power;
+        netdev->driver->get(netdev, NETOPT_TX_POWER, &power, sizeof(int16_t));
+        printf("Power: %d\n", power);
+    }
+    else if (!strcmp("integrity", argv[2])) {
+        netopt_enable_t integrity;
+        netdev->driver->get(netdev, NETOPT_INTEGRITY_CHECK, &integrity, sizeof(netopt_enable_t));
+        printf("Integrity: %s ", (integrity == NETOPT_ENABLE) ? "enabled" : "disabled");
+    }
+    else if (!strcmp("invert_iq", argv[2])) {
+        netopt_enable_t invert_iq;
+        netdev->driver->get(netdev, NETOPT_IQ_INVERT, &invert_iq, sizeof(netopt_enable_t));
+        printf("Invert IQ: %s ", (invert_iq == NETOPT_ENABLE) ? "enabled" : "disabled");
+    }
+    else if (!strcmp("preamble", argv[2])) {
+        uint16_t preamble;
+        netdev->driver->get(netdev, NETOPT_PREAMBLE_LENGTH, &preamble, sizeof(uint16_t));
+        printf("Preamble: %d\n", preamble);
+    }
     else if (!strcmp("random", argv[2])) {
         uint32_t rand;
         netdev->driver->get(netdev, NETOPT_RANDOM, &rand, sizeof(uint32_t));
@@ -180,7 +200,7 @@ static int sx126x_get_cmd(netdev_t *netdev, int argc, char **argv)
 
 static void _set_usage(const char *cmd)
 {
-    printf("Usage: %s set <freq|bw|sf|cr> <value>\n", cmd);
+    printf("Usage: %s set <freq|bw|sf|cr|power|integrity|invert_iq|preamble> <value>\n", cmd);
 }
 
 static int sx126x_set_cmd(netdev_t *netdev, int argc, char **argv)
@@ -220,6 +240,23 @@ static int sx126x_set_cmd(netdev_t *netdev, int argc, char **argv)
     else if (!strcmp("cr", argv[2])) {
         uint8_t cr = atoi(argv[3]);
         ret = netdev->driver->set(netdev, NETOPT_CODING_RATE, &cr, sizeof(uint8_t));
+    }
+    else if (!strcmp("power", argv[2])) {
+        int16_t power = atoi(argv[3]);
+        ret = netdev->driver->set(netdev, NETOPT_TX_POWER, &power, sizeof(int16_t));
+    }
+    else if (!strcmp("integrity", argv[2])) {
+        netopt_enable_t integrity = (!strcmp("enabled", argv[3])) ? NETOPT_ENABLE : NETOPT_DISABLE;
+        ret = netdev->driver->set(netdev, NETOPT_INTEGRITY_CHECK, &integrity,
+                                  sizeof(netopt_enable_t));
+    }
+    else if (!strcmp("invert_iq", argv[2])) {
+        netopt_enable_t invert_iq = (!strcmp("enabled", argv[3])) ? NETOPT_ENABLE : NETOPT_DISABLE;
+        ret = netdev->driver->set(netdev, NETOPT_IQ_INVERT, &invert_iq, sizeof(netopt_enable_t));
+    }
+    else if (!strcmp("preamble", argv[2])) {
+        uint16_t preamble = atoi(argv[3]);
+        ret = netdev->driver->set(netdev, NETOPT_PREAMBLE_LENGTH, &preamble, sizeof(uint16_t));
     }
     else {
         _set_usage(argv[0]);
