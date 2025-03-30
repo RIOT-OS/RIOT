@@ -285,6 +285,16 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         *((netopt_enable_t *)val) = sx126x_get_lora_crc(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
         return sizeof(netopt_enable_t);
 
+    case NETOPT_PREAMBLE_LENGTH:
+        assert(max_len >= sizeof(uint16_t));
+        *((uint16_t *)val) = sx126x_get_lora_preamble_length(dev);
+        return sizeof(uint16_t);
+
+    case NETOPT_TX_POWER:
+        assert(max_len >= sizeof(int8_t));
+        *((int8_t *)val) = sx126x_get_tx_power();
+        return sizeof(int8_t);
+
     case NETOPT_RANDOM:
         assert(max_len >= sizeof(uint32_t));
         sx126x_get_random_numbers(dev, val, 1);

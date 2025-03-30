@@ -344,3 +344,15 @@ void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert)
     dev->pkt_params.invert_iq_is_on = iq_invert;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
+
+void sx126x_set_tx_power(sx126x_t *dev, int8_t tx_power)
+{
+    DEBUG("[sx126x]: sx126x_set_tx_power \n");
+    sx126x_set_tx_params(dev, tx_power, CONFIG_SX126X_RAMP_TIME_DEFAULT);
+}
+
+int8_t sx126x_get_tx_power(void)
+{
+    DEBUG("[sx126x]: sx126x_get_tx_power \n");
+    return CONFIG_SX126X_TX_POWER_DEFAULT;
+}
