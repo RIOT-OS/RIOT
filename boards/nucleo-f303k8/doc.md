@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-f303k8 STM32 Nucleo-F303K8
 @ingroup     boards_common_nucleo32
 @brief       Support for the STM32 Nucleo-F303K8
@@ -82,4 +81,3 @@ make BOARD=nucleo-f303k8 PROGRAMMER=cpy2remed flash
 For using the ST Nucleo-F303K8 board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */

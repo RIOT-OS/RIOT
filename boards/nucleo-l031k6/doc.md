@@ -1,12 +1,12 @@
-/**
-@defgroup    boards_nucleo-l011k4 STM32 Nucleo-L011K4
+@defgroup    boards_nucleo-l031k6 STM32 Nucleo-L031K6
 @ingroup     boards_common_nucleo32
-@brief       Support for the STM32 Nucleo-L011K4
+@brief       Support for the STM32 Nucleo-L031K6
 
 ## Overview
 
-The Nucleo-L011K4 is a board from ST's Nucleo family supporting ARM-Cortex-M0+
-STM32L011K4 microcontroller with 2KiB of RAM and 16KiB of Flash.
+The Nucleo-L031K6 is a board from ST's Nucleo family supporting ARM Cortex-M0
+STM32L031K6T6 microcontroller with 8KiB of RAM and 32KiB of Flash.
+
 
 ## Flashing the Board Using ST-LINK Removable Media
 
@@ -16,9 +16,7 @@ could be performed manually; however, the cpy2remed (copy to removable
 media) PROGRAMMER script does this automatically. To program board in
 this manner, use the command:
 ```
-make BOARD=nucleo-l011k4 PROGRAMMER=cpy2remed flash
+make BOARD=nucleo-l031k6 PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
       can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */
