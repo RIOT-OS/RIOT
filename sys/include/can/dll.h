@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef CAN_DLL_H
+#define CAN_DLL_H
+
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -16,9 +19,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-
-#ifndef CAN_DLL_H
-#define CAN_DLL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,6 +104,6 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid);
 }
 #endif
 
-#endif /* CAN_DLL_H */
-
 /** @} */
+
+#endif /* CAN_DLL_H */

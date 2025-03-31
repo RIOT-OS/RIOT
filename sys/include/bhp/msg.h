@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef BHP_MSG_H
+#define BHP_MSG_H
+
 /**
  * @defgroup     sys_bhp_msg Message based implementation of Bottom Half Processor
  * @ingroup      sys_bhp
@@ -20,9 +23,6 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef BHP_MSG_H
-#define BHP_MSG_H
 
 #include "msg.h"
 #include "thread.h"
@@ -102,5 +102,5 @@ static inline void bhp_msg_handler(msg_t *msg)
 }
 #endif
 
-#endif /* BHP_MSG_H */
 /** @} */
+#endif /* BHP_MSG_H */

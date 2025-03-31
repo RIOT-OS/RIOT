@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef BASE64_H
+#define BASE64_H
+
 /**
  * @defgroup    sys_base64 base64 encoder decoder
  * @ingroup     sys_serialization
@@ -16,9 +19,6 @@
  * @brief       encoding and decoding functions for base64
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
-
-#ifndef BASE64_H
-#define BASE64_H
 
 #include <stddef.h> /* for size_t */
 

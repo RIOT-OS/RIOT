@@ -29,6 +29,9 @@
  * $FreeBSD: src/lib/libmd/sha256.h,v 1.1.2.1 2005/06/24 13:32:25 cperciva Exp $
  */
 
+#ifndef HASHES_SHA256_H
+#define HASHES_SHA256_H
+
 /**
  * @defgroup    sys_hashes_sha256 SHA-256
  * @ingroup     sys_hashes_unkeyed
@@ -43,9 +46,6 @@
  * @author      Rene Kijewski
  * @author      Hermann Lelong
  */
-
-#ifndef HASHES_SHA256_H
-#define HASHES_SHA256_H
 
 #include <inttypes.h>
 #include <stddef.h>

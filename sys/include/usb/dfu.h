@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef USB_DFU_H
+#define USB_DFU_H
+
 /**
  * @defgroup    usb_dfu   DFU - USB Device Firmware Upgrade
  * @ingroup     usb
@@ -18,9 +21,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef USB_DFU_H
-#define USB_DFU_H
 
 #include <stdint.h>
 
@@ -132,5 +132,5 @@ typedef struct __attribute__((packed))  {
 }
 #endif
 
-#endif /* USB_DFU_H */
 /** @} */
+#endif /* USB_DFU_H */

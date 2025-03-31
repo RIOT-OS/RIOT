@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef CONGURE_H
+#define CONGURE_H
 /**
  * @defgroup    sys_congure CongURE - A Congestion control framework
  * @ingroup     sys
@@ -17,8 +19,6 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef CONGURE_H
-#define CONGURE_H
 
 #include <stdint.h>
 
@@ -221,5 +221,5 @@ struct congure_snd_driver {
 }
 #endif
 
-#endif /* CONGURE_H */
 /** @} */
+#endif /* CONGURE_H */

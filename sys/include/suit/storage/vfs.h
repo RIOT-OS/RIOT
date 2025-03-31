@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+#ifndef SUIT_STORAGE_VFS_H
+#define SUIT_STORAGE_VFS_H
+
 /**
  * @defgroup    sys_suit_storage_vfs  riotboot vfs storage backend
  * @ingroup     sys_suit_storage
@@ -29,9 +32,6 @@
  * @brief       riotboot vfs storage backend functions for SUIT manifests
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef SUIT_STORAGE_VFS_H
-#define SUIT_STORAGE_VFS_H
 
 #include "suit.h"
 #include "../../sys/include/vfs.h"
@@ -68,5 +68,5 @@ typedef struct {
 }
 #endif
 
-#endif /* SUIT_STORAGE_VFS_H */
 /** @} */
+#endif /* SUIT_STORAGE_VFS_H */

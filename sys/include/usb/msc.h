@@ -8,6 +8,9 @@
  *
  */
 
+#ifndef USB_MSC_H
+#define USB_MSC_H
+
 /**
  * @defgroup    usbus_msc USBUS Mass Storage Class functions
  * @ingroup     usb
@@ -19,9 +22,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef USB_MSC_H
-#define USB_MSC_H
 
 #include <stdint.h>
 #include "usb/usbus.h"
@@ -100,5 +100,5 @@ extern "C" {
 }
 #endif
 
-#endif /* USB_MSC_H */
 /** @} */
+#endif /* USB_MSC_H */

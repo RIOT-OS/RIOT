@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef CHECKSUM_UCRC16_H
+#define CHECKSUM_UCRC16_H
 /**
  * @defgroup    sys_checksum_ucrc16     CRC16 (lightweight)
  * @ingroup     sys_checksum
@@ -26,8 +28,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef CHECKSUM_UCRC16_H
-#define CHECKSUM_UCRC16_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -78,5 +78,5 @@ uint16_t ucrc16_calc_le(const uint8_t *buf, size_t len, uint16_t poly,
 }
 #endif
 
-#endif /* CHECKSUM_UCRC16_H */
 /** @} */
+#endif /* CHECKSUM_UCRC16_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_6LO_H
+#define NET_GNRC_NETIF_6LO_H
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_6LO_H
-#define NET_GNRC_NETIF_6LO_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -72,5 +72,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_6LO_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_6LO_H */

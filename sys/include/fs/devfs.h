@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FS_DEVFS_H
+#define FS_DEVFS_H
+
 /**
  * @defgroup  sys_fs_devfs DevFS device file system
  * @ingroup   sys_fs
@@ -21,9 +24,6 @@
  * @brief   DevFS public API
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef FS_DEVFS_H
-#define FS_DEVFS_H
 
 #include "clist.h"
 #include "vfs.h"
@@ -89,6 +89,6 @@ int devfs_unregister(devfs_t *node);
 }
 #endif
 
-#endif /* FS_DEVFS_H */
-
 /** @} */
+
+#endif /* FS_DEVFS_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef BENCHMARK_H
+#define BENCHMARK_H
+
 /**
  * @defgroup    sys_benchmark Benchmark
  * @ingroup     sys
@@ -17,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BENCHMARK_H
-#define BENCHMARK_H
 
 #include <stdint.h>
 
@@ -65,5 +65,5 @@ void benchmark_print_time(uint32_t time, unsigned long runs, const char *name);
 }
 #endif
 
-#endif /* BENCHMARK_H */
 /** @} */
+#endif /* BENCHMARK_H */

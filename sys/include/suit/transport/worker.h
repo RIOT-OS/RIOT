@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef SUIT_TRANSPORT_WORKER_H
+#define SUIT_TRANSPORT_WORKER_H
+
 /**
  * @ingroup     sys_suit
  * @defgroup    sys_suit_transport_worker SUIT firmware worker thread
@@ -135,5 +138,5 @@ int suit_handle_manifest_buf(const uint8_t *buffer, size_t size);
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_WORKER_H */
 /** @} */
+#endif /* SUIT_TRANSPORT_WORKER_H */

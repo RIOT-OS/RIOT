@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HASHES_SHA512_COMMON_H
+#define HASHES_SHA512_COMMON_H
+
 /**
  * @defgroup    sys_hashes_sha512_common SHA-512 common
  * @ingroup     sys_hashes_unkeyed
@@ -17,9 +20,6 @@
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
-
-#ifndef HASHES_SHA512_COMMON_H
-#define HASHES_SHA512_COMMON_H
 
 #include <string.h>
 #include <stdint.h>

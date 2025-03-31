@@ -108,6 +108,9 @@
  *
  */
 
+#ifndef BLOOM_H
+#define BLOOM_H
+
 /**
  * @defgroup    sys_bloom Bloom filter
  * @ingroup     sys
@@ -119,9 +122,6 @@
  *
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
-
-#ifndef BLOOM_H
-#define BLOOM_H
 
 #include <stdlib.h>
 #include <stdbool.h>

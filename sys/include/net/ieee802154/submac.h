@@ -6,6 +6,8 @@
  * details.
  */
 
+#ifndef NET_IEEE802154_SUBMAC_H
+#define NET_IEEE802154_SUBMAC_H
 /**
  * @defgroup     net_ieee802154_submac IEEE802.15.4 SubMAC layer
  * @ingroup      net_ieee802154
@@ -104,8 +106,6 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef NET_IEEE802154_SUBMAC_H
-#define NET_IEEE802154_SUBMAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -612,5 +612,5 @@ static inline void ieee802154_submac_tx_done_cb(ieee802154_submac_t *submac)
 }
 #endif
 
-#endif /* NET_IEEE802154_SUBMAC_H */
 /** @} */
+#endif /* NET_IEEE802154_SUBMAC_H */

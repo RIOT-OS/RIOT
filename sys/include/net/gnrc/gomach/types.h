@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_GOMACH_TYPES_H
+#define NET_GNRC_GOMACH_TYPES_H
+
 /**
  * @ingroup     net_gnrc_gomach
  * @{
@@ -15,9 +18,6 @@
  * @internal
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
-
-#ifndef NET_GNRC_GOMACH_TYPES_H
-#define NET_GNRC_GOMACH_TYPES_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -310,5 +310,5 @@ typedef struct gomach {
 }
 #endif
 
-#endif /* NET_GNRC_GOMACH_TYPES_H */
 /** @} */
+#endif /* NET_GNRC_GOMACH_TYPES_H */

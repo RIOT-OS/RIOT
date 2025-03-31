@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#ifndef XTIMER_H
+#define XTIMER_H
 /**
  * @defgroup    sys_xtimer xtimer high level timer abstraction layer (deprecated)
  * @ingroup     sys
@@ -39,8 +41,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef XTIMER_H
-#define XTIMER_H
 
 #include <stdbool.h>
 #include <stdint.h>

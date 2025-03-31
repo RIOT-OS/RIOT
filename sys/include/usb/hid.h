@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef USB_HID_H
+#define USB_HID_H
+
 /**
  * @defgroup    usb_hid   HID - USB communications device class
  * @ingroup     usb
@@ -18,9 +21,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef USB_HID_H
-#define USB_HID_H
 
 #include <stdint.h>
 
@@ -513,5 +513,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
-#endif /* USB_HID_H */
 /** @} */
+#endif /* USB_HID_H */

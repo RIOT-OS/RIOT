@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CLIF_H
+#define CLIF_H
+
 /**
  * @defgroup    sys_clif CoRE Link Format
  * @ingroup     sys_serialization
@@ -91,9 +94,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef CLIF_H
-#define CLIF_H
 
 #include <sys/types.h>
 
@@ -331,5 +331,5 @@ int clif_init_attr(clif_attr_t *attr, clif_attr_type_t type);
 }
 #endif
 
-#endif /* CLIF_H */
 /** @} */
+#endif /* CLIF_H */

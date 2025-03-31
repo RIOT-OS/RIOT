@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef BITFIELD_H
+#define BITFIELD_H
+
 /**
  * @defgroup    sys_bitfield Bitfields
  * @ingroup     sys
@@ -25,9 +28,6 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-
-#ifndef BITFIELD_H
-#define BITFIELD_H
 
 #include <stdint.h>
 #include <stdbool.h>

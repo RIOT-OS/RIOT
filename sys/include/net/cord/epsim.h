@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_CORD_EPSIM_H
+#define NET_CORD_EPSIM_H
+
 /**
  * @defgroup    net_cord_epsim CoRE RD Simple Registration Endpoint
  * @ingroup     net_cord
@@ -24,9 +27,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_CORD_EPSIM_H
-#define NET_CORD_EPSIM_H
 
 #include "net/sock/udp.h"
 
@@ -71,5 +71,5 @@ int cord_epsim_state(void);
 }
 #endif
 
-#endif /* NET_CORD_EPSIM_H */
 /** @} */
+#endif /* NET_CORD_EPSIM_H */

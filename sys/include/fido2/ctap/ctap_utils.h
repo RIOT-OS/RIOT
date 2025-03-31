@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FIDO2_CTAP_CTAP_UTILS_H
+#define FIDO2_CTAP_CTAP_UTILS_H
+
 /**
  * @defgroup    fido2_ctap_utils FIDO2 CTAP utils
  * @ingroup     fido2_ctap
@@ -18,9 +21,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef FIDO2_CTAP_CTAP_UTILS_H
-#define FIDO2_CTAP_CTAP_UTILS_H
 
 #include <stdint.h>
 #include "fido2/ctap/ctap.h"
@@ -90,5 +90,5 @@ static inline bool fido2_ctap_utils_ks_equal(const ctap_resident_key_t *k1,
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_UTILS_H */
 /** @} */
+#endif /* FIDO2_CTAP_CTAP_UTILS_H */

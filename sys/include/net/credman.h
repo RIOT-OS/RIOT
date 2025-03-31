@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_CREDMAN_H
+#define NET_CREDMAN_H
+
 /**
  * @defgroup    net_credman (D)TLS Credential Manager
  * @ingroup     net net_dtls
@@ -23,9 +26,6 @@
  *
  * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  */
-
-#ifndef NET_CREDMAN_H
-#define NET_CREDMAN_H
 
 #include <unistd.h>
 #include <stdint.h>
@@ -274,5 +274,5 @@ void credman_reset(void);
 }
 #endif
 
-#endif /* NET_CREDMAN_H */
 /** @} */
+#endif /* NET_CREDMAN_H */

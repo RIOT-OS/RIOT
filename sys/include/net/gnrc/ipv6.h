@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef NET_GNRC_IPV6_H
+#define NET_GNRC_IPV6_H
+
 /**
  * @defgroup    net_gnrc_ipv6 IPv6
  * @ingroup     net_gnrc
@@ -94,9 +97,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-
-#ifndef NET_GNRC_IPV6_H
-#define NET_GNRC_IPV6_H
 
 #include "sched.h"
 #include "thread.h"

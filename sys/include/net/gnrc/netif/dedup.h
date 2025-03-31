@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_DEDUP_H
+#define NET_GNRC_NETIF_DEDUP_H
 /**
  * @defgroup    net_gnrc_netif_dedup    Link-layer Broadcast deduplication
  * @ingroup     net_gnrc_netif
@@ -24,8 +26,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_DEDUP_H
-#define NET_GNRC_NETIF_DEDUP_H
 
 #include <stdint.h>
 
@@ -48,5 +48,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_DEDUP_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_DEDUP_H */

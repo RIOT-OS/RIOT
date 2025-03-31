@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_ICMPV6_ECHO_H
+#define NET_GNRC_ICMPV6_ECHO_H
 /**
  * @defgroup    net_gnrc_icmpv6_echo  ICMPv6 echo messages
  * @ingroup     net_gnrc_icmpv6
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_ICMPV6_ECHO_H
-#define NET_GNRC_ICMPV6_ECHO_H
 
 #include <inttypes.h>
 
@@ -107,5 +107,5 @@ int gnrc_icmpv6_echo_rsp_handle(gnrc_pktsnip_t *pkt, size_t len,
 }
 #endif
 
-#endif /* NET_GNRC_ICMPV6_ECHO_H */
 /** @} */
+#endif /* NET_GNRC_ICMPV6_ECHO_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TEST_UTILS_NETDEV_ETH_MINIMAL_H
+#define TEST_UTILS_NETDEV_ETH_MINIMAL_H
+
 /**
  * @defgroup    test_utils_netdev_eth_minimal Minimal netdev Ethernet device processing
  * @ingroup     sys
@@ -22,9 +25,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef TEST_UTILS_NETDEV_ETH_MINIMAL_H
-#define TEST_UTILS_NETDEV_ETH_MINIMAL_H
 
 #include "net/netdev.h"
 
@@ -63,5 +63,5 @@ int netdev_eth_minimal_init(void);
 }
 #endif
 
-#endif /* TEST_UTILS_NETDEV_ETH_MINIMAL_H */
 /** @} */
+#endif /* TEST_UTILS_NETDEV_ETH_MINIMAL_H */

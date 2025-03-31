@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef CHECKSUM_CRC8_H
+#define CHECKSUM_CRC8_H
 /**
  * @defgroup    sys_checksum_crc8     CRC-8
  * @ingroup     sys_checksum
@@ -18,8 +20,6 @@
  *
  * @author  Gunar Schorcht <gunar@schorcht.net>
  */
-#ifndef CHECKSUM_CRC8_H
-#define CHECKSUM_CRC8_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -47,5 +47,5 @@ uint8_t crc8(const uint8_t *data, size_t len, uint8_t poly, uint8_t seed);
 }
 #endif
 
-#endif /* CHECKSUM_CRC8_H */
 /** @} */
+#endif /* CHECKSUM_CRC8_H */

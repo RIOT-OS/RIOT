@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef UNIVERSAL_ADDRESS_H
+#define UNIVERSAL_ADDRESS_H
+
 /**
  * @defgroup    sys_universal_address Universal Address Container
  * @ingroup     sys
@@ -17,9 +20,6 @@
  * @brief       Types and functions for operating universal addresses
  * @author      Martin Landsmann
  */
-
-#ifndef UNIVERSAL_ADDRESS_H
-#define UNIVERSAL_ADDRESS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -170,5 +170,5 @@ void universal_address_print_table(void);
 }
 #endif
 
-#endif /* UNIVERSAL_ADDRESS_H */
 /** @} */
+#endif /* UNIVERSAL_ADDRESS_H */

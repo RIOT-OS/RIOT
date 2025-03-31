@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CAN_CONN_RAW_H
+#define CAN_CONN_RAW_H
+
 /**
  * @defgroup    sys_can_conn Connection
  * @ingroup     sys_can
@@ -21,9 +24,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  *
  */
-
-#ifndef CAN_CONN_RAW_H
-#define CAN_CONN_RAW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,5 +138,5 @@ int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, siz
 }
 #endif
 
-#endif /* CAN_CONN_RAW_H */
 /** @} */
+#endif /* CAN_CONN_RAW_H */

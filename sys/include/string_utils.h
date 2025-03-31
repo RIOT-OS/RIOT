@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef STRING_UTILS_H
+#define STRING_UTILS_H
+
 /**
  * @defgroup    sys_string_utils    Utility functions that are missing in `string.h`
  * @ingroup     sys
@@ -32,9 +35,6 @@
 
 #include "flash_utils.h"
 #include "modules.h"
-
-#ifndef STRING_UTILS_H
-#define STRING_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -183,5 +183,5 @@ const void *memchk(const void *data, uint8_t c, size_t len);
 }
 #endif
 
-#endif /* STRING_UTILS_H */
 /** @} */
+#endif /* STRING_UTILS_H */

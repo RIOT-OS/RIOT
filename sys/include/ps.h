@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef PS_H
+#define PS_H
+
 /**
  * @defgroup    sys_ps PS
  * @ingroup     sys
@@ -18,9 +21,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-
-#ifndef PS_H
-#define PS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,5 +35,5 @@ void ps(void);
 }
 #endif
 
-#endif /* PS_H */
 /** @} */
+#endif /* PS_H */

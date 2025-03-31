@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef RIOTBOOT_HDR_H
+#define RIOTBOOT_HDR_H
+
 /**
  * @defgroup    sys_riotboot_hdr RIOT header helpers and tools
  * @ingroup     sys
@@ -28,9 +31,6 @@
  *
  * @}
  */
-
-#ifndef RIOTBOOT_HDR_H
-#define RIOTBOOT_HDR_H
 
 #ifdef __cplusplus
 extern "C" {

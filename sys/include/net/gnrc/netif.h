@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_H
+#define NET_GNRC_NETIF_H
 /**
  * @defgroup    net_gnrc_netif Network interface API
  * @ingroup     net_gnrc
@@ -26,8 +28,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_H
-#define NET_GNRC_NETIF_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -774,5 +774,5 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_H */

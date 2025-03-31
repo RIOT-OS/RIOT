@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_RB_H
+#define NET_GNRC_SIXLOWPAN_FRAG_RB_H
 /**
  * @defgroup net_gnrc_sixlowpan_frag_rb 6LoWPAN reassembly buffer
  * @ingroup  net_gnrc_sixlowpan_frag
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_RB_H
-#define NET_GNRC_SIXLOWPAN_FRAG_RB_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -316,5 +316,5 @@ static inline bool gnrc_sixlowpan_frag_rb_ints_empty(void)
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_RB_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_RB_H */

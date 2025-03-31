@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_IPV6_BLACKLIST_H
+#define NET_GNRC_IPV6_BLACKLIST_H
 /**
  * @defgroup    net_gnrc_ipv6_blacklist IPv6 address blacklist
  * @ingroup     net_gnrc_ipv6
@@ -19,8 +21,6 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
-#ifndef NET_GNRC_IPV6_BLACKLIST_H
-#define NET_GNRC_IPV6_BLACKLIST_H
 
 #include <stdbool.h>
 
@@ -82,5 +82,5 @@ void gnrc_ipv6_blacklist_print(void);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_BLACKLIST_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_BLACKLIST_H */

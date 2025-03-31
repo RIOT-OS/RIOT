@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_CORD_EP_H
+#define NET_CORD_EP_H
+
 /**
  * @defgroup    net_cord_ep CoRE RD Endpoint
  * @ingroup     net_cord
@@ -30,9 +33,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_CORD_EP_H
-#define NET_CORD_EP_H
 
 #include "net/sock/udp.h"
 
@@ -115,5 +115,5 @@ void cord_ep_dump_status(void);
 }
 #endif
 
-#endif /* NET_CORD_EP_H */
 /** @} */
+#endif /* NET_CORD_EP_H */

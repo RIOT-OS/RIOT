@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef EVENT_THREAD_H
+#define EVENT_THREAD_H
+
 /**
  * @ingroup     sys_event
  * @brief       Provides utility functions for event handler threads
@@ -49,9 +52,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef EVENT_THREAD_H
-#define EVENT_THREAD_H
 
 #include <stddef.h>
 
@@ -124,5 +124,5 @@ extern event_queue_t event_thread_queues[EVENT_QUEUE_PRIO_NUMOF];
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_THREAD_H */
 /** @} */
+#endif /* EVENT_THREAD_H */

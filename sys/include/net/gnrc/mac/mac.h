@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_MAC_MAC_H
+#define NET_GNRC_MAC_MAC_H
+
 /**
  * @defgroup    net_gnrc_mac Common MAC module
  * @ingroup     net_gnrc
@@ -24,9 +27,6 @@
  */
 
 #include "modules.h"
-
-#ifndef NET_GNRC_MAC_MAC_H
-#define NET_GNRC_MAC_MAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,5 +126,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_MAC_MAC_H */
 /** @} */
+#endif /* NET_GNRC_MAC_MAC_H */

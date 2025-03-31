@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef USB_USBUS_H
+#define USB_USBUS_H
+
 /**
  * @defgroup    usb_usbus USBUS device and endpoint manager
  * @ingroup     usb
@@ -19,9 +22,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef USB_USBUS_H
-#define USB_USBUS_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -789,5 +789,5 @@ static inline bool usbus_urb_isset_flag(usbus_urb_t *urb,
 #ifdef __cplusplus
 }
 #endif
-#endif /* USB_USBUS_H */
 /** @} */
+#endif /* USB_USBUS_H */

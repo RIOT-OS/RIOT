@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_DNS_MSG_H
+#define NET_DNS_MSG_H
 /**
  * @defgroup    net_dns_msg DNS message parser and composer
  * @ingroup     net_dns
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_DNS_MSG_H
-#define NET_DNS_MSG_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -117,5 +117,5 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
 }
 #endif
 
-#endif /* NET_DNS_MSG_H */
 /** @} */
+#endif /* NET_DNS_MSG_H */

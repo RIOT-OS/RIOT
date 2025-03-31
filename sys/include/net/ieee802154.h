@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_IEEE802154_H
+#define NET_IEEE802154_H
+
 /**
  * @defgroup    net_ieee802154_header IEEE 802.15.4 frame headers and definitions
  * @ingroup     net_ieee802154
@@ -17,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_IEEE802154_H
-#define NET_IEEE802154_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -794,5 +794,5 @@ static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
 }
 #endif
 
-#endif /* NET_IEEE802154_H */
 /** @} */
+#endif /* NET_IEEE802154_H */

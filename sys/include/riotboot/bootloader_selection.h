@@ -5,6 +5,13 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+#ifndef RIOTBOOT_BOOTLOADER_SELECTION_H
+#define RIOTBOOT_BOOTLOADER_SELECTION_H
+
+/* Include guards and cplusplus are more of a formality; this header is local
+ * to the riotboot_dfu application that isn't written in C++ and not included
+ * from anywhere else either, but still here for consistency (and because
+ * otherwise the checks complain) */
 /** @ingroup bootloaders
  *
  * @{
@@ -14,13 +21,6 @@
  *
  * @author Christian Amsüss <chrysn@fsfe.org>
  */
-
-/* Include guards and cplusplus are more of a formality; this header is local
- * to the riotboot_dfu application that isn't written in C++ and not included
- * from anywhere else either, but still here for consistency (and because
- * otherwise the checks complain) */
-#ifndef RIOTBOOT_BOOTLOADER_SELECTION_H
-#define RIOTBOOT_BOOTLOADER_SELECTION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,6 +82,6 @@ extern "C" {
 }
 #endif
 
-#endif /* RIOTBOOT_BOOTLOADER_SELECTION_H */
-
 /** @} */
+
+#endif /* RIOTBOOT_BOOTLOADER_SELECTION_H */

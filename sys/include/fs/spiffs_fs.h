@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FS_SPIFFS_FS_H
+#define FS_SPIFFS_FS_H
+
 /**
  * @defgroup    sys_spiffs  SPIFFS integration
  * @ingroup     pkg_spiffs
@@ -40,9 +43,6 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef FS_SPIFFS_FS_H
-#define FS_SPIFFS_FS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,6 +150,6 @@ void spiffs_unlock(struct spiffs_t *fs);
 }
 #endif
 
-#endif /* FS_SPIFFS_FS_H */
-
 /** @} */
+
+#endif /* FS_SPIFFS_FS_H */

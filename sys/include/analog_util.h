@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef ANALOG_UTIL_H
+#define ANALOG_UTIL_H
+
 /**
  * @defgroup    sys_analog_util Analog data conversion utilities
  * @ingroup     sys
@@ -17,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef ANALOG_UTIL_H
-#define ANALOG_UTIL_H
 
 #include <stdint.h>
 
@@ -90,5 +90,5 @@ uint16_t dac_util_mapf(float value, float min, float max);
 }
 #endif
 
-#endif /* ANALOG_UTIL_H */
 /** @} */
+#endif /* ANALOG_UTIL_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_UDP_H
+#define NET_UDP_H
 /**
  * @defgroup    net_udp UDP
  * @ingroup     net
@@ -20,8 +22,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_UDP_H
-#define NET_UDP_H
 
 #include "byteorder.h"
 
@@ -50,5 +50,5 @@ void udp_hdr_print(udp_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_UDP_H */
 /** @} */
+#endif /* NET_UDP_H */

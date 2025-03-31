@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef RIOTBOOT_SERIAL_H
+#define RIOTBOOT_SERIAL_H
+
 /**
  * @defgroup    sys_riotboot_serial Serial Bootloader Protocol
  * @ingroup     sys
@@ -18,9 +21,6 @@
  *
  * @}
  */
-
-#ifndef RIOTBOOT_SERIAL_H
-#define RIOTBOOT_SERIAL_H
 
 #ifdef __cplusplus
 extern "C" {

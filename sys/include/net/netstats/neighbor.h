@@ -6,6 +6,8 @@
  * more details.
  */
 
+#ifndef NET_NETSTATS_NEIGHBOR_H
+#define NET_NETSTATS_NEIGHBOR_H
 /**
  * @ingroup     net_netstats
  * @brief       Records statistics about link layer neighbors
@@ -16,8 +18,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-#ifndef NET_NETSTATS_NEIGHBOR_H
-#define NET_NETSTATS_NEIGHBOR_H
 
 #include <string.h>
 #include "net/netif.h"

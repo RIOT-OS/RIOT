@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_NETOPT_H
+#define NET_NETOPT_H
+
 /**
  * @defgroup    net_netopt   Netopt - Configuration options for network APIs
  * @ingroup     net
@@ -21,9 +24,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef NET_NETOPT_H
-#define NET_NETOPT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -1085,5 +1085,5 @@ const char *netopt2str(netopt_t opt);
 }
 #endif
 
-#endif /* NET_NETOPT_H */
 /** @} */
+#endif /* NET_NETOPT_H */

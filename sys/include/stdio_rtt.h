@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef STDIO_RTT_H
+#define STDIO_RTT_H
+
 /**
  * @ingroup     sys_stdio_rtt
  *
@@ -16,9 +19,6 @@
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef STDIO_RTT_H
-#define STDIO_RTT_H
 
 #include "stdio_base.h"
 

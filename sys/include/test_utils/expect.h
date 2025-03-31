@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef TEST_UTILS_EXPECT_H
+#define TEST_UTILS_EXPECT_H
+
 /**
  * @defgroup    test_utils_expect expect() utility function
  * @ingroup     sys
@@ -21,9 +24,6 @@
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef TEST_UTILS_EXPECT_H
-#define TEST_UTILS_EXPECT_H
 
 #include <stdio.h>
 #include "compiler_hints.h"
@@ -83,5 +83,5 @@ NORETURN static inline void _expect_failure(const char *file, unsigned line)
 }
 #endif
 
-#endif /* TEST_UTILS_EXPECT_H */
 /** @} */
+#endif /* TEST_UTILS_EXPECT_H */

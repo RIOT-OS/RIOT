@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef LUID_H
+#define LUID_H
+
 /**
  * @defgroup    sys_luid Locally Unique ID Generator
  * @ingroup     sys
@@ -49,9 +52,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef LUID_H
-#define LUID_H
 
 #include <stddef.h>
 
@@ -199,5 +199,5 @@ void luid_base(void *buf, size_t len);
 }
 #endif
 
-#endif /* LUID_H */
 /** @} */
+#endif /* LUID_H */

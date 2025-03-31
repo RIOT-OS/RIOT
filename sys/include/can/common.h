@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef CAN_COMMON_H
+#define CAN_COMMON_H
+
 /**
  * @defgroup   sys_can_common  Common definitions
  * @ingroup    sys_can
@@ -22,9 +25,6 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef CAN_COMMON_H
-#define CAN_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,5 +171,5 @@ typedef struct can_reg_entry {
 }
 #endif
 
-#endif /* CAN_COMMON_H */
 /** @} */
+#endif /* CAN_COMMON_H */

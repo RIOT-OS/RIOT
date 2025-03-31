@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef CAN_PKT_H
+#define CAN_PKT_H
+
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -16,9 +19,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-
-#ifndef CAN_PKT_H
-#define CAN_PKT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -143,5 +143,5 @@ void can_pkt_buf_free(void *data, size_t size);
 }
 #endif
 
-#endif /* CAN_PKT_H */
 /** @} */
+#endif /* CAN_PKT_H */

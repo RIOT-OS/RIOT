@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+#ifndef NET_WIFI_SCAN_LIST_H
+#define NET_WIFI_SCAN_LIST_H
+
 /**
  * @defgroup    net_wifi_scan_list List of scanned WiFis access points
  * @ingroup     net
@@ -16,9 +19,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
-
-#ifndef NET_WIFI_SCAN_LIST_H
-#define NET_WIFI_SCAN_LIST_H
 
 #include <stddef.h>
 
@@ -82,5 +82,5 @@ static inline unsigned wifi_scan_list_to_array(const wifi_scan_list_t *list,
 }
 #endif
 
-#endif /* NET_WIFI_SCAN_LIST_H */
 /** @} */
+#endif /* NET_WIFI_SCAN_LIST_H */

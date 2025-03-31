@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef ISRPIPE_READ_TIMEOUT_H
+#define ISRPIPE_READ_TIMEOUT_H
+
 /**
  * @defgroup    isr_pipe_read_timeout  Read timeouts with ISR pipe
  * @ingroup     isr_pipe
@@ -18,9 +21,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  */
-
-#ifndef ISRPIPE_READ_TIMEOUT_H
-#define ISRPIPE_READ_TIMEOUT_H
 
 #include "isrpipe.h"
 

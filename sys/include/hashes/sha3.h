@@ -11,6 +11,9 @@
  * For more information see: http://creativecommons.org/publicdomain/zero/1.0/
  */
 
+#ifndef HASHES_SHA3_H
+#define HASHES_SHA3_H
+
 /**
  * @defgroup    sys_hashes_sha3 SHA-3
  * @ingroup     sys_hashes_unkeyed
@@ -23,9 +26,6 @@
  * @author      Implementation by the Keccak, Keyak and Ketje Teams (https://keccak.team/)
  * @author      RIOT OS adaptations by Mathias Tausig
  */
-
-#ifndef HASHES_SHA3_H
-#define HASHES_SHA3_H
 
 #include <stdlib.h>
 
@@ -189,5 +189,5 @@ void sha3_512(void *digest, const void *data, size_t len);
 }
 #endif
 
-#endif /* HASHES_SHA3_H */
 /** @} */
+#endif /* HASHES_SHA3_H */

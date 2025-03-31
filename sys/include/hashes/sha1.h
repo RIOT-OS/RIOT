@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HASHES_SHA1_H
+#define HASHES_SHA1_H
+
 /**
  * @defgroup    sys_hashes_sha1 SHA-1
  * @ingroup     sys_hashes_unkeyed
@@ -23,9 +26,6 @@
 /* This code is public-domain - it is based on libcrypt
  * placed in the public domain by Wei Dai and other contributors. */
 
-#ifndef HASHES_SHA1_H
-#define HASHES_SHA1_H
-
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -35,12 +35,12 @@ extern "C" {
 /**
  * @brief   Length of SHA-1 digests in byte
  */
-#define SHA1_DIGEST_LENGTH  (20)
+#define SHA1_DIGEST_LENGTH (20)
 
 /**
  * @brief   Length of SHA-1 block in byte
  */
-#define SHA1_BLOCK_LENGTH   (64)
+#define SHA1_BLOCK_LENGTH  (64)
 
 /**
  * @brief SHA-1 algorithm context
@@ -117,5 +117,5 @@ void sha1_final_hmac(sha1_context *ctx, void *digest);
 }
 #endif
 
-#endif /* HASHES_SHA1_H */
 /** @} */
+#endif /* HASHES_SHA1_H */

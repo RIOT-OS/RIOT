@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef PSA_CRYPTO_PSA_ALGORITHM_H
+#define PSA_CRYPTO_PSA_ALGORITHM_H
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -18,9 +21,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef PSA_CRYPTO_PSA_ALGORITHM_H
-#define PSA_CRYPTO_PSA_ALGORITHM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,5 +54,5 @@ typedef uint32_t psa_algorithm_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_ALGORITHM_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_ALGORITHM_H */

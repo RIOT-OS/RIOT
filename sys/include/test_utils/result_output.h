@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TEST_UTILS_RESULT_OUTPUT_H
+#define TEST_UTILS_RESULT_OUTPUT_H
+
 /**
  * @defgroup    test_utils_result_output Test result output
  * @ingroup     sys
@@ -46,9 +49,6 @@
  *
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
-
-#ifndef TEST_UTILS_RESULT_OUTPUT_H
-#define TEST_UTILS_RESULT_OUTPUT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -353,5 +353,5 @@ void turo_simple_exit_status(turo_t *ctx, int exit_status);
 #ifdef __cplusplus
 }
 #endif
-#endif /* TEST_UTILS_RESULT_OUTPUT_H */
 /** @} */
+#endif /* TEST_UTILS_RESULT_OUTPUT_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CRYPTO_CIPHERS_H
+#define CRYPTO_CIPHERS_H
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -18,9 +21,6 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Mark Essien <markessien@gmail.com>
  */
-
-#ifndef CRYPTO_CIPHERS_H
-#define CRYPTO_CIPHERS_H
 
 #include <stdint.h>
 #include "modules.h"

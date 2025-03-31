@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_DTLS_H
+#define NET_DTLS_H
 /**
  * @defgroup    net_dtls DTLS
  * @ingroup     net
@@ -33,8 +35,6 @@
  *
  * @author  Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  */
-#ifndef NET_DTLS_H
-#define NET_DTLS_H
 
 #include "modules.h"
 
@@ -57,5 +57,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_DTLS_H */
 /** @} */
+#endif /* NET_DTLS_H */

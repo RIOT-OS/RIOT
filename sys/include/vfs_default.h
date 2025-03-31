@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef VFS_DEFAULT_H
+#define VFS_DEFAULT_H
+
 /**
  * @ingroup   sys_vfs
  * @brief     VFS default mount points
@@ -16,9 +19,6 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef VFS_DEFAULT_H
-#define VFS_DEFAULT_H
 
 #include "board.h"
 #include "modules.h"
@@ -83,6 +83,6 @@ extern "C" {
 }
 #endif
 
-#endif /* VFS_DEFAULT_H */
-
 /** @} */
+
+#endif /* VFS_DEFAULT_H */

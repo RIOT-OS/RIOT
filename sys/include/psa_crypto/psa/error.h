@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef PSA_CRYPTO_PSA_ERROR_H
+#define PSA_CRYPTO_PSA_ERROR_H
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -20,9 +23,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef PSA_CRYPTO_PSA_ERROR_H
-#define PSA_CRYPTO_PSA_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -212,5 +212,5 @@ typedef int32_t psa_status_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_ERROR_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_ERROR_H */

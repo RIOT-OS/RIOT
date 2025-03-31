@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CB_MUX_H
+#define CB_MUX_H
+
 /**
  * @defgroup    sys_cb_mux Callback multiplexer
  * @ingroup     sys
@@ -25,9 +28,6 @@
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef CB_MUX_H
-#define CB_MUX_H
 
 #include <stdint.h>
 

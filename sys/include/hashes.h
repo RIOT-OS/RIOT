@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HASHES_H
+#define HASHES_H
+
 /**
  * @ingroup     sys_hashes_non_crypto
  * @{
@@ -16,9 +19,6 @@
  * @author      Jason Linehan <patientulysses@gmail.com>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
-
-#ifndef HASHES_H
-#define HASHES_H
 
 #include <stddef.h>
 #include <inttypes.h>

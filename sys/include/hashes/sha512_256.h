@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HASHES_SHA512_256_H
+#define HASHES_SHA512_256_H
+
 /**
  * @defgroup    sys_hashes_sha512_256 SHA-512/256
  * @ingroup     sys_hashes_unkeyed
@@ -17,9 +20,6 @@
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
-
-#ifndef HASHES_SHA512_256_H
-#define HASHES_SHA512_256_H
 
 #include <inttypes.h>
 #include <stddef.h>

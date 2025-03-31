@@ -6,6 +6,8 @@
  * details.
  */
 
+#ifndef ZTIMER_CONVERT_SHIFT_H
+#define ZTIMER_CONVERT_SHIFT_H
 /**
  * @defgroup  sys_ztimer_convert_shift conversion using shifts
  * @ingroup   sys_ztimer_convert
@@ -21,8 +23,6 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef ZTIMER_CONVERT_SHIFT_H
-#define ZTIMER_CONVERT_SHIFT_H
 
 #include <stdint.h>
 
@@ -67,5 +67,5 @@ void ztimer_convert_shift_up_init(ztimer_convert_shift_t *clock,
 }
 #endif
 
-#endif /* ZTIMER_CONVERT_SHIFT_H */
 /** @} */
+#endif /* ZTIMER_CONVERT_SHIFT_H */

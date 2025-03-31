@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_FB_H
+#define NET_GNRC_SIXLOWPAN_FRAG_FB_H
 /**
  * @defgroup net_gnrc_sixlowpan_frag_fb 6LoWPAN fragmentation buffer
  * @ingroup  net_gnrc_sixlowpan_frag
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_FB_H
-#define NET_GNRC_SIXLOWPAN_FRAG_FB_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -139,5 +139,5 @@ static inline bool gnrc_sixlowpan_frag_fb_send(gnrc_sixlowpan_frag_fb_t *fbuf)
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_FB_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_FB_H */

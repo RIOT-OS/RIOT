@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef HASHES_SHA384_H
+#define HASHES_SHA384_H
+
 /**
  * @defgroup    sys_hashes_sha384 SHA-384
  * @ingroup     sys_hashes_unkeyed
@@ -17,9 +20,6 @@
  *
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
-
-#ifndef HASHES_SHA384_H
-#define HASHES_SHA384_H
 
 #include <inttypes.h>
 #include <stddef.h>
