@@ -10,6 +10,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     atxmega-a1-xplained \
     atxmega-a1u-xpro \
     bluepill-stm32f030c8 \
+    hifive1 \
+    hifive1b \
     i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \

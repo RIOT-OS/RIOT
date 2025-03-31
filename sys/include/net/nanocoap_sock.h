@@ -211,6 +211,8 @@ typedef struct {
     nanocoap_socket_type_t type;            /**< Socket type (UDP, DTLS) */
 #endif
     uint16_t msg_id;                        /**< next CoAP message ID */
+    uint8_t hdr_buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX]; /**< buffer for CoAP header with options,
+                                                            token and payload marker */
 } nanocoap_sock_t;
 
 /**
@@ -555,14 +557,14 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
  *
  * @param[in]   sock    socket to use for the request
  * @param[in]   path    remote path and query
- * @param[out]  buf     buffer to write response to
- * @param[in]   len     length of @p buffer
+ * @param[out]  response buffer to write response to
+ * @param[in]   len_max length of @p buffer
  *
  * @returns     length of response payload on success
  * @returns     @see nanocoap_sock_request_cb on error
  */
-ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf,
-                          size_t len);
+ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
+                          void *response, size_t len_max);
 
 /**
  * @brief   Simple non-confirmable GET
