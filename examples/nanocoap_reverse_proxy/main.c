@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
+#include "time_units.h"
 #include "ztimer.h"
 
 #if MODULE_NANOCOAP_SERVER_TCP
@@ -39,8 +40,6 @@ static nanocoap_tcp_server_ctx_t tcp_ctx;
 static coap_ws_over_udp_yolo_init_arg_t _ws_ctx;
 #endif
 
-extern void setup_observe_event(void);
-
 int main(void)
 {
     puts("RIOT nanocoap example application");
@@ -49,11 +48,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");
-    ztimer_sleep(ZTIMER_MSEC, 3 * MS_PER_SEC);
-
-    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE)) {
-        setup_observe_event();
-    }
+    ztimer_sleep(ZTIMER_USEC, 3 * US_PER_SEC);
 
     /* print network addresses */
     printf("{\"IPv6 addresses\": [\"");
