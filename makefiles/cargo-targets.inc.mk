@@ -95,7 +95,7 @@ $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
 # This prevents cargo inside docker from creating them with root permissions
 # (should they not exist), and also from re-building everything every time
 # because the .cargo inside is as ephemeral as the build container.
-$(shell mkdir -p ~/.cargo/git ~/.cargo/registry)
+$(shell mkdir -p $(HOME)/.cargo/git $(HOME)/.cargo/registry)
 
 FORCE:
 .phony: FORCE
