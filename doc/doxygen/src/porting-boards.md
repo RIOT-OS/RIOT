@@ -392,7 +392,21 @@ In this case some special considerations must be taken with the makefiles:
   `include $(RIOTBOARD)/foo-parent/Makefile.*include*`
 
 An example can be found in
-[`tests/build_system/external_board_native`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_board_native)
+[`tests/build_system/external_board_native`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_board_native).
+
+# Board names and aliases                                        {#boards-alias}
+
+New boards should be named according to
+[RDM0003](https://github.com/RIOT-OS/RIOT/blob/master/doc/memos/rdm0003.md).
+Historically, some board names have not followed this structure.
+For backwards compatibility, RIOT supports board aliases that can be used
+in place of the actual board name in the environment or Make variable `BOARD`.
+
+A list of all existing board aliases can be found in
+[`makefiles/board_alias.inc.mk](https://github.com/RIOT-OS/RIOT/blob/master/makefiles/board_alias.inc.mk).
+[`BOARD=native`](@ref boards_common_native) is a special alias in that it
+resolves to either [`native32`](@ref boards_native32) or [`native64`](@ref boards_native64)
+depending on the host architecture.
 
 # Tools                                                          {#boards-tools}
 
