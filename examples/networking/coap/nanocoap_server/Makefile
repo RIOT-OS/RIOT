@@ -7,15 +7,44 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../..
 
+# use GNRC by default
+LWIP_IPV4 ?= 0
+LWIP_IPV6 ?= 0
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_default
+
+ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
+  USEMODULE += auto_init_gnrc_netif
+  # Specify the mandatory networking modules
+  USEMODULE += gnrc_ipv6_default
+  # Additional networking modules that can be dropped if not needed
+  USEMODULE += gnrc_icmpv6_echo
+else
+  ifeq (1,$(LWIP_IPV4))
+    USEMODULE += ipv4_addr
+
+    USEMODULE += lwip_arp
+    USEMODULE += lwip_ipv4
+    USEMODULE += netdev_legacy_api
+
+# If this module will be disabled, example set IPv4 192.168.100.150 address.
+    USEMODULE += lwip_dhcp_auto
+    CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+
+    USEMODULE += random
+  endif
+
+  ifeq (1,$(LWIP_IPV6))
+    USEMODULE += ipv6_addr
+
+    USEMODULE += lwip_ipv6
+    USEMODULE += lwip_ipv6_autoconfig
+  endif
+endif
+
 USEMODULE += sock_udp
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
 
 USEMODULE += nanocoap_sock
 USEMODULE += nanocoap_resources
