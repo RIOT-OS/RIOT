@@ -33,7 +33,9 @@ Basic Usage
 To use PSA Crypto, add `psa/crypto.h` to your includes. This will make all
 operations and macros available.
 
-Call `psa_crypto_init()` before calling any other operation.
+The library is automatically initialized on startup if @ref sys_auto_init is used
+(enabled by default). Otherwise, @ref psa_crypto_init needs to be called before
+any other operation.
 
 ## Structure Initialization
 Whenever you declare a PSA Crypto structure (e.g. operation contexts or key attributes),
