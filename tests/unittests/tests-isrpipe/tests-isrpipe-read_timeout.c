@@ -16,7 +16,7 @@
 
 static void test_read_timeout(void)
 {
-    uint8_t buffer[2];
+    uint8_t buffer[2] = {0};
     uint8_t read_buf[2];
     isrpipe_t pipe;
     int res;
@@ -50,7 +50,7 @@ static void test_read_timeout(void)
 
 static void test_read_all_timeout(void)
 {
-    uint8_t buffer[2];
+    uint8_t buffer[2] = {0};
     uint8_t read_buf[2];
     isrpipe_t pipe;
     int res;

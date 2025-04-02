@@ -43,6 +43,9 @@ static void* _reader_thread(void *arg)
 
 static void setup_up(void)
 {
+    /* clear buffer contents from previous tests */
+    memset(_buffer, 0, sizeof(_buffer));
+
     /* prep the pipe */
     isrpipe_init(&_pipe, _buffer, ARRAY_SIZE(_buffer));
 }
