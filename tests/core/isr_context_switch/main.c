@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+ *               2025 ML!PA Consulting GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +14,7 @@
  * @file
  * @brief   Application for testing context switching triggered from IRQ
  *
- * @author  Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author  Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * @}
  */
