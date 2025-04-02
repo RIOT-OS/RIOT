@@ -96,6 +96,13 @@ int adc_init(adc_t line)
     assume((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX);
     ADC->CCR = ((clk_div / 2) - 1) << 16;
 
+    if (IS_USED(MODULE_PERIPH_VBAT)) {
+        /* Set the sampling rate for the VBat channel to 112 cycles. It reads
+        * correct with 84 cycles already, so this adds some margin. */
+        ADC1->SMPR1 = (ADC1->SMPR1 & ~ADC_SMPR1_SMP18) | \
+                      (ADC_SMPR1_SMP18_2 | ADC_SMPR1_SMP18_0);
+    }
+
     /* enable the ADC module */
     dev(line)->CR2 = ADC_CR2_ADON;
 
