@@ -25,10 +25,10 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "busy_wait.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
 #include "periph/vbat.h"
-#include "ztimer.h"
 
 /**
  * @brief   Default VBAT undefined value
@@ -36,6 +36,13 @@
 #ifndef VBAT_ADC
 #define VBAT_ADC    ADC_UNDEF
 #endif
+
+/* ADC register CR bits with HW property "rs":
+ * Software can read as well as set this bit. We want to avoid writing a status
+ * bit with a Read-Modify-Write cycle and accidentally setting other status
+ * bits as well. Writing '0' has no effect on the bit value. */
+#define ADC_CR_BITS_PROPERTY_RS (ADC_CR_ADCAL | ADC_CR_ADSTP | ADC_CR_ADSTART \
+                                | ADC_CR_ADDIS | ADC_CR_ADEN)
 
 /**
  * @brief   Allocate lock for the ADC device
@@ -56,6 +63,54 @@ static inline void done(void)
     mutex_unlock(&lock);
 }
 
+static int _enable_adc(void)
+{
+    /* check if the ADC is not already enabled */
+    if (ADC->CR & ADC_CR_ADEN) {
+        return 0;
+    }
+
+    /* ensure the prerequisites are right */
+    if (ADC->CR & (ADC_CR_ADCAL | ADC_CR_ADSTP | ADC_CR_ADSTART | ADC_CR_ADDIS)) {
+        return -1;
+    }
+
+    /* clear ADRDY by writing to it */
+    ADC->ISR |= ADC_ISR_ADRDY;
+
+    /* enable the ADC and wait for the READY flag */
+    ADC->CR = (ADC->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADEN;
+
+    while (!(ADC->ISR & ADC_ISR_ADRDY)) {}
+
+    return 0;
+}
+
+static int _disable_adc(void)
+{
+    /* check if disable is going on or ADC is disabled already */
+    if ((ADC->CR & ADC_CR_ADDIS) || !(ADC->CR & ADC_CR_ADEN)) {
+        while (ADC->CR & ADC_CR_ADDIS) {}
+        return 0;
+    }
+
+    /* make sure no conversion is going on and stop it if it is */
+    if (ADC->CR & ADC_CR_ADSTART) {
+        ADC->CR = (ADC->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADSTP;
+
+        while (ADC->CR & ADC_CR_ADSTP) {}
+    }
+
+    /* disable the ADC and wait until is is disabled*/
+    ADC->CR = (ADC->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADDIS;
+    while (!(ADC->CR & ADC_CR_ADEN)) {}
+
+    /* clear the ADRDY bit by writing 1 to it */
+    ADC->ISR |= ADC_ISR_ADRDY;
+
+    return 0;
+}
+
 int adc_init(adc_t line)
 {
     /* check if the line is valid */
@@ -71,8 +126,9 @@ int adc_init(adc_t line)
         gpio_init_analog(adc_config[line].pin);
     }
 
-    /* init ADC line only if it wasn't already initialized */
-    if (!(ADC->CR & (ADC_CR_ADEN))) {
+    /* init ADC line only if it wasn't already initialized. Check a register
+     * set by the initialization which has a reset value of 0 */
+    if (ADC->SMPR == 0) {
 
         /* set prescaler to 0 to let the ADC run with maximum speed */
         ADC_COMMON->CCR &= ~(ADC_CCR_PRESC);
@@ -82,31 +138,24 @@ int adc_init(adc_t line)
         ADC->CFGR2 |= ADC_CFGR2_CKMODE_0;
 
         /* enable ADC internal voltage regulator and wait for startup period */
-        ADC->CR |= (ADC_CR_ADVREGEN);
-#if IS_USED(MODULE_ZTIMER_USEC)
-        ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
-#else
-        /* to avoid using ZTIMER_USEC unless already included round up the
-           internal voltage regulator start up to 1ms */
-        ztimer_sleep(ZTIMER_MSEC, 1);
-#endif
+        ADC->CR = (ADC->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADVREGEN;
+        busy_wait(ADC_T_ADCVREG_STUP_US * 2);
 
-        /* ´start automatic calibration and wait for it to complete */
-        ADC->CR |= ADC_CR_ADCAL;
+        /* start automatic calibration and wait for it to complete */
+        ADC->CR = (ADC->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADCAL;
         while (ADC->CR  & ADC_CR_ADCAL) {}
-
-        /* clear ADRDY by writing it*/
-        ADC->ISR |= (ADC_ISR_ADRDY);
-
-        /* enable ADC and wait for it to be ready */
-        ADC->CR |= (ADC_CR_ADEN);
-        while ((ADC->ISR & ADC_ISR_ADRDY) == 0) {}
 
         /* set sequence length to 1 conversion */
         ADC->CFGR1 &= ~ADC_CFGR1_CONT;
 
-        /* Sampling time of 3.5 ADC clocks for all channels*/
-        ADC->SMPR = 0x0101;
+        /* Set Sampling Time Register 1 to 3.5 ADC Cycles for all GPIO-Channels
+         * and Sampling Time Register 2 to 39.5 ADC Cycles for VBat. Set the
+         * VBat channel to use Sampling Time Register 2. */
+        ADC->SMPR = ADC_SMPR_SMP1_0;
+        if (IS_USED(MODULE_PERIPH_VBAT)) {
+            ADC->SMPR |= ADC_SMPR_SMP2_2 | ADC_SMPR_SMP2_0 |
+                         (1 << (adc_config[VBAT_ADC].chan+ ADC_SMPR_SMPSEL_Pos));
+        }
     }
 
     /* free the device again */
@@ -140,8 +189,14 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* specify channel for regular conversion */
     ADC->CHSELR = (1 << adc_config[line].chan);
 
+    /* check if the ADC was enabled successfully */
+    if (_enable_adc() == -1) {
+        done();
+        return -1;
+    }
+
     /* start conversion and wait for it to complete */
-    ADC->CR |= ADC_CR_ADSTART;
+    ADC->CR = (ADC->CR & ~ADC_CR_BITS_PROPERTY_RS) | ADC_CR_ADSTART;
     while (!(ADC->ISR & ADC_ISR_EOC)) {}
 
     /* read the sample */
@@ -152,8 +207,14 @@ int32_t adc_sample(adc_t line, adc_res_t res)
         vbat_disable();
     }
 
-    /* free the device again */
+    /* disable, unlock and power off the device again */
+    int ret = _disable_adc();
     done();
 
-    return sample;
+    if (ret == -1) {
+        return -1;
+    }
+    else {
+        return sample;
+    }
 }
