@@ -254,7 +254,7 @@ def check_control_d(child):
     # The current shell instance was initiated by shell_run(). The shell will respawn
     # automatically except on native. On native, RIOT is shut down completely,
     # therefore exclude this part.
-    if BOARD not in ['native', 'native64']:
+    if BOARD not in ['native', 'native32', 'native64']:
         child.sendline(CONTROL_D)
         child.expect_exact(PROMPT)
 
@@ -273,7 +273,7 @@ def check_preempt(child):
 
 def testfunc(child):
     # avoid sending an extra empty line on native.
-    if BOARD in ['native', 'native64']:
+    if BOARD in ['native', 'native32', 'native64']:
         child.crlf = '\n'
 
     bufsize = check_and_get_bufsize(child)

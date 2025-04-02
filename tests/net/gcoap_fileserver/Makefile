@@ -26,14 +26,14 @@ USEMODULE += shell_cmd_md5sum
 TEST_ON_CI_BLACKLIST += all
 
 # automated test only works on native
-# TEST_ON_CI_WHITELIST += native native64
+# TEST_ON_CI_WHITELIST += native32 native64
 
 # use small blocksize for test to increase chance for errors
 CFLAGS += -DCONFIG_NANOCOAP_BLOCKSIZE_DEFAULT=COAP_BLOCKSIZE_16
 CFLAGS += -DCONFIG_COAP_ACK_TIMEOUT_MS=100
 CFLAGS += -DCONFIG_COAP_MAX_RETRANSMIT=10
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
   USEMODULE += socket_zep
   USEMODULE += socket_zep_hello
   USEMODULE += netdev

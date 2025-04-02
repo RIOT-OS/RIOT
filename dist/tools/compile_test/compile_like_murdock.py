@@ -91,7 +91,7 @@ DEFAULT_BOARDS = [
     'mega-xplained',
     'microbit',
     'mulle',
-    'native',
+    'native32',
     'native64',
     'nrf52840dk',
     'nrf9160dk',

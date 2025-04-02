@@ -117,7 +117,7 @@
   - "sys/include/usb.h"
 
 "Platform: native":
-  - "boards/native/**/*"
+  - "boards/native32/**/*"
   - "boards/native64/**/*"
   - "cpu/native/**/*"
   - "makefiles/arch/native.inc.mk"

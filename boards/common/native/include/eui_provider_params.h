@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_native
+ * @ingroup     boards_common_native
  * @{
  *
  * @file

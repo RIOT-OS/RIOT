@@ -72,7 +72,7 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 
   # always enable auto-format for native
-  ifneq (,$(filter native native64,$(BOARD)))
+  ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
 endif

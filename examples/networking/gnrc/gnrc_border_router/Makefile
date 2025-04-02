@@ -115,7 +115,7 @@ endif
 # use ethos (ethernet over serial) or SLIP (serial-line IP) for network
 # communication and stdio over UART, but not on native, as native has a tap
 # interface towards the host.
-ifeq (,$(filter native native64,$(BOARD)))
+ifeq (,$(filter native native32 native64,$(BOARD)))
   ifeq (slip,$(UPLINK))
     # SLIP baudrate and UART device can be configured from make command
     SLIP_BAUDRATE ?= 115200
@@ -172,7 +172,7 @@ host-tools:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)
 
 # define native specific targets to only run UHCP daemon when required
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
 ifeq (uhcp,$(PREFIX_CONF))
 .PHONY: uhcpd-daemon
 

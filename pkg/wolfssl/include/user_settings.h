@@ -60,10 +60,10 @@ extern "C" {
 #define HAVE_TLS_EXTENSIONS
 #endif
 
-/* Align on 32-bit (exc. native,
+/* Align on 32-bit (exc. native32,
  * don't modify default alignment.)
  */
-#ifndef BOARD_NATIVE
+#ifndef BOARD_NATIVE32
 #define WOLFSSL_GENERAL_ALIGNMENT 4
 #endif
 

@@ -73,7 +73,7 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
 endif
 
 # Enable fileserver for boards with plenty of memory
-HIGH_MEMORY_BOARDS := native native64 same54-xpro mcb2388
+HIGH_MEMORY_BOARDS := native native32 native64 same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   # enable separate response
@@ -89,7 +89,7 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   USEMODULE += vfs_default
 
   # always enable auto-format for native
-  ifneq (,$(filter native native64,$(BOARD)))
+  ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
 endif

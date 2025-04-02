@@ -9,13 +9,13 @@ EPOCH = $(call memoized,EPOCH,$(shell date +%s))
 APP_VER ?= $(EPOCH)
 
 # Default addressing if following README.native.md
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
   SUIT_CLIENT ?= [2001:db8::2]
   SUIT_COAP_SERVER ?= [2001:db8::1]
   $(call target-export-variables,test-with-config,SUIT_COAP_SERVER)
 endif
 
-ifneq (,$(filter native native64,$(BOARD)))
+ifneq (,$(filter native native32 native64,$(BOARD)))
   # Set settings for publishing fake fw payloads to native
   SUIT_NATIVE_PAYLOAD ?= "AABBCCDD"
   SUIT_NATIVE_PAYLOAD_BIN ?= $(BINDIR_APP)/fw.$(APP_VER).bin

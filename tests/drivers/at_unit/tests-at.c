@@ -50,7 +50,7 @@ at_urc_t urc_short = {
 };
 #endif
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 #define AT_UNIT_UART_DEV 0
 #else
 /* Most non-native boards have stdout mapped to device 0 */
