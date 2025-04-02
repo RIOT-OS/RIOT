@@ -20,6 +20,7 @@
 #ifndef BCD_H
 #define BCD_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -51,6 +52,22 @@ static inline uint8_t bcd_to_byte(uint8_t bcd)
     /* == (10 * (bcd >> 4)) + (bcd & 0xf) */
     return bcd - (6 * (bcd >> 4));
 }
+
+/**
+ * @brief   Convert a decimal value into a BCD buffer.
+ *          (This looks like the decimal integer value when printed as hex)
+ *
+ * This will e.g. turn the value 123 -> 0x123 (decimal: 291)
+ *
+ * @param[in]  val  Decimal value to print
+ * @param[out] dst  Destination buffer
+ * @param[in]  len  Size of the destination buffer
+ *
+ * @return number of bytes written
+ * @return -ENOBUFS if @p dst is not large enough
+ *         In that case the state of @p dst is undefined.
+ */
+int bcd_buf_from_u32(uint32_t val, void *dst, size_t len);
 
 #ifdef __cplusplus
 }
