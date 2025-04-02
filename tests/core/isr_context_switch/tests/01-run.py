@@ -12,8 +12,14 @@ import sys
 from testrunner import run
 
 
+# A larger timeout is needed on slower MCUs. On the samr21-xpro, this test
+# takes about 60 seconds
+TIMEOUT = 120
+
+
 def testfunc(child):
-    child.expect("TEST PASSED")
+    child.expect("Testing 500 context switches triggered from ISR")
+    child.expect("TEST PASSED", timeout=TIMEOUT)
 
 
 if __name__ == "__main__":

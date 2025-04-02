@@ -25,18 +25,16 @@
 #include "mutex.h"
 #include "periph/timer.h"
 #include "thread.h"
+#include "clk.h"
 
 #ifndef CHANNEL
-#define CHANNEL             0
+#  define CHANNEL           0
 #endif
 #ifndef TEST_REPETITIONS
-#define TEST_REPETITIONS    500
+#  define TEST_REPETITIONS  500
 #endif
-#ifndef TEST_TIMEOUT_SHORT
-#define TEST_TIMEOUT_SHORT  8
-#endif
-#ifndef TEST_TIMEOUT_LONG
-#define TEST_TIMEOUT_LONG   1000
+#ifndef TEST_TIMEOUT_MIN
+#  define TEST_TIMEOUT_MIN  10
 #endif
 
 static mutex_t sig_main = MUTEX_INIT_LOCKED;
@@ -45,6 +43,8 @@ static mutex_t sig_t2 = MUTEX_INIT_LOCKED;
 static char t1_stack[THREAD_STACKSIZE_TINY];
 static char t2_stack[THREAD_STACKSIZE_TINY];
 static tim_t timer;
+static uint32_t timeout_short;
+static uint32_t timeout_long;
 
 static void _cb(void *unused1, int unused2)
 {
@@ -60,10 +60,10 @@ static void _cb(void *unused1, int unused2)
     }
 
     if (counter <= UINT8_MAX / 2) {
-        timer_set(timer, CHANNEL, TEST_TIMEOUT_LONG);
+        timer_set(timer, CHANNEL, timeout_long);
     }
     else {
-        timer_set(timer, CHANNEL, TEST_TIMEOUT_SHORT);
+        timer_set(timer, CHANNEL, timeout_short);
     }
 }
 
@@ -86,10 +86,18 @@ static void *t2_impl(void *unused)
     return NULL;
 }
 
-static bool _try_init_and_print_freq(uint32_t freq)
+static bool _try_setup_with_freq(uint32_t freq)
 {
     if (timer_init(timer, freq, _cb, NULL) == 0) {
-        printf("INFO: timer running at %" PRIu32 " Hz\n", freq);
+        timeout_short = 200ULL * freq / (uint64_t)coreclk();
+        if (timeout_short < TEST_TIMEOUT_MIN) {
+            timeout_short = TEST_TIMEOUT_MIN;
+        }
+        timeout_long = timeout_short * 100;
+
+        printf("INFO: timer running at %" PRIu32 " Hz\n"
+               "timeout short: %" PRIu32", timeout long: %" PRIu32 "\n",
+               freq, timeout_short, timeout_long);
         return true;
     }
 
@@ -102,7 +110,7 @@ static int _init_timer(void)
         for (unsigned timer_num = 0; timer_num < TIMER_NUMOF; timer_num++) {
             timer = TIMER_DEV(timer_num);
             uint32_t freq = timer_get_closest_freq(timer, MHZ(1));
-            if (_try_init_and_print_freq(freq)) {
+            if (_try_setup_with_freq(freq)) {
                 return 0;
             }
             printf("D'oh! timer_init(%u, %" PRIu32 ", ...) failed!\n"
@@ -121,15 +129,6 @@ static int _init_timer(void)
                 if (timer_init(timer, timer_freqs[i], _cb, NULL) == 0) {
                     return 0;
                 }
-            }
-
-            /* on same boards CLOCK_CORECLOCK is not a compile time constant, but
-             * determined at runtime. Hence, handle it separately from the
-             * hard-coded list of frequencies above to ensure compatibility. */
-            uint32_t clk = CLOCK_CORECLOCK;
-            if (timer_init(timer, clk, _cb, NULL) == 0) {
-                printf("INFO: timer running at %" PRIu32 " Hz\n", clk);
-                return 0;
             }
         }
     }
@@ -154,7 +153,7 @@ int main(void)
         return 1;
     }
 
-    timer_set(timer, CHANNEL, TEST_TIMEOUT_LONG);
+    timer_set(timer, CHANNEL, timeout_short);
     mutex_lock(&sig_main);
     puts("TEST PASSED");
 
