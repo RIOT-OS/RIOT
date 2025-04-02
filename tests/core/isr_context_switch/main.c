@@ -32,7 +32,13 @@
 #  define CHANNEL           0
 #endif
 #ifndef TEST_REPETITIONS
-#  define TEST_REPETITIONS  500
+/* default to more repetitions on widely used fast MCUs */
+#  if CPU_CORE_CORTEX_M4 || CPU_CORE_CORTEX_M4F || CPU_CORE_CORTEX_M7
+#    define TEST_REPETITIONS  5000
+#  else
+/* default to fewer on MCUs that may be slower */
+#    define TEST_REPETITIONS  500
+#  endif
 #endif
 #ifndef TEST_TIMEOUT_MIN
 #  define TEST_TIMEOUT_MIN  10
@@ -44,14 +50,19 @@ static mutex_t sig_t2 = MUTEX_INIT_LOCKED;
 static char t1_stack[THREAD_STACKSIZE_TINY];
 static char t2_stack[THREAD_STACKSIZE_TINY];
 static tim_t timer;
-static uint32_t timeout_short;
-static uint32_t timeout_long;
+static uint32_t timeout_start;
+static uint32_t timeout_increment;
 
 static void _cb(void *unused1, int unused2)
 {
     (void)unused1;
     (void)unused2;
     static uint8_t counter = 0;
+    static uint32_t timeout;
+
+    if (counter == 0) {
+        timeout = timeout_start;
+    }
 
     if (counter++ & 0x01) {
         mutex_unlock(&sig_t1);
@@ -60,12 +71,8 @@ static void _cb(void *unused1, int unused2)
         mutex_unlock(&sig_t2);
     }
 
-    if (counter <= UINT8_MAX / 2) {
-        timer_set(timer, CHANNEL, timeout_long);
-    }
-    else {
-        timer_set(timer, CHANNEL, timeout_short);
-    }
+    timer_set(timer, CHANNEL, timeout);
+    timeout += timeout_increment;
 }
 
 static void *t1_impl(void *unused)
@@ -90,15 +97,15 @@ static void *t2_impl(void *unused)
 static bool _try_setup_with_freq(uint32_t freq)
 {
     if (timer_init(timer, freq, _cb, NULL) == 0) {
-        timeout_short = 200ULL * freq / (uint64_t)coreclk();
-        if (timeout_short < TEST_TIMEOUT_MIN) {
-            timeout_short = TEST_TIMEOUT_MIN;
+        timeout_start = 500ULL * freq / (uint64_t)coreclk();
+        if (timeout_start < TEST_TIMEOUT_MIN) {
+            timeout_start = TEST_TIMEOUT_MIN;
         }
-        timeout_long = timeout_short * 100;
+        timeout_increment = (timeout_start / 4);
 
-        printf("INFO: timer running at %" PRIu32 " Hz\n"
-               "timeout short: %" PRIu32", timeout long: %" PRIu32 "\n",
-               freq, timeout_short, timeout_long);
+        printf("INFO: timer running at %" PRIu32 " Hz.\n"
+               "Timeout at start: %" PRIu32 ", incrementing timeout in steps of: %" PRIu32 "\n",
+               freq, timeout_start, timeout_increment);
         return true;
     }
 
@@ -110,7 +117,7 @@ static int _init_timer(void)
     if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
         for (unsigned timer_num = 0; timer_num < TIMER_NUMOF; timer_num++) {
             timer = TIMER_DEV(timer_num);
-            uint32_t freq = timer_get_closest_freq(timer, MHZ(1));
+            uint32_t freq = timer_get_closest_freq(timer, coreclk());
             if (_try_setup_with_freq(freq)) {
                 return 0;
             }
@@ -154,7 +161,7 @@ int main(void)
         return 1;
     }
 
-    timer_set(timer, CHANNEL, timeout_short);
+    timer_set(timer, CHANNEL, timeout_start);
     mutex_lock(&sig_main);
     puts("TEST PASSED");
 
