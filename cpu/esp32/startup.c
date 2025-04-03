@@ -42,8 +42,6 @@
 #include "periph/init.h"
 #include "periph/rtc.h"
 
-#include "esp_idf_api/uart.h"
-
 /* ESP-IDF headers */
 #include "esp_attr.h"
 #include "esp_clk_internal.h"
@@ -51,6 +49,7 @@
 #include "esp_log.h"
 #include "esp_private/startup_internal.h"
 #include "esp_private/esp_clk.h"
+#include "esp_rom_uart.h"
 #include "esp_sleep.h"
 #include "esp_timer.h"
 #include "rom/cache.h"
@@ -167,7 +166,7 @@ static NORETURN void IRAM system_startup_cpu0(void)
     uart_system_init();
 
     /* initialize stdio */
-    esp_idf_esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+    esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
     early_init();
 
     RESET_REASON reset_reason = rtc_get_reset_reason(PRO_CPU_NUM);
@@ -344,7 +343,7 @@ static NORETURN void IRAM system_init (void)
     /* starting RIOT */
 #if IS_USED(MODULE_ESP_LOG_STARTUP)
     LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
-    esp_idf_esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+    esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
 #else
     ets_printf("\n");
 #endif
