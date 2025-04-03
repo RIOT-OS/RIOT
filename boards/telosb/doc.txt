@@ -50,7 +50,7 @@ This should take care of everything!
 
 ## Using the shell
 
-The shell is using the UART interface of the TelosB at 115200 baud.
+The shell is using the UART interface of the TelosB at 9600 baud.
 
 ## More information
 
