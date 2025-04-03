@@ -8,7 +8,7 @@ buildtest:
 	for board in $(BOARDS); do \
 		if BOARD=$${board} $(MAKE) check-toolchain-supported > /dev/null 2>&1; then \
 			$(COLOR_ECHO) -n "Building for $$board ... " ; \
-			BOARD=$${board} RIOT_CI_BUILD=1 \
+			env --unset=MAKEFLAGS BOARD=$${board} RIOT_CI_BUILD=1 \
 				$(MAKE) clean all -j $(NPROC) $(BUILDTEST_MAKE_REDIRECT); \
 			RES=$$? ; \
 			if [ $$RES -eq 0 ]; then \
@@ -17,7 +17,7 @@ buildtest:
 				$(COLOR_ECHO) "$(COLOR_RED)failed!$(COLOR_RESET)" ; \
 				RESULT=false ; \
 			fi ; \
-			BOARD=$${board} $(MAKE) clean-intermediates >/dev/null 2>&1 || true; \
+			env --unset=MAKEFLAGS BOARD=$${board} $(MAKE) clean-intermediates >/dev/null 2>&1 || true; \
 		fi; \
 	done ; \
 	$${RESULT}

@@ -60,6 +60,13 @@ DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
 RIOT_VERSION_DUMMY_CODE         ?= RIOT_VERSION_NUM\(2042,5,23,0\)
 
+# Undefine the board for the `buildtest` target, as the `makefiles/buildtest.inc.mk`
+# will override the BOARD anyway and the BOARD might be set with an (incorrect)
+# default from the application or test Makefile.
+ifneq (,$(filter buildtest,$(MAKECMDGOALS)))
+  BOARD=
+endif
+
 # Resolve potential BOARD alias to canonical name before defining BINDIR
 include $(RIOTMAKE)/board_alias.inc.mk
 
