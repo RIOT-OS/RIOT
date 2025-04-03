@@ -96,6 +96,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -106,10 +107,7 @@
 #include "thread.h"
 #include "thread_flags.h"
 #include "ptrtag.h"
-
-#if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -429,6 +427,9 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
  * @pre     The queue must have a waiter (i.e. it should have been claimed, or
  *          initialized using @ref event_queue_init, @ref event_queues_init)
  *
+ * @note    Enable the `event_loop_debug` module to print the execution times of
+ *          the event handler functions.
+ *
  * @param[in]   queues      Event queues to process
  * @param[in]   n_queues    Number of queues passed with @p queues
  */
@@ -437,7 +438,22 @@ static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
     event_t *event;
 
     while ((event = event_wait_multi(queues, n_queues))) {
-        event->handler(event);
+        if (IS_USED(MODULE_EVENT_LOOP_DEBUG)) {
+            uint32_t now;
+            ztimer_acquire(ZTIMER_USEC);
+            printf("event: executing %p->%p\n",
+                   (void *)event, (void *)(uintptr_t)event->handler);
+            now = ztimer_now(ZTIMER_USEC);
+
+            event->handler(event);
+
+            printf("event: %p took %" PRIu32 " µs\n",
+                   (void *)event, ztimer_now(ZTIMER_USEC) - now);
+            ztimer_release(ZTIMER_USEC);
+        }
+        else {
+            event->handler(event);
+        }
     }
 }
 
@@ -457,6 +473,9 @@ static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
  *
  * @pre     The queue must have a waiter (i.e. it should have been claimed, or
  *          initialized using @ref event_queue_init, @ref event_queues_init)
+ *
+ * @note    Enable the `event_loop_debug` module to print the execution times of
+ *          the event handler functions.
  *
  * @param[in]   queue   event queue to process
  */

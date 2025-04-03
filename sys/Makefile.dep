@@ -384,6 +384,10 @@ ifneq (,$(filter event_periodic_callback,$(USEMODULE)))
   USEMODULE += event_periodic
 endif
 
+ifneq (,$(filter event_loop_debug,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
 ifneq (,$(filter emcute,$(USEMODULE)))
   USEMODULE += core_thread_flags
   USEMODULE += sock_udp
