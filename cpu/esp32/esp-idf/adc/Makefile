@@ -5,9 +5,12 @@ ESP32_SDK_SRC = \
   components/driver/deprecated/adc_legacy.c \
   components/esp_hw_support/adc_share_hw_ctrl.c \
   components/hal/adc_hal_common.c \
-  components/hal/rtc_io_hal.c \
   components/soc/$(CPU_FAM)/adc_periph.c \
   #
+
+ifeq (,$(filter esp_idf_gpio,$(USEMODULE)))
+  ESP32_SDK_SRC += components/hal/rtc_io_hal.c
+endif
 
 ifneq (esp32,$(CPU_FAM))
   ESP32_SDK_SRC += components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c

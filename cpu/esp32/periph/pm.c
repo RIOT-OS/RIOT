@@ -30,13 +30,12 @@
 #include "periph/uart.h"
 
 /* ESP-IDF headers */
+#include "driver/uart.h"
 #include "esp_sleep.h"
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
 #include "soc/rtc_cntl_reg.h"
-
-#include "esp_idf_api/uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -165,13 +164,12 @@ void pm_set(unsigned mode)
     /* Prepare GPIOs as wakeup source */
     gpio_pm_sleep_enter(mode);
 
-    extern esp_err_t esp_sleep_enable_uart_wakeup(int uart);
 #if (ESP_PM_WUP_UART0 > 2)
-    esp_idf_uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
+    uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
     esp_sleep_enable_uart_wakeup(0);
 #endif
 #if (ESP_PM_WUP_UART1 > 2)
-    esp_idf_uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
+    uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
     esp_sleep_enable_uart_wakeup(1);
 #endif
 
