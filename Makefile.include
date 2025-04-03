@@ -870,6 +870,10 @@ TERMFLASHDEPS ?= $(filter flash flash-only,$(MAKECMDGOALS))
 TERMDEPS += $(TERMFLASHDEPS)
 termdeps: $(TERMDEPS)
 
+# (At least) the native targets don't have `flash` as a dependency,
+# therefore the terminal will be called before the compilation is done.
+# Setting `term` to NOTPARALLEL makes sure it is not executed during compilation.
+.NOTPARALLEL: term
 term: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	${TERMENV} $(TERMPROG) $(TERMFLAGS) $(TERMTEE)
