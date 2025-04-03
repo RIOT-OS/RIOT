@@ -1,5 +1,7 @@
 # define board aliases as follows
 # BOARD_ALIAS += alias-name:real-name
+BOARD_ALIAS += feather-nrf52840:adafruit-feather-nrf52840-express
+BOARD_ALIAS += feather-nrf52840-sense:adafruit-feather-nrf52840-sense
 
 # default to native32 or native64 depending on host platform
 _platform_bits := $(shell getconf LONG_BIT)

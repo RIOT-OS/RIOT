@@ -1,4 +1,4 @@
-@defgroup    boards_feather-nrf52840-sense Adafruit Feather nRF52840 Sense
+@defgroup    boards_adafruit-feather-nrf52840-sense Adafruit Feather nRF52840 Sense
 @ingroup     boards
 @brief       Support for the Adafruit Feather nRF52840 Sense
 
@@ -19,12 +19,12 @@ Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
 
 ### Flashing, Bootloader, and Terminal
 
-Refer to the [Feather nRF52840 Express](@ref boards_feather-nrf52840) documentation for further details.
+Refer to the [Feather nRF52840 Express](@ref boards_adafruit-feather-nrf52840-express) documentation for further details.
 Details to the Flashing process can be found in the common
 [Adafruit nRF52 Bootloader](@ref boards_common_adafruit-nrf52-bootloader) documentation.
 Both use the same flasher, bootloader, and terminal settings.
 
 Example with `hello-world` application:
-```
-     make BOARD=feather-nrf52840-sense -C examples/basic/hello-world flash term
+```sh
+make BOARD=adafruit-feather-nrf52840-sense -C examples/basic/hello-world flash term
 ```

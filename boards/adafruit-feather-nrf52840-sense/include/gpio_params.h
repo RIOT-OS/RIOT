@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Freie Universität Berlin
+ * Copyright (C) 2023 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +8,14 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840
+ * @ingroup     boards_adafruit-feather-nrf52840-sense
  * @{
  *
  * @file
  * @brief       Configuration of SAUL mapped GPIO pins
  *
  * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
+ * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
 #ifndef GPIO_PARAMS_H
@@ -32,7 +34,7 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name  = "LED Red (D3)",
+        .name  = "LED Red (D13)",
         .pin   = LED0_PIN,
         .mode  = GPIO_OUT,
         .flags = (SAUL_GPIO_INIT_CLEAR),

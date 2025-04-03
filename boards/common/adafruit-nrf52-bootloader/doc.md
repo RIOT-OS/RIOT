@@ -16,10 +16,12 @@ Enter the bootloader mode (usually by double tapping the reset button for
 nRF52840 based boards) and check the `INFO_UF2.TXT` for bootloader information.
 If the version is less than `0.4.0`, please refer to @ref ada-nrf52-update.
 
-Until and including RIOT Release 2025.01, the SoftDevice on `feather-nrf52840`
-and `feather-nrf52840-sense` boards got erased when flashing RIOT. To restore
-the ability of using i.a. Arduino and CircuitPython, the SoftDevice has to be
-flashed again. Please also refer to @ref ada-nrf52-update.
+Until and including RIOT Release 2025.01, the SoftDevice on
+[`adafruit-feather-nrf52840-express`](@ref boards_adafruit-feather-nrf52840-express)
+and [`adafruit-feather-nrf52840-sense`](@ref boards_adafruit-feather-nrf52840-sense)
+boards got erased when flashing RIOT. To restore the ability of using i.a.
+Arduino and CircuitPython, the SoftDevice has to be flashed again.
+Please also refer to @ref ada-nrf52-update.
 
 If the bootloader is not present on your board at all, an external debugger
 such as the J-Link has to be used. Please refer to @ref ada-nrf52-reflashing.
@@ -32,11 +34,11 @@ the RIOT buildsystem can find it. If you have an auto-mounter installed this
 will happen automatically.
 
 The rest of the process is automated in the usual way with e.g.
-`BOARD=feather-nrf52840`.
+`BOARD=adafruit-feather-nrf52840-express`.
 
 Example with `hello-world` application:
-```
-     make BOARD=feather-nrf52840 -C examples/basic/hello-world flash term
+```sh
+make BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash term
 ```
 
 If RIOT is already running on the board, it will automatically reset the CPU and enter
@@ -52,8 +54,8 @@ the additional space, you can specify the `UF2_SOFTDEV=DROP` option in your
 `make` command. **Be aware that you have to reflash the SoftDevice if you want
 to use it in the future!**
 
-```
-     make UF2_SOFTDEV=DROP BOARD=feather-nrf52840 -C examples/basic/hello-world flash term
+```sh
+make UF2_SOFTDEV=DROP BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash term
 ```
 
 If your board features a non-standard SoftDevice version, you can specify it
@@ -77,7 +79,8 @@ Details on the installation process can be found in [Adafruit's GitHub
 repository](https://github.com/adafruit/Adafruit_nRF52_Bootloader).
 
 @note The Adafruit nRF52 Bootloader uses other board names than RIOT. The
-      `feather-nrf52840` for example is called `feather_nrf52840_express`.
+      `adafruit-feather-nrf52840-express` for example is simply called
+      `feather_nrf52840_express`.
       Be sure to check the `boards/` subfolder in the bootloader directory
       to find out the correct board name.
 

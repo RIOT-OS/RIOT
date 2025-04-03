@@ -1,4 +1,4 @@
-@defgroup    boards_feather-nrf52840 Adafruit Feather nRF52840 Express
+@defgroup    boards_adafruit-feather-nrf52840-express Adafruit Feather nRF52840 Express
 @ingroup     boards
 @brief       Support for the Adafruit Feather nRF52840 Express
 
@@ -17,6 +17,11 @@ Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
 
 Flashing the Feather nRF52840 is described in the
 common [Adafruit nRF52 Bootloader](@ref boards_common_adafruit-nrf52-bootloader) section.
+
+Example with `hello-world` application:
+```sh
+make BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash
+```
 
 ### Terminal
 To connect a terminal to the Feather, RIOT chooses `stdio_cdc_acm` per default.
