@@ -13,6 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <errno.h>
 #include "embUnit.h"
 
 #include "bcd.h"
@@ -59,6 +60,31 @@ static void test_bcd_to_byte(void)
     TEST_ASSERT_EQUAL_INT(99, bcd_to_byte(0x99));
 }
 
+static void test_bcd_buf_from_u32(void)
+{
+    uint32_t buf = UINT32_MAX; /* test if full buffer gets written */
+
+    TEST_ASSERT_EQUAL_INT(1, bcd_buf_from_u32(0, &buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_INT(0x0, buf);
+
+    TEST_ASSERT_EQUAL_INT(1, bcd_buf_from_u32(12, &buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_INT(0x12, buf);
+
+    TEST_ASSERT_EQUAL_INT(2, bcd_buf_from_u32(123, &buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_INT(0x123, buf);
+
+    TEST_ASSERT_EQUAL_INT(3, bcd_buf_from_u32(123456, &buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_INT(0x123456, buf);
+
+    TEST_ASSERT_EQUAL_INT(4, bcd_buf_from_u32(12345678, &buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_INT(0x12345678, buf);
+
+    TEST_ASSERT_EQUAL_INT(-ENOBUFS, bcd_buf_from_u32(123456789, &buf, sizeof(buf)));
+
+    /* test empty buffer */
+    TEST_ASSERT_EQUAL_INT(-ENOBUFS, bcd_buf_from_u32(0, NULL, 0));
+}
+
 Test *tests_bcd_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -68,6 +94,7 @@ Test *tests_bcd_tests(void)
         new_TestFixture(test_bcd_to_byte__zero),
         new_TestFixture(test_bcd_to_byte__greater_0x99),
         new_TestFixture(test_bcd_to_byte),
+        new_TestFixture(test_bcd_buf_from_u32),
     };
 
     EMB_UNIT_TESTCALLER(bcd_tests, NULL, NULL, fixtures);
