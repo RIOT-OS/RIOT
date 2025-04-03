@@ -5,6 +5,10 @@
 _platform_bits := $(shell getconf LONG_BIT)
 BOARD_ALIAS += native:native$(_platform_bits)
 
+# include color echo macros
+include $(RIOTMAKE)/utils/ansi.mk
+include $(RIOTMAKE)/color.inc.mk
+
 # if board is a known alias, have _BOARD_ALIAS_USED hold alias and board
 _BOARD_ALIAS_USED := $(strip $(subst :, , $(filter $(BOARD):%, $(BOARD_ALIAS))))
 ifneq (, $(_BOARD_ALIAS_USED))
@@ -23,6 +27,7 @@ ifneq (, $(_BOARD_ALIAS_USED))
   ifeq (native,$(_alias))
     $(shell echo 'using BOARD="$(_board)" as "$(_alias)" on a $(_platform_bits)-bit system' 1>&2)
   else
-    $(shell echo 'warning: BOARD="$(_alias)" is a deprecated alias. Consider using BOARD="$(_board)" instead.' 1>&2)
+    MSG="Warning: BOARD=\"$(_alias)\" is a deprecated alias. Consider using BOARD=\"$(_board)\" instead."
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)$(MSG)$(COLOR_RESET)" 1>&2)
   endif
 endif
