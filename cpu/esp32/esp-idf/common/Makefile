@@ -116,9 +116,11 @@ ifeq (esp32,$(CPU_FAM))
 endif
 
 ifeq (esp32c3,$(CPU_FAM))
+  ESP32_SDK_SRC += components/esp_hw_support/lowpower/port/$(CPU_FAM)/sleep_cpu.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
   ESP32_SDK_SRC += components/esp_hw_support/sleep_console.c
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
+  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/rtc_cntl_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
   ESP32_SDK_SRC += components/hal/systimer_hal.c
 endif
