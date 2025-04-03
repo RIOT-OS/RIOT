@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef ENTROPY_SOURCE_H
+#define ENTROPY_SOURCE_H
+
 /**
  * @defgroup   sys_entropy_source_common Entropy Source Common
  * @ingroup    sys_entropy_source
@@ -17,9 +20,6 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
-
-#ifndef ENTROPY_SOURCE_H
-#define ENTROPY_SOURCE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -302,5 +302,5 @@ static inline int entropy_source_test(entropy_source_tests_rep_t *state_rep,
 }
 #endif
 
-#endif /* ENTROPY_SOURCE_H */
 /** @} */
+#endif /* ENTROPY_SOURCE_H */

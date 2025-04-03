@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_RPL_STRUCTS_H
+#define NET_GNRC_RPL_STRUCTS_H
+
 /**
  * @ingroup net_gnrc_rpl
  * @{
@@ -20,9 +23,6 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
-
-#ifndef NET_GNRC_RPL_STRUCTS_H
-#define NET_GNRC_RPL_STRUCTS_H
 
 #ifdef __cplusplus
 extern "C" {

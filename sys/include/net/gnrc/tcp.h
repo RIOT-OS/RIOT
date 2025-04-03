@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_TCP_H
+#define NET_GNRC_TCP_H
+
 /**
  * @defgroup    net_gnrc_tcp TCP
  * @ingroup     net_gnrc
@@ -18,9 +21,6 @@
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
-
-#ifndef NET_GNRC_TCP_H
-#define NET_GNRC_TCP_H
 
 #include <stdint.h>
 #include "net/gnrc/pkt.h"
@@ -371,5 +371,5 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
 }
 #endif
 
-#endif /* NET_GNRC_TCP_H */
 /** @} */
+#endif /* NET_GNRC_TCP_H */

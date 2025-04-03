@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_SNTP_H
+#define NET_SNTP_H
+
 /**
  * @defgroup    net_sntp Simple Network Time Protocol
  * @ingroup     net
@@ -19,9 +22,6 @@
  * @author      Luminița Lăzărescu <cluminita.lazarescu@gmail.com>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef NET_SNTP_H
-#define NET_SNTP_H
 
 #include <stdint.h>
 #include <time.h>
@@ -66,5 +66,5 @@ static inline uint64_t sntp_get_unix_usec(void)
 }
 #endif
 
-#endif /* NET_SNTP_H */
 /** @} */
+#endif /* NET_SNTP_H */

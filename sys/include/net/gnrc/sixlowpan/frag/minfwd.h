@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H
+#define NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H
 /**
  * @defgroup    net_gnrc_sixlowpan_frag_minfwd  Minimal fragment forwarding
  * @ingroup     net_gnrc_sixlowpan_frag
@@ -20,8 +22,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H
-#define NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H
 
 #include <stddef.h>
 
@@ -96,5 +96,5 @@ int gnrc_sixlowpan_frag_minfwd_frag_iphc(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_MINFWD_H */

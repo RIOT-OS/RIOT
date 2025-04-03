@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef EVENT_TIMEOUT_H
+#define EVENT_TIMEOUT_H
+
 /**
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger events after timeout
@@ -33,9 +36,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef EVENT_TIMEOUT_H
-#define EVENT_TIMEOUT_H
 
 #include "event.h"
 #include "ztimer.h"
@@ -127,5 +127,5 @@ static inline bool event_timeout_is_pending(const event_timeout_t *event_timeout
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_TIMEOUT_H */
 /** @} */
+#endif /* EVENT_TIMEOUT_H */

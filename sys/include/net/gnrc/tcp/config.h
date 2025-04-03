@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_TCP_CONFIG_H
+#define NET_GNRC_TCP_CONFIG_H
+
 /**
  * @ingroup     net_gnrc_tcp
  *
@@ -16,9 +19,6 @@
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
-
-#ifndef NET_GNRC_TCP_CONFIG_H
-#define NET_GNRC_TCP_CONFIG_H
 
 #include "timex.h"
 
@@ -211,5 +211,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_TCP_CONFIG_H */
 /** @} */
+#endif /* NET_GNRC_TCP_CONFIG_H */

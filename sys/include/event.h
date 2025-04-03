@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef EVENT_H
+#define EVENT_H
+
 /**
  * @defgroup    sys_event Event Queue
  * @ingroup     sys
@@ -92,9 +95,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef EVENT_H
-#define EVENT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -489,5 +489,5 @@ void event_sync(event_queue_t *queue);
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_H */
 /** @} */
+#endif /* EVENT_H */

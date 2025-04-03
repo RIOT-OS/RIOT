@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GCOAP_DNS_H
+#define NET_GCOAP_DNS_H
 /**
  * @defgroup net_gcoap_dns  DNS over CoAP client implementation
  * @ingroup  net_gcoap
@@ -26,8 +28,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GCOAP_DNS_H
-#define NET_GCOAP_DNS_H
 
 #include <stdint.h>
 
@@ -215,5 +215,5 @@ ssize_t gcoap_dns_server_proxy_get(char *proxy, size_t proxy_len);
 }
 #endif
 
-#endif /* NET_GCOAP_DNS_H */
 /** @} */
+#endif /* NET_GCOAP_DNS_H */

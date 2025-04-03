@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SHELL_LOCK_H
+#define SHELL_LOCK_H
+
 /**
  * @defgroup     sys_shell_lock Shell lock
  * @ingroup      sys
@@ -20,9 +23,6 @@
  * @file
  * @brief       Shell interface definition
  */
-
-#ifndef SHELL_LOCK_H
-#define SHELL_LOCK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,5 +85,5 @@ void shell_lock_auto_lock_refresh(void);
 }
 #endif
 
-#endif /* SHELL_LOCK_H */
 /** @} */
+#endif /* SHELL_LOCK_H */

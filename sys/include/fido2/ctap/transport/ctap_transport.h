@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H
+#define FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H
+
 /**
  * @defgroup    fido2_ctap_transport FIDO2 CTAP transport
  * @ingroup     fido2_ctap
@@ -18,9 +21,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H
-#define FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H
 
 #include <stdint.h>
 #include "mutex.h"
@@ -44,5 +44,5 @@ void fido2_ctap_transport_init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H */
 /** @} */
+#endif /* FIDO2_CTAP_TRANSPORT_CTAP_TRANSPORT_H */

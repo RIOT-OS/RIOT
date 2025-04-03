@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_IPV6_H
+#define NET_GNRC_NETIF_IPV6_H
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_IPV6_H
-#define NET_GNRC_NETIF_IPV6_H
 
 #include "modules.h"
 
@@ -261,5 +261,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_IPV6_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_IPV6_H */

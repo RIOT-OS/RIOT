@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef USB_USBUS_DFU_H
+#define USB_USBUS_DFU_H
+
 /**
  * @defgroup    usbus_dfu   USBUS DFU - USB Device Firmware Upgrade
  * @ingroup     usb
@@ -15,9 +18,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef USB_USBUS_DFU_H
-#define USB_USBUS_DFU_H
 
 #include "usb/dfu.h"
 #include "riotboot/flashwrite.h"
@@ -59,5 +59,5 @@ void usbus_dfu_init(usbus_t *usbus, usbus_dfu_device_t *handler, unsigned mode);
 }
 #endif
 
-#endif /* USB_USBUS_DFU_H */
 /** @} */
+#endif /* USB_USBUS_DFU_H */

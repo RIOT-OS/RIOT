@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef ECC_HAMMING256_H
+#define ECC_HAMMING256_H
+
 /**
  * @ingroup     sys_ecc
  * @brief
@@ -14,9 +17,6 @@
  * @brief       Hamming Code implementation for 256byte data segments
  * @author      Lucas Jenß <lucas@x3ro.de>
  */
-
-#ifndef ECC_HAMMING256_H
-#define ECC_HAMMING256_H
 
 #include <stdint.h>
 
@@ -64,5 +64,5 @@ uint8_t hamming_verify256x( uint8_t *data, uint32_t size, const uint8_t *code );
 }
 #endif
 
-#endif /* ECC_HAMMING256_H */
 /** @} */
+#endif /* ECC_HAMMING256_H */

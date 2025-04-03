@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef STDIO_BASE_H
+#define STDIO_BASE_H
+
 /**
  * @defgroup    sys_stdio STDIO abstraction
  * @ingroup     sys
@@ -20,9 +23,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef STDIO_BASE_H
-#define STDIO_BASE_H
 
 #include <unistd.h>
 

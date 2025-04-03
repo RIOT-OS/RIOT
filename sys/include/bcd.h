@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef BCD_H
+#define BCD_H
 /**
  * @defgroup    sys_bcd Binary coded decimal
  * @ingroup     sys
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef BCD_H
-#define BCD_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -73,5 +73,5 @@ int bcd_buf_from_u32(uint32_t val, void *dst, size_t len);
 }
 #endif
 
-#endif /* BCD_H */
 /** @} */
+#endif /* BCD_H */

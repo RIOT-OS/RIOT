@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SENML_H
+#define SENML_H
+
 /**
  * @defgroup    sys_senml SenML
  * @ingroup     sys
@@ -32,9 +35,6 @@
  *
  * @author      Silke Hofstra <silke@slxh.eu>
  */
-
-#ifndef SENML_H
-#define SENML_H
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -522,5 +522,5 @@ const char *senml_unit_to_str(senml_unit_t unit);
 }
 #endif
 
-#endif /* SENML_H */
 /** @} */
+#endif /* SENML_H */

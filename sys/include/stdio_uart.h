@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef STDIO_UART_H
+#define STDIO_UART_H
+
 /**
  * @defgroup    sys_stdio_uart STDIO over UART
  * @ingroup     sys_stdio
@@ -85,9 +88,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef STDIO_UART_H
-#define STDIO_UART_H
 
 /* Boards may override the default STDIO UART device */
 #include "board.h"

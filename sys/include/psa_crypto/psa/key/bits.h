@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef PSA_CRYPTO_PSA_KEY_BITS_H
+#define PSA_CRYPTO_PSA_KEY_BITS_H
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -18,9 +21,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef PSA_CRYPTO_PSA_KEY_BITS_H
-#define PSA_CRYPTO_PSA_KEY_BITS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +37,5 @@ typedef uint16_t psa_key_bits_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_KEY_BITS_H */
 /** @} */
+#endif /* PSA_CRYPTO_PSA_KEY_BITS_H */

@@ -6,13 +6,13 @@
  * directory for more details.
  */
 
+#ifndef EMBUNIT_COLORTEXTOUTPUTTER_H
+#define EMBUNIT_COLORTEXTOUTPUTTER_H
 /**
  * @{
  *
  * @file    ColorTextOutputter.h
  */
-#ifndef EMBUNIT_COLORTEXTOUTPUTTER_H
-#define EMBUNIT_COLORTEXTOUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -26,5 +26,5 @@ OutputterRef ColorTextOutputter_outputter(void);
 }
 #endif
 
-#endif /* EMBUNIT_COLORTEXTOUTPUTTER_H */
 /** @} */
+#endif /* EMBUNIT_COLORTEXTOUTPUTTER_H */

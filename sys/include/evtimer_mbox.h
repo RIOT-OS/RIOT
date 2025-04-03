@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef EVTIMER_MBOX_H
+#define EVTIMER_MBOX_H
 /**
  * @addtogroup  sys_evtimer
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
-#ifndef EVTIMER_MBOX_H
-#define EVTIMER_MBOX_H
 
 #include "assert.h"
 #include "msg.h"
@@ -87,5 +87,5 @@ static inline void evtimer_init_mbox(evtimer_t *evtimer)
 }
 #endif
 
-#endif /* EVTIMER_MBOX_H */
 /** @} */
+#endif /* EVTIMER_MBOX_H */

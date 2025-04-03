@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_SOCK_UTIL_H
+#define NET_SOCK_UTIL_H
+
 /**
  * @defgroup    net_sock_util   sock utility functions
  * @ingroup     net_sock
@@ -21,9 +24,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_SOCK_UTIL_H
-#define NET_SOCK_UTIL_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -301,5 +301,5 @@ int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
 }
 #endif
 
-#endif /* NET_SOCK_UTIL_H */
 /** @} */
+#endif /* NET_SOCK_UTIL_H */

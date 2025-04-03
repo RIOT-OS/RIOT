@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef ATOMIC_UTILS_H
+#define ATOMIC_UTILS_H
+
 /**
  * @defgroup    sys_atomic_utils    Utility functions for atomic access
  * @ingroup     sys
@@ -132,9 +135,6 @@
  * @brief       API of the utility functions for atomic accesses
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef ATOMIC_UTILS_H
-#define ATOMIC_UTILS_H
 
 #include <stdint.h>
 
@@ -1391,5 +1391,5 @@ static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
 }
 #endif
 
-#endif /* ATOMIC_UTILS_H */
 /** @} */
+#endif /* ATOMIC_UTILS_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef AUTO_INIT_UTILS_H
+#define AUTO_INIT_UTILS_H
 /**
  * @defgroup    sys_auto_init_utils Utilities to influence the order of auto-initialized modules
  * @ingroup     sys
@@ -24,8 +26,6 @@
  * @experimental
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-#ifndef AUTO_INIT_UTILS_H
-#define AUTO_INIT_UTILS_H
 
 #include <stdint.h>
 #include "xfa.h"
@@ -97,5 +97,5 @@ typedef struct {
 }
 #endif
 
-#endif /* AUTO_INIT_UTILS_H */
 /** @} */
+#endif /* AUTO_INIT_UTILS_H */

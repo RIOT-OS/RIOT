@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SYS_BUS_H
+#define SYS_BUS_H
+
 /**
  * @ingroup     sys
  * @defgroup    sys_bus System Buses for common events
@@ -18,9 +21,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef SYS_BUS_H
-#define SYS_BUS_H
 
 #include <assert.h>
 #include "msg_bus.h"
@@ -73,5 +73,5 @@ static inline msg_bus_t *sys_bus_get(sys_bus_t bus)
 }
 #endif
 
-#endif /* SYS_BUS_H */
 /** @} */
+#endif /* SYS_BUS_H */

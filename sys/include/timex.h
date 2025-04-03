@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef TIMEX_H
+#define TIMEX_H
+
 /**
  * @defgroup    sys_timex Timex
  * @brief       Timestamp representation, computation, and conversion
@@ -16,9 +19,6 @@
  * @file
  * @brief       Utility library for comparing and computing timestamps
  */
-
-#ifndef TIMEX_H
-#define TIMEX_H
 
 #include <stdint.h>
 #include <inttypes.h>

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_PKTBUF_H
+#define NET_GNRC_PKTBUF_H
 /**
  * @defgroup    net_gnrc_pktbuf   Packet buffer
  * @ingroup     net_gnrc
@@ -27,8 +29,6 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef NET_GNRC_PKTBUF_H
-#define NET_GNRC_PKTBUF_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -330,5 +330,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
-#endif /* NET_GNRC_PKTBUF_H */
 /** @} */
+#endif /* NET_GNRC_PKTBUF_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_MAC_H
+#define NET_GNRC_NETIF_MAC_H
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_MAC_H
-#define NET_GNRC_NETIF_MAC_H
 
 #include "net/gnrc/mac/types.h"
 #include "net/csma_sender.h"
@@ -110,5 +110,5 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_MAC_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_MAC_H */

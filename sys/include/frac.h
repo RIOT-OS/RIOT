@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FRAC_H
+#define FRAC_H
+
 /**
  * @defgroup  sys_frac   Fractional integer operations
  * @ingroup   sys
@@ -37,9 +40,6 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @{
  */
-
-#ifndef FRAC_H
-#define FRAC_H
 
 #include <stdint.h>
 

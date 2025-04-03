@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef DIV_H
+#define DIV_H
+
 /**
  * @defgroup  sys_div   Integer division functions
  * @ingroup   sys_math
@@ -20,9 +23,6 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @{
  */
-
-#ifndef DIV_H
-#define DIV_H
 
 #include <assert.h>
 #include <stdint.h>

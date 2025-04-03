@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef ZTIMER64_XTIMER_COMPAT_H
+#define ZTIMER64_XTIMER_COMPAT_H
 /**
  * @defgroup  sys_ztimer64_xtimer_compat ztimer64_xtimer_compat: 64 Bit xtimer wrapper
  * @ingroup   sys_ztimer64
@@ -17,8 +19,6 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef ZTIMER64_XTIMER_COMPAT_H
-#define ZTIMER64_XTIMER_COMPAT_H
 
 #include <assert.h>
 #include <stdbool.h>

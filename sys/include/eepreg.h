@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef EEPREG_H
+#define EEPREG_H
+
 /**
  * @defgroup    sys_eepreg EEPROM registration
  * @ingroup     sys
@@ -53,9 +56,6 @@
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef EEPREG_H
-#define EEPREG_H
 
 #include <stdint.h>
 

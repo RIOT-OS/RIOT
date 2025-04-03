@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_IPV6_HDR_H
+#define NET_GNRC_IPV6_HDR_H
 /**
  * @defgroup    net_gnrc_ipv6_hdr IPv6 header definitions
  * @ingroup     net_gnrc_ipv6
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_HDR_H
-#define NET_GNRC_IPV6_HDR_H
 
 #include <stdint.h>
 
@@ -50,5 +50,5 @@ gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_HDR_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_HDR_H */

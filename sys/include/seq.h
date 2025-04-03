@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SEQ_H
+#define SEQ_H
+
 /**
  * @ingroup     sys_seq
  * @{
@@ -18,9 +21,6 @@
  *
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
-
-#ifndef SEQ_H
-#define SEQ_H
 
 #include <stdint.h>
 #include <errno.h>

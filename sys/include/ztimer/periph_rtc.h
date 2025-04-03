@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef ZTIMER_PERIPH_RTC_H
+#define ZTIMER_PERIPH_RTC_H
+
 /**
  * @defgroup    sys_ztimer_periph_rtc  ztimer periph/rtc backend
  * @ingroup     sys_ztimer
@@ -20,9 +23,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef ZTIMER_PERIPH_RTC_H
-#define ZTIMER_PERIPH_RTC_H
 
 #include "ztimer.h"
 
@@ -48,5 +48,5 @@ void ztimer_periph_rtc_init(ztimer_periph_rtc_t *clock);
 }
 #endif
 
-#endif /* ZTIMER_PERIPH_RTC_H */
 /** @} */
+#endif /* ZTIMER_PERIPH_RTC_H */

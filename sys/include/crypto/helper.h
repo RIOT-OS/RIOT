@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CRYPTO_HELPER_H
+#define CRYPTO_HELPER_H
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -16,9 +19,6 @@
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
-
-#ifndef CRYPTO_HELPER_H
-#define CRYPTO_HELPER_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -67,5 +67,5 @@ void crypto_secure_wipe(void *buf, size_t len);
 }
 #endif
 
-#endif /* CRYPTO_HELPER_H */
 /** @} */
+#endif /* CRYPTO_HELPER_H */

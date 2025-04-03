@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CHUNKED_RINGBUFFER_H
+#define CHUNKED_RINGBUFFER_H
+
 /**
  * @defgroup    sys_chunk_buffer    chunked Ringbuffer
  * @ingroup     sys
@@ -19,9 +22,6 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef CHUNKED_RINGBUFFER_H
-#define CHUNKED_RINGBUFFER_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -247,5 +247,5 @@ bool crb_chunk_foreach(chunk_ringbuf_t *rb, crb_foreach_callback_t func, void *c
 }
 #endif
 
-#endif /* CHUNKED_RINGBUFFER_H */
 /** @} */
+#endif /* CHUNKED_RINGBUFFER_H */

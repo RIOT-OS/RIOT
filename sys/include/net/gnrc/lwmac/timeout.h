@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_LWMAC_TIMEOUT_H
+#define NET_GNRC_LWMAC_TIMEOUT_H
+
 /**
  * @ingroup     net_gnrc_lwmac
  * @{
@@ -18,9 +21,6 @@
  * @author      Daniel Krebs <github@daniel-krebs.net>
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
-
-#ifndef NET_GNRC_LWMAC_TIMEOUT_H
-#define NET_GNRC_LWMAC_TIMEOUT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -98,5 +98,5 @@ void gnrc_lwmac_timeout_make_expire(gnrc_lwmac_timeout_t *timeout);
 }
 #endif
 
-#endif /* NET_GNRC_LWMAC_TIMEOUT_H */
 /** @} */
+#endif /* NET_GNRC_LWMAC_TIMEOUT_H */

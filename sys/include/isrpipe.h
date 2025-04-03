@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef ISRPIPE_H
+#define ISRPIPE_H
+
 /**
  * @defgroup isr_pipe ISR Pipe
  * @ingroup sys
@@ -18,9 +21,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  */
-
-#ifndef ISRPIPE_H
-#define ISRPIPE_H
 
 #include <stdint.h>
 

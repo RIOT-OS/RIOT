@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef FMT_H
+#define FMT_H
+
 /**
  * @defgroup    sys_fmt String formatting (fmt)
  * @ingroup     sys
@@ -37,9 +40,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef FMT_H
-#define FMT_H
 
 #include <stddef.h>
 #include <stdint.h>

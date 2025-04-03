@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef SCHEDSTATISTICS_H
+#define SCHEDSTATISTICS_H
+
 /**
  * @defgroup    schedstatistics Schedstatistics
  * @ingroup     sys
@@ -25,9 +28,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *
  */
-
-#ifndef SCHEDSTATISTICS_H
-#define SCHEDSTATISTICS_H
 
 #include <stdint.h>
 
@@ -60,5 +60,5 @@ void init_schedstatistics(void);
 }
 #endif
 
-#endif /* SCHEDSTATISTICS_H */
 /** @} */
+#endif /* SCHEDSTATISTICS_H */

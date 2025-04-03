@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef UNALIGNED_H
+#define UNALIGNED_H
+
 /**
  * @defgroup    sys_unaligned unaligned memory access methods
  * @ingroup     sys
@@ -33,9 +36,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef UNALIGNED_H
-#define UNALIGNED_H
 
 #include <stdint.h>
 

@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef FUZZING_H
+#define FUZZING_H
+
 /**
  * @defgroup    sys_fuzzing FUZZING utilities
  * @ingroup     sys
@@ -18,9 +21,6 @@
  *
  * @author      Sören Tempel <tempel@uni-bremen.de>
  */
-
-#ifndef FUZZING_H
-#define FUZZING_H
 
 #ifdef __cplusplus
 extern "C" {

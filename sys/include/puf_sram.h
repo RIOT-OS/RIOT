@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef PUF_SRAM_H
+#define PUF_SRAM_H
 /**
  * @defgroup     sys_puf_sram SRAM PUF
  * @ingroup      sys
@@ -51,8 +53,6 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
-#ifndef PUF_SRAM_H
-#define PUF_SRAM_H
 
 #ifdef __cplusplus
 extern "C" {

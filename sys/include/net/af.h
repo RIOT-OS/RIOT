@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_AF_H
+#define NET_AF_H
 /**
  * @defgroup    net_af  UNIX address families
  * @ingroup     net
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_AF_H
-#define NET_AF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,5 +48,5 @@ typedef enum {
 }
 #endif
 
-#endif /* NET_AF_H */
 /** @} */
+#endif /* NET_AF_H */

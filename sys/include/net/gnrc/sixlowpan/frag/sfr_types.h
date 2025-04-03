@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H
+#define NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H
 /**
  * @addtogroup  net_gnrc_sixlowpan_frag_sfr
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H
-#define NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H
 
 #include <stdint.h>
 
@@ -64,5 +64,5 @@ typedef struct gnrc_sixlowpan_frag_sfr_fb {
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_TYPES_H */

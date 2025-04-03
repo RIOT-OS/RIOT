@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_SOCK_ASYNC_EVENT_H
+#define NET_SOCK_ASYNC_EVENT_H
 /**
  * @defgroup        net_sock_async_event    Asynchronous sock with event API
  * @ingroup         net_sock
@@ -165,8 +167,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_ASYNC_EVENT_H
-#define NET_SOCK_ASYNC_EVENT_H
 
 #include "event.h"
 /* guard required since `sock_dtls_types.h` might not be provided */
@@ -317,5 +317,5 @@ void sock_event_close(sock_async_ctx_t *async_ctx);
 }
 #endif
 
-#endif /* NET_SOCK_ASYNC_EVENT_H */
 /** @} */
+#endif /* NET_SOCK_ASYNC_EVENT_H */

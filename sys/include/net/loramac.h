@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_LORAMAC_H
+#define NET_LORAMAC_H
+
 /**
  * @defgroup    net_loramac LoRaMAC
  * @ingroup     net
@@ -18,9 +21,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef NET_LORAMAC_H
-#define NET_LORAMAC_H
 
 #include <assert.h>
 #include <stdint.h>

@@ -7,6 +7,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+#ifndef ZTIMER_PERIODIC_H
+#define ZTIMER_PERIODIC_H
+
 /**
  * @ingroup     sys_ztimer
  * @brief       Periodic ztimer API
@@ -65,9 +68,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef ZTIMER_PERIODIC_H
-#define ZTIMER_PERIODIC_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -156,5 +156,5 @@ void ztimer_periodic_stop(ztimer_periodic_t *timer);
 }
 #endif
 
-#endif /* ZTIMER_PERIODIC_H */
 /** @} */
+#endif /* ZTIMER_PERIODIC_H */

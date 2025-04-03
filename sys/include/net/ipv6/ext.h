@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_IPV6_EXT_H
+#define NET_IPV6_EXT_H
 /**
  * @defgroup    net_ipv6_ext    IPv6 extension headers
  * @ingroup     net_ipv6
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_IPV6_EXT_H
-#define NET_IPV6_EXT_H
 
 #include <stdint.h>
 
@@ -59,5 +59,5 @@ static inline ipv6_ext_t *ipv6_ext_get_next(ipv6_ext_t *ext)
 }
 #endif
 
-#endif /* NET_IPV6_EXT_H */
 /** @} */
+#endif /* NET_IPV6_EXT_H */

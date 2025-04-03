@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef USB_USBUS_HID_IO_H
+#define USB_USBUS_HID_IO_H
+
 /**
  * @defgroup    usbus_hid_io USBUS HID IO
  * @ingroup     usb_hid
@@ -18,9 +21,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef USB_USBUS_HID_IO_H
-#define USB_USBUS_HID_IO_H
 
 #include <string.h>
 #include <stdint.h>
@@ -96,5 +96,5 @@ void usb_hid_io_init(usbus_t *usbus, const uint8_t *report_desc, size_t report_d
 }
 #endif
 
-#endif /* USB_USBUS_HID_IO_H */
 /** @} */
+#endif /* USB_USBUS_HID_IO_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_IPV4_H
+#define NET_IPV4_H
 /**
  * @defgroup    net_ipv4    IPv4
  * @ingroup     net
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_IPV4_H
-#define NET_IPV4_H
 
 #include "net/ipv4/addr.h"
 
@@ -30,5 +30,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_IPV4_H */
 /** @} */
+#endif /* NET_IPV4_H */

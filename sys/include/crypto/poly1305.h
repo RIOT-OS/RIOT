@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#ifndef CRYPTO_POLY1305_H
+#define CRYPTO_POLY1305_H
 /**
  * @ingroup     sys_crypto
  * @defgroup    sys_crypto_poly1305 poly1305
@@ -25,8 +27,6 @@
  *
  * @see         https://tools.ietf.org/html/rfc8439#section-2.5
  */
-#ifndef CRYPTO_POLY1305_H
-#define CRYPTO_POLY1305_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,5 +90,5 @@ void poly1305_auth(uint8_t *mac, const uint8_t *data, size_t len,
 #ifdef __cplusplus
 }
 #endif
-#endif /* CRYPTO_POLY1305_H */
 /** @} */
+#endif /* CRYPTO_POLY1305_H */

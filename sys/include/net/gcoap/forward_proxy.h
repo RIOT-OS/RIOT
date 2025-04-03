@@ -6,6 +6,9 @@
  * more details.
  */
 
+#ifndef NET_GCOAP_FORWARD_PROXY_H
+#define NET_GCOAP_FORWARD_PROXY_H
+
 /**
  * @defgroup    net_gcoap_forward_proxy    GCoAP Forward Proxy
  * @ingroup     net_gcoap
@@ -22,9 +25,6 @@
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
-
-#ifndef NET_GCOAP_FORWARD_PROXY_H
-#define NET_GCOAP_FORWARD_PROXY_H
 
 #include <stdbool.h>
 #include <errno.h>

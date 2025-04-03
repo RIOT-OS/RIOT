@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_SIXLOWPAN_CTX_H
+#define NET_GNRC_SIXLOWPAN_CTX_H
 /**
  * @defgroup    net_gnrc_sixlowpan_ctx    Contexts for 6LoWPAN address compression
  * @ingroup     net_gnrc_sixlowpan
@@ -23,8 +25,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_CTX_H
-#define NET_GNRC_SIXLOWPAN_CTX_H
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -200,5 +200,5 @@ void gnrc_sixlowpan_ctx_reset(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_CTX_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_CTX_H */

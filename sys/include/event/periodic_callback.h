@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef EVENT_PERIODIC_CALLBACK_H
+#define EVENT_PERIODIC_CALLBACK_H
+
 /**
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger periodic event callbacks
@@ -21,9 +24,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  */
-
-#ifndef EVENT_PERIODIC_CALLBACK_H
-#define EVENT_PERIODIC_CALLBACK_H
 
 #include <assert.h>
 #include "event/callback.h"
@@ -180,5 +180,5 @@ static inline void event_periodic_callback_stop(event_periodic_callback_t *event
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_PERIODIC_CALLBACK_H */
 /** @} */
+#endif /* EVENT_PERIODIC_CALLBACK_H */

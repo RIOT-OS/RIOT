@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CRYPTO_AES_H
+#define CRYPTO_AES_H
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -26,9 +29,6 @@
  * @author      Fabrice Bellard
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  */
-
-#ifndef CRYPTO_AES_H
-#define CRYPTO_AES_H
 
 #include <stdint.h>
 #include "crypto/ciphers.h"

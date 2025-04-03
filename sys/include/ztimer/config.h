@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef ZTIMER_CONFIG_H
+#define ZTIMER_CONFIG_H
+
 /**
  * @ingroup     sys_ztimer
  * @{
@@ -16,9 +19,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef ZTIMER_CONFIG_H
-#define ZTIMER_CONFIG_H
 
 #include "board.h"
 #include "periph_conf.h"
@@ -202,5 +202,5 @@ extern "C" {
 }
 #endif
 
-#endif /* ZTIMER_CONFIG_H */
 /** @} */
+#endif /* ZTIMER_CONFIG_H */

@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CAN_CONN_ISOTP_H
+#define CAN_CONN_ISOTP_H
+
 /**
  * @ingroup    sys_can_conn
  * @{
@@ -16,9 +19,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  *
  */
-
-#ifndef CAN_CONN_ISOTP_H
-#define CAN_CONN_ISOTP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -198,5 +198,5 @@ int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *maste
 }
 #endif
 
-#endif /* CAN_CONN_ISOTP_H */
 /** @} */
+#endif /* CAN_CONN_ISOTP_H */

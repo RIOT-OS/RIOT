@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_PROTNUM_H
+#define NET_PROTNUM_H
 /**
  * @defgroup    net_protnum  Protocol Numbers
  * @ingroup     net
@@ -23,8 +25,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_PROTNUM_H
-#define NET_PROTNUM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -181,5 +181,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_PROTNUM_H */
 /** @} */
+#endif /* NET_PROTNUM_H */

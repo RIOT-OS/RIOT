@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_GOMACH_GOMACH_H
+#define NET_GNRC_GOMACH_GOMACH_H
+
 /**
  * @defgroup    net_gnrc_gomach GoMacH
  * @ingroup     net_gnrc
@@ -38,9 +41,6 @@
  *
  * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  */
-
-#ifndef NET_GNRC_GOMACH_GOMACH_H
-#define NET_GNRC_GOMACH_GOMACH_H
 
 #include "periph/rtt.h"
 #include "net/gnrc/netif.h"
@@ -374,5 +374,5 @@ int gnrc_netif_gomach_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_GOMACH_GOMACH_H */
 /** @} */
+#endif /* NET_GNRC_GOMACH_GOMACH_H */

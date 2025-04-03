@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_ASYMCUTE_H
+#define NET_ASYMCUTE_H
+
 /**
  * @defgroup    net_asymcute MQTT-SN Client (Asymcute)
  * @ingroup     net
@@ -40,9 +43,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_ASYMCUTE_H
-#define NET_ASYMCUTE_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -574,5 +574,5 @@ int asymcute_unsubscribe(asymcute_con_t *con, asymcute_req_t *req,
 }
 #endif
 
-#endif /* NET_ASYMCUTE_H */
 /** @} */
+#endif /* NET_ASYMCUTE_H */

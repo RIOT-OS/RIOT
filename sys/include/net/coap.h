@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_COAP_H
+#define NET_COAP_H
+
 /**
  * @defgroup    net_coap CoAP defines
  * @ingroup     net
@@ -18,9 +21,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
-
-#ifndef NET_COAP_H
-#define NET_COAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -631,5 +631,5 @@ typedef enum {
 }
 #endif
 
-#endif /* NET_COAP_H */
 /** @} */
+#endif /* NET_COAP_H */

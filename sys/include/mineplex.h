@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef MINEPLEX_H
+#define MINEPLEX_H
+
 /**
  * @defgroup    sys_mineplex 5x5 Font 'Mineplex'
  * @ingroup     sys
@@ -17,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef MINEPLEX_H
-#define MINEPLEX_H
 
 #include <stdint.h>
 
@@ -55,5 +55,5 @@ const uint8_t *mineplex_char(char c);
 }
 #endif
 
-#endif /* MINEPLEX_H */
 /** @} */
+#endif /* MINEPLEX_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_IPV6_NIB_CONF_H
+#define NET_GNRC_IPV6_NIB_CONF_H
 /**
  * @defgroup    net_gnrc_ipv6_nib_conf  GNRC IPv6 NIB compile configurations
  * @ingroup     net_gnrc_ipv6_nib
@@ -18,8 +20,6 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_NIB_CONF_H
-#define NET_GNRC_IPV6_NIB_CONF_H
 
 #include "modules.h"
 
@@ -318,5 +318,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_CONF_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_NIB_CONF_H */

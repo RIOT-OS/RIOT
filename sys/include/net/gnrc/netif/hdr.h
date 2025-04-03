@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_HDR_H
+#define NET_GNRC_NETIF_HDR_H
+
 /**
  * @defgroup    net_gnrc_netif_hdr Generic network interface header
  * @ingroup     net_gnrc_netif
@@ -17,9 +20,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-
-#ifndef NET_GNRC_NETIF_HDR_H
-#define NET_GNRC_NETIF_HDR_H
 
 #include <errno.h>
 #include <string.h>
@@ -444,5 +444,5 @@ int gnrc_netif_hdr_get_srcaddr(gnrc_pktsnip_t* pkt, uint8_t** pointer_to_addr);
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_HDR_H */
 /** @} */
+#endif /* NET_GNRC_NETIF_HDR_H */

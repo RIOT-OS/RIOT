@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_ICMPV6_ERROR_H
+#define NET_GNRC_ICMPV6_ERROR_H
 /**
  * @defgroup    net_gnrc_icmpv6_error ICMPv6 error messages
  * @ingroup     net_gnrc_icmpv6
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_ICMPV6_ERROR_H
-#define NET_GNRC_ICMPV6_ERROR_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -106,5 +106,5 @@ void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
 }
 #endif
 
-#endif /* NET_GNRC_ICMPV6_ERROR_H */
 /** @} */
+#endif /* NET_GNRC_ICMPV6_ERROR_H */

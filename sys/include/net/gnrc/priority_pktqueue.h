@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_PRIORITY_PKTQUEUE_H
+#define NET_GNRC_PRIORITY_PKTQUEUE_H
+
 /**
  * @defgroup    net_gnrc_priority_pktqueue Priority packet queue for GNRC
  * @ingroup     net_gnrc
@@ -19,9 +22,6 @@
  * @author      Daniel Krebs <github@daniel-krebs.net>
  * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  */
-
-#ifndef NET_GNRC_PRIORITY_PKTQUEUE_H
-#define NET_GNRC_PRIORITY_PKTQUEUE_H
 
 #include <stdint.h>
 
@@ -135,5 +135,5 @@ void gnrc_priority_pktqueue_push(gnrc_priority_pktqueue_t *queue,
 }
 #endif
 
-#endif /* NET_GNRC_PRIORITY_PKTQUEUE_H */
 /** @} */
+#endif /* NET_GNRC_PRIORITY_PKTQUEUE_H */

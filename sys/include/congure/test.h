@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef CONGURE_TEST_H
+#define CONGURE_TEST_H
+
 /**
  * @defgroup    sys_congure_test    CongURE test framework shell commands
  * @ingroup     sys_congure
@@ -32,9 +35,6 @@
  *
  * @author  Martine S Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef CONGURE_TEST_H
-#define CONGURE_TEST_H
 
 #include "congure_impl.h"
 
@@ -328,5 +328,5 @@ int congure_test_call_report(int argc, char **argv);
 }
 #endif
 
-#endif /* CONGURE_TEST_H */
 /** @} */
+#endif /* CONGURE_TEST_H */

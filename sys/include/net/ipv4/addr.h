@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_IPV4_ADDR_H
+#define NET_IPV4_ADDR_H
 /**
  * @defgroup    net_ipv4_addr   IPv4 addresses
  * @ingroup     net_ipv4
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_IPV4_ADDR_H
-#define NET_IPV4_ADDR_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -141,5 +141,5 @@ void ipv4_addr_print(const ipv4_addr_t *addr);
 }
 #endif
 
-#endif /* NET_IPV4_ADDR_H */
 /** @} */
+#endif /* NET_IPV4_ADDR_H */

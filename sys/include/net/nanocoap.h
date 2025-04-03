@@ -9,6 +9,9 @@
  * directory for more details.
  */
 
+#ifndef NET_NANOCOAP_H
+#define NET_NANOCOAP_H
+
 /**
  * @defgroup    net_nanocoap nanoCoAP small CoAP library
  * @ingroup     net
@@ -73,9 +76,6 @@
  * @author      Ken Bannister <kb2ma@runbox.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_NANOCOAP_H
-#define NET_NANOCOAP_H
 
 #include <assert.h>
 #include <errno.h>
@@ -2443,5 +2443,5 @@ static inline uint32_t coap_get_observe(coap_pkt_t *pkt)
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_H */
 /** @} */
+#endif /* NET_NANOCOAP_H */

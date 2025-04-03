@@ -6,6 +6,9 @@
  * details.
  */
 
+#ifndef ARCHITECTURE_H
+#define ARCHITECTURE_H
+
 /**
  * @defgroup    sys_architecture    Platform-independent access to architecture
  *                                  details
@@ -20,9 +23,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef ARCHITECTURE_H
-#define ARCHITECTURE_H
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -229,5 +229,5 @@ typedef uintptr_t   uinttxtptr_t;
 }
 #endif
 
-#endif /* ARCHITECTURE_H */
 /** @} */
+#endif /* ARCHITECTURE_H */

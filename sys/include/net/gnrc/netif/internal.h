@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETIF_INTERNAL_H
+#define NET_GNRC_NETIF_INTERNAL_H
 /**
  * @addtogroup  net_gnrc_netif
  * @internal
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_INTERNAL_H
-#define NET_GNRC_NETIF_INTERNAL_H
 
 #include "modules.h"
 

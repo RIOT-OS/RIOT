@@ -7,6 +7,9 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_LWMAC_LWMAC_H
+#define NET_GNRC_LWMAC_LWMAC_H
+
 /**
  * @defgroup    net_gnrc_lwmac LWMAC
  * @ingroup     net_gnrc
@@ -71,9 +74,6 @@
  * @author      Daniel Krebs <github@daniel-krebs.net>
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
-
-#ifndef NET_GNRC_LWMAC_LWMAC_H
-#define NET_GNRC_LWMAC_LWMAC_H
 
 #include "net/gnrc/netif.h"
 
@@ -351,5 +351,5 @@ int gnrc_netif_lwmac_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_LWMAC_LWMAC_H */
 /** @} */
+#endif /* NET_GNRC_LWMAC_LWMAC_H */

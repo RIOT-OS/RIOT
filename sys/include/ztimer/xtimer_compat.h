@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef ZTIMER_XTIMER_COMPAT_H
+#define ZTIMER_XTIMER_COMPAT_H
 /**
  * @defgroup  sys_ztimer_xtimer_compat ztimer_xtimer_compat: xtimer wrapper
  * @ingroup   sys_ztimer
@@ -17,8 +19,6 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef ZTIMER_XTIMER_COMPAT_H
-#define ZTIMER_XTIMER_COMPAT_H
 
 #include <assert.h>
 #include <stdbool.h>

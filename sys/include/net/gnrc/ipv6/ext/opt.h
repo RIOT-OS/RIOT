@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_IPV6_EXT_OPT_H
+#define NET_GNRC_IPV6_EXT_OPT_H
 /**
  * @defgroup    net_gnrc_ipv6_ext_opt Support for IPv6 option extension headers
  * @ingroup     net_gnrc_ipv6_ext
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_EXT_OPT_H
-#define NET_GNRC_IPV6_EXT_OPT_H
 
 #include <stdint.h>
 
@@ -56,5 +56,5 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_opt_process(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_OPT_H */
 /** @} */
+#endif /* NET_GNRC_IPV6_EXT_OPT_H */

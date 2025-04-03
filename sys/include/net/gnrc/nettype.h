@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_NETTYPE_H
+#define NET_GNRC_NETTYPE_H
 /**
  * @defgroup    net_gnrc_nettype  gnrc_nettype: Protocol type
  * @ingroup     net_gnrc
@@ -30,8 +32,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETTYPE_H
-#define NET_GNRC_NETTYPE_H
 
 #include <inttypes.h>
 
@@ -306,5 +306,5 @@ static inline uint8_t gnrc_nettype_to_protnum(gnrc_nettype_t type)
 }
 #endif
 
-#endif /* NET_GNRC_NETTYPE_H */
 /** @} */
+#endif /* NET_GNRC_NETTYPE_H */

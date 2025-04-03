@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef NET_GNRC_SIXLOWPAN_CONFIG_H
+#define NET_GNRC_SIXLOWPAN_CONFIG_H
 /**
  * @defgroup    net_gnrc_sixlowpan_config GNRC 6LoWPAN compile configurations
  * @ingroup     net_gnrc_sixlowpan
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_CONFIG_H
-#define NET_GNRC_SIXLOWPAN_CONFIG_H
 
 #include "modules.h"
 #include "timex.h"
@@ -411,5 +411,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_CONFIG_H */
 /** @} */
+#endif /* NET_GNRC_SIXLOWPAN_CONFIG_H */

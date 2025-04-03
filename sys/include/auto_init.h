@@ -8,6 +8,9 @@
  * directory for more details.
  */
 
+#ifndef AUTO_INIT_H
+#define AUTO_INIT_H
+
 /**
  * @defgroup    sys_auto_init Auto-initialization
  * @ingroup     sys
@@ -104,9 +107,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef AUTO_INIT_H
-#define AUTO_INIT_H
 
 #ifdef __cplusplus
 extern "C" {
