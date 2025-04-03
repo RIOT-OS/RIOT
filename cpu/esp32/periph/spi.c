@@ -42,6 +42,7 @@
 #include "periph/spi.h"
 #include "syscalls.h"
 
+#include "driver/gpio.h"
 #include "esp_attr.h"
 #include "esp_cpu.h"
 #include "esp_private/periph_ctrl.h"
@@ -49,8 +50,6 @@
 #include "hal/spi_hal.h"
 #include "hal/spi_types.h"
 #include "soc/rtc.h"
-
-#include "esp_idf_api/gpio.h"
 
 #undef MHZ
 #include "macros/units.h"
@@ -272,22 +271,22 @@ void spi_deinit_pins(spi_t bus)
     _spi[bus].pins_initialized = false;
 
     if (gpio_is_valid(spi_config[bus].sck)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].sck);
+        gpio_reset_pin(spi_config[bus].sck);
         gpio_set_pin_usage(spi_config[bus].sck, _GPIO);
     }
 
     if (gpio_is_valid(spi_config[bus].mosi)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].mosi);
+        gpio_reset_pin(spi_config[bus].mosi);
         gpio_set_pin_usage(spi_config[bus].mosi, _GPIO);
     }
 
     if (gpio_is_valid(spi_config[bus].miso)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].miso);
+        gpio_reset_pin(spi_config[bus].miso);
         gpio_set_pin_usage(spi_config[bus].miso, _GPIO);
     }
 
     if (gpio_is_valid(spi_config[bus].cs)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].cs);
+        gpio_reset_pin(spi_config[bus].cs);
         gpio_set_pin_usage(spi_config[bus].cs, _GPIO);
     }
 

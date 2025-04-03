@@ -28,13 +28,12 @@
 #include "irq.h"
 #include "periph/gpio_ll.h"
 
+#include "driver/gpio.h"
 #include "esp/common_macros.h"
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "gpio_ll_arch.h"
 #include "soc/gpio_struct.h"
-
-#include "esp_idf_api/gpio.h"
 
 #ifdef MODULE_FMT
 #  include "fmt.h"
@@ -118,13 +117,13 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     if (conf.state == GPIO_DISCONNECT) {
         /* reset the pin to disconnects any other peripheral output configured
            via GPIO Matrix, the pin is reconfigured according to given conf */
-        esp_idf_gpio_reset_pin(gpio);
+        gpio_reset_pin(gpio);
     }
 
     /* since we can't read back the configuration, we have to save it */
     _gpio_conf[gpio] = conf;
 
-    if (esp_idf_gpio_config(&cfg) != ESP_OK) {
+    if (gpio_config(&cfg) != ESP_OK) {
         return -ENOTSUP;
     }
 
@@ -147,7 +146,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
         strength = GPIO_DRIVE_CAP_DEFAULT;
     }
     if ((cfg.pin_bit_mask & SOC_GPIO_VALID_OUTPUT_GPIO_MASK) &&
-        (esp_idf_gpio_set_drive_capability(gpio, strength) != ESP_OK)) {
+        (gpio_set_drive_capability(gpio, strength) != ESP_OK)) {
         return -ENOTSUP;
     }
 

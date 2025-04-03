@@ -60,9 +60,9 @@
 #else /* defined(CPU_ESP8266) */
 
 #include "esp_cpu.h"
-#include "esp_idf_api/uart.h"
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
+#include "esp_rom_uart.h"
 #include "hal/uart_ll.h"
 #include "soc/clk_tree_defs.h"
 #include "soc/gpio_reg.h"
@@ -194,7 +194,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_set_pin_usage(uart_config[uart].txd, _UART);
         gpio_set_pin_usage(uart_config[uart].rxd, _UART);
 
-        esp_idf_esp_rom_output_tx_wait_idle(uart);
+        esp_rom_output_tx_wait_idle(uart);
         esp_rom_gpio_connect_out_signal(uart_config[uart].txd,
                                         _uarts[uart].signal_txd, false, false);
         esp_rom_gpio_connect_in_signal(uart_config[uart].rxd,
@@ -325,7 +325,7 @@ static uint8_t IRAM _uart_rx_one_char(uart_t uart)
     /* wait until at least von byte is in RX FIFO */
     while (uart_ll_get_rxfifo_len(_uarts[uart].regs) == 0) {}
 
-    uint8_t data; 
+    uint8_t data;
     uart_ll_read_rxfifo(_uarts[uart].regs, &data, 1);
 
     return data;

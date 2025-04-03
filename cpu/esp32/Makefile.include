@@ -130,6 +130,7 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/deprecated
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_adc/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_common/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_gpio/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_uart/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/include
