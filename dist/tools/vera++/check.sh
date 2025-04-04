@@ -48,9 +48,19 @@ if github_annotate_is_on; then
         LINENUM=$(echo "${line}" | cut -d: -f2)
         DETAILS=$(echo "${line}" | cut -d: -f3- |
                   sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
-
-        # parse if warning (errors don't have a label)
-        if echo "$DETAILS" | grep -q "^warning: "; then
+        if
+        {
+            echo "$DETAILS" | grep -q "longer than 100 characters" &&
+            inline_comment=$(sed -n "${LINENUM}p" "${FILENAME}" | sed -n '/\/\*\*</p') &&
+            http_comment=$(sed -n "${LINENUM}p" "${FILENAME}" | sed -n '/^\s*[*/].*https*:\/\//p') &&
+            [ -n "${inline_comment}" -o -n "${http_comment}" ]
+        }
+        then
+            # ignore inline comments exceeding line length
+            # ignore lines containing http:// or https:// exceeding line length
+            true
+        elif echo "$DETAILS" | grep -q "^warning: "; then
+            # parse if warning (errors don't have a label)
             DETAILS=$(echo "$DETAILS" | sed 's/^warning: //')
             github_annotate_warning "$FILENAME" "$LINENUM" "$DETAILS"
         else
