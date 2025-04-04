@@ -198,9 +198,6 @@ include $(RIOTMAKE)/docker.inc.mk
 include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
-# include concurrency helpers
-include $(RIOTMAKE)/info-nproc.inc.mk
-
 # List of boards variables
 include $(RIOTMAKE)/boards.inc.mk
 
@@ -231,9 +228,7 @@ endif
 
 include $(RIOTMAKE)/cargo-settings.inc.mk
 
-GLOBAL_GOALS += buildtest \
-                buildtest-indocker \
-                info-boards-features-blacklisted \
+GLOBAL_GOALS += info-boards-features-blacklisted \
                 info-boards-features-conflicting \
                 info-boards-features-missing \
                 info-boards-supported \
@@ -243,7 +238,6 @@ GLOBAL_GOALS += buildtest \
 
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   include $(RIOTMAKE)/info-global.inc.mk
-  include $(RIOTMAKE)/buildtests.inc.mk
 else
 
 all: link
