@@ -118,6 +118,16 @@ typedef struct {
      * again until it succeeds or the CAN controller goes into an error state.
      */
     bool disable_automatic_retransmission : 1;
+    /**
+     * @brief Whether to enable the transmit pause feature
+     *
+     * When set to `true`, the CAN controller will insert a delay of two bit
+     * times between two subsequent frames. This decreases the maximum
+     * throughput, but it ensures that other nodes with a lower priority
+     * (according to the CAN ID) will not starve (in other words it prevents
+     "Babbling Idiot Syndrome").
+     */
+    bool enable_transmit_pause            : 1;
 } can_conf_t;
 #define HAVE_CAN_CONF_T
 
