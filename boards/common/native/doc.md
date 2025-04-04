@@ -26,6 +26,22 @@ and @ref boards_native64. Using `BOARD=native` will automatically select the rig
 - Network: Tap Interface
 - UART: Runtime configurable - `/dev/tty*` are supported
 - Timers: Host timer
+- RTC: host-time but at 'UTC' to behave consistent with embedded systems if TZ is set that timezone will be used.
+    - set `TZ` environment variable e.g.:
+    - execute `export TZ=":/etc/localtime"` prior `make term` in the very shell you intend to run make term in
+    - add `export TZ=":/etc/localtime"` to your `~/.profile`
+    - run `TZ=":/etc/localtime" make term`
+    - to set set `TZ` in riot application as picolibc and newlib are able to respect that setting if `NAME+/-hh:mm:ss`
+      (-time is added, +time is subtracted from UTC (+ pointing WEST England towards America) see `man timezone`
+      eg.: `IST-5:30` or `TZ="NZST-12NZDT-13,M10.1.0,M3.3.0"` or `TZ="CET-1CEST-2,M3.5.0,M10.5.0"` or `TZ="ACST-9:30ACDT-10:30,M10.1.0,M4.1.0"`
+
+    to have time function behave like host or another timezone.
+    <span style="color:red">
+    ! Some things will behave faulty, since the assumption of most pkgs and
+    system modules is to run on a embedded system with no timezone set.
+    One often used function that respect timezone setting is `mktime` !
+    </span>
+
 - LEDs: One red and one green LED - state changes are printed to the UART
 - PWM: Dummy PWM
 - QDEC: Emulated according to PWM
