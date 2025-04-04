@@ -11,6 +11,7 @@ CURDIR=$(cd "$(dirname "$0")" && pwd)
 : "${QUIET:=0}"
 : "${WARNING:=1}"
 
+BASE_BRANCH=""
 . "$RIOTBASE"/dist/tools/ci/changed_files.sh
 . "$RIOTBASE"/dist/tools/ci/github_annotate.sh
 # tests/pkg/utensor/models/deep_mlp_weight.hpp is an auto-generated file
