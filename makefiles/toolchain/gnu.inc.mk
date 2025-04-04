@@ -30,6 +30,9 @@ ifneq (8, $(firstword $(shell echo 8 $(GCC_VERSION) | tr ' ' '\n' | sort -n)))
   OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
 endif
 
+# GCC does not warn about documentation (yet)
+OPTIONAL_CFLAGS_BLACKLIST += -Wdocumentation -Wno-error=documentation -Wno-documentation-deprecated-sync
+
 # We use GDB for debugging
 include $(RIOTMAKE)/tools/gdb.inc.mk
 
