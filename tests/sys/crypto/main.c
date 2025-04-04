@@ -22,6 +22,7 @@ int main(void)
     TESTS_RUN(tests_crypto_modes_ocb_tests());
     TESTS_RUN(tests_crypto_modes_ecb_tests());
     TESTS_RUN(tests_crypto_modes_cbc_tests());
+    TESTS_RUN(tests_crypto_modes_cbc_pkcs7_tests());
     TESTS_RUN(tests_crypto_modes_ctr_tests());
     TESTS_END();
     return 0;
