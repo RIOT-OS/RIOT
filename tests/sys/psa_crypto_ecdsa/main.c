@@ -30,8 +30,6 @@ int main(void)
     bool failed = false;
     psa_status_t status;
 
-    psa_crypto_init();
-
     status = test_ecdsa_p256_vectors();
     if (status != PSA_SUCCESS) {
         failed = true;
