@@ -177,21 +177,24 @@ multiple git work trees or clones of the RIOT repository.
 
 Comparing Build Sizes                                  {#comparing-build-sizes}
 =====================
-There is a make target for build size comparison. You can use it like that:
+There is a make target for build size comparison. It will automatically check
+all the boards compiled in the `NEWBIN` and `OLDBIN` and compare them.
+For boards that do not have a complementary partner, a warning is generated.
+You can use it like that:
 
 ~~~~~~~~~~~~~~~~~~~
 $ cd RIOT/test/test_something
 
 $ git checkout master
-$ BINDIRBASE=master-bin make buildtest
+$ BINDIRBASE=master-bin BOARD=native64 make all
 
 $ git checkout my-branch
-$ BINDIRBASE=my-branch-bin make buildtest
+$ BINDIRBASE=my-branch-bin BOARD=native64 make all
 
 $ OLDBIN=master-bin NEWBIN=my-branch-bin make info-buildsizes-diff
 text    data    bss     dec     BOARD/BINDIRBASE
 
-0       0       0       0       avsextrem    **← this line contains the diff**
+0       0       0       0       native64    **← this line contains the diff**
 57356   1532    96769   155657  master-bin
 57356   1532    96769   155657  my-branch-bin
 
