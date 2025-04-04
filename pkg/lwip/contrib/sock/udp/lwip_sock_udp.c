@@ -40,6 +40,8 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     int res;
     struct netconn *tmp = NULL;
 
+    memset(sock, 0, sizeof(*sock));
+
     if ((res = lwip_sock_create(&tmp, (struct _sock_tl_ep *)local,
                                 (struct _sock_tl_ep *)remote, 0, flags,
                                 NETCONN_UDP)) == 0) {
