@@ -72,6 +72,21 @@ psa_status_t cryptocell_310_common_ecc_generate_key_pair(uint8_t *priv_key_buffe
     return PSA_SUCCESS;
 }
 
+psa_status_t cryptocell_310_common_ecc_derive_pub_key(const uint8_t *priv_key_buffer,
+                                                 uint8_t *pub_key_buffer,
+                                                 uint32_t priv_key_buffer_length,
+                                                 uint32_t *pub_key_buffer_length,
+                                                 CRYS_ECPKI_DomainID_t domain)
+{
+    (void) priv_key_buffer;
+    (void) pub_key_buffer;
+    (void) priv_key_buffer_length;
+    (void) pub_key_buffer_length;
+    (void) domain;
+    DEBUG("cryptocell_310 does not support key derivation.\n");
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
 psa_status_t cryptocell_310_common_ecc_sign(const uint8_t *priv_key,
                                          uint32_t priv_key_size,
                                          const uint8_t *input,
