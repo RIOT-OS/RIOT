@@ -74,13 +74,33 @@ void rtc_init(void)
     TIMSK2 |= (1 << TOIE2);
 }
 
+
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
+
     /* second starts now */
     TCNT2 = 0;
 
     tm_now = *time;
 
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 
