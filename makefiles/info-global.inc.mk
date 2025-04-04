@@ -155,6 +155,5 @@ generate-Makefile.ci:
 	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
 
 
-# Reset BOARDSDIR so unchanged for makefiles included after, for now only
-# needed for buildtests.inc.mk
+# Reset BOARDSDIR so unchanged for makefiles included after
 BOARDDIR := $(BOARDDIR_GLOBAL)

@@ -1,4 +1,4 @@
-ifneq (, $(filter buildtest info-concurrency, $(MAKECMDGOALS)))
+ifneq (, $(filter info-concurrency, $(MAKECMDGOALS)))
   ifeq (, $(strip $(NPROC)))
     # Linux (utility program)
     NPROC := $(shell nproc 2>/dev/null)

@@ -9,7 +9,6 @@ This example should foremost give you an overview how to use the Makefile system
 * First you must give your application a name, which is commonly the same as the name of the directory it resides in.
   Then you can define a default BOARD for which the application was written.
   By using e.g. `make BOARD=msba2` you can override the default board.
-  With `make buildtest` the application gets compiled for all supported boards.
 
 * The variable `RIOTBASE` contains an absolute or relative path to the directory where you have checked out RIOT.
   If your code resides in a subdirectory of RIOT, then you can use `$(CURDIR)` as it's done in here.
