@@ -315,25 +315,12 @@ The user on your computer requires permission to access and use docker. There ar
 - Your OS distribution may create a group called `docker`. If so, then adding yourself to that group (and logging out and in again) should grant you permission.
 - Execute docker with sudo. This is in fact the most secure and recommended setup (see [here](https://docs.docker.com/install/linux/linux-postinstall/), [here](https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface), [here](https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/) and [here](https://fosterelli.co/privilege-escalation-via-docker.html)). No extra setup steps are needed. `make` should be instructed to use `sudo` by setting `DOCKER="sudo docker"` in the command line.
 
-### Downloading and testing RIOT docker container
-
-Finally, download the pre-built RIOT Docker container:
-
-```console
-# docker pull riot/riotbuild
-```
-
-This will take a while. If it finishes correctly, you can then use the toolchains contained in the Docker container:
-(**from the riot root**):
-
-```console
-$ docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild ./dist/tools/compile_test/compile_test.py
-```
-
 Usage
 -----
 
-The RIOT build system provides support for using the Docker container to build RIOT projects, so you do not need to type the long docker command line every time:
+The RIOT build system provides support for using a Docker container containing all necessary tools to build RIOT projects.
+The latest image is automatically fetched from the Docker Hub, so you just have to execute the
+build command like this:
 
 (**from the directory you would normally run make, e.g. examples/basic/default**)
 

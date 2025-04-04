@@ -1,4 +1,4 @@
-.PHONY: info-objsize info-buildsizes info-build info-boards-supported \
+.PHONY: info-objsize info-buildsize info-build info-boards-supported \
         info-features-missing info-modules info-cpu \
         info-features-provided info-features-required \
         info-features-used info-kconfig-variables \

@@ -93,7 +93,7 @@ function _riot {
         "info-build:show details to debug the build"
         "info-build-json:show details of the build as JSON"
         "info-buildsize:print the size of the firmware for the given board"
-        "info-buildsizes:print the size of the firmware for every supported board"
+	"info-buildsizes-diff:compare the size of two firmware builds for two given directories"
         "info-cpu:print the CPU family for the given board"
         "info-features-missing:list features missing by the given baord in regard to the given app"
         "info-features-provided:list features provided by the given board"
