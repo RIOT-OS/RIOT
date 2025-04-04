@@ -132,6 +132,11 @@ ifneq (,$(filter gnrc% %gnrc,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/gnrc/Makefile.dep
 endif
 
+# include NFC dependencies
+ifneq (,$(filter nfc% %nfc,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/nfc/Makefile.dep
+endif
+
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer
