@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840
+ * @ingroup     boards_common_particle-mesh
  * @ingroup     saul_bat_voltage
  * @{
  * @file

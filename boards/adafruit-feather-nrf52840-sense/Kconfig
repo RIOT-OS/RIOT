@@ -5,9 +5,9 @@
 # directory for more details.
 
 config BOARD
-    default "feather-nrf52840-sense" if BOARD_FEATHER_NRF52840_SENSE
+    default "adafruit-feather-nrf52840-sense" if BOARD_ADAFRUIT_FEATHER_NRF52840_SENSE
 
-config BOARD_FEATHER_NRF52840_SENSE
+config BOARD_ADAFRUIT_FEATHER_NRF52840_SENSE
     bool
     default y
     select BOARD_COMMON_NRF52

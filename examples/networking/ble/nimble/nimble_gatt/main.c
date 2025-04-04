@@ -49,7 +49,7 @@
 #define GATT_MANUFACTURER_NAME_UUID             0x2A29
 #define GATT_MODEL_NUMBER_UUID                  0x2A24
 
-#define STR_ANSWER_BUFFER_SIZE 100
+#define STR_ANSWER_BUFFER_SIZE 120
 
 /* UUID = 1bce38b3-d137-48ff-a13e-033e14c7a335 */
 static const ble_uuid128_t gatt_svr_svc_rw_demo_uuid

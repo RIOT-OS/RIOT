@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840
+ * @ingroup     boards_adafruit-feather-nrf52840-express
  * @{
  *
  * @file

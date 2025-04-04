@@ -458,7 +458,7 @@ Some scripts and tools available to ease `BOARD` porting and testing:
 # Further reference                                         {#further-reference}
 
 - [In her blog][martines-blog], Martine Lenders documented her approach of
-  porting the @ref boards_feather-nrf52840 in February 2020.
+  porting the @ref boards_adafruit-feather-nrf52840-express in February 2020.
 - [Over at HackMD][hackmd-slstk3400a], Akshai M documented his approach of
   porting the @ref boards_slstk3400a in July 2020.
 

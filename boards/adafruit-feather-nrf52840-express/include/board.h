@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2020 Freie Universität Berlin
- * Copyright (C) 2023 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,15 +7,14 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840-sense
+ * @ingroup     boards_adafruit-feather-nrf52840-express
  * @{
  *
  * @file
  * @brief       Board specific configuration for the Adafruit Feather nRF52840
- *              Sense
+ *              Express
  *
  * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
- * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
 #ifndef BOARD_H
@@ -34,11 +32,11 @@ extern "C" {
  * @name    LED pin configuration
  * @{
  */
-#define LED0_PIN            GPIO_PIN(1, 9)
+#define LED0_PIN            GPIO_PIN(1, 15)
 #define LED1_PIN            GPIO_PIN(1, 10)
 
 #define LED_PORT            (NRF_P1)
-#define LED0_MASK           (1 << 9)
+#define LED0_MASK           (1 << 15)
 #define LED1_MASK           (1 << 10)
 #define LED_MASK            (LED0_MASK | LED1_MASK)
 
@@ -64,37 +62,6 @@ extern "C" {
  * @{
  */
 #define MTD_0   mtd_dev_get(0)      /**< MTD device for the external 2MB flash */
-/** @} */
-
-/**
- * @name    BMP280 sensor configuration
- * @{
- */
-#define BMX280_PARAM_I2C_DEV   I2C_DEV(0)   /**< I2C device */
-/** @} */
-
-/**
- * @name    LIS3MDL 3-axis magnetometer
- * @{
- */
-#define LIS3MDL_PARAM_I2C      I2C_DEV(0)   /**< I2C device */
-#define LIS3MDL_PARAM_ADDR     (0x1C)       /**< I2C address */
-/** @} */
-
-/**
- * @name    SHT30 temperature and humidity sensor
- * @{
- */
-#define SHT3X_PARAM_I2C_DEV    I2C_DEV(0)          /**< I2C device */
-#define SHT3X_PARAM_I2C_ADDR   (SHT3X_I2C_ADDR_1)  /**< I2C address */
-/** @} */
-
-/**
- * @name    LSM6DSXX accelerometer sensor configuration
- * @{
- */
-#define LSM6DSXX_PARAM_I2C      I2C_DEV(0)  /**< I2C device */
-#define LSM6DSXX_PARAM_ADDR     (0x6A)      /**< I2C address */
 /** @} */
 
 /**

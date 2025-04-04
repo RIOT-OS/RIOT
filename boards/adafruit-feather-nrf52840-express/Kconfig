@@ -5,9 +5,9 @@
 # directory for more details.
 
 config BOARD
-    default "feather-nrf52840" if BOARD_FEATHER_NRF52840
+    default "adafruit-feather-nrf52840-express" if BOARD_ADAFRUIT_FEATHER_NRF52840_EXPRESS
 
-config BOARD_FEATHER_NRF52840
+config BOARD_ADAFRUIT_FEATHER_NRF52840_EXPRESS
     bool
     default y
     select BOARD_COMMON_NRF52

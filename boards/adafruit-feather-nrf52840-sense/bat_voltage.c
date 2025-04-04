@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840
+ * @ingroup     boards_adafruit-feather-nrf52840-sense
  * @ingroup     saul_bat_voltage
  * @{
  * @file

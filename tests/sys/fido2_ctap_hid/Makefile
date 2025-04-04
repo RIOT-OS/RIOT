@@ -6,7 +6,7 @@ include ../Makefile.sys_common
 BOARD_WHITELIST = \
   nrf52840dk \
   nrf52840dongle \
-  feather-nrf52840-sense
+  adafruit-feather-nrf52840-sense
 
 USEMODULE += fido2_ctap_transport_hid
 USEPKG += fido2_tests

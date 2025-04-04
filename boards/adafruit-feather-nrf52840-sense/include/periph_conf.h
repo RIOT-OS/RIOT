@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_feather-nrf52840-sense
+ * @ingroup     boards_adafruit-feather-nrf52840-sense
  * @{
  *
  * @file
