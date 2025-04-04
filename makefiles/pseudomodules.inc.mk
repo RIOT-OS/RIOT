@@ -322,6 +322,7 @@ PSEUDOMODULES += netdev_layer
 PSEUDOMODULES += netdev_legacy_api
 PSEUDOMODULES += netdev_new_api
 PSEUDOMODULES += netdev_register
+PSEUDOMODULES += netdev_tx_info_timestamp
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_neighbor_etx

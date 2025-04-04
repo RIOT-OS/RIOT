@@ -198,8 +198,10 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
 }
 
 ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
-                       const sock_ip_ep_t *remote, uint8_t nh)
+                       const sock_ip_ep_t *remote, uint8_t nh,
+                       gnrc_sock_send_aux_t *aux)
 {
+    (void)aux; /* usage of aux depends on selected modules */
     gnrc_pktsnip_t *pkt;
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     gnrc_nettype_t type;
@@ -287,6 +289,12 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
 
 #if IS_USED(MODULE_GNRC_TX_SYNC)
     gnrc_tx_sync(&tx_sync);
+#  if IS_USED(MODULE_NETDEV_TX_INFO_TIMESTAMP) && IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if (aux->timestamp && (tx_sync.tx_info.flags & NETDEV_TX_INFO_FLAG_TIMESTAMP)) {
+        *aux->timestamp = tx_sync.tx_info.timestamp;
+        aux->flags |= GNRC_SOCK_SEND_AUX_FLAG_TIMESTAMP;
+    }
+#  endif
 #endif
 
 #ifdef MODULE_GNRC_NETERR

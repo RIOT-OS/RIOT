@@ -1856,10 +1856,17 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
 static void _event_handler_tx_done(event_t *evp)
 {
     gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_tx_done);
-    int res = netif->dev->driver->confirm_send(netif->dev, NULL);
+    netdev_tx_info_t *tx_info = NULL;
+    gnrc_pktsnip_t *pkt = netif->tx_pkt;
+    if (IS_USED(MODULE_GNRC_TX_SYNC)) {
+        gnrc_tx_sync_t *tx_sync = gnrc_tx_sync_search(pkt);
+        if (tx_sync) {
+            tx_info = &tx_sync->tx_info;
+        }
+    }
+    int res = netif->dev->driver->confirm_send(netif->dev, tx_info);
     /* after confirm_send() is called, the device is ready to send the next
      * frame. So clear netif->tx_pkt to signal readiness */
-    gnrc_pktsnip_t *pkt = netif->tx_pkt;
     netif->tx_pkt = NULL;
     bool push_back = netif->flags & GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
     netif->flags &= ~GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
