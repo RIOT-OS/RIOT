@@ -318,7 +318,7 @@ The user on your computer requires permission to access and use docker. There ar
 Usage
 -----
 
-The RIOT build system provides support for using the Docker container to build RIOT projects.
+The RIOT build system provides support for using a Docker container containing all necessary tools to build RIOT projects.
 The latest image is automatically fetched from the Docker Hub, so you just have to execute the
 build command like this:
 
