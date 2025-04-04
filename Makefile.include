@@ -198,9 +198,6 @@ include $(RIOTMAKE)/docker.inc.mk
 include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
-# include concurrency helpers
-include $(RIOTMAKE)/info-nproc.inc.mk
-
 # List of boards variables
 include $(RIOTMAKE)/boards.inc.mk
 
