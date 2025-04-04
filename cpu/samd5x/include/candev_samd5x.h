@@ -118,6 +118,16 @@ typedef struct {
      * again until it succeeds or the CAN controller goes into an error state.
      */
     bool disable_automatic_retransmission : 1;
+    /**
+     * @brief Whether to disable the transmit pause feature
+     *
+     * When set to `true`, the CAN controller will punch out TX frames from
+     * the FIFO without a delay of two bit times. The benefit would be to
+     * increase the maximum throughput. The downside is that other nodes with
+     * a lower priority (according to the CAN ID) may starve ("Babbling Idiot
+     * Syndrome").
+     */
+    bool disable_transmit_pause           : 1;
 } can_conf_t;
 #define HAVE_CAN_CONF_T
 
