@@ -427,6 +427,8 @@ static int _init(candev_t *candev)
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         _dump_msg_ram_section(dev);
     }
+
+    if (dev->conf->disa)
     /* Disable automatic retransmission by default */
     /* This can be added as a configuration parameter for the CAN controller */
     dev->conf->can->CCCR.reg |= CAN_CCCR_DAR;
