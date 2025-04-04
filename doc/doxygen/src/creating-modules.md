@@ -84,6 +84,15 @@ External modules can optionally define the following files:
 An example can be found in
 [`tests/build_system/external_module_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_module_dirs)
 
+Unit tests for modules outside of RIOTBASE     {#unittests-outside-of-riotbase}
+------------------------------------------
+
+When writing external modules, it can be helpful to make use of the existing
+unit test infrastructure in `tests/unittests` to run both upstream unit tests
+as well as downstream project-specific unit tests in a single app. For this the
+environment variable `EXTERNAL_UNITTEST_DIRS` can be used to list directories
+(separated by a space) to additional unit tests.
+
 Pseudomodules                                                  {#pseudomodules}
 =============
 Pseudomodules are modules that are not static libraries, i.e. do not generate a
