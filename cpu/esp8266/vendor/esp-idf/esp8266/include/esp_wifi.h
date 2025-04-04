@@ -140,7 +140,7 @@ extern wifi_osi_funcs_t s_wifi_osi_funcs;
   * @attention 2. Always use WIFI_INIT_CONFIG_DEFAULT macro to init the config to default values, this can
   *               guarantee all the fields got correct value when more fields are added into wifi_init_config_t
   *               in future release. If you want to set your owner initial values, overwrite the default values
-  *               which are set by WIFI_INIT_CONFIG_DEFAULT, please be notified that the field 'magic' of 
+  *               which are set by WIFI_INIT_CONFIG_DEFAULT, please be notified that the field 'magic' of
   *               wifi_init_config_t should always be WIFI_INIT_CONFIG_MAGIC!
   *
   * @param  config pointer to WiFi init configuration structure; can point to a temporary variable.
@@ -239,7 +239,7 @@ esp_err_t esp_wifi_restore(void);
   * @attention 1. This API only impact WIFI_MODE_STA or WIFI_MODE_APSTA mode
   * @attention 2. If the ESP8266 is connected to an AP, call esp_wifi_disconnect to disconnect.
   *
-  * @return 
+  * @return
   *    - ESP_OK: succeed
   *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
   *    - ESP_ERR_WIFI_NOT_START: WiFi is not started by esp_wifi_start
@@ -333,9 +333,9 @@ esp_err_t esp_wifi_scan_get_ap_num(uint16_t *number);
 /**
   * @brief     Get AP list found in last scan
   *
-  * @param[inout]  number As input param, it stores max AP number ap_records can hold. 
-  *                As output param, it receives the actual AP number this API returns.
-  * @param         ap_records  wifi_ap_record_t array to hold the found APs
+  * @param[in,out] number       As input param, it stores max AP number ap_records can hold.
+  *                             As output param, it receives the actual AP number this API returns.
+  * @param         ap_records   wifi_ap_record_t array to hold the found APs
   *
   * @return
   *    - ESP_OK: succeed
@@ -358,7 +358,7 @@ esp_err_t esp_wifi_scan_get_ap_records(uint16_t *number, wifi_ap_record_t *ap_re
   * @return
   *    - ESP_OK: succeed
   *    - ESP_ERR_WIFI_CONN: The station interface don't initialized
-  *    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status 
+  *    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status
   */
 esp_err_t esp_wifi_sta_get_ap_info(wifi_ap_record_t *ap_info);
 
@@ -496,7 +496,7 @@ esp_err_t esp_wifi_get_channel(uint8_t *primary, wifi_second_chan_t *second);
   * @attention 4. When the country info is changed because of configuration or because the station connects to a different
   *               external AP, the country IE in probe response/beacon of the soft-AP is changed also.
   * @attention 5. The country configuration is not stored into flash
-  * @attention 6. This API doesn't validate the per-country rules, it's up to the user to fill in all fields according to 
+  * @attention 6. This API doesn't validate the per-country rules, it's up to the user to fill in all fields according to
   *               local regulations.
   *
   * @param     country   the configured country info
@@ -558,7 +558,7 @@ esp_err_t esp_wifi_set_mac(wifi_interface_t ifx, const uint8_t mac[6]);
 esp_err_t esp_wifi_get_mac(wifi_interface_t ifx, uint8_t mac[6]);
 
 /**
-  * @brief The RX callback function in the promiscuous mode. 
+  * @brief The RX callback function in the promiscuous mode.
   *        Each time a packet is received, the callback function will be called.
   *
   * @param buf  Data received. Type of data in buffer (wifi_promiscuous_pkt_t or wifi_pkt_rx_ctrl_t) indicated by 'type' parameter.
@@ -879,7 +879,7 @@ esp_err_t esp_wifi_get_event_mask(uint32_t *mask);
   * @return    ESP_OK, succeed;
   * @return    ESP_FAIL, fail.
   */
-esp_err_t esp_wifi_send_pkt_freedom(uint8_t *buf, int32_t len, bool sys_seq); 
+esp_err_t esp_wifi_send_pkt_freedom(uint8_t *buf, int32_t len, bool sys_seq);
 
 #ifdef __cplusplus
 }

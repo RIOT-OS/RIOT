@@ -123,10 +123,10 @@ typedef struct {
 /**
  * @brief   Initialize the given STMPE811 device
  *
- * @param[inout] dev        Device descriptor of the STMPE811
- * @param[in] params        Initialization parameters of the STMPE811 device
- * @param[in] cb            Callback function called on touch interrupts
- * @param[in] arg           Context argument used in callback function
+ * @param[in,out] dev       Device descriptor of the STMPE811
+ * @param[in]     params    Initialization parameters of the STMPE811 device
+ * @param[in]     cb        Callback function called on touch interrupts
+ * @param[in]     arg       Context argument used in callback function
  *
  * @return                  0 on success
  * @return                  -ENODEV when no valid device

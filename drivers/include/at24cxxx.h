@@ -125,7 +125,7 @@ int at24cxxx_init(at24cxxx_t *dev, const at24cxxx_params_t *params);
  *
  * @return          AT24CXXX_OK on success
  * @return          -ERANGE if @p pos is out of bounds
- * @return          @see i2c_read_regs
+ * @return          Same as @ref i2c_read_regs
  */
 int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest);
 
@@ -139,7 +139,7 @@ int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest);
  *
  * @return          AT24CXXX_OK on success
  * @return          -ERANGE if @p pos + @p len is out of bounds
- * @return          @see i2c_read_regs
+ * @return          Same as @ref i2c_read_regs
  */
 int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len);
 
@@ -152,7 +152,7 @@ int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len);
  *
  * @return          AT24CXXX_OK on success
  * @return          -ERANGE if @p pos is out of bounds
- * @return          @see i2c_write_regs
+ * @return          Same as @ref i2c_write_regs
  */
 int at24cxxx_write_byte(const at24cxxx_t *dev, uint32_t pos, uint8_t data);
 
@@ -168,7 +168,7 @@ int at24cxxx_write_byte(const at24cxxx_t *dev, uint32_t pos, uint8_t data);
  *
  * @return          AT24CXXX_OK on success
  * @return          -ERANGE if @p pos + @p len is out of bounds
- * @return          @see i2c_write_regs
+ * @return          Same as @ref i2c_write_regs
  */
 int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
                    size_t len);
@@ -186,7 +186,7 @@ int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
  *
  * @return          AT24CXXX_OK on success
  * @return          -ERANGE if @p pos + @p len is out of bounds
- * @return          @see i2c_write_byte
+ * @return          Same as @ref i2c_write_byte
  */
 int at24cxxx_set(const at24cxxx_t *dev, uint32_t pos, uint8_t val,
                  size_t len);
@@ -195,24 +195,24 @@ int at24cxxx_set(const at24cxxx_t *dev, uint32_t pos, uint8_t val,
  * @brief Set @p len bytes from position @p pos to
  * AT24CXXX_CLEAR_BYTE
  *
- * This is a wrapper around @see at24cxxx_set.
+ * This is a wrapper around @ref at24cxxx_set.
  *
  * @param[in]       dev       AT24CXXX device handle
  * @param[in]       pos       Position in EEPROM memory
  * @param[in]       len       Requested length to be written
  *
- * @return          @see at24cxxx_set
+ * @return          same as @ref at24cxxx_set
  */
 int at24cxxx_clear(const at24cxxx_t *dev, uint32_t pos, size_t len);
 
 /**
  * @brief Set the entire EEPROM memory to AT24CXXX_CLEAR_BYTE
  *
- * This is a wrapper around @see at24cxxx_clear.
+ * This is a wrapper around same as @ref at24cxxx_clear.
  *
  * @param[in]       dev       AT24CXXX device handle
  *
- * @return          @see at24cxxx_set
+ * @return          same as @ref at24cxxx_set
  */
 int at24cxxx_erase(const at24cxxx_t *dev);
 

@@ -53,7 +53,7 @@ enum {
     STDIO_UDP,                  /**< stdio via UDP */
     STDIO_TELNET,               /**< stdio via telnet */
     STDIO_ETHOS,                /**< stdio via ethos (mutiplex) */
-    STDIO_SLIP,                 /*<< stdio via SLIP (mutiplex) */
+    STDIO_SLIP,                 /**< stdio via SLIP (mutiplex) */
 };
 
 /**
