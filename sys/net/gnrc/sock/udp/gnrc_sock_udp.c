@@ -101,7 +101,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         (local->netif != remote->netif)) {
         return -EINVAL;
     }
-    memset(&sock->local, 0, sizeof(sock_udp_ep_t));
+    memset(sock, 0, sizeof(*sock));
     if (local != NULL) {
         uint16_t port = local->port;
 
@@ -130,7 +130,6 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         memcpy(&sock->local, local, sizeof(sock_udp_ep_t));
         sock->local.port = port;
     }
-    memset(&sock->remote, 0, sizeof(sock_udp_ep_t));
     if (remote != NULL) {
         if (gnrc_af_not_supported(remote->family)) {
             return -EAFNOSUPPORT;
