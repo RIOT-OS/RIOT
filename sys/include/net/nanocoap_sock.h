@@ -191,6 +191,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Event priority for nanoCoAP sock events (e.g. used by `nanocoap_sock_observe`)
+ */
+#ifndef CONFIG_NANOCOAP_SOCK_EVENT_PRIO
+#  define CONFIG_NANOCOAP_SOCK_EVENT_PRIO       EVENT_PRIO_MEDIUM
+#endif
+
+/**
  * @brief   NanoCoAP socket types
  */
 typedef enum {
@@ -225,6 +232,15 @@ typedef struct {
     coap_method_t method;           /**< request method (GET, POST, PUT)    */
     uint8_t blksize;                /**< CoAP blocksize exponent            */
 } coap_block_request_t;
+
+/**
+ * @brief   Observe Client helper struct
+ */
+typedef struct {
+    coap_request_cb_t cb;           /**< user callback function             */
+    void *arg;                      /**< callback function argument         */
+    nanocoap_sock_t sock;           /**< socket used for the request        */
+} coap_observe_client_t;
 
 /**
  * @brief   Context from CoAP request for separate response
@@ -551,6 +567,40 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 #endif
     sock_udp_close(&sock->udp);
 }
+
+/**
+ * @brief   Observe a CoAP resource behind a URL (via GET)
+ *
+ * @note This requires the `nanocoap_sock_observe` module.
+ *
+ * @param[in]   url     URL to subscribe to
+ * @param[out]  ctx     nanoCoAP observe context
+ * @param[in]   cb      callback function called for every resource update
+ * @param[in]   arg     callback function argument
+ *
+ * @returns     Number of bytes send on success
+ * @retval      -EPROTONOSUPPORT    registration failed
+ * @retval      <0                  other error
+
+ */
+ssize_t nanocoap_sock_observe_url(const char *url, coap_observe_client_t *ctx,
+                                  coap_request_cb_t cb, void *arg);
+/**
+ * @brief   Stop observing a CoAP resource
+ *
+ * @note This requires the `nanocoap_sock_observe` module.
+ *
+ * @param[in]   url     URL to unsubscribe subscribe from
+ * @param[out]  ctx     nanoCoAP observe context that was previously used with
+ *                      @see nanocoap_sock_observe_url
+ *
+ * @pre         @p nanocoap_sock_observe_url has been called on the same arguments
+ *              before and the Observation has not yet been cancelled yet.
+ *
+ * @returns     >=0 on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_unobserve_url(const char *url, coap_observe_client_t *ctx);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) GET

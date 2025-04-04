@@ -568,6 +568,12 @@ ifneq (,$(filter nanocoap_link_format,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter nanocoap_sock_observe,$(USEMODULE)))
+  USEMODULE += event_thread
+  USEMODULE += sock_async_event
+  USEMODULE += nanocoap_sock
+endif
+
 ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
   USEMODULE += nanocoap_sock
   USEMODULE += vfs

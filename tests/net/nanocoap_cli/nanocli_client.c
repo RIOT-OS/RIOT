@@ -393,3 +393,51 @@ static int _cmd_get_non(int argc, char **argv)
 }
 
 SHELL_COMMAND(get_non, "non-confirmable get", _cmd_get_non);
+
+#ifdef MODULE_NANOCOAP_SOCK_OBSERVE
+static int _observe_cb(void *arg, coap_pkt_t *pkt)
+{
+    (void)arg;
+
+    if (coap_get_code_class(pkt) != COAP_CLASS_SUCCESS) {
+        printf("observe: error\n");
+    }
+
+    od_hex_dump(pkt->payload, pkt->payload_len, OD_WIDTH_DEFAULT);
+
+    return pkt->payload_len;
+}
+
+static int _cmd_observe(int argc, char **argv)
+{
+    static coap_observe_client_t ctx;
+    bool observe = true;
+    int res;
+
+    if ((argc < 2) || (argc > 3)) {
+        printf("usage: %s <url> [on|off]\n", argv[0]);
+        return 1;
+    }
+    if (argc > 2 && !strcmp("off", argv[2])) {
+        observe = false;
+    }
+
+    if (ctx.cb && observe) {
+        puts("CLI can observe only a single resource at a time");
+        return -1;
+    }
+
+    if (observe) {
+        res = nanocoap_sock_observe_url(argv[1], &ctx, _observe_cb, NULL);
+    }
+    else {
+        res = nanocoap_sock_unobserve_url(argv[1], &ctx);
+    }
+
+    if (res < 0) {
+        printf("error: %d\n", res);
+    }
+    return res;
+}
+SHELL_COMMAND(observe, "observe URL", _cmd_observe);
+#endif /* MODULE_NANOCOAP_SOCK_OBSERVE */
