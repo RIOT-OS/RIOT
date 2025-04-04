@@ -109,7 +109,15 @@ typedef struct {
      *  @ref can_conf_t::enable_pin will be set HIGH when active and LOW when
      * inactive.
      */
-     bool enable_pin_active_low;
+    bool enable_pin_active_low            : 1;
+    /**
+     * @brief Whether to disable automatic retransmission
+     *
+     * When set to `true`, a CAN frame will not be retransmitted on transmission
+     * failure (e.g. on missing ACK). Otherwise the frame will be transmitted
+     * again until it succeeds or the CAN controller goes into an error state.
+     */
+    bool disable_automatic_retransmission : 1;
 } can_conf_t;
 #define HAVE_CAN_CONF_T
 

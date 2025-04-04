@@ -452,9 +452,15 @@ static int _init(candev_t *candev)
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         _dump_msg_ram_section(dev);
     }
-    /* Disable automatic retransmission by default */
-    /* This can be added as a configuration parameter for the CAN controller */
-    dev->conf->can->CCCR.reg = CAN_CCCR_DAR;
+
+    uint32_t cccr = dev->conf->can->CCCR.reg;
+    cccr &= ~(CAN_CCCR_DAR);
+
+    if (dev->conf->disable_automatic_retransmission) {
+         cccr |= CAN_CCCR_DAR;
+    }
+
+    dev->conf->can->CCCR.reg = cccr;
 
     /* Reject all remote frames */
     dev->conf->can->GFC.reg = CAN_GFC_RRFE | CAN_GFC_RRFS;
