@@ -62,7 +62,8 @@ enum {
 
 typedef enum {
     MODE_INIT,
-    MODE_TEST,
+    MODE_LOOPBACK,
+    MODE_MONITOR,
 } can_mode_t;
 
 typedef struct {
@@ -203,7 +204,7 @@ static int _set_mode(Can *can, can_mode_t can_mode)
             _enter_init_mode(can);
             can->CCCR.reg |= CAN_CCCR_CCE;
             break;
-        case MODE_TEST:
+        case MODE_LOOPBACK:
             DEBUG_PUTS("test mode");
             _enter_init_mode(can);
             /* CCCR.TEST and CCCR.MON can be set only when CCCR.INIT and CCCR.CCE are set */
@@ -213,6 +214,14 @@ static int _set_mode(Can *can, can_mode_t can_mode)
 #if IS_ACTIVE(CANDEV_SAMD5X_INTERNAL_LOOPBACK)
             can->CCCR.reg |= CAN_CCCR_MON;
 #endif
+            _exit_init_mode(can);
+            break;
+        case MODE_MONITOR:
+            DEBUG_PUTS("monitor mode");
+            _enter_init_mode(can);
+            /* CCCR.TEST and CCCR.MON can be set only when CCCR.INIT and CCCR.CCE are set */
+            can->CCCR.reg |= CAN_CCCR_CCE;
+            can->CCCR.reg |= CAN_CCCR_MON;
             _exit_init_mode(can);
             break;
         default:
@@ -781,7 +790,16 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
                         }
                         break;
                     case CANOPT_STATE_LOOPBACK:
-                        res = _set_mode(dev->conf->can, MODE_TEST);
+                        res = _set_mode(dev->conf->can, MODE_LOOPBACK);
+                        if (res == 0) {
+                            res = sizeof(canopt_state_t);
+                        }
+                        else {
+                            return -1;
+                        }
+                        break;
+                    case CANOPT_STATE_LISTEN_ONLY:
+                        res = _set_mode(dev->conf->can, MODE_MONITOR);
                         if (res == 0) {
                             res = sizeof(canopt_state_t);
                         }
