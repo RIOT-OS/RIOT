@@ -6,11 +6,11 @@ all: welcome
 	@echo ""
 	@exit 1
 
-doc doc-man doc-latex:
+doc doc-man doc-latex doc-ci:
 	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
 		--output-md doc/doxygen/src/feature_list.md
-	"$(MAKE)" -BC doc/doxygen $@
+	"$(MAKE)" -C doc/doxygen $@
 
 docclean:
 	"$(MAKE)" -BC doc/doxygen clean
