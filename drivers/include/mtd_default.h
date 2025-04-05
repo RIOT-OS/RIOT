@@ -33,6 +33,10 @@ extern "C" {
 #include "mtd_emulated.h"
 #endif
 
+#if defined(MODULE_MTD_FLASHPAGE)
+#include "mtd_flashpage.h"
+#endif
+
 #if defined(MODULE_MTD_SDCARD_DEFAULT)
 extern mtd_sdcard_t mtd_sdcard_dev0;
 #endif
