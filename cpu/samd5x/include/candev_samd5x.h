@@ -28,7 +28,9 @@ extern "C" {
 #include "can/candev.h"
 
 #ifndef CANDEV_SAMD5X_DEFAULT_BITRATE
-/** Default bitrate */
+/**
+ * @brief   Bitrate to use on init if @ref can_conf_t::bitrate is zero
+ */
 #define CANDEV_SAMD5X_DEFAULT_BITRATE 500000U
 #endif
 
@@ -91,6 +93,7 @@ extern "C" {
 typedef struct {
     /** CAN device handler */
     Can *can;
+    uint32_t bitrate; /**< initial bitrate after init */
     /** CAN Rx pin */
     gpio_t rx_pin;
     /** CAN Tx pin */

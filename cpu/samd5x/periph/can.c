@@ -365,8 +365,10 @@ void can_init(can_t *dev, const can_conf_t *conf)
 {
     dev->candev.driver = &candev_samd5x_driver;
 
-    struct can_bittiming timing = { .bitrate = CANDEV_SAMD5X_DEFAULT_BITRATE,
-                                    .sample_point = CANDEV_SAMD5X_DEFAULT_SPT };
+    struct can_bittiming timing = {
+        .bitrate = conf->bitrate ? conf->bitrate : CANDEV_SAMD5X_DEFAULT_BITRATE,
+        .sample_point = CANDEV_SAMD5X_DEFAULT_SPT
+    };
 
     uint32_t clk_freq = sam0_gclk_freq(conf->gclk_src);
     can_device_calc_bittiming(clk_freq, &bittiming_const, &timing);
