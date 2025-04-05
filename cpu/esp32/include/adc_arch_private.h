@@ -32,11 +32,12 @@ extern "C" {
 #define RTCIO_GPIO(n)   n           /* n-th RTCIO GPIO */
 #define RTCIO_NA        UINT8_MAX   /* RTCIO pin not available */
 
-#define ADC_UNIT_MAX        ((adc_unit_t)255)                   /* Invalid ADC unit ID */
+#define ADC_UNIT_INV        ((adc_unit_t)255)                   /* Invalid ADC unit ID */
+#define ADC_CHANNEL_INV     SOC_ADC_MAX_CHANNEL_NUM             /* Invalid ADC channel ID */
 
-#define ADC_CHANNEL_MAX     SOC_ADC_MAX_CHANNEL_NUM             /* Invalid ADC channel ID */
 #define ADC1_CHANNEL_MAX    (SOC_ADC_CHANNEL_NUM(ADC_UNIT_1))   /* Number of channels of ADC1 */
 #define ADC2_CHANNEL_MAX    (SOC_ADC_CHANNEL_NUM(ADC_UNIT_2))   /* Number of channels of ADC2 */
+#define ADC_CHANNEL_MAX(u)  ((u == ADC_UNIT_1) ? ADC1_CHANNEL_MAX : ADC2_CHANNEL_MAX)
 
 /**
  * @brief   ADC hardware descriptor (for internal use only)
