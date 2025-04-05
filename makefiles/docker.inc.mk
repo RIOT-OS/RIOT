@@ -21,7 +21,6 @@ DOCKER ?= docker
 # List of Docker-enabled make goals
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
-  buildtest-indocker \
   scan-build \
   scan-build-analyze \
   tests-% \

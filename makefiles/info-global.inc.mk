@@ -1,5 +1,4 @@
-.PHONY: info-buildsizes \
-        info-buildsizes-diff \
+.PHONY: info-buildsizes-diff \
         info-boards-supported \
         info-boards-features-missing \
         info-boards-features-blacklisted \
@@ -108,25 +107,29 @@ BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) \
                        $(BOARDS_WITH_BLACKLISTED_FEATURES) \
                        $(BOARDS_WITH_CONFLICTING_FEATURES), $(BOARDS))
 
-info-buildsizes: SHELL=bash
-info-buildsizes:
-	@echo -e "   text\t   data\t    bss\t    dec\tboard"; \
-	for board in $(BOARDS); do \
-	    echo "$$(BOARD=$${board} $(MAKE) --no-print-directory info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${board}"; \
-	done;
-
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
+	COMMON_BOARDS=(); ONLY_OLD=(); ONLY_NEW=(); \
 	for board in $(BOARDS); do \
+	  if [[ -e "$${OLDBIN}/$${board}" && -e "$${NEWBIN}/$${board}" ]]; then \
+	    COMMON_BOARDS+=($${board}); \
+	  elif [[ -e "$${OLDBIN}/$${board}" ]]; then \
+	    ONLY_OLD+=($${board}); \
+	  elif [[ -e "$${NEWBIN}/$${board}" ]]; then \
+	    ONLY_NEW+=($${board}); \
+	  fi; \
+	done; \
+	for board in "$${COMMON_BOARDS[@]}"; do \
 	  for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
-	      BINDIRBASE=$${BINDIRBASE} BOARD=$${board} $(MAKE) info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4; \
+	      env --unset=MAKEFLAGS BINDIRBASE=$${BINDIRBASE} BOARD=$${board} $(MAKE) info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4; \
 	  done | \
 	  while read -a OLD && read -a NEW; do \
 	    for I in 0 1 2 3; do \
 	      if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
 	        DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
 	        if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_RED)"; fi; \
+	        if [[ "$${DIFF}" -eq 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_YELLOW)"; fi; \
 	        if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_GREEN)"; fi; \
 	      else \
 	        DIFF="$(COLOR_RED)ERR"; \
@@ -137,7 +140,13 @@ info-buildsizes-diff:
 	    for I in 0 1 2 3; do echo -ne "$${OLD[I]-$(COLOR_RED)ERR$(COLOR_RESET)}\t"; done; echo -e "$${OLDBIN}"; \
 	    for I in 0 1 2 3; do echo -ne "$${NEW[I]-$(COLOR_RED)ERR$(COLOR_RESET)}\t"; done; echo -e "$${NEWBIN}\n"; \
 	  done; \
-	done;
+	done; \
+	if [[ "$${#ONLY_OLD[@]}" -gt 0 ]]; then \
+	  $(COLOR_ECHO) "$(COLOR_YELLOW)Boards in OLDBIN without complementary NEWBIN: $${ONLY_OLD[*]}$(COLOR_RESET)"; \
+	fi; \
+	if [[ "$${#ONLY_NEW[@]}" -gt 0 ]]; then \
+	  $(COLOR_ECHO) "$(COLOR_YELLOW)Boards in NEWBIN without complementary OLDBIN: $${ONLY_NEW[*]}$(COLOR_RESET)"; \
+	fi;
 
 info-boards-supported:
 	@echo $(BOARDS)
@@ -155,6 +164,5 @@ generate-Makefile.ci:
 	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
 
 
-# Reset BOARDSDIR so unchanged for makefiles included after, for now only
-# needed for buildtests.inc.mk
+# Reset BOARDSDIR so unchanged for makefiles included after
 BOARDDIR := $(BOARDDIR_GLOBAL)
