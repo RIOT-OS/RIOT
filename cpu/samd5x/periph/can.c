@@ -18,6 +18,7 @@
  */
 
 #include <assert.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "can/device.h"
@@ -224,15 +225,39 @@ static int _set_mode(Can *can, can_mode_t can_mode)
 
 static void _setup_clock(can_t *dev)
 {
-    if (dev->conf->can == CAN0) {
-        GCLK->PCHCTRL[CAN0_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(dev->conf->gclk_src);
+    int pchid = 0;
+    if (dev->conf->can == CAN0){
+        pchid = CAN0_GCLK_ID;
     }
-    else if (dev->conf->can == CAN1) {
-        GCLK->PCHCTRL[CAN1_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(dev->conf->gclk_src);
+    else if (dev->conf->can == CAN1){
+        pchid = CAN1_GCLK_ID;
     }
     else {
+        /* only CAN0 and CAN1 supported. When ported to MCUs with more
+         * CAN controllers, this code needs to be adapted */
         DEBUG_PUTS("CAN channel not supported");
+        assert(0);
+        return;
     }
+
+    uint32_t pchctrl = GCLK->PCHCTRL[pchid].reg;
+
+    /* disable */
+    GCLK->PCHCTRL[pchid].reg = pchctrl & (~GCLK_PCHCTRL_CHEN);
+    do {
+        pchctrl = GCLK->PCHCTRL[pchid].reg;
+    } while (pchctrl & GCLK_PCHCTRL_CHEN);
+
+    /* setup */
+    pchctrl = GCLK_PCHCTRL_GEN(dev->conf->gclk_src);
+    GCLK->PCHCTRL[pchid].reg = pchctrl;
+
+    /* enable */
+    pchctrl |= GCLK_PCHCTRL_CHEN;
+    GCLK->PCHCTRL[pchid].reg = pchctrl;
+    do {
+        pchctrl = GCLK->PCHCTRL[pchid].reg;
+    } while (!(pchctrl & GCLK_PCHCTRL_CHEN));
 }
 
 static void _set_bit_timing(can_t *dev)
@@ -429,17 +454,20 @@ static int _init(candev_t *candev)
     }
     /* Disable automatic retransmission by default */
     /* This can be added as a configuration parameter for the CAN controller */
-    dev->conf->can->CCCR.reg |= CAN_CCCR_DAR;
+    dev->conf->can->CCCR.reg = CAN_CCCR_DAR;
 
     /* Reject all remote frames */
-    dev->conf->can->GFC.reg |= CAN_GFC_RRFE | CAN_GFC_RRFS;
+    dev->conf->can->GFC.reg = CAN_GFC_RRFE | CAN_GFC_RRFS;
 
     /* Enable reception interrupts: reception on FIFO0 and FIFO1 */
-    dev->conf->can->IE.reg |= CAN_IE_RF0NE | CAN_IE_RF1NE;
+    uint32_t ie_reg = CAN_IE_RF0NE | CAN_IE_RF1NE;
     /* Enable transmission events interrupts */
-    dev->conf->can->IE.reg |= CAN_IE_TEFNE;
+    ie_reg |= CAN_IE_TEFNE;
     /* Enable errors interrupts */
-    dev->conf->can->IE.reg |= CAN_IE_PEDE | CAN_IE_PEAE | CAN_IE_BOE | CAN_IE_EWE | CAN_IE_EPE;
+    ie_reg |= CAN_IE_PEDE | CAN_IE_PEAE | CAN_IE_BOE | CAN_IE_EWE | CAN_IE_EPE;
+    /* write Interrupt enable register */
+    dev->conf->can->IE.reg = ie_reg;
+
     /* Enable the interrupt lines */
     dev->conf->can->ILE.reg = CAN_ILE_EINT0 | CAN_ILE_EINT1;
 
