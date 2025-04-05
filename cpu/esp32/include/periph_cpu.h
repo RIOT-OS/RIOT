@@ -338,18 +338,6 @@ union gpio_conf_esp32 {
  * @note The reference voltage Vref can vary from device to device in the range
  *       of 1.0V and 1.2V.
  *
- * The Vref of a device can be read at a predefined GPIO with the function
- * #adc_line_vref_to_gpio. The results of the ADC input can then be adjusted
- * accordingly.
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * extern int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For the GPIO that can be used with this function, see:
- *
- * - \ref esp32_adc_channels_esp32 "ESP32"
- * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
- * - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
- *
  * @{
  */
 

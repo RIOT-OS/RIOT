@@ -96,7 +96,6 @@ extern "C" {
  * - ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
  *   therefore not available as ADC channels if the modules `esp_wifi` or
  *   `esp_now` are used.
- * - Vref can be read with function #adc_line_vref_to_gpio at GPIO25.
  */
 
 /**

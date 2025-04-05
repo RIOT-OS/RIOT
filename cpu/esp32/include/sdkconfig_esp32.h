@@ -111,9 +111,9 @@ extern "C" {
 /**
  * ESP32 specific ADC calibration
  */
-#define CONFIG_ADC_CAL_EFUSE_TP_ENABLE          1
-#define CONFIG_ADC_CAL_EFUSE_VREF_ENABLE        1
-#define CONFIG_ADC_CAL_LUT_ENABLE               1
+#define CONFIG_ADC_CALI_EFUSE_TP_ENABLE         1
+#define CONFIG_ADC_CALI_EFUSE_VREF_ENABLE       1
+#define CONFIG_ADC_CALI_LUT_ENABLE              1
 
 /**
  * ESP32 specific PHY configuration

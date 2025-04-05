@@ -158,6 +158,13 @@ extern "C" {
 #  define CONFIG_ADC_ONESHOT_FORCE_USE_ADC2_ON_C3           1
 #endif
 
+/* According to the ESP32-C3 Errata Sheet ADC2 does not work correctly.
+ * To use ADC2 and GPIO5 as ADC channel, CONFIG_ADC_ONESHOT_FORCE_USE_ADC2_ON_C3
+ * has to be set (default). */
+#ifndef CONFIG_ADC_ONESHOT_FORCE_USE_ADC2_ON_C3
+#define CONFIG_ADC_ONESHOT_FORCE_USE_ADC2_ON_C3         1
+#endif
+
 #ifdef __cplusplus
 }
 #endif
