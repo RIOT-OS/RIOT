@@ -90,8 +90,8 @@ struct conn_can_isotp_master {
  * This must be called on slave connections when conn_can_isotp_multi is used.
  * Does not exist otherwise.
  *
- * @param[in]    master     the master connection
- * @param[inout] slave      the slave connection to initialize
+ * @param[in]       master      the master connection
+ * @param[in,out]   slave       the slave connection to initialize
  */
 static inline void conn_can_isotp_init_slave(conn_can_isotp_t *master, conn_can_isotp_slave_t *slave)
 {
@@ -124,9 +124,9 @@ typedef struct conn_can_isotp {
 /**
  * @brief  Create can isotp connection socket
  *
- * @param[inout] conn       ISO-TP connection
- * @param[in] options       ISO-TP options
- * @param[in] ifnum         can device Interface
+ * @param[in,out] conn      ISO-TP connection
+ * @param[in]     options   ISO-TP options
+ * @param[in]     ifnum     can device Interface
  *
  * @return 0 if socket was successfully connected
  * @return any other negative number in case of an error
@@ -136,11 +136,11 @@ int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options,
 /**
  * @brief Bind a can isotp connection
  *
- * @param[inout] conn       ISO-TP connection
- * @param[in] fc_options    ISO-TP flow control options, can be NULL for default parameters
+ * @param[in,out] conn          ISO-TP connection
+ * @param[in]     fc_options    ISO-TP flow control options, can be NULL for default parameters
  *
- * @return 0 on success
- * @return any other negative number in case of an error
+ * @retval        0             on success
+ * @retval        !=0           in case of an error
  */
 int conn_can_isotp_bind(conn_can_isotp_t *conn, struct isotp_fc_options *fc_options);
 

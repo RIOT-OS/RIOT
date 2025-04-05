@@ -33,9 +33,9 @@ extern "C" {
 /**
  * @brief Private macro for routing littlefs log msgs to RIOT's log module.
  *
- * @param[in] level             log level of this log message
- * @param[in] fmt               printf style format string
- * @param[inout] ...            printf style variadic args
+ * @param[in]     level         log level of this log message
+ * @param[in]     fmt           printf style format string
+ * @param[in,out] ...           printf style variadic args
  */
 #define _LFS_LOG(level, fmt, ...)\
     LOG(level, "lfs: " fmt "%s\n", __VA_ARGS__)
