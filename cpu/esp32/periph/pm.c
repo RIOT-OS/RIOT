@@ -30,6 +30,7 @@
 #include "periph/uart.h"
 
 /* ESP-IDF headers */
+#include "driver/gpio.h"
 #include "driver/uart.h"
 #include "esp_sleep.h"
 #include "rom/rtc.h"
@@ -165,12 +166,29 @@ void pm_set(unsigned mode)
     gpio_pm_sleep_enter(mode);
 
 #if (ESP_PM_WUP_UART0 > 2)
+    _Static_assert(UART_NUMOF > 0, "UART_DEV(0) is not defined");
+#if CPU_FAM_ESP32
+    /* For ESP32, UART RxD has to be configured for direct IO using IOMUX */
+    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_RX_PIN_IDX];
+    gpio_iomux_out(UART0_RXD, sig->iomux_func, false);
+    gpio_iomux_in(UART0_RXD, sig->signal);
+#endif
     uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
     esp_sleep_enable_uart_wakeup(0);
 #endif
 #if (ESP_PM_WUP_UART1 > 2)
+    _Static_assert(UART_NUMOF > 1, "UART_DEV(1) is not defined");
+#if CPU_FAM_ESP32
+    /* For ESP32, UART RxD has to be configured for direct IO using IOMUX */
+    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_RX_PIN_IDX];
+    gpio_iomux_out(UART1_RXD, sig->iomux_func, false);
+    gpio_iomux_in(UART1_RXD, sig->signal);
+#endif
     uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
     esp_sleep_enable_uart_wakeup(1);
+#endif
+#if MODULE_STDIO_UART
+    uart_wait_tx_idle_polling(CONFIG_ESP_CONSOLE_UART_NUM);
 #endif
 
     if (mode == ESP_PM_DEEP_SLEEP) {

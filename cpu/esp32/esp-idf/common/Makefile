@@ -97,6 +97,11 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   ESP32_SDK_SRC += components/soc/$(CPU_FAM)/spi_periph.c
 endif
 
+# TODO separate module
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/uart_periph.c
+endif
+
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   ESP32_SDK_SRC += components/soc/$(CPU_FAM)/rtc_io_periph.c
 endif
