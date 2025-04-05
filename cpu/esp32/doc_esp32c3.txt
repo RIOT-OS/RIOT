@@ -80,10 +80,13 @@ total:
 The maximum number of ADC channels #ADC_NUMOF_MAX is 6.
 
 @note
-- ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
-  therefore not available as ADC channels if the modules `esp_wifi` or
+- According to the ESP32-C2 Errata Sheet, ADC2 with GPIO5 as ADC channel may
+  not work correctly. By default it is still possible to use it anyway.
+  Set `CONFIG_ADC_ONESHOT_FORCE_USE_ADC2_ON_C3` to 0 if you do not want to use
+  it and want to activate the configuration check for this channel.
+- ADC2 is also used by the WiFi module. GPIO5 connected to ADC2 is
+  therefore not available as ADC channels if the modules `esp_wifi*` or
   `esp_now` are used.
-- Vref can be read with function #adc_line_vref_to_gpio at GPIO5.
 
 ## I2C Interfaces {#esp32_i2c_interfaces_esp32c3}
 
