@@ -24,10 +24,11 @@ ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
 else
   ifeq (1,$(LWIP_IPV4))
     USEMODULE += ipv4_addr
-
     USEMODULE += lwip_arp
     USEMODULE += lwip_ipv4
-    USEMODULE += netdev_legacy_api
+
+    USEMODULE += netdev_eth
+    USEMODULE += netdev_new_api
 
 # If this module will be disabled, example set IPv4 192.168.100.150 address.
     USEMODULE += lwip_dhcp_auto

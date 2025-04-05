@@ -82,7 +82,7 @@ static void _isr(event_t *ev);
 bool is_netdev_legacy_api(netdev_t *netdev)
 {
     static_assert(IS_USED(MODULE_NETDEV_NEW_API) || IS_USED(MODULE_NETDEV_LEGACY_API),
-                  "used netdev misses dependency to netdev_legacy_api");
+                  "used netdev misses dependency to netdev_legacy_api or netdev_new_api");
     if (!IS_USED(MODULE_NETDEV_NEW_API)) {
         return true;
     }
@@ -185,18 +185,20 @@ err_t lwip_netdev_init(struct netif *netif)
             res = ERR_IF;
             goto free;
         }
-        /* netif_create_ip6_linklocal_address() does weird byte-swapping
-         * with full IIDs, so let's do it ourselves */
-        addr = ip_2_ip6(&(netif->ip6_addr[0]));
-        /* addr->addr is a uint32_t array */
-        if (l2util_ipv6_iid_from_addr(dev_type,
+        if (IS_USED(MODULE_IPV6_ADDR)) {
+            /* netif_create_ip6_linklocal_address() does weird byte-swapping
+            * with full IIDs, so let's do it ourselves */
+            addr = ip_2_ip6(&(netif->ip6_addr[0]));
+            /* addr->addr is a uint32_t array */
+            if (l2util_ipv6_iid_from_addr(dev_type,
                                       netif->hwaddr, netif->hwaddr_len,
                                       (eui64_t *)&addr->addr[2]) < 0) {
-            res = ERR_IF;
-            goto free;
+                res = ERR_IF;
+                goto free;
+            }
+            ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
+            ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
         }
-        ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
-        ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
         /* Set address state. */
 #if LWIP_IPV6_DUP_DETECT_ATTEMPTS
         /* Will perform duplicate address detection (DAD). */

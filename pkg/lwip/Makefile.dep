@@ -108,6 +108,10 @@ ifneq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_netdev
 endif
 
+ifneq (,$(filter lwip_dhcp,$(USEMODULE)))
+  USEMODULE += lwip_ethernet
+endif
+
 ifneq (,$(filter netif,$(USEMODULE)))
   USEMODULE += fmt
 endif
