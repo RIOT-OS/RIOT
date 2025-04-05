@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <inttypes.h>
 #include "fmt.h"
 #include "thread.h"
 #include "shell.h"
@@ -79,10 +80,10 @@ void* lis2dh12_test_process(void* arg) {
     while (1) {
 
         /* wait for interrupt */
-        int int1_src = lis2dh12_wait_event(&dev, LIS2DH12_INT1, false);
+        int32_t int1_src = lis2dh12_wait_event(&dev, LIS2DH12_INT1, false);
 
         if (int1_src <= 0) {
-            printf("error: %d\n", int1_src);
+            printf("error: %" PRId32 "\n", int1_src);
             continue;
         }
 
