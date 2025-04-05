@@ -131,6 +131,13 @@ typedef struct {
      "Babbling Idiot Syndrome").
      */
     bool enable_transmit_pause            : 1;
+    /**
+     * @brief Whether to start in monitor mode after initialization
+     *
+     * When set to `true`, the CAN controller will start in monitor mode instead
+     * of regular mode after initialization.
+     */
+    bool start_in_monitor_mode            : 1;
 } can_conf_t;
 #define HAVE_CAN_CONF_T
 

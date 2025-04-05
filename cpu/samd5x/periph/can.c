@@ -465,7 +465,7 @@ static int _init(candev_t *candev)
     }
 
     uint32_t cccr = dev->conf->can->CCCR.reg;
-    cccr &= ~(CAN_CCCR_DAR | CAN_CCCR_TXP);
+    cccr &= ~(CAN_CCCR_DAR | CAN_CCCR_TXP | CAN_CCCR_MON);
 
     if (dev->conf->disable_automatic_retransmission) {
          cccr |= CAN_CCCR_DAR;
@@ -473,6 +473,10 @@ static int _init(candev_t *candev)
 
     if (dev->conf->enable_transmit_pause) {
         cccr |= CAN_CCCR_TXP;
+    }
+
+    if (dev->conf->start_in_monitor_mode) {
+        cccr |= CAN_CCCR_MON;
     }
 
     dev->conf->can->CCCR.reg = cccr;
