@@ -66,11 +66,11 @@ typedef struct conn_can_raw {
 /**
  * @brief  Create can connection socket
  *
- * @param[inout] conn       CAN connection
- * @param[in] filter        list of filters to set
- * @param[in] count         number of filters in @p filter
- * @param[in] ifnum         can device Interface
- * @param[in] flags         conn flags to set (CONN_CAN_RECVONLY)
+ * @param[in,out]   conn    CAN connection
+ * @param[in]       filter  list of filters to set
+ * @param[in]       count   number of filters in @p filter
+ * @param[in]       ifnum   can device Interface
+ * @param[in]       flags   conn flags to set (CONN_CAN_RECVONLY)
  *
  * @post   @p filter must remain allocated until @p conn is closed
  *

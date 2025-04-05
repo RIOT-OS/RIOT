@@ -92,7 +92,7 @@ void sx1280_setup(sx1280_t *dev, const sx1280_params_t *params, uint8_t index);
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev                    Device descriptor of the driver
+ * @param[in,out] dev                   Device descriptor of the driver
  *
  * @return 0 on success
  */

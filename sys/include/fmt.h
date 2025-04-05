@@ -562,7 +562,7 @@ void print_str(const char* str);
  *
  * @note Caller must ensure @p str can take pad_len characters!
  *
- * @param[inout]    str         string to pad (or NULL)
+ * @param[in,out]   str         string to pad (or NULL)
  * @param[in]       in_len      length of str
  * @param[in]       pad_len     total length after padding
  * @param[in]       pad_char    char to use as pad char

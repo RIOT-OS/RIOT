@@ -655,7 +655,7 @@ static void _on_resp_timeout(void *arg) {
  * current design because the discriminator is the send_limit field, which is
  * still used to count down).
  *
- * @param[inout]   memo   The memo indicating the pending request
+ * @param[in,out]  memo   The memo indicating the pending request
  *
  * @pre The @p memo is GCOAP_MEMO_RETRANSMIT or GCOAP_MEMO_WAIT, and its
  *      send_limit is not GCOAP_SEND_LIMIT_NON.

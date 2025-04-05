@@ -261,7 +261,7 @@ public:
 
   /**
    * @brief Swap threads.
-   * @param[inout] t    Thread to swap data with.
+   * @param[in,out] t   Thread to swap data with.
    */
   void swap(thread& t) noexcept {
     std::swap(m_data, t.m_data);
@@ -309,8 +309,8 @@ private:
 
 /**
  * @brief Swaps two threads.
- * @param[inout] lhs    Reference to one thread.
- * @param[inout] rhs    Reference to the other thread.
+ * @param[in,out] lhs   Reference to one thread.
+ * @param[in,out] rhs   Reference to the other thread.
  */
 void swap(thread& lhs, thread& rhs) noexcept;
 

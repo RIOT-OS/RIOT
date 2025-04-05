@@ -166,7 +166,7 @@ public:
 
     /**
      * @brief   Transfer data
-     * @param[inout]    buf     Buffer containing the data to send, received
+     * @param[in,out]   buf     Buffer containing the data to send, received
      *                          data will be written here
      * @param[in]       count   Number of bytes to send
      */

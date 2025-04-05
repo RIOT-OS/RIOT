@@ -94,7 +94,7 @@ typedef struct {
 #define GNRC_SOCK_RECV_AUX_FLAG_RSSI        0x02    /**< RSSI valid */
 
 /**
- * @brief   Internal helper functions for GNRC
+ * @name    Internal helper functions for GNRC
  * @internal
  * @{
  */

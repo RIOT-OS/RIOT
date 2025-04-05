@@ -344,13 +344,13 @@ void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret,
  * __ATOMIC_ACQ_REL. It also cannot be a stronger order than that specified by
  * success_memorder.
  *
- * @param[in]  len
- * @param[in]  ptr
- * @param[in]  expected  the expected value of ptr
- * @param[in]  desired   the desired value of ptr
- * @param[in]  weak      ignored in this implementation
- * @param[in]  success_memorder ignored in this implementation
- * @param[in]  failure_memorder ignored in this implementation
+ * @param[in]  len                  Length of @p ptr and @p expected in bytes
+ * @param[in]  ptr                  The value to check
+ * @param[in]  expected             the expected value of ptr
+ * @param[in]  desired              the desired value of ptr
+ * @param[in]  weak                 ignored in this implementation
+ * @param[in]  success_memorder     ignored in this implementation
+ * @param[in]  failure_memorder     ignored in this implementation
  *
  * @return true if *ptr had the expected value before the exchange and *ptr was updated
  * @return false otherwise

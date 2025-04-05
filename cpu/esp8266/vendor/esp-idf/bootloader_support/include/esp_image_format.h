@@ -141,9 +141,9 @@ typedef enum {
  *
  * If encryption is enabled, data will be transparently decrypted.
  *
- * @param mode Mode of operation (verify, silent verify, or load).
- * @param part Partition to load the app from.
- * @param[inout] data Pointer to the image metadata structure which is be filled in by this function. 'start_addr' member should be set (to the start address of the image.) Other fields will all be initialised by this function.
+ * @param         mode  Mode of operation (verify, silent verify, or load).
+ * @param         part  Partition to load the app from.
+ * @param[in,out] data  Pointer to the image metadata structure which is be filled in by this function. 'start_addr' member should be set (to the start address of the image.) Other fields will all be initialised by this function.
  *
  * Image validation checks:
  * - Magic byte.

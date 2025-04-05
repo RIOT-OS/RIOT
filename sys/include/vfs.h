@@ -1188,7 +1188,7 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
  *
  * @see @c sc_vfs.c (@c df command) for a usage example
  *
- * @param[inout]  dir     The root directory of the discovered mount point
+ * @param[in,out] dir     The root directory of the discovered mount point
  *
  * @return     @c true if another file system is mounted; @p dir then contains an open directory.
  * @return     @c false if the file system list is exhausted; @p dir is uninitialized then.

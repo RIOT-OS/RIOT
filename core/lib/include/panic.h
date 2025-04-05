@@ -85,8 +85,6 @@ typedef enum {
  *
  * @param[in] crash_code    a unique code for identifying the crash reason
  * @param[in] message       a human readable reason for the crash
- *
- * @return                  this function never returns
  * */
 NORETURN void core_panic(core_panic_t crash_code, const char *message);
 

@@ -232,7 +232,7 @@ union gpio_conf_sam0 {
          * consulted.
          */
         bool initial_value                      : 1;
-        uint8_t                                 : 1; /*< padding */
+        uint8_t                                 : 1; /**< padding */
     };
 };
 
@@ -602,35 +602,35 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 /**
  * @brief   Called before the power management enters a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void gpio_pm_cb_enter(int deep);
 
 /**
  * @brief   Called after the power management left a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void gpio_pm_cb_leave(int deep);
 
 /**
  * @brief   Called before the power management enters a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void cpu_pm_cb_enter(int deep);
 
 /**
  * @brief   Called after the power management left a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void cpu_pm_cb_leave(int deep);
 
 /**
  * @brief   Wrapper for cortexm_sleep calling power management callbacks
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 static inline void sam0_cortexm_sleep(int deep)
 {
@@ -660,9 +660,9 @@ void gpio_disable_mux(gpio_t pin);
  * @brief   Available voltage regulators on the supply controller.
  */
 typedef enum {
-    SAM0_VREG_LDO,  /*< LDO, always available but not very power efficient */
-    SAM0_VREG_BUCK  /*< Buck converter, efficient but may clash with internal
-                        fast clock generators (see errata sheets) */
+    SAM0_VREG_LDO,  /**< LDO, always available but not very power efficient */
+    SAM0_VREG_BUCK  /**< Buck converter, efficient but may clash with internal
+                         fast clock generators (see errata sheets) */
 } sam0_supc_t;
 
 /**
@@ -676,7 +676,8 @@ typedef enum {
  *                 Please refer to the errata sheet, further restrictions may
  *                 apply depending on the MCU.
  *
- * @param[in]   src
+ * @param[in]   src     Voltage regulator to use, see @ref sam0_supc_t for
+ *                      options
  */
 static inline void sam0_set_voltage_regulator(sam0_supc_t src)
 {

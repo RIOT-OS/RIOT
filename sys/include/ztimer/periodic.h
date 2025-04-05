@@ -107,7 +107,7 @@ typedef struct {
  * After initializing, use @ref ztimer_periodic_start() to start the timer.
  *
  * @param[in]       clock       the clock to configure this timer on
- * @param[inout]    timer       periodic timer object to initialize
+ * @param[in,out]   timer       periodic timer object to initialize
  * @param[in]       callback    function to call on each trigger
  *                              returns `true` if the timer should keep going
  * @param[in]       arg         argument to pass to callback function

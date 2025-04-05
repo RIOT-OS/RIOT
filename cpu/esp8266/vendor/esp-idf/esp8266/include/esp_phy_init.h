@@ -141,8 +141,8 @@ esp_err_t esp_phy_store_cal_data_to_nvs(const esp_phy_calibration_data_t *cal_da
  * @param init_data  PHY parameters. Default set of parameters can
  *                   be obtained by calling esp_phy_get_default_init_data
  *                   function.
- * @param mode  Calibration mode (Full, partial, or no calibration)
- * @param[inout] calibration_data
+ * @param         mode              Calibration mode (Full, partial, or no calibration)
+ * @param[in,out] calibration_data  Calibration data to use.
  * @return ESP_OK on success.
  * @return ESP_FAIL on fail.
  */

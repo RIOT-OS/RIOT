@@ -695,10 +695,10 @@ static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
  * @pre There is enough allocated space in @p l2_group for an address for a
  *      device of type @p dev_type (e.g. 6 bytes for an ethernet address).
  *
- * @param[in] dev_type      The network interface @p l2_addr should be generated
+ * @param[in]   netif       The network interface @p l2_addr should be generated
  *                          for.
- * @param[in] ipv6_group    An IPv6 multicast address.
- * @param[out] l2_group     A link layer multicast address
+ * @param[in]   ipv6_group  An IPv6 multicast address.
+ * @param[out]  l2_group    A link layer multicast address
  *
  * @return  Length of @p l2_group in bytes
  * @return  `-ENOTSUP` if link layer does not support multicast.
