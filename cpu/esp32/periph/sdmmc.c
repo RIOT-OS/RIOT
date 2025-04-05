@@ -122,6 +122,8 @@ static void _isr_cd_pin(void *arg);
 
 static void _init(sdmmc_dev_t *sdmmc_dev)
 {
+    DEBUG("[sdmmc] %s", __func__);
+
     esp32_sdmmc_dev_t *dev = container_of(sdmmc_dev, esp32_sdmmc_dev_t, sdmmc_dev);
     assert(dev);
 
@@ -243,7 +245,7 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         .data = 0,
         .datalen = 0,
         .blklen = 0,
-        .timeout_ms = 100,
+        .timeout_ms = 1000,
     };
 
     switch (resp_type) {
@@ -266,7 +268,7 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         cmd.flags |= SCF_RSP_R5;
         break;
     case SDMMC_R6:
-        cmd.flags |= SCF_RSP_R7;
+        cmd.flags |= SCF_RSP_R6;
         break;
     case SDMMC_R7:
         cmd.flags |= SCF_RSP_R7;
@@ -280,7 +282,22 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         return _esp_err_to_sdmmc_err_code(res);
     }
     else if (cmd.error) {
+#ifdef CPU_FAM_ESP32S3
+        /*
+         * FIXME:
+         * The host controller triggers an invalid response error on ESP32-S3,
+         * although the response from the card is completely correct and is
+         * received completely by the host controller. The reason for this is
+         * not yet clear. The sequence of commands including all parameters
+         * sent to the host controller as well as the timing are exactly the
+         * same as in the IDF code The initialization of the host controller
+         * is also exactly the same as in the IDF code. The problem only
+         * occurs with the ESP32-S3, but not with the ESP32. As a workaround,
+         * we ignore an invalid response error ESP32-S3.
+         */
+#else
         return _esp_err_to_sdmmc_err_code(cmd.error);
+#endif
     }
 
     if ((resp_type == SDMMC_R1) || (resp_type == SDMMC_R1B)) {
@@ -397,7 +414,22 @@ static int _xfer_execute(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer,
         return _esp_err_to_sdmmc_err_code(res);
     }
     else if (cmd.error) {
+#ifdef CPU_FAM_ESP32S3
+        /*
+         * FIXME:
+         * The host controller triggers an invalid response error on ESP32-S3,
+         * although the response from the card is completely correct and is
+         * received completely by the host controller. The reason for this is
+         * not yet clear. The sequence of commands including all parameters
+         * sent to the host controller as well as the timing are exactly the
+         * same as in the IDF code The initialization of the host controller
+         * is also exactly the same as in the IDF code. The problem only
+         * occurs with the ESP32-S3, but not with the ESP32. As a workaround,
+         * we ignore an invalid response error ESP32-S3.
+         */
+#else
         return _esp_err_to_sdmmc_err_code(cmd.error);
+#endif
     }
 
     if (done) {

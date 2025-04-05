@@ -1,0 +1,25 @@
+From 132616012f4ea9ccad1e35611d8fb5132bc4efe4 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Mar 2025 10:22:41 +0100
+Subject: [PATCH 21/27] newlib: include the newlibc sys/uio.h
+
+---
+ components/newlib/platform_include/sys/uio.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/newlib/platform_include/sys/uio.h b/components/newlib/platform_include/sys/uio.h
+index 3ff3eba871..388fed3d66 100644
+--- a/components/newlib/platform_include/sys/uio.h
++++ b/components/newlib/platform_include/sys/uio.h
+@@ -6,6 +6,8 @@
+ 
+ #pragma once
+ 
++#include_next <sys/uio.h>
++
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
+-- 
+2.34.1
+

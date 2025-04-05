@@ -116,8 +116,7 @@ mode:
 
 - Controller SPI0 is reserved for caching external memory like Flash
 - Controller SPI1 is reserved for external memory like PSRAM
-- Controller SPI2 can be used as general purpose SPI (also called HSPI)
-- Controller SPI3 can be used as general purpose SPI (also called VSPI)
+- Controller SPI2 can be used as general purpose SPI (also called FSPI)
 
 Thus, only SPI2 (FSPI) can be used as general purpose SPI in RIOT as
 SPI_DEV(0).
@@ -176,15 +175,18 @@ UART_DEV(2) | RxD  | GPIO16 |`UART2_RXD` | optional, can be overridden
 There are two option on how to uese the JTAG interface on ESP32-C3:
 
 1.  Using the built-in USB-to-JTAG bridge connected to an USB cable as follows:
+    <center>
     USB Signal     | ESP32-C3 Pin
     :--------------|:-----------
     D- (white)     | GPIO18
     D+ (green)     | GPIO19
     V_Bus (red)    | 5V
     Ground (black) | GND
+    </center>
 
 2.  Using an external JTAG adapter connected to the JTAG interface exposed
     to GPIOs as follows:
+    <center>
     JTAG Signal | ESP32-C3 Pin
     :-----------|:-----------
     TRST_N      | CHIP_PU
@@ -193,10 +195,11 @@ There are two option on how to uese the JTAG interface on ESP32-C3:
     TCK         | GPIO6 (MTCK)
     TMS         | GPIO4 (MTMS)
     GND         | GND
-    <br>
+    </center><br>
     @note This option requires that the USB D- and USB D+ signals are connected
           to the ESP32-C3 USB interface at GPIO18 and GPIO19.
 
+<br>
 Using the built-in USB-to-JTAG is the default option, i.e. the JTAG interface
 of the ESP32-C3 is connected to the built-in USB-to-JTAG bridge. To use an
 external JTAG adapter, the JTAG interface of the ESP32-C3 has to be connected
