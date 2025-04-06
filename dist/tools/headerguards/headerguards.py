@@ -43,11 +43,14 @@ def fix_headerguard(filename):
     tmp.seek(0)
 
     guard_found = 0
+    pragma_once_found = 0
     include_next_found = 0
     guard_name = ""
     ifstack = 0
     for line in inlines:
-        if guard_found == 0:
+        if line.startswith("#pragma once"):
+            pragma_once_found += 1
+        if guard_found == 0 and pragma_once_found == 0:
             if line.startswith("#ifndef"):
                 guard_found += 1
                 guard_name = line[8:].rstrip()
@@ -73,7 +76,8 @@ def fix_headerguard(filename):
         tmp.write(line)
 
     tmp.seek(0)
-    if guard_found == 3:
+    if (pragma_once_found == 0 and guard_found == 3) or \
+       (pragma_once_found == 1 and guard_found == 0):
         if include_next_found == 0:
             for line in difflib.unified_diff(inlines, tmp.readlines(),
                                              "%s" % filename, "%s" % filename):
