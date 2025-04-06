@@ -21,6 +21,7 @@
  * @}
  */
 
+#include "rtc_utils.h"
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
@@ -122,6 +123,42 @@ static void _get_rtc_mem(void)
 static inline void _set_rtc_mem(void) {}
 static inline void _get_rtc_mem(void) {}
 #endif
+
+/* Override __attribute__((weak)) hooks */
+
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    uint32_t t_old = rtc_mktime(old_time);
+    uint32_t t_new = rtc_mktime(new_time);
+    uint32_t diff;
+    char sign;
+    if (t_new >= t_old) {
+        diff = t_new - t_old;
+        sign = '+';
+    }
+    else {
+        diff = t_old - t_new;
+        sign = '-';
+    }
+    printf("pre rtc_set_time: %c%"PRIu32"\n", sign, diff);
+}
+
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    uint32_t t_old = rtc_mktime(old_time);
+    uint32_t t_new = rtc_mktime(new_time);
+    uint32_t diff;
+    char sign;
+    if (t_new >= t_old) {
+        diff = t_new - t_old;
+        sign = '+';
+    }
+    else {
+        diff = t_old - t_new;
+        sign = '-';
+    }
+    printf("post rtc_set_time: %c%"PRIu32"\n", sign, diff);
+}
 
 int main(void)
 {
