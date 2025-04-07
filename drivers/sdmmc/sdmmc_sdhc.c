@@ -718,7 +718,7 @@ static int _wait_sdhc_busy(sdhc_t *sdhc)
 /**
  * @brief   Wait for a given event while checking for errors
  *
- * @param   state       SDHC device context
+ * @param   sdhc_dev    SDHC device generating the event
  * @param   event       Event to wait for [SDHC_NISTR_*]
  * @param   error_mask  Mask of errors to be checked [SDHC_EISTR_*]
  * @param   reset       Reset type in case of errors

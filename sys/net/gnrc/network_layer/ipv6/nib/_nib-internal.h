@@ -683,7 +683,7 @@ static inline _nib_offl_entry_t *_nib_dc_add(const ipv6_addr_t *next_hop,
 /**
  * @brief   Removes a destination cache entry
  *
- * @param[in,out] nib_dr    An entry.
+ * @param[in,out] nib_offl  Destination entry to remove.
  *
  * Corresponding on-link entry is removed, too.
  *
@@ -735,7 +735,7 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
  * @brief   Removes a prefix from the prefix list as well as the addresses
  *          associated with the prefix.
  *
- * @param[in,out] nib_offl    An entry.
+ * @param[in,out] pfx       The prefix to remove.
  *
  * Corresponding on-link entry is removed, too.
  */
@@ -872,8 +872,8 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
  * @return  0, on success.
  * @return  -ENETUNREACH, when no route was found.
  */
-int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
-                   gnrc_ipv6_nib_ft_t *entry);
+int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
+                   gnrc_ipv6_nib_ft_t *fte);
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || DOXYGEN
 /**

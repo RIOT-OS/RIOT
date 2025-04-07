@@ -610,8 +610,11 @@ ssize_t nanocoap_sock_unobserve_url(const char *url, coap_observe_client_t *ctx)
  * @param[out]  response buffer to write response to
  * @param[in]   len_max length of @p buffer
  *
- * @returns     length of response payload on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
                           void *response, size_t len_max);
@@ -624,8 +627,11 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
                               void *response, size_t len_max);
@@ -640,8 +646,11 @@ ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
                           const void *request, size_t len,
@@ -657,10 +666,11 @@ ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     0 if the request was sent and no response buffer was provided,
- *              independently of success (because no response is requested in that case)
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
                               const void *request, size_t len,
@@ -692,8 +702,12 @@ ssize_t nanocoap_sock_put_url(const char *url,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >0      Success, return value is the length of the response payload
+ * @retval  0       Success, response contained no payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                            const void *request, size_t len,
@@ -709,10 +723,12 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     0 if the request was sent and no response buffer was provided,
- *              independently of success (because no response is requested in that case)
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >0      Success, return value is the length of the response payload
+ * @retval  0       Success, response contained no payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
                                const void *request, size_t len,
@@ -745,8 +761,11 @@ ssize_t nanocoap_sock_post_url(const char *url,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
                             const void *request, size_t len,
@@ -763,10 +782,11 @@ ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @returns     length of response payload on success
- * @returns     0 if the request was sent and no response buffer was provided,
- *              independently of success (because no response is requested in that case)
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
                                 const void *request, size_t len,
@@ -795,8 +815,10 @@ ssize_t nanocoap_sock_fetch_url(const char *url,
  * @param[in]   sock    socket to use for the request
  * @param[in]   path    remote path (with query) to delete
  *
- * @returns     0 on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @retval  0       Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path);
 
@@ -966,8 +988,11 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
  * @param[in]       len     Total length of the buffer associated with the
  *                          request
  *
- * @returns     length of response on success
- * @returns     @see nanocoap_sock_request_cb on error
+ * @return          length of response payload or error code
+ * @retval  >=0     Success, return value is the length of the response payload
+ * @retval  <0      Failure, return value is the error code. See
+                    @ref nanocoap_sock_request_cb on error for the list of
+                    error codes
  */
 ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
                          const sock_udp_ep_t *remote, size_t len);

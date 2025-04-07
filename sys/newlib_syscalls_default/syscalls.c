@@ -464,7 +464,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *buf)
  *
  * @param[in]  r        pointer to reent structure
  * @param[in]  name     path to file
- * @param[out] buf      pointer to stat struct to fill
+ * @param[out] st       pointer to stat struct to fill
  *
  * @return 0 on success
  * @return -1 on error, @c r->_errno set to a constant from errno.h to indicate the error
