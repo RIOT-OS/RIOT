@@ -8,7 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../../../..
 
 # use GNRC by default
-LWIP_IPV4 ?= 0
+LWIP_IPV4 ?= 1
 LWIP_IPV6 ?= 0
 
 # Include packages that pull up and auto-init the link layer.
