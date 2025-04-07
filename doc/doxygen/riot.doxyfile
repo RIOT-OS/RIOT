@@ -1356,6 +1356,8 @@ HTML_COLORSTYLE_SAT    = 62
 
 HTML_COLORSTYLE_GAMMA  = 80
 
+HTML_COLORSTYLE        = LIGHT
+
 # If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML
 # page will contain the date and time when the page was generated. Setting this
 # to YES can help to show when doxygen was last run and thus if the
