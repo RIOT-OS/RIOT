@@ -43,21 +43,28 @@ include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
 .PHONY: doc doc-man doc-latex
-doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT)
+doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT) doxygen-version
+
+# Check the Doxygen version and print a warning
+.PHONY: doxygen-version
+.NOTPARALLEL: doxygen-version
+doxygen-version:
 	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
-		sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
-		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
-		"It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
-		"to avoid incorrectly formatted output.$(COLOR_RESET)"; \
+	  sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
+	  $(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
+	  "It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
+	  "to avoid incorrectly formatted output.\nYou can use 'make doc-ci' to build" \
+	  "the documentation with the required Doxygen version, which will be downloaded" \
+	  "and (if required) compiled locally.$(COLOR_RESET)"; \
 	fi
 
 # GraphViz is a mandatory dependency to generate the Doxygen documentation for RIOT
 .PHONY: graphviz-check
 graphviz-check:
 	@command -v dot >/dev/null 2>&1 || { \
-		$(COLOR_ECHO) "$(COLOR_RED)Error: GraphViz (dot) is not installed." \
-    "GraphViz is mandatory to generate the RIOT documentation.$(COLOR_RESET)"; \
-		exit 1; \
+	  $(COLOR_ECHO) "$(COLOR_RED)Error: GraphViz (dot) is not installed." \
+	  "GraphViz is mandatory to generate the RIOT documentation.$(COLOR_RESET)"; \
+	  exit 1; \
 	}
 
 .PHONY: doc-ci
