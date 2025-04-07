@@ -311,7 +311,9 @@ is considered as unused. To avoid this, one should add
 
 ## Header Guards
 
-All files are required to have header guards of the form
+All header files are required to either contain the widely supported `#pragma once`
+preprocessor directive as the first line after the [copyright note](#documentation),
+or header guards of the form
 
 ```c
 #ifndef PATH_TO_FILE_FILENAME_H
@@ -320,6 +322,9 @@ All files are required to have header guards of the form
 ...
 #endif /* PATH_TO_FILE_FILENAME_H */
 ```
+
+Header guards are deprecated in RIOT header files and will gradually be converted
+to `#pragma once`.
 
 Rules for generating the guard name:
 
