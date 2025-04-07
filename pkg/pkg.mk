@@ -195,3 +195,8 @@ distclean:: clean
 # Reset goal for package
 .DEFAULT_GOAL =
 endif
+
+# Disabling some diagnostics: These issues needs to be fixed upstream
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-documentation
+endif
