@@ -1,6 +1,6 @@
 # Manifest Generator
 
-This repository contains a tool to generate manifests following the specification in https://tools.ietf.org/html/draft-ietf-suit-manifest-03.
+This repository contains a tool to generate manifests following the specification in https://tools.ietf.org/html/draft-ietf-suit-manifest-09.
 
 # Installing
 
