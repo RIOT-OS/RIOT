@@ -453,7 +453,6 @@ static inline senml_numeric_t senml_duration_ms(int32_t ms)
  *
  * @param n Numeric value to set.
  * @param ms Duration in milliseconds.
- * @return Numeric representation of the duration.
  */
 static inline void senml_set_duration_ms(senml_numeric_t *n, int32_t ms)
 {
@@ -476,7 +475,6 @@ static inline senml_numeric_t senml_duration_us(int32_t us)
  *
  * @param n Numeric value to set.
  * @param us Duration in microseconds.
- * @return Numeric representation of the duration.
  */
 static inline void senml_set_duration_us(senml_numeric_t *n, int32_t us)
 {

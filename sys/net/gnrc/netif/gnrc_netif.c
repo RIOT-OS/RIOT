@@ -1735,8 +1735,6 @@ static event_t *_gnrc_netif_fetch_event(gnrc_netif_t *netif)
  *
  * @param[in]   netif   gnrc_netif instance to operate on
  * @param[out]  msg     pointer to message buffer to write the first received message
- *
- * @return >0 if msg contains a new message
  */
 static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 {

@@ -142,8 +142,6 @@ void adc_continuous_begin(adc_res_t res);
  *
  * @note requires the `periph_adc_continuous` feature
  *
- * @brief   Sample a value from the given ADC line
- *
  * @return                  the sampled value on success
  */
 int32_t adc_continuous_sample(adc_t line);
