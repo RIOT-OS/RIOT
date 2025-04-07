@@ -344,6 +344,11 @@ extern void auto_init_gnrc_ipv6_static_addr(void);
 AUTO_INIT(auto_init_gnrc_ipv6_static_addr,
           AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR);
 #endif
+#if IS_USED(MODULE_PSA_CRYPTO)
+extern void psa_crypto_init(void);
+AUTO_INIT(psa_crypto_init,
+          AUTO_INIT_PRIO_MOD_PSA_CRYPTO);
+#endif
 
 void auto_init(void)
 {
