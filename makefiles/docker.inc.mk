@@ -5,7 +5,7 @@
 # When the docker image is updated, checks at
 # dist/tools/buildsystem_sanity_check/check.sh start complaining in CI, and
 # provide the latest values to verify and fill in.
-DOCKER_TESTED_IMAGE_REPO_DIGEST := 0993a39a90e0b573637ea488d51fb33ba1cbeacbfbae4a27cca2091d0873d383
+DOCKER_TESTED_IMAGE_REPO_DIGEST := 63a87608742890b1ecfc2eea5289d32298d6696a4bd1d9d11a9da2fd32071e4f
 
 DOCKER_PULL_IDENTIFIER := docker.io/riot/riotbuild@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
 export DOCKER_IMAGE ?= $(DOCKER_PULL_IDENTIFIER)
