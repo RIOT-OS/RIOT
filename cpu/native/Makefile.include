@@ -7,6 +7,12 @@ ifneq (,$(filter periph_can,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter can,$(USEMODULE)))
+  # In case of native, we rely on the real CAN implementation to handle
+  # the nitty-gritty details such as loop delay.
+  CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
+endif
+
 ifneq (,$(filter periph_timer,$(USEMODULE)))
   # using timer_settime requires -lrt
   LINKFLAGS += -lrt
