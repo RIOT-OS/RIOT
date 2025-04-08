@@ -33,6 +33,112 @@ static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, i
     iolist->iol_next = next;
 }
 
+static inline bool iolist_is_empty(const iolist_t* iolist)
+{
+    while (iolist) {
+        if (iolist->iol_len > 0) {
+            return false;
+        }
+        iolist = iolist->iol_next;
+    }
+
+    return true;
+}
+
+static void iolist_append(iolist_t** iolist, iolist_t* chunk)
+{
+    assert(iolist);
+    if (*iolist) {
+        iolist_t* v = *iolist;
+        while (v->iol_next) {
+            v = v->iol_next;
+        }
+        v->iol_next = chunk;
+    }
+    else {
+        *iolist = chunk;
+    }
+}
+
+bool unicoap_message_payload_is_empty(const unicoap_message_t* message)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS:
+        return iolist_is_empty(message->payload_chunks);
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        return message->payload_size == 0;
+    default:
+        UNREACHABLE();
+        return -1;
+    }
+}
+
+ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* buffer, size_t capacity)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS:
+        return iolist_to_buffer(message->payload_chunks, buffer, capacity);
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        if (message->payload_size > capacity) {
+            UNICOAP_DEBUG("buf too small " _NEED_HAVE "\n", message->payload_size, capacity);
+            return -ENOBUFS;
+        }
+        memcpy(buffer, message->payload, message->payload_size);
+        return message->payload_size;
+    default:
+        UNREACHABLE();
+        return -1;
+    }
+}
+
+ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint8_t* buffer, size_t capacity)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS: {
+        assert(buffer);
+        ssize_t res = iolist_to_buffer(message->payload_chunks, buffer, capacity);
+        if (res < 0) {
+            UNICOAP_DEBUG("buf too small " _NEED_HAVE "\n", iolist_size(message->payload_chunks), capacity);
+            return res;
+        }
+        message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
+        message->payload = buffer;
+        message->payload_size = res;
+        return res;
+    }
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        return message->payload_size;
+    default:
+        UNREACHABLE();
+        return -1;
+    }
+}
+
+void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* chunk)
+{
+    assert(message->payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS);
+    if (message->payload_chunks) {
+        iolist_append(&message->payload_chunks, chunk);
+    }
+    else {
+        message->payload_chunks = chunk;
+    }
+}
+
+static inline iolist_t* _append_payload_to_iolist(const unicoap_message_t* message, iolist_t* element)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS:
+        return message->payload_chunks;
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        iolist_init(element, message->payload, message->payload_size, NULL);
+        return element;
+    default:
+        UNREACHABLE();
+        return NULL;
+    }
+}
+
 /**
  * @pre 4 iolists
  */
@@ -52,14 +158,14 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
                     unicoap_message_options_size(message), NULL);
     }
 
-    if (message->payload_size > 0) {
+    if (unicoap_message_payload_get_size(message) > 0) {
         element->iol_next = element + 1;
         element += 1;
 
         header[header_size] = UNICOAP_PAYLOAD_MARKER;
         iolist_init(element, &header[header_size], 1, element + 1);
-        element += 1;
-        iolist_init(element, (uint8_t*)message->payload, message->payload_size, NULL);
+
+        element->iol_next = _append_payload_to_iolist(message, element + 1);
     }
 
     return 0;
@@ -76,17 +182,20 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity, con
         }
         memcpy(pdu, unicoap_message_options_data(message), unicoap_message_options_size(message));
         pdu += unicoap_message_options_size(message);
+        capacity -= unicoap_message_options_size(message);
     }
 
-    if (message->payload_size > 0) {
-        /* greater than, not greater equals due to need for payload marker */
-        if (capacity <= message->payload_size) {
-            return -ENOBUFS;
-        }
+    if (unicoap_message_payload_get_size(message) > 0) {
         *pdu = UNICOAP_PAYLOAD_MARKER;
         pdu += 1;
-        memcpy(pdu, message->payload, message->payload_size);
-        return unicoap_message_options_size(message) + 1 + message->payload_size;
+        capacity -= 1;
+
+        ssize_t size = 0;
+        if ((size = unicoap_message_payload_copy(message, pdu, capacity)) < 0) {
+            return -ENOBUFS;
+        }
+
+        return unicoap_message_options_size(message) + 1 + size;
     }
     else {
         return unicoap_message_options_size(message);

@@ -40,29 +40,72 @@ extern "C" {
  * @{
  */
 /**
+ * @brief A type indicating how a message's payload is represented
+ */
+typedef enum {
+    /**
+     * @brief Contiguous payload buffer
+     */
+    UNICOAP_PAYLOAD_CONTIGUOUS = 0,
+
+    /**
+     * @brief @ref iolist_t payload vector
+     */
+    UNICOAP_PAYLOAD_NONCONTIGUOUS = 1
+} unicoap_payload_representation_t;
+
+/**
  * @brief Generic CoAP message
+ *
+ * The payload of this message can either be represented as a vector (@ref iolist_t) or a buffer.
+ * You use @ref unicoap_message_payload_get and @ref unicoap_message_payload_set to work with contiguous payloads.
+ * For iolists, refer to @ref unicoap_message_payload_get_chunks, @ref unicoap_message_payload_set_chunks, and
+ * @ref unicoap_message_payload_append_chunk. Regardless of the representation, you can always use
+ * @ref unicoap_message_payload_get_size. For vectored payload, this entails an overhead with a complexity of `O(n)`.
+ * If you just want to check whether there is _any_ payload, use @ref unicoap_message_payload_is_empty.
+ * You can also make the payload contiguous by calling @ref unicoap_message_payload_make_contiguous, which mutates the
+ * message. If you purely want to obtain a contiguous representation stored in another buffer, use
+ * @ref unicoap_message_payload_copy.
+ *
  */
 typedef struct {
     /**
      * @brief Message options
      *
-     * Key-Value entries akin to HTTP headers
+     * Key-value entries akin to HTTP headers
      *
      * @see @ref net_unicoap_options
      */
     unicoap_options_t* options;
 
     /**
-     * @brief Message payload
+     * @brief Payload representation
      */
-    uint8_t* payload;
+    union {
+        /**
+         * @brief Contiguous payload
+         */
+        struct {
+            /**
+             * @brief Message payload
+             *
+             * Access via
+             */
+            uint8_t* payload;
 
-    /**
-     * @brief Size of message payload
-     *
-     * Number of bytes in @ref unicoap_message_t.payload
-     */
-    size_t payload_size;
+            /**
+             * @brief Size of message payload
+             *
+             * Number of bytes in @ref unicoap_message_t.payload
+             */
+            size_t payload_size;
+        };
+
+        /**
+         * @brief Noncontiguous payload
+         */
+        iolist_t* payload_chunks;
+    };
 
     union {
         /**
@@ -101,7 +144,126 @@ typedef struct {
          */
         unicoap_signal_t signal;
     };
+
+    /**
+     * @brief A value indicating how the payload is represented
+     *
+     * If the payload is noncontiguous, the @ref unicoap_message_t.payload_chunks property must be accessed.
+     * Otherwise, only @ref unicoap_message_t.payload must be read and written to.
+     */
+    unicoap_payload_representation_t payload_representation : 1;
 } unicoap_message_t;
+
+/**
+ * @brief Retrieves contiguous message payload, if available
+ * @pre Payload representation must be @ref UNICOAP_PAYLOAD_CONTIGUOUS
+ *
+ * @param message Message to retrieve payload buffer from
+ *
+ * @returns Payload buffer pointer
+ */
+static inline uint8_t* unicoap_message_payload_get(unicoap_message_t* message)
+{
+    assert(message->payload_representation == UNICOAP_PAYLOAD_CONTIGUOUS);
+    return message->payload;
+}
+
+/**
+ * @brief Assigns the given message a contiguous payload
+ *
+ * @param message Message
+ * @param[in] payload Payload buffer
+ * @param size Size of @p payload in bytes
+ */
+static inline void unicoap_message_payload_set(unicoap_message_t* message, uint8_t* payload, size_t size)
+{
+    message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
+    message->payload = payload;
+    message->payload_size = size;
+}
+
+/**
+ * @brief Retrieves noncontiguous message payload, if available
+ * @pre Payload representation must be @ref UNICOAP_PAYLOAD_NONCONTIGUOUS
+ *
+ * @param message Message to retrieve payload vector from
+ *
+ * @returns Payload vector pointer
+ */
+static inline iolist_t* unicoap_message_payload_get_chunks(unicoap_message_t* message)
+{
+    assert(message->payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS);
+    return message->payload_chunks;
+}
+
+/**
+ * @brief Assigns the given message a noncontiguous payload
+ *
+ * @param message Message
+ * @param[in] chunks Payload vector
+ */
+static inline void unicoap_message_payload_set_chunks(unicoap_message_t* message, iolist_t* chunks)
+{
+    message->payload_representation = UNICOAP_PAYLOAD_NONCONTIGUOUS;
+    message->payload_chunks = chunks;
+}
+
+/**
+ * @brief Appends a payload chunk to
+ * @pre Message's payload must be noncontiguous
+ *
+ * @param message Message
+ * @param[in] chunk Payload chunk
+ */
+void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* chunk);
+
+/**
+ * @brief Retrieves payload size, regardless of payload representation
+ * @param message Message whose payload size to compute
+ * @returns Payload size in bytes
+ *
+ * @note This function calls @ref iolist_size, thus iterates over all vector elements. The complexity is $O(n)$.
+ */
+static inline size_t unicoap_message_payload_get_size(const unicoap_message_t* message)
+{
+    return message->payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS ?
+               iolist_size(message->payload_chunks) :
+               message->payload_size;
+}
+
+/**
+ * @brief Determines whether message has any payload
+ * @param message Message with payload in question
+ * @return A boolean indicating whether any payload bytes are present
+ *
+ * The given message may still have a buffer or iolist vector associated, yet this function returns `false` if the buffer or vector
+ * is empty.
+ */
+bool unicoap_message_payload_is_empty(const unicoap_message_t* message);
+
+/**
+ * @brief Copies payload into given buffer
+ *
+ * @param message Message whose payload to copy
+ * @param[in,out] buffer Destination payload buffer
+ * @param capacity Capacity of @p buffer in bytes
+ *
+ * @returns Payload size in bytes, `-ENOBUFS` if given buffer is too small
+ *
+ * You can call this method regardless of whether payload is stored contiguously or noncontiguously.
+ */
+ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* buffer, size_t capacity);
+
+/**
+ * @brief Copies noncontiguous payload into contiguous storage buffer
+ * @pre None, if payload is already contiguous, this method does not copy.
+ * @param[in,out] message Message whose payload to make contiguous
+ * @param[in,out] buffer Destination payload buffer
+ * @param capacity Capacity of @p buffer in bytes
+ *
+ * @returns Payload size in bytes, `-ENOBUFS` if given buffer is too small
+ */
+ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint8_t* buffer, size_t capacity);
 
 /**
  * @brief Properties of a given CoAP message

@@ -18,9 +18,11 @@
 
 Test* tests_unicoap_options(void);
 Test* tests_unicoap_pdu(void);
+Test* tests_unicoap_message(void);
 
 void tests_unicoap(void)
 {
     TESTS_RUN(tests_unicoap_pdu());
     TESTS_RUN(tests_unicoap_options());
+    TESTS_RUN(tests_unicoap_message());
 }
