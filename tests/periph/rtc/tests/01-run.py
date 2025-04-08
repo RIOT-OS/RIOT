@@ -13,9 +13,33 @@ from testrunner import run
 
 BOARD = os.getenv('BOARD', 'native')
 DATE_PATTERN = r'\d{4}\-\d{2}\-\d{2} \d{2}\:\d{2}\:\d{2}'
+TEST_RTC_MEM = 'periph_rtc_mem' in os.getenv('FEATURES_USED', '')
 
 
-def testfunc(child):
+def test_rtc_mem(child):
+    child.sendline("rtc_clear")
+    child.expect("RTC mem cleared")
+
+    child.sendline("rtc_verify")
+    child.expect("RTC mem content does not match")
+
+    child.sendline("rtc_write")
+    child.expect("RTC mem set")
+
+    child.sendline("rtc_verify")
+    child.expect("RTC mem OK")
+
+    child.sendline("rtc_reboot")
+    child.expect("Rebooting")
+
+    child.sendline("rtc_verify")
+    child.expect("RTC mem OK")
+
+    child.sendline("rtc_clear")
+
+
+def test_alarm(child):
+    child.sendline("rtc_test_alarms")
     child.expect(r'This test will display \'Alarm\!\' every 2 seconds '
                  r'for (\d{1}) times')
     alarm_count = int(child.match.group(1))
@@ -43,6 +67,10 @@ def testfunc(child):
     for _ in range(alarm_count):
         child.expect_exact('Alarm!')
 
+    child.expect_exact(">")
+
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    if TEST_RTC_MEM:
+        run(test_rtc_mem)
+    sys.exit(run(test_alarm))
