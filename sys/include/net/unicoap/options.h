@@ -800,6 +800,1552 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
 /** @} */
 /** @} */
 
+/* MARK: - Predefined Accessors - */
+
+/**
+ * @defgroup net_unicoap_options_predefined Predefined Options
+ * @ingroup net_unicoap_options
+ * @brief Read, set, and add options predefined by IANA
+ * @{
+ */
+/* MARK: - Content-Format */
+/**
+ * @name Content-Format
+ * @{
+ */
+/**
+ * @brief Retrieves the `Content-Format` option value, if present
+ *
+ * @param options Options
+ * @param[out] format Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_content_format(unicoap_options_t* options,
+                                                         unicoap_content_format_t* format)
+{
+    return unicoap_options_get_uint16(options, UNICOAP_OPTION_CONTENT_FORMAT, format);
+}
+
+/**
+ * @brief Sets the `Content-Format` option
+ *
+ * @param options Options
+ * @param format Option value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_content_format(unicoap_options_t* options,
+                                                     unicoap_content_format_t format)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_CONTENT_FORMAT, format);
+}
+
+/**
+ * @brief Removes the `Content-Format` option, if present
+ *
+ * @param options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_content_format(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_CONTENT_FORMAT);
+}
+/** @} */
+
+/* MARK: - Accept */
+/**
+ * @name Accept
+ * @{
+ */
+/**
+ * @brief Retrieves the `Accept` option value, if present
+ *
+ * @param options Options
+ * @param[out] format Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_accept(unicoap_options_t* options,
+                                                 unicoap_content_format_t* format)
+{
+    return unicoap_options_get_uint16(options, UNICOAP_OPTION_ACCEPT, format);
+}
+
+/**
+ * @brief Sets the `Accept` option
+ *
+ * @param options Options
+ * @param format Option value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_accept(unicoap_options_t* options,
+                                             unicoap_content_format_t format)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_ACCEPT, format);
+}
+
+/**
+ * @brief Removes the `Accept` option, if present
+ *
+ * @param options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_accept(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_ACCEPT);
+}
+/** @} */
+
+/* MARK: - Max-Age */
+/**
+ * @name Max-Age
+ * @{
+ */
+/**
+ * @brief Retrieves the `Max-Age` option value, if present
+ *
+ * @param options Options
+ * @param[out] age Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_max_age(unicoap_options_t* options, uint32_t* age)
+{
+    return unicoap_options_get_uint32(options, UNICOAP_OPTION_MAX_AGE, age);
+}
+
+/**
+ * @brief Sets the `Max-Age` option
+ *
+ * @param options Options
+ * @param age Option value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_max_age(unicoap_options_t* options, uint32_t age)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_MAX_AGE, age);
+}
+
+/**
+ * @brief Removes the `Max-Age` option, if present
+ *
+ * @param options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_max_age(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_MAX_AGE);
+}
+/** @} */
+
+/* MARK: - If-Match */
+/**
+ * @name If-Match
+ * @{
+ */
+/**
+ * @brief Retrieves the first `If-Match` option value, if any
+ *
+ * @param options Options
+ * @param[in,out] value Option value. Provide a pointer to a an `uint8_t` pointer, which may be `NULL`.
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_first_if_match(unicoap_options_t* options,
+                                                         uint8_t** value)
+{
+    return unicoap_options_get(options, UNICOAP_OPTION_IF_MATCH, value);
+}
+
+/**
+ * @brief Retrieves the first `If-Match` option value, if any
+ *
+ * @param iterator Option iterator
+ * @param[in,out] value Option value. Provide a pointer to a an `uint8_t` pointer, which may be `NULL`.
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator_t* iterator,
+                                                        uint8_t** value)
+{
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_IF_MATCH, value);
+}
+
+/**
+ * @brief Adds a repeatable `If-Match` option with the given value
+ *
+ * Use this function to insert multiple `If-Match` options
+ *
+ * @param[in] options Options
+ * @param[in] value Unsigned integer option value
+ * @param value_size Number of bytes to copy from @p value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_if_match(unicoap_options_t* options, uint8_t* value,
+                                               size_t value_size)
+{
+    assert(value_size <= 8);
+    return unicoap_options_add(options, UNICOAP_OPTION_IF_MATCH, value, value_size);
+}
+
+/**
+ * @brief Removes all `If-Match` options, if any
+ *
+ * @param options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_all_if_match(unicoap_options_t* options)
+{
+    return unicoap_options_remove_all(options, UNICOAP_OPTION_IF_MATCH);
+}
+/** @} */
+
+/* MARK: - If-None-Match */
+/**
+ * @name If-None-Match Option
+ * @{
+ */
+/**
+ * @brief Determines whether `If-None-Match` is present
+ *
+ * @param options Options
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline bool unicoap_options_get_if_none_match(unicoap_options_t* options)
+{
+    return unicoap_options_contains(options, UNICOAP_OPTION_IF_NONE_MATCH);
+}
+
+/**
+ * @brief Sets `If-None-Match` options
+ *
+ * @note This option's value is indicated by the option being present or not.
+ *
+ * @param options Options
+ * @param value A boolean value indicating whether to set (`true`) or to remove the `If-None-Match` option (`false`)
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_if_none_match(unicoap_options_t* options, bool value)
+{
+    if (value) {
+        return unicoap_options_remove(options, UNICOAP_OPTION_IF_NONE_MATCH);
+    }
+    else {
+        return unicoap_options_set(options, UNICOAP_OPTION_IF_NONE_MATCH, NULL, 0);
+    }
+}
+/** @} */
+
+/* MARK: - ETag */
+/**
+ * @name ETag
+ * @{
+ */
+/**
+ * @brief Retrieves the `ETag` option value, if any
+ *
+ * This is a zero-copy API.
+ *
+ * @param options Options
+ * @param[out] value Pointer to a variable that will be assigned a pointer to the ETag
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_first_etag(unicoap_options_t* options, uint8_t** value)
+{
+    return unicoap_options_get(options, UNICOAP_OPTION_ETAG, value);
+}
+
+/**
+ * @brief Gets the next `ETag` option provided by the given iterator
+ *
+ * This is a zero-copy API.
+ *
+ * @param iterator Option iterator
+ * @param[out] value Pointer to a variable that will be assigned a pointer to the ETag
+ *
+ * @see @ref unicoap_options_get_next_by_number
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-1` if the iterator is finished
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* iterator,
+                                                    uint8_t** value)
+{
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_ETAG, value);
+}
+
+/**
+ * @brief Adds a repeatable `ETag` option with the given value
+ *
+ * Use this function to insert multiple `ETag` options
+ *
+ * @param[in] options Options
+ * @param[in] value Unsigned integer option value
+ * @param value_size Number of bytes to copy from @p value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_etag(unicoap_options_t* options, uint8_t* value,
+                                           size_t value_size)
+{
+    assert((value_size >= 1) && (value_size <= 8));
+    return unicoap_options_add(options, UNICOAP_OPTION_ETAG, value, value_size);
+}
+
+/**
+ * @brief Removes all `Etag` options, if any
+ *
+ * @param options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_etags(unicoap_options_t* options)
+{
+    return unicoap_options_remove_all(options, UNICOAP_OPTION_ETAG);
+}
+/** @} */
+
+/* MARK: - Uri-Path */
+/**
+ * @name Uri-Path
+ * @{
+ */
+/**
+ * @brief Copies the Uri-Path option values into the given path buffer, forming an absolute path
+ *
+ * @param[in] options Options
+ * @param[in,out] path Buffer to copy path value into, must be large enough to carry characters and null-terminator.
+ * @param capacity Number of usable bytes in @p path
+ *
+ * @returns Path length, excluding null-terminator, but including separators.
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_uri_path(unicoap_options_t* options, char* path,
+                                                   size_t capacity)
+{
+    return unicoap_options_get_strings(options, UNICOAP_OPTION_URI_PATH, path, capacity, '/');
+}
+
+/**
+ * @brief Splits the given path into separate `Uri-Path` values and adds them as option values
+ *
+ * Use this function to set an entire path, which would normally involve adding each path component individually.
+ *
+ * @param[in] options Options
+ * @param[in] path Array of characters
+ * @param length String length
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_uri_path(unicoap_options_t* options, char* path, size_t length)
+{
+    return unicoap_options_add_values(options, UNICOAP_OPTION_URI_PATH, (uint8_t*)path,
+                                      length, '/');
+}
+
+/**
+ * @brief Splits the given path into separate `Uri-Path` values and adds them as option values
+ *
+ * Use this function to set an entire path, which would normally involve adding each path component individually.
+ *
+ * @param[in] options Options
+ * @param[in] path Null-terminated path
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_uri_path_string(unicoap_options_t* options, char* path)
+{
+    return unicoap_options_add_uri_path(options, path, strlen(path));
+}
+
+/**
+ * @brief Gets the next `Uri-Path`, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[out] component A pointer to next option's string value
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t
+unicoap_options_get_next_uri_path_component(unicoap_options_iterator_t* iterator, char** component)
+{
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_URI_PATH,
+                                              (uint8_t**)component);
+}
+
+/**
+ * @brief Adds resource path component as single `Uri-Path` option
+ *
+ * @param[in] options Options
+ * @param[in] component Path component string, does not need to be null-terminated
+ * @param length Length of @p component
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_uri_path_component(unicoap_options_t* options,
+                                                         const char* component, size_t length)
+{
+    assert(length <= 0xff);
+    return unicoap_options_add_string(options, UNICOAP_OPTION_URI_PATH, component, length);
+}
+
+/**
+ * @brief Adds null-terminated resource path component as single `Uri-Path` option
+ *
+ * @param[in] options Options
+ * @param[in] component Null-terminated path component string, does not need to be null-terminated
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_uri_path_component_string(unicoap_options_t* options,
+                                                                const char* component)
+{
+    return unicoap_options_add(options, UNICOAP_OPTION_URI_PATH, (uint8_t*)component, strlen(component));
+}
+
+/**
+ * @brief Removes all `Uri-Path` options
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_uri_path(unicoap_options_t* options)
+{
+    return unicoap_options_remove_all(options, UNICOAP_OPTION_URI_PATH);
+}
+/** @} */
+
+/* MARK: - Uri-Query */
+/**
+ * @name Uri-Query
+ * @{
+ */
+/**
+ * @brief Retrieves URI query string
+ *
+ * @param[in] options Options
+ * @param[in,out] query Query string buffer
+ * @param capacity Buffer capacity @p query
+ *
+ * @returns Length of query string including separators
+ * @returns Negative integer on error
+ *
+ * This function generates a query string by concatenating all `Uri-Query` options and null-terminates the resulting
+ * string.
+ *
+ * **Example**: `a=1`, `b`, `c=yes` is turned into `?a=1&b&c=yes`
+ */
+static inline ssize_t unicoap_options_get_uri_queries(unicoap_options_t* options, char* query,
+                                                      size_t capacity)
+{
+    ssize_t res =
+        unicoap_options_get_strings(options, UNICOAP_OPTION_URI_QUERY, query, capacity, '&');
+    if (res > 0) {
+        *query = '?';
+    }
+    return res;
+}
+
+/**
+ * @brief Retrieves first URI query from options
+ *
+ * @param[in] options Options
+ * @param[out] component A pointer to a string variable
+ *
+ * @returns Length of query value in bytes
+ * @returns Negative integer on error
+ *
+ * This function makes @p component point to the string value of the first `Uri-Query` option.
+ */
+static inline ssize_t unicoap_options_get_first_uri_query(unicoap_options_t* options,
+                                                          char** component)
+{
+    return unicoap_options_get(options, UNICOAP_OPTION_URI_QUERY, (uint8_t**)component);
+}
+
+/**
+ * @brief Gets the next `Uri-Query`, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[out] component A pointer to next option's string value
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterator_t* iterator,
+                                                         char** component)
+{
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_URI_QUERY,
+                                              (uint8_t**)component);
+}
+
+/**
+ * @brief Gets the next query option matching the given name, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * This method splits query values at the `=` character. It is used both for `Uri-Query` and `Location-Query`.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[out] number Option number
+ * @param[in] name Name of query paramter to find
+ * @param[out] value Pointer to a string variable
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* iterator,
+                                               unicoap_option_number_t number, const char* name,
+                                               char** value);
+
+/**
+ * @brief Gets the next `Uri-Query` option matching the given name, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * This method splits query values at the `=` character.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[in] name Name of query paramter to find
+ * @param[out] value Pointer to a string variable
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t
+unicoap_options_get_next_uri_query_by_name(unicoap_options_iterator_t* iterator, const char* name,
+                                           char** value)
+{
+    return unicoap_options_get_next_query_by_name(iterator, UNICOAP_OPTION_URI_QUERY, name, value);
+}
+
+/**
+ * @brief Gets the first `Uri-Query` option matching the given name
+ *
+ * This is a zero-copy API.
+ *
+ * This method splits query values at the `=` character.
+ *
+ * @param[in,out] options Options
+ * @param[in] name Name of query paramter to find
+ * @param[out] value Pointer to a string variable
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_options_t* options,
+                                                                  const char* name, char** value)
+{
+    unicoap_options_iterator_t iterator;
+    unicoap_options_iterator_init(&iterator, options);
+    return unicoap_options_get_next_uri_query_by_name(&iterator, name, value);
+}
+
+/**
+ * @brief Adds URI query
+ *
+ * @param[in] options Options
+ * @param[in] query Query name and/or value, e.g., `key=value` or `key`, or arbitrary...
+ * @param length Length of @p query
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_uri_query(unicoap_options_t* options, const char* query, size_t length)
+{
+    assert(length <= 0xff);
+    return unicoap_options_add_string(options, UNICOAP_OPTION_URI_QUERY, query, length);
+}
+
+/**
+ * @brief Adds null-terminated URI query
+ *
+ * @param[in] options Options
+ * @param[in] query Null-terminated query name and/or value, e.g., `key=value` or `key`, or arbitrary...
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_uri_query_string(unicoap_options_t* options, const char* query)
+{
+    return unicoap_options_add_uri_query(options, query, strlen(query));
+}
+
+/**
+ * @brief Adds multiple URI queries from string
+ *
+ * @param[in] options Options
+ * @param[in] queries Query string, e.g., `a=0&b&c=yes`
+ * @param length Length of @p queries
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ *
+ * This function splits the given string at occurrences of the `&` character and inserts the resulting components
+ * as individual `Uri-Query` strings
+ */
+static inline int unicoap_options_add_uri_queries(unicoap_options_t* options, const char* queries,
+                                                  size_t length)
+{
+    return unicoap_options_add_values(options, UNICOAP_OPTION_URI_QUERY, (uint8_t*)queries, length,
+                                      '&');
+}
+
+/**
+ * @brief Adds multiple URI queries from a null-terminated string
+ *
+ * @param[in] options Options
+ * @param[in] queries Null-terminated query string, e.g., `a=0&b&c=yes`
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ *
+ * This function splits the given string at occurrences of the `&` character and inserts the resulting components
+ * as individual `Uri-Query` strings
+ */
+static inline int unicoap_options_add_uri_queries_string(unicoap_options_t* options, const char* queries)
+{
+    return unicoap_options_add_uri_queries(options, queries, strlen(queries));
+}
+
+/**
+ * @brief Removes all `Uri-Query` options
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_uri_queries(unicoap_options_t* options)
+{
+    return unicoap_options_remove_all(options, UNICOAP_OPTION_URI_QUERY);
+}
+/** @} */
+
+/* MARK: - Uri-Port */
+/**
+ * @name Uri-Port
+ * @{
+ */
+/**
+ * @brief Retrieves the `Uri-Port` option value, if any
+ *
+ * @param options Options
+ * @param[out] port URI port
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_uri_port(unicoap_options_t* options, uint16_t* port)
+{
+    return unicoap_options_get_uint16(options, UNICOAP_OPTION_URI_PORT, port);
+}
+
+/**
+ * @brief Sets the `Uri-Port` option
+ *
+ * @param[in] options Options
+ * @param port Port
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_uri_port(unicoap_options_t* options, uint16_t port)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_URI_PORT, port);
+}
+
+/**
+ * @brief Removes the `Uri-Port` option
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_uri_port(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_URI_PORT);
+}
+/** @} */
+
+/* MARK: - Uri-Host */
+/**
+ * @name Uri-Host
+ * @{
+ */
+/**
+ * @brief Retrieves the `Uri-Host` option value, if any
+ *
+ * @param options Options
+ * @param host Host string buffer
+ * @param capacity The capacity of @p host in bytes
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_uri_host(unicoap_options_t* options, char* host,
+                                                   size_t capacity)
+{
+    return unicoap_options_get_string(options, UNICOAP_OPTION_URI_HOST, host, capacity);
+}
+
+/**
+ * @brief Sets the `Uri-Host` option
+ *
+ * @param[in] options Options
+ * @param host Host string
+ * @param length Length of @p host in bytes
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_uri_host(unicoap_options_t* options, const char* host, size_t length)
+{
+    assert((length > 0) && (length <= 0xff));
+    return unicoap_options_set_string(options, UNICOAP_OPTION_URI_HOST, host, length);
+}
+
+/**
+ * @brief Sets the `Uri-Host` option based on a null-terminated host string
+ *
+ * @param[in] options Options
+ * @param host Null-terminated host string
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_uri_host_string(unicoap_options_t* options, const char* host)
+{
+    return unicoap_options_set_uri_host(options, host, strlen(host));
+}
+
+/**
+ * @brief Removes `Uri-Host` option
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_uri_host(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_URI_HOST);
+}
+/** @} */
+
+/* MARK: - Location-Path */
+/**
+ * @name Location-Path
+ * @{
+ */
+
+/**
+ * @brief Copies the `Location-Path` option values into the given path buffer, forming an absolute path
+ *
+ * @param[in] options Options
+ * @param[in,out] path Buffer to copy path value into, must be large enough to carry characters and null-terminator.
+ * @param capacity Number of usable bytes in @p path
+ *
+ * @returns Path length, excluding null-terminator, but including separators.
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_location_path(unicoap_options_t* options, char* path,
+                                                        size_t capacity)
+{
+    return unicoap_options_get_strings(options, UNICOAP_OPTION_LOCATION_PATH, path, capacity, '/');
+}
+
+/**
+ * @brief Splits the given path into separate `Location-Path` values and adds them as option values
+ *
+ * Use this function to set an entire path, which would normally involve adding each path component individually.
+ *
+ * @param[in] options Options
+ * @param[in] path Array of characters
+ * @param length String length
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_location_path(unicoap_options_t* options, char* path, size_t length)
+{
+    return unicoap_options_add_values(options, UNICOAP_OPTION_LOCATION_PATH, (uint8_t*)path, length, '/');
+}
+
+/**
+ * @brief Splits the given null-terminated path into separate `Location-Path` values and adds them as option values
+ *
+ * Use this function to set an entire path, which would normally involve adding each path component individually.
+ *
+ * @param[in] options Options
+ * @param[in] path Null-terminated path
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_location_path_string(unicoap_options_t* options, char* path)
+{
+    return unicoap_options_add_location_path(options, path, strlen(path));
+}
+
+/**
+ * @brief Gets the next `Location-Path`, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[out] component A pointer to next option's string value
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t
+unicoap_options_get_next_location_path_component(unicoap_options_iterator_t* iterator,
+                                                 uint8_t** component)
+{
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_LOCATION_PATH, component);
+}
+
+/**
+ * @brief Adds resource path component as single `Location-Path` option
+ *
+ * @param[in] options Options
+ * @param[in] component Path component string, does not need to be null-terminated
+ * @param length Length of @p component
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_location_path_component(unicoap_options_t* options,
+                                                              const char* component, size_t length)
+{
+    assert(length <= 0xff);
+    return unicoap_options_add_string(options, UNICOAP_OPTION_LOCATION_PATH, component, length);
+}
+
+/**
+ * @brief Adds null-terminated resource path component as single `Location-Path` option
+ *
+ * @param[in] options Options
+ * @param[in] component Null-terminated path component string
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_location_path_component_string(unicoap_options_t* options,
+                                                                     const char* component)
+{
+    return unicoap_options_add_location_path_component(options, component, strlen(component));
+}
+
+/**
+ * @brief Removes all `Uri-Path` options
+ *
+ * @param[in] options Options
+ *
+ */
+static inline int unicoap_options_remove_location_path(unicoap_options_t* options)
+{
+    return unicoap_options_remove_all(options, UNICOAP_OPTION_LOCATION_PATH);
+}
+/** @} */
+
+/* MARK: - Location-Query */
+/**
+ * @name Location-Query
+ * @{
+ */
+
+/**
+ * @brief Retrieves Location query string
+ *
+ * @param[in] options Options
+ * @param[in,out] query Query string buffer
+ * @param capacity Buffer capacity @p query
+ *
+ * @returns Length of query string including separators
+ * @returns Negative integer on error
+ *
+ * This function generates a query string by concatenating all `Location-Query` options and null-terminates the resulting
+ * string.
+ *
+ * **Example**: `a=1`, `b`, `c=yes` is turned into `?a=1&b&c=yes`
+ */
+static inline ssize_t unicoap_options_get_location_queries(unicoap_options_t* options, char* query,
+                                                           size_t capacity)
+{
+    ssize_t res =
+        unicoap_options_get_strings(options, UNICOAP_OPTION_LOCATION_QUERY, query, capacity, '&');
+    if (res > 0) {
+        *query = '?';
+    }
+    return res;
+}
+
+/**
+ * @brief Retrieves first Location query from options
+ *
+ * @param[in] options Options
+ * @param[out] component A pointer to a string variable
+ *
+ * @returns Length of query value in bytes
+ * @returns Negative integer on error
+ *
+ * This function makes @p component point to the string value of the first `Location-Query` option.
+ */
+static inline ssize_t unicoap_options_get_first_location_query(unicoap_options_t* options,
+                                                               char** component)
+{
+    return unicoap_options_get(options, UNICOAP_OPTION_LOCATION_QUERY, (uint8_t**)component);
+}
+
+/**
+ * @brief Gets the next `Location-Query`, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[out] component A pointer to next option's string value
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_iterator_t* iterator,
+                                                              char** component)
+{
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_LOCATION_QUERY, (uint8_t**)component);
+}
+
+/**
+ * @brief Gets the next `Location-Query` option matching the given name, potentially skipping any options inbetween.
+ *
+ * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
+ *
+ * This method splits query values at the `=` character.
+ *
+ * @param[in,out] iterator Option iterator
+ * @param[in] name Name of query paramter to find
+ * @param[out] value Pointer to a string variable
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t
+unicoap_options_get_next_location_query_by_name(unicoap_options_iterator_t* iterator,
+                                                const char* name, char** value)
+{
+    return unicoap_options_get_next_query_by_name(iterator, UNICOAP_OPTION_LOCATION_QUERY, name,
+                                                  value);
+}
+
+/**
+ * @brief Gets the first `Location-Query` option matching the given name
+ *
+ * This is a zero-copy API.
+ *
+ * This method splits query values at the `=` character.
+ *
+ * @param[in,out] options Options
+ * @param[in] name Name of query paramter to find
+ * @param[out] value Pointer to a string variable
+ *
+ * @returns Positive size of option value
+ * @returns `-1` if the iterator is finished
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_options_t* options,
+                                                                       const char* name,
+                                                                       char** value)
+{
+    unicoap_options_iterator_t iterator;
+    unicoap_options_iterator_init(&iterator, options);
+    return unicoap_options_get_next_location_query_by_name(&iterator, name, value);
+}
+
+/**
+ * @brief Adds Location query
+ *
+ * @param[in] options Options
+ * @param[in] query Query name and/or value, e.g., `key=value` or `key`, or arbitrary...
+ * @param length Length of @p query
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_location_query(unicoap_options_t* options,
+                                                     const char* query, size_t length)
+{
+    assert(length <= 0xff);
+    return unicoap_options_add_string(options, UNICOAP_OPTION_LOCATION_QUERY, query, length);
+}
+
+/**
+ * @brief Adds null-terminated Location query
+ *
+ * @param[in] options Options
+ * @param[in] query Null-terminated query name and/or value, e.g., `key=value` or `key`, or arbitrary...
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_add_location_query_string(unicoap_options_t* options, const char* query)
+{
+    return unicoap_options_add_location_query(options, query, strlen(query));
+}
+
+/**
+ * @brief Adds multiple Location queries from string
+ *
+ * @param[in] options Options
+ * @param[in] queries Query string, e.g., `a=0&b&c=yes`
+ * @param length Length of @p query
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ *
+ * This function splits the given string at occurrences of the `&` character and inserts the resulting components
+ * as individual `Location-Query` strings
+ */
+static inline int unicoap_options_add_location_queries(unicoap_options_t* options, const char* queries,
+                                                       size_t length)
+{
+    return unicoap_options_add_values(options, UNICOAP_OPTION_LOCATION_QUERY, (uint8_t*)queries, length,
+                                      '&');
+}
+
+/**
+ * @brief Adds multiple Location queries from a null-terminated string
+ *
+ * @param[in] options Options
+ * @param[in] queries Null-terminated query string, e.g., `a=0&b&c=yes`
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ *
+ * This function splits the given string at occurrences of the `&` character and inserts the resulting components
+ * as individual `Location-Query` strings
+ */
+static inline int unicoap_options_add_location_queries_string(unicoap_options_t* options, const char* queries)
+{
+    return unicoap_options_add_location_queries(options, queries, strlen(queries));
+}
+
+/**
+ * @brief Removes all `Location-Query` options
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_location_queries(unicoap_options_t* options)
+{
+    return unicoap_options_remove_all(options, UNICOAP_OPTION_LOCATION_QUERY);
+}
+/** @} */
+
+/* MARK: - Proxy-Uri */
+/**
+ * @name Proxy-Uri
+ * @{
+ */
+/**
+ * @brief Retrieves the `Proxy-Uri` option
+ *
+ * @param[in] options Options
+ * @param[in,out] uri Buffer where URI will be written in
+ * @param capacity Capacity @p uri buffer in bytes
+ *
+ * @returns Length of Proxy URI in bytes if successful
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_proxy_uri(unicoap_options_t* options, char* uri,
+                                                    size_t capacity)
+{
+    return unicoap_options_get_string(options, UNICOAP_OPTION_PROXY_URI, uri, capacity);
+}
+
+/**
+ * @brief Sets the `Proxy-Uri` option
+ *
+ * @param[in] options Options
+ * @param[in,out] uri Proxy URI string, does not need to be null-terminated
+ * @param length Length of @p uri in bytes
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_proxy_uri(unicoap_options_t* options, const char* uri, size_t length)
+{
+    assert((length > 0) && (length <= 1034));
+    return unicoap_options_set_string(options, UNICOAP_OPTION_PROXY_URI, uri, length);
+}
+
+/**
+ * @brief Sets the `Proxy-Uri` option based on a null-terminated URI string
+ *
+ * @param[in] options Options
+ * @param[in,out] uri Null-terminated proxy URI string
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_proxy_uri_string(unicoap_options_t* options, const char* uri)
+{
+    return unicoap_options_set_proxy_uri(options, uri, strlen(uri));
+}
+
+/**
+ * @brief Removes `Proxy-Uri` options
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_proxy_uri(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_PROXY_URI);
+}
+/** @} */
+
+/* MARK: - Proxy-Scheme */
+/**
+ * @name Proxy-Scheme
+ * @{
+ */
+
+/**
+ * @brief Retrieves the `Proxy-Scheme` option
+ *
+ * @param[in] options Options
+ * @param[in,out] scheme Buffer where scheme will be written in
+ * @param capacity Capacity @p scheme buffer in bytes
+ *
+ * @returns Length of Proxy URI in bytes if successful
+ * @returns Negative integer on error
+ */
+static inline ssize_t unicoap_options_get_proxy_scheme(unicoap_options_t* options, char* scheme, size_t capacity)
+{
+    return unicoap_options_get_string(options, UNICOAP_OPTION_PROXY_SCHEME, scheme, capacity);
+}
+
+/**
+ * @brief Sets the `Proxy-Scheme` option
+ *
+ * @param[in] options Options
+ * @param[in,out] scheme Proxy URI string, does not need to be null-terminated
+ * @param length Length of @p scheme in bytes
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_proxy_scheme(unicoap_options_t* options, const char* scheme, size_t length)
+{
+    assert((length > 0) && (length <= 0xff));
+    return unicoap_options_set_string(options, UNICOAP_OPTION_PROXY_SCHEME, scheme, length);
+}
+
+/**
+ * @brief Sets the `Proxy-Scheme` option
+ *
+ * @param[in] options Options
+ * @param[in] scheme Proxy URI string, does not need to be null-terminated
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_proxy_scheme_string(unicoap_options_t* options, const char* scheme)
+{
+    return unicoap_options_set_proxy_scheme(options, scheme, strlen(scheme));
+}
+
+/**
+ * @brief Removes `Proxy-Scheme` option
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_remove_proxy_scheme(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_PROXY_SCHEME);
+}
+/** @} */
+
+/* MARK: - Observe */
+/**
+ * @name Observe
+ * @{
+ */
+/** @brief Observe value for registering for notifications */
+#define UNICOAP_OBSERVE_OPTION_REGISTER   (0)
+
+/** @brief Observe value for cancelling a registration for notifications */
+#define UNICOAP_OBSERVE_OPTION_DEREGISTER (1)
+/**
+ * @brief Retrieves the `Observe` option value, if any
+ *
+ * @param options Options
+ * @param observe Observe value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_observe(unicoap_options_t* options, uint32_t* observe)
+{
+    return unicoap_options_get_uint24(options, UNICOAP_OPTION_OBSERVE, observe);
+}
+
+/**
+ * @brief Sets the `Observe` option
+ *
+ * @param[in] options Options
+ * @param observe Observe option value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_observe(unicoap_options_t* options, uint32_t observe)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_OBSERVE, observe);
+}
+
+/**
+ * @brief Sets the `Observe` option to a randomly generated value
+ *
+ * @param[in] options Options
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+int unicoap_options_set_observe_generated(unicoap_options_t* options);
+/** @} */
+
+/* MARK: - No-Response */
+/**
+ * @name No-Response
+ * @{
+ */
+/**
+ * @brief Retrieves the `No-Response` option value, if any
+ *
+ * @param options Options
+ * @param[out] value Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return `-ENOENT` if option is not present
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_no_response(unicoap_options_t* options, uint8_t* value)
+{
+    return unicoap_options_get_uint8(options, UNICOAP_OPTION_NO_RESPONSE, value);
+}
+
+/**
+ * @brief Set the `No-Response` option
+ *
+ * @param[in] options Options
+ * @param value Option value
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+static inline int unicoap_options_set_no_response(unicoap_options_t* options, uint8_t value)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_NO_RESPONSE, value);
+}
+/** @} **/
+
+/* MARK: - Block and Size for Block-wise Transfers */
+/**
+ * @name Block and Size for Block-wise Transfers
+ * @{
+ */
+/**
+ * @name Block-wise Transfers
+ */
+/**
+ * @brief Sentinel value for @ref unicoap_block_option_t indicating an uninitialized value
+ */
+#define UNICOAP_BLOCK_OPTION_NONE (0x0f000000)
+
+/**
+ * @brief Block1 and Block2 option value
+ */
+typedef uint32_t unicoap_block_option_t;
+
+/**
+ * @brief Retrieves a Block1 or Block2 option
+ *
+ * @param options Options
+ * @param option_number Option number
+ * @param[out] block Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_block(unicoap_options_t* options,
+                                                unicoap_option_number_t option_number,
+                                                unicoap_block_option_t* block)
+{
+    return unicoap_options_get_uint24(options, option_number, block);
+}
+
+/**
+ * @brief Sets a Block1 or Block2 option.
+ *
+ * @param options Options
+ * @param option_number Option number
+ * @param[in] block Option value
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the set operation failed
+ */
+static inline int unicoap_options_set_block(unicoap_options_t* options,
+                                            unicoap_option_number_t option_number,
+                                            unicoap_block_option_t block)
+{
+    assert(block <= UNICOAP_UINT24_MAX);
+    return unicoap_options_set_uint(options, option_number, block);
+}
+
+/* MARK: - Block1 */
+/**
+ * @brief Retrieves the Block1 option
+ *
+ * @param options Options
+ * @param[out] block Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_block1(unicoap_options_t* options,
+                                                 unicoap_block_option_t* block)
+{
+    return unicoap_options_get_block(options, UNICOAP_OPTION_BLOCK1, block);
+}
+
+/**
+ * @brief Sets a Block1 option.
+ *
+ * @param options Options
+ * @param[in] block Option value
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the set operation failed
+ */
+static inline int unicoap_options_set_block1(unicoap_options_t* options,
+                                             unicoap_block_option_t block)
+{
+    return unicoap_options_set_block(options, UNICOAP_OPTION_BLOCK1, block);
+}
+
+/**
+ * @brief Removes the Block1 option
+ *
+ * @param options Options
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the remove operation failed
+ */
+static inline int unicoap_options_remove_block1(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_BLOCK1);
+}
+
+/* MARK: - Block2 */
+/**
+ * @brief Retrieves the Block1 option
+ *
+ * @param options Options
+ * @param[out] block Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_block2(unicoap_options_t* options,
+                                                 unicoap_block_option_t* block)
+{
+    return unicoap_options_get_block(options, UNICOAP_OPTION_BLOCK2, block);
+}
+
+/**
+ * @brief Sets a Block2 option.
+ *
+ * @param options Options
+ * @param[in] block Option value
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the set operation failed
+ */
+static inline int unicoap_options_set_block2(unicoap_options_t* options,
+                                             unicoap_block_option_t block)
+{
+    return unicoap_options_set_block(options, UNICOAP_OPTION_BLOCK2, block);
+}
+
+/**
+ * @brief Removes the Block2 option
+ *
+ * @param options Options
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the remove operation failed
+ */
+static inline int unicoap_options_remove_block2(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_BLOCK2);
+}
+
+/* MARK: - Size1 */
+/**
+ * @brief Retrieves the Size1 option
+ *
+ * @param options Options
+ * @param[out] size Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_size1(unicoap_options_t* options, uint32_t* size)
+{
+    return unicoap_options_get_uint32(options, UNICOAP_OPTION_SIZE1, size);
+}
+
+/**
+ * @brief Sets a Size1 option.
+ *
+ * @param options Options
+ * @param size Option value
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the set operation failed
+ */
+static inline int unicoap_options_set_size1(unicoap_options_t* options, uint32_t size)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_SIZE1, size);
+}
+
+/**
+ * @brief Removes the Size1 option
+ *
+ * @param options Options
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the remove operation failed
+ */
+static inline int unicoap_options_remove_size1(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_SIZE1);
+}
+
+/* MARK: - Size2 */
+/**
+ * @brief Retrieves the Size2 option
+ *
+ * @param options Options
+ * @param[out] size Option value
+ *
+ * @return Size of option value (zero or more bytes)
+ * @return Negative errno if the get operation failed
+ */
+static inline ssize_t unicoap_options_get_size2(unicoap_options_t* options, uint32_t* size)
+{
+    return unicoap_options_get_uint32(options, UNICOAP_OPTION_SIZE2, size);
+}
+
+/**
+ * @brief Sets a Size2 option.
+ *
+ * @param options Options
+ * @param size Option value
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the set operation failed
+ */
+static inline int unicoap_options_set_size2(unicoap_options_t* options, uint32_t size)
+{
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_SIZE2, size);
+}
+
+/**
+ * @brief Removes the Size2 option
+ *
+ * @param options Options
+ *
+ * @return Zero if the set operation succeeded
+ * @return Negative errno if the remove operation failed
+ */
+static inline int unicoap_options_remove_size2(unicoap_options_t* options)
+{
+    return unicoap_options_remove(options, UNICOAP_OPTION_SIZE2);
+}
+/** @} */
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
