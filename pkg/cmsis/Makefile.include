@@ -1,14 +1,15 @@
-INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/Core/Include
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/cmsis/CMSIS/Core/Include
 
 ifneq (,$(filter cmsis-dsp,$(USEMODULE)))
-  INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/DSP/Include
-  INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/DSP/PrivateInclude
+  INCLUDES += -isystem$(PKGDIRBASE)/cmsis/CMSIS/DSP/Include
+  INCLUDES += -isystem$(PKGDIRBASE)/cmsis/CMSIS/DSP/PrivateInclude
   CFLAGS += -DARM_CPU="cortex-m4"
 endif
 
 ifneq (,$(filter cmsis-nn,$(USEMODULE)))
-  INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/DSP/Include
-  INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/NN/Include
+  INCLUDES += -isystem$(PKGDIRBASE)/cmsis/CMSIS/DSP/Include
+  INCLUDES += -isystem$(PKGDIRBASE)/cmsis/CMSIS/NN/Include
   # Required for some basic math functions
   CFLAGS += -Wno-sign-compare
 endif

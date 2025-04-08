@@ -1,9 +1,10 @@
 MODULE := semtech_loramac_contrib
 
-INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/mac \
-            -I$(PKGDIRBASE)/semtech-loramac/src/boards \
-            -I$(PKGDIRBASE)/semtech-loramac/src/radio \
-            -I$(PKGDIRBASE)/semtech-loramac/src/system/crypto \
-            -I$(PKGDIRBASE)/semtech-loramac/src
+# Use -isystem instead of -I to disable warnings about these headers
+INCLUDES += -isystem$(PKGDIRBASE)/semtech-loramac/src/mac \
+            -isystem$(PKGDIRBASE)/semtech-loramac/src/boards \
+            -isystem$(PKGDIRBASE)/semtech-loramac/src/radio \
+            -isystem$(PKGDIRBASE)/semtech-loramac/src/system/crypto \
+            -isystem$(PKGDIRBASE)/semtech-loramac/src
 
 include $(RIOTBASE)/Makefile.base

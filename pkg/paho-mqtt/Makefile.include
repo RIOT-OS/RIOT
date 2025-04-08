@@ -1,6 +1,7 @@
-INCLUDES += -I$(PKGDIRBASE)/paho-mqtt/MQTTClient-C/src/
-INCLUDES += -I$(PKGDIRBASE)/paho-mqtt/MQTTPacket/src
-INCLUDES += -I$(RIOTBASE)/pkg/paho-mqtt/include
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/paho-mqtt/MQTTClient-C/src/
+INCLUDES += -isystem$(PKGDIRBASE)/paho-mqtt/MQTTPacket/src
+INCLUDES += -isystem$(RIOTBASE)/pkg/paho-mqtt/include
 
 DIRS += $(RIOTBASE)/pkg/paho-mqtt/contrib
 

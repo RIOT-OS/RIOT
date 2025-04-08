@@ -1,5 +1,6 @@
-INCLUDES += -I$(RIOTBASE)/pkg/lvgl/include
-INCLUDES += -I$(PKGDIRBASE)
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(RIOTBASE)/pkg/lvgl/include
+INCLUDES += -isystem$(PKGDIRBASE)
 
 # Don't use relative includes in lvgl
 CFLAGS += -DLV_CONF_INCLUDE_SIMPLE

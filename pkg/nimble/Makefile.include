@@ -1,7 +1,8 @@
-NIMIBASE = -I$(PKGDIRBASE)/nimble
+# Using -isystem instead of -I to prevent warnings for the following headers
+NIMIBASE = -isystem$(PKGDIRBASE)/nimble
 
 # include RIOT glue code headers
-INCLUDES += -I$(RIOTPKG)/nimble/contrib/include
+INCLUDES += -isystem$(RIOTPKG)/nimble/contrib/include
 
 # include generic nimble headers
 INCLUDES += $(NIMIBASE)/nimble/include
@@ -11,7 +12,7 @@ ifneq (,$(filter nimble_npl_riot,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/porting/npl/riot/include
 else
   INCLUDES += $(NIMIBASE)/porting/npl/riot/include/npl_syscfg
-  INCLUDES += -I$(RIOTPKG)/nimble/npl/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/npl/include
 endif
 INCLUDES += $(NIMIBASE)/porting/nimble/include
 
@@ -85,16 +86,16 @@ endif
 
 # include additional headers for RIOT specific NimBLE submodules
 ifneq (,$(filter nimble_addr,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/addr/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/addr/include
 endif
 
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/autoadv/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/autoadv/include
   DIRS += $(RIOTPKG)/nimble/autoadv
 endif
 
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/autoconn/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/autoconn/include
 endif
 
 ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
@@ -124,7 +125,7 @@ else
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/netif/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/netif/include
 
   # configure NimBLE's internals
   NIMBLE_MAX_CONN ?= 3
@@ -166,17 +167,17 @@ else
 endif
 
 ifneq (,$(filter nimble_rpble,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/rpble/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/rpble/include
 endif
 
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/scanlist/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/scanlist/include
 endif
 
 ifneq (,$(filter nimble_scanner,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/scanner/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/scanner/include
 endif
 
 ifneq (,$(filter nimble_statconn,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/nimble/statconn/include
+  INCLUDES += -isystem$(RIOTPKG)/nimble/statconn/include
 endif

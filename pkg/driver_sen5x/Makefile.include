@@ -1,1 +1,2 @@
-INCLUDES += -I$(PKGDIRBASE)/driver_sen5x
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/driver_sen5x

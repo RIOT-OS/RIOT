@@ -1,7 +1,8 @@
-INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-riot/include
-INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-core/include
-INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-pkt/include
-INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-fwd/include
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/ccn-lite/src/ccnl-riot/include
+INCLUDES += -isystem$(PKGDIRBASE)/ccn-lite/src/ccnl-core/include
+INCLUDES += -isystem$(PKGDIRBASE)/ccn-lite/src/ccnl-pkt/include
+INCLUDES += -isystem$(PKGDIRBASE)/ccn-lite/src/ccnl-fwd/include
 
 CFLAGS += -DCCNL_RIOT
 ARCHIVES += $(BINDIR)/ccn-lite.a

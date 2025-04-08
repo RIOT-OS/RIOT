@@ -1,5 +1,6 @@
-INCLUDES += -I$(PKGDIRBASE)/lv_drivers \
-            -I$(RIOTBASE)/pkg/lv_drivers/include \
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/lv_drivers \
+            -isystem$(RIOTBASE)/pkg/lv_drivers/include \
             #
 
 # Don't use relative includes in lv_drivers, already set in LVGL package

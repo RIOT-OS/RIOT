@@ -1,3 +1,4 @@
-INCLUDES += -I$(PKGDIRBASE)/driver_sx126x/src
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/driver_sx126x/src
 
 DIRS += $(RIOTBASE)/pkg/driver_sx126x/contrib
