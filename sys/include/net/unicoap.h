@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "net/unicoap/constants.h"
 #include "net/unicoap/message.h"
 
 /**
