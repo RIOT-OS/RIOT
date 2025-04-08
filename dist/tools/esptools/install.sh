@@ -1,13 +1,18 @@
 #!/bin/sh
 
-ESP32_GCC_RELEASE="esp-12.2.0_20230208"
-ESP32_GCC_VERSION_DIR="12.2.0"
-ESP32_GCC_VERSION_DOWNLOAD="12.2.0_20230208"
+ESP32_GCC_RELEASE="esp-14.2.0_20241119"
+ESP32_GCC_VERSION_DIR="14.2.0"
+ESP32_GCC_VERSION_DOWNLOAD="14.2.0_20241119"
 
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
-ESP32_OPENOCD_VERSION="v0.12.0-esp32-20230313"
-ESP32_OPENOCD_VERSION_TGZ="0.12.0-esp32-20230313"
+ESP32_OPENOCD_VERSION="v0.12.0-esp32-20241016"
+ESP32_OPENOCD_VERSION_TGZ="0.12.0-esp32-20241016"
+
+ESP32_QEMU_VERSION="esp-develop-9.0.0-20240606"
+ESP32_QEMU_VERSION_DOWNLOAD="esp_develop_9.0.0_20240606"
+
+GDB_VERSION="14.2_20240403"
 
 # set the tool path to the default if not already set
 if [ -z "${IDF_TOOLS_PATH}" ]; then
@@ -44,7 +49,7 @@ case "${PLATFORM}" in
         OS_OCD="linux-amd64"
         ;;
     linux-arm64|Linux-arm64|Linux-aarch64|Linux-armv8l|aarch64)
-        OS="aarch64-linux"
+        OS="aarch64-linux-gnu"
         OS_OCD="linux-arm64"
         ;;
     linux-armel|Linux-arm|Linux-armv7l|arm-linux-gnueabi)
@@ -56,7 +61,7 @@ case "${PLATFORM}" in
         OS_OCD="linux-armhf"
         ;;
     linux-i686|linux32|Linux-i686|FreeBSD-i386|i586-linux-gnu|i686-linux-gnu)
-        OS="i686-linux-gnu"
+        OS="i586-linux-gnu"
         ;;
     macos|osx|darwin|Darwin-x86_64|x86_64-apple-darwin)
         OS="x86_64-apple-darwin"
@@ -90,20 +95,12 @@ install_arch()
             TARGET_ARCH="xtensa-esp8266-elf"
             ESP_GCC_RELEASE="${ESP8266_GCC_RELEASE}"
             ;;
-        esp32)
-            TARGET_ARCH="xtensa-esp32-elf"
+        esp32|esp32s2|esp32s3)
+            TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32c3)
             TARGET_ARCH="riscv32-esp-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
-        esp32s2)
-            TARGET_ARCH="xtensa-esp32s2-elf"
-            ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
-            ;;
-        esp32s3)
-            TARGET_ARCH="xtensa-esp32s3-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         *)
@@ -160,23 +157,35 @@ install_openocd()
 
 install_qemu()
 {
-    if [ "${OS}" != "x86_64-linux-gnu" ]; then
-        echo "error: QEMU for ESP32 does not support OS ${OS}"
-        exit 1
-    fi
+    case "${OS}" in
+        x86_64-linux-gnu|aarch64-linux-gnu)
+            ;;
+        x86_64-apple-darwin|aarch64-apple-darwin)
+            ;;
+        *)
+            echo "error: OS ${OS} not supported"
+            exit 1
+            ;;
+    esac
+
+    case $1 in
+        riscv)
+            QEMU_ARCH="qemu-riscv32-softmmu"
+            ;;
+        *)
+            QEMU_ARCH="qemu-xtensa-softmmu"
+            ;;
+    esac
 
     # qemu version depends on the version of ncurses lib
-    if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
-        ESP32_QEMU_VERSION="esp-develop-7.2.0-20230223"
-        URL_TGZ="esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-${OS}.tar.bz2"
-    else
+    if [ "$(ldconfig -p | grep -c libncursesw.so.6)" = "0" ]; then
         ESP32_QEMU_VERSION="esp-develop-20210220"
-        URL_TGZ="qemu-${ESP32_QEMU_VERSION}.tar.bz2"
     fi
 
-    TOOLS_DIR="${TOOLS_PATH}/qemu-esp32/${ESP32_QEMU_VERSION}"
+    TOOLS_DIR="${TOOLS_PATH}/${QEMU_ARCH}/${ESP32_QEMU_VERSION}"
 
     URL_PATH="https://github.com/espressif/qemu/releases/download"
+    URL_TGZ="${QEMU_ARCH}-${ESP32_QEMU_VERSION_DOWNLOAD}-${OS}.tar.xz"
     URL="${URL_PATH}/${ESP32_QEMU_VERSION}/${URL_TGZ}"
 
     echo "Creating directory ${TOOLS_DIR} ..." && \
@@ -185,7 +194,7 @@ install_qemu()
     echo "Downloading ${URL_TGZ} ..." && \
     download "${URL}" "${URL_TGZ}" && \
     echo "Extracting ${URL_TGZ} in ${TOOLS_DIR} ..." && \
-    tar xfj "${URL_TGZ}" && \
+    tar xfJ "${URL_TGZ}" && \
     echo "Removing ${URL_TGZ} ..." && \
     rm -f "${URL_TGZ}" && \
     echo "QEMU for ESP32 installed in ${TOOLS_DIR}"
@@ -205,14 +214,12 @@ install_gdb()
             exit 1
     esac
 
-    GDB_VERSION="12.1_20221002"
-
     TOOLS_DIR="${TOOLS_PATH}/${GDB_ARCH}/${GDB_VERSION}"
 
     URL_PATH="https://github.com/espressif/binutils-gdb/releases/download"
     URL_TGZ="${GDB_ARCH}-${GDB_VERSION}-${OS}.tar.gz"
     URL="${URL_PATH}/esp-gdb-v${GDB_VERSION}/${URL_TGZ}"
-echo $URL_GET $URL
+
     echo "Creating directory ${TOOLS_DIR} ..." && \
     mkdir -p "${TOOLS_DIR}" && \
     cd "${TOOLS_DIR}" && \
@@ -228,6 +235,7 @@ echo $URL_GET $URL
 if [ -z "$1" ]; then
     echo "Usage: install.sh <tool>"
     echo "       install.sh gdb <platform>"
+    echo "       install.sh qemu <platform>"
     echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
     echo "<platform> = xtensa | riscv"
     exit 1
@@ -239,7 +247,8 @@ elif [ "$1" = "all" ]; then
     install_gdb xtensa
     install_gdb riscv
     install_openocd
-    install_qemu
+    install_qemu xtensa
+    install_qemu riscv
 elif [ "$1" = "gdb" ]; then
     if [ -z "$2" ]; then
         echo "platform required: xtensa | riscv"
@@ -249,7 +258,7 @@ elif [ "$1" = "gdb" ]; then
 elif [ "$1" = "openocd" ]; then
     install_openocd
 elif [ "$1" = "qemu" ]; then
-    install_qemu
+    install_qemu "$2"
 else
     install_arch "$1"
 fi
