@@ -63,7 +63,7 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t le
 ctap_status_code_t fido2_ctap_mem_init(void)
 {
 #ifdef CPU_NATIVE
-    _mtd_dev = mtd_default_get_dev(0);
+    _mtd_dev = mtd_dev_get(0);
 #endif
 
     int ret = mtd_init(_mtd_dev);
