@@ -274,15 +274,6 @@ PSEUDOMODULES += lwext4_vfs_format
 ##
 PSEUDOMODULES += libc_gettimeofday
 
-## @defgroup pseudomodule_malloc_tracing malloc_tracing
-## @brief Debug dynamic memory management by hooking in a print into each call
-##        of malloc(), calloc(), realloc() and free
-## @{
-## @deprecated  Use module `malloc_monitor` with verbous configuration instead;
-##              will be removed after 2024.07 release.
-PSEUDOMODULES += malloc_tracing
-## @}
-
 ## @defgroup pseudomodule_mpu_stack_guard mpu_stack_guard
 ## @brief MPU based stack guard
 ##
