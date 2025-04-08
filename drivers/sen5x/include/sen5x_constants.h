@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SEN5X_CONSTANTS_H
-#define SEN5X_CONSTANTS_H
+#pragma once
 
 /**
  * @ingroup     drivers_sen5x
@@ -35,4 +34,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* SEN5X_CONSTANTS_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SEN5X_H
-#define SEN5X_H
+#pragma once
 
 /**
  * @defgroup    drivers_sen5x Sensirion Embedded I2C SEN5x Driver
@@ -327,4 +326,3 @@ void sen5x_get_voc_state(const sen5x_t *dev, uint8_t *state, uint8_t state_size)
 #endif
 
 /** @} */
-#endif /* SEN5X_H */

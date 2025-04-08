@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SEN5X_PARAMS_H
-#define SEN5X_PARAMS_H
+#pragma once
 
 /**
  * @ingroup     drivers_sen5x
@@ -90,4 +89,3 @@ static const saul_reg_info_t sen5x_saul_info[] =
 #endif
 
 /** @} */
-#endif /* SEN5X_PARAMS_H */
