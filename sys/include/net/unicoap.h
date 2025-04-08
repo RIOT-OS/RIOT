@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "net/unicoap/message.h"
+
 /**
  * @addtogroup net_unicoap
  * @{
