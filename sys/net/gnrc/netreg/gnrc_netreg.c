@@ -132,11 +132,14 @@ static void _gnrc_netreg_release_exclusive(void) {
 int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
 {
 #if DEVELHELP
+    thread_t *thread = thread_get(entry->target.pid);
+    assert(thread);
+
 # if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
     bool has_msg_q = (entry->type != GNRC_NETREG_TYPE_DEFAULT) ||
-                     thread_has_msg_queue(thread_get(entry->target.pid));
+                     thread_has_msg_queue(thread);
 # else
-    bool has_msg_q = thread_has_msg_queue(thread_get(entry->target.pid));
+    bool has_msg_q = thread_has_msg_queue(thread);
 # endif
 
     /* only threads with a message queue are allowed to register at gnrc */

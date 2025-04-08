@@ -331,6 +331,8 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     }
 
     LL_SORT(dodag->parents, dodag->instance->of->parent_cmp);
+
+    assert(dodag->parents);
     new_best = dodag->parents;
 
     if (new_best->rank == GNRC_RPL_INFINITE_RANK) {
