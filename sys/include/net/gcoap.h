@@ -919,10 +919,10 @@ const coap_resource_t *gcoap_get_resource_by_path_iterator(const gcoap_listener_
  * message request, ready to send.
  *
  * With module module [`nanocoap_cache`](@ref net_nanocoap_cache) an all-zero ETag option of
- * length 8 which is updated with a value or removed in @ref gcoap_req_send() /
- * @ref gcoap_req_send_tl() depending on existing cache entries for cache (re-)validation. If you do
- * not use the given send functions or do not want cache entries to revalidated for any reason,
- * remove that empty option using @ref coap_opt_remove().
+ * length 8 which is updated with a value or removed in @ref gcoap_req_send() depending on
+ * existing cache entries for cache (re-)validation. If you do not use the given send functions
+ * or do not want cache entries to revalidated for any reason, remove that empty option using
+ * @ref coap_opt_remove().
  *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
@@ -949,10 +949,10 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * message request, ready to send.
  *
  * With module module [`nanocoap_cache`](@ref net_nanocoap_cache) an all-zero ETag option of
- * length 8 which is updated with a value or removed in @ref gcoap_req_send() /
- * @ref gcoap_req_send_tl() depending on existing cache entries for cache (re-)validation. If you do
- * not use the given send functions or do not want cache entries to revalidated for any reason,
- * remove that empty option using @ref coap_opt_remove().
+ * length 8 which is updated with a value or removed in @ref gcoap_req_send() depending on
+ * existing cache entries for cache (re-)validation. If you do not use the given send functions
+ * or do not want cache entries to revalidated for any reason, remove that empty option using
+ * @ref coap_opt_remove().
  *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
@@ -1024,34 +1024,6 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
                        const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
                        gcoap_resp_handler_t resp_handler, void *context,
                        gcoap_socket_type_t tl_type);
-
-/**
- * @brief   Sends a buffer containing a CoAP request to the provided endpoint
- *
- * @deprecated Will be removed after the 2023.10 release. Use alias @ref gcoap_req_send() instead.
- *
- * @param[in] buf           Buffer containing the PDU
- * @param[in] len           Length of the buffer
- * @param[in] remote        Destination for the packet
- * @param[in] resp_handler  Callback when response received, may be NULL
- * @param[in] context       User defined context passed to the response handler
- * @param[in] tl_type       The transport type to use for send. When
- *                          @ref GCOAP_SOCKET_TYPE_UNDEF is selected, the highest
- *                          available (by value) will be selected. Only single
- *                          types are allowed, not a combination of them.
- *
- * @return  length of the packet
- * @return -ENOTCONN, if DTLS was used and session establishment failed
- * @return -EINVAL, if @p tl_type is is not supported
- * @return  0 if cannot send
- */
-static inline ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
-                                        const sock_udp_ep_t *remote,
-                                        gcoap_resp_handler_t resp_handler, void *context,
-                                        gcoap_socket_type_t tl_type)
-{
-    return gcoap_req_send(buf, len, remote, NULL, resp_handler, context, tl_type);
-}
 
 /**
  * @brief   Initializes a CoAP response packet on a buffer
