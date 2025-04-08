@@ -511,6 +511,7 @@ For example:
 USEMODULE += hashes
 USEMODULE += psa_riot_hashes
 USEMODULE += psa_riot_hashes_sha_256
+```
 
 will build the file at `sys/hashes/psa_riot_hashes/sha_256.c`, but none of the other files in
 the directory.
