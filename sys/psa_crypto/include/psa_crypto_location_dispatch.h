@@ -44,14 +44,14 @@ extern "C" {
  * @param signature_length
  * @return psa_status_t
  */
-psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attributes,
-                                               psa_algorithm_t alg,
-                                               const psa_key_slot_t *slot,
-                                               const uint8_t *hash,
-                                               size_t hash_length,
-                                               uint8_t *signature,
-                                               size_t signature_size,
-                                               size_t *signature_length);
+psa_status_t psa_location_dispatch_sign_hash(const psa_key_attributes_t *attributes,
+                                             psa_algorithm_t alg,
+                                             const psa_key_slot_t *slot,
+                                             const uint8_t *hash,
+                                             size_t hash_length,
+                                             uint8_t *signature,
+                                             size_t signature_size,
+                                             size_t *signature_length);
 
 /**
  * @brief   Dispatch call of a message signature function to a location specific backend.

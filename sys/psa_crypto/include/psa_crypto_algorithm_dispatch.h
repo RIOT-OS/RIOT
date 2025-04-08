@@ -38,9 +38,9 @@ extern "C" {
  * @brief   Dispatch a hash setup function to a specific backend.
  *          See @ref psa_hash_setup()
  *
- * @param operation
- * @param alg
- * @return @ref psa_status_t
+ * @param       operation       PSA hash operation to set up
+ * @param[in]   alg             PSA algorithm to use
+ * @return      @ref psa_status_t
  */
 psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
                                                psa_algorithm_t alg);
@@ -49,10 +49,10 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
  * @brief   Dispatch a hash update function to a specific backend.
  *          See @ref psa_hash_update()
  *
- * @param operation
- * @param input
- * @param input_length
- * @return @ref psa_status_t
+ * @param       operation       PSA hash operation to use
+ * @param[in]   input           Data to add
+ * @param[in]   input_length    Length of @p input
+ * @return      @ref psa_status_t
  */
 psa_status_t psa_algorithm_dispatch_hash_update(psa_hash_operation_t *operation,
                                                 const uint8_t *input,
@@ -62,11 +62,11 @@ psa_status_t psa_algorithm_dispatch_hash_update(psa_hash_operation_t *operation,
  * @brief   Dispatch a hash finish function to a specific backend.
  *          See @ref psa_hash_finish()
  *
- * @param operation
- * @param hash
- * @param hash_size
- * @param hash_length
- * @return @ref psa_status_t
+ * @param       operation     PSA hash operation to use
+ * @param[out]  hash          The generated hash will be written here
+ * @param[in]   hash_size     Size of the buffer in @p hash
+ * @param[out]  hash_length   The number of bytes actually written to @p hash
+ * @return      @ref psa_status_t
  */
 psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
                                                 uint8_t *hash,
