@@ -12,6 +12,7 @@
 #include "net/unicoap/constants.h"
 #include "net/unicoap/config.h"
 #include "net/unicoap/message.h"
+#include "net/unicoap/options.h"
 
 /**
  * @addtogroup net_unicoap
