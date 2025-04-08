@@ -82,7 +82,7 @@ extern struct fal_flash_dev mtd_flash0;
 /**
  * @brief   Default MTD to use for flashdb
  */
-#define FAL_MTD                                     mtd_default_get_dev(0)
+#define FAL_MTD                                     mtd_dev_get(0)
 #endif
 
 #if !defined(FAL_PART0_LABEL) || defined(DOXYGEN)
