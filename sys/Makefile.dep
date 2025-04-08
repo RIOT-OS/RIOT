@@ -355,9 +355,6 @@ ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter can_%,$(USEMODULE)))
-endif
-
 ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += can
 endif
