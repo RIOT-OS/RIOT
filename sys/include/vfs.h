@@ -1147,27 +1147,9 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data);
 int vfs_normalize_path(char *buf, const char *path, size_t buflen);
 
 /**
- * @brief Iterate through all mounted file systems
- *
- * @attention Not thread safe! Do not mix calls to this function with other
- * calls which modify the mount table, such as vfs_mount() and vfs_umount()
- *
- * Set @p cur to @c NULL to start from the beginning
- *
- * @deprecated This will become an internal-only function after the 2022.04
- *   release, use @ref vfs_iterate_mount_dirs instead.
- *
- * @param[in]  cur  current iterator value
- *
- * @return     Pointer to next mounted file system in list after @p cur
- * @return     NULL if @p cur is the last element in the list
- */
-const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
-
-/**
  * @brief Iterate through all mounted file systems by their root directories
  *
- * Unlike @ref vfs_iterate_mounts, this is thread safe, and allows thread safe
+ * This function is thread safe, and allows thread safe
  * access to the mount point's stats through @ref vfs_dstatvfs. If mounts or
  * unmounts happen while iterating, this is guaranteed to report all file
  * systems that stayed mounted, and may report any that are transiently
