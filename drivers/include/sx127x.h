@@ -338,8 +338,6 @@ uint8_t sx127x_get_state(const sx127x_t *dev);
  *
  * @param[in] dev                      The sx127x device descriptor
  * @param[in] state                    The new radio state
- *
- * @return radio state [RF_IDLE, RF_RX_RUNNING, RF_TX_RUNNING]
  */
 void sx127x_set_state(sx127x_t *dev, uint8_t state);
 

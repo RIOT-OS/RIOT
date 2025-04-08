@@ -96,7 +96,6 @@ static psa_key_id_t key_id_count = PSA_KEY_ID_VOLATILE_MIN;
 /**
  * @brief   Get the correct empty slot list, depending on the key type
  *
- * @param   attr
  * @return  clist_node_t*   Pointer to the list the key is supposed to be stored in,
  *                          according to its attributes
  */

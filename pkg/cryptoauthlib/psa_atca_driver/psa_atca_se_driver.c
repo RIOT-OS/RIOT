@@ -82,10 +82,6 @@
 
 /**
  * @brief   Convert ATCA status values to PSA errors
- *
- * @param   error
- *
- * @return  @ref psa_status_t
  */
 static psa_status_t atca_to_psa_error(ATCA_STATUS error)
 {
@@ -172,10 +168,6 @@ const char *atca_status_to_humanly_readable(ATCA_STATUS status)
 /* Secure Element Cipher Functions */
 /**
  * @brief   Set up a driver specific AES CBC mode operation
- *
- * @param   ctx
- * @param   dev
- * @param   key_slot
  */
 static void atca_cbc_setup(atca_aes_cbc_ctx_t *ctx,
                            ATCADevice dev,

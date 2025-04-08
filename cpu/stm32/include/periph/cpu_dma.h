@@ -180,7 +180,7 @@ uint16_t dma_suspend(dma_t dma);
  * @brief   Resume a suspended DMA transfer on a stream
  *
  * @param[in] dma         logical DMA stream
- * @param[in] reamaining  the remaining number of transfers to perform
+ * @param[in] remaining   the remaining number of transfers to perform
  */
 void dma_resume(dma_t dma, uint16_t remaining);
 
@@ -260,7 +260,7 @@ void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
  * @param[in]   dma         Logical DMA stream
  * @param[in]   mem         Memory address
  * @param[in]   len         Number of transfers to perform
- * @param[in]   inc_mem     Increment the memory address (by the transfer width) after read/write
+ * @param[in]   incr_mem    Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 

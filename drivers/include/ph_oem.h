@@ -136,10 +136,9 @@ typedef struct ph_oem {
  * @param[in,out]   dev      device descriptor
  * @param[in]       params   device configuration
  *
- * @return @ref PH_OEM_OK on success
- * @return @ref PH_OEM_NODEV if no device is found on the bus
- * @return @ref PH_OEM_NOT_PH if the device found at the address is not a pH OEM device
- * @return
+ * @retval  PH_OEM_OK       on success
+ * @retval  PH_OEM_NODEV    if no device is found on the bus
+ * @retval  PH_OEM_NOT_PH   if the device found at the address is not a pH OEM device
  */
 int ph_oem_init(ph_oem_t *dev, const ph_oem_params_t *params);
 

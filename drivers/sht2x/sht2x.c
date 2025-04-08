@@ -300,7 +300,7 @@ int sht2x_write_userreg(const sht2x_t *dev, uint8_t userreg)
  * @brief       Read a sensor value from the given SHT2X device
  *
  * @param[in]  dev          Device descriptor of SHT2X device to read from
- * @param[in]  cmd          The SHT2x command (hold mode only)
+ * @param[in]  command      The SHT2x command (hold mode only)
  * @param[out] val          The raw sensor value (only valid if no error)
  *
  * @return                  SHT2X_OK value is returned in @p val
@@ -346,7 +346,7 @@ static int read_sensor(const sht2x_t* dev, cmd_t command, uint16_t *val)
  * @brief       Read a sensor value from the given SHT2X device, polling mode
  *
  * @param[in]  dev          Device descriptor of SHT2X device to read from
- * @param[in]  cmd          The SHT2x command (hold mode only)
+ * @param[in]  command      The SHT2x command (hold mode only)
  * @param[out] val          The raw sensor value (only valid if no error)
  *
  * @return                  SHT2X_OK value is returned in @p val

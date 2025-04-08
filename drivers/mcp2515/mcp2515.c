@@ -75,7 +75,7 @@ static int _mcp2515_enable_irq(candev_mcp2515_t *dev, uint8_t irq);
  * the “ID” or “data” address of any of the three transmit buffers.
  *
  * @param[in]  id           filter identifier in the MCP2515 mailbox
- * @param|out] bytebuf      buffer instruction
+ * @param[out] bytebuf      buffer instruction
  */
 static void _fill_standard_id(uint32_t id, uint8_t *bytebuf);
 
@@ -85,7 +85,7 @@ static void _fill_standard_id(uint32_t id, uint8_t *bytebuf);
  * for more details see _fill_standard_id.
  *
  * @param[in]  id           filter identifier in the MCP2515 mailbox
- * @param|out] bytebuf      buffer instruction
+ * @param[out] bytebuf      buffer instruction
  */
 static void _fill_extended_id(uint32_t id, uint8_t *bytebuf);
 

@@ -29,9 +29,6 @@ extern "C" {
 
 /**
  * @brief   Converts errors of the RIOT cipher module to PSA status values
- *
- * @param   error
- * @return  @ref psa_status_t
  */
 psa_status_t cipher_to_psa_error(int error);
 

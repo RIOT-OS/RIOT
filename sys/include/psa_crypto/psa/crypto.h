@@ -1744,12 +1744,6 @@ psa_status_t psa_export_public_key(psa_key_id_t key,
  *
  * @details This function generates a random symmetric key. As of yet it does not implement
  *          asymmetric key generation.
- *
- * @param attributes
- * @param key_buffer
- * @param key_buffer_size
- * @param key_buffer_length
- * @return psa_status_t
  */
 psa_status_t psa_builtin_generate_key(const psa_key_attributes_t *attributes, uint8_t *key_buffer,
                                       size_t key_buffer_size, size_t *key_buffer_length);

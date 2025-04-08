@@ -563,7 +563,7 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac);
  * @brief save internal MAC state in non-volatile storage and shutdown
  *        the MAC layer gracefully.
  *
- * @param mac
+ * @param[in] mac pointer to the MAC descriptor
  */
 void gnrc_lorawan_perform_save(gnrc_lorawan_t *mac);
 

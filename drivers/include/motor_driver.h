@@ -216,8 +216,6 @@ int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id);
  *
  * @param[in] motor_driver      motor driver to which motor is attached
  * @param[in] motor_id          motor ID on driver
- *
- * @return
  */
 void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id);
 
@@ -226,8 +224,6 @@ void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id);
  *
  * @param[in] motor_driver      motor driver to which motor is attached
  * @param[in] motor_id          motor ID on driver
- *
- * @return
  */
 void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id);
 

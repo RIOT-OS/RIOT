@@ -534,7 +534,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 extern kernel_pid_t gnrc_rpl_pid;
 
 /**
- * @brief @see @ref GNRC_RPL_ALL_NODES_ADDR
+ * @brief   See @ref GNRC_RPL_ALL_NODES_ADDR
  */
 extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
 

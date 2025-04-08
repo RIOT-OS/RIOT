@@ -197,7 +197,7 @@ union gpio_conf_nrf5x {
          * consulted.
          */
         bool initial_value                      : 1;
-        uint8_t                                 : 1; /*< padding */
+        uint8_t                                 : 1; /**< padding */
     };
 };
 /* END: GPIO LL overwrites */

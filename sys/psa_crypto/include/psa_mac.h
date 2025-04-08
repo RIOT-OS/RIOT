@@ -32,16 +32,6 @@ extern "C" {
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA256 computation
  *          See psa_mac_compute()
- *
- * @param   attributes
- * @param   key_buffer
- * @param   key_buffer_size
- * @param   input
- * @param   input_length
- * @param   mac
- * @param   mac_size
- * @param   mac_length
- * @return  psa_status_t
  */
 psa_status_t psa_mac_compute_hmac_sha256(   const psa_key_attributes_t *attributes,
                                             const uint8_t *key_buffer,

@@ -53,7 +53,6 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
  *               Native threads must call sched_thread_exit().
  *               A pthread must not call sched_thread_exit().
  * @param[out]   retval   Return value, supplied to a joining thread.
- * @return       This function does not return.
  */
 void pthread_exit(void *retval) NORETURN;
 

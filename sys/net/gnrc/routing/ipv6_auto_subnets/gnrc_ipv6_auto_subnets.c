@@ -540,8 +540,8 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
 /**
  * @brief Check if memory region is set to 0
  *
- * @param[in]   The memory array to check
- * @param[in]   The size of the memory array
+ * @param[in]   addr    The memory array to check
+ * @param[in]   len     The size of the memory array
  *
  * @return  true if all bytes are set to 0
  */
@@ -593,13 +593,13 @@ static int _alloc_l2addr_entry(const void *addr, size_t len)
  *        Only the first packet from a host generates a comparison, all subsequent
  *        packets will be ignored until the `l2addrs` array is reset.
  *
- * @param[in] upstream interface, ignore if the source does not match
- * @param[in] pkt   a received packet
+ * @param[in]   iface   upstream interface, ignore if the source does not match
+ * @param[in]   pkt     a received packet
  *
- * @return  1 if the sender l2 address is in order before the local l2 address
- * @return  0 if the order could not be determined or a packet from the sender
- *            was already processed
- * @return -1 if the sender l2 address is in order behind the local l2 address
+ * @retval      1       the sender l2 address is in order before the local l2 address
+ * @retval      0       the order could not be determined or a packet from the sender
+ *                      was already processed
+ * @retval      -1      the sender l2 address is in order behind the local l2 address
  */
 static int _get_my_l2addr_rank(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt)
 {

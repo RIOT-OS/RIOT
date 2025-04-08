@@ -771,8 +771,8 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
 /**
  * @brief   Function called by the device driver on device events
  *
+ * @param     dev           netdev causing the event
  * @param[in] event         type of event
- * @param[in] data          optional parameter
  */
 static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
 {

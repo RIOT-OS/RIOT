@@ -393,7 +393,7 @@ union gpio_conf_minimal {
          * consulted.
          */
         bool initial_value              : 1;
-        uint8_t                         : 2; /*< padding */
+        uint8_t                         : 2; /**< padding */
     };
 };
 
