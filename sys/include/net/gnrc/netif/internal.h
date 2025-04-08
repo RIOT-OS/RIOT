@@ -131,6 +131,28 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
                              const ipv6_addr_t *addr);
 
 /**
+ * @brief   Returns the index of the first pfx
+ *          in gnrc_netif_t::ipv6_addrs of @p netif
+ *          where the first @p pfx_len bits match with @p pfx
+ *
+ * @pre `(netif != NULL) && (pfx != NULL)`
+ *
+ * Can be used to check if an address is assigned to an interface.
+ *
+ * @param[in] netif the network interface
+ * @param[in] pfx  the address to check
+ * @param[in] pfx_len the amount of bits to compare
+ *
+ * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
+ *
+ * @return  index of the first matching address
+ *          in gnrc_netif_t::ipv6_addrs of @p netif
+ * @return  -1, if no matching address found for @p netif
+ */
+int gnrc_netif_ipv6_addr_pfx_idx(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *pfx, uint8_t pfx_len);
+
+/**
  * @brief   Gets state from address flags
  *
  * @param[in] netif the network interface
@@ -159,6 +181,25 @@ static inline uint8_t gnrc_netif_ipv6_addr_dad_trans(const gnrc_netif_t *netif,
 {
     return netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
+/**
+ * @brief   Gets number of address generation retries already performed for an address
+ *
+ * @param[in] netif the network interface
+ * @param[in] idx   index of the address (and its flags)
+ *
+ * @return  the number of address generation retries already
+ *          performed
+ */
+static inline uint8_t gnrc_netif_ipv6_addr_gen_retries(const gnrc_netif_t *netif,
+                                                     int idx)
+{
+    return (netif->ipv6.addrs_flags[idx]
+    & GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES)
+    >> GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS;
+}
+#endif
 
 /**
  * @brief   Returns the index of an address in gnrc_netif_t::ipv6_addrs of @p
