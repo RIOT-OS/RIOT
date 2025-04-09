@@ -1,12 +1,13 @@
 PROGRAMMER ?= uf2conv
 
-ifneq (,$(filter uf2conv,$(PROGRAMMER)))
+ifneq (,$(filter uf2conv adafruit-nrfutil,$(PROGRAMMER)))
 
   # The Adafruit nRF52 Bootloader currently only really supports
   # two MCUs. Set the according Family Flag and SoftDevice version if
   # not set already.
   ifneq (,$(filter nrf52833xxaa,$(CPU_MODEL)))
     UF2CONV_FLAGS = -f 0x621E937A
+    ADANRFUTIL_FLAGS = --dev-type 0x0052
 
     # The Adafruit nRF52 Bootloader has a static MBR at the first 4k
     # and a 38k UF2 Bootloader at the end, leaving 972k (nRF52840) or 460k
@@ -22,10 +23,12 @@ ifneq (,$(filter uf2conv,$(PROGRAMMER)))
     else ifneq (,$(filter SD611,$(UF2_SOFTDEV)))
       ROM_OFFSET = 0x26000
       ROM_LEN    = 0x5a000
+      ADANRFUTIL_FLAGS += --sd-req 0x00B6
 
     else ifneq (,$(filter SD730,$(UF2_SOFTDEV)))
       ROM_OFFSET = 0x27000
       ROM_LEN    = 0x59000
+      ADANRFUTIL_FLAGS += --sd-req 0x0123
 
     else
       $(error Unsupported SoftDevice Version $(UF2_SOFTDEV).)
@@ -33,6 +36,7 @@ ifneq (,$(filter uf2conv,$(PROGRAMMER)))
 
   else ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
     UF2CONV_FLAGS = -f 0xADA52840
+    ADANRFUTIL_FLAGS = --dev-type 0x0052
 
     ifneq (,$(filter DROP,$(UF2_SOFTDEV)))
       ROM_OFFSET = 0x1000
@@ -41,10 +45,12 @@ ifneq (,$(filter uf2conv,$(PROGRAMMER)))
     else ifneq (,$(filter SD611,$(UF2_SOFTDEV)))
       ROM_OFFSET = 0x26000
       ROM_LEN    = 0xda000
+      ADANRFUTIL_FLAGS += --sd-req 0x00B6
 
     else ifneq (,$(filter SD730,$(UF2_SOFTDEV)))
       ROM_OFFSET = 0x27000
       ROM_LEN    = 0xd9000
+      ADANRFUTIL_FLAGS += --sd-req 0x0123
 
     else
       $(error Unsupported SoftDevice Version $(UF2_SOFTDEV).)
@@ -60,6 +66,7 @@ ifneq (,$(filter uf2conv,$(PROGRAMMER)))
 endif
 
 PROGRAMMERS_SUPPORTED += uf2conv
+PROGRAMMERS_SUPPORTED += adafruit-nrfutil
 
 # HACK: replicate dependency resolution in Makefile.dep, only works
 # if `USEMODULE` or `DEFAULT_MODULE` is set by the command line or in the
