@@ -176,7 +176,8 @@ extern "C" {
 
 /**
  * @brief   An offset for ZTIMER_USEC allowing to compentsate for the offset
- *          of @ref ztimer_sleep().
+ *          of @ref ztimer_sleep(). It can be measured with @ref
+ *          ztimer_overhead_sleep()
  *
  * @note    As internally @ref ztimer_sleep() uses @ref ztimer_set()
  *          @ref CONFIG_ZTIMER_USEC_ADJUST_SET should be tuned before.
