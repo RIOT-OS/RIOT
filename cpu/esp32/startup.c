@@ -71,6 +71,7 @@
 
 #if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
 #include "esp_private/spi_flash_os.h"
+#include "esp_flash_internal.h"
 #endif
 
 #if IS_USED(MODULE_ESP_SPI_RAM)
