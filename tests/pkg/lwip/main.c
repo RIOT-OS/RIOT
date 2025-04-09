@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "common.h"
+#include "cli.h"
 #include "lwip.h"
 #include "lwip/netif.h"
 #if LWIP_IPV4

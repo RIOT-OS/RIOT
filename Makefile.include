@@ -397,6 +397,7 @@ ifneq (,$(IOTLAB_NODE))
 endif
 
 # Add standard include directories
+INCLUDES += -I$(APPDIR)
 INCLUDES += -I$(RIOTBASE)/core/lib/include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/drivers/include
