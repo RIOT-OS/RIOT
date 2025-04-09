@@ -15,7 +15,6 @@
  * @brief       Function declarations for low level wrapper functions for cipher operations.
  *
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
- *
  */
 
 #ifndef PSA_CIPHERS_H
@@ -32,17 +31,6 @@ extern "C" {
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 CBC encryption.
  *          See @ref psa_cipher_encrypt()
- *
- * @param attributes
- * @param key_buffer
- * @param key_buffer_size
- * @param alg
- * @param input
- * @param input_length
- * @param output
- * @param output_size
- * @param output_length
- * @return @ref psa_status_t
  */
 psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attributes,
                                             const uint8_t *key_buffer,
@@ -57,17 +45,6 @@ psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attribut
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 CBC decryption.
  *          See @ref psa_cipher_decrypt()
- *
- * @param attributes
- * @param key_buffer
- * @param key_buffer_size
- * @param alg
- * @param input
- * @param input_length
- * @param output
- * @param output_size
- * @param output_length
- * @return @ref psa_status_t
  */
 psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attributes,
                                             const uint8_t *key_buffer,
@@ -84,17 +61,6 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
 /**
  * @brief   Low level wrapper function to call a driver for an AES 192 CBC encryption.
  *          See @ref psa_cipher_encrypt()
- *
- * @param attributes
- * @param key_buffer
- * @param key_buffer_size
- * @param alg
- * @param input
- * @param input_length
- * @param output
- * @param output_size
- * @param output_length
- * @return @ref psa_status_t
  */
 psa_status_t psa_cipher_cbc_aes_192_encrypt(const psa_key_attributes_t *attributes,
                                             const uint8_t *key_buffer,
@@ -111,17 +77,6 @@ psa_status_t psa_cipher_cbc_aes_192_encrypt(const psa_key_attributes_t *attribut
 /**
  * @brief   Low level wrapper function to call a driver for an AES 256 CBC encryption.
  *          See @ref psa_cipher_encrypt()
- *
- * @param attributes
- * @param key_buffer
- * @param key_buffer_size
- * @param alg
- * @param input
- * @param input_length
- * @param output
- * @param output_size
- * @param output_length
- * @return psa_status_t
  */
 psa_status_t psa_cipher_cbc_aes_256_encrypt(const psa_key_attributes_t *attributes,
                                             const uint8_t *key_buffer,
