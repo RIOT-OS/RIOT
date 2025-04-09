@@ -108,6 +108,19 @@ ifneq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_netdev
 endif
 
+#dirty hack when lwip_dhcp is used for IPv4 (use of lwip_ipv4 module)
+#on boards that do not have physical network interface (lack of netdev_new_api
+#module)
+ifneq (,$(filter lwip_dhcp,$(USEMODULE)))
+  ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+#    ifeq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
+    ifeq (,$(filter netdev_new_api,$(USEMODULE)))
+      USEMODULE += netdev_eth
+      USEMODULE += netdev_new_api
+   endif
+  endif
+endif
+
 ifneq (,$(filter netif,$(USEMODULE)))
   USEMODULE += fmt
 endif
