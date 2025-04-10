@@ -43,6 +43,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <time.h>
 #include <unistd.h>
 
 #ifdef __cplusplus
@@ -405,6 +406,25 @@ size_t fmt_str(char *out, const char *str);
 size_t fmt_to_lower(char *out, const char *str);
 
 /**
+ * @brief   Format a time structure to an ISO 8601 string
+ *
+ * This function does only take care of format validity
+ * and not of date/time validity.
+ *
+ * @param[out]  out         Pointer to output buffer
+ * @param[in]   tm          Pointer to time structure
+ * @param[in]   separator   Date and time separator.
+ *                          Must be 'T' for ISO 8601 or may be ' '
+ *
+ * @return     nr of characters written to (or needed in) @p out
+ *
+ * @retval     -EINVAL      if @p tm is specifying a number for
+ *                          year, month, day, hour, minute which would yield
+ *                          to an invalid date/time format
+ */
+int fmt_time_tm_iso8601(char out[20], const struct tm *tm, char separator);
+
+/**
  * @brief Convert string of decimal digits to uint32
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
@@ -454,6 +474,28 @@ uint32_t scn_u32_hex(const char *str, size_t n);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 ssize_t scn_buf_hex(void *dest, size_t dest_len, const char *hex, size_t hex_len);
+
+/**
+ * @brief   Convert an ISO 8601 string to time structure
+ *
+ * This function parses a string in the format
+ * YYYY-MM-DD\<separator\>HH:MM:SS or YYYY-MM-DD.
+ *
+ * A terminating '\0' is not required.
+ *
+ * This function does only take care of format validity
+ * and not of date/time validity.
+ *
+ * @param[out]  tm          Pointer to time structure
+ * @param[in]   str         Pointer to string to read from
+ * @param[in]   separator   Date and time separator
+ *
+ * @return  Number of characters read from @p str on success (19 or 10)
+ *
+ * @retval      -EINVAL     if @p str has an invalid format
+ * @retval      -EBADF      if the expected separator does not match
+ */
+int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator);
 
 /**
  * @brief Print string to stdout

@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "container.h"
@@ -472,6 +473,55 @@ size_t fmt_to_lower(char *out, const char *str)
     return len;
 }
 
+int fmt_time_tm_iso8601(char out[20], const struct tm *tm, char separator)
+{
+    assert(out);
+    assert(tm);
+    /* The lowest year allowed in ISO 8601 is 0000 (year zero), which represents 1 BCE */
+    if ((tm->tm_year < -1900 || tm->tm_year > 9999 - 1900) ||
+        (tm->tm_mon < -1 || tm->tm_mon > 99 - 1) ||
+        (tm->tm_mday < 0 || tm->tm_mday > 99) ||
+        (tm->tm_hour < 0 || tm->tm_hour > 99) ||
+        (tm->tm_min < 0 || tm->tm_min > 99) ||
+        (tm->tm_sec < 0 || tm->tm_sec > 99)) {
+        return -EINVAL;
+    }
+    char *pos = out;
+    int len;
+
+    len =  fmt_u16_dec(pos, tm->tm_year + 1900);
+    fmt_lpad(pos, len, 4, '0');
+    pos += 4;
+    *pos++ = '-';
+
+    len = fmt_u16_dec(pos, tm->tm_mon + 1);
+    fmt_lpad(pos, len, 2, '0');
+    pos += 2;
+    *pos++ = '-';
+
+    len = fmt_u16_dec(pos, tm->tm_mday);
+    fmt_lpad(pos, len, 2, '0');
+    pos += 2;
+    *pos++ = separator;
+
+    len = fmt_u16_dec(pos, tm->tm_hour);
+    fmt_lpad(pos, len, 2, '0');
+    pos += 2;
+    *pos++ = ':';
+
+    len = fmt_u16_dec(pos, tm->tm_min);
+    fmt_lpad(pos, len, 2, '0');
+    pos += 2;
+    *pos++ = ':';
+
+    len = fmt_u16_dec(pos, tm->tm_sec);
+    fmt_lpad(pos, len, 2, '0');
+    pos += 2;
+    *pos = '\0';
+
+    return pos - out;
+}
+
 uint32_t scn_u32_dec(const char *str, size_t n)
 {
     uint32_t res = 0;
@@ -565,6 +615,54 @@ ssize_t scn_buf_hex(void *_dest, size_t dest_len, const char *hex, size_t hex_le
     }
 
     return len;
+}
+
+int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator)
+{
+    assert(tm);
+    assert(str);
+    memset(tm, 0, sizeof(*tm));
+    tm->tm_isdst = -1; /* undefined */
+
+    if (!fmt_is_digit(str[0]) || !fmt_is_digit(str[1]) ||
+        !fmt_is_digit(str[2]) || !fmt_is_digit(str[3]) ||
+        str[4] != '-' ||
+        !fmt_is_digit(str[5]) || !fmt_is_digit(str[6]) ||
+        str[7] != '-' ||
+        !fmt_is_digit(str[8]) || !fmt_is_digit(str[9])) {
+        return -EINVAL;
+    }
+
+    uint32_t num = scn_u32_dec(str, 4);
+    tm->tm_year = num - 1900;
+    num = scn_u32_dec(str + 5, 2);
+    tm->tm_mon = num - 1;
+    num = scn_u32_dec(str + 8, 2);
+    tm->tm_mday = num;
+
+    if (str[10] == '\0') {
+        /* no time, just date */
+        return 10;
+    }
+    if (str[10] != separator) {
+        return -EBADF;
+    }
+    if (!fmt_is_digit(str[11]) || !fmt_is_digit(str[12]) ||
+        str[13] != ':' ||
+        !fmt_is_digit(str[14]) || !fmt_is_digit(str[15]) ||
+        str[16] != ':' ||
+        !fmt_is_digit(str[17]) || !fmt_is_digit(str[18])) {
+        return -EINVAL;
+    }
+
+    num = scn_u32_dec(str + 11, 2);
+    tm->tm_hour = num;
+    num = scn_u32_dec(str + 14, 2);
+    tm->tm_min = num;
+    num = scn_u32_dec(str + 17, 2);
+    tm->tm_sec = num;
+
+    return 19;
 }
 
 /* native gets special treatment as native's stdio code is ... special.
