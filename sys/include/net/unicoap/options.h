@@ -826,7 +826,7 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
 static inline ssize_t unicoap_options_get_content_format(unicoap_options_t* options,
                                                          unicoap_content_format_t* format)
 {
-    return unicoap_options_get_uint16(options, UNICOAP_OPTION_CONTENT_FORMAT, format);
+    return unicoap_options_get_uint16(options, UNICOAP_OPTION_CONTENT_FORMAT, (uint16_t*)format);
 }
 
 /**
@@ -841,7 +841,7 @@ static inline ssize_t unicoap_options_get_content_format(unicoap_options_t* opti
 static inline int unicoap_options_set_content_format(unicoap_options_t* options,
                                                      unicoap_content_format_t format)
 {
-    return unicoap_options_set_uint(options, UNICOAP_OPTION_CONTENT_FORMAT, format);
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_CONTENT_FORMAT, (uint32_t)format);
 }
 
 /**
@@ -876,7 +876,7 @@ static inline int unicoap_options_remove_content_format(unicoap_options_t* optio
 static inline ssize_t unicoap_options_get_accept(unicoap_options_t* options,
                                                  unicoap_content_format_t* format)
 {
-    return unicoap_options_get_uint16(options, UNICOAP_OPTION_ACCEPT, format);
+    return unicoap_options_get_uint16(options, UNICOAP_OPTION_ACCEPT, (uint16_t*)format);
 }
 
 /**
@@ -891,7 +891,7 @@ static inline ssize_t unicoap_options_get_accept(unicoap_options_t* options,
 static inline int unicoap_options_set_accept(unicoap_options_t* options,
                                              unicoap_content_format_t format)
 {
-    return unicoap_options_set_uint(options, UNICOAP_OPTION_ACCEPT, format);
+    return unicoap_options_set_uint(options, UNICOAP_OPTION_ACCEPT, (uint32_t)format);
 }
 
 /**

@@ -619,6 +619,9 @@ typedef enum {
     UNICOAP_OPTION_REQUEST_TAG = 292,
 } __attribute__((__packed__)) unicoap_option_number_t;
 
+static_assert(sizeof(unicoap_option_number_t) == sizeof(uint16_t),
+              "unicoap_option_number_t has unexpected size");
+
 /**
  * @brief CoAP signaling option number
  *
