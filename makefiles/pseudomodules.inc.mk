@@ -475,6 +475,7 @@ PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
 PSEUDOMODULES += socket_zep_hello
+PSEUDOMODULES += soft_onewire_hwtimer
 PSEUDOMODULES += soft_uart_modecfg
 PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_available
