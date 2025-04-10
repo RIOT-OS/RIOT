@@ -1,5 +1,5 @@
 # Actually |(periph_timer_poll and periph_gpio_ll), but that's too complex for FEATURES_REQUIRED_ANY to express
-FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_timer_poll
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_systick|periph_timer_poll
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
   ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
@@ -10,6 +10,9 @@ ifeq (,$(filter ws281x_%,$(USEMODULE)))
   endif
   ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
     USEMODULE += ws281x_esp32
+  endif
+  ifneq (,$(filter periph_systick,$(FEATURES_USED)))
+    USEMODULE += ws281x_systick_gpio_ll
   endif
   # Not only looking for the used feature but also for the absence of any more specific driver
   ifeq (-periph_timer_poll,$(filter ws281x_%,$(USEMODULE))-$(filter periph_timer_poll,$(FEATURES_USED)))
@@ -36,6 +39,10 @@ endif
 
 ifneq (,$(filter ws281x_timer_gpio_ll,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_ll periph_timer periph_timer_poll
+endif
+
+ifneq (,$(filter ws281x_systick_gpio_ll,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_ll periph_systick
 endif
 
 # It would seem xtimer is always required as it is used in the header...
