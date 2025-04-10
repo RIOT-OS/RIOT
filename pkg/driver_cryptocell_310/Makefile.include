@@ -1,5 +1,6 @@
-INCLUDES += -I$(PKGDIRBASE)/driver_cryptocell_310/include
-INCLUDES += -I$(RIOTPKG)/driver_cryptocell_310/include
+# using -isystem instead of -I to avoid warnings on the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/driver_cryptocell_310/include
+INCLUDES += -isystem$(RIOTPKG)/driver_cryptocell_310/include
 DIRS += $(RIOTPKG)/driver_cryptocell_310/contrib
 
 ARCHIVES += $(PKGDIRBASE)/driver_cryptocell_310/libnrf_cc310_0.9.13.a

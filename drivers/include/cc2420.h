@@ -103,9 +103,6 @@ typedef struct {
  * @param[in]  params       device parameters
  * @param[in]  index        index of @p params in a global parameter struct array.
  *                          If initialized manually, pass a unique identifier instead.
- *
- * @return                  0 on success
- * @return                  -1 on error
  */
 void cc2420_setup(cc2420_t *dev, const cc2420_params_t *params, uint8_t index);
 
@@ -159,8 +156,6 @@ void cc2420_set_addr_short(cc2420_t *dev, const uint8_t *addr);
  *
  * @param[in]  dev           device to read from
  * @param[out] addr_long     buffer to save the read address
- *
- * @return                  the currently set (8-byte) long address
  */
 void cc2420_get_addr_long(cc2420_t *dev, uint8_t *addr_long);
 

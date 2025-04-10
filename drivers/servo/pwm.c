@@ -38,9 +38,9 @@
 /**
  * @brief   Calculate the duty cycle corresponding to the given duration of the
  *          "on duration"
- * @param   pwm_freq        frequency of the PWM peripheral
- * @param   pwm_res         resolution of the PWM peripheral
- * @param   duration        duration of the "on phase" in microseconds
+ * @param   freq            frequency of the PWM peripheral
+ * @param   res             resolution of the PWM peripheral
+ * @param   duration_us     duration of the "on phase" in microseconds
  *
  * @note    Scientific rounding is used
  */

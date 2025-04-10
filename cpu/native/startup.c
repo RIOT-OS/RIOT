@@ -157,7 +157,7 @@ static const struct option long_opts[] = {
 /**
  * @brief   initialize _native_null_in_pipe to allow for reading from stdin
  *
- * @param[in] stdiotype _STDIOTYPE_STDIO to to just initialize pipe, any other
+ * @param[in] stdintype _STDIOTYPE_STDIO to to just initialize pipe, any other
  *                      value to also redirect stdin to that pipe
  */
 void _native_input(_stdiotype_t stdintype)
@@ -251,7 +251,7 @@ void daemonize(void)
 /**
  * Remove any -d options from an argument vector.
  *
- * @param[in][out]  argv    an argument vector
+ * @param[in,out]   argv    an argument vector
  */
 static void filter_daemonize_argv(char **argv)
 {

@@ -1,10 +1,11 @@
 DIRS += $(RIOTBASE)/pkg/wakaama/contrib
 
-INCLUDES += -I$(RIOTBASE)/pkg/wakaama/include
-INCLUDES += -I$(PKGDIRBASE)/wakaama/include
-INCLUDES += -I$(PKGDIRBASE)/wakaama/core
-INCLUDES += -I$(PKGDIRBASE)/wakaama/data
-INCLUDES += -I$(PKGDIRBASE)/wakaama/coap/er-coap-13
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(RIOTBASE)/pkg/wakaama/include
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/include
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/core
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/data
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/coap/er-coap-13
 
 # NOTE: Use wakaama in client mode
 CFLAGS += -DLWM2M_CLIENT_MODE

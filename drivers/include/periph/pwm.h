@@ -97,9 +97,9 @@ typedef uint_fast8_t pwm_t;
  */
 #ifndef HAVE_PWM_MODE_T
 typedef enum {
-    PWM_LEFT,           /*< use left aligned PWM */
-    PWM_RIGHT,          /*< use right aligned PWM */
-    PWM_CENTER          /*< use center aligned PWM */
+    PWM_LEFT,           /**< use left aligned PWM */
+    PWM_RIGHT,          /**< use right aligned PWM */
+    PWM_CENTER          /**< use center aligned PWM */
 } pwm_mode_t;
 #endif
 

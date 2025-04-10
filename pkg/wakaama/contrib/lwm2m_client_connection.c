@@ -65,8 +65,8 @@
  * @brief Creates a new connection object based on the security instance
  *        represented by @p instance_id.
  *
- * @param[in] instance_id ID number of the instance of security object
- * @param[in, out] client_data LwM2M client data
+ * @param[in]     sec_obj_inst_id   ID number of the instance of security object
+ * @param[in,out] client_data       LwM2M client data
  *
  * @return Pointer to the new connection
  */
@@ -97,7 +97,7 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
  * @return  pointer to the interface to use on success
  * @retval  NULL on error
  */
-static netif_t *_get_interface(const char *iface, size_t len);
+static netif_t *_get_interface(const char *iface, size_t iface_len);
 
 void *lwm2m_connect_server(uint16_t sec_obj_inst_id, void *user_data)
 {

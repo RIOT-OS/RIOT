@@ -82,8 +82,8 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[in]    params     Initialization parameters
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[in]     params    Initialization parameters
  *
  * @return 0 on success
  * @return > 0 on error
@@ -93,7 +93,7 @@ int sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
 /**
  * @brief   Execute a reset on the given device
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  *
  * @return 0 on success
  * @return > 0 on error
@@ -103,7 +103,7 @@ int sen5x_reset(const sen5x_t *dev);
 /**
  * @brief   Starts a continuous measurement
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  */
 void sen5x_wake(const sen5x_t *dev);
 
@@ -111,28 +111,28 @@ void sen5x_wake(const sen5x_t *dev);
  * @brief   Starts a continuous measurement without PM. Only humidity,
  *          temperature, VOC and NOx are measured.
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  */
 void sen5x_wake_no_pm(const sen5x_t *dev);
 
 /**
  * @brief   Stops the measurement and returns to idle mode
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  */
 void sen5x_sleep(const sen5x_t *dev);
 
 /**
  * @brief   Sets the fan to maximum speed, to clean it within 10 seconds
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  */
 void sen5x_clean_fan(const sen5x_t *dev);
 
 /**
  * @brief   Sets the fan to maximum speed, to clean it within 10 seconds
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  *
  * @return 0 if no new measurements are available
  * @return 1 if new measuremtns are ready to be read
@@ -142,26 +142,26 @@ bool sen5x_data_ready_flag(const sen5x_t *dev);
 /**
  * @brief   Read measured mass concentration, humidity and temperature values
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[out]   values     Pointer to wrapper containing all measured values
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[out]    values    Pointer to wrapper containing all measured values
  */
 void sen5x_read_values(const sen5x_t *dev, sen5x_measurement_t *values);
 
 /**
  * @brief   Read measured particle matter values
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[out]   values     Pointer to wrapper containing all measured values
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[out]    values    Pointer to wrapper containing all measured values
  */
 void sen5x_read_pm_values(const sen5x_t *dev, sen5x_measurement_t *values);
 
 /**
  * @brief   Set a custom temperature offset to the ambient temperature
  *
- * @param[inout] dev            Device descriptor of the driver
- * @param[in]    temp_offset    Temperature offset in °C
- * @param[in]    slope          Normalized temperature offset slope
- * @param[in]    time_constant  Time constant in seconds
+ * @param[in,out] dev           Device descriptor of the driver
+ * @param[in]     temp_offset   Temperature offset in °C
+ * @param[in]     slope         Normalized temperature offset slope
+ * @param[in]     time_constant Time constant in seconds
  */
 void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset,
                                     int16_t slope, uint16_t time_constant);
@@ -169,7 +169,7 @@ void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset,
 /**
  * @brief   Set a custom temperature offset to the ambient temperature
  *
- * @param[inout]  dev            Device descriptor of the driver
+ * @param[in,out] dev            Device descriptor of the driver
  * @param[out]    temp_offset    Temperature offset in °C
  * @param[out]    slope          Normalized temperature offset slope
  * @param[out]    time_constant  Time constant in seconds
@@ -181,8 +181,8 @@ void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset,
  * @brief   Set the parameter for a warm start on the device, to improve initial
  *          accuracy of the ambient temperature output
  *
- * @param[inout] dev            Device descriptor of the driver
- * @param[in]    warm_start     Warm start behavior as a value in the range from
+ * @param[in,out] dev           Device descriptor of the driver
+ * @param[in]     warm_start    Warm start behavior as a value in the range from
  *                              0 (cold start, default) to 65535 (warm start).
  */
 void sen5x_set_warm_start(const sen5x_t *dev, uint16_t warm_start);
@@ -190,8 +190,8 @@ void sen5x_set_warm_start(const sen5x_t *dev, uint16_t warm_start);
 /**
  * @brief   Get the warm start parameter
  *
- * @param[inout] dev            Device descriptor of the driver
- * @param[out]   warm_start     Warm start behavior as a value in the range from
+ * @param[in,out] dev           Device descriptor of the driver
+ * @param[out]    warm_start    Warm start behavior as a value in the range from
  *                              0 (cold start, default) to 65535 (warm start).
  */
 void sen5x_get_warm_start(const sen5x_t *dev, uint16_t *warm_start);
@@ -199,15 +199,15 @@ void sen5x_get_warm_start(const sen5x_t *dev, uint16_t *warm_start);
 /**
  * @brief   Set the parameters for the VOC Algorithm tuning
  *
- * @param[inout] dev                            Device descriptor of the driver
- * @param[in]    index_offset                   VOC index representing typical (average) conditions
- * @param[in]    learning_time_offset_hours     Time constant to estimate the VOC
+ * @param[in,out] dev                           Device descriptor of the driver
+ * @param[in]     index_offset                  VOC index representing typical (average) conditions
+ * @param[in]     learning_time_offset_hours    Time constant to estimate the VOC
  *                                              algorithm offset from the history in hours
- * @param[in]    learning_time_gain_hours       Time constant to estimate the VOC
+ * @param[in]     learning_time_gain_hours      Time constant to estimate the VOC
  *                                              algorithm gain from the history in hours
- * @param[in]    gating_max_duration_minutes    Maximum duration of gating in minutes
- * @param[in]    std_initial                    Initial estimate for standard deviation
- * @param[in]    gain_factor                    Gain factor to amplify or to attenuate
+ * @param[in]     gating_max_duration_minutes   Maximum duration of gating in minutes
+ * @param[in]     std_initial                   Initial estimate for standard deviation
+ * @param[in]     gain_factor                   Gain factor to amplify or to attenuate
  *                                              the VOC index output
  */
 void sen5x_set_voc_algorithm_tuning(
@@ -218,7 +218,7 @@ void sen5x_set_voc_algorithm_tuning(
 /**
  * @brief   Get the VOC Algorithm tuning parameters
  *
- * @param[inout]  dev                            Device descriptor of the driver
+ * @param[in,out] dev                            Device descriptor of the driver
  * @param[out]    index_offset                   VOC index representing typical
  *                                               (average) conditions
  * @param[out]    learning_time_offset_hours     Time constant to estimate the VOC
@@ -238,19 +238,19 @@ void sen5x_get_voc_algorithm_tuning(
 /**
  * @brief   Set the parameters for the NOx Algorithm tuning
  *
- * @param[inout] dev                            Device descriptor of the driver
- * @param[in]    index_offset                   NOx index representing typical (average) conditions
- * @param[in]    learning_time_offset_hours     Time constant to estimate the NOx algorithm offset
+ * @param[in,out] dev                           Device descriptor of the driver
+ * @param[in]     index_offset                  NOx index representing typical (average) conditions
+ * @param[in]     learning_time_offset_hours    Time constant to estimate the NOx algorithm offset
  *                                              from the history in hours
- * @param[in]    learning_time_gain_hours       The time constant to estimate the
+ * @param[in]     learning_time_gain_hours      The time constant to estimate the
  *                                              NOx algorithm gain from the history has no
  *                                              impact for NOx. This parameter is still in place
  *                                              for consistency reasons with the VOC tuning
  *                                              parameters command.
  *                                              This parameter must always be set to 12 hours
- * @param[in]    gating_max_duration_minutes    Maximum duration of gating in minutes
- * @param[in]    std_initial                    Initial estimate for standard deviation
- * @param[in]    gain_factor                    Gain factor to amplify or to attenuate
+ * @param[in]     gating_max_duration_minutes   Maximum duration of gating in minutes
+ * @param[in]     std_initial                   Initial estimate for standard deviation
+ * @param[in]     gain_factor                   Gain factor to amplify or to attenuate
  *                                              the NOx index output
  */
 void sen5x_set_nox_algorithm_tuning(
@@ -261,7 +261,7 @@ void sen5x_set_nox_algorithm_tuning(
 /**
  * @brief   Get the NOx Algorithm tuning parameters
  *
- * @param[inout]  dev                            Device descriptor of the driver
+ * @param[in,out] dev                            Device descriptor of the driver
  * @param[out]    index_offset                   NOx index representing typical(average) conditions
  * @param[out]    learning_time_offset_hours     Time constant to estimate the NOx algorithm
  *                                               offset from the history in hours
@@ -284,8 +284,8 @@ void sen5x_get_nox_algorithm_tuning(
 /**
  * @brief   Set the mode for the RH/T acceleration algorithm
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[in]    mode       RH/T acceleration mode:
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[in]     mode      RH/T acceleration mode:
  *                              = 0: Low Acceleration
  *                              = 1: High Acceleration
  *                              = 2: Medium Acceleration
@@ -295,8 +295,8 @@ void sen5x_set_rht_acceleration(const sen5x_t *dev, uint16_t mode);
 /**
  * @brief   Get the mode for the RH/T acceleration algorithm
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[out]   mode       RH/T acceleration mode:
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[out]    mode      RH/T acceleration mode:
  *                              = 0: Low Acceleration
  *                              = 1: High Acceleration
  *                              = 2: Medium Acceleration
@@ -306,18 +306,18 @@ void sen5x_get_rht_acceleration(const sen5x_t *dev, uint16_t *mode);
 /**
  * @brief   Get the VOC Algorithm state
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[in]    state      VOC Algorithm state
- * @param[in]    state_size Size of the VOC Algorithm state
+ * @param[in,out] dev           Device descriptor of the driver
+ * @param[in]     state         VOC Algorithm state
+ * @param[in]     state_size    Size of the VOC Algorithm state
  */
 void sen5x_set_voc_state(const sen5x_t *dev, const uint8_t *state, uint8_t state_size);
 
 /**
  * @brief   Set the VOC Algorithm state
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[out]   state      VOC Algorithm state
- * @param[in]    state_size Size of the VOC Algorithm state
+ * @param[in,out] dev           Device descriptor of the driver
+ * @param[out]    state         VOC Algorithm state
+ * @param[in]     state_size    Size of the VOC Algorithm state
  */
 void sen5x_get_voc_state(const sen5x_t *dev, uint8_t *state, uint8_t state_size);
 

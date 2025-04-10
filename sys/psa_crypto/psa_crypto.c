@@ -451,12 +451,6 @@ psa_status_t psa_cipher_abort(psa_cipher_operation_t *operation)
  *
  *          See @ref psa_cipher_encrypt_setup(...)
  *          See @ref psa_cipher_decrypt_setup(...)
- *
- * @param   operation
- * @param   key
- * @param   alg
- * @param   direction   Whether encrypt or decrypt, see @ref psa_encrypt_or_decrypt_t
- * @return  @ref psa_status_t
  */
 static psa_status_t psa_cipher_setup(   psa_cipher_operation_t *operation,
                                         psa_key_id_t key,
@@ -520,16 +514,6 @@ static psa_status_t psa_cipher_setup(   psa_cipher_operation_t *operation,
  *
  *          See @ref psa_cipher_encrypt(...)
  *          See @ref psa_cipher_decrypt(...)
- *
- * @param   key
- * @param   alg
- * @param   input
- * @param   input_length
- * @param   output
- * @param   output_size
- * @param   output_length
- * @param   direction       Whether to encrypt or decrypt, see @ref psa_encrypt_or_decrypt_t
- * @return  @ref psa_status_t
  */
 static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
                                                 psa_algorithm_t alg,
@@ -1254,12 +1238,6 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
  *
  *          See @ref psa_export_key
  *
- * @param   key_buffer
- * @param   key_buffer_size
- * @param   data
- * @param   data_size
- * @param   data_length
- *
  * @return  @ref PSA_SUCCESS
  *          @ref PSA_ERROR_INVALID_ARGUMENT
  */
@@ -1351,12 +1329,6 @@ psa_status_t psa_export_key(psa_key_id_t key,
  * @brief   Export asymmetric public key that is stored in local memory
  *
  *          See @ref psa_export_public_key
- *
- * @param   key_buffer
- * @param   key_buffer_size
- * @param   data
- * @param   data_size
- * @param   data_length
  *
  * @return  @ref PSA_SUCCESS
  *          @ref PSA_ERROR_INVALID_ARGUMENT

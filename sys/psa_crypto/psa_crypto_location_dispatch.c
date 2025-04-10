@@ -166,19 +166,6 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
  *
  *          Some secure elements don't provide single part operations for cipher encryption.
  *          This is a wrapper function, to support those.
- *
- * @param   drv
- * @param   drv_context
- * @param   attributes
- * @param   alg
- * @param   direction
- * @param   slot
- * @param   input
- * @param   input_length
- * @param   output
- * @param   output_size
- * @param   output_length
- * @return  @ref psa_status_t
  */
 static psa_status_t psa_se_cipher_encrypt_decrypt(  const psa_drv_se_t *drv,
                                                     psa_drv_se_context_t *drv_context,

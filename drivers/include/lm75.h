@@ -136,7 +136,7 @@ int lm75_get_temperature(lm75_t *dev, int *temperature);
  * @param[in] temp_os       desired OS temperature in mºC
  * @param[in] temp_hyst     desired HYST temperature in mºC
  * @param[in] cb            callback that is called from interrupt context
- * @param[in] *arg          optional arguments for the gpio_init_int function
+ * @param[in] arg           optional arguments for the gpio_init_int function
  *
  * @return LM75_SUCCESS, on success
  * @return LM75_ERROR_I2C, on I2C related error

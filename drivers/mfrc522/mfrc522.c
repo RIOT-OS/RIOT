@@ -152,9 +152,9 @@ static void _device_read_n(mfrc522_t *dev, mfrc522_pcd_register_t reg,
 /**
  * @brief Read single byte from a given register of the device.
  *
- * @param[in] dev     Device descriptor of the MFRC522
- * @param[in] reg     Register to read from
- * @param[in] byte    uint8_t pointer to store the value in
+ * @param[in]   dev       Device descriptor of the MFRC522
+ * @param[in]   reg       Register to read from
+ * @param[in]   value     uint8_t pointer to store the value in
  */
 static void _device_read(mfrc522_t *dev, mfrc522_pcd_register_t reg,
                          uint8_t *value)

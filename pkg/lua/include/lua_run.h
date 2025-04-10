@@ -182,14 +182,14 @@ LUALIB_API int lua_riot_openlibs(lua_State *L, uint16_t modmask);
  * or to manually reset the heap (only if there's no other thread using it).
  *
  * @param       modname     name of the module.
- * @param       memory      @see lua_riot_newstate()
- * @param       mem_size    @see lua_riot_newstate()
- * @param       modmask     @see lua_riot_newstate()
+ * @param       memory      See @ref lua_riot_newstate()
+ * @param       mem_size    See @ref lua_riot_newstate()
+ * @param       modmask     See @ref lua_riot_newstate()
  * @param[out]  retval      Value returned by the lua code, if it is a number,
  *                          or zero if no value is returned or the value is not
  *                          a number. If retval is null, the value is not stored.
  *
- * @return      An error code ( @see LUAR_ERRORS). LUAR_EXIT indicates no error.
+ * @return      An error code ( See @ref LUAR_ERRORS). LUAR_EXIT indicates no error.
  */
 LUALIB_API int lua_riot_do_module(const char *modname, void *memory, size_t mem_size,
                                   uint16_t modmask, int *retval);
@@ -200,16 +200,16 @@ LUALIB_API int lua_riot_do_module(const char *modname, void *memory, size_t mem_
  * Only text data (i.e. lua source code) can be loaded by this function. The
  * lua interpreter is not robust against corrupt binary code.
  *
- * @see lua_riot_do_module() for more information on internal errors.
+ * See @ref lua_riot_do_module() for more information on internal errors.
  *
  * @param       buf     Text data (lua source code).
  * @param       buflen  Size of the text data in bytes. If buf is
  *                      a zero-terminated string, the zero must not be counted.
- * @param       memory      @see lua_riot_newstate()
- * @param       mem_size    @see lua_riot_newstate()
- * @param       modmask     @see lua_riot_newstate()
- * @param[out]  retval      @see lua_riot_do_module()
- * @return      @see lua_riot_do_module().
+ * @param       memory      See @ref lua_riot_newstate()
+ * @param       mem_size    See @ref lua_riot_newstate()
+ * @param       modmask     See @ref lua_riot_newstate()
+ * @param[out]  retval      See @ref lua_riot_do_module()
+ * @return      See @ref lua_riot_do_module().
  */
 LUALIB_API int lua_riot_do_buffer(const uint8_t *buf, size_t buflen, void *memory,
                                   size_t mem_size, uint16_t modmask, int *retval);

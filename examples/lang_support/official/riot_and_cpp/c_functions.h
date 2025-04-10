@@ -38,9 +38,9 @@ int hello(void);
 /**
  * @brief   Get day of week from given date (day, month, year >= 1/1/2000).
  *
- * @param[in]   day
- * @param[in]   month
- * @param[in]   year
+ * @param[in]   day     day of the date
+ * @param[in]   month   month of the date
+ * @param[in]   year    year f the date
  *
  * @return      day of week (0 means Sunday, ... 6 means Saturday)
  */

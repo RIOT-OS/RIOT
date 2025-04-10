@@ -1,16 +1,17 @@
-INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/common/inc
-INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/emlib/inc
-INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/emlib-extra/inc
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/common/inc
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/emlib/inc
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/emlib-extra/inc
 
 ifneq (,$(filter gecko_sdk_librail,$(USEMODULE)))
   ARCHIVES += $(BINDIR)/gecko_sdk_librail.a
-  INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/common
-  INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/chip/efr32/$(EFM32_LIBRAIL_HEADER_NAME)
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/common
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/chip/efr32/$(EFM32_LIBRAIL_HEADER_NAME)
 endif
 
 ifneq (,$(filter gecko_sdk_librail_pa,$(USEMODULE)))
-  INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions
-  INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions/$(EFM32_LIBRAIL_PA_HEADER_NAME)/config
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions/$(EFM32_LIBRAIL_PA_HEADER_NAME)/config
 endif
 
 ifeq ($(CPU_CORE),cortex-m33)

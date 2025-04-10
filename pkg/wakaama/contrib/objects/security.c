@@ -180,10 +180,10 @@ static uint8_t _create_cb(lwm2m_context_t * context, uint16_t instance_id, int n
 /**
  * @brief Get a value from a security object instance.
  *
- * @param data[in, out]     Data structure indicating the id of the resource
- *                          to get the value of. It will contain the value if
- *                          successful.
- * @param instance[in]      Instance to get the data from.
+ * @param[in,out]   data        Data structure indicating the id of the resource
+ *                              to get the value of. It will contain the value
+ *                              if successful.
+ * @param[in]       instance    Instance to get the data from.
  * @retval 0 on success
  * @retval <0 otherwise
  */
@@ -192,9 +192,9 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance);
 /**
  * @brief Initialize a new instance with the given arguments.
  *
- * @param instance[out]     Instance to initialize.
- * @param instance_id[in]   ID of the instance.
- * @param args[in]          Arguments to initialize the instance with.
+ * @param[out]  instance        Instance to initialize.
+ * @param[in]   instance_id     ID of the instance.
+ * @param[in]   args            Arguments to initialize the instance with.
  *
  * @retval 0 on success
  * @retval -ENOMEM if there is no memory available to copy credentials

@@ -31,13 +31,6 @@ extern "C" {
  * @brief   Low level wrapper function to call a driver for an ECC key generation
  *          with a SECP 192 R1 key.
  *          See @ref psa_generate_key()
- *
- * @param   attributes
- * @param   priv_key_buffer
- * @param   pub_key_buffer
- * @param   priv_key_buffer_length
- * @param   pub_key_buffer_length
- * @return  @ref psa_status_t
  */
 psa_status_t psa_generate_ecc_p192r1_key_pair(  const psa_key_attributes_t *attributes,
                                                 uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
@@ -94,13 +87,6 @@ psa_status_t psa_ecc_p192r1_verify_message(const psa_key_attributes_t *attribute
  * @brief   Low level wrapper function to call a driver for an ECC key generation
  *          with a SECP 192 R1 key.
  *          See @ref psa_generate_key()
- *
- * @param   attributes
- * @param   priv_key_buffer
- * @param   pub_key_buffer
- * @param   priv_key_buffer_length
- * @param   pub_key_buffer_length
- * @return  @ref psa_status_t
  */
 psa_status_t psa_generate_ecc_p256r1_key_pair(  const psa_key_attributes_t *attributes,
                                                 uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
@@ -157,12 +143,6 @@ psa_status_t psa_ecc_p256r1_verify_message(const psa_key_attributes_t *attribute
  * @brief   Low level wrapper function to call a driver for an ECC key generation
  *          with an ed25519 key.
  *          See @ref psa_generate_key()
- *
- * @param   priv_key_buffer
- * @param   pub_key_buffer
- * @param   priv_key_buffer_length
- * @param   pub_key_buffer_length
- * @return  @ref psa_status_t
  */
 psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
                                                 size_t *priv_key_buffer_length,
@@ -170,12 +150,6 @@ psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer, uint8_
 
 /**
  * @brief   Low level wrapper function for deriving an ed25519 public key from the private key.
- *
- * @param[in]       priv_key_buffer
- * @param[out]      pub_key_buffer
- * @param[in]       priv_key_buffer_length
- * @param[in,out]   pub_key_buffer_length
- * @return          @ref psa_status_t
  */
 psa_status_t psa_derive_ecc_ed25519_public_key( const uint8_t *priv_key_buffer,
                                                 uint8_t *pub_key_buffer,

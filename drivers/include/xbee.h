@@ -178,10 +178,6 @@ extern const netdev_driver_t xbee_driver;
  *
  * @param[out] dev          Xbee device to initialize
  * @param[in]  params       parameters for device initialization
- *
- * @return                  0 on success
- * @return                  -ENODEV on invalid device descriptor
- * @return                  -ENXIO on invalid UART or GPIO pins
  */
 void xbee_setup(xbee_t *dev, const xbee_params_t *params);
 

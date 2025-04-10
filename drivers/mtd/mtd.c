@@ -190,7 +190,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
  * @param[in]  data     Pointer to the data to be written
  * @param[in]  sector   Sector to write
  * @param[in]  offset   Byte offset from the start of the sector
- * @param[in]  size     Number of bytes
+ * @param[in]  len      Number of bytes
  *
  * @return bytes written on success
  * @return < 0 value on error

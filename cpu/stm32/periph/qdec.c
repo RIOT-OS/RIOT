@@ -39,8 +39,8 @@ static qdec_isr_ctx_t isr_ctx[QDEC_NUMOF];
 /**
  * @brief Read the current value of the given qdec device. Internal use.
  *
- * @param[in] dev           the qdec to read the current value from
- * @param[in] dev           perform a reset of qdec counter if not 0
+ * @param[in] qdec          the qdec to read the current value from
+ * @param[in] reset         perform a reset of qdec counter if not 0
  *
  * @return                  the qdecs current value
  */
