@@ -31,7 +31,7 @@
  * clist_find()         | O(n)    | find and return node
  * clist_find_before()  | O(n)    | find node return node pointing to node
  * clist_remove()       | O(n)    | remove and return node
- * clist_sort()         | O(NlogN)| sort list (stable)
+ * clist_sort()         | O(n²)   | sort list (stable)
  * clist_count()        | O(n)    | count the number of elements in a list
  * clist_is_empty()     | O(1)    | returns true if the list contains no elements
  * clist_exactly_one()  | O(1)    | returns true if the list contains one element
