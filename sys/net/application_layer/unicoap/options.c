@@ -32,46 +32,48 @@
 #ifndef DOXYGEN
 /**
  * # Terminology
- * @note For improved readibility and consistent naming throughout the
- * option parser, the following terminology is used.
  *
  * ## Quantities
- * - `size`: Number of bytes a given value consists of. `length`is not used due to ambiguity.
- * - `capacity`: Maximum number of bytes available in a given buffer. A buffer usually has a capacity and the value stored inside a size.
+ * - `size`: Number of bytes a given value consists of.
+ * - `capacity`: Maximum number of bytes available in a given buffer.
+ *    A buffer usually has a capacity and the value stored inside has a size.
  * - `count`: A discrete number of elements in a container.
- * - `width`: Constant number of bits and bytes a certain type occupies. E.g., `uint16_t` has a width of 16 bits or 2 bytes.
+ * - `width`: Constant number of bits and bytes a certain type occupies.
  *
  * ## Option Format
- * - `DELTA`: Positive option number difference to the preceding option, zero if first option.
- * - `GAMMA`: Size of option body attached. RFC 7252 refers to this value as the *Option Length*.
- * - `field`: A specific bit or byte region in an encoded, formatted message, packet, etc.
- * - `HEAD`: An encoded option's first 1 to 5 bytes, contains `DELTA nibble` and `GAMMA nibble`, may contain `DELTA extended` and `GAMMA extended`.
- * - `BODY`: Body attached to option, succeeding `HEAD`. RFC 7252 refers to this field as the *Option Value*.
- * - `DELTA nibble`: Either `DELTA` value, if lower than 13, or sentinel value 13 (`0xe`), or 14 (`0xd`). 15 (`0xf`)  is disallowed.
- * - `DELTA extended`: For `DELTA` values greater or equal 13, `DELTA - 13`. For `DELTA` values greater or equal `14 + 0xff`, `DELTA - 14 - 0xff`
- * - `GAMMA nibble`: Either `GAMMA` value, if lower than 13, or sentinel value 13 (`0xe`), or 14 (`0xd`). 15 (`0xf`)  is disallowed.
- * - `GAMMA extended`: For `GAMMA` values greater or equal 13, `GAMMA - 13`. For `GAMMA` values greater or equal `14 + 0xff`, `GAMMA - 14 - 0xff`
+ * - `delta`: Positive option number difference to the preceding option, zero if first option.
+ * - `length`: Size of option value attached.
+ * - `field`: A specific bit or byte region in the option header
+ * - `HEAD`: An encoded option's first 1 to 5 bytes, contains `delta nibble` and `length nibble`,
+ *    may contain `delta extended` and `length extended`.
+ * - `VALUE`: Value attached to option, succeeding `HEAD`.
+ * - `delta nibble`: Either `delta` value, if lower than 13, or sentinel value 13 (`0xe`), or 14 (`0xd`). 15 (`0xf`)  is disallowed.
+ * - `delta extended`: For `delta` values greater or equal 13, `delta - 13`.
+ *    For `delta` values greater or equal `14 + 0xff`, `delta - 14 - 0xff`
+ * - `length nibble`: Either `length` value, if lower than 13, or sentinel value 13 (`0xe`), or 14 (`0xd`). 15 (`0xf`)  is disallowed.
+ * - `length extended`: For `length` values greater or equal 13, `length - 13`.
+ *    For `length` values greater or equal `14 + 0xff`, `length - 14 - 0xff`
  *
  * ```
  *   0   1   2   3   4   5   6   7
  * +===============================+
  * |            H E A D            |
  * |               '               |
- * |     DELTA     '     GAMMA     |
+ * |     delta     '     length    |
  * |     nibble    '     nibble    |
  * |    (4 bits)   '    (4 bits)   |
  * + - - - - - - - + - - - - - - - +
- * /             DELTA             /
- * \           extended            \
+ * /             delta             /
+ * \            extended           \
  * /          (0-2 bytes)          /
  * + - - - - - - - - - - - - - - . +
- * /             GAMMA             /
+ * /             length            /
  * \            extended           \
  * /          (0-2 bytes)          /
  * +===============================+
  * \                               \
- * /            B O D Y            /
- * \         (GAMMA bytes)         \
+ * /           V A L U E           /
+ * \         (length bytes)        \
  * /                               /
  * +===============================+
  * ```
@@ -81,10 +83,10 @@
 #define DECODE_DELTA_NIBBLE(head)    (head >> 4)
 #define ENCODE_DELTA_NIBBLE(nibble)  (nibble << 4)
 
-#define DECODE_GAMMA_NIBBLE(head)    (head & 0xf)
-#define ENCODE_GAMMA_NIBBLE(nibble)  (nibble)
+#define DECODE_LENGTH_NIBBLE(head)    (head & 0xf)
+#define ENCODE_LENGTH_NIBBLE(nibble)  (nibble)
 
-// MARK: - Unsigned Integer Parsing -
+/* MARK: - Unsigned Integer Parsing */
 
 #define UINT4_MAX                    (12)
 #define UINT12_MAX                   (13 + 0xff)
@@ -207,17 +209,17 @@ static inline ssize_t _option_size_diff(uint16_t new_delta, uint8_t current_delt
 
 static inline ssize_t _option_size(uint16_t delta, size_t value_size)
 {
-    ssize_t delta_size = _uint_extended_size(delta);
-    if (delta_size < 0) {
-        return delta_size;
+    ssize_t delta_field_size = _uint_extended_size(delta);
+    if (delta_field_size < 0) {
+        return delta_field_size;
     }
-    ssize_t gamma_size = _uint_extended_size((uint32_t)value_size);
-    if (gamma_size < 0) {
-        return gamma_size;
+    ssize_t length_field_size = _uint_extended_size((uint32_t)value_size);
+    if (length_field_size < 0) {
+        return length_field_size;
     }
 
-    /* add extended delta field size, extended gamma field size + actual size of value */
-    return 1 + delta_size + gamma_size + value_size;
+    /* add extended delta field size, extended length field size + actual size of value */
+    return 1 + delta_field_size + length_field_size + value_size;
 }
 
 /**
@@ -248,7 +250,7 @@ static inline ssize_t _read_option_in_range_inline(uint8_t** cursor, const uint8
         return d;
     }
 
-    ssize_t value_size = _uint_read_in_range(DECODE_GAMMA_NIBBLE(head), cursor, end);
+    ssize_t value_size = _uint_read_in_range(DECODE_LENGTH_NIBBLE(head), cursor, end);
     if (value_size < 0) {
         OPTIONS_DEBUG("bad op len\n");
         return value_size;
@@ -292,7 +294,7 @@ static inline ssize_t _read_option(uint8_t** cursor, uint8_t** value)
     }
     *cursor += delta_size;
 
-    ssize_t value_size = _uint_read(DECODE_GAMMA_NIBBLE(head), cursor);
+    ssize_t value_size = _uint_read(DECODE_LENGTH_NIBBLE(head), cursor);
     if (value_size < 0) {
         OPTIONS_DEBUG("bad op value size\n");
         return value_size;
@@ -308,18 +310,18 @@ static void _write_option(uint8_t** cursor, uint16_t delta, const uint8_t* value
     uint8_t* head = *cursor;
     *cursor += 1;
     *head = ENCODE_DELTA_NIBBLE(_uint_write(delta, cursor));
-    *head |= ENCODE_GAMMA_NIBBLE(_uint_write((uint32_t)value_size, cursor));
+    *head |= ENCODE_LENGTH_NIBBLE(_uint_write((uint32_t)value_size, cursor));
     if (value) {
         memcpy(*cursor, value, value_size);
         *cursor += value_size;
     }
 }
 
-static inline void _write_head_partial(uint8_t** cursor, uint16_t delta, uint8_t gamma_nibble)
+static inline void _write_head_partial(uint8_t** cursor, uint16_t delta, uint8_t length_nibble)
 {
     uint8_t* head = *cursor;
     *cursor += 1;
-    *head = ENCODE_DELTA_NIBBLE(_uint_write(delta, cursor)) | ENCODE_GAMMA_NIBBLE(gamma_nibble);
+    *head = ENCODE_DELTA_NIBBLE(_uint_write(delta, cursor)) | ENCODE_LENGTH_NIBBLE(length_nibble);
 }
 
 static inline void _move_option_data(unicoap_options_t* options, uint8_t* dest, uint8_t* src)
@@ -539,7 +541,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
     else {
         /* The successor's option delta will change */
         uint8_t* cursor = e->data;
-        uint8_t gamma_nibble = DECODE_GAMMA_NIBBLE(*cursor);
+        uint8_t length_nibble = DECODE_LENGTH_NIBBLE(*cursor);
         uint16_t new_delta = e->number - number;
 
         ssize_t diff = _option_size_diff(new_delta, DECODE_DELTA_NIBBLE(*cursor));
@@ -555,7 +557,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
 
         e->data = cursor;
         _write_option(&cursor, delta, value, value_size);
-        _write_head_partial(&cursor, new_delta, gamma_nibble);
+        _write_head_partial(&cursor, new_delta, length_nibble);
     }
 
     e->number = number;
@@ -634,7 +636,7 @@ int __remove_me_unicoap_options_remove(unicoap_options_t* options, unicoap_optio
     else {
         /* The successor's option delta will change */
         unicoap_option_entry_t* next = e + 1;
-        uint8_t gamma_nibble = DECODE_GAMMA_NIBBLE(*next->data);
+        uint8_t length_nibble = DECODE_LENGTH_NIBBLE(*next->data);
         uint16_t new_delta = next->number - number;
 
         /* This diff corresponds to the number of bytes the next option
@@ -651,7 +653,7 @@ int __remove_me_unicoap_options_remove(unicoap_options_t* options, unicoap_optio
         }
 
         /* shift, starting at extended length field
-         * [ Nibbles (1B) | extended delta | extended gamma | value ] [ Nib...
+         * [ Nibbles (1B) | extended delta | extended length | value ] [ Nib...
          *   \______ changes anyway ______/ \>>>>>> shift remainder >>>>>>>
          */
         uint8_t* cursor =
@@ -666,9 +668,9 @@ int __remove_me_unicoap_options_remove(unicoap_options_t* options, unicoap_optio
         memmove(cursor + total_diff, cursor, remainder_size);
         options->storage_size = new_size;
 
-        /* rewrite Nibbles (1B) and extended delta field */
+        /* rewrite nibbles (1B) and extended delta field */
         cursor = e->data;
-        _write_head_partial(&cursor, new_delta, gamma_nibble);
+        _write_head_partial(&cursor, new_delta, length_nibble);
 
         /* remove entry from options lookup array */
         _shift_option_entries(options, i + 1, -1);
@@ -706,7 +708,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
         /* the successor's option delta will change */
         unicoap_option_entry_t* next = removed_entry + index_offset;
         unicoap_option_entry_t* prev = (i > 0) ? (&options->entries[i - 1]) : NULL;
-        uint8_t gamma_nibble = DECODE_GAMMA_NIBBLE(*next->data);
+        uint8_t length_nibble = DECODE_LENGTH_NIBBLE(*next->data);
         uint16_t new_delta = next->number - (prev ? prev->number : 0);
 
         /* This diff corresponds to the number of bytes the next option
@@ -726,7 +728,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
         }
 
         /* shift, starting at extended length field
-         * [ Nibbles (1B) | extended delta | extended gamma | value ] [ Nib...
+         * [ Nibbles (1B) | extended delta | extended length | value ] [ Nib...
          *   \______ changes anyway ______/^\_______ shift remainder _______
          *                                 |
          *                               cursor
@@ -751,7 +753,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 
         /* rewrite Nibbles (1 byte) and extended delta field */
         cursor = removed_entry->data;
-        _write_head_partial(&cursor, new_delta, gamma_nibble);
+        _write_head_partial(&cursor, new_delta, length_nibble);
 
         /* remove entry from options lookup array */
         _shift_option_entries(options, i + index_offset, -index_offset);
