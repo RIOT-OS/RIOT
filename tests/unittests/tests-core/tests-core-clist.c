@@ -295,22 +295,26 @@ static void test_clist_sort(void)
 {
     clist_node_t *list = &test_clist;
 
-    for (int i = 0; i < TEST_CLIST_LEN; i++) {
-        clist_rpush(list, &tests_clist_buf[i]);
-    }
+    for (size_t cur_len = 0; cur_len < TEST_CLIST_LEN; cur_len++) {
+        for (size_t i = 0; i < cur_len; i++) {
+            clist_rpush(list, &tests_clist_buf[i]);
+        }
 
-    /* rotate the list a couple of times in order to mess up the sorting */
-    clist_lpoprpush(list);
-    clist_lpoprpush(list);
-    clist_lpoprpush(list);
+        /* rotate the list a couple of times in order to mess up the sorting */
+        clist_lpoprpush(list);
+        clist_lpoprpush(list);
+        clist_lpoprpush(list);
 
-    /* sort list */
-    clist_sort(list, _cmp);
+        /* sort list */
+        clist_sort(list, _cmp);
 
-    uintptr_t last = (uintptr_t) list->next;
+        uintptr_t last = (uintptr_t) list->next;
 
-    for (int i = 0; i < TEST_CLIST_LEN; i++) {
-        TEST_ASSERT((uintptr_t) clist_rpop(list) <= last);
+        for (size_t i = 0; i < cur_len; i++) {
+            uintptr_t tmp = (uintptr_t)clist_rpop(list);
+            TEST_ASSERT(tmp <= last);
+            last = tmp;
+        }
     }
 }
 
