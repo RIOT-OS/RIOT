@@ -53,7 +53,7 @@ int main(void)
 #define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
 
     sys_lock_tcpip_core();
-    struct netif *iface = netif_find("ET0aa");
+    struct netif *iface = netif_find("ET0");
 
 #ifndef MODULE_LWIP_DHCP_AUTO
     ip4_addr_t ip, subnet;
