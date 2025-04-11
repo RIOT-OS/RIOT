@@ -30,7 +30,11 @@ extern "C" {
 
 #include "net/ethernet/hdr.h"
 
-#include "net/if.h"
+#if defined(__APPLE__)
+#  include "net/if_var.h"
+#else
+#  include "net/if.h"
+#endif
 
 /* MARK: - Low-level ethernet driver for native tap interfaces */
 /**

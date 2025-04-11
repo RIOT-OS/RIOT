@@ -1,5 +1,11 @@
 NATIVEINCLUDES += -I$(RIOTCPU)/native/include/
 
+ifeq ($(OS),Darwin)
+	EXECUTABLE_EXTENSION ?= macho
+else
+	EXECUTABLE_EXTENSION ?= elf
+endif
+
 ifneq (,$(filter periph_can,$(USEMODULE)))
   ifeq (,$(filter libsocketcan,$(USEPKG)))
     # link system libsocketcan if not using the provided package
@@ -14,8 +20,10 @@ ifneq (,$(filter can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter periph_timer,$(USEMODULE)))
-  # using timer_settime requires -lrt
-  LINKFLAGS += -lrt
+  ifneq ($(OS),Darwin)
+		# using timer_settime requires -lrt
+		LINKFLAGS += -lrt
+	endif
 endif
 
 TOOLCHAINS_SUPPORTED = gnu llvm afl

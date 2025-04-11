@@ -2,6 +2,7 @@
 *.o
 # Target files
 *.elf
+*.macho
 # Documentation artifacts
 doc/doxygen/html
 doc/doxygen/latex

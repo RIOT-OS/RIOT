@@ -28,7 +28,7 @@ info-objsize:
 	done | sort -n -r -k $${SORTROW}
 
 info-buildsize:
-	@$(SIZE) -d -B $(ELFFILE) || echo ''
+	@$(SIZE) -d -B $(EXECUTABLE) || echo ''
 
 info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
@@ -50,7 +50,7 @@ info-build:
 	@echo 'DISABLE_MODULE: $(sort $(DISABLE_MODULE))'
 	@echo 'USEMODULE:      $(sort $(filter-out $(DEFAULT_MODULE), $(USEMODULE)))'
 	@echo ''
-	@echo 'ELFFILE: $(ELFFILE)'
+	@echo 'EXECUTABLE: $(EXECUTABLE)'
 	@echo 'HEXFILE: $(HEXFILE)'
 	@echo 'BINFILE: $(BINFILE)'
 	@echo 'FLASHFILE: $(FLASHFILE)'
@@ -158,7 +158,7 @@ info-build-json:
 	@echo '"RIOTPKG": "$(RIOTPKG)",'
 	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null,$(EXTERNAL_BOARD_DIRS)),'
 	@echo '"BINDIR": "$(BINDIR)",'
-	@echo '"ELFFILE": "$(ELFFILE)",'
+	@echo '"EXECUTABLE": "$(EXECUTABLE)",'
 	@echo '"HEXFILE": "$(HEXFILE)",'
 	@echo '"BINFILE": "$(BINFILE)",'
 	@echo '"FLASHFILE": "$(FLASHFILE)",'

@@ -75,11 +75,18 @@ void _isr_switch_to_user(void) {
     ucontext_t *context = _native_user_context();
     _native_interrupts_enabled = true;
 
-    /* Get PC/LR. This is where we will resume execution on the userspace thread. */
-    _native_user_fptr = (uintptr_t)_context_get_fptr(context);
+    /* Get PC/LR. This is where we will resume execution on the userspace thread.
+     *
+     * arm64e: We want the presigned version. This enables us to authenticate the pointer
+     * in _native_isr_leave. */
+    _native_user_fptr = (uintptr_t)_context_get_fptr(context, /* presigned: */ true);
 
-    /* Now we want to go to _native_isr_leave before resuming execution at _native_user_fptr. */
-    _context_set_fptr(context, (uintptr_t)_native_isr_leave);
+    /* Now we want to go to _native_isr_leave before resuming execution at _native_user_fptr.
+     *
+     * arm64: We supply an unsigned pointer, hence presigned=false.
+     * This instructs _context_set_fptr to sign the pointer which is necessary given how
+     * setcontext is implemented on macOS. */
+    _context_set_fptr(context, (uintptr_t)_native_isr_leave, /* presigned: */ false);
 
     if (setcontext(context) == -1) {
         err(EXIT_FAILURE, "_isr_schedule_and_switch: setcontext");
@@ -237,6 +244,11 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 {
     ucontext_t *p;
 
+#  if defined(__APPLE__) && \
+   (defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE))
+    void *stack_buffer = stack_start;
+#  endif
+
     stack_start = align_stack((uintptr_t)stack_start, &stacksize);
 
     (void) VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
@@ -265,7 +277,42 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
         err(EXIT_FAILURE, "thread_stack_init: sigemptyset");
     }
 
+#  if defined(__APPLE__) && \
+   (defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE))
+    /* MARK: Hack for macOS
+     * On macOS, makecontext sets the stack to all zeroes.
+     * Consequently, makecontext destroys the stack guards (stack[i] == &stack[i])
+     * created in thread_create on macOS.
+     *
+     * Hence, on macOS, we need to restore the stack guards after our call to makecontext.
+     * To figure out whether THREAD_CREATE_NO_STACKTEST is present in the call to thread_create,
+     * we check if the second address in the stack buffer is equal to its address.
+     * (Reminder: The first byte in the stack buffer is always set to its address, regardless of
+     * THREAD_CREATE_NO_STACKTEST).
+     */
+    expect(stacksize > 1);
+    bool must_recreate_stacktest =
+        *(uintptr_t *)(uintptr_t)(stack_buffer + 1) == (uintptr_t)(stack_buffer + 1);
+#  endif
+
     makecontext64(p, (void (*)(void))task_func, arg);
+
+#  if defined(__APPLE__) && \
+   (defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE))
+    /* assign each int of the stack the value of it's address.
+     * Alignment has been handled before, so silence -Wcast-align.
+     *
+     * Apple's implementation of makecontext always pushes at least 8 arguments onto
+     * the stack, thus we must ensure these 8 arguments do not get overwritten. */
+    uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack_buffer;
+    uintptr_t *stackmax = must_recreate_stacktest ?
+        (uintptr_t *)(uintptr_t)(p - 8 * sizeof(int)) : stackp + 1;
+
+    while (stackp < stackmax) {
+        *stackp = (uintptr_t)stackp;
+        stackp++;
+    }
+#  endif
 
     return (char *) p;
 }

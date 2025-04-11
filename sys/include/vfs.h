@@ -327,14 +327,13 @@ extern "C" {
  * @param[in] path  Mount path
  * @param[in] idx   Unique index of the mount point
  */
-#define VFS_AUTO_MOUNT(type, mtd, path, idx)        \
-    static type ## _desc_t fs_desc_ ## idx = mtd;   \
-                                                    \
-    XFA(vfs_mount_t, vfs_mountpoints_xfa, 0)        \
-    _mount_mtd_ ## idx = {                          \
-        .fs = &type ## _file_system,                \
-        .mount_point = path,                        \
-        .private_data = &fs_desc_ ## idx,           \
+#define VFS_AUTO_MOUNT(type, mtd, path, idx)                          \
+    static type ## _desc_t fs_desc_ ## idx = mtd;                     \
+                                                                      \
+    XFA(vfs_mount_t, vfs_mountpoints_xfa, 0, _mount_mtd_ ## idx) = {  \
+        .fs = &type ## _file_system,                                  \
+        .mount_point = path,                                          \
+        .private_data = &fs_desc_ ## idx,                             \
     }
 
 /* Forward declarations */
