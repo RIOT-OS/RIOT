@@ -619,12 +619,9 @@ ssize_t scn_buf_hex(void *_dest, size_t dest_len, const char *hex, size_t hex_le
     return len;
 }
 
-int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator)
+int scn_time_tm_iso8601_date(struct tm *tm, const char *str)
 {
-    assert(tm);
-    assert(str);
-    memset(tm, 0, sizeof(*tm));
-    tm->tm_isdst = -1; /* undefined */
+    uint32_t num;
 
     if (!fmt_is_digit(str[0]) || !fmt_is_digit(str[1]) ||
         !fmt_is_digit(str[2]) || !fmt_is_digit(str[3]) ||
@@ -635,34 +632,63 @@ int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator)
         return -EINVAL;
     }
 
-    uint32_t num = scn_u32_dec(str, 4);
+    num = scn_u32_dec(&str[0], 4);
     tm->tm_year = num - 1900;
-    num = scn_u32_dec(str + 5, 2);
+    num = scn_u32_dec(&str[5], 2);
     tm->tm_mon = num - 1;
-    num = scn_u32_dec(str + 8, 2);
+    num = scn_u32_dec(&str[8], 2);
     tm->tm_mday = num;
+
+    return 10;
+}
+
+int scn_time_tm_iso8601_time(struct tm *tm, const char *str)
+{
+    uint32_t num;
+
+    if (!fmt_is_digit(str[0]) || !fmt_is_digit(str[1]) ||
+        str[2] != ':' ||
+        !fmt_is_digit(str[3]) || !fmt_is_digit(str[4]) ||
+        str[5] != ':' ||
+        !fmt_is_digit(str[6]) || !fmt_is_digit(str[7])) {
+        return -EINVAL;
+    }
+
+    num = scn_u32_dec(&str[0], 2);
+    tm->tm_hour = num;
+    num = scn_u32_dec(&str[3], 2);
+    tm->tm_min = num;
+    num = scn_u32_dec(&str[6], 2);
+    tm->tm_sec = num;
+
+    tm->tm_isdst = -1; /* undefined */
+
+    return 8;
+}
+
+int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator)
+{
+    assert(tm);
+    assert(str);
+    memset(tm, 0, sizeof(*tm));
+
+    int res = scn_time_tm_iso8601_date(tm, str);
+    if (res < 0) {
+        return res;
+    }
 
     if (str[10] == '\0') {
         /* no time, just date */
-        return 10;
+        return res;
     }
     if (str[10] != separator) {
         return -EBADF;
     }
-    if (!fmt_is_digit(str[11]) || !fmt_is_digit(str[12]) ||
-        str[13] != ':' ||
-        !fmt_is_digit(str[14]) || !fmt_is_digit(str[15]) ||
-        str[16] != ':' ||
-        !fmt_is_digit(str[17]) || !fmt_is_digit(str[18])) {
-        return -EINVAL;
-    }
 
-    num = scn_u32_dec(str + 11, 2);
-    tm->tm_hour = num;
-    num = scn_u32_dec(str + 14, 2);
-    tm->tm_min = num;
-    num = scn_u32_dec(str + 17, 2);
-    tm->tm_sec = num;
+    res = scn_time_tm_iso8601_time(tm, &str[11]);
+    if (res < 0) {
+        return res;
+    }
 
     return 19;
 }
