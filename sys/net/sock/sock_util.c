@@ -26,20 +26,23 @@
 #include <string.h>
 #include <assert.h>
 
-#include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "net/iana/portrange.h"
 
-#if defined(MODULE_DNS)
-#include "net/dns.h"
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP
+#  include "net/sock/udp.h"
 #endif
 
-#ifdef MODULE_RANDOM
-#include "random.h"
+#if MODULE_DNS
+#  include "net/dns.h"
 #endif
 
-#ifdef MODULE_FMT
-#include "fmt.h"
+#if MODULE_RANDOM
+#  include "random.h"
+#endif
+
+#if MODULE_FMT
+#  include "fmt.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -47,49 +50,6 @@
 
 #define PORT_STR_LEN    (5)
 #define NETIF_STR_LEN   (5)
-
-int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
-                   char *addr_str, uint16_t *port)
-{
-    const void *addr_ptr;
-    *addr_str = '\0';
-
-    switch (endpoint->family) {
-#ifdef SOCK_HAS_IPV4
-    case AF_INET:
-        addr_ptr = &endpoint->addr.ipv4;
-        break;
-#endif
-#ifdef SOCK_HAS_IPV6
-    case AF_INET6:
-        addr_ptr = &endpoint->addr.ipv6;
-        break;
-#endif
-    default:
-        return -ENOTSUP;
-    }
-
-    if (!inet_ntop(endpoint->family, addr_ptr, addr_str, INET6_ADDRSTRLEN)) {
-        return 0;
-    }
-
-    if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6) && endpoint->netif) {
-#ifdef MODULE_FMT
-        char *tmp = addr_str + strlen(addr_str);
-        *tmp++ = '%';
-        tmp += fmt_u16_dec(tmp, endpoint->netif);
-        *tmp = '\0';
-#else
-        sprintf(addr_str + strlen(addr_str), "%%%4u", endpoint->netif);
-#endif
-    }
-
-    if (port) {
-        *port = endpoint->port;
-    }
-
-    return strlen(addr_str);
-}
 
 static char* _find_hoststart(const char *url)
 {
@@ -165,6 +125,50 @@ const char *sock_urlpath(const char *url)
     }
 
     return _find_pathstart(hoststart);
+}
+
+#if HAVE_SOCK_TL_EP
+int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
+                   char *addr_str, uint16_t *port)
+{
+    const void *addr_ptr;
+    *addr_str = '\0';
+
+    switch (endpoint->family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        addr_ptr = &endpoint->addr.ipv4;
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        addr_ptr = &endpoint->addr.ipv6;
+        break;
+#endif
+    default:
+        return -ENOTSUP;
+    }
+
+    if (!inet_ntop(endpoint->family, addr_ptr, addr_str, INET6_ADDRSTRLEN)) {
+        return 0;
+    }
+
+    if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6) && endpoint->netif) {
+#ifdef MODULE_FMT
+        char *tmp = addr_str + strlen(addr_str);
+        *tmp++ = '%';
+        tmp += fmt_u16_dec(tmp, endpoint->netif);
+        *tmp = '\0';
+#else
+        sprintf(addr_str + strlen(addr_str), "%%%4u", endpoint->netif);
+#endif
+    }
+
+    if (port) {
+        *port = endpoint->port;
+    }
+
+    return strlen(addr_str);
 }
 
 int _parse_port(sock_udp_ep_t *ep_out, const char *portstart)
@@ -258,20 +262,20 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
     hostbuf[hostlen] = '\0';
 
     if (!brackets_flag) {
-#ifdef SOCK_HAS_IPV4
+#  ifdef SOCK_HAS_IPV4
         if (inet_pton(AF_INET, hostbuf, &ep_out->addr.ipv4) == 1) {
             ep_out->family = AF_INET;
             return 0;
         }
-#endif
+#  endif
     }
 
-#ifdef SOCK_HAS_IPV6
+#  ifdef SOCK_HAS_IPV6
     if (inet_pton(AF_INET6, hostbuf, ep_out->addr.ipv6) == 1) {
         ep_out->family = AF_INET6;
         return 0;
     }
-#endif
+#  endif
 
     return -EINVAL;
 }
@@ -283,7 +287,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
         return 0;
     }
 
-#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
+#  if MODULE_SOCK_DNS || MODULE_SOCK_DNS_MOCK
     int family;
     char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
     const char *host;
@@ -314,20 +318,20 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
     }
 
     switch (dns_query(host, &ep_out->addr, family)) {
-#ifdef SOCK_HAS_IPV4
+#    ifdef SOCK_HAS_IPV4
     case 4:
         ep_out->family = AF_INET;
         return 0;
-#endif
-#ifdef SOCK_HAS_IPV6
+#    endif
+#    ifdef SOCK_HAS_IPV6
     case 16:
         ep_out->family = AF_INET6;
         return 0;
-#endif
+#    endif
     default:
         return -EINVAL;
     }
-#endif
+#  endif
     return res;
 }
 
@@ -343,18 +347,19 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
 
     /* compare addresses */
     switch (a->family) {
-#ifdef SOCK_HAS_IPV4
+#  ifdef SOCK_HAS_IPV4
     case AF_INET:
         return memcmp(a->addr.ipv4, b->addr.ipv4, 4) == 0;
-#endif
-#ifdef SOCK_HAS_IPV6
+#  endif
+#  ifdef SOCK_HAS_IPV6
     case AF_INET6:
         return memcmp(a->addr.ipv6, b->addr.ipv6, 16) == 0;
-#endif
+#  endif
     default:
         return false;
     }
 }
+#endif
 
 #if defined(MODULE_SOCK_DTLS)
 int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,

@@ -28,63 +28,37 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "net/sock/udp.h"
-#include "net/sock/tcp.h"
 #include "net/sock/config.h"
 
-#ifdef MODULE_SOCK_DTLS
-#include "net/credman.h"
-#include "net/sock/dtls.h"
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || DOXYGEN
+#  include "net/sock/udp.h"
 #endif
+#if MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
+#  include "net/sock/tcp.h"
+#endif
+#ifdef MODULE_SOCK_DTLS
+#  include "net/credman.h"
+#  include "net/sock/dtls.h"
+#endif
+
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || DOXYGEN
+#  define HAVE_SOCK_UDP_EP   1
+#endif
+
+#if MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
+#  define HAVE_SOCK_TCP_EP   1
+#else
+#  define HAVE_SOCK_TCP_EP   0
+#endif
+
+#if HAVE_SOCK_UDP_EP || HAVE_SOCK_TCP_EP
+#  define HAVE_SOCK_TL_EP   1
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Format common IP-based transport layer endpoint to string and port
- *
- * @param[in]   endpoint    endpoint to format
- * @param[out]  addr_str    where to write address as string
- * @param[out]  port        where to write port number as uint16_t
- *
- * @returns     number of bytes written to @p addr_str on success
- * @returns     <0 otherwise
- */
-int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
-                   char *addr_str, uint16_t *port);
-
-/**
- * @brief   Format TCP endpoint to string and port
- *
- * @param[in]   endpoint    endpoint to format
- * @param[out]  addr_str    where to write address as string
- * @param[out]  port        where to write port number as uint16_t
- *
- * @returns     number of bytes written to @p addr_str on success
- * @returns     <0 otherwise
- */
-static inline int sock_tcp_ep_fmt(const sock_tcp_ep_t *endpoint,
-                                  char *addr_str, uint16_t *port)
-{
-    return sock_tl_ep_fmt(endpoint, addr_str, port);
-}
-
-/**
- * @brief   Format UDP endpoint to string and port
- *
- * @param[in]   endpoint    endpoint to format
- * @param[out]  addr_str    where to write address as string
- * @param[out]  port        where to write port number as uint16_t
- *
- * @returns     number of bytes written to @p addr_str on success
- * @returns     <0 otherwise
- */
-static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
-                                  char *addr_str, uint16_t *port)
-{
-    return sock_tl_ep_fmt(endpoint, addr_str, port);
-}
 
 /**
  * @brief    Split url to host:port and url path
@@ -118,6 +92,58 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath);
  */
 const char *sock_urlpath(const char *url);
 
+#if HAVE_SOCK_TL_EP
+/**
+ * @brief   Format common IP-based transport layer endpoint to string and port
+ *
+ * @param[in]   endpoint    endpoint to format
+ * @param[out]  addr_str    where to write address as string
+ * @param[out]  port        where to write port number as uint16_t
+ *
+ * @returns     number of bytes written to @p addr_str on success
+ * @returns     <0 otherwise
+ */
+int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
+                   char *addr_str, uint16_t *port);
+#endif
+
+#if HAVE_SOCK_TCP_EP
+/**
+ * @brief   Format TCP endpoint to string and port
+ *
+ * @param[in]   endpoint    endpoint to format
+ * @param[out]  addr_str    where to write address as string
+ * @param[out]  port        where to write port number as uint16_t
+ *
+ * @returns     number of bytes written to @p addr_str on success
+ * @returns     <0 otherwise
+ */
+static inline int sock_tcp_ep_fmt(const sock_tcp_ep_t *endpoint,
+                                  char *addr_str, uint16_t *port)
+{
+    return sock_tl_ep_fmt(endpoint, addr_str, port);
+}
+#endif
+
+#if HAVE_SOCK_UDP_EP
+/**
+ * @brief   Format UDP endpoint to string and port
+ *
+ * @param[in]   endpoint    endpoint to format
+ * @param[out]  addr_str    where to write address as string
+ * @param[out]  port        where to write port number as uint16_t
+ *
+ * @returns     number of bytes written to @p addr_str on success
+ * @returns     <0 otherwise
+ */
+static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
+                                  char *addr_str, uint16_t *port)
+{
+    return sock_tl_ep_fmt(endpoint, addr_str, port);
+}
+#endif
+
+#if HAVE_SOCK_TL_EP
 /**
  * @brief    Convert string to common IP-based transport layer endpoint
  *
@@ -131,7 +157,9 @@ const char *sock_urlpath(const char *url);
  * @returns     <0 otherwise
  */
 int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
+#endif
 
+#if HAVE_SOCK_TL_EP
 /**
  * @brief   Convert string to common IP-based transport layer endpoint
  *          If the `sock_dns` module is used, this will do a DNS lookup
@@ -147,7 +175,9 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
  * @returns     <0 otherwise
  */
 int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str);
+#endif
 
+#if HAVE_SOCK_TCP_EP
 /**
  * @brief    Convert string to TCP endpoint
  *
@@ -164,7 +194,9 @@ static inline int sock_tcp_str2ep(sock_tcp_ep_t *ep_out, const char *str)
 {
     return sock_tl_str2ep(ep_out, str);
 }
+#endif
 
+#if HAVE_SOCK_TCP_EP
 /**
  * @brief    Convert string to TCP endpoint
  *           If the `sock_dns` module is used, this will do a DNS lookup
@@ -183,7 +215,9 @@ static inline int sock_tcp_name2ep(sock_tcp_ep_t *ep_out, const char *str)
 {
     return sock_tl_name2ep(ep_out, str);
 }
+#endif
 
+#if HAVE_SOCK_UDP_EP
 /**
  * @brief    Convert string to UDP endpoint
  *
@@ -200,7 +234,9 @@ static inline int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     return sock_tl_str2ep(ep_out, str);
 }
+#endif
 
+#if HAVE_SOCK_UDP_EP
 /**
  * @brief    Convert string to UDP endpoint
  *           If the `sock_dns` module is used, this will do a DNS lookup
@@ -219,7 +255,9 @@ static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     return sock_tl_name2ep(ep_out, str);
 }
+#endif
 
+#if HAVE_SOCK_TL_EP
 /**
  * @brief   Compare the two given common IP-based transport layer endpoints
  *
@@ -235,7 +273,9 @@ static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
  */
 bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
                       const struct _sock_tl_ep *b);
+#endif
 
+#if HAVE_SOCK_TCP_EP
 /**
  * @brief   Compare the two given TCP endpoints
  *
@@ -254,7 +294,9 @@ static inline bool sock_tcp_ep_equal(const sock_tcp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
+#endif
 
+#if HAVE_SOCK_UDP_EP
 /**
  * @brief   Compare the two given UDP endpoints
  *
@@ -273,6 +315,7 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
+#endif
 
 #if defined(MODULE_SOCK_DTLS) || DOXYGEN
 /**
