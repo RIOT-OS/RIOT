@@ -27,7 +27,6 @@ else
 
     USEMODULE += lwip_arp
     USEMODULE += lwip_ipv4
-    USEMODULE += netdev_legacy_api
 
 # If this module will be disabled, example set IPv4 192.168.100.150 address.
     USEMODULE += lwip_dhcp_auto
