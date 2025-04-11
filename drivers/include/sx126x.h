@@ -301,6 +301,13 @@ bool sx126x_get_lora_iq_invert(const sx126x_t *dev);
  */
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
 
+/**
+ * @brief   Gets the LoRa tx power
+ *
+ * @return the tx power
+ */
+int8_t sx126x_get_tx_power(void);
+
 #ifdef __cplusplus
 }
 #endif
