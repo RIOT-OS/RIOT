@@ -62,7 +62,8 @@ enum {
 
 typedef enum {
     MODE_INIT,
-    MODE_TEST,
+    MODE_LOOPBACK,
+    MODE_MONITOR,
 } can_mode_t;
 
 typedef struct {
@@ -203,7 +204,7 @@ static int _set_mode(Can *can, can_mode_t can_mode)
             _enter_init_mode(can);
             can->CCCR.reg |= CAN_CCCR_CCE;
             break;
-        case MODE_TEST:
+        case MODE_LOOPBACK:
             DEBUG_PUTS("test mode");
             _enter_init_mode(can);
             /* CCCR.TEST and CCCR.MON can be set only when CCCR.INIT and CCCR.CCE are set */
@@ -213,6 +214,14 @@ static int _set_mode(Can *can, can_mode_t can_mode)
 #if IS_ACTIVE(CANDEV_SAMD5X_INTERNAL_LOOPBACK)
             can->CCCR.reg |= CAN_CCCR_MON;
 #endif
+            _exit_init_mode(can);
+            break;
+        case MODE_MONITOR:
+            DEBUG_PUTS("monitor mode");
+            _enter_init_mode(can);
+            /* CCCR.TEST and CCCR.MON can be set only when CCCR.INIT and CCCR.CCE are set */
+            can->CCCR.reg |= CAN_CCCR_CCE;
+            can->CCCR.reg |= CAN_CCCR_MON;
             _exit_init_mode(can);
             break;
         default:
@@ -356,8 +365,10 @@ void can_init(can_t *dev, const can_conf_t *conf)
 {
     dev->candev.driver = &candev_samd5x_driver;
 
-    struct can_bittiming timing = { .bitrate = CANDEV_SAMD5X_DEFAULT_BITRATE,
-                                    .sample_point = CANDEV_SAMD5X_DEFAULT_SPT };
+    struct can_bittiming timing = {
+        .bitrate = conf->bitrate ? conf->bitrate : CANDEV_SAMD5X_DEFAULT_BITRATE,
+        .sample_point = CANDEV_SAMD5X_DEFAULT_SPT
+    };
 
     uint32_t clk_freq = sam0_gclk_freq(conf->gclk_src);
     can_device_calc_bittiming(clk_freq, &bittiming_const, &timing);
@@ -452,9 +463,23 @@ static int _init(candev_t *candev)
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         _dump_msg_ram_section(dev);
     }
-    /* Disable automatic retransmission by default */
-    /* This can be added as a configuration parameter for the CAN controller */
-    dev->conf->can->CCCR.reg = CAN_CCCR_DAR;
+
+    uint32_t cccr = dev->conf->can->CCCR.reg;
+    cccr &= ~(CAN_CCCR_DAR | CAN_CCCR_TXP | CAN_CCCR_MON);
+
+    if (dev->conf->disable_automatic_retransmission) {
+         cccr |= CAN_CCCR_DAR;
+    }
+
+    if (dev->conf->enable_transmit_pause) {
+        cccr |= CAN_CCCR_TXP;
+    }
+
+    if (dev->conf->start_in_monitor_mode) {
+        cccr |= CAN_CCCR_MON;
+    }
+
+    dev->conf->can->CCCR.reg = cccr;
 
     /* Reject all remote frames */
     dev->conf->can->GFC.reg = CAN_GFC_RRFE | CAN_GFC_RRFS;
@@ -771,7 +796,16 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
                         }
                         break;
                     case CANOPT_STATE_LOOPBACK:
-                        res = _set_mode(dev->conf->can, MODE_TEST);
+                        res = _set_mode(dev->conf->can, MODE_LOOPBACK);
+                        if (res == 0) {
+                            res = sizeof(canopt_state_t);
+                        }
+                        else {
+                            return -1;
+                        }
+                        break;
+                    case CANOPT_STATE_LISTEN_ONLY:
+                        res = _set_mode(dev->conf->can, MODE_MONITOR);
                         if (res == 0) {
                             res = sizeof(canopt_state_t);
                         }
