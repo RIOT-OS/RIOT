@@ -43,6 +43,10 @@ ifneq (,$(filter pmp_noexec_ram,$(USEMODULE)))
   FEATURES_REQUIRED += periph_pmp
 endif
 
+ifneq (,$(filter periph_adc_multi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEPKG += lwip
 endif
