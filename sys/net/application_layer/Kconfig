@@ -6,6 +6,7 @@
 #
 menu "CoAP"
 
+rsource "unicoap/Kconfig"
 rsource "Kconfig.coap"
 rsource "gcoap/Kconfig"
 rsource "nanocoap/Kconfig"
