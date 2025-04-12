@@ -44,6 +44,10 @@ extern "C" {
 #define BENCHMARK_FUNC(name, runs, func)                        \
     do {                                                        \
         ztimer_stopwatch_t timer = { .clock = ZTIMER_USEC };    \
+        /* warm up cache, branch predictor, ... */              \
+        for (unsigned long i = 0; i < 32; i++) {                \
+            func;                                               \
+        }                                                       \
         ztimer_stopwatch_start(&timer);                         \
         for (unsigned long i = 0; i < runs; i++) {              \
             func;                                               \
