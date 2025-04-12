@@ -30,13 +30,27 @@
 #  define BENCH_RUNS          (1000UL * 1000UL)
 #endif
 #ifndef BENCH_CLIST_RUNS
-#  define BENCH_CLIST_RUNS (BENCH_RUNS / 1000UL)
+#  if defined(BOARD_NATIVE64) || defined(BOARD_NATIVE32)
+#    define BENCH_CLIST_RUNS BENCH_RUNS
+#  else
+#    define BENCH_CLIST_RUNS (BENCH_RUNS / 1000UL)
+#  endif
 #endif
+
+#ifndef BENCH_CLIST_SORT_TEST_NODES
+#  define BENCH_CLIST_SORT_TEST_NODES 256
+#endif
+
+struct test_node {
+    clist_node_t list;
+    int value;
+};
 
 static mutex_t _lock;
 static thread_t *t;
 static thread_flags_t _flag = 0x0001;
 static msg_t _msg;
+static struct test_node nodes[BENCH_CLIST_SORT_TEST_NODES];
 
 static void _mutex_lockunlock(void)
 {
@@ -62,34 +76,15 @@ static void _flag_waitone(void)
     thread_flags_wait_one(_flag);
 }
 
-struct test_node {
-    clist_node_t list;
-    int value;
-};
-
 static clist_node_t clist;
 
-static void _build_test_clist(size_t len)
-{
-    static struct test_node nodes[128];
-
-    assert(len <= ARRAY_SIZE(nodes));
-
-    memset(nodes, 0, sizeof(nodes));
-    clist.next = NULL;
-
-    for (size_t i = 0; i < len; i++) {
-        clist_rpush(&clist, &nodes[i].list);
-    }
-}
-
-static void _insert_unsorted_data(clist_node_t *list)
+static void _insert_reserved_data(clist_node_t *list)
 {
     clist_node_t *last = list->next;
     if (!last) {
         return;
     }
-    unsigned val = 128;
+    unsigned val = BENCH_CLIST_SORT_TEST_NODES;
 
     clist_node_t *cur = last->next;
     while (cur != last) {
@@ -103,6 +98,27 @@ static void _insert_unsorted_data(clist_node_t *list)
     }
 }
 
+static void _insert_prng_data(clist_node_t *list)
+{
+    clist_node_t *last = list->next;
+    if (!last) {
+        return;
+    }
+
+    uint32_t prng = 1337; /* what else as seed? */
+    clist_node_t *cur = last->next;
+
+    while (cur != last) {
+        struct test_node *n = container_of(cur, struct test_node, list);
+
+        prng ^= prng << 13;
+        prng ^= prng >> 17;
+        prng ^= prng << 5;
+        n->value = prng;
+        cur = cur->next;
+    }
+}
+
 static int _cmp(clist_node_t *_lhs, clist_node_t *_rhs)
 {
     struct test_node *lhs = container_of(_lhs, struct test_node, list);
@@ -111,20 +127,49 @@ static int _cmp(clist_node_t *_lhs, clist_node_t *_rhs)
     return lhs->value - rhs->value;
 }
 
-static void _clist_sort_test(void)
+static void _build_test_clist(size_t len)
+{
+
+    assert(len <= ARRAY_SIZE(nodes));
+
+    memset(nodes, 0, sizeof(nodes));
+    clist.next = NULL;
+
+    for (size_t i = 0; i < len; i++) {
+        clist_rpush(&clist, &nodes[i].list);
+    }
+
+    /* shuffle the elements a bit by adding random data and sorting it */
+    _insert_prng_data(&clist);
+    clist_sort(&clist, _cmp);
+}
+
+static void _clist_sort_test_worst_case(void)
 {
     clist_node_t *list = &clist;
 
-    _insert_unsorted_data(list);
+    _insert_reserved_data(list);
+    clist_sort(list, _cmp);
+}
+
+static void _clist_sort_test_avg_case(void)
+{
+    clist_node_t *list = &clist;
+
+    _insert_prng_data(list);
     clist_sort(list, _cmp);
 }
 
 static void _bench_clist_sort(unsigned size)
 {
-    char name[32] = {};
-    snprintf(name, sizeof(name) - 1, "clist_sort() (%u nodes)", size);
+    char name[48] = {};
+    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, worst)", size);
     _build_test_clist(size);
-    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test());
+    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_worst_case());
+
+    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, avg)", size);
+    _build_test_clist(size);
+    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_avg_case());
 }
 
 int main(void)
@@ -147,9 +192,11 @@ int main(void)
     BENCHMARK_FUNC("msg_try_receive()", BENCH_RUNS, msg_try_receive(&_msg));
     BENCHMARK_FUNC("msg_avail()", BENCH_RUNS, msg_avail());
     puts("");
-    _bench_clist_sort(8);
-    _bench_clist_sort(32);
-    _bench_clist_sort(128);
+
+    for (unsigned len = 4; len <= BENCH_CLIST_SORT_TEST_NODES; len <<= 1) {
+    _bench_clist_sort(len);
+
+    }
 
     puts("\n[SUCCESS]");
     return 0;

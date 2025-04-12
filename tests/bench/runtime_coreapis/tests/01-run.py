@@ -27,9 +27,9 @@ def testfunc(child):
     child.expect(BENCHMARK_REGEXP.format(func="thread flags set/wait one"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_try_receive\(\)"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_avail\(\)"))
-    child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort\(\) \(\d+ nodes\)", timeout=TIMEOUT))
-    child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort\(\) \(\d+ nodes\)", timeout=TIMEOUT))
-    child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort\(\) \(\d+ nodes\)", timeout=TIMEOUT))
+    for _ in range(7):
+        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, worst\)", timeout=TIMEOUT))
+        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, avg\)", timeout=TIMEOUT))
     child.expect_exact('[SUCCESS]')
 
 
