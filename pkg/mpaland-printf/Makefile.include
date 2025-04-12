@@ -7,3 +7,8 @@ LINKFLAGS += -Wl,-wrap=vprintf
 LINKFLAGS += -Wl,-wrap=vsnprintf
 LINKFLAGS += -Wl,-wrap=putchar
 LINKFLAGS += -Wl,-wrap=puts
+
+# Fix bug with newlib not providing PRId64 / PRIu64
+ifneq (,$(filter newlib,$(FEATURES_USED)))
+  CFLAGS += -D__int64_t_defined
+endif
