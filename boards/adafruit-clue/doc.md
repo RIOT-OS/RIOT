@@ -18,15 +18,10 @@ The board detailed description and schematic is available
 
 ### Flash the board
 
-The board is flashed using the `adafruit-nrfutil` Python package:
-```
-    $ pip install --user adafruit-nrfutil
-```
-
-Example with `hello-world` application:
-```
-    make BOARD=adafruit-clue -C examples/basic/hello-world flash
-```
+The board is flashed using its on-board
+[bootloader](https://github.com/adafruit/Adafruit_nRF52_Bootloader).
+More information about how to work with this bootloader can be found in the
+@ref boards_common_adafruit-nrf52-bootloader section.
 
 ### Accessing STDIO via UART
 
@@ -37,7 +32,3 @@ Use the `term` target to connect to the board serial port<br/>
 ```
     make BOARD=adafruit-clue -C examples/basic/hello-world term
 ```
-
-The `TERM_DELAY` environment variable can be used to add a delay (in second)
-before opening the serial terminal. The default value is 2s which should be
-enough in most of the situations.
