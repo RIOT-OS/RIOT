@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_adafruit-clue Adafruit Clue
 @ingroup     boards
 @brief       Support for the Adafruit Clue
@@ -42,4 +41,3 @@ Use the `term` target to connect to the board serial port<br/>
 The `TERM_DELAY` environment variable can be used to add a delay (in second)
 before opening the serial terminal. The default value is 2s which should be
 enough in most of the situations.
- */

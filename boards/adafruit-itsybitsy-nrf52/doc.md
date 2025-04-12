@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_adafruit-itsybitsy-nrf52 Adafruit-Itsybitsy-nRF52
 @ingroup     boards
 @brief       Support for the Adafruit-Itsybitsy-nRF52
@@ -41,5 +40,3 @@ you may need to run `pip3 install --upgrade pip3` before being able to run `pip3
 ### Accessing STDIO
 
 The usual way to obtain a console on this board is using an emulated USB serial port.
-
- */
