@@ -6,19 +6,32 @@
  * directory for more details.
  */
 
+#include <assert.h>
 #include <string.h>
 #include <stdint.h>
 
 #include "embUnit.h"
 
 #include "clist.h"
+#include "container.h"
 
 #include "tests-core.h"
 
-#define TEST_CLIST_LEN    (8)
+#define TEST_CLIST_LEN    (64)
 
-static list_node_t tests_clist_buf[TEST_CLIST_LEN];
+/* Test list data structure */
+struct test_list_node {
+    list_node_t list;
+    int value;
+};
+
+static struct test_list_node tests_clist_buf[TEST_CLIST_LEN];
 static list_node_t test_clist;
+
+static struct test_list_node * _get_test_list_node(list_node_t *node)
+{
+    return container_of(node, struct test_list_node, list);
+}
 
 static void set_up(void)
 {
@@ -28,7 +41,7 @@ static void set_up(void)
 
 static void test_clist_rpush(void)
 {
-    list_node_t *elem = &(tests_clist_buf[0]);
+    list_node_t *elem = &(tests_clist_buf[0].list);
     list_node_t *list = &test_clist;
 
     clist_rpush(list, elem);
@@ -41,7 +54,7 @@ static void test_clist_add_two(void)
 {
     list_node_t *list = &test_clist;
 
-    list_node_t *elem = &(tests_clist_buf[1]);
+    list_node_t *elem = &(tests_clist_buf[1].list);
 
     test_clist_rpush();
 
@@ -57,14 +70,14 @@ static void test_clist_add_three(void)
     list_node_t *list = &test_clist;
 
     for (int i = 0; i < 3; i++) {
-        clist_rpush(list, &(tests_clist_buf[i]));
+        clist_rpush(list, &(tests_clist_buf[i].list));
     }
 
     TEST_ASSERT_NOT_NULL(list->next);
-    TEST_ASSERT(list->next == &(tests_clist_buf[2]));
-    TEST_ASSERT(list->next->next == &(tests_clist_buf[0]));
-    TEST_ASSERT(list->next->next->next == &(tests_clist_buf[1]));
-    TEST_ASSERT(list->next->next->next->next == &(tests_clist_buf[2]));
+    TEST_ASSERT(list->next == &(tests_clist_buf[2].list));
+    TEST_ASSERT(list->next->next == &(tests_clist_buf[0].list));
+    TEST_ASSERT(list->next->next->next == &(tests_clist_buf[1].list));
+    TEST_ASSERT(list->next->next->next->next == &(tests_clist_buf[2].list));
 }
 
 static void test_clist_find(void)
@@ -74,10 +87,10 @@ static void test_clist_find(void)
     test_clist_add_three();
 
     for (int i = 0; i < 3; i++) {
-        TEST_ASSERT(clist_find(list, &(tests_clist_buf[i])) == &(tests_clist_buf[i]));
+        TEST_ASSERT(clist_find(list, &(tests_clist_buf[i].list)) == &(tests_clist_buf[i].list));
     }
 
-    TEST_ASSERT_NULL(clist_find(list, &(tests_clist_buf[3])));
+    TEST_ASSERT_NULL(clist_find(list, &(tests_clist_buf[3].list)));
 }
 
 static void test_clist_find_before(void)
@@ -86,13 +99,13 @@ static void test_clist_find_before(void)
 
     test_clist_add_three();
 
-    TEST_ASSERT(clist_find_before(list, &(tests_clist_buf[0])) == &(tests_clist_buf[2]));
+    TEST_ASSERT(clist_find_before(list, &(tests_clist_buf[0].list)) == &(tests_clist_buf[2].list));
 
     for (int i = 1; i < 3; i++) {
-        TEST_ASSERT(clist_find_before(list, &(tests_clist_buf[i])) == &(tests_clist_buf[i-1]));
+        TEST_ASSERT(clist_find_before(list, &(tests_clist_buf[i].list)) == &(tests_clist_buf[i-1].list));
     }
 
-    TEST_ASSERT_NULL(clist_find_before(list, &(tests_clist_buf[3])));
+    TEST_ASSERT_NULL(clist_find_before(list, &(tests_clist_buf[3].list)));
 }
 
 static void test_clist_remove(void)
@@ -102,27 +115,27 @@ static void test_clist_remove(void)
     for (int i = 0; i < 3; i++) {
         set_up();
         test_clist_add_three();
-        clist_remove(list, &(tests_clist_buf[i]));
+        clist_remove(list, &(tests_clist_buf[i].list));
 
         for (int j = 0; j < 3; j++) {
             if (i == j) {
-                TEST_ASSERT_NULL(clist_find(list, &(tests_clist_buf[j])));
+                TEST_ASSERT_NULL(clist_find(list, &(tests_clist_buf[j].list)));
             }
             else {
-                TEST_ASSERT(clist_find(list, &(tests_clist_buf[j])) == &(tests_clist_buf[j]));
+                TEST_ASSERT(clist_find(list, &(tests_clist_buf[j].list)) == &(tests_clist_buf[j].list));
             }
         }
     }
 
     /* list now contains 0, 1 */
-    TEST_ASSERT(list->next == &(tests_clist_buf[1]));
-    TEST_ASSERT(list->next->next == &(tests_clist_buf[0]));
+    TEST_ASSERT(list->next == &(tests_clist_buf[1].list));
+    TEST_ASSERT(list->next->next == &(tests_clist_buf[0].list));
 
-    clist_remove(list, &(tests_clist_buf[1]));
-    TEST_ASSERT(list->next == &(tests_clist_buf[0]));
-    TEST_ASSERT(list->next->next == &(tests_clist_buf[0]));
+    clist_remove(list, &(tests_clist_buf[1].list));
+    TEST_ASSERT(list->next == &(tests_clist_buf[0].list));
+    TEST_ASSERT(list->next->next == &(tests_clist_buf[0].list));
 
-    clist_remove(list, &(tests_clist_buf[0]));
+    clist_remove(list, &(tests_clist_buf[0].list));
     TEST_ASSERT_NULL(list->next);
 }
 
@@ -132,13 +145,13 @@ static void test_clist_lpop(void)
 
     test_clist_add_three();
 
-    TEST_ASSERT(clist_lpop(list) == &tests_clist_buf[0]);
+    TEST_ASSERT(clist_lpop(list) == &tests_clist_buf[0].list);
     TEST_ASSERT_NOT_NULL(list->next);
 
-    TEST_ASSERT(clist_lpop(list) == &tests_clist_buf[1]);
+    TEST_ASSERT(clist_lpop(list) == &tests_clist_buf[1].list);
     TEST_ASSERT_NOT_NULL(list->next);
 
-    TEST_ASSERT(clist_lpop(list) == &tests_clist_buf[2]);
+    TEST_ASSERT(clist_lpop(list) == &tests_clist_buf[2].list);
     TEST_ASSERT_NULL(list->next);
     TEST_ASSERT_NULL(clist_lpop(list));
 }
@@ -148,10 +161,10 @@ static void test_clist_lpush(void)
     list_node_t *list = &test_clist;
 
     test_clist_add_two();
-    clist_lpush(list, &tests_clist_buf[2]);
+    clist_lpush(list, &tests_clist_buf[2].list);
 
     TEST_ASSERT_NOT_NULL(list->next);
-    TEST_ASSERT(list->next->next == &tests_clist_buf[2]);
+    TEST_ASSERT(list->next->next == &tests_clist_buf[2].list);
 }
 
 static void test_clist_rpop(void)
@@ -163,7 +176,7 @@ static void test_clist_rpop(void)
     clist_rpop(list);
 
     TEST_ASSERT_NOT_NULL(list->next);
-    TEST_ASSERT(list->next->next == &tests_clist_buf[0]);
+    TEST_ASSERT(list->next->next == &tests_clist_buf[0].list);
 }
 
 static void test_clist_remove_two(void)
@@ -187,11 +200,11 @@ static void test_clist_lpoprpush(void)
 
     clist_lpoprpush(list);
 
-    TEST_ASSERT(list->next->next == &tests_clist_buf[1]);
+    TEST_ASSERT(list->next->next == &tests_clist_buf[1].list);
 
     clist_lpoprpush(list);
 
-    TEST_ASSERT(list->next->next == &tests_clist_buf[0]);
+    TEST_ASSERT(list->next->next == &tests_clist_buf[0].list);
 }
 
 static int _foreach_called;
@@ -200,10 +213,10 @@ static int _foreach_abort_after = TEST_CLIST_LEN/2;
 
 static void _foreach_test(clist_node_t *node)
 {
-    TEST_ASSERT(node == &tests_clist_buf[_foreach_called]);
+    TEST_ASSERT(node == &tests_clist_buf[_foreach_called].list);
 
     for (int i = 0; i < TEST_CLIST_LEN; i++) {
-        if (node == &tests_clist_buf[i]) {
+        if (node == &tests_clist_buf[i].list) {
             _foreach_visited[i]++;
             break;
         }
@@ -246,7 +259,7 @@ static void test_clist_foreach(void)
     TEST_ASSERT(res == NULL);
 
     for (int i = 0; i < TEST_CLIST_LEN; i++) {
-        clist_rpush(list, &tests_clist_buf[i]);
+        clist_rpush(list, &tests_clist_buf[i].list);
     }
 
     res = clist_foreach(list, _foreach_test_trampoline, NULL);
@@ -266,51 +279,104 @@ static void test_clist_foreach(void)
     TEST_ASSERT(res == NULL);
 }
 
-static int _cmp(clist_node_t *a, clist_node_t *b)
+static int _cmp(clist_node_t *_a, clist_node_t *_b)
 {
-    /* this comparison function will sort by the actual memory address of the
-     * list node (descending) */
-    return (uintptr_t)a - (uintptr_t) b;
+    struct test_list_node *a = _get_test_list_node(_a);
+    struct test_list_node *b = _get_test_list_node(_b);
+    return a->value - b->value;
 }
 
-static void test_clist_sort_empty(void)
+static bool _is_clist_stable_sorted(clist_node_t *list)
 {
-    clist_node_t empty = { .next=NULL };
-    clist_sort(&empty, _cmp);
+    /* empty list is always considered as sorted */
+    if (!list->next) {
+        return true;
+    }
 
-    TEST_ASSERT(empty.next == NULL);
+    clist_node_t *end_of_clist = list->next;
+    clist_node_t *prev = list->next->next;
+    clist_node_t *cur = prev->next;
+
+    while (prev != end_of_clist) {
+        int cmp = _cmp(prev, cur);
+        if (cmp > 0) {
+            return false;
+        }
+        if (cmp == 0) {
+            /* stable sort requires that order is not touched when elements
+             * are equal */
+            if ((uintptr_t)prev > (uintptr_t)cur) {
+                return false;
+            }
+        }
+
+        prev = cur;
+        cur = cur->next;
+    }
+
+    return true;
+}
+
+static void _prepare_unsorted_clist(size_t len)
+{
+    TEST_ASSERT(len <= ARRAY_SIZE(tests_clist_buf));
+    /*
+     * Test data generated using following python snippet:
+     *
+     * import random
+     *
+     * random.seed(1337)
+     * for i in range(8):
+     *     result = " " * 8
+     *     for i in range(7):
+     *         result += f"0x{random.getrandbits(8):02x},   "
+     *     result += f"0x{random.getrandbits(8):02x},"
+     *     print(result)
+     *
+     * Note that the given seed was selected to produce duplicates (e.g. 0xb2)
+     * in the input, so that stable sorting is tested.
+     */
+    static const unsigned values[] = {
+        0x9e,   0xec,   0x88,   0xb5,   0x5d,   0x92,   0x95,   0xbb,
+        0x2a,   0xc6,   0xd3,   0x55,   0x62,   0xa2,   0xca,   0x5c,
+        0xeb,   0xfe,   0x4e,   0x64,   0xfe,   0xb2,   0x34,   0xc2,
+        0xa8,   0xdd,   0xe9,   0x5d,   0x1b,   0x6c,   0xd2,   0xa2,
+        0x66,   0xe6,   0x10,   0x81,   0xb2,   0xab,   0x59,   0xe3,
+        0x67,   0x67,   0xcd,   0xbc,   0xcc,   0x4f,   0xa9,   0x04,
+        0xd5,   0x5a,   0x98,   0x1e,   0x75,   0x3f,   0xf5,   0x2b,
+        0xcb,   0xda,   0x50,   0xad,   0xb0,   0xeb,   0xea,   0x9a,
+    };
+    static_assert(ARRAY_SIZE(tests_clist_buf) <= ARRAY_SIZE(values),
+                  "Not enough test data for sort test");
+
+    set_up();
+    clist_node_t *list = &test_clist;
+    for (size_t i = 0; i < len; i++) {
+        tests_clist_buf[i].value = values[i];
+        clist_rpush(list, &tests_clist_buf[i].list);
+    }
 }
 
 /*
- * This test works by first adding all list nodes of tests_clist_buf to a new
- * list. As the array is traversed in order, the memory addresses of the list
- * nodes are naturally sorted ascending.
- * The list is then rotated (using clist_lpoprpush()) a couple of times in
- * order to create a somewhat arbitrary sorting.
- * Then clist_sort() is run with a comparison function that just returns the
- * difference (a-b), which effectively leads to a list sorted by descending
- * list node addresses.
+ * This test iterates over lists lengths starting with 0 up to TEST_CLIST_LEN
+ * and adds the buffer elements in ascending memory order to the list. The
+ * elements are filled with demo test data that contains duplicates.
+ *
+ * Afert sorting, it is verified that
+ * - the resulting list is sorted
+ * - the resulting list still has the correct size (no elements lost in sort)
+ * - duplicate elements of the input data are still in the original order
+ *   (the sort is stable)
  */
 static void test_clist_sort(void)
 {
     clist_node_t *list = &test_clist;
 
-    for (int i = 0; i < TEST_CLIST_LEN; i++) {
-        clist_rpush(list, &tests_clist_buf[i]);
-    }
-
-    /* rotate the list a couple of times in order to mess up the sorting */
-    clist_lpoprpush(list);
-    clist_lpoprpush(list);
-    clist_lpoprpush(list);
-
-    /* sort list */
-    clist_sort(list, _cmp);
-
-    uintptr_t last = (uintptr_t) list->next;
-
-    for (int i = 0; i < TEST_CLIST_LEN; i++) {
-        TEST_ASSERT((uintptr_t) clist_rpop(list) <= last);
+    for (size_t cur_len = 0; cur_len < TEST_CLIST_LEN; cur_len++) {
+        _prepare_unsorted_clist(cur_len);
+        clist_sort(list, _cmp);
+        TEST_ASSERT(_is_clist_stable_sorted(list));
+        TEST_ASSERT_EQUAL_INT(cur_len, clist_count(list));
     }
 }
 
@@ -320,7 +386,7 @@ static void test_clist_count(void)
     TEST_ASSERT(n == 0);
 
     for (unsigned i = 1; i <= TEST_CLIST_LEN; i++) {
-        clist_rpush(&test_clist, &tests_clist_buf[i - 1]);
+        clist_rpush(&test_clist, &tests_clist_buf[i - 1].list);
         n = clist_count(&test_clist);
         TEST_ASSERT(n == i);
     }
@@ -336,7 +402,7 @@ static void test_clist_is_empty(void)
     TEST_ASSERT(clist_is_empty(&test_clist));
 
     for (unsigned i = 1; i <= TEST_CLIST_LEN; i++) {
-        clist_rpush(&test_clist, &tests_clist_buf[i - 1]);
+        clist_rpush(&test_clist, &tests_clist_buf[i - 1].list);
         TEST_ASSERT(!clist_is_empty(&test_clist));
     }
     for (unsigned i = TEST_CLIST_LEN; i > 0; i--) {
@@ -355,14 +421,14 @@ static void test_clist_special_cardinality(void)
     TEST_ASSERT(!clist_exactly_one(&test_clist));
     TEST_ASSERT(!clist_more_than_one(&test_clist));
 
-    clist_rpush(&test_clist, &tests_clist_buf[i++]);
+    clist_rpush(&test_clist, &tests_clist_buf[i++].list);
 
     TEST_ASSERT(!clist_is_empty(&test_clist));
     TEST_ASSERT(clist_exactly_one(&test_clist));
     TEST_ASSERT(!clist_more_than_one(&test_clist));
 
     while (i < TEST_CLIST_LEN) {
-        clist_rpush(&test_clist, &tests_clist_buf[i++]);
+        clist_rpush(&test_clist, &tests_clist_buf[i++].list);
 
         TEST_ASSERT(!clist_is_empty(&test_clist));
         TEST_ASSERT(!clist_exactly_one(&test_clist));
@@ -402,7 +468,6 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_remove),
         new_TestFixture(test_clist_lpoprpush),
         new_TestFixture(test_clist_foreach),
-        new_TestFixture(test_clist_sort_empty),
         new_TestFixture(test_clist_sort),
         new_TestFixture(test_clist_count),
         new_TestFixture(test_clist_is_empty),
