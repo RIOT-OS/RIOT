@@ -79,7 +79,7 @@ static void _flag_waitone(void)
 
 static clist_node_t clist;
 
-static int _insert_reserved_data(clist_node_t *item, void *arg)
+static int _insert_reversed_data(clist_node_t *item, void *arg)
 {
     unsigned *val = arg;
     struct test_node *n = container_of(item, struct test_node, list);
