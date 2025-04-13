@@ -79,69 +79,34 @@ static void _flag_waitone(void)
 
 static clist_node_t clist;
 
-static void _insert_reserved_data(clist_node_t *list)
+static int _insert_reserved_data(clist_node_t *item, void *arg)
 {
-    clist_node_t *last = list->next;
-    if (!last) {
-        return;
-    }
-    unsigned val = BENCH_CLIST_SORT_TEST_NODES - 1;
-
-    clist_node_t *cur = last->next;
-    while (cur != last) {
-        struct test_node *n = container_of(cur, struct test_node, list);
-
-        n->value = val--;
-        cur = cur->next;
-    }
-    struct test_node *n = container_of(last, struct test_node, list);
-    n->value = BENCH_CLIST_SORT_TEST_NODES;
+    unsigned *val = arg;
+    struct test_node *n = container_of(item, struct test_node, list);
+    n->value = *val--;
+    return 0;
 }
 
-static void _insert_fully_sorted_data(clist_node_t *list)
+static int _insert_fully_sorted_data(clist_node_t *item, void *arg)
 {
-    clist_node_t *last = list->next;
-    if (!last) {
-        return;
-    }
-    unsigned val = 0;
-
-    clist_node_t *cur = last->next;
-    while (cur != last) {
-        struct test_node *n = container_of(cur, struct test_node, list);
-
-        n->value = val++;
-        cur = cur->next;
-    }
-
-    struct test_node *n = container_of(last, struct test_node, list);
-    n->value = val;
+    unsigned *val = arg;
+    struct test_node *n = container_of(item, struct test_node, list);
+    n->value = *val++;
+    return 0;
 }
 
-static void _insert_almost_sorted_data(clist_node_t *list)
+static int _insert_almost_sorted_data(clist_node_t *item, void *arg)
 {
-    clist_node_t *last = list->next;
-    if (!last) {
-        return;
+    unsigned *val = arg;
+    struct test_node *n = container_of(item, struct test_node, list);
+    if (*val == 3) {
+        n->value = BENCH_CLIST_SORT_TEST_NODES;
     }
-    unsigned val = 0;
-
-    clist_node_t *cur = last->next;
-    while (cur != last) {
-        struct test_node *n = container_of(cur, struct test_node, list);
-
-        if (val == 3) {
-            n->value = BENCH_CLIST_SORT_TEST_NODES;
-        }
-        else {
-            n->value = val;
-        }
-        val++;
-        cur = cur->next;
+    else {
+        n->value = *val;
     }
-
-    struct test_node *n = container_of(last, struct test_node, list);
-    n->value = 3;
+    *val += 1;
+    return 0;
 }
 
 static uint16_t _prng_next(uint16_t val)
@@ -152,15 +117,11 @@ static uint16_t _prng_next(uint16_t val)
     return val;
 }
 
-static void _insert_prng_data(clist_node_t *list)
+static int _insert_prng_data(clist_node_t *item, void *arg)
 {
-    clist_node_t *last = list->next;
-    if (!last) {
-        return;
-    }
-
-    uint16_t prng = 1337; /* what else as seed? */
-    clist_node_t *cur = last->next;
+    uint16_t *seed = arg;
+    struct test_node *n = container_of(item, struct test_node, list);
+    *seed = _prng_next(*seed);
 
     /* By masking off some bits from the full sequence PRNG input we introduce
      * duplicates: 2 dups in 64 items, 3 in 128 items, 20 in 256 items.
@@ -168,17 +129,9 @@ static void _insert_prng_data(clist_node_t *list)
      * The API explicitly says stable sort, so we better have some input data
      * where this attribute would make a difference. */
     const uint16_t dup_mask = 0x3ff;
+    n->value = *seed & dup_mask;
 
-    while (cur != last) {
-        struct test_node *n = container_of(cur, struct test_node, list);
-
-        prng = _prng_next(prng);
-        n->value = prng & dup_mask;
-        cur = cur->next;
-    }
-
-    struct test_node *n = container_of(last, struct test_node, list);
-    n->value = _prng_next(prng) & dup_mask;
+    return 0;
 }
 
 static int _cmp(clist_node_t *_lhs, clist_node_t *_rhs)
@@ -206,7 +159,8 @@ static void _clist_sort_test_reversed(void)
 {
     clist_node_t *list = &clist;
 
-    _insert_reserved_data(list);
+    unsigned value = BENCH_CLIST_SORT_TEST_NODES;
+    clist_foreach(list, _insert_reserved_data, &value);
     clist_sort(list, _cmp);
 }
 
@@ -214,7 +168,8 @@ static void _clist_sort_test_prng(void)
 {
     clist_node_t *list = &clist;
 
-    _insert_prng_data(list);
+    uint16_t seed = 1337; /* What else as seed? ;-P */
+    clist_foreach(list, _insert_prng_data, &seed);
     clist_sort(list, _cmp);
 }
 
@@ -222,7 +177,8 @@ static void _clist_sort_test_full_sorted(void)
 {
     clist_node_t *list = &clist;
 
-    _insert_fully_sorted_data(list);
+    unsigned value = 0;
+    clist_foreach(list, _insert_fully_sorted_data, &value);
     clist_sort(list, _cmp);
 }
 
@@ -230,7 +186,8 @@ static void _clist_sort_test_almost_sorted(void)
 {
     clist_node_t *list = &clist;
 
-    _insert_almost_sorted_data(list);
+    unsigned value = 0;
+    clist_foreach(list, _insert_almost_sorted_data, &value);
     clist_sort(list, _cmp);
 }
 
