@@ -65,6 +65,7 @@ developing for:
 * wget or curl
 * python3
 * pyserial (linux distro package often named python3-serial or py3-serial)
+* psutil (python3-psutil or py3-psutil)
 * Doxygen for building the documentation
 
 @note For each architecture a default tool for flashing and on-chip debugging is listed below - in
@@ -75,7 +76,8 @@ developing for:
 
 For example, in Ubuntu the above tools can be installed with the following command:
 
-    sudo apt install git gcc-arm-none-eabi make gcc-multilib libstdc++-arm-none-eabi-newlib openocd gdb-multiarch doxygen wget unzip python3-serial
+    sudo apt install git gcc-arm-none-eabi make gcc-multilib libstdc++-arm-none-eabi-newlib\
+     openocd gdb-multiarch doxygen wget unzip python3-serial python3-psutil
 
 @details Running `BOARD=<INSERT_TARGET_BOARD_HERE> make info-programmers-supported` in your
          application folder lists the programmers supported by RIOT for the given board.
