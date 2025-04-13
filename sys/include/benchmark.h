@@ -42,10 +42,24 @@ extern "C" {
  * @param[in] func      function call to benchmark
  */
 #define BENCHMARK_FUNC(name, runs, func)                        \
+    BENCHMARK_FUNC_WARMUP(name, 0, runs, func)
+
+/**
+ * @brief   Measure the runtime of a given function call
+ *
+ * Same as @ref BENCHMARK_FUNC, but do a few warmup iterations before starting
+ * the benchmark to warm up the dynamic branch predictor state and caches.
+ *
+ * @param[in] name      name for labeling the output
+ * @param[in] warmup    number of times to run @p func before the benchmark
+ * @param[in] runs      number of times to run @p func during the benchmark
+ * @param[in] func      function call to benchmark
+ */
+#define BENCHMARK_FUNC_WARMUP(name, warmup, runs, func)         \
     do {                                                        \
         ztimer_stopwatch_t timer = { .clock = ZTIMER_USEC };    \
         /* warm up cache, branch predictor, ... */              \
-        for (unsigned long i = 0; i < 32; i++) {                \
+        for (unsigned long i = 0; i < warmup; i++) {            \
             func;                                               \
         }                                                       \
         ztimer_stopwatch_start(&timer);                         \
