@@ -47,11 +47,6 @@ struct test_node {
     int value;
 };
 
-struct sorting_result{
-    bool sorts_correctly;
-    bool sorting_is_stable;
-};
-
 static mutex_t _lock;
 static thread_t *t;
 static thread_flags_t _flag = 0x0001;
@@ -239,12 +234,11 @@ static void _clist_sort_test_almost_sorted(void)
     clist_sort(list, _cmp);
 }
 
-static void _check_list_is_stable_sorted(struct sorting_result *res,
-                                         clist_node_t *list)
+static bool _is_list_sorted(clist_node_t *list)
 {
     /* empty list is always considered as sorted */
     if (!list->next) {
-        return;
+        return true;
     }
 
     clist_node_t *end_of_clist = list->next;
@@ -256,47 +250,38 @@ static void _check_list_is_stable_sorted(struct sorting_result *res,
         struct test_node *rhs = container_of(cur, struct test_node, list);
 
         if (lhs->value > rhs->value) {
-            res->sorting_is_stable = false;
-            return;
-        }
-
-        if (lhs->value == rhs->value) {
-            /* stable sort requires that order is not touched when elements
-             * are equal */
-            if ((uintptr_t)lhs > (uintptr_t)rhs) {
-                res->sorting_is_stable = false;
-                /* keep going, we still want to confirm whether it at least
-                 * sorts correctly */
-            }
+            return false;
         }
 
         prev = cur;
         cur = cur->next;
     }
+
+    return true;
 }
 
-static void _bench_clist_sort(struct sorting_result *res, unsigned size)
+static void _bench_clist_sort(unsigned size)
 {
     char name[48] = {};
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, rev)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_reversed());
-    _check_list_is_stable_sorted(res, &clist);
+    expect(_is_list_sorted(&clist));
 
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, prng)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_prng());
-    _check_list_is_stable_sorted(res, &clist);
+    expect(_is_list_sorted(&clist));
 
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, sort)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_full_sorted());
-    _check_list_is_stable_sorted(res, &clist);
+    expect(_is_list_sorted(&clist));
 
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, ≈sort)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_almost_sorted());
-    _check_list_is_stable_sorted(res, &clist);
+    expect(_is_list_sorted(&clist));
 }
 
 int main(void)
@@ -320,25 +305,9 @@ int main(void)
     BENCHMARK_FUNC("msg_avail()", BENCH_RUNS, msg_avail());
     puts("");
 
-    struct sorting_result res = {
-        .sorts_correctly = true,
-        .sorting_is_stable = true,
-    };
-
     for (unsigned len = 4; len <= BENCH_CLIST_SORT_TEST_NODES; len <<= 1) {
-       _bench_clist_sort(&res, len);
+       _bench_clist_sort(len);
     }
 
-    if (!res.sorting_is_stable) {
-        puts("WARNING: clist_sort() is not stable (despite API claim)");
-    }
-
-    if (res.sorts_correctly) {
-        puts("\n[SUCCESS]");
-    }
-    else {
-        puts("ERROR: clist_sort() is not sorting correctly");
-        puts("\n[FAILURE]");
-    }
-    return 0;
+   puts("\n[SUCCESS]");
 }
