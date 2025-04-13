@@ -84,18 +84,63 @@ static void _insert_reserved_data(clist_node_t *list)
     if (!last) {
         return;
     }
-    unsigned val = BENCH_CLIST_SORT_TEST_NODES;
+    unsigned val = BENCH_CLIST_SORT_TEST_NODES - 1;
 
     clist_node_t *cur = last->next;
     while (cur != last) {
         struct test_node *n = container_of(cur, struct test_node, list);
 
-        /* This is the worst case for most sorting algorithms: having the
-         * list perfectly sorted but in inverse direction. For real time, we
-         * only care about worst case and not about best case / average case */
         n->value = val--;
         cur = cur->next;
     }
+    struct test_node *n = container_of(last, struct test_node, list);
+    n->value = BENCH_CLIST_SORT_TEST_NODES;
+}
+
+static void _insert_fully_sorted_data(clist_node_t *list)
+{
+    clist_node_t *last = list->next;
+    if (!last) {
+        return;
+    }
+    unsigned val = 0;
+
+    clist_node_t *cur = last->next;
+    while (cur != last) {
+        struct test_node *n = container_of(cur, struct test_node, list);
+
+        n->value = val++;
+        cur = cur->next;
+    }
+
+    struct test_node *n = container_of(last, struct test_node, list);
+    n->value = val;
+}
+
+static void _insert_almost_sorted_data(clist_node_t *list)
+{
+    clist_node_t *last = list->next;
+    if (!last) {
+        return;
+    }
+    unsigned val = 0;
+
+    clist_node_t *cur = last->next;
+    while (cur != last) {
+        struct test_node *n = container_of(cur, struct test_node, list);
+
+        if (val == 3) {
+            n->value = BENCH_CLIST_SORT_TEST_NODES;
+        }
+        else {
+            n->value = val;
+        }
+        val++;
+        cur = cur->next;
+    }
+
+    struct test_node *n = container_of(last, struct test_node, list);
+    n->value = 3;
 }
 
 static void _insert_prng_data(clist_node_t *list)
@@ -144,7 +189,7 @@ static void _build_test_clist(size_t len)
     clist_sort(&clist, _cmp);
 }
 
-static void _clist_sort_test_worst_case(void)
+static void _clist_sort_test_reversed(void)
 {
     clist_node_t *list = &clist;
 
@@ -152,7 +197,7 @@ static void _clist_sort_test_worst_case(void)
     clist_sort(list, _cmp);
 }
 
-static void _clist_sort_test_avg_case(void)
+static void _clist_sort_test_prng(void)
 {
     clist_node_t *list = &clist;
 
@@ -160,16 +205,40 @@ static void _clist_sort_test_avg_case(void)
     clist_sort(list, _cmp);
 }
 
+static void _clist_sort_test_full_sorted(void)
+{
+    clist_node_t *list = &clist;
+
+    _insert_fully_sorted_data(list);
+    clist_sort(list, _cmp);
+}
+
+static void _clist_sort_test_almost_sorted(void)
+{
+    clist_node_t *list = &clist;
+
+    _insert_almost_sorted_data(list);
+    clist_sort(list, _cmp);
+}
+
 static void _bench_clist_sort(unsigned size)
 {
     char name[48] = {};
-    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, worst)", size);
+    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, rev)", size);
     _build_test_clist(size);
-    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_worst_case());
+    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_reversed());
 
-    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, avg)", size);
+    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, prng)", size);
     _build_test_clist(size);
-    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_avg_case());
+    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_prng());
+
+    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, sort)", size);
+    _build_test_clist(size);
+    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_full_sorted());
+
+    snprintf(name, sizeof(name) - 1, "clist_sort (#%u, ≈sort)", size);
+    _build_test_clist(size);
+    BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_almost_sorted());
 }
 
 int main(void)

@@ -28,8 +28,10 @@ def testfunc(child):
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_try_receive\(\)"), timeout=TIMEOUT)
     child.expect(BENCHMARK_REGEXP.format(func=r"msg_avail\(\)"))
     for _ in range(7):
-        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, worst\)", timeout=TIMEOUT))
-        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, avg\)", timeout=TIMEOUT))
+        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, rev\)", timeout=TIMEOUT))
+        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, prng\)", timeout=TIMEOUT))
+        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, sort\)", timeout=TIMEOUT))
+        child.expect(BENCHMARK_REGEXP.format(func=r"clist_sort \(#\d+, ≈sort\)", timeout=TIMEOUT))
     child.expect_exact('[SUCCESS]')
 
 
