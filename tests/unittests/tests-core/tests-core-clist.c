@@ -87,7 +87,8 @@ static void test_clist_find(void)
     test_clist_add_three();
 
     for (int i = 0; i < 3; i++) {
-        TEST_ASSERT(clist_find(list, &(tests_clist_buf[i].list)) == &(tests_clist_buf[i].list));
+        clist_node_t *found = clist_find(list, &(tests_clist_buf[i].list));
+        TEST_ASSERT(found == &(tests_clist_buf[i].list));
     }
 
     TEST_ASSERT_NULL(clist_find(list, &(tests_clist_buf[3].list)));
@@ -99,10 +100,12 @@ static void test_clist_find_before(void)
 
     test_clist_add_three();
 
-    TEST_ASSERT(clist_find_before(list, &(tests_clist_buf[0].list)) == &(tests_clist_buf[2].list));
+    clist_node_t *found = clist_find_before(list, &(tests_clist_buf[0].list));
+    TEST_ASSERT(found == &(tests_clist_buf[2].list));
 
     for (int i = 1; i < 3; i++) {
-        TEST_ASSERT(clist_find_before(list, &(tests_clist_buf[i].list)) == &(tests_clist_buf[i-1].list));
+        found = clist_find_before(list, &(tests_clist_buf[i].list));
+        TEST_ASSERT(found == &(tests_clist_buf[i-1].list));
     }
 
     TEST_ASSERT_NULL(clist_find_before(list, &(tests_clist_buf[3].list)));
@@ -122,7 +125,8 @@ static void test_clist_remove(void)
                 TEST_ASSERT_NULL(clist_find(list, &(tests_clist_buf[j].list)));
             }
             else {
-                TEST_ASSERT(clist_find(list, &(tests_clist_buf[j].list)) == &(tests_clist_buf[j].list));
+                clist_node_t *found = clist_find(list, &(tests_clist_buf[j].list));
+                TEST_ASSERT(found == &(tests_clist_buf[j].list));
             }
         }
     }
