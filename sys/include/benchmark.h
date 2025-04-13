@@ -59,7 +59,8 @@ extern "C" {
     do {                                                        \
         ztimer_stopwatch_t timer = { .clock = ZTIMER_USEC };    \
         /* warm up cache, branch predictor, ... */              \
-        for (unsigned long i = 0; i < warmup; i++) {            \
+        unsigned long _warmup = warmup;                         \
+        while (_warmup--) {                                     \
             func;                                               \
         }                                                       \
         ztimer_stopwatch_start(&timer);                         \
