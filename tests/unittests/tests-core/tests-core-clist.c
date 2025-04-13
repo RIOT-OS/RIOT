@@ -345,7 +345,7 @@ static void _prepare_unsorted_clist(size_t len)
         0xcb,   0xda,   0x50,   0xad,   0xb0,   0xeb,   0xea,   0x9a,
     };
     static_assert(ARRAY_SIZE(tests_clist_buf) <= ARRAY_SIZE(values),
-                  "Not enough test date for sort test");
+                  "Not enough test data for sort test");
 
     set_up();
     clist_node_t *list = &test_clist;
