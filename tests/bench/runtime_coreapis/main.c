@@ -21,8 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mutex.h"
 #include "benchmark.h"
+#include "mutex.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "thread_flags.h"
 
@@ -44,6 +45,11 @@
 struct test_node {
     clist_node_t list;
     int value;
+};
+
+struct sorting_result{
+    bool sorts_correctly;
+    bool sorting_is_stable;
 };
 
 static mutex_t _lock;
@@ -143,6 +149,14 @@ static void _insert_almost_sorted_data(clist_node_t *list)
     n->value = 3;
 }
 
+static uint16_t _prng_next(uint16_t val)
+{
+    val ^= val << 7;
+    val ^= val >> 9;
+    val ^= val << 8;
+    return val;
+}
+
 static void _insert_prng_data(clist_node_t *list)
 {
     clist_node_t *last = list->next;
@@ -150,18 +164,26 @@ static void _insert_prng_data(clist_node_t *list)
         return;
     }
 
-    uint32_t prng = 1337; /* what else as seed? */
+    uint16_t prng = 1337; /* what else as seed? */
     clist_node_t *cur = last->next;
+
+    /* By masking off some bits from the full sequence PRNG input we introduce
+     * duplicates: 2 dups in 64 items, 3 in 128 items, 20 in 256 items.
+     *
+     * The API explicitly says stable sort, so we better have some input data
+     * where this attribute would make a difference. */
+    const uint16_t dup_mask = 0x3ff;
 
     while (cur != last) {
         struct test_node *n = container_of(cur, struct test_node, list);
 
-        prng ^= prng << 13;
-        prng ^= prng >> 17;
-        prng ^= prng << 5;
-        n->value = prng;
+        prng = _prng_next(prng);
+        n->value = prng & dup_mask;
         cur = cur->next;
     }
+
+    struct test_node *n = container_of(last, struct test_node, list);
+    n->value = _prng_next(prng) & dup_mask;
 }
 
 static int _cmp(clist_node_t *_lhs, clist_node_t *_rhs)
@@ -183,10 +205,6 @@ static void _build_test_clist(size_t len)
     for (size_t i = 0; i < len; i++) {
         clist_rpush(&clist, &nodes[i].list);
     }
-
-    /* shuffle the elements a bit by adding random data and sorting it */
-    _insert_prng_data(&clist);
-    clist_sort(&clist, _cmp);
 }
 
 static void _clist_sort_test_reversed(void)
@@ -221,24 +239,64 @@ static void _clist_sort_test_almost_sorted(void)
     clist_sort(list, _cmp);
 }
 
-static void _bench_clist_sort(unsigned size)
+static void _check_list_is_stable_sorted(struct sorting_result *res,
+                                         clist_node_t *list)
+{
+    /* empty list is always considered as sorted */
+    if (!list->next) {
+        return;
+    }
+
+    clist_node_t *end_of_clist = list->next;
+    clist_node_t *prev = list->next->next;
+    clist_node_t *cur = prev->next;
+
+    while (prev != end_of_clist) {
+        struct test_node *lhs = container_of(prev, struct test_node, list);
+        struct test_node *rhs = container_of(cur, struct test_node, list);
+
+        if (lhs->value > rhs->value) {
+            res->sorting_is_stable = false;
+            return;
+        }
+
+        if (lhs->value == rhs->value) {
+            /* stable sort requires that order is not touched when elements
+             * are equal */
+            if ((uintptr_t)lhs > (uintptr_t)rhs) {
+                res->sorting_is_stable = false;
+                /* keep going, we still want to confirm whether it at least
+                 * sorts correctly */
+            }
+        }
+
+        prev = cur;
+        cur = cur->next;
+    }
+}
+
+static void _bench_clist_sort(struct sorting_result *res, unsigned size)
 {
     char name[48] = {};
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, rev)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_reversed());
+    _check_list_is_stable_sorted(res, &clist);
 
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, prng)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_prng());
+    _check_list_is_stable_sorted(res, &clist);
 
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, sort)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_full_sorted());
+    _check_list_is_stable_sorted(res, &clist);
 
     snprintf(name, sizeof(name) - 1, "clist_sort (#%u, ≈sort)", size);
     _build_test_clist(size);
     BENCHMARK_FUNC(name, BENCH_CLIST_RUNS, _clist_sort_test_almost_sorted());
+    _check_list_is_stable_sorted(res, &clist);
 }
 
 int main(void)
@@ -262,11 +320,25 @@ int main(void)
     BENCHMARK_FUNC("msg_avail()", BENCH_RUNS, msg_avail());
     puts("");
 
-    for (unsigned len = 4; len <= BENCH_CLIST_SORT_TEST_NODES; len <<= 1) {
-    _bench_clist_sort(len);
+    struct sorting_result res = {
+        .sorts_correctly = true,
+        .sorting_is_stable = true,
+    };
 
+    for (unsigned len = 4; len <= BENCH_CLIST_SORT_TEST_NODES; len <<= 1) {
+       _bench_clist_sort(&res, len);
     }
 
-    puts("\n[SUCCESS]");
+    if (!res.sorting_is_stable) {
+        puts("WARNING: clist_sort() is not stable (despite API claim)");
+    }
+
+    if (res.sorts_correctly) {
+        puts("\n[SUCCESS]");
+    }
+    else {
+        puts("ERROR: clist_sort() is not sorting correctly");
+        puts("\n[FAILURE]");
+    }
     return 0;
 }
