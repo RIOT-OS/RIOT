@@ -160,7 +160,7 @@ static void _clist_sort_test_reversed(void)
     clist_node_t *list = &clist;
 
     unsigned value = BENCH_CLIST_SORT_TEST_NODES;
-    clist_foreach(list, _insert_reserved_data, &value);
+    clist_foreach(list, _insert_reversed_data, &value);
     clist_sort(list, _cmp);
 }
 
