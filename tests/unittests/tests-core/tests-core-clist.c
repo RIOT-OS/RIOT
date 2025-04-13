@@ -22,7 +22,7 @@
 /* Test list data structure */
 struct test_list_node {
     list_node_t list;
-    unsigned value;
+    int value;
 };
 
 static struct test_list_node tests_clist_buf[TEST_CLIST_LEN];
@@ -281,7 +281,8 @@ static void test_clist_foreach(void)
 
 static int _cmp(clist_node_t *_a, clist_node_t *_b)
 {
-    struct test_list_node *a = _get_test_list_node(_a), *b = _get_test_list_node(_b);
+    struct test_list_node *a = _get_test_list_node(_a);
+    struct test_list_node *b = _get_test_list_node(_b);
     return a->value - b->value;
 }
 
@@ -333,6 +334,9 @@ static void _prepare_unsorted_clist(size_t len)
      *         result += f"0x{random.getrandbits(8):02x},   "
      *     result += f"0x{random.getrandbits(8):02x},"
      *     print(result)
+     *
+     * Note that the given seed was selected to produce duplicates (e.g. 0xb2)
+     * in the input, so that stable sorting is tested.
      */
     static const unsigned values[] = {
         0x9e,   0xec,   0x88,   0xb5,   0x5d,   0x92,   0x95,   0xbb,
@@ -356,14 +360,15 @@ static void _prepare_unsorted_clist(size_t len)
 }
 
 /*
- * This test works by first adding all list nodes of tests_clist_buf to a new
- * list. As the array is traversed in order, the memory addresses of the list
- * nodes are naturally sorted ascending.
- * The list is then rotated (using clist_lpoprpush()) a couple of times in
- * order to create a somewhat arbitrary sorting.
- * Then clist_sort() is run with a comparison function that just returns the
- * difference (a-b), which effectively leads to a list sorted by descending
- * list node addresses.
+ * This test iterates over lists lengths starting with 0 up to TEST_CLIST_LEN
+ * and adds the buffer elements in ascending memory order to the list. The
+ * elements are filled with demo test data that contains duplicates.
+ *
+ * Afert sorting, it is verified that
+ * - the resulting list is sorted
+ * - the resulting list still has the correct size (no elements lost in sort)
+ * - duplicate elements of the input data are still in the original order
+ *   (the sort is stable)
  */
 static void test_clist_sort(void)
 {
