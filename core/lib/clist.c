@@ -20,18 +20,22 @@
 
 #include "clist.h"
 
-clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
+void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
 {
-    clist_node_t *sorted, *unsorted;
+    clist_node_t *sorted, *unsorted, *last, *first;
+
+    last = list->next;
 
     /* Special case: Empty list */
-    if (!list) {
-        return NULL;
+    if (!last) {
+        return;
     }
 
-    /* Special case: Only one item */
-    if (!list->next) {
-        return list;
+    first = last->next;
+
+    /* Special case: One item list */
+    if (first == last) {
+        return;
     }
 
     /* We break the circular list into two linear lists. The list sorted
@@ -40,10 +44,10 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
      * Note: Since sorted is one element long at start, it is naturally sorted,
      *       as every one item list is inherently sorted.
       */
-    sorted = list->next;
+    sorted = first;
     unsorted = sorted->next;
-    sorted->next = NULL;
-    list->next = NULL;
+    first->next = NULL;
+    last->next = NULL;
 
 sort_next_cycle:
     while (unsorted) {
@@ -51,11 +55,26 @@ sort_next_cycle:
         clist_node_t **prev = &sorted;
         while (iter) {
             if (cmp(unsorted, iter) < 0) {
-                /* head of unsorted needs to be inserted before iter */
-                clist_node_t *tmp = unsorted->next;
+                /* Head of unsorted needs to be inserted before iter. We will
+                 * insert as many elements from unsorted before iter as
+                 * posbile: So all elements that are already sorted and
+                 * smaller than iter. (Note: Not smaller or equal, as we claim
+                 * to use a stable sort here) */
+
+                /* safe away current iter */
+                clist_node_t *end = iter;
                 *prev = unsorted;
-                unsorted->next = iter;
-                unsorted = tmp;
+                iter = unsorted;
+                unsorted = unsorted->next;
+                while (unsorted) {
+                    if ((cmp(unsorted, end) >= 0) || (cmp(iter, unsorted) > 0)) {
+                        iter->next = end;
+                        goto sort_next_cycle;
+                    }
+                    iter = unsorted;
+                    unsorted = unsorted->next;
+                }
+                iter->next = end;
                 goto sort_next_cycle;
             }
             prev = &iter->next;
@@ -64,18 +83,30 @@ sort_next_cycle:
         /* head of unsorted needs to be inserted after iter */
         clist_node_t *tmp = unsorted->next;
         *prev = unsorted;
-        unsorted->next = NULL;
+
+        /* keep inserting elements from unsorted while elements are already
+         * in order */
+        iter = unsorted;
         unsorted = tmp;
+        while (unsorted) {
+            if (cmp(iter, unsorted) > 0) {
+                /* found end of sorted list, go back to insertion sort */
+                iter->next = NULL;
+                break;
+            }
+            iter = unsorted;
+            unsorted = unsorted->next;
+        }
     }
 
     /* We now have in sorted a sorted linear list. Let's make that circular
      * again and return the pointer to the last item */
-
-    clist_node_t *last = sorted;
+    last = sorted;
     while (last->next) {
         last = last->next;
     }
     last->next = sorted;
 
-    return last;
+    /* write the new last to the list */
+    list->next = last;
 }

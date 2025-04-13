@@ -386,18 +386,6 @@ static inline clist_node_t *clist_foreach(clist_node_t *list, int (*func)(
 typedef int (*clist_cmp_func_t)(clist_node_t *a, clist_node_t *b);
 
 /**
- * @brief   List sorting helper function
- *
- * @internal
- *
- * @param[in]   list_head   ptr to the first element inside a clist
- * @param[in]   cmp         comparison function
- *
- * @returns     ptr to *last* element in list
- */
-clist_node_t *_clist_sort(clist_node_t *list_head, clist_cmp_func_t cmp);
-
-/**
  * @brief   Sort a list
  *
  * This function will sort @p list using merge sort.
@@ -439,12 +427,7 @@ clist_node_t *_clist_sort(clist_node_t *list_head, clist_cmp_func_t cmp);
  * @param[in,out]   list    List to sort
  * @param[in]       cmp     Comparison function
  */
-static inline void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
-{
-    if (list->next) {
-        list->next = _clist_sort(list->next->next, cmp);
-    }
-}
+void clist_sort(clist_node_t *list, clist_cmp_func_t cmp);
 
 /**
  * @brief   Count the number of items in the given list
