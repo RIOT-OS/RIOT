@@ -31,11 +31,7 @@
 #  define BENCH_RUNS          (1000UL * 1000UL)
 #endif
 #ifndef BENCH_CLIST_RUNS
-#  if defined(BOARD_NATIVE64) || defined(BOARD_NATIVE32)
-#    define BENCH_CLIST_RUNS BENCH_RUNS
-#  else
-#    define BENCH_CLIST_RUNS (BENCH_RUNS / 1000UL)
-#  endif
+#  define BENCH_CLIST_RUNS (BENCH_RUNS / 1000UL)
 #endif
 
 #ifndef BENCH_CLIST_SORT_TEST_NODES
