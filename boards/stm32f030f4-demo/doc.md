@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_stm32f030f4-demo STM32F030F4 Demo Board
 @ingroup     boards
 @brief       Support for the STM32F030F4 Demo Board
@@ -50,5 +49,3 @@ and debug via GDB by simply typing
 ```
 make BOARD=stm32f030f4-demo debug
 ```
-
- */
