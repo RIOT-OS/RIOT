@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_stm32f3discovery STM32F3Discovery
 @ingroup     boards
 @brief       Support for the STM32F3Discovery board
@@ -158,4 +157,3 @@ toolchain.
    - **PA10** is connected with **TX** on the UART converter
    - **PA9** is connected with **RX** on the UART converter
 2. done
- */
