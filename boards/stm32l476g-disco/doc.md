@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_stm32l476g-disco STM32L476G-DISCO
- * @ingroup     boards
- * @brief       Support for the STM32L476G-DISCO board.
+@defgroup    boards_stm32l476g-disco STM32L476G-DISCO
+@ingroup     boards
+@brief       Support for the STM32L476G-DISCO board.
 
 ## Overview
 
@@ -60,5 +59,3 @@ provided by integrated ST-LINK programmer. ST-LINK is connected to the
 microcontroller USART2.
 
 The default baud rate is 115200.
-
- */

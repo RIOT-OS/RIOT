@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_stm32f723e-disco STM32F723E-DISCO board
 @ingroup     boards
 @brief       Support for the STM32F723E-DISCO board
@@ -34,4 +33,3 @@ By default, the USB OTG FS port is used. To use the USB OTG HS port with the
 internal UTMI+ HS PHY, enable the module `periph_usbdev_hs_utmi`:
 
     make BOARD=stm32f723e-disco USEMODULE=periph_usbdev_hs_utmi -C examples/advanced/usbus_minimal
- */
