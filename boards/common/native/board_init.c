@@ -14,6 +14,7 @@
  * @}
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include "board.h"
 
 #include "board_internal.h"
@@ -79,5 +80,9 @@ VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, VFS_DEFAULT_NVM(0), 0);
  */
 void board_init(void)
 {
+    if (!getenv("TZ")) {
+        puts("TZ not set, setting UTC");
+    }
+    setenv("TZ", "UTC", 0);
     puts("RIOT " RIOT_BOARD " board initialized.");
 }
