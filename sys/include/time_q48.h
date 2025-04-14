@@ -35,7 +35,7 @@ extern "C" {
  * The upper 48 bits of the counter are the seconds since 1st January 1970
  * The lower 16 bits are the fractions of the second with 1/64k prec
  */
-typedef uint64_t time_q48_t;
+typedef int64_t time_q48_t;
 
 /**
  * @brief Get seconds from Q48.16 time format
@@ -44,7 +44,7 @@ typedef uint64_t time_q48_t;
  *
  * @return Second part of the timestamp
  */
-static inline uint64_t time_q48_get_sec(time_q48_t time)
+static inline int64_t time_q48_get_sec(time_q48_t time)
 {
     return time >> 16;
 }
@@ -69,9 +69,9 @@ static inline uint32_t time_q48_get_usec(time_q48_t time)
  *
  * @return Timestamp in Q48.16 format
  */
-static inline time_q48_t time_to_q48(uint64_t secs, uint32_t us)
+static inline time_q48_t time_to_q48(int64_t secs, uint32_t us)
 {
-    uint64_t now = secs << 16;
+    int64_t now = secs << 16;
     now += ((uint64_t)us * 0xFFFF) / US_PER_SEC;
 
     return now;
