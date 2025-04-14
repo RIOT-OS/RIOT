@@ -14,9 +14,6 @@ APP_SHELL_FMT ?= NONE
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit
 
-# requires #19005
-TEST_ON_CI_BLACKLIST += native32 native64
-
 include $(RIOTBASE)/Makefile.include
 
 CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_SMALL+THREAD_EXTRA_STACKSIZE_PRINTF)'
