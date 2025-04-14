@@ -337,6 +337,8 @@ if __name__ == '__main__':
             '-mlongcalls',
             # GCC specific diagnostics: Tell GCC address space starts at 0
             '--param=min-pagesize=0',
+            # -fanalyzer is GCC only
+            '-fanalyzer',
         ]
         _args.filter_out.extend(flags)
     generate_compile_commands(_args)
