@@ -3,6 +3,8 @@ PKG_URL=https://github.com/microsoft/uf2.git
 PKG_VERSION=27e322fcdcc6eee0642242638d4f2557efb32559
 PKG_LICENSE=MIT
 
+RIOTBASE ?= $(CURDIR)/../../..
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 all: $(CURDIR)/uf2conv.py $(CURDIR)/uf2families.json

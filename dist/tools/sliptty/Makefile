@@ -11,3 +11,5 @@ $(BIN): $(wildcard *.c)
 
 clean:
 	$(RM) $(BIN)
+
+distclean: clean

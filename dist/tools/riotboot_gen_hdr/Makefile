@@ -37,3 +37,5 @@ bin/genhdr: $(GENHDR_HDR) $(GENHDR_SRC) Makefile | bin/
 
 clean:
 	$(Q)rm -rf bin/
+
+distclean: clean

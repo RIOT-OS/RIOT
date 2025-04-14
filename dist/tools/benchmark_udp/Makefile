@@ -17,3 +17,5 @@ $(BINARY): $(SRCS)
 
 clean:
 	rm -f $(BINARY)
+
+distclean: clean
