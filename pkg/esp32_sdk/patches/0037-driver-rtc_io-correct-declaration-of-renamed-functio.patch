@@ -1,0 +1,30 @@
+From d9443415cc1e10526a265601cd98374988660101 Mon Sep 17 00:00:00 2001
+From: Jongmin Kim <jmkim@debian.org>
+Date: Mon, 14 Apr 2025 15:03:34 +0900
+Subject: [PATCH 1/2] driver/rtc_io: correct declaration of renamed function
+ rtc_gpio_force_hold_en_all
+
+The implementation of `rtc_gpio_force_hold_all()` was renamed to`rtc_gpio_force_hold_en_all()`
+in the patch `0022-driver-gpio-fix-undefined-reference-to-rtc_gpio_forc.patch`.
+
+This patch corrects the function declaration to match the renamed implementation.
+---
+ components/driver/include/driver/rtc_io.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/driver/include/driver/rtc_io.h b/components/driver/include/driver/rtc_io.h
+index cbf32c4f..766bde11 100644
+--- a/components/driver/include/driver/rtc_io.h
++++ b/components/driver/include/driver/rtc_io.h
+@@ -269,7 +269,7 @@ esp_err_t rtc_gpio_isolate(gpio_num_t gpio_num);
+  * Force hold signal is enabled before going into deep sleep for pins which
+  * are used for EXT1 wakeup.
+  */
+-esp_err_t rtc_gpio_force_hold_all(void);
++esp_err_t rtc_gpio_force_hold_en_all(void);
+ 
+ /**
+  * @brief Disable force hold signal for all RTC IOs
+-- 
+2.49.0
+
