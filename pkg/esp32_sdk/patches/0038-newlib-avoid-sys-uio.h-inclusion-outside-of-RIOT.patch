@@ -1,0 +1,31 @@
+From 87cf66f13900f4609ac6e1fa4b4c8046232268bd Mon Sep 17 00:00:00 2001
+From: Jongmin Kim <jmkim@debian.org>
+Date: Mon, 14 Apr 2025 15:08:58 +0900
+Subject: [PATCH 2/2] newlib: avoid sys/uio.h inclusion outside of RIOT
+
+The RIOT header `<sys/uio.h>` is not available when using the bundled ESP-IDF
+outside of RIOT.
+
+This patch ensures that `<sys/uio.h>` is only included when `RIOT_VERSION` is
+defined.
+---
+ components/newlib/platform_include/sys/uio.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/newlib/platform_include/sys/uio.h b/components/newlib/platform_include/sys/uio.h
+index 388fed3d..5a8652a7 100644
+--- a/components/newlib/platform_include/sys/uio.h
++++ b/components/newlib/platform_include/sys/uio.h
+@@ -6,7 +6,9 @@
+ 
+ #pragma once
+ 
++#ifdef RIOT_VERSION
+ #include_next <sys/uio.h>
++#endif /* RIOT_VERSION */
+ 
+ #include <stdint.h>
+ #include <sys/types.h>
+-- 
+2.49.0
+
