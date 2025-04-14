@@ -4,6 +4,7 @@
 RIOTBASE ?= .
 
 APPS_BASE_DIRS = bootloaders examples fuzzing tests
+TOOLS_BASE_DIRS = dist/tools
 
 # 1. recursively find Makefiles
 # 2. take parent folders
@@ -13,6 +14,12 @@ APPS_BASE_DIRS = bootloaders examples fuzzing tests
 APPLICATION_DIRS := $(shell find $(APPS_BASE_DIRS) -name Makefile -type f | \
     xargs dirname | \
     grep -vF "/bin/" | \
+    grep -vFf $(RIOTBASE)/makefiles/app_dirs.blacklist | \
+    sort | uniq)
+
+# used for `make claen` and `make distclean`
+TOOLS_DIRS := $(shell find $(TOOLS_BASE_DIRS) -mindepth 2 -maxdepth 2 -name Makefile -type f | \
+    xargs dirname | \
     grep -vFf $(RIOTBASE)/makefiles/app_dirs.blacklist | \
     sort | uniq)
 

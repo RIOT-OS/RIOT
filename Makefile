@@ -17,7 +17,7 @@ docclean:
 
 clean:
 	@echo "Cleaning all build products for the current board"
-	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir clean; done
+	@for dir in $(APPLICATION_DIRS) $(TOOLS_DIRS); do "$(MAKE)" -C$$dir clean; done
 
 pkg-clean:
 	@echo "Cleaning all package sources"
@@ -25,7 +25,7 @@ pkg-clean:
 
 distclean: docclean pkg-clean
 	@echo "Cleaning all build products"
-	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir distclean; done
+	@for dir in $(APPLICATION_DIRS) $(TOOLS_DIRS); do "$(MAKE)" -C$$dir distclean; done
 
 print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh
