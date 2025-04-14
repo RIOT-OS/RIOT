@@ -125,24 +125,24 @@ PROGRAMMER ?= esptool
 # Add esptool in the list supported programmers
 PROGRAMMERS_SUPPORTED += esptool
 
-# The ELFFILE is defined by default in $(RIOTBASE)/Makefile.include but only
-# after this file is included, so we need ELFFILE defined earlier.
+# The EXECUTABLE is defined by default in $(RIOTBASE)/Makefile.include but only
+# after this file is included, so we need EXECUTABLE defined earlier.
 # This is used to create new make rules in this file (based on FLASHFILE)
 # and can't be deferred.
-ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
-FLASHFILE ?= $(ELFFILE).bin
+EXECUTABLE ?= $(BINDIR)/$(APPLICATION).elf
+FLASHFILE ?= $(EXECUTABLE).bin
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
 
 # This is the binary that ends up programmed in the flash.
-$(ELFFILE).bin: $(ELFFILE)
+$(EXECUTABLE).bin: $(EXECUTABLE)
 	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
 		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
 		-o $@ $<
 
 # Convert .elf and .csv to .bin files at build time, but make them available for
 # tests at flash time. These can't be added to FLASHDEPS because they depend on
-# on ELFFILE and would trigger a rebuild with "flash-only".
+# on EXECUTABLE and would trigger a rebuild with "flash-only".
 BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
 TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
 

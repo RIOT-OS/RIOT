@@ -13,6 +13,10 @@ else
   endif
 endif
 
+ifeq ($(OS),Darwin)
+  USEMODULE += periph_timer_darwin
+endif
+
 ifneq (,$(filter stdio_default,$(USEMODULE)))
   USEMODULE += stdio_native
 endif

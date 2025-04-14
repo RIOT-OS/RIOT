@@ -93,7 +93,7 @@ else
   _NODES_FLASH_OPTION = --flash
   ifeq (,$(filter firefly zigduino,$(BOARD)))
     # All boards in IoT-LAB except firefly can be flashed using $(BINFILE).
-    # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards on accept $(HEXFILE).
+    # On IoT-LAB, firefly only accepts $(EXECUTABLE) and WSN320 boards on accept $(HEXFILE).
     # Using $(BINFILE) speeds up the firmware upload since the file is much
     # smaller than an elffile.
     # This feature is only available in cli-tools version >= 3.
@@ -224,7 +224,7 @@ ifneq (,$(filter firefly iotlab-a8-m3 zigduino,$(BOARD)))
 else
   DEBUGGER_COMMON_FLAGS = "$(firstword $(subst ., ,$(IOTLAB_NODE)))" "$(_IOTLAB_NODELIST)" "$(_IOTLAB_AUTHORITY)" "$(_IOTLAB_EXP_ID)"
   DEBUGGER = $(RIOTBASE)/dist/testbed-support/iotlab-debug.sh
-  DEBUGGER_FLAGS = $(DEBUGGER_COMMON_FLAGS) "$(ELFFILE)"
+  DEBUGGER_FLAGS = $(DEBUGGER_COMMON_FLAGS) "$(EXECUTABLE)"
   DEBUGSERVER = $(DEBUGGER)
   DEBUGSERVER_FLAGS = $(DEBUGGER_COMMON_FLAGS) "" "1"
 endif

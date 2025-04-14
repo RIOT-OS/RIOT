@@ -9,7 +9,7 @@ endif
 
 RESET ?= $(RIOTBOARD)/common/native/dist/reset.sh
 FLASHER ?=
-FLASHFILE ?= $(ELFFILE)
+FLASHFILE ?= $(EXECUTABLE)
 
 ifeq (pyterm,$(RIOT_TERMINAL))
   TERMFLAGS += -ps $(FLASHFILE)

@@ -423,7 +423,7 @@ typedef struct {
  * @param name  internal name of the resource entry, must be unique
  */
 #define NANOCOAP_RESOURCE(name) \
-    XFA_CONST(coap_resource_t, coap_resources_xfa, 0) CONCAT(coap_resource_, name) =
+    XFA_CONST(coap_resource_t, coap_resources_xfa, 0, CONCAT(coap_resource_, name)) =
 #else
 /**
  * @brief   Global CoAP resource list

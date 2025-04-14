@@ -7,7 +7,7 @@ OPENOCD_CORE = stm32mp15x.cm4
 GDB_PORT_CORE_OFFSET = 1
 
 FFLAGS ?= flashr $(FLASHFILE)
-DEBUGGER_FLAGS ?= debugr $(DEBUG_ELFFILE)
+DEBUGGER_FLAGS ?= debugr $(DEBUG_EXECUTABLE)
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk

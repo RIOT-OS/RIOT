@@ -325,11 +325,18 @@ void native_signal_action(int sig, siginfo_t *info, void *context)
     _set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
 
-    /* Get PC/LR. This is where we will resume execution on the userspace thread. */
-    _native_user_fptr = (uintptr_t)_context_get_fptr((ucontext_t *)context);
+    /* Get PC/LR. This is where we will resume execution on the userspace thread.
+     *
+     * arm64e: We want the presigned version. This enables us to authenticate the pointer
+     * in _native_sig_leave_tramp. */
+    _native_user_fptr = (uintptr_t)_context_get_fptr((ucontext_t *)context, /* presigned: */ true);
 
-    /* Now we want to go to _native_sig_leave_tramp before resuming execution at _native_user_fptr. */
-    _context_set_fptr(context, (uintptr_t)_native_sig_leave_tramp);
+    /* Now we want to go to _native_sig_leave_tramp before resuming execution at _native_user_fptr.
+     *
+     * arm64: We supply an unsigned pointer, hence presigned=false.
+     * This instructs _context_set_fptr to sign the pointer which is necessary given how
+     * setcontext is implemented on macOS. */
+    _context_set_fptr(context, (uintptr_t)_native_sig_leave_tramp, /* presigned: */ false);
 }
 
 static void _set_signal_handler(int sig, bool add)

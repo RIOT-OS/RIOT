@@ -62,9 +62,9 @@ test_config() {
 }
 
 test_elffile() {
-    if [ ! -f "${ELFFILE}" ]; then
-        echo "Error: Unable to locate ELFFILE"
-        echo "       (${ELFFILE})"
+    if [ ! -f "${EXECUTABLE}" ]; then
+        echo "Error: Unable to locate EXECUTABLE"
+        echo "       (${EXECUTABLE})"
         exit 1
     fi
 }

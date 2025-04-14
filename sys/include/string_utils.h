@@ -122,7 +122,7 @@ int __swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...)
  *
  * for all other cases, we provide it here
  */
-#if !defined(CPU_NATIVE) \
+#if (!defined(CPU_NATIVE) || defined(__APPLE__)) \
     && !(IS_USED(MODULE_PICOLIBC) && __BSD_VISIBLE) \
     && !(IS_USED(MODULE_NEWLIB) && __BSD_VISIBLE && !defined(CPU_ESP8266))
 

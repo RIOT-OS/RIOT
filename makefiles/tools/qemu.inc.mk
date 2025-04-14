@@ -1,6 +1,6 @@
 QEMU ?= qemu-system-arm
 QEMU_MACHINE ?= $(BOARD)
-FLASHFILE ?= $(ELFFILE)
+FLASHFILE ?= $(EXECUTABLE)
 
 ifeq (,$(EMULATOR_TMP_DIR))
   EMULATOR_TMP_DIR := $(shell mktemp -td riot_$(APPLICATION)_$(BOARD).XXXXX)
@@ -12,7 +12,7 @@ EMULATOR_MONITOR ?= $(EMULATOR_TMP_DIR)/mon
 # Configure emulator variables
 EMULATOR ?= $(QEMU)
 EMULATOR_FLAGS ?= -machine $(QEMU_MACHINE) \
-                  -device loader,file=$(ELFFILE) \
+                  -device loader,file=$(EXECUTABLE) \
                   -serial  unix:$(EMULATOR_SERIAL_PORT)_socket,server=on,wait=off \
                   -monitor unix:$(EMULATOR_MONITOR)_socket,server=on,wait=off \
                   -nographic
@@ -33,7 +33,7 @@ QEMU_DEBUG_FLAGS += $(EMULATOR_FLAGS)
 DEBUGSERVER ?= $(EMULATOR)
 DEBUGSERVER_FLAGS ?= $(QEMU_DEBUG_FLAGS)
 
-DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(DEBUG_ELFFILE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR)
+DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(DEBUG_EXECUTABLE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR)
 DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
 
 # No flasher available with qemu emulator

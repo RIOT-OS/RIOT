@@ -1423,8 +1423,8 @@ typedef struct sdmmc_dev {
  *     },
  * };
  *
- * XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_1 = (sdmmc_dev_t * const)&_mcu_sdmmc_devs[0];
- * XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_2 = (sdmmc_dev_t * const)&_mcu_sdmmc_devs[1];
+ * XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0, _sdmmc_1) = (sdmmc_dev_t * const)&_mcu_sdmmc_devs[0];
+ * XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0, _sdmmc_2) = (sdmmc_dev_t * const)&_mcu_sdmmc_devs[1];
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  */
