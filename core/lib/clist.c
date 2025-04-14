@@ -1,153 +1,256 @@
 /*
- * Copyright (C) 2017 Inria
- *               2017 Freie Universität Berlin
- *               2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2025 Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * The code of _clist_sort() has been imported from
- * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html.
- * Original copyright notice:
- *
- * This file is copyright 2001 Simon Tatham.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT.  IN NO EVENT SHALL SIMON TATHAM BE LIABLE FOR
- * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 /**
  * @ingroup     core_util
- * @{
  *
  * @file
  * @brief       clist helper implementations
  *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
- * @}
  */
 
 #include "clist.h"
+#include "container.h"
 
-clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+#ifndef CONFIG_CLIST_SORT_BUF_SIZE
+/**
+ * @brief   size of the two static buffer used to speed up the sort
+ *
+ * Bumping this will increase the sorting speed of larger list at the cost of
+ * stack size. The stack size required by the two buffers amounts to:
+ * `2 * CONFIG_CLIST_SORT_BUF_SIZE * sizeof(void *)`
+ */
+#  define CONFIG_CLIST_SORT_BUF_SIZE 8
+#endif
+
+#if (CONFIG_CLIST_SORT_BUF_SIZE == 0) || (CONFIG_CLIST_SORT_BUF_SIZE & (CONFIG_CLIST_SORT_BUF_SIZE - 1) != 0)
+#  error "CONFIG_CLIST_SORT_BUF_SIZE needs to be a power of 2"
+#endif
+
+struct lists_buf {
+    list_node_t *lists[CONFIG_CLIST_SORT_BUF_SIZE];
+};
+
+/**
+ * @brief   print the given lists if `ENABLE_DEBUG` is set to `1`
+ * @param   head    List to print
+ * @note    this function will be fully optimized out with `ENABLE_DEBUG == 0`
+ */
+static void _debug_print_list(list_node_t *head)
 {
-    clist_node_t *p, *q, *e;
-    int insize, psize, qsize, i;
+    if (ENABLE_DEBUG) {
+        while (head) {
+            DEBUG("-->[%p]", (void *)head);
+            head = head->next;
+        }
+    }
+}
 
-    /*
-     * Silly special case: if `list' was passed in as NULL, return
-     * NULL immediately.
-     */
-    if (!list) {
+/**
+ * @brief   Merge two sorted lists into one sorted lists
+ * @param   lhs     left list to sort
+ * @param   rhs     right list to sort
+ * @param   cmp     compare function to use to determine the list order
+ * @return  head of the newly merged list
+ *
+ * @pre    @p lhs is not `NULL`
+ * @pre    @p rhs is not `NULL`
+ */
+static list_node_t *_merge(list_node_t *lhs, list_node_t *rhs, clist_cmp_func_t cmp)
+{
+    DEBUG("\nmerging:\nlhs: ");
+    _debug_print_list(lhs);
+    DEBUG("\nrhs: ");
+    _debug_print_list(rhs);
+
+    /* handle first element special */
+    list_node_t *result;
+    if (cmp(lhs, rhs) > 0) {
+        result = rhs;
+        rhs = rhs->next;
+    }
+    else {
+        result = lhs;
+        lhs = lhs->next;
+    }
+
+    /* while both lists still contain elements, merge them */
+    list_node_t *iter = result;
+    while (lhs && rhs) {
+        if (cmp(lhs, rhs) > 0) {
+            iter->next = rhs;
+            rhs = rhs->next;
+        }
+        else {
+            iter->next = lhs;
+            lhs = lhs->next;
+        }
+        iter = iter->next;
+    }
+
+    /* fill the rest with the list that is not fully drained */
+    if (lhs) {
+        iter->next = lhs;
+    }
+    else {
+        iter->next = rhs;
+    }
+
+    DEBUG("\nmerged: ");
+    _debug_print_list(result);
+    DEBUG_PUTS("");
+
+    return result;
+}
+
+/**
+ * @brief   Break circular list into a linear list
+ *
+ * @return  Head of the list
+ * @retval  NULL    List was not broken and already is sorted
+ */
+static list_node_t *linearlize_list(clist_node_t *list)
+{
+    list_node_t *last, *first;
+
+    last = list->next;
+
+    /* Special case: Empty list */
+    if (!last) {
         return NULL;
     }
 
-    insize = 1;
+    first = last->next;
 
-    while (1) {
-        clist_node_t *tail = NULL;
-        clist_node_t *oldhead = list;
-        p = list;
-        list = NULL;
-
-        int nmerges = 0;  /* count number of merges we do in this pass */
-
-        while (p) {
-            nmerges++;  /* there exists a merge to be done */
-            /* step `insize' places along from p */
-            q = p;
-            psize = 0;
-            for (i = 0; i < insize; i++) {
-                psize++;
-                q = (q->next == oldhead) ? NULL : q->next;
-                /* cppcheck-suppress nullPointer
-                 * (reason: possible bug in cppcheck 1.6x) */
-                if (!q) {
-                    break;
-                }
-            }
-
-            /* if q hasn't fallen off end, we have two lists to merge */
-            qsize = insize;
-
-            /* now we have two lists; merge them */
-            while (psize > 0 || (qsize > 0 && q)) {
-
-                /* decide whether next element of merge comes from p or q */
-                if (psize == 0) {
-                    /* p is empty; e must come from q. */
-                    e = q; q = q->next; qsize--;
-                    if (q == oldhead) {
-                        q = NULL;
-                    }
-                }
-                else if (qsize == 0 || !q) {
-                    /* q is empty; e must come from p. */
-                    e = p; p = p->next; psize--;
-                    if (p == oldhead) {
-                        p = NULL;
-                    }
-                }
-                else if (cmp(p, q) <= 0) {
-                    /* First element of p is lower (or same);
-                     * e must come from p. */
-                    e = p; p = p->next; psize--;
-                    if (p == oldhead) {
-                        p = NULL;
-                    }
-                }
-                else {
-                    /* First element of q is lower; e must come from q. */
-                    e = q; q = q->next; qsize--;
-                    if (q == oldhead) {
-                        q = NULL;
-                    }
-                }
-
-                /* add the next element to the merged list */
-                if (tail) {
-                    tail->next = e;
-                }
-                else {
-                    list = e;
-                }
-                tail = e;
-            }
-
-            /* now p has stepped `insize' places along, and q has too */
-            p = q;
-        }
-
-        /* cppcheck-suppress nullPointer
-         * (reason: tail cannot be NULL at this point, because list != NULL) */
-        tail->next = list;
-
-        /* If we have done only one merge, we're finished. */
-        if (nmerges <= 1) { /* allow for nmerges==0, the empty list case */
-            return tail;
-        }
-
-        /* Otherwise repeat, merging lists twice the size */
-        insize *= 2;
+    /* Special case: One item list */
+    if (first == last) {
+        return NULL;
     }
+
+    last->next = NULL;
+    return first;
+}
+
+/**
+ * @brief   take a buf of sorted list and merge them down into a single
+ *          sorted list
+ * @param   lists   bunch of lists to merge
+ * @param   cmp     compare function to use to determine the list order
+ * @return  head of the merged lists
+ *
+ * @note    @p lists may have `NULL` elements
+ */
+static list_node_t *_binary_merge_bufs(struct lists_buf *lists,
+                                       clist_cmp_func_t cmp)
+{
+    while (lists->lists[1]) {
+        unsigned dst_idx = 0;
+        unsigned src_idx = 0;
+        while (src_idx < ARRAY_SIZE(lists->lists)) {
+            if (!lists->lists[src_idx + 1]) {
+                list_node_t *tmp = lists->lists[src_idx];
+                lists->lists[src_idx] = NULL;
+                lists->lists[dst_idx] = tmp;
+                break;
+            }
+            list_node_t *merged = _merge(lists->lists[src_idx],
+                                         lists->lists[src_idx + 1], cmp);
+            lists->lists[src_idx++] = NULL;
+            lists->lists[src_idx++] = NULL;
+            lists->lists[dst_idx++] = merged;
+        }
+    }
+
+    return lists->lists[0];
+}
+
+/**
+ * @brief   Consume up to `2 * CONFIG_CLIST_SORT_BUF_SIZE` elements from the
+ *          given list and sort them
+ * @param   iter_in_out     pointer to the iterator
+ * @param   cmp             compare function to use to determine the list order
+ * @return  Head of the sorted sub-list bitten of from the input
+ *
+ * @p iter_in_out points to the iterator used to track which part of the input
+ * of @ref clist_sort has not been sorted yet. At return, it will be updated
+ * to the first item after the chunk that has been bitten off from the input
+ * and sorted. If the end of the input was reached, it is upstead to point to
+ * `NULL` instead.
+ */
+static list_node_t *_sort_chunk(list_node_t **iter_in_out, clist_cmp_func_t cmp)
+{
+    struct lists_buf lists = { .lists = { NULL } };
+    list_node_t *iter = *iter_in_out;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(lists.lists); i++) {
+        if (!iter) {
+            break;
+        }
+        list_node_t *lhs = iter;
+        iter = iter->next;
+        lhs->next = NULL;
+        list_node_t *rhs = iter;
+        if (!rhs) {
+            lists.lists[i] = lhs;
+            break;
+        }
+        iter = iter->next;
+        rhs->next = NULL;
+        lists.lists[i] = _merge(lhs, rhs, cmp);
+    }
+
+    *iter_in_out = iter;
+
+    return _binary_merge_bufs(&lists, cmp);
+}
+
+/**
+ * @brief   Get the last element of the given linear list
+ */
+list_node_t *_get_last(list_node_t *head) {
+    while (head->next) {
+        head = head->next;
+    }
+    return head;
+}
+
+void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
+{
+    list_node_t *head = linearlize_list(list);
+    if (!head) {
+        return;
+    }
+
+    list_node_t *iter = head;
+    unsigned idx = 0;
+    struct lists_buf lists = { .lists = {NULL } };
+
+    while (iter) {
+        list_node_t *tmp = _sort_chunk(&iter, cmp);
+        if (lists.lists[idx]) {
+            lists.lists[idx] = _merge(lists.lists[idx], tmp, cmp);
+        }
+        else {
+            lists.lists[idx] = tmp;
+        }
+
+        idx++;
+        idx &= (ARRAY_SIZE(lists.lists) - 1);
+    }
+
+    list_node_t *result = _binary_merge_bufs(&lists, cmp);
+
+    /* turn the linear list back into a circular one */
+    list->next = _get_last(result);
+    list->next->next = result;
 }
