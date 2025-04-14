@@ -302,16 +302,14 @@ static bool _is_clist_stable_sorted(clist_node_t *list)
     clist_node_t *cur = prev->next;
 
     while (prev != end_of_clist) {
-        struct test_list_node *a = _get_test_list_node(prev);
-        struct test_list_node *b = _get_test_list_node(cur);
-
-        if (a->value > b->value) {
+        int cmp = _cmp(prev, cur);
+        if (cmp > 0) {
             return false;
         }
-        if (a->value == b->value) {
+        if (cmp == 0) {
             /* stable sort requires that order is not touched when elements
              * are equal */
-            if ((uintptr_t)a > (uintptr_t)b) {
+            if ((uintptr_t)prev > (uintptr_t)cur) {
                 return false;
             }
         }
