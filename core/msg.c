@@ -484,7 +484,9 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
 
     thread_t *thread = thread_get(pid);
 
-    assert(thread != NULL);
+    if (!thread) {
+        return 0;
+    }
 
     int queue_cap = 0;
 
