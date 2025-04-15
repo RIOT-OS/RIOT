@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup     core_sync_mutex
  * @{
@@ -17,9 +19,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef MUTEX_H
-#define MUTEX_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -349,5 +348,4 @@ void mutex_cancel(mutex_cancel_t *mc);
 }
 #endif
 
-#endif /* MUTEX_H */
 /** @} */

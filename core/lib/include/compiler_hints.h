@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_internal
  * @{
@@ -17,9 +19,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef COMPILER_HINTS_H
-#define COMPILER_HINTS_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -198,5 +197,4 @@ static inline unsigned may_be_zero(unsigned n)
 }
 #endif
 
-#endif /* COMPILER_HINTS_H */
 /** @} */

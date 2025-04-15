@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef PRIORITY_QUEUE_H
-#define PRIORITY_QUEUE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -139,4 +138,3 @@ void priority_queue_print_node(priority_queue_t *root);
 #endif
 
 /** @} */
-#endif /* PRIORITY_QUEUE_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    core_thread Threading
  * @ingroup     core
@@ -115,9 +117,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef THREAD_H
-#define THREAD_H
 
 #include "clist.h"
 #include "cib.h"
@@ -660,4 +659,3 @@ static inline uintptr_t thread_measure_stack_free(const thread_t *thread)
 #endif
 
 /** @} */
-#endif /* THREAD_H */

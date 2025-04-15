@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    core_sched Scheduler
  * @ingroup     core
@@ -77,9 +79,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef SCHED_H
-#define SCHED_H
 
 #include <stddef.h>
 #include <inttypes.h>
@@ -385,5 +384,4 @@ static inline int sched_runq_more_than_one(uint8_t prio)
 }
 #endif
 
-#endif /* SCHED_H */
 /** @} */

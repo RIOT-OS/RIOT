@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -18,9 +20,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef CIB_H
-#define CIB_H
 
 #include "assert.h"
 
@@ -242,5 +241,4 @@ static inline int cib_put_unsafe(cib_t *cib)
 }
 #endif
 
-#endif /* CIB_H */
 /** @} */

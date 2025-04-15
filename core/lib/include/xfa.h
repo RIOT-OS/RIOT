@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @brief       Cross File Arrays
@@ -21,9 +23,6 @@
  * @file
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef XFA_H
-#define XFA_H
 
 #include <inttypes.h>
 #include "compiler_hints.h"
@@ -194,5 +193,4 @@ extern "C" {
 }
 #endif
 
-#endif /* XFA_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_internal
  * @{
@@ -17,9 +19,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef MODULES_H
-#define MODULES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,5 +106,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MODULES_H */
 /** @} */

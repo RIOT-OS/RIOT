@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_internal
  * @{
@@ -17,9 +19,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef RIOT_VERSION_H
-#define RIOT_VERSION_H
 
 #include <stdint.h>
 
@@ -60,5 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif /* RIOT_VERSION_H */
 /** @} */
