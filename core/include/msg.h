@@ -375,16 +375,21 @@ int msg_reply_int(msg_t *m, msg_t *reply);
  *
  * @param[in] pid    a PID
  *
- * @return Number of messages available in queue of @p pid on success
- * @return 0, if no caller's message queue is initialized
+ * @return  Number of messages available in queue of the thread identified by
+ *          PID @p pid
+ * @retval  0       The message queue of the thread identified by PID @p pid is
+ *                  *not* initialized or PID @p pid does not refer to a running
+ *                  thread
  */
 unsigned msg_avail_thread(kernel_pid_t pid);
 
 /**
  * @brief Check how many messages are available (waiting) in the message queue
  *
- * @return Number of messages available in our queue on success
- * @return 0, if no caller's message queue is initialized
+ * @pre     The caller is running in thread context
+ *
+ * @return  Number of messages available in our queue
+ * @retval  0       Caller's message queue is *not* initialized
  */
 unsigned msg_avail(void);
 

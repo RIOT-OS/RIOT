@@ -458,12 +458,23 @@ static unsigned _msg_avail(thread_t *thread)
 
 unsigned msg_avail_thread(kernel_pid_t pid)
 {
-    return _msg_avail(thread_get(pid));
+    unsigned irq_state = irq_disable();
+    thread_t *t = thread_get(pid);
+    if (!t) {
+        irq_restore(irq_state);
+        return 0;
+    }
+    unsigned result = _msg_avail(t);
+    irq_restore(irq_state);
+    return result;
 }
 
 unsigned msg_avail(void)
 {
-    return _msg_avail(thread_get_active());
+    unsigned irq_state = irq_disable();
+    unsigned result = _msg_avail(thread_get_active());
+    irq_restore(irq_state);
+    return result;
 }
 
 unsigned msg_queue_capacity(kernel_pid_t pid)
