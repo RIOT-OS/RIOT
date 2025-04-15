@@ -7,7 +7,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p-xplained-mini \
     atmega8 \
     nucleo-c031c6 \
-    nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-f334r8 \
