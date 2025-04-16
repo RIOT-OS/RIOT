@@ -47,7 +47,7 @@ function _programmers {
         "mspdebug:for MSP430 boards"
         "goodfet:for some MSP430 boards"
         "uf2conv:program via UF2 bootloader (except RP2040)"
-        "elf2uf2:program via UF2 bootloader (RP2040)"
+        "picotool:program via UF2 bootloader (Raspberry Pi Pico Devices)"
         "cpy2remed:program via ST-Link using filesystem disk interface"
         "adafruit-nrfutil:program via Adafruits nRF5x bootloader"
         "bmp:Black Magic Probe"

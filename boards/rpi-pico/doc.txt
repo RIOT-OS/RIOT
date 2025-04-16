@@ -71,9 +71,7 @@
  * make BOARD=rpi-pico flash
  * ```
  *
- * This is default flashing option using elf2uf2 PROGRAMMER. If the storage is
- * not automatically mounted to `/media/<USER_NAME>/RPI-RP2`, you can overwrite
- * the path by exporting the shell environment variable `ELF2UF2_MOUNT_PATH`.
+ * This is default flashing option using picotool PROGRAMMER.
  *
  * ### Flashing the Board Using OpenOCD
  *
