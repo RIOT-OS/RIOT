@@ -1,18 +1,14 @@
-/**
- * @defgroup    boards_stm32f750n8-dk STM32F750N8-DK
- * @ingroup     boards
- * @brief       Support for the STM32F750N8-DK board.
+@defgroup    boards_stm32f746g-disco STM32F746G-DISCO
+@ingroup     boards
+@brief       Support for the STM32F746G-DISCO board.
 
 ## Overview
 
-The ST [STM32F750N8-DK](https://www.st.com/en/evaluation-tools/stm32f7508-dk.html)
-is an evaluation board supporting a ARM Cortex-M7 STM32750N8 microcontroller
-with 340KB of RAM and 64KB of ROM Flash. This board is just a clone of the
-STM32F746G-DISCO board with a different microcontroller. The pinout
-is identical.
+The ST [STM32F746G-DISCO](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html)
+is an evaluation board supporting a ARM Cortex-M7 STM32F746NG microcontroller
+with 340KB of RAM and 1MB of ROM Flash.
 
-As a result, the main features available on this board are shared with the ones
-provided by the STM32F746G-DISCO:
+As main features, this board provides:
 - a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
 - an ethernet port
 - 2 user USB ports (FS and HS)
@@ -29,32 +25,31 @@ Current hardware support:
 | I2C |  X | I2C1 on PB8/PB9    |
 | Ethernet | X |  |
 | USB OTG FS | X |  |
-| USB OTG HS | - |  |
+| USB OTG HS | X |  |
 | TFT LCD | X |  |
 | Capacitive touch screen | X | |
 | User microphones | - | |
 | External Quad-SPI Flash | - | |
-| External SDRAM | - | |
+| External SDRAM | X | |
+| SD Card Interface | x | SDMMC1 on PC8..PC13 and PD2 |
 
 ## Flashing the device
 
-The STM32F750N8-DK board includes an on-board ST-LINK programmer and can be
+The STM32F746G-DISCO board includes an on-board ST-LINK programmer and can be
 flashed using OpenOCD.
 The board can be flashed with:
 
 ```
-make BOARD=stm32f750n8-dk flash
+make BOARD=stm32f746g-disco flash
 ```
 
 and debug via GDB with
 ```
-make BOARD=stm32f750n8-dk debug
+make BOARD=stm32f746g-disco debug
 ```
 
 ## Supported Toolchains
 
-For using the STM32F750N8-DK board we recommend the usage of the
+For using the STM32F746G-DISCO board we recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
-
- */
