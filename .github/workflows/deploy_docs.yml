@@ -4,7 +4,6 @@ on:
     push:
         branches:
             - master
-            - newguides # Remove once ready
 
 jobs:
     build-docs:
@@ -27,5 +26,5 @@ jobs:
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 publish_dir: doc/starlight/dist
                 publish_branch: gh-pages
-                cname: newguides.annsann.eu
+                cname: guide.riot-os.org
                 commit_message: "Deploy documentation"
