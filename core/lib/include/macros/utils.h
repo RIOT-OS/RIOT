@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_macros
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef MACROS_UTILS_H
-#define MACROS_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,5 +92,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MACROS_UTILS_H */
 /** @} */

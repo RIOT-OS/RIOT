@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -86,9 +88,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef CLIST_H
-#define CLIST_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -500,5 +499,4 @@ static inline bool clist_more_than_one(clist_node_t *list)
 }
 #endif
 
-#endif /* CLIST_H */
 /** @} */

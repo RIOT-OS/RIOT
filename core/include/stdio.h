@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_stdio_null
  *
@@ -22,8 +24,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef CORE_STDIO_H
-#define CORE_STDIO_H
 #include_next "stdio.h"
 
 #ifdef MODULE_STDIO_NULL
@@ -66,5 +66,4 @@ static inline int vprintf_null(const char *__restrict__ format, va_list ap)
 
 #endif  /* MODULE_STDIO_NULL */
 
-#endif  /* CORE_STDIO_H */
 /** @} */

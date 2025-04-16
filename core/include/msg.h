@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    core_msg  Messaging / IPC
  * @ingroup     core
@@ -172,9 +174,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
-
-#ifndef MSG_H
-#define MSG_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -434,5 +433,4 @@ void msg_queue_print(void);
 }
 #endif
 
-#endif /* MSG_H */
 /** @} */

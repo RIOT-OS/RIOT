@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -20,9 +22,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef DEBUG_H
-#define DEBUG_H
 
 #include <stdio.h>
 #include "sched.h"
@@ -148,5 +147,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEBUG_H */
 /** @} */

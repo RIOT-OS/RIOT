@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -29,9 +31,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef LOG_H
-#define LOG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -124,5 +123,4 @@ enum {
 }
 #endif
 
-#endif /* LOG_H */
 /** @} */

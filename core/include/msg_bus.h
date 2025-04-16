@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_msg
  *
@@ -34,9 +36,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef MSG_BUS_H
-#define MSG_BUS_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -264,5 +263,4 @@ static inline int msg_bus_post(msg_bus_t *bus, uint8_t type, const void *arg)
 }
 #endif
 
-#endif /* MSG_BUS_H */
 /** @} */

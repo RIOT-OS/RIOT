@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef IRQ_H
+#define IRQ_H
+
 /**
  * @defgroup    core_irq     IRQ Handling
  * @ingroup     core
@@ -19,9 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef IRQ_H
-#define IRQ_H
-
 #include <stdbool.h>
 #include "cpu_conf.h"
 
@@ -30,9 +30,9 @@ extern "C" {
 #endif
 
 #ifdef IRQ_API_INLINED
-#define MAYBE_INLINE static inline __attribute__((always_inline))
+#  define MAYBE_INLINE static inline __attribute__((always_inline))
 #else
-#define MAYBE_INLINE
+#  define MAYBE_INLINE
 #endif /* IRQ_API_INLINED */
 
 #ifndef IRQ_API_INLINED
@@ -91,12 +91,12 @@ MAYBE_INLINE bool irq_is_enabled(void);
 MAYBE_INLINE bool irq_is_in(void);
 
 #else
-#include "irq_arch.h" /* IWYU pragma: export */
-#endif /* IRQ_API_INLINED */
+#  include "irq_arch.h" /* IWYU pragma: export */
+#endif                  /* IRQ_API_INLINED */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* IRQ_H */
 /** @} */
+#endif /* IRQ_H */

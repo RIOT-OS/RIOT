@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  *
@@ -18,9 +20,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef ASSERT_H
-#define ASSERT_H
 
 #include <stdint.h>
 
@@ -169,5 +168,4 @@ __NORETURN void _assert_panic(void);
 }
 #endif
 
-#endif /* ASSERT_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -29,9 +31,6 @@
  *              to use either a mutex or to disable interrupts to ensure
  *              exclusive access as indicated in the API doc.
  */
-
-#ifndef CIB_H
-#define CIB_H
 
 #include "assert.h"
 
@@ -285,5 +284,4 @@ static inline int cib_put_unsafe(cib_t *cib)
 }
 #endif
 
-#endif /* CIB_H */
 /** @} */

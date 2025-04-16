@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -18,9 +20,6 @@
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
-
-#ifndef PANIC_H
-#define PANIC_H
 
 #include "kernel_defines.h"
 
@@ -100,5 +99,4 @@ void panic_arch(void);
 }
 #endif
 
-#endif /* PANIC_H */
 /** @} */
