@@ -25,15 +25,16 @@ exit_code=0
 #       1 -> Not found
 parse_code_block() {
     start_line=$1
+    file_path=$2
     # Check whether there is a <!--skip ci--> comment in the line before the code block
-    skip_ci=$(sed -n "$((start_line - 1))p" "$file" | grep -c '<!--skip ci-->')
+    skip_ci=$(sed -n "$((start_line - 1))p" "$file_path" | grep -c '<!--skip ci-->')
     if [ "$skip_ci" -gt 0 ]; then
         echo "  ✔️ Line $start_line: Code block is skipped due to <!--skip ci--> comment"
         return 0
     fi
 
     # Extract the code block content until the ending ```
-    code_block=$(awk -v start="$start_line" 'NR>start{if(/^```$/){exit}; print}' "$file")
+    code_block=$(awk -v start="$start_line" 'NR>start{if(/^```$/){exit}; print}' "$file_path")
 
     # Check if this code exists in any file in the source directory
     found=0
@@ -62,14 +63,16 @@ markdown_files=$(find "$GUIDES_DIR" -type f \( -name "*.md" -o -name "*.mdx" \))
 
 # Find and process all .md and .mdx files
 for file in $markdown_files; do
+    echo "🧐 Processing file: $file"
+
     # Check if there is a code_folder defined in the markdown file
-    code_folder=$(grep -oP 'code_folder:\s*\K.+' "$file")
+    code_folder=$(grep -oP -m1 'code_folder:\s*\K.+' "$file")
     if [ -z "$code_folder" ]; then
+        echo "  ✔️ File does not specify code_folder, skipping ..."
         continue
     fi
     SOURCE_DIR="$BASE_DIR/$code_folder"
 
-    echo "🧐 Processing file: $file"
     echo "🔍 Looking for code in $SOURCE_DIR"
 
     # Get all code block start lines

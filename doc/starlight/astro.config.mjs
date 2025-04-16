@@ -57,6 +57,12 @@ export default defineConfig({
             "build-system/advanced_build_system_tricks",
           ],
         },
+        {
+            label: "Miscellaneous",
+            items: [
+                "misc/how_to_doc"
+            ]
+        }
       ],
       customCss: [],
       logo: {

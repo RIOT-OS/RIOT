@@ -28,6 +28,7 @@ cowsay "Hello World!"
 ```
 
 # Non C Code with Skip CI
+
 <!--skip ci-->
 ```bash
 cowsay "Goodbye World!"

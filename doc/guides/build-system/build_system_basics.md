@@ -1,9 +1,9 @@
 ---
 title: Build System Basics
 description: This page describes the basic concepts of the RIOT build system.
----                
+---
 
-## FEATURES                                           
+## FEATURES
 
 ### What is a FEATURE?
 
@@ -32,19 +32,19 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
 `periph_%` and other _hw_ (hardware) related `FEATURES` it must follow a 3rd criteria.
 
 - Needs the "hardware" or BSP support (toolchain, build system, flasher, etc.)
-    - e.g.: `stm32l152re` has an SPI peripheral
-            `riotboot` needs to be able to link and flash at an offset
+  - e.g.: `stm32l152re` has an SPI peripheral
+    `riotboot` needs to be able to link and flash at an offset
 - Needs support in RIOT, an implementation of an api to interact with the _hw_
-    - e.g.: `cpu/stm32_common/periph/spi.c` is implemented for `stm32l1`
-            `riotboot` needs an implementation of `cpu_jump_to_image`
-- Wiring between the _cpu/soc_(system on a chip)  a _bus_ and other _cpu_/_hw_ components.
-    - e.g.: `nucleo-l152re/include/periph_conf.h` specified wiring between `PORT_Ax`
-             and `SPI1`
+  - e.g.: `cpu/stm32_common/periph/spi.c` is implemented for `stm32l1`
+    `riotboot` needs an implementation of `cpu_jump_to_image`
+- Wiring between the _cpu/soc_(system on a chip) a _bus_ and other _cpu_/_hw_ components.
+  - e.g.: `nucleo-l152re/include/periph_conf.h` specified wiring between `PORT_Ax`
+    and `SPI1`
 
-### All the FEATURES_%
+### All the FEATURES\_%
 
 - `FEATURES_PROVIDED` are available hardware (including BSP) features
-  (e.g.:`periph_hwrng`, `periph_uart`)  or characteristics (e.g:`arch_32bits`) of
+  (e.g.:`periph_hwrng`, `periph_uart`) or characteristics (e.g:`arch_32bits`) of
   a board.
 
 - `FEATURES_CONFLICT` are a series of `FEATURES` that can't be used at the same
@@ -68,17 +68,16 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
 
 - `FEATURES_USED` are the final list of `FEATURES` that will be used by an `APPLICATION`
 
-### Where to define FEATURES_%
+### Where to define FEATURES\_%
 
 - `FEATURES_PROVIDED`, `FEATURES_CONFLICT` and `FEATURES_CONFLICT_MSG ` are
-   defined in `Makefile.features`
+  defined in `Makefile.features`
 
 - `FEATURES_REQUIRED`, `FEATURES_OPTIONAL`, `FEATURES_REQUIRED_ANY`,
-   and `FEATURES_BLACKLIST` are defined by the application `Makefile`
-   (`examples/%/Makefile`, `tests/%/Makefile`, etc.) or in `Makefile.dep`
+  and `FEATURES_BLACKLIST` are defined by the application `Makefile`
+  (`examples/%/Makefile`, `tests/%/Makefile`, etc.) or in `Makefile.dep`
 
-## CPU/CPU_MODEL                                                    
-
+## CPU/CPU_MODEL
 
 `CPU` and `CPU_MODEL` refer to the _soc_ or _mcu_ (microcontroller)
 present in a `BOARD`. The variables `CPU`, `CPU_FAM`, etc. are just arbitrary groupings
@@ -95,30 +94,28 @@ A `CPU/CPU_MODEL` might support `FEATURES` that will depend on the `BOARD` wirin
 e.g.: bus (`uart`, `spi`) mappings. In this cases the `FEATURE` should be provided
 by the `BOARD.`
 
-## BOARD                                                              
+## BOARD
 
 In RIOTs build-system, a `BOARD` is a grouping of:
 
 - _soc/mcu_ (`CPU/CPU_MODEL`)
-    - e.g.: `b-l072z-lrwan1` `stm32l072cz`
+  - e.g.: `b-l072z-lrwan1` `stm32l072cz`
 - _sensor/actuators_ (buttons and leds included) (`drivers`)
-    - e.g.: `b-l072z-lrwan1` leds and buttons
+  - e.g.: `b-l072z-lrwan1` leds and buttons
 - _radios_, _ethernet_, etc. devices (`drivers`)
-    - e.g.: `b-l072z-lrwan1` `sx1276`
+  - e.g.: `b-l072z-lrwan1` `sx1276`
 - _programming/debugging_ tools
-    - e.g.: `b-l072z-lrwan1` `stlink`
+  - e.g.: `b-l072z-lrwan1` `stlink`
 - configuration mapping cpu support capabilities to availability
-    - e.g.: `b-l072z-lrwan1` `periph_conf.h`, `gpio_params`
+  - e.g.: `b-l072z-lrwan1` `periph_conf.h`, `gpio_params`
 
 A `board` can have all the required `FEATURES` to interact with a radio or
 sensor/actuator, but it doesn't necessarily provide that `FEATURE`.
 
-e.g.:
-    - `samr21-xpro` provides a `at86rf233` radio as well as the necessary
-       `periph_*` features.
-    - `nucleo-*` provide all `periph_*` features to use `sx1272`, and
-       even a default configuration for the `SX1272MB2xA` shield, but not
-       doesn't provide the radio.
+e.g.: - `samr21-xpro` provides a `at86rf233` radio as well as the necessary
+`periph_*` features. - `nucleo-*` provide all `periph_*` features to use `sx1272`, and
+even a default configuration for the `SX1272MB2xA` shield, but not
+doesn't provide the radio.
 
 If a `board` in `$(RIOTBASE)/boards` is connected to a radio shield, sensors,
 actuators, etc. then it is a different `board` than the one provided by default.
@@ -130,8 +127,7 @@ A `nucleo-*` with a `SX1272MB2xA` is a different board in RIOT sense.
 
 _note_: if `devicetree` is implemented this concept will change.
 
-
-# Variables declaration guidelines        
+# Variables declaration guidelines
 
 This page contains basic guidelines about `make` variable declaration, it
 summarizes some of the pros and cons as well as specifies good and bad patterns
