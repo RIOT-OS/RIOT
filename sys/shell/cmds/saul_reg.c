@@ -85,7 +85,7 @@ static void list(void)
     }
 }
 
-static void read(int argc, char **argv)
+static void _reg_read(int argc, char **argv)
 {
     int num;
     saul_reg_t *dev;
@@ -109,7 +109,7 @@ static void read(int argc, char **argv)
     probe(num, dev);
 }
 
-static void write(int argc, char **argv)
+static void _reg_write(int argc, char **argv)
 {
     int num, dim;
     saul_reg_t *dev;
@@ -156,10 +156,10 @@ static int _saul(int argc, char **argv)
     }
     else {
         if (flash_strcmp(argv[1], TO_FLASH("read")) == 0) {
-            read(argc, argv);
+            _reg_read(argc, argv);
         }
         else if (flash_strcmp(argv[1], TO_FLASH("write")) == 0) {
-            write(argc, argv);
+            _reg_write(argc, argv);
         }
         else {
             printf("usage: %s read|write\n", argv[0]);
