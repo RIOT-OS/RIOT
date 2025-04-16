@@ -1,6 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     nucleo-l011k4 \
-    samd10-xmini \
     stm32f030f4-demo \
     #

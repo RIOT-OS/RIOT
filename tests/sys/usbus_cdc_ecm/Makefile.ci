@@ -1,3 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
+    stm32f7508-dk \
     #

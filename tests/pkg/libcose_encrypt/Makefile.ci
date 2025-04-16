@@ -10,7 +10,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
-    nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l011k4 \

@@ -8,7 +8,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     nucleo-c031c6 \
     nucleo-f031k6 \
-    nucleo-f042k6 \
     nucleo-l011k4 \
     nucleo-l031k6 \
     samd10-xmini \

@@ -19,7 +19,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     im880b \
     mega-xplained \
     microduino-corerf \
-    msb-430 \
     msb-430h \
     nucleo-c031c6 \
     nucleo-f030r8 \
