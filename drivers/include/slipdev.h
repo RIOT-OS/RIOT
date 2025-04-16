@@ -94,6 +94,14 @@ enum {
      */
     SLIPDEV_STATE_STDIN_ESC,
     /**
+     * @brief   Device writes received data as coap message
+     */
+    SLIPDEV_STATE_CONFIG,
+    /**
+     * @brief   Device writes received data as coap message, next byte is escaped
+     */
+    SLIPDEV_STATE_CONFIG_ESC,
+    /**
      * @brief   Device is in standby, will wake up when sending data
      */
     SLIPDEV_STATE_STANDBY,
@@ -120,13 +128,19 @@ typedef struct {
 typedef struct {
     netdev_t netdev;                        /**< parent class */
     slipdev_params_t config;                /**< configuration parameters */
-    chunk_ringbuf_t rb;                     /**< Ringbuffer to store received frames.       */
+    chunk_ringbuf_t rb;                     /**< Ringbuffer to store received NET frames.   */
                                             /* Written to from interrupts (with irq_disable */
                                             /* to prevent any simultaneous writes),         */
                                             /* consumed exclusively in the network stack's  */
                                             /* loop at _isr.                                */
 
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
+
+#if IS_USED(MODULE_SLIPDEV_STDIO)
+    chunk_ringbuf_t rb_config;              /**< Ringbuffer to store received CONFIG frames.*/
+    uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE]; /**< memory used by RX buffer */
+    kernel_pid_t coap_server_pid;
+#endif
     /**
      * @brief   Device state
      * @see     [Device state definitions](@ref drivers_slipdev_states)
