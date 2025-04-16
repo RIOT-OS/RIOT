@@ -148,7 +148,7 @@ static void test_creation(void)
 #ifdef DEVELHELP
     TEST_ASSERT_EQUAL_STRING("eth", sched_threads[ethernet_netif.pid]->name);
 #endif
-    TEST_ASSERT(thread_has_msg_queue(sched_threads[ethernet_netif.pid]));
+    TEST_ASSERT(msg_queue_capacity(ethernet_netif.pid) > 0);
 
     TEST_ASSERT_EQUAL_INT((gnrc_netif_ieee802154_create(&ieee802154_netif,
             ieee802154_netif_stack, IEEE802154_STACKSIZE, GNRC_NETIF_PRIO,
@@ -170,7 +170,7 @@ static void test_creation(void)
 #ifdef DEVELHELP
     TEST_ASSERT_EQUAL_STRING("wpan", sched_threads[ieee802154_netif.pid]->name);
 #endif
-    TEST_ASSERT(thread_has_msg_queue(sched_threads[ieee802154_netif.pid]));
+    TEST_ASSERT(msg_queue_capacity(ieee802154_netif.pid) > 0);
 
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT((gnrc_netif_create(&netifs[i],
@@ -182,7 +182,7 @@ static void test_creation(void)
         TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_DEFAULT_HL, netifs[i].cur_hl);
         TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_TEST, netifs[i].device_type);
         TEST_ASSERT(netifs[i].pid > KERNEL_PID_UNDEF);
-        TEST_ASSERT(thread_has_msg_queue(sched_threads[netifs[i].pid]));
+        TEST_ASSERT(msg_queue_capacity(netifs[i].pid) > 0);
         TEST_ASSERT_EQUAL_INT(i + SPECIAL_DEVS + 1, gnrc_netif_numof());
         for (unsigned j = 0; j < (i + SPECIAL_DEVS + 1); j++) {
             TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
