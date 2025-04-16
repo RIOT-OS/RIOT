@@ -464,6 +464,7 @@ PSEUDOMODULES += shield_llcc68
 PSEUDOMODULES += shield_sx1262
 PSEUDOMODULES += shield_w5100
 PSEUDOMODULES += slipdev_stdio
+PSEUDOMODULES += slipdev_config
 PSEUDOMODULES += slipdev_l2addr
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
