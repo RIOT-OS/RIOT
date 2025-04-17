@@ -1,4 +1,4 @@
-From 24d4f4ef60aaaef3c471eb248799ebefde33cc03 Mon Sep 17 00:00:00 2001
+From 81ef21a29faafbdb95800ce40b2e20b533b88ebd Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 22:42:21 +0200
 Subject: [PATCH 4/4] Fix parsing of `int8_t`
@@ -11,7 +11,7 @@ The code assumes that `char` is signed, but the C standard allows
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/printf.c b/printf.c
-index 5266cf7..440cfa6 100644
+index 5266cf7..3f5f66a 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -734,7 +734,7 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
@@ -24,5 +24,5 @@ index 5266cf7..440cfa6 100644
            }
          }
 -- 
-2.45.0
+2.43.0
 

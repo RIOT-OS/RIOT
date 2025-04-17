@@ -1,7 +1,7 @@
-From 6fcc450e49791de23446b26cb4b2dc388590c763 Mon Sep 17 00:00:00 2001
+From 2070026e3325ad7640c5cddc9cb1254aa63d61bb Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 17:51:38 +0200
-Subject: [PATCH 2/2] Wrapper targets: Add endpoints for -Wl,wrap=...
+Subject: [PATCH 2/4] Wrapper targets: Add endpoints for -Wl,wrap=...
 
 This adds aliases needed to wrap printf() and friends.
 ---
@@ -9,7 +9,7 @@ This adds aliases needed to wrap printf() and friends.
  1 file changed, 38 insertions(+)
 
 diff --git a/printf.c b/printf.c
-index fd83570..4694bab 100644
+index 4a17672..e06c9aa 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -32,6 +32,7 @@
@@ -62,5 +62,5 @@ index fd83570..4694bab 100644
 +    return len + 1;
 +}
 -- 
-2.45.0
+2.43.0
 

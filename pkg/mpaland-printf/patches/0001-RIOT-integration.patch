@@ -1,7 +1,7 @@
-From 875a37ec418c41ffd060e39b2153357a32175ac5 Mon Sep 17 00:00:00 2001
+From 04f0f9616f74bbb93a2994d627d4ab476bd81d31 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 17:51:01 +0200
-Subject: [PATCH 1/2] RIOT integration
+Subject: [PATCH 1/4] RIOT integration
 
 Use stdio_write() from stdio_base.h for output
 ---
@@ -10,7 +10,7 @@ Use stdio_write() from stdio_base.h for output
  2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/printf.c b/printf.c
-index 8a700ad..fd83570 100644
+index 8a700ad..4a17672 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -34,6 +34,7 @@
@@ -33,7 +33,7 @@ index 8a700ad..fd83570 100644
 +    stdio_write(&character, sizeof(character));
 +}
 diff --git a/printf.h b/printf.h
-index 6075bc2..e185911 100644
+index 6075bc2..154930a 100644
 --- a/printf.h
 +++ b/printf.h
 @@ -46,7 +46,7 @@ extern "C" {
@@ -46,5 +46,5 @@ index 6075bc2..e185911 100644
  
  /**
 -- 
-2.45.0
+2.43.0
 
