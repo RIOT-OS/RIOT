@@ -15,17 +15,9 @@ doc doc-man doc-latex doc-ci:
 docclean:
 	"$(MAKE)" -BC doc/doxygen clean
 
-clean:
-	@echo "Cleaning all build products for the current board"
-	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir clean; done
-
 pkg-clean:
 	@echo "Cleaning all package sources"
 	rm -rf build/pkg
-
-distclean: docclean pkg-clean
-	@echo "Cleaning all build products"
-	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir distclean; done
 
 print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh
@@ -42,6 +34,21 @@ include makefiles/tools/riotgen.inc.mk
 -include makefiles/tests.inc.mk
 
 include makefiles/color.inc.mk
+
+CLEAN_DIRS := $(APPLICATION_DIRS) $(TOOLS_DIRS)
+
+.PHONY: clean distclean $(CLEAN_DIRS:%=CLEAN--%) $(CLEAN_DIRS:%=DISTCLEAN--%)
+clean: $(CLEAN_DIRS:%=CLEAN--%)
+	@echo "Cleaned all build products."
+
+distclean: docclean pkg-clean $(CLEAN_DIRS:%=DISTCLEAN--%)
+	@echo "Cleaned everything."
+
+$(CLEAN_DIRS:%=CLEAN--%):
+	-"$(MAKE)" -C $(@:CLEAN--%=%) clean
+
+$(CLEAN_DIRS:%=DISTCLEAN--%):
+	-"$(MAKE)" -C $(@:DISTCLEAN--%=%) distclean
 
 # Prints a welcome message
 define welcome_message

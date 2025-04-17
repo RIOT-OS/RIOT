@@ -31,9 +31,11 @@ $(DISPATCH): $(SRCS) bin
 $(TOPOGEN): topogen.c bin
 	$(CC) $(CFLAGS) $< -o $@ -lm
 
-.PHONY: clean run graph help
+.PHONY: clean distclean run graph help
 clean:
 	rm -fr bin
+
+distclean: clean
 
 run: $(DISPATCH) $(TOPOLOGY)
 	$(DISPATCH) -t $(TOPOLOGY) -g $(GV_OUT) ::1 $(ZEP_PORT_BASE)

@@ -5,3 +5,5 @@ dose: dose.c
 
 clean:
 	rm -f dose
+
+distclean: clean

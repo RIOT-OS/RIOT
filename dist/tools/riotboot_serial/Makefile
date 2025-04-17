@@ -12,3 +12,5 @@ riotboot_serial: $(OBJS)
 clean:
 	@rm -fr $(OBJS)
 	@rm -fr riotboot_serial
+
+distclean: clean
