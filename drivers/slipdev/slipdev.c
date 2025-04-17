@@ -408,33 +408,63 @@ static const netdev_driver_t slip_driver = {
 };
 
 #if IS_USED(MODULE_SLIPDEV_STDIO)
+static uint16_t _fcs_part(const uint8_t * data, size_t len) {
+    uint16_t fcs = SPECIAL_INIT_FCS;
+    for (size_t i = 0; i < len; ++i)
+    {
+        fcs = (fcs >> 8) ^ FCS_LOOKUP[(fcs ^ data[i]) & 0xff];
+    }
+    return fcs;
+}
+
+static int check_fcs(const uint8_t * data, size_t len) {
+    uint16_t trialfcs = _fcs_part(data, len);
+    return trialfcs == GOOD_FCS;
+}
+
+static uint16_t fcs(const uint8_t * data, size_t len) {
+    uint16_t trialfcs = _fcs_part(data, len);
+    uint16_t result = trialfcs ^ INIT_FCS;
+    return result;
+}
+
 static void *_coap_server_thread(void *arg)
 {
     static uint8_t buf[512];
     slipdev_t *dev = arg;
-    DEBUG("Started coap_server thread\n");
     while (1) {
         thread_flags_wait_any(1);
         size_t len;
         while (crb_get_chunk_size(&dev->rb_config, &len)) {
             crb_consume_chunk(&dev->rb_config, buf, len);
 
+            if (!check_fcs(buf, len)) {
+                break;
+            }
+
+            // cut off the FCS checksum at the end
+            size_t pktlen = len - 2;
+
             coap_pkt_t pkt;
             sock_udp_ep_t remote;
             coap_request_ctx_t ctx = {
                 .remote = &remote,
             };
-            if (coap_parse(&pkt, (uint8_t *)buf, len) < 0) {
+            if (coap_parse(&pkt, buf, pktlen) < 0) {
                 break;
             }
             unsigned int res = 0;
-            if ((res = coap_handle_req(&pkt, (uint8_t *) buf, 512, &ctx)) <= 0) {
+            if ((res = coap_handle_req(&pkt, buf, sizeof(buf), &ctx)) <= 0) {
                 break;
             }
+
+            uint16_t fcs_sum = fcs(buf, res);
 
             slipdev_lock();
             slipdev_write_byte(dev->config.uart, SLIPDEV_CONFIG_START);
             slipdev_write_bytes(dev->config.uart, buf, res);
+            slipdev_write_byte(dev->config.uart, fcs_sum);
+            slipdev_write_byte(dev->config.uart, fcs_sum >> 8);
             slipdev_write_byte(dev->config.uart, SLIPDEV_END);
             slipdev_unlock();
         }
