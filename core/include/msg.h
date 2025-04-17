@@ -393,10 +393,11 @@ unsigned msg_avail_thread(kernel_pid_t pid);
 unsigned msg_avail(void);
 
 /**
- * @brief Get maximum capacity of a thread's queue length
+ * @brief   Get maximum capacity of a thread's queue length
  *
- * @return Number of total messages that fit in the queue of @p pid on success
- * @return 0, if no caller's message queue is initialized
+ * @return  Number of total messages that fit in the queue of @p pid on success
+ * @retval  0       Either the thread identified by PID @p pid does not exist or
+ *                  has no message queue initialized (yet)
  */
 unsigned msg_queue_capacity(kernel_pid_t pid);
 
