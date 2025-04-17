@@ -845,6 +845,7 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
 _nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
 #else
 #define _nib_abr_iter(abr) NULL
+#define _nib_abr_add_pfx(abr, pfx) (void)abr
 #endif
 
 /**
