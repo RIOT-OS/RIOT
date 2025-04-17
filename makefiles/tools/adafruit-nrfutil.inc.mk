@@ -5,4 +5,4 @@ FFLAGS = dfu serial --port=${PORT} --baudrate=${BAUD} --touch=1200 --package=$(H
 
 %.hex.zip: %.hex
 	$(call check_cmd,$(FLASHER),Flash program and preparation tool)
-	$(FLASHER) dfu genpkg --dev-type 0x0052 --sd-req 0x00B6 --application $< $@
+	$(FLASHER) dfu genpkg $(ADANRFUTIL_FLAGS) --application $< $@

@@ -1,12 +1,1 @@
-# Adafruit-nrfutil is the default programmer
-PROGRAMMER ?= adafruit-nrfutil
-
-include $(RIOTBOARD)/common/nrf52/Makefile.include
-PROGRAMMERS_SUPPORTED += adafruit-nrfutil
-
-ifeq ($(PROGRAMMER),adafruit-nrfutil)
-  # The preinstalled bootloader must also be taken into account so
-  # ROM_OFFSET skips the space taken by such bootloader.
-  ROM_OFFSET = 0x26000
-  include $(RIOTMAKE)/tools/usb_board_reset.mk
-endif
+UF2_SOFTDEV = SD611
