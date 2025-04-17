@@ -284,8 +284,9 @@ kernel_pid_t thread_create(char *stack,
 /**
  * @brief       Retrieve a thread control block by PID.
  * @pre         @p pid is valid
- * @param[in]   pid   Thread to retrieve.
- * @return      `NULL` if the PID is invalid or there is no such thread.
+ * @param[in]   pid         Thread to retrieve.
+ * @return      The thread identified by @p pid
+ * @retval      `NULL`      no thread at the given valid PID is active.
  */
 static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
 {
