@@ -45,10 +45,12 @@ fi
 if [ "${SOFTDEVICE}" = "not found" ] && [ "${UF2_SOFTDEV}" != "DROP" ]; then
     echo -e "\033[0;31mNo SoftDevice present on the device, but the compilation is set" \
     "to expect a SoftDevice."
+    echo -e "RIOT will now try to install the SoftDevice for you."
     echo -e "For more information see:" \
-    "https://doc.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html#ada-nrf52-update"\
-    "\033[0m"
-    exit 1
+    "https://doc.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html#ada-nrf52-update"
+    echo -e "Press enter to continue or CTRL-C to abort.\033[0m"
+    read -r
+    env CFLAGS= make -C "${RIOTTOOLS}/adafruit_nrf52_bootloader" flash || exit 1
 fi
 
 # Extract the actual SoftDevice version and compare it to the requested one
