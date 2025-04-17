@@ -19,6 +19,7 @@
  */
 
 #include <assert.h>
+#include <stdalign.h>
 #include <string.h>
 
 #include "stdio_uart.h"
@@ -109,8 +110,7 @@ static bool _bootdelay(unsigned tries, volatile bool *boot_default)
     return *boot_default;
 }
 
-__attribute__ ((aligned(4)))
-static struct {
+static alignas(4) struct {
     uint8_t pos;                /* current pos in rx buffer */
     uint8_t remaining;          /* remaining bytes to read  */
     union {

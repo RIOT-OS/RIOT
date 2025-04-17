@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdalign.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -31,7 +32,7 @@
  */
 #define MAIN_LUA_MEM_SIZE (40000)
 
-static char lua_memory[MAIN_LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIGNMENT__)));
+static alignas(__BIGGEST_ALIGNMENT__) char lua_memory[MAIN_LUA_MEM_SIZE];
 
 #define BARE_MINIMUM_MODS (LUAR_LOAD_BASE | LUAR_LOAD_IO | LUAR_LOAD_CORO | LUAR_LOAD_PACKAGE)
 

@@ -151,7 +151,8 @@ struct event {
 /**
  * @brief   event queue structure
  */
-typedef struct PTRTAG {
+typedef struct {
+    PTRTAG
     clist_node_t event_list;    /**< list of queued events              */
     thread_t *waiter;           /**< thread owning event queue          */
 } event_queue_t;
