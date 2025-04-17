@@ -4,6 +4,9 @@ on:
     push:
         branches:
             - master
+        paths:
+            - 'doc/guides/**'
+            - 'doc/starlight/**'
 
 jobs:
     build-docs:
