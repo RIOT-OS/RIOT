@@ -4,7 +4,7 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://riotguide.annsann.eu",
+  site: "https://guide.riot-os.org",
   integrations: [
     starlight({
       title: "Riot Documentation",
@@ -71,7 +71,7 @@ export default defineConfig({
       },
       plugins: [],
       editLink: {
-        baseUrl: "https://github.com/AnnsAnns/RIOT/tree/newguides/doc/guides",
+        baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
       },
     }),
   ],
