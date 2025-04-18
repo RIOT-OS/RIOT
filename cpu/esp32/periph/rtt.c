@@ -34,8 +34,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define RTC_CLK_CAL_FRACT       19  /* fractional bits of calibration value */
-
 /* contains the values as given at the interface */
 typedef struct {
     uint32_t alarm;         /**< alarm value as set at the interface */
