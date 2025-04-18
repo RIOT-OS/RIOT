@@ -21,13 +21,30 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include "auto_init.h"
+#include "auto_init_utils.h"
+
 #include "stdio_base.h"
 #include "macros/utils.h"
 #include "net/sock/async.h"
 #include "net/sock/udp.h"
+#include "net/gnrc/netif.h"
+#include "net/netdev.h"
 
 #ifndef CONFIG_STDIO_UDP_PORT
-#define CONFIG_STDIO_UDP_PORT       2323
+#define CONFIG_STDIO_UDP_PORT           2323
+#endif
+
+#ifndef CONFIG_STDIO_UDP_NETIF_TYPE
+#define CONFIG_STDIO_UDP_NETIF_TYPE     NETDEV_ANY
+#endif
+
+#ifndef CONFIG_STDIO_UDP_NETIF_IDX
+#define CONFIG_STDIO_UDP_NETIF_IDX      0
+#endif
+
+#ifndef AUTO_INIT_PRIO_MOD_STDIO_UDP
+#define AUTO_INIT_PRIO_MOD_STDIO_UDP    2000
 #endif
 
 #ifndef EOT
@@ -62,11 +79,21 @@ static void _sock_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 
 static void _init(void)
 {
-    const sock_udp_ep_t local = {
+    sock_udp_ep_t local = {
         .family = AF_INET6,
         .netif = SOCK_ADDR_ANY_NETIF,
         .port = CONFIG_STDIO_UDP_PORT,
     };
+
+    if (CONFIG_STDIO_UDP_NETIF_TYPE != NETDEV_ANY) {
+        gnrc_netif_t *netif = gnrc_netif_get_by_type(CONFIG_STDIO_UDP_NETIF_TYPE,
+                                                     CONFIG_STDIO_UDP_NETIF_IDX);
+        /* this will fail when called in early init */
+        if (netif == NULL) {
+            return;
+        }
+        local.netif = netif->pid;
+    }
 
     sock_udp_create(&sock, &local, NULL, 0);
     sock_udp_set_cb(&sock, _sock_cb, NULL);
@@ -89,5 +116,9 @@ static void _detach(void)
     sock_udp_close(&sock);
     memset(&remote, 0, sizeof(remote));
 }
-
 STDIO_PROVIDER(STDIO_UDP, _init, _detach, _write)
+
+#if CONFIG_STDIO_UDP_NETIF_TYPE != NETDEV_ANY
+/* call _init() again when network interfaces have been brought up */
+AUTO_INIT(_init, AUTO_INIT_PRIO_MOD_STDIO_UDP);
+#endif
