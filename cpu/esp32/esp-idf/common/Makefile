@@ -57,10 +57,30 @@ ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/app_update/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_bootloader_format/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_partition/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
 endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/include
+endif
+
+# TODO separate module
+ifneq (,$(filter esp_idf_phy,$(USEMODULE)))
+  ESP32_SDK_SRC += components/esp_phy/$(CPU_FAM)/phy_init_data.c
+  ESP32_SDK_SRC += components/esp_phy/src/phy_common.c
+  ESP32_SDK_SRC += components/esp_phy/src/phy_init.c
+  ESP32_SDK_SRC += components/esp_system/port/soc/$(CPU_FAM)/reset_reason.c
+  ESP32_SDK_SRC += components/soc/esp32/dport_access.c
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
+  ifeq (,$(filter esp_idf_wifi,$(USEMODULE)))
+    ESP32_SDK_SRC += components/esp_wifi/src/wifi_init.c
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
+  endif
 endif
 
 # TODO separate module
