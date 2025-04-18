@@ -28,6 +28,11 @@ ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
 endif
 
+ifeq (esp32h2,$(CPU_FAM))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/esp_private
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
+endif
+
 ifeq (esp32s3,$(CPU_FAM))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash
 endif
