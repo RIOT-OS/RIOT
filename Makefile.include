@@ -520,6 +520,22 @@ ifeq ($(RIOT_CI_BUILD),1)
     endif
     # be more quiet when building for CI
     QUIETER=1
+
+    # Enable static analysis only for some boards to not spent to much CPU time.
+    # This list is intentionally a subset of the `QUICKBUILD_BOARDS` from
+    # `.murdock`
+    BOARDS_CI_STATIC_ANALYSIS := \
+      esp32-wroom-32 \
+      native64 \
+      nrf52840dk \
+      samr21-xpro \
+      stm32f429i-disc1 \
+      #
+    ifneq (,$(filter $(BOARD),$(BOARDS_CI_STATIC_ANALYSIS)))
+      export STATIC_ANALYSIS := 1
+    else
+      export STATIC_ANALYSIS := 0
+    endif
 endif
 
 ifeq ($(QUIETER),1)

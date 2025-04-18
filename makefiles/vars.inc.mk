@@ -70,6 +70,7 @@ export CXX                   # The CXX compiler to use.
 export CCAS                  # The C compiler to use for assembler files, typically the same as CC.
 export CFLAGS                # The compiler flags. Must only ever be used with `+=`.
 export CFLAGS_CPU            # CPU architecture specific compiler flags
+export CFLAGS_STATIC_ANALYSIS# Additional CFLAGS to use when static analysis should be enabled
 export CXXUWFLAGS            # (Patterns of) flags in CFLAGS that should not be passed to CXX.
 export CXXEXFLAGS            # Additional flags that should be passed to CXX.
 export CCASUWFLAGS           # (Patterns of) flags in CFLAGS that should not be passed to CCAS.
