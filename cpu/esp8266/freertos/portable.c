@@ -21,18 +21,8 @@
 
 unsigned _xt_tick_divisor = 0;  /* cached number of cycles per tick */
 
-extern void vTaskEnterCritical( portMUX_TYPE *mux );
-extern void vTaskExitCritical( portMUX_TYPE *mux );
-
-void vPortEnterCritical(void)
-{
-    vTaskEnterCritical(0);
-}
-
-extern void vPortExitCritical(void)
-{
-    vTaskExitCritical(0);
-}
+extern void vPortEnterCritical(void);
+extern void vPortExitCritical(void);
 
 /* source: /path/to/esp8266-rtos-sdk/components/freertos/port/esp8266/port.c */
 void IRAM_ATTR vPortETSIntrLock(void)

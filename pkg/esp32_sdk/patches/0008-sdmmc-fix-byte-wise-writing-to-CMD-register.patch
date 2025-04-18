@@ -1,0 +1,40 @@
+From 97e5f240e60ca9d7806f9e4ed53ac1c025e8ce87 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 17:55:31 +0100
+Subject: [PATCH 08/28] sdmmc: fix byte-wise writing to CMD register
+
+Writing the 32-bit CMD register using memcpy results in the register being written byte by byte in any order. If the start bit in the CMD register is set before all bytes have been written, a wrong command is executed. Writing to the 32-bit CMD register must be performed as a single word register copy instruction which is guaranteed by the assignment.
+---
+ components/hal/esp32/include/hal/sdmmc_ll.h   | 2 +-
+ components/hal/esp32s3/include/hal/sdmmc_ll.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/components/hal/esp32/include/hal/sdmmc_ll.h b/components/hal/esp32/include/hal/sdmmc_ll.h
+index 0f5a62ea37..feecb231e5 100644
+--- a/components/hal/esp32/include/hal/sdmmc_ll.h
++++ b/components/hal/esp32/include/hal/sdmmc_ll.h
+@@ -491,7 +491,7 @@ static inline void sdmmc_ll_poll_demand(sdmmc_dev_t *hw)
+  */
+ static inline void sdmmc_ll_set_command(sdmmc_dev_t *hw, sdmmc_hw_cmd_t cmd)
+ {
+-    memcpy((void *)&hw->cmd, &cmd, sizeof(sdmmc_hw_cmd_t));
++    hw->cmd = cmd;
+ }
+ 
+ /**
+diff --git a/components/hal/esp32s3/include/hal/sdmmc_ll.h b/components/hal/esp32s3/include/hal/sdmmc_ll.h
+index 2747905931..60cd5923bd 100644
+--- a/components/hal/esp32s3/include/hal/sdmmc_ll.h
++++ b/components/hal/esp32s3/include/hal/sdmmc_ll.h
+@@ -527,7 +527,7 @@ static inline void sdmmc_ll_poll_demand(sdmmc_dev_t *hw)
+  */
+ static inline void sdmmc_ll_set_command(sdmmc_dev_t *hw, sdmmc_hw_cmd_t cmd)
+ {
+-    memcpy((void *)&hw->cmd, &cmd, sizeof(sdmmc_hw_cmd_t));
++    hw->cmd = cmd;
+ }
+ 
+ /**
+-- 
+2.34.1
+

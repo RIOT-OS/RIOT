@@ -1,0 +1,375 @@
+From 2273125f8cc71c1e03be9f199dfba6d94a82aeb5 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 17:38:07 +0100
+Subject: [PATCH 06/28] bootloader: allow compilation for RIOT-OS
+
+---
+ .../subproject/main/ld/esp32/bootloader.ld    | 58 ++++++++---------
+ .../subproject/main/ld/esp32c3/bootloader.ld  | 58 ++++++++---------
+ .../subproject/main/ld/esp32s2/bootloader.ld  | 62 +++++++++----------
+ .../subproject/main/ld/esp32s3/bootloader.ld  | 60 +++++++++---------
+ components/log/include/esp_log.h              |  4 ++
+ components/log/include/esp_log_buffer.h       |  4 ++
+ components/log/include/esp_log_color.h        |  2 +
+ 7 files changed, 129 insertions(+), 119 deletions(-)
+
+diff --git a/components/bootloader/subproject/main/ld/esp32/bootloader.ld b/components/bootloader/subproject/main/ld/esp32/bootloader.ld
+index d5fb575ddd..97bb99b8a6 100644
+--- a/components/bootloader/subproject/main/ld/esp32/bootloader.ld
++++ b/components/bootloader/subproject/main/ld/esp32/bootloader.ld
+@@ -41,38 +41,38 @@ SECTIONS
+     _loader_text_start = ABSOLUTE(.);
+     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+      *(.iram1 .iram1.*) /* catch stray IRAM_ATTR */
+-    *liblog.a:(.literal .text .literal.* .text.*)
++    *components/log/*(.literal .text .literal.* .text.*)
+     /* we use either libgcc or compiler-rt, so put similar entries for them here */
+     *libgcc.a:(.literal .text .literal.* .text.*)
+     *libclang_rt.builtins.a:(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_clock_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_common_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_flash.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
+-    *libesp_common.a:fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
+-    *libbootloader_support.a:bootloader_efuse.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_utility.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_sha.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_console_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_panic.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_soc.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:esp_image_format.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encrypt.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_partitions.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
+-    *libmicro-ecc.a:*.*(.literal .text .literal.* .text.*)
+-    *libspi_flash.a:*.*(.literal .text .literal.* .text.*)
+-    *libhal.a:wdt_hal_iram.*(.literal .text .literal.* .text.*)
+-    *libhal.a:mmu_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:efuse_hal.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_clk.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_time.*(.literal .text .literal.* .text.*)
+-    *libefuse.a:*.*(.literal .text .literal.* .text.*)
+-    *libesp_rom.a:*.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_clock_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_common_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_flash.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
++    *components/esp_system/fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
++    *components/bootloader_support/*/bootloader_efuse.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_utility.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_sha.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_console_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_panic.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_soc.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/esp_image_format.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encrypt.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_partitions.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
++    *components/*/micro-ecc/*(.literal .text .literal.* .text.*)
++    *components/spi_flash/*(.literal .text .literal.* .text.*)
++    *components/hal/wdt_hal_iram.*(.literal .text .literal.* .text.*)
++    *components/hal/mmu_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/efuse_hal.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_clk.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_time.*(.literal .text .literal.* .text.*)
++    *components/efuse/*(.literal .text .literal.* .text.*)
++    *components/esp_rom/*/*(.literal .text .literal.* .text.*)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+diff --git a/components/bootloader/subproject/main/ld/esp32c3/bootloader.ld b/components/bootloader/subproject/main/ld/esp32c3/bootloader.ld
+index 21f19c14fe..0a7a2d32dc 100644
+--- a/components/bootloader/subproject/main/ld/esp32c3/bootloader.ld
++++ b/components/bootloader/subproject/main/ld/esp32c3/bootloader.ld
+@@ -62,38 +62,38 @@ SECTIONS
+     _loader_text_start = ABSOLUTE(.);
+     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+     *(.iram1 .iram1.*) /* catch stray IRAM_ATTR */
+-    *liblog.a:(.literal .text .literal.* .text.*)
++    *components/log/*(.literal .text .literal.* .text.*)
+     /* we use either libgcc or compiler-rt, so put similar entries for them here */
+     *libgcc.a:(.literal .text .literal.* .text.*)
+     *libclang_rt.builtins.a:(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_clock_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_common_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_flash.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
+-    *libbootloader_support.a:bootloader_efuse.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_utility.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_sha.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_console_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_panic.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_soc.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:esp_image_format.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encrypt.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_partitions.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
+-    *libmicro-ecc.a:*.*(.literal .text .literal.* .text.*)
+-    *libspi_flash.a:*.*(.literal .text .literal.* .text.*)
+-    *libhal.a:wdt_hal_iram.*(.literal .text .literal.* .text.*)
+-    *libhal.a:mmu_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:cache_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:efuse_hal.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_clk.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_time.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:regi2c_ctrl.*(.literal .text .literal.* .text.*)
+-    *libefuse.a:*.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_clock_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_common_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_flash.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
++    *components/bootloader_support/*/bootloader_efuse.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_utility.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_sha.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_console_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_panic.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_soc.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/esp_image_format.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encrypt.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_partitions.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
++    *components/*/micro-ecc/*(.literal .text .literal.* .text.*)
++    *components/spi_flash/*(.literal .text .literal.* .text.*)
++    *components/hal/wdt_hal_iram.*(.literal .text .literal.* .text.*)
++    *components/hal/mmu_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/cache_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/efuse_hal.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_clk.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_time.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/regi2c_ctrl.*(.literal .text .literal.* .text.*)
++    *components/efuse/*(.literal .text .literal.* .text.*)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+diff --git a/components/bootloader/subproject/main/ld/esp32s2/bootloader.ld b/components/bootloader/subproject/main/ld/esp32s2/bootloader.ld
+index f2c4ede304..d26362429e 100644
+--- a/components/bootloader/subproject/main/ld/esp32s2/bootloader.ld
++++ b/components/bootloader/subproject/main/ld/esp32s2/bootloader.ld
+@@ -28,40 +28,40 @@ SECTIONS
+     _loader_text_start = ABSOLUTE(.);
+     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+      *(.iram1 .iram1.*) /* catch stray IRAM_ATTR */
+-    *liblog.a:(.literal .text .literal.* .text.*)
++    *components/log/*(.literal .text .literal.* .text.*)
+     /* we use either libgcc or compiler-rt, so put similar entries for them here */
+     *libgcc.a:(.literal .text .literal.* .text.*)
+     *libclang_rt.builtins.a:(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_clock_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_common_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_flash.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
+-    *libesp_common.a:fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
+-    *libbootloader_support.a:bootloader_efuse.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_utility.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_sha.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_console_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_panic.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_soc.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:esp_image_format.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encrypt.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_partitions.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
+-    *libmicro-ecc.a:*.*(.literal .text .literal.* .text.*)
+-    *libspi_flash.a:*.*(.literal .text .literal.* .text.*)
+-    *libhal.a:wdt_hal_iram.*(.literal .text .literal.* .text.*)
+-    *libhal.a:mmu_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:cache_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:efuse_hal.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_clk.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_time.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:regi2c_ctrl.*(.literal .text .literal.* .text.*)
+-    *libefuse.a:*.*(.literal .text .literal.* .text.*)
+-    *libesp_rom.a:esp_rom_regi2c.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_clock_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_common_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_flash.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
++    *components/esp_system/fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
++    *components/bootloader_support/*/bootloader_efuse.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_utility.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_sha.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_console_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_panic.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_soc.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/esp_image_format.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encrypt.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_partitions.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
++    *components/*/micro-ecc/*(.literal .text .literal.* .text.*)
++    *components/spi_flash/*(.literal .text .literal.* .text.*)
++    *components/hal/wdt_hal_iram.*(.literal .text .literal.* .text.*)
++    *components/hal/mmu_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/cache_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/efuse_hal.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_clk.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_time.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/regi2c_ctrl.*(.literal .text .literal.* .text.*)
++    *components/efuse/*(.literal .text .literal.* .text.*)
++    *components/esp_rom/*/esp_rom_regi2c.*(.literal .text .literal.* .text.*)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+diff --git a/components/bootloader/subproject/main/ld/esp32s3/bootloader.ld b/components/bootloader/subproject/main/ld/esp32s3/bootloader.ld
+index c0f4702a01..e57c49c434 100644
+--- a/components/bootloader/subproject/main/ld/esp32s3/bootloader.ld
++++ b/components/bootloader/subproject/main/ld/esp32s3/bootloader.ld
+@@ -63,39 +63,39 @@ SECTIONS
+     _loader_text_start = ABSOLUTE(.);
+     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+      *(.iram1 .iram1.*) /* catch stray IRAM_ATTR */
+-    *liblog.a:(.literal .text .literal.* .text.*)
++    *components/log/*(.literal .text .literal.* .text.*)
+     /* we use either libgcc or compiler-rt, so put similar entries for them here */
+     *libgcc.a:(.literal .text .literal.* .text.*)
+     *libclang_rt.builtins.a:(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_clock_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_common_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_flash.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
+-    *libesp_common.a:fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
+-    *libbootloader_support.a:bootloader_efuse.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_utility.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_sha.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_console_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_panic.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_soc.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:esp_image_format.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encrypt.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_partitions.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
+-    *libmicro-ecc.a:*.*(.literal .text .literal.* .text.*)
+-    *libspi_flash.a:*.*(.literal .text .literal.* .text.*)
+-    *libhal.a:wdt_hal_iram.*(.literal .text .literal.* .text.*)
+-    *libhal.a:mmu_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:cache_hal.*(.literal .text .literal.* .text.*)
+-    *libhal.a:efuse_hal.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_clk.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_time.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:regi2c_ctrl.*(.literal .text .literal.* .text.*)
+-    *libefuse.a:*.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_clock_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_common_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_flash.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
++    *components/esp_system/fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
++    *components/bootloader_support/*/bootloader_efuse.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_utility.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_sha.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_console_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_panic.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_soc.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/esp_image_format.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encrypt.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_partitions.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
++    *components/*/micro-ecc/*(.literal .text .literal.* .text.*)
++    *components/spi_flash/*(.literal .text .literal.* .text.*)
++    *components/hal/wdt_hal_iram.*(.literal .text .literal.* .text.*)
++    *components/hal/mmu_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/cache_hal.*(.literal .text .literal.* .text.*)
++    *components/hal/efuse_hal.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_clk.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_time.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/regi2c_ctrl.*(.literal .text .literal.* .text.*)
++    *components/efuse/*(.literal .text .literal.* .text.*)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+diff --git a/components/log/include/esp_log.h b/components/log/include/esp_log.h
+index e2cb068f43..eb6d94acad 100644
+--- a/components/log/include/esp_log.h
++++ b/components/log/include/esp_log.h
+@@ -59,6 +59,8 @@ void esp_log_writev(esp_log_level_t level, const char* tag, const char* format,
+ 
+ /** @cond */
+ 
++#if !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD)
++
+ #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+ #define LOG_SYSTEM_TIME_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%s) %s: " format LOG_RESET_COLOR "\n"
+ 
+@@ -259,6 +261,8 @@ void esp_log_writev(esp_log_level_t level, const char* tag, const char* format,
+ #endif // !(defined(__cplusplus) && (__cplusplus >  201703L))
+ /** @endcond */
+ 
++#endif /* !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD) */
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/components/log/include/esp_log_buffer.h b/components/log/include/esp_log_buffer.h
+index 5453061403..603a3c5b3b 100644
+--- a/components/log/include/esp_log_buffer.h
++++ b/components/log/include/esp_log_buffer.h
+@@ -63,6 +63,8 @@ void esp_log_buffer_char_internal(const char *tag, const void *buffer, uint16_t
+ */
+ void esp_log_buffer_hexdump_internal(const char *tag, const void *buffer, uint16_t buff_len, esp_log_level_t log_level);
+ 
++#if !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD)
++
+ /**
+  * @brief Log a buffer of hex bytes at specified level, separated into 16 bytes each line.
+  *
+@@ -173,6 +175,8 @@ static inline void esp_log_buffer_char(const char *tag, const void *buffer, uint
+ }
+ /** @endcond */
+ 
++#endif /* !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD) */
++
+ #endif // !NON_OS_BUILD || __DOXYGEN__
+ 
+ #ifdef __cplusplus
+diff --git a/components/log/include/esp_log_color.h b/components/log/include/esp_log_color.h
+index 483d634ea6..dde406a526 100644
+--- a/components/log/include/esp_log_color.h
++++ b/components/log/include/esp_log_color.h
+@@ -94,12 +94,14 @@ extern "C" {
+ #define LOG_COLOR_D           ""
+ #define LOG_COLOR_V           ""
+ #else
++#if !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD)
+ #define LOG_RESET_COLOR       ""
+ #define LOG_COLOR_E           ""
+ #define LOG_COLOR_W           ""
+ #define LOG_COLOR_I           ""
+ #define LOG_COLOR_D           ""
+ #define LOG_COLOR_V           ""
++#endif /* !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD) */
+ #endif
+ /** @endcond */
+ 
+-- 
+2.34.1
+

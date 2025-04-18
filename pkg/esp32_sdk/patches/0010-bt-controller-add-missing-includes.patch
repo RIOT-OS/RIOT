@@ -1,0 +1,25 @@
+From b0a8bfb89d5f80f951cfa9f57e128c90940d0523 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 17:57:00 +0100
+Subject: [PATCH 10/28] bt/controller: add missing includes
+
+---
+ components/bt/controller/esp32c3/bt.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/bt/controller/esp32c3/bt.c b/components/bt/controller/esp32c3/bt.c
+index 19eea2ee87..90123c47cd 100644
+--- a/components/bt/controller/esp32c3/bt.c
++++ b/components/bt/controller/esp32c3/bt.c
+@@ -30,6 +30,8 @@
+ #include "esp_err.h"
+ #include "esp_log.h"
+ #include "esp_pm.h"
++#include "esp_intr_types.h"
++#include "esp_intr_alloc.h"
+ #include "esp_ipc.h"
+ #include "esp_private/periph_ctrl.h"
+ #include "esp_private/esp_clk.h"
+-- 
+2.34.1
+
