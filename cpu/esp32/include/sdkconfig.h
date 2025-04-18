@@ -51,11 +51,11 @@
  * can be overridden by an application specific configuration.
  */
 #ifdef CONFIG_CONSOLE_UART_NUM
-#define CONFIG_ESP_CONSOLE_UART_NUM         CONFIG_CONSOLE_UART_NUM
+#define CONFIG_ESP_CONSOLE_UART_NUM             CONFIG_CONSOLE_UART_NUM
 #else
-#define CONFIG_ESP_CONSOLE_UART_NUM         0
+#define CONFIG_ESP_CONSOLE_UART_NUM             0
 #endif
-#define CONFIG_ESP_CONSOLE_UART_BAUDRATE    STDIO_UART_BAUDRATE
+#define CONFIG_ESP_CONSOLE_UART_BAUDRATE        STDIO_UART_BAUDRATE
 
 #define CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM CONFIG_ESP_CONSOLE_UART_NUM
 
@@ -63,14 +63,14 @@
  * Log output configuration (DO NOT CHANGE)
  */
 #ifndef CONFIG_LOG_DEFAULT_LEVEL
-#define CONFIG_LOG_DEFAULT_LEVEL    LOG_LEVEL
+#define CONFIG_LOG_DEFAULT_LEVEL                LOG_LEVEL
 #endif
-#define CONFIG_LOG_MAXIMUM_LEVEL    LOG_LEVEL
+#define CONFIG_LOG_MAXIMUM_LEVEL                LOG_LEVEL
 
 /**
  * System specific configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_NEWLIB_NANO
+#if MODULE_NEWLIB_NANO
 #define CONFIG_NEWLIB_NANO_FORMAT               1
 #endif
 
@@ -82,9 +82,10 @@
 #define CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER     1
 #define CONFIG_ESP_TIMER_TASK_STACK_SIZE        3584
 #define CONFIG_ESP_TIMER_INTERRUPT_LEVEL        1
-#define CONFIG_TIMER_TASK_STACK_SIZE            CONFIG_ESP_TIMER_TASK_STACK_SIZE
 #define CONFIG_ESP_TIMER_TASK_AFFINITY          0
 #define CONFIG_ESP_TIMER_ISR_AFFINITY_CPU0      1
+
+#define CONFIG_TIMER_TASK_STACK_SIZE            CONFIG_ESP_TIMER_TASK_STACK_SIZE
 
 #define CONFIG_APP_BUILD_TYPE_APP_2NDBOOT       1
 #define CONFIG_APP_BUILD_GENERATE_BINARIES      1
@@ -102,31 +103,19 @@
 /**
  * BLE driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_BLE
+#if MODULE_ESP_BLE
 #define CONFIG_BT_ENABLED                       1
 #define CONFIG_BT_CONTROLLER_ENABLED            1
 #define CONFIG_BT_CONTROLLER_ONLY               1
-#define CONFIG_ESP_COEX_ENABLED                 1
-#define CONFIG_ESP_WIFI_ENABLED                 1   /* WiFi module has to be enabled */
 #define CONFIG_SOC_BT_SUPPORTED                 SOC_BT_SUPPORTED
 #define CONFIG_SOC_PM_SUPPORT_BT_PD             SOC_PM_SUPPORT_BT_PD
 #define CONFIG_SOC_PM_SUPPORT_BT_WAKEUP         SOC_PM_SUPPORT_BT_WAKEUP
-
-#ifndef MODULE_ESP_WIFI_ANY
-#define CONFIG_ESP_PHY_ENABLED                  1
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME             10
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME             50
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_WAIT_BROADCAST_DATA_TIME    15
-#endif
-
-#else
-#define CONFIG_BT_ENABLED                       0
 #endif
 
 /**
  * SPI RAM configuration (DO NOT CHANGE)
  */
-#ifdef  MODULE_ESP_SPI_RAM
+#if MODULE_ESP_SPI_RAM
 #define CONFIG_SPIRAM                           1
 #define CONFIG_SPIRAM_TYPE_AUTO                 1
 #define CONFIG_SPIRAM_SIZE                      -1
@@ -162,7 +151,7 @@
 /**
  * RTC Clock configuration
  */
-#ifdef MODULE_ESP_RTC_TIMER_32K
+#if MODULE_ESP_RTC_TIMER_32K
 #define CONFIG_RTC_CLK_SRC_EXT_CRYS                 1
 #else
 #define CONFIG_RTC_CLK_SRC_INT_RC                   1
@@ -171,8 +160,8 @@
 /**
  * Ethernet driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_ETH
-#define CONFIG_ETH_ENABLED                      1
+#if MODULE_ESP_ETH
+#define CONFIG_ETH_ENABLED                          1
 #endif
 
 /**
@@ -188,11 +177,8 @@
 /**
  * Wi-Fi driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_WIFI_ANY
-#define CONFIG_CRYPTO_INTERNAL                      1
-#define CONFIG_ESP_PHY_ENABLED                      1
+#if MODULE_ESP_WIFI_ANY
 #define CONFIG_ESP_WIFI_ENABLED                     1
-
 #define CONFIG_ESP_WIFI_AMPDU_RX_ENABLED            1
 #define CONFIG_ESP_WIFI_AMPDU_TX_ENABLED            1
 #define CONFIG_ESP_WIFI_AUTH_WPA2_PSK               1
@@ -210,13 +196,11 @@
 #define CONFIG_ESP_WIFI_MBEDTLS_CRYPTO              0   /* default 1 for WPA3 */
 #define CONFIG_ESP_WIFI_MBEDTLS_TLS_CLIENT          0   /* default 1 for WPA3 */
 #define CONFIG_ESP_WIFI_MGMT_SBUF_NUM               32
+#define CONFIG_ESP_WIFI_NVS_ENABLED                 MODULE_ESP_IDF_NVS_FLASH
 #define CONFIG_ESP_WIFI_PW_ID                       ""
 #define CONFIG_ESP_WIFI_RX_BA_WIN                   6
 #define CONFIG_ESP_WIFI_RX_IRAM_OPT                 0   /* default 1 */
 #define CONFIG_ESP_WIFI_RX_MGMT_BUF_NUM_DEF         5
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME 10
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME 50
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_WAIT_BROADCAST_DATA_TIME    15
 #define CONFIG_ESP_WIFI_SOFTAP_BEACON_MAX_LEN       752
 #define CONFIG_ESP_WIFI_STA_DISCONNECTED_PM_ENABLE  1
 #define CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM        10
@@ -225,40 +209,59 @@
 #define CONFIG_ESP_WIFI_TX_BA_WIN                   6
 #define CONFIG_ESP_WIFI_TX_BUFFER_TYPE              1
 
-#if defined(MODULE_ESP_IDF_NVS_FLASH) && !defined(CPU_FAM_ESP32C3)
-#define CONFIG_ESP_WIFI_NVS_ENABLED                 1
-#endif
+#define CONFIG_CRYPTO_INTERNAL                      1
 
-#if defined(MODULE_ESP_WIFI_AP) || defined(MODULE_ESP_NOW)
+#if MODULE_ESP_WIFI_AP || MODULE_ESP_NOW
 #define CONFIG_ESP_WIFI_SOFTAP_SUPPORT              1
 #endif
 
-#if defined(MODULE_ESP_WIFI_ENTERPRISE)
+#if MODULE_ESP_WIFI_ENTERPRISE
 #define CONFIG_ESP_WIFI_ENTERPRISE_SUPPORT          1
 #endif
 
-#if defined(MODULE_ESP_BLE)
-#define CONFIG_ESP_COEX_SW_COEXIST_ENABLE           1
 #endif
 
-#endif
+#define CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME 10
+#define CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME 50
+#define CONFIG_ESP_WIFI_SLP_DEFAULT_WAIT_BROADCAST_DATA_TIME    15
 
 /**
  * PHY configuration
  */
-#if MODULE_ESP_IDF_NVS_ENABLED
-#define CONFIG_ESP_PHY_CALIBRATION_AND_DATA_STORAGE     1
-#endif
-
+#if SOC_PHY_SUPPORTED
+#define CONFIG_ESP_PHY_ENABLED                          1
+#define CONFIG_ESP_PHY_CALIBRATION_MODE                 0
 #define CONFIG_ESP_PHY_MAX_TX_POWER                     20
 #define CONFIG_ESP_PHY_MAX_WIFI_TX_POWER                20
+#define CONFIG_ESP_PHY_RF_CAL_PARTIAL                   1
+#if MODULE_ESP_IDF_NVS_FLASH
+#define CONFIG_ESP_PHY_CALIBRATION_AND_DATA_STORAGE     1
+#endif
+#endif
+
+/**
+ * Coexist configuration (DO NOT CHANGE)
+ */
+#if !SOC_WIRELESS_HOST_SUPPORTED
+#define CONFIG_ESP_COEX_ENABLED                         1
+#if CONFIG_ESP_WIFI_ENABLED && CONFIG_BT_ENABLED
+#define CONFIG_ESP_COEX_SW_COEXIST_ENABLE               1
+#endif
+
+#if 0
+/* TODO:
+ * CONFIG_SW_COEXIST_ENABLE is deprecated but still used in code.
+ * It is not defined in IDF sdkconfigs and does not work if defined. */
+#define CONFIG_SW_COEXIST_ENABLE            1
+#endif
+#endif /* !SOC_WIRELESS_HOST_SUPPORTED */
 
 /**
  * Flashpage configuration
  */
 #ifndef CONFIG_ESP_FLASHPAGE_CAPACITY
 
-#ifdef MODULE_PERIPH_FLASHPAGE
+#if MODULE_PERIPH_FLASHPAGE
 #if CONFIG_ESP_FLASHPAGE_CAPACITY_64K
 #define CONFIG_ESP_FLASHPAGE_CAPACITY                   0x10000
 #elif CONFIG_ESP_FLASHPAGE_CAPACITY_128K
@@ -274,9 +277,9 @@
 #else
 #define CONFIG_ESP_FLASHPAGE_CAPACITY                   0x80000
 #endif
-#else /* MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE */
+#else /* MODULE_PERIPH_FLASHPAGE */
 #define CONFIG_ESP_FLASHPAGE_CAPACITY                   0x0
-#endif /* MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE */
+#endif /* MODULE_PERIPH_FLASHPAGE */
 
 #endif /* !CONFIG_ESP_FLASHPAGE_CAPACITY */
 
@@ -287,7 +290,6 @@
 #ifndef CONFIG_LCD_DATA_BUF_SIZE
 #define CONFIG_LCD_DATA_BUF_SIZE                        512
 #endif
-
 #define CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE             CONFIG_LCD_DATA_BUF_SIZE
 #endif
 
@@ -307,46 +309,44 @@
 #endif
 
 #ifndef CONFIG_MMU_PAGE_SIZE
-#define CONFIG_MMU_PAGE_SIZE_64KB   1
-#define CONFIG_MMU_PAGE_SIZE        0x10000
+#define CONFIG_MMU_PAGE_SIZE_64KB                   1
+#define CONFIG_MMU_PAGE_SIZE                        0x10000
 #endif
 
 #ifndef CONFIG_FREERTOS_NUMBER_OF_CORES
-#define CONFIG_FREERTOS_NUMBER_OF_CORES 1
+#define CONFIG_FREERTOS_NUMBER_OF_CORES             1
 #endif
 
-#define CONFIG_ESP_DEBUG_OCDAWARE       1
+#define CONFIG_ESP_DEBUG_OCDAWARE                   1
 
-#define CONFIG_ADC_SUPPRESS_DEPRECATE_WARN  1
+#define CONFIG_ADC_SUPPRESS_DEPRECATE_WARN          1
 
 #define CONFIG_HEAP_POISONING_DISABLED              1
 #define CONFIG_HEAP_TRACING_OFF                     1
 #define CONFIG_LOG_TAG_LEVEL_CACHE_BINARY_MIN_HEAP  1
 
-#define CONFIG_ULP_COPROC_RESERVE_MEM       0
+#define CONFIG_ULP_COPROC_RESERVE_MEM               0
 
 #ifdef SOC_RTC_MEM_SUPPORTED
-#define CONFIG_SOC_RTC_MEM_SUPPORTED        1
+#define CONFIG_SOC_RTC_MEM_SUPPORTED                1
 #endif
 #ifdef SOC_RTC_FAST_MEM_SUPPORTED
-#define CONFIG_SOC_RTC_FAST_MEM_SUPPORTED   1
+#define CONFIG_SOC_RTC_FAST_MEM_SUPPORTED           1
 #endif
 #ifdef SOC_RTC_SLOW_SUPPORTED
-#define CONFIG_SOC_RTC_SLOW_MEM_SUPPORTED   1
+#define CONFIG_SOC_RTC_SLOW_MEM_SUPPORTED           1
 #endif
 
 /**
  * SDMMC Host configuration
  */
 #ifdef SOC_SDMMC_HOST_SUPPORTED
-
 #define CONFIG_SOC_SDMMC_HOST_SUPPORTED     SOC_SDMMC_HOST_SUPPORTED
 #define CONFIG_SOC_SDMMC_DELAY_PHASE_NUM    SOC_SDMMC_DELAY_PHASE_NUM
 #define CONFIG_SOC_SDMMC_NUM_SLOTS          SOC_SDMMC_NUM_SLOTS
 #define CONFIG_SOC_SDMMC_SUPPORT_XTAL_CLOCK SOC_SDMMC_SUPPORT_XTAL_CLOCK
 #define CONFIG_SOC_SDMMC_USE_GPIO_MATRIX    SOC_SDMMC_USE_GPIO_MATRIX
 #define CONFIG_SOC_SDMMC_USE_IOMUX          SOC_SDMMC_USE_IOMUX
-
 #endif /* SOC_SDMMC_HOST_SUPPORTED */
 
 /**
