@@ -1,3 +1,8 @@
+---
+title: Getting Started with RIOT on Windows
+description: This guide will help you to set up RIOT on Windows using WSL
+---
+
 # Getting Started on Windows
 
 > [!NOTE]

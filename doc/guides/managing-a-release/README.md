@@ -1,3 +1,8 @@
+---
+title: Managing a Release
+description: This page describes the process of managing a release.
+---
+
 # Contents
 
 1. [Checklist](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#1-checklist)
