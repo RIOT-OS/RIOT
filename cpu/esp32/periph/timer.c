@@ -64,8 +64,8 @@
 /* hardware timer modules used */
 
 /**
- * ESP32 has four 64 bit hardware timers:
- * two timer groups TMG0 and TMG1 with 2 timers each
+ * ESP32 and ESP32-S2 have four 64 bit hardware timers while ESP32-S3 has four
+ * 54 bit hardware timers: two timer groups TMG0 and TMG1 with 2 timers each
  *
  * TMG0, timer 0 is used for system time in us and is therefore not
  * available as low level timer. Timers have only one channel. Timer devices
@@ -80,7 +80,7 @@
  * timer device is needed.
  *
  * ---
- * ESP32-C3 hast only two 54 bit hardware timers:
+ * ESP32-C3, ESP32-H2 have only two 54 bit hardware timers:
  * two timer groups TMG0 and TMG1 with 1 timer each
  *
  * TMG0, timer 0 is used for system time in us and is therefore not
@@ -113,34 +113,29 @@ struct _hw_timer_desc_t {
 
 static const struct _hw_timer_desc_t _timers_desc[] =
 {
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
     {
         .module = PERIPH_TIMG0_MODULE,
         .group = TIMER_GROUP_0,
         .index = TIMER_1,
         .int_src  = ETS_TG0_T1_LEVEL_INTR_SOURCE,
     },
+#endif
+#if SOC_TIMER_GROUPS > 1
     {
         .module = PERIPH_TIMG1_MODULE,
         .group = TIMER_GROUP_1,
         .index = TIMER_0,
         .int_src  = ETS_TG1_T0_LEVEL_INTR_SOURCE,
     },
+#  if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
     {
         .module = PERIPH_TIMG1_MODULE,
         .group = TIMER_GROUP_1,
         .index = TIMER_1,
         .int_src  = ETS_TG1_T1_LEVEL_INTR_SOURCE,
     }
-#elif defined(CPU_FAM_ESP32C3)
-    {
-        .module = PERIPH_TIMG1_MODULE,
-        .group = TIMER_GROUP_1,
-        .index = TIMER_0,
-        .int_src  = ETS_TG1_T0_LEVEL_INTR_SOURCE
-    },
-#else
-#error "MCU implementation needed"
+#  endif
 #endif
 };
 

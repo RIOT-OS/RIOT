@@ -39,7 +39,9 @@
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
 #include "soc/io_mux_reg.h"
+#ifndef CPU_FAM_ESP32H2
 #include "soc/rtc_cntl_reg.h"
+#endif
 #include "soc/rtc_io_periph.h"
 
 #if __xtensa__
@@ -58,7 +60,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if SOC_PM_SUPPORT_EXT_WAKEUP
+#if SOC_PM_SUPPORT_EXT1_WAKEUP
 #if CPU_FAM_ESP32
 #define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
 #define ESP_PM_WUP_PINS_ANY_LOW     -1
@@ -87,7 +89,6 @@
 #error "ESP_PM_WUP_PINS_ALL_LOW is not allowed as ESP_PM_WUP_LEVEL."
 #endif
 #endif
-
 
 #ifndef ESP_PM_WUP_LEVEL
 #define ESP_PM_WUP_LEVEL            ESP_PM_WUP_PINS_ANY_HIGH
@@ -259,7 +260,9 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     _gpio_pin_pd[pin] = cfg.pull_down_en;
 #if SOC_RTCIO_HOLD_SUPPORTED
     /* disable the RTCIO hold function for the case we come from deep sleep */
-    rtc_gpio_hold_dis(pin);
+    if (rtc_gpio_is_valid_gpio(pin)) {
+        rtc_gpio_hold_dis(pin);
+    }
 #endif /* SOC_RTCIO_HOLD_SUPPORTED */
 #endif /* ESP_PM_WUP_PINS */
 
@@ -510,6 +513,14 @@ void gpio_pm_sleep_enter(unsigned mode)
         /* isolating GPIO12 from external circuits is especially recommended for
          * ESP32-WROVER that have an external pullup on GPIO12 */
         rtc_gpio_isolate(GPIO_NUM_12);
+#elif CPU_FAM_ESP32H2
+        /* On ESP32H2 rtc_gpio_force_hold_en_all doesn't enable the hold
+         * function for all RTC GPIOs, so we have to do it for each pin. */
+        for (unsigned i = 0; i < SOC_GPIO_PIN_COUNT; i++) {
+            if (rtc_gpio_is_valid_gpio(i)) {
+                rtc_gpio_hold_en(i);
+            }
+        }
 #endif
 #else
 #  error "ESP32x variant does not support hold feature in deep sleep";
@@ -589,6 +600,8 @@ void gpio_pm_sleep_enter(unsigned mode)
                 gpio_pullup_dis(wup_pins[i]);
                 gpio_pulldown_en(wup_pins[i]);
             }
+#elif SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP
+            rtc_gpio_hold_en(wup_pins[i]);
 #endif
         }
 #if SOC_PM_SUPPORT_EXT1_WAKEUP
