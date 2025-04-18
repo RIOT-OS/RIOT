@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_stm32mp157c-dk2 STM32MP157C-DK2 board
 @ingroup     boards
 @brief       Support for the STM32MP157C-DK2 board
@@ -101,4 +100,3 @@ echo stop > /sys/class/remoteproc/remoteproc0/state
 For using the STM32MP157C-DK2 board we strongly recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
- */
