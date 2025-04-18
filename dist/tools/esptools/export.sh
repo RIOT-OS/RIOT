@@ -26,7 +26,7 @@ export_arch()
             TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
-        esp32c3)
+        esp32c3|esp32h2)
             TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
@@ -147,10 +147,11 @@ if [ -z "$1" ]; then
     echo "Usage: export.sh <tool>"
     echo "       export.sh gdb <platform>"
     echo "       export.sh qemu <platform>"
-    echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
+    echo "<tool> = all | gdb | openocd | qemu |"
+    echo "         esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32h2 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         export_arch "$arch"
     done
