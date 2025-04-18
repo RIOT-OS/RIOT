@@ -20,6 +20,8 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
   # add additional modules and packages used for any BLE interface
   FEATURES_REQUIRED += esp_ble
   USEMODULE += esp_idf_ble
+  USEMODULE += esp_idf_nvs_flash
+  USEMODULE += esp_idf_phy
   USEPKG += esp32_sdk_lib_phy
   ifeq (esp32,$(CPU_FAM))
     FEATURES_REQUIRED += esp_ble_esp32
@@ -47,6 +49,7 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
+  USEMODULE += esp_idf_phy
   USEMODULE += esp_idf_wifi
   USEMODULE += esp_idf_wpa_supplicant
   USEMODULE += esp_idf_wpa_supplicant_esp_supplicant
