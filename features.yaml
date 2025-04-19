@@ -160,6 +160,8 @@ groups:
               ESP32-S3 variant.
       - name: esp_hw_counter
         help: The used ESP32x SoC supports HW counters that can be used as timers.
+      - name: esp_ieee802154
+        help: The ESP32x IEEE 802.15.4 driver
       - name: esp_rmt
         help: The ESP32x SoC has an RMT (Remote Control Transceiver) peripheral.
       - name: esp_rtc_timer_32k
