@@ -1,0 +1,3 @@
+export ESP32_SDK_LIB_BT_DIR ?= $(PKGDIRBASE)/esp32_sdk_lib_bt_esp32h2
+
+PSEUDOMODULES += esp32_sdk_lib_bt_esp32h2
