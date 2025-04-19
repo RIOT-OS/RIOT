@@ -1,8 +1,5 @@
 MODULE = esp_idf_ieee802154
 
-ESP32_SDK_SRC += components/esp_phy/src/btbb_init.c
-ESP32_SDK_SRC += components/esp_phy/src/phy_common.c
-ESP32_SDK_SRC += components/esp_phy/src/phy_init_esp32hxx.c
 ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_ack.c
 ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_dev.c
 ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_event.c
