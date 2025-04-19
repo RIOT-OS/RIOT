@@ -158,6 +158,8 @@ groups:
       - name: esp_ble_esp32c3
         help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-C3 or
               ESP32-S3 variant.
+      - name: esp_ble_esp32h2
+        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-H2 variant.
       - name: esp_hw_counter
         help: The used ESP32x SoC supports HW counters that can be used as timers.
       - name: esp_ieee802154
