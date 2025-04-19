@@ -117,6 +117,7 @@ FEATURES_EXISTING := \
     esp_ble_esp32 \
     esp_ble_esp32c3 \
     esp_hw_counter \
+    esp_ieee802154 \
     esp_jtag \
     esp_now \
     esp_rmt \
