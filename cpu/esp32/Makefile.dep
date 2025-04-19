@@ -27,6 +27,9 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
   ifeq (esp32,$(CPU_FAM))
     FEATURES_REQUIRED += esp_ble_esp32
     USEPKG += esp32_sdk_lib_bt_esp32
+  else ifeq (esp32h2,$(CPU_FAM))
+    FEATURES_REQUIRED += esp_ble_esp32h2
+    USEPKG += esp32_sdk_lib_bt_esp32h2
   else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
     FEATURES_REQUIRED += esp_ble_esp32c3
     USEPKG += esp32_sdk_lib_bt_esp32c3
@@ -161,9 +164,15 @@ endif
 ifneq (,$(filter nimble,$(USEPKG)))
   USEMODULE += esp_ble
   USEMODULE += esp_ble_nimble
+  USEMODULE += esp_idf_nvs_flash
   USEMODULE += nimble_host
   USEMODULE += nimble_transport_hci_h4
   USEMODULE += ztimer_msec
+  ifeq (esp32h2,$(CPU_FAM))
+    # TODO for the moment, we use tinycrypt for encryption
+    # USEPKG += esp32_sdk_mbedtls
+    USEPKG += esp32_sdk_lib_coexist
+  endif
 endif
 
 ifneq (,$(filter periph_adc,$(USEMODULE)))
