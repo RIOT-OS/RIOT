@@ -19,7 +19,7 @@ index cebdb29f..0b09e978 100644
  
 +/* If `g_msys_pool_list` is defined in the low-level BLE Controller driver,
 + * which is the case for the ESP32-H2, for example, `g_msys_pool_list` must
-+ * be declared extern here instead of definint it. */
++ * be declared extern here instead of defining it. */
 +#if NIMBLE_G_MSYS_POOL_LIST_IN_CONTROLLER
 +extern STAILQ_HEAD(, os_mbuf_pool) g_msys_pool_list;
 +#else
