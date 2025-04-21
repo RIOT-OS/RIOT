@@ -49,16 +49,10 @@ ifneq (,$(filter esp32 esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += ble_nimble
   FEATURES_PROVIDED += ble_nimble_netif
   FEATURES_PROVIDED += esp_ble
-endif
-
-ifeq (esp32,$(CPU_FAM))
-  FEATURES_PROVIDED += esp_ble_esp32
-else ifeq (esp32h2,$(CPU_FAM))
-  FEATURES_PROVIDED += esp_ble_esp32h2
-else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
-  FEATURES_PROVIDED += ble_adv_ext
-  FEATURES_PROVIDED += ble_phy_2mbit
-  FEATURES_PROVIDED += esp_ble_esp32c3
+  ifneq (esp32,$(CPU_FAM))
+    FEATURES_PROVIDED += ble_adv_ext
+    FEATURES_PROVIDED += ble_phy_2mbit
+  endif
 endif
 
 ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))

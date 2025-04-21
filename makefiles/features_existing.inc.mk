@@ -114,9 +114,6 @@ FEATURES_EXISTING := \
     efm32_coretemp \
     emulator_renode \
     esp_ble \
-    esp_ble_esp32 \
-    esp_ble_esp32c3 \
-    esp_ble_esp32h2 \
     esp_hw_counter \
     esp_ieee802154 \
     esp_jtag \

@@ -152,14 +152,6 @@ groups:
         help: ESP WiFi SoftAP support is present.
       - name: esp_wifi_enterprise
         help: The ESP WiFi interface supports WPA2 enterprise mode.
-      - name: esp_ble_esp32
-        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32
-              variant.
-      - name: esp_ble_esp32c3
-        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-C3 or
-              ESP32-S3 variant.
-      - name: esp_ble_esp32h2
-        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-H2 variant.
       - name: esp_hw_counter
         help: The used ESP32x SoC supports HW counters that can be used as timers.
       - name: esp_ieee802154
@@ -177,7 +169,7 @@ groups:
               case additional GPIOs are used for the SPI interface and cannot be
               used for other purposes.
       - name: esp_ble
-        help: An ESP32 Bluetooth LE transceiver is present.
+        help: An ESP32x Bluetooth LE transceiver is present.
     - title: nordic nRF Specific Features
       features:
       - name: radio_nrf802154
