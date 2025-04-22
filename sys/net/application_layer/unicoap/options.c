@@ -226,9 +226,9 @@ static inline ssize_t _option_size(uint16_t delta, size_t value_size)
  * @brief Reads option
  *
  * @param[in,out]   cursor Buffer cursor variable
- * @param[in]       end Pointer to after last buffer lement
+ * @param[in]       end Pointer to after last buffer element
  * @param[out]      delta Option delta of this option
- * @param[out]   value  Option value
+ * @param[out]      value  Option value
  *
  * @return Size of option value, value starting at `value`
  * @return `-EPAYLD` if @p cursor points at the payload marker

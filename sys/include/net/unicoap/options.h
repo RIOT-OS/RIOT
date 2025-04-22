@@ -140,7 +140,7 @@ static inline void unicoap_options_init(unicoap_options_t* options, uint8_t* sto
 }
 
 /**
- * @brief Determines wether the given options container has one or more options with the number passed.
+ * @brief Determines whether the given options container has one or more options with the number passed.
  *
  * @param[in] options Options
  * @param number The option number
@@ -325,7 +325,7 @@ static inline size_t unicoap_options_size(const unicoap_options_t* options)
 #define UNICOAP_UINT24_MAX (0xffffff)
 
 /**
- * @brief Unsigned integer large enough to accomodate the maximum integer
+ * @brief Unsigned integer large enough to accommodate the maximum integer
  * representable by CoAP option delta fields and extended length fields.
  *
  * @see [CoAP RFC 7252, 3.1](https://datatracker.ietf.org/doc/html/rfc7252#section-3.1)
@@ -387,7 +387,7 @@ int unicoap_options_add_values(unicoap_options_t* options, unicoap_option_number
  * Use this API with repeatable options
  *
  * @param[in] options Options
- * @param number Option numbr
+ * @param number Option number
  * @param[in,out] buffer Buffer to copy string value into, must be large enough to carry characters and null-terminator.
  * @param capacity Number of usable bytes in @p dest
  * @param separator Character to insert between option values. If no option exists, just the separator will be written into @p dest
@@ -544,7 +544,7 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
                                  unicoap_option_number_t* number, uint8_t** value);
 
 /**
- * @brief Gets the next option with the given number, potentially skipping any options inbetween.
+ * @brief Gets the next option with the given number, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -575,7 +575,7 @@ void unicoap_options_dump_all(const unicoap_options_t* options);
  * @brief Copies the string value of the first option with the given number into the given buffer
  *
  * @param[in] options Options
- * @param number Option numbr
+ * @param number Option number
  * @param[in,out] dest Buffer to copy string value into, must be large enough to carry characters and null-terminator.
  * @param capacity Number of usable bytes in @p dest
  *
@@ -596,7 +596,7 @@ static inline ssize_t unicoap_options_get_string(unicoap_options_t* options, uni
  * @brief Copies the string values of all option with the given number into the given buffer
  *
  * @param[in] options Options
- * @param number Option numbr
+ * @param number Option number
  * @param[in,out] dest Buffer to copy string value into, must be large enough to carry characters and null-terminator.
  * @param capacity Number of usable bytes in @p dest
  * @param separator Character to insert between option values. If no option exists, just the separator will be written into @p dest
@@ -668,7 +668,7 @@ static inline int unicoap_options_add_string(unicoap_options_t* options,
  * @param[in] options Options
  * @param number Option number
  * @param[in,out] integer A pointer to a type capable of storing the number of bytes specified by @p integer_size in the machine's byte order
- * @param integer_size Maximum number of bytes used to represent the interger
+ * @param integer_size Maximum number of bytes used to represent the integer
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
