@@ -1198,7 +1198,7 @@ static inline int unicoap_options_add_uri_path_string(unicoap_options_t* options
 }
 
 /**
- * @brief Gets the next `Uri-Path`, potentially skipping any options inbetween.
+ * @brief Gets the next `Uri-Path`, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -1311,7 +1311,7 @@ static inline ssize_t unicoap_options_get_first_uri_query(unicoap_options_t* opt
 }
 
 /**
- * @brief Gets the next `Uri-Query`, potentially skipping any options inbetween.
+ * @brief Gets the next `Uri-Query`, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -1330,7 +1330,7 @@ static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterato
 }
 
 /**
- * @brief Gets the next query option matching the given name, potentially skipping any options inbetween.
+ * @brief Gets the next query option matching the given name, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -1338,7 +1338,7 @@ static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterato
  *
  * @param[in,out] iterator Option iterator
  * @param[out] number Option number
- * @param[in] name Name of query paramter to find
+ * @param[in] name Name of query parameter to find
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
@@ -1350,14 +1350,14 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
                                                char** value);
 
 /**
- * @brief Gets the next `Uri-Query` option matching the given name, potentially skipping any options inbetween.
+ * @brief Gets the next `Uri-Query` option matching the given name, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
  * This method splits query values at the `=` character.
  *
  * @param[in,out] iterator Option iterator
- * @param[in] name Name of query paramter to find
+ * @param[in] name Name of query parameter to find
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
@@ -1379,7 +1379,7 @@ unicoap_options_get_next_uri_query_by_name(unicoap_options_iterator_t* iterator,
  * This method splits query values at the `=` character.
  *
  * @param[in,out] options Options
- * @param[in] name Name of query paramter to find
+ * @param[in] name Name of query parameter to find
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
@@ -1645,7 +1645,7 @@ static inline int unicoap_options_add_location_path_string(unicoap_options_t* op
 }
 
 /**
- * @brief Gets the next `Location-Path`, potentially skipping any options inbetween.
+ * @brief Gets the next `Location-Path`, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -1757,7 +1757,7 @@ static inline ssize_t unicoap_options_get_first_location_query(unicoap_options_t
 }
 
 /**
- * @brief Gets the next `Location-Query`, potentially skipping any options inbetween.
+ * @brief Gets the next `Location-Query`, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -1775,14 +1775,14 @@ static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_it
 }
 
 /**
- * @brief Gets the next `Location-Query` option matching the given name, potentially skipping any options inbetween.
+ * @brief Gets the next `Location-Query` option matching the given name, potentially skipping any options in between.
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
  * This method splits query values at the `=` character.
  *
  * @param[in,out] iterator Option iterator
- * @param[in] name Name of query paramter to find
+ * @param[in] name Name of query parameter to find
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
@@ -1805,7 +1805,7 @@ unicoap_options_get_next_location_query_by_name(unicoap_options_iterator_t* iter
  * This method splits query values at the `=` character.
  *
  * @param[in,out] options Options
- * @param[in] name Name of query paramter to find
+ * @param[in] name Name of query parameter to find
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
