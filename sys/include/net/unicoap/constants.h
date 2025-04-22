@@ -62,7 +62,7 @@ typedef enum {
  * used. Hence, no more than 4 bits are needed, which is why TKL fields never occupy more than
  * 4 bits.
  *
- * Use this constant to define bitfields containg a token length member.
+ * Use this constant to define bitfields containing a token length member.
  */
 #define UNICOAP_TOKEN_LENGTH_FIXED_WIDTH 4
 /** @} */
@@ -282,7 +282,7 @@ typedef enum {
     UNICOAP_STATUS_NOT_ACCEPTABLE = UNICOAP_CODE(RESPONSE_CLIENT_FAILURE, 6),
 
     /**
-     * @brief 4.08 Request Entitiy Incomplete
+     * @brief 4.08 Request Entity Incomplete
      *
      * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7959#section-2.9.2)
      */
@@ -303,7 +303,7 @@ typedef enum {
     UNICOAP_STATUS_PRECONDITION_FAILED = UNICOAP_CODE(RESPONSE_CLIENT_FAILURE, 12),
 
     /**
-     * @brief 4.13 Request Entitiy Too Large
+     * @brief 4.13 Request Entity Too Large
      *
      * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.9.2.9)
      * @see [RFC 7959](https://datatracker.ietf.org/doc/html/rfc7959#section-2.9.3)
