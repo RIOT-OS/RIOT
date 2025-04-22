@@ -83,11 +83,13 @@
  * For lower CPU clock frequencies, the APB clock corresponds to the CPU clock
  * frequency. Therefore, we need to determine the actual UART clock frequency
  * from the actual APB clock frequency. */
-#define UART_CLK_FREQ   rtc_clk_apb_freq_get() /* APB_CLK is used */
+#  define UART_CLK_FREQ rtc_clk_apb_freq_get() /* APB_CLK is used */
+#elif CPU_FAM_ESP32C6
+#  define UART_CLK_FREQ (CLK_LL_PLL_80M_FREQ_MHZ * MHZ)  /* PLL_F80M_CLK is used */
 #elif CPU_FAM_ESP32H2
-#define UART_CLK_FREQ   (CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
+#  define UART_CLK_FREQ (CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
 #else
-#error "Platform implementation is missing"
+#  error "Platform implementation is missing"
 #endif
 
 #endif /* defined(CPU_ESP8266) */
