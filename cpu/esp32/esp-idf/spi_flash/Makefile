@@ -23,7 +23,7 @@ ESP32_SDK_SRC = \
   components/spi_flash/spi_flash_chip_winbond.c \
   #
 
-ifneq (,$(filter esp32s2 esp32s3 esp32c3 esp32h2,$(CPU_FAM)))
+ifneq (,$(filter esp32s2 esp32s3 esp32c3 esp32c6 esp32h2,$(CPU_FAM)))
   ESP32_SDK_SRC += components/hal/spi_flash_hal_gpspi.c
 endif
 
