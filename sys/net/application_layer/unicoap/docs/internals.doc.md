@@ -76,7 +76,7 @@ using confirmable and acknowledgement messages.
 
 #### CoAP over TCP, CoAP over TLS, and CoAP over WebScokets (RFC 8323)
 RFC 8323 eliminates the need for reliability to be implement on the application layer, as the underlying
-transport protocol already provides realiability. While message processing looks the same for both
+transport protocol already provides reliability. While message processing looks the same for both
 CoAP over TCP/TLS ([RFC 8323, Section 3](https://datatracker.ietf.org/doc/html/rfc8323#section-3)) and
 CoAP over WebSockets ([RFC 8323, Section 4](https://datatracker.ietf.org/doc/html/rfc8323#section-4)),
 the PDU format employed *does* vary a little between them.
@@ -103,7 +103,7 @@ support module. For example, the CoAP over DTLS driver encompasses a transport m
 and depends on the common RFC 7252 messaging module also employed by the CoAP over UDP driver.
 You can see this relationship in `Makefile.dep` in the `unicoap` source directory. The common
 messaging module is a shared dependency of both the `unicoap_driver_udp` and `unicoap_driver_dtls`
-driver module. We encourage you to follow the same approach for CoAP combinatons that share a common
+driver module. We encourage you to follow the same approach for CoAP combinations that share a common
 messaging model, such as CoAP over TCP, TLS, and WebSockets when implementing these.
 
 On a high level, each driver interacts with the upper layers on these three occasions:
