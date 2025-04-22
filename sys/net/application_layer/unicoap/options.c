@@ -620,65 +620,6 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
     return 0;
 }
 
-int __remove_me_unicoap_options_remove(unicoap_options_t* options, unicoap_option_number_t number)
-{
-    int i = _find_option_index(options, number);
-    if (unlikely(i < 0)) {
-        return 0;
-    }
-
-    unicoap_option_entry_t* e = &options->entries[i];
-
-    if ((i + 1) == (int)options->option_count) {
-        options->storage_size -= e->size;
-        options->option_count -= 1;
-    }
-    else {
-        /* The successor's option delta will change */
-        unicoap_option_entry_t* next = e + 1;
-        uint8_t length_nibble = DECODE_LENGTH_NIBBLE(*next->data);
-        uint16_t new_delta = next->number - number;
-
-        /* This diff corresponds to the number of bytes the next option
-         * grows (positive) or shrinks by (negative) */
-        ssize_t diff = _option_size_diff(new_delta, DECODE_DELTA_NIBBLE(*next->data));
-        /* the extended delta field's size might change due to a new
-         * delta value */
-        ssize_t total_diff = -(int)e->size + diff;
-
-        size_t new_size = options->storage_size + total_diff;
-        if (new_size > options->storage_capacity) {
-            OPTIONS_DEBUG("storage too small to remove option (delta of next option changes)\n");
-            return -ENOBUFS;
-        }
-
-        /* shift, starting at extended length field
-         * [ Nibbles (1B) | extended delta | extended length | value ] [ Nib...
-         *   \______ changes anyway ______/ \>>>>>> shift remainder >>>>>>>
-         */
-        uint8_t* cursor =
-            next->data + 1 + _uint_extended_size_from_nibble(DECODE_DELTA_NIBBLE(*next->data));
-        next->data = e->data; /* next option takes place of removed */
-        next->size += diff;   /* amount for changes in ext. delta field size */
-
-        size_t remainder_size =
-            options->storage_size - ((uintptr_t)cursor - (uintptr_t)options->entries->data);
-        /* need to move next and all options after that at the same time,
-         * otherwise we may overwrite data of one another */
-        memmove(cursor + total_diff, cursor, remainder_size);
-        options->storage_size = new_size;
-
-        /* rewrite nibbles (1B) and extended delta field */
-        cursor = e->data;
-        _write_head_partial(&cursor, new_delta, length_nibble);
-
-        /* remove entry from options lookup array */
-        _shift_option_entries(options, i + 1, -1);
-        _update_option_entries(options, i, total_diff);
-    }
-    return 0;
-}
-
 int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number_t number)
 {
     OPTIONS_DEBUG("attempting to remove %s (nr=%u)\n", unicoap_string_from_option_number(number),
