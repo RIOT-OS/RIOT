@@ -36,6 +36,9 @@ OPTIONAL_CFLAGS_BLACKLIST += -Wdocumentation -Wno-error=documentation -Wno-docum
 # We use GDB for debugging
 include $(RIOTMAKE)/tools/gdb.inc.mk
 
+# GCC's static analysis tools can be enabled using -fanalyzer
+CFLAGS_STATIC_ANALYSIS := -fanalyzer
+
 # Data address spaces starts at zero for all supported architectures. This fixes
 # compilation at least on MSP430 and AVR.
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
