@@ -9,10 +9,10 @@
 
 #pragma once
 
-#include "net/unicoap/constants.h"
-#include "net/unicoap/config.h"
-#include "net/unicoap/message.h"
-#include "net/unicoap/options.h"
+#include "net/unicoap/constants.h" /* IWYU pragma: export */
+#include "net/unicoap/config.h" /* IWYU pragma: export */
+#include "net/unicoap/message.h" /* IWYU pragma: export */
+#include "net/unicoap/options.h" /* IWYU pragma: export */
 
 /**
  * @addtogroup net_unicoap
