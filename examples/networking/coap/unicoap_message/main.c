@@ -58,7 +58,7 @@ static void _example_handle_message(const unicoap_message_t* message)
 
     assert(format == UNICOAP_FORMAT_JSON);
 
-    /* Uri-Query can occur more than once. Hence, unicoap provides multiple conenience
+    /* Uri-Query can occur more than once. Hence, unicoap provides multiple convenience
      * accessors. */
     char* query = NULL;
 
