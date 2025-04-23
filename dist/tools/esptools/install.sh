@@ -1,7 +1,6 @@
 #!/bin/sh
 
 ESP32_GCC_RELEASE="esp-14.2.0_20241119"
-ESP32_GCC_VERSION_DIR="14.2.0"
 ESP32_GCC_VERSION_DOWNLOAD="14.2.0_20241119"
 
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
@@ -111,7 +110,7 @@ install_arch()
     TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}"
 
     if [ "$1" = "esp8266" ]; then
-        git clone https://github.com/gschorcht/xtensa-esp8266-elf ${TOOLS_DIR}/${TARGET_ARCH}
+        git clone https://github.com/gschorcht/xtensa-esp8266-elf "${TOOLS_DIR}/${TARGET_ARCH}"
     else
         URL_PATH="https://github.com/espressif/crosstool-NG/releases/download"
         URL_TGZ="${TARGET_ARCH}-${ESP32_GCC_VERSION_DOWNLOAD}-${OS}.tar.xz"
