@@ -11,7 +11,7 @@
  * @ingroup      sys_stdio
  * @brief        STDIO via the USB Serial/JTAG debug interface found on some ESP32 SoCs
  *
- * Some members of the ESP32 family (ESP32-C3, ESP32-S3, ESP32-H2) provide a on-chip
+ * Some members of the ESP32 family (ESP32-C3, ESP32-H2, ESP32-S3) provide a on-chip
  * debug interface that provides a serial console and JTAG via USB.
  *
  * To route STDIO to this debug console, enable this module.
@@ -71,8 +71,9 @@ This document describes the RIOT implementation for supported variants
     2. [WiFi Network Interface](#esp32_wifi_network_interface)
     3. [WiFi SoftAP Network Interface](#esp32_wifi_ap_network_interface)
     4. [ESP-NOW Network Interface](#esp32_esp_now_network_interface)
-    4. [Bluetooth Interface](#esp32_esp_bluetooth_interface)
-    5. [Other Network Devices](#esp32_other_network_devices)
+    5. [Bluetooth Interface](#esp32_esp_bluetooth_interface)
+    6. [IEEE 802.15.4 Network Interface](#esp32_esp_ieee802154_interface)
+    7. [Other Network Devices](#esp32_other_network_devices)
 10. [Application-Specific Configurations](#esp32_application_specific_configurations)
     1. [Make Variable `CFLAGS`](#esp32_config_make_variable)
     2. [Application-Specific Board Configuration](#esp32_application_specific_board_configuration)
@@ -182,9 +183,10 @@ either based on
 
 - Tensilica Xtensa 32-bit LX6 microprocessor (ESP32),
 - Tensilica Xtensa 32-bit LX7 microprocessor (ESP32-S2, ESP32-S3), or
-- 32-bit RISC-V CPU (ESP32-C3, ESP32-H2).
+- 32-bit RISC-V CPU (ESP32-C3, ESP32-C3 ESP32-H2).
 
-At the moment, ESP32, ESP32-S2, ESP32-S3 and ESP32-C3 variants (families) are supported by RIOT-OS.
+At the moment, ESP32, ESP32-S2, ESP32-S3, ESP32-C3 and ESP32-H2
+variants (families) are supported by RIOT-OS.
 
 @note Even if the used ESP32x SoC is a dual-core version, RIOT-OS uses only
       one core.
@@ -219,7 +221,7 @@ The key features of ESP32 are:
 | GPIO              | 34 (6 are only inputs, 18 are RTC GPIOs)                          | yes |
 | I2C               | 2                                                                 | yes |
 | SDMMC             | 2                                                                 | yes |
-| SPI               | 4                                                                 | yes (2) |
+| SPI               | 4 (2 are usable as general purpose SPI)                           | yes |
 | UART              | 3                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | v4.2 BR/EDR and BLE                                               | yes |
@@ -243,7 +245,7 @@ The key features of ESP32-C3 are:
 | MCU               | ESP32-C3                                                          | Supported by RIOT |
 | ------------------|-------------------------------------------------------------------|------------------ |
 | Vendor            | Espressif                                                         | |
-| Cores             | 1 32-bit RISC-V core                                              | yes |
+| Cores             | 1 x 32-bit RISC-V core                                            | yes |
 | FPU               | -                                                                 | -   |
 | RAM               | 400 KiB SRAM <br> 8 KiB RTC SRAM                                  | yes <br> yes |
 | ROM               | 384 KiB                                                           | yes |
@@ -255,7 +257,7 @@ The key features of ESP32-C3 are:
 | DAC               | -                                                                 | -   |
 | GPIO              | 22                                                                | yes |
 | I2C               | 1                                                                 | yes |
-| SPI               | 3                                                                 | yes (1) |
+| SPI               | 3 (1 is usable as general purpose SPI)                            | yes |
 | UART              | 2                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | Bluetooth 5 (LE)                                                  | yes |
@@ -267,6 +269,43 @@ The key features of ESP32-C3 are:
 | Crypto            | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG                | no  |
 | Vcc               | 3.0 - 3.6 V                                                       | |
 | Documents         | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-c3_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf) | |
+
+</center><br>
+
+### Features of The ESP32-H2 SoC variant (family)
+
+The key features of ESP32-H2 are:
+
+<center>
+
+| MCU               | ESP32-H2                                                          | Supported by RIOT |
+| ------------------|-------------------------------------------------------------------|------------------ |
+| Vendor            | Espressif                                                         | |
+| Cores             | 1 x 32-bit RISC-V core                                            | yes |
+| FPU               | -                                                                 | -   |
+| RAM               | 320 KiB SRAM <br> 4 KiB LP SRAM                                   | yes <br> yes |
+| ROM               | 384 KiB                                                           | yes |
+| Flash             | 4 MiB                                                             | yes |
+| Frequency         | 96 MHz, 64 Mhz, 48 MHz                                            | yes |
+| Power Consumption | 17 mA @ 96 MHz <br> 13 mA @ 64 MHz <br> 11 mA @ 64 MHz <br> 85 uA in light sleep mode <br> 7 uA in deep sleep mode | yes <br> yes <br> yes <br> yes <br> yes |
+| Timer             | 2 x 54 bit                                                        | yes |
+| ADC               | 1 x SAR-ADC with up to 5 x 12 bit channels total                  | yes |
+| DAC               | -                                                                 | -   |
+| GPIO              | 28                                                                | yes |
+| I2C               | 2                                                                 | yes |
+| SPI               | 2 (1 is usable as general purpose SPI)                            | yes |
+| UART              | 2                                                                 | yes |
+| WiFi              | -                                                                 | -   |
+| Bluetooth         | Bluetooth 5.3 (LE)                                                | yes |
+| IEEE 802.15.4     | 250 Kbps data rate in 2.4 GHz band with OQPSK PHY                 | yes |
+| Ethernet          | -                                                                 | -   |
+| CAN               | version 2.0                                                       | yes |
+| IR                | up to 4 channels TX/RX                                            | -   |
+| Motor PWM         | -                                                                 | no  |
+| LED PWM           | 6 channels with 14 bit resolution in 1 channel group with 4 timers | yes |
+| Crypto            | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG                | no  |
+| Vcc               | 3.0 - 3.6 V                                                       | |
+| Documents         | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-h2_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32-h2_technical_reference_manual_en.pdf) | |
 
 </center><br>
 
@@ -291,7 +330,7 @@ The key features of ESP32-S2 are:
 | DAC               | 2 x DAC with 8 bit                                                | -   |
 | GPIO              | 43 (22 are RTC GPIOs)                                             | yes |
 | I2C               | 2                                                                 | yes |
-| SPI               | 4                                                                 | yes (2) |
+| SPI               | 4 (2 are usable as general purpose SPI)                           | yes |
 | UART              | 2                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | -                                                                 | -   |
@@ -328,7 +367,7 @@ The key features of ESP32-S3 are:
 | GPIO              | 45 (22 are RTC GPIOs)                                             | yes |
 | I2C               | 2                                                                 | yes |
 | SDMMC             | 2                                                                 | yes |
-| SPI               | 4                                                                 | yes (2) |
+| SPI               | 4 (2 are usable as general purpose SPI)                           | yes |
 | UART              | 3                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | Bluetooth 5 (LE)                                                  | yes |
@@ -354,6 +393,7 @@ Most common modules used by ESP32x SoC boards are:
 - [ESP32-WROVER](https://www.espressif.com/sites/default/files/documentation/esp32-wrover_datasheet_en.pdf)
 - [ESP32-C3-MINI-1](https://www.espressif.com/sites/default/files/documentation/esp32-c3-mini-1_datasheet_en.pdf)
 - [ESP32-C3-WROOM-02](https://www.espressif.com/sites/default/files/documentation/esp32-c3-wroom-02_datasheet_en.pdf)
+- [ESP32-H2-MINI-1](https://www.espressif.com/sites/default/files/documentation/esp32-h2-mini-1_mini-1u_datasheet_en.pdf)
 - [ESP32-S2-MINI-1](https://www.espressif.com/sites/default/files/documentation/esp32-s2-mini-1_esp32-s2-mini-1u_datasheet_en.pdf)
 - [ESP32-S2-SOLO](https://www.espressif.com/sites/default/files/documentation/esp32-s2-solo_esp32-s2-solo-u_datasheet_en.pdf)
 - [ESP32-S2-WROOM](https://www.espressif.com/sites/default/files/documentation/esp32-s2-wroom_esp32-s2-wroom-i_datasheet_en.pdf)
@@ -384,6 +424,7 @@ The RIOT-OS for ESP32x SoCs supports the following features at the moment:
 - ESP-NOW netdev interface
 - ESP WiFi netdev interface in (WPA2 Personal Mode/Enterprise Mode, SoftAP mode)
 - ESP Ethernet MAC (EMAC) netdev interface
+- IEEE 802.15.4 HAL interface
 
 [Back to table of contents](#esp32_toc)
 
@@ -463,9 +504,9 @@ toolchain (Debian/Ubuntu package names):
 The shell script `$RIOTBASE/dist/tools/esptools/install.sh` is used to
 install Espressif's precompiled versions of the following tools:
 
-- ESP32 vendor toolchain (for ESP8266, ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
+- ESP32 vendor toolchain
 - GDB for ESP32x SoCs based on Xtensa or RISC-V
-- OpenOCD for ESP32 (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
+- OpenOCD for ESP32 (for ESP32, ESP32-S2, ESP32-S3, ESP32-C3 and ESP32-H2)
 - QEMU for ESP32x SoCs (for ESP32, ESP32-S3 and ESP32-C3)
 
 `$RIOTBASE` defines the root directory of the RIOT repository. The shell
@@ -477,7 +518,8 @@ $ dist/tools/esptools/install.sh
 Usage: install.sh <tool>
        install.sh gdb <platform>
        install.sh qemu <platform>
-<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
+<tool> = all | gdb | openocd | qemu |
+         esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -507,7 +549,8 @@ $ . dist/tools/esptools/export.sh
 Usage: export.sh <tool>
        export.sh gdb <platform>
        export.sh qemu <platform>
-<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
+<tool> = all | gdb | openocd | qemu |
+         esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -526,10 +569,8 @@ install it separately.
 
 The RIOT port uses the ESP flasher programme `esptool.py` as a package directly
 from [GitHub](https://github.com/espressif/esptool) within a virtual Python
-environment. The `esptool.py` version that is available as a Python package
-for your operating system does not normally work.
-
-The RIOT port uses the ESP flasher program `esptool.py` as package directly from [GitHub](https://github.com/espressif/esptool) within an virtual Python environment. The version of `esptool.py` available as Python package for your OS does not usually work.
+environment. The `esptool.py` available as a Python package for your operating
+system may not work.
 
 It is also possible to use your own version of `esptool.py` by overriding
 the make variable `ESPTOOL` in the command line, for example:
@@ -588,9 +629,11 @@ application. These are:
 
 Module              | Description
 --------------------|------------
+esp_ble             | Enable the built-in Bluetooth LE module, see section [Bluetooth Interface](#esp32_esp_bluetooth_interface)
 esp_eth             | Enable the Ethernet MAC (EMAC) interface as `netdev` network device, see section [Ethernet Network Interface](#esp32_ethernet_network_interface).
 esp_gdb             | Enable the compilation with debug information for debugging with [QEMU and GDB](#esp32_qemu_mode_and_gdb) (`QEMU=1`) or via [JTAG interface with OpenOCD](#esp32_jtag_debugging).
 esp_i2c_hw          | Use the hardware I2C implementation, see section [I2C Interfaces](#esp32_i2c_interfaces).
+esp_ieee802154      | Enable the built-in IEEE 802.15.4 module, see section [IEEE 802.15.4 Interface](#esp32_esp_ieee802154_interface)
 esp_idf_heap        | Use the ESP-IDF heap implementation, see section [ESP-IDF Heap Implementation](#esp32_esp_idf_heap_implementation).
 esp_log_colored     | Enable colored log output, see section [Log output](#esp32_esp_log_module).
 esp_log_startup     | Enable additional startup information, see section [Log output](#esp32_esp_log_module).
@@ -724,6 +767,7 @@ For details, see:
 
 - \ref esp32_gpio_pins_esp32 "ESP32"
 - \ref esp32_gpio_pins_esp32c3 "ESP32-C3"
+- \ref esp32_gpio_pins_esp32h2 "ESP32-H2"
 - \ref esp32_gpio_pins_esp32s2 "ESP32-S2"
 - \ref esp32_gpio_pins_esp32s3 "ESP32-S3"
 
@@ -731,13 +775,14 @@ For details, see:
 
 ## ADC Channels {#esp32_adc_channels}
 
-ESP32x SoCs integrate two SAR ADCs (ADC1 and ADC2). The bit width of the
+ESP32x SoCs integrate up to two SAR ADCs (ADC1 and ADC2). The bit width of the
 ADC devices, the number of channels per device and the GPIOs that can be
 used as ADC channels depend on the respective ESP32x SoC family. For
 details, see:
 
 - \ref esp32_adc_channels_esp32 "ESP32"
 - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
+- \ref esp32_adc_channels_esp32h2 "ESP32-H2"
 - \ref esp32_adc_channels_esp32s2 "ESP32-S2"
 - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
 
@@ -780,7 +825,7 @@ Attenuation | Voltage Range     | Symbol
       0 dB  | 0 ... 1.1V (Vref) | `ADC_ATTEN_DB_0`
 2.5 / 3 dB  | 0 ... 1.5V        | `ADC_ATTEN_DB_2_5`
       6 dB  | 0 ... 2.2V        | `ADC_ATTEN_DB_6`
-11 / 12 dB  | 0 ... 3.3V        | `ADC_ATTEN_DB_11` (default)
+11 / 12 dB  | 0 ... 3.3V        | `ADC_ATTEN_DB_12` (default)
 
 </center><br>
 
@@ -859,6 +904,7 @@ on used ESP32x SoC family, for details see:
 
 - \ref esp32_i2c_interfaces_esp32 "ESP32"
 - \ref esp32_i2c_interfaces_esp32c3 "ESP32-C3"
+- \ref esp32_i2c_interfaces_esp32h2 "ESP32-H2"
 - \ref esp32_i2c_interfaces_esp32s2 "ESP32-S2"
 - \ref esp32_i2c_interfaces_esp32s3 "ESP32-S3"
 
@@ -911,6 +957,7 @@ channel depends on respective ESP32x SoC family. For details, see:
 
 - \ref esp32_pwm_channels_esp32 "ESP32"
 - \ref esp32_pwm_channels_esp32c3 "ESP32-C3"
+- \ref esp32_pwm_channels_esp32h2 "ESP32-H2"
 - \ref esp32_pwm_channels_esp32s2 "ESP32-S2"
 - \ref esp32_pwm_channels_esp32s3 "ESP32-S3"
 
@@ -1089,6 +1136,7 @@ on used ESP32x SoC family, for details see:
 
 - \ref esp32_spi_interfaces_esp32 "ESP32"
 - \ref esp32_spi_interfaces_esp32c3 "ESP32-C3"
+- \ref esp32_spi_interfaces_esp32h2 "ESP32-H2"
 - \ref esp32_spi_interfaces_esp32s2 "ESP32-S2"
 - \ref esp32_spi_interfaces_esp32s3 "ESP32-S3"
 
@@ -1133,6 +1181,7 @@ ESP32x SoC family, for details see:
 
 - \ref esp32_timers_esp32 "ESP32"
 - \ref esp32_timers_esp32c3 "ESP32-C3"
+- \ref esp32_timers_esp32h2 "ESP32-H2"
 - \ref esp32_timers_esp32s2 "ESP32-S2"
 - \ref esp32_timers_esp32s3 "ESP32-S3"
 
@@ -1195,6 +1244,7 @@ on used ESP32x SoC family, for details see:
 
 - \ref esp32_uart_interfaces_esp32 "ESP32"
 - \ref esp32_uart_interfaces_esp32c3 "ESP32-C3"
+- \ref esp32_uart_interfaces_esp32h2 "ESP32-H2"
 - \ref esp32_uart_interfaces_esp32s2 "ESP32-S2"
 - \ref esp32_uart_interfaces_esp32s3 "ESP32-S3"
 
@@ -1789,12 +1839,24 @@ The following ESP32x SoC variants (families) integrate a Bluetooth Link
 Controller and a Bluetooth baseband system:
 
 - ESP32 supports Bluetooth v4.2 BR/EDR and Bluetooth LE
-- ESP32-C3, ESP32-S3 support Bluetooth 5 and Bluetooth mesh
+- ESP32-C3, ESP32-H2, ESP32-S3 support Bluetooth 5 and Bluetooth mesh
 
 The Bluetooth interface can be used with the Bluetooth host implementation
 of the NimBLE package. Use one of the `nimble_*` modules for different
 applications to enable the Bluetooth interface and the NimBLE host
 implementation. Please refer to the NimBle package documentation for details.
+
+[Back to table of contents](#esp32_toc)
+
+## IEEE 802.15.4 Network Interface {#esp32_esp_ieee802154_interface}
+
+ESP-H2 includes an IEEE 802.15.4 subsystem
+that integrates PHY and MAC layer.
+
+The \ref drivers_ieee802154_hal "IEEE 802.15.4 Hardware Abstraction Layer"
+driver for the IEEE 802.15.4 subsystem of ESP32x SoCs (module `esp_ieee802154`)
+can be used together with RIOT's \ref net_ieee802154_submac "IEEE 802.15.4 SubMAC layer"
+to use the IEEE 802.15.4 subsystem of ESP32x SoCs as network interface.
 
 [Back to table of contents](#esp32_toc)
 
@@ -1998,6 +2060,7 @@ For details, see:
 
 - \ref esp32_jtag_interface_esp32 "ESP32"
 - \ref esp32_jtag_interface_esp32c3 "ESP32-C3"
+- \ref esp32_jtag_interface_esp32h2 "ESP32-H2"
 - \ref esp32_jtag_interface_esp32s2 "ESP32-S2"
 - \ref esp32_jtag_interface_esp32s3 "ESP32-S3"
 
@@ -2019,6 +2082,7 @@ that can be used without additional chips. For details, see:
 
 - \ref esp32_jtag_interface_esp32 "ESP32"
 - \ref esp32_jtag_interface_esp32c3 "ESP32-C3"
+- \ref esp32_jtag_interface_esp32h2 "ESP32-H2"
 - \ref esp32_jtag_interface_esp32s2 "ESP32-S2"
 - \ref esp32_jtag_interface_esp32s3 "ESP32-S3"
 
@@ -2061,6 +2125,8 @@ Detailed information on how to configure the JTAG interface of the respective
 ESP32x SoC variant (family) can be found in ESP-IDF Programming Guide:
 
 - [ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
+- [ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/jtag-debugging/index.html)
+- [ESP32-H2](https://docs.espressif.com/projects/esp-idf/en/latest/esp32h2/api-guides/jtag-debugging/index.html)
 - [ESP32-S3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-guides/jtag-debugging/index.html)
 - [ESP32-S2](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/api-guides/jtag-debugging/index.html)
 - [ESP32-S3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-guides/jtag-debugging/index.html)

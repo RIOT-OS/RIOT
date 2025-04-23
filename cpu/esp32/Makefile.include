@@ -3,9 +3,6 @@ FLASH_CHIP  = $(CPU_FAM)
 
 export ESP32_SDK_DIR ?= $(PKGDIRBASE)/esp32_sdk
 
-# for newer ESP32 chips we need binary version 4.8.1 of esptool
-export ESPTOOL = esptool
-
 ifneq (,$(filter usb_board_reset,$(USEMODULE)))
   include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
