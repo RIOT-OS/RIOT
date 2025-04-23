@@ -1,8 +1,6 @@
-/**
- * @defgroup    boards_stm32f429i-disco STM32F429I-DISCO
- * @ingroup     boards
- * @brief       Support for the STM32F429I-DISCO board
- */
+@defgroup    boards_stm32f429i-disco STM32F429I-DISCO
+@ingroup     boards
+@brief       Support for the STM32F429I-DISCO board
 
 ### General information
 

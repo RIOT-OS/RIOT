@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_stm32f4discovery STM32F4Discovery
 @ingroup     boards
 @brief       Support for the STM32F4Discovery board
@@ -261,4 +260,3 @@ is a good value to start with.
 If you want the terminal to work using `make term` command and get a message
 about missing tty device install the driver from
 https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers .
- */

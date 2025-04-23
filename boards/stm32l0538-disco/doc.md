@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_stm32l0538-disco STM32L0538-DISCO
- * @ingroup     boards
- * @brief       Support for the STM32L0538-DISCO board
+@defgroup    boards_stm32l0538-disco STM32L0538-DISCO
+@ingroup     boards
+@brief       Support for the STM32L0538-DISCO board
 
 ### Introduction
 
@@ -76,5 +75,3 @@ required. Use the `term` target to open a terminal:
 
 If an external ST-Link adapter is used, RX and TX pins can be directly connected
 to it. In this case, STDIO is available on /dev/ttyACMx (Linux case).
-
- */
