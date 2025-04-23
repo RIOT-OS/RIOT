@@ -25,6 +25,7 @@
 #ifndef SUIT_TRANSPORT_WORKER_H
 #define SUIT_TRANSPORT_WORKER_H
 
+#include <stdbool.h>
 #if MODULE_NANOCOAP
 #  include "net/nanocoap.h"
 #endif
@@ -38,8 +39,11 @@ extern "C" {
  *
  * @param[in] url       url pointer containing the full coap url to the manifest
  * @param[in] len       length of the url
+ *
+ * @retval true if the worker was triggered
+ * @retval false if the worker is already busy
  */
-void suit_worker_trigger(const char *url, size_t len);
+bool suit_worker_trigger(const char *url, size_t len);
 
 /**
  * @brief   Trigger a SUIT update via a worker thread
