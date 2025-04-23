@@ -1,0 +1,69 @@
+# Reasoning
+# =========
+#
+# Selection of Checks
+# ------------------
+#
+# Selecting the following general purpose checks relevant for C code:
+# - clang-analyzer-* ()
+# - bugprone-*
+# - readability-*
+# - misc-*
+#
+# Additional checks for other languages or specific to projects/coding standards
+# are not used, expected for the Linux kernel coding conventions, as the RIOT
+# coding conventions builds upon the Linux coding conventions.
+#
+# Finally, the following checks are disabled:
+# - bugprone-reserved-identifier:
+#       Too many false positives, as check does not take `static` declaration
+#       into account
+# - bugprone-easily-swappable-parameters:
+#       This cannot be avoided
+# - bugprone-too-small-loop-variable:
+#       Too many false positives
+#
+#
+# Which Warnings to Raise to Errors
+# ---------------------------------
+#
+# - bugprone-*:
+#       Avoiding known pitfalls or explicitly adding a magic comment and a
+#       reasoning for why sticking with a footgun should be doable
+# - portability-*:
+#       Porability issues bite us hard due to the wide varity of board,
+#       toolchains, standard C libs, etc. we use. So we should avoid them
+#       where possible
+#
+#
+# Fine Tuning
+# -----------
+#
+# - readability-function-cognitive-complexity.IgnoreMacros: 'true':
+#       Otherwise the use of `DEBUG()...` will be penalized, even though it
+#       helps both in debugging and to document the code.
+#
+# Warning
+# -------
+#
+# This configuration file is rather new and may enable a few warnings with a
+# low signal-to-noise ratio are may not enable checks that would be exteremely
+# helpful. If you modify this file to improve your experience, please consider
+# upstreaming the changes.
+---
+Checks: "clang-analyzer-*,
+         bugprone-*,
+         portability-*,
+         readability-*,
+         misc-*,
+         linuxkernel-*,
+         -bugprone-reserved-identifier,
+         -bugprone-easily-swappable-parameters,
+        "
+WarningsAsErrors: "bugprone-*,
+                   portability-*,
+                  "
+HeaderFilterRegex: ''
+FormatStyle:     file
+CheckOptions:
+  readability-function-cognitive-complexity.IgnoreMacros: 'true'
