@@ -107,10 +107,11 @@ TESTRUNNER_RESET_AFTER_TERM ?= 1
 # with ed25519 support.
 TEST_ON_CI_BLACKLIST = all
 
+# Include global Makefile.include first to apply board aliasses
+include $(RIOTBASE)/Makefile.include
+
 # Add custom SUIT targets
 include $(CURDIR)/Makefile.suit.custom
-
-include $(RIOTBASE)/Makefile.include
 
 # export IFACE for test
 $(call target-export-variables,test-with-config test-with-config/check-config,IFACE)
