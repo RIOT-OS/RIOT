@@ -134,6 +134,9 @@ static void sx126x_init_default_config(sx126x_t *dev)
     /* packet type must be set first */
     sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
     sx126x_set_channel(dev, CONFIG_SX126X_CHANNEL_DEFAULT);
+#ifdef CONFIG_LORA_SX126X_DEFAULT_SYNC_WORD
+    sx126x_set_lora_sync_word(dev, CONFIG_LORA_SX126X_DEFAULT_SYNC_WORD);
+#endif
 
     /* Configure PA optimal settings for maximum output power
      * Values used here comes from the datasheet, section 13.1.14 SetPaConfig
