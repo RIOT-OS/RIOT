@@ -50,6 +50,10 @@ def fix_headerguard(filename):
     for line in inlines:
         if line.startswith("#pragma once"):
             pragma_once_found += 1
+        elif line.lstrip().startswith("#pragma once"):
+            # check for lines that have leading whitespaces and add a correction
+            pragma_once_found += 1
+            line = "#pragma once\n"
         if guard_found == 0 and pragma_once_found == 0:
             if line.startswith("#ifndef"):
                 guard_found += 1
