@@ -61,6 +61,17 @@ export default defineConfig({
                 "getting-started/finding_modules",
               ],
             },
+            {
+              label: "C Basics",
+              items: [
+                "c_tutorials/create_project",
+                "c_tutorials/timers",
+                "c_tutorials/shell",
+                "c_tutorials/threads",
+                "c_tutorials/gpio",
+                "c_tutorials/saul",
+              ],
+            },
           ],
         },
         {

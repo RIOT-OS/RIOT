@@ -112,6 +112,8 @@ One last manual step is to add the new guide to the navigation. This is done in 
 
 Compared to the Doxygen output we want to be extremely careful about the navigation and only show the guides that are relevant to the user and in a logical order that does not overwhelm the user with too many options at once.
 
+It is also important to note that the place in each section is directly related to the order in which the guides are listed in the `sidebar` array in the `astro.config.mjs` file. The order of the items in the array determines the order in which they will be displayed in the navigation. So if you want to place your guide at the top of a section, you should add it to the beginning of the `items` array for that section.
+
 Generally, the less information you declare within the config the better, given that ideally your frontmatter information is enough to generate the navigation.
 
 You can either add your guide to an existing section or create a new section. In the event that you want to simply append your guide to an existing section, you can simply add the file name to the list of files in the section. The root of the so called `slug` of your file is the guides folder itself, so a guide under `doc/guides/test/hello_world.md` will have the slug `test/hello_world.md`.
