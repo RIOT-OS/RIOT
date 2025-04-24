@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_atomic_utils    Utility functions for atomic access
  * @ingroup     sys
@@ -133,9 +135,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef ATOMIC_UTILS_H
-#define ATOMIC_UTILS_H
-
 #include <stdint.h>
 
 #include "irq.h"
@@ -147,6 +146,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* NOLINTBEGIN(bugprone-macro-parentheses, readability-inconsistent-declaration-parameter-name)
+ *
+ * The macros ATOMIC_LOAD_IMPL() and friends do not surround the argument used
+ * to pass the type with parenthesis. Suppressing the clang-tidy warning here,
+ * as adding parenthesis around a type would be a synstax error.
+ *
+ * The macro ATOMIC_FETCH_OP_IMPL() uses `val` as argument value. But we want
+ * the declaration may be more specific (e.g. summand instead of val).
+ */
 
 /* Declarations and documentation: */
 
@@ -239,6 +248,28 @@ static inline uint32_t atomic_load_u32(const volatile uint32_t *var);
  * @return  The value stored in @p var
  */
 static inline uint64_t atomic_load_u64(const volatile uint64_t *var);
+/**
+ * @brief   Load an `unsigned int` atomically
+ *
+ * @param[in]       var     Variable to load atomically
+ * @return  The value stored in @p var
+ *
+ * @note    This effectively an alias for @ref atomic_load_u64,
+ *          @ref atomic_load_u32, or @ref atomic_load_u16 depending on the size
+ *          of `unsigned int`.
+ */
+static inline unsigned atomic_load_unsigned(const volatile unsigned *var)
+{
+    if (sizeof(uint64_t) == sizeof(unsigned)) {
+        return atomic_load_u64((volatile void *)var);
+    }
+
+    if (sizeof(uint32_t) == sizeof(unsigned)) {
+        return atomic_load_u32((volatile void *)var);
+    }
+
+    return atomic_load_u16((volatile void *)var);
+}
 
 /**
  * @brief   Load an `uintptr_t` atomically
@@ -250,12 +281,12 @@ static inline uintptr_t atomic_load_uintptr(const volatile uintptr_t *var) {
     if (sizeof(uintptr_t) == 2) {
         return atomic_load_u16((const volatile uint16_t *)var);
     }
-    else if (sizeof(uintptr_t) == 4) {
+
+    if (sizeof(uintptr_t) == 4) {
         return atomic_load_u32((const volatile uint32_t *)(uintptr_t)var);
     }
-    else {
-        return atomic_load_u64((const volatile uint64_t *)(uintptr_t)var);
-    }
+
+    return atomic_load_u64((const volatile uint64_t *)(uintptr_t)var);
 }
 /**
  * @brief   Load an `void *` atomically
@@ -274,7 +305,7 @@ static inline void * atomic_load_ptr(void **ptr_addr) {
  */
 static inline kernel_pid_t atomic_load_kernel_pid(const volatile kernel_pid_t *var)
 {
-    return atomic_load_u16((const volatile uint16_t *)var);
+    return (kernel_pid_t)atomic_load_u16((const volatile uint16_t *)var);
 }
 /** @} */
 
@@ -306,6 +337,27 @@ static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val);
  * @param[in]       val     Value to write
  */
 static inline void atomic_store_u64(volatile uint64_t *dest, uint64_t val);
+/**
+ * @brief  Store an `uint64_t` atomically
+ * @param[out]      dest    Location to atomically write the new value to
+ * @param[in]       val     Value to write
+ *
+ * @note    This is effectively an alias of @ref atomic_store_u64,
+ *          @ref atomic_store_u32, or @ref atomic_store_u16 depending on the
+ *          size of `unsigned int`.
+ */
+static inline void atomic_store_unsigned(volatile unsigned *dest, unsigned val)
+{
+    if (sizeof(uint64_t) == sizeof(unsigned)) {
+        atomic_store_u64((volatile void *)dest, val);
+    }
+    else if (sizeof(uint32_t) == sizeof(unsigned)) {
+        atomic_store_u32((volatile void *)dest, val);
+    }
+    else {
+        atomic_store_u16((volatile void *)dest, val);
+    }
+}
 
 /**
  * @brief   Store an `uintptr_t` atomically
@@ -383,6 +435,29 @@ static inline uint32_t atomic_fetch_add_u32(volatile uint32_t *dest,
  */
 static inline uint64_t atomic_fetch_add_u64(volatile uint64_t *dest,
                                             uint64_t summand);
+/**
+ * @brief   Atomically add a value onto a given value
+ * @param[in,out]   dest    Add @p summand onto this value atomically in-place
+ * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref atomic_fetch_add_u64,
+ *          @ref atomic_fetch_add_u32, or @ref atomic_fetch_add_u16 depending
+ *          on the size of `unsigned int`.
+ */
+static inline unsigned atomic_fetch_add_unsigned(volatile unsigned *dest,
+                                                 unsigned summand)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return atomic_fetch_add_u64((volatile void *)dest, summand);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return atomic_fetch_add_u32((volatile void *)dest, summand);
+    }
+
+    return atomic_fetch_add_u16((volatile void *)dest, summand);
+}
 /** @} */
 
 /**
@@ -425,6 +500,30 @@ static inline uint32_t atomic_fetch_sub_u32(volatile uint32_t *dest,
  */
 static inline uint64_t atomic_fetch_sub_u64(volatile uint64_t *dest,
                                             uint64_t subtrahend);
+/**
+ * @brief   Atomically subtract a value from a given value
+ * @param[in,out]   dest        Subtract @p subtrahend from this value
+ *                              atomically in-place
+ * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref atomic_fetch_sub_u64,
+ *          @ref atomic_fetch_sub_u32, or @ref atomic_fetch_sub_u16 depending
+ *          on the size of `unsigned int`.
+ */
+static inline unsigned atomic_fetch_sub_unsigned(volatile unsigned *dest,
+                                                 unsigned subtrahend)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return atomic_fetch_sub_u64((volatile void *)dest, subtrahend);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return atomic_fetch_sub_u32((volatile void *)dest, subtrahend);
+    }
+
+    return atomic_fetch_sub_u16((volatile void *)dest, subtrahend);
+}
 /** @} */
 
 /**
@@ -466,6 +565,30 @@ static inline uint32_t atomic_fetch_or_u32(volatile uint32_t *dest,
  */
 static inline uint64_t atomic_fetch_or_u64(volatile uint64_t *dest,
                                            uint64_t val);
+/**
+ * @brief   Atomic version of `*dest |= val`
+ * @param[in,out]   dest        Replace this value with the result of
+ *                              `*dest | val`
+ * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref atomic_fetch_or_u64,
+ *          @ref atomic_fetch_or_u32, or @ref atomic_fetch_or_u16 depending
+ *          on the size of `unsigned int`.
+ */
+static inline unsigned atomic_fetch_or_unsigned(volatile unsigned *dest,
+                                                unsigned val)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return atomic_fetch_or_u64((volatile void *)dest, val);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return atomic_fetch_or_u32((volatile void *)dest, val);
+    }
+
+    return atomic_fetch_or_u16((volatile void *)dest, val);
+}
 /** @} */
 
 /**
@@ -507,6 +630,30 @@ static inline uint32_t atomic_fetch_xor_u32(volatile uint32_t *dest,
  */
 static inline uint64_t atomic_fetch_xor_u64(volatile uint64_t *dest,
                                             uint64_t val);
+/**
+ * @brief   Atomic version of `*dest ^= val`
+ * @param[in,out]   dest        Replace this value with the result of
+ *                              `*dest ^ val`
+ * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref atomic_fetch_xor_u64,
+ *          @ref atomic_fetch_xor_u32, xor @ref atomic_fetch_xor_u16 depending
+ *          on the size of `unsigned int`.
+ */
+static inline unsigned atomic_fetch_xor_unsigned(volatile unsigned *dest,
+                                                 unsigned val)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return atomic_fetch_xor_u64((volatile void *)dest, val);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return atomic_fetch_xor_u32((volatile void *)dest, val);
+    }
+
+    return atomic_fetch_xor_u16((volatile void *)dest, val);
+}
 /** @} */
 
 /**
@@ -548,6 +695,30 @@ static inline uint32_t atomic_fetch_and_u32(volatile uint32_t *dest,
  */
 static inline uint64_t atomic_fetch_and_u64(volatile uint64_t *dest,
                                             uint64_t val);
+/**
+ * @brief   Atomic version of `*dest &= val`
+ * @param[in,out]   dest        Replace this value with the result of
+ *                              `*dest & val`
+ * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref atomic_fetch_and_u64,
+ *          @ref atomic_fetch_and_u32, and @ref atomic_fetch_and_u16 depending
+ *          on the size of `unsigned int`.
+ */
+static inline unsigned atomic_fetch_and_unsigned(volatile unsigned *dest,
+                                                 unsigned val)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return atomic_fetch_and_u64((volatile void *)dest, val);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return atomic_fetch_and_u32((volatile void *)dest, val);
+    }
+
+    return atomic_fetch_and_u16((volatile void *)dest, val);
+}
 /** @} */
 
 /**
@@ -679,6 +850,30 @@ static inline uint32_t semi_atomic_fetch_add_u32(volatile uint32_t *dest,
  */
 static inline uint64_t semi_atomic_fetch_add_u64(volatile uint64_t *dest,
                                                  uint64_t summand);
+/**
+ * @brief   Semi-atomically add a value onto a given value
+ * @param[in,out]   dest    Add @p summand onto this value semi-atomically
+ *                          in-place
+ * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref semi_atomic_fetch_add_u64,
+ *          @ref semi_atomic_fetch_add_u32, or @ref semi_atomic_fetch_add_u16,
+ *          depending on the size of `unsigned int`.
+ */
+static inline unsigned semi_atomic_fetch_add_unsigned(volatile unsigned *dest,
+                                                      unsigned summand)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return semi_atomic_fetch_add_u64((volatile void *)dest, summand);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return semi_atomic_fetch_add_u32((volatile void *)dest, summand);
+    }
+
+    return semi_atomic_fetch_add_u16((volatile void *)dest, summand);
+}
 /** @} */
 
 /**
@@ -721,6 +916,30 @@ static inline uint32_t semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
  */
 static inline uint64_t semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
                                                  uint64_t subtrahend);
+/**
+ * @brief   Semi-atomically subtract a value from a given value
+ * @param[in,out]   dest        Subtract @p subtrahend from this value
+ *                              semi-atomically in-place
+ * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref semi_atomic_fetch_sub_u64,
+ *          @ref semi_atomic_fetch_sub_u32, or @ref semi_atomic_fetch_sub_u16,
+ *          depending on the size of `unsigned int`.
+ */
+static inline unsigned semi_atomic_fetch_sub_unsigned(volatile unsigned *dest,
+                                                      unsigned subtrahend)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return semi_atomic_fetch_sub_u64((volatile void *)dest, subtrahend);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return semi_atomic_fetch_sub_u32((volatile void *)dest, subtrahend);
+    }
+
+    return semi_atomic_fetch_sub_u16((volatile void *)dest, subtrahend);
+}
 /** @} */
 
 /**
@@ -762,6 +981,30 @@ static inline uint32_t semi_atomic_fetch_or_u32(volatile uint32_t *dest,
  */
 static inline uint64_t semi_atomic_fetch_or_u64(volatile uint64_t *dest,
                                                 uint64_t val);
+/**
+ * @brief   Semi-atomic version of `*dest |= val`
+ * @param[in,out]   dest        Replace this value with the result of
+ *                              `*dest | val`
+ * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref semi_atomic_fetch_or_u64,
+ *          @ref semi_atomic_fetch_or_u32, or @ref semi_atomic_fetch_or_u16,
+ *          depending on the size of `unsigned int`.
+ */
+static inline unsigned semi_atomic_fetch_or_unsigned(volatile unsigned *dest,
+                                                     unsigned val)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return semi_atomic_fetch_or_u64((volatile void *)dest, val);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return semi_atomic_fetch_or_u32((volatile void *)dest, val);
+    }
+
+    return semi_atomic_fetch_or_u16((volatile void *)dest, val);
+}
 /** @} */
 
 /**
@@ -804,6 +1047,30 @@ static inline uint32_t semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
  */
 static inline uint64_t semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
                                                  uint64_t val);
+/**
+ * @brief   Semi-atomic version of `*dest ^= val`
+ * @param[in,out]   dest        Replace this value with the result of
+ *                              `*dest ^ val`
+ * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref semi_atomic_fetch_xor_u64,
+ *          @ref semi_atomic_fetch_xor_u32, xor @ref semi_atomic_fetch_xor_u16,
+ *          depending on the size of `unsigned int`.
+ */
+static inline unsigned semi_atomic_fetch_xor_unsigned(volatile unsigned *dest,
+                                                      unsigned val)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return semi_atomic_fetch_xor_u64((volatile void *)dest, val);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return semi_atomic_fetch_xor_u32((volatile void *)dest, val);
+    }
+
+    return semi_atomic_fetch_xor_u16((volatile void *)dest, val);
+}
 /** @} */
 
 /**
@@ -846,6 +1113,30 @@ static inline uint32_t semi_atomic_fetch_and_u32(volatile uint32_t *dest,
  */
 static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
                                                  uint64_t val);
+/**
+ * @brief   Semi-atomic version of `*dest &= val`
+ * @param[in,out]   dest        Replace this value with the result of
+ *                              `*dest & val`
+ * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
+ *
+ * @note    This is effectively an alias of @ref semi_atomic_fetch_and_u64,
+ *          @ref semi_atomic_fetch_and_u32, and @ref semi_atomic_fetch_and_u16,
+ *          depending on the size of `unsigned int`.
+ */
+static inline unsigned semi_atomic_fetch_and_unsigned(volatile unsigned *dest,
+                                                      unsigned val)
+{
+    if (sizeof(unsigned) == sizeof(uint64_t)) {
+        return semi_atomic_fetch_and_u64((volatile void *)dest, val);
+    }
+
+    if (sizeof(unsigned) == sizeof(uint32_t)) {
+        return semi_atomic_fetch_and_u32((volatile void *)dest, val);
+    }
+
+    return semi_atomic_fetch_and_u16((volatile void *)dest, val);
+}
 /** @} */
 
 /* Fallback implementations of atomic utility functions: */
@@ -1391,5 +1682,5 @@ static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
 }
 #endif
 
-#endif /* ATOMIC_UTILS_H */
+/* NOLINTEND(bugprone-macro-parentheses, readability-inconsistent-declaration-parameter-name) */
 /** @} */
