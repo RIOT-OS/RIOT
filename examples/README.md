@@ -142,3 +142,14 @@ Here is a quick overview of the examples available in the RIOT:
 | [twr_aloha](./advanced/twr_aloha/README.md) | This example allows testing different two-way ranging algorithms between two boards supporting a dw1000 device. This makes use of the uwb-core pkg. |
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
+
+## Examples for Guides
+
+| Example | Description |
+|---------|-------------|
+| [creating_project](./guides/creating_project/README.md) | This example is used in the [Create Project](https://guide.riot-os.org/c_tutorials/create_project/) tutorial |
+| [shell](./guides/shell/README.md) | This example is used in the [Echo](https://guide.riot-os.org/c_tutorials/shell/) tutorial |
+| [gpio](./guides/gpio/README.md) | This example is used in the [GPIO](https://guide.riot-os.org/c_tutorials/gpio/) tutorial |
+| [saul](./guides/saul/README.md) | This example is used in the [SAUL](https://guide.riot-os.org/c_tutorials/saul/) tutorial |
+| [threads](./guides/threads/README.md) | This example is used in the [Threads](https://guide.riot-os.org/c_tutorials/threads/) tutorial |
+| [timers](./guides/timers/README.md) | This example is used in the [Timers](https://guide.riot-os.org/c_tutorials/timers/) tutorial |
