@@ -49,6 +49,17 @@ export default defineConfig({
           ],
         },
         {
+            label: "C Basics",
+            items: [
+              "c_tutorials/create_project",
+              "c_tutorials/timers",
+              "c_tutorials/shell",
+              "c_tutorials/threads",
+              "c_tutorials/gpio",
+              "c_tutorials/saul",
+            ],
+        },
+        {
           label: "Build System",
           items: [
             "build-system/build_system",
