@@ -1,6 +1,6 @@
 .all:
 
-.PHONY: all doc doc-man doc-latex docclean print-versions welcome
+.PHONY: all doc doc-man doc-latex docclean doc-starlight print-versions welcome
 
 all: welcome
 	@echo ""
@@ -12,8 +12,12 @@ doc doc-man doc-latex doc-ci:
 		--output-md doc/doxygen/src/feature_list.md
 	"$(MAKE)" -C doc/doxygen $@
 
+doc-starlight:
+	"$(MAKE)" -C doc/starlight dev
+
 docclean:
 	"$(MAKE)" -BC doc/doxygen clean
+	"$(MAKE)" -C doc/starlight clean
 
 pkg-clean:
 	@echo "Cleaning all package sources"
