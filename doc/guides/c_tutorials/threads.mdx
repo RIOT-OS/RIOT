@@ -1,6 +1,7 @@
 ---
 title: Threads
 description: This tutorial explains how to use threads in RIOT.
+code_folder: examples/guides/threads/
 ---
 
 import Contact from '@components/contact.astro';
@@ -53,7 +54,7 @@ Lastly, we need to actually start the thread. Go into your `main` function and i
 int main(void) {
     thread_create(my_thread_stack, sizeof(my_thread_stack),
             THREAD_PRIORITY_MAIN - 1, 0, my_first_thread, NULL,
-            "My first thread");
+            "My first thread"); 
 
     puts("Hello, from the main thread!");
 }

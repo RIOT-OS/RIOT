@@ -1,6 +1,7 @@
 ---
 title: Creating a Project
 description: This tutorial will guide you through creating a new project with a simple hello world program.
+code_folder: examples/guides/creating_project/
 ---
 import Contact from '@components/contact.astro';
 import GitSetup from '@components/gitsetup.mdx';
@@ -19,12 +20,9 @@ Now that Visual Studio Code is open, we create a new file called `main.c` and ad
 
 ```c
 #include <stdio.h>
-#include "ztimer.h"
 
 int main(void)
 {
-    ztimer_sleep(ZTIMER_SEC, 3);
-
     puts("Hello World!");
 
     return 0;
@@ -33,7 +31,7 @@ int main(void)
 
 ![The hello world program in Visual Studio Code](img/create_project/03_main_c.png)
 
-This program will print "Hello World!" to the console after sleeping for 3 seconds. We use the `ztimer_sleep` function to sleep for 3 seconds otherwise we will most likely miss the output before connecting to our device. This function is part of the `ztimer` module, which is part of RIOT. The `puts` function is part of the standard C library and is used to print a string to the console.
+This program will print "Hello World!" to the console when it is run. The `#include <stdio.h>` line includes the standard input/output library, which allows us to use the `puts` function to print to the console.
 
 ## Step 3: Creating the Makefile
 
@@ -53,9 +51,6 @@ RIOTBASE ?= $(CURDIR)/RIOT
 # which is not needed in a production environment but helps in the
 # development process:
 DEVELHELP ?= 1
-
-# This board requires a start sleep to actually catch the printed output
-USEMODULE += ztimer_sec
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
