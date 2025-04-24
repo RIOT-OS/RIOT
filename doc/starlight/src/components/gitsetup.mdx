@@ -38,3 +38,17 @@ git submodule add https://github.com/RIOT-OS/RIOT.git
 ![Adding the submodule](img/gitsetup/02_riot_submodule.png)
 
 When looking into our directory via `ls`, we can see that a new directory called `RIOT` has been created. This directory contains the RIOT source code. If you were to push your project to a git hosting service, the `RIOT` directory would not be included in the repository. Instead, the repository would contain a reference to the commit of the RIOT repository that you have added as a submodule. This way, the repository stays small and only contains the code that you have written and not the entire RIOT source code.
+
+:::note
+Remember that you need to clone your own repository with the `--recursive` option to get the submodule as well.
+
+```bash
+git clone --recursive https://git.example.com/your/repo.git
+```
+
+Alternatively if you have already cloned your own repository, you can run the following command to initialize and update the submodule:
+
+```bash
+git submodule update --init --recursive
+```
+:::

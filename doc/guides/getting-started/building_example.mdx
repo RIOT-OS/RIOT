@@ -1,0 +1,101 @@
+---
+title: Building an Example
+description: Building an example application with RIOT
+---
+
+import Contact from '@components/contact.astro';
+
+<Contact />
+
+:::note
+This guide uses the `samr21-xpro` board as an example.
+You can replace it with the name of any other supported board,
+as learned in the previous section, by replacing `samr21-xpro`
+with the name of your board.
+:::
+
+RIOT provides a number of examples in the `examples/` directory. Every example
+has a README that documents its usage and its purpose. You can build them by
+opening a shell, navigating to an example (e.g. `examples/default`), and
+running:
+
+```bash
+make BOARD=samr21-xpro
+```
+
+or
+
+```bash
+make all BOARD=samr21-xpro
+```
+
+To flash the application to a board just run:
+
+```bash
+make flash BOARD=samr21-xpro
+```
+
+You can then access the board via the serial interface:
+
+```bash
+make term BOARD=samr21-xpro
+```
+
+If you are using multiple boards you can use the `PORT` macro to specify the
+serial interface:
+
+```bash
+make term BOARD=samr21-xpro PORT=/dev/ttyACM1
+```
+
+For flashing and accessing the board via the serial interface, the current user
+needs to have the correct access rights on the serial device.
+The easiest way to ensure this is to add the current user to the group that is
+owning the serial device. For example, this can be achieved on Linux by issuing
+the following line, logging out and logging in again:
+
+```bash
+sudo usermod -aG $(stat --format="%G" /dev/ttyACM0) $USER
+```
+
+Note that the `PORT` macro has a slightly different semantic in `native`. Here
+it is used to provide the name of the TAP interface you want to use for the
+virtualized networking capabilities of RIOT.
+
+We use `pyterm` as the default terminal application. It is shipped with RIOT in
+the `dist/tools/pyterm/` directory. If you choose to use another terminal
+program you can set `TERMPROG` (and if need be the `TERMFLAGS`) macros:
+
+```bash
+make -C examples/gnrc_networking/ term \
+    BOARD=samr21-xpro \
+    TERMPROG=gtkterm \
+    TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
+```
+
+You may not see the greeting
+
+```plaintext title="The greeting message from the board"
+main(): This is RIOT!
+```
+
+when you flash the board. In this case, type `reboot` in the command line or reboot manually.
+
+:::tip[Using the native port with networking]
+If you compile RIOT for the native cpu and include the `netdev_tap` module,
+you can specify a network interface like this: `PORT=tap0 make term`
+
+*Setting up a tap network*
+
+There is a shell script in `RIOT/dist/tools/tapsetup` called `tapsetup` which
+you can use to create a network of tap interfaces.
+
+*USAGE*
+
+To create a bridge and two (or `count` at your option) tap interfaces:
+```shell
+    sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
+```
+
+A detailed example can be found in `examples/gnrc_networking`.
+:::

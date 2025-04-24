@@ -49,6 +49,21 @@ export default defineConfig({
           ],
         },
         {
+          label: "Tutorials",
+          items: [
+            {
+              label: "Getting Started",
+              items: [
+                "getting-started/install-wsl",
+                "getting-started/installing",
+                "getting-started/flashing",
+                "getting-started/building_example",
+                "getting-started/finding_modules",
+              ],
+            },
+          ],
+        },
+        {
           label: "Build System",
           items: [
             "build-system/build_system",

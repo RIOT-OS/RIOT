@@ -90,6 +90,16 @@ Now you can add content to the guide using Markdown. Starlight supports all the 
 
 You can see a full list of the supported features in the [Starlight documentation](https://starlight.astro.build/guides/authoring-content/).
 
+### MDX
+
+MDX is a superset of Markdown that allows you to use JSX components within your Markdown file. This means that you can do things such as importing reusable components. One component that is/should be used frequently is the `Contact` component, which adds a small little note explaining some ways of getting help from the RIOT community. This component is imported like this:
+
+```markdown title="doc/guides/test/hello_world.mdx"
+import Contact from '@components/contact.astro';
+
+<Contact/>
+```
+
 :::danger[Keep it simple]
 Please always keep in mind that the more non-standard Markdown you write, the more it will worsen the readability of the guide in the repository itself.
 
