@@ -1,0 +1,17 @@
+# wrap stdio functions to use mpaland's printf instead of the one from the
+# standard C lib
+LINKFLAGS += -Wl,-wrap=printf
+LINKFLAGS += -Wl,-wrap=sprintf
+LINKFLAGS += -Wl,-wrap=snprintf
+LINKFLAGS += -Wl,-wrap=vprintf
+LINKFLAGS += -Wl,-wrap=vsnprintf
+LINKFLAGS += -Wl,-wrap=putchar
+LINKFLAGS += -Wl,-wrap=puts
+
+# Workaround for bug in the newlib headers shipped with e.g. Ubuntu 24.04 LTS
+# not defining PRId64 / PRIu64 / PRIx64 / PRIo64 in <inttypes.h> due to an issue
+# in <machine/_default_types.h>. Tested to cause no regression on fixed newlib
+# headers.
+ifneq (,$(filter newlib,$(FEATURES_USED)))
+  CFLAGS += -D__int64_t_defined=1
+endif
