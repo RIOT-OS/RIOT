@@ -79,23 +79,28 @@
 
 /* millisecond timer definitions dependent on active ztimer backend */
 #if IS_USED(MODULE_ZTIMER_MSEC)
-#define _ZTIMER_ACQUIRE()       ztimer_acquire(ZTIMER_MSEC)
-#define _ZTIMER_RELEASE()       ztimer_release(ZTIMER_MSEC)
-#define _ZTIMER_NOW()           ztimer_now(ZTIMER_MSEC)
-#define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_MSEC, n)
+#define _ZTIMER_CLOCK           ZTIMER_MSEC
+#define _ZTIMER_TICKS_PER_MS    1
+
 #elif IS_USED(MODULE_ZTIMER_USEC)
-#define _ZTIMER_ACQUIRE()       ztimer_acquire(ZTIMER_USEC)
-#define _ZTIMER_RELEASE()       ztimer_release(ZTIMER_USEC)
-#define _ZTIMER_NOW()           ztimer_now(ZTIMER_USEC) / US_PER_MS
-#define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_USEC, n * US_PER_MS)
+#define _ZTIMER_CLOCK           ZTIMER_USEC
+#define _ZTIMER_TICKS_PER_MS    US_PER_MS
 #else
 #error "Either module ztimer_msec or ztimer_usec is needed"
 #endif
+
+#define _ZTIMER_ACQUIRE()       ztimer_acquire(_ZTIMER_CLOCK)
+#define _ZTIMER_RELEASE()       ztimer_release(_ZTIMER_CLOCK)
+#define _ZTIMER_NOW()           (ztimer_now(_ZTIMER_CLOCK) / _ZTIMER_TICKS_PER_MS)
+#define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(_ZTIMER_CLOCK, n * _ZTIMER_TICKS_PER_MS)
 
 /* Monitor card insertion and removal */
 #define SDHC_NISTR_CARD_DETECT   (SDHC_NISTR_CREM | SDHC_NISTR_CINS)
 #define SDHC_NISTER_CARD_DETECT  (SDHC_NISTER_CREM | SDHC_NISTER_CINS)
 #define SDHC_NISIER_CARD_DETECT  (SDHC_NISIER_CREM | SDHC_NISIER_CINS)
+
+  /* 2s timeout for IRQ wait */
+#define SDHC_IRQ_TIMEOUT_MS     (2000 * _ZTIMER_TICKS_PER_MS)
 
 #include "board.h"
 
@@ -734,7 +739,6 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
 
     sdhc_dev->error = 0;
 
-    /* TODO: timeout */
     sdhc->NISIER.reg |= event;
     sdhc->EISIER.reg |= error_mask;
 
@@ -743,7 +747,8 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
 #if defined(CPU_SAMD5X) || defined(CPU_SAME5X)
     pm_block(SAM0_PM_IDLE);
 #endif
-    mutex_lock(&sdhc_dev->irq_wait);
+    bool timeout = ztimer_mutex_lock_timeout(_ZTIMER_CLOCK, &sdhc_dev->irq_wait,
+                                             SDHC_IRQ_TIMEOUT_MS) < 0;
 #if defined(CPU_SAMD5X) || defined(CPU_SAME5X)
     pm_unblock(SAM0_PM_IDLE);
 #endif
@@ -751,9 +756,14 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
     sdhc->NISIER.reg &= ~event;
     sdhc->EISIER.reg &= ~error_mask;
 
-    if (sdhc_dev->error & error_mask) {
+    if (timeout || (sdhc_dev->error & error_mask)) {
         if (IS_USED(ENABLE_DEBUG)) {
-            DEBUG("[sdmmc] SDHC error: EISTR=%04x, ", sdhc_dev->error);
+            if (timeout) {
+                DEBUG("[sdmmc] IRQ wait timeout\n");
+            }
+            else {
+                DEBUG("[sdmmc] SDHC error: EISTR=%04x, ", sdhc_dev->error);
+            }
             switch (reset) {
             case SDHC_SRR_SWRSTCMD:
                 DEBUG("reset CMD\n");
