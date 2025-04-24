@@ -60,6 +60,13 @@ export default defineConfig({
             ],
         },
         {
+          label: "Rust Basics",
+          items: [
+            "rust_tutorials/rust_in_riot",
+            "rust_tutorials/create_project",
+          ],
+        },
+        {
           label: "Build System",
           items: [
             "build-system/build_system",
