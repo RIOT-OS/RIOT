@@ -1,6 +1,7 @@
 ---
 title: Timers and Callbacks
 description: This tutorial explains how to use timers and callbacs in RIOT.
+code_folder: examples/guides/timers/
 ---
 
 Timers and interrupts are essential concepts in embedded systems programming. In this tutorial, we will take a look at how to use timers and interrupts in RIOT.
@@ -47,7 +48,6 @@ int main(void)
         .callback = timer_callback,
         .arg = "3 seconds have passed!"
     };
-}
 ```
 
 This code creates a timer and initializes it with the callback function we created earlier and a message that will be printed when the timer expires.
@@ -71,9 +71,10 @@ instead of constantly checking if the timer has expired. For example, lets use o
 ![The output](img/timers/01_output.png)
 
 ```c
-ztimer_sleep(ZTIMER_SEC, 5);
+    // Sleep for 5 seconds
+    ztimer_sleep(ZTIMER_SEC, 5);
 
-puts("5 seconds have passed!");
+    puts("5 seconds have passed!");
 ```
 
 ## Conclusion

@@ -1,6 +1,7 @@
 ---
 title: Sensors/Actuators using SAUL
 description: Learn how to use sensors and actuators with RIOT
+code_folder: examples/guides/saul/
 ---
 
 In the previous chapter we learned how to interact with the GPIO directly, but RIOT provides a more abstract way to interact with sensors and actuators. RIOT calls this the SAUL (Sensors/Actuators Abstraction Layer) system.
@@ -87,7 +88,6 @@ which then stores the result in a `phydat_t` struct we provide.
     // and store the result in the temperature variable
     // saul_reg_read returns the dimension of the data read (1 in this case)
     int dimension = saul_reg_read(temperature_sensor, &temperature);
-  }
 ```
 
 Once again, since C doesn't have exceptions, we need to check if the sensor was read correctly.

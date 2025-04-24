@@ -1,6 +1,7 @@
 ---
 title: Shell Commands
 description: This tutorial explains how to use the RIOT shell.
+code_folder: examples/guides/shell/
 ---
 
 The shell is a powerful tool in RIOT that allows you to interact with your application at runtime.
@@ -22,9 +23,11 @@ This line tells the build system to include the shell module in our application.
 
 Now we can start the shell in our main function by calling the `shell_init` function. Go into your `main.c` file and include the following code:
 
-```c
+```c title="The include so we can use the shell"
 #include "shell.h"
+```
 
+```c title="The main function"
 int main(void)
 {
     // Buffer to store command line input
@@ -57,9 +60,11 @@ RIOT provides a set of macros to make this process easier.
 
 Let's create a simple shell command that echoes back the input. Go into your `main.c` file and include the following code:
 
-```c
+```c title="The include so we can print to the console"
 #include <stdio.h>
+```
 
+```c title="The function that implements the echo command"
 int echo_command(int argc, char **argv)
 {
     for (int i = 1; i < argc; i++) {
@@ -75,10 +80,8 @@ This function takes two arguments: `argc` and `argv`. `argc` is the number of ar
 
 Now all that is left is to register the command with the shell. Go back to your `main.c` file and include the following code _outside_ of the `main` function:
 
-```c
-SHELL_COMMAND(echo,
-              "Echoes back the input",
-              echo_command);
+```c title="Register the command with the shell"
+SHELL_COMMAND(echo,"Echo a message", echo_command);
 ```
 
 This macro takes three arguments: the name of the command, a short description of the command, and the function that implements the command.

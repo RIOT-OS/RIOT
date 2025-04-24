@@ -1,6 +1,7 @@
 ---
 title: GPIO & Real Boards
 description: This tutorial explains how to use GPIO in RIOT to control LEDs or read button presses.
+code_folder: examples/guides/gpio/
 ---
 
 import Contact from '@components/contact.astro';
@@ -100,6 +101,7 @@ gpio_mode_t led0_mode = GPIO_OUT;
 
 Now we can control the LED by first initializing the pin and then clearing or setting it.
 
+{/*<!--skip ci-->*/}
 ```c
 int main(void) {
   // Initialize the LED0 pin
@@ -117,10 +119,10 @@ This code will turn off the LED when the board starts which is quite boring,
 so let's make it blink by adding a delay and toggling the LED.
 
 ```c
-while (1) {
+  while (1) {
     gpio_toggle(led0);
     ztimer_sleep(ZTIMER_MSEC, 500);
-}
+  }
 ```
 
 ![The Code in Visual Studio Code](img/gpio/04_code.png)
@@ -144,11 +146,12 @@ that way we can drastically reduce the power consumption of the device.
 
 First we need to define the callback function that will be called when the button is pressed.
 
-```c
-// Define the LED0 pin and mode
+```c title="Define the LED0 pin and mode"
 gpio_t led1 = GPIO_PIN(1, 10);
 gpio_mode_t led1_mode = GPIO_OUT;
+```
 
+```c title="Define the button callback function"
 void button_callback (void *arg)
 {
     (void) arg; /* the argument is not used */
@@ -163,12 +166,39 @@ void button_callback (void *arg)
 
 Now we need to define the button pin and mode and initialize it.
 
-```c
-// Define the button pin and callback
+```c {1-2, 26-27}
+// Define the button pin
 gpio_t button = GPIO_PIN(1, 2);
 
+void button_callback (void *arg)
+{
+    (void) arg; /* the argument is not used */
+    if (!gpio_read(button)) {
+        gpio_set(led1);
+    }
+    else {
+        gpio_clear(led1);
+    }
+}
+
 int main(void) {
-    gpio_init_int(button, GPIO_IN_PU, GPIO_BOTH, button_callback, NULL);
+  // Initialize the LED0 pin
+  gpio_init(led0, led0_mode);
+  // Turn off the LED0 pin
+  gpio_clear(led0);
+
+  // Initialize the LED1 pin
+  gpio_init(led1, led1_mode);
+  // Turn off the LED1 pin
+  gpio_clear(led1);
+
+  // Initialize the button pin
+  gpio_init_int(button, GPIO_IN_PU, GPIO_BOTH, button_callback, NULL);
+
+  while (1) {
+    gpio_toggle(led0);
+    ztimer_sleep(ZTIMER_MSEC, 500);
+  }
 }
 ```
 
