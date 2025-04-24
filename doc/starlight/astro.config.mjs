@@ -72,6 +72,13 @@ export default defineConfig({
                 "c_tutorials/saul",
               ],
             },
+            {
+              label: "Rust Basics",
+              items: [
+                "rust_tutorials/rust_in_riot",
+                "rust_tutorials/create_project",
+              ],
+            },
           ],
         },
         {
