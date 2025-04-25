@@ -1,4 +1,4 @@
-From 33f690a4882dc567df328a900c5d12e113feb15c Mon Sep 17 00:00:00 2001
+From ff4c545caca2e74e66cb55b4e7c6ce75155a1b8a Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 18:38:51 +0200
 Subject: [PATCH 3/4] RIOT integration: Enable floating support based on module
@@ -9,10 +9,10 @@ Subject: [PATCH 3/4] RIOT integration: Enable floating support based on module
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/printf.c b/printf.c
-index e06c9aa..5266cf7 100644
+index d560d2b..7c1ac61 100644
 --- a/printf.c
 +++ b/printf.c
-@@ -62,7 +62,7 @@
+@@ -61,7 +61,7 @@
  
  // support for the floating point type (%f)
  // default: activated
