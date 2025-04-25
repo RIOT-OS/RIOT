@@ -23,7 +23,7 @@
 #include "sx126x.h"
 #include "sx126x_driver.h"
 
-#ifdef MODULE_SHIELD_LC68
+#if defined(MODULE_SHIELD_LLCC68)
 #  include "arduino_iomap.h"
 #endif
 
