@@ -229,6 +229,13 @@ ifneq (,$(filter newlib,$(USEMODULE)))
       endif
     endif
   endif
+  ifneq (,$(filter bug_newlib_broken_stdio,$(FEATURES_USED)))
+    # work around broken newlib stdio by using alternative stdio implementation,
+    # unless stdio_null is used, which is inherently thread-safe :)
+    ifeq (,$(filter stdio_null,$(USEMODULE)))
+      USEPKG += mpaland-printf
+    endif
+  endif
 endif
 
 ifneq (,$(filter posix_select,$(USEMODULE)))
