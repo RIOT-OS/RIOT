@@ -108,10 +108,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     GPIO_Type *port = _port(pin);
     unsigned pin_num = _pin_num(pin);
 
-    /* open-drain output with pull-up is not supported */
-    if (mode == GPIO_OD_PU) {
-        return -1;
-    }
+    // GPIO_IN ,   /**< configure as input without pull resistor */
+    // GPIO_IN_PD, /**< configure as input with pull-down resistor */
+    // GPIO_IN_PU, /**< configure as input with pull-up resistor */
+    // GPIO_OUT,   /**< configure as output in push-pull mode */
+    // GPIO_OD,    /**< configure as output in open-drain mode without pull resistor */
+    // GPIO_OD_PU
 
     /* enable the clock for the selected port */
     _port_enable_clock(pin);
@@ -119,22 +121,15 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /* set pin mode */
     _set_mode_or_af(port, pin_num, mode);
 
-    // /* For input modes, ODR controls pull up settings */
-    // if (gpio_mode_is_input(mode)) {
-    //     if (mode == GPIO_IN_PU) {
-    //         cpu_reg_enable_bits(&port->OCTL, 1 << pin_num);
-    //     }
-    //     else {
-    //         cpu_reg_disable_bits(&port->OCTL, 1 << pin_num);
-    //     }
-    // }
-
-    /* set pull resistor configuration */
+    /* set control (2 bits per pin)*/
+    port->CTL &= ~(0x3 << (2 * pin_num));
+    port->CTL |= (((mode) & 0x3) << (2 *pin_num));
+    /* set pull resistor configuration (2 bits per pin)*/
     port->PUD &= ~(0x3 << (2 * pin_num));
-    port->PUD |=  (((mode >> 2) & 0x3) << (2 * pin_num));
-    /* set output mode */
-    port->OMODE &= ~(1 << pin_num);
-    port->OMODE |=  (((mode >> 4) & 0x1) << pin_num);
+    port->PUD |= (((mode >> 2) & 0x3) << (2 * pin_num));
+    /* set output mode (1 bit per pin)*/
+    port->OMODE &= ~(0x1 << pin_num);
+    port->OMODE |= (((mode >> 4) & 0x1) << pin_num);
     /* set pin speed to maximum */
     port->OSPD |= (3 << (2 * pin_num));
 
@@ -175,7 +170,6 @@ int gpio_read(gpio_t pin)
     }
     else {
         /* or input */
-        // GPIO_ISTAT(-GPIO_PORT-)
         return (port->ISTAT & (1 << pin_num));
     }
 }
@@ -183,19 +177,16 @@ int gpio_read(gpio_t pin)
 void gpio_set(gpio_t pin)
 {
     _port(pin)->BOP = (1 << _pin_num(pin));
-    // (GPIO_BOP(-GPIO_PORT-) = (uint32_t) -MASK-)
 }
 
 void gpio_clear(gpio_t pin)
 {
     _port(pin)->BC = (1 << _pin_num(pin));
-    // (GPIO_BC(-GPIO_PORT-) = (uint32_t) -MASK-)
 }
 
 void gpio_toggle(gpio_t pin)
 {
     _port(pin)->TG = (1 << _pin_num(pin));
-    // GPIO_TG((uint32_t)_port(pin)) = (uint32_t) (1 << _pin_num(pin));
 }
 
 void gpio_write(gpio_t pin, int value)

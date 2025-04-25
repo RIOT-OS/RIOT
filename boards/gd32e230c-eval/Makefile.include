@@ -10,13 +10,33 @@
 
 #using JLink, do we have to enable the Virtual COM port using JLink configurator?
 
-#PROGRAMMER ?= openocd
-#OPENOCD_DEBUG_ADAPTER ?= jlink
-#PROGRAMMERS_SUPPORTED += jlink openocd
-#OPENOCD_SKIP_VERIFY = yes
+# PROGRAMMER ?= openocdJLINK
+# OPENOCD_DEBUG_ADAPTER ?= jlink
+# PROGRAMMERS_SUPPORTED += jlink openocd
+# OPENOCD_SKIP_VERIFY = yes
+
+#OPENOCD_DEBUG_ADAPTER ?= dap
+
 
 PROGRAMMER ?= jlink
 PROGRAMMERS_SUPPORTED ?= jlink
 JLINK_DEVICE ?= GD32E230C8
+#JLINK_DEVICE ?= ${CPU_MODEL}
 FLASH_ADDR ?= 0x8000000
+#OPENOCD_DEBUG_ADAPTER ?= jlink
+OPENOCD_CONFIG ?= board/GD32XXX.cfg
+#   $(RIOTBASE)JLINK/boards/common/cc26xx_cc13xx/dist/openocd_cc26x0.cfg
+#JLINK_IF = JTAG
+#RIOT_TERMINAL ?= jlink
 
+
+# configure the serial interface
+# PORT_LINUX ?= /dev/ttyUSB0
+
+# configure the flasher
+# PROGRAMMER ?= openocd
+# OPENOCD_CONFIG ?= $(RIOTBOARD)/gd32e230c-eval/dist/openocd.cfg
+# OPENOCD_DEBUG_ADAPTER ?= dap
+# OPENOCD_FTDI_ADAPTER ?= openocd-usb
+# OPENOCD_TRANSPORT = swd
+# OPENOCD_RESET_USE_CONNECT_ASSERT_SRST = 1

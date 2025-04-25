@@ -68,14 +68,6 @@ static inline void _port_enable_clock(gpio_t pin)
     periph_clk_en(AHB, (RCU_AHBEN_PAEN_Msk << _port_num(pin)));  //GPIO are all on AHB2 which shares configuration with AHB
 }
 
-//static inline void set_mode(GPIO_Type *port, int pin_num, unsigned mode)
-//{
-//    uint32_t tmp = port->OMODE;
-//    tmp &= ~(0x3 << (2 * pin_num));// is this MODE_MASK  or GPIO_MODE_MASK ?
-//    tmp |=  ((mode & 0x3) << (2 * pin_num));
-//    port->OMODE = tmp;
-//}
-
 /**
  * @brief   Check if the given mode is some kind of input mode
  * @param[in]   mode    Mode to check

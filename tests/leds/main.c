@@ -26,6 +26,8 @@
 #include "periph_conf.h"
 #include "periph/gpio.h"
 
+// #include "gd32e23x_gpio.h"
+
 #define DELAY_SHORT         (coreclk() / 50)
 #define DELAY_LONG          (DELAY_SHORT * 4)
 
@@ -38,6 +40,61 @@ void dumb_delay(uint32_t delay)
 
 int main(void)
 {
+
+//code below works
+//make gpio_inits work by themselves
+//make init done by saul work like these...
+
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
+    gpio_init(LED3_PIN, GPIO_OUT);
+    gpio_init(BTN0_PIN, GPIO_IN);
+    gpio_init(BTN1_PIN, GPIO_IN);
+
+    // uint32_t ctl = GPIO_CTL(GPIOA);
+    // uint32_t pupd = GPIO_PUD(GPIOA);
+    // for(uint16_t i = 0U;i < 16U;i++){
+    //     if(((1U << i) & LED0_MASK) ||
+    //        ((1U << i) & LED1_MASK) ||
+    //        ((1U << i) & LED2_MASK) ||
+    //        ((1U << i) & LED3_MASK))
+    //     {
+    //         ctl &= ~GPIO_MODE_MASK(i);
+    //         ctl |= GPIO_MODE_SET(i, GPIO_MODE_OUTPUT);
+    //         pupd &= ~GPIO_PUPD_MASK(i);
+    //         pupd |= GPIO_PUPD_SET(i, GPIO_PUPD_NONE);
+    //     }
+    //     if((1U << i) & BTN0_MASK)
+    //     {
+    //         ctl &= ~GPIO_MODE_MASK(i);
+    //         ctl |= GPIO_MODE_SET(i, GPIO_MODE_INPUT);
+    //         pupd &= ~GPIO_PUPD_MASK(i);
+    //         pupd |= GPIO_PUPD_SET(i, GPIO_PUPD_NONE);
+    //     }
+    // }
+
+    // GPIO_CTL(GPIOA) = ctl;
+    // GPIO_PUD(GPIOA) = pupd;
+    // if(GPIO_OTYPE_OD == GPIO_OTYPE_PP){
+    //     GPIO_OMODE(GPIOA) |= (uint32_t)LED0_MASK;
+    // }else{
+    //     GPIO_OMODE(GPIOA) &= (uint32_t)(~LED0_MASK);
+    // }
+    // uint32_t ospeed = GPIO_OSPD(GPIOA);
+    // for(uint16_t i = 0U;i < 16U;i++){
+    //     if(((1U << i) & LED0_MASK) ||
+    //        ((1U << i) & LED1_MASK) ||
+    //        ((1U << i) & LED2_MASK) ||
+    //        ((1U << i) & LED3_MASK))
+    //     {
+    //         ospeed &= ~GPIO_OSPEED_MASK(i);
+    //         ospeed |= GPIO_OSPEED_SET(i,GPIO_OSPEED_50MHZ);
+    //     }
+    // }
+    // GPIO_OSPD(GPIOA) = ospeed;
+
+
     int numof = 0;
 
     /* get the number of available LED's and turn them all off*/

@@ -50,7 +50,35 @@ extern "C" {
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+#define GPIO_PIN(x, y)      (GPIOA_BASE | (x << 10) | y)
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 5 bit to encode the mode:
+ * - bit 0+1: pin mode (input / output)
+ * - bit 2+3: pull resistor configuration
+ * - bit   4: output type (0: push-pull, 1: open-drain)
+ */
+#define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
+
+/**
+ * @brief   Override GPIO mode options
+ *
+ * We use 4 bit to encode CNF and MODE.
+ * @{
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+                        //CTL, PUD, OM
+    GPIO_IN     = GPIO_MODE(0, 0, 0),   /**< input w/o pull R */
+    GPIO_IN_PD  = GPIO_MODE(0, 2, 0),   /**< input with pull-down */
+    GPIO_IN_PU  = GPIO_MODE(0, 1, 0),   /**< input with pull-up */
+    GPIO_OUT    = GPIO_MODE(1, 0, 0),   /**< push-pull output */
+    GPIO_OD     = GPIO_MODE(1, 0, 1),   /**< open-drain w/o pull R */
+    GPIO_OD_PU  = GPIO_MODE(1, 1, 1)    /**< not supported by HW */
+} gpio_mode_t;
+/** @} */
 
 /**
  * @brief   Available peripheral buses
