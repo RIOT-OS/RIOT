@@ -139,6 +139,7 @@ FEATURES_EXISTING := \
     no_idle_thread \
     periph_adc \
     periph_adc_continuous \
+    periph_aead_aes_128_ccm \
     periph_can \
     periph_cipher_aes_128_cbc \
     periph_cipher_chacha20 \
