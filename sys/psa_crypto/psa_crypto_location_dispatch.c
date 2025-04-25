@@ -329,6 +329,52 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
 
 #endif /* MODULE_PSA_CIPHER */
 
+#if IS_USED(MODULE_PSA_AEAD)
+psa_status_t psa_location_dispatch_aead_encrypt(const psa_key_attributes_t *attributes,
+                                                psa_algorithm_t alg,
+                                                const psa_key_slot_t *slot,
+                                                const uint8_t *nonce,
+                                                size_t nonce_length,
+                                                const uint8_t *additional_data,
+                                                size_t additional_data_length,
+                                                const uint8_t *plaintext,
+                                                size_t plaintext_length,
+                                                uint8_t *ciphertext,
+                                                size_t ciphertext_size,
+                                                size_t *ciphertext_length)
+{
+
+    /* TODO: implement MODULE_PSA_SECURE_ELEMENT support */
+
+    return psa_algorithm_dispatch_aead_encrypt(attributes, alg, slot, nonce,
+                                                nonce_length, additional_data,
+                                                additional_data_length, plaintext,
+                                                plaintext_length, ciphertext,
+                                                ciphertext_size, ciphertext_length);
+}
+
+psa_status_t psa_location_dispatch_aead_decrypt(const psa_key_attributes_t *attributes,
+                                                psa_algorithm_t alg,
+                                                const psa_key_slot_t *slot,
+                                                const uint8_t *nonce,
+                                                size_t nonce_length,
+                                                const uint8_t *additional_data,
+                                                size_t additional_data_length,
+                                                const uint8_t *ciphertext,
+                                                size_t ciphertext_length,
+                                                uint8_t *plaintext,
+                                                size_t plaintext_size,
+                                                size_t *plaintext_length)
+{
+    /* TODO: implement MODULE_PSA_SECURE_ELEMENT support */
+
+    return psa_algorithm_dispatch_aead_decrypt( attributes, alg, slot, nonce, nonce_length,
+                                                additional_data, additional_data_length,
+                                                ciphertext, ciphertext_length, plaintext,
+                                                plaintext_size, plaintext_length);
+}
+#endif /* MODULE_PSA_AEAD */
+
 #if IS_USED(MODULE_PSA_ASYMMETRIC)
 psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
