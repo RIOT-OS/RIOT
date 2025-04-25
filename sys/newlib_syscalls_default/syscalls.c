@@ -144,23 +144,7 @@ static const struct heap heaps[NUM_HEAPS] = {
  */
 void _init(void)
 {
-    /* Definition copied from newlib/libc/stdio/local.h */
-    extern void __sinit (struct _reent *);
-
-    /* When running multiple threads: Initialize reentrant structure before the
-     * scheduler starts. This normally happens upon the first stdio function
-     * called. However, if no boot message happens this can result in two
-     * concurrent "first calls" to stdio in data corruption, if no locking is
-     * used. Except for ESP (which is using its own syscalls.c anyway), this
-     * currently is the case in RIOT. */
-    if (MAXTHREADS > 1) {
-        /* Also, make an exception for riotboot, which does not use stdio
-         * at all. This would pull in stdio and increase .text size
-         * significantly there */
-        if (!IS_USED(MODULE_RIOTBOOT)) {
-            __sinit(_REENT);
-        }
-    }
+    /* nothing to do here */
 }
 
 /**
