@@ -460,6 +460,7 @@ PSEUDOMODULES += shell_cmds_default
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += shell_lock_auto_locking
 PSEUDOMODULES += shield_llcc68
+PSEUDOMODULES += shield_sx1262
 PSEUDOMODULES += shield_w5100
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += slipdev_l2addr
