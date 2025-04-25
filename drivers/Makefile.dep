@@ -203,6 +203,13 @@ ifneq (,$(filter shield_llcc68,$(USEMODULE)))
   USEMODULE += llcc68
 endif
 
+ifneq (,$(filter shield_sx1262,$(USEMODULE)))
+  FEATURES_REQUIRED += arduino_pins
+  FEATURES_REQUIRED += arduino_shield_uno
+  FEATURES_REQUIRED += arduino_spi
+  USEMODULE += sx1262
+endif
+
 ifneq (,$(filter shield_w5100,$(USEMODULE)))
   FEATURES_REQUIRED += arduino_pins
   FEATURES_REQUIRED += arduino_shield_isp
