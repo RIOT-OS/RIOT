@@ -31,6 +31,9 @@ include $(RIOTBASE)/boards/Makefile.dep
 # pull dependencies from packages
 -include $(PKG_PATHS:%=%Makefile.dep)
 
+# pull application module Makefile.dep if they exist
+-include $(sort $(USEMODULE:%=$(APPDIR)/%/Makefile.dep))
+
 ifneq (,$(filter mpu_stack_guard,$(USEMODULE)))
   FEATURES_REQUIRED += cortexm_mpu
 endif
