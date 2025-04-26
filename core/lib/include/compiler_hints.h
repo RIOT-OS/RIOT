@@ -41,6 +41,20 @@ extern "C" {
 #endif
 
 /**
+ * @def NONSTRING
+ * @brief The `NONSTRING` keyword tells the compiler to assume that a char array
+ *        is not used as c string. (Specifically: It does not need a terminating
+ *        zero byte.)
+ */
+#ifndef NONSTRING
+#  if (__GNUC__ >= 15)
+#    define NONSTRING __attribute__((nonstring))
+#  else
+#    define NONSTRING
+#  endif
+#endif
+
+/**
  * @def PURE
  * @brief The function has no effects except the return value and its return
  *        value depends only on the parameters and/or global variables. Such a
