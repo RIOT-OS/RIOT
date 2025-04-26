@@ -22,15 +22,20 @@
 #include <string.h>
 
 #include "base64.h"
+#include "compiler_hints.h"
 #include "fmt.h"
 #include "macros/utils.h"
 #include "xtimer.h"
 
 static char buf[128];
 
+/* no need for the zero-termination here, base64_encode() gets the size of the
+ * string as explicit argument */
+NONSTRING
 static const char input[96] = "This is an extremely, enormously, greatly, "
                               "immensely, tremendously, remarkably lengthy "
                               "sentence!";
+NONSTRING
 static const char base64[128] =
 "VGhpcyBpcyBhbiBleHRyZW1lbHksIGVub3Jtb3VzbHksIGdyZWF0bHksIGltbWVuc2VseSwgdHJl"
 "bWVuZG91c2x5LCByZW1hcmthYmx5IGxlbmd0aHkgc2VudGVuY2Uh";

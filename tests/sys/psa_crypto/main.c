@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "embUnit.h"
+#include "compiler_hints.h"
 #include "psa/crypto.h"
 
 void addFailurePSA(const char *func, psa_status_t errcode, long line, const char *file)
@@ -73,7 +74,9 @@ static void test_hash_interleaved(void)
 {
     const psa_algorithm_t alg = PSA_ALG_SHA_256;
 
+    NONSTRING
     const uint8_t in1[1] = "a";
+    NONSTRING
     const uint8_t in2[1] = "b";
 
     const uint8_t exp1[] = {

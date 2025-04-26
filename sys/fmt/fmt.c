@@ -27,12 +27,14 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "compiler_hints.h"
 #include "container.h"
 #include "fmt.h"
 #include "modules.h"
 
 extern ssize_t stdio_write(const void* buffer, size_t len);
 
+NONSTRING
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
 static const uint32_t _tenmap[] = {
