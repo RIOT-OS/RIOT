@@ -7,5 +7,6 @@ USEMODULE += $(DRIVER)
 USEMODULE += ztimer_usec
 USEMODULE += ztimer_msec
 USEMODULE += fmt
+USEMODULE += fmt_table
 
 include $(RIOTBASE)/Makefile.include
