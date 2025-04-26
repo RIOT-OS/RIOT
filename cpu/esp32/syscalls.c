@@ -243,7 +243,9 @@ static struct syscall_stub_table s_stub_table =
     ._retarget_lock_release = &__retarget_lock_release,
     ._retarget_lock_release_recursive = &__retarget_lock_release_recursive,
 #endif
-#if CONFIG_NEWLIB_NANO_FORMAT
+/* if mpaland-printf is used, do not keep references to _printf_float here to
+ * not pull in two stdio implementations */
+#if CONFIG_NEWLIB_NANO_FORMAT && !MODULE_MPALAND_PRINTF
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
 #else /* CONFIG_NEWLIB_NANO_FORMAT */

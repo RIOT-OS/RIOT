@@ -1,12 +1,24 @@
 # wrap stdio functions to use mpaland's printf instead of the one from the
 # standard C lib
 LINKFLAGS += -Wl,-wrap=printf
+LINKFLAGS += -Wl,-wrap=fprintf
+LINKFLAGS += -Wl,-wrap=dprintf
 LINKFLAGS += -Wl,-wrap=sprintf
 LINKFLAGS += -Wl,-wrap=snprintf
 LINKFLAGS += -Wl,-wrap=vprintf
+LINKFLAGS += -Wl,-wrap=vfprintf
+LINKFLAGS += -Wl,-wrap=vdprintf
+LINKFLAGS += -Wl,-wrap=vsprintf
 LINKFLAGS += -Wl,-wrap=vsnprintf
 LINKFLAGS += -Wl,-wrap=putchar
 LINKFLAGS += -Wl,-wrap=puts
+
+# By wrapping the newlib only `_printf_common` symbol to the undefined
+# `__wrap__printf_common` symbol, linking will fail if any reference to
+# `_printf_common` remains. Since `_printf_common` is only used by newlib's
+# stdio, we will catch any instance of both mpaland-printf and newlib's stdio
+# being both linked in.
+LINKFLAGS += -Wl,-wrap=_printf_common
 
 # Workaround for bug in the newlib headers shipped with e.g. Ubuntu 24.04 LTS
 # not defining PRId64 / PRIu64 / PRIx64 / PRIo64 in <inttypes.h> due to an issue
