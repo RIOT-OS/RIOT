@@ -2,3 +2,9 @@
 # AVR MCUs we do need the ability to print from PROGMEM, though. Hence, this
 # is not compatible with AVR MCUs.
 FEATURES_BLACKLIST += arch_avr8
+
+# On 32 bit and 64 bit systems support for long long is so cheap, that we
+# can enable it by default. Users can still disable it, though.
+ifneq (,$(filter arch_32bit arch_64bit,$(FEATURES_USED)))
+  DEFAULT_MODULE += printf_long_long
+endif
