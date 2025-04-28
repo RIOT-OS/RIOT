@@ -28,6 +28,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -99,6 +100,28 @@ enum {
     UART_ISR_NUMOF,
 };
 
+static inline void set_power(uart_t uart, bool value)
+{
+    UART_TYPE *dev = uart_config[uart].dev;
+
+    if (value) {
+        dev->ENABLE = ENABLE_ON;
+    }
+    else {
+        dev->ENABLE = ENABLE_OFF;
+    }
+
+#ifndef UARTE_PRESENT
+    dev->POWER = value;
+#endif
+}
+
+static inline bool get_power(uart_t uart)
+{
+    UART_TYPE *dev = uart_config[uart].dev;
+    return dev->ENABLE != ENABLE_OFF;
+}
+
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
 /* ensure the ISR names have been defined as needed */
@@ -114,11 +137,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* remember callback addresses and argument */
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg = arg;
-
-#ifndef UARTE_PRESENT
-    /* only the legacy non-EasyDMA UART needs to be powered on explicitly */
-    dev->POWER = 1;
-#endif
 
     /* reset configuration registers */
     dev->CONFIG = 0;
@@ -206,7 +224,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* enable the UART device */
-    dev->ENABLE = ENABLE_ON;
+    set_power(uart, true);
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
@@ -240,6 +258,7 @@ void uart_poweron(uart_t uart)
 {
     assume((unsigned)uart < UART_NUMOF);
 
+    set_power(uart, true);
     if (isr_ctx[uart].rx_cb) {
         uart_config[uart].dev->TASKS_STARTRX = 1;
     }
@@ -250,6 +269,7 @@ void uart_poweroff(uart_t uart)
     assume((unsigned)uart < UART_NUMOF);
 
     uart_config[uart].dev->TASKS_STOPRX = 1;
+    set_power(uart, false);
 }
 
 /* Unify macro names across nRF51 (UART) and nRF52 and newer (UARTE) */
@@ -335,6 +355,10 @@ static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assume((unsigned)uart < UART_NUMOF);
+    if (!get_power(uart)) {
+        /* Device is powered down. Writing anyway would deadlock */
+        return;
+    }
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         /* in IRQ or interrupts disabled */
