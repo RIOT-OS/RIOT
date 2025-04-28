@@ -105,11 +105,17 @@ static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server);
 
 static inline bool _should_search_rtr(const gnrc_netif_t *netif)
 {
-    /* 6LBR interface does not send RS.
-       A non-advertising router sends RS or a 6LN that is advertising or not
+    /* RS are globally disabled */
+    if (!CONFIG_GNRC_IPV6_NIB_SOL_ROUTER) {
+        return false;
+    }
+    /* 6LBR interface does not send RS. */
+    if (gnrc_netif_is_6lbr(netif)) {
+        return false;
+    }
+    /* A non-advertising router sends RS or a 6LN that is advertising or not
        has to refetch router information */
-    return !gnrc_netif_is_6lbr(netif) &&
-           (!gnrc_netif_is_rtr_adv(netif) || gnrc_netif_is_6ln(netif));
+    return !gnrc_netif_is_rtr_adv(netif) || gnrc_netif_is_6ln(netif);
 }
 
 void gnrc_ipv6_nib_init(void)
