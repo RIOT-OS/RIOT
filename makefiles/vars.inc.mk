@@ -23,6 +23,7 @@ export NATIVEINCLUDES        # The native include paths, set by the various nati
 
 export GCC_C_INCLUDES        # system include dirs implicitly used by GCC's c compiler, only defined with TOOLCHAIN=llvm
 export GCC_CXX_INCLUDES      # system include dirs implicitly used by GCC's c++ compiler, only defined with TOOLCHAIN=llvm
+export GCC_VERSION           # version of GCC if GCC is used, empty otherwise
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
 export BIN_USEMODULE         # Modules specific to bindist (see bindist.ink.mk). Set in the application's Makefile.

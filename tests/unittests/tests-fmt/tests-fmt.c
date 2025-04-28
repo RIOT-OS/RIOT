@@ -17,6 +17,7 @@
 
 #include "embUnit/embUnit.h"
 
+#include "compiler_hints.h"
 #include "fmt.h"
 #include "tests-fmt.h"
 
@@ -244,6 +245,7 @@ static void test_fmt_hex_bytes(void)
 
 static void test_fmt_u16_hex(void)
 {
+    NONSTRING
     char out[8] = "zzzzzzzz";
 
     /* Check return count with null buffer input */
@@ -260,6 +262,7 @@ static void test_fmt_u16_hex(void)
 
 static void test_fmt_u32_hex(void)
 {
+    NONSTRING
     char out[12] = "zzzzzzzzzzzz";
 
     /* Check return count with null buffer input */
@@ -276,6 +279,7 @@ static void test_fmt_u32_hex(void)
 
 static void test_fmt_u64_hex(void)
 {
+    NONSTRING
     char out[20] = "zzzzzzzzzzzzzzzzzzzz";
 
     /* Check return count with null buffer input */
@@ -292,6 +296,7 @@ static void test_fmt_u64_hex(void)
 
 static void test_fmt_u16_dec(void)
 {
+    NONSTRING
     char out[8] = "zzzzzzzz";
     uint8_t chars = 0;
 
@@ -310,6 +315,7 @@ static void test_fmt_u16_dec(void)
 
 static void test_fmt_u32_dec(void)
 {
+    NONSTRING
     char out[16] = "zzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -329,6 +335,7 @@ static void test_fmt_u32_dec(void)
 
 static void test_fmt_u64_dec(void)
 {
+    NONSTRING
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -345,6 +352,7 @@ static void test_fmt_u64_dec(void)
 
 static void test_fmt_u64_dec_zero(void)
 {
+    NONSTRING
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -355,6 +363,7 @@ static void test_fmt_u64_dec_zero(void)
 
 static void test_fmt_u64_dec_u64max(void)
 {
+    NONSTRING
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 

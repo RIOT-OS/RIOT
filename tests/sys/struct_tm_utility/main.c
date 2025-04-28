@@ -29,17 +29,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "compiler_hints.h"
 #include "shell.h"
 #include "tm.h"
 
+NONSTRING
 static const char MON_NAMES[12][3] = {
     "JAN", "FEB", "MAR", "APR",
     "MAY", "JUN", "JUL", "AUG",
     "SEP", "OCT", "NOV", "DEC",
 };
+NONSTRING
 static const char DAY_NAMES[7][3] = {
     "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"
 };
+NONSTRING
 static const char BOOL_NAMES[2][3] = { "NO", "YES" };
 
 bool proper_atoi(const char *a, int *i)
