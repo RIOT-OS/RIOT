@@ -62,9 +62,9 @@ int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length
         return res;
     }
 
-    ndef_write_to_buffer(message, &status_byte, 1);
-    ndef_write_to_buffer(message, (uint8_t *)lang_code, lang_code_length);
-    ndef_write_to_buffer(message, (uint8_t *)text, text_length);
+    ndef_put_into_buffer(message, &status_byte, 1);
+    ndef_put_into_buffer(message, (uint8_t *)lang_code, lang_code_length);
+    ndef_put_into_buffer(message, (uint8_t *)text, text_length);
 
     return 0;
 }

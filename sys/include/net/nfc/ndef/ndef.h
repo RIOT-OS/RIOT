@@ -214,7 +214,7 @@ void ndef_pretty_print(const ndef_t *ndef);
  * @retval Pointer to the memory cursor before the write
  * @retval NULL if the data is too long
  */
-uint8_t *ndef_write_to_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length);
+uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length);
 
 /**
  * @brief Initializes the given NDEF message with the given buffer and buffer size.

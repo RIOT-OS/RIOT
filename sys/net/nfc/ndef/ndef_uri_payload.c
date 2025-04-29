@@ -42,8 +42,8 @@ int ndef_record_add_uri(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code
     }
 
     /* write the payload here */
-    ndef_write_to_buffer(ndef, (uint8_t *)&identifier_code, IDENTIFIER_CODE_LENGTH);
-    ndef_write_to_buffer(ndef, (uint8_t *)uri, uri_length);
+    ndef_put_into_buffer(ndef, (uint8_t *)&identifier_code, IDENTIFIER_CODE_LENGTH);
+    ndef_put_into_buffer(ndef, (uint8_t *)uri, uri_length);
 
     return 0;
 }

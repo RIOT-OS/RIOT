@@ -90,21 +90,19 @@ void ndef_pretty_print(const ndef_t *ndef)
     printf("\n");
 }
 
-uint8_t *ndef_write_to_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length)
+uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length)
 {
+    uint8_t *before_write = ndef->buffer.cursor;
+
     if (ndef->buffer.cursor + data_length > ndef->buffer.memory_end) {
         LOG_ERROR("NDEF buffer overflow\n");
         return NULL;
     }
 
-    /* copy the data into the buffer */
     memcpy(ndef->buffer.cursor, data, data_length);
-
-    /* shift the cursor to the new position */
     ndef->buffer.cursor += data_length;
 
-    /* return the new cursor position */
-    return ndef->buffer.cursor;
+    return before_write;
 }
 
 void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size)
@@ -192,35 +190,35 @@ int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, cons
         record.record_type = NDEF_LONG_RECORD;
     }
 
-    record.header = ndef_write_to_buffer(ndef, &header_byte, 1);
-    record.type_length = ndef_write_to_buffer(ndef, &type_length, 1);
+    record.header = ndef_put_into_buffer(ndef, &header_byte, 1);
+    record.type_length = ndef_put_into_buffer(ndef, &type_length, 1);
 
     if (record.record_type == NDEF_SHORT_RECORD) {
         uint8_t payload_length_single_byte = (uint8_t)payload_length & 0xFF;
-        record.payload_length = ndef_write_to_buffer(ndef,
+        record.payload_length = ndef_put_into_buffer(ndef,
                                                      (uint8_t *)&payload_length_single_byte,
                                                      SHORT_RECORD_PAYLOAD_LENGTH_SIZE);
     }
     else {
         /* payload length shall be MSB first or Big Endian */
         uint32_t payload_length_multi_byte = htonl(payload_length);
-        record.payload_length = ndef_write_to_buffer(ndef,
+        record.payload_length = ndef_put_into_buffer(ndef,
                                                      (uint8_t *)&payload_length_multi_byte,
                                                      LONG_RECORD_PAYLOAD_LENGTH_SIZE);
     }
 
     if (id) {
-        record.id_length = ndef_write_to_buffer(ndef, &id_length, 1);
+        record.id_length = ndef_put_into_buffer(ndef, &id_length, 1);
     }
 
-    record.type = ndef_write_to_buffer(ndef, (uint8_t *)type, type_length);
+    record.type = ndef_put_into_buffer(ndef, (uint8_t *)type, type_length);
 
     if (id) {
-        record.id = ndef_write_to_buffer(ndef, id, id_length);
+        record.id = ndef_put_into_buffer(ndef, id, id_length);
     }
 
     if (payload != NULL) {
-        record.payload = ndef_write_to_buffer(ndef, payload, payload_length);
+        record.payload = ndef_put_into_buffer(ndef, payload, payload_length);
     }
     else {
         /**
@@ -280,7 +278,9 @@ size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32
 {
     size_t size = NDEF_RECORD_HEADER_SIZE + NDEF_RECORD_TYPE_LENGTH_SIZE + type_length;
 
-    size += NDEF_RECORD_ID_LENGTH_SIZE + id_length;
+    if (id_length > 0) {
+        size += NDEF_RECORD_ID_LENGTH_SIZE + id_length;
+    }
 
     if (payload_length <= NDEF_SHORT_RECORD_PAYLOAD_LENGTH) {
         size += SHORT_RECORD_PAYLOAD_LENGTH_SIZE;

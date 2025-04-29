@@ -34,7 +34,7 @@ int ndef_record_add_mime(ndef_t *ndef, const char *mime_type, uint32_t mime_type
     ndef_add_record(ndef, (uint8_t *)mime_type, mime_type_length, NULL, 0, NULL,
                     mime_payload_length, NDEF_TNF_MEDIA_TYPE);
 
-    ndef_write_to_buffer(ndef, (uint8_t *)mime_payload, mime_payload_length);
+    ndef_put_into_buffer(ndef, (uint8_t *)mime_payload, mime_payload_length);
 
     return 0;
 }
