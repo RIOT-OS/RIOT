@@ -17,22 +17,6 @@
 
 #include "embUnit.h"
 
-static void print_different_byte(ndef_buffer_t buffer1, ndef_buffer_t buffer2) {
-    size_t size1 = buffer1.cursor - buffer1.memory;
-    size_t size2 = buffer2.cursor - buffer2.memory;
-
-    if (size1 != size2) {
-        printf("Buffers are not equal in size: %zu != %zu\n", size1, size2);
-        return;
-    }
-
-    for (size_t i = 0; i < size1; i++) {
-        if (buffer1.memory[i] != buffer2.memory[i]) {
-            printf("Buffers differ at byte %zu: 0x%02X != 0x%02X\n", i, buffer1.memory[i], buffer2.memory[i]);
-        }
-    }
-}
-
 /**
  * @brief Compares two NDEF message buffers
  * 
@@ -148,13 +132,10 @@ static void test_ndef_two_records(void)
     ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
     ndef_record_add_text(&message, "Hej Verden", 10, "da", 2, UTF8);
 
-    print_different_byte(message.buffer, ndef_two_record_buffer);
-    ndef_pretty_print(&message);
-
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_two_record_buffer));
 }
-/*
-static bool test_ndef_remove(void)
+
+static void test_ndef_remove(void)
 {
     puts("NDEF remove test");
     ndef_t message;
@@ -162,26 +143,53 @@ static bool test_ndef_remove(void)
     ndef_init(&message, buffer, 1024);
     ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
     ndef_record_add_text(&message, "Hej Verden", 10, "da", 2, UTF8);
-    puts("Before removal:");
-    ndef_pretty_print(&message);
+
+    uint8_t ndef_two_record_data[] = {
+        0x91, 0x01, 0x0E, 0x54,
+        0x02,                                                               /* status byte */
+        0x65, 0x6E,                                                         /* en */ 
+        0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64,   /* Hello World */
+
+        0x51, 0x01, 0x0D, 0x54,
+        0x02,                                                               /* status byte */
+        0x64, 0x61,                                                         /* da */ 
+        0x48, 0x65, 0x6A, 0x20, 0x56, 0x65, 0x72, 0x64, 0x65, 0x6E          /* Hej Verden */
+    };
+    ndef_buffer_t ndef_two_record_buffer = {
+        .memory = ndef_two_record_data,
+        .cursor = ndef_two_record_data + sizeof(ndef_two_record_data),
+        .memory_end = ndef_two_record_data + sizeof(ndef_two_record_data)
+    };
+
+    TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_two_record_buffer));
+
     ndef_remove_last_record(&message);
 
-    puts("After removal:");
-    ndef_pretty_print(&message);
+    uint8_t ndef_one_record_data[] = {
+        0xD1, 0x01, 0x0E, 0x54,
+        0x02,                                                               /* status byte */
+        0x65, 0x6E,                                                         /* en */ 
+        0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64    /* Hello World */
+    };
+    ndef_buffer_t ndef_one_record_buffer = {
+        .memory = ndef_one_record_data,
+        .cursor = ndef_one_record_data + sizeof(ndef_one_record_data),
+        .memory_end = ndef_one_record_data + sizeof(ndef_one_record_data)
+    };
 
-    return true;
+    TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_one_record_buffer));
 }
 
-static bool test_ndef_calculate_size(void)
+static void test_ndef_calculate_size(void)
 {
     puts("NDEF calculate size test");
     uint8_t buffer[1024];
     ndef_t message;
     ndef_init(&message, buffer, 1024);
     ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
-    assert((uint32_t)(message.buffer.cursor - message.buffer.memory) == ndef_record_calculate_text_size(11, 2));
-    return true;
-} */
+    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
+                          ndef_record_calculate_text_size(11, 2));
+}
 
 static Test *tests_nfc_ndef_tests(void)
 {
@@ -190,6 +198,8 @@ static Test *tests_nfc_ndef_tests(void)
         new_TestFixture(test_ndef_uri_record),
         new_TestFixture(test_ndef_mime_record),
         new_TestFixture(test_ndef_two_records),
+        new_TestFixture(test_ndef_remove),
+        new_TestFixture(test_ndef_calculate_size),
     };
 
     EMB_UNIT_TESTCALLER(nfc_ndef_tests, NULL, NULL, fixtures);
