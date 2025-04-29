@@ -24,10 +24,17 @@ if [ -z "${MOUNTPOINT}" ]; then
     exit 1
 fi
 
+if [ ! "$(echo "${MOUNTPOINT}" | wc -l)" -eq 1 ]; then
+    echo "More than one device with UF2 bootloader found!"
+    echo "RIOT cannot distinguish the correct device."\
+    "Please connect no more than one device at a time."
+    exit 1
+fi
+
 INFO_FILE="${MOUNTPOINT}/INFO_UF2.TXT"
 
 if [ ! -f "${INFO_FILE}" ]; then
-    echo "No INFO_FILE.TXT found in UF2 Mass Storage Device!"
+    echo "No INFO_UF2.TXT found in UF2 Mass Storage Device!"
     exit 1
 fi
 
