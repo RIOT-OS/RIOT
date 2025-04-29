@@ -59,6 +59,7 @@ void ndef_pretty_print(const ndef_t *ndef)
         printf("SR: %d\n", (record->header[0] & RECORD_SR_MASK) != 0);
         printf("IL: %d\n", (record->header[0] & RECORD_IL_MASK) != 0);
         printf("TNF: %d\n", record->header[0] & RECORD_TNF_MASK);
+        printf("Header byte: 0x%02x\n", record->header[0]);
         printf("Type length: %d\n", record->type_length[0]);
         printf("Type: ");
         for (int j = 0; j < record->type_length[0]; ++j) {
