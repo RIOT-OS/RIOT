@@ -73,10 +73,10 @@ void ndef_pretty_print(const ndef_t *ndef)
             payload_length = record->payload_length[0];
         }
         else {
-            payload_length = record->payload_length[0] << 24 |
-                             record->payload_length[1] << 16 |
-                             record->payload_length[2] << 8 |
-                             record->payload_length[3];
+            payload_length = ((uint32_t) record->payload_length[0]) << 24 |
+                             ((uint32_t) record->payload_length[1]) << 16 |
+                             ((uint32_t) record->payload_length[2]) <<  8 |
+                             ((uint32_t) record->payload_length[3]);
         }
 
         printf("Payload length: %" PRIu32 "\n", payload_length);
