@@ -148,7 +148,7 @@ Congratulations! You have now learned how to use the SAUL system to interact wit
 and how to read the temperature from a temperature sensor. 🎉
 
 :::note
-The source code for this tutorial can be found [HERE](https://github.com/AnnsAnns/RIOT-Tutorial-Repository/tree/07_saul).
+The source code for this tutorial can be found [HERE](https://github.com/RIOT-OS/RIOT/tree/master/examples/guides/saul).
 
 If your project is not working as expected, you can compare your code with the code in this repository to see if you missed anything.
 :::

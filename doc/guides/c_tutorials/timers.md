@@ -82,7 +82,7 @@ instead of constantly checking if the timer has expired. For example, lets use o
 In this tutorial, we learned how to use timers in RIOT. We created a callback function that prints a message to the console and scheduled a timer to call the callback function after 3 seconds.
 
 :::note
-The source code for this tutorial can be found [HERE](https://github.com/AnnsAnns/RIOT-Tutorial-Repository/tree/03_timers).
+The source code for this tutorial can be found [HERE](https://github.com/RIOT-OS/RIOT/tree/master/examples/guides/timers).
 
 If your project is not working as expected, you can compare your code with the code in this repository to see if you missed anything.
 :::

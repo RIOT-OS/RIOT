@@ -95,7 +95,7 @@ And that's it! You have created a custom shell command. Now you can build and ru
 In this tutorial, we have learned how to use the shell in RIOT and how to create custom shell commands.
 
 :::note
-The source code for this tutorial can be found [HERE](https://github.com/AnnsAnns/RIOT-Tutorial-Repository/tree/04_shell).
+The source code for this tutorial can be found [HERE](https://github.com/RIOT-OS/RIOT/tree/master/examples/guides/shell).
 
 If your project is not working as expected, you can compare your code with the code in this repository to see if you missed anything.
 :::
