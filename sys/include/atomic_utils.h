@@ -135,6 +135,7 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
+#include <limits.h>
 #include <stdint.h>
 
 #include "irq.h"
@@ -213,8 +214,20 @@ typedef struct {
     volatile uint64_t *dest;    /**< Memory containing the bit to set/clear */
     uint64_t mask;              /**< Bitmask used for setting the bit */
 } atomic_bit_u64_t;
+
 /** @} */
 #endif /* HAS_ATOMIC_BIT */
+
+/**
+ * @brief   Type specifying a bit in an `unsigned int`
+ */
+#if UINT_MAX == UINT16_MAX
+typedef atomic_bit_u16_t atomic_bit_unsigned_t;
+#elif UINT_MAX == UINT32_MAX
+typedef atomic_bit_u32_t atomic_bit_unsigned_t;
+#else
+typedef atomic_bit_u64_t atomic_bit_unsigned_t;
+#endif
 
 /**
  * @name    Atomic Loads
@@ -729,6 +742,8 @@ static inline unsigned atomic_fetch_and_unsigned(volatile unsigned *dest,
  * @brief   Create a reference to a bit in an `uint8_t`
  * @param[in]       dest        Memory containing the bit
  * @param[in]       bit         Bit number (`0` refers to the least significant)
+ *
+ * @return Opaque reference to the bit.
  */
 static inline atomic_bit_u8_t atomic_bit_u8(volatile uint8_t *dest,
                                             uint8_t bit);
@@ -737,6 +752,8 @@ static inline atomic_bit_u8_t atomic_bit_u8(volatile uint8_t *dest,
  * @brief   Create a reference to a bit in an `uint16_t`
  * @param[in]       dest        Memory containing the bit
  * @param[in]       bit         Bit number (`0` refers to the least significant)
+ *
+ * @return Opaque reference to the bit.
  */
 static inline atomic_bit_u16_t atomic_bit_u16(volatile uint16_t *dest,
                                               uint8_t bit);
@@ -745,6 +762,8 @@ static inline atomic_bit_u16_t atomic_bit_u16(volatile uint16_t *dest,
  * @brief   Create a reference to a bit in an `uint32_t`
  * @param[in]       dest        Memory containing the bit
  * @param[in]       bit         Bit number (`0` refers to the least significant)
+ *
+ * @return Opaque reference to the bit.
  */
 static inline atomic_bit_u32_t atomic_bit_u32(volatile uint32_t *dest,
                                               uint8_t bit);
@@ -753,9 +772,32 @@ static inline atomic_bit_u32_t atomic_bit_u32(volatile uint32_t *dest,
  * @brief   Create a reference to a bit in an `uint64_t`
  * @param[in]       dest        Memory containing the bit
  * @param[in]       bit         Bit number (`0` refers to the least significant)
+ *
+ * @return Opaque reference to the bit.
  */
 static inline atomic_bit_u64_t atomic_bit_u64(volatile uint64_t *dest,
                                               uint8_t bit);
+
+/**
+ * @brief   Create a reference to a bit in an `unsigned int`
+ * @param[in]       dest        Memory containing the bit
+ * @param[in]       bit         Bit number (`0` refers to the least significant)
+ *
+ * @return Opaque reference to the bit.
+ */
+static inline atomic_bit_unsigned_t atomic_bit_unsigned(volatile unsigned *dest,
+                                                        uint8_t bit)
+{
+    /* Some archs define uint32_t as unsigned long, uint16_t as short etc.,
+     * we need to cast. */
+#if UINT_MAX == UINT16_MAX
+    return atomic_bit_u16((uint16_t volatile *)dest, bit);
+#elif UINT_MAX == UINT32_MAX
+    return atomic_bit_u32((uint32_t volatile *)dest, bit);
+#else
+    return atomic_bit_u64((uint64_t volatile *)dest, bit);
+#endif
+}
 /** @} */
 
 /**
@@ -782,6 +824,20 @@ static inline void atomic_set_bit_u32(atomic_bit_u32_t bit);
  * @param[in,out]   bit         bit to set
  */
 static inline void atomic_set_bit_u64(atomic_bit_u64_t bit);
+/**
+ * @brief   Atomic version of `*dest |= (1 << bit)`
+ * @param[in,out]   bit         bit to set
+ */
+static inline void atomic_set_bit_unsigned(atomic_bit_unsigned_t bit)
+{
+#if UINT_MAX == UINT16_MAX
+      atomic_set_bit_u16(bit);
+#elif UINT_MAX == UINT32_MAX
+      atomic_set_bit_u32(bit);
+#else
+      atomic_set_bit_u64(bit);
+#endif
+}
 /** @} */
 
 /**
@@ -808,6 +864,20 @@ static inline void atomic_clear_bit_u32(atomic_bit_u32_t bit);
  * @param[in,out]   bit         bit to set
  */
 static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit);
+/**
+ * @brief   Atomic version of `*dest &= ~(1 << bit)`
+ * @param[in,out]   bit         bit to set
+ */
+static inline void atomic_clear_bit_unsigned(atomic_bit_unsigned_t bit)
+{
+#if UINT_MAX == UINT16_MAX
+      atomic_clear_bit_u16(bit);
+#elif UINT_MAX == UINT32_MAX
+      atomic_clear_bit_u32(bit);
+#else
+      atomic_clear_bit_u64(bit);
+#endif
+}
 /** @} */
 
 /**
