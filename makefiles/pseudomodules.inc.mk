@@ -342,20 +342,8 @@ PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += posix_headers
-## @defgroup sys_stdio_printf_float         Support for printing floats
-## @ingroup sys_stdio
-## @{
-## This module enables printing of floats, if the printf implementation has
-## configurable features.
 PSEUDOMODULES += printf_float
-## @}
-## @defgroup sys_stdio_printf_long_long     Support for printing long long
-## @ingroup sys_stdio
-## @{
-## This module enables printing of long long / unsigned long long, if the printf
-##  implementation has configurable features.
 PSEUDOMODULES += printf_long_long
-## @}
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += psa_riot_cipher_aes_common
