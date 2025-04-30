@@ -271,7 +271,7 @@ void ndef_clear(ndef_t *ndef)
     assert(ndef != NULL);
 
     ndef->record_count = 0;
-    ndef->buffer.cursor = 0;
+    ndef->buffer.cursor = ndef->buffer.memory;
 }
 
 size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32_t payload_length)
