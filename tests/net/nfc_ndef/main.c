@@ -189,6 +189,17 @@ static void test_ndef_calculate_size(void)
     ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
     TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
                           ndef_record_calculate_text_size(11, 2));
+    ndef_clear(&message);
+
+    ndef_record_add_uri(&message, NDEF_URI_HTTPS_WWW, "riot-os.org", 11);
+    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
+                          ndef_record_calculate_uri_size(11));
+    ndef_clear(&message);
+    
+    ndef_record_add_mime(&message, "text/plain", 10, (uint8_t *)"Hello World", 11);
+    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
+                          ndef_record_calculate_mime_size(10, 11));
+    
 }
 
 static Test *tests_nfc_ndef_tests(void)
