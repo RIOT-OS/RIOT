@@ -34,7 +34,7 @@ Next we need to include the necessary headers in our `main.c` file. Add the foll
 
 We need:
 - `stdio.h` for the `printf` function,
-- `board.h` for the board specific configuration, 
+- `board.h` for the board specific configuration,
 - `ztimer.h` for the ztimer module so we can sleep for a while,
 - and `saul_reg.h` for the SAUL registry and related functions.
 
@@ -55,7 +55,7 @@ search for `SAUL_SENSE_TEMP` devices.
 ```
 
 This doesn't actually guerantee that the sensor is available, which is why we also need to
-check if the sensor truly exists. To do this we create a simple if statement that checks 
+check if the sensor truly exists. To do this we create a simple if statement that checks
 whether the result of the function was `NULL` or not.
 
 ```c
