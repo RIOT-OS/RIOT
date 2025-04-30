@@ -15,7 +15,7 @@ import Contact from '@components/contact.astro';
 Now that we have added RIOT as a submodule to our project, we can start writing our hello world program.
 You can use any text editor to create this file. We will use Visual Studio Code in this example. To open Visual Studio Code in the directory, you can use the following command:
 
-```bash
+```bash title="Open Visual Studio Code"
 code .
 ```
 
@@ -23,7 +23,7 @@ code .
 
 Now that Visual Studio Code is open, we need to tell Rust what kind of project we want to create. We do this by running the following command in the terminal:
 
-```bash
+```bash title="Create a new Rust project"
 cargo new hello_world --lib
 ```
 
@@ -45,7 +45,7 @@ You should now have 3 new files within your project directory:
 
 Now that we have created our hello world program, we need to create a Makefile to build our program. The Makefile is a build automation tool that allows us to define how our program should be built. We create a new file called `Makefile` in the root directory of our project and add the following code:
 
-```makefile
+```makefile title="Makefile"
 # name of your application
 APPLICATION = hello-world
 
@@ -66,17 +66,16 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Tell the build system to use the Rust crate here
-FEATURES_REQUIRED += rust_target
 # Make sure this matches the name of the Rust crate
 APPLICATION_RUST_MODULE = hello_world
-BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 include $(RIOTBASE)/Makefile.include
 ```
 
 :::note
-The `BUILD_IN_DOCKER=1` flag tells the build system to use the docker image provided by RIOT to build our program. This ensures that we have all the necessary dependencies to build our program. If you have already built RIOT on your system, you can omit this flag and the build system will use the toolchain installed on your system.
+The `BUILD_IN_DOCKER=1` flag tells the build system to use the docker image provided by RIOT to build our program. 
+This ensures that we have all the necessary dependencies to build our program. 
+If you have already built RIOT on your system, you can omit this flag and the build system will use the toolchain installed on your system.
 :::
 
 Now RIOT knows that you want to build a Rust application and will use the `hello_world` crate as the main module.
@@ -87,7 +86,7 @@ Now RIOT knows that you want to build a Rust application and will use the `hello
 
 Next, we need to adjust the `Cargo.toml` file to tell Cargo that we want to build for RIOT. Open the `Cargo.toml` file and replace its contents with the following:
 
-```toml
+```toml title="Cargo.toml"
 [package]
 name = "hello-world"
 version = "0.1.0"
@@ -125,7 +124,7 @@ make info-rust
 
 The output will look something like this:
 
-```bash
+```bash title="Output of make info-rust"
 [ann@ann-laptop13 rust01-hello-world]$ make info-rust
 cargo version
 cargo 1.81.0 (2dbb1af80 2024-08-20)
@@ -144,7 +143,7 @@ Beware that the way command line arguments are passed in is not consistent acros
 In VSCode you can now go to the workspace settings `.vscode/settings.json`
 and add the following settings:
 
-```json
+```json title=".vscode/settings.json"
 {
     "rust-analyzer.cargo.extraArgs": [
         "--profile",
@@ -162,7 +161,7 @@ You can also use the `make cargo-command` command to run cargo commands with the
 We are nearly done with setting up our project. The last thing we need to do i
 s to write the actual hello world program. Open the `src/lib.rs` file and replace its contents with the following code:
 
-```rust
+```rust title="src/lib.rs"
 #![no_std]
 
 use riot_wrappers::riot_main;
@@ -181,7 +180,7 @@ this replaces the `println!` macro from the standard library, since, as mentione
 
 Now we need to actually write the `main` function. Add the following code to the `src/lib.rs` file:
 
-```rust
+```rust title="src/lib.rs"
 riot_main!(main);
 
 fn main() {
@@ -202,19 +201,19 @@ Congratulations! You have now created your first Rust program for RIOT. 🎉
 
 To build our program, we use the following command:
 
-```bash
+```bash title="Build the program"
 make
 ```
 
 After building the program, we can run it using the following command to start the RIOT shell:
 
-```bash
+```bash title="Connect to the RIOT shell"
 make term
 ```
 
 You should see the following output:
 
-```
+```txt title="Output in the terminal"
 You are running RIOT using Rust on a(n) native board.
 ```
 
