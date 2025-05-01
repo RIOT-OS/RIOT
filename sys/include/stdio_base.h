@@ -8,10 +8,7 @@
  */
 
 /**
- * @defgroup    sys_stdio STDIO abstraction
- * @ingroup     sys
- *
- * @brief       Simple standard input/output (STDIO) abstraction for RIOT
+ * @addtogroup  sys_stdio STDIO abstraction
  *
  * @{
  * @file
