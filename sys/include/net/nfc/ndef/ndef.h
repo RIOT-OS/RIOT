@@ -12,7 +12,7 @@
 /**
  * @defgroup    ndef NDEF
  * @ingroup     net
- * @brief       Serialization for the NFC Data Exchange Format 
+ * @brief       Serialization for the NFC Data Exchange Format
  * @{
  *
  * @file
@@ -187,7 +187,7 @@ typedef struct {
     /**
      * @brief Array of NDEF record descriptors
      */
-    ndef_record_desc_t records[MAX_NDEF_RECORD_COUNT];
+    uint8_t* records[MAX_NDEF_RECORD_COUNT];
 
     /**
      * @brief Number of records in the NDEF message
@@ -200,7 +200,7 @@ typedef struct {
  *
  * @param[in] ndef NDEF message to print
  */
-void ndef_pretty_print(const ndef_t *ndef);
+void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t record_count);
 
 /**
  * @brief Writes the data buffer to the given NDEF message.
@@ -278,6 +278,29 @@ int ndef_remove_last_record(ndef_t *ndef);
  * @param[in,out] ndef Message to clear
  */
 void ndef_clear(ndef_t *ndef);
+
+/**
+ * @brief Parses the NDEF message and returns the record descriptors
+ *
+ * @note The array @ref record_descriptors must be large enough to hold all record descriptors.
+ * @param[in]   ndef                    NDEF message to parse
+ * @param[out]  record_descriptors      Array of record descriptors
+ * @param[in]   record_descriptors_size Size of the array
+ *
+ * @retval 0    on success
+ * @retval -1   if the message can't be parsed
+ */
+int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
+                            size_t record_descriptors_size);
+
+/**
+ * @brief Parses a single NDEF record
+ *
+ * @param[in]   ndef_record         NDEF record to parse
+ * @param[out]  record_descriptor   Record descriptor to fill
+ *
+ */
+void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_descriptor);
 
 /**
  * @brief NDEF text encoding
@@ -378,8 +401,8 @@ int ndef_record_add_uri(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code
 size_t ndef_record_calculate_uri_size(uint32_t uri_length);
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param ndef                  NDEF message
  * @param mime_type             MIME type
  * @param mime_type_length      Length of the MIME type
