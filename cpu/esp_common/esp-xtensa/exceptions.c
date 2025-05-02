@@ -34,6 +34,22 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifdef MCU_ESP8266
+
+#include "esp_flash_data_types.h"
+#include "rom_functions.h"
+#include "spi_flash.h"
+
+extern esp_spi_flash_chip_t flashchip;
+
+#else /* MCU_ESP8266 */
+
+#include "rom/cache.h"
+#include "rom/spi_flash.h"
+#include "soc/soc.h"
+
+#endif /* MCU_ESP8266 */
+
 extern void heap_stats(void);
 
 static const char* exception_names [] =
@@ -80,8 +96,42 @@ static const char* exception_names [] =
     "Coprocessor7Disabled",        /* 39 */
 };
 
+static void IRAM_ATTR exception_handler_entry(void)
+{
+    /* Ensure that the exception handler is called only once. */
+    static uint8_t exception_handler_calls = 0;
+    if (++exception_handler_calls > 1) {
+        /* If the exception handler is called more than once, break to the
+         * debugger if attached or stop the execution. This normally indicates
+         * an exception while handling another exception, for example trying
+         * to use a function from IROM while the cache is disabled. */
+        __asm__ volatile ("break 0, 0");
+    }
+
+    /* Before the literal strings in the IROM can be accessed by the exception
+     * handler, it has to be ensured that the IROM cache is enabled. However,
+     * before its activation it is necessary to wait until possible write
+     * operations to the SPI flash have been finished. */
+#if defined(CPU_FAM_ESP32)
+    esp_rom_spiflash_wait_idle(&g_rom_flashchip);
+    Cache_Read_Enable(PRO_CPU_NUM);
+#elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+    esp_rom_spiflash_wait_idle(&g_rom_flashchip);
+    Cache_Invalidate_ICache_All();
+    Cache_Resume_ICache(1);
+    Cache_Resume_DCache(1);
+#elif defined(MCU_ESP8266)
+    Wait_SPI_Idle(&flashchip);
+    Cache_Read_Enable_New();
+#else
+#error Platform implementation required
+#endif
+}
+
 void IRAM NORETURN exception_handler (XtExcFrame *frame)
 {
+    exception_handler_entry();
+
     uint32_t excsave1;
     uint32_t epc1;
     RSR(excsave1, excsave1);
@@ -196,18 +246,13 @@ void init_exceptions (void)
     xt_set_exception_handler(EXCCAUSE_PRIVILEGED, exception_handler);
 }
 
-void IRAM NORETURN panic_arch(void)
+void panic_arch(void)
 {
 #if defined(DEVELHELP)
     heap_stats();
     /* break in debugger or reboot after WDT */
     __asm__ volatile ("break 0,0");
-#else /* DEVELHELP */
-    /* restart */
-    pm_reboot();
 #endif /* DEVELHELP */
-
-    UNREACHABLE();
 }
 
 void _panic_handler(uint32_t addr)

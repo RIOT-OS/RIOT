@@ -5,7 +5,6 @@ ESP32_SDK_SRC = \
   components/bootloader_support/src/bootloader_common.c \
   components/driver/spi_common.c \
   components/spi_flash/$(CPU_FAM)/flash_ops_$(CPU_FAM).c \
-  components/spi_flash/$(CPU_FAM)/spi_flash_rom_patch.c \
   components/spi_flash/partition.c \
   #
 
