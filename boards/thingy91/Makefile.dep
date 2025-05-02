@@ -1,0 +1,12 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += lps22hb
+  USEMODULE += hts221
+endif
+
+# Use Segger's RTT unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_rtt 
+endif
+
+#include $(RIOTBOARD)/common/nrf9160/Makefile.dep
