@@ -3,8 +3,12 @@
 # is not compatible with AVR MCUs.
 FEATURES_BLACKLIST += arch_avr8
 
-# On 32 bit and 64 bit systems support for long long is so cheap, that we
-# can enable it by default. Users can still disable it, though.
-ifneq (,$(filter arch_32bit arch_64bit,$(FEATURES_USED)))
-  DEFAULT_MODULE += printf_long_long
+# On ESP it is not easily possible to replace newlib's stdio, as there is only
+# API compatibility and not ABI compatibility between mpaland-printf and newlib's
+# printf and the ESP SDK contains binary blobs.
+FEATURES_BLACKLIST += arch_esp
+
+# On 64 bit systems, we depend on long long support to be able to support `%p`
+ifneq (,$(filter arch_64bit,$(FEATURES_USED)))
+  USEMODULE += printf_long_long
 endif
