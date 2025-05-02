@@ -90,6 +90,11 @@ extern "C" {
 #define BTN2_MODE           GPIO_IN_PU
 #define BTN3_PIN            GPIO_PIN(0, 25)
 #define BTN3_MODE           GPIO_IN_PU
+#define BTN4_PIN            GPIO_PIN(0, 18)
+#define BTN4_MODE           GPIO_IN_PU
+
+#define BTN_RST_PIN         BTN4_PIN    /**< reset button */
+#define BTN_RST_MODE        BTN4_MODE   /**< reset button mode */
 /** @} */
 
 #ifdef __cplusplus
