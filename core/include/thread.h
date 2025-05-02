@@ -365,6 +365,9 @@ THREAD_MAYBE_INLINE void thread_yield_higher(void);
  *          but its scheduler entry and stack will be kept.
  *          A zombie state thread is supposed to be cleaned up
  *          by @ref thread_kill_zombie().
+ *
+ *          This function would be NORETURN, but its no-op behavior inside an
+ *          ISR precludes such an annotation.
  */
 void thread_zombify(void);
 
