@@ -4,6 +4,7 @@ PSEUDOMODULES += lcd_spi
 PSEUDOMODULES += lcd_parallel
 PSEUDOMODULES += lcd_parallel_16bit
 PSEUDOMODULES += lcd_parallel_ll_mcu
+PSEUDOMODULES += lcd_init_sequence
 
 USEMODULE_INCLUDES_lcd := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_lcd)
