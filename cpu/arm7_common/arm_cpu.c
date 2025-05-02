@@ -16,8 +16,10 @@
  * @}
  */
 
+#include <stdalign.h>
 #include <stdint.h>
 #include <stdio.h>
+
 #include "arm_cpu.h"
 #include "irq.h"
 #include "sched.h"
@@ -26,12 +28,12 @@
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
 
-__attribute__((used, section(".usr_stack"), aligned(4))) uint8_t usr_stack[USR_STACKSIZE];
-__attribute__((used, section(".und_stack"), aligned(4))) uint8_t und_stack[UND_STACKSIZE];
-__attribute__((used, section(".fiq_stack"), aligned(4))) uint8_t fiq_stack[FIQ_STACKSIZE];
-__attribute__((used, section(".irq_stack"), aligned(4))) uint8_t irq_stack[ISR_STACKSIZE];
-__attribute__((used, section(".abt_stack"), aligned(4))) uint8_t abt_stack[ABT_STACKSIZE];
-__attribute__((used, section(".svc_stack"), aligned(4))) uint8_t svc_stack[ISR_STACKSIZE];
+__attribute__((used, section(".usr_stack"))) alignas(4) uint8_t usr_stack[USR_STACKSIZE];
+__attribute__((used, section(".und_stack"))) alignas(4) uint8_t und_stack[UND_STACKSIZE];
+__attribute__((used, section(".fiq_stack"))) alignas(4) uint8_t fiq_stack[FIQ_STACKSIZE];
+__attribute__((used, section(".irq_stack"))) alignas(4) uint8_t irq_stack[ISR_STACKSIZE];
+__attribute__((used, section(".abt_stack"))) alignas(4) uint8_t abt_stack[ABT_STACKSIZE];
+__attribute__((used, section(".svc_stack"))) alignas(4) uint8_t svc_stack[ISR_STACKSIZE];
 
 #if (ISR_STACKSIZE % 4)
 #error "ISR_STACKSIZE must be a multiple of 4"

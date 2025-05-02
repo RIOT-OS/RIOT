@@ -21,6 +21,7 @@
 #ifndef PERIPH_CPU_USBDEV_H
 #define PERIPH_CPU_USBDEV_H
 
+#include <stdalign.h>
 #include <stdint.h>
 
 #include "periph/cpu_gpio.h"
@@ -37,7 +38,7 @@ extern "C" {
 /**
  * @brief USBDEV buffer instantiation requirement
  */
-#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+#define USBDEV_CPU_DMA_REQUIREMENTS    alignas(USBDEV_CPU_DMA_ALIGNMENT)
 
 /**
  * @brief stm32 USB device FS configuration

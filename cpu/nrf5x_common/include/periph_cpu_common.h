@@ -417,7 +417,7 @@ typedef struct {
 /**
  * @brief USBDEV buffer instantiation requirement
  */
-#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+#define USBDEV_CPU_DMA_REQUIREMENTS    alignas(USBDEV_CPU_DMA_ALIGNMENT)
 
 #if !defined(CPU_FAM_NRF51) && !defined(DOXYGEN)
 /**

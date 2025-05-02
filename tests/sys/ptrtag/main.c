@@ -25,7 +25,8 @@
 #include "ptrtag.h"
 #include "test_utils/expect.h"
 
-typedef struct PTRTAG {
+typedef struct {
+    PTRTAG
     uint8_t a;
 } custom_type_t;
 

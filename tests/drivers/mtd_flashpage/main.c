@@ -11,6 +11,7 @@
  *
  * @file
  */
+#include <stdalign.h>
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
@@ -118,8 +119,7 @@ static void test_mtd_write_erase(void)
 
 static void test_mtd_write_read(void)
 {
-    const char buf[] __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
-            = "ABCDEFGHIJKLMNO";
+    const alignas(FLASHPAGE_WRITE_BLOCK_ALIGNMENT) char buf[] = "ABCDEFGHIJKLMNO";
 
     uint8_t buf_empty[3];
     memset(buf_empty, FLASHPAGE_ERASE_STATE, sizeof(buf_empty));
