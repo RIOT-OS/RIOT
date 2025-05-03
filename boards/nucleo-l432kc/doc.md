@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nucleo-l432kc STM32 Nucleo-L432KC
 @ingroup     boards_common_nucleo32
 @brief       Support for the STM32 Nucleo-L432KC
@@ -47,5 +46,3 @@ make BOARD=nucleo-l432kc PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
       can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */
