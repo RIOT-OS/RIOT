@@ -202,6 +202,21 @@ static void test_ndef_calculate_size(void)
     
 }
 
+static void test_ndef_pretty_print(void)
+{
+    puts("NDEF pretty print test");
+
+    ndef_t message;
+    uint8_t buffer[1024];
+
+    ndef_init(&message, buffer, 1024);
+    ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
+
+    ndef_record_desc_t record_descriptors[1];
+    ndef_parse(&message, record_descriptors, 1);
+    ndef_pretty_print(record_descriptors, 1);
+}
+
 static Test *tests_nfc_ndef_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures){
@@ -211,6 +226,7 @@ static Test *tests_nfc_ndef_tests(void)
         new_TestFixture(test_ndef_two_records),
         new_TestFixture(test_ndef_remove),
         new_TestFixture(test_ndef_calculate_size),
+        new_TestFixture(test_ndef_pretty_print),
     };
 
     EMB_UNIT_TESTCALLER(nfc_ndef_tests, NULL, NULL, fixtures);
