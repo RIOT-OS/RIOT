@@ -103,6 +103,9 @@ UART_DEV(0):RxD | GPIO20                | \ref esp32_uart_interfaces "UART inter
 @note The configuration of ADC channels contains all ESP32-C3 GPIOs that could
       be used as ADC channels.
 
+@note BUTTON0 conflicts with the SPI MISO line. If the SPI
+      module is enabled, the button will be automatically disabled.
+
 For detailed information about the peripheral configurations of ESP32-C3
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
