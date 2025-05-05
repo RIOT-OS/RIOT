@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_esp32s3
  * @brief       Board definitions that are common for all ESP32-S3 boards.
@@ -20,9 +22,6 @@
  * @{
  */
 
-#ifndef BOARD_COMMON_ESP32S3_H
-#define BOARD_COMMON_ESP32S3_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,11 +33,11 @@ extern "C" {
  * @{
  */
 #if CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ <= 80
-#define CONFIG_ZTIMER_USEC_ADJUST_SET   (880/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
-#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP ((CONFIG_ZTIMER_USEC_ADJUST_SET >> 2) * 5)
+#  define CONFIG_ZTIMER_USEC_ADJUST_SET     (880/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
+#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   ((CONFIG_ZTIMER_USEC_ADJUST_SET >> 2) * 5)
 #else
-#define CONFIG_ZTIMER_USEC_ADJUST_SET   (960/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
-#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP (CONFIG_ZTIMER_USEC_ADJUST_SET)
+#  define CONFIG_ZTIMER_USEC_ADJUST_SET     (960/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
+#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (CONFIG_ZTIMER_USEC_ADJUST_SET)
 #endif
 /** @} */
 
@@ -48,5 +47,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_COMMON_ESP32S3_H */
 /** @} */
