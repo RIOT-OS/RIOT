@@ -432,5 +432,5 @@ size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, uint32_t mime_
 }
 #endif
 
-/** }@ */
+/** @} */
 #endif /* NET_NFC_NDEF_NDEF_H */
