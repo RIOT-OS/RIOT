@@ -333,10 +333,20 @@ uint32_t sx126x_get_channel(const sx126x_t *dev)
 
 void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
 {
+    sx126x_clear_device_errors(dev);
     SX126X_DEBUG(dev, "sx126x_set_channel %" PRIu32 "Hz \n", freq);
     dev->channel = freq;
     sx126x_set_rf_freq(dev, dev->channel);
     sx126x_cal_img(dev, dev->channel);
+    /* Image calibration sets the chip mode back to STBY_RC */
+    /* When using DIO3, TCXO switches off. */
+    sx126x_set_standby(dev, SX126X_STANDBY_CFG_XOSC);
+    /* check for errors */
+    sx126x_errors_mask_t error = 0;
+    sx126x_get_device_errors(dev, &error);
+    if (error) {
+        SX126X_LOG_INFO(dev, "sx126x_set_channel: device errors 0x%04x\n", error);
+    }
 }
 
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
