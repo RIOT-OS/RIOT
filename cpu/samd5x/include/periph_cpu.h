@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_samd5x
  * @brief           CPU specific definitions for internal peripheral handling
@@ -16,9 +18,6 @@
  *
  * @author          Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -73,16 +72,16 @@ enum {
  */
 #define SAM0_GCLK_MAIN 0                /**< 120 MHz main clock       */
 #ifndef SAM0_GCLK_32KHZ
-#define SAM0_GCLK_32KHZ 1               /**< 32 kHz clock             */
+#  define SAM0_GCLK_32KHZ 1             /**< 32 kHz clock             */
 #endif
 #ifndef SAM0_GCLK_TIMER
-#define SAM0_GCLK_TIMER 2               /**< 4-8 MHz clock for xTimer */
+#  define SAM0_GCLK_TIMER 2             /**< 4-8 MHz clock for xTimer */
 #endif
 #ifndef SAM0_GCLK_PERIPH
-#define SAM0_GCLK_PERIPH 3              /**< 12-48 MHz (DFLL) clock   */
+#  define SAM0_GCLK_PERIPH 3            /**< 12-48 MHz (DFLL) clock   */
 #endif
 #ifndef SAM0_GCLK_100MHZ
-#define SAM0_GCLK_100MHZ 4              /**< 100MHz FDPLL clock       */
+#  define SAM0_GCLK_100MHZ 4            /**< 100MHz FDPLL clock       */
 #endif
 /** @} */
 
@@ -300,5 +299,4 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

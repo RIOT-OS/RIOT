@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_samd5x
  * @brief           CPU specific definitions for CAN controllers
@@ -17,75 +19,72 @@
  * @author          Firas Hamdi <firas.hamdi@ml-pa.com>
  */
 
-#ifndef CANDEV_SAMD5X_H
-#define CANDEV_SAMD5X_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if defined(CAN_INST_NUM)
-#include "can/candev.h"
+#  include "can/candev.h"
 
-#ifndef CANDEV_SAMD5X_DEFAULT_BITRATE
+#  ifndef CANDEV_SAMD5X_DEFAULT_BITRATE
 /**
  * @brief   Bitrate to use on init if @ref can_conf_t::bitrate is zero
  */
-#define CANDEV_SAMD5X_DEFAULT_BITRATE 500000U
-#endif
+#    define CANDEV_SAMD5X_DEFAULT_BITRATE 500000U
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_SPT
+#  ifndef CANDEV_SAMD5X_DEFAULT_SPT
 /** Default sampling-point */
-#define CANDEV_SAMD5X_DEFAULT_SPT 875
-#endif
+#    define CANDEV_SAMD5X_DEFAULT_SPT 875
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM
-#define CANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM 3
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM
+#    define CANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM 3
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_EXT_FILTER_NUM
-#define CANDEV_SAMD5X_DEFAULT_EXT_FILTER_NUM 3
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_EXT_FILTER_NUM
+#    define CANDEV_SAMD5X_DEFAULT_EXT_FILTER_NUM 3
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_RX_FIFO_0_ELTS_NUM
-#define CANDEV_SAMD5X_DEFAULT_RX_FIFO_0_ELTS_NUM 32
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_RX_FIFO_0_ELTS_NUM
+#    define CANDEV_SAMD5X_DEFAULT_RX_FIFO_0_ELTS_NUM 32
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_RX_FIFO_1_ELTS_NUM
-#define CANDEV_SAMD5X_DEFAULT_RX_FIFO_1_ELTS_NUM 32
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_RX_FIFO_1_ELTS_NUM
+#    define CANDEV_SAMD5X_DEFAULT_RX_FIFO_1_ELTS_NUM 32
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_TX_EVT_FIFO_ELTS_NUM
-#define CANDEV_SAMD5X_DEFAULT_TX_EVT_FIFO_ELTS_NUM 16
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_TX_EVT_FIFO_ELTS_NUM
+#    define CANDEV_SAMD5X_DEFAULT_TX_EVT_FIFO_ELTS_NUM 16
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_TX_BUFFER_NUM
-#define CANDEV_SAMD5X_DEFAULT_TX_BUFFER_NUM 16
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_TX_BUFFER_NUM
+#    define CANDEV_SAMD5X_DEFAULT_TX_BUFFER_NUM 16
+#  endif
 
-#ifndef CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM
-#define CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM 16
-#endif
+#  ifndef CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM
+#    define CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM 16
+#  endif
 
 /* unit: elements */
-#define CANDEV_SAMD5X_MAX_STD_FILTER 128
-#define CANDEV_SAMD5X_MAX_EXT_FILTER 64
-#define CANDEV_SAMD5X_MAX_RX_FIFO_0_ELTS 64
-#define CANDEV_SAMD5X_MAX_RX_FIFO_1_ELTS 64
-#define CANDEV_SAMD5X_MAX_RX_BUFFER 64
-#define CANDEV_SAMD5X_MAX_TX_EVT_FIFO_ELTS 32
-#define CANDEV_SAMD5X_MAX_TX_BUFFER 32
-#define CANDEV_SAMD5X_MSG_RAM_MAX_SIZE 448
+#  define CANDEV_SAMD5X_MAX_STD_FILTER 128
+#  define CANDEV_SAMD5X_MAX_EXT_FILTER 64
+#  define CANDEV_SAMD5X_MAX_RX_FIFO_0_ELTS 64
+#  define CANDEV_SAMD5X_MAX_RX_FIFO_1_ELTS 64
+#  define CANDEV_SAMD5X_MAX_RX_BUFFER 64
+#  define CANDEV_SAMD5X_MAX_TX_EVT_FIFO_ELTS 32
+#  define CANDEV_SAMD5X_MAX_TX_BUFFER 32
+#  define CANDEV_SAMD5X_MSG_RAM_MAX_SIZE 448
 
 /* SAMD5x CAN controller error codes (values from datasheet section 39.8.14) */
-#define CANDEV_SAMD5X_NO_ERROR 0
-#define CANDEV_SAMD5X_STUFF_ERROR 1
-#define CANDEV_SAMD5X_FORM_ERROR 2
-#define CANDEV_SAMD5X_ACK_ERROR 3
-#define CANDEV_SAMD5X_BIT1_ERROR 4
-#define CANDEV_SAMD5X_BIT0_ERROR 5
-#define CANDEV_SAMD5X_CRC_ERROR 6
-#define CANDEV_SAMD5X_NO_CHANGE_ERROR 7
+#  define CANDEV_SAMD5X_NO_ERROR 0
+#  define CANDEV_SAMD5X_STUFF_ERROR 1
+#  define CANDEV_SAMD5X_FORM_ERROR 2
+#  define CANDEV_SAMD5X_ACK_ERROR 3
+#  define CANDEV_SAMD5X_BIT1_ERROR 4
+#  define CANDEV_SAMD5X_BIT0_ERROR 5
+#  define CANDEV_SAMD5X_CRC_ERROR 6
+#  define CANDEV_SAMD5X_NO_CHANGE_ERROR 7
 
 /**
  * @brief CAN device configuration descriptor
@@ -139,7 +138,7 @@ typedef struct {
      */
     bool start_in_monitor_mode            : 1;
 } can_conf_t;
-#define HAVE_CAN_CONF_T
+#  define HAVE_CAN_CONF_T
 
 /**
  * @brief CAN message RAM accessible to the CAN controller
@@ -176,7 +175,7 @@ typedef struct {
     /** False to use Tx FIFO operation, True to use Tx Queue operation */
     bool tx_fifo_queue_ctrl;
 } can_t;
-#define HAVE_CAN_T
+#  define HAVE_CAN_T
 
 /**
  * @brief   Enable/Disable the transmitter delay compensation
@@ -208,5 +207,4 @@ void candev_samd5x_exit_sleep_mode(candev_t *candev);
 }
 #endif
 
-#endif /* CANDEV_SAMD5X_H */
 /** @} */

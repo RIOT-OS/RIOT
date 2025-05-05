@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_saml21
  * @brief           CPU specific definitions for internal peripheral handling
@@ -16,9 +18,6 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -174,5 +173,4 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_samd21
  * @brief           CPU specific definitions for internal peripheral handling
@@ -16,9 +18,6 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -40,7 +39,7 @@ extern "C" {
  *          Idle modes are enabled by default, deep sleep mode blocked
  */
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL      { 1, 0, 0, 0 }
+#  define PM_BLOCKER_INITIAL    { 1, 0, 0, 0 }
 #endif
 
 /**
@@ -200,5 +199,4 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_sam0_common_sdhc sam0 SD Host Controller
  * @ingroup     cpu_sam0_common
@@ -22,9 +24,6 @@
  * @author      alkgrove <bob@alkgrove.com>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef SDHC_H
-#define SDHC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -167,5 +166,4 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t block, uint16_t num);
 }
 #endif
 
-#endif /* SDHC_H */
 /** @} */

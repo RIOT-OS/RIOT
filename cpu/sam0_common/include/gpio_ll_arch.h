@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_sam0_common
  * @ingroup         drivers_periph_gpio_ll
@@ -18,9 +20,6 @@
  *
  * @author          Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
 
 #include "architecture.h"
 #include "periph_cpu.h"
@@ -202,5 +201,4 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

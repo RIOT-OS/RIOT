@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_sam0_common_usb sam0 USB peripheral
  * @ingroup     cpu_sam0_common
@@ -19,12 +21,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef SAM_USB_H
-#define SAM_USB_H
-
-#include <stdint.h>
-#include <stdlib.h>
-#include "periph_cpu.h"
 #include "periph/usbdev.h"
 
 #ifdef __cplusplus
@@ -50,5 +46,4 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* SAM_USB_H */
 /** @} */

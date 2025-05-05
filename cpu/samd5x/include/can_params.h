@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_samd5x
  * @brief           CPU specific definitions for CAN controllers
@@ -16,9 +18,6 @@
  *
  * @author          Firas Hamdi <firas.hamdi@ml-pa.com>
  */
-
-#ifndef CAN_PARAMS_H
-#define CAN_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,5 +39,4 @@ static const candev_params_t candev_params[] = {
 }
 #endif
 
-#endif /* CAN_PARAMS_H */
 /** @} */
