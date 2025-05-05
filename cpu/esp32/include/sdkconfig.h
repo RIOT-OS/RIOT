@@ -154,7 +154,7 @@
 #if MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_CLK_SRC_EXT_CRYS               1
 #else
-#define CONFIG_RTC_CLK_SRC_INT_RC                   1
+#  define CONFIG_RTC_CLK_SRC_INT_RC                 1
 #endif
 
 /**
