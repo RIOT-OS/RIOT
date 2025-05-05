@@ -21,9 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef SDKCONFIG_H
-#define SDKCONFIG_H
-
 /*
  * The SoC capability definitions are often included indirectly in the
  * ESP-IDF files, although all ESP-IDF files require them. Since not all
@@ -157,7 +154,7 @@
 #if MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_CLK_SRC_EXT_CRYS               1
 #else
-#define CONFIG_RTC_CLK_SRC_INT_RC                   1
+#  define CONFIG_RTC_CLK_SRC_INT_RC                 1
 #endif
 
 /**
