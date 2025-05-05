@@ -34,28 +34,28 @@ extern "C" {
 
 /* Mapping of Kconfig defines to the respective enumeration values */
 #if CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_2
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     2
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       2
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_5
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     5
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       5
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_10
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     10
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       10
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_20
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     20
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       20
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_40
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     40
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       40
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_80
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     80
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       80
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_160
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     160
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       160
 #elif CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ_240
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     240
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       240
 #endif
 
 /**
  * @brief Defines the CPU frequency [values = 2, 5, 10, 10, 40, 80, 160, 240]
  */
 #ifndef CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ
-#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ     80
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ       80
 #endif
 
 /** @} */
@@ -66,7 +66,7 @@ extern "C" {
 #define CONFIG_RTC_CLK_CAL_CYCLES               576
 
 #ifdef MODULE_ESP_RTC_TIMER_32K
-#define CONFIG_RTC_XTAL_CAL_RETRY               3
+#  define CONFIG_RTC_XTAL_CAL_RETRY             3
 #endif
 
 /**
@@ -112,19 +112,19 @@ extern "C" {
  * ESP32-S2 specific USB configuration
  */
 #ifdef MODULE_ESP_IDF_USB
-#define CONFIG_USB_OTG_SUPPORTED                1
+#  define CONFIG_USB_OTG_SUPPORTED              1
 #endif
 /**
  * ESP32-S2 specific SPI RAM configuration
  */
 #ifdef  MODULE_ESP_SPI_RAM
-#ifdef MODULE_ESP_SPI_OCT
-#define CONFIG_SPIRAM_MODE_OCT                  1
-#else
-#define CONFIG_SPIRAM_MODE_QUAD                 1
-#endif
-#define CONFIG_SPIRAM_CLK_IO                    30
-#define CONFIG_SPIRAM_CS_IO                     26
+#  ifdef MODULE_ESP_SPI_OCT
+#    define CONFIG_SPIRAM_MODE_OCT              1
+#  else
+#    define CONFIG_SPIRAM_MODE_QUAD             1
+#  endif
+#  define CONFIG_SPIRAM_CLK_IO                  30
+#  define CONFIG_SPIRAM_CS_IO                   26
 #endif
 
 /**
