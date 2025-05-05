@@ -24,6 +24,7 @@
 
 #include "net/lora.h"
 #include "periph/spi.h"
+#include "units.h"
 
 #include "sx126x.h"
 #include "sx126x_regs.h"
@@ -475,11 +476,46 @@ uint32_t sx126x_get_channel(const sx126x_t *dev)
     return dev->channel;
 }
 
+/* 9.2.1 Image Calibration for Specific Frequency Bands */
+static void _cal_img(sx126x_t *dev, uint32_t freq)
+{
+    sx126x_chip_modes_t state = sx126x_get_state(dev);
+    /* don't know what to do with frequencies that don't fit in the intervals from the datasheet */
+    if (freq <= MHZ(928) && freq >= MHZ(902)) {
+        /* 902 - 928 MHz band and anything upper */
+        sx126x_cal_img_in_mhz(dev, 902, 928);
+    }
+    else if (freq <= MHZ(870) && freq >= MHZ(863)) {
+        /* 863 - 870 MHz band */
+        sx126x_cal_img_in_mhz(dev, 863, 870);
+    }
+    else if (freq <= MHZ(787) && freq >= MHZ(779)) {
+        /* 779 - 787 MHz band */
+        sx126x_cal_img_in_mhz(dev, 779, 787);
+    }
+    else if (freq <= MHZ(510) && freq >= MHZ(470)) {
+        /* 470 - 510 MHz band */
+        sx126x_cal_img_in_mhz(dev, 470, 510);
+    }
+    else if (freq <= MHZ(440) && freq >= MHZ(430)) {
+        /* 430 - 440 MHz band and anything lower */
+        sx126x_cal_img_in_mhz(dev, 430, 440);
+    }
+    else {
+        /* Contact your Semtech representative for the other optimal calibration settings
+           outside of the given frequency bands. */
+    }
+    /* Image calibration sets the chip mode back to STBY_RC */
+    /* When using DIO3, TCXO switches off. */
+    sx126x_set_state(dev, state);
+}
+
 void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
 {
     DEBUG("[sx126x]: sx126x_set_channel %" PRIu32 "Hz \n", freq);
     dev->channel = freq;
     sx126x_set_rf_freq(dev, dev->channel);
+    _cal_img(dev, freq);
 }
 
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
