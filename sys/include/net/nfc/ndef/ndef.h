@@ -6,8 +6,8 @@
  * details.
  */
 
-#ifndef NDEF_H
-#define NDEF_H
+#ifndef NET_NFC_NDEF_NDEF_H
+#define NET_NFC_NDEF_NDEF_H
 
 /**
  * @defgroup    ndef NDEF
@@ -20,6 +20,10 @@
  *
  * @author      Nico Behrens <nifrabe@outlook.de>
  */
+
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -196,9 +200,10 @@ typedef struct {
 } ndef_t;
 
 /**
- * @brief Pretty prints the NDEF message in human-readable format.
+ * @brief Pretty prints the NDEF message descriptors in human-readable format.
  *
- * @param[in] ndef NDEF message to print
+ * @param[in] ndef_record_descriptors 	Pointer to the array of record descriptors
+ * @param[in] record_count 				Number of records in the array
  */
 void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t record_count);
 
@@ -222,11 +227,11 @@ uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_l
  * @note The buffer needs to be allocated by the user and has to stay valid for the entire lifetime
  * of the NDEF message struct.
  *
- * @param[out] 	ndef 		    Message to initilaize
+ * @param[out] 	ndef 		    Message to initialize
  * @param[in] 	buffer 			Empty buffer that is used by the NDEF message
  * @param[in] 	buffer_size 	Buffer size
  */
-void ndef_init(ndef_t *message, uint8_t *buffer, uint32_t buffer_size);
+void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size);
 
 /**
  * @brief Adds an NDEF record to the end of the NDEF message
@@ -282,7 +287,7 @@ void ndef_clear(ndef_t *ndef);
 /**
  * @brief Parses the NDEF message and returns the record descriptors
  *
- * @note The array @ref record_descriptors must be large enough to hold all record descriptors.
+ * @note The array must be large enough to hold all record descriptors.
  * @param[in]   ndef                    NDEF message to parse
  * @param[out]  record_descriptors      Array of record descriptors
  * @param[in]   record_descriptors_size Size of the array
@@ -418,10 +423,14 @@ int ndef_record_add_mime(ndef_t *ndef, const char *mime_type, uint32_t mime_type
  * @brief Calculates the size of an NDEF mime record
  *
  * @param[in] mime_type_length      Length of the MIME type
- * @param[in] mime_payload_length   Lenght of the MIME payload
+ * @param[in] mime_payload_length   Length of the MIME payload
  * @return Size of the MIME record
  */
 size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, uint32_t mime_payload_length);
 
-/** }@ */
+#ifdef __cplusplus
+}
 #endif
+
+/** }@ */
+#endif /* NET_NFC_NDEF_NDEF_H */

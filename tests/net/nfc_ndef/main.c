@@ -19,7 +19,7 @@
 
 /**
  * @brief Compares two NDEF message buffers
- * 
+ *
  * @param buffer1 First buffer to compare
  * @param buffer2 Second buffer to compare
  * @return true     if the buffers are equal
@@ -42,7 +42,7 @@ static void test_ndef_text_record(void)
     uint8_t ndef_text_record_data[] = {
         0xD1, 0x01, 0x0E, 0x54,
         0x02,                                                               /* status byte */
-        0x65, 0x6E,                                                         /* en */ 
+        0x65, 0x6E,                                                         /* en */
         0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64    /* Hello World */
     };
     ndef_buffer_t ndef_text_record_buffer = {
@@ -65,7 +65,7 @@ static void test_ndef_uri_record(void)
     puts("NDEF URI record test");
     uint8_t ndef_uri_record_data[] = {
         0xD1, 0x01, 0x0C, 0x55,
-        0x02,                                                               /* https */ 
+        0x02,                                                               /* https */
         0x72, 0x69, 0x6F, 0x74, 0x2D, 0x6F, 0x73, 0x2E, 0x6F, 0x72, 0x67    /* riot-os.org */
     };
     ndef_buffer_t ndef_uri_record_buffer = {
@@ -87,7 +87,7 @@ static void test_ndef_mime_record(void)
 {
     puts("NDEF MIME record test");
     uint8_t ndef_uri_record_data[] = {
-        0xD2, 0x0A, 0x0B, 
+        0xD2, 0x0A, 0x0B,
         0x74, 0x65, 0x78, 0x74, 0x2F, 0x70, 0x6C, 0x61, 0x69, 0x6E,        /* text/plain */
         0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64   /* Hello World */
     };
@@ -111,12 +111,12 @@ static void test_ndef_two_records(void)
     uint8_t ndef_two_record_data[] = {
         0x91, 0x01, 0x0E, 0x54,
         0x02,                                                               /* status byte */
-        0x65, 0x6E,                                                         /* en */ 
+        0x65, 0x6E,                                                         /* en */
         0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64,   /* Hello World */
 
         0x51, 0x01, 0x0D, 0x54,
         0x02,                                                               /* status byte */
-        0x64, 0x61,                                                         /* da */ 
+        0x64, 0x61,                                                         /* da */
         0x48, 0x65, 0x6A, 0x20, 0x56, 0x65, 0x72, 0x64, 0x65, 0x6E          /* Hej Verden */
     };
     ndef_buffer_t ndef_two_record_buffer = {
@@ -147,12 +147,12 @@ static void test_ndef_remove(void)
     uint8_t ndef_two_record_data[] = {
         0x91, 0x01, 0x0E, 0x54,
         0x02,                                                               /* status byte */
-        0x65, 0x6E,                                                         /* en */ 
+        0x65, 0x6E,                                                         /* en */
         0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64,   /* Hello World */
 
         0x51, 0x01, 0x0D, 0x54,
         0x02,                                                               /* status byte */
-        0x64, 0x61,                                                         /* da */ 
+        0x64, 0x61,                                                         /* da */
         0x48, 0x65, 0x6A, 0x20, 0x56, 0x65, 0x72, 0x64, 0x65, 0x6E          /* Hej Verden */
     };
     ndef_buffer_t ndef_two_record_buffer = {
@@ -168,7 +168,7 @@ static void test_ndef_remove(void)
     uint8_t ndef_one_record_data[] = {
         0xD1, 0x01, 0x0E, 0x54,
         0x02,                                                               /* status byte */
-        0x65, 0x6E,                                                         /* en */ 
+        0x65, 0x6E,                                                         /* en */
         0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64    /* Hello World */
     };
     ndef_buffer_t ndef_one_record_buffer = {
@@ -187,19 +187,19 @@ static void test_ndef_calculate_size(void)
     ndef_t message;
     ndef_init(&message, buffer, 1024);
     ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
-    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
+    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory),
                           ndef_record_calculate_text_size(11, 2));
     ndef_clear(&message);
 
     ndef_record_add_uri(&message, NDEF_URI_HTTPS_WWW, "riot-os.org", 11);
-    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
+    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory),
                           ndef_record_calculate_uri_size(11));
     ndef_clear(&message);
-    
+
     ndef_record_add_mime(&message, "text/plain", 10, (uint8_t *)"Hello World", 11);
-    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory), 
+    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory),
                           ndef_record_calculate_mime_size(10, 11));
-    
+
 }
 
 static void test_ndef_pretty_print(void)
