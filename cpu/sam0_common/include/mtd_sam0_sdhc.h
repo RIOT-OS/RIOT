@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_mtd_sam0_sdhc MTD wrapper for SAM0 SDHC devices
  * @ingroup     drivers_storage
@@ -19,11 +21,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef MTD_SAM0_SDHC_H
-#define MTD_SAM0_SDHC_H
-
-#include <stdint.h>
 
 #include "mtd.h"
 #include "sdhc.h"
@@ -52,5 +49,4 @@ extern const mtd_desc_t mtd_sam0_sdhc_driver;
 }
 #endif
 
-#endif /* MTD_SAM0_SDHC_H */
 /** @} */

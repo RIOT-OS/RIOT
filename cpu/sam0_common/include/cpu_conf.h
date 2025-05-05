@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_sam0_common
  * @brief           Implementation specific CPU configuration options
@@ -18,45 +20,42 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
-
 #include "cpu_conf_common.h"
 
 #if defined(CPU_SAMD10)
-#include "vendor/samd10/include/samd10.h"
+#  include "vendor/samd10/include/samd10.h"
 #elif defined(CPU_SAMD20)
-#include "vendor/samd20/include/samd20.h"
+#  include "vendor/samd20/include/samd20.h"
 #elif defined(CPU_SAMD20B)
-#include "vendor/samd20/include_b/samd20.h"
+#  include "vendor/samd20/include_b/samd20.h"
 #elif defined(CPU_SAMD21A)
-#include "vendor/samd21/include_a/samd21.h"
+#  include "vendor/samd21/include_a/samd21.h"
 #elif defined(CPU_SAMD21B)
-#include "vendor/samd21/include_b/samd21.h"
+#  include "vendor/samd21/include_b/samd21.h"
 #elif defined(CPU_SAMD21C)
-#include "vendor/samd21/include_c/samd21.h"
+#  include "vendor/samd21/include_c/samd21.h"
 #elif defined(CPU_SAMD21D)
-#include "vendor/samd21/include_d/samd21.h"
+#  include "vendor/samd21/include_d/samd21.h"
 #elif defined(CPU_SAMD51)
-#include "vendor/samd51/include/samd51.h"
+#  include "vendor/samd51/include/samd51.h"
 #elif defined(CPU_SAME51)
-#include "vendor/same51/include/same51.h"
+#  include "vendor/same51/include/same51.h"
 #elif defined(CPU_SAME54)
-#include "vendor/same54/include/same54.h"
+#  include "vendor/same54/include/same54.h"
 #elif defined(CPU_SAML10)
-#include "vendor/saml10/include/sam.h"
+#  include "vendor/saml10/include/sam.h"
 #elif defined(CPU_SAML11)
-#include "vendor/saml11/include/sam.h"
+#  include "vendor/saml11/include/sam.h"
 #elif defined(CPU_SAML21A)
-#include "vendor/saml21/include/saml21.h"
+#  include "vendor/saml21/include/saml21.h"
 #elif defined(CPU_SAML21B)
-#include "vendor/saml21/include_b/saml21.h"
+#  include "vendor/saml21/include_b/saml21.h"
 #elif defined(CPU_SAMR21)
-#include "vendor/samr21/include/samr21.h"
+#  include "vendor/samr21/include/samr21.h"
 #elif defined(CPU_SAMR30)
-#include "vendor/samr30/include/samr30.h"
+#  include "vendor/samr30/include/samr30.h"
 #elif defined(CPU_SAMR34)
-#include "vendor/samr34/include/samr34.h"
+#  include "vendor/samr34/include/samr34.h"
 #endif
 
 #ifdef __cplusplus
@@ -72,9 +71,9 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_ADDR
 
 #ifdef CPU_COMMON_SAML1X
-#define CPU_FLASH_RWWEE_BASE            DATAFLASH_ADDR
+#  define CPU_FLASH_RWWEE_BASE          DATAFLASH_ADDR
 #else
-#define CPU_FLASH_RWWEE_BASE            NVMCTRL_RWW_EEPROM_ADDR
+#  define CPU_FLASH_RWWEE_BASE          NVMCTRL_RWW_EEPROM_ADDR
 #endif
 /** @} */
 
@@ -84,15 +83,15 @@ extern "C" {
  */
 /* a flashpage in RIOT is mapped to a flash row on the SAM0s */
 #if defined(NVMCTRL_ROW_SIZE)
-#define FLASHPAGE_SIZE             (NVMCTRL_ROW_SIZE)
+#  define FLASHPAGE_SIZE           (NVMCTRL_ROW_SIZE)
 #elif defined(NVMCTRL_BLOCK_SIZE)
-#define FLASHPAGE_SIZE             (NVMCTRL_BLOCK_SIZE)
+#  define FLASHPAGE_SIZE           (NVMCTRL_BLOCK_SIZE)
 #elif defined(NVMCTRL_PAGE_SIZE)
 /* saml1x: The NVM is organized into rows, where each row contains four pages,
 as shown in the NVM Row Organization figure. */
-#define FLASHPAGE_SIZE             (4 * NVMCTRL_PAGE_SIZE)
+#  define FLASHPAGE_SIZE           (4 * NVMCTRL_PAGE_SIZE)
 #else
-#error "Unsupported Device"
+#  error "Unsupported Device"
 #endif
 
 /* one SAM0 row contains 4 SAM0 pages, so 4 SAM0 pages contain
@@ -112,10 +111,10 @@ as shown in the NVM Row Organization figure. */
  * catch all without relying on the CPU model but on the named defines
  */
 #ifdef NVMCTRL_RWW_EEPROM_SIZE
-#define FLASHPAGE_RWWEE_NUMOF      (NVMCTRL_RWWEE_PAGES / FLASHPAGE_PAGES_PER_ROW)
+#  define FLASHPAGE_RWWEE_NUMOF    (NVMCTRL_RWWEE_PAGES / FLASHPAGE_PAGES_PER_ROW)
 #endif
 #ifdef DATAFLASH_SIZE
-#define FLASHPAGE_RWWEE_NUMOF      (DATAFLASH_NB_OF_PAGES / FLASHPAGE_PAGES_PER_ROW)
+#  define FLASHPAGE_RWWEE_NUMOF    (DATAFLASH_NB_OF_PAGES / FLASHPAGE_PAGES_PER_ROW)
 #endif
 /** @} */
 
@@ -123,12 +122,11 @@ as shown in the NVM Row Organization figure. */
  * @brief   The CPU has Low Power RAM that can be used as Heap
  */
 #ifdef CPU_HAS_BACKUP_RAM
-#define NUM_HEAPS (2)
+#  define NUM_HEAPS (2)
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */
