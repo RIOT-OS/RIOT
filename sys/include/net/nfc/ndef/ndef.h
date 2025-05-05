@@ -191,7 +191,7 @@ typedef struct {
     /**
      * @brief Array of NDEF record descriptors
      */
-    uint8_t* records[MAX_NDEF_RECORD_COUNT];
+    uint8_t *records[MAX_NDEF_RECORD_COUNT];
 
     /**
      * @brief Number of records in the NDEF message
@@ -296,7 +296,7 @@ void ndef_clear(ndef_t *ndef);
  * @retval -1   if the message can't be parsed
  */
 int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
-                            size_t record_descriptors_size);
+               size_t record_descriptors_size);
 
 /**
  * @brief Parses a single NDEF record

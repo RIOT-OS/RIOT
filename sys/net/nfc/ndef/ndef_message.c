@@ -72,10 +72,10 @@ void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t
             payload_length = record->payload_length[0];
         }
         else {
-            payload_length = ((uint32_t) record->payload_length[0]) << 24 |
-                             ((uint32_t) record->payload_length[1]) << 16 |
-                             ((uint32_t) record->payload_length[2]) <<  8 |
-                             ((uint32_t) record->payload_length[3]);
+            payload_length = ((uint32_t)record->payload_length[0]) << 24 |
+                             ((uint32_t)record->payload_length[1]) << 16 |
+                             ((uint32_t)record->payload_length[2]) << 8 |
+                             ((uint32_t)record->payload_length[3]);
         }
 
         printf("Payload length: %" PRIu32 "\n", payload_length);
@@ -128,8 +128,6 @@ int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, cons
     /* a payload must be bigger than zero and smaller than the maximum NDEF payload length */
     assert(payload_length > 0);
     assert(payload_length <= NDEF_LONG_RECORD_PAYLOAD_LENGTH);
-
-
 
     /* the maximum is specified at compile time */
     if (ndef->record_count >= MAX_NDEF_RECORD_COUNT) {
@@ -316,8 +314,7 @@ void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_de
         return;
     }
 
-    record_desc->record_type = (*(record_desc->header) & RECORD_SR_MASK) ? NDEF_SHORT_RECORD
-                                                                         : NDEF_LONG_RECORD;
+    record_desc->record_type = (*(record_desc->header) & RECORD_SR_MASK) ? NDEF_SHORT_RECORD : NDEF_LONG_RECORD;
 
     record_desc->type_length = (uint8_t *)(record_desc->header + NDEF_RECORD_HEADER_SIZE);
     record_desc->payload_length = (uint8_t *)(record_desc->type_length +
@@ -326,10 +323,9 @@ void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_de
     /* the pointer for any field after the payload_length depends on the type of the record */
     uint8_t *pointer_after_payload_length = (uint8_t *)(record_desc->payload_length +
                                                         ((record_desc->record_type ==
-                                                        NDEF_SHORT_RECORD) ?
-                                                        SHORT_RECORD_PAYLOAD_LENGTH_SIZE :
-                                                        LONG_RECORD_PAYLOAD_LENGTH_SIZE));
-
+                                                          NDEF_SHORT_RECORD) ?
+                                                             SHORT_RECORD_PAYLOAD_LENGTH_SIZE :
+                                                             LONG_RECORD_PAYLOAD_LENGTH_SIZE));
 
     if (*(record_desc->header) & RECORD_IL_MASK) {
         record_desc->id_length = pointer_after_payload_length;
@@ -348,7 +344,8 @@ void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_de
 }
 
 int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
-                            size_t record_descriptors_size) {
+               size_t record_descriptors_size)
+{
     assert(ndef != NULL);
     assert(record_descriptors != NULL);
 
