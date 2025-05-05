@@ -221,11 +221,6 @@ int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, cons
         ndef_put_into_buffer(ndef, payload, payload_length);
     }
     else {
-        /**
-         *  this needs to be done so the payload points to the correct position
-         *  for further writes
-         */
-
         /* the payload has to be written by the calling function */
         (void)payload;
     }
