@@ -156,7 +156,13 @@ int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, cons
     /* message end has to be true because records are only added at the end */
     me = true;
 
-    /* chunking is not supported */
+    /**
+     * Chunking is not supported and not needed for tag functionality. Furthermore, chunking
+     * is not a mechanism for introducing multiplexing or data streaming into NDEF and it MUST NOT
+     * be used for those purposes. It is a mechanism to reduce the need for outbound
+     * buffering on the generating side. This is similar to the message chunking mechanism
+     * defined in HTTP/1.1 [RFC 2616].
+     */
     cf = false;
 
     /* if the payload is short, set sr (short record) to true */
