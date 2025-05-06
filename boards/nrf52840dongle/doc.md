@@ -48,7 +48,27 @@ reset button as well as 15 configurable external pins.
 
 ### Flash the board {#nrf52840dongle_flash}
 
-The board is flashed using its on-board boot loader; the proprietary
+The board is flashed using its on-board boot loader
+called [Open USB bootloader](https://devzone.nordicsemi.com/nordic/short-range-guides/b/getting-started/posts/nrf52840-dongle-programming-tutorial)
+using either of two tools described below.
+
+If RIOT is already running on the board, flashing the device will automatically reset the CPU and enter
+the bootloader.
+If some other firmware is running or RIOT crashed, you need to enter the bootloader
+manually by pressing the board's reset button.
+
+Readiness of the bootloader is indicated by LD2 pulsing in red.
+
+#### nrfdfu
+
+The tool [nrfdfu](https://github.com/knurling-rs/nrfdfu-rs/)
+is RIOT's default way of flashing a program by sending it to the bootloader.
+
+It needs to be installed locally using `cargo install nrfdfu`.
+
+#### nrfutil
+
+The proprietary
 [nrfutil](https://www.nordicsemi.com/Products/Development-tools/nRF-Util) program needs to
 be installed, and `nrfutil install nrf5sdk-tools` needs to be executed. Note
 that nrfutil, even when not running the "install" command, will install itself
@@ -58,12 +78,11 @@ maintained by Nordic, and has become dysfunctional on Python 3.11.
 The nrfutil can turn the binary into a suitable zip file and send it to the
 bootloader. The process is automated in the usual `make flash` target.
 
-If RIOT is already running on the board, it will automatically reset the CPU and enter
-the bootloader.
-If some other firmware is running or RIOT crashed, you need to enter the bootloader
-manually by pressing the board's reset button.
+#### Other programming methods
 
-Readiness of the bootloader is indicated by LD2 pulsing in red.
+When building a program for this board to be flashed using other methods
+(e.g. using the board's Tag-Connect footprint),
+setting `USING_NRF_BOOTLOADER=1` in the makefiles aligns the program suitable to be flashed after the bootloader.
 
 ### Accessing STDIO
 
