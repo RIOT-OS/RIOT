@@ -31,9 +31,11 @@
 
 #if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || DOXYGEN
 #  include "net/sock/udp.h"
+#  define SOCK_HAS_UDP  1   /**< UDP support is enabled */
 #endif
 #if MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
 #  include "net/sock/tcp.h"
+#  define SOCK_HAS_TCP  1   /**< TCP support is enabled */
 #endif
 #ifdef MODULE_SOCK_DTLS
 #  include "net/credman.h"
@@ -94,6 +96,7 @@ const char *sock_urlpath(const char *url);
 int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
                    char *addr_str, uint16_t *port);
 
+#if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
 /**
  * @brief   Format TCP endpoint to string and port
  *
@@ -109,7 +112,9 @@ static inline int sock_tcp_ep_fmt(const sock_tcp_ep_t *endpoint,
 {
     return sock_tl_ep_fmt(endpoint, addr_str, port);
 }
+#endif
 
+#if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
 /**
  * @brief   Format UDP endpoint to string and port
  *
@@ -125,6 +130,7 @@ static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
 {
     return sock_tl_ep_fmt(endpoint, addr_str, port);
 }
+#endif
 
 /**
  * @brief    Convert string to common IP-based transport layer endpoint
@@ -156,6 +162,7 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
  */
 int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str);
 
+#if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
 /**
  * @brief    Convert string to TCP endpoint
  *
@@ -191,7 +198,9 @@ static inline int sock_tcp_name2ep(sock_tcp_ep_t *ep_out, const char *str)
 {
     return sock_tl_name2ep(ep_out, str);
 }
+#endif
 
+#if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
 /**
  * @brief    Convert string to UDP endpoint
  *
@@ -227,6 +236,7 @@ static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     return sock_tl_name2ep(ep_out, str);
 }
+#endif
 
 /**
  * @brief   Compare the two given common IP-based transport layer endpoints
@@ -244,6 +254,7 @@ static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
 bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
                       const struct _sock_tl_ep *b);
 
+#if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
 /**
  * @brief   Compare the two given TCP endpoints
  *
@@ -262,7 +273,9 @@ static inline bool sock_tcp_ep_equal(const sock_tcp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
+#endif
 
+#if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
 /**
  * @brief   Compare the two given UDP endpoints
  *
@@ -281,6 +294,7 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
+#endif
 #endif
 
 #if defined(MODULE_SOCK_DTLS) || DOXYGEN
