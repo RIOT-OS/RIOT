@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-#include "common.h"
+#include "test_common.h"
 #include "errno.h"
 #include "event/thread.h"
 #include "luid.h"

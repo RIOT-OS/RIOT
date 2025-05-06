@@ -22,7 +22,7 @@
 #include "assert.h"
 #include "kernel_defines.h"
 #include "net/ieee802154/radio.h"
-#include "common.h"
+#include "test_common.h"
 #include "bhp/event.h"
 
 #ifdef MODULE_CC2538_RF

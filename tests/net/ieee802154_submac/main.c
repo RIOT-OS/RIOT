@@ -34,7 +34,7 @@
 #include "test_utils/expect.h"
 #include "ztimer.h"
 
-#include "common.h"
+#include "test_common.h"
 
 #define MAX_LINE    (80)
 
