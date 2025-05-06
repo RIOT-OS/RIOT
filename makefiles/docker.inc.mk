@@ -359,6 +359,19 @@ docker_run_make = \
 	-w '$(DOCKER_APPDIR)' '$2' \
 	$(MAKE) $(DOCKER_OVERRIDE_CMDLINE) $4 $1
 
+# create cargo folders
+# This prevents cargo inside docker from creating them with root permissions
+# (should they not exist), and also from re-building everything every time
+# because the .cargo inside is as ephemeral as the build container.
+DEPS_FOR_RUNNING_DOCKER += $(HOME)/.cargo/git
+DEPS_FOR_RUNNING_DOCKER += $(HOME)/.cargo/registry
+
+$(HOME)/.cargo/git:
+	$(Q)mkdir -p $@
+
+$(HOME)/.cargo/registry:
+	$(Q)mkdir -p $@
+
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
 # order to only perform building inside the container and defer executing any
@@ -368,4 +381,6 @@ docker_run_make = \
 # hardware which may not be reachable from inside the container.
 ..in-docker-container: $(DEPS_FOR_RUNNING_DOCKER)
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
+	@mkdir -p $(HOME)/.cargo/git
+	@mkdir -p $(HOME)/.cargo/registry
 	$(call docker_run_make,$(DOCKER_MAKECMDGOALS),$(DOCKER_IMAGE),,$(DOCKER_MAKE_ARGS))
