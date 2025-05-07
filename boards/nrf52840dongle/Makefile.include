@@ -1,6 +1,6 @@
 # This board uses the vendor's serial bootloader
 
-PROGRAMMER ?= nrfutil
+PROGRAMMER ?= nrfdfu
 
 ifeq (nrfutil,$(PROGRAMMER))
   USING_NRF_BOOTLOADER = 1
