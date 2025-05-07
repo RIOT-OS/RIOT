@@ -109,11 +109,10 @@ UART_DEV(0):RxD   | GPIO44 | USB-to-UART bridge | \ref esp32_uart_interfaces "UA
 \n
 
 @note
-SPI_DEV(1) is only configured if the `sdcard_spi` module is explicitly used to
-access the SD card in SPI mode. Otherwise, the SDMMC host is configured and
-used by the `periph_sdmmc` module to access the SD card (default). That is,
-add module `sdcard_spi` to the make variable `USEMODULE` to use the SD Card
-in SPI mode.
+SPI_DEV(1) is only configured if the `sdcard_spi` module is explicitly added to
+the `USEMODULE` in the application's Makefile to access the SD card in SPI mode.
+By default, the SDMMC host is configured and used by the `periph_sdmmc`
+module to access the SD card.
 
 For detailed information about the peripheral configurations of ESP32-S3
 boards, see section \ref esp32_peripherals "Common Peripherals".
