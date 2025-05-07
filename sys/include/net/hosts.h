@@ -104,7 +104,7 @@ typedef struct {
  * @see HOST_IPV6 macro.
  *
  * @param[in]   host_name       Host name to resolve into address
- * @param[out]  addr_out        Buffer to write result into, but be able to accomondate
+ * @param[out]  addr_out        Buffer to write result into, but be able to accommodate
  *                              an address of the selected family
  * @param[in]   family          Either AF_INET (IPv4), AF_INET6 (IPv6) or AF_UNSPEC
  *                              (either IPv4 or IPv6)
