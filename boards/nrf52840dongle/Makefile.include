@@ -22,6 +22,7 @@ endif
 ifeq (1,$(USING_NRF_BOOTLOADER))
   # Using an nrfutil style flasher implies using the Nordic bootloader described at
   # <https://devzone.nordicsemi.com/nordic/short-range-guides/b/getting-started/posts/nrf52840-dongle-programming-tutorial>.
+  #
   # It has a static MBR at the first 4k, and an ample 128k Open USB Bootloader at
   # the end, leaving 892k for the application. This overwrites any SoftDevice,
   # but that's what the minimal working example for the dongle does as well.
