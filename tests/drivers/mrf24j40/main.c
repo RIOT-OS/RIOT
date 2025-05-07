@@ -26,7 +26,7 @@
 #include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
 #include "net/netdev/ieee802154_submac.h"
-#include "common.h"
+#include "test_common.h"
 
 static netdev_ieee802154_submac_t mrf24j40_netdev[MRF24J40_NUM];
 
