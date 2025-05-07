@@ -11,8 +11,6 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   ifeq (,$(filter sdcard_spi,$(USEMODULE)))
     # use mtd_sdmmc_default if sdcard_spi isn't explicitly enabled
     USEMODULE += mtd_sdmmc_default
-  else
-    USEMODULE += mtd_sdcard_default
   endif
 endif
 
