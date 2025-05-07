@@ -52,6 +52,12 @@ the bootloader.
 If some other firmware is running or RIOT crashed, you need to enter the bootloader
 manually by double-tapping the board's reset button while the device is connected.
 
+@note Some distributions do not setup automounting in the default installation.
+The bootloader emulates a mass storage device which the `uf2conv` script searches
+for in common mounting locations. If the device is not mounted, the flashing
+process fails. Please configure automounting in this case or refer to the
+[`adafruit-nrfutil` Programmer](@ref ada-nrf52-adafruit-nrfutil).
+
 The board definitions with RIOT retain the SoftDevice firmware blob shipped with
 the original Adafruit nRF52 Bootloader that is used by i.a. Arduino and
 CircuitPython but not used by RIOT. If you want to override the SoftDevice
