@@ -11,4 +11,10 @@ endif
 LINKFLAGS += -Wl,--defsym=flash_printf=printf_P
 LINKFLAGS += -Wl,--defsym=flash_fprintf=fprintf_P
 LINKFLAGS += -Wl,--defsym=flash_snprintf=snprintf_P
+
+# work around for shitty Ubuntu/Debian AVR toolchain. This can be dropped
+# when all commonly used versions of Ubuntu/Debian ship less historic
+# versions of GCC.
+CFLAGS += -DUINT_WIDTH=16
+
 include $(RIOTMAKE)/arch/avr8.inc.mk
