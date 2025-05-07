@@ -96,7 +96,7 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter openwsn,$(USEPKG)))
     USEMODULE += shell_cmd_openwsn
   endif
-  ifneq (,$(filter rtt_rtc periph_rtc,$(USEMODULE)))
+  ifneq (,$(filter rtt64 rtt_rtc periph_rtc,$(USEMODULE)))
     USEMODULE += shell_cmd_rtc
   endif
   ifneq (,$(filter saul_reg,$(USEMODULE)))
