@@ -37,6 +37,6 @@ PROGRAMMERS_SUPPORTED += nrfutil nrfdfu
 
 %.hex.zip: %.hex
 	$(call check_cmd,$(FLASHER),Flash program and preparation tool)
-	$(FLASHER) pkg generate --hw-version 52 --sd-req 0x00 --application-version 1234 --application $< $@
+	$(FLASHER) pkg generate --hw-version 52 --sd-req 0x00 --application-version 1 --application $< $@
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
