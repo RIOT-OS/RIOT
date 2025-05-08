@@ -106,6 +106,28 @@ Makefile wildcards.
 
 Both approaches are illustrated and explained in `examples/basic/subfolders`.
 
+## Setting Board-specific Dependencies
+
+Required dependencies of applications may change depending on the
+target board or architecture. This is especially
+relevant for networking applications where multiple hardware implementations
+exist and the appropriate one has to be chosen for the given board
+or architecture.
+To achieve this task elegantly, a `Makefile.board.dep` file can be
+created in the application folder, which is automatically included and
+evaluated by RIOT build system during the dependency resolution phase.
+This ensures that all the relevant variables such as `FEATURES_USED` or the
+`USEMODULE` list are fully populated.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ifneq (,$(filter arch_esp,$(FEATURES_USED)))
+  USEMODULE += esp_wifi
+endif
+
+ifneq (,$(filter native native32 native64,$(BOARD)))
+  USEMODULE += netdev_default
+endif
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Helper tools
 
