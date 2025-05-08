@@ -211,7 +211,7 @@ static void _set_usage(char *cmd_name)
          "       * \"hop_limit\" - set hop limit\n"
          "       * \"hl\" - alias for \"hop_limit\"\n"
          "       * \"key\" - set the encryption key in hexadecimal format\n"
-         "       * \"mtu\" - IPv6 maximum transition unit\n"
+         "       * \"mtu\" - IPv6 maximum transmission unit\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
