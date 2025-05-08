@@ -109,8 +109,9 @@ support multiple platforms are given in section
 
 ### nRF52
 
-- `adafruit-nrfutil` (requires Adafruit bootloader)
+- `adafruit-nrfutil`, `uf2conv` (requires Adafruit bootloader), see @ref boards_common_adafruit-nrf52-bootloader
 - `nrfutil` (required nRF bootloader)
+- `nrfjprog` (requires a separate J-Link debugger)
 
 ### RP2040
 

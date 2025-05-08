@@ -9,12 +9,16 @@ that are based on the Nordic Semiconductor nRF52 microcontroller family.
 It features a Mass Storage Device emulation, so that UF2 files can be uploaded
 via Drag and Drop. It is also backwards compatible to the BOSSA bootloader.
 With the Adafruit nRF52 Bootloader, no external debugger such as a J-Link is
-necessary for the normal usage.
+necessary for the normal usage. The tool used for flashing the board with
+UF2 files via the Mass Storage Device is `uf2conv` from the [Microsoft UF2
+Reference Repository](https://github.com/microsoft/uf2).
 
 In some cases the bootloader may be too old to even mount on startup.
 Enter the bootloader mode (usually by double tapping the reset button for
 nRF52840 based boards) and check the `INFO_UF2.TXT` for bootloader information.
-If the version is less than `0.4.0`, please refer to @ref ada-nrf52-update.
+If the version is less than `0.4.0`, please refer to @ref ada-nrf52-update or
+use the [`adafruit-nrfutil` Script](@ref ada-nrf52-adafruit-nrfutil) to
+program your board.
 
 Until and including RIOT Release 2025.01, the SoftDevice on
 [`adafruit-feather-nrf52840-express`](@ref boards_adafruit-feather-nrf52840-express)
@@ -27,6 +31,8 @@ If the bootloader is not present on your board at all, an external debugger
 such as the J-Link has to be used. Please refer to @ref ada-nrf52-reflashing.
 
 ## Flashing the Board with RIOT
+
+### Using the default `uf2conv` Programmer
 
 The board is flashed using its on-board UF2 bootloader by default.
 The bootloader will present a mass storage device that has to be mounted so
@@ -46,6 +52,12 @@ the bootloader.
 If some other firmware is running or RIOT crashed, you need to enter the bootloader
 manually by double-tapping the board's reset button while the device is connected.
 
+@note Some distributions do not setup automounting in the default installation.
+The bootloader emulates a mass storage device which the `uf2conv` script searches
+for in common mounting locations. If the device is not mounted, the flashing
+process fails. Please configure automounting in this case or refer to the
+[`adafruit-nrfutil` Programmer](@ref ada-nrf52-adafruit-nrfutil).
+
 The board definitions with RIOT retain the SoftDevice firmware blob shipped with
 the original Adafruit nRF52 Bootloader that is used by i.a. Arduino and
 CircuitPython but not used by RIOT. If you want to override the SoftDevice
@@ -64,6 +76,24 @@ for SoftDevice Version 6.1.1 and `SD730` for Version 7.3.0.
 **Setting the wrong SoftDevice version might corrupt the SoftDevice and
 make a reflash of the SoftDevice necessary. Do not change it unless you know
 what you're doing!**
+
+### Using the `adafruit-nrfutil` Programmer {#ada-nrf52-adafruit-nrfutil}
+
+The `adafruit-nrfutil` is an adapted version of the original, discontinuied
+`nrfutil` script from Nordic Semiconductor and programs the nRF52
+microcontroller via DFU (Direct File Upload) via the serial port or via USB.
+If you want to use the `adafruit-nrfutil` programming script, most of the
+previous information about the `uf2conv` script applies as well.
+Before using the script, you have to install it with the following command:
+```sh
+pip3 install --user adafruit-nrfutil
+```
+
+To select the `adafruit-nrfutil`, you can define the programmer in the
+environment when you call `make`:
+```sh
+PROGRAMMER=adafruit-nrfutil BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash term
+```
 
 ## Updating Old Bootloaders and Restoring the SoftDevice {#ada-nrf52-update}
 
@@ -87,7 +117,7 @@ repository](https://github.com/adafruit/Adafruit_nRF52_Bootloader).
 With the following commands, the bootloader with SoftDevice will be compiled
 and flashed. For MacOS, you might have to select a different serial port.
 
-```
+```sh
 git clone https://github.com/adafruit/Adafruit_nRF52_Bootloader.git
 cd Adafruit_nRF52_Bootloader
 git submodule update --init
