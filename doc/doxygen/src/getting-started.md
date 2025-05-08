@@ -28,29 +28,39 @@ A set of common tools and a toolchain for the hardware you target needs to be in
 
 ### Choosing an Operating System for the Development PC
 
-Most of the RIOT OS developers are using Linux on their development PCs, so you can expect the
-most streamlined experience here. Other POSIX-compliant OSes such as the various BSD flavours
+#### Linux
+
+Most of the RIOT OS developers are using Linux on their development PCs, so
+you can expect the most streamlined experience here.
+Not all distributions have packages for cross-compilation for microcontrollers
+and non-x86 platforms such as ARM.
+Ubuntu works well for cross-development, Fedora for example does not provide
+the necessary packages.
+However, with most distributions, you can use the
+[RIOT Docker container](@ref build-in-docker) as an alternative.
+
+Other POSIX-compliant OSes such as the various BSD flavours
 will also be fine - however, we rely on users to report bugs regarding tooling incompatibilities
 here. So expect occasional issues for the development branch and please help testing during the
 feature freeze period, if you develop on macOS or BSD.
 
-Windows users can refer to [this guide][dev-setup-windows] to
-[setup the development environment][dev-setup-windows] on Windows.
+#### Windows
 
-[dev-setup-windows]: https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/setup-windows
+Windows users can refer to [this guide][dev-setup-windows] to setup the
+development environment on Windows which guides through the process of
+setting up the
+[Windows Subsystem for Linux (WSL)](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux).
 
-Native development on macOS machines is not officially supported. What works well is using Linux
-in a virtual machine, but at much lower performance than running Linux natively. We also offer Docker images.
-For development on Windows, using the
-[Windows Subsystem for Linux (WSL)](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)
-is a good option
-([installation instructions here](https://docs.microsoft.com/en-us/windows/wsl/install)), but it
-is (as of October 2021) not possible to directly access USB devices from Linux. As a result,
-accessing the serial connection to a board running RIOT, flashing it, and on-chip-debugging from WSL
-will not be possible. (It is possible to pass through the file system of USB storage device. This
-should allow flashing boards that have an [UF2 compatible](https://github.com/Microsoft/uf2) from
-within WSL, but this has not been tested yet.) Hence, WSL users will have to use native Windows
-tools for accessing the serial connection and flashing the board.
+[dev-setup-windows]: https://guide.riot-os.org/getting-started/install-wsl/
+
+#### MacOS
+Native development on macOS machines is not officially supported.
+Some packages can be found in the homebrew repositories, but the installation
+is not trivial, especially for different microcontroller platforms.
+As an alternative, the [RIOT Docker Container](@ref build-in-docker) can be used
+or a virtual machine running Linux. The latter option has a significant
+performance reduction compared to Docker.
+
 
 ### Common Tools
 
