@@ -14,7 +14,7 @@ TEST_DEPS += image
 
 include $(RIOTBASE)/Makefile.include
 
-ifneq (,$(filter native native32 native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   USEMODULE += mtd_native
 
   #overwrite default mtd_native-config to use fat image as flash device
