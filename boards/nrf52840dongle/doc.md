@@ -48,7 +48,18 @@ reset button as well as 15 configurable external pins.
 
 ### Flash the board {#nrf52840dongle_flash}
 
-The board is flashed using its on-board boot loader; the proprietary
+The board is flashed using its on-board boot loader using either of two tools described below.
+
+Readiness of the bootloader is indicated by LD2 pulsing in red.
+
+If RIOT is already running on the board, it will automatically reset the CPU and enter
+the bootloader.
+If some other firmware is running or RIOT crashed, you need to enter the bootloader
+manually by pressing the board's reset button.
+
+#### nrfutil
+
+The proprietary
 [nrfutil](https://www.nordicsemi.com/Products/Development-tools/nRF-Util) program needs to
 be installed, and `nrfutil install nrf5sdk-tools` needs to be executed. Note
 that nrfutil, even when not running the "install" command, will install itself
@@ -58,12 +69,10 @@ maintained by Nordic, and has become dysfunctional on Python 3.11.
 The nrfutil can turn the binary into a suitable zip file and send it to the
 bootloader. The process is automated in the usual `make flash` target.
 
-If RIOT is already running on the board, it will automatically reset the CPU and enter
-the bootloader.
-If some other firmware is running or RIOT crashed, you need to enter the bootloader
-manually by pressing the board's reset button.
+#### nrfdfu
 
-Readiness of the bootloader is indicated by LD2 pulsing in red.
+TBD `cargo install nrfdfu` if and when the PR is accepted and a new version is released (but the PR depends on RIOT having a demo)
+(and set PROGRAMMER= or will we automate that?)
 
 ### Accessing STDIO
 
