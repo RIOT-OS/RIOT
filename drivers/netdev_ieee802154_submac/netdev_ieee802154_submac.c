@@ -174,6 +174,7 @@ static int _send(netdev_t *netdev, const iolist_t *pkt)
          * inside the TX Done callback */
         netdev_submac->ev = NETDEV_EVENT_TX_STARTED;
     }
+    netdev_submac->bytes_tx = res;
     return res;
 }
 
@@ -280,21 +281,14 @@ static void submac_tx_done(ieee802154_submac_t *submac, int status,
     }
 
     netdev_submac->dispatch = true;
+    netdev_submac->ev = NETDEV_EVENT_TX_COMPLETE;
 
     switch (status) {
-    case TX_STATUS_SUCCESS:
-        netdev_submac->ev = NETDEV_EVENT_TX_COMPLETE;
-        break;
-    case TX_STATUS_FRAME_PENDING:
-        netdev_submac->ev = NETDEV_EVENT_TX_COMPLETE_DATA_PENDING;
-        break;
     case TX_STATUS_MEDIUM_BUSY:
-        netdev_submac->ev = NETDEV_EVENT_TX_MEDIUM_BUSY;
+        netdev_submac->bytes_tx = -EBUSY;
         break;
     case TX_STATUS_NO_ACK:
-        netdev_submac->ev = NETDEV_EVENT_TX_NOACK;
-        break;
-    default:
+        netdev_submac->bytes_tx = -EHOSTUNREACH;
         break;
     }
 }
@@ -377,6 +371,16 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)info;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154,
+                                                             netdev_ieee802154_submac_t,
+                                                             dev);
+    return netdev_submac->bytes_tx;
+}
+
 int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac)
 {
     netdev_t *netdev = &netdev_submac->dev.netdev;
@@ -402,6 +406,7 @@ static const netdev_driver_t netdev_submac_driver = {
     .recv = _recv,
     .isr = _isr,
     .init = _init,
+    .confirm_send = _confirm_send,
 };
 
 /** @} */
