@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_esp32_wemos_d1_r32 Wemos D1 R32 (ESPDuino-32)
  * @ingroup     boards_esp32
- * @brief       Support for the Wemos D1 R32 board (ESPDuino-32)
+ * @brief       Support for the Wemos D1 R32 (ESPDuino-32) board
  * @author      Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32_wemos_d1_r32 Wemos D1 R32 board (ESPDuino-32)
@@ -26,9 +26,9 @@
 ## Overview {#esp32_wemos_d1_r32_overview}
 
 The Wemos D1 R32 board is an ESP32 board in the Arduino Uno format that uses the
-ESP32-WROOM-32 module. The board is exactly the same as the ESPDuino-32 board
-and is pin compatible with the Arduino Uno board as the ESPDuino-32 board.
-The peripheral configuration corresponds to the Arduino Uno pinout and
+ESP32-WROOM-32 module. It is exactly the same board that is also known as
+ESPDuino-32 on the market. The board is pin compatible with the Arduino Uno
+board. The peripheral configuration corresponds to the Arduino Uno pinout and
 guaranties the compatibility with Arduino Uno Shields.
 
 \image html "https://makerselectronics.com/wp-content/uploads/2022/09/wemos-d1-r32-w-esp32-uno-r3-pinout-1-800x800.jpg.webp" "WeMos D1 R32 ESPDuino32" width=400px
@@ -57,12 +57,12 @@ information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
 The boad configuration guaranties that the board is compatible with Arduino
 Uno Shield. The board configuration provides:
 
-6 x ADC channels
-2 x DAC channels
-2 x PWM devices with a total of 7 channels
-1 x SPI device
-1 x I2C device
-2 x UART devices
+- 6 x ADC channels
+- 2 x DAC channels
+- 2 x PWM devices with a total of 7 channels
+- 1 x SPI device
+- 1 x I2C device
+- 2 x UART devices
 
 The following table shows the default board configuration, which is sorted
 according to the defined functionality of GPIOs.
