@@ -74,7 +74,7 @@ GPIO overview:
 - 1 x SPI
 - 1 x I2C
 - 1 x UART
-- 11 x PWM channels (only 4 defined by default)
+- 11 x PWM channels (only 3 defined by default)
 
 The purpose for which a GPIO is used depends on which module
 or function is used first. For example, if module `periph_spi` is not used,
@@ -91,7 +91,7 @@ BUTTON0         | GPIO9                 | GPIO9 is a [strapping pin](https://doc
 ADC             | GPIO2, GPIO3, GPIO4   | \ref esp32_adc_channels "ADC Channels"
 I2C_DEV(0):SCL  | GPIO7                 | \ref esp32_i2c_interfaces "I2C Interfaces"
 I2C_DEV(0):SDA  | GPIO6                 | \ref esp32_i2c_interfaces "I2C Interfaces"
-PWM_DEV(0)      | GPIO2, GPIO3, GPIO4, GPIO5 | \ref esp32_pwm_channels "PWM Channels"
+PWM_DEV(0)      | GPIO2, GPIO3, GPIO4   | \ref esp32_pwm_channels "PWM Channels"
 SPI_DEV(0):SCK  | GPIO8                 | \ref esp32_spi_interfaces "SPI Interfaces"
 SPI_DEV(0):MISO | GPIO9                 | \ref esp32_spi_interfaces "SPI Interfaces"
 SPI_DEV(0):MOSI | GPIO10                | \ref esp32_spi_interfaces "SPI Interfaces"
