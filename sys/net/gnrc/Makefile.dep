@@ -463,6 +463,18 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter auto_init_gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark
+endif
+
+ifneq (,$(filter gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += ipv4_addr
+  USEMODULE += fmt
+  USEMODULE += gnrc_pktbuf
+  USEMODULE += nanocoap
+  USEMODULE += od
+endif
+
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
