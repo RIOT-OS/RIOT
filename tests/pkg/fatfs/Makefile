@@ -22,7 +22,7 @@ compressed-image:
 
 include $(RIOTBASE)/Makefile.include
 
-ifneq (,$(filter native native32 native64,$(BOARD)))
+ifneq (,$(filter native32 native64,$(BOARD)))
   # overwrite default mtd_native-config to use fat image as flash device
   CFLAGS += -DMTD_NATIVE_FILENAME=\"./bin/riot_fatfs_disk.img\"
   CFLAGS += -DFATFS_IMAGE_FILE_SIZE_MIB=$(FATFS_IMAGE_FILE_SIZE_MIB)
