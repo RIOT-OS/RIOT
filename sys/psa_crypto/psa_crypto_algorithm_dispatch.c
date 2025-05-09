@@ -38,6 +38,10 @@
 #include "psa_ciphers.h"
 #endif
 
+#if IS_USED(MODULE_PSA_AEAD)
+#include "psa_aead.h"
+#endif
+
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 #include "psa_crypto_operation_encoder.h"
 #endif
@@ -728,6 +732,152 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     }
 }
 #endif /* MODULE_PSA_CIPHER */
+
+#if IS_USED(MODULE_PSA_AEAD)
+psa_status_t psa_algorithm_dispatch_aead_encrypt(   const psa_key_attributes_t *attributes,
+                                                    psa_algorithm_t alg,
+                                                    const psa_key_slot_t *slot,
+                                                    const uint8_t *nonce,
+                                                    size_t nonce_length,
+                                                    const uint8_t *additional_data,
+                                                    size_t additional_data_length,
+                                                    const uint8_t *plaintext,
+                                                    size_t plaintext_length,
+                                                    uint8_t *ciphertext,
+                                                    size_t ciphertext_size,
+                                                    size_t *ciphertext_length)
+{
+    psa_aead_op_t op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
+
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (attributes->type != PSA_KEY_TYPE_AES) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    if (op == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint8_t tag_len = PSA_AEAD_TAG_LENGTH(attributes->type, attributes->bits, alg);
+
+    switch (op) {
+    #if IS_USED(MODULE_PSA_AEAD_AES_128_CCM)
+        case PSA_CCM_AES_128:
+            return psa_aead_aes_128_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, plaintext,
+                                            plaintext_length, ciphertext,
+                                            ciphertext_size, ciphertext_length);
+    #endif
+    #if IS_USED(MODULE_PSA_AEAD_AES_192_CCM)
+        case PSA_CCM_AES_192:
+            return psa_aead_aes_192_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, plaintext,
+                                            plaintext_length, ciphertext,
+                                            ciphertext_size, ciphertext_length);
+    #endif
+    #if IS_USED(MODULE_PSA_AEAD_AES_256_CCM)
+        case PSA_CCM_AES_256:
+            return psa_aead_aes_256_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, plaintext,
+                                            plaintext_length, ciphertext,
+                                            ciphertext_size, ciphertext_length);
+    #endif
+        default:
+            (void)attributes;
+            (void)alg;
+            (void)slot;
+            (void)nonce;
+            (void)nonce_length;
+            (void)additional_data;
+            (void)additional_data_length;
+            (void)plaintext;
+            (void)plaintext_length;
+            (void)ciphertext;
+            (void)ciphertext_size;
+            (void)ciphertext_length;
+            return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *attributes,
+                                                    psa_algorithm_t alg,
+                                                    const psa_key_slot_t *slot,
+                                                    const uint8_t *nonce,
+                                                    size_t nonce_length,
+                                                    const uint8_t *additional_data,
+                                                    size_t additional_data_length,
+                                                    const uint8_t *ciphertext,
+                                                    size_t ciphertext_length,
+                                                    uint8_t *plaintext,
+                                                    size_t plaintext_size,
+                                                    size_t *plaintext_length)
+{
+    psa_aead_op_t op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
+
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (attributes->type != PSA_KEY_TYPE_AES) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    if (op == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint8_t tag_len = PSA_AEAD_TAG_LENGTH(attributes->type, attributes->bits, alg);
+
+    switch (op) {
+    #if IS_USED(MODULE_PSA_AEAD_AES_128_CCM)
+        case PSA_CCM_AES_128:
+            return psa_aead_aes_128_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, ciphertext,
+                                            ciphertext_length, plaintext,
+                                            plaintext_size, plaintext_length);
+    #endif
+    #if IS_USED(MODULE_PSA_AEAD_AES_192_CCM)
+        case PSA_CCM_AES_192:
+            return psa_aead_aes_192_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, ciphertext,
+                                            ciphertext_length, plaintext,
+                                            plaintext_size, plaintext_length);
+    #endif
+    #if IS_USED(MODULE_PSA_AEAD_AES_256_CCM)
+        case PSA_CCM_AES_256:
+            return psa_aead_aes_256_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, ciphertext,
+                                            ciphertext_length, plaintext,
+                                            plaintext_size, plaintext_length);
+    #endif
+        default:
+            (void)attributes;
+            (void)alg;
+            (void)slot;
+            (void)nonce;
+            (void)nonce_length;
+            (void)additional_data;
+            (void)additional_data_length;
+            (void)ciphertext;
+            (void)ciphertext_length;
+            (void)plaintext;
+            (void)plaintext_size;
+            (void)plaintext_length;
+            return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+#endif /* MODULE_PSA_AEAD */
 
 #if IS_USED(MODULE_PSA_MAC)
 psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attributes,

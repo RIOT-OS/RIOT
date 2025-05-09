@@ -71,6 +71,13 @@ static inline int constant_time_memcmp(const uint8_t *a, const uint8_t *b, size_
 }
 #endif /* MODULE_PSA_HASH */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
+                                                          psa_key_slot_t **p_slot,
+                                                          psa_key_usage_t usage,
+                                                          psa_algorithm_t alg);
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
+
 const char *psa_status_to_humanly_readable(psa_status_t status)
 {
     switch (status) {
@@ -116,6 +123,8 @@ const char *psa_status_to_humanly_readable(psa_status_t status)
             return "PSA_ERROR_INSUFFICIENT_DATA";
         case PSA_ERROR_INVALID_HANDLE:
             return "PSA_ERROR_INVALID_HANDLE";
+        case PSA_SUCCESS:
+            return "PSA_SUCCESS";
         default:
             return "Error value not recognized";
     }
@@ -143,6 +152,98 @@ psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
+/**
+ * @brief   aead encrypt and decrypt function
+ *
+ *          See @ref psa_aead_encrypt(...)
+ *          See @ref psa_aead_decrypt(...)
+ *
+ * @param   direction       Whether to encrypt or decrypt, see @ref psa_encrypt_or_decrypt_t
+ * @return  @ref psa_status_t
+ */
+static psa_status_t psa_aead_encrypt_decrypt(   psa_key_id_t key,
+                                                psa_algorithm_t alg,
+                                                const uint8_t * nonce,
+                                                size_t nonce_length,
+                                                const uint8_t * additional_data,
+                                                size_t additional_data_length,
+                                                const uint8_t * input,
+                                                size_t input_length,
+                                                uint8_t * output,
+                                                size_t output_size,
+                                                size_t * output_length,
+                                                psa_encrypt_or_decrypt_t direction)
+{
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if ((additional_data_length != 0 && !additional_data) || !nonce) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    if (!PSA_ALG_IS_AEAD(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (nonce_length > PSA_AEAD_NONCE_MAX_SIZE) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (direction == PSA_CRYPTO_DRIVER_DECRYPT && (!input || input_length == 0)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (direction == PSA_CRYPTO_DRIVER_ENCRYPT && (!output || output_size == 0)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
+                             PSA_KEY_USAGE_ENCRYPT :
+                             PSA_KEY_USAGE_DECRYPT);
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
+        if (output_size < PSA_AEAD_ENCRYPT_OUTPUT_SIZE(slot->attr.type, alg, input_length)) {
+            unlock_status = psa_unlock_key_slot(slot);
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
+        status = psa_location_dispatch_aead_encrypt(&slot->attr, alg, slot, nonce, nonce_length,
+                                                    additional_data, additional_data_length,
+                                                    input, input_length, output,
+                                                    output_size, output_length);
+    }
+    else {
+        if (output_size < PSA_AEAD_DECRYPT_OUTPUT_SIZE(slot->attr.type, alg, input_length)) {
+            unlock_status = psa_unlock_key_slot(slot);
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
+        status = psa_location_dispatch_aead_decrypt(&slot->attr, alg, slot, nonce, nonce_length,
+                                                    additional_data, additional_data_length,
+                                                    input, input_length, output,
+                                                    output_size, output_length);
+    }
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
+}
+
 psa_status_t psa_aead_decrypt(  psa_key_id_t key,
                                 psa_algorithm_t alg,
                                 const uint8_t *nonce,
@@ -155,18 +256,10 @@ psa_status_t psa_aead_decrypt(  psa_key_id_t key,
                                 size_t plaintext_size,
                                 size_t *plaintext_length)
 {
-    (void)key;
-    (void)alg;
-    (void)nonce;
-    (void)nonce_length;
-    (void)additional_data;
-    (void)additional_data_length;
-    (void)ciphertext;
-    (void)ciphertext_length;
-    (void)plaintext;
-    (void)plaintext_size;
-    (void)plaintext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    return psa_aead_encrypt_decrypt(key, alg, nonce, nonce_length, additional_data,
+                                    additional_data_length, ciphertext, ciphertext_length,
+                                    plaintext, plaintext_size, plaintext_length,
+                                    PSA_CRYPTO_DRIVER_DECRYPT);
 }
 
 psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
@@ -191,18 +284,10 @@ psa_status_t psa_aead_encrypt(  psa_key_id_t key,
                                 size_t ciphertext_size,
                                 size_t *ciphertext_length)
 {
-    (void)key;
-    (void)alg;
-    (void)nonce;
-    (void)nonce_length;
-    (void)additional_data;
-    (void)additional_data_length;
-    (void)plaintext;
-    (void)plaintext_length;
-    (void)ciphertext;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    return psa_aead_encrypt_decrypt(key, alg, nonce, nonce_length, additional_data,
+                                    additional_data_length, plaintext, plaintext_length,
+                                    ciphertext, ciphertext_size, ciphertext_length,
+                                    PSA_CRYPTO_DRIVER_ENCRYPT);
 }
 
 psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
