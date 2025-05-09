@@ -14,7 +14,7 @@ RIOTBASE ?= $(CURDIR)/../../../..
 USEMODULE += netdev_default
 
 # use GNRC by default
-LWIP_IPV4 ?= 0
+LWIP_IPV4 ?= 1
 LWIP_IPV6 ?= 0
 
 ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))

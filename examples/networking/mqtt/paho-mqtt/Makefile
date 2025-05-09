@@ -39,8 +39,8 @@ USEMODULE += netdev_default
 USEPKG += paho-mqtt
 
 # paho-mqtt depends on TCP support, choose which stacks you want
-GNRC_IPV6 ?= 1
-LWIP_IPV4 ?= 0
+GNRC_IPV6 ?= 0
+LWIP_IPV4 ?= 1
 LWIP_IPV6 ?= 0
 
 include Makefile.lwip
