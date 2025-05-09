@@ -23,5 +23,6 @@ or your FS will probably get damaged.
 
 # Real Hardware
 
-Currently the test defaults to sdcard_spi on real hardware. But generally any
-device that supports the mtd-interface can be used with FatFs.
+On real hardware, the test uses the default MTD if it has been enabled by the
+board definition with the corresponding `mtd_*_default` module or `sdcard_spi`.
+But generally any device that supports the mtd-interface can be used with FatFS.
