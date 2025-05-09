@@ -157,9 +157,14 @@ int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
     gnrc_netreg_entry_t *e;
     LL_FOREACH(netreg[type], e) {
         assert(entry != e);
+        if (e->target.pid == entry->target.pid) {
+            entry = NULL;
+            break;
+        }
     }
-
-    LL_PREPEND(netreg[type], entry);
+    if (entry) {
+        LL_PREPEND(netreg[type], entry);
+    }
     _gnrc_netreg_release_exclusive();
 
     return 0;

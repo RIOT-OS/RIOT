@@ -26,9 +26,11 @@
 #include "sx126x_driver.h"
 
 #include "net/netdev.h"
+#include "net/ieee802154/radio.h"
 
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "ztimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +82,44 @@ typedef enum {
 } sx126x_type_t;
 
 /**
+ * @brief   Internal sx126x device states
+ */
+typedef enum {
+    SX126X_STATE_STANDBY,
+    SX126X_STATE_TX,
+    SX126X_STATE_ACK,
+    SX126X_STATE_RX,
+    SX126X_STATE_CAD,
+} sx126x_state_t;
+
+/**
+ * @brief   Dio2 pin purpose
+ */
+typedef enum {
+    SX126X_DIO2_UNUSED,     /**< Not used */
+    SX126X_DIO2_IRQ,        /**< IRQ pin */
+    SX126X_DIO2_RF_SWITCH,  /**< RF switch control pin */
+} sx126x_dio2_mode_t;
+
+/**
+ * @brief   Dio3 pin purpose
+ */
+typedef enum {
+    SX126X_DIO3_UNUSED,     /**< Not used */
+    SX126X_DIO3_IRQ,        /**< IRQ pin */
+    SX126X_DIO3_TCX0,       /**< TCXO control pin */
+} sx126x_dio3_mode_t;
+
+/**
+ * @brief   Mask of all available interrupts
+ */
+#define SX126X_IRQ_MASK_ALL     (SX126X_IRQ_TX_DONE | SX126X_IRQ_RX_DONE | \
+                                 SX126X_IRQ_PREAMBLE_DETECTED | SX126X_IRQ_SYNC_WORD_VALID | \
+                                 SX126X_IRQ_HEADER_VALID | SX126X_IRQ_HEADER_ERROR | \
+                                 SX126X_IRQ_CRC_ERROR | SX126X_IRQ_CAD_DONE | \
+                                 SX126X_IRQ_CAD_DETECTED | SX126X_IRQ_TIMEOUT)
+
+/**
  * @brief   Device initialization parameters
  */
 typedef struct {
@@ -88,6 +128,33 @@ typedef struct {
     gpio_t reset_pin;                   /**< Reset pin */
     gpio_t busy_pin;                    /**< Busy pin */
     gpio_t dio1_pin;                    /**< Dio1 pin */
+    uint16_t dio1_irq_mask;             /**< IRQ mask for IRQs to route to Dio1 */
+#if IS_USED(MODULE_SX126X_DIO2)
+    sx126x_dio2_mode_t dio2_mode;       /**< Dio2 purpose */
+    union {
+        struct {
+            gpio_t dio2_pin;            /**< Dio2 IRQ pin if purpose is SX126X_DIO2_IRQ */
+            uint16_t dio2_irq_mask;     /**< IRQ mask for IRQs to route to Dio3 */
+        };
+        struct {
+            gpio_t rf_switch_pin;       /**< RF switch control pin if purpose is SX126X_DIO2_RF_SWITCH */
+        };
+    } u_dio2_arg;
+#endif
+#if IS_USED(MODULE_SX126X_DIO3)
+    sx126x_dio3_mode_t dio3_mode;       /**< Dio3 purpose */
+    union {
+        struct {
+            gpio_t dio3_pin;            /**< Dio3 IRQ pin if purpose is SX126X_DIO3_IRQ */
+            uint16_t dio3_irq_mask;     /**< IRQ mask for IRQs to route to Dio3 */
+        };
+        struct {
+            unsigned tcxo_volt    :8;   /**< TCXO voltage (see sx126x_tcxo_ctrl_voltages_t)*/
+            unsigned tcx0_timeout :24;  /**< TCXO timeout to wait for 32MHz coming from TXC0,
+                                             Delay duration = Delay(23:0) * 15.625 μs */
+        };
+    } u_dio3_arg;
+#endif
     sx126x_reg_mod_t regulator;         /**< Power regulator mode */
     sx126x_type_t type;                 /**< Variant of sx126x */
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
@@ -104,16 +171,33 @@ typedef struct {
  */
 struct sx126x {
     netdev_t netdev;                        /**< Netdev parent struct */
-    sx126x_params_t *params;                /**< Initialization parameters */
+    const sx126x_params_t *params;          /**< Initialization parameters */
     sx126x_pkt_params_lora_t pkt_params;    /**< Lora packet parameters */
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
-    uint16_t rx_timeout;                    /**< Rx Timeout in terms of symbols */
+    int32_t rx_timeout;                     /**< Rx Timeout in terms of symbols:
+                                                 <0: continuous Rx,
+                                                  0: single Rx,
+                                                 >0: actual timeout */
     bool radio_sleep;                       /**< Radio sleep status */
+#if IS_USED(MODULE_SX126X_IEEE802154)
+    sx126x_cad_params_t cad_params;         /**< Radio Channel Activity Detection parameters */
+    bool cad_detected   : 1;                /**< Channel Activity Detected Flag */
+    bool cad_done       : 1;                /**< Channel Activity Detection Done Flag */
+    bool ack_filter     : 1;                /**< whether the ACK filter is activated or not */
+    bool promisc        : 1;                /**< whether the device is in promiscuous mode or not */
+    bool pending        : 1;                /**< whether there pending bit should be set in the ACK frame or not */
+    sx126x_state_t state;
+    uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];   /**< Short (2 bytes) device address */
+    uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];     /**< Long (8 bytes) device address */
+    uint16_t pan_id;                                    /**< PAN ID */
+#endif
+    void (*event_cb)(void *arg);            /**< IRQ event callback */
+    void *event_arg;                        /**< IRQ event argument */
 };
 
 /**
- * @brief   Setup the radio device
+ * @brief   Setup the radio device for LoRA mode
  *
  * @param[in] dev                       Device descriptor
  * @param[in] params                    Parameters for device initialization
@@ -121,6 +205,20 @@ struct sx126x {
  *                                      If initialized manually, pass a unique identifier instead.
  */
 void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index);
+
+/**
+ * @brief   Setup the radio device for IEEE 802.15.4 HAL layer
+ *
+ * @param[in] dev                       Device descriptor
+ * @param[in] params                    Parameters for device initialization
+ * @param[in] index                     Index of @p params in a global parameter struct array.
+ *                                      If initialized manually, pass a unique identifier instead.
+ * @param[in] hal                       IEEE 802.15.4 HAL layer
+ * @param[in] event_cb                  Event callback function
+ * @param[in] arg                       Event callback argument
+ */
+void sx126x_hal_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index,
+                      ieee802154_dev_t *hal, void (*event_cb)(void *arg), void *arg);
 
 /**
  * @brief   Initialize the given device
@@ -300,6 +398,25 @@ bool sx126x_get_lora_iq_invert(const sx126x_t *dev);
  * @param[in] iq_invert                The LoRa IQ inverted mode
  */
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
+
+/**
+ * @brief   Calculate the time on air in µs for 1 symbol
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ *
+ * @return the time on air in µs for 1 symbol
+ */
+uint32_t sx126x_symbol_time_on_air_us(const sx126x_t *dev);
+
+/**
+ * @brief   Calculate the time on air in µs for a given payload length
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ * @param[in] payload_len              The payload length of a frame to be sent
+ *
+ * @return the time on air in µs of a frame with the given payload length
+ */
+uint32_t sx126x_time_on_air_us(const sx126x_t *dev, uint16_t payload_len);
 
 #ifdef __cplusplus
 }
