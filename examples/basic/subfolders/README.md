@@ -1,8 +1,8 @@
 # Application Example with Subfolders
 
 This example demonstrates the usage of subfolders in a RIOT application
-(or in a RIOT module in general) show-casing two possible approaches: RIOT
-modules and simple subfolders.
+(or in a RIOT module in general) show-casing two possible approaches:
+External RIOT modules and simple subfolders.
 
 ## Details
 
@@ -12,16 +12,18 @@ while the source files in `folder` are considered part of the application itself
 
 ```
 .
+├── external_modules
+│   └── module
+│       ├── a.c
+│       ├── b.c
+│       └── Makefile
 ├── folder
 │   ├── a.c
 │   └── subfolder
-│       └── b.c
+│       ├── b.c
+│       └── c.c
 ├── main.c
 ├── Makefile
-├── module
-│   ├── a.c
-│   ├── b.c
-│   └── Makefile
 └── README.md
 ```
 
@@ -30,14 +32,11 @@ while the source files in `folder` are considered part of the application itself
 At a minimum, each module in RIOT requires a `Makefile` with the following content:
 
 ```Makefile
-MODULE := my_module
-
 include $(RIOTBASE)/Makefile.base
 ```
 
-If `MODULE` is not specified, the name of the module's directory is automatically used,
-leaving only the last line as minimal content.
-It is important to note that module names have to be unique both among _all_ RIOT modules,
+The name of the module's directory is automatically used as the module name.
+It is important to note that module names have to be unique among _all_ RIOT modules,
 i.e., including the modules that are part of RIOT itself.
 
 If not manually specified via `SRC`, all source files which reside
@@ -47,12 +46,13 @@ RIOT modules are also described in greater detail [in the documentation](https:/
 Two lines need to be added to the application's Makefile in order to compile and use the module:
 
 ```Makefile
-DIRS += module
-USEMODULE += my_module
+EXTERNAL_MODULE_DIRS += $(CURDIR)/external_modules/
+USEMODULE += module
 ```
 
-The string added to `DIRS` has to match the directory name,
-while the string added to `USEMODULE` has to match the module's name as defined above.
+The path added to `EXTERNAL_MODULE_DIRS` is the parent directory of the external module,
+while the string added to `USEMODULE` has to match the module's directory name.
+External modules are described in greater detail [in the documentation](https://doc.riot-os.org/creating-an-application.html#autotoc_md2308).
 
 
 ### Subfolders

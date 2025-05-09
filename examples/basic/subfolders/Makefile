@@ -8,8 +8,8 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../../..
 
 # Add subfolders as modules
-DIRS += module
-USEMODULE += my_module # name as defined in module/Makefile
+EXTERNAL_MODULE_DIRS += $(CURDIR)/external_modules/
+USEMODULE += module # module name must match folder name
 
 # Add source files in subfolders manually
 SRC += main.c
@@ -18,9 +18,9 @@ SRC += folder/a.c folder/subfolder/b.c folder/subfolder/c.c
 # Alternative method to add files in subfolders using wildcards
 # SRC += $(wildcard *.c folder/*.c folder/**/*.c)
 
-# Adding subfolders both via SRC and DIRS will generate a warning
-# and likely fail during linking
-# DIRS += folder
+# Adding files in subfolders both via SRC and EXTERNAL_MODULE_DIRS
+# will generate a warning and likely fail during linking
+# SRC += external_modules/module/a.c
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
