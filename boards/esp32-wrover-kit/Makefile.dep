@@ -12,8 +12,11 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-  ifeq (,$(filter sdcard_spi,$(USEMODULE)))
-    # use mtd_sdmmc_default if sdcard_spi isn't explicitly enabled
+  ifneq (,$(filter sdcard_spi,$(USEMODULE)))
+    # use SD Card in SPI mode if sdcard_spi is explicitly enabled
+    USEMODULE += mtd_sdcard_default
+  else
+    # use SDMMC host for the SD Card otherwise
     USEMODULE += mtd_sdmmc_default
   endif
 endif

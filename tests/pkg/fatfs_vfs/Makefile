@@ -10,6 +10,10 @@ CFLAGS += -DCONFIG_FATFS_FORMAT_ALLOC_STATIC=1
 
 FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 
+TEST_DEPS += image
+
+include $(RIOTBASE)/Makefile.include
+
 ifneq (,$(filter native native32 native64,$(BOARD)))
   USEMODULE += mtd_native
 
@@ -19,13 +23,9 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
   CFLAGS += -DMTD_NATIVE_FILENAME=$(MTD_NATIVE_FILENAME)
   CFLAGS += -DFATFS_IMAGE_FILE_SIZE_MIB=$(FATFS_IMAGE_FILE_SIZE_MIB)
   CFLAGS += -DMTD_SECTOR_NUM=$(MTD_SECTOR_NUM)
-else
+else ifeq (,$(filter mtd_%_default,$(USEMODULE)))
   USEMODULE += mtd_sdcard
 endif
-
-TEST_DEPS += image
-
-include $(RIOTBASE)/Makefile.include
 
 image:
 	@tar -xjf riot_fatfs_disk.tar.gz -C ./bin/
