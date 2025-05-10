@@ -30,10 +30,12 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
+#ifdef MODULE_PERIPH_INIT_BUTTONS
         .name = "BOOT",
         .pin = BTN0_PIN,
         .mode = BTN0_MODE,
         .flags = SAUL_GPIO_INVERTED
+#endif
     },
 };
 
