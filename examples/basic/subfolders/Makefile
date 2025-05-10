@@ -11,6 +11,11 @@ RIOTBASE ?= $(CURDIR)/../../..
 EXTERNAL_MODULE_DIRS += $(CURDIR)/external_modules/
 USEMODULE += module # module name must match folder name
 
+# This is used for the test integration: The app will wait for "s" being sent
+# before starting with the output, so that the test does not fail because it
+# already finished printing when the terminal attaches.
+USEMODULE += test_utils_interactive_sync
+
 # Add source files in subfolders manually
 SRC += main.c
 SRC += folder/a.c folder/subfolder/b.c folder/subfolder/c.c
