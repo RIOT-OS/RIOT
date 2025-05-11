@@ -23,6 +23,8 @@ or your FS will probably get damaged.
 
 # Real Hardware
 
-On real hardware, the test uses the default MTD if it has been enabled by the
-board definition with the corresponding `mtd_*_default` module or `sdcard_spi`.
-But generally any device that supports the mtd-interface can be used with FatFS.
+On real hardware, either the SD Card connected to a SD/MMC controller is used
+or an SD Card in SPI mode using the driver module `sdcard_spi`. Whether a board
+has an SD card connected to an SD/MMC controller is defined in the list by the
+Makefile variable `BOARD_WITH_MTD_SDMMC`. Generally any device that supports
+the mtd-interface can be used with FatFS.
