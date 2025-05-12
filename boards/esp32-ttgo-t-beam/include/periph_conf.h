@@ -51,10 +51,10 @@
 #ifndef ADC_GPIOS
 #if MODULE_ESP32_TTGO_T_BEAM_V1_0
 #define ADC_GPIOS   { GPIO0, GPIO2, GPIO4, GPIO13, GPIO25, \
-                      GPIO32, GPIO33, GPIO35 }
+                      GPIO32, GPIO33, GPIO35, GPIO36, GPIO39 }
 #else
 #define ADC_GPIOS   { GPIO0, GPIO2, GPIO4, GPIO13, GPIO25, \
-                      GPIO32, GPIO33, GPIO34, GPIO35 }
+                      GPIO32, GPIO33, GPIO35, GPIO36, GPIO34 }
 #endif
 #endif
 
