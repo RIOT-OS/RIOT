@@ -211,6 +211,10 @@ int sx126x_init(sx126x_t *dev)
     /* Reset the device */
     sx126x_reset(dev);
 
+    if(sx126x_is_sx1262(dev)) {
+        sx126x_cfg_tx_clamp(dev);
+    }
+
     /* check for errors */
     sx126x_errors_mask_t error = 0;
     sx126x_get_device_errors(dev, &error);
