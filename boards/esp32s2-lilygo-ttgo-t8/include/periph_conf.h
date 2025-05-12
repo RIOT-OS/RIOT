@@ -169,7 +169,7 @@ extern "C" {
 #define SPI1_MOSI   GPIO11  /**< SPI MOSI */
 #endif
 #ifndef SPI1_CS0
-#define SPI1_CS0    GPIO10  /**< SPI CS0 used for Display */
+#define SPI1_CS0    GPIO10  /**< SPI CS0 used for SD Card */
 #endif
 /** @} */
 
