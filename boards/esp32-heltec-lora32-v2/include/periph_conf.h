@@ -101,7 +101,7 @@
  */
 /** PWM channels for device PWM_DEV(0) */
 #ifndef PWM0_GPIOS
-#define PWM0_GPIOS  { GPIO25, GPIO0, GPIO2, GPIO17 }
+#define PWM0_GPIOS  { GPIO25, GPIO17, GPIO2 }
 #endif
 
 /** PWM_DEV(1) is not used */
