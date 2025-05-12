@@ -1,0 +1,5 @@
+USEMODULE += netdev_ieee802154
+USEMODULE += netdev_new_api
+USEMODULE += ieee802154
+USEMODULE += ieee802154_submac
+USEMODULE += ztimer_usec
