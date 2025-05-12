@@ -198,7 +198,6 @@ div.fragment {
   line-height: 1.42857143;
   margin: 0 0 10px;
   padding: 10px;
-  overflow: visible;
   page-break-inside: avoid;
   word-break: break-all;
   word-wrap: break-word;
