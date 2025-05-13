@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266
  * @{
@@ -14,9 +16,6 @@
  * @brief       Low-level UART driver for source code compatibility with ESP-IDF
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef UART_LL_H
-#define UART_LL_H
 
 #ifndef DOXYGEN
 
@@ -129,5 +128,4 @@ static inline uint32_t uart_ll_get_intr_ena_status(uart_dev_t *hw)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* UART_LL_H */
 /** @} */
