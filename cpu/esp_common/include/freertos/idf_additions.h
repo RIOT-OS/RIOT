@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_IDF_ADDITIONS_H
-#define FREERTOS_IDF_ADDITIONS_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -24,4 +23,3 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_IDF_ADDITIONS_H */
