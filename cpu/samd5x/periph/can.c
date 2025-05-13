@@ -103,7 +103,7 @@ static const struct can_bittiming_const bittiming_const = {
 };
 
 /* since this driver is sam only its safe to assume that 0 is an undefined pin */
-bool _pin_is_valid_and_defined(gpio_t pin){
+static bool _pin_is_valid_and_defined(gpio_t pin){
      return (pin) && gpio_is_valid(pin);
 }
 
