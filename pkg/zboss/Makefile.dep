@@ -7,3 +7,4 @@ USEMODULE += gnrc_mac
 USEMODULE += auto_init_gnrc_netif
 
 FEATURES_REQUIRED += periph_flashpage
+FEATURES_REQUIRED += periph_flashpage_pagewise
