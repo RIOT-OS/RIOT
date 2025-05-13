@@ -17,6 +17,7 @@
  * @}
  */
 
+#include "can/can.h"
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
@@ -101,7 +102,7 @@ static const struct can_bittiming_const bittiming_const = {
     .brp_inc = 1,
 };
 
-/* since this driver is sam only its safe to asume that 0 is an undefined pin */
+/* since this driver is sam only its safe to assume that 0 is an undefined pin */
 bool _pin_is_valid_and_defined(gpio_t pin){
      return (pin) && gpio_is_valid(pin);
 }
@@ -267,25 +268,28 @@ static void _setup_clock(can_t *dev)
     } while (!(pchctrl & GCLK_PCHCTRL_CHEN));
 }
 
-static void _set_bit_timing(can_t *dev)
+static void _set_bit_timing(can_t * dev)
 {
-    assert(dev->candev.bittiming.sjw >= 1);
-    assert(dev->candev.bittiming.phase_seg2 >= 1);
-    assert(dev->candev.bittiming.phase_seg1 + dev->candev.bittiming.prop_seg >= 1);
-    assert(dev->candev.bittiming.brp >= 1);
+    struct can_bittiming * bittiming = & dev->candev.bittiming;
+    assert(bittiming->sjw >= 1);
+    assert(bittiming->phase_seg2 >= 1);
+    assert(bittiming->phase_seg1 + bittiming->prop_seg >= 1);
+    assert(bittiming->brp >= 1);
 
     DEBUG("bitrate=%" PRIu32 ", sample_point=%" PRIu32 ", brp=%" PRIu32 ", prop_seg=%" PRIu32
           ", phase_seg1=%" PRIu32 ", phase_seg2=%" PRIu32 ", sjw=%" PRIu32 "\n",
-          dev->candev.bittiming.bitrate, dev->candev.bittiming.sample_point,
-          dev->candev.bittiming.brp, dev->candev.bittiming.prop_seg,
-          dev->candev.bittiming.phase_seg1, dev->candev.bittiming.phase_seg2,
-          dev->candev.bittiming.sjw);
+          bittiming->bitrate, bittiming->sample_point,
+          bittiming->brp, bittiming->prop_seg,
+          bittiming->phase_seg1, bittiming->phase_seg2,
+          bittiming->sjw);
 
     /* Set bit timing */
-    dev->conf->can->NBTP.reg = (uint32_t)((CAN_NBTP_NTSEG2(dev->candev.bittiming.phase_seg2 - 1))
-                            | (CAN_NBTP_NTSEG1(dev->candev.bittiming.phase_seg1 + dev->candev.bittiming.prop_seg - 1))
-                            | (CAN_NBTP_NBRP(dev->candev.bittiming.brp - 1))
-                            | (CAN_NBTP_NSJW(dev->candev.bittiming.sjw - 1)));
+    uint32_t nbtp = CAN_NBTP_NTSEG2(bittiming->phase_seg2 - 1)
+                    | CAN_NBTP_NTSEG1(bittiming->phase_seg1 + bittiming->prop_seg - 1)
+                    | CAN_NBTP_NBRP(bittiming->brp - 1)
+                    | CAN_NBTP_NSJW(bittiming->sjw - 1);
+
+    dev->conf->can->NBTP.reg = nbtp;
 }
 
 static void _set_tx_fifo_data_size(can_t *dev, uint8_t size) {
@@ -386,19 +390,19 @@ void can_init(can_t *dev, const can_conf_t *conf)
 static void _dump_msg_ram_section(can_t *dev)
 {
     puts("start address|\tsize of section");
-    printf("Standard filters|\t%p|\t%u\n", (dev->msg_ram.std_filter),
+    printf("SFF filters|\t0x%08" PRIxPTR "|\t%u\n", (uintptr_t)(dev->msg_ram.std_filter),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.std_filter)));
-    printf("Extended filters|\t%p|\t%u\n", (dev->msg_ram.ext_filter),
+    printf("EFF filters|\t0x%08" PRIxPTR "|\t%u\n", (uintptr_t)(dev->msg_ram.ext_filter),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.ext_filter)));
-    printf("Rx FIFO 0|\t%p |\t%u\n", (dev->msg_ram.rx_fifo_0),
+    printf("Rx FIFO 0|\t0x%08" PRIxPTR " |\t%u\n", (uintptr_t)(dev->msg_ram.rx_fifo_0),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.rx_fifo_0)));
-    printf("Rx FIFO 1|\t%p|\t%u\n", (dev->msg_ram.rx_fifo_1),
+    printf("Rx FIFO 1|\t0x%08" PRIxPTR "|\t%u\n", (uintptr_t)(dev->msg_ram.rx_fifo_1),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.rx_fifo_1)));
-    printf("Rx buffer|\t%p|\t%u\n", (dev->msg_ram.rx_buffer),
+    printf("Rx buffer|\t0x%08" PRIxPTR "|\t%u\n", (uintptr_t)(dev->msg_ram.rx_buffer),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.rx_buffer)));
-    printf("Tx event FIFO|\t%p|\t%u\n", (dev->msg_ram.tx_event_fifo),
+    printf("Tx event FIFO|\t0x%08" PRIxPTR "|\t%u\n", (uintptr_t)(dev->msg_ram.tx_event_fifo),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.tx_event_fifo)));
-    printf("Tx buffer|\t%p|\t%u\n", (dev->msg_ram.tx_buffer),
+    printf("Tx buffer|\t0x%08" PRIxPTR "|\t%u\n", (uintptr_t)(dev->msg_ram.tx_buffer),
                                         (unsigned)(ARRAY_SIZE(dev->msg_ram.tx_buffer)));
 }
 
@@ -503,15 +507,15 @@ static int _init(candev_t *candev)
     return res;
 }
 
-#define LOWER_HALF_NIBBLE (0x0F)
+#define LOWEST_NIBBLE (0x0F)
 
 static uint8_t _form_message_marker(size_t idx)
 {
     static unsigned count;
     count++;
-    return (LOWER_HALF_NIBBLE & idx) | ((count & LOWER_HALF_NIBBLE) << 4) ;
+    return (LOWEST_NIBBLE & idx) | ((count & LOWEST_NIBBLE) << 4);
 }
-#undef LOWER_HALF_NIBBLE
+#undef LOWEST_NIBBLE
 
 static int _send(candev_t *candev, const struct can_frame *frame)
 {
@@ -539,14 +543,14 @@ static int _send(candev_t *candev, const struct can_frame *frame)
     uint32_t txbe0 = 0;
     uint32_t txbe1 = 0;
     if (frame->can_id & CAN_EFF_FLAG) {
-        DEBUG_PUTS("Extended ID");
+        DEBUG_PUTS("EFF ID");
         txbe0 = CAN_TXBE_0_ID(frame->can_id & CAN_EFF_MASK) | CAN_TXBE_0_XTD;
     }
     else {
         DEBUG_PUTS("Standard identifier");
         txbe0 = CAN_TXBE_0_ID((frame->can_id & CAN_SFF_MASK) << 18);
     }
-    if( frame->can_id & CAN_RTR_FLAG){
+    if ( frame->can_id & CAN_RTR_FLAG){
         txbe0 |= CAN_TXBE_0_RTR;
     }
     txbe0 |= CAN_TXBE_0_ESI;
@@ -565,7 +569,7 @@ static int _send(candev_t *candev, const struct can_frame *frame)
     /* Request transmission */
     dev->conf->can->TXBAR.reg |= (1 << put_idx);
 
-    /* message marker is more useful to identify this message tranmission than mailbox*/
+    /* message marker is more useful to identify this message transmission than mailbox*/
     return tx_mm;
 }
 
@@ -620,11 +624,11 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
             return -1;
     }
     if (filter->can_id & CAN_EFF_FLAG) {
-        DEBUG_PUTS("Extended filter to add in the extended filter section of the message RAM");
+        DEBUG_PUTS("EFF id filter to add in the extended filter section of the message RAM");
         /* Check if the filter already exists */
         idx = _find_filter(dev, filter, false);
         if (idx != -1) {
-            DEBUG_PUTS("Extended filter already exists --> Update it");
+            DEBUG_PUTS("EFF id filter already exists --> Update it");
         }
         else {
             /* Find a free slot where to save the filter */
@@ -644,26 +648,29 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
             return -1;
         }
 
-        DEBUG("Extended Filter to add at idx = %d\n", idx);
-        dev->msg_ram.ext_filter[idx].XIDFE_0.reg |= CAN_XIDFE_0_EFEC(filter_conf);
+        DEBUG("EFF id filter to add at idx = %d\n", idx);
         /* For now, only CLASSIC filters are supported */
-        dev->msg_ram.ext_filter[idx].XIDFE_1.reg |= CAN_XIDFE_1_EFT(CANDEV_SAMD5X_CLASSIC_FILTER);
-        dev->msg_ram.ext_filter[idx].XIDFE_0.reg |= CAN_XIDFE_0_EFID1(filter->can_id);
-        dev->msg_ram.ext_filter[idx].XIDFE_1.reg |= CAN_XIDFE_1_EFID2(filter->can_mask & CAN_EFF_MASK);
-        DEBUG("Extended filter element N°%d: F0 = %p, F1 = %p\n",
-              idx, (void *)(dev->msg_ram.ext_filter[idx].XIDFE_0.reg),
-              (void *)(dev->msg_ram.ext_filter[idx].XIDFE_1.reg));
+        /* avoid multiple writes into volatile memory*/
+        uint32_t xidfe_0 = CAN_XIDFE_0_EFEC(filter_conf) | CAN_XIDFE_0_EFID1(filter->can_id);
+        uint32_t xidfe_1 = CAN_XIDFE_1_EFT(CANDEV_SAMD5X_CLASSIC_FILTER)
+                         | CAN_XIDFE_1_EFID2(filter->can_mask & CAN_EFF_MASK);
+
+        dev->msg_ram.ext_filter[idx].XIDFE_0.reg |= xidfe_0;
+        dev->msg_ram.ext_filter[idx].XIDFE_1.reg |= xidfe_1;
+        DEBUG("EFF id filter element N°%d: F0 = 0x%08" PRIxPTR ", F1 = 0x%08" PRIxPTR "\n",
+              idx, (uintptr_t)(dev->msg_ram.ext_filter[idx].XIDFE_0.reg),
+              (uintptr_t)(dev->msg_ram.ext_filter[idx].XIDFE_1.reg));
         _set_mode(dev->conf->can, MODE_INIT);
         /* Reject all extended frames that are not matching the filters applied */
         dev->conf->can->GFC.reg |= CAN_GFC_ANFE((uint32_t)CAN_REJECT);
         _exit_init_mode(dev->conf->can);
     }
     else {
-        DEBUG_PUTS("Standard filter to add in the standard filter section of the message RAM");
+        DEBUG_PUTS("SFF id filter to add in the standard filter section of the message RAM");
         /* Check if the filter already exists */
         idx = _find_filter(dev, filter, true);
         if (idx != -1) {
-            DEBUG_PUTS("Standard filter already exists --> Update it");
+            DEBUG_PUTS("SFF id filter already exists --> Update it");
         }
         else {
             /* Find a free slot where to save the filter */
@@ -683,15 +690,16 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
             return -1;
         }
 
-        DEBUG("Standard Filter to add at idx = %d\n", idx);
+        DEBUG("SFF id filter to add at idx = %d\n", idx);
         /* For now, only CLASSIC filters are supported */
-        dev->msg_ram.std_filter[idx].SIDFE_0.reg = CAN_SIDFE_0_SFEC(filter_conf)
-                                                      | CAN_SIDFE_0_SFT(CANDEV_SAMD5X_CLASSIC_FILTER)
-                                                      | CAN_SIDFE_0_SFID1(filter->can_id & CAN_SFF_MASK)
-                                                      | CAN_SIDFE_0_SFID2(filter->can_mask & CAN_SFF_MASK);
+        uint32_t sidfe_0 = CAN_SIDFE_0_SFEC(filter_conf)
+                         | CAN_SIDFE_0_SFT(CANDEV_SAMD5X_CLASSIC_FILTER)
+                         | CAN_SIDFE_0_SFID1(filter->can_id & CAN_SFF_MASK)
+                         | CAN_SIDFE_0_SFID2(filter->can_mask & CAN_SFF_MASK);
+        dev->msg_ram.std_filter[idx].SIDFE_0.reg = sidfe_0;
 
-        DEBUG("Standard filter element N°%d: S0 = %p" PRIx32 "\n",
-              (int)idx, (void *)(dev->msg_ram.std_filter[idx].SIDFE_0.reg));
+        DEBUG("SFF id filter element N°%d: S0 = 0x%08" PRIxPTR "\n",
+              (int)idx, (uintptr_t)(dev->msg_ram.std_filter[idx].SIDFE_0.reg));
         _set_mode(dev->conf->can, MODE_INIT);
         /* Reject all standard frames that are not matching the filters applied */
         dev->conf->can->GFC.reg |= CAN_GFC_ANFS((uint32_t)CAN_REJECT);
@@ -709,7 +717,7 @@ static int _remove_filter(candev_t *candev, const struct can_filter *filter)
     if (filter->can_id & CAN_EFF_FLAG) {
         idx = _find_filter(dev, filter, false);
         if (idx != -1) {
-            DEBUG("Extended filter to disable at idx = %d\n", idx);
+            DEBUG("EFF id filter to disable at idx = %d\n", idx);
             dev->msg_ram.ext_filter[idx].XIDFE_0.reg &= ~CAN_XIDFE_0_EFEC_Msk;
         }
         else {
@@ -720,7 +728,7 @@ static int _remove_filter(candev_t *candev, const struct can_filter *filter)
     else {
         idx = _find_filter(dev, filter, true);
         if (idx != -1) {
-            DEBUG("Standard filter to disable at idx = %d\n", idx);
+            DEBUG("SFF id filter to disable at idx = %d\n", idx);
             dev->msg_ram.std_filter[idx].SIDFE_0.reg &= ~CAN_SIDFE_0_SFEC_Msk;
         }
         else {
@@ -842,7 +850,7 @@ void _mcan_hdr_can_frame(struct can_frame * f, uint32_t r0, uint32_t r1){
     f->can_id = canid;
     f->can_dlc = (r1 & CAN_TXEFE_1_DLC_Msk) >> CAN_TXEFE_1_DLC_Pos;
 
-    /* timstamp and message marker are currently unprased */
+    /* timestamp and message marker are currently unprased */
 }
 
 
@@ -877,7 +885,7 @@ static void _isr(candev_t *candev)
             uint32_t rxfe_1 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_1.reg;
 
             _mcan_hdr_can_frame(&frame,rxfe_0 ,rxfe_1 );
-            /* extract extra data here eg timstamps */
+            /* extract extra data here e.g. timestamps */
             memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_DATA, frame.can_dlc);
 
             /* acknowledge FIFO */
@@ -911,7 +919,7 @@ static void _isr(candev_t *candev)
             uint32_t rxfe_1 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_1.reg;
 
             _mcan_hdr_can_frame(&frame,rxfe_0 ,rxfe_1 );
-            /* extract extra data here eg timstamps */
+            /* extract extra data here e.g. timestamps */
             memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_DATA, frame.can_dlc);
 
             /* acknowledge FIFO */
@@ -945,10 +953,10 @@ static void _isr(candev_t *candev)
             uint32_t txfe_1 = dev->msg_ram.tx_event_fifo[idx].TXEFE_1.reg;
 
             _mcan_hdr_can_frame(&frame,txfe_0 ,txfe_1 );
-            /* extract extra data here eg timstamps */
+            /* extract extra data here e.g. timestamps */
             memcpy(frame.data, (uint32_t *)dev->msg_ram.tx_buffer[idx].TXBE_DATA, frame.can_dlc);
 
-            /*TODO acknowledge TX EVENT */
+            /* acknowledge TX EVENT */
             can->TXEFA.reg = CAN_TXEFA_EFAI(idx);
             if (dev->candev.event_callback) {
                 dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_CONFIRMATION, &frame);
