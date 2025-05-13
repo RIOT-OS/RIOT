@@ -550,7 +550,7 @@ static int _send(candev_t *candev, const struct can_frame *frame)
         DEBUG_PUTS("Standard identifier");
         txbe0 = CAN_TXBE_0_ID((frame->can_id & CAN_SFF_MASK) << 18);
     }
-    if ( frame->can_id & CAN_RTR_FLAG){
+    if (frame->can_id & CAN_RTR_FLAG){
         txbe0 |= CAN_TXBE_0_RTR;
     }
     txbe0 |= CAN_TXBE_0_ESI;
@@ -610,14 +610,13 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
     can_t *dev = container_of(candev, can_t, candev);
 
     ssize_t idx = 0;
-    uint32_t tmp = 0;
-    uint8_t filter_conf = 0;
+    uint8_t mbx = 0;
     switch (filter->target_mailbox) {
         case 0:
-            filter_conf = CANDEV_SAMD5X_FILTER_RX_FIFO_0;
+            mbx = CANDEV_SAMD5X_FILTER_RX_FIFO_0;
             break;
         case 1 :
-            filter_conf = CANDEV_SAMD5X_FILTER_RX_FIFO_1;
+            mbx = CANDEV_SAMD5X_FILTER_RX_FIFO_1;
             break;
         default:
             puts("Invalid target mailbox --> Do not apply filter");
@@ -633,8 +632,8 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
         else {
             /* Find a free slot where to save the filter */
             for (idx = 0; (uint16_t)idx < ARRAY_SIZE(dev->msg_ram.ext_filter); idx++) {
-                tmp = dev->msg_ram.ext_filter[idx].XIDFE_0.reg;
-                if (((tmp & CAN_XIDFE_0_EFEC_Msk) >> CAN_XIDFE_0_EFEC_Pos) ==
+                uint32_t xidfe_0 = dev->msg_ram.ext_filter[idx].XIDFE_0.reg;
+                if (((xidfe_0 & CAN_XIDFE_0_EFEC_Msk) >> CAN_XIDFE_0_EFEC_Pos) ==
                     CANDEV_SAMD5X_FILTER_DISABLE)
                 {
                     DEBUG_PUTS("empty slot");
@@ -651,7 +650,7 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
         DEBUG("EFF id filter to add at idx = %d\n", idx);
         /* For now, only CLASSIC filters are supported */
         /* avoid multiple writes into volatile memory*/
-        uint32_t xidfe_0 = CAN_XIDFE_0_EFEC(filter_conf) | CAN_XIDFE_0_EFID1(filter->can_id);
+        uint32_t xidfe_0 = CAN_XIDFE_0_EFEC(mbx) | CAN_XIDFE_0_EFID1(filter->can_id);
         uint32_t xidfe_1 = CAN_XIDFE_1_EFT(CANDEV_SAMD5X_CLASSIC_FILTER)
                          | CAN_XIDFE_1_EFID2(filter->can_mask & CAN_EFF_MASK);
 
@@ -675,8 +674,8 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
         else {
             /* Find a free slot where to save the filter */
             for (idx = 0; (uint16_t)idx < ARRAY_SIZE(dev->msg_ram.std_filter); idx++) {
-                tmp = dev->msg_ram.std_filter[idx].SIDFE_0.reg;
-                if (((tmp & CAN_SIDFE_0_SFEC_Msk) >> CAN_SIDFE_0_SFEC_Pos) ==
+                uint32_t sidfe_0 = dev->msg_ram.std_filter[idx].SIDFE_0.reg;
+                if (((sidfe_0 & CAN_SIDFE_0_SFEC_Msk) >> CAN_SIDFE_0_SFEC_Pos) ==
                     CANDEV_SAMD5X_FILTER_DISABLE)
                 {
                     DEBUG_PUTS("empty slot");
@@ -692,7 +691,7 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
 
         DEBUG("SFF id filter to add at idx = %d\n", idx);
         /* For now, only CLASSIC filters are supported */
-        uint32_t sidfe_0 = CAN_SIDFE_0_SFEC(filter_conf)
+        uint32_t sidfe_0 = CAN_SIDFE_0_SFEC(mbx)
                          | CAN_SIDFE_0_SFT(CANDEV_SAMD5X_CLASSIC_FILTER)
                          | CAN_SIDFE_0_SFID1(filter->can_id & CAN_SFF_MASK)
                          | CAN_SIDFE_0_SFID2(filter->can_mask & CAN_SFF_MASK);
