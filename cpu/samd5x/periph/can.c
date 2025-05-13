@@ -829,25 +829,25 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
     return res;
 }
 
-void _mcan_hdr_can_frame(struct can_frame * f, uint32_t r0, uint32_t r1){
-    /* while r0 and r1 in fifo elements (rx and tx) are not the same
-     * the most relevant bits of R0 and R1 are shared between the different
+void _mcan_hdr_can_frame(struct can_frame * frame, uint32_t fe_r0, uint32_t fe_r1){
+    /* while fifo element R0 and R1 in rx and tx are not the same
+     * the most relevant bits of r0 and r1 are shared between the different
      * fifo element types this using the TXEFE definition to parse them */
     canid_t canid = 0;
-    if (r0 & CAN_TXEFE_0_XTD){
+    if (fe_r0 & CAN_TXEFE_0_XTD){
         canid |= CAN_EFF_FLAG;
-        canid |= (r0 & CAN_TXEFE_0_ID_Msk) >> CAN_TXEFE_0_ID_Pos;
+        canid |= (fe_r0 & CAN_TXEFE_0_ID_Msk) >> CAN_TXEFE_0_ID_Pos;
     }
     else {
         /* 11 bit can id are stored in bit [28:18] of the ID field */
-        canid |= (r0 & CAN_TXEFE_0_ID_Msk) >> CAN_TXEFE_0_ID_Pos >> 18;
+        canid |= (fe_r0 & CAN_TXEFE_0_ID_Msk) >> CAN_TXEFE_0_ID_Pos >> 18;
     }
 
-    if (r0 & CAN_TXEFE_0_RTR){
+    if (fe_r0 & CAN_TXEFE_0_RTR){
         canid |= CAN_RTR_FLAG;
     }
-    f->can_id = canid;
-    f->can_dlc = (r1 & CAN_TXEFE_1_DLC_Msk) >> CAN_TXEFE_1_DLC_Pos;
+    frame->can_id = canid;
+    frame->can_dlc = (fe_r1 & CAN_TXEFE_1_DLC_Msk) >> CAN_TXEFE_1_DLC_Pos;
 
     /* timestamp and message marker are currently unprased */
 }
@@ -962,7 +962,7 @@ static void _isr(candev_t *candev)
             if (dev->candev.event_callback) {
                 dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_CONFIRMATION, &frame);
             }
-        } while(lvl > 1 );
+        } while (lvl > 1);
     }
 
     static uint8_t last_error_code = 0;

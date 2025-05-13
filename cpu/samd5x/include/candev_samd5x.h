@@ -143,7 +143,7 @@ typedef struct {
 /**
  * @brief CAN message RAM accessible to the CAN controller
  */
-typedef struct can_msg_ram {
+struct can_msg_ram {
     /** Standard filters space in the CAN message RAM */
     CanMramSidfe std_filter[CANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM];
     /** Extended filters space in the CAN message RAM */
@@ -158,7 +158,7 @@ typedef struct can_msg_ram {
     CanMramTxefe tx_event_fifo[CANDEV_SAMD5X_DEFAULT_TX_EVT_FIFO_ELTS_NUM];
     /** Transmission FIFO space in the CAN message RAM */
     CanMramTxbe tx_buffer[CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM];
-} can_msg_ram_t;
+};
 
 /**
  * @brief CAN device descriptor
