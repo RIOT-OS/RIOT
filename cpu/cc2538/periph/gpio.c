@@ -31,7 +31,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MODE_NOTSUP         (0xff)
+#define MODE_NOTSUP         (0xf0)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t isr_ctx[4][8];
@@ -100,7 +100,7 @@ static inline uint8_t _pp_num(gpio_t pin)
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     /* check if mode is valid */
-    if (mode == MODE_NOTSUP) {
+    if (mode >= MODE_NOTSUP) {
         return -1;
     }
 
