@@ -831,8 +831,8 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 
 void _mcan_hdr_can_frame(struct can_frame * f, uint32_t r0, uint32_t r1){
     /* while r0 and r1 in fifo elements (rx and tx) are not the same
-     * the most relvant bits of R0 and R1 are shared between the different
-     * fifo element types this using the TXEFE defintion to parse them */
+     * the most relevant bits of R0 and R1 are shared between the different
+     * fifo element types this using the TXEFE definition to parse them */
     canid_t canid = 0;
     if (r0 & CAN_TXEFE_0_XTD){
         canid |= CAN_EFF_FLAG;
@@ -840,7 +840,7 @@ void _mcan_hdr_can_frame(struct can_frame * f, uint32_t r0, uint32_t r1){
     }
     else {
         /* 11 bit can id are stored in bit [28:18] of the ID field */
-        canid |= (r0 & CAN_TXEFE_0_ID_Msk) >> CAN_TXEFE_0_ID_Pos >> 18 ;
+        canid |= (r0 & CAN_TXEFE_0_ID_Msk) >> CAN_TXEFE_0_ID_Pos >> 18;
     }
 
     if (r0 & CAN_TXEFE_0_RTR){
@@ -851,7 +851,6 @@ void _mcan_hdr_can_frame(struct can_frame * f, uint32_t r0, uint32_t r1){
 
     /* timestamp and message marker are currently unprased */
 }
-
 
 static void _isr(candev_t *candev)
 {
@@ -867,7 +866,7 @@ static void _isr(candev_t *candev)
         /* Clear the interrupt source flag */
         can->IR.reg |= CAN_IR_RF0N;
 
-        unsigned lvl = 0 ;
+        unsigned lvl = 0;
         do{
             uint32_t rx_fifo_status = can->RXF0S.reg;
             size_t rx_get_idx = ((rx_fifo_status & CAN_RXF0S_F0GI_Msk) >> CAN_RXF0S_F0GI_Pos);
@@ -883,9 +882,10 @@ static void _isr(candev_t *candev)
             uint32_t rxfe_0 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_0.reg;
             uint32_t rxfe_1 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_1.reg;
 
-            _mcan_hdr_can_frame(&frame,rxfe_0 ,rxfe_1 );
+            _mcan_hdr_can_frame(&frame, rxfe_0, rxfe_1);
             /* extract extra data here e.g. timestamps */
-            memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_DATA, frame.can_dlc);
+            memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_DATA,
+                   frame.can_dlc);
 
             /* acknowledge FIFO */
             can->RXF0A.reg = CAN_RXF0A_F0AI(rx_get_idx);
@@ -901,7 +901,7 @@ static void _isr(candev_t *candev)
         /* Clear the interrupt source flag */
         can->IR.reg |= CAN_IR_RF1N;
 
-        unsigned lvl = 0 ;
+        unsigned lvl = 0;
         do{
             uint32_t rx_fifo_status = can->RXF1S.reg;
             size_t rx_get_idx =   ((rx_fifo_status & CAN_RXF1S_F1GI_Msk) >> CAN_RXF1S_F1GI_Pos);
@@ -917,9 +917,10 @@ static void _isr(candev_t *candev)
             uint32_t rxfe_0 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_0.reg;
             uint32_t rxfe_1 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_1.reg;
 
-            _mcan_hdr_can_frame(&frame,rxfe_0 ,rxfe_1 );
+            _mcan_hdr_can_frame(&frame, rxfe_0, rxfe_1);
             /* extract extra data here e.g. timestamps */
-            memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_DATA, frame.can_dlc);
+            memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_DATA,
+                   frame.can_dlc);
 
             /* acknowledge FIFO */
             can->RXF1A.reg = CAN_RXF1A_F1AI(rx_get_idx);
@@ -933,7 +934,8 @@ static void _isr(candev_t *candev)
     if (irq_reg & CAN_IR_TEFN) {
         DEBUG_PUTS("New Tx event FIFO entry");
         can->IR.reg |= CAN_IR_TEFN;
-        unsigned lvl = 0 ;
+
+        unsigned lvl = 0;
         do{
             uint32_t txfs = can->TXEFS.reg;
             size_t tx_get_idx = ((txfs & CAN_TXEFS_EFGI_Msk) >> CAN_TXEFS_EFGI_Pos);
@@ -951,7 +953,7 @@ static void _isr(candev_t *candev)
             uint32_t txfe_0 = dev->msg_ram.tx_event_fifo[idx].TXEFE_0.reg;
             uint32_t txfe_1 = dev->msg_ram.tx_event_fifo[idx].TXEFE_1.reg;
 
-            _mcan_hdr_can_frame(&frame,txfe_0 ,txfe_1 );
+            _mcan_hdr_can_frame(&frame, txfe_0, txfe_1);
             /* extract extra data here e.g. timestamps */
             memcpy(frame.data, (uint32_t *)dev->msg_ram.tx_buffer[idx].TXBE_DATA, frame.can_dlc);
 
