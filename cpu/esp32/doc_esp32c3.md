@@ -1,12 +1,11 @@
-/*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2022 Gunar Schorcht
 
-/**
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
 @defgroup   cpu_esp32_esp32c3 ESP32-C3 family
 @ingroup    cpu_esp32
 @brief      Specific properties of ESP32-C3 variant (family)
@@ -229,5 +228,3 @@ For more information about JTAG configuration for ESP32-C3, refer to the
 section [Configure Other JTAG Interface]
 (https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/jtag-debugging/configure-other-jtag.html)
 in the ESP-IDF documentation.
-
-*/
