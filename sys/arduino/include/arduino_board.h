@@ -46,6 +46,18 @@ extern "C" {
 #define F_CPU CLOCK_CORECLOCK
 #endif
 
+/**
+ * @brief Arduino IDE define for the on-board LED
+ *
+ * In Arduino IDE the on-board LED pin is defined by macro `LED_BUILTIN`. It
+ * is used whenever the LED is controlled. To make it easier to use Arduino
+ * sketches as they are, `LED_BUILTIN` is defined by using @ref ARDUINO_LED as
+ * defined by the board.
+ */
+#ifndef LED_BUILTIN
+#  define LED_BUILTIN   ARDUINO_LED
+#endif
+
 #ifdef __cplusplus
 }
 #endif
