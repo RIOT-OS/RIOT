@@ -34,6 +34,7 @@ endif
 
 ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
   USEMODULE += ipv6
+  USEMODULE += ipv6_addr
   USEMODULE += random
 endif
 
@@ -106,6 +107,18 @@ endif
 # if an actual netdev is used, we need lwip_netdev to integrate it
 ifneq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_netdev
+endif
+
+# Addition of missing modules for boards that do not have physical network
+# module - a dirty hack when lwip_dhcp is used for IPv4 (use of lwip_ipv4 module)
+# on such boards (lack of netdev_new_api module)
+ifneq (,$(filter lwip_dhcp,$(USEMODULE)))
+  ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+    ifeq (,$(filter netdev_new_api,$(USEMODULE)))
+      USEMODULE += netdev_eth
+      USEMODULE += netdev_new_api
+   endif
+  endif
 endif
 
 ifneq (,$(filter netif,$(USEMODULE)))

@@ -82,7 +82,7 @@ static void _isr(event_t *ev);
 bool is_netdev_legacy_api(netdev_t *netdev)
 {
     static_assert(IS_USED(MODULE_NETDEV_NEW_API) || IS_USED(MODULE_NETDEV_LEGACY_API),
-                  "used netdev misses dependency to netdev_legacy_api");
+                  "used netdev misses dependency to netdev_legacy_api or netdev_new_api");
     if (!IS_USED(MODULE_NETDEV_NEW_API)) {
         return true;
     }
