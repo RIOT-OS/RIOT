@@ -53,7 +53,6 @@ extern "C" {
 /**
  * @}
  */
-
 #define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus
