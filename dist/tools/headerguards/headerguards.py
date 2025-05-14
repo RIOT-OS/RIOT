@@ -44,7 +44,6 @@ def fix_headerguard(filename):
 
     guard_found = 0
     pragma_once_found = 0
-    include_next_found = 0
     guard_name = ""
     ifstack = 0
     for line in inlines:
@@ -80,8 +79,6 @@ def fix_headerguard(filename):
                 else:
                     guard_found += 1
                     line = "#endif /* %s */\n" % supposed
-            elif line.startswith("#include_next"):
-                include_next_found = 1
 
         tmp.write(line)
 
@@ -91,10 +88,9 @@ def fix_headerguard(filename):
         # Valid cases:
         #  - no #pragma once, classic headerguards (#ifndef, #define, #endif)
         #  - one #pragma once, no classic headerguards
-        if include_next_found == 0:
-            for line in difflib.unified_diff(inlines, tmp.readlines(),
-                                             "%s" % filename, "%s" % filename):
-                sys.stdout.write(line)
+        for line in difflib.unified_diff(inlines, tmp.readlines(),
+                                         "%s" % filename, "%s" % filename):
+            sys.stdout.write(line)
     elif (pragma_once_found == 0 and guard_found == 0):
         print("%s: no header guards found" % filename, file=sys.stderr)
         return False
