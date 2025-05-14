@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "board.h"
+#include <ctype.h>
 #include "errno.h"
 #include "fmt.h"
 #include "macros/units.h"
@@ -120,23 +121,52 @@ static int cmd_read_page(mtd_dev_t *dev, int argc, char **argv)
 
 static int _print_write_usage(const char *progname)
 {
-    printf("usage: %s <addr> <data>\n", progname);
+    printf("usage: %s [-b] <addr> <data>\n", progname);
     return -1;
+}
+
+ssize_t _fmt_binary(char *buf)
+{
+    size_t len = 0;
+    if (strlen(buf) % 2) {
+        return -1;
+    }
+    for (size_t i = 0; i < len; i++) {
+        if (!isxdigit((int)(buf[i]))) {
+            return -1;
+        }
+    }
+    return fmt_hex_bytes((uint8_t *)buf, buf);
 }
 
 static int cmd_write(mtd_dev_t *dev, int argc, char **argv)
 {
     uint32_t addr, len;
+    void *data;
 
     assert(strcmp(*argv, "write") == 0);
     if (argc < 3) {
         return _print_write_usage(argv[0]);
     }
 
-    addr = atoi(argv[1]);
-    len  = strlen(argv[2]);
+    bool binary = argc > 3 && (strcmp(argv[1], "-b") == 0);
+    if (binary) {
+        addr = atoi(argv[2]);
+        data = argv[3];
+        ssize_t blen  = _fmt_binary(data);
+        if (blen < 0) {
+            printf("error: data must be hexadecimal: %s\n", (char *)data);
+            return -1;
+        }
+        len = blen;
+    }
+    else {
+        addr = atoi(argv[1]);
+        data = argv[2];
+        len  = strlen(data);
+    }
 
-    int res = mtd_write(dev, argv[2], addr, len);
+    int res = mtd_write(dev, data, addr, len);
 
     if (res) {
         printf("error: %i\n", res);
@@ -147,24 +177,40 @@ static int cmd_write(mtd_dev_t *dev, int argc, char **argv)
 
 static int _print_write_page_raw_usage(const char *progname)
 {
-    printf("usage: %s <page> <offset> <data>\n", progname);
+    printf("usage: %s [-b] <page> <offset> <data>\n", progname);
     return -1;
 }
 
 static int cmd_write_page_raw(mtd_dev_t *dev, int argc, char **argv)
 {
     uint32_t page, offset, len;
+    void *data;
 
     assert(strcmp(*argv, "write_page_raw") == 0);
     if (argc < 4) {
         return _print_write_page_raw_usage(argv[0]);
     }
 
-    page   = atoi(argv[1]);
-    offset = atoi(argv[2]);
-    len    = strlen(argv[3]);
+    bool binary = argc > 4 && (strcmp(argv[1], "-b") == 0);
+    if (binary) {
+        page   = atoi(argv[2]);
+        offset = atoi(argv[3]);
+        data = argv[4];
+        ssize_t blen  = _fmt_binary(data);
+        if (blen < 0) {
+            printf("error: data must be hexadecimal: %s\n", (char *)data);
+            return -1;
+        }
+        len = blen;
+    }
+    else {
+        page   = atoi(argv[1]);
+        offset = atoi(argv[2]);
+        data = argv[3];
+        len    = strlen(data);
+    }
 
-    int res = mtd_write_page_raw(dev, argv[3], page, offset, len);
+    int res = mtd_write_page_raw(dev, data, page, offset, len);
 
     if (res) {
         printf("error: %i\n", res);
@@ -175,7 +221,7 @@ static int cmd_write_page_raw(mtd_dev_t *dev, int argc, char **argv)
 
 static int _print_write_page_usage(const char *progname)
 {
-    printf("usage: %s <page> <offset> <data>\n", progname);
+    printf("usage: %s [-b] <page> <offset> <data>\n", progname);
     return -1;
 }
 
@@ -183,17 +229,33 @@ static int cmd_write_page(mtd_dev_t *dev, int argc, char **argv)
 {
 #if IS_USED(MODULE_MTD_WRITE_PAGE)
     uint32_t page, offset, len;
+    void *data;
 
     assert(strcmp(*argv, "write_page") == 0);
     if (argc < 4) {
         return _print_write_page_usage(argv[0]);
     }
 
-    page   = atoi(argv[1]);
-    offset = atoi(argv[2]);
-    len    = strlen(argv[3]);
+    bool binary = argc > 4 && (strcmp(argv[1], "-b") == 0);
+    if (binary) {
+        page   = atoi(argv[2]);
+        offset = atoi(argv[3]);
+        data = argv[4];
+        ssize_t blen  = _fmt_binary(data);
+        if (blen < 0) {
+            printf("error: data must be hexadecimal: %s\n", (char *)data);
+            return -1;
+        }
+        len = blen;
+    }
+    else {
+        page   = atoi(argv[1]);
+        offset = atoi(argv[2]);
+        data = argv[3];
+        len    = strlen(data);
+    }
 
-    int res = mtd_write_page(dev, argv[3], page, offset, len);
+    int res = mtd_write_page(dev, data, page, offset, len);
 
     if (res) {
         printf("error: %i\n", res);
@@ -309,6 +371,7 @@ static void _print_info(mtd_dev_t *dev)
 static int cmd_info(mtd_dev_t *dev, int argc, char **argv)
 {
     (void)argc;
+    (void)argv;
     assert(strcmp(*argv, "info") == 0);
 
     if (dev) {
