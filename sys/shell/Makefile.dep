@@ -214,6 +214,7 @@ ifneq (,$(filter shell_cmd_md5sum,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_mtd,$(USEMODULE)))
   USEMODULE += fmt
+  USEMODULE += mtd
   USEMODULE += od
 endif
 ifneq (,$(filter shell_cmd_nanocoap_vfs,$(USEMODULE)))
