@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Command to read and write bytes from/to an MTD devices
+ * @brief       Command to low-level access Memory Technology Devices (MTD)
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
