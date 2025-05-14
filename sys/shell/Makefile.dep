@@ -212,6 +212,11 @@ endif
 ifneq (,$(filter shell_cmd_md5sum,$(USEMODULE)))
   USEMODULE += shell_cmd_vfs
 endif
+ifneq (,$(filter shell_cmd_mtd,$(USEMODULE)))
+  USEMODULE += fmt
+  USEMODULE += mtd
+  USEMODULE += od
+endif
 ifneq (,$(filter shell_cmd_nanocoap_vfs,$(USEMODULE)))
   USEMODULE += nanocoap_vfs
   USEMODULE += vfs_util
