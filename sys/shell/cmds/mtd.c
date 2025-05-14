@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -27,6 +28,7 @@
 #include <string.h>
 
 #include "board.h"
+#include "errno.h"
 #include "fmt.h"
 #include "macros/units.h"
 #include "mtd.h"
@@ -228,6 +230,7 @@ static int _print_write_page_usage(const char *progname)
 
 static int cmd_write_page(mtd_dev_t *dev, int argc, char **argv)
 {
+#if IS_USED(MODULE_MTD_WRITE_PAGE)
     uint32_t page, offset, len;
     void *data;
 
@@ -262,6 +265,13 @@ static int cmd_write_page(mtd_dev_t *dev, int argc, char **argv)
     }
 
     return res;
+#else
+    (void)dev;
+    (void)argc;
+    (void)argv;
+    printf("error: write_page not supported, missing module mtd_write_page\n");
+    return -ENOTSUP;
+#endif
 }
 
 static int _print_erase_usage(const char *progname)
