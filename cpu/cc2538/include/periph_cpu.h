@@ -153,7 +153,7 @@ typedef enum {
     GPIO_IN_PD      = ((uint8_t)OVERRIDE_PULLDOWN),     /**< input, pull-down */
     GPIO_IN_PU      = ((uint8_t)OVERRIDE_PULLUP),       /**< input, pull-up */
     GPIO_OUT        = ((uint8_t)OVERRIDE_ENABLE),       /**< output */
-    GPIO_OD         = (0xff),                           /**< not supported */
+    GPIO_OD         = (0xfe),                           /**< not supported */
     GPIO_OD_PU      = (0xff)                            /**< not supported */
 } gpio_mode_t;
 /** @} */
