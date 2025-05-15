@@ -219,6 +219,10 @@ void saul_init_devs(void)
         extern void auto_init_max31855(void);
         auto_init_max31855();
     }
+    if (IS_USED(MODULE_MCP23X17)) {
+        extern void auto_init_mcp23x17(void);
+        auto_init_mcp23x17();
+    }
     if (IS_USED(MODULE_MCP47XX)) {
         extern void auto_init_mcp47xx(void);
         auto_init_mcp47xx();
