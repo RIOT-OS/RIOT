@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "common.h"
+#include "test_common.h"
 #include "fmt.h"
 #include "init_dev.h"
 #include "kw2xrf.h"

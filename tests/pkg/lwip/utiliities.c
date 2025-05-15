@@ -15,7 +15,7 @@
 
 #include <stdbool.h>
 
-#include "common.h"
+#include "utilities.h"
 
 size_t hex2ints(uint8_t *out, const char *in)
 {

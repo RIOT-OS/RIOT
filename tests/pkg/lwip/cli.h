@@ -15,8 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef CLI_H
+#define CLI_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -45,17 +45,6 @@ extern "C" {
 /**
  * @}
  */
-
-/**
- * @brief   Converts hex string to byte array.
- *
- * @param[out] out  Resulting byte array
- * @param[in] in    `\0` terminated string. Non-hex characters (all except 0-9, a-f, A-F)
- *                  will be ignored.
- *
- * @return  Length of @p out.
- */
-size_t hex2ints(uint8_t *out, const char *in);
 
 #ifdef MODULE_SOCK_IP
 /**
@@ -100,5 +89,5 @@ int udp_cmd(int argc, char **argv);
 }
 #endif
 
-#endif /* COMMON_H */
+#endif /* CLI_H */
 /** @} */

@@ -16,18 +16,27 @@
  * @author     Jens Wetterich <jens@wetterich-net.de>
  */
 
+#include <stdbool.h>
+
+/* prevent the inclusion of irq.h on irq.hpp */
+#define IRQ_H
+unsigned irq_disable(void);
+unsigned irq_enable(void);
+bool irq_is_enabled(void);
+bool irq_is_in(void);
+void irq_restore(unsigned state);
+
 #define FFF_ARG_HISTORY_LEN  1u
 #define FFF_CALL_HISTORY_LEN 1u
 #include "cppunit.hpp"
 #include "fff.h"
-#include "irq.h"
 #include "irq.hpp"
 DEFINE_FFF_GLOBALS
 
 FAKE_VALUE_FUNC(unsigned, irq_disable)
 FAKE_VALUE_FUNC(unsigned, irq_enable)
-FAKE_VALUE_FUNC(int, irq_is_enabled)
-FAKE_VALUE_FUNC(int, irq_is_in)
+FAKE_VALUE_FUNC(bool, irq_is_enabled)
+FAKE_VALUE_FUNC(bool, irq_is_in)
 FAKE_VOID_FUNC(irq_restore, unsigned)
 
 class irq_suite : public riot::testing::test_suite {

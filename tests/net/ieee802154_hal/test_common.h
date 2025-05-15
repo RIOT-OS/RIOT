@@ -15,8 +15,8 @@
  *
  * @author  José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef TEST_COMMON_H
+#define TEST_COMMON_H
 
 #include "net/ieee802154/radio.h"
 #if IS_USED(MODULE_SOCKET_ZEP)
@@ -60,5 +60,5 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque);
 }
 #endif
 
-#endif /* COMMON_H */
+#endif /* TEST_COMMON_H */
 /** @} */

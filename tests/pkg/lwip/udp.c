@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "common.h"
+#include "cli.h"
 #include "od.h"
 #include "net/af.h"
 #include "net/sock/async/event.h"
@@ -29,6 +29,7 @@
 #include "shell.h"
 #include "test_utils/expect.h"
 #include "thread.h"
+#include "utilities.h"
 #include "ztimer.h"
 
 #ifdef MODULE_SOCK_UDP
