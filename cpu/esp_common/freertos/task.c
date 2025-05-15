@@ -148,6 +148,11 @@ void vTaskSuspend(TaskHandle_t xTaskToSuspend)
     }
 }
 
+void vTaskSuspendAll(void)
+{
+    /* TODO */
+}
+
 void vTaskResume(TaskHandle_t xTaskToResume)
 {
     extern volatile thread_t *sched_active_thread;
@@ -156,6 +161,12 @@ void vTaskResume(TaskHandle_t xTaskToResume)
     uint32_t pid = (uint32_t)xTaskToResume;
     assert(pid_is_valid(pid));
     thread_wakeup (pid);
+}
+
+BaseType_t xTaskResumeAll(void)
+{
+    /* TODO */
+    return pdFALSE;
 }
 
 void vTaskDelay(const TickType_t xTicksToDelay)

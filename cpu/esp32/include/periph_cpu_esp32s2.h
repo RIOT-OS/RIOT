@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /** Mapping configured ESP32-S2 default clock to CLOCK_CORECLOCK define */
-#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ)
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
 
 /**
  * @brief   CPU cycles per busy wait loop
@@ -96,8 +96,6 @@ extern "C" {
  * - ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
  *   therefore not available as ADC channels if the modules `esp_wifi` or
  *   `esp_now` are used.
- * - Vref can be read with function #adc_line_vref_to_gpio at an ADC2 channel,
- *   that is at GPIO11 ... GPIO20.
  * - GPIO3 is a strapping pin und shouldn't be used as ADC channel
  */
 
@@ -269,7 +267,6 @@ extern "C" {
  */
 #define USBDEV_NUM_ENDPOINTS            DWC2_USB_OTG_FS_NUM_EP
 /** @} */
-
 
 #ifdef __cplusplus
 }

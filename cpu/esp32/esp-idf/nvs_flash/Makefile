@@ -3,8 +3,6 @@ MODULE = esp_idf_nvs_flash
 # source files to be compiled for this module
 ESP32_SDK_SRCXX = \
   components/nvs_flash/src/nvs_api.cpp \
-  components/nvs_flash/src/nvs_cxx_api.cpp \
-  components/nvs_flash/src/nvs_handle_locked.cpp \
   components/nvs_flash/src/nvs_handle_simple.cpp \
   components/nvs_flash/src/nvs_item_hash_list.cpp \
   components/nvs_flash/src/nvs_page.cpp \
@@ -12,13 +10,15 @@ ESP32_SDK_SRCXX = \
   components/nvs_flash/src/nvs_partition.cpp \
   components/nvs_flash/src/nvs_partition_lookup.cpp \
   components/nvs_flash/src/nvs_partition_manager.cpp \
+  components/nvs_flash/src/nvs_platform.cpp \
   components/nvs_flash/src/nvs_storage.cpp \
   components/nvs_flash/src/nvs_types.cpp \
   #
 
 # additional include pathes required by this module
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_partition/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/private_include
 
 include $(RIOTBASE)/Makefile.base
 
