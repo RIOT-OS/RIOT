@@ -96,8 +96,8 @@ Function        | GPIOs  | Remarks |Configuration
 :---------------|:-------|:--------|:----------------------------------
 BUTTON0         | GPIO0  | | |
 ADC             | GPIO0, GPIO2, GPIO4, GPIO12, GPIO13,\n GPIO14, GPIO15, GPIO25, GPIO26, GPIO27,\n GPIO32, GPIO33, GPIO34, GPIO35, GPIO36,\n GPIO39 | | see \ref esp32_adc_channels "ADC Channels"
-DAC             | GPIO25, GPIO26 | | \ref esp32_dac_channels "refer"
-PWM_DEV(0)      | GPIO0, GPIO2, GPIO4, GPIO16, GPIO17 | - | \ref esp32_pwm_channels "DAC Channels"
+DAC             | GPIO25, GPIO26 | | \ref esp32_dac_channels "DAC Channels"
+PWM_DEV(0)      | GPIO0, GPIO2, GPIO4, GPIO16, GPIO17 | - | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(1)      | GPIO27, GPIO32, GPIO33 | - | \ref esp32_pwm_channels "PWM Channels"
 I2C_DEV(0):SDA  | GPIO21 | | \ref esp32_i2c_interfaces "I2C Interfaces"
 I2C_DEV(0):SCL  | GPIO22 | | \ref esp32_i2c_interfaces "I2C Interfaces"
