@@ -28,7 +28,6 @@ extern "C" {
 
 #define ARDUINO_UART_D0D1       UART_DEV(0) /**< Arduino UART interface */
 #define ARDUINO_SPI_D11D12D13   SPI_DEV(0)  /**< Arduino SPI bus */
-#define ARDUINO_I2C_UNO         I2C_DEV(0)  /**< Arduino I2C bus */
 
 #if MODULE_ESP32_TTGO_T_BEAM_V1_0
 #  define ARDUINO_LED           (3)         /**< LED is connected to Arduino pin 3 */
