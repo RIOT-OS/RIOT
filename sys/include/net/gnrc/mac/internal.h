@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_mac
  * @{
@@ -18,8 +20,6 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-#ifndef NET_GNRC_MAC_INTERNAL_H
-#define NET_GNRC_MAC_INTERNAL_H
 
 #include <stdint.h>
 
@@ -141,5 +141,4 @@ void gnrc_mac_dispatch(gnrc_mac_rx_t *rx);
 }
 #endif
 
-#endif /* NET_GNRC_MAC_INTERNAL_H */
 /** @} */

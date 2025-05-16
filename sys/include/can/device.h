@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -17,8 +19,6 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
-#ifndef CAN_DEVICE_H
-#define CAN_DEVICE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -122,6 +122,5 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
 }
 #endif
 
-#endif /* CAN_DEVICE_H */
 
 /** @} */

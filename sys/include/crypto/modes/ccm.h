@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -17,8 +19,6 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef CRYPTO_MODES_CCM_H
-#define CRYPTO_MODES_CCM_H
 
 #include "crypto/ciphers.h"
 
@@ -109,5 +109,4 @@ int cipher_decrypt_ccm(const cipher_t *cipher,
 }
 #endif
 
-#endif /* CRYPTO_MODES_CCM_H */
 /** @} */

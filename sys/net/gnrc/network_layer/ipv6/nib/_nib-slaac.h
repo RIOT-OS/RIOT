@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_ipv6_nib
  * @brief
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PRIV_NIB_SLAAC_H
-#define PRIV_NIB_SLAAC_H
 
 #include <kernel_defines.h>
 #include <stdint.h>
@@ -80,5 +80,4 @@ void _handle_valid_addr(const ipv6_addr_t *addr);
 }
 #endif
 
-#endif /* PRIV_NIB_SLAAC_H */
 /** @} */

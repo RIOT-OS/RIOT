@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_atomic_utils_volatile   Helpers for volatile accesses
  * @ingroup     sys_atomic_utils
@@ -25,8 +27,6 @@
  * @warning     In most cases using this over @ref sys_atomic_utils is a bug!
  */
 
-#ifndef VOLATILE_UTILS_H
-#define VOLATILE_UTILS_H
 
 #include <stdint.h>
 
@@ -351,5 +351,4 @@ static inline uint64_t volatile_fetch_and_u64(volatile uint64_t *dest,
 }
 #endif
 
-#endif /* VOLATILE_UTILS_H */
 /** @} */

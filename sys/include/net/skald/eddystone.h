@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    ble_skald_eddystone Skald meets Eddy
  * @ingroup     ble_skald
@@ -32,8 +34,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_SKALD_EDDYSTONE_H
-#define NET_SKALD_EDDYSTONE_H
 
 #include "net/eddystone.h"
 #include "net/skald.h"
@@ -83,5 +83,4 @@ void skald_eddystone_url_adv(skald_ctx_t *ctx,
 }
 #endif
 
-#endif /* NET_SKALD_EDDYSTONE_H */
 /** @} */

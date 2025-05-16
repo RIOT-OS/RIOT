@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_se_driver    PSA Crypto Secure Element Wrapper
@@ -36,8 +38,6 @@
  *              authors implement, are not intended to be called by application developers.
  */
 
-#ifndef PSA_CRYPTO_SE_DRIVER_H
-#define PSA_CRYPTO_SE_DRIVER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1310,5 +1310,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PSA_CRYPTO_SE_DRIVER_H */
 /** @} */

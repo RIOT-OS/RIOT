@@ -21,6 +21,8 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_ecc
  * @{
@@ -36,8 +38,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw.hamburg.de>
  */
 
-#ifndef ECC_GOLAY2412_H
-#define ECC_GOLAY2412_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,5 +71,4 @@ void golay2412_decode(uint32_t _dec_msg_len,
 }
 #endif
 
-#endif /* ECC_GOLAY2412_H */
 /** @} */

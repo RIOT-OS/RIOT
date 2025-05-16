@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef RESULT_OUTPUT_TYPES_H
-#define RESULT_OUTPUT_TYPES_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,4 +41,3 @@ struct turo {
 #ifdef __cplusplus
 }
 #endif
-#endif /* RESULT_OUTPUT_TYPES_H */

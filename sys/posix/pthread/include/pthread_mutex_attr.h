@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -14,8 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef PTHREAD_MUTEX_ATTR_H
-#define PTHREAD_MUTEX_ATTR_H
 
 #include <errno.h>
 
@@ -215,7 +215,6 @@ int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness);
 }
 #endif
 
-#endif /* PTHREAD_MUTEX_ATTR_H */
 
 /**
  * @}

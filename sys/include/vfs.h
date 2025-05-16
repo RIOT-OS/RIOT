@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup  sys_vfs Virtual File System (VFS) layer
  * @ingroup   sys
@@ -50,8 +52,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef VFS_H
-#define VFS_H
 
 #include <stdint.h>
 #include <sys/stat.h> /* for struct stat */
@@ -1210,6 +1210,5 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp,
 }
 #endif
 
-#endif /* VFS_H */
 
 /** @} */

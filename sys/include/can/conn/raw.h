@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_can_conn Connection
  * @ingroup     sys_can
@@ -22,8 +24,6 @@
  *
  */
 
-#ifndef CAN_CONN_RAW_H
-#define CAN_CONN_RAW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,5 +138,4 @@ int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, siz
 }
 #endif
 
-#endif /* CAN_CONN_RAW_H */
 /** @} */

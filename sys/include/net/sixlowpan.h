@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sixlowpan   6LoWPAN
  * @ingroup     net
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_SIXLOWPAN_H
-#define NET_SIXLOWPAN_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -343,5 +343,4 @@ void sixlowpan_print(uint8_t *data, size_t size);
 }
 #endif
 
-#endif /* NET_SIXLOWPAN_H */
 /** @} */

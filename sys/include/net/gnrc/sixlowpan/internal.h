@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_sixlowpan
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_INTERNAL_H
-#define NET_GNRC_SIXLOWPAN_INTERNAL_H
 
 #include <stddef.h>
 
@@ -73,5 +73,4 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_INTERNAL_H */
 /** @} */

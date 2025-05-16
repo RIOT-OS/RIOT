@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_can_isotp ISO transport protocol over CAN
  * @ingroup     sys_can
@@ -18,8 +20,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef CAN_ISOTP_H
-#define CAN_ISOTP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -214,5 +214,4 @@ void isotp_free_rx(can_rx_data_t *rx);
 }
 #endif
 
-#endif /* CAN_ISOTP_H */
 /** @} */

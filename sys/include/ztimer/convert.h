@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_ztimer_convert ztimer frequency conversion modules
  * @ingroup     sys_ztimer
@@ -27,8 +29,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef ZTIMER_CONVERT_H
-#define ZTIMER_CONVERT_H
 
 #include "ztimer.h"
 
@@ -93,5 +93,4 @@ void ztimer_convert_stop(ztimer_clock_t *clock);
 }
 #endif
 
-#endif /* ZTIMER_CONVERT_H */
 /** @} */

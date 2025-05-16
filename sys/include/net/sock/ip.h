@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sock_ip     Raw IPv4/IPv6 sock API
  * @ingroup     net_sock
@@ -265,8 +267,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_IP_H
-#define NET_SOCK_IP_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -707,5 +707,4 @@ static inline ssize_t sock_ip_send(sock_ip_t *sock,
 }
 #endif
 
-#endif /* NET_SOCK_IP_H */
 /** @} */

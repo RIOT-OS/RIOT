@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sixlowpan_sfr   6LoWPAN selective fragment recovery
  * @ingroup     net_sixlowpan
@@ -19,8 +21,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_SIXLOWPAN_SFR_H
-#define NET_SIXLOWPAN_SFR_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -374,5 +374,4 @@ static inline bool sixlowpan_sfr_ack_is(const sixlowpan_sfr_t *hdr)
 }
 #endif
 
-#endif /* NET_SIXLOWPAN_SFR_H */
 /** @} */

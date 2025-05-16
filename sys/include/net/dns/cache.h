@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_dns_cache   DNS cache
  * @ingroup     net_dns
@@ -30,8 +32,6 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef NET_DNS_CACHE_H
-#define NET_DNS_CACHE_H
 
 #include <stdint.h>
 
@@ -107,5 +107,4 @@ static inline void dns_cache_add(const char *domain_name, const void *addr,
 }
 #endif
 
-#endif /* NET_DNS_CACHE_H */
 /** @} */

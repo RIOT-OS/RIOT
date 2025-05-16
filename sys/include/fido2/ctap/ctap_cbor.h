@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_cbor FIDO2 CTAP CBOR
  * @ingroup     fido2_ctap
@@ -19,8 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-#ifndef FIDO2_CTAP_CTAP_CBOR_H
-#define FIDO2_CTAP_CTAP_CBOR_H
 
 #include "fido2/ctap/ctap.h"
 
@@ -334,5 +334,4 @@ void fido2_ctap_cbor_init_encoder(uint8_t *buf, size_t len);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_CBOR_H */
 /** @} */

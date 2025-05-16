@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_ctap FIDO2 CTAP
  * @ingroup     fido2_ctap
@@ -22,8 +24,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-#ifndef FIDO2_CTAP_CTAP_H
-#define FIDO2_CTAP_CTAP_H
 
 #include <stdint.h>
 
@@ -680,5 +680,4 @@ ctap_state_t *fido2_ctap_get_state(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_H */
 /** @} */

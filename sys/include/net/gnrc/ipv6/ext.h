@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6_ext IPv6 extension headers.
  * @ingroup     net_gnrc_ipv6
@@ -19,8 +21,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef NET_GNRC_IPV6_EXT_H
-#define NET_GNRC_IPV6_EXT_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -192,7 +192,6 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_H */
 /**
  * @}
  */

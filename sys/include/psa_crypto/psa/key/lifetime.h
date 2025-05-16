@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef PSA_CRYPTO_PSA_KEY_LIFETIME_H
-#define PSA_CRYPTO_PSA_KEY_LIFETIME_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -278,5 +278,4 @@ typedef uint32_t psa_key_location_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_KEY_LIFETIME_H */
 /** @} */

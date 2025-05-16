@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gcoap  GCoAP
  * @ingroup     net
@@ -394,8 +396,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_GCOAP_H
-#define NET_GCOAP_H
 
 #include <stdint.h>
 
@@ -1209,5 +1209,4 @@ static inline coap_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_memo_t 
 }
 #endif
 
-#endif /* NET_GCOAP_H */
 /** @} */

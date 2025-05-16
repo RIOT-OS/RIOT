@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_rtc_utils RTC helpers
  * @ingroup     sys
@@ -16,8 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef RTC_UTILS_H
-#define RTC_UTILS_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -96,5 +96,4 @@ bool rtc_tm_valid(const struct tm *t);
 }
 #endif
 
-#endif /* RTC_UTILS_H */
 /** @} */

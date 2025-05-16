@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_pipe Pipe IPC
  * @ingroup     sys
@@ -32,8 +34,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef PIPE_H
-#define PIPE_H
 
 #include <sys/types.h>
 
@@ -121,7 +121,6 @@ void pipe_free(pipe_t *rp);
 }
 #endif
 
-#endif /* PIPE_H */
 /**
  * @}
  */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef PSA_CRYPTO_PSA_KEY_TYPE_H
-#define PSA_CRYPTO_PSA_KEY_TYPE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -877,5 +877,4 @@ typedef uint8_t psa_dh_family_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_KEY_TYPE_H */
 /** @} */

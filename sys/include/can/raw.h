@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -21,8 +23,6 @@
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  */
 
-#ifndef CAN_RAW_H
-#define CAN_RAW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -275,5 +275,4 @@ int raw_can_set_trx(int ifnum, can_trx_t *trx);
 }
 #endif
 
-#endif /* CAN_RAW_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_inet_csum    Internet Checksum
  * @ingroup     net
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_INET_CSUM_H
-#define NET_INET_CSUM_H
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -77,5 +77,4 @@ static inline uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
 }
 #endif
 
-#endif /* NET_INET_CSUM_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  sys_timex
  * @{
@@ -14,8 +16,6 @@
  * @brief       Utility library for `struct tm`.
  */
 
-#ifndef TM_H
-#define TM_H
 
 #include <time.h>
 #include <sys/time.h>
@@ -121,5 +121,4 @@ int tm_is_valid_time(int hour, int min, int sec);
 }
 #endif
 
-#endif /* TM_H */
 /** @} */

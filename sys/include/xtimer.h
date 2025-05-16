@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_xtimer xtimer high level timer abstraction layer (deprecated)
  * @ingroup     sys
@@ -39,8 +41,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef XTIMER_H
-#define XTIMER_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -683,4 +683,3 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 #endif /* MODULE_ZTIMER_XTIMER_COMPAT */
 
 /** @} */
-#endif /* XTIMER_H */

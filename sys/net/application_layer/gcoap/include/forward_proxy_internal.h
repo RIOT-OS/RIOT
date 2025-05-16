@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gcoap_forward_proxy_thread    GCoAP Forward Proxy Thread
  * @ingroup     net_gcoap
@@ -19,8 +21,6 @@
  * @author      Mariem Charrada <mariem.charrada@ml-pa.com>
  */
 
-#ifndef FORWARD_PROXY_INTERNAL_H
-#define FORWARD_PROXY_INTERNAL_H
 
 #include <stdint.h>
 #include "net/coap.h"
@@ -85,7 +85,6 @@ int gcoap_forward_proxy_req_send(client_ep_t *cep);
 }
 #endif
 
-#endif /* FORWARD_PROXY_INTERNAL_H */
 /**
  * @}
  */

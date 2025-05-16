@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc    Generic (GNRC) network stack
  * @ingroup     net
@@ -284,8 +286,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_GNRC_H
-#define NET_GNRC_H
 
 #include "net/netopt.h"
 #include "net/gnrc/netapi.h"
@@ -306,5 +306,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_H */
 /** @} */

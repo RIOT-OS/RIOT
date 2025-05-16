@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_netdev_test    netdev dummy test driver
  * @ingroup     drivers_netdev
@@ -75,8 +77,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_NETDEV_TEST_H
-#define NET_NETDEV_TEST_H
 
 #include "mutex.h"
 
@@ -291,5 +291,4 @@ void netdev_test_reset(netdev_test_t *dev);
 }
 #endif
 
-#endif /* NET_NETDEV_TEST_H */
 /** @} */

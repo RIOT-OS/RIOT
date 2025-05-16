@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  net_gnrc_ipv6_nib
  * @internal
@@ -16,8 +18,6 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PRIV_NIB_INTERNAL_H
-#define PRIV_NIB_INTERNAL_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -914,6 +914,5 @@ void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt);
 }
 #endif
 
-#endif /* PRIV_NIB_INTERNAL_H */
 /** @internal
  * @} */

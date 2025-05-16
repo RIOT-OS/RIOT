@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_mac  PSA Wrapper Functions: MAC
@@ -18,8 +20,6 @@
  *
  */
 
-#ifndef PSA_MAC_H
-#define PSA_MAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,5 +46,4 @@ psa_status_t psa_mac_compute_hmac_sha256(   const psa_key_attributes_t *attribut
 }
 #endif
 
-#endif /* PSA_MAC_H */
 /**@}*/

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_matstat
  *
@@ -29,8 +31,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef MATSTAT_H
-#define MATSTAT_H
 
 #include <stdint.h>
 
@@ -113,6 +113,5 @@ void matstat_merge(matstat_state_t *dest, const matstat_state_t *src);
 }
 #endif
 
-#endif /* MATSTAT_H */
 
 /** @} */

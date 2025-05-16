@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_cord_common CoRE RD Common
  * @ingroup     net_cord
@@ -18,8 +20,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_CORD_COMMON_H
-#define NET_CORD_COMMON_H
 
 #include "net/cord/config.h"
 
@@ -64,5 +64,4 @@ int cord_common_add_qstring(coap_pkt_t *pkt);
 }
 #endif
 
-#endif /* NET_CORD_COMMON_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_hashes_sha512_common SHA-512 common
  * @ingroup     sys_hashes_unkeyed
@@ -18,8 +20,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-#ifndef HASHES_SHA512_COMMON_H
-#define HASHES_SHA512_COMMON_H
 
 #include <string.h>
 #include <stdint.h>
@@ -71,4 +71,3 @@ void sha512_common_final(sha512_common_context_t *ctx, void *digest, size_t dig_
 #endif
 
 /** @} */
-#endif /* HASHES_SHA512_COMMON_H */
