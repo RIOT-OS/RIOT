@@ -111,7 +111,7 @@ Both approaches are illustrated and explained in `examples/basic/subfolders`.
 Required dependencies of applications may change depending on the
 target board or architecture. This is especially
 relevant for networking applications where multiple hardware implementations
-exist and the appropriate one has to be chosen for the given board
+exist and the appropriate implementation has to be chosen for the given board
 or architecture.
 To achieve this task elegantly, a `Makefile.board.dep` file can be
 created in the application folder, which is automatically included and
