@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SI70XX_H
-#define SI70XX_H
+#pragma once
 
 /**
  * @defgroup    drivers_si70xx Si7006/13/20/21/5x temperature and humidity sensors
@@ -151,4 +150,3 @@ uint8_t si70xx_get_revision(const si70xx_t *dev);
 #endif
 
 /** @} */
-#endif /* SI70XX_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx126x
  * @{
@@ -15,8 +17,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef SX126X_NETDEV_H
-#define SX126X_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -33,5 +33,4 @@ extern const netdev_driver_t sx126x_driver;
 }
 #endif
 
-#endif /* SX126X_NETDEV_H */
 /** @} */

@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef SX127X_H
-#define SX127X_H
+#pragma once
 
 /**
  * @defgroup    drivers_sx127x Semtech SX1272 and SX1276 radios driver
@@ -682,4 +681,3 @@ void sx127x_set_freq_hop(sx127x_t *dev, bool freq_hop_on);
 #endif
 
 /** @} */
-#endif /* SX127X_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_periph_dac
  * @{
@@ -16,8 +18,6 @@
  * @author      Benjamin Valentin <benpicco@beuth-hochschule.de>
  */
 
-#ifndef DAC_DDS_PARAMS_H
-#define DAC_DDS_PARAMS_H
 
 #include "board.h"
 #include "macros/units.h"
@@ -65,5 +65,4 @@ static const dac_dds_params_t dac_dds_params[] =
 }
 #endif
 
-#endif /* DAC_DDS_PARAMS_H */
 /** @} */

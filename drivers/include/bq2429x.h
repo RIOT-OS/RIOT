@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BQ2429X_H
-#define BQ2429X_H
+#pragma once
 
 /**
  * @defgroup    drivers_bq2429x BQ2429x
@@ -500,4 +499,3 @@ int bq2429x_get_vreg(const bq2429x_t *dev,
 #endif
 
 /** @} */
-#endif /* BQ2429X_H */

@@ -5,8 +5,8 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
-#ifndef PERIPH_USBDEV_H
-#define PERIPH_USBDEV_H
+
+#pragma once
 
 /**
  * @defgroup    drivers_periph_usbdev usbdev - USB Device Driver API
@@ -688,4 +688,3 @@ static inline int usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 #endif
 
 /** @} */
-#endif /* PERIPH_USBDEV_H */

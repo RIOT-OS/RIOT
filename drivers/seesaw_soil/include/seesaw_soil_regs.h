@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_seesaw_soil
  * @{
@@ -16,8 +18,6 @@
  * @author      Viktor Gal <viktor.gal@maeth.com>
  */
 
-#ifndef SEESAW_SOIL_REGS_H
-#define SEESAW_SOIL_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -45,5 +45,4 @@ extern "C"
 }
 #endif
 
-#endif /* SEESAW_SOIL_REGS_H */
 /** @} */

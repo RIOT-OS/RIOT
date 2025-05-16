@@ -6,8 +6,7 @@
  * more details.
  */
 
-#ifndef NET_NETDEV_LORA_H
-#define NET_NETDEV_LORA_H
+#pragma once
 
 /**
  * @defgroup    drivers_netdev_lora LoRa drivers
@@ -41,4 +40,3 @@ typedef struct {
 #endif
 
 /** @} */
-#endif /* NET_NETDEV_LORA_H */

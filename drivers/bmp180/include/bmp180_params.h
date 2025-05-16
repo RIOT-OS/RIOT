@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bmp180
  *
@@ -18,8 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BMP180_PARAMS_H
-#define BMP180_PARAMS_H
 
 #include "board.h"
 #include "bmp180.h"
@@ -74,5 +74,4 @@ static const saul_reg_info_t bmp180_saul_info[] =
 }
 #endif
 
-#endif /* BMP180_PARAMS_H */
 /** @} */

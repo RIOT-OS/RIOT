@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef MAG3110_H
-#define MAG3110_H
+#pragma once
 
 /**
  * @defgroup    drivers_mag3110 MAG3110 3-Axis Digital Magnetometer
@@ -225,4 +224,3 @@ int mag3110_read_dtemp(const mag3110_t *dev, int8_t *dtemp);
 #endif
 
 /** @} */
-#endif /* MAG3110_H */

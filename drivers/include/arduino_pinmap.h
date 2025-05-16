@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ARDUINO_PINMAP_H
-#define ARDUINO_PINMAP_H
+#pragma once
 
 /**
  * @ingroup     drivers
@@ -35,4 +34,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* ARDUINO_PINMAP_H */

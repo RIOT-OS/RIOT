@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PULSE_COUNTER_H
-#define PULSE_COUNTER_H
+#pragma once
 
 /**
  * @defgroup    drivers_pulse_counter Pulse counter
@@ -93,4 +92,3 @@ void pulse_counter_reset(pulse_counter_t *dev);
 #endif
 
 /** @} */
-#endif /* PULSE_COUNTER_H */

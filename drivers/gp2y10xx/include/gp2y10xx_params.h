@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_gp2y10xx
  * @{
@@ -17,8 +19,6 @@
  * @}
  */
 
-#ifndef GP2Y10XX_PARAMS_H
-#define GP2Y10XX_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -108,5 +108,3 @@ static const saul_reg_info_t gp2y10xx_saul_info[] =
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* GP2Y10XX_PARAMS_H */

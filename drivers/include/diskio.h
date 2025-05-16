@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef DISKIO_H
-#define DISKIO_H
+#pragma once
 
 /**
  * @defgroup    drivers_diskio Disk IO Driver
@@ -159,4 +158,3 @@ diskio_result_t mci_ioctl(unsigned char ctrl, void *buff);
 #endif
 
 /** @} */
-#endif /* DISKIO_H */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup    drivers_cc2420
  * @{
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef CC2420_NETDEV_H
-#define CC2420_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -37,5 +37,4 @@ extern const netdev_driver_t cc2420_driver;
 }
 #endif
 
-#endif /* CC2420_NETDEV_H */
 /** @} */

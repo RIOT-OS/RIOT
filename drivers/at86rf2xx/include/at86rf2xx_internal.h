@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf2xx
  * @{
@@ -21,8 +23,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef AT86RF2XX_INTERNAL_H
-#define AT86RF2XX_INTERNAL_H
 
 #include <stdint.h>
 
@@ -339,5 +339,4 @@ static inline uint32_t at86rf2xx_get_sc(const at86rf2xx_t *dev)
 }
 #endif
 
-#endif /* AT86RF2XX_INTERNAL_H */
 /** @} */

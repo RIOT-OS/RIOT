@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PH_OEM_H
-#define PH_OEM_H
+#pragma once
 
 /**
  * @defgroup    drivers_ph_oem pH OEM sensor device driver
@@ -358,4 +357,3 @@ int ph_oem_read_ph(const ph_oem_t *dev, uint16_t *ph_value);
 #endif
 
 /** @} */
-#endif /* PH_OEM_H */

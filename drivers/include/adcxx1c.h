@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ADCXX1C_H
-#define ADCXX1C_H
+#pragma once
 
 /**
  * @defgroup   drivers_adcxx1c ADCXX1C ADC device driver
@@ -182,4 +181,3 @@ int adcxx1c_get_and_clear_alert(const adcxx1c_t *dev);
 #endif
 
 /** @} */
-#endif /* ADCXX1C_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ATWINC15X0_H
-#define ATWINC15X0_H
+#pragma once
 
 /**
  * @ingroup     drivers_netdev
@@ -114,4 +113,3 @@ void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint
 #endif
 
 /** @} */
-#endif /* ATWINC15X0_H */

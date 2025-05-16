@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef STMPE811_H
-#define STMPE811_H
+#pragma once
 
 /**
  * @defgroup    drivers_stmpe811 STMPE811 Touchscreen Controller
@@ -163,4 +162,3 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
 #endif
 
 /** @} */
-#endif /* STMPE811_H */

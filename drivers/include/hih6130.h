@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef HIH6130_H
-#define HIH6130_H
+#pragma once
 
 /**
  * @defgroup    drivers_hih6130 HIH6130 humidity and temperature sensor
@@ -67,4 +66,3 @@ int hih6130_get_humidity_temperature(const hih6130_t *dev,
 #endif
 
 /** @} */
-#endif /* HIH6130_H */

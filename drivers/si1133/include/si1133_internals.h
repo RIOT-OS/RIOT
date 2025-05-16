@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_si1133
  * @brief       Internal addresses, registers, constants for the Si1133 sensors
@@ -18,8 +20,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-#ifndef SI1133_INTERNALS_H
-#define SI1133_INTERNALS_H
 
 #include <stdint.h>
 
@@ -194,5 +194,4 @@ typedef struct __attribute__((packed)) _si1133_channel_params {
 }
 #endif
 
-#endif /* SI1133_INTERNALS_H */
 /** @} */

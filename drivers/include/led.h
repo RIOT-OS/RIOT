@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LED_H
-#define LED_H
+#pragma once
 
 /**
  * @defgroup    drivers_led Control on-board LEDs
@@ -209,4 +208,3 @@ static inline void led_toggle(unsigned id)
 #endif
 
 /** @} */
-#endif /* LED_H */

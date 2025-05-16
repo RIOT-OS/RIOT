@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MAX31855_H
-#define MAX31855_H
+#pragma once
 
 /**
  * @defgroup    drivers_max31855 MAX31855 Thermocouple-to-Digital Converter driver
@@ -132,4 +131,3 @@ void max31855_read_raw(max31855_t *dev, uint32_t *data);
 #endif
 
 /** @} */
-#endif /* MAX31855_H */

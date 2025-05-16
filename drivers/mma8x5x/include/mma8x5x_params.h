@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mma8x5x
  * @{
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef MMA8X5X_PARAMS_H
-#define MMA8X5X_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -79,5 +79,4 @@ static const saul_reg_info_t mma8x5x_saul_info[] =
 }
 #endif
 
-#endif /* MMA8X5X_PARAMS_H */
 /** @} */

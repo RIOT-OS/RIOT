@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_kw2xrf
  * @{
@@ -16,8 +18,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef KW2XRF_TM_H
-#define KW2XRF_TM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,5 +56,4 @@ int kw2xrf_set_test_mode(kw2xrf_t *dev, uint8_t mode);
 }
 #endif
 
-#endif /* KW2XRF_TM_H */
 /** @} */

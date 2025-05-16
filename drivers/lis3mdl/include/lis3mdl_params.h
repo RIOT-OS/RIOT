@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lis3mdl
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef LIS3MDL_PARAMS_H
-#define LIS3MDL_PARAMS_H
 
 #include "board.h"
 #include "lis3mdl.h"
@@ -87,5 +87,4 @@ static const saul_reg_info_t lis3mdl_saul_info[] =
 }
 #endif
 
-#endif /* LIS3MDL_PARAMS_H */
 /** @} */

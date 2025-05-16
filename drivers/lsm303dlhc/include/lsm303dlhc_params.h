@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lsm303dlhc
  *
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef LSM303DLHC_PARAMS_H
-#define LSM303DLHC_PARAMS_H
 
 #include "board.h"
 #include "lsm303dlhc.h"
@@ -95,5 +95,4 @@ static const saul_reg_info_t lsm303dlhc_saul_info[] =
 }
 #endif
 
-#endif /* LSM303DLHC_PARAMS_H */
 /** @} */

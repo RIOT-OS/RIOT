@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_GPIO_LL_IRQ_H
-#define PERIPH_GPIO_LL_IRQ_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_gpio_ll_irq  IRQ Support in Peripheral GPIO Low-Level API
@@ -178,4 +177,3 @@ void gpio_ll_irq_off(gpio_port_t port, uint8_t pin);
 #endif
 
 /** @} */
-#endif /* PERIPH_GPIO_LL_IRQ_H */

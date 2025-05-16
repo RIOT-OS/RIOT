@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_qmc5883l
  * @{
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef QMC5883L_INTERNAL_H
-#define QMC5883L_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -72,5 +72,4 @@ extern "C"
 }
 #endif
 
-#endif /* QMC5883L_INTERNAL_H */
 /** @} */

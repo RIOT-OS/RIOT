@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MTD_MAPPER_H
-#define MTD_MAPPER_H
+#pragma once
 
 /**
  * @defgroup    drivers_mtd_mapper  MTD address mapper
@@ -110,4 +109,3 @@ extern const mtd_desc_t mtd_mapper_driver;
 #endif
 
 /** @} */
-#endif /* MTD_MAPPER_H */

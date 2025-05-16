@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MTD_SDCARD_H
-#define MTD_SDCARD_H
+#pragma once
 
 /**
  * @defgroup    drivers_mtd_sdcard MTD wrapper for SPI SD Cards
@@ -73,4 +72,3 @@ extern const mtd_desc_t mtd_sdcard_driver;
 #endif
 
 /** @} */
-#endif /* MTD_SDCARD_H */

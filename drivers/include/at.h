@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef AT_H
-#define AT_H
+#pragma once
 
 /**
  * @defgroup    drivers_at AT (Hayes) command set library
@@ -663,4 +662,3 @@ void at_postprocess_urc_all(at_dev_t *dev, char *buf);
 #endif
 
 /** @} */
-#endif /* AT_H */

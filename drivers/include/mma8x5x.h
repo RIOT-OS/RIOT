@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef MMA8X5X_H
-#define MMA8X5X_H
+#pragma once
 
 /**
  * @defgroup    drivers_mma8x5x MMA8x5x Accelerometer
@@ -223,4 +222,3 @@ void mma8x5x_ack_int(const mma8x5x_t *dev);
 #endif
 
 /** @} */
-#endif /* MMA8X5X_H */

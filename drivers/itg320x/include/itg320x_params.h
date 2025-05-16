@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_itg320x
  * @brief       Default configuration for InvenSense ITG320X 3-axis gyroscope
@@ -14,8 +16,6 @@
  * @{
  */
 
-#ifndef ITG320X_PARAMS_H
-#define ITG320X_PARAMS_H
 
 #include "board.h"
 #include "itg320x.h"
@@ -102,5 +102,4 @@ static const saul_reg_info_t itg320x_saul_info[] =
 }
 #endif
 
-#endif /* ITG320X_PARAMS_H */
 /** @} */

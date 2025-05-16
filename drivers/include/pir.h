@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PIR_H
-#define PIR_H
+#pragma once
 
 /**
  * @defgroup    drivers_pir PIR Motion Sensor
@@ -142,4 +141,3 @@ int pir_register_thread(pir_t *dev);
 #endif
 
 /** @} */
-#endif /* PIR_H */

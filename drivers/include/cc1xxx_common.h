@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef CC1XXX_COMMON_H
-#define CC1XXX_COMMON_H
+#pragma once
+
 /**
  * @defgroup    drivers_cc1xxx CC1100/CC1100e/CC1101/CC1200 common code
  * @ingroup     drivers_netdev
@@ -146,4 +146,3 @@ void cc1xxx_eui_get(const netdev_t *dev, uint8_t *eui);
 #endif
 
 /** @} */
-#endif /* CC1XXX_COMMON_H */

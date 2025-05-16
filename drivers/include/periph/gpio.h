@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_GPIO_H
-#define PERIPH_GPIO_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_gpio GPIO
@@ -287,4 +286,3 @@ static inline int gpio_is_valid(gpio_t gpio)
 #endif
 
 /** @} */
-#endif /* PERIPH_GPIO_H */

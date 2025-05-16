@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_io1_xplained
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef IO1_XPLAINED_PARAMS_H
-#define IO1_XPLAINED_PARAMS_H
 
 #include "board.h"
 #include "io1_xplained.h"
@@ -91,5 +91,4 @@ saul_gpio_params_t io1_xplained_saul_gpios[] =
 }
 #endif
 
-#endif /* IO1_XPLAINED_PARAMS_H */
 /** @} */

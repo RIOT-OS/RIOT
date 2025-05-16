@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MFRC522_H
-#define MFRC522_H
+#pragma once
 
 /**
  * @defgroup drivers_mfrc522 MFRC522 RFID controller
@@ -875,4 +874,3 @@ bool mfrc522_pcd_perform_self_test(mfrc522_t *dev);
 #endif
 
 /** @} */
-#endif /* MFRC522_H */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef NCV7356_H
-#define NCV7356_H
+#pragma once
+
 /**
 * @defgroup    drivers_ncv7356 NCV7356 Single Wire CAN Transceiver
 * @ingroup     drivers_can
@@ -93,4 +93,3 @@ extern const trx_driver_t ncv7356_driver;
 #endif
 
 /** @} */
-#endif /* NCV7356_H */

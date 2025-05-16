@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SAUL_PERIPH_H
-#define SAUL_PERIPH_H
+#pragma once
 
 /**
  * @ingroup     drivers_saul
@@ -180,4 +179,3 @@ typedef struct {
 #endif
 
 /** @} */
-#endif /* SAUL_PERIPH_H */

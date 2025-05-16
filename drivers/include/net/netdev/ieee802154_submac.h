@@ -6,8 +6,8 @@
  * details.
  */
 
-#ifndef NET_NETDEV_IEEE802154_SUBMAC_H
-#define NET_NETDEV_IEEE802154_SUBMAC_H
+#pragma once
+
 /**
  * @defgroup     drivers_netdev_ieee802154_submac IEEE802.15.4 SubMAC netdev layer
  * @ingroup      drivers_netdev_api
@@ -71,4 +71,3 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac);
 #endif
 
 /** @} */
-#endif /* NET_NETDEV_IEEE802154_SUBMAC_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef HM330X_H
-#define HM330X_H
+#pragma once
 
 /**
  * @defgroup    drivers_hm330x HM330X Laser Particulate Matter Sensor
@@ -139,4 +138,3 @@ void hm330x_wakeup(hm330x_t *dev);
 #endif
 
 /** @} */
-#endif /* HM330X_H */

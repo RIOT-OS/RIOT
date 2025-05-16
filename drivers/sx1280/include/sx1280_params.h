@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx1280
  * @{
@@ -18,8 +20,6 @@
  *
  */
 
-#ifndef SX1280_PARAMS_H
-#define SX1280_PARAMS_H
 
 #include "board.h"
 #include "sx1280.h"
@@ -109,5 +109,4 @@ static const sx1280_params_t sx1280_params[] =
 }
 #endif
 
-#endif /* SX1280_PARAMS_H */
 /** @} */

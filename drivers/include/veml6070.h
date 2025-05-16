@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef VEML6070_H
-#define VEML6070_H
+#pragma once
 
 /**
  * @defgroup    drivers_veml6070 VEML6070 UV sensor
@@ -89,4 +88,3 @@ uint16_t veml6070_read_uv(const veml6070_t *dev);
 #endif
 
 /** @} */
-#endif /* VEML6070_H */

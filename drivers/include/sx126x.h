@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SX126X_H
-#define SX126X_H
+#pragma once
 
 /**
  * @defgroup    drivers_sx126x SX1261/2/8 and LLCC68 LoRa radio driver
@@ -306,4 +305,3 @@ void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
 #endif
 
 /** @} */
-#endif /* SX126X_H */

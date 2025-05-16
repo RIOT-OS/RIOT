@@ -8,8 +8,7 @@
  * directory for more details.
  */
 
-#ifndef LCD_H
-#define LCD_H
+#pragma once
 
 /**
  * @defgroup    drivers_lcd LCD display driver
@@ -494,4 +493,3 @@ extern const lcd_ll_par_driver_t lcd_ll_par_driver;
 }
 #endif
 /** @} */
-#endif /* LCD_H */

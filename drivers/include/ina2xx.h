@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef INA2XX_H
-#define INA2XX_H
+#pragma once
 
 /**
  * @defgroup    drivers_ina2xx INA2XX current/power monitor
@@ -257,4 +256,3 @@ int ina2xx_read_power(const ina2xx_t *dev, uint32_t *power);
 #endif
 
 /** @} */
-#endif /* INA2XX_H */

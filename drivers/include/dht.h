@@ -8,8 +8,7 @@
  * directory for more details.
  */
 
-#ifndef DHT_H
-#define DHT_H
+#pragma once
 
 /**
  * @defgroup    drivers_dht DHT Family of Humidity and Temperature Sensors
@@ -135,4 +134,3 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 #endif
 
 /** @} */
-#endif /* DHT_H */

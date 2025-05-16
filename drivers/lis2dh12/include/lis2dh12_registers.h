@@ -3,6 +3,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lis2dh12
  * @{
@@ -13,8 +15,6 @@
  * @author      Jan Mohr <jan.mohr@ml-pa.com>
  */
 
-#ifndef LIS2DH12_REGISTERS_H
-#define LIS2DH12_REGISTERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -469,5 +469,4 @@ typedef union {
 }
 #endif
 
-#endif /* LIS2DH12_REGISTERS_H */
 /** @} */

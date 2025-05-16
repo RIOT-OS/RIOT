@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_EEPROM_H
-#define PERIPH_EEPROM_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_eeprom EEPROM driver
@@ -121,4 +120,3 @@ size_t eeprom_erase(void);
 #endif
 
 /** @} */
-#endif /* PERIPH_EEPROM_H */

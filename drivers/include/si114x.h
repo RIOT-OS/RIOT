@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SI114X_H
-#define SI114X_H
+#pragma once
 
 /**
  * @defgroup    drivers_si114x Si1145/6/7 UV/Ambient light/Proximity sensors
@@ -140,4 +139,3 @@ uint8_t si114x_read_response(si114x_t *dev);
 #endif
 
 /** @} */
-#endif /* SI114X_H */

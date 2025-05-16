@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PCA9633_H
-#define PCA9633_H
+#pragma once
 
 /**
  * @defgroup    drivers_pca9633 PCA9633 I2C PWM controller
@@ -334,4 +333,3 @@ void pca9633_set_group_control_mode(pca9633_t* dev,
 #endif
 
 /** @} */
-#endif /* PCA9633_H */

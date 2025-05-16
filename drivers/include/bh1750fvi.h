@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BH1750FVI_H
-#define BH1750FVI_H
+#pragma once
 
 /**
  * @defgroup    drivers_bh1750fvi BH1750FVI Light Sensor
@@ -100,4 +99,3 @@ uint16_t bh1750fvi_sample(const bh1750fvi_t *dev);
 #endif
 
 /** @} */
-#endif /* BH1750FVI_H */

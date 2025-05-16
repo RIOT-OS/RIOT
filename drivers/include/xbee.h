@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef XBEE_H
-#define XBEE_H
+#pragma once
 
 /**
  * @defgroup    drivers_xbee XBee driver
@@ -215,4 +214,3 @@ int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr);
 #endif
 
 /** @} */
-#endif /* XBEE_H */

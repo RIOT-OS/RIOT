@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lis3mdl
  *
@@ -17,8 +19,6 @@
  * @author      René Herthel <rene-herthel@outlook.de>
  */
 
-#ifndef LIS3MDL_INTERNAL_H
-#define LIS3MDL_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,5 +150,4 @@ extern "C" {
 }
 #endif
 
-#endif /* LIS3MDL_INTERNAL_H */
 /** @} */

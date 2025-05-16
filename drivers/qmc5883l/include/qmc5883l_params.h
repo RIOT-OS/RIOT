@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_qmc5883l
  *
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef QMC5883L_PARAMS_H
-#define QMC5883L_PARAMS_H
 
 #include "saul_reg.h"
 #include "board.h"
@@ -80,5 +80,4 @@ static const saul_reg_info_t qmc5883l_saul_info[] =
 }
 #endif
 
-#endif /* QMC5883L_PARAMS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_tmp00x
  *
@@ -16,8 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef TMP00X_PARAMS_H
-#define TMP00X_PARAMS_H
 
 #include "board.h"
 #include "tmp00x.h"
@@ -90,5 +90,4 @@ static const saul_reg_info_t tmp00x_saul_info[] =
 }
 #endif
 
-#endif /* TMP00X_PARAMS_H */
 /** @} */

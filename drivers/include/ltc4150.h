@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LTC4150_H
-#define LTC4150_H
+#pragma once
 
 /**
  * @defgroup    drivers_ltc4150 LTC4150 coulomb counter
@@ -344,4 +343,3 @@ void ltc4150_pulses2c(const ltc4150_dev_t *dev,
 #endif
 
 /** @} */
-#endif /* LTC4150_H */

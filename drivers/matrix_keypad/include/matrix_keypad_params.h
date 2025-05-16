@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_matrix_keypad
  *
@@ -16,8 +18,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef MATRIX_KEYPAD_PARAMS_H
-#define MATRIX_KEYPAD_PARAMS_H
 
 #include "board.h"
 #include "matrix_keypad.h"
@@ -76,5 +76,4 @@ static const matrix_keypad_params_t matrix_keypad_params[] =
 }
 #endif
 
-#endif /* MATRIX_KEYPAD_PARAMS_H */
 /** @} */

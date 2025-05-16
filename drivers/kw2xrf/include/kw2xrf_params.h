@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_kw2xrf
  *
@@ -16,8 +18,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-#ifndef KW2XRF_PARAMS_H
-#define KW2XRF_PARAMS_H
 
 #include "board.h"
 #include "kw2xrf.h"
@@ -70,5 +70,4 @@ static const kw2xrf_params_t kw2xrf_params[] =
 }
 #endif
 
-#endif /* KW2XRF_PARAMS_H */
 /** @} */

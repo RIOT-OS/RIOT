@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef CC2420_H
-#define CC2420_H
+#pragma once
 
 /**
  * @defgroup    drivers_cc2420 CC2420 radio driver
@@ -298,4 +297,3 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info);
 #endif
 
 /** @} */
-#endif /* CC2420_H */

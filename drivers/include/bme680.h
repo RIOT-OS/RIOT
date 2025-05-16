@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef BME680_H
-#define BME680_H
+#pragma once
 
 /**
  * @defgroup    drivers_bme680 BME680 Temperature/Humidity/Pressure/Gas sensor
@@ -322,4 +321,3 @@ int bme680_set_ambient_temp(bme680_t* dev, int8_t temp);
 #endif
 
 /** @} */
-#endif /* BME680_H */

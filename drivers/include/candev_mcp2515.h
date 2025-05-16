@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef CANDEV_MCP2515_H
-#define CANDEV_MCP2515_H
+#pragma once
 
 /**
  * @defgroup    drivers_mcp2515 MCP2515
@@ -133,4 +132,3 @@ void candev_mcp2515_init(candev_mcp2515_t *dev,
 #endif
 
 /** @} */
-#endif /* CANDEV_MCP2515_H */

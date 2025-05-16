@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_apa102
  * @{
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef APA102_PARAMS_H
-#define APA102_PARAMS_H
 
 #include "board.h"
 
@@ -58,5 +58,4 @@ static const  apa102_params_t apa102_params[] =
 }
 #endif
 
-#endif /* APA102_PARAMS_H */
 /** @} */

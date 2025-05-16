@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_soft_spi
  * @{
@@ -16,8 +18,6 @@
  * @author      Markus Blechschmidt <Markus.Blechschmidt@haw-hamburg.de>
  */
 
-#ifndef SOFT_SPI_PARAMS_H
-#define SOFT_SPI_PARAMS_H
 
 #include "soft_spi.h"
 
@@ -57,5 +57,4 @@ static soft_spi_conf_t soft_spi_config[] = {
 }
 #endif
 
-#endif /* SOFT_SPI_PARAMS_H */
 /** @} */

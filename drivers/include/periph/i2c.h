@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_I2C_H
-#define PERIPH_I2C_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_i2c I2C
@@ -496,4 +495,3 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 #endif
 
 /** @} */
-#endif /* PERIPH_I2C_H */

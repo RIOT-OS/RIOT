@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef SDP3X_H
-#define SDP3X_H
+#pragma once
 
 /**
  * @defgroup    drivers_sdp3x SDP3x temperature and differential pressure sensor
@@ -194,5 +193,3 @@ int8_t sdp3x_exit_sleep(const sdp3x_t *dev);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SDP3X_H */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf2xx
  *
@@ -20,8 +22,6 @@
  *
  * @author      Fabian Hüßler   <fabian.huessler@ovgu.de>
  */
-#ifndef AT86RF2XX_AES_H
-#define AT86RF2XX_AES_H
 
 #include "at86rf2xx.h"
 
@@ -238,5 +238,4 @@ void at86rf2xx_aes_cbc_decrypt(at86rf2xx_t *dev,
 }
 #endif
 
-#endif /* AT86RF2XX_AES_H */
 /** @} */

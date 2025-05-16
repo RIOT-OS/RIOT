@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_stmpe811
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef STMPE811_PARAMS_H
-#define STMPE811_PARAMS_H
 
 #include "kernel_defines.h"
 #include "board.h"
@@ -117,5 +117,4 @@ static const uint8_t stmpe811_screen_ids[] =
 }
 #endif
 
-#endif /* STMPE811_PARAMS_H */
 /** @} */

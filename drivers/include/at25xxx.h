@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_at25xxx AT25xxx family of SPI-EEPROMs
  * @ingroup     drivers_misc
@@ -20,8 +22,6 @@
  * @}
  */
 
-#ifndef AT25XXX_H
-#define AT25XXX_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -156,5 +156,3 @@ int at25xxx_clear(const at25xxx_t *dev, uint32_t pos, size_t len);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* AT25XXX_H */

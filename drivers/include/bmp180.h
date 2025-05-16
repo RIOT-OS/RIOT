@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BMP180_H
-#define BMP180_H
+#pragma once
 
 /**
  * @defgroup    drivers_bmp180 BMP180 temperature and pressure sensor
@@ -139,4 +138,3 @@ uint32_t bmp180_sealevel_pressure(const bmp180_t *dev, int16_t altitude);
 #endif
 
 /** @} */
-#endif /* BMP180_H */

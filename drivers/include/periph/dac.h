@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_DAC_H
-#define PERIPH_DAC_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_dac DAC
@@ -134,4 +133,3 @@ void dac_poweroff(dac_t line);
 #endif
 
 /** @} */
-#endif /* PERIPH_DAC_H */

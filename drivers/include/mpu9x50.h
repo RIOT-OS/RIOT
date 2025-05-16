@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef MPU9X50_H
-#define MPU9X50_H
+#pragma once
 
 /**
  * @defgroup    drivers_mpu9x50 MPU-9X50 (MPU9150 and MPU9250) accelerometer/magnetometer/gyroscope
@@ -309,4 +308,3 @@ int mpu9x50_set_compass_sample_rate(mpu9x50_t *dev, uint8_t rate);
 #endif
 
 /** @} */
-#endif /* MPU9X50_H */

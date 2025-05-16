@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef RTT_RTC_H
-#define RTT_RTC_H
+#pragma once
 
 /**
  * @defgroup    drivers_rtt_rtc     RTC emulation on top of a RTT
@@ -58,4 +57,3 @@ void rtt_rtc_gettimeofday(uint32_t *s, uint32_t *us);
 #endif
 
 /** @} */
-#endif /* RTT_RTC_H */

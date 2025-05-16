@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_PTP_H
-#define PERIPH_PTP_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_ptp  PTP-Clock
@@ -405,4 +404,3 @@ static inline void ptp_timer_set_absolute_u64(uint64_t target)
 #endif
 
 /** @} */
-#endif /* PERIPH_PTP_H */

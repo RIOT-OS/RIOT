@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef TCS37727_H
-#define TCS37727_H
+#pragma once
 
 /**
  * @defgroup    drivers_tcs37727 TCS37727 RGB Light Sensor
@@ -149,4 +148,3 @@ void tcs37727_read(const tcs37727_t *dev, tcs37727_data_t *data);
 #endif
 
 /** @} */
-#endif /* TCS37727_H */

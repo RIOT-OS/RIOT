@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_adcxx1c
  * @{
@@ -16,8 +18,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef ADCXX1C_REGS_H
-#define ADCXX1C_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,5 +49,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ADCXX1C_REGS_H */
 /** @} */

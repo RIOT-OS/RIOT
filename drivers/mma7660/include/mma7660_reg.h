@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mma7660
  * @{
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef MMA7660_REG_H
-#define MMA7660_REG_H
 
 #ifdef __cplusplus
 extern "C"
@@ -48,5 +48,4 @@ extern "C"
 }
 #endif
 
-#endif /* MMA7660_REG_H */
 /** @} */

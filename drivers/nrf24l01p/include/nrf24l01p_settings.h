@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_nrf24l01p
  * @{
@@ -18,8 +20,6 @@
  *
  */
 
-#ifndef NRF24L01P_SETTINGS_H
-#define NRF24L01P_SETTINGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,5 +184,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NRF24L01P_SETTINGS_H */
 /** @} */

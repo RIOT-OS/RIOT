@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DAC_DDS_H
-#define DAC_DDS_H
+#pragma once
 
 /**
  * @defgroup    drivers_dac_dds DAC Direct Digital Synthesis
@@ -161,4 +160,3 @@ void dac_dds_stop(dac_dds_t dac);
 #endif
 
 /** @} */
-#endif /* DAC_DDS_H */

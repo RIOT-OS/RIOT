@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef ETHOS_H
-#define ETHOS_H
+#pragma once
 
 /**
  * @defgroup    drivers_ethos_stdio   STDIO via ethos
@@ -164,4 +163,3 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 }
 #endif
 /** @} */
-#endif /* ETHOS_H */

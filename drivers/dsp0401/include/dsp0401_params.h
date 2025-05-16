@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_dsp0401
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef DSP0401_PARAMS_H
-#define DSP0401_PARAMS_H
 
 #include "board.h"
 #include "dsp0401.h"
@@ -77,5 +77,4 @@ static const dsp0401_params_t dsp0401_params[] =
 }
 #endif
 
-#endif /* DSP0401_PARAMS_H */
 /** @} */

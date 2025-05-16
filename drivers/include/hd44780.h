@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef HD44780_H
-#define HD44780_H
+#pragma once
+
 /**
  * @defgroup    drivers_hd44780 HD44780 LCD driver
  * @ingroup     drivers_display
@@ -210,4 +210,3 @@ void hd44780_print(const hd44780_t *dev, const char *data);
 #endif
 
 /** @} */
-#endif /* HD44780_H */

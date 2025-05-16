@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mcp2515
  * @brief       Driver for the Microchip MCP2515 can controller.
@@ -19,8 +21,6 @@
  *
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-#ifndef MCP2515_DEFINES_H
-#define MCP2515_DEFINES_H
 
 #include <stdint.h>
 
@@ -394,5 +394,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MCP2515_DEFINES_H */
 /** @} */

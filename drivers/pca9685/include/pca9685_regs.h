@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_pca9685
  * @brief       Register definitions for the PCA9685 I2C PWM controller
@@ -14,8 +16,6 @@
  * @{
  */
 
-#ifndef PCA9685_REGS_H
-#define PCA9685_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -94,5 +94,4 @@ extern "C"
 }
 #endif
 
-#endif /* PCA9685_REGS_H */
 /** @} */

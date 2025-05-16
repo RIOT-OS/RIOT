@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MTD_FLASHPAGE_H
-#define MTD_FLASHPAGE_H
+#pragma once
 
 /**
  * @defgroup    drivers_mtd_flashpage MTD wrapper for Flashpage devices
@@ -118,4 +117,3 @@ extern mtd_dev_t *mtd_aux;
 #endif
 
 /** @} */
-#endif /* MTD_FLASHPAGE_H */

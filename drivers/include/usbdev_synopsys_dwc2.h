@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef USBDEV_SYNOPSYS_DWC2_H
-#define USBDEV_SYNOPSYS_DWC2_H
+#pragma once
 
 /**
  * @ingroup drivers_periph_usbdev
@@ -121,4 +120,3 @@ typedef struct {
 #endif
 
 /** @} */
-#endif /* USBDEV_SYNOPSYS_DWC2_H */

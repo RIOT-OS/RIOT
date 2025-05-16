@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PN532_H
-#define PN532_H
+#pragma once
 
 /**
  * @defgroup    drivers_pn532 PN532 NFC Reader
@@ -392,4 +391,3 @@ void pn532_release_passive(pn532_t *dev, unsigned target_id);
 #endif
 
 /** @} */
-#endif /* PN532_H */

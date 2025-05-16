@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at24cxxx
  * @{
@@ -16,8 +18,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef AT24CXXX_PARAMS_H
-#define AT24CXXX_PARAMS_H
 
 #include "board.h"
 #include "periph/gpio.h"
@@ -99,5 +99,4 @@ static const at24cxxx_params_t at24cxxx_params[] =
 }
 #endif
 
-#endif /* AT24CXXX_PARAMS_H */
 /** @} */

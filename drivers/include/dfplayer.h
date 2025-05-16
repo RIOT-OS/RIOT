@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DFPLAYER_H
-#define DFPLAYER_H
+#pragma once
 
 /**
  * @defgroup    drivers_dfplayer DFPlayer Mini MP3 Player
@@ -774,4 +773,3 @@ static inline void dfplayer_source_set_rm(dfplayer_source_set_t *set,
 #include "dfplayer_implementation.h"
 
 /** @} */
-#endif /* DFPLAYER_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DS3231_H
-#define DS3231_H
+#pragma once
 
 /**
  * @defgroup    drivers_ds3231 DS3231 Real Time Clock
@@ -313,4 +312,3 @@ int ds3231_disable_bat(const ds3231_t *dev);
 #endif
 
 /** @} */
-#endif /* DS3231_H */

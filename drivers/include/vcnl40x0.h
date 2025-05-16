@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef VCNL40X0_H
-#define VCNL40X0_H
+#pragma once
 
 /**
  * @defgroup    drivers_vcnl40x0 VCNL4010/VCNL4020/VCNL4040 Proximity and Ambient Light Sensors
@@ -146,4 +145,3 @@ uint16_t vcnl40x0_read_illuminance(const vcnl40x0_t *dev);
 #endif
 
 /** @} */
-#endif /* VCNL40X0_H */

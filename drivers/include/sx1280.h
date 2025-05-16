@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef SX1280_H
-#define SX1280_H
+#pragma once
 
 /**
  * @defgroup    drivers_sx1280 LoRa radio driver
@@ -264,4 +263,3 @@ void sx1280_set_lora_iq_invert(sx1280_t *dev, bool iq_invert);
 #endif
 
 /** @} */
-#endif /* SX1280_H */

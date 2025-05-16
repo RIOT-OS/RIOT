@@ -8,8 +8,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_WDT_H
-#define PERIPH_WDT_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_wdt WDT
@@ -368,4 +367,3 @@ void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
 #endif
 
 /** @} */
-#endif /* PERIPH_WDT_H */

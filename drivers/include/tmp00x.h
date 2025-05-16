@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef TMP00X_H
-#define TMP00X_H
+#pragma once
 
 /**
  * @defgroup    drivers_tmp00x TMP006/TMP007 Infrared Thermopile Sensor
@@ -299,4 +298,3 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to);
 #endif
 
 /** @} */
-#endif /* TMP00X_H */

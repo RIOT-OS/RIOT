@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef GP2Y10XX_H
-#define GP2Y10XX_H
+#pragma once
 
 /**
  * @defgroup   drivers_gp2y10xx GP2Y10xx Optical Dust Sensor device driver
@@ -125,4 +124,3 @@ int gp2y10xx_read_density(const gp2y10xx_t *dev, uint16_t *density);
 #endif
 
 /** @} */
-#endif /* GP2Y10XX_H */

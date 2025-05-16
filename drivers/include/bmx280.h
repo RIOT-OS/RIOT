@@ -8,8 +8,7 @@
  * directory for more details.
  */
 
-#ifndef BMX280_H
-#define BMX280_H
+#pragma once
 
 /**
  * @defgroup    drivers_bmx280 BMP280/BME280 temperature, pressure and humidity sensor
@@ -308,4 +307,3 @@ uint16_t bme280_read_humidity(bmx280_t *dev);
 #endif
 
 /** @} */
-#endif /* BMX280_H */

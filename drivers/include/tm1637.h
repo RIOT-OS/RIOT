@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TM1637_H
-#define TM1637_H
+#pragma once
 
 /**
  * @defgroup    drivers_tm1637 TM1637 display
@@ -118,4 +117,3 @@ int tm1637_clear(const tm1637_t *dev);
 #endif
 
 /** @} */
-#endif /* TM1637_H */

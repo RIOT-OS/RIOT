@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef SPS30_H
-#define SPS30_H
+#pragma once
 
 /**
  * @defgroup    drivers_sps30 SPS30 Particulate Matter Sensor
@@ -309,4 +308,3 @@ int sps30_wakeup(const sps30_t *dev);
 }
 #endif
 /** @} */
-#endif /* SPS30_H */

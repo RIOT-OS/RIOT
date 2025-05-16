@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef MTD_SPI_NOR_H
-#define MTD_SPI_NOR_H
+#pragma once
 
 /**
  * @defgroup    drivers_mtd_spi_nor Serial NOR flash
@@ -185,4 +184,3 @@ extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes;
 #endif
 
 /** @} */
-#endif /* MTD_SPI_NOR_H */

@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_GPIO_LL_H
-#define PERIPH_GPIO_LL_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_gpio_ll GPIO Low-Level API
@@ -1006,4 +1005,3 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 /** @} */
 
 /** @} */
-#endif /* PERIPH_GPIO_LL_H */

@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef ATA8520E_H
-#define ATA8520E_H
+#pragma once
 
 /**
  * @defgroup    drivers_ata8520e Microchip ATA8520E transceiver
@@ -240,4 +239,3 @@ int ata8520e_send_bit(ata8520e_t *dev, bool bit);
 #endif
 
 /** @} */
-#endif /* ATA8520E_H */

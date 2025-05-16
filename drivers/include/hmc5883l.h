@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef HMC5883L_H
-#define HMC5883L_H
+#pragma once
 
 /**
  * @defgroup    drivers_hmc5883l HMC5883L 3-axis digital compass
@@ -293,4 +292,3 @@ int hmc5883l_power_up(hmc5883l_t *dev);
 #endif
 
 /** @} */
-#endif /* HMC5883L_H */

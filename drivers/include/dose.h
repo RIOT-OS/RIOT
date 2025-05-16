@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef DOSE_H
-#define DOSE_H
+#pragma once
 
 /**
  * @defgroup    drivers_dose Differentially Operated Serial Ethernet
@@ -234,4 +233,3 @@ void dose_setup(dose_t *dev, const dose_params_t *params, uint8_t index);
 }
 #endif
 /** @} */
-#endif /* DOSE_H */

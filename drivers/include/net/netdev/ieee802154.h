@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef NET_NETDEV_IEEE802154_H
-#define NET_NETDEV_IEEE802154_H
+#pragma once
+
 /**
  * @defgroup    drivers_netdev_ieee802154 802.15.4 radio drivers
  * @ingroup     drivers_netdev_api
@@ -287,4 +287,3 @@ static inline void netdev_ieee802154_setup(netdev_ieee802154_t *dev)
 #endif
 
 /** @} */
-#endif /* NET_NETDEV_IEEE802154_H */

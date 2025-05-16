@@ -9,8 +9,7 @@
  * more details.
  */
 
-#ifndef NET_NETDEV_H
-#define NET_NETDEV_H
+#pragma once
 
 /**
  * @defgroup    drivers_netdev_api Netdev - Network Device Driver API
@@ -670,4 +669,3 @@ static inline void netdev_trigger_event_isr(netdev_t *netdev)
 #endif
 
 /** @} */
-#endif /* NET_NETDEV_H */

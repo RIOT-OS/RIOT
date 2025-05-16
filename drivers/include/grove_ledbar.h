@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef GROVE_LEDBAR_H
-#define GROVE_LEDBAR_H
+#pragma once
 
 /**
  * @defgroup    drivers_grove_ledbar Grove ledbar
@@ -91,4 +90,3 @@ void grove_ledbar_clear(grove_ledbar_t *dev);
 #endif
 
 /** @} */
-#endif /* GROVE_LEDBAR_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TSL4531X_H
-#define TSL4531X_H
+#pragma once
 
 /**
  * @defgroup    drivers_tsl4531x TSL4531x Illuminance sensor
@@ -192,4 +191,3 @@ int tsl4531x_simple_read(tsl4531x_t *dev);
 #endif
 
 /** @} */
-#endif /* TSL4531X_H */

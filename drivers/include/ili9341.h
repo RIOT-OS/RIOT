@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef ILI9341_H
-#define ILI9341_H
+#pragma once
 
 /**
  * @defgroup    drivers_ili9341 ILI9341 display driver
@@ -105,4 +104,3 @@ extern const lcd_driver_t lcd_ili9341_driver;
 }
 #endif
 /** @} */
-#endif /* ILI9341_H */

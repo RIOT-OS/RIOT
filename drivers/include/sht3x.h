@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SHT3X_H
-#define SHT3X_H
+#pragma once
 
 /**
  * @ingroup     drivers_sht3x
@@ -164,4 +163,3 @@ int sht3x_read (sht3x_dev_t* dev, int16_t* temp, int16_t* hum);
 #endif
 
 /** @} */
-#endif /* SHT3X_H */

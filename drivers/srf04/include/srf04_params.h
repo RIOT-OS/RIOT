@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_srf04
  *
@@ -16,8 +18,6 @@
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
 
-#ifndef SRF04_PARAMS_H
-#define SRF04_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +61,4 @@ static const srf04_params_t srf04_params[] = {
 }
 #endif
 
-#endif /* SRF04_PARAMS_H */
 /** @} */

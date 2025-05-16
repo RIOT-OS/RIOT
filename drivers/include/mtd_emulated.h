@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef MTD_EMULATED_H
-#define MTD_EMULATED_H
+#pragma once
+
 /**
  * @defgroup    drivers_mtd_emulated MTD wrapper for emulated MTD devices
  * @ingroup     drivers_mtd
@@ -105,4 +105,3 @@ extern const mtd_desc_t _mtd_emulated_driver;
 #endif
 
 /** @} */
-#endif /* MTD_EMULATED_H */

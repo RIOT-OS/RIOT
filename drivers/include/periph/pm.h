@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_PM_H
-#define PERIPH_PM_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_pm Power Management
@@ -56,4 +55,3 @@ void pm_set_lowest(void);
 #endif
 
 /** @} */
-#endif /* PERIPH_PM_H */

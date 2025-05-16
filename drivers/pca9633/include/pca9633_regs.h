@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_pca9633
  * @brief       Register definitions for the PCA9633 I2C PWM controller
@@ -14,8 +16,6 @@
  * @{
  */
 
-#ifndef PCA9633_REGS_H
-#define PCA9633_REGS_H
 
 #include "bitarithm.h"
 
@@ -201,5 +201,4 @@ extern "C"
 }
 #endif
 
-#endif /* PCA9633_REGS_H */
 /** @} */

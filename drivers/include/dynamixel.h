@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef DYNAMIXEL_H
-#define DYNAMIXEL_H
+#pragma once
 
 /**
  * @defgroup    drivers_dynamixel Dynamixel driver
@@ -168,4 +167,3 @@ int dynamixel_read(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t *dat
 #endif
 
 /** @} */
-#endif /* DYNAMIXEL_H */

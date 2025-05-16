@@ -6,8 +6,7 @@
  * more details.
  */
 
-#ifndef NET_NETDEV_WIFI_H
-#define NET_NETDEV_WIFI_H
+#pragma once
 
 /**
  * @defgroup    drivers_netdev_wifi Wi-Fi drivers
@@ -206,4 +205,3 @@ typedef void (*wifi_on_disconnect_result_t) (void *netif, const wifi_disconnect_
 #endif
 
 /** @} */
-#endif /* NET_NETDEV_WIFI_H */

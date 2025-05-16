@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef AIP31068_H
-#define AIP31068_H
+#pragma once
 
 /**
  * @defgroup    drivers_aip31068 AIP31068 I2C LCD controller
@@ -423,4 +422,3 @@ int aip31068_print_char(aip31068_t *dev, char c);
 #endif
 
 /** @} */
-#endif /* AIP31068_H */

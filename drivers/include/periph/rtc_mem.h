@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef PERIPH_RTC_MEM_H
-#define PERIPH_RTC_MEM_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_rtc_mem Low-Power RTC Memory
@@ -67,4 +66,3 @@ void rtc_mem_write(unsigned offset, const void *data, size_t len);
 #endif
 
 /** @} */
-#endif /* PERIPH_RTC_MEM_H */

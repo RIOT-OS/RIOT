@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MATRIX_KEYPAD_H
-#define MATRIX_KEYPAD_H
+#pragma once
 
 /**
  * @defgroup    drivers_matrix_keypad Matrix Keypad
@@ -226,4 +225,3 @@ size_t matrix_keypad_scan(matrix_keypad_t *dev);
 #endif
 
 /** @} */
-#endif /* MATRIX_KEYPAD_H */

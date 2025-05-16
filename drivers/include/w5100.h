@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef W5100_H
-#define W5100_H
+#pragma once
 
 /**
  * @defgroup    drivers_w5100 W5100 ethernet driver
@@ -87,4 +86,3 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params, uint8_t index);
 #endif
 
 /** @} */
-#endif /* W5100_H */

@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef ISL29125_H
-#define ISL29125_H
+#pragma once
 
 /**
  * @defgroup    drivers_isl29125 ISL29125 RGB light sensor
@@ -215,4 +214,3 @@ int isl29125_read_irq_status(const isl29125_t *dev);
 #endif
 
 /** @} */
-#endif /* ISL29125_H */

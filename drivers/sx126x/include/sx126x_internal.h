@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sx126x_internal SX1261/2/8 and LLCC68 internal functions
  * @ingroup     drivers_sx126x
@@ -17,8 +19,6 @@
  *
  * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef SX126X_INTERNAL_H
-#define SX126X_INTERNAL_H
 
 #include <assert.h>
 #include "sx126x.h"
@@ -126,5 +126,4 @@ static inline bool sx126x_is_stm32wl(sx126x_t *dev)
 }
 #endif
 
-#endif /* SX126X_INTERNAL_H */
 /** @} */

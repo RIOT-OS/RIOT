@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef ENCX24J600_H
-#define ENCX24J600_H
+#pragma once
 
 /**
  * @defgroup    drivers_encx24j600 ENCX24J600
@@ -68,4 +67,3 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params, uint
 }
 #endif
 /** @} */
-#endif /* ENCX24J600_H */

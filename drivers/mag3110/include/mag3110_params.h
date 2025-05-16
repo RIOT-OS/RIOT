@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mag3110
  * @{
@@ -16,8 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef MAG3110_PARAMS_H
-#define MAG3110_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -73,5 +73,4 @@ static const saul_reg_info_t mag3110_saul_info[] =
 }
 #endif
 
-#endif /* MAG3110_PARAMS_H */
 /** @} */

@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef SRF08_H
-#define SRF08_H
+#pragma once
 
 /**
  * @defgroup    drivers_srf08 SRF08 ultrasonic range sensor
@@ -165,4 +164,3 @@ int srf08_get_distances(const srf08_t *dev,
 #endif
 
 /** @} */
-#endif /* SRF08_H */

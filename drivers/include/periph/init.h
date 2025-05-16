@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_INIT_H
-#define PERIPH_INIT_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_init Common peripheral initialization
@@ -48,4 +47,3 @@ void periph_init(void);
 #endif
 
 /** @} */
-#endif /* PERIPH_INIT_H */

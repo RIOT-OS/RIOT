@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef SI1133_H
-#define SI1133_H
+#pragma once
 
 /**
  * @defgroup    drivers_si1133 Si1133 UV Index/Ambient Light Sensor with I2C
@@ -207,4 +206,3 @@ si1133_ret_code_t si1133_capture_sensors(si1133_t *dev, int32_t *values,
 #endif
 
 /** @} */
-#endif /* SI1133_H */
