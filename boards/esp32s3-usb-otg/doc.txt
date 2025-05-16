@@ -47,7 +47,7 @@ The main features of the board are:
 | 8 MByte Flash                  | yes            |
 | USB Type-A Host Interface      | no             |
 | USB Type-A Device Interface    | yes            |
-| SD Card Slot                   | yes (SPI mode) |
+| SD Card Slot                   | yes            |
 | LCD Color Display 240 x 240    | yes            |
 
 ## Hardware {#esp32s3_usb_otg_hardware}
@@ -107,6 +107,12 @@ UART_DEV(0):TxD   | GPIO43 | USB-to-UART bridge | \ref esp32_uart_interfaces "UA
 UART_DEV(0):RxD   | GPIO44 | USB-to-UART bridge | \ref esp32_uart_interfaces "UART interfaces"
 </center>
 \n
+
+@note
+SPI_DEV(1) is only configured if the `sdcard_spi` module is explicitly added to
+the `USEMODULE` in the application's Makefile to access the SD card in SPI mode.
+By default, the SDMMC host is configured and used by the `periph_sdmmc`
+module to access the SD card.
 
 For detailed information about the peripheral configurations of ESP32-S3
 boards, see section \ref esp32_peripherals "Common Peripherals".
