@@ -421,9 +421,9 @@ void native_interrupt_init(void)
     struct sigaction sa;
     DEBUG_IRQ("native_interrupt_init\n");
 
-    (void) VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
+    (void) VALGRIND_STACK_REGISTER(_isr_stack, _isr_stack + sizeof(_isr_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   (void *)__isr_stack, (void*)(__isr_stack + sizeof(__isr_stack)));
+                   (void *)_isr_stack, (void*)(_isr_stack + sizeof(_isr_stack)));
 
     _native_pending_signals = 0;
     memset(_native_irq_handlers, 0, sizeof(_native_irq_handlers));
