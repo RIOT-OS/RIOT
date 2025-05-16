@@ -19,6 +19,7 @@
  */
 
 #include "board.h"
+#include "saul_reg.h"
 
 #include "max31865.h"
 #include "max31865_internal.h"
@@ -85,6 +86,12 @@ extern "C" {
             .lut_numlines = MAX31865_LUT_NUMLINES, \
 }
 #endif
+/**
+ * @brief    Default SAUL info for the MAX31865 driver
+ */
+#ifndef MAX31865_SAUL_INFO
+#define MAX31865_SAUL_INFO { .name = "max31865_rtd" }
+#endif
 /**@}*/
 
 /**
@@ -95,6 +102,13 @@ static const max31865_params_t max31865_params[] =
     MAX31865_PARAMS
 };
 
+/**
+ * @brief   Allocate and configure entries to the SAUL registry
+ */
+static const saul_reg_info_t max31865_saul_info[] =
+{
+    MAX31865_SAUL_INFO
+};
 
 #ifdef __cplusplus
 }

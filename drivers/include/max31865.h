@@ -11,6 +11,7 @@
 /**
  * @defgroup    drivers_max31865 MAX31865 RTD-to-Digital converter driver
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the SPI RTD-to-Digital converter MAX31865.
  *
  * \section sec_max31865_ovrvw Overview
