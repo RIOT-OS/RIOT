@@ -40,8 +40,10 @@ sint8 nm_bus_init(void *arg)
     assert(atwinc15x0);
     assert(gpio_is_valid(atwinc15x0->params.ssn_pin));
 
+#if !defined(CPU_ESP32) && !defined(CPU_ESP8266)
     gpio_init(atwinc15x0->params.ssn_pin, GPIO_OUT);
     gpio_set(atwinc15x0->params.ssn_pin);
+#endif
 
     nm_bsp_reset();
     nm_bsp_sleep(1);
