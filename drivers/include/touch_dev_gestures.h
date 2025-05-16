@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TOUCH_DEV_GESTURES_H
-#define TOUCH_DEV_GESTURES_H
+#pragma once
 
 /**
  * @defgroup    drivers_touch_dev_gestures Touch device gesture recognition
@@ -246,4 +245,3 @@ touch_dev_gesture_t touch_dev_recognize_gesture(touch_dev_gesture_ctx_t *ctx,
 #endif
 
 /** @} */
-#endif /* TOUCH_DEV_GESTURES_H */

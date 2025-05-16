@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SAUL_H
-#define SAUL_H
+#pragma once
 
 /**
  * @defgroup    drivers_saul [S]ensor [A]ctuator [U]ber [L]ayer
@@ -357,4 +356,3 @@ ssize_t saul_class_write(char *dest, size_t max_size, uint8_t class_id);
 #endif
 
 /** @} */
-#endif /* SAUL_H */

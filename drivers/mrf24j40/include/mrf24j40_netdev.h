@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mrf24j40
  * @{
@@ -18,8 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef MRF24J40_NETDEV_H
-#define MRF24J40_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -36,5 +36,4 @@ extern const netdev_driver_t mrf24j40_driver;
 }
 #endif
 
-#endif /* MRF24J40_NETDEV_H */
 /** @} */

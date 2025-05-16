@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DSP0401_H
-#define DSP0401_H
+#pragma once
 
 /**
  * @defgroup    drivers_dsp0401 DSP0401
@@ -104,4 +103,3 @@ void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay);
 #endif
 
 /** @} */
-#endif /* DSP0401_H */

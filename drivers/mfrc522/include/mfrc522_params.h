@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_actuators
  * @brief   Default configuration for the MFRC522 controller
@@ -15,8 +17,6 @@
  * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
-#ifndef MFRC522_PARAMS_H
-#define MFRC522_PARAMS_H
 
 #include <stdbool.h>
 
@@ -81,5 +81,4 @@ static const mfrc522_params_t mfrc522_params[] =
 }
 #endif
 
-#endif /* MFRC522_PARAMS_H */
 /** @} */

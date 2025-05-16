@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef AD7746_H
-#define AD7746_H
+#pragma once
 
 /**
  * @defgroup   drivers_ad7746 AD7746 Capacitance-to-digital converter driver
@@ -332,4 +331,3 @@ int ad7746_set_cap_sr(const ad7746_t *dev, ad7746_cap_sample_rate_t sr);
 #endif
 
 /** @} */
-#endif /* AD7746_H */

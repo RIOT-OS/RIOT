@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_GPIO_UTIL_H
-#define PERIPH_GPIO_UTIL_H
+#pragma once
 
 /**
  * @defgroup   gpio_util GPIO I/O Utils
@@ -44,4 +43,3 @@ uint8_t gpio_util_shiftin(gpio_t data_pin, gpio_t clock_pin);
 }
 #endif
 /** @} */
-#endif /* PERIPH_GPIO_UTIL_H */

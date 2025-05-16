@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_FREQM_H
-#define PERIPH_FREQM_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_freqm FREQM
@@ -97,4 +96,3 @@ int freqm_frequency_get(freqm_t idx, uint32_t *result, uint32_t period_us);
 #endif
 
 /** @} */
-#endif /* PERIPH_FREQM_H */

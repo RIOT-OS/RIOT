@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef APDS99XX_H
-#define APDS99XX_H
+#pragma once
 
 /**
  * @defgroup    drivers_apds99xx APDS99XX proximity and ambient light sensors
@@ -684,4 +683,3 @@ int apds99xx_int_source(apds99xx_t *dev, apds99xx_int_source_t* src);
 #endif
 
 /** @} */
-#endif /* APDS99XX_H */

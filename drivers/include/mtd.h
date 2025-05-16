@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MTD_H
-#define MTD_H
+#pragma once
 
 /**
  * @defgroup    drivers_mtd Memory Technology Device
@@ -545,4 +544,3 @@ static inline mtd_dev_t *mtd_dev_get(unsigned idx)
 #endif
 
 /** @} */
-#endif /* MTD_H */

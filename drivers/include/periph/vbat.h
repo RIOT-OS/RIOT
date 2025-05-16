@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_VBAT_H
-#define PERIPH_VBAT_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_vbat backup battery monitoring
@@ -69,4 +68,3 @@ bool vbat_is_empty(void);
 #endif
 
 /** @} */
-#endif /* PERIPH_VBAT_H */

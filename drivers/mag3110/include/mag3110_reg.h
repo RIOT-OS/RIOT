@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mag3110
  * @{
@@ -18,8 +20,6 @@
  *
  */
 
-#ifndef MAG3110_REG_H
-#define MAG3110_REG_H
 
 #ifdef __cplusplus
 extern "C"
@@ -76,5 +76,4 @@ extern "C"
 }
 #endif
 
-#endif /* MAG3110_REG_H */
 /** @} */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef W5500_H
-#define W5500_H
+#pragma once
 
 /**
  * @defgroup    drivers_w5500 W5500 ethernet driver
@@ -87,4 +86,3 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index);
 #endif
 
 /** @} */
-#endif /* W5500_H */

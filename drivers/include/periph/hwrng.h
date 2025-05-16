@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_HWRNG_H
-#define PERIPH_HWRNG_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_hwrng HWRNG Abstraction
@@ -74,4 +73,3 @@ void hwrng_read(void *buf, unsigned int num);
 #endif
 
 /** @} */
-#endif /* PERIPH_HWRNG_H */

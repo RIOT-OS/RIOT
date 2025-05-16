@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef FT5X06_H
-#define FT5X06_H
+#pragma once
 
 /**
  * @defgroup    drivers_ft5x06 FocalTech FT5x06 touch panel driver
@@ -186,4 +185,3 @@ int ft5x06_read_touch_gesture(const ft5x06_t *dev, ft5x06_touch_gesture_t *gestu
 #endif
 
 /** @} */
-#endif /* FT5X06_H */

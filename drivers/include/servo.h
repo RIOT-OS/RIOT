@@ -8,8 +8,7 @@
  * details.
  */
 
-#ifndef SERVO_H
-#define SERVO_H
+#pragma once
 
 /**
  * @defgroup    drivers_servo Servo Motor Driver
@@ -233,4 +232,3 @@ void servo_set(servo_t *dev, uint8_t pos);
 #endif
 
 /** @} */
-#endif /* SERVO_H */

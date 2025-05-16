@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sht2x
  *
@@ -20,8 +22,6 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-#ifndef SHT2X_PARAMS_H
-#define SHT2X_PARAMS_H
 
 #include "sht2x.h"
 #include "saul_reg.h"
@@ -140,5 +140,4 @@ static const saul_reg_info_t sht2x_saul_reg_info[SHT2X_NUMOF] =
 }
 #endif
 
-#endif /* SHT2X_PARAMS_H */
 /** @} */

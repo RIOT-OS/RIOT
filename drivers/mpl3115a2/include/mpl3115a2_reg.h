@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mpl3115a2
  * @{
@@ -18,8 +20,6 @@
  *
  */
 
-#ifndef MPL3115A2_REG_H
-#define MPL3115A2_REG_H
 
 #ifdef __cplusplus
 extern "C"
@@ -130,5 +130,4 @@ extern "C"
 }
 #endif
 
-#endif /* MPL3115A2_REG_H */
 /** @} */

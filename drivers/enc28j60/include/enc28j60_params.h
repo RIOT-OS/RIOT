@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_enc28j60
  * @{
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef ENC28J60_PARAMS_H
-#define ENC28J60_PARAMS_H
 
 #include "board.h"
 
@@ -61,5 +61,4 @@ static const  enc28j60_params_t enc28j60_params[] = {
 }
 #endif
 
-#endif /* ENC28J60_PARAMS_H */
 /** @} */

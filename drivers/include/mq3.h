@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef MQ3_H
-#define MQ3_H
+#pragma once
 
 /**
  * @defgroup    drivers_mq3 MQ-3 Alcohol Tester
@@ -78,4 +77,3 @@ int16_t mq3_read(const mq3_t *dev);
 #endif
 
 /** @} */
-#endif /* MQ3_H */

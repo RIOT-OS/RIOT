@@ -8,8 +8,7 @@
  * directory for more details.
  */
 
-#ifndef ST77XX_H
-#define ST77XX_H
+#pragma once
 
 /**
  * @defgroup    drivers_st77xx ST77xx display driver
@@ -405,4 +404,3 @@ extern const lcd_driver_t lcd_st77xx_driver;
 }
 #endif
 /** @} */
-#endif /* ST77XX_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TM1637_PARAMS_H
-#define TM1637_PARAMS_H
+#pragma once
 
 /**
  * @ingroup     drivers_tm1637
@@ -60,4 +59,3 @@ static const tm1637_params_t tm1637_params[] = {
 #endif
 
 /** @} */
-#endif /* TM1637_PARAMS_H */

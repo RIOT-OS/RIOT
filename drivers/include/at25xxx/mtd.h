@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef AT25XXX_MTD_H
-#define AT25XXX_MTD_H
+#pragma once
 
 /**
  * @defgroup    drivers_mtd_at25xxx MTD wrapper for AT25xxx family of SPI-EEPROMs
@@ -53,4 +52,3 @@ extern const mtd_desc_t mtd_at25xxx_driver;
 #endif
 
 /** @} */
-#endif /* AT25XXX_MTD_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_isl29020
  *
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef ISL29020_PARAMS_H
-#define ISL29020_PARAMS_H
 
 #include "board.h"
 #include "isl29020.h"
@@ -75,5 +75,4 @@ static const saul_reg_info_t isl29020_saul_info[] =
 }
 #endif
 
-#endif /* ISL29020_PARAMS_H */
 /** @} */

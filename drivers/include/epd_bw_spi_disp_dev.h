@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef EPD_BW_SPI_DISP_DEV_H
-#define EPD_BW_SPI_DISP_DEV_H
+#pragma once
 
 /**
  * @ingroup     drivers_epd_bw_spi
@@ -35,4 +34,3 @@ extern const disp_dev_driver_t epd_bw_spi_disp_dev_driver;
 #endif
 
 /** @} */
-#endif /* EPD_BW_SPI_DISP_DEV_H */

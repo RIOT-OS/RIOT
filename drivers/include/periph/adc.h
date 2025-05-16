@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_ADC_H
-#define PERIPH_ADC_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_adc ADC
@@ -158,4 +157,3 @@ void adc_continuous_stop(void);
 #endif
 
 /** @} */
-#endif /* PERIPH_ADC_H */

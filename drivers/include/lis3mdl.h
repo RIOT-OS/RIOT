@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LIS3MDL_H
-#define LIS3MDL_H
+#pragma once
 
 /**
  * @defgroup    drivers_lis3mdl LIS3MDL 3-axis magnetometer
@@ -159,4 +158,3 @@ void lis3mdl_disable(const lis3mdl_t *dev);
 #endif
 
 /** @} */
-#endif /* LIS3MDL_H */

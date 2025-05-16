@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef PERIPH_RTT_H
-#define PERIPH_RTT_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_rtt RTT
@@ -241,4 +240,3 @@ void rtt_poweroff(void);
 #endif
 
 /** @} */
-#endif /* PERIPH_RTT_H */

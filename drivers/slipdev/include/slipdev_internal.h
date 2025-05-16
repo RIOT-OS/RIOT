@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_slipdev
  * @{
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef SLIPDEV_INTERNAL_H
-#define SLIPDEV_INTERNAL_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -83,5 +83,4 @@ void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len);
 }
 #endif
 
-#endif /* SLIPDEV_INTERNAL_H */
 /** @} */

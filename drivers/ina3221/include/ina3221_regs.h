@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ina3221
  * @{
@@ -18,8 +20,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef INA3221_REGS_H
-#define INA3221_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,5 +54,4 @@ typedef enum ina3221_reg {
 }
 #endif
 
-#endif /* INA3221_REGS_H */
 /** @} */

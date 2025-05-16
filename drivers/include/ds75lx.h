@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DS75LX_H
-#define DS75LX_H
+#pragma once
 
 /**
  * @defgroup    drivers_ds75lx Maxim DS75LX temperature sensor
@@ -111,4 +110,3 @@ int ds75lx_shutdown(const ds75lx_t *dev);
 #endif
 
 /** @} */
-#endif /* DS75LX_H */

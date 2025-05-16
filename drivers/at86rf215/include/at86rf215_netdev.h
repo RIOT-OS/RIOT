@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf215
  * @{
@@ -16,8 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef AT86RF215_NETDEV_H
-#define AT86RF215_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -34,5 +34,4 @@ extern const netdev_driver_t at86rf215_driver;
 }
 #endif
 
-#endif /* AT86RF215_NETDEV_H */
 /** @} */

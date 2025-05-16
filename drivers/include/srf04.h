@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SRF04_H
-#define SRF04_H
+#pragma once
 
 /**
  * @defgroup    drivers_srf04 srf04 ultra sonic range finder
@@ -107,4 +106,3 @@ int srf04_get_distance(const srf04_t *dev);
 #endif
 
 /** @} */
-#endif /* SRF04_H */

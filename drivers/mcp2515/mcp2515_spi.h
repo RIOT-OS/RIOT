@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mcp2515
  * @brief       Driver for the Microchip MCP2515 can controller.
@@ -18,8 +20,6 @@
  *
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-#ifndef MCP2515_SPI_H
-#define MCP2515_SPI_H
 
 #include <stdint.h>
 #include "candev_mcp2515.h"
@@ -164,5 +164,4 @@ int mcp2515_spi_bitmod(const candev_mcp2515_t *dev, uint8_t addr, uint8_t mask,
 }
 #endif
 
-#endif /* MCP2515_SPI_H */
 /** @} */

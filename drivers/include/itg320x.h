@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ITG320X_H
-#define ITG320X_H
+#pragma once
 
 /**
  * @defgroup    drivers_itg320x ITG320X 3-axis gyroscope
@@ -313,4 +312,3 @@ int itg320x_power_up(itg320x_t *dev);
 #endif
 
 /** @} */
-#endif /* ITG320X_H */

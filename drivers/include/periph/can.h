@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_CAN_H
-#define PERIPH_CAN_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_can CAN
@@ -63,4 +62,3 @@ void can_init(can_t *dev, const can_conf_t *conf);
 #endif
 
 /** @} */
-#endif /* PERIPH_CAN_H */

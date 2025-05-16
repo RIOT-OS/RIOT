@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_mfrc522
  * @brief   Register definitions for the MFRC522 controller
@@ -19,8 +21,6 @@
  * @{
  */
 
-#ifndef MFRC522_REGS_H
-#define MFRC522_REGS_H
 
 #include "bitarithm.h"
 
@@ -1164,5 +1164,4 @@ typedef enum {
 }
 #endif
 
-#endif /* MFRC522_REGS_H */
 /** @} */

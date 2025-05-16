@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef WS281X_H
-#define WS281X_H
+#pragma once
 
 /**
  * @defgroup    drivers_ws281x WS2812/SK6812 RGB LED (NeoPixel)
@@ -253,4 +252,3 @@ static inline void ws281x_write(ws281x_t *dev)
 #endif
 
 /** @} */
-#endif /* WS281X_H */

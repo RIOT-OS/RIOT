@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_tsl2561
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef TSL2561_PARAMS_H
-#define TSL2561_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -75,5 +75,4 @@ saul_reg_info_t tsl2561_saul_info[] =
 }
 #endif
 
-#endif /* TSL2561_PARAMS_H */
 /** @} */

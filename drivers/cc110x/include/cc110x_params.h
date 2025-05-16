@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -16,8 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef CC110X_PARAMS_H
-#define CC110X_PARAMS_H
 
 #include "board.h"
 #include "cc110x_settings.h"
@@ -122,5 +122,4 @@ static const cc110x_params_t cc110x_params[] = {
 #ifdef __cplusplus
 }
 #endif
-#endif /* CC110X_PARAMS_H */
 /** @} */

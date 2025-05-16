@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_stmpe811
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef STMPE811_CONSTANTS_H
-#define STMPE811_CONSTANTS_H
 
 #include "stmpe811.h"
 
@@ -247,5 +247,4 @@ extern "C" {
 }
 #endif
 
-#endif /* STMPE811_CONSTANTS_H */
 /** @} */

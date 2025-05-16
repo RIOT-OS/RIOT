@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef MII_H
-#define MII_H
+#pragma once
 
 /**
  * @defgroup    drivers_mii     Ethernet Media-Independent Interface (MII)
@@ -206,4 +205,3 @@ static inline bool mii_can_10_mbps_half_dp(uint16_t bmsr)
 #endif
 
 /** @} */
-#endif /* MII_H */

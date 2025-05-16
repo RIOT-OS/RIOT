@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef AT86RF2XX_H
-#define AT86RF2XX_H
+#pragma once
 
 /**
  * @defgroup    drivers_at86rf2xx AT86RF2xx based drivers
@@ -596,4 +595,3 @@ void at86rf2xx_disable_smart_idle(at86rf2xx_t *dev);
 #endif
 
 /** @} */
-#endif /* AT86RF2XX_H */

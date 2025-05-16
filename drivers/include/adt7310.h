@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ADT7310_H
-#define ADT7310_H
+#pragma once
 
 /**
  * @defgroup    drivers_adt7310 ADT7310 SPI temperature sensor
@@ -178,4 +177,3 @@ float adt7310_read_float(const adt7310_t *dev);
 #endif
 
 /** @} */
-#endif /* ADT7310_H */

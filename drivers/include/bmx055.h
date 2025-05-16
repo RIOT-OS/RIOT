@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BMX055_H
-#define BMX055_H
+#pragma once
 
 /**
  * @defgroup    drivers_bmx055 BMX055 9-axis sensor
@@ -200,4 +199,3 @@ int bmx055_gyro_read(const bmx055_t *dev, int16_t *data);
 #endif
 
 /** @} */
-#endif /* BMX055_H */

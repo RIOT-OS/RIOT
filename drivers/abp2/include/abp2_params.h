@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_abp2
  * @{
@@ -17,8 +19,6 @@
  * @author      David Picard <david.picard@clermont.in2p3.fr>
  */
 
-#ifndef ABP2_PARAMS_H
-#define ABP2_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -115,5 +115,4 @@ static const saul_reg_info_t abp2_saul_info[][2] =
 }
 #endif
 
-#endif /* ABP2_PARAMS_H */
 /** @} */

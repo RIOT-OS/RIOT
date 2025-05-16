@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sds011
  * @{
@@ -16,8 +18,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-#ifndef SDS011_PARAMS_H
-#define SDS011_PARAMS_H
 
 #include "board.h"
 #include "periph/uart.h"
@@ -74,5 +74,4 @@ saul_reg_info_t sds011_saul_info[] =
 }
 #endif
 
-#endif /* SDS011_PARAMS_H */
 /** @} */

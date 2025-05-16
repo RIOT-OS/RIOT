@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef HSC_H
-#define HSC_H
+#pragma once
 
 /**
  * @defgroup    drivers_hsc HSC temperature and pressure sensor
@@ -100,4 +99,3 @@ int hsc_read_pressure(const hsc_t *dev, int32_t *dest);
 #endif
 
 /** @} */
-#endif /* HSC_H */

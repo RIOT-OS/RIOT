@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_PWM_H
-#define PERIPH_PWM_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_pwm PWM
@@ -187,4 +186,3 @@ void pwm_poweroff(pwm_t dev);
 #endif
 
 /** @} */
-#endif /* PERIPH_PWM_H */

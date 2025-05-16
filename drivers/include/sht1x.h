@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef SHT1X_H
-#define SHT1X_H
+#pragma once
 
 /**
  * @defgroup    drivers_sht1x SHT10/SHT11/SHT15 Humidity and Temperature Sensor
@@ -184,4 +183,3 @@ int sht1x_reset(sht1x_dev_t *dev);
 #endif
 
 /** @} */
-#endif /* SHT1X_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc2420
  *
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CC2420_PARAMS_H
-#define CC2420_PARAMS_H
 
 #include "board.h"
 #include "cc2420.h"
@@ -83,5 +83,4 @@ static const cc2420_params_t cc2420_params[] =
 }
 #endif
 
-#endif /* CC2420_PARAMS_H */
 /** @} */

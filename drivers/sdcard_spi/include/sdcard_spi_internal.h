@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sdcard_spi
  * @{
@@ -21,8 +23,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-#ifndef SDCARD_SPI_INTERNAL_H
-#define SDCARD_SPI_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -289,5 +289,4 @@ sd_rw_response_t sdcard_spi_read_sds(sdcard_spi_t *card, sd_status_t *sd_status)
 }
 #endif
 
-#endif /* SDCARD_SPI_INTERNAL_H */
 /** @} */

@@ -9,8 +9,7 @@
  * details.
  */
 
-#ifndef CC110X_H
-#define CC110X_H
+#pragma once
 
 /**
  * @defgroup    drivers_cc110x CC1100/CC1100e/CC1101 Sub-GHz transceiver driver
@@ -653,4 +652,3 @@ void cc110x_sleep(cc110x_t *dev);
 #endif
 
 /** @} */
-#endif /* CC110X_H */

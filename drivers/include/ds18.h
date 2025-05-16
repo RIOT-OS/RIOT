@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DS18_H
-#define DS18_H
+#pragma once
 
 /**
  * @defgroup    drivers_ds18 DS18 temperature sensor driver
@@ -124,4 +123,3 @@ int ds18_get_temperature(const ds18_t *dev, int16_t *temperature);
 #endif
 
 /** @} */
-#endif /* DS18_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef OPT3001_H
-#define OPT3001_H
+#pragma once
 
 /**
  * @defgroup    drivers_opt3001 OPT3001 Ambient Light Sensor
@@ -164,4 +163,3 @@ int opt3001_read_lux(const opt3001_t *dev, uint32_t *convl);
 #endif
 
 /** @} */
-#endif /* OPT3001_H */

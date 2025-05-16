@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef ADS101X_H
-#define ADS101X_H
+#pragma once
 
 /**
  * @defgroup   drivers_ads101x ADS101x/111x ADC device driver
@@ -182,4 +181,3 @@ int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
 #endif
 
 /** @} */
-#endif /* ADS101X_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef KW2XRF_H
-#define KW2XRF_H
+#pragma once
 
 /**
  * @defgroup    drivers_kw2xrf KW2x radio-driver
@@ -174,4 +173,3 @@ void kw2xrf_radio_hal_irq_handler(void *dev);
 #endif
 
 /** @} */
-#endif /* KW2XRF_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_vcnl40x0
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef VCNL40X0_PARAMS_H
-#define VCNL40X0_PARAMS_H
 
 #include "board.h"
 #include "vcnl40x0.h"
@@ -79,5 +79,4 @@ static const saul_reg_info_t vcnl40x0_saul_reg_info[] =
 }
 #endif
 
-#endif /* VCNL40X0_PARAMS_H */
 /** @} */

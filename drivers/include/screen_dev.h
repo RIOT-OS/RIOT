@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SCREEN_DEV_H
-#define SCREEN_DEV_H
+#pragma once
 
 /**
  * @defgroup    drivers_screen_dev Screen device generic API
@@ -59,4 +58,3 @@ typedef struct {
 #endif
 
 /** @} */
-#endif /* SCREEN_DEV_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_CPUID_H
-#define PERIPH_CPUID_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_cpuid CPUID
@@ -63,4 +62,3 @@ void cpuid_get(void *id);
 #endif
 
 /** @} */
-#endif /* PERIPH_CPUID_H */

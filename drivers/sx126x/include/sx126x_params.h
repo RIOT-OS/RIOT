@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx126x
  *
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef SX126X_PARAMS_H
-#define SX126X_PARAMS_H
 
 #include "board.h"
 #include "sx126x.h"
@@ -127,5 +127,4 @@ static const sx126x_params_t sx126x_params[] =
 }
 #endif
 
-#endif /* SX126X_PARAMS_H */
 /** @} */

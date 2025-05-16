@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef FXOS8700_H
-#define FXOS8700_H
+#pragma once
 
 /**
  * @defgroup    drivers_fxos8700 FXOS8700 3-axis accelerometer/magnetometer
@@ -168,4 +167,3 @@ int fxos8700_read_cached(const void* dev, fxos8700_measurement_t* acc, fxos8700_
 #endif
 
 /** @} */
-#endif /* FXOS8700_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ENC28J60_H
-#define ENC28J60_H
+#pragma once
 
 /**
  * @defgroup    drivers_enc28j60 ENC28J60
@@ -68,4 +67,3 @@ void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params, uint8_t in
 #endif
 
 /** @} */
-#endif /* ENC28J60_H */

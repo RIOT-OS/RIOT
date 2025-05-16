@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DS3234_H
-#define DS3234_H
+#pragma once
 
 /**
  * @defgroup    drivers_ds3234  DS3234 Extremely Accurate SPI RTC
@@ -67,4 +66,3 @@ int ds3234_pps_init(const ds3234_params_t *params);
 #endif
 
 /** @} */
-#endif /* DS3234_H */

@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef AT86RF215_H
-#define AT86RF215_H
+#pragma once
 
 /**
  * @defgroup    drivers_at86rf215 AT86RF215 based drivers
@@ -683,4 +682,3 @@ void at86rf215_disable_batmon(at86rf215_t *dev);
 #endif
 
 /** @} */
-#endif /* AT86RF215_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lpd8808
  *
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef LPD8808_PARAMS_H
-#define LPD8808_PARAMS_H
 
 #include "board.h"
 
@@ -58,5 +58,4 @@ static const lpd8808_params_t lpd8808_params[] =
 }
 #endif
 
-#endif /* LPD8808_PARAMS_H */
 /** @} */

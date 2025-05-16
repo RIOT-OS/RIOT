@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LM75_H
-#define LM75_H
+#pragma once
 
 /**
  * @ingroup     drivers_lm75
@@ -243,4 +242,3 @@ int lm75_low_power_mode(lm75_t *dev, uint16_t interval);
 #endif
 
 /** @} */
-#endif /* LM75_H */

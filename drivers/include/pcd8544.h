@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PCD8544_H
-#define PCD8544_H
+#pragma once
 
 /**
  * @defgroup    drivers_pcd8544 PCD8544 LCD driver
@@ -199,4 +198,3 @@ void pcd8544_riot(const pcd8544_t *dev);
 #endif
 
 /** @} */
-#endif /* PCD8544_H */

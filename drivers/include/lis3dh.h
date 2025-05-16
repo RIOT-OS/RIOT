@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LIS3DH_H
-#define LIS3DH_H
+#pragma once
 
 /**
  * @defgroup    drivers_lis3dh LIS3DH accelerometer
@@ -906,4 +905,3 @@ int lis3dh_get_fifo_level(const lis3dh_t *dev);
 #endif
 
 /** @} */
-#endif /* LIS3DH_H */

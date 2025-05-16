@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MY9221_H
-#define MY9221_H
+#pragma once
 
 /**
  * @defgroup    drivers_my9221 MY9221 LED controller
@@ -126,4 +125,3 @@ void my9221_toggle_led(my9221_t *dev, const uint8_t led);
 #endif
 
 /** @} */
-#endif /* MY9221_H */

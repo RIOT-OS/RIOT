@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SDCARD_SPI_H
-#define SDCARD_SPI_H
+#pragma once
 
 /**
  * @defgroup    drivers_sdcard_spi SPI SD Card driver
@@ -281,4 +280,3 @@ uint64_t sdcard_spi_get_capacity(sdcard_spi_t *card);
 #endif
 
 /** @} */
-#endif /* SDCARD_SPI_H */

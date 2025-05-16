@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_uart_half_duplex half-duplex UART Driver
  * @ingroup     drivers_actuators
@@ -21,8 +23,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-#ifndef UART_HALF_DUPLEX_H
-#define UART_HALF_DUPLEX_H
 
 #include <stdlib.h>
 
@@ -140,5 +140,4 @@ size_t uart_half_duplex_recv(const uart_half_duplex_t *dev, size_t size);
 }
 #endif
 
-#endif /* UART_HALF_DUPLEX_H */
 /** @} */

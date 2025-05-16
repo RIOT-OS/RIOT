@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef INA3221_H
-#define INA3221_H
+#pragma once
 
 /**
  * @defgroup    drivers_ina3221 INA3221 current/power monitor
@@ -1104,4 +1103,3 @@ void ina3221_calculate_power_uw(ina3221_ch_t ch,
 #endif
 
 /** @} */
-#endif /* INA3221_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_dfplayer
  * @{
@@ -14,8 +16,6 @@
  * @brief       Header-only functions of the DFPlayer Mini Device driver
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-#ifndef DFPLAYER_IMPLEMENTATION_H
-#define DFPLAYER_IMPLEMENTATION_H
 
 #include <errno.h>
 
@@ -257,5 +257,4 @@ static inline void dfplayer_source_set_rm(dfplayer_source_set_t *set,
 }
 #endif
 
-#endif /* DFPLAYER_IMPLEMENTATION_H */
 /** @} */

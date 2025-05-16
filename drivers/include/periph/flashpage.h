@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_FLASHPAGE_H
-#define PERIPH_FLASHPAGE_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_flashpage Flash page driver
@@ -424,4 +423,3 @@ int flashpage_rwwee_write_and_verify(unsigned page, const void *data);
 #endif
 
 /** @} */
-#endif /* PERIPH_FLASHPAGE_H */

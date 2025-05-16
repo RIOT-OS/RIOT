@@ -8,8 +8,7 @@
  * directory for more details.
  */
 
-#ifndef SHT2X_H
-#define SHT2X_H
+#pragma once
 
 /**
  * @defgroup    drivers_sht2x SHT2x Humidity and Temperature sensor
@@ -194,4 +193,3 @@ int sht2x_write_userreg(const sht2x_t *dev, uint8_t userreg);
 #endif
 
 /** @} */
-#endif /* SHT2X_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_hmc5883l
  * @brief       Default configuration for the Honeywell HMC5883L 3-axis digital compass
@@ -14,8 +16,6 @@
  * @{
  */
 
-#ifndef HMC5883L_PARAMS_H
-#define HMC5883L_PARAMS_H
 
 #include "board.h"
 #include "hmc5883l.h"
@@ -99,5 +99,4 @@ static const saul_reg_info_t hmc5883l_saul_info[] =
 }
 #endif
 
-#endif /* HMC5883L_PARAMS_H */
 /** @} */

@@ -7,8 +7,7 @@
  * details.
  */
 
-#ifndef MRF24J40_H
-#define MRF24J40_H
+#pragma once
 
 /**
  * @defgroup    drivers_mrf24j40 MRF24J40 based drivers
@@ -405,4 +404,3 @@ int mrf24j40_init(mrf24j40_t *dev, const mrf24j40_params_t *params, ieee802154_d
 #endif
 
 /** @} */
-#endif /* MRF24J40_H */

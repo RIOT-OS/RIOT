@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_opt3001
  *
@@ -16,8 +18,6 @@
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
 
-#ifndef OPT3001_REGS_H
-#define OPT3001_REGS_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -87,5 +87,4 @@
 }
 #endif
 
-#endif /* OPT3001_REGS_H */
 /** @} */

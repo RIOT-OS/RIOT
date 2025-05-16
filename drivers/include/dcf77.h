@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DCF77_H
-#define DCF77_H
+#pragma once
 
 /**
  * @defgroup    drivers_dcf77 DCF77 long wave receiver with 77,5 kHz
@@ -118,4 +117,3 @@ void dcf77_set_tick_cb(dcf77_t *dev, dcf77_tick_cb_t cb, void *arg);
 #endif
 
 /** @} */
-#endif /* DCF77_H */

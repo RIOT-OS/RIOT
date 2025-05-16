@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef NET_NETDEV_BLE_H
-#define NET_NETDEV_BLE_H
+#pragma once
 
 /**
  * @defgroup    drivers_netdev_ble netdev BLE mode
@@ -197,4 +196,3 @@ static inline void netdev_ble_stop(netdev_t *dev)
 #endif
 
 /** @} */
-#endif /* NET_NETDEV_BLE_H */

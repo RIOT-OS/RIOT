@@ -6,8 +6,7 @@
  * more details.
  */
 
-#ifndef CAN_CANDEV_H
-#define CAN_CANDEV_H
+#pragma once
 
 /**
  * @defgroup    drivers_candev CAN device driver interface
@@ -182,4 +181,3 @@ typedef struct candev_driver {
 #endif
 
 /** @} */
-#endif /* CAN_CANDEV_H */

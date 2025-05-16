@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef KW41ZRF_H
-#define KW41ZRF_H
+#pragma once
 
 /**
  * @defgroup    drivers_kw41zrf KW41Z radio-driver
@@ -166,4 +165,3 @@ int kw41zrf_reset(kw41zrf_t *dev);
 #endif
 
 /** @} */
-#endif /* KW41ZRF_H */

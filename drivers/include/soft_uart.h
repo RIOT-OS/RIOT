@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SOFT_UART_H
-#define SOFT_UART_H
+#pragma once
 
 /**
  * @defgroup    drivers_soft_uart Software UART
@@ -138,4 +137,3 @@ void soft_uart_poweroff(soft_uart_t uart);
 #endif
 
 /** @} */
-#endif /* SOFT_UART_H */

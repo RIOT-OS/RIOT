@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_vcnl40x0
  * @{
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef VCNL40X0_INTERNALS_H
-#define VCNL40X0_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,5 +134,4 @@ extern "C" {
 }
 #endif
 
-#endif /* VCNL40X0_INTERNALS_H */
 /** @} */

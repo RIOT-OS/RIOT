@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_stmpe811
  * @{
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef STMPE811_TOUCH_DEV_H
-#define STMPE811_TOUCH_DEV_H
 
 #include "touch_dev.h"
 
@@ -34,5 +34,4 @@ extern const touch_dev_driver_t stmpe811_touch_dev_driver;
 }
 #endif
 
-#endif /* STMPE811_TOUCH_DEV_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_mrf24j40
  * @{
@@ -18,8 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef MRF24J40_INTERNAL_H
-#define MRF24J40_INTERNAL_H
 
 #include <stdint.h>
 
@@ -162,5 +162,4 @@ void mrf24j40_flush_rx(mrf24j40_t *dev);
 }
 #endif
 
-#endif /* MRF24J40_INTERNAL_H */
 /** @} */

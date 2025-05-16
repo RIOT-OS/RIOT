@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lm75
  *
@@ -16,8 +18,6 @@
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
  */
 
-#ifndef LM75_PARAMS_H
-#define LM75_PARAMS_H
 
 #include "board.h"
 #include "lm75.h"
@@ -177,5 +177,4 @@ static const lm75_params_t lm75_params[] =
 }
 #endif
 
-#endif /* LM75_PARAMS_H */
 /** @} */

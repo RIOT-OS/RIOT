@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SAUL_BAT_VOLTAGE_H
-#define SAUL_BAT_VOLTAGE_H
+#pragma once
 
 /**
  * @ingroup     drivers_saul
@@ -50,4 +49,3 @@ typedef struct {
 #endif
 
 /** @} */
-#endif /* SAUL_BAT_VOLTAGE_H */

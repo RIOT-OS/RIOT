@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef EPD_BW_SPI_H
-#define EPD_BW_SPI_H
+#pragma once
 
 /**
  * @defgroup    drivers_epd_bw_spi Generic black/white e-paper/e-ink SPI display driver.
@@ -271,4 +270,3 @@ void epd_bw_spi_swreset(epd_bw_spi_t *dev);
 }
 #endif
 /** @} */
-#endif /* EPD_BW_SPI_H */

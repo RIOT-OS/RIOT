@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_TIMER_H
-#define PERIPH_TIMER_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_timer Timer
@@ -352,4 +351,3 @@ bool timer_poll_channel(tim_t dev, int channel);
 #endif
 
 /** @} */
-#endif /* PERIPH_TIMER_H */

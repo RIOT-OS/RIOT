@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_scd30
  * @{
@@ -19,8 +21,6 @@
  * @author      Nishchay Agrawal <f2016088@pilani.bits-pilani.ac.in>
  */
 
-#ifndef SCD30_INTERNAL_H
-#define SCD30_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,5 +58,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SCD30_INTERNAL_H */
 /** @} */

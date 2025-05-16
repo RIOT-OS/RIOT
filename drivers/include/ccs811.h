@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef CCS811_H
-#define CCS811_H
+#pragma once
 
 /**
  * @ingroup     drivers_ccs811
@@ -404,4 +403,3 @@ int ccs811_set_baseline (const ccs811_t *dev, uint16_t baseline);
 #endif
 
 /** @} */
-#endif /* CCS811_H */

@@ -5,8 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-#ifndef MTD_DEFAULT_H
-#define MTD_DEFAULT_H
+
+#pragma once
+
 /**
  * @ingroup     drivers_mtd
  * @{
@@ -46,4 +47,3 @@ extern mtd_emulated_t mtd_emulated_dev0;
 #endif
 
 /** @} */
-#endif /* MTD_DEFAULT_H */

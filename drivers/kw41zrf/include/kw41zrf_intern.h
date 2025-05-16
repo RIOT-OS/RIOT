@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_kw41zrf
  * @{
@@ -17,8 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef KW41ZRF_INTERN_H
-#define KW41ZRF_INTERN_H
 
 #include <stdint.h>
 #include "kw41zrf.h"
@@ -279,5 +279,4 @@ static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
 }
 #endif
 
-#endif /* KW41ZRF_INTERN_H */
 /** @} */

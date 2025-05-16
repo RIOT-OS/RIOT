@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SDMMC_SDMMC_H
-#define SDMMC_SDMMC_H
+#pragma once
 
 /**
  * @defgroup    drivers_sdmmc    SDIO/SD/MMC Device API (SDMMC)
@@ -1957,5 +1956,3 @@ uint64_t sdmmc_get_capacity(sdmmc_dev_t *dev);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SDMMC_SDMMC_H */

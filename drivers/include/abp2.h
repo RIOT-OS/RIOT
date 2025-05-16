@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup   drivers_abp2 ABP2 series Honeywell pressure and temperature sensor driver
  * @ingroup    drivers_sensors
@@ -70,8 +72,6 @@
  * @author     David Picard <david.picard@clermont.in2p3.fr>
  */
 
-#ifndef ABP2_H
-#define ABP2_H
 
 #include "saul.h"
 
@@ -309,5 +309,4 @@ int32_t abp2_temperature(const abp2_t *dev, const abp2_raw_t *raw_values);
 }
 #endif
 
-#endif /* ABP2_H */
 /** @} */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef TJA1042_H
-#define TJA1042_H
+#pragma once
+
 /**
  * @defgroup    drivers_tja1042 TJA1042
  * @ingroup     drivers_can
@@ -79,4 +79,3 @@ extern const trx_driver_t tja1042_driver;
 #endif
 
 /** @} */
-#endif /* TJA1042_H */

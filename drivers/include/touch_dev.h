@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TOUCH_DEV_H
-#define TOUCH_DEV_H
+#pragma once
 
 /**
  * @defgroup    drivers_touch_dev Touch device generic API
@@ -210,4 +209,3 @@ void touch_dev_set_touch_event_callback(const touch_dev_t *dev, touch_event_cb_t
 #endif
 
 /** @} */
-#endif /* TOUCH_DEV_H */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_feetech
  *
@@ -17,8 +19,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-#ifndef FEETECH_READER_H
-#define FEETECH_READER_H
 
 #include "feetech_protocol.h"
 
@@ -292,5 +292,4 @@ const uint8_t *feetech_reader_sync_write_item_get_payload(const feetech_reader_t
 }
 #endif
 
-#endif /* FEETECH_READER_H */
 /** @} */

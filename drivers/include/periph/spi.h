@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_SPI_H
-#define PERIPH_SPI_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_spi SPI
@@ -458,4 +457,3 @@ static inline uint16_t spi_transfer_u16_be(spi_t bus, spi_cs_t cs, bool cont, ui
 #endif
 
 /** @} */
-#endif /* PERIPH_SPI_H */

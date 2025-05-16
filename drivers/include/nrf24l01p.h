@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef NRF24L01P_H
-#define NRF24L01P_H
+#pragma once
 
 /**
  * @defgroup    drivers_nrf24l01p NRF24L01+ driver interface
@@ -626,4 +625,3 @@ void nrf24l01p_rx_cb(void *arg);
 #endif
 
 /** @} */
-#endif /* NRF24L01P_H */

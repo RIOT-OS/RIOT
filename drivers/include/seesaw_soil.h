@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SEESAW_SOIL_H
-#define SEESAW_SOIL_H
+#pragma once
 
 /**
  * @defgroup    drivers_seesaw_soil Adafruit Seesaw Soil Moisture and Temperature Sensor
@@ -116,4 +115,3 @@ int seesaw_soil_moisture(const seesaw_soil_t *dev, uint16_t *moist);
 #endif
 
 /** @} */
-#endif /* SEESAW_SOIL_H */

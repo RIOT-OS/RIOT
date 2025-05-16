@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc2420
  * @{
@@ -18,8 +20,6 @@
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  */
 
-#ifndef CC2420_REGISTERS_H
-#define CC2420_REGISTERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -242,5 +242,4 @@ enum {
 }
 #endif
 
-#endif /* CC2420_REGISTERS_H */
 /** @} */

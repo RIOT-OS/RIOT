@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LC709203F_H
-#define LC709203F_H
+#pragma once
 
 /**
  * @defgroup    drivers_lc709203f LC709203F
@@ -385,4 +384,3 @@ void lc709203f_set_status_bit(const lc709203f_t *dev, const lc709203f_temp_obtai
 #endif
 
 /** @} */
-#endif /* LC709203F_H */

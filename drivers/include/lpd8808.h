@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LPD8808_H
-#define LPD8808_H
+#pragma once
 
 /**
  * @defgroup    drivers_lpd8808 LPD8808 based LED Strip
@@ -80,4 +79,3 @@ void lpd8808_load_rgb(const lpd8808_t *dev, color_rgb_t vals[]);
 #endif
 
 /** @} */
-#endif /* LPD8808_H */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef DS1307_H
-#define DS1307_H
+#pragma once
+
 /**
  * @defgroup    drivers_ds1307  DS1307 RTC
  * @ingroup     drivers_sensors
@@ -158,4 +158,3 @@ int ds1307_get_sqw_mode(const ds1307_t *dev);
 #endif
 
 /** @} */
-#endif /* DS1307_H */

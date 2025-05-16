@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef MCP47XX_H
-#define MCP47XX_H
+#pragma once
 
 /**
  * @defgroup    drivers_mcp47xx MCP47xx DAC with I2C interface
@@ -340,4 +339,3 @@ uint8_t mcp47xx_dac_channels(mcp47xx_t *dev);
 #endif
 
 /** @} */
-#endif /* MCP47XX_H */

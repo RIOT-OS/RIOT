@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_QDEC_H
-#define PERIPH_QDEC_H
+#pragma once
 
 /**
  * @defgroup    drivers_periph_qdec Quadrature Decoder (QDEC)
@@ -200,4 +199,3 @@ void qdec_stop(qdec_t qdec);
 #endif
 
 /** @} */
-#endif /* PERIPH_QDEC_H */

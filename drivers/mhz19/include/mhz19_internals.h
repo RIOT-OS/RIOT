@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mhz19
  * @{
@@ -16,8 +18,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef MHZ19_INTERNALS_H
-#define MHZ19_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,5 +96,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MHZ19_INTERNALS_H */
 /** @} */

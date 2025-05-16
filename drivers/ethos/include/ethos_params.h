@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_ethos
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef ETHOS_PARAMS_H
-#define ETHOS_PARAMS_H
 
 #include "board.h"
 #include "ethos.h"
@@ -44,5 +44,4 @@ static const ethos_params_t ethos_params[] = {
 }
 #endif
 
-#endif /* ETHOS_PARAMS_H */
 /** @} */

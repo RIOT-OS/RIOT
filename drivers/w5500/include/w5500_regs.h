@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_w5500
  * @{
@@ -16,8 +18,6 @@
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
 
-#ifndef W5500_REGS_H
-#define W5500_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -173,5 +173,4 @@ extern "C" {
 }
 #endif
 
-#endif /* W5500_REGS_H */
 /** @} */

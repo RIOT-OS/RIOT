@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef LIS2DH12_H
-#define LIS2DH12_H
+#pragma once
 
 /**
  * @defgroup    drivers_lis2dh12 LIS2DH12 Accelerometer
@@ -504,4 +503,3 @@ int lis2dh12_poweroff(const lis2dh12_t *dev);
 #endif
 
 /** @} */
-#endif /* LIS2DH12_H */

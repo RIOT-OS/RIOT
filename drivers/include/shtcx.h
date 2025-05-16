@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SHTCX_H
-#define SHTCX_H
+#pragma once
 
 /**
  * @defgroup    drivers_shtcx SHTCX Temperature and humidity sensor
@@ -124,4 +123,3 @@ int8_t shtcx_reset(const shtcx_t *dev);
 #endif
 
 /** @} */
-#endif /* SHTCX_H */

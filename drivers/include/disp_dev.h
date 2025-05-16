@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef DISP_DEV_H
-#define DISP_DEV_H
+#pragma once
 
 /**
  * @defgroup    drivers_disp_dev Display device generic API
@@ -207,4 +206,3 @@ static inline void disp_dev_backlight_off(void)
 #endif
 
 /** @} */
-#endif /* DISP_DEV_H */

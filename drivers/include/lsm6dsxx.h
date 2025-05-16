@@ -7,8 +7,7 @@
  *
  */
 
-#ifndef LSM6DSXX_H
-#define LSM6DSXX_H
+#pragma once
 
 /**
  * @defgroup    drivers_lsm6dsxx LSM6DSXX 3D accelerometer/gyroscope
@@ -221,4 +220,3 @@ int lsm6dsxx_gyro_power_up(const lsm6dsxx_t *dev);
 #endif
 
 /** @} */
-#endif /* LSM6DSXX_H */

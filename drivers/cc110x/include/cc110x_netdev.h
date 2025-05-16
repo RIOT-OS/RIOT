@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -16,8 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef CC110X_NETDEV_H
-#define CC110X_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -44,5 +44,4 @@ void cc110x_on_gdo(void *dev);
 }
 #endif
 
-#endif /* CC110X_NETDEV_H */
 /** @} */

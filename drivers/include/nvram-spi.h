@@ -6,8 +6,7 @@
  * details.
  */
 
-#ifndef NVRAM_SPI_H
-#define NVRAM_SPI_H
+#pragma once
 
 /**
  * @ingroup     drivers_nvram
@@ -65,4 +64,3 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size);
 #endif
 
 /** @} */
-#endif /* NVRAM_SPI_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ISL29020_H
-#define ISL29020_H
+#pragma once
 
 /**
  * @defgroup    drivers_isl29020 ISL29020 light sensor
@@ -130,4 +129,3 @@ int isl29020_disable(const isl29020_t *dev);
 #endif
 
 /** @} */
-#endif /* ISL29020_H */

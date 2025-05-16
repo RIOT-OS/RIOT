@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf2xx
  * @{
@@ -21,8 +23,6 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef AT86RF2XX_REGISTERS_H
-#define AT86RF2XX_REGISTERS_H
 
 #include "at86rf2xx.h"
 
@@ -549,5 +549,4 @@ extern "C" {
 }
 #endif
 
-#endif /* AT86RF2XX_REGISTERS_H */
 /** @} */
