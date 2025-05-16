@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_hashes_aes128_cmac AES128_CMAC
  * @ingroup     sys_hashes_keyed
@@ -19,8 +21,6 @@
  * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  */
 
-#ifndef HASHES_AES128_CMAC_H
-#define HASHES_AES128_CMAC_H
 
 #include <stdio.h>
 #include "crypto/ciphers.h"
@@ -84,5 +84,4 @@ void aes128_cmac_final(aes128_cmac_context_t *ctx, void *digest);
 }
 #endif
 
-#endif /* HASHES_AES128_CMAC_H */
 /** @} */

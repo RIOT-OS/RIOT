@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6_ext_frag Support for IPv6 fragmentation extension
  * @ingroup     net_gnrc_ipv6_ext
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_EXT_FRAG_H
-#define NET_GNRC_IPV6_EXT_FRAG_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -211,5 +211,4 @@ gnrc_ipv6_ext_frag_stats_t *gnrc_ipv6_ext_frag_stats(void);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_FRAG_H */
 /** @} */

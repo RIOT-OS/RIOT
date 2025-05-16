@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        net_sock_async  Sock extension for asynchronous access
  * @ingroup         net_sock
@@ -20,8 +22,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_SOCK_ASYNC_H
-#define NET_SOCK_ASYNC_H
 
 #include "net/sock/async/types.h"
 
@@ -235,5 +235,4 @@ sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock);
 }
 #endif
 
-#endif /* NET_SOCK_ASYNC_H */
 /** @} */

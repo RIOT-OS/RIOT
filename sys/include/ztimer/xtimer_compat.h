@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup  sys_ztimer_xtimer_compat ztimer_xtimer_compat: xtimer wrapper
  * @ingroup   sys_ztimer
@@ -17,8 +19,6 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef ZTIMER_XTIMER_COMPAT_H
-#define ZTIMER_XTIMER_COMPAT_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -297,4 +297,3 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b)
 #endif
 
 /** @} */
-#endif /* ZTIMER_XTIMER_COMPAT_H */

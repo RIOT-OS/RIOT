@@ -8,6 +8,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup     sys_suit
  * @brief       SUIT policy definitions
@@ -20,8 +23,6 @@
  *
  */
 
-#ifndef SUIT_POLICY_H
-#define SUIT_POLICY_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -55,5 +56,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SUIT_POLICY_H */
 /** @} */

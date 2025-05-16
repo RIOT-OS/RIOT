@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef PSA_CRYPTO_PSA_CRYPTO_SE_CONFIG_H
-#define PSA_CRYPTO_PSA_CRYPTO_SE_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +44,4 @@ typedef union {
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_SE_CONFIG_H */
 /** @} */

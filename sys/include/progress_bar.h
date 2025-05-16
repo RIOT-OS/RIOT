@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_progress_bar
  * @{
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef PROGRESS_BAR_H
-#define PROGRESS_BAR_H
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -129,4 +129,3 @@ void progress_bar_update_multi(progress_bar_t *progress_bar_list, uint8_t len);
 #endif
 
 /** @} */
-#endif /* PROGRESS_BAR_H */

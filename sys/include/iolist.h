@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_iolist iolist scatter / gather IO
  * @ingroup     sys
@@ -21,8 +23,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef IOLIST_H
-#define IOLIST_H
 
 #include <unistd.h>
 
@@ -97,5 +97,4 @@ ssize_t iolist_to_buffer(const iolist_t *iolist, void *dst, size_t len);
 #ifdef __cplusplus
 }
 #endif
-#endif /* IOLIST_H */
 /** @} */

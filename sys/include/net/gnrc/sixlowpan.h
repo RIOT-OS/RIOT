@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_sixlowpan    6LoWPAN
  * @ingroup     net_gnrc
@@ -132,8 +134,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_H
-#define NET_GNRC_SIXLOWPAN_H
 
 #include <stdbool.h>
 
@@ -166,5 +166,4 @@ kernel_pid_t gnrc_sixlowpan_init(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_H */
 /** @} */

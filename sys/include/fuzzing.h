@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_fuzzing FUZZING utilities
  * @ingroup     sys
@@ -19,8 +21,6 @@
  * @author      Sören Tempel <tempel@uni-bremen.de>
  */
 
-#ifndef FUZZING_H
-#define FUZZING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,4 +67,3 @@ uint8_t *fuzzing_read_bytes(int fd, size_t *size);
 #endif
 
 /** @} */
-#endif /* FUZZING_H */

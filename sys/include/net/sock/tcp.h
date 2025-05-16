@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sock_tcp    TCP sock API
  * @ingroup     net_sock
@@ -296,8 +298,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_TCP_H
-#define NET_SOCK_TCP_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -547,5 +547,4 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len);
 
 #include "sock_types.h"
 
-#endif /* NET_SOCK_TCP_H */
 /** @} */

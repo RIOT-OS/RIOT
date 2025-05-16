@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots) on internal flash
  * @ingroup     sys
@@ -22,8 +24,6 @@
  * @}
  */
 
-#ifndef RIOTBOOT_SLOT_H
-#define RIOTBOOT_SLOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -142,5 +142,3 @@ extern const riotboot_hdr_t *const riotboot_slots[];
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* RIOTBOOT_SLOT_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_arp    Address resolution protocol (ARP)
  * @ingroup     net_ipv4
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_ARP_H
-#define NET_ARP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,5 +40,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_ARP_H */
 /** @} */

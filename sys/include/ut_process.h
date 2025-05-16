@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup sys_ut_process URI template processor
  * @ingroup  sys
@@ -23,8 +25,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef UT_PROCESS_H
-#define UT_PROCESS_H
 
 #include <stddef.h>
 #include <string.h>
@@ -97,5 +97,4 @@ static inline int ut_process_str_expand(const char *ut,
 }
 #endif
 
-#endif /* UT_PROCESS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -16,8 +18,6 @@
  *
  */
 
-#ifndef HASHES_PSA_RIOT_HASHES_H
-#define HASHES_PSA_RIOT_HASHES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,5 +89,4 @@ typedef keccak_state_t psa_hashes_sha3_ctx_t;
 }
 #endif
 
-#endif /* HASHES_PSA_RIOT_HASHES_H */
 /** @} */

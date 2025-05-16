@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_senml_saul SenML SAUL
  * @ingroup     sys_senml
@@ -22,8 +24,6 @@
  * @author      Silke Hofstra <silke@slxh.eu>
  */
 
-#ifndef SENML_SAUL_H
-#define SENML_SAUL_H
 
 #include <stdint.h>
 #include "nanocbor/nanocbor.h"
@@ -72,5 +72,4 @@ size_t senml_saul_encode_cbor(uint8_t *buf, size_t len, saul_reg_t *reg);
 }
 #endif
 
-#endif /* SENML_SAUL_H */
 /** @} */

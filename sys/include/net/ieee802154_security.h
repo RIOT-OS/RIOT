@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ieee802154_security  IEEE 802.15.4 security
  * @ingroup     net_ieee802154
@@ -27,8 +29,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef NET_IEEE802154_SECURITY_H
-#define NET_IEEE802154_SECURITY_H
 
 #include <stdint.h>
 #include "ieee802154.h"
@@ -439,5 +439,4 @@ extern const ieee802154_radio_cipher_ops_t ieee802154_radio_cipher_ops;
 }
 #endif
 
-#endif /* NET_IEEE802154_SECURITY_H */
 /** @} */

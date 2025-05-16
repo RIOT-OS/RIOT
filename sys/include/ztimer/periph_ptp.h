@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_ztimer_periph_ptp  ztimer periph/ptp backend
  * @ingroup     sys_ztimer
@@ -22,8 +24,6 @@
  * @author      Jana Eisoldt <jana.eisoldt@ovgu.de>
  */
 
-#ifndef ZTIMER_PERIPH_PTP_H
-#define ZTIMER_PERIPH_PTP_H
 
 #include "ztimer.h"
 
@@ -50,5 +50,4 @@ void ztimer_periph_ptp_init(ztimer_periph_ptp_t *clock);
 }
 #endif
 
-#endif /* ZTIMER_PERIPH_PTP_H */
 /** @} */

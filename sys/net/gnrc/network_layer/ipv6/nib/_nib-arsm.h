@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_ipv6_nib
  * @internal
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PRIV_NIB_ARSM_H
-#define PRIV_NIB_ARSM_H
 
 #include <kernel_defines.h>
 #include <stdint.h>
@@ -265,6 +265,5 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 }
 #endif
 
-#endif /* PRIV_NIB_ARSM_H */
 /** @internal
  * @} */

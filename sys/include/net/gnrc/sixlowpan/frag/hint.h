@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_sixlowpan_frag_hint    Fragment size hint
  * @ingroup     net_gnrc_sixlowpan_frag
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_HINT_H
-#define NET_GNRC_SIXLOWPAN_FRAG_HINT_H
 
 #include <stdint.h>
 
@@ -55,5 +55,4 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_HINT_H */
 /** @} */

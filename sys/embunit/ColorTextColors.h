@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @{
  *
@@ -13,8 +15,6 @@
  *
  * @author Janos Kutscherauer <noshky@gmail.com>
  */
-#ifndef COLORTEXTCOLORS_H
-#define COLORTEXTCOLORS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* COLORTEXTCOLORS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @file
  * @ingroup posix
@@ -16,8 +18,6 @@
  * @{
  */
 
-#ifndef FCNTL_H
-#define FCNTL_H
 
 #ifndef DOXYGEN
 #if defined(CPU_NATIVE) || MODULE_NEWLIB || MODULE_PICOLIBC
@@ -73,5 +73,4 @@ int  posix_fallocate(int, off_t, off_t);
 
 #endif /* DOXYGEN */
 
-#endif /* FCNTL_H */
 /** @} */

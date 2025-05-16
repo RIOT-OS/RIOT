@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup     drivers_ieee802154_hal IEEE802.15.4 Radio Hardware Abstraction Layer
  * @ingroup      drivers
@@ -19,8 +21,6 @@
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
 
-#ifndef NET_IEEE802154_RADIO_H
-#define NET_IEEE802154_RADIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1647,5 +1647,4 @@ static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
 }
 #endif
 
-#endif /* NET_IEEE802154_RADIO_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_util_zptr Pointer Compression
  * @ingroup     sys
@@ -54,8 +56,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef ZPTR_H
-#define ZPTR_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -135,5 +135,4 @@ static inline void *zptrd(zptr_t zptr) { return (void *)zptr; }
 }
 #endif
 
-#endif /* ZPTR_H */
 /** @} */

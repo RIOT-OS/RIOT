@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_fatfs  FatFs integration
  * @ingroup     sys_fs
@@ -17,8 +19,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-#ifndef FS_FATFS_H
-#define FS_FATFS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,6 +101,5 @@ extern const vfs_file_system_t fatfs_file_system;
 }
 #endif
 
-#endif /* FS_FATFS_H */
 
 /** @} */

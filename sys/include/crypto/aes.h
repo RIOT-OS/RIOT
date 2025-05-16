@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -27,8 +29,6 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  */
 
-#ifndef CRYPTO_AES_H
-#define CRYPTO_AES_H
 
 #include <stdint.h>
 #include "crypto/ciphers.h"
@@ -130,4 +130,3 @@ int aes_decrypt(const cipher_context_t *context, const uint8_t *cipher_block,
 #endif
 
 /** @} */
-#endif /* CRYPTO_AES_H */

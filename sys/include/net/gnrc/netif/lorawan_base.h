@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef NET_GNRC_NETIF_LORAWAN_BASE_H
-#define NET_GNRC_NETIF_LORAWAN_BASE_H
 
 #include "net/gnrc/netif.h"
 
@@ -46,5 +46,4 @@ int gnrc_netif_lorawan_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_LORAWAN_BASE_H */
 /** @} */

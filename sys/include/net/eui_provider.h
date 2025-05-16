@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_eui_provider    IEEE EUI-48/64 provider
  * @ingroup     net
@@ -95,8 +97,6 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef NET_EUI_PROVIDER_H
-#define NET_EUI_PROVIDER_H
 
 #include "net/eui48.h"
 #include "net/eui64.h"
@@ -201,5 +201,4 @@ static inline void eui_short_from_eui64(eui64_t *addr_long,
 }
 #endif
 
-#endif /* NET_EUI_PROVIDER_H */
 /** @} */

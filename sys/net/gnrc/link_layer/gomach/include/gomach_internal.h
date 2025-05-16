@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_gomach
  * @{
@@ -16,8 +18,6 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-#ifndef GOMACH_INTERNAL_H
-#define GOMACH_INTERNAL_H
 
 #include <stdint.h>
 
@@ -913,5 +913,4 @@ void gnrc_gomach_update_neighbor_pubchan(gnrc_netif_t *netif);
 }
 #endif
 
-#endif /* GOMACH_INTERNAL_H */
 /** @} */

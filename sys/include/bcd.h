@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_bcd Binary coded decimal
  * @ingroup     sys
@@ -18,8 +20,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef BCD_H
-#define BCD_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -112,5 +112,4 @@ int bcd_buf_from_str(const char *str, size_t str_len,
 }
 #endif
 
-#endif /* BCD_H */
 /** @} */

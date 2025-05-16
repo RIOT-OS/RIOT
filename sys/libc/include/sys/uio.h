@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  posix
  * @{
@@ -17,8 +19,6 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef SYS_UIO_H
-#define SYS_UIO_H
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -39,4 +39,3 @@ struct iovec {
 }
 #endif
 /** @} */
-#endif /* SYS_UIO_H */

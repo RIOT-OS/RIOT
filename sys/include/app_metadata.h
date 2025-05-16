@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_app_metadata app_metadata
  * @ingroup     sys
@@ -15,8 +17,6 @@
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
 
-#ifndef APP_METADATA_H
-#define APP_METADATA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,5 +50,4 @@ void app_metadata_print_json(void);
 }
 #endif
 
-#endif /* APP_METADATA_H */
 /** @} */

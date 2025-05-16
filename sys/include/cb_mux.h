@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_cb_mux Callback multiplexer
  * @ingroup     sys
@@ -26,8 +28,6 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-#ifndef CB_MUX_H
-#define CB_MUX_H
 
 #include <stdint.h>
 
@@ -139,5 +139,3 @@ void cb_mux_iter(cb_mux_t *head, cb_mux_iter_t func, void *arg);
 #endif
 
 /** @} */
-
-#endif /* CB_MUX_H */

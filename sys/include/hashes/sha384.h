@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_hashes_sha384 SHA-384
  * @ingroup     sys_hashes_unkeyed
@@ -18,8 +20,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-#ifndef HASHES_SHA384_H
-#define HASHES_SHA384_H
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -93,4 +93,3 @@ void sha384(const void *data, size_t len, void *digest);
 #endif
 
 /** @} */
-#endif /* HASHES_SHA384_H */

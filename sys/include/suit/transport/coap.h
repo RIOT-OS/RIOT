@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_suit
  * @defgroup    sys_suit_transport_coap SUIT firmware CoAP transport
@@ -22,8 +24,6 @@
  *
  */
 
-#ifndef SUIT_TRANSPORT_COAP_H
-#define SUIT_TRANSPORT_COAP_H
 
 #include "net/nanocoap.h"
 #include "suit/transport/worker.h"
@@ -74,5 +74,4 @@ static inline void suit_coap_trigger(const uint8_t *url, size_t len)
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_COAP_H */
 /** @} */

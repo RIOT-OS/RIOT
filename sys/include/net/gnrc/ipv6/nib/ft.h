@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6_nib_ft    Forwarding table
  * @ingroup     net_gnrc_ipv6_nib
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_NIB_FT_H
-#define NET_GNRC_IPV6_NIB_FT_H
 
 #include <stdint.h>
 
@@ -153,5 +153,4 @@ void gnrc_ipv6_nib_ft_print(const gnrc_ipv6_nib_ft_t *fte);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_FT_H */
 /** @} */

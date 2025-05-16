@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  net_gnrc_netif_pktq
  * @brief
@@ -20,8 +22,6 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_PKTQ_TYPE_H
-#define NET_GNRC_NETIF_PKTQ_TYPE_H
 
 #include "net/gnrc/pktqueue.h"
 #include "xtimer.h"
@@ -46,5 +46,4 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_PKTQ_TYPE_H */
 /** @} */

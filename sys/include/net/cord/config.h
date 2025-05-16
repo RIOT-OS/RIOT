@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_cord_config CoRE RD Configuration
  * @ingroup     net_cord
@@ -20,8 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_CORD_CONFIG_H
-#define NET_CORD_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -110,5 +110,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_CORD_CONFIG_H */
 /** @} */

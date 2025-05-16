@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ipv4_hdr    IPv4 header
  * @ingroup     net_ipv4
@@ -17,8 +19,6 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
-#ifndef NET_IPV4_HDR_H
-#define NET_IPV4_HDR_H
 
 #include "byteorder.h"
 #include "net/ipv4/addr.h"
@@ -190,5 +190,4 @@ static inline uint16_t ipv4_hdr_get_fo(ipv4_hdr_t *hdr)
 }
 #endif
 
-#endif /* NET_IPV4_HDR_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  net_gnrc_netif
  * @internal
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_INTERNAL_H
-#define NET_GNRC_NETIF_INTERNAL_H
 
 #include "modules.h"
 
@@ -747,6 +747,5 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_INTERNAL_H */
 /** @internal
  *@} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_ecc  PSA Wrapper Functions: ECC
@@ -17,8 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  */
 
-#ifndef PSA_ECC_H
-#define PSA_ECC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,5 +182,4 @@ psa_status_t psa_ecc_ed25519_verify_message(const uint8_t *key_buffer, size_t ke
 }
 #endif
 
-#endif /* PSA_ECC_H */
 /**@}*/

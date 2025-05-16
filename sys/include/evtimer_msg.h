@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  sys_evtimer
  * @{
@@ -17,8 +19,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef EVTIMER_MSG_H
-#define EVTIMER_MSG_H
 
 #include "msg.h"
 #include "evtimer.h"
@@ -84,5 +84,4 @@ static inline void evtimer_init_msg(evtimer_t *evtimer)
 }
 #endif
 
-#endif /* EVTIMER_MSG_H */
 /** @} */

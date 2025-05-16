@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  posix_sockets
  * @{
@@ -26,8 +28,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SYS_SOCKET_H
-#define SYS_SOCKET_H
 
 #ifdef CPU_NATIVE
 /* Ignore Linux definitions in native */
@@ -509,4 +509,3 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 /**
  * @}
  */
-#endif /* SYS_SOCKET_H */

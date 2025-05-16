@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_phydat Phydat
  * @ingroup     sys
@@ -32,8 +34,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PHYDAT_H
-#define PHYDAT_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -324,5 +324,4 @@ int64_t phydat_unix(int16_t year, int16_t month, int16_t day,
 }
 #endif
 
-#endif /* PHYDAT_H */
 /** @} */

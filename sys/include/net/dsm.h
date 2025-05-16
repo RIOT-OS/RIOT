@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_dsm DTLS Session Management (DSM)
  * @ingroup     net net_dtls
@@ -27,8 +29,6 @@
  * @author      János Brodbeck <janos.brodbeck@ml-pa.com>
  */
 
-#ifndef NET_DSM_H
-#define NET_DSM_H
 
 #include <stdint.h>
 
@@ -121,5 +121,4 @@ ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session
 }
 #endif
 
-#endif /* NET_DSM_H */
 /** @} */

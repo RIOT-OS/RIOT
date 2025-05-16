@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup net_dhcpv6_relay   DHCPv6 relay agent
  * @ingroup  net_dhcpv6
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_DHCPV6_RELAY_H
-#define NET_DHCPV6_RELAY_H
 
 #include <stdint.h>
 
@@ -75,5 +75,4 @@ void dhcpv6_relay_init(event_queue_t *event_queue, uint16_t listen_netif,
 }
 #endif
 
-#endif /* NET_DHCPV6_RELAY_H */
 /** @} */

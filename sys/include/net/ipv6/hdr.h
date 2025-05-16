@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ipv6_hdr    IPv6 header
  * @ingroup     net_ipv6
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_IPV6_HDR_H
-#define NET_IPV6_HDR_H
 
 #include <stdint.h>
 
@@ -303,5 +303,4 @@ void ipv6_hdr_print(ipv6_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_IPV6_HDR_H */
 /** @} */

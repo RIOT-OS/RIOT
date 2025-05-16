@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_malloc_monitor_internals Heap Memory Usage Monitor internals
  * @ingroup     sys_malloc_monitor
@@ -14,8 +17,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-#ifndef MALLOC_MONITOR_INTERNAL_H
-#define MALLOC_MONITOR_INTERNAL_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -66,7 +67,6 @@ void malloc_monitor_mv(void *ptr_old, void *ptr_new, size_t size_new, uinttxtptr
 }
 #endif
 
-#endif /* MALLOC_MONITOR_INTERNAL_H */
 
 /**
  * @}

@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_ztimer ztimer high level timer abstraction layer
  * @ingroup     sys
@@ -259,8 +262,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef ZTIMER_H
-#define ZTIMER_H
 
 #include <stdint.h>
 
@@ -895,5 +896,4 @@ extern ztimer_clock_t *const ZTIMER_MSEC_BASE;
 }
 #endif
 
-#endif /* ZTIMER_H */
 /** @} */

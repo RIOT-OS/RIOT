@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_pktbuf
  * @brief   Internal definitions of the static implementation of
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PKTBUF_STATIC_H
-#define PKTBUF_STATIC_H
 
 #include <sys/types.h>
 
@@ -54,5 +54,4 @@ static inline size_t _align(size_t size)
 }
 #endif
 
-#endif /* PKTBUF_STATIC_H */
 /** @} */

@@ -8,6 +8,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup     sys_suit
  * @brief       SUIT draft-ietf-suit-manifest-03 manifest handlers
@@ -21,8 +24,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef SUIT_HANDLERS_H
-#define SUIT_HANDLERS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -227,5 +228,4 @@ void suit_param_cbor_to_ref(const suit_manifest_t *manifest,
 }
 #endif
 
-#endif /* SUIT_HANDLERS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ipv6    IPv6
  * @ingroup     net
@@ -19,8 +21,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_IPV6_H
-#define NET_IPV6_H
 
 #include "net/ipv6/addr.h"
 #include "net/ipv6/ext.h"
@@ -41,5 +41,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_IPV6_H */
 /** @} */

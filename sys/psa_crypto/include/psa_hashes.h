@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_hashes   PSA Wrapper Functions: Hashes
@@ -17,8 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  */
 
-#ifndef PSA_HASHES_H
-#define PSA_HASHES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -304,5 +304,4 @@ psa_status_t psa_hashes_sha3_512_finish(psa_hashes_sha3_ctx_t *ctx,
 }
 #endif
 
-#endif /* PSA_HASHES_H */
 /**@}*/

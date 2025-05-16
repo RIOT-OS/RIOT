@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_sixlowpan_frag_vrb Virtual reassembly buffer
  * @ingroup     net_gnrc_sixlowpan_frag
@@ -18,8 +20,6 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_VRB_H
-#define NET_GNRC_SIXLOWPAN_FRAG_VRB_H
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -180,5 +180,4 @@ void gnrc_sixlowpan_frag_vrb_reset(void);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_VRB_H */
 /** @} */

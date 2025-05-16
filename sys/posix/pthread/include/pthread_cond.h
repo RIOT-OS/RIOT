@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -14,8 +16,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef PTHREAD_COND_H
-#define PTHREAD_COND_H
 
 #include <time.h>
 #include "mutex.h"
@@ -147,7 +147,6 @@ int pthread_cond_broadcast(pthread_cond_t *cond);
 }
 #endif
 
-#endif /* PTHREAD_COND_H */
 
 /**
  * @}

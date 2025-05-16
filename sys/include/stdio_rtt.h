@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_stdio_rtt
  *
@@ -17,8 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef STDIO_RTT_H
-#define STDIO_RTT_H
 
 #include "stdio_base.h"
 
@@ -45,4 +45,3 @@ void rtt_stdio_enable_blocking_stdout(void);
 #endif
 
 /** @} */
-#endif /* STDIO_RTT_H */

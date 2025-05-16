@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_ztimer_mock ztimer mock clock backend
  * @ingroup     sys_ztimer
@@ -24,8 +26,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef ZTIMER_MOCK_H
-#define ZTIMER_MOCK_H
 
 #include <stdint.h>
 #include "ztimer.h"
@@ -96,5 +96,4 @@ void ztimer_mock_init(ztimer_mock_t *self, unsigned width);
 }
 #endif
 
-#endif /* ZTIMER_MOCK_H */
 /** @} */

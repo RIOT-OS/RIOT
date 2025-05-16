@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sock_udp    UDP sock API
  * @ingroup     net_sock
@@ -265,8 +267,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_UDP_H
-#define NET_SOCK_UDP_H
 
 #include <assert.h>
 #include <errno.h>
@@ -848,5 +848,4 @@ static inline bool sock_udp_ep_is_v6(const sock_udp_ep_t *ep)
 }
 #endif
 
-#endif /* NET_SOCK_UDP_H */
 /** @} */

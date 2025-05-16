@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6_nib_abr   Authoritative border router list
  * @ingroup     net_gnrc_ipv6_nib
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_NIB_ABR_H
-#define NET_GNRC_IPV6_NIB_ABR_H
 
 #include "modules.h"
 
@@ -140,5 +140,4 @@ void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_ABR_H */
 /** @} */

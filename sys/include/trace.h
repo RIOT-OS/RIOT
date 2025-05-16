@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys
  * @brief       Trace program flows
@@ -50,8 +52,6 @@
  *
  */
 
-#ifndef TRACE_H
-#define TRACE_H
 
 #include <stdint.h>
 
@@ -96,5 +96,4 @@ void trace_reset(void);
 }
 #endif
 
-#endif /* TRACE_H */
 /** @} */

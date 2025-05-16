@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_shell Shell
  * @ingroup     sys
@@ -44,8 +46,6 @@
  * @brief       Shell interface definition
  */
 
-#ifndef SHELL_H
-#define SHELL_H
 
 #include <stdint.h>
 #include "periph/pm.h"
@@ -316,5 +316,4 @@ int shell_parse_file(const shell_command_t *commands,
 }
 #endif
 
-#endif /* SHELL_H */
 /** @} */

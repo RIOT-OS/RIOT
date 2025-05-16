@@ -30,6 +30,8 @@
  * $FreeBSD: src/lib/libmd/sha256.h,v 1.1.2.1 2005/06/24 13:32:25 cperciva Exp $
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_hashes_sha2xx_common SHA-2xx common
  * @ingroup     sys_hashes_unkeyed
@@ -46,8 +48,6 @@
  * @author      Peter Kietzmann
  */
 
-#ifndef HASHES_SHA2XX_COMMON_H
-#define HASHES_SHA2XX_COMMON_H
 
 #include <string.h>
 #include <stdint.h>
@@ -99,4 +99,3 @@ void sha2xx_final(sha2xx_context_t *ctx, void *digest, size_t dig_len);
 #endif
 
 /** @} */
-#endif /* HASHES_SHA2XX_COMMON_H */

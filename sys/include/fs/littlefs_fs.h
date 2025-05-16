@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_littlefs  littlefs integration
  * @ingroup     pkg_littlefs
@@ -19,8 +21,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef FS_LITTLEFS_FS_H
-#define FS_LITTLEFS_FS_H
 
 #include <stdalign.h>
 
@@ -106,5 +106,4 @@ extern const vfs_file_system_t littlefs_file_system;
 }
 #endif
 
-#endif /* FS_LITTLEFS_FS_H */
 /** @} */

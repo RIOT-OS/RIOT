@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6_ext_rh Support for IPv6 routing header extension
  * @ingroup     net_gnrc_ipv6_ext
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_EXT_RH_H
-#define NET_GNRC_IPV6_EXT_RH_H
 
 #include "net/gnrc/pkt.h"
 
@@ -67,5 +67,4 @@ int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_EXT_RH_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ipv6_ext_opt IPv6 destination and hop-by-hop options
  * @ingroup     net_ipv6_ext
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_IPV6_EXT_OPT_H
-#define NET_IPV6_EXT_OPT_H
 
 #include <stdint.h>
 
@@ -92,5 +92,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_IPV6_EXT_OPT_H */
 /** @} */

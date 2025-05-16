@@ -5,6 +5,9 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    usb   USB
  * @ingroup     sys
@@ -17,8 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef USB_H
-#define USB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -271,5 +272,4 @@ typedef enum {
 }
 #endif
 
-#endif /* USB_H */
 /** @} */

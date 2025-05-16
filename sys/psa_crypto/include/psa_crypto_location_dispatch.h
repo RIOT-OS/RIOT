@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_loc_disp PSA Crypto Location Dispatcher
@@ -17,8 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  */
 
-#ifndef PSA_CRYPTO_LOCATION_DISPATCH_H
-#define PSA_CRYPTO_LOCATION_DISPATCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -177,5 +177,4 @@ psa_status_t psa_location_dispatch_generate_random(uint8_t *output,
 }
 #endif
 
-#endif /* PSA_CRYPTO_LOCATION_DISPATCH_H */
 /** @} */

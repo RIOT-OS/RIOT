@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_netstats
  * @brief       Records statistics about link layer neighbors
@@ -16,8 +18,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-#ifndef NET_NETSTATS_NEIGHBOR_H
-#define NET_NETSTATS_NEIGHBOR_H
 
 #include <string.h>
 #include "net/netif.h"
@@ -187,7 +187,6 @@ bool netstats_nb_isfresh(netif_t *netif, netstats_nb_t *stats);
 }
 #endif
 
-#endif /* NET_NETSTATS_NEIGHBOR_H */
 /**
  * @}
  */

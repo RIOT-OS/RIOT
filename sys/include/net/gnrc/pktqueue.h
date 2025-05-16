@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_pktqueue Packet queue
  * @ingroup     net_gnrc
@@ -18,8 +20,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef NET_GNRC_PKTQUEUE_H
-#define NET_GNRC_PKTQUEUE_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -84,7 +84,6 @@ static inline gnrc_pktqueue_t *gnrc_pktqueue_remove_head(gnrc_pktqueue_t **queue
 }
 #endif
 
-#endif /* NET_GNRC_PKTQUEUE_H */
 /**
  * @}
  */

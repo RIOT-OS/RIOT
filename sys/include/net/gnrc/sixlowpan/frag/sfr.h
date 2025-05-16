@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_sixlowpan_frag_sfr  6LoWPAN selective fragment recovery
  * @ingroup     net_gnrc_sixlowpan
@@ -31,8 +33,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_FRAG_SFR_H
-#define NET_GNRC_SIXLOWPAN_FRAG_SFR_H
 
 #include "assert.h"
 #include "bitfield.h"
@@ -203,5 +203,4 @@ void gnrc_sixlowpan_frag_sfr_stats_get(gnrc_sixlowpan_frag_sfr_stats_t *stats);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_H */
 /** @} */

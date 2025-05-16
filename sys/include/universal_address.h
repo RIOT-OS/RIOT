@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_universal_address Universal Address Container
  * @ingroup     sys
@@ -18,8 +20,6 @@
  * @author      Martin Landsmann
  */
 
-#ifndef UNIVERSAL_ADDRESS_H
-#define UNIVERSAL_ADDRESS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -170,5 +170,4 @@ void universal_address_print_table(void);
 }
 #endif
 
-#endif /* UNIVERSAL_ADDRESS_H */
 /** @} */

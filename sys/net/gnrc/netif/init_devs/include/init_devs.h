@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_auto_init_gnrc_netif
  * @{
@@ -16,8 +18,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef INIT_DEVS_H
-#define INIT_DEVS_H
 
 #include "thread.h"
 #include "msg.h"
@@ -72,5 +72,4 @@ extern "C" {
 }
 #endif
 
-#endif /* INIT_DEVS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6 IPv6
  * @ingroup     net_gnrc
@@ -95,8 +97,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef NET_GNRC_IPV6_H
-#define NET_GNRC_IPV6_H
 
 #include "sched.h"
 #include "thread.h"
@@ -274,7 +274,6 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt);
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_H */
 /**
  * @}
  */

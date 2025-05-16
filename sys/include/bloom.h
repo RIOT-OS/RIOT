@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /*
  * bloom.c
  *
@@ -120,8 +122,6 @@
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef BLOOM_H
-#define BLOOM_H
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -229,4 +229,3 @@ bool bloom_check(bloom_t *bloom, const uint8_t *buf, size_t len);
 #endif
 
 /** @} */
-#endif /* BLOOM_H */

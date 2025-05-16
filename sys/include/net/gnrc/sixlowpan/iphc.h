@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_sixlowpan_iphc   IPv6 header compression (IPHC)
  * @ingroup     net_gnrc_sixlowpan
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_SIXLOWPAN_IPHC_H
-#define NET_GNRC_SIXLOWPAN_IPHC_H
 
 #include <stdbool.h>
 
@@ -67,5 +67,4 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 }
 #endif
 
-#endif /* NET_GNRC_SIXLOWPAN_IPHC_H */
 /** @} */

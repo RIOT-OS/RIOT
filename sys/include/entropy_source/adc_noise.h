@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup   sys_entropy_source_adc ADC Noise Entropy Source
  * @ingroup    sys_entropy_source
@@ -31,8 +33,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-#ifndef ENTROPY_SOURCE_ADC_NOISE_H
-#define ENTROPY_SOURCE_ADC_NOISE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -154,5 +154,4 @@ static inline uint32_t entropy_source_adc_entropy_per_sample(void)
 }
 #endif
 
-#endif /* ENTROPY_SOURCE_ADC_NOISE_H */
 /** @} */

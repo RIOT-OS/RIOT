@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    debug_irq_disable IRQ Disable Debug helper
  * @ingroup     sys
@@ -17,8 +19,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef DEBUG_IRQ_DISABLE_H
-#define DEBUG_IRQ_DISABLE_H
 
 #include <stdint.h>
 
@@ -51,4 +51,3 @@ void debug_irq_disable_print(const char *file, unsigned line, uint32_t ticks);
 #endif
 
 /** @} */
-#endif /* DEBUG_IRQ_DISABLE_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ndp IPv6 neighbor discovery
  * @ingroup     net_ipv6
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_NDP_H
-#define NET_NDP_H
 
 #include <stdint.h>
 
@@ -396,5 +396,4 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
-#endif /* NET_NDP_H */
 /** @} */

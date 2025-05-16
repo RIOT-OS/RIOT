@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_fs_devfs
  * @{
@@ -17,8 +19,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef RANDOM_VFS_H
-#define RANDOM_VFS_H
 
 #include "vfs.h"
 
@@ -44,5 +44,4 @@ extern const vfs_file_ops_t random_vfs_ops;
 }
 #endif
 
-#endif /* RANDOM_VFS_H */
 /** @} */

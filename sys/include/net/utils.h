@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_utils   Network helper functions
  * @ingroup     net
@@ -19,8 +21,6 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
-#ifndef NET_UTILS_H
-#define NET_UTILS_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -62,5 +62,4 @@ int netutils_get_ipv6(ipv6_addr_t *addr, netif_t **netif, const char *hostname);
 }
 #endif
 
-#endif /* NET_UTILS_H */
 /** @} */

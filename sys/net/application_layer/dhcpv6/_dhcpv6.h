@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_dhcpv6
  * @{
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PRIV_DHCPV6_H
-#define PRIV_DHCPV6_H
 
 #include <stdint.h>
 
@@ -353,5 +353,4 @@ void dhcpv6_client_dns_rns_conf(const dhcpv6_opt_dns_rns_t *opt,
 }
 #endif
 
-#endif /* PRIV_DHCPV6_H */
 /** @} */

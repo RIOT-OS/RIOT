@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -19,8 +21,6 @@
  * @author      Mark Essien <markessien@gmail.com>
  */
 
-#ifndef CRYPTO_CIPHERS_H
-#define CRYPTO_CIPHERS_H
 
 #include <stdint.h>
 #include "modules.h"
@@ -188,4 +188,3 @@ int cipher_get_block_size(const cipher_t *cipher);
 #endif
 
 /** @} */
-#endif /* CRYPTO_CIPHERS_H */

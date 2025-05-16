@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -14,8 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef PTHREAD_RWLOCK_ATTR_H
-#define PTHREAD_RWLOCK_ATTR_H
 
 #include <errno.h>
 
@@ -80,7 +80,6 @@ int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
 }
 #endif
 
-#endif /* PTHREAD_RWLOCK_ATTR_H */
 
 /**
  * @}

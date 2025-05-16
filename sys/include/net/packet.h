@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_packet Packet interface on device level
  * @ingroup     net
@@ -18,8 +20,6 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef NET_PACKET_H
-#define NET_PACKET_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,4 +45,3 @@ struct sockaddr_ll {
 /**
  * @}
  */
-#endif /* NET_PACKET_H */

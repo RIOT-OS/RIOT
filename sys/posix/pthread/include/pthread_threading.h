@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -14,8 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef PTHREAD_THREADING_H
-#define PTHREAD_THREADING_H
 
 #include "kernel_defines.h"
 
@@ -106,7 +106,6 @@ static inline int pthread_equal(pthread_t thread1, pthread_t thread2)
 }
 #endif
 
-#endif /* PTHREAD_THREADING_H */
 
 /**
  * @}

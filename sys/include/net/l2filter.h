@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @experimental
  * @defgroup    net_l2filter Link layer address filter
@@ -29,8 +31,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_L2FILTER_H
-#define NET_L2FILTER_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -132,5 +132,4 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len);
 }
 #endif
 
-#endif /* NET_L2FILTER_H */
 /** @} */

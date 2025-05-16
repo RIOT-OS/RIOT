@@ -21,6 +21,8 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -31,8 +33,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CRYPTO_CHACHA_H
-#define CRYPTO_CHACHA_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -139,7 +139,6 @@ uint32_t chacha_prng_next(void);
 }
 #endif
 
-#endif /* CRYPTO_CHACHA_H */
 
 /**
  * @}

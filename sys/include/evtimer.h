@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_evtimer Millisecond interval event timers
  * @ingroup     sys
@@ -38,8 +40,6 @@
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#ifndef EVTIMER_H
-#define EVTIMER_H
 
 #include <stdint.h>
 #include "modules.h"
@@ -121,5 +121,4 @@ static inline uint32_t evtimer_now_msec(void)
 }
 #endif
 
-#endif /* EVTIMER_H */
 /** @} */

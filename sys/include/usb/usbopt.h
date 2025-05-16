@@ -5,6 +5,9 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    usb_usbopt   usbopt - Configuration options for USB APIs
  * @ingroup     usb
@@ -19,8 +22,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef USB_USBOPT_H
-#define USB_USBOPT_H
 
 #include <stdint.h>
 
@@ -120,5 +121,4 @@ typedef enum {
 }
 #endif
 
-#endif /* USB_USBOPT_H */
 /** @} */

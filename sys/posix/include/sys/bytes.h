@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  posix_sockets
  */
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SYS_BYTES_H
-#define SYS_BYTES_H
 
 #include <stddef.h>
 
@@ -41,5 +41,4 @@ typedef uint32_t socklen_t;         /**< socket address length */
 }
 #endif
 
-#endif /* SYS_BYTES_H */
 /** @} */

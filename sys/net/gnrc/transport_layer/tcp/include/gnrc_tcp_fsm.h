@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_tcp
  *
@@ -17,8 +19,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_FSM_H
-#define GNRC_TCP_FSM_H
 
 #include <stdint.h>
 #include "mbox.h"
@@ -101,5 +101,4 @@ _gnrc_tcp_fsm_state_t _gnrc_tcp_fsm_get_state(gnrc_tcp_tcb_t *tcb);
 }
 #endif
 
-#endif /* GNRC_TCP_FSM_H */
 /** @} */

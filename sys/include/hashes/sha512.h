@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_hashes_sha512 SHA-512
  * @ingroup     sys_hashes_unkeyed
@@ -18,8 +20,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-#ifndef HASHES_SHA512_H
-#define HASHES_SHA512_H
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -94,4 +94,3 @@ void sha512(const void *data, size_t len, void *digest);
 #endif
 
 /** @} */
-#endif /* HASHES_SHA512_H */
