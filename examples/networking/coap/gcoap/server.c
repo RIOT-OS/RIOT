@@ -26,9 +26,13 @@
 #include <time.h>
 
 #include "event/periodic_callback.h"
+#include "event/timeout.h"
 #include "event/thread.h"
 #include "fmt.h"
+#include "net/coap.h"
 #include "net/gcoap.h"
+#include "net/nanocoap.h"
+#include "net/sock/util.h"
 #include "net/utils.h"
 #include "od.h"
 #include "periph/rtc.h"
@@ -69,6 +73,7 @@ static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, co
 #if IS_USED(MODULE_PERIPH_RTC)
 static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 #endif
+static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context);
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
@@ -77,6 +82,7 @@ static const coap_resource_t _resources[] = {
 #if IS_USED(MODULE_PERIPH_RTC)
     { "/rtc", COAP_GET, _rtc_handler, NULL },
 #endif
+    { "/separate", COAP_GET, _separate_handler, NULL },
 };
 
 static const char *_link_params[] = {
@@ -226,6 +232,99 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, co
         puts("gcoap_cli: msg buffer too small");
         return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
     }
+}
+
+/* separate response requires an event thread to execute it */
+#ifndef CONFIG_EXAMPLE_GCOAP_SEPARATE_EVENT_QUEUE
+#  ifdef MODULE_EVENT_THREAD
+#    define CONFIG_EXAMPLE_GCOAP_SEPARATE_EVENT_QUEUE   EVENT_PRIO_MEDIUM
+#  else
+#    define CONFIG_EXAMPLE_GCOAP_SEPARATE_EVENT_QUEUE   gcoap_get_event_queue()
+#  endif
+#endif
+#ifndef CONFIG_EXAMPLE_GCOAP_SEPARATE_RESP_PDU_BUF_SIZE
+#  define CONFIG_EXAMPLE_GCOAP_SEPARATE_RESP_PDU_BUF_SIZE     (32)
+#endif
+#ifndef CONFIG_EXAMPLE_GCOAP_SEPARATE_REQ_PDU_BUF_SIZE
+#  define CONFIG_EXAMPLE_GCOAP_SEPARATE_REQ_PDU_BUF_SIZE      (32)
+#endif
+
+static void _send_separate_response_cb(event_t *ev)
+{
+    gcoap_separate_response_ctx_t *ctx = container_of(ev, gcoap_separate_response_ctx_t, ev);
+    coap_pkt_t req = { 0 };
+    /* parse request again */
+    coap_parse(&req, ctx->req_buf, ctx->req_buf_size);
+    /* determine response type */
+    unsigned type = coap_get_type(&req) == COAP_TYPE_CON ? COAP_TYPE_CON : COAP_TYPE_NON;
+    /* determine response code */
+    unsigned code = ctx->result < 0 ? COAP_CODE_INTERNAL_SERVER_ERROR : COAP_CODE_CONTENT;
+    /* build simple response without further options or payload */
+    coap_pkt_t resp = req;
+    if (gcoap_separate_resp_init(&resp, ctx->resp_buf, ctx->resp_buf_size, type, code) < 0) {
+        puts("_send_separate_response(): failed to init separate response");
+        return;
+    }
+    /* maybe add options */
+    /* add payload */
+    ssize_t len;
+    if ((len = coap_opt_finish(&resp, COAP_OPT_FINISH_PAYLOAD)) < 0) {
+        printf("_send_separate_response(): failed to finish response %"PRIdSIZE"\n", len);
+        return;
+    }
+    if (resp.payload_len) {
+        strncpy((char *)resp.payload, "This is a delayed response.", resp.payload_len - 1);
+        resp.payload_len = strlen((char *)resp.payload);
+        len += resp.payload_len;
+    }
+    /* send response */
+    if ((len = gcoap_resp_send_separate(ctx->resp_buf, len, &ctx->remote, &ctx->local, ctx->tl)) <= 0) {
+        printf("_send_separate_response(): failed to send response %"PRIdSIZE"\n", len);
+        return;
+    }
+}
+
+/* buffer size can be adjusted to fit the expectation of a resource */
+static uint8_t _sep_req[CONFIG_EXAMPLE_GCOAP_SEPARATE_RESP_PDU_BUF_SIZE];
+static uint8_t _sep_resp[CONFIG_EXAMPLE_GCOAP_SEPARATE_REQ_PDU_BUF_SIZE];
+static gcoap_separate_response_ctx_t _separate_ctx = {
+    .ev = {
+        .handler = _send_separate_response_cb,
+    }
+};
+
+static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+{
+    static event_timeout_t _event_timeout;
+
+    if (event_timeout_is_pending(&_event_timeout)) {
+        if (!sock_udp_ep_equal(context->remote, &_separate_ctx.remote)) {
+            puts("_separate_handler(): response already scheduled");
+            return gcoap_response(pkt, buf, len, COAP_CODE_SERVICE_UNAVAILABLE);
+        }
+        else {
+            /* ignore, maybe ACK got lost */
+            goto empty_ack;
+        }
+    }
+    if (gcoap_resp_prepare_separate(&_separate_ctx,
+                                    _sep_req, sizeof(_sep_req),
+                                    _sep_resp, sizeof(_sep_resp),
+                                    pkt, context) < 0) {
+        puts("_separate_handler(): request too large");
+        return gcoap_response(pkt, buf, len, COAP_CODE_REQUEST_ENTITY_TOO_LARGE);
+    }
+
+    puts("_separate_handler(): schedule response");
+
+    event_timeout_ztimer_init(&_event_timeout, ZTIMER_MSEC,
+                              CONFIG_EXAMPLE_GCOAP_SEPARATE_EVENT_QUEUE,
+                              &_separate_ctx.ev);
+    event_timeout_set(&_event_timeout, 3 * MS_PER_SEC);
+
+empty_ack:
+    /* gcoap handles transmission of empty ACK */
+    return 0;
 }
 
 void notify_observers(void)
