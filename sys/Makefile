@@ -77,6 +77,9 @@ endif
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   DIRS += net/gnrc/application_layer/uhcpc
 endif
+ifneq (,$(filter hosts,$(USEMODULE)))
+  DIRS += net/application_layer/hosts
+endif
 ifneq (,$(filter icmpv6,$(USEMODULE)))
   DIRS += net/network_layer/icmpv6
 endif
