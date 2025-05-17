@@ -143,7 +143,7 @@ typedef struct {
 /**
  * @brief CAN message RAM accessible to the CAN controller
  */
-typedef struct {
+typedef struct can_msg_ram {
     /** Standard filters space in the CAN message RAM */
     CanMramSidfe std_filter[CANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM];
     /** Extended filters space in the CAN message RAM */
@@ -157,8 +157,8 @@ typedef struct {
     /** Transmission events FIFO space in the CAN message RAM */
     CanMramTxefe tx_event_fifo[CANDEV_SAMD5X_DEFAULT_TX_EVT_FIFO_ELTS_NUM];
     /** Transmission FIFO space in the CAN message RAM */
-    CanMramTxbe tx_fifo_queue[CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM];
-} msg_ram_conf_t;
+    CanMramTxbe tx_buffer[CANDEV_SAMD5X_DEFAULT_TX_BUFFER_FIFO_QUEUE_NUM];
+} can_msg_ram_t;
 
 /**
  * @brief CAN device descriptor
@@ -169,11 +169,9 @@ typedef struct {
     /** CAN device configuration descriptor */
     const can_conf_t *conf;
     /** CAN message RAM accessible to the CAN controller */
-    msg_ram_conf_t msg_ram_conf;
+    can_msg_ram_t msg_ram;
     /** Enable/Disable Transceiver Delay Compensation */
     bool tdc_ctrl;
-    /** False to use Tx FIFO operation, True to use Tx Queue operation */
-    bool tx_fifo_queue_ctrl;
 } can_t;
 #  define HAVE_CAN_T
 
