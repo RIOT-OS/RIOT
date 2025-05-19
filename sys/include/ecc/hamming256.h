@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_ecc
  * @brief
@@ -15,8 +17,6 @@
  * @author      Lucas Jenß <lucas@x3ro.de>
  */
 
-#ifndef ECC_HAMMING256_H
-#define ECC_HAMMING256_H
 
 #include <stdint.h>
 
@@ -64,5 +64,4 @@ uint8_t hamming_verify256x( uint8_t *data, uint32_t size, const uint8_t *code );
 }
 #endif
 
-#endif /* ECC_HAMMING256_H */
 /** @} */

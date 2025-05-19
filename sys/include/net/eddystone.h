@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_eddystone Eddystone
  * @ingroup     net
@@ -20,8 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_EDDYSTONE_H
-#define NET_EDDYSTONE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,5 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_EDDYSTONE_H */
 /** @} */

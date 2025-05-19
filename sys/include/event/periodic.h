@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger periodic events
@@ -33,8 +35,6 @@
  *
  */
 
-#ifndef EVENT_PERIODIC_H
-#define EVENT_PERIODIC_H
 
 #include "event.h"
 #include "ztimer/periodic.h"
@@ -151,5 +151,4 @@ static inline void event_periodic_stop(event_periodic_t *event_periodic)
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_PERIODIC_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_dhcpv6 Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
  * @ingroup     net_ipv6
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_DHCPV6_H
-#define NET_DHCPV6_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,5 +109,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_DHCPV6_H */
 /** @} */

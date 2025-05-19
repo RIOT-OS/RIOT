@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_nanosock
  * @brief       VFS NanoCoAP helper functions
@@ -17,8 +19,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef NET_NANOCOAP_VFS_H
-#define NET_NANOCOAP_VFS_H
 
 #include "net/nanocoap_sock.h"
 
@@ -85,5 +85,4 @@ int nanocoap_vfs_put(nanocoap_sock_t *sock, const char *path, const char *src,
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_VFS_H */
 /** @} */

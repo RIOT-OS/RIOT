@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_checksum_crc32 CRC32
  * @ingroup     sys_checksum
@@ -17,8 +19,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef CHECKSUM_CRC32_H
-#define CHECKSUM_CRC32_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -46,6 +46,5 @@ uint32_t crc32(const void *buf, size_t size);
 }
 #endif
 
-#endif /* CHECKSUM_CRC32_H */
 
 /** @} */

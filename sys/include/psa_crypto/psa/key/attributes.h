@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef PSA_CRYPTO_PSA_KEY_ATTRIBUTES_H
-#define PSA_CRYPTO_PSA_KEY_ATTRIBUTES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,5 +182,4 @@ static inline psa_key_attributes_t psa_key_attributes_init(void)
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_KEY_ATTRIBUTES_H */
 /** @} */

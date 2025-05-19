@@ -6,6 +6,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_memarray memory array allocator
  * @ingroup     sys_memory_management
@@ -17,8 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef MEMARRAY_H
-#define MEMARRAY_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -164,7 +165,6 @@ size_t memarray_available(memarray_t *mem);
 }
 #endif
 
-#endif /* MEMARRAY_H */
 
 /**
  * @}

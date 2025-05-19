@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_stdio_semihosting STDIO over Semihosting
  * @ingroup     sys_stdio
@@ -56,8 +58,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef STDIO_SEMIHOSTING_H
-#define STDIO_SEMIHOSTING_H
 
 #include "stdio_base.h"
 
@@ -76,4 +76,3 @@ extern "C" {
 }
 #endif
 /** @} */
-#endif /* STDIO_SEMIHOSTING_H */

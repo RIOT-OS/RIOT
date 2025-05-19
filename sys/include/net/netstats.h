@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_netstats Packet statistics per module
  * @ingroup     net
@@ -23,8 +25,6 @@
 #include "net/l2util.h"
 #include "mutex.h"
 
-#ifndef NET_NETSTATS_H
-#define NET_NETSTATS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -132,5 +132,4 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_NETSTATS_H */
 /** @} */

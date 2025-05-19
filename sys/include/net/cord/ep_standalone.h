@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_cord_ep_standalone CoRE RD Endpoint Standalone Extension
  * @ingroup     net_cord_ep
@@ -23,8 +25,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_CORD_EP_STANDALONE_H
-#define NET_CORD_EP_STANDALONE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,5 +84,4 @@ void cord_ep_standalone_signal(bool connected);
 }
 #endif
 
-#endif /* NET_CORD_EP_STANDALONE_H */
 /** @} */

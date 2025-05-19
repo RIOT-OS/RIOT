@@ -21,6 +21,8 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_ecc
  * @{
@@ -32,8 +34,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw.hamburg.de>
  */
 
-#ifndef ECC_REPETITION_H
-#define ECC_REPETITION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,5 +73,4 @@ void repetition_decode(unsigned int _dec_msg_len,
 }
 #endif
 
-#endif /* ECC_REPETITION_H */
 /** @} */

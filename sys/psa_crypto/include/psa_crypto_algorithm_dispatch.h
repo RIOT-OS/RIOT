@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_alg_disp PSA Crypto Algorithm Dispatcher
@@ -17,8 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  */
 
-#ifndef PSA_CRYPTO_ALGORITHM_DISPATCH_H
-#define PSA_CRYPTO_ALGORITHM_DISPATCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -174,5 +174,4 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
 }
 #endif
 
-#endif /* PSA_CRYPTO_ALGORITHM_DISPATCH_H */
 /** @} */

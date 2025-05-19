@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_fib
  * @{
@@ -16,8 +18,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef NET_FIB_TABLE_H
-#define NET_FIB_TABLE_H
 
 #include <stdint.h>
 
@@ -139,5 +139,4 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_FIB_TABLE_H */
 /** @} */

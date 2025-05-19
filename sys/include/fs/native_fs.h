@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup sys_fs_native Native FS Integration
  * @ingroup cpu_native
@@ -19,8 +21,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifndef FS_NATIVE_FS_H
-#define FS_NATIVE_FS_H
 
 #include <stdalign.h>
 
@@ -46,5 +46,4 @@ extern const vfs_file_system_t native_file_system;
 }
 #endif
 
-#endif /* FS_NATIVE_FS_H */
 /** @} */

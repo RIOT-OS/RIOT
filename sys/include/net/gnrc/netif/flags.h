@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_FLAGS_H
-#define NET_GNRC_NETIF_FLAGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -152,5 +152,4 @@ enum {
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_FLAGS_H */
 /** @} */

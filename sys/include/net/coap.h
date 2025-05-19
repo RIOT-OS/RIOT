@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_coap CoAP defines
  * @ingroup     net
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef NET_COAP_H
-#define NET_COAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -631,5 +631,4 @@ typedef enum {
 }
 #endif
 
-#endif /* NET_COAP_H */
 /** @} */

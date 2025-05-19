@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_nanosock
  * @brief       NanoCoAP Link Format helper functions
@@ -18,8 +20,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef NET_NANOCOAP_LINK_FORMAT_H
-#define NET_NANOCOAP_LINK_FORMAT_H
 
 #include "net/nanocoap_sock.h"
 
@@ -74,5 +74,4 @@ int nanocoap_link_format_get_url(const char *url,
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_LINK_FORMAT_H */
 /** @} */

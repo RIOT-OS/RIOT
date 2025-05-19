@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef RESULT_OUTPUT_TYPES_H
-#define RESULT_OUTPUT_TYPES_H
+#pragma once
 
 #include "kernel_defines.h"
 
@@ -45,4 +44,3 @@ struct turo {
 #ifdef __cplusplus
 }
 #endif
-#endif /* RESULT_OUTPUT_TYPES_H */

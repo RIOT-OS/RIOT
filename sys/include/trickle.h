@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup sys_trickle Trickle Timer
  * @ingroup sys
@@ -25,8 +27,6 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
-#ifndef TRICKLE_H
-#define TRICKLE_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -123,5 +123,4 @@ void trickle_callback(trickle_t *trickle);
 }
 #endif
 
-#endif /* TRICKLE_H */
 /** @} */

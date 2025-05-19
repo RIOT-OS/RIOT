@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    usbus_cdc_ecm USBUS CDC ECM - USBUS CDC ethernet control model
  * @ingroup     usb
@@ -19,8 +21,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef USB_USBUS_CDC_ECM_H
-#define USB_USBUS_CDC_ECM_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -163,5 +163,4 @@ void usbus_cdcecm_init(usbus_t *usbus, usbus_cdcecm_device_t *handler);
 }
 #endif
 
-#endif /* USB_USBUS_CDC_ECM_H */
 /** @} */

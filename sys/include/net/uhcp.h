@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_uhcp UHCP
  * @ingroup     net
@@ -27,8 +29,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NET_UHCP_H
-#define NET_UHCP_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -185,5 +185,4 @@ int udp_sendto(uint8_t *buf, size_t len, uint8_t *dst, uint16_t dst_port, uhcp_i
 }
 #endif
 
-#endif /* NET_UHCP_H */
 /** @} */

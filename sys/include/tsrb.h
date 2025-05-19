@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_tsrb Thread safe ringbuffer
  * @ingroup     sys
@@ -20,8 +22,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef TSRB_H
-#define TSRB_H
 
 #include <assert.h>
 #include <stddef.h>
@@ -203,5 +203,4 @@ int tsrb_add(tsrb_t *rb, const uint8_t *src, size_t n);
 }
 #endif
 
-#endif /* TSRB_H */
 /** @} */

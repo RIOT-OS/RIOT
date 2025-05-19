@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    busy_wait   Busy Waiting low-level helpers
  * @ingroup     sys
@@ -18,8 +20,6 @@
  * @{
  */
 
-#ifndef BUSY_WAIT_H
-#define BUSY_WAIT_H
 
 #include <stdint.h>
 #include "periph_conf.h"
@@ -85,5 +85,4 @@ static inline void busy_wait_us(unsigned usec)
 }
 #endif
 
-#endif /* BUSY_WAIT_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_ipv6_nib
  * @{
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PRIV_NIB_6LR_H
-#define PRIV_NIB_6LR_H
 
 #include <kernel_defines.h>
 
@@ -132,5 +132,4 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6
 }
 #endif
 
-#endif /* PRIV_NIB_6LR_H */
 /** @} */

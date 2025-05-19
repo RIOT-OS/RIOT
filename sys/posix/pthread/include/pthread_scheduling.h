@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -15,8 +17,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef PTHREAD_SCHEDULING_H
-#define PTHREAD_SCHEDULING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +55,6 @@ int pthread_setschedprio(pthread_t target_thread, int prio);
 }
 #endif
 
-#endif /* PTHREAD_SCHEDULING_H */
 
 /**
  * @}

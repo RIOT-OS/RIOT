@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_fib Forwarding Information Base (FIB)
  * @ingroup     net
@@ -24,8 +26,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef NET_FIB_H
-#define NET_FIB_H
 
 #include <stdint.h>
 
@@ -514,5 +514,4 @@ int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
 }
 #endif
 
-#endif /* NET_FIB_H */
 /** @} */

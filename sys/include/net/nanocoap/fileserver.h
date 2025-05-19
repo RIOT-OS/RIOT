@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_nanocoap_fileserver CoAP file server
  * @ingroup     net_nanocoap
@@ -75,8 +77,6 @@
  * @author      chrysn <chrysn@fsfe.org>
  */
 
-#ifndef NET_NANOCOAP_FILESERVER_H
-#define NET_NANOCOAP_FILESERVER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -156,6 +156,5 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 }
 #endif
 
-#endif /* NET_NANOCOAP_FILESERVER_H */
 
 /** @} */

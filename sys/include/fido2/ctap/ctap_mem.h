@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_mem FIDO2 CTAP flash
  * @ingroup     fido2_ctap
@@ -19,8 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-#ifndef FIDO2_CTAP_CTAP_MEM_H
-#define FIDO2_CTAP_CTAP_MEM_H
 
 #include <stdint.h>
 
@@ -170,5 +170,4 @@ ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_MEM_H */
 /** @} */

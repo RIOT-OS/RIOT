@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    isr_pipe_read_timeout  Read timeouts with ISR pipe
  * @ingroup     isr_pipe
@@ -19,8 +21,6 @@
  *
  */
 
-#ifndef ISRPIPE_READ_TIMEOUT_H
-#define ISRPIPE_READ_TIMEOUT_H
 
 #include "isrpipe.h"
 
@@ -72,4 +72,3 @@ int isrpipe_read_all_timeout(isrpipe_t *isrpipe, uint8_t *buf, size_t count, uin
 }
 #endif
 /** @} */
-#endif /* ISRPIPE_READ_TIMEOUT_H */

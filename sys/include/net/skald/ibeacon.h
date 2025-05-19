@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    ble_skald_ibeacon Skald about iBeacon
  * @ingroup     ble_skald
@@ -25,8 +27,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_SKALD_IBEACON_H
-#define NET_SKALD_IBEACON_H
 
 #include "net/skald.h"
 
@@ -52,5 +52,4 @@ void skald_ibeacon_advertise(skald_ctx_t *ctx, const skald_uuid_t *uuid,
 }
 #endif
 
-#endif /* NET_SKALD_IBEACON_H */
 /** @} */

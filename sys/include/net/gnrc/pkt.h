@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_pkt Packet
  * @ingroup     net_gnrc_pktbuf
@@ -19,8 +21,6 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef NET_GNRC_PKT_H
-#define NET_GNRC_PKT_H
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -293,5 +293,4 @@ gnrc_pktsnip_t *gnrc_pktsnip_search_type(gnrc_pktsnip_t *pkt,
 }
 #endif
 
-#endif /* NET_GNRC_PKT_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_tcp
  *
@@ -17,8 +19,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_COMMON_H
-#define GNRC_TCP_COMMON_H
 
 #include <stdint.h>
 #include "thread.h"
@@ -165,5 +165,4 @@ _gnrc_tcp_common_tcb_list_t *_gnrc_tcp_common_get_tcb_list(void);
 }
 #endif
 
-#endif /* GNRC_TCP_COMMON_H */
 /** @} */

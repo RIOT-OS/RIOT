@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup      net_sock_async  Sock extension for asynchronous access
  *
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_SOCK_ASYNC_TYPES_H
-#define NET_SOCK_ASYNC_TYPES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -176,5 +176,4 @@ typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t flags,
 }
 #endif
 
-#endif /* NET_SOCK_ASYNC_TYPES_H */
 /** @} */

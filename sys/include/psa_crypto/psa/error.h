@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -21,8 +23,6 @@
  *
  */
 
-#ifndef PSA_CRYPTO_PSA_ERROR_H
-#define PSA_CRYPTO_PSA_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -212,5 +212,4 @@ typedef int32_t psa_status_t;
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_ERROR_H */
 /** @} */

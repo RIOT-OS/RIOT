@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -21,8 +23,6 @@
  *
  */
 
-#ifndef PSA_CRYPTO_OPERATION_ENCODER_H
-#define PSA_CRYPTO_OPERATION_ENCODER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -237,5 +237,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PSA_CRYPTO_OPERATION_ENCODER_H */
 /** @} */

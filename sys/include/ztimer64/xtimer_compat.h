@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup  sys_ztimer64_xtimer_compat ztimer64_xtimer_compat: 64 Bit xtimer wrapper
  * @ingroup   sys_ztimer64
@@ -17,8 +19,6 @@
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef ZTIMER64_XTIMER_COMPAT_H
-#define ZTIMER64_XTIMER_COMPAT_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -310,4 +310,3 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
 #endif
 
 /** @} */
-#endif /* ZTIMER64_XTIMER_COMPAT_H */
