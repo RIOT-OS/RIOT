@@ -5,8 +5,9 @@
 Available MTD Subcommands
 ==========================
 
-There are different sub commands available to read and write data to and from an MTD.
-Additional subcommands for example print information or control power states.
+There are different subcommands available to read and write data to and from an MTD,
+as well as additional subcommands for example to print information or to control
+power states.
 
 Subcommand: read \<addr\> \<len\>
 -----------------------------
