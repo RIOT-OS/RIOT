@@ -17,7 +17,7 @@ The subcommand consumes a memory address and a length in bytes of how many bytes
 Subcommand: read_page \<page\> \<offset\> \<len\>
 -------------------------------------------
 
-The subcommand consumes a page number, an offset withing that page and a length in bytes
+The subcommand consumes a page number, an offset within that page and a length in bytes
 of how many bytes to read.
 @see mtd_read_page
 
