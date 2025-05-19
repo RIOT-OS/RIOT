@@ -98,7 +98,7 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM0_GPIOS
-#define PWM0_GPIOS  { GPIO2, GPIO3, GPIO4, GPIO5 }
+#define PWM0_GPIOS  { GPIO2, GPIO3, GPIO4 }
 #endif
 
 /** @} */

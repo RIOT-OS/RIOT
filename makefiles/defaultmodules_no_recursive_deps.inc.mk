@@ -15,3 +15,4 @@ DEFAULT_MODULE += periph_init_led4
 DEFAULT_MODULE += periph_init_led5
 DEFAULT_MODULE += periph_init_led6
 DEFAULT_MODULE += periph_init_led7
+DEFAULT_MODULE += periph_init_buttons

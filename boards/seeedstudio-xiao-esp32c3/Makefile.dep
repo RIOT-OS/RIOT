@@ -1,9 +1,17 @@
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_usb_serial_jtag
+ifneq (,$(filter periph_spi, $(USEMODULE)))
+  ifeq (,$(filter periph_init_buttons, $(DISABLE_MODULE)))
+    DISABLE_MODULE += periph_init_buttons
+
+    MSG="Warning: Using periph_spi on Seeed Studio Xiao ESP32C3 board will disable BUTTON0 due to pin conflict."
+    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)$(MSG)$(COLOR_RESET)" 1>&2)
+  endif
+else ifneq (,$(filter saul_default,$(USEMODULE)))
+  # The button is the only SAUL device. Enable it only when SPI is not enabled.
+  USEMODULE += saul_gpio
 endif
 
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_usb_serial_jtag
 endif
 
 include $(RIOTBOARD)/common/esp32c3/Makefile.dep
