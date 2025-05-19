@@ -2,7 +2,7 @@
 @addtogroup sys_shell_commands
 @brief      MTD shell command for low level storage device access
 
-Available mtd sub commands
+Available MTD Subcommands
 ==========================
 
 There are different sub commands available to read and write data to and from an MTD.
