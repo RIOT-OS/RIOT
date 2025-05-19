@@ -1,5 +1,5 @@
 # This files contains dependencies for default modules. They are parsed at the
-# end of the dependency loop. They MAY include new modules, but this modules
+# end of the dependency loop. They MAY include new modules, but these modules
 # MUST NOT have dependencies themselves.
 
 ifneq (,$(filter auto_init%,$(USEMODULE)))
