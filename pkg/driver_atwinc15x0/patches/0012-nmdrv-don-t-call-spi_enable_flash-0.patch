@@ -1,0 +1,35 @@
+From 0abb3daceea8424cc277a2c0c01570099c495c96 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 13 May 2025 18:47:45 +0200
+Subject: [PATCH 12/12] nmdrv: don't call spi_enable_flash(0)
+
+SPI Flash isn't used in RIOT. Disabling the SPI Flash with `spi_enable_flash(0)` is the only function call to the SPI Flash driver. Therefore we don't use the SPI Flash driver at all and comment out this call to prevent an undefined reference.
+---
+ src/driver/source/nmdrv.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/driver/source/nmdrv.c b/src/driver/source/nmdrv.c
+index 396ade953a2..160d84b011b 100644
+--- a/src/driver/source/nmdrv.c
++++ b/src/driver/source/nmdrv.c
+@@ -383,14 +383,14 @@ sint8 nm_drv_deinit(void * arg)
+ 		M2M_ERR("[nmi stop]: chip_deinit fail\n");
+ 		goto ERR1;
+ 	}
+-	
++#if 0 /* We don't use SPI Flash in RIOT */
+ 	/* Disable SPI flash to save power when the chip is off */
+-	ret = spi_flash_enable(0);
++    ret = spi_flash_enable(0);
+ 	if (M2M_SUCCESS != ret) {
+ 		M2M_ERR("[nmi stop]: SPI flash disable fail\n");
+ 		goto ERR1;
+ 	}
+-
++#endif
+ 	ret = nm_bus_iface_deinit();
+ 	if (M2M_SUCCESS != ret) {
+ 		M2M_ERR("[nmi stop]: fail init bus\n");
+-- 
+2.34.1
+
