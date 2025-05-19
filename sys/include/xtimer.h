@@ -42,6 +42,12 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+/**
+ * @brief This macro is used to check whether internal headers have been
+ * included via the public header
+ */
+#define XTIMER_H
+
 #include <stdbool.h>
 #include <stdint.h>
 
