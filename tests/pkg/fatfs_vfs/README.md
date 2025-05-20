@@ -25,12 +25,19 @@ or your FS will probably get damaged.
 
 # Real Hardware
 
-Currently the test defaults to sdcard_spi on real hardware. But generally any
-device that supports the mtd-interface can be used with FatFs. To use the
-automated test in pkg_fatfs_vfs you need to copy the generated image to your
-storage device (e.g. your SD-card). To copy the image onto the card you can use
-something like `make image && dd if=bin/riot_fatfs_disk.img
-of=/dev/<your_sdcard>`. After that you can connect the card to your RIOT device
+On real hardware, an SD card is used by default either via an SD/MMC controller
+in SD mode or via an SPI interface in SPI mode using the driver module
+`sdcard_spi`. Whether the SD card is used with an SD/MMC controller in
+SD mode is determined by the board by enabling the `mtd_sdmmc_default` module.
+Generally any device that supports the mtd-interface can be used with FatFS.
+
+To use the automated test in pkg_fatfs_vfs you need to copy the generated image
+to your storage device (e.g. your SD-card). To copy the image onto the card you
+can use something like
+
+    make image && dd if=bin/riot_fatfs_disk.img of=/dev/<your_sdcard>
+
+After that you can connect the card to your RIOT device
 and check the test output via terminal.
 
     make flash test-with-config
