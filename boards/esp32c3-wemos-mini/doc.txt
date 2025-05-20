@@ -97,7 +97,7 @@ Almost all GPIOs are broken out and can be used for different peripherals:
 - 1 x SPI
 - 1 x I2C
 - 1 x UART
-- 2 x PWM channels
+- 1 x PWM with 3 channels
 
 However, since the number of GPIOs of the ESP32-C3 SoC is very limited, some
 GPIOs are used in multiple peripheral configurations but can only be used for
@@ -122,18 +122,18 @@ This configuration can be overridden by \ref esp32_application_specific_configur
 <center>
 Function        | v1.0.0 | v2.1.0 | Remarks | Configuration
 :---------------|:-------|:-------|:--------|:---------------------
-BUTTON0         | GPIO9 | GPIO9 | | |
-ADC             | GPIO0 ... GPIO5 | GPIO0 ... GPIO5 | | see \ref esp32_adc_channels "ADC Channels"
-I2C_DEV(0):SCL  | GPIO10 | GPIO10 | | \ref esp32_i2c_interfaces "I2C Interfaces"
-I2C_DEV(0):SDA  | GPIO8 | GPIO8 | | \ref esp32_i2c_interfaces "I2C Interfaces"
-LED0            | GPIO7 | - | | |
-PWM_DEV(0)      | GPIO1, GPIO6, GPIO7 | GPIO2, GPIO6 | | \ref esp32_pwm_channels "PWM Channels"
-RGB-LED         | - | GPIO7 | supported by driver module `ws281x` | |
-SPI_DEV(0):CLK  | GPIO2 | GPIO1 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0):MISO | GPIO3 | GPIO0 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0):MOSI | GPIO4 | GPIO4 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0):CS0  | GPIO5 | GPIO5  | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
-UART_DEV(0):TxD | GPIO21 | GPIO21  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+BUTTON0         | GPIO9  | GPIO9  |         | |
+ADC             | GPIO0 ... GPIO5 | GPIO0 ... GPIO5 | | \ref esp32_adc_channels "ADC Channels"
+I2C_DEV(0):SCL  | GPIO10 | GPIO10 |         | \ref esp32_i2c_interfaces "I2C Interfaces"
+I2C_DEV(0):SDA  | GPIO8  | GPIO8  |         | \ref esp32_i2c_interfaces "I2C Interfaces"
+LED0            | GPIO7  | -      |         | |
+PWM_DEV(0)      | GPIO1, GPIO6, GPIO7 | GPIO2, GPIO6, GPIO3 | | \ref esp32_pwm_channels "PWM Channels"
+RGB-LED         | -      | GPIO7  | supported by driver module `ws281x` | |
+SPI_DEV(0):CLK  | GPIO2  | GPIO1  | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):MISO | GPIO3  | GPIO0  | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):MOSI | GPIO4  | GPIO4  | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):CS0  | GPIO5  | GPIO5  | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+UART_DEV(0):TxD | GPIO21 | GPIO21 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0):RxD | GPIO20 | GPIO20 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
 \n
@@ -150,7 +150,7 @@ boards, see section \ref esp32_peripherals "Common Peripherals".
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html https://gitlab.com/gschorcht/RIOT.wiki-Images/-/raw/master/esp32/Wesos_ESP32-C3_mini_pinout.png "Wemos EPS32-C3 mini Pinout"
+@image html https://gitlab.com/gschorcht/RIOT.wiki-Images/-/raw/master/esp32/Wemos_ESP32-C3_mini_pinout_v2.png "Wemos EPS32-C3 mini Pinout"
 
 The corresponding board schematics can be found:
 

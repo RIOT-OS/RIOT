@@ -106,7 +106,7 @@ BTN0            | GPIO0  | low active  | |
 LED0            | GPIO25 | high active | |
 ADC             | GPIO36, GPIO39, GPIO37, GPIO38,\n GPIO0, GPIO2, GPIO12, GPIO13,\n GPIO4, GPIO15 | | \ref esp32_adc_channels "ADC Channels"
 DAC             | | | \ref esp32_dac_channels "DAC Channels"
-PWM_DEV(0)      | GPIO25, GPIO0, GPIO2, GPIO17 | | \ref esp32_pwm_channels "PWM Channels"
+PWM_DEV(0)      | GPIO25, GPIO2, GPIO17 | | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(1)      | GPIO22, GPIO23 | | \ref esp32_pwm_channels "PWM Channels"
 I2C_DEV(0):SDA  | GPIO4 | | \ref esp32_i2c_interfaces "I2C Interfaces"
 I2C_DEV(0):SCL  | GPIO15 | I2C_SPEED_FAST is used | \ref esp32_i2c_interfaces "I2C Interfaces"
@@ -220,7 +220,7 @@ The corresponding board schematics can be found [here for SX1276 version](https:
 and [here for SX1278 version](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WiFi_LoRa_32_V2(433%2C470-510).PDF).
 
 \anchor esp32_heltec_lora_32_v2_pinout_img
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Heltec_WiFi_LoRa_32_V2_pinout.png" "WiFi LoRa 32 V2 Pintout Diagram"
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Heltec_WiFi_LoRa_32_V2_pinout_v2.png" "WiFi LoRa 32 V2 Pintout Diagram"
 
 [Back to table of contents](#esp32_heltec_lora32_v2_toc)
 

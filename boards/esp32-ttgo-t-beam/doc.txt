@@ -107,9 +107,9 @@ Function        | GPIOs  | Remarks |Configuration
 :---------------|:-------|:--------|:----------------------------------
 BUTTON0         | GPIO39 | low active  | |
 LED0            | GPIO14 | high active | |
-ADC             | GPIO0, GPIO2, GPIO4, GPIO13,\n GPIO25, GPIO32, GPIO33, GPIO34,\n GPIO35 | | \ref esp32_adc_channels "ADC Channels"
+ADC             | GPIO0, GPIO2, GPIO4, GPIO13,\n GPIO25, GPIO32, GPIO33, GPIO35,\n GPIO36, GPIO34 | | \ref esp32_adc_channels "ADC Channels"
 DAC             | GPIO25 | | \ref esp32_dac_channels "DAC Channels"
-PWM_DEV(0)      | GPIO0, GPIO2, GPIO25 | | \ref esp32_pwm_channels "PWM Channels"
+PWM_DEV(0)      | GPIO14, GPIO0, GPIO2, GPIO25 | | \ref esp32_pwm_channels "PWM Channels"
 I2C_DEV(0):SDA  | GPIO21 | | \ref esp32_i2c_interfaces "I2C Interfaces"
 I2C_DEV(0):SCL  | GPIO22 | I2C_SPEED_FAST is used | \ref esp32_i2c_interfaces "I2C Interfaces"
 SPI_DEV(0):CLK  | GPIO5 | VSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
@@ -128,9 +128,9 @@ TTGO- T-Beam V1.0
 Function        | GPIOs  | Remarks |Configuration
 :---------------|:-------|:--------|:----------------------------------
 BUTTON0         | GPIO38 | low active  | |
-ADC             | GPIO0, GPIO2, GPIO4, GPIO13,\n GPIO25, GPIO32, GPIO33, GPIO35 | | \ref esp32_adc_channels "ADC Channels"
+ADC             | GPIO0, GPIO2, GPIO4, GPIO13,\n GPIO25, GPIO32, GPIO33, GPIO35,\n GPIO36, GPIO39 | | \ref esp32_adc_channels "ADC Channels"
 DAC             | GPIO25 | | \ref esp32_dac_channels "DAC Channels"
-PWM_DEV(0)      | GPIO0, GPIO2, GPIO25 | | \ref esp32_pwm_channels "PWM Channels"
+PWM_DEV(0)      | GPIO14, GPIO0, GPIO2, GPIO25 | | \ref esp32_pwm_channels "PWM Channels"
 I2C_DEV(0):SDA  | GPIO21 | | \ref esp32_i2c_interfaces "I2C Interfaces"
 I2C_DEV(0):SCL  | GPIO22 | I2C_SPEED_FAST is used | \ref esp32_i2c_interfaces "I2C Interfaces"
 SPI_DEV(0):CLK  | GPIO5 | VSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
@@ -165,7 +165,7 @@ for TTGO T-Beam boards.
 The corresponding board schematics can be found on TinyMicros.com for
 [TTGO T-Beam rev0](http://tinymicros.com/mediawiki/images/b/b9/TTGO_T-Beam_Schematic.pdf)
 and GitHub for
-[TTGO T-Beam V1.0](https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/blob/master/schematic/LilyGo_TBeam_V1.0.pdf)
+[TTGO T-Beam V1.0](https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/blob/a45c3b17842c5c377a8bc8475ae529ba0b90f9b4/schematic/LilyGo_TBeam_V1.0.pdf)
 
 [Back to table of contents](#esp32_ttgo_t_beam_toc)
 

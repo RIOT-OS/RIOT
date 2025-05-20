@@ -89,9 +89,8 @@ extern "C" {
 /**
  * @name   PWM channel configuration
  *
- * For generic boards, two PWM devices are configured. These devices
- * contain all GPIOs that are not defined as I2C, SPI or UART for this board.
- * Generally, all outputs pins could be used as PWM channels.
+ * One PWM device is configured. It uses all GPIOs that are not defined as
+ * I2C, SPI or UART for this board.
  *
  * @note As long as the according PWM device is not initialized with
  * the `pwm_init`, the GPIOs declared for this device can be used
@@ -105,11 +104,11 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM0_GPIOS
-#ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
-#define PWM0_GPIOS  { GPIO1, GPIO6, GPIO7 }
-#else /* MODULE_ESP32C3_WEMOS_MINI_V2_1_0 */
-#define PWM0_GPIOS  { GPIO2, GPIO6 }
-#endif
+#  ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
+#    define PWM0_GPIOS  { GPIO1, GPIO6, GPIO7 }
+#  else /* MODULE_ESP32C3_WEMOS_MINI_V2_1_0 */
+#    define PWM0_GPIOS  { GPIO2, GPIO6, GPIO3 }
+#  endif
 #endif
 
 /** @} */
