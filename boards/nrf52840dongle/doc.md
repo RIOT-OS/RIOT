@@ -75,7 +75,7 @@ that nrfutil, even when not running the "install" command, will install itself
 into `~/.nrfutil`. The older Python based version of nrfutil is no longer
 maintained by Nordic, and has become dysfunctional on Python 3.11.
 
-The nrfutil can turn the binary into a suitable zip file and send it to the
+The nrfutil works in two steps by turning the binary into a zip file and then sending the content of that zip file to the
 bootloader. The process is automated in the usual `make flash` target.
 
 #### Other programming methods
