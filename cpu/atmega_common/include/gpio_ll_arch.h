@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_atmega_common
  * @ingroup     drivers_periph_gpio_ll
@@ -20,8 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
 
 #include <assert.h>
 
@@ -372,5 +372,4 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

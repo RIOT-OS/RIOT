@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_atmega_common
  * @ingroup     drivers_periph_gpio
@@ -22,8 +24,6 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  */
 
-#ifndef ATMEGA_GPIO_H
-#define ATMEGA_GPIO_H
 #include <stddef.h>
 #include <stdio.h>
 
@@ -83,5 +83,4 @@ static inline uint16_t atmega_port_addr(gpio_t pin)
 }
 #endif
 
-#endif /* ATMEGA_GPIO_H */
 /** @} */

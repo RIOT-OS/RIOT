@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef ARCHITECTURE_ARCH_H
-#define ARCHITECTURE_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* ARCHITECTURE_ARCH_H */

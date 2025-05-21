@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef SYSCALLS_COMMON_H
-#define SYSCALLS_COMMON_H
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -50,5 +50,3 @@ void *system_secure_memset(void *s, int c, size_t n);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYSCALLS_COMMON_H */

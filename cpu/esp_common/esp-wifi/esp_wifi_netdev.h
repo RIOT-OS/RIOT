@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common_esp_wifi
  * @{
@@ -16,8 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef ESP_WIFI_NETDEV_H
-#define ESP_WIFI_NETDEV_H
 
 #include <stdbool.h>
 
@@ -73,5 +73,4 @@ typedef struct
 }
 #endif
 
-#endif /* ESP_WIFI_NETDEV_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_efm32_drivers_coretemp EFM32 internal temperature sensor
  * @ingroup     cpu_efm32_drivers
@@ -30,8 +32,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-#ifndef DRIVERS_CORETEMP_H
-#define DRIVERS_CORETEMP_H
 
 #include <stdint.h>
 
@@ -64,5 +64,4 @@ int16_t coretemp_read(void);
 }
 #endif
 
-#endif /* DRIVERS_CORETEMP_H */
 /** @} */

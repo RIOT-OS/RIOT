@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     candev_stm32
  * @{
@@ -17,8 +19,6 @@
  * @}
  */
 
-#ifndef CAN_PARAMS_H
-#define CAN_PARAMS_H
 
 #include "can/device.h"
 #include "periph/can.h"
@@ -162,5 +162,3 @@ static const candev_params_t candev_params[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CAN_PARAMS_H */

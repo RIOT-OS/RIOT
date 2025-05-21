@@ -1,5 +1,5 @@
-#ifndef DRIVER_GPIO_H
-#define DRIVER_GPIO_H
+#pragma once
+
 
 #ifdef ESP_IDF_CODE
 
@@ -20,5 +20,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DRIVER_GPIO_H */

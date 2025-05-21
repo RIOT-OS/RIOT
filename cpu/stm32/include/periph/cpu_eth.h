@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_ETH_H
-#define PERIPH_CPU_ETH_H
 
 #include <stdint.h>
 
@@ -165,5 +165,4 @@ void stm32_eth_common_init(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_ETH_H */
 /** @} */

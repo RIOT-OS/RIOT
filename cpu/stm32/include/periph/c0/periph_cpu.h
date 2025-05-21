@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,8 +18,6 @@
  * @author      Jason Parker <Jason.Parker@bissell.com>
  */
 
-#ifndef PERIPH_C0_PERIPH_CPU_H
-#define PERIPH_C0_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,5 +60,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_C0_PERIPH_CPU_H */
 /** @} */

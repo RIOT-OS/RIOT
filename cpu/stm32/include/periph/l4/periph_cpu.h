@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef PERIPH_L4_PERIPH_CPU_H
-#define PERIPH_L4_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,5 +84,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_L4_PERIPH_CPU_H */
 /** @} */

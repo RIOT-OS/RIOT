@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atmega128rfa1
  * @{
@@ -17,8 +19,6 @@
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-#ifndef DEFAULT_TIMER_CONFIG_H
-#define DEFAULT_TIMER_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,5 +54,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */

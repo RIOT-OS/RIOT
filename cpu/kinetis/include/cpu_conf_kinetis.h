@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_kinetis
  * @{
@@ -16,8 +18,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef CPU_CONF_KINETIS_H
-#define CPU_CONF_KINETIS_H
 
 #include "cpu_conf_common.h"
 
@@ -187,5 +187,4 @@ extern "C"
 }
 #endif
 
-#endif /* CPU_CONF_KINETIS_H */
 /** @} */

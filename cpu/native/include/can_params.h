@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup drivers_candev_linux
  * @{
@@ -16,8 +18,6 @@
  * @brief  Default linux can config
  * @author Vincent Dupont <vincent@otakeys.com>
  */
-#ifndef CAN_PARAMS_H
-#define CAN_PARAMS_H
 
 #include "candev_linux.h"
 #include "can/device.h"
@@ -42,5 +42,4 @@ static const candev_params_t candev_params[] = {
 }
 #endif
 
-#endif /* CAN_PARAMS_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_SPI_H
-#define PERIPH_CPU_SPI_H
 
 #include <stdint.h>
 
@@ -135,5 +135,4 @@ gpio_t spi_pin_clk(spi_t bus);
 }
 #endif
 
-#endif /* PERIPH_CPU_SPI_H */
 /** @} */

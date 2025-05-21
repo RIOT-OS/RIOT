@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -37,8 +39,6 @@
    doesn't have a stat, and the necv70 doesn't matter.) -- eichin
  */
 
-#ifndef SYS_TYPES_H
-#define SYS_TYPES_H
 
 #ifndef DOXYGEN
 
@@ -325,7 +325,6 @@ typedef long suseconds_t;
 
 #undef __need_inttypes
 
-#endif /* _SYS_TYPES_H */
 
 #ifdef __cplusplus
 }

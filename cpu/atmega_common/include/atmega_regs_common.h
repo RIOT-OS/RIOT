@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_atmega_common
  * @{
@@ -23,8 +25,6 @@
  *
  */
 
-#ifndef ATMEGA_REGS_COMMON_H
-#define ATMEGA_REGS_COMMON_H
 
 #include <avr/io.h>
 #include <avr/power.h>
@@ -182,5 +182,4 @@ typedef struct {
 }
 #endif
 
-#endif /* ATMEGA_REGS_COMMON_H */
 /** @} */

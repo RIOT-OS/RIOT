@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,8 +18,6 @@
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef PERIPH_CPU_VBAT_H
-#define PERIPH_CPU_VBAT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +37,4 @@ void vbat_disable(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_VBAT_H */
 /** @} */

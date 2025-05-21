@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266
  * @{
@@ -17,8 +19,6 @@
  * @}
  */
 
-#ifndef GPIO_ARCH_H
-#define GPIO_ARCH_H
 
 #include "gpio_arch_common.h"
 
@@ -38,4 +38,3 @@ extern const uint8_t _iomux_to_gpio[];
 #endif
 
 #endif /* DOXYGEN */
-#endif /* GPIO_ARCH_H */

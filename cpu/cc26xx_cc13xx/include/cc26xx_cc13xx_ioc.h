@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
@@ -16,8 +18,6 @@
  * @author          Leon George <leon@georgemail.eu>
  */
 
-#ifndef CC26XX_CC13XX_IOC_H
-#define CC26XX_CC13XX_IOC_H
 
 #include "cc26xx_cc13xx.h"
 
@@ -182,5 +182,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_IOC_H */
 /** @} */

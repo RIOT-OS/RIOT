@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -16,8 +18,6 @@
  * @brief  Native CPU peripheral configuration
  * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "macros/units.h"
 
@@ -130,5 +130,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

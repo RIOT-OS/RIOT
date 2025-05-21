@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_FREERTOS_H
-#define FREERTOS_FREERTOS_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -76,4 +75,3 @@ void vPortClearInterruptMaskFromISR(UBaseType_t state);
 #include "freertos/queue.h"
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_FREERTOS_H */

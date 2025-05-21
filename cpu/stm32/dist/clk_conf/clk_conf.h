@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @brief       Compute clock constants for STM32F[2|4|7] CPUs
  *
@@ -14,8 +16,6 @@
  * @{
  */
 
-#ifndef CLK_CONF_H
-#define CLK_CONF_H
 
 #include <stdbool.h>
 
@@ -655,5 +655,4 @@ static const clk_cfg_t stm32_mp_clk_cfg[] = {
 }
 #endif
 
-#endif /* CLK_CONF_H */
 /** @} */

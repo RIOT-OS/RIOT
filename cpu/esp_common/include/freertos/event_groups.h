@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_EVENT_GROUPS_H
-#define FREERTOS_EVENT_GROUPS_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -43,4 +42,3 @@ EventBits_t xEventGroupWaitBits (const EventGroupHandle_t xEventGroup,
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_EVENT_GROUPS_H */

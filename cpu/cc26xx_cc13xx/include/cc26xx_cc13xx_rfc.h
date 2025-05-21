@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
@@ -16,8 +18,6 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-#ifndef CC26XX_CC13XX_RFC_H
-#define CC26XX_CC13XX_RFC_H
 
 #include "cc26xx_cc13xx.h"
 
@@ -167,5 +167,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_RFC_H */
 /** @} */

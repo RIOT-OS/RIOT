@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_esp32_sdk
  * @{
@@ -24,8 +26,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-#ifndef SDKCONFIG_H
-#define SDKCONFIG_H
 
 #ifndef DOXYGEN
 
@@ -111,5 +111,3 @@ extern "C" {
 
 #endif /* DOXYGEN */
 /** @} */
-
-#endif /* SDKCONFIG_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef IRQ_ARCH_COMMON_H
-#define IRQ_ARCH_COMMON_H
 
 #include "irq.h"
 #include "sched.h"
@@ -70,5 +70,3 @@ extern volatile uint32_t irq_interrupt_nesting;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* IRQ_ARCH_COMMON_H */

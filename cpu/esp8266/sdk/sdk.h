@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266_sdk
  * @{
@@ -17,8 +19,6 @@
  * @}
  */
 
-#ifndef SDK_H
-#define SDK_H
 
 #include <stdint.h>
 
@@ -33,5 +33,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SDK_H */

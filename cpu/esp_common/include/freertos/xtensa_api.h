@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_XTENSA_API_H
-#define FREERTOS_XTENSA_API_H
+#pragma once
 
 #include "xtensa/xtensa_api.h"
 
@@ -20,5 +19,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* FREERTOS_XTENSA_API_H */

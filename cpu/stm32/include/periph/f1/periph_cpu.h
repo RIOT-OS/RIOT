@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,8 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_F1_PERIPH_CPU_H
-#define PERIPH_F1_PERIPH_CPU_H
 
 #include "cpu_conf.h"
 
@@ -172,5 +172,4 @@ static inline void afio_mapr_write(uint32_t new_value)
 }
 #endif
 
-#endif /* PERIPH_F1_PERIPH_CPU_H */
 /** @} */

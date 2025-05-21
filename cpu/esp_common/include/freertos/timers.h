@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_TIMERS_H
-#define FREERTOS_TIMERS_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -40,4 +39,3 @@ void *pvTimerGetTimerID(const TimerHandle_t xTimer);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_TIMERS_H */

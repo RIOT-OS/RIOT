@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_gd32v
  * @{
@@ -18,8 +20,6 @@
  * @author          Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <inttypes.h>
 
@@ -570,5 +570,4 @@ void gd32v_disable_irc8(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

@@ -5,6 +5,9 @@
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
+
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
@@ -16,8 +19,6 @@
  *
  */
 
-#ifndef CC26XX_CC13XX_GPIO_H
-#define CC26XX_CC13XX_GPIO_H
 
 #include "cc26xx_cc13xx.h"
 
@@ -58,6 +59,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26XX_CC13XX_GPIO_H */
 
 /** @} */

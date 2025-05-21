@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_sam_common
  * @brief           Common CPU specific definitions for all SAM3/SAM4x based CPUs
@@ -17,8 +19,6 @@
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -130,5 +130,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

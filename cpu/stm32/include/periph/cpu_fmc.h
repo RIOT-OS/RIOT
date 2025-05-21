@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_stm32_periph_fmc STM32 FMC/FSMC peripheral driver
  * @ingroup     cpu_stm32
@@ -52,8 +54,6 @@
  * @author          Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef PERIPH_CPU_FMC_H
-#define PERIPH_CPU_FMC_H
 
 #include <stdint.h>
 
@@ -376,5 +376,4 @@ typedef uint8_t fmc_bank_id_t;  /**< FMC bank identifier */
 }
 #endif
 
-#endif /* PERIPH_CPU_FMC_H */
 /** @} */

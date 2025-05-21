@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup drivers_socket_zep  Socket-based ZEP
  * @ingroup  drivers_netdev
@@ -54,8 +56,6 @@
  * @brief  Socket ZEP definitions
  * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef SOCKET_ZEP_H
-#define SOCKET_ZEP_H
 
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
@@ -150,5 +150,4 @@ void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal);
 }
 #endif
 
-#endif /* SOCKET_ZEP_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -19,8 +21,6 @@
  * @author          Hauke Petersen <hauke.pertersen@fu-berlin.de>
 */
 
-#ifndef STMCLK_H
-#define STMCLK_H
 
 #include <stdbool.h>
 
@@ -98,5 +98,4 @@ bool stmclk_dbp_is_locked(void);
 }
 #endif
 
-#endif /* STMCLK_H */
 /** @} */

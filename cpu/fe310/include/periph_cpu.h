@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_fe310
  * @{
@@ -16,8 +18,6 @@
  * @author          Ken Rabold
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <inttypes.h>
 
@@ -181,5 +181,4 @@ void fe310_clock_init(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266
  * @{
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef SYSCALLS_H
-#define SYSCALLS_H
 
 #include "syscalls_common.h"
 
@@ -36,5 +36,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYSCALLS_H */

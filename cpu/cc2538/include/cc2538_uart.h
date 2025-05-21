@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_cc2538_uart CC2538 UART
  * @ingroup         cpu_cc2538_regs
@@ -17,8 +19,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef CC2538_UART_H
-#define CC2538_UART_H
 
 #include "cc2538.h"
 
@@ -187,5 +187,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_UART_H */
 /** @} */

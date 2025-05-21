@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -16,8 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef SDKCONFIG_DEFAULT_COMMON_H
-#define SDKCONFIG_DEFAULT_COMMON_H
 
 #ifndef DOXYGEN
 
@@ -47,5 +47,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_DEFAULT_COMMON_H */
 /** @} */

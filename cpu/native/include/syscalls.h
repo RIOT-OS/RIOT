@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SYSCALLS_H
-#define SYSCALLS_H
+#pragma once
 
 #include <sys/time.h>
 #include <stdint.h>
@@ -114,5 +113,3 @@ __SPECIFIER int (*real_statvfs)(const char *restrict path, struct statvfs *restr
 #endif
 
 /** @} */
-
-#endif /* SYSCALLS_H */

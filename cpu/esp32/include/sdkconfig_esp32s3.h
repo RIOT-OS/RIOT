@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -19,8 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef SDKCONFIG_ESP32S3_H
-#define SDKCONFIG_ESP32S3_H
 
 #ifndef DOXYGEN
 
@@ -190,5 +190,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_ESP32S3_H */
 /** @} */

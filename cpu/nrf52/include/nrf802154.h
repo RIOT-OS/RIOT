@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_nrf52_802154 IEEE802.15.4 Driver for nRF52840 SoCs
  * @ingroup     drivers_netdev
@@ -33,8 +35,6 @@
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
 
-#ifndef NRF802154_H
-#define NRF802154_H
 
 #include "net/ieee802154/radio.h"
 
@@ -102,5 +102,4 @@ void nrf802154_setup(nrf802154_t *dev);
 }
 #endif
 
-#endif /* NRF802154_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_msp430
 * @{
@@ -20,8 +22,6 @@
  *
  */
 
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include <stdbool.h>
 #include <msp430.h>
@@ -107,4 +107,3 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
 #endif
 
 /** @} */
-#endif /* IRQ_ARCH_H */

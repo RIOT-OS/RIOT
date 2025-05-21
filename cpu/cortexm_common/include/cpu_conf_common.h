@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cortexm_common
  * @{
@@ -16,8 +18,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef CPU_CONF_COMMON_H
-#define CPU_CONF_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,5 +182,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_COMMON_H */
 /** @} */

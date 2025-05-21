@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atxmega
  * @{
@@ -16,8 +18,6 @@
  * @author          Gerson Fernando Budke <nandojve@gmail.com>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,5 +72,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

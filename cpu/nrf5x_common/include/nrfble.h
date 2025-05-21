@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_nrf5x_nrfble NRF BLE radio driver
  * @ingroup     drivers_netdev
@@ -18,8 +20,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NRFBLE_H
-#define NRFBLE_H
 
 #include "net/netdev.h"
 
@@ -51,5 +51,4 @@ netdev_t *nrfble_setup(void);
 }
 #endif
 
-#endif /* NRFBLE_H */
 /** @} */

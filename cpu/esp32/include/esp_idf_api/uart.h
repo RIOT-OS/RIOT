@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32_esp_idf_api
  * @{
@@ -17,8 +19,6 @@
  * @}
  */
 
-#ifndef ESP_IDF_API_UART_H
-#define ESP_IDF_API_UART_H
 
 #ifndef DOXYGEN     /* Hide implementation details from doxygen */
 
@@ -33,4 +33,3 @@ void esp_idf_uart_set_wakeup_threshold(unsigned uart_num, uint32_t threshold);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ESP_IDF_API_UART_H */

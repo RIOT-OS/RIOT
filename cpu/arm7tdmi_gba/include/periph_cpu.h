@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_arm7tdmi_gba
  * @{
@@ -16,8 +18,6 @@
  * @author
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -34,5 +34,4 @@ extern "C"
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

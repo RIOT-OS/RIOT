@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_riscv_common
  * @{
@@ -16,8 +18,6 @@
  * @author          JP Bonn
  */
 
-#ifndef CPUCYCLE_H
-#define CPUCYCLE_H
 
 #include <stdint.h>
 
@@ -36,5 +36,4 @@ uint64_t get_cycle_count(void);
 }
 #endif
 
-#endif /* CPUCYCLE_H */
 /** @} */

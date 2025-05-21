@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266_sdk
  * @{
@@ -16,8 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-#ifndef ETS_H
-#define ETS_H
 
 #ifndef DOXYGEN
 
@@ -71,4 +71,3 @@ extern void ets_wdt_enable (void);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ETS_H */

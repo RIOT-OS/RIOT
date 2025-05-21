@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -16,8 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef CPU_H
-#define CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +44,4 @@ static inline uintptr_t cpu_get_caller_pc(void)
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

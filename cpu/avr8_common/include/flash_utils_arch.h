@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @{
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef FLASH_UTILS_ARCH_H
-#define FLASH_UTILS_ARCH_H
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -105,4 +105,3 @@ int flash_snprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash, ...)
 #endif
 
 /** @} */
-#endif /* FLASH_UTILS_ARCH_H */

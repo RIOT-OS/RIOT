@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,8 +18,6 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef PERIPH_CPU_GPIO_LL_H
-#define PERIPH_CPU_GPIO_LL_H
 
 #include <stdalign.h>
 #include <stdint.h>
@@ -195,5 +195,4 @@ union gpio_conf_stm32 {
 }
 #endif
 
-#endif /* PERIPH_CPU_GPIO_LL_H */
 /** @} */

@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cc2538
  * @{
@@ -19,8 +21,6 @@
  * @author      Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef CC2538_RF_H
-#define CC2538_RF_H
 
 #include <stdbool.h>
 
@@ -468,5 +468,4 @@ void cc2538_set_tx_power(int dBm);
 }
 #endif
 
-#endif /* CC2538_RF_H */
 /** @} */

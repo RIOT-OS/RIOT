@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_nrf52
  * @{
@@ -18,8 +20,6 @@
  * @author          Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -151,5 +151,4 @@ void nrf5x_spi_release(NRF_SPIM_Type *bus);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

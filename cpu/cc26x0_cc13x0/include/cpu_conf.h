@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup      cpu_cc26x0_cc13x0
  * @{
@@ -18,8 +20,6 @@
  *
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #ifndef SET_MODE_CONF_1_ALT_DCDC_IPEAK
 #define SET_MODE_CONF_1_ALT_DCDC_IPEAK 0x2 /**< 32 mA */
@@ -50,5 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

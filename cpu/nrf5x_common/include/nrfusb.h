@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_nrf52_nrfusb NRF usb peripheral implementation
  * @ingroup     cpu_nrf52
@@ -19,8 +21,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef NRFUSB_H
-#define NRFUSB_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -66,5 +66,4 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* NRFUSB_H */
 /** @} */

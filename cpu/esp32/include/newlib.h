@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -20,8 +22,6 @@
  * toolchains, ESP32x toolchains don't use different `newlib.h` versions.
  */
 
-#ifndef NEWLIB_H
-#define NEWLIB_H
 
 #include "kernel_defines.h"
 
@@ -43,5 +43,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* NEWLIB_H */
 /** @} */

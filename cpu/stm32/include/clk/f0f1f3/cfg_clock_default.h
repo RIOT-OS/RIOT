@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_stm32
  * @{
@@ -23,8 +25,6 @@
  *
  */
 
-#ifndef CLK_F0F1F3_CFG_CLOCK_DEFAULT_H
-#define CLK_F0F1F3_CFG_CLOCK_DEFAULT_H
 
 #include "cfg_clock_common_fx_gx_mp1_c0.h"
 #include "kernel_defines.h"
@@ -145,5 +145,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_F0F1F3_CFG_CLOCK_DEFAULT_H */
 /** @} */

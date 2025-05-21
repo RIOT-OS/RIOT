@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_cc2538_adc CC2538 ADC
  * @ingroup         cpu_cc2538_regs
@@ -19,8 +21,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef CC2538_SOC_ADC_H
-#define CC2538_SOC_ADC_H
 
 #include "cc2538.h"
 
@@ -47,6 +47,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_SOC_ADC_H */
 
 /** @} */

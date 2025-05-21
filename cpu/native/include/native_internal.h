@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup cpu_native_stdio  STDIO for native
  * @ingroup  sys_stdio
@@ -32,8 +34,6 @@
  * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author carl-tud
  */
-#ifndef NATIVE_INTERNAL_H
-#define NATIVE_INTERNAL_H
 
 #include "util/ucontext.h"
 #include <stdio.h>
@@ -332,5 +332,4 @@ ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 }
 #endif
 
-#endif /* NATIVE_INTERNAL_H */
 /** @} */

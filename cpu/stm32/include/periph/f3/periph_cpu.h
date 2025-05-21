@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,8 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PERIPH_F3_PERIPH_CPU_H
-#define PERIPH_F3_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,5 +84,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_F3_PERIPH_CPU_H */
 /** @} */

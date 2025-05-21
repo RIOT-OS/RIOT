@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atxmega
  * @{
@@ -22,8 +24,6 @@
 
 #include "periph_cpu.h"
 
-#ifndef CPU_PM_H
-#define CPU_PM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +37,4 @@ void pm_periph_power_off(void);
 }
 #endif
 
-#endif /* CPU_PM_H */
 /** @} */

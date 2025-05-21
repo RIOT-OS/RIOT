@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common_esp_wifi
  * @ingroup     cpu_esp_common_conf
@@ -17,8 +19,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef ESP_WIFI_PARAMS_H
-#define ESP_WIFI_PARAMS_H
 
 #if defined(MODULE_ESP_WIFI) || defined(DOXYGEN)
 
@@ -111,5 +111,4 @@ extern "C" {
 
 #endif /* MODULE_ESP_WIFI || DOXYGEN */
 
-#endif /* ESP_WIFI_PARAMS_H */
 /**@}*/

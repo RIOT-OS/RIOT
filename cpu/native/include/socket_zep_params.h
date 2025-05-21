@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup drivers_socket_zep
  * @{
@@ -16,8 +18,6 @@
  * @brief  Configuration parameters for the @ref drivers_socket_zep driver
  * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef SOCKET_ZEP_PARAMS_H
-#define SOCKET_ZEP_PARAMS_H
 
 #include "socket_zep.h"
 
@@ -44,5 +44,4 @@ extern socket_zep_params_t socket_zep_params[SOCKET_ZEP_MAX];
 }
 #endif
 
-#endif /* SOCKET_ZEP_PARAMS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup drivers_netdev
  * @{
@@ -17,8 +19,6 @@
  *         TAP interfaces
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NETDEV_TAP_H
-#define NETDEV_TAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,5 +74,4 @@ void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int 
 }
 #endif
 
-#endif /* NETDEV_TAP_H */
 /** @} */

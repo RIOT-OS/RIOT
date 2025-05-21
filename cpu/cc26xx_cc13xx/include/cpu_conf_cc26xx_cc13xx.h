@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup      cpu_cc26xx_cc13xx
  * @{
@@ -18,8 +20,6 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-#ifndef CPU_CONF_CC26XX_CC13XX_H
-#define CPU_CONF_CC26XX_CC13XX_H
 
 #include "kernel_defines.h"
 
@@ -534,5 +534,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_CC26XX_CC13XX_H */
 /** @} */

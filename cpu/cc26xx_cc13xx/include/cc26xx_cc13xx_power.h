@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx
  * @{
@@ -16,8 +18,6 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-#ifndef CC26XX_CC13XX_POWER_H
-#define CC26XX_CC13XX_POWER_H
 
 #include <cc26xx_cc13xx.h>
 #include <stdbool.h>
@@ -91,5 +91,4 @@ void power_clock_disable_uart(uart_t uart);
 } /* end extern "C" */
 #endif
 
-#endif /* CC26XX_CC13XX_POWER_H */
 /** @} */
