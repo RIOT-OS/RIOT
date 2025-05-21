@@ -150,7 +150,10 @@ void vTaskSuspend(TaskHandle_t xTaskToSuspend)
 
 void vTaskSuspendAll(void)
 {
-    /* TODO */
+    /* TODO:
+     * It has to be implemented once there is a mechanism in RIOT to suspend
+     * the scheduler without disabling interrupts. At the moment it is a
+     * placeholder to make the linker happy. */
 }
 
 void vTaskResume(TaskHandle_t xTaskToResume)
