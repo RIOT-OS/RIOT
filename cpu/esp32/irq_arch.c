@@ -57,16 +57,16 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #endif
 #if SOC_TIMER_GROUPS > 1
     { ETS_TG1_T0_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
+#  if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#endif /* SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1 */
+#  endif /* SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1 */
 #endif /* SOC_TIMER_GROUPS > 1 */
 #if defined(CPU_FAM_ESP32)
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
     { ETS_SYSTIMER_TARGET2_EDGE_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #else
-#error "Platform implementation is missing"
+#  error "Platform implementation is missing"
 #endif
     { ETS_UART0_INTR_SOURCE, CPU_INUM_UART, 1 },
     { ETS_UART1_INTR_SOURCE, CPU_INUM_UART, 1 },
@@ -79,11 +79,11 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_I2C_EXT1_INTR_SOURCE, CPU_INUM_I2C, 1 },
 #endif
 #if defined(SOC_BLE_SUPPORTED)
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
     { ETS_RWBLE_INTR_SOURCE, CPU_INUM_BLE, 2 },
-#else
-#error "Platform implementation is missing"
-#endif
+#  else
+#    error "Platform implementation is missing"
+#  endif
 #endif /* SOC_BLE_SUPPORTED */
 #if defined(SOC_EMAC_SUPPORTED)
     { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH, 1 },
