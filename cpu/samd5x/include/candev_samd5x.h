@@ -168,6 +168,13 @@ typedef struct {
     candev_t candev;
     /** CAN device configuration descriptor */
     const can_conf_t *conf;
+    /** some state of this can device */
+    struct {
+        uint8_t last_error_code;
+        uint8_t d_last_error_code;
+        uint8_t tx_error_count;
+        uint8_t rx_error_count;
+    } state;
     /** CAN message RAM accessible to the CAN controller */
     can_msg_ram_t msg_ram;
     /** Enable/Disable Transceiver Delay Compensation */

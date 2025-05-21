@@ -852,6 +852,209 @@ static void _mcan_hdr_can_frame(struct can_frame * frame, uint32_t fe_r0, uint32
     /* timestamp and message marker are currently unprased */
 }
 
+static void _rf0n_isr(candev_t *candev)
+{
+    can_t *dev = container_of(candev, can_t, candev);
+    Can* can = dev->conf->can;
+    unsigned lvl = 0;
+    do {
+        uint32_t rx_fifo_status = can->RXF0S.reg;
+        size_t rx_get_idx = ((rx_fifo_status & CAN_RXF0S_F0GI_Msk) >> CAN_RXF0S_F0GI_Pos);
+        size_t rx_put_idx = ((rx_fifo_status & CAN_RXF0S_F0PI_Msk) >> CAN_RXF0S_F0PI_Pos);
+        size_t rx_fifo_lvl =  ((rx_fifo_status & CAN_RXF0S_F0FL_Msk) >> CAN_RXF0S_F0FL_Pos);
+        lvl = rx_fifo_lvl;
+        DEBUG("rx get index = %u\n", rx_get_idx);
+        DEBUG("rx put index = %u\n", rx_put_idx);
+        DEBUG("rx fifo lvl = %u\n", rx_fifo_lvl);
+
+        struct can_frame frame = {0};
+        /* Reuse variable to avoid multiple read of the same register */
+        uint32_t rxfe_0 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_0.reg;
+        uint32_t rxfe_1 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_1.reg;
+
+        _mcan_hdr_can_frame(&frame, rxfe_0, rxfe_1);
+        /* extract extra data here e.g. timestamps */
+        memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_DATA,
+               frame.can_dlc);
+
+        /* acknowledge FIFO */
+        can->RXF0A.reg = CAN_RXF0A_F0AI(rx_get_idx);
+        if (dev->candev.event_callback) {
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_INDICATION, &frame);
+        }
+    } while (lvl > 1);
+}
+
+static void _rf1n_isr(candev_t *candev)
+{
+    can_t *dev = container_of(candev, can_t, candev);
+    Can* can = dev->conf->can;
+    unsigned lvl = 0;
+    do {
+        uint32_t rx_fifo_status = can->RXF1S.reg;
+        size_t rx_get_idx = ((rx_fifo_status & CAN_RXF1S_F1GI_Msk) >> CAN_RXF1S_F1GI_Pos);
+        size_t rx_put_idx = ((rx_fifo_status & CAN_RXF1S_F1PI_Msk) >> CAN_RXF1S_F1PI_Pos);
+        size_t rx_fifo_lvl = ((rx_fifo_status & CAN_RXF1S_F1FL_Msk) >> CAN_RXF1S_F1FL_Pos);
+        lvl = rx_fifo_lvl;
+        DEBUG("rx get index = %u\n", rx_get_idx);
+        DEBUG("rx put index = %u\n", rx_put_idx);
+        DEBUG("rx fifo lvl = %u\n", rx_fifo_lvl);
+
+        struct can_frame frame = {0};
+        /* Reuse variable to avoid multiple read of the same register */
+        uint32_t rxfe_0 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_0.reg;
+        uint32_t rxfe_1 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_1.reg;
+
+        _mcan_hdr_can_frame(&frame, rxfe_0, rxfe_1);
+        /* extract extra data here e.g. timestamps */
+        memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_DATA,
+               frame.can_dlc);
+
+        /* acknowledge FIFO */
+        can->RXF1A.reg = CAN_RXF1A_F1AI(rx_get_idx);
+        if (dev->candev.event_callback) {
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_INDICATION, &frame);
+        }
+    } while (lvl > 1);
+}
+
+static void _tefn_isr(candev_t *candev)
+{
+    can_t *dev = container_of(candev, can_t, candev);
+    Can* can = dev->conf->can;
+
+    unsigned lvl = 0;
+    do {
+        uint32_t txfs = can->TXEFS.reg;
+        size_t tx_get_idx = ((txfs & CAN_TXEFS_EFGI_Msk) >> CAN_TXEFS_EFGI_Pos);
+        size_t tx_put_idx = ((txfs & CAN_TXEFS_EFPI_Msk) >> CAN_TXEFS_EFPI_Pos);
+        size_t tx_fifo_lvl =  ((txfs & CAN_TXEFS_EFFL_Msk) >> CAN_TXEFS_EFFL_Pos);
+        lvl = tx_fifo_lvl;
+        DEBUG("tx get index = %u\n", tx_get_idx);
+        DEBUG("tx put index = %u\n", tx_put_idx);
+        DEBUG("tx fifo lvl = %u\n", tx_fifo_lvl);
+
+        size_t idx = tx_get_idx;
+
+        struct can_frame  frame = {};
+
+        uint32_t txfe_0 = dev->msg_ram.tx_event_fifo[idx].TXEFE_0.reg;
+        uint32_t txfe_1 = dev->msg_ram.tx_event_fifo[idx].TXEFE_1.reg;
+
+        _mcan_hdr_can_frame(&frame, txfe_0, txfe_1);
+        /* extract extra data here e.g. timestamps */
+        memcpy(frame.data, (uint32_t *)dev->msg_ram.tx_buffer[idx].TXBE_DATA, frame.can_dlc);
+
+        /* acknowledge TX EVENT */
+        can->TXEFA.reg = CAN_TXEFA_EFAI(idx);
+        if (dev->candev.event_callback) {
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_CONFIRMATION, &frame);
+        }
+    } while (lvl > 1);
+}
+
+/* error code handling for LEC and DLEC errorS */
+static void _error_code_handling(candev_t *candev, uint8_t error_code)
+{
+    can_t *dev = container_of(candev, can_t, candev);
+
+    switch (error_code) {
+        case CANDEV_SAMD5X_NO_ERROR:
+            /* no error detected with in last can event */
+        case CANDEV_SAMD5X_NO_CHANGE_ERROR:
+            /* no can event happened -> unchanged */
+            break;
+        case CANDEV_SAMD5X_STUFF_ERROR:
+            DEBUG_PUTS("STUFF error");
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+            break;
+        case CANDEV_SAMD5X_FORM_ERROR:
+            DEBUG_PUTS("FORM error");
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+            break;
+        case CANDEV_SAMD5X_ACK_ERROR:
+            DEBUG_PUTS("ACK error");
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+            break;
+        case CANDEV_SAMD5X_BIT1_ERROR:
+            DEBUG_PUTS("BIT1 error");
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+            break;
+        case CANDEV_SAMD5X_BIT0_ERROR:
+            DEBUG_PUTS("BIT0 error");
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
+            break;
+        case CANDEV_SAMD5X_CRC_ERROR:
+            DEBUG_PUTS("CRC error");
+            dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
+            break;
+        default:
+            break;
+    }
+}
+
+static void _error_count_handling(candev_t *candev)
+{
+    can_t *dev = container_of(candev, can_t, candev);
+    Can* can = dev->conf->can;
+
+    /* Extract the Tx and Rx error counters */
+    uint32_t ecr = can->ECR.reg;
+    uint8_t tx_err_cnt = (uint8_t)((ecr & CAN_ECR_TEC_Msk) >> CAN_ECR_TEC_Pos);
+    uint8_t rx_err_cnt = (uint8_t)((ecr & CAN_ECR_REC_Msk) >> CAN_ECR_REC_Pos);
+    DEBUG("tx error counter = %u\n", tx_err_cnt);
+    DEBUG("rx error counter = %u\n", rx_err_cnt);
+
+    /* TX count update when TX error count changed (usually ++) */
+    if (tx_err_cnt != dev->state.tx_error_count) {
+        dev->state.tx_error_count = tx_err_cnt;
+        DEBUG_PUTS("tx error count changed");
+    }
+
+    /* RX countupdate when RX error count changed (usually ++) */
+    if (rx_err_cnt != dev->state.rx_error_count) {
+        dev->state.rx_error_count = rx_err_cnt;
+        DEBUG_PUTS("rx error count changed");
+    }
+}
+
+/* PED and PEA must be handled at the same time as reading PSR destroys the LEC and DLEC */
+static void _pe_isr(candev_t *candev, uint32_t irq_reg ){
+    can_t *dev = container_of(candev, can_t, candev);
+    Can* can = dev->conf->can;
+
+    _error_count_handling(candev);
+
+    /* PSR read will set DLEC and LEC to NO_CHANGE */
+    uint32_t psr = can->PSR.reg;
+    uint8_t lec = (uint8_t)(psr& CAN_PSR_LEC_Msk) >> CAN_PSR_LEC_Pos;
+    uint8_t dlec = (uint8_t)(psr & CAN_PSR_DLEC_Msk) >> CAN_PSR_DLEC_Pos;
+
+    /* LEC is not NO_CHANGE when retrieved -> save error_code */
+    if (lec != CANDEV_SAMD5X_NO_CHANGE_ERROR) {
+       dev->state.last_error_code = lec;
+    }
+
+    /* DLEC is not NO_CHANGE when retrieved -> save error_code */
+    if (dlec != CANDEV_SAMD5X_NO_CHANGE_ERROR) {
+       dev->state.d_last_error_code = dlec;
+    }
+
+    /* Interrupt triggered due to protocol error
+     * in arbitration phase or data phase without BRS */
+    if (irq_reg & CAN_IR_PEA) {
+        DEBUG_PUTS("protocol error in arbitration phase");
+        _error_code_handling(candev, dev->state.last_error_code);
+   }
+
+   /* Interrupt triggered due to protocol error
+    * in data phase only CAN_FD with BRS (Bit Rate Switch) */
+    if (irq_reg & CAN_IR_PED) {
+        DEBUG_PUTS("protocol error in data phase");
+        _error_code_handling(candev, dev->state.d_last_error_code);
+    }
+}
+
 static void _isr(candev_t *candev)
 {
     can_t *dev = container_of(candev, can_t, candev);
@@ -865,34 +1068,7 @@ static void _isr(candev_t *candev)
         DEBUG_PUTS("New message in Rx FIFO 0");
         /* Clear the interrupt source flag */
         can->IR.reg |= CAN_IR_RF0N;
-
-        unsigned lvl = 0;
-        do {
-            uint32_t rx_fifo_status = can->RXF0S.reg;
-            size_t rx_get_idx = ((rx_fifo_status & CAN_RXF0S_F0GI_Msk) >> CAN_RXF0S_F0GI_Pos);
-            size_t rx_put_idx = ((rx_fifo_status & CAN_RXF0S_F0PI_Msk) >> CAN_RXF0S_F0PI_Pos);
-            size_t rx_fifo_lvl =  ((rx_fifo_status & CAN_RXF0S_F0FL_Msk) >> CAN_RXF0S_F0FL_Pos);
-            lvl = rx_fifo_lvl;
-            DEBUG("rx get index = %u\n", rx_get_idx);
-            DEBUG("rx put index = %u\n", rx_put_idx);
-            DEBUG("rx fifo lvl = %u\n", rx_fifo_lvl);
-
-            struct can_frame frame = {0};
-            /* Reuse variable to avoid multiple read of the same register */
-            uint32_t rxfe_0 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_0.reg;
-            uint32_t rxfe_1 = dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_1.reg;
-
-            _mcan_hdr_can_frame(&frame, rxfe_0, rxfe_1);
-            /* extract extra data here e.g. timestamps */
-            memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_0[rx_get_idx].RXF0E_DATA,
-                   frame.can_dlc);
-
-            /* acknowledge FIFO */
-            can->RXF0A.reg = CAN_RXF0A_F0AI(rx_get_idx);
-            if (dev->candev.event_callback) {
-                dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_INDICATION, &frame);
-            }
-        } while (lvl > 1);
+        _rf0n_isr(candev);
     }
 
     /* Interrupt triggered due to reception of CAN frame on Rx_FIFO_1 */
@@ -900,187 +1076,24 @@ static void _isr(candev_t *candev)
         DEBUG_PUTS("New message in Rx FIFO 1");
         /* Clear the interrupt source flag */
         can->IR.reg |= CAN_IR_RF1N;
-
-        unsigned lvl = 0;
-        do {
-            uint32_t rx_fifo_status = can->RXF1S.reg;
-            size_t rx_get_idx =   ((rx_fifo_status & CAN_RXF1S_F1GI_Msk) >> CAN_RXF1S_F1GI_Pos);
-            size_t rx_put_idx =   ((rx_fifo_status & CAN_RXF1S_F1PI_Msk) >> CAN_RXF1S_F1PI_Pos);
-            size_t rx_fifo_lvl =  ((rx_fifo_status & CAN_RXF1S_F1FL_Msk) >> CAN_RXF1S_F1FL_Pos);
-            lvl = rx_fifo_lvl;
-            DEBUG("rx get index = %u\n", rx_get_idx);
-            DEBUG("rx put index = %u\n", rx_put_idx);
-            DEBUG("rx fifo lvl = %u\n", rx_fifo_lvl);
-
-            struct can_frame frame = {0};
-            /* Reuse variable to avoid multiple read of the same register */
-            uint32_t rxfe_0 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_0.reg;
-            uint32_t rxfe_1 = dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_1.reg;
-
-            _mcan_hdr_can_frame(&frame, rxfe_0, rxfe_1);
-            /* extract extra data here e.g. timestamps */
-            memcpy(frame.data, (uint32_t *)dev->msg_ram.rx_fifo_1[rx_get_idx].RXF1E_DATA,
-                   frame.can_dlc);
-
-            /* acknowledge FIFO */
-            can->RXF1A.reg = CAN_RXF1A_F1AI(rx_get_idx);
-            if (dev->candev.event_callback) {
-                dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_INDICATION, &frame);
-            }
-        } while (lvl > 1);
+        _rf1n_isr(candev);
     }
 
     /* Interrupt triggered due to new transmission event */
     if (irq_reg & CAN_IR_TEFN) {
         DEBUG_PUTS("New Tx event FIFO entry");
         can->IR.reg |= CAN_IR_TEFN;
-
-        unsigned lvl = 0;
-        do {
-            uint32_t txfs = can->TXEFS.reg;
-            size_t tx_get_idx = ((txfs & CAN_TXEFS_EFGI_Msk) >> CAN_TXEFS_EFGI_Pos);
-            size_t tx_put_idx = ((txfs & CAN_TXEFS_EFPI_Msk) >> CAN_TXEFS_EFPI_Pos);
-            size_t tx_fifo_lvl =  ((txfs & CAN_TXEFS_EFFL_Msk) >> CAN_TXEFS_EFFL_Pos);
-            lvl = tx_fifo_lvl;
-            DEBUG("tx get index = %u\n", tx_get_idx);
-            DEBUG("tx put index = %u\n", tx_put_idx);
-            DEBUG("tx fifo lvl = %u\n", tx_fifo_lvl);
-
-            size_t idx = tx_get_idx;
-
-            struct can_frame  frame = {};
-
-            uint32_t txfe_0 = dev->msg_ram.tx_event_fifo[idx].TXEFE_0.reg;
-            uint32_t txfe_1 = dev->msg_ram.tx_event_fifo[idx].TXEFE_1.reg;
-
-            _mcan_hdr_can_frame(&frame, txfe_0, txfe_1);
-            /* extract extra data here e.g. timestamps */
-            memcpy(frame.data, (uint32_t *)dev->msg_ram.tx_buffer[idx].TXBE_DATA, frame.can_dlc);
-
-            /* acknowledge TX EVENT */
-            can->TXEFA.reg = CAN_TXEFA_EFAI(idx);
-            if (dev->candev.event_callback) {
-                dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_CONFIRMATION, &frame);
-            }
-        } while (lvl > 1);
+        _tefn_isr(candev);
     }
 
-    static uint8_t last_error_code = 0;
-    /* Interrupt triggered due to protocol error in data phase */
-    if (irq_reg & CAN_IR_PED) {
-        DEBUG_PUTS("protocol error in data phase");
-        can->IR.reg |= CAN_IR_PED;
-        /* Extract the Tx and Rx error counters */
-        uint32_t reg = can->ECR.reg;
-        uint8_t tx_err_cnt = (uint8_t) (reg & CAN_ECR_TEC_Msk);
-        DEBUG("tx error counter = %u\n", tx_err_cnt);
-        uint8_t rx_err_cnt = (uint8_t)((reg & CAN_ECR_REC_Msk) >> CAN_ECR_REC_Pos);
-        DEBUG("rx error counter = %u\n", rx_err_cnt);
-        /* Check the CAN error type */
-        uint8_t error_code = (uint8_t)(can->PSR.reg & CAN_PSR_LEC_Msk);
-        DEBUG("error code = %u\n", error_code);
-        if (error_code == CANDEV_SAMD5X_NO_CHANGE_ERROR) {
-            error_code = last_error_code;
-        }
-
-        switch (error_code) {
-            case CANDEV_SAMD5X_STUFF_ERROR:
-                DEBUG_PUTS("STUFF error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_FORM_ERROR:
-                DEBUG_PUTS("FORM error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_ACK_ERROR:
-                DEBUG_PUTS("ACK error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_BIT1_ERROR:
-                DEBUG_PUTS("BIT1 error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_BIT0_ERROR:
-                DEBUG_PUTS("BIT0 error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_CRC_ERROR:
-                DEBUG_PUTS("CRC error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
-                }
-                break;
-            default:
-                break;
-        }
-
-        last_error_code = error_code;
-    }
-
-    /* Interrupt triggered due to protocol error in arbitration phase */
-    if (irq_reg & CAN_IR_PEA) {
+    /* Interrupt triggered due to protocol error in arbitration phase or
+     * Interrupt triggered due to protocol error in data phase with BRS (can-fd only)
+     * handling reads PSR -> one handler for both IRQ */
+    if (irq_reg & (CAN_IR_PEA|CAN_IR_PED)  ) {
         DEBUG_PUTS("protocol error in arbitration phase");
-        can->IR.reg |= CAN_IR_PEA;
-        /* Extract the Tx and Rx error counters */
-        uint32_t reg = can->ECR.reg;
-        uint8_t tx_err_cnt = (uint8_t) (reg & CAN_ECR_TEC_Msk);
-        DEBUG("tx error counter = %u\n", tx_err_cnt);
-        uint8_t rx_err_cnt = (uint8_t)((reg & CAN_ECR_REC_Msk) >> CAN_ECR_REC_Pos);
-        DEBUG("rx error counter = %u\n", rx_err_cnt);
-        /* Check the CAN error type */
-        uint8_t error_code = (uint8_t)(can->PSR.reg & CAN_PSR_LEC_Msk);
-        DEBUG("error code = %u\n", error_code);
-        if (error_code == CANDEV_SAMD5X_NO_CHANGE_ERROR) {
-            error_code = last_error_code;
-        }
-
-        switch (error_code) {
-            case CANDEV_SAMD5X_STUFF_ERROR:
-                DEBUG_PUTS("STUFF error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_FORM_ERROR:
-                DEBUG_PUTS("FORM error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_ACK_ERROR:
-                DEBUG_PUTS("ACK error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_BIT0_ERROR:
-                DEBUG_PUTS("BIT0 error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_TX_ERROR, NULL);
-                }
-                break;
-            case CANDEV_SAMD5X_CRC_ERROR:
-                DEBUG_PUTS("CRC error");
-                if (dev->candev.event_callback) {
-                    dev->candev.event_callback(&(dev->candev), CANDEV_EVENT_RX_ERROR, NULL);
-                }
-                break;
-            default:
-                break;
-        }
-
-        last_error_code = error_code;
-    }
+        can->IR.reg |= (irq_reg & (CAN_IR_PEA|CAN_IR_PED));
+        _pe_isr(candev, irq_reg);
+   }
 
     /* Interrupt triggered due to Bus_Off status */
     if (irq_reg & CAN_IR_BO) {
@@ -1114,6 +1127,7 @@ static void _isr(candev_t *candev)
         NVIC_EnableIRQ(CAN0_IRQn);
     }
     else {
+        /* it's safe to assume can == CAN1 */
         NVIC_EnableIRQ(CAN1_IRQn);
     }
 }
