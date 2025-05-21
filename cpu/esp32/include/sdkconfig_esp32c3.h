@@ -63,9 +63,6 @@ extern "C" {
  */
 #define CONFIG_RTC_CLK_CAL_CYCLES               1024
 
-#ifdef MODULE_ESP_RTC_TIMER_32K
-#endif
-
 /**
  * ESP32-C3 specific EFUSE configuration
  */

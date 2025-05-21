@@ -30,7 +30,7 @@
  * ESP-IDF files. This avoids to update vendor code.
  */
 #ifndef LD_FILE_GEN
-#include "soc/soc_caps.h"
+#  include "soc/soc_caps.h"
 #endif
 
 /**
@@ -39,7 +39,7 @@
  * Determined with `git describe --tags` in `$ESP32_SDK_DIR`
  */
 #if !defined(IDF_VER)
-#include "esp_idf_ver.h"
+#  include "esp_idf_ver.h"
 #endif
 
 #ifndef DOXYGEN
