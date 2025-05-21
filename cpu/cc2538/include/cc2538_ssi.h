@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup      cpu_cc2538
  * @{
@@ -17,8 +19,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef CC2538_SSI_H
-#define CC2538_SSI_H
 
 #include "cc2538.h"
 
@@ -61,5 +61,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_SSI_H */
 /** @} */

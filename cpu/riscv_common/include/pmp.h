@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_riscv_common
  * @{
@@ -19,8 +21,6 @@
  * @author          Bennet Blischke
  */
 
-#ifndef PMP_H
-#define PMP_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -121,5 +121,4 @@ void print_pmpcfg(uint8_t entry);
 }
 #endif
 
-#endif /* PMP_H */
 /** @} */

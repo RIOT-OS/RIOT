@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef UTIL_UCONTEXT_H
-#define UTIL_UCONTEXT_H
+#pragma once
 
 #if USE_LIBUCONTEXT
 #  include <libucontext/libucontext.h>
@@ -132,5 +131,3 @@ static inline void makecontext64(ucontext_t *context, void (*func)(void), void* 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* UTIL_UCONTEXT_H */

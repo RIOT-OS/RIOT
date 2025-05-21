@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_tinyusb
  * @ingroup     cpu_stm32
@@ -31,8 +33,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef TINYUSB_HW_DEFAULTS_H
-#define TINYUSB_HW_DEFAULTS_H
 
 #include "periph_conf.h"
 
@@ -137,5 +137,4 @@ extern "C" {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TINYUSB_HW_DEFAULTS_H */
 /** @} */

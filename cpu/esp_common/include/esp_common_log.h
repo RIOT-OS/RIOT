@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef ESP_COMMON_LOG_H
-#define ESP_COMMON_LOG_H
 
 #ifndef DOXYGEN
 
@@ -140,5 +140,4 @@ extern int ets_printf(const char *fmt, ...);
 
 #endif /* DOXYGEN */
 
-#endif /* ESP_COMMON_LOG_H */
 /** @} */

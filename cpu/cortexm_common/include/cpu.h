@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_cortexm_common ARM Cortex-M common
  * @ingroup     cpu
@@ -27,8 +29,6 @@
  * @todo        remove include irq.h once core was adjusted
  */
 
-#ifndef CPU_H
-#define CPU_H
 
 #include "irq.h"
 #include "sched.h"
@@ -250,5 +250,4 @@ bool cpu_check_address(volatile const char *address);
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

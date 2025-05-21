@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_efm32
  * @{
@@ -17,8 +19,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "kernel_defines.h"
 #include "mutex.h"
@@ -745,5 +745,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

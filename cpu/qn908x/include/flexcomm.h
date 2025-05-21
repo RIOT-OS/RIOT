@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_qn908x
  *
@@ -22,8 +24,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-#ifndef FLEXCOMM_H
-#define FLEXCOMM_H
 
 #include <stdint.h>
 #include "periph_cpu.h"
@@ -63,5 +63,4 @@ int flexcomm_instance_from_addr(const FLEXCOMM_Type *dev);
 }
 #endif
 
-#endif /* FLEXCOMM_H */
 /** @} */

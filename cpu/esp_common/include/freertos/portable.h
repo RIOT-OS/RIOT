@@ -8,10 +8,10 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
+#pragma once
+
 /* Empty file, only required for source code compatibility */
 
-#ifndef FREERTOS_PORTABLE_H
-#define FREERTOS_PORTABLE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,5 +20,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* FREERTOS_PORTABLE_H */

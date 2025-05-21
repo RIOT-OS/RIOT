@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32_esp_eth
  * @{
@@ -16,8 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef ESP_ETH_PARAMS_H
-#define ESP_ETH_PARAMS_H
 
 #if defined(MODULE_ESP_ETH) || defined(DOXYGEN)
 
@@ -46,5 +46,4 @@ extern "C" {
 
 #endif /* MODULE_ESP_ETH || DOXYGEN */
 
-#endif /* ESP_ETH_PARAMS_H */
 /** @} */

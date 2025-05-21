@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc2538_regs
  * @{
@@ -16,8 +18,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef CC2538_H
-#define CC2538_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -809,5 +809,4 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 }
 #endif
 
-#endif /* CC2538_H */
 /** @} */

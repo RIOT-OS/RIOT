@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef TOOLS_H
-#define TOOLS_H
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -40,5 +40,3 @@ void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TOOLS_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26x0_cc13x0_definitions
  * @{
@@ -14,8 +16,6 @@
  * @brief           CC26x0/CC13x0 PRCM register definitions
  */
 
-#ifndef CC26X0_CC13X0_PRCM_H
-#define CC26X0_CC13X0_PRCM_H
 
 #include <cc26xx_cc13xx.h>
 
@@ -359,5 +359,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X0_CC13X0_PRCM_H */
 /** @} */

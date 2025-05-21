@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -16,8 +18,6 @@
  * @brief  Multiple asynchronous read on file descriptors
  * @author Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
-#ifndef ASYNC_READ_H
-#define ASYNC_READ_H
 
 #include <sys/types.h>
 #include <poll.h>
@@ -102,5 +102,4 @@ void native_async_read_add_int_handler(int fd, void *arg, native_async_read_call
 }
 #endif
 
-#endif /* ASYNC_READ_H */
 /** @} */

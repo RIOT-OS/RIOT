@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include <stdint.h>
 
@@ -268,5 +268,4 @@ void periph_lpclk_dis(bus_t bus, uint32_t mask);
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

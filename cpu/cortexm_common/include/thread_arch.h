@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cortexm_common
  * @{
@@ -17,8 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
 
 #include "cpu_conf.h"
 
@@ -46,5 +46,4 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */

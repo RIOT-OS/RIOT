@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup drivers_mtd
  * @defgroup   drivers_mtd_native Native MTD
@@ -17,8 +19,6 @@
  * @file
  * @author Vincent Dupont <vincent@otakeys.com>
  */
-#ifndef MTD_NATIVE_H
-#define MTD_NATIVE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,5 +41,4 @@ extern const mtd_desc_t native_flash_driver;
 }
 #endif
 
-#endif /* MTD_NATIVE_H */
 /** @} */

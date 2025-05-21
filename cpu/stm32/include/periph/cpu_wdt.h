@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_WDT_H
-#define PERIPH_CPU_WDT_H
 
 #include "timex.h"
 #include "periph/cpu_common.h"
@@ -53,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CPU_WDT_H */
 /** @} */

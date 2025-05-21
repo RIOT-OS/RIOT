@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_nrf5x_common
  * @ingroup     drivers_periph_timer
@@ -19,8 +21,6 @@
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 
-#ifndef TIMER_ARCH_H
-#define TIMER_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,5 +38,4 @@ static inline bool timer_poll_channel(tim_t tim, int channel)
 }
 #endif
 
-#endif /* TIMER_ARCH_H */
 /** @} */

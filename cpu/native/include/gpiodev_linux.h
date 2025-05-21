@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup drivers_gpio_linux Linux User Mode GPIO Driver
  * @ingroup  cpu_native
@@ -42,8 +44,6 @@
  * @brief  Implementation of GPIO access from Linux User Space
  * @author Benjamin Valentin <benpicco@googlemail.com>
  */
-#ifndef GPIODEV_LINUX_H
-#define GPIODEV_LINUX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,5 +69,4 @@ void gpio_linux_teardown(void);
 }
 #endif
 
-#endif /* GPIODEV_LINUX_H */
 /** @} */

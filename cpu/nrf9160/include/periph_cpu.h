@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_nrf9160
  * @{
@@ -16,8 +18,6 @@
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 #include "macros/units.h"
@@ -40,5 +40,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

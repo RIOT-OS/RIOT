@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -19,8 +21,6 @@
 
 #include "sdkconfig.h"
 
-#ifndef FREERTOS_FREERTOSCONFIG_H
-#define FREERTOS_FREERTOSCONFIG_H
 
 #ifndef DOXYGEN
 
@@ -33,4 +33,3 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_FREERTOSCONFIG_H */

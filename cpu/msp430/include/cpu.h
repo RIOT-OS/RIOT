@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_msp430
  * @brief       Texas Instruments MSP430 specific code
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef CPU_H
-#define CPU_H
 
 #include <stdint.h>
 
@@ -140,5 +140,4 @@ static inline uintptr_t cpu_get_caller_pc(void)
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

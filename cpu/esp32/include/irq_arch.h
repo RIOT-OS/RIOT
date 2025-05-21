@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include "irq_arch_common.h"
 
@@ -64,5 +64,3 @@ void esp_irq_init(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* IRQ_ARCH_H */

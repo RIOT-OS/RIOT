@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_PORTMACRO_H
-#define FREERTOS_PORTMACRO_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -80,4 +79,3 @@ bool xPortCanYield(void);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_PORTMACRO_H */

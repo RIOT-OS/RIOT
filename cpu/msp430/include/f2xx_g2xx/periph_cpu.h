@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_msp430_f2xx_g2xx
  * @{
@@ -16,8 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef F2XX_G2XX_PERIPH_CPU_H
-#define F2XX_G2XX_PERIPH_CPU_H
 
 #include <stdbool.h>
 
@@ -268,5 +268,4 @@ extern const msp430_usci_spi_params_t usci_b1_as_spi;
 }
 #endif
 
-#endif /* F2XX_G2XX_PERIPH_CPU_H */
 /** @} */

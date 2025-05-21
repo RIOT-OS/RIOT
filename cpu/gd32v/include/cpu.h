@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_gd32v
  * @{
@@ -14,8 +16,6 @@
  * @brief       CPU specific definitions
  */
 
-#ifndef CPU_H
-#define CPU_H
 
 #include "cpu_conf.h"
 #include "cpu_common.h"
@@ -45,5 +45,4 @@ static inline void cpu_jump_to_image(uint32_t addr)
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
@@ -14,8 +16,6 @@
  * @brief           CC26xx/CC13xx WDT register definitions
  */
 
-#ifndef CC26XX_CC13XX_WDT_H
-#define CC26XX_CC13XX_WDT_H
 
 #include <cc26xx_cc13xx.h>
 
@@ -53,5 +53,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26XX_CC13XX_WDT_H */
 /** @} */

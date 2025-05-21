@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -17,8 +19,6 @@
  * @brief  Implementation of the kernels thread interface
  * @author Koen Zandberg <koen@bergzand.net>
  */
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,5 +28,4 @@ extern "C" {
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */

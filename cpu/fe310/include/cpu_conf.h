@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_fe310
  * @{
@@ -16,8 +18,6 @@
  * @author          Ken Rabold
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 #include "vendor/platform.h"
@@ -46,5 +46,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

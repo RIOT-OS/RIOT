@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_lpc23xx
  * @{
@@ -16,8 +18,6 @@
  * @author          Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -252,5 +252,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

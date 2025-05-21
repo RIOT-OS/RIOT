@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup cpu_native  Native CPU
  * @ingroup  cpu
@@ -22,8 +24,6 @@
  * @brief Native CPU header
  * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
-#ifndef CPU_H
-#define CPU_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -60,5 +60,4 @@ __attribute__((always_inline)) static inline uintptr_t cpu_get_caller_pc(void)
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

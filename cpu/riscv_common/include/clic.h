@@ -5,6 +5,9 @@
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
+
+#pragma once
+
 /**
  * @ingroup         cpu_riscv_common
  * @{
@@ -18,8 +21,6 @@
  *
  * @author          Koen Zandberg <koen@bergzand.net>
  */
-#ifndef CLIC_H
-#define CLIC_H
 
 #include "cpu_conf.h"
 
@@ -93,5 +94,4 @@ void clic_isr_handler(uint32_t irq);
 }
 #endif
 
-#endif /* CLIC_H */
 /** @} */

@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /* please doxygen by hiding dangling references */
 #if defined(MODULE_PERIPH_MCG) || defined(MODULE_PERIPH_MCG_LITE) || defined(DOXYGEN)
 /**
@@ -120,8 +122,6 @@
  */
 #endif /* MODULE_PERIPH_MCG */
 
-#ifndef MCG_H
-#define MCG_H
 
 #include "periph_conf.h"
 
@@ -171,5 +171,4 @@ void kinetis_mcg_init(void);
 }
 #endif
 
-#endif /* MCG_H */
 /** @} */

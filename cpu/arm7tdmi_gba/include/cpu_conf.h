@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C"
@@ -90,5 +89,3 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CPU_CONF_H */

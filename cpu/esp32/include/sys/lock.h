@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -19,8 +21,6 @@
  * even if retargetable locking is enabled in newlib.
  */
 
-#ifndef SYS_LOCK_H
-#define SYS_LOCK_H
 
 #ifndef DOXYGEN
 
@@ -59,5 +59,4 @@ void _lock_release_recursive(_lock_t *lock);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYS_LOCK_H */
 /** @} */

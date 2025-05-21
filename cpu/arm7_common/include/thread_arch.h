@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_arm7_common
  * @{
@@ -17,8 +19,6 @@
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Heiko Will <heiko.will@fu-berlin.de>
  */
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
 
 #include "irq.h"
 
@@ -46,5 +46,4 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */

@@ -1,5 +1,5 @@
-#ifndef ATMEGA_PCINT_H
-#define ATMEGA_PCINT_H
+#pragma once
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,5 +11,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ATMEGA_PCINT_H */

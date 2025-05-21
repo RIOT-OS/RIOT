@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_rpx0xx
  * @{
@@ -17,8 +19,6 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "cpu.h"
 #include "vendor/RP2040.h"
@@ -816,5 +816,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

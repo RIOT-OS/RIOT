@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_GPIO_H
-#define PERIPH_CPU_GPIO_H
 
 #include <stdint.h>
 #include "cpu.h"
@@ -226,5 +226,4 @@ void gpio_init_analog(gpio_t pin);
 }
 #endif
 
-#endif /* PERIPH_CPU_GPIO_H */
 /** @} */

@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_TASK_H
-#define FREERTOS_TASK_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -104,4 +103,3 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_TASK_H */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_PWM_H
-#define PERIPH_CPU_PWM_H
 
 #include <stdint.h>
 
@@ -71,5 +71,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_PWM_H */
 /** @} */

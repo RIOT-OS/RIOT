@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_msp430_f2xx_g2xx
  * @{
@@ -20,8 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef F2XX_G2XX_MSP430_REGS_H
-#define F2XX_G2XX_MSP430_REGS_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -207,5 +207,4 @@ extern msp430_usci_b_t USCI_B1;
 }
 #endif
 
-#endif /* F2XX_G2XX_MSP430_REGS_H */
 /** @} */

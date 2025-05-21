@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cortexm_common
  * @{
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -129,5 +129,4 @@ bool irq_is_in(void)
 }
 #endif
 
-#endif /* IRQ_ARCH_H */
 /** @} */

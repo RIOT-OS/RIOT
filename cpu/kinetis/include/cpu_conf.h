@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_kinetis
  * @{
@@ -16,8 +18,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 /* This is needed to homogenize the symbolic IRQ names across different versions
  * of the vendor headers. These must be defined before any vendor headers are
@@ -72,5 +72,4 @@ extern "C"
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

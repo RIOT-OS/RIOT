@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef PERIPH_CPU_I2C_H
-#define PERIPH_CPU_I2C_H
 
 #include <stdint.h>
 
@@ -179,5 +179,4 @@ static const i2c_timing_param_t timing_params[] = {
 }
 #endif
 
-#endif /* PERIPH_CPU_I2C_H */
 /** @} */

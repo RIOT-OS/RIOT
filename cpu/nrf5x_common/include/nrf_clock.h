@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_nrf5x_common
  * @{
@@ -16,8 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NRF_CLOCK_H
-#define NRF_CLOCK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,5 +69,4 @@ void clock_stop_lf(void);
 }
 #endif
 
-#endif /* NRF_CLOCK_H */
 /** @} */

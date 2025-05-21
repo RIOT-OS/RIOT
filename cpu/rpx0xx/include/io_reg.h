@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_rpx0xx
  * @{
@@ -24,8 +26,6 @@
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-#ifndef IO_REG_H
-#define IO_REG_H
 
 #include <stdint.h>
 
@@ -134,5 +134,4 @@ static inline void io_reg_write_dont_corrupt(volatile uint32_t *reg, uint32_t va
 }
 #endif
 
-#endif /* IO_REG_H */
 /** @} */

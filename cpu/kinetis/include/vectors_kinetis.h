@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_kinetis
  * @{
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef VECTORS_KINETIS_H
-#define VECTORS_KINETIS_H
 
 #include <stdint.h>
 #include "vectors_cortexm.h"
@@ -178,5 +178,3 @@ void isr_wdog_ewm(void);     /**< WDOG interrupt handler */
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
-#endif /* VECTORS_KINETIS_H */

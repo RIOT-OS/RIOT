@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @brief       Common implementations and headers for AVR-8 family based micro-controllers
@@ -29,8 +31,6 @@
  *
  */
 
-#ifndef CPU_H
-#define CPU_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -181,5 +181,4 @@ void avr8_reset_cause(void);
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_atxmega
  * @brief       Non Volatile Memory (NVM) internal API
@@ -15,8 +17,6 @@
  *
  */
 
-#ifndef CPU_NVM_H
-#define CPU_NVM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +61,4 @@ uint8_t nvm_read_production_signature_row(uint8_t address);
 }
 #endif
 
-#endif /* CPU_NVM_H */
 /** @} */

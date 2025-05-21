@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32_esp_idf_api
  * @{
@@ -17,8 +19,6 @@
  * @}
  */
 
-#ifndef ESP_IDF_API_GPIO_H
-#define ESP_IDF_API_GPIO_H
 
 #include "esp_err.h"
 #include "hal/gpio_types.h"
@@ -63,4 +63,3 @@ esp_err_t esp_idf_rtc_gpio_pulldown_dis(gpio_num_t gpio_num);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ESP_IDF_API_GPIO_H */

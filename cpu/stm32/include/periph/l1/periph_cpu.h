@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,8 +20,6 @@
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
 
-#ifndef PERIPH_L1_PERIPH_CPU_H
-#define PERIPH_L1_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,5 +73,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_L1_PERIPH_CPU_H */
 /** @} */

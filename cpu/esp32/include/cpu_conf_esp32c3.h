@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @ingroup     config
@@ -18,8 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef CPU_CONF_ESP32C3_H
-#define CPU_CONF_ESP32C3_H
 
 #ifndef ESP_ISR_STACKSIZE
 /** Stack size used in interrupt context */
@@ -37,5 +37,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_ESP32C3_H */
 /** @} */

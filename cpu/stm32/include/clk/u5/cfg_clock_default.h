@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_stm32
  * @{
@@ -16,8 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef CLK_U5_CFG_CLOCK_DEFAULT_H
-#define CLK_U5_CFG_CLOCK_DEFAULT_H
 
 #include "cfg_clock_common_lx_u5_wx.h"
 #include "kernel_defines.h"
@@ -130,5 +130,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_U5_CFG_CLOCK_DEFAULT_H */
 /** @} */

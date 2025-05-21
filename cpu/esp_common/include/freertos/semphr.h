@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_SEMPHR_H
-#define FREERTOS_SEMPHR_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -81,4 +80,3 @@ void vPortCPUReleaseMutex (portMUX_TYPE *mux);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_SEMPHR_H */

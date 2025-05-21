@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common_esp_now
  * @{
@@ -17,8 +19,6 @@
  * @author      Timo Rothenpieler <timo.rothenpieler@uni-bremen.de>
  */
 
-#ifndef ESP_NOW_NETDEV_H
-#define ESP_NOW_NETDEV_H
 
 #include "net/netdev.h"
 #include "mutex.h"
@@ -122,5 +122,4 @@ int esp_now_set_channel(uint8_t channel);
 }
 #endif
 
-#endif /* ESP_NOW_NETDEV_H */
 /** @} */

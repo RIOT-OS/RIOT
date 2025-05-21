@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @{
@@ -17,8 +19,6 @@
  *
  */
 
-#ifndef STATES_INTERNAL_H
-#define STATES_INTERNAL_H
 
 #include <avr/io.h>
 
@@ -109,5 +109,4 @@ extern uint8_t avr8_state_irq_count_sram;               /**< IRQ state variable.
 }
 #endif
 
-#endif /* STATES_INTERNAL_H */
 /** @} */

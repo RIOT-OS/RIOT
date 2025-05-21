@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cortexm_common
  *
@@ -16,8 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef ATOMIC_UTILS_ARCH_H
-#define ATOMIC_UTILS_ARCH_H
 #ifndef DOXYGEN
 
 #include "bit.h"
@@ -188,5 +188,4 @@ static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */

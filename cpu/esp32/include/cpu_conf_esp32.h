@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @ingroup     config
@@ -18,8 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef CPU_CONF_ESP32_H
-#define CPU_CONF_ESP32_H
 
 /** Number of DRAM sections that can be used as heap. */
 #define NUM_HEAPS (4)
@@ -32,5 +32,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_ESP32_H */
 /** @} */

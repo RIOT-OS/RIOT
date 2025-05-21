@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_QUEUE_H
-#define FREERTOS_QUEUE_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -123,4 +122,3 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue );
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_QUEUE_H */

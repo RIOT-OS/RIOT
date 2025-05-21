@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_cc2538_sysctrl CC2538 System Control
  * @ingroup         cpu_cc2538_regs
@@ -17,8 +19,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  */
 
-#ifndef CC2538_SYS_CTRL_H
-#define CC2538_SYS_CTRL_H
 
 #include "cc2538.h"
 
@@ -160,6 +160,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_SYS_CTRL_H */
 
 /** @} */

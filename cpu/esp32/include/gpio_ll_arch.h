@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @ingroup     drivers_periph_gpio_ll
@@ -18,8 +20,6 @@
  * @}
  */
 
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
 
 #include "gpio_arch.h"
 #include "irq.h"
@@ -159,5 +159,3 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* GPIO_LL_ARCH_H */

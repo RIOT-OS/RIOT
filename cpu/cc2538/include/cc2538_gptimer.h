@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_cc2538_gptimer CC2538 General Purpose Timer
  * @ingroup         cpu_cc2538_regs
@@ -19,8 +21,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  */
 
-#ifndef CC2538_GPTIMER_H
-#define CC2538_GPTIMER_H
 
 #include <stdint.h>
 
@@ -88,5 +88,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_GPTIMER_H */
 /** @} */
