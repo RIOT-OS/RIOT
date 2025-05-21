@@ -27,7 +27,7 @@ typedef void* QueueHandle_t;
  * In FreeRTOS different types of semaphores, mutexes and queues are all
  * mapped to a single generic queue type. With all these different types,
  * single functions for send, receive, give and take are then used. To be
- * able to dsitinguish between these different types in RIOT, we need typed
+ * able to distinguish between these different types in RIOT, we need typed
  * objects.
  */
 typedef struct {
