@@ -22,7 +22,6 @@
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
-
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus

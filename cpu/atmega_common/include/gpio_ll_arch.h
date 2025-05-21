@@ -22,7 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <assert.h>
 
 #include "cpu.h"

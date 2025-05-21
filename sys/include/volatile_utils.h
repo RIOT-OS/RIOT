@@ -27,7 +27,6 @@
  * @warning     In most cases using this over @ref sys_atomic_utils is a bug!
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

@@ -20,7 +20,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "isl29125.h"
 

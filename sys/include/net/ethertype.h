@@ -24,7 +24,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

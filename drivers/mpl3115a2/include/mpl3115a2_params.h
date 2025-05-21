@@ -18,7 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "mpl3115a2.h"

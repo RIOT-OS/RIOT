@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include "irq_arch_common.h"
 
 #ifdef __cplusplus

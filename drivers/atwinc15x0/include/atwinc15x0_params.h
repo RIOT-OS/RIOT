@@ -18,7 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "board.h"
 
 #ifdef __cplusplus

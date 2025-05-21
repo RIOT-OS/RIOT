@@ -31,7 +31,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -112,6 +111,5 @@ void matstat_merge(matstat_state_t *dest, const matstat_state_t *src);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

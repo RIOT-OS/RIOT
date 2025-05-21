@@ -25,7 +25,6 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
-
 #if defined(MODULE_AT_URC)
 static int _check_urc(clist_node_t *node, void *arg);
 #endif

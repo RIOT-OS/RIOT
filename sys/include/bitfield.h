@@ -28,7 +28,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>

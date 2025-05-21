@@ -19,7 +19,6 @@
  * @author      Timo Rothenpieler <timo.rothenpieler@uni-bremen.de>
  */
 
-
 #include "net/netdev.h"
 #include "mutex.h"
 #include "net/ethernet/hdr.h"

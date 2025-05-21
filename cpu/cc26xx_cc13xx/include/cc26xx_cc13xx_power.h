@@ -18,7 +18,6 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-
 #include <cc26xx_cc13xx.h>
 #include <stdbool.h>
 

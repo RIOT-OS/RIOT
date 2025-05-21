@@ -21,7 +21,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdint.h>
 #include <stddef.h>
 #include "periph/usbdev.h"

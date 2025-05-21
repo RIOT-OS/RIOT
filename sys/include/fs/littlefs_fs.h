@@ -21,14 +21,12 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include <stdalign.h>
 
 #include "vfs.h"
 #include "lfs.h"
 #include "mtd.h"
 #include "mutex.h"
-
 
 #ifdef __cplusplus
 extern "C" {

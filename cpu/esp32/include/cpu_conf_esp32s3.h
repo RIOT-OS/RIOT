@@ -20,7 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #ifndef ESP_ISR_STACKSIZE
 /** Stack size used in interrupt context */
 #define ESP_ISR_STACKSIZE               (THREAD_STACKSIZE_DEFAULT)

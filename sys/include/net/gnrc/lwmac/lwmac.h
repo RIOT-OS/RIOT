@@ -74,7 +74,6 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus

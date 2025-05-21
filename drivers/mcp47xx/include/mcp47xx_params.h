@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "mcp47xx.h"
 #include "saul_reg.h"

@@ -17,7 +17,6 @@
  * @brief           CC26x2, CC13x2 AUX register definitions
  */
 
-
 #include <stdbool.h>
 
 #include "cc26xx_cc13xx.h"
@@ -476,6 +475,5 @@ typedef struct {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
 
 /** @}*/

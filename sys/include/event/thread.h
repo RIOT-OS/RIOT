@@ -52,7 +52,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <stddef.h>
 
 #include "event.h"

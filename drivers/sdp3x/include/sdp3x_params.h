@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include "board.h"
 #include "sdp3x.h"
 #include "saul_reg.h"

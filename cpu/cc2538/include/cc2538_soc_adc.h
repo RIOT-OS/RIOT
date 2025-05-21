@@ -21,7 +21,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "cc2538.h"
 
 #ifdef __cplusplus
@@ -46,6 +45,5 @@ typedef struct {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
 
 /** @} */

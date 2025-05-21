@@ -19,7 +19,6 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "cpu.h"
 #include "vendor/RP2040.h"
 #include "io_reg.h"

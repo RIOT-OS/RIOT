@@ -20,7 +20,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "cpu_conf_common.h"
 
 #include "vendor/LPC17xx.h"

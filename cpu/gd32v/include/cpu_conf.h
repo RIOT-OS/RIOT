@@ -21,7 +21,6 @@
 #include "vendor/gd32vf103_core.h"
 #include "cpu_conf_common.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

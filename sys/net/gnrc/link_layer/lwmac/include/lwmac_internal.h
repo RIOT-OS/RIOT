@@ -20,7 +20,6 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-
 #include <stdint.h>
 
 #include "periph/rtt.h"

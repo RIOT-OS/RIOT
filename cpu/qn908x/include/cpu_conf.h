@@ -18,7 +18,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-
 #include "cpu_conf_common.h"
 
 #include "vendor/QN908XC.h"

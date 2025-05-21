@@ -46,7 +46,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <stdio.h>
 #include <string.h>
 

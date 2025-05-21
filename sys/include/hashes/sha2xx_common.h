@@ -48,7 +48,6 @@
  * @author      Peter Kietzmann
  */
 
-
 #include <string.h>
 #include <stdint.h>
 

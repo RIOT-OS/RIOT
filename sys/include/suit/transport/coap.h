@@ -24,7 +24,6 @@
  *
  */
 
-
 #include "net/nanocoap.h"
 #include "suit/transport/worker.h"
 

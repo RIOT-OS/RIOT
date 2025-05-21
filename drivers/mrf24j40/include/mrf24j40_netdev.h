@@ -20,7 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus

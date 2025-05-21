@@ -34,7 +34,6 @@
  * @brief       Common interface to the software PRNG
  */
 
-
 #include <inttypes.h>
 #include <stddef.h>
 

@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "mma7660.h"

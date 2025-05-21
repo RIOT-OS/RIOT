@@ -24,7 +24,6 @@
  * @author      Jana Eisoldt <jana.eisoldt@ovgu.de>
  */
 
-
 #include "ztimer.h"
 
 #ifdef __cplusplus

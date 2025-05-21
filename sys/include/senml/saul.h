@@ -24,7 +24,6 @@
  * @author      Silke Hofstra <silke@slxh.eu>
  */
 
-
 #include <stdint.h>
 #include "nanocbor/nanocbor.h"
 #include "saul_reg.h"

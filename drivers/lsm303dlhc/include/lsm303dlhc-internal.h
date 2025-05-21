@@ -19,7 +19,6 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

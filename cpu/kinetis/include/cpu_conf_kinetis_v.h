@@ -20,7 +20,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #if (KINETIS_FAMILY == 2)
 #if (KINETIS_SUBFAMILY == 2)
 /* Put your vendor includes here */

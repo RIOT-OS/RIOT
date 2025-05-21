@@ -24,7 +24,6 @@
 
 #include "irq_arch.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

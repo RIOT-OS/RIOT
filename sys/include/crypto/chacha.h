@@ -33,7 +33,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include <stddef.h>
 
@@ -138,7 +137,6 @@ uint32_t chacha_prng_next(void);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

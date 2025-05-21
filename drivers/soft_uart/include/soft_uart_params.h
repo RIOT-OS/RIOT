@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "board.h"
 #include "soft_uart.h"
 #include "macros/units.h"

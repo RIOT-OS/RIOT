@@ -18,7 +18,6 @@
  * @author      Frits Kuipers <frits.kuipers@gmail.com>
  */
 
-
 #include "board.h"
 #include "ds18.h"
 #include "saul_reg.h"

@@ -24,7 +24,6 @@
  * @author      Silke Hofstra <silke@slxh.eu>
  */
 
-
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>

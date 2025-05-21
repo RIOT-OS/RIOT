@@ -25,7 +25,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus

@@ -19,7 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "stdio_base.h"
 
 #ifdef __cplusplus

@@ -24,7 +24,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include "clist.h"
 #include "vfs.h"
 
@@ -88,6 +87,5 @@ int devfs_unregister(devfs_t *node);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

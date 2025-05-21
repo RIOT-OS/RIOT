@@ -63,7 +63,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <stdint.h>
 
 #include "irq.h"

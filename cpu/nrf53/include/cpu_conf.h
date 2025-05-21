@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifdef CPU_MODEL_NRF5340_APP
 #include "vendor/nrf5340_application.h"
 #include "vendor/nrf5340_application_bitfields.h"

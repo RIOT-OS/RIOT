@@ -18,7 +18,6 @@
  * @author      Igor Knippenberg <igor.knippenberg@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -105,7 +105,6 @@ typedef uintptr_t gpio_port_t;
 #  define GPIO_PORT_NUMBERING_ALPHABETIC    implementation_specific
 #endif
 
-
 #ifdef DOXYGEN
 /**
  * @brief   Get the @ref gpio_port_t value of the port labeled 0.

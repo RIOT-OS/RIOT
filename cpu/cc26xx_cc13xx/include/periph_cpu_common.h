@@ -18,7 +18,6 @@
  * @author          Leon M. George <leon@georgemail.de>
  */
 
-
 #include "cpu.h"
 
 #ifdef __cplusplus

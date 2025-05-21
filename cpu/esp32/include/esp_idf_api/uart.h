@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #ifndef DOXYGEN     /* Hide implementation details from doxygen */
 
 #ifdef __cplusplus

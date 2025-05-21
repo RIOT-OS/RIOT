@@ -22,7 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "container.h"
 #include "periph/gpio.h"
 

@@ -18,7 +18,6 @@
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
 
-
 #include "bhp.h"
 #include <event.h>
 

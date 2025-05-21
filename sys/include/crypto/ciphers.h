@@ -21,7 +21,6 @@
  * @author      Mark Essien <markessien@gmail.com>
  */
 
-
 #include <stdint.h>
 #include "modules.h"
 

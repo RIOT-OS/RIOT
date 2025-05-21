@@ -19,7 +19,6 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-
 #include <stddef.h>
 #include <inttypes.h>
 

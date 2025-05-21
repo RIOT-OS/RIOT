@@ -64,7 +64,6 @@ extern "C" {
 #define ARDUINO_PIN_LAST        28
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif

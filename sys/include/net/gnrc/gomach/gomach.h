@@ -41,7 +41,6 @@
  * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  */
 
-
 #include "periph/rtt.h"
 #include "net/gnrc/netif.h"
 

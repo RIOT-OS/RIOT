@@ -23,7 +23,6 @@
  * @{
  */
 
-
 #include <stdint.h>
 
 #include "cc2538.h"
@@ -343,7 +342,6 @@ typedef struct {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
 
 /** @} */
 /** @} */

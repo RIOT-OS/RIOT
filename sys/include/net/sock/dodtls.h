@@ -31,7 +31,6 @@
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
 
-
 #include "net/sock/dtls.h"
 #include "net/sock/udp.h"
 

@@ -20,7 +20,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

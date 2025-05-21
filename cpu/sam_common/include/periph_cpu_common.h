@@ -19,7 +19,6 @@
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #include "cpu.h"
 
 #ifdef __cplusplus

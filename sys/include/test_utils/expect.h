@@ -24,7 +24,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <stdio.h>
 #include "compiler_hints.h"
 #include "panic.h"

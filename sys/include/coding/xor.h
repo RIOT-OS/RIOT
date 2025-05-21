@@ -26,7 +26,6 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <stddef.h>
 #include <stdint.h>
 

@@ -34,7 +34,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-
 #include <sys/types.h>
 
 #include "mutex.h"

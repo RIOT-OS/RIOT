@@ -29,7 +29,6 @@
  * @author      János Brodbeck <janos.brodbeck@ml-pa.com>
  */
 
-
 #include <stdint.h>
 
 #include "dtls.h"

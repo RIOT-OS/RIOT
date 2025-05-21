@@ -23,7 +23,6 @@
  *
  */
 
-
 #include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_NRF52832XXAA

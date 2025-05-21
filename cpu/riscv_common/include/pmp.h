@@ -21,7 +21,6 @@
  * @author          Bennet Blischke
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 

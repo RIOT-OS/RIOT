@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #ifndef DOXYGEN
 
 #include <stdint.h>

@@ -31,7 +31,6 @@
  * backward compatibility.
  */
 
-
 #include "lcd.h"
 #include "st77xx.h"
 

@@ -40,7 +40,6 @@
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include "modules.h"
 

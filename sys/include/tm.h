@@ -16,7 +16,6 @@
  * @brief       Utility library for `struct tm`.
  */
 
-
 #include <time.h>
 #include <sys/time.h>
 #include <stdint.h>

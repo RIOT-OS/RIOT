@@ -20,7 +20,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include <stdint.h>
 #include <stdio.h>
 

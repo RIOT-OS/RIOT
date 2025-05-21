@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #include <errno.h>
 
 #ifdef __cplusplus
@@ -214,7 +213,6 @@ int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

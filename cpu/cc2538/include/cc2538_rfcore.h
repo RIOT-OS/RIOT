@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "cc2538.h"
 
 #ifdef __cplusplus

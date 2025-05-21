@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "l3gxxxx.h"
 #include "saul_reg.h"

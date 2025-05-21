@@ -15,7 +15,6 @@
  * @author      Jan Mohr <jan.mohr@ml-pa.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

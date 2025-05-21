@@ -18,7 +18,6 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <stdalign.h>
 #include <stdint.h>
 #include "periph_cpu.h"

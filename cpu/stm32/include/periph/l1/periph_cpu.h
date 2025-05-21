@@ -20,7 +20,6 @@
  * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

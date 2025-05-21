@@ -19,7 +19,6 @@
  * @author      Aaron Sowry <aaron@mutex.nz>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

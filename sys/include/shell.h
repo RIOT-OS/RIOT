@@ -46,7 +46,6 @@
  * @brief       Shell interface definition
  */
 
-
 #include <stdint.h>
 #include "periph/pm.h"
 

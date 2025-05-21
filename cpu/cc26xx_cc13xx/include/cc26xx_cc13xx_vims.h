@@ -16,7 +16,6 @@
  * @brief           CC26xx/CC13xx VIMS register definitions
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -20,7 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "suit.h"
 #include "riotboot/flashwrite.h"
 

@@ -489,7 +489,6 @@ static int set_extended_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
     *fle_ram_address_f1 |= (fr2 & CAN_EFF_MASK)                     /* Filter mask */
                            | FDCAN_SRAM_FLE_F1_EFT_CLASSIC;         /* Set classic filter type */
 
-
     DEBUG("%s: FDCAN%u extended filter %u F0 value is %lx\n",
           __func__, get_channel_id(can),
           filter_id,

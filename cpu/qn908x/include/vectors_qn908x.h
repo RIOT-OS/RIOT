@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include <stdint.h>
 #include "vectors_cortexm.h"
 

@@ -18,7 +18,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 

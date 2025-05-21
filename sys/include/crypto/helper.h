@@ -19,7 +19,6 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-
 #include <stddef.h>
 #include <stdint.h>
 

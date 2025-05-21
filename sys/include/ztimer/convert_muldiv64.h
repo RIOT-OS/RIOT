@@ -48,7 +48,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include "ztimer.h"
 #include "ztimer/convert.h"
 

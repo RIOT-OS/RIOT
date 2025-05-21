@@ -26,7 +26,6 @@
  * `num_payloads` must be provided.
  */
 
-
 #include "suit.h"
 
 #ifdef __cplusplus

@@ -38,7 +38,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #ifdef __cplusplus
 extern "C"
 {

@@ -22,7 +22,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "cfg_clock_common_fx_gx_mp1_c0.h"
 #include "kernel_defines.h"
 #include "macros/units.h"

@@ -43,7 +43,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -149,6 +148,5 @@ void spiffs_unlock(struct spiffs_t *fs);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

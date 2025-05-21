@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include "gpio_arch_common.h"
 
 #ifndef DOXYGEN

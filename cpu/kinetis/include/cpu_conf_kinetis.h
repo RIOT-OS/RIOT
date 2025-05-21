@@ -18,7 +18,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include "cpu_conf_common.h"
 
 #if (__CORTEX_M < 3)

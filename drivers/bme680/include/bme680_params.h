@@ -20,7 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "board.h"
 #include "bme680.h"
 #include "saul_reg.h"

@@ -18,7 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "cfg_clock_common_lx_u5_wx.h"
 #include "kernel_defines.h"
 #include "macros/units.h"

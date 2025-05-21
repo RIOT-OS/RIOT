@@ -24,7 +24,6 @@
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
-
 #include "cpu.h"
 
 #ifdef __cplusplus

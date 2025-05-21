@@ -19,7 +19,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

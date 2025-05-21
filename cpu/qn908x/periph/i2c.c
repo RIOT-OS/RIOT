@@ -234,7 +234,6 @@ static uint32_t _i2c_stop(I2C_Type *i2c_dev)
     return status;
 }
 
-
 static int _i2c_transfer_blocking(i2c_t dev, uint32_t addr_dir, uint8_t *data,
                                   size_t len, uint8_t flags)
 {

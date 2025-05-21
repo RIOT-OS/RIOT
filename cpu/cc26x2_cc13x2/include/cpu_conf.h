@@ -20,7 +20,6 @@
  *
  */
 
-
 #ifndef SET_MODE_CONF_1_ALT_DCDC_IPEAK
 #define SET_MODE_CONF_1_ALT_DCDC_IPEAK 0x2 /**< 12 mA */
 #endif

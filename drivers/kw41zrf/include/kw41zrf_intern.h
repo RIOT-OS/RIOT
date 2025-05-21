@@ -19,7 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdint.h>
 #include "kw41zrf.h"
 /* For XCVSEQ_IDLE */

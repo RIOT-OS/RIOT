@@ -22,7 +22,6 @@
  * @author          Anton Gerasimov <anton.gerasimov@here.com>
  */
 
-
 #if defined(KINETIS_CORE_Z)
 #if (KINETIS_ROMSIZE == 128)
 /* Kinetis KEAZ128 */

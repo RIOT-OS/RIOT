@@ -16,7 +16,6 @@
  * @brief           CC26x2/CC13x2 Device setup functions
  */
 
-
 #include <cc26xx_cc13xx.h>
 
 #ifdef __cplusplus

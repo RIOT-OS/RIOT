@@ -18,7 +18,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-
 #include <stdint.h>
 
 #include "sched.h"

@@ -20,7 +20,6 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>

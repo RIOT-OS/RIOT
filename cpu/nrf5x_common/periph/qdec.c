@@ -27,7 +27,6 @@
 
 #ifdef QDEC_NUMOF
 
-
 /**
  * @brief   Interrupt context for each configured qdec
  */

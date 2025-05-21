@@ -18,7 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "kernel_defines.h"
 #include "board.h"
 #include "stmpe811.h"

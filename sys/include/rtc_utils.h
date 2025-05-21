@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>

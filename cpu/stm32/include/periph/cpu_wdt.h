@@ -20,7 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include "timex.h"
 #include "periph/cpu_common.h"
 

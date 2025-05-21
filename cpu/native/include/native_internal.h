@@ -146,7 +146,6 @@ void _native_call_sig_handlers_and_switch(void);
 extern void _native_sig_leave_tramp(void);
 /** @} */
 
-
 /* MARK: - System Calls */
 /**
  * @name System Calls

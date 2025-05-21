@@ -18,7 +18,6 @@
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
 */
 
-
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/pio.h"

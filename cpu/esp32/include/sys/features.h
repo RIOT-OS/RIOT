@@ -21,7 +21,6 @@
  * lead to compilation problems with newer GCC/newlib versions, see below.
  */
 
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus

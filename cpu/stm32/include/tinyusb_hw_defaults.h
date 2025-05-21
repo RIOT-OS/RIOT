@@ -33,7 +33,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "periph_conf.h"
 
 #if !DOXYGEN

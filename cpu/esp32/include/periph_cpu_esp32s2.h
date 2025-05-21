@@ -18,7 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "sdkconfig.h"
 
 #ifdef __cplusplus
@@ -269,7 +268,6 @@ extern "C" {
  */
 #define USBDEV_NUM_ENDPOINTS            DWC2_USB_OTG_FS_NUM_EP
 /** @} */
-
 
 #ifdef __cplusplus
 }

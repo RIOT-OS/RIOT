@@ -21,7 +21,6 @@
 #include "stmclk.h"
 #include "periph_conf.h"
 
-
 #define RCC_CFGR1_SW_MSI            (0x00000000U)
 #define RCC_CFGR1_SW_HSI            (RCC_CFGR1_SW_0)
 #define RCC_CFGR1_SW_HSE            (RCC_CFGR1_SW_1)

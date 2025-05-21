@@ -20,7 +20,6 @@
  * @author          Aurelien Gonce <aurelien.gonce@altran.fr>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

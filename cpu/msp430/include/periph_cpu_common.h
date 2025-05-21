@@ -18,7 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdbool.h>
 
 #include "bitarithm.h"
@@ -438,7 +437,6 @@ extern REG16 TIMER_B_IRQFLAGS;
  */
 extern msp430_timer_t TIMER_B;
 /** @} */
-
 
 /**
  * @brief   Initialize the basic clock system to provide the main clock,

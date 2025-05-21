@@ -22,7 +22,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 
 #include "hashes/sha256.h"

@@ -36,7 +36,6 @@
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 
-
 #include "cpu.h"
 #include "periph_cpu.h"
 

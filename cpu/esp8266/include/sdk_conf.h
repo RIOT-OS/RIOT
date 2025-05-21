@@ -23,7 +23,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #ifndef DOXYGEN
 
 #include "board.h"

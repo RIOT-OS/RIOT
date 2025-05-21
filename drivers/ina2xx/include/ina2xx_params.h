@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "board.h"
 #include "ina2xx.h"
 #include "saul_reg.h"

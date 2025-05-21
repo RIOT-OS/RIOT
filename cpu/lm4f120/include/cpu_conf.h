@@ -20,7 +20,6 @@
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */
 
-
 #include "cpu_conf_common.h"
 
 #ifdef __cplusplus

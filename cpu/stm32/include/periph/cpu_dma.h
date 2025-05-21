@@ -21,7 +21,6 @@
  * @author          Joshua DeWeese <jdeweese@primecontrols.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

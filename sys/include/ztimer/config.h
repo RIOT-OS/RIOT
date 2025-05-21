@@ -19,7 +19,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include "board.h"
 #include "periph_conf.h"
 

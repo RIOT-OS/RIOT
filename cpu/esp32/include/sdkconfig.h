@@ -21,7 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 /*
  * Some files in ESP-IDF use functions from `stdlib.h` without including the
  * header. To avoid having to patch all these files, `stdlib.h` is included

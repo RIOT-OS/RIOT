@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -894,7 +893,6 @@ psa_status_t psa_asymmetric_decrypt(psa_key_id_t key,
                                     size_t output_size,
                                     size_t *output_length);
 #endif /* MODULE_PSA_ASYMMETRIC */
-
 
 #if IS_USED(MODULE_PSA_CIPHER) || defined(DOXYGEN)
 /**

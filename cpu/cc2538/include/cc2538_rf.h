@@ -21,7 +21,6 @@
  * @author      Ian Martin <ian@locicontrols.com>
  */
 
-
 #include <stdbool.h>
 
 #include "board.h"

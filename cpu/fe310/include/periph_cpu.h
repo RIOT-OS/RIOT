@@ -18,7 +18,6 @@
  * @author          Ken Rabold
  */
 
-
 #include <inttypes.h>
 
 #include "periph_cpu_common.h"

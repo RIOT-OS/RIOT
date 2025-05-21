@@ -34,7 +34,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw.hamburg.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

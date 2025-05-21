@@ -19,7 +19,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include <stdint.h>
 #include "assert.h"
 #include "net/tcp.h"

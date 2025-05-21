@@ -76,7 +76,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>

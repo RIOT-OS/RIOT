@@ -35,7 +35,6 @@
 #include "flash_utils.h"
 #include "modules.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

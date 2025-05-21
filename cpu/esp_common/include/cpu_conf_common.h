@@ -21,7 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 /**
  * @brief   Declare the heap_stats function as available
  *

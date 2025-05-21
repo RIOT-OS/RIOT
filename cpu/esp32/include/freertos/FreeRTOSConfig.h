@@ -21,7 +21,6 @@
 
 #include "sdkconfig.h"
 
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus

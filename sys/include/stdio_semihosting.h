@@ -58,7 +58,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "stdio_base.h"
 
 #ifdef __cplusplus

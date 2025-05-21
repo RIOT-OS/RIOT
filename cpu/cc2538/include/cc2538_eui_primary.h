@@ -18,7 +18,6 @@
  * @author          Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "net/eui64.h"
 
 #ifdef __cplusplus

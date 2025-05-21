@@ -18,7 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "board.h"
 #include "hts221.h"
 #include "hts221_regs.h"

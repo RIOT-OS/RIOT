@@ -18,7 +18,6 @@
  * @author      Wouter Symons <wsymons@nalys-group.com>
  */
 
-
 #include "board.h"
 #include "bh1900nux.h"
 

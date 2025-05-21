@@ -21,7 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus

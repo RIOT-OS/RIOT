@@ -20,7 +20,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "board.h"
 #include "si70xx.h"
 #include "saul_reg.h"

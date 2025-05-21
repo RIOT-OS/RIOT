@@ -65,7 +65,6 @@ psa_status_t example_cipher_aes_128(void)
     psa_set_key_bits(&attr, 128);
     psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
 
-
     psa_key_lifetime_t lifetime = PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION
                                       (PSA_KEY_LIFETIME_VOLATILE, PSA_ATCA_LOCATION_DEV0);
     psa_set_key_lifetime(&attr, lifetime);

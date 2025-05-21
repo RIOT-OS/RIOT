@@ -20,7 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include <stdint.h>
 
 #include "cpu.h"
@@ -132,7 +131,6 @@ typedef struct {
     uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
 } uart_conf_t;
-
 
 #ifdef __cplusplus
 }

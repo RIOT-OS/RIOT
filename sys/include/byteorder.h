@@ -18,7 +18,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-
 #include <string.h>
 #include <stdint.h>
 #include <endian.h>

@@ -19,7 +19,6 @@
  * @author          Anton Gerasimov <tossel@gmail.com>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

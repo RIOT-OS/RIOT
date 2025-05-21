@@ -20,7 +20,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

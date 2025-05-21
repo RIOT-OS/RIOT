@@ -19,7 +19,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include "vfs.h"
 
 #ifdef __cplusplus

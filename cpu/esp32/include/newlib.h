@@ -22,7 +22,6 @@
  * toolchains, ESP32x toolchains don't use different `newlib.h` versions.
  */
 
-
 #include "kernel_defines.h"
 
 #ifndef DOXYGEN

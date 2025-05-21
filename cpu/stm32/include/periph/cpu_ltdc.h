@@ -18,7 +18,6 @@
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include <stdint.h>
 
 #include "periph/cpu_gpio.h"

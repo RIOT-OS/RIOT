@@ -26,7 +26,6 @@
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

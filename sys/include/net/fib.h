@@ -26,7 +26,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-
 #include <stdint.h>
 
 #include "net/fib/table.h"

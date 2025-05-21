@@ -24,7 +24,6 @@
  *
  */
 
-
 #include <stdbool.h>
 #if MODULE_NANOCOAP
 #  include "net/nanocoap.h"

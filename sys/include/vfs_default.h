@@ -19,7 +19,6 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "board.h"
 #include "modules.h"
 #if IS_USED(MODULE_VFS) || DOXYGEN
@@ -82,6 +81,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

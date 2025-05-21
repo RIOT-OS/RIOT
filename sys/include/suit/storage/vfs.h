@@ -33,7 +33,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "suit.h"
 #include "../../sys/include/vfs.h"
 #include "vfs_default.h"

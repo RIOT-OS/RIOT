@@ -20,7 +20,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdint.h>
 #include <stdbool.h>
 

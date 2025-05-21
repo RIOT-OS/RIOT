@@ -19,7 +19,6 @@
  * @see     [The Open Group Base Specifications Issue 7: pthread.h - threads](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
  */
 
-
 #include <time.h>
 
 /**
@@ -57,7 +56,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

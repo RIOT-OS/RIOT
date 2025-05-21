@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include <stdbool.h>
 
 #include "gpio_arch_common.h"

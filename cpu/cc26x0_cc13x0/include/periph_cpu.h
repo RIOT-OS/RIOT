@@ -18,7 +18,6 @@
  * @author          Leon M. George <leon@georgemail.de>
  */
 
-
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus

@@ -22,7 +22,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "board.h"
 #include "lcd.h"
 #include "st7735_params.h"

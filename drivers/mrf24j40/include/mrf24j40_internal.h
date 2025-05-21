@@ -20,7 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdint.h>
 
 #include "mrf24j40.h"

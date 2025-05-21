@@ -22,7 +22,6 @@
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

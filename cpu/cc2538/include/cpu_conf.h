@@ -18,7 +18,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  */
 
-
 #include "kernel_defines.h"
 #include "cpu_conf_common.h"
 #include "cc2538.h"

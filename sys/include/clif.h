@@ -94,7 +94,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include <sys/types.h>
 
 #include "clif_internal.h"

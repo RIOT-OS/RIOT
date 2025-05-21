@@ -167,7 +167,6 @@ extern "C"
 #define TMP00X_CONFIG_CR_DEF       TMP00X_CONFIG_CR_AS4 /**< Default for Testing */
 /** @} */
 
-
 /**
  * @name    Constants for TMP00X calibration
  * @{

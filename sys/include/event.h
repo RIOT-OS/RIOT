@@ -95,7 +95,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>

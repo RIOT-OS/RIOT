@@ -19,7 +19,6 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  */
 
-
 #include "net/gnrc/rpl/structs.h"
 
 #ifdef __cplusplus

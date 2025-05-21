@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #ifndef DOXYGEN     /* Hide implementation details from doxygen */
 
 #ifdef __cplusplus
@@ -89,7 +88,6 @@ extern "C" {
             } while (0U)
 
 #endif
-
 
 #endif /* defined(RIOT_VERSION) */
 

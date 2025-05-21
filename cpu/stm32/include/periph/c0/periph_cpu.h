@@ -18,7 +18,6 @@
  * @author      Jason Parker <Jason.Parker@bissell.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

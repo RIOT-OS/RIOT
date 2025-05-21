@@ -17,7 +17,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -54,7 +53,6 @@ int pthread_setschedprio(pthread_t target_thread, int prio);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

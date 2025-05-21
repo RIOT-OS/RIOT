@@ -18,7 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "cpu_conf.h"
 
 #ifdef __cplusplus

@@ -20,7 +20,6 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-
 #include "kernel_defines.h"
 
 #include "cpu_conf_common.h"

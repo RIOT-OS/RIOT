@@ -20,7 +20,6 @@
  * @author          Marc Poulhiès <dkm@kataplop.net>
  */
 
-
 #include "cpu.h"
 
 #ifdef __cplusplus

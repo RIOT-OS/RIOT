@@ -93,7 +93,6 @@ static gcoap_listener_t _listener = {
     NULL
 };
 
-
 /* Adds link format params to resource list */
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context) {

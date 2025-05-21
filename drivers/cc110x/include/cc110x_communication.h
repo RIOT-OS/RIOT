@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "cc110x.h"

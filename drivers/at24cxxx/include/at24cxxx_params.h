@@ -18,7 +18,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include "board.h"
 #include "periph/gpio.h"
 #include "at24cxxx_defines.h"

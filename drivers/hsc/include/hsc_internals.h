@@ -19,7 +19,6 @@
  * @author      Quang Pham <phhr_quang@live.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

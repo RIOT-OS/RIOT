@@ -16,7 +16,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-
 #include <time.h>
 #include "mutex.h"
 #include "priority_queue.h"
@@ -146,7 +145,6 @@ int pthread_cond_broadcast(pthread_cond_t *cond);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

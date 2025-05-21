@@ -21,7 +21,6 @@
  * @author          Hauke Petersen <hauke.pertersen@fu-berlin.de>
 */
 
-
 #include <stdbool.h>
 
 #ifdef __cplusplus

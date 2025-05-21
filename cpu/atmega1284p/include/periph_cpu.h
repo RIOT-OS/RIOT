@@ -22,7 +22,6 @@
  * @author          Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus

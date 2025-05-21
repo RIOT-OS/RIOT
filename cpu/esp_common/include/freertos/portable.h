@@ -12,7 +12,6 @@
 
 /* Empty file, only required for source code compatibility */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

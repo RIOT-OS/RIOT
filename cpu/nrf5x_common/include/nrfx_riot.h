@@ -21,7 +21,6 @@
  * @author          Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "kernel_defines.h"
 #include "cpu_conf.h"
 #include "periph_conf.h"

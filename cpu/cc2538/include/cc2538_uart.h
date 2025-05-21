@@ -19,7 +19,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  */
 
-
 #include "cc2538.h"
 
 #ifdef __cplusplus

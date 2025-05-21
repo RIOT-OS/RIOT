@@ -19,7 +19,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-
 #include <stdlib.h>
 #include <stdbool.h>
 

@@ -17,7 +17,6 @@
  * @brief       System core clock utility functions
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include "periph_conf.h"

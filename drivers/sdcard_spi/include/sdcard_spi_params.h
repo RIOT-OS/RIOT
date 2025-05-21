@@ -18,7 +18,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-
 #include "board.h"
 
 #ifdef __cplusplus

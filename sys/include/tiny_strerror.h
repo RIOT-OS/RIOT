@@ -43,7 +43,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <errno.h>
 #include <string.h>
 

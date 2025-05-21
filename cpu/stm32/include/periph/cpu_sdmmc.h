@@ -18,7 +18,6 @@
  * @author          Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include <stdint.h>
 
 #include "periph/cpu_dma.h"

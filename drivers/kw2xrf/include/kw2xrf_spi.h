@@ -17,7 +17,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-
 #include <stdio.h>
 #include "board.h"
 #include "cpu.h"

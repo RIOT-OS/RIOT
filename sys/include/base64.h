@@ -19,7 +19,6 @@
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
 
-
 #include <stddef.h> /* for size_t */
 
 #ifdef __cplusplus

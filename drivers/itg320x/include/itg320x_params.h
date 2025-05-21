@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "itg320x.h"
 #include "saul_reg.h"

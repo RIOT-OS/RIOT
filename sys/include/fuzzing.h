@@ -21,7 +21,6 @@
  * @author      Sören Tempel <tempel@uni-bremen.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

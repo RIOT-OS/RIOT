@@ -19,7 +19,6 @@
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

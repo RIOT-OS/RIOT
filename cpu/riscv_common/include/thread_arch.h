@@ -19,7 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "irq.h"
 
 #ifdef __cplusplus

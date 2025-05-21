@@ -22,7 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 
 #include "msp430_regs_common.h"

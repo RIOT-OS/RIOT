@@ -23,7 +23,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include <stdint.h>
 
 #include "at86rf2xx.h"

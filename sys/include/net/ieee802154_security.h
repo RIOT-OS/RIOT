@@ -29,7 +29,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include <stdint.h>
 #include "ieee802154.h"
 #include "crypto/ciphers.h"

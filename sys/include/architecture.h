@@ -23,7 +23,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <stdint.h>
 #include <inttypes.h>
 #include <limits.h>

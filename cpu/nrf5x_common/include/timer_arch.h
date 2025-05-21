@@ -21,7 +21,6 @@
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

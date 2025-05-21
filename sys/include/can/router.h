@@ -19,7 +19,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

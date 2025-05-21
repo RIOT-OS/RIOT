@@ -19,7 +19,6 @@
  * @author      Dylan Laduranty <dylanladuranty@gmail.com>
  */
 
-
 #include <stdbool.h>
 
 #include "net/ethernet.h"

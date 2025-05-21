@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -232,7 +231,6 @@ int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksiz
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

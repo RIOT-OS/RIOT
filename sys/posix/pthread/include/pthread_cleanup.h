@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,7 +93,6 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

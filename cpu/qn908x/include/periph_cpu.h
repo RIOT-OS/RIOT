@@ -18,7 +18,6 @@
  * @author          iosabi <iosabi@protonmail.com>
  */
 
-
 #include <stdint.h>
 #include <stdbool.h>
 

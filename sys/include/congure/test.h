@@ -35,7 +35,6 @@
  * @author  Martine S Lenders <m.lenders@fu-berlin.de>
  */
 
-
 #include "congure_impl.h"
 
 #ifdef __cplusplus

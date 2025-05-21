@@ -21,7 +21,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -250,6 +249,5 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

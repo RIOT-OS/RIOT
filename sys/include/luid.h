@@ -52,7 +52,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stddef.h>
 
 #include "net/eui48.h"

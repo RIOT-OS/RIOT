@@ -18,7 +18,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #include "usb/dfu.h"
 #include "riotboot/flashwrite.h"
 

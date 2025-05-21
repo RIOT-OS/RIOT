@@ -23,7 +23,6 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-
 #include "at86rf2xx.h"
 
 #ifdef __cplusplus

@@ -19,7 +19,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus

@@ -19,7 +19,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "architecture.h"
 #include "periph_cpu.h"
 

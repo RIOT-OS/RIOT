@@ -19,7 +19,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-
 #include "cpu_conf_common.h"
 
 #include "em_device.h"

@@ -18,7 +18,6 @@
  * @author          Leon George <leon@georgemail.eu>
  */
 
-
 #include "cc26xx_cc13xx.h"
 
 #ifdef __cplusplus

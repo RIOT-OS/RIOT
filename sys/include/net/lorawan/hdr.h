@@ -21,7 +21,6 @@
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>

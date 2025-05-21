@@ -19,7 +19,6 @@
  *
  */
 
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <avr/pgmspace.h>
@@ -60,7 +59,6 @@ static inline char * flash_strncpy(char *ram, FLASH_ATTR const char *flash, size
 {
     return strncpy_P(ram, (const char *)flash, n);
 }
-
 
 static inline int flash_vprintf(FLASH_ATTR const char *flash, va_list args)
 {

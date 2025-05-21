@@ -20,7 +20,6 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

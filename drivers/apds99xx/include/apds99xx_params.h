@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "apds99xx.h"
 #include "saul_reg.h"

@@ -22,7 +22,6 @@
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

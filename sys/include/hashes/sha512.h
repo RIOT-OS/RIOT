@@ -20,7 +20,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -44,7 +43,6 @@ extern "C" {
  * @brief Context for cipher operations based on sha512
  */
 typedef sha512_common_context_t sha512_context_t;
-
 
 /**
  * @brief SHA-512 initialization.  Begins a SHA-512 operation.

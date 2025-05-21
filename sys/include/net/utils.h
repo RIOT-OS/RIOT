@@ -21,7 +21,6 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include <stddef.h>
 

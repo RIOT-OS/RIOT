@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "ccs811.h"
 #include "saul_reg.h"

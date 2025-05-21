@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #ifdef __cplusplus
 #include "arduino.hpp"
 #endif

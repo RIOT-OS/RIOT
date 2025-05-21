@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef ESP_IDF_CODE
 
 #include_next "driver/gpio.h"

@@ -18,7 +18,6 @@
  * @author          JP Bonn
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

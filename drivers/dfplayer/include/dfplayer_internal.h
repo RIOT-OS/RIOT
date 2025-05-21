@@ -17,7 +17,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <stdint.h>
 
 #include "dfplayer_types.h"

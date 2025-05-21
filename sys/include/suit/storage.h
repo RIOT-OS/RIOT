@@ -98,7 +98,6 @@
  * @warning This API is by design not thread safe
  */
 
-
 #include "suit.h"
 
 #ifdef __cplusplus

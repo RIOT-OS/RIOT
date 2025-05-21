@@ -39,7 +39,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "periph/rtt.h"
 
 #ifdef __cplusplus
