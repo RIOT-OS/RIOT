@@ -54,6 +54,9 @@ typedef enum {
  * @brief   Attenuation of 11 dB is depcricated and has to be mapped
  *
  * The define ensures the compatibility with older versions.
+ *
+ * @deprecated `ADC_ATTENUATION_11_DB` is deprecated, use
+ *             `ADC_ATTENUATION_12_DB` instead.
  */
 #define ADC_ATTENUATION_11_DB   ADC_ATTENUATION_12_DB
 
@@ -84,8 +87,8 @@ typedef enum {
  *
  * @param [in] line   ADC line for which the attenuation is set
  * @param [in] atten  Attenuation, see type definition of @ref adc_attenuation_t
- * @return  0    on success
- * @return  -1   on error
+ * @retval  0    on success
+ * @retval  -1   on error
  */
 int adc_set_attenuation(adc_t line, adc_atten_t atten);
 
@@ -109,8 +112,8 @@ int adc_set_attenuation(adc_t line, adc_atten_t atten);
  * @param [in]  line    ADC line
  * @param [in]  sample  sample sample as read by adc_read
  * @param [out] voltage voltage in mV
- * @return 0 on success
- * @return -EINVAL if the initialization of the calibration failed
+ * @retval 0 on success
+ * @retval -EINVAL if the initialization of the calibration failed
  */
 int adc_raw_to_voltage(adc_t line, int sample, int *voltage);
 
@@ -132,8 +135,8 @@ int adc_raw_to_voltage(adc_t line, int sample, int *voltage);
  * @param [in] line    ADC line for which Vref of its ADC unit is routed to the GPIO
  * @param [in] gpio    GPIO to which Vref is routed (ADC2 channel GPIOs only)
  *
- * @return  0       on success
- * @return  -1      on error
+ * @retval  0       on success
+ * @retval  -1      on error
  */
 __attribute__((__deprecated__))
 int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
@@ -147,8 +150,8 @@ int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
  * @warning The function is not supported any longer, use
  *          @ref adc_raw_to_voltage to get the voltage for a sample value.
  *
- * @return  0 on success
- * @return  -1 on invalid ADC line
+ * @retval  0 on success
+ * @retval  -1 on invalid ADC line
  */
 __attribute__((__deprecated__))
 static inline int adc_vref_to_gpio25(void)
