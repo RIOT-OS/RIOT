@@ -43,9 +43,9 @@ extern "C" {
  * SoCs, but we use interrupt 11 for the RMT peripheral on RISC-V-based ESP32x
  * SoCs. Interrupt 11 is reserved for profiling on Xtensa-based ESP32x SoCs. */
 #if defined(__XTENSA__)
-#define CPU_INUM_RMT             1  /**< Level interrupt with low priority 1 */
+#  define CPU_INUM_RMT           1  /**< Level interrupt with low priority 1 */
 #else
-#define CPU_INUM_RMT             11 /**< Level interrupt with low priority 1 */
+#  define CPU_INUM_RMT          11  /**< Level interrupt with low priority 1 */
 #endif
 #define CPU_INUM_GPIO            2  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_BLE             5  /**< Level interrupt with low priority 1 */
