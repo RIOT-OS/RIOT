@@ -512,7 +512,7 @@ void gpio_pm_sleep_enter(unsigned mode)
         rtc_gpio_isolate(GPIO_NUM_12);
 #endif
 #else
-    #error "ESP32x variant does not support hold feature in deep sleep";
+#  error "ESP32x variant does not support hold feature in deep sleep";
 #endif
 #endif
 
