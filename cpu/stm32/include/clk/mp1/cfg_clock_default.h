@@ -18,7 +18,6 @@
  * @author          Gilles DOFFE <gilles.doffe@savoirfairelinux.com>
 */
 
-
 #include "cfg_clock_common_fx_gx_mp1_c0.h"
 #include "kernel_defines.h"
 #include "macros/units.h"

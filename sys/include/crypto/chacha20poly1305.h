@@ -27,7 +27,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "crypto/poly1305.h"
 
 #ifdef __cplusplus

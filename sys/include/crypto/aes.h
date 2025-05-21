@@ -29,7 +29,6 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include "crypto/ciphers.h"
 

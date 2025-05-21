@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "board.h"
 
 #ifdef MODULE_SHIELD_W5100

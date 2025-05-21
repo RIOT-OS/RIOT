@@ -18,7 +18,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "board.h"
 #include "lcd.h"
 

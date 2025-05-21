@@ -18,7 +18,6 @@
  * @author      Michel Gerlach <michel.gerlach@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "dcf77.h"
 

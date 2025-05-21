@@ -19,7 +19,6 @@
  *          Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 
-
 #ifdef __cplusplus
 #include <atomic>
 using std::atomic_flag;
@@ -95,7 +94,6 @@ int pthread_spin_unlock(pthread_spinlock_t *lock);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

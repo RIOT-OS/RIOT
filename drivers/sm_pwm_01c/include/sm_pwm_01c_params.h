@@ -18,7 +18,6 @@
  *
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "sm_pwm_01c.h"

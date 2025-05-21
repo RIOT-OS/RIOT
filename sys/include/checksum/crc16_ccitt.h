@@ -31,7 +31,6 @@
  * @author      Bennet Blischke <bennet.blischke@haw-hamburg.de>
  */
 
-
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -185,6 +184,5 @@ uint16_t crc16_ccitt_aug_calc(const unsigned char *buf, size_t len);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

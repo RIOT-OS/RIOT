@@ -18,7 +18,6 @@
  * @author          Gerson Fernando Budke <nandojve@gmail.com>
  */
 
-
 #include <avr/io.h>
 
 #ifdef __cplusplus

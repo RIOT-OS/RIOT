@@ -18,7 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

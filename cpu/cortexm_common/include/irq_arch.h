@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdbool.h>
 #include <stdint.h>
 #include "cpu_conf.h"

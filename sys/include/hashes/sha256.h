@@ -46,7 +46,6 @@
  * @author      Hermann Lelong
  */
 
-
 #include <inttypes.h>
 #include <stddef.h>
 

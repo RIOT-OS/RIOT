@@ -22,7 +22,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "kernel_defines.h"
 #include "macros/units.h"
 

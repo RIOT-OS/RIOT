@@ -20,7 +20,6 @@
  * @author          Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include <inttypes.h>
 
 #include "cpu.h"

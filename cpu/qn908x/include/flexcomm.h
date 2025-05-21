@@ -24,7 +24,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-
 #include <stdint.h>
 #include "periph_cpu.h"
 

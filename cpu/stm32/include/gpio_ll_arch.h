@@ -21,7 +21,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include "architecture.h"
 #include "periph_cpu.h"
 

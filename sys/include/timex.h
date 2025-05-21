@@ -19,7 +19,6 @@
  * @brief       Utility library for comparing and computing timestamps
  */
 
-
 #include <stdint.h>
 #include <inttypes.h>
 #include "time_units.h"

@@ -25,7 +25,6 @@
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
-
 #include <stdbool.h>
 #include <errno.h>
 

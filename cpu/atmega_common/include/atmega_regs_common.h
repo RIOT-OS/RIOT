@@ -25,7 +25,6 @@
  *
  */
 
-
 #include <avr/io.h>
 #include <avr/power.h>
 

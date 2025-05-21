@@ -25,7 +25,6 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -182,6 +181,5 @@ typedef struct can_frame can_frame_t;
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

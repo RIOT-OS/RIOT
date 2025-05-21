@@ -20,7 +20,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus

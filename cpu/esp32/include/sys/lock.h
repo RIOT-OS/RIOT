@@ -21,7 +21,6 @@
  * even if retargetable locking is enabled in newlib.
  */
 
-
 #ifndef DOXYGEN
 
 #include <stdint.h>

@@ -18,7 +18,6 @@
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
 
-
 #ifdef __cplusplus
  extern "C" {
 #endif

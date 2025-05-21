@@ -19,7 +19,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include "timex.h"
 
 #ifdef __cplusplus

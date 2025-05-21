@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include <stdbool.h>
 
 #ifdef __cplusplus

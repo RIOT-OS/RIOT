@@ -19,7 +19,6 @@
  *
  */
 
-
 #include <avr/io.h>
 
 #ifdef __cplusplus

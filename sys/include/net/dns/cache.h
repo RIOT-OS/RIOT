@@ -32,7 +32,6 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <stdint.h>
 
 #include "modules.h"

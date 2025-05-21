@@ -20,7 +20,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #include <inttypes.h>
 
 #include "byteorder.h"

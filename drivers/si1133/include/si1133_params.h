@@ -18,7 +18,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-
 #include "board.h"
 #include "si1133.h"
 #include "saul_reg.h"

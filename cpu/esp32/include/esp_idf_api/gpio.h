@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include "esp_err.h"
 #include "hal/gpio_types.h"
 

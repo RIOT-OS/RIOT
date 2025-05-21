@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "hmc5883l.h"
 #include "saul_reg.h"

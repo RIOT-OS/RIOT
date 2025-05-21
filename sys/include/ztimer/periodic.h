@@ -69,7 +69,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <stdbool.h>
 #include <stdint.h>
 

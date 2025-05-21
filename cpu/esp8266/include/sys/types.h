@@ -39,7 +39,6 @@
    doesn't have a stat, and the necv70 doesn't matter.) -- eichin
  */
 
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus
@@ -324,7 +323,6 @@ typedef long suseconds_t;
 #endif  /* !__need_inttypes */
 
 #undef __need_inttypes
-
 
 #ifdef __cplusplus
 }

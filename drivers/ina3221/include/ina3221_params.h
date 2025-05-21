@@ -20,7 +20,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include "board.h"
 #include "ina3221.h"
 #include "saul_reg.h"

@@ -25,7 +25,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

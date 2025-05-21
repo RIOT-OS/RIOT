@@ -20,7 +20,6 @@
 
 #include "periph_cpu.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

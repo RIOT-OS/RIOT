@@ -286,7 +286,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "net/netopt.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netreg.h"

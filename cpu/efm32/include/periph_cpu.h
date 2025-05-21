@@ -19,7 +19,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-
 #include "kernel_defines.h"
 #include "mutex.h"
 
@@ -63,7 +62,6 @@ typedef struct {
     CMU_Clock_TypeDef clk;   /**< Clock domain */
     CMU_ClkDiv_TypeDef div;  /**< Divisor */
 } clk_div_t;
-
 
 /**
  * @brief   Length of CPU ID in octets.

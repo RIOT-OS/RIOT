@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "board.h"
 #include "dht.h"
 #include "saul_reg.h"

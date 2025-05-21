@@ -75,7 +75,6 @@ extern "C" {
 #define CONFIG_ILI9341_VCOML            -2000
 #endif
 
-
 /**
  * @name    ILI9341 display rotation modes
  * @{

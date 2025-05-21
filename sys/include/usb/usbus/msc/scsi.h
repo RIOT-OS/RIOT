@@ -19,7 +19,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #include "byteorder.h"
 
 #ifdef __cplusplus

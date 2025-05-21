@@ -19,7 +19,6 @@
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-
 #include "periph_cpu_common.h"
 #include "atmega_regs_common.h"
 

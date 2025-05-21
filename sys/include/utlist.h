@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *              http://troydhanson.github.io/uthash/utlist.html
  */
 
-
 /** @brief Version number */
 #define UTLIST_VERSION 1.9.9
 #include <stddef.h>

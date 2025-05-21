@@ -18,7 +18,6 @@
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #include "periph_cpu_common.h"
 #include "macros/units.h"
 

@@ -35,7 +35,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <assert.h>
 #include "event.h"
 

@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #include "kernel_defines.h"
 
 #ifdef __cplusplus
@@ -105,7 +104,6 @@ static inline int pthread_equal(pthread_t thread1, pthread_t thread2)
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

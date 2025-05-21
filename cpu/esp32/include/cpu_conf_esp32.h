@@ -20,7 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 /** Number of DRAM sections that can be used as heap. */
 #define NUM_HEAPS (4)
 

@@ -19,7 +19,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "cpu_conf_common.h"
 #include "vendor/sam.h"
 

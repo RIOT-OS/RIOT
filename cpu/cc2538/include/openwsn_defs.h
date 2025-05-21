@@ -18,7 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

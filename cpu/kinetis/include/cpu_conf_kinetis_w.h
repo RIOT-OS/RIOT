@@ -20,7 +20,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #if defined(KINETIS_CORE_D)
 /* Kinetis KW2xD */
 #if defined(CPU_MODEL_MKW21D256VHA5) || \

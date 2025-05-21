@@ -18,7 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #if defined(MODULE_ESP_ETH) || defined(DOXYGEN)
 
 /**

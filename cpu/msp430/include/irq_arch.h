@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <stdbool.h>
 #include <msp430.h>
 #include "irq.h"

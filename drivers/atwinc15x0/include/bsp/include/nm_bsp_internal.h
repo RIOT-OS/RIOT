@@ -20,7 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

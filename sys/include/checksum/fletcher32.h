@@ -20,7 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -85,6 +84,5 @@ uint32_t fletcher32_finish(fletcher32_ctx_t *ctx);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

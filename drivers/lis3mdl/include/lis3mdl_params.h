@@ -18,7 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "board.h"
 #include "lis3mdl.h"
 #include "saul_reg.h"

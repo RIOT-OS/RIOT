@@ -23,7 +23,6 @@
  * @brief       Shell interface definition
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

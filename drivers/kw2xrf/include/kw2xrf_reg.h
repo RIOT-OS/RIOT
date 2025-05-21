@@ -52,7 +52,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

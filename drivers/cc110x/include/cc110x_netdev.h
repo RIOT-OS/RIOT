@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus

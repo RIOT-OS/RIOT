@@ -22,7 +22,6 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-
 #include "sht2x.h"
 #include "saul_reg.h"
 

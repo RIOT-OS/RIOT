@@ -13,7 +13,6 @@
  * @{
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -52,7 +51,6 @@ void malloc_monitor_reset_high_watermark(void);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

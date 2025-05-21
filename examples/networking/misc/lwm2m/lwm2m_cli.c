@@ -211,7 +211,6 @@ static int _parse_lwm2m_switch_cmd(int argc, char **argv)
     return 0;
 }
 
-
 static int _cli_cmd(int argc, char **argv)
 {
     if (argc == 1) {

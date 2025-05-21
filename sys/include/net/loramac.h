@@ -21,7 +21,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>

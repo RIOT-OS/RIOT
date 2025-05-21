@@ -20,7 +20,6 @@
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "mpu9x50.h"

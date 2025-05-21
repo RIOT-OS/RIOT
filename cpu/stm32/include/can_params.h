@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include "can/device.h"
 #include "periph/can.h"
 

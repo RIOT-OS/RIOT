@@ -56,7 +56,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include <inttypes.h>

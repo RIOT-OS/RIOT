@@ -16,7 +16,6 @@
  * @brief           CC26x0/CC13x0 AUX register definitions
  */
 
-
 #include <stdbool.h>
 
 #include "cc26xx_cc13xx.h"

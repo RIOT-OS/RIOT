@@ -19,7 +19,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "cpu.h"
 #include "periph_cpu.h"
 #include "periph/adc.h"

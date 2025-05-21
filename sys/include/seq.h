@@ -21,7 +21,6 @@
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
-
 #include <stdint.h>
 #include <errno.h>
 

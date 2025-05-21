@@ -18,7 +18,6 @@
  * @author          Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <inttypes.h>
 
 #include "cpu.h"

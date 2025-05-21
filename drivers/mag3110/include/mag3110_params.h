@@ -18,7 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "mag3110.h"

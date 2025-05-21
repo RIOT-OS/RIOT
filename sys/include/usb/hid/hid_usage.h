@@ -23,7 +23,6 @@
  * @see Based on HID Usage Tables 1.21, https://www.usb.org/sites/default/files/hut1_21.pdf
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

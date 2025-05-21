@@ -21,7 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "cpu_conf_common.h"
 #include "xtensa_conf.h"
 

@@ -22,7 +22,6 @@
  * @}
  */
 
-
 #include "riotboot/hdr.h"
 
 #ifdef __cplusplus

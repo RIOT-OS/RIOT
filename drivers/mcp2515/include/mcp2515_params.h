@@ -19,7 +19,6 @@
  * @author      Wouter Symons <wosym@airsantelmo.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

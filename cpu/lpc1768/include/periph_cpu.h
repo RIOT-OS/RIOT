@@ -19,7 +19,6 @@
  * @author          Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-
 #include <stdint.h>
 
 #include "cpu.h"

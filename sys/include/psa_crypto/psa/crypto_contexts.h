@@ -19,7 +19,6 @@
  *
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,7 +26,6 @@ extern "C" {
 #include "kernel_defines.h"
 
 #include "psa/crypto_includes.h"
-
 
 #if IS_USED(MODULE_PSA_HASH)
 /**

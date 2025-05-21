@@ -35,7 +35,6 @@
  *
  */
 
-
 #include "event.h"
 #include "ztimer/periodic.h"
 

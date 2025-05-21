@@ -22,7 +22,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "arduino_iomap.h"
 #include "periph/pwm.h"
 

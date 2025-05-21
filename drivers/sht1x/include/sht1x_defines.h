@@ -19,7 +19,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <stdint.h>
 #include <periph/gpio.h>
 #include <mutex.h>

@@ -20,7 +20,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "board.h"
 #include "jc42.h"
 #include "periph/i2c.h"

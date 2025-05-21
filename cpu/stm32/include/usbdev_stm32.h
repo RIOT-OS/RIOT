@@ -37,7 +37,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdint.h>
 #include <stdlib.h>
 #include "periph_cpu.h"

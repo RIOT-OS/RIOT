@@ -16,7 +16,6 @@
  * @brief           CC26x2, CC13x2 FCFG register definitions
  */
 
-
 #include <cc26xx_cc13xx.h>
 
 #ifdef __cplusplus
@@ -156,6 +155,5 @@ typedef struct {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
 
 /** @} */

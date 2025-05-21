@@ -18,7 +18,6 @@
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "opt3001.h"
 #include "saul_reg.h"

@@ -19,7 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

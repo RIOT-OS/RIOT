@@ -18,7 +18,6 @@
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

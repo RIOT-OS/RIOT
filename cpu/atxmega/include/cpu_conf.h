@@ -18,7 +18,6 @@
  * @author          Gerson Fernando Budke <nandojve@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

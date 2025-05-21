@@ -23,7 +23,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <stdio.h>
 
 #ifdef __cplusplus

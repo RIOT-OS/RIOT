@@ -53,7 +53,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include <string.h>
 

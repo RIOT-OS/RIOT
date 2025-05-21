@@ -32,7 +32,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

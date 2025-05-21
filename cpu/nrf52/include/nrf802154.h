@@ -35,7 +35,6 @@
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
 
-
 #include "net/ieee802154/radio.h"
 
 #ifdef __cplusplus

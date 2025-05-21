@@ -23,7 +23,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdalign.h>
 
 #include "vfs.h"

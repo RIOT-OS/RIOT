@@ -21,7 +21,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

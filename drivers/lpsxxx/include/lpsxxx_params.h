@@ -20,7 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "board.h"
 #include "lpsxxx.h"
 #include "saul_reg.h"

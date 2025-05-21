@@ -18,7 +18,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

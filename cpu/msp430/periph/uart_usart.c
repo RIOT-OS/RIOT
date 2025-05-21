@@ -75,7 +75,6 @@ int uart_init(uart_t uart, uint32_t symbolrate, uart_rx_cb_t rx_cb, void *arg)
     confs[uart].ctl = CHAR;
     confs[uart].prescaler = msp430_usart_prescale(symbolrate, USART_MIN_BR_UART);
 
-
     if (rx_cb) {
         init(uart);
     }

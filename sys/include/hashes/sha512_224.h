@@ -20,7 +20,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-
 #include <inttypes.h>
 #include <stddef.h>
 

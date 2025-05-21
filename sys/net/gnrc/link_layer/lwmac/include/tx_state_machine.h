@@ -21,7 +21,6 @@
  * @}
  */
 
-
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/mac/types.h"

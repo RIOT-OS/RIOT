@@ -25,7 +25,6 @@
  *
  */
 
-
 #include "net/nanocoap.h"
 #include "suit.h"
 

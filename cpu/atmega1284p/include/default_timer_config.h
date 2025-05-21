@@ -18,7 +18,6 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "periph_cpu_common.h"
 #include "periph_conf.h" /* <- Allow overwriting timer config from board */
 

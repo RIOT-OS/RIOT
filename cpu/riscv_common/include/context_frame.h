@@ -18,7 +18,6 @@
  * @author      JP Bonn
  */
 
-
 #if !defined(__ASSEMBLER__)
 #include <stdint.h>
 #endif /* __ASSEMBLER__ */

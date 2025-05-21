@@ -18,7 +18,6 @@
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
  */
 
-
 #include "board.h"
 #include "lm75.h"
 #include "lm75_regs.h"

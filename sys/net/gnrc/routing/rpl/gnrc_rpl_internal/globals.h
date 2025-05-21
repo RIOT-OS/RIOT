@@ -18,7 +18,6 @@
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
-
 #include "evtimer.h"
 
 #ifdef __cplusplus

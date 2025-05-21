@@ -24,7 +24,6 @@
  * @author          Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-
 #include "atmega_regs_common.h"
 
 #ifdef __cplusplus

@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "board.h"
 #include "macros/units.h"
 #include "periph/gpio.h"

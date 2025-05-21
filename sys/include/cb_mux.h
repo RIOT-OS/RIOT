@@ -28,7 +28,6 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-
 #include <stdint.h>
 
 /* For alternate cb_mux_cbid_t */

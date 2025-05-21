@@ -97,7 +97,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-
 #include "sched.h"
 #include "thread.h"
 

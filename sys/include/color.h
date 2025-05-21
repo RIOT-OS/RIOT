@@ -22,7 +22,6 @@
  * @author      Simon Brummer <brummer.simon@googlemail.com>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

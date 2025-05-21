@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include "syscalls_common.h"
 
 #ifdef __cplusplus

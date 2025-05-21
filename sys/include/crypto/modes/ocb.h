@@ -22,7 +22,6 @@
  * @author      Mathias Tausig <mathias@tausig.at>
  */
 
-
 #include "crypto/ciphers.h"
 #include <stdint.h>
 #include <stddef.h>

@@ -17,7 +17,6 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -66,7 +65,6 @@ void malloc_monitor_mv(void *ptr_old, void *ptr_new, size_t size_new, uinttxtptr
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

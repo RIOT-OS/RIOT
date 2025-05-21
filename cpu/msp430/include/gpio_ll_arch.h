@@ -19,7 +19,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
 
-
 #include "cpu.h"
 #include "periph_cpu.h"
 

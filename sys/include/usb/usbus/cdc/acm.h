@@ -40,7 +40,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <stdint.h>
 #include "usb/cdc.h"
 #include "usb/usbus.h"

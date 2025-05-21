@@ -18,7 +18,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

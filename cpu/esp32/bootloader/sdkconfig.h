@@ -26,7 +26,6 @@
  * @author      iosabi <iosabi@protonmail.com>
  */
 
-
 #ifndef DOXYGEN
 
 #include "esp_idf_ver.h"

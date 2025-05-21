@@ -23,7 +23,6 @@
  * @}
  */
 
-
 #include "periph/i2c.h"
 #include "saul.h"
 #include "xtimer.h"

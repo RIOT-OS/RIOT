@@ -19,7 +19,6 @@
  *
  */
 
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus

@@ -28,7 +28,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include <assert.h>
 
 #include "cpu.h"

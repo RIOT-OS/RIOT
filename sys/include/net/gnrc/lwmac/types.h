@@ -21,7 +21,6 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-
 #include "msg.h"
 #include "xtimer.h"
 #include "net/gnrc/lwmac/hdr.h"

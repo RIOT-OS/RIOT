@@ -20,7 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include <stdint.h>
 
 #include "cpu_conf.h"

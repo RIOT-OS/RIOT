@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus

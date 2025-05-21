@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include "periph/gpio.h"
 
 #ifndef DOXYGEN

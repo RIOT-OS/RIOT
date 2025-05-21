@@ -52,7 +52,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdint.h>
 #include <sys/stat.h> /* for struct stat */
 #include <sys/types.h> /* for off_t etc. */
@@ -1209,6 +1208,5 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp,
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

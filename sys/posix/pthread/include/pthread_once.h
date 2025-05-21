@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,7 +52,6 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

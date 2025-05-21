@@ -17,7 +17,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus

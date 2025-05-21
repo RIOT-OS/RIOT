@@ -18,7 +18,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

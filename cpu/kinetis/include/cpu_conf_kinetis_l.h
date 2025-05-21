@@ -20,7 +20,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #if (KINETIS_FAMILY == 4)
 #if (KINETIS_SUBFAMILY == 3)
 #if defined(CPU_MODEL_MKL43Z128VLH4) || \

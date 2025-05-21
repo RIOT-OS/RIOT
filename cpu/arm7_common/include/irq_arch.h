@@ -18,7 +18,6 @@
  * @author          Heiko Will <hwill@inf.fu-berlin.de>
  */
 
-
 #include "VIC.h"
 #include <stdbool.h>
 

@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "at86rf215.h"
 #include "board.h"
 

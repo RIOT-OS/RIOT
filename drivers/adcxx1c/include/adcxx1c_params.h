@@ -19,7 +19,6 @@
  * @}
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "adcxx1c.h"

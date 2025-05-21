@@ -23,7 +23,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stddef.h>
 #include <stdint.h>
 
@@ -60,6 +59,5 @@ extern const vfs_file_system_t constfs_file_system;
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

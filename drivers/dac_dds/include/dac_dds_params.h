@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benpicco@beuth-hochschule.de>
  */
 
-
 #include "board.h"
 #include "macros/units.h"
 

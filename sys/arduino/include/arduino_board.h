@@ -21,7 +21,6 @@
  * @author      Thomas Perrot   <thomas.perrot@tupi.fr>
  */
 
-
 #include "arduino_board_analog.h"
 #include "arduino_board_pins.h"
 #include "arduino_board_pwm.h"

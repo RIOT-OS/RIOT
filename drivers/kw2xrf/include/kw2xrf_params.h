@@ -18,7 +18,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "kw2xrf.h"
 

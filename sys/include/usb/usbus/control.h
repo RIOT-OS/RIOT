@@ -20,7 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 /**
  * @brief   Number of IN EPs required for the control interface
  */

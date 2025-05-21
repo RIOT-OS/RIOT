@@ -19,7 +19,6 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -121,6 +120,5 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

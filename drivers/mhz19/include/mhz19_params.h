@@ -20,7 +20,6 @@
  * @author      Christian Manal <manal@uni-bremen.de>
  */
 
-
 #include "board.h"
 #include "mhz19.h"
 #include "saul_reg.h"

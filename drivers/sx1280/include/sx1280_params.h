@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "board.h"
 #include "sx1280.h"
 #include "sx1280_constants.h"
@@ -81,7 +80,6 @@ extern "C" {
 #ifndef SX1280_PARAM_DIO1
 #define SX1280_PARAM_DIO1                   GPIO_PIN(2, 7) /**< DIO1 */
 #endif
-
 
 /**
  * @brief Default sx1280 parameters

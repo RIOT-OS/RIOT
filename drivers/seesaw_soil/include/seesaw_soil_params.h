@@ -18,7 +18,6 @@
  * @author      Viktor Gal <viktor.gal@maeth.com>
  */
 
-
 #include "board.h"
 #include "seesaw_soil.h"
 #include "saul_reg.h"

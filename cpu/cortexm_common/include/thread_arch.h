@@ -19,7 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include "cpu_conf.h"
 
 #ifdef __cplusplus

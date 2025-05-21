@@ -21,7 +21,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <stdalign.h>
 
 #include "vfs.h"

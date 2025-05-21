@@ -18,7 +18,6 @@
  * @author          Koen Zandberg
  */
 
-
 #include "vendor/riscv_csr.h"
 #include "cpu_conf_common.h"
 

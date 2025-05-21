@@ -18,7 +18,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-
 #include "kw2xrf_reg.h"
 #include "kw2xrf.h"
 

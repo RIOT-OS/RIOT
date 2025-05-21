@@ -20,7 +20,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-
 #include <assert.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -164,7 +163,6 @@ size_t memarray_available(memarray_t *mem);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

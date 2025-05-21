@@ -60,7 +60,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>

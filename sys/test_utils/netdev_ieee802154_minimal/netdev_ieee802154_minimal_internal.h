@@ -18,7 +18,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include "net/netdev.h"
 #include "event.h"
 #include "init_dev.h"
@@ -41,6 +40,5 @@ extern device_reg_entry_t _devices[NETDEV_IEEE802154_MINIMAL_NUMOF];
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

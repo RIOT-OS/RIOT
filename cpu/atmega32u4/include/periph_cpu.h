@@ -19,7 +19,6 @@
  *
  */
 
-
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus

@@ -21,7 +21,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #if !defined(__ASSEMBLER__)
 #include <stdint.h>
 #endif

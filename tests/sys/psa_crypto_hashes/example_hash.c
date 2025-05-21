@@ -114,7 +114,6 @@ static const uint8_t hash_long_sha512_256[] = {
     0x63, 0x52, 0x68, 0x81, 0x4a, 0xce
 };
 
-
 /**
  * @brief   Example function to use different hash algorithms
  *          with the PSA Crypto API.

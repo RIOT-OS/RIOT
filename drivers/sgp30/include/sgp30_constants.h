@@ -18,7 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-
 #include "timex.h"
 
 #ifdef __cplusplus

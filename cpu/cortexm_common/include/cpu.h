@@ -29,7 +29,6 @@
  * @todo        remove include irq.h once core was adjusted
  */
 
-
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"

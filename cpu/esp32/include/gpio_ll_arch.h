@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include "gpio_arch.h"
 #include "irq.h"
 #include "soc/gpio_reg.h"

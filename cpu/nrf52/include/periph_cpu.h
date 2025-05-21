@@ -20,7 +20,6 @@
  * @author          Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
-
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus

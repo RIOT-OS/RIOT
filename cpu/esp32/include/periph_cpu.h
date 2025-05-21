@@ -18,7 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include <stdbool.h>
 #include <stdint.h>
 #include "sdkconfig.h"

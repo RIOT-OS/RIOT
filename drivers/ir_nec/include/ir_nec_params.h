@@ -18,7 +18,6 @@
  * @author      Dario Petrillo <dario.pk1@gmail.com>
  */
 
-
 #include "board.h"
 #include "ir_nec.h"
 #include "ir_nec_constants.h"

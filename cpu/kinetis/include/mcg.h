@@ -122,7 +122,6 @@
  */
 #endif /* MODULE_PERIPH_MCG */
 
-
 #include "periph_conf.h"
 
 #ifdef __cplusplus

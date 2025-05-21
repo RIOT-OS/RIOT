@@ -23,7 +23,6 @@
  *
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

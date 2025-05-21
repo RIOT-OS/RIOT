@@ -22,7 +22,6 @@
  * Derived from the default configuration for the tsl2561 driver.
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "tsl4531x.h"

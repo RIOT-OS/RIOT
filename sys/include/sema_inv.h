@@ -41,7 +41,6 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "atomic_utils.h"
 #include "mutex.h"
 

@@ -25,7 +25,6 @@
 #include "net/l2util.h"
 #include "mutex.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

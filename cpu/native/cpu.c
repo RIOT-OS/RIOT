@@ -139,7 +139,6 @@ void cpu_switch_context_exit(void)
 
 /* ========================================= */
 
-
 void _isr_thread_yield(void)
 {
     DEBUG_CPU("... ISR: switched to ISR context, scheduling\n");

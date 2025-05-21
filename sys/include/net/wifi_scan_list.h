@@ -20,7 +20,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
 
-
 #include <stddef.h>
 
 #include "l2scan_list.h"

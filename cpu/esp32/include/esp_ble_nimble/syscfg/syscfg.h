@@ -18,7 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #if !DOXYGEN
 
 /* disable native transport mechanism and enable the custom transport mechanism */

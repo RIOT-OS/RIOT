@@ -18,7 +18,6 @@
  * @author          Ken Rabold
  */
 
-
 #include "cpu_conf_common.h"
 #include "vendor/platform.h"
 

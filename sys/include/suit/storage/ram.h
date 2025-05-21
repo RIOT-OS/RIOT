@@ -31,7 +31,6 @@
  * distinction between valid content and not yet invalidated content.
  */
 
-
 #include <stdint.h>
 
 #include "suit.h"

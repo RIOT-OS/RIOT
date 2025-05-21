@@ -810,7 +810,6 @@ int mfrc522_picc_select(mfrc522_t *dev, mfrc522_uid_t *uid, uint8_t valid_bits)
             current_level_known_bits = 0;
         }
 
-
         /* destination index in buffer[] */
         uint8_t index = 2;
         if (use_cascade_tag) {

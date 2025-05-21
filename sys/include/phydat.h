@@ -34,7 +34,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/types.h>

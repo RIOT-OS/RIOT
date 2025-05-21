@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "sps30.h"
 #include "saul_reg.h"

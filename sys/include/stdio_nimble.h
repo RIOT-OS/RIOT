@@ -163,7 +163,6 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
-
 #include "stdio_base.h"
 
 #ifdef __cplusplus

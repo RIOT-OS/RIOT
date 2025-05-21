@@ -16,7 +16,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include <inttypes.h>
 #include "ft5x06.h"
 

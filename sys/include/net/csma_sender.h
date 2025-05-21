@@ -24,7 +24,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #include <stdint.h>
 
 #include "net/netdev.h"
@@ -141,6 +140,5 @@ int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

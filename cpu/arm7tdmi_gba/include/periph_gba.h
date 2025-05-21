@@ -18,7 +18,6 @@
  * @author      Bennet Blischke
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

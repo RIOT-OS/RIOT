@@ -21,7 +21,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <assert.h>
 #include "msg_bus.h"
 

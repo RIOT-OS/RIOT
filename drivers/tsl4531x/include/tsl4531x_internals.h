@@ -24,7 +24,6 @@
  * Derived from the internals.h file for the tsl2561 driver.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -18,7 +18,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #ifdef __cplusplus
  extern "C" {
 #endif

@@ -20,7 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-
 #include <limits.h>
 
 #include "cpu.h"

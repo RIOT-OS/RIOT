@@ -21,7 +21,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #include <stdint.h>
 
 #include "usb.h"

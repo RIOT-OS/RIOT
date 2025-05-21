@@ -18,7 +18,6 @@
  * @author      Viktor Gal <viktor.gal@maeth.com>
  */
 
-
 #ifdef __cplusplus
 extern "C"
 {

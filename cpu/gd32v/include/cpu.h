@@ -16,7 +16,6 @@
  * @brief       CPU specific definitions
  */
 
-
 #include "cpu_conf.h"
 #include "cpu_common.h"
 

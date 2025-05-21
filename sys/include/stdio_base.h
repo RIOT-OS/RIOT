@@ -20,7 +20,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <unistd.h>
 
 #include "modules.h"

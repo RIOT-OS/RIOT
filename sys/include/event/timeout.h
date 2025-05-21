@@ -36,7 +36,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include "event.h"
 #include "ztimer.h"
 

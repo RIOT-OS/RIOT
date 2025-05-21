@@ -27,7 +27,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "net/skald.h"
 
 #ifdef __cplusplus

@@ -26,7 +26,6 @@
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
-
 #include "atmega_regs_common.h"
 
 #ifdef __cplusplus

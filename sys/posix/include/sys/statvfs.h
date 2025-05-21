@@ -70,7 +70,6 @@ enum {
 }
 #endif
 
-
 #endif /* CPU_NATIVE */
 
 /** @} */

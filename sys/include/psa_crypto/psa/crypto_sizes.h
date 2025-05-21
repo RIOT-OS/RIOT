@@ -24,7 +24,6 @@
  *              These macros will be implemented successively in the future.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

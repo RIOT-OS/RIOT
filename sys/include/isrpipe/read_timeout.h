@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "isrpipe.h"
 
 #ifdef __cplusplus

@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "vendor/nrf9160.h"
 #include "vendor/nrf9160_bitfields.h"
 #include "vendor/nrf9160_peripherals.h"

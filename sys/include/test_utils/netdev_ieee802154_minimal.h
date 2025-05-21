@@ -28,7 +28,6 @@
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus
