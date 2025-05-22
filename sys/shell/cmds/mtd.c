@@ -374,6 +374,7 @@ static void _print_info(mtd_dev_t *dev)
 static int cmd_info(mtd_dev_t *dev, int argc, char **argv)
 {
     (void)argc;
+    (void)argv;
     assert(strcmp(*argv, "info") == 0);
 
     if (dev) {
