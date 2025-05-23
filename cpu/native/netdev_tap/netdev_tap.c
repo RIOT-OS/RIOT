@@ -54,6 +54,7 @@
 #include "net/netdev/eth.h"
 #include "net/ethernet.h"
 #include "net/ethernet/hdr.h"
+#include "net/eui_provider.h"
 #include "netdev_tap.h"
 #include "net/netopt.h"
 
@@ -331,6 +332,47 @@ static void _tap_isr(int fd, void *arg) {
     }
 }
 
+void netdev_tap_get_host_eui48(netdev_tap_t *dev, eui48_t *out)
+{
+# if __FreeBSD__ /* FreeBSD */
+    struct ifaddrs *iflist;
+    if (real_getifaddrs(&iflist) == 0) {
+        for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
+            if ((cur->ifa_addr->sa_family == AF_LINK) &&
+                (strcmp(cur->ifa_name, name) == 0) && cur->ifa_addr) {
+                struct sockaddr_dl *sdl = (struct sockaddr_dl *)cur->ifa_addr;
+                memcpy(out, LLADDR(sdl), sdl->sdl_alen);
+                break;
+            }
+        }
+        real_freeifaddrs(iflist);
+    }
+# else /* Linux */
+    struct ifreq ifr = {};
+    ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
+    strncpy(ifr.ifr_name, dev->tap_name, IFNAMSIZ);
+    if (real_ioctl(dev->tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
+        _native_pending_syscalls_up();
+        warn("ioctl TUNSETIFF");
+        warnx("probably the tap interface (%s) does not exist or is already in use", dev->tap_name);
+        real_exit(EXIT_FAILURE);
+    }
+
+    /* get MAC address */
+    memset(&ifr, 0, sizeof(ifr));
+    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", dev->tap_name);
+    if (real_ioctl(dev->tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
+        _native_pending_syscalls_up();
+        warn("ioctl SIOCGIFHWADDR");
+        if (real_close(dev->tap_fd) == -1) {
+            warn("close");
+        }
+        real_exit(EXIT_FAILURE);
+    }
+    memcpy(out, ifr.ifr_hwaddr.sa_data, ETHERNET_ADDR_LEN);
+# endif
+}
+
 static int _init(netdev_t *netdev)
 {
     DEBUG("%s:%s:%u\n", __FILE__, __func__, __LINE__);
@@ -342,12 +384,10 @@ static int _init(netdev_t *netdev)
         return -ENODEV;
     }
 
-    char *name = dev->tap_name;
 # ifdef __FreeBSD__
     char clonedev[255] = "/dev/"; /* XXX bad size */
     strncpy(clonedev + 5, name, 250);
 # else /* Linux */
-    struct ifreq ifr;
     const char *clonedev = "/dev/net/tun";
 # endif
     /* initialize device descriptor */
@@ -356,45 +396,8 @@ static int _init(netdev_t *netdev)
     if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
-# if __FreeBSD__ /* FreeBSD */
-    struct ifaddrs *iflist;
-    if (real_getifaddrs(&iflist) == 0) {
-        for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
-            if ((cur->ifa_addr->sa_family == AF_LINK) && (strcmp(cur->ifa_name, name) == 0) && cur->ifa_addr) {
-                struct sockaddr_dl *sdl = (struct sockaddr_dl *)cur->ifa_addr;
-                memcpy(dev->addr, LLADDR(sdl), sdl->sdl_alen);
-                break;
-            }
-        }
-        real_freeifaddrs(iflist);
-    }
-# else /* Linux */
-    memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
-    strncpy(ifr.ifr_name, name, IFNAMSIZ);
-    if (real_ioctl(dev->tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
-        _native_pending_syscalls_up();
-        warn("ioctl TUNSETIFF");
-        warnx("probably the tap interface (%s) does not exist or is already in use", name);
-        real_exit(EXIT_FAILURE);
-    }
-
     /* get MAC address */
-    memset(&ifr, 0, sizeof(ifr));
-    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", name);
-    if (real_ioctl(dev->tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
-        _native_pending_syscalls_up();
-        warn("ioctl SIOCGIFHWADDR");
-        if (real_close(dev->tap_fd) == -1) {
-            warn("close");
-        }
-        real_exit(EXIT_FAILURE);
-    }
-    memcpy(dev->addr, ifr.ifr_hwaddr.sa_data, ETHERNET_ADDR_LEN);
-
-    /* change mac addr so it differs from what the host is using */
-    dev->addr[5]++;
-# endif
+    netdev_eui48_get(netdev, (eui48_t *)dev->addr);
     DEBUG("gnrc_tapnet_init(): dev->addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
             dev->addr[0], dev->addr[1], dev->addr[2],
             dev->addr[3], dev->addr[4], dev->addr[5]);

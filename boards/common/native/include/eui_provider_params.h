@@ -19,6 +19,8 @@
 #define EUI_PROVIDER_PARAMS_H
 
 #include "native_cli_eui_provider.h"
+#include "netdev_tap.h"
+#include "netdev_tap_params.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +37,37 @@ extern "C" {
 #endif
 #define EUI64_PROVIDER_INDEX  NETDEV_INDEX_ANY
 /** @} */
+
+/**
+ * @brief   EUI is derived from host interface
+ */
+static inline int _get_tap_eui48(uint8_t index, eui48_t *addr)
+{
+#ifndef MODULE_NETDEV_TAP
+    (void)index;
+    (void)addr;
+    return -1;
+#else
+    extern netdev_tap_t netdev_taps[NETDEV_TAP_MAX];
+    if (index >= NETDEV_TAP_MAX) {
+        return -1;
+    }
+
+    netdev_tap_get_host_eui48(&netdev_taps[index], addr);
+
+    /* change mac addr so it differs from what the host is using */
+    addr->uint8[5]++;
+
+    return 0;
+#endif
+}
+
+#ifndef EUI48_PROVIDER_FUNC
+#define EUI48_PROVIDER_FUNC   _get_tap_eui48
+#endif
+#ifndef EUI48_PROVIDER_TYPE
+#define EUI48_PROVIDER_TYPE   NETDEV_TAP
+#endif
 
 #ifdef __cplusplus
 }
