@@ -128,6 +128,15 @@ int main(void)
     dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
+    /* put all interfaces in promiscuous mode, disable sending ACKs */
+    gnrc_netif_t *netif = NULL;
+    while ((netif = gnrc_netif_iter(netif))) {
+        const netopt_enable_t enable = NETOPT_ENABLE;
+        const netopt_enable_t disable = NETOPT_DISABLE;
+        gnrc_netapi_set(netif->pid, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
+        gnrc_netapi_set(netif->pid, NETOPT_AUTOACK, 0, &disable, sizeof(disable));
+    }
+
     /* start the shell */
     puts("All ok, starting the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
