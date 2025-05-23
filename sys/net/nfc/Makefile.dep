@@ -1,0 +1,28 @@
+ifneq (,$(filter nfc_t2t,$(USEMODULE)))
+  USEMODULE += nfc_ndef
+endif
+
+ifneq (,$(filter nfc_nfct,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_nfct
+  ifneq (,$(filter nfct_custom_emulator,$(USEMODULE)))
+    # The user must provide an emulator module
+  else
+    # This is cpu specific configuration, NFCT requires at least one working emulator
+    # the standard emulator is the NFCT T2T emulator
+    ifneq (,$(filter nrf52%,$(BOARD)))
+      # if no tag type if provided
+      ifeq (,$(filter nfct_t2t nfct_t4t,$(USEMODULE)))
+        USEMODULE += nrfx_nfct_t2t_emulator
+      endif
+
+      ifneq (,$(filter nfct_t2t,$(USEMODULE)))
+        USEMODULE += nrfx_nfct_t2t_emulator
+      endif
+      ifneq (,$(filter nfct_t4t,$(USEMODULE)))
+        USEMODULE += nrfx_nfct_t4t_emulator
+      endif
+
+    endif
+  endif
+endif
+
