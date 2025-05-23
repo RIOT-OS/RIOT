@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_iotlab IoTlab Common
  * @ingroup     boards_common
@@ -20,9 +22,6 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #include <stdint.h>
 
@@ -96,5 +95,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_COMMON_H */
 /** @} */

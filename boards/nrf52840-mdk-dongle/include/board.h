@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf52840-mdk-dongle
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -90,5 +89,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

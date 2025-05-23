@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_saml21-xpro
  * @{
@@ -19,9 +21,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -277,5 +276,4 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

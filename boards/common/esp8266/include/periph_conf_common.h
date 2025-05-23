@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_esp8266
  * @brief       Configurations of the MCU periphery that are common for all
@@ -14,9 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @{
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 /* include board.h and periph_cpu.h to make them visible in any case */
 #include "periph_cpu.h"
@@ -272,5 +271,4 @@ static const uart_conf_t uart_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

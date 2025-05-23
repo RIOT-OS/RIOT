@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp32s2_lilygo_ttgo_t8
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/gpio.h"
 #include "periph/adc.h"
@@ -124,5 +123,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_seeeduino_xiao
  * @{
@@ -17,9 +19,6 @@
  * @author      Justus Krebs <justus.krebs@st.ovgu.de>
  * @author      Nick Weiler <nick.weiler@st.ovgu.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -237,5 +236,4 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_samr21-xpro
  * @{
@@ -17,9 +19,6 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -113,5 +112,4 @@ void board_antenna_config(uint8_t antenna);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

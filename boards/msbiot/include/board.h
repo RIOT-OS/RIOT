@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_msbiot
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -75,5 +74,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

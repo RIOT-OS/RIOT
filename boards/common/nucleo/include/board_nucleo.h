@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_nucleo STM32 Nucleo Common
  * @ingroup     boards_common
@@ -17,9 +19,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_NUCLEO_H
-#define BOARD_NUCLEO_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -59,5 +58,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_NUCLEO_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_bluepill_stm32f103cb
  *
@@ -26,9 +28,6 @@
  * @author      Alexander Kurth <kurth1@uni-bremen.de>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
-
 #include "board_common.h"
 
 #ifdef __cplusplus
@@ -41,5 +40,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

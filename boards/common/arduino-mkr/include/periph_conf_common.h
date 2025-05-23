@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_arduino-mkr
  * @{
@@ -21,9 +23,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Bumsik kim <kbumsik@gmail.com>
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 
@@ -216,5 +215,4 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

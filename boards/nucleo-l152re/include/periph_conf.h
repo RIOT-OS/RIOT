@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nucleo-l152re
  * @{
@@ -16,9 +18,6 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
@@ -231,5 +230,4 @@ static const dac_conf_t dac_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_f4vi1
  * @{
@@ -16,9 +18,6 @@
  * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -50,5 +49,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

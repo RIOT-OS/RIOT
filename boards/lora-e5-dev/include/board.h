@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_lora-e5-dev
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.yyfr>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "kernel_defines.h"
 #if IS_USED(MODULE_SX126X_STM32WL)
@@ -98,5 +97,4 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

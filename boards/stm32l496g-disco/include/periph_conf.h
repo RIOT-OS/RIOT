@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_stm32l496g-disco
  * @{
@@ -17,9 +19,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -607,5 +606,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

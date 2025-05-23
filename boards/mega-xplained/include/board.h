@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /*
  * @ingroup     boards_mega-xplained
  * @brief       Support for the Mega Xplained board.
@@ -20,9 +22,6 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -129,5 +128,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

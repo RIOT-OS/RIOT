@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_microduino-corerf
  * @{
@@ -16,9 +18,6 @@
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
-
 #include "periph_conf_atmega_common.h"
 
 #ifdef __cplusplus
@@ -26,5 +25,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

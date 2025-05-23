@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_spark-core
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -85,5 +84,4 @@
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

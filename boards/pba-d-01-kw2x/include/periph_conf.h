@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_pba-d-01-kw2x
  * @{
@@ -18,9 +20,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -275,5 +274,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

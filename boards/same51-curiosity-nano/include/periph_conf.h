@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_same51-curiosity-nano
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -345,5 +344,4 @@ static const adc_conf_chan_t adc_channels[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

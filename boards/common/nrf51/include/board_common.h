@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_nrf51 NRF51 common
  * @ingroup     boards_common
@@ -19,9 +21,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #include "cpu.h"
 
@@ -54,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

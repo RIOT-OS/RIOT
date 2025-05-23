@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_alientek-pandora
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Luo Jia <luojia@hust.edu.cn>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -68,5 +67,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

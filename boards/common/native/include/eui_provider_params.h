@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_native
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef EUI_PROVIDER_PARAMS_H
-#define EUI_PROVIDER_PARAMS_H
-
 #include "native_cli_eui_provider.h"
 
 #ifdef __cplusplus
@@ -40,5 +39,4 @@ extern "C" {
 }
 #endif
 
-#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */

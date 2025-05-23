@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_maple-mini
  * @{
@@ -16,9 +18,6 @@
  * @author      Frits Kuipers <frits.kuipers@gmail.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,5 +59,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

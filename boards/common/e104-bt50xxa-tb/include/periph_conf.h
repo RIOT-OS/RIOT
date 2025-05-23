@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_e104-bt50xxa-tb
  * @{
@@ -16,9 +18,6 @@
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_rtt_default.h"
@@ -98,5 +97,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

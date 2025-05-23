@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_cc1352p_launchpad
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Luis A. Ruiz <luisan00@hotmail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "periph/gpio.h"
 
@@ -65,5 +64,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

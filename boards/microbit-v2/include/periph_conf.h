@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_microbit_v2
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "board.h"
 #include "periph_cpu.h"
@@ -113,5 +112,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

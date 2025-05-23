@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_frdm-kw41z
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "periph_conf_common.h"
@@ -110,5 +109,4 @@ static const adc_conf_t adc_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_blxxxpill
  *
@@ -20,9 +22,6 @@
  * @author      Tristan Bruns <tbruns@uni-bremen.de>
  * @author      Alexander Kurth <kurth1@uni-bremen.de>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,5 +62,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_COMMON_H */
 /** @} */

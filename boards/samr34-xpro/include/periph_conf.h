@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_samr34-xpro
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "macros/units.h"
@@ -230,5 +229,4 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

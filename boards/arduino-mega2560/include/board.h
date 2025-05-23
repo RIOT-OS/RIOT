@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_arduino-mega2560
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +36,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

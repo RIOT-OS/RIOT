@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nucleo-f302r8
  * @{
@@ -19,9 +21,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -193,5 +192,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

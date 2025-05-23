@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_blxxxpill
  * @{
@@ -20,9 +22,6 @@
  * @author      Alexander Kurth <kurth1@uni-bremen.de>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* blxxxpill boards provide an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -370,5 +369,4 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_iotlab
  * @{
@@ -16,9 +18,6 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 /* iotlab boards provide an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -168,5 +167,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

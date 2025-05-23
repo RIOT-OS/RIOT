@@ -1,3 +1,5 @@
+#pragma once
+
  /*
  * Copyright (C) 2014-2015,2017 Freie Universität Berlin
  *
@@ -17,9 +19,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Andreas "Paul" Pauli <andreas.pauli@haw-hamburg.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -166,5 +165,4 @@ static const pwm_chan_conf_t pwm_chan[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

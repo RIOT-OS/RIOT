@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf52dk
  * @{
@@ -18,9 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_conf_common.h"
 
@@ -69,5 +68,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_atmega256rfr2-xpro
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -74,5 +73,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

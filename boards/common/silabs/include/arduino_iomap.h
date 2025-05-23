@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_silabs
  * @brief       SiLabs Boards configuration for the Arduino API
@@ -13,9 +15,6 @@
  * @author      Federico Pellegrin <fede@evolware.org>
  * @{
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "board.h"
 #include "periph_cpu.h"
@@ -50,5 +49,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

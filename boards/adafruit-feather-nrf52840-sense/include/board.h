@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_adafruit-feather-nrf52840-sense
  * @{
@@ -18,9 +20,6 @@
  * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -116,5 +115,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_firefly
  * @brief       Support for the Firefly board
@@ -16,9 +18,6 @@
  *
  * @author      Anon Mall <anon.mall@gt-arc.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -76,5 +75,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

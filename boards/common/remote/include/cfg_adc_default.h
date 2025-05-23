@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_remote
  * @{
@@ -18,9 +20,6 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CFG_ADC_DEFAULT_H
-#define CFG_ADC_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -48,5 +47,4 @@ static const adc_conf_t adc_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_ADC_DEFAULT_H */
 /** @} */

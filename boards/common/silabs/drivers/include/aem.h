@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_silabs_drivers_aem Advanced energy monitor driver
  * @ingroup     boards_common_silabs_drivers
@@ -16,9 +18,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef AEM_H
-#define AEM_H
 
 #include "board.h"
 
@@ -60,5 +59,4 @@ void aem_init(void);
 }
 #endif
 
-#endif /* AEM_H */
 /** @} */

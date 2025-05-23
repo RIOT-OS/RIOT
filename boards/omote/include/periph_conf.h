@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_omote
  * @{
@@ -16,9 +18,6 @@
  * @brief       Peripheral MCU configuration for the omote board
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "cc2538_gpio.h"
 #include "periph_cpu.h"
@@ -115,5 +114,4 @@ static const uart_conf_t uart_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

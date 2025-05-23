@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_gd32vf103c_start
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_common.h"
 #include "periph/gpio.h"
@@ -50,5 +49,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

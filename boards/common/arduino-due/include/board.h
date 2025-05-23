@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_arduino_due Arduino Due Common
  * @ingroup     boards_common
@@ -17,9 +19,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -44,5 +43,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

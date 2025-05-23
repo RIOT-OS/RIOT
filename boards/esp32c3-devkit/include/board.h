@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp32c3_devkit
  * @brief       Board definitions for ESP32-C3-DevKit boards
@@ -26,9 +28,6 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -95,5 +94,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

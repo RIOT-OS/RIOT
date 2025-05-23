@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf52840dongle
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -92,5 +91,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

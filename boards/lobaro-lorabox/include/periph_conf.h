@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_lobaro_lorabox
  * @brief       Support for the Lobaro lorabox with stm32l151cb
@@ -20,9 +22,6 @@
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /*
  * This board provides an LSE, so enable it before including the default clock config
@@ -143,5 +142,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

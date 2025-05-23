@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_cc1352p_launchpad
  * @{
@@ -16,9 +18,6 @@
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  * @author          Luis A. Ruiz <luisan00@hotmail.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -114,5 +113,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

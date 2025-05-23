@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_stm32
  * @brief       Common LED macros
@@ -19,9 +21,6 @@
  * The idea is that STM32 boards only define the pin number, port number and
  * port of LEDs and this header provides the rest of the defines
  */
-
-#ifndef STM32_LEDS_H
-#define STM32_LEDS_H
 
 /* Using gpio_ll_arch for GPIO access. On STM32, accessing the GPIO output
  * buffer via GPIO LL even works when the GPIO LL feature/module is not in
@@ -147,5 +146,4 @@ extern "C" {
 }
 #endif
 
-#endif /* STM32_LEDS_H */
 /** @} */

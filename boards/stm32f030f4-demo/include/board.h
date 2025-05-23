@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_stm32f030f4-demo
  *
@@ -20,9 +22,6 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,5 +50,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

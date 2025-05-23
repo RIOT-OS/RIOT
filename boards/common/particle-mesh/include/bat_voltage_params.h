@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_particle-mesh
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Martine S. Lenders <martine.lenders@tu-dresden.de>
  */
-
-#ifndef BAT_VOLTAGE_PARAMS_H
-#define BAT_VOLTAGE_PARAMS_H
 
 #include "saul/bat_voltage.h"
 
@@ -52,5 +51,4 @@ static const saul_bat_voltage_params_t saul_bat_voltage_params[] =
 }
 #endif
 
-#endif /* BAT_VOLTAGE_PARAMS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_generic_cc2538_cc2592_dk
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -103,5 +102,4 @@ static const adc_conf_t adc_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

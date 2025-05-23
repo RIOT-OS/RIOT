@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_msb-430 MSB-430 common
  * @ingroup     boards_common
@@ -18,9 +20,6 @@
  * @author      unknown
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #include "cpu.h"
 
@@ -54,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */
