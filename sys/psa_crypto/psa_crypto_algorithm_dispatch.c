@@ -576,9 +576,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
         case PSA_ECC_P256_R1:
-            // todo: support for Weierstrass curves
-            (void)slot;
-            ret = PSA_ERROR_NOT_SUPPORTED;
+            ret = psa_derive_ecc_p256r1_public_key(data, pubkey_data, data_length, pubkey_data_len);
             break;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
