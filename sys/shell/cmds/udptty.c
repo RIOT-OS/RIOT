@@ -32,8 +32,6 @@
 #define EOT 0x4
 #endif
 
-extern int readline(char *buf, size_t size);
-
 static void _sock_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 {
     (void)arg;
@@ -90,7 +88,7 @@ static int _udptty_cmd(int argc, char **argv)
 
     do {
         char buf[64];
-        res = readline(buf, sizeof(buf));
+        res = shell_readline(buf, sizeof(buf));
 
         if (res > 0) {
             buf[res] = '\n';

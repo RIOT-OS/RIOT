@@ -105,7 +105,7 @@ static bool _login(char *line_buf, size_t buf_size)
 
     while (1) {
         memset(line_buf, 0, buf_size);
-        while (readline(line_buf, buf_size) > 0) {
+        while (shell_readline(line_buf, buf_size) > 0) {
             return _safe_strcmp(line_buf, CONFIG_SHELL_LOCK_PASSWORD);
         }
     }
