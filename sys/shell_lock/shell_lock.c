@@ -52,9 +52,6 @@ static bool _shell_is_locked = true;
 static ztimer_t _shell_auto_lock_ztimer;
 #endif
 
-/* defined in shell.c */
-extern int readline(char *buf, size_t size);
-
 static int _lock_handler(int argc, char **argv)
 {
     (void) argc;

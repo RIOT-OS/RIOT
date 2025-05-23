@@ -439,30 +439,7 @@ static inline void new_line(void)
     }
 }
 
-/**
- * @brief   Read a single line from standard input into a buffer.
- *
- * In addition to copying characters, this routine echoes the line back to
- * stdout and also supports primitive line editing.
- *
- * If the input line is too long, the input will still be consumed until the end
- * to prevent the next line from containing garbage.
- *
- * We allow Unix (\n), DOS (\r\n), and Mac linebreaks (\r).
- * QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio").
- * DOS newlines are handled like hitting enter twice.
- *
- * @param   buf     Buffer where the input will be placed.
- * @param   size    Size of the buffer. The maximum line length will be one less
- *                  than size, to accommodate for the null terminator.
- *                  The minimum buffer size is 1.
- *
- * @return  length of the read line, excluding the terminator, if reading was
- *          successful.
- * @return  EOF, if the end of the input stream was reached.
- * @return  -ENOBUFS if the buffer size was exceeded.
- */
-int readline(char *buf, size_t size) /* needed externally by module shell_lock */
+int readline(char *buf, size_t size)
 {
     int curr_pos = 0;
     bool length_exceeded = false;
