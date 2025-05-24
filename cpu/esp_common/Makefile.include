@@ -38,6 +38,12 @@ ifeq (xtensa,$(CPU_ARCH))
   CFLAGS += -mlongcalls -mtext-section-literals
 endif
 
+# Since there is not yet a working mechanism on ESPs to get the caller address
+# within a function, `assert` always outputs 0x0 as the caller address.
+# This makes absolutely no sense and makes debugging more difficult.
+# `DEBUG_ASSERT_VERBOSE` is therefore enabled by default on ESPs.
+CFLAGS += -DDEBUG_ASSERT_VERBOSE
+
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 OPTIONAL_CFLAGS_BLACKLIST += -gz

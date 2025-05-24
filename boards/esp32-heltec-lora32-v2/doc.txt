@@ -216,8 +216,8 @@ purpose. However, if optional off-board hardware modules are used,
 these GPIOs may also be occupied,
 see section \ref esp32_heltec_lora32_v2_board_configuration for more information.
 
-The corresponding board schematics can be found [here for SX1276 version](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WIFI_LoRa_32_V2(868-915).PDF)
-and [here for SX1278 version](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/master/SchematicDiagram/WiFi_LoRa_32(V2)/WiFi_LoRa_32_V2(433%2C470-510).PDF).
+The corresponding board schematics can be found [here for SX1276 version](https://resource.heltec.cn/download/WiFi_LoRa_32/V2/WIFI_LoRa_32_V2(868-915).PDF)
+and [here for SX1278 version](https://resource.heltec.cn/download/WiFi_LoRa_32/V2/WiFi_LoRa_32_V2(433%2C470-510).PDF).
 
 \anchor esp32_heltec_lora_32_v2_pinout_img
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Heltec_WiFi_LoRa_32_V2_pinout_v2.png" "WiFi LoRa 32 V2 Pintout Diagram"
