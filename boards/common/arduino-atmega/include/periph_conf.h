@@ -27,10 +27,10 @@ extern "C" {
  * to be placed before the include. (Currently none needed.)
  */
 
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #include "periph_conf_atmega_common.h"
+
+/** @} */
