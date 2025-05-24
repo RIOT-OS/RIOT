@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_adafruit-feather-nrf52840-sense
+ * @ingroup     boards_feather-m0
  * @{
  *
  * @file
@@ -41,7 +41,7 @@ static const saul_bat_voltage_params_t saul_bat_voltage_params[] =
     {
         .name = "BAT",
         .phydat_scale = -3,
-        .line = ADC_LINE(5),
+        .line = ADC_LINE(7),
         .res = ADC_RES_10BIT,
         .convert = saul_bat_voltage_convert,
     },
