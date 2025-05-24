@@ -439,7 +439,7 @@ static inline void new_line(void)
     }
 }
 
-int readline(char *buf, size_t size)
+int shell_readline(char *buf, size_t size)
 {
     int curr_pos = 0;
     bool length_exceeded = false;
@@ -513,7 +513,7 @@ void shell_run_once(const shell_command_t *shell_commands,
     print_prompt();
 
     while (1) {
-        int res = readline(line_buf, len);
+        int res = shell_readline(line_buf, len);
 
         if (IS_USED(MODULE_SHELL_LOCK)) {
             if (shell_lock_is_locked()) {

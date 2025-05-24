@@ -293,7 +293,7 @@ int shell_parse_file(const shell_command_t *commands,
  * @return  EOF, if the end of the input stream was reached.
  * @return  -ENOBUFS if the buffer size was exceeded.
  */
-int readline(char *buf, size_t size);
+int shell_readline(char *buf, size_t size);
 
 #ifndef __cplusplus
 /**
