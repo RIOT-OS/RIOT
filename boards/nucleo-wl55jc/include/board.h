@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nucleo-wl55jc
  * @{
@@ -16,9 +18,6 @@
  * @author      Akshai M <akshai.m@fu-berlin.de>
  * @author      Hauke Petersen <devel@haukepetersen.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_nucleo.h"
 
@@ -90,5 +89,4 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

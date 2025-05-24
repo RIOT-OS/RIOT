@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_slwstk6000b
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef BOARD_MODULE_H
-#define BOARD_MODULE_H
 
 #include "periph/gpio.h"
 
@@ -107,5 +106,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_MODULE_H */
 /** @} */

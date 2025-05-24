@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_remote-revb
  * @{
@@ -19,9 +21,6 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "cfg_adc_default.h"
 #include "cfg_clk_default.h"
@@ -38,5 +37,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_cc1352_launchpad
  * @{
@@ -19,9 +21,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  * @author          Anton Gerasimov <tossel@gmail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "periph/gpio.h"
 
@@ -69,5 +68,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

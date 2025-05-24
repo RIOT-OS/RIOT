@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_atxmega
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 #include "macros/units.h"
@@ -96,5 +95,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

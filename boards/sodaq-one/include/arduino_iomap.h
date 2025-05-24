@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_sodaq-one
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kees Bakker <kees@ijzerbout.nl>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/adc.h"
 #include "periph/gpio.h"
@@ -138,5 +137,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

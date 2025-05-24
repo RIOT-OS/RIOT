@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_slstk3400a
  * @{
@@ -17,9 +19,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  * @author      Akshai M <mail@akshaim.in>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -117,5 +116,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

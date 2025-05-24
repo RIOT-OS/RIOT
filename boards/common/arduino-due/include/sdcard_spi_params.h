@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_arduino_due
  * @{
@@ -17,9 +19,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef SDCARD_SPI_PARAMS_H
-#define SDCARD_SPI_PARAMS_H
 
 #include "arduino_pinmap.h"
 
@@ -74,5 +73,4 @@ static const  sdcard_spi_params_t sdcard_spi_params[] = {
 }
 #endif
 
-#endif /* SDCARD_SPI_PARAMS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_im880b
  * @brief       Support for im880b
@@ -16,9 +18,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -60,5 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_iotlab-a8-m3
  * @{
@@ -14,9 +16,6 @@
  * @brief       Board specific definitions for the iotlab-a8-m3 board
  *
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -48,5 +47,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

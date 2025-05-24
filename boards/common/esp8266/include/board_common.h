@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
+#pragma once
 
 /**
  * @ingroup     boards_common_esp8266
@@ -133,4 +132,3 @@ void board_print_config (void);
 /** @} */
 
 #endif /* ESP_PLATFORM */
-#endif /* BOARD_COMMON_H */

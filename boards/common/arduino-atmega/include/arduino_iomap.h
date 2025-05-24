@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_arduino-atmega
  * @{
@@ -23,9 +25,6 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/adc.h"
 #include "periph/gpio.h"
@@ -332,5 +331,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

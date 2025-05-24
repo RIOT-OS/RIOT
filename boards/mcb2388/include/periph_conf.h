@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_mcb2388
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benpicco@beuth-hochschule.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "kernel_defines.h"
@@ -145,5 +144,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

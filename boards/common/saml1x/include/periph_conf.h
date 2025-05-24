@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_saml1x
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -260,5 +259,4 @@ static const adc_conf_chan_t adc_channels[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

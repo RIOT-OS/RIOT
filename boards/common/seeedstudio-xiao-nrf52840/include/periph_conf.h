@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
+#pragma once
+
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
  * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
@@ -103,4 +103,3 @@ static const i2c_conf_t i2c_config[] = {
 #endif
 
 /** @} */
-#endif /* PERIPH_CONF_H */

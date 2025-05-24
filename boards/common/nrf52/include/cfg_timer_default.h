@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf52
  * @{
@@ -16,9 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef CFG_TIMER_DEFAULT_H
-#define CFG_TIMER_DEFAULT_H
 
 #include "kernel_defines.h"
 #include "periph_cpu.h"
@@ -102,5 +101,4 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_DEFAULT_H */
 /** @} */

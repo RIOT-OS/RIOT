@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_rpi_pico
  * @ingroup         boards_rpi_pico_w
@@ -15,9 +17,6 @@
  * @brief           Configuration of CPU peripherals for the Raspberry Pi Pico
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -198,5 +197,4 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

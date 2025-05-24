@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf51
  * @{
@@ -17,9 +19,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef CFG_RTT_DEFAULT_H
-#define CFG_RTT_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,5 +46,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_RTT_DEFAULT_H */
 /** @} */

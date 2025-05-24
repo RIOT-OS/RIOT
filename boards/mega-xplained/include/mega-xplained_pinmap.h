@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_mega-xplained
  * @{
@@ -18,9 +20,6 @@
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef MEGA_XPLAINED_PINMAP_H
-#define MEGA_XPLAINED_PINMAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,5 +73,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MEGA_XPLAINED_PINMAP_H */
 /** @} */

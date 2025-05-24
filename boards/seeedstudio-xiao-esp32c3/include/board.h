@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_seeedstudio-xiao-esp32c3
  * @brief       Board definitions for the Seeed Studio Xiao ESP32-C3 board
@@ -14,9 +16,6 @@
  * @file        board.h
  * @author      David Picard
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -76,5 +75,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

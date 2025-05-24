@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp32_esp-wrover-kit
  * @brief       Peripheral MCU configuration for Espressif ESP-WROVER-KIT V3
@@ -41,9 +43,6 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 #include "periph_cpu.h"
@@ -240,5 +239,4 @@ static const sdmmc_conf_t sdmmc_config[] = {
 /* include common board definitions as last step */
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */

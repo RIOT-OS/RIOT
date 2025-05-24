@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp32_olimex-esp32-evb
  * @brief       Board specific definitions for Olimex ESP32-EVB (ESP32-GATEWAY)
@@ -30,9 +32,6 @@
  * @file
  * @{
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -126,5 +125,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

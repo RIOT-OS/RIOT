@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BOARD_MODULES_H
-#define BOARD_MODULES_H
+#pragma once
 
 /**
  * @ingroup     boards_esp32_mh-et-live-minikit
@@ -92,5 +91,3 @@ extern "C" {
 #endif
 
 /** @} */
-
-#endif /* BOARD_MODULES_H */

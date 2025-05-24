@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nz32-sc151
  * @{
@@ -15,9 +17,6 @@
  *              LoRa module
  * @author      Francisco Molina <francisco.molina@inria.cl>
 */
-
-#ifndef SX127X_PARAMS_H
-#define SX127X_PARAMS_H
 
 #include "sx127x.h"
 
@@ -45,5 +44,4 @@ static const sx127x_params_t sx127x_params[] =
 }
 #endif
 
-#endif /* SX127X_PARAMS_H */
 /** @} */

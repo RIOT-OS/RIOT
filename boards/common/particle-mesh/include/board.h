@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_particle-mesh
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -190,5 +189,4 @@ void board_nrfantenna_select(enum board_nrfantenna_selection choice);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

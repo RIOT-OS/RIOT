@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf51dongle
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_common.h"
 
@@ -54,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

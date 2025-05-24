@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_phynode-kw41z
  * @{
@@ -17,9 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      José Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "periph_conf_common.h"
@@ -89,5 +88,4 @@ static const adc_conf_t adc_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

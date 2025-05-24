@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_gba_cartridge
  * @{
@@ -15,9 +17,6 @@
  *
  * @author
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 
@@ -30,5 +29,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

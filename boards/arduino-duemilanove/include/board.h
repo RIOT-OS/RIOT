@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_arduino-duemilanove
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_common.h"
 
@@ -29,5 +28,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

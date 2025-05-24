@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf52
  * @{
@@ -16,9 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
-
-#ifndef CFG_SPI_DEFAULT_H
-#define CFG_SPI_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -49,5 +48,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* CFG_SPI_DEFAULT_H */
 /** @} */

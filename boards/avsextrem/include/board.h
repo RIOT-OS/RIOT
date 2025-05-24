@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_avsextrem
  * @{
@@ -17,9 +19,6 @@
  * @author      Heiko Will
  * @author      Zakaria Kasmi
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "lpc23xx.h"
 #include "bitarithm.h"
@@ -52,4 +51,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* BOARD_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf51
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CFG_CLOCK_16_0_H
-#define CFG_CLOCK_16_0_H
 
 #include "periph_cpu.h"
 
@@ -46,5 +45,4 @@
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_CLOCK_16_0_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf51
  * @{
@@ -17,9 +19,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef CFG_TIMER_012_H
-#define CFG_TIMER_012_H
 
 #include "periph_cpu.h"
 
@@ -70,5 +69,4 @@ static const timer_conf_t timer_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_TIMER_012_H */
 /** @} */

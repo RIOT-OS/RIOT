@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_remote
  * @{
@@ -18,9 +20,6 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CFG_UART_DEFAULT_H
-#define CFG_UART_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -66,5 +65,4 @@ static const uart_conf_t uart_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_UART_DEFAULT_H */
 /** @} */

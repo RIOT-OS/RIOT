@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_esp32x
  * @brief       Peripheral configurations that are common for all ESP32x boards
@@ -20,9 +22,6 @@
  * @file
  * @{
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 #if defined(CPU_FAM_ESP32)
 #include "periph_conf_common_esp32.h"
@@ -413,5 +412,4 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

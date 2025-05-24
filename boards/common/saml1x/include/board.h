@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_saml1x Microchip SAML1X
  * @ingroup     boards
@@ -18,9 +20,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -81,5 +80,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

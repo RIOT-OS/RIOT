@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_msp430
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef CFG_TIMER_A_SMCLK_B_ACLK_H
-#define CFG_TIMER_A_SMCLK_B_ACLK_H
 
 #include "periph_cpu.h"
 
@@ -57,5 +56,4 @@ static const timer_conf_t timer_conf[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_A_SMCLK_B_ACLK_H */
 /** @} */

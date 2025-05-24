@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_cc2650_launchpad
  * @{
@@ -17,9 +19,6 @@
  * @author          Nicholas Jackson <nicholas.jackson@griffithuni.edu.au>
  * @author          Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "periph/gpio.h"
 
@@ -67,5 +66,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

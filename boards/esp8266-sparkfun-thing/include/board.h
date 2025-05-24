@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp8266_sparkfun-thing
  * @brief       Board specific definitions for
@@ -14,9 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @{
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -56,5 +55,4 @@ extern "C" {
 /* include common board definitions as last step */
 #include "board_common.h"
 
-#endif /* BOARD_H */
 /** @} */

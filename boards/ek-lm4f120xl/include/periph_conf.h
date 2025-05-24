@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_ek-lm4f120xl
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "macros/units.h"
@@ -160,5 +159,4 @@ static const spi_conf_t spi_confs[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

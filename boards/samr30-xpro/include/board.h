@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_samr30-xpro Atmel SAM R30 Xplained Pro
  * @ingroup     boards
@@ -17,9 +19,6 @@
  *
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -101,5 +100,4 @@ void board_antenna_config(uint8_t antenna);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

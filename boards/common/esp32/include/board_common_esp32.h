@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_esp32
  * @brief       Board definitions that are common for all ESP32 boards.
@@ -19,9 +21,6 @@
  * @file
  * @{
  */
-
-#ifndef BOARD_COMMON_ESP32_H
-#define BOARD_COMMON_ESP32_H
 
 #include "board_common.h"
 
@@ -48,5 +47,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_COMMON_ESP32_H */
 /** @} */

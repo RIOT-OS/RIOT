@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_sodaq SODAQ boards common
  * @ingroup     boards_common
@@ -17,9 +19,6 @@
  *
  * @author      Kees Bakker <kees@sodaq.com>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +36,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

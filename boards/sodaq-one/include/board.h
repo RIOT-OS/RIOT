@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_sodaq-one
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kees Bakker <kees@sodaq.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -106,5 +105,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

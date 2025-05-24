@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_silabs
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef USBDEV_CFG_OTG_FS_H
-#define USBDEV_CFG_OTG_FS_H
 
 #include "periph_cpu.h"
 #include "usbdev_efm32.h"
@@ -52,5 +51,4 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 }
 #endif
 
-#endif /* USBDEV_CFG_OTG_FS_H */
 /** @} */

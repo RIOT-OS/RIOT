@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp32_ttgo-t-beam
  * @brief       Board specific definitions for TTGO T-Beam board
@@ -26,9 +28,6 @@
  * @file
  * @author      Yegor Yefremov <yegorslists@googlemail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -103,5 +102,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

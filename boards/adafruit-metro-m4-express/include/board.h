@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_adafruit-metro-m4-express
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "arduino_iomap.h"
 #include "cpu.h"
@@ -74,5 +73,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

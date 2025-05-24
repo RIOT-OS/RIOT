@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_arduino-atmega Arduino Atmega Common
  * @ingroup     boards_common
@@ -21,9 +23,6 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -127,5 +126,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

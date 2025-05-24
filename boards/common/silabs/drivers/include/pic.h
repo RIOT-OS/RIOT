@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_silabs_drivers_pic Power-and-interrupt driver
  * @ingroup     boards_common_silabs_drivers
@@ -16,9 +18,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef PIC_H
-#define PIC_H
 
 #include "board.h"
 
@@ -49,5 +48,4 @@ void pic_write(uint8_t addr, uint8_t value);
 }
 #endif
 
-#endif /* PIC_H */
 /** @} */
