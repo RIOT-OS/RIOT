@@ -400,6 +400,20 @@ typedef enum {
      * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.8.1)
      */
     UNICOAP_OPTION_IF_MATCH = 1,
+    
+    /**
+     * @brief `Uri-Host` option
+     *
+     * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.8.2)
+     */
+    UNICOAP_OPTION_URI_HOST = 3,
+    
+    /**
+     * @brief `ETag` option
+     *
+     * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.6)
+     */
+    UNICOAP_OPTION_ETAG = 4,
 
     /**
      * @brief `If-None-Match` option
@@ -407,20 +421,6 @@ typedef enum {
      * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.8.2)
      */
     UNICOAP_OPTION_IF_NONE_MATCH = 5,
-
-    /**
-     * @brief `Uri-Host` option
-     *
-     * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.8.2)
-     */
-    UNICOAP_OPTION_URI_HOST = 3,
-
-    /**
-     * @brief `ETag` option
-     *
-     * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.6)
-     */
-    UNICOAP_OPTION_ETAG = 4,
 
     /**
      * @brief `Observe` option
@@ -672,6 +672,7 @@ typedef enum {
  * @{
  */
 /* MARK: - Content-Format values */
+/* Please see the generator in iana/contenttype.js */
 /**
  * @name Content-Format values
  * @{
@@ -683,404 +684,542 @@ typedef enum {
  */
 typedef enum {
     /**
-     * @brief   Content-Type `plain/text`
+     * @brief Content type `text/plain; charset=utf-8`
+     * @see [RFC2046](https://www.iana.org/go/rfc2046)
+     * @see [RFC3676](https://www.iana.org/go/rfc3676)
+     * @see [RFC5147](https://www.iana.org/go/rfc5147)
      */
     UNICOAP_FORMAT_TEXT = 0,
 
     /**
-     * @brief   Content-Type `application/cose; cose-type="cose-encrypt0"`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cose; cose-type=\"cose-encrypt0\"`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE_ENCRYPT0 = 16,
+    UNICOAP_FORMAT_COSE = 16,
 
     /**
-     * @brief   Content-Type `application/cose; cose-type="cose-mac0"`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cose; cose-type=\"cose-mac0\"`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE_MAC0 = 17,
+    UNICOAP_FORMAT_COSE = 17,
 
     /**
-     * @brief   Content-Type `application/cose; cose-type="cose-sign1"`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cose; cose-type=\"cose-sign1\"`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE_SIGN1 = 18,
+    UNICOAP_FORMAT_COSE = 18,
 
     /**
-     * @brief   Content-Type `application/ace+cbor`
-     * @see     [RFC 9200](https://datatracker.ietf.org/doc/html/rfc9200)
+     * @brief Content type `application/ace+cbor`
+     * @see [RFC9200](https://www.iana.org/go/rfc9200)
      */
     UNICOAP_FORMAT_ACE_CBOR = 19,
 
     /**
-     * @brief   Content-Type `image/gif`
-     * @see     https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+     * @brief Content type `image/gif`
+     * @see [https://www.w3.org/Graphics/GIF/spec-gif89a.txt](https://www.w3.org/Graphics/GIF/spec-gif89a.txt)
      */
     UNICOAP_FORMAT_IMAGE_GIF = 21,
 
     /**
-     * @brief   Content-Type `image/jpeg`
-     * @see     [ISO/IEC 10918-5](https://www.itu.int/rec/T-REC-T.871-201105-I/en)
+     * @brief Content type `image/jpeg`
+     * @see [ISO/IEC 10918-5](https://www.itu.int/rec/T-REC-T.871-201105-I/en)
      */
     UNICOAP_FORMAT_IMAGE_JPEG = 22,
 
     /**
-     * @brief   Content-Type `image/png`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc2083)
+     * @brief Content type `image/png`
+     * @see [RFC2083](https://www.iana.org/go/rfc2083)
      */
     UNICOAP_FORMAT_IMAGE_PNG = 23,
 
     /**
-     * @brief   Content-Type `application/link`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc6690)
+     * @brief Content type `application/link-format`
+     * @see [RFC6690](https://www.iana.org/go/rfc6690)
      */
-    UNICOAP_FORMAT_LINK = 40,
+    UNICOAP_FORMAT_LINK_FORMAT = 40,
 
     /**
-     * @brief   Content-Type `application/xml`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc3023)
+     * @brief Content type `application/xml`
+     * @see [RFC3023](https://www.iana.org/go/rfc3023)
      */
     UNICOAP_FORMAT_XML = 41,
 
     /**
-     * @brief   Content-Type `application/octet-stream`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc2045)
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc2046)
+     * @brief Content type `application/octet-stream`
+     * @see [RFC2045](https://www.iana.org/go/rfc2045)
+     * @see [RFC2046](https://www.iana.org/go/rfc2046)
      */
-    UNICOAP_FORMAT_OCTET = 42,
+    UNICOAP_FORMAT_OCTET_STREAM = 42,
 
     /**
-     * @brief   Content-Type `application/exi`
-     * @see     [Efficient XML Interchange (EXI) Format](http://www.w3.org/TR/2014/REC-exi-20140211/#contenttypeRegistration)
+     * @brief Content type `application/exi`
+     * @see [\"Efficient XML Interchange (EXI) Format 1.0 (Second Edition)\", February 2014](http://www.w3.org/TR/2014/REC-exi-20140211/#contenttypeRegistration)
      */
     UNICOAP_FORMAT_EXI = 47,
 
     /**
-     * @brief   Content-Type `application/json`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc8259)
+     * @brief Content type `application/json`
+     * @see [RFC8259](https://www.iana.org/go/rfc8259)
      */
     UNICOAP_FORMAT_JSON = 50,
 
     /**
-     * @brief   Content-Type `application/json-patch+json`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc6902)
+     * @brief Content type `application/json-patch+json`
+     * @see [RFC6902](https://www.iana.org/go/rfc6902)
      */
     UNICOAP_FORMAT_JSON_PATCH_JSON = 51,
 
     /**
-     * @brief   Content-Type `application/merge-patch+json`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc7396)
+     * @brief Content type `application/merge-patch+json`
+     * @see [RFC7396](https://www.iana.org/go/rfc7396)
      */
     UNICOAP_FORMAT_MERGE_PATCH_JSON = 52,
 
     /**
-     * @brief   Content-Type `application/cbor`
-     * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc8949)
+     * @brief Content type `application/cbor`
+     * @see [RFC8949](https://www.iana.org/go/rfc8949)
      */
     UNICOAP_FORMAT_CBOR = 60,
 
     /**
-     * @brief   Content-Type `application/cwt`
-     * @see     [RFC 8392](https://datatracker.ietf.org/doc/html/rfc8392)
+     * @brief Content type `application/cwt`
+     * @see [RFC8392](https://www.iana.org/go/rfc8392)
      */
     UNICOAP_FORMAT_CWT = 61,
 
     /**
-     * @brief   Content-Type `application/multipart-core`
-     * @see     [RFC 8710](https://datatracker.ietf.org/doc/html/rfc8710)
+     * @brief Content type `application/multipart-core`
+     * @see [RFC8710](https://www.iana.org/go/rfc8710)
      */
     UNICOAP_FORMAT_MULTIPART_CORE = 62,
 
     /**
-     * @brief   Content-Type `application/cbor-seq`
-     * @see     [RFC 8742](https://datatracker.ietf.org/doc/html/rfc8742)
+     * @brief Content type `application/cbor-seq`
+     * @see [RFC8742](https://www.iana.org/go/rfc8742)
      */
     UNICOAP_FORMAT_CBOR_SEQ = 63,
 
     /**
-     * @brief   Content-Type `application/cose; cose-type="cose-encrypt"`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/edhoc+cbor-seq`
+     * @see [RFC9528](https://www.iana.org/go/rfc9528)
      */
-    UNICOAP_FORMAT_COSE_ENCRYPT = 96,
+    UNICOAP_FORMAT_EDHOC_CBOR_SEQ = 64,
 
     /**
-     * @brief   Content-Type `application/cose; cose-type="cose-mac"`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cid-edhoc+cbor-seq`
+     * @see [RFC9528](https://www.iana.org/go/rfc9528)
      */
-    UNICOAP_FORMAT_COSE_MAC = 97,
+    UNICOAP_FORMAT_CID_EDHOC_CBOR_SEQ = 65,
 
     /**
-     * @brief   Content-Type `application/cose; cose-type="cose-sign"`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cose; cose-type=\"cose-encrypt\"`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE_SIGN = 98,
+    UNICOAP_FORMAT_COSE = 96,
 
     /**
-     * @brief   Content-Type `application/cose-key`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cose; cose-type=\"cose-mac\"`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
+     */
+    UNICOAP_FORMAT_COSE = 97,
+
+    /**
+     * @brief Content type `application/cose; cose-type=\"cose-sign\"`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
+     */
+    UNICOAP_FORMAT_COSE = 98,
+
+    /**
+     * @brief Content type `application/cose-key`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
     UNICOAP_FORMAT_COSE_KEY = 101,
 
     /**
-     * @brief   Content-Type `application/cose-key-set`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+     * @brief Content type `application/cose-key-set`
+     * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
     UNICOAP_FORMAT_COSE_KEY_SET = 102,
 
     /**
-     * @brief   Content-Type `application/senml+json`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/senml+json`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENML_JSON = 110,
 
     /**
-     * @brief   Content-Type `application/sensml+json`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/sensml+json`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENSML_JSON = 111,
 
     /**
-     * @brief   Content-Type `application/senml+cbor`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/senml+cbor`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENML_CBOR = 112,
 
     /**
-     * @brief   Content-Type `application/sensml+json`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/sensml+cbor`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENSML_CBOR = 113,
 
     /**
-     * @brief   Content-Type `application/senml+exi`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/senml-exi`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENML_EXI = 114,
 
     /**
-     * @brief   Content-Type `application/sensml+exi`
-     * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/sensml-exi`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENSML_EXI = 115,
 
     /**
-     * @brief   Content-Type `application/yang-data+cbor; id=sid`
-     * @see     [RFC 9254](https://datatracker.ietf.org/doc/html/rfc9254)
+     * @brief Content type `application/yang-data+cbor; id=sid`
+     * @see [RFC9254](https://www.iana.org/go/rfc9254)
      */
-    UNICOAP_FORMAT_YANG_DATA_CBOR_SID = 140,
+    UNICOAP_FORMAT_YANG_DATA_CBOR = 140,
 
     /**
-     * @brief   Content-Type `application/coap-group+json`
-     * @see     [RFC 7390](https://datatracker.ietf.org/doc/html/rfc7390)
+     * @brief Content type `application/coap-group+json`
+     * @see [RFC7390](https://www.iana.org/go/rfc7390)
      */
     UNICOAP_FORMAT_COAP_GROUP_JSON = 256,
 
     /**
-     * @brief   Content-Type `application/concise-problem-details+cbor`
-     * @see     [RFC 9290](https://datatracker.ietf.org/doc/html/rfc9290)
+     * @brief Content type `application/concise-problem-details+cbor`
+     * @see [RFC9290](https://www.iana.org/go/rfc9290)
      */
-    UNICOAP_FORMAT_PROBLEM_DETAILS_CBOR = 257,
+    UNICOAP_FORMAT_CONCISE_PROBLEM_DETAILS_CBOR = 257,
 
     /**
-     * @brief   Content-Type `application/swid+cbor`
-     * @see     [RFC 9393](https://datatracker.ietf.org/doc/html/rfc9393)
+     * @brief Content type `application/swid+cbor`
+     * @see [RFC9393](https://www.iana.org/go/rfc9393)
      */
     UNICOAP_FORMAT_SWID_CBOR = 258,
 
     /**
-     * @brief   Content-Type `application/pkixcmp`
-     * @see     [draft-ietf-ace-cmpv2-coap-transport](https://datatracker.ietf.org/doc/draft-ietf-ace-cmpv2-coap-transport/)
-     * @see     [RFC 4210](https://datatracker.ietf.org/doc/html/rfc4210)
+     * @brief Content type `application/pkixcmp`
+     * @see [RFC9482](https://www.iana.org/go/rfc9482)
+     * @see [RFC-ietf-lamps-rfc6712bis-10](https://www.iana.org/go/draft-ietf-lamps-rfc6712bis-10)
      */
     UNICOAP_FORMAT_PKIXCMP = 259,
 
     /**
-     * @brief   Content-Type `application/dots+cbor`
-     * @see     [RFC 9132](https://datatracker.ietf.org/doc/html/rfc9132)
+     * @brief Content type `application/yang-sid+json`
+     * @see [RFC9595](https://www.iana.org/go/rfc9595)
+     */
+    UNICOAP_FORMAT_YANG_SID_JSON = 260,
+
+    /**
+     * @brief Content type `application/ace-groupcomm+cbor`
+     * @see [RFC9594](https://www.iana.org/go/rfc9594)
+     */
+    UNICOAP_FORMAT_ACE_GROUPCOMM_CBOR = 261,
+
+    /**
+     * @brief Content type `application/ace-trl+cbor`
+     * @see [RFC-ietf-ace-revoked-token-notification-09](https://www.iana.org/go/draft-ietf-ace-revoked-token-notification-09)
+     */
+    UNICOAP_FORMAT_ACE_TRL_CBOR = 262,
+
+    /**
+     * @brief Content type `application/eat+cwt`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     */
+    UNICOAP_FORMAT_EAT_CWT = 263,
+
+    /**
+     * @brief Content type `application/eat+jwt`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     */
+    UNICOAP_FORMAT_EAT_JWT = 264,
+
+    /**
+     * @brief Content type `application/eat-bun+cbor`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     */
+    UNICOAP_FORMAT_EAT_BUN_CBOR = 265,
+
+    /**
+     * @brief Content type `application/eat-bun+json`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     */
+    UNICOAP_FORMAT_EAT_BUN_JSON = 266,
+
+    /**
+     * @brief Content type `application/eat-ucs+cbor`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     */
+    UNICOAP_FORMAT_EAT_UCS_CBOR = 267,
+
+    /**
+     * @brief Content type `application/eat-ucs+json`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     */
+    UNICOAP_FORMAT_EAT_UCS_JSON = 268,
+
+    /**
+     * @brief Content type `application/coap-eap`
+     * @see [RFC-ietf-ace-wg-coap-eap-14](https://www.iana.org/go/draft-ietf-ace-wg-coap-eap-14)
+     */
+    UNICOAP_FORMAT_COAP_EAP = 269,
+
+    /**
+     * @brief Content type `application/dots+cbor`
+     * @see [RFC9132](https://www.iana.org/go/rfc9132)
      */
     UNICOAP_FORMAT_DOTS_CBOR = 271,
 
     /**
-     * @brief   Content-Type `application/missing-blocks+cbor-seq`
-     * @see     [RFC 9177](https://datatracker.ietf.org/doc/html/rfc9177)
+     * @brief Content type `application/missing-blocks+cbor-seq`
+     * @see [RFC9177](https://www.iana.org/go/rfc9177)
      */
     UNICOAP_FORMAT_MISSING_BLOCKS_CBOR_SEQ = 272,
 
     /**
-     * @brief   Content-Type `application/pkcs7-mime; smime-type=server-generated-key`
-     * @see     [RFC 7030](https://datatracker.ietf.org/doc/html/rfc7030)
-     * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
-     * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+     * @brief Content type `application/pkcs7-mime; smime-type=server-generated-key`
+     * @see [RFC7030](https://www.iana.org/go/rfc7030)
+     * @see [RFC8551](https://www.iana.org/go/rfc8551)
+     * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
-    UNICOAP_FORMAT_PKCS7_MIME_SERVER_GEN = 280,
+    UNICOAP_FORMAT_PKCS7_MIME = 280,
 
     /**
-     * @brief   Content-Type `application/pkcs7-mime; smime-type=certs-only`
-     * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
-     * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+     * @brief Content type `application/pkcs7-mime; smime-type=certs-only`
+     * @see [RFC8551](https://www.iana.org/go/rfc8551)
+     * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
-    UNICOAP_FORMAT_PKCS7_MIME_CERTS_ONLY = 281,
+    UNICOAP_FORMAT_PKCS7_MIME = 281,
 
     /**
-     * @brief   Content-Type `application/pkcs8`
-     * @see     [RFC 5958](https://datatracker.ietf.org/doc/html/rfc5958)
-     * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
-     * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+     * @brief Content type `application/pkcs8`
+     * @see [RFC5958](https://www.iana.org/go/rfc5958)
+     * @see [RFC8551](https://www.iana.org/go/rfc8551)
+     * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
     UNICOAP_FORMAT_PKCS8 = 284,
 
     /**
-     * @brief   Content-Type `application/csrattrs`
-     * @see     [RFC 7030](https://datatracker.ietf.org/doc/html/rfc7030)
-     * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+     * @brief Content type `application/csrattrs`
+     * @see [RFC7030](https://www.iana.org/go/rfc7030)
+     * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
     UNICOAP_FORMAT_CSRATTRS = 285,
 
     /**
-     * @brief   Content-Type `application/pkcs10`
-     * @see     [RFC 5967](https://datatracker.ietf.org/doc/html/rfc5967)
-     * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
-     * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+     * @brief Content type `application/pkcs10`
+     * @see [RFC5967](https://www.iana.org/go/rfc5967)
+     * @see [RFC8551](https://www.iana.org/go/rfc8551)
+     * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
     UNICOAP_FORMAT_PKCS10 = 286,
 
     /**
-     * @brief   Content-Type `application/pkix-cert`
-     * @see     [RFC 2585](https://datatracker.ietf.org/doc/html/rfc2585)
-     * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+     * @brief Content type `application/pkix-cert`
+     * @see [RFC2585](https://www.iana.org/go/rfc2585)
+     * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
     UNICOAP_FORMAT_PKIX_CERT = 287,
 
     /**
-     * @brief   Content-Type `application/aif+cbor`
-     * @see     [RFC 9237](https://datatracker.ietf.org/doc/html/rfc9237)
+     * @brief Content type `application/aif+cbor`
+     * @see [RFC9237](https://www.iana.org/go/rfc9237)
      */
     UNICOAP_FORMAT_AIF_CBOR = 290,
 
     /**
-     * @brief   Content-Type `application/aif+json`
-     * @see     [RFC 9237](https://datatracker.ietf.org/doc/html/rfc9237)
+     * @brief Content type `application/aif+json`
+     * @see [RFC9237](https://www.iana.org/go/rfc9237)
      */
     UNICOAP_FORMAT_AIF_JSON = 291,
 
     /**
-     * @brief   Content-Type `application/senml+xml`
-     * @see     [RFC 9237](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/senml+xml`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENML_XML = 310,
 
     /**
-     * @brief   Content-Type `application/sensml+xml`
-     * @see     [RFC 9237](https://datatracker.ietf.org/doc/html/rfc8428)
+     * @brief Content type `application/sensml+xml`
+     * @see [RFC8428](https://www.iana.org/go/rfc8428)
      */
     UNICOAP_FORMAT_SENSML_XML = 311,
 
     /**
-     * @brief   Content-Type `application/senml-etch+json`
-     * @see     [RFC 8790](https://datatracker.ietf.org/doc/html/rfc8790)
+     * @brief Content type `application/senml-etch+json`
+     * @see [RFC8790](https://www.iana.org/go/rfc8790)
      */
-    UNICOAP_FORMAT_SNML_ETCH_JSON = 320,
+    UNICOAP_FORMAT_SENML_ETCH_JSON = 320,
 
     /**
-     * @brief   Content-Type `application/senml-etch+cbor`
-     * @see     [RFC 8790](https://datatracker.ietf.org/doc/html/rfc8790)
+     * @brief Content type `application/senml-etch+cbor`
+     * @see [RFC8790](https://www.iana.org/go/rfc8790)
      */
-    UNICOAP_FORMAT_SNML_ETCH_CBOR = 322,
+    UNICOAP_FORMAT_SENML_ETCH_CBOR = 322,
 
     /**
-     * @brief   Content-Type `application/yang-data+cbor`
-     * @see     [RFC 9254](https://datatracker.ietf.org/doc/html/rfc9254)
+     * @brief Content type `application/yang-data+cbor`
+     * @see [RFC9254](https://www.iana.org/go/rfc9254)
      */
-    UNICOAP_FORMAT_YAML_DATA_CBOR = 340,
+    UNICOAP_FORMAT_YANG_DATA_CBOR = 340,
 
     /**
-     * @brief   Content-Type `application/yang-data+cbor; id=name`
-     * @see     [RFC 9254](https://datatracker.ietf.org/doc/html/rfc9254)
+     * @brief Content type `application/yang-data+cbor; id=name`
+     * @see [RFC9254](https://www.iana.org/go/rfc9254)
      */
-    UNICOAP_FORMAT_YAML_DATA_CBOR_ID_NAME = 341,
+    UNICOAP_FORMAT_YANG_DATA_CBOR = 341,
 
     /**
-     * @brief   Content-Type `application/td+json`
-     * @see     [Web of Things = WoT) Thing Description 1.1](https://www.w3.org/TR/wot-thing-description11/)
+     * @brief Content type `application/td+json`
+     * @see [\"Web of Things (WoT) Thing Description 1.1\", April 2022](https://www.w3.org/TR/wot-thing-description11/)
      */
     UNICOAP_FORMAT_TD_JSON = 432,
 
     /**
-     * @brief   Content-Type `application/tm+json`
-     * @see     [Web of Things = WoT) Thing Description 1.1](https://www.w3.org/TR/wot-thing-description11/)
+     * @brief Content type `application/tm+json`
+     * @see [\"Web of Things (WoT) Thing Description 1.1\", April 2022](https://www.w3.org/TR/wot-thing-description11/)
      */
     UNICOAP_FORMAT_TM_JSON = 433,
 
     /**
-     * @brief   Content-Type `application/dns-message`
-     * @see     [draft-ietf-core-dns-over-coap](https://datatracker.ietf.org/doc/draft-ietf-core-dns-over-coap/)
+     * @brief Content type `application/sdf+json`
+     * @see [RFC-ietf-asdf-sdf-23](https://www.iana.org/go/draft-ietf-asdf-sdf-23)
      */
-    UNICOAP_FORMAT_DNS_MESSAGE = 553,
+    UNICOAP_FORMAT_SDF_JSON = 434,
 
     /**
-     * @brief   Content-Type `application/voucher-cose+cbor`
-     * @see     [draft-ietf-anima-constrained-voucher](https://datatracker.ietf.org/doc/draft-ietf-anima-constrained-voucher/)
-     * @note    Temporary registration until April 12, 2024.
+     * @brief Content type `application/uccs+cbor`
+     * @see [RFC-ietf-rats-uccs-12, Section 6.4](https://www.iana.org/go/draft-ietf-rats-uccs-12)
      */
-    UNICOAP_FORMAT_VOUCER_COSE_CBOR = 836,
+    UNICOAP_FORMAT_UCCS_CBOR = 601,
 
     /**
-     * @brief   Content-Type `application/vnd.ocf+cbor`
+     * @brief Content type `application/vnd.ocf+cbor`
+     * @see [Michael_Koster](https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#Michael_Koster)
      */
-    UNICOAP_FORMAT_VND_OCF_CBOR = 10000,
+    UNICOAP_FORMAT_OCF_CBOR = 10000,
 
     /**
-     * @brief   Content-Type `application/oscore`
-     * @see     [RFC 8613](https://datatracker.ietf.org/doc/html/rfc8613)
+     * @brief Content type `application/oscore`
+     * @see [RFC8613](https://www.iana.org/go/rfc8613)
      */
     UNICOAP_FORMAT_OSCORE = 10001,
 
     /**
-     * @brief   Content-Type `application/javascript`
-     * @see     [RFC 4329](https://datatracker.ietf.org/doc/html/rfc4329)
+     * @brief Content type `application/javascript`
+     * @see [RFC4329](https://www.iana.org/go/rfc4329)
      */
     UNICOAP_FORMAT_JAVASCRIPT = 10002,
 
     /**
-     * @brief   Content-Type `application/json` with Content Coding `deflate`
-     * @see     [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
-     * @see     [RFC 9110,  Section 8.4.1.2](https://datatracker.ietf.org/doc/html/rfc9110)
+     * @brief Content type `application/eat+cwt; eat_profile=\"tag:psacertified.org,2023:psa#tfm\"`
+     * @see [RFC-tschofenig-rats-psa-token-24](https://www.iana.org/go/draft-tschofenig-rats-psa-token-24)
+     */
+    UNICOAP_FORMAT_EAT_CWT = 10003,
+
+    /**
+     * @brief Content type `application/eat+cwt; eat_profile=\"tag:psacertified.org,2019:psa#legacy\"`
+     * @see [RFC-tschofenig-rats-psa-token-24](https://www.iana.org/go/draft-tschofenig-rats-psa-token-24)
+     */
+    UNICOAP_FORMAT_EAT_CWT = 10004,
+
+    /**
+     * @brief Content type `application/eat+cwt; eat_profile=2.16.840.1.113741.1.16.1`
+     * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
+     * @see [draft-cds-rats-intel-corim-profile-02](https://www.iana.org/go/draft-cds-rats-intel-corim-profile-02)
+     */
+    UNICOAP_FORMAT_EAT_CWT = 10005,
+
+    /**
+     * @brief Content type `application/toc+cbor`
+     * @see [CE-Binding, Section 6.3.1](https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Concise-Evidence-Binding-for-SPDM-Version-1.0-Revision-54_pub.pdf)
+     */
+    UNICOAP_FORMAT_TOC_CBOR = 10570,
+
+    /**
+     * @brief Content type `application/ce+cbor`
+     * @see [CE-Binding, Section 6.3.2](https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Concise-Evidence-Binding-for-SPDM-Version-1.0-Revision-54_pub.pdf)
+     */
+    UNICOAP_FORMAT_CE_CBOR = 10571,
+
+    /**
+     * @brief Content type `application/toc+cbor;profile=2.16.840.1.113741.1.16.1`
+     * @see [TCG DICE Concise Evidence Binding for SPDM](https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Concise-Evidence-Binding-for-SPDM-Version-1.1-RC1_10April25.pdf)
+     * @see [draft-cds-rats-intel-corim-profile](https://www.iana.org/go/draft-cds-rats-intel-corim-profile)
+     */
+    UNICOAP_FORMAT_TOC_CBOR = 10572,
+
+    /**
+     * @brief Content type `application/ce+cbor;profile=2.16.840.1.113741.1.16.1`
+     * @see [TCG DICE Concise Evidence Binding for SPDM](https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Concise-Evidence-Binding-for-SPDM-Version-1.1-RC1_10April25.pdf)
+     * @see [draft-cds-rats-intel-corim-profile](https://www.iana.org/go/draft-cds-rats-intel-corim-profile)
+     */
+    UNICOAP_FORMAT_CE_CBOR = 10573,
+
+    /**
+     * @brief Content type `application/json` in `deflate` coding
+     * @see [RFC8259](https://www.iana.org/go/rfc8259)
+     * @see [RFC9110, Section 8.4.1.2](https://www.iana.org/go/rfc9110)
      */
     UNICOAP_FORMAT_JSON_DEFLATE = 11050,
 
     /**
-     * @brief   Content-Type `application/cbor` with Content Coding `deflate`
-     * @see     [RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949)
-     * @see     [RFC 9110,  Section 8.4.1.2](https://datatracker.ietf.org/doc/html/rfc9110)
+     * @brief Content type `application/cbor` in `deflate` coding
+     * @see [RFC8949](https://www.iana.org/go/rfc8949)
+     * @see [RFC9110, Section 8.4.1.2](https://www.iana.org/go/rfc9110)
      */
     UNICOAP_FORMAT_CBOR_DEFLATE = 11060,
 
     /**
-     * @brief   Content-Type `application/vnd.oma.lwm2m+tlv`
-     * @see     [OMA-TS-LightweightM2M-V1_0](https://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf)
+     * @brief Content type `application/vnd.oma.lwm2m+tlv`
+     * @see [OMA-TS-LightweightM2M-V1_0](http://www.openmobilealliance.org/tech/extref/OMA-TS-LightweightM2M-V1_0.zip)
      */
-    UNICOAP_FORMAT_VND_OMA_LWM2M_TLV = 11542,
+    UNICOAP_FORMAT_OMA_LWM2M_TLV = 11542,
 
     /**
-     * @brief   Content-Type `application/vnd.oma.lwm2m+json`
-     * @see     [OMA-TS-LightweightM2M-V1_0](https://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf)
+     * @brief Content type `application/vnd.oma.lwm2m+json`
+     * @see [OMA-TS-LightweightM2M-V1_0](http://www.openmobilealliance.org/tech/extref/OMA-TS-LightweightM2M-V1_0.zip)
      */
-    UNICOAP_FORMAT_VND_OMA_LWM2M_JSON = 11543,
+    UNICOAP_FORMAT_OMA_LWM2M_JSON = 11543,
 
     /**
-     * @brief   Content-Type `application/vnd.oma.lwm2m+cbor`
-     * @see     [OMA-TS-LightweightM2M-V1_2](https://www.openmobilealliance.org/release/LightweightM2M/V1_2-20201110-A/HTML-Version/OMA-TS-LightweightM2M_Core-V1_2-20201110-A.html)
+     * @brief Content type `application/vnd.oma.lwm2m+cbor`
+     * @see [OMA-TS-LightweightM2M-V1_2](http://www.openmobilealliance.org/wp/Overviews/lightweightm2m_overview.html)
      */
-    UNICOAP_FORMAT_VND_OMA_LWM2M_CBOR = 11544,
+    UNICOAP_FORMAT_OMA_LWM2M_CBOR = 11544,
 
     /**
-     * @brief   Content-Type `text/css`
-     * @see     https://datatracker.ietf.org/doc/html/rfc2318
+     * @brief Content type `text/plain;charset=utf-8` in `zstd` coding
+     * @see [Benjamin_Valentin](https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#Benjamin_Valentin)
+     */
+    UNICOAP_FORMAT_TEXT_ZSTD = 12000,
+
+    /**
+     * @brief Content type `application/xml` in `zstd` coding
+     * @see [Benjamin_Valentin](https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#Benjamin_Valentin)
+     */
+    UNICOAP_FORMAT_XML_ZSTD = 12041,
+
+    /**
+     * @brief Content type `application/json` in `zstd` coding
+     * @see [Benjamin_Valentin](https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#Benjamin_Valentin)
+     */
+    UNICOAP_FORMAT_JSON_ZSTD = 12050,
+
+    /**
+     * @brief Content type `text/css`
+     * @see [RFC2318](https://www.iana.org/go/rfc2318)
      */
     UNICOAP_FORMAT_TEXT_CSS = 20000,
 
     /**
-     * @brief   Content-Type `image/svg+xml`
-     * @see     [RFC 2318](https://www.w3.org/TR/SVG/mimereg.html)
+     * @brief Content type `image/svg+xml`
+     * @see [https://www.w3.org/TR/SVG/mimereg.html](https://www.w3.org/TR/SVG/mimereg.html)
      */
     UNICOAP_FORMAT_IMAGE_SVG_XML = 30000,
 } __attribute__((__packed__)) unicoap_content_format_t;
