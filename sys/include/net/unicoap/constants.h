@@ -549,7 +549,7 @@ typedef enum {
     UNICOAP_OPTION_EDHOC = 21,
 
     /**
-     * @brief `Block1` option
+     * @brief `Block2` option
      *
      * Used to indicate the block size and number in a block-wise transfer. Used only to transfer a request body.
      *
@@ -558,7 +558,7 @@ typedef enum {
     UNICOAP_OPTION_BLOCK2 = 23,
 
     /**
-     * @brief `Block2` option
+     * @brief `Block1` option
      *
      * Used to indicate the block size and number in a block-wise transfer. Used only to transfer a response body.
      *
@@ -640,53 +640,58 @@ typedef enum {
      * @see [RFC 9175](https://datatracker.ietf.org/doc/html/rfc9175)
      */
     UNICOAP_OPTION_REQUEST_TAG = 292,
-} __attribute__((__packed__)) unicoap_option_number_t;
-
-static_assert(sizeof(unicoap_option_number_t) == sizeof(uint16_t),
-              "unicoap_option_number_t has unexpected size");
-
-/**
- * @brief CoAP signaling option number
- *
- * These option numbers are only valid in signaling messages.
- */
-typedef enum {
+    
     /**
      * @brief Max-Message-Size option
      * Applies to `7.01` @ref UNICOAP_SIGNAL_CAPABILITIES_SETTINGS message
+     *
+     * @see [RFC8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.3.1)
      */
-    UNICOAP_SIGNALING_OTPION_MAX_MESSAGE_SIZE = 2,
+    UNICOAP_SIGNALING_CSM_OPTION_MAX_MESSAGE_SIZE = 2,
 
     /**
      * @brief Blockwise-Transfer option
      * Applies to `7.01` @ref UNICOAP_SIGNAL_CAPABILITIES_SETTINGS message
+     *
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.3.2)
      */
-    UNICOAP_SIGNALING_OTPION_BLOCKWISE_TRANSFER = 4,
+    UNICOAP_SIGNALING_CSM_OPTION_BLOCKWISE_TRANSFER = 4,
 
     /**
      * @brief Custody option
      * Applies to `7.02` @ref UNICOAP_SIGNAL_PING and `7.03` @ref UNICOAP_SIGNAL_PONG message
+     *
+     * @see [RFC8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.4.1)
      */
-    UNICOAP_SIGNALING_OPTION_CUSTODY = 2,
+    UNICOAP_SIGNALING_PING_PONG_OPTION_CUSTODY = 2,
 
     /**
      * @brief Alternative-Address option
      * Applies to `7.04` @ref UNICOAP_SIGNAL_RELEASE message
+     *
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.5)
      */
-    UNICOAP_SIGNALING_OPTION_ALTERNATIVE_ADDRESS = 2,
+    UNICOAP_SIGNALING_RELEASE_OPTION_ALTERNATIVE_ADDRESS = 2,
 
     /**
      * @brief Hold-Off option
      * Applies to `7.04` @ref UNICOAP_SIGNAL_RELEASE message
+     *
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.5)
      */
-    UNICOAP_SIGNALING_OPTION_HOLD_OFF = 4,
+    UNICOAP_SIGNALING_RELEASE_OPTION_HOLD_OFF = 4,
 
     /**
      * @brief Bad-CSM-Option  option
      * Applies to `7.05` @ref UNICOAP_SIGNAL_ABORT message
+     *
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.6)
      */
-    UNICOAP_SIGNALING_OPTION_BAD_CSM = 2,
-} __attribute__((__packed__)) unicoap_signaling_option_number_t;
+    UNICOAP_SIGNALING_ABORT_OPTION_BAD_CSM = 2,
+} __attribute__((__packed__)) unicoap_option_number_t;
+
+static_assert(sizeof(unicoap_option_number_t) == sizeof(uint16_t),
+              "unicoap_option_number_t has unexpected size");
 /** @} */
 /** @} */
 
