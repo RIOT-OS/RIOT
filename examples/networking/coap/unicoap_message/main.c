@@ -202,7 +202,7 @@ static void _example_create_message(void)
 
     const char payload[] = "Dear thermostat, please adjust your target temperature to 22.5 °C";
     unicoap_message_t message;
-    unicoap_request_init_string_options(&message, UNICOAP_METHOD_POST, payload, &options);
+    unicoap_request_init_string_with_options(&message, UNICOAP_METHOD_POST, payload, &options);
 
     /* Options ----------------- */
 
