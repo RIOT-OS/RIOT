@@ -34,11 +34,11 @@ static void _example_handle_message(const unicoap_message_t* message)
     /* The unicoap message type supports different typed views of the CoAP message code:
      * message->method, message->status, and message->signal.
      *
-     * Now, we want to get a string from the method: GET, PUT, POST, etc
-     * unicoap_description_* methods generate a null-terminated constant C string
+     * Now, we want to get a string from the method: GET, PUT, POST, etc.
+     * unicoap_string_from_* methods generate a null-terminated constant C string
      * from typed values. */
     const char* method_name = unicoap_string_from_method(message->method);
-    /* More expensive, but also possible: unicoap_string_from_code(uint8_t code). */
+    /* Also possible, more general: unicoap_string_from_code(uint8_t code). */
 
     printf("PDU is a CoAP %s request"
            " with payload=<%" PRIuSIZE " bytes>\n",
@@ -56,7 +56,10 @@ static void _example_handle_message(const unicoap_message_t* message)
         return;
     }
 
-    assert(format == UNICOAP_FORMAT_JSON);
+    if (format != UNICOAP_FORMAT_JSON) {
+        puts("Error: was expecting JSON request!");
+        return;
+    }
 
     /* Uri-Query can occur more than once. Hence, unicoap provides multiple convenience
      * accessors. */
@@ -86,7 +89,7 @@ static void _example_handle_message(const unicoap_message_t* message)
     }
 
     /* If you do want to access all values of a repeatable option,
-     * unicoap offers to ways:
+     * unicoap offers two ways:
      * a, unicoap can generate a contiguous string from repeatable options: ?a=1&b=2&c=3
      * b, you iterate over all options using the unicoap option iterator */
     char query_string[50] = { 0 };
@@ -119,14 +122,29 @@ static void _example_parse_pdu(void)
 {
     ssize_t res = 0;
 
+    /*
+     {
+       "type": "Confirmable",
+       "code": "POST",
+       "id": 65201,
+       "token": 0,
+       "options": [
+         "Uri-Path: actuators",
+         "Uri-Path: leds",
+         "Content-Format: application/json",
+         "Uri-Query: color=g",
+         "Accept: application/json"
+       ]
+     }
+     */
     const uint8_t pdu[] = {
         0x40, 0x02, 0xfe, 0xb1, 0xb9, 0x61, 0x63, 0x74, 0x75, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x04, 0x6c, 0x65, 0x64, 0x73, 0x11, 0x32, 0x37, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3d, 0x67, 0x21, 0x32, 0xff, 0x6d, 0x6f, 0x64, 0x65, 0x3d, 0x6f, 0x6e
     };
 
-    /* Next, allocate a helper structure */
+    /* Allocate a helper structure */
     unicoap_parser_result_t parsed = { 0 };
 
-    /* Parse using helper function */
+    /* Parse using helper function, _result version initializes options structure for us. */
     if ((res = unicoap_pdu_parse_rfc7252_result(pdu, sizeof(pdu), &parsed)) < 0) {
         puts("Error: parsing failed");
         return;
@@ -189,7 +207,7 @@ static void _example_create_message(void)
     /* Options ----------------- */
 
     /* To set the path, use the following method. There are two versions for null-terminated
-     * strings and ones that aren't. */
+     * strings and for ones that aren't. */
     int res = unicoap_options_add_uri_path_string(&options, "/thermostat/temperature");
     if (res < 0) {
         if (res == -ENOBUFS) {
@@ -198,13 +216,14 @@ static void _example_create_message(void)
         puts("Error: could not add URI path");
     }
 
-    /* Repeatable options like Uri-Path can also be added individually: */
+    /* Repeatable options like Uri-Path can also be added individually.
+     * This results in /thermostat/temperature/target*/
     res = unicoap_options_add_uri_path_component_string(&options, "target");
     if (res < 0) {
         puts("Error: could not add path component");
     }
 
-    /* The same applies to URI queries. */
+    /* Uri-Query is a repeatable options, and can thus also be added individually. */
     res = unicoap_options_add_uri_queries_string(&options, "unit=C&cool=yes");
     if (res < 0) {
         puts("Error: could not add URI query");

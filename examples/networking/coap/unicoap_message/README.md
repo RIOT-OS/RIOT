@@ -7,8 +7,8 @@ This example corresponds to the [sample code _Using Message APIs_ on doc.riot-os
 
 ## Running the Example
 
-To try this example on your host, run
+To try this example on your host, run:
 ```sh
 BOARD=native make flash term
 ```
-. This will compile and run the application.
+This will compile and run the application.
