@@ -1,0 +1,167 @@
+/*
+ * Copyright (C) 2025 Krzysztof Cabaj <kcabaj@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     examples
+ * @{
+ *
+ * @file
+ * @brief       lwip_ipv4 - sample application for demonstrating basic LWIP
+ *              IPv4 client/server functions.
+ *
+ * @author      Krzysztof Cabaj <kcabaj@gmail.com>
+ *
+ * @}
+ */
+#include "stdio.h"
+#include "stdlib.h"
+#include "shell.h"
+#include "net/sock/udp.h"
+#include <arpa/inet.h>
+#include "thread.h"
+#include "mutex.h"
+
+static char server_stack[4096];
+mutex_t server_mutex = MUTEX_INIT;
+int server_running = 0;
+uint16_t server_port;
+
+static int _client_cmd(int argc, char **argv)
+{
+    uint32_t dest_ip;
+
+    if (argc < 4) {
+        printf("usage: %s <destination IP> <port> <text>\n", argv[0]);
+        return -1;
+    }
+
+    if (inet_pton(AF_INET, argv[1], &dest_ip) != 1) {
+        printf("\"%s\" - is not a valid IPv4 address!\n", argv[1]);
+        return -1;
+    }
+
+    uint16_t port = atoi(argv[2]);
+    size_t data_len = strlen(argv[3]);
+    sock_udp_t sock;
+    sock_udp_ep_t remote = { .addr = { .ipv4_u32 = dest_ip },
+                             .family = AF_INET,
+                             .port = port };
+    int result;
+
+    if ((result = sock_udp_create(&sock, NULL, &remote, SOCK_FLAGS_REUSE_EP)) != 0) {
+        printf("Error sock_udp_create - result %d!\n", result);
+        return -1;
+    }
+    if (data_len != (size_t)sock_udp_send(&sock, argv[3], data_len, NULL)) {
+        printf("Error sock_udp_send!\n");
+        return -1;
+    }
+
+    sock_udp_close(&sock);
+
+    return 0;
+}
+
+SHELL_COMMAND(client, "Send UDP datagram", _client_cmd);
+
+void *server_thread(void *arg)
+{
+    (void)arg;
+    sock_udp_t sock;
+    sock_udp_ep_t local = { .family = AF_INET,
+                            .port = server_port };
+    sock_udp_ep_t remote;
+    int result;
+    char buffer[64] = { 0 };
+
+    if (sock_udp_create(&sock, &local, NULL, SOCK_FLAGS_REUSE_EP) != 0) {
+        printf("Sock_udp_create error!\n");
+        printf("Server stopped.\n");
+
+        mutex_lock(&server_mutex);
+        server_running = 0;
+        mutex_unlock(&server_mutex);
+
+        return NULL;
+    }
+
+    printf("Server started.\n");
+
+    while(1) {
+        if ((result = sock_udp_recv(&sock, buffer, sizeof(buffer), SOCK_NO_TIMEOUT, &remote)) < 0) {
+            printf("Sock_udp_recv error!\n");
+            printf("Server stopped.\n");
+
+            sock_udp_close(&sock);
+
+            mutex_lock(&server_mutex);
+            server_running = 0;
+            mutex_unlock(&server_mutex);
+
+            return NULL;
+        }
+
+        printf("Received %d bytes - %s\n", result, buffer);
+
+        if (sock_udp_send(&sock, buffer, result, &remote) != result) {
+            printf("Sock_udp_send error!\n");
+            printf("Server stopped.\n");
+
+            sock_udp_close(&sock);
+
+            mutex_lock(&server_mutex);
+            server_running = 0;
+            mutex_unlock(&server_mutex);
+
+            return NULL;
+        }
+    }
+
+    sock_udp_close(&sock);
+
+    return NULL;
+}
+
+static int _server_cmd(int argc, char **argv)
+{
+    int is_running;
+    if (argc < 2) {
+        printf("usage: %s <port>\n", argv[0]);
+        return -1;
+    }
+
+    mutex_lock(&server_mutex);
+    is_running = server_running;
+    mutex_unlock(&server_mutex);
+
+    if(is_running == 1) {
+        printf("Server already running!\n");
+        return -1;
+    }
+
+    server_port = atoi(argv[1]);
+
+    mutex_lock(&server_mutex);
+    server_running = 1;
+    mutex_unlock(&server_mutex);
+
+    thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN-1, THREAD_CREATE_STACKTEST, server_thread, NULL, "server");
+
+    return -1;
+}
+
+SHELL_COMMAND(server, "Starts server which receives UDP datagrams", _server_cmd);
+
+int main(void)
+{
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    return 0;
+}
