@@ -1,0 +1,5 @@
+INCLUDES += -I$(RIOTBASE)/sys/net/sock/tls/include
+INCLUDES += -I$(PKGDIRBASE)/wolfssl
+INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/sock_tls
+INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/include
+

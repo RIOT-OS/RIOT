@@ -203,6 +203,9 @@ endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   DIRS += test_utils/interactive_sync
 endif
+ifneq (,$(filter tcp_tls,$(USEMODULE)))
+  DIRS += net/sock/tls
+endif
 ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
   DIRS += test_utils/netdev_eth_minimal
 endif

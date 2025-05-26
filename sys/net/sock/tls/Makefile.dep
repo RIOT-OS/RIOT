@@ -1,0 +1,14 @@
+# sys/net/sock/tls/Makefile.dep
+
+ifneq (,$(filter tcp_tls,$(USEMODULE)))
+  # Only generic dependencies and flags:
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+
+  # Generic debug flag for your frontend code:
+  CFLAGS += -DDEBUG_TCP_TLS
+
+  # Generic compiler flags (optional):
+  CFLAGS += -Wno-error=unused-variable -Wno-error=unused-parameter
+endif
+
