@@ -73,7 +73,7 @@ typedef enum {
  * @{
  */
 /**
- * @brief Number of bits needed to represent @ref unicoap_message_type_t
+ * @brief Number of bits needed to represent @ref unicoap_rfc7252_message_type_t
  */
 #define UNICOAP_MESSAGE_TYPE_FIXED_WIDTH 3
 
@@ -92,7 +92,7 @@ typedef enum {
 
     /** @brief An reset message */
     UNICOAP_TYPE_RST = 3
-} __attribute__((__packed__)) unicoap_message_type_t;
+} __attribute__((__packed__)) unicoap_rfc7252_message_type_t;
 /** @} */
 
 /* MARK: - Message codes */
