@@ -67,12 +67,12 @@ XIPFS_NEW_PARTITION(nvme0p1, "/dev/nvme0p1", NVME0P1_PAGE_NUM);
  * xipfs_format, that can be found at https://github.com/2xs/XiPFS_Format .
  *
  * Then modify the Makefile to suit your needs/sources and call make.
- * You should end up with a *.bin file ready to be uploaded.
+ * You should end up with a *.fae file ready to be uploaded.
  */
 #include "blob/hello-world.fae.h"
 
 #define FILENAME_OF_HELLO_WORLD_FAE  "/dev/nvme0p0/hello-world.fae"
-#define SIZEOF_HELLO_WORLD_BIN       (sizeof(hello_world_fae) / sizeof(hello_world_fae[0]))
+#define SIZEOF_HELLO_WORLD_FAE       (sizeof(hello_world_fae) / sizeof(hello_world_fae[0]))
 
 /**
  * @brief Execution in-place demonstrator.
@@ -124,7 +124,6 @@ XIPFS_NEW_PARTITION(nvme0p1, "/dev/nvme0p1", NVME0P1_PAGE_NUM);
  * ```
  */
 int execution_handler(int argc, char **argv) {
-
     (void)argc;
     (void)argv;
 
@@ -133,7 +132,7 @@ int execution_handler(int argc, char **argv) {
 
         /** There's no executable file yet, let's drop one */
         int ret = xipfs_extended_driver_new_file(
-            FILENAME_OF_HELLO_WORLD_FAE, SIZEOF_HELLO_WORLD_BIN, 1
+            FILENAME_OF_HELLO_WORLD_FAE, SIZEOF_HELLO_WORLD_FAE, 1
         );
         if (ret < 0) {
             printf("xipfs_extended_driver_new_file : failed to create '%s' : error=%d\n",
@@ -152,7 +151,7 @@ int execution_handler(int argc, char **argv) {
             return EXIT_FAILURE;
         }
 
-        ssize_t write_ret = vfs_write(file_handle, hello_world_fae, SIZEOF_HELLO_WORLD_BIN);
+        ssize_t write_ret = vfs_write(file_handle, hello_world_fae, SIZEOF_HELLO_WORLD_FAE);
         if (write_ret < 0) {
             printf("vfs_write : failed to fill '%s' : error=%d\n",
                    FILENAME_OF_HELLO_WORLD_FAE, write_ret);
@@ -167,6 +166,8 @@ int execution_handler(int argc, char **argv) {
         FILENAME_OF_HELLO_WORLD_FAE,
         NULL
     };
+
+
     int ret = xipfs_extended_driver_execv(FILENAME_OF_HELLO_WORLD_FAE, exec_argv);
     if (ret < 0) {
         printf("Failed to execute '%s' : error=%d\n", FILENAME_OF_HELLO_WORLD_FAE, ret);

@@ -185,6 +185,8 @@ static void test_xipfs_execv_efault_path(void);
 static void test_xipfs_execv_enoent_path_null_char(void);
 static void test_xipfs_execv_eisdir_path_root(void);
 static void test_xipfs_execv_enametoolong_path(void);
+static void test_xipfs_execv_efault_no_syscalls_table(void);
+static void test_xipfs_execv_efault_syscalls_table_with_null(void);
 static void test_xipfs_execv_eisdir_path(void);
 static void test_xipfs_execv_enotdir_path(void);
 static void test_xipfs_execv_enoent_path(void);
@@ -366,6 +368,8 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     test_xipfs_execv_enoent_path_null_char();
     test_xipfs_execv_eisdir_path_root();
     test_xipfs_execv_enametoolong_path();
+    test_xipfs_execv_efault_no_syscalls_table();
+    test_xipfs_execv_efault_syscalls_table_with_null();
     test_xipfs_execv_eisdir_path();
     test_xipfs_execv_enotdir_path();
     test_xipfs_execv_enoent_path();
@@ -391,9 +395,14 @@ int main(void)
     {
         printf("Constructing vfs_xipfs_mount from mtd_flash_aux_slot...");
 
+        mutex_t            mutex;
+        mutex_t            execution_mutex;
         vfs_xipfs_mount_t  vfs_xipfs_mount;
 
-        int ret = xipfs_construct_from_flashpage(&mtd_flash_aux_slot, "/dev/nvme0p0", &vfs_xipfs_mount);
+        int ret = xipfs_construct_from_flashpage(
+            &mtd_flash_aux_slot, "/dev/nvme0p0",
+            &execution_mutex, &mutex,
+            &vfs_xipfs_mount);
         XIPFS_ASSERT(ret == 0);
         printf("Done.\n");
 
@@ -2375,7 +2384,7 @@ static void test_xipfs_execv_efault_path(void)
     int ret;
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, NULL, NULL);
+    ret = xipfs_execv(xipfs_nvme0p0, NULL, NULL, NULL);
     XIPFS_ASSERT(ret == -EFAULT);
 }
 
@@ -2384,7 +2393,7 @@ static void test_xipfs_execv_enoent_path_null_char(void)
     int ret;
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "", NULL);
+    ret = xipfs_execv(xipfs_nvme0p0, "", NULL, NULL);
     XIPFS_ASSERT(ret == -ENOENT);
 }
 
@@ -2393,7 +2402,7 @@ static void test_xipfs_execv_eisdir_path_root(void)
     int ret;
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "/", NULL);
+    ret = xipfs_execv(xipfs_nvme0p0, "/", NULL, NULL);
     XIPFS_ASSERT(ret == -EISDIR);
 }
 
@@ -2403,9 +2412,49 @@ static void test_xipfs_execv_enametoolong_path(void)
 
     /* test */
     ret = xipfs_execv(xipfs_nvme0p0, "/totoooooooooooooooooooooo"
-            "oooooooooooooooooooooooooooooooooooooo", NULL);
+            "oooooooooooooooooooooooooooooooooooooo", NULL, NULL);
     XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
+
+static void test_xipfs_execv_efault_no_syscalls_table(void) {
+    int ret;
+
+    char *argv[2] = {
+        "/toto/", NULL
+    };
+
+    /* test */
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto/", argv, NULL);
+    XIPFS_ASSERT(ret == -EFAULT);
+}
+
+static void test_xipfs_execv_efault_syscalls_table_with_null(void) {
+    int ret;
+
+    char *argv[2] = {
+        "/toto/", NULL
+    };
+    const void *user_syscalls[XIPFS_USER_SYSCALL_MAX] = {
+        NULL
+    };
+
+    /* test */
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto/", argv, user_syscalls);
+    XIPFS_ASSERT(ret == -EFAULT);
+}
+
+static void fake_syscall(void) {}
+static const void *fake_user_syscalls[XIPFS_USER_SYSCALL_MAX] = {
+    [       XIPFS_USER_SYSCALL_PRINTF] = fake_syscall,
+    [     XIPFS_USER_SYSCALL_GET_TEMP] = fake_syscall,
+    [      XIPFS_USER_SYSCALL_ISPRINT] = fake_syscall,
+    [       XIPFS_USER_SYSCALL_STRTOL] = fake_syscall,
+    [      XIPFS_USER_SYSCALL_GET_LED] = fake_syscall,
+    [      XIPFS_USER_SYSCALL_SET_LED] = fake_syscall,
+    [    XIPFS_USER_SYSCALL_COPY_FILE] = fake_syscall,
+    [XIPFS_USER_SYSCALL_GET_FILE_SIZE] = fake_syscall,
+    [       XIPFS_USER_SYSCALL_MEMSET] = fake_syscall
+};
 
 static void test_xipfs_execv_eisdir_path(void)
 {
@@ -2420,7 +2469,7 @@ static void test_xipfs_execv_eisdir_path(void)
     XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "/toto/", argv);
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto/", argv, fake_user_syscalls);
     XIPFS_ASSERT(ret == -EISDIR);
 
     /* clean up */
@@ -2444,7 +2493,7 @@ static void test_xipfs_execv_enotdir_path(void)
     XIPFS_ASSERT(ret == 0);
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "/toto/toto", argv);
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto/toto", argv, fake_user_syscalls);
     XIPFS_ASSERT(ret == -ENOTDIR);
 
     /* clean up */
@@ -2460,6 +2509,6 @@ static void test_xipfs_execv_enoent_path(void)
     };
 
     /* test */
-    ret = xipfs_execv(xipfs_nvme0p0, "/toto", argv);
+    ret = xipfs_execv(xipfs_nvme0p0, "/toto", argv, fake_user_syscalls);
     XIPFS_ASSERT(ret == -ENOENT);
 }

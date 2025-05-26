@@ -37,6 +37,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 /*
  * RIOT includes
@@ -45,6 +47,8 @@
 #include "debug.h"
 #include "fs/xipfs_fs.h"
 #include "periph/flashpage.h"
+
+#include "saul_reg.h"
 
 /*
  * xipfs includes
@@ -82,17 +86,6 @@
  * @param x The unused variable name
  */
 #define UNUSED(x) ((void)(x))
-
-/*
- * Global variables
- */
-
-/**
- * @internal
- *
- * @brief xipfs global lock
- */
-static mutex_t xipfs_mutex = MUTEX_INIT;
 
 /*
  * Helper functions
@@ -291,9 +284,9 @@ static int _close(vfs_file_t *filp)
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_close(mp, descp);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -307,9 +300,9 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_fstat(mp, descp, buf);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -323,9 +316,9 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_lseek(mp, descp, off, whence);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -340,9 +333,9 @@ static int _open(vfs_file_t *filp, const char *name, int flags,
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_open(mp, descp, name, flags, mode);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -356,9 +349,9 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_read(mp, descp, dest, nbytes);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -372,9 +365,9 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_write(mp, descp, src, nbytes);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -388,9 +381,9 @@ static int _fsync(vfs_file_t *filp)
     mp = _get_xipfs_mount_t(filp->mp);
     descp = (xipfs_file_desc_t *)(uintptr_t)&filp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_fsync(mp, descp, filp->pos);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -408,9 +401,9 @@ static int _opendir(vfs_DIR *dirp, const char *dirname)
     mp = _get_xipfs_mount_t(dirp->mp);
     descp = (xipfs_dir_desc_t *)(uintptr_t)&dirp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_opendir(mp, descp, dirname);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -426,9 +419,9 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     descp = (xipfs_dir_desc_t *)(uintptr_t)&dirp->private_data.ptr;
     direntp = (xipfs_dirent_t *)(uintptr_t)entry->d_name;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_readdir(mp, descp, direntp);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -442,9 +435,9 @@ static int _closedir(vfs_DIR *dirp)
     mp = _get_xipfs_mount_t(dirp->mp);
     descp = (xipfs_dir_desc_t *)(uintptr_t)&dirp->private_data.ptr;
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_closedir(mp, descp);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -460,9 +453,11 @@ static int _format(vfs_mount_t *vfs_mp)
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->execution_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_format(mp);
-    mutex_unlock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
+    mutex_lock(mp->execution_mutex);
 
     return ret;
 }
@@ -474,9 +469,9 @@ static int _mount(vfs_mount_t *vfs_mp)
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_mount(mp);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -497,9 +492,11 @@ static int _unlink(vfs_mount_t *vfs_mp, const char *name)
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->execution_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_unlink(mp, name);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
+    mutex_lock(mp->execution_mutex);
 
     return ret;
 }
@@ -511,9 +508,9 @@ static int _mkdir(vfs_mount_t *vfs_mp, const char *name, mode_t mode)
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_mkdir(mp, name, mode);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -525,9 +522,11 @@ static int _rmdir(vfs_mount_t *vfs_mp, const char *name)
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->execution_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_rmdir(mp, name);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
+    mutex_unlock(mp->execution_mutex);
 
     return ret;
 }
@@ -540,9 +539,9 @@ static int _rename(vfs_mount_t *vfs_mp, const char *from_path,
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_rename(mp, from_path, to_path);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -555,9 +554,9 @@ static int _stat(vfs_mount_t *vfs_mp, const char *restrict path,
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_stat(mp, path, buf);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     return ret;
 }
@@ -571,9 +570,9 @@ static int _statvfs(vfs_mount_t *vfs_mp, const char *restrict path,
 
     mp = _get_xipfs_mount_t(vfs_mp);
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp->mutex);
     ret = xipfs_statvfs(mp, path, &xipfs_buf);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp->mutex);
 
     (void)memset(buf, 0, sizeof(*buf));
     buf->f_bsize   = xipfs_buf.f_bsize;
@@ -607,12 +606,114 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_
         return -EIO;
     }
 
-    mutex_lock(&xipfs_mutex);
+    mutex_lock(mp.mutex);
     ret = xipfs_new_file(&mp, path, size, exec);
-    mutex_unlock(&xipfs_mutex);
+    mutex_unlock(mp.mutex);
 
     return ret;
 }
+
+static int get_temperature(void) {
+    phydat_t physical_data;
+    saul_reg_t *device = saul_reg_find_type(SAUL_SENSE_TEMP);
+    int res = saul_reg_read(device, &physical_data);
+    if (res < 0)
+        return res;
+
+    return physical_data.val[0];
+}
+
+static int get_led(int pos) {
+    phydat_t    physical_data;
+    saul_reg_t *device = saul_reg_find_nth(pos);
+    int res = saul_reg_read(device, &physical_data);
+    if (res < 0)
+        return res;
+
+    return physical_data.val[0];
+}
+
+static int set_led(int pos, int val) {
+    phydat_t    physical_data;
+    saul_reg_t *device = saul_reg_find_nth(pos);
+    physical_data.val[0] = val;
+    int res = saul_reg_write(device, &physical_data);
+    return res;
+}
+
+static int get_file_size(const char *full_path, size_t *size) {
+    xipfs_mount_t mp;
+    const char *path;
+    int ret;
+    struct stat buf;
+
+    if ((full_path == NULL) || (size == NULL)) {
+        return -EFAULT;
+    }
+    if ((ret = get_xipfs_mp(full_path, &mp)) < 0) {
+        return ret;
+    }
+    if ((path = get_rel_path(&mp, full_path)) == NULL) {
+        return -EIO;
+    }
+
+    *size = 0;
+    ret = xipfs_stat(&mp, path, &buf);
+    if (ret < 0) {
+        return ret;
+    }
+    *size = buf.st_size;
+    return 0;
+}
+
+static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
+    xipfs_mount_t mp;
+    const char *path;
+    xipfs_file_desc_t desc;
+    int ret;
+    size_t file_size;
+
+    ret = get_file_size(full_path, &file_size);
+    if (ret < 0) {
+        return ret;
+    }
+    if (nbyte > file_size)
+        nbyte = file_size;
+    if (full_path == NULL) {
+        return -EFAULT;
+    }
+    if ((ret = get_xipfs_mp(full_path, &mp)) < 0) {
+        return ret;
+    }
+    if ((path = get_rel_path(&mp, full_path)) == NULL) {
+        return -EIO;
+    }
+
+    ret = xipfs_open(&mp, &desc, path, O_RDONLY, 0);
+    if (ret < 0) {
+        return ret;
+    }
+    ret = xipfs_read(&mp, &desc, buf, nbyte);
+    if (ret < 0) {
+        return ret;
+    }
+    ret = xipfs_close(&mp, &desc);
+
+    return nbyte;
+}
+
+
+static const void *xipfs_user_syscalls_table[XIPFS_USER_SYSCALL_MAX] = {
+    [       XIPFS_USER_SYSCALL_PRINTF] = vprintf,
+    [     XIPFS_USER_SYSCALL_GET_TEMP] = get_temperature,
+    [      XIPFS_USER_SYSCALL_ISPRINT] = isprint,
+    [       XIPFS_USER_SYSCALL_STRTOL] = strtol,
+    [      XIPFS_USER_SYSCALL_GET_LED] = get_led,
+    [      XIPFS_USER_SYSCALL_SET_LED] = set_led,
+    [    XIPFS_USER_SYSCALL_COPY_FILE] = copy_file,
+    [XIPFS_USER_SYSCALL_GET_FILE_SIZE] = get_file_size,
+    [       XIPFS_USER_SYSCALL_MEMSET] = memset
+};
 
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
 {
@@ -630,9 +731,9 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
         return -EIO;
     }
 
-    mutex_lock(&xipfs_mutex);
-    ret = xipfs_execv(&mp, path, argv);
-    mutex_unlock(&xipfs_mutex);
+    mutex_lock(mp.execution_mutex);
+    ret = xipfs_execv(&mp, path, argv, xipfs_user_syscalls_table);
+    mutex_unlock(mp.execution_mutex);
 
     return ret;
 }
@@ -676,9 +777,12 @@ const vfs_file_system_t xipfs_file_system = {
 };
 
 
-int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path, vfs_xipfs_mount_t *vfs_xipfs_mount) {
+int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path,
+                                   mutex_t *execution_mutex, mutex_t *mutex,
+                                   vfs_xipfs_mount_t *vfs_xipfs_mount) {
 
-    if ( (flashpage == NULL) || (path == NULL) || (path[0] == '\0') )
+    if (   (flashpage == NULL) || (path == NULL) || (path[0] == '\0')
+        || (execution_mutex == NULL) || (mutex == NULL) )
         return -EINVAL;
 
     vfs_xipfs_mount->vfs_mp.fs          = &xipfs_file_system;
@@ -691,6 +795,10 @@ int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path,
           (unsigned char *)XIPFS_NVM_BASE
         + (flashpage->offset * XIPFS_NVM_PAGE_SIZE)
         );
+    vfs_xipfs_mount->execution_mutex = execution_mutex;
+    mutex_init(vfs_xipfs_mount->execution_mutex);
+    vfs_xipfs_mount->mutex = mutex;
+    mutex_init(vfs_xipfs_mount->mutex);
 
     return 0;
 }
