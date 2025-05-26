@@ -81,7 +81,7 @@ static inline unsigned _get_type(const unicoap_header_rfc7252_t* header)
  * @param[in]   header   CoAP PDU header
  * @param       type   CoAP PDU type
  */
-static inline void _set_type(unicoap_header_rfc7252_t* header, unicoap_message_type_t type)
+static inline void _set_type(unicoap_header_rfc7252_t* header, unicoap_rfc7252_message_type_t type)
 {
     assert((type & ~0x3) == 0);
     header->version_type_token_length |= type << 4;
@@ -218,7 +218,7 @@ ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
     return sizeof(unicoap_header_rfc7252_t) + properties->token_length;
 }
 
-const char* unicoap_string_from_rfc7252_type(unicoap_message_type_t type)
+const char* unicoap_string_from_rfc7252_type(unicoap_rfc7252_message_type_t type)
 {
     switch (type) {
     case UNICOAP_TYPE_NON:
