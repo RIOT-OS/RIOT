@@ -192,7 +192,7 @@ function.
 ```c
 const char payload[] = "Hello, World!";
 
-unicoap_request_init_string_options(&message, UNICOAP_METHOD_POST, payload, &options);
+unicoap_request_init_string_with_options(&message, UNICOAP_METHOD_POST, payload, &options);
 ```
 
 ### Customizing Options
