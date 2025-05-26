@@ -64,7 +64,7 @@ typedef enum {
  * @ref unicoap_message_payload_get_size. For vectored payload, this entails an overhead with a complexity of `O(n)`.
  * If you just want to check whether there is _any_ payload, use @ref unicoap_message_payload_is_empty.
  * You can also make the payload contiguous by calling @ref unicoap_message_payload_make_contiguous, which mutates the
- * message. If you purely want to obtain a contiguous representation stored in another buffer, use
+ * message struct. If you purely want to obtain a contiguous representation stored in another buffer, use
  * @ref unicoap_message_payload_copy.
  *
  */
@@ -89,20 +89,25 @@ typedef struct {
             /**
              * @brief Message payload
              *
-             * Access via
+             * Access via @ref unicoap_message_payload_get and @ref unicoap_message_payload_set.
              */
             uint8_t* payload;
 
             /**
              * @brief Size of message payload
              *
-             * Number of bytes in @ref unicoap_message_t.payload
+             * Number of bytes in @ref unicoap_message_t::payload. Access via @ref unicoap_message_payload_get_size.
              */
             size_t payload_size;
         };
 
         /**
          * @brief Noncontiguous payload
+         *
+         * Use one of these APIs:
+         * - @ref unicoap_message_payload_get_chunks
+         * - @ref unicoap_message_payload_set_chunks
+         * - @ref unicoap_message_payload_append_chunk
          */
         iolist_t* payload_chunks;
     };
@@ -126,21 +131,21 @@ typedef struct {
         /**
          * @brief CoAP request method
          *
-         * Check if this is a request message before reading this property.
+         * @pre Check if this is a request message before reading this property using @ref unicoap_message_is_request.
          */
         unicoap_method_t method;
 
         /**
          * @brief CoAP response status
          *
-         * Check if this is a response message before reading this property.
+         * @pre Check if this is a response message before reading this property using @ref unicoap_message_is_response.
          */
         unicoap_status_t status;
 
         /**
          * @brief CoAP signal
          *
-         * Check if this is a signalling message before reading this property.
+         * Check if this is a signaling message before reading this property using @ref unicoap_message_is_signal.
          */
         unicoap_signal_t signal;
     };
@@ -148,8 +153,8 @@ typedef struct {
     /**
      * @brief A value indicating how the payload is represented
      *
-     * If the payload is noncontiguous, the @ref unicoap_message_t.payload_chunks property must be accessed.
-     * Otherwise, only @ref unicoap_message_t.payload must be read and written to.
+     * If the payload is noncontiguous, the @ref unicoap_message_t::payload_chunks property must be accessed.
+     * Otherwise, only @ref unicoap_message_t::payload must be read and written to.
      */
     unicoap_payload_representation_t payload_representation : 1;
 } unicoap_message_t;
@@ -209,7 +214,7 @@ static inline void unicoap_message_payload_set_chunks(unicoap_message_t* message
 }
 
 /**
- * @brief Appends a payload chunk to
+ * @brief Appends a payload chunk to a message
  * @pre Message's payload must be noncontiguous
  *
  * @param message Message
@@ -219,10 +224,10 @@ void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* 
 
 /**
  * @brief Retrieves payload size, regardless of payload representation
- * @param message Message whose payload size to compute
+ * @param message Message whose payload size to compute (if noncontiguous payload) or retrieve (contiguous payload).
  * @returns Payload size in bytes
  *
- * @note This function calls @ref iolist_size, thus iterates over all vector elements. The complexity is $O(n)$.
+ * @note This function calls @ref iolist_size if payload is noncontiguous, thus iterates over all iolist elements. The complexity is $O(n)$.
  */
 static inline size_t unicoap_message_payload_get_size(const unicoap_message_t* message)
 {
@@ -266,13 +271,13 @@ ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* 
 ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint8_t* buffer, size_t capacity);
 
 /**
- * @brief Properties of a given CoAP message
+ * @brief Properties of a CoAP message
  */
 typedef struct {
     /** @brief CoAP token used to correlate requests to responses */
     uint8_t* token;
 
-    /** @brief Length CoAP message token */
+    /** @brief Length of @ref unicoap_message_properties_t::token */
     uint8_t token_length : UNICOAP_TOKEN_LENGTH_FIXED_WIDTH;
 
     /**
@@ -308,11 +313,11 @@ typedef struct {
  *
  * @returns Message type label, never `NULL`
  * Possible return values are are:
- * - `"NON"`: A non-confirmable message
- * - `"CON"`: A confirmable message
- * - `"ACK"`: An acknowledgement message
- * - `"RST"`: A reset message
- * - `"?"`: Unknown message type
+ * @retval `"NON"` A non-confirmable message
+ * @retval `"CON"` A confirmable message
+ * @retval `"ACK"` An acknowledgement message
+ * @retval `"RST"` A reset message
+ * @retval `"?"` Unknown message type
  */
 const char* unicoap_string_from_rfc7252_type(unicoap_message_type_t type);
 
@@ -345,10 +350,10 @@ static inline size_t unicoap_message_options_size(const unicoap_message_t* messa
 /**
  * @brief Reads the code class number encoded in the given code
  *
- * A message code is divided into the class bits and detail bits, where `C` is a class bit and `D` is a detail bit.
+ * A message code is divided into the three class bits and five detail bits.
  * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
- * message codes are written as `c.dd` where `c` is the unsigned integer encoded in the three `C` bits and
- * `dd` is the beforementioned two-digit number encoded in the five `D` bits.
+ * message codes are written as `c.dd`. In the following listing,  `C` is a class bit and `D` is a detail bit.
+ * The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
  * ```
  *   Bit
  *   7 6 5   4   3 2 1 0
@@ -368,10 +373,10 @@ static inline uint8_t unicoap_code_class(uint8_t code)
 /**
  * @brief Reads the code detail number encoded in the given code
  *
- * A message code is divided into the class bits and detail bits, where `C` is a class bit and `D` is a detail bit.
+ * A message code is divided into the three class bits and five detail bits.
  * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
- * message codes are written as `c.dd` where `c` is the unsigned integer encoded in the three `C` bits and
- * `dd` is the beforementioned two-digit number encoded in the five `D` bits.
+ * message codes are written as `c.dd`. In the following listing,  `C` is a class bit and `D` is a detail bit.
+ * The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
  * ```
  *   Bit
  *   7 6 5   4   3 2 1 0
@@ -503,7 +508,7 @@ static inline unicoap_message_t unicoap_message_string(uint8_t code, const char*
 }
 
 /**
- * @brief Initializes message with string payload and options
+ * @brief Initializes message with byte payload and options
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload bytes (nullable)
@@ -521,7 +526,7 @@ static inline void unicoap_message_init_options(unicoap_message_t* message, uint
 }
 
 /**
- * @brief Creates message with string payload and options
+ * @brief Creates message with byte payload and options
  * @param code Message code
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
@@ -538,7 +543,7 @@ static inline unicoap_message_t unicoap_message_options(uint8_t code, uint8_t* p
 }
 
 /**
- * @brief Initializes message with string payload and options
+ * @brief Initializes message with string byte and options
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -548,14 +553,11 @@ static inline void unicoap_message_init_string_options(unicoap_message_t* messag
                                                        const char* payload,
                                                        unicoap_options_t* options)
 {
-    message->code = code;
-    message->options = options;
-    message->payload = (uint8_t*)payload;
-    message->payload_size = payload ? strlen(payload) : 0;
+    unicoap_message_init_options(message, code, (uint8_t*)payload, payload ? strlen(payload) : 0, options);
 }
 
 /**
- * @brief Creates message with string payload and options
+ * @brief Creates message with byte payload and options
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
@@ -577,17 +579,13 @@ static inline unicoap_message_t unicoap_message_string_options(uint8_t code, con
  * @{
  */
 /**
- * @brief Determines if the the given message's code is a a signaling code
+ * @brief Determines if the given message's code is a a signaling code
  *
  * This function internally reads the code class encoded in the code's upper three bits.
  *
  * @param code Message code
  *
  * @return A boolean value indicating whether the given message is a signal
- *
- * @see @ref unicoap_code_class
- *
- * @see @ref unicoap_code_detail
  */
 static inline bool unicoap_message_is_signal(uint8_t code)
 {
@@ -639,9 +637,6 @@ const char* unicoap_string_from_signal(unicoap_signal_t signal);
  *
  * @param code Message code
  * @return A boolean value indicating whether the given message is a request
- *
- * @see @ref unicoap_code_class
- * @see @ref unicoap_code_detail
  */
 static inline bool unicoap_message_is_request(uint8_t code)
 {
@@ -651,7 +646,7 @@ static inline bool unicoap_message_is_request(uint8_t code)
 /**
  * @brief Obtains request method from the given message's code
  * @param[in] request Request message, pre-initialized
- * @returns Request method
+ * @returns Request method if code is a request code
  */
 static inline unicoap_method_t unicoap_request_get_method(const unicoap_message_t* request)
 {
@@ -748,7 +743,7 @@ static inline unicoap_message_t unicoap_request_string(unicoap_method_t method, 
 }
 
 /**
- * @brief Initializes request with string payload and options
+ * @brief Initializes request with byte payload and options
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload bytes (nullable)
@@ -763,7 +758,7 @@ static inline void unicoap_request_init_options(unicoap_message_t* request, unic
 }
 
 /**
- * @brief Creates request with string payload and options
+ * @brief Creates request with byte payload and options
  * @param method Request method
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
@@ -819,10 +814,6 @@ static inline unicoap_message_t unicoap_request_string_options(unicoap_method_t 
  * @param code Message code
  *
  * @return A boolean value indicating whether the given message is a response
- *
- * @see @ref unicoap_code_class
- *
- * @see @ref unicoap_code_detail
  */
 bool unicoap_message_is_response(uint8_t code);
 
@@ -924,7 +915,7 @@ static inline unicoap_message_t unicoap_response_string(unicoap_status_t status,
 }
 
 /**
- * @brief Initializes response with string payload and options
+ * @brief Initializes response with byte payload and options
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload bytes (nullable)
@@ -939,7 +930,7 @@ static inline void unicoap_response_init_options(unicoap_message_t* response,
 }
 
 /**
- * @brief Creates response with string payload and options
+ * @brief Creates response with string byte and options
  * @param status Response status
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
@@ -1051,14 +1042,66 @@ static inline ssize_t unicoap_pdu_parse(const uint8_t* pdu, size_t size, unicoap
  *
  * @param[in] cursor Start of options buffer
  * @param[out] end Pointer to after last buffer element
- * @param[in,out] message Pre-allocated message two write options and payload into. Must have valid options pointer
+ * @param[in,out] message Pre-allocated message to write options and payload into. Must have valid options pointer
  *
  * @returns `0` on success
  * @returns Negative errno on failure
  */
 ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* end,
                                               unicoap_message_t* message);
+/** @} */
 
+/* MARK: - Serializing */
+/**
+ * @name Serializing
+ * @{
+ */
+/**
+ * @brief Populates the given buffer with options and payload
+ *
+ * Call this method with the remaining capacity after you have written the CoAP header into a PDU buffer
+ *
+ * @param[in] cursor Pointer to first byte after header
+ * @param remaining_capacity Capacity remaining for options, payload marker, and payload
+ * @param[in] message Message containing options and payload
+ *
+ * @returns Number of bytes written
+ * @returns `-ENOBUFS` if buffer is too small
+ */
+ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_capacity, const unicoap_message_t* message);
+
+/**
+ * @brief Populates the given iolist with header, options, payload separator and payload
+ *
+ * Use this method to construct a vector message for vectored send functions in your transport
+ * driver.
+ *
+ * The iolist is squashed if a carbon copy buffer is present, i.e., all iolist chunks are copied into the
+ * carbon copy buffer. In that case, the first iolist element will hold the reference to the carbon copy
+ * buffer.
+ *
+ * @param[in] header Encoded CoAP header
+ * @param header_size Size of @p header
+ * @param[in] message Message containing options and payload
+ * @param[in,out] iolists Buffer of iolists, pre-allocated, size must be be @ref UNICOAP_PDU_IOLIST_COUNT
+ *
+ * @returns `0` on success
+ * @returns `-ENOBUFS` if carbon copy buffer is too small
+ *
+ */
+int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, const unicoap_message_t* message,
+                                           iolist_t* iolists);
+/** @} */
+/** @} */
+
+/**
+ * @addtogroup net_unicoap_drivers_rfc7252_pdu
+ * @{
+ */
+/**
+ * @name Parsing
+ * @{
+ */
 /**
  * @brief Parses RFC 7252 PDU
  *
@@ -1069,6 +1112,8 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
  *
  * @returns `0` on success
  * @returns Negative errno on failure
+ * @retval `-EBADOPT` Bad option
+ * @retval `-ENOBUFS` Options buffer in @ref unicoap_message_t::options (@ref unicoap_options_t) too small
  *
  * @remark To allocate everything needed in one go, use @ref unicoap_pdu_parse instead.
  */
@@ -1092,25 +1137,10 @@ static inline ssize_t unicoap_pdu_parse_rfc7252_result(const uint8_t* pdu, size_
 }
 /** @} */
 
-/* MARK: - Serializing */
 /**
  * @name Serializing
  * @{
  */
-/**
- * @brief Populates the given buffer with options and payload
- *
- * Call this method with the remaining capacity after you have written the CoAP header into a PDU buffer
- *
- * @param[in] cursor Pointer to first byte after header
- * @param remaining_capacity Capacity remaining for options, payload marker, and payload
- * @param[in] message Message containing options and payload
- *
- * @returns Number of bytes written
- * @returns `-ENOBUFS` if buffer is too small
- */
-ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_capacity, const unicoap_message_t* message);
-
 /**
  * @brief Writes RFC 7252 PDU header in the given buffer
  *
@@ -1120,6 +1150,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_
  * @param[in] properties Message properties to serialize into the header
  *
  * @returns Header size
+ * @retval `-ENOBUFS` Buffer too small
  */
 ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
                                          const unicoap_message_t* message,
@@ -1135,6 +1166,7 @@ ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
  *
  * @returns Size of PDU
  * @returns Negative integer one error
+ * @retval `-ENOBUFS` Buffer too small
  */
 static inline ssize_t unicoap_pdu_build_rfc7252(uint8_t* pdu, size_t capacity,
                                                 const unicoap_message_t* message,
@@ -1151,33 +1183,11 @@ static inline ssize_t unicoap_pdu_build_rfc7252(uint8_t* pdu, size_t capacity,
 
 /* MARK: unicoap_driver_extension_point */
 
-/** @brief Number iolists in the iolist buffer that must be passed to @ref unicoap_pdu_buildv_options_and_payload */
+/** @brief Number of iolists in the iolist buffer that must be passed to @ref unicoap_pdu_buildv_options_and_payload */
 #define UNICOAP_PDU_IOLIST_COUNT (4)
 
 /**
- * @brief Populates the given iolist with header, options, payload separator and payload
- *
- * Use this method to construct a vector message for vectored send functions in your transport
- * driver.
- *
- * The iolist is squashed if a carbon copy buffer is present, i.e., all iolist chunks are copied into the
- * carbon copy buffer. In that case, the first iolist element will hold the reference to the carbon copy
- * buffer.
- *
- * @param[in] header Encoded CoAP header
- * @param header_size Size of @p header
- * @param[in] message Message containing options and payload
- * @param[in,out] iolists Buffer of iolists, pre-allocated, size must be be @ref UNICOAP_PDU_IOLIST_COUNT
- *
- * @returns `0` on success
- * @returns `-ENOBUFS` if carbon copy buffer is too small
- *
- */
-int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, const unicoap_message_t* message,
-                                           iolist_t* iolists);
-
-/**
- * @brief Populates iolist with header, options, and payload
+ * @brief Populates the given iolist with header according to RFC 7252, options, and payload
  *
  * @param[in] header Header buffer
  * @param header_capacity Capacity of header buffer
@@ -1187,6 +1197,7 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
  *
  * @returns `0` on success
  * @returns Negative integer one error
+ * @retval `-ENOBUFS` Buffer too small
  */
 static inline ssize_t unicoap_pdu_buildv_rfc7252(uint8_t* header, size_t header_capacity, const unicoap_message_t* message, const unicoap_message_properties_t* properties, iolist_t* iolists)
 {
@@ -1199,10 +1210,9 @@ static inline ssize_t unicoap_pdu_buildv_rfc7252(uint8_t* header, size_t header_
     return unicoap_pdu_buildv_options_and_payload(header, res, message, iolists);
 }
 
+/** @} */
+/** @} */
 /* MARK: unicoap_driver_extension_point */
-
-/** @} */
-/** @} */
 
 #ifdef __cplusplus
 }
