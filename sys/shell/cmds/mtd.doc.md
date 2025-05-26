@@ -1,5 +1,5 @@
 @defgroup   sys_shell_commands_mtd MTD shell command
-@addtogroup sys_shell_commands
+@ingroup    sys_shell_commands
 @brief      MTD shell command for low level storage device access
 
 Available MTD Subcommands
