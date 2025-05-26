@@ -297,7 +297,7 @@ typedef struct {
     /** @brief RFC 7252 only properties */
     struct {
         /** @brief RFC 7252 message type */
-        unicoap_message_type_t type : UNICOAP_MESSAGE_TYPE_FIXED_WIDTH;
+        unicoap_rfc7252_message_type_t type : UNICOAP_MESSAGE_TYPE_FIXED_WIDTH;
 
         /** @brief RFC 7252 message ID */
         uint16_t id;
@@ -319,7 +319,7 @@ typedef struct {
  * @retval `"RST"` A reset message
  * @retval `"?"` Unknown message type
  */
-const char* unicoap_string_from_rfc7252_type(unicoap_message_type_t type);
+const char* unicoap_string_from_rfc7252_type(unicoap_rfc7252_message_type_t type);
 
 /**
  * @brief Retrieves options storage buffer
