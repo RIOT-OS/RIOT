@@ -446,7 +446,7 @@ static inline void unicoap_message_init_empty(unicoap_message_t* message, uint8_
  * @param code Message code
  * @return Message structure
  */
-static inline unicoap_message_t unicoap_message_empty(uint8_t code)
+static inline unicoap_message_t unicoap_message_alloc_empty(uint8_t code)
 {
     return (unicoap_message_t){ .code = code };
 }
@@ -474,7 +474,7 @@ static inline void unicoap_message_init(unicoap_message_t* message, uint8_t code
  * @param payload_size Payload size
  * @return Message structure
  */
-static inline unicoap_message_t unicoap_message(uint8_t code, uint8_t* payload, size_t payload_size)
+static inline unicoap_message_t unicoap_message_alloc(uint8_t code, uint8_t* payload, size_t payload_size)
 {
     return (unicoap_message_t){ .code = code, .payload = payload, .payload_size = payload_size };
 }
@@ -500,7 +500,7 @@ static inline void unicoap_message_init_string(unicoap_message_t* message, uint8
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @return Message structure
  */
-static inline unicoap_message_t unicoap_message_string(uint8_t code, const char* payload)
+static inline unicoap_message_t unicoap_message_alloc_string(uint8_t code, const char* payload)
 {
     return (unicoap_message_t){ .code = code,
                                 .payload = (uint8_t*)payload,
@@ -533,7 +533,7 @@ static inline void unicoap_message_init_options(unicoap_message_t* message, uint
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Message structure
  */
-static inline unicoap_message_t unicoap_message_options(uint8_t code, uint8_t* payload,
+static inline unicoap_message_t unicoap_message_alloc_options(uint8_t code, uint8_t* payload,
                                                         size_t payload_size,
                                                         unicoap_options_t* options)
 {
@@ -563,7 +563,7 @@ static inline void unicoap_message_init_string_options(unicoap_message_t* messag
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Message structure
  */
-static inline unicoap_message_t unicoap_message_string_options(uint8_t code, const char* payload,
+static inline unicoap_message_t unicoap_message_alloc_string_options(uint8_t code, const char* payload,
                                                                unicoap_options_t* options)
 {
     return (unicoap_message_t){ .code = code,
@@ -688,9 +688,9 @@ static inline void unicoap_request_init_empty(unicoap_message_t* request, unicoa
  * @param method Request method
  * @return Request structure
  */
-static inline unicoap_message_t unicoap_request_empty(unicoap_method_t method)
+static inline unicoap_message_t unicoap_request_alloc_empty(unicoap_method_t method)
 {
-    return unicoap_message_empty((uint8_t)method);
+    return unicoap_message_alloc_empty((uint8_t)method);
 }
 
 /**
@@ -713,10 +713,10 @@ static inline void unicoap_request_init(unicoap_message_t* request, unicoap_meth
  * @param payload_size Payload size
  * @return Request structure
  */
-static inline unicoap_message_t unicoap_request(unicoap_method_t method, uint8_t* payload,
+static inline unicoap_message_t unicoap_request_alloc(unicoap_method_t method, uint8_t* payload,
                                                 size_t payload_size)
 {
-    return unicoap_message((uint8_t)method, payload, payload_size);
+    return unicoap_message_alloc((uint8_t)method, payload, payload_size);
 }
 
 /**
@@ -737,9 +737,9 @@ static inline void unicoap_request_init_string(unicoap_message_t* request, unico
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @return Request structure
  */
-static inline unicoap_message_t unicoap_request_string(unicoap_method_t method, const char* payload)
+static inline unicoap_message_t unicoap_request_alloc_string(unicoap_method_t method, const char* payload)
 {
-    return unicoap_message_string((uint8_t)method, payload);
+    return unicoap_message_alloc_string((uint8_t)method, payload);
 }
 
 /**
@@ -765,11 +765,11 @@ static inline void unicoap_request_init_options(unicoap_message_t* request, unic
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Request structure
  */
-static inline unicoap_message_t unicoap_request_options(unicoap_method_t method, uint8_t* payload,
+static inline unicoap_message_t unicoap_request_alloc_options(unicoap_method_t method, uint8_t* payload,
                                                         size_t payload_size,
                                                         unicoap_options_t* options)
 {
-    return unicoap_message_options((uint8_t)method, payload, payload_size, options);
+    return unicoap_message_alloc_options((uint8_t)method, payload, payload_size, options);
 }
 
 /**
@@ -793,11 +793,11 @@ static inline void unicoap_request_init_string_options(unicoap_message_t* reques
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Request structure
  */
-static inline unicoap_message_t unicoap_request_string_options(unicoap_method_t method,
+static inline unicoap_message_t unicoap_request_alloc_string_options(unicoap_method_t method,
                                                                const char* payload,
                                                                unicoap_options_t* options)
 {
-    return unicoap_message_string_options((uint8_t)method, payload, options);
+    return unicoap_message_alloc_string_options((uint8_t)method, payload, options);
 }
 /** @} */
 
@@ -859,9 +859,9 @@ static inline void unicoap_response_init_empty(unicoap_message_t* response, unic
  * @param status Response status
  * @return Response structure
  */
-static inline unicoap_message_t unicoap_response_empty(unicoap_status_t status)
+static inline unicoap_message_t unicoap_response_alloc_empty(unicoap_status_t status)
 {
-    return unicoap_message_empty((uint8_t)status);
+    return unicoap_message_alloc_empty((uint8_t)status);
 }
 
 /**
@@ -884,10 +884,10 @@ static inline void unicoap_response_init(unicoap_message_t* response, unicoap_st
  * @param payload_size Payload size
  * @return Response structure
  */
-static inline unicoap_message_t unicoap_response(unicoap_status_t status, uint8_t* payload,
+static inline unicoap_message_t unicoap_response_alloc(unicoap_status_t status, uint8_t* payload,
                                                  size_t payload_size)
 {
-    return unicoap_message((uint8_t)status, payload, payload_size);
+    return unicoap_message_alloc((uint8_t)status, payload, payload_size);
 }
 
 /**
@@ -908,10 +908,10 @@ static inline void unicoap_response_init_string(unicoap_message_t* response,
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @return Response structure
  */
-static inline unicoap_message_t unicoap_response_string(unicoap_status_t status,
+static inline unicoap_message_t unicoap_response_alloc_string(unicoap_status_t status,
                                                         const char* payload)
 {
-    return unicoap_message_string((uint8_t)status, payload);
+    return unicoap_message_alloc_string((uint8_t)status, payload);
 }
 
 /**
@@ -937,11 +937,11 @@ static inline void unicoap_response_init_options(unicoap_message_t* response,
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Response structure
  */
-static inline unicoap_message_t unicoap_response_options(unicoap_status_t status, uint8_t* payload,
+static inline unicoap_message_t unicoap_response_alloc_options(unicoap_status_t status, uint8_t* payload,
                                                          size_t payload_size,
                                                          unicoap_options_t* options)
 {
-    return unicoap_message_options((uint8_t)status, payload, payload_size, options);
+    return unicoap_message_alloc_options((uint8_t)status, payload, payload_size, options);
 }
 
 /**
@@ -966,11 +966,11 @@ static inline void unicoap_response_init_string_options(unicoap_message_t* respo
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Response structure
  */
-static inline unicoap_message_t unicoap_response_string_options(unicoap_status_t status,
+static inline unicoap_message_t unicoap_response_alloc_string_options(unicoap_status_t status,
                                                                 const char* payload,
                                                                 unicoap_options_t* options)
 {
-    return unicoap_message_string_options((uint8_t)status, payload, options);
+    return unicoap_message_alloc_string_options((uint8_t)status, payload, options);
 }
 /** @} */
 /** @} */
