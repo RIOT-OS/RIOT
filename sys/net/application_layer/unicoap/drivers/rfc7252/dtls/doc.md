@@ -12,7 +12,7 @@ The CoAP over DTLS driver uses the same socket both for client and server functi
 
 @see @ref UNICOAP_PROTO_DTLS
 -->
-@see @ref unicoap_message_type_t
+@see @ref unicoap_rfc7252_message_type_t
 
 This is the dependency graph of this driver:
 
