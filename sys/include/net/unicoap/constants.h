@@ -53,7 +53,7 @@ typedef enum {
 /**
  * @brief Maximum length of the ETag option in bytes
  */
-#define UNICOAP_ETAG_LENGTH_MAX          (8) /**<  */
+#define UNICOAP_ETAG_LENGTH_MAX          (8)
 
 /**
  * @brief Numbers of bits needed to represent token length
@@ -105,9 +105,10 @@ typedef enum {
  */
 #define UNICOAP_CODE_EMPTY (0)
 
+/* This function is needed by this header, yet public use is discouraged. */
 #ifndef DOXYGEN
 /**
- * @brief Helper macro generating a CoAP message code from a class prefix and two digits from 00 to 31.
+ * @brief Helper macro generating a CoAP message code from a class prefix
  */
 #  define UNICOAP_CODE(suffix, detail) ((CONCAT(UNICOAP_CODE_CLASS_, suffix) << 5) | detail)
 #endif
