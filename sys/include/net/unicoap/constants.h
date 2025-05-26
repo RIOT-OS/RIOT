@@ -170,21 +170,39 @@ static_assert(sizeof(unicoap_method_t) == sizeof(uint8_t),
 
 /**
  * @brief CoAP Signal Message Codes (`7.xx` range)
+ *
+ * Each of these signaling messages has their own option number space.
+ * @see [RFC 8323, Section 5.1](https://datatracker.ietf.org/doc/html/rfc8323#section-5.1)
  */
 typedef enum {
-    /** @brief Capabilities and settings message (CSM) */
+    /**
+     * @brief Capabilities and settings message (CSM)
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.3)
+     */
     UNICOAP_SIGNAL_CAPABILITIES_SETTINGS = 1,
 
-    /** @brief Ping message */
+    /**
+     * @brief Ping message
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.4)
+     */
     UNICOAP_SIGNAL_PING = 2,
 
-    /** @brief Pong message */
+    /**
+     * @brief Pong message
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.4)
+     */
     UNICOAP_SIGNAL_PONG = 3,
 
-    /** @brief Release message */
+    /**
+     * @brief Release message
+     * @see [RFC 8323](https://datatracker.ietf.org/doc/html/rfc8323#section-5.5)
+     */
     UNICOAP_SIGNAL_RELEASE = 4,
 
-    /** @brief Abort message */
+    /**
+     * @brief Abort message
+     * @see [RFC 8323])(https://datatracker.ietf.org/doc/html/rfc8323#section-5.6)
+     */
     UNICOAP_SIGNAL_ABORT = 5,
 } __attribute__((__packed__)) unicoap_signal_t;
 
