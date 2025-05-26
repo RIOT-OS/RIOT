@@ -161,6 +161,10 @@ typedef enum {
     UNICOAP_METHOD_IPATCH = 7,
 } __attribute__((__packed__)) unicoap_method_t;
 
+/* We want to allow casting the code field in the pdu to this enum.
+ * This enum is used in a union in unicoap_message_t.
+ * The static_asserts in this header guarantee usage of these enums is safe in a union
+ * with an uint8_t code field. */
 static_assert(sizeof(unicoap_method_t) == sizeof(uint8_t),
               "Method enum is too wide, please file an issue.");
 
