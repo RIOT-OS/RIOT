@@ -432,6 +432,7 @@ const char* unicoap_string_from_code_class(uint8_t code);
  * @brief Initializes message with no payload and no options
  * @param code Message code
  * @param[in,out] message Pre-allocated message structure
+ * @pre @p message is allocated
  */
 static inline void unicoap_message_init_empty(unicoap_message_t* message, uint8_t code)
 {
@@ -457,6 +458,7 @@ static inline unicoap_message_t unicoap_message_alloc_empty(uint8_t code)
  * @param code Message code
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
+ * @pre @p message is allocated
  */
 static inline void unicoap_message_init(unicoap_message_t* message, uint8_t code, uint8_t* payload,
                                         size_t payload_size)
@@ -484,6 +486,7 @@ static inline unicoap_message_t unicoap_message_alloc(uint8_t code, uint8_t* pay
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
+ * @pre @p message is allocated
  */
 static inline void unicoap_message_init_string(unicoap_message_t* message, uint8_t code,
                                                const char* payload)
@@ -514,6 +517,8 @@ static inline unicoap_message_t unicoap_message_alloc_string(uint8_t code, const
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
  * @param[in] options Message options, must be pre-allocated and pre-initialized
+ * @pre @p message is allocated
+ * @pre @p options is allocated
  */
 static inline void unicoap_message_init_with_options(unicoap_message_t* message, uint8_t code,
                                                 uint8_t* payload, size_t payload_size,
@@ -532,6 +537,7 @@ static inline void unicoap_message_init_with_options(unicoap_message_t* message,
  * @param payload_size Payload size
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Message structure
+ * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_message_alloc_with_options(uint8_t code, uint8_t* payload,
                                                         size_t payload_size,
@@ -548,6 +554,8 @@ static inline unicoap_message_t unicoap_message_alloc_with_options(uint8_t code,
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
+ * @pre @p message is allocated
+ * @pre @p options is allocated
  */
 static inline void unicoap_message_init_string_with_options(unicoap_message_t* message, uint8_t code,
                                                        const char* payload,
@@ -562,6 +570,7 @@ static inline void unicoap_message_init_string_with_options(unicoap_message_t* m
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Message structure
+ * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_message_alloc_string_with_options(uint8_t code, const char* payload,
                                                                unicoap_options_t* options)
@@ -657,6 +666,7 @@ static inline unicoap_method_t unicoap_request_get_method(const unicoap_message_
  * @brief Sets request method
  * @param[in,out] request Request message, pre-allocated
  * @param method Request method to set
+ * @pre @p request is allocated
  */
 static inline void unicoap_request_set_method(unicoap_message_t* request, unicoap_method_t method)
 {
@@ -677,6 +687,7 @@ const char* unicoap_string_from_method(unicoap_method_t method);
  * @brief Initializes request with no payload and no options
  * @param method Request method
  * @param[in,out] request Pre-allocated request structure
+ * @pre @p request is allocated
  */
 static inline void unicoap_request_init_empty(unicoap_message_t* request, unicoap_method_t method)
 {
@@ -699,6 +710,7 @@ static inline unicoap_message_t unicoap_request_alloc_empty(unicoap_method_t met
  * @param method Request method
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
+ * @pre @p request is allocated
  */
 static inline void unicoap_request_init(unicoap_message_t* request, unicoap_method_t method,
                                         uint8_t* payload, size_t payload_size)
@@ -724,6 +736,7 @@ static inline unicoap_message_t unicoap_request_alloc(unicoap_method_t method, u
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
+ * @pre @p request is allocated
  */
 static inline void unicoap_request_init_string(unicoap_message_t* request, unicoap_method_t method,
                                                const char* payload)
@@ -749,6 +762,8 @@ static inline unicoap_message_t unicoap_request_alloc_string(unicoap_method_t me
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
  * @param[in] options Message options, must be pre-allocated and pre-initialized
+ * @pre @p request is allocated
+ * @pre @p options is allocated
  */
 static inline void unicoap_request_init_with_options(unicoap_message_t* request, unicoap_method_t method,
                                                 uint8_t* payload, size_t payload_size,
@@ -764,6 +779,7 @@ static inline void unicoap_request_init_with_options(unicoap_message_t* request,
  * @param payload_size Payload size
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Request structure
+ * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_request_alloc_with_options(unicoap_method_t method, uint8_t* payload,
                                                         size_t payload_size,
@@ -778,6 +794,8 @@ static inline unicoap_message_t unicoap_request_alloc_with_options(unicoap_metho
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
+ * @pre @p request is allocated
+ * @pre @p options is allocated
  */
 static inline void unicoap_request_init_string_with_options(unicoap_message_t* request,
                                                        unicoap_method_t method, const char* payload,
@@ -792,6 +810,7 @@ static inline void unicoap_request_init_string_with_options(unicoap_message_t* r
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Request structure
+ * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_request_alloc_string_with_options(unicoap_method_t method,
                                                                const char* payload,
@@ -831,6 +850,7 @@ static inline unicoap_status_t unicoap_response_get_status(const unicoap_message
  * @brief Sets response status
  * @param[in,out] response Response message, pre-allocated
  * @param status Response status to set
+ * @pre @p response is allocated
  */
 static inline void unicoap_response_set_status(unicoap_message_t* response, unicoap_status_t status)
 {
@@ -848,6 +868,7 @@ const char* unicoap_string_from_status(unicoap_status_t status);
  * @brief Initializes response with no payload and no options
  * @param status Response status
  * @param[in,out] response Pre-allocated response structure
+ * @pre @p response is allocated
  */
 static inline void unicoap_response_init_empty(unicoap_message_t* response, unicoap_status_t status)
 {
@@ -870,6 +891,7 @@ static inline unicoap_message_t unicoap_response_alloc_empty(unicoap_status_t st
  * @param status Response status
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
+ * @pre @p response is allocated
  */
 static inline void unicoap_response_init(unicoap_message_t* response, unicoap_status_t status,
                                          uint8_t* payload, size_t payload_size)
@@ -895,6 +917,7 @@ static inline unicoap_message_t unicoap_response_alloc(unicoap_status_t status, 
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
+ * @pre @p response is allocated
  */
 static inline void unicoap_response_init_string(unicoap_message_t* response,
                                                 unicoap_status_t status, const char* payload)
@@ -921,6 +944,8 @@ static inline unicoap_message_t unicoap_response_alloc_string(unicoap_status_t s
  * @param[in] payload Payload bytes (nullable)
  * @param payload_size Payload size
  * @param[in] options Message options, must be pre-allocated and pre-initialized
+ * @pre @p response is allocated
+ * @pre @p options is allocated
  */
 static inline void unicoap_response_init_with_options(unicoap_message_t* response,
                                                  unicoap_status_t status, uint8_t* payload,
@@ -936,6 +961,7 @@ static inline void unicoap_response_init_with_options(unicoap_message_t* respons
  * @param payload_size Payload size
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Response structure
+ * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_status_t status, uint8_t* payload,
                                                          size_t payload_size,
@@ -950,6 +976,8 @@ static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_stat
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
+ * @pre @p response is allocated
+ * @pre @p options is allocated
  */
 static inline void unicoap_response_init_string_with_options(unicoap_message_t* response,
                                                         unicoap_status_t status,
@@ -965,6 +993,7 @@ static inline void unicoap_response_init_string_with_options(unicoap_message_t* 
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
  * @return Response structure
+ * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_response_alloc_string_with_options(unicoap_status_t status,
                                                                 const char* payload,
@@ -995,6 +1024,8 @@ static inline unicoap_message_t unicoap_response_alloc_string_with_options(unico
  * @param size PDU size
  * @param[in,out] message Pre-allocated message
  * @param[in,out] properties Pre-allocated properties
+ * @pre @p message is allocated
+ * @pre @p properties is allocated
  *
  */
 typedef ssize_t (*unicoap_parser_t)(const uint8_t* pdu, size_t size, unicoap_message_t* message,
@@ -1023,6 +1054,7 @@ typedef struct {
  * @param size PDU size
  * @param[out] parsed Pre-allocated parsed message structure
  * @param parser Parser to use
+ * @pre @p parsed is allocated
  *
  * @returns @ref unicoap_parser_t result
  *
@@ -1043,6 +1075,8 @@ static inline ssize_t unicoap_pdu_parse(const uint8_t* pdu, size_t size, unicoap
  * @param[in] cursor Start of options buffer
  * @param[out] end Pointer to after last buffer element
  * @param[in,out] message Pre-allocated message to write options and payload into. Must have valid options pointer
+ *
+ * @pre @p message is allocated
  *
  * @returns `0` on success
  * @returns Negative errno on failure
@@ -1085,6 +1119,8 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_
  * @param[in] message Message containing options and payload
  * @param[in,out] iolists Buffer of iolists, pre-allocated, size must be be @ref UNICOAP_PDU_IOLIST_COUNT
  *
+ * @pre @p iolists is allocated
+ *
  * @returns `0` on success
  * @returns `-ENOBUFS` if carbon copy buffer is too small
  *
@@ -1110,6 +1146,9 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
  * @param[out] message Pre-allocated message to populate, should have options set
  * @param[out] properties Pre-allocated properties structure to populate
  *
+ * @pre @p message is allocated
+ * @pre @p properties is allocated
+ *
  * @returns `0` on success
  * @returns Negative errno on failure
  * @retval `-EBADOPT` Bad option
@@ -1126,6 +1165,8 @@ ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_messa
  * @param[in] pdu PDU buffer
  * @param size PDU size
  * @param[out] parsed Pre-allocated parsed message structure
+ *
+ * @pre @p parsed is allocated
  *
  * @returns @ref unicoap_parser_t result
  *
@@ -1194,6 +1235,8 @@ static inline ssize_t unicoap_pdu_build_rfc7252(uint8_t* pdu, size_t capacity,
  * @param[in] message Message containing options and payload
  * @param[in] properties Message properties containing ID and type
  * @param[in,out] iolists Buffer of iolists, pre-allocated, size must be be @ref UNICOAP_PDU_IOLIST_COUNT
+ *
+ * @pre @p iolists is allocated
  *
  * @returns `0` on success
  * @returns Negative integer one error
