@@ -126,6 +126,8 @@ Here is a quick overview of the examples available in the RIOT:
 | [sniffer](./networking/misc/sniffer/README.md) | This application is built to run together with the script `./tools/sniffer.py` as a sniffer for (wireless) data traffic. |
 | [benckmark_udp](./networking/misc/benchmark_udp/README.md) | This example uses the `benchmark_udp` module to create a stress-test for the RIOT network stack. |
 | [sock_tcp_echo](./networking/misc/sock_tcp_echo/README.md) | This is a simple TCP echo server / client that uses the SOCK API. |
+| [lwip_ipv4](./networking/misc/lwip_ipv4/README.md) | This is a simple UDP client / server using LWIP for IPv4. |
+
 
 ## Advanced Examples
 
