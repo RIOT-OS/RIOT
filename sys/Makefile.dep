@@ -581,7 +581,7 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
 endif
 
 # include unicoap dependencies
-ifneq (,$(filter unicoap% %unicoap,$(USEMODULE)))
+ifneq (,$(filter unicoap%,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.dep
 endif
 
