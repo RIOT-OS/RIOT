@@ -723,19 +723,19 @@ typedef enum {
      * @brief Content type `application/cose; cose-type=\"cose-encrypt0\"`
      * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE = 16,
+    UNICOAP_FORMAT_COSE_ENCRYPT0 = 16,
 
     /**
      * @brief Content type `application/cose; cose-type=\"cose-mac0\"`
      * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE = 17,
+    UNICOAP_FORMAT_COSE_MAC0 = 17,
 
     /**
      * @brief Content type `application/cose; cose-type=\"cose-sign1\"`
      * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE = 18,
+    UNICOAP_FORMAT_COSE_SIGN1 = 18,
 
     /**
      * @brief Content type `application/ace+cbor`
@@ -844,19 +844,19 @@ typedef enum {
      * @brief Content type `application/cose; cose-type=\"cose-encrypt\"`
      * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE = 96,
+    UNICOAP_FORMAT_COSE_ENCRYPT = 96,
 
     /**
      * @brief Content type `application/cose; cose-type=\"cose-mac\"`
      * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE = 97,
+    UNICOAP_FORMAT_COSE_MAC = 97,
 
     /**
      * @brief Content type `application/cose; cose-type=\"cose-sign\"`
      * @see [RFC9052](https://www.iana.org/go/rfc9052)
      */
-    UNICOAP_FORMAT_COSE = 98,
+    UNICOAP_FORMAT_COSE_SIGN = 98,
 
     /**
      * @brief Content type `application/cose-key`
@@ -910,7 +910,7 @@ typedef enum {
      * @brief Content type `application/yang-data+cbor; id=sid`
      * @see [RFC9254](https://www.iana.org/go/rfc9254)
      */
-    UNICOAP_FORMAT_YANG_DATA_CBOR = 140,
+    UNICOAP_FORMAT_YANG_DATA_CBOR_SID = 140,
 
     /**
      * @brief Content type `application/coap-group+json`
@@ -1015,14 +1015,14 @@ typedef enum {
      * @see [RFC8551](https://www.iana.org/go/rfc8551)
      * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
-    UNICOAP_FORMAT_PKCS7_MIME = 280,
+    UNICOAP_FORMAT_PKCS7_MIME_SERVER_GENERATED_KEY = 280,
 
     /**
      * @brief Content type `application/pkcs7-mime; smime-type=certs-only`
      * @see [RFC8551](https://www.iana.org/go/rfc8551)
      * @see [RFC9148](https://www.iana.org/go/rfc9148)
      */
-    UNICOAP_FORMAT_PKCS7_MIME = 281,
+    UNICOAP_FORMAT_PKCS7_MIME_CERTS_ONLY = 281,
 
     /**
      * @brief Content type `application/pkcs8`
@@ -1100,7 +1100,7 @@ typedef enum {
      * @brief Content type `application/yang-data+cbor; id=name`
      * @see [RFC9254](https://www.iana.org/go/rfc9254)
      */
-    UNICOAP_FORMAT_YANG_DATA_CBOR = 341,
+    UNICOAP_FORMAT_YANG_DATA_CBOR_NAME = 341,
 
     /**
      * @brief Content type `application/td+json`
@@ -1148,20 +1148,20 @@ typedef enum {
      * @brief Content type `application/eat+cwt; eat_profile=\"tag:psacertified.org,2023:psa#tfm\"`
      * @see [RFC-tschofenig-rats-psa-token-24](https://www.iana.org/go/draft-tschofenig-rats-psa-token-24)
      */
-    UNICOAP_FORMAT_EAT_CWT = 10003,
+    UNICOAP_FORMAT_EAT_CWT_PSA_TFM = 10003,
 
     /**
      * @brief Content type `application/eat+cwt; eat_profile=\"tag:psacertified.org,2019:psa#legacy\"`
      * @see [RFC-tschofenig-rats-psa-token-24](https://www.iana.org/go/draft-tschofenig-rats-psa-token-24)
      */
-    UNICOAP_FORMAT_EAT_CWT = 10004,
+    UNICOAP_FORMAT_EAT_CWT_PSA_LEGACY = 10004,
 
     /**
      * @brief Content type `application/eat+cwt; eat_profile=2.16.840.1.113741.1.16.1`
      * @see [RFC-ietf-rats-eat-media-type-12](https://www.iana.org/go/draft-ietf-rats-eat-media-type-12)
      * @see [draft-cds-rats-intel-corim-profile-02](https://www.iana.org/go/draft-cds-rats-intel-corim-profile-02)
      */
-    UNICOAP_FORMAT_EAT_CWT = 10005,
+    UNICOAP_FORMAT_EAT_CWT_INTEL = 10005,
 
     /**
      * @brief Content type `application/toc+cbor`
@@ -1180,14 +1180,14 @@ typedef enum {
      * @see [TCG DICE Concise Evidence Binding for SPDM](https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Concise-Evidence-Binding-for-SPDM-Version-1.1-RC1_10April25.pdf)
      * @see [draft-cds-rats-intel-corim-profile](https://www.iana.org/go/draft-cds-rats-intel-corim-profile)
      */
-    UNICOAP_FORMAT_TOC_CBOR = 10572,
+    UNICOAP_FORMAT_TOC_CBOR_INTEL = 10572,
 
     /**
      * @brief Content type `application/ce+cbor;profile=2.16.840.1.113741.1.16.1`
      * @see [TCG DICE Concise Evidence Binding for SPDM](https://trustedcomputinggroup.org/wp-content/uploads/TCG-DICE-Concise-Evidence-Binding-for-SPDM-Version-1.1-RC1_10April25.pdf)
      * @see [draft-cds-rats-intel-corim-profile](https://www.iana.org/go/draft-cds-rats-intel-corim-profile)
      */
-    UNICOAP_FORMAT_CE_CBOR = 10573,
+    UNICOAP_FORMAT_CE_CBOR_INTEL = 10573,
 
     /**
      * @brief Content type `application/json` in `deflate` coding
