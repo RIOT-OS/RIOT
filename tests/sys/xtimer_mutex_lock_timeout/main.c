@@ -42,38 +42,6 @@
 static kernel_pid_t main_thread_pid;
 
 /**
- * Forward declarations
- */
-static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
-                                                            char **argv);
-static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
-                                                          char **argv);
-static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
-                                                              char **argv);
-static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
-                                                             char **argv);
-static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
-                                                           char **argv);
-
-/**
- * @brief   List of command for this application.
- */
-static const shell_command_t shell_commands[] = {
-    { "mutex_timeout_long_unlocked", "unlocked mutex (no-spin timeout)",
-      cmd_test_xtimer_mutex_lock_timeout_long_unlocked, },
-    { "mutex_timeout_long_locked", "locked mutex (no-spin timeout)",
-      cmd_test_xtimer_mutex_lock_timeout_long_locked, },
-    { "mutex_timeout_long_locked_low",
-      "lock low-prio-locked-mutex from high-prio-thread (no-spin timeout)",
-      cmd_test_xtimer_mutex_lock_timeout_low_prio_thread, },
-    { "mutex_timeout_short_unlocked", "unlocked mutex (spin timeout)",
-      cmd_test_xtimer_mutex_lock_timeout_short_unlocked, },
-    { "mutex_timeout_short_locked", "locked mutex (spin timeout)",
-      cmd_test_xtimer_mutex_lock_timeout_short_locked, },
-    { NULL, NULL, NULL }
-};
-
-/**
  * @brief   stack for
  *          cmd_test_xtimer_mutex_lock_timeout_low_prio_thread
  *          not enough stack for doing printf only use puts
@@ -158,6 +126,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
     return 0;
 }
 
+SHELL_COMMAND(mutex_timeout_long_unlocked, "unlocked mutex (no-spin timeout)", cmd_test_xtimer_mutex_lock_timeout_long_unlocked);
+
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout
  *
@@ -196,6 +166,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
 
     return 0;
 }
+
+SHELL_COMMAND(mutex_timeout_long_locked, "locked mutex (no-spin timeout)", cmd_test_xtimer_mutex_lock_timeout_long_locked);
 
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout
@@ -265,6 +237,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
     return 0;
 }
 
+SHELL_COMMAND(mutex_timeout_long_locked_low, "lock low-prio-locked-mutex from high-prio-thread (no-spin timeout)", cmd_test_xtimer_mutex_lock_timeout_low_prio_thread);
+
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout when spinning
  *
@@ -305,6 +279,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
     return 0;
 }
 
+SHELL_COMMAND(mutex_timeout_short_locked, "locked mutex (spin timeout)", cmd_test_xtimer_mutex_lock_timeout_short_locked);
+
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout when spinning
  *
@@ -344,6 +320,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
     return 0;
 }
 
+SHELL_COMMAND(mutex_timeout_short_unlocked, "unlocked mutex (spin timeout)", cmd_test_xtimer_mutex_lock_timeout_short_unlocked);
+
 /**
  * @brief   main function starting shell
  *
@@ -353,7 +331,7 @@ int main(void)
 {
     puts("Starting shell...");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
