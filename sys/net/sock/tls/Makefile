@@ -1,3 +1,6 @@
-MODULE = sock_tls
+APPLICATION = tls_test
 
-include $(RIOTBASE)/Makefile.base
+USEMODULE += sock_tls
+USEPKG += wolfssl
+
+include $(RIOTBASE)/Makefile.include

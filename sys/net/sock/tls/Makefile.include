@@ -1,0 +1,20 @@
+ifneq (,$(filter sock_tls,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/net/sock/tls
+
+  # WolfSSL include paths and configuration
+  CFLAGS += -DWOLFSSL_USER_SETTINGS=1
+  CFLAGS += -DWOLFSSL_RIOT_OS=1
+  CFLAGS += -DWOLFSSL_SP_MATH_ALL -Wno-unused-parameter
+
+  INCLUDES += -I$(APPDIR)
+  INCLUDES += -I$(PKGDIRBASE)/wolfssl
+  INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/sock_tls
+  INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/include
+
+  # Add the directory to build
+  DIRS += $(RIOTBASE)/sys/net/sock/tls
+endif
+
+# WolfSSL pseudomodules
+PSEUDOMODULES += wolfcrypt_%
+PSEUDOMODULES += wolfssl_%
