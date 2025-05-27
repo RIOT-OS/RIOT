@@ -75,7 +75,7 @@ int _raw_to_temperature(max31865_t *dev, uint16_t raw_data, int32_t *temperature
     }
     i--;
     LOG_DEBUG("%s() >> i = %d\n", __FUNCTION__, i);
-    LOG_DEBUG("%s() >> a0 = %ld, a1 = %ld, raw_data = 0x%04X\n", __FUNCTION__,
+    LOG_DEBUG("%s() >> a0 = %"PRIi32", a1 = %"PRIi32", raw_data = 0x%04X\n", __FUNCTION__,
               (*dev->params->lut)[i][MAX31865_LUTCOL_A0],
               (*dev->params->lut)[i][MAX31865_LUTCOL_A1],
               (uint16_t)(*dev->params->lut)[i][MAX31865_LUTCOL_CODE]);
@@ -84,8 +84,8 @@ int _raw_to_temperature(max31865_t *dev, uint16_t raw_data, int32_t *temperature
                       + (*dev->params->lut)[i][MAX31865_LUTCOL_A1] * raw_data;
     /* convert µ°C to c°C: */
     int32_t temp_cc = temp_uc / 10000;
-    LOG_DEBUG("%s() >> T (°µC) = %ld\n", __FUNCTION__, temp_uc);
-    LOG_DEBUG("%s() >> T (°C) = %ld.%02d\n", __FUNCTION__, temp_cc / 100, abs(temp_cc) % 100);
+    LOG_DEBUG("%s() >> T (°µC) = %"PRIi32"\n", __FUNCTION__, temp_uc);
+    LOG_DEBUG("%s() >> T (°C) = %"PRIi32".%02d\n", __FUNCTION__, temp_cc / 100, abs(temp_cc) % 100);
 
     /* convert to centi degC */
     *temperature = temp_uc / 10000;
@@ -122,7 +122,7 @@ int _temp_to_raw(max31865_t *dev, int32_t temp, uint16_t *raw_data)
     *raw_data = (temp_uc - (*dev->params->lut)[i][MAX31865_LUTCOL_A0]) /
                 (*dev->params->lut)[i][MAX31865_LUTCOL_A1];
 
-    LOG_DEBUG("%s() >> i = %d, T = %lu c°C, ADC code = 0x%04u\n", __FUNCTION__, i, temp, *raw_data);
+    LOG_DEBUG("%s() >> i = %d, T = %"PRIi32" c°C, ADC code = 0x%04u\n", __FUNCTION__, i, temp, *raw_data);
 
     return 0;
 }
