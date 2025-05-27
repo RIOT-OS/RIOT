@@ -34,6 +34,7 @@
 #include <sys/unistd.h>
 #include <unistd.h>
 
+#include "assert.h"
 #include "log.h"
 #include "modules.h"
 #include "periph/pm.h"
@@ -645,4 +646,21 @@ clock_t _times_r(struct _reent *ptr, struct tms *ptms)
     ptr->_errno = ENOSYS;
 
     return (-1);
+}
+
+/**
+ * @brief Wrapper for newlib's assert implementation
+ */
+NORETURN
+void __wrap___assert_func (const char *file, int line, const char *func, const char *expr)
+{
+    (void)file;
+    (void)line;
+    (void)func;
+    (void)expr;
+#ifdef DEBUG_ASSERT_VERBOSE
+    _assert_failure(file, line);
+#else
+    _assert_panic();
+#endif
 }
