@@ -29,7 +29,7 @@
 #define MEASUREMENT_SLEEP_MS        (1000)
 #define MAX_LOOPS_MEAS              (3)
 
-void print_fault(max31865_fault_t value);
+static void print_fault(max31865_fault_t value);
 
 int main(void)
 {
@@ -71,7 +71,7 @@ int main(void)
     return 0;
 }
 
-void print_fault(max31865_fault_t value)
+static void print_fault(max31865_fault_t value)
 {
     switch (value) {
     case MAX31865_FAULT_NO_FAULT:
