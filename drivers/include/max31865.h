@@ -195,12 +195,11 @@ void max31865_clear_fault(max31865_t *dev, const max31865_params_t *params, uint
  *
  * @pre \a dev and \a data must not be NULL
  *
- * If the error bit in the RTD register is set, this function performs a
- * full automatic fault-detect cycle.
- *
- * However, this bit might miss some error conditions.
- * For a better control on fault detection, call #max31865_read_raw(),
- * #max31865_raw_to_data() and #max31865_detect_fault() instead.
+ * This function does a minimal error check.
+ * For a better control on fault detection, call
+ * #max31865_detect_fault().
+ * The #max31865_data_t.fault field of \a data will be set
+ * to #MAX31865_FAULT_NO_FAULT.
  *
  * @retval 0 on success
  * @retval -EIO if an error was detected by the MAX31865. For a detailed

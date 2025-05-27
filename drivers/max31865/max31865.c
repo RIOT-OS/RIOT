@@ -231,7 +231,6 @@ int max31865_read(max31865_t *dev, max31865_data_t *data)
 
     uint16_t raw_data;
     if (max31865_read_raw(dev, &raw_data) == -EIO) {
-        max31865_detect_fault(dev, &data->fault);
         return -EIO;
     }
     else {
