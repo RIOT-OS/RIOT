@@ -18,6 +18,8 @@
  * @author      David Picard
  */
 
+#include "container.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
