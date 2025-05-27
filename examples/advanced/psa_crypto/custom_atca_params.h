@@ -21,7 +21,9 @@
 #define CUSTOM_ATCA_PARAMS_H
 
 #include "cryptoauthlib.h"
-#include "psa/crypto.h"
+#include "psa/asymmetric_signature/algorithm.h"
+#include "psa/key/lifetime.h"
+#include "psa/key/type.h"
 
 #ifdef __cplusplus
 extern "C" {
