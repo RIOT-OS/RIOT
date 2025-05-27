@@ -16,8 +16,7 @@
  * @author      Martine S. Lenders <martine.lenders@tu-dresden.de>
  */
 
-#ifndef BAT_VOLTAGE_PARAMS_H
-#define BAT_VOLTAGE_PARAMS_H
+#pragma once
 
 #include "saul/bat_voltage.h"
 
@@ -30,7 +29,7 @@ extern "C" {
  *
  * @param[in] adc_sample    The raw ADC sample.
  *
- * @return Voltage value for phydat.
+ * @return Voltage value in mV for phydat.
  */
 int16_t saul_bat_voltage_convert(int32_t adc_sample);
 
@@ -52,5 +51,4 @@ static const saul_bat_voltage_params_t saul_bat_voltage_params[] =
 }
 #endif
 
-#endif /* BAT_VOLTAGE_PARAMS_H */
 /** @} */
