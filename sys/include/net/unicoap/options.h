@@ -499,7 +499,7 @@ static inline int unicoap_options_remove(unicoap_options_t* options, unicoap_opt
  * @brief The iterator you use to retrieve option values in-order.
  *
  * ## Example
- * @code
+ * ```c
  * unicoap_option_iterator iterator = {0};
  * unicoap_options_iterator_init(&iterator, message->options);
  *
@@ -511,7 +511,7 @@ static inline int unicoap_options_remove(unicoap_options_t* options, unicoap_opt
  *     printf("%s (%i) = (%" PRIiSIZE " bytes): ", unicoap_string_from_option_number(number), number, size);
  *     my_dump_hex(value, size);
  * }
- * @endcode
+ * ```
  */
 typedef struct {
     /**
@@ -600,7 +600,7 @@ void unicoap_options_dump_all(const unicoap_options_t* options);
  * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to store string
  * @retval `-EBADOPT` Options buffer is corrupted
  */
-static inline ssize_t unicoap_options_get_string(unicoap_options_t* options, unicoap_option_number_t number,
+static inline ssize_t unicoap_options_copy_string(unicoap_options_t* options, unicoap_option_number_t number,
                                                  char* dest, size_t capacity)
 {
     ssize_t size = unicoap_options_copy_value(options, number, (uint8_t*)dest, capacity - 1);
@@ -624,7 +624,7 @@ static inline ssize_t unicoap_options_get_string(unicoap_options_t* options, uni
  * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to store string
  * @retval `-BADOPT` Options buffer is corrupted
  */
-static inline ssize_t unicoap_options_get_strings(unicoap_options_t* options, unicoap_option_number_t number,
+static inline ssize_t unicoap_options_copy_strings(unicoap_options_t* options, unicoap_option_number_t number,
                                                   char* dest, size_t capacity, char separator)
 {
     assert(capacity > 0);
@@ -1211,7 +1211,7 @@ static inline int unicoap_options_remove_etags(unicoap_options_t* options)
 static inline ssize_t unicoap_options_get_uri_path(unicoap_options_t* options, char* path,
                                                    size_t capacity)
 {
-    return unicoap_options_get_strings(options, UNICOAP_OPTION_URI_PATH, path, capacity, '/');
+    return unicoap_options_copy_strings(options, UNICOAP_OPTION_URI_PATH, path, capacity, '/');
 }
 
 /**
@@ -1345,7 +1345,7 @@ static inline ssize_t unicoap_options_get_uri_queries(unicoap_options_t* options
                                                       size_t capacity)
 {
     ssize_t res =
-        unicoap_options_get_strings(options, UNICOAP_OPTION_URI_QUERY, query, capacity, '&');
+        unicoap_options_copy_strings(options, UNICOAP_OPTION_URI_QUERY, query, capacity, '&');
     if (res > 0) {
         *query = '?';
     }
@@ -1614,7 +1614,7 @@ static inline int unicoap_options_remove_uri_port(unicoap_options_t* options)
 static inline ssize_t unicoap_options_get_uri_host(unicoap_options_t* options, char* host,
                                                    size_t capacity)
 {
-    return unicoap_options_get_string(options, UNICOAP_OPTION_URI_HOST, host, capacity);
+    return unicoap_options_copy_string(options, UNICOAP_OPTION_URI_HOST, host, capacity);
 }
 
 /**
@@ -1685,7 +1685,7 @@ static inline int unicoap_options_remove_uri_host(unicoap_options_t* options)
 static inline ssize_t unicoap_options_get_location_path(unicoap_options_t* options, char* path,
                                                         size_t capacity)
 {
-    return unicoap_options_get_strings(options, UNICOAP_OPTION_LOCATION_PATH, path, capacity, '/');
+    return unicoap_options_copy_strings(options, UNICOAP_OPTION_LOCATION_PATH, path, capacity, '/');
 }
 
 /**
@@ -1816,7 +1816,7 @@ static inline ssize_t unicoap_options_get_location_queries(unicoap_options_t* op
                                                            size_t capacity)
 {
     ssize_t res =
-        unicoap_options_get_strings(options, UNICOAP_OPTION_LOCATION_QUERY, query, capacity, '&');
+        unicoap_options_copy_strings(options, UNICOAP_OPTION_LOCATION_QUERY, query, capacity, '&');
     if (res > 0) {
         *query = '?';
     }
@@ -2016,7 +2016,7 @@ static inline int unicoap_options_remove_location_queries(unicoap_options_t* opt
 static inline ssize_t unicoap_options_get_proxy_uri(unicoap_options_t* options, char* uri,
                                                     size_t capacity)
 {
-    return unicoap_options_get_string(options, UNICOAP_OPTION_PROXY_URI, uri, capacity);
+    return unicoap_options_copy_string(options, UNICOAP_OPTION_PROXY_URI, uri, capacity);
 }
 
 /**
@@ -2085,7 +2085,7 @@ static inline int unicoap_options_remove_proxy_uri(unicoap_options_t* options)
  */
 static inline ssize_t unicoap_options_get_proxy_scheme(unicoap_options_t* options, char* scheme, size_t capacity)
 {
-    return unicoap_options_get_string(options, UNICOAP_OPTION_PROXY_SCHEME, scheme, capacity);
+    return unicoap_options_copy_string(options, UNICOAP_OPTION_PROXY_SCHEME, scheme, capacity);
 }
 
 /**
