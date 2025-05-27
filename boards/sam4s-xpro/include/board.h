@@ -5,6 +5,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_sam4s-xpro
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -58,5 +57,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

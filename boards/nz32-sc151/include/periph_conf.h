@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nz32-sc151
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francisco.molina@inria.cl>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
@@ -197,5 +196,4 @@ static const dac_conf_t dac_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

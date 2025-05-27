@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf52840-mdk-dongle
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
-
-#ifndef PWM_PARAMS_H
-#define PWM_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -50,5 +49,4 @@ static const saul_pwm_rgb_params_t saul_pwm_rgb_params[] =
 }
 #endif
 
-#endif /* PWM_PARAMS_H */
 /** @} */

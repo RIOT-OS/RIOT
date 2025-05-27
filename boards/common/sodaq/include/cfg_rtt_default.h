@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_sodaq
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kees Bakker <kees@sodaq.com>
  */
-
-#ifndef CFG_RTT_DEFAULT_H
-#define CFG_RTT_DEFAULT_H
 
 #include <stdint.h>
 
@@ -41,5 +40,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_RTT_DEFAULT_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_acd52832
  *
@@ -18,9 +20,6 @@
  *
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 
@@ -54,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_arduino-mkr Arduino MKR Common
  * @ingroup     boards_common
@@ -19,11 +21,7 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
-
 #include "cpu.h"
-#include "periph_conf.h"
 #include "arduino_pinmap.h"
 
 #ifdef __cplusplus
@@ -34,5 +32,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_remote
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Antonio Lignan <alinan@zolertia.com>
  */
-
-#ifndef FANCY_LEDS_H
-#define FANCY_LEDS_H
 
 #include "board_common.h"
 
@@ -62,5 +61,4 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* FANCY_LEDS_H */
 /** @} */

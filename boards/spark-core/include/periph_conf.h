@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_spark-core
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
@@ -96,5 +95,4 @@ static const spi_conf_t spi_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

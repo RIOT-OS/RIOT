@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_gd32vf103c_start
  * @{
@@ -18,9 +20,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "macros/units.h"
 #include "periph/adc.h"
@@ -146,5 +145,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

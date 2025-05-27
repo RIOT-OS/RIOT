@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_slwstk6000b
  * @{
@@ -17,9 +19,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  * @author      Kai Beckmann <kai.beckmann@hs-rm.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -125,5 +124,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

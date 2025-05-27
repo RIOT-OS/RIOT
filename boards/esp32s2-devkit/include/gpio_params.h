@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
+#pragma once
 
 /**
  * @ingroup     boards_esp32s2_devkit
@@ -41,5 +40,4 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */

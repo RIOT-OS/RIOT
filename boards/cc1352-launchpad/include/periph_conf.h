@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_cc1352_launchpad
  * @{
@@ -17,9 +19,6 @@
  * @author          Nicholas Jackson <nicholas.jackson@griffithuni.edu.au>
  * @author          Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -104,5 +103,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

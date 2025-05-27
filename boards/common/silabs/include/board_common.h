@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_silabs
  *
@@ -17,9 +19,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #include "board.h"
 
@@ -38,5 +37,4 @@ void board_common_init(void);
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_nucleo64 STM32 Nucleo-64
  * @ingroup     boards
@@ -18,9 +20,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_nucleo.h"
 #include "arduino_pinmap.h"
@@ -121,5 +120,4 @@ static const motor_driver_config_t motor_driver_config[] = {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

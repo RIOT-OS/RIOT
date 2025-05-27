@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_slwstk6000b
  * @{
@@ -17,9 +19,6 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  * @author      Kai Beckmann <kai.beckmann@hs-rm.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -194,5 +193,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

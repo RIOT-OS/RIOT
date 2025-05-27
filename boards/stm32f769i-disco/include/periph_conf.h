@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_stm32f769i-disco
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -193,5 +192,4 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

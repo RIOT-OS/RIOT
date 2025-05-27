@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_deRFmega256
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexander Chudov <chudov@gmail.com>
  */
-#ifndef EUI_PROVIDER_PARAMS_H
-#define EUI_PROVIDER_PARAMS_H
-
 #include "net/eui64.h"
 #include "periph/eeprom.h"
 
@@ -60,5 +59,4 @@ static inline int _eeprom_mac_get_eui64(uint8_t index, eui64_t *addr)
 }
 #endif
 
-#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */

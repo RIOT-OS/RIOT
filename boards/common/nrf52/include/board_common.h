@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf52
  * @brief       Shared files and configuration for all nRF52 boards.
@@ -17,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
-
 #include "cpu.h"
 
 #ifdef __cplusplus
@@ -30,5 +29,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

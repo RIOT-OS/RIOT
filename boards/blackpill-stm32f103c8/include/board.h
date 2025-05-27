@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_blackpill_stm32f103c8
  * @brief       Support for the stm32f103c8 based Black pill.
@@ -23,9 +25,6 @@
  * @author      Alexander Kurth <kurth1@uni-bremen.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,5 +46,4 @@ extern "C" {
 /* Beware: This include must come *after* LED0 parameters have been defined */
 #include "board_common.h"
 
-#endif /* BOARD_H */
 /** @} */

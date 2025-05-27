@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_zigduino
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 
@@ -56,5 +55,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

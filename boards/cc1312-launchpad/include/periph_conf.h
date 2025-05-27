@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         boards_cc1312_launchpad
  * @{
@@ -19,9 +21,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -118,5 +117,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

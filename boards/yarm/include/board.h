@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_yarm
  * @brief       Support for the Acmesystems YARM board.
@@ -18,9 +20,6 @@
  * @author      Antonio Galea <antonio.galea@gmail.com>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
-
 #include "cpu.h"
 
 #ifdef __cplusplus
@@ -31,5 +30,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

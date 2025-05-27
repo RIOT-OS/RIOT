@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_mcb2388
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benpicco@beuth-hochschule.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "lpc23xx.h"
 
@@ -117,5 +116,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

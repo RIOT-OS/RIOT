@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nucleo-f070rb
  * @{
@@ -17,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* HSE available on this board */
 #ifndef CONFIG_BOARD_HAS_HSE
@@ -203,5 +202,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

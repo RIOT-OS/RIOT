@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_seeeduino_xiao
  * @brief       Support for the Seeeduino XIAO board.
@@ -18,9 +20,6 @@
  * @author      Justus Krebs <justus.krebs@st.ovgu.de>
  * @author      Nick Weiler <nick.weiler@st.ovgu.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -73,5 +72,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

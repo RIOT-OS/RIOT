@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_hifive1b SiFive HiFive1b RISC-V board
  * @ingroup     boards
@@ -17,9 +19,6 @@
  *
  * @author      Ken Rabold
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -65,5 +64,4 @@ void board_init_clock(void);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

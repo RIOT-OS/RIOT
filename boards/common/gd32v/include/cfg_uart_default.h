@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_gd32v
  * @{
@@ -17,9 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef CFG_UART_DEFAULT_H
-#define CFG_UART_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -51,5 +50,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* CFG_UART_DEFAULT_H */
 /** @} */

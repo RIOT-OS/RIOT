@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_adafruit-clue
  * @{
@@ -16,9 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_32_0.h"
@@ -119,5 +118,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

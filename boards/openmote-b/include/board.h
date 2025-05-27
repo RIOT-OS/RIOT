@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_openmote-b
  * @{
@@ -17,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -158,5 +157,4 @@
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

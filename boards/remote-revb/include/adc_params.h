@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup   boards_remote-revb
  * @{
@@ -16,9 +18,6 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author    Antonio Lignan <alinan@zolertia.com>
  */
-
-#ifndef ADC_PARAMS_H
-#define ADC_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -54,5 +53,4 @@ static const  saul_adc_params_t saul_adc_params[] =
 }
 #endif
 
-#endif /* ADC_PARAMS_H */
 /** @} */

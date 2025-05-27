@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf52840dk
  * @{
@@ -16,9 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_common.h"
 
@@ -96,5 +95,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

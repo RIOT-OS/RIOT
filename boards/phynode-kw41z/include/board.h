@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_phynode-kw41z
  * @{
@@ -17,9 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      José Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -144,5 +143,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

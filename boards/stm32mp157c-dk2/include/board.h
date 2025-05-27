@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_stm32mp157c-dk2
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gilles DOFFE <gilles.doffe@savoirfairelinux.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -30,5 +29,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

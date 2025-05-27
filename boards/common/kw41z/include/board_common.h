@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_kw41z KW41Z common
  * @ingroup     boards_common
@@ -20,9 +22,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
-
 #include "cpu.h"
 #include "periph_conf.h"
 
@@ -35,5 +34,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

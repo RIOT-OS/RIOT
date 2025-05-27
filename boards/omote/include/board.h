@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_omote
  * @{
@@ -13,9 +15,6 @@
  * @file
  * @brief       Board specific definitions for the omote board
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -93,5 +92,4 @@
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */
