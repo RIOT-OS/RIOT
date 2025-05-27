@@ -93,6 +93,13 @@ psa_status_t psa_generate_ecc_p256r1_key_pair(  const psa_key_attributes_t *attr
                                                 size_t *pub_key_buffer_length);
 
 /**
+ * @brief   Low level wrapper function to call a driver for deriving an P256R1 public key from the private key.
+ */
+psa_status_t psa_derive_ecc_p256r1_public_key(  const uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
+                                                size_t priv_key_buffer_length,
+                                                size_t *pub_key_buffer_length);
+
+/**
  * @brief   Low level wrapper function to call a driver for an ECC hash signature
  *          with a SECP 256 R1 key.
  *          See @ref psa_sign_hash()
