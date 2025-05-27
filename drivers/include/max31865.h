@@ -72,7 +72,7 @@
  * @code
  * max31865_params_t my_params = max31865_params[0];
  * my_params.spi = SPI_DEV(1);
- * my_params.cs_pin = GPIO5;
+ * my_params.cs_pin = GPIO_PIN(0, 5);
  * max31865_init(&dev, &my_params);
  * @endcode
  *

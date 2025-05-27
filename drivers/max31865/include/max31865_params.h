@@ -37,15 +37,15 @@ extern "C" {
 /**
  * @brief    Default SPI bus for the MAX31865 driver
  */
-#ifndef MAX31865_PARAM_PARAM_SPI
-#  define MAX31865_PARAM_PARAM_SPI        (SPI_DEV(0))
+#ifndef MAX31865_PARAM_SPI
+#  define MAX31865_PARAM_SPI        (SPI_DEV(0))
 #endif
 
 /**
  * @brief    Default CS pin for the MAX31865 driver
  */
-#ifndef MAX31865_PARAM_PARAM_CS_PIN
-#  define MAX31865_PARAM_PARAM_CS_PIN     (GPIO_PIN(0, 5))
+#ifndef MAX31865_PARAM_CS_PIN
+#  define MAX31865_PARAM_CS_PIN     (GPIO_PIN(0, 5))
 #endif
 
 /**
