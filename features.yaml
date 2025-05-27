@@ -866,6 +866,8 @@ groups:
       help: AES 128 CBC hardware acceleration present
     - name: periph_cipher_chacha20
       help: ChaCha20 hardware acceleration present
+    - name: periph_aead_aes_128_ccm
+      help: AES 128 CCM hardware acceleration present
     - name: periph_ecc_p192r1
       help: ECC P192R1 hardware acceleration peripheral present.
     - name: periph_ecc_p256r1

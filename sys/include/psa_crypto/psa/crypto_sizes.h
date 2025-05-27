@@ -61,13 +61,16 @@ extern "C" {
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
        IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
        IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
+       IS_USED(MODULE_PSA_AEAD_AES_256_CCM) || \
        IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256) || \
        IS_USED(MODULE_PSA_CIPHER_CHACHA20))
 #define CONFIG_PSA_MAX_KEY_SIZE 32
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || \
+       IS_USED(MODULE_PSA_AEAD_AES_192_CCM) || \
        IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
 #define CONFIG_PSA_MAX_KEY_SIZE 24
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)) || \
+      (IS_USED(MODULE_PSA_AEAD_AES_128_CCM)) || \
       (IS_USED(MODULE_PSA_CIPHER_AES_128_ECB))
 #define CONFIG_PSA_MAX_KEY_SIZE 16
 #else
@@ -124,6 +127,52 @@ extern "C" {
 /* implementation-defined value */
 
 /**
+ * @brief   The length of a tag for an AEAD algorithm, in bytes.
+ *
+ * @details This is the size of the tag output from @ref psa_aead_finish().
+ *          If the size of the tag buffer is at least this large, it is guaranteed that
+ *          @ref psa_aead_finish() will not fail due to an insufficient tag buffer size.
+ *
+ *          See also @ref PSA_AEAD_TAG_MAX_SIZE.
+ *
+ * @param   key_type    The type of the AEAD key.
+ * @param   key_bits    The size of the AEAD key in bits.
+ * @param   alg         An AEAD algorithm: a value of type @ref psa_algorithm_t such that
+ *                      @ref PSA_ALG_IS_AEAD(@p alg) is true.
+ *
+ * @return  The tag length for the specified algorithm and key.
+ *          0 if the AEAD algorithm does not have an identified tag that can be distinguished from
+ *          the rest of the ciphertext.
+ *          0 if the AEAD algorithm is not recognized or not supported.
+ */
+#define PSA_AEAD_TAG_LENGTH(key_type, key_bits, alg)     \
+    (PSA_ALG_IS_AEAD(alg) ?                              \
+    (((alg) & 0x003f0000) >> 16) :                       \
+    ((void) (key_type), (void) (key_bits), 0))
+
+/**
+ * @brief   A sufficient buffer size for storing the tag output by @ref psa_aead_finish(),
+ *          for any of the supported key types and AEAD algorithms.
+ *
+ * @details If the size of the tag buffer is at least this large, it is guaranteed that
+ *          @ref psa_aead_finish() will not fail due to an insufficient buffer size.
+ *
+ *          See also @ref PSA_AEAD_TAG_LENGTH().
+ */
+#define PSA_AEAD_TAG_MAX_SIZE (16)
+
+/**
+ * @brief   A sufficient buffer size for storing the tag output by @ref psa_aead_finish(),
+ *          for AES key types and CCM algorithms.
+ *
+ * @details If the size of the tag buffer is at least this large, it is guaranteed that
+ *          @ref psa_aead_finish() will not fail due to an insufficient buffer size.
+ *
+ *          See also @ref PSA_AEAD_TAG_LENGTH().
+ */
+#define PSA_AES_CCM_TAG_MAX_SIZE (16)
+
+/**
  * @brief   A sufficient plaintext buffer size for @ref psa_aead_decrypt(), in bytes.
  *
  * @details If the size of the plaintext buffer is at least this large, it is guaranteed that
@@ -142,7 +191,9 @@ extern "C" {
  *          are incompatible.
  */
 #define PSA_AEAD_DECRYPT_OUTPUT_SIZE(key_type, alg, ciphertext_length) \
-/* implementation-defined value */
+        (PSA_AEAD_NONCE_LENGTH(key_type, alg) != 0 &&                  \
+            ((ciphertext_length) > PSA_AEAD_TAG_LENGTH(key_type, 0, alg)) ?   \
+        (ciphertext_length) - PSA_AEAD_TAG_LENGTH(key_type, 0, alg) : 0)
 
 /**
  * @brief   A sufficient ciphertext buffer size for @ref psa_aead_encrypt(),
@@ -157,7 +208,7 @@ extern "C" {
  * @param   plaintext_length Size of the plaintext in bytes.
  */
 #define PSA_AEAD_ENCRYPT_OUTPUT_MAX_SIZE(plaintext_length) \
-/* implementation-defined value */
+        ((plaintext_length) + PSA_AEAD_TAG_MAX_SIZE)
 
 /**
  * @brief   A sufficient ciphertext buffer size for @ref psa_aead_encrypt(), in bytes.
@@ -178,7 +229,8 @@ extern "C" {
  *          are incompatible.
  */
 #define PSA_AEAD_ENCRYPT_OUTPUT_SIZE(key_type, alg, plaintext_length) \
-/* implementation-defined value */
+        (PSA_AEAD_NONCE_LENGTH(key_type, alg) != 0 ?                  \
+        (plaintext_length) + PSA_AEAD_TAG_LENGTH(key_type, 0, alg) : 0)
 
 /**
  * @brief   A sufficient ciphertext buffer size for @ref psa_aead_finish(),
@@ -231,7 +283,13 @@ extern "C" {
  *          0 if the key type or AEAD algorithm is not recognized, not supported or the parameters
  *          are incompatible.
  */
-#define PSA_AEAD_NONCE_LENGTH(key_type, alg) /* implementation-defined value */
+#define PSA_AEAD_NONCE_LENGTH(key_type, alg) \
+    ((PSA_BLOCK_CIPHER_BLOCK_LENGTH(key_type) == 16 && \
+        ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) || \
+        (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM))) || \
+        (key_type == PSA_KEY_TYPE_CHACHA20 && \
+        PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CHACHA20_POLY1305) ? \
+        12 : 0)
 
 /**
  * @brief   A sufficient buffer size for storing the nonce generated by
@@ -242,40 +300,7 @@ extern "C" {
  *
  *          See also @ref PSA_AEAD_NONCE_LENGTH().
  */
-#define PSA_AEAD_NONCE_MAX_SIZE /* implementation-defined value */
-
-/**
- * @brief   The length of a tag for an AEAD algorithm, in bytes.
- *
- * @details This is the size of the tag output from @ref psa_aead_finish().
- *          If the size of the tag buffer is at least this large, it is guaranteed that
- *          @ref psa_aead_finish() will not fail due to an insufficient tag buffer size.
- *
- *          See also @ref PSA_AEAD_TAG_MAX_SIZE.
- *
- * @param   key_type    The type of the AEAD key.
- * @param   key_bits    The size of the AEAD key in bits.
- * @param   alg         An AEAD algorithm: a value of type @ref psa_algorithm_t such that
- *                      @ref PSA_ALG_IS_AEAD(@p alg) is true.
- *
- * @return  The tag length for the specified algorithm and key.
- *          0 if the AEAD algorithm does not have an identified tag that can be distinguished from
- *          the rest of the ciphertext.
- *          0 if the AEAD algorithm is not recognized or not supported.
- */
-#define PSA_AEAD_TAG_LENGTH(key_type, key_bits, alg) \
-/* implementation-defined value */
-
-/**
- * @brief   A sufficient buffer size for storing the tag output by @ref psa_aead_finish(),
- *          for any of the supported key types and AEAD algorithms.
- *
- * @details If the size of the tag buffer is at least this large, it is guaranteed that
- *          @ref psa_aead_finish() will not fail due to an insufficient buffer size.
- *
- *          See also @ref PSA_AEAD_TAG_LENGTH().
- */
-#define PSA_AEAD_TAG_MAX_SIZE /* implementation-defined value */
+#define PSA_AEAD_NONCE_MAX_SIZE (13)
 
 /**
  * @brief   A sufficient output buffer size for @ref psa_aead_update(), for any of the supported key
