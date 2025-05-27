@@ -12,7 +12,7 @@ sensing elements.
 This test application will initialize a MAX31865 device to output
 the temperature every second.
 
-The driver uses fixed-point arithmetics for all conversions.
+The driver uses fixed-point arithmetic for all conversions.
 To do so, it needs a lookup table (LUT).
 A default one is provided for a Pt100 and a 330&Omega; reference resistor.
 The user can generate one for different resistor values with the
