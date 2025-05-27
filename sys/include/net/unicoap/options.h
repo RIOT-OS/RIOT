@@ -38,12 +38,13 @@
  * ```c
  * UNICOAP_OPTIONS_ALLOC(my_options, 20);
  *
- * if (unicoap_options_add_uri_queries_string(&my_options, "a=1&b=2") < 0) {
- *     printf("!\n");
+ * int res = 0;
+ * if ((result = unicoap_options_add_uri_queries_string(&my_options, "a=1&b=2")) < 0) {
+ *     printf("error: could not add Uri-Query options: %i (%s)\n", res, strerror(-res));
  * }
  *
  * if (unicoap_options_set_accept(&my_options, UNICOAP_FORMAT_TEXT) < 0) {
- *     printf("!\n");
+ *     printf("error: could set Accept option: %i (%s)\n", res, strerror(-res));
  * }
  * ```
  *
@@ -119,7 +120,7 @@ typedef struct {
     /**
      * @brief Number of options present
      *
-     * This is also the number of entries in the @ref unicoap_options_t.entries array.
+     * This is also the number of entries in the @ref unicoap_options_t::entries array.
      */
     size_t option_count;
 } unicoap_options_t;
@@ -140,7 +141,7 @@ static inline void unicoap_options_init(unicoap_options_t* options, uint8_t* sto
 }
 
 /**
- * @brief Determines whether the given options container has one or more options with the number passed.
+ * @brief Determines whether the given options container has one or more options with the given number.
  *
  * @param[in] options Options
  * @param number The option number
@@ -176,12 +177,11 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
 /**
  * @brief Allocates options with buffer capacity
  *
- * @param name Name options structure
+ * @param name Name of the variable storing the options structure
  * @param capacity Storage buffer capacity in bytes
  *
  * Allocates a new @ref unicoap_options_t container and a storage buffer with
- * @ref CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY,
- * then calls @ref unicoap_options_init.
+ * the given capacity, then calls @ref unicoap_options_init.
  */
 #define UNICOAP_OPTIONS_ALLOC(name, capacity) \
     _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity)
@@ -189,10 +189,11 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
 /**
  * @brief Allocates options with default capacity
  *
- * @param name Name of options structure
+ * @param name Name of the variable storing the options structure
  *
  * Allocates a new @ref unicoap_options_t container and a storage buffer with
- * the given capacity, then calls @ref unicoap_options_init.
+ * @ref CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY,
+ * then calls @ref unicoap_options_init.
  */
 #define UNICOAP_OPTIONS_ALLOC_DEFAULT(name) \
     UNICOAP_OPTIONS_ALLOC(name, CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY)
@@ -279,8 +280,9 @@ const char* unicoap_string_from_option_number(unicoap_option_number_t number);
  * @param[in,out] destination New storage buffer
  * @param capacity @p destination capacity
  *
- * @returns `0` on success
  * @returns negative number on error
+ * @retval `0` on success
+ * @retval `-ENOBUFS` @p destination is not sufficiently big
  */
 ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destination,
                                      size_t capacity);
@@ -312,7 +314,7 @@ static inline size_t unicoap_options_size(const unicoap_options_t* options)
  * @{
  */
 /** @brief Bad option */
-#if !defined(EPAYLD) || defined(DOXYGEN)
+#if !defined(EBADOPT) || defined(DOXYGEN)
 #  define EBADOPT 151
 #endif
 
@@ -353,11 +355,12 @@ static inline size_t unicoap_options_size(const unicoap_options_t* options)
  *
  * @param[in] options Options
  * @param number Option number
- * @param[in] value Ooption value to set
+ * @param[in] value Option value to set
  * @param value_size Number of bytes the @p value is made up of
  *
- * @returns Zero on success
  * @returns Negative integer on error
+ * @retval Zero on success
+ * @retval `-ENOBUFS` if options storage buffer lacks sufficient capacity to add option
  */
 int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t number,
                         const uint8_t* value, size_t value_size);
@@ -375,14 +378,15 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
  * @param size Number of bytes the value is made up of
  * @param separator Separator byte used to indicate boundaries between option values
  *
- * @returns Zero on success
  * @returns Negative integer on error
+ * @retval Zero on success
+ * @retval `-ENOBUFS` if options storage buffer lacks sufficient capacity to add option
  */
 int unicoap_options_add_values(unicoap_options_t* options, unicoap_option_number_t number,
                                const uint8_t* buffer, size_t size, uint8_t separator);
 
 /**
- * @brief Copies the values of all option with the given number into the given buffer
+ * @brief Copies the values of all options with the given number into the given buffer
  *
  * Use this API with repeatable options
  *
@@ -394,6 +398,7 @@ int unicoap_options_add_values(unicoap_options_t* options, unicoap_option_number
  *
  * @returns String length, excluding null-terminator, but including separators.
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options storage buffer lacks sufficient capacity to add option
  */
 ssize_t unicoap_options_copy_values(unicoap_options_t* options, unicoap_option_number_t number,
                                     uint8_t* buffer, size_t capacity, uint8_t separator);
@@ -405,6 +410,8 @@ ssize_t unicoap_options_copy_values(unicoap_options_t* options, unicoap_option_n
  *
  * @param options Options
  * @param number Option number
+ *
+ * @note If no option with the specified number exists, this function will return zero.
  *
  * @returns Zero on success
  * @returns Negative integer on error
@@ -426,8 +433,9 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
  * @param[in,out] value Option value. Provide a pointer to a an `uint8_t` pointer, which may be `NULL`.
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Options not found
+ * @retval `-EBADOPT` Options buffer is corrupted
  */
 ssize_t unicoap_options_get(unicoap_options_t* options, unicoap_option_number_t number,
                             uint8_t** value);
@@ -441,8 +449,10 @@ ssize_t unicoap_options_get(unicoap_options_t* options, unicoap_option_number_t 
  * @param capacity Number of usable bytes in the @p dest buffer
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Options not found
+ * @retval `-EBADOPT` Options buffer is corrupted
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to add option
  */
 ssize_t unicoap_options_copy_value(unicoap_options_t* options, unicoap_option_number_t number,
                                    uint8_t* dest, size_t capacity);
@@ -457,6 +467,7 @@ ssize_t unicoap_options_copy_value(unicoap_options_t* options, unicoap_option_nu
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options storage buffer lacks sufficient capacity to set option
  */
 int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t number,
                         const uint8_t* value, size_t value_size);
@@ -466,6 +477,8 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
  *
  * @param options Options
  * @param number Option number
+ *
+ * @note If no option with the specified number exists, this function will return zero.
  *
  * @returns Zero on success
  * @returns Negative integer on error
@@ -536,9 +549,10 @@ static inline void unicoap_options_iterator_init(unicoap_options_iterator_t* ite
  * @param[out] number The number of the next option
  * @param[out] value A pointer to next option's value
  *
- * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
+ * @returns Positive size of option value on success
  * @returns Negative integer on error
+ * @retval `-1` if the iterator is finished
+ * @retval `-EBADOPT` Options buffer is corrupted
  */
 ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
                                  unicoap_option_number_t* number, uint8_t** value);
@@ -553,8 +567,9 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
  * @param[out] value A pointer to next option's value
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-1` if the iterator is finished
+ * @retval `-EBADOPT` Options buffer is corrupted
  */
 ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
                                            unicoap_option_number_t number, uint8_t** value);
@@ -581,6 +596,9 @@ void unicoap_options_dump_all(const unicoap_options_t* options);
  *
  * @returns String length, excluding null-terminator.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to add option
+ * @retval `-EBADOPT` Options buffer is corrupted
  */
 static inline ssize_t unicoap_options_get_string(unicoap_options_t* options, unicoap_option_number_t number,
                                                  char* dest, size_t capacity)
@@ -593,7 +611,7 @@ static inline ssize_t unicoap_options_get_string(unicoap_options_t* options, uni
 }
 
 /**
- * @brief Copies the string values of all option with the given number into the given buffer
+ * @brief Copies the string values of all options with the given number into the given buffer
  *
  * @param[in] options Options
  * @param number Option number
@@ -603,6 +621,8 @@ static inline ssize_t unicoap_options_get_string(unicoap_options_t* options, uni
  *
  * @returns String length, excluding null-terminator, but including separators.
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to add option
+ * @retval `-BADOPT` Options buffer is corrupted
  */
 static inline ssize_t unicoap_options_get_strings(unicoap_options_t* options, unicoap_option_number_t number,
                                                   char* dest, size_t capacity, char separator)
@@ -626,6 +646,7 @@ static inline ssize_t unicoap_options_get_strings(unicoap_options_t* options, un
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_string(unicoap_options_t* options,
                                              unicoap_option_number_t number, const char* string,
@@ -647,6 +668,7 @@ static inline int unicoap_options_set_string(unicoap_options_t* options,
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_string(unicoap_options_t* options,
                                              unicoap_option_number_t number, const char* string,
@@ -672,6 +694,8 @@ static inline int unicoap_options_add_string(unicoap_options_t* options,
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 ssize_t unicoap_options_get_variable_uint(unicoap_options_t* options,
                                           unicoap_option_number_t number, void* integer,
@@ -688,6 +712,8 @@ ssize_t unicoap_options_get_variable_uint(unicoap_options_t* options,
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_uint32(unicoap_options_t* options, unicoap_option_number_t number,
                                                  uint32_t* uint)
@@ -712,6 +738,8 @@ static inline ssize_t unicoap_options_get_uint32(unicoap_options_t* options, uni
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_uint24(unicoap_options_t* options, unicoap_option_number_t number,
                                                  uint32_t* uint)
@@ -736,6 +764,8 @@ static inline ssize_t unicoap_options_get_uint24(unicoap_options_t* options, uni
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_uint16(unicoap_options_t* options, unicoap_option_number_t number,
                                                  uint16_t* uint)
@@ -760,6 +790,8 @@ static inline ssize_t unicoap_options_get_uint16(unicoap_options_t* options, uni
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 ssize_t unicoap_options_get_uint8(unicoap_options_t* options, unicoap_option_number_t number,
                                   uint8_t* uint);
@@ -776,6 +808,7 @@ ssize_t unicoap_options_get_uint8(unicoap_options_t* options, unicoap_option_num
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to set option
  */
 int unicoap_options_set_uint(unicoap_options_t* options, unicoap_option_number_t number,
                              uint32_t value);
@@ -794,6 +827,7 @@ int unicoap_options_set_uint(unicoap_options_t* options, unicoap_option_number_t
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to set option
  */
 int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t number,
                              uint32_t value);
