@@ -409,6 +409,10 @@ groups:
             Indicates that the board is mechanically and electrically compatible
             with shields developed for the Arduino Nano. (Note: Except the
             ISP header, that requires `arduino_shield_isp` in addition.)
+    - name: feather_shield
+      help: >
+            Indicates that the board is mechanically and electrically compatible
+            with shields developed for the Adafruit Feather board family.
     - name: xiao_shield
       help: >
             Indicates that the board is mechanically and electrically compatible
