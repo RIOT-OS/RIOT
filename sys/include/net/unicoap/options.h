@@ -854,8 +854,9 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
  * @param[out] format Option value
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_content_format(unicoap_options_t* options,
                                                          unicoap_content_format_t* format)
@@ -871,6 +872,7 @@ static inline ssize_t unicoap_options_get_content_format(unicoap_options_t* opti
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_content_format(unicoap_options_t* options,
                                                      unicoap_content_format_t format)
@@ -904,8 +906,9 @@ static inline int unicoap_options_remove_content_format(unicoap_options_t* optio
  * @param[out] format Option value
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_accept(unicoap_options_t* options,
                                                  unicoap_content_format_t* format)
@@ -921,6 +924,7 @@ static inline ssize_t unicoap_options_get_accept(unicoap_options_t* options,
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_accept(unicoap_options_t* options,
                                              unicoap_content_format_t format)
@@ -954,8 +958,9 @@ static inline int unicoap_options_remove_accept(unicoap_options_t* options)
  * @param[out] age Option value
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_max_age(unicoap_options_t* options, uint32_t* age)
 {
@@ -970,6 +975,7 @@ static inline ssize_t unicoap_options_get_max_age(unicoap_options_t* options, ui
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_max_age(unicoap_options_t* options, uint32_t age)
 {
@@ -1002,8 +1008,9 @@ static inline int unicoap_options_remove_max_age(unicoap_options_t* options)
  * @param[in,out] value Option value. Provide a pointer to a an `uint8_t` pointer, which may be `NULL`.
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_first_if_match(unicoap_options_t* options,
                                                          uint8_t** value)
@@ -1018,8 +1025,9 @@ static inline ssize_t unicoap_options_get_first_if_match(unicoap_options_t* opti
  * @param[in,out] value Option value. Provide a pointer to a an `uint8_t` pointer, which may be `NULL`.
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator_t* iterator,
                                                         uint8_t** value)
@@ -1038,6 +1046,7 @@ static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_if_match(unicoap_options_t* options, uint8_t* value,
                                                size_t value_size)
@@ -1071,8 +1080,9 @@ static inline int unicoap_options_remove_all_if_match(unicoap_options_t* options
  * @param options Options
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline bool unicoap_options_get_if_none_match(unicoap_options_t* options)
 {
@@ -1089,6 +1099,7 @@ static inline bool unicoap_options_get_if_none_match(unicoap_options_t* options)
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_if_none_match(unicoap_options_t* options, bool value)
 {
@@ -1115,8 +1126,9 @@ static inline int unicoap_options_set_if_none_match(unicoap_options_t* options, 
  * @param[out] value Pointer to a variable that will be assigned a pointer to the ETag
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_first_etag(unicoap_options_t* options, uint8_t** value)
 {
@@ -1134,8 +1146,9 @@ static inline ssize_t unicoap_options_get_first_etag(unicoap_options_t* options,
  * @see @ref unicoap_options_get_next_by_number
  *
  * @return Size of option value (zero or more bytes)
- * @return `-1` if the iterator is finished
  * @return Negative errno if the get operation failed
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* iterator,
                                                     uint8_t** value)
@@ -1154,6 +1167,7 @@ static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* 
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_etag(unicoap_options_t* options, uint8_t* value,
                                            size_t value_size)
@@ -1190,6 +1204,9 @@ static inline int unicoap_options_remove_etags(unicoap_options_t* options)
  *
  * @returns Path length, excluding null-terminator, but including separators.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-ENOBUFS` if @p path lacks sufficient capacity to store path
  */
 static inline ssize_t unicoap_options_get_uri_path(unicoap_options_t* options, char* path,
                                                    size_t capacity)
@@ -1208,6 +1225,7 @@ static inline ssize_t unicoap_options_get_uri_path(unicoap_options_t* options, c
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_uri_path(unicoap_options_t* options, char* path, size_t length)
 {
@@ -1225,6 +1243,7 @@ static inline int unicoap_options_add_uri_path(unicoap_options_t* options, char*
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_uri_path_string(unicoap_options_t* options, char* path)
 {
@@ -1240,8 +1259,9 @@ static inline int unicoap_options_add_uri_path_string(unicoap_options_t* options
  * @param[out] component A pointer to next option's string value
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t
 unicoap_options_get_next_uri_path_component(unicoap_options_iterator_t* iterator, char** component)
@@ -1259,6 +1279,7 @@ unicoap_options_get_next_uri_path_component(unicoap_options_iterator_t* iterator
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_uri_path_component(unicoap_options_t* options,
                                                          const char* component, size_t length)
@@ -1275,6 +1296,7 @@ static inline int unicoap_options_add_uri_path_component(unicoap_options_t* opti
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_uri_path_component_string(unicoap_options_t* options,
                                                                 const char* component)
@@ -1310,6 +1332,9 @@ static inline int unicoap_options_remove_uri_path(unicoap_options_t* options)
  *
  * @returns Length of query string including separators
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-ENOBUFS` if @p query lacks sufficient capacity to store query string
  *
  * This function generates a query string by concatenating all `Uri-Query` options and null-terminates the resulting
  * string.
@@ -1335,6 +1360,8 @@ static inline ssize_t unicoap_options_get_uri_queries(unicoap_options_t* options
  *
  * @returns Length of query value in bytes
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  *
  * This function makes @p component point to the string value of the first `Uri-Query` option.
  */
@@ -1353,8 +1380,9 @@ static inline ssize_t unicoap_options_get_first_uri_query(unicoap_options_t* opt
  * @param[out] component A pointer to next option's string value
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterator_t* iterator,
                                                          char** component)
@@ -1376,8 +1404,9 @@ static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterato
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* iterator,
                                                unicoap_option_number_t number, const char* name,
@@ -1395,8 +1424,9 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t
 unicoap_options_get_next_uri_query_by_name(unicoap_options_iterator_t* iterator, const char* name,
@@ -1417,8 +1447,9 @@ unicoap_options_get_next_uri_query_by_name(unicoap_options_iterator_t* iterator,
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_options_t* options,
                                                                   const char* name, char** value)
@@ -1437,6 +1468,7 @@ static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_option
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_uri_query(unicoap_options_t* options, const char* query, size_t length)
 {
@@ -1452,6 +1484,7 @@ static inline int unicoap_options_add_uri_query(unicoap_options_t* options, cons
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_uri_query_string(unicoap_options_t* options, const char* query)
 {
@@ -1467,6 +1500,7 @@ static inline int unicoap_options_add_uri_query_string(unicoap_options_t* option
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  *
  * This function splits the given string at occurrences of the `&` character and inserts the resulting components
  * as individual `Uri-Query` strings
@@ -1486,6 +1520,7 @@ static inline int unicoap_options_add_uri_queries(unicoap_options_t* options, co
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  *
  * This function splits the given string at occurrences of the `&` character and inserts the resulting components
  * as individual `Uri-Query` strings
@@ -1521,8 +1556,9 @@ static inline int unicoap_options_remove_uri_queries(unicoap_options_t* options)
  * @param[out] port URI port
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_uri_port(unicoap_options_t* options, uint16_t* port)
 {
@@ -1537,6 +1573,7 @@ static inline ssize_t unicoap_options_get_uri_port(unicoap_options_t* options, u
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_uri_port(unicoap_options_t* options, uint16_t port)
 {
@@ -1570,8 +1607,9 @@ static inline int unicoap_options_remove_uri_port(unicoap_options_t* options)
  * @param capacity The capacity of @p host in bytes
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_uri_host(unicoap_options_t* options, char* host,
                                                    size_t capacity)
@@ -1588,6 +1626,7 @@ static inline ssize_t unicoap_options_get_uri_host(unicoap_options_t* options, c
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_uri_host(unicoap_options_t* options, const char* host, size_t length)
 {
@@ -1603,6 +1642,7 @@ static inline int unicoap_options_set_uri_host(unicoap_options_t* options, const
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_uri_host_string(unicoap_options_t* options, const char* host)
 {
@@ -1638,6 +1678,9 @@ static inline int unicoap_options_remove_uri_host(unicoap_options_t* options)
  *
  * @returns Path length, excluding null-terminator, but including separators.
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-ENOBUFS` if @p path lacks sufficient capacity to contain path
  */
 static inline ssize_t unicoap_options_get_location_path(unicoap_options_t* options, char* path,
                                                         size_t capacity)
@@ -1656,6 +1699,7 @@ static inline ssize_t unicoap_options_get_location_path(unicoap_options_t* optio
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_location_path(unicoap_options_t* options, char* path, size_t length)
 {
@@ -1672,6 +1716,7 @@ static inline int unicoap_options_add_location_path(unicoap_options_t* options, 
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_location_path_string(unicoap_options_t* options, char* path)
 {
@@ -1687,8 +1732,9 @@ static inline int unicoap_options_add_location_path_string(unicoap_options_t* op
  * @param[out] component A pointer to next option's string value
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t
 unicoap_options_get_next_location_path_component(unicoap_options_iterator_t* iterator,
@@ -1706,6 +1752,7 @@ unicoap_options_get_next_location_path_component(unicoap_options_iterator_t* ite
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_location_path_component(unicoap_options_t* options,
                                                               const char* component, size_t length)
@@ -1722,6 +1769,7 @@ static inline int unicoap_options_add_location_path_component(unicoap_options_t*
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_location_path_component_string(unicoap_options_t* options,
                                                                      const char* component)
@@ -1756,6 +1804,8 @@ static inline int unicoap_options_remove_location_path(unicoap_options_t* option
  *
  * @returns Length of query string including separators
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-ENOBUFS` if @p query lacks sufficient capacity to store query
  *
  * This function generates a query string by concatenating all `Location-Query` options and null-terminates the resulting
  * string.
@@ -1781,6 +1831,8 @@ static inline ssize_t unicoap_options_get_location_queries(unicoap_options_t* op
  *
  * @returns Length of query value in bytes
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  *
  * This function makes @p component point to the string value of the first `Location-Query` option.
  */
@@ -1799,8 +1851,9 @@ static inline ssize_t unicoap_options_get_first_location_query(unicoap_options_t
  * @param[out] component A pointer to next option's string value
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_iterator_t* iterator,
                                                               char** component)
@@ -1820,8 +1873,9 @@ static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_it
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished
  */
 static inline ssize_t
 unicoap_options_get_next_location_query_by_name(unicoap_options_iterator_t* iterator,
@@ -1843,8 +1897,9 @@ unicoap_options_get_next_location_query_by_name(unicoap_options_iterator_t* iter
  * @param[out] value Pointer to a string variable
  *
  * @returns Positive size of option value
- * @returns `-1` if the iterator is finished
  * @returns Negative integer on error
+ * @retval `-EBADOPT` Option is corrupted
+ * @retval `-1` if the iterator is finished, query is not found
  */
 static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_options_t* options,
                                                                        const char* name,
@@ -1864,6 +1919,7 @@ static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_o
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_location_query(unicoap_options_t* options,
                                                      const char* query, size_t length)
@@ -1880,6 +1936,7 @@ static inline int unicoap_options_add_location_query(unicoap_options_t* options,
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  */
 static inline int unicoap_options_add_location_query_string(unicoap_options_t* options, const char* query)
 {
@@ -1895,6 +1952,7 @@ static inline int unicoap_options_add_location_query_string(unicoap_options_t* o
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  *
  * This function splits the given string at occurrences of the `&` character and inserts the resulting components
  * as individual `Location-Query` strings
@@ -1914,6 +1972,7 @@ static inline int unicoap_options_add_location_queries(unicoap_options_t* option
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add options
  *
  * This function splits the given string at occurrences of the `&` character and inserts the resulting components
  * as individual `Location-Query` strings
@@ -1951,6 +2010,8 @@ static inline int unicoap_options_remove_location_queries(unicoap_options_t* opt
  *
  * @returns Length of Proxy URI in bytes if successful
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_proxy_uri(unicoap_options_t* options, char* uri,
                                                     size_t capacity)
@@ -1967,6 +2028,7 @@ static inline ssize_t unicoap_options_get_proxy_uri(unicoap_options_t* options, 
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_proxy_uri(unicoap_options_t* options, const char* uri, size_t length)
 {
@@ -1982,6 +2044,7 @@ static inline int unicoap_options_set_proxy_uri(unicoap_options_t* options, cons
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_proxy_uri_string(unicoap_options_t* options, const char* uri)
 {
@@ -2017,6 +2080,8 @@ static inline int unicoap_options_remove_proxy_uri(unicoap_options_t* options)
  *
  * @returns Length of Proxy URI in bytes if successful
  * @returns Negative integer on error
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_proxy_scheme(unicoap_options_t* options, char* scheme, size_t capacity)
 {
@@ -2032,6 +2097,7 @@ static inline ssize_t unicoap_options_get_proxy_scheme(unicoap_options_t* option
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_proxy_scheme(unicoap_options_t* options, const char* scheme, size_t length)
 {
@@ -2047,6 +2113,7 @@ static inline int unicoap_options_set_proxy_scheme(unicoap_options_t* options, c
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_proxy_scheme_string(unicoap_options_t* options, const char* scheme)
 {
@@ -2084,8 +2151,9 @@ static inline int unicoap_options_remove_proxy_scheme(unicoap_options_t* options
  * @param observe Observe value
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_observe(unicoap_options_t* options, uint32_t* observe)
 {
@@ -2100,6 +2168,7 @@ static inline ssize_t unicoap_options_get_observe(unicoap_options_t* options, ui
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_observe(unicoap_options_t* options, uint32_t observe)
 {
@@ -2113,6 +2182,7 @@ static inline int unicoap_options_set_observe(unicoap_options_t* options, uint32
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 int unicoap_options_set_observe_generated(unicoap_options_t* options);
 /** @} */
@@ -2129,8 +2199,9 @@ int unicoap_options_set_observe_generated(unicoap_options_t* options);
  * @param[out] value Option value
  *
  * @return Size of option value (zero or more bytes)
- * @return `-ENOENT` if option is not present
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_no_response(unicoap_options_t* options, uint8_t* value)
 {
@@ -2145,6 +2216,7 @@ static inline ssize_t unicoap_options_get_no_response(unicoap_options_t* options
  *
  * @returns Zero on success
  * @returns Negative integer on error
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_no_response(unicoap_options_t* options, uint8_t value)
 {
@@ -2179,6 +2251,8 @@ typedef uint32_t unicoap_block_option_t;
  *
  * @return Size of option value (zero or more bytes)
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_block(unicoap_options_t* options,
                                                 unicoap_option_number_t option_number,
@@ -2196,6 +2270,7 @@ static inline ssize_t unicoap_options_get_block(unicoap_options_t* options,
  *
  * @return Zero if the set operation succeeded
  * @return Negative errno if the set operation failed
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_block(unicoap_options_t* options,
                                             unicoap_option_number_t option_number,
@@ -2214,6 +2289,8 @@ static inline int unicoap_options_set_block(unicoap_options_t* options,
  *
  * @return Size of option value (zero or more bytes)
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_block1(unicoap_options_t* options,
                                                  unicoap_block_option_t* block)
@@ -2229,6 +2306,7 @@ static inline ssize_t unicoap_options_get_block1(unicoap_options_t* options,
  *
  * @return Zero if the set operation succeeded
  * @return Negative errno if the set operation failed
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_block1(unicoap_options_t* options,
                                              unicoap_block_option_t block)
@@ -2258,6 +2336,8 @@ static inline int unicoap_options_remove_block1(unicoap_options_t* options)
  *
  * @return Size of option value (zero or more bytes)
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_block2(unicoap_options_t* options,
                                                  unicoap_block_option_t* block)
@@ -2273,6 +2353,7 @@ static inline ssize_t unicoap_options_get_block2(unicoap_options_t* options,
  *
  * @return Zero if the set operation succeeded
  * @return Negative errno if the set operation failed
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_block2(unicoap_options_t* options,
                                              unicoap_block_option_t block)
@@ -2302,6 +2383,8 @@ static inline int unicoap_options_remove_block2(unicoap_options_t* options)
  *
  * @return Size of option value (zero or more bytes)
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_size1(unicoap_options_t* options, uint32_t* size)
 {
@@ -2316,6 +2399,7 @@ static inline ssize_t unicoap_options_get_size1(unicoap_options_t* options, uint
  *
  * @return Zero if the set operation succeeded
  * @return Negative errno if the set operation failed
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_size1(unicoap_options_t* options, uint32_t size)
 {
@@ -2344,6 +2428,8 @@ static inline int unicoap_options_remove_size1(unicoap_options_t* options)
  *
  * @return Size of option value (zero or more bytes)
  * @return Negative errno if the get operation failed
+ * @retval `-ENOENT` Option not found
+ * @retval `-EBADOPT` Option is corrupted
  */
 static inline ssize_t unicoap_options_get_size2(unicoap_options_t* options, uint32_t* size)
 {
@@ -2358,6 +2444,7 @@ static inline ssize_t unicoap_options_get_size2(unicoap_options_t* options, uint
  *
  * @return Zero if the set operation succeeded
  * @return Negative errno if the set operation failed
+ * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_size2(unicoap_options_t* options, uint32_t size)
 {
