@@ -47,10 +47,7 @@ static int cmd_check(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "check", "Check address", cmd_check},
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(check, "Check address", cmd_check);
 
 int main(void)
 {
@@ -61,6 +58,6 @@ int main(void)
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
