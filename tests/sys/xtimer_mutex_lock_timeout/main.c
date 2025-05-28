@@ -29,11 +29,11 @@
  * incompatible with xtimers tick conversion, e.g. the waspmote-pro
  */
 #ifndef XTIMER_SHIFT
-#define XTIMER_SHIFT    (0)
+#  define XTIMER_SHIFT (0)
 #endif
 
 /* timeout at one millisecond (1000 us) to make sure it does not spin. */
-#define LONG_MUTEX_TIMEOUT 1000
+#define LONG_MUTEX_TIMEOUT  1000
 
 /* timeout smaller than XTIMER_BACKOFF to make sure it spins. */
 #define SHORT_MUTEX_TIMEOUT ((1 << XTIMER_SHIFT) + 1)
@@ -126,7 +126,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
     return 0;
 }
 
-SHELL_COMMAND(mutex_timeout_long_unlocked, "unlocked mutex (no-spin timeout)", cmd_test_xtimer_mutex_lock_timeout_long_unlocked);
+SHELL_COMMAND(mutex_timeout_long_unlocked, "unlocked mutex (no-spin timeout)",
+              cmd_test_xtimer_mutex_lock_timeout_long_unlocked);
 
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout
@@ -167,7 +168,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
     return 0;
 }
 
-SHELL_COMMAND(mutex_timeout_long_locked, "locked mutex (no-spin timeout)", cmd_test_xtimer_mutex_lock_timeout_long_locked);
+SHELL_COMMAND(mutex_timeout_long_locked, "locked mutex (no-spin timeout)",
+    cmd_test_xtimer_mutex_lock_timeout_long_locked);
 
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout
@@ -237,7 +239,9 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
     return 0;
 }
 
-SHELL_COMMAND(mutex_timeout_long_locked_low, "lock low-prio-locked-mutex from high-prio-thread (no-spin timeout)", cmd_test_xtimer_mutex_lock_timeout_low_prio_thread);
+SHELL_COMMAND(mutex_timeout_long_locked_low,
+    "lock low-prio-locked-mutex from high-prio-thread (no-spin timeout)",
+    cmd_test_xtimer_mutex_lock_timeout_low_prio_thread);
 
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout when spinning
@@ -279,7 +283,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
     return 0;
 }
 
-SHELL_COMMAND(mutex_timeout_short_locked, "locked mutex (spin timeout)", cmd_test_xtimer_mutex_lock_timeout_short_locked);
+SHELL_COMMAND(mutex_timeout_short_locked, "locked mutex (spin timeout)",
+    cmd_test_xtimer_mutex_lock_timeout_short_locked);
 
 /**
  * @brief   shell command to test xtimer_mutex_lock_timeout when spinning
@@ -320,7 +325,8 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
     return 0;
 }
 
-SHELL_COMMAND(mutex_timeout_short_unlocked, "unlocked mutex (spin timeout)", cmd_test_xtimer_mutex_lock_timeout_short_unlocked);
+SHELL_COMMAND(mutex_timeout_short_unlocked, "unlocked mutex (spin timeout)",
+    cmd_test_xtimer_mutex_lock_timeout_short_unlocked);
 
 /**
  * @brief   main function starting shell
