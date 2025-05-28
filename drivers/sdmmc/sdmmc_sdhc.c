@@ -840,7 +840,7 @@ static int _sdhc_to_sdmmc_err_code(uint16_t code)
 static void _isr(sdhc_dev_t *sdhc_dev)
 {
     sdhc_t *sdhc = sdhc_dev->conf->sdhc;
-    DEBUG_PUTS("[sdmmc] IRQ");
+
     if (sdhc->NISTR.reg & SDHC_NISTR_CARD_DETECT) {
         DEBUG_PUTS("[sdmmc] card presence changed");
 
