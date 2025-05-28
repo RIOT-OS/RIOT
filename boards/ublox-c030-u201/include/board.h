@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_ublox-c030-u201 Ublox C030-U201
  * @ingroup     boards
@@ -17,9 +19,6 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -92,5 +91,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

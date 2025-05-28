@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_arduino-uno
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 /**
  * @name    ztimer configuration values
@@ -39,5 +38,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

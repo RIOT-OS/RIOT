@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_native
  *
@@ -18,9 +20,6 @@
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -219,4 +218,3 @@ static const motor_driver_config_t motor_driver_config[] = {
 #endif
 
 /** @} */
-#endif /* BOARD_H */

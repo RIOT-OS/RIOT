@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_hifive1 SiFive HiFive1 RISC-V board
  * @ingroup     boards
@@ -17,9 +19,6 @@
  *
  * @author      Ken Rabold
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "periph/gpio.h"
 
@@ -64,5 +63,4 @@ void board_init_clock(void);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_microbit Common microbit LED handling
  * @ingroup     boards_common
@@ -16,9 +18,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef MICROBIT_H
-#define MICROBIT_H
 
 #include <stdint.h>
 
@@ -87,5 +86,4 @@ void microbit_matrix_shift_str(const char *str, uint32_t delay);
 }
 #endif
 
-#endif /* MICROBIT_H */
 /** @} */

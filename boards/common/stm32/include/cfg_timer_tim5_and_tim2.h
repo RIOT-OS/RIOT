@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_stm32
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CFG_TIMER_TIM5_AND_TIM2_H
-#define CFG_TIMER_TIM5_AND_TIM2_H
 
 #include "periph_cpu.h"
 
@@ -74,5 +73,4 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_TIM5_AND_TIM2_H */
 /** @} */

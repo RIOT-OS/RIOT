@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_gd32v
  * @{
@@ -17,9 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef PERIPH_COMMON_CONF_H
-#define PERIPH_COMMON_CONF_H
 
 #include "macros/units.h"
 #include "periph_cpu.h"
@@ -62,5 +61,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_COMMON_CONF_H */
 /** @} */

@@ -29,7 +29,7 @@
  * [1] https://www.rfc-editor.org/rfc/rfc6979#appendix-A.2.5
  */
 static const psa_algorithm_t algo = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
-static const psa_key_type_t type = PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1);
+static const psa_key_type_t type = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
 
 static const uint8_t private_key[] = {0xC9, 0xAF, 0xA9, 0xD8, 0x45, 0xBA, 0x75, 0x16, 0x6B, 0x5C,
     0x21, 0x57, 0x67, 0xB1, 0xD6, 0x93, 0x4E, 0x50, 0xC3, 0xDB, 0x36, 0xE8, 0x9B, 0x12, 0x7B, 0x8A,
@@ -60,15 +60,27 @@ psa_status_t test_ecdsa_p256_vectors(void) {
     psa_key_attributes_t key_attr = psa_key_attributes_init();
     psa_key_id_t key_id;
 
-    psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_VERIFY_MESSAGE);
+    psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_VERIFY_MESSAGE | PSA_KEY_USAGE_EXPORT);
     psa_set_key_algorithm(&key_attr, algo);
     psa_set_key_bits(&key_attr, PSA_BYTES_TO_BITS(sizeof(private_key)));
     psa_set_key_type(&key_attr, type);
 
     psa_status_t status;
-    status = psa_import_key(&key_attr, public_key, sizeof(public_key), &key_id);
+    status = psa_import_key(&key_attr, private_key, sizeof(private_key), &key_id);
     if (status != PSA_SUCCESS) {
         return status;
+    }
+
+    /* testing public key derivation */
+    uint8_t exp_public_key[sizeof(public_key)];
+    size_t length;
+    status = psa_export_public_key(key_id, exp_public_key, sizeof(public_key), &length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    if (0 != memcmp(public_key, exp_public_key, sizeof(public_key))) {
+        return -1;
     }
 
     status = psa_verify_message(key_id, algo, message, sizeof(message), signature, sizeof(signature));

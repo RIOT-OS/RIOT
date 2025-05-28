@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_cc2538
  * @{
@@ -18,9 +20,6 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CFG_TIMER_DEFAULT_H
-#define CFG_TIMER_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -64,5 +63,4 @@ static const timer_conf_t timer_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_TIMER_DEFAULT_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nucleo-f303ze
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -203,5 +202,4 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp32_olimex-esp32-evb
  * @brief       Peripheral MCU configuration for Olimex ESP32-EVB (ESP32-GATEWAY)
@@ -30,9 +32,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -239,5 +238,4 @@ static const sdmmc_conf_t sdmmc_config[] = {
 /* include common peripheral definitions as last step */
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */

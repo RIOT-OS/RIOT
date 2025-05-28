@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_openlabs-kw41z-mini
  * @{
@@ -16,9 +18,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Thomas Stilwell <stilwellt@openlabs.co>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -89,5 +88,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

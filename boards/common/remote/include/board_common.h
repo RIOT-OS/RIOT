@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_remote Zolertia Re-Mote common
  * @ingroup     boards_common
@@ -19,9 +21,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *              Antonio Lignan <alinan@zolertia.com>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -87,5 +86,4 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* BOARD_COMMON_H */
 /** @} */

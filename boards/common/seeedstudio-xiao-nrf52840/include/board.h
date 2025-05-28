@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef BOARD_H
-#define BOARD_H
+#pragma once
+
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
  * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
@@ -112,4 +112,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* BOARD_H */

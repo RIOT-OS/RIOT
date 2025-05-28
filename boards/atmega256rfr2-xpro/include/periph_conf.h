@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup boards_atmega256rfr2-xpro
  * @{
@@ -15,9 +17,6 @@
  *
  * @author  Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_conf_atmega_common.h"
 
@@ -29,5 +28,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

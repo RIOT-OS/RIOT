@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_gd32v
  * @{
@@ -17,9 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,5 +35,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

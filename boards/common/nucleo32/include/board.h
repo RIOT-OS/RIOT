@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_nucleo32 STM32 Nucleo-32
  * @ingroup     boards
@@ -18,9 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_nucleo.h"
 #include "arduino_pinmap.h"
@@ -44,5 +43,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

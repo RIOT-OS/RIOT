@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_frdm-kl43z NXP FRDM-KL43Z Board
  * @ingroup     boards
@@ -17,9 +19,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -99,5 +98,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_nrf52
  * @{
@@ -16,9 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef CFG_CLOCK_32_0_H
-#define CFG_CLOCK_32_0_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +43,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_CLOCK_32_0_H */
 /** @} */

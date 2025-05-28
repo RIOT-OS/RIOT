@@ -257,9 +257,12 @@ names in uppercase and add the prefix `CONFIG_MODULE_` to all of them.
 - psa_asymmetric_ecc_p192r1_custom_backend
 - psa_asymmetric_ecc_p192r1_backend_microecc
 
-#### NIST ECC P192
+#### NIST ECC P256
 - psa_asymmetric_ecc_p256r1
 - psa_asymmetric_ecc_p256r1_backend_periph
+
+@warning Cryptocell 310 does not support public key derivation from a private key.
+
 - psa_asymmetric_ecc_p256r1_custom_backend
 - psa_asymmetric_ecc_p256r1_backend_microecc
 
@@ -268,6 +271,25 @@ names in uppercase and add the prefix `CONFIG_MODULE_` to all of them.
 - psa_asymmetric_ecc_ed25519_backend_periph
 - psa_asymmetric_ecc_ed25519_custom_backend
 - psa_asymmetric_ecc_ed25519_backend_c25519
+
+### AEAD
+- Base: psa_aead
+
+#### AES CCM
+- psa_aead_aes_128_ccm
+- psa_aead_aes_128_ccm_backend_periph
+- psa_aead_aes_128_ccm_backend_cifra
+- psa_aead_aes_128_ccm_backend_tinycrypt
+
+@note    Be aware that the tinycrypt only allows a nonce size of 13.
+
+- psa_aead_aes_128_ccm_custom_backend
+- psa_aead_aes_192_ccm
+- psa_aead_aes_192_ccm_backend_cifra
+- psa_aead_aes_192_ccm_custom_backend
+- psa_aead_aes_256_ccm
+- psa_aead_aes_256_ccm_backend_cifra
+- psa_aead_aes_256_ccm_custom_backend
 
 ### Ciphers
 - Base: psa_cipher

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup   boards_stm32f3discovery
  * @{
@@ -16,9 +18,6 @@
  * @author    Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author    Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -83,5 +82,4 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */

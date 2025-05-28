@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
+#pragma once
+
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
  * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
@@ -129,4 +129,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* ARDUINO_IOMAP_H */

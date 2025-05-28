@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_cc2538
  * @{
@@ -20,9 +22,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef CFG_CLK_DEFAULT_H
-#define CFG_CLK_DEFAULT_H
 
 #include <stdint.h>
 
@@ -79,5 +78,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_CLK_DEFAULT_H */
 /** @} */

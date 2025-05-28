@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_stm32
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CFG_I2C1_PB6_PB7_H
-#define CFG_I2C1_PB6_PB7_H
 
 #include "periph_cpu.h"
 
@@ -66,5 +65,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* CFG_I2C1_PB6_PB7_H */
 /** @} */

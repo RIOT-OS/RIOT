@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_avr-rss2
  * @{
@@ -16,9 +18,6 @@
  * @author      Robert Olsson <roolss@kth.se>
  *
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -114,5 +113,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_usb-kw41z
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -114,5 +113,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

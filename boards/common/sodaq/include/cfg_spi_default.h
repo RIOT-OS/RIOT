@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_sodaq
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kees Bakker <kees@sodaq.com>
  */
-
-#ifndef CFG_SPI_DEFAULT_H
-#define CFG_SPI_DEFAULT_H
 
 #include <stdint.h>
 
@@ -58,5 +57,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* CFG_SPI_DEFAULT_H */
 /** @} */

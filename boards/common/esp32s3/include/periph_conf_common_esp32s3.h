@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_esp32s3
  * @brief       Common peripheral configurations for ESP32-S3 boards
@@ -20,9 +22,6 @@
  * @file
  * @{
  */
-
-#ifndef PERIPH_CONF_COMMON_ESP32S3_H
-#define PERIPH_CONF_COMMON_ESP32S3_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,5 +44,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_ESP32S3_H */
 /** @} */

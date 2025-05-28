@@ -18,7 +18,7 @@ GENHDR_SRC := $(COMMON_SRC) $(RIOT_HDR_SRC) \
 
 GENHDR_HDR := $(COMMON_HDR) $(RIOT_HDR_HDR)
 
-CFLAGS += -g -I. -O3 -Wall -Wextra -pedantic -std=c99
+CFLAGS += -g -I. -O3 -Wall -Wextra
 
 ifeq ($(QUIET),1)
   Q=@

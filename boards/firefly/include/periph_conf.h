@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_firefly
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Anon Mall <anon.mall@gt-arc.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "cfg_adc_default.h"
 #include "cfg_clk_default.h"
@@ -57,5 +56,4 @@ static const spi_conf_t spi_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

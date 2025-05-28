@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_yunjia-nrf51822
  * @{
@@ -16,14 +18,10 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
-
 #include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {}
 #endif
 
-#endif /* BOARD_H */
 /** @} */

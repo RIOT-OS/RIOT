@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_arduino-mkrwan1300
  * @brief       Support for the Arduino MKRWAN1300 board.
@@ -17,9 +19,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -51,5 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

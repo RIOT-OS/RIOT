@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_bastwan BastWAN board
  * @ingroup     boards
@@ -20,9 +22,6 @@
  *
  * @author      Lokotius Filzer <h-filzer@pixelsalat.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -72,5 +71,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

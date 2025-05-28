@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_silabs_drivers_bc Board communication controller
  * @ingroup     boards_common_silabs_drivers
@@ -16,9 +18,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef BC_H
-#define BC_H
 
 #include "board.h"
 
@@ -39,5 +38,4 @@ void bc_init(void);
 }
 #endif
 
-#endif /* BC_H */
 /** @} */

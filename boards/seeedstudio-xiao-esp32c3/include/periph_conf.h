@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_seeedstudio-xiao-esp32c3
  * @brief       Peripheral configurations for the Seeed Studio ESP32-C3 Xiao board
@@ -26,9 +28,6 @@
  * @file
  * @author      David Picard
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -154,5 +153,4 @@ extern "C" {
 /* include common peripheral definitions as last step */
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */

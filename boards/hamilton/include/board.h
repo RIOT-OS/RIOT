@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_hamilton
  * @brief       Support for the HamiltonIoT Hamilton board.
@@ -17,9 +19,6 @@
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -130,5 +129,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

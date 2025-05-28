@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    boards_common_nucleo144 STM32 Nucleo-144
  * @ingroup     boards
@@ -22,9 +24,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "arduino_pinmap.h"
 #include "board_nucleo.h"
@@ -81,5 +80,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

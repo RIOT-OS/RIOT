@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_esp8266_esp-12x
  * @brief       Board specific definitions for ESP-12x based boards.
@@ -13,9 +15,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @{
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -38,5 +37,4 @@ extern "C" {
 /* include common board definitions as last step */
 #include "board_common.h"
 
-#endif /* BOARD_H */
 /** @} */

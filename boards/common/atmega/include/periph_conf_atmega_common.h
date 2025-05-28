@@ -13,6 +13,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_arduino-atmega
  * @{
@@ -31,9 +33,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
-
-#ifndef PERIPH_CONF_ATMEGA_COMMON_H
-#define PERIPH_CONF_ATMEGA_COMMON_H
 
 #include "periph_cpu.h"
 
@@ -244,5 +243,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_ATMEGA_COMMON_H */
 /** @} */

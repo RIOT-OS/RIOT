@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_olimex_msp430_h2618
  *
@@ -17,9 +19,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "macros/units.h"
@@ -49,4 +48,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* BOARD_H */

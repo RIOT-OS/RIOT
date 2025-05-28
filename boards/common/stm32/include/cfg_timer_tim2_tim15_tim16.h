@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_common_stm32
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef CFG_TIMER_TIM2_TIM15_TIM16_H
-#define CFG_TIMER_TIM2_TIM15_TIM16_H
 
 #include "periph_cpu.h"
 
@@ -73,5 +72,4 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_TIM2_TIM15_TIM16_H */
 /** @} */

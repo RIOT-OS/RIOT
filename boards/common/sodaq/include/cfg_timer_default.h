@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_sodaq-autonomo
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kees Bakker <kees@sodaq.com>
  */
-
-#ifndef CFG_TIMER_DEFAULT_H
-#define CFG_TIMER_DEFAULT_H
 
 #include <stdint.h>
 
@@ -72,5 +71,4 @@ static const tc32_conf_t timer_config[] = {
 }
 #endif
 
-#endif /* CFG_TIMER_DEFAULT_H */
 /** @} */

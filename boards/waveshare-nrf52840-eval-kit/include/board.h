@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_waveshare_nrf52840_eval_kit
  * @{
@@ -15,9 +17,6 @@
  *
  * @author     Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_common.h"
 
@@ -93,5 +92,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

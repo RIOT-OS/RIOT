@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_sipeed_longan_nano
  * @{
@@ -16,9 +18,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_common.h"
 #include "periph/gpio.h"
@@ -100,5 +99,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

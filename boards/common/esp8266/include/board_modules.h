@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef BOARD_MODULES_H
-#define BOARD_MODULES_H
+#pragma once
 
 /**
  * @ingroup     boards_common_esp8266
@@ -126,5 +125,3 @@ extern "C" {
 #endif
 
 /** @} */
-
-#endif /* BOARD_MODULES_H */
