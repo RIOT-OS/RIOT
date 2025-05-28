@@ -155,14 +155,6 @@ typedef enum {
 } max31865_fault_t;
 
 /**
- * @brief   Data structure for the MAX31865
- */
-typedef struct {
-    int32_t rtd_temperature_cdegc;      /**< RTD temperature in centi-degrees Celsius (0.01°C) */
-    max31865_fault_t fault;             /**< Fault status */
-} max31865_data_t;
-
-/**
  * @brief   Initialize the given device
  *
  * @param[in,out] dev    Device descriptor of the driver
@@ -190,23 +182,19 @@ void max31865_clear_fault(max31865_t *dev, const max31865_params_t *params, uint
  * @brief Read data from the MAX31865. This is a shortcut to read raw data
  * and parse it to the data structure.
  *
- * @param[in] dev Device descriptor of the driver
- * @param[out] data Pointer to the data structure.
+ * @param[inout] dev                    Device descriptor of the driver
+ * @param[out] rtd_temperature_cdegc    Temperature in centi-degrees Celsius (0.01°C)
  *
  * @pre \a dev and \a data must not be NULL
  *
  * This function does a minimal error check.
- * For a better control on fault detection, call
+ * To get more details on the fault, call
  * #max31865_detect_fault().
- * The #max31865_data_t.fault field of \a data will be set
- * to #MAX31865_FAULT_NO_FAULT.
  *
  * @retval 0 on success
- * @retval -EIO if an error was detected by the MAX31865. For a detailed
- * error description, check the fault field of the data structure. In this
- * case, the temperature is not valid.
+ * @retval -EIO if an error was detected by the MAX31865
  */
-int max31865_read(max31865_t *dev, max31865_data_t *data);
+int max31865_read(max31865_t *dev, int32_t *rtd_temperature_cdegc);
 
 /**
  * @brief Read raw data from the MAX31865
@@ -227,13 +215,16 @@ int max31865_read_raw(max31865_t *dev, uint16_t *raw_data);
 /**
  * @brief   Parse the raw data from the MAX31865 to the data structure
  *
- * @param[inout] dev       Device descriptor of the driver
- * @param[in] raw_data     Raw data from the MAX31865
- * @param[out] data        Pointer to the data structure.
+ * @param[inout] dev                    Device descriptor of the driver
+ * @param[in] raw_data                  Raw data from the MAX31865
+ * @param[out] rtd_temperature_cdegc    Temperature in centi-degrees Celsius (0.01°C)
  *
  * @pre                    @p data must not be NULL
+ *
+ * @retval 0 on success
+ * @retval -EINVAL on error
  */
-void max31865_raw_to_data(max31865_t *dev, uint32_t raw_data, max31865_data_t *data);
+int max31865_raw_to_data(max31865_t *dev, uint16_t raw_data, int32_t *rtd_temperature_cdegc);
 
 /**
  * @brief Run an automatic fault-detection cycle

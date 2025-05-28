@@ -45,55 +45,6 @@
  * ****************************************************************************/
 
 /**
- * @brief Convert raw data to temperature
- * @param[in] dev Device descriptor of the driver
- * @param[in] raw_data Code used to set the RTD low and RTD high registers
- * @param[out] temp Temperature in Celsius centi-degrees (0.01°C)
- */
-int _raw_to_temperature(max31865_t *dev, uint16_t raw_data, int32_t *temperature)
-{
-    assert(dev->params->lut);
-    assert(temperature);
-
-    if (raw_data < (*dev->params->lut)[0][MAX31865_LUTCOL_CODE]) {
-        LOG_ERROR("%s() >> ERROR: raw_data too small 0x%04X < 0x%04X\n", __FUNCTION__, raw_data,
-                  (uint16_t)(*dev->params->lut)[0][MAX31865_LUTCOL_CODE]);
-        return -EINVAL;
-    }
-    if (raw_data > (*dev->params->lut)[dev->params->lut_numlines - 1][MAX31865_LUTCOL_CODE]) {
-        LOG_ERROR("%s() >> ERROR: raw_data too big 0x%04X > 0x%04X\n", __FUNCTION__, raw_data,
-                  (uint16_t)(*dev->params->lut)[dev->params->lut_numlines -
-                                                1][MAX31865_LUTCOL_CODE]);
-        return -EINVAL;
-    }
-    /* walk the LUT to find the appropriate coefficients for linear interpolation: */
-    int i = 0;
-    for (i = 0 ; i < dev->params->lut_numlines ; i++) {
-        if (raw_data < (*dev->params->lut)[i][MAX31865_LUTCOL_CODE]) {
-            break;
-        }
-    }
-    i--;
-    LOG_DEBUG("%s() >> i = %d\n", __FUNCTION__, i);
-    LOG_DEBUG("%s() >> a0 = %"PRIi32", a1 = %"PRIi32", raw_data = 0x%04X\n", __FUNCTION__,
-              (*dev->params->lut)[i][MAX31865_LUTCOL_A0],
-              (*dev->params->lut)[i][MAX31865_LUTCOL_A1],
-              (uint16_t)(*dev->params->lut)[i][MAX31865_LUTCOL_CODE]);
-    /* calculate T in µ°C by linear interpolation with the coefficients from the LUT: */
-    int32_t temp_uc = (*dev->params->lut)[i][MAX31865_LUTCOL_A0]
-                      + (*dev->params->lut)[i][MAX31865_LUTCOL_A1] * raw_data;
-    /* convert µ°C to c°C: */
-    int32_t temp_cc = temp_uc / 10000;
-    LOG_DEBUG("%s() >> T (°µC) = %"PRIi32"\n", __FUNCTION__, temp_uc);
-    LOG_DEBUG("%s() >> T (°C) = %"PRIi32".%02d\n", __FUNCTION__, temp_cc / 100, abs(temp_cc) % 100);
-
-    /* convert to centi degC */
-    *temperature = temp_uc / 10000;
-
-    return 0;
-}
-
-/**
  * @brief Convert temperature to raw data
  * @param[in] dev Device descriptor of the driver
  * @param[in] temp Temperature in Celsius centi-degrees (0.01°C)
@@ -217,24 +168,59 @@ int max31865_read_raw(max31865_t *dev, uint16_t *raw_data)
     return 0;
 }
 
-void max31865_raw_to_data(max31865_t *dev, uint32_t raw_data, max31865_data_t *data)
+int max31865_raw_to_data(max31865_t *dev, uint16_t raw_data, int32_t *rtd_temperature_cdegc)
 {
-    assert(data);
+    assert(dev->params->lut);
+    assert(rtd_temperature_cdegc);
 
-    _raw_to_temperature(dev, raw_data, &data->rtd_temperature_cdegc);
-    data->fault = MAX31865_FAULT_NO_FAULT;
+    if (raw_data < (*dev->params->lut)[0][MAX31865_LUTCOL_CODE]) {
+        LOG_ERROR("%s() >> ERROR: raw_data too small 0x%04X < 0x%04X\n", __FUNCTION__, raw_data,
+                  (uint16_t)(*dev->params->lut)[0][MAX31865_LUTCOL_CODE]);
+        return -EINVAL;
+    }
+    if (raw_data > (*dev->params->lut)[dev->params->lut_numlines - 1][MAX31865_LUTCOL_CODE]) {
+        LOG_ERROR("%s() >> ERROR: raw_data too big 0x%04X > 0x%04X\n", __FUNCTION__, raw_data,
+                  (uint16_t)(*dev->params->lut)[dev->params->lut_numlines -
+                                                1][MAX31865_LUTCOL_CODE]);
+        return -EINVAL;
+    }
+    /* walk the LUT to find the appropriate coefficients for linear interpolation: */
+    int i = 0;
+    for (i = 0 ; i < dev->params->lut_numlines ; i++) {
+        if (raw_data < (*dev->params->lut)[i][MAX31865_LUTCOL_CODE]) {
+            break;
+        }
+    }
+    i--;
+    LOG_DEBUG("%s() >> i = %d\n", __FUNCTION__, i);
+    LOG_DEBUG("%s() >> a0 = %"PRIi32", a1 = %"PRIi32", raw_data = 0x%04X\n", __FUNCTION__,
+              (*dev->params->lut)[i][MAX31865_LUTCOL_A0],
+              (*dev->params->lut)[i][MAX31865_LUTCOL_A1],
+              (uint16_t)(*dev->params->lut)[i][MAX31865_LUTCOL_CODE]);
+    /* calculate T in µ°C by linear interpolation with the coefficients from the LUT: */
+    int32_t temp_uc = (*dev->params->lut)[i][MAX31865_LUTCOL_A0]
+                      + (*dev->params->lut)[i][MAX31865_LUTCOL_A1] * raw_data;
+    /* convert µ°C to c°C: */
+    int32_t temp_cc = temp_uc / 10000;
+    LOG_DEBUG("%s() >> T (°µC) = %"PRIi32"\n", __FUNCTION__, temp_uc);
+    LOG_DEBUG("%s() >> T (°C) = %"PRIi32".%02d\n", __FUNCTION__, temp_cc / 100, abs(temp_cc) % 100);
+
+    /* convert to centi degC */
+    *rtd_temperature_cdegc = temp_uc / 10000;
+
+    return 0;
 }
 
-int max31865_read(max31865_t *dev, max31865_data_t *data)
+int max31865_read(max31865_t *dev, int32_t *rtd_temperature_cdegc)
 {
-    assert(dev && data);
+    assert(dev && rtd_temperature_cdegc);
 
     uint16_t raw_data;
     if (max31865_read_raw(dev, &raw_data) == -EIO) {
         return -EIO;
     }
     else {
-        max31865_raw_to_data(dev, raw_data, data);
+        max31865_raw_to_data(dev, raw_data, rtd_temperature_cdegc);
     }
 
     return 0;
