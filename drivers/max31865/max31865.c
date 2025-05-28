@@ -52,7 +52,7 @@
  * @return 0 on success.
  * @return -EINVAL if temperature is out of LUT range.
  */
-int _temp_to_raw(max31865_t *dev, int32_t temp, uint16_t *raw_data)
+static int _temp_to_raw(max31865_t *dev, int32_t temp, uint16_t *raw_data)
 {
     int32_t temp_uc = temp * 10000;     // c°C --> µ°C
 

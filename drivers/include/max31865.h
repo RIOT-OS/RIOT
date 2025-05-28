@@ -213,13 +213,13 @@ int max31865_read(max31865_t *dev, int32_t *rtd_temperature_cdegc);
 int max31865_read_raw(max31865_t *dev, uint16_t *raw_data);
 
 /**
- * @brief   Parse the raw data from the MAX31865 to the data structure
+ * @brief   Convert the raw data from the MAX31865 temperature
  *
  * @param[inout] dev                    Device descriptor of the driver
  * @param[in] raw_data                  Raw data from the MAX31865
  * @param[out] rtd_temperature_cdegc    Temperature in centi-degrees Celsius (0.01°C)
  *
- * @pre                    @p data must not be NULL
+ * @pre                                 @p data must not be NULL
  *
  * @retval 0 on success
  * @retval -EINVAL on error
