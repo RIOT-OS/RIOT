@@ -24,17 +24,15 @@
 
 static int read_temp(const void *dev, phydat_t *res)
 {
-    max31865_data_t data;
+    int32_t temperature_cdegc;
 
-    max31865_read((max31865_t *)dev, &data);
-
-    if (data.fault != MAX31865_FAULT_NO_FAULT) {
+    if (max31865_read((max31865_t *)dev, &temperature_cdegc) != 0) {
         return -ECANCELED;
     }
 
     res->unit = UNIT_TEMP_C;
     res->scale = -2;
-    phydat_fit(res, &data.rtd_temperature_cdegc, 1);
+    phydat_fit(res, &temperature_cdegc, 1);
 
     return 1;
 }
