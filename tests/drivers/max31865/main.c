@@ -34,8 +34,9 @@ static void print_fault(max31865_fault_t value);
 int main(void)
 {
     max31865_t dev;
-    max31865_data_t data;
+    int32_t temperature_cdegc;
     phydat_t phyTemp;
+    max31865_fault_t fault_code;
 
     puts("MAX31865 RTD-to-Digital converter test application\n");
 
@@ -57,15 +58,18 @@ int main(void)
     while (1) {
         ztimer_sleep(ZTIMER_MSEC, MEASUREMENT_SLEEP_MS);
 
-        max31865_read(&dev, &data);
-        phyTemp.val[0] = data.rtd_temperature_cdegc;    /* unit: 0.01°C */
-        phyTemp.scale = -2;             /* 1 cdegC = 1e-02 degC */
-        phyTemp.unit = UNIT_TEMP_C;     /* set the unit */
-        phydat_dump(&phyTemp, 1);       /* print the value in a pretty format */
-
-        if (data.fault != MAX31865_FAULT_NO_FAULT) {
-            print_fault(data.fault);
+        if (max31865_read(&dev, &temperature_cdegc) == 0) {
+            phyTemp.val[0] = temperature_cdegc;     /* unit: 0.01°C */
+            phyTemp.scale = -2;             /* 1 cdegC = 1e-02 degC */
+            phyTemp.unit = UNIT_TEMP_C;     /* set the unit */
+            phydat_dump(&phyTemp, 1);       /* print the value in a pretty format */
+        }
+        else if (max31865_detect_fault(&dev, &fault_code) == 0) {
+            print_fault(fault_code);
             max31865_clear_fault(&dev, &max31865_params[0], NULL);
+        }
+        else {
+            LOG_ERROR("%s() >> fault detection failed\n", __FUNCTION__);
         }
     }
     return 0;
