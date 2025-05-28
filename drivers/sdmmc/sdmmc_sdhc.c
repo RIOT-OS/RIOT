@@ -739,7 +739,6 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
 
     sdhc_dev->error = 0;
 
-    /* TODO: timeout */
     sdhc->NISIER.reg |= event;
     sdhc->EISIER.reg |= error_mask;
 
