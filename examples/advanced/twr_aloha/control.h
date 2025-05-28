@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -16,9 +18,6 @@
  *
  * @}
  */
-
-#ifndef CONTROL_H
-#define CONTROL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -115,5 +114,3 @@ uint32_t uwb_core_rng_req_remaining(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CONTROL_H */

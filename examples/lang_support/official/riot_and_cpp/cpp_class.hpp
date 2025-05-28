@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup
  * @brief
@@ -19,9 +21,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  * @author      DangNhat Pham-Huu <51002279@stu.hcmut.edu.vn>
  */
-
-#ifndef CPP_CLASS_H
-#define CPP_CLASS_H
 
 #include <cstdio>
 
@@ -60,4 +59,3 @@ private:
 };
 
 /** @} */
-#endif /* CPP_CLASS_H */

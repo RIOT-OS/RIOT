@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef CREDENTIALS_H
-#define CREDENTIALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,5 +74,3 @@ static const uint8_t server_rpk_pub[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CREDENTIALS_H */
