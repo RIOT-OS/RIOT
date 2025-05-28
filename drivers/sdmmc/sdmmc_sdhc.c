@@ -761,7 +761,9 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
             if (timeout) {
                 DEBUG("[sdmmc] IRQ wait timeout\n");
             }
-            DEBUG("[sdmmc] SDHC error: EISTR=%04x, ", sdhc_dev->error);
+            else {
+                DEBUG("[sdmmc] SDHC error: EISTR=%04x, ", sdhc_dev->error);
+            }
             switch (reset) {
             case SDHC_SRR_SWRSTCMD:
                 DEBUG("reset CMD\n");
