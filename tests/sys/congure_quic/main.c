@@ -205,7 +205,7 @@ static int _get_event_cb(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(get_event_cb,#
+SHELL_COMMAND(get_event_cb,
     "Get state of cong_event_cb mock of CongURE state object", _get_event_cb);
 
 /** @} */
