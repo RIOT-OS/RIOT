@@ -25,7 +25,7 @@ This TLS implementation provides:
 The following modules are required and automatically included when using this module:
 
 ```makefile
-USEMODULE += sock_tls
+USEMODULE += tcp_tls
 ```
 
 This will pull in all necessary dependencies including:

@@ -5,8 +5,8 @@
  * @date 2025-05-21 12:35:22
  */
 
-#ifndef SOCK_TLS_TCP_H
-#define SOCK_TLS_TCP_H
+#ifndef NET_SOCK_TLS_H
+#define NET_SOCK_TLS_H
 
 #include "net/sock/tcp.h"
 #include <wolfssl/ssl.h>
@@ -116,4 +116,4 @@ void sock_tls_tcp_disconnect(sock_tls_tcp_t *sock);
 }
 #endif
 
-#endif /* SOCK_TLS_TCP_H */
+#endif /* NET_SOCK_TLS_H */
