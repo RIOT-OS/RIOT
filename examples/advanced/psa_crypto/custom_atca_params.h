@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -17,9 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-#ifndef CUSTOM_ATCA_PARAMS_H
-#define CUSTOM_ATCA_PARAMS_H
-
 #include "cryptoauthlib.h"
 #include "psa/crypto.h"
 
@@ -121,5 +120,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CUSTOM_ATCA_PARAMS_H */
 /** @} */

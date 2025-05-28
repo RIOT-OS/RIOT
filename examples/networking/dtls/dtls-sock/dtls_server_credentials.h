@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef DTLS_SERVER_CREDENTIALS_H
-#define DTLS_SERVER_CREDENTIALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -131,5 +130,3 @@ static const unsigned char known_client_public_key_0_y[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DTLS_SERVER_CREDENTIALS_H */
