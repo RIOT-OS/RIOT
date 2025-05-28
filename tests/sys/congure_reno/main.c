@@ -159,7 +159,8 @@ static int _get_fr_calls(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(get_ff_calls, "Get the number of calls to fast_retransmit callback of CongURE state object", _get_fr_calls);
+SHELL_COMMAND(get_ff_calls,
+    "Get the number of calls to fast_retransmit callback of CongURE state object", _get_fr_calls);
 
 static int _set_same_wnd_adv_res(int argc, char **argv)
 {
@@ -173,6 +174,8 @@ static int _set_same_wnd_adv_res(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(set_same_wnd_adv, "Set the result for the same_window_advertised callback of CongURE state object", _set_same_wnd_adv_res);
+SHELL_COMMAND(set_same_wnd_adv,
+    "Set the result for the same_window_advertised callback of CongURE state object",
+    _set_same_wnd_adv_res);
 
 /** @} */

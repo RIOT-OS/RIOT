@@ -172,7 +172,8 @@ static int _set_max_ack_delay(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(set_max_ack_delay, "Set max_ack_delay member for CongURE state object", _set_max_ack_delay);
+SHELL_COMMAND(set_max_ack_delay,
+    "Set max_ack_delay member for CongURE state object", _set_max_ack_delay);
 
 static int _set_recovery_start(int argc, char **argv)
 {
@@ -184,7 +185,8 @@ static int _set_recovery_start(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(set_recovery_start, "Set recovery_start member for CongURE state object", _set_recovery_start);
+SHELL_COMMAND(set_recovery_start,
+    "Set recovery_start member for CongURE state object", _set_recovery_start);
 
 static int _get_event_cb(int argc, char **argv)
 {
@@ -203,6 +205,7 @@ static int _get_event_cb(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(get_event_cb, "Get state of cong_event_cb mock of CongURE state object", _get_event_cb);
+SHELL_COMMAND(get_event_cb,#
+    "Get state of cong_event_cb mock of CongURE state object", _get_event_cb);
 
 /** @} */
