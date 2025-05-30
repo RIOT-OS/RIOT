@@ -125,11 +125,9 @@ int max31865_init(max31865_t *dev, const max31865_params_t *params)
     return 0;
 }
 
-void max31865_clear_fault(max31865_t *dev, const max31865_params_t *params, uint8_t *config)
+void max31865_clear_fault(const max31865_t *dev, uint8_t *config)
 {
     assert(dev);
-    assert(params);
-    // assert(config);
 
     uint8_t cfg_byte = 0;
     uint8_t clr_byte = 0;
@@ -144,7 +142,7 @@ void max31865_clear_fault(max31865_t *dev, const max31865_params_t *params, uint
     spi_release(dev->params->spi);
 }
 
-int max31865_read_raw(max31865_t *dev, uint16_t *raw_data)
+int max31865_read_raw(const max31865_t *dev, uint16_t *raw_data)
 {
     assert(dev);
     assert(raw_data);
@@ -168,7 +166,7 @@ int max31865_read_raw(max31865_t *dev, uint16_t *raw_data)
     return 0;
 }
 
-int max31865_raw_to_data(max31865_t *dev, uint16_t raw_data, int32_t *rtd_temperature_cdegc)
+int max31865_raw_to_data(const max31865_t *dev, uint16_t raw_data, int32_t *rtd_temperature_cdegc)
 {
     assert(dev->params->lut);
     assert(rtd_temperature_cdegc);
@@ -211,7 +209,7 @@ int max31865_raw_to_data(max31865_t *dev, uint16_t raw_data, int32_t *rtd_temper
     return 0;
 }
 
-int max31865_read(max31865_t *dev, int32_t *rtd_temperature_cdegc)
+int max31865_read(const max31865_t *dev, int32_t *rtd_temperature_cdegc)
 {
     assert(dev && rtd_temperature_cdegc);
 
@@ -321,7 +319,7 @@ void max31865_switch_vbias(max31865_t *dev, bool enable)
     spi_release(dev->params->spi);
 }
 
-void max31865_oneshot(max31865_t *dev)
+void max31865_oneshot(const max31865_t *dev)
 {
     assert(dev);
 

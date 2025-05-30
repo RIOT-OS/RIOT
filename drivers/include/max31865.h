@@ -26,7 +26,7 @@
  * - Compatible with 2-, 3-, and 4-Wire Sensor Connections
  * - 15-Bit ADC resolution; resolution 0.03125°C
  * - Total accuracy over all operating conditions: 0.5°C (0.05% FS) max
- * - 21ms max conversion time
+ * - 21 ms max conversion time
  *
  * The RTD register and the threshold registers represent the ratio
  * of the RTD resistance to the reference resistance.
@@ -169,20 +169,20 @@ int max31865_init(max31865_t *dev, const max31865_params_t *params);
 /**
  * @brief Clear the fault flag
  *
- * @param[in,out] dev   Device descriptor of the driver
+ * @param[in] dev       Device descriptor of the driver
  * @param[in] params    Initialization parameters
  * @param[out] config   If not NULL, set to the value of the config register
  *
  * Call this function if after #max31865_read() or #max31865_detect_fault() if
  * either of them reports a fault.
  */
-void max31865_clear_fault(max31865_t *dev, const max31865_params_t *params, uint8_t *config);
+void max31865_clear_fault(const max31865_t *dev, uint8_t *config);
 
 /**
  * @brief Read data from the MAX31865. This is a shortcut to read raw data
  * and parse it to the data structure.
  *
- * @param[inout] dev                    Device descriptor of the driver
+ * @param[in] dev                       Device descriptor of the driver
  * @param[out] rtd_temperature_cdegc    Temperature in centi-degrees Celsius (0.01°C)
  *
  * @pre \a dev and \a data must not be NULL
@@ -194,7 +194,7 @@ void max31865_clear_fault(max31865_t *dev, const max31865_params_t *params, uint
  * @retval 0 on success
  * @retval -EIO if an error was detected by the MAX31865
  */
-int max31865_read(max31865_t *dev, int32_t *rtd_temperature_cdegc);
+int max31865_read(const max31865_t *dev, int32_t *rtd_temperature_cdegc);
 
 /**
  * @brief Read raw data from the MAX31865
@@ -210,12 +210,12 @@ int max31865_read(max31865_t *dev, int32_t *rtd_temperature_cdegc);
  * In this case, the temperature is not valid.
  * Call #max31865_detect_fault() for more details.
  */
-int max31865_read_raw(max31865_t *dev, uint16_t *raw_data);
+int max31865_read_raw(const max31865_t *dev, uint16_t *raw_data);
 
 /**
  * @brief   Convert the raw data from the MAX31865 temperature
  *
- * @param[inout] dev                    Device descriptor of the driver
+ * @param[in] dev                       Device descriptor of the driver
  * @param[in] raw_data                  Raw data from the MAX31865
  * @param[out] rtd_temperature_cdegc    Temperature in centi-degrees Celsius (0.01°C)
  *
@@ -224,7 +224,7 @@ int max31865_read_raw(max31865_t *dev, uint16_t *raw_data);
  * @retval 0 on success
  * @retval -EINVAL on error
  */
-int max31865_raw_to_data(max31865_t *dev, uint16_t raw_data, int32_t *rtd_temperature_cdegc);
+int max31865_raw_to_data(const max31865_t *dev, uint16_t raw_data, int32_t *rtd_temperature_cdegc);
 
 /**
  * @brief Run an automatic fault-detection cycle
@@ -267,7 +267,7 @@ void max31865_switch_vbias(max31865_t *dev, bool enable);
  * The user must wait at least 52ms in 60Hz or 62.5ms in 50Hz filter mode
  * for the conversion to complete, before reading the conversion result.
  */
-void max31865_oneshot(max31865_t *dev);
+void max31865_oneshot(const max31865_t *dev);
 
 #ifdef __cplusplus
 }
