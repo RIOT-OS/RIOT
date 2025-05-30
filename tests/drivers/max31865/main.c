@@ -51,7 +51,7 @@ int main(void)
         return 1;
     }
     uint8_t cfgreg = 0;
-    max31865_clear_fault(&dev, &max31865_params[0], &cfgreg);
+    max31865_clear_fault(&dev, &cfgreg);
     LOG_DEBUG("%s() >> Config register readback = 0x%02X\n", __FUNCTION__, cfgreg);
 
     /* periodically convert temperature values */
@@ -66,7 +66,7 @@ int main(void)
         }
         else if (max31865_detect_fault(&dev, &fault_code) == 0) {
             print_fault(fault_code);
-            max31865_clear_fault(&dev, &max31865_params[0], NULL);
+            max31865_clear_fault(&dev, NULL);
         }
         else {
             LOG_ERROR("%s() >> fault detection failed\n", __FUNCTION__);
