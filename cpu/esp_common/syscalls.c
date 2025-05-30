@@ -33,9 +33,16 @@
 #include "syscalls.h"
 
 #ifdef MODULE_ESP_IDF_HEAP
-#include "esp_heap_caps.h"
+#  include "esp_heap_caps.h"
+
+#  ifndef CPU_ESP8266                       /* for all ESP32x SoCs */
+#    define MULTI_HEAP_FREERTOS             /* allow multi-heap */
+#    include "heap/multi_heap_platform.h"   /* use multi-heap and */
+#    include "heap/heap_private.h"          /* use the `heaps_cap_*_default` functions */
+#  endif
+
 #else
-#include "malloc.h"
+#  include "malloc.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -328,8 +335,19 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
 
 #ifdef MODULE_ESP_IDF_HEAP
 
-#define heap_caps_malloc_default(s)         heap_caps_malloc(s, MALLOC_CAP_DEFAULT)
-#define heap_caps_realloc_default(p, s)     heap_caps_realloc(p, s, MALLOC_CAP_DEFAULT)
+/* For ESP8266, the `heap_caps_*_default` functions are simply mapped to the
+ * corresponding `heap_caps_*` functions because SPI RAM is not supported.
+ * But for ESP32x, where SPI RAM might be enabled, the implementation of the
+ * `heap_caps_*_default` functions of the ESP-IDF must be used, as these try
+ * to allocate memory blocks smaller than `CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL`
+ * from the internal memory first. This is important for some control data
+ * structures that must be located in the internal memory, such as the NVS
+ * partition table, in order to avoid access conflicts between SPI RAM and
+ * SPI flash memory. */
+#  ifdef CPU_ESP8266
+#     define heap_caps_malloc_default(s)        heap_caps_malloc(s, MALLOC_CAP_DEFAULT)
+#     define heap_caps_realloc_default(p, s)    heap_caps_realloc(p, s, MALLOC_CAP_DEFAULT)
+#  endif
 
 void* IRAM_ATTR __wrap__malloc_r(struct _reent *r, size_t size)
 {
