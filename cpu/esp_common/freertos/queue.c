@@ -134,6 +134,31 @@ QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
     return queue;
 }
 
+QueueHandle_t xQueueCreateCountingSemaphoreStatic(const UBaseType_t uxMaxCount,
+                                                  const UBaseType_t uxInitialCount,
+                                                  StaticQueue_t *pxStaticQueue)
+{
+    assert(pxStaticQueue);
+    assert(uxMaxCount != 0);
+    assert(uxInitialCount <= uxMaxCount);
+
+    _queue_t *queue = (_queue_t *)pxStaticQueue;
+
+    DEBUG("%s pid=%d queue=%p max=%d initial=%d\n", __func__,
+          thread_getpid(), queue, uxMaxCount, uxInitialCount);
+
+    if (xQueueCreateStatic(uxMaxCount, queueSEMAPHORE_QUEUE_ITEM_LENGTH,
+                           NULL, pxStaticQueue) == NULL) {
+        return NULL;
+    }
+
+    queue->type = queueQUEUE_TYPE_COUNTING_SEMAPHORE;
+    queue->item_level = uxInitialCount;
+    queue->item_tail = (queue->item_front + queue->item_level) % queue->item_num;
+
+    return queue;
+}
+
 QueueHandle_t xQueueCreateWithCaps(const UBaseType_t uxQueueLength,
                                    const UBaseType_t uxItemSize,
                                    const UBaseType_t uxMemoryCaps)

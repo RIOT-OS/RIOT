@@ -44,6 +44,7 @@ typedef struct {
 } _queue_t;
 
 typedef _queue_t StaticQueue_t;
+typedef _queue_t StaticSemaphore_t;
 
 QueueHandle_t xQueueGenericCreate (const UBaseType_t uxQueueLength,
                                    const UBaseType_t uxItemSize,
@@ -60,6 +61,10 @@ BaseType_t xQueueGetStaticBuffers( QueueHandle_t xQueue,
 
 QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
                                              const UBaseType_t uxInitialCount);
+
+QueueHandle_t xQueueCreateCountingSemaphoreStatic(const UBaseType_t uxMaxCount,
+                                                  const UBaseType_t uxInitialCount,
+                                                  StaticQueue_t *pxStaticQueue);
 
 QueueHandle_t xQueueCreateWithCaps(const UBaseType_t uxQueueLength,
                                    const UBaseType_t uxItemSize,
