@@ -103,6 +103,9 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #if defined(SOC_USB_SERIAL_JTAG_SUPPORTED)
     { ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG, 1 },
 #endif
+#if SOC_LCDCAM_SUPPORTED
+    { ETS_LCD_CAM_INTR_SOURCE, CPU_INUM_LCDCAM, 2 },
+#endif
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)

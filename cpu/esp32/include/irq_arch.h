@@ -56,6 +56,7 @@ extern "C" {
 #define CPU_INUM_CAN            17  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_ETH            18  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_USB            18  /**< Level interrupt with low priority 1 */
+#define CPU_INUM_LCDCAM         19  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_FRC2           20  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_SYSTIMER       20  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_SDMMC          21  /**< Level interrupt with medium priority 2 */

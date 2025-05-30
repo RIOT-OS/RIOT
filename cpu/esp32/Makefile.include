@@ -187,7 +187,10 @@ ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_idf_lcd,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_i2c/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_spi/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_lcd/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_lcd/priv_include
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
