@@ -471,10 +471,11 @@ ssize_t unicoap_options_copy_value(unicoap_options_t* options, unicoap_option_nu
     return size;
 }
 
-ssize_t unicoap_options_copy_values(unicoap_options_t* options, unicoap_option_number_t number,
-                                    uint8_t* buffer, size_t capacity, uint8_t component_prefix)
+ssize_t unicoap_options_copy_values_joined(unicoap_options_t* options, unicoap_option_number_t number,
+                                    uint8_t* buffer, size_t capacity, uint8_t separator, uint8_t prefix)
 {
     assert(buffer && (capacity > 0));
+    uint8_t _buffer_start = buffer;
 
     unicoap_options_iterator_t iterator;
     unicoap_options_iterator_init(&iterator, options);
@@ -487,17 +488,17 @@ ssize_t unicoap_options_copy_values(unicoap_options_t* options, unicoap_option_n
             return -ENOBUFS;
         }
 
-        *buffer = component_prefix;
+        *buffer = separator;
         buffer += 1;
         memcpy(buffer, component, res);
         buffer += res;
         size += res + 1;
     }
 
-    if (size == 0) {
-        *buffer = component_prefix;
+    if (size == 0 && prefix != 0) {
         size = 1;
     }
+    *_buffer_start = prefix;
 
     return size;
 }
