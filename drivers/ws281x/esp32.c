@@ -88,7 +88,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     uint32_t total_cycles, one_on, one_off, zero_on, zero_off, on_wait, off_wait;
 
     /* Current frequency */
-    rtc_cpu_freq_t freq = esp_clk_cpu_freq();
+    int freq = esp_clk_cpu_freq();
 
     total_cycles = freq / (NS_PER_SEC / WS281X_T_DATA_NS);
     one_on = freq / (NS_PER_SEC / WS281X_T_DATA_ONE_NS);
@@ -114,21 +114,21 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
                 off_wait = zero_off;
             }
             data <<= 1;
-            while (cpu_hal_get_cycle_count() < current_wait) { }
+            while (esp_cpu_get_cycle_count() < current_wait) { }
             /* end of LOW phase and start of HIGH phase */
-            start = cpu_hal_get_cycle_count();
+            start = esp_cpu_get_cycle_count();
             gpio_set(dev->params.pin);
             current_wait = start + on_wait;
-            while (cpu_hal_get_cycle_count() < current_wait) { }
+            while (esp_cpu_get_cycle_count() < current_wait) { }
             /* end of HIGH phase and start of HIGH phase */
-            start = cpu_hal_get_cycle_count();
+            start = esp_cpu_get_cycle_count();
             gpio_clear(dev->params.pin);
             current_wait = start + off_wait;
         }
         pos++;
     }
     /* final LOW phase */
-    current_wait = cpu_hal_get_cycle_count();
+    current_wait = esp_cpu_get_cycle_count();
     /* end of final LOW phase */
 #endif
 }
