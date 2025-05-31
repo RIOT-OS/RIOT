@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /** Time since boot in us (64bit version) */
-int64_t system_get_time_64 (void);
+uint64_t system_get_time_64 (void);
 
 /** initialize system watchdog timer and start it */
 void system_wdt_init (void);

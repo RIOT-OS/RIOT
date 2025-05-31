@@ -21,6 +21,10 @@ extern "C" {
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES   1
 #define configMAX_PRIORITIES    SCHED_PRIO_LEVELS
 
+#ifndef configSTACK_DEPTH_TYPE
+#define configSTACK_DEPTH_TYPE  uint32_t
+#endif
+
 #ifndef configASSERT
 #define configASSERT            assert
 #endif
