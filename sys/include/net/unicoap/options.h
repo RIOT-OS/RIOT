@@ -841,9 +841,9 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_uri_host(const unicoap_options_t* options, char** host)
+static inline ssize_t unicoap_options_get_uri_host(const unicoap_options_t* options, const char** host)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_URI_HOST, (uint8_t**)host);
+    return unicoap_options_get(options, UNICOAP_OPTION_URI_HOST, (const uint8_t**)host);
 }
 
 /**
@@ -1147,9 +1147,9 @@ static inline int unicoap_options_remove_accept(unicoap_options_t* options)
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_proxy_scheme(const unicoap_options_t* options, char** scheme)
+static inline ssize_t unicoap_options_get_proxy_scheme(const unicoap_options_t* options, const char** scheme)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_PROXY_SCHEME, (uint8_t**)scheme);
+    return unicoap_options_get(options, UNICOAP_OPTION_PROXY_SCHEME, (const uint8_t**)scheme);
 }
 
 /**
@@ -1215,9 +1215,9 @@ static inline int unicoap_options_remove_proxy_scheme(unicoap_options_t* options
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_proxy_uri(const unicoap_options_t* options, char** uri)
+static inline ssize_t unicoap_options_get_proxy_uri(const unicoap_options_t* options, const char** uri)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_PROXY_URI, (uint8_t**)uri);
+    return unicoap_options_get(options, UNICOAP_OPTION_PROXY_URI, (const uint8_t**)uri);
 }
 
 /**
@@ -1336,7 +1336,7 @@ static inline int unicoap_options_remove_no_response(unicoap_options_t* options)
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_first_if_match(const unicoap_options_t* options, uint8_t** value)
+static inline ssize_t unicoap_options_get_first_if_match(const unicoap_options_t* options, const uint8_t** value)
 {
     return unicoap_options_get(options, UNICOAP_OPTION_IF_MATCH, value);
 }
@@ -1353,7 +1353,7 @@ static inline ssize_t unicoap_options_get_first_if_match(const unicoap_options_t
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator_t* iterator, uint8_t** value)
+static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator_t* iterator, const uint8_t** value)
 {
     return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_IF_MATCH, value);
 }
@@ -1405,7 +1405,7 @@ static inline int unicoap_options_remove_all_if_match(unicoap_options_t* options
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_first_etag(const unicoap_options_t* options, uint8_t** etag)
+static inline ssize_t unicoap_options_get_first_etag(const unicoap_options_t* options, const uint8_t** etag)
 {
     return unicoap_options_get(options, UNICOAP_OPTION_ETAG, etag);
 }
@@ -1422,7 +1422,7 @@ static inline ssize_t unicoap_options_get_first_etag(const unicoap_options_t* op
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* iterator, uint8_t** etag)
+static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* iterator, const uint8_t** etag)
 {
     return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_ETAG, etag);
 }
@@ -1475,9 +1475,9 @@ static inline int unicoap_options_remove_etags(unicoap_options_t* options)
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_first_location_path_component(const unicoap_options_t* options, char** component)
+static inline ssize_t unicoap_options_get_first_location_path_component(const unicoap_options_t* options, const char** component)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_LOCATION_PATH, (uint8_t**)component);
+    return unicoap_options_get(options, UNICOAP_OPTION_LOCATION_PATH, (const uint8_t**)component);
 }
 
 /**
@@ -1492,9 +1492,9 @@ static inline ssize_t unicoap_options_get_first_location_path_component(const un
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_location_path_component(unicoap_options_iterator_t* iterator, char** component)
+static inline ssize_t unicoap_options_get_next_location_path_component(unicoap_options_iterator_t* iterator, const char** component)
 {
-    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_LOCATION_PATH, (uint8_t**)component);
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_LOCATION_PATH, (const uint8_t**)component);
 }
 
 /**
@@ -1623,9 +1623,9 @@ static inline int unicoap_options_remove_location_path(unicoap_options_t* option
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_first_uri_path_component(const unicoap_options_t* options, char** component)
+static inline ssize_t unicoap_options_get_first_uri_path_component(const unicoap_options_t* options, const char** component)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_URI_PATH, (uint8_t**)component);
+    return unicoap_options_get(options, UNICOAP_OPTION_URI_PATH, (const uint8_t**)component);
 }
 
 /**
@@ -1640,9 +1640,9 @@ static inline ssize_t unicoap_options_get_first_uri_path_component(const unicoap
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_uri_path_component(unicoap_options_iterator_t* iterator, char** component)
+static inline ssize_t unicoap_options_get_next_uri_path_component(unicoap_options_iterator_t* iterator, const char** component)
 {
-    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_URI_PATH, (uint8_t**)component);
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_URI_PATH, (const uint8_t**)component);
 }
 
 /**
@@ -1776,9 +1776,9 @@ static inline int unicoap_options_remove_uri_path(unicoap_options_t* options)
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_first_uri_query(const unicoap_options_t* options, char** query)
+static inline ssize_t unicoap_options_get_first_uri_query(const unicoap_options_t* options, const char** query)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_URI_QUERY, (uint8_t**)query);
+    return unicoap_options_get(options, UNICOAP_OPTION_URI_QUERY, (const uint8_t**)query);
 }
 
 /**
@@ -1793,9 +1793,9 @@ static inline ssize_t unicoap_options_get_first_uri_query(const unicoap_options_
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterator_t* iterator, char** query)
+static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterator_t* iterator, const char** query)
 {
-    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_URI_QUERY, (uint8_t**)query);
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_URI_QUERY, (const uint8_t**)query);
 }
 
 /**
@@ -1811,7 +1811,7 @@ static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterato
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_uri_query_by_name(unicoap_options_iterator_t* iterator, const char* name, char** value)
+static inline ssize_t unicoap_options_get_next_uri_query_by_name(unicoap_options_iterator_t* iterator, const char* name, const char** value)
 {
     return unicoap_options_get_next_query_by_name(iterator, UNICOAP_OPTION_URI_QUERY, name, value);
 }
@@ -1832,7 +1832,7 @@ static inline ssize_t unicoap_options_get_next_uri_query_by_name(unicoap_options
  * @note If you already have an @ref unicoap_options_iterator_t instance allocated somewhere, use
  * it and call @ref unicoap_options_get_next_uri_query_by_name instead.
  */
-static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_options_t* options, const char* name, char** value)
+static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_options_t* options, const char* name, const char** value)
 {
     unicoap_options_iterator_t iterator;
     unicoap_options_iterator_init(&iterator, options);
@@ -1962,9 +1962,9 @@ static inline int unicoap_options_remove_uri_queries(unicoap_options_t* options)
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option corrupted
  */
-static inline ssize_t unicoap_options_get_first_location_query(const unicoap_options_t* options, char** query)
+static inline ssize_t unicoap_options_get_first_location_query(const unicoap_options_t* options, const char** query)
 {
-    return unicoap_options_get(options, UNICOAP_OPTION_LOCATION_QUERY, (uint8_t**)query);
+    return unicoap_options_get(options, UNICOAP_OPTION_LOCATION_QUERY, (const uint8_t**)query);
 }
 
 /**
@@ -1979,9 +1979,9 @@ static inline ssize_t unicoap_options_get_first_location_query(const unicoap_opt
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_iterator_t* iterator, char** query)
+static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_iterator_t* iterator, const char** query)
 {
-    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_LOCATION_QUERY, (uint8_t**)query);
+    return unicoap_options_get_next_by_number(iterator, UNICOAP_OPTION_LOCATION_QUERY, (const uint8_t**)query);
 }
 
 /**
@@ -1997,7 +1997,7 @@ static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_it
  * @retval `-EBADOPT` Option corrupted
  * @retval `-1` if the iterator is finished
  */
-static inline ssize_t unicoap_options_get_next_location_query_by_name(unicoap_options_iterator_t* iterator, const char* name, char** value)
+static inline ssize_t unicoap_options_get_next_location_query_by_name(unicoap_options_iterator_t* iterator, const char* name, const char** value)
 {
     return unicoap_options_get_next_query_by_name(iterator, UNICOAP_OPTION_LOCATION_QUERY, name, value);
 }
@@ -2018,7 +2018,7 @@ static inline ssize_t unicoap_options_get_next_location_query_by_name(unicoap_op
  * @note If you already have an @ref unicoap_options_iterator_t instance allocated somewhere, use
  * it and call @ref unicoap_options_get_next_location_query_by_name instead.
  */
-static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_options_t* options, const char* name, char** value)
+static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_options_t* options, const char* name, const char** value)
 {
     unicoap_options_iterator_t iterator;
     unicoap_options_iterator_init(&iterator, options);
