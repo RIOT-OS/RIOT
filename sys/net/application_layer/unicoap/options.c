@@ -367,7 +367,7 @@ static int _shift_option_data(unicoap_options_t* options, size_t i, ssize_t data
     return 0;
 }
 
-static int _find_option_index(unicoap_options_t* options, uint16_t number)
+static int _find_option_index(const unicoap_options_t* options, uint16_t number)
 {
     size_t count = options->option_count;
     for (size_t i = 0; i < count; i += 1) {
@@ -439,12 +439,12 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
 
 // MARK: - Public API -
 
-bool unicoap_options_contains(unicoap_options_t* options, unicoap_option_number_t number)
+bool unicoap_options_contains(const unicoap_options_t* options, unicoap_option_number_t number)
 {
     return _find_option_index(options, number) >= 0;
 }
 
-ssize_t unicoap_options_get(unicoap_options_t* options, unicoap_option_number_t number,
+ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_number_t number,
                             uint8_t** value)
 {
     int i = _find_option_index(options, number);
@@ -456,7 +456,7 @@ ssize_t unicoap_options_get(unicoap_options_t* options, unicoap_option_number_t 
     return _read_option(&cursor, value);
 }
 
-ssize_t unicoap_options_copy_value(unicoap_options_t* options, unicoap_option_number_t number,
+ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_option_number_t number,
                                    uint8_t* dest, size_t capacity)
 {
     uint8_t* src = NULL;
@@ -471,14 +471,14 @@ ssize_t unicoap_options_copy_value(unicoap_options_t* options, unicoap_option_nu
     return size;
 }
 
-ssize_t unicoap_options_copy_values_joined(unicoap_options_t* options, unicoap_option_number_t number,
-                                    uint8_t* buffer, size_t capacity, uint8_t separator, uint8_t prefix)
+ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, unicoap_option_number_t number,
+                                    uint8_t* buffer, size_t capacity, uint8_t separator)
 {
     assert(buffer && (capacity > 0));
-    uint8_t _buffer_start = buffer;
-
+    
+    /* We are not mutating options here and the iterator does not escape. */
     unicoap_options_iterator_t iterator;
-    unicoap_options_iterator_init(&iterator, options);
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
     size_t size = 0;
 
     ssize_t res = 0;
@@ -487,18 +487,17 @@ ssize_t unicoap_options_copy_values_joined(unicoap_options_t* options, unicoap_o
         if (capacity < (size_t)(res + 1)) {
             return -ENOBUFS;
         }
-
-        *buffer = separator;
-        buffer += 1;
+        
+        /* Only insert separator between values */
+        if (size > 0) {
+            *buffer = separator;
+            buffer += 1;
+            size += 1;
+        }
         memcpy(buffer, component, res);
         buffer += res;
-        size += res + 1;
+        size += res;
     }
-
-    if (size == 0 && prefix != 0) {
-        size = 1;
-    }
-    *_buffer_start = prefix;
 
     return size;
 }
@@ -778,7 +777,7 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
     return -ENOENT;
 }
 
-ssize_t unicoap_options_get_variable_uint(unicoap_options_t* options,
+ssize_t unicoap_options_get_variable_uint(const unicoap_options_t* options,
                                           unicoap_option_number_t number, void* integer,
                                           size_t integer_size)
 {
@@ -798,7 +797,7 @@ ssize_t unicoap_options_get_variable_uint(unicoap_options_t* options,
     return size;
 }
 
-ssize_t unicoap_options_get_uint8(unicoap_options_t* options, unicoap_option_number_t number,
+ssize_t unicoap_options_get_uint8(const unicoap_options_t* options, unicoap_option_number_t number,
                                   uint8_t* integer)
 {
     return unicoap_options_get_variable_uint(options, number, integer, sizeof(uint8_t));
