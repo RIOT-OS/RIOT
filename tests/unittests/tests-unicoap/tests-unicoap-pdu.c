@@ -80,7 +80,7 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     char* component = NULL;
 
     char path[30];
-    TEST_ASSERT_EQUAL_INT(unicoap_options_get_uri_path(&parsed.options, path, sizeof(path)), sizeof_string("/actuators/leds"));
+    TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)), sizeof_string("/actuators/leds"));
     _TEST_ASSERT_EQUAL_BYTES_STRING(path, "/actuators/leds");
 
     unicoap_options_iterator_init(&iterator, &parsed.options);
@@ -92,8 +92,8 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     _TEST_ASSERT_EQUAL_BYTES(component, "leds", sizeof_string("leds"));
 
     char queries[30];
-    TEST_ASSERT_EQUAL_INT(unicoap_options_get_uri_queries(&parsed.options, queries, sizeof(queries)), sizeof_string("?color=g"));
-    _TEST_ASSERT_EQUAL_BYTES_STRING(queries, "?color=g");
+    TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_queries(&parsed.options, queries, sizeof(queries)), sizeof_string("color=g"));
+    _TEST_ASSERT_EQUAL_BYTES_STRING(queries, "color=g");
 
     unicoap_options_iterator_init(&iterator, &parsed.options);
 
