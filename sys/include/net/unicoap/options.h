@@ -1520,7 +1520,8 @@ static inline ssize_t unicoap_options_copy_location_path(const unicoap_options_t
     *path = '/';
     path += 1;
     capacity -= 1;
-    return unicoap_options_copy_values_joined(options, UNICOAP_OPTION_LOCATION_PATH, (uint8_t*)path, capacity, '/');
+    int res = unicoap_options_copy_values_joined(options, UNICOAP_OPTION_LOCATION_PATH, (uint8_t*)path, capacity, '/');
+    return res < 0 ? res : res + 1;
 }
 
 /**
@@ -1668,10 +1669,7 @@ static inline ssize_t unicoap_options_copy_uri_path(const unicoap_options_t* opt
     path += 1;
     capacity -= 1;
     int res = unicoap_options_copy_values_joined(options, UNICOAP_OPTION_URI_PATH, (uint8_t*)path, capacity, '/');
-    if (res >= 0) {
-        res += 1;
-    }
-    return res;
+    return res < 0 ? res : res + 1;
 }
 
 /**
