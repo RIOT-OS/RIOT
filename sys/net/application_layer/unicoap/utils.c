@@ -450,7 +450,7 @@ void unicoap_options_dump_all(const unicoap_options_t* options)
 {
     unicoap_options_iterator_t iterator = { 0 };
     unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
-    uint8_t* value = NULL;
+    const uint8_t* value = NULL;
     ssize_t size = -1;
     unicoap_option_number_t number = 0;
 
