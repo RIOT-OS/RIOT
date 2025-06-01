@@ -445,7 +445,7 @@ bool unicoap_options_contains(const unicoap_options_t* options, unicoap_option_n
 }
 
 ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_number_t number,
-                            uint8_t** value)
+                           const uint8_t** value)
 {
     int i = _find_option_index(options, number);
     if (i < 0) {
@@ -453,13 +453,13 @@ ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_num
     }
 
     uint8_t* cursor = options->entries[i].data;
-    return _read_option(&cursor, value);
+    return _read_option(&cursor, (uint8_t**)value);
 }
 
 ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_option_number_t number,
                                    uint8_t* dest, size_t capacity)
 {
-    uint8_t* src = NULL;
+    const uint8_t* src = NULL;
     ssize_t size = unicoap_options_get(options, number, &src);
     if (size < 0) {
         return size;
@@ -482,7 +482,7 @@ ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, uni
     size_t size = 0;
 
     ssize_t res = 0;
-    uint8_t* component;
+    const uint8_t* component;
     while ((res = unicoap_options_get_next_by_number(&iterator, number, &component)) > 0) {
         if (capacity < (size_t)(res + 1)) {
             return -ENOBUFS;
@@ -706,7 +706,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 // MARK: - Iterator
 
 ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
-                                 unicoap_option_number_t* number, uint8_t** value)
+                                 unicoap_option_number_t* number, const uint8_t** value)
 {
     assert(iterator->options);
     assert(iterator->options->entries->data);
@@ -717,7 +717,7 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
 
     unicoap_option_entry_t* e = &iterator->options->entries[iterator->index];
     uint8_t* cursor = e->data;
-    ssize_t value_size = _read_option(&cursor, value);
+    ssize_t value_size = _read_option(&cursor, (uint8_t**)value);
     if (value_size < 0) {
         return value_size;
     }
@@ -730,7 +730,7 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
 }
 
 ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
-                                           unicoap_option_number_t number, uint8_t** value)
+                                           unicoap_option_number_t number, const uint8_t** value)
 {
     unicoap_options_t* options = iterator->options;
     while ((iterator->index < options->option_count) &&
@@ -743,12 +743,12 @@ ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
 
 ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* iterator,
                                                unicoap_option_number_t number, const char* name,
-                                               char** value)
+                                               const char** value)
 {
     char* _name = NULL;
-    char* component = NULL;
+    const char* component = NULL;
     ssize_t res = -1;
-    while ((res = unicoap_options_get_next_by_number(iterator, number, (uint8_t**)&component)) >= 0) {
+    while ((res = unicoap_options_get_next_by_number(iterator, number, (const uint8_t**)&component)) >= 0) {
         assert(component);
         _name = (char*)component;
 
@@ -781,7 +781,7 @@ ssize_t unicoap_options_get_variable_uint(const unicoap_options_t* options,
                                           unicoap_option_number_t number, void* integer,
                                           size_t integer_size)
 {
-    uint8_t* src = NULL;
+    const uint8_t* src = NULL;
     ssize_t size = unicoap_options_get(options, number, &src);
     if (size < 0) {
         return size;
