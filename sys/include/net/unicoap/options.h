@@ -442,7 +442,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
  * @retval `-EBADOPT` Options buffer is corrupted
  */
 ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_number_t number,
-                            uint8_t** value);
+                            const uint8_t** value);
 
 /**
  * @brief Copies the value of the option with given value, if present, into a buffer
@@ -559,7 +559,7 @@ static inline void unicoap_options_iterator_init(unicoap_options_iterator_t* ite
  * @retval `-EBADOPT` Options buffer is corrupted
  */
 ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
-                                 unicoap_option_number_t* number, uint8_t** value);
+                                 unicoap_option_number_t* number, const uint8_t** value);
 
 /**
  * @brief Gets the next option with the given number, potentially skipping any options in between.
@@ -576,7 +576,7 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
  * @retval `-EBADOPT` Options buffer is corrupted
  */
 ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
-                                           unicoap_option_number_t number, uint8_t** value);
+                                           unicoap_option_number_t number, const uint8_t** value);
 
 /**
  * @brief Gets the next query option matching the given name, potentially skipping any options in between.
@@ -600,7 +600,7 @@ ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
  */
 ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* iterator,
                                                unicoap_option_number_t number, const char* name,
-                                               char** value);
+                                               const char** value);
 
 /**
  * @brief Iterates and dumps all options using `printf`
