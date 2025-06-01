@@ -77,7 +77,7 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     TEST_ASSERT_EQUAL_INT(format, UNICOAP_FORMAT_JSON);
 
     unicoap_options_iterator_t iterator = { 0 };
-    char* component = NULL;
+    const char* component = NULL;
 
     char path[30];
     TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)), sizeof_string("/actuators/leds"));
