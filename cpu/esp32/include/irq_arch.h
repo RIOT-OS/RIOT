@@ -62,6 +62,7 @@ extern "C" {
 #define CPU_INUM_SDMMC          21  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_TIMER          22  /**< Edge  interrupt with medium priority 2 */
 #define CPU_INUM_WDT            23  /**< Level interrupt with medium priority 3 */
+#define CPU_INUM_ZMAC           27  /**< Level interrupt with medium priority 3 */
 #define CPU_INUM_SOFTWARE       29  /**< Software interrupt with medium priority 3 */
 /** @} */
 
