@@ -26,7 +26,7 @@ static void test_contiguous_payload(void)
 {
     unicoap_message_t message = { .method = UNICOAP_METHOD_GET };
 
-    TEST_ASSERT_EQUAL_INT(unicoap_message_payload_is_empty(&message), true);
+    TEST_ASSERT(unicoap_message_payload_is_empty(&message));
 
     uint8_t payload[] = { 0xc0, 0xff, 0xee };
     unicoap_message_payload_set(&message, payload, sizeof(payload));
@@ -52,7 +52,7 @@ static void test_noncontiguous_payload(void)
 {
     unicoap_message_t message = { .method = UNICOAP_METHOD_GET };
 
-    TEST_ASSERT_EQUAL_INT(unicoap_message_payload_is_empty(&message), true);
+    TEST_ASSERT(unicoap_message_payload_is_empty(&message));
 
     uint8_t payload2[] = { 0xee };
 
@@ -164,6 +164,7 @@ static void test_noncontiguous_payload_copy(void)
     };
 
     unicoap_message_payload_set_chunks(&message, &chunk);
+    TEST_ASSERT(message.payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS);
 
     const char hello[] = "Hello, World!";
     iolist_t chunk3 = {
@@ -172,6 +173,7 @@ static void test_noncontiguous_payload_copy(void)
     };
 
     unicoap_message_payload_append_chunk(&message, &chunk3);
+    TEST_ASSERT(message.payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS);
 
     uint8_t buffer[sizeof(payload) + sizeof(payload2) + sizeof_string(hello)];
     TEST_ASSERT_EQUAL_INT(unicoap_message_payload_copy(&message, buffer, sizeof(buffer)), sizeof(buffer));
