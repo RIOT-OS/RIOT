@@ -68,6 +68,10 @@ ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
   endif
 endif
 
+ifeq (esp32h2,$(CPU_FAM))
+  FEATURES_PROVIDED += esp_ieee802154
+endif
+
 ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
   ifneq (,$(filter esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))

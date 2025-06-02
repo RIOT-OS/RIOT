@@ -28,6 +28,10 @@ ifneq (, $(filter esp_freertos, $(USEMODULE)))
     DIRS += freertos
 endif
 
+ifneq (, $(filter esp_ieee802154, $(USEMODULE)))
+    DIRS += esp-ieee802154
+endif
+
 ifneq (, $(filter esp_lcd, $(USEMODULE)))
     DIRS += esp-lcd
 endif
