@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
-
-#ifndef GCOAP_EXAMPLE_H
-#define GCOAP_EXAMPLE_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -53,5 +52,4 @@ void notify_observers(void);
 }
 #endif
 
-#endif /* GCOAP_EXAMPLE_H */
 /** @} */

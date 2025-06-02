@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef TINYDTLS_KEYS_H
-#define TINYDTLS_KEYS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,5 +58,3 @@ static const unsigned char ecdsa_pub_key_y[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TINYDTLS_KEYS_H */
