@@ -52,7 +52,7 @@
  * @return 0 on success.
  * @return -EINVAL if temperature is out of LUT range.
  */
-static int _temp_to_raw(max31865_t *dev, int32_t temp, uint16_t *raw_data)
+static int _temp_to_raw(const max31865_t *dev, int32_t temp, uint16_t *raw_data)
 {
     int32_t temp_uc = temp * 10000;     // c°C --> µ°C
 
@@ -223,7 +223,7 @@ int max31865_read(const max31865_t *dev, int32_t *rtd_temperature_cdegc)
     }
 }
 
-int max31865_detect_fault(max31865_t *dev, max31865_fault_t *flt_code)
+int max31865_detect_fault(const max31865_t *dev, max31865_fault_t *flt_code)
 {
     assert(dev);
     assert(flt_code);

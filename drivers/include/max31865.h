@@ -215,8 +215,8 @@ int max31865_read_raw(const max31865_t *dev, uint16_t *raw_data);
 /**
  * @brief   Convert the raw data from the MAX31865 temperature
  *
- * @param[in] dev                       Device descriptor of the driver
- * @param[in] raw_data                  Raw data from the MAX31865
+ * @param[in]  dev                      Device descriptor of the driver
+ * @param[in]  raw_data                 Raw data from the MAX31865
  * @param[out] rtd_temperature_cdegc    Temperature in centi-degrees Celsius (0.01°C)
  *
  * @pre                                 @p data must not be NULL
@@ -246,7 +246,7 @@ int max31865_raw_to_data(const max31865_t *dev, uint16_t raw_data, int32_t *rtd_
  * @retval 0 on success.
  * @retval -EIO on error.
  */
-int max31865_detect_fault(max31865_t *dev, max31865_fault_t *flt_code);
+int max31865_detect_fault(const max31865_t *dev, max31865_fault_t *flt_code);
 
 /**
  * @brief Switch V<sub>BIAS</sub> on or off
