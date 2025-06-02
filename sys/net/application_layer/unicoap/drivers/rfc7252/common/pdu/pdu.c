@@ -55,7 +55,7 @@ static inline unicoap_protocol_version_t _get_version(const unicoap_header_rfc72
 }
 
 /**
- * @brief       Sets message CoAP version
+ * @brief       Sets message CoAP version to 1
  * @param[in]   header   CoAP PDU header
  */
 static inline void _set_version(unicoap_header_rfc7252_t* header)
@@ -64,7 +64,7 @@ static inline void _set_version(unicoap_header_rfc7252_t* header)
 }
 
 /**
- * @brief       Gets the message type of an "Earth PDU"
+ * @brief       Gets the message type of an RFC 7252 PDU
  * @param[in]   header   CoAP PDU header
  * @returns     @ref COAP_TYPE_CON
  * @returns             @ref COAP_TYPE_NON
@@ -77,7 +77,7 @@ static inline unsigned _get_type(const unicoap_header_rfc7252_t* header)
 }
 
 /**
- * @brief       Sets the message type of an "Earth PDU"
+ * @brief       Sets the message type of an RFC 7252 PDU
  * @param[in]   header   CoAP PDU header
  * @param       type   CoAP PDU type
  */
@@ -162,7 +162,7 @@ ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_messa
         return -EBADMSG;
     }
 
-    if ((_get_code(header) == 0) && (size > sizeof(unicoap_header_rfc7252_t))) {
+    if ((_get_code(header) == UNICOAP_CODE_EMPTY) && (size > sizeof(unicoap_header_rfc7252_t))) {
         PDU_7252_DEBUG("empty msg is too long\n");
         return -EBADMSG;
     }
@@ -200,8 +200,7 @@ ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
                                          const unicoap_message_properties_t* properties)
 {
     assert(properties->token_length <= 0xf);
-    assert(capacity >= sizeof(unicoap_header_rfc7252_t));
-    if (capacity < sizeof(unicoap_header_rfc7252_t)) {
+    if (capacity < sizeof(unicoap_header_rfc7252_t) + properties->token_length) {
         return -ENOBUFS;
     }
 
