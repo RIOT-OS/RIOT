@@ -26,7 +26,7 @@ static int read_temp(const void *dev, phydat_t *res)
 {
     int32_t temperature_cdegc;
 
-    if (max31865_read((max31865_t *)dev, &temperature_cdegc) != 0) {
+    if (max31865_read(dev, &temperature_cdegc) != 0) {
         return -ECANCELED;
     }
 
