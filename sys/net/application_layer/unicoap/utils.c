@@ -80,7 +80,7 @@ ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* 
         return iolist_to_buffer(message->payload_chunks, buffer, capacity);
     case UNICOAP_PAYLOAD_CONTIGUOUS:
         if (message->payload_size > capacity) {
-            UNICOAP_DEBUG("buf too small " _NEED_HAVE "\n", message->payload_size, capacity);
+            UNICOAP_DEBUG("buf too small " _UNICOAP_NEED_HAVE "\n", message->payload_size, capacity);
             return -ENOBUFS;
         }
         memcpy(buffer, message->payload, message->payload_size);
@@ -98,7 +98,7 @@ ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint
         assert(buffer);
         ssize_t res = iolist_to_buffer(message->payload_chunks, buffer, capacity);
         if (res < 0) {
-            UNICOAP_DEBUG("buf too small " _NEED_HAVE "\n", iolist_size(message->payload_chunks), capacity);
+            UNICOAP_DEBUG("buf too small " _UNICOAP_NEED_HAVE "\n", iolist_size(message->payload_chunks), capacity);
             return res;
         }
         message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
