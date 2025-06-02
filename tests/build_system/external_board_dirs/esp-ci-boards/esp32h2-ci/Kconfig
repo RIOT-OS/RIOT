@@ -1,0 +1,16 @@
+# Copyright (c) 2025 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32h2-ci" if BOARD_ESP32H2_CI
+
+config BOARD_ESP32H2_CI
+    bool
+    default y
+    select BOARD_COMMON_ESP32H2
+    select CPU_MODEL_ESP32H2_MINI_1X_H4S
+
+source "$(RIOTBOARD)/common/esp32h2/Kconfig"
