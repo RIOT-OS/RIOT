@@ -628,7 +628,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
 
         /* If the options grows due to the delta field becoming wider, we extend the option in the leading
          * direction. Otherwise, we would need to move once to adjust for the delta width and once
-         * again to accomodate the new option. We already created exactly enough space to fit the
+         * again to accommodate the new option. We already created exactly enough space to fit the
          * new delta width AND the new option by calling _shift_options(options, i, total_diff) above.
          *
          * Before:
