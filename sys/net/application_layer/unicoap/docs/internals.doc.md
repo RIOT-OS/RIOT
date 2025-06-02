@@ -13,9 +13,9 @@ Each of these standards leverage different messaging models, i.e., what timeouts
 reliable transmission is implemented, and what messages are allowed to be sent
 in response to a certain message type. A custom CoAP PDU header (i.e., another PDU
 format) has been specified for CoAP over reliable transports.
-For instance, CoAP over UDP and over DTLS share the same PDU format; so do CoAP over TCP and TLS. 
-The set of protocol characteristics that vary depending on the _transport_ forms a specific version 
-of CoAP, which is called a _CoAP combination_ in `unicoap`. 
+For instance, CoAP over UDP and over DTLS share the same PDU format; so do CoAP over TCP and TLS.
+The set of protocol characteristics that vary depending on the _transport_ forms a specific version
+of CoAP, which is called a _CoAP combination_ in `unicoap`.
 For instance, CoAP over UDP is CoAP combination, so is CoAP over DTLS.
 
 ## Layered Design
@@ -25,8 +25,8 @@ as shown in the figure below. Conceptually, newly received message traverse thes
 the application, and data sent by the application travels in the opposite direction.
 Located beneath the application, the _exchange_ layer embodies the REST model of CoAP.
 It is responsible for handling advanced CoAP features operating above the request-response exchanges,
-such as [resource observation](/FIXME-upcoming-pr-net_unicoap_client_resource_observation) 
-and [block-wise transfer](/FIXME-upcoming-pr-net_unicoap_blockwise). 
+such as [resource observation](/FIXME-upcoming-pr-net_unicoap_client_resource_observation)
+and [block-wise transfer](/FIXME-upcoming-pr-net_unicoap_blockwise).
 This layer is shared between CoAP combinations, i.e., the REST semantics remain the same,
 regardless of the messaging model and transport beneath.
 Since messaging differs between CoAP combinations, a modular design to ease the addition
@@ -57,7 +57,7 @@ Specification:          RFC 7252                       RFC 8323
 | |                        |                       /                \
 | |                        |                      /                  \
 | +- PDU Format:    shared between         shared between         WebSockets
-|                     UDP & DTLS             TCP & TLS             /     \ 
+|                     UDP & DTLS             TCP & TLS             /     \
 |                      /       \               /    \             /       \
 |                     /         \             /      \           /         \
 +-- Transport       UDP        DTLS          TCP     TLS    WebSockets  WebSockets
@@ -133,8 +133,8 @@ On a high level, each driver interacts with the upper layers on these three occa
 
 The following figure illustrates communication between layers in a block-wise transfer,
 where a client request from the application may result in multiple
-[`unicoap_messaging_send`](/FIXME-upcoming-pr-unicoap_messaging_send) and 
-[`unicoap_exchange_process`](/FIXME-upcoming-pr-unicoap_exchange_process) calls between the 
+[`unicoap_messaging_send`](/FIXME-upcoming-pr-unicoap_messaging_send) and
+[`unicoap_exchange_process`](/FIXME-upcoming-pr-unicoap_exchange_process) calls between the
 exchange and messaging layer:
 
 <img src="unicoap-layers-comms.svg" alt="Figure 3: Communication between layers" width="600em"/>

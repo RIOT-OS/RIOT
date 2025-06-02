@@ -3,8 +3,8 @@
 @brief Tools for parsing PDUs and serializing messages and options
 
 ## Parsing
-To parse a message on your own, use one of the parsers in @ref net_unicoap_message and 
-@ref unicoap_parser_result_t. The parsed message structure helps you allocate everything needed in 
+To parse a message on your own, use one of the parsers in @ref net_unicoap_message and
+@ref unicoap_parser_result_t. The parsed message structure helps you allocate everything needed in
 one go.
 
 ```c
