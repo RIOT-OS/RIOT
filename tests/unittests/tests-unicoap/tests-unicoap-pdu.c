@@ -30,7 +30,7 @@
     TEST_ASSERT_EQUAL_INT((parsed)->properties.rfc7252.id, (message_id));                         \
     TEST_ASSERT_EQUAL_INT((parsed)->properties.rfc7252.type, (message_type))
 
-static inline void test_parsed_message(unicoap_parser_result_t* parsed, uint8_t code, size_t payload_size, const uint8_t* payload, uint8_t token_length, uint8_t* token)
+static void test_parsed_message(unicoap_parser_result_t* parsed, uint8_t code, size_t payload_size, const uint8_t* payload, uint8_t token_length, uint8_t* token)
 {
     TEST_ASSERT_EQUAL_INT(parsed->message.code, code);
     TEST_ASSERT_EQUAL_INT(parsed->message.payload_size, payload_size);
@@ -51,6 +51,25 @@ static inline void test_parsed_message(unicoap_parser_result_t* parsed, uint8_t 
 
 static void test_pdu_rfc7252_actuators_round_trip(void)
 {
+    /* In this order:
+     UDP
+     Message:
+     {
+       "type": "Confirmable",
+       "code": "POST",
+       "id": 65201,
+       "token": 0,
+       "options": [
+         "Uri-Path: actuators",
+         "Uri-Path: leds",
+         "Content-Format: application/json",
+         "Uri-Query: color=g",
+         "Accept: application/json"
+       ]
+     }
+     Payload (JSON):
+     6D 6F 64 65 3D 6F 6E
+     */
     uint8_t pdu[] = {
         0x40, 0x02, 0xfe, 0xb1, 0xb9, 0x61, 0x63, 0x74, 0x75, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x04, 0x6c, 0x65, 0x64, 0x73, 0x11, 0x32, 0x37, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3d, 0x67, 0x21, 0x32, 0xff, 0x6d, 0x6f, 0x64, 0x65, 0x3d, 0x6f, 0x6e
     };
@@ -76,13 +95,12 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     unicoap_options_get_accept(&parsed.options, &format);
     TEST_ASSERT_EQUAL_INT(format, UNICOAP_FORMAT_JSON);
 
-    unicoap_options_iterator_t iterator = { 0 };
-    const char* component = NULL;
-
     char path[30];
     TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)), sizeof_string("/actuators/leds"));
     _TEST_ASSERT_EQUAL_BYTES_STRING(path, "/actuators/leds");
 
+    unicoap_options_iterator_t iterator = { 0 };
+    const char* component = NULL;
     unicoap_options_iterator_init(&iterator, &parsed.options);
 
     TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_path_component(&iterator, &component), sizeof_string("actuators"));
@@ -99,12 +117,13 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
 
     TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_query(&iterator, &component), sizeof_string("color=g"));
     _TEST_ASSERT_EQUAL_BYTES(component, "color=g", sizeof_string("color=g"));
+    TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_query(&iterator, &component), -1);
 
     uint8_t pdu_copy[sizeof(pdu) + 100] = { 0 };
     TEST_ASSERT_EQUAL_INT(unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy), &parsed.message, &parsed.properties), sizeof(pdu));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 
-    // Try building a vector
+    /* Try to build a vector */
 
     memset(pdu_copy, 0, sizeof(pdu_copy));
 
@@ -118,6 +137,17 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
 
 static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
 {
+    /*
+     UDP
+     Message:
+     {
+       "type": "Acknowledgement",
+       "code": "MethodNotAllowed",
+       "id": 3132,
+       "token": 3516372673,
+       "options": []
+     }
+     */
     /* from https://wiki.wireshark.org/samplecaptures */
     const uint8_t pdu[] = { 0x64, 0x85, 0x0c, 0x3c, 0xd1, 0x97, 0x96, 0xc1 };
 
@@ -130,11 +160,15 @@ static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
                                       _BYTES(0xd1, 0x97, 0x96, 0xc1),
                                       UNICOAP_TYPE_ACK, 3132);
 
+    char path[30];
+    TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)), sizeof_string("/"));
+    _TEST_ASSERT_EQUAL_BYTES_STRING(path, "/");
+
     uint8_t pdu_copy[sizeof(pdu) + 100] = { 0 };
     TEST_ASSERT_EQUAL_INT(unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy), &parsed.message, &parsed.properties), sizeof(pdu));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 
-    // Try building a vector
+    /* Try to build a vector */
 
     memset(pdu_copy, 0, sizeof(pdu_copy));
 
@@ -148,6 +182,19 @@ static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
 
 static void test_pdu_rfc7252_cbor_request_round_trip(void)
 {
+    /*
+     UDP
+     Message:
+     {
+       "type": "Confirmable",
+       "code": "POST",
+       "id": 3134,
+       "token": 3516372675,
+       "options": [
+         "Content-Format: application/cbor"
+       ]
+     }
+     */
     /* from https://wiki.wireshark.org/samplecaptures */
     const uint8_t pdu[] = { 0x44, 0x02, 0x0c, 0x3e, 0xd1, 0x97, 0x96, 0xc3, 0xc1, 0x3c, 0xff, 0x0a };
 
@@ -164,7 +211,7 @@ static void test_pdu_rfc7252_cbor_request_round_trip(void)
     TEST_ASSERT_EQUAL_INT(unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy), &parsed.message, &parsed.properties), sizeof(pdu));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 
-    // Try building a vector
+    /* Try to build a vector */
 
     memset(pdu_copy, 0, sizeof(pdu_copy));
 
