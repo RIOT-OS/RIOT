@@ -1092,6 +1092,9 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
  */
 ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_capacity, const unicoap_message_t* message);
 
+/** @brief Number of iolists in the iolist buffer that must be passed to @ref unicoap_pdu_buildv_options_and_payload */
+#define UNICOAP_PDU_IOLIST_COUNT (4)
+
 /**
  * @brief Populates the given iolist with header, options, payload separator and payload
  *
@@ -1105,16 +1108,15 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_
  * @param[in] header Encoded CoAP header
  * @param header_size Size of @p header
  * @param[in] message Message containing options and payload
- * @param[in,out] iolists Buffer of iolists, pre-allocated, size must be be @ref UNICOAP_PDU_IOLIST_COUNT
+ * @param[in,out] iolists Buffer of iolists, pre-allocated, size must be @ref UNICOAP_PDU_IOLIST_COUNT
  *
  * @pre @p iolists is allocated
  *
- * @returns `0` on success
- * @returns `-ENOBUFS` if carbon copy buffer is too small
+ * @returns Zero on success, negative error number otherwise
  *
  */
 int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, const unicoap_message_t* message,
-                                           iolist_t* iolists);
+                                           iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT]);
 /** @} */
 /** @} */
 
@@ -1226,9 +1228,6 @@ static inline ssize_t unicoap_pdu_build_rfc7252(uint8_t* pdu, size_t capacity,
 
 /* MARK: unicoap_driver_extension_point */
 
-/** @brief Number of iolists in the iolist buffer that must be passed to @ref unicoap_pdu_buildv_options_and_payload */
-#define UNICOAP_PDU_IOLIST_COUNT (4)
-
 /**
  * @brief Populates the given iolist with header according to RFC 7252, options, and payload
  *
@@ -1244,7 +1243,7 @@ static inline ssize_t unicoap_pdu_build_rfc7252(uint8_t* pdu, size_t capacity,
  * @returns Negative integer one error
  * @retval `-ENOBUFS` Buffer too small
  */
-static inline ssize_t unicoap_pdu_buildv_rfc7252(uint8_t* header, size_t header_capacity, const unicoap_message_t* message, const unicoap_message_properties_t* properties, iolist_t* iolists)
+static inline ssize_t unicoap_pdu_buildv_rfc7252(uint8_t* header, size_t header_capacity, const unicoap_message_t* message, const unicoap_message_properties_t* properties, iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT])
 {
     ssize_t res = 0;
     assert(header_capacity >= UNICOAP_HEADER_SIZE_MAX);
