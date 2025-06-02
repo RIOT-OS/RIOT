@@ -1139,7 +1139,7 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
  * @retval `-EBADOPT` Bad option
  * @retval `-ENOBUFS` Options buffer in @ref unicoap_message_t::options (@ref unicoap_options_t) too small
  *
- * @remark To allocate everything needed in one go, use @ref unicoap_pdu_parse instead.
+ * @remark To allocate everything needed in one go, use @ref unicoap_pdu_parse_rfc7252_result instead.
  *
  * This function does not mutate or copy the buffer pointed at by @p pdu . However, it **does escape** pointers into the
  * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
