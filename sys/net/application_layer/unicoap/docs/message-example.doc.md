@@ -7,7 +7,7 @@ Sample code.
 This example demonstrates how you can use `unicoap` message and options APIs and how to parse PDUs.
 You can find a demo application in the `examples/networking/coap/unicoap_message` folder.
 
-## Bytes to Message
+## Bytes to Message (Deserializing)
 
 ### Parsing a PDU
 
@@ -16,7 +16,7 @@ To start, let us assume `pdu` is a buffer containing the CoAP PDU.
 const uint8_t pdu[] = { /* ... */ };
 ```
 
-To make parsing easy, allocate a result structure.
+Next, allocate a result structure.
 
 ```c
 unicoap_parser_result_t parsed = { 0 };
@@ -24,18 +24,21 @@ unicoap_parser_result_t parsed = { 0 };
 
 Then, call one of the message parsers. CoAP supports different transports which is why the CoAP PDU
 header varies. In this case, let us assume we received the message over UDP or DTLS. In these cases,
-we use the RFC 7252 PDU format.
+we use the RFC 7252 PDU format. Using the result structure frees you of needing to allocate options
+and a message struct and to wire up options with message struct.
 
 ```c
 if ((res = unicoap_pdu_parse_rfc7252_result(pdu, sizeof(pdu), &parsed)) < 0) {
     puts("Error: parsing failed");
     return;
 }
+
+unicoap_message_t* message = &parsed.message;
 ```
 
 Because the header varies, transport-dependent details like the RFC 7252 message type and ID
 are accessible via the
-@ref unicoap_message_properties_t.rfc7252 member.
+@ref unicoap_message_properties_t::rfc7252 member.
 
 ```c
 printf("CoAP message has token=<%i bytes>\n",
@@ -99,8 +102,6 @@ several convenience accessors. Let us retrieve the first `Uri-Query` option.
 ```c
 char* query = NULL;
 
-/* The first getter provides a view into the PDU buffer. The returned string
- * is thus not null-terminated. */
 ssize_t res = unicoap_options_get_first_uri_query(message->options, &query);
 if (res < 0) {
     if (res == -ENOENT) {
@@ -134,12 +135,12 @@ if (res < 0) {
 For a number of repeatable options, such as `Uri-Path`, `Location-Path`, `Uri-Query`,
 and `Location-Query`, `unicoap` offers accessors that generate the original, contiguous representation.
 This means that multiple `Uri-Path` options are stitched back together, forming the `/original/path`.
-Now, let us create a query string (`?a=1&b=2&c=3`).
+These accessores do copy. Now, let us create a query string (`?a=1&b=2&c=3`).
 
 ```c
 char query_string[50] = { 0 };
 
-res = unicoap_options_get_uri_queries(message->options, query_string, sizeof(query_string));
+res = unicoap_options_copy_uri_queries(message->options, query_string, sizeof(query_string));
 if (res < 0) {
     puts("Error: could not generate URI query string");
 }
@@ -173,7 +174,7 @@ while ((res = unicoap_options_get_next(&iterator, &number, &value)) >= 0) {
 }
 ```
 
-## Message to Bytes
+## Message to Bytes (Serializing)
 
 ### Creating a Message Container
 
@@ -190,9 +191,7 @@ Now, let us initialize a message. You can either use the designated initializer 
 function.
 
 ```c
-const char payload[] = "Hello, World!";
-
-unicoap_request_init_string_with_options(&message, UNICOAP_METHOD_POST, payload, &options);
+unicoap_request_init_string_with_options(&message, UNICOAP_METHOD_POST, "Hello, World!", &options);
 ```
 
 ### Customizing Options
@@ -242,7 +241,9 @@ if (res < 0) {
 ```
 
 `unicoap` offers versions for both null-terminated C strings and strings without a null-terminator
-that require a length indication instead.
+that require a length indication instead. Example: @ref unicoap_options_add_uri_queries and 
+@ref unicoap_options_add_uri_queries_string, or @ref unicoap_options_add_uri_query and 
+@ref unicoap_options_add_uri_query_string.
 
 ### Serializing a Message
 
@@ -283,7 +284,6 @@ if (res < 0) {
 }
 
 printf("The final PDU has a size of %" PRIuSIZE " bytes.\n", res);
-}
 ```
 
 @}

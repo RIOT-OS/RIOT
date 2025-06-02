@@ -26,7 +26,7 @@ unicoap_driver_udp
 │   ├── sock_async_event
 │   ├── sock_aux_local
 │   └── sock_util
-└── sock_udp
+└── ... (operating system networking module)
 ```
 
 @}

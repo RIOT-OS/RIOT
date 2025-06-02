@@ -26,12 +26,8 @@ unicoap_driver_dtls
 │   ├── sock_async_event
 │   ├── sock_aux_local
 │   └── sock_util
-├── sock_dtls
-├── tinydtls_sock_dtls
-├── tinydtls (package)
-├── prng_sha1prng
-├── dsm
-└── ztimer_usecf
+├── ... (operating system networking modules)
+.
 ```
 
 @}

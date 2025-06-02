@@ -4,7 +4,8 @@
 @{
 
 @ref unicoap_message_t is the central container type for CoAP messages. To see how to access
-CoAP options, see @ref net_unicoap_options.
+CoAP options, see @ref net_unicoap_options. You may also look at the [guide to using CoAP
+messages](https://guides.riot-os.org/FIXME)
 
 ## Example
 
