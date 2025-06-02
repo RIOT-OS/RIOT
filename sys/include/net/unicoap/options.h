@@ -112,6 +112,7 @@ typedef struct {
 
     /**
      * @brief Helper array used to encode and decode options into options storage.
+     * @internal
      *
      * @see @ref CONFIG_UNICOAP_OPTIONS_MAX
      */
