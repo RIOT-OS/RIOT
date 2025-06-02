@@ -33,9 +33,16 @@
 #include "syscalls.h"
 
 #ifdef MODULE_ESP_IDF_HEAP
-#include "esp_heap_caps.h"
+#  include "esp_heap_caps.h"
+
+#  ifndef CPU_ESP8266                       /* for all ESP32x SoCs */
+#    define MULTI_HEAP_FREERTOS             /* allow multi-heap */
+#    include "heap/multi_heap_platform.h"   /* use multi-heap and */
+#    include "heap/heap_private.h"          /* use the `heaps_cap_*_default` functions */
+#  endif
+
 #else
-#include "malloc.h"
+#  include "malloc.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -89,6 +96,10 @@ static _lock_t *__malloc_static_object = NULL;
  * switches. */
 #define _lock_critical_enter()  uint32_t __lock_state = irq_disable();
 #define _lock_critical_exit()   irq_restore(__lock_state);
+
+/* check whether `struct __lock` is large enough to hold a recursive mutex */
+static_assert(sizeof(struct __lock) >= sizeof(rmutex_t),
+              "struct __lock is too small to hold a recursive mutex of type rmutex_t");
 
 #endif
 
@@ -318,74 +329,25 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
     _lock_critical_exit();
 }
 
-#if defined(_RETARGETABLE_LOCKING)
-
-/* check whether `struct __lock` is large enough to hold a recursive mutex */
-static_assert(sizeof(struct __lock) >= sizeof(rmutex_t),
-              "struct __lock is too small to hold a recursive mutex of type rmutex_t");
-
-/* map newlib's `__retarget_*` functions to the existing `_lock_*` functions */
-
-void __retarget_lock_init(_LOCK_T *lock)
-{
-    _lock_init(lock);
-}
-
-extern void __retarget_lock_init_recursive(_LOCK_T *lock)
-{
-    _lock_init_recursive(lock);
-}
-
-void __retarget_lock_close(_LOCK_T lock)
-{
-    _lock_close(&lock);
-}
-
-void __retarget_lock_close_recursive(_LOCK_T lock)
-{
-    _lock_close_recursive(&lock);
-}
-
-void __retarget_lock_acquire(_LOCK_T lock)
-{
-    _lock_acquire(&lock);
-}
-
-void __retarget_lock_acquire_recursive(_LOCK_T lock)
-{
-    _lock_acquire_recursive(&lock);
-}
-
-int __retarget_lock_try_acquire(_LOCK_T lock)
-{
-    return _lock_try_acquire(&lock);
-}
-
-int __retarget_lock_try_acquire_recursive(_LOCK_T lock)
-{
-    return _lock_try_acquire_recursive(&lock);
-}
-
-void __retarget_lock_release(_LOCK_T lock)
-{
-    _lock_release(&lock);
-}
-
-void __retarget_lock_release_recursive(_LOCK_T lock)
-{
-    _lock_release(&lock);
-}
-
-#endif /* _RETARGETABLE_LOCKING */
-
 /**
  * @name Memory allocation functions
  */
 
 #ifdef MODULE_ESP_IDF_HEAP
 
-#define heap_caps_malloc_default(s)         heap_caps_malloc(s, MALLOC_CAP_DEFAULT)
-#define heap_caps_realloc_default(p, s)     heap_caps_realloc(p, s, MALLOC_CAP_DEFAULT)
+/* For ESP8266, the `heap_caps_*_default` functions are simply mapped to the
+ * corresponding `heap_caps_*` functions because SPI RAM is not supported.
+ * But for ESP32x, where SPI RAM might be enabled, the implementation of the
+ * `heap_caps_*_default` functions of the ESP-IDF must be used, as these try
+ * to allocate memory blocks smaller than `CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL`
+ * from the internal memory first. This is important for some control data
+ * structures that must be located in the internal memory, such as the NVS
+ * partition table, in order to avoid access conflicts between SPI RAM and
+ * SPI flash memory. */
+#  ifdef CPU_ESP8266
+#     define heap_caps_malloc_default(s)        heap_caps_malloc(s, MALLOC_CAP_DEFAULT)
+#     define heap_caps_realloc_default(p, s)    heap_caps_realloc(p, s, MALLOC_CAP_DEFAULT)
+#  endif
 
 void* IRAM_ATTR __wrap__malloc_r(struct _reent *r, size_t size)
 {

@@ -25,13 +25,14 @@
 #include "gpio_arch.h"
 #include "irq_arch.h"
 
-#include "driver/periph_ctrl.h"
+#include "esp_clk_tree.h"
+#include "esp_cpu.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
-#include "hal/interrupt_controller_types.h"
-#include "hal/interrupt_controller_ll.h"
 #include "hal/twai_hal.h"
 #include "log.h"
 #include "rom/ets_sys.h"
+#include "soc/clk_tree_defs.h"
 #include "soc/gpio_sig_map.h"
 
 #define ENABLE_DEBUG 0
@@ -592,11 +593,17 @@ static void _esp_can_power_up(can_t *dev)
     periph_module_reset(PERIPH_TWAI_MODULE);
     periph_module_enable(PERIPH_TWAI_MODULE);
 
+    twai_hal_config_t config = { .controller_id = 0 };
+
+    esp_clk_tree_src_get_freq_hz((soc_module_clk_t)TWAI_CLK_SRC_DEFAULT,
+                                 ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
+                                 &config.clock_source_hz);
+
     /* initialize the HAL context, on return the CAN controller is in listen
      * only mode but not yet started, the error counters are reset and
      * pending interrupts cleared */
 
-    if (!twai_hal_init(&hw)) {
+    if (!twai_hal_init(&hw, &config)) {
         assert(false);
     }
 
@@ -608,8 +615,8 @@ static void _esp_can_power_up(can_t *dev)
 
     /* route CAN interrupt source to CPU interrupt and enable it */
     intr_matrix_set(PRO_CPU_NUM, ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN);
-    intr_cntrl_ll_set_int_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)(uintptr_t)dev);
-    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_CAN));
+    esp_cpu_intr_set_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)(uintptr_t)dev);
+    esp_cpu_intr_enable(BIT(CPU_INUM_CAN));
 
     /* initialize used GPIOs */
     _esp_can_init_pins();

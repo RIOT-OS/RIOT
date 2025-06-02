@@ -424,9 +424,9 @@ static inline void _i2c_delay(_i2c_bus_t* bus)
             __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
         }
 #else
-        uint32_t start = cpu_hal_get_cycle_count();
+        uint32_t start = esp_cpu_get_cycle_count();
         uint32_t wait_until = start + cycles;
-        while (cpu_hal_get_cycle_count() < wait_until) { }
+        while (esp_cpu_get_cycle_count() < wait_until) { }
 #endif
     }
 }

@@ -95,6 +95,7 @@ endif
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += netopt
   USEMODULE += ztimer_msec
+  USEMODULE += ztimer_sec
 endif
 
 ifneq (,$(filter esp_eth esp_wifi esp_now,$(USEMODULE)))

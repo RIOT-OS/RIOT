@@ -23,11 +23,14 @@
 #include "periph/dac.h"
 
 #include "esp_common.h"
-#include "driver/dac_common.h"
+#include "hal/dac_ll.h"
 #include "soc/dac_periph.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+/* for source code compatibility */
+#define DAC_CHANNEL_MAX SOC_DAC_CHAN_NUM
 
 /* forward declarations of internal functions */
 static bool _dac_conf_check(void);
@@ -61,27 +64,27 @@ void dac_set(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
     assert(_dac_channels[line] != DAC_CHANNEL_MAX);
-    dac_output_voltage(_dac_channels[line], value >> (16 - SOC_DAC_RESOLUTION));
+    dac_ll_update_output_value(_dac_channels[line], value >> (16 - SOC_DAC_RESOLUTION));
 }
 
 void dac_poweroff(dac_t line)
 {
     assert(line < DAC_NUMOF);
     assert(_dac_channels[line] != DAC_CHANNEL_MAX);
-    dac_output_disable(_dac_channels[line]);
+    dac_ll_power_down(_dac_channels[line]);
 }
 
 void dac_poweron(dac_t line)
 {
     assert(line < DAC_NUMOF);
     assert(_dac_channels[line] != DAC_CHANNEL_MAX);
-    dac_output_enable(_dac_channels[line]);
+    dac_ll_power_on(_dac_channels[line]);
 }
 
 static bool _dac_conf_check(void)
 {
     for (unsigned i = 0; i < DAC_NUMOF; i++) {
-        for (unsigned j = 0; i < SOC_DAC_PERIPH_NUM; j++) {
+        for (unsigned j = 0; i < SOC_DAC_CHAN_NUM; j++) {
             if (dac_channels[i] == dac_periph_signal.dac_channel_io_num[j]) {
                 _dac_channels[i] = j;
                 break;

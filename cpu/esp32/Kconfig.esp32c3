@@ -69,7 +69,7 @@ menu "ESP32-C3 specific configurations"
         config ESP32C3_DEFAULT_CPU_FREQ_MHZ_2
             bool "2 MHz"
         config ESP32C3_DEFAULT_CPU_FREQ_MHZ_5
-            bool "50 MHz"
+            bool "5 MHz"
         config ESP32C3_DEFAULT_CPU_FREQ_MHZ_10
             bool "10 MHz"
         config ESP32C3_DEFAULT_CPU_FREQ_MHZ_20

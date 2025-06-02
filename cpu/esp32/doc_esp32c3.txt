@@ -80,10 +80,13 @@ total:
 The maximum number of ADC channels #ADC_NUMOF_MAX is 6.
 
 @note
-- ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
-  therefore not available as ADC channels if the modules `esp_wifi` or
+- According to the ESP32-C2 Errata Sheet, ADC2 with GPIO5 as ADC channel may
+  not work correctly. By default it is still possible to use it anyway.
+  Set `CONFIG_ADC_ONESHOT_FORCE_USE_ADC2_ON_C3` to 0 if you do not want to use
+  it and want to activate the configuration check for this channel.
+- ADC2 is also used by the WiFi module. GPIO5 connected to ADC2 is
+  therefore not available as ADC channels if the modules `esp_wifi*` or
   `esp_now` are used.
-- Vref can be read with function #adc_line_vref_to_gpio at GPIO5.
 
 ## I2C Interfaces {#esp32_i2c_interfaces_esp32c3}
 
@@ -116,8 +119,7 @@ mode:
 
 - Controller SPI0 is reserved for caching external memory like Flash
 - Controller SPI1 is reserved for external memory like PSRAM
-- Controller SPI2 can be used as general purpose SPI (also called HSPI)
-- Controller SPI3 can be used as general purpose SPI (also called VSPI)
+- Controller SPI2 can be used as general purpose SPI (also called FSPI)
 
 Thus, only SPI2 (FSPI) can be used as general purpose SPI in RIOT as
 SPI_DEV(0).
@@ -176,15 +178,18 @@ UART_DEV(2) | RxD  | GPIO16 |`UART2_RXD` | optional, can be overridden
 There are two option on how to uese the JTAG interface on ESP32-C3:
 
 1.  Using the built-in USB-to-JTAG bridge connected to an USB cable as follows:
+    <center>
     USB Signal     | ESP32-C3 Pin
     :--------------|:-----------
     D- (white)     | GPIO18
     D+ (green)     | GPIO19
     V_Bus (red)    | 5V
     Ground (black) | GND
+    </center>
 
 2.  Using an external JTAG adapter connected to the JTAG interface exposed
     to GPIOs as follows:
+    <center>
     JTAG Signal | ESP32-C3 Pin
     :-----------|:-----------
     TRST_N      | CHIP_PU
@@ -193,10 +198,11 @@ There are two option on how to uese the JTAG interface on ESP32-C3:
     TCK         | GPIO6 (MTCK)
     TMS         | GPIO4 (MTMS)
     GND         | GND
-    <br>
+    </center><br>
     @note This option requires that the USB D- and USB D+ signals are connected
           to the ESP32-C3 USB interface at GPIO18 and GPIO19.
 
+<br>
 Using the built-in USB-to-JTAG is the default option, i.e. the JTAG interface
 of the ESP32-C3 is connected to the built-in USB-to-JTAG bridge. To use an
 external JTAG adapter, the JTAG interface of the ESP32-C3 has to be connected

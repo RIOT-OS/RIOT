@@ -1,0 +1,27 @@
+From d1d459905d7152eb1ff065ea80dd73e384c7ff7b Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 18:04:52 +0100
+Subject: [PATCH 17/28] hal: avoid conflicts for ARRAY_SIZE macro
+
+---
+ components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h b/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h
+index 9ba2778472..c740e8d0cf 100644
+--- a/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h
++++ b/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h
+@@ -25,7 +25,10 @@
+ extern "C" {
+ #endif
+ 
++#ifndef ARRAY_SIZE
+ #define ARRAY_SIZE(arr) (sizeof((arr))/sizeof(*(arr)))
++#endif
++
+ #define MSPI_TIMING_LL_FLASH_OCT_MASK                 (SPI_MEM_FCMD_OCT | SPI_MEM_FADDR_OCT | SPI_MEM_FDIN_OCT | SPI_MEM_FDOUT_OCT)
+ #define MSPI_TIMING_LL_FLASH_QUAD_MASK                (SPI_MEM_FASTRD_MODE | SPI_MEM_FREAD_DUAL | SPI_MEM_FREAD_DIO | SPI_MEM_FREAD_QUAD | SPI_MEM_FREAD_QIO)
+ #define MSPI_TIMING_LL_FLASH_QIO_MODE_MASK            (SPI_MEM_FREAD_QIO | SPI_MEM_FASTRD_MODE)
+-- 
+2.34.1
+

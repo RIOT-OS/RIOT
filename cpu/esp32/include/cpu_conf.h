@@ -79,7 +79,7 @@
  */
 #if !DOXYGEN && !defined(__ASSEMBLER__)
 /* start address of flash pages in CPU address space as determined by the linker */
-extern uint8_t _fp_mem_start;
+extern uint8_t _fp_mmu_start;
 #endif
 
 #define FLASHPAGE_SIZE                  (4096U) /**< Size of pages (flash sectors) in bytes */
@@ -94,7 +94,7 @@ extern uint8_t _fp_mem_start;
 /**
  * @brief   CPU base address for flash page access as determined by the linker
  */
-#define CPU_FLASH_BASE                  ((uint32_t)&_fp_mem_start)
+#define CPU_FLASH_BASE                  ((uint32_t)&_fp_mmu_start)
 
 /** @} */
 
