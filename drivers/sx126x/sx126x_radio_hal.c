@@ -412,7 +412,11 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     sx126x_get_lora_pkt_status(dev, &pkt_status);
 
     if (info) {
-        info->lqi = pkt_status.snr_pkt_in_db;
+        /* scale int8_t LoRa SNR into uint8_t IEEE 802.15.4 LQI */
+        SX126X_DEBUG(dev, "hal: SNR %"PRId8"db\n", pkt_status.snr_pkt_in_db);
+        info->lqi = (-INT8_MIN) + pkt_status.snr_pkt_in_db;
+        /* scale into IEEE 802.15.4 RSSI [-174,80] dbm */
+        SX126X_DEBUG(dev, "hal: RSSI %"PRId8"dbm\n", pkt_status.rssi_pkt_in_dbm);
         info->rssi = ieee802154_dbm_to_rssi(pkt_status.rssi_pkt_in_dbm);
     }
     /* Put PSDU to the output buffer */
