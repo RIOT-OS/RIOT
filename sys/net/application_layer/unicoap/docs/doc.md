@@ -9,28 +9,28 @@ Module. Specify `USEMODULE += unicoap` in your application's Makefile.
 the documentation already exists. Do not expect everything to work yet.
 
 `unicoap` is RIOT's unified and modular framework for communication via the Constrained Application
-Protocol. `unicoap` supports for different transports and several CoAP features, enabled by
+Protocol. `unicoap` supports different transports and several CoAP features, enabled by
 a **layered** and **modular** design. Support for each CoAP transport, such as UDP, is available through
 [_drivers_](@ref net_unicoap_drivers).
 
-`unicoap` aims to to replace [`gcoap`](@ref net_gcoap),
+`unicoap` aims to eventually replace [`gcoap`](@ref net_gcoap),
 [`nanocoap`](@ref net_nanocoap), and [`nanocoap_sock`](@ref net_nanosock), in favor of
 a more beginner-friendly and easily extensible design.
 
-To configure `unicoap`, go to [the compile-time configuration](@ref net_unicoap_config).
+To configure `unicoap`, go to the [compile-time configuration](@ref net_unicoap_config).
 <!--
 FIXME: undefined references, upcoming PR
 If you are already using `unicoap` und want to go the extra mile, head to
 @ref net_unicoap_optimizing.
-For extending or debugging internals, read more on this frameworks internal mechanics in the
-@ref net_unicoap_developer.
+For extending or debugging internals, read more on this framework's internal mechanics in the
+@ref net_unicoap_internal.
 -->
 
 ## CoAP
 
 The [Constrained Application Protocol (CoAP)](https://datatracker.ietf.org/doc/html/rfc7252)
 is a lightweight alternative to HTTP. HTTP as a general-purpose application protocol carries a
-significant overhead and would thus be problematic for IoT networks with limited bandwidth and
+significant overhead and is thus problematic for IoT networks with limited bandwidth and
 nodes with little memory. CoAP covers a range of features needed in the IoT, such as resource
 discovery, message fragmentation, and end-to-end message protection.
 

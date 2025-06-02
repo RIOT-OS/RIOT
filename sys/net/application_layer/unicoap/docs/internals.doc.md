@@ -13,10 +13,10 @@ Each of these standards leverage different messaging models, i.e., what timeouts
 reliable transmission is implemented, and what messages are allowed to be sent
 in response to a certain message type. A custom CoAP PDU header (i.e., another PDU
 format) has been specified for CoAP over reliable transports.
-For instance, CoAP over UDP and over DTLS share the same PDU format; so do CoAP over TCP and TLS; as well
-as CoAP over WebSockets. The set of protocol characteristics
-that vary depending on the _transport_ forms a specific version of CoAP, which is called a
-CoAP combination in `unicoap`. For instance, CoAP over UDP is CoAP combination, so is CoAP over DTLS.
+For instance, CoAP over UDP and over DTLS share the same PDU format; so do CoAP over TCP and TLS. 
+The set of protocol characteristics that vary depending on the _transport_ forms a specific version 
+of CoAP, which is called a _CoAP combination_ in `unicoap`. 
+For instance, CoAP over UDP is CoAP combination, so is CoAP over DTLS.
 
 ## Layered Design
 
@@ -26,7 +26,7 @@ the application, and data sent by the application travels in the opposite direct
 Located beneath the application, the _exchange_ layer embodies the REST model of CoAP.
 It is responsible for handling advanced CoAP features operating above the request-response model,
 such as resource observation and block-wise transfer. This layer is shared between CoAP combinations,
-i.e., the REST semantics, including Resource Observation and Block-wise transfer remain the same,
+i.e., the REST semantics remain the same,
 regardless of the messaging model and transport beneath.
 Since framing and messaging differ between CoAP combinations, a modular design to ease the addition
 of new CoAP combinations was necessary: The layer dedicated to _messaging_ covers framing and can
@@ -139,7 +139,7 @@ CoAP over DTLS drivers that share the RFC 7252 messaging implementation:
 
 <img src="unicoap-layers-comms-apis.svg" alt="Figure 4: APIs for communication between layers" width="700em"/>
 
-## Help, What Do I Need to Do to Add a New CoAP Driver?
+## Adding a New Driver
 In the `unicoap` codebase you will encounter several marks (`MARK: ...`)
 that help with extending the suite.
 
