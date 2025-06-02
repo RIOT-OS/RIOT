@@ -221,8 +221,8 @@
 
 #endif
 
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME 10
-#define CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME 50
+#define CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME             10
+#define CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME             50
 #define CONFIG_ESP_WIFI_SLP_DEFAULT_WAIT_BROADCAST_DATA_TIME    15
 
 /**
@@ -299,6 +299,8 @@
 #  include "sdkconfig_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #  include "sdkconfig_esp32c3.h"
+#elif defined(CPU_FAM_ESP32H2)
+#  include "sdkconfig_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)
 #  include "sdkconfig_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
