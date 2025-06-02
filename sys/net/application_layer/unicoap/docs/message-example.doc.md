@@ -242,7 +242,7 @@ if (res < 0) {
 
 `unicoap` offers versions for both null-terminated C strings and strings without a null-terminator
 that require a length indication instead. Example: @ref unicoap_options_add_uri_queries and
-@ref unicoap_options_add_uri_queries_string, or @ref unicoap_options_add_uri_query and 
+@ref unicoap_options_add_uri_queries_string, or @ref unicoap_options_add_uri_query and
 @ref unicoap_options_add_uri_query_string.
 
 ### Serializing a Message
