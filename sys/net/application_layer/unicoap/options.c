@@ -29,7 +29,6 @@
 #include "debug.h"
 #include "private.h"
 
-#ifndef DOXYGEN
 /**
  * # Terminology
  *
@@ -38,7 +37,7 @@
  * - `capacity`: Maximum number of bytes available in a given buffer.
  *    A buffer usually has a capacity and the value stored inside has a size.
  * - `count`: A discrete number of elements in a container.
- * - `width`: Constant number of bits and bytes a certain type occupies.
+ * - `width`: Constant number of bits a certain type or field occupies.
  *
  * ## Option Format
  * - `delta`: Positive option number difference to the preceding option, zero if first option.
@@ -48,10 +47,10 @@
  *    may contain `delta extended` and `length extended`.
  * - `VALUE`: Value attached to option, succeeding `HEAD`.
  * - `delta nibble`: Either `delta` value, if lower than 13, or sentinel value 13 (`0xe`), or 14 (`0xd`). 15 (`0xf`)  is disallowed.
- * - `delta extended`: For `delta` values greater or equal 13, `delta - 13`.
+ * - `delta extended`: For `delta nibble` values greater or equal 13, `delta nibble - 13`.
  *    For `delta` values greater or equal `14 + 0xff`, `delta - 14 - 0xff`
  * - `length nibble`: Either `length` value, if lower than 13, or sentinel value 13 (`0xe`), or 14 (`0xd`). 15 (`0xf`)  is disallowed.
- * - `length extended`: For `length` values greater or equal 13, `length - 13`.
+ * - `length extended`: For `length nibble` values greater or equal 13, `length nibble - 13`.
  *    For `length` values greater or equal `14 + 0xff`, `length - 14 - 0xff`
  *
  * ```
@@ -78,7 +77,6 @@
  * +===============================+
  * ```
  */
-#endif
 
 #define DECODE_DELTA_NIBBLE(head)    (head >> 4)
 #define ENCODE_DELTA_NIBBLE(nibble)  (nibble << 4)
@@ -137,7 +135,7 @@ ssize_t _uint_read_in_range(uint8_t nibble, uint8_t** cursor, const uint8_t* end
         return nibble;
     }
     else if (nibble == 13) {
-        *cursor += 1;
+        *cursor += sizeof(uint8_t);
         if (*cursor > end) {
             OPTIONS_DEBUG("extended uint: reading out of bounds\n");
             return -EBADOPT;

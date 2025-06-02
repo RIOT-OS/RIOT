@@ -1024,6 +1024,7 @@ static inline unicoap_message_t unicoap_response_alloc_string_with_options(unico
  * @param size PDU size
  * @param[in,out] message Pre-allocated message
  * @param[in,out] properties Pre-allocated properties
+ *
  * @pre @p message is allocated
  * @pre @p properties is allocated
  *
@@ -1048,26 +1049,6 @@ typedef struct {
 } unicoap_parser_result_t;
 
 /**
- * @brief Helper method for manually parsing a PDU
- *
- * @param[in] pdu PDU buffer
- * @param size PDU size
- * @param[out] parsed Pre-allocated parsed message structure
- * @param parser Parser to use
- * @pre @p parsed is allocated
- *
- * @returns @ref unicoap_parser_t result
- *
- * This function is marked `static inline`, thus entails no runtime overhead
- */
-static inline ssize_t unicoap_pdu_parse(const uint8_t* pdu, size_t size, unicoap_parser_t parser,
-                                        unicoap_parser_result_t* parsed)
-{
-    parsed->message.options = &parsed->options;
-    return parser(pdu, size, &parsed->message, &parsed->properties);
-}
-
-/**
  * @brief Parses PDU starting at options
  *
  * Call this method after you have parsed the CoAP header.
@@ -1080,6 +1061,13 @@ static inline ssize_t unicoap_pdu_parse(const uint8_t* pdu, size_t size, unicoap
  *
  * @returns `0` on success
  * @returns Negative errno on failure
+ *
+ * This function does not mutate or copy the buffer pointed at by @p cursor . However, it **does escape** pointers into the
+ * buffer pointed at by @p cursor in @p message . This is necessary to create a lookup array for options, i.e., to avoid
+ * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
+ * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified by `const`.
+ * That hypothetical `const` depends on your usage of the message and its options.
  */
 ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* end,
                                               unicoap_message_t* message);
@@ -1149,12 +1137,18 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
  * @pre @p message is allocated
  * @pre @p properties is allocated
  *
- * @returns `0` on success
- * @returns Negative errno on failure
+ * @returns Zero on success or negative errno on failure
  * @retval `-EBADOPT` Bad option
  * @retval `-ENOBUFS` Options buffer in @ref unicoap_message_t::options (@ref unicoap_options_t) too small
  *
  * @remark To allocate everything needed in one go, use @ref unicoap_pdu_parse instead.
+ *
+ * This function does not mutate or copy the buffer pointed at by @p pdu . However, it **does escape** pointers into the
+ * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
+ * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
+ * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified by `const`.
+ * That hypothetical `const` depends on your usage of the message and its options.
  */
 ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_message_t* message,
                                   unicoap_message_properties_t* properties);
@@ -1163,18 +1157,26 @@ ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_messa
  * @brief Helper method for manually parsing a PDU
  *
  * @param[in] pdu PDU buffer
- * @param size PDU size
+ * @param size PDU size in bytes
  * @param[out] parsed Pre-allocated parsed message structure
  *
  * @pre @p parsed is allocated
  *
- * @returns @ref unicoap_parser_t result
+ * @returns Zero on success or negative errno on failure
+ * @retval `-EBADOPT` Bad option
+ * @retval `-ENOBUFS` Options buffer in @ref unicoap_message_t::options (@ref unicoap_options_t) too small
  *
- * This function is marked `static inline`, thus entails no runtime overhead
+ * This function does not mutate or copy the buffer pointed at by @p pdu . However, it **does escape** pointers into the
+ * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
+ * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
+ * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified by `const`.
+ * That hypothetical `const` depends on your usage of the message and its options.
  */
 static inline ssize_t unicoap_pdu_parse_rfc7252_result(const uint8_t* pdu, size_t size, unicoap_parser_result_t* parsed)
 {
-    return unicoap_pdu_parse(pdu, size, unicoap_pdu_parse_rfc7252, parsed);
+    parsed->message.options = &parsed->options;
+    return unicoap_pdu_parse_rfc7252(pdu, size, &parsed->message, &parsed->properties);
 }
 /** @} */
 
