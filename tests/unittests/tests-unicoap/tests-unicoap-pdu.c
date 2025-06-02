@@ -56,7 +56,7 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     };
 
     unicoap_parser_result_t parsed = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse(pdu, sizeof(pdu), unicoap_pdu_parse_rfc7252, &parsed), 0);
+    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse_rfc7252_result(pdu, sizeof(pdu), &parsed), 0);
 
     _TEST_ASSERT_EQUAL_PARSED_RFC7252(&parsed,
                                       UNICOAP_METHOD_POST,
@@ -122,7 +122,7 @@ static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
     const uint8_t pdu[] = { 0x64, 0x85, 0x0c, 0x3c, 0xd1, 0x97, 0x96, 0xc1 };
 
     unicoap_parser_result_t parsed = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse((uint8_t*)pdu, sizeof(pdu), unicoap_pdu_parse_rfc7252, &parsed), 0);
+    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed), 0);
 
     _TEST_ASSERT_EQUAL_PARSED_RFC7252(&parsed,
                                       UNICOAP_STATUS_METHOD_NOT_ALLOWED,
@@ -152,7 +152,7 @@ static void test_pdu_rfc7252_cbor_request_round_trip(void)
     const uint8_t pdu[] = { 0x44, 0x02, 0x0c, 0x3e, 0xd1, 0x97, 0x96, 0xc3, 0xc1, 0x3c, 0xff, 0x0a };
 
     unicoap_parser_result_t parsed = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse((uint8_t*)pdu, sizeof(pdu), unicoap_pdu_parse_rfc7252, &parsed), 0);
+    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed), 0);
 
     _TEST_ASSERT_EQUAL_PARSED_RFC7252(&parsed,
                                       UNICOAP_METHOD_POST,
