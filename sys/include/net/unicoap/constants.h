@@ -423,14 +423,14 @@ typedef enum {
      * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.8.1)
      */
     UNICOAP_OPTION_IF_MATCH = 1,
-    
+
     /**
      * @brief `Uri-Host` option
      *
      * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.8.2)
      */
     UNICOAP_OPTION_URI_HOST = 3,
-    
+
     /**
      * @brief `ETag` option
      *
@@ -640,7 +640,7 @@ typedef enum {
      * @see [RFC 9175](https://datatracker.ietf.org/doc/html/rfc9175)
      */
     UNICOAP_OPTION_REQUEST_TAG = 292,
-    
+
     /**
      * @brief Max-Message-Size option
      * Applies to `7.01` @ref UNICOAP_SIGNAL_CAPABILITIES_SETTINGS message
