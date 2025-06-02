@@ -121,7 +121,8 @@ extern "C" {
 
     print('''/** Number of lines in #max31865_{LUT} */'''.format(LUT=args.LUTNAME), file=f)
     macro_name = "MAX31865_" + args.LUTNAME.upper() + "_NUMLINES"
-    print("#define %s        (ARRAY_SIZE(max31865_lut_def))" % (macro_name), file=f)
+    lut_name = "max31865_" + args.LUTNAME.lower()
+    print("#define %s        (ARRAY_SIZE(%s))" % (macro_name, lut_name), file=f)
 
     print('''\
 /**
