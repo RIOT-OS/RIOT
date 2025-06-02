@@ -44,7 +44,7 @@ extern "C" {
 #define UNICOAP_DEBUG_PREFIX "coap"
 
 #ifndef DOXYGEN
-#  define _NEED_HAVE "(need %" PRIuSIZE ", have %" PRIuSIZE ")"
+#  define _UNICOAP_NEED_HAVE "(need %" PRIuSIZE ", have %" PRIuSIZE ")"
 #endif
 
 #ifndef DOXYGEN
