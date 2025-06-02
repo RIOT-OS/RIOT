@@ -812,20 +812,6 @@ static uint64_t stats_ops;
 static uint64_t stats_tests;
 static uint64_t stats_failures;
 
-static int sc_tearing_test(int argc, char **argv);
-static int sc_lost_update_test(int argc, char **argv);
-static int sc_stats(int argc, char **argv);
-static int sc_stop(int argc, char **argv);
-static int sc_list(int argc, char **argv);
-static const shell_command_t shell_commands[] = {
-    { "tearing_test", "Run a store/load tearing test", sc_tearing_test },
-    { "lost_update_test", "Run a lost update test", sc_lost_update_test },
-    { "stats", "Show stats of current test", sc_stats },
-    { "stop", "Stop running test", sc_stop },
-    { "list", "List functions that can be tested", sc_list },
-    { NULL, NULL, NULL }
-};
-
 static void tearing_test_worker(test_state_t *state)
 {
     switch (state->conf.width) {
@@ -1100,6 +1086,8 @@ static void *thread_checker_func(void *arg)
     return NULL;
 }
 
+static int sc_stop(int argc, char **argv);
+
 static void *thread_timeout_func(void *arg)
 {
     (void)arg;
@@ -1226,6 +1214,8 @@ static int sc_tearing_test(int argc, char **argv)
     return select_func_and_start_test(argv[1], timeout);
 }
 
+SHELL_COMMAND(tearing_test, "Run a store/load tearing test", sc_tearing_test );
+
 static int sc_lost_update_test(int argc, char **argv)
 {
     if ((argc != 2) && (argc != 3)) {
@@ -1253,6 +1243,8 @@ static int sc_lost_update_test(int argc, char **argv)
     return select_func_and_start_test(argv[1], timeout);
 }
 
+SHELL_COMMAND(lost_update_test, "Run a lost update test", sc_lost_update_test );
+
 static int sc_stats(int argc, char **argv)
 {
     (void)argc;
@@ -1272,6 +1264,8 @@ static int sc_stats(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(stats, "Show stats of current test", sc_stats );
+
 static int sc_stop(int argc, char **argv)
 {
     (void)argc;
@@ -1290,6 +1284,8 @@ static int sc_stop(int argc, char **argv)
     }
     return 0;
 }
+
+SHELL_COMMAND(stop, "Stop running test", sc_stop );
 
 static int sc_list(int argc, char **argv)
 {
@@ -1318,6 +1314,8 @@ static int sc_list(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(list, "List functions that can be tested", sc_list );
 
 int main(void)
 {
@@ -1356,7 +1354,7 @@ int main(void)
         "test is working as expected.\n"
     );
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
