@@ -128,9 +128,9 @@ static inline ssize_t _uint_extended_size(uint32_t uint)
     }
 }
 
-ssize_t _uint_read_in_range(uint8_t nibble, uint8_t** cursor, const uint8_t* end)
+ssize_t _uint_read_in_range(uint8_t nibble, const uint8_t** cursor, const uint8_t* end)
 {
-    uint8_t* extended = *cursor;
+    const uint8_t* extended = *cursor;
     if (nibble < 13) {
         return nibble;
     }
@@ -156,7 +156,7 @@ ssize_t _uint_read_in_range(uint8_t nibble, uint8_t** cursor, const uint8_t* end
     }
 }
 
-static ssize_t _uint_read(uint8_t nibble, uint8_t** cursor)
+static ssize_t _uint_read(uint8_t nibble, const uint8_t** cursor)
 {
     if (nibble < 13) {
         return nibble;
@@ -217,7 +217,7 @@ static inline ssize_t _option_size(uint16_t delta, size_t value_size)
     }
 
     /* add extended delta field size, extended length field size + actual size of value */
-    return 1 + delta_field_size + length_field_size + value_size;
+    return sizeof(uint8_t) + delta_field_size + length_field_size + value_size;
 }
 
 /**
@@ -232,8 +232,8 @@ static inline ssize_t _option_size(uint16_t delta, size_t value_size)
  * @return `-EPAYLD` if @p cursor points at the payload marker
  * @return `-EBADOPT` if reading this option fails
  */
-static inline ssize_t _read_option_in_range_inline(uint8_t** cursor, const uint8_t* end,
-                                                   uint16_t* delta, uint8_t** value)
+static inline ssize_t _read_option_in_range(const uint8_t** cursor, const uint8_t* end,
+                                                   uint16_t* delta, const uint8_t** value)
 {
     uint8_t head = **cursor;
     *cursor += 1;
@@ -280,7 +280,7 @@ static inline ssize_t _read_option_in_range_inline(uint8_t** cursor, const uint8
  * @return `-EPAYLD` if @p cursor points at the payload marker
  * @return `-EBADOPT` if reading this option fails
  */
-static inline ssize_t _read_option(uint8_t** cursor, uint8_t** value)
+static inline ssize_t _read_option(const uint8_t** cursor, const uint8_t** value)
 {
     uint8_t head = **cursor;
     *cursor += 1;
@@ -322,7 +322,21 @@ static inline void _write_head_partial(uint8_t** cursor, uint16_t delta, uint8_t
     *head = ENCODE_DELTA_NIBBLE(_uint_write(delta, cursor)) | ENCODE_LENGTH_NIBBLE(length_nibble);
 }
 
-static inline void _move_option_data(unicoap_options_t* options, uint8_t* dest, uint8_t* src)
+/**
+ * @brief Moves options in storage buffer freely in both directions
+ *
+ * @param[in,out] options Option struct whose storage buffer to mutate
+ * @param[in,out] src Start of memory region to move
+ * @param[in,out] dest Start of target memory region where to move @p src
+ *
+ * Moves memory region starting at @p src and ending the last of the currently used buffer to @p dest.
+ *
+ * @pre @p dest lies within storage buffer capacity
+ * @pre @p src lies within storage buffer capacity
+ *
+ * @warning You must perform runtime bounds checks at the call site.
+ */
+static inline void _move_options_in_storage_buffer(unicoap_options_t* options, uint8_t* dest, uint8_t* src)
 {
     size_t remainder = options->storage_size - ((uintptr_t)src - (uintptr_t)options->entries->data);
     assert(dest < options->entries->data + options->storage_capacity);
@@ -331,13 +345,37 @@ static inline void _move_option_data(unicoap_options_t* options, uint8_t* dest, 
     memmove(dest, src, remainder);
 }
 
-static inline void _update_option_entries(unicoap_options_t* options, size_t i, ssize_t data_diff)
+
+/**
+ * @brief Adds diff to pointers in lookup array ('entries')
+ *
+ * @param[in,out] options Options with lookup array ('entries')
+ * @param i Index in lookup array where to begin applying @p data_diff (equals option index)
+ * @param data_diff Positive or negative difference in storage buffer at the `i`-th option.
+ *
+ * Positive diff shifts towards higher addresses, negative diff towards lower ones.
+ *
+ * Use this function to update entries in the lookup array after you have moved options in the storage buffer using
+ * @ref _move_options_in_storage_buffer.
+ */
+static inline void _update_option_entries_with_storage_diff(unicoap_options_t* options, size_t i, ssize_t data_diff)
 {
     for (; i < options->option_count; i += 1) {
         options->entries[i].data += data_diff;
     }
 }
 
+/**
+ * @brief Shifts entries in lookup array ('entries') by given diff
+ *
+ * @param[in,out] options Options with lookup array ('entries')
+ * @param i Index in lookup array where to begin shifting (equals index of option)
+ * @param diff Positive or negative difference.
+ *
+ * Positive diff shifts towards higher addresses, negative diff towards lower ones.
+ *
+ * @warning You must perform bounds checks at the call site.
+ */
 static inline void _shift_option_entries(unicoap_options_t* options, size_t i, ssize_t diff)
 {
     assert(i < CONFIG_UNICOAP_OPTIONS_MAX);
@@ -347,7 +385,22 @@ static inline void _shift_option_entries(unicoap_options_t* options, size_t i, s
     options->option_count += diff;
 }
 
-static int _shift_option_data(unicoap_options_t* options, size_t i, ssize_t data_diff)
+/**
+ * @brief Shifts options in storage buffer and updates entries in lookup array accordingly
+ *
+ * @param[in,out] options Options struct whose storage buffer to mutate, with lookup array ('entries')
+ * @param i Index in lookup array where to begin shifting (equals index of option)
+ * @param diff Positive or negative difference.
+ *
+ * Positive diff shifts towards higher addresses, negative diff towards lower ones.
+ *
+ * This function checks if the storage buffer has enough remaining capacity and is roughly equal to calling
+ * @ref _move_options_in_storage_buffer first, followed by @ref _update_option_entries_with_storage_diff.
+ *
+ * @remark If @p i is equal to the end index (one index after the last valid index, i.e., the count), this function does not shift as there is
+ * nothing to shift at all.
+ */
+static int _shift_options(unicoap_options_t* options, size_t i, ssize_t data_diff)
 {
     size_t new_size = options->storage_size + data_diff;
     if (new_size > options->storage_capacity) {
@@ -357,8 +410,10 @@ static int _shift_option_data(unicoap_options_t* options, size_t i, ssize_t data
 
     if (i < options->option_count) {
         uint8_t* data = options->entries[i].data;
-        _move_option_data(options, data + data_diff, data);
-        _update_option_entries(options, i, data_diff);
+        _move_options_in_storage_buffer(options, data + data_diff, data);
+        _update_option_entries_with_storage_diff(options, i, data_diff);
+    } else {
+        /* Nothing to shift, see @remark above */
     }
 
     options->storage_size = new_size;
@@ -385,27 +440,43 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
 {
     uint8_t* start = cursor;
     assert(message->options);
+    /* e points to the current entry in the lookup array */
     unicoap_option_entry_t* e = message->options->entries;
     unicoap_option_number_t option_number = 0;
     message->options->option_count = 0;
+    
+    /* Set the pointer of the first entry in the lookup array to the start of the storage buffer. */
     message->options->entries->data = start;
     message->options->storage_size = 0;
+    
+    /* In case someone wants to parse a message and that message does not contains an FF
+     * payload separator, they can actually set/add options and mutate the storage buffer.
+     * If there is a payload separator however, below at (<-) we adjust the capacity to exactly
+     * the size of options blob. I.e., you could still mutate the options buffer by setting
+     * options (or removing, and then setting/adding), but you won't be able to write beyond
+     * the last byte before the FF separator.
+     *
+     * Parsing and getters in unicoap do not mutate the storage buffer.
+     * After having parsed a message, callers can still decide to not to treat their own buffer
+     * as const and add/set/remove options (mutate). This of course requires global reasoning in
+     * the application. If the original buffer passed to this function was considered const
+     * by the applications, so should the options. If it wasn't considered const, options can be
+     * mutated.
+     */
     message->options->storage_capacity = (uintptr_t)end - (uintptr_t)start;
 
-    /* parse options */
-    /* FIXME: should this be <= ?*/
     while (cursor < end) {
         uint8_t* option_start = cursor;
         uint16_t delta = 0;
-
-        ssize_t option_size = _read_option_in_range_inline(&cursor, end, &delta, NULL);
+        
+        /* Casting from non-const to const is safe. */
+        ssize_t option_size = _read_option_in_range((const uint8_t **)&cursor, end, &delta, NULL);
 
         if (option_size == -EPAYLD) {
             /* we hit the payload marker */
             message->payload_size = (size_t)(end - cursor);
             message->payload = message->payload_size > 0 ? cursor : NULL;
-            /* Use 0xff as capacity for options buffer */
-            message->options->storage_capacity = (uintptr_t)cursor - (uintptr_t)start;
+            message->options->storage_capacity = (uintptr_t)cursor - (uintptr_t)start; /* (<-) */
             OPTIONS_DEBUG("payload size = %" PRIuSIZE " opts capacity = %" PRIuSIZE "\n", message->payload_size, message->options->storage_capacity);
             return 0;
         }
@@ -450,13 +521,15 @@ ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_num
         return -ENOENT;
     }
 
-    uint8_t* cursor = options->entries[i].data;
-    return _read_option(&cursor, (uint8_t**)value);
+    const uint8_t* cursor = options->entries[i].data;
+    return _read_option(&cursor, value);
 }
 
 ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_option_number_t number,
                                    uint8_t* dest, size_t capacity)
 {
+    assert(buffer && capacity > 0);
+
     const uint8_t* src = NULL;
     ssize_t size = unicoap_options_get(options, number, &src);
     if (size < 0) {
@@ -472,8 +545,8 @@ ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_opt
 ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, unicoap_option_number_t number,
                                     uint8_t* buffer, size_t capacity, uint8_t separator)
 {
-    assert(buffer && (capacity > 0));
-    
+    assert(buffer && capacity > 0);
+
     /* We are not mutating options here and the iterator does not escape. */
     unicoap_options_iterator_t iterator;
     unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
@@ -544,12 +617,46 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
 
         ssize_t diff = _option_size_diff(new_delta, DECODE_DELTA_NIBBLE(*cursor));
         ssize_t total_diff = option_size + diff;
-        if (_shift_option_data(options, i, total_diff) < 0) {
+        if (_shift_options(options, i, total_diff) < 0) {
             OPTIONS_DEBUG("storage too small for new option\n");
             return -ENOBUFS;
         }
 
+        /* The size of the option (not just the value) grows if its new delta is wider than before.
+         * If it is smaller, the entire option shrinks. */
         e->size += diff;
+
+        /* If the options grows due to the delta field becoming wider, we extend the option in the leading
+         * direction. Otherwise, we would need to move once to adjust for the delta width and once
+         * again to accomodate the new option. We already created exactly enough space to fit the
+         * new delta width AND the new option by calling _shift_options(options, i, total_diff) above.
+         *
+         * Before:
+         * ... value ] [ Nibbles (1B) | extended delta | extended length | value ]
+         *            ^\_______ shift remainder ______>
+         *            |
+         *    New opt goes here
+         *
+         * After making space for new option + changed delta of successor option:
+         * ... value ]                    [ Nibbles (1B) | extended delta | extended length | value ]
+         *            ^                   ^
+         *            |                   |
+         *    New opt goes here        e->data
+         *
+         * If successor opt delta width grows, e->data must move in leading direction
+         * ... value ] ________________ [#######[ Nibbles old (1B) | extended old delta | ... ]
+         *            ^       NEW       ^ (new) ^ (old)
+         *            |                  \      |
+         *    New opt goes here           \__ e->data
+         *
+         * If successor opt delta width shrinks, e->data must move in trailing direction
+         * ... value ] ________________ [Nibbles old (1B) | extended old delta | ... ]
+         *            ^    NEW   ^ (old) ^ (new)
+         *            |          |      /
+         *    New opt goes here  e->data
+         *
+         *
+         */
         e->data -= diff;
         _shift_option_entries(options, i, 1);
 
@@ -606,7 +713,7 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
         uint16_t delta = (i > 0) ? (number - opts[i - 1].number) : number;
 
         size_t option_size = _option_size(delta, value_size);
-        if (_shift_option_data(options, i + 1, (int)option_size - (int)e->size) < 0) {
+        if (_shift_options(options, i + 1, (int)option_size - (int)e->size) < 0) {
             OPTIONS_DEBUG("storage too small for new option value\n");
             return -ENOBUFS;
         }
@@ -696,7 +803,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 
         /* remove entry from options lookup array */
         _shift_option_entries(options, i + index_offset, -index_offset);
-        _update_option_entries(options, i + 1, total_diff);
+        _update_option_entries_with_storage_diff(options, i + 1, total_diff);
     }
     return 0;
 }
@@ -714,8 +821,8 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
     }
 
     unicoap_option_entry_t* e = &iterator->options->entries[iterator->index];
-    uint8_t* cursor = e->data;
-    ssize_t value_size = _read_option(&cursor, (uint8_t**)value);
+    const uint8_t* cursor = e->data;
+    ssize_t value_size = _read_option(&cursor, value);
     if (value_size < 0) {
         return value_size;
     }
