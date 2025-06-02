@@ -353,7 +353,7 @@ static int _shift_option_data(unicoap_options_t* options, size_t i, ssize_t data
 {
     size_t new_size = options->storage_size + data_diff;
     if (new_size > options->storage_capacity) {
-        OPTIONS_DEBUG("buf too small, " _NEED_HAVE "\n", new_size, options->storage_capacity);
+        OPTIONS_DEBUG("buf too small, " _UNICOAP_NEED_HAVE "\n", new_size, options->storage_capacity);
         return -ENOBUFS;
     }
 
@@ -528,7 +528,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
         size_t storage_size = options->storage_size + option_size;
         /* Option to be inserted is trailing option, can just add after last option */
         if (storage_size > options->storage_capacity) {
-            OPTIONS_DEBUG("buf too small to insert opt " _NEED_HAVE "\n", storage_size, options->storage_capacity);
+            OPTIONS_DEBUG("buf too small to insert opt " _UNICOAP_NEED_HAVE "\n", storage_size, options->storage_capacity);
             return -ENOBUFS;
         }
 
