@@ -444,11 +444,11 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
     unicoap_option_entry_t* e = message->options->entries;
     unicoap_option_number_t option_number = 0;
     message->options->option_count = 0;
-    
+
     /* Set the pointer of the first entry in the lookup array to the start of the storage buffer. */
     message->options->entries->data = start;
     message->options->storage_size = 0;
-    
+
     /* In case someone wants to parse a message and that message does not contains an FF
      * payload separator, they can actually set/add options and mutate the storage buffer.
      * If there is a payload separator however, below at (<-) we adjust the capacity to exactly
@@ -468,7 +468,7 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
     while (cursor < end) {
         uint8_t* option_start = cursor;
         uint16_t delta = 0;
-        
+
         /* Casting from non-const to const is safe. */
         ssize_t option_size = _read_option_in_range((const uint8_t **)&cursor, end, &delta, NULL);
 
@@ -558,7 +558,7 @@ ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, uni
         if (capacity < (size_t)(res + 1)) {
             return -ENOBUFS;
         }
-        
+    
         /* Only insert separator between values */
         if (size > 0) {
             *buffer = separator;
