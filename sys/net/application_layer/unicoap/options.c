@@ -198,7 +198,7 @@ static int _uint_write(uint32_t value, uint8_t** cursor)
     }
 }
 
-// MARK: - Private API -
+/* MARK: - Private API - */
 
 static inline ssize_t _option_size_diff(uint16_t new_delta, uint8_t current_delta_nibble)
 {
@@ -506,7 +506,7 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
     return 0;
 }
 
-// MARK: - Public API -
+/* MARK: - Public API - */
 
 bool unicoap_options_contains(const unicoap_options_t* options, unicoap_option_number_t number)
 {
@@ -654,8 +654,6 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
          *            ^    NEW   ^ (old) ^ (new)
          *            |          |      /
          *    New opt goes here  e->data
-         *
-         *
          */
         e->data -= diff;
         _shift_option_entries(options, i, 1);
@@ -680,6 +678,8 @@ int unicoap_options_add_values(unicoap_options_t* options, unicoap_option_number
     }
     const uint8_t* start = buffer;
     while (buffer <= end) {
+        /* Add option when encountering separator and when there is nothing following.
+         * This would be bar in /foo/bar. */
         if ((*buffer == separator) || ((buffer != start) && (buffer == end))) {
             if ((res = unicoap_options_add(options, number, start,
                                            (uintptr_t)buffer - (uintptr_t)start)) < 0) {
@@ -707,8 +707,6 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
         return unicoap_options_add(options, number, value, value_size);
     }
     else {
-        assert((value_size <= UNICOAP_UINT_MAX) && opts->data);
-
         unicoap_option_entry_t* e = &opts[i];
         uint16_t delta = (i > 0) ? (number - opts[i - 1].number) : number;
 
@@ -808,7 +806,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
     return 0;
 }
 
-// MARK: - Iterator
+/* MARK: - Iterator */
 
 ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
                                  unicoap_option_number_t* number, const uint8_t** value)
