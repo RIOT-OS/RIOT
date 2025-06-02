@@ -327,6 +327,9 @@ static inline size_t unicoap_options_size(const unicoap_options_t* options)
 /** @brief Largest number representable with 24 bits (3 bytes) */
 #define UNICOAP_UINT24_MAX (0xffffff)
 
+/** @brief Size in bytes of number representable with 24 bits (3 bytes) */
+#define UNICOAP_UINT24_SIZE (3)
+
 /**
  * @brief Unsigned integer large enough to accommodate the maximum integer
  * representable by CoAP option delta fields and extended length fields.
@@ -667,22 +670,27 @@ static inline int unicoap_options_add_string(unicoap_options_t* options,
  * @name Unsigned integers
  * @{
  */
+#ifndef DOXYGEN
 /**
  * @brief Retrieves an unsigned option value with a configurable maximum width
  *
  * @param[in] options Options
  * @param number Option number
- * @param[in,out] integer A pointer to a type capable of storing the number of bytes specified by @p integer_size in the machine's byte order
- * @param integer_size Maximum number of bytes used to represent the integer
+ * @param[in,out] uint Pointer to 32-bit integer that will store unsigned integer in host byte order
+ * @param max_size Maximum number of bytes used to represent the integer (1 to 4)
  *
  * @returns Number of bytes occupied by the unsigned integer in the option value.
  * @returns Negative integer on error
  * @retval `-ENOENT` Option not found
- * @retval `-EBADOPT` Option is corrupted
+ * @retval `-EBADOPT` Option is corrupted or integer wider than expected
+ *
+ * @pre @p max_size does not exceed `sizeof(uint32_t)`
  */
-ssize_t unicoap_options_get_variable_uint(const unicoap_options_t* options,
-                                          unicoap_option_number_t number, void* integer,
-                                          size_t integer_size);
+ssize_t _unicoap_options_get_variable_uint(const unicoap_options_t* options,
+                                          unicoap_option_number_t number, uint32_t* uint,
+                                          size_t max_size);
+#endif
+
 /**
  * @brief Retrieves an unsigned option value that takes up at most 4 bytes.
  *
@@ -701,12 +709,7 @@ ssize_t unicoap_options_get_variable_uint(const unicoap_options_t* options,
 static inline ssize_t unicoap_options_get_uint32(const unicoap_options_t* options, unicoap_option_number_t number,
                                                  uint32_t* uint)
 {
-    uint32_t i = 0;
-    ssize_t res = unicoap_options_get_variable_uint(options, number, &i, sizeof(uint32_t));
-    if (res >= 0) {
-        *uint = ntohl(i);
-    }
-    return res;
+    return _unicoap_options_get_variable_uint(options, number, uint, sizeof(uint32_t));
 }
 
 /**
@@ -727,12 +730,7 @@ static inline ssize_t unicoap_options_get_uint32(const unicoap_options_t* option
 static inline ssize_t unicoap_options_get_uint24(const unicoap_options_t* options, unicoap_option_number_t number,
                                                  uint32_t* uint)
 {
-    uint32_t i = 0;
-    ssize_t res = unicoap_options_get_variable_uint(options, number, (uint8_t*)&i + 1, 3);
-    if (res >= 0) {
-        *uint = ntohl(i);
-    }
-    return res;
+    return _unicoap_options_get_variable_uint(options, number, uint, UNICOAP_UINT24_SIZE);
 }
 
 /**
@@ -753,11 +751,9 @@ static inline ssize_t unicoap_options_get_uint24(const unicoap_options_t* option
 static inline ssize_t unicoap_options_get_uint16(const unicoap_options_t* options, unicoap_option_number_t number,
                                                  uint16_t* uint)
 {
-    uint16_t i = 0;
-    ssize_t res = unicoap_options_get_variable_uint(options, number, &i, sizeof(uint16_t));
-    if (res >= 0) {
-        *uint = ntohs(i);
-    }
+    uint32_t _uint = 0;
+    int res = _unicoap_options_get_variable_uint(options, number, &_uint, sizeof(uint16_t));
+    *uint = (uint16_t)_uint;
     return res;
 }
 
@@ -775,9 +771,13 @@ static inline ssize_t unicoap_options_get_uint16(const unicoap_options_t* option
  * @returns Negative integer on error
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option is corrupted
+ * @retval `-ENOBUFS` Option value was bigger than 1 byte
  */
-ssize_t unicoap_options_get_uint8(const unicoap_options_t* options, unicoap_option_number_t number,
-                                  uint8_t* uint);
+static inline ssize_t unicoap_options_get_uint8(const unicoap_options_t* options, unicoap_option_number_t number,
+                                  uint8_t* uint)
+{
+    return unicoap_options_copy_value(options, number, uint, sizeof(uint8_t));
+}
 
 /**
  * @brief Sets the option with the given number to the unsigned integer value passed.

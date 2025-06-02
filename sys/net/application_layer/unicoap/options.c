@@ -880,30 +880,39 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
     return -ENOENT;
 }
 
-ssize_t unicoap_options_get_variable_uint(const unicoap_options_t* options,
-                                          unicoap_option_number_t number, void* integer,
-                                          size_t integer_size)
+static inline uint32_t _ntoh_variable(const uint8_t* variable_network_uint, size_t size)
 {
+    switch (size) {
+        case sizeof(uint8_t):
+            return (uint32_t)*variable_network_uint;
+        case sizeof(uint16_t):
+            return (uint32_t)byteorder_bebuftohs(variable_network_uint);
+        case UNICOAP_UINT24_SIZE:
+            return ((uint32_t)byteorder_bebuftohs(variable_network_uint) << 8) | ((uint32_t)variable_network_uint[2]);
+        case sizeof(uint32_t):
+            return byteorder_bebuftohl(variable_network_uint);
+        default:
+            UNREACHABLE();
+            return 0;
+    }
+}
+
+ssize_t _unicoap_options_get_variable_uint(const unicoap_options_t* options,
+                                          unicoap_option_number_t number, uint32_t* uint,
+                                          size_t max_size)
+{
+    assert(max_size <= sizeof(uint32_t));
     const uint8_t* src = NULL;
     ssize_t size = unicoap_options_get(options, number, &src);
     if (size < 0) {
         return size;
     }
-    if ((size_t)size > integer_size) {
+    if ((size_t)size > max_size) {
         return -EBADOPT;
     }
 
-    memset(integer, 0, integer_size);
-    if (size) {
-        memcpy((uint8_t*)integer + (integer_size - size), src, size);
-    }
+    *uint = _ntoh_variable(src, size);
     return size;
-}
-
-ssize_t unicoap_options_get_uint8(const unicoap_options_t* options, unicoap_option_number_t number,
-                                  uint8_t* integer)
-{
-    return unicoap_options_get_variable_uint(options, number, integer, sizeof(uint8_t));
 }
 
 static size_t _encode_variable_uint(uint32_t* value)
