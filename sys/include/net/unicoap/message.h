@@ -1101,10 +1101,6 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* cursor, size_t remaining_
  * Use this method to construct a vector message for vectored send functions in your transport
  * driver.
  *
- * The iolist is squashed if a carbon copy buffer is present, i.e., all iolist chunks are copied into the
- * carbon copy buffer. In that case, the first iolist element will hold the reference to the carbon copy
- * buffer.
- *
  * @param[in] header Encoded CoAP header
  * @param header_size Size of @p header
  * @param[in] message Message containing options and payload
