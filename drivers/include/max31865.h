@@ -258,7 +258,7 @@ int max31865_detect_fault(max31865_t *dev, max31865_fault_t *flt_code);
  * if the capacitance across the RTD is as recommended in the datasheet --
  * before measuring a valid temperature.
  */
-void max31865_switch_vbias(max31865_t *dev, bool enable);
+void max31865_switch_vbias(const max31865_t *dev, bool enable);
 
 /**
  * @brief Start a one-shot conversion

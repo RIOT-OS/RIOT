@@ -211,17 +211,16 @@ int max31865_raw_to_data(const max31865_t *dev, uint16_t raw_data, int32_t *rtd_
 
 int max31865_read(const max31865_t *dev, int32_t *rtd_temperature_cdegc)
 {
-    assert(dev && rtd_temperature_cdegc);
+    assert(dev);
+    assert(rtd_temperature_cdegc);
 
     uint16_t raw_data;
     if (max31865_read_raw(dev, &raw_data) == -EIO) {
         return -EIO;
     }
     else {
-        max31865_raw_to_data(dev, raw_data, rtd_temperature_cdegc);
+        return max31865_raw_to_data(dev, raw_data, rtd_temperature_cdegc);
     }
-
-    return 0;
 }
 
 int max31865_detect_fault(max31865_t *dev, max31865_fault_t *flt_code)
@@ -288,7 +287,7 @@ int max31865_detect_fault(max31865_t *dev, max31865_fault_t *flt_code)
     return 0;
 }
 
-void max31865_switch_vbias(max31865_t *dev, bool enable)
+void max31865_switch_vbias(const max31865_t *dev, bool enable)
 {
     assert(dev);
 
