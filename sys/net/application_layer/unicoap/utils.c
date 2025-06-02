@@ -139,11 +139,10 @@ static inline iolist_t* _append_payload_to_iolist(const unicoap_message_t* messa
     }
 }
 
-/**
- * @pre 4 iolists
- */
+static const uint8_t _payload_separator = 0xff;
+
 int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, const unicoap_message_t* message,
-                                           iolist_t* iolists)
+                                           iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT])
 {
     assert(header);
     assert(message);
@@ -162,8 +161,7 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
         element->iol_next = element + 1;
         element += 1;
 
-        header[header_size] = UNICOAP_PAYLOAD_MARKER;
-        iolist_init(element, &header[header_size], 1, element + 1);
+        iolist_init(element, (uint8_t*)&_payload_separator, 1, element + 1);
 
         element->iol_next = _append_payload_to_iolist(message, element + 1);
     }
