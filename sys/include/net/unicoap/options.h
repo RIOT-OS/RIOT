@@ -1513,7 +1513,7 @@ static inline ssize_t unicoap_options_get_next_location_path_component(unicoap_o
  *
  * This function creates a string from all `Location-Path` options by joining them with the `/` separator.
  * The string will bear the `/` prefix even if there is no `Location-Path` option.
- * The string wil not be null-terminated. The resulting string uses UTF-8 encoding.
+ * The string will not be null-terminated. The resulting string uses UTF-8 encoding.
  */
 static inline ssize_t unicoap_options_copy_location_path(const unicoap_options_t* options, char* path, size_t capacity)
 {
@@ -1661,7 +1661,7 @@ static inline ssize_t unicoap_options_get_next_uri_path_component(unicoap_option
  *
  * This function creates a string from all `Uri-Path` options by joining them with the `/` separator.
  * The string will bear the `/` prefix even if there is no `Uri-Path` option.
- * The string wil not be null-terminated. The resulting string uses UTF-8 encoding.
+ * The string will not be null-terminated. The resulting string uses UTF-8 encoding.
  */
 static inline ssize_t unicoap_options_copy_uri_path(const unicoap_options_t* options, char* path, size_t capacity)
 {
@@ -1852,7 +1852,7 @@ static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_option
  * @retval `-ENOBUFS` @p queries lacks sufficient capacity to copy values
  *
  * This function creates a string from all `Uri-Query` options by joining them with the `&` separator.
- * The string wil not be null-terminated. The resulting string uses UTF-8 encoding.
+ * The string will not be null-terminated. The resulting string uses UTF-8 encoding.
  */
 static inline ssize_t unicoap_options_copy_uri_queries(const unicoap_options_t* options, char* queries, size_t capacity)
 {
@@ -2038,7 +2038,7 @@ static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_o
  * @retval `-ENOBUFS` @p queries lacks sufficient capacity to copy values
  *
  * This function creates a string from all `Location-Query` options by joining them with the `&` separator.
- * The string wil not be null-terminated. The resulting string uses UTF-8 encoding.
+ * The string will not be null-terminated. The resulting string uses UTF-8 encoding.
  */
 static inline ssize_t unicoap_options_copy_location_queries(const unicoap_options_t* options, char* queries, size_t capacity)
 {
