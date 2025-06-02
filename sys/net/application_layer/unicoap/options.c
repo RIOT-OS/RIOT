@@ -558,7 +558,7 @@ ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, uni
         if (capacity < (size_t)(res + 1)) {
             return -ENOBUFS;
         }
-    
+
         /* Only insert separator between values */
         if (size > 0) {
             *buffer = separator;
