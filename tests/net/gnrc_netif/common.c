@@ -33,7 +33,7 @@ netdev_t *devs[DEFAULT_DEVS_NUMOF];
 
 #define MSG_QUEUE_SIZE  (8)
 
-static gnrc_netreg_entry_t dumper_undef, dumper_ipv6;
+static gnrc_netreg_entry_t dumper_ipv6;
 static msg_t _main_msg_queue[MSG_QUEUE_SIZE];
 static uint8_t tmp_buffer[ETHERNET_DATA_LEN];
 static size_t tmp_buffer_bytes = 0;
@@ -188,11 +188,8 @@ void _tests_init(void)
         netdev_test_set_get_cb(&_devs[i], NETOPT_MAX_PDU_SIZE,
                                _get_netdev_max_packet_size);
     }
-    gnrc_netreg_entry_init_pid(&dumper_undef, GNRC_NETREG_DEMUX_CTX_ALL,
-                               gnrc_pktdump_pid);
     gnrc_netreg_entry_init_pid(&dumper_ipv6, GNRC_NETREG_DEMUX_CTX_ALL,
                                gnrc_pktdump_pid);
-    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dumper_undef);
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &dumper_ipv6);
 }
 
