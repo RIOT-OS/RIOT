@@ -188,12 +188,12 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity, con
         pdu += 1;
         capacity -= 1;
 
-        ssize_t size = 0;
-        if ((size = unicoap_message_payload_copy(message, pdu, capacity)) < 0) {
+        ssize_t payload_size = 0;
+        if ((payload_size = unicoap_message_payload_copy(message, pdu, capacity)) < 0) {
             return -ENOBUFS;
         }
 
-        return unicoap_message_options_size(message) + 1 + size;
+        return unicoap_message_options_size(message) + 1 + payload_size;
     }
     else {
         return unicoap_message_options_size(message);
