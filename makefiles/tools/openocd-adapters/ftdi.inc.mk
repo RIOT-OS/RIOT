@@ -18,3 +18,22 @@ ifeq (swd, $(OPENOCD_TRANSPORT))
     OPENOCD_ADAPTER_INIT += -c 'ftdi layout_signal SWD_EN -data 0'
   endif
 endif
+
+ifeq (tigard,$(OPENOCD_FTDI_ADAPTER))
+  # The Tigard provides both (bitbanging) SWD/JTAG debugger and UART adapter.
+  # When freshly connected, the Tigard will provide to UART interface, of
+  # which the first will be used for UART and the second be reconfigured for
+  # bit-banging JTAG/SWD. We assume the UART of the Tigard is used for serial
+  # by default.
+  TTY_BOARD_FILTER ?= --model 'Tigard V1' --iface-num 0
+
+  # The debug adapter and the UART adapter are the same device, so they have
+  # the same serial number
+  DEBUG_ADAPTER_ID_IS_TTY_SERIAL ?= 1
+
+  # If the user provided a programmer serial, we also use that to detect the
+  # TTY.
+  ifneq (,$(SERIAL))
+    TTY_SELECT_CMD += --serial "$(SERIAL)"
+  endif
+endif
