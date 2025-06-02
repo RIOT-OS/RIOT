@@ -79,6 +79,9 @@ void vPortCPUReleaseMutex (portMUX_TYPE *mux);
         xQueueCreateCountingSemaphoreStatic( ( uxMaxCount ), ( uxInitialCount ), \
                                              ( pxSemaphoreBuffer ) )
 
+#define uxSemaphoreGetCount( xSemaphore ) \
+        uxQueueMessagesWaiting( ( QueueHandle_t ) ( xSemaphore ) )
+
 #ifdef __cplusplus
 }
 #endif
