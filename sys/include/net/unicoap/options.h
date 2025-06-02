@@ -854,7 +854,7 @@ static inline ssize_t unicoap_options_get_uri_host(const unicoap_options_t* opti
  * @param[in] host `Uri-Host` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p host, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  *
  * @pre @p host must be at least of size 1 bytes
@@ -872,7 +872,7 @@ static inline ssize_t unicoap_options_set_uri_host(unicoap_options_t* options, c
  * @param[in,out] options Options to write to
  * @param[in] host `Uri-Host` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  *
  * @pre @p host must be at least of size 1 bytes
@@ -891,7 +891,7 @@ static inline ssize_t unicoap_options_set_uri_host_string(unicoap_options_t* opt
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_uri_host(unicoap_options_t* options)
 {
@@ -925,7 +925,7 @@ static inline bool unicoap_options_get_if_none_match(const unicoap_options_t* op
  * @param[in,out] options Options to write to
  * @param value `If-None-Match` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_if_none_match(unicoap_options_t* options, bool value)
@@ -967,7 +967,7 @@ static inline ssize_t unicoap_options_get_uri_port(const unicoap_options_t* opti
  * @param[in,out] options Options to write to
  * @param port `Uri-Port` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_uri_port(unicoap_options_t* options, uint16_t port)
@@ -980,7 +980,7 @@ static inline ssize_t unicoap_options_set_uri_port(unicoap_options_t* options, u
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_uri_port(unicoap_options_t* options)
 {
@@ -1015,7 +1015,7 @@ static inline ssize_t unicoap_options_get_content_format(const unicoap_options_t
  * @param[in,out] options Options to write to
  * @param format `Content-Format` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_content_format(unicoap_options_t* options, unicoap_content_format_t format)
@@ -1028,7 +1028,7 @@ static inline ssize_t unicoap_options_set_content_format(unicoap_options_t* opti
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_content_format(unicoap_options_t* options)
 {
@@ -1063,7 +1063,7 @@ static inline ssize_t unicoap_options_get_max_age(const unicoap_options_t* optio
  * @param[in,out] options Options to write to
  * @param age `Max-Age` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_max_age(unicoap_options_t* options, uint32_t age)
@@ -1076,7 +1076,7 @@ static inline ssize_t unicoap_options_set_max_age(unicoap_options_t* options, ui
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_max_age(unicoap_options_t* options)
 {
@@ -1111,7 +1111,7 @@ static inline ssize_t unicoap_options_get_accept(const unicoap_options_t* option
  * @param[in,out] options Options to write to
  * @param format `Accept` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_accept(unicoap_options_t* options, unicoap_content_format_t format)
@@ -1124,7 +1124,7 @@ static inline ssize_t unicoap_options_set_accept(unicoap_options_t* options, uni
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_accept(unicoap_options_t* options)
 {
@@ -1160,7 +1160,7 @@ static inline ssize_t unicoap_options_get_proxy_scheme(const unicoap_options_t* 
  * @param[in] scheme `Proxy-Scheme` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p scheme, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  *
  */
@@ -1175,7 +1175,7 @@ static inline ssize_t unicoap_options_set_proxy_scheme(unicoap_options_t* option
  * @param[in,out] options Options to write to
  * @param[in] scheme `Proxy-Scheme` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  *
  *
@@ -1192,7 +1192,7 @@ static inline ssize_t unicoap_options_set_proxy_scheme_string(unicoap_options_t*
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_proxy_scheme(unicoap_options_t* options)
 {
@@ -1228,7 +1228,7 @@ static inline ssize_t unicoap_options_get_proxy_uri(const unicoap_options_t* opt
  * @param[in] uri `Proxy-Uri` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p uri, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  *
  * @pre @p uri must be at least of size 1 bytes
@@ -1246,7 +1246,7 @@ static inline ssize_t unicoap_options_set_proxy_uri(unicoap_options_t* options, 
  * @param[in,out] options Options to write to
  * @param[in] uri `Proxy-Uri` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  *
  * @pre @p uri must be at least of size 1 bytes
@@ -1265,7 +1265,7 @@ static inline ssize_t unicoap_options_set_proxy_uri_string(unicoap_options_t* op
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_proxy_uri(unicoap_options_t* options)
 {
@@ -1300,7 +1300,7 @@ static inline ssize_t unicoap_options_get_no_response(const unicoap_options_t* o
  * @param[in,out] options Options to write to
  * @param value `No-Response` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_no_response(unicoap_options_t* options, uint8_t value)
@@ -1313,7 +1313,7 @@ static inline ssize_t unicoap_options_set_no_response(unicoap_options_t* options
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_no_response(unicoap_options_t* options)
 {
@@ -1366,7 +1366,7 @@ static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator
  * @param[in] value `If-Match` value
  * @param size Number of bytes in @p value in bytes
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p value size must not exceed 8 bytes
@@ -1382,7 +1382,7 @@ static inline ssize_t unicoap_options_add_if_match(unicoap_options_t* options, u
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_all_if_match(unicoap_options_t* options)
 {
@@ -1415,7 +1415,7 @@ static inline ssize_t unicoap_options_get_first_etag(const unicoap_options_t* op
  * @brief Gets the next `ETag` option provided by the specified iterator
  *
  * @param[in,out] iterator Option iterator
- * @param[out] value Pointer to a variable that will store next etag
+ * @param[out] etag Pointer to a variable that will store next etag
  *
  * @see @ref unicoap_options_get_next_by_number
  *
@@ -1435,7 +1435,7 @@ static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* 
  * @param[in] etag `ETag` value
  * @param size Number of bytes in @p etag in bytes
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p etag must be at least of size 1 bytes
@@ -1452,7 +1452,7 @@ static inline ssize_t unicoap_options_add_etag(unicoap_options_t* options, uint8
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_etags(unicoap_options_t* options)
 {
@@ -1485,7 +1485,7 @@ static inline ssize_t unicoap_options_get_first_location_path_component(const un
  * @brief Gets the next `Location-Path` option provided by the specified iterator
  *
  * @param[in,out] iterator Option iterator
- * @param[out] value Pointer to a variable that will store next component
+ * @param[out] component Pointer to a variable that will store next component
  *
  * @see @ref unicoap_options_get_next_by_number
  *
@@ -1532,7 +1532,7 @@ static inline ssize_t unicoap_options_copy_location_path(const unicoap_options_t
  * @param[in] component `Location-Path` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p component, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  */
@@ -1547,7 +1547,7 @@ static inline ssize_t unicoap_options_add_location_path_component(unicoap_option
  * @param[in,out] options Options to write to
  * @param[in] component `Location-Path` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  *
@@ -1566,7 +1566,7 @@ static inline ssize_t unicoap_options_add_location_path_component_string(unicoap
  * @param[in] path as buffer of UTF-8 code units with values separated by `/`
  * @param length Number of UTF-8 code units in @p path, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * If the string with the values you want to add _starts_ with the separator, you can still use this function.
@@ -1582,7 +1582,7 @@ static inline ssize_t unicoap_options_add_location_path(unicoap_options_t* optio
  * @param[in,out] options Options to write to
  * @param[in] path as null-terminated string of UTF-8 code units with values separated by `/`
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * If the string with the values you want to add _starts_ with the separator, you can still use this function.
@@ -1600,7 +1600,7 @@ static inline ssize_t unicoap_options_add_location_path_string(unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_location_path(unicoap_options_t* options)
 {
@@ -1633,7 +1633,7 @@ static inline ssize_t unicoap_options_get_first_uri_path_component(const unicoap
  * @brief Gets the next `Uri-Path` option provided by the specified iterator
  *
  * @param[in,out] iterator Option iterator
- * @param[out] value Pointer to a variable that will store next component
+ * @param[out] component Pointer to a variable that will store next component
  *
  * @see @ref unicoap_options_get_next_by_number
  *
@@ -1680,7 +1680,7 @@ static inline ssize_t unicoap_options_copy_uri_path(const unicoap_options_t* opt
  * @param[in] component `Uri-Path` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p component, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p component size must not exceed 255 bytes
@@ -1697,7 +1697,7 @@ static inline ssize_t unicoap_options_add_uri_path_component(unicoap_options_t* 
  * @param[in,out] options Options to write to
  * @param[in] component `Uri-Path` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p component size must not exceed 255 bytes
@@ -1717,7 +1717,7 @@ static inline ssize_t unicoap_options_add_uri_path_component_string(unicoap_opti
  * @param[in] path as buffer of UTF-8 code units with values separated by `/`
  * @param length Number of UTF-8 code units in @p path, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  * @pre components' size must not exceed 255 bytes
  *
@@ -1734,7 +1734,7 @@ static inline ssize_t unicoap_options_add_uri_path(unicoap_options_t* options, c
  * @param[in,out] options Options to write to
  * @param[in] path as null-terminated string of UTF-8 code units with values separated by `/`
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  * @pre components size must not exceed 255 bytes
  *
@@ -1753,7 +1753,7 @@ static inline ssize_t unicoap_options_add_uri_path_string(unicoap_options_t* opt
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_uri_path(unicoap_options_t* options)
 {
@@ -1786,7 +1786,7 @@ static inline ssize_t unicoap_options_get_first_uri_query(const unicoap_options_
  * @brief Gets the next `Uri-Query` option provided by the specified iterator
  *
  * @param[in,out] iterator Option iterator
- * @param[out] value Pointer to a variable that will store next query
+ * @param[out] query Pointer to a variable that will store next query
  *
  * @see @ref unicoap_options_get_next_by_number
  *
@@ -1866,7 +1866,7 @@ static inline ssize_t unicoap_options_copy_uri_queries(const unicoap_options_t* 
  * @param[in] query `Uri-Query` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p query, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p query size must not exceed 255 bytes
@@ -1883,7 +1883,7 @@ static inline ssize_t unicoap_options_add_uri_query(unicoap_options_t* options, 
  * @param[in,out] options Options to write to
  * @param[in] query `Uri-Query` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p query size must not exceed 255 bytes
@@ -1903,7 +1903,7 @@ static inline ssize_t unicoap_options_add_uri_query_string(unicoap_options_t* op
  * @param[in] queries as buffer of UTF-8 code units with values separated by `&`
  * @param length Number of UTF-8 code units in @p queries, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  * @pre queries' size must not exceed 255 bytes
  *
@@ -1920,7 +1920,7 @@ static inline ssize_t unicoap_options_add_uri_queries(unicoap_options_t* options
  * @param[in,out] options Options to write to
  * @param[in] queries as null-terminated string of UTF-8 code units with values separated by `&`
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  * @pre queries size must not exceed 255 bytes
  *
@@ -1939,7 +1939,7 @@ static inline ssize_t unicoap_options_add_uri_queries_string(unicoap_options_t* 
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_uri_queries(unicoap_options_t* options)
 {
@@ -1972,7 +1972,7 @@ static inline ssize_t unicoap_options_get_first_location_query(const unicoap_opt
  * @brief Gets the next `Location-Query` option provided by the specified iterator
  *
  * @param[in,out] iterator Option iterator
- * @param[out] value Pointer to a variable that will store next query
+ * @param[out] query Pointer to a variable that will store next query
  *
  * @see @ref unicoap_options_get_next_by_number
  *
@@ -2052,7 +2052,7 @@ static inline ssize_t unicoap_options_copy_location_queries(const unicoap_option
  * @param[in] query `Location-Query` value as buffer of UTF-8 code units
  * @param length Number of UTF-8 code units in @p query, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p query size must not exceed 255 bytes
@@ -2069,7 +2069,7 @@ static inline ssize_t unicoap_options_add_location_query(unicoap_options_t* opti
  * @param[in,out] options Options to write to
  * @param[in] query `Location-Query` value as buffer of UTF-8 code units, must be null-terminated
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  *
  * @pre @p query size must not exceed 255 bytes
@@ -2089,7 +2089,7 @@ static inline ssize_t unicoap_options_add_location_query_string(unicoap_options_
  * @param[in] queries as buffer of UTF-8 code units with values separated by `&`
  * @param length Number of UTF-8 code units in @p queries, excluding null-terminator (if present) in bytes without potential null-terminator
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  * @pre queries' size must not exceed 255 bytes
  *
@@ -2106,7 +2106,7 @@ static inline ssize_t unicoap_options_add_location_queries(unicoap_options_t* op
  * @param[in,out] options Options to write to
  * @param[in] queries as null-terminated string of UTF-8 code units with values separated by `&`
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
  * @pre queries size must not exceed 255 bytes
  *
@@ -2125,7 +2125,7 @@ static inline ssize_t unicoap_options_add_location_queries_string(unicoap_option
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_location_queries(unicoap_options_t* options)
 {
@@ -2166,7 +2166,7 @@ static inline ssize_t unicoap_options_get_observe(const unicoap_options_t* optio
  * @param[in,out] options Options to write to
  * @param observe `Observe` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_observe(unicoap_options_t* options, uint32_t observe)
@@ -2179,7 +2179,7 @@ static inline ssize_t unicoap_options_set_observe(unicoap_options_t* options, ui
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_observe(unicoap_options_t* options)
 {
@@ -2191,7 +2191,7 @@ static inline int unicoap_options_remove_observe(unicoap_options_t* options)
  *
  * @param[in] options Options to read from
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 int unicoap_options_set_observe_generated(unicoap_options_t* options);
@@ -2239,7 +2239,7 @@ static inline ssize_t unicoap_options_get_block(const unicoap_options_t* options
  * @param number Option number (@ref UNICOAP_OPTION_BLOCK1 or @ref UNICOAP_OPTION_BLOCK2)
  * @param block `Block1` or `Block2` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_block(unicoap_options_t* options,
@@ -2271,7 +2271,7 @@ static inline ssize_t unicoap_options_get_block1(const unicoap_options_t* option
  * @param[in,out] options Options to write to
  * @param block `Block1` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_block1(unicoap_options_t* options, unicoap_block_option_t block)
@@ -2284,7 +2284,7 @@ static inline ssize_t unicoap_options_set_block1(unicoap_options_t* options, uni
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_block1(unicoap_options_t* options)
 {
@@ -2312,7 +2312,7 @@ static inline ssize_t unicoap_options_get_block2(const unicoap_options_t* option
  * @param[in,out] options Options to write to
  * @param block `Block2` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_block2(unicoap_options_t* options, unicoap_block_option_t block)
@@ -2325,7 +2325,7 @@ static inline ssize_t unicoap_options_set_block2(unicoap_options_t* options, uni
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_block2(unicoap_options_t* options)
 {
@@ -2353,7 +2353,7 @@ static inline ssize_t unicoap_options_get_size1(const unicoap_options_t* options
  * @param[in,out] options Options to write to
  * @param size `Size1` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_size1(unicoap_options_t* options, uint32_t size)
@@ -2366,7 +2366,7 @@ static inline ssize_t unicoap_options_set_size1(unicoap_options_t* options, uint
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_size1(unicoap_options_t* options)
 {
@@ -2394,7 +2394,7 @@ static inline ssize_t unicoap_options_get_size2(const unicoap_options_t* options
  * @param[in,out] options Options to write to
  * @param size `Size2` value
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
  */
 static inline ssize_t unicoap_options_set_size2(unicoap_options_t* options, uint32_t size)
@@ -2407,7 +2407,7 @@ static inline ssize_t unicoap_options_set_size2(unicoap_options_t* options, uint
  *
  * @param[in,out] options Options to write to
  *
- * @returns Zero on succes, negative error number otherwise
+ * @returns Zero on success, negative error number otherwise
  */
 static inline int unicoap_options_remove_size2(unicoap_options_t* options)
 {
