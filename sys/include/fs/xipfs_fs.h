@@ -81,8 +81,8 @@ typedef struct vfs_xipfs_mount_s {
     const char *mount_path;  /**< mount point path         */
     size_t page_num;         /**< number of flash page     */
     void *page_addr;         /**< first flash page address */
-    mutex_t *execution_mutex;
-    mutex_t *mutex;
+    mutex_t *execution_mutex;/**< For execution and deletion operations */
+    mutex_t *mutex;          /**< For regular and deletion operations */
 } vfs_xipfs_mount_t;
 
 /** The xipfs vfs driver */
