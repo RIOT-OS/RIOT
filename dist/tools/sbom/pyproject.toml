@@ -1,0 +1,22 @@
+[project]
+name = "riot_sbom"
+version = "1.0.0"
+description = "Create an sbom for a RIOT application"
+authors = [{name = "Daniel Lockau", email = "daniel.lockau@ml-pa.com"}]
+license = { text = "MIT" }
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+spdx-tools = "^0.8.2"
+scancode-toolkit = "^32.3.3"
+
+[tool.poetry.group.test.dependencies]
+jsonschema = "^4.23.0"
+
+[project.scripts]
+riot-sbom = "riot_sbom.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
