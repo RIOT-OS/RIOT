@@ -63,7 +63,7 @@ static void _example_handle_message(const unicoap_message_t* message)
 
     /* Uri-Query can occur more than once. Hence, unicoap provides multiple convenience
      * accessors. */
-    char* query = NULL;
+    const char* query = NULL;
 
     /* The first getter provides a view into the PDU buffer. The returned string
      * is thus not null-terminated. */
@@ -93,7 +93,7 @@ static void _example_handle_message(const unicoap_message_t* message)
      * a, unicoap can generate a contiguous string from repeatable options: ?a=1&b=2&c=3
      * b, you iterate over all options using the unicoap option iterator */
     char query_string[50] = { 0 };
-    res = unicoap_options_get_uri_queries(message->options, query_string, sizeof(query_string));
+    res = unicoap_options_copy_uri_queries(message->options, query_string, sizeof(query_string));
     if (res < 0) {
         puts("Error: could not generate URI query string");
     }
@@ -110,7 +110,7 @@ static void _example_handle_message(const unicoap_message_t* message)
     /* You can also use the option iterator to iterate over all options */
     unicoap_options_iterator_init(&iterator, message->options);
     unicoap_option_number_t number;
-    uint8_t* value = NULL;
+    const uint8_t* value = NULL;
 
     while ((res = unicoap_options_get_next(&iterator, &number, &value)) >= 0) {
         const char* name = unicoap_string_from_option_number(number);
