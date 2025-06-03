@@ -100,7 +100,7 @@ Options like `Uri-Query` can occur more than once. For these types of options, `
 several convenience accessors. Let us retrieve the first `Uri-Query` option.
 
 ```c
-char* query = NULL;
+const char* query = NULL;
 
 ssize_t res = unicoap_options_get_first_uri_query(message->options, &query);
 if (res < 0) {
@@ -166,7 +166,7 @@ The option iterator can also be used to iterate over all options, regardless of 
 ```c
 unicoap_options_iterator_init(&iterator, message->options);
 unicoap_option_number_t number;
-uint8_t* value = NULL;
+const uint8_t* value = NULL;
 
 while ((res = unicoap_options_get_next(&iterator, &number, &value)) >= 0) {
     const char* name = unicoap_string_from_option_number(number);
