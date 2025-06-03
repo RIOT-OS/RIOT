@@ -29,15 +29,9 @@ extern "C" {
 
 /**
  * @brief   Automatically reboot the system on panic()
- *
- * By default this is on when @ref DEVELHELP is disabled.
  */
 #ifndef CONFIG_CORE_REBOOT_ON_PANIC
-#ifdef DEVELHELP
-#define CONFIG_CORE_REBOOT_ON_PANIC (0)
-#else
-#define CONFIG_CORE_REBOOT_ON_PANIC (1)
-#endif
+#  define CONFIG_CORE_REBOOT_ON_PANIC (1)
 #endif
 
 /**
