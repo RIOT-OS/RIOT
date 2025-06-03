@@ -528,7 +528,7 @@ ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_num
 ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_option_number_t number,
                                    uint8_t* dest, size_t capacity)
 {
-    assert(buffer && capacity > 0);
+    assert(dest && capacity > 0);
 
     const uint8_t* src = NULL;
     ssize_t size = unicoap_options_get(options, number, &src);
@@ -668,7 +668,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
     return 0;
 }
 
-int unicoap_options_add_values(unicoap_options_t* options, unicoap_option_number_t number,
+int unicoap_options_add_values_joined(unicoap_options_t* options, unicoap_option_number_t number,
                                const uint8_t* buffer, size_t size, uint8_t separator)
 {
     int res = 0;
