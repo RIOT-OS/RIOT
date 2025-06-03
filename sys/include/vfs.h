@@ -222,7 +222,7 @@ extern "C" {
  * @brief   VFS parameters for xipfs
  * @{
  */
-#ifdef MODULE_XIPFS || DOXYGEN
+#if defined(MODULE_XIPFS) || DOXYGEN
 #  define XIPFS_VFS_DIR_BUFFER_SIZE        (68) /**< sizeof(xipfs_dir_desc_t) */
 #  define XIPFS_VFS_FILE_BUFFER_SIZE       (12) /**< sizeof(xipfs_file_desc_t) */
 #else
