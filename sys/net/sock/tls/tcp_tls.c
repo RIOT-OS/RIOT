@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "net/sock/tcp.h"
-#include "tls.h"
+#include "net/sock/tls.h"
 #include <wolfssl/ssl.h>
 #include <wolfssl/error-ssl.h>
 #include "ztimer.h"
