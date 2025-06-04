@@ -166,7 +166,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
     dev->mod_params.ldro = _ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 
-    dev->pkt_params.pld_len_in_bytes = 0;
+    dev->pkt_params.pld_len_in_bytes = CONFIG_SX126X_LORA_FIXED_PAYLOAD_LENGTH_DEFAULT;
     dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_SX126X_LORA_PAYLOAD_CRC_OFF_DEFAULT);
     dev->pkt_params.header_type = IS_ACTIVE(CONFIG_SX126X_LORA_FIXED_HEADER_LEN_MODE_DEFAULT)
                                     ? SX126X_LORA_PKT_IMPLICIT : SX126X_LORA_PKT_EXPLICIT;
