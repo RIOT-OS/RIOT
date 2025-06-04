@@ -194,9 +194,9 @@ def _modules_packages(app, board, jobs, env, cwd, args):
         _print_module_or_pkg_mismatch(app, board, lines, args)
 
 
-def _build(app, board, jobs, env, cwd, args):
+def _build(app, board, toolchain, jobs, env, cwd, args):
     cmd = (f'/bin/bash -c "source .murdock; JOBS={jobs} '
-           f'compile {app} {board}:gnu"')
+           f'compile {app} {board}:{toolchain}"')
     try:
         out = __exec_cmd(cmd, shell=True, env=env, cwd=cwd,
                          stderr=subprocess.STDOUT)
@@ -235,6 +235,8 @@ def main():
     parser.add_argument("-a", "--apps", nargs="+",
                         help=("A list of apps to test on the supported boards."
                               " If empty we will choose what is tested."))
+    parser.add_argument("-t", "--toolchain", choices=["gnu", "llvm"], default="gnu",
+                        help=("Toolchain to use"))
     parser.add_argument("-d", "--dry-run", action="store_true",
                         help=("Show each of the boards and apps to be compiled"
                               " without spending super long to compile them"))
@@ -281,7 +283,8 @@ def main():
                 _modules_packages(app, board, args.jobs, full_env, riot_dir,
                                   args)
             else:
-                _build(app, board, args.jobs, full_env, riot_dir, args)
+                _build(app, board, args.toolchain, args.jobs, full_env,
+                       riot_dir, args)
     elapse_time = datetime.datetime.now() - start_time
     _end(elapse_time.total_seconds(), args.jobs)
 
