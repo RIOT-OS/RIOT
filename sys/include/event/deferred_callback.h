@@ -69,6 +69,10 @@ static inline void event_deferred_callback_post(event_deferred_callback_t *event
                                                 ztimer_clock_t *clock, uint32_t timeout,
                                                 void (*callback)(void *), void *arg)
 {
+    /* cancel the event if it has already been queued */
+    ztimer_remove(clock, &event->timer);
+    event_cancel(queue, &event->event.super);
+
     event->event = (event_callback_t) {
         .super.handler = _event_callback_handler,
         .callback = callback,
