@@ -203,6 +203,7 @@ def _build(app, board, toolchain, jobs, env, cwd, args):
         if args.very_very_verbose:
             print(out)
         print(f"{app: <30} {board: <30} PASS")
+        return True
     except subprocess.CalledProcessError as err:
         err.output = err.output.decode("utf-8", errors="replace")
         lines = err.output.split("\n")
@@ -215,6 +216,7 @@ def _build(app, board, toolchain, jobs, env, cwd, args):
             print(f"{app: <30} {board: <30} FAIL: Kconfig hash mismatch")
         else:
             print(f"{app: <30} {board: <30} FAIL")
+        return False
 
 
 def main():
@@ -263,6 +265,7 @@ def main():
     if 'all' in apps:
         apps = _all_apps(riot_dir)
 
+    ret = 0
     for app in apps:
         test_dir = str(pathlib.PurePath(riot_dir, app))
         if not pathlib.Path(test_dir).exists():
@@ -283,10 +286,12 @@ def main():
                 _modules_packages(app, board, args.jobs, full_env, riot_dir,
                                   args)
             else:
-                _build(app, board, args.toolchain, args.jobs, full_env,
-                       riot_dir, args)
+                if not _build(app, board, args.toolchain, args.jobs, full_env,
+                              riot_dir, args):
+                    ret = -1
     elapse_time = datetime.datetime.now() - start_time
     _end(elapse_time.total_seconds(), args.jobs)
+    exit(ret)
 
 
 if __name__ == '__main__':
