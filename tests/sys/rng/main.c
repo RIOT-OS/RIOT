@@ -27,31 +27,6 @@
 
 #include "test.h"
 
-/*
- * Forward declarations
- */
-static int cmd_distributions(int argc, char **argv);
-static int cmd_dump(int argc, char **argv);
-static int cmd_entropy(int argc, char **argv);
-static int cmd_fips(int argc, char **argv);
-static int cmd_seed(int argc, char **argv);
-static int cmd_source(int argc, char **argv);
-static int cmd_speed(int argc, char **argv);
-
-/**
- * @brief   List of command for this application.
- */
-static const shell_command_t shell_commands[] = {
-    { "distributions", "run distributions test", cmd_distributions },
-    { "dump", "dump random numbers", cmd_dump },
-    { "fips", "run FIPS 140-2 tests", cmd_fips },
-    { "entropy", "calculate entropy test", cmd_entropy },
-    { "seed", "set random seed", cmd_seed },
-    { "source", "set randomness source", cmd_source },
-    { "speed", "run speed test", cmd_speed },
-    { NULL, NULL, NULL }
-};
-
 /**
  * @brief   Distributions command, which accepts one argument (samples).
  *
@@ -75,6 +50,8 @@ static int cmd_distributions(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(distributions, "run distributions test", cmd_distributions);
 
 /**
  * @brief   Dump command, which accepts one argument (samples).
@@ -113,6 +90,8 @@ static int cmd_dump(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(dump, "dump random numbers", cmd_dump);
+
 /**
  * @brief   Calculate Shannon's entropy (bits), which accepts one argument
  *          (samples).
@@ -138,6 +117,8 @@ static int cmd_entropy(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(entropy, "calculate entropy test", cmd_entropy);
+
 /**
  * @brief   Run the FIPS 140-2 tests.
  *
@@ -155,6 +136,8 @@ static int cmd_fips(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(fips, "run FIPS 140-2 tests", cmd_fips);
 
 /**
  * @brief   Set the random seed.
@@ -178,6 +161,8 @@ static int cmd_seed(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(seed, "set random seed", cmd_seed);
 
 /**
  * @brief   Helper for setting the RNG source.
@@ -219,6 +204,8 @@ static int cmd_source(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(source, "set randomness source", cmd_source);
+
 /**
  * @brief   Speed command, which accepts one argument (duration).
  *
@@ -256,11 +243,13 @@ static int cmd_speed(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(speed, "run speed test", cmd_speed);
+
 int main(void)
 {
     puts("Starting shell...");
     static char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

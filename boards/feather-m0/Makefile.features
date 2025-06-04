@@ -15,4 +15,5 @@ FEATURES_PROVIDED += periph_usbdev
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += arduino_analog
 FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += feather_shield
 FEATURES_PROVIDED += highlevel_stdio

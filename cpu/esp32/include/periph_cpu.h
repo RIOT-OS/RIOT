@@ -27,6 +27,8 @@
 #include "soc/periph_defs.h"
 #include "soc/soc_caps.h"
 
+#include "modules.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -184,13 +186,20 @@ typedef enum {
     GPIO_PULL_STRONGEST = 0
 } gpio_pull_strength_t;
 
+/*
+ * This include is placed here by intention to avoid type name conflicts.
+ * Having the macros HAVE_GPIO_* defined before including this file allows to
+ * use these macros in `hal/gpio_types.h` to decide whether to use the
+ * ESP-IDF types when compiling ESP-IDF modules or to use the RIOT types
+ * when compiling RIOT source code.
+ */
+#include "hal/gpio_types.h"
+
 #define HAVE_GPIO_PULL_T
-typedef enum {
-    GPIO_FLOATING = 0,
-    GPIO_PULL_UP = 1,
-    GPIO_PULL_DOWN = 2,
-    GPIO_PULL_KEEP = 3   /*< not supported */
-} gpio_pull_t;
+typedef gpio_pull_mode_t gpio_pull_t;
+#define GPIO_PULL_UP    GPIO_PULLUP_ONLY
+#define GPIO_PULL_DOWN  GPIO_PULLDOWN_ONLY
+#define GPIO_PULL_KEEP  GPIO_PULLUP_PULLDOWN
 
 /**
  * @brief   Current an output pin can drive in active and sleep modes
@@ -328,18 +337,6 @@ union gpio_conf_esp32 {
  *
  * @note The reference voltage Vref can vary from device to device in the range
  *       of 1.0V and 1.2V.
- *
- * The Vref of a device can be read at a predefined GPIO with the function
- * #adc_line_vref_to_gpio. The results of the ADC input can then be adjusted
- * accordingly.
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * extern int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For the GPIO that can be used with this function, see:
- *
- * - \ref esp32_adc_channels_esp32 "ESP32"
- * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
- * - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
  *
  * @{
  */
@@ -914,9 +911,9 @@ typedef struct {
 #endif
 
 /** Timer group used for system time */
-#define TIMER_SYSTEM_GROUP      TIMER_GROUP_0
-/** Index of the timer in the timer timer group used for system time */
-#define TIMER_SYSTEM_INDEX      TIMER_0
+#define TIMER_SYSTEM_GROUP      0   /* formerly TIMER_GROUP_0 */
+/** Index of the timer in the timer group used for system time */
+#define TIMER_SYSTEM_INDEX      0   /* formerly TIMER_0 */
 /** System time interrupt source */
 #define TIMER_SYSTEM_INT_SRC    ETS_TG0_T0_LEVEL_INTR_SOURCE
 
@@ -976,6 +973,39 @@ typedef struct {
     gpio_t txd;             /**< GPIO used as TxD pin */
     gpio_t rxd;             /**< GPIO used as RxD pin */
 } uart_conf_t;
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override UART stop bits
+ */
+typedef enum {
+    UART_STOP_BITS_1   = 0x1,  /*!< stop bit: 1bit*/
+    UART_STOP_BITS_1_5 = 0x2,  /*!< stop bit: 1.5bits*/
+    UART_STOP_BITS_2   = 0x3,  /*!< stop bit: 2bits*/
+} uart_stop_bits_t;
+
+#define HAVE_UART_STOP_BITS_T
+
+/**
+ * @brief   Marker for unsupported UART parity modes
+ */
+#define UART_MODE_UNSUPPORTED 0xf0
+
+/**
+ * @brief   Override UART parity values
+ */
+typedef enum {
+    UART_PARITY_NONE  = 0x0,
+    UART_PARITY_EVEN  = 0x2,
+    UART_PARITY_ODD   = 0x3,
+    UART_PARITY_MARK  = UART_MODE_UNSUPPORTED | 0,
+    UART_PARITY_SPACE = UART_MODE_UNSUPPORTED | 1,
+} uart_parity_t;
+
+#define UART_PARITY_DISABLE UART_PARITY_NONE
+#define HAVE_UART_PARITY_T
+
+#endif /* !DOXYGEN */
 
 /**
  * @brief   Maximum number of UART interfaces
