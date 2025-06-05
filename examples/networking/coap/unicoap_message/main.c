@@ -217,7 +217,7 @@ static void _example_create_message(void)
     }
 
     /* Repeatable options like Uri-Path can also be added individually.
-     * This results in /thermostat/temperature/target*/
+     * This results in /thermostat/temperature/target */
     res = unicoap_options_add_uri_path_component_string(&options, "target");
     if (res < 0) {
         puts("Error: could not add path component");
