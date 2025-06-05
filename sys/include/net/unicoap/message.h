@@ -312,7 +312,6 @@ typedef struct {
  * @param type CoAP over UDP/DTLS message.
  *
  * @returns Message type label, never `NULL`
- * Possible return values are are:
  * @retval `"NON"` A non-confirmable message
  * @retval `"CON"` A confirmable message
  * @retval `"ACK"` An acknowledgement message
@@ -352,7 +351,7 @@ static inline size_t unicoap_message_options_size(const unicoap_message_t* messa
  *
  * A message code is divided into the three class bits and five detail bits.
  * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
- * message codes are written as `c.dd`. In the following listing,  `C` is a class bit and `D` is a detail bit.
+ * message codes are written as `c.dd`. In the following listing, `C` is a class bit and `D` is a detail bit.
  * The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
  * ```
  *   Bit
@@ -375,7 +374,7 @@ static inline uint8_t unicoap_code_class(uint8_t code)
  *
  * A message code is divided into the three class bits and five detail bits.
  * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
- * message codes are written as `c.dd`. In the following listing,  `C` is a class bit and `D` is a detail bit.
+ * message codes are written as `c.dd`. In the following listing, `C` is a class bit and `D` is a detail bit.
  * The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
  * ```
  *   Bit
@@ -1062,7 +1061,7 @@ typedef struct {
  * @returns `0` on success
  * @returns Negative errno on failure
  *
- * This function does not mutate or copy the buffer pointed at by @p cursor . However, it **does escape** pointers into the
+ * @note This function does not mutate or copy the buffer pointed at by @p cursor. However, it **does escape** pointers into the
  * buffer pointed at by @p cursor in @p message . This is necessary to create a lookup array for options, i.e., to avoid
  * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
  * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
@@ -1141,14 +1140,14 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
  *
  * @remark To allocate everything needed in one go, use @ref unicoap_pdu_parse_rfc7252_result instead.
  *
- * This function does not mutate or copy the buffer pointed at by @p pdu . However, it **does escape** pointers into the
+ * @note This function does not mutate or copy the buffer pointed at by @p pdu. However, it **does escape** pointers into the
  * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
  * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
- * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
- * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified by `const`.
+ * This depends on whether the buffer @p pdu passed to this function is considered constant _by you_.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p pdu is not qualified by `const`.
  * That hypothetical `const` depends on your usage of the message and its options.
  */
-ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_message_t* message,
+ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* message,
                                   unicoap_message_properties_t* properties);
 
 /**
@@ -1164,14 +1163,14 @@ ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_messa
  * @retval `-EBADOPT` Bad option
  * @retval `-ENOBUFS` Options buffer in @ref unicoap_message_t::options (@ref unicoap_options_t) too small
  *
- * This function does not mutate or copy the buffer pointed at by @p pdu . However, it **does escape** pointers into the
+ * @note This function does not mutate or copy the buffer pointed at by @p pdu. However, it **does escape** pointers into the
  * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
  * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
- * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
- * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified by `const`.
+ * This depends on whether the buffer @p pdu passed to this function is considered constant _by you_.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p pdu is not qualified by `const`.
  * That hypothetical `const` depends on your usage of the message and its options.
  */
-static inline ssize_t unicoap_pdu_parse_rfc7252_result(const uint8_t* pdu, size_t size, unicoap_parser_result_t* parsed)
+static inline ssize_t unicoap_pdu_parse_rfc7252_result(uint8_t* pdu, size_t size, unicoap_parser_result_t* parsed)
 {
     parsed->message.options = &parsed->options;
     return unicoap_pdu_parse_rfc7252(pdu, size, &parsed->message, &parsed->properties);
