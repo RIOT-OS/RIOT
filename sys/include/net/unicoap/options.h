@@ -2206,6 +2206,7 @@ int unicoap_options_set_observe_generated(unicoap_options_t* options);
 
 /**
  * @brief Sentinel value for @ref unicoap_block_option_t indicating an uninitialized value
+ * @note This constant occupies 4 bytes and does thus not represent a valid `Block1` or `Block2` value.
  */
 #define UNICOAP_BLOCK_OPTION_NONE (0x0f000000)
 
