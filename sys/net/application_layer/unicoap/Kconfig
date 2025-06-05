@@ -40,7 +40,7 @@ menu "CoAP Unified Suite (unicoap)"
 
         config UNICOAP_DEBUG_LOGGING
             bool "Enable debug logging"
-            default y
+            default n
             help
                 When enabled, debug logs are printed. Helps trace messages through layers.
 

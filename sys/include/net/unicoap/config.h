@@ -38,7 +38,7 @@
  * **Default**: enabled
  */
 #if !defined(CONFIG_UNICOAP_DEBUG_LOGGING) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_DEBUG_LOGGING 1
+#  define CONFIG_UNICOAP_DEBUG_LOGGING 0
 #endif
 /** @} */
 
