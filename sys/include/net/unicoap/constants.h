@@ -75,7 +75,7 @@ typedef enum {
 /**
  * @brief Number of bits needed to represent @ref unicoap_rfc7252_message_type_t
  */
-#define UNICOAP_MESSAGE_TYPE_FIXED_WIDTH 3
+#define UNICOAP_RFC7252_MESSAGE_TYPE_FIXED_WIDTH 3
 
 /**
  * @brief RFC 7252 message type
