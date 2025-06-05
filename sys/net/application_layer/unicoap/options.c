@@ -457,7 +457,7 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
      * the last byte before the FF separator.
      *
      * Parsing and getters in unicoap do not mutate the storage buffer.
-     * After having parsed a message, callers can still decide to not to treat their own buffer
+     * After having parsed a message, callers can still decide not to treat their own buffer
      * as const and add/set/remove options (mutate). This of course requires global reasoning in
      * the application. If the original buffer passed to this function was considered const
      * by the applications, so should the options. If it wasn't considered const, options can be
