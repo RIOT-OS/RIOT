@@ -37,26 +37,165 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-const sx126x_pa_cfg_params_t sx1268_pa_cfg = {
-    .pa_duty_cycle = 0x04,
-    .hp_max = 0x06,
-    .device_sel = 0x00,
-    .pa_lut = 0x01
+#if IS_USED(MODULE_SX1268)
+/* sx1268 */
+const sx126x_pa_cfg_params_t sx1268_pa_cfg[] = {
+    /* 10 dBm */
+    {
+        .pa_duty_cycle = 0x00,
+        .hp_max = 0x03,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 14 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x06,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 17 dBm */
+    {
+        .pa_duty_cycle = 0x02,
+        .hp_max = 0x03,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 20 dBm */
+    {
+        .pa_duty_cycle = 0x03,
+        .hp_max = 0x05,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 22 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x07,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+};
+#endif
+
+/* sx1261 */
+const sx126x_pa_cfg_params_t lpa_cfg[] = {
+    /* 10 dBm */
+    {
+        .pa_duty_cycle = 0x01,
+        .hp_max = 0x00,
+        .device_sel = 0x01,
+        .pa_lut = 0x01
+    },
+    /* 14 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x00,
+        .device_sel = 0x01,
+        .pa_lut = 0x01
+    },
+    /* 15 dBm */
+    {
+        .pa_duty_cycle = 0x06,
+        .hp_max = 0x00,
+        .device_sel = 0x01,
+        .pa_lut = 0x01
+    },
 };
 
-const sx126x_pa_cfg_params_t lpa_cfg = {
-    .pa_duty_cycle = 0x04,
-    .hp_max = 0x00,
-    .device_sel = 0x01,
-    .pa_lut = 0x01
+/* sx1262, llcc68 */
+const sx126x_pa_cfg_params_t hpa_cfg[] = {
+    /* 14 dBm */
+    {
+        .pa_duty_cycle = 0x02,
+        .hp_max = 0x02,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    {
+        /* 17 dBm */
+        .pa_duty_cycle = 0x02,
+        .hp_max = 0x03,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    {
+        /* 20 dBm */
+        .pa_duty_cycle = 0x03,
+        .hp_max = 0x05,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    {
+        /* 22 dBm */
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x07,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    }
 };
 
-const sx126x_pa_cfg_params_t hpa_cfg = {
-    .pa_duty_cycle = 0x02,
-    .hp_max = 0x02,
-    .device_sel = 0x00,
-    .pa_lut = 0x01
-};
+static const sx126x_pa_cfg_params_t *_select_pa_cfg(sx126x_t *dev, int tx_power_dbm)
+{
+    if (sx126x_is_sx1261(dev)) {
+        if (tx_power_dbm <= 10) {
+            return &lpa_cfg[0];
+        }
+        else if (tx_power_dbm <= 14) {
+            return &lpa_cfg[1];
+        }
+        else {
+            return &lpa_cfg[2];
+        }
+    }
+    else if (sx126x_is_sx1262(dev) || sx126x_is_llcc68(dev)) {
+        if (tx_power_dbm <= 14) {
+            return &hpa_cfg[0];
+        }
+        else if (tx_power_dbm <= 17) {
+            return &hpa_cfg[1];
+        }
+        else if (tx_power_dbm <= 20) {
+            return &hpa_cfg[2];
+        }
+        else {
+            return &hpa_cfg[3];
+        }
+    }
+#if IS_USED(MODULE_SX1268)
+    else if (sx126x_is_sx1268(dev)) {
+        if (tx_power_dbm <= 10) {
+            return &sx1268_pa_cfg[0];
+        }
+        else if (tx_power_dbm <= 14) {
+            return &sx1268_pa_cfg[1];
+        }
+        else if (tx_power_dbm <= 17) {
+            return &sx1268_pa_cfg[2];
+        }
+        else if (tx_power_dbm <= 20) {
+            return &sx1268_pa_cfg[3];
+        }
+        else if (tx_power_dbm <= 22) {
+            return &sx1268_pa_cfg[4];
+        }
+    }
+#endif /* IS_USED(MODULE_SX1268) */
+    else {
+        if (tx_power_dbm <= 10) {
+            return &lpa_cfg[0];
+        }
+        else if (tx_power_dbm <= 14) {
+            return &lpa_cfg[1];
+        }
+        else if (tx_power_dbm <= 15) {
+            return &lpa_cfg[2];
+        }
+        else {
+            return &hpa_cfg[0]; /* default to 14 dBm */
+        }
+    }
+}
 
 static const uint16_t _bw_khz[11] = {
     [SX126X_LORA_BW_007] = 7,
@@ -142,16 +281,11 @@ static void sx126x_init_default_config(sx126x_t *dev)
      * Values used here comes from the datasheet, section 13.1.14 SetPaConfig
      * and are optimal for a TX output power of 14dBm.
      */
-    if (sx126x_is_llcc68(dev) || sx126x_is_sx1262(dev)) {
-        sx126x_set_pa_cfg(dev, &hpa_cfg);
-    }
-    else if (sx126x_is_sx1268(dev)) {
-        sx126x_set_pa_cfg(dev, &sx1268_pa_cfg);
-    }
-    else if (sx126x_is_sx1261(dev)) {
-        sx126x_set_pa_cfg(dev, &lpa_cfg);
-    }
+    const sx126x_pa_cfg_params_t *pa_cfg = _select_pa_cfg(dev, CONFIG_SX126X_TX_POWER_DEFAULT);
+    sx126x_set_pa_cfg(dev, pa_cfg);
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
+    /* Tx PA params depends on device type and desired output power.
+       Clarify if this really makes sense in params. */
     if (dev->params->tx_pa_mode == SX126X_RF_MODE_TX_LPA){
         sx126x_set_pa_cfg(dev, &lpa_cfg);
     } else {
