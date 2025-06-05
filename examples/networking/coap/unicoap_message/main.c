@@ -223,7 +223,7 @@ static void _example_create_message(void)
         puts("Error: could not add path component");
     }
 
-    /* Uri-Query is a repeatable options, and can thus also be added individually. */
+    /* Uri-Query is a repeatable option, and can thus also be added individually. */
     res = unicoap_options_add_uri_queries_string(&options, "unit=C&cool=yes");
     if (res < 0) {
         puts("Error: could not add URI query");
