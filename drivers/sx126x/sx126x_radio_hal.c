@@ -446,15 +446,15 @@ static int _config_phy(ieee802154_dev_t *hal, ieee802154_phy_conf_t *conf)
 {
     sx126x_t *dev = hal->priv;
     uint8_t channel = conf->channel;
-    /* dont allow overwriting TX power */
-    conf->pow = SX126X_POWER_DEFAULT;
     if (channel > SX126X_CHAN_MAX) {
         return -EINVAL;
     }
+    SX126X_DEBUG(dev, "hal: config_phy channel %"PRIu8"\n", channel);
     sx126x_set_channel(dev, channel * SX126X_HAL_CHAN_SPACING + SX126X_HAL_CHAN_BASE);
     if (conf->pow < SX126X_POWER_MIN || conf->pow > SX126X_POWER_MAX) {
         return -EINVAL;
     }
+    SX126X_DEBUG(dev, "hal: config_phy power %"PRId8"\n", conf->pow);
     sx126x_set_tx_params(dev, conf->pow, CONFIG_SX126X_RAMP_TIME_DEFAULT);
     conf->res.ack_timeout_us =
         sx126x_symbol_time_on_air_us(dev) * (IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS +
