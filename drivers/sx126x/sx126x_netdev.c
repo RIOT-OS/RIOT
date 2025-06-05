@@ -441,7 +441,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = -EINVAL;
             break;
         }
-        sx126x_set_tx_params(dev, power, SX126X_RAMP_10_US);
+        sx126x_set_tx_power(dev, power, SX126X_RAMP_10_US);
         return sizeof(int16_t);
 
     case NETOPT_FIXED_HEADER:
