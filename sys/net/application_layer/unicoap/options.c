@@ -390,7 +390,7 @@ static inline void _shift_option_entries(unicoap_options_t* options, size_t i, s
  *
  * @param[in,out] options Options struct whose storage buffer to mutate, with lookup array ('entries')
  * @param i Index in lookup array where to begin shifting (equals index of option)
- * @param diff Positive or negative difference.
+ * @param data_diff Positive or negative difference.
  *
  * Positive diff shifts towards higher addresses, negative diff towards lower ones.
  *
