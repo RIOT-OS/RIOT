@@ -481,7 +481,7 @@ static inline unicoap_message_t unicoap_message_alloc(uint8_t code, uint8_t* pay
 }
 
 /**
- * @brief Initializes message with string payload but no options
+ * @brief Initializes message with payload from null-terminated UTF-8 string but no options
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -497,7 +497,7 @@ static inline void unicoap_message_init_string(unicoap_message_t* message, uint8
 }
 
 /**
- * @brief Creates message with string payload but no options
+ * @brief Creates message with payload from null-terminated but no options
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @return Message structure
@@ -548,7 +548,7 @@ static inline unicoap_message_t unicoap_message_alloc_with_options(uint8_t code,
 }
 
 /**
- * @brief Initializes message with string byte and options
+ * @brief Initializes message with payload from null-terminated UTF-8 string and options
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -564,7 +564,7 @@ static inline void unicoap_message_init_string_with_options(unicoap_message_t* m
 }
 
 /**
- * @brief Creates message with byte payload and options
+ * @brief Creates message with payload from null-terminated UTF-8 string and options
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
@@ -731,7 +731,7 @@ static inline unicoap_message_t unicoap_request_alloc(unicoap_method_t method, u
 }
 
 /**
- * @brief Initializes request with string payload but no options
+ * @brief Initializes request with payload from null-terminated UTF-8 string but no options
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -744,7 +744,7 @@ static inline void unicoap_request_init_string(unicoap_message_t* request, unico
 }
 
 /**
- * @brief Creates request with string payload but no options
+ * @brief Creates request with payload from null-terminated UTF-8 string but no options
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @return Request structure
@@ -788,7 +788,7 @@ static inline unicoap_message_t unicoap_request_alloc_with_options(unicoap_metho
 }
 
 /**
- * @brief Initializes request with string payload and options
+ * @brief Initializes request with payload from null-terminated UTF-8 string and options
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -804,7 +804,7 @@ static inline void unicoap_request_init_string_with_options(unicoap_message_t* r
 }
 
 /**
- * @brief Creates request with string payload and options
+ * @brief Creates request with payload from null-terminated UTF-8 string and options
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
@@ -912,7 +912,7 @@ static inline unicoap_message_t unicoap_response_alloc(unicoap_status_t status, 
 }
 
 /**
- * @brief Initializes response with string payload but no options
+ * @brief Initializes response with payload from null-terminated UTF-8 string but no options
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -925,7 +925,7 @@ static inline void unicoap_response_init_string(unicoap_message_t* response,
 }
 
 /**
- * @brief Creates response with string payload but no options
+ * @brief Creates response with payload from null-terminated UTF-8 string but no options
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @return Response structure
@@ -970,7 +970,7 @@ static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_stat
 }
 
 /**
- * @brief Initializes response with string payload and options
+ * @brief Initializes response with payload from null-terminated UTF-8 string and options
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -987,7 +987,7 @@ static inline void unicoap_response_init_string_with_options(unicoap_message_t* 
 }
 
 /**
- * @brief Creates response with string payload and options
+ * @brief Creates response with payload from null-terminated UTF-8 string and options
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
