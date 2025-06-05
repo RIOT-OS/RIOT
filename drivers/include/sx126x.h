@@ -254,6 +254,17 @@ uint8_t sx126x_get_coding_rate(const sx126x_t *dev);
 void sx126x_set_coding_rate(sx126x_t *dev, uint8_t cr);
 
 /**
+ * @brief   Sets the TX power and ramp time
+ *
+ * The actual transmission power may be different depending on device capabilities and board design.
+ *
+ * @param[in] dev                       Device descriptor of the driver
+ * @param[in] power_dbm                 The TX power in dBm
+ * @param[in] ramp_time                 The ramp time
+ */
+void sx126x_set_tx_power(sx126x_t *dev, int8_t power_dbm, sx126x_ramp_time_t ramp_time);
+
+/**
  * @brief   Gets the payload length
  *
  * @param[in] dev                      Device descriptor of the driver
