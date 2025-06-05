@@ -145,7 +145,7 @@ static void _example_parse_pdu(void)
     unicoap_parser_result_t parsed = { 0 };
 
     /* Parse using helper function, _result version initializes options structure for us. */
-    if ((res = unicoap_pdu_parse_rfc7252_result(pdu, sizeof(pdu), &parsed)) < 0) {
+    if ((res = unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed)) < 0) {
         puts("Error: parsing failed");
         return;
     }
