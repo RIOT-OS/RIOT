@@ -148,7 +148,7 @@ static inline void _set_token_length(unicoap_header_rfc7252_t* header, uint8_t t
     header->version_type_token_length |= token_length;
 }
 
-ssize_t unicoap_pdu_parse_rfc7252(const uint8_t* pdu, size_t size, unicoap_message_t* message,
+ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* message,
                                   unicoap_message_properties_t* properties)
 {
     if (size < sizeof(unicoap_header_rfc7252_t)) {
