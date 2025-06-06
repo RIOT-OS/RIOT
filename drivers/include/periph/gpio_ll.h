@@ -17,6 +17,15 @@
  * @warning     This API is not stable yet and intended for internal use only
  *              as of now.
  *
+ * # General
+ *
+ * Ports and pin numbers are not always internally defined as the same numbers
+ * that you would expect them to be. Therefore it is highly recommended to call
+ * the low level functions like gpio_ll_init() or gpio_ll_query_conf() with the
+ * gpio_get_port() and gpio_get_pin_num() functions instead of directly setting
+ * port or pin numbers. Using the helper functions will assure reliable
+ * operation on all platforms and GPIO banks.
+ *
  * # Design Goals
  *
  * This API aims to provide low-level access to GPIOs with as little
@@ -821,11 +830,31 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t state);
 
 /**
  * @brief   Extract the `gpio_port_t` from a `gpio_t`
+ *
+ * CPU specific implementation to return the GPIO port for a given
+ * GPIO pin.
+ *
+ * @param[in] pin GPIO pin structure, usually defined with the GPIO_PIN macro
+ *
+ * @return  GPIO port
+ *
  */
 static inline gpio_port_t gpio_get_port(gpio_t pin);
 
 /**
  * @brief   Extract the pin number from a `gpio_t`
+ *
+ * CPU specific implementation to return the internal pin number for a
+ * given GPIO pin.
+ *
+ * @note    The actual, internal pin numbers are not always directly related to
+ *          their name. For example on some microcontrollers as the nRF52,
+ *          the distinction between P0 and P1 pins is made by a bit that is set
+ *          in the pin numbers.
+ *
+ * @param[in] pin GPIO pin structure, usually defined with the GPIO_PIN macro
+ *
+ * @return  Internal pin number
  */
 static inline uint8_t gpio_get_pin_num(gpio_t pin);
 
