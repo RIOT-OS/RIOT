@@ -5,7 +5,7 @@ $(BINDIR_APP): $(CLEAN)
 
 # Include to be able to use memoized
 include $(RIOTBASE)/makefiles/utils/variables.mk
-EPOCH = $(call memoized,EPOCH,$(shell date +%s))
+EPOCH := $(call memoized,EPOCH,$(shell date +%s))
 APP_VER ?= $(EPOCH)
 
 # Default addressing if following README.native.md
