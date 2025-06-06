@@ -37,6 +37,13 @@ void tests_checksum(void);
 Test *tests_checksum_crc8_tests(void);
 
 /**
+ * @brief   Generates tests for checksum/crc8_lsb.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc8_lsb_tests(void);
+
+/**
  * @brief   Generates tests for crc16-ccitt-kermit from checksum/crc16_ccitt.h
  *
  * @return  embUnit tests if successful, NULL if not.
