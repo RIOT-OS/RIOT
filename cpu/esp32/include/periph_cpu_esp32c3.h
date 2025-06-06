@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /** Mapping configured ESP32-C3 default clock to CLOCK_CORECLOCK define */
-#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32C3_DEFAULT_CPU_FREQ_MHZ)
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
 
 /**
  * @brief   CPU cycles per busy wait loop
@@ -72,10 +72,9 @@ extern "C" {
  * The maximum number of ADC channels #ADC_NUMOF_MAX is 6.
  *
  * @note
- * - ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
+ *   ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
  *   therefore not available as ADC channels if the modules `esp_wifi` or
  *   `esp_now` are used.
- * - Vref can be read with function #adc_line_vref_to_gpio at GPIO5.
  */
 
 /**

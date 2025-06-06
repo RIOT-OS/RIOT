@@ -28,32 +28,11 @@
 
 static char _line_buf[SHELL_BUFSIZE];
 
-static int _json_statham(int argc, char **argv);
-static int _set_mss(int argc, char **argv);
-static int _set_cwnd(int argc, char **argv);
-static int _set_ssthresh(int argc, char **argv);
-static int _get_fr_calls(int argc, char **argv);
-static int _set_same_wnd_adv_res(int argc, char **argv);
-
 static congure_reno_snd_t _congure_state;
-static const shell_command_t shell_commands[] = {
-    { "state", "Prints current CongURE state object as JSON", _json_statham },
-    { "set_cwnd", "Set cwnd member for CongURE state object", _set_cwnd },
-    { "set_mss", "Set new MSS for CongURE state object", _set_mss },
-    { "set_ssthresh", "Set ssthresh member for CongURE state object",
-      _set_ssthresh },
-    { "get_ff_calls",
-      "Get the number of calls to fast_retransmit callback of CongURE state "
-      "object", _get_fr_calls },
-    { "set_same_wnd_adv",
-      "Set the result for the same_window_advertised callback of CongURE state "
-      "object", _set_same_wnd_adv_res },
-    { NULL, NULL, NULL }
-};
 
 int main(void)
 {
-    shell_run(shell_commands, _line_buf, SHELL_BUFSIZE);
+    shell_run(NULL, _line_buf, SHELL_BUFSIZE);
     return 0;
 }
 
@@ -113,6 +92,8 @@ static int _json_statham(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(state, "Prints current CongURE state object as JSON", _json_statham);
+
 static int _set_mss(int argc, char **argv)
 {
     uint32_t tmp;
@@ -128,6 +109,8 @@ static int _set_mss(int argc, char **argv)
     congure_reno_set_mss(&_congure_state, (congure_wnd_size_t)tmp);
     return 0;
 }
+
+SHELL_COMMAND(set_mss, "Set new MSS for CongURE state object", _set_mss);
 
 static int _set_cwnd(int argc, char **argv)
 {
@@ -145,6 +128,8 @@ static int _set_cwnd(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(set_cwnd, "Set cwnd member for CongURE state object", _set_cwnd);
+
 static int _set_ssthresh(int argc, char **argv)
 {
     uint32_t tmp;
@@ -161,6 +146,8 @@ static int _set_ssthresh(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(set_ssthresh, "Set ssthresh member for CongURE state object", _set_ssthresh);
+
 static int _get_fr_calls(int argc, char **argv)
 {
     (void)argc;
@@ -171,6 +158,9 @@ static int _get_fr_calls(int argc, char **argv)
     print_str("}\n");
     return 0;
 }
+
+SHELL_COMMAND(get_ff_calls,
+    "Get the number of calls to fast_retransmit callback of CongURE state object", _get_fr_calls);
 
 static int _set_same_wnd_adv_res(int argc, char **argv)
 {
@@ -183,5 +173,9 @@ static int _set_same_wnd_adv_res(int argc, char **argv)
     );
     return 0;
 }
+
+SHELL_COMMAND(set_same_wnd_adv,
+    "Set the result for the same_window_advertised callback of CongURE state object",
+    _set_same_wnd_adv_res);
 
 /** @} */

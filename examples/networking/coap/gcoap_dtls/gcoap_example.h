@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     examples
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
-
-#ifndef GCOAP_EXAMPLE_H
-#define GCOAP_EXAMPLE_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -34,14 +33,6 @@ extern "C" {
 #endif
 
 extern uint16_t req_count;  /**< Counts requests sent by CLI. */
-
-/**
- * @brief   Shell interface exposing the client side features of gcoap
- * @param   argc    Number of shell arguments (including shell command name)
- * @param   argv    Shell argument values (including shell command name)
- * @return  Exit status of the shell command
- */
-int gcoap_cli_cmd(int argc, char **argv);
 
 /**
  * @brief   Registers the CoAP resources exposed in the example app
@@ -61,5 +52,4 @@ void notify_observers(void);
 }
 #endif
 
-#endif /* GCOAP_EXAMPLE_H */
 /** @} */

@@ -1,0 +1,33 @@
+From 7517fc3cdf4913727dda1a1cad464927d24db7ec Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Mar 2025 10:20:04 +0100
+Subject: [PATCH 19/28] heap: IRAM is not used as heap
+
+RIOT only supports memory as a heap that allows byte access. IRAM only allows word-by-word access.
+---
+ components/heap/port/esp32/memory_layout.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/heap/port/esp32/memory_layout.c b/components/heap/port/esp32/memory_layout.c
+index b35d8c1b3e..b6c6d59010 100644
+--- a/components/heap/port/esp32/memory_layout.c
++++ b/components/heap/port/esp32/memory_layout.c
+@@ -95,6 +95,7 @@ const soc_memory_region_t soc_memory_regions[] = {
+     { 0x3FFF0000, 0x8000, SOC_MEMORY_TYPE_DIRAM,    0x400A8000,true},  //pool 7 <- can be used for MAC dump
+     { 0x3FFF8000, 0x4000, SOC_MEMORY_TYPE_DIRAM,    0x400A4000,true},  //pool 6 blk 1 <- can be used as trace memory
+     { 0x3FFFC000, 0x4000, SOC_MEMORY_TYPE_DIRAM,    0x400A0000,true},  //pool 6 blk 0 <- can be used as trace memory
++#if !defined(RIOT_VERSION)
+     { 0x40070000, 0x8000, SOC_MEMORY_TYPE_IRAM,     0,         false}, //pool 0
+     { 0x40078000, 0x8000, SOC_MEMORY_TYPE_IRAM,     0,         false}, //pool 1
+     { 0x40080000, 0x2000, SOC_MEMORY_TYPE_IRAM,     0,         false}, //pool 2-5, mmu page 0
+@@ -113,6 +114,7 @@ const soc_memory_region_t soc_memory_regions[] = {
+     { 0x4009A000, 0x2000, SOC_MEMORY_TYPE_IRAM,     0,         false}, //pool 2-5, mmu page 13
+     { 0x4009C000, 0x2000, SOC_MEMORY_TYPE_IRAM,     0,         false}, //pool 2-5, mmu page 14
+     { 0x4009E000, 0x2000, SOC_MEMORY_TYPE_IRAM,     0,         false}, //pool 2-5, mmu page 15
++#endif
+ #ifdef CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP
+     { SOC_RTC_DRAM_LOW, 0x2000, SOC_MEMORY_TYPE_RTCRAM, 0, false}, //RTC Fast Memory
+ #endif
+-- 
+2.34.1
+

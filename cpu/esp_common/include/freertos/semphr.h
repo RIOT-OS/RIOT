@@ -75,6 +75,10 @@ void vPortCPUReleaseMutex (portMUX_TYPE *mux);
         xQueueGiveFromISR( ( QueueHandle_t ) ( xSemaphore ), \
                            ( pxHigherPriorityTaskWoken ) )
 
+#define xSemaphoreCreateCountingStatic( uxMaxCount, uxInitialCount, pxSemaphoreBuffer ) \
+        xQueueCreateCountingSemaphoreStatic( ( uxMaxCount ), ( uxInitialCount ), \
+                                             ( pxSemaphoreBuffer ) )
+
 #ifdef __cplusplus
 }
 #endif

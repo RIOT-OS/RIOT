@@ -152,6 +152,7 @@ features. The following list of features currently exists:
 | `arduino_shield_nano` | Board has side headers compatible with the Arduino Nano       |
 | `arduino_shield_uno`  | Board has side headers compatible with the Arduino UNO        |
 | `arduino_shield_mega` | Board has side headers compatible with the Arduino MEGA       |
+| `feather_shield`      | Board has headers compatible with the Adafruit Feather boards |
 | `xiao_shield`         | Board has headers compatible with the Seeedstudio XIAO boards |
 
 @note   A board providing `arduino_shield_mega` **MUST** also provide

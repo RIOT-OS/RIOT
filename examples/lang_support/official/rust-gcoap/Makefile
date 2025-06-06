@@ -1,6 +1,9 @@
 # name of your application
 APPLICATION = rust_gcoap
 
+# TODO: Fix bug in docker image
+BOARD_BLACKLIST := native32 native64 native
+
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 #
 # The presence of this triggers building Rust code contained in this

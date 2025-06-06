@@ -25,7 +25,6 @@
 #include "net/lora.h"
 #include "periph/spi.h"
 
-#include "sx126x_driver.h"
 #include "sx126x.h"
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
