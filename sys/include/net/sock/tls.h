@@ -37,9 +37,11 @@ typedef struct sock_tls_tcp_queue {
  *
  * @param[out] sock Pointer to TLS socket structure to initialize
  * @param[in] method WolfSSL method (client or server) to use
+ * @param[in] ca_cert Pointer to CA certificate buffer (PEM format)
+ * @param[in] ca_cert_len Length of the CA certificate buffer
  * @return int 0 on success, negative errno on failure
  */
-int sock_tls_tcp_create(sock_tls_tcp_t *sock, WOLFSSL_METHOD *method);
+int sock_tls_tcp_create(sock_tls_tcp_t *sock, WOLFSSL_METHOD *method, const unsigned char *ca_cert, unsigned int ca_cert_len);
 
 /**
  * @brief Establishes a TLS connection to a remote server
