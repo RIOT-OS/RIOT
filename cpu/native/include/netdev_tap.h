@@ -27,7 +27,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "net/netdev.h"
-
+#include "net/eui48.h"
 #include "net/ethernet/hdr.h"
 
 #include "net/if.h"
@@ -68,6 +68,14 @@ typedef struct {
  *                  If initialized manually, pass a unique identifier instead.
  */
 void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params, int index);
+
+/**
+ * @brief   Get the EUI48 of the host side tap interface
+ *
+ * @param dev   tap device to query
+ * @param out   struct to write the result to
+ */
+void netdev_tap_get_host_eui48(netdev_tap_t *dev, eui48_t *out);
 /** @} */
 
 #ifdef __cplusplus
