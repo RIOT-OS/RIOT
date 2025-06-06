@@ -13,12 +13,11 @@
 #include <wolfssl/ssl.h>
 #include <wolfssl/error-ssl.h>
 #include "ztimer.h"
-#include "ca_cert.h"
 #include "debug.h"
 
 #define TLS_DEFAULT_TIMEOUT (5000)  /* 5 seconds timeout */
 #define CHUNK_SIZE 256              /* Maximum chunk size for read/write operations */
-#define MAX_TRIES 3                 /* Maximum number of retry attempts */
+#define MAX_RETRIES 3                 /* Maximum number of retry attempts */
 
 static int _wolfssl_tcp_receive(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
     sock_tls_tcp_t *sock = (sock_tls_tcp_t *)ctx;
@@ -26,7 +25,7 @@ static int _wolfssl_tcp_receive(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
     int remaining = sz;
     int tries = 0;
 
-    while (remaining > 0 && tries < MAX_TRIES) {
+    while (remaining > 0 && tries < MAX_RETRIES) {
         int chunk_size = (remaining > CHUNK_SIZE) ? CHUNK_SIZE : remaining;
         int ret = sock_tcp_read(sock->tcp_sock, buf + total_received, chunk_size, TLS_DEFAULT_TIMEOUT);
 
@@ -41,7 +40,7 @@ static int _wolfssl_tcp_receive(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
             printf("TCP Read timeout after %d ms\n", (int)TLS_DEFAULT_TIMEOUT);
             tries++;
             if (total_received > 0) return total_received;
-            if (tries >= MAX_TRIES) return WOLFSSL_CBIO_ERR_TIMEOUT;
+            if (tries >= MAX_RETRIES) return WOLFSSL_CBIO_ERR_TIMEOUT;
             continue;
         }
 
@@ -60,7 +59,7 @@ static int _wolfssl_tcp_send(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
     int remaining = sz;
     int tries = 0;
 
-    while (remaining > 0 && tries < MAX_TRIES) {
+    while (remaining > 0 && tries < MAX_RETRIES) {
         int chunk_size = (remaining > CHUNK_SIZE) ? CHUNK_SIZE : remaining;
         int ret = sock_tcp_write(sock->tcp_sock, buf + total_sent, chunk_size);
 
@@ -73,8 +72,8 @@ static int _wolfssl_tcp_send(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
 
         if (ret == -EAGAIN || ret == -EWOULDBLOCK) {
             tries++;
-            if (tries >= MAX_TRIES) {
-                printf("TCP Send failed after %d tries\n", MAX_TRIES);
+            if (tries >= MAX_RETRIES) {
+                printf("TCP Send failed after %d tries\n", MAX_RETRIES);
                 if (total_sent > 0) return total_sent;
                 return WOLFSSL_CBIO_ERR_GENERAL;
             }
@@ -90,7 +89,7 @@ static int _wolfssl_tcp_send(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
     return total_sent > 0 ? total_sent : WOLFSSL_CBIO_ERR_GENERAL;
 }
 
-int sock_tls_tcp_create(sock_tls_tcp_t *sock, WOLFSSL_METHOD *method) {
+int sock_tls_tcp_create(sock_tls_tcp_t *sock, WOLFSSL_METHOD *method, const unsigned char *ca_cert, unsigned int ca_cert_len) {
     if (!sock || !method) return -EINVAL;
 
     memset(sock, 0, sizeof(sock_tls_tcp_t));
@@ -102,7 +101,7 @@ int sock_tls_tcp_create(sock_tls_tcp_t *sock, WOLFSSL_METHOD *method) {
         return -EINVAL;
     }
 
-    if (wolfSSL_CTX_load_verify_buffer(sock->ctx, ca_cert_pem, ca_cert_pem_len, SSL_FILETYPE_PEM) != SSL_SUCCESS) {
+    if (wolfSSL_CTX_load_verify_buffer(sock->ctx, ca_cert, ca_cert_len, SSL_FILETYPE_PEM) != SSL_SUCCESS) {
         wolfSSL_CTX_free(sock->ctx);
         return -EINVAL;
     }
