@@ -69,6 +69,8 @@ static inline void event_deferred_callback_post(event_deferred_callback_t *event
                                                 ztimer_clock_t *clock, uint32_t timeout,
                                                 void (*callback)(void *), void *arg)
 {
+    ztimer_remove(clock, &event->timer);
+
     event->event = (event_callback_t) {
         .super.handler = _event_callback_handler,
         .callback = callback,
