@@ -754,7 +754,7 @@ struct ieee802154_radio_ops {
                            int8_t retries);
 
     /**
-     * @brief Set the frame filter moder.
+     * @brief Set the frame filter mode.
      *
      * @pre the device is on
      *
@@ -765,6 +765,19 @@ struct ieee802154_radio_ops {
      * @return negative errno on error
      */
     int (*set_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode);
+
+    /**
+     * @brief Get the frame filter mode.
+     *
+     * @pre the device is on
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[out] mode address filter mode
+     *
+     * @return 0 on success
+     * @return negative errno on error
+     */
+    int (*get_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode);
 
     /**
      * @brief Configure the address filter.
@@ -1012,6 +1025,25 @@ static inline int ieee802154_radio_set_frame_filter_mode(ieee802154_dev_t *dev,
                                                     ieee802154_filter_mode_t mode)
 {
     return dev->driver->set_frame_filter_mode(dev, mode);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::get_frame_filter_mode
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[out] mode frame filter mode
+ *
+ * @return result of @ref ieee802154_radio_ops::get_frame_filter_mode
+ */
+static inline int ieee802154_radio_get_frame_filter_mode(ieee802154_dev_t *dev,
+                                                         ieee802154_filter_mode_t *mode)
+{
+    if (dev->driver->get_frame_filter_mode) {
+        return dev->driver->get_frame_filter_mode(dev, mode);
+    }
+    return -ENOTSUP;
 }
 
 /**
