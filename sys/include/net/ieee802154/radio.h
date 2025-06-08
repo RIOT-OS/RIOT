@@ -73,6 +73,13 @@ typedef enum {
      */
     IEEE802154_CAP_AUTO_CSMA            = BIT1,
     /**
+     * @brief the device supports automatic ACK frame transmission
+     *
+     * The device automatically sends an ACK frame when it receives a frame
+     * with the ACK Req bit set.
+     */
+    IEEE802154_CAP_AUTO_ACK             = BIT2,
+    /**
      * @brief the device support ACK timeout interrupt
      *
      * The device will automatically attempt to receive and handle the ACK
@@ -83,71 +90,71 @@ typedef enum {
      *
      * The ACK frame is not indicated to the upper layer.
      */
-    IEEE802154_CAP_IRQ_ACK_TIMEOUT      = BIT2,
+    IEEE802154_CAP_IRQ_ACK_TIMEOUT      = BIT3,
     /**
      * @brief the device supports the IEEE802.15.4 2.4 GHz band
      *
      * It's assumed that @ref IEEE802154_CAP_IRQ_TX_DONE is present.
      */
-    IEEE802154_CAP_24_GHZ               = BIT3,
+    IEEE802154_CAP_24_GHZ               = BIT4,
     /**
      * @brief the device support the IEEE802.15.4 Sub GHz band
      */
-    IEEE802154_CAP_SUB_GHZ              = BIT4,
+    IEEE802154_CAP_SUB_GHZ              = BIT5,
     /**
      * @brief the device reports reception off frames with invalid CRC.
      */
-    IEEE802154_CAP_IRQ_CRC_ERROR        = BIT5,
+    IEEE802154_CAP_IRQ_CRC_ERROR        = BIT6,
     /**
      * @brief the device reports when the transmission is done
      */
-    IEEE802154_CAP_IRQ_TX_DONE          = BIT6,
+    IEEE802154_CAP_IRQ_TX_DONE          = BIT7,
     /**
      * @brief the device reports the start of a frame (SFD) when received.
      */
-    IEEE802154_CAP_IRQ_RX_START         = BIT7,
+    IEEE802154_CAP_IRQ_RX_START         = BIT8,
     /**
      * @brief the device reports the start of a frame (SFD) was sent.
      */
-    IEEE802154_CAP_IRQ_TX_START         = BIT8,
+    IEEE802154_CAP_IRQ_TX_START         = BIT9,
     /**
      * @brief the device reports the end of the CCA procedure
      */
-    IEEE802154_CAP_IRQ_CCA_DONE         = BIT9,
+    IEEE802154_CAP_IRQ_CCA_DONE         = BIT10,
     /**
      * @brief the device provides the number of retransmissions
      *
      * It's assumed that @ref IEEE802154_CAP_FRAME_RETRANS is present.
      */
-    IEEE802154_CAP_FRAME_RETRANS_INFO   = BIT10,
+    IEEE802154_CAP_FRAME_RETRANS_INFO   = BIT11,
     /**
      * @brief the device retains all register values when off.
      */
-    IEEE802154_CAP_REG_RETENTION        = BIT11,
+    IEEE802154_CAP_REG_RETENTION        = BIT12,
     /**
      * @brief Binary Phase Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_BPSK             = BIT12,
+    IEEE802154_CAP_PHY_BPSK             = BIT13,
     /**
      * @brief Amplitude-Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_ASK              = BIT13,
+    IEEE802154_CAP_PHY_ASK              = BIT14,
     /**
      * @brief Offset Quadrature Phase-Shift Keying
      */
-    IEEE802154_CAP_PHY_OQPSK            = BIT14,
+    IEEE802154_CAP_PHY_OQPSK            = BIT15,
     /**
      * @brief Multi-Rate Offset Quadrature Phase-Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_MR_OQPSK         = BIT15,
+    IEEE802154_CAP_PHY_MR_OQPSK         = BIT16,
     /**
      * @brief Multi-Rate Orthogonal Frequency-Division Multiplexing PHY mode
      */
-    IEEE802154_CAP_PHY_MR_OFDM          = BIT16,
+    IEEE802154_CAP_PHY_MR_OFDM          = BIT17,
     /**
      * @brief Multi-Rate Frequency Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_MR_FSK           = BIT17,
+    IEEE802154_CAP_PHY_MR_FSK           = BIT18,
     /**
      * @brief the device supports source address match table.
      *
@@ -156,7 +163,7 @@ typedef enum {
      * Request command from a child node, the Frame Pending bit of the ACK is
      * set if the source address matches one from the table.
      */
-    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
+    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
 } ieee802154_rf_caps_t;
 
 /**
