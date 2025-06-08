@@ -819,6 +819,20 @@ struct ieee802154_radio_ops {
 };
 
 /**
+ * @brief Check if the device has a specific capability
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[in] cap capabilities to check for
+ *
+ * @retval true if the device has the capability
+ * @retval false if the device doesn't have the capability
+ */
+static inline bool ieee802154_radio_has_capability(ieee802154_dev_t *dev, uint32_t cap)
+{
+    return (dev->driver->caps & cap) == cap;
+}
+
+/**
  * @brief Shortcut to @ref ieee802154_radio_ops::write
  *
  * @param[in] dev IEEE802.15.4 device descriptor
