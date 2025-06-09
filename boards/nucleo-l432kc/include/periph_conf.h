@@ -115,7 +115,13 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
-static const adc_conf_t adc_config[] = {{}};
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0),  .dev = 0, .chan = 5},  /* ADC12_IN5  */
+    {GPIO_PIN(PORT_A, 1),  .dev = 0, .chan = 6},  /* ADC12_IN6  */
+    {GPIO_PIN(PORT_A, 3),  .dev = 0, .chan = 8},  /* ADC12_IN8  */
+    {GPIO_PIN(PORT_A, 4),  .dev = 0, .chan = 9},  /* ADC12_IN9  */
+    {GPIO_PIN(PORT_A, 7),  .dev = 0, .chan = 12}, /* ADC12_IN12 */
+};
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 
