@@ -1,2 +1,3 @@
+USEPKG += picosdk
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

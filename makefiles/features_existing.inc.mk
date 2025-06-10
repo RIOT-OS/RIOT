@@ -85,8 +85,8 @@ FEATURES_EXISTING := \
     cpu_nrf53 \
     cpu_nrf9160 \
     cpu_qn908x \
-    cpu_rpx0xx \
     cpu_rp2350 \
+    cpu_rpx0xx \
     cpu_sam3 \
     cpu_sam4s \
     cpu_samd21 \
