@@ -156,6 +156,10 @@ typedef enum {
      */
     IEEE802154_CAP_PHY_MR_FSK           = BIT18,
     /**
+     * @brief LoRa capability mode (not standardized in IEEE 802.15.4)
+     */
+    IEEE802154_CAP_PHY_LORA             = BIT19,
+    /**
      * @brief the device supports source address match table.
      *
      * A Source Address Match table contains source addresses with pending
@@ -163,7 +167,7 @@ typedef enum {
      * Request command from a child node, the Frame Pending bit of the ACK is
      * set if the source address matches one from the table.
      */
-    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT20,
 } ieee802154_rf_caps_t;
 
 /**
@@ -175,7 +179,8 @@ typedef enum {
     | IEEE802154_CAP_PHY_OQPSK      \
     | IEEE802154_CAP_PHY_MR_OQPSK   \
     | IEEE802154_CAP_PHY_MR_OFDM    \
-    | IEEE802154_CAP_PHY_MR_FSK)    \
+    | IEEE802154_CAP_PHY_MR_FSK     \
+    | IEEE802154_CAP_PHY_LORA)      \
 
 /**
  * @brief Transmission status
@@ -1683,6 +1688,8 @@ static inline uint32_t ieee802154_phy_mode_to_cap(
             return IEEE802154_CAP_PHY_MR_OFDM;
         case IEEE802154_PHY_MR_FSK:
             return IEEE802154_CAP_PHY_MR_FSK;
+        case IEEE802154_PHY_LORA:
+            return IEEE802154_CAP_PHY_LORA;
 
         case IEEE802154_PHY_DISABLED:
         default:
@@ -1718,6 +1725,8 @@ static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
             return IEEE802154_PHY_MR_OFDM;
         case IEEE802154_CAP_PHY_MR_FSK:
             return IEEE802154_PHY_MR_FSK;
+        case IEEE802154_CAP_PHY_LORA:
+            return IEEE802154_PHY_LORA;
 
         default:
             break;
