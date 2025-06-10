@@ -24,8 +24,6 @@
 #include "stdio_base.h"
 #include "stdio_uart.h"
 
-mutex_t slipdev_mutex = MUTEX_INIT;
-
 static void _isrpipe_write(void *arg, uint8_t data)
 {
     isrpipe_write_one(arg, (char)data);
@@ -37,7 +35,7 @@ static void _init(void)
      * the network device is initialized */
     uart_init(slipdev_params[0].uart, slipdev_params[0].baudrate,
               _isrpipe_write, &stdin_isrpipe);
-    
+
     slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_END);
 }
 
