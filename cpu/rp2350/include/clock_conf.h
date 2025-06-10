@@ -7,6 +7,7 @@
 #pragma once
 
 #include "RP2350.h"
+#include "macros/units.h"
 
 // Based on hardware/regs/xosc.h and 8.2.8
 #define XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ 0xaa0u
