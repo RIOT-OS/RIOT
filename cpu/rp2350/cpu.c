@@ -25,7 +25,7 @@ void gpio_reset(void) {
 void cpu_init(void) {
   /* initialize the Cortex-M core */
   // cortexm_init();
-  
+
   gpio_reset();
   early_init();
 
