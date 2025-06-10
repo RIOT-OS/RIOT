@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef BOARD_H
-#define BOARD_H
+#pragma once
 
 #include "RP2350.h"
 #include "cpu.h"
@@ -20,6 +19,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* BOARD_H */
-/** @} */

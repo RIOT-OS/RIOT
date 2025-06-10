@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
+#pragma once
 
 #include <stdint.h>
 
@@ -19,6 +18,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PERIPH_CONF_H */
-/** @} */

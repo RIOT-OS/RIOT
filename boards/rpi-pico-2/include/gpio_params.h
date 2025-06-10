@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
+#pragma once
 
 #include "board.h"
 #include "saul/periph.h"
@@ -17,6 +16,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* GPIO_PARAMS_H */
-/** @} */
