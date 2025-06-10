@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include "cpu.h"
 
 #include "RP2350.h"
@@ -17,12 +23,11 @@ void gpio_reset(void) {
 }
 
 void cpu_init(void) {
-  /* initialize the Cortex-M core */
-  //cortexm_init();
-  gpio_reset();
-  //_cpu_reset();
+  /* initialize the Cortex-M core, once UART support is moved
+  to shared driver as currently this will cause unhandled interrupts */
+  /* cortexm_init(); */
 
-  /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+  gpio_reset();
   early_init();
 
   clock_reset();

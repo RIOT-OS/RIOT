@@ -7,20 +7,20 @@
 #pragma once
 
 /**
- * @ingroup         cpu_rp2350
+ * @ingroup         boards_rpi_pico_2
  * @{
+ *
  * @file
- * @brief           CPU configuration for the RP2350
+ * @brief           Board specific definitions for the Raspberry Pi Pico 2
  *
  * @author          Tom Hert <git@annsann.eu>
  */
 
 #include "RP2350.h"
-#include "core_cm33.h"
-#include "cpu_conf_common.h"
-
-#define CPU_DEFAULT_IRQ_PRIO (1U)
-#define CPU_IRQ_NUMOF (52U)
+#include "cpu.h"
+#include "cpu_conf.h"
+#include "periph_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
