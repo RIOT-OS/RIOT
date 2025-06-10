@@ -1,5 +1,7 @@
+# Dependencies are listed as PEP 723 metadata in `bmp.py`. This file exists
+# for compatibility reasons.
 humanize
 packaging
+progressbar
 pygdbmi
 pyserial
-progressbar
