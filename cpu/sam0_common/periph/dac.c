@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "periph/dac.h"
 #include "periph/gpio.h"
+#include "macros/units.h"
 
 #define DAC_VAL(in) (in >> (16 - DAC_RES_BITS))
 
@@ -66,15 +67,15 @@ static inline void _sync(void)
 #ifdef DAC_DACCTRL_CCTRL_Msk
 static uint32_t _get_CCTRL(uint32_t freq)
 {
-    if (freq < 1200000) {
+    if (freq <= KHZ(1200)) {
         return DAC_DACCTRL_CCTRL_CC100K;
     }
 
-    if (freq < 6000000) {
+    if (freq <= MHZ(6)) {
         return DAC_DACCTRL_CCTRL_CC1M;
     }
 
-    if (freq < 12000000) {
+    if (freq <= MHZ(12)) {
         return DAC_DACCTRL_CCTRL_CC12M;
     }
 
@@ -109,8 +110,8 @@ int8_t dac_init(dac_t line)
 
     _dac_init_clock(line);
 
-    /* Settings can only be changed when DAC is disabled */
-    DAC->CTRLA.reg &= ~DAC_CTRLA_ENABLE;
+    /* Settings can only be changed when DAC is disabled, reset config */
+    DAC->CTRLA.reg = DAC_CTRLA_SWRST;
     _sync();
 
 #ifdef DAC_DACCTRL_ENABLE
@@ -125,7 +126,7 @@ int8_t dac_init(dac_t line)
 #endif
                    ;
 
-    DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
+    DAC->CTRLA.reg = DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_STATUS_READY
@@ -140,14 +141,14 @@ int8_t dac_init(dac_t line)
 void dac_set(dac_t line, uint16_t value)
 {
 #ifdef DAC_SYNCBUSY_DATA1
-    /* DAC has multiple outputs */
-    const uint32_t mask = (1 << (DAC_SYNCBUSY_DATA_Pos + line));
-    while (DAC->SYNCBUSY.reg & mask) {}
+    const uint32_t mask = (1 << (DAC_INTFLAG_EMPTY_Pos + line));
+    while (!(DAC->INTFLAG.reg & mask)) {}
 
+    /* DAC has multiple outputs */
     DAC->DATA[line].reg = DAC_VAL(value);
 #else
     /* DAC has only one output */
-    (void) line;
+    (void)line;
 
     _sync();
     DAC->DATA.reg = DAC_VAL(value);
