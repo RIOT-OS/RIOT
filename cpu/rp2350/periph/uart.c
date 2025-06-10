@@ -1,5 +1,10 @@
-#include "periph/uart.h"
+/*
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 
+#include "periph/uart.h"
 #include "periph_cpu.h"
 
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {

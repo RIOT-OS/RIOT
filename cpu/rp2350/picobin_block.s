@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 // Picobin block required for the binary
 // This defines the minimum viable image metadata to be recognized by the RP2350 bootloader
 // based on RP2350 Chapter 5.9.1

@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include "cpu.h"
 
 #include "RP2350.h"
@@ -18,7 +24,7 @@ void gpio_reset(void) {
 
 void cpu_init(void) {
   /* initialize the Cortex-M core */
-  //cortexm_init();
+  // cortexm_init();
   gpio_reset();
   //_cpu_reset();
 

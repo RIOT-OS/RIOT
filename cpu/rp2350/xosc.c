@@ -1,22 +1,7 @@
 /*
- * Copyright (C) 2021 Otto-von-Guericke Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
-
-/**
- * @ingroup     cpu_rpx0xx
- * @{
- *
- * @file
- * @brief       Implementation of the crystal oscillator (XOSC)
- *
- * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
- *
- * @}
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #include <assert.h>
@@ -38,7 +23,8 @@ void xosc_start(void) {
   // Set the startup delay (default 1ms)
   XOSC->STARTUP = STARTUP_DELAY;
   // set enable bit
-  atomic_set(&XOSC->CTRL, XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB);
+  atomic_set(&XOSC->CTRL,
+             XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB);
 
   while (!(XOSC->STATUS & XOSC_STATUS_STABLE_BITS)) {
     // Wait for the crystal to stabilize
@@ -47,7 +33,7 @@ void xosc_start(void) {
 
 void xosc_sleep(int32_t milliseconds) {
   for (int32_t i = 0; i < milliseconds; i++) {
-    XOSC->COUNT = CYCLES_PER_MS* milliseconds;
+    XOSC->COUNT = CYCLES_PER_MS * milliseconds;
     while (XOSC->COUNT != 0) {
     }
   }
