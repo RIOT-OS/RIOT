@@ -60,7 +60,7 @@ STM32_WITH_VBAT = stm32f031% stm32f038% stm32f042% stm32f048% \
                   stm32f7% \
                   stm32g0% \
                   stm32g4% stm32gbk1cb \
-                  stm32l4% \
+                  stm32l433% stm32l45% stm32l47% stm32l49% stm32l4r% \
                   stm32l5% \
                   stm32u5% \
                   stm32wb% \
