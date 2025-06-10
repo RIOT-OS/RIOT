@@ -377,10 +377,10 @@ static const adc_conf_chan_t adc_channels[] = {
  */
                             /* Must not exceed 12 MHz */
 #define DAC_CLOCK           SAM0_GCLK_TIMER
-                            /* Use external reference voltage on PA03 */
-                            /* (You have to manually connect PA03 with Vcc) */
+#ifndef DAC_VREF
                             /* Internal reference only gives 1V */
-#define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
+#define DAC_VREF            DAC_CTRLB_REFSEL_INTREF
+#endif
 /** @} */
 
 /**
