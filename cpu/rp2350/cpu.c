@@ -25,10 +25,8 @@ void gpio_reset(void) {
 void cpu_init(void) {
   /* initialize the Cortex-M core */
   // cortexm_init();
+  
   gpio_reset();
-  //_cpu_reset();
-
-  /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
   early_init();
 
   clock_reset();
