@@ -37,7 +37,7 @@ static void _init(void)
      * the network device is initialized */
     uart_init(slipdev_params[0].uart, slipdev_params[0].baudrate,
               _isrpipe_write, &stdin_isrpipe);
-    
+
     slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_END);
 }
 

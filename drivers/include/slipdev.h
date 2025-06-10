@@ -94,11 +94,11 @@ enum {
      */
     SLIPDEV_STATE_STDIN_ESC,
     /**
-     * @brief   Device writes received data as coap message
+     * @brief   Device writes received data as CoAP message
      */
     SLIPDEV_STATE_CONFIG,
     /**
-     * @brief   Device writes received data as coap message, next byte is escaped
+     * @brief   Device writes received data as CoAP message, next byte is escaped
      */
     SLIPDEV_STATE_CONFIG_ESC,
     /**
@@ -139,7 +139,7 @@ typedef struct {
 #if IS_USED(MODULE_SLIPDEV_STDIO)
     chunk_ringbuf_t rb_config;              /**< Ringbuffer to store received CONFIG frames.*/
     uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE]; /**< memory used by RX buffer */
-    kernel_pid_t coap_server_pid;
+    kernel_pid_t coap_server_pid;           /**< The PID of the CoAP server */
 #endif
     /**
      * @brief   Device state
