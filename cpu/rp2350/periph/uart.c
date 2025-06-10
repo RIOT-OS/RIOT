@@ -5,6 +5,7 @@
  */
 
 #include "periph/uart.h"
+
 #include "periph_cpu.h"
 
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {
@@ -49,7 +50,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len) {
   for (size_t i = 0; i < len; i++) {
     UART0->UARTDR = data[i];
     // Wait until the TX FIFO is empty before sending the next byte
-    while (!(UART0->UARTFR & UART_UARTFR_TXFE_BITS));
+    while (!(UART0->UARTFR & UART_UARTFR_TXFE_BITS)) {
+    }
   }
 }
 

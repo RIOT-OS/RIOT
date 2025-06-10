@@ -3,3 +3,4 @@
  * @ingroup     boards
  * @brief       Support for the RP2350 based Raspberry Pi Pico board
  *
+ */
