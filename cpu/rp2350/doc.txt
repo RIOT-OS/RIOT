@@ -1,0 +1,8 @@
+/**
+@defgroup        cpu_rp23xx RP23xx MCUs
+@ingroup         cpu
+@brief           RP23xx MCU code and definitions
+
+This module contains the code and definitions for MCUs of the RP23xx family used by the Pi Pico 2
+
+ */
