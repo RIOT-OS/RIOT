@@ -19,7 +19,6 @@ use lakers::{CryptoTrait, Credential};
 extern crate rust_riotmodules;
 
 use heapless::{String, Vec};
-use ccm::{KeyInit, aead::AeadInPlace};
 use p256::ecdsa::{VerifyingKey, signature::Verifier};
 
 // Custom RNG implementation using RIOT's random functions
@@ -50,41 +49,44 @@ impl RngCore for RiotRng {
 
 impl CryptoRng for RiotRng {}
 
-// Custom Security Configuration
-pub struct CustomSecurityConfig {
-    /// Symmetric key for AES-CCM-16-128-256 (COSE algorithm 31)
-    as_symmetric_key: Option<[u8; 32]>,
-    /// Asymmetric key for ES256 (COSE algorithm -7) - (x, y, audience)
-    as_asymmetric_key: Option<([u8; 32], [u8; 32], String<8>)>,
-    /// Our own EDHOC credential and private key
+// Fixed private key from private_key.h
+const FIXED_PRIVATE_KEY: [u8; 32] = [
+    0xf6, 0x3e, 0x22, 0xc8, 0xd3, 0x2d, 0xe8, 0x6b,
+    0x52, 0x83, 0x72, 0xd3, 0x79, 0x4e, 0x05, 0x25,
+    0xa0, 0x62, 0xfb, 0x41, 0x41, 0xed, 0x91, 0x9a,
+    0x45, 0x09, 0x65, 0x19, 0xc5, 0x94, 0x8c, 0x3d
+];
+
+// Proper EDHOC Security Configuration
+pub struct EdhocSecurityConfig {
+    /// Authorization Server's public key for token signature verification (ES256)
+    as_public_key: Option<([u8; 32], [u8; 32])>, // (x, y) coordinates
+    /// Our own EDHOC credential and private key (for signing message 2)
     own_edhoc_credential: Option<(Credential, lakers::BytesP256ElemLen)>,
-    /// Known EDHOC client credentials with their scopes
+    /// Known EDHOC client credentials with their authorized scopes
     known_edhoc_clients: Vec<(Credential, scope::UnionScope), 4>,
-    /// Unauthenticated scope
+    /// Unauthenticated scope (if any)
     unauthenticated_scope: Option<scope::UnionScope>,
     /// Request creation hints for unauthorized responses
     request_creation_hints: &'static [u8],
+    /// Our audience identifier (for token validation)
+    rs_audience: String<16>,
 }
 
-impl CustomSecurityConfig {
+impl EdhocSecurityConfig {
     pub fn new() -> Self {
         Self {
-            as_symmetric_key: None,
-            as_asymmetric_key: None,
+            as_public_key: None,
             own_edhoc_credential: None,
             known_edhoc_clients: Vec::new(),
             unauthenticated_scope: None,
             request_creation_hints: b"",
+            rs_audience: String::new(),
         }
     }
 
-    pub fn with_symmetric_as_key(mut self, key: [u8; 32]) -> Self {
-        self.as_symmetric_key = Some(key);
-        self
-    }
-
-    pub fn with_asymmetric_as_key(mut self, x: [u8; 32], y: [u8; 32], audience: String<8>) -> Self {
-        self.as_asymmetric_key = Some((x, y, audience));
+    pub fn with_as_public_key(mut self, x: [u8; 32], y: [u8; 32]) -> Self {
+        self.as_public_key = Some((x, y));
         self
     }
 
@@ -102,17 +104,22 @@ impl CustomSecurityConfig {
         self.unauthenticated_scope = Some(scope);
         self
     }
+
+    pub fn with_audience(mut self, audience: &str) -> Self {
+        self.rs_audience = String::from(audience).unwrap_or_else(|_| String::new());
+        self
+    }
 }
 
 // Custom claims implementation
 #[derive(Debug, Clone)]
-pub struct CustomClaims {
+pub struct EdhocClaims {
     pub scope: scope::UnionScope,
     pub time_constraint: TimeConstraint,
     pub is_important: bool,
 }
 
-impl GeneralClaims for CustomClaims {
+impl GeneralClaims for EdhocClaims {
     type Scope = scope::UnionScope;
 
     fn scope(&self) -> &Self::Scope {
@@ -128,87 +135,23 @@ impl GeneralClaims for CustomClaims {
     }
 }
 
-impl seccfg::ServerSecurityConfig for CustomSecurityConfig {
+impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
     const PARSES_TOKENS: bool = true;
     const HAS_EDHOC: bool = true;
 
-    type GeneralClaims = CustomClaims;
+    type GeneralClaims = EdhocClaims;
 
     fn decrypt_symmetric_token<'buf>(
         &self,
-        headers: &ace::HeaderMap,
-        aad: &[u8],
-        ciphertext_buffer: &'buf mut [u8],
+        _headers: &ace::HeaderMap,
+        _aad: &[u8],
+        _ciphertext_buffer: &'buf mut [u8],
     ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'buf>), CredentialError> {
-        type Aes256Ccm = ccm::Ccm<aes::Aes256, ccm::consts::U16, ccm::consts::U13>;
-        const TAG_SIZE: usize = 16;
-        const NONCE_SIZE: usize = 13;
-
-        // Get the symmetric key
-        let key = self.as_symmetric_key.ok_or_else(|| {
-            println!("Error: Symmetrically encrypted token received, but no symmetric key configured.");
-            CredentialErrorDetail::KeyNotPresent
-        })?;
-
-        let cipher = Aes256Ccm::new((&key).into());
-
-        // Extract nonce from headers
-        let nonce: &[u8; NONCE_SIZE] = headers
-            .iv
-            .ok_or_else(|| {
-                println!("Error: IV missing from token.");
-                CredentialErrorDetail::InconsistentDetails
-            })?
-            .try_into()
-            .map_err(|_| {
-                println!("Error: Token's IV length mismatches algorithm.");
-                CredentialErrorDetail::InconsistentDetails
-            })?;
-
-        // Split ciphertext and tag
-        let ciphertext_len = ciphertext_buffer
-            .len()
-            .checked_sub(TAG_SIZE)
-            .ok_or_else(|| {
-                println!("Error: Token's ciphertext too short for the algorithm's tag.");
-                CredentialErrorDetail::InconsistentDetails
-            })?;
-
-        let (ciphertext, tag) = ciphertext_buffer.split_at_mut(ciphertext_len);
-
-        // Decrypt
-        cipher
-            .decrypt_in_place_detached(nonce.into(), aad, ciphertext, ccm::Tag::from_slice(tag))
-            .map_err(|_| {
-                println!("Error: Token decryption failed.");
-                CredentialErrorDetail::VerifyFailed
-            })?;
-
-        // Parse claims
-        let claims: ace::CwtClaimsSet = minicbor::decode(ciphertext)
-            .map_err(|_| {
-                println!("Error: Failed to decode CWT claims set.");
-                CredentialErrorDetail::UnsupportedExtension
-            })?;
-
-        // Parse scope
-        let scope = scope::AifValue::parse(claims.scope)
-            .map_err(|_| {
-                println!("Error: Failed to parse scope from token.");
-                CredentialErrorDetail::UnsupportedExtension
-            })?
-            .into();
-
-        let time_constraint = TimeConstraint::from_claims_set(&claims);
-
-        let custom_claims = CustomClaims {
-            scope,
-            time_constraint,
-            is_important: false,
-        };
-
-        println!("Successfully decrypted and validated symmetric token.");
-        Ok((custom_claims, claims))
+        // In EDHOC/OSCORE, symmetric tokens are not used in the traditional sense.
+        // Token decryption should be handled by the OSCORE layer using derived keys.
+        // This method should not be called in a proper EDHOC implementation.
+        println!("Warning: decrypt_symmetric_token called - this should not happen in EDHOC flow");
+        Err(CredentialErrorDetail::KeyNotPresent.into())
     }
 
     fn verify_asymmetric_token<'b>(
@@ -218,73 +161,73 @@ impl seccfg::ServerSecurityConfig for CustomSecurityConfig {
         signature: &[u8],
         signed_payload: &'b [u8],
     ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'b>), CredentialError> {
-        // Check algorithm
+        // Check algorithm - must be ES256 (COSE algorithm -7)
         if headers.alg != Some(-7) {
-            println!("Error: Unsupported algorithm for asymmetric token.");
+            println!("Error: Unsupported algorithm for asymmetric token, expected ES256 (-7)");
             return Err(CredentialErrorDetail::UnsupportedAlgorithm.into());
         }
 
-        // Get the asymmetric key
-        let Some((x, y, rs_audience)) = self.as_asymmetric_key.as_ref() else {
-            println!("Error: Asymmetrically signed token received, but no asymmetric key configured.");
+        // Get the AS public key for signature verification
+        let Some((x, y)) = self.as_public_key else {
+            println!("Error: No AS public key configured for token verification");
             return Err(CredentialErrorDetail::KeyNotPresent.into());
         };
 
-        // Create verifying key
+        // Create verifying key from AS public key
         let as_key = VerifyingKey::from_encoded_point(
-            &p256::EncodedPoint::from_affine_coordinates(x.into(), y.into(), false),
+            &p256::EncodedPoint::from_affine_coordinates((&x).into(), (&y).into(), false),
         )
         .map_err(|_| {
-            println!("Error: Failed to create verifying key from configured coordinates.");
+            println!("Error: Failed to create verifying key from AS public key");
             CredentialErrorDetail::InconsistentDetails
         })?;
 
-        // Parse signature
+        // Parse and verify signature
         let signature = p256::ecdsa::Signature::from_slice(signature)
             .map_err(|_| {
-                println!("Error: Invalid signature format.");
+                println!("Error: Invalid signature format");
                 CredentialErrorDetail::InconsistentDetails
             })?;
 
-        // Verify signature
+        // Verify the signature
         as_key
             .verify(signed_data, &signature)
             .map_err(|_| {
-                println!("Error: Signature verification failed.");
+                println!("Error: AS signature verification failed");
                 CredentialErrorDetail::VerifyFailed
             })?;
 
-        // Parse claims
+        // Parse the signed payload
         let claims: ace::CwtClaimsSet = minicbor::decode(signed_payload)
             .map_err(|_| {
-                println!("Error: Failed to decode signed payload.");
+                println!("Error: Failed to decode signed token payload");
                 CredentialErrorDetail::UnsupportedExtension
             })?;
 
-        // Check audience
-        if claims.aud != Some(rs_audience) {
-            println!("Error: Token audience doesn't match our audience.");
+        // Verify audience (this RS must be the intended recipient)
+        if !self.rs_audience.is_empty() && claims.aud.as_ref() != Some(&self.rs_audience) {
+            println!("Error: Token audience mismatch - not intended for this RS");
             return Err(CredentialErrorDetail::VerifyFailed.into());
         }
 
-        // Parse scope
+        // Parse scope from claims
         let scope = scope::AifValue::parse(claims.scope)
             .map_err(|_| {
-                println!("Error: Failed to parse scope from signed token.");
+                println!("Error: Failed to parse scope from verified token");
                 CredentialErrorDetail::UnsupportedExtension
             })?
             .into();
 
         let time_constraint = TimeConstraint::from_claims_set(&claims);
 
-        let custom_claims = CustomClaims {
+        let edhoc_claims = EdhocClaims {
             scope,
             time_constraint,
-            is_important: false,
+            is_important: false, // Token-based claims are not as important as EDHOC-based
         };
 
-        println!("Successfully verified and validated asymmetric token.");
-        Ok((custom_claims, claims))
+        println!("Successfully verified AS-signed token");
+        Ok((edhoc_claims, claims))
     }
 
     fn own_edhoc_credential(&self) -> Option<(Credential, lakers::BytesP256ElemLen)> {
@@ -295,33 +238,33 @@ impl seccfg::ServerSecurityConfig for CustomSecurityConfig {
         &self,
         id_cred_x: lakers::IdCred,
     ) -> Option<(Credential, Self::GeneralClaims)> {
-        println!("Evaluating peer's credential...");
+        println!("Evaluating peer's EDHOC credential...");
 
         // Check against known EDHOC clients
         for (credential, scope) in &self.known_edhoc_clients {
             if id_cred_x.reference_only() {
-                // Check by KID
+                // Check by KID (Key Identifier)
                 if let Ok(cred_kid) = credential.by_kid() {
                     if cred_kid.as_ref() == Ok(&id_cred_x) {
-                        println!("Peer indicated use of preconfigured key by KID.");
+                        println!("Peer authenticated using preconfigured key by KID");
                         return Some((
                             credential.clone(),
-                            CustomClaims {
+                            EdhocClaims {
                                 scope: scope.clone(),
                                 time_constraint: TimeConstraint::unbounded(),
-                                is_important: true,
+                                is_important: true, // EDHOC-based claims are important
                             },
                         ));
                     }
                 }
             } else {
-                // Check by value
+                // Check by credential value
                 if let Ok(cred_value) = credential.by_value() {
                     if cred_value.as_ref() == Ok(&id_cred_x) {
-                        println!("Peer indicated use of preconfigured credential by value.");
+                        println!("Peer authenticated using preconfigured credential by value");
                         return Some((
                             credential.clone(),
-                            CustomClaims {
+                            EdhocClaims {
                                 scope: scope.clone(),
                                 time_constraint: TimeConstraint::unbounded(),
                                 is_important: true,
@@ -332,14 +275,14 @@ impl seccfg::ServerSecurityConfig for CustomSecurityConfig {
             }
         }
 
-        // Check if unauthenticated clients are allowed
+        // If no preconfigured client matches, check if unauthenticated access is allowed
         if let Some(unauth_scope) = &self.unauthenticated_scope {
-            println!("Unauthenticated clients are generally accepted, evaluating credential.");
+            println!("No preconfigured client found, checking unauthenticated access");
             if let Some(credential_by_value) = id_cred_x.get_ccs().as_ref() {
-                println!("The unauthorized client provided a usable credential by value.");
+                println!("Allowing unauthenticated client with provided credential");
                 return Some((
                     credential_by_value.clone(),
-                    CustomClaims {
+                    EdhocClaims {
                         scope: unauth_scope.clone(),
                         time_constraint: TimeConstraint::unbounded(),
                         is_important: false,
@@ -348,12 +291,12 @@ impl seccfg::ServerSecurityConfig for CustomSecurityConfig {
             }
         }
 
-        println!("No matching credential found for peer.");
+        println!("No valid credential found - access denied");
         None
     }
 
     fn nosec_authorization(&self) -> Option<Self::GeneralClaims> {
-        self.unauthenticated_scope.as_ref().map(|scope| CustomClaims {
+        self.unauthenticated_scope.as_ref().map(|scope| EdhocClaims {
             scope: scope.clone(),
             time_constraint: TimeConstraint::unbounded(),
             is_important: false,
@@ -366,50 +309,106 @@ impl seccfg::ServerSecurityConfig for CustomSecurityConfig {
     ) -> Result<(), seccfg::NotAllowedRenderingFailed> {
         use coap_message::Code;
         message.set_code(M::Code::new(coap_numbers::code::UNAUTHORIZED).map_err(|_| {
-            println!("Error: CoAP stack can not represent Unauthorized responses.");
+            println!("Error: CoAP stack cannot represent Unauthorized responses");
             seccfg::NotAllowedRenderingFailed
         })?);
-        message
-            .set_payload(self.request_creation_hints)
-            .map_err(|_| {
-                println!("Error: Request creation hints do not fit in error message.");
-                seccfg::NotAllowedRenderingFailed
-            })?;
+        
+        if !self.request_creation_hints.is_empty() {
+            message
+                .set_payload(self.request_creation_hints)
+                .map_err(|_| {
+                    println!("Error: Request creation hints do not fit in error message");
+                    seccfg::NotAllowedRenderingFailed
+                })?;
+        }
         Ok(())
     }
 }
 
-// Generate credential pair function - simplified version without cbo! macro
-fn generate_credpair() -> (Credential, lakers::BytesP256ElemLen) {
-    let mut crypto = lakers_crypto_rustcrypto::Crypto::new(RiotRng);
-    let (private, public) = crypto.p256_generate_key_pair();
+// Function to generate public key from the fixed private key
+fn compute_public_key_from_private(private_key: &[u8; 32]) -> [u8; 64] {
+    use p256::{SecretKey, PublicKey};
+    use p256::elliptic_curve::sec1::ToEncodedPoint;
     
-    // Create a simple credential with the public key
-    // This is a minimal CCS (CBOR Credential Set) structure
+    // Create secret key from our fixed private key
+    let secret_key = SecretKey::from_slice(private_key)
+        .expect("Private key should be valid P-256 scalar");
+    
+    // Derive the corresponding public key
+    let public_key = PublicKey::from(&secret_key);
+    
+    // Get the uncompressed point coordinates
+    let encoded_point = public_key.to_encoded_point(false);
+    let coords = encoded_point.coordinates();
+    
+    let mut public_key_bytes = [0u8; 64];
+    if let Some((x, y)) = coords {
+        public_key_bytes[..32].copy_from_slice(x.as_slice());
+        public_key_bytes[32..].copy_from_slice(y.as_slice());
+    }
+    
+    public_key_bytes
+}
+
+// Modified credential generation function using fixed private key
+fn generate_credpair_with_fixed_key() -> (Credential, lakers::BytesP256ElemLen) {
+    // Use the fixed private key
+    let private_key = FIXED_PRIVATE_KEY;
+    
+    // Compute the corresponding public key
+    let public_key_bytes = compute_public_key_from_private(&private_key);
+    let (x_coord, y_coord) = public_key_bytes.split_at(32);
+    
+    // Create proper CBOR Credential Set (CCS) structure
+    // Structure: {8: {1: {1: 2, -1: 1, -2: x_coord, -3: y_coord}}}
+    // This represents: {cnf: {COSE_Key: {kty: EC2, crv: P-256, x: x_coord, y: y_coord}}}
     let mut cred_bytes = heapless::Vec::<u8, 128>::new();
     
-    // Simple CBOR structure: {8: {1: {1: 2, 2: h'', -1: 1, -2: public_key}}}
-    // This represents: {cnf: {COSE_Key: {kty: EC2, kid: empty, crv: P-256, x: public_key}}}
+    // Build CBOR structure manually
     cred_bytes.extend_from_slice(&[
-        0xA1, 0x08, 0xA1, 0x01, 0xA4, 0x01, 0x02, 0x02, 0x40, 0x20, 0x01, 0x21, 0x58, 0x20
+        0xA1, // Map with 1 pair
+        0x08, // Key: 8 (cnf)
+        0xA1, // Value: Map with 1 pair  
+        0x01, // Key: 1 (COSE_Key)
+        0xA4, // Value: Map with 4 pairs
+        0x01, 0x02, // kty: 2 (EC2)
+        0x20, 0x01, // crv: 1 (P-256)  
+        0x21, 0x58, 0x20, // x: bytes(32)
     ]).unwrap();
-    cred_bytes.extend_from_slice(&public).unwrap();
+    cred_bytes.extend_from_slice(x_coord).unwrap();
+    cred_bytes.extend_from_slice(&[
+        0x22, 0x58, 0x20, // y: bytes(32)
+    ]).unwrap();
+    cred_bytes.extend_from_slice(y_coord).unwrap();
     
-    let credential = Credential::parse_ccs(&cred_bytes).expect("Valid credential");
-    println!("Generated private/public key pair.");
+    let credential = Credential::parse_ccs(&cred_bytes).expect("Valid credential structure");
+    println!("Generated EDHOC credential pair using fixed private key");
+    println!("Private key: {:02x?}", private_key);
+    println!("Public key x: {:02x?}", x_coord);
+    println!("Public key y: {:02x?}", y_coord);
     
-    (credential, private)
+    // Convert private key to lakers format
+    let mut lakers_private_key = lakers::BytesP256ElemLen::new();
+    lakers_private_key.copy_from_slice(&private_key);
+    
+    (credential, lakers_private_key)
 }
 
-// Dummy keys for testing - replace with real keys later
-fn get_dummy_as_symmetric_key() -> [u8; 32] {
-    [0x42; 32] // Dummy symmetric key
-}
-
-fn get_dummy_as_asymmetric_key() -> ([u8; 32], [u8; 32]) {
-    // Dummy ES256 public key coordinates
-    let x = [0x01; 32];
-    let y = [0x02; 32];
+// Real AS public key - replace with your actual Authorization Server's public key
+fn get_as_public_key() -> ([u8; 32], [u8; 32]) {
+    // These should be the actual P-256 public key coordinates of your Authorization Server
+    let x = [
+        0x0d, 0x8d, 0x5d, 0x2e, 0x1b, 0x02, 0x82, 0xe1,
+        0x0e, 0xa0, 0x61, 0x1e, 0x6a, 0x9b, 0x49, 0xaf,
+        0xbe, 0x1b, 0x0e, 0xbd, 0xcd, 0x9a, 0x89, 0x5c,
+        0x7a, 0x27, 0x20, 0x25, 0xdd, 0x37, 0xf8, 0x35
+    ];
+    let y = [
+        0x62, 0x12, 0x57, 0x45, 0x49, 0x87, 0xe1, 0xf7,
+        0x23, 0x5a, 0xf9, 0xd6, 0x81, 0x33, 0x59, 0xf4,
+        0x0a, 0x7a, 0xa8, 0x06, 0xf4, 0x2b, 0x75, 0x10,
+        0x3a, 0x2d, 0xca, 0x61, 0x2f, 0xb1, 0xe6, 0xac
+    ];
     (x, y)
 }
 
@@ -428,8 +427,8 @@ fn main() {
         { riot_coap_handler_demos::ping_passive::DEFAULT_SIZE },
     > = riot_coap_handler_demos::ping_passive::PingHistoryMutex::new();
 
-    // Generate server credentials
-    let (own_credential, own_private_key) = generate_credpair();
+    // Generate server's EDHOC credentials using the fixed private key
+    let (own_credential, own_private_key) = generate_credpair_with_fixed_key();
     
     // Create RNG and crypto factory
     let rng = RiotRng;
@@ -439,7 +438,7 @@ fn main() {
     };
     let time = TimeUnknown;
 
-    // Build the base handler tree first
+    // Build the base handler tree
     let base_handler = coap_message_demos::full_application_tree(None)
         .below(&["ps"], riot_coap_handler_demos::ps::ps_tree())
         .below(&["led"], riot_coap_handler_demos::led::all_leds())
@@ -460,15 +459,12 @@ fn main() {
         )
         .with_wkc();
 
-    // Create custom security configuration
-    let security_config = CustomSecurityConfig::new()
-        .with_symmetric_as_key(get_dummy_as_symmetric_key())
-        .with_asymmetric_as_key(
-            get_dummy_as_asymmetric_key().0,
-            get_dummy_as_asymmetric_key().1,
-            String::from("test-rs").unwrap()
-        )
+    // Create EDHOC security configuration
+    let (as_x, as_y) = get_as_public_key();
+    let security_config = EdhocSecurityConfig::new()
+        .with_as_public_key(as_x, as_y)
         .with_own_edhoc_credential(own_credential, own_private_key)
+        .with_audience("test-rs")
         .allow_unauthenticated(scope::AllowAll.into());
 
     // Wrap the base handler with EDHOC/OSCORE security
@@ -502,8 +498,13 @@ fn main() {
         greg.register(&mut listener);
 
         println!(
-            "CoAP server ready with EDHOC endpoint at /.well-known/edhoc; waiting for interfaces to settle before reporting addresses..."
+            "CoAP server ready with EDHOC endpoint at /.well-known/edhoc"
         );
+        println!("Security configuration:");
+        println!("  - AS public key configured for token verification");
+        println!("  - Own EDHOC credential generated with FIXED private key");
+        println!("  - Unauthenticated access allowed");
+        println!("Waiting for interfaces to settle before reporting addresses...");
 
         let sectimer = ztimer::Clock::sec();
         sectimer.sleep(ztimer::Ticks(2));
@@ -526,8 +527,7 @@ fn main() {
             }
         }
 
-        // Sending main thread to sleep; can't return or the Gcoap handler would need to be
-        // deregistered (which it can't).
+        // Keep the main thread running
         loop {
             PINGS.tick();
             sectimer.sleep(ztimer::Ticks(1));
