@@ -280,6 +280,7 @@ typedef enum {
     IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
     IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
     IEEE802154_PHY_MR_FSK,          /**< Multi-Rate Frequency Shift Keying */
+    IEEE802154_PHY_LORA,            /**< LoRa modulation (no standard for IEEE 802.15.4) */
 
     IEEE802154_PHY_NO_OP,           /**< don't change PHY configuration */
 } ieee802154_phy_mode_t;
