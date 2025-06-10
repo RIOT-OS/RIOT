@@ -12,6 +12,10 @@
 #define ATOMIC_BITMASK_SET_WRITE 0x2000
 #define ATOMIC_BITMASK_CLEAR_WRITE 0x3000
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Perform an atomic XOR write to a register
  *
@@ -49,3 +53,7 @@ static inline void reset_component(uint32_t reset_value,
     // Wait for the reset to complete
   }
 }
+
+#ifdef __cplusplus
+}
+#endif

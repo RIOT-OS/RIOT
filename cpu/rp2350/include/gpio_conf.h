@@ -6,6 +6,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Possible function values for @ref gpio_io_ctrl_t::function_select
  */
@@ -28,3 +32,7 @@ typedef enum {
                               *   (function depends on pin) */
   FUNCTION_SELECT_NONE = 31, /**< Reset value, pin unconnected */
 } gpio_function_select_t;
+
+#ifdef __cplusplus
+}
+#endif

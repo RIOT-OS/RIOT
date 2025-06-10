@@ -68,6 +68,10 @@
 #define PDIV ((PD1 << PLL_PRIM_POSTDIV1_LSB) | (PD2 << PLL_PRIM_POSTDIV2_LSB))
 #define FBDIV ((VCO_FREQ / XOSC_HZ) / REF_DIV)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Configures the Crystal to run.
  *
@@ -104,3 +108,7 @@ void clock_reset(void);
  * @note RP2350 Docs Chapter 8, mostly 8.2 for more details
  */
 void cpu_clock_init(void);
+
+#ifdef __cplusplus
+}
+#endif
