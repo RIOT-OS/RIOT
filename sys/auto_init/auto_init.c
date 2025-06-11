@@ -27,18 +27,7 @@
 #include "auto_init_priorities.h"
 #include "kernel_defines.h"
 
-#define ENABLE_DEBUG CONFIG_AUTO_INIT_ENABLE_DEBUG
-#include "debug.h"
-
 XFA_INIT_CONST(auto_init_module_t, auto_init_xfa);
-
-static inline void _auto_init_module(const volatile auto_init_module_t *module)
-{
-#if IS_ACTIVE(CONFIG_AUTO_INIT_ENABLE_DEBUG)
-    DEBUG("auto_init: %s (%u)\n", module->name, module->prio);
-#endif
-    module->init();
-}
 
 #if IS_USED(MODULE_AUTO_INIT_ZTIMER)
 extern void ztimer_init(void);
@@ -173,6 +162,11 @@ AUTO_INIT(auto_init_devfs,
 extern void auto_init_vfs(void);
 AUTO_INIT(auto_init_vfs,
           AUTO_INIT_PRIO_MOD_VFS);
+#endif
+#if IS_USED(MODULE_CONFIGURATION)
+extern void auto_init_configuration(void);
+AUTO_INIT(auto_init_configuration,
+          AUTO_INIT_PRIO_MOD_CONFIGURATION);
 #endif
 #if IS_USED(MODULE_AUTO_INIT_GNRC_IPV6_NIB)
 extern void gnrc_ipv6_nib_init(void);
@@ -353,6 +347,6 @@ AUTO_INIT(psa_crypto_init,
 void auto_init(void)
 {
     for (unsigned i = 0; i < XFA_LEN(auto_init_module_t, auto_init_xfa); i++) {
-        _auto_init_module(&auto_init_xfa[i]);
+        auto_init_module(&auto_init_xfa[i]);
     }
 }
