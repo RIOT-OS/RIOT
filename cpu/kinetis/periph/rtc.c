@@ -66,9 +66,27 @@ void rtc_init(void)
 
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
     uint32_t t = rtc_mktime(time);
+
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
 
     /* Disable time counter before writing to the timestamp register */
     bit_clear32(&RTC->SR, RTC_SR_TCE_SHIFT);
@@ -78,6 +96,7 @@ int rtc_set_time(struct tm *time)
     /* Enable when done */
     bit_set32(&RTC->SR, RTC_SR_TCE_SHIFT);
 
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 

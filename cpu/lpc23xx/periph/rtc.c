@@ -66,6 +66,20 @@ void rtc_init(void)
           RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC);
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 /**
  * @brief   Sets the current time in broken down format directly from to RTC
  * @param[in]   localt      Pointer to structure with time to set
@@ -79,6 +93,10 @@ int rtc_set_time(struct tm *localt)
     /* normalize input */
     rtc_tm_normalize(localt);
 
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, localt);
+
     /* set clock */
     RTC_SEC   = localt->tm_sec;
     RTC_MIN   = localt->tm_min;
@@ -89,6 +107,7 @@ int rtc_set_time(struct tm *localt)
     RTC_MONTH = localt->tm_mon + 1;
     RTC_YEAR  = localt->tm_year;
 
+    rtc_post_set_time(&old_time, localt);
     return 0;
 }
 
