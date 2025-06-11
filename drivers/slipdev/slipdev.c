@@ -32,9 +32,18 @@
 
 #include "isrpipe.h"
 #include "mutex.h"
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
 #include "net/nanocoap.h"
+#endif
 #include "stdio_uart.h"
 
+
+#if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG))
+/* For synchronization with stdio/config threads */
+mutex_t slipdev_mutex = MUTEX_INIT;
+#endif
+
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
 #define COAP_STACKSIZE (1024)
 
 /* Magic values for the fcs */
@@ -69,19 +78,20 @@ static const uint16_t FCS_LOOKUP[256] = {
 };
 
 static char coap_stack[COAP_STACKSIZE];
+#endif /* IS_USED(MODULE_SLIPDEV_CONFIG) */
 
 static int _check_state(slipdev_t *dev);
 
 static inline void slipdev_lock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         mutex_lock(&slipdev_mutex);
     }
 }
 
 static inline void slipdev_unlock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         mutex_unlock(&slipdev_mutex);
     }
 }
@@ -91,7 +101,6 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
     slipdev_t *dev = arg;
 
     switch (dev->state) {
-#if IS_USED(MODULE_SLIPDEV_STDIO)
     case SLIPDEV_STATE_STDIN:
         switch (byte) {
         case SLIPDEV_ESC:
@@ -101,7 +110,9 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             dev->state = SLIPDEV_STATE_NONE;
             break;
         default:
+#if IS_USED(MODULE_SLIPDEV_STDIO)
             isrpipe_write_one(&stdin_isrpipe, byte);
+#endif
             break;
         }
         return;
@@ -115,19 +126,24 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             break;
         }
         dev->state = SLIPDEV_STATE_STDIN;
+#if IS_USED(MODULE_SLIPDEV_STDIO)
         isrpipe_write_one(&stdin_isrpipe, byte);
-        return;
+#endif
+        return;      
     case SLIPDEV_STATE_CONFIG:
         switch (byte) {
         case SLIPDEV_ESC:
             dev->state = SLIPDEV_STATE_CONFIG_ESC;
             break;
         case SLIPDEV_END:
-            crb_end_chunk(&dev->rb_config, true);
             dev->state = SLIPDEV_STATE_NONE;
+#if IS_USED(MODULE_SLIPDEV_CONFIG) 
+            crb_end_chunk(&dev->rb_config, true);
             thread_flags_set(thread_get(dev->coap_server_pid), 1);
+#endif
             break;
         default:
+#if IS_USED(MODULE_SLIPDEV_CONFIG) 
             /* discard frame if byte can't be added */
             if (!crb_add_byte(&dev->rb_config, byte)) {
                 DEBUG("slipdev: rx buffer full, drop frame\n");
@@ -135,6 +151,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
                 dev->state = SLIPDEV_STATE_NONE;
                 return;
             }
+#endif
             break;
         }
         return;
@@ -147,6 +164,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             byte = SLIPDEV_ESC;
             break;
         }
+#if IS_USED(MODULE_SLIPDEV_CONFIG) 
         /* discard frame if byte can't be added */
         if (!crb_add_byte(&dev->rb_config, byte)) {
             DEBUG("slipdev: rx buffer full, drop frame\n");
@@ -154,9 +172,9 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             dev->state = SLIPDEV_STATE_NONE;
             return;
         }
+#endif
         dev->state = SLIPDEV_STATE_CONFIG;
         return;
-#endif
     case SLIPDEV_STATE_NONE:
         /* is diagnostic frame? */
         if (IS_USED(MODULE_SLIPDEV_STDIO) &&
@@ -167,10 +185,12 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
         }
 
         if (byte == SLIPDEV_CONFIG_START) {
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
             /* try to create new frame */
             if (!crb_start_chunk(&dev->rb_config)) {
                 return;
             }
+#endif
             dev->state = SLIPDEV_STATE_CONFIG;
             return;
         }
@@ -180,7 +200,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             return;
         }
 
-        /* try to create new frame */
+        /* try to create new ip frame */
         if (!crb_start_chunk(&dev->rb)) {
             return;
         }
@@ -283,8 +303,8 @@ void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len)
 
 static int _check_state(slipdev_t *dev)
 {
-    /* power states not supported when multiplexing stdio */
-    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+    /* power states not supported when multiplexing stdio / configuration */
+    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         return 0;
     }
 
@@ -357,7 +377,7 @@ static void _isr(netdev_t *netdev)
     }
 }
 
-#if !IS_USED(MODULE_SLIPDEV_STDIO)
+#if !(IS_USED(MODULE_SLIPDEV_STDIO) ||  IS_USED(MODULE_SLIPDEV_CONFIG))
 static int _set_state(slipdev_t *dev, netopt_state_t state)
 {
     if (IS_USED(MODULE_SLIPDEV_STDIO)) {
@@ -394,7 +414,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t max_le
         return -ENOTSUP;
     }
 }
-#endif /* !MODULE_SLIPDEV_STDIO */
+#endif /* !(MODULE_SLIPDEV_STDIO || MODULE_SLIPDEV_CONFIG) */
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
@@ -433,14 +453,14 @@ static const netdev_driver_t slip_driver = {
     .isr = _isr,
     .get = _get,
     .confirm_send = _confirm_send,
-#if IS_USED(MODULE_SLIPDEV_STDIO)
+#if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG))
     .set = netdev_set_notsup,
 #else
     .set = _set,
 #endif
 };
 
-#if IS_USED(MODULE_SLIPDEV_STDIO)
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
 static uint16_t _fcs_part(const uint8_t * data, size_t len) {
     uint16_t fcs = SPECIAL_INIT_FCS;
     for (size_t i = 0; i < len; ++i)
@@ -505,11 +525,11 @@ static void *_coap_server_thread(void *arg)
 
     return NULL;
 }
-#endif
+#endif /* MODULE_SLIPDEV_CONFIG */
 
 void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index)
 {
-#if IS_USED(MODULE_SLIPDEV_STDIO)
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
     crb_init(&dev->rb_config, dev->rxmem_config, sizeof(dev->rxmem_config));
 
     dev->coap_server_pid = thread_create(coap_stack, sizeof(coap_stack), THREAD_PRIORITY_MAIN - 1,

@@ -136,7 +136,7 @@ typedef struct {
 
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
 
-#if IS_USED(MODULE_SLIPDEV_STDIO)
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
     chunk_ringbuf_t rb_config;              /**< Ringbuffer to store received CONFIG frames.*/
     uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE]; /**< memory used by RX buffer */
     kernel_pid_t coap_server_pid;           /**< The PID of the CoAP server */
