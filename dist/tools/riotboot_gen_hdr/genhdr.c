@@ -14,6 +14,7 @@
 
 #include <errno.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -140,7 +141,23 @@ int updatehdr(int argc, char *argv[])
     return 0;
 }
 
-int readhdr(const char *file)
+static void print_hdr(const riotboot_hdr_t *hdr)
+{
+    printf("version: %u\n", hdr->version);
+    printf("address: 0x%x\n", hdr->start_addr);
+    printf("checksum: %svalid\n", riotboot_hdr_validate(hdr) ? "in" : "");
+}
+
+static void print_hdr_json(const riotboot_hdr_t *hdr)
+{
+    printf("{\n");
+    printf("\t\"version\": %u,\n", hdr->version);
+    printf("\t\"address\": %u,\n", hdr->start_addr);
+    printf("\t\"valid\": %s\n", riotboot_hdr_validate(hdr) ? "false" : "true");
+    printf("}\n");
+}
+
+int readhdr(const char *file, bool json)
 {
     riotboot_hdr_t hdr = { 0 };
     int res = from_file(file, &hdr, sizeof(hdr));
@@ -154,9 +171,11 @@ int readhdr(const char *file)
         return -EIO;
     }
 
-    printf("version: %u\n", hdr.version);
-    printf("address: 0x%x\n", hdr.start_addr);
-    printf("checksum: %svalid\n", riotboot_hdr_validate(&hdr) ? "in" : "");
+    if (json) {
+        print_hdr_json(&hdr);
+    } else {
+        print_hdr(&hdr);
+    }
 
     return 0;
 }
