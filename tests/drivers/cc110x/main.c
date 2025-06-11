@@ -74,12 +74,14 @@ static int sc_dump(int argc, char **argv)
         }
 
         if (new_state) {
+            gnrc_netreg_entry_init_pid(&dump, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
             if (gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &dump)) {
                 puts("Failed to register packet dumping");
             }
         }
         else {
             gnrc_netreg_unregister(GNRC_NETTYPE_SIXLOWPAN, &dump);
+            gnrc_netreg_entry_init_pid(&dump, 0, KERNEL_PID_UNDEF);
         }
 
         is_enabled = new_state;
@@ -95,9 +97,6 @@ int main(void)
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
-    gnrc_netreg_entry_init_pid(&dump, GNRC_NETREG_DEMUX_CTX_ALL,
-                               gnrc_pktdump_pid);
 
     puts("cc110x driver test application\n"
          "==============================\n"
