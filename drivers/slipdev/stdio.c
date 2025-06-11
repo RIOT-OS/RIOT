@@ -24,8 +24,6 @@
 #include "stdio_base.h"
 #include "stdio_uart.h"
 
-mutex_t slipdev_mutex = MUTEX_INIT;
-
 static void _isrpipe_write(void *arg, uint8_t data)
 {
     isrpipe_write_one(arg, (char)data);
