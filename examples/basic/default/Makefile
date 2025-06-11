@@ -30,7 +30,8 @@ QUIET ?= 1
 CFLAGS += "-DCONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX=10"
 
 # Modules to include:
-USEMODULE += slipdev_stdio
+USEMODULE += slipdev_config
+#USEMODULE += slipdev_stdio
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
