@@ -37,7 +37,6 @@
 #endif
 #include "stdio_uart.h"
 
-
 #if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG))
 /* For synchronization with stdio/config threads */
 mutex_t slipdev_mutex = MUTEX_INIT;
@@ -129,7 +128,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
 #if IS_USED(MODULE_SLIPDEV_STDIO)
         isrpipe_write_one(&stdin_isrpipe, byte);
 #endif
-        return;      
+        return;
     case SLIPDEV_STATE_CONFIG:
         switch (byte) {
         case SLIPDEV_ESC:
@@ -137,13 +136,13 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             break;
         case SLIPDEV_END:
             dev->state = SLIPDEV_STATE_NONE;
-#if IS_USED(MODULE_SLIPDEV_CONFIG) 
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
             crb_end_chunk(&dev->rb_config, true);
             thread_flags_set(thread_get(dev->coap_server_pid), 1);
 #endif
             break;
         default:
-#if IS_USED(MODULE_SLIPDEV_CONFIG) 
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
             /* discard frame if byte can't be added */
             if (!crb_add_byte(&dev->rb_config, byte)) {
                 DEBUG("slipdev: rx buffer full, drop frame\n");
@@ -164,7 +163,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             byte = SLIPDEV_ESC;
             break;
         }
-#if IS_USED(MODULE_SLIPDEV_CONFIG) 
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
         /* discard frame if byte can't be added */
         if (!crb_add_byte(&dev->rb_config, byte)) {
             DEBUG("slipdev: rx buffer full, drop frame\n");
