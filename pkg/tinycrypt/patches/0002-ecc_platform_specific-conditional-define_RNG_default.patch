@@ -1,0 +1,27 @@
+From daf508e6e9f4bc9bdcfa2f9bda523f17444603af Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Mon, 14 Apr 2025 15:49:37 +0200
+Subject: [PATCH 2/2] ecc_platform_specific: conditional define_RNG_default
+
+To be able to control whether `default_CSPNRG` is used or not during compilation, `define_RNG_default` is defined conditionally.
+---
+ lib/include/tinycrypt/ecc_platform_specific.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/include/tinycrypt/ecc_platform_specific.h b/lib/include/tinycrypt/ecc_platform_specific.h
+index e2c8823..f2385b6 100644
+--- a/lib/include/tinycrypt/ecc_platform_specific.h
++++ b/lib/include/tinycrypt/ecc_platform_specific.h
+@@ -74,7 +74,9 @@
+  * for some platforms, such as Unix and Linux. For other platforms, you may need
+  * to provide another PRNG function.
+ */
++#ifndef default_RNG_defined
+ #define default_RNG_defined 1
++#endif
+ 
+ int default_CSPRNG(uint8_t *dest, unsigned int size);
+ 
+-- 
+2.34.1
+

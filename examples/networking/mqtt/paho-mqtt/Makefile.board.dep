@@ -1,7 +1,9 @@
 # Put board specific dependencies here
 
 ifneq (,$(filter arch_esp,$(FEATURES_USED)))
-  USEMODULE += esp_wifi
+  ifneq (esp32h2,$(CPU_FAM))
+    USEMODULE += esp_wifi
+  endif
 endif
 
 ifneq (,$(filter native native32 native64,$(BOARD)))

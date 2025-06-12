@@ -145,6 +145,10 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue );
         xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), \
                            queueSEND_TO_BACK )
 
+#define xQueueSendToFront( xQueue, pvItemToQueue, xTicksToWait ) \
+        xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), \
+                           queueSEND_TO_FRONT )
+
 #define xQueueSendFromISR( xQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) \
         xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \
                                   ( pxHigherPriorityTaskWoken ), \
@@ -154,6 +158,11 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue );
         xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \
                                   ( pxHigherPriorityTaskWoken ), \
                                   queueSEND_TO_BACK )
+
+#define xQueueSendToFrontFromISR( xQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) \
+        xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \
+                                  ( pxHigherPriorityTaskWoken ), \
+                                  queueSEND_TO_FRONT )
 
 #define xQueueOverwriteFromISR( xQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) \
         xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \

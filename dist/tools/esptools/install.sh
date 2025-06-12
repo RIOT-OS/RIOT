@@ -1,7 +1,6 @@
 #!/bin/sh
 
 ESP32_GCC_RELEASE="esp-14.2.0_20241119"
-ESP32_GCC_VERSION_DIR="14.2.0"
 ESP32_GCC_VERSION_DOWNLOAD="14.2.0_20241119"
 
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
@@ -11,6 +10,8 @@ ESP32_OPENOCD_VERSION_TGZ="0.12.0-esp32-20241016"
 
 ESP32_QEMU_VERSION="esp-develop-9.0.0-20240606"
 ESP32_QEMU_VERSION_DOWNLOAD="esp_develop_9.0.0_20240606"
+
+ESPTOOL_VERSION="v4.8.1"
 
 GDB_VERSION="14.2_20240403"
 
@@ -47,14 +48,17 @@ case "${PLATFORM}" in
     linux-amd64|linux64|Linux-x86_64|FreeBSD-amd64|x86_64-linux-gnu)
         OS="x86_64-linux-gnu"
         OS_OCD="linux-amd64"
+        OS_ESPTOOL="linux-amd64"
         ;;
     linux-arm64|Linux-arm64|Linux-aarch64|Linux-armv8l|aarch64)
         OS="aarch64-linux-gnu"
         OS_OCD="linux-arm64"
+        OS_ESPTOOL="linux-arm64"
         ;;
     linux-armel|Linux-arm|Linux-armv7l|arm-linux-gnueabi)
         OS="arm-linux-gnueabi"
         OS_OCD="linux-armel"
+        OS_ESPTOOL="linux-arm32"
         ;;
     linux-armhf|arm-linux-gnueabihf)
         OS="arm-linux-gnueabihf"
@@ -66,10 +70,12 @@ case "${PLATFORM}" in
     macos|osx|darwin|Darwin-x86_64|x86_64-apple-darwin)
         OS="x86_64-apple-darwin"
         OS_OCD="macos"
+        OS_ESPTOOL="macos"
         ;;
     macos-arm64|Darwin-arm64|aarch64-apple-darwin|arm64-apple-darwin)
         OS="aarch64-apple-darwin"
         OS_OCD="macos-arm64"
+        OS_ESPTOOL="macos"
         ;;
     *)
         echo "error: OS architecture ${PLATFORM} not supported"
@@ -99,7 +105,7 @@ install_arch()
             TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
-        esp32c3)
+        esp32c3|esp32h2)
             TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
@@ -111,7 +117,7 @@ install_arch()
     TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}"
 
     if [ "$1" = "esp8266" ]; then
-        git clone https://github.com/gschorcht/xtensa-esp8266-elf ${TOOLS_DIR}/${TARGET_ARCH}
+        git clone https://github.com/gschorcht/xtensa-esp8266-elf "${TOOLS_DIR}/${TARGET_ARCH}"
     else
         URL_PATH="https://github.com/espressif/crosstool-NG/releases/download"
         URL_TGZ="${TARGET_ARCH}-${ESP32_GCC_VERSION_DOWNLOAD}-${OS}.tar.xz"
@@ -232,15 +238,42 @@ install_gdb()
     echo "GDB for $1 installed in ${TOOLS_DIR}"
 }
 
+install_esptool()
+{
+    if [ "${OS_ESPTOOL}" = "" ]; then
+        echo "OS not supported by esptool binary"
+        exit 1
+    fi
+
+    TOOLS_DIR="${TOOLS_PATH}/esptool/${ESPTOOL_VERSION}"
+
+    URL_PATH="https://github.com/espressif/esptool/releases/download"
+    URL_FILE="esptool-${ESPTOOL_VERSION}-${OS_ESPTOOL}.zip"
+    URL="${URL_PATH}/${ESPTOOL_VERSION}/${URL_FILE}"
+
+    echo "Creating directory ${TOOLS_DIR} ..." && \
+    mkdir -p "${TOOLS_DIR}" && \
+    cd "${TOOLS_DIR}" && \
+    echo "Downloading ${URL_FILE} ..." && \
+    download "${URL}" "${URL_FILE}" && \
+    echo "Extracting ${URL_FILE} in ${TOOLS_DIR} ..." && \
+    unzip -u "${URL_FILE}" && \
+    echo "Removing ${URL_FILE} ..." && \
+    rm -f "${URL_FILE}" && \
+    chmod a+x "${TOOLS_DIR}/esptool-${OS_ESPTOOL}/esp*" && \
+    echo "esptool for ESP32x SoCs installed in ${TOOLS_DIR}/esptool-${OS_ESPTOOL}"
+}
+
 if [ -z "$1" ]; then
     echo "Usage: install.sh <tool>"
     echo "       install.sh gdb <platform>"
     echo "       install.sh qemu <platform>"
-    echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
+    echo "<tool> = all | esptool | gdb | openocd | qemu |"
+    echo "         esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
     exit 1
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32h2 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         install_arch "$arch"
     done
@@ -249,6 +282,7 @@ elif [ "$1" = "all" ]; then
     install_openocd
     install_qemu xtensa
     install_qemu riscv
+    install_esptool
 elif [ "$1" = "gdb" ]; then
     if [ -z "$2" ]; then
         echo "platform required: xtensa | riscv"
@@ -259,6 +293,8 @@ elif [ "$1" = "openocd" ]; then
     install_openocd
 elif [ "$1" = "qemu" ]; then
     install_qemu "$2"
+elif [ "$1" = "esptool" ]; then
+    install_esptool
 else
     install_arch "$1"
 fi
