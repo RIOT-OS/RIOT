@@ -50,8 +50,8 @@ void cpu_clock_init(void) {
   // This register contains one decoded bit for each of the clock sources
   // enumerated in the CTRL SRC field. The bit does not directly correlate with
   // the value of the SRC field For example 0x0 is the first bit while 0x1 is
-  // the second bit In some way this makes sense, in some way I lost too much
-  // time on this
+  // the second bit. In some way this makes sense, in some way I lost too much
+  // time on this.
   while (CLOCKS->CLK_SYS_SELECTED != 2) {
   }
 
