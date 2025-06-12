@@ -29,8 +29,8 @@ static inline void atomic_xor(volatile uint32_t *reg, uint32_t val) {
 /**
  * @brief Set bits in a register atomically
  *
- * @param[in] reg   Pointer to the target register
- * @param[in] val   Bit mask of bits to set
+ * @param[in,out] reg   Pointer to the target register
+ * @param[in] val       Bit mask of bits to set
  */
 static inline void atomic_set(volatile uint32_t *reg, uint32_t val) {
   *(volatile uint32_t *)((uintptr_t)reg | ATOMIC_BITMASK_SET_WRITE) = val;
