@@ -9,6 +9,7 @@ CFLAGS += -D$(CPU_MODEL)
 CFLAGS += -DROM_START_ADDR=$(ROM_START_ADDR)
 CFLAGS += -DRAM_START_ADDR=$(RAM_START_ADDR)
 CFLAGS += -Wno-error
+
 # Include paths
 INCLUDES += -I$(RIOTCPU)/rp2350/include
 INCLUDES += -isystem$(RIOTBASE)/dist/tools/picosdk/picosdk/src/rp2_common/cmsis/stub/CMSIS/Core/Include
