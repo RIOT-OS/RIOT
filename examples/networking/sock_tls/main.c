@@ -18,10 +18,14 @@
 #include "ca_cert.h"
 #include "cert_data.h"
 
-
-#define SERVER_PORT 12345
-#define BUFFER_SIZE 1024
-#define MAIN_QUEUE_SIZE 8
+#define SERVER_PORT         12345
+#define BUFFER_SIZE         1024
+#define MAIN_QUEUE_SIZE     8
+#define TLS_IO_TIMEOUT      30 //(in sec)
+#define RESPONSE_MSG_SERVER        "Hello from TLS server!"
+#define RESPONSE_MSG_LEN    (sizeof(RESPONSE_MSG_SERVER) - 1)
+#define READ_CHUNK_SIZE     256
+#define MAX_MSG_SIZE        1024
 
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
@@ -55,28 +59,25 @@ static int tls_server(int argc, char **argv) {
 
     while (1) {
         sock_tls_tcp_t *client_sock = NULL;
-        ret = sock_tls_tcp_accept(&tls_queue, &client_sock, 30 * 1000000);
+        ret = sock_tls_tcp_accept(&tls_queue, &client_sock, TLS_IO_TIMEOUT * 1000000);
         if (ret < 0) {
             printf("Server: Accept failed: %d\n", ret);
             ztimer_sleep(ZTIMER_MSEC, 1000);
             continue;
         }
 
-        char buffer[256];
+        char buffer[READ_CHUNK_SIZE];
         size_t total_received = 0;
-        size_t max_msg_size = 1024;
 
-        while (total_received < max_msg_size) {
-            ssize_t received = sock_tls_tcp_read(client_sock, buffer + total_received,
-                                               sizeof(buffer) - total_received);
+        while (total_received < MAX_MSG_SIZE) {
+            ssize_t received = sock_tls_tcp_read(client_sock, buffer, sizeof(buffer));
             if (received <= 0) break;
 
             total_received += received;
             printf("Server: Received %d bytes: %.*s\n",
-                   (int)received, (int)received, buffer + total_received - received);
+                   (int)received, (int)received, buffer);
 
-            const char *response = "Hello from TLS server!";
-            ssize_t sent = sock_tls_tcp_write(client_sock, response, strlen(response));
+            ssize_t sent = sock_tls_tcp_write(client_sock, RESPONSE_MSG_SERVER, RESPONSE_MSG_LEN);
             if (sent < 0) break;
             printf("Server: Sent response successfully\n");
         }

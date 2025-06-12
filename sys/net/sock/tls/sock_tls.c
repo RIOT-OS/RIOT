@@ -20,6 +20,7 @@
 #define MAX_RETRIES 3                 /* Maximum number of retry attempts */
 
 static int _wolfssl_tcp_receive(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
+    (void)ssl;
     sock_tls_tcp_t *sock = (sock_tls_tcp_t *)ctx;
     int total_received = 0;
     int remaining = sz;
@@ -54,6 +55,7 @@ static int _wolfssl_tcp_receive(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
 }
 
 static int _wolfssl_tcp_send(WOLFSSL* ssl, char* buf, int sz, void* ctx) {
+    (void)ssl;
     sock_tls_tcp_t *sock = (sock_tls_tcp_t *)ctx;
     int total_sent = 0;
     int remaining = sz;
