@@ -17,4 +17,6 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 0
 
+BOARD_WHITELIST := rpi-pico-2
+
 include $(RIOTBASE)/Makefile.include
