@@ -1,7 +1,11 @@
 # sys/net/sock/tls/Makefile.dep
 
-ifneq (,$(filter tcp_tls,$(USEMODULE)))
+ifneq (,$(filter sock_tls,$(USEMODULE)))
   # Only generic dependencies:
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_icmpv6_echo
+  USEMODULE += gnrc_sock_tcp
+  USEMODULE += sock_tcp
   USEMODULE += ztimer
   USEMODULE += ztimer_msec
 
