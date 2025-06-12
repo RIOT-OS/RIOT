@@ -75,12 +75,7 @@ extern "C" {
 
 /**
  * @brief   Configures the Crystal to run.
- *
- * @param   f_ref       Desired frequency in Hz
- *
- * @pre     1 MHz <= @p f_ref <= 15 MHz.
- *
- * The reference hardware manual suggests to use a 12 MHz crystal.
+ * @note The reference hardware manual suggests to use a 12 MHz crystal, which we use by default.
  */
 void xosc_start(void);
 
