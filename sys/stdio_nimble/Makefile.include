@@ -1,0 +1,16 @@
+# The program flow is based on ztimer calling the send function which calls
+# NimBLE functions. With and without debugging enabled, the standard Cortex-M
+# ISR stacksize of 512 bytes is too small for that.
+# To avoid collisions with other modules, this check is implemented.
+
+# extract the ISR_STACKSIZE variable out of the CFLAGS (if it is set)
+ISR_STACKSIZE_VAL := $(shell echo "$(CFLAGS)" | sed -n 's/.*-DISR_STACKSIZE=\([0-9]\{3,4\}\).*/\1/p')
+
+# set it to the desired value if it is unset or check if it is big enough
+ifeq ($(ISR_STACKSIZE_VAL),)
+  CFLAGS += "-DISR_STACKSIZE=1024"
+else
+  ifeq ($(shell sh [ $(ISR_STACKSIZE_VAL) -ge 1024 ] && echo OK || echo NOT_OK), NOT_OK)
+    $(error ISR_STACKSIZE = $(ISR_STACKSIZE_VAL) smaller than 1024, insufficient for stdio_nimble)
+  endif
+endif
