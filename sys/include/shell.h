@@ -325,6 +325,20 @@ int shell_readline(char *buf, size_t size);
  * SHELL_COMMAND(my_command, "my command help text", _my_command);
  * ```
  */
+
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
+#include "net/nanocoap.h"
+__attribute__ ((unused))
+static ssize_t _cmd_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+{
+
+    char * desc = (char *) context->resource->context;
+    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
+            COAP_FORMAT_TEXT, (uint8_t*)desc, strlen(desc));
+}
+#endif
+
+#if !IS_USED(MODULE_SLIPDEV_CONFIG)
 #define SHELL_COMMAND(cmd, help, func) \
     XFA_USE_CONST(shell_command_xfa_t, shell_commands_xfa_v2); \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_name[] = #cmd; \
@@ -334,6 +348,22 @@ int shell_readline(char *buf, size_t size);
         .desc = _xfa_ ## cmd ## _cmd_desc, \
         .handler = &func \
     };
+#else
+#define SHELL_COMMAND(cmd, help, func) \
+    XFA_USE_CONST(shell_command_xfa_t, shell_commands_xfa_v2); \
+    static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_name[] = #cmd; \
+    static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_desc[] = help; \
+    XFA_CONST(shell_command_xfa_t, shell_commands_xfa_v2, 0) _xfa_ ## cmd ## _cmd = { \
+        .name = _xfa_ ## cmd ## _cmd_name, \
+        .desc = _xfa_ ## cmd ## _cmd_desc, \
+        .handler = &func \
+    }; \
+    extern ssize_t _cmd_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context); \
+    NANOCOAP_RESOURCE(cmd) { \
+        .path = "/shell/" #cmd, .methods = COAP_GET, .handler = _cmd_handler, .context = help \
+    };
+#endif
+
 #endif /* __cplusplus */
 
 #ifdef __cplusplus
