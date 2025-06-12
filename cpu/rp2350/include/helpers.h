@@ -39,8 +39,8 @@ static inline void atomic_set(volatile uint32_t *reg, uint32_t val) {
 /**
  * @brief Clear bits in a register atomically
  *
- * @param[in] reg   Pointer to the target register
- * @param[in] val   Bit mask of bits to clear
+ * @param[in,out] reg   Pointer to the target register
+ * @param[in] val       Bit mask of bits to clear
  */
 static inline void atomic_clear(volatile uint32_t *reg, uint32_t val) {
   *(volatile uint32_t *)((uintptr_t)reg | ATOMIC_BITMASK_CLEAR_WRITE) = val;
