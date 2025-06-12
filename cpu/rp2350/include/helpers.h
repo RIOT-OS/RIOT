@@ -19,8 +19,8 @@ extern "C" {
 /**
  * @brief Perform an atomic XOR write to a register
  *
- * @param[in] reg   Pointer to the target register
- * @param[in] val   Value to be XORed with the register
+ * @param[in,out] reg   Pointer to the target register
+ * @param[in] val       Value to be XORed with the register
  */
 static inline void atomic_xor(volatile uint32_t *reg, uint32_t val) {
   *(volatile uint32_t *)((uintptr_t)reg | ATOMIC_XOR_WRITE) = val;
