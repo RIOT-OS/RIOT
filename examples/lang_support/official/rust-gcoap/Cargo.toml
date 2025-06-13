@@ -41,6 +41,7 @@ p256 = { version = "0.13.2", default-features = false, features = ["ecdsa"] }
 digest = { version = "0.10.7", default-features = false }
 der = { version = "0.7.10", default-features = false }
 coap-numbers = "0.2.7"
+coap-message = "0.3.6"
 
 [patch.crates-io]
 # from https://github.com/seanmonstar/try-lock/pull/11, necessary for those
