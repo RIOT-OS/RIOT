@@ -11,15 +11,17 @@ use core::ffi::c_void;
 use riot_wrappers::riot_sys;
 
 use coap_handler_implementations::{HandlerBuilder, ReportingHandlerBuilder};
-use coapcore::{OscoreEdhocHandler, seccfg, scope, ace, error::CredentialError, error::CredentialErrorDetail, generalclaims::GeneralClaims, time::TimeConstraint};
+// Fixed imports - use public API from coapcore
+use coapcore::{OscoreEdhocHandler, seccfg, scope, ace, GeneralClaims, time::TimeConstraint};
 use lakers_crypto_rustcrypto::Crypto;
 use rand_core::{RngCore, CryptoRng, impls, Error};
 use coapcore::time::TimeUnknown;
-use lakers::{CryptoTrait, Credential};
+use lakers::Credential;
+use ::coap_message::{MutableWritableMessage, Code};
 extern crate rust_riotmodules;
 
 use heapless::{String, Vec};
-use p256::ecdsa::{VerifyingKey, signature::Verifier};
+use p256::ecdsa::{VerifyingKey, signature::Verifier, SigningKey};
 
 // Custom RNG implementation using RIOT's random functions
 struct RiotRng;
@@ -106,7 +108,8 @@ impl EdhocSecurityConfig {
     }
 
     pub fn with_audience(mut self, audience: &str) -> Self {
-        self.rs_audience = String::from(audience).unwrap_or_else(|_| String::new());
+        // Fixed: Use heapless::String::from_str instead of String::from
+        self.rs_audience = String::from_str(audience).unwrap_or_else(|_| String::new());
         self
     }
 }
@@ -146,12 +149,12 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         _headers: &ace::HeaderMap,
         _aad: &[u8],
         _ciphertext_buffer: &'buf mut [u8],
-    ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'buf>), CredentialError> {
+    ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'buf>), coapcore::CredentialError> {
         // In EDHOC/OSCORE, symmetric tokens are not used in the traditional sense.
         // Token decryption should be handled by the OSCORE layer using derived keys.
         // This method should not be called in a proper EDHOC implementation.
         println!("Warning: decrypt_symmetric_token called - this should not happen in EDHOC flow");
-        Err(CredentialErrorDetail::KeyNotPresent.into())
+        Err(coapcore::CredentialError::NoKey)
     }
 
     fn verify_asymmetric_token<'b>(
@@ -160,17 +163,18 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         signed_data: &[u8],
         signature: &[u8],
         signed_payload: &'b [u8],
-    ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'b>), CredentialError> {
+    ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'b>), coapcore::CredentialError> {
         // Check algorithm - must be ES256 (COSE algorithm -7)
-        if headers.alg != Some(-7) {
+        // Fixed: Use accessor method instead of direct field access
+        if headers.algorithm() != Some(-7) {
             println!("Error: Unsupported algorithm for asymmetric token, expected ES256 (-7)");
-            return Err(CredentialErrorDetail::UnsupportedAlgorithm.into());
+            return Err(coapcore::CredentialError::WrongKeyType);
         }
 
         // Get the AS public key for signature verification
         let Some((x, y)) = self.as_public_key else {
             println!("Error: No AS public key configured for token verification");
-            return Err(CredentialErrorDetail::KeyNotPresent.into());
+            return Err(coapcore::CredentialError::NoKey);
         };
 
         // Create verifying key from AS public key
@@ -179,14 +183,14 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         )
         .map_err(|_| {
             println!("Error: Failed to create verifying key from AS public key");
-            CredentialErrorDetail::InconsistentDetails
+            coapcore::CredentialError::WrongKeyType
         })?;
 
         // Parse and verify signature
         let signature = p256::ecdsa::Signature::from_slice(signature)
             .map_err(|_| {
                 println!("Error: Invalid signature format");
-                CredentialErrorDetail::InconsistentDetails
+                coapcore::CredentialError::WrongKeyType
             })?;
 
         // Verify the signature
@@ -194,27 +198,28 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             .verify(signed_data, &signature)
             .map_err(|_| {
                 println!("Error: AS signature verification failed");
-                CredentialErrorDetail::VerifyFailed
+                coapcore::CredentialError::VerifyFailed
             })?;
 
-        // Parse the signed payload
-        let claims: ace::CwtClaimsSet = minicbor::decode(signed_payload)
+        // Parse the signed payload - Fixed: use minicbor::Decoder
+        let mut decoder = minicbor::Decoder::new(signed_payload);
+        let claims: ace::CwtClaimsSet = decoder.decode()
             .map_err(|_| {
                 println!("Error: Failed to decode signed token payload");
-                CredentialErrorDetail::UnsupportedExtension
+                coapcore::CredentialError::ParseFailed
             })?;
 
         // Verify audience (this RS must be the intended recipient)
         if !self.rs_audience.is_empty() && claims.aud.as_ref() != Some(&self.rs_audience) {
             println!("Error: Token audience mismatch - not intended for this RS");
-            return Err(CredentialErrorDetail::VerifyFailed.into());
+            return Err(coapcore::CredentialError::VerificationFailed);
         }
 
         // Parse scope from claims
         let scope = scope::AifValue::parse(claims.scope)
             .map_err(|_| {
                 println!("Error: Failed to parse scope from verified token");
-                CredentialErrorDetail::UnsupportedExtension
+                coapcore::CredentialError::ParseFailed
             })?
             .into();
 
@@ -245,7 +250,8 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             if id_cred_x.reference_only() {
                 // Check by KID (Key Identifier)
                 if let Ok(cred_kid) = credential.by_kid() {
-                    if cred_kid.as_ref() == Ok(&id_cred_x) {
+                    // Fixed: Remove .as_ref() calls and compare directly
+                    if cred_kid == Ok(id_cred_x) {
                         println!("Peer authenticated using preconfigured key by KID");
                         return Some((
                             credential.clone(),
@@ -260,7 +266,8 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             } else {
                 // Check by credential value
                 if let Ok(cred_value) = credential.by_value() {
-                    if cred_value.as_ref() == Ok(&id_cred_x) {
+                    // Fixed: Remove .as_ref() calls and compare directly
+                    if cred_value == Ok(id_cred_x) {
                         println!("Peer authenticated using preconfigured credential by value");
                         return Some((
                             credential.clone(),
@@ -303,12 +310,11 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         })
     }
 
-    fn render_not_allowed<M: coap_message::MutableWritableMessage>(
+    fn render_not_allowed<M: MutableWritableMessage>(
         &self,
         message: &mut M,
     ) -> Result<(), seccfg::NotAllowedRenderingFailed> {
-        use coap_message::Code;
-        message.set_code(M::Code::new(coap_numbers::code::UNAUTHORIZED).map_err(|_| {
+        message.set_code(Code::new(coap_numbers::code::UNAUTHORIZED).map_err(|_| {
             println!("Error: CoAP stack cannot represent Unauthorized responses");
             seccfg::NotAllowedRenderingFailed
         })?);
@@ -334,17 +340,18 @@ fn compute_public_key_from_private(private_key: &[u8; 32]) -> [u8; 64] {
     let secret_key = SecretKey::from_slice(private_key)
         .expect("Private key should be valid P-256 scalar");
     
-    // Derive the corresponding public key
-    let public_key = PublicKey::from(&secret_key);
+    // Fixed: Use PublicKey::from(&secret_key) with correct conversion
+    let signing_key = SigningKey::from(&secret_key);
+    let public_key = PublicKey::from(&signing_key);
     
     // Get the uncompressed point coordinates
     let encoded_point = public_key.to_encoded_point(false);
-    let coords = encoded_point.coordinates();
     
+    // Fixed: Handle coordinates properly
     let mut public_key_bytes = [0u8; 64];
-    if let Some((x, y)) = coords {
-        public_key_bytes[..32].copy_from_slice(x.as_slice());
-        public_key_bytes[32..].copy_from_slice(y.as_slice());
+    if let p256::elliptic_curve::sec1::Coordinates::Uncompressed { x, y } = encoded_point.coordinates() {
+        public_key_bytes[..32].copy_from_slice(x);
+        public_key_bytes[32..].copy_from_slice(y);
     }
     
     public_key_bytes
@@ -387,8 +394,8 @@ fn generate_credpair_with_fixed_key() -> (Credential, lakers::BytesP256ElemLen) 
     println!("Public key x: {:02x?}", x_coord);
     println!("Public key y: {:02x?}", y_coord);
     
-    // Convert private key to lakers format
-    let mut lakers_private_key = lakers::BytesP256ElemLen::new();
+    // Fixed: Create lakers private key properly
+    let mut lakers_private_key = [0u8; 32];
     lakers_private_key.copy_from_slice(&private_key);
     
     (credential, lakers_private_key)
