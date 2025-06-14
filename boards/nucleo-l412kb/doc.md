@@ -8,6 +8,10 @@
 The Nucleo-L412KB is a board from ST's Nucleo family supporting ARM-Cortex-M4
 STM32L412KB microcontroller with 40KiB of RAM and 128KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-l432kc-and-more.svg "Pinout for the Nucleo-L412KB (from STM user manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 32)" width=25%
+
 ## Flashing the Board Using ST-LINK Removable Media
 
 On-board ST-LINK programmer provides via composite USB device removable media.
