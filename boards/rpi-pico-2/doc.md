@@ -62,7 +62,7 @@ PROGRAMMER=openocd make debug
 
 ### Flashing using Picotool
 
-Simply connect the board to your computer and use the following command:
+Simply connect the board to your computer via USB and use the following command:
 
 ```bash
 BOARD=rpi-pico-2 make flash
