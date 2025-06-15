@@ -58,7 +58,7 @@ void auto_init_mrf24j40(void)
                         bhp_event_isr_cb, &mrf24j40_bhp[i]);
 
         netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, i);
-        netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
+        netdev_ieee802154_submac_init(&mrf24j40_netdev[i], NULL);
 
         gnrc_netif_ieee802154_create(&_netif[i], _mrf24j40_stacks[i],
                                      MRF24J40_MAC_STACKSIZE, MRF24J40_MAC_PRIO,
