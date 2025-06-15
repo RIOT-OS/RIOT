@@ -26,7 +26,7 @@ VECTORS_FILE    := $(RIOTCPU)/rp2350/vectors.c
 
 # Supported programmers and debuggers
 PROGRAMMERS_SUPPORTED := picotool openocd jlink
-PROGRAMMER ?= openocd
+PROGRAMMER ?= picotool
 OPENOCD_DEBUG_ADAPTER ?= dap
 
 # Include the base Cortex-M makefile
