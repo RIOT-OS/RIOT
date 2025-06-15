@@ -45,7 +45,7 @@ The Raspberry Pi Pico 2 is a microcontroller board based on the RP2350 chip, fea
 
 The Raspberry Pi Pico 2 has a built-in bootloader that allows flashing via USB. However, you can also use OpenOCD for flashing the board.
 
-Raspberry Pi provide a setup if you have two pico boards where one acts as a programmer. 
+If you have two Raspberry Pi Pico boards, you can utilize one as a programmer to program the other board.
 Please refer to the [Debugprobe documentation](https://www.raspberrypi.com/documentation/microcontrollers/debug-probe.html#getting-started) for more details.
 
 To do this, you need to connect the board to your computer and use the following command:
