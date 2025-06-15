@@ -28,7 +28,7 @@ STM32L432KCU6 microcontroller with 64KiB of RAM and 256KiB of Flash.
 | CANs       | 1                   |
 | RTC        | 1                   |
 | I2Cs       | 2                   |
-| Vcc        | ToDo1.7V - 3.6V         |
+| Vcc        | 1.71V - 3.6V        |
 | Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l432kc.pdf) |
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0394-stm32l41xxx42xxx43xxx44xxx45xxx46xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)|
 | Programming Manual | [Programming Manual](http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf) |
