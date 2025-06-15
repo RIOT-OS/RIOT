@@ -57,7 +57,7 @@ PROGRAMMER=openocd BOARD=rpi-pico-2 make flash
 You can then debug your application using GDB with the following command:
 
 ```bash
-PROGRAMMER=openocd make debug
+PROGRAMMER=openocd BOARD=rpi-pico-2 make debug
 ```
 
 ### Flashing using Picotool
