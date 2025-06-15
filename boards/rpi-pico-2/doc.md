@@ -51,7 +51,7 @@ Please refer to the [Debugprobe documentation](https://www.raspberrypi.com/docum
 To do this, you need to connect the board to your computer and use the following command:
 
 ```bash
-PROGRAMMER=openocd make flash
+PROGRAMMER=openocd BOARD=rpi-pico-2 make flash
 ```
 
 You can then debug your application using GDB with the following command:
