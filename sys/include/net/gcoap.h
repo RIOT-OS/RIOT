@@ -868,6 +868,23 @@ typedef struct {
 } gcoap_observe_memo_t;
 
 /**
+ * @brief Context for a separate response
+ */
+typedef struct {
+    event_t ev;                             /**< Event for the separate response */
+    gcoap_socket_type_t tl;                 /**< Transport type on which the request was received */
+    sock_udp_ep_t remote;                   /**< Remote to send response to */
+#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+    sock_udp_ep_t local;                    /**< Local endpoint from which to send the response */
+#endif
+    int result;                                 /**< Result of processing the request */
+    uint8_t *req_buf;                           /**< Buffer to cache request */
+    size_t req_buf_size;                        /**< Size of the buffer containing the request */
+    uint8_t *resp_buf;                          /**< Buffer to write response to */
+    size_t resp_buf_size;                       /**< Size of the buffer to write the response to */
+} gcoap_separate_response_ctx_t;
+
+/**
  * @brief   Initializes the gcoap thread and device
  *
  * Must call once before first use.
@@ -877,6 +894,16 @@ typedef struct {
  * @return  -EINVAL, if the IP port already is in use.
  */
 kernel_pid_t gcoap_init(void);
+
+/**
+ * @brief   Get a pointer to the internal gcoap event queue, to offload tasks to the gcoap thread
+ *          using RIOT's event API
+ *
+ * @warning     Beware to only use the event API on it.
+ *
+ * @return  Event queue pointer
+ */
+event_queue_t *gcoap_get_event_queue(void);
 
 /**
  * @brief   Starts listening for resource paths
@@ -1040,6 +1067,20 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code);
 
 /**
+ * @brief   Initialize a CoAP separate response packet in a buffer
+ *
+ * @param[out]  pdu     Response metadata
+ * @param[in]   buf     Buffer containing the PDU
+ * @param[in]   len     Length of the buffer
+ * @param[in]   type    Type of the response (CON/NON)
+ * @param[in]   code    Response code
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int gcoap_separate_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned type, unsigned code);
+
+/**
  * @brief   Writes a complete CoAP response PDU when there is no payload
  *
  * @param[out] pdu      Response metadata
@@ -1057,6 +1098,41 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
                 ? coap_opt_finish(pdu, COAP_OPT_FINISH_NONE)
                 : -1;
 }
+
+/**
+ * @brief   Prepare a context to be able to send a separate response
+ *
+ * @param[out]  ctx             Separate response context to prepare
+ * @param[in]   req_buf         Buffer to cache the request
+ * @param[in]   req_buf_size    Size of the request buffer
+ * @param[in]   resp_buf        Buffer to cache the request
+ * @param[in]   resp_buf_size   Size of the request buffer
+ * @param[in]   req_pkt         Request packet that initiated the separate response
+ * @param[in]   req_ctx         CoAP request context
+ *
+ * @return < 0 on error or 0 on success
+ */
+int gcoap_resp_prepare_separate(gcoap_separate_response_ctx_t *ctx,
+                                void *req_buf, size_t req_buf_size,
+                                void *resp_buf, size_t resp_buf_size,
+                                const coap_pkt_t *req_pkt,
+                                const coap_request_ctx_t *req_ctx);
+
+/**
+ * @brief   Sends the PDU buffer containing a separate response
+ *
+ * @param[in] buf           Separate response buffer
+ * @param[in] len           Length of the buffer
+ * @param[in] remote        Destination endpoint to reply to
+ * @param[in] local         Local endpoint to send from, may be NULL
+ * @param[in] tl_type       Transport type to use for the reply
+ *
+ * @return  length of the packet
+ * @return  -1 on error or 0 if cannot send
+ */
+ssize_t gcoap_resp_send_separate(const uint8_t *buf, size_t len,
+                                 const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                                 gcoap_socket_type_t tl_type);
 
 /**
  * @brief   Initializes a CoAP Observe notification packet on a buffer, for the
