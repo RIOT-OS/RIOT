@@ -1,0 +1,48 @@
+From 28af8d5699c455c44b48175b4c8453d4e7a79d6c Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Mon, 30 Dec 2024 23:38:40 +0100
+Subject: [PATCH] debug: Declare as printf-style, remove empty statement
+
+This resolves the -Wformat-nonliteral warning by (which complains about
+non-literals used as printf formatters, unless the containing function
+itself is also printf style), and a stray leftover empty debug statement
+discovered by that warning: -Wformat-nonliteral is a bit of a false
+postive here because due to the level prefix, the empty printf is not
+*really* empty, but it is accurate enough in that it does not provide
+any valuable details.
+
+Forwarded: https://github.com/apache/mynewt-nimble/pull/1951
+
+---
+ nimble/host/src/ble_gatts.c                         | 2 --
+ porting/npl/riot/include/nimble/nimble_npl_os_log.h | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/nimble/host/src/ble_gatts.c b/nimble/host/src/ble_gatts.c
+index c77e561b..ee6a8a3c 100644
+--- a/nimble/host/src/ble_gatts.c
++++ b/nimble/host/src/ble_gatts.c
+@@ -1619,8 +1619,6 @@ ble_gatts_peer_cl_sup_feat_update(uint16_t conn_handle, struct os_mbuf *om)
+     int rc = 0;
+     int i;
+ 
+-    BLE_HS_LOG(DEBUG, "");
+-
+     if (!om) {
+         return BLE_ATT_ERR_INSUFFICIENT_RES;
+     }
+diff --git a/porting/npl/riot/include/nimble/nimble_npl_os_log.h b/porting/npl/riot/include/nimble/nimble_npl_os_log.h
+index 24315a21..f585070d 100644
+--- a/porting/npl/riot/include/nimble/nimble_npl_os_log.h
++++ b/porting/npl/riot/include/nimble/nimble_npl_os_log.h
+@@ -25,6 +25,7 @@
+ 
+ /* Example on how to use macro to generate module logging functions */
+ #define BLE_NPL_LOG_IMPL(lvl) \
++        __attribute__((__format__ (__printf__, 1, 0))) \
+         static inline void _BLE_NPL_LOG_CAT(BLE_NPL_LOG_MODULE, \
+                 _BLE_NPL_LOG_CAT(_, lvl))(const char *fmt, ...)\
+         {                               \
+-- 
+2.45.2
+

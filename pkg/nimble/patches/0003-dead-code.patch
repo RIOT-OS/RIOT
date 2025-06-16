@@ -1,0 +1,32 @@
+From 65cd7b07c186d8084606271d30d5f5419c5a1f11 Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Tue, 24 Dec 2024 02:55:20 +0100
+Subject: [PATCH] nimble: Fix dead code warning
+
+---
+ nimble/transport/src/rx_task.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/nimble/transport/src/rx_task.c b/nimble/transport/src/rx_task.c
+index 4e7d7196..957ab790 100644
+--- a/nimble/transport/src/rx_task.c
++++ b/nimble/transport/src/rx_task.c
+@@ -45,6 +45,7 @@ rx_event_func(struct ble_npl_event *ev)
+     rx_func(rx_func_arg);
+ }
+ 
++#ifdef MYNEWT
+ static void
+ rx_task_func(void *arg)
+ {
+@@ -57,6 +58,7 @@ rx_task_func(void *arg)
+         ble_npl_event_run(ev);
+     }
+ }
++#endif
+ 
+ void
+ ble_transport_rx_register(ble_transport_rx_func_t *func, void *arg)
+-- 
+2.45.2
+

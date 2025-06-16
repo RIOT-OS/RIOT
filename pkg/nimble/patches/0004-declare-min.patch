@@ -1,0 +1,297 @@
+From 0a128e1b1f376b5bb9b01c043fa22d4e4d24a1d1 Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Fri, 27 Dec 2024 22:48:57 +0100
+Subject: [PATCH] Consistently declare min() macro before using it
+
+Forwarded: https://github.com/apache/mynewt-nimble/pull/1950
+
+---
+ apps/blemesh/src/main.c                  | 4 ++++
+ apps/blestress/src/rx_stress.c           | 4 ++++
+ apps/btshell/src/cmd.c                   | 4 ++++
+ apps/btshell/src/main.c                  | 4 ++++
+ apps/bttester/src/btp_mesh.c             | 4 ++++
+ apps/bttester/src/bttester.c             | 4 ++++
+ apps/bttester/src/rtt_pipe.c             | 4 ++++
+ apps/mesh_badge/src/mesh.c               | 4 ++++
+ apps/mesh_badge/src/reel_board.c         | 4 ++++
+ nimble/controller/src/ble_ll_isoal.c     | 4 ++++
+ nimble/drivers/dialog_cmac/src/ble_phy.c | 4 ++++
+ nimble/drivers/native/src/ble_phy.c      | 4 ++++
+ nimble/drivers/nrf51/src/ble_phy.c       | 4 ++++
+ nimble/drivers/nrf5x/src/ble_phy.c       | 4 ++++
+ nimble/host/src/ble_iso.c                | 4 ++++
+ nimble/host/src/ble_l2cap_coc.c          | 4 ++++
+ nimble/host/test/src/ble_att_svr_test.c  | 4 ++++
+ porting/nimble/src/os_mbuf.c             | 2 +-
+ 18 files changed, 69 insertions(+), 1 deletion(-)
+
+diff --git a/apps/blemesh/src/main.c b/apps/blemesh/src/main.c
+index e11ceb8f..1636bdcf 100644
+--- a/apps/blemesh/src/main.c
++++ b/apps/blemesh/src/main.c
+@@ -32,6 +32,10 @@
+ #include "services/gap/ble_svc_gap.h"
+ #include "mesh/glue.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ /* Company ID */
+ #define CID_VENDOR 0x05C3
+ #define STANDARD_TEST_ID 0x00
+diff --git a/apps/blestress/src/rx_stress.c b/apps/blestress/src/rx_stress.c
+index d684ab40..52f15c57 100644
+--- a/apps/blestress/src/rx_stress.c
++++ b/apps/blestress/src/rx_stress.c
+@@ -20,6 +20,10 @@
+ #include <host/ble_gap.h>
+ #include "rx_stress.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ /* UUID128 of stress test use cases*/
+ static uint8_t rx_stress_uuid128[STRESS_UUIDS_NUM][16];
+ 
+diff --git a/apps/btshell/src/cmd.c b/apps/btshell/src/cmd.c
+index a9758e14..ff841c26 100644
+--- a/apps/btshell/src/cmd.c
++++ b/apps/btshell/src/cmd.c
+@@ -45,6 +45,10 @@
+ #include "cmd_l2cap.h"
+ #include "cmd_leaudio.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #define BTSHELL_MODULE "btshell"
+ 
+ int
+diff --git a/apps/btshell/src/main.c b/apps/btshell/src/main.c
+index 72929276..ba9d480e 100644
+--- a/apps/btshell/src/main.c
++++ b/apps/btshell/src/main.c
+@@ -58,6 +58,10 @@
+ #include "../src/ble_hs_atomic_priv.h"
+ #include "../src/ble_hs_priv.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #if MYNEWT_VAL(BLE_ROLE_CENTRAL)
+ #define BTSHELL_MAX_SVCS               32
+ #define BTSHELL_MAX_CHRS               64
+diff --git a/apps/bttester/src/btp_mesh.c b/apps/bttester/src/btp_mesh.c
+index 2825329a..aad7eb4a 100644
+--- a/apps/bttester/src/btp_mesh.c
++++ b/apps/bttester/src/btp_mesh.c
+@@ -38,6 +38,10 @@
+ 
+ #include "btp/btp.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ extern uint8_t own_addr_type;
+ 
+ #define CONTROLLER_INDEX 0
+diff --git a/apps/bttester/src/bttester.c b/apps/bttester/src/bttester.c
+index d5e0399a..fa4a82bb 100644
+--- a/apps/bttester/src/bttester.c
++++ b/apps/bttester/src/bttester.c
+@@ -35,6 +35,10 @@
+ #include "bttester_pipe.h"
+ #include "btp/btp.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #define CMD_QUEUED 2
+ 
+ static struct os_eventq avail_queue;
+diff --git a/apps/bttester/src/rtt_pipe.c b/apps/bttester/src/rtt_pipe.c
+index 4e667709..d1a8bd4a 100644
+--- a/apps/bttester/src/rtt_pipe.c
++++ b/apps/bttester/src/rtt_pipe.c
+@@ -19,6 +19,10 @@
+ 
+ #include "syscfg/syscfg.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #if MYNEWT_VAL(BTTESTER_PIPE_RTT)
+ 
+ #include "os/mynewt.h"
+diff --git a/apps/mesh_badge/src/mesh.c b/apps/mesh_badge/src/mesh.c
+index ee999172..8137ab92 100644
+--- a/apps/mesh_badge/src/mesh.c
++++ b/apps/mesh_badge/src/mesh.c
+@@ -11,6 +11,10 @@
+ #include "mesh.h"
+ #include "board.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #define BT_COMP_ID_LF 0x05f1
+ 
+ #define MOD_LF            0x0000
+diff --git a/apps/mesh_badge/src/reel_board.c b/apps/mesh_badge/src/reel_board.c
+index 5e5f6b40..3cf527b9 100644
+--- a/apps/mesh_badge/src/reel_board.c
++++ b/apps/mesh_badge/src/reel_board.c
+@@ -20,6 +20,10 @@
+ 
+ #define printk console_printf
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ enum font_size {
+ 	FONT_BIG = 0,
+ 	FONT_MEDIUM = 1,
+diff --git a/nimble/controller/src/ble_ll_isoal.c b/nimble/controller/src/ble_ll_isoal.c
+index bed974bb..d23382c9 100644
+--- a/nimble/controller/src/ble_ll_isoal.c
++++ b/nimble/controller/src/ble_ll_isoal.c
+@@ -24,6 +24,10 @@
+ #include <controller/ble_ll_isoal.h>
+ #include <controller/ble_ll_iso_big.h>
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #if MYNEWT_VAL(BLE_LL_ISO)
+ 
+ STAILQ_HEAD(ble_ll_iso_tx_q, os_mbuf_pkthdr);
+diff --git a/nimble/drivers/dialog_cmac/src/ble_phy.c b/nimble/drivers/dialog_cmac/src/ble_phy.c
+index 434aaa96..c077f25f 100644
+--- a/nimble/drivers/dialog_cmac/src/ble_phy.c
++++ b/nimble/drivers/dialog_cmac/src/ble_phy.c
+@@ -39,6 +39,10 @@
+ #error LE Coded PHY cannot be enabled on DA1469x
+ #endif
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ /* Statistics */
+ STATS_SECT_START(ble_phy_stats)
+     STATS_SECT_ENTRY(phy_isrs)
+diff --git a/nimble/drivers/native/src/ble_phy.c b/nimble/drivers/native/src/ble_phy.c
+index 5969dff1..e1d2e4aa 100644
+--- a/nimble/drivers/native/src/ble_phy.c
++++ b/nimble/drivers/native/src/ble_phy.c
+@@ -28,6 +28,10 @@
+ #include "controller/ble_phy.h"
+ #include "controller/ble_ll.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ /* BLE PHY data structure */
+ struct ble_phy_obj
+ {
+diff --git a/nimble/drivers/nrf51/src/ble_phy.c b/nimble/drivers/nrf51/src/ble_phy.c
+index c3a523dc..955db635 100644
+--- a/nimble/drivers/nrf51/src/ble_phy.c
++++ b/nimble/drivers/nrf51/src/ble_phy.c
+@@ -47,6 +47,10 @@
+ #error LE Coded PHY cannot be enabled on nRF51
+ #endif
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ static uint32_t
+ ble_phy_mode_pdu_start_off(int phy_mode)
+ {
+diff --git a/nimble/drivers/nrf5x/src/ble_phy.c b/nimble/drivers/nrf5x/src/ble_phy.c
+index 9e517ae3..ff1af75f 100644
+--- a/nimble/drivers/nrf5x/src/ble_phy.c
++++ b/nimble/drivers/nrf5x/src/ble_phy.c
+@@ -56,6 +56,10 @@
+ #include <nrf_erratas.h>
+ #include "phy_priv.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #if MYNEWT_VAL(BLE_LL_CFG_FEAT_LE_CODED_PHY)
+ #if !MYNEWT_VAL_CHOICE(MCU_TARGET, nRF52840) && \
+     !MYNEWT_VAL_CHOICE(MCU_TARGET, nRF52811) && \
+diff --git a/nimble/host/src/ble_iso.c b/nimble/host/src/ble_iso.c
+index 7e78cc96..600e7ed5 100644
+--- a/nimble/host/src/ble_iso.c
++++ b/nimble/host/src/ble_iso.c
+@@ -30,6 +30,10 @@
+ #include "ble_hs_hci_priv.h"
+ #include "ble_hs_mbuf_priv.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #define ble_iso_big_conn_handles_init(_big, _handles, _num_handles)         \
+     do {                                                                    \
+         struct ble_iso_conn *conn = SLIST_FIRST(&ble_iso_conns);            \
+diff --git a/nimble/host/src/ble_l2cap_coc.c b/nimble/host/src/ble_l2cap_coc.c
+index a3d1b1c2..7fdf54e2 100644
+--- a/nimble/host/src/ble_l2cap_coc.c
++++ b/nimble/host/src/ble_l2cap_coc.c
+@@ -25,6 +25,10 @@
+ #include "ble_l2cap_coc_priv.h"
+ #include "ble_l2cap_sig_priv.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #if MYNEWT_VAL(BLE_L2CAP_COC_MAX_NUM) != 0 && NIMBLE_BLE_CONNECT
+ 
+ #define BLE_L2CAP_SDU_SIZE              2
+diff --git a/nimble/host/test/src/ble_att_svr_test.c b/nimble/host/test/src/ble_att_svr_test.c
+index 84394d6a..95b5eec6 100644
+--- a/nimble/host/test/src/ble_att_svr_test.c
++++ b/nimble/host/test/src/ble_att_svr_test.c
+@@ -27,6 +27,10 @@
+ #include "host/ble_l2cap.h"
+ #include "ble_hs_test_util.h"
+ 
++#ifndef min
++#define min(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ static uint8_t *ble_att_svr_test_attr_r_1;
+ static uint16_t ble_att_svr_test_attr_r_1_len;
+ static uint8_t *ble_att_svr_test_attr_r_2;
+diff --git a/porting/nimble/src/os_mbuf.c b/porting/nimble/src/os_mbuf.c
+index 796a8537..6d84be1f 100644
+--- a/porting/nimble/src/os_mbuf.c
++++ b/porting/nimble/src/os_mbuf.c
+@@ -1273,4 +1273,4 @@ os_mbuf_pack_chains(struct os_mbuf *m1, struct os_mbuf *m2)
+     }
+ 
+     return m1;
+-}
+\ No newline at end of file
++}
+-- 
+2.45.2
+
