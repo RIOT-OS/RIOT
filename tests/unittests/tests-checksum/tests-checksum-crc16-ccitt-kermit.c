@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bennet Blischke <bennet.blischke@haw-hamburg.de>
+ * Copyright 2022 Bennet Hattesen <bennet.blischke@haw-hamburg.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level

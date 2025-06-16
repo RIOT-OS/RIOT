@@ -123,6 +123,21 @@ uint16_t crc16_ccitt_mcrf4xx_calc(const unsigned char *buf, size_t len)
     return crc16_ccitt_kermit_update(0xFFFF, buf, len);
 }
 
+uint16_t crc16_ccitt_fcs_start(const unsigned char *buf, size_t len)
+{
+    return crc16_ccitt_kermit_update(0xFFFF, buf, len);
+}
+
+uint16_t crc16_ccitt_fcs_finish(uint16_t crc, const unsigned char *buf, size_t len)
+{
+    return crc16_ccitt_kermit_update(crc, buf, len) ^ 0xFFFFU;
+}
+
+uint16_t crc16_ccitt_fcs_calc(const unsigned char *buf, size_t len)
+{
+    return crc16_ccitt_fcs_start(buf, len) ^ 0xFFFFU;
+}
+
 uint16_t crc16_ccitt_false_update(uint16_t crc, const unsigned char *buf, size_t len)
 {
     while (len--) {

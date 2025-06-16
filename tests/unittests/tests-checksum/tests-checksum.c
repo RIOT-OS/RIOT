@@ -13,6 +13,7 @@ void tests_checksum(void)
     TESTS_RUN(tests_checksum_crc8_tests());
     TESTS_RUN(tests_checksum_crc8_lsb_tests());
     TESTS_RUN(tests_checksum_crc16_ccitt_kermit_tests());
+    TESTS_RUN(tests_checksum_crc16_ccitt_fcs_tests());
     TESTS_RUN(tests_checksum_crc16_ccitt_mcrf4xx_tests());
     TESTS_RUN(tests_checksum_crc16_ccitt_aug_tests());
     TESTS_RUN(tests_checksum_crc16_ccitt_false_tests());

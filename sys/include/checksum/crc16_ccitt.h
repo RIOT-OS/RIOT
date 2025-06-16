@@ -72,6 +72,71 @@ uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_
 uint16_t crc16_ccitt_kermit_calc(const unsigned char *buf, size_t len);
 
 /**
+ * @brief           Start a CRC16-CCITT-FCS / IBM-SDLC calculation
+ *
+ * @param[in]  buf  Start of the memory area to checksum
+ * @param[in]  len  Number of bytes to checksum
+ *
+ * @return          Partial checksum of the specified memory area. To be finalised
+ *                  with crc16_ccitt_fcs_finish()
+ */
+uint16_t crc16_ccitt_fcs_start(const unsigned char *buf, size_t len);
+
+/**
+ * @brief           Update CRC16-CCITT-FCS / IBM-SDLC
+ *
+ * @param[in]  crc  A start value for the CRC calculation, usually the
+ *                  return value of a previous call to
+ *                  crc16_ccitt_fcs_start() or crc16_ccitt_fcs_update()
+ * @param[in]  buf  Start of the memory area to checksum
+ * @param[in]  len  Number of bytes to checksum
+ *
+ * @return          Partial checksum of the specified memory area based on the
+ *                  given start value. To be finalised with crc16_ccitt_fcs_finish()
+ */
+static inline uint16_t crc16_ccitt_fcs_update(uint16_t crc, const unsigned char *buf,
+                                                  size_t len)
+{
+    /* Since CCITT-KERMIT and CCITT-FCS only differ in the starting
+     * seed, we wrap around crc16_ccitt_kermit_update() for updating */
+    return crc16_ccitt_kermit_update(crc, buf, len);
+}
+
+/**
+ * @brief           Finalise CRC16-CCITT-FCS / IBM-SDLC
+ *
+ * @param[in]  crc  A start value for the CRC calculation, usually the
+ *                  return value of a previous call to
+ *                  crc16_ccitt_fcs_start() or crc16_ccitt_fcs_update()
+ * @param[in]  buf  Start of the memory area to checksum
+ * @param[in]  len  Number of bytes to checksum
+ *
+ * @return          Checksum of the specified memory area based on the
+ *                  given start value.
+ */
+uint16_t crc16_ccitt_fcs_finish(uint16_t crc, const unsigned char *buf, size_t len);
+
+/**
+ * @brief           Calculate CRC16-CCITT-FCS / IBM-SDLC in one pass.
+ *
+ * Parameter | Value
+ * --------: | :----
+ * Polynom   | `0x1021`
+ * Init      | `0xffff`
+ * Refin     | `true`
+ * Refout    | `true`
+ * Xorout    | `0xffff`
+ * Check     | `0x906e`
+ * Residue   | `0xf0b8`
+ *
+ * @param[in]  buf  Start of the memory area to checksum
+ * @param[in]  len  Number of bytes to checksum
+ *
+ * @return          Checksum of the specified memory area
+ */
+uint16_t crc16_ccitt_fcs_calc(const unsigned char *buf, size_t len);
+
+/**
  * @brief           Update CRC16-CCITT-MCRF4XX
  *
  * @param[in]  crc  A start value for the CRC calculation, usually the
