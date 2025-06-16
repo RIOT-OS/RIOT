@@ -450,6 +450,9 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 # include global Makefile.include for `boards` modules
 include $(RIOTBASE)/boards/Makefile.include
 
+# Include common programmer logic if available
+-include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
+
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
 # the content of RIOT_TERMINAL
 include $(RIOTMAKE)/tools/serial.inc.mk
@@ -462,9 +465,6 @@ ifeq (1,$(EMULATE))
   TERMDEPS += $(EMULATORDEPS)
   DEBUGDEPS += $(EMULATORDEPS)
 endif
-
-# Include common programmer logic if available
--include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
 
 # Check if programmer is supported by the board, only if PROGRAMMERS_SUPPORTED
 # is set and if programmer is not iotlab
