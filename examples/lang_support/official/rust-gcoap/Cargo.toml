@@ -15,13 +15,24 @@ codegen-units = 1
 opt-level = "s"
 
 [dependencies]
-riot-wrappers = { version = "^0.9.0", features = [ "set_panic_handler", "panic_handler_format", "with_coap_message", "with_coap_handler", "provide_critical_section_1_0" ] }
+riot-wrappers = { version = "^0.9.0", features = [
+    "set_panic_handler",
+    "panic_handler_format",
+    "with_coap_message",
+    "with_coap_handler",
+    "provide_critical_section_1_0"
+] }
 rust_riotmodules = { path = "../../../../sys/rust_riotmodules/" }
 portable-atomic = { version = "1", features = [ "critical-section" ] }
 
 coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
 coap-handler-implementations = "0.5"
-riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs", "saul", "nib", "ping" ] }
+riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [
+    "vfs",
+    "saul",
+    "nib",
+    "ping"
+] }
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has
@@ -30,7 +41,8 @@ riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-exampl
 static_cell = "2.1.0"
 
 # EDHOC and OSCORE dependencies
-coapcore = { version = "0.1.0", default-features = false }
+# Using your forked version of coapcore (git only)
+coapcore = { git = "https://github.com/KiyoLelou10/ariel-os", default-features = false }
 lakers = { version = "0.8.0", default-features = false }
 lakers-crypto-rustcrypto = { version = "0.8.0", default-features = false }
 liboscore = { version = "0.2.4", default-features = false }
