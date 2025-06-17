@@ -143,13 +143,15 @@ Here is a quick overview of the examples available in the RIOT:
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 
-## Examples for Guides
+## Examples from Guides
+
+Our guides [link here] walk you through small tutorials to get started. The following examples are the resulting code from completing their respective guide.
 
 | Example | Description |
 |---------|-------------|
-| [creating_project](./guides/creating_project/README.md) | This example is used in the [Create Project](https://guide.riot-os.org/c_tutorials/create_project/) tutorial |
-| [shell](./guides/shell/README.md) | This example is used in the [Echo](https://guide.riot-os.org/c_tutorials/shell/) tutorial |
-| [gpio](./guides/gpio/README.md) | This example is used in the [GPIO](https://guide.riot-os.org/c_tutorials/gpio/) tutorial |
-| [saul](./guides/saul/README.md) | This example is used in the [SAUL](https://guide.riot-os.org/c_tutorials/saul/) tutorial |
-| [threads](./guides/threads/README.md) | This example is used in the [Threads](https://guide.riot-os.org/c_tutorials/threads/) tutorial |
-| [timers](./guides/timers/README.md) | This example is used in the [Timers](https://guide.riot-os.org/c_tutorials/timers/) tutorial |
+| [creating_project](./guides/creating_project/README.md) | Teaches you the very first steps. How to setup a RIOT project, build and run a Hello World in it. [Create Project](https://guide.riot-os.org/c_tutorials/create_project/) tutorial |
+| [shell](./guides/shell/README.md) | Teaches you how to use the interactive RIOT shell for your application. [Shell](https://guide.riot-os.org/c_tutorials/shell/) tutorial |
+| [gpio](./guides/gpio/README.md) | Teaches you how to configure and use GPIO pins for external hardware interaction. [GPIO](https://guide.riot-os.org/c_tutorials/gpio/) tutorial |
+| [saul](./guides/saul/README.md) | Teaches you how to interact with sensors and actuators through the SAUL interface. [SAUL](https://guide.riot-os.org/c_tutorials/saul/) tutorial |
+| [threads](./guides/threads/README.md) | Teaches you how to create and manage multiple execution threads in your RIOT application. [Threads](https://guide.riot-os.org/c_tutorials/threads/) tutorial |
+| [timers](./guides/timers/README.md) | Teaches you how to use timers for periodic tasks and time measurement in RIOT. [Timers](https://guide.riot-os.org/c_tutorials/timers/) tutorial |

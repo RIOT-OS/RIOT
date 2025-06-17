@@ -5,6 +5,9 @@ APPLICATION = hello-world
 BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
+# If you are following the tutorial, your RIOT base directory will
+# most likely be something like RIOTBASE ?= $(CURDIR)/RIOT
+# instead of this
 RIOTBASE ?= $(CURDIR)/../../..
 
 # Comment this out to disable code in RIOT that does safety checking
