@@ -152,15 +152,13 @@ gpio_mode_t led1_mode = GPIO_OUT;
 ```
 
 ```c title="Define the button callback function"
-void button_callback (void *arg)
-{
-    (void) arg; /* the argument is not used */
-    if (!gpio_read(button)) {
-        gpio_set(led1);
-    }
-    else {
-        gpio_clear(led1);
-    }
+void button_callback(void *arg) {
+  (void)arg; /* the argument is not used */
+  if (!gpio_read(button)) {
+    gpio_set(led1);
+  } else {
+    gpio_clear(led1);
+  }
 }
 ```
 
@@ -170,15 +168,13 @@ Now we need to define the button pin and mode and initialize it.
 // Define the button pin
 gpio_t button = GPIO_PIN(1, 2);
 
-void button_callback (void *arg)
-{
-    (void) arg; /* the argument is not used */
-    if (!gpio_read(button)) {
-        gpio_set(led1);
-    }
-    else {
-        gpio_clear(led1);
-    }
+void button_callback(void *arg) {
+  (void)arg; /* the argument is not used */
+  if (!gpio_read(button)) {
+    gpio_set(led1);
+  } else {
+    gpio_clear(led1);
+  }
 }
 
 int main(void) {

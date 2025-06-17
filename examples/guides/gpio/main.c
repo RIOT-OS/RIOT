@@ -1,5 +1,5 @@
-#include "periph/gpio.h"
 #include "board.h"
+#include "periph/gpio.h"
 #include "ztimer.h"
 
 // Define the LED0 pin and mode
@@ -13,15 +13,13 @@ gpio_mode_t led1_mode = GPIO_OUT;
 // Define the button pin
 gpio_t button = GPIO_PIN(1, 2);
 
-void button_callback(void *arg)
-{
-    (void) arg; /* the argument is not used */
-    if (!gpio_read(button)) {
-        gpio_set(led1);
-    }
-    else {
-        gpio_clear(led1);
-    }
+void button_callback(void *arg) {
+  (void)arg; /* the argument is not used */
+  if (!gpio_read(button)) {
+    gpio_set(led1);
+  } else {
+    gpio_clear(led1);
+  }
 }
 
 int main(void) {
