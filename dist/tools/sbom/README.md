@@ -9,7 +9,7 @@ Bill of Materials (SBOM) for RIOT OS based software projects.
 
 Please build & install using [poetry](https://python-poetry.org/docs/).
 Executing `poetry build && poetry install` should install the package and its
-depedencies in your current virtual environment.
+dependencies in your current virtual environment.
 Distribution through pip is currently not planned.
 
 ## Running
