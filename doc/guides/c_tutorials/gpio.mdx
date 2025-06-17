@@ -20,7 +20,7 @@ For this tutorial I will be using a the `feather-nrf52840-sense` board with the 
 
 First, we need to inform RIOT about the board we are using.
 
-To do this we need to change the `BOARD` variable in our `Makefile` to the board we are using.
+To do this we adapt the `BOARD` variable in our `Makefile` to the board we are using.
 
 ```make
 BOARD ?= feather-nrf52840-sense
@@ -33,7 +33,7 @@ it should still execute the same code as before but now using the actual board.
 
 ![Flash output in Visual Studio Code](img/gpio/02_flash_output.png)
 
-:::caution
+:::Tip
 It might return something like:
 
 ```
@@ -99,7 +99,7 @@ gpio_t led0 = GPIO_PIN(1, 9);
 gpio_mode_t led0_mode = GPIO_OUT;
 ```
 
-Now we can control the LED by first initializing the pin and then clearing or setting it.
+Now we can control the LED. First we initialize the pin and afterwards we turn the LED off by clearing the pin
 
 {/*<!--skip ci-->*/}
 ```c
@@ -115,7 +115,7 @@ int main(void) {
 }
 ```
 
-This code will turn off the LED when the board starts which is quite boring,
+Turning the LED off when the board starts is quite boring,
 so let's make it blink by adding a delay and toggling the LED.
 
 ```c

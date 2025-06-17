@@ -18,7 +18,7 @@ code .
 
 Now that Visual Studio Code is open, we create a new file called `main.c` and add the following code:
 
-```c
+```c title="hello_world/main.c"
 #include <stdio.h>
 
 int main(void)
@@ -37,7 +37,7 @@ This program will print "Hello World!" to the console when it is run. The `#incl
 
 Now that we have created our hello world program, we need to create a Makefile to build our program. The Makefile is a build automation tool that allows us to define how our program should be built. We create a new file called `Makefile` in the `hello_world` directory and add the following code:
 
-```makefile
+```makefile  title="hello_world/Makefile"
 # name of your application
 APPLICATION = hello-world
 
@@ -45,7 +45,7 @@ APPLICATION = hello-world
 BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/RIOT
+RIOTBASE ?= $(CURDIR)/../RIOT
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -69,7 +69,7 @@ Congratulations! You have now created a new project with a simple hello world pr
 To build our program, we use the following command:
 
 ```bash
-BUILD_IN_DOCKER=1 make flash
+BUILD_IN_DOCKER=1 make all
 ```
 
 :::note
