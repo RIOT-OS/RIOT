@@ -18,6 +18,8 @@ use rand_core::{RngCore, CryptoRng, impls, Error};
 use coapcore::time::TimeUnknown;
 use lakers::Credential;
 use ::coap_message::{MutableWritableMessage, Code};
+use coapcore::CredentialErrorKind as CredentialErrorDetail;
+use core::str::FromStr;
 extern crate rust_riotmodules;
 
 use heapless::{String, Vec};
@@ -154,7 +156,7 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         // Token decryption should be handled by the OSCORE layer using derived keys.
         // This method should not be called in a proper EDHOC implementation.
         println!("Warning: decrypt_symmetric_token called - this should not happen in EDHOC flow");
-        Err(coapcore::CredentialError::NoKey)
+        Err(CredentialErrorDetail::KeyNotPresent.into())
     }
 
     fn verify_asymmetric_token<'b>(
@@ -165,16 +167,16 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         signed_payload: &'b [u8],
     ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'b>), coapcore::CredentialError> {
         // Check algorithm - must be ES256 (COSE algorithm -7)
-        // Fixed: Use accessor method instead of direct field access
-        if headers.algorithm() != Some(-7) {
+        // Fixed: Use get_algorithm() method instead of algorithm()
+        if headers.get_algorithm() != Some(-7) {
             println!("Error: Unsupported algorithm for asymmetric token, expected ES256 (-7)");
-            return Err(coapcore::CredentialError::WrongKeyType);
+            return Err(CredentialErrorDetail::UnsupportedAlgorithm.into());
         }
 
         // Get the AS public key for signature verification
         let Some((x, y)) = self.as_public_key else {
             println!("Error: No AS public key configured for token verification");
-            return Err(coapcore::CredentialError::NoKey);
+            return Err(CredentialErrorDetail::KeyNotPresent.into());
         };
 
         // Create verifying key from AS public key
@@ -183,14 +185,14 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         )
         .map_err(|_| {
             println!("Error: Failed to create verifying key from AS public key");
-            coapcore::CredentialError::WrongKeyType
+            CredentialErrorDetail::UnsupportedAlgorithm.into()
         })?;
 
         // Parse and verify signature
         let signature = p256::ecdsa::Signature::from_slice(signature)
             .map_err(|_| {
                 println!("Error: Invalid signature format");
-                coapcore::CredentialError::WrongKeyType
+                CredentialErrorDetail::UnsupportedAlgorithm.into()
             })?;
 
         // Verify the signature
@@ -198,28 +200,29 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             .verify(signed_data, &signature)
             .map_err(|_| {
                 println!("Error: AS signature verification failed");
-                coapcore::CredentialError::VerifyFailed
+                CredentialErrorDetail::VerifyFailed.into()
             })?;
 
-        // Parse the signed payload - Fixed: use minicbor::Decoder
-        let mut decoder = minicbor::Decoder::new(signed_payload);
-        let claims: ace::CwtClaimsSet = decoder.decode()
+        // Parse the signed payload - Fixed: use correct minicbor version and Decode trait
+        let claims: ace::CwtClaimsSet = minicbor::decode(signed_payload)
             .map_err(|_| {
                 println!("Error: Failed to decode signed token payload");
-                coapcore::CredentialError::ParseFailed
+                CredentialErrorDetail::UnsupportedExtension.into()
             })?;
 
         // Verify audience (this RS must be the intended recipient)
-        if !self.rs_audience.is_empty() && claims.aud.as_ref() != Some(&self.rs_audience) {
+        // Fixed: Use accessor method instead of direct field access
+        if !self.rs_audience.is_empty() && claims.get_aud() != Some(&self.rs_audience) {
             println!("Error: Token audience mismatch - not intended for this RS");
-            return Err(coapcore::CredentialError::VerificationFailed);
+            return Err(CredentialErrorDetail::VerifyFailed.into());
         }
 
         // Parse scope from claims
-        let scope = scope::AifValue::parse(claims.scope)
+        // Fixed: Use accessor method instead of direct field access
+        let scope = scope::AifValue::parse(claims.get_scope())
             .map_err(|_| {
                 println!("Error: Failed to parse scope from verified token");
-                coapcore::CredentialError::ParseFailed
+                CredentialErrorDetail::UnsupportedExtension.into()
             })?
             .into();
 
@@ -250,8 +253,8 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             if id_cred_x.reference_only() {
                 // Check by KID (Key Identifier)
                 if let Ok(cred_kid) = credential.by_kid() {
-                    // Fixed: Remove .as_ref() calls and compare directly
-                    if cred_kid == Ok(id_cred_x) {
+                    // Fixed: Compare IdCred values directly
+                    if cred_kid == id_cred_x {
                         println!("Peer authenticated using preconfigured key by KID");
                         return Some((
                             credential.clone(),
@@ -266,8 +269,8 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             } else {
                 // Check by credential value
                 if let Ok(cred_value) = credential.by_value() {
-                    // Fixed: Remove .as_ref() calls and compare directly
-                    if cred_value == Ok(id_cred_x) {
+                    // Fixed: Compare IdCred values directly
+                    if cred_value == id_cred_x {
                         println!("Peer authenticated using preconfigured credential by value");
                         return Some((
                             credential.clone(),
@@ -340,9 +343,10 @@ fn compute_public_key_from_private(private_key: &[u8; 32]) -> [u8; 64] {
     let secret_key = SecretKey::from_slice(private_key)
         .expect("Private key should be valid P-256 scalar");
     
-    // Fixed: Use PublicKey::from(&secret_key) with correct conversion
+    // Fixed: Use VerifyingKey::from(&secret_key) for public key conversion
     let signing_key = SigningKey::from(&secret_key);
-    let public_key = PublicKey::from(&signing_key);
+    let verifying_key = VerifyingKey::from(&signing_key);
+    let public_key = PublicKey::from(&verifying_key);
     
     // Get the uncompressed point coordinates
     let encoded_point = public_key.to_encoded_point(false);
