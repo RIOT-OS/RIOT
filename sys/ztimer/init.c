@@ -64,6 +64,7 @@
 #define WIDTH_TO_MAXVAL(width)  (UINT32_MAX >> (32 - width))
 
 #define FREQ_1MHZ       1000000LU
+#define FREQ_500KHZ     500000LU
 #define FREQ_250KHZ     250000LU
 #define FREQ_1KHZ       1000LU
 #define FREQ_1HZ        1LU
@@ -219,6 +220,9 @@ ztimer_clock_t *const ZTIMER_USEC = &ZTIMER_TIMER_CLK;
 #  elif (ZTIMER_TIMER_FREQ == 250000LU) && !(CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION)
 static ztimer_convert_shift_t _ztimer_convert_shift_usec;
 ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_shift_usec.super.super;
+#  elif (ZTIMER_TIMER_FREQ == 500000LU) && !(CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION)
+static ztimer_convert_shift_t _ztimer_convert_shift_usec;
+ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_shift_usec.super.super;
 #  else
 static ztimer_convert_frac_t _ztimer_convert_frac_usec;
 ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
@@ -353,6 +357,15 @@ void ztimer_init(void)
               periph_timer_freq);
     ztimer_convert_shift_up_init(&_ztimer_convert_shift_usec,
                                  ZTIMER_USEC_BASE, 2);
+#    elif (ZTIMER_TIMER_FREQ == FREQ_500KHZ) && !(CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION)
+    if (IS_ACTIVE(DEVELHELP) && ((periph_timer_freq < 487500) || (periph_timer_freq > 512500))) {
+        LOG_WARNING("ZTIMER_USEC from %" PRIu32 " Hz clock with \"left-shift by 1\" frequency conversion\n",
+                    periph_timer_freq);
+    }
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %lu to 1000000\n",
+              periph_timer_freq);
+    ztimer_convert_shift_up_init(&_ztimer_convert_shift_usec,
+                                 ZTIMER_USEC_BASE, 1);
 #    else
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_frac %lu to 1000000\n",
               ZTIMER_TIMER_FREQ);
