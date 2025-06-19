@@ -145,7 +145,7 @@ Here is a quick overview of the examples available in the RIOT:
 
 ## Examples from Guides
 
-Our guides [link here] walk you through small tutorials to get started. The following examples are the resulting code from completing their respective guide.
+[Our guides](https://guide.riot-os.org/) walk you through small tutorials to get started. The following examples are the resulting code from completing their respective guide.
 
 | Example | Description |
 |---------|-------------|
