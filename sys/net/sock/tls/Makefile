@@ -1,3 +1,3 @@
-MODULE = sock_tls
-SRC = sock_tls.c
+MODULE := sock_tls_tcp
+
 include $(RIOTBASE)/Makefile.base

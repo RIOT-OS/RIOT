@@ -2,11 +2,14 @@ APPLICATION = ttls_wolfssl
 
 BOARD ?= native
 
-RIOTBASE ?= $(CURDIR)/../RIOT
+RIOTBASE ?= $(CURDIR)/../../..
 
-USEMODULE += sock_tls
+USEMODULE += sock_tls_tcp
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
+USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_icmpv6_echo
+USEMODULE += gnrc_sock_tcp
 
 # WolfSSL modules
 USEPKG += wolfssl
