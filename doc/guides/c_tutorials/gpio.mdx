@@ -28,12 +28,13 @@ BOARD ?= feather-nrf52840-sense
 
 ![The board variable in Visual Studio Code](img/gpio/01_define_board.png)
 
-Try flashing the board with `make flash` and see if it works,
-it should still execute the same code as before but now using the actual board.
+First we want to make sure that we can build the code for the board.
+To do this we can simply run `make all` in the terminal,
+this will build the code for the board and check if everything is set up correctly.
 
-![Flash output in Visual Studio Code](img/gpio/02_flash_output.png)
+If everything is set up correctly, we should now be able to move on to flashing the board.
 
-:::Tip
+:::tip
 It might return something like:
 
 ```
@@ -49,6 +50,12 @@ If it still doesn't work, consider running it via the Docker container using `BU
 
 Please refer to the [Flashing a RIOT Application](/getting-started/flashing) guide for more information.
 :::
+
+Try flashing the board with `make flash` and see if it works,
+it should still execute the same code as before when running RIOT natively on your
+own hardware but now using the actual board.
+
+![Flash output in Visual Studio Code](img/gpio/02_flash_output.png)
 
 Now if we type `make term` we should see the output of the board in the terminal.
 Make sure that you have the board connected to your computer via USB and
