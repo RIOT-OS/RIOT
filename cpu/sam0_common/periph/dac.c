@@ -110,8 +110,8 @@ int8_t dac_init(dac_t line)
 
     _dac_init_clock(line);
 
-    /* Settings can only be changed when DAC is disabled, reset config */
-    DAC->CTRLA.reg = DAC_CTRLA_SWRST;
+    /* Settings can only be changed when DAC is disabled */
+    DAC->CTRLA.reg &= ~DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_DACCTRL_ENABLE
@@ -126,7 +126,7 @@ int8_t dac_init(dac_t line)
 #endif
                    ;
 
-    DAC->CTRLA.reg = DAC_CTRLA_ENABLE;
+    DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_STATUS_READY
