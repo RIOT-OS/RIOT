@@ -27,6 +27,10 @@
 
 #define DAC_VAL(in) (in >> (16 - DAC_RES_BITS))
 
+#ifndef CONFIG_SAM0_DAC_RUN_ON_STANDBY
+#define CONFIG_SAM0_DAC_RUN_ON_STANDBY 0
+#endif
+
 static void _dac_init_clock(dac_t line)
 {
     sam0_gclk_enable(DAC_CLOCK);
@@ -116,8 +120,12 @@ int8_t dac_init(dac_t line)
 
 #ifdef DAC_DACCTRL_ENABLE
     DAC->DACCTRL[line].reg = DAC_DACCTRL_ENABLE
-                           | _get_CCTRL(sam0_gclk_freq(DAC_CLOCK));
+                           | _get_CCTRL(sam0_gclk_freq(DAC_CLOCK))
 #endif
+#if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_DACCTRL_RUNSTDBY)
+                           | DAC_DACCTRL_RUNSTDBY
+#endif
+                           ;
 
     /* Set Reference Voltage & enable Output if needed */
     DAC->CTRLB.reg = DAC_VREF
@@ -126,7 +134,11 @@ int8_t dac_init(dac_t line)
 #endif
                    ;
 
-    DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
+    DAC->CTRLA.reg = DAC_CTRLA_ENABLE
+#if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_CTRLA_RUNSTDBY)
+                   | DAC_CTRLA_RUNSTDBY
+#endif
+                   ;
     _sync();
 
 #ifdef DAC_STATUS_READY
