@@ -15,7 +15,7 @@ STM32F413ZH microcontroller with 320KiB of RAM and 1.5MiB of Flash.
 
 | MCU        |    STM32F413ZH      |
 |:---------- |:------------------- |
-| Family     | ARM Cortex-M4       |
+| Family     | ARM Cortex-M4F      |
 | Vendor     | ST Microelectronics |
 | RAM        | 320KiB              |
 | Flash      | 1.5MiB              |

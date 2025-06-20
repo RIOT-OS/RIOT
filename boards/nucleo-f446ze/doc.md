@@ -19,7 +19,7 @@ STM32F446ZE microcontroller with 128KiB of RAM and 512KiB of ROM Flash.
 
 | MCU        | STM32F446ZE       |
 |:---------- |:----------------- |
-| Family     | ARM Cortex-M4     |
+| Family     | ARM Cortex-M4F    |
 | Vendor     | ST Microelectronics |
 | RAM        | 128KiB            |
 | Flash      | 512KiB            |

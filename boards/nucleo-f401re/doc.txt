@@ -20,7 +20,7 @@ STM32F401RE microcontroller with 96KiB of RAM and 512KiB of Flash.
 
 | MCU        | STM32F401RE       |
 |:---------- |:----------------- |
-| Family     | ARM Cortex-M4     |
+| Family     | ARM Cortex-M4F    |
 | Vendor     | ST Microelectronics |
 | RAM        | 96KiB             |
 | Flash      | 512KiB            |

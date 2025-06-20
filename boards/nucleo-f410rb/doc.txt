@@ -20,7 +20,7 @@ STM32F410RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
 | MCU        | STM32F410RBT      |
 |:---------- |:----------------- |
-| Family     | ARM Cortex-M4     |
+| Family     | ARM Cortex-M4F    |
 | Vendor     | ST Microelectronics |
 | RAM        | 32KiB             |
 | Flash      | 128KiB            |

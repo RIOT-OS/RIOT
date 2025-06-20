@@ -15,7 +15,7 @@ STM32L432KCU6 microcontroller with 64KiB of RAM and 256KiB of Flash.
 
 | MCU        |    STM32L432KC      |
 |:---------- |:------------------- |
-| Family     | ARM Cortex-M4       |
+| Family     | ARM Cortex-M4F      |
 | Vendor     | ST Microelectronics |
 | RAM        | 64KiB               |
 | Flash      | 256KiB              |
