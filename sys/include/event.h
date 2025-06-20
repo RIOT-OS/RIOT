@@ -416,7 +416,8 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
  * It is pretty much defined as:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- *     while ((event = event_wait_multi(queues, n_queues))) {
+ *     while (1) {
+ *         event_t *event = event_wait_multi(queues, n_queues);
  *         event->handler(event);
  *     }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -434,9 +435,8 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
  */
 static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
 {
-    event_t *event;
-
-    while ((event = event_wait_multi(queues, n_queues))) {
+    while (1) {
+        event_t *event = event_wait_multi(queues, n_queues);
         if (IS_USED(MODULE_EVENT_LOOP_DEBUG)) {
             uint32_t now;
             ztimer_acquire(ZTIMER_USEC);
