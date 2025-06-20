@@ -22,6 +22,8 @@
 #ifndef ENTROPY_MBEDTLS_RIOT_H
 #define ENTROPY_MBEDTLS_RIOT_H
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,6 +78,6 @@ int entropy_mbedtls_riot_get(unsigned char *output, size_t len);
 #ifdef __cplusplus
 }
 #endif
-/** @} */
 
 #endif /* ENTROPY_MBEDTLS_RIOT_H */
+/** @} */
