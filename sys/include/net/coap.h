@@ -237,6 +237,37 @@ typedef enum {
 /** @} */
 
 /**
+ * @name    CoAP Signaling Codes
+ *
+ * See [RFC 8323 Section 5](https://www.rfc-editor.org/rfc/rfc8323#section-5)
+ * @{
+ */
+#define COAP_CLASS_SIGNAL                     (7)
+#define COAP_CODE_SIGNAL_CSM                 ((7 << 5) | 1)
+#define COAP_CODE_SIGNAL_PING                ((7 << 5) | 2)
+#define COAP_CODE_SIGNAL_PONG                ((7 << 5) | 3)
+#define COAP_CODE_SIGNAL_RELEASE             ((7 << 5) | 4)
+#define COAP_CODE_SIGNAL_ABORT               ((7 << 5) | 5)
+/** @} */
+
+/**
+ * @name    CoAP Signaling Option Numbers
+ *
+ * This Option Numbers only apply to CoAP messages with code
+ * @ref COAP_CODE_SIGNAL_CSM. See
+ * [RFC 8323 Section 11.2](https://www.rfc-editor.org/rfc/rfc8323#section-11.2)
+ *
+ * @note    This option numbers may collide with the numeric values of normal
+ *          CoAP Options. This is by design; the CSM Signalling Messages use
+ *          a distinctive CoAP Option Number space.
+ * @{
+ */
+#define COAP_SIGNAL_CSM_OPT_MAX_MESSAGE_SIZE        2 /**< Signals the max message size */
+#define COAP_SIGNAL_CSM_OPT_BLOCK_WISE_TRANSFER     4 /**< zero-length flag to indicate support for block-wise transfers */
+#define COAP_SIGNAL_CSM_OPT_EXTENDED_TOKEN_LENGTH   6 /**< Signals the length of token willing to process */
+/** @} */
+
+/**
  * @name    Content-Format option codes
  * @anchor  net_coap_format
  * @{

@@ -18,14 +18,16 @@
 #include <stdbool.h>
 
 #include "event.h"
-#include "kernel_defines.h"
 #include "net/gcoap.h"
 #include "net/gcoap/forward_proxy.h"
 #include "uri_parser.h"
-#include "net/nanocoap/cache.h"
 #include "ztimer.h"
 
 #include "forward_proxy_internal.h"
+
+#if MODULE_NANOCOAP_CACHE
+#  include "net/nanocoap/cache.h"
+#endif
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -242,7 +244,7 @@ static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote,
 
 static void _send_empty_ack(event_t *event)
 {
-    coap_hdr_t buf;
+    uint8_t buf[sizeof(coap_udp_hdr_t)];
     client_ep_t *cep = container_of(event, client_ep_t, event);
 
     if (_cep_get_response_type(cep) != COAP_TYPE_ACK) {
@@ -250,17 +252,15 @@ static void _send_empty_ack(event_t *event)
     }
     _cep_set_response_type(cep, COAP_TYPE_CON);
 
-    /* Flipping byte order as unlike in the other places where mid is
-     * used, coap_build_hdr would actually flip it back */
-    coap_build_hdr(&buf, COAP_TYPE_ACK, NULL, 0, 0, ntohs(cep->mid));
+    coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_ACK, NULL, 0, 0, cep->mid);
     _dispatch_msg(&buf, sizeof(buf), &cep->ep, &cep->proxy_ep);
 }
 
 static void _set_response_type(coap_pkt_t *pdu, uint8_t resp_type)
 {
-    coap_hdr_set_type(pdu->hdr, resp_type);
+    coap_pkt_set_type(pdu, resp_type);
     if (resp_type == COAP_TYPE_CON) {
-        pdu->hdr->id = htons(gcoap_next_msg_id());
+        coap_set_id(pdu, gcoap_next_msg_id());
     }
 }
 
@@ -315,18 +315,18 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
         /* the response was truncated, so there should be enough space
          * to allocate an empty error message instead (with a potential Observe option) if not,
          * _listen_buf is _way_ too short ;-) */
-        assert(buf_len >= (sizeof(*pdu->hdr) + 4U));
-        gcoap_resp_init(pdu, (uint8_t *)pdu->hdr, buf_len, COAP_CODE_INTERNAL_SERVER_ERROR);
+        assert(buf_len >= (sizeof(coap_udp_hdr_t) + 4U));
+        gcoap_resp_init(pdu, pdu->buf, buf_len, COAP_CODE_INTERNAL_SERVER_ERROR);
         coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
         _set_response_type(pdu, _cep_get_response_type(cep));
     }
     else if (memo->state == GCOAP_MEMO_TIMEOUT) {
         /* send RST */
-        gcoap_resp_init(pdu, (uint8_t *)pdu->hdr, buf_len, COAP_CODE_EMPTY);
+        gcoap_resp_init(pdu, pdu->buf, buf_len, COAP_CODE_EMPTY);
         coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
     }
     /* don't use buf_len here, in case the above `gcoap_resp_init`s changed `pdu` */
-    _dispatch_msg(pdu->hdr, coap_get_total_len(pdu), &cep->ep, &cep->proxy_ep);
+    _dispatch_msg(pdu->buf, coap_get_total_len(pdu), &cep->ep, &cep->proxy_ep);
     _free_client_ep(cep);
 }
 
@@ -417,7 +417,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
 int gcoap_forward_proxy_req_send(client_ep_t *cep)
 {
     int len;
-    if ((len = gcoap_req_send((uint8_t *)cep->pdu.hdr, coap_get_total_len(&cep->pdu),
+    if ((len = gcoap_req_send(cep->pdu.buf, coap_get_total_len(&cep->pdu),
                              &cep->server_ep, NULL, _forward_resp_handler, cep,
                              GCOAP_SOCKET_TYPE_UNDEF)) <= 0) {
         DEBUG("gcoap_forward_proxy_req_send(): gcoap_req_send failed %d\n", len);
@@ -456,15 +456,9 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
     unsigned token_len = coap_get_token_len(client_pkt);
 
     coap_pkt_init(&client_ep->pdu, proxy_req_buf, CONFIG_GCOAP_PDU_BUF_SIZE,
-                  sizeof(coap_hdr_t) + token_len);
+                  sizeof(coap_udp_hdr_t) + token_len);
 
-    client_ep->pdu.hdr->ver_t_tkl = client_pkt->hdr->ver_t_tkl;
-    client_ep->pdu.hdr->code = client_pkt->hdr->code;
-    client_ep->pdu.hdr->id = client_pkt->hdr->id;
-
-    if (token_len) {
-        memcpy(coap_get_token(&client_ep->pdu), coap_get_token(client_pkt), token_len);
-    }
+    memcpy(client_ep->pdu.buf, client_pkt->buf, coap_get_total_hdr_len(client_pkt));
 
     /* copy all options from client_pkt to pkt */
     len = _gcoap_forward_proxy_copy_options(&client_ep->pdu, client_pkt, client_ep, urip);
@@ -501,7 +495,7 @@ int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
         return -ENOMEM;
     }
 
-    cep->mid = pkt->hdr->id;
+    cep->mid = coap_get_id(pkt);
     _cep_set_response_type(
         cep,
         (coap_get_type(pkt) == COAP_TYPE_CON) ? COAP_TYPE_ACK : COAP_TYPE_NON
