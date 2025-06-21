@@ -37,7 +37,7 @@
 #include "rom/uart.h"
 #include "soc/rtc.h"
 #ifndef CPU_FAM_ESP32H2
-#include "soc/rtc_cntl_reg.h"
+#  include "soc/rtc_cntl_reg.h"
 #endif
 
 #define ENABLE_DEBUG 0
