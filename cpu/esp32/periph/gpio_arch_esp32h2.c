@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
+ * Copyright (C) 2025 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Architecture-specific GPIO definitions for ESP32-C3 variant (family)
+ * @brief       Architecture-specific GPIO definitions for ESP32-H2 variant (family)
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
