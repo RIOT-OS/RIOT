@@ -65,7 +65,7 @@ else ifeq (esp32c3,$(CPU_FAM))
   RAM_START_ADDR = 0x3FC80000
 else ifeq (esp32h2,$(CPU_FAM))
   # ESP32-H2 has 320 kByte RAM but the 2nd stage bootloader starts at 0x4083EFD0
-  # so that there are only 258.000 byte (about 250 kByte) remaining
+  # so that there are only 258,000 byte (about 250 kByte) remaining
   RAM_LEN = 250K
   RAM_START_ADDR = 0x40800000
 else
