@@ -117,6 +117,9 @@ with open(header, "w") as f:
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef MAX31865_CUSTOM_LUT_PROVIDED
+#define MAX31865_CUSTOM_LUT_PROVIDED
 ''', file=f)
 
     print('''/** Number of lines in #max31865_{LUT} */'''.format(LUT=args.LUTNAME), file=f)
@@ -151,4 +154,10 @@ extern "C" {
         else:
             line = line + " };"
         print(line % (round(lut[i][0]), round(lut[i][1]), round(lut[i][2]), round(lut[i][3])), file=f)
+
+    print('''\
+
+#include_next "max31865_lut.h"
+
+#endif  /* MAX31865_CUSTOM_LUT_PROVIDED */''', file=f)
     print("\n#ifdef __cplusplus\n}\n#endif\n\n/** @} */", file=f)
