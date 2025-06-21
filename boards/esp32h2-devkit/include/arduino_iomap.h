@@ -34,7 +34,7 @@ extern "C" {
 #define ARDUINO_PIN_2       GPIO25  /**< Arduino pin 2 */
 #define ARDUINO_PIN_3       GPIO2   /**< Arduino pin 3 (PWM) */
 #if !defined(MODULE_ESP_RTC_TIMER_32K)
-#define ARDUINO_PIN_4       GPIO13  /**< Arduino pin 4 */
+#  define ARDUINO_PIN_4     GPIO13  /**< Arduino pin 4 */
 #endif
 #define ARDUINO_PIN_5       GPIO12  /**< Arduino pin 5 (PWM) */
 #define ARDUINO_PIN_6       GPIO22  /**< Arduino pin 6 (PWM) */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
+ * Copyright (C) 2025 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -37,8 +37,8 @@
  * @brief   Default button GPIO pin definition
  *
  * ESP32-H2-DevKitM-1 boards have a BOOT button connected to GPIO9, which can be
- * used as button during normal operation. Since the GPIO9 pin is pulled up,
- * the button signal is inverted, i.e., pressing the button will give a
+ * used as button during normal operation. Since the button connects GPIO9 pin
+ * to GND, the button signal is inverted, i.e., pressing the button will give a
  * low signal.
  */
 #define BTN0_PIN            GPIO9

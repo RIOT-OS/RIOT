@@ -46,7 +46,7 @@ extern "C" {
 /**
  * @brief   Declaration of GPIOs that can be used as ADC channels
  *
- * For generic boards, all ADC pins that have broken out are declared as ADC
+ * For generic boards, all ADC pins that are broken out are declared as ADC
  * channels.
  *
  * @note As long as the GPIOs listed in ADC_GPIOS are not initialized as ADC
@@ -117,7 +117,7 @@ extern "C" {
 /**
  * @name    SPI configuration
  *
- * @note The GPIOs listed in the configuration are first initialized as SPI
+ * @note The GPIOs listed in the configuration are only initialized as SPI
  * signals when the corresponding SPI interface is used for the first time
  * by either calling the `spi_init_cs` function or the `spi_acquire`
  * function. That is, they are not allocated as SPI signals before and can
@@ -144,7 +144,7 @@ extern "C" {
 /**
  * @name   UART configuration
  *
- * ESP32-H2 provides 2 UART interfaces at maximum:
+ * ESP32-H2 provides 2 UART interfaces:
  *
  * UART_DEV(0) uses fixed standard configuration.<br>
  * UART_DEV(1) is not used.<br>

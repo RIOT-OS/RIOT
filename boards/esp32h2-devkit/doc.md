@@ -57,7 +57,7 @@ see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 ### Board Configuration {#esp32h2_devkit_board_configuration}
 
 ESP32-H2-DevKitM-1 boards have no special hardware on board with the exception
-of a single pin RGB-LED.
+of a WS2812-compatible RGB-LED.
 
 All GPIOs are simply broken out for flexibility. Therefore, the board
 configuration is the most flexible one which provides:
@@ -67,7 +67,7 @@ configuration is the most flexible one which provides:
 - 1 x I2C
 - 1 x UART
 - 2 x PWM with 3 channels each
-- 1 RGB-LED
+- 1 x RGB-LED
 
 Since all GPIOs are broken out, GPIOs can be used for different purposes
 in different applications. For flexibility, GPIOs can be listed in multiple
@@ -118,7 +118,7 @@ USB D+            | GPIO26 | | |
 - The configuration of ADC channels contains all ESP32-H2 GPIOs that could
   be used as ADC channels.
 - GPIO6 and GPIO7 are not broken out for any reason.
-- GPPIO15 to GPIO21 are used for in-package flash and are not broken out.
+- GPPIO15 to GPIO21 are used for the in-package flash and are not broken out.
 
 For detailed information about the peripheral configurations of ESP32-H2
 boards, see section \ref esp32_peripherals "Common Peripherals".
