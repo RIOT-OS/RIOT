@@ -245,7 +245,7 @@ The key features of ESP32-C3 are:
 | MCU               | ESP32-C3                                                          | Supported by RIOT |
 | ------------------|-------------------------------------------------------------------|------------------ |
 | Vendor            | Espressif                                                         | |
-| Cores             | 1 32-bit RISC-V core                                              | yes |
+| Cores             | 1 x 32-bit RISC-V core                                            | yes |
 | FPU               | -                                                                 | -   |
 | RAM               | 400 KiB SRAM <br> 8 KiB RTC SRAM                                  | yes <br> yes |
 | ROM               | 384 KiB                                                           | yes |
@@ -281,7 +281,7 @@ The key features of ESP32-H2 are:
 | MCU               | ESP32-H2                                                          | Supported by RIOT |
 | ------------------|-------------------------------------------------------------------|------------------ |
 | Vendor            | Espressif                                                         | |
-| Cores             | 1 32-bit RISC-V core                                              | yes |
+| Cores             | 1 x 32-bit RISC-V core                                            | yes |
 | FPU               | -                                                                 | -   |
 | RAM               | 320 KiB SRAM <br> 4 KiB LP SRAM                                   | yes <br> yes |
 | ROM               | 384 KiB                                                           | yes |
