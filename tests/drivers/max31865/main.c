@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "max31865.h"
+#include "max31865_lut.h"           /* include BEFORE max31865_params.h */
 #include "max31865_params.h"
 #include "ztimer.h"
 #include "log.h"

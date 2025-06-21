@@ -1,5 +1,7 @@
 include ../Makefile.drivers_common
 
+INCLUDES += -I$(APPDIR)
+
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
 
