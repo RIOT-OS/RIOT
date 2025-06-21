@@ -12,7 +12,7 @@ directory for more details.
 @brief       Definitions and configurations that are common for all ESP32-H2 boards.
 
 For detailed information about the ESP32-H2, configuring and compiling RIOT
-for ESP32-H2 boards, please refer \ref esp32_riot.
+for ESP32-H2 boards, please refer to \ref esp32_riot.
 
 @defgroup    boards_esp32h2  ESP32-H2 Boards
 @ingroup     boards
