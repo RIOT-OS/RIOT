@@ -58,9 +58,9 @@
 #include "rom/uart.h"
 #include "soc/rtc.h"
 #ifndef CPU_FAM_ESP32H2
-#include "soc/rtc_cntl_reg.h"
-#include "soc/rtc_cntl_struct.h"
-#include "soc/syscon_reg.h"
+#  include "soc/rtc_cntl_reg.h"
+#  include "soc/rtc_cntl_struct.h"
+#  include "soc/syscon_reg.h"
 #endif
 #include "soc/timer_group_struct.h"
 

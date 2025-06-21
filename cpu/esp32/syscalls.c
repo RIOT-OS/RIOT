@@ -45,8 +45,8 @@
 #include "soc/periph_defs.h"
 #include "soc/rtc.h"
 #ifndef CPU_FAM_ESP32H2
-#include "soc/rtc_cntl_reg.h"
-#include "soc/rtc_cntl_struct.h"
+#  include "soc/rtc_cntl_reg.h"
+#  include "soc/rtc_cntl_struct.h"
 #endif
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
@@ -219,7 +219,8 @@ extern int _scanf_float(struct _reent *rptr,
 /* We need to override these functions that are used from ROM */
 
 __attribute__((__noreturn__))
-static void _riot__assert_func(const char *file, int line, const char * func, const char *failedexpr)
+static void _riot__assert_func(const char *file, int line, const char * func,
+                               const char *failedexpr)
 {
     extern __NORETURN void _assert_failure(const char *file, unsigned line);
     (void)func;
@@ -227,7 +228,7 @@ static void _riot__assert_func(const char *file, int line, const char * func, co
     _assert_failure(file, line);
 }
 
-static void _riot__sinit (struct _reent *reent)
+static void _riot__sinit(struct _reent *reent)
 {
     /* this function should never be called from ROM */
     assert(0);
