@@ -24,8 +24,10 @@
 extern "C" {
 #endif
 
-/** Number of lines in #max31865_lut_def */
-#define MAX31865_LUT_DEF_NUMLINES        (ARRAY_SIZE(max31865_lut_def))
+#ifndef MAX31865_CUSTOM_LUT_PROVIDED
+
+/** Number of lines in #max31865_lut */
+#define MAX31865_LUT_NUMLINES        (ARRAY_SIZE(max31865_lut))
 /**
  * @ingroup drivers_max31865
  * @brief Default lookup table for temperature conversion
@@ -41,7 +43,7 @@ extern "C" {
  * - Tmin      = -200°C
  * - Tmax      = 650°C
  */
-static const int32_t max31865_lut_def[][4] =
+static const int32_t max31865_lut[][4] =
 { { 0x0E5E, -200000000, -242967290, 11682 },
   { 0x11B6, -190000000, -243466981, 11792 },
   { 0x1506, -180000000, -244071429, 11905 },
@@ -128,6 +130,8 @@ static const int32_t max31865_lut_def[][4] =
   { 0xFACE, 630000000, -389142857, 15873 },
   { 0xFD44, 640000000, -392420382, 15924 },
   { 0xFFB8, 650000000, -395750799, 15974 } };
+
+#endif  /* MAX31865_CUSTOM_LUT_PROVIDED */
 
 #ifdef __cplusplus
 }

@@ -23,7 +23,7 @@
 
 #include "max31865.h"
 #include "max31865_internal.h"
-#include "max31865_lut_def.h"
+#include "max31865_lut.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,8 +84,8 @@ extern "C" {
             .cfg_byte = MAX31865_PARAM_CFG_BYTE, \
             .temp_low_threshold = MAX31865_PARAM_TEMP_THRES_LOW, \
             .temp_high_threshold = MAX31865_PARAM_TEMP_THRES_HIGH, \
-            .lut = &max31865_lut_def, \
-            .lut_numlines = MAX31865_LUT_DEF_NUMLINES, \
+            .lut = &max31865_lut, \
+            .lut_numlines = MAX31865_LUT_NUMLINES, \
 }
 #endif
 /**
