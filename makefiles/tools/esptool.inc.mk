@@ -5,6 +5,7 @@ ifneq (,$(filter qout qio,$(FLASH_MODE)))
 endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
+ESPTOOL_FLASH ?= $(ESPTOOL)
 
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
@@ -13,7 +14,7 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   FLASHDEPS += esp-qemu
 else
   PROGRAMMER_SPEED ?= 460800
-  FLASHER = $(ESPTOOL)
+  FLASHER = $(ESPTOOL_FLASH)
   FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
   FFLAGS += --before default_reset write_flash -z
   FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
@@ -21,9 +22,10 @@ else
   FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
   FFLAGS += $(FLASHFILE_POS) $(FLASHFILE)
+  FLASHDEPS += esptool_flash
 endif
 
-.PHONY: esp-qemu
+.PHONY: esp-qemu esptool_flash clean
 
 esp-qemu: $(FLASHFILE)
 ifeq (esp32,$(CPU))
@@ -50,6 +52,12 @@ else
 		cat - $(FLASHFILE) tmp.bin | \
 		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
 endif
+
+esptool_flash: $(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py
+
+$(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py:
+	python3 -m venv $(PKGDIRBASE)/esptool/venv_flash
+	$(PKGDIRBASE)/esptool/venv_flash/bin/pip install esptool
 
 # reset tool configuration
 RESET ?= $(RIOTTOOLS)/esptools/espreset.py
