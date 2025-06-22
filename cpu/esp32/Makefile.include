@@ -92,7 +92,10 @@ endif
 
 FLASHFILE_POS ?= 0x10000
 
-ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
+ifeq (,$(ESPTOOL))
+  ESPTOOL ?= $(PKGDIRBASE)/esptool/venv/bin/esptool.py
+  ESPTOOL_FLASH ?= $(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py
+endif
 
 include $(RIOTCPU)/esp_common/Makefile.include
 

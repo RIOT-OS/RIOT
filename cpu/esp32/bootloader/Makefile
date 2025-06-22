@@ -418,7 +418,7 @@ $(ESP_SDK_BOOTLOADER_ELF): \
 	$(Q)$(CC) -o $@ $(LINKFLAGS) -Wl,-Map=$(@:%.elf=%.map)
 
 FLASH_CHIP = $(CPU_FAM)
-ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
+ESPTOOL ?= $(PKGDIRBASE)/esptool/venv/bin/esptool.py
 # TODO: These should be exported/configurable from the app side. That would
 # require to export these values.
 FLASH_MODE ?= dio   # ESP-IDF uses dio as default flash mode for the bootloader

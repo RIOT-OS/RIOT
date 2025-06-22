@@ -439,30 +439,7 @@ The building process using Docker comprises two steps:
 Both steps can also be performed with a single command on the host system
 by setting the `BUILD_IN_DOCKER` variable:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
-  make flash BOARD=...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-@note
-During the migration phase from the ESP32 toolchain with GCC 5.2.0, which was
-specially compiled for RIOT, to Espressif's precompiled ESP32 vendor toolchain
-with GCC 8.4.0, the RIOT Docker build image
-[schorcht/riotbuild_esp32_espressif_gcc_8.4.0](https://hub.docker.com/repository/docker/schorcht/riotbuild_esp32_espressif_gcc_8.4.0)
-has to be used instead of `riot/riotbuild` as this already contains the
-precompiled ESP32 vendor toolchain from Espressif while `riot/riotbuild`
-does not.
-Therefore, the RIOT Docker build image has to be pulled with command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ sudo docker pull schorcht/riotbuild_esp32_espressif_gcc_8.4.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-and the RIOT Docker build image in step 1 has to be started with command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild schorcht/riotbuild_esp32_espressif_gcc_8.4.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The single step build command on the host system has then to be:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" DOCKER_IMAGE=schorcht/riotbuild_esp32_espressif_gcc_8.4.0 \
-  make flash BOARD=...
+$ BUILD_IN_DOCKER=1 make flash BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_toc)
@@ -547,25 +524,17 @@ install it separately.
 
 ### Installation of esptool.py (ESP flash programmer tool) {#esp32_installation_of_esptool}
 
-The RIOT port does not work with the `esptool.py` ESP flasher program
-available on [GitHub](https://github.com/espressif/esptool) or
-as a package for your OS. Instead, a modified version included in
-ESP-IDF SDK is required.
+The RIOT port uses the ESP flasher programme `esptool.py` as a package directly
+from [GitHub](https://github.com/espressif/esptool) within a virtual Python
+environment. The `esptool.py` version that is available as a Python package
+for your operating system does not normally work.
 
-To avoid the installation of the complete ESP-IDF SDK, for example, because
-RIOT Docker build image is used for compilation, `esptool.py` has been
-extracted from the SDK and placed in RIOT's directory `dist/tools/esptool`.
-For convenience, the build system uses always the version from this directory.
+The RIOT port uses the ESP flasher program `esptool.py` as package directly from [GitHub](https://github.com/espressif/esptool) within an virtual Python environment. The version of `esptool.py` available as Python package for your OS does not usually work.
 
-Therefore, it is **not necessary to install** `esptool.py` explicitly. However
-`esptool.py` depends on `pySerial` which can be installed either
-using `pip`
+It is also possible to use your own version of `esptool.py` by overriding
+the make variable `ESPTOOL` in the command line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ sudo pip3 install pyserial
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-or the package manager of your OS, for example on Debian/Ubuntu systems:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ apt install python3-serial
+$ ESPTOOL=/path/to/esptool.py make flash BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For more information on `esptool.py`, please refer to the
