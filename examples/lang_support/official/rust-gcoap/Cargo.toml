@@ -46,7 +46,7 @@ coapcore = { git = "https://github.com/KiyoLelou10/ariel-os", default-features =
 lakers = { version = "0.8.0", default-features = false }
 lakers-crypto-rustcrypto = { version = "0.8.0", default-features = false }
 liboscore = { version = "0.2.4", default-features = false }
-minicbor = { version = "0.1.0", default-features = false }
+minicbor = { version = "0.26.5", default-features = false }
 heapless = { version = "0.8", default-features = false }
 rand_core = { version = "0.6.4", default-features = false }
 p256 = { version = "0.13.2", default-features = false, features = ["ecdsa"] }
