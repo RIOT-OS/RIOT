@@ -156,7 +156,7 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         // Token decryption should be handled by the OSCORE layer using derived keys.
         // This method should not be called in a proper EDHOC implementation.
         println!("Warning: decrypt_symmetric_token called - this should not happen in EDHOC flow");
-        Err(CredentialErrorDetail::KeyNotPresent.into())
+        Err(coapcore::CredentialError::from(CredentialErrorDetail::KeyNotPresent))
     }
 
     fn verify_asymmetric_token<'b>(
@@ -168,15 +168,15 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
     ) -> Result<(Self::GeneralClaims, ace::CwtClaimsSet<'b>), coapcore::CredentialError> {
         // Check algorithm - must be ES256 (COSE algorithm -7)
         // Fixed: Use get_algorithm() method instead of algorithm()
-        if headers.get_algorithm() != Some(-7) {
+        if headers.alg != Some(-7) {
             println!("Error: Unsupported algorithm for asymmetric token, expected ES256 (-7)");
-            return Err(CredentialErrorDetail::UnsupportedAlgorithm.into());
+            return Err(coapcore::CredentialError::from(CredentialErrorDetail::UnsupportedAlgorithm));
         }
 
         // Get the AS public key for signature verification
         let Some((x, y)) = self.as_public_key else {
             println!("Error: No AS public key configured for token verification");
-            return Err(CredentialErrorDetail::KeyNotPresent.into());
+            return Err(coapcore::CredentialError::from(CredentialErrorDetail::KeyNotPresent));
         };
 
         // Create verifying key from AS public key
@@ -185,14 +185,14 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
         )
         .map_err(|_| {
             println!("Error: Failed to create verifying key from AS public key");
-            CredentialErrorDetail::UnsupportedAlgorithm.into()
+            coapcore::CredentialError::from(CredentialErrorDetail::UnsupportedAlgorithm)
         })?;
 
         // Parse and verify signature
         let signature = p256::ecdsa::Signature::from_slice(signature)
             .map_err(|_| {
                 println!("Error: Invalid signature format");
-                CredentialErrorDetail::UnsupportedAlgorithm.into()
+                coapcore::CredentialError::from(CredentialErrorDetail::UnsupportedAlgorithm)
             })?;
 
         // Verify the signature
@@ -200,29 +200,29 @@ impl seccfg::ServerSecurityConfig for EdhocSecurityConfig {
             .verify(signed_data, &signature)
             .map_err(|_| {
                 println!("Error: AS signature verification failed");
-                CredentialErrorDetail::VerifyFailed.into()
+                coapcore::CredentialError::from(CredentialErrorDetail::VerifyFailed)
             })?;
 
         // Parse the signed payload - Fixed: use correct minicbor version and Decode trait
         let claims: ace::CwtClaimsSet = minicbor::decode(signed_payload)
             .map_err(|_| {
                 println!("Error: Failed to decode signed token payload");
-                CredentialErrorDetail::UnsupportedExtension.into()
+                coapcore::CredentialError::from(CredentialErrorDetail::UnsupportedExtension)
             })?;
 
         // Verify audience (this RS must be the intended recipient)
         // Fixed: Use accessor method instead of direct field access
-        if !self.rs_audience.is_empty() && claims.get_aud() != Some(&self.rs_audience) {
+        if !self.rs_audience.is_empty() && claims.aud != Some(&self.rs_audience) {
             println!("Error: Token audience mismatch - not intended for this RS");
-            return Err(CredentialErrorDetail::VerifyFailed.into());
+            return Err(coapcore::CredentialError::from(CredentialErrorDetail::VerifyFailed));
         }
 
         // Parse scope from claims
         // Fixed: Use accessor method instead of direct field access
-        let scope = scope::AifValue::parse(claims.get_scope())
+        let scope = scope::AifValue::parse(claims.scope)
             .map_err(|_| {
                 println!("Error: Failed to parse scope from verified token");
-                CredentialErrorDetail::UnsupportedExtension.into()
+                coapcore::CredentialError::from(CredentialErrorDetail::UnsupportedExtension)
             })?
             .into();
 
