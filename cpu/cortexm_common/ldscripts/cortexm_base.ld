@@ -229,6 +229,12 @@ SECTIONS
         . = ALIGN(4);
     } > bkup_ram
 
+    .backup.noinit (NOLOAD) : ALIGN(4) {
+        _sbackup_noinit = .;
+        *(.backup.noinit)
+        _ebackup_noinit = .;
+    } > bkup_ram
+
     .heap3 (NOLOAD) : ALIGN(4) {
         _sheap1 = . ;
         _eheap1 = ORIGIN(bkup_ram) + LENGTH(bkup_ram);
