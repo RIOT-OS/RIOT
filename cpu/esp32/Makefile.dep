@@ -2,6 +2,7 @@
 
 include $(RIOTCPU)/esp_common/Makefile.dep
 
+USEPKG += esptool
 USEPKG += esp32_sdk
 
 USEMODULE += esp_idf_common
