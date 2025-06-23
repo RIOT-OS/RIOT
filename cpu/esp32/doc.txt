@@ -518,7 +518,7 @@ $ dist/tools/esptools/install.sh
 Usage: install.sh <tool>
        install.sh gdb <platform>
        install.sh qemu <platform>
-<tool> = all | esptool | gdb | openocd | qemu |
+<tool> = all | gdb | openocd | qemu |
          esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -549,7 +549,7 @@ $ . dist/tools/esptools/export.sh
 Usage: export.sh <tool>
        export.sh gdb <platform>
        export.sh qemu <platform>
-<tool> = all | esptool | gdb | openocd | qemu |
+<tool> = all | gdb | openocd | qemu |
          esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -569,10 +569,8 @@ install it separately.
 
 The RIOT port uses the ESP flasher programme `esptool.py` as a package directly
 from [GitHub](https://github.com/espressif/esptool) within a virtual Python
-environment. The `esptool.py` version that is available as a Python package
-for your operating system does not normally work.
-
-The RIOT port uses the ESP flasher program `esptool.py` as package directly from [GitHub](https://github.com/espressif/esptool) within an virtual Python environment. The version of `esptool.py` available as Python package for your OS does not usually work.
+environment. The `esptool.py` available as a Python package for your operating
+system may not work.
 
 It is also possible to use your own version of `esptool.py` by overriding
 the make variable `ESPTOOL` in the command line, for example:
