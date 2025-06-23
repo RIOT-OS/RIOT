@@ -27,6 +27,14 @@
 
 #define DAC_VAL(in) (in >> (16 - DAC_RES_BITS))
 
+#ifndef CONFIG_SAM0_DAC_REFRESH
+#define CONFIG_SAM0_DAC_REFRESH 2
+#endif
+
+#ifndef CONFIG_SAM0_DAC_RUN_ON_STANDBY
+#define CONFIG_SAM0_DAC_RUN_ON_STANDBY 0
+#endif
+
 static void _dac_init_clock(dac_t line)
 {
     sam0_gclk_enable(DAC_CLOCK);
@@ -110,13 +118,29 @@ int8_t dac_init(dac_t line)
 
     _dac_init_clock(line);
 
-    /* Settings can only be changed when DAC is disabled, reset config */
-    DAC->CTRLA.reg = DAC_CTRLA_SWRST;
+    /* Settings can only be changed when DAC is disabled */
+    DAC->CTRLA.reg &= ~DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_DACCTRL_ENABLE
     DAC->DACCTRL[line].reg = DAC_DACCTRL_ENABLE
-                           | _get_CCTRL(sam0_gclk_freq(DAC_CLOCK));
+                           | _get_CCTRL(sam0_gclk_freq(DAC_CLOCK))
+#endif
+#if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_DACCTRL_RUNSTDBY)
+                           | DAC_DACCTRL_RUNSTDBY
+#endif
+                           ;
+
+#ifdef DAC_DACCTRL_REFRESH
+    /** The DAC can only maintain its output on the desired value for approximately 100 μs.
+     *  For static voltages the conversion must be refreshed periodically (see e.g.
+     *  '47.6.9.3 Conversion Refresh' in the SAM D5xE5x family data sheet).
+     *
+     *  Note: T_REFRESH = REFRESH * T_OSCULP32K
+     */
+    static_assert(CONFIG_SAM0_DAC_REFRESH != 1, "DACCTRLx.REFRESH = 1 is reserved");
+
+    DAC->DACCTRL[line].bit.REFRESH = CONFIG_SAM0_DAC_REFRESH;
 #endif
 
     /* Set Reference Voltage & enable Output if needed */
@@ -126,7 +150,11 @@ int8_t dac_init(dac_t line)
 #endif
                    ;
 
-    DAC->CTRLA.reg = DAC_CTRLA_ENABLE;
+    DAC->CTRLA.reg = DAC_CTRLA_ENABLE
+#if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_CTRLA_RUNSTDBY)
+                   | DAC_CTRLA_RUNSTDBY
+#endif
+                   ;
     _sync();
 
 #ifdef DAC_STATUS_READY
