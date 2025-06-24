@@ -19,8 +19,8 @@
 #include "core_cm33.h"
 #include "cpu_conf_common.h"
 
-#define CPU_DEFAULT_IRQ_PRIO (1U)
-#define CPU_IRQ_NUMOF (52U)
+#define CPU_DEFAULT_IRQ_PRIO 1u
+#define CPU_IRQ_NUMOF 52u
 
 #ifdef __cplusplus
 extern "C" {

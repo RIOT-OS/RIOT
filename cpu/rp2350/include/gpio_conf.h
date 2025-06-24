@@ -17,7 +17,7 @@
  */
 
 /** The number of GPIO pins available on the RP2350 */
-#define GPIO_PIN_NUMOF 30U
+#define GPIO_PIN_NUMOF 30u
 
 #ifdef __cplusplus
 extern "C" {

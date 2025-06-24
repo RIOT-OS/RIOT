@@ -31,31 +31,31 @@
 typedef uint32_t gpio_t;
 
 /** GPIO Pin ID for the onboard LED */
-#define LED0_PIN_ID 25
+#define LED0_PIN_ID 25u
 
 /** GPIO Pin ID for oscillator debugging */
-#define OSC_DEBUG_PIN_ID 15
+#define OSC_DEBUG_PIN_ID 15u
 
 /** Reset bit for the system PLL */
-#define RESET_PLL_SYS 1 << 14
+#define RESET_PLL_SYS (1u << 14u)
 
 /** Reset bit for the pads bank 0 */
-#define RESET_PADS_BANK0 1 << 9
+#define RESET_PADS_BANK0 (1u << 9u)
 
 /** Reset bit for UART0 peripheral */
-#define RESET_UART0 1 << 26
+#define RESET_UART0 (1u << 26u)
 
 /** Reset bit for UART1 peripheral */
-#define RESET_UART1 1 << 27
+#define RESET_UART1 (1u << 27u)
 
 /** Reset bit for the IO bank 0 */
-#define RESET_IO_BANK0 1 << 6
+#define RESET_IO_BANK0 (1u << 6u)
 
 /** Input enable bit for GPIO0 in PADS_BANK0 */
-#define PADS_BANK0_GPIO0_IE_BITS 1 << 6
+#define PADS_BANK0_GPIO0_IE_BITS (1u << 6u)
 
 /** Isolation bits for PADS_BANK0 */
-#define PADS_BANK0_ISO_BITS 1 << 8
+#define PADS_BANK0_ISO_BITS (1u << 8u)
 
 #ifdef __cplusplus
 extern "C" {

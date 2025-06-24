@@ -24,53 +24,28 @@
 extern "C" {
 #endif
 
-/**
- * @brief UART baud rate in bits per second
- */
-#define BAUDRATE 115200
+/** UART baud rate in bits per second */
+#define BAUDRATE 115200u
 
-/**
- * @brief Integer baud rate divisor
- * Calculated based on CPU frequency and desired baud rate
- * Formula: ((8 * CPUFREQ + BAUDRATE) / (2 * BAUDRATE)) / 64
- */
-#define IBRD ((8 * CPUFREQ + BAUDRATE) / (2 * BAUDRATE)) / 64
+/** Integer baud rate divisor */
+#define IBRD ((((8u * CPUFREQ) + BAUDRATE) / (2u * BAUDRATE)) / 64u)
 
-/**
- * @brief Fractional baud rate divisor
- * Calculated based on CPU frequency and desired baud rate
- * Formula: ((8 * CPUFREQ + BAUDRATE) / (2 * BAUDRATE)) % 64
- */
-#define FBRD ((8 * CPUFREQ + BAUDRATE) / (2 * BAUDRATE)) % 64
+/** Fractional baud rate divisor */
+#define FBRD ((((8u * CPUFREQ) + BAUDRATE) / (2u * BAUDRATE)) % 64u)
 
-/**
- * @brief UART enable bit in control register
- * Bit 0 of UARTCR register
- */
-#define UART_UARTCR_UARTEN_BITS 1 << 0
+/** UART enable bit in control register */
+#define UART_UARTCR_UARTEN_BITS (1u << 0u)
 
-/**
- * @brief UART receive enable bit in control register
- * Bit 9 of UARTCR register
- */
-#define UART_UARTCR_RXE_BITS 1 << 9
+/** UART receive enable bit in control register */
+#define UART_UARTCR_RXE_BITS (1u << 9u)
 
-/**
- * @brief UART transmit enable bit in control register
- * Bit 8 of UARTCR register
- */
-#define UART_UARTCR_TXE_BITS 1 << 8
+/** UART transmit enable bit in control register */
+#define UART_UARTCR_TXE_BITS (1u << 8u)
 
-/**
- * @brief UART receive FIFO full flag bit in flag register
- * Bit 6 of UARTFR register
- */
-#define UART_UARTFR_RXFF_BITS 1 << 6
+/** UART receive FIFO full flag bit in flag register */
+#define UART_UARTFR_RXFF_BITS (1u << 6u)
 
-/**
- * @brief UART transmit FIFO empty flag bit in flag register
- * Bit 7 of UARTFR register
- */
-#define UART_UARTFR_TXFE_BITS 1 << 7
+/** UART transmit FIFO empty flag bit in flag register */
+#define UART_UARTFR_TXFE_BITS (1u << 7u)
 
 /** @} */

@@ -19,11 +19,11 @@
  */
 
 /** Bit to be set for an atomic XOR operation */
-#define ATOMIC_XOR_WRITE 0x1000
+#define ATOMIC_XOR_WRITE 0x1000u
 /** Bit to be set for an atomic set operation */
-#define ATOMIC_BITMASK_SET_WRITE 0x2000
+#define ATOMIC_BITMASK_SET_WRITE 0x2000u
 /** Bits to be set for an atomic clear operation */
-#define ATOMIC_BITMASK_CLEAR_WRITE 0x3000
+#define ATOMIC_BITMASK_CLEAR_WRITE 0x3000u
 
 #ifdef __cplusplus
 extern "C" {
