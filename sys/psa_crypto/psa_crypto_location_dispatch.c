@@ -506,6 +506,80 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
     return psa_algorithm_dispatch_mac_compute(attributes, alg, slot, input, input_length, mac,
                                               mac_size, mac_length);
 }
+
+psa_status_t psa_location_dispatch_mac_verify(const psa_key_attributes_t *attributes,
+                                              psa_algorithm_t alg,
+                                              const psa_key_slot_t *slot,
+                                              const uint8_t *input,
+                                              size_t input_length,
+                                              const uint8_t *mac,
+                                              size_t mac_length)
+{
+#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+    psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
+    psa_drv_se_context_t *drv_context;
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+    const psa_drv_se_t *drv;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (psa_get_se_driver(attributes->lifetime, &drv, &drv_context)) {
+        if (drv->mac == NULL || drv->mac->p_mac_verify == NULL) {
+            return PSA_ERROR_NOT_SUPPORTED;
+        }
+
+        return drv->mac->p_mac_verify(drv_context, input, input_length, *slot_number, alg, mac,
+                                      mac_length);
+    }
+#endif /* CONFIG_PSA_SECURE_ELEMENT */
+
+    return psa_algorithm_dispatch_mac_verify(attributes, alg, slot, input, input_length, mac,
+                                             mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
+                                                  const psa_key_attributes_t *attributes,
+                                                  const psa_key_slot_t *slot,
+                                                  psa_algorithm_t alg)
+{
+    return psa_algorithm_dispatch_mac_sign_setup(operation, attributes, slot, alg);
+}
+
+psa_status_t psa_location_dispatch_mac_verify_setup(psa_mac_operation_t *operation,
+                                                    const psa_key_attributes_t *attributes,
+                                                    const psa_key_slot_t *slot,
+                                                    psa_algorithm_t alg)
+{
+    return psa_algorithm_dispatch_mac_verify_setup(operation, attributes, slot, alg);
+}
+
+psa_status_t psa_location_dispatch_mac_update(psa_mac_operation_t *operation,
+                                              const uint8_t *input,
+                                              size_t input_length)
+{
+    return psa_algorithm_dispatch_mac_update(operation, input, input_length);
+}
+
+psa_status_t psa_location_dispatch_mac_sign_finish(psa_mac_operation_t *operation,
+                                                   uint8_t *mac,
+                                                   size_t mac_size,
+                                                   size_t *mac_length)
+{
+    return psa_algorithm_dispatch_mac_sign_finish(operation, mac, mac_size, mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_verify_finish(psa_mac_operation_t *operation,
+                                                     const uint8_t *mac,
+                                                     size_t mac_length)
+{
+    return psa_algorithm_dispatch_mac_verify_finish(operation, mac, mac_length);
+}
+
+psa_status_t psa_location_dispatch_mac_abort(psa_mac_operation_t *operation)
+{
+    return psa_algorithm_dispatch_mac_abort(operation);
+}
 #endif /* MODULE_PSA_MAC */
 
 psa_status_t psa_location_dispatch_generate_random(uint8_t *output,
