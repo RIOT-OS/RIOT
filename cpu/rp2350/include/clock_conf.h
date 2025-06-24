@@ -94,16 +94,16 @@
 
 #if (PLL_VCO_FEEDBACK_SCALE_MIN < PLL_VCO_FEEDBACK_SCALE_MIN) || \
     (PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
-#error "Value for PLL_VCO_FEEDBACK_SCALE out of range, check config"
+#  error "Value for PLL_VCO_FEEDBACK_SCALE out of range, check config"
 #endif
 #if (PLL_REF_DIV_MIN < PLL_REF_DIV_MIN) || (PLL_REF_DIV_MAX > PLL_REF_DIV_MAX)
-#error "Value for PLLxosc_sleep_REF_DIV out of range, check config"
+#  error "Value for PLLxosc_sleep_REF_DIV out of range, check config"
 #endif
 #if (PLL_POSTDIV_MIN < PLL_POSTDIV_MIN) || (PLL_POSTDIV_MAX > PLL_POSTDIV_MAX)
-#error "Value for PLL_POSTDIV out of range, check config"
+#  error "Value for PLL_POSTDIV out of range, check config"
 #endif
 #if ((CLOCK_XOSC > CLOCK_XOSC_MAX) || (CLOCK_XOSC < CLOCK_XOSC_MIN))
-#error "Value for CLOCK_XOSC out of range, check config"
+#  error "Value for CLOCK_XOSC out of range, check config"
 #endif
 
 /** Post divider for the PLL, calculated based on the post divider values */
