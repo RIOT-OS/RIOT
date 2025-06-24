@@ -40,13 +40,13 @@
 /** Default crystal frequency is 12 MHz */
 #define XOSC_HZ MHZ(12u)
 /** Reference divider for the PLL, set to 2 as per hardware manual */
-#define REF_DIV 2u
+#define PLL_REF_DIV 2u
 /** VCO frequency for the PLL, set to 750 MHz as per hardware manual */
-#define VCO_FREQ 750000000u
+#define PLL_VCO_FREQ 750000000u
 /** Post divider 1 for the PLL, set to 6 as per hardware manual */
-#define PD1 6u
+#define PLL_PD1 6u
 /** Post divider 2 for the PLL, set to 2 as per hardware manual */
-#define PD2 2u
+#define PLL_PD2 2u
 /** Power down bits for the PLL */
 #define PLL_PWR_PD_BITS 0x00000001u
 /** VCO power down bits for the PLL */
@@ -107,10 +107,10 @@
 #endif
 
 /** Post divider for the PLL, calculated based on the post divider values */
-#define PDIV ((PD1 << PLL_PRIM_POSTDIV1_LSB) | (PD2 << PLL_PRIM_POSTDIV2_LSB))
+#define PDIV ((PLL_PD1 << PLL_PRIM_POSTDIV1_LSB) | (PLL_PD2 << PLL_PRIM_POSTDIV2_LSB))
 /** Feedback divider for the PLL, calculated based on the VCO frequency and
  * reference clock frequency */
-#define FBDIV ((VCO_FREQ / XOSC_HZ) / REF_DIV)
+#define FBDIV ((PLL_VCO_FREQ / XOSC_HZ) / PLL_REF_DIV)
 #ifdef __cplusplus
 extern "C" {
 #endif
