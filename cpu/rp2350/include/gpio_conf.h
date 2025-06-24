@@ -16,6 +16,9 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
+/** The number of GPIO pins available on the RP2350 */
+#define GPIO_PIN_NUMOF 30U
+
 #ifdef __cplusplus
 extern "C" {
 #endif

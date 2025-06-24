@@ -26,8 +26,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define GPIO_PIN_NUMOF 30U
-
 int gpio_init(gpio_t pin, gpio_mode_t mode) {
   /* Check if we exceed the maximum number of GPIO pins */
   assert(pin < GPIO_PIN_NUMOF);
@@ -60,25 +58,33 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
 }
 
 bool gpio_read(gpio_t pin) {
-    /* Check if we exceed the maximum number of GPIO pins */
-    assert(pin < GPIO_PIN_NUMOF);
-    /* Read the pin state */
-    return (SIO->GPIO_IN & (1 << pin)) != 0; /* Return true if the pin is HIGH */
+  /* Check if we exceed the maximum number of GPIO pins */
+  assert(pin < GPIO_PIN_NUMOF);
+  /* Read the pin state */
+  return (SIO->GPIO_IN & (1 << pin)) != 0; /* Return true if the pin is HIGH */
 }
 
 void gpio_set(gpio_t pin) {
+  /* Check if we exceed the maximum number of GPIO pins */
+  assert(pin < GPIO_PIN_NUMOF);
   SIO->GPIO_OUT_SET = 1 << pin; /* Set the pin to HIGH */
 }
 
 void gpio_clear(gpio_t pin) {
+  /* Check if we exceed the maximum number of GPIO pins */
+  assert(pin < GPIO_PIN_NUMOF);
   SIO->GPIO_OUT_CLR = 1 << pin; /* Set the pin to LOW */
 }
 
 void gpio_toggle(gpio_t pin) {
+  /* Check if we exceed the maximum number of GPIO pins */
+  assert(pin < GPIO_PIN_NUMOF);
   SIO->GPIO_OUT_XOR = 1 << pin; /* Toggle the pin state (XOR) */
 }
 
 void gpio_write(gpio_t pin, bool value) {
+  /* Check if we exceed the maximum number of GPIO pins */
+  assert(pin < GPIO_PIN_NUMOF);
   if (value) {
     gpio_set(pin); /* Set the pin to HIGH */
   } else {
