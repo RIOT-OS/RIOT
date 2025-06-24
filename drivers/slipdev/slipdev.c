@@ -82,7 +82,8 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             break;
         default:
 #if IS_USED(MODULE_SLIPDEV_STDIO)
-            isrpipe_write_one(&stdin_isrpipe, byte);
+            if (dev->config.uart == STDIO_UART_DEV)
+                isrpipe_write_one(&stdin_isrpipe, byte);
 #endif
             break;
         }
@@ -98,7 +99,8 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
         }
         dev->state = SLIPDEV_STATE_STDIN;
 #if IS_USED(MODULE_SLIPDEV_STDIO)
-        isrpipe_write_one(&stdin_isrpipe, byte);
+        if (dev->config.uart == STDIO_UART_DEV)
+            isrpipe_write_one(&stdin_isrpipe, byte);
 #endif
         return;
     case SLIPDEV_STATE_CONFIG:
@@ -148,9 +150,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
         return;
     case SLIPDEV_STATE_NONE:
         /* is diagnostic frame? */
-        if (IS_USED(MODULE_SLIPDEV_STDIO) &&
-            (byte == SLIPDEV_STDIO_START) &&
-            (dev->config.uart == STDIO_UART_DEV)) {
+        if (byte == SLIPDEV_STDIO_START) {
             dev->state = SLIPDEV_STATE_STDIN;
             return;
         }
