@@ -17,7 +17,7 @@ STM32L476RG microcontroller with 128KiB of RAM and 1MiB of Flash.
 
 | MCU        |   STM32L476RG     |
 |:---------- |:----------------- |
-| Family     | ARM Cortex-M4     |
+| Family     | ARM Cortex-M4F    |
 | Vendor     | ST Microelectronics|
 | RAM        | 128KiB            |
 | Flash      | 1MiB              |

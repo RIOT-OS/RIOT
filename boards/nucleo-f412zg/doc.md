@@ -15,7 +15,7 @@ STM32F412ZG microcontroller with 256KiB of RAM and 1MiB of Flash.
 
 | MCU          |     STM32F412ZG
 |:-------------|:--------------------|
-| Family       | ARM Cortex-M4       |
+| Family       | ARM Cortex-M4F      |
 | Vendor       | ST Microelectronics |
 | RAM          | 256KiB              |
 | Flash        | 1MiB                |

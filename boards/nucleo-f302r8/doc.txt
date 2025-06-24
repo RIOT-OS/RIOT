@@ -21,7 +21,7 @@ microcontroller with 16KiB of RAM and 64KiB of Flash.
 ### MCU
 | MCU        | STM32F302R8           |
 |:---------- |:--------------------- |
-| Family     | ARM Cortex-M4         |
+| Family     | ARM Cortex-M4F        |
 | Vendor     | ST Microelectronics   |
 | RAM        | 16KiB                 |
 | Flash      | 64KiB                 |

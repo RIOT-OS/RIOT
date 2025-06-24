@@ -20,7 +20,7 @@ STM32F334R8 microcontroller with 12KiB of RAM and 64KiB or Flash.
 ### MCU
 | MCU        | STM32F334R8       |
 |:---------- |:----------------- |
-| Family     | ARM Cortex-M4     |
+| Family     | ARM Cortex-M4F    |
 | Vendor     | ST Microelectronics |
 | RAM        | 12KiB             |
 | Flash      | 64KiB             |

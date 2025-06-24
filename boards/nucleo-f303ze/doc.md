@@ -18,7 +18,7 @@ STM32F303ZE microcontroller with 64KiB of RAM and 512KiB of ROM.
 ### MCU
 | MCU        | STM32F303ZE       |
 |:---------- |:----------------- |
-| Family     | ARM Cortex-M4     |
+| Family     | ARM Cortex-M4F    |
 | Vendor     | ST Microelectronics |
 | RAM        | 64KiB             |
 | Flash      | 512KiB            |
