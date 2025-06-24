@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup         cpu_rp2350
+ * @{
+ *
+ * @file
+ * @brief           UART implementation for the RP2350
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include "periph/uart.h"
 
 #include "periph_cpu.h"
@@ -56,3 +66,5 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len) {
 
 void uart_poweron(uart_t uart) {}
 void uart_poweroff(uart_t uart) {}
+
+/** @} */

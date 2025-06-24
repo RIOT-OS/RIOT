@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup         cpu_rp2350
+ * @{
+ *
+ * @file
+ * @brief           GPIO implementation for the RP2350
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include "periph/gpio.h"
 
 #include <errno.h>
@@ -75,3 +85,5 @@ void gpio_write(gpio_t pin, bool value) {
     gpio_clear(pin); /* Set the pin to LOW */
   }
 }
+
+/** @} */

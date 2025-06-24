@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup         cpu_rp2350
+ * @{
+ *
+ * @file
+ * @brief           CPU initialization implementation for the RP2350
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include "cpu.h"
 
 #include "RP2350.h"
@@ -36,3 +46,5 @@ void cpu_init(void) {
   /* trigger static peripheral initialization */
   periph_init();
 }
+
+/** @} */

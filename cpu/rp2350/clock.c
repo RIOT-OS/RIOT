@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup         cpu_rp2350
+ * @{
+ *
+ * @file
+ * @brief           Clock configuration implementation for the RP2350
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include "periph_cpu.h"
 
 void clock_reset(void) {
@@ -57,3 +67,5 @@ void cpu_clock_init(void) {
   /* AUXSRC = 0x0 -> CLK_SYS Indirectly through lower line */
   CLOCKS->CLK_PERI_CTRL = CLK_PERI_CTRL_ENABLE_BIT;
 }
+
+/** @} */

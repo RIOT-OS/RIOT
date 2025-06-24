@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup         cpu_rp2350
+ * @{
+ *
+ * @file
+ * @brief           XOSC implementation for the RP2350
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include <assert.h>
 
 #include "RP2350.h"
@@ -42,3 +52,5 @@ void xosc_sleep(int32_t milliseconds) {
 void xosc_stop(void) {
   /* @TODO */
 }
+
+/** @} */

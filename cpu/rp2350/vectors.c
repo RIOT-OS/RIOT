@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup         cpu_rp2350
+ * @{
+ *
+ * @file
+ * @brief           Interrupt vector table for the RP2350
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include "RP2350.h"
 #include "cpu_conf.h"
 #include "vectors_cortexm.h"
@@ -122,3 +132,5 @@ const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     (void*)isr_spareirq_4,   /* 50 SPAREIRQ_IRQ_4 */
     (void*)isr_spareirq_5,   /* 51 SPAREIRQ_IRQ_5 */
 };
+
+/** @} */
