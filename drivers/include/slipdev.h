@@ -42,6 +42,7 @@
 #include "net/netdev.h"
 #include "periph/uart.h"
 #include "chunked_ringbuffer.h"
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
