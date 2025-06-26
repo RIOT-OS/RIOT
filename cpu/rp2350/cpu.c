@@ -30,6 +30,11 @@
 void gpio_reset(void) {
   reset_component(RESET_PADS_BANK0, RESET_PADS_BANK0);
   reset_component(RESET_IO_BANK0, RESET_IO_BANK0);
+
+  /* Since the GPIO pins on the rp2350 are by default disable,
+  * we need to enable the input for LED0 to be able to use it
+  * in Macros such as LED0_ON, LED0_OFF, and LED0_TOGGLE. */
+  gpio_init(LED0_PIN_ID, GPIO_OUT);
 }
 
 void cpu_init(void) {

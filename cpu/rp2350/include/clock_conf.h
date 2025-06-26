@@ -91,6 +91,8 @@
 /** Selected field value for the system clock control register
  * to select the peripheral clock */
 #define CLK_SYS_SELECTED_PERI_FIELD_VALUE 2u
+/** RIOT core clock frequency defined as the CPU frequency */
+#define CLOCK_CORECLOCK MHZ(12u)
 
 #if (PLL_VCO_FEEDBACK_SCALE_MIN < PLL_VCO_FEEDBACK_SCALE_MIN) || \
     (PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
