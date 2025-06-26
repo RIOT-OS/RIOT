@@ -22,7 +22,7 @@
 #include "net/sntp.h"
 #include "net/ntp_packet.h"
 #include "net/sock/udp.h"
-#include "xtimer.h"
+#include "ztimer64.h"
 #include "mutex.h"
 #include "byteorder.h"
 
@@ -70,7 +70,7 @@ int sntp_sync(sock_udp_ep_t *server, uint32_t timeout)
     mutex_lock(&_sntp_mutex);
     _sntp_offset = (((int64_t)byteorder_ntohl(_sntp_packet.transmit.seconds)) * US_PER_SEC) +
                    ((((int64_t)byteorder_ntohl(_sntp_packet.transmit.fraction)) * 232)
-                   / 1000000) - xtimer_now_usec64();
+                   / 1000000) - ztimer64_now(ZTIMER64_USEC);
     mutex_unlock(&_sntp_mutex);
     return 0;
 }
