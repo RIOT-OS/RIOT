@@ -1,4 +1,6 @@
 #!/bin/sh
+#
+# SPDX-FileCopyrightText: Copyright (C) 2025 ML!PA Consulting GmbH, All rights reserved
 
 SCRIPT_DIR="$(dirname $(readlink -f $0))"
 RIOTBASE=${RIOTBASE:-${SCRIPT_DIR}/../../..}
