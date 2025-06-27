@@ -25,6 +25,7 @@
 #include "byteorder.h"
 #include "thread.h"
 #include "msg.h"
+#include "net/gnrc/nettype.h"
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 #include "net/icmpv6.h"
@@ -34,6 +35,10 @@
 #include "net/udp.h"
 #include "net/sixlowpan.h"
 #include "od.h"
+
+#ifndef CONFIG_GNRC_PKTBUF_NETTYPE
+#define CONFIG_GNRC_PKTBUF_NETTYPE  GNRC_NETTYPE_UNDEF
+#endif
 
 /**
  * @brief   PID of the pktdump thread
@@ -45,6 +50,7 @@ kernel_pid_t gnrc_pktdump_pid = KERNEL_PID_UNDEF;
  */
 static char _stack[GNRC_PKTDUMP_STACKSIZE];
 static msg_t _msg_queue[GNRC_PKTDUMP_MSG_QUEUE_SIZE];
+static gnrc_netreg_entry_t _netreg_dump;
 
 static void _dump_snip(gnrc_pktsnip_t *pkt)
 {
@@ -201,6 +207,10 @@ kernel_pid_t gnrc_pktdump_init(void)
         gnrc_pktdump_pid = thread_create(_stack, sizeof(_stack), GNRC_PKTDUMP_PRIO,
                              0,
                              _eventloop, NULL, "pktdump");
+        if (gnrc_pktdump_pid > 0) {
+            gnrc_netreg_entry_init_pid(&_netreg_dump, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
+            gnrc_netreg_register(CONFIG_GNRC_PKTBUF_NETTYPE, &_netreg_dump);
+        }
     }
     return gnrc_pktdump_pid;
 }
