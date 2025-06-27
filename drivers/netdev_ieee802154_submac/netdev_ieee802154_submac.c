@@ -16,6 +16,9 @@
 #include "net/netdev/ieee802154_submac.h"
 #include "event/thread.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 static const ieee802154_submac_cb_t _cb;
 
 static const netdev_driver_t netdev_submac_driver;
@@ -45,7 +48,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
     netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154, netdev_ieee802154_submac_t, dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
-
+    DEBUG("IEEE802154 submac: _get(): opt %d\n", opt);
     switch (opt) {
         case NETOPT_STATE:
             *((netopt_state_t*) value) = _get_submac_state(submac);
@@ -63,8 +66,21 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             break;
     }
 
-    return netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev), opt,
-                                 value, max_len);
+    int get =  netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev), opt,
+                                     value, max_len);
+    if (get > 0) {
+        return get;
+    }
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_LEGACY)
+    netdev_t *legacy = netdev_submac->legacy;
+    if (legacy && legacy->driver && legacy->driver->get) {
+        if ((get = legacy->driver->get(legacy, opt, value, max_len))) {
+            return get;
+        }
+    }
+#endif
+
+    return -ENOTSUP;
 }
 
 static int _set_submac_state(ieee802154_submac_t *submac, netopt_state_t state)
@@ -92,7 +108,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
 
     int res;
     int16_t tx_power;
-
+    DEBUG("IEEE802154 submac: _set(): opt %d\n", opt);
     switch (opt) {
     case NETOPT_ADDRESS:
         ieee802154_set_short_addr(submac, value);
@@ -123,8 +139,21 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
         break;
     }
 
-    return netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev),
-                                 opt, value, value_len);
+    int set =  netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev), opt,
+                                     value, value_len);
+    if (set > 0) {
+        return set;
+    }
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_LEGACY)
+    netdev_t *legacy = netdev_submac->legacy;
+    if (legacy && legacy->driver && legacy->driver->set) {
+        if ((set = legacy->driver->set(legacy, opt, value, value_len))) {
+            return set;
+        }
+    }
+#endif
+
+    return -ENOTSUP;
 }
 
 void ieee802154_submac_bh_request(ieee802154_submac_t *submac)
@@ -381,7 +410,7 @@ static int _confirm_send(netdev_t *netdev, void *info)
     return netdev_submac->bytes_tx;
 }
 
-int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac)
+int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac, netdev_t *legacy)
 {
     netdev_t *netdev = &netdev_submac->dev.netdev;
 
@@ -395,6 +424,10 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac)
 
     netdev_submac->ack_timer.callback = _ack_timeout;
     netdev_submac->ack_timer.arg = netdev_submac;
+    (void)legacy;
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_LEGACY)
+    netdev_submac->legacy = legacy;
+#endif
 
     return 0;
 }
