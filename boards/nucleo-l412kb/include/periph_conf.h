@@ -138,6 +138,14 @@ static const spi_conf_t spi_config[] = {
  *
  * For Nucleo-L431KB this information is in board manual,
  * Table 15 or STM32L412KB MCU datasheet - Table 14.
+ *
+ * VBAT is connected ADC1_IN18 internal line and a voltage divider
+ * is used, so that only 1/3 of the actual VBAT is measured. This
+ * allows for a supply voltage higher than the reference voltage.
+ *
+ * For STM32L412KB more information is provided in the MCU datasheet,
+ * in section 3.15.3 - Vbat battery voltage monitoring.
+ *
  * @{
  */
 static const adc_conf_t adc_config[] = {
@@ -146,12 +154,17 @@ static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_A, 3),  .dev = 0, .chan = 8},  /* ADC1_IN8  */
     {GPIO_PIN(PORT_A, 4),  .dev = 0, .chan = 9},  /* ADC1_IN9  */
     {GPIO_PIN(PORT_A, 7),  .dev = 0, .chan = 12}, /* ADC1_IN12 */
+    {GPIO_UNDEF,           .dev = 0, .chan = 18}, /* VBAT */
 };
 
 /**
  * @brief Number of ADC devices
  */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
+#define VBAT_ADC            ADC_LINE(5) /**< VBAT ADC line */
+
+/** @} */
 
 #ifdef __cplusplus
 }
