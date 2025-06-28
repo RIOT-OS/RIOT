@@ -117,8 +117,40 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
-static const adc_conf_t adc_config[] = {{}};
+/**
+ * @brief ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32L412KB order. Instead, we
+ * just define 5 ADC channels, for the Nucleo
+ * Arduino Nano header pins A0-A3 and A6 - all which are
+ * enabled by default and without collision with other
+ * features, for example, I2C or VCP_TX.
+ *
+* To find appropriate device and channel find in the
+ * board manual, table showing pin assignments and
+ * information about ADC - a text similar to ADC[X]_IN[Y],
+ * where:
+ * [X] - describes used device - indexed from 0,
+ * for example ADC1_IN10 is device 0,
+ * [Y] - describes used channel - indexed from 1,
+ * for example ADC1_IN10 is channel 10
+ *
+ * For Nucleo-L431KB this information is in board manual,
+ * Table 15 or STM32L412KB MCU datasheet - Table 14.
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0),  .dev = 0, .chan = 5},  /* ADC1_IN5  */
+    {GPIO_PIN(PORT_A, 1),  .dev = 0, .chan = 6},  /* ADC1_IN6  */
+    {GPIO_PIN(PORT_A, 3),  .dev = 0, .chan = 8},  /* ADC1_IN8  */
+    {GPIO_PIN(PORT_A, 4),  .dev = 0, .chan = 9},  /* ADC1_IN9  */
+    {GPIO_PIN(PORT_A, 7),  .dev = 0, .chan = 12}, /* ADC1_IN12 */
+};
 
+/**
+ * @brief Number of ADC devices
+ */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 
 #ifdef __cplusplus
