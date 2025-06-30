@@ -394,7 +394,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_DRIVER_CRYPTOCELL_310            1570
 #endif
-
+#ifndef AUTO_INIT_PRIO_MOD_ZBOSS
+/**
+ * @brief    ZBOSS-Stack priority
+ */
+#define AUTO_INIT_PRIO_MOD_ZBOSS                        1600
+#endif
 #ifdef __cplusplus
 }
 #endif
