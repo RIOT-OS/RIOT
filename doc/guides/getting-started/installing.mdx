@@ -81,7 +81,7 @@ You will still need a "clone" of the RIOT Repository to work with.
 - Open the terminal.
 - Type `git clone https://github.com/RIOT-OS/RIOT` and confirm with the return-key
 - This may take some time. Eventually, it will print `done.` when it completed
-- Type `cd RIOT/examples/hello-world` and confirm with the return-key to enter
+- Type `cd RIOT/examples/basic/hello-world` and confirm with the return-key to enter
   the folder `hello-world` example app in the RIOT repo
 - Type `make` and confirm with the return key to build the app for the board
   `native`
@@ -112,12 +112,12 @@ The app should behave the same when run on real hardware.
 ![Ubuntu terminal running `make compile-commands` in the `hello-world` app](img/06-Use_VS_Code-00.png)
 
 - If not already open, open the terminal
-- Confirm that the terminal is pointed to the folder `~/RIOT/examples/hello-world`
+- Confirm that the terminal is pointed to the folder `~/RIOT/examples/basic/hello-world`
     - The blue part left of the prompt (the `$` sign in the terminal) shows
       the current working directory for the terminal
-    - If the blue string is not `~/RIOT/examples/hello-world`, type
-      `cd ~/RIOT/examples/hello-world` to enter that path
-- Inside `~/RIOT/examples/hello-world` run the command `make compile-commands`
+    - If the blue string is not `~/RIOT/examples/basic/hello-world`, type
+      `cd ~/RIOT/examples/basic/hello-world` to enter that path
+- Inside `~/RIOT/examples/basic/hello-world` run the command `make compile-commands`
 - The output should look like above
 
 ![Launching VS Code from Ubuntu](img/06-Use_VS_Code-01.png)
@@ -132,7 +132,8 @@ The app should behave the same when run on real hardware.
 1. Click on "Yes, I trust the authors"
 
 - Now, use the tree view in the left and open the `examples` folder
-- Open the `hello-world` folder inside the `examples` folder
+- Open the `basic` folder inside the `examples` folder
+- Open the `hello-world` folder inside the `basic` folder
 - Open the `main.c` file in the `hello-world` folder within `examples`
 - The file should open and look like this:
 
@@ -182,7 +183,7 @@ Re-run `make compile-commands` when:
   in the source code
 - Save the modified source code (e.g. `Ctrl`+`S`)
 - Open the integrated terminal by clicking on the terminal tab at the bottom
-- Navigate to `~/RIOT/examples/hello-world` using `cd ~/RIOT/examples/hello-world`
+- Navigate to `~/RIOT/examples/basic/hello-world` using `cd ~/RIOT/examples/basic/hello-world`
 - Run the `make` command to build the code
 - Run make `make term` to launch the application
 - The result should look like:
