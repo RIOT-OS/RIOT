@@ -737,6 +737,32 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
     }
 }
 
+static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
+                             uint16_t len, bool is_new)
+{
+    gnrc_rpl_opt_t *opts = (gnrc_rpl_opt_t *)(dio + 1);
+    uint32_t included_opts = 0;
+
+    if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, opts, len, src, &included_opts)) {
+        DEBUG("RPL: Error encountered during DIO option parsing\n");
+        return false;
+    }
+
+    if (is_new && !(included_opts & (((uint32_t)1) << GNRC_RPL_OPT_DODAG_CONF))) {
+        if (!IS_ACTIVE(CONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN)) {
+            DEBUG("RPL: DIO without DODAG_CONF option - request new DIO\n");
+            gnrc_rpl_send_DIS(NULL, src, NULL, 0);
+            return false;
+        }
+        else {
+            DEBUG("RPL: DIO without DODAG_CONF option - use default trickle parameters\n");
+            gnrc_rpl_send_DIS(NULL, src, NULL, 0);
+        }
+    }
+
+    return true;
+}
+
 void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, kernel_pid_t iface,
                              ipv6_addr_t *src, uint16_t len)
 {
@@ -783,25 +809,9 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
     parent->rank = byteorder_ntohs(dio->rank);
     gnrc_rpl_parent_update(dodag, parent);
 
-    uint32_t included_opts = 0;
-    if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, (gnrc_rpl_opt_t *)(dio + 1), len,
-                        src, &included_opts)) {
-        DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
+    if (!_handle_DIO_opts(inst, dio, src, len, true)) {
         gnrc_rpl_instance_remove(inst);
         return;
-    }
-
-    if (!(included_opts & (((uint32_t)1) << GNRC_RPL_OPT_DODAG_CONF))) {
-        if (!IS_ACTIVE(CONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN)) {
-            DEBUG("RPL: DIO without DODAG_CONF option - remove DODAG and request new DIO\n");
-            gnrc_rpl_instance_remove(inst);
-            gnrc_rpl_send_DIS(NULL, src, NULL, 0);
-            return;
-        }
-        else {
-            DEBUG("RPL: DIO without DODAG_CONF option - use default trickle parameters\n");
-            gnrc_rpl_send_DIS(NULL, src, NULL, 0);
-        }
     }
 
     /* if there was no address created manually or by a PIO on the interface,
@@ -902,9 +912,8 @@ void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio
         parent->dtsn = dio->dtsn;
         dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
         dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
-        uint32_t included_opts = 0;
-        if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, (gnrc_rpl_opt_t *)(dio + 1), len,
-                            src, &included_opts)) {
+
+        if (!_handle_DIO_opts(inst, dio, src, len, false)) {
             DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
             gnrc_rpl_instance_remove(inst);
             return;
