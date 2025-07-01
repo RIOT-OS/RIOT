@@ -24,12 +24,12 @@ Two examples are provided:
 
 * ``rust-hello-world`` is minimal in the sense of setup and code complexity; it is the typical Hello World example.
 
-  (Note that it is not necessarily minimal in terms of built size,
+  (Note that it is not necessarily minimal in terms of build size,
   as Rust's regular printing infrastructure is more powerful and a bit heavier than your off-the-shelf ``printf``,
   which embedded libcs already often trim down).
 
 * ``rust-gcoap`` is a set of demo CoAP resources
-  both from the [coap-message-demos] crate (containing platform and library independent examples)
+  both from the [coap-message-demos] crate (containing platform- and library-independent examples)
   and from the [riot-module-examples] crate (containing RIOT specific examples).
 
 There are [additional examples] available on GitLab,
@@ -54,7 +54,7 @@ How it works
 
 The easy part of the story is that Rust code gets compiled into a static library
 which is then linked together with the rest of the RIOT code;
-if the main function happens to be implemented in Rust, so it is.
+if the main function happens to be implemented in Rust, so is it.
 
 The **RIOT build system** contains rules and metadata to facilitate building and linking:
 it calls `cargo` (Rust's own build system),
@@ -92,7 +92,7 @@ The wrappers are [documented together with riot-sys and some of the examples].
 Library components in Rust
 --------------------------
 
-It is possible to use Rust in different modules than the application itself.
+It is possible to use Rust in other modules than the application itself.
 
 Such modules are usually pseudomodules (although they may be mixed with C in regular modules as well).
 They always depend on the `rust_riotmodules` module / crate,
