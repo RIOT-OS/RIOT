@@ -169,6 +169,9 @@ You can also call cargo related commands with `make cargo-command CARGO_COMMAND=
 Beware that the way command line arguments are passed in is not consistent across cargo commands, so adding `--profile release` or other flags from above as part of CARGO_COMMAND may be necessary.
 ```
 
+Add the environment variables to your shell configuration file for this project
+or use the `make cargo-command` command to run cargo commands with the correct arguments.
+
 In VSCode you can now go to the workspace settings `.vscode/settings.json`
 and add the following settings:
 
@@ -182,9 +185,6 @@ and add the following settings:
 }
 ```
 
-and export the environment variables in your preferred way.
-You can also use the `make cargo-command` command
-to run cargo commands with the correct arguments.
 
 ## Step 4: Writing the Hello World Program
 
