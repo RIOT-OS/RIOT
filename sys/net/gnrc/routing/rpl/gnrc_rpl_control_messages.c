@@ -763,12 +763,77 @@ static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv
     return true;
 }
 
+bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
+                            uint16_t len, bool is_new)
+{
+    gnrc_rpl_dodag_t *dodag = &inst->dodag;
+    gnrc_rpl_parent_t *parent = NULL;
+
+    if (!gnrc_rpl_parent_add_by_addr(dodag, src, &parent) && (parent == NULL)) {
+        DEBUG("RPL: Could not allocate new parent.\n");
+        return false;
+    }
+
+    /* gnrc_rpl_parent_add_by_addr should have set this already */
+    assert(parent != NULL);
+
+    if (is_new) {
+        gnrc_rpl_delay_dao(dodag);
+
+        uint32_t interval_min = 1 << dodag->dio_min;
+        uint8_t interval_max = dodag->dio_interval_doubl;
+        trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                      interval_min, interval_max, dodag->dio_redun);
+    }
+    else {
+        trickle_increment_counter(&dodag->trickle);
+    }
+
+    parent->rank = byteorder_ntohs(dio->rank);
+    gnrc_rpl_parent_update(dodag, parent);
+
+    /* sender of incoming DIO is not preferred parent of mine (anymore) */
+    if (parent != dodag->parents) {
+        if ((byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK)
+            && (dodag->my_rank != GNRC_RPL_INFINITE_RANK)) {
+            trickle_reset_timer(&dodag->trickle);
+        }
+        return false;
+    }
+
+    if (!_handle_DIO_opts(inst, dio, src, len, false)) {
+        DEBUG("RPL: Error encountered during DIO option parsing\n");
+        return false;
+    }
+
+    if (is_new) {
+        /* if there was no address created manually or by a PIO on the interface,
+         * leave this DODAG */
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
+        if (gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id) < 0) {
+            DEBUG("RPL: no IPv6 address configured on interface %i to match the "
+                  "given dodag id: %s\n", netif->pid,
+                  ipv6_addr_to_str(addr_str, &(dio->dodag_id), sizeof(addr_str)); );
+            return false;
+        }
+    }
+
+    if (parent->dtsn != dio->dtsn) {
+        gnrc_rpl_delay_dao(dodag);
+    }
+
+    parent->dtsn = dio->dtsn;
+    dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
+    dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
+    dodag->version = dio->version_number;
+
+    return true;
+}
+
 void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, kernel_pid_t iface,
                              ipv6_addr_t *src, uint16_t len)
 {
     gnrc_netif_t *netif;
-    gnrc_rpl_dodag_t *dodag;
-    gnrc_rpl_parent_t *parent = NULL;
 
     if (byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK) {
         DEBUG("RPL: ignore INFINITE_RANK DIO when we are not yet part of this DODAG\n");
@@ -789,44 +854,14 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
 
     gnrc_rpl_dodag_init(inst, &dio->dodag_id, netif->pid);
 
-    dodag = &inst->dodag;
-
     DEBUG("RPL: Joined DODAG (%s).\n",
-          ipv6_addr_to_str(addr_str, &(dio->dodag_id), sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &(dio->dodag_id), sizeof(addr_str)); );
 
-    if (!gnrc_rpl_parent_add_by_addr(dodag, src, &parent) && (parent == NULL)) {
-        DEBUG("RPL: Could not allocate new parent.\n");
+    if (!_update_dodag_from_DIO(inst, dio, src, len, true)) {
+        DEBUG("RPL: remove DODAG.\n");
         gnrc_rpl_instance_remove(inst);
-        return;
     }
 
-    gnrc_rpl_delay_dao(dodag);
-    uint32_t interval_min = 1 << dodag->dio_min;
-    uint8_t interval_max = dodag->dio_interval_doubl;
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
-                  interval_min, interval_max, dodag->dio_redun);
-
-    parent->rank = byteorder_ntohs(dio->rank);
-    gnrc_rpl_parent_update(dodag, parent);
-
-    if (!_handle_DIO_opts(inst, dio, src, len, true)) {
-        gnrc_rpl_instance_remove(inst);
-        return;
-    }
-
-    /* if there was no address created manually or by a PIO on the interface,
-     * leave this DODAG */
-    if (gnrc_netif_ipv6_addr_match(netif, &dio->dodag_id) < 0) {
-        DEBUG("RPL: no IPv6 address configured on interface %i to match the "
-              "given dodag id: %s\n", netif->pid,
-              ipv6_addr_to_str(addr_str, &(dio->dodag_id), sizeof(addr_str)));
-        gnrc_rpl_instance_remove(inst);
-        return;
-    }
-
-    dodag->version = dio->version_number;
-    dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
-    dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
 }
 
 void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
@@ -878,47 +913,7 @@ void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio
         return;
     }
 
-    gnrc_rpl_parent_t *parent = NULL;
-
-    if (!gnrc_rpl_parent_add_by_addr(dodag, src, &parent) && (parent == NULL)) {
-        DEBUG("RPL: Could not allocate new parent.\n");
-        return;
-    }
-
-    /* gnrc_rpl_parent_add_by_addr should have set this already */
-    assert(parent != NULL);
-
-    trickle_increment_counter(&dodag->trickle);
-
-    parent->rank = byteorder_ntohs(dio->rank);
-
-    gnrc_rpl_parent_update(dodag, parent);
-
-    /* sender of incoming DIO is not a parent of mine (anymore) and has an INFINITE rank
-       and I have a rank != INFINITE_RANK */
-    if (parent->state == GNRC_RPL_PARENT_UNUSED) {
-        if ((byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK)
-            && (dodag->my_rank != GNRC_RPL_INFINITE_RANK)) {
-            trickle_reset_timer(&dodag->trickle);
-        }
-        return;
-    }
-
-    /* incoming DIO is from pref. parent */
-    if (parent == dodag->parents) {
-        if (parent->dtsn != dio->dtsn) {
-            gnrc_rpl_delay_dao(dodag);
-        }
-        parent->dtsn = dio->dtsn;
-        dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
-        dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
-
-        if (!_handle_DIO_opts(inst, dio, src, len, false)) {
-            DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
-            gnrc_rpl_instance_remove(inst);
-            return;
-        }
-    }
+    _update_dodag_from_DIO(inst, dio, src, len, false);
 }
 
 void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
