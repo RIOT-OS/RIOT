@@ -46,6 +46,7 @@ export default defineConfig({
           items: [
             { label: "Introduction", slug: "index" },
             "general/structure",
+            "general/vision",
           ],
         },
         {
