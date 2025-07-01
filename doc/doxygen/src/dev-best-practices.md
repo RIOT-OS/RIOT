@@ -3,7 +3,7 @@
 [TOC]
 
 * Use the [methodology](#methodology) described below.
-* Use [`ccache`](@ref ccache) to speedup compilation
+* Use [`ccache`](https://guide.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-ccache) to speedup compilation
 
 ## Coding "Dos" and "Don'ts":                                                {#coding-dos-and-donts}
 
