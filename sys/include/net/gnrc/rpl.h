@@ -568,6 +568,14 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 #define CONFIG_GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
 #endif
 
+#define GNRC_RPL_GROUNDED_SHIFT             (7)
+#define GNRC_RPL_MOP_SHIFT                  (3)
+#define GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT   (7)
+#define GNRC_RPL_OPT_TRANSIT_E_FLAG         (1 << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT)
+#define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
+#define GNRC_RPL_PRF_MASK                   (0x7)
+#define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
+
 /**
  * @brief Initialization of the RPL thread.
  *
