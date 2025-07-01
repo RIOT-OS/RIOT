@@ -512,6 +512,11 @@ static inline uint32_t _sec_to_ms(uint32_t sec)
     }
 }
 
+static inline char *_ip_addr_str(ipv6_addr_t *addr)
+{
+    return ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
+}
+
 /** @todo allow target prefixes in target options to be of variable length */
 static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt,
                            uint16_t len,
@@ -638,8 +643,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                 first_target = target;
             }
 
-            DEBUG("RPL: adding FT entry %s/%d\n",
-                  ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
+            DEBUG("RPL: adding FT entry %s/%d\n", _ip_addr_str(&(target->target)),
                   target->prefix_length);
 
             gnrc_ipv6_nib_ft_del(&(target->target), target->prefix_length);
@@ -660,8 +664,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             }
 
             do {
-                DEBUG("RPL: updating FT entry %s/%d\n",
-                      ipv6_addr_to_str(addr_str, &(first_target->target), sizeof(addr_str)),
+                DEBUG("RPL: updating FT entry %s/%d\n", _ip_addr_str(&(first_target->target)),
                       first_target->prefix_length);
 
                 gnrc_ipv6_nib_ft_del(&(first_target->target),
@@ -843,8 +846,7 @@ static bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *di
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
         if (gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id) < 0) {
             DEBUG("RPL: no IPv6 address configured on interface %i to match the "
-                  "given dodag id: %s\n", netif->pid,
-                  ipv6_addr_to_str(addr_str, &(dio->dodag_id), sizeof(addr_str)); );
+                  "given dodag id: %s\n", netif->pid, _ip_addr_str(&(dio->dodag_id)));
             return false;
         }
     }
@@ -894,8 +896,7 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
 
     gnrc_rpl_dodag_init(inst, &dio->dodag_id, netif->pid);
 
-    DEBUG("RPL: Joined DODAG (%s).\n",
-          ipv6_addr_to_str(addr_str, &(dio->dodag_id), sizeof(addr_str)); );
+    DEBUG("RPL: Joined DODAG (%s).\n", _ip_addr_str(&(dio->dodag_id)));
 
     if (!_update_dodag_from_DIO(inst, dio, src, len, true)) {
         DEBUG("RPL: remove DODAG.\n");
@@ -1097,7 +1098,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         if (ipv6_addr_is_global(&fte.dst) &&
             !ipv6_addr_is_unspecified(&fte.next_hop)) {
             DEBUG("RPL: Send DAO - building target %s/%d\n",
-                  ipv6_addr_to_str(addr_str, &fte.dst, sizeof(addr_str)), fte.dst_len);
+                  _ip_addr_str(&fte.dst), fte.dst_len);
 
             if ((pkt = _dao_target_build(pkt, &fte.dst, fte.dst_len)) == NULL) {
                 DEBUG("RPL: Send DAO - no space left in packet buffer\n");
@@ -1107,8 +1108,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     }
 
     /* add own address */
-    DEBUG("RPL: Send DAO - building target %s/128\n",
-          ipv6_addr_to_str(addr_str, me, sizeof(addr_str)));
+    DEBUG("RPL: Send DAO - building target %s/128\n", _ip_addr_str(me));
     if ((pkt = _dao_target_build(pkt, me, IPV6_ADDR_BIT_LEN)) == NULL) {
         DEBUG("RPL: Send DAO - no space left in packet buffer\n");
         return;
@@ -1248,10 +1248,7 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
     /* check if the D flag is set before accessing the DODAG id */
     if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
         if (memcmp(&dodag->dodag_id, (ipv6_addr_t *)(dao + 1), sizeof(ipv6_addr_t)) != 0) {
-            DEBUG("RPL: DAO with unknown DODAG id (%s)\n", ipv6_addr_to_str(addr_str,
-                                                                            (ipv6_addr_t *)(dao +
-                                                                                            1),
-                                                                            sizeof(addr_str)));
+            DEBUG("RPL: DAO with unknown DODAG id (%s)\n", _ip_addr_str((ipv6_addr_t *)(dao + 1)));
             return;
         }
         opts = (gnrc_rpl_opt_t *)(((uint8_t *)opts) + sizeof(ipv6_addr_t));
@@ -1314,10 +1311,8 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
     /* check if the D flag is set before accessing the DODAG id */
     if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
         if (memcmp(&dodag->dodag_id, (ipv6_addr_t *)(dao_ack + 1), sizeof(ipv6_addr_t)) != 0) {
-            DEBUG("RPL: DAO-ACK with unknown DODAG id (%s)\n", ipv6_addr_to_str(addr_str,
-                                                                                (ipv6_addr_t *)(
-                                                                                    dao_ack + 1),
-                                                                                sizeof(addr_str)));
+            DEBUG("RPL: DAO-ACK with unknown DODAG id (%s)\n",
+                  _ip_addr_str((ipv6_addr_t *)(dao_ack + 1)));
             return;
         }
     }
