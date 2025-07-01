@@ -36,13 +36,13 @@ There's one drawback: without further tweaking, `gcc` stops emitting colored out
 
 - Install using the package manager of your distribution, e.g., on Ubuntu or Debian:
 
-```
+```shell
 sudo apt-get install ccache
 ```
 
 - Set `CCACHE` variable to `ccache`:
 
-```
+```shell
 export CCACHE=ccache
 ```
 

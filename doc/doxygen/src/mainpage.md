@@ -48,33 +48,15 @@ RIOT is developed by an open community that anyone is welcome to join:
 
 [mastodon-link]: https://fosstodon.org/@RIOT_OS
 
-The quickest start                                        {#the-quickest-start}
+Getting Started
 ==================
-You can run RIOT on most IoT devices, on open-access testbed hardware (e.g.
-IoT-lab), and also directly as a process on your Linux or FreeBSD machine (we
-call this the `native` port). Try it right now in your terminal window:
 
-~~~~~~~{.sh}
-git clone https://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
-cd RIOT
-git checkout <LATEST_RELEASE>
-sudo ./dist/tools/tapsetup/tapsetup         # create virtual Ethernet
-                                            # interfaces to connect multiple
-                                            # RIOT instances
-cd examples/basic/default/
-make all
-make term
-~~~~~~~
+To get started with RIOT, you can follow the
+[Setup Guide](https://guide.riot-os.org/getting-started/installing/) on
+the RIOT Guide Site. This guide will help you to set up your development
+environment, build and run your first application, and configure RIOT for
+your specific hardware.
 
-... and you are in the RIOT shell!
-Type `help` to discover available commands. For further information see the
-[README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/master/examples/basic/default).
-
-To use RIOT directly on your embedded platform, and for more hands-on details
-with RIOT, see @ref getting-started.
-
-Before that, skimming through the next section is recommended (but not
-mandatory).
 
 Structure                                                          {#structure}
 =========
