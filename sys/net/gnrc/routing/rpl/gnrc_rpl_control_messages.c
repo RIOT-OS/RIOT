@@ -737,6 +737,107 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
     }
 }
 
+/**
+ * @brief   Handles a received DIO message for an existing DODAG.
+ *
+ * @param[in] inst      The @p RPL instance of the DODAG.
+ * @param[in] dio       The received @p DIO packet.
+ * @param[in] src       The address of the sender.
+ * @param[in] len       The length of the DIO packet.
+ */
+static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
+                                         ipv6_addr_t *src, uint16_t len)
+{
+    gnrc_rpl_dodag_t *dodag = &inst->dodag;
+
+    /* ignore dodags with other dodag_id's for now */
+    /* TODO: choose DODAG with better rank */
+    if (memcmp(&dodag->dodag_id, &dio->dodag_id, sizeof(ipv6_addr_t)) != 0) {
+        DEBUG("RPL: DIO received from another DODAG, but same instance - ignore\n");
+        return;
+    }
+
+    if (inst->mop != ((dio->g_mop_prf >> GNRC_RPL_MOP_SHIFT) & GNRC_RPL_SHIFTED_MOP_MASK)) {
+        DEBUG("RPL: invalid MOP for this instance.\n");
+        return;
+    }
+
+#ifdef MODULE_GNRC_RPL_P2P
+    gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
+    if ((dodag->instance->mop == GNRC_RPL_P2P_MOP) && (p2p_ext->lifetime_sec <= 0)) {
+        return;
+    }
+#endif
+
+    if (GNRC_RPL_COUNTER_GREATER_THAN(dio->version_number, dodag->version)) {
+        if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
+            dodag->version = GNRC_RPL_COUNTER_INCREMENT(dio->version_number);
+            trickle_reset_timer(&dodag->trickle);
+        }
+        else {
+            dodag->version = dio->version_number;
+            gnrc_rpl_local_repair(dodag);
+        }
+    }
+    else if (GNRC_RPL_COUNTER_GREATER_THAN(dodag->version, dio->version_number)) {
+        trickle_reset_timer(&dodag->trickle);
+        return;
+    }
+
+    if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
+        if (byteorder_ntohs(dio->rank) != GNRC_RPL_INFINITE_RANK) {
+            trickle_increment_counter(&dodag->trickle);
+        }
+        else {
+            trickle_reset_timer(&dodag->trickle);
+        }
+        return;
+    }
+
+    gnrc_rpl_parent_t *parent = NULL;
+
+    if (!gnrc_rpl_parent_add_by_addr(dodag, src, &parent) && (parent == NULL)) {
+        DEBUG("RPL: Could not allocate new parent.\n");
+        return;
+    }
+    else if (parent != NULL) {
+        trickle_increment_counter(&dodag->trickle);
+    }
+
+    /* gnrc_rpl_parent_add_by_addr should have set this already */
+    assert(parent != NULL);
+
+    parent->rank = byteorder_ntohs(dio->rank);
+
+    gnrc_rpl_parent_update(dodag, parent);
+
+    /* sender of incoming DIO is not a parent of mine (anymore) and has an INFINITE rank
+       and I have a rank != INFINITE_RANK */
+    if (parent->state == GNRC_RPL_PARENT_UNUSED) {
+        if ((byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK)
+            && (dodag->my_rank != GNRC_RPL_INFINITE_RANK)) {
+            trickle_reset_timer(&dodag->trickle);
+            return;
+        }
+    }
+    /* incoming DIO is from pref. parent */
+    else if (parent == dodag->parents) {
+        if (parent->dtsn != dio->dtsn) {
+            gnrc_rpl_delay_dao(dodag);
+        }
+        parent->dtsn = dio->dtsn;
+        dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
+        dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
+        uint32_t included_opts = 0;
+        if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, (gnrc_rpl_opt_t *)(dio + 1), len,
+                            src, &included_opts)) {
+            DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
+            gnrc_rpl_instance_remove(inst);
+            return;
+        }
+    }
+}
+
 void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                        uint16_t len)
 {
@@ -835,103 +936,12 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
                       dodag->dio_redun);
 
         gnrc_rpl_parent_update(dodag, parent);
-        return;
     }
     else if (inst == NULL) {
         DEBUG("RPL: Could not allocate a new instance.\n");
-        return;
     }
     else {
-        /* instance exists already */
-        /* ignore dodags with other dodag_id's for now */
-        /* TODO: choose DODAG with better rank */
-
-        dodag = &inst->dodag;
-
-        if (memcmp(&dodag->dodag_id, &dio->dodag_id, sizeof(ipv6_addr_t)) != 0) {
-            DEBUG("RPL: DIO received from another DODAG, but same instance - ignore\n");
-            return;
-        }
-    }
-
-    if (inst->mop != ((dio->g_mop_prf >> GNRC_RPL_MOP_SHIFT) & GNRC_RPL_SHIFTED_MOP_MASK)) {
-        DEBUG("RPL: invalid MOP for this instance.\n");
-        return;
-    }
-
-#ifdef MODULE_GNRC_RPL_P2P
-    gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
-    if ((dodag->instance->mop == GNRC_RPL_P2P_MOP) && (p2p_ext->lifetime_sec <= 0)) {
-        return;
-    }
-#endif
-
-    if (GNRC_RPL_COUNTER_GREATER_THAN(dio->version_number, dodag->version)) {
-        if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
-            dodag->version = GNRC_RPL_COUNTER_INCREMENT(dio->version_number);
-            trickle_reset_timer(&dodag->trickle);
-        }
-        else {
-            dodag->version = dio->version_number;
-            gnrc_rpl_local_repair(dodag);
-        }
-    }
-    else if (GNRC_RPL_COUNTER_GREATER_THAN(dodag->version, dio->version_number)) {
-        trickle_reset_timer(&dodag->trickle);
-        return;
-    }
-
-    if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
-        if (byteorder_ntohs(dio->rank) != GNRC_RPL_INFINITE_RANK) {
-            trickle_increment_counter(&dodag->trickle);
-        }
-        else {
-            trickle_reset_timer(&dodag->trickle);
-        }
-        return;
-    }
-
-    gnrc_rpl_parent_t *parent = NULL;
-
-    if (!gnrc_rpl_parent_add_by_addr(dodag, src, &parent) && (parent == NULL)) {
-        DEBUG("RPL: Could not allocate new parent.\n");
-        return;
-    }
-    else if (parent != NULL) {
-        trickle_increment_counter(&dodag->trickle);
-    }
-
-    /* gnrc_rpl_parent_add_by_addr should have set this already */
-    assert(parent != NULL);
-
-    parent->rank = byteorder_ntohs(dio->rank);
-
-    gnrc_rpl_parent_update(dodag, parent);
-
-    /* sender of incoming DIO is not a parent of mine (anymore) and has an INFINITE rank
-       and I have a rank != INFINITE_RANK */
-    if (parent->state == GNRC_RPL_PARENT_UNUSED) {
-        if ((byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK)
-            && (dodag->my_rank != GNRC_RPL_INFINITE_RANK)) {
-            trickle_reset_timer(&dodag->trickle);
-            return;
-        }
-    }
-    /* incoming DIO is from pref. parent */
-    else if (parent == dodag->parents) {
-        if (parent->dtsn != dio->dtsn) {
-            gnrc_rpl_delay_dao(dodag);
-        }
-        parent->dtsn = dio->dtsn;
-        dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
-        dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
-        uint32_t included_opts = 0;
-        if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, (gnrc_rpl_opt_t *)(dio + 1), len,
-                            src, &included_opts)) {
-            DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
-            gnrc_rpl_instance_remove(inst);
-            return;
-        }
+        _recv_DIO_for_existing_dodag(inst, dio, src, len);
     }
 }
 
