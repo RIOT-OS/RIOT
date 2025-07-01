@@ -49,14 +49,23 @@ Now that we have created our hello world program, we need to create a Makefile t
 # name of your application
 APPLICATION = hello-world
 
+# The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
+#
+# The presence of this triggers building Rust code contained in this
+# application in addition to any C code.
+APPLICATION_RUST_MODULE = rust_hello_world
+
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
-# Build in Docker by default (set to 0 to build locally)
+# If you want to build in a Docker container, set this to 1.
+# This is useful if you want to build on a system that does not have the
+# RIOT toolchain installed, or if you want to ensure that the build is
+# reproducible.
 BUILD_IN_DOCKER ?= 1
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/RIOT
+RIOTBASE ?= $(CURDIR)/../../../..
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -66,9 +75,6 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Make sure this matches the name of the Rust crate
-APPLICATION_RUST_MODULE = hello_world
-
 include $(RIOTBASE)/Makefile.include
 ```
 
@@ -76,6 +82,7 @@ include $(RIOTBASE)/Makefile.include
 The `BUILD_IN_DOCKER=1` flag tells the build system to use the docker image provided by RIOT to build our program.
 This ensures that we have all the necessary dependencies to build our program.
 If you have already built RIOT on your system, you can omit this flag and the build system will use the toolchain installed on your system.
+If you want to build your program on a different board, you can change the `BOARD` variable to the name of the board you want to build for.
 :::
 
 Now RIOT knows that you want to build a Rust application and will use the `hello_world` crate as the main module.
@@ -201,8 +208,8 @@ Congratulations! You have now created your first Rust program for RIOT. 🎉
 
 To build our program, we use the following command:
 
-```bash title="Build the program"
-make
+```bash title="Build and flash the program"
+make flash
 ```
 
 After building the program, we can run it using the following command to start the RIOT shell:
