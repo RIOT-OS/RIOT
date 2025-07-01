@@ -48,7 +48,7 @@ RIOT is developed by an open community that anyone is welcome to join:
 
 [mastodon-link]: https://fosstodon.org/@RIOT_OS
 
-Getting Started                                        {#getting-started}
+Getting Started
 ==================
 
 To get started with RIOT, you can follow the
