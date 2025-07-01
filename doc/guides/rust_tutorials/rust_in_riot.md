@@ -11,7 +11,7 @@ and tested for in applications using the Makefile line
 In addition to the regular RIOT build toolchain
 and a recent nightly Rust toolchain for the given target,
 using this also requires C2Rust with some patches applied to be installed;
-see [toolchain](#toolchain) for installation instructions.
+see <a href="#toolchain">toolchain</a> for installation instructions.
 All these are readily available in the [official RIOT docker image],
 which gets used by default if `BUILD_IN_DOCKER=1` is set.
 
@@ -24,12 +24,12 @@ Two examples are provided:
 
 * ``rust-hello-world`` is minimal in the sense of setup and code complexity; it is the typical Hello World example.
 
-  (Note that it is not necessarily minimal in terms of build size,
+  (Note that it is not necessarily minimal in terms of built size,
   as Rust's regular printing infrastructure is more powerful and a bit heavier than your off-the-shelf ``printf``,
   which embedded libcs already often trim down).
 
 * ``rust-gcoap`` is a set of demo CoAP resources
-  both from the [coap-message-demos] crate (containing platform- and library-independent examples)
+  both from the [coap-message-demos] crate (containing platform and library independent examples)
   and from the [riot-module-examples] crate (containing RIOT specific examples).
 
 There are [additional examples] available on GitLab,
@@ -54,7 +54,7 @@ How it works
 
 The easy part of the story is that Rust code gets compiled into a static library
 which is then linked together with the rest of the RIOT code;
-if the main function happens to be implemented in Rust, so is it.
+if the main function happens to be implemented in Rust, so it is.
 
 The **RIOT build system** contains rules and metadata to facilitate building and linking:
 it calls `cargo` (Rust's own build system),
@@ -92,7 +92,7 @@ The wrappers are [documented together with riot-sys and some of the examples].
 Library components in Rust
 --------------------------
 
-It is possible to use Rust in other modules than the application itself.
+It is possible to use Rust in different modules than the application itself.
 
 Such modules are usually pseudomodules (although they may be mixed with C in regular modules as well).
 They always depend on the `rust_riotmodules` module / crate,
@@ -111,7 +111,7 @@ and placing an `extern crate rust_riotmodules;` statement in the code.
 (The latter is needed even after most `extern crate` was abolished in 2018,
 because crates depended on but not used otherwise are usually not linked in).
 
-Toolchain
+Toolchain {#toolchain}
 ---------
 
 To install the necessary Rust components, it is easiest use [**rustup**, installed as described on its website].
@@ -120,7 +120,7 @@ Using Rust on RIOT needs the latest stable version of Rust.
 
 Make sure you have the core library for the CPU (**target**) of your choice available:
 
-```shell
+```
 $ rustup target add thumbv7m-none-eabi
 ```
 
@@ -137,8 +137,8 @@ To avoid playing the whack-a-mole of installing components whenever an install s
 consider installing this list of packages on Debian
 (or an equivalent list on the distribution of your choice):
 
-```shell
-apt install libclang-dev llvm llvm-dev cmake libssl-dev pkg-config
+```
+# apt install libclang-dev llvm llvm-dev cmake libssl-dev pkg-config
 ```
 
 This encompass both components needed for riot-sys and for the later installation of C2Rust.
@@ -147,13 +147,14 @@ This encompass both components needed for riot-sys and for the later installatio
 In addition to the Rust compiler you'll need to install the C2Rust transpiler;
 as this is using some recent fixes, it is best installed as:
 
+<!-- The locked works around <https://github.com/dtolnay/proc-macro2/issues/475> as closed in <https://github.com/immunant/c2rust/pull/1197>; there is no newer release that could be tested. -->
 ```shell
-$ cargo install c2rust --git https://github.com/immunant/c2rust
+$ cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0 --locked
 ```
 
 If multiple versions of LLVM are installed locally, it may be necessary to prefix it with the selected LLVM version:
 
-```shell
+```
 $ LLVM_CONFIG_PATH=/usr/bin/llvm-config-16 cargo install …
 ```
 
