@@ -20,7 +20,7 @@ use lakers::Credential;
 use ::coap_message::{MutableWritableMessage, Code};
 use coapcore::CredentialErrorKind as CredentialErrorDetail;
 use core::str::FromStr;
-use log::{info, debug, warn, error};
+use log::{info, debug};
 
 // Simple RIOT-compatible logger
 struct RiotLogger;
@@ -45,35 +45,58 @@ extern crate rust_riotmodules;
 use heapless::{String, Vec};
 use p256::ecdsa::{VerifyingKey, signature::Verifier, SigningKey};
 
-/*riot_wrappers::coap_handler;
+use coap_handler::Handler;
+
+// Import OptionsExt for take_uri_path
+use coap_message_utils::OptionsExt;
+use coap_message::ReadableMessage;
 
 struct LoggingWrapper<H> {
     inner: H,
 }
 
-impl<H: Handler> Handler for LoggingWrapper<H> {
-    type RequestData = <H as Handler>::RequestData;
-    type ExtractRequestError = <H as Handler>::ExtractRequestError;
-    type BuildResponseError = <H as Handler>::BuildResponseError;
+impl<H> LoggingWrapper<H> {
+    pub fn new(inner: H) -> Self {
+        Self { inner }
+    }
+}
 
-    fn extract_request_data(
+impl<H: Handler> Handler for LoggingWrapper<H> {
+    type RequestData = H::RequestData;
+    type ExtractRequestError = H::ExtractRequestError;
+    type BuildResponseError<M: coap_message::MinimalWritableMessage> = H::BuildResponseError<M>;
+
+    fn extract_request_data<M: coap_message::ReadableMessage>(
         &mut self,
-        request: &impl coap_message::ReadableMessage,
-    ) -> Result<<LoggingWrapper<H> as Example>::RequestData, <LoggingWrapper<H> as Example>::ExtractRequestError> {
+        request: &M,
+    ) -> Result<Self::RequestData, Self::ExtractRequestError> {
         // Log all incoming requests
-        info!("Incoming CoAP request: {} {}", 
-              request.code(), 
-              request.options().uri_path().collect::<Vec<_>>().join("/"));
+        let mut uri_path = heapless::String::<64>::new();
+        
+        // Use take_uri_path instead of take_into for URI path processing
+        request.options()
+            .take_uri_path(|segment| {
+                if !uri_path.is_empty() {
+                    let _ = uri_path.push('/');
+                }
+                let _ = uri_path.push_str(segment);
+            })
+            .for_each(drop); // Consume the iterator without collecting
+        
+        // Use format! for debugging - this should work without Debug bound
+        info!("CoAP: {} /{}", 
+              core::any::type_name::<M::Code>(), // Alternative to Debug formatting
+              uri_path);
         
         // Check if this might be an EDHOC request
-        let uri_path: String = request.options().uri_path().collect::<Vec<_>>().join("/");
-        if uri_path.contains("edhoc") || uri_path.contains(".well-known/edhoc") {
-            info!("=== POTENTIAL EDHOC REQUEST DETECTED ===");
+        if uri_path.contains("edhoc") || uri_path.contains(".well-known") {
+            info!("=== EDHOC REQUEST ===");
             info!("URI: /{}", uri_path);
-            info!("Method: {}", request.code());
-            if let Some(payload) = request.payload() {
-                info!("Payload length: {} bytes", payload.len());
-                // Don't log the actual payload as it's binary EDHOC data
+            info!("Method: {}", core::any::type_name::<M::Code>());
+            let payload = request.payload();
+            if !payload.is_empty() {
+                info!("Payload: {} bytes", payload.len());
+                debug!("Payload hex: {:02x?}", &payload[..payload.len().min(16)]);
             }
         }
         
@@ -84,14 +107,19 @@ impl<H: Handler> Handler for LoggingWrapper<H> {
         self.inner.estimate_length(request)
     }
 
-    fn build_response(
+    fn build_response<M: coap_message::MutableWritableMessage>(
         &mut self,
-        response: &mut impl coap_message::MutableWritableMessage,
+        response: &mut M,
         request: Self::RequestData,
-    ) -> Result<(), Self::BuildResponseError> {
-        self.inner.build_response(response, request)
+    ) -> Result<(), Self::BuildResponseError<M>> {
+        let result = self.inner.build_response(response, request);
+        
+        // Log response - simplified since we can't easily get the code back
+        debug!("Response built");
+        
+        result
     }
-}*/
+}
 
 // Custom RNG implementation using RIOT's random functions
 struct RiotRng;
@@ -563,9 +591,11 @@ fn main() {
         .with_audience("test-rs")
         .allow_unauthenticated(scope::AllowAll.into());
 
+    
+
     println!("[DEBUG] Wrapping handler with EDHOC/OSCORE security...");
 
-    // Wrap the base handler with EDHOC/OSCORE security
+    // First create the EDHOC/OSCORE handler
     let secure_handler = OscoreEdhocHandler::new(
         base_handler,
         security_config,
@@ -574,7 +604,11 @@ fn main() {
         time,
     );
 
-    let mut handler = riot_wrappers::coap_handler::v0_2::GcoapHandler(secure_handler);
+    // Then wrap the entire secure handler with logging
+    let logged_secure_handler = LoggingWrapper::new(secure_handler);
+
+    // Use the logged version
+    let mut handler = riot_wrappers::coap_handler::v0_2::GcoapHandler(logged_secure_handler);
 
     let mut listener = gcoap::SingleHandlerListener::new_catch_all(&mut handler);
 
