@@ -58,14 +58,18 @@ typedef enum {
  * @brief Generic CoAP message
  *
  * The payload of this message can either be represented as a vector (@ref iolist_t) or a buffer.
- * You use @ref unicoap_message_payload_get and @ref unicoap_message_payload_set to work with contiguous payloads.
- * For iolists, refer to @ref unicoap_message_payload_get_chunks, @ref unicoap_message_payload_set_chunks, and
- * @ref unicoap_message_payload_append_chunk. Regardless of the representation, you can always use
- * @ref unicoap_message_payload_get_size. For vectored payload, this entails an overhead with a complexity of `O(n)`.
- * If you just want to check whether there is _any_ payload, use @ref unicoap_message_payload_is_empty.
- * You can also make the payload contiguous by calling @ref unicoap_message_payload_make_contiguous, which mutates the
- * message struct. If you purely want to obtain a contiguous representation stored in another buffer, use
- * @ref unicoap_message_payload_copy.
+ * You use @ref unicoap_message_payload_get and @ref unicoap_message_payload_set to work with
+ * contiguous payloads. For iolists, refer to @ref unicoap_message_payload_get_chunks,
+ * @ref unicoap_message_payload_set_chunks, and @ref unicoap_message_payload_append_chunk.
+ *
+ * Regardless of the representation, you can always use
+ * @ref unicoap_message_payload_get_size. For vectored payload, this entails an overhead of `O(n)`.
+ * If you just want to check whether there is _any_ payload, use
+ * @ref unicoap_message_payload_is_empty.
+ * You can also make the payload contiguous by calling @ref unicoap_message_payload_make_contiguous,
+ * which mutates the
+ * message struct. If you purely want to obtain a contiguous representation stored in another
+ * buffer, use @ref unicoap_message_payload_copy.
  *
  */
 typedef struct {
@@ -96,7 +100,8 @@ typedef struct {
             /**
              * @brief Size of message payload
              *
-             * Number of bytes in @ref unicoap_message_t::payload. Access via @ref unicoap_message_payload_get_size.
+             * Number of bytes in @ref unicoap_message_t::payload. Access via
+             * @ref unicoap_message_payload_get_size.
              */
             size_t payload_size;
         };
@@ -158,8 +163,8 @@ typedef struct {
     /**
      * @brief A value indicating how the payload is represented
      *
-     * If the payload is noncontiguous, the @ref unicoap_message_t::payload_chunks property must be accessed.
-     * Otherwise, only @ref unicoap_message_t::payload must be read and written to.
+     * If the payload is noncontiguous, the @ref unicoap_message_t::payload_chunks property must be
+     * accessed. Otherwise, only @ref unicoap_message_t::payload must be read and written to.
      */
     unicoap_payload_representation_t payload_representation : 1;
 } unicoap_message_t;
@@ -229,10 +234,12 @@ void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* 
 
 /**
  * @brief Retrieves payload size, regardless of payload representation
- * @param message Message whose payload size to compute (if noncontiguous payload) or retrieve (contiguous payload).
+ * @param message Message whose payload size to compute (if noncontiguous payload) or
+ *                retrieve (contiguous payload).
  * @returns Payload size in bytes
  *
- * @note This function calls @ref iolist_size if payload is noncontiguous, thus iterates over all iolist elements. The complexity is $O(n)$.
+ * @note This function calls @ref iolist_size if payload is noncontiguous, thus iterates over all iolist elements.
+ *       The complexity is $O(n)$.
  */
 static inline size_t unicoap_message_payload_get_size(const unicoap_message_t* message)
 {
@@ -244,10 +251,10 @@ static inline size_t unicoap_message_payload_get_size(const unicoap_message_t* m
 /**
  * @brief Determines whether message has any payload
  * @param message Message with payload in question
- * @return A boolean indicating whether any payload bytes are present
+ * @returns A boolean indicating whether any payload bytes are present
  *
- * The given message may still have a buffer or iolist vector associated, yet this function returns `false` if the buffer or vector
- * is empty.
+ * The given message may still have a buffer or iolist vector associated, yet this function returns
+ * `false` if the buffer or vector is empty.
  */
 bool unicoap_message_payload_is_empty(const unicoap_message_t* message);
 
