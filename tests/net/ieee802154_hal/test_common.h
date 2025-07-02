@@ -28,6 +28,7 @@
                      IS_USED(MODULE_MRF24J40) + \
                      IS_USED(MODULE_KW2XRF) + \
                      IS_USED(MODULE_KW41ZRF) + \
+                     IS_USED(MODULE_AT86RF2XX) + \
                      IS_USED(MODULE_ESP_IEEE802154)
 
 #ifdef __cplusplus
@@ -45,6 +46,7 @@ typedef enum {
     IEEE802154_DEV_TYPE_SOCKET_ZEP,
     IEEE802154_DEV_TYPE_KW2XRF,
     IEEE802154_DEV_TYPE_MRF24J40,
+    IEEE802154_DEV_TYPE_AT86RF2XX,
     IEEE802154_DEV_TYPE_ESP_IEEE802154,
     IEEE802154_DEV_TYPE_KW41ZRF,
 } ieee802154_dev_type_t;
