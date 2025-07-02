@@ -167,8 +167,8 @@ ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* 
         return -EBADMSG;
     }
 
-    const uint8_t* end = pdu + size;
-    const uint8_t* cursor = pdu + sizeof(unicoap_header_rfc7252_t);
+    uint8_t* end = pdu + size;
+    uint8_t* cursor = pdu + sizeof(unicoap_header_rfc7252_t);
 
     message->code = _get_code(header);
     properties->rfc7252.type = _get_type(header);
@@ -192,12 +192,7 @@ ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* 
         return -EBADMSG;
     }
 
-    /* unicoap_pdu_parse_options_and_payload populates the given message struct which contains
-     * a reference to the buffer pointed at by cursor. unicoap_pdu_parse_options_and_payload
-     * cannot guarantee that buffer is treated const by the application, hence the cursor
-     * parameter is not marked const and must be casted.
-     * See the note in the documentation of unicoap_pdu_parse_options_and_payload. */
-    return unicoap_pdu_parse_options_and_payload((uint8_t*)cursor, (uint8_t*)end, message);
+    return unicoap_pdu_parse_options_and_payload(cursor, end, message);
 }
 
 ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
