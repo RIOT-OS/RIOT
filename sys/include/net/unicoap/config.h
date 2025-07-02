@@ -71,11 +71,10 @@
 /**
  * @brief Size of buffer unicoap allocates for a CoAP message header,
  * including token length.
- *
- * @note If you add support for new CoAP transport protocols, you may need to increase this value.
  */
 #define UNICOAP_HEADER_SIZE_MAX (15)
 /* MARK: unicoap_driver_extension_point */
+/* Developer note: If you are adding another CoAP driver, you may need to increase this value. */
 
 /**
  * @brief Maximum length of a token received from a client
