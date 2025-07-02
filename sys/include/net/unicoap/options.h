@@ -841,7 +841,7 @@ static inline ssize_t unicoap_options_get_uri_host(const unicoap_options_t* opti
  *
  * @param[in,out] options Options to write to
  * @param[in] host `Uri-Host` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p host, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p host, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
@@ -1147,7 +1147,7 @@ static inline ssize_t unicoap_options_get_proxy_scheme(const unicoap_options_t* 
  *
  * @param[in,out] options Options to write to
  * @param[in] scheme `Proxy-Scheme` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p scheme, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p scheme, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
@@ -1215,7 +1215,7 @@ static inline ssize_t unicoap_options_get_proxy_uri(const unicoap_options_t* opt
  *
  * @param[in,out] options Options to write to
  * @param[in] uri `Proxy-Uri` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p uri, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p uri, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to set option
@@ -1519,7 +1519,7 @@ static inline ssize_t unicoap_options_copy_location_path(const unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] component `Location-Path` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p component, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p component, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -1553,7 +1553,7 @@ static inline ssize_t unicoap_options_add_location_path_component_string(unicoap
  *
  * @param[in,out] options Options to write to
  * @param[in] path as buffer of UTF-8 code units with values separated by `/`
- * @param length Number of UTF-8 code units in @p path, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p path, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -1667,7 +1667,7 @@ static inline ssize_t unicoap_options_copy_uri_path(const unicoap_options_t* opt
  *
  * @param[in,out] options Options to write to
  * @param[in] component `Uri-Path` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p component, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p component, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -1704,7 +1704,7 @@ static inline ssize_t unicoap_options_add_uri_path_component_string(unicoap_opti
  *
  * @param[in,out] options Options to write to
  * @param[in] path as buffer of UTF-8 code units with values separated by `/`
- * @param length Number of UTF-8 code units in @p path, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p path, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -1853,7 +1853,7 @@ static inline ssize_t unicoap_options_copy_uri_queries(const unicoap_options_t* 
  *
  * @param[in,out] options Options to write to
  * @param[in] query `Uri-Query` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p query, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p query, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -1890,7 +1890,7 @@ static inline ssize_t unicoap_options_add_uri_query_string(unicoap_options_t* op
  *
  * @param[in,out] options Options to write to
  * @param[in] queries as buffer of UTF-8 code units with values separated by `&`
- * @param length Number of UTF-8 code units in @p queries, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p queries, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -2039,7 +2039,7 @@ static inline ssize_t unicoap_options_copy_location_queries(const unicoap_option
  *
  * @param[in,out] options Options to write to
  * @param[in] query `Location-Query` value as buffer of UTF-8 code units
- * @param length Number of UTF-8 code units in @p query, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p query, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
@@ -2076,7 +2076,7 @@ static inline ssize_t unicoap_options_add_location_query_string(unicoap_options_
  *
  * @param[in,out] options Options to write to
  * @param[in] queries as buffer of UTF-8 code units with values separated by `&`
- * @param length Number of UTF-8 code units in @p queries, excluding null-terminator (if present) in bytes without potential null-terminator
+ * @param length Number of UTF-8 code units in @p queries, excluding null-terminator (if present) in bytes
  *
  * @returns Zero on success, negative error number otherwise
  * @retval `-ENOBUFS` Options buffer lacks sufficient capacity to add options
