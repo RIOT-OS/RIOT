@@ -47,14 +47,12 @@ network_uint16_t short_addr;                                            /**< Sub
 static void _ev_tx_done_handler(event_t *event);                        /**< TX Done event handler */
 static void _ev_rx_done_handler(event_t *event);                        /**< RX Done event handler */
 static void _ev_crc_error_handler(event_t *event);                      /**< CRC Error event handler */
-static void _ev_bh_request_handler(event_t *event);                     /**< BH Request event handler */
 static void _ev_ack_timeout_handler(event_t *event);                    /**< ACK Timeout event handler */
 static void _ev_set_rx_handler(event_t *event);                         /**< Set RX event handler */
 
 static event_t ev_tx_done = { .handler = _ev_tx_done_handler };         /**< TX Done descriptor */
 static event_t ev_rx_done = { .handler = _ev_rx_done_handler };         /**< RX Done descriptor */
 static event_t ev_crc_error = { .handler = _ev_crc_error_handler };     /**< CRC Error descriptor */
-static event_t ev_bh_request = { .handler = _ev_bh_request_handler };   /**< BH Request descriptor */
 static event_t ev_ack_timeout = { .handler = _ev_ack_timeout_handler }; /**< ACK TO descriptor */
 static event_t ev_set_rx = { .handler = _ev_set_rx_handler };           /**< Set RX descriptor */
 
@@ -112,14 +110,6 @@ static void _ev_crc_error_handler(event_t *event)
     mutex_unlock(&lock);
 }
 
-static void _ev_bh_request_handler(event_t *event)
-{
-    (void)event;
-    mutex_lock(&lock);
-    ieee802154_submac_bh_process(&submac);
-    mutex_unlock(&lock);
-}
-
 static void _ev_ack_timeout_handler(event_t *event)
 {
     (void)event;
@@ -165,12 +155,6 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
     default:
         break;
     }
-}
-
-void ieee802154_submac_bh_request(ieee802154_submac_t *submac)
-{
-    (void)submac;
-    event_post(EVENT_PRIO_HIGHEST, &ev_bh_request);
 }
 
 static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
