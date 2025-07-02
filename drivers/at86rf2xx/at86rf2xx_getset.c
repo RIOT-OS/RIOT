@@ -352,9 +352,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 
     DEBUG("set option %i to %i\n", option, state);
 
-    /* set option field */
-    dev->flags = (state) ? (dev->flags |  option)
-                         : (dev->flags & ~option);
     /* trigger option specific actions */
     switch (option) {
         case AT86RF2XX_OPT_CSMA:
@@ -433,8 +430,6 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
     else {
         while (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_IN_PROGRESS) {}
     }
-
-    dev->state = state;
 }
 
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
@@ -472,18 +467,18 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Go to SLEEP mode from TRX_OFF */
 #if AT86RF2XX_IS_PERIPH
             /* reset interrupts states in device */
-            dev->irq_status = 0;
             /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
             *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
 #else
             gpio_set(dev->params.sleep_pin);
 #endif
-            dev->state = state;
+            dev->sleep = true;
         }
         else {
             if (old_state == AT86RF2XX_STATE_SLEEP) {
                 DEBUG("at86rf2xx: waking up from sleep mode\n");
                 at86rf2xx_assert_awake(dev);
+                dev->sleep = false;
             }
             _set_state(dev, state, state);
         }
