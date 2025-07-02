@@ -127,18 +127,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                                  opt, value, value_len);
 }
 
-void ieee802154_submac_bh_request(ieee802154_submac_t *submac)
-{
-    netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
-                                                             netdev_ieee802154_submac_t,
-                                                             submac);
-
-    netdev_t *netdev = &netdev_submac->dev.netdev;
-    netdev_submac->isr_flags |= NETDEV_SUBMAC_FLAGS_BH_REQUEST;
-
-    netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-}
-
 void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac)
 {
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
@@ -192,10 +180,6 @@ static void _isr(netdev_t *netdev)
         int flags = netdev_submac->isr_flags;
         netdev_submac->isr_flags = 0;
         irq_enable();
-
-        if (flags & NETDEV_SUBMAC_FLAGS_BH_REQUEST) {
-            ieee802154_submac_bh_process(submac);
-        }
 
         if (flags & NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT) {
             ieee802154_submac_ack_timeout_fired(&netdev_submac->submac);
@@ -351,6 +335,14 @@ static int _init(netdev_t *netdev)
 
     /* This function already sets the PAN ID to the default one */
     netdev_ieee802154_reset(netdev_ieee802154);
+
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+    const ieee802154_radio_cipher_ops_t *cipher_ops;
+    if ((cipher_ops = ieee802154_radio_get_cipher_ops(&submac->dev))) {
+        netdev_ieee802154->sec_ctx.dev.cipher_ops = cipher_ops;
+        netdev_ieee802154->sec_ctx.dev.ctx = &submac->dev;
+    }
+#endif
 
     uint16_t chan = submac->channel_num;
     int16_t tx_power = submac->tx_pow;
