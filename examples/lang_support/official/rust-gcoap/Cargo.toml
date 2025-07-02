@@ -25,6 +25,7 @@ riot-wrappers = { version = "^0.9.0", features = [
 ] }
 rust_riotmodules = { path = "../../../../sys/rust_riotmodules/" }
 portable-atomic = { version = "1", features = [ "critical-section" ] }
+coap-handler = "0.2"
 
 coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
 coap-handler-implementations = "0.5"
@@ -55,6 +56,7 @@ digest = { version = "0.10.7", default-features = false }
 der = { version = "0.7.10", default-features = false }
 coap-numbers = "0.2.7"
 coap-message = "0.3.6"
+coap-message-utils = "0.3.8"
 
 [patch.crates-io]
 # from https://github.com/seanmonstar/try-lock/pull/11, necessary for those
