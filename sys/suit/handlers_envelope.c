@@ -32,6 +32,16 @@
 #include "suit/handlers.h"
 #include "suit.h"
 
+size_t suit_get_public_key(uint8_t idx, const void **dst)
+{
+    if (idx >= ARRAY_SIZE(public_key)) {
+        return 0;
+    }
+
+    *dst = &public_key[idx];
+    return sizeof(public_key[idx]);
+}
+
 static int _verify_with_key(suit_manifest_t *manifest, const nanocbor_value_t *it,
                             const void *key)
 {
