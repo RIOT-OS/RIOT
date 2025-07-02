@@ -1351,6 +1351,18 @@ static inline int ieee802154_radio_cca(ieee802154_dev_t *dev)
 }
 
 /**
+ * @brief Retrieve radio cipher ops
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return Radio cipher ops or NULL if device has no cipher ops
+ */
+static inline const struct ieee802154_radio_cipher_ops *ieee802154_radio_get_cipher_ops(const ieee802154_dev_t *dev)
+{
+    return dev->driver->cipher_ops;
+}
+
+/**
  * @brief Check if the device supports ACK timeout
  *
  * Internally this function reads ieee802154_radio_ops::caps and checks for
