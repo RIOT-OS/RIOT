@@ -116,10 +116,12 @@ typedef struct {
         /**
          * @brief CoAP message code
          *
-         * A message code is divided into the class bits and detail bits, where `C` is a class bit and `D` is a detail bit.
-         * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
-         * message codes are written as `c.dd` where `c` is the unsigned integer encoded in the three `C` bits and
-         * `dd` is the beforementioned two-digit number encoded in the five `D` bits.
+         * A message code is divided into the class bits and detail bits, where `C` is a class bit
+         * and `D` is a detail bit.
+         * The class bits form a single-digit number, the detail bits represents a two-digit number.
+         * Hence, message codes are written as `c.dd` where `c` is the unsigned integer encoded in
+         * the three `C` bits and `dd` is the beforementioned two-digit number encoded in the five
+         * `D` bits.
          */
         uint8_t code;
 
@@ -131,21 +133,24 @@ typedef struct {
         /**
          * @brief CoAP request method
          *
-         * @pre Check if this is a request message before reading this property using @ref unicoap_message_is_request.
+         * @pre Check if this is a request message before reading this property using
+         * @ref unicoap_message_is_request.
          */
         unicoap_method_t method;
 
         /**
          * @brief CoAP response status
          *
-         * @pre Check if this is a response message before reading this property using @ref unicoap_message_is_response.
+         * @pre Check if this is a response message before reading this property using
+         * @ref unicoap_message_is_response.
          */
         unicoap_status_t status;
 
         /**
          * @brief CoAP signal
          *
-         * Check if this is a signaling message before reading this property using @ref unicoap_message_is_signal.
+         * Check if this is a signaling message before reading this property using
+         * @ref unicoap_message_is_signal.
          */
         unicoap_signal_t signal;
     };
@@ -351,8 +356,8 @@ static inline size_t unicoap_message_options_size(const unicoap_message_t* messa
  *
  * A message code is divided into the three class bits and five detail bits.
  * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
- * message codes are written as `c.dd`. In the following listing, `C` is a class bit and `D` is a detail bit.
- * The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
+ * message codes are written as `c.dd`. In the following listing, `C` is a class bit and `D` is a
+ * detail bit. The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
  * ```
  *   Bit
  *   7 6 5   4   3 2 1 0
@@ -374,8 +379,8 @@ static inline uint8_t unicoap_code_class(uint8_t code)
  *
  * A message code is divided into the three class bits and five detail bits.
  * The class bits form a single-digit number, the detail bits represents a two-digit number. Hence,
- * message codes are written as `c.dd`. In the following listing, `C` is a class bit and `D` is a detail bit.
- * The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
+ * message codes are written as `c.dd`. In the following listing, `C` is a class bit and `D` is a
+ * detail bit. The `C` bits represent the class `c`, and the `D` bits form the detail number `d`.
  * ```
  *   Bit
  *   7 6 5   4   3 2 1 0
@@ -520,8 +525,8 @@ static inline unicoap_message_t unicoap_message_alloc_string(uint8_t code, const
  * @pre @p options is allocated
  */
 static inline void unicoap_message_init_with_options(unicoap_message_t* message, uint8_t code,
-                                                uint8_t* payload, size_t payload_size,
-                                                unicoap_options_t* options)
+                                                     uint8_t* payload, size_t payload_size,
+                                                     unicoap_options_t* options)
 {
     message->code = code;
     message->options = options;
@@ -539,8 +544,8 @@ static inline void unicoap_message_init_with_options(unicoap_message_t* message,
  * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_message_alloc_with_options(uint8_t code, uint8_t* payload,
-                                                        size_t payload_size,
-                                                        unicoap_options_t* options)
+                                                                   size_t payload_size,
+                                                                   unicoap_options_t* options)
 {
     return (unicoap_message_t){
         .code = code, .options = options, .payload = payload, .payload_size = payload_size
@@ -557,8 +562,8 @@ static inline unicoap_message_t unicoap_message_alloc_with_options(uint8_t code,
  * @pre @p options is allocated
  */
 static inline void unicoap_message_init_string_with_options(unicoap_message_t* message, uint8_t code,
-                                                       const char* payload,
-                                                       unicoap_options_t* options)
+                                                            const char* payload,
+                                                            unicoap_options_t* options)
 {
     unicoap_message_init_with_options(message, code, (uint8_t*)payload, payload ? strlen(payload) : 0, options);
 }
@@ -568,11 +573,11 @@ static inline void unicoap_message_init_string_with_options(unicoap_message_t* m
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
  * @param[in] options Message options, must be pre-allocated and pre-initialized
- * @return Message structure
+ * @returns Message structure
  * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_message_alloc_string_with_options(uint8_t code, const char* payload,
-                                                               unicoap_options_t* options)
+                                                                          unicoap_options_t* options)
 {
     return (unicoap_message_t){ .code = code,
                                 .options = options,
@@ -725,7 +730,7 @@ static inline void unicoap_request_init(unicoap_message_t* request, unicoap_meth
  * @return Request structure
  */
 static inline unicoap_message_t unicoap_request_alloc(unicoap_method_t method, uint8_t* payload,
-                                                size_t payload_size)
+                                                      size_t payload_size)
 {
     return unicoap_message_alloc((uint8_t)method, payload, payload_size);
 }
@@ -765,8 +770,8 @@ static inline unicoap_message_t unicoap_request_alloc_string(unicoap_method_t me
  * @pre @p options is allocated
  */
 static inline void unicoap_request_init_with_options(unicoap_message_t* request, unicoap_method_t method,
-                                                uint8_t* payload, size_t payload_size,
-                                                unicoap_options_t* options)
+                                                     uint8_t* payload, size_t payload_size,
+                                                     unicoap_options_t* options)
 {
     unicoap_message_init_with_options(request, (uint8_t)method, payload, payload_size, options);
 }
@@ -781,8 +786,8 @@ static inline void unicoap_request_init_with_options(unicoap_message_t* request,
  * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_request_alloc_with_options(unicoap_method_t method, uint8_t* payload,
-                                                        size_t payload_size,
-                                                        unicoap_options_t* options)
+                                                                   size_t payload_size,
+                                                                   unicoap_options_t* options)
 {
     return unicoap_message_alloc_with_options((uint8_t)method, payload, payload_size, options);
 }
@@ -797,8 +802,8 @@ static inline unicoap_message_t unicoap_request_alloc_with_options(unicoap_metho
  * @pre @p options is allocated
  */
 static inline void unicoap_request_init_string_with_options(unicoap_message_t* request,
-                                                       unicoap_method_t method, const char* payload,
-                                                       unicoap_options_t* options)
+                                                            unicoap_method_t method, const char* payload,
+                                                            unicoap_options_t* options)
 {
     unicoap_message_init_string_with_options(request, (uint8_t)method, payload, options);
 }
@@ -812,8 +817,8 @@ static inline void unicoap_request_init_string_with_options(unicoap_message_t* r
  * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_request_alloc_string_with_options(unicoap_method_t method,
-                                                               const char* payload,
-                                                               unicoap_options_t* options)
+                                                                          const char* payload,
+                                                                          unicoap_options_t* options)
 {
     return unicoap_message_alloc_string_with_options((uint8_t)method, payload, options);
 }
@@ -906,7 +911,7 @@ static inline void unicoap_response_init(unicoap_message_t* response, unicoap_st
  * @return Response structure
  */
 static inline unicoap_message_t unicoap_response_alloc(unicoap_status_t status, uint8_t* payload,
-                                                 size_t payload_size)
+                                                       size_t payload_size)
 {
     return unicoap_message_alloc((uint8_t)status, payload, payload_size);
 }
@@ -931,7 +936,7 @@ static inline void unicoap_response_init_string(unicoap_message_t* response,
  * @return Response structure
  */
 static inline unicoap_message_t unicoap_response_alloc_string(unicoap_status_t status,
-                                                        const char* payload)
+                                                              const char* payload)
 {
     return unicoap_message_alloc_string((uint8_t)status, payload);
 }
@@ -947,8 +952,8 @@ static inline unicoap_message_t unicoap_response_alloc_string(unicoap_status_t s
  * @pre @p options is allocated
  */
 static inline void unicoap_response_init_with_options(unicoap_message_t* response,
-                                                 unicoap_status_t status, uint8_t* payload,
-                                                 size_t payload_size, unicoap_options_t* options)
+                                                      unicoap_status_t status, uint8_t* payload,
+                                                      size_t payload_size, unicoap_options_t* options)
 {
     unicoap_message_init_with_options(response, (uint8_t)status, payload, payload_size, options);
 }
@@ -963,8 +968,8 @@ static inline void unicoap_response_init_with_options(unicoap_message_t* respons
  * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_status_t status, uint8_t* payload,
-                                                         size_t payload_size,
-                                                         unicoap_options_t* options)
+                                                                    size_t payload_size,
+                                                                    unicoap_options_t* options)
 {
     return unicoap_message_alloc_with_options((uint8_t)status, payload, payload_size, options);
 }
@@ -979,9 +984,9 @@ static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_stat
  * @pre @p options is allocated
  */
 static inline void unicoap_response_init_string_with_options(unicoap_message_t* response,
-                                                        unicoap_status_t status,
-                                                        const char* payload,
-                                                        unicoap_options_t* options)
+                                                             unicoap_status_t status,
+                                                             const char* payload,
+                                                             unicoap_options_t* options)
 {
     unicoap_message_init_string_with_options(response, (uint8_t)status, payload, options);
 }
@@ -995,8 +1000,8 @@ static inline void unicoap_response_init_string_with_options(unicoap_message_t* 
  * @pre @p options is allocated
  */
 static inline unicoap_message_t unicoap_response_alloc_string_with_options(unicoap_status_t status,
-                                                                const char* payload,
-                                                                unicoap_options_t* options)
+                                                                           const char* payload,
+                                                                           unicoap_options_t* options)
 {
     return unicoap_message_alloc_string_with_options((uint8_t)status, payload, options);
 }
@@ -1054,18 +1059,21 @@ typedef struct {
  *
  * @param[in] cursor Start of options buffer
  * @param[out] end Pointer to after last buffer element
- * @param[in,out] message Pre-allocated message to write options and payload into. Must have valid options pointer
+ * @param[in,out] message Pre-allocated message to write options and payload into. Must have valid
+ *                        options pointer
  *
  * @pre @p message is allocated
  *
  * @returns `0` on success
  * @returns Negative errno on failure
  *
- * @note This function does not mutate or copy the buffer pointed at by @p cursor. However, it **does escape** pointers into the
- * buffer pointed at by @p cursor in @p message . This is necessary to create a lookup array for options, i.e., to avoid
- * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
+ * @note This function does not mutate or copy the buffer pointed at by @p cursor. However,
+ * it **does escape** pointers into the buffer pointed at by @p cursor in @p message . This is
+ * necessary to create a lookup array for options, i.e., to avoid re-parsing the options buffer.
+ * You will need to decide whether you treat the message's options as constant or not.
  * This depends on whether the buffer @p cursor passed to this function is considered constant _by you_.
- * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified by `const`.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not qualified
+ * by `const`. That hypothetical `const` depends on your usage of the message and its options.
  * That hypothetical `const` depends on your usage of the message and its options.
  */
 ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* end,
@@ -1080,7 +1088,8 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
 /**
  * @brief Populates the given buffer with options and payload
  *
- * Call this method with the remaining capacity after you have written the CoAP header into a PDU buffer
+ * Call this method with the remaining capacity after you have written the CoAP header into a
+ * PDU buffer
  *
  * @param[in] cursor Pointer to first byte after header
  * @param remaining_capacity Capacity remaining for options, payload marker, and payload
@@ -1140,12 +1149,13 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size, 
  *
  * @remark To allocate everything needed in one go, use @ref unicoap_pdu_parse_rfc7252_result instead.
  *
- * @note This function does not mutate or copy the buffer pointed at by @p pdu. However, it **does escape** pointers into the
- * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
- * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
+ * @note This function does not mutate or copy the buffer pointed at by @p pdu. However,
+ * it **does escape** pointers into the buffer pointed at by @p pdu in @p message . This is
+ * necessary to create a lookup array for options, i.e., to avoid re-parsing the options buffer.
+ * You will need to decide whether you treat the message's options as constant or not.
  * This depends on whether the buffer @p pdu passed to this function is considered constant _by you_.
- * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p pdu is not qualified by `const`.
- * That hypothetical `const` depends on your usage of the message and its options.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p pdu is not qualified
+ * by `const`. That hypothetical `const` depends on your usage of the message and its options.
  */
 ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* message,
                                   unicoap_message_properties_t* properties);
@@ -1163,12 +1173,13 @@ ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* 
  * @retval `-EBADOPT` Bad option
  * @retval `-ENOBUFS` Options buffer in @ref unicoap_message_t::options (@ref unicoap_options_t) too small
  *
- * @note This function does not mutate or copy the buffer pointed at by @p pdu. However, it **does escape** pointers into the
- * buffer pointed at by @p pdu in @p message . This is necessary to create a lookup array for options, i.e., to avoid
- * re-parsing the options buffer. You will need to decide whether you treat the message's options as constant or not.
+ * @note This function does not mutate or copy the buffer pointed at by @p pdu. However,
+ * it **does escape** pointers into the buffer pointed at by @p pdu in @p message . This is
+ * necessary to create a lookup array for options, i.e., to avoid re-parsing the options buffer.
+ * You will need to decide whether you treat the message's options as constant or not.
  * This depends on whether the buffer @p pdu passed to this function is considered constant _by you_.
- * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p pdu is not qualified by `const`.
- * That hypothetical `const` depends on your usage of the message and its options.
+ * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p pdu is not qualified
+ * by `const`. That hypothetical `const` depends on your usage of the message and its options.
  */
 static inline ssize_t unicoap_pdu_parse_rfc7252_result(uint8_t* pdu, size_t size, unicoap_parser_result_t* parsed)
 {
