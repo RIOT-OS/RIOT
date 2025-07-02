@@ -191,6 +191,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
     case IEEE802154_DEV_TYPE_MRF24J40:
         printf("mrf24j40");
         break;
+    case IEEE802154_DEV_TYPE_AT86RF2XX:
+        printf("at86rf2xx");
+        break;
     case IEEE802154_DEV_TYPE_ESP_IEEE802154:
         printf("esp_ieee802154");
         break;
