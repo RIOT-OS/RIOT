@@ -37,6 +37,11 @@ extern "C" {
 typedef struct ieee802154_radio_ops ieee802154_radio_ops_t;
 
 /**
+ * @brief Forward declaration of radio cipher ops structure.
+ */
+struct ieee802154_radio_cipher_ops;
+
+/**
  * @brief IEEE802.15.4 Radio capabilities
  *
  * These flags represent the hardware capabilities of a given device.
@@ -820,6 +825,13 @@ struct ieee802154_radio_ops {
      */
     int (*config_src_addr_match)(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
                                  const void *value);
+
+    /**
+     * @brief Radio cipher ops.
+     *
+     * May be NULL if the radio does not support crypto acceleration.
+     */
+    const struct ieee802154_radio_cipher_ops *cipher_ops;
 };
 
 /**
