@@ -416,13 +416,12 @@ ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, uni
  *
  * Use this API with repeatable options
  *
- * @param options Options
+ * @param[in,out] options Options
  * @param number Option number
  *
  * @note If no option with the specified number exists, this function will return zero.
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Negative integer on error or zero on success
  */
 int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number_t number);
 /** @} */
@@ -436,12 +435,11 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 /**
  * @brief Retrieves the value of the option with given value, if present
  *
- * @param options Options
+ * @param[in] options Options
  * @param number Option number
  * @param[in,out] value Option value. Provide a pointer to a an `uint8_t` pointer, which may be `NULL`.
  *
- * @return Size of option value (zero or more bytes)
- * @return Negative errno if the get operation failed
+ * @return Size of option value (zero or more bytes) or negative errno if the get operation failed
  * @retval `-ENOENT` Options not found
  * @retval `-EBADOPT` Options buffer is corrupted
  */
@@ -451,13 +449,12 @@ ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_num
 /**
  * @brief Copies the value of the option with given value, if present, into a buffer
  *
- * @param options Options
+ * @param[in] options Options
  * @param number Option number
  * @param[in,out] dest Destination buffer where option value will be copied into
  * @param capacity Number of usable bytes in the @p dest buffer
  *
- * @return Size of option value (zero or more bytes)
- * @return Negative errno if the get operation failed
+ * @return Size of option value (zero or more bytes) or negative errno if the get operation failed
  * @retval `-ENOENT` Options not found
  * @retval `-EBADOPT` Options buffer is corrupted
  * @retval `-ENOBUFS` if @p dest lacks sufficient capacity to store value
@@ -468,13 +465,12 @@ ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_opt
 /**
  * @brief Sets the option with the given number
  *
- * @param options Options
+ * @param[in,out] options Options
  * @param number Option number
  * @param[in] value Option value
  * @param value_size Number of bytes the @p value is made up of
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Zero on success or egative integer on error instead
  * @retval `-ENOBUFS` if options storage buffer lacks sufficient capacity to set option
  */
 int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t number,
@@ -488,8 +484,7 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
  *
  * @note If no option with the specified number exists, this function will return zero.
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Zero on success or negative integer on error instead
  */
 static inline int unicoap_options_remove(unicoap_options_t* options, unicoap_option_number_t number)
 {
@@ -557,8 +552,7 @@ static inline void unicoap_options_iterator_init(unicoap_options_iterator_t* ite
  * @param[out] number The number of the next option
  * @param[out] value A pointer to next option's value
  *
- * @returns Positive size of option value on success
- * @returns Negative integer on error
+ * @returns Positive size of option value on success or negative integer on error instead
  * @retval `-1` if the iterator is finished
  * @retval `-EBADOPT` Options buffer is corrupted
  */
@@ -574,8 +568,7 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
  * @param number The option number to look out for
  * @param[out] value A pointer to next option's value
  *
- * @returns Positive size of option value
- * @returns Negative integer on error
+ * @returns Positive size of option value or negative integer on error
  * @retval `-1` if the iterator is finished
  * @retval `-EBADOPT` Options buffer is corrupted
  */
@@ -628,8 +621,7 @@ void unicoap_options_dump_all(const unicoap_options_t* options);
  *
  * Specify the number of characters or zero to let `unicoap` determine the string length.
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Zero on success or negative integer on error otherwise
  * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 static inline int unicoap_options_set_string(unicoap_options_t* options,
@@ -652,8 +644,7 @@ static inline int unicoap_options_set_string(unicoap_options_t* options,
  *
  * Specify the number of characters or zero to let `unicoap` determine the string length.
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Zero on success or negative integer on error
  * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 static inline int unicoap_options_add_string(unicoap_options_t* options,
@@ -679,8 +670,8 @@ static inline int unicoap_options_add_string(unicoap_options_t* options,
  * @param[in,out] uint Pointer to 32-bit integer that will store unsigned integer in host byte order
  * @param max_size Maximum number of bytes used to represent the integer (1 to 4)
  *
- * @returns Number of bytes occupied by the unsigned integer in the option value.
- * @returns Negative integer on error
+ * @returns Number of bytes occupied by the unsigned integer in the option value or negative
+ *          integer on error
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option is corrupted or integer wider than expected
  *
@@ -701,8 +692,8 @@ ssize_t _unicoap_options_get_variable_uint(const unicoap_options_t* options,
  * @param number Option number
  * @param[in,out] uint Provide a pointer to an allocated 32-bit unsigned integer, will have been filled after function has returned
  *
- * @returns Number of bytes occupied by the unsigned integer in the option value.
- * @returns Negative integer on error
+ * @returns Number of bytes occupied by the unsigned integer in the option value or negative
+ *          integer on error
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option is corrupted
  */
@@ -722,8 +713,8 @@ static inline ssize_t unicoap_options_get_uint32(const unicoap_options_t* option
  * @param number Option number
  * @param[in,out] uint Provide a pointer to an allocated 32-bit unsigned integer, will have been filled after function has returned
  *
- * @returns Number of bytes occupied by the unsigned integer in the option value.
- * @returns Negative integer on error
+ * @returns Number of bytes occupied by the unsigned integer in the option value or negative
+ *          integer on error
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option is corrupted
  */
@@ -743,8 +734,8 @@ static inline ssize_t unicoap_options_get_uint24(const unicoap_options_t* option
  * @param number Option number
  * @param[in,out] uint Provide a pointer to an allocated 16-bit unsigned integer, will have been filled after function has returned
  *
- * @returns Number of bytes occupied by the unsigned integer in the option value.
- * @returns Negative integer on error
+ * @returns Number of bytes occupied by the unsigned integer in the option value or negative
+ *          integer on error
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option is corrupted
  */
@@ -767,8 +758,8 @@ static inline ssize_t unicoap_options_get_uint16(const unicoap_options_t* option
  * @param number Option number
  * @param[in,out] uint Provide a pointer to an allocated 8-bit unsigned integer, will have been filled after function has returned
  *
- * @returns Number of bytes occupied by the unsigned integer in the option value.
- * @returns Negative integer on error
+ * @returns Number of bytes occupied by the unsigned integer in the option value or negative
+ *          integer on error
  * @retval `-ENOENT` Option not found
  * @retval `-EBADOPT` Option is corrupted
  * @retval `-ENOBUFS` Option value was bigger than 1 byte
@@ -789,8 +780,7 @@ static inline ssize_t unicoap_options_get_uint8(const unicoap_options_t* options
  * @param number Option number
  * @param value Unsigned integer option value
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Zero on success or negative integer on error
  * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to set option
  */
 int unicoap_options_set_uint(unicoap_options_t* options, unicoap_option_number_t number,
@@ -808,8 +798,7 @@ int unicoap_options_set_uint(unicoap_options_t* options, unicoap_option_number_t
  * @param number Option number
  * @param value Unsigned integer option value
  *
- * @returns Zero on success
- * @returns Negative integer on error
+ * @returns Zero on success or negative integer on error
  * @retval `-ENOBUFS` if options buffer lacks sufficient capacity to add option
  */
 int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t number,
