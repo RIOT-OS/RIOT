@@ -90,7 +90,7 @@ typedef struct {
 /**
  * @brief CoAP options container
  *
- * This structure provides a *view* on a storage buffer
+ * This structure provides a *view* into a storage buffer
  * containing [RFC7252](https://datatracker.ietf.org/doc/html/rfc7252)-encoded options.
  *
  * @see @ref net_unicoap_options
