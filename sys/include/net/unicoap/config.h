@@ -59,7 +59,8 @@
 /**
  * @brief Default buffer capacity unicoap chooses when you invoke @ref UNICOAP_OPTIONS_ALLOC_DEFAULT
  *
- * Options are stored in a contiguous memory region according to the format specified in [RFC 7252, Section 3.1](https://datatracker.ietf.org/doc/html/rfc7252#section-3.1)
+ * Options are stored in a contiguous memory region according to the format specified in
+ * [RFC 7252, Section 3.1](https://datatracker.ietf.org/doc/html/rfc7252#section-3.1).
  * This parameter does not affect @ref UNICOAP_OPTIONS_ALLOC.
  *
  * **Default**: 32 bytes
@@ -140,9 +141,6 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #  define CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH (3)
 #endif
 
-static_assert(CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH <= 3,
-              "CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH must not exceed 3");
-
 /**
  * @brief See @ref  CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH
  */
@@ -152,6 +150,8 @@ static_assert(CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH <= 3,
 #  define UNICOAP_OBS_TICK_EXPONENT (6)
 #elif (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 1)
 #  define UNICOAP_OBS_TICK_EXPONENT (14)
+#else
+#  error CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH must not exceed 3
 #endif
 /** @} */
 
