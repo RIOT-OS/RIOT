@@ -1031,7 +1031,7 @@ static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_stat
 /**
  * @brief Initializes response with payload from null-terminated UTF-8 string and options
  * @memberof unicoap_message_t
- * 
+ *
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
