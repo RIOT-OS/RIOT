@@ -171,6 +171,7 @@ typedef struct {
 
 /**
  * @brief Retrieves contiguous message payload, if available
+ * @memberof unicoap_message_t
  * @pre Payload representation must be @ref UNICOAP_PAYLOAD_CONTIGUOUS
  *
  * @param message Message to retrieve payload buffer from
@@ -185,6 +186,7 @@ static inline uint8_t* unicoap_message_payload_get(unicoap_message_t* message)
 
 /**
  * @brief Assigns the given message a contiguous payload
+ * @memberof unicoap_message_t
  *
  * @param message Message
  * @param[in] payload Payload buffer
@@ -199,6 +201,7 @@ static inline void unicoap_message_payload_set(unicoap_message_t* message, uint8
 
 /**
  * @brief Retrieves noncontiguous message payload, if available
+ * @memberof unicoap_message_t
  * @pre Payload representation must be @ref UNICOAP_PAYLOAD_NONCONTIGUOUS
  *
  * @param message Message to retrieve payload vector from
@@ -213,6 +216,7 @@ static inline iolist_t* unicoap_message_payload_get_chunks(unicoap_message_t* me
 
 /**
  * @brief Assigns the given message a noncontiguous payload
+ * @memberof unicoap_message_t
  *
  * @param message Message
  * @param[in] chunks Payload vector
@@ -225,6 +229,7 @@ static inline void unicoap_message_payload_set_chunks(unicoap_message_t* message
 
 /**
  * @brief Appends a payload chunk to a message
+ * @memberof unicoap_message_t
  * @pre Message's payload must be noncontiguous
  *
  * @param message Message
@@ -234,6 +239,7 @@ void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* 
 
 /**
  * @brief Retrieves payload size, regardless of payload representation
+ * @memberof unicoap_message_t
  * @param message Message whose payload size to compute (if noncontiguous payload) or
  *                retrieve (contiguous payload).
  * @returns Payload size in bytes
@@ -250,6 +256,7 @@ static inline size_t unicoap_message_payload_get_size(const unicoap_message_t* m
 
 /**
  * @brief Determines whether message has any payload
+ * @memberof unicoap_message_t
  * @param message Message with payload in question
  * @returns A boolean indicating whether any payload bytes are present
  *
@@ -260,6 +267,7 @@ bool unicoap_message_payload_is_empty(const unicoap_message_t* message);
 
 /**
  * @brief Copies payload into given buffer
+ * @memberof unicoap_message_t
  *
  * @param message Message whose payload to copy
  * @param[in,out] buffer Destination payload buffer
@@ -273,6 +281,7 @@ ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* 
 
 /**
  * @brief Copies noncontiguous payload into contiguous storage buffer
+ * @memberof unicoap_message_t
  * @pre None, if payload is already contiguous, this method does not copy.
  * @param[in,out] message Message whose payload to make contiguous
  * @param[in,out] buffer Destination payload buffer
@@ -334,6 +343,7 @@ const char* unicoap_string_from_rfc7252_type(unicoap_rfc7252_message_type_t type
 
 /**
  * @brief Retrieves options storage buffer
+ * @memberof unicoap_message_t
  * @param[in] message Message
  * @returns Pointer to first byte of storage buffer, can be `NULL`
  */
@@ -344,6 +354,7 @@ static inline uint8_t* unicoap_message_options_data(const unicoap_message_t* mes
 
 /**
  * @brief Retrieves total size of options in buffer
+ * @memberof unicoap_message_t
  * @param[in] message Message
  * @returns Size of options in buffer in bytes
  */
@@ -441,6 +452,7 @@ const char* unicoap_string_from_code_class(uint8_t code);
  */
 /**
  * @brief Initializes message with no payload and no options
+ * @memberof unicoap_message_t
  * @param code Message code
  * @param[in,out] message Pre-allocated message structure
  * @pre @p message is allocated
@@ -465,6 +477,7 @@ static inline unicoap_message_t unicoap_message_alloc_empty(uint8_t code)
 
 /**
  * @brief Initializes message with payload but no options
+ * @memberof unicoap_message_t
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload bytes (nullable)
@@ -494,6 +507,8 @@ static inline unicoap_message_t unicoap_message_alloc(uint8_t code, uint8_t* pay
 
 /**
  * @brief Initializes message with payload from null-terminated UTF-8 string but no options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -523,6 +538,8 @@ static inline unicoap_message_t unicoap_message_alloc_string(uint8_t code, const
 
 /**
  * @brief Initializes message with byte payload and options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload bytes (nullable)
@@ -561,6 +578,8 @@ static inline unicoap_message_t unicoap_message_alloc_with_options(uint8_t code,
 
 /**
  * @brief Initializes message with payload from null-terminated UTF-8 string and options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] message Pre-allocated message structure
  * @param code Message code
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -614,6 +633,7 @@ static inline bool unicoap_message_is_signal(uint8_t code)
 
 /**
  * @brief Retrieves signal code from given signal message
+ * @memberof unicoap_message_t
  *
  * @param[in] message CoAP signal
  * @returns Message code as @ref unicoap_signal_t
@@ -625,6 +645,7 @@ static inline unicoap_signal_t unicoap_message_get_signal(const unicoap_message_
 
 /**
  * @brief Sets signal code of given signal message
+ * @memberof unicoap_message_t
  *
  * @param[in,out] message CoAP signal
  * @param signal Signal code
@@ -665,6 +686,8 @@ static inline bool unicoap_message_is_request(uint8_t code)
 
 /**
  * @brief Obtains request method from the given message's code
+ * @memberof unicoap_message_t
+ *
  * @param[in] request Request message, pre-initialized
  * @returns Message code as @ref unicoap_method_t
  */
@@ -675,6 +698,8 @@ static inline unicoap_method_t unicoap_request_get_method(const unicoap_message_
 
 /**
  * @brief Sets request method
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] request Request message, pre-allocated
  * @param method Request method to set
  * @pre @p request is allocated
@@ -696,6 +721,8 @@ const char* unicoap_string_from_method(unicoap_method_t method);
 
 /**
  * @brief Initializes request with no payload and no options
+ * @memberof unicoap_message_t
+ *
  * @param method Request method
  * @param[in,out] request Pre-allocated request structure
  * @pre @p request is allocated
@@ -717,6 +744,8 @@ static inline unicoap_message_t unicoap_request_alloc_empty(unicoap_method_t met
 
 /**
  * @brief Initializes request with payload but no options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload bytes (nullable)
@@ -744,6 +773,8 @@ static inline unicoap_message_t unicoap_request_alloc(unicoap_method_t method, u
 
 /**
  * @brief Initializes request with payload from null-terminated UTF-8 string but no options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -768,6 +799,8 @@ static inline unicoap_message_t unicoap_request_alloc_string(unicoap_method_t me
 
 /**
  * @brief Initializes request with byte payload and options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload bytes (nullable)
@@ -801,6 +834,8 @@ static inline unicoap_message_t unicoap_request_alloc_with_options(unicoap_metho
 
 /**
  * @brief Initializes request with payload from null-terminated UTF-8 string and options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] request Pre-allocated request structure
  * @param method Request method
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -849,6 +884,8 @@ bool unicoap_message_is_response(uint8_t code);
 
 /**
  * @brief Obtains response status from the given message's code
+ * @memberof unicoap_message_t
+ *
  * @param[in] response Response message, pre-initialized
  * @returns Message code as @ref unicoap_status_t
  */
@@ -859,6 +896,8 @@ static inline unicoap_status_t unicoap_response_get_status(const unicoap_message
 
 /**
  * @brief Sets response status
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] response Response message, pre-allocated
  * @param status Response status to set
  * @pre @p response is allocated
@@ -877,6 +916,8 @@ const char* unicoap_string_from_status(unicoap_status_t status);
 
 /**
  * @brief Initializes response with no payload and no options
+ * @memberof unicoap_message_t
+ *
  * @param status Response status
  * @param[in,out] response Pre-allocated response structure
  * @pre @p response is allocated
@@ -898,6 +939,8 @@ static inline unicoap_message_t unicoap_response_alloc_empty(unicoap_status_t st
 
 /**
  * @brief Initializes response with payload but no options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload bytes (nullable)
@@ -925,6 +968,8 @@ static inline unicoap_message_t unicoap_response_alloc(unicoap_status_t status, 
 
 /**
  * @brief Initializes response with payload from null-terminated UTF-8 string but no options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated
@@ -950,6 +995,8 @@ static inline unicoap_message_t unicoap_response_alloc_string(unicoap_status_t s
 
 /**
  * @brief Initializes response with byte payload and options
+ * @memberof unicoap_message_t
+ *
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload bytes (nullable)
@@ -983,6 +1030,8 @@ static inline unicoap_message_t unicoap_response_alloc_with_options(unicoap_stat
 
 /**
  * @brief Initializes response with payload from null-terminated UTF-8 string and options
+ * @memberof unicoap_message_t
+ * 
  * @param[in,out] response Pre-allocated response structure
  * @param status Response status
  * @param[in] payload Payload string (nullable), must be null-terminated

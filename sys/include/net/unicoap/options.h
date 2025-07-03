@@ -128,6 +128,7 @@ typedef struct {
 
 /**
  * @brief Initializes the given options structure.
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options struct to initialize
  * @param[in] storage A buffer unicoap will use to store option values in
@@ -143,6 +144,7 @@ static inline void unicoap_options_init(unicoap_options_t* options, uint8_t* sto
 
 /**
  * @brief Determines whether the given options container has one or more options with the given number.
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options
  * @param number The option number
@@ -153,6 +155,7 @@ bool unicoap_options_contains(const unicoap_options_t* options, unicoap_option_n
 
 /**
  * @brief Removes all options
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options
  */
@@ -207,6 +210,7 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  */
 /**
  * @brief Determines whether the given option is considered critical
+ * @memberof unicoap_option_number_t
  *
  * Criticality is independent from the corresponding option's value.
  * As per [CoAP RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252),
@@ -222,6 +226,7 @@ static inline bool unicoap_option_is_critical(unicoap_option_number_t option_num
 
 /**
  * @brief Determines whether the given option is safe to forward
+ * @memberof unicoap_option_number_t
  *
  * Whether an option is safe to forward is independent from the corresponding option's value.
  *
@@ -235,6 +240,7 @@ static inline bool unicoap_option_is_safe_to_forward(unicoap_option_number_t opt
 
 /**
  * @brief Determines whether the given option is **not** intended to be part of the cache key
+ * @memberof unicoap_option_number_t
  *
  * Whether an option is considered [NoCacheKey](https://datatracker.ietf.org/doc/html/rfc7252#section-5.4.2)
  * is independent from the option's value.
@@ -249,6 +255,7 @@ static inline bool unicoap_option_is_no_cache_key(unicoap_option_number_t option
 
 /**
  * @brief Determines whether the given option is intended to be part of the cache key
+ * @memberof unicoap_option_number_t
  *
  * Whether an option is considered a [NoCacheKey](https://datatracker.ietf.org/doc/html/rfc7252#section-5.4.2)
  * is independent from the option's value.
@@ -276,6 +283,7 @@ const char* unicoap_string_from_option_number(unicoap_option_number_t number);
 
 /**
  * @brief Copies storage and adjusts @p options struct.
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options struct whose storage to swap
  * @param[in,out] destination New storage buffer
@@ -290,6 +298,8 @@ ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destin
 
 /**
  * @brief Retrieves storage buffer
+ * @memberof unicoap_options_t
+ *
  * @param[in] options Options
  * @returns Pointer to first byte of storage buffer, can be `NULL`
  */
@@ -300,6 +310,8 @@ static inline uint8_t* unicoap_options_data(const unicoap_options_t* options)
 
 /**
  * @brief Retrieves total size of options in buffer
+ * @memberof unicoap_options_t
+ *
  * @param[in] options Options
  * @returns Size of options in buffer in bytes
  */
@@ -354,6 +366,7 @@ static inline size_t unicoap_options_size(const unicoap_options_t* options)
  */
 /**
  * @brief Adds a repeatable option with the given value.
+ * @memberof unicoap_options_t
  *
  * Use this function to insert multiple options with the same number but potentially different values.
  *
@@ -371,6 +384,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
 
 /**
  * @brief Splits the given value into separate values and adds them as option values
+ * @memberof unicoap_options_t
  *
  * Use this function to insert multiple options with the same number but potentially different values.
  * The @p buffer will be sliced everywhere the @p separator occurs. This is the same as calling
@@ -392,6 +406,7 @@ int unicoap_options_add_values_joined(unicoap_options_t* options, unicoap_option
 
 /**
  * @brief Copies the values of all options with the given number joined by the given separator
+ * @memberof unicoap_options_t
  *
  * Use this API with repeatable options
  *
@@ -413,6 +428,7 @@ ssize_t unicoap_options_copy_values_joined(const unicoap_options_t* options, uni
 
 /**
  * @brief Removes all options with the given number, if any
+ * @memberof unicoap_options_t
  *
  * Use this API with repeatable options
  *
@@ -434,6 +450,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
  */
 /**
  * @brief Retrieves the value of the option with given value, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options
  * @param number Option number
@@ -448,6 +465,7 @@ ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_num
 
 /**
  * @brief Copies the value of the option with given value, if present, into a buffer
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options
  * @param number Option number
@@ -464,6 +482,7 @@ ssize_t unicoap_options_copy_value(const unicoap_options_t* options, unicoap_opt
 
 /**
  * @brief Sets the option with the given number
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options
  * @param number Option number
@@ -478,6 +497,7 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
 
 /**
  * @brief Removes option with the given number, if present
+ * @memberof unicoap_options_t
  *
  * @param options Options
  * @param number Option number
@@ -530,6 +550,7 @@ typedef struct {
 
 /**
  * @brief Initializes the given iterator structure
+ * @memberof unicoap_options_iterator_t
  *
  * @param[in,out] iterator Option iterator struct to initialize
  * @param[in] options Options to iterate over
@@ -545,6 +566,7 @@ static inline void unicoap_options_iterator_init(unicoap_options_iterator_t* ite
 
 /**
  * @brief Gets the next option provided by the given iterator
+ * @memberof unicoap_options_iterator_t
  *
  * This is a zero-copy API.
  *
@@ -561,6 +583,7 @@ ssize_t unicoap_options_get_next(unicoap_options_iterator_t* iterator,
 
 /**
  * @brief Gets the next option with the given number, potentially skipping any options in between.
+ * @memberof unicoap_options_iterator_t
  *
  * This is a zero-copy API. Use this function to iterate over specific options that may occur more than once.
  *
@@ -577,6 +600,7 @@ ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
 
 /**
  * @brief Gets the next query option matching the given name, potentially skipping any options in between.
+ * @memberof unicoap_options_iterator_t
  *
  * Use this function to iterate over specific options that may occur more than once.
  *
@@ -601,6 +625,8 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
 
 /**
  * @brief Iterates and dumps all options using `printf`
+ * @memberof unicoap_options_t
+ *
  * @param[in] options Options
  */
 void unicoap_options_dump_all(const unicoap_options_t* options);
@@ -613,6 +639,7 @@ void unicoap_options_dump_all(const unicoap_options_t* options);
  */
 /**
  * @brief Sets a non-repeatable option to the given string value.
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options
  * @param number Option number
@@ -634,6 +661,7 @@ static inline int unicoap_options_set_string(unicoap_options_t* options,
 
 /**
  * @brief Adds a repeatable option with the given string value.
+ * @memberof unicoap_options_t
  *
  * Use this function to insert multiple options with the same number but potentially different values.
  *
@@ -664,6 +692,7 @@ static inline int unicoap_options_add_string(unicoap_options_t* options,
 #ifndef DOXYGEN
 /**
  * @brief Retrieves an unsigned option value with a configurable maximum width
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options
  * @param number Option number
@@ -684,6 +713,7 @@ ssize_t _unicoap_options_get_variable_uint(const unicoap_options_t* options,
 
 /**
  * @brief Retrieves an unsigned option value that takes up at most 4 bytes.
+ * @memberof unicoap_options_t
  *
  * Unsigned option values in CoAP are variable in length, i.e., uints are not zero-padded.
  * A zero may be represented by a zero-length option value.
@@ -705,6 +735,7 @@ static inline ssize_t unicoap_options_get_uint32(const unicoap_options_t* option
 
 /**
  * @brief Retrieves an unsigned option value that takes up at most 3 bytes.
+ * @memberof unicoap_options_t
  *
  * Unsigned option values in CoAP are variable in length, i.e., uints are not zero-padded.
  * A zero may be represented by a zero-length option value.
@@ -726,6 +757,7 @@ static inline ssize_t unicoap_options_get_uint24(const unicoap_options_t* option
 
 /**
  * @brief Retrieves an unsigned option value that takes up at most 2 bytes.
+ * @memberof unicoap_options_t
  *
  * Unsigned option values in CoAP are variable in length, i.e., uints are not zero-padded.
  * A zero may be represented by a zero-length option value.
@@ -750,6 +782,7 @@ static inline ssize_t unicoap_options_get_uint16(const unicoap_options_t* option
 
 /**
  * @brief Retrieves an unsigned option value that takes up at most one bytes.
+ * @memberof unicoap_options_t
  *
  * Unsigned option values in CoAP are variable in length, i.e., uints are not zero-padded.
  * A zero may be represented by a zero-length option value.
@@ -772,6 +805,7 @@ static inline ssize_t unicoap_options_get_uint8(const unicoap_options_t* options
 
 /**
  * @brief Sets the option with the given number to the unsigned integer value passed.
+ * @memberof unicoap_options_t
  *
  * Unsigned option values in CoAP are variable in length, i.e., uints are not zero-padded.
  * A zero may be represented by a zero-length option value.
@@ -788,6 +822,7 @@ int unicoap_options_set_uint(unicoap_options_t* options, unicoap_option_number_t
 
 /**
  * @brief Adds a repeatable option with the given unsigned integer value.
+ * @memberof unicoap_options_t
  *
  * Use this function to insert multiple options with the same number but potentially different values.
  *
@@ -823,6 +858,7 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
 
 /**
  * @brief Retrieves the `Uri-Host` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] host Pointer to value variable as buffer of UTF-8 code units
@@ -838,6 +874,7 @@ static inline ssize_t unicoap_options_get_uri_host(const unicoap_options_t* opti
 
 /**
  * @brief Sets the `Uri-Host` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] host `Uri-Host` value as buffer of UTF-8 code units
@@ -857,6 +894,7 @@ static inline ssize_t unicoap_options_set_uri_host(unicoap_options_t* options, c
 
 /**
  * @brief Sets the `Uri-Host` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] host `Uri-Host` value as buffer of UTF-8 code units, must be null-terminated
@@ -877,6 +915,7 @@ static inline ssize_t unicoap_options_set_uri_host_string(unicoap_options_t* opt
 
 /**
  * @brief Removes the `Uri-Host` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -896,6 +935,7 @@ static inline int unicoap_options_remove_uri_host(unicoap_options_t* options)
 
 /**
  * @brief Determines whether the `If-None-Match` option is present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  *
@@ -910,6 +950,7 @@ static inline bool unicoap_options_get_if_none_match(const unicoap_options_t* op
 
 /**
  * @brief Sets the `If-None-Match` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param value `If-None-Match` value
@@ -937,6 +978,7 @@ static inline ssize_t unicoap_options_set_if_none_match(unicoap_options_t* optio
 
 /**
  * @brief Retrieves the `Uri-Port` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] port Pointer to value variable
@@ -952,6 +994,7 @@ static inline ssize_t unicoap_options_get_uri_port(const unicoap_options_t* opti
 
 /**
  * @brief Sets the `Uri-Port` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param port `Uri-Port` value
@@ -966,6 +1009,7 @@ static inline ssize_t unicoap_options_set_uri_port(unicoap_options_t* options, u
 
 /**
  * @brief Removes the `Uri-Port` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -985,6 +1029,7 @@ static inline int unicoap_options_remove_uri_port(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `Content-Format` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] format Pointer to value variable
@@ -1000,6 +1045,7 @@ static inline ssize_t unicoap_options_get_content_format(const unicoap_options_t
 
 /**
  * @brief Sets the `Content-Format` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param format `Content-Format` value
@@ -1014,6 +1060,7 @@ static inline ssize_t unicoap_options_set_content_format(unicoap_options_t* opti
 
 /**
  * @brief Removes the `Content-Format` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1033,6 +1080,7 @@ static inline int unicoap_options_remove_content_format(unicoap_options_t* optio
 
 /**
  * @brief Retrieves the `Max-Age` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] age Pointer to value variable
@@ -1048,6 +1096,7 @@ static inline ssize_t unicoap_options_get_max_age(const unicoap_options_t* optio
 
 /**
  * @brief Sets the `Max-Age` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param age `Max-Age` value
@@ -1062,6 +1111,7 @@ static inline ssize_t unicoap_options_set_max_age(unicoap_options_t* options, ui
 
 /**
  * @brief Removes the `Max-Age` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1081,6 +1131,7 @@ static inline int unicoap_options_remove_max_age(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `Accept` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] format Pointer to value variable
@@ -1096,6 +1147,7 @@ static inline ssize_t unicoap_options_get_accept(const unicoap_options_t* option
 
 /**
  * @brief Sets the `Accept` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param format `Accept` value
@@ -1110,6 +1162,7 @@ static inline ssize_t unicoap_options_set_accept(unicoap_options_t* options, uni
 
 /**
  * @brief Removes the `Accept` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1129,6 +1182,7 @@ static inline int unicoap_options_remove_accept(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `Proxy-Scheme` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] scheme Pointer to value variable as buffer of UTF-8 code units
@@ -1144,6 +1198,7 @@ static inline ssize_t unicoap_options_get_proxy_scheme(const unicoap_options_t* 
 
 /**
  * @brief Sets the `Proxy-Scheme` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] scheme `Proxy-Scheme` value as buffer of UTF-8 code units
@@ -1160,6 +1215,7 @@ static inline ssize_t unicoap_options_set_proxy_scheme(unicoap_options_t* option
 
 /**
  * @brief Sets the `Proxy-Scheme` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] scheme `Proxy-Scheme` value as buffer of UTF-8 code units, must be null-terminated
@@ -1178,6 +1234,7 @@ static inline ssize_t unicoap_options_set_proxy_scheme_string(unicoap_options_t*
 
 /**
  * @brief Removes the `Proxy-Scheme` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1197,6 +1254,7 @@ static inline int unicoap_options_remove_proxy_scheme(unicoap_options_t* options
 
 /**
  * @brief Retrieves the `Proxy-Uri` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] uri Pointer to value variable as buffer of UTF-8 code units
@@ -1212,6 +1270,7 @@ static inline ssize_t unicoap_options_get_proxy_uri(const unicoap_options_t* opt
 
 /**
  * @brief Sets the `Proxy-Uri` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] uri `Proxy-Uri` value as buffer of UTF-8 code units
@@ -1231,6 +1290,7 @@ static inline ssize_t unicoap_options_set_proxy_uri(unicoap_options_t* options, 
 
 /**
  * @brief Sets the `Proxy-Uri` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] uri `Proxy-Uri` value as buffer of UTF-8 code units, must be null-terminated
@@ -1251,6 +1311,7 @@ static inline ssize_t unicoap_options_set_proxy_uri_string(unicoap_options_t* op
 
 /**
  * @brief Removes the `Proxy-Uri` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1270,6 +1331,7 @@ static inline int unicoap_options_remove_proxy_uri(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `No-Response` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] value Pointer to value variable
@@ -1285,6 +1347,7 @@ static inline ssize_t unicoap_options_get_no_response(const unicoap_options_t* o
 
 /**
  * @brief Sets the `No-Response` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param value `No-Response` value
@@ -1299,6 +1362,7 @@ static inline ssize_t unicoap_options_set_no_response(unicoap_options_t* options
 
 /**
  * @brief Removes the `No-Response` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1318,6 +1382,7 @@ static inline int unicoap_options_remove_no_response(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the first `If-Match` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] value Pointer to value variable
@@ -1333,6 +1398,7 @@ static inline ssize_t unicoap_options_get_first_if_match(const unicoap_options_t
 
 /**
  * @brief Gets the next `If-Match` option provided by the specified iterator
+ * @memberof unicoap_options_t
  *
  * @param[in,out] iterator Option iterator
  * @param[out] value Pointer to a variable that will store next value
@@ -1350,6 +1416,7 @@ static inline ssize_t unicoap_options_get_next_if_match(unicoap_options_iterator
 
 /**
  * @brief Adds `If-Match` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] value `If-Match` value
@@ -1368,6 +1435,7 @@ static inline ssize_t unicoap_options_add_if_match(unicoap_options_t* options, u
 
 /**
  * @brief Removes all `If-Match` options, if any
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1387,6 +1455,7 @@ static inline int unicoap_options_remove_all_if_match(unicoap_options_t* options
 
 /**
  * @brief Retrieves the first `ETag` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] etag Pointer to value variable
@@ -1402,6 +1471,7 @@ static inline ssize_t unicoap_options_get_first_etag(const unicoap_options_t* op
 
 /**
  * @brief Gets the next `ETag` option provided by the specified iterator
+ * @memberof unicoap_options_t
  *
  * @param[in,out] iterator Option iterator
  * @param[out] etag Pointer to a variable that will store next etag
@@ -1419,6 +1489,7 @@ static inline ssize_t unicoap_options_get_next_etag(unicoap_options_iterator_t* 
 
 /**
  * @brief Adds `ETag` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] etag `ETag` value
@@ -1438,6 +1509,7 @@ static inline ssize_t unicoap_options_add_etag(unicoap_options_t* options, uint8
 
 /**
  * @brief Removes all `ETag` options, if any
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1457,6 +1529,7 @@ static inline int unicoap_options_remove_etags(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the first `Location-Path` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] component Pointer to value variable as buffer of UTF-8 code units
@@ -1472,6 +1545,7 @@ static inline ssize_t unicoap_options_get_first_location_path_component(const un
 
 /**
  * @brief Gets the next `Location-Path` option provided by the specified iterator
+ * @memberof unicoap_options_t
  *
  * @param[in,out] iterator Option iterator
  * @param[out] component Pointer to a variable that will store next component
@@ -1489,6 +1563,7 @@ static inline ssize_t unicoap_options_get_next_location_path_component(unicoap_o
 
 /**
  * @brief Copies absolute location path into the given buffer
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[in,out] path Buffer of UTF-8 code units
@@ -1516,6 +1591,7 @@ static inline ssize_t unicoap_options_copy_location_path(const unicoap_options_t
 
 /**
  * @brief Adds `Location-Path` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] component `Location-Path` value as buffer of UTF-8 code units
@@ -1532,6 +1608,7 @@ static inline ssize_t unicoap_options_add_location_path_component(unicoap_option
 
 /**
  * @brief Adds `Location-Path` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] component `Location-Path` value as buffer of UTF-8 code units, must be null-terminated
@@ -1550,6 +1627,7 @@ static inline ssize_t unicoap_options_add_location_path_component_string(unicoap
 
 /**
  * @brief Adds multiple `Location-Path` options from string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] path as buffer of UTF-8 code units with values separated by `/`
@@ -1567,6 +1645,7 @@ static inline ssize_t unicoap_options_add_location_path(unicoap_options_t* optio
 
 /**
  * @brief Adds multiple `Location-Path` options from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] path as null-terminated string of UTF-8 code units with values separated by `/`
@@ -1586,6 +1665,7 @@ static inline ssize_t unicoap_options_add_location_path_string(unicoap_options_t
 
 /**
  * @brief Removes all `Location-Path` options, if any
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1605,6 +1685,7 @@ static inline int unicoap_options_remove_location_path(unicoap_options_t* option
 
 /**
  * @brief Retrieves the first `Uri-Path` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] component Pointer to value variable as buffer of UTF-8 code units
@@ -1620,6 +1701,7 @@ static inline ssize_t unicoap_options_get_first_uri_path_component(const unicoap
 
 /**
  * @brief Gets the next `Uri-Path` option provided by the specified iterator
+ * @memberof unicoap_options_t
  *
  * @param[in,out] iterator Option iterator
  * @param[out] component Pointer to a variable that will store next component
@@ -1637,6 +1719,7 @@ static inline ssize_t unicoap_options_get_next_uri_path_component(unicoap_option
 
 /**
  * @brief Copies absolute URI path into the given buffer
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[in,out] path Buffer of UTF-8 code units
@@ -1664,6 +1747,7 @@ static inline ssize_t unicoap_options_copy_uri_path(const unicoap_options_t* opt
 
 /**
  * @brief Adds `Uri-Path` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] component `Uri-Path` value as buffer of UTF-8 code units
@@ -1682,6 +1766,7 @@ static inline ssize_t unicoap_options_add_uri_path_component(unicoap_options_t* 
 
 /**
  * @brief Adds `Uri-Path` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] component `Uri-Path` value as buffer of UTF-8 code units, must be null-terminated
@@ -1701,6 +1786,7 @@ static inline ssize_t unicoap_options_add_uri_path_component_string(unicoap_opti
 
 /**
  * @brief Adds multiple `Uri-Path` options from string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] path as buffer of UTF-8 code units with values separated by `/`
@@ -1719,6 +1805,7 @@ static inline ssize_t unicoap_options_add_uri_path(unicoap_options_t* options, c
 
 /**
  * @brief Adds multiple `Uri-Path` options from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] path as null-terminated string of UTF-8 code units with values separated by `/`
@@ -1739,6 +1826,7 @@ static inline ssize_t unicoap_options_add_uri_path_string(unicoap_options_t* opt
 
 /**
  * @brief Removes all `Uri-Path` options, if any
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1758,6 +1846,7 @@ static inline int unicoap_options_remove_uri_path(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the first `Uri-Query` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] query Pointer to value variable as buffer of UTF-8 code units
@@ -1773,6 +1862,7 @@ static inline ssize_t unicoap_options_get_first_uri_query(const unicoap_options_
 
 /**
  * @brief Gets the next `Uri-Query` option provided by the specified iterator
+ * @memberof unicoap_options_t
  *
  * @param[in,out] iterator Option iterator
  * @param[out] query Pointer to a variable that will store next query
@@ -1790,6 +1880,7 @@ static inline ssize_t unicoap_options_get_next_uri_query(unicoap_options_iterato
 
 /**
  * @brief Gets the next `Uri-Query` option matching the given name, potentially skipping any options in between.
+ * @memberof unicoap_options_t
  *
  * This method splits `Uri-Query` options at the `=` character.
  *
@@ -1808,6 +1899,7 @@ static inline ssize_t unicoap_options_get_next_uri_query_by_name(unicoap_options
 
 /**
  * @brief Retrieves the first `Uri-Query` option matching the given name, if present
+ * @memberof unicoap_options_t
  *
  * This method splits `Uri-Query` options at the `=` character.
  *
@@ -1831,6 +1923,7 @@ static inline ssize_t unicoap_options_get_first_uri_query_by_name(unicoap_option
 
 /**
  * @brief Copies URI query string into the given buffer
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[in,out] queries Buffer of UTF-8 code units
@@ -1850,6 +1943,7 @@ static inline ssize_t unicoap_options_copy_uri_queries(const unicoap_options_t* 
 
 /**
  * @brief Adds `Uri-Query` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] query `Uri-Query` value as buffer of UTF-8 code units
@@ -1868,6 +1962,7 @@ static inline ssize_t unicoap_options_add_uri_query(unicoap_options_t* options, 
 
 /**
  * @brief Adds `Uri-Query` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] query `Uri-Query` value as buffer of UTF-8 code units, must be null-terminated
@@ -1887,6 +1982,7 @@ static inline ssize_t unicoap_options_add_uri_query_string(unicoap_options_t* op
 
 /**
  * @brief Adds multiple `Uri-Query` options from string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] queries as buffer of UTF-8 code units with values separated by `&`
@@ -1905,6 +2001,7 @@ static inline ssize_t unicoap_options_add_uri_queries(unicoap_options_t* options
 
 /**
  * @brief Adds multiple `Uri-Query` options from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] queries as null-terminated string of UTF-8 code units with values separated by `&`
@@ -1925,6 +2022,7 @@ static inline ssize_t unicoap_options_add_uri_queries_string(unicoap_options_t* 
 
 /**
  * @brief Removes all `Uri-Query` options, if any
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -1944,6 +2042,7 @@ static inline int unicoap_options_remove_uri_queries(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the first `Location-Query` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] query Pointer to value variable as buffer of UTF-8 code units
@@ -1959,6 +2058,7 @@ static inline ssize_t unicoap_options_get_first_location_query(const unicoap_opt
 
 /**
  * @brief Gets the next `Location-Query` option provided by the specified iterator
+ * @memberof unicoap_options_t
  *
  * @param[in,out] iterator Option iterator
  * @param[out] query Pointer to a variable that will store next query
@@ -1976,6 +2076,7 @@ static inline ssize_t unicoap_options_get_next_location_query(unicoap_options_it
 
 /**
  * @brief Gets the next `Location-Query` option matching the given name, potentially skipping any options in between.
+ * @memberof unicoap_options_t
  *
  * This method splits `Location-Query` options at the `=` character.
  *
@@ -1994,6 +2095,7 @@ static inline ssize_t unicoap_options_get_next_location_query_by_name(unicoap_op
 
 /**
  * @brief Retrieves the first `Location-Query` option matching the given name, if present
+ * @memberof unicoap_options_t
  *
  * This method splits `Location-Query` options at the `=` character.
  *
@@ -2017,6 +2119,7 @@ static inline ssize_t unicoap_options_get_first_location_query_by_name(unicoap_o
 
 /**
  * @brief Copies location query string into the given buffer
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[in,out] queries Buffer of UTF-8 code units
@@ -2036,6 +2139,7 @@ static inline ssize_t unicoap_options_copy_location_queries(const unicoap_option
 
 /**
  * @brief Adds `Location-Query` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] query `Location-Query` value as buffer of UTF-8 code units
@@ -2054,6 +2158,7 @@ static inline ssize_t unicoap_options_add_location_query(unicoap_options_t* opti
 
 /**
  * @brief Adds `Location-Query` option from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] query `Location-Query` value as buffer of UTF-8 code units, must be null-terminated
@@ -2073,6 +2178,7 @@ static inline ssize_t unicoap_options_add_location_query_string(unicoap_options_
 
 /**
  * @brief Adds multiple `Location-Query` options from string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] queries as buffer of UTF-8 code units with values separated by `&`
@@ -2091,6 +2197,7 @@ static inline ssize_t unicoap_options_add_location_queries(unicoap_options_t* op
 
 /**
  * @brief Adds multiple `Location-Query` options from null-terminated string
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param[in] queries as null-terminated string of UTF-8 code units with values separated by `&`
@@ -2111,6 +2218,7 @@ static inline ssize_t unicoap_options_add_location_queries_string(unicoap_option
 
 /**
  * @brief Removes all `Location-Query` options, if any
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -2136,6 +2244,7 @@ static inline int unicoap_options_remove_location_queries(unicoap_options_t* opt
 
 /**
  * @brief Retrieves the `Observe` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] observe Pointer to value variable
@@ -2151,6 +2260,7 @@ static inline ssize_t unicoap_options_get_observe(const unicoap_options_t* optio
 
 /**
  * @brief Sets the `Observe` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param observe `Observe` value
@@ -2165,6 +2275,7 @@ static inline ssize_t unicoap_options_set_observe(unicoap_options_t* options, ui
 
 /**
  * @brief Removes the `Observe` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -2177,6 +2288,7 @@ static inline int unicoap_options_remove_observe(unicoap_options_t* options)
 
 /**
  * @brief Sets the `Observe` option to a randomly generated value
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  *
@@ -2206,6 +2318,7 @@ typedef uint32_t unicoap_block_option_t;
 
 /**
  * @brief Retrieves a `Block1` or `Block2` option
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param number Option number (@ref UNICOAP_OPTION_BLOCK1 or @ref UNICOAP_OPTION_BLOCK2)
@@ -2224,6 +2337,7 @@ static inline ssize_t unicoap_options_get_block(const unicoap_options_t* options
 
 /**
  * @brief Sets the `Block1` or `Block2` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param number Option number (@ref UNICOAP_OPTION_BLOCK1 or @ref UNICOAP_OPTION_BLOCK2)
@@ -2242,6 +2356,7 @@ static inline int unicoap_options_set_block(unicoap_options_t* options,
 
 /**
  * @brief Retrieves the `Block1` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] block Pointer to value variable
@@ -2257,6 +2372,7 @@ static inline ssize_t unicoap_options_get_block1(const unicoap_options_t* option
 
 /**
  * @brief Sets the `Block1` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param block `Block1` value
@@ -2271,6 +2387,7 @@ static inline ssize_t unicoap_options_set_block1(unicoap_options_t* options, uni
 
 /**
  * @brief Removes the `Block1` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -2283,6 +2400,7 @@ static inline int unicoap_options_remove_block1(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `Block2` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] block Pointer to value variable
@@ -2298,6 +2416,7 @@ static inline ssize_t unicoap_options_get_block2(const unicoap_options_t* option
 
 /**
  * @brief Sets the `Block2` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param block `Block2` value
@@ -2312,6 +2431,7 @@ static inline ssize_t unicoap_options_set_block2(unicoap_options_t* options, uni
 
 /**
  * @brief Removes the `Block2` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -2324,6 +2444,7 @@ static inline int unicoap_options_remove_block2(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `Size1` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] size Pointer to value variable
@@ -2339,6 +2460,7 @@ static inline ssize_t unicoap_options_get_size1(const unicoap_options_t* options
 
 /**
  * @brief Sets the `Size1` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param size `Size1` value
@@ -2353,6 +2475,7 @@ static inline ssize_t unicoap_options_set_size1(unicoap_options_t* options, uint
 
 /**
  * @brief Removes the `Size1` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
@@ -2365,6 +2488,7 @@ static inline int unicoap_options_remove_size1(unicoap_options_t* options)
 
 /**
  * @brief Retrieves the `Size2` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in] options Options to read from
  * @param[out] size Pointer to value variable
@@ -2380,6 +2504,7 @@ static inline ssize_t unicoap_options_get_size2(const unicoap_options_t* options
 
 /**
  * @brief Sets the `Size2` option
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  * @param size `Size2` value
@@ -2394,6 +2519,7 @@ static inline ssize_t unicoap_options_set_size2(unicoap_options_t* options, uint
 
 /**
  * @brief Removes the `Size2` option, if present
+ * @memberof unicoap_options_t
  *
  * @param[in,out] options Options to write to
  *
