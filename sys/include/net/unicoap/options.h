@@ -210,7 +210,6 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  */
 /**
  * @brief Determines whether the given option is considered critical
- * @memberof unicoap_option_number_t
  *
  * Criticality is independent from the corresponding option's value.
  * As per [CoAP RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252),
@@ -226,7 +225,6 @@ static inline bool unicoap_option_is_critical(unicoap_option_number_t option_num
 
 /**
  * @brief Determines whether the given option is safe to forward
- * @memberof unicoap_option_number_t
  *
  * Whether an option is safe to forward is independent from the corresponding option's value.
  *
@@ -240,7 +238,6 @@ static inline bool unicoap_option_is_safe_to_forward(unicoap_option_number_t opt
 
 /**
  * @brief Determines whether the given option is **not** intended to be part of the cache key
- * @memberof unicoap_option_number_t
  *
  * Whether an option is considered [NoCacheKey](https://datatracker.ietf.org/doc/html/rfc7252#section-5.4.2)
  * is independent from the option's value.
@@ -255,7 +252,6 @@ static inline bool unicoap_option_is_no_cache_key(unicoap_option_number_t option
 
 /**
  * @brief Determines whether the given option is intended to be part of the cache key
- * @memberof unicoap_option_number_t
  *
  * Whether an option is considered a [NoCacheKey](https://datatracker.ietf.org/doc/html/rfc7252#section-5.4.2)
  * is independent from the option's value.
