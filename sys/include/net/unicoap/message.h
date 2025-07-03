@@ -616,7 +616,7 @@ static inline bool unicoap_message_is_signal(uint8_t code)
  * @brief Retrieves signal code from given signal message
  *
  * @param[in] message CoAP signal
- * @returns @ref unicoap_signal_t
+ * @returns Message code as @ref unicoap_signal_t
  */
 static inline unicoap_signal_t unicoap_message_get_signal(const unicoap_message_t* message)
 {
@@ -666,7 +666,7 @@ static inline bool unicoap_message_is_request(uint8_t code)
 /**
  * @brief Obtains request method from the given message's code
  * @param[in] request Request message, pre-initialized
- * @returns Request method if code is a request code
+ * @returns Message code as @ref unicoap_method_t
  */
 static inline unicoap_method_t unicoap_request_get_method(const unicoap_message_t* request)
 {
@@ -850,7 +850,7 @@ bool unicoap_message_is_response(uint8_t code);
 /**
  * @brief Obtains response status from the given message's code
  * @param[in] response Response message, pre-initialized
- * @returns Response status
+ * @returns Message code as @ref unicoap_status_t
  */
 static inline unicoap_status_t unicoap_response_get_status(const unicoap_message_t* response)
 {
