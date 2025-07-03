@@ -1399,7 +1399,7 @@ static inline ssize_t unicoap_options_get_first_if_match(const unicoap_options_t
  * @param[in,out] iterator Option iterator
  * @param[out] value Pointer to a variable that will store next value
  *
- * @see @ref unicoap_options_get_next_by_number
+ * @see @ref unicoap_options_iterator_t::unicoap_options_get_next_by_number
  *
  * @returns Size of option value in bytes on success, negative error number otherwise
  * @retval `-EBADOPT` Option corrupted
@@ -1472,7 +1472,7 @@ static inline ssize_t unicoap_options_get_first_etag(const unicoap_options_t* op
  * @param[in,out] iterator Option iterator
  * @param[out] etag Pointer to a variable that will store next etag
  *
- * @see @ref unicoap_options_get_next_by_number
+ * @see @ref unicoap_options_iterator_t::unicoap_options_get_next_by_number
  *
  * @returns Size of option value in bytes on success, negative error number otherwise
  * @retval `-EBADOPT` Option corrupted
@@ -1546,7 +1546,7 @@ static inline ssize_t unicoap_options_get_first_location_path_component(const un
  * @param[in,out] iterator Option iterator
  * @param[out] component Pointer to a variable that will store next component
  *
- * @see @ref unicoap_options_get_next_by_number
+ * @see @ref unicoap_options_iterator_t::unicoap_options_get_next_by_number
  *
  * @returns Size of option value in bytes on success, negative error number otherwise
  * @retval `-EBADOPT` Option corrupted
@@ -1702,7 +1702,7 @@ static inline ssize_t unicoap_options_get_first_uri_path_component(const unicoap
  * @param[in,out] iterator Option iterator
  * @param[out] component Pointer to a variable that will store next component
  *
- * @see @ref unicoap_options_get_next_by_number
+ * @see @ref unicoap_options_iterator_t::unicoap_options_get_next_by_number
  *
  * @returns Size of option value in bytes on success, negative error number otherwise
  * @retval `-EBADOPT` Option corrupted
@@ -1863,7 +1863,7 @@ static inline ssize_t unicoap_options_get_first_uri_query(const unicoap_options_
  * @param[in,out] iterator Option iterator
  * @param[out] query Pointer to a variable that will store next query
  *
- * @see @ref unicoap_options_get_next_by_number
+ * @see @ref unicoap_options_iterator_t::unicoap_options_get_next_by_number
  *
  * @returns Size of option value in bytes on success, negative error number otherwise
  * @retval `-EBADOPT` Option corrupted
@@ -2059,7 +2059,7 @@ static inline ssize_t unicoap_options_get_first_location_query(const unicoap_opt
  * @param[in,out] iterator Option iterator
  * @param[out] query Pointer to a variable that will store next query
  *
- * @see @ref unicoap_options_get_next_by_number
+ * @see @ref unicoap_options_iterator_t::unicoap_options_get_next_by_number
  *
  * @returns Size of option value in bytes on success, negative error number otherwise
  * @retval `-EBADOPT` Option corrupted
