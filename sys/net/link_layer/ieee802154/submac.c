@@ -783,8 +783,9 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
 
     /* Go back to RX if needed */
     if (current_state == IEEE802154_FSM_STATE_RX) {
-        res = ieee802154_radio_set_rx(dev);
-        assert (res >= 0);
+        int rx = ieee802154_radio_set_rx(dev);
+        assert(rx >= 0);
+        (void)rx;
     }
 
     return res;

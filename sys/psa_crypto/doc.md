@@ -101,7 +101,7 @@ uint8_t PLAINTEXT[] = { ... };
 size_t output_buf_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES, PSA_ALG_CBC_NO_PADDING,sizeof(PLAINTEXT));
 uint8_t output_buffer[output_buf_size];
 
-status = psa_cipher_encrypt(key_id, PSA_ALG_CBC_NO_PADDING, PLAINTEXT, sizeof(PLAINTEXT),output_buffer, sizeof(output_buffer), &output_length));
+status = psa_cipher_encrypt(key_id, PSA_ALG_CBC_NO_PADDING, PLAINTEXT, sizeof(PLAINTEXT), output_buffer, sizeof(output_buffer), &output_length);
 ```
 
 All the supported key types, algorithms and usage flags can be found in the documentation.
