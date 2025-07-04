@@ -33,17 +33,28 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US (320U)
-#define ACK_TIMEOUT_US                     (864U)
+#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
+#define ACK_TIMEOUT_US                      (864U)
 
-#define IEEE802154_FSM_STATE_NUMOF         7
+#define IEEE802154_FSM_STATE_NUMOF          7
 
-static ieee802154_submac_fsm_return_status _fsm_state_invalid(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev);      /**< Invalid state */
-static ieee802154_submac_fsm_return_status _fsm_state_idle(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev);         /**< The transceiver is off */
-static ieee802154_submac_fsm_return_status _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev);           /**< SubMAC is ready to receive frames */
-static ieee802154_submac_fsm_return_status _fsm_state_tx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev);           /**< The SubMAC is currently transmitting a frame */
-static ieee802154_submac_fsm_return_status _fsm_state_prepare(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev);      /**< The SubMAC is preparing the next transmission */
-static ieee802154_submac_fsm_return_status _fsm_state_wait_for_ack(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev); /**< The SubMAC is waiting for an ACK frame */
+static ieee802154_submac_fsm_return_status _fsm_state_invalid(ieee802154_submac_t *submac,
+                                                              ieee802154_fsm_ev_t ev);            /**< Invalid state */
+
+static ieee802154_submac_fsm_return_status _fsm_state_idle(ieee802154_submac_t *submac,
+                                                           ieee802154_fsm_ev_t ev);               /**< The transceiver is off */
+
+static ieee802154_submac_fsm_return_status _fsm_state_rx(ieee802154_submac_t *submac,
+                                                         ieee802154_fsm_ev_t ev);                 /**< SubMAC is ready to receive frames */
+
+static ieee802154_submac_fsm_return_status _fsm_state_tx(ieee802154_submac_t *submac,
+                                                         ieee802154_fsm_ev_t ev);                 /**< The SubMAC is currently transmitting a frame */
+
+static ieee802154_submac_fsm_return_status _fsm_state_prepare(ieee802154_submac_t *submac,
+                                                              ieee802154_fsm_ev_t ev);            /**< The SubMAC is preparing the next transmission */
+
+static ieee802154_submac_fsm_return_status _fsm_state_wait_for_ack(ieee802154_submac_t *submac,
+                                                                   ieee802154_fsm_ev_t ev);       /**< The SubMAC is waiting for an ACK frame */
 typedef struct {
     ieee802154_fsm_state_t state;
     const char *name;
@@ -80,7 +91,8 @@ static const char *get_state_name(ieee802154_fsm_state_t state)
     return "UNKNOWN";
 }
 
-static ieee802154_submac_fsm_return_status _state_transition(ieee802154_fsm_t *fsm, ieee802154_fsm_state_t new_state)
+static ieee802154_submac_fsm_return_status _state_transition(ieee802154_fsm_t *fsm,
+                                                             ieee802154_fsm_state_t new_state)
 {
     fsm->fsm_state = new_state;
     return IEEE802154_SUBMAC_FSM_RETURN_TRANSITION;
@@ -109,7 +121,7 @@ static ieee802154_submac_fsm_return_status _tx_end(ieee802154_submac_t *submac, 
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void)res;
+    (void) res;
 
     submac->wait_for_ack = false;
 
@@ -126,7 +138,8 @@ static void _print_debug(ieee802154_fsm_state_t old, ieee802154_fsm_state_t new,
     DEBUG("%s--(%s)->%s\n", get_state_name(old), str_ev[ev], get_state_name(new));
 }
 
-ieee802154_submac_fsm_return_status _fsm_state_invalid(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
+ieee802154_submac_fsm_return_status _fsm_state_invalid(ieee802154_submac_t *submac,
+                                                       ieee802154_fsm_ev_t ev)
 {
     (void)submac;
     switch (ev) {
@@ -142,10 +155,10 @@ static ieee802154_submac_fsm_return_status _handle_tx_no_ack(ieee802154_submac_t
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void)res;
+    (void) res;
 
     /* In case of ACK Timeout, either trigger retransmissions or end
-      * the TX procedure */
+     * the TX procedure */
     if (_has_retrans_left(submac)) {
         submac->retrans++;
         res = ieee802154_radio_set_idle(&submac->dev, true);
@@ -176,13 +189,14 @@ static int _handle_fsm_ev_request_tx(ieee802154_submac_t *submac)
     }
 }
 
-static ieee802154_submac_fsm_return_status _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
+static ieee802154_submac_fsm_return_status _fsm_state_rx(ieee802154_submac_t *submac,
+                                                         ieee802154_fsm_ev_t ev)
 {
     ieee802154_dev_t *dev = &submac->dev;
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void)res;
+    (void) res;
 
     switch (ev) {
     case IEEE802154_FSM_EV_ENTRY:
@@ -236,7 +250,8 @@ static ieee802154_submac_fsm_return_status _fsm_state_rx(ieee802154_submac_t *su
     return _state_transition(&submac->fsm, _fsm_state_invalid);
 }
 
-static ieee802154_submac_fsm_return_status _fsm_state_idle(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
+static ieee802154_submac_fsm_return_status _fsm_state_idle(ieee802154_submac_t *submac,
+                                                           ieee802154_fsm_ev_t ev)
 {
     ieee802154_dev_t *dev = &submac->dev;
 
@@ -261,9 +276,9 @@ static ieee802154_submac_fsm_return_status _fsm_state_idle(ieee802154_submac_t *
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT
-          * and TX_DONE. We simply discard the frame and keep the state as
-          * it is
-          */
+         * and TX_DONE. We simply discard the frame and keep the state as
+         * it is
+         */
         ieee802154_radio_read(&submac->dev, NULL, 0, NULL);
         return IEEE802154_SUBMAC_FSM_RETURN_HANDLED;
     default:
@@ -302,9 +317,9 @@ static ieee802154_submac_fsm_return_status _fsm_state_prepare(ieee802154_submac_
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT
-          * and TX_DONE. We simply discard the frame and keep the state as
-          * it is
-          */
+         * and TX_DONE. We simply discard the frame and keep the state as
+         * it is
+         */
         ieee802154_radio_read(&submac->dev, NULL, 0, NULL);
         return IEEE802154_SUBMAC_FSM_RETURN_HANDLED;
     case IEEE802154_FSM_EV_REQUEST_TX:
@@ -316,14 +331,15 @@ static ieee802154_submac_fsm_return_status _fsm_state_prepare(ieee802154_submac_
     return _state_transition(&submac->fsm, _fsm_state_invalid);
 }
 
-static ieee802154_submac_fsm_return_status _fsm_state_tx_process_tx_done(ieee802154_submac_t *submac,
-                                                                         ieee802154_tx_info_t *info)
+static ieee802154_submac_fsm_return_status _fsm_state_tx_process_tx_done(
+                                                    ieee802154_submac_t *submac,
+                                                    ieee802154_tx_info_t *info)
 {
     ieee802154_dev_t *dev = &submac->dev;
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void)res;
+    (void) res;
 
     switch (info->status) {
     case TX_STATUS_FRAME_PENDING:
@@ -332,16 +348,16 @@ static ieee802154_submac_fsm_return_status _fsm_state_tx_process_tx_done(ieee802
     case TX_STATUS_SUCCESS:
         submac->csma_retries_nb = 0;
         /* If the radio handles ACK, the TX_DONE event marks completion of
-         * the transmission procedure. Report TX done to the upper layer */
+        * the transmission procedure. Report TX done to the upper layer */
         if (_does_handle_ack(&submac->dev) || !submac->wait_for_ack) {
             return _tx_end(submac, info->status, info);
         }
         /* If the radio doesn't handle ACK, set the transceiver state to RX_ON
-          * and enable the ACK filter */
+         * and enable the ACK filter */
         else {
             ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACK_ONLY);
             res = ieee802154_radio_set_rx(dev);
-            assert(res >= 0);
+            assert (res >= 0);
 
             /* Handle ACK reception */
             ieee802154_submac_ack_timer_set(submac);
@@ -354,30 +370,32 @@ static ieee802154_submac_fsm_return_status _fsm_state_tx_process_tx_done(ieee802
         return _handle_tx_no_ack(submac);
     case TX_STATUS_MEDIUM_BUSY:
         /* If radio has retransmissions or CSMA-CA, this means the CSMA-CA
-          * procedure failed. We finish the SubMAC operation and report
-          * medium busy
-          */
-        if (_does_handle_csma(&submac->dev) || submac->csma_retries_nb++ >= submac->csma_retries) {
+         * procedure failed. We finish the SubMAC operation and report
+         * medium busy
+         */
+        if (_does_handle_csma(&submac->dev)
+            || submac->csma_retries_nb++ >= submac->csma_retries) {
             return _tx_end(submac, info->status, info);
         }
         /* Otherwise, this is a failed CCA attempt. Proceed with CSMA-CA */
         else {
             /* The HAL should guarantee that's still possible to transmit
-              * in the current state, since the radio is still in TX_ON.
-              * Therefore, this is valid */
+             * in the current state, since the radio is still in TX_ON.
+             * Therefore, this is valid */
             return _state_transition(&submac->fsm, _fsm_state_prepare);
         }
     }
     return _state_transition(&submac->fsm, _fsm_state_invalid);
 }
 
-static ieee802154_submac_fsm_return_status _fsm_state_tx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
+static ieee802154_submac_fsm_return_status _fsm_state_tx(ieee802154_submac_t *submac,
+                                                         ieee802154_fsm_ev_t ev)
 {
     ieee802154_tx_info_t info;
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void)res;
+    (void) res;
 
     switch (ev) {
     case IEEE802154_FSM_EV_ENTRY:
@@ -390,9 +408,9 @@ static ieee802154_submac_fsm_return_status _fsm_state_tx(ieee802154_submac_t *su
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT
-          * and TX_DONE. We simply discard the frame and keep the state as
-          * it is
-          */
+         * and TX_DONE. We simply discard the frame and keep the state as
+         * it is
+         */
         ieee802154_radio_read(&submac->dev, NULL, 0, NULL);
         return IEEE802154_SUBMAC_FSM_RETURN_HANDLED;
     case IEEE802154_FSM_EV_REQUEST_TX:
@@ -444,23 +462,24 @@ static ieee802154_submac_fsm_return_status _fsm_state_wait_for_ack(ieee802154_su
 }
 
 int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
-                                                    ieee802154_fsm_ev_t ev)
+                                 ieee802154_fsm_ev_t ev)
 {
     ieee802154_fsm_state_t last_state = submac->fsm.fsm_state;
     ieee802154_fsm_ev_t last_event = ev;
     ieee802154_submac_fsm_return_status res;
 
     uint8_t was_busy =  atomic_fetch_or_u8(&submac->fsm.busy_status, true);
+
     if (was_busy) {
         return -EBUSY;
     }
-    while ((res = (*submac->fsm.fsm_state)(submac, last_event)) == IEEE802154_SUBMAC_FSM_RETURN_TRANSITION) {
+    while ((res = (*submac->fsm.fsm_state)(submac,last_event)) == IEEE802154_SUBMAC_FSM_RETURN_TRANSITION) {
         if (_fsm_state_invalid == submac->fsm.fsm_state) {
             _print_debug(last_state, submac->fsm.fsm_state, ev);
             assert(false);
         }
         res = (*last_state)(submac, IEEE802154_FSM_EV_EXIT);
-        assert(res != IEEE802154_SUBMAC_FSM_RETURN_TRANSITION); //state shouldnt make a transition on exit event
+        assert(res != IEEE802154_SUBMAC_FSM_RETURN_TRANSITION); //state shouldn`t make a transition on exit event
         last_state = submac->fsm.fsm_state;
         last_event = IEEE802154_FSM_EV_ENTRY;
     }
@@ -468,7 +487,7 @@ int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
     if (IEEE802154_SUBMAC_FSM_RETURN_BUSY == res) {
         return -EBUSY;
     }
-    else if (IEEE802154_SUBMAC_FSM_RETURN_ALREADY == res) {
+    if (IEEE802154_SUBMAC_FSM_RETURN_ALREADY == res) {
         return -EALREADY;
     }
     return 0;
@@ -497,11 +516,11 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 }
 
 /*
-  * MR-OQPSK timing calculations
-  *
-  * The standard unfortunately does not list the formula, instead it has to be pieced together
-  * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
-  */
+ * MR-OQPSK timing calculations
+ *
+ * The standard unfortunately does not list the formula, instead it has to be pieced together
+ * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
+ */
 
 static uint8_t _mr_oqpsk_spreading(uint8_t chips, uint8_t mode)
 {
@@ -560,31 +579,35 @@ static inline uint8_t _mr_oqpsk_ack_psdu_duration_syms(uint8_t chips, uint8_t mo
 
     /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */
     /* with Mp = Np * 16, see Table 182 */
-    return (Npsdu + Ns / 2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
+    return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
 }
 
 MAYBE_UNUSED
 static inline uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpsk_conf_t *conf)
 {
     /* see 802.15.4g-2012, p. 30 */
-    uint16_t symbols = _mr_oqpsk_cca_duration_syms(conf->chips) + _mr_oqpsk_shr_duration_syms(conf->chips) + 15 /* PHR duration */
-                       + _mr_oqpsk_ack_psdu_duration_syms(conf->chips, conf->rate_mode);
+    uint16_t symbols = _mr_oqpsk_cca_duration_syms(conf->chips)
+                     + _mr_oqpsk_shr_duration_syms(conf->chips)
+                     + 15   /* PHR duration */
+                     + _mr_oqpsk_ack_psdu_duration_syms(conf->chips, conf->rate_mode);
 
-    return _mr_oqpsk_symbol_duration_us(conf->chips) * symbols + IEEE802154G_ATURNAROUNDTIME_US;
+    return _mr_oqpsk_symbol_duration_us(conf->chips) * symbols
+         + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 MAYBE_UNUSED
 static inline uint16_t _mr_oqpsk_csma_backoff_period_us(const ieee802154_mr_oqpsk_conf_t *conf)
 {
-    return _mr_oqpsk_cca_duration_syms(conf->chips) * _mr_oqpsk_symbol_duration_us(conf->chips) + IEEE802154G_ATURNAROUNDTIME_US;
+    return _mr_oqpsk_cca_duration_syms(conf->chips) * _mr_oqpsk_symbol_duration_us(conf->chips)
+         + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 /*
-  * MR-OFDM timing calculations
-  *
-  * The standard unfortunately does not list the formula, instead it has to be pieced together
-  * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
-  */
+ * MR-OFDM timing calculations
+ *
+ * The standard unfortunately does not list the formula, instead it has to be pieced together
+ * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
+ */
 
 static unsigned _mr_ofdm_frame_duration(uint8_t option, uint8_t scheme, uint8_t bytes)
 {
@@ -593,10 +616,11 @@ static unsigned _mr_ofdm_frame_duration(uint8_t option, uint8_t scheme, uint8_t 
 
     --option;
     /* phyMaxFrameDuration = phySHRDuration + phyPHRDuration
-      *                     + ceiling [(aMaxPHYPacketSize + 1) x phySymbolsPerOctet] */
+     *                     + ceiling [(aMaxPHYPacketSize + 1) x phySymbolsPerOctet] */
     const unsigned phySHRDuration = 6;
     const unsigned phyPHRDuration = option ? 6 : 3;
-    const unsigned phyPDUDuration = ((bytes + 1) * (1 << option) + quot[scheme] - 1) / quot[scheme];
+    const unsigned phyPDUDuration = ((bytes + 1) * (1 << option) + quot[scheme] - 1)
+                                  / quot[scheme];
 
     return (phySHRDuration + phyPHRDuration + phyPDUDuration) * IEEE802154_MR_OFDM_SYMBOL_TIME_US;
 }
@@ -605,28 +629,32 @@ static inline uint16_t _mr_ofdm_csma_backoff_period_us(const ieee802154_mr_ofdm_
 {
     (void)conf;
 
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_OFDM_SYMBOL_TIME_US + IEEE802154G_ATURNAROUNDTIME_US;
+    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_OFDM_SYMBOL_TIME_US
+         + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 MAYBE_UNUSED
 static inline uint16_t _mr_ofdm_ack_timeout_us(const ieee802154_mr_ofdm_conf_t *conf)
 {
-    return _mr_ofdm_csma_backoff_period_us(conf) + IEEE802154G_ATURNAROUNDTIME_US + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
+    return _mr_ofdm_csma_backoff_period_us(conf)
+         + IEEE802154G_ATURNAROUNDTIME_US
+         + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
 }
 
 /*
-  * MR-FSK timing calculations
-  *
-  * The standard unfortunately does not list the formula, instead it has to be pieced together
-  * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
-  */
+ * MR-FSK timing calculations
+ *
+ * The standard unfortunately does not list the formula, instead it has to be pieced together
+ * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
+ */
 
 MAYBE_UNUSED
 static inline uint16_t _mr_fsk_csma_backoff_period_us(const ieee802154_mr_fsk_conf_t *conf)
 {
     (void)conf;
 
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_FSK_SYMBOL_TIME_US + IEEE802154G_ATURNAROUNDTIME_US;
+    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_FSK_SYMBOL_TIME_US
+         + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 MAYBE_UNUSED
@@ -648,9 +676,10 @@ static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *co
         ack_len *= 2;
     }
 
-    return _mr_fsk_csma_backoff_period_us(conf) + IEEE802154G_ATURNAROUNDTIME_US
-           /* long Preamble + SFD; SFD=2 */
-           + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
+    return _mr_fsk_csma_backoff_period_us(conf)
+         + IEEE802154G_ATURNAROUNDTIME_US
+         /* long Preamble + SFD; SFD=2 */
+         + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
 }
 
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
@@ -739,10 +768,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     }
     else {
         /* Get first set bit, and use it as the default,
-          *
-          * by this order, the priority is defined on the ieee802154_rf_caps_t
-          * definition, first IEEE 802.15.4-2006 PHY modes, then
-          * IEEE 802.15.4g-2012 PHY modes. */
+         *
+         * by this order, the priority is defined on the ieee802154_rf_caps_t
+         * definition, first IEEE 802.15.4-2006 PHY modes, then
+         * IEEE 802.15.4g-2012 PHY modes. */
         unsigned bit = bitarithm_lsb(supported_phy_modes);
 
         submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
@@ -839,7 +868,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
     /* Go back to RX if needed */
     if (current_state == _fsm_state_rx) {
         res = ieee802154_radio_set_rx(dev);
-        assert(res >= 0);
+        assert (res >= 0);
     }
 
     return res;
