@@ -63,6 +63,7 @@
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "esp_rom_uart.h"
+#include "hal/clk_tree_ll.h"
 #include "hal/uart_ll.h"
 #include "soc/clk_tree_defs.h"
 #include "soc/gpio_reg.h"
@@ -73,14 +74,21 @@
 #include "soc/soc_caps.h"
 #include "soc/uart_pins.h"
 
+#undef  UART_CLK_FREQ
+
+#if CPU_FAM_ESP32 || CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3 || CPU_FAM_ESP32C3
 /* UART_CLK_FREQ corresponds to APB_CLK_FREQ for ESP32, ESP32-S2, ESP32-S3,
  * ESP32-C2 and ESP32-C3, which is a fixed frequency of 80 MHz. However,
  * this only applies to CPU clock frequencies of 80 MHz and above.
  * For lower CPU clock frequencies, the APB clock corresponds to the CPU clock
  * frequency. Therefore, we need to determine the actual UART clock frequency
  * from the actual APB clock frequency. */
-#undef  UART_CLK_FREQ
 #define UART_CLK_FREQ   rtc_clk_apb_freq_get() /* APB_CLK is used */
+#elif CPU_FAM_ESP32H2
+#define UART_CLK_FREQ   (CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
+#else
+#error "Platform implementation is missing"
+#endif
 
 #endif /* defined(CPU_ESP8266) */
 

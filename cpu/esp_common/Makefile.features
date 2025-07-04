@@ -3,10 +3,7 @@
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_esp
 FEATURES_PROVIDED += cpp
-FEATURES_PROVIDED += esp_now
 FEATURES_PROVIDED += esp_spiffs
-FEATURES_PROVIDED += esp_wifi
-FEATURES_PROVIDED += esp_wifi_ap
 FEATURES_PROVIDED += libstdcpp
 FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_cpuid
@@ -30,8 +27,17 @@ ifeq (rv32,$(CPU_ARCH))
   FEATURES_PROVIDED += arch_esp_riscv
 endif
 
-# All ESP* MCUs have a peripheral network interface
-FEATURES_PROVIDED += netif
+ifneq (esp32h2,$(CPU_FAM))
+  FEATURES_PROVIDED += esp_now
+  FEATURES_PROVIDED += esp_spiffs
+  FEATURES_PROVIDED += esp_wifi
+  FEATURES_PROVIDED += esp_wifi_ap
+endif
+
+ifneq (esp32h2,$(CPU_FAM))
+  # All ESP* MCUs have a peripheral network interface
+  FEATURES_PROVIDED += netif
+endif
 
 FEATURES_CONFLICT += esp_wifi_ap:esp_now
 FEATURES_CONFLICT_MSG += "ESP_NOW and ESP_WIFI_AP can not be used at the same time."
