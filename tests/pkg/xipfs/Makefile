@@ -6,5 +6,6 @@ USEPKG += xipfs
 USEMODULE += xipfs
 USEMODULE += saul_default
 
+TOOLCHAINS_BLACKLIST += llvm
 
 include $(RIOTBASE)/Makefile.include
