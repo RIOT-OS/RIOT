@@ -30,6 +30,19 @@
 #include "constants.h"
 #include "stack.h"
 
+#include "byteorder.h"
+#include "net/gnrc/ipv6/ext/opt.h"
+
+void gnrc_ipv6_ext_opt_rpl_cb(gnrc_pktsnip_t *pkt, ipv6_ext_opt_rpl_t *opt)
+{
+    (void)pkt;
+    uint16_t rank = byteorder_ntohs(opt->rank);
+
+    printf("got RPL opt with rank %u\n", rank);
+    opt->rank = byteorder_htons(++rank);
+}
+
+
 #define _TEST_BUFFER_SIZE   (128)
 
 #define CALL(fn)            puts("Calling " # fn); fn; tear_down()
