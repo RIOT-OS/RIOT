@@ -7,3 +7,10 @@ FEATURES_REQUIRED += periph_uart
 ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
+ifneq (,$(filter slipdev_config,$(USEMODULE)))
+  USEMODULE += checksum
+  USEMODULE += sock_udp
+  USEMODULE += gnrc_ipv6
+  USEMODULE += nanocoap_sock
+  USEMODULE += nanocoap_resources
+endif
