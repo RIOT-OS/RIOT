@@ -5,6 +5,21 @@
 
 Module. Specify `USEMODULE += unicoap_driver_dtls` in your application's Makefile.
 
+Include these headers required for managing DTLS credentials.
+```c
+#include "net/sock/dtls/creds.h"
+#include "net/credman.h"
+#include "net/dsm.h"
+```
+
+Then, in your application, call @ref sock_dtls_add_credential to add a DTLS credential.
+<!--
+FIXME: undefined references, upcoming PR
+If you need
+to access the DTLS socket, call @ref unicoap_transport_io_dtls_get_socket(). You must add
+DTLS credentials yourself.
+-->
+
 <!--
 FIXME: undefined references, upcoming PR
 To change the UDP port `unicoap` is listening on, modify @ref CONFIG_UNICOAP_DTLS_PORT.

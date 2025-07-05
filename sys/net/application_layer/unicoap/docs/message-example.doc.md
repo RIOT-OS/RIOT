@@ -83,8 +83,8 @@ unicoap_options_dump_all(message->options);
 ```
 
 To read options like `Content-Format` which can occur no more than once, you use
-@ref unicoap_options_get_content_format. Read accessors for non-repeatable options are prefixed
-with `unicoap_options_get`.
+@ref unicoap_options_t::unicoap_options_get_content_format. 
+Read accessors for non-repeatable options are prefixed with `unicoap_options_get`.
 
 ```c
 unicoap_content_format_t format = 0;
@@ -149,7 +149,8 @@ if (res < 0) {
 Alternatively, you can iterate over all query options, avoiding the copy operation and allocation.
 To do this, you will need to allocate an
 @ref unicoap_options_iterator_t and initialize it using
-@ref unicoap_options_iterator_init. This is the central tool to iterate over options.
+@ref unicoap_options_iterator_t::unicoap_options_iterator_init. 
+This is the main tool to iterate over options.
 `unicoap` exposes multiple methods for getting the next instance of a repeatable option.
 
 ```c
@@ -241,9 +242,11 @@ if (res < 0) {
 ```
 
 `unicoap` offers versions for both null-terminated C strings and strings without a null-terminator
-that require a length indication instead. Example: @ref unicoap_options_add_uri_queries and
-@ref unicoap_options_add_uri_queries_string, or @ref unicoap_options_add_uri_query and
-@ref unicoap_options_add_uri_query_string.
+that require a length indication instead. Example: 
+@ref unicoap_options_t::unicoap_options_add_uri_queries and
+@ref unicoap_options_t::unicoap_options_add_uri_queries_string, or 
+@ref unicoap_options_t::unicoap_options_add_uri_query and
+@ref unicoap_options_t::unicoap_options_add_uri_query_string.
 
 ### Serializing a Message
 
