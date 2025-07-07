@@ -43,9 +43,16 @@ extern "C" {
 /**
  * @brief   Marker byte for beginning of stdio
  * @see     taken from diagnostic transfer from
- *          [SLIPMUX](https://tools.ietf.org/html/draft-bormann-t2trg-slipmux-02#section-4)
+ *          [SLIPMUX](https://tools.ietf.org/html/draft-bormann-t2trg-slipmux-03#section-4)
  */
 #define SLIPDEV_STDIO_START (0x0aU)
+
+/**
+ * @brief   Marker byte for beginning of configuration/CoAP
+ * @see     taken from configuration from
+ *          [SLIPMUX](https://tools.ietf.org/html/draft-bormann-t2trg-slipmux-03#section-5)
+ */
+#define SLIPDEV_CONFIG_START (0xa9U)
 /** @} */
 
 /**
