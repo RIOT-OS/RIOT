@@ -13,6 +13,8 @@
 #include "net/unicoap/config.h" /* IWYU pragma: export */
 #include "net/unicoap/message.h" /* IWYU pragma: export */
 #include "net/unicoap/options.h" /* IWYU pragma: export */
+#include "net/unicoap/application.h" /* IWYU pragma: export */
+#include "net/unicoap/transport.h" /* IWYU pragma: export */
 
 /**
  * @addtogroup net_unicoap
