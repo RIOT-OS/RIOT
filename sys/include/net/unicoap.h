@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "net/unicoap/constants.h" /* IWYU pragma: export */
 #include "net/unicoap/message.h" /* IWYU pragma: export */
 
 /**
