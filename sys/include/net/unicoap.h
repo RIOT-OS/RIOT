@@ -27,6 +27,56 @@
  * @author Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
  */
 
+/* MARK: - Controlling the unicoap instance */
+/**
+ * @name Controlling the unicoap instance
+ * @{
+ */
+/**
+ * @brief Initializes the unicoap stack, creating a separate thread
+ *
+ * if you disable the `auto_init_unicoap` you will need to call this function manually.
+ * Otherwise, and provided `auto_init` is used, unicoap will be initialized automatically.
+ *
+ * @returns unicoap thread PID
+ */
+kernel_pid_t unicoap_init(void);
+
+/**
+ * @brief Tears down the unicoap stack, closing the background thread.
+ *
+ * Provided @ref CONFIG_UNICOAP_CREATE_THREAD is enabled, this function will also zombify the
+ * thread created on initialization.
+ *
+ */
+int unicoap_deinit(void);
+
+#if !defined(DOXYGEN) && !IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
+/* Internal thread function */
+void* _unicoap_loop_run(void* arg);
+#endif
+
+#if defined(DOXYGEN) || !IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
+/**
+ * @brief Runs `unicoap` processing loop
+ *
+ * This function never returns, unless explicitly instructed using @ref unicoap_deinit.
+ *
+ * @warning Running the unicoap processing loop on a user-supplied thread is an **experimental**
+ * feature.
+ *
+ * @warning You must not call this function when @ref CONFIG_UNICOAP_CREATE_THREAD is enabled.
+ * If @ref CONFIG_UNICOAP_CREATE_THREAD is enabled, this function is not defined.
+ *
+ * @returns Never
+ */
+static inline void unicoap_loop_run(void)
+{
+    _unicoap_loop_run(NULL);
+}
+#endif
+/** @} */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

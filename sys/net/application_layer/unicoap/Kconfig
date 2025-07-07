@@ -38,11 +38,29 @@ menu "CoAP Unified Suite (unicoap)"
 
     menu "Behaviors"
 
+        config UNICOAP_NO_AUTO_INIT
+            bool "Automatically initialize unicoap on startup"
+            default y
+            help
+                If automatic initialization is disabled, you will need to call unicoap_init manually.
+
+        config CONFIG_UNICOAP_CREATE_THREAD
+            bool "Create dedicated thread for unicoap"
+            default y
+            help
+                When this option is turned on, unicoap_init will call thread_create. The unicoap thread will execute unicoap_loop_run. If you want to run unicoap on another thread (e.g., the main thread), disable this option and call unicoap_loop_run yourself.
+
         config UNICOAP_DEBUG_LOGGING
             bool "Enable debug logging"
             default n
             help
                 When enabled, debug logs are printed. Helps trace messages through layers.
+
+        config UNICOAP_ASSIST
+            bool "Enable assistant (API misuse, warnings, fixits)"
+            default n
+            help
+                When enabled, helpful warnings and error explanations are printed to stdout. Disable this setting and enable link-time optimization to strip logic from application binary. Enables safety measures in the parser and client and server API. Trades safety for performance due to added conditional statements.
 
         config UNICOAP_PREVENT_OPTIONAL_RESPONSES
             bool "Prevent sending optional responses"

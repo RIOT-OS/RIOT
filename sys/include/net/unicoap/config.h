@@ -33,12 +33,43 @@
  * @{
  */
 /**
+ * @brief A configuration option determining whether a dedicated thread is created for `unicoap`
+ * on initialization
+ *
+ * When this option is turned on, @ref unicoap_init will call @ref thread_create. The `unicoap`
+ * thread will execute @ref unicoap_loop_run. If you want to run unicoap on another thread
+ * (e.g., the main thread), disable this option and call @ref unicoap_loop_run yourself.
+ *
+ * **Default**: enabled
+ */
+#if !defined(CONFIG_UNICOAP_CREATE_THREAD) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CREATE_THREAD 1
+#endif
+
+/**
  * @brief Enables debug logging in all `unicoap` source files, except where locally overwritten
  *
  * **Default**: enabled
  */
 #if !defined(CONFIG_UNICOAP_DEBUG_LOGGING) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_DEBUG_LOGGING 0
+#endif
+
+/**
+ * @brief Catches and prints API misuse
+ *
+ * When enabled, helpful warnings and error explanations are printed to stdout. Disable this
+ * setting and enable link-time optimization to strip logic from application binary.
+ * Trades safety for performance due to added conditional statements.
+ *
+ * **Default:** enabled.
+ *
+ * @warning unicoap will not honour safety fences, hence you may run into faulty memory behavior
+ * if your API usage deviates from the documented one.
+ */
+
+#if !defined(CONFIG_UNICOAP_ASSIST) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_ASSIST 1
 #endif
 /** @} */
 
