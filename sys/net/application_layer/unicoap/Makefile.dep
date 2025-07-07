@@ -23,6 +23,8 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += ipv6_addr
   USEMODULE += ipv4_addr
+
+  DEFAULT_MODULE += auto_init_unicoap
 endif
 
 # This variable ensures the "No drivers" warning gets printed only once
