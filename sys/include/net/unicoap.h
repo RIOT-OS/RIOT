@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "net/unicoap/message.h" /* IWYU pragma: export */
+
 /**
  * @addtogroup net_unicoap
  * @{
