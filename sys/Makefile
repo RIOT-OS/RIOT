@@ -224,6 +224,9 @@ endif
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   DIRS += net/application_layer/uhcp
 endif
+ifneq (,$(filter unicoap,$(USEMODULE)))
+  DIRS += net/application_layer/unicoap
+endif
 ifneq (,$(filter usbus usbus_%,$(USEMODULE)))
     DIRS += usb/usbus
 endif

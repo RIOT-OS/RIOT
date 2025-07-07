@@ -1,0 +1,4 @@
+ifneq (,$(filter unicoap,$(USEMODULE)))
+  # Vectored data support
+  USEMODULE += iolist
+endif

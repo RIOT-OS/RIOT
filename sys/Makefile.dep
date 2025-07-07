@@ -572,6 +572,11 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
 
+# include unicoap dependencies
+ifneq (,$(filter unicoap%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.dep
+endif
+
 ifneq (,$(filter skald_%,$(USEMODULE)))
   USEMODULE += skald
 endif
