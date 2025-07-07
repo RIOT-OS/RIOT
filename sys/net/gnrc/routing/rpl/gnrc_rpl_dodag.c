@@ -150,6 +150,30 @@ gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
     return NULL;
 }
 
+void gnrc_rpl_dodag_root_init(gnrc_rpl_dodag_t *dodag)
+{
+    dodag->dtsn = 1;
+    dodag->prf = 0;
+    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
+    dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
+    dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
+    dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
+    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
+    dodag->version = GNRC_RPL_COUNTER_INIT;
+    dodag->grounded = GNRC_RPL_GROUNDED;
+    dodag->node_status = GNRC_RPL_ROOT_NODE;
+    dodag->my_rank = GNRC_RPL_ROOT_RANK;
+    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
+
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
+        dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
+    }
+
+    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
+                  dodag->dio_redun);
+}
+
 bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag_id,
                          kernel_pid_t iface)
 {
