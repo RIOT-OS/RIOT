@@ -106,4 +106,13 @@ menu "CoAP Unified Suite (unicoap)"
 
     endmenu
 
+    menu "CoAP over UDP"
+        config UNICOAP_UDP_PORT
+            int "UDP port"
+            default 5683
+            range 1 65535
+    endmenu
+
+    # unicoap_driver_extension_point
+
 endmenu # unicoap

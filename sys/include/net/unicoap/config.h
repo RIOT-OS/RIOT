@@ -42,6 +42,49 @@
 #endif
 /** @} */
 
+/* MARK: - Ports and Sockets */
+/**
+ * @name Ports
+ * @{
+ */
+/**
+ * @brief   Default CoAP port
+ */
+#define UNICOAP_DEFAULT_COAP_PORT  (5683)
+
+/**
+ * @brief   Default CoAP secure port
+ */
+#define UNICOAP_DEFAULT_COAPS_PORT (5684)
+
+/**
+ * @brief UDP port
+ * @ingroup net_unicoap_drivers_udp
+ */
+#if !defined(CONFIG_UNICOAP_UDP_PORT) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_UDP_PORT UNICOAP_DEFAULT_COAP_PORT
+#endif
+
+/**
+ * @brief If enables, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the
+ * entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf.
+ *
+ * **Default**: Set if `gnrc_sock_udp` module is used (automatically used when UDP driver imported)
+ */
+#if !defined(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES IS_USED(MODULE_GNRC_SOCK_UDP)
+#endif
+
+/**
+ * @brief Instructs the transport drivers to retrieve the local endpoint a PDU arrives at.
+ *
+ * **Default**: Enabled
+ */
+#if !defined(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS 1
+#endif
+/** @} */
+
 /* MARK: - Limits */
 /**
  * @name Limits
