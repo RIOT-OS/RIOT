@@ -410,7 +410,131 @@ int unicoap_options_set_observe_generated(unicoap_options_t* options)
         options, (ztimer_now(ZTIMER_MSEC) >> UNICOAP_OBS_TICK_EXPONENT) & 0xFFFFFF);
 }
 
+/* These must be in state.c as it reads the _state object. */
 
+ssize_t unicoap_resource_core_link_format_build(char* buffer, size_t capacity,
+                                                unicoap_proto_t proto)
+{
+    unicoap_listener_t* listener = _state.listeners;
+
+    char* out = (char*)buffer;
+    size_t pos = 0;
+
+    unicoap_link_encoder_ctx_t ctx;
+    ctx.content_format = UNICOAP_FORMAT_LINK;
+    /* indicate initial link for the list */
+    ctx.uninitialized = true;
+
+    /* write payload */
+    for (; listener != NULL; listener = listener->next) {
+        if (!listener->link_encoder) {
+            continue;
+        }
+
+        if (!unicoap_match_proto(listener->protocols, proto)) {
+            continue;
+        }
+        ctx.link_pos = 0;
+
+        for (; ctx.link_pos < listener->resource_count; ctx.link_pos += 1) {
+            if (!unicoap_match_proto(listener->resources[ctx.link_pos].protocols, proto)) {
+                continue;
+            }
+            ssize_t res;
+            if (out) {
+                res = listener->link_encoder(&listener->resources[ctx.link_pos], &out[pos],
+                                             capacity - pos, &ctx);
+            }
+            else {
+                res = listener->link_encoder(&listener->resources[ctx.link_pos], NULL, 0, &ctx);
+            }
+
+            if (res > 0) {
+                pos += res;
+                ctx.uninitialized = false;
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    return pos;
+}
+
+int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource_t** resource_ptr,
+                          const unicoap_listener_t** listener_ptr)
+{
+    assert(packet);
+    int ret = UNICOAP_STATUS_PATH_NOT_FOUND;
+
+    char path[CONFIG_UNIOCOAP_PATH_LENGTH_MAX];
+    ssize_t path_length = 0;
+
+    /* Copying Uri-Paths once followed by calls to strcmp is cheaper than
+     * repeatedly parsing options and not allocating a buffer */
+    if ((path_length =
+         unicoap_options_copy_uri_path(packet->message->options, path, sizeof(path))) <= 0) {
+        /* The Uri-Path options are longer than
+         * CONFIG_UNIOCOAP_PATH_SIZE_MAX, and thus do not match anything
+         * that could be found by this handler. */
+        SERVER_DEBUG("could not copy Uri-Path\n");
+        return UNICOAP_STATUS_PATH_NOT_FOUND;
+    }
+
+    for (unicoap_listener_t* listener = _state.listeners; listener; listener = listener->next) {
+        const unicoap_resource_t* resource;
+        int res;
+
+        if (!unicoap_match_proto(listener->protocols, unicoap_packet_proto(packet))) {
+            SERVER_DEBUG("ignoring listener, proto %s not in set\n",
+                         unicoap_string_from_proto(unicoap_packet_proto(packet)));
+            continue;
+        }
+
+        res = listener->request_matcher(path, (size_t)path_length, listener,
+                                        &resource, packet->message, packet->remote);
+        switch (res) {
+        case UNICOAP_STATUS_PATH_NOT_FOUND:
+            /* check next resource on mismatch */
+            continue;
+        case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
+            *resource_ptr = resource;
+            *listener_ptr = listener;
+            ret = res;
+            /* found a resource, but method/proto do not match */
+            continue;
+        case 0:
+            *resource_ptr = resource;
+            *listener_ptr = listener;
+            SERVER_DEBUG("%s%s: found\n", (*resource_ptr)->path,
+                         (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
+            return 0;
+        default:
+            SERVER_DEBUG("error: resource matcher failed\n");
+            /* res is probably UNICOAP_RESOURCE_ERROR or some other
+                 * unhandled error */
+            return res;
+        }
+    }
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        switch (ret) {
+        case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
+            SERVER_DEBUG("%s%s: method %s not allowed\n", (*resource_ptr)->path,
+                         (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "",
+                         unicoap_string_from_method(unicoap_request_get_method(packet->message)));
+            break;
+        case UNICOAP_STATUS_PATH_NOT_FOUND:
+            SERVER_DEBUG("%.*s: resource not found\n", (int)path_length, path);
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ret;
+}
 
 void unicoap_print_listeners(void)
 {

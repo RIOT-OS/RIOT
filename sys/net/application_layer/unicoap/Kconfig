@@ -44,6 +44,23 @@ menu "CoAP Unified Suite (unicoap)"
             help
                 When enabled, debug logs are printed. Helps trace messages through layers.
 
+        config UNICOAP_PREVENT_OPTIONAL_RESPONSES
+            bool "Prevent sending optional responses"
+            default n
+            help
+                Server only. Prevents unicoap from sending a response if optional, as indicated by the No-Response option. If enabled, responses prepared by the application will be disregarded and not sent.
+
+        config UNICOAP_SOCK_ZERO_COPY_GUARANTEES
+            bool "Zero-copy sock guarantees"
+            help
+                 If enables, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf. Default value: gnrc_sock_udp is used.
+
+        config UNICOAP_GET_LOCAL_ENDPOINTS
+            bool "Retrieve local endpoint"
+            default y
+            help
+                 Instructs the transport drivers to retrieve the local endpoint a PDU arrives at.
+
     endmenu
 
     comment "******************"

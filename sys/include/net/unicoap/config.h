@@ -156,6 +156,49 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief Numbers of bits needed to represent a given ETag's length
  */
 #define UNICOAP_ETAG_LENGTH_FIXED_WIDTH 4
+
+/**
+ * @brief Capacity of internal buffers. Set to maximum PDU size.
+ *
+ * **Default**: 128
+ *
+ * @note In certain situations, such as when sending a request unreliably,
+ * this limit has no effect. Internally, it is used for, but not limited to, retransmission copies.
+ */
+#if !defined(CONFIG_UNICOAP_PDU_SIZE_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_PDU_SIZE_MAX (128)
+#endif
+
+/**
+ * @brief Maximum length of a resource path string. Used for request matching.
+ *
+ * **Default**: 64 characters
+ *
+ * Normally, you could match a request's path against all resources' paths by comparing
+ * the individual `Uri-Path` options present in the request. Re-parsing the options for each
+ * resource the server hosts becomes expensive fast. Therefore, unicoap serializes the `Uri-Path`
+ * and then does consecutive`strncmp` calls.
+ *
+ * @see @ref unicoap_resource_match_path_string
+ * @see @ref unicoap_resource_match_path_options
+ */
+#if !defined(CONFIG_UNIOCOAP_PATH_LENGTH_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNIOCOAP_PATH_LENGTH_MAX (64)
+#endif
+
+static_assert(CONFIG_UNIOCOAP_PATH_LENGTH_MAX > 0,
+              "CONFIG_UNIOCOAP_PATH_LENGTH_MAX is zero: Path buffer too small");
+
+/**
+ * @brief Maximum size of `/.well-known/core` payload.
+ *
+ * **Default**: 120 bytes
+ *
+ * Allowed to exceed the maximum [PDU size](@ref CONFIG_UNICOAP_PDU_SIZE_MAX)
+ */
+#if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX (120)
+#endif
 /** @} */
 
 /* MARK: - Timing */
@@ -203,6 +246,33 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #  define UNICOAP_OBS_TICK_EXPONENT (14)
 #else
 #  error CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH must not exceed 3
+#endif
+/** @} */
+
+/* MARK: - Server */
+/**
+ * @name Server
+ * @{
+ */
+/**
+ * @brief Prevents unicoap from sending a response if optional, as indicated by the `No-Response`
+ * option
+ *
+ * If enabled, responses prepared by the application will be disregarded and not sent.
+ *
+ * **Default**: off
+ */
+#if !defined(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES 0
+#endif
+/**
+ * @brief Determines whether `unicoap` registers a default `/.well-known/core` resource.
+ * @see @ref net_unicoap_server
+ *
+ * **Default**: enabled (1)
+ */
+#if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_WELL_KNOWN_CORE (1)
 #endif
 /** @} */
 
@@ -311,6 +381,71 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 #  define CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS (15 * MS_PER_SEC)
 #endif
 /** @} */
+
+/* MARK: - Stack sizes */
+/**
+ * @name Stack sizes
+ * @{
+ */
+/**
+ * @brief Stack size for module thread
+ */
+#if !defined(UNICOAP_STACK_SIZE) || defined(DOXYGEN)
+
+/**
+ * @brief Extra stack memory to be used when CoAP over DTLS driver is used
+ */
+#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#    define UNICOAP_DTLS_EXTRA_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
+#  else
+#    define UNICOAP_DTLS_EXTRA_STACKSIZE (0)
+#  endif
+
+/**
+ * @brief Stack memory used by `unicoap` thread
+ *
+ * This parameter is relevant if you disable @ref CONFIG_UNICOAP_CREATE_THREAD
+ */
+#  define UNICOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE + \
+       CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY + UNICOAP_DTLS_EXTRA_STACKSIZE)
+#endif
+/** @} */
+
+/* TODO: Put the following into the Automatic Block-wise Transfers Group once available */
+
+/**
+ * @brief Block size unicoap will suggest for Block1 and Block2 transfers
+ *
+ * **Default**: 64 bytes
+ */
+#if !defined(CONFIG_UNICOAP_BLOCK_SIZE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_BLOCK_SIZE (32)
+#endif
+
+#ifndef DOXYGEN
+#  ifdef CONFIG_UNICOAP_BLOCK_SZX
+#    error CONFIG_UNICOAP_BLOCK_SZX must not be configured manually.
+#  endif
+#  if CONFIG_UNICOAP_BLOCK_SIZE == 1024
+#    define CONFIG_UNICOAP_BLOCK_SZX (6)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 512
+#    define CONFIG_UNICOAP_BLOCK_SZX (5)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 256
+#    define CONFIG_UNICOAP_BLOCK_SZX (4)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 128
+#    define CONFIG_UNICOAP_BLOCK_SZX (3)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 64
+#    define CONFIG_UNICOAP_BLOCK_SZX (2)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 32
+#    define CONFIG_UNICOAP_BLOCK_SZX (1)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 16
+#    define CONFIG_UNICOAP_BLOCK_SZX (0)
+#  else
+#    error CONFIG_UNICOAP_BLOCK_SIZE must be 1024, 512, 256, 128, 64, 32, or 16
+#  endif
+#endif
+
+/* TODO: Add static_asserts once other Block-wise parameters are available */
 
 #ifdef __cplusplus
 extern "C" {
