@@ -77,6 +77,18 @@ static uint16_t _dflt_route_lifetime_sec(gnrc_rpl_dodag_t *dodag)
             (GNRC_RPL_PARENT_PROBE_INTERVAL / MS_PER_SEC));
 }
 
+void gnrc_rpl_poison_routes(gnrc_rpl_dodag_t *dodag)
+{
+    if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
+        DEBUG("RPL: Poison all children routes in DODAG.\n");
+
+        /* Poison routes by advertising infinity rank */
+        dodag->my_rank = GNRC_RPL_INFINITE_RANK;
+        trickle_reset_timer(&dodag->trickle);
+        gnrc_rpl_cleanup_start(dodag);
+    }
+}
+
 bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst)
 {
     *inst = NULL;
@@ -130,8 +142,9 @@ void gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag)
     gnrc_rpl_dodag_remove_all_parents(dodag);
     trickle_stop(&dodag->trickle);
     evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->float_timeout_event);
     evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->instance->cleanup_event);
-
+    memset(dodag, 0, sizeof(gnrc_rpl_dodag_t));
 }
 
 void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
@@ -200,6 +213,8 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag
     dodag->iface = iface;
     dodag->dao_event.msg.content.ptr = instance;
     dodag->dao_event.msg.type = GNRC_RPL_MSG_TYPE_DODAG_DAO_TX;
+    dodag->float_timeout_event.msg.content.ptr = instance;
+    dodag->float_timeout_event.msg.type = GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT;
 
     if ((netif != NULL) && !(netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING)) {
         gnrc_rpl_leaf_operation(dodag);
@@ -211,6 +226,32 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag
         return false;
     }
 #endif
+
+    return true;
+}
+
+bool _float_dodag(gnrc_rpl_dodag_t *dodag)
+{
+    evtimer_event_t *float_event = (evtimer_event_t *)&dodag->float_timeout_event;
+
+    DEBUG("RPL: Set node as root for floating DODAG.\n");
+
+    evtimer_del(&gnrc_rpl_evtimer, float_event);
+
+    /* find address on interface that matches the prefix of the old dodag */
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
+    int idx = gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id);
+    if (idx < 0) {
+        DEBUG("RPL: could not find address to use as DODAGID.");
+        return false;
+    }
+    dodag->dodag_id = netif->ipv6.addrs[idx];
+    gnrc_rpl_dodag_root_init(dodag);
+    dodag->grounded &= !GNRC_RPL_GROUNDED;
+
+    /* floating dodag should timeout eventually if no new grounded dodag is found */
+    float_event->offset = CONFIG_GNRC_RPL_DODAG_FLOAT_TIMEOUT;
+    evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->float_timeout_event, gnrc_rpl_pid);
 
     return true;
 }
@@ -300,10 +341,8 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
     dodag->dtsn++;
 
-    if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
-        dodag->my_rank = GNRC_RPL_INFINITE_RANK;
-        trickle_reset_timer(&dodag->trickle);
-        gnrc_rpl_cleanup_start(dodag);
+    if ((CONFIG_GNRC_RPL_DODAG_FLOAT_TIMEOUT <= 0) || !_float_dodag(dodag)) {
+        gnrc_rpl_poison_routes(dodag);
     }
 
     if (dodag->parents) {

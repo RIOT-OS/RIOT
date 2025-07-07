@@ -250,6 +250,15 @@ static void _parent_timeout(gnrc_rpl_parent_t *parent)
     evtimer_add_msg(&gnrc_rpl_evtimer, &parent->timeout_event, gnrc_rpl_pid);
 }
 
+/* Handle timeout for floating DODAG by poisoning all routes. */
+static void _dodag_float_timeout(gnrc_rpl_dodag_t *dodag)
+{
+    if (dodag->grounded != GNRC_RPL_GROUNDED) {
+        gnrc_rpl_poison_routes(dodag);
+    }
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->float_timeout_event);
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
@@ -299,6 +308,11 @@ static void *_event_loop(void *args)
                 if (instance->dodag.parents == NULL) {
                     gnrc_rpl_instance_remove(instance);
                 }
+                break;
+            case GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT:
+                DEBUG("RPL: GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT received\n");
+                instance = msg.content.ptr;
+                _dodag_float_timeout(&instance->dodag);
                 break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_MSG:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_MSG received\n");
