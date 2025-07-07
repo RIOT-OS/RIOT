@@ -1,6 +1,28 @@
 ifneq (,$(filter unicoap,$(USEMODULE)))
   # Vectored data support
   USEMODULE += iolist
+
+	# Allocated buffer element lists
+  USEMODULE += bitfield
+
+  # Message ID generation
+  USEMODULE += random
+
+  # Retransmissions, etc
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+
+  # Event loop
+  USEMODULE += event_thread
+  USEMODULE += event_callback
+  USEMODULE += event_timeout_ztimer
+
+  # Synchronous methods
+  USEMODULE += sema
+
+  USEMODULE += netif
+  USEMODULE += ipv6_addr
+  USEMODULE += ipv4_addr
 endif
 
 # This variable ensures the "No drivers" warning gets printed only once
@@ -33,14 +55,32 @@ ifneq (,$(filter unicoap_driver_udp,$(USEMODULE)))
   # CoAP over UDP uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
 
-  # FIXME: upcoming PR: CoAP over UDP driver implementation
+	# We're using the sock API
+	USEMODULE += unicoap_sock_support
+  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
   # CoAP over DTLS uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
 
-  # FIXME: upcoming PR: CoAP over DTLS driver implementation
+	# We're using the sock API
+	USEMODULE += unicoap_sock_support
+  USEMODULE += sock_dtls
+
+  # DTLS stuff
+  USEMODULE += tinydtls_sock_dtls
+  USEPKG += tinydtls
+  USEMODULE += prng_sha1prng
+  USEMODULE += dsm
+  USEMODULE += ztimer_usecf
 endif
 
 # MARK: unicoap_driver_extension_point
+
+ifneq (,$(filter unicoap_sock_support,$(USEMODULE)))
+  USEMODULE += sock_async
+  USEMODULE += sock_async_event
+  USEMODULE += sock_aux_local
+  USEMODULE += sock_util
+endif
