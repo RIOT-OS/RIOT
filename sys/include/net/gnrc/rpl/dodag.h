@@ -179,6 +179,15 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
 void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag);
 
 /**
+ * @brief Poison all routes of @p dodag by setting an infinite rank, and schedule
+ * a cleanup for the @p dodag.
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ *
+ */
+void gnrc_rpl_poison_routes(gnrc_rpl_dodag_t *dodag);
+
+/**
  * @brief   Start a local repair.
  *
  * @param[in] dodag     Pointer to the DODAG
