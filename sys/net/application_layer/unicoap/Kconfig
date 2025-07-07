@@ -58,4 +58,52 @@ menu "CoAP Unified Suite (unicoap)"
 
     endmenu
 
+    comment "******************"
+    comment "DRIVERS"
+
+        menu "RFC 7252 messaging (CoAP over UDP and DTLS common)"
+
+        comment "******************"
+        comment "BUFFERS"
+
+        config UNICOAP_RFC7252_TRANSMISSIONS_MAX
+            int "Maximum number of parallel RFC 7252 (re-)transmissions"
+            range 0 9999999
+            default 2
+            help
+                  Maximum number of parallel message IDs that are sent and watched for reset and acknowledgment messages. Must not exceed CONFIG_UNICOAP_MEMOS_MAX.
+
+        config UNICOAP_CARBON_COPIES_MAX
+            int "Carbon copies: Maximum number of PDU copies for retransmissions (and piggybacked ACKs in deduplication)"
+            range 0 9999999
+            default 2
+            help
+                 Used for retransmitting CON messages, and storing ACK messages when deduplicating.
+
+        comment "******************"
+        comment "TIMING"
+
+        config UNICOAP_TIMEOUT_ACK_MS
+            int "ACK timeout -> retransmission"
+            range 1 9999999
+            default 2000
+            help
+                 Initial ACK timeout after which a given message will be retransmitted.
+
+        config UNICOAP_RANDOM_FACTOR_1000
+            int "ACK timeout upper bound factor * 1000"
+            range 1000 9999999
+            default 1500
+            help
+                This represents the ACK_RANDOM_FACTOR (RFC 7252, section 4.2, https://tools.ietf.org/html/rfc7252#section-4.2) multiplied by 1000, to avoid floating point arithmetic.
+
+        config UNICOAP_RETRANSMISSIONS_MAX
+            int "Maximum retransmissions"
+            range 1 32
+            default 4
+            help
+                 Maximum number of retransmissions of a confirmable message
+
+    endmenu
+
 endmenu # unicoap

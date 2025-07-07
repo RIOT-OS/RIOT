@@ -155,6 +155,82 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #endif
 /** @} */
 
+/* MARK: - RFC 7252 messaging */
+/**
+ * @name RFC 7252 messaging
+ * @{
+ */
+/**
+ * @brief Used to calculate upper bound for timeout
+ *
+ * **Default**: 1500
+ *
+ * This represents the `ACK_RANDOM_FACTOR`
+ * ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
+ * multiplied by 1000, to avoid floating point arithmetic.
+ *
+ * @see
+ * @ref CONFIG_UNICOAP_TIMEOUT_ACK_MS
+ */
+#if !defined(CONFIG_UNICOAP_RANDOM_FACTOR_1000) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RANDOM_FACTOR_1000 (1500)
+#endif
+
+/** @brief Upper bound of range ACK timeouts are selected from */
+#define UNICOAP_TIMEOUT_ACK_RANGE_UPPER \
+    ((uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS * CONFIG_UNICOAP_RANDOM_FACTOR_1000 / 1000)
+
+/**
+ * @brief Initial ACK timeout after which a given message will be retransmitted.
+ *
+ * **Unit**: milliseconds
+ * **Default:** 2000
+ *
+ * @note The timeout doubles for subsequent retries. To avoid synchronization of retransmissions
+ * across hosts, the actual timeout is chosen randomly between
+ * [the ACK timeout](@ref CONFIG_UNICOAP_TIMEOUT_ACK_MS) and
+ * ([ACK timeout](@ref CONFIG_UNICOAP_TIMEOUT_ACK_MS) `*`
+ * [random factor](@ref CONFIG_UNICOAP_RANDOM_FACTOR_1000) / 1000).
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_ACK_MS) || DOXYGEN
+#  define CONFIG_UNICOAP_TIMEOUT_ACK_MS (2000)
+#endif
+
+/**
+ * @brief Maximum number of retransmissions of a confirmable message
+ *
+ * **Default**: 4
+ */
+#if !defined(CONFIG_UNICOAP_RETRANSMISSIONS_MAX) || DOXYGEN
+#  define CONFIG_UNICOAP_RETRANSMISSIONS_MAX (4)
+#endif
+
+static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
+              "CONFIG_UNICOAP_RETRANSMISSIONS_MAX must not exceed 31");
+
+/**
+ * @brief Maximum number of parallel message IDs that are sent and watched for reset and
+ * acknowledgment messages
+ *
+ * **Default**: 2 transmissions
+ */
+#if !defined(CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX 2
+#endif
+
+/* TODO: Client and advanced server features: Limit to exchange-layer state objects */
+
+/**
+ * @brief Maximum number of internal buffers unicoap reserves.
+ *
+ * Used for retransmitting `CON` messages, and storing `ACK` messages when deduplicating.
+ * **Default**: 2
+ */
+#if !defined(CONFIG_UNICOAP_CARBON_COPIES_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CARBON_COPIES_MAX (2)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 extern "C" {
 }
