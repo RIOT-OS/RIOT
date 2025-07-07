@@ -113,6 +113,35 @@ menu "CoAP Unified Suite (unicoap)"
             range 1 65535
     endmenu
 
+    menu "CoAP over DTLS"
+        config UNICOAP_DTLS_PORT
+            int "DTLS port"
+            default 5684
+            range 1 65535
+
+        config UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS
+            int "DTLS handshake timeout (ms)"
+            range 0 9999999
+            default 3000
+            help
+                 Timeout for the DTLS handshake process. Set to 0 for infinite time.
+
+        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
+            int "DTLS minimum number of available sessions at any time"
+            range 0 9999999
+            default 1
+            help
+                 Number of minimum available sessions. If the count of available sessions falls below this threshold, the oldest used session will be closed after a timeout time. Set to 0 to deactivate this feature.
+
+        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS
+            int "DTLS session triage timeout (ms)"
+            range 0 9999999
+            default 15000
+            help
+                 Timeout for freeing up a session when minimum number of available sessions is not given.
+    endmenu
+
+
     # unicoap_driver_extension_point
 
 endmenu # unicoap

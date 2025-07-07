@@ -66,6 +66,14 @@
 #endif
 
 /**
+ * @brief DTLS port
+ * @ingroup net_unicoap_drivers_dtls
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_PORT) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_PORT UNICOAP_DEFAULT_COAPS_PORT
+#endif
+
+/**
  * @brief If enables, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the
  * entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf.
  *
@@ -271,6 +279,36 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
  */
 #if !defined(CONFIG_UNICOAP_CARBON_COPIES_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_CARBON_COPIES_MAX (2)
+#endif
+/** @} */
+
+/* MARK: - DTLS */
+/**
+ * @name DTLS
+ * @{
+ */
+/**
+ * @brief   Timeout for the DTLS handshake process. Set to 0 for infinite time
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS (3 * MS_PER_SEC)
+#endif
+
+/**
+ * @brief   Number of minimum available sessions. If the count of available
+ *          sessions falls below this threshold, the oldest used session will be
+ *          closed after a timeout time. Set to 0 to deactivate this feature.
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS (1)
+#endif
+
+/**
+ * @brief   Timeout for freeing up a session when minimum number of available
+ *          sessions is not given.
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS (15 * MS_PER_SEC)
 #endif
 /** @} */
 
