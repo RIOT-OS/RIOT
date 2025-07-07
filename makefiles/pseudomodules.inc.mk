@@ -511,6 +511,13 @@ PSEUDOMODULES += suit_storage_%
 PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
+
+# An umbrella module for the unicoap_driver_rfc7252_common_pdu
+# and unicoap_driver_rfc7252_common_messaging modules
+PSEUDOMODULES += unicoap_driver_rfc7252_common
+# Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
+PSEUDOMODULES += unicoap_driver_rfc7252_pdu
+
 PSEUDOMODULES += usbus_urb
 PSEUDOMODULES += vdd_lc_filter_%
 ## @defgroup pseudomodule_vfs_auto_format vfs_auto_format
