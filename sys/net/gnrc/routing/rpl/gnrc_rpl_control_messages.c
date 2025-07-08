@@ -25,6 +25,7 @@
 #include "xtimer.h"
 #endif
 
+#include "bit.h"
 #include "net/af.h"
 #include "net/icmpv6.h"
 #include "net/ipv6/hdr.h"
@@ -60,9 +61,6 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
 #define GNRC_RPL_PRF_MASK                   (0x7)
 #define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
-
-#define OPTS_ADD(options, opt)               (*options |= (1UL << opt))
-#define OPTS_HAS(options, opt)               (*options  & (1UL << opt))
 
 /**
  * @brief   Checks validity of DIO control messages
@@ -541,19 +539,19 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
         switch (opt->type) {
         case (GNRC_RPL_OPT_PAD1):
             DEBUG("RPL: PAD1 option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_PAD1);
+            bit_set32(included_opts, GNRC_RPL_OPT_PAD1);
             len_parsed += 1;
             opt = (gnrc_rpl_opt_t *)(((uint8_t *)opt) + 1);
             continue;
 
         case (GNRC_RPL_OPT_PADN):
             DEBUG("RPL: PADN option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_PADN);
+            bit_set32(included_opts, GNRC_RPL_OPT_PADN);
             break;
 
         case (GNRC_RPL_OPT_DODAG_CONF):
             DEBUG("RPL: DODAG CONF DIO option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_DODAG_CONF);
+            bit_set32(included_opts, GNRC_RPL_OPT_DODAG_CONF);
             dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
             gnrc_rpl_opt_dodag_conf_t *dc = (gnrc_rpl_opt_dodag_conf_t *)opt;
             gnrc_rpl_of_t *of = gnrc_rpl_get_of_for_ocp(byteorder_ntohs(dc->ocp));
@@ -578,7 +576,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
 
         case (GNRC_RPL_OPT_PREFIX_INFO):
             DEBUG("RPL: Prefix Information DIO option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_PREFIX_INFO);
+            bit_set32(included_opts, GNRC_RPL_OPT_PREFIX_INFO);
 
             if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
                 dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
@@ -605,7 +603,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             break;
         case (GNRC_RPL_OPT_SOLICITED_INFO):
             DEBUG("RPL: RPL SOLICITED INFO option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_SOLICITED_INFO);
+            bit_set32(included_opts, GNRC_RPL_OPT_SOLICITED_INFO);
             gnrc_rpl_opt_dis_solicited_t *sol = (gnrc_rpl_opt_dis_solicited_t *)opt;
 
             /* check expected length */
@@ -638,7 +636,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             break;
         case (GNRC_RPL_OPT_TARGET):
             DEBUG("RPL: RPL TARGET DAO option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_TARGET);
+            bit_set32(included_opts, GNRC_RPL_OPT_TARGET);
 
             gnrc_rpl_opt_target_t *target = (gnrc_rpl_opt_target_t *)opt;
             if (first_target == NULL) {
@@ -656,7 +654,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
 
         case (GNRC_RPL_OPT_TRANSIT):
             DEBUG("RPL: RPL TRANSIT INFO DAO option parsed\n");
-            OPTS_ADD(included_opts, GNRC_RPL_OPT_TRANSIT);
+            bit_set32(included_opts, GNRC_RPL_OPT_TRANSIT);
 
             gnrc_rpl_opt_transit_t *transit = (gnrc_rpl_opt_transit_t *)opt;
             if (first_target == NULL) {
@@ -758,7 +756,7 @@ static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv
         return false;
     }
 
-    if (is_new && !OPTS_HAS(&included_opts, GNRC_RPL_OPT_DODAG_CONF)) {
+    if (is_new && !bit_check32(&included_opts, GNRC_RPL_OPT_DODAG_CONF)) {
         if (!IS_ACTIVE(CONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN)) {
             DEBUG("RPL: DIO without DODAG_CONF option - request new DIO\n");
             gnrc_rpl_send_DIS(NULL, src, NULL, 0);
