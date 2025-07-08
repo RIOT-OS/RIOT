@@ -746,7 +746,10 @@ static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv
     gnrc_rpl_opt_t *opts = (gnrc_rpl_opt_t *)(dio + 1);
     uint32_t included_opts = 0;
 
-    if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, opts, len, src, &included_opts)) {
+    /* subtract length of ICMPv6 header and DIO base object fields to get length of DIO options */
+    size_t opt_len = len - sizeof(gnrc_rpl_dio_t) - sizeof(icmpv6_hdr_t);
+
+    if (!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, inst, opts, opt_len, src, &included_opts)) {
         DEBUG("RPL: Error encountered during DIO option parsing\n");
         return false;
     }
@@ -932,8 +935,6 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
             return;
         }
     }
-
-    len -= (sizeof(gnrc_rpl_dio_t) + sizeof(icmpv6_hdr_t));
 
     if (gnrc_rpl_instance_add(dio->instance_id, &inst)) {
         _recv_DIO_for_new_dodag(inst, dio, iface, src, len);
