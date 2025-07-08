@@ -176,6 +176,14 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *
     return inst;
 }
 
+void gnrc_rpl_addr_unreachable(ipv6_addr_t *addr)
+{
+    msg_t msg;
+    msg.type = GNRC_RPL_MSG_TYPE_ADDR_UNREACHABLE;
+    msg.content.ptr = addr;
+    msg_send(&msg, gnrc_rpl_pid);
+}
+
 static void _receive(gnrc_pktsnip_t *icmpv6)
 {
     gnrc_pktsnip_t *ipv6, *netif;
@@ -273,6 +281,16 @@ static void _parent_timeout(gnrc_rpl_parent_t *parent)
     evtimer_add_msg(&gnrc_rpl_evtimer, &parent->timeout_event, gnrc_rpl_pid);
 }
 
+static void _addr_unreachable(ipv6_addr_t *addr)
+{
+    gnrc_rpl_parent_t *parent;
+    int idx = 0;
+
+    while ((idx = gnrc_rpl_parent_iter_by_addr(addr, &parent, idx)) >= 0) {
+        _parent_timeout(parent);
+    }
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
@@ -293,6 +311,7 @@ static void *_event_loop(void *args)
     trickle_t *trickle;
     gnrc_rpl_parent_t *parent;
     gnrc_rpl_instance_t *instance;
+    ipv6_addr_t *addr;
 
     /* start event loop */
     while (1) {
@@ -310,6 +329,11 @@ static void *_event_loop(void *args)
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT received\n");
                 parent = msg.content.ptr;
                 _parent_timeout(parent);
+                break;
+            case GNRC_RPL_MSG_TYPE_ADDR_UNREACHABLE:
+                DEBUG("RPL: GNRC_RPL_MSG_TYPE_ADDR_UNREACHABLE received\n");
+                addr = msg.content.ptr;
+                _addr_unreachable(addr);
                 break;
             case GNRC_RPL_MSG_TYPE_DODAG_DAO_TX:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_DODAG_DAO_TX received\n");
