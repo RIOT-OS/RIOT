@@ -865,7 +865,7 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
 
 }
 
-void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
+static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
                                   ipv6_addr_t *src, uint16_t len)
 {
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
