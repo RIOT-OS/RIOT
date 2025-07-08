@@ -770,7 +770,7 @@ static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv
 }
 
 static bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
-                            uint16_t len, bool is_new)
+                                   uint16_t len, bool is_new)
 {
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
     gnrc_rpl_parent_t *parent = NULL;
@@ -869,7 +869,7 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
 }
 
 static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
-                                  ipv6_addr_t *src, uint16_t len)
+                                         ipv6_addr_t *src, uint16_t len)
 {
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
 
