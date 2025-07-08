@@ -511,7 +511,7 @@ static inline uint32_t _sec_to_ms(uint32_t sec)
     }
 }
 
-char *_ip_addr_str(ipv6_addr_t *addr)
+static inline char *_ip_addr_str(ipv6_addr_t *addr)
 {
     return ipv6_addr_to_str(addr_str, addr, (unsigned)sizeof(addr_str));
 }
