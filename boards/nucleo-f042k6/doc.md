@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_nucleo-f042k6 STM32 Nucleo-F042K6
- * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo-F042K6
+@defgroup    boards_nucleo-f042k6 STM32 Nucleo-F042K6
+@ingroup     boards_common_nucleo32
+@brief       Support for the STM32 Nucleo-F042K6
 
 ## Overview
 
@@ -47,5 +46,3 @@ make BOARD=nucleo-f042k6 PROGRAMMER=cpy2remed flash
 ```
 @note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
       can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
- */
