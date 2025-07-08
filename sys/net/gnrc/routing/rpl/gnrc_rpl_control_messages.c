@@ -766,7 +766,7 @@ static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv
     return true;
 }
 
-bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
+static bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
                             uint16_t len, bool is_new)
 {
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
