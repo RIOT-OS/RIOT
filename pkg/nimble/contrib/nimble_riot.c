@@ -23,6 +23,7 @@
 #include "thread.h"
 #include "nimble_riot.h"
 
+#include "net/ipv6/addr.h"
 #include "nimble/nimble_port.h"
 #include "host/ble_hs.h"
 #include "host/util/util.h"
