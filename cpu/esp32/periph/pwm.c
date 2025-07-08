@@ -28,11 +28,13 @@
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 
+#include "esp_clk_tree.h"
 #include "esp_cpu.h"
 #include "esp_common.h"
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "hal/ledc_hal.h"
+#include "soc/ledc_periph.h"
 #include "soc/ledc_struct.h"
 #include "soc/rtc.h"
 
@@ -126,9 +128,14 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
         hw_res_bit++;
     }
 
+    uint32_t clk_freq;
+    esp_clk_tree_src_get_freq_hz((soc_module_clk_t)LEDC_SCLK,
+                                 ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
+                                 &clk_freq);
+
     uint32_t hw_res = 1 << hw_res_bit;
 
-    uint32_t hw_ticks_max = rtc_clk_apb_freq_get();
+    uint32_t hw_ticks_max = clk_freq;
     uint32_t hw_ticks_min = hw_ticks_max / (1 << SOC_LEDC_CLK_DIV_INT_BIT_NUM);
     uint32_t hw_freq_min = hw_ticks_min / (1 << SOC_LEDC_TIMER_BIT_WIDTH) + 1;
 
@@ -139,11 +146,11 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* number of hardware ticks required, at maximum it can be APB clock */
-    uint32_t hw_ticks = MIN(freq * hw_res, rtc_clk_apb_freq_get());
+    uint32_t hw_ticks = MIN(freq * hw_res, clk_freq);
 
     /*
-     * if the number of required ticks is less than minimum ticks supported by
-     * the hardware supports, we have to increase the resolution.
+     * if the number of required ticks is less than the minimum supported by
+     * the hardware, we have to increase the resolution.
      */
     while (hw_ticks < hw_ticks_min) {
         hw_res_bit++;
@@ -153,7 +160,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* LEDC_CLK_DIV is given in Q10.8 format */
     uint32_t hw_clk_div =
-        ((uint64_t)rtc_clk_apb_freq_get() << SOC_LEDC_CLK_DIV_FRAC_BIT_NUM) / hw_ticks;
+        ((uint64_t)clk_freq << SOC_LEDC_CLK_DIV_FRAC_BIT_NUM) / hw_ticks;
 
     _DEV.freq = freq;
     _DEV.res = res;
@@ -255,9 +262,10 @@ void pwm_poweron(pwm_t pwm)
     /* enable and init the module and select the right clock source */
     periph_module_enable(_CFG.module);
     ledc_hal_init(&_DEV.hw, _CFG.group);
-    ledc_hal_set_slow_clk_sel(&_DEV.hw, LEDC_SLOW_CLK_APB);
+    ledc_ll_enable_clock(_DEV.hw.dev, true);
+    ledc_hal_set_slow_clk_sel(&_DEV.hw, (ledc_slow_clk_sel_t)LEDC_SCLK);
 #if SOC_LEDC_HAS_TIMER_SPECIFIC_MUX
-    ledc_hal_set_clock_source(&_DEV.hw, _CFG.timer, LEDC_APB_CLK);
+    ledc_hal_set_clock_source(&_DEV.hw, _CFG.timer, (ledc_clk_src_t)LEDC_SCLK);
 #endif
 
     /* update the timer according to determined parameters */

@@ -36,7 +36,9 @@
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
-#include "soc/rtc_cntl_reg.h"
+#ifndef CPU_FAM_ESP32H2
+#  include "soc/rtc_cntl_reg.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -192,6 +194,7 @@ void pm_set(unsigned mode)
 #endif
 
     if (mode == ESP_PM_DEEP_SLEEP) {
+        system_wdt_stop();
         esp_deep_sleep_start();
         /* waking up from deep-sleep leads to a DEEPSLEEP_RESET */
         UNREACHABLE();

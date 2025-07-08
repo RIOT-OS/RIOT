@@ -32,6 +32,7 @@
 #include "sys/lock.h"
 #include "timex.h"
 
+#include "esp_clk_tree.h"
 #include "esp_cpu.h"
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_caps.h"
@@ -43,8 +44,10 @@
 #include "rom/libc_stubs.h"
 #include "soc/periph_defs.h"
 #include "soc/rtc.h"
-#include "soc/rtc_cntl_reg.h"
-#include "soc/rtc_cntl_struct.h"
+#ifndef CPU_FAM_ESP32H2
+#  include "soc/rtc_cntl_reg.h"
+#  include "soc/rtc_cntl_struct.h"
+#endif
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
 #include "sdkconfig.h"
@@ -212,6 +215,27 @@ extern int _scanf_float(struct _reent *rptr,
                         FILE *fp,
                         va_list *ap);
 
+#if !defined(CPU_FAM_ESP32) && !defined(CPU_FAM_ESP32S2)
+/* We need to override these functions that are used from ROM */
+
+__attribute__((__noreturn__))
+static void _riot__assert_func(const char *file, int line, const char * func,
+                               const char *failedexpr)
+{
+    extern __NORETURN void _assert_failure(const char *file, unsigned line);
+    (void)func;
+    (void)failedexpr;
+    _assert_failure(file, line);
+}
+
+static void _riot__sinit(struct _reent *reent)
+{
+    /* this function should never be called from ROM */
+    assert(0);
+}
+
+#endif
+
 static struct syscall_stub_table s_stub_table =
 {
     .__getreent = &__getreent,
@@ -275,6 +299,11 @@ static struct syscall_stub_table s_stub_table =
     ._printf_float = NULL,
     ._scanf_float = NULL,
 #endif /* CONFIG_NEWLIB_NANO_FORMAT */
+#if !defined(CPU_FAM_ESP32) && !defined(CPU_FAM_ESP32S2)
+    .__assert_func = &_riot__assert_func,
+    .__sinit = &_riot__sinit,
+    ._cleanup_r = NULL,             /* we don't need a cleanup of stdio */
+#endif
 };
 
 timer_hal_context_t sys_timer = {
@@ -406,9 +435,15 @@ void IRAM syscalls_init_arch(void)
 
     /* initialize and enable the system timer in us */
     periph_module_enable(PERIPH_TIMG0_MODULE);
+
+    uint32_t clk_freq;
+    esp_clk_tree_src_get_freq_hz((soc_module_clk_t)GPTIMER_CLK_SRC_DEFAULT,
+                                 ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
+                                 &clk_freq);
+
     timer_ll_set_clock_source(sys_timer.dev, sys_timer.timer_id, GPTIMER_CLK_SRC_DEFAULT);
     timer_ll_enable_clock(sys_timer.dev, sys_timer.timer_id, true);
-    timer_ll_set_clock_prescale(sys_timer.dev, sys_timer.timer_id, rtc_clk_apb_freq_get() / MHZ);
+    timer_ll_set_clock_prescale(sys_timer.dev, sys_timer.timer_id, clk_freq / MHZ);
     timer_ll_set_count_direction(sys_timer.dev, sys_timer.timer_id, GPTIMER_COUNT_UP);
     timer_ll_enable_auto_reload(sys_timer.dev, sys_timer.timer_id, false);
     timer_ll_enable_counter(sys_timer.dev, sys_timer.timer_id, true);
@@ -425,6 +460,13 @@ void IRAM syscalls_init_arch(void)
 #else
     syscall_table_ptr = &s_stub_table;
 #endif
+
+    /* we don't need a cleanup for stdio */
+    _GLOBAL_REENT->__cleanup = NULL;
+    /* init stdio */
+    _REENT_SDIDINIT(_GLOBAL_REENT) = 0;
+    __sinit(_GLOBAL_REENT);
+    _REENT_SDIDINIT(_GLOBAL_REENT) = 1;
 }
 
 uint32_t system_get_time(void)
@@ -466,7 +508,12 @@ void system_wdt_init(void)
     /* initialize and disable boot watchdogs MWDT and RWDT (the prescaler for
      * MWDT is the APB clock in MHz to get a microsecond tick, for RWDT it is
      * not applicable) */
-    wdt_hal_init(&mwdt, WDT_MWDT0, rtc_clk_apb_freq_get()/MHZ, true);
+    uint32_t clk_freq;
+    esp_clk_tree_src_get_freq_hz((soc_module_clk_t)GPTIMER_CLK_SRC_DEFAULT,
+                                 ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
+                                 &clk_freq);
+
+    wdt_hal_init(&mwdt, WDT_MWDT0, clk_freq / MHZ, true);
     wdt_hal_init(&rwdt, WDT_RWDT, 0, false);
 
     /* disable write protection for MWDT and RWDT */

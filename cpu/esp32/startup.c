@@ -57,9 +57,11 @@
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
-#include "soc/rtc_cntl_reg.h"
-#include "soc/rtc_cntl_struct.h"
-#include "soc/syscon_reg.h"
+#ifndef CPU_FAM_ESP32H2
+#  include "soc/rtc_cntl_reg.h"
+#  include "soc/rtc_cntl_struct.h"
+#  include "soc/syscon_reg.h"
+#endif
 #include "soc/timer_group_struct.h"
 
 #if __xtensa__
@@ -267,7 +269,7 @@ static NORETURN void IRAM system_init (void)
                 rtc_clk_fast_freq_get() == RTC_FAST_FREQ_8M ? 8 * MHZ
                                                             : esp_clk_xtal_freq()/4,
                 rtc_clk_slow_freq_get_hz());
-    LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
+    LOG_STARTUP("RTC Slow Clock calibration value: %d\n", esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
 
     /* initialize architecture specific interrupt handling */

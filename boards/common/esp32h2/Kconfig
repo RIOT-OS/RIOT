@@ -1,0 +1,11 @@
+# Copyright (c) 2025 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD_COMMON_ESP32H2
+    bool
+    select BOARD_COMMON_ESP32X
+
+source "$(RIOTBOARD)/common/esp32x/Kconfig"

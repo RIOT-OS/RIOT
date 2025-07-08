@@ -460,6 +460,21 @@ void heap_caps_init(void)
 {
 }
 
+void* heap_caps_aligned_alloc(size_t alignment, size_t size, uint32_t caps)
+{
+    (void)caps;
+
+    uintptr_t raw_addr = (uintptr_t)malloc(size + alignment - 1);
+    uintptr_t aligned_addr = (raw_addr + (alignment - 1)) & ~(alignment - 1);
+
+    if (!raw_addr) {
+        return NULL;
+    }
+
+    assert(raw_addr == aligned_addr);
+    return (void *)aligned_addr;
+}
+
 extern uint8_t  _eheap;     /* end of heap (defined in ld script) */
 extern uint8_t  _sheap;     /* start of heap (defined in ld script) */
 

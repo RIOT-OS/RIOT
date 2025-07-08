@@ -26,7 +26,7 @@ export_arch()
             TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
-        esp32c3)
+        esp32c3|esp32h2)
             TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
@@ -36,7 +36,7 @@ export_arch()
     esac
 
     TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}/${TARGET_ARCH}"
-    TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
+    TOOLS_DIR_IN_PATH=$(echo "$PATH" | grep "${TOOLS_DIR}")
 
     if [ ! -e "${TOOLS_DIR}" ]; then
         echo "${TOOLS_DIR} does not exist - please run"
@@ -44,7 +44,7 @@ export_arch()
         return
     fi
 
-    if [ -z "${TOOLS_DIR_IN_PATH}" ]; then
+    if [ -e "${TOOLS_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
         echo "Extending PATH by ${TOOLS_DIR}/bin"
         export PATH="${TOOLS_DIR}/bin:${PATH}"
     fi
@@ -58,7 +58,7 @@ export_arch()
 export_openocd()
 {
     TOOLS_DIR="${TOOLS_PATH}/openocd-esp32/${ESP32_OPENOCD_VERSION}"
-    TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
+    TOOLS_DIR_IN_PATH=$(echo "$PATH" | grep "${TOOLS_DIR}")
     OPENOCD_DIR="${TOOLS_DIR}/openocd-esp32"
 
     if [ -e "${OPENOCD_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
@@ -81,7 +81,6 @@ export_qemu()
     # map different platform names to a unique OS name
     case "${PLATFORM}" in
         linux-amd64|linux64|Linux-x86_64|FreeBSD-amd64)
-            OS="linux-amd64"
             ;;
         *)
             echo "error: OS architecture ${PLATFORM} not supported"
@@ -99,7 +98,7 @@ export_qemu()
     esac
 
     # qemu version depends on the version of ncurses lib
-    if [ "$(ldconfig -p | grep -c libncursesw.so.6)" == "0" ]; then
+    if [ "$(ldconfig -p | grep -c libncursesw.so.6)" = "0" ]; then
         ESP32_QEMU_VERSION="esp-develop-20210220"
     fi
 
@@ -108,7 +107,7 @@ export_qemu()
     fi
 
     TOOLS_DIR="${TOOLS_PATH}/${QEMU_ARCH}/${ESP32_QEMU_VERSION}/qemu"
-    TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
+    TOOLS_DIR_IN_PATH=$(echo "$PATH" | grep "${TOOLS_DIR}")
 
     if [ -e "${TOOLS_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
         echo "Extending PATH by ${TOOLS_DIR}/bin"
@@ -133,7 +132,7 @@ export_gdb()
     esac
 
     TOOLS_DIR="${TOOLS_PATH}/${GDB_ARCH}/${GDB_VERSION}/${GDB_ARCH}"
-    TOOLS_DIR_IN_PATH="$(echo $PATH | grep "${TOOLS_DIR}")"
+    TOOLS_DIR_IN_PATH=$(echo "$PATH" | grep "${TOOLS_DIR}")
 
     if [ -e "${TOOLS_DIR}" ] && [ -z "${TOOLS_DIR_IN_PATH}" ]; then
         echo "Extending PATH by ${TOOLS_DIR}/bin"
@@ -147,10 +146,11 @@ if [ -z "$1" ]; then
     echo "Usage: export.sh <tool>"
     echo "       export.sh gdb <platform>"
     echo "       export.sh qemu <platform>"
-    echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
+    echo "<tool> = all | gdb | openocd | qemu |"
+    echo "         esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32h2 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         export_arch "$arch"
     done
@@ -172,7 +172,7 @@ elif [ "$1" = "openocd" ]; then
 elif [ "$1" = "qemu" ]; then
     export_qemu $2
 else
-    export_arch $1
+    export_arch "$1"
 fi
 
 unset ESP32_GCC_RELEASE

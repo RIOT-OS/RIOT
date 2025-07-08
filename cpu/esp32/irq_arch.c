@@ -63,7 +63,8 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #endif /* SOC_TIMER_GROUPS > 1 */
 #if defined(CPU_FAM_ESP32)
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
-#elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || \
+      defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32H2)
     { ETS_SYSTIMER_TARGET2_EDGE_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #else
 #  error "Platform implementation is missing"
@@ -81,6 +82,7 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #if defined(SOC_BLE_SUPPORTED)
 #  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
     { ETS_RWBLE_INTR_SOURCE, CPU_INUM_BLE, 2 },
+#  elif defined(CPU_FAM_ESP32H2)
 #  else
 #    error "Platform implementation is missing"
 #  endif
@@ -95,8 +97,15 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_SDIO_HOST_INTR_SOURCE, CPU_INUM_SDMMC, 2 },
 #endif
 #if defined(SOC_TWAI_SUPPORTED)
+#  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || \
+      defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32C3)
     { ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN, 1 },
-#endif
+#  elif defined(CPU_FAM_ESP32H2)
+    { ETS_TWAI0_INTR_SOURCE, CPU_INUM_CAN, 1 },
+#  else
+#    error "Platform implementation is missing"
+#  endif
+#endif /* SOC_TWAI_SUPPORTED */
 #if defined(SOC_USB_OTG_SUPPORTED)
     { ETS_USB_INTR_SOURCE, CPU_INUM_USB, 1 },
 #endif
