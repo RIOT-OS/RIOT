@@ -8,6 +8,29 @@
 The Nucleo-F042K6 is a board from ST's Nucleo family supporting ARM Cortex-M0
 STM32F042K6 microcontroller with 6KiB of RAM and 32KiB of Flash.
 
+### MCU
+
+| MCU        |    STM32F042K6      |
+|:---------- |:------------------- |
+| Family     | ARM Cortex-M0       |
+| Vendor     | ST Microelectronics |
+| RAM        | 6KiB                |
+| Flash      | 32KiB               |
+| Frequency  | up to 48MHz         |
+| FPU        | no                  |
+| Timers     | 9 (5x 16-bit, 1x 32, 1x Systick, 2x Watchdog) |
+| ADC        | 1x 12-bit (10 channels) |
+| UARTs      | 2 (two USARTs)      |
+| SPIs       | 1                   |
+| CANs       | 1                   |
+| RTC        | 1                   |
+| I2Cs       | 1                   |
+| Vcc        | 2.0V - 3.6V         |
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32f042k6.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0215-stm32f0-series-cortexm0-programming-manual-stmicroelectronics.pdf) |
+| Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf) |
+
 ## Flashing the Board Using ST-LINK Removable Media
 
 On-board ST-LINK programmer provides via composite USB device removable media.
