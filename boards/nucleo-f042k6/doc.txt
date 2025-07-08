@@ -8,6 +8,10 @@
 The Nucleo-F042K6 is a board from ST's Nucleo family supporting ARM Cortex-M0
 STM32F042K6 microcontroller with 6KiB of RAM and 32KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-f031k6-and-more.svg "Pinout for the Nucleo-F042K6 (from ST User Manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 31)" width=25%
+
 ### MCU
 
 | MCU        |    STM32F042K6      |
