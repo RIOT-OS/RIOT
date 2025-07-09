@@ -1,27 +1,23 @@
-/*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2025 Gunar Schorcht
 
-/**
- * @defgroup     stdio_usb_serial_jtag  STDIO over ESP32 Debug Serial/JTAG
- * @ingroup      sys_stdio
- * @brief        STDIO via the USB Serial/JTAG debug interface found on some ESP32 SoCs
- *
- * Some members of the ESP32 family (ESP32-C3, ESP32-H2, ESP32-S3) provide a on-chip
- * debug interface that provides a serial console and JTAG via USB.
- *
- * To route STDIO to this debug console, enable this module.
- *
- *     USEMODULE += stdio_usb_serial_jtag
- *
- * @see          cpu_esp32
- */
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
 
-/**
+@defgroup     stdio_usb_serial_jtag  STDIO over ESP32 Debug Serial/JTAG
+@ingroup      sys_stdio
+@brief        STDIO via the USB Serial/JTAG debug interface found on some ESP32 SoCs
+
+Some members of the ESP32 family (ESP32-C3, ESP32-H2, ESP32-S3) provide a on-chip
+debug interface that provides a serial console and JTAG via USB.
+To route STDIO to this debug console, enable this module.
+
+    USEMODULE += stdio_usb_serial_jtag
+
+@see          cpu_esp32
+
 @defgroup   cpu_esp32 ESP32 SoC Series
 @ingroup    cpu
 @brief      Implementation for Espressif ESP32 SoC Series
@@ -2269,5 +2265,3 @@ pm_set (mode=2) at cpu/esp32/periph/pm.c:117
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_toc)
-
-*/
