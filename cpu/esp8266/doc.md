@@ -1,4 +1,11 @@
-/**
+<!--
+Copyright (C) 2025 Gunar Schorcht
+
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
 @defgroup        cpu_esp8266 ESP8266 / ESP8285
 @ingroup         cpu
 @brief           RIOT-OS port for Espressif's ESP8266 / ESP8285 MCUs
@@ -1305,5 +1312,3 @@ execution. If you know where you want to break before downloading the program
 to the target, you can use `gdbstub_do_break()` as much as you want.
 
 [Back to table of contents](#esp8266_toc)
-
-*/
