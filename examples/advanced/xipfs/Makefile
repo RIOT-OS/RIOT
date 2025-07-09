@@ -15,6 +15,9 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# XIPFS is currently not compatible with the llvm toolchain
+TOOLCHAINS_BLACKLIST += llvm
+
 BLOBS += hello-world.fae
 
 # Modules to include:
