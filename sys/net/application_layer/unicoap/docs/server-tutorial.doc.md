@@ -387,7 +387,8 @@ python3 client.py -m GET -u "coap://[fe80::c0:ff:ee%tap0]/greeting?name=RIOTeer"
 ```
 
 where `fe80::c0:ff:ee` is the IPv6 address of the RIOT interface behind the tap interface.
-Please refer to **TODO** to determine that IP address?!
+If you run the `examples/default` shell application and type `ifconfig` you should see a list of
+interfaces and their addresses. 
 
 You should see a number of debug logs from that script culminating in:
 
