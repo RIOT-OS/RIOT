@@ -1,0 +1,20 @@
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menu "libcoap_client"
+    depends on USEPKG_LIBCOAP
+
+config LIBCOAP_CLIENT_URI
+    string "CoAP URI to connect to"
+    default "coap://[fe80::405:5aff:fe15:9b7f]/.well-known/core"
+config LIBCOAP_USE_PSK
+    string "Secret to use for PSK communications"
+    default "secretPSK"
+    depends on USEMODULE_TINYDTLS
+config LIBCOAP_USE_PSK_ID
+    string "User ID to use for PSK communications"
+    default "user_abc"
+    depends on USEMODULE_TINYDTLS
+
+endmenu # libcoap_client
