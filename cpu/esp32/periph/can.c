@@ -40,6 +40,11 @@
 
 #define CAN     TWAI
 
+#ifdef CPU_FAM_ESP32H2
+#  define PERIPH_TWAI_MODULE    PERIPH_TWAI0_MODULE
+#  define ETS_TWAI_INTR_SOURCE  ETS_TWAI0_INTR_SOURCE
+#endif
+
 /** Common ESP CAN definitions */
 #define ESP_CAN_INTR_MASK   (0xffU)      /* interrupts handled by ESP CAN */
 #define ESP_CAN_CLOCK       APB_CLK_FREQ /* controller main clock */

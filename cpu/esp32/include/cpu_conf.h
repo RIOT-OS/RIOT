@@ -22,7 +22,7 @@
  */
 
 #if !defined(__ASSEMBLER__)
-#include <stdint.h>
+#  include <stdint.h>
 #endif
 
 /**
@@ -31,9 +31,9 @@
  */
 /** Extra thread stack size required if newlib-nano is not used */
 #ifdef MODULE_NEWLIB_NANO
-#define THREAD_EXTRA_STACKSIZE          (0)
+#  define THREAD_EXTRA_STACKSIZE        (0)
 #else
-#define THREAD_EXTRA_STACKSIZE          (512)
+#  define THREAD_EXTRA_STACKSIZE        (512)
 #endif
 
 /** Extra thread stack size if `printf` is used */
@@ -41,17 +41,17 @@
 
 #ifndef THREAD_STACKSIZE_DEFAULT
 /** Default thread stack size */
-#define THREAD_STACKSIZE_DEFAULT        (2048)
+#  define THREAD_STACKSIZE_DEFAULT      (2048)
 #endif
 
 #ifndef THREAD_STACKSIZE_IDLE
 /** Stack size for the idle thread */
-#define THREAD_STACKSIZE_IDLE           (2048)
+#  define THREAD_STACKSIZE_IDLE         (2048)
 #endif
 
 #ifndef ESP_WIFI_STACKSIZE
 /** Stack size for the WiFi thread */
-#define ESP_WIFI_STACKSIZE              (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE)
+#  define ESP_WIFI_STACKSIZE            (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE)
 #endif
 /** @} */
 
@@ -100,15 +100,17 @@ extern uint8_t _fp_mmu_start;
 
 /* include ESP32x SoC specific compile time configurations */
 #if defined(CPU_FAM_ESP32)
-#include "cpu_conf_esp32.h"
+#  include "cpu_conf_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
-#include "cpu_conf_esp32c3.h"
+#  include "cpu_conf_esp32c3.h"
+#elif defined(CPU_FAM_ESP32H2)
+#  include "cpu_conf_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)
-#include "cpu_conf_esp32s2.h"
+#  include "cpu_conf_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
-#include "cpu_conf_esp32s3.h"
+#  include "cpu_conf_esp32s3.h"
 #else
-#error "ESP32x family implementation missing"
+#  error "ESP32x family implementation missing"
 #endif
 
 #ifdef __cplusplus
