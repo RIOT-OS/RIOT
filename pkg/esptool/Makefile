@@ -13,4 +13,4 @@ clean::
 
 $(PKG_SOURCE_DIR)/venv/bin/esptool.py:
 	python3 -m venv $(PKG_SOURCE_DIR)/venv
-	$(PKG_SOURCE_DIR)/venv/bin/pip install esptool
+	$(PKG_SOURCE_DIR)/venv/bin/pip install esptool==4.9.0
