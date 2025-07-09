@@ -1324,7 +1324,10 @@ HTML_EXTRA_FILES       = src/css/bootstrap.min.css \
                          src/js/jquery.smartmenus.bootstrap.min.js \
                          src/js/jquery-ui.min.js \
                          src/js/menu.js \
-                         src/js/riot-doxy.js
+                         src/js/riot-doxy.js \
+                         ../../sys/net/application_layer/unicoap/docs/unicoap-layers.svg \
+                         ../../sys/net/application_layer/unicoap/docs/unicoap-layers-comms.svg \
+                         ../../sys/net/application_layer/unicoap/docs/unicoap-layers-comms-apis.svg
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
