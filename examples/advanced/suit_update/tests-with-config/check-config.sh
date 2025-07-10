@@ -1,11 +1,9 @@
 #! /bin/sh
 #
 # check_config.sh
-# Copyright (C) 2021 Martine Lenders <mail@martine-lenders.eu>
-# Copyright (C) 2022 Inria
-#
-# Distributed under terms of the MIT license.
-#
+# SPDX-FileCopyrightText: 2021 Martine Lenders <mail@martine-lenders.eu>
+# SPDX-FileCopyrightText: 2022 Inria
+# SPDX-License-Identifier: MIT
 
 ip link show dev "${IFACE}" > /dev/null
 RESULT=$?
