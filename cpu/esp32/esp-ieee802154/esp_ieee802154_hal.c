@@ -95,7 +95,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
             info->rssi = ieee802154_dbm_to_rssi(_rx_frame[len]);
             info->lqi = _rx_frame[len+1];
         }
-        memcpy(buf, &_rx_frame[1], len);
+        memcpy(buf, _rx_frame + 1, len);
         res = len;
     }
 
@@ -143,7 +143,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
         return (IS_ACTIVE(_USE_SET_RX) && esp_ieee802154_receive()) ? -EIO : 0;
     case IEEE802154_HAL_OP_SET_IDLE:
-        /* ctx = (bool *force) */
+        /* TODO: ctx = (bool *force) */
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_IDLE\n", __func__);
         return (IS_ACTIVE(_USE_SET_IDLE) && esp_ieee802154_sleep()) ? -EIO : 0;
         return 0;

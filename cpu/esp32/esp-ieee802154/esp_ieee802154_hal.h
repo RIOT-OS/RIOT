@@ -33,8 +33,8 @@ void esp_ieee802154_setup(ieee802154_dev_t *dev);
 /**
  * @brief Initialize the ESP32x IEEE 802.15.4 module.
  *
- * @return 0 on success
- * @return negative errno on error
+ * @retval 0 on success
+ * @retval negative errno on error
  */
 int esp_ieee802154_init(void);
 
