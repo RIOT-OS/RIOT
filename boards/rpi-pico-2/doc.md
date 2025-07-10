@@ -82,5 +82,6 @@ Currently RP2350 support is rather minimal, as such peripheral support is extrem
 - GPIO
 - Non-configurable write-only UART (UART0 using Pin 0 and 1)
     - The UART Baudrate is set to 115200.
+    - UART does not work via USB, you need to connect it directly to the GPIO pins.
 
 More peripherals will be added in the future. It should also be noted that we currently only support the Cortex M33 cores, not the RISC-V Hazard cores.
