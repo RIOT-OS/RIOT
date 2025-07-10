@@ -25,15 +25,17 @@
 #include "net/netdev/ieee802154_submac.h"
 
 /**
- * @brief   Define stack parameters for the MAC layer thread
- * @{
+ * @brief   Stack size for the MAC layer thread
  */
 #ifndef ESP_IEEE802154_MAC_STACKSIZE
-#define ESP_IEEE802154_MAC_STACKSIZE       (IEEE802154_STACKSIZE_DEFAULT)
+#  define ESP_IEEE802154_MAC_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #endif
 
+/**
+ * @brief   Priority of the MAC layer thread
+ */
 #ifndef ESP_IEEE802154_MAC_PRIO
-#define ESP_IEEE802154_MAC_PRIO            (GNRC_NETIF_PRIO)
+#  define ESP_IEEE802154_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
 static char _esp_ieee802154_stack[ESP_IEEE802154_MAC_STACKSIZE];
@@ -57,4 +59,3 @@ void auto_init_esp_ieee802154(void)
                                  ESP_IEEE802154_MAC_PRIO, "esp_ieee802154",
                                  &esp_ieee802154_netdev.dev.netdev);
 }
-/** @} */
