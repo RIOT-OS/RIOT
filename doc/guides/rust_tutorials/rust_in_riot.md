@@ -10,7 +10,7 @@ and tested for in applications using the Makefile line
 
 In addition to the regular RIOT build toolchain
 and a recent nightly Rust toolchain for the given target,
-using this also requires C2Rust with some patches applied to be installed;
+using this also requires C2Rust with some patches applied to be installed,
 see <a href="#toolchain">toolchain</a> for installation instructions.
 All these are readily available in the [official RIOT docker image],
 which gets used by default if `BUILD_IN_DOCKER=1` is set.
@@ -22,7 +22,7 @@ Examples
 
 Two examples are provided:
 
-* ``rust-hello-world`` is minimal in the sense of setup and code complexity; it is the typical Hello World example.
+* ``rust-hello-world`` is minimal in the sense of setup and code complexity, it is the typical Hello World example.
 
   (Note that it is not necessarily minimal in terms of build size,
   as Rust's regular printing infrastructure is more powerful and a bit heavier than your off-the-shelf ``printf``,
@@ -53,7 +53,7 @@ How it works
 ------------
 
 The easy part of the story is that Rust code gets compiled into a static library
-which is then linked together with the rest of the RIOT code;
+which is then linked together with the rest of the RIOT code,
 if the main function happens to be implemented in Rust, so it is.
 
 The **RIOT build system** contains rules and metadata to facilitate building and linking:
@@ -62,7 +62,7 @@ sets up paths to work well with out-of-tree builds,
 configures the Rust target depending on the board's CPU,
 and unpacks the static library into object files to facilitate interaction with XFA.
 
-The [**riot-sys**] crate translates a selected subset of RIOT's header files for use in Rust;
+The [**riot-sys**] crate translates a selected subset of RIOT's header files for use in Rust,
 this happens both using the [bindgen] crate (working from API information in header files)
 and [C2Rust] \(translating static inline functions, and with some help from riot-sys, constant preprocessor initializers).
 Functions exported by riot-sys are inherently unsafe to use (in Rust's sense of unsafe),
@@ -70,7 +70,7 @@ and may be somewhat volatile in their API due to mismatches between RIOT's / C's
 
 The [**riot-wrappers**] crate creates safe and idiomatic wrappers around the types and functions provided by riot-sys.
 Thanks to Rust's strong zero-cost abstractions, these often come at no increased runtime cost.
-For example, locking a [riot_wrappers::mutex::Mutex] can rely on it having been properly initialized at creation;
+For example, locking a [riot_wrappers::mutex::Mutex] can rely on it having been properly initialized at creation,
 furthermore, the mutex is freed when it goes out of scope.
 
 Where practical, the wrappers are not accessed through own methods
@@ -107,7 +107,7 @@ If the application is written in Rust,
 (This helps deduplicate between application and library code,
 and also avoids symbol name clashes).
 This is done by adding a dependency on the local `rust_riotmodules` crate (which is a no-op when no such modules are enabled),
-and placing an `extern crate rust_riotmodules;` statement in the code.
+and placing an `extern crate rust_riotmodules,` statement in the code.
 (The latter is needed even after most `extern crate` was abolished in 2018,
 because crates depended on but not used otherwise are usually not linked in).
 
@@ -147,10 +147,10 @@ consider installing this list of packages on Debian
 This encompass both components needed for riot-sys and for the later installation of C2Rust.
 
 
-In addition to the Rust compiler you'll need to install the C2Rust transpiler;
+In addition to the Rust compiler you'll need to install the C2Rust transpiler,
 as this is using some recent fixes, it is best installed as:
 
-<!-- The locked works around <https://github.com/dtolnay/proc-macro2/issues/475> as closed in <https://github.com/immunant/c2rust/pull/1197>; there is no newer release that could be tested. -->
+<!-- The locked works around <https://github.com/dtolnay/proc-macro2/issues/475> as closed in <https://github.com/immunant/c2rust/pull/1197>, there is no newer release that could be tested. -->
 ```shell
 $ cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0 --locked
 ```
@@ -189,7 +189,7 @@ The typical workflow of (C-nonbreaking, Rust-breaking) API changes is as follows
 
   The PR is tested against current master in its CI (albeit not for the full set of boards).
   To test whether it also works for the changed API,
-  a commit titled "REMOVEME Test with updated riot-wrappes" can be added to the original PR;
+  a commit titled "REMOVEME Test with updated riot-wrappes" can be added to the original PR,
   it alters `.cargo/config.toml` to point to the changed branch,
   and removes any Cargo.lock files in the RIOT tree.
 
@@ -215,7 +215,7 @@ There are a few variations that can occur:
   [See the phydat callback type change] for an example.
 
 * When neither casting nor type detection is sufficient,
-  a marker can be introduced through riot-sys;
+  a marker can be introduced through riot-sys,
   it detects a keyword's presence in the source and passes it as [information provided by riot-sys] to riot-wrappers.
   [See the coap_request_ctx_t change] for an example.
 
@@ -229,7 +229,7 @@ There are a few variations that can occur:
 * When functions are moved from being static and not being static,
   their names go from `riot_sys::inline::name` to `riot_sys::name` (or vice versa).
 
-  riot-sys [has a list] of items that are always publicly exported directly as `riot_sys::name`;
+  riot-sys [has a list] of items that are always publicly exported directly as `riot_sys::name`,
   just add the function there.
 
   If non-generic types are referenced in them, they go from `riot_sys::inline::my_type_t`  to `riot_sys::my_type_t`.
