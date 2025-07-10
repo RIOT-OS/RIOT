@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 Codecoup
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

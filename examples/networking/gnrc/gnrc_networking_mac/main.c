@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 INRIA
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

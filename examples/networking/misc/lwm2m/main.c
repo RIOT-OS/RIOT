@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2018 Beduino Master Projekt - University of Bremen
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
