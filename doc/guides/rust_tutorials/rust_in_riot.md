@@ -10,9 +10,7 @@ If you want to create a new application using Rust, you can start with the
 :::
 
 On supported CPUs, Rust can be used to develop RIOT applications.
-Support is indicated in the `has_rust_target` feature,
-and tested for in applications using the Makefile line
-`FEATURES_REQUIRED += rust_target`.
+Support is indicated in the `has_rust_target` feature.
 
 In addition to the regular RIOT build toolchain
 and a recent nightly Rust toolchain for the given target,
