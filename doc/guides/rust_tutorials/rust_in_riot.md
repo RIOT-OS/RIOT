@@ -25,15 +25,17 @@ which gets used by default if `BUILD_IN_DOCKER=1` is set.
 
 Two examples are provided:
 
-- `rust-hello-world` is minimal in the sense of setup and code complexity, it is the typical Hello World example.
+- `rust-hello-world` is minimal in the sense of setup and code complexity,
+    it is the typical Hello World example.
 
-  (Note that it is not necessarily minimal in terms of build size,
-  as Rust's regular printing infrastructure is more powerful and a bit heavier than your off-the-shelf `printf`,
-  which embedded libcs already often trim down).
+    (Note that it is not necessarily minimal in terms of build size,
+    as Rust's regular printing infrastructure is more powerful and a bit heavier
+    than your off-the-shelf `printf`,
+    which embedded libcs already often trim down).
 
 - `rust-gcoap` is a set of demo CoAP resources
-  both from the [coap-message-demos] crate (containing platform and library independent examples)
-  and from the [riot-module-examples] crate (containing RIOT specific examples).
+    both from the [coap-message-demos] crate (containing platform and library independent examples)
+    and from the [riot-module-examples] crate (containing RIOT specific examples).
 
 There are [additional examples] available on GitLab,
 maintained in coordination with the riot-wrappers crate.
@@ -65,13 +67,16 @@ and unpacks the static library into object files to facilitate interaction with 
 
 The [**riot-sys**] crate translates a selected subset of RIOT's header files for use in Rust,
 this happens both using the [bindgen] crate (working from API information in header files)
-and [C2Rust] \(translating static inline functions, and with some help from riot-sys, constant preprocessor initializers).
+and [C2Rust] \(translating static inline functions, and with some help from riot-sys,
+constant preprocessor initializers).
 Functions exported by riot-sys are inherently unsafe to use (in Rust's sense of unsafe),
-and may be somewhat volatile in their API due to mismatches between RIOT's / C's and Rust's API stability concepts.
+and may be somewhat volatile in their API due to mismatches between RIOT's / C's
+and Rust's API stability concepts.
 
 The [**riot-wrappers**] crate creates safe and idiomatic wrappers around the types and functions provided by riot-sys.
 Thanks to Rust's strong zero-cost abstractions, these often come at no increased runtime cost.
-For example, locking a [riot_wrappers::mutex::Mutex] can rely on it having been properly initialized at creation,
+For example, locking a [riot_wrappers::mutex::Mutex]
+can rely on it having been properly initialized at creation,
 furthermore, the mutex is freed when it goes out of scope.
 
 Where practical, the wrappers are not accessed through own methods
@@ -94,7 +99,8 @@ The wrappers are [documented together with riot-sys and some of the examples].
 
 It is possible to use Rust in different modules than the application itself.
 
-Such modules are usually pseudomodules (although they may be mixed with C in regular modules as well).
+Such modules are usually pseudomodules
+(although they may be mixed with C in regular modules as well).
 They always depend on the `rust_riotmodules` module / crate,
 which collects all enabled modules into a single crate by means of optional features.
 
@@ -106,7 +112,8 @@ If the application is written in Rust,
 `rust_riotmodules` needs to be added as a dependency of the application.
 (This helps deduplicate between application and library code,
 and also avoids symbol name clashes).
-This is done by adding a dependency on the local `rust_riotmodules` crate (which is a no-op when no such modules are enabled),
+This is done by adding a dependency on the local `rust_riotmodules` crate
+(which is a no-op when no such modules are enabled),
 and placing an `extern crate rust_riotmodules,` statement in the code.
 (The latter is needed even after most `extern crate` was abolished in 2018,
 because crates depended on but not used otherwise are usually not linked in).
@@ -127,7 +134,8 @@ $ rustup target add thumbv7m-none-eabi
 
 Substitute `thumbv7m-none-eabi` with the value of `RUST_TARGET`
 in the output of `make info-build` of an application that has your current board selected
-(or just add it later whenever the Rust compiler complains about not finding the core library for a given target).
+(or just add it later whenever the Rust compiler complains about not finding
+the core library for a given target).
 Using the beta or nightly toolchains will work just as well
 if they are selected through rustup's override mechanism.
 
@@ -141,7 +149,7 @@ consider installing this list of packages on Debian
 # apt install libclang-dev llvm llvm-dev cmake libssl-dev pkg-config
 ```
 
-This encompass both components needed for riot-sys and for the later installation of C2Rust.
+This encompasses both components needed for riot-sys and for the later installation of C2Rust.
 
 In addition to the Rust compiler you'll need to install the C2Rust transpiler,
 as this is using some recent fixes, it is best installed as:
@@ -152,24 +160,27 @@ as this is using some recent fixes, it is best installed as:
 $ cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0 --locked
 ```
 
-If multiple versions of LLVM are installed locally, it may be necessary to prefix it with the selected LLVM version:
+If multiple versions of LLVM are installed locally,
+it may be necessary to prefix it with the selected LLVM version:
 
 ```
 $ LLVM_CONFIG_PATH=/usr/bin/llvm-config-16 cargo install …
 ```
 
 [cargo]: https://doc.rust-lang.org/cargo/
-[**rustup**, installed as described on its website]: https://rustup.rs/
+[**rustup**, installed as described on its project website]: https://rustup.rs/
 
 ## Maintenance
 
 The [riot-sys] and [riot-wrappers] crates are currently maintained as parts of the RIOT project.
-While being released via crates.io on demand, usually RIOT uses a fixed version from the git repositories that are [easily updated].
+While being released via crates.io on demand,
+usually RIOT uses a fixed version from the git repositories that are [easily updated].
 
 The autogenerated bindings of the C API are slightly stricter than C's API,
 and thus occasionally require additional work when C APIs change subtly.
 The riot-sys crate takes the brunt of these changes --
-it changes automatically, and no attempt is currently made to reflect these changes in a SemVer compatible manner.
+it changes automatically, and no attempt is currently made
+to reflect these changes in a SemVer compatible manner.
 The riot-wrappers crate smooths this out,
 and provides an API that aims to be more stable than the C API.
 It does that by generously converting types that changed,
@@ -179,66 +190,72 @@ The typical workflow of (C-nonbreaking, Rust-breaking) API changes is as follows
 
 - A PR subtly alters a type (eg. `uint8_t *` to `void *` in [#17990]).
 
-  Consequently, builds of Rust examples break.
+    Consequently, builds of Rust examples break.
 
-- A PR is opened on riot-wrappers to smooth over the change, like [aab605f4] <!-- commit reference rather than PR as that was still on GitLab back then -->.
+- A PR is opened on riot-wrappers to smooth over the change, like [aab605f4]
+<!-- commit reference rather than PR as that was still on GitLab back then -->.
 
-  The PR is tested against current master in its CI (albeit not for the full set of boards).
-  To test whether it also works for the changed API,
-  a commit titled "REMOVEME Test with updated riot-wrappes" can be added to the original PR,
-  it alters `.cargo/config.toml` to point to the changed branch,
-  and removes any Cargo.lock files in the RIOT tree.
+    The PR is tested against current master in its CI (albeit not for the full set of boards).
+    To test whether it also works for the changed API,
+    a commit titled "REMOVEME Test with updated riot-wrappes" can be added to the original PR,
+    it alters `.cargo/config.toml` to point to the changed branch,
+    and removes any Cargo.lock files in the RIOT tree.
 
-  That PR is then merged.
+    That PR is then merged.
 
 - The version of riot-wrappers that works both with the previous and the new code
-  is pulled into the RIOT master branch by updating the Cargo.lock files.
-  The PR can look like [#18181], and verifies that the new riot-wrappers works on all boards.
+    is pulled into the RIOT master branch by updating the Cargo.lock files.
+    The PR can look like [#18181], and verifies that the new riot-wrappers works on all boards.
 
-  That PR is then merged.
+    That PR is then merged.
 
 - For the next builds (up to the merging of) the original PR,
-  the REMOVEME commit can be removed.
+    the REMOVEME commit can be removed.
 
-  It is good practice to rebase it onto the latest master after the update to riot-wrappers has been merged,
-  as this helps keeping bisectability up.
+    It is good practice to rebase it onto the latest master after
+    the update to riot-wrappers has been merged,
+    as this helps keeping bisectability up.
 
-  The PR now contains no Rust specific changes, and can be merged.
+    The PR now contains no Rust specific changes, and can be merged.
 
 There are a few variations that can occur:
 
 - Sometimes casting is not enough, and a type must be extracted from a signature.
-  [See the phydat callback type change] for an example.
+    [See the phydat callback type change] for an example.
 
 - When neither casting nor type detection is sufficient,
-  a marker can be introduced through riot-sys,
-  it detects a keyword's presence in the source and passes it as [information provided by riot-sys] to riot-wrappers.
-  [See the coap_request_ctx_t change] for an example.
+    a marker can be introduced through riot-sys,
+    it detects a keyword's presence in the source and passes it as
+    [information provided by riot-sys] to riot-wrappers.
+    [See the coap_request_ctx_t change] for an example.
 
-  In that case, a riot-sys PR is opened in parallel to the riot-wrappers PR.
+    In that case, a riot-sys PR is opened in parallel to the riot-wrappers PR.
 
-  This method helps keeping changes backportable easily:
-  riot-sys and riot-wrappers are expected to work with the latest released version of RIOT all the time,
-  and avoid flag-day changes.
-  (Keeping riot-sys and riot-wrappers compatible with the latest release is also important to retain the ability to backport fixes).
+    This method helps keeping changes backportable easily:
+    riot-sys and riot-wrappers are expected to work with the latest released
+    version of RIOT all the time,
+    and avoid flag-day changes.
+    (Keeping riot-sys and riot-wrappers compatible with the latest release
+    is also important to retain the ability to backport fixes).
 
 - When functions are moved from being static and not being static,
-  their names go from `riot_sys::inline::name` to `riot_sys::name` (or vice versa).
+    their names go from `riot_sys::inline::name` to `riot_sys::name` (or vice versa).
 
-  riot-sys [has a list] of items that are always publicly exported directly as `riot_sys::name`,
-  just add the function there.
+    riot-sys [has a list] of items that are always publicly exported directly as `riot_sys::name`,
+    just add the function there.
 
-  If non-generic types are referenced in them, they go from `riot_sys::inline::my_type_t` to `riot_sys::my_type_t`.
-  The [inline_cast] function family helps making that cast a bit safer.
+    If non-generic types are referenced in them,
+    they go from `riot_sys::inline::my_type_t` to `riot_sys::my_type_t`.
+    The [inline_cast] function family helps making that cast a bit safer.
 
 - Things fail around atomics.
 
-  Until [C2Rust's support for atomics has improved],
-  riot-sys requires all exported headers to use the better supported `atomic_utils.h`.
+    Until [C2Rust's support for atomics has improved],
+    riot-sys requires all exported headers to use the better supported `atomic_utils.h`.
 
-  If it is unavoidable that atomics are part of header files
-  (and not actually used in any static inline functions),
-  riot-sys's [atomics workarounds] can be extended as a last resort.
+    If it is unavoidable that atomics are part of header files
+    (and not actually used in any static inline functions),
+    riot-sys's [atomics workarounds] can be extended as a last resort.
 
 [riot-wrappers]: https://github.com/RIOT-OS/rust-riot-wrappers/
 [riot-sys]: https://github.com/RIOT-OS/rust-riot-sys/
