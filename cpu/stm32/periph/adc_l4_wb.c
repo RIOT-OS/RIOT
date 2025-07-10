@@ -35,6 +35,9 @@
 #if defined ADC_DEVS && ADC_DEVS == 1
 #define ADC ADC1_COMMON
 #endif
+#if defined ADC_DEVS && ADC_DEVS == 2
+#define ADC ADC12_COMMON
+#endif
 #if defined ADC_DEVS && ADC_DEVS == 3
 #define ADC ADC123_COMMON
 #endif
