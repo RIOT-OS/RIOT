@@ -24,7 +24,7 @@ Two examples are provided:
 
 * ``rust-hello-world`` is minimal in the sense of setup and code complexity; it is the typical Hello World example.
 
-  (Note that it is not necessarily minimal in terms of built size,
+  (Note that it is not necessarily minimal in terms of build size,
   as Rust's regular printing infrastructure is more powerful and a bit heavier than your off-the-shelf ``printf``,
   which embedded libcs already often trim down).
 
@@ -114,9 +114,12 @@ because crates depended on but not used otherwise are usually not linked in).
 Toolchain {#toolchain}
 ---------
 
-To install the necessary Rust components, it is easiest use [**rustup**, installed as described on its website].
 
-Using Rust on RIOT needs the latest stable version of Rust.
+Using Rust on RIOT needs the latest stable version of Rust. Please note that
+many popular Linux distributions provide very old versions in their
+repositories. Therefore to install the necessary Rust components, it is
+recommended and easiest to use [**rustup**, installed as described
+on its project website].
 
 Make sure you have the core library for the CPU (**target**) of your choice available:
 
@@ -124,7 +127,7 @@ Make sure you have the core library for the CPU (**target**) of your choice avai
 $ rustup target add thumbv7m-none-eabi
 ```
 
-Substitute thumbv7m-none-eabi with the value of `RUST_TARGET`
+Substitute `thumbv7m-none-eabi` with the value of `RUST_TARGET`
 in the output of `make info-build` of an application that has your current board selected
 (or just add it later whenever the Rust compiler complains about not finding the core library for a given target).
 Using the beta or nightly toolchains will work just as well
