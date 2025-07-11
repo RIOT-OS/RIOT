@@ -1,4 +1,3 @@
-/**
 @defgroup        boards_cc2650_launchpad TI CC2650 LaunchPad XL
 @ingroup         boards
 @brief           Texas Instruments SimpleLink(TM) CC2650 Wireless MCU LaunchPad(TM) Kit
@@ -59,5 +58,3 @@ Now we can just do `make flash` and `make debug`, this all using OpenOCD.
 For detailed information about CC2650 MCUs as well as configuring, compiling
 RIOT and installation of flashing tools for CC2650 boards,
 see \ref cc26xx_cc13xx_riot.
-
-*/

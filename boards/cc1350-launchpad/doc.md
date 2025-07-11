@@ -1,4 +1,3 @@
-/**
 @defgroup        boards_cc1350_launchpad TI CC1350 LaunchPad XL
 @ingroup         boards
 @brief           Texas Instruments SimpleLink(TM) CC1350 Wireless MCU LaunchPad(TM) Kit
@@ -76,5 +75,3 @@ level shifter when connecting to 5V UART.
 For detailed information about CC1350 MCUs as well as configuring, compiling
 RIOT and installation of flashing tools for CC1350 boards,
 see \ref cc26xx_cc13xx_riot.
-
-*/

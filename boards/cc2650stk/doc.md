@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_cc2650stk CC2650STK
 @ingroup     boards
 @brief       Support for the SimpleLink™ CC2650 sensor tag
@@ -215,4 +214,3 @@ on all three channels you can create three ble_rop_cmd_t commands and chain them
 via `cmd.pNextOp`.
 3. Send the command to be executed to the RF core via the `rfc_send_cmd()`
 function
- */

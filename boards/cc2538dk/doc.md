@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_cc2538dk CC2538DK
 @ingroup     boards
 @brief       Support for the Texas Instruments CC2538DK board.
@@ -147,4 +146,3 @@ $ sudo kextload /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
 If everything worked, the XDS will be enumerated as
 `/dev/tty.usbserial-<serial-number>`
- */
