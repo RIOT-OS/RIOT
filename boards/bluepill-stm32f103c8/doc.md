@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_bluepill_stm32f103c8 Bluepill STM32F103C8 board
 @ingroup     boards
 @brief       Support for the stm32f103c8 based bluepill board.
@@ -12,5 +11,3 @@ in @ref boards_common_blxxxpill instead.
 
 The [STM32-base](https://stm32-base.org/boards/STM32F103C8T6-Blue-Pill.html)
 page on the bluepill contains additional info on the hardware.
-
- */

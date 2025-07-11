@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_bluepill-stm32f030c8 STM32F030C8 based Bluepill
 @ingroup     boards
 @brief       Support for the STM32F030C8 based Bluepill
@@ -61,5 +60,3 @@ reset button.
 You can work around this by pressing the reset button when OpenOCD wants to connect
 to the Blue Pill, or keep it pressed until OpenOCD tries to connect.
 Hit the reset button again after flashing in order to boot the newly flashed image.
-
- */

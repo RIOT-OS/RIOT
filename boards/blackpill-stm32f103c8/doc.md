@@ -1,5 +1,4 @@
-/**
-@defgroup    boards_blackpill_stm32f103cb Blackpill STM32F103CB board (128KiB flash)
+@defgroup    boards_blackpill_stm32f103c8 Blackpill STM32F103C8 board
 @ingroup     boards
 @brief       Support for the stm32f103c8 based blackpill board.
 
@@ -12,5 +11,3 @@ in @ref boards_common_blxxxpill instead.
 
 The [STM32-base](https://stm32-base.org/boards/STM32F103C8T6-Black-Pill.html)
 page on the blackpill contains additional info on the hardware.
-
- */
