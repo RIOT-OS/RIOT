@@ -35,7 +35,7 @@ void esp_ieee802154_setup(ieee802154_dev_t *dev);
  *
  * The function 
  * - initializes the ESP32x 802.15.4 subsystem,
- * - clears the source matching table for short and extended adresses,
+ * - clears the source matching table for short and extended addresses,
  * - enables the radio in idle state,
  * - sets the CCA mode to energy detection only (IEEE802154_CCA_MODE_ED_THRESHOLD),
  * - sets the timeout for the ACK frame, and
