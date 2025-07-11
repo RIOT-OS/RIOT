@@ -435,6 +435,7 @@ PSEUDOMODULES += shell_cmd_iw
 PSEUDOMODULES += shell_cmd_lwip_netif
 PSEUDOMODULES += shell_cmd_mci
 PSEUDOMODULES += shell_cmd_md5sum
+PSEUDOMODULES += shell_cmd_mtd
 PSEUDOMODULES += shell_cmd_nanocoap_vfs
 PSEUDOMODULES += shell_cmd_netstats_neighbor
 PSEUDOMODULES += shell_cmd_nice
