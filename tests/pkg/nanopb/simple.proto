@@ -2,8 +2,11 @@
 // one message.
 
 syntax = "proto2";
-import "nanopb.proto";
 
 message SimpleMessage {
-    required int32 lucky_number = 1;
+    enum Enum {
+        lucky = 13;
+    };
+
+    optional Enum number = 1;
 }
