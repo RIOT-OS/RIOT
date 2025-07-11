@@ -110,7 +110,7 @@
  *
  * Be aware that the condition checking is fenced but not atomic w.r. to
  * signaling, so you have to ensure that by other means. E.g. in the example
- * code above this is enforced by atomic_load_u64().
+ * code above this is enforced by @ref atomic_load_u64().
  *
  * ### When to use?
  *
@@ -224,7 +224,7 @@ static inline void queue_wake_all(wait_queue_t *wait_queue)
         wait_queue_leave(wq);       \
     } while (0)
 
-#if IS_USED(MODULE_ZTIMER)
+#if IS_USED(MODULE_ZTIMER) || DOXYGEN
 #  include "ztimer.h"
 
 /**
