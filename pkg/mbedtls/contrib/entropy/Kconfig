@@ -4,7 +4,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menu "mbed TLS mbedtls entropy"
+menu "mbed TLS entropy"
     depends on USEMODULE_MBEDTLS_ENTROPY
 
 config MBEDTLS_ENTROPY_HARDWARE_ALT
@@ -28,7 +28,7 @@ config MBEDTLS_NO_PLATFORM_ENTROPY
 config MBEDTLS_ENTROPY_FORCE_SHA256
     bool "Force the entropy accumulator to use a SHA-256."
     default y
-    depends on MBEDTLS_SHA256_C
+    select MBEDTLS_SHA256
     help
         Force the entropy accumulator to use a SHA-256
         accumulator instead of the default SHA-512 based
@@ -36,4 +36,4 @@ config MBEDTLS_ENTROPY_FORCE_SHA256
         can be much faster than SHA-512. Use this option if you
         have performance concerns.
 
-endmenu # mbed TLS mbedtls entropy
+endmenu # mbed TLS entropy
