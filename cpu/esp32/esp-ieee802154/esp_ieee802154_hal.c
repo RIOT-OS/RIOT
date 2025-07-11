@@ -15,6 +15,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* ACK frame timeout should be a multiple of 16 */
+#define ESP_IEEE802154_ACK_TIMEOUT  (3456)
+
+_Static_assert((3456 % 16 == 0), "ACK frame timeout should be a multiple of 16");
+
 /* Although the device driver supports IEEE802154_CAP_IRQ_TX_START,
  * IEEE802154_CAP_IRQ_RX_START and IEEE802154_CAP_IRQ_CCA_DONE, we are not
  * using it for now to avoid unnecessary performance degradation as it is
@@ -420,7 +425,7 @@ int esp_ieee802154_init(void)
     esp_ieee802154_set_rx_when_idle(true);
     esp_ieee802154_receive();
     esp_ieee802154_set_cca_mode(ESP_IEEE802154_CCA_MODE_ED);
-    esp_ieee802154_set_ack_timeout(3456);    /* should be a multiple of 16 */
+    esp_ieee802154_set_ack_timeout(ESP_IEEE802154_ACK_TIMEOUT);
     esp_ieee802154_set_promiscuous(false);
 
     return 0;
