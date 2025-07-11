@@ -15,8 +15,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* ACK frame timeout should be a multiple of 16 */
-#define ESP_IEEE802154_ACK_TIMEOUT  (3456)
+/* ACK frame timeout in microseconds, should be a multiple of 16 */
+#define ESP_IEEE802154_ACK_TIMEOUT_US (3456)
 
 _Static_assert((3456 % 16 == 0), "ACK frame timeout should be a multiple of 16");
 
@@ -425,7 +425,7 @@ int esp_ieee802154_init(void)
     esp_ieee802154_set_rx_when_idle(true);
     esp_ieee802154_receive();
     esp_ieee802154_set_cca_mode(ESP_IEEE802154_CCA_MODE_ED);
-    esp_ieee802154_set_ack_timeout(ESP_IEEE802154_ACK_TIMEOUT);
+    esp_ieee802154_set_ack_timeout(ESP_IEEE802154_ACK_TIMEOUT_US);
     esp_ieee802154_set_promiscuous(false);
 
     return 0;
