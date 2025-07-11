@@ -72,22 +72,6 @@
 #endif /* !MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE */
 
 /*
- * Macro definitions
- */
-
-/**
- * @internal
- *
- * @def UNUSED
- *
- * @brief The most versatile macro for disabling warnings
- * related to unused variables
- *
- * @param x The unused variable name
- */
-#define UNUSED(x) ((void)(x))
-
-/*
  * Helper functions
  */
 
@@ -478,7 +462,7 @@ static int _mount(vfs_mount_t *vfs_mp)
 
 static int _umount(vfs_mount_t *vfs_mp)
 {
-    UNUSED(vfs_mp);
+    (void)vfs_mp;
 
     /* nothing to do */
 
@@ -617,8 +601,9 @@ static int get_temperature(void) {
     phydat_t physical_data;
     saul_reg_t *device = saul_reg_find_type(SAUL_SENSE_TEMP);
     int res = saul_reg_read(device, &physical_data);
-    if (res < 0)
+    if (res < 0) {
         return res;
+    }
 
     return physical_data.val[0];
 }
@@ -627,8 +612,9 @@ static int get_led(int pos) {
     phydat_t    physical_data;
     saul_reg_t *device = saul_reg_find_nth(pos);
     int res = saul_reg_read(device, &physical_data);
-    if (res < 0)
+    if (res < 0) {
         return res;
+    }
 
     return physical_data.val[0];
 }
@@ -677,8 +663,9 @@ static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
     if (ret < 0) {
         return ret;
     }
-    if (nbyte > file_size)
+    if (nbyte > file_size) {
         nbyte = file_size;
+    }
     if (full_path == NULL) {
         return -EFAULT;
     }
@@ -701,7 +688,6 @@ static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
 
     return nbyte;
 }
-
 
 static const void *xipfs_user_syscalls_table[XIPFS_USER_SYSCALL_MAX] = {
     [       XIPFS_USER_SYSCALL_PRINTF] = vprintf,
@@ -776,14 +762,14 @@ const vfs_file_system_t xipfs_file_system = {
     .d_op = &xipfs_dir_ops,
 };
 
-
 int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path,
                                    mutex_t *execution_mutex, mutex_t *mutex,
                                    vfs_xipfs_mount_t *vfs_xipfs_mount) {
 
     if (   (flashpage == NULL) || (path == NULL) || (path[0] == '\0')
-        || (execution_mutex == NULL) || (mutex == NULL) )
+        || (execution_mutex == NULL) || (mutex == NULL) ) {
         return -EINVAL;
+    }
 
     vfs_xipfs_mount->vfs_mp.fs          = &xipfs_file_system;
     vfs_xipfs_mount->vfs_mp.mount_point = path;

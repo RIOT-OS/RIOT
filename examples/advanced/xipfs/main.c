@@ -32,7 +32,7 @@
  *
  * @brief This macro handles fatal errors
  */
-#define PANIC() for (;;);
+#define PANIC() for (;;) {}
 
 /**
  * @def NVME0P0_PAGE_NUM
@@ -167,7 +167,6 @@ int execution_handler(int argc, char **argv) {
         NULL
     };
 
-
     int ret = xipfs_extended_driver_execv(FILENAME_OF_HELLO_WORLD_FAE, exec_argv);
     if (ret < 0) {
         printf("Failed to execute '%s' : error=%d\n", FILENAME_OF_HELLO_WORLD_FAE, ret);
@@ -182,12 +181,11 @@ static shell_command_t shell_commands[] = {
     {NULL, NULL, NULL},
 };
 
-#else // BOARD_DWM1001
+#else /* BOARD_DWM1001 */
 
-#define shell_commands NULL
+static shell_command_t shell_commands[] = { {NULL, NULL, NULL} };
 
-#endif // BOARD_DWM1001
-
+#endif /* BOARD_DWM1001 */
 
 /**
  * @internal
@@ -198,7 +196,6 @@ static shell_command_t shell_commands[] = {
  * @param xipfs_mp A pointer to a memory region containing an
  * xipfs mount point structure
  */
-
 static void mount_or_format(vfs_xipfs_mount_t *xipfs_mp)
 {
     if (vfs_mount(&xipfs_mp->vfs_mp) < 0) {
@@ -216,7 +213,6 @@ static void mount_or_format(vfs_xipfs_mount_t *xipfs_mp)
     }
     printf("vfs_mount: \"%s\": OK\n", xipfs_mp->vfs_mp.mount_point);
 }
-
 
 int main(void)
 {

@@ -31,13 +31,14 @@ static char *execute_file_handler_args[XIPFS_EXEC_ARGC_MAX];
 
 static int _execute_file_handler(int argc, char **argv) {
     if ( (argc == 1) || (argc > XIPFS_EXEC_ARGC_MAX) ) {
-        printf("Usage %s xipfs_executable_filename [arg0] [arg1] ... [arg%d]\n", argv[0], (XIPFS_EXEC_ARGC_MAX - 1));
+        printf("Usage %s xipfs_executable_filename [arg0] [arg1] ... [arg%d]\n",
+               argv[0], (XIPFS_EXEC_ARGC_MAX - 1));
         printf("\t- xipfs_executable_filename : filename of the desired XIPFS file to execute\n");
         return 1;
     }
 
     memset(execute_file_handler_args, 0, sizeof(execute_file_handler_args));
-    for(int i = 1; i <argc; ++i) {
+    for (int i = 1; i <argc; ++i) {
         execute_file_handler_args[i-1] = argv[i];
     }
 
@@ -51,7 +52,6 @@ static int _execute_file_handler(int argc, char **argv) {
 }
 
 SHELL_COMMAND(execute, "Execute an XIPFS file", _execute_file_handler);
-
 
 static void print_create_executable_file_usage(int argc, char **argv) {
     (void)argc;
@@ -90,4 +90,4 @@ static int _create_executable_file(int argc, char **argv) {
 
 SHELL_COMMAND(create_executable, "Create an XIPFS executable file", _create_executable_file);
 
-#endif // MODULE_XIPFS_FS
+#endif /* MODULE_XIPFS_FS */

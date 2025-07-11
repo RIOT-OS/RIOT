@@ -32,7 +32,7 @@
  *
  * @brief This macro handles fatal errors
  */
-#define PANIC() for (;;);
+#define PANIC() for (;;) {}
 
 /**
  * @def NVME0P0_PAGE_NUM
@@ -41,13 +41,13 @@
  */
 #define NVME0P0_PAGE_NUM 20
 
-#define XIPFS_ASSERT(condition)  \
-do {                             \
-    if (!(condition)) {          \
+#define XIPFS_ASSERT(condition)       \
+do {                                  \
+    if (!(condition)) {               \
         printf("Line %d ", __LINE__); \
-    }                            \
-    assert((condition));           \
-}while(0)
+    }                                 \
+    assert((condition));              \
+} while (0)
 
 /*
  * Allocate a new contiguous space for the nvme0p0 file system
@@ -57,8 +57,7 @@ XIPFS_NEW_PARTITION(nvme0p0, "/dev/nvme0p0", NVME0P0_PAGE_NUM);
 /*
  * Get a pointer to an xipfs_mount_t from a vfs_xipfs_mount_t
  */
-xipfs_mount_t *xipfs_nvme0p0 = NULL; //(xipfs_mount_t *)&nvme0p0.magic;
-
+xipfs_mount_t *xipfs_nvme0p0 = NULL;
 
 /*
  * Test function prototypes
@@ -149,14 +148,14 @@ static void test_xipfs_rename_enotdir_from_path_empty_dir_to_path_file(void);
 static void test_xipfs_rename_enotempty_from_path_empty_dir_to_path_nonempty_dir(void);
 static void test_xipfs_rename_enotdir_from_path_empty_dir_to_path_not_dirs(void);
 static void test_xipfs_rename_enoent_from_path_empty_dir_to_path_not_found(void);
-static void test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_creatable_trailing_slash(void);
+static void test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_trailing_slash(void);
 static void test_xipfs_rename_einval_from_path_empty_dir_to_path_creatable_subdir_itself(void);
 static void test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_file(void);
 static void test_xipfs_rename_einval_from_path_nonempty_dir_to_path_empty_dir_subdir_itself(void);
 static void test_xipfs_rename_enotempty_from_path_nonempty_dir_to_path_nonempty_dir(void);
 static void test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_not_dirs(void);
 static void test_xipfs_rename_enoent_from_path_nonempty_dir_to_path_not_found(void);
-static void test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_creatable_trailing_slash(void);
+static void test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_trailing_slash(void);
 static void test_xipfs_rename_enotdir_from_path_not_dirs(void);
 static void test_xipfs_rename_enoent_from_path_not_found(void);
 static void test_xipfs_rename_ok(void);
@@ -190,8 +189,6 @@ static void test_xipfs_execv_efault_syscalls_table_with_null(void);
 static void test_xipfs_execv_eisdir_path(void);
 static void test_xipfs_execv_enotdir_path(void);
 static void test_xipfs_execv_enoent_path(void);
-
-
 
 void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     int ret;
@@ -324,14 +321,14 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     test_xipfs_rename_enotempty_from_path_empty_dir_to_path_nonempty_dir();
     test_xipfs_rename_enotdir_from_path_empty_dir_to_path_not_dirs();
     test_xipfs_rename_enoent_from_path_empty_dir_to_path_not_found();
-    test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_creatable_trailing_slash();
+    test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_trailing_slash();
     test_xipfs_rename_einval_from_path_empty_dir_to_path_creatable_subdir_itself();
     test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_file();
     test_xipfs_rename_einval_from_path_nonempty_dir_to_path_empty_dir_subdir_itself();
     test_xipfs_rename_enotempty_from_path_nonempty_dir_to_path_nonempty_dir();
     test_xipfs_rename_enotdir_from_path_nonempty_dir_to_path_not_dirs();
     test_xipfs_rename_enoent_from_path_nonempty_dir_to_path_not_found();
-    test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_creatable_trailing_slash();
+    test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_trailing_slash();
     test_xipfs_rename_enotdir_from_path_not_dirs();
     test_xipfs_rename_enoent_from_path_not_found();
     test_xipfs_rename_ok();
@@ -382,8 +379,6 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     printf("Tests finished.\n");
 }
 
-
-
 /*
  * Entry point
  */
@@ -415,8 +410,7 @@ int main(void)
         test_xipfs_suite(&vfs_xipfs_mount);
     }
 
-
-    for (;;);
+    for (;;) {}
 }
 
 /*
@@ -658,7 +652,6 @@ static void test_xipfs_open_enametoolong_name(void)
             O_CREAT, 0);
     XIPFS_ASSERT(ret == -ENAMETOOLONG);
 }
-
 
 static void test_xipfs_open_eexist_xipfs_infos_flags(void)
 {
@@ -1780,7 +1773,7 @@ static void test_xipfs_rename_enoent_from_path_empty_dir_to_path_not_found(void)
     XIPFS_ASSERT(ret == 0);
 }
 
-static void test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_creatable_trailing_slash(void)
+static void test_xipfs_rename_enametoolong_from_path_empty_dir_to_path_trailing_slash(void)
 {
     int ret;
 
@@ -1932,7 +1925,7 @@ static void test_xipfs_rename_enoent_from_path_nonempty_dir_to_path_not_found(vo
     XIPFS_ASSERT(ret == 0);
 }
 
-static void test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_creatable_trailing_slash(void)
+static void test_xipfs_rename_enametoolong_from_path_nonempty_dir_to_path_trailing_slash(void)
 {
     int ret;
 

@@ -32,9 +32,9 @@ necessary functions to interact with the flash controller.
   increases the risk of undetected data corruption, as there is no
   mechanism to ensure that files have not been altered or damaged.
 
-- Global file system lock: `xipfs` needs a global file system lock. A
-  global file system lock can lead to performance bottlenecks, as it
-  prevents multiple threads from accessing the file system
+- Per mountpoint file system lock: `xipfs` needs a file system lock per
+  mountpoint. Such a mechanism can lead to performance bottlenecks,
+  as it prevents multiple threads from accessing the file system montpoint
   simultaneously.
 
 - Fixed file size: `xipfs` provide fixed file size. By default, a file

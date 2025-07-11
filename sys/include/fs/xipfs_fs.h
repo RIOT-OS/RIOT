@@ -64,7 +64,6 @@ extern "C" {
         .mutex = &mutex_##id                          \
     }
 
-
 /**
  * @brief xipfs descriptor for vfs integration
  *
@@ -88,7 +87,6 @@ typedef struct vfs_xipfs_mount_s {
 /** The xipfs vfs driver */
 extern const vfs_file_system_t xipfs_file_system;
 
-
 /**
  * @brief vfs_xipfs_mount_t constructor from a mtd_flashpage_t.
  *
@@ -109,7 +107,6 @@ extern const vfs_file_system_t xipfs_file_system;
 int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path,
                                    mutex_t *execution_mutex, mutex_t *mutex,
                                    vfs_xipfs_mount_t *vfs_xipfs_mount);
-
 
 /* Extended driver handling executables */
 
@@ -134,7 +131,7 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_
  *
  * @param full_path A full path such as `/dev/nvme0p0/my_executable_file`
  *
- * @param argv Executable arguments. Cannot be NULL, at least argv[0] contains the executable filename.
+ * @param argv Executable arguments. Cannot be NULL, argv[0] contains the executable filename.
  *
  * @retval Less than 0 on errors.
  * @retval 0 on success.

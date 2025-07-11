@@ -29,6 +29,4 @@ USEMODULE += saul_default
 # Use xipfs file system
 USEMODULE += xipfs
 
-CFLAGS +=-DRIOT_OS
-
 include $(RIOTBASE)/Makefile.include
