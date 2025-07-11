@@ -42,6 +42,12 @@
 #include "net/fib/table.h"
 #endif
 
+#ifdef MODULE_GNRC_RPL_SR
+#include "net/gnrc/rpl.h"
+#include "net/gnrc/rpl/srh.h"
+#endif
+
+
 #include "net/gnrc/ipv6.h"
 
 #define ENABLE_DEBUG        0
@@ -102,7 +108,8 @@ kernel_pid_t gnrc_ipv6_init(void)
 static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
                                   bool interested);
 
-static inline bool _gnrc_ipv6_is_interested(unsigned nh) {
+static inline bool _gnrc_ipv6_is_interested(unsigned nh)
+{
 #ifdef MODULE_GNRC_ICMPV6
     return (nh == PROTNUM_ICMPV6);
 #else  /* MODULE_GNRC_ICMPV6 */
@@ -116,13 +123,13 @@ static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, unsigned nh)
     _dispatch_next_header(pkt, nh, _gnrc_ipv6_is_interested(nh));
     switch (nh) {
 #ifdef MODULE_GNRC_ICMPV6
-        case PROTNUM_ICMPV6:
-            DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
-            gnrc_icmpv6_demux(netif, pkt);
-            break;
+    case PROTNUM_ICMPV6:
+        DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
+        gnrc_icmpv6_demux(netif, pkt);
+        break;
 #endif /* MODULE_GNRC_ICMPV6 */
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -137,7 +144,7 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
     assert(tmp->size >= sizeof(ipv6_hdr_t));
     assert(ipv6_hdr_is(tmp->data));
 
-    return ((ipv6_hdr_t*) tmp->data);
+    return ((ipv6_hdr_t *)tmp->data);
 }
 
 /* internal functions */
@@ -196,63 +203,63 @@ static void *_event_loop(void *args)
         msg_receive(&msg);
 
         switch (msg.type) {
-            case GNRC_NETAPI_MSG_TYPE_RCV:
-                DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_RCV received\n");
-                _receive(msg.content.ptr);
-                break;
+        case GNRC_NETAPI_MSG_TYPE_RCV:
+            DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_RCV received\n");
+            _receive(msg.content.ptr);
+            break;
 
-            case GNRC_NETAPI_MSG_TYPE_SND:
-                DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_SND received\n");
-                _send(msg.content.ptr, true);
-                break;
+        case GNRC_NETAPI_MSG_TYPE_SND:
+            DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_SND received\n");
+            _send(msg.content.ptr, true);
+            break;
 
-            case GNRC_NETAPI_MSG_TYPE_GET:
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                DEBUG("ipv6: reply to unsupported get/set\n");
-                reply.content.value = -ENOTSUP;
-                msg_reply(&msg, &reply);
-                break;
+        case GNRC_NETAPI_MSG_TYPE_GET:
+        case GNRC_NETAPI_MSG_TYPE_SET:
+            DEBUG("ipv6: reply to unsupported get/set\n");
+            reply.content.value = -ENOTSUP;
+            msg_reply(&msg, &reply);
+            break;
 
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
-            case GNRC_IPV6_EXT_FRAG_RBUF_GC:
-                gnrc_ipv6_ext_frag_rbuf_gc();
-                break;
-            case GNRC_IPV6_EXT_FRAG_CONTINUE:
-                DEBUG("ipv6: continue fragmenting packet\n");
-                gnrc_ipv6_ext_frag_send(msg.content.ptr);
-                break;
-            case GNRC_IPV6_EXT_FRAG_SEND:
-                DEBUG("ipv6: send fragment\n");
-                _send_by_netif_hdr(msg.content.ptr);
-                break;
+        case GNRC_IPV6_EXT_FRAG_RBUF_GC:
+            gnrc_ipv6_ext_frag_rbuf_gc();
+            break;
+        case GNRC_IPV6_EXT_FRAG_CONTINUE:
+            DEBUG("ipv6: continue fragmenting packet\n");
+            gnrc_ipv6_ext_frag_send(msg.content.ptr);
+            break;
+        case GNRC_IPV6_EXT_FRAG_SEND:
+            DEBUG("ipv6: send fragment\n");
+            _send_by_netif_hdr(msg.content.ptr);
+            break;
 #endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
-            case GNRC_IPV6_NIB_SND_UC_NS:
-            case GNRC_IPV6_NIB_SND_MC_NS:
-            case GNRC_IPV6_NIB_SND_NA:
-            case GNRC_IPV6_NIB_SEARCH_RTR:
-            case GNRC_IPV6_NIB_REPLY_RS:
-            case GNRC_IPV6_NIB_SND_MC_RA:
-            case GNRC_IPV6_NIB_REACH_TIMEOUT:
-            case GNRC_IPV6_NIB_DELAY_TIMEOUT:
-            case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
-            case GNRC_IPV6_NIB_ABR_TIMEOUT:
-            case GNRC_IPV6_NIB_PFX_TIMEOUT:
-            case GNRC_IPV6_NIB_RTR_TIMEOUT:
-            case GNRC_IPV6_NIB_RECALC_REACH_TIME:
-            case GNRC_IPV6_NIB_REREG_ADDRESS:
-            case GNRC_IPV6_NIB_DAD:
-            case GNRC_IPV6_NIB_VALID_ADDR:
-                DEBUG("ipv6: NIB timer event received\n");
-                gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
-                break;
-            case GNRC_IPV6_NIB_IFACE_UP:
-                gnrc_ipv6_nib_iface_up(msg.content.ptr);
-                break;
-            case GNRC_IPV6_NIB_IFACE_DOWN:
-                gnrc_ipv6_nib_iface_down(msg.content.ptr, false);
-                break;
-            default:
-                break;
+        case GNRC_IPV6_NIB_SND_UC_NS:
+        case GNRC_IPV6_NIB_SND_MC_NS:
+        case GNRC_IPV6_NIB_SND_NA:
+        case GNRC_IPV6_NIB_SEARCH_RTR:
+        case GNRC_IPV6_NIB_REPLY_RS:
+        case GNRC_IPV6_NIB_SND_MC_RA:
+        case GNRC_IPV6_NIB_REACH_TIMEOUT:
+        case GNRC_IPV6_NIB_DELAY_TIMEOUT:
+        case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
+        case GNRC_IPV6_NIB_ABR_TIMEOUT:
+        case GNRC_IPV6_NIB_PFX_TIMEOUT:
+        case GNRC_IPV6_NIB_RTR_TIMEOUT:
+        case GNRC_IPV6_NIB_RECALC_REACH_TIME:
+        case GNRC_IPV6_NIB_REREG_ADDRESS:
+        case GNRC_IPV6_NIB_DAD:
+        case GNRC_IPV6_NIB_VALID_ADDR:
+            DEBUG("ipv6: NIB timer event received\n");
+            gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
+            break;
+        case GNRC_IPV6_NIB_IFACE_UP:
+            gnrc_ipv6_nib_iface_up(msg.content.ptr);
+            break;
+        case GNRC_IPV6_NIB_IFACE_DOWN:
+            gnrc_ipv6_nib_iface_down(msg.content.ptr, false);
+            break;
+        default:
+            break;
         }
     }
 
@@ -393,7 +400,9 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         gnrc_netif_acquire(netif);
         invalid_src = ((!ipv6_addr_is_loopback(&hdr->dst)) &&
                        (idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) >= 0) &&
-            (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+                      (gnrc_netif_ipv6_addr_get_state(netif,
+                                                      idx) !=
+                       GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
         gnrc_netif_release(netif);
         if (invalid_src) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
@@ -497,6 +506,13 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
     gnrc_ipv6_nib_nc_t nce;
 
     DEBUG("ipv6: send unicast\n");
+    #ifdef MODULE_GNRC_RPL_SR
+    if (ipv6_addr_is_link_local(&ipv6_hdr->dst) && !ipv6_addr_is_link_local(&ipv6_hdr->src)) {
+        /* Link-local address return netif = 0, use the netif of RPL*/
+        gnrc_netif_t *iface = gnrc_netif_get_by_prefix(gnrc_rpl_get_root_dodag_id());
+        netif = gnrc_netif_get_by_pid(iface->pid);
+    }
+    #endif
     if (gnrc_ipv6_nib_get_next_hop_l2addr(&ipv6_hdr->dst, netif, pkt,
                                           &nce) < 0) {
         /* packet is released by NIB */
@@ -656,6 +672,18 @@ static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
     }
 }
 
+/* function for sending in non-storing mode */
+static inline bool _pkt_from_me(ipv6_hdr_t *hdr)
+{
+    if (ipv6_addr_is_loopback(&hdr->dst) || ipv6_addr_is_unspecified(&hdr->src)) {
+        return true;
+    }
+
+    else {
+        return !(gnrc_netif_get_by_ipv6_addr(&hdr->src) == NULL);
+    }
+}
+
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 {
     gnrc_netif_t *netif = NULL;
@@ -666,8 +694,8 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     /* get IPv6 snip and (if present) generic interface header */
     if (pkt->type == GNRC_NETTYPE_NETIF) {
         /* If there is already a netif header (routing protocols and
-         * neighbor discovery might add them to preset sending interface or
-         * higher layers wants to provide flags to the interface ) */
+        * neighbor discovery might add them to preset sending interface or
+        * higher layers wants to provide flags to the interface ) */
         const gnrc_netif_hdr_t *netif_hdr = pkt->data;
 
         netif = gnrc_netif_hdr_get_netif(pkt->data);
@@ -710,8 +738,31 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     }
     pkt = tmp_pkt;
 
-    ipv6_hdr = pkt->data;
+    ipv6_hdr = (ipv6_hdr_t *)pkt->data;
+#ifdef MODULE_GNRC_RPL_SR
+    /* If the packet is from me, insert SRH if needed */
+    if (get_is_root() &&
+        !ipv6_addr_is_link_local(&(ipv6_hdr->dst)) &&
+        _pkt_from_me(ipv6_hdr)) {
+        if (gnrc_rpl_get_root_dodag_id() == NULL) {
+            DEBUG("ipv6: no DODAG ID available, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        pkt = gnrc_rpl_srh_insert(pkt, ipv6_hdr);
+        if (pkt == NULL) {
+            DEBUG("ipv6: SRH insertion failed, dropping packet\n");
+            return;
+        }
 
+        /* Set the src to the global address to avoid being set to the local one in _safe_fill_ipv6_hdr */
+        memcpy(&ipv6_hdr->src, gnrc_rpl_get_root_dodag_id(), sizeof(ipv6_addr_t));
+    }
+#endif
+
+    if (pkt == NULL) {
+        return;
+    }
     if (ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         _send_multicast(pkt, prep_hdr, netif, netif_hdr_flags);
     }
@@ -724,7 +775,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         }
 
         if (ipv6_addr_is_loopback(&ipv6_hdr->dst) ||    /* dst is loopback address */
-            /* or dst registered to a local interface */
+                                                        /* or dst registered to a local interface */
             (tmp_netif != NULL)) {
             _send_to_self(pkt, prep_hdr, tmp_netif);
         }
@@ -846,8 +897,8 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
     else if (ipv6_len > (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t))) {
         DEBUG("ipv6: invalid payload length: %d, actual: %d, dropping packet\n",
-              (int) byteorder_ntohs(hdr->len),
-              (int) (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t)));
+              (int)byteorder_ntohs(hdr->len),
+              (int)(gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t)));
         gnrc_icmpv6_error_param_prob_send(ICMPV6_ERROR_PARAM_PROB_HDR_FIELD,
                                           &(hdr->len), pkt);
         gnrc_pktbuf_release_error(pkt, EINVAL);
@@ -870,21 +921,33 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
 #ifdef MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
         /* redirect to next hop */
-        DEBUG("ipv6: decrement hop limit to %u\n", (uint8_t) (hdr->hl - 1));
+        DEBUG("ipv6: decrement hop limit to %u\n", (uint8_t)(hdr->hl - 1));
 
         /* RFC 4291, section 2.5.6 states: "Routers must not forward any
          * packets with Link-Local source or destination addresses to other
          * links."
+         * In RPL Non-storing, we need to forward the packets with
+         * link-local source address
          */
-        if ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst)))) {
-            DEBUG("ipv6: do not forward packets with link-local source or"
-                  " destination address\n");
+        bool route_local = true;
+    #ifdef MODULE_GNRC_RPL_SR
+        route_local = ipv6_addr_is_link_local(&(hdr->dst));
+        DEBUG("ipv6: do not forward packets with link-local destination address\n");
+
+    #else
+        route_local =
+            ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst))));
+        DEBUG("ipv6: do not forward packets with link-local source or"
+              " destination address\n");
+    #endif
+        if (route_local) {
 #ifdef MODULE_GNRC_ICMPV6_ERROR
             if (ipv6_addr_is_link_local(&(hdr->src)) &&
                 !ipv6_addr_is_link_local(&(hdr->dst))) {
                 gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_SCOPE, pkt);
             }
-            else if (!ipv6_addr_is_multicast(&(hdr->dst))) {
+            else
+            if (!ipv6_addr_is_multicast(&(hdr->dst))) {
                 gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, pkt);
             }
 #endif
@@ -900,13 +963,19 @@ static void _receive(gnrc_pktsnip_t *pkt)
                 gnrc_pktbuf_remove_snip(pkt, netif_hdr);
             }
             pkt = gnrc_pktbuf_reverse_snips(pkt);
-            if (pkt != NULL) {
-                _send(pkt, false);
-            }
-            else {
+            if (pkt == NULL) {
                 DEBUG("ipv6: unable to reverse pkt from receive order to send "
                       "order; dropping it\n");
+                return;
             }
+#ifdef MODULE_GNRC_RPL_SR
+            if (get_is_root()) {
+                pkt = gnrc_rpl_srh_insert(pkt, hdr);
+            }
+            _send(pkt, false);
+#else /*MODULE_GNRC_RPL_SR*/
+            _send(pkt, false);
+#endif
             return;
         }
         else {

@@ -22,7 +22,7 @@
 
 #include "net/gnrc/icmpv6/error.h"
 
-#ifdef MODULE_GNRC_RPL_SRH
+#ifdef MODULE_GNRC_RPL_SR
 #include "net/gnrc/rpl/srh.h"
 #endif
 
@@ -73,43 +73,47 @@ int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt)
     int res = GNRC_IPV6_EXT_RH_AT_DST;
     void *err_ptr = NULL;
 
-    /* check seg_left early to avoid duplicating the packet */
-    if (ext->seg_left == 0) {
-        return res;
-    }
     ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     assert(ipv6 != NULL);
     hdr = ipv6->data;
+
+    /* check seg_left early to avoid duplicating the packet */
+    if (ext->seg_left == 0) {
+        DEBUG("Last destination.\n");
+        /* restore the destination address to the original global form */
+        memcpy(&hdr->dst, &hdr->src, 8);
+        return res;
+    }
     switch (ext->type) {
-#ifdef MODULE_GNRC_RPL_SRH
-        case IPV6_EXT_RH_TYPE_RPL_SRH:
-            res = gnrc_rpl_srh_process(hdr, (gnrc_rpl_srh_t *)ext, &err_ptr);
-            break;
+#ifdef MODULE_GNRC_RPL_SR
+    case IPV6_EXT_RH_TYPE_RPL_SRH:
+        res = gnrc_rpl_srh_process(hdr, (gnrc_rpl_srh_t *)ext, &err_ptr);
+        break;
 #endif
-        default:
-            res = GNRC_IPV6_EXT_RH_ERROR;
-            err_ptr = &ext->type;
-            break;
+    default:
+        res = GNRC_IPV6_EXT_RH_ERROR;
+        err_ptr = &ext->type;
+        break;
     }
     switch (res) {
-        case GNRC_IPV6_EXT_RH_FORWARDED:
-            _forward_pkt(pkt, hdr);
-            break;
-        case GNRC_IPV6_EXT_RH_AT_DST:
-            break;
-        default:
+    case GNRC_IPV6_EXT_RH_FORWARDED:
+        _forward_pkt(pkt, hdr);
+        break;
+    case GNRC_IPV6_EXT_RH_AT_DST:
+        break;
+    default:
 #ifdef MODULE_GNRC_ICMPV6_ERROR
-            if (err_ptr) {
-                gnrc_icmpv6_error_param_prob_send(
-                        ICMPV6_ERROR_PARAM_PROB_HDR_FIELD,
-                        err_ptr, pkt
-                    );
-            }
+        if (err_ptr) {
+            gnrc_icmpv6_error_param_prob_send(
+                ICMPV6_ERROR_PARAM_PROB_HDR_FIELD,
+                err_ptr, pkt
+                );
+        }
 #else
-            (void)err_ptr;
+        (void)err_ptr;
 #endif
-            gnrc_pktbuf_release_error(pkt, EINVAL);
-            break;
+        gnrc_pktbuf_release_error(pkt, EINVAL);
+        break;
     }
     return res;
 }

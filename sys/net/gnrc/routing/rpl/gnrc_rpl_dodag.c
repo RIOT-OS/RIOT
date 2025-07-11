@@ -44,7 +44,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
 
 static void _rpl_trickle_send_dio(void *args)
 {
-    gnrc_rpl_instance_t *inst = (gnrc_rpl_instance_t *) args;
+    gnrc_rpl_instance_t *inst = (gnrc_rpl_instance_t *)args;
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
 
     /* a leaf node does not send DIOs periodically */
@@ -63,9 +63,9 @@ static void _rpl_trickle_send_dio(void *args)
     }
 #endif
 
-    gnrc_rpl_send_DIO(inst, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
+    gnrc_rpl_send_DIO(inst, (ipv6_addr_t *)&ipv6_addr_all_rpl_nodes);
     DEBUG("trickle callback: Instance (%d) | DODAG: (%s)\n", inst->id,
-          ipv6_addr_to_str(addr_str,&dodag->dodag_id, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)));
 }
 
 /* The lifetime of the default route should exceed the parent timeout interval
@@ -113,7 +113,7 @@ bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst)
 
 bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id)
 {
-    for(uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+    for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].id == instance_id) {
             return gnrc_rpl_instance_remove(&gnrc_rpl_instances[i]);
         }
@@ -223,7 +223,8 @@ bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
         (*parent)->state = GNRC_RPL_PARENT_ACTIVE;
         (*parent)->addr = *addr;
         (*parent)->rank = GNRC_RPL_INFINITE_RANK;
-        evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)(&(*parent)->timeout_event));
+        evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer),
+                    (evtimer_event_t *)(&(*parent)->timeout_event));
         ((evtimer_event_t *)(&(*parent)->timeout_event))->next = NULL;
         (*parent)->timeout_event.msg.type = GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT;
         (*parent)->timeout_event.msg.content.ptr = (*parent);
@@ -259,7 +260,8 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 
 void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag)
 {
-    evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)&dodag->instance->cleanup_event);
+    evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer),
+                (evtimer_event_t *)&dodag->instance->cleanup_event);
     ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = CONFIG_GNRC_RPL_CLEANUP_TIME;
     dodag->instance->cleanup_event.msg.type = GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP;
     evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->instance->cleanup_event, gnrc_rpl_pid);
@@ -289,7 +291,8 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
     if ((parent != NULL) && (parent->state != GNRC_RPL_PARENT_UNUSED)) {
         parent->state = GNRC_RPL_PARENT_ACTIVE;
         evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)&parent->timeout_event);
-        ((evtimer_event_t *)&(parent->timeout_event))->offset = (dodag->default_lifetime - 1) * dodag->lifetime_unit * MS_PER_SEC;
+        ((evtimer_event_t *)&(parent->timeout_event))->offset = (dodag->default_lifetime - 1) *
+                                                                dodag->lifetime_unit * MS_PER_SEC;
         parent->timeout_event.msg.type = GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT;
         evtimer_add_msg(&gnrc_rpl_evtimer, &parent->timeout_event, gnrc_rpl_pid);
 #ifdef MODULE_GNRC_RPL_P2P
@@ -301,7 +304,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
                                  _dflt_route_lifetime_sec(dodag));
         }
 #ifdef MODULE_GNRC_RPL_P2P
-        }
+    }
 #endif
     }
 
@@ -346,7 +349,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
         }
 
 #ifdef MODULE_GNRC_RPL_P2P
-    if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
+        if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
         gnrc_ipv6_nib_ft_del(NULL, 0);
         gnrc_ipv6_nib_ft_add(NULL, 0, &dodag->parents->addr, dodag->iface,
@@ -398,7 +401,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, const ipv6
     }
 
     if (gnrc_rpl_instance_add(instance_id, &inst)) {
-        inst->of = (gnrc_rpl_of_t *) gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
+        inst->of = (gnrc_rpl_of_t *)gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
         inst->mop = mop;
         inst->min_hop_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
         inst->max_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
