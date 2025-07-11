@@ -26,19 +26,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "thread.h"
 #include "shell.h"
-
-#include "net/gnrc/pktdump.h"
-#include "net/gnrc.h"
 
 int main(void)
 {
     puts("LWMAC test application");
-
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                          gnrc_pktdump_pid);
-    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
