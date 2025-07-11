@@ -184,6 +184,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_GCOAP                        1240
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_UNICOAP
+/**
+ * @brief   `unicoap` priority
+ */
+#define AUTO_INIT_PRIO_MOD_UNICOAP                        1245
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_DEVFS
 /**
  * @brief   DEVFS priority
