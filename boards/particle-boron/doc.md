@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_particle-boron Particle Boron
 @ingroup     boards
 @brief       Support for the Particle Boron
@@ -27,5 +26,3 @@ voltage for the Particle Boron, please report this!
 ### Flash the board
 
 See the `Flashing` section in @ref boards_common_particle-mesh.
-
- */

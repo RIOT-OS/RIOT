@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_particle-xenon Particle Xenon
 @ingroup     boards
 @brief       Support for the Particle Xenon
@@ -21,5 +20,3 @@ The board datasheet is available [here](https://docs.particle.io/assets/pdfs/dat
 ### Flash the board
 
 See the `Flashing` section in @ref boards_common_particle-mesh.
-
- */

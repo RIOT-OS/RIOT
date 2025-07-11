@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_particle-argon Particle Argon
 @ingroup     boards
 @brief       Support for the Particle Argon
@@ -27,5 +26,3 @@ voltage for the Particle Argon, please report this!
 ### Flash the board
 
 See the `Flashing` section in @ref boards_common_particle-mesh.
-
- */
