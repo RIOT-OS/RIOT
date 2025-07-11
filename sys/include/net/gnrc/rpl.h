@@ -707,6 +707,16 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, const ipv6
                                                  uint8_t mop);
 
 /**
+ * @brief   Mark an address as unreachable.
+ *
+ * @note    Connection-oriented link-layers can use this to hint RPL
+ *          that a parent with this address is unreachable.
+ *
+ * @param[in] addr              Address that became unreachable.
+ */
+void gnrc_rpl_addr_unreachable(ipv6_addr_t *addr);
+
+/**
  * @brief Send a control message
  *
  * @param[in] pkt               gnrc_pktnsip_t to send

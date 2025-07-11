@@ -129,6 +129,7 @@ typedef struct {
     uint8_t version;            /**< DODAG version */
     uint8_t role;               /**< RPL role of the node */
     uint16_t rank;              /**< the node's rank in the DODAG */
+    ipv6_addr_t parent_addr;    /**< address of the node's preferred parent */
 } nimble_rpble_ctx_t;
 
 /**

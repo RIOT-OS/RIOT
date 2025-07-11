@@ -45,6 +45,10 @@ extern evtimer_msg_t gnrc_rpl_evtimer;
  * @brief   Message type for DAO transmissions.
  */
 #define GNRC_RPL_MSG_TYPE_DODAG_DAO_TX        (0x0906)
+/**
+ * @brief   Message type for signaling an unreachable address.
+ */
+#define GNRC_RPL_MSG_TYPE_ADDR_UNREACHABLE  (0x0907)
 /** @} */
 
 /**
