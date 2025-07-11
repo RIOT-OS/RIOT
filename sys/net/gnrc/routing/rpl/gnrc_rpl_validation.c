@@ -28,10 +28,10 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
 {
     uint16_t expected_len = 0;
 
-    while(expected_len < len) {
+    while (expected_len < len) {
         if (opt->type == GNRC_RPL_OPT_PAD1) {
             expected_len += 1;
-            opt = (gnrc_rpl_opt_t *) (((uint8_t *) opt) + 1);
+            opt = (gnrc_rpl_opt_t *)(((uint8_t *)opt) + 1);
             continue;
         }
 
@@ -39,75 +39,75 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
             break;
         }
 
-        switch(opt->type) {
-            case (GNRC_RPL_OPT_DODAG_CONF):
-                if (msg_type != GNRC_RPL_ICMPV6_CODE_DIO) {
-                    DEBUG("RPL: DODAG CONF DIO option not expected\n");
-                    return false;
-                }
+        switch (opt->type) {
+        case (GNRC_RPL_OPT_DODAG_CONF):
+            if (msg_type != GNRC_RPL_ICMPV6_CODE_DIO) {
+                DEBUG("RPL: DODAG CONF DIO option not expected\n");
+                return false;
+            }
 
-                if (opt->length != GNRC_RPL_OPT_DODAG_CONF_LEN) {
-                    DEBUG("RPL: wrong DIO option (DODAG CONF) len: %d, expected: %d\n",
-                           opt->length, GNRC_RPL_OPT_DODAG_CONF_LEN);
-                    return false;
-                }
-                break;
+            if (opt->length != GNRC_RPL_OPT_DODAG_CONF_LEN) {
+                DEBUG("RPL: wrong DIO option (DODAG CONF) len: %d, expected: %d\n",
+                      opt->length, GNRC_RPL_OPT_DODAG_CONF_LEN);
+                return false;
+            }
+            break;
 
-            case (GNRC_RPL_OPT_PREFIX_INFO):
-                if (msg_type != GNRC_RPL_ICMPV6_CODE_DIO) {
-                    DEBUG("RPL: PREFIX INFO DIO option not expected\n");
-                    return false;
-                }
+        case (GNRC_RPL_OPT_PREFIX_INFO):
+            if (msg_type != GNRC_RPL_ICMPV6_CODE_DIO) {
+                DEBUG("RPL: PREFIX INFO DIO option not expected\n");
+                return false;
+            }
 
-                if (opt->length != GNRC_RPL_OPT_PREFIX_INFO_LEN) {
-                    DEBUG("RPL: wrong DIO option (PREFIX INFO) len: %d, expected: %d\n",
-                           opt->length, GNRC_RPL_OPT_PREFIX_INFO_LEN);
-                    return false;
-                }
-                break;
+            if (opt->length != GNRC_RPL_OPT_PREFIX_INFO_LEN) {
+                DEBUG("RPL: wrong DIO option (PREFIX INFO) len: %d, expected: %d\n",
+                      opt->length, GNRC_RPL_OPT_PREFIX_INFO_LEN);
+                return false;
+            }
+            break;
 
-            case (GNRC_RPL_OPT_TARGET):
-                if (msg_type != GNRC_RPL_ICMPV6_CODE_DAO) {
-                    DEBUG("RPL: RPL TARGET DAO option not expected\n");
-                    return false;
-                }
+        case (GNRC_RPL_OPT_TARGET):
+            if (msg_type != GNRC_RPL_ICMPV6_CODE_DAO) {
+                DEBUG("RPL: RPL TARGET DAO option not expected\n");
+                return false;
+            }
 
-                if (opt->length > GNRC_RPL_OPT_TARGET_LEN) {
-                    DEBUG("RPL: wrong DAO option (RPL TARGET) len: %d, expected (max): %d\n",
-                           opt->length, GNRC_RPL_OPT_TARGET_LEN);
-                    return false;
-                }
-                break;
+            if (opt->length > GNRC_RPL_OPT_TARGET_LEN) {
+                DEBUG("RPL: wrong DAO option (RPL TARGET) len: %d, expected (max): %d\n",
+                      opt->length, GNRC_RPL_OPT_TARGET_LEN);
+                return false;
+            }
+            break;
 
-            case (GNRC_RPL_OPT_TRANSIT):
-                if (msg_type != GNRC_RPL_ICMPV6_CODE_DAO) {
-                    DEBUG("RPL: RPL TRANSIT INFO DAO option not expected\n");
-                    return false;
-                }
+        case (GNRC_RPL_OPT_TRANSIT):
+            if (msg_type != GNRC_RPL_ICMPV6_CODE_DAO) {
+                DEBUG("RPL: RPL TRANSIT INFO DAO option not expected\n");
+                return false;
+            }
 
-                uint8_t parent_addr = 0;
-                if (inst->mop == GNRC_RPL_MOP_NON_STORING_MODE) {
-                    parent_addr = sizeof(ipv6_addr_t);
-                }
+            uint8_t parent_addr = 0;
+            if (inst->mop == GNRC_RPL_MOP_NON_STORING_MODE) {
+                parent_addr = sizeof(ipv6_addr_t);
+            }
 
-                if (opt->length != (GNRC_RPL_OPT_TRANSIT_INFO_LEN + parent_addr)) {
-                    DEBUG("RPL: wrong DAO option (TRANSIT INFO) len: %d, expected: %d\n",
-                           opt->length, (GNRC_RPL_OPT_TRANSIT_INFO_LEN + parent_addr));
-                    return false;
-                }
-                break;
+            if (opt->length != (GNRC_RPL_OPT_TRANSIT_INFO_LEN + parent_addr)) {
+                DEBUG("RPL: wrong DAO option (TRANSIT INFO) len: %d, expected: %d\n",
+                      opt->length, (GNRC_RPL_OPT_TRANSIT_INFO_LEN + parent_addr));
+                return false;
+            }
+            break;
 
-            default:
-                break;
+        default:
+            break;
 
         }
         expected_len += opt->length + sizeof(gnrc_rpl_opt_t);
 
         if (expected_len >= len) {
-          break;
+            break;
         }
 
-        opt = (gnrc_rpl_opt_t *) (((uint8_t *) (opt + 1)) + opt->length);
+        opt = (gnrc_rpl_opt_t *)(((uint8_t *)(opt + 1)) + opt->length);
     }
 
     if (expected_len == len) {
