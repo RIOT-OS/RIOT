@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2025 Mihai Renea <mihai.renea@ml-pa.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 Mihai Renea <mihai.renea@ml-pa.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -18,7 +15,7 @@
  * "core_thread_flags_group" to be enabled in USEMODULE.
  *
  * Wait queues enable lock-free, IRQ-safe condition signaling. This API is
- * inspired from the Linux Kernel.
+ * inspired by the Linux Kernel.
  *
  * Wait queues have similar semantics to condition variables, but don't require
  * setting the condition + signaling to be atomic, hence no mutex is required.
@@ -27,7 +24,7 @@
  * doing so will probably cause a race condition elsewhere. Consider the
  * following scenario using condition variables:
  *
- * ```
+ * @code{c}
  * static uint64_t measurement;
  * mutex_t cond_lock = MUTEX_INIT;
  * cond_t cond = COND_INIT;
@@ -46,7 +43,7 @@
  *     }
  *     mutex_unlock(&cond_lock);
  * }
- * ```
+ * @endcode
  *
  * Note, the mutex is there only for the cond_wait() API call, as we're not
  * allowed to call mutex_lock() inside the ISR. This alone is a hint that
@@ -58,7 +55,7 @@
  *
  * Using a wait queue, we can do this:
  *
- * ```
+ * @code{c}
  * static uint64_t measurement;
  * wq_t wq = WAIT_QUEUE_INIT;
  *
@@ -76,7 +73,7 @@
  *    }
  *    wait_queue_leave(&wq);
  * }
- * ```
+ * @endcode
  *
  * This is free of the race condition above because if the ISR fires between
  * the condition check and the queue_wait() call, queue_wait() will return
@@ -88,16 +85,16 @@
  * code can be eliminated by using the @ref QUEUE_WAIT() macro, which combines
  * the join, wait, and leave operations:
  *
- * ```
+ * @code{c}
  * void wait_for_critical_value(void)
  * {
  *     QUEUE_WAIT(&wq, atomic_load_u64(&measurement) >= THRESHOLD);
  * }
- * ```
+ * @endcode
  *
  * If you don't want to wait indefinitely, you can do it with a timeout:
  *
- * ```
+ * @code{c}
  * void wait_for_critical_value(void)
  * {
  *     if (QUEUE_WAIT_ZTIMER(ZTIMER_MSEC, 10, &wq, atomic_load_u64(&measurement) >= THRESHOLD)) {
@@ -107,15 +104,15 @@
  *         puts("timeout!");
  *     }
  * }
- * ```
+ * @endcode
  *
- * Limitations
+ * ### Limitations
  *
  * Be aware that the condition checking is fenced but not atomic w.r. to
  * signaling, so you have to ensure that by other means. E.g. in the example
  * code above this is enforced by atomic_load_u64().
  *
- * When to use?
+ * ### When to use?
  *
  * If you know for sure you're synchronizing between threads only (no ISR),
  * then the condition variable has the advantage of implicit condition
@@ -228,7 +225,7 @@ static inline void queue_wake_all(wait_queue_t *wait_queue)
     } while (0)
 
 #if IS_USED(MODULE_ZTIMER)
-#include "ztimer.h"
+#  include "ztimer.h"
 
 /**
  * @brief Convenience macro for waiting for a condition with a timeout.
@@ -244,7 +241,7 @@ static inline void queue_wake_all(wait_queue_t *wait_queue)
  * @retval true   if the condition was met before the timeout expired
  * @retval false  if the timeout expired
  */
-#define QUEUE_WAIT_ZTIMER(clock, timeout, wq, cond_expr)                    \
+#  define QUEUE_WAIT_ZTIMER(clock, timeout, wq, cond_expr)                    \
     ({                                                                      \
         ztimer_t _wq_timer;                                                 \
         ztimer_set_timeout_flag(clock, &_wq_timer, timeout);                \
