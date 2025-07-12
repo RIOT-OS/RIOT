@@ -81,11 +81,8 @@ Keep in mind that the capacitor will likely be destroyed when removed by force
 and it will be difficult to restore the auto-reset feature of the clones.
 
 #### Software
-You need to have [AVaRICE](http://avarice.sourceforge.net/) installed. Some
-distros have this packaged already. If you need to compile it by hand, go for
-the latest SVN revision. The latest release cannot be compiled on anything but
-historic platforms and contains bugs that prevent it from debugging the
-ATmega328P anyway.
+You need to have [AVaRICE](e539724b20) installed. Some
+distros have this packaged already.
 
 #### Fuses
 In order to use On-Chip Debugging, the `DWEN` bit in the high fuse needs to be

@@ -119,10 +119,7 @@ started using
 #### Software Requirements
 
 In order to debug you'll need an GDB version with AVR support and
-[AVaRICE](http://avarice.sourceforge.net/). Note that AVaRICE sadly is not
-being actively maintained and the latest release will not compile on most
-systems. Thus, unless your distribution already ships a package of the SVN
-version of AVaRICE, you'll have to build the tool from source.
+[AVaRICE](https://github.com/avrdudes/avarice).
 
 ### JTAG Pin Mapping
 

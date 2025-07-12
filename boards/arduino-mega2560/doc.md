@@ -132,7 +132,7 @@ MCUs.
 ### Debugging RIOT on the Arduino Mega 2560
 
 `make BOARD=arduino-mega2560 debug-server`: starts an
-[avarice](http://avarice.sourceforge.net/) (avarice needs to be installed)
+[avarice](https://github.com/avrdudes/avarice) (avarice needs to be installed)
 server that `avr-gdb` can connect to.
 
 `make BOARD=arduino-mega2560 debug`: starts an avarice server and connects

@@ -78,7 +78,8 @@ type to get terminal:
 
 ## On-Chip Debugging (OCD)
 
-E.g. with the AVR Xplained Mini and [AVaRICE](http://avarice.sourceforge.net/)
+E.g. with the AVR Xplained Mini and
+[AVaRICE](https://github.com/avrdudes/avarice)
 you can debug the ATmega328P using the debugWIRE interface.  Compared to the
 ATmega MCUs with JTAG interface the debug facilities are however significantly
 reduced: Only a single hardware breakpoint and no watchpoints are supported.
