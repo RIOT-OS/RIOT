@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atmega328p Standalone ATmega328p
 @ingroup     boards
 @brief       Support for using the ATmega328p as standalone board
@@ -158,4 +157,3 @@ cold boot and the ATmega328P will have debugWIRE enabled again.
 
 ## Caution
 Don't expect having a working network stack due to very limited resources ;-)
- */

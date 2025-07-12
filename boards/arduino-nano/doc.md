@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-nano Arduino Nano
 @ingroup     boards
 @brief       Support for the Arduino Nano board
@@ -159,4 +158,3 @@ avoid any issues. You might want to do the same, e.g. via:
 
 ## Caution
 Don't expect having a working network stack due to very limited resources.
- */

@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-mega2560 Arduino Mega 2560
 @ingroup     boards
 @brief       Support for the Arduino Mega 2560 board
@@ -192,4 +191,3 @@ In order to install it, you must download and install a CDC-ACM driver from
 (Go to Support and Downloads/Software & Driver/Mac Software).
 
 A reboot should be enough to find your Arduino on `/dev/tty.usbmodem*`
- */

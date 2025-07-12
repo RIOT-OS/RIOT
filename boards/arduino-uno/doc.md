@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-uno Arduino Uno
 @ingroup     boards
 @brief       Support for the Arduino Uno board
@@ -155,5 +154,3 @@ original instruction to break on. Once this break instruction is reached, the
 original instruction is restored. This is not only super slow, but also
 wastes two flash cycles every time a breakpoint is hit. This cumulates to
 significant flash wear during long debugging sessions.
-
-*/
