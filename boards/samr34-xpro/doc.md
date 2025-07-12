@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_samr34-xpro Microchip SAM R34 Xplained Pro
 @ingroup     boards
 @brief       Support for the Microchip SAM R34 Xplained Pro and WLR089 Xplained Pro
@@ -36,5 +35,3 @@ An evaluation board for the radio certified WLR089 module exists as the WLR089 X
 | Vcc        | 1.8V - 3.6V           |
 | Datasheet  | [Datasheet](https://ww1.microchip.com/downloads/en/DeviceDoc/SAMR34-R35-Low-Power-LoRa-Sub-GHz-SiP-Data-Sheet-DS70005356B.pdf) |
 | Board Manual | [SAM R34 XPro](https://www.microchip.com/en-us/development-tool/DM320111)<br>[WLR089 XPro](https://www.microchip.com/en-us/development-tool/EV23M25A)|
-
- */

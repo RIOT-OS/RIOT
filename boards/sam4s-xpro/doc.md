@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_sam4s-xpro ATSAM4S Xplained Pro board
 @ingroup     boards
 @brief       Support for the ATSAM4S Xplained Pro board
@@ -44,5 +43,3 @@ featuring a SAM4SD32 (Cortex-M4) SoC running up to 120 MHz. This MCU comes with
 By default, openOCD is used for both flashing and debugging.
 EDBG programmer is also available with:
 `PROGRAMMER=edbg BOARD=sam4s-xpro make -C tests/leds flash`
-
- */

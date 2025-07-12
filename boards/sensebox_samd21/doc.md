@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_sensebox_samd21 SenseBox MCU with SAMD21
- * @ingroup     boards
- * @brief       Support for the SenseBox MCU with SAMD21 board.
+@defgroup    boards_sensebox_samd21 SenseBox MCU with SAMD21
+@ingroup     boards
+@brief       Support for the SenseBox MCU with SAMD21 board.
 
 ### General information
 
@@ -66,4 +65,3 @@ This has the following limitations:
 - FSK mode is not possible
 - The interrupt pins can have different configurations, so caution is required
 when making changes.
- */

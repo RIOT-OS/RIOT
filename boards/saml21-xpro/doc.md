@@ -1,25 +1,29 @@
-/**
-@defgroup    boards_samd21-xpro Atmel SAM D21 Xplained Pro
+@defgroup    boards_saml21-xpro Atmel SAM L21 Xplained Pro
 @ingroup     boards
-@brief       Support for the Atmel SAM D21 Xplained Pro board.
+@brief       Support for the Atmel SAM L21 Xplained Pro board.
 
 ## Overview
 
-The `SAMD21 Xplained Pro` is an ultra-low power evaluation board by Atmel
-featuring an ATSAMD21J18A SoC. The SoC includes a SAMD21 ARM Cortex-M0+ micro-
+The `SAML21 Xplained Pro` is an ultra-low power evaluation board by Atmel
+featuring a ATSAML21J18A SoC. The SoC includes a SAML21 ARM Cortex-M0+ micro-
 controller. For programming the MCU comes with 32Kb of RAM and 256Kb of flash
 memory.
 
-The samd21-xpro is available from various hardware vendors for ~30USD (as of
-2017 May).
+The saml21-xpro is available from various hardware vendors for ~50USD (as of
+oct. 2015).
+
+*Please note:*  ATMEL's most recent SAML21s are the `B` variant, or
+`ATSAML21J18B`.  Because the driver changes are mostly small, throughout this
+reference the device will continue to be referred to as the `ATSAML21J18[A/B]`
+indiscriminately;
 
 ## Hardware
 
-![samd21-xpro image](http://www.microchip.com/_ImagedCopy/ATSAMD21-XPRO_angle.jpg)
+![saml21-xpro image](https://www.microchip.com/_ImagedCopy/ATSAML21-XPRO-B_angle.jpg)
 
 
 ### MCU
-| MCU        | ATSAMD21J18A      |
+| MCU        | ATSAML21J18A      |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M0+    |
 | Vendor | Atmel |
@@ -27,14 +31,14 @@ The samd21-xpro is available from various hardware vendors for ~30USD (as of
 | Flash      | 256Kb             |
 | Frequency  | up to 48MHz |
 | FPU        | no                |
-| Timers | 5 (16-bit)    |
+| Timers | 8 (16-bit)    |
 | ADCs       | 1x 12-bit (20 channels)           |
 | UARTs      | max 6 (shared with SPI and I2C)               |
 | SPIs       | max 6 (see UART)                  |
 | I2Cs       | max 6 (see UART)              |
-| Vcc        | 1.62V - 3.63V         |
-| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_Data%20Sheet_DS40001882E.pdf) |
-| Board Manual   | [Board Manual](http://www.atmel.com/Images/Atmel-42220-SAMD21-Xplained-Pro_User-Guide.pdf)|
+| Vcc        | 1.8V - 3.6V           |
+| Datasheet  | [Datasheet](http://www.atmel.com/Images/Atmel-42385-SAM-L21-Datasheet.pdf) |
+| Board Manual   | [Board Manual](http://www.atmel.com/Images/Atmel-42405-SAML21-Xplained-Pro_User-Guide.pdf)|
 
 ### User Interface
 
@@ -42,38 +46,41 @@ The samd21-xpro is available from various hardware vendors for ~30USD (as of
 
 | Device | PIN |
 |:------ |:--- |
-| LED0   | PB30 |
-| SW0 (button) | PA15 |
+| LED0   | PB10 |
+| SW0 (button) | PA02 |
 
 
 ## Implementation Status
 
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
-| MCU        | samd21    | yes    | |
+| MCU        | saml21        | yes    |  |
 | Low-level driver | GPIO    | yes       | |
-|        | ADC       | yes   | |
-|        | PWM       | yes   | |
+|        | PWM       | yes       | |
 |        | UART      | yes       | |
 |        | I2C       | yes       | |
 |        | SPI       | yes       | |
 |        | USB       | yes       | |
 |        | RTT       | yes       | |
 |        | RTC       | yes       | |
+|        | RNG       | yes       | |
 |        | Timer     | yes       | |
+|        | ADC       | yes       | |
+|        | DAC       | yes       | |
+
+
 
 ## Flashing the device
 
-Connect the device to your Micro-USB cable using the port labeled as *DEBUG
-USB*.
+Connect the device to your Micro-USB cable using the port labeled as *EDBG*.
 
-The standard method for flashing RIOT to the samd21-xpro is using [edbg](https://github.com/ataradov/edbg).
-by calling: `make BOARD=samd21-xpro -C tests/leds flash`
+The standard method for flashing RIOT to the saml21-xpro is using [edbg](https://github.com/ataradov/edbg).
+by calling: `make BOARD=saml21-xpro -C tests/leds flash`
 
 Note that on Linux, you will need libudev-dev package to be installed.
 
 Users can also use openOCD to flash and/or debug the board using:
-`PROGRAMMER=openocd make BOARD=samd21-xpro -C tests/leds flash`
+`PROGRAMMER=openocd make BOARD=saml21-xpro -C tests/leds flash`
 
 On Linux you will have to add a **udev** rule for hidraw, like
 ```
@@ -95,8 +102,6 @@ yaourt -S openocd-git
 ### Ubuntu
 Although this refers to setting up the SAMR21, this guide is still very
 helpful to understanding how to set up a solid RIOT development environment for
-the SAMD21: http://watr.li/samr21-dev-setup-ubuntu.html
+the SAML21: http://watr.li/samr21-dev-setup-ubuntu.html
 
 ## Known Issues / Problems
-
- */

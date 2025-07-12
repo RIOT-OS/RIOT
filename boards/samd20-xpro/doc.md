@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_samd20-xpro Atmel SAM D20 Xplained Pro
 @ingroup     boards
 @brief       Support for the Atmel SAM D20 Xplained Pro board.
@@ -78,5 +77,3 @@ helpful to understanding how to set up a solid RIOT development environment for
 the SAMD20: http://watr.li/samr21-dev-setup-ubuntu.html
 
 ## Known Issues / Problems
-
- */

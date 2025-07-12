@@ -1,22 +1,21 @@
-/**
-@defgroup    boards_saml11-xpro Microchip SAML11 Xplained Pro
+@defgroup    boards_saml10-xpro Microchip SAML10 Xplained Pro
 @ingroup     boards
-@brief       Support for the Microchip SAML11 Xplained Pro board.
+@brief       Support for the Microchip SAML10 Xplained Pro board.
 
 ## Overview
 
-The `SAML11 Xplained Pro` is an ultra-low power evaluation board by Microchip
-featuring a ATSAML11E16A SoC. The SoC includes a SAML11 ARM Cortex-M23 micro-
+The `SAML10 Xplained Pro` is an ultra-low power evaluation board by Microchip
+featuring a ATSAML10E16A SoC. The SoC includes a SAML10 ARM Cortex-M23 micro-
 controller. For programming the MCU comes with 16KB of RAM and 64KB of flash
-memory. In addition, this SoC features the ARM TrustZone technology.
+memory.
 
 ## Hardware
 
-![saml11-xpro image](https://www.microchip.com/_ImagedCopy/Converted-146683-1559149241-C16616-180424-MCU32-PHOTO-DM320205-Front-Transparent.png)
+![saml10-xpro image](https://www.microchip.com/_ImagedCopy/SAML10%20Xpro%20Front%20Title.jpg)
 
 
 ### MCU
-| MCU        | ATSAML11E14A      |
+| MCU        | ATSAML10E16A      |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M23    |
 | Vendor | Microchip |
@@ -47,36 +46,21 @@ memory. In addition, this SoC features the ARM TrustZone technology.
 
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
-| MCU        | saml11    | partly    | PLL clock not implemented |
+| MCU        | saml10    | partly    | PLL clock not implemented |
 | Low-level driver | GPIO    | yes       | |
 |        | PWM       | no            | |
 |        | UART      | yes           | |
 |        | I2C       | yes        | |
 |        | SPI       | yes        | |
 |        | USB       | no        | |
-|        | RTT       | yes       | |
+|        | RTT       | yes        | |
 |        | RTC       | yes      |  |
 |        | RNG       | yes        |  |
 |        | Timer     | yes           | |
 |        | ADC       | yes         | |
 
-
-
 ## Flashing the device
 
 Connect the device to your Micro-USB cable.
 
-The standard method for flashing RIOT to the saml11-xpro is using EDBG.
-
-## Special case
-
-SERCOM1 (available on EXT1 connector) needs an extra step to be usable.
-By default, this SERCOM is only available in the secure world. As RIOT
-doesn't support it for now, the only option, to use it, is to enable
-SERCOM non-secure mode. To do so, a fuse bit must be set in User ROW
-flash memory. Such action can be done with the following EDBG command:
-'edbg -t saml11 -F w0,194,1'
-or pass it as argument when calling make:
-EDBG_ARGS="-F w0,194,1" BOARD=saml11-xpro make flash term -C tests/periph/uart
-
-*/
+The standard method for flashing RIOT to the saml10-xpro is using EDBG.

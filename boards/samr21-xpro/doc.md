@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_samr21-xpro Atmel SAM R21 Xplained Pro
 @ingroup     boards
 @brief       Support for the Atmel SAM R21 Xplained Pro board.
@@ -203,4 +202,3 @@ But when you try to flash again, you could get a CMSIS-DAP related error. It
 seems to only happen with USB 3.0 ports. You can take a look at
 [Vagrant](http://en.wikipedia.org/wiki/Vagrant_%28software%29) and use a virtual
 Linux to run the virtual RIOT, and flash from macOS.
- */

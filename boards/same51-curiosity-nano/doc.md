@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_same51-curiosity-nano Microchip SAM E51 Curiosity Nano
 @ingroup     boards
 @brief       Support for the Microchip SAM E51 Curiosity Nano board.
@@ -82,5 +81,3 @@ sudo service udev restart
 ```
 
 ## Known Issues / Problems
-
- */

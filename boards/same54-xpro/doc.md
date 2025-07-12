@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_same54-xpro Microchip SAM E54 Xplained Pro
 @ingroup     boards
 @brief       Support for the Microchip SAM E54 Xplained Pro board.
@@ -91,5 +90,3 @@ sudo service udev restart
 ```
 
 ## Known Issues / Problems
-
- */

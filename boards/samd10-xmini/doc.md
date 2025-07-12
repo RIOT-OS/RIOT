@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_samd10-xmini Atmel SAM D10 Xplained Mini
 @ingroup     boards
 @brief       Support for the Atmel SAM D10 Xplained Mini board.
@@ -72,5 +71,3 @@ sudo service udev restart
 The I2C pins on the board do not have any pull-ups connected to them.
 That means that running e.g. `i2c_scan` without any I2C slaves connected
 will run into timeouts.
-
- */
