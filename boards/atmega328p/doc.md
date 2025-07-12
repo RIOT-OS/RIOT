@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atmega328p Standalone ATmega328p
 @ingroup     boards
 @brief       Support for using the ATmega328p as standalone board
@@ -111,7 +110,7 @@ the TTL adapter. Usually everything between 3.3 V and 5 V should work.
 
 ## On-Chip Debugging (OCD)
 
-E.g. with the AVR Dragon and [AVaRICE](http://avarice.sourceforge.net/) you
+E.g. with the AVR Dragon and [AVaRICE](https://github.com/avrdudes/avarice) you
 can debug the ATmega328P using the debugWIRE interface. Compared to the ATmega
 MCUs with JTAG interface the debug facilities are however significantly reduced:
 Only a single hardware breakpoint and no watchpoints are supported. The
@@ -158,4 +157,3 @@ cold boot and the ATmega328P will have debugWIRE enabled again.
 
 ## Caution
 Don't expect having a working network stack due to very limited resources ;-)
- */

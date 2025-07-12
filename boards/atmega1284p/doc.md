@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atmega1284p Standalone ATmega1284P
 @ingroup     boards
 @brief       Support for using the ATmega1284P as standalone board
@@ -120,10 +119,7 @@ started using
 #### Software Requirements
 
 In order to debug you'll need an GDB version with AVR support and
-[AVaRICE](http://avarice.sourceforge.net/). Note that AVaRICE sadly is not
-being actively maintained and the latest release will not compile on most
-systems. Thus, unless your distribution already ships a package of the SVN
-version of AVaRICE, you'll have to build the tool from source.
+[AVaRICE](https://github.com/avrdudes/avarice).
 
 ### JTAG Pin Mapping
 
@@ -143,5 +139,3 @@ pins will no longer be available as GPIOs when this fuse is set. With the
 default settings the MCUs are preprogrammed during manufacturing, the `JTAGEN`
 fuse is already set. So with a new and unused package, you're ready directly
 ready to go.
-
- */

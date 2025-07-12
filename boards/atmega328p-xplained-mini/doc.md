@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atmega328p_xplained_mini ATmega328p Xplained Mini
 @ingroup     boards
 @brief       Support for using the ATmega328p Xplained Mini board
@@ -79,7 +78,8 @@ type to get terminal:
 
 ## On-Chip Debugging (OCD)
 
-E.g. with the AVR Xplained Mini and [AVaRICE](http://avarice.sourceforge.net/)
+E.g. with the AVR Xplained Mini and
+[AVaRICE](https://github.com/avrdudes/avarice)
 you can debug the ATmega328P using the debugWIRE interface.  Compared to the
 ATmega MCUs with JTAG interface the debug facilities are however significantly
 reduced: Only a single hardware breakpoint and no watchpoints are supported.
@@ -122,4 +122,3 @@ cold boot and the ATmega328P will have debugWIRE enabled again.
 
 There is a how to ATWINC1500 802.11 b/g/n Wi-Fi Network with this board
 (AN_42552).
- */

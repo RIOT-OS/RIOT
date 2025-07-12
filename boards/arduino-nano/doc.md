@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-nano Arduino Nano
 @ingroup     boards
 @brief       Support for the Arduino Nano board
@@ -93,11 +92,8 @@ permanent). After this modification, flashing via bootloader requires a manual
 press on the reset button.
 
 #### Software
-You need to have [AVaRICE](http://avarice.sourceforge.net/) installed. Some
-distros have this packaged already. If you need to compile it by hand, go for
-the latest SVN revision. The latest release cannot be compiled on anything but
-historic platforms and contains bugs that prevent it from debugging the
-ATmega328P anyway.
+You need to have [AVaRICE](https://github.com/avrdudes/avarice) installed. Some
+distros have this packaged already.
 
 #### Fuses
 In order to use On-Chip Debugging, the `DWEN` bit in the high fuse needs to be
@@ -159,4 +155,3 @@ avoid any issues. You might want to do the same, e.g. via:
 
 ## Caution
 Don't expect having a working network stack due to very limited resources.
- */

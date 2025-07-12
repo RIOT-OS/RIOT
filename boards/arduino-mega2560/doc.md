@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-mega2560 Arduino Mega 2560
 @ingroup     boards
 @brief       Support for the Arduino Mega 2560 board
@@ -133,7 +132,7 @@ MCUs.
 ### Debugging RIOT on the Arduino Mega 2560
 
 `make BOARD=arduino-mega2560 debug-server`: starts an
-[avarice](http://avarice.sourceforge.net/) (avarice needs to be installed)
+[avarice](https://github.com/avrdudes/avarice) (avarice needs to be installed)
 server that `avr-gdb` can connect to.
 
 `make BOARD=arduino-mega2560 debug`: starts an avarice server and connects
@@ -192,4 +191,3 @@ In order to install it, you must download and install a CDC-ACM driver from
 (Go to Support and Downloads/Software & Driver/Mac Software).
 
 A reboot should be enough to find your Arduino on `/dev/tty.usbmodem*`
- */
