@@ -29,7 +29,8 @@
                      IS_USED(MODULE_NRF802154) + \
                      SOCKET_ZEP_MAX + \
                      IS_USED(MODULE_MRF24J40) + \
-                     IS_USED(MODULE_KW2XRF)
+                     IS_USED(MODULE_KW2XRF) + \
+                     IS_USED(MODULE_ESP_IEEE802154)
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +47,7 @@ typedef enum {
     IEEE802154_DEV_TYPE_SOCKET_ZEP,
     IEEE802154_DEV_TYPE_KW2XRF,
     IEEE802154_DEV_TYPE_MRF24J40,
+    IEEE802154_DEV_TYPE_ESP_IEEE802154,
 } ieee802154_dev_type_t;
 
 typedef ieee802154_dev_t* (*ieee802154_dev_cb_t)(ieee802154_dev_type_t type,

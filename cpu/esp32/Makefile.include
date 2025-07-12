@@ -243,6 +243,12 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
 endif
 
+ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-ieee802154
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/ieee802154/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
+endif
+
 ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_sdmmc/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/sdmmc/include
@@ -402,6 +408,15 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
     ARCHIVES += -lrtc
   else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
     ARCHIVES += -lbtbb
+  endif
+endif
+
+ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
+  ifeq (esp32h2,$(CPU_FAM))
+    LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
+    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)
+    ARCHIVES += -lbtbb
+    ARCHIVES += -lphy
   endif
 endif
 

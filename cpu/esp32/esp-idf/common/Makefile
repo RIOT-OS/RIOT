@@ -64,20 +64,26 @@ endif
 
 # TODO separate module
 ifneq (,$(filter esp_idf_phy,$(USEMODULE)))
-  ESP32_SDK_SRC += components/esp_phy/$(CPU_FAM)/phy_init_data.c
   ESP32_SDK_SRC += components/esp_phy/src/phy_common.c
-  ESP32_SDK_SRC += components/esp_phy/src/phy_init.c
-  ESP32_SDK_SRC += components/esp_system/port/soc/$(CPU_FAM)/reset_reason.c
-  ESP32_SDK_SRC += components/soc/esp32/dport_access.c
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/include
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
-  ifeq (,$(filter esp_idf_wifi,$(USEMODULE)))
-    ESP32_SDK_SRC += components/esp_wifi/src/wifi_init.c
-    INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
-    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
+  ifeq (esp32h2,$(CPU_FAM))
+    ESP32_SDK_SRC += components/esp_phy/src/btbb_init.c
+    ESP32_SDK_SRC += components/esp_phy/src/phy_init_esp32hxx.c
+    ESP32_SDK_SRC += components/esp_phy/src/phy_override.c
+  else
+    ESP32_SDK_SRC += components/esp_phy/$(CPU_FAM)/phy_init_data.c
+    ESP32_SDK_SRC += components/esp_phy/src/phy_init.c
+    ESP32_SDK_SRC += components/esp_system/port/soc/$(CPU_FAM)/reset_reason.c
+    ESP32_SDK_SRC += components/soc/esp32/dport_access.c
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
+    ifeq (,$(filter esp_idf_wifi,$(USEMODULE)))
+      ESP32_SDK_SRC += components/esp_wifi/src/wifi_init.c
+      INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
+      INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
+    endif
   endif
 endif
 
