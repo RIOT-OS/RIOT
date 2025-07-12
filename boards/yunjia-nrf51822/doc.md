@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_yunjia-nrf51822 Yunjia NRF51822
 @ingroup     boards
 @brief       Support for the Yunjia NRF51822 board
@@ -239,4 +238,3 @@ configuration script with: `openocd -f boards/yunjia-nrf51822/dist/openocd.cfg`.
 `nrf51 mass_erase`.
 
 This should have erased the whole memory of the device.
- */

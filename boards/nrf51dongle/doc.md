@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nrf51dongle nRF51 Dongle
 @ingroup     boards
 @brief       Support for the Nordic nRF51 Dongle
@@ -51,4 +50,3 @@ To interact with the board just start the tool using the following command:
 For RIOT itself there is a Flash-Script available. When using any of the
 Examples type in the following command:
 `# Make -B clean flash`
- */

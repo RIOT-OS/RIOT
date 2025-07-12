@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nrf52840-mdk nRF52840-MDK
 @ingroup     boards
 @brief       Support for the nRF52840-MDK
@@ -34,4 +33,3 @@ Use the `term` target to connect to the board serial port<br/>
 ```
     make BOARD=nrf52840-mdk -C examples/basic/hello-world term
 ```
- */

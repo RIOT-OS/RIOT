@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nrf51dk nRF51DK Development Kit
 @ingroup     boards
 @brief       Support for the Nordic nRF51DK Development Kit
@@ -31,4 +30,3 @@ To flash the board, use the following command:
 $ make BOARD=nrf51dk flash
 ```
 from any application directory.
- */

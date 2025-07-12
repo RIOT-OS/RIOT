@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nrf9160dk nRF9160DK
 @ingroup     boards
 @brief       Support for the nRF9160DK board
@@ -31,5 +30,3 @@ Use the `term` target to connect to the board serial port<br/>
 ```
     make BOARD=nrf9160dk -C examples/basic/hello-world term
 ```
-
- */

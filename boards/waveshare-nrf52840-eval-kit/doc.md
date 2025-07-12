@@ -1,4 +1,3 @@
-/**
 @defgroup   boards_waveshare_nrf52840_eval_kit Waveshare nRF52840 Eval Kit
 @ingroup    boards
 @brief      Support for the Waveshare nRF52840 Eval Kit
@@ -156,5 +155,3 @@ RESET_PIN='GPIO_PIN\(0,18\)' make BOARD=waveshare-nrf52840-eval-kit -C dist/tool
 ```
 Simply compile, flash, and run that tool on your board, and the reset pin should
 work for the time being.
-
- */

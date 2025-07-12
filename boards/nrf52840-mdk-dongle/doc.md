@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nrf52840-mdk-dongle nRF52840 MDK USB Dongle
 @ingroup     boards
 @brief       Support for the nRF52840 MDK USB Dongle
@@ -58,5 +57,3 @@ To ease debugging,
 pins 0.6 and 0.7 are configured as RX and TX, respectively.
 They provide stdio if no CDC-ACM is disabled,
 and can be used as a custom UART otherwise.
-
- */
