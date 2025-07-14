@@ -103,7 +103,6 @@ Here is a quick overview of the examples available in the RIOT:
 | [gnrc_networking_subnets](./networking/gnrc/gnrc_networking_subnets/README.md) | This example demonstrates IPv6 subnet auto-configuration for networks on a tree topology. |
 | [gnrc_border_router](./networking/gnrc/gnrc_border_router/README.md) | Example of `gnrc_border_router` using automatic configuration |
 | [gnrc_lorawan](./networking/gnrc/gnrc_lorawan/README.md) | Send and receive LoRaWAN packets and perform basic LoRaWAN commands |
-| [gnrc_networking_mac](./networking/gnrc/gnrc_networking_mac/README.md) | This example shows you how to try out communications between RIOT instances with duty-cycled MAC layer protocols |
 
 ### DTLS
 

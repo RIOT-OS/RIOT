@@ -8,7 +8,6 @@ menu "GNRC Network stack"
     depends on USEMODULE_GNRC
 
 rsource "application_layer/dhcpv6/Kconfig"
-rsource "link_layer/gomach/Kconfig"
 rsource "link_layer/lorawan/Kconfig"
 rsource "link_layer/lwmac/Kconfig"
 rsource "link_layer/mac/Kconfig"

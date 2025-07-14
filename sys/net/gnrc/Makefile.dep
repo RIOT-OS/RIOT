@@ -19,20 +19,6 @@ ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_nettype_gomach
-  USEMODULE += random
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires 64bit timestamps
-    USEMODULE += ztimer64_xtimer_compat
-  endif
-  USEMODULE += gnrc_mac
-  USEMODULE += ztimer_no_periph_rtt
-  FEATURES_REQUIRED += periph_rtt
-endif
-
 ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += random

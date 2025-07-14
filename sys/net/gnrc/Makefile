@@ -64,9 +64,6 @@ endif
 ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
     DIRS += link_layer/lorawan
 endif
-ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
-    DIRS += link_layer/gomach
-endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
   DIRS += pktbuf_static
 endif
