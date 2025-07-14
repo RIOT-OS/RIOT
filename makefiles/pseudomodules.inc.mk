@@ -144,12 +144,6 @@ PSEUDOMODULES += gnrc_netif_dedup
 PSEUDOMODULES += gnrc_nettype_ccn
 ## @}
 
-## @defgroup 	net_gnrc_nettype_gomac      gnrc_nettype_gomac
-## @{
-## Enables @ref GNRC_NETTYPE_GOMACH
-PSEUDOMODULES += gnrc_nettype_gomach
-## @}
-
 ## @defgroup 	net_gnrc_nettype_icmpv6     gnrc_nettype_icmpv6
 ## Enables @ref GNRC_NETTYPE_ICMPV6.
 ## @{
