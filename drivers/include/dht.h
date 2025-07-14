@@ -40,17 +40,6 @@ extern "C" {
 #endif
 
 /**
- * @brief       Possible return codes
- *
- * @deprecated  The functions use errno codes instead now
- */
-enum {
-    DHT_OK      =  0,           /**< all good */
-    DHT_NOCSUM  = -EIO,         /**< checksum error */
-    DHT_TIMEOUT = -ETIMEDOUT,   /**< communication timed out */
-};
-
-/**
  * @brief   Data type for storing DHT sensor readings
  */
 typedef struct {
