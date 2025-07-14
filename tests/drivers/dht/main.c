@@ -39,7 +39,7 @@ int main(void)
 
     /* initialize first configured sensor */
     printf("Initializing DHT sensor...\t");
-    if (dht_init(&dev, &dht_params[0]) == DHT_OK) {
+    if (dht_init(&dev, &dht_params[0]) == 0) {
         puts("[OK]\n");
     }
     else {
@@ -51,15 +51,15 @@ int main(void)
     while (1) {
         ztimer_sleep(ZTIMER_USEC, DELAY);
 
-        if (dht_read(&dev, &temp, &hum) != DHT_OK) {
+        if (dht_read(&dev, &temp, &hum) != 0) {
             puts("Error reading both values");
             continue;
         }
-        if (dht_read(&dev, &temp, NULL) != DHT_OK) {
+        if (dht_read(&dev, &temp, NULL) != 0) {
             puts("Error reading just temperature");
             continue;
         }
-        if (dht_read(&dev, NULL, &hum) != DHT_OK) {
+        if (dht_read(&dev, NULL, &hum) != 0) {
             puts("Error reading just humidity");
             continue;
         }
