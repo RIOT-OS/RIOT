@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2017 Freie Universität Berlin
- *               2017 Inria
- *               2017 HAW-Hamburg
- *               2018 Fundacion Inria Chile
+ * Copyright (C) 2017 Inria
+ * Copyright (C) 2017 HAW-Hamburg
+ * Copyright (C) 2018 Fundacion Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
