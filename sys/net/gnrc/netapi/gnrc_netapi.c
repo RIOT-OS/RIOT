@@ -141,3 +141,41 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 
     return numof;
 }
+
+int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netnotify_t event,
+                       void *data, size_t data_len)
+{
+    gnrc_netapi_notify_t notify;
+    msg_t cmd;
+    msg_t ack;
+
+    notify.event = event;
+    notify.data = data;
+    notify.data_len = data_len;
+
+    cmd.type = GNRC_NETAPI_MSG_TYPE_NOTIFY;
+    cmd.content.ptr = (void *)&notify;
+
+    gnrc_netreg_acquire_shared();
+
+    int numof = gnrc_netreg_num(type, demux_ctx);
+
+    if (numof != 0) {
+        /* Look up the registered threads for this message type. */
+        gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
+        
+        /* Dispatch to all registered threads sequentially. */
+        while (sendto) {
+            /* Need to wait for an ACK to ensure that the msg was received and that
+               there won't be any dangling pointers after the function returned. */
+            /* TODO: First send to all threads, then wait for all ACK's?*/
+            msg_send_receive(&cmd, &ack, sendto->target.pid);
+            assert(ack.type == GNRC_NETAPI_MSG_TYPE_ACK);
+            sendto = gnrc_netreg_getnext(sendto);
+        }
+    }
+
+    gnrc_netreg_release_shared();
+
+    return numof;
+}
