@@ -331,6 +331,24 @@ end:
     ble_l2cap_recv_ready(event->receive.chan, rxb);
 }
 
+/**
+ * @brief   Sends a netapi notification for a connection event.
+ *
+ * @param[in] notify    The type of notification event.
+ * @param[in] addr      BLE address of the node that (dis-)connected.
+ */
+static inline void _dispatch_connection_event(netnotify_t notify, uint8_t *addr)
+{
+    netnotify_l2_connec_t event = {
+        .l2addr = addr,
+        .l2addr_len = BLE_ADDR_LEN,
+        .if_pid = _netif.pid,
+    };
+
+    gnrc_netapi_notify(GNRC_NETTYPE_L2_DISCOVERY, GNRC_NETREG_DEMUX_CTX_ALL,
+                       notify, &event, sizeof(netnotify_l2_connec_t));
+}
+
 static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
 {
     int handle = (int)arg;
@@ -349,6 +367,7 @@ static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
             conn->state |= NIMBLE_NETIF_L2CAP_CLIENT;
             conn->state &= ~NIMBLE_NETIF_CONNECTING;
             _notify(handle, NIMBLE_NETIF_CONNECTED_MASTER, conn->addr);
+            _dispatch_connection_event(NETNOTIFY_L2_CONNECTED, conn->addr);
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             assert(conn->state & NIMBLE_NETIF_L2CAP_CLIENT);
@@ -404,6 +423,7 @@ static int _on_l2cap_server_evt(struct ble_l2cap_event *event, void *arg)
             }
 
             _notify(handle, NIMBLE_NETIF_CONNECTED_SLAVE, conn->addr);
+            _dispatch_connection_event(NETNOTIFY_L2_CONNECTED, conn->addr);
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             conn = nimble_netif_conn_from_gaphandle(event->disconnect.conn_handle);
@@ -498,6 +518,7 @@ static int _on_gap_master_evt(struct ble_gap_event *event, void *arg)
             nimble_netif_conn_free(handle, addr);
             thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
+            _dispatch_connection_event(NETNOTIFY_L2_DISCONNECTED, addr);
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
@@ -542,6 +563,7 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
             nimble_netif_conn_free(handle, addr);
             thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
+            _dispatch_connection_event(NETNOTIFY_L2_DISCONNECTED, addr);
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:

@@ -105,6 +105,8 @@ typedef enum {
     GNRC_NETTYPE_ICMPV6,        /**< Protocol is ICMPv6 */
 #endif
 
+    GNRC_NETTYPE_L2_DISCOVERY,  /**< L2 node discovery */
+
 #if IS_USED(MODULE_GNRC_NETTYPE_CCN) || defined(DOXYGEN)
     GNRC_NETTYPE_CCN,           /**< Protocol is CCN */
     GNRC_NETTYPE_CCN_CHUNK,     /**< Protocol is CCN, packet contains a content
