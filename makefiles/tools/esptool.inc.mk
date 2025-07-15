@@ -57,7 +57,7 @@ esptool_flash: $(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py
 
 $(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py:
 	python3 -m venv $(PKGDIRBASE)/esptool/venv_flash
-	$(PKGDIRBASE)/esptool/venv_flash/bin/pip install esptool
+	$(PKGDIRBASE)/esptool/venv_flash/bin/pip install esptool==4.9.0
 
 # reset tool configuration
 RESET ?= $(RIOTTOOLS)/esptools/espreset.py
