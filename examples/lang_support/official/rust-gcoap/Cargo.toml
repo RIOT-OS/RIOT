@@ -15,19 +15,48 @@ codegen-units = 1
 opt-level = "s"
 
 [dependencies]
-riot-wrappers = { version = "^0.9.0", features = [ "set_panic_handler", "panic_handler_format", "with_coap_message", "with_coap_handler", "provide_critical_section_1_0" ] }
+log = { version = "0.4", default-features = false }
+riot-wrappers = { version = "^0.9.0", features = [
+    "set_panic_handler",
+    "panic_handler_format",
+    "with_coap_message",
+    "with_coap_handler",
+    "provide_critical_section_1_0"
+] }
+rust_riotmodules = { path = "../../../../sys/rust_riotmodules/" }
 portable-atomic = { version = "1", features = [ "critical-section" ] }
+coap-handler = "0.2"
 
 coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
 coap-handler-implementations = "0.5"
-riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs", "saul", "nib", "ping" ] }
+riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [
+    "vfs",
+    "saul",
+    "nib",
+    "ping"
+] }
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has
 # its own top-level Rust crate to include rust_riotmodules from inside
-# RIOTBASE.
-rust_riotmodules = { path = "../../../../sys/rust_riotmodules/" }
+# RIOTBASE
 static_cell = "2.1.0"
+
+# EDHOC and OSCORE dependencies
+# Using your forked version of coapcore (git only)
+coapcore = { git = "https://github.com/KiyoLelou10/ariel-os", default-features = false }
+lakers = { version = "0.8.0", default-features = false }
+lakers-crypto-rustcrypto = { version = "0.8.0", default-features = false }
+liboscore = { version = "0.2.4", default-features = false }
+minicbor = { version = "0.26.5", default-features = false }
+heapless = { version = "0.8", default-features = false }
+rand_core = { version = "0.6.4", default-features = false }
+p256 = { version = "0.13.2", default-features = false, features = ["ecdsa"] }
+digest = { version = "0.10.7", default-features = false }
+der = { version = "0.7.10", default-features = false }
+coap-numbers = "0.2.7"
+coap-message = "0.3.6"
+coap-message-utils = "0.3.8"
 
 [patch.crates-io]
 # from https://github.com/seanmonstar/try-lock/pull/11, necessary for those
