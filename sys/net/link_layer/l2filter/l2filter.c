@@ -44,7 +44,11 @@ void l2filter_init(l2filter_t *list)
 
 int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len)
 {
-    assert(list && addr && (addr_len <= CONFIG_L2FILTER_ADDR_MAXLEN));
+    assert(list && addr);
+    if (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN) {
+        assert(0);
+        return -EINVAL;
+    }
 
     int res = -ENOMEM;
 
