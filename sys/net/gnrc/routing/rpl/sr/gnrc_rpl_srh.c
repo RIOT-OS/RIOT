@@ -228,7 +228,6 @@ gnrc_pktsnip_t *gnrc_rpl_srh_insert(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6_hdr)
         "RPL SRH: A new SRH has been created: Len=%d, No. of Segments=%d, Compressed Bytes=%d, Padding Size=%d.\n", \
         srh->len, srh->seg_left, (srh->compr & 0x0F), ((srh->pad_resv & 0xF0) >> 4));
 
-
     uint8_t *addr_vector = (uint8_t *)(srh + 1);
     for (int8_t i = route_length - 2; i >= 0; i--) {
         memcpy(addr_vector, ((uint8_t *)&route_list[i]) + compri, IPV6_ADDR_LEN - compri);

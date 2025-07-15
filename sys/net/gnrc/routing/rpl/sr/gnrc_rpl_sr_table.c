@@ -16,7 +16,6 @@
 #define ENABLE_DEBUG  0
 #include "debug.h"
 
-
 static fib_table_t table;
 static fib_entry_t _sr_table_entries[GNRC_SR_FIB_TABLE_SIZE];
 
@@ -30,7 +29,7 @@ void gnrc_sr_initialize_table(ipv6_addr_t *root, kernel_pid_t iface)
         memcpy(&root_node, root, sizeof(ipv6_addr_t));
     }
     else {
-        DEBUG("FIB Table not Initialized, unvalid root address\n");
+        DEBUG("FIB Table not Initialized, invalid root address\n");
     }
 
     table.size = GNRC_SR_FIB_TABLE_SIZE;
@@ -50,7 +49,7 @@ void gnrc_sr_table_print(void)
 
 void gnrc_sr_print_table_route(ipv6_addr_t *node)
 {
-    /* Intilaize route retrive */
+    /* Initialize route retrieve */
     ipv6_addr_t route_buffer[GNRC_SR_MAX_ROUTE_SIZE];
     size_t route_length = 0;
     /* Retrieve the route from the specified node to the root node */
@@ -86,7 +85,6 @@ int gnrc_sr_add_new_dst(ipv6_addr_t *child, size_t prefix, ipv6_addr_t *parent,
     DEBUG("SR Table: Child %s - ", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)child,
                                                     sizeof(addr_str)));
     DEBUG("Parent: %s\n", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)parent, sizeof(addr_str)));
-
 
     if (fib_add_entry(&table, sr_iface_id, (uint8_t *)child, prefix, sr_flags,
                       (uint8_t *)parent, prefix, sr_flags, lifetime * 1000) == 0) {

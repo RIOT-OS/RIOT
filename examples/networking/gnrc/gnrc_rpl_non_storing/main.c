@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2025 Ahmad Mahmod <ahmad.nawras.mahmod@gmail.com -- mahmod@unistra.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,9 @@
  * @{
  *
  * @file
- * @brief       Example application for demonstrating the RIOT network stack
+ * @brief       Example application for demonstrating the RIOT non-storing mode of RPL
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Ahmad Mahmod <ahmad.nawras.mahmod@gmail.com -- mahmod@unistra.fr>
  *
  * @}
  */
@@ -23,12 +23,8 @@
 #include "shell.h"
 #include "msg.h"
 
-
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
-
-
 
 static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }

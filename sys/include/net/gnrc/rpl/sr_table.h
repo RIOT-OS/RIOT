@@ -8,7 +8,6 @@
 
 #pragma once
 
-
 /**
  * @defgroup    net_gnrc_rpl_sr_table RPL source routing table
  * @ingroup     net_gnrc_rpl
@@ -72,8 +71,6 @@
 extern "C" {
 #endif
 
-
-
 /**
  * @brief Initializes the source routing table with a specified root node.
  *
@@ -93,7 +90,6 @@ void gnrc_sr_table_print(void);
  * @param[in] node IPv6 address of the destination node.
  */
 void gnrc_sr_print_table_route(ipv6_addr_t *node);
-
 
 /**
  * @brief Adds a new source routing entry to the routing table.

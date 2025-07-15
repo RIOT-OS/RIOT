@@ -975,7 +975,8 @@ static gnrc_pktsnip_t *_dao_target_build(gnrc_pktsnip_t *pkt, ipv6_addr_t *addr,
     return opt_snip;
 }
 
-static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime, ipv6_addr_t *parent, bool external)
+static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
+                                        ipv6_addr_t *parent, bool external)
 {
     gnrc_rpl_opt_transit_t *transit;
     gnrc_pktsnip_t *opt_snip;
