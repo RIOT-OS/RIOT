@@ -499,11 +499,3 @@ endif
 ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
   USEMODULE += xtimer
 endif
-
-ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_nettype_lwmac
-  USEMODULE += gnrc_mac
-  USEMODULE += xtimer
-  FEATURES_REQUIRED += periph_rtt
-endif

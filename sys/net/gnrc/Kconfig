@@ -9,7 +9,6 @@ menu "GNRC Network stack"
 
 rsource "application_layer/dhcpv6/Kconfig"
 rsource "link_layer/lorawan/Kconfig"
-rsource "link_layer/lwmac/Kconfig"
 rsource "link_layer/mac/Kconfig"
 rsource "netif/Kconfig"
 rsource "network_layer/ipv6/Kconfig"
