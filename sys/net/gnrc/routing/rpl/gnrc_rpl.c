@@ -40,6 +40,10 @@
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
 #endif
+#ifdef MODULE_GNRC_RPL_SR
+#include "net/gnrc/rpl/sr_table.h"
+#include "net/gnrc/rpl/srh.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -61,6 +65,8 @@ static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _me_reg;
 static mutex_t _inst_id_mutex = MUTEX_INIT;
 static uint8_t _instance_id;
+static ipv6_addr_t gnrc_dodag_id;
+static bool is_root = false;
 
 gnrc_rpl_instance_t gnrc_rpl_instances[GNRC_RPL_INSTANCES_NUMOF];
 gnrc_rpl_parent_t gnrc_rpl_parents[GNRC_RPL_PARENTS_NUMOF];
@@ -132,6 +138,27 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     gnrc_ipv6_nib_change_rtr_adv_iface(netif, true);
 
     return gnrc_rpl_pid;
+}
+
+void set_is_root(void)
+{
+    is_root = true;
+    return;
+}
+
+bool get_is_root(void)
+{
+    return is_root;
+}
+
+ipv6_addr_t *gnrc_rpl_get_root_dodag_id(void)
+{
+    return &gnrc_dodag_id;
+}
+
+ipv6_addr_t *gnrc_rpl_set_root_dodag_id(ipv6_addr_t *dodag_id)
+{
+    return memcpy(&gnrc_dodag_id, dodag_id, sizeof(ipv6_addr_t));
 }
 
 gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *dodag_id,

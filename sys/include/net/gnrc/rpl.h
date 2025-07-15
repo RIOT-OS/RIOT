@@ -21,10 +21,20 @@
  * USEMODULE
  * ---------
  *
- * - RPL (Storing Mode)
+ * - RPL
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   USEMODULE += gnrc_rpl
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - RPL Mode Selection
+ *   - Non-storing
+ * @code{.mk}
+ * CFLAGS += -DCONFIG_GNRC_RPL_MOP_NON_STORING_MODE=1
+ * @endcode
+ *   - Storing
+ * @code{.mk}
+ * CFLAGS += -DCONFIG_GNRC_RPL_MOP_STORING_MODE=1
+ * @endcode
  *
  * - RPL auto-initialization on interface
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
@@ -122,7 +132,6 @@
  *   and [RFC6719](https://tools.ietf.org/html/rfc6719))
  *   (see [14448](https://github.com/RIOT-OS/RIOT/pull/14448) and
  *   [#14623](https://github.com/RIOT-OS/RIOT/pull/14623))
- * - Non-Storing mode
  * - DAG-Metric Container ([RFC6550#6.7.4](https://tools.ietf.org/html/rfc6550#section-6.7.4)
  *   and [RFC6551](https://tools.ietf.org/html/rfc6551))
  *
@@ -499,7 +508,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  *          RFC 6550, section 3.5.1, Rank Comparison (DAGRank())
  *      </a>
  */
-#define DAGRANK(rank,mhri)   (rank/mhri)
+#define DAGRANK(rank, mhri)   (rank/mhri)
 
 /**
  *  @name   Global / Local instance id masks
@@ -577,6 +586,35 @@ extern netstats_rpl_t gnrc_rpl_netstats;
  * @return  a negative errno on error.
  */
 kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
+
+/**
+ * @brief Get the root dodag id needed for SRH in ipv6 thread for src address.
+ *
+ * @return  A pointer to the root dodag id.
+ */
+ipv6_addr_t *gnrc_rpl_get_root_dodag_id(void);
+
+/**
+ * @brief Set the root dodag id needed for SRH in ipv6 thread for src address.
+ *
+ * @param[in] dodag_id       ipv6 address of the DODAG
+ * @return  A pointer to the root dodag id.
+ */
+ipv6_addr_t *gnrc_rpl_set_root_dodag_id(ipv6_addr_t *dodag_id);
+
+/**
+ * @brief   Set the node as root for SRH.
+ *
+ */
+void set_is_root(void);
+
+/**
+ * @brief   get if the node is root for SRH.
+ *
+ * @return  true, if the node is root
+ * @return  false, if the node is not root
+ */
+bool get_is_root(void);
 
 /**
  * @brief Initialization of a node as root.

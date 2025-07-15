@@ -106,6 +106,10 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
+  ifneq (,$(filter -DCONFIG_GNRC_RPL_MOP_NON_STORING_MODE=1,$(CFLAGS)))
+      USEMODULE += gnrc_rpl_sr
+      USEMODULE += fib
+  endif
   ifeq (,$(filter ztimer_msec,$(USEMODULE)))
     USEMODULE += xtimer
   endif
@@ -340,7 +344,7 @@ ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += icmpv6
 endif
 
-ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
+ifneq (,$(filter gnrc_rpl_sr,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_ext_rh
 endif
 
