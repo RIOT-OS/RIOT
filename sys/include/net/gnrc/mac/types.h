@@ -27,9 +27,6 @@
 #include "net/gnrc/priority_pktqueue.h"
 #include "net/ieee802154.h"
 #include "net/gnrc/mac/mac.h"
-#ifdef MODULE_GNRC_LWMAC
-#include "net/gnrc/lwmac/types.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,12 +69,6 @@ typedef struct {
 #if (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0) || defined(DOXYGEN)
     gnrc_pktsnip_t *dispatch_buffer[GNRC_MAC_DISPATCH_BUFFER_SIZE];      /**< dispatch packet buffer */
 #endif /* (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0) || defined(DOXYGEN) */
-
-#ifdef MODULE_GNRC_LWMAC
-    gnrc_lwmac_l2_addr_t l2_addr; /**< Records the sender's address */
-    gnrc_lwmac_rx_state_t state;  /**< LWMAC specific internal reception state */
-    uint8_t rx_bad_exten_count;   /**< Count how many unnecessary RX extensions have been executed */
-#endif
 } gnrc_mac_rx_t;
 
 /**
@@ -169,16 +160,6 @@ typedef struct {
     gnrc_priority_pktqueue_node_t _queue_nodes[GNRC_MAC_TX_QUEUE_SIZE]; /**< Shared buffer for TX queue nodes */
     gnrc_pktsnip_t *packet;                                             /**< currently scheduled packet for sending */
 #endif /* (GNRC_MAC_TX_QUEUE_SIZE != 0) || defined(DOXYGEN) */
-
-#ifdef MODULE_GNRC_LWMAC
-    gnrc_lwmac_tx_state_t state;       /**< LWMAC specific internal transmission state */
-    uint32_t wr_sent;                  /**< Count how many WRs were sent until WA received */
-    uint32_t timestamp;                /**< Records the receiver's current phase */
-    uint8_t bcast_seqnr;               /**< Sequence number for broadcast data to filter at receiver */
-    uint8_t tx_burst_count;            /**< Count how many consecutive packets have been transmitted */
-    uint8_t tx_retry_count;            /**< Count how many Tx-retrials have been executed before packet drop */
-    uint8_t preamble_fail_counts;      /**< Preamble trial failure count. */
-#endif
 } gnrc_mac_tx_t;
 
 /**

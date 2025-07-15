@@ -20,9 +20,6 @@
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
-#ifdef MODULE_GNRC_LWMAC
-#include "net/gnrc/lwmac/lwmac.h"
-#endif
 #include "net/gnrc.h"
 #include "include/init_devs.h"
 
@@ -50,17 +47,10 @@ void auto_init_at86rf2xx(void)
         LOG_DEBUG("[auto_init_netif] initializing at86rf2xx #%u\n", i);
 
         at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i], i);
-#if defined(MODULE_GNRC_LWMAC)
-        gnrc_netif_lwmac_create(&_netif[i], _at86rf2xx_stacks[i],
-                                AT86RF2XX_MAC_STACKSIZE,
-                                AT86RF2XX_MAC_PRIO, "at86rf2xx-lwmac",
-                                &at86rf2xx_devs[i].netdev.netdev);
-#else
         gnrc_netif_ieee802154_create(&_netif[i], _at86rf2xx_stacks[i],
                                      AT86RF2XX_MAC_STACKSIZE,
                                      AT86RF2XX_MAC_PRIO, "at86rf2xx",
                                      &at86rf2xx_devs[i].netdev.netdev);
-#endif
     }
 }
 /** @} */
