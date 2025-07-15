@@ -171,10 +171,43 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
     }
 }
 
+/**
+ * @brief   Handles a netapi event notification.
+ *
+ * @param[in] notify    The type of notification.
+ */
+static inline void _netapi_event(gnrc_netapi_notify_t *notify)
+{
+
+    netnotify_l2_connec_t *connect;
+
+    switch (notify->event) {
+    case NETNOTIFY_L2_CONNECTED:
+        connect = (netnotify_l2_connec_t *)notify->data;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+        /* Add node to neighbor cache if interface represents a 6LN. */
+        gnrc_ipv6_nib_nc_try_set_6ln(connect->if_pid, connect->l2addr, connect->l2addr_len);
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
+        break;
+    case NETNOTIFY_L2_DISCONNECTED:
+        connect = (netnotify_l2_connec_t *)notify->data;
+        /* Remove node from neighbor cache. */
+        gnrc_ipv6_nib_nc_del_l2(connect->if_pid, connect->l2addr, connect->l2addr_len);
+        break;
+    default:
+        break;
+    }
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
-    gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+
+    /* Register entry for messages in IPv6 context. */
+    gnrc_netreg_entry_t me_ipv6_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                            thread_getpid());
+    /* Register entry for messages in L2 discovery context. */
+    gnrc_netreg_entry_t me_discovery_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             thread_getpid());
 
     (void)args;
@@ -184,8 +217,12 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
     gnrc_ipv6_ext_frag_init();
 #endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
-    /* register interest in all IPv6 packets */
-    gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
+
+    /* Register interest in all IPv6 packets. */
+    gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_ipv6_reg);
+
+    /* Register interest in L2 neighbor discovery info. */
+    gnrc_netreg_register(GNRC_NETTYPE_L2_DISCOVERY, &me_discovery_reg);
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -210,6 +247,12 @@ static void *_event_loop(void *args)
             case GNRC_NETAPI_MSG_TYPE_SET:
                 DEBUG("ipv6: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
+                msg_reply(&msg, &reply);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_NOTIFY:
+                DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
+                _netapi_event(msg.content.ptr);
+                reply.content.value = 0;
                 msg_reply(&msg, &reply);
                 break;
 
