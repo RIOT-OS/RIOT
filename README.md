@@ -191,6 +191,6 @@ https://www.riot-os.org
 [stackoverflow-badge]: https://img.shields.io/badge/stackoverflow-%5Briot--os%5D-yellow
 [stackoverflow-link]: https://stackoverflow.com/questions/tagged/riot-os
 [mastodon-badge]: https://img.shields.io/badge/social-Mastodon-informational.svg
-[mastodon-link]: https://fosstodon.org/@RIOT_OS
+[mastodon-link]: https://floss.social/@RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
 [wiki-link]: https://github.com/RIOT-OS/RIOT/wiki
