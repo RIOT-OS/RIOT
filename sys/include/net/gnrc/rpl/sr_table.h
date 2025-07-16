@@ -32,7 +32,7 @@
  * @brief Maximum number of hops per route in the source routing table.
  */
 #ifndef GNRC_SR_MAX_ROUTE_SIZE
-#define GNRC_SR_MAX_ROUTE_SIZE (16)
+#   define GNRC_SR_MAX_ROUTE_SIZE (16)
 #endif
 
 /**
@@ -40,7 +40,7 @@
  * @brief Number of header entries in the SR FIB table.
  */
 #ifndef GNRC_SR_FIB_TABLE_HEADER_ELEMENTS
-#define GNRC_SR_FIB_TABLE_HEADER_ELEMENTS (2)
+#   define GNRC_SR_FIB_TABLE_HEADER_ELEMENTS (2)
 #endif
 
 /**
@@ -48,7 +48,7 @@
  * @brief Total size of the SR FIB table.
  */
 #ifndef GNRC_SR_FIB_TABLE_SIZE
-#define GNRC_SR_FIB_TABLE_SIZE (32)
+#   define GNRC_SR_FIB_TABLE_SIZE (32)
 #endif
 
 /**
@@ -56,7 +56,7 @@
  * @brief Size of the header section in the SR FIB table.
  */
 #ifndef GNRC_SR_FIB_TABLE_HEADER_SIZE
-#define GNRC_SR_FIB_TABLE_HEADER_SIZE (32)
+#   define GNRC_SR_FIB_TABLE_HEADER_SIZE (32)
 #endif
 
 /**
@@ -64,7 +64,7 @@
  * @brief Number of entries in the FIB entry pool.
  */
 #ifndef GNRC_SR_FIB_TABLE_ENTRY_POOL_SIZE
-#define GNRC_SR_FIB_TABLE_ENTRY_POOL_SIZE (32)
+#   define GNRC_SR_FIB_TABLE_ENTRY_POOL_SIZE (32)
 #endif
 
 #ifdef __cplusplus

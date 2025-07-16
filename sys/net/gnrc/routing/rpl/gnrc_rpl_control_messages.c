@@ -1043,7 +1043,6 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         }
         else {
             if (destination == NULL) {
-
                 destination = parent;
             }
         }

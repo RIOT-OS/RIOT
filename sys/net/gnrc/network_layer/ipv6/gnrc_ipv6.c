@@ -508,7 +508,7 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
         gnrc_netif_t *iface = gnrc_netif_get_by_prefix(gnrc_rpl_get_root_dodag_id());
         netif = gnrc_netif_get_by_pid(iface->pid);
     }
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
     if (gnrc_ipv6_nib_get_next_hop_l2addr(&ipv6_hdr->dst, netif, pkt,
                                           &nce) < 0) {
         /* packet is released by NIB */
@@ -753,7 +753,8 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             return;
         }
 
-        /* Set the src to the global address to avoid being set to the local one in _safe_fill_ipv6_hdr */
+        /* Set the src to the global address 
+         * to avoid being set to the local one in _safe_fill_ipv6_hdr */
         memcpy(&ipv6_hdr->src, gnrc_rpl_get_root_dodag_id(),\
             sizeof(ipv6_addr_t));
     }
@@ -929,16 +930,16 @@ static void _receive(gnrc_pktsnip_t *pkt)
          * link-local source address
          */
         bool route_local = true;
-    #ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SR
         route_local = ipv6_addr_is_link_local(&(hdr->dst));
         DEBUG("ipv6: do not forward packets with link-local destination address\n");
 
-    #else
+#else /* MODULE_GNRC_RPL_SR */
         route_local =
             ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst))));
         DEBUG("ipv6: do not forward packets with link-local source or"
               " destination address\n");
-    #endif
+#endif /* MODULE_GNRC_RPL_SR */
         if (route_local) {
 #ifdef MODULE_GNRC_ICMPV6_ERROR
             if (ipv6_addr_is_link_local(&(hdr->src)) &&
@@ -972,9 +973,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
                 pkt = gnrc_rpl_srh_insert(pkt, hdr);
             }
             _send(pkt, false);
-#else /*MODULE_GNRC_RPL_SR*/
+#else /* MODULE_GNRC_RPL_SR */
             _send(pkt, false);
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
             return;
         }
         else {

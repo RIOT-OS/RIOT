@@ -484,7 +484,7 @@ static size_t _iphc_nhc_ipv6_ext_decode(gnrc_pktsnip_t *sixlo, size_t offset,
         case NHC_IPV6_EXT_EID_RH:
             protnum = PROTNUM_IPV6_EXT_RH;
             break;
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
         case NHC_IPV6_EXT_EID_FRAG:
             protnum = PROTNUM_IPV6_EXT_FRAG;
             break;
@@ -529,9 +529,9 @@ static size_t _iphc_nhc_ipv6_decode(gnrc_pktsnip_t *sixlo, size_t offset,
 
     switch (ipv6_nhc & NHC_IPV6_EXT_EID_MASK) {
         case NHC_IPV6_EXT_EID_HOPOPT:
-        #ifndef MODULE_GNRC_RPL_SR
+#ifndef MODULE_GNRC_RPL_SR
         case NHC_IPV6_EXT_EID_RH:
-        #endif
+#endif /* MODULE_GNRC_RPL_SR */
         case NHC_IPV6_EXT_EID_FRAG:
         case NHC_IPV6_EXT_EID_DST:
         case NHC_IPV6_EXT_EID_MOB: {
@@ -1068,7 +1068,7 @@ static inline bool _compressible_nh(uint8_t nh)
         case PROTNUM_IPV6:
 #ifndef MODULE_GNRC_RPL_SR
         case PROTNUM_IPV6_EXT_RH:
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
         case PROTNUM_IPV6_EXT_FRAG:
         case PROTNUM_IPV6_EXT_DST:
         case PROTNUM_IPV6_EXT_MOB:
@@ -1416,11 +1416,11 @@ static ssize_t _iphc_nhc_ipv6_ext_encode(uint8_t *nhc_data,
              * > header is a multiple of 8 octets, the trailing Pad1 or PadN option
              * > MAY be elided by the compressor. */
             break;
-        #ifndef MODULE_GNRC_RPL_SR
+#ifndef MODULE_GNRC_RPL_SR
         case PROTNUM_IPV6_EXT_RH:
             nhc_data[0] |= NHC_IPV6_EXT_EID_RH;
             break;
-        #endif
+#endif /* MODULE_GNRC_RPL_SR */
         case PROTNUM_IPV6_EXT_FRAG:
             nhc_data[0] |= NHC_IPV6_EXT_EID_FRAG;
             break;
@@ -1613,7 +1613,7 @@ static inline bool _compressible(gnrc_pktsnip_t *hdr)
 # if defined(MODULE_GNRC_IPV6_EXT)
         case GNRC_NETTYPE_IPV6_EXT:
 # endif /* defined(MODULE_GNRC_IPV6_EXT) */
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
 # if defined(MODULE_GNRC_UDP)
         case GNRC_NETTYPE_UDP:
 # endif /* defined(MODULE_GNRC_UDP) */
@@ -1701,7 +1701,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
             case PROTNUM_IPV6_EXT_HOPOPT:
 #ifndef MODULE_GNRC_RPL_SR
             case PROTNUM_IPV6_EXT_RH:
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
             case PROTNUM_IPV6_EXT_FRAG:
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_MOB:

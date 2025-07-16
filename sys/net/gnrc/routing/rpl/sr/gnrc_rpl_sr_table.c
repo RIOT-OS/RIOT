@@ -84,7 +84,7 @@ int gnrc_sr_add_new_dst(ipv6_addr_t *child, size_t prefix, ipv6_addr_t *parent,
 
     DEBUG("SR table: Child %s - ", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)child,
         sizeof(addr_str)));
-    DEBUG("Parent: %s\n", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)parent, 
+    DEBUG("Parent: %s\n", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)parent,
         sizeof(addr_str)));
 
     if (fib_add_entry(&table, sr_iface_id, (uint8_t *)child, prefix, sr_flags,

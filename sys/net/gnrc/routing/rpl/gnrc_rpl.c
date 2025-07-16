@@ -43,7 +43,7 @@
 #ifdef MODULE_GNRC_RPL_SR
 #include "net/gnrc/rpl/sr_table.h"
 #include "net/gnrc/rpl/srh.h"
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

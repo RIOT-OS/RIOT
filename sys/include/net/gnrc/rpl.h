@@ -33,9 +33,13 @@
  * @endcode
  *   - Storing
  * @code{.mk}
- * CFLAGS += -DCONFIG_GNRC_RPL_MOP_STORING_MODE=1
+ * CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_NO_MC=1 
  * @endcode
- *
+ * or 
+ * @code{.mk}
+ * CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_MC=1
+ * @endcode
+ * 
  * - RPL auto-initialization on interface
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   USEMODULE += auto_init_gnrc_rpl
@@ -611,8 +615,8 @@ void set_is_root(void);
 /**
  * @brief   get if the node is root for SRH.
  *
- * @return  true, if the node is root
- * @return  false, if the node is not root
+ * @retval  true, if the node is root
+ * @retval  false, if the node is not root
  */
 bool get_is_root(void);
 

@@ -392,7 +392,7 @@ static int _gnrc_rpl(int argc, char **argv)
         gnrc_sr_table_print();
         return 0;
     }
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
     else if ((argc == 3) && strcmp(argv[1], "init") == 0) {
         return _gnrc_rpl_init(argv[2]);
     }
@@ -475,7 +475,7 @@ static int _gnrc_rpl(int argc, char **argv)
          "- send a multicast DIS with SOL option\n");
 #ifdef MODULE_GNRC_RPL_SR
     puts("* sr_table\t - show the source routing table in the root nodes only.");
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
     if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
         printf("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs\n");
     }
