@@ -29,7 +29,7 @@ void gnrc_sr_initialize_table(ipv6_addr_t *root, kernel_pid_t iface)
         memcpy(&root_node, root, sizeof(ipv6_addr_t));
     }
     else {
-        DEBUG("FIB Table not Initialized, invalid root address\n");
+        DEBUG("RPL SR Table: FIB table not initialized: invalid root address\n");
     }
 
     table.size = GNRC_SR_FIB_TABLE_SIZE;
@@ -37,25 +37,25 @@ void gnrc_sr_initialize_table(ipv6_addr_t *root, kernel_pid_t iface)
     table.data.entries = _sr_table_entries;
 
     fib_init(&table);
-    DEBUG("FIB Table Initialized\n");
+    DEBUG("RPL SR Table: FIB table initialized\n");
 
 }
 
 void gnrc_sr_table_print(void)
 {
-    DEBUG("FIB Table Content:\n");
+    DEBUG("RPL SR Table: FIB table content:\n");
     fib_print_routes(&table);
 }
 
 void gnrc_sr_print_table_route(ipv6_addr_t *node)
 {
-    /* Initialize route retrieve */
+    /* Initialize route retrieval */
     ipv6_addr_t route_buffer[GNRC_SR_MAX_ROUTE_SIZE];
     size_t route_length = 0;
-    /* Retrieve the route from the specified node to the root node */
+    /* Retrieve the route from the specified node to the root */
     int result = gnrc_sr_get_full_route(node, route_buffer, &route_length);
 
-    printf("A route to %s route has been found: ",
+    printf("RPL SR Table: A route to %s has been found: ",
            ipv6_addr_to_str(addr_str, (ipv6_addr_t *)node, sizeof(addr_str)));
     if (result >= 0) {
         for (size_t i = 0; i < route_length; ++i) {
@@ -65,7 +65,7 @@ void gnrc_sr_print_table_route(ipv6_addr_t *node)
         printf("\n");
     }
     else {
-        printf("No route found");
+        printf("RPL SR Table: No route found\n");
     }
 }
 
@@ -73,27 +73,28 @@ int gnrc_sr_add_new_dst(ipv6_addr_t *child, size_t prefix, ipv6_addr_t *parent,
                         kernel_pid_t sr_iface_id,
                         uint32_t sr_flags, uint32_t lifetime)
 {
-    /* Initialize a new SR */
+    /* Initialize a new source route */
     if (child == NULL || parent == NULL
         || ipv6_addr_is_unspecified(child) || ipv6_addr_is_unspecified(parent)
         || (prefix == 0) || (sr_flags != FIB_FLAG_RPL_ROUTE)
         || ipv6_addr_equal(child, parent)) {
-        DEBUG("Invalid Parameter\n");
+        DEBUG("RPL SR Table: Invalid parameter\n");
         return -1;
     }
 
-    DEBUG("SR Table: Child %s - ", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)child,
-                                                    sizeof(addr_str)));
-    DEBUG("Parent: %s\n", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)parent, sizeof(addr_str)));
+    DEBUG("SR table: Child %s - ", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)child,
+        sizeof(addr_str)));
+    DEBUG("Parent: %s\n", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)parent, 
+        sizeof(addr_str)));
 
     if (fib_add_entry(&table, sr_iface_id, (uint8_t *)child, prefix, sr_flags,
                       (uint8_t *)parent, prefix, sr_flags, lifetime * 1000) == 0) {
         /* Append only the child-parent pair */
-        DEBUG("A new entry has been added to SR table.\n");
+        DEBUG("RPL SR Table: A new entry has been added to the SR table.\n");
         return 0;
     }
     else {
-        DEBUG("Failed to create source route for child-parent pair.\n");
+        DEBUG("RPL SR Table: Failed to add child-parent pair to the source routing table.\n");
         return -1;
     }
 }
@@ -101,11 +102,11 @@ int gnrc_sr_add_new_dst(ipv6_addr_t *child, size_t prefix, ipv6_addr_t *parent,
 int gnrc_sr_delete_route(ipv6_addr_t *dst_node, size_t dst_size)
 {
     if (dst_node == NULL) {
-        DEBUG("Invalid IPv6 Address\n");
+        DEBUG("RPL SR Table: Invalid IPv6 address\n");
         return -1;
     }
     fib_remove_entry(&table,  (uint8_t *)dst_node, dst_size);
-    DEBUG("Route to destination deleted successfully.\n");
+    DEBUG("RPL SR Table: Route to destination successfully deleted.\n");
 
     return 0;
 }
@@ -114,7 +115,7 @@ int gnrc_sr_get_full_route(ipv6_addr_t *dst_node, ipv6_addr_t *route_buffer,
                            size_t *route_length)
 {
     if (dst_node == NULL || route_buffer == NULL || route_length == NULL) {
-        DEBUG("Invalid parameter\n");
+        DEBUG("RPL SR Table: Invalid parameter\n");
         return -1;
     }
 
@@ -136,7 +137,7 @@ int gnrc_sr_get_full_route(ipv6_addr_t *dst_node, ipv6_addr_t *route_buffer,
                                       sizeof(ipv6_addr_t), sr_flags);
 
         if (result < 0) {
-            DEBUG("Result = %d - Failed to find route to the root. Stuck at node: %s\n", result,
+            DEBUG("RPL SR Table: Failed to find a route to the root. Stuck at node: %s\n", result,
                   ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&current_node, sizeof(addr_str)));
             return -1;
         }
@@ -155,7 +156,7 @@ int gnrc_sr_get_full_route(ipv6_addr_t *dst_node, ipv6_addr_t *route_buffer,
     *route_length = route_index;
 
     if (ENABLE_DEBUG) {
-        DEBUG("Route reconstructed: ");
+        DEBUG("RPL SR Table: Reconstructed route: ");
         for (size_t i = 0; i < *route_length; ++i) {
             DEBUG("%s", ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&route_buffer[i],
                                          sizeof(addr_str)));

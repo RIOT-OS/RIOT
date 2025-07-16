@@ -668,6 +668,7 @@ static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
     }
 }
 
+#ifdef MODULE_GNRC_RPL_SR
 /* function for sending in non-storing mode */
 static inline bool _pkt_from_me(ipv6_hdr_t *hdr)
 {
@@ -679,6 +680,7 @@ static inline bool _pkt_from_me(ipv6_hdr_t *hdr)
         return !(gnrc_netif_get_by_ipv6_addr(&hdr->src) == NULL);
     }
 }
+#endif /* MODULE_GNRC_RPL_SR */
 
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 {
