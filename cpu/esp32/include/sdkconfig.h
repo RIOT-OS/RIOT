@@ -311,6 +311,8 @@
 #  include "sdkconfig_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #  include "sdkconfig_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "sdkconfig_esp32c6.h"
 #elif defined(CPU_FAM_ESP32H2)
 #  include "sdkconfig_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)

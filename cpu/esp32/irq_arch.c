@@ -61,60 +61,69 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #  endif /* SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1 */
 #endif /* SOC_TIMER_GROUPS > 1 */
-#if defined(CPU_FAM_ESP32)
+#if CPU_FAM_ESP32
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
-#elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || \
-      defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32H2)
-    { ETS_SYSTIMER_TARGET2_EDGE_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
+#elif CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3 || \
+      CPU_FAM_ESP32C3 || CPU_FAM_ESP32C6 || CPU_FAM_ESP32H2
+    { ETS_SYSTIMER_TARGET2_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #else
 #  error "Platform implementation is missing"
 #endif
     { ETS_UART0_INTR_SOURCE, CPU_INUM_UART, 1 },
     { ETS_UART1_INTR_SOURCE, CPU_INUM_UART, 1 },
-#if SOC_UART_NUM > 2
+#if SOC_UART_HP_NUM > 2
     { ETS_UART2_INTR_SOURCE, CPU_INUM_UART, 1 },
 #endif
     { ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO, 1 },
     { ETS_I2C_EXT0_INTR_SOURCE, CPU_INUM_I2C, 1 },
-#if SOC_I2C_NUM > 1
+#if SOC_HP_I2C_NUM > 1
     { ETS_I2C_EXT1_INTR_SOURCE, CPU_INUM_I2C, 1 },
 #endif
-#if defined(SOC_BLE_SUPPORTED)
-#  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#if SOC_BLE_SUPPORTED
+#  if CPU_FAM_ESP32 || CPU_FAM_ESP32S3 || CPU_FAM_ESP32C3
     { ETS_RWBLE_INTR_SOURCE, CPU_INUM_BLE, 1 },
-#  elif defined(CPU_FAM_ESP32H2)
+#  elif CPU_FAM_ESP32C6
+    { ETS_LP_TIMER_INTR_SOURCE, CPU_INUM_BLE, 1 },
+    { ETS_BT_MAC_INTR_SOURCE, CPU_INUM_BT_MAC, 1 },
+#  elif CPU_FAM_ESP32H2
     { ETS_LP_BLE_TIMER_INTR_SOURCE, CPU_INUM_BLE, 1 },
     { ETS_BT_MAC_INTR_SOURCE, CPU_INUM_BT_MAC, 1 },
 #  else
 #    error "Platform implementation is missing"
 #  endif
 #endif /* SOC_BLE_SUPPORTED */
-#if defined(SOC_EMAC_SUPPORTED)
+#if SOC_EMAC_SUPPORTED
     { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH, 1 },
 #endif
 #if SOC_IEEE802154_SUPPORTED
+#  if CPU_FAM_ESP32C6
+    { ETS_ZB_MAC_SOURCE, CPU_INUM_ZMAC, 3},
+#  elif CPU_FAM_ESP32H2
     { ETS_ZB_MAC_INTR_SOURCE, CPU_INUM_ZMAC, 3},
+#  else
+#    error "Platform implementation is missing"
+#  endif
 #endif
-#if defined(SOC_RMT_SUPPORTED)
+#if SOC_RMT_SUPPORTED
     { ETS_RMT_INTR_SOURCE, CPU_INUM_RMT, 1 },
 #endif
-#if defined(SOC_SDMMC_HOST_SUPPORTED)
+#if SOC_SDMMC_HOST_SUPPORTED
     { ETS_SDIO_HOST_INTR_SOURCE, CPU_INUM_SDMMC, 2 },
 #endif
-#if defined(SOC_TWAI_SUPPORTED)
-#  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || \
-      defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32C3)
+#if SOC_TWAI_SUPPORTED
+#  if CPU_FAM_ESP32 || CPU_FAM_ESP32S3 || \
+      CPU_FAM_ESP32S2 || CPU_FAM_ESP32C3
     { ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN, 1 },
-#  elif defined(CPU_FAM_ESP32H2)
+#  elif CPU_FAM_ESP32C6 || CPU_FAM_ESP32H2
     { ETS_TWAI0_INTR_SOURCE, CPU_INUM_CAN, 1 },
 #  else
 #    error "Platform implementation is missing"
 #  endif
 #endif /* SOC_TWAI_SUPPORTED */
-#if defined(SOC_USB_OTG_SUPPORTED)
+#if SOC_USB_OTG_SUPPORTED
     { ETS_USB_INTR_SOURCE, CPU_INUM_USB, 1 },
 #endif
-#if defined(SOC_USB_SERIAL_JTAG_SUPPORTED)
+#if SOC_USB_SERIAL_JTAG_SUPPORTED
     { ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG, 1 },
 #endif
 #if SOC_LCDCAM_SUPPORTED
@@ -215,6 +224,9 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
     if (ret_handle) {
         *((intr_handle_t *)ret_handle) = (const intr_handle_t)&_irq_data_table[i];
     }
+
+    DEBUG("%s source=%d routed to interrupt %u\n",
+          __func__, source, _irq_data_table[i].intr);
 
     return ESP_OK;
 }
