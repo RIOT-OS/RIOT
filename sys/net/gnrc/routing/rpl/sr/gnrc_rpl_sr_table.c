@@ -137,7 +137,7 @@ int gnrc_sr_get_full_route(ipv6_addr_t *dst_node, ipv6_addr_t *route_buffer,
                                       sizeof(ipv6_addr_t), sr_flags);
 
         if (result < 0) {
-            DEBUG("RPL SR Table: Failed to find a route to the root. Stuck at node: %s\n", result,
+            DEBUG("RPL SR Table: Failed to find a route to the root. Stuck at node: %s\n",
                   ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&current_node, sizeof(addr_str)));
             return -1;
         }

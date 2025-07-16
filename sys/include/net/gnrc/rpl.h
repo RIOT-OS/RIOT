@@ -33,13 +33,13 @@
  * @endcode
  *   - Storing
  * @code{.mk}
- * CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_NO_MC=1 
+ * CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_NO_MC=1
  * @endcode
- * or 
+ * or
  * @code{.mk}
  * CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_MC=1
  * @endcode
- * 
+ *
  * - RPL auto-initialization on interface
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  *   USEMODULE += auto_init_gnrc_rpl
@@ -613,10 +613,10 @@ ipv6_addr_t *gnrc_rpl_set_root_dodag_id(ipv6_addr_t *dodag_id);
 void set_is_root(void);
 
 /**
- * @brief   get if the node is root for SRH.
+ * @brief   Check if the node is a RPL root (used for SRH).
  *
- * @retval  true, if the node is root
- * @retval  false, if the node is not root
+ * @retval true  The node is a root
+ * @retval false The node is not a root
  */
 bool get_is_root(void);
 

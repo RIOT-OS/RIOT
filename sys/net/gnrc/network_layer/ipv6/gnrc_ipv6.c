@@ -753,7 +753,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             return;
         }
 
-        /* Set the src to the global address 
+        /* Set the src to the global address
          * to avoid being set to the local one in _safe_fill_ipv6_hdr */
         memcpy(&ipv6_hdr->src, gnrc_rpl_get_root_dodag_id(),\
             sizeof(ipv6_addr_t));

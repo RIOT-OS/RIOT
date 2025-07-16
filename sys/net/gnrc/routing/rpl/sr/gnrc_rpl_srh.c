@@ -178,7 +178,7 @@ gnrc_pktsnip_t *gnrc_rpl_srh_insert(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6_hdr)
     ipv6_addr_t route_list[GNRC_SR_MAX_ROUTE_SIZE];
 
     uint8_t ext_len = 0;
-    uint8_t compri = 15, compre = 15; /* ComprI and ComprE fields of the RPL Source Routing Header. */
+    uint8_t compri = 15, compre = 15;
     uint8_t padding = 0;
 
     /* Get the route to destination */
