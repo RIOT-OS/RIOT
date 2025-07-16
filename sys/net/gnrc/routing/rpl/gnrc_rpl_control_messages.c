@@ -999,7 +999,7 @@ static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
 #ifdef MODULE_GNRC_RPL_SRH
     transit->parent = *parent;
 #else /* MODULE_GNRC_RPL_SRH */
-    (void)parent; /* unused in non-storing mode */
+    (void)parent; /* unused in storing mode */
 #endif
     transit->e_flags = (external) << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT;
     transit->path_control = 0;
@@ -1012,7 +1012,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 {
     gnrc_rpl_dodag_t *dodag;
     uint8_t mop;
-    ipv6_addr_t *parent;
+    ipv6_addr_t parent;
 
     if (inst == NULL) {
         DEBUG("RPL: Error - trying to send DAO without being part of a dodag.\n");
@@ -1021,6 +1021,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     dodag = &inst->dodag;
     mop = inst->mop;
+    memcpy(&parent, &dodag->parents->addr, sizeof(ipv6_addr_t));
     
     if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
         return;
@@ -1041,8 +1042,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
             destination = &dodag->dodag_id;
         }
         else {
-            parent = &(dodag->parents->addr);
-            destination = parent;
+            destination = &parent;
         }
     }
     gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;
@@ -1065,14 +1065,13 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     me = &netif->ipv6.addrs[idx];
     if (mop == GNRC_RPL_MOP_NON_STORING_MODE) {
         /* Add the prefix to include the parent's global IP address. */
-        memcpy(parent, &dodag->dodag_id, 8);
-        if ((pkt = _dao_transit_build(pkt, lifetime, parent, false)) == NULL) {
+        ipv6_addr_init_prefix(&parent, &dodag->dodag_id, IPV6_ADDR_BIT_LEN - 64);
+        if ((pkt = _dao_transit_build(pkt, lifetime, &parent, false)) == NULL) {
             DEBUG("RPL: Send DAO - no space left in packet buffer\n");
             return;
         }
     }
     else {
-
         /* add external and RPL FT entries */
         /* TODO: nib: dropped support for external transit options for now */
         void *ft_state = NULL;
@@ -1080,7 +1079,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         while (gnrc_ipv6_nib_ft_iter(NULL, dodag->iface, &ft_state, &fte)) {
             DEBUG("RPL: Send DAO - building transit option\n");
 
-            if ((pkt = _dao_transit_build(pkt, lifetime, parent, false)) == NULL) {
+            if ((pkt = _dao_transit_build(pkt, lifetime, &parent, false)) == NULL) {
                 DEBUG("RPL: Send DAO - no space left in packet buffer\n");
                 return;
             }
