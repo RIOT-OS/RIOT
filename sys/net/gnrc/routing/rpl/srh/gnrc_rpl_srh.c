@@ -137,30 +137,12 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh, void **err_ptr)
     return GNRC_IPV6_EXT_RH_FORWARDED;
 }
 
-static uint8_t _ipv6_addr_matching_bytes(const ipv6_addr_t *a, const ipv6_addr_t *b)
-{
-    if ((a == NULL) || (b == NULL)) {
-        return 0;
-    }
-
-    if (a == b) {
-        return sizeof(ipv6_addr_t);
-    }
-
-    for (size_t i = 0; i < sizeof(ipv6_addr_t); i++) {
-        if (((uint8_t *)a)[i] != ((uint8_t *)b)[i]) {
-            return i;
-        }
-    }
-    return 16;
-}
-
 static uint8_t _compute_compression_index(ipv6_addr_t *route_list, size_t route_length,
                                           ipv6_addr_t *dest_addr)
 {
     uint8_t compri = 15;
     for (uint8_t i = 0; i < route_length; i++) {
-        compri = MIN(compri, _ipv6_addr_matching_bytes(&route_list[i], dest_addr));
+        compri = MIN(compri, ipv6_addr_match_prefix(&route_list[i], dest_addr)/8);
     }
 
     return compri;
