@@ -90,6 +90,9 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #if defined(SOC_EMAC_SUPPORTED)
     { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH, 1 },
 #endif
+#if SOC_IEEE802154_SUPPORTED
+    { ETS_ZB_MAC_INTR_SOURCE, CPU_INUM_ZMAC, 3},
+#endif
 #if defined(SOC_RMT_SUPPORTED)
     { ETS_RMT_INTR_SOURCE, CPU_INUM_RMT, 1 },
 #endif
