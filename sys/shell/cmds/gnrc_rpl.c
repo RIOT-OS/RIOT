@@ -31,7 +31,7 @@
 #include "net/gnrc/rpl/p2p_dodag.h"
 #include "net/gnrc/rpl/p2p_structs.h"
 #endif
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
 #include "net/gnrc/rpl/sr_table.h"
 #endif
 
@@ -387,12 +387,12 @@ static int _gnrc_rpl(int argc, char **argv)
     if ((argc < 2) || (strcmp(argv[1], "show") == 0)) {
         return _gnrc_rpl_dodag_show();
     }
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     else if (strcmp(argv[1], "sr_table") == 0) {
         gnrc_sr_table_print();
         return 0;
     }
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
     else if ((argc == 3) && strcmp(argv[1], "init") == 0) {
         return _gnrc_rpl_init(argv[2]);
     }
@@ -473,9 +473,9 @@ static int _gnrc_rpl(int argc, char **argv)
     printf("* send dis\t\t\t\t- send a multicast DIS\n");
     printf("* send dis <VID_flags> <version> <instance_id> <dodag_id>"
          "- send a multicast DIS with SOL option\n");
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     puts("* sr_table\t - show the source routing table in the root nodes only.");
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
     if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
         printf("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs\n");
     }

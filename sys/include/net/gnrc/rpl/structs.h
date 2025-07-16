@@ -197,7 +197,7 @@ typedef struct __attribute__((packed)) {
     uint8_t path_control;       /**< limits the number of DAO parents */
     uint8_t path_sequence;      /**< increased value for route updates */
     uint8_t path_lifetime;      /**< lifetime of routes */
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     ipv6_addr_t parent;         /**< IPv6 prefix, address or multicast group */
 #endif
 } gnrc_rpl_opt_transit_t;

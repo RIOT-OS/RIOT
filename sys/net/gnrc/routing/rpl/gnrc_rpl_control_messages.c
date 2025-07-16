@@ -644,7 +644,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             /* Non-storing */
 #ifdef MODULE_GNRC_RPL_SR
             gnrc_sr_delete_route(&(target->target), sizeof(ipv6_addr_t));
-#else
+#else /* MODULE_GNRC_RPL_SR */
             DEBUG("RPL: adding FT entry %s/%d\n",
                   ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
                   target->prefix_length);
@@ -653,7 +653,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,
                                  dodag->iface,
                                  dodag->default_lifetime * dodag->lifetime_unit);
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
             break;
 
         case (GNRC_RPL_OPT_TRANSIT):
@@ -674,7 +674,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                                     transit->path_lifetime * dodag->lifetime_unit);
             }
             (void)src;
-#else
+#else /* MODULE_GNRC_RPL_SR */
             do {
                 DEBUG("RPL: updating FT entry %s/%d\n",
                       ipv6_addr_to_str(addr_str, &(first_target->target), sizeof(addr_str)),
@@ -691,7 +691,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                                                          sizeof(gnrc_rpl_opt_t) +
                                                          first_target->length);
             }while (first_target->type == GNRC_RPL_OPT_TARGET);
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
 
             first_target = NULL;
             break;
@@ -992,13 +992,13 @@ static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
     uint8_t parent_size = 0;
 #ifdef MODULE_GNRC_RPL_SR
     parent_size = sizeof(ipv6_addr_t);
-#endif
+#endif /* MODULE_GNRC_RPL_SR */
     transit->length = sizeof(transit->e_flags) + sizeof(transit->path_control) +
                       sizeof(transit->path_sequence) + sizeof(transit->path_lifetime) +
                       parent_size;
 #ifdef MODULE_GNRC_RPL_SR
     transit->parent = *parent;
-#else
+#else /* MODULE_GNRC_RPL_SR */
     (void)parent; /* unused in non-storing mode */
 #endif
     transit->e_flags = (external) << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT;

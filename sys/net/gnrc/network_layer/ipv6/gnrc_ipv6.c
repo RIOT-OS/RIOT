@@ -42,7 +42,7 @@
 #include "net/fib/table.h"
 #endif
 
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/srh.h"
 #endif
@@ -502,13 +502,13 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
     gnrc_ipv6_nib_nc_t nce;
 
     DEBUG("ipv6: send unicast\n");
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     if (ipv6_addr_is_link_local(&ipv6_hdr->dst) && !ipv6_addr_is_link_local(&ipv6_hdr->src)) {
         /* Link-local address return netif = 0, use the netif of RPL*/
         gnrc_netif_t *iface = gnrc_netif_get_by_prefix(gnrc_rpl_get_root_dodag_id());
         netif = gnrc_netif_get_by_pid(iface->pid);
     }
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
     if (gnrc_ipv6_nib_get_next_hop_l2addr(&ipv6_hdr->dst, netif, pkt,
                                           &nce) < 0) {
         /* packet is released by NIB */
@@ -668,7 +668,7 @@ static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
     }
 }
 
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
 /* function for sending in non-storing mode */
 static inline bool _pkt_from_me(ipv6_hdr_t *hdr)
 {
@@ -680,7 +680,7 @@ static inline bool _pkt_from_me(ipv6_hdr_t *hdr)
         return !(gnrc_netif_get_by_ipv6_addr(&hdr->src) == NULL);
     }
 }
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
 
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 {
@@ -737,7 +737,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     pkt = tmp_pkt;
 
     ipv6_hdr = (ipv6_hdr_t *)pkt->data;
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     /* If the packet is from me, insert SRH if needed */
     if (get_is_root() &&
         !ipv6_addr_is_link_local(&(ipv6_hdr->dst)) &&
@@ -758,7 +758,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         memcpy(&ipv6_hdr->src, gnrc_rpl_get_root_dodag_id(),\
             sizeof(ipv6_addr_t));
     }
-#endif
+#endif /* MODULE_GNRC_RPL_SRH */
 
     if (pkt == NULL) {
         return;
@@ -930,16 +930,16 @@ static void _receive(gnrc_pktsnip_t *pkt)
          * link-local source address
          */
         bool route_local = true;
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
         route_local = ipv6_addr_is_link_local(&(hdr->dst));
         DEBUG("ipv6: do not forward packets with link-local destination address\n");
 
-#else /* MODULE_GNRC_RPL_SR */
+#else /* MODULE_GNRC_RPL_SRH */
         route_local =
             ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst))));
         DEBUG("ipv6: do not forward packets with link-local source or"
               " destination address\n");
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
         if (route_local) {
 #ifdef MODULE_GNRC_ICMPV6_ERROR
             if (ipv6_addr_is_link_local(&(hdr->src)) &&
@@ -968,14 +968,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
                       "order; dropping it\n");
                 return;
             }
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
             if (get_is_root()) {
                 pkt = gnrc_rpl_srh_insert(pkt, hdr);
             }
             _send(pkt, false);
-#else /* MODULE_GNRC_RPL_SR */
+#else /* MODULE_GNRC_RPL_SRH */
             _send(pkt, false);
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
             return;
         }
         else {
