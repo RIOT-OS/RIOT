@@ -57,7 +57,7 @@
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
-#ifndef CPU_FAM_ESP32H2
+#if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
 #  include "soc/rtc_cntl_reg.h"
 #  include "soc/rtc_cntl_struct.h"
 #  include "soc/syscon_reg.h"
