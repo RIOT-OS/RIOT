@@ -2,11 +2,11 @@
 
 This example demonstrates how to configure and use **RPL in non-storing mode** using RIOT OS. It covers setting up a root node, verifying the source routing table, and checking connectivity between nodes.
 
-> ⚠️ This example requires **at least two real nodes** to function properly.
+> This example requires **at least two real nodes** to function properly.
 
 ---
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 Ensure the application is compiled for your target board. For example, for IoT-LAB M3:
 
@@ -14,27 +14,32 @@ Ensure the application is compiled for your target board. For example, for IoT-L
 make BOARD=iotlab-m3
 ```
 
-> 🔧 Replace `iotlab-m3` with the appropriate board name if using another platform.
+> Replace `iotlab-m3` with the appropriate board name if using another platform.
 
 ---
 
-## ⚙️ Select RPL Mode
+## Select RPL Mode
 
 You can define the RPL Mode of Operation (MOP) via `CFLAGS` in the Makefile:
 
 - **Storing Mode**
-  ```make
-  CFLAGS += -DCONFIG_GNRC_RPL_MOP_STORING_MODE=1
-  ```
+    ```make
+    CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_NO_MC=1
+    ```
+    or
+
+    ```make
+    CFLAGS += -DGNRC_RPL_MOP_STORING_MODE_MC=1
+    ```
 
 - **Non-Storing Mode**
-  ```make
-  CFLAGS += -DCONFIG_GNRC_RPL_MOP_NON_STORING_MODE=1
-  ```
+    ```make
+    CFLAGS += -DCONFIG_GNRC_RPL_MOP_NON_STORING_MODE=1
+    ```
 
 ---
 
-## 🌐 Configure the Root Node
+## Configure the Root Node
 
 1. Check the node's **link-local IPv6 address**:
 
@@ -49,7 +54,7 @@ You can define the RPL Mode of Operation (MOP) via `CFLAGS` in the Makefile:
    inet6 addr: fe80::58ac:f9d7:b9f1:63c7  scope: link  VAL
    ```
 
-2. Assign a **global IPv6 address** and configure the node as the RPL root:
+2. Assign a **global IPv6 address** and configure the node as the RPL root (we use `2001:db8::` as a prefix):
 
    ```sh
    ifconfig 6 add 2001:db8::58ac:f9d7:b9f1:63c7
@@ -66,7 +71,7 @@ You can define the RPL Mode of Operation (MOP) via `CFLAGS` in the Makefile:
 
 ---
 
-## 📦 Check the Source Routing Table
+## Check the Source Routing Table
 
 On the root node, use the following command to inspect the source routing entries:
 
@@ -85,7 +90,7 @@ Destination                             Flags     Next Hop                      
 
 ---
 
-## 📡 Test Node Connectivity
+## Test Node Connectivity (ping)
 
 Ping one of the leaf nodes to verify the source routing path is working:
 
@@ -100,11 +105,3 @@ Example output:
 12 bytes from 2001:db8::6c39:af4c:615d:9313: icmp_seq=1 ttl=62 rssi=-68 dBm time=32.34 ms
 12 bytes from 2001:db8::6c39:af4c:615d:9313: icmp_seq=2 ttl=62 rssi=-67 dBm time=38.31 ms
 ```
-
----
-
-## ✅ Everything is Set
-
-Your RPL non-storing mode setup is now complete. Enjoy testing and development!
-
----
