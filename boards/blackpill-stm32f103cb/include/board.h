@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2015 TriaGnoSys GmbH
- *               2017 Alexander Kurth, Sören Tempel, Tristan Bruns
- *               2018 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 TriaGnoSys GmbH
+ * SPDX-FileCopyrightText: 2017 Alexander Kurth, Sören Tempel, Tristan Bruns
+ * SPDX-FileCopyrightText: 2018 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
