@@ -17,7 +17,7 @@ export default defineConfig({
         {
           icon: "mastodon",
           label: "Mastodon",
-          href: "https://fosstodon.org/@RIOT_OS",
+          href: "https://floss.social/@RIOT_OS",
         },
         {
           icon: "matrix",

@@ -49,4 +49,4 @@ RIOT is developed by an open community that anyone is welcome to join:
 - Contact us on Matrix for live support and discussions:
   [riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org)
 
-[mastodon-link]: https://fosstodon.org/@RIOT_OS
+[mastodon-link]: https://floss.social/@RIOT_OS
