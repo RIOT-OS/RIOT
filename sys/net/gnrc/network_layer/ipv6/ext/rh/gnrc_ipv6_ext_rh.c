@@ -22,7 +22,7 @@
 
 #include "net/gnrc/icmpv6/error.h"
 
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
 #include "net/gnrc/rpl/srh.h"
 #endif
 
@@ -85,7 +85,7 @@ int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt)
         return res;
     }
     switch (ext->type) {
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
         case IPV6_EXT_RH_TYPE_RPL_SRH:
             res = gnrc_rpl_srh_process(hdr, (gnrc_rpl_srh_t *)ext, &err_ptr);
             break;

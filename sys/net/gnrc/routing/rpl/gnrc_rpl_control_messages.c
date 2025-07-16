@@ -48,7 +48,7 @@
 #include "net/gnrc/rpl/p2p.h"
 #endif
 
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
 #include "net/gnrc/rpl/sr_table.h"
 #include "net/gnrc/rpl/srh.h"
 #endif
@@ -642,9 +642,9 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                 first_target = target;
             }
             /* Non-storing */
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
             gnrc_sr_delete_route(&(target->target), sizeof(ipv6_addr_t));
-#else /* MODULE_GNRC_RPL_SR */
+#else /* MODULE_GNRC_RPL_SRH */
             DEBUG("RPL: adding FT entry %s/%d\n",
                   ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
                   target->prefix_length);
@@ -653,7 +653,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,
                                  dodag->iface,
                                  dodag->default_lifetime * dodag->lifetime_unit);
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
             break;
 
         case (GNRC_RPL_OPT_TRANSIT):
@@ -665,7 +665,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                       "a preceding RPL TARGET DAO option\n");
                 break;
             }
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
             if (!ipv6_addr_equal(&(first_target->target), &(transit->parent))) {
                 gnrc_sr_delete_route(&(first_target->target), sizeof(ipv6_addr_t));
                 gnrc_sr_add_new_dst(&(first_target->target), sizeof(ipv6_addr_t),
@@ -674,7 +674,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                                     transit->path_lifetime * dodag->lifetime_unit);
             }
             (void)src;
-#else /* MODULE_GNRC_RPL_SR */
+#else /* MODULE_GNRC_RPL_SRH */
             do {
                 DEBUG("RPL: updating FT entry %s/%d\n",
                       ipv6_addr_to_str(addr_str, &(first_target->target), sizeof(addr_str)),
@@ -691,7 +691,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                                                          sizeof(gnrc_rpl_opt_t) +
                                                          first_target->length);
             }while (first_target->type == GNRC_RPL_OPT_TARGET);
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
 
             first_target = NULL;
             break;
@@ -990,15 +990,15 @@ static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
     transit = opt_snip->data;
     transit->type = GNRC_RPL_OPT_TRANSIT;
     uint8_t parent_size = 0;
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     parent_size = sizeof(ipv6_addr_t);
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
     transit->length = sizeof(transit->e_flags) + sizeof(transit->path_control) +
                       sizeof(transit->path_sequence) + sizeof(transit->path_lifetime) +
                       parent_size;
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     transit->parent = *parent;
-#else /* MODULE_GNRC_RPL_SR */
+#else /* MODULE_GNRC_RPL_SRH */
     (void)parent; /* unused in non-storing mode */
 #endif
     transit->e_flags = (external) << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT;
@@ -1021,8 +1021,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     dodag = &inst->dodag;
     mop = inst->mop;
-    parent = &(dodag->parents->addr);
-
+    
     if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
         return;
     }
@@ -1042,9 +1041,8 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
             destination = &dodag->dodag_id;
         }
         else {
-            if (destination == NULL) {
-                destination = parent;
-            }
+            parent = &(dodag->parents->addr);
+            destination = parent;
         }
     }
     gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;

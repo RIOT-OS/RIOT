@@ -40,10 +40,10 @@
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
 #endif
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
 #include "net/gnrc/rpl/sr_table.h"
 #include "net/gnrc/rpl/srh.h"
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -200,12 +200,12 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *
                   dodag->dio_redun);
     gnrc_rpl_rpble_update(dodag);
 
-#ifdef MODULE_GNRC_RPL_SR
+#ifdef MODULE_GNRC_RPL_SRH
     if (inst->mop == GNRC_RPL_MOP_NON_STORING_MODE) {
         gnrc_sr_initialize_table((ipv6_addr_t *)dodag_id, dodag->iface);
         DEBUG("RPL: SR Table Initialized");
     }
-#endif /* MODULE_GNRC_RPL_SR */
+#endif /* MODULE_GNRC_RPL_SRH */
     set_is_root();
     gnrc_rpl_set_root_dodag_id((ipv6_addr_t *)dodag_id);
 
