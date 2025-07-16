@@ -22,6 +22,8 @@ extern "C" {
 typedef enum {
     NETNOTIFY_L2_CONNECTED,
     NETNOTIFY_L2_DISCONNECTED,
+    NETNOTIFY_L3_DISCOVERED,
+    NETNOTIFY_L3_UNREACHABLE,
 } netnotify_t;
 
 /**

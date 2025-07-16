@@ -172,6 +172,71 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
 }
 
 /**
+ * @brief   Find entry in NIB neighbor cache.
+ *
+ * @param[in] l2addr        Layer 2 address of the neighbor.
+ * @param[in] l2addr_len    Length of @p l2addr.
+ * @param[out] ipv6         IPv6 address of the neighbor or NULL.
+ *
+ * @return  True, if a neighbor with @p l2addr was found in the nc.
+ * @return  False, otherwise.
+ */
+static inline bool _find_entry_in_nc(uint8_t *l2addr, uint8_t l2addr_len, ipv6_addr_t *ipv6)
+{
+    void *state = NULL;
+    gnrc_ipv6_nib_nc_t nce;
+
+    while (gnrc_ipv6_nib_nc_iter(0, &state, &nce)) {
+        if (l2util_addr_equal(l2addr, l2addr_len, nce.l2addr, nce.l2addr_len)) {
+            *ipv6 = nce.ipv6;
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief   Handle a link-layer connection-established event.
+ *
+ * @param[in] connect   Netapi connection event.
+ */
+static inline void _on_l2_connected(netnotify_l2_connec_t *connect)
+{
+    ipv6_addr_t ipv6;
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+    /* Add neighbor to neighbor cache if interface represents a 6LN. */
+    gnrc_ipv6_nib_nc_try_set_6ln(connect->if_pid, connect->l2addr, connect->l2addr_len);
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
+
+    /* Inform routing layer of new reachable neighbor. */
+    if (_find_entry_in_nc(connect->l2addr, connect->l2addr_len, &ipv6)) {
+        gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
+                           NETNOTIFY_L3_DISCOVERED, &ipv6, sizeof(ipv6_addr_t));
+    }
+}
+
+/**
+ * @brief   Handle a link-layer connection-closed event.
+ *
+ * @param[in] connect   Netapi connection event.
+ */
+static inline void _on_l2_disconnected(netnotify_l2_connec_t *connect)
+{
+    ipv6_addr_t ipv6;
+
+    /* Inform routing layer of unreachable neighbor. This must be done *before* removing
+        the neighbor from the neighbor cache. */
+    if (_find_entry_in_nc(connect->l2addr, connect->l2addr_len, &ipv6)) {
+        gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
+                           NETNOTIFY_L3_UNREACHABLE, &ipv6, sizeof(ipv6_addr_t));
+    }
+
+    /* Remove from neighbor cache. */
+    gnrc_ipv6_nib_nc_del_l2(connect->if_pid, connect->l2addr, connect->l2addr_len);
+}
+
+/**
  * @brief   Handles a netapi event notification.
  *
  * @param[in] notify    The type of notification.
@@ -179,20 +244,12 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
 static inline void _netapi_event(gnrc_netapi_notify_t *notify)
 {
 
-    netnotify_l2_connec_t *connect;
-
     switch (notify->event) {
     case NETNOTIFY_L2_CONNECTED:
-        connect = (netnotify_l2_connec_t *)notify->data;
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-        /* Add node to neighbor cache if interface represents a 6LN. */
-        gnrc_ipv6_nib_nc_try_set_6ln(connect->if_pid, connect->l2addr, connect->l2addr_len);
-#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
+        _on_l2_connected((netnotify_l2_connec_t *)notify->data);
         break;
     case NETNOTIFY_L2_DISCONNECTED:
-        connect = (netnotify_l2_connec_t *)notify->data;
-        /* Remove node from neighbor cache. */
-        gnrc_ipv6_nib_nc_del_l2(connect->if_pid, connect->l2addr, connect->l2addr_len);
+        _on_l2_disconnected((netnotify_l2_connec_t *)notify->data);
         break;
     default:
         break;
