@@ -1022,7 +1022,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     dodag = &inst->dodag;
     mop = inst->mop;
     memcpy(&parent, &dodag->parents->addr, sizeof(ipv6_addr_t));
-    
+
     if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
         return;
     }
