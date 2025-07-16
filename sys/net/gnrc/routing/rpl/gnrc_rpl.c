@@ -200,6 +200,15 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *
                   dodag->dio_redun);
     gnrc_rpl_rpble_update(dodag);
 
+#ifdef MODULE_GNRC_RPL_SR
+    if (inst->mop == GNRC_RPL_MOP_NON_STORING_MODE) {
+        gnrc_sr_initialize_table((ipv6_addr_t *)dodag_id, dodag->iface);
+        DEBUG("RPL: SR Table Initialized");
+    }
+#endif /* MODULE_GNRC_RPL_SR */
+    set_is_root();
+    gnrc_rpl_set_root_dodag_id((ipv6_addr_t *)dodag_id);
+
     return inst;
 }
 
