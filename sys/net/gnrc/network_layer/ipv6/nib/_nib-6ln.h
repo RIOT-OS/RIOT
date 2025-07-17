@@ -79,7 +79,7 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
  *
  * @param[in] netif      The interface to @p l2addr.
  * @param[in] l2addr     Layer 2 address.
- * @param[in] l2addr_l2n Length of the layer 2 address.
+ * @param[in] l2addr_len Length of the layer 2 address.
  * @param[out] ipv6addr  The resulting IPv6 address.
  *
  * @return  sizeof(ipv6_addr_t) on success.
