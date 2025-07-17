@@ -200,13 +200,13 @@ static inline bool _find_entry_in_nc(uint8_t *l2addr, uint8_t l2addr_len, ipv6_a
  *
  * @param[in] connect   Netapi connection event.
  */
-static inline void _on_l2_connected(netnotify_l2_connec_t *connect)
+static inline void _on_l2_connected(netnotify_l2_connection_t *connect)
 {
     ipv6_addr_t ipv6;
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     /* Add neighbor to neighbor cache if interface represents a 6LN. */
-    gnrc_ipv6_nib_nc_try_set_6ln(connect->if_pid, connect->l2addr, connect->l2addr_len);
+    gnrc_ipv6_nib_nc_set_6ln(connect->if_pid, connect->l2addr, connect->l2addr_len);
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
     /* Inform routing layer of new reachable neighbor. */
@@ -221,7 +221,7 @@ static inline void _on_l2_connected(netnotify_l2_connec_t *connect)
  *
  * @param[in] connect   Netapi connection event.
  */
-static inline void _on_l2_disconnected(netnotify_l2_connec_t *connect)
+static inline void _on_l2_disconnected(netnotify_l2_connection_t *connect)
 {
     ipv6_addr_t ipv6;
 
@@ -246,10 +246,10 @@ static inline void _netapi_event(gnrc_netapi_notify_t *notify)
 
     switch (notify->event) {
     case NETNOTIFY_L2_CONNECTED:
-        _on_l2_connected((netnotify_l2_connec_t *)notify->data);
+        _on_l2_connected((netnotify_l2_connection_t *)notify->data);
         break;
     case NETNOTIFY_L2_DISCONNECTED:
-        _on_l2_disconnected((netnotify_l2_connec_t *)notify->data);
+        _on_l2_disconnected((netnotify_l2_connection_t *)notify->data);
         break;
     default:
         break;

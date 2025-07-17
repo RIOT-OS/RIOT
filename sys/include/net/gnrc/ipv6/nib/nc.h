@@ -249,10 +249,10 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
  *          gnrc_netif_t::device_type of @p netif.
  * @return  -ENOMEM, if no space is left in neighbor cache.
  */
-int gnrc_ipv6_nib_nc_try_set_6ln(unsigned iface, const uint8_t *l2addr,
+int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
                                  size_t l2addr_len);
 #else /* CONFIG_GNRC_IPV6_NIB_6LN */
-#define gnrc_ipv6_nib_nc_try_set_6ln(unsigned iface, const uint8_t *l2addr,
+#define gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
                                  size_t l2addr_len)   (-ENOTSUP)
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 

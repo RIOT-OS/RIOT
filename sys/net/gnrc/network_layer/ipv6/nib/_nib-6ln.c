@@ -95,7 +95,7 @@ int _build_ll_ipv6_from_addr(gnrc_netif_t *netif, const uint8_t *l2addr, uint8_t
         return res;
     }
 
-    /* Add IPv6 link-loca prefix. */
+    /* Add IPv6 link-local prefix. */
     ipv6_addr_set_link_local_prefix(ipv6addr);
 
     return sizeof(ipv6_addr_t);

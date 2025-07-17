@@ -25,7 +25,7 @@
 
 #include "_nib-internal.h"
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-  #include "_nib-6ln.h"
+#  include "_nib-6ln.h"
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
 int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
@@ -63,7 +63,7 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
 }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-int gnrc_ipv6_nib_nc_try_set_6ln(unsigned iface, const uint8_t *l2addr, size_t l2addr_len)
+int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr, size_t l2addr_len)
 {
     int res;
     ipv6_addr_t ipv6addr;
