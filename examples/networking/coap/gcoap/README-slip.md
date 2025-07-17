@@ -64,4 +64,4 @@ Ping the TUN interface from the router mote, via the BR:
 
     ping bbbb::1
 
-[1]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc_borader_router    "SLIP instructions"
+[1]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc_border_router    "SLIP instructions"
