@@ -280,9 +280,9 @@ static void _parent_timeout(gnrc_rpl_parent_t *parent)
 }
 
 /**
- * @brief   Handles the event that a new neigbor was discovered and is reachable.
+ * @brief   Handles the event that a new neighbor was discovered and is reachable.
  *
- * @param[in] addr  The address of the neigbor.
+ * @param[in] addr  The address of the neighbor.
  */
 static inline void _handle_discovered_neighbor(ipv6_addr_t *addr)
 {
@@ -292,9 +292,9 @@ static inline void _handle_discovered_neighbor(ipv6_addr_t *addr)
 
 
 /**
- * @brief   Handles the event that a neigbor became unreachable.
+ * @brief   Handles the event that a neighbor became unreachable.
  *
- * @param[in] addr  The address of the neigbor.
+ * @param[in] addr  The address of the neighbor.
  */
 static inline void _handle_unreachable_neighbor(ipv6_addr_t *addr)
 {
