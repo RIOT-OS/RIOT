@@ -30,8 +30,8 @@ extern "C" {
  * @{
  */
 
-#define ADS1115_REG_CONVERSION  (0x00) /**< Conversion register */
-#define ADS1115_REG_CONFIG      (0x01) /**< Configuration register */
+#define ADS1115_REG_CONVERSION  (0x00)  /**< Conversion register */
+#define ADS1115_REG_CONFIG      (0x01)  /**< Configuration register */
 /** @} */
 
 

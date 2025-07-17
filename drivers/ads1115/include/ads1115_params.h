@@ -64,16 +64,16 @@ extern "C" {
 
 #ifndef ADS1115_PARAMS
 #define ADS1115_PARAMS          { \
-    .i2c           = ADS1115_PARAM_I2C, \
-    .addr          = ADS1115_PARAM_ADDR, \
-    .mux           = ADS1115_PARAM_MUX, \
-    .pga           = ADS1115_PARAM_PGA, \
-    .mode          = ADS1115_PARAM_MODE, \
-    .dr            = ADS1115_PARAM_DR, \
-    .comp_mode     = ADS1115_PARAM_COMP_MODE, \
-    .comp_polarity = ADS1115_PARAM_COMP_POLARITY, \
-    .comp_latch    = ADS1115_PARAM_COMP_LATCH, \
-    .comp_queue    = ADS1115_PARAM_COMP_QUEUE \
+            .i2c = ADS1115_PARAM_I2C, \
+            .addr = ADS1115_PARAM_ADDR, \
+            .mux = ADS1115_PARAM_MUX, \
+            .pga = ADS1115_PARAM_PGA, \
+            .mode = ADS1115_PARAM_MODE, \
+            .dr = ADS1115_PARAM_DR, \
+            .comp_mode = ADS1115_PARAM_COMP_MODE, \
+            .comp_polarity = ADS1115_PARAM_COMP_POLARITY, \
+            .comp_latch = ADS1115_PARAM_COMP_LATCH, \
+            .comp_queue = ADS1115_PARAM_COMP_QUEUE \
 }
 #endif
 

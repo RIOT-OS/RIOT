@@ -69,7 +69,7 @@ int ads1115_init(ads1115_t *dev, const ads1115_params_t *params)
     i2c_acquire(DEV);
 
     // Test communication
-    uint8_t test_conf[2] = {0x00, ADS1115_CONF_TEST_VALUE};
+    uint8_t test_conf[2] = { 0x00, ADS1115_CONF_TEST_VALUE };
     if (i2c_write_regs(DEV, ADDR, ADS1115_REG_CONFIG, test_conf, 2, 0) < 0) {
         DEBUG("[ads1115] init - error: write test failed\n");
         res = ADS1115_NODEV;
@@ -103,7 +103,7 @@ release:
 int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux)
 {
     assert(dev);
-    
+
     int res = ADS1115_NOI2C;
 
     i2c_acquire(DEV);
@@ -117,8 +117,8 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux)
 
     // Update MUX bits
     uint16_t conf = ((uint16_t)reg[0] << 8) | reg[1];
-    conf &= ~(0x07 << ADS1115_CONF_MUX_BIT); // Clear MUX bits
-    conf |= (mux << ADS1115_CONF_MUX_BIT);   // Set new MUX
+    conf &= ~(0x07 << ADS1115_CONF_MUX_BIT);    // Clear MUX bits
+    conf |= (mux << ADS1115_CONF_MUX_BIT);      // Set new MUX
 
     // Write back updated configuration
     reg[0] = conf >> 8;
@@ -165,5 +165,3 @@ int ads1115_convert_to_mv(ads1115_t *dev, uint16_t value)
     assert(dev);
     return 1000 * value * _ads1115_get_pga_voltage(dev->params.pga) / (1 << 15); // Msb is sign bit
 }
-
-
