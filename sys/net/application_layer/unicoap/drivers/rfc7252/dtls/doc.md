@@ -1,4 +1,4 @@
-@defgroup net_unicoap_drivers_dtls CoAP over DTLS Driver
+g@defgroup net_unicoap_drivers_dtls CoAP over DTLS Driver
 @ingroup net_unicoap_drivers
 @brief Use CoAP over DTLS, with optional reliability
 @{
@@ -12,21 +12,13 @@ Include these headers required for managing DTLS credentials.
 #include "net/dsm.h"
 ```
 
-Then, in your application, call @ref sock_dtls_add_credential to add a DTLS credential.
-<!--
-FIXME: undefined references, upcoming PR
-If you need
-to access the DTLS socket, call @ref unicoap_transport_io_dtls_get_socket(). You must add
-DTLS credentials yourself.
--->
-
-<!--
-FIXME: undefined references, upcoming PR
-To change the UDP port `unicoap` is listening on, modify @ref CONFIG_UNICOAP_DTLS_PORT.
-The CoAP over DTLS driver uses the same socket both for client and server functionality.
+Then, in your application, call @ref sock_dtls_add_credential to add a DTLS credential. If you need
+to access the DTLS socket, call @ref unicoap_transport_dtls_get_socket(). You must add
+DTLS credentials yourself. To change the UDP port `unicoap` is listening on,
+modify @ref CONFIG_UNICOAP_DTLS_PORT. The CoAP over DTLS driver uses the same socket both for
+client and server functionality.
 
 @see @ref UNICOAP_PROTO_DTLS
--->
 @see @ref unicoap_rfc7252_message_type_t
 
 This is the dependency graph of this driver:
