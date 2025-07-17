@@ -163,7 +163,7 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netnotify_t even
     if (numof != 0) {
         /* Look up the registered threads for this message type. */
         gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
-        
+
         /* Dispatch to all registered threads sequentially. */
         while (sendto) {
             /* Need to wait for an ACK to ensure that the msg was received and that
