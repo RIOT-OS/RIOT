@@ -29,11 +29,11 @@ typedef enum {
 /**
  * @brief   L2 (dis-)connection event data.
  */
-typedef struct netnotify_l2_connec {
+typedef struct netnotify_l2_connection {
     uint8_t *l2addr;            /**< L2 address of the node */
     uint8_t l2addr_len;         /**< length of L2 address in byte */
     kernel_pid_t if_pid;        /**< PID of network interface */
-} netnotify_l2_connec_t;
+} netnotify_l2_connection_t;
 
 
 #ifdef __cplusplus

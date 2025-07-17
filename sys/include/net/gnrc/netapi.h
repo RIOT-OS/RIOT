@@ -89,7 +89,7 @@ extern "C" {
 #define GNRC_NETAPI_MSG_TYPE_GET        (0x0204)
 
 /**
- * @brief   @ref core_msg type for replying to get/ set option, and notify messages.
+ * @brief   @ref core_msg type for replying to get/set option, and notify messages.
  */
 #define GNRC_NETAPI_MSG_TYPE_ACK        (0x0205)
 
@@ -110,7 +110,7 @@ typedef struct {
 } gnrc_netapi_opt_t;
 
 /**
- * @brief   Data structure to be send for notification events.
+ * @brief   Data structure to be sent for notification events.
  */
 typedef struct {
     netnotify_t event;          /**< the type of event */

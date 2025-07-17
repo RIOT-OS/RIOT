@@ -145,16 +145,18 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netnotify_t event,
                        void *data, size_t data_len)
 {
-    gnrc_netapi_notify_t notify;
-    msg_t cmd;
     msg_t ack;
 
-    notify.event = event;
-    notify.data = data;
-    notify.data_len = data_len;
+    gnrc_netapi_notify_t notify = {
+        .event = event,
+        .data = data,
+        .data_len = data_len,
+    };
 
-    cmd.type = GNRC_NETAPI_MSG_TYPE_NOTIFY;
-    cmd.content.ptr = (void *)&notify;
+    msg_t cmd = {
+        .type = GNRC_NETAPI_MSG_TYPE_NOTIFY,
+        .content.ptr = (void *)&notify,
+    };
 
     gnrc_netreg_acquire_shared();
 
