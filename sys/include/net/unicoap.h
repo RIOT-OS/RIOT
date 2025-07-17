@@ -33,9 +33,9 @@
  * @{
  */
 /**
- * @brief Initializes the unicoap stack, creating a separate thread
+ * @brief Initializes the unicoap stack
  *
- * if you disable the `auto_init_unicoap` you will need to call this function manually.
+ * If you disable the `auto_init_unicoap` you will need to call this function manually.
  * Otherwise, and provided `auto_init` is used, unicoap will be initialized automatically.
  *
  * @returns unicoap thread PID
@@ -48,6 +48,7 @@ kernel_pid_t unicoap_init(void);
  * Provided @ref CONFIG_UNICOAP_CREATE_THREAD is enabled, this function will also zombify the
  * thread created on initialization.
  *
+ * @returns Zero on success, `-1` otherwise
  */
 int unicoap_deinit(void);
 
@@ -61,9 +62,6 @@ void* _unicoap_loop_run(void* arg);
  * @brief Runs `unicoap` processing loop
  *
  * This function never returns, unless explicitly instructed using @ref unicoap_deinit.
- *
- * @warning Running the unicoap processing loop on a user-supplied thread is an **experimental**
- * feature.
  *
  * @warning You must not call this function when @ref CONFIG_UNICOAP_CREATE_THREAD is enabled.
  * If @ref CONFIG_UNICOAP_CREATE_THREAD is enabled, this function is not defined.
