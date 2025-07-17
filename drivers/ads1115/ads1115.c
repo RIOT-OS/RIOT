@@ -56,6 +56,7 @@ static uint16_t _build_config_reg(const ads1115_params_t *params)
     return conf;
 }
 
+
 int ads1115_init(ads1115_t *dev, const ads1115_params_t *params)
 {
     assert(dev && params);
@@ -97,6 +98,72 @@ int ads1115_init(ads1115_t *dev, const ads1115_params_t *params)
 release:
     i2c_release(DEV);
     return res;
+}
+
+int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux)
+{
+    assert(dev);
+    
+    int res = ADS1115_NOI2C;
+
+    i2c_acquire(DEV);
+
+    // Read current configuration
+    uint8_t reg[2];
+    if (i2c_read_regs(DEV, ADDR, ADS1115_REG_CONFIG, reg, 2, 0) < 0) {
+        i2c_release(DEV);
+        goto release;
+    }
+
+    // Update MUX bits
+    uint16_t conf = ((uint16_t)reg[0] << 8) | reg[1];
+    conf &= ~(0x07 << ADS1115_CONF_MUX_BIT); // Clear MUX bits
+    conf |= (mux << ADS1115_CONF_MUX_BIT);   // Set new MUX
+
+    // Write back updated configuration
+    reg[0] = conf >> 8;
+    reg[1] = conf & 0xFF;
+
+    if (i2c_write_regs(DEV, ADDR, ADS1115_REG_CONFIG, reg, 2, 0) < 0) {
+        goto release;
+    }
+
+    res = ADS1115_OK;
+    dev->params.mux = mux;
+
+
+release:
+    i2c_release(DEV);
+    return res;
+}
+
+int ads1115_read_conversion(ads1115_t *dev, uint16_t *value)
+{
+    assert(dev && value);
+
+    int res = ADS1115_NOI2C;
+    uint8_t buf[2];
+
+    i2c_acquire(DEV);
+
+    // Read conversion register
+    if (i2c_read_regs(DEV, ADDR, ADS1115_REG_CONVERSION, buf, 2, 0) < 0) {
+        goto release;
+    }
+
+    // Combine bytes into a single value
+    *value = ((int16_t)buf[0] << 8) | buf[1];
+    res = ADS1115_OK;
+
+release:
+    i2c_release(DEV);
+    return res;
+}
+
+int ads1115_convert_to_mv(ads1115_t *dev, uint16_t value)
+{
+    assert(dev);
+    return 1000 * value * _ads1115_get_pga_voltage(dev->params.pga) / (1 << 15); // Msb is sign bit
 }
 
 

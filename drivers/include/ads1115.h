@@ -34,8 +34,8 @@ extern "C" {
  */
 enum {
     ADS1115_OK = 0,          /**< Operation successful */
-    ADS1115_NODEV = -1,      /**< No device found on the bus */
-    ADS1115_NOI2C = -2,      /**< I2C communication error */
+    ADS1115_NOI2C = -1,      /**< I2C communication error */
+    ADS1115_NODEV = -2,      /**< No device found on the bus */
     ADS1115_NODATA = -3,     /**< No data available */
 };
 /**
@@ -73,16 +73,16 @@ typedef enum {
  * @brief Programmable gain amplifier configuration
  */
 typedef enum {
-    ADS1115_PGA_6_144V = 0x0, /**< FSR = ±6.144V */
-    ADS1115_PGA_4_096V = 0x1, /**< FSR = ±4.096V */
-    ADS1115_PGA_2_048V = 0x2, /**< FSR = ±2.048V (default) */
-    ADS1115_PGA_1_024V = 0x3, /**< FSR = ±1.024V */
-    ADS1115_PGA_0_512V = 0x4, /**< FSR = ±0.512V */
-    ADS1115_PGA_0_256V = 0x5, /**< FSR = ±0.256V */
+    ADS1115_PGA_6_144V, /**< FSR = ±6.144V */
+    ADS1115_PGA_4_096V, /**< FSR = ±4.096V */
+    ADS1115_PGA_2_048V, /**< FSR = ±2.048V (default) */
+    ADS1115_PGA_1_024V, /**< FSR = ±1.024V */
+    ADS1115_PGA_0_512V, /**< FSR = ±0.512V */
+    ADS1115_PGA_0_256V, /**< FSR = ±0.256V */
 
     // Aliases (same behavior)
-    ADS1115_PGA_0_256V_B = 0x6, /**< Alias: same as 0x5 */
-    ADS1115_PGA_0_256V_C = 0x7  /**< Alias: same as 0x5 */
+    ADS1115_PGA_0_256V_B,
+    ADS1115_PGA_0_256V_C
 } ads1115_pga_t;
 
 /**
@@ -196,7 +196,35 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux);
  * @return ADS1115_NODATA if no data is available
  * @return ADS1115_NOI2C if other error occurs
  */
-int ads1115_read_conversion(ads1115_t *dev, int16_t *value);
+int ads1115_read_conversion(ads1115_t *dev, uint16_t *value);
+
+
+static inline float _ads1115_get_pga_voltage(ads1115_pga_t pga)
+{
+    switch (pga) {
+        case ADS1115_PGA_6_144V: return 6.144f;
+        case ADS1115_PGA_4_096V: return 4.096f;
+        case ADS1115_PGA_2_048V: return 2.048f;
+        case ADS1115_PGA_1_024V: return 1.024f;
+        case ADS1115_PGA_0_512V: return 0.512f;
+        case ADS1115_PGA_0_256V:
+        case ADS1115_PGA_0_256V_B:
+        case ADS1115_PGA_0_256V_C:
+            return 0.256f;
+        default:
+            return 0.0f;
+    }
+}
+
+/**
+ * @brief Converts the digital value from the ADS1115 device to millivolts.
+ *
+ * @param[in] dev    Device descriptor
+ * @param[in] value  Raw value from the ADS1115 device
+ *
+ * @return Converted value in millivolts
+ */
+int ads1115_convert_to_mv(ads1115_t *dev, uint16_t value);
 
 
 #ifdef __cplusplus
