@@ -106,15 +106,20 @@ typedef struct {
 /**
  * @brief Resource request handler
  *
- * This handler is called whenever a request reaches the given resource. If you use a certain handler
- * for more than one resource, you may want to read the [`resource` property of the context](@ref unicoap_request_context_t.resource).
+ * This handler is called whenever a request reaches the given resource. If you use a certain
+ * handler for more than one resource, you may want to read @ref unicoap_request_context_t.resource.
  *
  * @param[in] request Request, safe to mutate and send response with mutated message.
- * @param[in] arg Argument specified in [resource definition](@ref unicoap_resource_t)
- * @param[in] ctx Request context, use to send response.
  * @param[in] aux Auxiliary data associated with the request
+ * @param[in] ctx Request context, use to send response.
+ * @param[in] arg Argument specified in [resource definition](@ref unicoap_resource_t)
+ *
+ * If you do not call @ref unicoap_send_response and return a negative value from the handler,
+ * an `Internal Server Error` response will be sent.
  *
  * @return `0`, status code or errno.
+ * @retval @ref UNICOAP_IGNORING_REQUEST iff you don't want to respond
+ * @retval @ref unicoap_status_t for an otherwise empty response
  *
  */
 typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unicoap_aux_t* aux,
@@ -123,8 +128,11 @@ typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unico
 /**
  * @brief Determines if the client is interested in a response
  *
- * @returns `false` if a response must be sent
- * @returns `true` if sending a response is not mandatory
+ * @param[in] options Request options
+ * @param status The CoAP status code you would respond with
+ *
+ * @retval `false` if a response with that status code must be sent
+ * @retval `true` if sending a response with that status code is not mandatory
  */
 bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t status);
 
@@ -132,7 +140,8 @@ bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t s
  * @brief Error number indicating the resource handler will not respond
  *
  * Return this error number from your request handler if you have determined you don't need to
- * send a response using @ref unicoap_response_is_optional.
+ * send a response using @ref unicoap_response_is_optional. `unicoap` does not check whether you
+ * have checked with @ref unicoap_response_is_optional.
  */
 #define UNICOAP_IGNORING_REQUEST (-2042)
 
@@ -141,17 +150,25 @@ bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t s
  *
  * Consumes @p response .
  *
- * You MUST NOT call this method after having deferred a response.
+ * @warning You MUST NOT call this method after having deferred a response.
  *
  * @param[in,out] response Response message to send
  * @param[in,out] context Request context to respond in
  *
- * @returns Zero on success.
- * @returns Negative integer on error
+ * This function's return value can be used as a return value in @ref unicoap_request_handler_t.
+ *
+ * @retval Zero on success.
+ * @retval Negative integer on error
  */
 int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t* context);
 
-/** @brief Maps a given @p errno to a CoAP response status code */
+/**
+ * @brief Maps a given @p errno to a CoAP response status code
+ *
+ * @param _errno Error number such as `-ENOENT`
+ *
+ * @return Status code
+ */
 unicoap_status_t unicoap_response_status_from_errno(int _errno);
 /** @} */
 
@@ -192,6 +209,8 @@ typedef enum {
 
 /**
  * @brief Prints resource flags
+ *
+ * @param flags Resource flags
  */
 void unicoap_print_resource_flags(unicoap_resource_flags_t flags);
 
@@ -208,6 +227,8 @@ typedef uint8_t unicoap_proto_set_t;
 
 /**
  * @brief Prints protocols bitfield
+ *
+ * @param protocols Set of allowed transports
  */
 void unicoap_print_protocols(unicoap_proto_set_t protocols);
 
@@ -224,6 +245,8 @@ typedef uint8_t unicoap_method_set_t;
 
 /**
  * @brief Prints methods bitfield
+ *
+ * @param methods Set of CoAP methods
  */
 void unicoap_print_methods(unicoap_method_set_t methods);
 
@@ -232,7 +255,8 @@ void unicoap_print_methods(unicoap_method_set_t methods);
  *
  * This structure models a CoAP resource that can handle requests with a specified set
  * of methods and allowed protocols. Normally, each resource listens for requests matching
- * the given path. If you want to match all paths in with a certain path prefix, see @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE.
+ * the given path. If you want to match all paths with a certain path prefix,
+ * see @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE.
  */
 struct unicoap_resource {
     /**
@@ -245,8 +269,8 @@ struct unicoap_resource {
     /**
      * @brief Request handler callback
      *
-     * Function that will be executed once a new request directed at this resource reaches the server.
-     * Will be called asynchronously.
+     * Function that will be executed once a new request directed at this resource reaches the
+     * server. Will be called from the `unicoap` thread.
      */
     unicoap_request_handler_t handler;
 
@@ -317,10 +341,11 @@ struct unicoap_resource {
 /**
  * @brief Builds a string in Constrained RESTful Environments (CoRE) Link Format
  *
- * You use this method to build a stringified list of resources registered with `unicoap`. To register a resource,
- * use @ref unicoap_listener_register or @ref net_unicoap_resources_xfa. The string generated contains only resources
- * available using the specified transport. When handling a request destined for `/.well-known/core`, you should
- * call this method with the transport you received the request over.
+ * You use this method to build a stringified list of resources registered with `unicoap`.
+ * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_resources_xfa.
+ * The string generated contains only resources available using the specified transport. When
+ * handling a request destined for `/.well-known/core`, you should call this method with the
+ * transport you received the request over.
  *
  * **Example**:
  * ```
@@ -330,7 +355,7 @@ struct unicoap_resource {
  *
  * @see [Constrained RESTful Environments (CoRE) Link Format](https://datatracker.ietf.org/doc/html/rfc6690)
  *
- * @param[out] buffer The buffer that will contained the built string in CoRE Link Format
+ * @param[in,out] buffer The buffer that will contain the built string in CoRE Link Format
  * @param capacity The capacity @p buffer in bytes
  * @param proto The `unicoap` protocol number of the transport
  *
@@ -344,7 +369,7 @@ ssize_t unicoap_resource_core_link_format_build(char* buffer, size_t capacity,
  */
 typedef struct {
     /**
-     * @brief ExpectedContent-Format of resource
+     * @brief Expected content format of resource
      */
     unicoap_content_format_t content_format;
 
@@ -353,20 +378,20 @@ typedef struct {
      */
     size_t link_pos;
 
-    /** @brief Boolean value indicating whether to Initialize result list for first resource */
+    /** @brief Boolean value indicating whether to initialize result list for first resource */
     bool uninitialized : 1;
 } unicoap_link_encoder_ctx_t;
 
 /**
  * @brief   Handler function to write a resource link
  *
- * @param[in] resource      Resource for link
- * @param[out] buffer          Buffer on which to write; may be null
- * @param[in] capacity        Remaining length for @p buf
- * @param[in] context       Contextual information on what/how to write
+ * @param[in] resource Resource for link
+ * @param[out] buffer Buffer on which to write
+ * @param[in] capacity Remaining length for @p buffer
+ * @param[in] context Contextual information on what/how to write
  *
- * @return  count of bytes written to @p buf (or writable if @p buf is null)
- * @return  -1 on error
+ * @retval  Number of bytes written to @p buffer
+ * @retval  `-1` on error
  */
 typedef ssize_t (*unicoap_link_encoder_t)(const unicoap_resource_t* resource, char* buffer,
                                           size_t capacity, unicoap_link_encoder_ctx_t* context);
@@ -380,6 +405,7 @@ typedef ssize_t (*unicoap_link_encoder_t)(const unicoap_resource_t* resource, ch
  * @param[in,out] context Encoding context
  *
  * @returns Length of encoded resource string in bytes or negative integer on error
+ * @retval `ENOBUFS` Buffer too small to encode resources in link format.
  */
 ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* buffer,
                                      size_t capacity, unicoap_link_encoder_ctx_t* context);
@@ -405,8 +431,8 @@ typedef struct unicoap_listener unicoap_listener_t;
  * @param[in]  request      Request message
  * @param[in]  endpoint     Remote endpoint the request originates from
  *
- * @return Zero if resource is found and matcher determined request matches resource definition
- * @return Non-zero CoAP status code appropriate for the mismatch
+ * @retval Zero if resource is found and matcher determined request matches resource definition
+ * @retval Non-zero CoAP status code appropriate for the mismatch
  */
 typedef int (*unicoap_request_matcher_t)(const char* path, size_t path_length,
                                          const unicoap_listener_t* listener,
@@ -473,12 +499,10 @@ struct unicoap_listener {
  * the listener is deregistered. This may never happen or happen implicitly when `unicoap` is
  * deinitialized. We recommend you statically allocate the listener and its resources.
  *
- * @note If you are tempted to register a pre-linked chain of listeners,
- *       consider placing all their resources in the resources array of a
- *       single listener instead. In the few cases where this does not work
- *       (that is, when the resources need a different `link_encoder` or other
- *       fields of the listener struct), they can just be registered
- *       individually.
+ * @note
+ * If you are tempted to register a pre-linked chain of listeners,
+ * consider placing all their resources in the resources array of a
+ * single listener instead.
  *
  * @param[in] listener  Listener containing the resources.
  *
@@ -497,6 +521,10 @@ void unicoap_listener_deregister(unicoap_listener_t* listener);
 /**
  * @brief Determines whether the complete Uri-Path matches the resources path.
  *
+ * @param[in] resource Resource
+ * @param[in] path URI path such as `/foo/bar`
+ * @param length Number of UTF-8 characters in @p path
+ *
  * @see @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE
  *
  * @return > 0 if resource paths match
@@ -505,13 +533,21 @@ bool unicoap_resource_match_path_string(const unicoap_resource_t* resource, cons
 
 /**
  * @brief Determines whether the complete Uri-Path matches the resources path.
- * @warning If you want to call this function in a loop, consider reading the Uri-Path with @ref unicoap_options_copy_uri_path
- * and then calling @ref unicoap_resource_match_path_string repeatedly.
  *
- * @see @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE
+ * @param[in] resource Resource to check for matching path
+ * @param[in] options Options to read URI path from
+ *
+ * @remark
+ * If you want to call this function in a loop, consider reading the Uri-Path with
+ * @ref unicoap_options_copy_uri_path and then calling @ref unicoap_resource_match_path_string
+ * repeatedly. This is useful when you want to match a given request against a numer of resources.
+ *
+ * This function obeys the @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE flag.
+ *
+ * @returns A boolean value indicating whether the given resource matches the path in @p options.
  */
 bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
-                                         unicoap_options_t* options);
+                                         const unicoap_options_t* options);
 /** @} */
 
 /**
@@ -572,10 +608,10 @@ static inline bool unicoap_resource_match_method(unicoap_method_set_t methods, u
  * @brief Macro creating a bit field describing the specified protocols.
  * @see @ref unicoap_resource_t.flags
  *
- * Use this macro to create a bitfield of disallowed protocols for a given
+ * Use this macro to create a bitfield of allowed protocols for a given
  * CoAP resource:
  * ```c
- * // Example: Disallowed this resource from being accessed over UDP and TCP
+ * // Example: Allow this resource to only be accessed over UDP and TCP
  * UNICOAP_PROTOCOLS(UNICOAP_PROTO_UDP, UNICOAP_PROTO_TCP)
  * ```
  */
@@ -587,7 +623,7 @@ static inline bool unicoap_resource_match_method(unicoap_method_set_t methods, u
 #define UNICOAP_PROTOCOLS_ALLOW_ALL         (0)
 
 /**
- * @brief @ref unicoap_proto_set_t value indicating all protocols are allowed
+ * @brief @ref unicoap_proto_set_t value indicating no protocol is allowed
  */
 #define UNICOAP_PROTOCOLS_ALLOW_NONE        (1)
 
@@ -600,7 +636,8 @@ static inline bool unicoap_resource_match_method(unicoap_method_set_t methods, u
  */
 static inline bool unicoap_match_proto(unicoap_proto_set_t protocols, unicoap_proto_t proto)
 {
-    return !protocols || (protocols & UNICOAP_PROTOCOL_FLAG(proto)) != 0;
+    return protocols  == UNICOAP_PROTOCOLS_ALLOW_ALL ||
+        (protocols & UNICOAP_PROTOCOL_FLAG(proto)) != 0;
 }
 /** @} */
 /** @} */
