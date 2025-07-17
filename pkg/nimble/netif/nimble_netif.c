@@ -339,14 +339,14 @@ end:
  */
 static inline void _dispatch_connection_event(netnotify_t notify, uint8_t *addr)
 {
-    netnotify_l2_connec_t event = {
+    netnotify_l2_connection_t event = {
         .l2addr = addr,
         .l2addr_len = BLE_ADDR_LEN,
         .if_pid = _netif.pid,
     };
 
     gnrc_netapi_notify(GNRC_NETTYPE_L2_DISCOVERY, GNRC_NETREG_DEMUX_CTX_ALL,
-                       notify, &event, sizeof(netnotify_l2_connec_t));
+                       notify, &event, sizeof(netnotify_l2_connection_t));
 }
 
 static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
