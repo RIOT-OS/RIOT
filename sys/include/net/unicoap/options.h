@@ -177,9 +177,9 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  * @{
  */
 #ifndef DOXYGEN
-#  define _UNICOAP_OPTIONS_ALLOC(_buf, _name, capacity) \
-      uint8_t _buf[capacity];                           \
-      unicoap_options_t _name;                          \
+#  define _UNICOAP_OPTIONS_ALLOC(_buf, _name, capacity, _static)    \
+      _static uint8_t _buf[capacity];                               \
+      unicoap_options_t _name;                                      \
       unicoap_options_init(&_name, _buf, capacity);
 #endif
 
@@ -193,7 +193,21 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  * the given capacity, then calls @ref unicoap_options_t::unicoap_options_init.
  */
 #define UNICOAP_OPTIONS_ALLOC(name, capacity) \
-    _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity)
+    _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity,)
+
+/**
+ * @brief Allocates options with static buffer capacity
+ *
+ * @param name Name of the variable storing the options structure
+ * @param capacity Static storage buffer capacity in bytes
+ *
+ * Allocates a new @ref unicoap_options_t container and a storage buffer with
+ * the given capacity, then calls @ref unicoap_options_t::unicoap_options_init.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC for allocating a non-static buffer.
+ */
+#define UNICOAP_OPTIONS_ALLOC_STATIC(name, capacity) \
+    _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity, static)
 
 /**
  * @brief Allocates options with default capacity
