@@ -226,7 +226,7 @@ static inline void _on_l2_disconnected(netnotify_l2_connection_t *connect)
     ipv6_addr_t ipv6;
 
     /* Inform routing layer of unreachable neighbor. This must be done *before* removing
-        the neighbor from the neighbor cache. */
+       the neighbor from the neighbor cache. */
     if (_find_entry_in_nc(connect->l2addr, connect->l2addr_len, &ipv6)) {
         gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
                            NETNOTIFY_L3_UNREACHABLE, &ipv6, sizeof(ipv6_addr_t));
