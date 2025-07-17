@@ -16,6 +16,9 @@
 
 #include "net/unicoap.h"
 
+/* This is needed for netifs_print_ipv6 in main below. */
+#include "net/netif.h"
+
 /* If you need CoAP over DTLS support, you need to include extra dependencies. What's more,
  * you'll also need to load a DTLS credential for message encryption and verification.
  * The `IS_USED(MODULE_UNICOAP_DRIVER_DTLS)` below checks if the @ref net_unicoap_drivers_dtls
@@ -43,7 +46,8 @@ static const credman_credential_t credential = {
 };
 #endif /* IS_USED(MODULE_UNICOAP_DRIVER_DTLS) */
 
-static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux, unicoap_request_context_t* ctx, void* arg) {
+static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
+                                unicoap_request_context_t* ctx, void* arg) {
     (void)aux;
     (void)arg;
 
@@ -74,7 +78,7 @@ UNICOAP_RESOURCE(hello) {
 
     /* Since we are using CoAP over UDP (or CoAP over DTLS, which relies on UDP for that matter),
      * we instruct `unicoap` to send confirmable responses. To do this, we pass the
-     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. Don't want to losse our greeting along the way. */
+     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. Don't want to loose our greeting along the way. */
     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
 
     /* You must declare what CoAP methods you want to allow for each resource. */
@@ -99,7 +103,8 @@ static bool is_valid_name(const char* string, size_t length) {
     return true;
 }
 
-static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux_t* aux, unicoap_request_context_t* ctx, void* arg) {
+static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux_t* aux,
+                                   unicoap_request_context_t* ctx, void* arg) {
     (void)aux;
     (void)arg;
 
@@ -227,4 +232,8 @@ int main(void) {
            (char*)credential.params.psk.id.s,
            (char*)credential.params.psk.key.s);
 #  endif
+
+    printf("app: IPv6 address: ");
+    netifs_print_ipv6(", ");
+    printf("\n");
 }
