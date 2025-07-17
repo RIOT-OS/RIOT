@@ -105,7 +105,7 @@
 #endif
 
 /**
- * @brief If enables, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the
+ * @brief If enabled, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the
  * entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf.
  *
  * **Default**: Set if `gnrc_sock_udp` module is used (automatically used when UDP driver imported)
