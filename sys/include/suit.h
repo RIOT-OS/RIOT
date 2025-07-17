@@ -325,6 +325,18 @@ static inline bool suit_component_check_flag(suit_component_t *component,
 int suit_component_name_to_string(const suit_manifest_t *manifest,
                                   const suit_component_t *component,
                                   char separator, char *buf, size_t buf_len);
+
+/**
+ * @brief Iterate public keys accepted by SUIT
+ *
+ * @param[in] idx   index of the key to query
+ * @param[out] dst  variable to store the pointer to the key in
+ *
+ * @return          size of the public key
+ * @return          0 if no key with that index exists
+ */
+size_t suit_get_public_key(uint8_t idx, const void **dst);
+
 #ifdef __cplusplus
 }
 #endif
