@@ -90,7 +90,7 @@ int _build_ll_ipv6_from_addr(gnrc_netif_t *netif, const uint8_t *l2addr, uint8_t
     }
 
     /* Build interface identifier based on l2 address. */
-    int res = gnrc_netif_eui64_from_addr(netif, l2addr, l2addr_len, (eui64_t *)&ipv6addr->u64[1]);
+    int res = gnrc_netif_ipv6_iid_from_addr(netif, l2addr, l2addr_len, (eui64_t *)&ipv6addr->u64[1]);
     if (res < 0) {
         return res;
     }
