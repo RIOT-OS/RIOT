@@ -184,6 +184,9 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
     INCLUDES += -I$(ESP32_SDK_DIR)/components/bt/include/esp32c3/include
   endif
   ifeq (esp32h2,$(CPU_FAM))
+    CFLAGS += -Ddefault_RNG_defined=0
+    CFLAGS += -DNIMBLE_OS_MSYS_INIT_IN_CONTROLLER=1
+    CFLAGS += -DNIMBLE_G_MSYS_POOL_LIST_IN_CONTROLLER=1
     INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
   endif
 endif
@@ -211,6 +214,7 @@ endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_partition/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
   CFLAGS += -DMBEDTLS_CIPHER_MODE_XTS
 endif
 
@@ -401,12 +405,18 @@ endif
 # Libraries needed when using esp_ble
 ifneq (,$(filter esp_ble,$(USEMODULE)))
   LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
-  LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
-  ARCHIVES += -lbtdm_app
   ARCHIVES += -lphy -lstdc++
+  ifneq (,$(filter esp32 esp32c3 esp32s3,$(CPU_FAM)))
+    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
+    ARCHIVES += -lbtdm_app
+  else ifeq (esp32h2,$(CPU_FAM))
+    LINKFLAGS += -L$(ESP32_SDK_LIB_COEXIST_DIR)/$(CPU_FAM)
+    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)
+    ARCHIVES += -lble_app -lcoexist
+  endif
   ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
-  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+  else ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
     ARCHIVES += -lbtbb
   endif
 endif

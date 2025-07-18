@@ -45,18 +45,14 @@ ifneq (esp32h2,$(CPU_FAM))
   FEATURES_PROVIDED += esp_wifi_enterprise
 endif
 
-ifeq (esp32,$(CPU_FAM))
+ifneq (,$(filter esp32 esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += ble_nimble
   FEATURES_PROVIDED += ble_nimble_netif
   FEATURES_PROVIDED += esp_ble
-  FEATURES_PROVIDED += esp_ble_esp32
-else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
-  FEATURES_PROVIDED += ble_adv_ext
-  FEATURES_PROVIDED += ble_nimble
-  FEATURES_PROVIDED += ble_nimble_netif
-  FEATURES_PROVIDED += ble_phy_2mbit
-  FEATURES_PROVIDED += esp_ble
-  FEATURES_PROVIDED += esp_ble_esp32c3
+  ifneq (esp32,$(CPU_FAM))
+    FEATURES_PROVIDED += ble_adv_ext
+    FEATURES_PROVIDED += ble_phy_2mbit
+  endif
 endif
 
 ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))

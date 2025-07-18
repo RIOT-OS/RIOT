@@ -45,6 +45,8 @@ extern "C" {
 
 #define xSemaphoreHandle        SemaphoreHandle_t
 
+typedef void (* TaskFunction_t)( void * );
+
 uint32_t xPortGetTickRateHz(void);
 BaseType_t xPortInIsrContext(void);
 

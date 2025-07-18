@@ -49,6 +49,7 @@ extern "C" {
 #endif
 #define CPU_INUM_GPIO            2  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_BLE             5  /**< Level interrupt with low priority 1 */
+#define CPU_INUM_BT_MAC          8  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_RTT             9  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_SERIAL_JTAG    10  /**< Edge  interrupt with low priority 1 */
 #define CPU_INUM_I2C            12  /**< Level interrupt with low priority 1 */
