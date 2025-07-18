@@ -33,6 +33,22 @@
 
 #define ADS1115_CONF_TEST_VALUE (1)
 
+static inline int _ads1115_get_pga_voltage(ads1115_pga_t pga)
+{
+    switch (pga) {
+    case ADS1115_PGA_6_144V: return 6144;
+    case ADS1115_PGA_4_096V: return 4096;
+    case ADS1115_PGA_2_048V: return 2048;
+    case ADS1115_PGA_1_024V: return 1024;
+    case ADS1115_PGA_0_512V: return 512;
+    case ADS1115_PGA_0_256V:
+    case ADS1115_PGA_0_256V_B:
+    case ADS1115_PGA_0_256V_C:
+        return 256;
+    default:
+        return 0;
+    }
+}
 
 /**
  * @brief Builds the configuration register value from the parameters
