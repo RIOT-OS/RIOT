@@ -172,12 +172,6 @@ PSEUDOMODULES += gnrc_nettype_ipv6_ext
 PSEUDOMODULES += gnrc_nettype_lorawan
 ## @}
 
-## @defgroup 	net_gnrc_nettype_lwmac      gnrc_nettype_lwmac
-## Enables @ref GNRC_NETTYPE_LWMAC
-## @{
-PSEUDOMODULES += gnrc_nettype_lwmac
-## @}
-
 ## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn
 ## Enables @ref GNRC_NETTYPE_NDN
 ## @{

@@ -242,18 +242,6 @@ void gnrc_mac_dispatch(gnrc_mac_rx_t *rx)
 
     for (unsigned i = 0; i < GNRC_MAC_DISPATCH_BUFFER_SIZE; i++) {
         if (rx->dispatch_buffer[i]) {
-#ifdef MODULE_GNRC_LWMAC
-            /* save pointer to netif header */
-            gnrc_pktsnip_t *netif = rx->dispatch_buffer[i]->next->next;
-
-            /* remove lwmac header */
-            rx->dispatch_buffer[i]->next->next = NULL;
-            gnrc_pktbuf_release(rx->dispatch_buffer[i]->next);
-
-            /* make append netif header after payload again */
-            rx->dispatch_buffer[i]->next = netif;
-#endif
-
             if (!gnrc_netapi_dispatch_receive(rx->dispatch_buffer[i]->type,
                                               GNRC_NETREG_DEMUX_CTX_ALL,
                                               rx->dispatch_buffer[i])) {
