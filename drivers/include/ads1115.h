@@ -198,21 +198,20 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux);
  */
 int ads1115_read_conversion(ads1115_t *dev, uint16_t *value);
 
-
-static inline float _ads1115_get_pga_voltage(ads1115_pga_t pga)
+static inline int _ads1115_get_pga_voltage(ads1115_pga_t pga)
 {
     switch (pga) {
-    case ADS1115_PGA_6_144V: return 6.144f;
-    case ADS1115_PGA_4_096V: return 4.096f;
-    case ADS1115_PGA_2_048V: return 2.048f;
-    case ADS1115_PGA_1_024V: return 1.024f;
-    case ADS1115_PGA_0_512V: return 0.512f;
+    case ADS1115_PGA_6_144V: return 6144;
+    case ADS1115_PGA_4_096V: return 4096;
+    case ADS1115_PGA_2_048V: return 2048;
+    case ADS1115_PGA_1_024V: return 1024;
+    case ADS1115_PGA_0_512V: return 512;
     case ADS1115_PGA_0_256V:
     case ADS1115_PGA_0_256V_B:
     case ADS1115_PGA_0_256V_C:
-        return 0.256f;
+        return 256;
     default:
-        return 0.0f;
+        return 0;
     }
 }
 
