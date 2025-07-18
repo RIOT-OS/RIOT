@@ -84,11 +84,11 @@ To pass variables overriding the command-line to docker `DOCKER_OVERRIDE_CMDLINE
 may be used:
 
 ```shell
-DOCKER_OVERRIDE_CMDLINE="BEER_TYPE='imperial stout'" BUILD_IN_DOCKER=1 make -C examples/hello-world/ RIOT_CI_BUILD=1
+DOCKER_OVERRIDE_CMDLINE="BEER_TYPE='imperial stout'" BUILD_IN_DOCKER=1 make -C examples/basic/hello-world/ RIOT_CI_BUILD=1
 Launching build container using image "riot/riotbuild:latest".
 sudo docker run --rm -t -u "$(id -u)" \
     ...
-    -w '/data/riotbuild/riotbase/examples/hello-world/' \
+    -w '/data/riotbuild/riotbase/examples/basic/hello-world/' \
     'riot/riotbuild:latest' make  BEER_TYPE='imperial stout' 'RIOT_CI_BUILD=1'
 ```
 
