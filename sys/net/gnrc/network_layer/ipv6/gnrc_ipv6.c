@@ -42,6 +42,11 @@
 #include "net/fib/table.h"
 #endif
 
+#ifdef MODULE_GNRC_RPL_SRH
+#include "net/gnrc/rpl.h"
+#include "net/gnrc/rpl/srh.h"
+#endif
+
 #include "net/gnrc/ipv6.h"
 
 #define ENABLE_DEBUG        0
@@ -497,6 +502,13 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
     gnrc_ipv6_nib_nc_t nce;
 
     DEBUG("ipv6: send unicast\n");
+#ifdef MODULE_GNRC_RPL_SRH
+    if (ipv6_addr_is_link_local(&ipv6_hdr->dst) && !ipv6_addr_is_link_local(&ipv6_hdr->src)) {
+        /* Link-local address return netif = 0, use the netif of RPL*/
+        gnrc_netif_t *iface = gnrc_netif_get_by_prefix(gnrc_rpl_get_root_dodag_id());
+        netif = gnrc_netif_get_by_pid(iface->pid);
+    }
+#endif /* MODULE_GNRC_RPL_SRH */
     if (gnrc_ipv6_nib_get_next_hop_l2addr(&ipv6_hdr->dst, netif, pkt,
                                           &nce) < 0) {
         /* packet is released by NIB */
@@ -656,6 +668,20 @@ static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
     }
 }
 
+#ifdef MODULE_GNRC_RPL_SRH
+/* function for sending in non-storing mode */
+static inline bool _pkt_from_me(ipv6_hdr_t *hdr)
+{
+    if (ipv6_addr_is_loopback(&hdr->dst) || ipv6_addr_is_unspecified(&hdr->src)) {
+        return true;
+    }
+
+    else {
+        return !(gnrc_netif_get_by_ipv6_addr(&hdr->src) == NULL);
+    }
+}
+#endif /* MODULE_GNRC_RPL_SRH */
+
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 {
     gnrc_netif_t *netif = NULL;
@@ -710,8 +736,33 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     }
     pkt = tmp_pkt;
 
-    ipv6_hdr = pkt->data;
+    ipv6_hdr = (ipv6_hdr_t *)pkt->data;
+#ifdef MODULE_GNRC_RPL_SRH
+    /* If the packet is from me, insert SRH if needed */
+    if (get_is_root() &&
+        !ipv6_addr_is_link_local(&(ipv6_hdr->dst)) &&
+        _pkt_from_me(ipv6_hdr)) {
+        if (gnrc_rpl_get_root_dodag_id() == NULL) {
+            DEBUG("ipv6: no DODAG ID available, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        pkt = gnrc_rpl_srh_insert(pkt, ipv6_hdr);
+        if (pkt == NULL) {
+            DEBUG("ipv6: SRH insertion failed, dropping packet\n");
+            return;
+        }
 
+        /* Set the src to the global address
+         * to avoid being set to the local one in _safe_fill_ipv6_hdr */
+        memcpy(&ipv6_hdr->src, gnrc_rpl_get_root_dodag_id(),\
+            sizeof(ipv6_addr_t));
+    }
+#endif /* MODULE_GNRC_RPL_SRH */
+
+    if (pkt == NULL) {
+        return;
+    }
     if (ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         _send_multicast(pkt, prep_hdr, netif, netif_hdr_flags);
     }
@@ -875,16 +926,28 @@ static void _receive(gnrc_pktsnip_t *pkt)
         /* RFC 4291, section 2.5.6 states: "Routers must not forward any
          * packets with Link-Local source or destination addresses to other
          * links."
+         * In RPL Non-storing, we need to forward the packets with
+         * link-local source address
          */
-        if ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst)))) {
-            DEBUG("ipv6: do not forward packets with link-local source or"
-                  " destination address\n");
+        bool route_local = true;
+#ifdef MODULE_GNRC_RPL_SRH
+        route_local = ipv6_addr_is_link_local(&(hdr->dst));
+        DEBUG("ipv6: do not forward packets with link-local destination address\n");
+
+#else /* MODULE_GNRC_RPL_SRH */
+        route_local =
+            ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst))));
+        DEBUG("ipv6: do not forward packets with link-local source or"
+              " destination address\n");
+#endif /* MODULE_GNRC_RPL_SRH */
+        if (route_local) {
 #ifdef MODULE_GNRC_ICMPV6_ERROR
             if (ipv6_addr_is_link_local(&(hdr->src)) &&
                 !ipv6_addr_is_link_local(&(hdr->dst))) {
                 gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_SCOPE, pkt);
             }
-            else if (!ipv6_addr_is_multicast(&(hdr->dst))) {
+            else
+            if (!ipv6_addr_is_multicast(&(hdr->dst))) {
                 gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, pkt);
             }
 #endif
@@ -900,13 +963,19 @@ static void _receive(gnrc_pktsnip_t *pkt)
                 gnrc_pktbuf_remove_snip(pkt, netif_hdr);
             }
             pkt = gnrc_pktbuf_reverse_snips(pkt);
-            if (pkt != NULL) {
-                _send(pkt, false);
-            }
-            else {
+            if (pkt == NULL) {
                 DEBUG("ipv6: unable to reverse pkt from receive order to send "
                       "order; dropping it\n");
+                return;
             }
+#ifdef MODULE_GNRC_RPL_SRH
+            if (get_is_root()) {
+                pkt = gnrc_rpl_srh_insert(pkt, hdr);
+            }
+            _send(pkt, false);
+#else /* MODULE_GNRC_RPL_SRH */
+            _send(pkt, false);
+#endif /* MODULE_GNRC_RPL_SRH */
             return;
         }
         else {

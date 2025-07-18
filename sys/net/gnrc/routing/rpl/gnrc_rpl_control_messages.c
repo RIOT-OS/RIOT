@@ -48,6 +48,11 @@
 #include "net/gnrc/rpl/p2p.h"
 #endif
 
+#ifdef MODULE_GNRC_RPL_SRH
+#include "net/gnrc/rpl/sr_table.h"
+#include "net/gnrc/rpl/srh.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -636,7 +641,10 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             if (first_target == NULL) {
                 first_target = target;
             }
-
+            /* Non-storing */
+#ifdef MODULE_GNRC_RPL_SRH
+            gnrc_sr_delete_route(&(target->target), sizeof(ipv6_addr_t));
+#else /* MODULE_GNRC_RPL_SRH */
             DEBUG("RPL: adding FT entry %s/%d\n",
                   ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
                   target->prefix_length);
@@ -645,6 +653,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,
                                  dodag->iface,
                                  dodag->default_lifetime * dodag->lifetime_unit);
+#endif /* MODULE_GNRC_RPL_SRH */
             break;
 
         case (GNRC_RPL_OPT_TRANSIT):
@@ -656,7 +665,16 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                       "a preceding RPL TARGET DAO option\n");
                 break;
             }
-
+#ifdef MODULE_GNRC_RPL_SRH
+            if (!ipv6_addr_equal(&(first_target->target), &(transit->parent))) {
+                gnrc_sr_delete_route(&(first_target->target), sizeof(ipv6_addr_t));
+                gnrc_sr_add_new_dst(&(first_target->target), sizeof(ipv6_addr_t),
+                                    &(transit->parent),
+                                    dodag->iface, FIB_FLAG_RPL_ROUTE,
+                                    transit->path_lifetime * dodag->lifetime_unit);
+            }
+            (void)src;
+#else /* MODULE_GNRC_RPL_SRH */
             do {
                 DEBUG("RPL: updating FT entry %s/%d\n",
                       ipv6_addr_to_str(addr_str, &(first_target->target), sizeof(addr_str)),
@@ -673,6 +691,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                                                          sizeof(gnrc_rpl_opt_t) +
                                                          first_target->length);
             }while (first_target->type == GNRC_RPL_OPT_TARGET);
+#endif /* MODULE_GNRC_RPL_SRH */
 
             first_target = NULL;
             break;
@@ -956,7 +975,8 @@ static gnrc_pktsnip_t *_dao_target_build(gnrc_pktsnip_t *pkt, ipv6_addr_t *addr,
     return opt_snip;
 }
 
-static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime, bool external)
+static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
+                                        ipv6_addr_t *parent, bool external)
 {
     gnrc_rpl_opt_transit_t *transit;
     gnrc_pktsnip_t *opt_snip;
@@ -969,8 +989,18 @@ static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
     }
     transit = opt_snip->data;
     transit->type = GNRC_RPL_OPT_TRANSIT;
+    uint8_t parent_size = 0;
+#ifdef MODULE_GNRC_RPL_SRH
+    parent_size = sizeof(ipv6_addr_t);
+#endif /* MODULE_GNRC_RPL_SRH */
     transit->length = sizeof(transit->e_flags) + sizeof(transit->path_control) +
-                      sizeof(transit->path_sequence) + sizeof(transit->path_lifetime);
+                      sizeof(transit->path_sequence) + sizeof(transit->path_lifetime) +
+                      parent_size;
+#ifdef MODULE_GNRC_RPL_SRH
+    transit->parent = *parent;
+#else /* MODULE_GNRC_RPL_SRH */
+    (void)parent; /* unused in storing mode */
+#endif
     transit->e_flags = (external) << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT;
     transit->path_control = 0;
     transit->path_sequence = 0;
@@ -981,6 +1011,8 @@ static gnrc_pktsnip_t *_dao_transit_build(gnrc_pktsnip_t *pkt, uint8_t lifetime,
 void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint8_t lifetime)
 {
     gnrc_rpl_dodag_t *dodag;
+    uint8_t mop;
+    ipv6_addr_t parent;
 
     if (inst == NULL) {
         DEBUG("RPL: Error - trying to send DAO without being part of a dodag.\n");
@@ -988,6 +1020,8 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     }
 
     dodag = &inst->dodag;
+    mop = inst->mop;
+    memcpy(&parent, &dodag->parents->addr, sizeof(ipv6_addr_t));
 
     if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
         return;
@@ -1004,10 +1038,13 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
             DEBUG("RPL: dodag has no preferred parent\n");
             return;
         }
-
-        destination = &(dodag->parents->addr);
+        if (mop == GNRC_RPL_MOP_NON_STORING_MODE) {
+            destination = &dodag->dodag_id;
+        }
+        else {
+            destination = &parent;
+        }
     }
-
     gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;
     gnrc_rpl_dao_t *dao;
 
@@ -1026,26 +1063,35 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         return;
     }
     me = &netif->ipv6.addrs[idx];
-
-    /* add external and RPL FT entries */
-    /* TODO: nib: dropped support for external transit options for now */
-    void *ft_state = NULL;
-    gnrc_ipv6_nib_ft_t fte;
-    while (gnrc_ipv6_nib_ft_iter(NULL, dodag->iface, &ft_state, &fte)) {
-        DEBUG("RPL: Send DAO - building transit option\n");
-
-        if ((pkt = _dao_transit_build(pkt, lifetime, false)) == NULL) {
+    if (mop == GNRC_RPL_MOP_NON_STORING_MODE) {
+        /* Add the prefix to include the parent's global IP address. */
+        ipv6_addr_init_prefix(&parent, &dodag->dodag_id, IPV6_ADDR_BIT_LEN - 64);
+        if ((pkt = _dao_transit_build(pkt, lifetime, &parent, false)) == NULL) {
             DEBUG("RPL: Send DAO - no space left in packet buffer\n");
             return;
         }
-        if (ipv6_addr_is_global(&fte.dst) &&
-            !ipv6_addr_is_unspecified(&fte.next_hop)) {
-            DEBUG("RPL: Send DAO - building target %s/%d\n",
-                  ipv6_addr_to_str(addr_str, &fte.dst, sizeof(addr_str)), fte.dst_len);
+    }
+    else {
+        /* add external and RPL FT entries */
+        /* TODO: nib: dropped support for external transit options for now */
+        void *ft_state = NULL;
+        gnrc_ipv6_nib_ft_t fte;
+        while (gnrc_ipv6_nib_ft_iter(NULL, dodag->iface, &ft_state, &fte)) {
+            DEBUG("RPL: Send DAO - building transit option\n");
 
-            if ((pkt = _dao_target_build(pkt, &fte.dst, fte.dst_len)) == NULL) {
+            if ((pkt = _dao_transit_build(pkt, lifetime, &parent, false)) == NULL) {
                 DEBUG("RPL: Send DAO - no space left in packet buffer\n");
                 return;
+            }
+            if (ipv6_addr_is_global(&fte.dst) &&
+                !ipv6_addr_is_unspecified(&fte.next_hop)) {
+                DEBUG("RPL: Send DAO - building target %s/%d\n",
+                      ipv6_addr_to_str(addr_str, &fte.dst, sizeof(addr_str)), fte.dst_len);
+
+                if ((pkt = _dao_target_build(pkt, &fte.dst, fte.dst_len)) == NULL) {
+                    DEBUG("RPL: Send DAO - no space left in packet buffer\n");
+                    return;
+                }
             }
         }
     }
@@ -1104,8 +1150,12 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
                              (destination && !ipv6_addr_is_multicast(destination)));
 #endif
 
-    gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
-
+    if (mop == GNRC_RPL_MOP_NON_STORING_MODE) {
+        gnrc_rpl_send(pkt, dodag->iface, me, destination, &dodag->dodag_id);
+    }
+    else {
+        gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
+    }
     dodag->dao_seq = GNRC_RPL_COUNTER_INCREMENT(dodag->dao_seq);
 }
 
