@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-leonardo Arduino Leonardo
 @ingroup     boards
 @brief       Support for the Arduino Leonardo board
@@ -58,5 +57,3 @@ the user program, flashing will fail. See below to work around
 Mac Users have export the environment variable both `PORT` and `PROG_DEV`
 to point to the device file of the TTL adapter (`PORT`) and the device file of
 the Arduino Leonardo (`PROG_DEV`).
-
- */

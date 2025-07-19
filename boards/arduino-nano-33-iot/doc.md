@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-nano-33-iot Arduino Nano 33 IoT
 @ingroup     boards
 @brief       Support for the Arduino Nano 33 IoT board.
@@ -24,4 +23,3 @@ STDIO of RIOT is directly available over the USB port.
 The `TERM_DELAY` environment variable can be used to add a delay (in second)
 before opening the serial terminal. The default value is 2s which should be
 enough in most of the situation.
- */

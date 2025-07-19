@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-nano-33-ble Arduino Nano 33 BLE
 @ingroup     boards
 @brief       Support for the Arduino Nano 33 BLE
@@ -31,4 +30,3 @@ Use the `term` target to connect to the board serial port<br/>
 ```
     make BOARD=arduino-nano-33-ble -C examples/basic/hello-world term
 ```
- */
