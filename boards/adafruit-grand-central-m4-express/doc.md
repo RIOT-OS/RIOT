@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_adafruit-grand-central-m4-express Adafruit Grand Central M4 Express
 @ingroup     boards
 @brief       Support for the Adafruit Grand Central M4 Express
@@ -48,5 +47,3 @@ Readiness of the bootloader is indicated by LED pulsing in red.
 
 The usual way to obtain a console on this board is using an emulated USB serial
 port.
-
- */

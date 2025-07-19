@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_adafruit-pybadge Adafruit PyBadge
 @ingroup     boards
 @brief       Support for the Adafruit PyBadge board.
@@ -36,5 +35,3 @@ button before running the flash command provided above.
 ### Accessing STDIO via UART
 
 STDIO of RIOT is directly available over the USB port.
-
- */

@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_adafruit-metro-m4-express Adafruit Metro M4 Express
 @ingroup     boards
 @brief       Support for the Adafruit Metro M4 Express
@@ -67,5 +66,3 @@ Accessing STDIO
 
 The usual way to obtain a console on this board is using an emulated USB serial
 port.
-
- */
