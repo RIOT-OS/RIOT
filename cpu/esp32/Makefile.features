@@ -4,6 +4,9 @@ ifeq (esp32,$(CPU_FAM))
 else ifeq (esp32c3,$(CPU_FAM))
   CPU_ARCH = rv32
   CPU_CORE = rv32imc
+else ifeq (esp32c6,$(CPU_FAM))
+  CPU_ARCH = rv32
+  CPU_CORE = rv32imac
 else ifeq (esp32h2,$(CPU_FAM))
   CPU_ARCH = rv32
   CPU_CORE = rv32imac
@@ -45,7 +48,7 @@ ifneq (esp32h2,$(CPU_FAM))
   FEATURES_PROVIDED += esp_wifi_enterprise
 endif
 
-ifneq (,$(filter esp32 esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
+ifneq (,$(filter esp32 esp32c3 esp32c6 esp32h2 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += ble_nimble
   FEATURES_PROVIDED += ble_nimble_netif
   FEATURES_PROVIDED += esp_ble
@@ -64,7 +67,7 @@ ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
   endif
 endif
 
-ifeq (esp32h2,$(CPU_FAM))
+ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
   FEATURES_PROVIDED += esp_ieee802154
 endif
 

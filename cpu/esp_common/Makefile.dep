@@ -53,7 +53,7 @@ ifneq (,$(filter netdev_default,$(USEMODULE)))
     endif
   else
     # otherwise use esp_now as default netdev if no other netdev is enabled
-    ifeq (,$(filter esp_wifi esp_eth nimble_netif nimble_netif_ext,$(USEMODULE)))
+    ifeq (,$(filter esp_wifi esp_eth esp_ieee802154 nimble_netif nimble_netif_ext,$(USEMODULE)))
       USEMODULE += esp_now
     endif
   endif

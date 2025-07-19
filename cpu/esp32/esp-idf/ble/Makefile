@@ -4,7 +4,7 @@ ifeq (esp32,$(CPU_FAM))
   # source files to be compiled for this module for ESP32
   ESP32_SDK_SRC += components/bt/controller/$(CPU_FAM)/bt.c
   ESP32_SDK_SRC += components/esp_system/esp_system.c
-else ifeq (esp32h2,$(CPU_FAM))
+else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
   # source files to be compiled for this module for ESP32H2
   ESP32_SDK_SRC += components/bt/controller/$(CPU_FAM)/bt.c
   ESP32_SDK_SRC += components/bt/porting/mem/bt_osi_mem.c
@@ -18,7 +18,7 @@ else ifneq (,$(filter esp32s3 esp32c3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/esp_system/esp_system.c
 endif
 
-ifeq (esp32h2,$(CPU_FAM))
+ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
   # ESP-IDF npl includes have to be found before the includes of pkg/nimble
   INCLUDES := -I$(ESP32_SDK_DIR)/components/bt/porting/npl/freertos/include $(INCLUDES)
   INCLUDES += -I$(ESP32_SDK_DIR)/components/bt/porting/transport/include
