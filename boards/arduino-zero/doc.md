@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-zero Arduino Zero
 @ingroup     boards
 @brief       Support for the Arduino Zero board.
@@ -88,4 +87,3 @@ The default stack sizes have not been tuned properly yet. If in doubt why
 your application crashes try increasing the default stack sizes and use `ps` to
 find out how much stack is being used.
 Tracked in https://github.com/RIOT-OS/RIOT/issues/2228
- */

@@ -1,25 +1,24 @@
-/**
-@defgroup    boards_arduino-mkrfox1200 Arduino MKRFOX1200
+@defgroup    boards_arduino-mkrwan1300 Arduino MKR WAN 1300
 @ingroup     boards
-@brief       Support for the Arduino MKRFOX1200 board.
+@brief       Support for the Arduino MKR WAN 1300 board.
 
 ### General information
 
-The [Arduino MKRFOX1200](https://www.arduino.cc/en/Main.ArduinoBoardMKRFox1200) board is
-a learning and development board that provides Sigfox connectivity and is
+The [Arduino MKR WAN 1300](https://store.arduino.cc/mkr-wan-1300) board is
+a learning and development board that provides LoRa connectivity and is
 powered by an Atmel SAMD21 microcontroller.
 
 ### Pinout
 
 <img src="https://www.arduino.cc/en/uploads/Main/MKR1000_pinout.png"
-     alt="Arduino MKRFOX1200 pinout" style="height:800px;"/>
+     alt="Arduino MKR WAN 1300 pinout" style="height:800px;"/>
 
 ### Flash the board
 
-Use `BOARD=arduino-mkrfox1200` with the `make` command.<br/>
+Use `BOARD=arduino-mkrwan1300` with the `make` command.<br/>
 Example with `hello-world` application:
 ```
-     make BOARD=arduino-mkrfox1200 -C examples/basic/hello-world flash
+     make BOARD=arduino-mkrwan1300 -C examples/basic/hello-world flash
 ```
 
 @note     If the application crashes, automatic reflashing via USB, as explained
@@ -34,4 +33,3 @@ STDIO of RIOT is directly available over the USB port.
 The `TERM_DELAY` environment variable can be used to add a delay (in second)
 before opening the serial terminal. The default value is 2s which should be
 enough in most of the situation.
- */

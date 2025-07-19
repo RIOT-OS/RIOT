@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-due Arduino Due
 @ingroup     boards
 @brief       Support for the Arduino Due board
@@ -57,5 +56,3 @@ the preinstalled arduino bootloader. Connect your board using the programming
 port to your host computer and type:
 
 `make BOARD=arduino-due flash`
-
- */

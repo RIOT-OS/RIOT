@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_arduino-duemilanove Arduino Duemilanove
 @ingroup     boards
 @brief       Support for the Arduino Duemilanove board
@@ -24,4 +23,3 @@ type:
 `make BOARD=arduino-duemilanove flash`
 
 This should take care of everything!
- */
