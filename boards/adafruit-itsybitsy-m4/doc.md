@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_adafruit-itsybitsy-m4 Adafruit-Itsybitsy-M4
 @ingroup     boards
 @brief       Support for the Adafruit-Itsybitsy-M4
@@ -33,5 +32,3 @@ Readiness of the bootloader is indicated by LD1 pulsing in red.
 ### Accessing STDIO
 
 The usual way to obtain a console on this board is using an emulated USB serial port.
-
- */
