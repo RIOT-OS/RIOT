@@ -61,7 +61,7 @@ see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 ### Board Configuration {#esp32c6_devkit_board_configuration}
 
 ESP32-C6-DevKit boards have no special hardware on board with the exception
-of a single pin RGB-LED.
+of a WS2812-compatible RGB-LED.
 
 All GPIOs are simply broken out for flexibility. Therefore, the board
 configuration is the most flexible one which provides:
@@ -71,9 +71,9 @@ configuration is the most flexible one which provides:
 - 1 x I2C
 - 1 x UART
 - 2 x PWM with 3 channels each
-- 1 RGB-LED
+- 1 x RGB-LED WS2812-compatible
 
-Since all GPIOs have broken out, GPIOs can be used for different purposes
+Since all GPIOs are broken out, GPIOs can be used for different purposes
 in different applications. For flexibility, GPIOs can be used in multiple
 peripheral configurations, but they can only be used for one peripheral
 at a time. For example, GPIO4 and GPIO5 are defined as ADC channels
@@ -124,7 +124,7 @@ USB D+          | GPIO13 | | |
 - GPIO10, GPIO11 and GPIO24 to GPIO30 are used for internal flash and are not broken out.
 - GPIO0 and GPIO1 can be used to connect an external 32.678 kHz crystal.
 - GPIO15 is a strapping pin used to select the JTAG interface if
-  `JTAG_SEL_ENABLE` is burned in eFuses.
+  `JTAG_SEL_ENABLE` is burned in the eFuses.
 
 For detailed information about the peripheral configurations of ESP32-C6
 boards, see section \ref esp32_peripherals "Common Peripherals".
@@ -150,7 +150,7 @@ The corresponding board schematics can be found:
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer
-and type using the programming port:
+and using the programming port and execute command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 BOARD=esp32c6-devkit make flash ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
