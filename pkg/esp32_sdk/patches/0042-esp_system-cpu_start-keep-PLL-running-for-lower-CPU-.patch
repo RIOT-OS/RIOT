@@ -18,7 +18,7 @@ index cad5d291ac..09c4a7cd5b 100644
  
 +#if (CPU_FAM_ESP32C6 && (CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ <= 40)) || \
 +    (CPU_FAM_ESP32H2 && (CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ <= 32))
-+    /* add a cunsomer for PLL480M to keep the PLL running on clock change */
++    /* add a consumer for PLL480M to keep the PLL running on clock change */
 +    rtc_clk_bbpll_add_consumer();
 +#endif
 +
