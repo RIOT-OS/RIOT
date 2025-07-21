@@ -93,7 +93,9 @@ static CONF_HANDLER(_conf_root_handler,
                     NULL,
                     &configuration_default_backend_ops,
                     &configuration_default_backend_data_ops,
-                    0, NULL);
+                    0,
+                    0,
+                    NULL);
 
 static conf_iterator_restore_t _configuration_iterator_init(conf_iterator_t *iter,
                                                             const conf_handler_t *handler,
@@ -149,10 +151,10 @@ static bool _sid_in_array_range(const conf_array_handler_t *array, conf_sid_t si
 
 static bool _sid_in_range(const conf_handler_t *handler, conf_sid_t sid)
 {
-    if (handler->conf_flags.handles_array) {
+    if (configuration_node_is_array(handler)) {
         return _sid_in_array_range(_ARRAY_HANDLER(handler), sid);
     }
-    else if (!handler->conf_flags.handles_primitive) {
+    else if (!configuration_node_is_primitive(handler)) {
         return _sid_in_node_range(handler, sid);
     }
     return handler->handler_id->sid_lower == sid;
@@ -256,7 +258,7 @@ static int _configuration_find_handler_sid(const conf_handler_t **next_handler,
     }
     while (handler) {
         if (key->sid_normal > handler->node_id->sid_lower) {
-            if (handler->conf_flags.handles_array) {
+            if (configuration_node_is_array(handler)) {
                 if (!_sid_in_array_bounds(_ARRAY_HANDLER(handler), key->sid_normal)) {
                     return -ERANGE;
                 }
@@ -283,7 +285,7 @@ static int _configuration_find_handler_sid(const conf_handler_t **next_handler,
         }
     }
     if (key->sid_normal != (*next_handler)->node_id->sid_lower) {
-        if ((*next_handler)->conf_flags.handles_array) {
+        if (configuration_node_is_array((*next_handler))) {
             if (!_sid_in_array_bounds(_ARRAY_HANDLER(*next_handler), key->sid_normal)) {
                 return -ERANGE;
             }
@@ -313,7 +315,7 @@ static int _configuration_prepare_sid(const conf_handler_t **next_handler, conf_
     int ret = _configuration_find_handler_sid(next_handler, key, key_buf, key_buf_len);
     if (ret < 0) {
         (void)ret;
-        DEBUG("configuration: no handler found %d, SID %llu\n", ret, key->sid);
+        DEBUG("configuration: no handler found %d, SID %"PRIu64"\n", ret, key->sid);
     }
     return ret;
 }
@@ -359,7 +361,7 @@ static conf_handler_t *_configuration_handler_encode_iterator_next(conf_path_ite
             key->sid_normal = next.node->node_id->sid_lower;
         }
         bool push_subnodes = false;
-        if (next.node->conf_flags.handles_array && next.index < _ARRAY_HANDLER(next.node)->array_size) {
+        if (configuration_node_is_array(next.node) && next.index < _ARRAY_HANDLER(next.node)->array_size) {
             assert(iter->sp < ARRAY_SIZE(iter->stack));
             iter->stack[iter->sp++] = (conf_path_iterator_item_t) { next.node, next.index + 1 };
             if (key->sid != *sid_start && key->sid_normal != next.node->node_id->sid_lower) {
@@ -375,7 +377,7 @@ static conf_handler_t *_configuration_handler_encode_iterator_next(conf_path_ite
             }
             push_subnodes = true;
         }
-        else if (!next.node->conf_flags.handles_primitive && next.index < 1) {
+        else if (!configuration_node_is_primitive(next.node) && next.index < 1) {
             assert(iter->sp < ARRAY_SIZE(iter->stack));
             iter->stack[iter->sp++] = (conf_path_iterator_item_t) { next.node, 1 };
             if (key->sid != *sid_start) {
@@ -415,13 +417,13 @@ static conf_handler_t *_configuration_handler_decode_iterator_next(conf_path_ite
         conf_path_iterator_item_t next = iter->stack[--iter->sp];
         if (handler) {
             /* got a new key: go deeper by finding the next handler */
-            if (!next.node->conf_flags.handles_primitive) {
+            if (!configuration_node_is_primitive(next.node)) {
                 assert(iter->sp < ARRAY_SIZE(iter->stack));
                 iter->stack[iter->sp++] = (conf_path_iterator_item_t) { next.node, next.index};
             }
-            if (next.node != handler && !handler->conf_flags.handles_primitive) {
+            if (next.node != handler && !configuration_node_is_primitive(handler)) {
                 uint32_t index = 0;
-                if (handler->conf_flags.handles_array && key->sid > handler->node_id->sid_lower) {
+                if (configuration_node_is_array(handler) && key->sid > handler->node_id->sid_lower) {
                     index = _sid_array_index(_ARRAY_HANDLER(handler), key->sid);
                 }
                 assert(iter->sp < ARRAY_SIZE(iter->stack));
@@ -437,7 +439,7 @@ static conf_handler_t *_configuration_handler_decode_iterator_next(conf_path_ite
             }
             else {
                 /* no new key: go upper by finishing an element */
-                if (handler->conf_flags.handles_array && next.index < _ARRAY_HANDLER(handler)->array_size) {
+                if (configuration_node_is_array(handler) && next.index < _ARRAY_HANDLER(handler)->array_size) {
                     if (handler->array_id->sid_lower + 1 + next.index * handler->array_id->sid_stride > key->sid) {
                         key->sid = handler->array_id->sid_lower + 1 + next.index * handler->array_id->sid_stride;
                         key->offset = next.index * handler->size;
@@ -479,7 +481,7 @@ static conf_handler_t *_configuration_path_sid_iterator_next(conf_path_iterator_
         if (key->sid != *sid_start && _configuration_append_segment(next.node, key, _KEY_BUF(key), _KEY_BUF_LEN(key))) {
             return NULL;
         }
-        if (next.node->conf_flags.handles_array) {
+        if (configuration_node_is_array(next.node)) {
             bool skip = key->sid == *sid_start && next.node->node_id->sid_lower < key->sid_normal;
             if (next.index == 0) {
                 if (key->sid_normal == next.node->node_id->sid_lower) {

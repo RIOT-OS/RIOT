@@ -70,7 +70,7 @@ int configuration_set_handler_default(const conf_handler_t *handler,
     assert((val && size && *size) || (!val && !size));
 
     size_t sz = size ? *size : 0;
-    if (handler->conf_flags.handles_array && handler->array_id->sid_lower == key->sid_normal) {
+    if (configuration_node_is_array(handler) && handler->array_id->sid_lower == key->sid_normal) {
         if (val && sz < handler->size * _ARRAY_HANDLER(handler)->array_size) {
             return -ENOBUFS;
         }
@@ -105,7 +105,7 @@ int configuration_get_handler_default(const conf_handler_t *handler,
     assert(handler->data);
 
     size_t sz = handler->size;
-    if (handler->conf_flags.handles_array && handler->array_id->sid_lower == key->sid_normal) {
+    if (configuration_node_is_array(handler) && handler->array_id->sid_lower == key->sid_normal) {
         if (*size < (sz = handler->size * _ARRAY_HANDLER(handler)->array_size)) {
             return -ENOBUFS;
         }
@@ -128,7 +128,7 @@ int configuration_import_handler_default(const conf_handler_t *handler,
     conf_sid_t sid_restore = key->sid;
     size_t sz = handler->size;
     const conf_backend_t *be = *configuration_get_src_backend(handler);
-    if (handler->conf_flags.handles_array && handler->array_id->sid_lower == key->sid_normal) {
+    if (configuration_node_is_array(handler) && handler->array_id->sid_lower == key->sid_normal) {
         sz = handler->size * _ARRAY_HANDLER(handler)->array_size;
     }
     int err = 0; (void)err;
@@ -211,7 +211,7 @@ int configuration_export_handler_default(const conf_handler_t *handler,
     size_t sz = handler->size;
     const conf_backend_t *be = *configuration_get_dst_backend(handler);
     const uint8_t *data = handler->data ? (const uint8_t *)handler->data + key->offset : NULL;
-    if (handler->conf_flags.handles_array && handler->array_id->sid_lower == key->sid_normal) {
+    if (configuration_node_is_array(handler) && handler->array_id->sid_lower == key->sid_normal) {
         sz = handler->size * _ARRAY_HANDLER(handler)->array_size;
     }
     int err; (void)err;
@@ -283,6 +283,22 @@ int configuration_delete_handler_default(const conf_handler_t *handler,
     return 0;
 }
 
+static int _encode_key_cbor(nanocbor_encoder_t *enc, const conf_handler_t *handler, uint64_t sid)
+{
+    (void)handler;
+    int ret;
+#if IS_USED(MODULE_CONFIGURATION_STRINGS)
+    if (handler->conf_flags & CONF_FLAGS_ENCODE_KEY_STRING) {
+        if ((ret = nanocbor_put_tstr(enc, handler->node_id->subtree)) == NANOCBOR_OK) {
+            ret = strlen(handler->node_id->subtree);
+        }
+        return ret;
+    }
+#endif
+    ret = nanocbor_fmt_uint(enc, sid);
+    return ret;
+}
+
 static int _encode_node_handler_cbor(const conf_handler_t *handler,
                                      conf_key_buf_t *key, const conf_sid_t *sid_start,
                                      void **enc_data, size_t *enc_size)
@@ -297,7 +313,7 @@ static int _encode_node_handler_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
             sid = key->sid - handler->parent->node_id->sid_lower;
 #endif
-            if (nanocbor_fmt_uint(&enc, sid) < 0) {
+            if (_encode_key_cbor(&enc, handler, sid) < 0) {
                 DEBUG("configuration: failed to encode node SID %"PRIu64" handler %p\n",
                       key->sid, (const void *)handler);
                 return -ENOBUFS;
@@ -382,7 +398,7 @@ static int _encode_array_handler_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
             sid = key->sid - handler->parent->array_id->sid_lower;
 #endif
-            if (nanocbor_fmt_uint(&enc, sid) < 0) {
+            if (_encode_key_cbor(&enc, handler, sid) < 0) {
                 DEBUG("configuration: failed to encode array SID %"PRIu64" handler %p\n",
                       key->sid, (const void *)arr_handler);
                 return -ENOBUFS;
@@ -511,7 +527,7 @@ static int _encode_uint_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
     sid = key->sid - handler->parent->node_id->sid_lower;
 #endif
-    if (nanocbor_fmt_uint(&enc, sid) < 0) {
+    if (_encode_key_cbor(&enc, handler, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR uint handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -606,7 +622,7 @@ static int _encode_int_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
     sid = key->sid - handler->parent->node_id->sid_lower;
 #endif
-    if (nanocbor_fmt_uint(&enc, sid) < 0) {
+    if (_encode_key_cbor(&enc, handler, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR int handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -701,7 +717,7 @@ static int _encode_byte_string_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
     sid = key->sid - handler->parent->node_id->sid_lower;
 #endif
-    if (nanocbor_fmt_uint(&enc, sid) < 0) {
+    if (_encode_key_cbor(&enc, handler, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR byte string handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -762,7 +778,7 @@ static int _encode_text_string_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
     sid = key->sid - handler->parent->node_id->sid_lower;
 #endif
-    if (nanocbor_fmt_uint(&enc, sid) < 0) {
+    if (_encode_key_cbor(&enc, handler, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR test string handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -810,6 +826,60 @@ static int _decode_text_string_cbor(const conf_handler_t *handler,
     return -ENOTSUP;
 }
 
+static int _encode_bool_cbor(const conf_handler_t *handler,
+                            conf_key_buf_t *key, const conf_sid_t *sid_start,
+                            void **enc_data, size_t *enc_size)
+{
+    (void)handler; (void)key; (void)sid_start; (void)enc_data; (void)enc_size;
+#if IS_USED(MODULE_NANOCBOR)
+    const bool *data = ((const bool *)handler->data) + key->offset;
+    nanocbor_encoder_t enc;
+    nanocbor_encoder_init(&enc, *enc_data, *enc_size);
+    uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+    sid = key->sid - handler->parent->node_id->sid_lower;
+#endif
+    if (_encode_key_cbor(&enc, handler, sid) < 0) {
+        DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR bool handler %p\n",
+              key->sid, (const void *)handler);
+        return -ENOBUFS;
+    }
+    if (nanocbor_fmt_bool(&enc, *data) < 0) {
+        DEBUG("configuration: failed to encode CBOR bool for SID %"PRIu64" handler %p\n",
+              key->sid, (const void *)handler);
+        return -ENOBUFS;
+    }
+    *enc_data = enc.cur;
+    *enc_size -= nanocbor_encoded_len(&enc);
+    return 0;
+#endif
+    return -ENOTSUP;
+}
+
+static int _decode_bool_cbor(const conf_handler_t *handler,
+                             conf_key_buf_t *key, conf_sid_t *sid_start,
+                             const void **dec_data, size_t *dec_size)
+{
+    (void)handler; (void)key; (void)sid_start; (void)dec_data; (void)dec_size;
+#if IS_USED(MODULE_NANOCBOR)
+    nanocbor_value_t dec;
+    int ret;
+    bool dat;
+    nanocbor_decoder_init(&dec, *dec_data, *dec_size);
+    if ((ret = nanocbor_get_bool(&dec, &dat) != NANOCBOR_OK)) {
+        DEBUG("configuration: failed to decode bool for SID %"PRIu64" handler %p\n",
+              key->sid, (const void *)handler);
+        return ret == NANOCBOR_ERR_END ? -ENOBUFS : -EINVAL;
+    }
+    void *data = ((uint8_t *)handler->data) + key->offset;
+    *(bool *)data = dat;
+    *dec_size -= dec.cur - (const uint8_t *)*dec_data;
+    *dec_data = dec.cur;
+    return 0;
+#endif
+    return -ENOTSUP;
+}
+
 static int _decode_skip_cbor(const conf_handler_t *handler,
                              conf_key_buf_t *key, conf_sid_t *sid_start,
                              const void **dec_data, size_t *dec_size)
@@ -844,24 +914,28 @@ int configuration_encode_handler_default(const conf_handler_t *handler,
 
     if (fmt == CONF_FMT_CBOR) {
         if (IS_USED(MODULE_NANOCBOR)) {
-            if (handler->conf_flags.handles_array) {
+            if (configuration_node_is_array(handler)) {
                 return _encode_array_handler_cbor(handler, key, sid_start, enc_data, enc_size);
             }
-            else if (handler->conf_flags.handles_primitive) {
-                if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_UINT) {
+            else if (configuration_node_is_primitive(handler)) {
+                if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_UINT) {
                     return _encode_uint_cbor(handler, key, sid_start, enc_data, enc_size);
                 }
-                else if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_INT) {
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_INT) {
                     return _encode_int_cbor(handler, key, sid_start, enc_data, enc_size);
                 }
-                else if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_BSTR) {
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_BSTR) {
                     return _encode_byte_string_cbor(handler, key, sid_start, enc_data, enc_size);
                 }
-                else if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_TSTR) {
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_TSTR) {
                     return _encode_text_string_cbor(handler, key, sid_start, enc_data, enc_size);
                 }
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_BOOL) {
+                    return _encode_bool_cbor(handler, key, sid_start, enc_data, enc_size);
+                }
                 else {
-                    assert(false);
+                    printf("configuration: unsupported primitive type %d for handler %p\n",
+                           configuration_node_primitive_type(handler), (const void *)handler);
                 }
             }
             return _encode_node_handler_cbor(handler, key, sid_start, enc_data, enc_size);
@@ -884,24 +958,28 @@ int configuration_decode_handler_default(const conf_handler_t *handler,
             if (!handler) {
                 return _decode_skip_cbor(handler, key, sid_start, dec_data, dec_size);
             }
-            else if (handler->conf_flags.handles_array) {
+            else if (configuration_node_is_array(handler)) {
                 return _decode_array_handler_cbor(handler, key, sid_start, dec_data, dec_size);
             }
-            else if (handler->conf_flags.handles_primitive) {
-                if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_UINT) {
+            else if (configuration_node_is_primitive(handler)) {
+                if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_UINT) {
                     return _decode_uint_cbor(handler, key, sid_start, dec_data, dec_size);
                 }
-                else if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_INT) {
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_INT) {
                     return _decode_int_cbor(handler, key, sid_start, dec_data, dec_size);
                 }
-                else if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_BSTR) {
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_BSTR) {
                     return _decode_byte_string_cbor(handler, key, sid_start, dec_data, dec_size);
                 }
-                else if (handler->conf_flags.primitive_type == CONF_PRIM_TYPE_TSTR) {
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_TSTR) {
                     return _decode_text_string_cbor(handler, key, sid_start, dec_data, dec_size);
                 }
+                else if (configuration_node_primitive_type(handler) == CONF_PRIM_TYPE_BOOL) {
+                    return _decode_bool_cbor(handler, key, sid_start, dec_data, dec_size);
+                }
                 else {
-                    assert(false);
+                    printf("configuration: unsupported primitive type %d for handler %p\n",
+                           configuration_node_primitive_type(handler), (const void *)handler);
                 }
             }
             return _decode_node_handler_cbor(handler, key, sid_start, dec_data, dec_size);

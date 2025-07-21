@@ -259,13 +259,14 @@ void auto_init_configuration_root_backend_init(void);
  * @param   data_ops            Pointer to handler data operations (verify, apply)
  * @param   be_ops              Pointer to handler backend operations (import, export, delete)
  * @param   be_data_ops         Pointer to handler backend data operations (encode, decode)
+ * @param   flags               Configuration flags @ref conf_handler_flags_t
  * @param   item_size           Size of the configuration item
  * @param   loc                 Location of the configuration data
  */
-#define CONF_HANDLER(name, id, data_ops, be_ops, be_data_ops, item_size, loc)                       \
+#define CONF_HANDLER(name, id, data_ops, be_ops, be_data_ops, flags, item_size, loc)                \
     conf_handler_t name =                                                                           \
     _CONF_HANDLER_INITIALIZER((const conf_handler_node_id_t *)id, data_ops, be_ops, be_data_ops,    \
-                              { 0 }, item_size, loc)
+                              flags, item_size, loc)
 
 /**
  * @brief   Macro to instantiate a configuration handler for a primitive type
@@ -282,16 +283,16 @@ void auto_init_configuration_root_backend_init(void);
 #define CONF_PRIMITIVE_HANDLER(name, id, data_ops, be_ops, be_data_ops, flags, item_size, loc)      \
     conf_handler_t name =                                                                           \
     _CONF_HANDLER_INITIALIZER((const conf_handler_node_id_t *)id, data_ops, be_ops, be_data_ops,    \
-                              _CONF_FLAGS(flags), item_size, loc)
+                              flags, item_size, loc)
 /**
  * @brief   Static initializer for a configuration handler node
  * @internal
  */
-#define _CONF_ARRAY_HANDLER_INITIALIZER(_id, _data_ops, _be_ops, _be_data_ops, _item_size, _loc, _numof)    \
-{                                                                                                           \
-    .handler =  _CONF_HANDLER_INITIALIZER((const conf_handler_node_id_t *)_id, _data_ops, _be_ops,          \
-                                          _be_data_ops, CONF_FLAGS_ARRAY(), _item_size, _loc),              \
-    .array_size = _numof,                                                                                   \
+#define _CONF_ARRAY_HANDLER_INITIALIZER(_id, _data_ops, _be_ops, _be_data_ops, _flags, _item_size, _loc, _numof)    \
+{                                                                                                                   \
+    .handler =  _CONF_HANDLER_INITIALIZER((const conf_handler_node_id_t *)_id, _data_ops, _be_ops,                  \
+                                          _be_data_ops, _flags | CONF_FLAGS_ARRAY, _item_size, _loc),               \
+    .array_size = _numof,                                                                                           \
 }
 /**
  * @brief   Macro to instantiate a configuration array handler
@@ -305,9 +306,9 @@ void auto_init_configuration_root_backend_init(void);
  * @param   loc                 Location of the configuration data
  * @param   numof               Number of items in the array
  */
-#define CONF_ARRAY_HANDLER(name, id, data_ops, be_ops, be_data_ops, item_size, loc, numof)          \
+#define CONF_ARRAY_HANDLER(name, id, data_ops, be_ops, be_data_ops, flags, item_size, loc, numof)   \
     conf_array_handler_t name =                                                                     \
-    _CONF_ARRAY_HANDLER_INITIALIZER(id, data_ops, be_ops, be_data_ops, item_size, loc, numof)
+    _CONF_ARRAY_HANDLER_INITIALIZER(id, data_ops, be_ops, be_data_ops, flags, item_size, loc, numof)
 
 /**
  * @brief   Macro to instantiate a configuration backend for a handler
@@ -589,52 +590,30 @@ struct {                                                    \
 typedef CONF_HANDLER_ID_T conf_handler_id_t;
 
 /**
- * @brief   Configuration of handler behavior
+ * @brief   Flags to be interpreted by the backend handlers
  */
-typedef struct {
-    uint32_t handles_array      :1;     /**< True if the handler handles an array of items */
-    uint32_t handles_primitive  :1;     /**< True if the handler handles a primitive item */
-    uint32_t primitive_type     :6;     /**< Type of the primitive item */
-} conf_handler_flags_t;
+typedef uint32_t conf_handler_flags_t;
+
+#define CONF_FLAGS_ARRAY                    (((conf_handler_flags_t)1) << 31)       /**< Handles an array */
+#define CONF_FLAGS_ENCODE_KEY_STRING        (((conf_handler_flags_t)1) << 30)       /**< Encode key as string */
+#define CONF_FLAGS_PRIMITIVE                (((conf_handler_flags_t)1) << 29)       /**< Primitive type handler */
+#define CONF_FLAGS_PRIMITIVE_TYPE_MASK      (((conf_handler_flags_t)0x3F) << 24)    /**< Primitive type mask */
+#define CONF_FLAGS_PRIMITIVE_TYPE_SHIFT     (24)                                    /**< Primitive type shift */
 
 enum {
-    CONF_PRIM_TYPE_UINT = 0,            /**< Unsigned integer */
-    CONF_PRIM_TYPE_INT,                 /**< Signed integer */
-    CONF_PRIM_TYPE_BSTR,                /**< Byte string */
-    CONF_PRIM_TYPE_TSTR,                /**< Text string */
+    CONF_PRIM_TYPE = CONF_FLAGS_PRIMITIVE,                              /**< Primitive type handler */
+    CONF_PRIM_TYPE_UINT = (CONF_FLAGS_PRIMITIVE
+                            | 1u << CONF_FLAGS_PRIMITIVE_TYPE_SHIFT),   /**< Unsigned integer */
+    CONF_PRIM_TYPE_INT = (CONF_FLAGS_PRIMITIVE
+                            | 2u << CONF_FLAGS_PRIMITIVE_TYPE_SHIFT),   /**< Signed integer */
+    CONF_PRIM_TYPE_BSTR = (CONF_FLAGS_PRIMITIVE
+                            | 3u << CONF_FLAGS_PRIMITIVE_TYPE_SHIFT),   /**< Byte string */
+    CONF_PRIM_TYPE_TSTR = (CONF_FLAGS_PRIMITIVE
+                            | 4u << CONF_FLAGS_PRIMITIVE_TYPE_SHIFT),   /**< Text string */
+    CONF_PRIM_TYPE_BOOL = (CONF_FLAGS_PRIMITIVE
+                            | 5u << CONF_FLAGS_PRIMITIVE_TYPE_SHIFT),   /**< Boolean */
     /* extend on demand */
 };
-
-/**
- * @brief   Configuration flags initializer
- * @internal
- */
-#define _CONF_FLAGS(_flags)         _flags()
-/**
- * @brief   Configuration array handler flags initializer
- * @internal use CONF_FLAGS_ARRAY
- */
-#define CONF_FLAGS_ARRAY()          { .handles_array = 1 }
-/**
- * @brief   Configuration unsigned integer handler flags initializer
- * @internal use CONF_FLAGS_PRIMITIVE_UINT
- */
-#define CONF_FLAGS_PRIMITIVE_UINT() { .handles_primitive = 1, .primitive_type = CONF_PRIM_TYPE_UINT }
-/**
- * @brief   Configuration signed integer handler flags initializer
- * @internal use CONF_FLAGS_PRIMITIVE_INT
- */
-#define CONF_FLAGS_PRIMITIVE_INT()   { .handles_primitive = 1, .primitive_type = CONF_PRIM_TYPE_INT }
-/**
- * @brief   Configuration byte string handler flags initializer
- * @internal use CONF_FLAGS_PRIMITIVE_BSTR
- */
-#define CONF_FLAGS_PRIMITIVE_BSTR()  { .handles_primitive = 1, .primitive_type = CONF_PRIM_TYPE_BSTR }
-/**
- * @brief   Configuration text string handler flags initializer
- * @internal use CONF_FLAGS_PRIMITIVE_TSTR
- */
-#define CONF_FLAGS_PRIMITIVE_TSTR()  { .handles_primitive = 1, .primitive_type = CONF_PRIM_TYPE_TSTR }
 
 /**
  * @brief   A node in the configuration tree
@@ -828,6 +807,24 @@ static inline char *configuration_key_buf(conf_key_t *key)
     (void)key;
     return "";
 #endif
+}
+
+static inline
+bool configuration_node_is_array(const conf_handler_t *handler)
+{
+    return (handler->conf_flags & CONF_FLAGS_ARRAY);
+}
+
+static inline
+bool configuration_node_is_primitive(const conf_handler_t *handler)
+{
+    return (handler->conf_flags & CONF_FLAGS_PRIMITIVE);
+}
+
+static inline
+conf_handler_flags_t configuration_node_primitive_type(const conf_handler_t *handler)
+{
+    return (handler->conf_flags & (CONF_FLAGS_PRIMITIVE | CONF_FLAGS_PRIMITIVE_TYPE_MASK));
 }
 
 /**
