@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_avr-rss2 Atmega256RFR2 rss2
 @ingroup     boards
 @brief       Support for the Radio Sensors Atmega256RFR2 rss2 board
@@ -7,7 +6,7 @@
 Document version V1.4 2019-11-10<br>
 Board is based AtMega256RFR2 with additional HW, EUI64 chip, HW comparator, RTC XTAL, BME280
 
-- Directory `$(RIOTBASE)/boards/avr-rss2'
+- Directory `$(RIOTBASE)/boards/avr-rss2`
 
 ### Board Features
 
@@ -100,4 +99,3 @@ Contact vendor. For research legislation is more relaxed in most countries.
 ### Board (Rev2.4) anatomy with connectors
 - http://radio-sensors.com/pictures/s2-2.4-front-edited.jpg
 - http://radio-sensors.com/pictures/s2-2.4-back-port-edited.jpg
-*/
