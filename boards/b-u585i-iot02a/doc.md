@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_b-u585i-iot02a STM32 B-U585I-IOT02A
 @ingroup     boards
 @brief       Support for the STM32 B-U585I-IOT02A
@@ -39,5 +38,3 @@ toolchain.
 
 **Important notice:** With GCC 10, the `tests/sys/malloc` application doesn't work.
 To use malloc, prefer GCC 9 which seems to work better.
-
- */
