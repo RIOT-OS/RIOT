@@ -42,8 +42,8 @@ enum {
  * @brief Operational status bit in write operations
  */
 typedef enum {
-    ADS1115_WRITE_NO_EFFECT     = 0,    /**<no effect> */
-    ADS1115_WRITE_SINGLE_SHOT   = 1,    /**<start a single-shot conversion when in power-down mode> */
+    ADS1115_WRITE_NO_EFFECT     = 0,    /**< No effect */
+    ADS1115_WRITE_SINGLE_SHOT   = 1,    /**< Start a single-shot conversion when in power-down mode */
 } ads1115_os_write_t;
 
 /**
@@ -51,21 +51,21 @@ typedef enum {
  */
 typedef enum {
     ADS1115_READ_BUSY   = 0,    /**<device is currently performing a conversion> */
-    ADS1115_READ_IDLE   = 1,    /**<device is not performing a conversion> */
+    ADS1115_READ_IDLE   = 1,    /**< Device is not performing a conversion */
 } ads1115_os_read_t;
 
 /**
  * @brief Input multiplexer configuration
  */
 typedef enum {
-    ADS1115_MUX_AIN0_AIN1   = 0,    /**<AIN0 - AIN1 differential input (AINp = AIN0 && AINn = AIN1) (default)*/
-    ADS1115_MUX_AIN0_AIN3   = 1,    /**<AIN0 - AIN3 differential input (AINp = AIN0 && AINn = AIN3) */
-    ADS1115_MUX_AIN1_AIN3   = 2,    /**<AIN1 - AIN3 differential input (AINp = AIN1 && AINn = AIN3) */
-    ADS1115_MUX_AIN2_AIN3   = 3,    /**<AIN2 - AIN3 differential input (AINp = AIN2 && AINn = AIN3) */
-    ADS1115_MUX_AIN0        = 4,    /**<AIN0 single-ended input (AINp = AIN0 && AINn = GND) */
-    ADS1115_MUX_AIN1        = 5,    /**<AIN1 single-ended input (AINp = AIN1 && AINn = GND) */
-    ADS1115_MUX_AIN2        = 6,    /**<AIN2 single-ended input (AINp = AIN2 && AINn = GND) */
-    ADS1115_MUX_AIN3        = 7     /**<AIN3 single-ended input (AINp = AIN3 && AINn = GND) */
+    ADS1115_MUX_AIN0_AIN1   = 0,    /**< AIN0 - AIN1 differential input (AINp = AIN0 && AINn = AIN1) (default) */
+    ADS1115_MUX_AIN0_AIN3   = 1,    /**< AIN0 - AIN3 differential input (AINp = AIN0 && AINn = AIN3) */
+    ADS1115_MUX_AIN1_AIN3   = 2,    /**< AIN1 - AIN3 differential input (AINp = AIN1 && AINn = AIN3) */
+    ADS1115_MUX_AIN2_AIN3   = 3,    /**< AIN2 - AIN3 differential input (AINp = AIN2 && AINn = AIN3) */
+    ADS1115_MUX_AIN0        = 4,    /**< AIN0 single-ended input (AINp = AIN0 && AINn = GND) */
+    ADS1115_MUX_AIN1        = 5,    /**< AIN1 single-ended input (AINp = AIN1 && AINn = GND) */
+    ADS1115_MUX_AIN2        = 6,    /**< AIN2 single-ended input (AINp = AIN2 && AINn = GND) */
+    ADS1115_MUX_AIN3        = 7     /**< AIN3 single-ended input (AINp = AIN3 && AINn = GND) */
 } ads1115_mux_t;
 
 /**
