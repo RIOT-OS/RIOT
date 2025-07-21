@@ -85,7 +85,7 @@ int ads1115_init(ads1115_t *dev, const ads1115_params_t *params)
 
     i2c_acquire(DEV);
 
-    // Test communication
+    /* Test communication */
     uint16_t test_conf = htons(ADS1115_CONF_TEST_VALUE);
     if (i2c_write_regs(DEV, ADDR, ADS1115_REG_CONFIG, &test_conf, sizeof(test_conf), 0) < 0) {
         DEBUG("[ads1115] init - error: write test failed\n");
@@ -100,7 +100,7 @@ int ads1115_init(ads1115_t *dev, const ads1115_params_t *params)
         goto release;
     }
 
-    // Apply actual configuration
+    /* Apply actual configuration */
     uint16_t conf = htons(_build_config_reg(&dev->params));
     if (i2c_write_regs(DEV, ADDR, ADS1115_REG_CONFIG, &conf, sizeof(conf), 0) < 0) {
         DEBUG("[ads1115] init - error: setting config failed\n");
@@ -123,19 +123,19 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux)
 
     i2c_acquire(DEV);
 
-    // Read current configuration
+    /* Read current configuration */
     uint16_t reg;
     if (i2c_read_regs(DEV, ADDR, ADS1115_REG_CONFIG, &reg, sizeof(reg), 0) < 0) {
         i2c_release(DEV);
         goto release;
     }
 
-    // Update MUX bits
+    /* Update MUX bits */
     uint16_t conf = ntohs(reg);
-    conf &= ~(0x07 << ADS1115_CONF_MUX_BIT);    // Clear MUX bits
-    conf |= (mux << ADS1115_CONF_MUX_BIT);      // Set new MUX
+    conf &= ~(0x07 << ADS1115_CONF_MUX_BIT);    /* Clear MUX bits */
+    conf |= (mux << ADS1115_CONF_MUX_BIT);      /* Set new MUX */
 
-    // Write back updated configuration
+    /* Write back updated configuration */
     reg = htons(conf);
 
     if (i2c_write_regs(DEV, ADDR, ADS1115_REG_CONFIG, &reg, sizeof(reg), 0) < 0) {
@@ -160,12 +160,12 @@ int ads1115_read_conversion(ads1115_t *dev, uint16_t *value)
 
     i2c_acquire(DEV);
 
-    // Read conversion register
+    /* Read conversion register */
     if (i2c_read_regs(DEV, ADDR, ADS1115_REG_CONVERSION, &buf, sizeof(buf), 0) < 0) {
         goto release;
     }
 
-    // Combine bytes into a single value
+    /* Combine bytes into a single value */
     *value = ntohs(buf);
     res = ADS1115_OK;
 
@@ -177,5 +177,5 @@ release:
 int ads1115_convert_to_mv(ads1115_t *dev, uint16_t value)
 {
     assert(dev);
-    return value * _ads1115_get_pga_voltage(dev->params.pga) / (1 << 15); // Msb is sign bit
+    return value * _ads1115_get_pga_voltage(dev->params.pga) / (1 << 15); /* Msb is sign bit */
 }
