@@ -22,7 +22,6 @@
  * @author     Baptiste Le Duc <baptiste.leduc38@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,6 +37,7 @@ enum {
     ADS1115_NODEV   = -2,       /**< No device found on the bus */
     ADS1115_NODATA  = -3,       /**< No data available */
 };
+
 /**
  * @brief Operational status bit in write operations
  */
@@ -67,7 +67,6 @@ typedef enum {
     ADS1115_MUX_AIN2        = 6,    /**<AIN2 single-ended input (AINp = AIN2 && AINn = GND) */
     ADS1115_MUX_AIN3        = 7     /**<AIN3 single-ended input (AINp = AIN3 && AINn = GND) */
 } ads1115_mux_t;
-
 
 /**
  * @brief Programmable gain amplifier configuration
@@ -175,7 +174,6 @@ typedef struct {
  */
 int ads1115_init(ads1115_t *dev, const ads1115_params_t *params);
 
-
 /**
  * @brief Sets the input channel for the ADS1115 device.
  *
@@ -198,7 +196,6 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux);
  */
 int ads1115_read_conversion(ads1115_t *dev, uint16_t *value);
 
-
 /**
  * @brief Converts the digital value from the ADS1115 device to millivolts.
  *
@@ -208,7 +205,6 @@ int ads1115_read_conversion(ads1115_t *dev, uint16_t *value);
  * @return Converted value in millivolts
  */
 int ads1115_convert_to_mv(ads1115_t *dev, uint16_t value);
-
 
 #ifdef __cplusplus
 }

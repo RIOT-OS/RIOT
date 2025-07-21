@@ -73,7 +73,6 @@ static uint16_t _build_config_reg(const ads1115_params_t *params)
     return conf;
 }
 
-
 int ads1115_init(ads1115_t *dev, const ads1115_params_t *params)
 {
     assert(dev && params);
@@ -144,7 +143,6 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux)
 
     res = ADS1115_OK;
     dev->params.mux = mux;
-
 
 release:
     i2c_release(DEV);

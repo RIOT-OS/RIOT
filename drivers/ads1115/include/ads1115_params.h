@@ -26,7 +26,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @name    Set default configuration parameters for the ADS1115 driver
  * @{
@@ -80,8 +79,6 @@ extern "C" {
 static const ads1115_params_t ads1115_params[] = {
     ADS1115_PARAMS
 };
-
-
 
 #ifdef __cplusplus
 }

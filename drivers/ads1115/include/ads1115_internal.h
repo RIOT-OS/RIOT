@@ -19,11 +19,9 @@
  * @}
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * @name    ADS1115 registers
@@ -33,7 +31,6 @@ extern "C" {
 #define ADS1115_REG_CONVERSION  (0x00)  /**< Conversion register */
 #define ADS1115_REG_CONFIG      (0x01)  /**< Configuration register */
 /** @} */
-
 
 /**
  * @name    ADS1115 configuration register bits
@@ -49,7 +46,6 @@ extern "C" {
 #define ADS1115_CONF_COMP_LATCH_BIT    (2)  /**< Comparator latch */
 #define ADS1115_CONF_COMP_QUEUE_BIT    (0)  /**< Comparator queue */
 /** @} */
-
 
 #ifdef __cplusplus
 }
