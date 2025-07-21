@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atxmega-a3bu-xplained ATxmega-A3BU Xplained board
 @ingroup     boards
 @brief       Support for the ATxmega-A3BU Xplained board
@@ -45,5 +44,3 @@ In order to flash the ATxmega256A3BU, simple run:
 This board needs a serial converter. The default STDIO is at J1 pins 2/3.
 
     make BOARD=atxmega-a3bu-xplained term
-
- */

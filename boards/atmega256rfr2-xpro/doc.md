@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atmega256rfr2-xpro Atmega256RFR2 Xplained Pro
 @ingroup     boards
 @brief       Support for the Atmega256RFR2 Xplained Pro board
@@ -38,5 +37,3 @@ It will be used automatically with `make term`:
 ```
 make BOARD=atmega256rfr2-xpro -C examples/basic/hello-world term
 ```
-
-*/

@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_atmega8 Standalone ATmega8
 @ingroup     boards
 @brief       Support for using the ATmega8 as standalone board
@@ -95,5 +94,3 @@ Connect a TTL adapter with pins 2/RXD and 3/TXD an run
 
 Please note that the supply voltage should be compatible with the logic level of
 the TTL adapter. Usually everything between 3.3 V and 5 V should work.
-
- */
