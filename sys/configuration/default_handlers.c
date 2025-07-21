@@ -283,6 +283,7 @@ int configuration_delete_handler_default(const conf_handler_t *handler,
     return 0;
 }
 
+#if IS_USED(MODULE_NANOCBOR)
 static int _encode_key_cbor(nanocbor_encoder_t *enc, const conf_handler_t *handler, uint64_t sid)
 {
     (void)handler;
@@ -298,6 +299,7 @@ static int _encode_key_cbor(nanocbor_encoder_t *enc, const conf_handler_t *handl
     ret = nanocbor_fmt_uint(enc, sid);
     return ret;
 }
+#endif
 
 static int _encode_node_handler_cbor(const conf_handler_t *handler,
                                      conf_key_buf_t *key, const conf_sid_t *sid_start,
