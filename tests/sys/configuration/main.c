@@ -301,6 +301,7 @@ static CONF_HANDLER(_products_food_conf_handler,
                     NULL,
                     &configuration_default_backend_ops,
                     &configuration_default_backend_data_ops,
+                    0,
                     sizeof(_conf.food),
                     &_conf.food);
 
@@ -313,6 +314,7 @@ static CONF_HANDLER(_products_bread_handler,
                      &_bread_white_data_ops,
                      &configuration_default_backend_ops,
                      &configuration_default_backend_data_ops,
+                     0,
                      sizeof(_conf.food.bread),
                      &_conf.food.bread);
 
@@ -351,6 +353,7 @@ static CONF_HANDLER(_products_cake_handler,
                     NULL,
                     &configuration_default_backend_ops,
                     &configuration_default_backend_data_ops,
+                    0,
                     sizeof(_conf.food.cake),
                     &_conf.food.cake);
 
@@ -389,6 +392,7 @@ static CONF_HANDLER(_products_drinks_conf_handler,
                     NULL,
                     &configuration_default_backend_ops,
                     &configuration_default_backend_data_ops,
+                    0,
                     sizeof(_conf.drinks),
                     &_conf.drinks);
 
@@ -440,6 +444,7 @@ static CONF_ARRAY_HANDLER(_products_orders_conf_handler,
                           &_orders_data_ops,
                           &configuration_default_backend_ops,
                           &configuration_default_backend_data_ops,
+                          0,
                           sizeof(_conf.orders[0]),
                           &_conf.orders,
                           ARRAY_SIZE(_conf.orders));
@@ -453,6 +458,7 @@ static CONF_ARRAY_HANDLER(_products_orders_items_conf_handler,
                           NULL,
                           &configuration_default_backend_ops,
                           &configuration_default_backend_data_ops,
+                          0,
                           sizeof(_conf.orders[0].items[0]),
                           &_conf.orders[0].items,
                           ARRAY_SIZE(_conf.orders[0].items));
