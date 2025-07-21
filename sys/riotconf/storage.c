@@ -92,8 +92,11 @@ int riotconf_storage_write(riotconf_storage_t *dev, const void *data, size_t off
         memcpy(((uint8_t *)dev->sector_buf) + offset, data, l);
         size -= l;
         data = (const uint8_t *)data + l;
+        offset += l;
     }
     uint32_t page = dev->sector_offset * dev->dev->pages_per_sector;
+    page += offset / dev->dev->page_size;
+    offset %= dev->dev->page_size;
     return mtd_write_page(dev->dev, data, page, offset, size);
 }
 
