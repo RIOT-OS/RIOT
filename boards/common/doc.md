@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_common Common Board Groups
 @ingroup     boards
 @brief       Common definitions and implementations for board groups
@@ -30,4 +29,3 @@ The following steps are tested with the STM32 bluepill board:
 4. Flash RIOT binary by running `PROGRAMMER=dfu-util BOARD=bluepill make flash`
 5. Reset Boot1 pin to 0 and reset device via button, this should boot the RIOT
    binary.
- */

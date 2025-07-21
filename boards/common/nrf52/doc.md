@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_common_nrf52 nRF52 common
 @ingroup     boards_common
 @brief       Common files and configuration for nRF52 boards.
@@ -30,5 +29,3 @@ debugger/programmer with OpenOCD to flash a nrf52 board:
 ```
     PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=stlink make BOARD=<nrf52 board> -C examples/basic/hello-world flash
 ```
-
-*/
