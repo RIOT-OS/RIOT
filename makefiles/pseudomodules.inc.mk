@@ -130,7 +130,6 @@ PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_timestamp
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
-PSEUDOMODULES += gnrc_netif_mac
 PSEUDOMODULES += gnrc_netif_single
 PSEUDOMODULES += gnrc_netif_dedup
 
