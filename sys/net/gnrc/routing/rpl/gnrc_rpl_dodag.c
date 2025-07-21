@@ -271,15 +271,15 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
     dodag->dtsn++;
 
-    if (dodag->parents) {
-        gnrc_rpl_dodag_remove_all_parents(dodag);
-        gnrc_ipv6_nib_ft_del(NULL, 0);
-    }
-
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
         dodag->my_rank = GNRC_RPL_INFINITE_RANK;
         trickle_reset_timer(&dodag->trickle);
         gnrc_rpl_cleanup_start(dodag);
+    }
+
+    if (dodag->parents) {
+        gnrc_rpl_dodag_remove_all_parents(dodag);
+        gnrc_ipv6_nib_ft_del(NULL, 0);
     }
 }
 
