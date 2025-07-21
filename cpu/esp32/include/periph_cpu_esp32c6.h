@@ -43,8 +43,8 @@ extern "C" {
 #define GPIO7  (GPIO_PIN(PORT_GPIO, 7))  /**< GPIO7 */
 #define GPIO8  (GPIO_PIN(PORT_GPIO, 8))  /**< GPIO8 */
 #define GPIO9  (GPIO_PIN(PORT_GPIO, 9))  /**< GPIO9 */
-#define GPIO10 (GPIO_PIN(PORT_GPIO, 10)) /**< GPIO10 is not broken for chips with flash */
-#define GPIO11 (GPIO_PIN(PORT_GPIO, 11)) /**< GPIO11 is not broken for chips with flash */
+#define GPIO10 (GPIO_PIN(PORT_GPIO, 10)) /**< GPIO10 is not broken out on chips with flash */
+#define GPIO11 (GPIO_PIN(PORT_GPIO, 11)) /**< GPIO11 is not broken out on chips with flash */
 #define GPIO12 (GPIO_PIN(PORT_GPIO, 12)) /**< GPIO12 */
 #define GPIO13 (GPIO_PIN(PORT_GPIO, 13)) /**< GPIO13 */
 #define GPIO14 (GPIO_PIN(PORT_GPIO, 14)) /**< GPIO14 is not usable for chips w/o flash */
@@ -57,13 +57,13 @@ extern "C" {
 #define GPIO21 (GPIO_PIN(PORT_GPIO, 21)) /**< GPIO21 */
 #define GPIO22 (GPIO_PIN(PORT_GPIO, 22)) /**< GPIO22 */
 #define GPIO23 (GPIO_PIN(PORT_GPIO, 23)) /**< GPIO23 */
-#define GPIO24 (GPIO_PIN(PORT_GPIO, 24)) /**< GPIO24*/
-#define GPIO25 (GPIO_PIN(PORT_GPIO, 25)) /**< GPIO25 is not broken for chips with flash */
-#define GPIO26 (GPIO_PIN(PORT_GPIO, 26)) /**< GPIO26 is not broken for chips with flash */
-#define GPIO27 (GPIO_PIN(PORT_GPIO, 27)) /**< GPIO27 is not broken for chips with flash */
-#define GPIO28 (GPIO_PIN(PORT_GPIO, 28)) /**< GPIO28 is not broken for chips with flash */
-#define GPIO29 (GPIO_PIN(PORT_GPIO, 29)) /**< GPIO29 is not broken for chips with flash */
-#define GPIO30 (GPIO_PIN(PORT_GPIO, 30)) /**< GPIO30 is not broken for chips with flash */
+#define GPIO24 (GPIO_PIN(PORT_GPIO, 24)) /**< GPIO24 */
+#define GPIO25 (GPIO_PIN(PORT_GPIO, 25)) /**< GPIO25 is not broken out on chips with flash */
+#define GPIO26 (GPIO_PIN(PORT_GPIO, 26)) /**< GPIO26 is not broken out on chips with flash */
+#define GPIO27 (GPIO_PIN(PORT_GPIO, 27)) /**< GPIO27 is not broken out on chips with flash */
+#define GPIO28 (GPIO_PIN(PORT_GPIO, 28)) /**< GPIO28 is not broken out on chips with flash */
+#define GPIO29 (GPIO_PIN(PORT_GPIO, 29)) /**< GPIO29 is not broken out on chips with flash */
+#define GPIO30 (GPIO_PIN(PORT_GPIO, 30)) /**< GPIO30 is not broken out on chips with flash */
 /** @} */
 
 /**
