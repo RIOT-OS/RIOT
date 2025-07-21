@@ -4,6 +4,7 @@ endif
 
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_riscv
+FEATURES_PROVIDED += bug_newlib_broken_stdio
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += libstdcpp
 FEATURES_PROVIDED += newlib
