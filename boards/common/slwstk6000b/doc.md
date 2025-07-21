@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
- * @ingroup     boards
- * @brief       Support for the Silicon Labs SLWSTK6000B starter kit
+@defgroup    boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
+@ingroup     boards
+@brief       Support for the Silicon Labs SLWSTK6000B starter kit
 
 ## Overview
 Silicon Labs Mighty Gecko Wireless Starter Kit is equipped with the EFM32
@@ -210,5 +209,4 @@ usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/o
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

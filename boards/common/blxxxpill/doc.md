@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_common_blxxxpill Blackpill and Bluepill common code
 @ingroup     boards_common
 @brief       Support for cheap stm32f103c8 based boards such as bluepill and blackpill.
@@ -152,4 +151,3 @@ https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?
 https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
 [imgTop]:
 https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-STM32_Blue_Pill_top.jpg
- */

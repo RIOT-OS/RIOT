@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_common_particle-mesh Particle Mesh common
 @ingroup     boards
 @brief       Common support for the Particle Mesh boards family (Xenon, Argon, Boron)
@@ -97,5 +96,3 @@ board_nrfantenna_select function.
 
 The external antenna connection should only be enabled if a suitable antenna is
 connected.
-
- */
