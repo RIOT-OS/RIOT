@@ -325,7 +325,7 @@ static CONF_PRIMITIVE_HANDLER(_products_bread_white_handler,
                               &_bread_white_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.food.bread.white),
                               &_conf.food.bread.white);
 
@@ -338,7 +338,7 @@ static CONF_PRIMITIVE_HANDLER(_products_bread_whole_grain_handler,
                               &_bread_whole_grain_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.food.bread.whole_grain),
                               &_conf.food.bread.whole_grain);
 
@@ -363,7 +363,7 @@ static CONF_PRIMITIVE_HANDLER(_products_cake_cheesecake_handler,
                               &_cake_cheesecake_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.food.cake.cheesecake),
                               &_conf.food.cake.cheesecake);
 
@@ -376,7 +376,7 @@ static CONF_PRIMITIVE_HANDLER(_products_cake_donut_handler,
                               &_cake_donut_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.food.cake.donut),
                               &_conf.food.cake.donut);
 
@@ -401,7 +401,7 @@ static CONF_PRIMITIVE_HANDLER(_products_drinks_coffee_conf_handler,
                               &_drinks_coffee_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.drinks.coffee),
                               &_conf.drinks.coffee);
 
@@ -414,7 +414,7 @@ static CONF_PRIMITIVE_HANDLER(_products_drinks_tea_conf_handler,
                               &_drinks_tea_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.drinks.tea),
                               &_conf.drinks.tea);
 
@@ -427,7 +427,7 @@ static CONF_PRIMITIVE_HANDLER(_products_drinks_cocoa_conf_handler,
                               &_drinks_cocoa_data_ops,
                               &configuration_default_backend_ops,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.drinks.cocoa),
                               &_conf.drinks.cocoa);
 
@@ -466,7 +466,7 @@ static CONF_PRIMITIVE_HANDLER(_products_orders_items_item_conf_handler,
                               NULL,
                               NULL,
                               &configuration_default_backend_data_ops,
-                              CONF_FLAGS_PRIMITIVE_TSTR,
+                              CONF_PRIM_TYPE_TSTR,
                               sizeof(_conf.orders[0].items[0]),
                               &_conf.orders[0].items[0]);
 
