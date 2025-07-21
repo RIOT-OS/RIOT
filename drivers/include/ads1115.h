@@ -168,9 +168,9 @@ typedef struct {
  * @param[in,out] dev    Device descriptor
  * @param[in] params     Device configuration parameters
  *
- * @return ADS1115_OK on success
- * @return ADS1115_NODEV if no device is found on the bus
- * @return ADS1115_NOI2C if other error occurs
+ * @retval ADS1115_OK on success
+ * @retval ADS1115_NODEV if no device is found on the bus
+ * @retval ADS1115_NOI2C if other error occurs
  */
 int ads1115_init(ads1115_t *dev, const ads1115_params_t *params);
 
@@ -180,9 +180,9 @@ int ads1115_init(ads1115_t *dev, const ads1115_params_t *params);
  * @param[in,out] dev    Device descriptor
  * @param[in] mux       Input multiplexer configuration
  *
- * @return ADS1115_OK on success
- * @return ADS1115_NODEV if no device is found on the bus
- * @return ADS1115_NOI2C if other error occurs
+ * @retval ADS1115_OK on success
+ * @retval ADS1115_NODEV if no device is found on the bus
+ * @retval ADS1115_NOI2C if other error occurs
  */
 int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux);
 
@@ -190,9 +190,9 @@ int ads1115_set_ain_ch_input(ads1115_t *dev, ads1115_mux_t mux);
  * @brief Read the conversion register of the ADS1115 device.
  * @param[in,out] dev    Device descriptor
  * @param[out] value     Pointer to store the conversion result
- * @return ADS1115_OK on success
- * @return ADS1115_NODATA if no data is available
- * @return ADS1115_NOI2C if other error occurs
+ * @retval ADS1115_OK on success
+ * @retval ADS1115_NODATA if no data is available
+ * @retval ADS1115_NOI2C if other error occurs
  */
 int ads1115_read_conversion(ads1115_t *dev, uint16_t *value);
 
