@@ -49,9 +49,6 @@ endif
 ifneq (,$(filter gnrc_netreg,$(USEMODULE)))
   DIRS += netreg
 endif
-ifneq (,$(filter gnrc_mac,$(USEMODULE)))
-  DIRS += link_layer/mac
-endif
 ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
   DIRS += pkt
 endif

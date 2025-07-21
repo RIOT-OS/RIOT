@@ -56,9 +56,6 @@
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/gnrc/netif/ipv6.h"
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_MAC)
-#include "net/gnrc/netif/mac.h"
-#endif
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
 #include "net/gnrc/netif/pktq/type.h"
 #endif
@@ -146,9 +143,6 @@ typedef struct {
 #if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN)
-    gnrc_netif_mac_t mac;                   /**< @ref net_gnrc_mac component */
-#endif  /* IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN) */
 #if IS_USED(MODULE_GNRC_NETIF_BUS) || DOXYGEN
     msg_bus_t bus[GNRC_NETIF_BUS_NUMOF];    /**< Event Message Bus */
 #endif
