@@ -127,7 +127,9 @@ extern "C" {
 #endif
 /** @} */
 
-/* Default parameters structure */
+/**
+ * @brief Default parameters structure
+ */
 static const ads1115_params_t ads1115_params[] = {
     ADS1115_PARAMS
 };
