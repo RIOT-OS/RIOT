@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_deRFmega128 deRFmega128 modules from Dresden Elektronik
- * @ingroup     boards
- * @brief       Support for deRFmega128 modules produced by Dresden Elektronik
+@defgroup    boards_deRFmega128 deRFmega128 modules from Dresden Elektronik
+@ingroup     boards
+@brief       Support for deRFmega128 modules produced by Dresden Elektronik
 
 # Overview
 deRFmega128 is a family of modules produced by Dresden Elektronik.
@@ -28,4 +27,3 @@ For details see the according data sheets:
 - [deRFmega128-22M00 and deRFmega128-22M10](https://www.dresden-elektronik.de/files/dresden-elektronik/content/downloads/datenblaetter/_outdated/deRFmega128-22M00-22M10-DBT-de.pdf)
 - [deRFmega128-22A00 and deRFmega128-22C00](https://www.dresden-elektronik.de/files/dresden-elektronik/content/downloads/datenblaetter/_outdated/deRFmega128-22A00-C00-DBT-de.pdf)
 - [deRFmega128-22A02 and deRFmega128-22C02](https://www.dresden-elektronik.de/files/dresden-elektronik/content/downloads/datenblaetter/_outdated/deRFmega128-22A02-C02-DBT-de.pdf)
- */

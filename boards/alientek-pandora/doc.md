@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_alientek-pandora Alientek Pandora
 @ingroup     boards
 @brief       Support for the Alientek Pandora board
@@ -36,5 +35,3 @@ Use the `term` target to open a terminal:
     make BOARD=alientek-pandora -C examples/basic/hello-world term
 
 An on-board ST-Link compatible debugger is used to transport serial STDIO message.
-
- */

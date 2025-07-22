@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_deRFmega256 deRFmega256 modules from Dresden Elektronik
- * @ingroup     boards
- * @brief       Support for deRFmega256 modules produced by Dresden Elektronik
+@defgroup    boards_deRFmega256 deRFmega256 modules from Dresden Elektronik
+@ingroup     boards
+@brief       Support for deRFmega256 modules produced by Dresden Elektronik
 
 # Overview
 deRFmega256 is a family of modules produced by Dresden Elektronik.
@@ -14,5 +13,3 @@ as separate products or as a main part of other products like [RaspBee](https://
 
 # Hardware
 The [datasheet](https://usermanual.wiki/dresden-elektronik-ingenieurtechnik/MEGA23M12.15-MEGA23M12-User-Manual/info) for modules.
-
- */
