@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_airfy-beacon Airfy Beacon
 @ingroup     boards
 @brief       Support for the Airfy Beacon board
@@ -245,4 +244,3 @@ The UART pins are configured in `boards/airfy-beacon/include/periph_conf.h`.
 The default values are PIN 17 and 18.
 
 The default Baud rate is `115 200`.
- */

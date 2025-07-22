@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_dwm1001 Decawave DWM1001
 @ingroup     boards
 @brief       Support for the Decawave DWM1001 development board
@@ -37,4 +36,3 @@ Use the `term` target to connect to the board serial port<br/>
 ```
 make BOARD=dwm1001 -C examples/basic/hello-world term
 ```
- */
