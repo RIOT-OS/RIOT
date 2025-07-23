@@ -119,7 +119,7 @@ static void _rtc_notify_observers(void *arg)
     }
     size_t len;
     char str_time[20] = "";
-    uint8_t buf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1 + sizeof(str_time)];
+    uint8_t buf[sizeof(coap_udp_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1 + sizeof(str_time)];
     coap_pkt_t pdu;
     const coap_resource_t *rtc_resource = NULL;
     const gcoap_listener_t *listener = NULL;
