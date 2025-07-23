@@ -563,16 +563,9 @@ install it separately.
 
 ### Installation of esptool.py (ESP flash programmer tool) {#esp32_installation_of_esptool}
 
-The RIOT port uses the ESP flasher programme `esptool.py` as a package directly
+The RIOT port uses the ESP flasher program `esptool.py` as a package directly
 from [GitHub](https://github.com/espressif/esptool) within a virtual Python
-environment. The `esptool.py` available as a Python package for your operating
-system may not work.
-
-It is also possible to use your own version of `esptool.py` by overriding
-the make variable `ESPTOOL` in the command line, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ ESPTOOL=/path/to/esptool.py make flash BOARD=...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+environment.
 
 For more information on `esptool.py`, please refer to the
 [git repository](https://github.com/espressif/esptool).
