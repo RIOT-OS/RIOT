@@ -357,29 +357,12 @@ package at build-time and there is no need to install it separately.
 
 ### Installation of esptool.py (ESP flash programmer tool) {#esp8266_installation_of_esptool}
 
-The RIOT port does not work with the `esptool.py` ESP flasher program
-available on [GitHub](https://github.com/espressif/esptool) or
-as package for your OS.
-Instead, a modified version from the ESP8266 RTOS SDK is required.
 
-To avoid the installation of the complete ESP8266 RTOS SDK, for example
-because RIOT Docker `riotdocker` is used for compilation, `esptool.py`
-has been extracted from the ESP8266 RTOS SDK and placed in RIOT's
-directory `dist/tools/esptool`.
-For convenience, the build system uses always the version from this directory.
+The RIOT port uses the ESP flasher program `esptool.py` as a package directly
+from [GitHub](https://github.com/espressif/esptool) within a virtual Python
+environment.
 
-Therefore, it is **not necessary to install** `esptool.py` explicitly. However
-`esptool.py` depends on `pySerial` which can be installed either
-using `pip`
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sudo pip install pyserial
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-or the package manager of your OS, for example on Debian/Ubuntu systems:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-apt install python-pyserial
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For more information on `esptool.py`, please refer the
+For more information on `esptool.py`, please refer to the
 [git repository](https://github.com/espressif/esptool).
 
 [Back to table of contents](#esp8266_toc)
