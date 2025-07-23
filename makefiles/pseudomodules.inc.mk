@@ -405,6 +405,7 @@ PSEUDOMODULES += shell_cmd_genfile
 PSEUDOMODULES += shell_cmd_gnrc_icmpv6_echo
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_blacklist
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_frag_stats
+PSEUDOMODULES += shell_cmd_gnrc_ipv6_firewall
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_nib
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_whitelist
 PSEUDOMODULES += shell_cmd_gnrc_netif
