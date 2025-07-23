@@ -110,6 +110,6 @@ FLASH_SIZE ?= 4
 # this second-stage bootloader image.
 $(ESP_SDK_BOOTLOADER_BIN): esptool $(ESP_SDK_BOOTLOADER_ELF)
 	$(Q)echo "Generating bootloader image $(ESP_SDK_BOOTLOADER_BIN)"
-	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
-	  --flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) -o $@ $(ESP_SDK_BOOTLOADER_ELF)
+	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash-mode $(FLASH_MODE) \
+	  --flash-size $(FLASH_SIZE)MB --flash-freq $(FLASH_FREQ) -o $@ $(ESP_SDK_BOOTLOADER_ELF)
 	$(Q)mv $(@)0x00000.bin $@
