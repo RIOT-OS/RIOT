@@ -30,6 +30,7 @@
 #include "irq.h"
 
 #include "bitarithm.h"
+#include "mutex.h"
 #include "sched.h"
 
 #define ENABLE_DEBUG 0
@@ -68,13 +69,30 @@ void thread_zombify(void)
         return;
     }
 
+    thread_t *thread = thread_get_active();
+
     irq_disable();
-    sched_set_status(thread_get_active(), STATUS_ZOMBIE);
+    sched_set_status(thread, STATUS_ZOMBIE);
+    if (thread->exit_val && thread->exit_val != (void *)UINTPTR_MAX) {
+        /* A thread is joining. */
+        mutex_unlock(thread->exit_val);
+    }
+    /* TODO: Here should go the return value of the thread function. */
+    thread->exit_val = NULL;
+
     irq_enable();
     thread_yield_higher();
 
     /* this line should never be reached */
     UNREACHABLE();
+}
+
+/* Assumes IRQ disabled. */
+static void _kill_zombie_unchecked(thread_t *thread)
+{
+    sched_threads[thread->pid] = NULL;
+    sched_num_threads--;
+    sched_set_status(thread, STATUS_STOPPED);
 }
 
 int thread_kill_zombie(kernel_pid_t pid)
@@ -92,10 +110,7 @@ int thread_kill_zombie(kernel_pid_t pid)
     else if (thread->status == STATUS_ZOMBIE) {
         DEBUG("thread_kill: Thread is a zombie.\n");
 
-        sched_threads[pid] = NULL;
-        sched_num_threads--;
-        sched_set_status(thread, STATUS_STOPPED);
-
+        _kill_zombie_unchecked(thread);
         result =  1;
     }
     else {
@@ -325,6 +340,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     }
 
     sched_threads[pid] = thread;
+    /* UINTPTR_MAX can't be the address of a mutex and marks this thread as not
+     * joinable. */
+    thread->exit_val = flags & THREAD_CREATE_JOINABLE ? NULL : (void *)UINTPTR_MAX;
 
     thread->pid = pid;
     thread->sp = thread_stack_init(function, arg, stack, stacksize);
@@ -374,6 +392,75 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     irq_restore(state);
 
     return pid;
+}
+
+int thread_join(kernel_pid_t pid, void **exit_value)
+{
+    (void)exit_value;
+
+    mutex_t exit_signal = MUTEX_INIT_LOCKED;
+    /* Disable interrupts before thread_get() s.t. no thread_kill_zombie() can
+     * sneak in-between. */
+    irq_disable();
+
+    thread_t *joinee = thread_get(pid);
+    if (!joinee) {
+        irq_enable();
+        /* No thread with this PID was found. */
+        return -ESRCH;
+    }
+
+    if (joinee->status <= STATUS_ZOMBIE) {
+        goto finished_checked;
+    }
+
+    if (joinee->exit_val != NULL) {
+        irq_enable();
+        /* Another thread is waiting, or not joinable. */
+        return -EINVAL;
+    }
+
+    joinee->exit_val = &exit_signal;
+
+    irq_enable();
+
+    mutex_lock(&exit_signal);
+
+    irq_disable();
+
+    /* The user really shouldn't do it because it counts as multiple joining,
+     * but it is possible to call thread_kill_zombie() on a ZOMBIE thread
+     * that had a joiner on it. Precisely, after a thread switches to ZOMBIE but
+     * before the joiner is woken up. In that case, the thread structure is
+     * either in an undefined state and we may not touch it anymore (thread_get()
+     * returns NULL), or the PID already belongs to a new, active thread. There is
+     * a third possibility that we don't catch here: the PID belongs to a new
+     * thread, and that one finished too. Then, we just "propagate" this error to the
+     * next waiter (if any), and the invariant that the thread ended still holds.
+     * However, the return value of the previous thread is lost and this one is
+     * unrelated. But for now return values are not implemented anyway (always NULL)
+     * so it doesn't matter.
+     *
+     * TODO: if return values are implemented, either declare the usage of
+     * thread_kill_zombie() as described above to be UB or find a fix. */
+    joinee = thread_get(pid);
+    if (!joinee || joinee->status != STATUS_ZOMBIE) {
+        irq_enable();
+        return -ECANCELED;
+    }
+
+finished_checked:
+    assume(joinee->status == STATUS_ZOMBIE);
+
+    if (exit_value) {
+        *exit_value = joinee->exit_val;
+    }
+
+    _kill_zombie_unchecked(joinee);
+
+    irq_enable();
+
+    return 0;
 }
 
 static const char *state_names[STATUS_NUMOF] = {
