@@ -46,8 +46,9 @@
 /**
  * @brief   Default button GPIO mode definition
  *
- * Since the GPIO of the button is pulled up with an external resistor, the
- * mode for the GPIO pin has to be GPIO_IN.
+ * Since the GPIO pin of the button needs to be pulled up for normal operation
+ * and the board does not have an external resistor connected to the GPIO pin,
+ * the mode for the GPIO pin must be set to GPIO_IN_PU.
  */
 #define BTN0_MODE           GPIO_IN_PU
 
