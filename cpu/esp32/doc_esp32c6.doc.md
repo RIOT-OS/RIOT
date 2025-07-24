@@ -175,7 +175,7 @@ There are two options on how to use the JTAG interface on ESP32-C6:
     D+ (green)     | GPIO13
     V_Bus (red)    | 5V
     Ground (black) | GND
-    </center>
+    </center><br>
 
 2.  Using an external JTAG adapter connected to the JTAG interface exposed
     to GPIOs as follows:
@@ -189,19 +189,16 @@ There are two options on how to use the JTAG interface on ESP32-C6:
     TMS         | GPIO4 (MTMS)
     GND         | GND
     </center><br>
-    @note This option requires that the USB D- and USB D+ signals are connected
-          to the ESP32-C6 USB interface at GPIO12 and GPIO13.
 
-<br>
 Using the built-in USB-to-JTAG bridge is the default option, i.e. the JTAG
 interface of the ESP32-C6 is connected to the built-in USB-to-JTAG bridge.
 To use an external JTAG adapter, the JTAG interface of the ESP32-C6 has to
 be connected to the GPIOs as shown above. For this purpose eFuses have to be
 burned with the following command:
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 espefuse.py burn_efuse JTAG_SEL_ENABLE --port /dev/ttyUSB0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 @warning Burning eFuses is an irreversible operation.
 
 Once the eFuses are burned with this command and option `JTAG_SEL_ENABLE`,
@@ -213,10 +210,10 @@ and an external JTAG adapter has to be used.
 
 Alternatively, the integrated USB-to-JTAG bridge can be permanently disabled
 with the following command:
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 espefuse.py burn_efuse DIS_USB_JTAG --port /dev/ttyUSB0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 @warning Burning eFuses is an irreversible operation.
 
 Once the eFuses are burned with this command and option `DIS_USB_JTAG`,
