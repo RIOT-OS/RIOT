@@ -139,7 +139,7 @@ SPI_DEV(0)    | CS0    | GPIO18 |`SPI0_CS0`   | `SPI2_HOST` (`FSPI`)
 
 ESP32-C6 has two timer groups with one timer each, resulting in a total of
 two timers. Thus one timer with one channel can be used in RIOT
-as timer device TIMER_DEV(0), because one timer is used as system timer.
+as timer device TIMER_DEV(0), because the other timer is used as system timer.
 
 ESP32-C6 do not have CCOMPARE registers. The counter implementation can not
 be used.
@@ -202,6 +202,8 @@ burned with the following command:
 espefuse.py burn_efuse JTAG_SEL_ENABLE --port /dev/ttyUSB0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+@warning Burning eFuses is an irreversible operation.
+
 Once the eFuses are burned with this command and option `JTAG_SEL_ENABLE`,
 GPIO15 is used as a bootstrapping pin to choose between the two options.
 If GPIO15 is HIGH when ESP32-C6 is reset, the JTAG interface is connected
@@ -215,11 +217,11 @@ with the following command:
 espefuse.py burn_efuse DIS_USB_JTAG --port /dev/ttyUSB0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+@warning Burning eFuses is an irreversible operation.
+
 Once the eFuses are burned with this command and option `DIS_USB_JTAG`,
 the JTAG interface is always exposed to GPIO4 ... GPIO7 and an external
 JTAG adapter has to be used.
-
-@note Burning eFuses is an irreversible operation.
 
 For more information about JTAG configuration for ESP32-C6, refer to the
 section [Configure Other JTAG Interface]

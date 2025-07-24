@@ -282,7 +282,7 @@ The key features of ESP32-C6 are:
 | RAM               | 512 KiB SRAM <br> 16 KiB LP SRAM                                  | yes <br> yes |
 | ROM               | 320 KiB                                                           | yes |
 | Flash             | 16 MiB                                                            | yes |
-| Frequency         | 160 MHz, 120 MHz, 80 MHz, 40 MHz, 20 MHz                          | yes |
+| Frequency         | 160 MHz, 120 MHz, **80 MHz**, 40 MHz, 20 MHz                      | yes |
 | Power Consumption | 27 mA @ 160 MHz <br> 19 mA @ 80 MHz <br> 180 uA in light sleep mode <br> 7 uA in deep sleep mode | yes <br> yes <br> yes <br> yes |
 | Timer             | 2 x 54 bit                                                        | yes |
 | ADC               | 1 x SAR-ADC with up to 7 x 12 bit channels total                  | yes |
