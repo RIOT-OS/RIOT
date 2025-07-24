@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "psa/algorithm.h"
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -31,7 +33,7 @@ extern "C" {
  * @note    Not yet implemented
  */
 struct psa_mac_operation_s {
-    int dummy;  /**< Not yet implemented */
+    psa_algorithm_t alg;
 };
 
 /**
