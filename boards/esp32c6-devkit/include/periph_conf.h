@@ -46,7 +46,7 @@ extern "C" {
 /**
  * @brief   Declaration of GPIOs that can be used as ADC channels
  *
- * For generic boards, all ADC pins that have broken out are declared as ADC
+ * For generic boards, all ADC pins that are broken out are declared as ADC
  * channels.
  *
  * @note As long as the GPIOs listed in ADC_GPIOS are not initialized as ADC
