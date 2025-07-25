@@ -177,10 +177,12 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  * @{
  */
 #ifndef DOXYGEN
-#  define _UNICOAP_OPTIONS_ALLOC(_buf, _name, capacity) \
-      uint8_t _buf[capacity];                           \
-      unicoap_options_t _name;                          \
-      unicoap_options_init(&_name, _buf, capacity);
+#  define _UNICOAP_OPTIONS_ALLOC(_buf, _name, capacity, _static)    \
+    _static uint8_t _buf[capacity];                                 \
+    _static unicoap_options_t _name = {                             \
+        .entries = { { .data = _buf } },                            \
+        .storage_capacity = capacity,                               \
+    };
 #endif
 
 /**
@@ -190,10 +192,28 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  * @param capacity Storage buffer capacity in bytes
  *
  * Allocates a new @ref unicoap_options_t container and a storage buffer with
- * the given capacity, then calls @ref unicoap_options_t::unicoap_options_init.
+ * the given capacity, and initializes it. No need to call
+ * @ref unicoap_options_t::unicoap_options_init afterwards.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC_STATIC for static allocation
  */
 #define UNICOAP_OPTIONS_ALLOC(name, capacity) \
-    _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity)
+    _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity,)
+
+/**
+ * @brief Statically allocates options with buffer capacity
+ *
+ * @param name Name of the variable storing the options structure
+ * @param capacity Static storage buffer capacity in bytes
+ *
+ * Statically allocates a new @ref unicoap_options_t container and a storage
+ * buffer with the given capacity, and initializes it. No need to call
+ * @ref unicoap_options_t::unicoap_options_init afterwards.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC for non-static allocation
+ */
+#define UNICOAP_OPTIONS_ALLOC_STATIC(name, capacity) \
+    _UNICOAP_OPTIONS_ALLOC(_CONCAT3(name, _storage, __LINE__), name, capacity, static)
 
 /**
  * @brief Allocates options with default capacity
@@ -201,11 +221,27 @@ static inline void unicoap_options_clear(unicoap_options_t* options)
  * @param name Name of the variable storing the options structure
  *
  * Allocates a new @ref unicoap_options_t container and a storage buffer with
- * @ref CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY,
- * then calls @ref unicoap_options_t::unicoap_options_init.
+ * @ref CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY, and initializes it.
+ * No need to call @ref unicoap_options_t::unicoap_options_init afterwards.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC_STATIC_DEFAULT for static allocation
  */
 #define UNICOAP_OPTIONS_ALLOC_DEFAULT(name) \
     UNICOAP_OPTIONS_ALLOC(name, CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY)
+
+/**
+ * @brief Statically allocates options with default capacity
+ *
+ * @param name Name of the variable storing the options structure
+ *
+ * Statically allocates a new @ref unicoap_options_t container and a storage buffer
+ * with @ref CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY, and initializes it.
+ * No need to call @ref unicoap_options_t::unicoap_options_init afterwards.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC_DEFAULT for non-static allocation
+ */
+#define UNICOAP_OPTIONS_ALLOC_STATIC_DEFAULT(name) \
+    UNICOAP_OPTIONS_ALLOC_STATIC(name, CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY)
 /** @} */
 
 /* MARK: - Option characteristics */
