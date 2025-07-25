@@ -1,0 +1,142 @@
+# Resolve SSL requirements according to the documentation in mbedtls_config.h.
+# Please keep the order.
+
+ifneq (,$(filter mbedtls_key_exchange_dhe_psk_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_dhm
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdhe_psk_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_ecdh
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_rsa_psk_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_rsa
+  USEMODULE += mbedtls_pkcs1_v15
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_rsa_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_rsa
+  USEMODULE += mbedtls_pkcs1_v15
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_dhe_rsa_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_dhm
+  USEMODULE += mbedtls_rsa
+  USEMODULE += mbedtls_pkcs1_v15
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdhe_rsa_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_ecdh
+  USEMODULE += mbedtls_rsa
+  USEMODULE += mbedtls_pkcs1_v15
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdhe_ecdsa_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_ecdh
+  USEMODULE += mbedtls_ecdsa
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdh_ecdsa_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_ecdh
+  USEMODULE += mbedtls_ecdsa
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdh_rsa_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_ecdh
+  USEMODULE += mbedtls_rsa
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecjpake_enabled,$(USEMODULE)))
+  USEMODULE += mbedtls_ecjpake
+  USEMODULE += mbedtls_sha256
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_connection_id,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_proto_dtls
+endif
+
+ifneq (,$(filter mbedtls_ssl_encrypt_then_mac,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_ssl_proto_tls1%,$(USEMODULE)))
+    $(info "mbedtls_ssl_extended_master_secret: using default TLS1.2")
+    USEMODULE += mbedtls_ssl_proto_tls1_2
+  endif
+endif
+
+ifneq (,$(filter mbedtls_ssl_extended_master_secret,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_ssl_proto_tls1%,$(USEMODULE)))
+    $(info "mbedtls_ssl_extended_master_secret: using default TLS1.2")
+    USEMODULE += mbedtls_ssl_proto_tls1_2
+  endif
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_tls1,$(USEMODULE)))
+  USEMODULE += mbedtls_md5
+  USEMODULE += mbedtls_sha1
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_tls1_1,$(USEMODULE)))
+  USEMODULE += mbedtls_md5
+  USEMODULE += mbedtls_sha1
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_tls1_2,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_sha1 mbedtls_sha256 mbedtls_sha512,$(USEMODULE)))
+    $(info "mbedtls_ssl_proto_tls1_2: using default SHA256")
+    USEMODULE += mbedtls_sha256
+  endif
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_dtls,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_ssl_proto_tls1_1 mbedtls_ssl_proto_tls1_2,$(USEMODULE)))
+    $(info "mbedtls_ssl_proto_dtls: using default TLS1.2")
+  endif
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_anti_replay,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_tls
+  USEMODULE += mbedtls_ssl_proto_dtls
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_hello_verify,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_proto_dtls
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_srtp,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_proto_dtls
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_client_port_reuse,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_dtls_hello_verify
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_badmac_limit,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_proto_dtls
+endif
+
+ifneq (,$(filter mbedtls_ssl_server_name_indication,$(USEMODULE)))
+  USEMODULE += mbedtls_x509_crt_parse
+endif
+
+ifneq (,$(filter mbedtls_ssl_ticket,$(USEMODULE)))
+  USEMODULE += mbedtls_cipher
+endif
+
+ifneq (,$(filter mbedtls_ssl_cli,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_tls
+endif
+
+ifneq (,$(filter mbedtls_ssl_srv,$(USEMODULE)))
+  USEMODULE += mbedtls_ssl_tls
+endif
+
+ifneq (,$(filter mbedtls_ssl_tls,$(USEMODULE)))
+  USEMODULE += mbedtls_cipher
+  USEMODULE+= mbedtls_md
+endif

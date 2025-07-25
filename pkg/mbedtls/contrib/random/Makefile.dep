@@ -1,0 +1,12 @@
+# Resolve RNG requirements according to the documentation in mbedtls_config.h.
+# Please keep the order.
+
+USEMODULE += mbedtls_entropy
+
+ifneq (,$(filter mbedtls_ctr_drbg,$(USEMODULE)))
+  USEMODULE += mbedtls_aes
+endif
+
+ifneq (, $(filter mbedtls_hmac_drbg,$(USEMODULE)))
+  USEMODULE += mbedtls_md
+endif
