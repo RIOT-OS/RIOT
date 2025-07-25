@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2025 Ahmad Mahmod <ahmad.nawras.mahmod@gmail.com -- mahmod@unistra.fr> *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -68,6 +69,16 @@ typedef struct __attribute__((packed)) {
  * @return  @ref GNRC_IPV6_EXT_RH_ERROR, on error
  */
 int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh, void **err_ptr);
+
+/**
+ * @brief Insert a RPL Source Routing Header (SRH) into an IPv6 packet.
+ *
+ * @param[in] pkt        The GNRC packet to modify.
+ * @param[in,out] ipv6_hdr The associated IPv6 header.
+ *
+ * @return Modified GNRC packet with SRH inserted, or NULL on failure.
+ */
+gnrc_pktsnip_t *gnrc_rpl_srh_insert(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6_hdr);
 
 #ifdef __cplusplus
 }
