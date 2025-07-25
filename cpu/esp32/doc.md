@@ -574,9 +574,13 @@ if you have already used ESP-IDF directly.
 
 Once the ESP32x tools are installed in the directory specified by the
 environment variable `$IDF_TOOLS_PATH`, the shell script
-`$RIOTBASE/dist/tools/esptools/install.sh` can be sourced to export the
+`$RIOTBASE/dist/tools/esptools/export.sh` can be sourced to export the
 paths of the installed tools using again the environment variable
 `$IDF_TOOLS_PATH`.
+By writing `.` followed by a space in front of the script, the script
+runs in the same environment as the current shell and sets the local
+environment variables, which would otherwise be lost on termination
+of the script.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ . dist/tools/esptools/export.sh
