@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# If the script is not sourced, the exported variables are not saved
+# in the environment.
+if [ "$(basename -- "$0")" = "export.sh" ]; then
+    echo "Please run the script prefixed with the 'source' command." 1>&2
+    exit 1
+fi
+
 ESP32_GCC_RELEASE="esp-14.2.0_20241119"
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
