@@ -538,13 +538,13 @@ environment variable `$IDF_TOOLS_PATH`, the shell script
 `$RIOTBASE/dist/tools/esptools/export.sh` can be sourced to export the
 paths of the installed tools using again the environment variable
 `$IDF_TOOLS_PATH`.
-By writing the `source` command in front of the script, the script
+By writing the `.` followed by a space in front of the script, the script
 runs in the same environment as the current shell and sets the local
 environment variables, which would otherwise be lost on termination
 of the script.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ source dist/tools/esptools/export.sh
+$ . dist/tools/esptools/export.sh
 
 Usage: export.sh <tool>
        export.sh gdb <platform>
