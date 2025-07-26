@@ -39,7 +39,7 @@
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
 #include "soc/io_mux_reg.h"
-#ifndef CPU_FAM_ESP32H2
+#if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
 #include "soc/rtc_cntl_reg.h"
 #endif
 #include "soc/rtc_io_periph.h"

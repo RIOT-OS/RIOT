@@ -1044,6 +1044,8 @@ typedef enum {
 #  include "periph_cpu_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #  include "periph_cpu_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "periph_cpu_esp32c6.h"
 #elif defined(CPU_FAM_ESP32H2)
 #  include "periph_cpu_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)

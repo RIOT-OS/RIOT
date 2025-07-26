@@ -1,0 +1,10 @@
+# We must duplicate the include done by $(RIOTBASE)/Makefile.include
+# to also include the main board header
+INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/esp32c6-devkit/include))
+
+# WIFI_EAP_USER and WIFI_EAP_PASS have to be defined to compile the
+# optional module esp_wifi_enterprise in CI
+CFLAGS += -DWIFI_EAP_USER=\"riot@riot-os.org\"
+CFLAGS += -DWIFI_EAP_PASS=\"riot\"
+
+include $(RIOTBOARD)/esp32c6-devkit/Makefile.include

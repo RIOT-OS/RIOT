@@ -176,13 +176,29 @@ else ifeq (esp32c3,$(CPU_FAM))
     components/soc/$(CPU_FAM)/gdma_periph.c \
     components/soc/$(CPU_FAM)/temperature_sensor_periph.c \
     #
+else ifeq (esp32c6,$(CPU_FAM))
+  ESP_SDK_BOOTLOADER_SRCS += \
+    components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c \
+    components/efuse/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_init.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_param.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_sleep.c \
+    components/esp_rom/patches/esp_rom_hp_regi2c_$(CPU_FAM).c \
+    components/esp_rom/patches/esp_rom_systimer.c \
+    components/esp_rom/patches/esp_rom_wdt.c \
+    components/hal/cache_hal.c \
+    components/hal/wdt_hal_iram.c \
+    components/hal/lp_timer_hal.c \
+    #
+ESP_SDK_BOOTLOADER_SRCS += components/bootloader_support/src/$(CPU_FAM)/bootloader_ecdsa.c
+
 else ifeq (esp32h2,$(CPU_FAM))
   ESP_SDK_BOOTLOADER_SRCS += \
     components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c \
     components/efuse/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c \
-    components/esp_hw_support/port/esp32h2/pmu_init.c \
-    components/esp_hw_support/port/esp32h2/pmu_param.c \
-    components/esp_hw_support/port/esp32h2/pmu_sleep.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_init.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_param.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_sleep.c \
     components/esp_rom/patches/esp_rom_regi2c_$(CPU_FAM).c \
     components/esp_rom/patches/esp_rom_systimer.c \
     components/esp_rom/patches/esp_rom_wdt.c \
@@ -260,7 +276,7 @@ ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
 
   ifeq (esp32c3,$(CPU_FAM))
     CFLAGS += -march=rv32imc_zicsr_zifencei
-  else ifeq (esp32h2,$(CPU_FAM))
+  else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
     CFLAGS += -march=rv32imac_zicsr_zifencei
   else
       $(error Missing -march option for ESP32x RISC-V SoC variant: $(CPU_FAM))
@@ -352,6 +368,13 @@ else ifneq (,$(filter esp32c3,$(CPU_FAM)))
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.bt_funcs.ld \
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3.ld \
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3_bt_funcs.ld \
+    #
+else ifneq (,$(filter esp32c6,$(CPU_FAM)))
+  LINKFLAGS += -nostartfiles
+  LINKFLAGS += --specs=nosys.specs
+  ESP_SDK_BOOTLOADER_ADD_LINK_FLAGS += \
+    -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld \
+    -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.version.ld \
     #
 else ifneq (,$(filter esp32h2,$(CPU_FAM)))
   LINKFLAGS += -nostartfiles
