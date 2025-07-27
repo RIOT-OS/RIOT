@@ -134,7 +134,7 @@ static const ads1115_params_t ads1115_params[] = {
     ADS1115_PARAMS
 };
 
-/** @} */  // close @ingroup drivers_ads1115
+/** @} */  /* close @ingroup drivers_ads1115 */ 
 
 #ifdef __cplusplus
 }

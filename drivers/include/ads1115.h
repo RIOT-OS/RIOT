@@ -84,7 +84,7 @@ typedef enum {
     ADS1115_PGA_0_512V, /**< FSR = ±0.512V */
     ADS1115_PGA_0_256V, /**< FSR = ±0.256V */
 
-    // Aliases (same behavior)
+    /* Aliases (same behavior) */ 
     ADS1115_PGA_0_256V_B,
     ADS1115_PGA_0_256V_C
 } ads1115_pga_t;
