@@ -264,4 +264,4 @@ else
 fi
 
 echo "Use following command to extend the PATH variable:"
-echo ". $(dirname "$0")/export.sh $1"
+echo ". $(dirname "$0")/export.sh $1 $2"
