@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2017 Ken Rabold
- *               2019 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Ken Rabold
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
