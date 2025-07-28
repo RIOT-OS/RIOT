@@ -46,6 +46,6 @@ ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   CFLAGS += -nostartfiles
 endif
 
-ifeq (esp32h2,$(CPU_FAM))
+ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
   CFLAGS += -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE
 endif
