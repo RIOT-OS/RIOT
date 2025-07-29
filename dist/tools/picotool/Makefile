@@ -8,10 +8,7 @@ RIOTBASE ?= $(CURDIR)/../../..
 RIOTTOOLS ?= $(CURDIR)/..
 
 # Location of the picosdk package
-PICOSDK_DIR = ../../../picosdk
-PICO_SDK_PATH ?= $(PICOSDK_DIR)/picosdk
-
-USEPKG += picosdk
+PICOSDK_DIR = $(RIOTBASE)/build/pkg/picosdk
 
 PKG_SOURCE_DIR = $(CURDIR)/source
 PKG_BUILD_DIR = $(PKG_SOURCE_DIR)/build
@@ -21,18 +18,15 @@ PKG_BUILD_DIR = $(PKG_SOURCE_DIR)/build
 include $(RIOTBASE)/pkg/pkg.mk
 
 # Create a dependency on the picosdk build
-$(CURDIR)/picotool: $(PKG_PREPARED) $(PICOSDK_DIR)/.prepared
+$(CURDIR)/picotool: $(PKG_PREPARED) picosdk
 	@echo "[INFO] compiling picotool from source now"
-	@cd $(PKG_SOURCE_DIR) && cmake -B build -S . -DPICO_SDK_PATH=$(PICO_SDK_PATH) -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+	@cd $(PKG_SOURCE_DIR) && cmake -B build -S . -DPICO_SDK_PATH=$(PICOSDK_DIR) -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 	@cd $(PKG_BUILD_DIR) && env --unset=CC --unset=CXX $(MAKE)
 	@cp $(PKG_BUILD_DIR)/picotool $(CURDIR)/picotool
 
-# Create a phony target to ensure picosdk is built
 .PHONY: picosdk
-picosdk: $(PICOSDK_DIR)/.prepared
-
-$(PICOSDK_DIR)/.prepared:
-	$(MAKE) -C $(RIOTBASE)/dist/tools/picosdk
+picosdk:
+	$(MAKE) -C $(RIOTBASE)/pkg/picosdk
 
 all: $(CURDIR)/picotool
 
