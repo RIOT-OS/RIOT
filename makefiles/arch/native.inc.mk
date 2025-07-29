@@ -32,12 +32,17 @@ ifeq (,$(filter -std=%, $(CFLAGS)))
   CFLAGS += -std=gnu11
 endif
 
+HOST_BIT := $(shell getconf LONG_BIT)
 ifeq ($(NATIVE_ARCH_BIT),64)
-  CFLAGS += -m64
-  LINKFLAGS += -m64
+  ifneq ($(HOST_BIT),64)
+    CFLAGS += -m64
+    LINKFLAGS += -m64
+  endif
 else ifeq ($(NATIVE_ARCH_BIT),32)
-  CFLAGS += -m32
-  LINKFLAGS += -m32
+  ifneq ($(HOST_BIT),32)
+    CFLAGS += -m32
+    LINKFLAGS += -m32
+  endif
 else
   $(error Unsupported native architecture)
 endif
