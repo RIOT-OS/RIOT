@@ -51,6 +51,9 @@ Once that is ready, in a parallel shell, run:
 ```
 $ aiocoap-client 'coap://[2a02:0b18:c13b:8018:1234:56ff:fe78:90ab]/.well-known/core'
 ```
+Note if you want to work with global addresses after flushing the example on a board, run the boarder router example in examples/networking/gnrc/gnrc_border_router please use the channel used there and replace the x in this line of the makefile: DEFAULT_CHANNEL ?= x with the channel used by the boarder router. If unsure you can always execute the boarder router and type in ifconfig to get the channel. Please comment out #DEFAULT_CHANNEL ?= x (The x should now be an actual number ) and comment out this line:
+#include $(RIOTMAKE)/default-radio-settings.inc.mk
+Afterwards you should see two ip addresses being printed: link-local and global. !!You need two boards one for the boarder router and one to run this example!!
 
 Note that no security is enabled by default so far; this is considered a bug.
 To mitigate this, no controls that are expected to be harmful are exposed in this example.
