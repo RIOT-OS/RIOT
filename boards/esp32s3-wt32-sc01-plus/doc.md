@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2023 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32s3_wt32_sc01_plus ESP32-S3 WT32-SC01 Plus
- * @ingroup     boards_esp32s3
- * @brief       Support for the ESP32-S3 WT32-SC01 Plus
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32s3_wt32_sc01_plus ESP32-S3 WT32-SC01 Plus
+@ingroup    boards_esp32s3
+@brief      Support for the ESP32-S3 WT32-SC01 Plus
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32s3_wt32_sc01_plus ESP32-S3 WT32-SC01 Plus
 
@@ -186,5 +185,3 @@ For detailed information on debugging an ESP32-S3 board, refer to the section
 [JTAG Debugging with ESP32x SoC](#esp32_jtag_debugging).
 
 [Back to table of contents](#esp32s3_wt32_sc01_plus_toc)
-
- */

@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2022 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2022 Benjamin Valentin
 
-/**
- * @defgroup    boards_esp32s2-wemos-mini Wemos S2 mini Board
- * @ingroup     boards_esp32s2
- * @brief       Support for Wemos S2 mini Board
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32s2-wemos-mini Wemos S2 mini Board
+@ingroup    boards_esp32s2
+@brief      Support for Wemos S2 mini Board
+@author     Benjamin Valentin <benjamin.valentin@ml-pa.com>
 
 \section esp32s2-wemos-mini Wemos S2 mini
 
@@ -41,4 +40,3 @@ For detailed information about ESP32-S2 as well as configuring and compiling
 RIOT for ESP32-S2 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32s2-wemos-mini_toc)
- */

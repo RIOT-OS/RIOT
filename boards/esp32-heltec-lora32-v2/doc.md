@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2018 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32_heltec-lora32-v2 Heltec WiFi LoRa 32 V2 boards
- * @ingroup     boards_esp32
- * @brief       Support for Heltec WiFi LoRa 32 V2 boards
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32_heltec-lora32-v2 Heltec WiFi LoRa 32 V2 boards
+@ingroup    boards_esp32
+@brief      Support for Heltec WiFi LoRa 32 V2 boards
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32_heltec_lora32_v2 Heltec WiFi LoRa 32 V2
 
@@ -236,4 +235,3 @@ For detailed information about ESP32 as well as configuring and compiling RIOT
 for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_heltec_lora32_v2_toc)
- */

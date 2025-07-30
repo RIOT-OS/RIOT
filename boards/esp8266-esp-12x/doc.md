@@ -1,5 +1,3 @@
-/**
-
 @defgroup    boards_esp8266_esp-12x  ESP-12x based boards
 @ingroup     boards_esp8266
 @brief       Support for boards that use ESP-12x modules.
@@ -140,4 +138,3 @@ easier.
 Following image shows the pinout of Adafruit Feather HUZZAH ESP8266.
 
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Adafruit_Huzzah_ESP8266_pinout.png" "Adafruit Feather HUZZAH ESP8266 pinout"
-*/

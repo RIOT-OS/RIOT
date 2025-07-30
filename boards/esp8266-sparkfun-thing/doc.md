@@ -1,5 +1,3 @@
-/**
-
 @defgroup    boards_esp8266_sparkfun-thing SparkFun ESP8266 Thing
 @ingroup     boards_esp8266
 @brief       Support for the SparkFun ESP8266 Thing modules.
@@ -106,4 +104,3 @@ make flash BOARD=esp8266-sparkfun-thing ...
 
 For detailed information about ESP8266 as well as configuring and compiling
 RIOT for ESP8266 boards, see \ref esp8266_riot.
-*/
