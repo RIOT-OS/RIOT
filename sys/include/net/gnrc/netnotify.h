@@ -8,6 +8,18 @@
 
 #pragma once
 
+/**
+ * @defgroup    net_gnrc_netnotify  Notification events for network APIs.
+ * @ingroup     net_gnrc
+ * @brief       Network event notification types.
+ * @{
+ *
+ * @file
+ * @brief   Network event notification type definitions.
+ *
+ * @author  Elena Frank <elena.frank@tu-dresden.de>
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,7 +39,7 @@ typedef enum {
 } netnotify_t;
 
 /**
- * @brief   L2 (dis-)connection event data.
+ * @brief   L2 connection event data.
  */
 typedef struct netnotify_l2_connection {
     uint8_t *l2addr;            /**< L2 address of the node */
