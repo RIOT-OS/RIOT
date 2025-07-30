@@ -202,7 +202,9 @@ static gnrc_pktsnip_t *_add_rio(gnrc_netif_t *netif, gnrc_pktsnip_t *ext_opts, b
 
         if (local_pfx || (offl && routed_pfx)) {
 
-            DEBUG("nib: adding downstream subnet to RA\n");
+            DEBUG("nib: adding downstream subnet %s/%u to RA on %u\n",
+                  ipv6_addr_to_str(addr_str, &entry->pfx, sizeof(addr_str)),
+                  entry->pfx_len, netif->pid);
             uint32_t valid_ltime = (entry->valid_until == UINT32_MAX) ? UINT32_MAX :
                                    ((entry->valid_until - now) / MS_PER_SEC);
             gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
