@@ -60,13 +60,6 @@ static const dma_conf_t dma_config[] = {
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev = TIM3,
-        .max = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .bus = APB1,
-        .irqn = TIM3_IRQn,
-    },
-    {
         .dev = TIM5,
         .max = 0xffffffff,
         .rcc_mask = RCC_APB1ENR_TIM5EN,
@@ -75,8 +68,7 @@ static const timer_conf_t timer_config[] = {
     }
 };
 
-#define TIMER_0_ISR         isr_tim3
-#define TIMER_1_ISR         isr_tim5
+#define TIMER_0_ISR         isr_tim5
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
