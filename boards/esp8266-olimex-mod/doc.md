@@ -1,5 +1,3 @@
-/**
-
 @defgroup    boards_esp8266_olimex-mod Olimex MOD-WIFI-ESP8266-DEV
 @ingroup     boards_esp8266
 @brief       Support for the Olimex MOD-WIFI-ESP8266-DEV board.
@@ -97,4 +95,3 @@ make flash BOARD=esp8266-olimex-mod ...
 
 For detailed information about ESP8266 as well as configuring and compiling
 RIOT for ESP8266 boards, see \ref esp8266_riot.
-*/

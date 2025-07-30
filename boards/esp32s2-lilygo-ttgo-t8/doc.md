@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2022 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32s2_lilygo_ttgo_t8 LILYGO TTGO T8 ESP32-S2 Board
- * @ingroup     boards_esp32s2
- * @brief       Support for LILYGO TTGO T8 ESP32-S2 Board
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32s2_lilygo_ttgo_t8 LILYGO TTGO T8 ESP32-S2 Board
+@ingroup    boards_esp32s2
+@brief      Support for LILYGO TTGO T8 ESP32-S2 Board
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32s2_lilygo_ttgo_t8 LILYGO TTGO T8 ESP32-S2
 
@@ -174,4 +173,3 @@ the download mode has to be forced before by pressing the Reset (RST) button
 while holding the BOOT (BOT) button.
 
 [Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
- */

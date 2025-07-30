@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2023 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32s3_pros3 ESP32 ProS3 Board
- * @ingroup     boards_esp32s3
- * @brief       Support for the ESP32 ProS3 board
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32s3_pros3 ESP32 ProS3 Board
+@ingroup    boards_esp32s3
+@brief      Support for the ESP32 ProS3 board
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32s3_pros3 ESP32 ProS3
 
@@ -188,5 +187,3 @@ adapter. Simply add `stdio_uart` to the list of used modules for this purpose:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 BOARD=esp32s3-pros3 USEMODULE=stdio_uart make flash ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- */

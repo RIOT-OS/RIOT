@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2023 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32s3_box ESP32-S3-Box
- * @ingroup     boards_esp32s3
- * @brief       Support for the ESP32-S3-Box
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32s3_box ESP32-S3-Box
+@ingroup    boards_esp32s3
+@brief      Support for the ESP32-S3-Box
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32s3_box ESP32-S3-Box
 
@@ -146,4 +145,3 @@ In download mode, the USB Serial/JTAG interface is always available.
       the flashed application.
 
 [Back to table of contents](#esp32s3_box_toc)
- */

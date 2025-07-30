@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2019 Yegor Yefremov
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2019 Yegor Yefremov
 
-/**
- * @defgroup    boards_esp32_ttgo-t-beam TTGO T-Beam
- * @ingroup     boards_esp32
- * @brief       Support for TTGO T-Beam boards
- * @author      Yegor Yefremov <yegorslists@googlemail.com>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32_ttgo-t-beam TTGO T-Beam
+@ingroup    boards_esp32
+@brief      Support for TTGO T-Beam boards
+@author     Yegor Yefremov <yegorslists@googlemail.com>
 
 \section esp32_ttgo_t_beam TTGO T-Beam
 
@@ -181,4 +180,3 @@ For detailed information about ESP32 as well as configuring and compiling
 RIOT for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_ttgo_t_beam_toc)
- */

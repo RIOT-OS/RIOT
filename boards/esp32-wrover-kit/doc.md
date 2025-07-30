@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2018 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32_esp-wrover-kit ESP-WROVER-KIT V3
- * @ingroup     boards_esp32
- * @brief       Support for for Espressif ESP-WROVER-KIT V3
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32_esp-wrover-kit ESP-WROVER-KIT V3
+@ingroup    boards_esp32
+@brief      Support for for Espressif ESP-WROVER-KIT V3
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32_wrover_kit ESP-WROVER-KIT V3
 
@@ -341,4 +340,3 @@ method for flashing with `esptool.py` can still be used. In that case, the
 There is a comprehensive
 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)
 for the ESP-WROVER-KIT with a lot information about hardware configuration.
- */

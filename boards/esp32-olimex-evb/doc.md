@@ -1,16 +1,15 @@
-/*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2018 Gunar Schorcht
 
-/**
- * @defgroup    boards_esp32_olimex-esp32-evb Olimex ESP32-EVB
- * @ingroup     boards_esp32
- * @brief       Support for Olimex ESP32-EVB and ESP32-GATEWAY
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32_olimex-esp32-evb Olimex ESP32-EVB
+@ingroup    boards_esp32
+@brief      Support for Olimex ESP32-EVB and ESP32-GATEWAY
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 \section esp32_olimex-esp32-evb Olimex ESP32-EVB and ESP32-GATEWAY
 
@@ -205,4 +204,3 @@ For detailed information about ESP32 as well as configuring and compiling
 RIOT for ESP32 boards, see \ref esp32_riot.
 
 [Back to table of contents](#esp32_olimex_esp32_evb_toc)
- */

@@ -1,18 +1,17 @@
-/*
- * Copyright (C) 2018 Gunar Schorcht
- * Copyright (C) 2020 Google LLC
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2018 Gunar Schorcht
+Copyright (C) 2020 Google LLC
 
-/**
- * @defgroup    boards_esp32_esp-ethernet-kit-v1_1 ESP32-Ethernet-Kit V1.1 Board
- * @ingroup     boards_esp32_esp-ethernet-kit
- * @brief       Support for for Espressif ESP32-Ethernet-Kit v1.1
- * @author      Gunar Schorcht <gunar@schorcht.net>
- * @author      Erik Ekman <eekman@google.com>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   boards_esp32_esp-ethernet-kit-v1_1 ESP32-Ethernet-Kit V1.1 Board
+@ingroup    boards_esp32_esp-ethernet-kit
+@brief      Support for for Espressif ESP32-Ethernet-Kit v1.1
+@author     Gunar Schorcht <gunar@schorcht.net>
+@author     Erik Ekman <eekman@google.com>
 
 \section esp32_esp-ethernet-kit-v1_1 Espressif ESP32-Ethernet-Kit V1.1
 
@@ -97,4 +96,3 @@ another 4 GPIOs can be made available (GPIO12, GPIO13, GPIO14, GPIO15).
 There is a comprehensive [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit-v1.1.html) for the ESP32-Ethernet-Kit with a lot information about hardware configuration.
 
 [Back to table of contents](#esp32_ethernet_kit_v1_1_toc)
- */
