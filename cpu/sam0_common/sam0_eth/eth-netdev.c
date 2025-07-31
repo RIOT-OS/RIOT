@@ -153,6 +153,10 @@ static inline void _setup_phy_irq(gpio_cb_t cb, void *arg)
 
 static int _sam0_eth_init(netdev_t *netdev)
 {
+    /* HACK: without the delay we see random hard faults or no sent/received
+       frames after boot. */
+    ztimer_sleep(ZTIMER_MSEC, 10);
+
     sam0_eth_init();
     eui48_t hwaddr;
     netdev_eui48_get(netdev, &hwaddr);
