@@ -24,5 +24,7 @@ else
 endif
 
 USEMODULE += $(DRIVER)
+USEMODULE += ztimer
+USEMODULE += ztimer_sec
 
 include $(RIOTBASE)/Makefile.include
