@@ -37,7 +37,7 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {
 
   UART0->UARTIBRD = IBRD;
   UART0->UARTFBRD = FBRD;
-  uart_mode(UART0, 8, UART_PARITY_NONE, 1);
+  uart_mode(0, 8, UART_PARITY_NONE, 1);
   return 0;
 }
 
