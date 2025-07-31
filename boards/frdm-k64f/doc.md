@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_frdm-k64f NXP FRDM-K64F Board
 @ingroup     boards
 @brief       Support for the NXP FRDM-K64F
@@ -98,4 +97,3 @@ in `boards/frdm-k64f/dist/openocd.cfg`
 
 Solution 3:
 + Ask Deep Thought
- */

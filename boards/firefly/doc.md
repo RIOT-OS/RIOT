@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_firefly Firefly Board
- * @ingroup     boards
- * @brief       Support for the Firefly board
+@defgroup   boards_firefly Firefly Board
+@ingroup    boards
+@brief      Support for the Firefly board
 
 Zolertia Firefly platform
 ============================================
@@ -128,5 +127,3 @@ More Reading
 [zolertia-wiki]: https://github.com/Zolertia/Resources/wiki
 [cc1200]: http://www.ti.com/product/cc1200     "CC1200"
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"
-
-*/
