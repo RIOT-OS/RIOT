@@ -30,27 +30,12 @@
 void gpio_reset(void) {
   reset_component(RESET_PADS_BANK0, RESET_PADS_BANK0);
   reset_component(RESET_IO_BANK0, RESET_IO_BANK0);
-}
 
-#define GPIO_FUNC_SIO 5
-// Get it, Pin + Init, hahahaha
-void pinit(void) {
-    // Set LED (25) and Pin 15 so we can debug with them
-    IO_BANK0->GPIO15_CTRL = GPIO_FUNC_SIO;
-    IO_BANK0->GPIO25_CTRL = GPIO_FUNC_SIO;
-
-    // Clear the ISO bits for GPIO15 and GPIO25
-    // Otherwise the GPIOs will not work
-    atomic_clear(&PADS_BANK0->GPIO15, PADS_BANK0_ISO_BITS);
-    atomic_clear(&PADS_BANK0->GPIO15, PADS_BANK0_GPIO0_IE_BITS);
-    atomic_clear(&PADS_BANK0->GPIO25, PADS_BANK0_ISO_BITS);
-
-    // Set the GPIO function for GPIO15 and GPIO25
-    // GPIO25 is used for the LED
-    // GPIO15 is used for debugging via Oscilloscope
-    SIO->GPIO_OE_SET = 1<<15 | 1<<25;
-    SIO->GPIO_OUT = 1<<15 | 1<<25;
-    SIO->GPIO_OUT_CLR = 1UL << 25;
+  /* Reenable the LED0 pin
+   * Otherwise the LED will not work after a reset
+   * This is needed, esp. when the LED is used via
+   * the define macros */
+  gpio_init(LED0_PIN_ID, GPIO_OUT);
 }
 
 void cpu_init(void) {
@@ -59,7 +44,6 @@ void cpu_init(void) {
   /* cortexm_init(); */
 
   gpio_reset();
-  pinit();
 
   clock_reset();
 

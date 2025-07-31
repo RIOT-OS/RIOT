@@ -39,6 +39,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
       *(uint32_t*)calculate_gpio_io_ctrl_register_addr(pin) =
           FUNCTION_SELECT_SIO;
 
+
       volatile uint32_t* pad_reg =
           (uint32_t*)calculate_gpio_pad_register_addr(pin);
 
