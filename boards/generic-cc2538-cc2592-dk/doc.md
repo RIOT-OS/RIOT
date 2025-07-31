@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_generic_cc2538_cc2592_dk Generic CC2538-CC2592-DK Board
 @ingroup     boards
 @brief       Support for the 3rd party CC2538-CC2592-DK board
@@ -80,5 +79,3 @@ make BOARD=generic-cc2538-cc2592-dk debug
 
 @note   By default OpenOCD is used for debugging. While debugging works fine
         with OpenOCD, flashing is only supported via the bootloader or `jlink`.
-
- */

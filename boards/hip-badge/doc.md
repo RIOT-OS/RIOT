@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_hip_badge HiP Badge
 @ingroup     boards_esp32c3
 @brief       Support for the Hacking in Parallel Badge
@@ -51,5 +50,3 @@ The event (and badge) were organized on short notice (6 Weeks), so there are som
 
  - [Badge Clinic](https://wiki.hip-berlin.de/index.php?title=Badge_Clinic)
  - [Design files](https://gitlab.com/tidklaas/hip-badge/)
-
- */

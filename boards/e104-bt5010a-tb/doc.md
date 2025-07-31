@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_e104-bt5010a-tb E104-BT5010A Test Board
 @ingroup     boards
 @brief       Support for the Ebyte E104-BT5010A Test Board (nRF52810)
@@ -27,5 +26,3 @@ Use the `term` target to connect to the board serial port<br/>
 ```
     make BOARD=e104-bt5010a-tb -C examples/basic/hello-world term
 ```
-
- */
