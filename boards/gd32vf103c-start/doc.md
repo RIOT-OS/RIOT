@@ -1,4 +1,3 @@
-/**
 @defgroup   boards_gd32vf103c_start GD32VF103C-START
 @ingroup    boards
 @brief      Support for the GD32VF103C-START board
@@ -99,5 +98,3 @@ needs to be connected to the USB connector labeled OTG.
 @note   It is safe to keep the jumper at JP2 in "Usart" position or even
         remove the jumper with RIOT. PA9 is still used as UART/TXD and VBUS
         sensing is disabled anyway.
-
- */

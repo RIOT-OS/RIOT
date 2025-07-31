@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_e180-zg120b-tb Ebyte E180-ZG120B-TB Test Board
- * @ingroup     boards
- * @brief       Support for Ebyte E180-ZG120B-TB Test Board
+@defgroup   boards_e180-zg120b-tb Ebyte E180-ZG120B-TB Test Board
+@ingroup    boards
+@brief      Support for Ebyte E180-ZG120B-TB Test Board
 
 ## Overview
 ![Image of the E180-ZG120B test board](https://www.ebyte.com/Uploadfiles/Picture/2019-12-20/201912201352132348.jpg)
@@ -261,5 +260,4 @@ the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.c
 toolchain.
 
 ## License information
-* Ebyte' EMLIB: zlib-style license (permits distribution of source).
- */
+Ebyte' EMLIB: zlib-style license (permits distribution of source).
