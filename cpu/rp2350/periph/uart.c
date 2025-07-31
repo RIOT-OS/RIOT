@@ -19,6 +19,10 @@
 #include "periph_cpu.h"
 
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {
+  (void)uart;
+  (void)baud;
+  (void)rx_cb;
+  (void)arg;
   /* Set the UART pins to the correct function */
   IO_BANK0->GPIO0_CTRL = FUNCTION_SELECT_UART;
   IO_BANK0->GPIO1_CTRL = FUNCTION_SELECT_UART;
@@ -33,10 +37,15 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {
 
   UART0->UARTIBRD = IBRD;
   UART0->UARTFBRD = FBRD;
+  uart_mode(UART0, 8, UART_PARITY_NONE, 1);
+  return 0;
 }
 
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits) {
+  (void)uart;
+  (void)data_bits;
+  (void)stop_bits;
   atomic_clear(&UART0->UARTCR, UART_UARTCR_UARTEN_BITS | UART_UARTCR_RXE_BITS |
                                    UART_UARTCR_TXE_BITS);
 
@@ -58,6 +67,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len) {
+  (void)uart;
   for (size_t i = 0; i < len; i++) {
     UART0->UARTDR = data[i];
     /* Wait until the TX FIFO is empty before sending the next byte */
@@ -66,7 +76,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len) {
   }
 }
 
-void uart_poweron(uart_t uart) {}
-void uart_poweroff(uart_t uart) {}
+void uart_poweron(uart_t uart) {
+  (void)uart;
+}
+void uart_poweroff(uart_t uart) {
+  (void)uart;
+}
 
 /** @} */

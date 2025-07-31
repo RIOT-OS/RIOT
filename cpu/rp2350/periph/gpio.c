@@ -55,6 +55,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
       /* Unsupported mode */
       return -ENOTSUP;
   }
+    return 0;
 }
 
 bool gpio_read(gpio_t pin) {
