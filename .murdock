@@ -18,6 +18,7 @@ native32
 native64
 nrf52840dk
 qn9080dk
+rpi-pico-2
 samr21-xpro
 stk3200
 stm32f429i-disc1"
