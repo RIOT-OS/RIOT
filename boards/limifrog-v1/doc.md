@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_limifrog-v1 LimiFrog Version 1
 @ingroup     boards
 @brief       Support for the limifrog-v1 board
@@ -84,4 +83,3 @@ picture.
 
 To debug the device you may also want to use a stand-alone UART converter and
 connect it to the pins PC10 and PC11 and keep the programmer plugged.
- */

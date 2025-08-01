@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_i-nucleo-lrwan1 ST I-NUCLEO-LRWAN1 LoRa board
 @ingroup     boards
 @brief       Support for the ST I-NUCLEO-LRWAN1 LoRa board shield
@@ -63,5 +62,3 @@ to STDIO.
 
 When flashing using an ST-Link, STDIO pins can be plugged directly to the RX/TX
 pins on the programmer, STDIO is then accessible like on any Nucleo boards.
-
- */

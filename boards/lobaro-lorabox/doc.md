@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_lobaro_lorabox Lobaro Lorabox
 @ingroup     boards
 @brief       Support for the Lobaro LoraBox with stm32l151cb-a
@@ -83,7 +82,6 @@ BOARD=lobaro-lorabox make term
 **Note:** If you want to access the port with a different application please
 keep in mind that RTS must be set to '0' and DTR to '1' as the provided UART-USB
 bridge seems to invert this lines.
- */
 
 ## SX1272 radio
 Please note that the board has a Semtech SX1272 radio. This means that when the
