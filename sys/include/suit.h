@@ -325,6 +325,17 @@ static inline bool suit_component_check_flag(suit_component_t *component,
 int suit_component_name_to_string(const suit_manifest_t *manifest,
                                   const suit_component_t *component,
                                   char separator, char *buf, size_t buf_len);
+
+/**
+ * @brief Get public key accepted by SUIT
+ *
+ * @param[in] idx   Index of the key to query
+ * @param[out] key  The public key used to verify the signature
+ *
+ * @returns         True if a key at that index exists
+ */
+bool suit_get_public_key(uint8_t idx, cose_key_t *key);
+
 #ifdef __cplusplus
 }
 #endif
