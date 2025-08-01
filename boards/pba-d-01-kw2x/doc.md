@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
 @ingroup     boards
 @brief       Support for the phyWAVE evaluation board
@@ -87,4 +86,3 @@ The actual pin configuration of the board for RIOT can be found in
 | Light Sensor   | [TCS3772](https://ams.com/documents/20143/36005/TCS3772_DS000175_3-00.pdf/8689a345-f46b-d3f0-f839-eb8d38ead80d)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/3135) |
 | IR-Termopile Sensor    | [TMP006](http://www.ti.com/ww/eu/sensampbook/tmp006.pdf)    |yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2148) |
 | Capacitive Button  | PCB   | yes        | [mainline](https://github.com/RIOT-OS/RIOT/pull/7147) |
- */

@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_omote omote
 @ingroup     boards
 @brief       Support for the omote board
@@ -98,4 +97,3 @@ More Reading
 2. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
 
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"
-*/

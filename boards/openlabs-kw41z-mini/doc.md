@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_openlabs-kw41z-mini openlabs.co kw41z-mini board
 @ingroup     boards
 @brief       Support for openlabs-kw41z-mini
@@ -107,4 +106,3 @@ ADC input A3 needs a hack applied to `cpu/kinetis/periph/adc.c` to remove
 The PWM peripheral on this board isn't supported in the Kinetis PWM driver yet.
 
 Use external I2C pullup resistors if I2C is used.
- */

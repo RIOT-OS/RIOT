@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_olimexino-stm32 STM32 Olimexino-stm32
 @ingroup     boards
 @brief       Support for the Olimexino STM32 board
@@ -64,4 +63,3 @@ USART1 is used for flashing the board whereas USART2 is the serial Output.
 
 ## Supported Toolchains
 For using the OLIMEXINO STM32 board you need to use ```arm-none-eabi```.
- */

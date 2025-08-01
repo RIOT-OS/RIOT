@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_phynode-kw41z PhyNODE KW41Z
 @ingroup     boards
 @brief       Support for the Phytec PhyNODE KW41Z Board
@@ -41,5 +40,3 @@ digital gas sensor are supported. There's ongoing work on
 [IEEE802.15.4 radio support for KW41Z][radio-support]
 
 [radio-support]: https://github.com/RIOT-OS/RIOT/pull/7107
-
- */
