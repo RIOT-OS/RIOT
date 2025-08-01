@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_microbit BBC micro:bit
 @ingroup     boards
 @brief       Support for the BBC micro:bit
@@ -99,5 +98,3 @@ Use it like this:
 ## Display
 
 The 5x5 LED matrix display can be driven using the @ref boards_common_microbit.
-
- */

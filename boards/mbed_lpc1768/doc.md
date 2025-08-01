@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_mbed_lpc1768 mbed LPC1768 development kit
 @ingroup     boards
 @brief       Support for the mbed LPC1768 board
@@ -98,4 +97,3 @@ status LED blinks fast.
 ## Known Issues
 * Does not compile with the mentor graphics toolchain (compare
 https://github.com/RIOT-OS/RIOT/issues/751)
- */

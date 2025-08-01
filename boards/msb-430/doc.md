@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_msb430 MSB-430
 @ingroup     boards
 @brief       Support for the ScatterWeb Modular Sensor Board 430
@@ -140,5 +139,3 @@ TTL adapter    MSB-430 Battery Holder Board
        RXD --- 5 (TXD / P3.6)
        5V  --- 3 (5V)
 ```
-
- */

@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_nz32-sc151 NZ32-SC151
 @ingroup     boards
 @brief       Support for the Modtronix nz32-sc151 board.
@@ -102,4 +101,3 @@ although you will need to build the files independently.
 |        | RTC       | yes       | |
 |        | RNG       | no        | |
 |        | Timer     | yes           | |
- */
