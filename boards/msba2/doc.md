@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_msba2 MSB-A2
 @ingroup     boards
 @brief       Support for the ScatterWeb MSB-A2 board
@@ -91,5 +90,3 @@ Once this is done, debugging is as simple as running:
 Theoretically you should be able to flash also via JTAG. But do not expect this
 to be faster. Also: Do you really want to risk bricking the MSB-A2 you spend so
 much time to modify? The author of this text surely didn't want to risk that...
-
- */

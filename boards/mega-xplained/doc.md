@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_mega-xplained Mega1284P-Xplained
 @ingroup     boards
 @brief       Support for the Mega1284P-Xplained board.
@@ -60,5 +59,3 @@ It will be used automatically with `make term`:
 
 More pins can be used for hardware interrupts using the Pin Change
 Interrupt feature. See @ref boards_common_atmega for details.
-
- */

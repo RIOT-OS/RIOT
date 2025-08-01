@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_mcb2388 MCB2388 Evaluation Board
 @ingroup     boards
 @brief       Support for the MCB2388 Evaluation Board
@@ -119,5 +118,3 @@ I was unable to flash the board using the ULINK-ME adapter and OpenOCD. (2019)
 
 The board might get stuck when using OpenOCD, you have to power-cycle it to
 being able to use ISP programming again.
-
- */

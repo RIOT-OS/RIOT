@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_microduino-corerf Microduino CoreRF
- * @ingroup     boards
- * @brief       Support for the Microduino CoreRF board
+@defgroup    boards_microduino-corerf Microduino CoreRF
+@ingroup     boards
+@brief       Support for the Microduino CoreRF board
 
 # Hardware
 ## Pinout
@@ -169,5 +168,3 @@ on-chip debugging) bits should be set: `E:F5, H:1A, L:FF`. This can be done
 ```
 avrdude -c dragon_isp -p m128rfa1 -U hfuse:w:0x1a:m
 ```
-
- */

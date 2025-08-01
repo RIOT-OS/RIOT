@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_msb430h MSB-430H
 @ingroup     boards
 @brief       Support for the ScatterWeb MSB-430H board
@@ -59,4 +58,3 @@ need a 3.3V TTL serial cable. For USB connections you could use a FTDI connector
 ## More information
 
 [FU Berlin info page on the MSB-430H](https://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/ScatterWeb/modules/mod_MSB-430H.html)
- */
