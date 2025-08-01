@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_p-l496g-cell02 ST P-L496G-CELL02
- * @ingroup     boards
- * @brief       Support for the ST P-L496G-CELL02 board
+@defgroup   boards_p-l496g-cell02 ST P-L496G-CELL02
+@ingroup    boards
+@brief      Support for the ST P-L496G-CELL02 board
 
 ## Overview
 
@@ -27,5 +26,3 @@ STDIO is available via the ST-Link programmer.
 Use the `term` target to open a terminal:
 
     make BOARD=p-l496g-cell02 -C examples/basic/hello-world term
-
- */

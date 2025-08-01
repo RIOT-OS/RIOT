@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_openmote-b OpenMote-b
 @ingroup     boards
 @brief       Support for the OpenMote-b board
@@ -67,4 +66,3 @@ The JTAG interface is required for debugging.  On some board revisions the
 debug may not be able to run. To debug use:
 
 `make debug`
- */

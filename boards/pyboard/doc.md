@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_pyboard pyboard
 @ingroup     boards
 @brief       Support for the pyboard
@@ -28,5 +27,3 @@ In order to get serial output, connect an USB/serial adapter to USART1 RX/TX
 
 - unconnect 3.3v/DFU pin
 - reset again
-
- */

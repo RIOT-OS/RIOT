@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_olimex_msp430_h1611 Olimex MSP430-H1611
 @ingroup     boards
 @brief       Support for the Olimex MSP430-H1611 board
@@ -93,5 +92,3 @@ TTL adapter    Olimex MSP430-H1611
        TXD --- 35 (P3.7)
        RXD --- 34 (P3.6)
 ```
-
- */
