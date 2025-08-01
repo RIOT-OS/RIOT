@@ -177,6 +177,22 @@ struct _thread {
 #if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
     thread_flags_t flags;           /**< currently set flags            */
 #endif
+    /**
+     * @brief Thread exit value or join mutex.
+     *
+     * For a thread marked THREAD_CREATE_JOINABLE:
+     *  - status > STATUS_ZOMBIE:   address of the joiner signaling mutex, NULL
+     *                              if none
+     *  - status == STATUS_ZOMBIE:  return value of the thread (not implemented,
+     *                              always NULL)
+     *  - status == STATUS_STOPPED: undefined
+     *
+     * For a thread NOT marked THREAD_CREATE_JOINABLE:
+     *  - status > STATUS_ZOMBIE:   UINTPTR_MAX (marks thread as un-joinable)
+     *  - status == STATUS_ZOMBIE:  NULL
+     *  - status == STATUS_STOPPED: undefined
+     */
+    void *exit_val;
 
     clist_node_t rq_entry;          /**< run queue entry                */
 
@@ -240,6 +256,14 @@ struct _thread {
 #define THREAD_CREATE_NO_STACKTEST      (8)
 
 /**
+ * @brief Thread is joinable.
+ *
+ * On exit, the thread will enter zombie state until @ref thread_join() or @ref
+ * thread_kill_zombie() is called on it.
+ */
+#define THREAD_CREATE_JOINABLE          (16)
+
+/**
  * @brief Legacy flag kept for compatibility.
  *
  * @deprecated will be removed after 2025.07 release
@@ -283,6 +307,22 @@ kernel_pid_t thread_create(char *stack,
                            thread_task_func_t task_func,
                            void *arg,
                            const char *name);
+
+/**
+ * @brief Wait for a thread to finish.
+ *
+ * @pre No other thread is already joining the target thread.
+ *
+ * @param[in]   pid         Thread to join.
+ * @param[out]  exit_value  Unimplemented. Set to NULL.
+ *
+ * @retval  0           on success.
+ * @retval -ESRCH       if no thread with this PID was found
+ * @retval -EINVAL      if the thread is not joinable, or another thread is
+ *                      already joining
+ * @retval -ECANCELED   if the thread was killed while waiting for it to finish
+ */
+int thread_join(kernel_pid_t pid, void **exit_value);
 
 /**
  * @brief       Retrieve a thread control block by PID.
