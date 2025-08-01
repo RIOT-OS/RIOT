@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_ikea-tradfri IKEA TRÅDFRI modules
- * @ingroup     boards
- * @brief       Support for the IKEA TRÅDFRI modules
+@defgroup    boards_ikea-tradfri IKEA TRÅDFRI modules
+@ingroup     boards
+@brief       Support for the IKEA TRÅDFRI modules
 
 ## Overview
 The IKEA TRÅDFRI is a small board found in different IKEA TRÅDFRI products.
@@ -223,4 +222,3 @@ toolchain.
 
 ## License information
 * Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */

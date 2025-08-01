@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_im880b im880b
 @ingroup     boards
 @brief       Support for the im880b with stm32l151cb-a
@@ -65,7 +64,6 @@ port is /dev/ttyUSB0. The pin connections are:
 ```
 BOARD=im880b make term
 ```
- */
 
 ## SX1272 radio
 Please note that the board has a Semtech SX1272 radio. This means that when the
