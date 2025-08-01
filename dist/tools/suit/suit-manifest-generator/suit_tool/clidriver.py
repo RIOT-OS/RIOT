@@ -65,3 +65,6 @@ class CLIDriver(object):
         }[self.options.action](self.options) or 0
 
         sys.exit(rc)
+
+if __name__ == "__main__":
+    main()
