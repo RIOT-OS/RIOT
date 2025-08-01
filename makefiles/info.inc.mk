@@ -134,9 +134,23 @@ define _to_json_string_list
 [$(filter-out "","$(subst $(space),"$(comma)$(space)",$(1))")]
 endef
 
-# Strips out any existing quotes so that the generated JSON is valid, not necessary sensible
+json_escape_swap := EsCaPe
+json_escape_quote := QuOtE
+# Corrects quotation and escape sequences in a string to be JSON compliant.
 define to_json_string_list
-$(call _to_json_string_list,$(strip $(subst ",,$(subst \",,$(1)))))
+$(call _to_json_string_list,$(strip $(subst $(json_escape_swap),\,\
+  $(subst $(json_escape_quote),",\
+  $(subst ",'\\\"',\
+  $(subst \,\\,\
+  $(subst \\,$(json_escape_swap)$(json_escape_swap),\
+  $(subst \/,$(json_escape_swap)/,\
+  $(subst \b,$(json_escape_swap)b,\
+  $(subst \f,$(json_escape_swap)f,\
+  $(subst \n,$(json_escape_swap)n,\
+  $(subst \r,$(json_escape_swap)r,\
+  $(subst \t,$(json_escape_swap)t,\
+  $(subst \u,$(json_escape_swap)u,\
+  $(subst \",$(json_escape_swap)$(json_escape_swap)$(json_escape_quote),$(1))))))))))))))))
 endef
 
 # Crude json encoded build info.
@@ -144,8 +158,7 @@ endef
 # converting the space separated lists in Make to a JSON array is flawed, it
 # doesn't consider quoted parts as a single list item.  This mainly shows up in
 # cflags such as:  -DNIMBLE_HOST_PRIO="(NIMBLE_CONTROLLER_PRIO + 1)", this is
-# splitted into 3 array elements. To ensure that the generated JSON is valid,
-# double quotes are currently stripped before generating the array.
+# splitted into 3 array elements.
 info-build-json:
 	@echo '{ '
 	@echo '"APPLICATION": "$(APPLICATION)",'
@@ -156,12 +169,15 @@ info-build-json:
 	@echo '"BOARDDIR": "$(BOARDDIR)",'
 	@echo '"RIOTCPU": "$(RIOTCPU)",'
 	@echo '"RIOTPKG": "$(RIOTPKG)",'
-	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null,$(EXTERNAL_BOARD_DIRS)),'
+	@echo '"EXTERNAL_BOARD_DIRS": $(call to_json_string_list,$(EXTERNAL_BOARD_DIRS)),'
 	@echo '"BINDIR": "$(BINDIR)",'
 	@echo '"ELFFILE": "$(ELFFILE)",'
 	@echo '"HEXFILE": "$(HEXFILE)",'
 	@echo '"BINFILE": "$(BINFILE)",'
 	@echo '"FLASHFILE": "$(FLASHFILE)",'
+	@echo '"EXTERNAL_MODULE_DIRS": $(call to_json_string_list,$(EXTERNAL_MODULE_DIRS)),'
+	@echo '"EXTERNAL_MODULE_PATHS": $(call to_json_string_list,$(EXTERNAL_MODULE_PATHS)),'
+	@echo '"EXTERNAL_PKG_DIRS": $(call to_json_string_list,$(EXTERNAL_PKG_DIRS)),'
 	@echo '"DEFAULT_MODULE": $(call to_json_string_list,$(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE)))),'
 	@echo '"DISABLE_MODULE": $(call to_json_string_list,$(sort $(DISABLE_MODULE))),'
 	@echo '"USEMODULE": $(call to_json_string_list,$(sort $(filter-out $(DEFAULT_MODULE), $(USEMODULE)))),'
@@ -257,3 +273,46 @@ info-rust:
 	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
 	@echo "You can also call cargo related commands with \`make cargo-command CARGO_COMMAND=\"cargo check\"\`."
 	@echo "Beware that the way command line arguments are passed in is not consistent across cargo commands, so adding \`--profile $(CARGO_PROFILE)\` or other flags from above as part of CARGO_COMMAND may be necessary."
+
+info-sbom-input:
+	@echo ">>>> BEGIN SBOM INPUT"
+	@echo "{"
+	@echo "  \"application\": {\"name\": \"$(APPLICATION)\", \"source_dir\": \"$(CURDIR)\", \"build_dir\": \"$(BINDIR)\"},"
+	@riot_version=$$(git rev-parse --verify HEAD); \
+	  riot_remote_name=$$(git branch -r --color=never --no-column --no-format --contains $${riot_version} | head -n1 | cut -d / -f1 | sed -E 's/^\s*//'); \
+	  riot_or_fork_url=$$(git remote get-url $${riot_remote_name}); \
+	  echo "  \"riot\": {\"source_dir\": \"$(RIOTBASE)\", \"url\": \"$${riot_or_fork_url}\", \"version\": \"$${riot_version}\", \"license\": \"LGPL-2.1\"},"
+	@echo "  \"board\": {\"name\": \"$(BOARD)\", \"source_dir\": \"$(BOARDDIR)\"},"
+	@echo "  \"external_modules\": ["
+	@imod=0; for module_path in $(EXTERNAL_MODULE_PATHS); \
+	do \
+	  imod=$$(( $${imod} + 1 )); \
+      echo -n "    "; \
+	  [ $${imod} -gt 1 ] && echo -n ","; \
+	  echo "{\"name\": \"$$(basename $${module_path})\", \"source_dir\": \"$${module_path}\"}"; \
+	done
+	@echo "  ],"
+	@echo "  \"packages\": ["
+	@ipkg=0; for pkg in $(sort $(USEPKG)); \
+	  do \
+	    ipkg=$$(( $${ipkg} + 1 )); \
+        echo -n "    "; \
+	    [ $${ipkg} -gt 1 ] && echo -n ","; \
+	    for pth in $(PKG_PATHS); \
+		do \
+		  case "$${pth}" in \
+		    */$${pkg}/) \
+			  pkg_def_dir="$${pth}"; \
+			  break; \
+			  ;; \
+		  esac; \
+		done; \
+		pkg_source_dir="$(RIOTBASE)/build/pkg/$${pkg}"; \
+	    pkg_vars=$$(make -j1 -p -n -C "$${pkg_def_dir}" 2>/dev/null | grep -E '(PKG_URL|PKG_VERSION|PKG_LICENSE)\s*:?='); \
+	    pkg_url=$$(echo $${pkg_vars} | grep -E '^PKG_URL' "$${pkg_def_dir}/Makefile" | sed -E 's/^\s*PKG_URL\s*:?=\s*//'); \
+	    pkg_ver=$$(echo $${pkg_vars} | grep -E '^PKG_VERSION' "$${pkg_def_dir}/Makefile" | sed -E 's/^\s*PKG_VERSION\s*:?=\s*//'); \
+	    pkg_lic=$$(echo $${pkg_vars} | grep -E '^PKG_LICENSE' "$${pkg_def_dir}/Makefile" | sed -E 's/^\s*PKG_LICENSE\s*:?=\s*//'); \
+	    echo "{\"name\": \"$${pkg}\", \"definition_dir\": \"$${pkg_def_dir}\", \"source_dir\": \"$${pkg_source_dir}\", \"url\": \"$${pkg_url}\", \"version\": \"$${pkg_ver}\", \"license\": \"$${pkg_lic}\"}"; \
+	  done
+	@echo "]}"
+	@echo "<<<< END SBOM INPUT"
