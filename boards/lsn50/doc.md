@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_lsn50 Dragino LSN50 LoRa Sensor Node
 @ingroup     boards
 @brief       Support for the Dragino LSN50 LoRa Sensor Node
@@ -47,5 +46,3 @@ required. Use the `term` target to open a terminal:
 
 If an external ST-Link adapter is used, RX and TX pins can be directly connected
 to it. In this case, STDIO is available on /dev/ttyACMx (Linux case).
-
- */
