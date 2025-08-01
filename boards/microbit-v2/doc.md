@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_microbit_v2 BBC micro:bit v2
 @ingroup     boards
 @brief       Support for the BBC micro:bit v2
@@ -52,5 +51,3 @@ may need to press hard if you have dry fingers.  See [the micro:bit documentatio
 for more information. Capacitive mode is currently not supported.
 
 [the micro:bit documentation on touch]: https://support.microbit.org/support/solutions/articles/19000116318-touch-sensing-on-the-micro-bit
-
- */

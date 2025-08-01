@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_msbiot MSB-IoT
 @ingroup     boards
 @brief       Support for the MSB-IoT board
@@ -342,4 +341,3 @@ Step 1: Connect your adapter and the boards pin strip with RX<=>PA02,
 TX<=>PA03 and GND<=>GND
 
 Step 2: Done. The MCUs USART2 is used as STDIO.
- */

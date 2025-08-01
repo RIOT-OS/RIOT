@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_mulle Eistec Mulle
 @ingroup     boards
 @brief       Support for Eistec Mulle IoT boards
@@ -70,4 +69,3 @@ straightforward, Makefiles and build system is fully functional with Clang.
 ### Programming and Debugging
 
 See [Eistec wiki](https://github.com/eistec/mulle/wiki).
- */
