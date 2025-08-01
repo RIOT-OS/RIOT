@@ -1,23 +1,6 @@
-/**
- * Auto initialization for SAUL devices
- *
- * Copyright (C) 2020 Freie Universität Berlin
- *               2020 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013  INRIA.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
- * @ingroup sys_auto_init
- * @{
- * @file
- * @brief   initializes any used SAUL device that has a trivial init function
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
- * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
- * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
- * @}
+/*
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #include "kernel_defines.h"
