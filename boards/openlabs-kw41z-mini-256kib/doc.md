@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_openlabs-kw41z-mini-256kib openlabs.co kw41z-mini-256kib board
 @ingroup     boards
 @brief       Support for openlabs-kw41z-mini (256kib Version)
@@ -18,5 +17,3 @@ microcontroller.
 
 ### M41W 9VT4 1N16S CTHHQP for the 512kiB version
 ![openlabs-kw41z-mini](https://user-images.githubusercontent.com/1301112/75628762-74478b80-5bdc-11ea-83ca-277e263867f6.jpg)
-
-*/

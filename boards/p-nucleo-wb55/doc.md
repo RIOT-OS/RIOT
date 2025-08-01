@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_p-nucleo-wb55 STM32 p-nucleo-wb55
 @ingroup     boards
 @brief       Support for the STM32 p-nucleo-wb55
@@ -126,5 +125,3 @@ make BOARD=p-nucleo-wb55 -C examples/basic/hello-world term
 |                   | USB               | yes       |            |
 |                   | PWM               | yes       | dev 0/4 ch |
 |                   | AES               | no        |            |
-
-*/

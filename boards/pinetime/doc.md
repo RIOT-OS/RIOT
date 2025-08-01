@@ -1,4 +1,3 @@
-/**
 @defgroup    boards_pinetime PineTime
 @ingroup     boards
 @brief       Support for the Pinetime
@@ -10,5 +9,3 @@ for an open source smartwatch in collaboration with wearable RTOS and Linux app
 developers & communities."
 
 See https://wiki.pine64.org/index.php/PineTime for more information.
-
- */
