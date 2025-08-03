@@ -134,16 +134,16 @@ static int _init(vl53l1x_t *dev);
 #if IS_USED(MODULE_VL53L1X_ST_API)
 
 /* for ST VL53L1X API basic read and write function are already implemented */
-#  define _read_byte(d, i, b)     VL53L1_RdByte((VL53L1_Dev_t*)d, i, b)
-#  define _read_word(d, i, w)     VL53L1_RdWord((VL53L1_Dev_t*)d, i, w)
-#  define _read(d, i, p, l)       VL53L1_ReadMulti((VL53L1_Dev_t*)d, i, p, l)
+#  define _read_byte(d, i, b)   VL53L1_RdByte((VL53L1_Dev_t*)d, i, b)
+#  define _read_word(d, i, w)   VL53L1_RdWord((VL53L1_Dev_t*)d, i, w)
+#  define _read(d, i, p, l)     VL53L1_ReadMulti((VL53L1_Dev_t*)d, i, p, l)
 
-#  define _write_byte(d, i, b)    VL53L1_WrByte((VL53L1_Dev_t*)d, i, b)
-#  define _write_word(d, i, w)    VL53L1_WrWord((VL53L1_Dev_t*)d, i, w)
-#  define _write_dword(d, i, w)   VL53L1_WrDWord((VL53L1_Dev_t*)d, i, w)
-#  define _write(d, i, p, l)      VL53L1_WriteMulti((VL53L1_Dev_t*)d, i, p, l)
+#  define _write_byte(d, i, b)  VL53L1_WrByte((VL53L1_Dev_t*)d, i, b)
+#  define _write_word(d, i, w)  VL53L1_WrWord((VL53L1_Dev_t*)d, i, w)
+#  define _write_dword(d, i, w) VL53L1_WrDWord((VL53L1_Dev_t*)d, i, w)
+#  define _write(d, i, p, l)    VL53L1_WriteMulti((VL53L1_Dev_t*)d, i, p, l)
 
-#  define _start(d)   VL53L1_StartMeasurement((VL53L1_Dev_t*)d)
+#  define _start_meas(d)        VL53L1_StartMeasurement((VL53L1_Dev_t*)d)
 
 extern VL53L1_Error VL53L1_UpdateByte(VL53L1_DEV Dev, uint16_t index,
                                                       uint8_t AndData,
@@ -185,7 +185,7 @@ static int _write_word(const vl53l1x_t *dev, uint16_t index, uint16_t data);
 static int _write_dword(const vl53l1x_t *dev, uint16_t index, uint32_t data);
 #  endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 
-static int _start(const vl53l1x_t *dev);
+static int _start_meas(const vl53l1x_t *dev);
 static int _update_dss(const vl53l1x_t *dev, _vl53l1x_raw_data_t* raw_data);
 
 #  if !IS_USED(MODULE_VL53L1X_BASIC)
@@ -386,7 +386,7 @@ int vl53l1x_read_data(vl53l1x_t *dev, vl53l1x_data_t *data)
 #endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 
     /* restart measurement */
-    EXEC_RET(_start(dev));
+    EXEC_RET(_start_meas(dev));
 
 #endif /* IS_USED(MODULE_VL53L1X_ST_API) */
 
@@ -943,7 +943,7 @@ static int _init(vl53l1x_t *dev)
 #endif /* IS_USED(MODULE_VL53L1X_BASIC) */
 
     /* start measurement */
-    EXEC_RET(_start(dev));
+    EXEC_RET(_start_meas(dev));
 
     return VL53L1X_OK;
 }
@@ -1002,7 +1002,7 @@ static int _reset(vl53l1x_t *dev)
 
 #if !IS_USED(MODULE_VL53L1X_ST_API)
 
-static int _start(const vl53l1x_t *dev)
+static int _start_meas(const vl53l1x_t *dev)
 {
     /* Copyrighted POLOLU / ST API code begin */
 
