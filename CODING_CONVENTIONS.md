@@ -390,7 +390,7 @@ Wrong:
 ## Documentation
 
 * All documentation must be in English.
-* All files contain the copyright note and the author.
+* All files have to contain the copyright and the author note in the SPDX format.
 * Doxygen documentation is mandatory for all header files.
 * Every header file includes a general description about the provided
   functionality.
@@ -400,11 +400,8 @@ An exemplary doxygen documentation in a header file can look like this.
 
 ```
 /*
- * Copyright (C) 2014 Peter Schmerzl <peter@schmerzl-os.org>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014 Peter Schmerzl <peter@schmerzl-os.org>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -430,6 +427,42 @@ An exemplary doxygen documentation in a header file can look like this.
  */
  int set_foobar(int state, int *old_state);
 ```
+
+### SPDX
+
+SPDX (System Package Data Exchange) is an open standard for adding
+information about licenses, security information or other metadata to source files.
+It allows for easy, automatic generation of SBOMs (Software Bill of Materials).
+
+RIOT used to use the standard copyright format in a long form, however this
+adds a lot of boilerplate code without much benefit. Furthermore the copyright
+notices tend to vary depending on the author, making it difficult to parse
+automatically and reliably.
+
+Old Style - License Information:
+```
+/*
+ * Copyright (C) 2013, 2014 INRIA
+ *               2015 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+```
+
+New Style - SPDX Format:
+```
+/*
+ * SPDX-FileCopyrightText: 2013-2014 INRIA
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+```
+
+More information concerning the transition to SPDX format can be found
+[here](https://github.com/RIOT-OS/RIOT/issues/21515).
 
 ## Common compilation warnings
 
