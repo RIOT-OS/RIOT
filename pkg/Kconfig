@@ -6,7 +6,6 @@
 #
 menu "Packages"
 
-rsource "driver_sen5x/Kconfig"
 rsource "flashdb/Kconfig"
 rsource "libfixmath/Kconfig"
 rsource "libschc/Kconfig"
