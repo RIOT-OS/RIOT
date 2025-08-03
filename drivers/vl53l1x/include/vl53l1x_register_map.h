@@ -35,13 +35,12 @@
  *
  */
 
+#pragma once
+
 /**
  * @file   vl53l1x_register_map.h
  * @brief  VL53L1X Register Map definitions
  */
-
-#ifndef VL53L1X_REGISTER_MAP_H
-#define VL53L1X_REGISTER_MAP_H
 
 #ifndef DOXYGEN
 
@@ -11878,4 +11877,3 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* VL53L1X_REGISTER_MAP_H */

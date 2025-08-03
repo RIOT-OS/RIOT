@@ -599,5 +599,4 @@ int vl53l1x_int_config(vl53l1x_t *dev, vl53l1x_int_config_t* cfg,
 }
 #endif
 
-#endif /* VL53L1X_H */
 /** @} */
