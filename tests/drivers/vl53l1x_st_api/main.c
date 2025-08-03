@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -15,14 +12,13 @@
  * The test application provides a direct test for the ST VL53L1X API
  * driver module vl53l1x_st_api, which supports the full functionality
  * of the sensor. Although the ST VL53L1X API driver could also be tested
- * with tests/driver_vl53l1x, this test application allows the use of the
+ * with tests/drivers/vl53l1x, this test application allows the use of the
  * ST VL53L1X API driver without additional definitions and is thus covered
  * by CI compilation.
  *
  * If the configuration parameter VL53L1X_PARAM_PIN_INT is defined, interrupts
- * are used to get data instead of polling for new data. In the case of driver
- * variant vl53l1x_st_api, threshold interrupts are configured. Otherwise
- * only data interrupts are used.
+ * are used to get data instead of polling for new data. Additionally,
+ * threshold interrupts are configured in this case.
  *
  * In all cases, the sensor is configured with following default parameters:
  *
