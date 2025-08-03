@@ -110,9 +110,6 @@
  * @file
  */
 
-#ifndef VL53L1X_H
-#define VL53L1X_H
-
 #ifdef __cplusplus
 extern "C"
 {
