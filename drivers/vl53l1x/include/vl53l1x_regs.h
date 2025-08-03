@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     drivers_vl53l1x
@@ -13,9 +12,6 @@
  * @file
  * @{
  */
-
-#ifndef VL53L1X_REGS_H
-#define VL53L1X_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -30,14 +26,14 @@ extern "C"
  * @name    Register addresses
  *
  * Register addresses are included from ST VL53L1X Register Map definitions.
- * Only addition addresses are defined here
+ * Only additionial addresses are defined here.
  *
  * @{
  */
-#define VL53L1X_MM_CONFIG__TIMEOUT_MACROP_A     (0x005a)
-#define VL53L1X_MM_CONFIG__TIMEOUT_MACROP_B     (0x005c)
-#define VL53L1X_RANGE_CONFIG__TIMEOUT_MACROP_A  (0x005e)
-#define VL53L1X_RANGE_CONFIG__TIMEOUT_MACROP_B  (0x0061)
+#  define VL53L1X_MM_CONFIG__TIMEOUT_MACROP_A     (0x005a)
+#  define VL53L1X_MM_CONFIG__TIMEOUT_MACROP_B     (0x005c)
+#  define VL53L1X_RANGE_CONFIG__TIMEOUT_MACROP_A  (0x005e)
+#  define VL53L1X_RANGE_CONFIG__TIMEOUT_MACROP_B  (0x0061)
 /** @} */
 #endif /* !DOXYGEN */
 
@@ -48,5 +44,4 @@ extern "C"
 }
 #endif
 
-#endif /* VL53L1X_REGS_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
+ * SPDX-FileCopyrightText: 2025 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/*
  * @note: Parts of the code are based on
  * [Pololu VL53L1X library for Arduino](https://github.com/pololu/vl53l1x-arduino)
  * These parts are marked accordingly and are subject to the copyright below
@@ -28,7 +27,7 @@
  * ---------------------------------------------------------------------------
  *
  * Copyright (c) 2017, STMicroelectronics
- * Copyright (c) 2018, Pololu Corporation
+ * Copyright (c) 2018-2022, Pololu Corporation
  * All Rights Reserved
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,21 +80,21 @@
 
 #if IS_ACTIVE(ENABLE_DEBUG)
 
-#define ASSERT_PARAM(cond) \
+#  define ASSERT_PARAM(cond) \
     if (!(cond)) { \
         DEBUG("[vl53l1x] %s: %s\n", \
               __func__, "parameter condition (" # cond ") not fulfilled"); \
         assert(cond); \
     }
 
-#define DEBUG_DEV(f, d, ...) \
+#  define DEBUG_DEV(f, d, ...) \
         DEBUG("[vl53l1x] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->params.i2c_dev, VL53L1X_I2C_ADDRESS, ## __VA_ARGS__);
 
 #else /* IS_ACTIVE(ENABLE_DEBUG) */
 
-#define ASSERT_PARAM(cond) assert(cond);
-#define DEBUG_DEV(f, d, ...)
+#  define ASSERT_PARAM(cond) assert(cond);
+#  define DEBUG_DEV(f, d, ...)
 
 #endif /* IS_ACTIVE(ENABLE_DEBUG) */
 
@@ -135,16 +134,16 @@ static int _init(vl53l1x_t *dev);
 #if IS_USED(MODULE_VL53L1X_ST_API)
 
 /* for ST VL53L1X API basic read and write function are already implemented */
-#define _read_byte(d, i, b)     VL53L1_RdByte((VL53L1_Dev_t*)d, i, b)
-#define _read_word(d, i, w)     VL53L1_RdWord((VL53L1_Dev_t*)d, i, w)
-#define _read(d, i, p, l)       VL53L1_ReadMulti((VL53L1_Dev_t*)d, i, p, l)
+#  define _read_byte(d, i, b)     VL53L1_RdByte((VL53L1_Dev_t*)d, i, b)
+#  define _read_word(d, i, w)     VL53L1_RdWord((VL53L1_Dev_t*)d, i, w)
+#  define _read(d, i, p, l)       VL53L1_ReadMulti((VL53L1_Dev_t*)d, i, p, l)
 
-#define _write_byte(d, i, b)    VL53L1_WrByte((VL53L1_Dev_t*)d, i, b)
-#define _write_word(d, i, w)    VL53L1_WrWord((VL53L1_Dev_t*)d, i, w)
-#define _write_dword(d, i, w)   VL53L1_WrDWord((VL53L1_Dev_t*)d, i, w)
-#define _write(d, i, p, l)      VL53L1_WriteMulti((VL53L1_Dev_t*)d, i, p, l)
+#  define _write_byte(d, i, b)    VL53L1_WrByte((VL53L1_Dev_t*)d, i, b)
+#  define _write_word(d, i, w)    VL53L1_WrWord((VL53L1_Dev_t*)d, i, w)
+#  define _write_dword(d, i, w)   VL53L1_WrDWord((VL53L1_Dev_t*)d, i, w)
+#  define _write(d, i, p, l)      VL53L1_WriteMulti((VL53L1_Dev_t*)d, i, p, l)
 
-#define _start(d)   VL53L1_StartMeasurement((VL53L1_Dev_t*)d)
+#  define _start(d)   VL53L1_StartMeasurement((VL53L1_Dev_t*)d)
 
 extern VL53L1_Error VL53L1_UpdateByte(VL53L1_DEV Dev, uint16_t index,
                                                       uint8_t AndData,
@@ -182,14 +181,14 @@ static int _read_word(const vl53l1x_t *dev, uint16_t index, uint16_t *data);
 static int _write(const vl53l1x_t *dev, uint16_t index, const uint8_t *data, uint32_t len);
 static int _write_byte(const vl53l1x_t *dev, uint16_t index, uint8_t data);
 static int _write_word(const vl53l1x_t *dev, uint16_t index, uint16_t data);
-#if !IS_USED(MODULE_VL53L1X_BASIC)
+#  if !IS_USED(MODULE_VL53L1X_BASIC)
 static int _write_dword(const vl53l1x_t *dev, uint16_t index, uint32_t data);
-#endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
+#  endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 
 static int _start(const vl53l1x_t *dev);
 static int _update_dss(const vl53l1x_t *dev, _vl53l1x_raw_data_t* raw_data);
 
-#if !IS_USED(MODULE_VL53L1X_BASIC)
+#  if !IS_USED(MODULE_VL53L1X_BASIC)
 static int _setup_manual_calibration(const vl53l1x_t *dev);
 static uint16_t _enc_timeout(uint32_t clks);
 static uint32_t _dec_timeout(uint16_t val);
@@ -197,12 +196,12 @@ static uint32_t _timeout_clk_to_us(uint32_t clks, uint32_t period_us);
 static uint32_t _timeout_us_to_clk(uint32_t us, uint32_t period_us);
 static uint32_t _calc_macro_period(const vl53l1x_t *dev, uint8_t vcsel_period);
 
-#endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
+#  endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 
 /* Copyrighted POLOLU / ST API code begin */
-#if !IS_USED(MODULE_VL53L1X_BASIC)
+#  if !IS_USED(MODULE_VL53L1X_BASIC)
 static const uint32_t _timing_guard = 4528;  /* used in timing budget calculations */
-#endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
+#  endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 static const uint16_t _target_rate = 0x0A00; /* used in DSS calculations */
 /* Copyrighted POLOLU / ST API code end */
 
@@ -864,13 +863,13 @@ static int _init(vl53l1x_t *dev)
 
 #else /* IS_USED(MODULE_VL53L1X_BASIC) */
 
-#if IS_USED(MODULE_VL53L1X_ST_API)
+#  if IS_USED(MODULE_VL53L1X_ST_API)
 
     /* configure the device without calibration data */
     EXEC_RET(VL53L1_DataInit(&dev->dev));
     EXEC_RET(VL53L1_StaticInit(&dev->dev));
 
-#else /* IS_USED(MODULE_VL53L1X_ST_API) */
+#  else /* IS_USED(MODULE_VL53L1X_ST_API) */
 
     /* Copyrighted POLOLU / ST API code begin */
     /* store oscillator info for later use */
@@ -934,7 +933,7 @@ static int _init(vl53l1x_t *dev)
 
     /* Copyrighted POLOLU / ST API code end */
 
-#endif /* IS_USED(MODULE_VL53L1X_ST_API) */
+#  endif /* IS_USED(MODULE_VL53L1X_ST_API) */
 
     /* set measurement parameters */
     EXEC_RET(vl53l1x_set_distance_mode(dev, dev->params.mode));
@@ -1017,7 +1016,7 @@ static int _start(const vl53l1x_t *dev)
 
 /* Copyrighted POLOLU / ST API code begin */
 
-#if !IS_USED(MODULE_VL53L1X_BASIC)
+#  if !IS_USED(MODULE_VL53L1X_BASIC)
 
 static uint32_t _dec_timeout(uint16_t val)
 {
@@ -1127,7 +1126,7 @@ static int _setup_manual_calibration(const vl53l1x_t *dev)
     return VL53L1X_OK;
 }
 
-#endif /* IS_USED(MODULE_VL53L1X_BASIC) */
+#  endif /* IS_USED(MODULE_VL53L1X_BASIC) */
 
 static int _update_dss(const vl53l1x_t *dev, _vl53l1x_raw_data_t* raw)
 {
@@ -1190,7 +1189,7 @@ static int _update_dss(const vl53l1x_t *dev, _vl53l1x_raw_data_t* raw)
 
 /* Copyrighted POLOLU / ST API code end */
 
-#define VL53L1X_BUFSIZ   32
+#  define VL53L1X_BUFSIZ   32
 static uint8_t _buffer[VL53L1X_BUFSIZ] = {};
 
 static int _read_byte(const vl53l1x_t *dev, uint16_t index, uint8_t *data)
@@ -1257,14 +1256,14 @@ static int _write_word(const vl53l1x_t *dev, uint16_t index, uint16_t data)
     return _write(dev, index, (uint8_t*)&bytes, 2);
 }
 
-#if !IS_USED(MODULE_VL53L1X_BASIC)
+#  if !IS_USED(MODULE_VL53L1X_BASIC)
 static int _write_dword(const vl53l1x_t *dev, uint16_t index, uint32_t data)
 {
     uint8_t bytes[4] = { (data >> 24) & 0xff, (data >> 16) & 0xff,
                          (data >> 8) & 0xff, data & 0xff };
     return _write(dev, index, (uint8_t*)&bytes, 4);
 }
-#endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
+#  endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 
 static int _write(const vl53l1x_t *dev, uint16_t index, const uint8_t *pdata, uint32_t len)
 {
