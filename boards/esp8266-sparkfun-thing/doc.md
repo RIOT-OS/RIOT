@@ -1,0 +1,106 @@
+@defgroup    boards_esp8266_sparkfun-thing SparkFun ESP8266 Thing
+@ingroup     boards_esp8266
+@brief       Support for the SparkFun ESP8266 Thing modules.
+
+## Overview
+
+The [SparkFun ESP8266 Thing](https://www.sparkfun.com/products/13231) and
+[SparkFun ESP8266 Thing DEV](https://www.sparkfun.com/products/13711) are
+low-cost and easy to use breakout and development boards for the ESP8266.
+Both SparkFun ESP8266 Thing boards are relatively simple boards. The pins
+are simply broken out to two parallel, breadboard-compatible rows.
+
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_x.png" "SparkFun ESP8266 Thing (left) / SparkFun ESP8266 Thing DEV (right)"
+
+## Hardware
+
+### MCU
+
+Most features of the board are provided by the ESP8266EX SoC.
+
+<center>
+
+MCU         | ESP8266EX
+------------|----------------------------
+Family      | Tensilica Xtensa LX106
+Vendor      | Espressif
+RAM         | 80 kByte
+Flash       | 512 kByte
+Frequency   | 80 / 160 MHz
+FPU         | no
+Timers      | 1 x 32 bit
+ADCs        | 1 x 10 bit (1 channel)
+LEDs        | 1 x GPIO1
+I2Cs        | 2 (software implementation)
+SPIs        | 1
+UARTs       | 1 (console)
+WiFi        | built in
+Vcc         | 2.5 - 3.6 V
+Datasheet   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/0a-esp8266ex_datasheet_en.pdf)
+Technical Reference | [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
+Board Schematic | [ESP8266 Thing](https://cdn.sparkfun.com/datasheets/Wireless/WiFi/SparkFun_ESP8266_Thing.pdf)\n [ESP8266 Thing Dev](https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266-Thing-Dev-v10.pdf)
+
+</center>
+
+### Board Versions
+
+Although the board definition works with both boards, it's important
+to know that they differ slightly in some features:
+
+<center>
+
+Feature                        | ESP8266 Thing | ESP8266 Thing Dev
+-------------------------------|---------------|------------------
+USB to Serial adapter on-board | no            | yes
+I2C pull-up resistors on-board | yes (jumpable)| no [1]
+Programming interface          | FTDI USB to Serial adapter | USB
+Reset/Flash/Boot logic         | FTDI          | USB
+Battery connector              | yes           | no (can be retrofitted)
+LiPo Charger on-board          | yes           | no
+LED (GPIO5)                    | high active   | low active [2]
+GPIO15 broken out              | no            | yes
+CHIP_EN broken out             | yes           | no
+
+</center>
+
+[1] Although the SparkFun ESP8266 Thing Dev has no on-board I2C pull-up
+resistors, the I2C interface can be used because the ESP8266 SoC has
+built-in pull-up resistors that are activated by the I2C peripheral driver.
+
+[2] The board configuration defines high-active LEDs. If the
+SparkFun ESP8266 Thing Dev is used with this board configuration,
+the LED outputs must be inverted by the application.
+
+### RIOT Pin Mapping
+
+The following figures show the mapping of these pin holes to RIOT pins.
+
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_pinout.png" "SparkFun Thin Pinout"
+\n
+
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_Dev_pinout.png" "SparkFun Thin Dev Pinout"
+\n
+
+Flash SPI pins including GPIO9 and GPIO10 are not broken out. The
+SparkFun Thing board has solder pads for these pins at the bottom layer.
+
+## Flashing the Device
+
+To flash the RIOT image, the device has to be connected to the host computer.
+Since the SparkFun Thing Dev board has an USB to Serial adapter on board,
+this can done directly using the Micro USB. SparkFun Thin board has to be
+connected to the host computer using the FTDI interface and a FTDI USB to
+Serial adapter/cable. For more information on how to program the
+SparkFun Thing board, please refer the
+[ESP8266 Thing Hookup Guide](https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/programming-the-thing).
+
+@note Please make sure the FTDI USB to Serial adapter/cable uses 3.3 V.
+
+Both boards have a reset/flash/boot logic on-board so that flashing is
+quite simple. To flash the RIOT image just type:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make flash BOARD=esp8266-sparkfun-thing ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For detailed information about ESP8266 as well as configuring and compiling
+RIOT for ESP8266 boards, see \ref esp8266_riot.
