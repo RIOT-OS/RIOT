@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_sltb001a Silicon Labs SLTB001A starter kit
- * @ingroup     boards
- * @brief       Support for Silicon Labs SLTB001A starter kit
+@defgroup   boards_sltb001a Silicon Labs SLTB001A starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs SLTB001A starter kit
 
 ## Overview
 Silicon Labs Thunderboard Sense is equipped with the EFM32 microcontroller. It
@@ -236,5 +235,4 @@ the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.c
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
