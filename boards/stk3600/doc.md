@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_stk3600 Silicon Labs STK3600 starter kit
- * @ingroup     boards
- * @brief       Support for Silicon Labs STK3600 starter kit
+@defgroup    boards_stk3600 Silicon Labs STK3600 starter kit
+@ingroup     boards
+@brief       Support for Silicon Labs STK3600 starter kit
 
 ## Overview
 Silicon Labs EFM32 Leopard Gecko Starter Kit is equipped with the EFM32
@@ -252,5 +251,4 @@ the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.c
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

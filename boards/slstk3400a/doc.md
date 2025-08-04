@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_slstk3400a Silicon Labs SLSTK3400A starter kit
- * @ingroup     boards
- * @brief       Support for Silicon Labs SLSTK3400A starter kit
+@defgroup   boards_slstk3400a Silicon Labs SLSTK3400A starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs SLSTK3400A starter kit
 
 ## Overview
 Silicon Labs EFM32 Happy Gecko Starter Kit is equipped with the EFM32
@@ -230,5 +229,4 @@ the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.c
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

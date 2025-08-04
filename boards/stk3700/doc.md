@@ -1,10 +1,9 @@
-/**
- * @defgroup    boards_slwstk6220a Silicon Labs SLWSTK6220A starter kit
- * @ingroup     boards
- * @brief       Support for Silicon Labs SLWSTK6220A starter kit
+@defgroup   boards_stk3700 Silicon Labs STK3700 starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs STK3700 starter kit
 
 ## Overview
-Silicon Labs EZR32WG 868MHz Wireless Starter Kit is equipped with the EFM32
+Silicon Labs EFM32 Giant Gecko Starter Kit is equipped with the EFM32
 microcontroller. It is specifically designed for low-power applications, having
 energy-saving peripherals, different energy modes and short wake-up times.
 
@@ -14,28 +13,28 @@ actively measure the power consumption of your hardware and code, in real-time.
 ## Hardware
 
 ### MCU
-| MCU             | EZR32WG330F256R60                                                                                 |
-|-----------------|---------------------------------------------------------------------------------------------------|
-| Family          | ARM Cortex-M4F                                                                                    |
-| Vendor          | Silicon Labs                                                                                      |
-| Vendor Family   | EZR32 Wonder Gecko                                                                                |
-| RAM             | 32.0 KiB                                                                                          |
-| Flash           | 256.0 KiB                                                                                         |
-| EEPROM          | no                                                                                                |
-| Frequency       | up to 48 MHz                                                                                      |
-| FPU             | yes                                                                                               |
-| MPU             | yes                                                                                               |
-| DMA             | 12 channels                                                                                       |
-| Timers          | 3x 16-bit + 1x 16-bit (low power)                                                                 |
-| ADCs, DACs      | 12-bit ADC, 12-bit DAC                                                                            |
-| UARTs           | 2x UART, 3x USART, 2x LEUART                                                                      |
-| SPIs            | 3x USART                                                                                          |
-| I2Cs            | 2x                                                                                                |
-| Vcc             | 1.98 V - 3.8 V                                                                                    |
-| Datasheet       | [Datasheet](https://www.silabs.com/documents/public/data-sheets/EZR32WG330_DataSheet.pdf)         |
-| Manual          | [Manual](https://www.silabs.com/documents/public/reference-manuals/EZR32LG-RM.pdf)                |
-| Board Manual    | [Board Manual](https://www.silabs.com/documents/public/user-guides/ug200-brd4502c-user-guide.pdf) |
-| Board Schematic | Can be downloaded using Silicon Labs' Simplicity Studio                                           |
+| MCU             | EFM32GG990F1024                                                                            |
+|-----------------|--------------------------------------------------------------------------------------------|
+| Family          | ARM Cortex-M3                                                                              |
+| Vendor          | Silicon Labs                                                                               |
+| Vendor Family   | EFM32 Giant Gecko                                                                          |
+| RAM             | 128.0 KiB                                                                                  |
+| Flash           | 1024.0 KiB                                                                                 |
+| EEPROM          | no                                                                                         |
+| Frequency       | up to 48 MHz                                                                               |
+| FPU             | no                                                                                         |
+| MPU             | yes                                                                                        |
+| DMA             | 12 channels                                                                                |
+| Timers          | 3x 16-bit + 1x 16-bit (low power)                                                          |
+| ADCs, DACs      | 12-bit ADC, 12-bit DAC                                                                     |
+| UARTs           | 2x UART, 3x USART, 2x LEUART                                                               |
+| SPIs            | 3x USART                                                                                   |
+| I2Cs            | 2x                                                                                         |
+| Vcc             | 1.98 V - 3.8 V                                                                             |
+| Datasheet       | [Datasheet](https://www.silabs.com/documents/public/data-sheets/efm32gg-datasheet.pdf)     |
+| Manual          | [Manual](https://www.silabs.com/documents/public/reference-manuals/EFM32GG-RM.pdf)         |
+| Board Manual    | [Board Manual](https://www.silabs.com/documents/public/user-guides/efm32gg-stk3700-ug.pdf) |
+| Board Schematic | Can be downloaded using Silicon Labs' Simplicity Studio                                    |
 
 ### Pinout
 This is the pinout of the expansion header on the right side of the board.
@@ -44,14 +43,14 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |      | PIN | PIN |      |
 |------|-----|-----|------|
 | 3V3  | 20  | 19  | RES  |
-| 5V   | 18  | 17  | RES  |
-| PD6  | 16  | 15  | PD7  |
-| PD5  | 14  | 13  | PF13 |
+| 5V   | 18  | 17  | PD7  |
+| PD6  | 16  | 15  | PC6  |
+| PD5  | 14  | 13  | PB12 |
 | PD4  | 12  | 11  | PB11 |
-| PD3  | 10  | 9   | PE1  |
-| PD2  | 8   | 7   | PE0  |
-| PD1  | 6   | 5   | PC7  |
-| PD0  | 4   | 3   | PC6  |
+| PD3  | 10  | 9   | PC5  |
+| PD2  | 8   | 7   | PC4  |
+| PD1  | 6   | 5   | PC3  |
+| PD0  | 4   | 3   | PC0  |
 | VMCU | 2   | 1   | GND  |
 
 **Note**: not all starter kits by Silicon Labs share the same pinout!
@@ -64,42 +63,42 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | ADC        | 0       | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
 | DAC        | 0       | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
 | HWCRYPTO   | &mdash; | &mdash;         |                                | AES128/AES256 only                                       |
-| I2C        | 0       | I2C0            | SDA: PE0, SCL: PE1             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| PWM        | 0       | TIMER0          | CHAN0: PF6, CHAN1: PF7         | Mapped to LED0 and LED1                                  |
+| I2C        | 0       | I2C0            | SDA: PD6, SCL: PD7             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+|            | 1       | I2C1            | SDA: PC4, SCL: PC5             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| PWM        | 0       | TIMER3          | CHAN0: PE2                     | Mapped to LED0                                           |
 | RTT        | &mdash; | RTC             |                                | Either RTT or RTC (see below)                            |
 | RTC        | &mdash; | RTC             |                                | Either RTC or RTT (see below)                            |
 | SPI        | 0       | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
-| Timer      | 0       | TIMER1 + TIMER2 |                                | TIMER1 is used as prescaler (must be adjacent)           |
+|            | 1       | USART2          | MOSI: NC, MISO: PC3, CLK: PC4  |                                                          |
+| Timer      | 0       | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjacent)           |
 |            | 1       | LETIMER0        |                                |                                                          |
 | UART       | 0       | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
 |            | 1       | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
 
 ### User interface
-| Peripheral | Mapped to | Pin | Comments   |
-|------------|-----------|-----|------------|
-| Button     | PB0       | PE3 |            |
-|            | PB1       | PE2 |            |
-| LED        | LED0      | PF6 | Yellow LED |
-|            | LED1      | PF7 | Yellow LED |
+| Peripheral | Mapped to | Pin  | Comments   |
+|------------|-----------|------|------------|
+| Button     | PB0       | PB9  |            |
+|            | PB1       | PB10 |            |
+| LED        | LED0      | PE2  | Yellow LED |
+|            | LED1      | PE3  | Yellow LED |
 
 ## Implementation Status
-| Device                        | ID          | Supported | Comments                                                       |
-|-------------------------------|-------------|-----------|----------------------------------------------------------------|
-| MCU                           | EZR32WG     | yes       | Power modes supported                                          |
-| Low-level driver              | ADC         | yes       |                                                                |
-|                               | DAC         | yes       |                                                                |
-|                               | Flash       | yes       |                                                                |
-|                               | GPIO        | yes       | Interrupts are shared across pins (see reference manual)       |
-|                               | HW Crypto   | yes       |                                                                |
-|                               | I2C         | yes       |                                                                |
-|                               | PWM         | yes       |                                                                |
-|                               | RTC         | yes       | As RTT or RTC                                                  |
-|                               | SPI         | partially | Only master mode                                               |
-|                               | Timer       | yes       |                                                                |
-|                               | UART        | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
-|                               | USB         | no        |                                                                |
-| LCD driver                    | LS013B7DH03 | yes       | Sharp Low Power Memory LCD via the U8g2 package                |
-| Temperature + humidity sensor | Si7021      | yes       | Silicon Labs Temperature + Humidity sensor                     |
+| Device           | ID        | Supported | Comments                                                       |
+|------------------|-----------|-----------|----------------------------------------------------------------|
+| MCU              | EFM32GG   | yes       | Power modes supported                                          |
+| Low-level driver | ADC       | yes       |                                                                |
+|                  | DAC       | yes       |                                                                |
+|                  | Flash     | yes       |                                                                |
+|                  | GPIO      | yes       | Interrupts are shared across pins (see reference manual)       |
+|                  | HW Crypto | yes       |                                                                |
+|                  | I2C       | yes       |                                                                |
+|                  | PWM       | yes       |                                                                |
+|                  | RTC       | yes       | As RTT or RTC                                                  |
+|                  | SPI       | partially | Only master mode                                               |
+|                  | Timer     | yes       |                                                                |
+|                  | UART      | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
+|                  | USB       | no        |                                                                |
 
 ## Board configuration
 
@@ -116,11 +115,6 @@ controller firmware installed.
 **Note:** the board controller *always* configures the virtual serial port at
 115200 baud with 8 bits, no parity and one stop bit. This also means that it
 expects data from the MCU with the same settings.
-
-The low power LCD is also used by the board controller when the `DISP_SELECTED`
-pin is low. This pin is not initialized by the board, so you have to ensure
-this pin is initialized by your application if you want to control the low
-power LCD.
 
 ### Advanced Energy Monitor
 This development kit has an Advanced Energy Monitor. It can be connected to the
@@ -252,10 +246,9 @@ make emulate
 ```
 
 ## Supported Toolchains
-For using the Silicon Labs SLWSTK6220A starter kit we strongly recommend
+For using the Silicon Labs STK3700 starter kit we strongly recommend
 the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

@@ -1,7 +1,6 @@
-/**
- * @defgroup    boards_slstk3402a Silicon Labs SLSTK3402A starter kit
- * @ingroup     boards
- * @brief       Support for Silicon Labs SLSTK3402A starter kit
+@defgroup   boards_slstk3402a Silicon Labs SLSTK3402A starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs SLSTK3402A starter kit
 
 ## Overview
 Silicon Labs EFM32 Pearl Gecko PG12 Starter Kit is equipped with the EFM32
@@ -261,5 +260,4 @@ the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.c
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

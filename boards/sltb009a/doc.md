@@ -1,11 +1,10 @@
-/**
- * @defgroup    boards_slstk3701a Silicon Labs SLSTK3701A starter kit
- * @ingroup     boards
- * @brief       Support for Silicon Labs SLSTK3701A starter kit
+@defgroup   boards_sltb009a Silicon Labs SLTB009A starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs SLTB009A starter kit
 
 ## Overview
 
-Silicon Labs EFM32 Giant Gecko GG11 Starter Kit is equipped with the EFM32 microcontroller.
+Silicon Labs Thunderboard GG12 is equipped with the EFM32 microcontroller.
 It is specifically designed for low-power applications, having energy-saving
 peripherals, different energy modes and short wake-up times.
 
@@ -16,53 +15,55 @@ actively measure the power consumption of your hardware and code, in real-time.
 
 ### MCU
 
-| MCU             | EFM32GG11B820F2048GL192                              |
+| MCU             | EFM32GG12B810F1024GM64                               |
 |-----------------|------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                       |
 | Vendor          | Silicon Labs                                         |
-| Vendor Family   | EFM32 Giant Gecko 11B                                |
-| RAM             | 512.0 KiB                                            |
-| Flash           | 2048.0 KiB                                           |
+| Vendor Family   | EFM32 Giant Gecko 12B                                |
+| RAM             | 192.0 KiB                                            |
+| Flash           | 1024.0 KiB                                           |
 | EEPROM          | no                                                   |
 | Frequency       | up to 50 MHz                                         |
 | FPU             | yes                                                  |
 | MPU             | yes                                                  |
-| DMA             | 24 channels                                          |
-| Timers          | 4 x 32-bit + 7 x 16-bit + 1 x 16-bit (low power)     |
-| ADCs            | 2 x 12-bit ADC (1 Msample/s)                         |
+| DMA             | 12 channels                                          |
+| Timers          | 4 x 32-bit, 7 x 16-bit + 1 x 16-bit (low power)      |
+| ADCs            | 12-bit ADC                                           |
 | DACs            | 2 x 12-bit VDAC (500 ksamples/s), 1 x IDAC           |
-| I2Cs            | 3 x                                                  |
-| SPIs            | 4 x USART                                            |
-| UARTs           | 4 x USART, 1 x LEUART                                |
+| I2Cs            | 2 x                                                  |
+| SPIs            | 5 x USART                                            |
+| UARTs           | 2 x UART, 5 x USART, 1 x LEUART                      |
 | USB             | 1 x Low Energy Full-Speed USB 2.0                    |
-| Ethernet        | Ethernet MAC 10/100 Mbps                             |
-| Vcc             | 1.85 V - 3.8 V                                       |
-| Datasheet       | [Datasheet](https://www.silabs.com/documents/public/data-sheets/efm32gg11-datasheet.pdf) |
-| Manual          | [Manual](https://www.silabs.com/documents/public/reference-manuals/efm32gg11-rm.pdf) |
-| Board Manual    | [Board Manual](https://www.silabs.com/documents/public/user-guides/ug287-stk3701.pdf) |
+| Vcc             | 1.8 V - 3.8 V                                        |
+| Datasheet       | [Datasheet](https://www.silabs.com/documents/public/data-sheets/efm32gg12-datasheet.pdf) |
+| Manual          | [Manual](https://www.silabs.com/documents/public/reference-manuals/efm32gg12-rm.pdf) |
+| Board Manual    | [Board Manual](https://www.silabs.com/documents/public/user-guides/ug371-sltb009a-user-guide.pdf) |
 | Board Schematic | Can be downloaded using Silicon Labs' Simplicity Studio |
 
 ### Pinout
 
-This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+This is the pinout of the expansion header of the board.
+PIN 1 is the top-left contact.
 
-| RIOT Peripheral | Name | PIN | PIN | Name   | RIOT Peripheral |
-|-----------------|------|-----|-----|--------|-----------------|
-|                 | 3V3  | 20  | 19  | ID SDA |                 |
-|                 | 5V   | 18  | 17  | ID SCL |                 |
-| I2C_DEV(0):SDA  | PC0  | 16  | 15  | PC1    | I2C_DEV(0):SCL  |
-| UART_DEV(1):RX  | PE9  | 14  | 13  | PB9    |                 |
-| UART_DEV(1):TX  | PE8  | 12  | 11  | PB11   | DAC_LINE(0)     |
-|                 | PE13 | 10  | 9   | PC5    | I2C_DEV(1):SCL  |
-| SPI_DEV(0):CLK  | PE12 | 8   | 7   | PC4    | I2C_DEV(1):SDA  |
-| SPI_DEV(0):MISO | PE11 | 6   | 5   | PA13   |                 |
-| SPI_DEV(0):MOSI | PE10 | 4   | 3   | PA12   |                 |
-|                 | VMCU | 2   | 1   | GND    |                 |
-
-**Note**: not all starter kits by Silicon Labs share the same pinout!
-
-**Note:** some pins are connected to the board controller, when enabled!
+| RIOT Peripheral | Name | PIN | PIN | Name | RIOT Peripheral |
+|-----------------|------|-----|-----|------|-----------------|
+|                 | GND  | 1   | 2   | VMCU |                 |
+|                 | PD0  | 3   | 4   | PA0  | SPI_DEV(0):MOSI |
+|                 | PD1  | 5   | 6   | PA1  | SPI_DEV(0):MISO |
+|                 | PA4  | 7   | 8   | PA2  | SPI_DEV(0):CLK  |
+|                 | PA5  | 9   | 10  | PA3  |                 |
+|                 | PA6  | 11  | 12  | PC4  | UART_DEV(1):TX  |
+|                 | PE15 | 13  | 14  | PC5  | UART_DEV(1):RX  |
+| I2C_DEV(0):SCL  | PE5  | 15  | 16  | PE4  | I2C_DEV(0):SCL  |
+|                 |      | 17  | 18  | 5V   |                 |
+|                 |      | 19  | 20  | 3V3  |                 |
+|                 | PB12 | 21  | 22  | PE8  |                 |
+| DAC_LINE(0)     | PB11 | 23  | 24  | PE9  |                 |
+|                 | PB3  | 25  | 26  | PE10 |                 |
+|                 | PB4  | 27  | 28  | PE11 |                 |
+|                 | PD2  | 29  | 30  | PE13 |                 |
+|                 | PD3  | 31  | 32  | PE14 |                 |
+|                 | PD4  | 33  | 34  | PF5  |                 |
 
 ### Peripheral mapping
 
@@ -70,33 +71,29 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |-------------|---------|------------|------------------|-------------------------------------|
 | ADC         | 0       | ADC0:CH0   |                  | Internal temperature                |
 | ADC         | 1       | ADC0:CH1   |                  | AVDD                                |
-| DAC         | 0       | DAC0:OUT0  | PB11             | AVVD as reference voltage           |
-| I2C         | 0       | I2C0       | SDA:PC0, SCL:PC1 | Normal speed                        |
-| I2C         | 1       | I2C1       | SDA:PC7, SCL:PC5 | Normal speed                        |
-| I2C         | 2       | I2C2       | SDA:PI4, SCL:PI5 | Normal speed, Sensor I2C bus        |
+| I2C         | 0       | I2C0       | SDA:PE4, SCL:PE5 | Normal speed                        |
 | HWCRYPTO    | -       | -          |                  | AES128/AES256, SHA1, SHA224/SHA256  |
 | HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
-| SPI         | 0       | USART0     | MOSI:PE10, MISO:PE11, CLK:PE12 |                       |
-| Timer       | 0       | WTIMER0 + WTIMER1 |           | WTIMER0 is used as prescaler        |
-| Timer       | 1       | TIMER0 + TIMER1   |           | TIMER0 is used as prescaler         |
-| Timer       | 2       | LETIMER0   |                  |                                     |
-| UART        | 0       | USART4     | RX:PH5, TX:PH4   | Default STDIO                       |
-| UART        | 1       | USART5     | RX:PE9, TX:PE8   |                                     |
+| SPI         | 0       | USART3     | MOSI:PA0, MISO:PA1, CLK:PA2 |                          |
+| Timer       | 0       | TIMER0 + TIMER1 |             | TIMER0 is used as prescaler         |
+| Timer       | 1       | LETIMER0   |                  |                                     |
+| UART        | 0       | USART0     | RX:PE6, TX:PE7   | Default STDIO                       |
+| UART        | 1       | UART0      | RX:PC5, TX:PC4   |                                     |
 
 ### User interface
 
 | Peripheral | Mapped to | Pin       | Comments   |
 |------------|-----------|-----------|------------|
-| Button     | PB0_PIN   | PC8       |            |
-|            | PB1_PIN   | PC9       |            |
-| LED        | LED0R_PIN | PH10      |            |
-|            | LED0G_PIN | PH11      |            |
-|            | LED0B_PIN | PH12      |            |
-|            | LED1R_PIN | PH13      |            |
-|            | LED1G_PIN | PH14      |            |
-|            | LED1B_PIN | PH15      |            |
+| Button     | PB0_PIN   | PD5       |            |
+|            | PB1_PIN   | PD8       |            |
+| LED        | LED0R_PIN | PA12      |            |
+|            | LED0G_PIN | PA13      |            |
+|            | LED0B_PIN | PA14      |            |
+|            | LED1R_PIN | PD6       |            |
+|            | LED1G_PIN | PF12      |            |
+|            | LED1B_PIN | PE12      |            |
 |            | LED0_PIN  | LED0R_PIN |            |
 |            | LED1_PIN  | LED1R_PIN |            |
 
@@ -104,10 +101,9 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 | Device           | ID         | Supported | Comments                                           |
 |------------------|------------|-----------|----------------------------------------------------|
-| MCU              | EFM32GG11B | yes       | Power modes supported                              |
+| MCU              | EFM32GG12B | yes       | Power modes supported                              |
 | Low-level driver | ADC        | yes       |                                                    |
 |                  | DAC        | yes       | VDAC, IDAC is not supported                        |
-|                  | Ethernet   | no        |                                                    |
 |                  | Flash      | yes       |                                                    |
 |                  | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
 |                  | HW Crypto  | yes       |                                                    |
@@ -116,7 +112,6 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |                  | RTCC       | yes       | As RTT or RTC                                      |
 |                  | SPI        | yes       | Only master mode                                   |
 |                  | Timer      | yes       |                                                    |
-|                  | TRNG       | yes       | True Random Number Generator                       |
 |                  | UART       | yes       | USART is shared with SPI. LEUART baud rate limited |
 |                  | USB        | yes       | Device mode                                        |
 
@@ -124,37 +119,12 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### Board controller
 
-The starter kit is equipped with a Board Controller. This controller provides a
-virtual serial port. The board controller is enabled via a GPIO pin.
-
-By default, this pin is enabled. You can disable the board controller module by
-passing `DISABLE_MODULE=silabs_bc` to the `make` command.
-
-**Note:** to use the virtual serial port, ensure you have the latest board
-controller firmware installed.
+The starter kit is equipped with a Board Controller. This controller provides
+a virtual serial port.
 
 **Note:** the board controller *always* configures the virtual serial port at
 115200 baud with 8 bits, no parity and one stop bit. This also means that it
 expects data from the MCU with the same settings.
-
-### Advanced Energy Monitor
-
-This development kit has an Advanced Energy Monitor. It can be connected to the
-Simplicity Studio development software.
-
-This development kit can measure energy consumption and correlate this with the
-code. It allows you to measure energy consumption on code-level.
-
-The board controller is responsible for measuring energy consumption. For
-real-time code correlation, the CoreDebug peripheral will be configured to
-output MCU register data and interrupt data via the SWO port.
-
-By default, this feature is enabled. It can be disabled by passing
-`DISABLE_MODULE=silabs_aem` to the `make` command.
-
-Note that Simplicity Studio requires debug symbols to correlate code. RIOT-OS
-defaults to GDB debug symbols, but Simplicity Studio requires DWARF-2 debug
-symbols (`-gdwarf-2` for GCC).
 
 ### Clock selection
 
@@ -216,6 +186,7 @@ Therefore, only one of both peripherals can be enabled at the same time.
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
 ### Hardware crypto
+
 This MCU is equipped with a hardware-accelerated crypto peripheral that can
 speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
 computations.
@@ -251,38 +222,36 @@ connected separately to one of the predefined pins for that peripheral.
 
 ## Flashing the device
 
-The board provides a on-board SEGGER J-Link debugger through the micro USB
-board so that flashing and debugging is very easy.
+The board provides a on-board J-Link debugger through the micro USB board so
+that flashing and debugging is very easy.
 
 Flashing is supported by RIOT-OS using the command below:
-
 ```
 make flash
 ```
 
 To run the GDB debugger, use the command:
-
 ```
 make debug
 ```
 
 Or, to connect with your own debugger:
-
 ```
 make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
-
 ```
 make emulate
 ```
 
 ## Supported Toolchains
-For using the Silicon Labs SLSTK3701A starter kit we strongly recommend
-the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
+
+For using the Silicon Labs SLTB009A starter kit we strongly recommend
+the usage of the
+[GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
 toolchain.
 
 ## License information
-* Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
- */
+
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
