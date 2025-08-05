@@ -34,4 +34,3 @@ code_of_conduct: ../../CODE_OF_CONDUCT.md
 governance: ../../GOVERNANCE.md
 	-@echo "Generating Governance documentation..."
 	-@sed '1,2d' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' | cat ./templates/GOVERNANCE.template.md - > ../guides/general/GOVERNANCE.md
-
