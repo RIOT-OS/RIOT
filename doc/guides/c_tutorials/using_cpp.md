@@ -17,8 +17,8 @@ can be one (or more) of the following:
 - No libstdc++ implementation for the target platform is available to RIOT,
     or the official RIOT docker image is missing it
 - Missing toolchain support for a given target platform
-- The C++ toolchain requires library code 
-    (such as constructor guards for the thread safe initialization of statically 
+- The C++ toolchain requires library code
+    (such as constructor guards for the thread safe initialization of statically
     allocated instances) or hooks in the startup process to perform initialization
 
 # Using C++
