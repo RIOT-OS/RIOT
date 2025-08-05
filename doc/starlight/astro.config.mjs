@@ -47,6 +47,8 @@ export default defineConfig({
             { label: "Introduction", slug: "index" },
             "general/structure",
             "general/vision",
+            "general/governance",
+            "general/code_of_conduct",
           ],
         },
         {
@@ -71,6 +73,7 @@ export default defineConfig({
                 "c_tutorials/threads",
                 "c_tutorials/gpio",
                 "c_tutorials/saul",
+                "c_tutorials/using_cpp",
               ],
             },
             {
