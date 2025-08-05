@@ -47,8 +47,8 @@ export default defineConfig({
             { label: "Introduction", slug: "index" },
             "general/structure",
             "general/vision",
-            "general/governance",
-            "general/code_of_conduct",
+            "generated/governance",
+            "generated/code_of_conduct",
           ],
         },
         {

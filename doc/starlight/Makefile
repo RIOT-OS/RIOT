@@ -27,10 +27,11 @@ integrate_outside_files: code_of_conduct governance
 
 .PHONY: code_of_conduct
 code_of_conduct: ../../CODE_OF_CONDUCT.md
+	-@mkdir -p ../guides/generated
 	-@echo "Generating Code of Conduct documentation..."
-	-@sed '1,2d' $< | cat ./templates/CODE_OF_CONDUCT.template.md - > ../guides/general/CODE_OF_CONDUCT.md
+	-@sed '1,2d' $< | cat ./templates/CODE_OF_CONDUCT.template.md - > ../guides/generated/CODE_OF_CONDUCT.md
 
 .PHONY: governance
 governance: ../../GOVERNANCE.md
 	-@echo "Generating Governance documentation..."
-	-@sed '1,2d' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' | cat ./templates/GOVERNANCE.template.md - > ../guides/general/GOVERNANCE.md
+	-@sed '1,2d' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' | cat ./templates/GOVERNANCE.template.md - > ../guides/generated/GOVERNANCE.md

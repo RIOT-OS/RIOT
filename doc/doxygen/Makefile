@@ -34,7 +34,7 @@ DOXYGEN ?= doxygen
 DOXYGEN_CUR_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
 
 # for the `doc-ci` target, we can choose which Doxygen version should be built.
-# If nothing has been chosen, select the minimum version
+# If nothing has been chosen, select the minimum version.
 # Valid options are `latest` and version numbers such as `1.13.2`.
 DOXYGEN_VERSION ?= $(DOXYGEN_MIN_VERSION)
 
