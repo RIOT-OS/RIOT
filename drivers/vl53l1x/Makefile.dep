@@ -1,0 +1,13 @@
+ifneq (,$(filter vl53l1x_%,$(USEMODULE)))
+  USEMODULE += vl53l1x
+endif
+
+USEMODULE += vl53l1x_st_api_core
+USEMODULE += vl53l1x_st_api_platform
+
+ifneq (,$(filter vl53l1x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += ztimer_msec
+endif

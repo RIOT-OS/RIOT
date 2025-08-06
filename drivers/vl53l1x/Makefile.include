@@ -1,0 +1,10 @@
+# include variants of VL53L1X drivers as pseudo modules
+PSEUDOMODULES += vl53l1x_basic
+
+USEMODULE_INCLUDES_vl53l1x := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES_vl53l1x_vendor_core := $(LAST_MAKEFILEDIR)/vendor/core
+USEMODULE_INCLUDES_vl53l1x_vendor_platform := $(LAST_MAKEFILEDIR)/vendor/platform
+
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_vl53l1x)
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_vl53l1x_vendor_core)
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_vl53l1x_vendor_platform)
