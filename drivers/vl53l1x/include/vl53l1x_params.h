@@ -68,6 +68,33 @@ extern "C" {
  * @{
  */
 
+#if !DOXYGEN
+
+/* Mapping of Kconfig defines to the respective driver enumeration values */
+#  ifdef CONFIG_VL53L1X_DIST_SHORT
+#    define CONFIG_VL53L1X_PARAM_DISTANCE_MODE      (VL53L1X_DIST_SHORT)
+#  elif CONFIG_VL53L1X_DIST_LONG
+#    define CONFIG_VL53L1X_PARAM_DISTANCE_MODE      (VL53L1X_DIST_LONG)
+#  endif
+
+#  ifdef CONFIG_VL53L1X_PARAM_TIMING_BUDGET_15
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (15)
+#  elif CONFIG_VL53L1X_PARAM_TIMING_BUDGET_20
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (20)
+#  elif    CONFIG_VL53L1X_PARAM_TIMING_BUDGET_33
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (33)
+#  elif    CONFIG_VL53L1X_PARAM_TIMING_BUDGET_50
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (50)
+#  elif    CONFIG_VL53L1X_PARAM_TIMING_BUDGET_100
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (100)
+#  elif    CONFIG_VL53L1X_PARAM_TIMING_BUDGET_200
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (200)
+#  elif    CONFIG_VL53L1X_PARAM_TIMING_BUDGET_500
+#     define CONFIG_VL53L1X_PARAM_TIMING_BUDGET     (500)
+#  endif
+
+#endif /* !DOXYGEN */
+
 /**
  * @brief   Default inter-measurement period [ms]: 100 ms
  */
