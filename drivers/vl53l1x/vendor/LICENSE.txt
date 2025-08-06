@@ -1,0 +1,7 @@
+This software component is provided to you as part of a software package and
+applicable license terms are in the  Package_license file. If you received this
+software component outside of a package or without applicable license terms,
+the terms of the BSD OPEN SOURCE SLA0103 license shall apply. 
+You may obtain a copy of the BSD OPEN SOURCE SLA0103 at:
+https://www.st.com/SLA0103
+
