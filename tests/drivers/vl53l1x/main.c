@@ -19,11 +19,11 @@
  * `vl53l1x` by default. In this case, it is not necessary to specify
  * the DRIVER variable in the make command:
  * ```
- *     make flash -C tests/driver_vl53l1x BOARD=...
+ *     make flash -C tests/drivers/vl53l1x BOARD=...
  * ```
  * To use the `vl53l1x_basic` driver variant, define it in it the make command:
  * ```
- *     DRIVER=vl53l1x_basic make flash -C tests/driver_vl53l1x BOARD=...
+ *     DRIVER=vl53l1x_basic make flash -C tests/drivers/vl53l1x BOARD=...
  * ```
  * If the configuration parameter VL53L1X_PARAM_PIN_INT is defined, interrupts
  * are used to get data instead of polling for new data. In the case of driver
