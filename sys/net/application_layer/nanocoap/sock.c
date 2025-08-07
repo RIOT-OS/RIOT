@@ -1131,6 +1131,29 @@ ssize_t nanocoap_get_blockwise_to_buf(nanocoap_sock_t *sock, const char *path,
     return (res < 0) ? (ssize_t)res : (ssize_t)_buf.len;
 }
 
+ssize_t _udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
+                      uint32_t timeout, sock_udp_ep_t *remote,
+                      sock_udp_aux_rx_t *aux)
+{
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote,
+                                        aux)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            res = max_len;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 {
     sock_udp_t sock;
@@ -1158,12 +1181,22 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         aux_in_ptr = &aux_in;
 #endif
 
-        res = sock_udp_recv_aux(&sock, buf, bufsize, SOCK_NO_TIMEOUT,
-                                &remote, aux_in_ptr);
+        res = _udp_recv_aux(&sock, buf, bufsize, SOCK_NO_TIMEOUT,
+                            &remote, aux_in_ptr);
         if (res <= 0) {
             DEBUG("nanocoap: error receiving UDP packet %" PRIdSIZE "\n", res);
+
+            if (res == -ENOBUFS) {
+                coap_pkt_t pkt;
+                coap_parse(&pkt, buf, bufsize);
+
+                res = coap_build_reply(&pkt, COAP_CODE_REQUEST_ENTITY_TOO_LARGE,
+                                       buf, bufsize, 0);
+                sock_udp_send(&sock, buf, res, &remote);
+            }
             continue;
         }
+
         coap_pkt_t pkt;
         if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
             DEBUG("nanocoap: error parsing packet\n");
