@@ -1,9 +1,6 @@
 <!--
-Copyright (C) 2025 Gunar Schorcht
-
-This file is subject to the terms and conditions of the GNU Lesser
-General Public License v2.1. See the file LICENSE in the top level
-directory for more details.
+SPDX-FileCopyrightText: 2025 Gunar Schorcht
+SPDX-License-Identifier: LGPL-2.1-only
 -->
 
 @defgroup    boards_common_esp32h2  ESP32-H2 Common
