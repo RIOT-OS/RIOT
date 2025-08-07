@@ -14,11 +14,12 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 
 #include <vfs.h>
 #include <fs/constfs.h>
+
+#include "test_utils/expect.h"
 
 static constfs_file_t constfs_files[1] = {
     /* Not completely empty -- that'd be a hassle around empty arrays and
@@ -83,7 +84,7 @@ int main(void) {
     res |= vfs_mount(&mount2);
     res |= vfs_mount(&mount3);
     res |= vfs_mount(&mount4);
-    assert(res == 0);
+    expect(res == 0);
     printf("Mounted 1234\n");
 
     /* N1N2N3N4E */
