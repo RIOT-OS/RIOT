@@ -43,6 +43,9 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi
 endif
+ifneq (,$(filter gnrc_netnotify,$(USEMODULE)))
+  DIRS += netapi/netnotify
+endif
 ifneq (,$(filter gnrc_netif gnrc_netif_%,$(USEMODULE)))
     DIRS += netif
 endif

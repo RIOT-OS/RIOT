@@ -60,7 +60,7 @@
 
 #include "thread.h"
 #include "net/netopt.h"
-#include "net/gnrc/netnotify.h"
+#include "net/gnrc/netapi/netnotify.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
@@ -108,15 +108,6 @@ typedef struct {
     void *data;                 /**< data to set or buffer to read into */
     uint16_t data_len;          /**< size of the data / the buffer */
 } gnrc_netapi_opt_t;
-
-/**
- * @brief   Data structure to be sent for notification events.
- */
-typedef struct {
-    netnotify_t event;          /**< the type of event */
-    void *data;                 /**< event data */
-    uint16_t data_len;          /**< size of the data */
-} gnrc_netapi_notify_t;
 
 /**
  * @brief   Shortcut function for sending @ref GNRC_NETAPI_MSG_TYPE_SND or
