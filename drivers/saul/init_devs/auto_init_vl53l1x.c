@@ -55,7 +55,7 @@ void auto_init_vl53l1x(void)
     for (unsigned i = 0; i < VL53L1X_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing vl53l1x #%u\n", i);
 
-        if (vl53l1x_init(&vl53l1x_devs[i], &vl53l1x_params[i]) != VL53L1X_OK) {
+        if (vl53l1x_init(&vl53l1x_devs[i], &vl53l1x_params[i]) != 0) {
             LOG_ERROR("[auto_init_saul] error initializing vl53l1x #%u\n", i);
             continue;
         }
