@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (C) 2025 ML!PA Consulting GmbH
+# SPDX-License-Identifier: MIT
 
 # This script expects newline-separated license expressions which it will
 # attempt to parse and validate.
