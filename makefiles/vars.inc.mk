@@ -1,5 +1,6 @@
 # set default values for selected global variables
 FLASH_ADDR ?= 0x0
+CFLAGS+=-DNDEBUG
 
 export Q                     # Used in front of Makefile lines to suppress the printing of the command if user did not opt-in to see them.
 export QQ                    # as Q, but be more quiet
