@@ -160,8 +160,12 @@ static int _cond_comp_offset(suit_manifest_t *manifest,
     LOG_INFO("Comparing manifest offset %"PRIx32" with other slot offset\n",
              offset);
 
-    return suit_storage_match_offset(comp->storage_backend, offset) ?
-        SUIT_OK : SUIT_ERR_COND;
+    bool match = suit_storage_match_offset(comp->storage_backend, offset);
+    if (match) {
+        return SUIT_OK;
+    }
+    LOG_WARNING("offset does not match\n");
+    return SUIT_ERR_COND;
 }
 
 static int _dtv_set_comp_idx(suit_manifest_t *manifest,
