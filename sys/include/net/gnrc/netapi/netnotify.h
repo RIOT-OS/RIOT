@@ -41,6 +41,12 @@ extern "C" {
 #include "net/ipv6/addr.h"
 #include "sched.h"
 
+/**
+ * @brief   Thread flag for acknowledging a received notify even.
+ *
+ * @note    The flag should only be set after all event data was copied
+ *          by receiver and can be freed by the sender.
+ */
 #define NETNOTIFY_FLAG_ACK         (1u << 10)
 
 /**
@@ -52,10 +58,10 @@ extern "C" {
  *          on the sender.
  */
 typedef enum {
-    NETNOTIFY_L2_CONNECTED,
-    NETNOTIFY_L2_DISCONNECTED,
-    NETNOTIFY_L3_DISCOVERED,
-    NETNOTIFY_L3_UNREACHABLE,
+    NETNOTIFY_L2_CONNECTED,     /**< Connection established on layer 2. */
+    NETNOTIFY_L2_DISCONNECTED,  /**< Connection closed on layer 2. */
+    NETNOTIFY_L3_DISCOVERED,    /**< Discovered node on the network layer. */
+    NETNOTIFY_L3_UNREACHABLE,   /**< Node became unreachable on the network layer. */
 } netnotify_t;
 
 /**

@@ -178,7 +178,7 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netnotify_t even
             if (data != NULL) {
                 thread_flags_wait_all(NETNOTIFY_FLAG_ACK);
             }
-            
+
             sendto = gnrc_netreg_getnext(sendto);
         }
     }

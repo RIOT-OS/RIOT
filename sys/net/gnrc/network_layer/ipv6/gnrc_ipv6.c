@@ -249,7 +249,7 @@ static inline void _netnotify_event(kernel_pid_t sender_pid, gnrc_netapi_notify_
     netnotify_t type = notify->event;
 
     l2addr_len = gnrc_netnotify_get_l2_connection_data(sender_pid, notify, l2addr, &if_pid);
-    
+
     if (l2addr_len <= 0){
         DEBUG("ipv6: invalid data on netapi notify event.\n");
         return;

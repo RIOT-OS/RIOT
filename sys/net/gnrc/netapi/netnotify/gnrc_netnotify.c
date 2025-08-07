@@ -28,7 +28,7 @@ uint8_t gnrc_netnotify_get_l2_connection_data(kernel_pid_t sender_pid, gnrc_neta
     case NETNOTIFY_L2_CONNECTED:
     case NETNOTIFY_L2_DISCONNECTED:
         assert(notify->data_len == sizeof(netnotify_l2_connection_t));
-        
+
         /* Parse event data.*/
         netnotify_l2_connection_t *data = notify->_data;
         memcpy(l2addr, data->l2addr, data->l2addr_len);
