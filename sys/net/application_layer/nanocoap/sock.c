@@ -1131,7 +1131,7 @@ ssize_t nanocoap_get_blockwise_to_buf(nanocoap_sock_t *sock, const char *path,
     return (res < 0) ? (ssize_t)res : (ssize_t)_buf.len;
 }
 
-int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
+int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
 {
     sock_udp_t sock;
     sock_udp_ep_t remote;
@@ -1145,10 +1145,19 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 
     ssize_t res = sock_udp_create(&sock, local, NULL, 0);
     if (res != 0) {
-        return -1;
+        return res;
     }
 
+    void *buf;
+    void *buf_ctx = NULL;
+
     while (1) {
+
+        if (buf_ctx) {
+            /* free the buffer */
+            res = sock_udp_recv_buf_aux(&sock, &buf, &buf_ctx, 0, NULL, NULL);
+            assert(res == 0);
+        }
 
         sock_udp_aux_rx_t *aux_in_ptr = NULL;
 #ifdef MODULE_SOCK_AUX_LOCAL
@@ -1158,14 +1167,14 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         aux_in_ptr = &aux_in;
 #endif
 
-        res = sock_udp_recv_aux(&sock, buf, bufsize, SOCK_NO_TIMEOUT,
-                                &remote, aux_in_ptr);
+        res = sock_udp_recv_buf_aux(&sock, &buf, &buf_ctx, SOCK_NO_TIMEOUT,
+                                    &remote, aux_in_ptr);
         if (res <= 0) {
             DEBUG("nanocoap: error receiving UDP packet %" PRIdSIZE "\n", res);
             continue;
         }
         coap_pkt_t pkt;
-        if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
+        if (coap_parse(&pkt, buf, res) < 0) {
             DEBUG("nanocoap: error parsing packet\n");
             continue;
         }
@@ -1183,12 +1192,12 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         }
         ctx.local = &aux_in.local;
 #endif
-        if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
+        if ((res = coap_handle_req(&pkt, rsp_buf, rsp_buf_len, &ctx)) <= 0) {
             DEBUG("nanocoap: error handling request %" PRIdSIZE "\n", res);
             continue;
         }
 
-        sock_udp_send_aux(&sock, buf, res, &remote, aux_out_ptr);
+        sock_udp_send_aux(&sock, rsp_buf, res, &remote, aux_out_ptr);
     }
 
     return 0;
