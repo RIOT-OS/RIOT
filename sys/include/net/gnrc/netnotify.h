@@ -18,7 +18,7 @@
  * @brief   Network event notification type definitions.
  *
  * @details The purpose of this API is to allow lower layers in the network
- *          stack to inform higher layers of general, protocol-inpdenendent
+ *          stack to inform higher layers of general, protocol-independent
  *          network events.
  *          It can be used through the @ref net_gnrc_netapi to notify any
  *          other network interfaces that have registered themselves through
