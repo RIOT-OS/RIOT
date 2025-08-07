@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 20215 Gunar Schorcht
+ * SPDX-FileCopyrightText: 2025 Gunar Schorcht
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
