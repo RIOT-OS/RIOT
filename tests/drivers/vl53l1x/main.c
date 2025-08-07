@@ -3,39 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-/**
- * @ingroup     tests
- * @brief       Test application for ST VL53L1X Time-of-Flight distance sensor
- * @author      Gunar Schorcht <gunar@schorcht.net>
- * @file
- *
- * The test application demonstrates the usage of different functions
- * dependent on used driver variant:
- *
- * - `vl53l1x_basic`  Basic driver with only very basic functionality
- * - `vl53l1x`        Default driver with complete functionality
- *
- * The driver variant used is defined by my variable DRIVER, which is set to
- * `vl53l1x` by default. In this case, it is not necessary to specify
- * the DRIVER variable in the make command:
- * ```
- *     make flash -C tests/drivers/vl53l1x BOARD=...
- * ```
- * To use the `vl53l1x_basic` driver variant, define it in it the make command:
- * ```
- *     DRIVER=vl53l1x_basic make flash -C tests/drivers/vl53l1x BOARD=...
- * ```
- * If the configuration parameter VL53L1X_PARAM_PIN_INT is defined, interrupts
- * are used to get data instead of polling for new data. In the case of driver
- * variant `vl53l1x`, threshold interrupts are configured. Otherwise
- * only data interrupts are used.
- *
- * In all cases, the sensor is configured with following default parameters:
- *
- * - timing budget of 50 ms
- * - intermeasurement period of 100 ms *
- */
-
 #include <stdio.h>
 
 #include "mutex.h"
@@ -45,7 +12,7 @@
 #include "vl53l1x.h"
 #include "vl53l1x_params.h"
 
-static void isr (void *arg)
+static void isr(void *arg)
 {
     /*
      * The ISR function is executed in the interrupt context. It must not be

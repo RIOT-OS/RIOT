@@ -10,7 +10,7 @@ dependent on used driver variant:
 
 ## Usage
 
-The driver variant used is defined by my variable DRIVER, which is set to
+The driver variant used is defined by variable DRIVER, which is set to
 `vl53l1x` by default. In this case, it is not necessary to specify
 the DRIVER variable in the make command:
 ```
