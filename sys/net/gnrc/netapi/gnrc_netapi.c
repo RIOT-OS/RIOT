@@ -24,8 +24,10 @@
 #include "mbox.h"
 #include "msg.h"
 #include "net/gnrc/netreg.h"
+#include "net/gnrc/netapi/netnotify.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -133,6 +135,50 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                 gnrc_pktbuf_release_error(pkt, EIO);
             }
 #endif
+            sendto = gnrc_netreg_getnext(sendto);
+        }
+    }
+
+    gnrc_netreg_release_shared();
+
+    return numof;
+}
+
+int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netnotify_t event,
+                       void *data, size_t data_len)
+{
+    gnrc_netapi_notify_t notify = {
+        .event = event,
+        ._data = data,
+        .data_len = data_len,
+    };
+
+    msg_t cmd = {
+        .type = GNRC_NETAPI_MSG_TYPE_NOTIFY,
+        .content.ptr = (void *)&notify,
+    };
+
+    gnrc_netreg_acquire_shared();
+
+    int numof = gnrc_netreg_num(type, demux_ctx);
+
+    if (numof != 0) {
+        /* Look up the registered threads for this message type. */
+        gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
+
+        /* Make sure the ACK flag isn't already set. */
+        thread_flags_clear(NETNOTIFY_FLAG_ACK);
+
+        /* Dispatch to all registered threads sequentially. */
+        while (sendto) {
+            msg_send(&cmd,sendto->target.pid);
+
+            /* Need to wait for an ACK to ensure that the data was read and that
+               there won't be any dangling pointers after the function returned. */
+            if (data != NULL) {
+                thread_flags_wait_all(NETNOTIFY_FLAG_ACK);
+            }
+
             sendto = gnrc_netreg_getnext(sendto);
         }
     }
