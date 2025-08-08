@@ -82,46 +82,18 @@ RIOT provides features including, but not limited to:
 * UWB
 * Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
 
-## Getting RIOT
-
-The most convenient way to get RIOT is to clone it via Git
-
-```console
-$ git clone https://github.com/RIOT-OS/RIOT
-```
-
-this will ensure that you get all the newest features and bug fixes with the
-caveat of an ever changing work environment.
-
-If you prefer things more stable, you can download the source code of one of our
-quarter annual releases [via Github][releases] as ZIP file or tarball. You can
-also checkout a release in a cloned Git repository using
-
-```console
-$ git pull --tags
-$ git checkout <YYYY.MM>
-```
-
-For more details on our release cycle, check our [documentation][release cycle].
-
-[releases]: https://github.com/RIOT-OS/RIOT/releases
-[release cycle]: https://doc.riot-os.org/release-cycle.html
-
 ## Getting Started
-* You want to start the RIOT? Just follow our
-[quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
-try this
-[tutorial](https://github.com/RIOT-OS/Tutorials/blob/master/README.md).
-For specific toolchain installation, follow instructions in the
-[getting started](https://doc.riot-os.org/getting-started.html) page.
-* The RIOT API itself can be built from the code using doxygen. The latest
-  version of the documentation is uploaded daily to
-  [doc.riot-os.org](https://doc.riot-os.org).
 
-Using Windows? Use [this guide][dev-setup-windows] to
-[setup the development environment][dev-setup-windows].
+* **Start here:**
+  Our comprehensive [Getting Started Guide](https://guide.riot-os.org/getting-started/installing/)
+  walks you through installation and your first RIOT applications.
 
-[dev-setup-windows]: doc/guides/setup-windows
+* **Learn by doing:**
+    * Try our [hands-on tutorials](https://github.com/RIOT-OS/Tutorials) designed for beginners
+    * Take the [RIOT online course](https://github.com/RIOT-OS/riot-course) at your own pace
+
+* **Explore the API:** Check out the [API documentation](https://doc.riot-os.org/)
+  for detailed information on RIOT's features and functions.
 
 ## Community
 
@@ -154,6 +126,31 @@ only "this isn't working". These details include:
 ### Collaboration
 
 RIOT closely collaborates with and inspires other open source projects, e.g., [Ariel OS](https://ariel-os.org/), an IoT OS written in Rust. We are more than happy to collaborate with those who share our [vision](https://doc.riot-os.org/vision.html).
+
+## Getting RIOT
+
+The most convenient way to get RIOT is to clone it via Git
+
+```console
+$ git clone https://github.com/RIOT-OS/RIOT
+```
+
+this will ensure that you get all the newest features and bug fixes with the
+caveat of an ever changing work environment.
+
+If you prefer things more stable, you can download the source code of one of our
+quarter annual releases [via Github][releases] as ZIP file or tarball. You can
+also checkout a release in a cloned Git repository using
+
+```console
+$ git pull --tags
+$ git checkout <YYYY.MM>
+```
+
+For more details on our release cycle, check our [documentation][release cycle].
+
+[releases]: https://github.com/RIOT-OS/RIOT/releases
+[release cycle]: https://doc.riot-os.org/release-cycle.html
 
 ## Contribute
 
