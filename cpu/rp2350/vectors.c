@@ -76,9 +76,10 @@ WEAK_DEFAULT void isr_spareirq_3(void);
 WEAK_DEFAULT void isr_spareirq_4(void);
 WEAK_DEFAULT void isr_spareirq_5(void);
 
-/* CPU specific interrupt vector table */
-ISR_VECTOR(1)
-const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
+/** CPU specific interrupt vector table
+ * @see 3.2 Interrupts and IRQn_Type in RP2350.h
+ */
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     (void*)isr_timer0_0,     /* 0 TIMER0_IRQ_0 */
     (void*)isr_timer0_1,     /* 1 TIMER0_IRQ_1 */
     (void*)isr_timer0_2,     /* 2 TIMER0_IRQ_2 */

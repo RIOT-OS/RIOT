@@ -18,6 +18,25 @@
 
 #include "periph_cpu.h"
 
+#include "regs/uart.h"
+
+static uart_isr_ctx_t ctx[UART_NUMOF];
+
+/** Pico1 uart uses non-sdk conform defines
+ * @todo Change Pico1 defines if I ever get around to it
+ */
+#define UART0_UARTIMSC_RXIM_Msk  (UART_UARTIMSC_RXIM_BITS)
+
+void _irq_enable(uart_t uart)
+{
+    UART0_Type *dev = uart_config[uart].dev;
+    /* We set the UART Receive Interrupt Mask (Bit 4) [See p979 UART 12.1]*/
+    dev->UARTIMSC = UART0_UARTIMSC_RXIM_Msk;
+    /* Enable the IRQ in the NVIC */
+    NVIC_EnableIRQ(uart_config[uart].irqn);
+}
+
+
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {
     (void)uart;
     (void)baud;

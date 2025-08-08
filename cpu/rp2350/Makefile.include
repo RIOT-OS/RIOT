@@ -14,7 +14,7 @@ CFLAGS += -Wno-error
 INCLUDES += -I$(RIOTCPU)/rp2350/include
 INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2_common/cmsis/stub/CMSIS/Core/Include
 INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
-
+INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2350/hardware_regs/include/hardware
 # Linker flags
 LINKFLAGS += -mcpu=$(CPU_ARCH) -mthumb
 LINKFLAGS += -Wl,--gc-sections
