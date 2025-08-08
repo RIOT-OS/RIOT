@@ -105,6 +105,25 @@ help. Our Forum provides an archive of prior questions and answers.
 - [GitHub Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
 with the code and documentation.
 
+### Governance
+
+For how our community is structured and governed, please see our [governance document].
+
+[governance document]: GOVERNANCE.md
+
+### How to Ask
+
+Please include as much detail as you can that is relevant to your question, not
+only "this isn't working". These details include:
+
+1. What you want to achieve.
+2. What have you tried so far (for example the commands you typed).
+3. What happened so far.
+
+### Collaboration
+
+RIOT closely collaborates with and inspires other open source projects, e.g., [Ariel OS](https://ariel-os.org/), an IoT OS written in Rust. We are more than happy to collaborate with those who share our [vision](https://doc.riot-os.org/vision.html).
+
 ## Getting RIOT
 
 The most convenient way to get RIOT is to clone it via Git
@@ -129,25 +148,6 @@ For more details on our release cycle, check our [documentation][release cycle].
 
 [releases]: https://github.com/RIOT-OS/RIOT/releases
 [release cycle]: https://doc.riot-os.org/release-cycle.html
-
-### Governance
-
-For how our community is structured and governed, please see our [governance document].
-
-[governance document]: GOVERNANCE.md
-
-### How to Ask
-
-Please include as much detail as you can that is relevant to your question, not
-only "this isn't working". These details include:
-
-1. What you want to achieve.
-2. What have you tried so far (for example the commands you typed).
-3. What happened so far.
-
-### Collaboration
-
-RIOT closely collaborates with and inspires other open source projects, e.g., [Ariel OS](https://ariel-os.org/), an IoT OS written in Rust. We are more than happy to collaborate with those who share our [vision](https://doc.riot-os.org/vision.html).
 
 ## Contribute
 
