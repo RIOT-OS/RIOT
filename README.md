@@ -82,6 +82,29 @@ RIOT provides features including, but not limited to:
 * UWB
 * Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
 
+## Getting Started
+
+* **Start here:** Our comprehensive [Getting Started Guide](https://guide.riot-os.org/getting-started/installing/) walks you through installation and your first RIOT applications.
+
+* **Learn by doing:**
+    * Try our [hands-on tutorials](https://github.com/RIOT-OS/Tutorials) designed for beginners
+    * Take the [RIOT online course](https://github.com/RIOT-OS/riot-course) at your own pace
+
+* **Explore the API:** Check out the [API documentation](https://doc.riot-os.org/) for detailed information on RIOT's features and functions.
+
+## Community
+
+You can ask for help on the Forum or on Matrix. Please send bug reports and
+feature requests to our [GitHub issue tracker](https://github.com/RIOT-OS/RIOT/issues)
+
+- [forum](https://forum.riot-os.org) is the default place to start asking for
+help. Our Forum provides an archive of prior questions and answers.
+- For chat, we use
+  [#riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org) on the
+  [Matrix](https://matrix.org/) chat network.
+- [GitHub Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
+with the code and documentation.
+
 ## Getting RIOT
 
 The most convenient way to get RIOT is to clone it via Git
@@ -106,35 +129,6 @@ For more details on our release cycle, check our [documentation][release cycle].
 
 [releases]: https://github.com/RIOT-OS/RIOT/releases
 [release cycle]: https://doc.riot-os.org/release-cycle.html
-
-## Getting Started
-* You want to start the RIOT? Just follow our
-[quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
-try this
-[tutorial](https://github.com/RIOT-OS/Tutorials/blob/master/README.md).
-For specific toolchain installation, follow instructions in the
-[getting started](https://doc.riot-os.org/getting-started.html) page.
-* The RIOT API itself can be built from the code using doxygen. The latest
-  version of the documentation is uploaded daily to
-  [doc.riot-os.org](https://doc.riot-os.org).
-
-Using Windows? Use [this guide][dev-setup-windows] to
-[setup the development environment][dev-setup-windows].
-
-[dev-setup-windows]: doc/guides/setup-windows
-
-## Community
-
-You can ask for help on the Forum or on Matrix. Please send bug reports and
-feature requests to our [GitHub issue tracker](https://github.com/RIOT-OS/RIOT/issues)
-
-- [forum](https://forum.riot-os.org) is the default place to start asking for
-help. Our Forum provides an archive of prior questions and answers.
-- For chat, we use
-  [#riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org) on the
-  [Matrix](https://matrix.org/) chat network.
-- [GitHub Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
-with the code and documentation.
 
 ### Governance
 
