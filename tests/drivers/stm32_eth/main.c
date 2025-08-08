@@ -21,8 +21,8 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "assert.h"
 #include "stm32_eth.h"
+#include "test_utils/expect.h"
 #include "test_utils/netdev_eth_minimal.h"
 
 static netdev_t stm32_eth;
@@ -37,7 +37,7 @@ int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
 
     /* initialize the device driver */
     int res = stm32_eth.driver->init(&stm32_eth);
-    assert(!res);
+    expect(!res);
 
     return 0;
 }

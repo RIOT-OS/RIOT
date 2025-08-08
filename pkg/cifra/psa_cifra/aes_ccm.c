@@ -28,7 +28,8 @@ psa_status_t psa_aead_encrypt_aes_ccm(const psa_key_attributes_t *attributes,
                                       size_t nonce_length, const uint8_t *additional_data,
                                       size_t additional_data_length, const uint8_t *plaintext,
                                       size_t plaintext_length, uint8_t *ciphertext,
-                                      size_t ciphertext_size, size_t *ciphertext_length)
+                                      MAYBE_UNUSED size_t ciphertext_size,
+                                      size_t *ciphertext_length)
 {
     (void)attributes;
     /* This should already have been checked by PSA. */

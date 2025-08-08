@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "board.h"
+#include "test_utils/expect.h"
 
 #if defined(MODULE_MTD_EMULATED)
 
@@ -161,7 +162,7 @@ int main(void)
 
     /* Get driver context */
     usbdev_t *usbdev = usbdev_get_ctx(0);
-    assert(usbdev);
+    expect(usbdev);
 
     usbus_t *usbus_auto_init_get(void);
     usbus = usbus_auto_init_get();
