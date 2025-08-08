@@ -23,6 +23,8 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
+#include "board.h"
+
 static uart_isr_ctx_t ctx[UART_NUMOF];
 
 /** Pico1 uart uses non-sdk conform defines

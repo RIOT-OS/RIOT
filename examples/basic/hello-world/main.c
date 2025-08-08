@@ -17,11 +17,15 @@
  */
 
 #include <stdio.h>
+#include "board.h"
 
 int main(void)
 {
-    puts("Hello World!");
+    LED0_ON;
+    LED0_OFF;
+    printf("Hello World!");
 
+    LED0_ON;
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s CPU.\n", RIOT_CPU);
 
