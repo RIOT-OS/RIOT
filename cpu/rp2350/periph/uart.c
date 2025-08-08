@@ -107,11 +107,11 @@ void uart_init_pins(uart_t uart)
     UART0_Type *dev = uart_config[uart].dev;
 
     /* Set the UART pins to the correct function */
-    *(uint32_t*)calculate_gpio_io_ctrl_register_addr(uart_config[uart].tx_pin) = FUNCTION_SELECT_UART;
-    *(uint32_t*)calculate_gpio_io_ctrl_register_addr(uart_config[uart].rx_pin) = FUNCTION_SELECT_UART;
+    *(uint32_t *)calculate_gpio_io_ctrl_register_addr(uart_config[uart].tx_pin) = FUNCTION_SELECT_UART;
+    *(uint32_t *)calculate_gpio_io_ctrl_register_addr(uart_config[uart].rx_pin) = FUNCTION_SELECT_UART;
     /* Clear the ISO bits */
-    atomic_clear((uint32_t*)calculate_gpio_pad_register_addr(uart_config[uart].tx_pin), PADS_BANK0_ISO_BITS);
-    atomic_clear((uint32_t*)calculate_gpio_pad_register_addr(uart_config[uart].rx_pin), PADS_BANK0_ISO_BITS);
+    atomic_clear((uint32_t *)calculate_gpio_pad_register_addr(uart_config[uart].tx_pin), PADS_BANK0_ISO_BITS);
+    atomic_clear((uint32_t *)calculate_gpio_pad_register_addr(uart_config[uart].rx_pin), PADS_BANK0_ISO_BITS);
 
     /* We reset UART0 here, so we can be sure it is in a known state */
     _reset_uart(uart);
@@ -179,9 +179,30 @@ void uart_poweron(uart_t uart)
     }
     uart_init_pins(uart);
 }
+
+void uart_deinit_pins(uart_t uart)
+{
+    assert((unsigned)uart < UART_NUMOF);
+    /* @TODO */
+    /* gpio_reset_all_config(uart_config[uart].tx_pin); */
+    SIO->GPIO_OE_CLR = 1LU << uart_config[uart].tx_pin;
+    if (ctx[uart].rx_cb) {
+        /* gpio_reset_all_config(uart_config[uart].rx_pin); */
+    }
+}
+
 void uart_poweroff(uart_t uart)
 {
-    (void)uart;
+    assert((unsigned)uart < UART_NUMOF);
+    UART0_Type *dev = uart_config[uart].dev;
+    /* backup configuration registers */
+    uartibrd = dev->UARTIBRD;
+    uartfbrd = dev->UARTFBRD;
+    uartlcr_h = dev->UARTLCR_H;
+    uartcr = dev->UARTCR;
+    /* disconnect GPIOs and power off peripheral */
+    uart_deinit_pins(uart);
+    _reset_uart(uart);
 }
 
 void isr_handler(uint8_t num)
