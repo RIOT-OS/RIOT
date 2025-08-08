@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Gunar Schorcht
+SPDX-License-Identifier: LGPL-2.1-only
+-->
+
 @defgroup pkg_driver_vl53l1x_st_api ST VL53L1X ULD API package
 @ingroup  pkg
 @brief    Ultra light driver API package for the ST VL53L1X Time-of-Flight (ToF) ranging sensor
