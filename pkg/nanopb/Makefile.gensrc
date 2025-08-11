@@ -1,7 +1,7 @@
 PROTOC ?= protoc
 PROTOC_GEN_NANOPB ?= $(PKGDIRBASE)/nanopb/generator/protoc-gen-nanopb
 
-PROTOBUF_FILES ?= $(wildcard *.proto)
+PROTOBUF_FILES += $(wildcard *.proto)
 
 # remove duplicates
 PROTOBUF_FILES := $(sort $(PROTOBUF_FILES))
