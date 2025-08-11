@@ -21,9 +21,12 @@
 #include "kernel_init.h"
 #include "macros/units.h"
 #include "periph/gpio.h"
+#include "periph/uart.h"
 #include "periph/init.h"
 #include "periph_cpu.h"
 #include "stdio_base.h"
+
+#include <stdio.h>
 
 #define DEBUG_WITH_OSC
 
@@ -33,7 +36,12 @@ void gpio_reset(void) {
 }
 
 void core1_main() {
-    while (1) {LED0_ON;};
+    while (1) {
+        for (int i = 0; i < 100; i++) {
+            __NOP();
+        }
+        LED0_ON;
+    }
 }
 
 /* Table 37 FIFO_ST, 1 if not empty*/
@@ -72,7 +80,7 @@ void core1_init() {
      * get the address, however, the vector table should sit right at the front
      * of the ROM so *technically* it might be fine
      */
-    (uint32_t) ROM_START_ADDR,
+    (uint32_t)  SCB->VTOR,
     /**
      * The stack pointer position should begin right after the
      */
@@ -124,7 +132,12 @@ void core1_init() {
         /* This is eq. to the SDK multicore_fifo_pop_blocking_inline*/
         /* We check whether there are events */
         while(!(SIO->FIFO_ST & 1<<SIO_FIFO_READ_VALID_BIT)) {
-            /* If not we simply wait */
+            /* If not we simply wait,
+             * fun fact, it appears like WFE is not optional in this scenario
+             * not using wfe causes a double fault crash
+             * Also for ref, WFE -> Wait For Event
+             * https://developer.arm.com/documentation/dui0552/a/the-cortex-m3-instruction-set/miscellaneous-instructions/wfe
+             */
             __WFE();
         };
 
