@@ -33,14 +33,13 @@ void gpio_reset(void) {
 }
 
 void core1_main() {
-    while (1) {
-        xosc_sleep(500);
-        LED0_TOGGLE;
-    }
+    LED0_ON;
 }
 
-/* Table 37 FIFO_ST*/
+/* Table 37 FIFO_ST, 1 if not empty*/
 #define SIO_FIFO_READ_VALID_BIT 0
+/* TABLE 37, 1 if not full */
+#define SIO_FIFO_SEND_READY_BIT 1
 #define core1_psm_bit 24
 extern uint32_t _estack;  /* End of stack based on cortex_m.ld */
 
@@ -83,7 +82,10 @@ void core1_init() {
     };
 
     uint32_t seq = 0;
-    do {
+    /** We iterate through the cmd_sequence till we covered every param
+     *(seq does not increase with each loop, thus we need to while loop this)
+     */
+    while(seq < sizeof(cmd_sequence)/sizeof(cmd_sequence[0])) {
         uint32_t cmd = cmd_sequence[seq];
         /* If the cmd is 0 we need to drain the READ FIFO first*/
         if(cmd == 0) {
@@ -94,18 +96,42 @@ void core1_init() {
              *         (void) sio_hw->fifo_rd;
              * ```
              * fifo_rvalid checks whether rx fifo is empty and then the value
-             * gets discarded
+             * gets discarded (called multicore_fifo_drain in chapter 5.3)
              */
             while(SIO->FIFO_ST & 1<<SIO_FIFO_READ_VALID_BIT) {
                 (void) SIO->FIFO_RD; /* Table 39 FIFO_RD*/
             };
 
-            /* SEV -> Set Event https://developer.arm.com/documentation/dui0473/m/arm-and-thumb-instructions/sev */
+            /** SEV -> Set Event
+             * @see https://developer.arm.com/documentation/dui0473/m/arm-and-thumb-instructions/sev
+             * The Doc (p376) says that this is done to cover cases where core 1
+             * is waiting for FIFO space. Though, as I understand it, this shouldn't technically
+             * happen since don't dynamically re-enable core1 (yet :D)
+             */
             __SEV();
         }
 
-        /* @TODO: Send instruction */
-    } while (seq < sizeof(cmd_sequence)/sizeof(cmd_sequence[0]));
+        /* This is eq. to the SDK multicore_fifo_push_blocking_inline */
+        /* Check whether queue is full */
+        while (!(SIO->FIFO_ST & 1<<SIO_FIFO_SEND_READY_BIT)) {
+            /* Wait for queue space */
+        }
+        /* Write data since we know we have space */
+        SIO->FIFO_WR = cmd;
+        /* Send event */
+        __SEV();
+
+        /* This is eq. to the SDK multicore_fifo_pop_blocking_inline*/
+        /* We check whether there are events */
+        while(!(SIO->FIFO_ST & 1<<SIO_FIFO_READ_VALID_BIT)) {
+            /* If not we simply wait */
+        };
+        /* Get the event since this is our response */
+        uint32_t response = SIO->FIFO_RD;
+
+        /* move to next state on correct response (echo-d value) otherwise start over */
+        seq = cmd == response ? seq + 1 : 0;
+    };
 }
 
 void cpu_init(void) {
