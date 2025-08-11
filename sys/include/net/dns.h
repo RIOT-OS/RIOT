@@ -21,6 +21,7 @@
  */
 
 #include "modules.h"
+#include "net/hosts.h"
 #include "net/sock/dns.h"
 #include "net/sock/dodtls.h"
 #include "net/gcoap/dns.h"
@@ -83,6 +84,9 @@ static inline int dns_query(const char *domain_name, void *addr_out, int family)
         }
     }
 
+    if (res <= 0 && IS_USED(MODULE_HOSTS)) {
+        res = hosts_query(domain_name, addr_out, family);
+    }
     if (res <= 0 && IS_USED(MODULE_GCOAP_DNS)) {
         res = gcoap_dns_query(domain_name, addr_out, family);
     }
