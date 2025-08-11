@@ -121,6 +121,10 @@ ifneq (,$(filter dns_%,$(USEMODULE)))
   USEMODULE += dns
 endif
 
+ifneq (,$(filter dns_cbor,$(USEMODULE)))
+  USEPKG += nanocbor
+endif
+
 ifneq (,$(filter fuzzing,$(USEMODULE)))
   USEMODULE += netdev_test
   USEMODULE += gnrc_netif
