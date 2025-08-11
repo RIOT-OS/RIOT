@@ -27,9 +27,19 @@ extern "C" {
 
 /**
  * @brief Default LoRaWAN channels
+ *
+ * @note It is possible to use a single channel, e.g., when using a single or
+ * dual channel gateway, by defining the macro `GNRC_LORAWAN_SINGLE_CHANNEL`
+ * during compilation, which specifies the single channel frequency to be used.
+ * For example:
+ * ```
+ * CFLAGS='-DGNRC_LORAWAN_SINGLE_CHANNEL=868100000UL'
+ * ```
  */
 static const uint32_t gnrc_lorawan_default_channels[] = {
-#if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
+#if defined(GNRC_LORAWAN_SINGLE_CHANNEL)
+    GNRC_LORAWAN_SINGLE_CHANNEL
+#elif (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868) || defined(DOXYGEN))
     868100000UL,
     868300000UL,
     868500000UL
