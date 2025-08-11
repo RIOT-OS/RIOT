@@ -64,22 +64,28 @@ extern "C" {
 #define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
 #endif
 
-/**
- * @def __NORETURN
- * @brief hidden (__) NORETURN definition
- * @internal
- *
- * Duplicating the definitions of kernel_defines.h as these are unsuitable for
- * system header files like the assert.h.
- * kernel_defines.h would define symbols that are not reserved.
- */
+/* not using compiler_hints.h here to avoid RIOT dependencies for standard C
+ * headers */
+
 #ifndef __NORETURN
-#ifdef __GNUC__
-#define __NORETURN __attribute__((noreturn))
-#else /*__GNUC__*/
-#define __NORETURN
-#endif /*__GNUC__*/
-#endif /*__NORETURN*/
+#  ifdef __GNUC__
+#    define __NORETURN __attribute__((noreturn))
+#  else
+#    define __NORETURN
+#  endif
+#endif
+
+/**
+ * @brief   Internal function to trigger a panic with a failed assertion as
+ *          identifying cause
+ * @internal
+ * @warning This is an internal function. API changes may happen without regard
+ *          for out-of tree uses.
+ *
+ * The implementation will identify the cause of the panic as a blown assertion,
+ * e.g. via a log output.
+ */
+__NORETURN void _assert_panic(void);
 
 #ifdef NDEBUG
 #define assert(ignore)((void)0)
@@ -134,7 +140,6 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  */
 #define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
 #else /* DEBUG_ASSERT_VERBOSE */
-__NORETURN void _assert_panic(void);
 #define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
 #endif /* DEBUG_ASSERT_VERBOSE */
 
