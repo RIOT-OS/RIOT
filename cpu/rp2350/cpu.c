@@ -33,7 +33,7 @@ void gpio_reset(void) {
 }
 
 void core1_main() {
-    LED0_ON;
+    while (1) {LED0_ON;};
 }
 
 /* Table 37 FIFO_ST, 1 if not empty*/
@@ -127,7 +127,7 @@ void core1_init() {
             /* If not we simply wait */
             __WFE();
         };
-            __BKPT(0);
+
         /* Get the event since this is our response */
         volatile uint32_t response = SIO->FIFO_RD;
 
