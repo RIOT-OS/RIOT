@@ -53,8 +53,6 @@ void core1_init() {
         /* Wait for the reset to complete */
     }
 
-    __BKPT(0);
-
     /* At this point Core1 is powered on but sleeping (See 5.2)*/
 
     /* Next we need to define the launching code by passing all relevant info
@@ -78,7 +76,7 @@ void core1_init() {
     /**
      * The stack pointer position should begin right after the
      */
-    (uint32_t) ((uint32_t)&_estack) - 0x1000,
+    (uint32_t) ((uint32_t)&_estack) - 0x100,
     /** Pointer to main function for core1 */
     (uint32_t) core1_main
     };
@@ -87,7 +85,7 @@ void core1_init() {
     /** We iterate through the cmd_sequence till we covered every param
      *(seq does not increase with each loop, thus we need to while loop this)
      */
-    while(seq < sizeof(cmd_sequence)/sizeof(cmd_sequence[0])) {
+    while(seq < 6) {
         uint32_t cmd = cmd_sequence[seq];
         /* If the cmd is 0 we need to drain the READ FIFO first*/
         if(cmd == 0) {
@@ -127,9 +125,11 @@ void core1_init() {
         /* We check whether there are events */
         while(!(SIO->FIFO_ST & 1<<SIO_FIFO_READ_VALID_BIT)) {
             /* If not we simply wait */
+            __WFE();
         };
+            __BKPT(0);
         /* Get the event since this is our response */
-        uint32_t response = SIO->FIFO_RD;
+        volatile uint32_t response = SIO->FIFO_RD;
 
         /* move to next state on correct response (echo-d value) otherwise start over */
         seq = cmd == response ? seq + 1 : 0;
@@ -151,7 +151,7 @@ void cpu_init(void) {
     cpu_clock_init();
 
     /* Init Core 1 */
-    // core1_init();
+    core1_init();
 
     /* initialize the early peripherals */
     early_init();
