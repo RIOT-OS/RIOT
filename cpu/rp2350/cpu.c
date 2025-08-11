@@ -53,6 +53,8 @@ void core1_init() {
         /* Wait for the reset to complete */
     }
 
+    __BKPT(0);
+
     /* At this point Core1 is powered on but sleeping (See 5.2)*/
 
     /* Next we need to define the launching code by passing all relevant info
@@ -72,13 +74,13 @@ void core1_init() {
      * get the address, however, the vector table should sit right at the front
      * of the ROM so *technically* it might be fine
      */
-    (uintptr_t) ROM_START_ADDR,
+    (uint32_t) ROM_START_ADDR,
     /**
      * The stack pointer position should begin right after the
      */
-    (uintptr_t) (&_estack - 0x100),
+    (uint32_t) ((uint32_t)&_estack) - 0x1000,
     /** Pointer to main function for core1 */
-    (uintptr_t) core1_main
+    (uint32_t) core1_main
     };
 
     uint32_t seq = 0;
@@ -137,7 +139,7 @@ void core1_init() {
 void cpu_init(void) {
     /* initialize the Cortex-M core, once UART support is moved
      * to shared driver as currently this will cause unhandled interrupts */
-    /* cortexm_init(); */
+    cortexm_init();
 
     /* Reset GPIO state */
     gpio_reset();
@@ -148,6 +150,9 @@ void cpu_init(void) {
     /* initialize the CPU clock */
     cpu_clock_init();
 
+    /* Init Core 1 */
+    // core1_init();
+
     /* initialize the early peripherals */
     early_init();
 
@@ -156,9 +161,6 @@ void cpu_init(void) {
 
     /* initialize the board */
     board_init();
-
-    /* Init Core 1 */
-    core1_init();
 }
 
 /** @} */
