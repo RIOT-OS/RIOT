@@ -39,8 +39,7 @@ static uint32_t uartcr;
  */
 #define UART0_UARTIMSC_RXIM_Msk (UART_UARTIMSC_RXIM_BITS)
 
-void _irq_enable(uart_t uart)
-{
+void _irq_enable(uart_t uart) {
     UART0_Type *dev = uart_config[uart].dev;
     /* We set the UART Receive Interrupt Mask (Bit 4) [See p979 UART 12.1]*/
     dev->UARTIMSC = UART0_UARTIMSC_RXIM_Msk;
@@ -49,8 +48,7 @@ void _irq_enable(uart_t uart)
 }
 
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
-              uart_stop_bits_t stop_bits)
-{
+              uart_stop_bits_t stop_bits) {
     assert((unsigned)uart < UART_NUMOF);
     UART0_Type *dev = uart_config[uart].dev;
 
@@ -85,8 +83,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
     return UART_OK;
 }
 
-static void _reset_uart(uart_t uart)
-{
+static void _reset_uart(uart_t uart) {
     switch (uart) {
     case 0:
         /* We reset UART0 here, so we can be sure it is in a known state */
@@ -101,8 +98,7 @@ static void _reset_uart(uart_t uart)
     }
 }
 
-void uart_init_pins(uart_t uart)
-{
+void uart_init_pins(uart_t uart) {
     assert((unsigned)uart < UART_NUMOF);
     UART0_Type *dev = uart_config[uart].dev;
 
@@ -120,8 +116,7 @@ void uart_init_pins(uart_t uart)
     dev->UARTFBRD = FBRD;
 }
 
-int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
-{
+int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg) {
     (void)baud;
 
     if (uart >= UART_NUMOF) {
@@ -151,8 +146,7 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
-void uart_write(uart_t uart, const uint8_t *data, size_t len)
-{
+void uart_write(uart_t uart, const uint8_t *data, size_t len) {
     UART0_Type *dev = uart_config[uart].dev;
     for (size_t i = 0; i < len; i++) {
         dev->UARTDR = data[i];
@@ -162,8 +156,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 }
 
-void uart_poweron(uart_t uart)
-{
+void uart_poweron(uart_t uart) {
     assert((unsigned)uart < UART_NUMOF);
     /* Get into a save state where we know whats up */
     _reset_uart(uart);
@@ -180,8 +173,7 @@ void uart_poweron(uart_t uart)
     uart_init_pins(uart);
 }
 
-void uart_deinit_pins(uart_t uart)
-{
+void uart_deinit_pins(uart_t uart) {
     assert((unsigned)uart < UART_NUMOF);
     /* @TODO */
     /* gpio_reset_all_config(uart_config[uart].tx_pin); */
@@ -191,8 +183,7 @@ void uart_deinit_pins(uart_t uart)
     }
 }
 
-void uart_poweroff(uart_t uart)
-{
+void uart_poweroff(uart_t uart) {
     assert((unsigned)uart < UART_NUMOF);
     UART0_Type *dev = uart_config[uart].dev;
     /* backup configuration registers */
@@ -205,8 +196,7 @@ void uart_poweroff(uart_t uart)
     _reset_uart(uart);
 }
 
-void isr_handler(uint8_t num)
-{
+void isr_handler(uint8_t num) {
     UART0_Type *dev = uart_config[num].dev;
 
     uint32_t status = dev->UARTMIS;
@@ -224,15 +214,13 @@ void isr_handler(uint8_t num)
 }
 
 /** Overwrites the WEAK_DEFAULT isr_uart0 */
-void isr_uart0(void)
-{
+void isr_uart0(void) {
     isr_handler(0);
     /* @todo ARM SPECIFIC CODE (also below)*/
     cortexm_isr_end();
 }
 
-void isr_uart1(void)
-{
+void isr_uart1(void) {
     isr_handler(1);
     cortexm_isr_end();
 }
