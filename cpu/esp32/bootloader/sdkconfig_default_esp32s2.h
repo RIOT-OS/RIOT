@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -16,29 +18,29 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef SDKCONFIG_DEFAULT_ESP32S2_H
-#define SDKCONFIG_DEFAULT_ESP32S2_H
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ
-#define CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ 160
+#ifndef CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ
+#  define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ 160
 #endif
 
-#define CONFIG_ESP32S2_DEBUG_OCDAWARE 1
+#define CONFIG_XTAL_FREQ 40
+
+#define CONFIG_ESP_DEBUG_OCDAWARE 1
 
 #define CONFIG_BOOTLOADER_OFFSET_IN_FLASH 0x1000
+#define CONFIG_BOOTLOADER_VDDSDIO_BOOST_1_9V 1
 #define CONFIG_EFUSE_MAX_BLK_LEN 256
 #define CONFIG_IDF_FIRMWARE_CHIP_ID 0x0002
+#define CONFIG_MMU_PAGE_SIZE 0x10000
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDKCONFIG_DEFAULT_ESP32S2_H */
 /** @} */

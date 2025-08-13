@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef PERIPH_CPU_SDMMC_H
-#define PERIPH_CPU_SDMMC_H
 
 #include <stdint.h>
 
@@ -96,5 +95,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_SDMMC_H */
 /** @} */

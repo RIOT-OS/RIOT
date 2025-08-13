@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_yunjia-nrf51822
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_16_0.h"
@@ -103,5 +102,4 @@ static const adc_conf_t adc_config[] = {4, 5, 6, 7};
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

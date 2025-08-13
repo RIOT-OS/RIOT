@@ -18,7 +18,6 @@
  * @author      Juergen Fitschen <me@jue.yt>
  */
 
-
 #include "board.h"
 
 #ifdef __cplusplus

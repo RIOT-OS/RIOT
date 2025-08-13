@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -18,9 +20,6 @@
  *
  * @}
  */
-
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,5 +35,3 @@ extern void thread_isr_stack_init(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* THREAD_ARCH_H */

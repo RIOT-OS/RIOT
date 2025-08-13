@@ -21,7 +21,6 @@
  * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  */
 
-
 #include <stdio.h>
 #include "crypto/ciphers.h"
 

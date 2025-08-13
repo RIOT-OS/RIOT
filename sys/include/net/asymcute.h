@@ -43,7 +43,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>

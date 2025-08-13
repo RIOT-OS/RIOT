@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc2538
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef CC2538_EUI_PRIMARY_H
-#define CC2538_EUI_PRIMARY_H
 
 #include "net/eui64.h"
 
@@ -71,5 +70,4 @@ static inline int cc2538_get_eui64_primary(uint8_t index, eui64_t *addr)
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_EUI_PRIMARY_H */
 /** @} */

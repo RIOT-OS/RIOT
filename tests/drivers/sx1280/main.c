@@ -115,7 +115,6 @@ static void _get_usage(const char *cmd)
     printf("Usage: %s get <type|freq|bw|sf|cr>\n", cmd);
 }
 
-
 static void _usage_freq(void)
 {
     printf("Usage: use freq between 2400000000 + (bw/2) and 2500000000 - (bw/2) (Hz) !\n");
@@ -143,7 +142,6 @@ static void _usage_cr(void)
     LORA_CR_LI_4_6 = 6\n \
     LORA_CR_LI_4_8 = 7\n");
 }
-
 
 static int sx1280_get_cmd(netdev_t *netdev, int argc, char **argv)
 {

@@ -72,7 +72,6 @@
  * @author     David Picard <david.picard@clermont.in2p3.fr>
  */
 
-
 #include "saul.h"
 
 #if defined(MODULE_ABP2_SPI)

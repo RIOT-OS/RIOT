@@ -1,0 +1,26 @@
+From cd2cadff0a0a1fcb4cfdbd802989934d3b15a22e Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 17:33:00 +0100
+Subject: [PATCH 04/28] wpa_supplicant: conditional include for mbedtls
+
+---
+ components/wpa_supplicant/port/os_xtensa.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/wpa_supplicant/port/os_xtensa.c b/components/wpa_supplicant/port/os_xtensa.c
+index 57e16ddc6a..7e5d78bd70 100644
+--- a/components/wpa_supplicant/port/os_xtensa.c
++++ b/components/wpa_supplicant/port/os_xtensa.c
+@@ -28,7 +28,9 @@
+ #include <sys/time.h>
+ #include "esp_random.h"
+ #include "utils/common.h"
++#if USE_MBEDTLS_CRYPTO
+ #include "mbedtls/platform_util.h"
++#endif
+ 
+ #include "ztimer.h"
+ 
+-- 
+2.34.1
+

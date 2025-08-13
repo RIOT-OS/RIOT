@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cc2538
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Aaron Sowry <aaron@mutex.nz>
  */
-
-#ifndef CC2538_RF_INTERNAL_H
-#define CC2538_RF_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,5 +99,4 @@ bool RFCORE_ASSERT_failure(const char *expr, const char *func, int line);
 }
 #endif
 
-#endif /* CC2538_RF_INTERNAL_H */
 /** @} */

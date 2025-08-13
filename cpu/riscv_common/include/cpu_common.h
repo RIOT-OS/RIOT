@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_riscv_common RISC-V common
  * @ingroup     cpu
@@ -21,9 +23,6 @@
 #include <stdint.h>
 
 #include "irq_arch.h"
-
-#ifndef CPU_COMMON_H
-#define CPU_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,5 +84,4 @@ void cpu_reg_disable_bits(volatile uint32_t *reg, uint32_t mask)
 }
 #endif
 
-#endif /* CPU_COMMON_H */
 /** @} */

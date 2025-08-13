@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_lm4f120
  * @{
@@ -17,9 +19,6 @@
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  * @author          Marc Poulhiès <dkm@kataplop.net>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "cpu.h"
 
@@ -187,5 +186,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

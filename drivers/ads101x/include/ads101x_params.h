@@ -20,7 +20,6 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "ads101x.h"

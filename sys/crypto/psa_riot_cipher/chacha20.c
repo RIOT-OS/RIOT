@@ -70,7 +70,6 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-
     if (output_size < (input_length - CHACHA20POLY1305_NONCE_BYTES)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -19,9 +21,6 @@
  * correctly if the `newlib_nano` module is used. In difference to other
  * toolchains, ESP32x toolchains don't use different `newlib.h` versions.
  */
-
-#ifndef NEWLIB_H
-#define NEWLIB_H
 
 #include "kernel_defines.h"
 
@@ -43,5 +42,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* NEWLIB_H */
 /** @} */

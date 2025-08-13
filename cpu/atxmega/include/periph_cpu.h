@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atxmega
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Gerson Fernando Budke <nandojve@gmail.com>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <avr/io.h>
 
@@ -612,5 +611,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

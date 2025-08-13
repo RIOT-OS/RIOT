@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,9 +19,6 @@
  * @author          Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author          Aurelien Gonce <aurelien.gonce@altran.fr>
  */
-
-#ifndef PERIPH_F2_PERIPH_CPU_H
-#define PERIPH_F2_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,5 +76,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_F2_PERIPH_CPU_H */
 /** @} */

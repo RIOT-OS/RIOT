@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_nrf53 Nordic nRF53 MCU
  * @ingroup         cpu
@@ -18,9 +20,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  *
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #ifdef CPU_MODEL_NRF5340_APP
 #include "vendor/nrf5340_application.h"
@@ -71,5 +70,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

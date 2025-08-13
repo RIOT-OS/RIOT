@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_efm32
  * @ingroup     drivers_periph_gpio_ll
@@ -33,9 +35,6 @@
  *
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
-
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -203,5 +202,4 @@ static inline void * gpio_port_unpack_addr(gpio_port_t port)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #ifndef MODULE_PERIPH_SPI
 #error "No SPI support on your board"
 #endif
@@ -38,6 +37,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

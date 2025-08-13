@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_kinetis
  * @brief           CPU specific implementations for the NXP Kinetis L series of
@@ -17,9 +19,6 @@
  *
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef CPU_CONF_KINETIS_L_H
-#define CPU_CONF_KINETIS_L_H
 
 #if (KINETIS_FAMILY == 4)
 #if (KINETIS_SUBFAMILY == 3)
@@ -41,5 +40,4 @@ extern "C"
 }
 #endif
 
-#endif /* CPU_CONF_KINETIS_L_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266_sdk
  * @{
@@ -16,9 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-
-#ifndef SDK_H
-#define SDK_H
 
 #include <stdint.h>
 
@@ -33,5 +32,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SDK_H */

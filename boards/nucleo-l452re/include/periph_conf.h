@@ -1,13 +1,12 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *               2017 Inria
- *               2017 HAW-Hamburg
- *               2018 Fundacion Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-FileCopyrightText: 2017 HAW-Hamburg
+ * SPDX-FileCopyrightText: 2018 Fundacion Inria Chile
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nucleo-l452re
@@ -21,9 +20,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @author      Francisco Molina <francisco.molina@inria.cl>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -175,5 +171,4 @@ static const adc_conf_t adc_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

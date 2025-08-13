@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include <stdint.h>
 #include "at86rf215.h"
 #include "at86rf215_registers.h"

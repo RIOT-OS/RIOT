@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cc2538
  * @{
@@ -17,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -386,5 +385,4 @@ typedef gpio_t adc_conf_t;
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

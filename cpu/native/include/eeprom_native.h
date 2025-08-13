@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup drivers_eeprom_native Native extra API for EEPROM
  * @ingroup  cpu_native
@@ -17,8 +19,6 @@
  * @file
  * @author Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-#ifndef EEPROM_NATIVE_H
-#define EEPROM_NATIVE_H
 
 #include "cpu.h"
 
@@ -46,5 +46,4 @@ void eeprom_native_read(void);
 }
 #endif
 
-#endif /* EEPROM_NATIVE_H */
 /** @} */

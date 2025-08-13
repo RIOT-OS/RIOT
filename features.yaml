@@ -152,14 +152,10 @@ groups:
         help: ESP WiFi SoftAP support is present.
       - name: esp_wifi_enterprise
         help: The ESP WiFi interface supports WPA2 enterprise mode.
-      - name: esp_ble_esp32
-        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32
-              variant.
-      - name: esp_ble_esp32c3
-        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-C3 or
-              ESP32-S3 variant.
       - name: esp_hw_counter
         help: The used ESP32x SoC supports HW counters that can be used as timers.
+      - name: esp_ieee802154
+        help: The ESP32x IEEE 802.15.4 driver
       - name: esp_rmt
         help: The ESP32x SoC has an RMT (Remote Control Transceiver) peripheral.
       - name: esp_rtc_timer_32k
@@ -173,7 +169,7 @@ groups:
               case additional GPIOs are used for the SPI interface and cannot be
               used for other purposes.
       - name: esp_ble
-        help: An ESP32 Bluetooth LE transceiver is present.
+        help: An ESP32x Bluetooth LE transceiver is present.
     - title: nordic nRF Specific Features
       features:
       - name: radio_nrf802154
@@ -287,6 +283,8 @@ groups:
         features:
         - name: cpu_rpx0xx
           help: The MCU is part of the Raspberry PI RPx0xx family.
+        - name: cpu_rp2350
+          help: The MCU is a Raspberry Pi RP2350
 
       - title: Silicon Laboratories EFM32 Grouping
         features:
@@ -409,6 +407,10 @@ groups:
             Indicates that the board is mechanically and electrically compatible
             with shields developed for the Arduino Nano. (Note: Except the
             ISP header, that requires `arduino_shield_isp` in addition.)
+    - name: feather_shield
+      help: >
+            Indicates that the board is mechanically and electrically compatible
+            with shields developed for the Adafruit Feather board family.
     - name: xiao_shield
       help: >
             Indicates that the board is mechanically and electrically compatible
@@ -866,6 +868,8 @@ groups:
       help: AES 128 CBC hardware acceleration present
     - name: periph_cipher_chacha20
       help: ChaCha20 hardware acceleration present
+    - name: periph_aead_aes_128_ccm
+      help: AES 128 CCM hardware acceleration present
     - name: periph_ecc_p192r1
       help: ECC P192R1 hardware acceleration peripheral present.
     - name: periph_ecc_p256r1

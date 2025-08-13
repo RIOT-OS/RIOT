@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_atmega_common
  *
@@ -21,9 +23,6 @@
  */
 
 #include <string.h>
-
-#ifndef STRINGS_H
-#define STRINGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,5 +77,4 @@ static inline void bcopy(const void *src, void *dest, size_t n)
 }
 #endif
 
-#endif /* STRINGS_H */
 /** @} */

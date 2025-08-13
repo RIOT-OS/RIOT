@@ -17,7 +17,7 @@ export default defineConfig({
         {
           icon: "mastodon",
           label: "Mastodon",
-          href: "https://fosstodon.org/@RIOT_OS",
+          href: "https://floss.social/@RIOT_OS",
         },
         {
           icon: "matrix",
@@ -46,6 +46,7 @@ export default defineConfig({
           items: [
             { label: "Introduction", slug: "index" },
             "general/structure",
+            "general/vision",
           ],
         },
         {
@@ -59,6 +60,24 @@ export default defineConfig({
                 "getting-started/flashing",
                 "getting-started/building_example",
                 "getting-started/finding_modules",
+              ],
+            },
+            {
+              label: "C Basics",
+              items: [
+                "c_tutorials/create_project",
+                "c_tutorials/timers",
+                "c_tutorials/shell",
+                "c_tutorials/threads",
+                "c_tutorials/gpio",
+                "c_tutorials/saul",
+              ],
+            },
+            {
+              label: "Rust Basics",
+              items: [
+                "rust_tutorials/rust_in_riot",
+                "rust_tutorials/create_project",
               ],
             },
           ],

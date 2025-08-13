@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_nrf9160 Nordic nRF9160 MCU
  * @ingroup         cpu
@@ -18,9 +20,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  *
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "vendor/nrf9160.h"
 #include "vendor/nrf9160_bitfields.h"
@@ -61,5 +60,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

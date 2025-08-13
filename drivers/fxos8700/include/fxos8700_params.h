@@ -18,7 +18,6 @@
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
 
-
 #include "board.h"
 #include "fxos8700.h"
 #include "saul_reg.h"

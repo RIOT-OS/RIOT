@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "event.h"
 #include "list.h"
 #include "irq.h"

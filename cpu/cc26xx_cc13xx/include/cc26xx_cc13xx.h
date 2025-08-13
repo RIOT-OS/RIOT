@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
@@ -16,9 +18,6 @@
  * @author          Leon M. George <leon@georgemail.eu>
  * @author          Anton Gerasimov <tossel@gmail.com>
  */
-
-#ifndef CC26XX_CC13XX_H
-#define CC26XX_CC13XX_H
 
 #include <stdint.h>
 
@@ -177,5 +176,4 @@ typedef enum IRQn {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_H */
 /** @} */

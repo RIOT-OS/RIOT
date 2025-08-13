@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2015 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_mulle
@@ -15,9 +14,6 @@
  *
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
-
-#ifndef MULLE_NVRAM_H
-#define MULLE_NVRAM_H
 
 #include "nvram.h"
 
@@ -40,5 +36,4 @@ extern nvram_t *mulle_nvram;
 }
 #endif
 
-#endif /* MULLE_NVRAM_H */
 /** @} */

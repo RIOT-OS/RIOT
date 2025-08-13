@@ -18,7 +18,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -19,7 +19,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include <stdint.h>
 #include "thread.h"
 #include "mutex.h"

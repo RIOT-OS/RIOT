@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_lm4f120 LM4F
  * @ingroup         cpu
@@ -17,9 +19,6 @@
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -71,5 +70,4 @@ extern void cpu_clock_init(int);
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

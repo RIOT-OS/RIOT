@@ -21,7 +21,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "sched.h"
 
 #ifdef __cplusplus

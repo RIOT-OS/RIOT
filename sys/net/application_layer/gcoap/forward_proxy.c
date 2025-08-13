@@ -87,7 +87,6 @@ static void _cep_set_timeout(client_ep_t *cep, ztimer_t *timer, uint32_t timeout
     ztimer_set(ZTIMER_MSEC, timer, timeout_ms);
 }
 
-
 void gcoap_forward_proxy_init(void)
 {
     gcoap_register_listener(&forward_proxy_listener);

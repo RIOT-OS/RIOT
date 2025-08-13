@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_native
@@ -15,9 +14,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef EUI_PROVIDER_PARAMS_H
-#define EUI_PROVIDER_PARAMS_H
-
 #include "native_cli_eui_provider.h"
 
 #ifdef __cplusplus
@@ -40,5 +36,4 @@ extern "C" {
 }
 #endif
 
-#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */

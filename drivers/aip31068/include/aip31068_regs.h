@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "bitarithm.h"
 
 #ifdef __cplusplus

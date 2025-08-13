@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atmega8
  * @{
@@ -19,9 +21,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -105,5 +104,4 @@ static inline bool atmega_has_pin_exti(uint8_t port_num, uint8_t pin_num)
 #include "periph_conf.h"
 #include "default_timer_config.h"
 
-#endif /* PERIPH_CPU_H */
 /** @} */

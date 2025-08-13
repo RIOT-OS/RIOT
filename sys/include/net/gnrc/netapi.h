@@ -58,7 +58,6 @@
  * @}
  */
 
-
 #include "thread.h"
 #include "net/netopt.h"
 #include "net/gnrc/nettype.h"

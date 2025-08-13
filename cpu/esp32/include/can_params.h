@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32_esp_can
  * @{
@@ -16,9 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  */
-
-#ifndef CAN_PARAMS_H
-#define CAN_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,5 +68,4 @@ static const can_conf_t candev_conf[] = {
 }
 #endif
 
-#endif /* CAN_PARAMS_H */
 /** @} */

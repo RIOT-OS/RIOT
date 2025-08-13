@@ -18,7 +18,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include "board.h"
 #include "ds3234.h"
 

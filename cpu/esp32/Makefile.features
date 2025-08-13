@@ -1,9 +1,15 @@
 ifeq (esp32,$(CPU_FAM))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx6
-else ifneq (,$(filter esp32c3,$(CPU_FAM)))
+else ifeq (esp32c3,$(CPU_FAM))
   CPU_ARCH = rv32
   CPU_CORE = rv32imc
+else ifeq (esp32c6,$(CPU_FAM))
+  CPU_ARCH = rv32
+  CPU_CORE = rv32imac
+else ifeq (esp32h2,$(CPU_FAM))
+  CPU_ARCH = rv32
+  CPU_CORE = rv32imac
 else ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx7
@@ -17,7 +23,6 @@ include $(RIOTCPU)/esp_common/Makefile.features
 
 FEATURES_PROVIDED += arch_esp32
 FEATURES_PROVIDED += esp_rmt
-FEATURES_PROVIDED += esp_wifi_enterprise
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
@@ -38,18 +43,19 @@ ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += esp_hw_counter
 endif
 
-ifeq (esp32,$(CPU_FAM))
+ifneq (esp32h2,$(CPU_FAM))
+  # ESP32-H2 doesn't have a WiFi module
+  FEATURES_PROVIDED += esp_wifi_enterprise
+endif
+
+ifneq (,$(filter esp32 esp32c3 esp32c6 esp32h2 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += ble_nimble
   FEATURES_PROVIDED += ble_nimble_netif
   FEATURES_PROVIDED += esp_ble
-  FEATURES_PROVIDED += esp_ble_esp32
-else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
-  FEATURES_PROVIDED += ble_adv_ext
-  FEATURES_PROVIDED += ble_nimble
-  FEATURES_PROVIDED += ble_nimble_netif
-  FEATURES_PROVIDED += ble_phy_2mbit
-  FEATURES_PROVIDED += esp_ble
-  FEATURES_PROVIDED += esp_ble_esp32c3
+  ifneq (esp32,$(CPU_FAM))
+    FEATURES_PROVIDED += ble_adv_ext
+    FEATURES_PROVIDED += ble_phy_2mbit
+  endif
 endif
 
 ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
@@ -59,6 +65,10 @@ ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
   ifeq (esp32s3,$(CPU_FAM))
     FEATURES_PROVIDED += periph_sdmmc_hs
   endif
+endif
+
+ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
+  FEATURES_PROVIDED += esp_ieee802154
 endif
 
 ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))

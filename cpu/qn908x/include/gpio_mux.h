@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_qn908x
  *
@@ -19,9 +21,6 @@
  *
  * @author      iosabi <iosabi@protonmail.com>
  */
-
-#ifndef GPIO_MUX_H
-#define GPIO_MUX_H
 
 #include <stdint.h>
 #include "periph_cpu.h"
@@ -77,5 +76,4 @@ void gpio_init_mux(gpio_t pin, uint32_t func);
 }
 #endif
 
-#endif /* GPIO_MUX_H */
 /** @} */

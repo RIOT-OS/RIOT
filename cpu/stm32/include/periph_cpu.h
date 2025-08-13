@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,9 +19,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -213,5 +212,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

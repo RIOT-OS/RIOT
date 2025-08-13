@@ -18,7 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

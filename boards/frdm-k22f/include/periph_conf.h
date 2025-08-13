@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2017 Eistec AB
- *               2021-2023 Hugues Larrive
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Eistec AB
+ * SPDX-FileCopyrightText: 2021-2023 Hugues Larrive
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_frdm-k22f
@@ -17,9 +16,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -312,5 +308,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

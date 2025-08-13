@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_stm32_usbdev stm32 USB OTG FS/HS peripheral
  * @ingroup     cpu_stm32
@@ -34,9 +36,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef USBDEV_STM32_H
-#define USBDEV_STM32_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -128,5 +127,4 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* USBDEV_STM32_H */
 /** @} */

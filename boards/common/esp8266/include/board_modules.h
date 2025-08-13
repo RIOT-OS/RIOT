@@ -1,13 +1,9 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef BOARD_MODULES_H
-#define BOARD_MODULES_H
+#pragma once
 
 /**
  * @ingroup     boards_common_esp8266
@@ -126,5 +122,3 @@ extern "C" {
 #endif
 
 /** @} */
-
-#endif /* BOARD_MODULES_H */

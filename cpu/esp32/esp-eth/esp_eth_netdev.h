@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32_esp_eth
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ESP_ETH_NETDEV_H
-#define ESP_ETH_NETDEV_H
 
 #include <stdbool.h>
 
@@ -59,5 +58,4 @@ typedef struct {
 }
 #endif
 
-#endif /* ESP_ETH_NETDEV_H */
 /** @} */

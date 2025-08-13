@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016-2017  OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2017 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nucleo-f207zg
@@ -17,9 +16,6 @@
  * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -301,5 +297,4 @@ static const eth_conf_t eth_config = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

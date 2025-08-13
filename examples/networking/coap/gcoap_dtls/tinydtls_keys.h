@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     examples
@@ -17,9 +16,6 @@
  *
  * @}
  */
-
-#ifndef TINYDTLS_KEYS_H
-#define TINYDTLS_KEYS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,5 +55,3 @@ static const unsigned char ecdsa_pub_key_y[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TINYDTLS_KEYS_H */

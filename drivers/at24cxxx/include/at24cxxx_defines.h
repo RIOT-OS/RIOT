@@ -23,7 +23,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include "kernel_defines.h"
 
 #ifdef __cplusplus

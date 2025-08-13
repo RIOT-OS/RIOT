@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @{
@@ -17,9 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,5 +27,4 @@ extern "C" {
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */

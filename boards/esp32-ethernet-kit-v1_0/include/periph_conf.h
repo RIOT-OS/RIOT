@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
- * Copyright (C) 2020 Google LLC
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Gunar Schorcht
+ * SPDX-FileCopyrightText: 2020 Google LLC
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_esp32_esp-ethernet-kit
@@ -15,9 +14,6 @@
  * @author      Erik Ekman <eekman@google.com>
  * @{
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -131,5 +127,4 @@
 /* include common board definitions as last step */
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */

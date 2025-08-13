@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2017 Inria
- *               2017 OTAKeys
- *               2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-FileCopyrightText: 2017 OTAKeys
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    boards_common_nucleo144 STM32 Nucleo-144
@@ -22,9 +21,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "arduino_pinmap.h"
 #include "board_nucleo.h"
@@ -81,5 +77,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

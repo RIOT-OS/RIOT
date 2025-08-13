@@ -27,7 +27,6 @@
  * backward compatibility.
  */
 
-
 #include "board.h"
 #include "lcd.h"
 #include "st7735.h"

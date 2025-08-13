@@ -19,7 +19,6 @@
  * @author      David Picard <david.picard@clermont.in2p3.fr>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "abp2.h"

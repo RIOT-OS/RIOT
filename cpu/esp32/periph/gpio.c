@@ -27,8 +27,10 @@
 #include "periph/gpio_ll_arch.h"
 #endif
 
+#include "driver/rtc_io.h"
 #include "esp/common_macros.h"
 #include "esp_intr_alloc.h"
+#include "driver/rtc_io.h"
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "hal/rtc_io_types.h"
@@ -37,17 +39,18 @@
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
 #include "soc/io_mux_reg.h"
+#if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
 #include "soc/rtc_cntl_reg.h"
+#endif
 #include "soc/rtc_io_periph.h"
 
 #if __xtensa__
 #include "xtensa/xtensa_api.h"
 #endif
 
-#include "esp_idf_api/gpio.h"
-
-#include "adc_arch.h"
+#include "bitarithm.h"
 #include "bitfield.h"
+#include "board.h"
 #include "esp_common.h"
 #include "esp_sleep.h"
 #include "gpio_arch.h"
@@ -57,16 +60,34 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if SOC_PM_SUPPORT_EXT_WAKEUP
+#if SOC_PM_SUPPORT_EXT1_WAKEUP
+#if CPU_FAM_ESP32
 #define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
-#define ESP_PM_WUP_PINS_ALL_LOW     ESP_EXT1_WAKEUP_ALL_LOW
 #define ESP_PM_WUP_PINS_ANY_LOW     -1
-#endif
-
-#if SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP
+#define ESP_PM_WUP_PINS_ALL_LOW     ESP_EXT1_WAKEUP_ALL_LOW
+#else /* CPU_FAM_ESP32 */
+#define ESP_PM_WUP_PINS_ANY_HIGH    ESP_EXT1_WAKEUP_ANY_HIGH
+#define ESP_PM_WUP_PINS_ANY_LOW     ESP_EXT1_WAKEUP_ANY_LOW
+#define ESP_PM_WUP_PINS_ALL_LOW     -1
+#endif /* CPU_FAM_ESP32 */
+#elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP
 #define ESP_PM_WUP_PINS_ANY_HIGH    ESP_GPIO_WAKEUP_GPIO_HIGH
 #define ESP_PM_WUP_PINS_ANY_LOW     ESP_GPIO_WAKEUP_GPIO_LOW
 #define ESP_PM_WUP_PINS_ALL_LOW     -1
+#else
+#define ESP_PM_WUP_PINS_ANY_HIGH    -1
+#define ESP_PM_WUP_PINS_ANY_LOW     -1
+#define ESP_PM_WUP_PINS_ALL_LOW     -1
+#endif
+
+#if CPU_FAM_ESP32
+#if ESP_PM_WUP_LEVEL == ESP_PM_WUP_PINS_ANY_LOW
+#error "ESP_PM_WUP_PINS_ANY_LOW is not allowed as ESP_PM_WUP_LEVEL."
+#endif
+#else
+#if ESP_PM_WUP_LEVEL == ESP_PM_WUP_PINS_ALL_LOW
+#error "ESP_PM_WUP_PINS_ALL_LOW is not allowed as ESP_PM_WUP_LEVEL."
+#endif
 #endif
 
 #ifndef ESP_PM_WUP_LEVEL
@@ -74,7 +95,7 @@
 #endif
 
 #if ESP_PM_WUP_LEVEL == -1
-#error "ESP32x SoC does not support this ESP_PM_WUP_LEVEL"
+#error "ESP32x variant does not support this ESP_PM_WUP_LEVEL"
 #endif
 
 #define GPIO_PRO_CPU_INTR_ENA       (BIT(2))
@@ -234,12 +255,25 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     cfg.intr_type = GPIO_INTR_DISABLE;
 
 #ifdef ESP_PM_WUP_PINS
-/* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
+    /* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
     _gpio_pin_pu[pin] = cfg.pull_up_en;
     _gpio_pin_pd[pin] = cfg.pull_down_en;
+#if SOC_RTCIO_HOLD_SUPPORTED
+    /* disable the RTCIO hold function for the case we come from deep sleep */
+    if (rtc_gpio_is_valid_gpio(pin)) {
+        rtc_gpio_hold_dis(pin);
+    }
+#endif /* SOC_RTCIO_HOLD_SUPPORTED */
+#endif /* ESP_PM_WUP_PINS */
+
+#ifdef ESP_PM_GPIO_HOLD
+#if SOC_RTCIO_HOLD_SUPPORTED
+    /* disable the RTCIO hold function for the case we come from deep sleep */
+    rtc_gpio_force_hold_dis_all();
+#endif
 #endif
 
-    return (esp_idf_gpio_config(&cfg) == ESP_OK) ? 0 : -1;
+    return (gpio_config(&cfg) == ESP_OK) ? 0 : -1;
 }
 
 #if MODULE_PERIPH_GPIO_IRQ
@@ -283,18 +317,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     /* install GPIO ISR of ESP-IDF if not yet done */
     if (!gpio_isr_service_installed &&
-        esp_idf_gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1) != ESP_OK) {
+        gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1) != ESP_OK) {
         return -1;
     }
     gpio_isr_service_installed = true;
 
     /* set the interrupt type for the pin */
-    if (esp_idf_gpio_set_intr_type(pin, type) != ESP_OK) {
+    if (gpio_set_intr_type(pin, type) != ESP_OK) {
         return -1;
     }
 
     /* unmask and clear pending interrupts for the pin */
-    if (esp_idf_gpio_isr_handler_add(pin, cb, arg) != ESP_OK) {
+    if (gpio_isr_handler_add(pin, cb, arg) != ESP_OK) {
         return -1;
     }
 
@@ -308,7 +342,7 @@ void gpio_irq_enable(gpio_t pin)
     DEBUG("%s: gpio=%d\n", __func__, pin);
     assert(pin < GPIO_PIN_NUMOF);
 
-    if (esp_idf_gpio_intr_enable(pin) == ESP_OK) {
+    if (gpio_intr_enable(pin) == ESP_OK) {
         gpio_int_enabled_table[pin] = true;
     }
 }
@@ -318,7 +352,7 @@ void gpio_irq_disable(gpio_t pin)
     DEBUG("%s: gpio=%d\n", __func__, pin);
     assert(pin < GPIO_PIN_NUMOF);
 
-    if (esp_idf_gpio_intr_disable(pin) == ESP_OK) {
+    if (gpio_intr_disable(pin) == ESP_OK) {
         gpio_int_enabled_table[pin] = false;
     }
 }
@@ -473,12 +507,24 @@ void gpio_pm_sleep_enter(unsigned mode)
 {
     if (mode == ESP_PM_DEEP_SLEEP) {
 #ifdef ESP_PM_GPIO_HOLD
-        /*
-         * Activate the power domain for RTC peripherals when
-         * ESP_PM_GPIO_HOLD is defined for deep sleep mode.
-         */
-        esp_idf_gpio_deep_sleep_hold();
-        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+#if SOC_RTCIO_HOLD_SUPPORTED
+        rtc_gpio_force_hold_en_all();
+#if CPU_FAM_ESP32
+        /* isolating GPIO12 from external circuits is especially recommended for
+         * ESP32-WROVER that have an external pullup on GPIO12 */
+        rtc_gpio_isolate(GPIO_NUM_12);
+#elif CPU_FAM_ESP32H2
+        /* On ESP32H2 rtc_gpio_force_hold_en_all doesn't enable the hold
+         * function for all RTC GPIOs, so we have to do it for each pin. */
+        for (unsigned i = 0; i < SOC_GPIO_PIN_COUNT; i++) {
+            if (rtc_gpio_is_valid_gpio(i)) {
+                rtc_gpio_hold_en(i);
+            }
+        }
+#endif
+#else
+#  error "ESP32x variant does not support hold feature in deep sleep";
+#endif
 #endif
 
 #ifdef ESP_PM_WUP_PINS
@@ -491,6 +537,37 @@ void gpio_pm_sleep_enter(unsigned mode)
         for (unsigned i = 0; i < ARRAY_SIZE(wup_pins); i++) {
             wup_pin_mask |= 1ULL << wup_pins[i];
 
+            /* ensure that valid GPIOs are used as wake-up source */
+#if SOC_PM_SUPPORT_EXT1_WAKEUP
+            if (rtc_io_num_map[wup_pins[i]] < 0) {
+                LOG_ERROR("GPIO%u is not a valid wake-up source, valid GPIOs are:",
+                          wup_pins[i]);
+                for (unsigned j = 0; j < SOC_GPIO_PIN_COUNT; j++) {
+                    if (rtc_io_num_map[j] != -1) {
+                        printf(" GPIO%u", j);
+                    }
+                }
+                printf("\n");
+                assert(false);
+            }
+#elif SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK
+            if (((1ULL << wup_pins[i]) & SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK) == 0) {
+                LOG_ERROR("GPIO%u is not a valid wake-up source, valid GPIOs are:",
+                          wup_pins[i]);
+
+                unsigned valid_num = bitarithm_bits_set(SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK);
+                uint32_t valid_mask = SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK;
+                for (unsigned j = 0; j < valid_num ; j++) {
+                    if (valid_mask & 1) {
+                        printf(" GPIO%u ", j);
+                    }
+                    valid_mask = valid_mask >> 1;
+                }
+                printf("\n");
+                assert(false);
+            }
+#endif
+
 #if SOC_RTCIO_INPUT_OUTPUT_SUPPORTED
             /* If internal pullups/pulldowns are used, they have to be
                activated also in deep sleep mode in RTC power domain */
@@ -499,33 +576,42 @@ void gpio_pm_sleep_enter(unsigned mode)
             assert(rtc_io_num_map[wup_pins[i]] >= 0);
             if (_gpio_pin_pu[wup_pins[i]]) {
                 pu_pd_used = true;
-                esp_idf_rtc_gpio_pullup_en(wup_pins[i]);
+                rtc_gpio_pullup_en(wup_pins[i]);
+                rtc_gpio_pulldown_dis(wup_pins[i]);
             }
-            else {
-                esp_idf_rtc_gpio_pullup_dis(wup_pins[i]);
-            }
-            if (_gpio_pin_pd[wup_pins[i]]) {
+            else if (_gpio_pin_pd[wup_pins[i]]) {
                 pu_pd_used = true;
-                esp_idf_rtc_gpio_pulldown_en(wup_pins[i]);
-            }
-            else {
-                esp_idf_rtc_gpio_pulldown_dis(wup_pins[i]);
+                rtc_gpio_pullup_dis(wup_pins[i]);
+                rtc_gpio_pulldown_en(wup_pins[i]);
             }
             if (pu_pd_used) {
+#if SOC_PM_SUPPORT_RTC_PERIPH_PD
                 /* If internal pullups/pulldowns are used, the RTC power domain
-                 * must remain active in deep sleep mode */
+                 * must remain active in deep sleep mode if supported */
                 esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+#endif
             }
-#endif /* SOC_RTCIO_INPUT_OUTPUT_SUPPORTED */
+#elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP && SOC_DEEP_SLEEP_SUPPORTED
+            if (_gpio_pin_pu[wup_pins[i]]) {
+                gpio_pullup_en(wup_pins[i]);
+                gpio_pulldown_dis(wup_pins[i]);
+            }
+            else if (_gpio_pin_pd[wup_pins[i]]) {
+                gpio_pullup_dis(wup_pins[i]);
+                gpio_pulldown_en(wup_pins[i]);
+            }
+#elif SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP
+            rtc_gpio_hold_en(wup_pins[i]);
+#endif
         }
-#if SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP
+#if SOC_PM_SUPPORT_EXT1_WAKEUP
+        /* ESP_PM_WUP_PINS_ALL_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
+        esp_sleep_enable_ext1_wakeup_io(wup_pin_mask, ESP_PM_WUP_LEVEL);
+#elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP && SOC_DEEP_SLEEP_SUPPORTED
         /* ESP_PM_WUP_PINS_ANY_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
         esp_deep_sleep_enable_gpio_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
-#elif SOC_PM_SUPPORT_EXT_WAKEUP
-        /* ESP_PM_WUP_PINS_ALL_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
-        esp_sleep_enable_ext1_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
 #else
-        #error "ESP32x SoC variant doesn't allow to define GPIOs for wake-up from deep sleep"
+        #error "ESP32x variant doesn't allow to define GPIOs for wake-up from deep sleep"
 #endif
 #endif /* ESP_PM_WUP_PINS */
     }
@@ -537,12 +623,12 @@ void gpio_pm_sleep_enter(unsigned mode)
                 switch (gpio_int_saved_type[i]) {
                     case GPIO_LOW:
                     case GPIO_FALLING:
-                        esp_idf_gpio_wakeup_enable(i, GPIO_INTR_LOW_LEVEL);
+                        gpio_wakeup_enable(i, GPIO_INTR_LOW_LEVEL);
                         DEBUG("%s gpio=%u GPIO_LOW\n", __func__, i);
                         break;
                     case GPIO_HIGH:
                     case GPIO_RISING:
-                        esp_idf_gpio_wakeup_enable(i, GPIO_INTR_HIGH_LEVEL);
+                        gpio_wakeup_enable(i, GPIO_INTR_HIGH_LEVEL);
                         DEBUG("%s gpio=%u GPIO_HIGH\n", __func__, i);
                         break;
                     case GPIO_BOTH:

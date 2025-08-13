@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_kinetis_wdog Kinetis WDOG
  * @ingroup     cpu_kinetis
@@ -36,9 +38,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#ifndef WDOG_H
-#define WDOG_H
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -53,5 +52,4 @@ void wdog_disable(void);
 }
 #endif
 
-#endif /* WDOG_H */
 /** @} */

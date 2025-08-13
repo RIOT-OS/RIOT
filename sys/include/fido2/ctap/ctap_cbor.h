@@ -21,7 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-
 #include "fido2/ctap/ctap.h"
 
 #ifdef __cplusplus

@@ -47,7 +47,6 @@ int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
     return 0;
 }
 
-
 int main(void)
 {
     puts("Test application for DOSE driver");

@@ -43,8 +43,8 @@ int motor_driver_init(motor_driver_t motor_driver)
     uint32_t freq = motor_driver_conf->pwm_frequency;
     uint16_t resol = motor_driver_conf->pwm_resolution;
 
-    uint32_t ret_pwm = pwm_init(pwm_dev, mode, freq, resol);
-    if (ret_pwm != freq) {
+    uint32_t pwm_freq = pwm_init(pwm_dev, mode, freq, resol);
+    if (pwm_freq == 0) {
         err = EINVAL;
         LOG_ERROR("pwm_init failed\n");
         goto motor_init_err;

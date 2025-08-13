@@ -19,7 +19,6 @@
  * @brief       Utility header providing time unit defines
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

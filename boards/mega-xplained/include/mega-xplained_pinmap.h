@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Matthew Blue <matthew.blue.neuro@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Matthew Blue <matthew.blue.neuro@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_mega-xplained
@@ -18,9 +17,6 @@
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef MEGA_XPLAINED_PINMAP_H
-#define MEGA_XPLAINED_PINMAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,5 +70,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MEGA_XPLAINED_PINMAP_H */
 /** @} */

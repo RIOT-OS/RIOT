@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_nrf52
@@ -16,9 +15,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef CFG_RTT_DEFAULT_H
-#define CFG_RTT_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,5 +42,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_RTT_DEFAULT_H */
 /** @} */

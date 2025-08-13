@@ -18,7 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "tsl2561.h"

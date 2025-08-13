@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #include <time.h>
 
 #include "mutex.h"
@@ -111,7 +110,6 @@ int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioceiling, int *o
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

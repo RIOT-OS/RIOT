@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -18,9 +20,6 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  * @author          Joshua DeWeese <jdeweese@primecontrols.com>
  */
-
-#ifndef PERIPH_CPU_DMA_H
-#define PERIPH_CPU_DMA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -270,5 +269,4 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 }
 #endif
 
-#endif /* PERIPH_CPU_DMA_H */
 /** @} */

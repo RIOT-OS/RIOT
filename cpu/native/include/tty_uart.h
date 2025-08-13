@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -16,8 +18,6 @@
  * @brief  UART implementation based on /dev/tty devices on host
  * @author Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
-#ifndef TTY_UART_H
-#define TTY_UART_H
 
 #include "periph/uart.h"
 
@@ -37,5 +37,4 @@ void tty_uart_setup(uart_t uart, const char *name);
 }
 #endif
 
-#endif /* TTY_UART_H */
 /** @} */

@@ -21,7 +21,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
 
-
 #include <stdlib.h>
 
 #include "list.h"

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_riscv_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Koen Zandberg
  */
-
-#ifndef CPU_CONF_COMMON_H
-#define CPU_CONF_COMMON_H
 
 #include "vendor/riscv_csr.h"
 #include "cpu_conf_common.h"
@@ -60,5 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_COMMON_H */
 /** @} */

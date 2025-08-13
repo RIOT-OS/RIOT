@@ -18,7 +18,6 @@
  * @author      Quang Pham <phhr_quang@live.com>
  */
 
-
 #include "board.h"
 #include "hsc.h"
 #include "hsc_internals.h"

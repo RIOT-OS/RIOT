@@ -1,19 +1,25 @@
 # common definitions for all ESP-IDF modules
 
 # additional include pathes required by ESP-IDF module
+INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/bootloader_flash/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include_bootloader
-INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/private_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/efuse/$(CPU_FAM)/private_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_app_format/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_gpio/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/ldo/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_ipc/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_mm/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_pm/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/public_compat
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/include/private
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/private_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/freertos/esp_additions/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include/hal
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/priv_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
 
@@ -22,8 +28,22 @@ ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
 endif
 
-ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
+ifeq (esp32c6,$(CPU_FAM))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/esp_private
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
+endif
+
+ifeq (esp32h2,$(CPU_FAM))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/esp_private
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
+endif
+
+ifeq (esp32s3,$(CPU_FAM))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash
+endif
+
+ifneq (,$(filter periph_i2c%,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/i2c/include
 endif
 
 SRC := $(addprefix $(ESP32_SDK_DIR)/,$(ESP32_SDK_SRC))

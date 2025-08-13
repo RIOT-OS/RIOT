@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     examples
@@ -15,9 +14,6 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
-
-#ifndef GCOAP_EXAMPLE_H
-#define GCOAP_EXAMPLE_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -34,14 +30,6 @@ extern "C" {
 #endif
 
 extern uint16_t req_count;  /**< Counts requests sent by CLI. */
-
-/**
- * @brief   Shell interface exposing the client side features of gcoap
- * @param   argc    Number of shell arguments (including shell command name)
- * @param   argv    Shell argument values (including shell command name)
- * @return  Exit status of the shell command
- */
-int gcoap_cli_cmd(int argc, char **argv);
 
 /**
  * @brief   Registers the CoAP resources exposed in the example app
@@ -61,5 +49,4 @@ void notify_observers(void);
 }
 #endif
 
-#endif /* GCOAP_EXAMPLE_H */
 /** @} */

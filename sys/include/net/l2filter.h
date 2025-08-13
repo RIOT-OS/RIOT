@@ -31,7 +31,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -84,8 +83,10 @@ typedef struct {
  * @pre     @p addr != NULL
  * @pre     @p addr_maxlen <= @ref CONFIG_L2FILTER_ADDR_MAXLEN
  *
- * @return  0 on success
- * @return  -ENOMEM if no empty slot left in list
+ * @retval  0 on success
+ * @retval  -ENOMEM if no empty slot left in list
+ * @retval  -EINVAL if `addr_len > CONFIG_L2FILTER_ADDR_MAXLEN` **AND** `NDEBUG` is enabled.
+ *          Otherwise this condition will trip an `assert()`.
  */
 int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len);
 

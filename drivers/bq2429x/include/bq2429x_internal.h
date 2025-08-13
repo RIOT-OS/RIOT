@@ -19,7 +19,6 @@
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

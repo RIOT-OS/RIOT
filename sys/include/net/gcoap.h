@@ -396,7 +396,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 
 #include "event/callback.h"

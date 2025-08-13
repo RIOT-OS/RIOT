@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_kinetis
  * @{
@@ -17,9 +19,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -881,5 +880,4 @@ void gpio_init_port(gpio_t pin, uint32_t pcr);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

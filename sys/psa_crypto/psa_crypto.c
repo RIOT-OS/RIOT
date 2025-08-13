@@ -71,6 +71,13 @@ static inline int constant_time_memcmp(const uint8_t *a, const uint8_t *b, size_
 }
 #endif /* MODULE_PSA_HASH */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
+                                                          psa_key_slot_t **p_slot,
+                                                          psa_key_usage_t usage,
+                                                          psa_algorithm_t alg);
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
+
 const char *psa_status_to_humanly_readable(psa_status_t status)
 {
     switch (status) {
@@ -116,6 +123,8 @@ const char *psa_status_to_humanly_readable(psa_status_t status)
             return "PSA_ERROR_INSUFFICIENT_DATA";
         case PSA_ERROR_INVALID_HANDLE:
             return "PSA_ERROR_INVALID_HANDLE";
+        case PSA_SUCCESS:
+            return "PSA_SUCCESS";
         default:
             return "Error value not recognized";
     }
@@ -143,6 +152,98 @@ psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
+/**
+ * @brief   aead encrypt and decrypt function
+ *
+ *          See @ref psa_aead_encrypt(...)
+ *          See @ref psa_aead_decrypt(...)
+ *
+ * @param   direction       Whether to encrypt or decrypt, see @ref psa_encrypt_or_decrypt_t
+ * @return  @ref psa_status_t
+ */
+static psa_status_t psa_aead_encrypt_decrypt(   psa_key_id_t key,
+                                                psa_algorithm_t alg,
+                                                const uint8_t * nonce,
+                                                size_t nonce_length,
+                                                const uint8_t * additional_data,
+                                                size_t additional_data_length,
+                                                const uint8_t * input,
+                                                size_t input_length,
+                                                uint8_t * output,
+                                                size_t output_size,
+                                                size_t * output_length,
+                                                psa_encrypt_or_decrypt_t direction)
+{
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if ((additional_data_length != 0 && !additional_data) || !nonce) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    if (!PSA_ALG_IS_AEAD(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (nonce_length > PSA_AEAD_NONCE_MAX_SIZE) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (direction == PSA_CRYPTO_DRIVER_DECRYPT && (!input || input_length == 0)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (direction == PSA_CRYPTO_DRIVER_ENCRYPT && (!output || output_size == 0)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
+                             PSA_KEY_USAGE_ENCRYPT :
+                             PSA_KEY_USAGE_DECRYPT);
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
+        if (output_size < PSA_AEAD_ENCRYPT_OUTPUT_SIZE(slot->attr.type, alg, input_length)) {
+            unlock_status = psa_unlock_key_slot(slot);
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
+        status = psa_location_dispatch_aead_encrypt(&slot->attr, alg, slot, nonce, nonce_length,
+                                                    additional_data, additional_data_length,
+                                                    input, input_length, output,
+                                                    output_size, output_length);
+    }
+    else {
+        if (output_size < PSA_AEAD_DECRYPT_OUTPUT_SIZE(slot->attr.type, alg, input_length)) {
+            unlock_status = psa_unlock_key_slot(slot);
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
+        status = psa_location_dispatch_aead_decrypt(&slot->attr, alg, slot, nonce, nonce_length,
+                                                    additional_data, additional_data_length,
+                                                    input, input_length, output,
+                                                    output_size, output_length);
+    }
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
+}
+
 psa_status_t psa_aead_decrypt(  psa_key_id_t key,
                                 psa_algorithm_t alg,
                                 const uint8_t *nonce,
@@ -155,18 +256,10 @@ psa_status_t psa_aead_decrypt(  psa_key_id_t key,
                                 size_t plaintext_size,
                                 size_t *plaintext_length)
 {
-    (void)key;
-    (void)alg;
-    (void)nonce;
-    (void)nonce_length;
-    (void)additional_data;
-    (void)additional_data_length;
-    (void)ciphertext;
-    (void)ciphertext_length;
-    (void)plaintext;
-    (void)plaintext_size;
-    (void)plaintext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    return psa_aead_encrypt_decrypt(key, alg, nonce, nonce_length, additional_data,
+                                    additional_data_length, ciphertext, ciphertext_length,
+                                    plaintext, plaintext_size, plaintext_length,
+                                    PSA_CRYPTO_DRIVER_DECRYPT);
 }
 
 psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
@@ -191,18 +284,10 @@ psa_status_t psa_aead_encrypt(  psa_key_id_t key,
                                 size_t ciphertext_size,
                                 size_t *ciphertext_length)
 {
-    (void)key;
-    (void)alg;
-    (void)nonce;
-    (void)nonce_length;
-    (void)additional_data;
-    (void)additional_data_length;
-    (void)plaintext;
-    (void)plaintext_length;
-    (void)ciphertext;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    return psa_aead_encrypt_decrypt(key, alg, nonce, nonce_length, additional_data,
+                                    additional_data_length, plaintext, plaintext_length,
+                                    ciphertext, ciphertext_size, ciphertext_length,
+                                    PSA_CRYPTO_DRIVER_ENCRYPT);
 }
 
 psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
@@ -1306,8 +1391,9 @@ psa_status_t psa_export_key(psa_key_id_t key,
     }
 
     if (!PSA_KEY_TYPE_IS_ECC(slot->attr.type) ||
-            PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_TWISTED_EDWARDS) {
-        /* key export is currently only supported for ed25519 keys */
+           (PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_TWISTED_EDWARDS &&
+            PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_SECP_R1)) {
+        /* key export is currently only supported for ed25519 and secp_r1 keys */
         status = PSA_ERROR_NOT_SUPPORTED;
         unlock_status = psa_unlock_key_slot(slot);
         if (unlock_status != PSA_SUCCESS) {
@@ -1702,17 +1788,6 @@ psa_status_t psa_key_derivation_setup(psa_key_derivation_operation_t *operation,
 #endif /* MODULE_PSA_KEY_DERIVATION */
 
 #if IS_USED(MODULE_PSA_MAC)
-psa_status_t psa_mac_abort(psa_mac_operation_t *operation)
-{
-    if (!lib_initialized) {
-        return PSA_ERROR_BAD_STATE;
-    }
-
-    *operation = psa_mac_operation_init();
-
-    return PSA_ERROR_NOT_SUPPORTED;
-}
-
 /**
  * @brief   Validate algorithm and key for a MAC operation
  *
@@ -1731,7 +1806,7 @@ static psa_status_t psa_mac_validate_alg_and_key_and_size(psa_key_attributes_t *
     psa_key_type_t type = psa_get_key_type(attr);
     psa_key_bits_t bits = psa_get_key_bits(attr);
 
-    if (!PSA_ALG_IS_HMAC(alg) || (PSA_ALG_GET_HASH(alg) != PSA_ALG_SHA_256)) {
+    if (!PSA_ALG_IS_HMAC(alg)) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
@@ -1788,7 +1863,7 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
         return status;
     }
 
-    status = psa_get_and_lock_key_slot_with_policy(key, &slot, attr.policy.usage, alg);
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_SIGN_MESSAGE, alg);
     if (status != PSA_SUCCESS) {
         unlock_status = psa_unlock_key_slot(slot);
         if (unlock_status != PSA_SUCCESS) {
@@ -1805,38 +1880,6 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
 
 }
 
-psa_status_t psa_mac_sign_finish(psa_mac_operation_t *operation,
-                                 uint8_t *mac,
-                                 size_t mac_size,
-                                 size_t *mac_length)
-{
-    (void)operation;
-    (void)mac;
-    (void)mac_size;
-    (void)mac_length;
-    return PSA_ERROR_NOT_SUPPORTED;
-}
-
-psa_status_t psa_mac_sign_setup(psa_mac_operation_t *operation,
-                                psa_key_id_t key,
-                                psa_algorithm_t alg)
-{
-    (void)operation;
-    (void)key;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
-}
-
-psa_status_t psa_mac_update(psa_mac_operation_t *operation,
-                            const uint8_t *input,
-                            size_t input_length)
-{
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    return PSA_ERROR_NOT_SUPPORTED;
-}
-
 psa_status_t psa_mac_verify(psa_key_id_t key,
                             psa_algorithm_t alg,
                             const uint8_t *input,
@@ -1844,33 +1887,174 @@ psa_status_t psa_mac_verify(psa_key_id_t key,
                             const uint8_t *mac,
                             size_t mac_length)
 {
-    (void)key;
-    (void)alg;
-    (void)input;
-    (void)input_length;
-    (void)mac;
-    (void)mac_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_slot_t *slot;
+    psa_status_t status;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !mac || !mac_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_get_key_attributes(key, &attr);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_mac_validate_alg_and_key_and_size(&attr, alg, mac_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_VERIFY_MESSAGE, alg);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_location_dispatch_mac_verify(&slot->attr, alg, slot, input, input_length,
+                                              mac, mac_length);
+    psa_unlock_key_slot(slot);
+
+    return status;
 }
 
-psa_status_t psa_mac_verify_finish(psa_mac_operation_t *operation,
-                                   const uint8_t *mac,
-                                   size_t mac_length)
+psa_status_t psa_mac_sign_setup(psa_mac_operation_t *operation,
+                                psa_key_id_t key,
+                                psa_algorithm_t alg)
 {
-    (void)operation;
-    (void)mac;
-    (void)mac_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_slot_t *slot;
+    psa_status_t status;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!PSA_ALG_IS_HMAC(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_get_key_attributes(key, &attr);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_SIGN_MESSAGE, alg);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_location_dispatch_mac_sign_setup(operation, &attr, slot, alg);
+    psa_unlock_key_slot(slot);
+
+    return status;
 }
 
 psa_status_t psa_mac_verify_setup(psa_mac_operation_t *operation,
                                   psa_key_id_t key,
                                   psa_algorithm_t alg)
 {
-    (void)operation;
-    (void)key;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_key_attributes_t attr = psa_key_attributes_init();
+    psa_key_slot_t *slot;
+    psa_status_t status;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!PSA_ALG_IS_HMAC(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_get_key_attributes(key, &attr);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_VERIFY_MESSAGE, alg);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    status = psa_location_dispatch_mac_verify_setup(operation, &attr, slot, alg);
+    psa_unlock_key_slot(slot);
+
+    return status;
+}
+
+psa_status_t psa_mac_update(psa_mac_operation_t *operation,
+                            const uint8_t *input,
+                            size_t input_length)
+{
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !input) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    return psa_location_dispatch_mac_update(operation, input, input_length);
+}
+
+psa_status_t psa_mac_sign_finish(psa_mac_operation_t *operation,
+                                 uint8_t *mac,
+                                 size_t mac_size,
+                                 size_t *mac_length)
+{
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !mac || !mac_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    return psa_location_dispatch_mac_sign_finish(operation, mac, mac_size, mac_length);
+}
+
+psa_status_t psa_mac_verify_finish(psa_mac_operation_t *operation,
+                                   const uint8_t *mac,
+                                   size_t mac_length)
+{
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !mac) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    return psa_location_dispatch_mac_verify_finish(operation, mac, mac_length);
+}
+
+psa_status_t psa_mac_abort(psa_mac_operation_t *operation)
+{
+    psa_status_t status;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_location_dispatch_mac_abort(operation);
+    *operation = psa_mac_operation_init();
+
+    return status;
 }
 
 psa_status_t psa_purge_key(psa_key_id_t key)
@@ -1925,7 +2109,7 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    if (!PSA_ALG_IS_SIGN_HASH(alg) || hash_length != PSA_HASH_LENGTH(alg)) {
+    if (!PSA_ALG_IS_SIGN_HASH(alg) || (hash_length != PSA_HASH_LENGTH(alg) && PSA_ALG_IS_HASH(alg))) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -2029,7 +2213,7 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    if (!PSA_ALG_IS_SIGN_HASH(alg) || hash_length != PSA_HASH_LENGTH(alg)) {
+    if (!PSA_ALG_IS_SIGN_HASH(alg) || (hash_length != PSA_HASH_LENGTH(alg) && PSA_ALG_IS_HASH(alg))) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 

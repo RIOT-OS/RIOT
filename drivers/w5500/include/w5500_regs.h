@@ -18,7 +18,6 @@
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

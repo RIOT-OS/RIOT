@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2014 Christian Mehlis <mehlis@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014 Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_airfy-beacon
@@ -16,14 +15,10 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
-
 #include "board_common.h"
 
 #ifdef __cplusplus
  extern "C" {}
 #endif
 
-#endif /* BOARD_H */
 /** @} */

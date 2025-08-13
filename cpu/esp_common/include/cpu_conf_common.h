@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_esp_common_conf ESP common compile configurations
  * @ingroup     cpu_esp_common
@@ -18,9 +20,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef CPU_CONF_COMMON_H
-#define CPU_CONF_COMMON_H
 
 /**
  * @brief   Declare the heap_stats function as available
@@ -52,5 +51,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_COMMON_H */
 /** @} */

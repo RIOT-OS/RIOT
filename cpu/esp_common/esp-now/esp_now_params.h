@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common_esp_now
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ESP_NOW_PARAMS_H
-#define ESP_NOW_PARAMS_H
 
 #if defined(MODULE_ESP_NOW) || defined(DOXYGEN)
 
@@ -125,5 +124,4 @@ static const esp_now_params_t esp_now_params = ESP_NOW_PARAMS;
 
 #endif /* MODULE_ESP_NOW || DOXYGEN */
 
-#endif /* ESP_NOW_PARAMS_H */
 /**@}*/

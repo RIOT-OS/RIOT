@@ -1,0 +1,470 @@
+/*
+ * Copyright (C) 2024-2025 Carl Seifert
+ * Copyright (C) 2024-2025 TU Dresden
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for
+ * more details.
+ */
+
+/**
+ * @file
+ * @ingroup net_unicoap
+ * @brief   Buffer and string tools
+ * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ */
+
+#include <errno.h>
+#include <stdbool.h>
+
+#include "iolist.h"
+
+#include "net/unicoap/options.h"
+#include "net/unicoap/message.h"
+
+#define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
+#include "debug.h"
+#include "private.h"
+
+static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next)
+{
+    iolist->iol_base = buffer;
+    iolist->iol_len = size;
+    iolist->iol_next = next;
+}
+
+static inline bool iolist_is_empty(const iolist_t* iolist)
+{
+    while (iolist) {
+        if (iolist->iol_len > 0) {
+            return false;
+        }
+        iolist = iolist->iol_next;
+    }
+
+    return true;
+}
+
+static void iolist_append(iolist_t** iolist, iolist_t* chunk)
+{
+    assert(iolist);
+    if (*iolist) {
+        iolist_t* v = *iolist;
+        while (v->iol_next) {
+            v = v->iol_next;
+        }
+        v->iol_next = chunk;
+    }
+    else {
+        *iolist = chunk;
+    }
+}
+
+bool unicoap_message_payload_is_empty(const unicoap_message_t* message)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS:
+        return iolist_is_empty(message->payload_chunks);
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        return message->payload_size == 0;
+    default:
+        UNREACHABLE();
+        return -1;
+    }
+}
+
+ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* buffer,
+                                     size_t capacity)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS:
+        return iolist_to_buffer(message->payload_chunks, buffer, capacity);
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        if (message->payload_size > capacity) {
+            UNICOAP_DEBUG("buf too small " _UNICOAP_NEED_HAVE "\n",
+                          message->payload_size, capacity);
+            return -ENOBUFS;
+        }
+        memcpy(buffer, message->payload, message->payload_size);
+        return message->payload_size;
+    default:
+        UNREACHABLE();
+        return -1;
+    }
+}
+
+ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint8_t* buffer,
+                                                size_t capacity)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS: {
+        assert(buffer);
+        ssize_t res = iolist_to_buffer(message->payload_chunks, buffer, capacity);
+        if (res < 0) {
+            UNICOAP_DEBUG("buf too small " _UNICOAP_NEED_HAVE "\n",
+                          iolist_size(message->payload_chunks), capacity);
+            return res;
+        }
+        message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
+        message->payload = buffer;
+        message->payload_size = res;
+        return res;
+    }
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        return message->payload_size;
+    default:
+        UNREACHABLE();
+        return -1;
+    }
+}
+
+void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* chunk)
+{
+    assert(message->payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS);
+    if (message->payload_chunks) {
+        iolist_append(&message->payload_chunks, chunk);
+    }
+    else {
+        message->payload_chunks = chunk;
+    }
+}
+
+static inline iolist_t* _append_payload_to_iolist(const unicoap_message_t* message,
+                                                  iolist_t* element)
+{
+    switch (message->payload_representation) {
+    case UNICOAP_PAYLOAD_NONCONTIGUOUS:
+        return message->payload_chunks;
+    case UNICOAP_PAYLOAD_CONTIGUOUS:
+        iolist_init(element, message->payload, message->payload_size, NULL);
+        return element;
+    default:
+        UNREACHABLE();
+        return NULL;
+    }
+}
+
+static const uint8_t _payload_separator = 0xff;
+
+int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size,
+                                           const unicoap_message_t* message,
+                                           iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT])
+{
+    assert(header);
+    assert(message);
+    assert(iolists);
+    iolist_init(iolists, header, header_size, NULL);
+
+    iolist_t* element = iolists;
+    if (message->options && message->options->option_count > 0) {
+        element->iol_next = element + 1;
+        element += 1;
+        iolist_init(element, unicoap_message_options_data(message),
+                    unicoap_message_options_size(message), NULL);
+    }
+
+    if (unicoap_message_payload_get_size(message) > 0) {
+        element->iol_next = element + 1;
+        element += 1;
+
+        iolist_init(element, (uint8_t*)&_payload_separator, 1, element + 1);
+
+        element->iol_next = _append_payload_to_iolist(message, element + 1);
+    }
+
+    return 0;
+}
+
+ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
+                                              const unicoap_message_t* message)
+{
+    assert(pdu);
+    assert(message);
+
+    if (message->options && message->options->option_count > 0) {
+        if (capacity < unicoap_message_options_size(message)) {
+            return -ENOBUFS;
+        }
+        memcpy(pdu, unicoap_message_options_data(message), unicoap_message_options_size(message));
+        pdu += unicoap_message_options_size(message);
+        capacity -= unicoap_message_options_size(message);
+    }
+
+    if (unicoap_message_payload_get_size(message) > 0) {
+        *pdu = UNICOAP_PAYLOAD_MARKER;
+        pdu += 1;
+        capacity -= 1;
+
+        ssize_t payload_size = 0;
+        if ((payload_size = unicoap_message_payload_copy(message, pdu, capacity)) < 0) {
+            return -ENOBUFS;
+        }
+
+        return unicoap_message_options_size(message) + 1 + payload_size;
+    }
+    else {
+        return unicoap_message_options_size(message);
+    }
+}
+
+bool unicoap_message_is_response(uint8_t code)
+{
+    switch (unicoap_code_class(code)) {
+    case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
+    case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
+    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+const char* unicoap_string_from_code_class(uint8_t code)
+{
+    if (code == UNICOAP_CODE_EMPTY) {
+        return "EMPTY";
+    }
+
+    switch (unicoap_code_class(code)) {
+    case UNICOAP_CODE_CLASS_REQUEST:
+        return "REQ";
+
+    case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
+    case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
+    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
+        return "RESP";
+
+    case UNICOAP_CODE_CLASS_SIGNAL:
+        return "SIGNAL";
+
+    default:
+        return "?";
+    }
+}
+
+const char* unicoap_string_from_code(uint8_t code)
+{
+    if (code == UNICOAP_CODE_EMPTY) {
+        return "Empty";
+    }
+
+    switch (unicoap_code_class(code)) {
+    case UNICOAP_CODE_CLASS_REQUEST:
+        return unicoap_string_from_method((unicoap_method_t)code);
+
+    case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
+    case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
+    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
+        return unicoap_string_from_status(code);
+
+    case UNICOAP_CODE_CLASS_SIGNAL:
+        return unicoap_string_from_signal(code);
+
+    default:
+        return "?";
+    }
+}
+
+const char* unicoap_string_from_signal(unicoap_signal_t signal)
+{
+    switch (signal) {
+    case UNICOAP_SIGNAL_CAPABILITIES_SETTINGS:
+        return "CSM";
+    case UNICOAP_SIGNAL_PING:
+        return "Ping";
+    case UNICOAP_SIGNAL_PONG:
+        return "Pong";
+    case UNICOAP_SIGNAL_ABORT:
+        return "Abort";
+    case UNICOAP_SIGNAL_RELEASE:
+        return "Release";
+    default:
+        return "?";
+    }
+}
+
+const char* unicoap_string_from_method(unicoap_method_t method)
+{
+    switch (method) {
+    case UNICOAP_METHOD_GET:
+        return "GET";
+    case UNICOAP_METHOD_PUT:
+        return "PUT";
+    case UNICOAP_METHOD_POST:
+        return "POST";
+    case UNICOAP_METHOD_PATCH:
+        return "PATCH";
+    case UNICOAP_METHOD_IPATCH:
+        return "iPATCH";
+    case UNICOAP_METHOD_FETCH:
+        return "FETCH";
+    case UNICOAP_METHOD_DELETE:
+        return "DELETE";
+    default:
+        return "?";
+    }
+}
+
+const char* unicoap_string_from_status(unicoap_status_t status)
+{
+    switch (status) {
+    case UNICOAP_STATUS_CREATED:
+        return "Created";
+    case UNICOAP_STATUS_DELETED:
+        return "Deleted";
+    case UNICOAP_STATUS_VALID:
+        return "Valid";
+    case UNICOAP_STATUS_CHANGED:
+        return "Changed";
+    case UNICOAP_STATUS_CONTENT:
+        return "Content";
+    case UNICOAP_STATUS_CONTINUE:
+        return "Continue";
+    case UNICOAP_STATUS_BAD_REQUEST:
+        return "Bad Request";
+    case UNICOAP_STATUS_UNAUTHORIZED:
+        return "Unauthorized";
+    case UNICOAP_STATUS_BAD_OPTION:
+        return "Bad Option";
+    case UNICOAP_STATUS_FORBIDDEN:
+        return "Forbidden";
+    case UNICOAP_STATUS_PATH_NOT_FOUND:
+        return "Not Found";
+    case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
+        return "Method Not Allowed";
+    case UNICOAP_STATUS_NOT_ACCEPTABLE:
+        return "Not Acceptable";
+    case UNICOAP_STATUS_REQUEST_ENTITY_INCOMPLETE:
+        return "Request Entity Incomplete";
+    case UNICOAP_STATUS_CONFLICT:
+        return "Conflict";
+    case UNICOAP_STATUS_PRECONDITION_FAILED:
+        return "Precondition Failed";
+    case UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE:
+        return "Request Entity Too Large";
+    case UNICOAP_STATUS_UNSUPPORTED_CONTENT_FORMAT:
+        return "Unsupported Content Format";
+    case UNICOAP_STATUS_UNPROCESSABLE_ENTITY:
+        return "Unprocessable Entity";
+    case UNICOAP_STATUS_TOO_MANY_REQUESTS:
+        return "Too Many Requests";
+    case UNICOAP_STATUS_INTERNAL_SERVER_ERROR:
+        return "Internal Server Error";
+    case UNICOAP_STATUS_NOT_IMPLEMENTED:
+        return "Not Implemented";
+    case UNICOAP_STATUS_BAD_GATEWAY:
+        return "Bad Gateway";
+    case UNICOAP_STATUS_SERVICE_UNAVAILABLE:
+        return "Service Unavailable";
+    case UNICOAP_STATUS_GATEWAY_TIMEOUT:
+        return "Gateway Timeout";
+    case UNICOAP_STATUS_PROXYING_NOT_SUPPORTED:
+        return "Proxying Not Supported";
+    default:
+        return "?";
+    }
+}
+
+const char* unicoap_string_from_option_number(unicoap_option_number_t number)
+{
+    switch (number) {
+    case UNICOAP_OPTION_SIZE1:
+        return "Size1";
+    case UNICOAP_OPTION_SIZE2:
+        return "Size2";
+    case UNICOAP_OPTION_BLOCK1:
+        return "Block1";
+    case UNICOAP_OPTION_BLOCK2:
+        return "Block2";
+    case UNICOAP_OPTION_Q_BLOCK1:
+        return "Q-Block1";
+    case UNICOAP_OPTION_Q_BLOCK2:
+        return "Q-Block2";
+    case UNICOAP_OPTION_ECHO:
+        return "Echo";
+    case UNICOAP_OPTION_ETAG:
+        return "ETag";
+    case UNICOAP_OPTION_EDHOC:
+        return "EDHOC";
+    case UNICOAP_OPTION_ACCEPT:
+        return "Accept";
+    case UNICOAP_OPTION_OSCORE:
+        return "OSCORE";
+    case UNICOAP_OPTION_OBSERVE:
+        return "Observe";
+    case UNICOAP_OPTION_MAX_AGE:
+        return "Max-Age";
+    case UNICOAP_OPTION_IF_MATCH:
+        return "If-Match";
+    case UNICOAP_OPTION_IF_NONE_MATCH:
+        return "If-None-Match";
+    case UNICOAP_OPTION_LOCATION_PATH:
+        return "Location-Path";
+    case UNICOAP_OPTION_LOCATION_QUERY:
+        return "Location-Query";
+    case UNICOAP_OPTION_URI_HOST:
+        return "Uri-Host";
+    case UNICOAP_OPTION_URI_PORT:
+        return "Uri-Port";
+    case UNICOAP_OPTION_URI_QUERY:
+        return "Uri-Query";
+    case UNICOAP_OPTION_URI_PATH:
+        return "Uri-Path";
+    case UNICOAP_OPTION_HOP_LIMIT:
+        return "Hop-Limit";
+    case UNICOAP_OPTION_PROXY_URI:
+        return "Proxy-Uri";
+    case UNICOAP_OPTION_PROXY_SCHEME:
+        return "Proxy-Scheme";
+    case UNICOAP_OPTION_NO_RESPONSE:
+        return "No-Response";
+    case UNICOAP_OPTION_REQUEST_TAG:
+        return "Request-Tag";
+    case UNICOAP_OPTION_CONTENT_FORMAT:
+        return "Content-Format";
+    default:
+        return "?";
+    }
+}
+
+int unicoap_print_code(uint8_t code, char* string)
+{
+    return sprintf(string, UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
+                   unicoap_code_detail(code));
+}
+
+bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t status)
+{
+    uint8_t no_response;
+    if (unicoap_options_get_no_response(options, &no_response) >= 0) {
+        const uint8_t no_response_index = (status >> 5) - 1;
+        /* if the handler code misbehaved here, we'd face UB otherwise */
+        assert(no_response_index < 7);
+        const uint8_t mask = 1 << no_response_index;
+
+        /* option contains bitmap of disinterest */
+        if (no_response & mask) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void unicoap_options_dump_all(const unicoap_options_t* options)
+{
+    unicoap_options_iterator_t iterator = { 0 };
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+    const uint8_t* value = NULL;
+    ssize_t size = -1;
+    unicoap_option_number_t number = 0;
+
+    while ((size = unicoap_options_get_next(&iterator, &number, &value)) >= 0) {
+        printf("<%s nr=%u size=%" PRIuSIZE " hex=", unicoap_string_from_option_number(number),
+               number, size);
+        for (int i = 0; i < size; i += 1) {
+            printf("%02X", value[i]);
+        }
+        printf(">\n");
+    }
+}

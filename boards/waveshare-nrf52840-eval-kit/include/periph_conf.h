@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_waveshare_nrf52840_eval_kit
  * @{
@@ -18,9 +20,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
@@ -153,5 +152,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

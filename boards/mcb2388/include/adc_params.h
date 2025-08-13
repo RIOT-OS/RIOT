@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Beuth Hochschule für Technik Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Beuth Hochschule für Technik Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup   boards_mcb2388
@@ -15,9 +14,6 @@
  *
  * @author    Benjamin Valentin <benpicco@beuth-hochschule.de>
  */
-
-#ifndef ADC_PARAMS_H
-#define ADC_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -42,5 +38,4 @@ static const  saul_adc_params_t saul_adc_params[] =
 }
 #endif
 
-#endif /* ADC_PARAMS_H */
 /** @} */

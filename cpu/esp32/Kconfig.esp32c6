@@ -1,0 +1,113 @@
+# Copyright (c) 2025 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_ESP32C6
+    bool
+    select CPU_COMMON_ESP32X
+    select CPU_CORE_RV32IMAC
+
+config CPU_FAM
+    default "esp32c6" if CPU_FAM_ESP32C6
+
+## CPU Models
+config CPU_MODEL_ESP32C6
+    bool
+    select CPU_FAM_ESP32C6
+    help
+        ESP32-C6 CPU without internal Flash
+
+config CPU_MODEL_ESP32C6_FH4
+    bool
+    select CPU_FAM_ESP32C6
+    help
+        ESP32-C6 CPU with 4 MB Flash
+
+config CPU_MODEL_ESP32C6_FH8
+    bool
+    select CPU_FAM_ESP32C6
+    help
+        ESP32-C6 CPU with 8 MB Flash
+
+## CPU Modules
+config CPU_MODEL_ESP32C6_MINI_1X_X4
+    bool
+    select CPU_MODEL_ESP32C6
+    help
+        ESP32-C6-MINI-1-N4, ESP32-C6-MINI-1U-N4, ESP32-C6-MINI-1-H4 or
+        ESP32-C6-MINI-1U-H4 module with 4 MB Flash
+
+config CPU_MODEL_ESP32C6_WROOM_1X_X4
+    bool
+    select CPU_MODEL_ESP32C6
+    help
+        ESP32-C6-WROOM-1-N4, ESP32-C6-WROOM-1U-N4, ESP32-C6-WROOM-1-H4 or
+        ESP32-C6-WROOM-1U-H4 module with 4 MB Flash
+
+config CPU_MODEL_ESP32C6_WROOM_1X_N8
+    bool
+    select CPU_MODEL_ESP32C6
+    help
+        ESP32-C6-WROOM-1-N8 or ESP32-C6-WROOM-1U-N8 module with 8 MB Flash
+
+config CPU_MODEL_ESP32C6_WROOM_1X_N16
+    bool
+    select CPU_MODEL_ESP32C6
+    help
+        ESP32-C6-WROOM-1-N16 or ESP32-C6-WROOM-1U-N16 module with 16 MB Flash
+
+## Choice
+config CPU_MODEL
+    depends on CPU_FAM_ESP32C6
+    default "esp32c6_mini_1x_x4" if CPU_MODEL_ESP32C6_MINI_1X_X4
+    default "esp32c6_wroom_1x_x4" if CPU_MODEL_ESP32C6_WROOM_1X_X4
+    default "esp32c6_wroom_1x_n8" if CPU_MODEL_ESP32C6_WROOM_1X_N8
+    default "esp32c6_wroom_1x_n16" if CPU_MODEL_ESP32C6_WROOM_1X_N16
+    default "esp32c6" if CPU_MODEL_ESP32C6
+    default "esp32c6_fh4" if CPU_MODEL_ESP32C6_FH4
+    default "esp32c6_fh8" if CPU_MODEL_ESP32C6_FH8
+
+if CPU_FAM_ESP32C6
+
+menu "ESP32-C6 specific configurations"
+    depends on HAS_ARCH_ESP32
+
+    # define configuration menu entries for ESP32-C6 variant (family)
+
+    choice
+        bool "CPU clock frequency"
+        default ESP32C6_DEFAULT_CPU_FREQ_MHZ_80
+        help
+            CPU clock frequency used (default 80 MHz).
+            Please note that peripherals such as I2C or SPI might not work at
+            the specified clock frequency if the selected CPU clock frequency
+            is too low. These peripherals are clocked by the APB clock, which
+            has a clock rate of 40 MHz for CPU clock frequencies greater than
+            or equal to 40 MHz, but is equal to the CPU clock frequency for
+            CPU clock frequencies less than 40 MHz. Thus, for SPI, the APB
+            clock rate must be at least five times the SPI clock rate. For the
+            I2C hardware implementation, the APB clock rate must be at least
+            3 MHZ to use I2C in fast mode with a I2C clock rate of 400 kHz.
+            For the I2C software implementation, the maximum I2C clock rate
+            is 1/130 times the CPU clock rate.
+
+        config ESP32C6_DEFAULT_CPU_FREQ_MHZ_20
+            bool "20 MHz"
+        config ESP32C6_DEFAULT_CPU_FREQ_MHZ_40
+            bool "40 MHz"
+        config ESP32C6_DEFAULT_CPU_FREQ_MHZ_80
+            bool "80 MHz"
+        config ESP32C6_DEFAULT_CPU_FREQ_MHZ_120
+            bool "120 MHz"
+        config ESP32C6_DEFAULT_CPU_FREQ_MHZ_160
+            bool "160 MHz"
+    endchoice
+
+    # import configuration menu entries that are common for all ESP32x SoCs
+    rsource "Kconfig.common"
+
+endmenu
+
+endif # CPU_FAM_ESP32C6

@@ -19,7 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include "kw41zrf.h"
 
 #ifdef __cplusplus

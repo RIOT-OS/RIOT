@@ -20,7 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include <stdint.h>
 #include <stdlib.h>
 

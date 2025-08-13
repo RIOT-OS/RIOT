@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_same54-xpro
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -378,10 +377,10 @@ static const adc_conf_chan_t adc_channels[] = {
  */
                             /* Must not exceed 12 MHz */
 #define DAC_CLOCK           SAM0_GCLK_TIMER
-                            /* Use external reference voltage on PA03 */
-                            /* (You have to manually connect PA03 with Vcc) */
+#ifndef DAC_VREF
                             /* Internal reference only gives 1V */
-#define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
+#define DAC_VREF            DAC_CTRLB_REFSEL_INTREF
+#endif
 /** @} */
 
 /**
@@ -446,5 +445,4 @@ static const freqm_config_t freqm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

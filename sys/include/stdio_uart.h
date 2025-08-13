@@ -88,7 +88,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 /* Boards may override the default STDIO UART device */
 #include "board.h"
 #include "stdio_base.h"

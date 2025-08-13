@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Luo Jia (HUST IoT Security Lab)
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Luo Jia (HUST IoT Security Lab)
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_alientek-pandora
@@ -15,9 +14,6 @@
  *
  * @author      Luo Jia <luojia@hust.edu.cn>
  */
-
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -80,5 +76,4 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */

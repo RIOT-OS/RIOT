@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_atmega_common
  * @brief       Common clock support for ATmega family based micro-controllers
@@ -28,9 +30,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
-
-#ifndef CPU_CLOCK_H
-#define CPU_CLOCK_H
 
 #include <stdint.h>
 
@@ -78,5 +77,4 @@ static inline void atmega_set_prescaler(uint8_t clk_scale)
 }
 #endif
 
-#endif /* CPU_CLOCK_H */
 /** @} */

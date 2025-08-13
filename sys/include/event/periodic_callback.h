@@ -24,7 +24,6 @@
  *
  */
 
-
 #include <assert.h>
 #include "event/callback.h"
 #include "event/periodic.h"

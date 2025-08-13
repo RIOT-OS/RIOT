@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @ingroup         drivers_periph_gpio_ll
@@ -18,9 +20,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
 
 #include "architecture.h"
 #include "periph_cpu.h"
@@ -283,5 +282,4 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

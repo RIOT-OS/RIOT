@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #include "mutex.h"
 
 #ifdef __cplusplus
@@ -135,7 +134,6 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "pcf857x.h"
 #include "saul_reg.h"

@@ -23,7 +23,6 @@
  * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
-
 #include <errno.h>
 #include <stdint.h>
 #include <unistd.h>

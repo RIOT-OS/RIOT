@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_atxmega
  * @brief       Common implementations and headers for ATxmega family based micro-controllers
@@ -20,9 +22,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
-
-#ifndef CPU_CLOCK_H
-#define CPU_CLOCK_H
 
 #include <stdint.h>
 
@@ -71,5 +70,4 @@ static inline void atxmega_set_prescaler(uint8_t clk_scale, uint8_t bus_scale)
 }
 #endif
 
-#endif /* CPU_CLOCK_H */
 /** @} */

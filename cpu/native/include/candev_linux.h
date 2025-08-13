@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup drivers_candev_linux SocketCAN driver
  * @ingroup  drivers_can
@@ -20,8 +22,6 @@
  * @author Aurelien Gonce <aurelien.gonce@altran.com>
  * @author Vincent Dupont <vincent@otakeys.com>
  */
-#ifndef CANDEV_LINUX_H
-#define CANDEV_LINUX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,5 +91,4 @@ extern can_conf_t candev_conf[CAN_DLL_NUMOF];
 }
 #endif
 
-#endif /* CANDEV_LINUX_H */
 /** @} */

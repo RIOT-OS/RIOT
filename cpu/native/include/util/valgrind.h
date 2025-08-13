@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef UTIL_VALGRIND_H
-#define UTIL_VALGRIND_H
+#pragma once
 
 #ifdef HAVE_VALGRIND_H
 #  include <valgrind.h>
@@ -23,5 +22,3 @@
 #ifdef __cplusplus
 extern "C" {}
 #endif
-
-#endif /* UTIL_VALGRIND_H */

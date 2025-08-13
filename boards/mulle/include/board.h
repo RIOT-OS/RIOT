@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2014 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_mulle
@@ -15,9 +14,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -159,5 +155,4 @@ extern "C" {
 #define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
 #define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
 /** @} */
-#endif /* BOARD_H */
 /** @} */

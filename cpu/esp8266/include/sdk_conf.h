@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266
  * @{
@@ -20,9 +22,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef SDK_CONF_H
-#define SDK_CONF_H
 
 #ifndef DOXYGEN
 
@@ -85,5 +84,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SDK_CONF_H */
 /** @} */

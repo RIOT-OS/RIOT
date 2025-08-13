@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_nrf5x_common
  * @{
@@ -18,9 +20,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef NRFX_RIOT_H
-#define NRFX_RIOT_H
 
 #include "kernel_defines.h"
 #include "cpu_conf.h"
@@ -63,5 +62,4 @@ static inline void nrfx_dcdc_init(void)
 }
 #endif
 
-#endif /* NRFX_RIOT_H */
 /** @} */

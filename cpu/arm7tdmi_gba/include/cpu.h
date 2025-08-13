@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef CPU_H
-#define CPU_H
+#pragma once
 
 /**
  * @ingroup     cpu_arm7tdmi_gba
@@ -27,4 +26,3 @@ extern uintptr_t __stack_start;     /**< end of user stack memory space */
 #endif
 
 /** @} */
-#endif /* CPU_H */

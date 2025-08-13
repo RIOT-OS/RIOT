@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_fe310
  * @{
@@ -13,9 +15,6 @@
  * @file
  * @brief       CPU specific definitions
  */
-
-#ifndef CPU_H
-#define CPU_H
 
 #include "cpu_common.h"
 
@@ -27,5 +26,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_H */
 /** @} */

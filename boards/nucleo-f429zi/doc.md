@@ -19,7 +19,7 @@ STM32F429ZI microcontroller with 256KiB of RAM and 2MiB of Flash.
 
 | MCU          | STM32F429ZI
 |:-------------|:--------------------|
-| Family       | ARM Cortex-M4       |
+| Family       | ARM Cortex-M4F      |
 | Vendor       | ST Microelectronics |
 | RAM          | 256KiB              |
 | Flash        | 2MiB                |

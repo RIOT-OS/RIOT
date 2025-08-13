@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_riscv_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef PLIC_H
-#define PLIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,5 +80,4 @@ void plic_isr_handler(void);
 }
 #endif
 
-#endif /* PLIC_H */
 /** @} */

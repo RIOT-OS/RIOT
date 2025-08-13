@@ -21,7 +21,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include <stdint.h>
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp/tcb.h"

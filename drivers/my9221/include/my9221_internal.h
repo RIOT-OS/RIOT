@@ -18,7 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "xtimer.h"
 
 #ifdef __cplusplus

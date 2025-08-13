@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup drivers_spidev_linux Linux User Mode SPI Driver
  * @ingroup  cpu_native
@@ -58,8 +60,6 @@
  * @brief  Implementation of SPI access from Linux User Space
  * @author Frank Hessel <frank@fhessel.de>
  */
-#ifndef SPIDEV_LINUX_H
-#define SPIDEV_LINUX_H
 
 #if defined(__linux__) || defined(DOXYGEN) /* Linux-only */
 
@@ -129,5 +129,4 @@ void spidev_linux_teardown(void);
 #endif
 #endif /* defined(__linux__) || defined(DOXYGEN) */
 
-#endif /* SPIDEV_LINUX_H */
 /** @} */

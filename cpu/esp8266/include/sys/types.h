@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -36,9 +38,6 @@
    more sense, and should work sufficiently well (in particular, h8300
    doesn't have a stat, and the necv70 doesn't matter.) -- eichin
  */
-
-#ifndef SYS_TYPES_H
-#define SYS_TYPES_H
 
 #ifndef DOXYGEN
 
@@ -324,8 +323,6 @@ typedef long suseconds_t;
 #endif  /* !__need_inttypes */
 
 #undef __need_inttypes
-
-#endif /* _SYS_TYPES_H */
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-
 #include "feetech_protocol.h"
 
 #include <stdint.h>

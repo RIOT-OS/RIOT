@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_stm32
  * @ingroup     drivers_can
@@ -27,9 +29,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @}
  */
-
-#ifndef CANDEV_STM32_H
-#define CANDEV_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -199,5 +198,3 @@ void candev_stm32_set_pins(can_t *dev, gpio_t tx_pin, gpio_t rx_pin);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CANDEV_STM32_H */

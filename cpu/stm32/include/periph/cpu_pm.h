@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,9 +19,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef PERIPH_CPU_PM_H
-#define PERIPH_CPU_PM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,5 +70,4 @@ void pm_backup_regulator_off(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_PM_H */
 /** @} */

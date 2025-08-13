@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 J. David Ibáñez <jdavid.ibp@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 J. David Ibáñez <jdavid.ibp@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_lora-e5-dev
@@ -18,9 +17,6 @@
  *
  * @author      J. David Ibáñez <jdavid.ibp@gmail.com>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/gpio.h"
 
@@ -64,10 +60,8 @@ extern "C" {
 #define ARDUINO_PIN_LAST        28
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

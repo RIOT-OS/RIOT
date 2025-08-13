@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2014 Ho Chi Minh city University of Technology (HCMUT)
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Ho Chi Minh city University of Technology (HCMUT)
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     examples
@@ -18,9 +17,6 @@
  */
 
 #include <stdio.h>
-
-#ifndef C_FUNCTIONS_H
-#define C_FUNCTIONS_H
 
 /*
  * all headers defining c functions must be marked as extern "C" when included
@@ -51,4 +47,3 @@ int day_of_week(int day, int month, int year);
 #endif
 
 /** @} */
-#endif /* C_FUNCTIONS_H */

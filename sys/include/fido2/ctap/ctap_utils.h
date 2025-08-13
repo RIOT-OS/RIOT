@@ -21,7 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include "fido2/ctap/ctap.h"
 #include "periph/gpio.h"

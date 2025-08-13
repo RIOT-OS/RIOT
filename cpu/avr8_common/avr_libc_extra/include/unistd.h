@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef UNISTD_H
-#define UNISTD_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -106,5 +105,3 @@ ssize_t      write(int, const void *, size_t);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* UNISTD_H */

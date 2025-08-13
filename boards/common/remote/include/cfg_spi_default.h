@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
- *               2015 Zolertia SL
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014-2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2015 Zolertia SL
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_remote
@@ -18,9 +17,6 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CFG_SPI_DEFAULT_H
-#define CFG_SPI_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -56,5 +52,4 @@ static const spi_conf_t spi_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* CFG_SPI_DEFAULT_H */
 /** @} */

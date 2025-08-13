@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "net/netdev.h"
 
 #ifdef __cplusplus

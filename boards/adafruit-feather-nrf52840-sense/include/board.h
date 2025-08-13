@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2020 Freie Universität Berlin
- * Copyright (C) 2023 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2023 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_adafruit-feather-nrf52840-sense
@@ -18,9 +17,6 @@
  * @author      Martine S. Lenders <m.lenders@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -116,5 +112,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

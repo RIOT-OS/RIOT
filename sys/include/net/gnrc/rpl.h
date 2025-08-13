@@ -140,7 +140,6 @@
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
-
 #include <string.h>
 #include <stdint.h>
 #include "modules.h"

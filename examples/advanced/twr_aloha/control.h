@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     examples
@@ -16,9 +15,6 @@
  *
  * @}
  */
-
-#ifndef CONTROL_H
-#define CONTROL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -115,5 +111,3 @@ uint32_t uwb_core_rng_req_remaining(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CONTROL_H */

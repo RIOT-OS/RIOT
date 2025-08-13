@@ -21,7 +21,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include <inttypes.h>
 #include "sx127x.h"
 

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_riscv_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include <inttypes.h>
 
@@ -43,5 +42,4 @@ typedef unsigned irqn_t;
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

@@ -18,7 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 
@@ -92,7 +91,6 @@ static const saul_reg_info_t hm330x_saul_info[] =
  * @brief   Number of saul info structs
  */
 #define HM330X_INFO_NUM ARRAY_SIZE(hm330x_saul_info)
-
 
 #ifdef __cplusplus
 }

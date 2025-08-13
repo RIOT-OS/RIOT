@@ -65,22 +65,6 @@ typedef enum {
      * @{
      * @name Link layer
      */
-#if IS_USED(MODULE_GNRC_NETTYPE_GOMACH) || defined(DOXYGEN)
-    /**
-     * @brief       Protocol is GoMacH
-     * @deprecated  @ref net_gnrc_gomach was deprecated and will be removed after
-     *              the 2024.10 release together with this protocol type.
-     */
-    GNRC_NETTYPE_GOMACH,
-#endif
-#if IS_USED(MODULE_GNRC_NETTYPE_LWMAC) || defined(DOXYGEN)
-    /**
-     * @brief       Protocol is lwMAC
-     * @deprecated  @ref net_gnrc_lwmac was deprecated and will be removed after
-     *              the 2024.10 release together with this protocol type.
-     */
-    GNRC_NETTYPE_LWMAC,
-#endif
 #if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM) || defined(DOXYGEN)
     GNRC_NETTYPE_CUSTOM,         /**< Custom ethertype */
 #endif

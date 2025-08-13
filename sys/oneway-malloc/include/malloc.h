@@ -31,7 +31,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -78,7 +77,6 @@ void free(void *ptr);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

@@ -17,7 +17,6 @@
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

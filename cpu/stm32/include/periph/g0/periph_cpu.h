@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,9 +18,6 @@
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef PERIPH_G0_PERIPH_CPU_H
-#define PERIPH_G0_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,5 +68,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_G0_PERIPH_CPU_H */
 /** @} */

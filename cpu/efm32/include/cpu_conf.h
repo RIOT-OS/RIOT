@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_efm32
  * @{
@@ -16,9 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -64,5 +63,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

@@ -19,7 +19,6 @@
 * @author       Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include <stdint.h>
 
 #include "evtimer_msg.h"

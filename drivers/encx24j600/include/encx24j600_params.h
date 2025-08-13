@@ -18,7 +18,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include "encx24j600.h"
 #include "board.h"
 

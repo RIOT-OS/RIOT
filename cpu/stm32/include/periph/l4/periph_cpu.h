@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,9 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
-
-#ifndef PERIPH_L4_PERIPH_CPU_H
-#define PERIPH_L4_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,10 +36,11 @@ extern "C" {
 #error "Can't determine the number of ADC devices"
 #endif
 
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG) || \
-    defined(CPU_MODEL_STM32L475VG) || defined(CPU_MODEL_STM32L452RE) || \
-    defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L496ZG) || \
-    defined(CPU_MODEL_STM32L4R5ZI) || defined(CPU_MODEL_STM32L496AG)
+#if defined(CPU_MODEL_STM32L412KB) || defined(CPU_MODEL_STM32L476RG) || \
+    defined(CPU_MODEL_STM32L476VG) || defined(CPU_MODEL_STM32L475VG) || \
+    defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC) || \
+    defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI) || \
+    defined(CPU_MODEL_STM32L496AG)
 /**
  * @brief   ADC voltage regulator start-up time [us]
  */
@@ -84,5 +84,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_L4_PERIPH_CPU_H */
 /** @} */

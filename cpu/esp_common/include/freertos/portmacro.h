@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_PORTMACRO_H
-#define FREERTOS_PORTMACRO_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -19,6 +18,7 @@
 #ifndef CPU_ESP8266
 #include "esp_heap_caps.h"
 #include "esp_timer.h"
+#include "soc/soc.h"
 #endif
 
 #include "mutex.h"
@@ -80,4 +80,3 @@ bool xPortCanYield(void);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_PORTMACRO_H */

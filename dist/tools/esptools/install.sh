@@ -1,7 +1,6 @@
 #!/bin/sh
 
 ESP32_GCC_RELEASE="esp-14.2.0_20241119"
-ESP32_GCC_VERSION_DIR="14.2.0"
 ESP32_GCC_VERSION_DOWNLOAD="14.2.0_20241119"
 
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
@@ -99,7 +98,7 @@ install_arch()
             TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
-        esp32c3)
+        esp32c3|esp32c6|esp32h2)
             TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
@@ -111,7 +110,7 @@ install_arch()
     TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}"
 
     if [ "$1" = "esp8266" ]; then
-        git clone https://github.com/gschorcht/xtensa-esp8266-elf ${TOOLS_DIR}/${TARGET_ARCH}
+        git clone https://github.com/gschorcht/xtensa-esp8266-elf "${TOOLS_DIR}/${TARGET_ARCH}"
     else
         URL_PATH="https://github.com/espressif/crosstool-NG/releases/download"
         URL_TGZ="${TARGET_ARCH}-${ESP32_GCC_VERSION_DOWNLOAD}-${OS}.tar.xz"
@@ -236,11 +235,12 @@ if [ -z "$1" ]; then
     echo "Usage: install.sh <tool>"
     echo "       install.sh gdb <platform>"
     echo "       install.sh qemu <platform>"
-    echo "<tool> = all | esp8266 | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu"
+    echo "<tool> = all | esptool | gdb | openocd | qemu |"
+    echo "         esp8266 | esp32 | esp32c3 | esp32c6 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
     exit 1
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32c6 esp32h2 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         install_arch "$arch"
     done
@@ -264,4 +264,4 @@ else
 fi
 
 echo "Use following command to extend the PATH variable:"
-echo ". $(dirname "$0")/export.sh $1"
+echo ". $(dirname "$0")/export.sh $1 $2"

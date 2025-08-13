@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_riscv_common
  * @{
@@ -19,9 +21,6 @@
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include <stdint.h>
 
@@ -114,5 +113,4 @@ static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 }
 #endif
 
-#endif /* IRQ_ARCH_H */
 /** @} */

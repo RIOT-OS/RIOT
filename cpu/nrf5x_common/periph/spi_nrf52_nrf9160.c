@@ -152,11 +152,11 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
     assert(bus < SPI_NUMOF);
 
     if (gpio_is_valid(spi_config[bus].mosi)) {
-        gpio_init(spi_config[bus].miso, mode->mosi);
+        gpio_init(spi_config[bus].mosi, mode->mosi);
     }
 
     if (gpio_is_valid(spi_config[bus].miso)) {
-        gpio_init(spi_config[bus].mosi, mode->miso);
+        gpio_init(spi_config[bus].miso, mode->miso);
     }
 
     if (gpio_is_valid(spi_config[bus].sclk)) {

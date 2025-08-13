@@ -35,7 +35,7 @@ When building in docker one might want for the command ran in docker to inherit
 variables that might have been set in the command line. e.g.:
 
 ```shell
-BOARD=samr21-xpro USEMODULE=xtimer make -C examples/hello-world
+BOARD=samr21-xpro USEMODULE=xtimer make -C examples/basic/hello-world
 ```
 
 In `docker.ink.mk` the origin of a variable listed in `DOCKER_ENV_VARS` is checked
@@ -46,11 +46,11 @@ You can also set in `DOCKER_ENV_VARS` in the environment to add variables to the
 list, e.g.:
 
 ```shell
-DOCKER_ENV_VARS=BEER_TYPE BEER_TYPE="imperial stout" BUILD_IN_DOCKER=1 make -C examples/hello-world/
+DOCKER_ENV_VARS=BEER_TYPE BEER_TYPE="imperial stout" BUILD_IN_DOCKER=1 make -C examples/basic/hello-world/
 docker run --rm -t -u "$(id -u)" \
     ...
     -e 'BEER_TYPE=imperial stout' \
-    -w '/data/riotbuild/riotbase/examples/hello-world/' \
+    -w '/data/riotbuild/riotbase/examples/basic/hello-world/' \
     'riot/riotbuild:latest' make
 ```
 
@@ -64,11 +64,11 @@ but will need to be prefixed with `-e` (see [option-summary]).
 e.g.:
 
 ```
-DOCKER_ENVIRONMENT_CMDLINE='-e BEER_TYPE="imperial stout"' BUILD_IN_DOCKER=1 make -C examples/hello-world/
+DOCKER_ENVIRONMENT_CMDLINE='-e BEER_TYPE="imperial stout"' BUILD_IN_DOCKER=1 make -C examples/basic/hello-world/
 docker run --rm -t -u "$(id -u)" \
     ...
     -e 'BEER_TYPE=imperial stout' \
-    -w '/data/riotbuild/riotbase/examples/hello-world/' \
+    -w '/data/riotbuild/riotbase/examples/basic/hello-world/' \
     'riot/riotbuild:latest' make
 ```
 
@@ -84,11 +84,11 @@ To pass variables overriding the command-line to docker `DOCKER_OVERRIDE_CMDLINE
 may be used:
 
 ```shell
-DOCKER_OVERRIDE_CMDLINE="BEER_TYPE='imperial stout'" BUILD_IN_DOCKER=1 make -C examples/hello-world/ RIOT_CI_BUILD=1
+DOCKER_OVERRIDE_CMDLINE="BEER_TYPE='imperial stout'" BUILD_IN_DOCKER=1 make -C examples/basic/hello-world/ RIOT_CI_BUILD=1
 Launching build container using image "riot/riotbuild:latest".
 sudo docker run --rm -t -u "$(id -u)" \
     ...
-    -w '/data/riotbuild/riotbase/examples/hello-world/' \
+    -w '/data/riotbuild/riotbase/examples/basic/hello-world/' \
     'riot/riotbuild:latest' make  BEER_TYPE='imperial stout' 'RIOT_CI_BUILD=1'
 ```
 

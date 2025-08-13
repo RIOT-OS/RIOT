@@ -20,7 +20,6 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -5,8 +5,7 @@
  *
  */
 
-#ifndef VIC_H
-#define VIC_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -86,4 +85,3 @@ bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 #endif
 
 /** @} */
-#endif /* VIC_H */

@@ -1,13 +1,10 @@
 /*
- * Copyright (C) 2024 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
+#pragma once
+
 /**
  * @ingroup     boards_seeedstudio-xiao-nrf52840
  * @ingroup     boards_seeedstudio-xiao-nrf52840-sense
@@ -103,4 +100,3 @@ static const i2c_conf_t i2c_config[] = {
 #endif
 
 /** @} */
-#endif /* PERIPH_CONF_H */

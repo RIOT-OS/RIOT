@@ -7,8 +7,7 @@
  * directory for more details.
  */
 
-#ifndef SYS_TYPES_H
-#define SYS_TYPES_H
+#pragma once
 
 #include <stdint.h>
 #include <stddef.h>
@@ -43,5 +42,3 @@ typedef     uint32_t useconds_t;  /**< Used for time in microseconds */
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYS_TYPES_H */

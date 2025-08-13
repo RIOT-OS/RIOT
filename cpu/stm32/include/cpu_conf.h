@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,9 +19,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
 */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include <stdint.h>
 #include "cpu_conf_common.h"
@@ -259,5 +258,4 @@ typedef uint16_t stm32_flashpage_block_t;
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

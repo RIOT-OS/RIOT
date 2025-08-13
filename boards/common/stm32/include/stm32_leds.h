@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_stm32
@@ -19,9 +18,6 @@
  * The idea is that STM32 boards only define the pin number, port number and
  * port of LEDs and this header provides the rest of the defines
  */
-
-#ifndef STM32_LEDS_H
-#define STM32_LEDS_H
 
 /* Using gpio_ll_arch for GPIO access. On STM32, accessing the GPIO output
  * buffer via GPIO LL even works when the GPIO LL feature/module is not in
@@ -147,5 +143,4 @@ extern "C" {
 }
 #endif
 
-#endif /* STM32_LEDS_H */
 /** @} */

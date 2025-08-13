@@ -22,7 +22,6 @@
  * @}
  */
 
-
 #include "hashes/sha256.h"
 
 #ifdef __cplusplus

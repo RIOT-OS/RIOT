@@ -18,7 +18,6 @@
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  */
 
-
 #include "board.h"
 #include "bq2429x.h"
 

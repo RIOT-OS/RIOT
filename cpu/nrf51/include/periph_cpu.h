@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_nrf51
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -112,5 +111,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

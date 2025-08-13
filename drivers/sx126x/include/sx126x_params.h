@@ -18,10 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "board.h"
 #include "sx126x.h"
-#include "sx126x_driver.h"
 
 #if defined(MODULE_SHIELD_LLCC68) || defined(MODULE_SHIELD_SX1262)
 #  include "arduino_iomap.h"

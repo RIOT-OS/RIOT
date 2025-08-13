@@ -20,7 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "board.h"
 #include "bmp180.h"
 #include "bmp180_internals.h"

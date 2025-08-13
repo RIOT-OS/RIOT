@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_stm32
@@ -15,9 +14,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CFG_RTT_DEFAULT_H
-#define CFG_RTT_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -46,5 +42,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_RTT_DEFAULT_H */
 /** @} */

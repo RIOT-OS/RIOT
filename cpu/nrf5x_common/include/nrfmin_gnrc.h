@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_nrf5x_nrfmin_gnrc GNRC adapter for nrfmin
  * @ingroup     drivers_nrf5x_nrfmin
@@ -18,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NRFMIN_GNRC_H
-#define NRFMIN_GNRC_H
 
 #include "nrfmin.h"
 
@@ -44,5 +43,4 @@ void gnrc_netdev_nrfmin_init(void);
 }
 #endif
 
-#endif /* NRFMIN_GNRC_H */
 /** @} */

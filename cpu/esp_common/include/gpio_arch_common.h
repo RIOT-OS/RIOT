@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -16,9 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-
-#ifndef GPIO_ARCH_COMMON_H
-#define GPIO_ARCH_COMMON_H
 
 #include "periph/gpio.h"
 
@@ -82,4 +81,3 @@ const char* gpio_get_pin_usage_str(gpio_t pin);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* GPIO_ARCH_COMMON_H */

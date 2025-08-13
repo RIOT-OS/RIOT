@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_sensebox_samd21
  * @brief       Support for the SenseBox MCU with SAMD21 board.
@@ -18,9 +20,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -175,5 +174,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

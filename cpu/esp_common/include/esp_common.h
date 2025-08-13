@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -16,9 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  */
-
-#ifndef ESP_COMMON_H
-#define ESP_COMMON_H
 
 #ifndef DOXYGEN
 
@@ -121,5 +120,4 @@ extern "C" {
 
 #endif /* DOXYGEN */
 
-#endif /* ESP_COMMON_H */
 /** @} */

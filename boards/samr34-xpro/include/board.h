@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_samr34-xpro
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -87,5 +86,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

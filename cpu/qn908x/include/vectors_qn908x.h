@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_qn908x
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef VECTORS_QN908X_H
-#define VECTORS_QN908X_H
 
 #include <stdint.h>
 #include "vectors_cortexm.h"
@@ -114,5 +113,3 @@ extern const uint32_t isp_configuration;
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
-#endif /* VECTORS_QN908X_H */

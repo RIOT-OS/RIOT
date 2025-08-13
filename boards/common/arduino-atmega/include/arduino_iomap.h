@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *               2016 Laurent Navet <laurent.navet@gmail.com>
- *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2016 Laurent Navet <laurent.navet@gmail.com>
+ * SPDX-FileCopyrightText: 2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_arduino-atmega
@@ -23,9 +22,6 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/adc.h"
 #include "periph/gpio.h"
@@ -332,5 +328,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

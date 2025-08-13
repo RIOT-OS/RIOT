@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_cortexm_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef CPU_CONF_COMMON_H
-#define CPU_CONF_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,6 +162,12 @@ extern "C" {
  *          and initialized with user provided data on cold boot.
  */
 #define BACKUP_RAM_DATA __attribute__((section(".backup.data")))
+
+/**
+ * @brief   Memory marked with this attribute is retained during deep sleep
+ *          and never initialized.
+ */
+#define BACKUP_RAM_NOINIT __attribute__((section(".backup.noinit")))
 #endif /* CPU_HAS_BACKUP_RAM */
 
 /**
@@ -182,5 +187,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_COMMON_H */
 /** @} */

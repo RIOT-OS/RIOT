@@ -19,7 +19,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -100,6 +99,5 @@ extern const vfs_file_system_t fatfs_file_system;
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

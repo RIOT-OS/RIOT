@@ -18,7 +18,6 @@
  * @author      Markus Blechschmidt <Markus.Blechschmidt@haw-hamburg.de>
  */
 
-
 #include "soft_spi.h"
 
 #ifdef __cplusplus

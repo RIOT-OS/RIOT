@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup backtrace       Stack backtrace (only under native)
  * @ingroup  core_util
@@ -21,8 +23,6 @@
  * @brief Backtrace functionalitry
  * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef BACKTRACE_H
-#define BACKTRACE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,5 +57,4 @@ int backtrace_len(void);
 }
 #endif
 
-#endif /* BACKTRACE_H */
 /** @} */

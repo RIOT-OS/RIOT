@@ -21,7 +21,6 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-
 #include "byteorder.h"
 
 #ifdef __cplusplus

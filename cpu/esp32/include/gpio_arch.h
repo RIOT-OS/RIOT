@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -16,9 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-
-#ifndef GPIO_ARCH_H
-#define GPIO_ARCH_H
 
 #include <stdbool.h>
 
@@ -44,5 +43,3 @@ void gpio_pm_sleep_exit(uint32_t cause);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* GPIO_ARCH_H */

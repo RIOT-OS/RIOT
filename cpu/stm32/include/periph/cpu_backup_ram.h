@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef PERIPH_CPU_BACKUP_RAM_H
-#define PERIPH_CPU_BACKUP_RAM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,5 +41,4 @@ bool cpu_woke_from_backup(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_BACKUP_RAM_H */
 /** @} */

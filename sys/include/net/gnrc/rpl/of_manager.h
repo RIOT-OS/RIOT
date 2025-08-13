@@ -18,7 +18,6 @@
  * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  */
 
-
 #include "structs.h"
 
 #ifdef __cplusplus

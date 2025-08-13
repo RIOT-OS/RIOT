@@ -29,19 +29,36 @@ extern "C" {
 #endif
 
 /**
- * @brief   Calculate CRC-8
+ * @brief   Calculate CRC-8 (MSB first)
+ *
+ * This CRC8 checksum type is usually more common.
  *
  * @param[in] data  Start of memory area to checksum
  * @param[in] len   Number of bytes in @p buf to calculate checksum for
  * @param[in] poly  The generator polynomial for the checksum
  * @param[in] seed  The seed (starting value) for the checksum
  *
- * @note Reflected inputs or outputs and final XOR must be realized
- *       by the caller if needed.
+ * @note A final XOR must be realized by the caller if needed.
  *
  * @return  Checksum of the specified memory area.
  */
 uint8_t crc8(const uint8_t *data, size_t len, uint8_t poly, uint8_t seed);
+
+/**
+ * @brief   Calculate a reflected CRC-8 (LSB first)
+ *
+ * This CRC8 checksum type is used for example by Onewire.
+ *
+ * @param[in] data  Start of memory area to checksum
+ * @param[in] len   Number of bytes in @p buf to calculate checksum for
+ * @param[in] poly  The generator polynomial for the checksum
+ * @param[in] seed  The seed (starting value) for the checksum
+ *
+ * @note A final XOR must be realized by the caller if needed.
+ *
+ * @return  Checksum of the specified memory area.
+ */
+uint8_t crc8_lsb(const uint8_t *data, size_t len, uint8_t poly, uint8_t seed);
 
 #ifdef __cplusplus
 }

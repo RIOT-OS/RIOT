@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nucleo-wl55jc
@@ -16,9 +15,6 @@
  * @author      Akshai M <akshai.m@fu-berlin.de>
  * @author      Hauke Petersen <devel@haukepetersen.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "board_nucleo.h"
 
@@ -90,5 +86,4 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_qn908x
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      iosabi <iosabi@protonmail.com>
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -328,5 +327,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

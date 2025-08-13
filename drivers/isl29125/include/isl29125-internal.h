@@ -18,7 +18,6 @@
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

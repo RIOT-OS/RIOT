@@ -20,7 +20,6 @@
  * @author      Martin Landsmann
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

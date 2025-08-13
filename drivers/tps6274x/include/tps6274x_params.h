@@ -18,7 +18,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
-
 #include "board.h"
 #include "tps6274x.h"
 

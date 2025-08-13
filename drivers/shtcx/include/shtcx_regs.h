@@ -19,7 +19,6 @@
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

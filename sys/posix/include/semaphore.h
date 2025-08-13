@@ -24,7 +24,6 @@
  * @author  Víctor Ariño <victor.arino@zii.aero>
  */
 
-
 #include <errno.h>
 #include <time.h>
 

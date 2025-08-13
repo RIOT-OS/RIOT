@@ -19,7 +19,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

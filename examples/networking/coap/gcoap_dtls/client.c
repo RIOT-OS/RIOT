@@ -1,9 +1,6 @@
-/*
- * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ /*
+ * SPDX-FileCopyrightText: 2015-2017 Ken Bannister
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -31,6 +28,7 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "od.h"
+#include "shell.h"
 #include "uri_parser.h"
 
 #include "gcoap_example.h"
@@ -229,7 +227,13 @@ static int _uristr2remote(const char *uri, sock_udp_ep_t *remote, const char **p
     return 0;
 }
 
-int gcoap_cli_cmd(int argc, char **argv)
+/**
+ * @brief   Shell interface exposing the client side features of gcoap
+ * @param   argc    Number of shell arguments (including shell command name)
+ * @param   argv    Shell argument values (including shell command name)
+ * @return  Exit status of the shell command
+ */
+static int _cli_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     char *method_codes[] = {"ping", "get", "post", "put"};
@@ -397,3 +401,5 @@ int gcoap_cli_cmd(int argc, char **argv)
 help:
     return _print_usage(argv);
 }
+
+SHELL_COMMAND(coap, "CoAP example", _cli_cmd);

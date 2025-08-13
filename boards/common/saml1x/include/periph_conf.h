@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_saml1x
@@ -16,9 +15,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -260,5 +256,4 @@ static const adc_conf_chan_t adc_channels[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef XTENSA_CONF_H
-#define XTENSA_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,5 +32,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* XTENSA_CONF_H */
 /** @} */

@@ -19,7 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "at86rf2xx.h"
 #include "board.h"
 

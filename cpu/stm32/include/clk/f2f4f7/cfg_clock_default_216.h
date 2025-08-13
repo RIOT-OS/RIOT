@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_stm32
  * @{
@@ -19,9 +21,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H
-#define CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H
 
 #include "kernel_defines.h"
 #include "macros/units.h"
@@ -83,5 +82,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H */
 /** @} */

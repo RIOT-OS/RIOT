@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_gd32v
  * @{
@@ -18,9 +20,6 @@
 
 #include "vendor/gd32vf103_core.h"
 #include "cpu_conf_common.h"
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,5 +77,4 @@ typedef enum {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

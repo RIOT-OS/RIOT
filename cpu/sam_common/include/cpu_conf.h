@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_sam_common
  * @brief           Implementation specific CPU configuration options
@@ -16,9 +18,6 @@
  *
  * @author          Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 #include "vendor/sam.h"
@@ -41,5 +40,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
@@ -13,9 +15,6 @@
  * @file
  * @brief           CC26xx/CC13xx VIMS register definitions
  */
-
-#ifndef CC26XX_CC13XX_VIMS_H
-#define CC26XX_CC13XX_VIMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,5 +257,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_VIMS_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_nrf52 Nordic nRF52 MCU
  * @ingroup         cpu
@@ -20,9 +22,6 @@
  * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -143,5 +142,4 @@ static inline void nrf52_sleep(void)
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

@@ -122,7 +122,6 @@
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>

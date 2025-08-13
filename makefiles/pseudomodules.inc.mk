@@ -130,7 +130,6 @@ PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_timestamp
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
-PSEUDOMODULES += gnrc_netif_mac
 PSEUDOMODULES += gnrc_netif_single
 PSEUDOMODULES += gnrc_netif_dedup
 
@@ -142,12 +141,6 @@ PSEUDOMODULES += gnrc_netif_dedup
 ## @{
 ## Enables @ref GNRC_NETTYPE_CCN and @ref GNRC_NETTYPE_CCN_CHUNK
 PSEUDOMODULES += gnrc_nettype_ccn
-## @}
-
-## @defgroup 	net_gnrc_nettype_gomac      gnrc_nettype_gomac
-## @{
-## Enables @ref GNRC_NETTYPE_GOMACH
-PSEUDOMODULES += gnrc_nettype_gomach
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_icmpv6     gnrc_nettype_icmpv6
@@ -176,12 +169,6 @@ PSEUDOMODULES += gnrc_nettype_ipv6_ext
 ##              This module will be removed after 2024.10 release.
 ## @{
 PSEUDOMODULES += gnrc_nettype_lorawan
-## @}
-
-## @defgroup 	net_gnrc_nettype_lwmac      gnrc_nettype_lwmac
-## Enables @ref GNRC_NETTYPE_LWMAC
-## @{
-PSEUDOMODULES += gnrc_nettype_lwmac
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn
@@ -456,6 +443,7 @@ PSEUDOMODULES += shell_cmd_sntp
 PSEUDOMODULES += shell_cmd_suit
 PSEUDOMODULES += shell_cmd_sys
 PSEUDOMODULES += shell_cmd_udptty
+PSEUDOMODULES += shell_cmd_xipfs
 PSEUDOMODULES += shell_cmd_vfs
 PSEUDOMODULES += shell_cmds_default
 PSEUDOMODULES += shell_hooks
@@ -464,6 +452,7 @@ PSEUDOMODULES += shield_llcc68
 PSEUDOMODULES += shield_sx1262
 PSEUDOMODULES += shield_w5100
 PSEUDOMODULES += slipdev_stdio
+PSEUDOMODULES += slipdev_config
 PSEUDOMODULES += slipdev_l2addr
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
@@ -510,6 +499,13 @@ PSEUDOMODULES += suit_storage_%
 PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
+
+# An umbrella module for the unicoap_driver_rfc7252_common_pdu
+# and unicoap_driver_rfc7252_common_messaging modules
+PSEUDOMODULES += unicoap_driver_rfc7252_common
+# Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
+PSEUDOMODULES += unicoap_driver_rfc7252_pdu
+
 PSEUDOMODULES += usbus_urb
 PSEUDOMODULES += vdd_lc_filter_%
 ## @defgroup pseudomodule_vfs_auto_format vfs_auto_format

@@ -26,7 +26,6 @@
  * @todo build error messages
  */
 
-
 #include "net/icmpv6.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pkt.h"

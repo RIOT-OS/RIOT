@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
 */
-
-#ifndef CLK_CLK_CONF_H
-#define CLK_CLK_CONF_H
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
@@ -50,5 +49,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CLK_CONF_H */
 /** @} */

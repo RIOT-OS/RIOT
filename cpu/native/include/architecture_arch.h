@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -16,8 +18,6 @@
  * @brief Architecture details
  * @author Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-#ifndef ARCHITECTURE_ARCH_H
-#define ARCHITECTURE_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +44,4 @@ void native_breakpoint(void);
 }
 #endif
 
-#endif /* ARCHITECTURE_ARCH_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup drivers_netdev
  * @{
@@ -16,8 +18,6 @@
  * @brief  Default configuration for the netdev_tap driver
  * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NETDEV_TAP_PARAMS_H
-#define NETDEV_TAP_PARAMS_H
 
 #include "netdev_tap.h"
 
@@ -46,5 +46,4 @@ extern netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 }
 #endif
 
-#endif /* NETDEV_TAP_PARAMS_H */
 /** @} */

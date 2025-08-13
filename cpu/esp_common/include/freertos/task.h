@@ -8,8 +8,7 @@
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_TASK_H
-#define FREERTOS_TASK_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -31,6 +30,7 @@ extern "C" {
 #define taskENTER_CRITICAL          portENTER_CRITICAL
 #define taskEXIT_CRITICAL           portEXIT_CRITICAL
 
+#define taskSCHEDULER_SUSPENDED     0
 #define taskSCHEDULER_NOT_STARTED   1
 #define taskSCHEDULER_RUNNING       2
 
@@ -104,4 +104,3 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_TASK_H */

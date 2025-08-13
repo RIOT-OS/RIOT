@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "saul_reg.h"
 #include "board.h"
 #include "qmc5883l.h"

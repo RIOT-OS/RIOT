@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup      cpu_cc2538
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Ian Martin <ian@locicontrols.com>
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "kernel_defines.h"
 #include "cpu_conf_common.h"
@@ -74,5 +73,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

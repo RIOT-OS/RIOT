@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atxmega
  * @{
@@ -17,9 +19,6 @@
  */
 
 #include "periph_cpu.h"
-
-#ifndef CPU_EBI_H
-#define CPU_EBI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,5 +149,4 @@ void hugemem_write_block(hugemem_ptr_t to, const void *from, size_t size);
 }
 #endif
 
-#endif /* CPU_EBI_H */
 /** @} */

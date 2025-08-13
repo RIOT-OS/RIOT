@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014 Hamburg University of Applied Sciences (HAW)
- * Copyright (C) 2014 Ho Chi Minh city University of Technology (HCMUT)
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Hamburg University of Applied Sciences (HAW)
+ * SPDX-FileCopyrightText: 2014 Ho Chi Minh city University of Technology (HCMUT)
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup
@@ -19,9 +18,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  * @author      DangNhat Pham-Huu <51002279@stu.hcmut.edu.vn>
  */
-
-#ifndef CPP_CLASS_H
-#define CPP_CLASS_H
 
 #include <cstdio>
 
@@ -60,4 +56,3 @@ private:
 };
 
 /** @} */
-#endif /* CPP_CLASS_H */

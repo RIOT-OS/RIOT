@@ -146,6 +146,7 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += l2util
   USEMODULE += bluetil_addr
+  USEMODULE += netdev_legacy_api
   ifneq (,$(filter gnrc_ipv6_%,$(USEMODULE)))
     USEMODULE += nimble_svc_ipss
   endif

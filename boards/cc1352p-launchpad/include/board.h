@@ -1,10 +1,9 @@
 /*
- * Copyright (C)    2020 Locha Inc
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 Locha Inc
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         boards_cc1352p_launchpad
@@ -15,9 +14,6 @@
  *
  * @author          Luis A. Ruiz <luisan00@hotmail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "periph/gpio.h"
 
@@ -65,5 +61,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

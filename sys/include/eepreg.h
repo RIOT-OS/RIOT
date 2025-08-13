@@ -56,7 +56,6 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
-
 #include <stdint.h>
 
 #include "periph_cpu.h"

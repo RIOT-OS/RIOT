@@ -20,7 +20,6 @@
  * @{
  */
 
-
 #include <stdint.h>
 #include "periph_conf.h"
 #include "time_units.h"

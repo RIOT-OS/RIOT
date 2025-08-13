@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -36,9 +38,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef RTT_ARCH_H
-#define RTT_ARCH_H
 
 #include "periph/rtt.h"
 
@@ -120,5 +119,4 @@ void rtt_pm_sleep_exit(uint32_t cause);
 }
 #endif
 
-#endif /* RTT_ARCH_H */
 /** @} */

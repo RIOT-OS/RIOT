@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,9 +19,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef PERIPH_CPU_ETH_H
-#define PERIPH_CPU_ETH_H
 
 #include <stdint.h>
 
@@ -160,10 +159,8 @@ typedef struct eth_dma_desc {
 void stm32_eth_common_init(void);
 #endif /* MODULE_PERIPH_ETH_COMMON */
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_ETH_H */
 /** @} */

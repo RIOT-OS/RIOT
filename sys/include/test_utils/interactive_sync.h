@@ -20,7 +20,6 @@
  * @author      Gaëtan Harter <gaetan.harter@fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

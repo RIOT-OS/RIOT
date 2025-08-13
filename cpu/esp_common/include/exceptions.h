@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -17,9 +19,6 @@
  * @}
  */
 
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,5 +29,3 @@ extern void init_exceptions(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* EXCEPTIONS_H */

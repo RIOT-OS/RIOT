@@ -19,7 +19,6 @@
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
 
-
 #ifdef __cplusplus
 extern "C"
 {

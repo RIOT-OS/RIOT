@@ -31,7 +31,8 @@ struct event_queue_and_size {
     size_t q_numof;
 };
 
-static void *_handler_thread(void *tagged_ptr)
+/* ARM GCC ignores that this function has no exit path, hence NORETURN. */
+NORETURN static void *_handler_thread(void *tagged_ptr)
 {
     event_queue_t *qs = ptrtag_ptr(tagged_ptr);
     /* number of queues is encoded in lower pointer bits */
@@ -39,9 +40,7 @@ static void *_handler_thread(void *tagged_ptr)
     event_queues_claim(qs, n);
     /* start event loop */
     event_loop_multi(qs, n);
-
-    /* should be never reached */
-    return NULL;
+    UNREACHABLE();
 }
 
 void event_thread_init_multi(event_queue_t *queues, size_t queues_numof,

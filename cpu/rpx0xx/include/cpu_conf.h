@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_rpx0xx
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
 */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include <stdint.h>
 
@@ -42,5 +41,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

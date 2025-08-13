@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef CPU_H
-#define CPU_H
+#pragma once
 
 /**
  * @defgroup    cpu_lpc23xx     NXP LPC23XX
@@ -79,4 +78,3 @@ bool cpu_backup_ram_is_initialized(void);
 #endif
 
 /** @} */
-#endif /* CPU_H */

@@ -1,0 +1,73 @@
+@defgroup    boards_nucleo-l476rg STM32 Nucleo-L476RG
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-L476RG
+
+
+## Overview
+
+The Nucleo-L476RG is a board from ST's Nucleo family supporting ARM Cortex-M4
+STM32L476RG microcontroller with 128KiB of RAM and 1MiB of Flash.
+
+## Pinout
+
+@image html pinouts/nucleo-l476rg.svg "Pinout for the Nucleo-L476RG (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 35)" width=50%
+
+### MCU
+
+| MCU        |   STM32L476RG     |
+|:---------- |:----------------- |
+| Family     | ARM Cortex-M4F    |
+| Vendor     | ST Microelectronics|
+| RAM        | 128KiB            |
+| Flash      | 1MiB              |
+| Frequency  | up to 80MHz       |
+| FPU        | yes               |
+| Timers     | 16 (2x watchdog, 1 SysTick, 6x 16-bit, 2x 32-bit [TIM2])  |
+| ADCs       | 3x 12-bit (up to 16 channels) |
+| UARTs      | 6 (three USARTs, two UARTs and one Low-Power UART) |
+| SPIs       | 3                 |
+| I2Cs       | 3                 |
+| RTC        | 1                 |
+| CAN        | 1                 |
+| Vcc        | 1.71 V - 3.6V     |
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l476je.pdf) |
+| Reference Manual | [Reference Manual](http://www.st.com/content/ccc/resource/technical/document/reference_manual/02/35/09/0c/4f/f7/40/03/DM00083560.pdf/files/DM00083560.pdf/jcr:content/translations/en.DM00083560.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf) |
+| Board Manual   | [Board Manual](https://www.st.com/content/ccc/resource/technical/document/user_manual/98/2e/fa/4b/e0/82/43/b7/DM00105823.pdf/files/DM00105823.pdf/jcr:content/translations/en.DM00105823.pdf) |
+
+## Flashing the device
+
+### Flashing the Board Using OpenOCD
+
+The ST Nucleo-L476RG board includes an on-board ST-LINK V2 programmer. The
+easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=nucleo-l476rg flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-l476rg debug
+```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-l476rg PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+
+
+## Supported Toolchains
+
+For using the ST Nucleo-L476RG board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.

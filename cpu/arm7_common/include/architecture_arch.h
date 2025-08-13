@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_arm7_common
  * @{
@@ -16,9 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  */
-
-#ifndef ARCHITECTURE_ARCH_H
-#define ARCHITECTURE_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +33,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* ARCHITECTURE_ARCH_H */

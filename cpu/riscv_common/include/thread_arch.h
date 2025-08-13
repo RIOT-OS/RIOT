@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_fe310
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
 
 #include "irq.h"
 
@@ -59,5 +58,4 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 }
 #endif
 
-#endif /* THREAD_ARCH_H */
 /** @} */

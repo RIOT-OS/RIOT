@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_msp430
  * @{
@@ -19,9 +21,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef MSP430_REGS_COMMON_H
-#define MSP430_REGS_COMMON_H
 
 #include <stdint.h>
 
@@ -117,5 +116,4 @@ typedef struct {
 }
 #endif
 
-#endif /* MSP430_REGS_COMMON_H */
 /** @} */

@@ -14,18 +14,19 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
 int genhdr(int argc, char *argv[]);
 int updatehdr(int argc, char *argv[]);
-int readhdr(const char *file);
+int readhdr(const char *file, bool json);
 
 int main(int argc, char *argv[])
 {
     char *usage = "genhdr generate [args]\n\t"
-                  "genhdr update [file] [new_version]\n\t"
-                  "genhdr show [file]";
+                  "genhdr update <file> <new_version>\n\t"
+                  "genhdr show [--json] <file>";
 
     if (argc < 2) {
         goto usage;
@@ -37,7 +38,9 @@ int main(int argc, char *argv[])
         return updatehdr(argc - 1, &argv[1]);
     }
     else if (!strcmp(argv[1], "show")) {
-        return readhdr(argv[2]);
+        bool json = argc > 2
+                 && !strcmp(argv[2], "--json");
+        return readhdr(argv[2 + json], json);
     }
 
 usage:

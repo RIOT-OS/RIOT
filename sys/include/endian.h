@@ -22,7 +22,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

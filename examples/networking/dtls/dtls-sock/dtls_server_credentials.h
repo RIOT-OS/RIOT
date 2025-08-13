@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2024 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     examples
@@ -17,9 +16,6 @@
  *
  * @}
  */
-
-#ifndef DTLS_SERVER_CREDENTIALS_H
-#define DTLS_SERVER_CREDENTIALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -131,5 +127,3 @@ static const unsigned char known_client_public_key_0_y[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DTLS_SERVER_CREDENTIALS_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_qn908x
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          iosabi <iosabi@protonmail.com>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -542,5 +541,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

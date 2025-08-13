@@ -17,7 +17,6 @@
  * @author      Lucas Jenß <lucas@x3ro.de>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

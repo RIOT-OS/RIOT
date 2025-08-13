@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_kinetis
  * @brief           CPU specific implementations for the NXP Kinetis EA series of
@@ -19,9 +21,6 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author          Anton Gerasimov <anton.gerasimov@here.com>
  */
-
-#ifndef CPU_CONF_KINETIS_EA_H
-#define CPU_CONF_KINETIS_EA_H
 
 #if defined(KINETIS_CORE_Z)
 #if (KINETIS_ROMSIZE == 128)
@@ -41,5 +40,4 @@ extern "C"
 }
 #endif
 
-#endif /* CPU_CONF_KINETIS_EA_H */
 /** @} */

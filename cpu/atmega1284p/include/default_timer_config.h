@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atmega1284p
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef DEFAULT_TIMER_CONFIG_H
-#define DEFAULT_TIMER_CONFIG_H
 
 #include "periph_cpu_common.h"
 #include "periph_conf.h" /* <- Allow overwriting timer config from board */
@@ -47,5 +46,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */

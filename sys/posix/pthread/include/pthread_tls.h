@@ -17,7 +17,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -86,7 +85,6 @@ struct __pthread_tls_datum **__pthread_get_tls_head(int self_id) PURE;
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

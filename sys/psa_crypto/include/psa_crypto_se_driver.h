@@ -38,7 +38,6 @@
  *              authors implement, are not intended to be called by application developers.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

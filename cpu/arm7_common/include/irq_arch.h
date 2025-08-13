@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_arm7_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Heiko Will <hwill@inf.fu-berlin.de>
  */
-
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include "VIC.h"
 #include <stdbool.h>
@@ -79,5 +78,4 @@ static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 }
 #endif
 
-#endif /* IRQ_ARCH_H */
 /** @} */

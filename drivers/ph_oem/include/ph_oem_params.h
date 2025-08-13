@@ -18,7 +18,6 @@
  * @author      Igor Knippenberg <igor.knippenberg@gmail.com>
  */
 
-
 #include "board.h" /* THIS INCLUDE IS MANDATORY */
 #include "saul_reg.h"
 #include "ph_oem.h"

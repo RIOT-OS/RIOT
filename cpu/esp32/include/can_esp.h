@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_esp32_esp_can ESP32 CAN controller
  * @ingroup     cpu_esp32
@@ -41,9 +43,6 @@
  * @{
  * @file
  */
-
-#ifndef CAN_ESP_H
-#define CAN_ESP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,5 +103,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CAN_ESP_H */
 /** @} */

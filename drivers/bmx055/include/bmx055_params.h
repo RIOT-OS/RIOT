@@ -18,7 +18,6 @@
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

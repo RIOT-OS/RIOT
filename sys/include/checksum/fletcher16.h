@@ -19,7 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -80,6 +79,5 @@ uint16_t fletcher16_finish(fletcher16_ctx_t *ctx);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

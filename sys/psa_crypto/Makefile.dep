@@ -143,6 +143,75 @@ ifneq (,$(filter psa_cipher_aes_192_cbc_backend_riot,$(USEMODULE)))
   USEMODULE += psa_riot_cipher_aes_192_cbc
 endif
 
+# AEAD
+ifneq (,$(filter psa_aead,$(USEMODULE)))
+  USEMODULE += psa_key_management
+endif
+
+## AES-128-CCM
+ifneq (,$(filter psa_aead_aes_128_ccm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_128_ccm_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_aes_128_ccm
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_aes_128_ccm,$(FEATURES_USED)))
+      USEMODULE += psa_aead_aes_128_ccm_backend_periph
+    else
+      USEMODULE += psa_aead_aes_128_ccm_backend_cifra
+    endif
+  endif
+endif
+ifneq (,$(filter psa_aead_aes_128_ccm_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_aes_128_ccm
+endif
+ifneq (,$(filter psa_aead_aes_128_ccm_backend_tinycrypt,$(USEMODULE)))
+  USEPKG += tinycrypt
+  USEMODULE += psa_tinycrypt
+  USEMODULE += psa_tinycrypt_aes_ccm
+endif
+
+## AES-192-CCM
+ifneq (,$(filter psa_aead_aes_192_ccm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_192_ccm_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_aes_192_ccm
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_aes_192_ccm,$(FEATURES_USED)))
+      USEMODULE += psa_aead_aes_192_ccm_backend_periph
+    else
+      USEMODULE += psa_aead_aes_192_ccm_backend_cifra
+    endif
+  endif
+endif
+ifneq (,$(filter psa_aead_aes_192_ccm_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_aes_192_ccm
+endif
+
+## AES-256-CCM
+ifneq (,$(filter psa_aead_aes_256_ccm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_256_ccm_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_aes_256_ccm
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_aes_256_ccm,$(FEATURES_USED)))
+      USEMODULE += psa_aead_aes_256_ccm_backend_periph
+    else
+      USEMODULE += psa_aead_aes_256_ccm_backend_cifra
+    endif
+  endif
+endif
+ifneq (,$(filter psa_aead_aes_256_ccm_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_aes_256_ccm
+endif
+
+## Cifra supports all of them
+ifneq (,$(filter psa_aead_aes_%_ccm_backend_cifra,$(USEMODULE)))
+  USEPKG += cifra
+  USEMODULE += psa_cifra
+  USEMODULE += psa_cifra_aes_ccm
+endif
+
+
 ## ChaCha20
 ifneq (,$(filter psa_cipher_chacha20,$(USEMODULE)))
   ifeq (,$(filter psa_cipher_chacha20_custom_backend,$(USEMODULE)))

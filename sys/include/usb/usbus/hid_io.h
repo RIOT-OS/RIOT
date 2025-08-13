@@ -21,7 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-
 #include <string.h>
 #include <stdint.h>
 

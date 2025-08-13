@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include <string.h>
 #if IS_USED(MODULE_NIMBLE_RPBLE)
 #include "nimble_rpble.h"

@@ -13,6 +13,7 @@ USEMODULE += $(PERIPH_FEATURES)
 PERIPH_IGNORE_MODULES := \
   periph_cipher_aes_128_cbc \
   periph_cipher_chacha20 \
+  periph_aead_aes_128_ccm \
   periph_clic \
   periph_common \
   periph_coretimer \

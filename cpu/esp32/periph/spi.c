@@ -26,6 +26,10 @@
  * @}
  */
 
+/* -Wsign-compare has to be deactivated in this file due to the comparison
+ * of int and size_t in spi_ll.h of the ESP-IDF */
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
 #include <assert.h>
 #include <string.h>
 
@@ -38,14 +42,15 @@
 #include "periph/spi.h"
 #include "syscalls.h"
 
-#include "driver/periph_ctrl.h"
+#include "driver/gpio.h"
 #include "esp_attr.h"
+#include "esp_clk_tree.h"
+#include "esp_cpu.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "hal/spi_hal.h"
 #include "hal/spi_types.h"
 #include "soc/rtc.h"
-
-#include "esp_idf_api/gpio.h"
 
 #undef MHZ
 #include "macros/units.h"
@@ -64,7 +69,7 @@ struct _spi_bus_t {
     spi_host_device_t hostid;        /* SPI hostid as used by ESP-IDF */
     const spi_signal_conn_t *periph; /* SPI peripheral descriptor */
     spi_hal_timing_conf_t timing;    /* calculated SPI timing parameters */
-    spi_clk_t clk_last;               /* SPI clock speed used last time in Hz */
+    spi_clk_t clk_last;              /* SPI clock speed used last time in Hz */
     uint8_t mode_last;               /* SPI mode used last time */
     bool pins_initialized;           /* SPI pins initialized */
 };
@@ -97,6 +102,15 @@ _Static_assert(SPI_NUMOF == ARRAY_SIZE(_spi),
 _Static_assert(SPI_NUMOF <= SPI_NUMOF_MAX,
                "Number of defined SPI devices is greater than the number of supported devices");
 
+#define PERIPH_SPI1_MODULE  PERIPH_SPI_MODULE
+#if defined(CPU_FAM_ESP32)
+#  define PERIPH_SPI2_MODULE  PERIPH_HSPI_MODULE
+#  define PERIPH_SPI3_MODULE  PERIPH_VSPI_MODULE
+#elif defined(CPU_FAM_ESP32S2)
+#  define PERIPH_SPI2_MODULE  PERIPH_FSPI_MODULE
+#  define PERIPH_SPI3_MODULE  PERIPH_HSPI_MODULE
+#endif
+
 void IRAM_ATTR spi_init(spi_t bus)
 {
     DEBUG("%s bus=%u\n", __func__, bus);
@@ -117,10 +131,27 @@ void IRAM_ATTR spi_init(spi_t bus)
     }
 
     /* enable (power on) the according SPI module */
-    periph_module_enable(_spi[bus].periph->module);
+    if (spi_config[bus].ctrl == SPI1_HOST) {
+        periph_module_enable(PERIPH_SPI1_MODULE);
+    }
+#if SOC_SPI_PERIPH_NUM > 1
+    else if (spi_config[bus].ctrl == SPI2_HOST) {
+        periph_module_enable(PERIPH_SPI2_MODULE);
+    }
+#endif
+#if SOC_SPI_PERIPH_NUM > 2
+    else if (spi_config[bus].ctrl == SPI3_HOST) {
+        periph_module_enable(PERIPH_SPI3_MODULE);
+    }
+#endif
+    else {
+        assert(false);
+    }
 
     /* initialize SPI peripheral */
     spi_ll_master_init(_spi[bus].periph->hw);
+    spi_ll_set_mosi_delay(_spi[bus].periph->hw, 0, 0);
+    spi_ll_apply_config(_spi[bus].periph->hw);
 
     /* bring the bus into a defined state (one-line mode) */
     spi_ll_master_set_line_mode(_spi[bus].periph->hw, (spi_line_mode_t){ 1, 1, 1 });
@@ -241,22 +272,22 @@ void spi_deinit_pins(spi_t bus)
     _spi[bus].pins_initialized = false;
 
     if (gpio_is_valid(spi_config[bus].sck)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].sck);
+        gpio_reset_pin(spi_config[bus].sck);
         gpio_set_pin_usage(spi_config[bus].sck, _GPIO);
     }
 
     if (gpio_is_valid(spi_config[bus].mosi)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].mosi);
+        gpio_reset_pin(spi_config[bus].mosi);
         gpio_set_pin_usage(spi_config[bus].mosi, _GPIO);
     }
 
     if (gpio_is_valid(spi_config[bus].miso)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].miso);
+        gpio_reset_pin(spi_config[bus].miso);
         gpio_set_pin_usage(spi_config[bus].miso, _GPIO);
     }
 
     if (gpio_is_valid(spi_config[bus].cs)) {
-        esp_idf_gpio_reset_pin(spi_config[bus].cs);
+        gpio_reset_pin(spi_config[bus].cs);
         gpio_set_pin_usage(spi_config[bus].cs, _GPIO);
     }
 
@@ -273,7 +304,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     cs = (cs == GPIO_UNDEF) ? spi_config[bus].cs : cs;
 
     /* if the CS pin used is not yet initialized, we do it now */
-    if (gpio_get_pin_usage(cs) != _SPI && spi_init_cs(bus, cs) != SPI_OK) {
+    if ((gpio_get_pin_usage(cs) != _SPI) && (spi_init_cs(bus, cs) != SPI_OK)) {
         LOG_TAG_ERROR("spi",
                       "SPI_DEV(%d) CS signal could not be initialized\n",
                       bus);
@@ -282,6 +313,9 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
 
     /* lock the bus */
     mutex_lock(&_spi[bus].lock);
+
+    /* enable peripheral output clock */
+    spi_ll_enable_clock(_spi[bus].hostid, true);
 
     /*
      * set SPI mode
@@ -307,17 +341,22 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
 
     /* check whether timing has to be recalculated (time consuming) */
     if (clk != _spi[bus].clk_last) {
-        uint32_t apb_clk = rtc_clk_apb_freq_get();
+        uint32_t apb_clk = 0;
         uint32_t clk_reg;
 
-        if (apb_clk / 5 < clk) {
+        spi_ll_set_clk_source(_spi[bus].periph->hw, SPI_CLK_SRC_DEFAULT);
+        esp_clk_tree_src_get_freq_hz((soc_module_clk_t)SPI_CLK_SRC_DEFAULT,
+                                     ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
+                                     &apb_clk);
+
+        if ((apb_clk / 4) < clk) {
             LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
-                          "least 5 times SPI clock rate (%d Hz)\n",
+                          "least 4 times SPI clock rate (%d Hz)\n",
                           apb_clk, clk);
             assert(false);
         }
 
-        /* duty cycle is measured in is 1/256th, 50% = 128 */
+        /* duty cycle is measured in 1/256th, 50% = 128 */
         int _clk = spi_ll_master_cal_clock(apb_clk, clk,
                                            128, &clk_reg);
 
@@ -332,8 +371,9 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     }
     spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw,
                                    &_spi[bus].timing.clock_reg);
+    spi_ll_apply_config(_spi[bus].periph->hw);
 
-#if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
+#if CPU_FAM_ESP32C3 || CPU_FAM_ESP32C6 || CPU_FAM_ESP32H2 || CPU_FAM_ESP32S3
     /*
      * If the SPI mode has been changed, the clock signal is only set to the
      * correct level at the beginning of the transfer on the ESP32x3. However,
@@ -349,7 +389,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
         spi_transfer_bytes(bus, GPIO_UNDEF, false, &temp, &temp, 1);
         _spi[bus].mode_last = mode;
     }
-#elif defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2)
+#elif CPU_FAM_ESP32 || CPU_FAM_ESP32S2
     /* This workaround isn't needed on ESP32 and ESP32-S2 */
 #else
 #error Platform implementation is missing
@@ -370,6 +410,10 @@ void IRAM_ATTR spi_release(spi_t bus)
 #if defined(CPU_FAM_ESP32)
 static const char* _spi_names[] = { "CSPI/FSPI", "HSPI", "VSPI"  };
 #elif defined(CPU_FAM_ESP32C3)
+static const char* _spi_names[] = { "SPI", "FSPI"  };
+#elif defined(CPU_FAM_ESP32C6)
+static const char* _spi_names[] = { "SPI", "FSPI"  };
+#elif defined(CPU_FAM_ESP32H2)
 static const char* _spi_names[] = { "SPI", "FSPI"  };
 #elif defined(CPU_FAM_ESP32S2)
 static const char* _spi_names[] = { "SPI", "FSPI", "HSPI" };
@@ -417,7 +461,8 @@ static void IRAM_ATTR _spi_transfer(uint8_t bus,
     spi_ll_write_buffer(_spi[bus].periph->hw, out ? out : _spi_empty_out, len << 3);
 
     /* start the transfer */
-    spi_ll_master_user_start(_spi[bus].periph->hw);
+    spi_ll_apply_config(_spi[bus].periph->hw);
+    spi_ll_user_start(_spi[bus].periph->hw);
 
     /* wait until the transfer is finished */
     while (spi_ll_get_running_cmd(_spi[bus].periph->hw)) {}

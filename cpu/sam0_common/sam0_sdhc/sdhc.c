@@ -137,7 +137,6 @@ static void _delay(unsigned us)
     }
 }
 
-
 /**
  * @brief   Reset the entire SDHC peripheral or a part of it
  *

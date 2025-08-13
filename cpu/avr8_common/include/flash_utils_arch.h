@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @{
@@ -16,9 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  */
-
-#ifndef FLASH_UTILS_ARCH_H
-#define FLASH_UTILS_ARCH_H
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -60,7 +59,6 @@ static inline char * flash_strncpy(char *ram, FLASH_ATTR const char *flash, size
 {
     return strncpy_P(ram, (const char *)flash, n);
 }
-
 
 static inline int flash_vprintf(FLASH_ATTR const char *flash, va_list args)
 {
@@ -105,4 +103,3 @@ int flash_snprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash, ...)
 #endif
 
 /** @} */
-#endif /* FLASH_UTILS_ARCH_H */

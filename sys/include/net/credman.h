@@ -26,7 +26,6 @@
  * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  */
 
-
 #include <unistd.h>
 #include <stdint.h>
 #include "modules.h"

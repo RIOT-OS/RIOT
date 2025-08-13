@@ -101,7 +101,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <stdint.h>
 #include <stddef.h>
 #include "iolist.h"

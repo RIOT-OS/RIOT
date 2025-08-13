@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "cc110x_calibration.h"
 #include "cc110x_communication.h"
 #include "cc110x_constants.h"

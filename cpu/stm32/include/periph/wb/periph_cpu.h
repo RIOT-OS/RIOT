@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -16,9 +18,6 @@
  * @author          Francisco Molina <francois-xavier.molina@inria.fr>
  *
  */
-
-#ifndef PERIPH_WB_PERIPH_CPU_H
-#define PERIPH_WB_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,5 +80,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_WB_PERIPH_CPU_H */
 /** @} */

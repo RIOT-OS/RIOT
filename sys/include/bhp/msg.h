@@ -23,7 +23,6 @@
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
 
-
 #include "msg.h"
 #include "thread.h"
 #include "bhp.h"

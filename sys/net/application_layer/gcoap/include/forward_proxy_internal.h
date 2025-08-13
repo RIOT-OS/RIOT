@@ -21,7 +21,6 @@
  * @author      Mariem Charrada <mariem.charrada@ml-pa.com>
  */
 
-
 #include <stdint.h>
 #include "net/coap.h"
 #include "net/gcoap.h"

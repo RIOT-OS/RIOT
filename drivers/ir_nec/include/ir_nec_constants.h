@@ -18,7 +18,6 @@
  * @author      Dario Petrillo <dario.pk1@gmail.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

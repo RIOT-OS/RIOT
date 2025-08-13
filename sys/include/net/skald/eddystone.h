@@ -34,7 +34,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "net/eddystone.h"
 #include "net/skald.h"
 

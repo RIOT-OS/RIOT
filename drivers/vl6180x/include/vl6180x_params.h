@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "vl6180x.h"

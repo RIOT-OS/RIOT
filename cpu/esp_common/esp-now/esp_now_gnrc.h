@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common_esp_now
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Timo Rothenpieler <timo.rothenpieler@uni-bremen.de>
  */
-#ifndef ESP_NOW_GNRC_H
-#define ESP_NOW_GNRC_H
 
 #include "net/gnrc/netif.h"
 
@@ -44,5 +44,4 @@ int gnrc_netif_esp_now_create(gnrc_netif_t *netif, char *stack, int stacksize, c
 }
 #endif
 
-#endif /* ESP_NOW_GNRC_H */
 /** @} */

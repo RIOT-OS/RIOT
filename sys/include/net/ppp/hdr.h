@@ -20,7 +20,6 @@
  * @author  José Ignacio Alamos
  */
 
-
 #include <inttypes.h>
 
 #include "byteorder.h"

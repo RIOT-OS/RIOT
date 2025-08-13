@@ -48,7 +48,6 @@
  * @author      Peter Kietzmann
  */
 
-
 #include <inttypes.h>
 #include <stddef.h>
 

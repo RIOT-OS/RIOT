@@ -28,7 +28,6 @@
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

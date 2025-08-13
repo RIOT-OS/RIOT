@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_cc2538_gpio CC2538 General-Purpose I/O
  * @ingroup         cpu_cc2538_regs
@@ -20,9 +22,6 @@
  *
  * @{
  */
-
-#ifndef CC2538_GPIO_H
-#define CC2538_GPIO_H
 
 #include <stdint.h>
 
@@ -343,8 +342,6 @@ typedef struct {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
-#endif /* CC2538_GPIO_H */
 
 /** @} */
 /** @} */

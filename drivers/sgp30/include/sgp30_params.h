@@ -18,7 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-
 #include "board.h"
 #include "sgp30.h"
 #include "sgp30_constants.h"

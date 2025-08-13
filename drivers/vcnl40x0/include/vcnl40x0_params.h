@@ -18,7 +18,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-
 #include "board.h"
 #include "vcnl40x0.h"
 #include "vcnl40x0_internals.h"

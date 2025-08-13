@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -16,8 +18,6 @@
  * @brief  CPU specific definitions for internal peripheral handling
  * @author Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_conf.h"
 
@@ -234,5 +234,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

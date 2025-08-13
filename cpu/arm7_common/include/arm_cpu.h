@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef ARM_CPU_H
-#define ARM_CPU_H
+#pragma once
 
 #include <stdint.h>
 #include "VIC.h"
@@ -60,5 +59,3 @@ static inline uintptr_t cpu_get_caller_pc(void)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ARM_CPU_H */

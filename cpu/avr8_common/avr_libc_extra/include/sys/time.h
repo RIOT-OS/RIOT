@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef SYS_TIME_H
-#define SYS_TIME_H
+#pragma once
 
 #include <sys/types.h>
 #include <time.h>
@@ -28,5 +27,3 @@ struct timeval {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYS_TIME_H */

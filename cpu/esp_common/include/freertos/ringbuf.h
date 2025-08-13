@@ -12,8 +12,7 @@
  * such as `uart.h` even if they do not need definitions from `ringbuf.h`.
  */
 
-#ifndef FREERTOS_RINGBUF_H
-#define FREERTOS_RINGBUF_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -54,4 +53,3 @@ void vRingbufferReturnItemFromISR(RingbufHandle_t xRingbuffer, void *pvItem,
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_RINGBUF_H */

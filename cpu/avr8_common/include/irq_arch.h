@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @{
@@ -23,9 +25,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
-
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -158,4 +157,3 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
 #endif
 
 /** @} */
-#endif /* IRQ_ARCH_H */

@@ -26,7 +26,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include "ztimer.h"
 #include "periph/timer.h"
 

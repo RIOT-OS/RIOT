@@ -102,7 +102,6 @@ static void test_nanocoap_cache__cachekey_blockwise(void)
     coap_opt_add_block1_control(&pkt1, &blockopt);
     coap_opt_finish(&pkt1, COAP_OPT_FINISH_NONE);
 
-
     blockopt.offset = 128;
     blockopt.blknum = 2;
 

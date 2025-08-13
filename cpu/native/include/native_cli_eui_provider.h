@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup cpu_native
  * @{
@@ -16,8 +18,6 @@
  * @brief  Command-line EUI provider for native
  * @author Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef NATIVE_CLI_EUI_PROVIDER_H
-#define NATIVE_CLI_EUI_PROVIDER_H
 
 #include "net/eui64.h"
 
@@ -46,5 +46,4 @@ int native_cli_get_eui64(uint8_t index, eui64_t *addr);
 }
 #endif
 
-#endif /* NATIVE_CLI_EUI_PROVIDER_H */
 /** @} */

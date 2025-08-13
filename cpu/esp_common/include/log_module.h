@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef LOG_MODULE_H
-#define LOG_MODULE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,4 +56,3 @@ static inline void log_write(unsigned level, const char *format, ...) {
 }
 #endif
 /**@}*/
-#endif /* LOG_MODULE_H */

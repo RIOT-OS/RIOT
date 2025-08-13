@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup        cpu_cc2538_rfcore CC2538 RF core interface
  * @ingroup         cpu_cc2538_regs
@@ -17,9 +19,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  *
  */
-
-#ifndef CC2538_RFCORE_H
-#define CC2538_RFCORE_H
 
 #include "cc2538.h"
 
@@ -275,5 +274,4 @@ enum {
 } /* extern "C" */
 #endif
 
-#endif /* CC2538_RFCORE_H */
 /** @} */

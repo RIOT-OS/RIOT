@@ -22,7 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "board.h"
 #include "bmx280.h"
 #include "saul_reg.h"

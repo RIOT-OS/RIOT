@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  cpu_atmega_common
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef INTTYPES_H
-#define INTTYPES_H
 
 #include_next <inttypes.h>
 
@@ -33,5 +33,4 @@ extern "C" {
 }
 #endif
 
-#endif /* INTTYPES_H */
 /** @} */

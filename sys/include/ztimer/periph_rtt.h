@@ -23,7 +23,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include "ztimer.h"
 
 #ifdef __cplusplus

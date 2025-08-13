@@ -19,7 +19,6 @@
  * @author      René Herthel <rene-herthel@outlook.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

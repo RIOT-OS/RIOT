@@ -18,7 +18,6 @@
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
 
-
 #include "board.h"
 
 #ifdef __cplusplus

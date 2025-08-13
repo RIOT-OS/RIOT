@@ -6,15 +6,14 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_stm32_lcd_fmc STM32 FMC/FSMC LCD low-level parallel interface driver
  * @ingroup     cpu_stm32
  *
  * @{
  */
-
-#ifndef LCD_FMC_H
-#define LCD_FMC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,5 +55,4 @@ typedef struct {
 }
 #endif
 
-#endif /* LCD_FMC_H */
 /** @} */

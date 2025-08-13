@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CPU_LTDC_H
-#define PERIPH_CPU_LTDC_H
 
 #include <stdint.h>
 
@@ -92,5 +91,4 @@ void ltdc_fill(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, const uint16_
 }
 #endif
 
-#endif /* PERIPH_CPU_LTDC_H */
 /** @} */

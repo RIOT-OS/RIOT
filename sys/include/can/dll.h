@@ -19,7 +19,6 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,6 +102,5 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid);
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

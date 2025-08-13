@@ -18,7 +18,6 @@
  * @author     Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-
 #include "board.h"
 #include "saul_reg.h"
 #include "adxl345.h"

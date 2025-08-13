@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup      cpu_cc26x2_cc13x2
  * @{
@@ -17,9 +19,6 @@
  * @author          Anton Gerasimov <tossel@gmail.com>
  *
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #ifndef SET_MODE_CONF_1_ALT_DCDC_IPEAK
 #define SET_MODE_CONF_1_ALT_DCDC_IPEAK 0x2 /**< 12 mA */
@@ -50,5 +49,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

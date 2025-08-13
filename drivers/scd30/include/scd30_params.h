@@ -20,7 +20,6 @@
  * @}
  */
 
-
 #include "periph/i2c.h"
 #include "scd30.h"
 

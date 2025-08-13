@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_stm32
  * @{
@@ -19,9 +21,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
-#define CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
 
 #include "kernel_defines.h"
 
@@ -89,5 +88,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H */
 /** @} */

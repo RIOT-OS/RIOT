@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2024 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_particle-mesh
@@ -15,9 +14,6 @@
  *
  * @author      Martine S. Lenders <martine.lenders@tu-dresden.de>
  */
-
-#ifndef BAT_VOLTAGE_PARAMS_H
-#define BAT_VOLTAGE_PARAMS_H
 
 #include "saul/bat_voltage.h"
 
@@ -52,5 +48,4 @@ static const saul_bat_voltage_params_t saul_bat_voltage_params[] =
 }
 #endif
 
-#endif /* BAT_VOLTAGE_PARAMS_H */
 /** @} */

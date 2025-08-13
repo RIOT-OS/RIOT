@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_fe310
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CLK_CONF_H
-#define CLK_CONF_H
 
 #include "macros/units.h"
 #include "kernel_defines.h"
@@ -131,5 +130,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CONF_H */
 /** @} */

@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atmega_common
  * @{
@@ -21,9 +23,6 @@
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
-
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -384,5 +383,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

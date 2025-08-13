@@ -18,7 +18,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include "board.h"
 #include "sht1x.h"
 #include "saul_reg.h"

@@ -25,7 +25,6 @@
 /* This code is public-domain - it is based on libcrypt
  * placed in the public domain by Wei Dai and other contributors. */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

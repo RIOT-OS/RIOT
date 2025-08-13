@@ -18,7 +18,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include "thread.h"
 #include "msg.h"
 #include "net/gnrc/netif/conf.h"    /* <- GNRC_NETIF_MSG_QUEUE_SIZE */

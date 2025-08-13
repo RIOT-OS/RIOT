@@ -26,7 +26,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-
 #include <stdint.h>
 #include <stddef.h>
 

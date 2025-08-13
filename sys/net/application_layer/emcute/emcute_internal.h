@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

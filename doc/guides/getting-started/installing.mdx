@@ -18,7 +18,7 @@ and has the most extensive documentation and community support.
 
 Some distributions, such as Fedora, do not provide the necessary packages for
 cross compilation. In this case, it is recommended to use the
-[RIOT Docker Container](/docs/guides/build-in-docker).
+[RIOT Docker Container](/build-system/build-in-docker/).
 
 #### Windows
 Windows is supported through Windows Subsystem for Linux (WSL).
@@ -42,12 +42,12 @@ We also offer Docker images that make it a bit easier to develop on macOS.
 :::note
 It is also possible to run RIOT in a Docker container.
 
-This is especially useful if you want to avoid installing the required software packages on your host system. For more information, see the [Build in Docker](/docs/guides/build-in-docker) guide.
+This is especially useful if you want to avoid installing the required software packages on your host system. For more information, see the [Build in Docker](/build-system/build-in-docker/) guide.
 :::
 
 Depending on the operation distribution you are using, the installation of the required software packages may vary.
 
-##### Ubuntu
+#### Ubuntu
 
 ```bash title="Ubuntu command to install required packages"
     sudo apt install make gcc-multilib python3-serial wget unzip git openocd gdb-multiarch esptool podman-docker clangd clang
@@ -81,7 +81,7 @@ You will still need a "clone" of the RIOT Repository to work with.
 - Open the terminal.
 - Type `git clone https://github.com/RIOT-OS/RIOT` and confirm with the return-key
 - This may take some time. Eventually, it will print `done.` when it completed
-- Type `cd RIOT/examples/hello-world` and confirm with the return-key to enter
+- Type `cd RIOT/examples/basic/hello-world` and confirm with the return-key to enter
   the folder `hello-world` example app in the RIOT repo
 - Type `make` and confirm with the return key to build the app for the board
   `native`
@@ -109,30 +109,29 @@ The app should behave the same when run on real hardware.
 
 ## Using VS Code for Development
 
-![Ubuntu terminal running `make compile-commands` in the `hello-world` app](img/06-Use_VS_Code-00.png)
-
 - If not already open, open the terminal
-- Confirm that the terminal is pointed to the folder `~/RIOT/examples/hello-world`
+- Confirm that the terminal is pointed to the folder `~/RIOT/examples/basic/hello-world`
     - The blue part left of the prompt (the `$` sign in the terminal) shows
       the current working directory for the terminal
-    - If the blue string is not `~/RIOT/examples/hello-world`, type
-      `cd ~/RIOT/examples/hello-world` to enter that path
-- Inside `~/RIOT/examples/hello-world` run the command `make compile-commands`
+    - If the blue string is not `~/RIOT/examples/basic/hello-world`, type
+      `cd ~/RIOT/examples/basic/hello-world` to enter that path
+- Inside `~/RIOT/examples/basic/hello-world` run the command `make compile-commands`
 - The output should look like above
 
-![Launching VS Code from Ubuntu](img/06-Use_VS_Code-01.png)
+![Ubuntu terminal running `make compile-commands` in the `hello-world` app](img/06-Use_VS_Code-01.png)
 
 - Navigate back to `~/RIOT` using the command `cd ~/RIOT`
 - run `code .` to launch VS Code
     - This will take a bit longer on the first launch
 - Eventually, a VS Code Window should pop up that looks like this:
 
-![VS Code as opened from WSL](img/06-Use_VS_Code-02.png)
+![VS Code opened via shell](img/06-Use_VS_Code-02.png)
 
 1. Click on "Yes, I trust the authors"
 
 - Now, use the tree view in the left and open the `examples` folder
-- Open the `hello-world` folder inside the `examples` folder
+- Open the `basic` folder inside the `examples` folder
+- Open the `hello-world` folder inside the `basic` folder
 - Open the `main.c` file in the `hello-world` folder within `examples`
 - The file should open and look like this:
 
@@ -182,7 +181,7 @@ Re-run `make compile-commands` when:
   in the source code
 - Save the modified source code (e.g. `Ctrl`+`S`)
 - Open the integrated terminal by clicking on the terminal tab at the bottom
-- Navigate to `~/RIOT/examples/hello-world` using `cd ~/RIOT/examples/hello-world`
+- Navigate to `~/RIOT/examples/basic/hello-world` using `cd ~/RIOT/examples/basic/hello-world`
 - Run the `make` command to build the code
 - Run make `make term` to launch the application
 - The result should look like:
@@ -191,3 +190,93 @@ Re-run `make compile-commands` when:
 
 Congratulations! You just compiled your first RIOT application. To run RIOT
 on real hardware, proceed with the next to sections.
+
+
+## Architecture Specific Requirements
+
+:::caution[Don't get lost]
+If this section overwhelms you, don’t worry, you can always come back to it later.
+This is only important if you want to develop for a specific architecture or board.
+For now everything should work fine with the packages installed above.
+
+You can safely skip this section if you are just getting started with RIOT
+and want to try out the examples or develop for the `native` board.
+:::
+
+
+For each architecture a default tool for flashing and on-chip debugging is listed below - in
+most cases OpenOCD. However, some boards use different tools, e.g. because a bootloader is
+installed that allows flashing via the serial interface. Check the board documentation for any
+details on this. If that documentation contains no info about a flashing tool, the default
+tool for its architecture is used.
+
+:::tip
+    Running `BOARD=<INSERT_TARGET_BOARD_HERE> make info-programmers-supported` in your
+    application folder lists the programmers supported by RIOT for the given board.
+:::
+
+#### Architecture: ARM7 and ARM Cortex M*
+
+* GCC, binutils, and newlib for `arm-none-eabi`
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* OpenOCD for debugging/flashing (most boards)
+    * Some boards use UF2 based bootloaders, which require auto-mounting to work with `make flash`
+    * Some boards default to using J-Link for flashing/debugging. Either install that or export
+      `PROGRAMMER=openocd` to just use OpenOCD instead
+    * installation instructions can be found [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
+* Optional: picolibc for `arm-none-eabi` to link against picolibc instead of newlib
+* Optional: clang to build with `TOOLCHAIN=llvm`
+* Optional: GDB multiarch for debugging
+    * If no multiarch package is available, use GDB for `arm-none-eabi` instead
+
+#### Architecture: Xtensa
+
+##### ESP32
+
+* [Toolchain for ESP32](https://doc.riot-os.org/group__cpu__esp32.html#esp32_toolchain)
+* [esptool](https://github.com/espressif/esptool) for flashing
+* Optional: OpenOCD and GDB (multiarch version) for [debugging via JTAG](https://doc.riot-os.org/group__cpu__esp32.html#esp32_jtag_debugging)
+
+##### ESP8266
+
+* [Toolchain for ESP8266](https://doc.riot-os.org/group__cpu__esp8266.html#esp8266_toolchain)
+* [esptool](https://github.com/espressif/esptool) for flashing
+* Optional: GDB (multiarch version) for [debugging via the gdbstub](https://doc.riot-os.org/group__cpu__esp8266.html#esp8266_esp_gdbstub)
+  interface for the ESP8266
+
+#### Architecture: AVR
+
+* GCC and binutils for AVR and avrlibc
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* avrdude for flashing
+* Optional: AVaRICE and GDB (multiarch version) for debugging
+
+#### Architecture: RISC-V
+
+* GCC, binutils, and newlib for RISC-V (target triple should start with `riscv` and end with
+  `-none-elf` or `-unknown-elf`. Note that most packages are multilib, e.g. `riscv64-unknown-elf`
+  will likely work fine for 32 bit RISC-V boards)
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* OpenOCD for debugging/flashing (some new boards might require a patched version of OpenOCD or a
+  recent build from the git sources)
+* Optional: picolibc to link against picolibc instead of newlib (recommended)
+* Optional: clang to build with `TOOLCHAIN=llvm`
+* Optional: GDB multiarch for debugging
+
+#### Architecture: MSP430
+
+* GCC, binutils, and newlib for MSP430
+    * Alternatively: Install docker and export `BUILD_IN_DOCKER=1`
+* [mspdebug](https://github.com/dlbeer/mspdebug) for flashing/debugging
+    * Optional: [MSP Debug Stack](https://www.ti.com/tool/download/MSPDS-OPEN-SOURCE) for additional
+      board support
+* Optional: GDB multiarch for debugging
+
+#### Architecture: native
+
+* On 64 bit systems: multilib versions for your host compilers, standard C library, and development
+  headers
+    * Alternatively: Compile with `BUILD_IN_DOCKER=1`. Note that for running the executable you
+      still need a multilib system (or 32 bit Linux) with glibc a standard C library.
+* A C library supporting the deprecated POSIX.1-2001 ucontext library (e.g. glibc, FreeBSD's libc)
+* Optional: GDB for debugging. (Prefer the multiarch version, this will also work for other boards)

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_bluepill-stm32f030c8
@@ -20,9 +19,6 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,5 +47,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

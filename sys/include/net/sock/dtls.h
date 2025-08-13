@@ -529,7 +529,6 @@
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>

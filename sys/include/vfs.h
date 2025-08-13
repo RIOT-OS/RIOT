@@ -52,7 +52,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #include <stdint.h>
 #include <sys/stat.h> /* for struct stat */
 #include <sys/types.h> /* for off_t etc. */
@@ -79,10 +78,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   MAX6 Function to get the largest of 6 values
+ * @brief   MAX7 Function to get the largest of 7 values
  */
-#ifndef MAX6
-#define MAX6(a, b, c, d, e, f) MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f))
+#ifndef MAX7
+#define MAX7(a, b, c, d, e, f, g) MAX(MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f)), (g))
 #endif
 
 /**
@@ -218,6 +217,19 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   VFS parameters for xipfs
+ * @{
+ */
+#if defined(MODULE_XIPFS) || DOXYGEN
+#  define XIPFS_VFS_DIR_BUFFER_SIZE        (68) /**< sizeof(xipfs_dir_desc_t) */
+#  define XIPFS_VFS_FILE_BUFFER_SIZE       (12) /**< sizeof(xipfs_file_desc_t) */
+#else
+#  define XIPFS_VFS_DIR_BUFFER_SIZE        (1)
+#  define XIPFS_VFS_FILE_BUFFER_SIZE       (1)
+#endif
+/** @} */
+
 #ifndef VFS_MAX_OPEN_FILES
 /**
  * @brief Maximum number of simultaneous open files
@@ -253,12 +265,13 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX6(FATFS_VFS_DIR_BUFFER_SIZE,      \
-                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,   \
-                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE,  \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE,     \
-                                 LWEXT4_VFS_DIR_BUFFER_SIZE,     \
-                                 NANOCOAP_FS_VFS_DIR_BUFFER_SIZE \
+#define VFS_DIR_BUFFER_SIZE MAX7(FATFS_VFS_DIR_BUFFER_SIZE,       \
+                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,    \
+                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE,   \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE,      \
+                                 LWEXT4_VFS_DIR_BUFFER_SIZE,      \
+                                 NANOCOAP_FS_VFS_DIR_BUFFER_SIZE, \
+                                 XIPFS_VFS_DIR_BUFFER_SIZE        \
                                 )
 #endif
 
@@ -282,12 +295,13 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX6(FATFS_VFS_FILE_BUFFER_SIZE,      \
-                                  LITTLEFS_VFS_FILE_BUFFER_SIZE,   \
-                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,  \
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE,     \
-                                  LWEXT4_VFS_FILE_BUFFER_SIZE,     \
-                                  NANOCOAP_FS_VFS_FILE_BUFFER_SIZE \
+#define VFS_FILE_BUFFER_SIZE MAX7(FATFS_VFS_FILE_BUFFER_SIZE,       \
+                                  LITTLEFS_VFS_FILE_BUFFER_SIZE,    \
+                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,   \
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE,      \
+                                  LWEXT4_VFS_FILE_BUFFER_SIZE,      \
+                                  NANOCOAP_FS_VFS_FILE_BUFFER_SIZE, \
+                                  XIPFS_VFS_FILE_BUFFER_SIZE        \
                                  )
 #endif
 
@@ -1209,6 +1223,5 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp,
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

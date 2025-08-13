@@ -17,7 +17,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif

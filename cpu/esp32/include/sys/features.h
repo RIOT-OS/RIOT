@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -18,9 +20,6 @@
  * This file is a wrapper for sys/features.h to revert default definitions that
  * lead to compilation problems with newer GCC/newlib versions, see below.
  */
-
-#ifndef SYS_FEATURES_H
-#define SYS_FEATURES_H
 
 #ifndef DOXYGEN
 
@@ -53,5 +52,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYS_FEATURES_H */
 /** @} */

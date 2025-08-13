@@ -77,7 +77,6 @@
  * @author      chrysn <chrysn@fsfe.org>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -155,6 +154,5 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */

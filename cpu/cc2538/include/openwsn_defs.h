@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef OPENWSN_DEFS_H
-#define OPENWSN_DEFS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,5 +38,4 @@ extern "C" {
 }
 #endif
 
-#endif /* OPENWSN_DEFS_H */
 /** @} */

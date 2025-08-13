@@ -23,7 +23,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-
 #include <stdlib.h>
 
 #include "periph/uart.h"

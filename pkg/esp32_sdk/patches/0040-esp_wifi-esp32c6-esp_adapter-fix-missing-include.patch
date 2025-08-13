@@ -1,0 +1,24 @@
+From 358072c5129a8149fa66452f5ab7c69d60fce4e4 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Mon, 21 Apr 2025 00:08:50 +0200
+Subject: [PATCH 40/40] esp_wifi/esp32c6/esp_adapter: fix missing include
+
+---
+ components/esp_wifi/esp32c6/esp_adapter.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp_wifi/esp32c6/esp_adapter.c b/components/esp_wifi/esp32c6/esp_adapter.c
+index 1cefee5e36..c4b37a1802 100644
+--- a/components/esp_wifi/esp32c6/esp_adapter.c
++++ b/components/esp_wifi/esp32c6/esp_adapter.c
+@@ -28,6 +28,7 @@
+ #include "esp_log.h"
+ #include "esp_event.h"
+ #include "esp_heap_caps.h"
++#include "esp_system.h"
+ #include "esp_timer.h"
+ #include "esp_private/esp_modem_clock.h"
+ #include "esp_private/wifi_os_adapter.h"
+-- 
+2.34.1
+

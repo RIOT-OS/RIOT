@@ -48,7 +48,6 @@
  * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  */
 
-
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
 #include "clif.h"

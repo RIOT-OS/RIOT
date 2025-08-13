@@ -18,7 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-
 #include "board.h"
 #include "at25xxx.h"
 

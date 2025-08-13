@@ -21,7 +21,6 @@
  * @author      Nishchay Agrawal <f2016088@pilani.bits-pilani.ac.in>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

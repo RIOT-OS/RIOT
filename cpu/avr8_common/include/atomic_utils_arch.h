@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  *
@@ -18,8 +20,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  */
 
-#ifndef ATOMIC_UTILS_ARCH_H
-#define ATOMIC_UTILS_ARCH_H
 #ifndef DOXYGEN
 
 #include "periph_cpu.h"
@@ -50,5 +50,4 @@ static inline void atomic_store_u8(volatile uint8_t *dest, uint8_t val)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */

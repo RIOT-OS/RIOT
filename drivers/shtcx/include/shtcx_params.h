@@ -20,7 +20,6 @@
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
-
 #include "board.h"
 #include "shtcx.h"
 #include "shtcx_regs.h"

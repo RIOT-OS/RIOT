@@ -20,7 +20,6 @@
  * @author      Cenk Gündoğan <mail@cgundogan.de>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

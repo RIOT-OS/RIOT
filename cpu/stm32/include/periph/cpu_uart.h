@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_stm32
  * @{
@@ -17,9 +19,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef PERIPH_CPU_UART_H
-#define PERIPH_CPU_UART_H
 
 #include <stdint.h>
 
@@ -133,10 +132,8 @@ typedef struct {
 #endif
 } uart_conf_t;
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_UART_H */
 /** @} */

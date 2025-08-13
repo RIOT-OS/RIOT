@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_avr8_common_stdio_wrapper   stdio wrapper for AVR8
  * @ingroup     cpu_avr8_common
@@ -21,8 +23,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef STDIO_H
-#define STDIO_H
 #include_next "stdio.h"
 
 /* C++ does not support __flash. Hence, only wrap printf() and friends for
@@ -141,5 +141,4 @@ extern "C" {
 
 #endif
 
-#endif /* STDIO_H */
 /** @} */

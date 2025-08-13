@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_riscv_common
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      JP Bonn
  */
-
-#ifndef CONTEXT_FRAME_H
-#define CONTEXT_FRAME_H
 
 #if !defined(__ASSEMBLER__)
 #include <stdint.h>
@@ -126,5 +125,4 @@ struct context_switch_frame {
 }
 #endif
 
-#endif /* CONTEXT_FRAME_H */
 /** @} */

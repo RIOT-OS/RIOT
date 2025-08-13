@@ -12,6 +12,10 @@
  * @defgroup    sys_mineplex 5x5 Font 'Mineplex'
  * @ingroup     sys
  * @brief       The Mineplex font for containing 5x5 pixel ASCII characters
+ *
+ * The font has a character representation for all ASCII characters from
+ * 0x20 (Space) to 0x7E (~).
+ *
  * @{
  *
  * @file
@@ -19,7 +23,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
 
 #include <stdint.h>
 
@@ -43,11 +46,23 @@ extern "C" {
  * The function returns the pointer to a 5 byte pointer containing the Mineplex
  * representation of the given ASCII character. The Mineplex character is
  * encoded row wise from top to bottom using the least significant 5 bit, where
- * byte 1, bit 1 is the top left pixel of the encoded character.
+ * byte 0, bit 0 is the top left pixel of the encoded character.
+ * The character is therefore stored mirrored, as shown in the example below
+ * for the character "F":
+ *
+ * ~~~~~~~~~~~~~~~~~
+ * 0x0F = 0b00001111
+ * 0x01 = 0b00000001
+ * 0x07 = 0b00000111
+ * 0x01 = 0b00000001
+ * 0x01 = 0b00000001
+ * ~~~~~~~~~~~~~~~~~
  *
  * @param[in] c         character to translate
  *
- * @return  a 5 byte big buffer containing the encoded Mineplex character
+ * @return  A pointer to the 5 byte sized character bitmap
+ * @retval  "Requested Char" For valid ASCII input characters
+ * @retval  "Space"          For invalid input values
  */
 const uint8_t *mineplex_char(char c);
 

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_msp430_x1xx
  * @{
@@ -19,9 +21,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef X1XX_MSP430_REGS_H
-#define X1XX_MSP430_REGS_H
 
 #include <stdint.h>
 
@@ -120,5 +119,4 @@ extern msp430_usart_t USART_1;
 }
 #endif
 
-#endif /* X1XX_MSP430_REGS_H */
 /** @} */

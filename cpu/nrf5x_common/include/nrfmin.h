@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_nrf5x_nrfmin NRF minimal radio driver
  * @ingroup     drivers_netdev
@@ -68,9 +70,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NRFMIN_H
-#define NRFMIN_H
 
 #include "net/netdev.h"
 
@@ -221,5 +220,4 @@ void nrfmin_set_txpower(int16_t power);
 }
 #endif
 
-#endif /* NRFMIN_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_cc26xx_cc13xx
  * @{
@@ -15,9 +17,6 @@
  *
  * @author          Leon M. George <leon@georgemail.de>
  */
-
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -166,5 +165,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

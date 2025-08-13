@@ -19,7 +19,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
 
-
 #include <stdint.h>
 
 #ifdef __cplusplus

@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "board.h"
 #include "lsm6dsxx.h"
 #include "saul_reg.h"

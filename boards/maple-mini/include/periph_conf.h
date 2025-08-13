@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 Frits Kuipers
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Frits Kuipers
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_maple-mini
@@ -15,9 +14,6 @@
  *
  * @author      Frits Kuipers <frits.kuipers@gmail.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
@@ -156,5 +152,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

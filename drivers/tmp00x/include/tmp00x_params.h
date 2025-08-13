@@ -18,7 +18,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  */
 
-
 #include "board.h"
 #include "tmp00x.h"
 #include "saul_reg.h"

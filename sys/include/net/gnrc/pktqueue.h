@@ -20,7 +20,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-
 #include <stdint.h>
 #include <stdlib.h>
 

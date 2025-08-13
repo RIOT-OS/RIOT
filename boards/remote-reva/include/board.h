@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_remote-reva
  * @{
@@ -18,9 +20,6 @@
  * @author      Antonio Lignan <alinan@zolertia.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -113,5 +112,4 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-#endif /* BOARD_H */
 /** @} */

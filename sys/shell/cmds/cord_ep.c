@@ -29,7 +29,6 @@
 #include "uri_parser.h"
 #include "shell.h"
 
-
 static int _make_sock_ep(sock_udp_ep_t *ep, const char *addr)
 {
     ep->port = 0;

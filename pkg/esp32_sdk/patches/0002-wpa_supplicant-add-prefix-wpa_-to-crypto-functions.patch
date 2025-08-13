@@ -1,43 +1,354 @@
-From a8a3c2c751dda987fb94a1afbd771134bcbd7f04 Mon Sep 17 00:00:00 2001
+From 28a7af35dd12aa6ab3b195cc62610124e39ff306 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
-Date: Sun, 30 Jan 2022 08:07:23 +0100
-Subject: [PATCH 02/12] wpa_supplicant: add prefix wpa_ to crypto functions
+Date: Sat, 1 Mar 2025 17:24:40 +0100
+Subject: [PATCH 02/28] wpa_supplicant: add prefix wpa_ to crypto functions
 
-Prefix `_wpa` added to crypto functions of `wpa_suppplicant` to avoid name conflicts with RIOT modules `crypto` and `hashes`.
+Prefix `wpa_` added to crypto functions of `wpa_suppplicant` to avoid name conflicts with RIOT modules `crypto` and `hashes`.
 ---
- components/wpa_supplicant/src/common/dpp.c     |  2 +-
- components/wpa_supplicant/src/common/sae.c     |  2 +-
- .../wpa_supplicant/src/common/wpa_common.c     |  2 +-
- components/wpa_supplicant/src/crypto/aes-cbc.c |  4 ++--
- components/wpa_supplicant/src/crypto/aes-ccm.c | 18 +++++++++---------
- components/wpa_supplicant/src/crypto/aes-ctr.c |  2 +-
- components/wpa_supplicant/src/crypto/aes-gcm.c |  6 +++---
- .../src/crypto/aes-internal-dec.c              |  2 +-
- .../src/crypto/aes-internal-enc.c              |  2 +-
- .../wpa_supplicant/src/crypto/aes-omac1.c      |  6 +++---
- .../wpa_supplicant/src/crypto/aes-unwrap.c     |  2 +-
- .../wpa_supplicant/src/crypto/aes-wrap.c       |  2 +-
- components/wpa_supplicant/src/crypto/aes.h     |  4 ++--
- components/wpa_supplicant/src/crypto/crypto.h  |  4 ++--
- .../src/crypto/crypto_internal-cipher.c        |  4 ++--
- .../src/crypto/crypto_internal.c               |  8 ++++----
- .../wpa_supplicant/src/crypto/crypto_mbedtls.c |  6 +++---
- .../wpa_supplicant/src/crypto/crypto_ops.c     |  4 ++--
- .../src/crypto/sha256-internal.c               |  4 ++--
- .../wpa_supplicant/src/crypto/sha256-tlsprf.c  |  2 +-
- components/wpa_supplicant/src/crypto/sha256.c  |  2 +-
- components/wpa_supplicant/src/crypto/sha256.h  |  2 +-
- .../wpa_supplicant/src/crypto/sha256_i.h       |  2 +-
- .../wpa_supplicant/src/wps/wps_attr_build.c    |  2 +-
- .../wpa_supplicant/src/wps/wps_attr_process.c  |  2 +-
- components/wpa_supplicant/src/wps/wps_common.c |  4 ++--
- 26 files changed, 50 insertions(+), 50 deletions(-)
+ .../src/crypto/crypto_mbedtls.c               | 28 ++++++------
+ .../wpa_supplicant/src/ap/comeback_token.c    |  6 +--
+ components/wpa_supplicant/src/ap/wpa_auth.c   |  6 +--
+ components/wpa_supplicant/src/common/dpp.c    | 14 +++---
+ .../wpa_supplicant/src/common/dpp_crypto.c    | 44 +++++++++----------
+ components/wpa_supplicant/src/common/sae.c    | 14 +++---
+ components/wpa_supplicant/src/common/sae_pk.c |  6 +--
+ .../wpa_supplicant/src/common/wpa_common.c    | 40 ++++++++---------
+ .../wpa_supplicant/src/crypto/aes-cbc.c       | 12 ++---
+ .../wpa_supplicant/src/crypto/aes-ccm.c       | 26 +++++------
+ .../wpa_supplicant/src/crypto/aes-ctr.c       |  6 +--
+ .../wpa_supplicant/src/crypto/aes-gcm.c       | 12 ++---
+ .../src/crypto/aes-internal-dec.c             |  8 ++--
+ .../src/crypto/aes-internal-enc.c             |  8 ++--
+ .../wpa_supplicant/src/crypto/aes-internal.c  |  2 +-
+ .../wpa_supplicant/src/crypto/aes-omac1.c     | 10 ++---
+ .../wpa_supplicant/src/crypto/aes-unwrap.c    |  6 +--
+ .../wpa_supplicant/src/crypto/aes-wrap.c      |  6 +--
+ components/wpa_supplicant/src/crypto/aes.h    | 12 ++---
+ components/wpa_supplicant/src/crypto/aes_i.h  |  2 +-
+ components/wpa_supplicant/src/crypto/crypto.h | 40 ++++++++---------
+ .../src/crypto/crypto_internal-cipher.c       | 14 +++---
+ .../src/crypto/crypto_internal.c              | 38 ++++++++--------
+ .../wpa_supplicant/src/crypto/crypto_ops.c    |  4 +-
+ .../wpa_supplicant/src/crypto/ms_funcs.c      | 10 ++---
+ .../wpa_supplicant/src/crypto/sha1-internal.c |  2 +-
+ .../wpa_supplicant/src/crypto/sha1-pbkdf2.c   |  4 +-
+ .../wpa_supplicant/src/crypto/sha1-prf.c      |  6 +--
+ .../wpa_supplicant/src/crypto/sha1-tlsprf.c   |  6 +--
+ .../wpa_supplicant/src/crypto/sha1-tprf.c     |  4 +-
+ components/wpa_supplicant/src/crypto/sha1.c   | 12 ++---
+ components/wpa_supplicant/src/crypto/sha1.h   |  8 ++--
+ .../src/crypto/sha256-internal.c              | 24 +++++-----
+ .../wpa_supplicant/src/crypto/sha256-kdf.c    |  6 +--
+ .../wpa_supplicant/src/crypto/sha256-prf.c    | 10 ++---
+ .../wpa_supplicant/src/crypto/sha256-tlsprf.c |  6 +--
+ components/wpa_supplicant/src/crypto/sha256.c | 12 ++---
+ components/wpa_supplicant/src/crypto/sha256.h | 10 ++---
+ .../wpa_supplicant/src/crypto/sha256_i.h      |  6 +--
+ .../src/crypto/sha384-internal.c              | 18 ++++----
+ .../wpa_supplicant/src/crypto/sha384-prf.c    | 10 ++---
+ .../wpa_supplicant/src/crypto/sha384-tlsprf.c |  6 +--
+ components/wpa_supplicant/src/crypto/sha384.h | 10 ++---
+ .../wpa_supplicant/src/crypto/sha384_i.h      |  6 +--
+ .../src/crypto/sha512-internal.c              | 24 +++++-----
+ .../wpa_supplicant/src/crypto/sha512_i.h      |  6 +--
+ .../wpa_supplicant/src/eap_peer/eap_fast.c    |  6 +--
+ .../src/eap_peer/eap_fast_common.c            |  6 +--
+ .../wpa_supplicant/src/eap_peer/eap_peap.c    |  4 +-
+ .../src/eap_peer/eap_peap_common.c            |  2 +-
+ .../src/eap_server/eap_server.c               | 16 +++----
+ components/wpa_supplicant/src/rsn_supp/wpa.c  |  6 +--
+ components/wpa_supplicant/src/tls/pkcs5.c     |  4 +-
+ .../src/tls/tlsv1_client_ocsp.c               | 10 ++---
+ .../src/tls/tlsv1_client_read.c               |  4 +-
+ .../wpa_supplicant/src/tls/tlsv1_cred.c       |  8 ++--
+ components/wpa_supplicant/src/tls/x509v3.c    |  8 ++--
+ components/wpa_supplicant/src/utils/base64.c  | 12 ++---
+ components/wpa_supplicant/src/utils/base64.h  | 14 +++---
+ components/wpa_supplicant/src/utils/json.c    |  4 +-
+ .../wpa_supplicant/src/wps/wps_attr_build.c   |  6 +--
+ .../wpa_supplicant/src/wps/wps_attr_process.c |  4 +-
+ .../wpa_supplicant/src/wps/wps_common.c       | 10 ++---
+ .../wpa_supplicant/src/wps/wps_enrollee.c     | 10 ++---
+ .../wpa_supplicant/src/wps/wps_registrar.c    | 12 ++---
+ 65 files changed, 358 insertions(+), 358 deletions(-)
 
+diff --git a/components/wpa_supplicant/esp_supplicant/src/crypto/crypto_mbedtls.c b/components/wpa_supplicant/esp_supplicant/src/crypto/crypto_mbedtls.c
+index b2679a04ea..61d320d396 100644
+--- a/components/wpa_supplicant/esp_supplicant/src/crypto/crypto_mbedtls.c
++++ b/components/wpa_supplicant/esp_supplicant/src/crypto/crypto_mbedtls.c
+@@ -84,25 +84,25 @@ cleanup:
+ 
+ }
+ 
+-int sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+                   u8 *mac)
+ {
+     return digest_vector(MBEDTLS_MD_SHA256, num_elem, addr, len, mac);
+ }
+ 
+-int sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+                   u8 *mac)
+ {
+     return digest_vector(MBEDTLS_MD_SHA384, num_elem, addr, len, mac);
+ }
+ 
+-int sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+                   u8 *mac)
+ {
+     return digest_vector(MBEDTLS_MD_SHA512, num_elem, addr, len, mac);
+ }
+ 
+-int sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
++int wpa_sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
+ {
+     return digest_vector(MBEDTLS_MD_SHA1, num_elem, addr, len, mac);
+ }
+@@ -323,30 +323,30 @@ static int hmac_vector(mbedtls_md_type_t md_type,
+     return ret;
+ }
+ 
+-int hmac_sha384_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha384_vector(const u8 *key, size_t key_len, size_t num_elem,
+                        const u8 *addr[], const size_t *len, u8 *mac)
+ {
+     return hmac_vector(MBEDTLS_MD_SHA384, key, key_len, num_elem, addr,
+                        len, mac);
+ }
+ 
+-int hmac_sha384(const u8 *key, size_t key_len, const u8 *data,
++int wpa_hmac_sha384(const u8 *key, size_t key_len, const u8 *data,
+                 size_t data_len, u8 *mac)
+ {
+-    return hmac_sha384_vector(key, key_len, 1, &data, &data_len, mac);
++    return wpa_hmac_sha384_vector(key, key_len, 1, &data, &data_len, mac);
+ }
+ 
+-int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+                        const u8 *addr[], const size_t *len, u8 *mac)
+ {
+     return hmac_vector(MBEDTLS_MD_SHA256, key, key_len, num_elem, addr,
+                        len, mac);
+ }
+ 
+-int hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
++int wpa_hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
+                 size_t data_len, u8 *mac)
+ {
+-    return hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
++    return wpa_hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
+ }
+ 
+ int hmac_md5_vector(const u8 *key, size_t key_len, size_t num_elem,
+@@ -362,17 +362,17 @@ int hmac_md5(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
+     return hmac_md5_vector(key, key_len, 1, &data, &data_len, mac);
+ }
+ 
+-int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+                      const u8 *addr[], const size_t *len, u8 *mac)
+ {
+     return hmac_vector(MBEDTLS_MD_SHA1, key, key_len, num_elem, addr,
+                        len, mac);
+ }
+ 
+-int hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
++int wpa_hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
+               u8 *mac)
+ {
+-    return hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
++    return wpa_hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
+ }
+ 
+ static void *aes_crypt_init(int mode, const u8 *key, size_t len)
+@@ -416,7 +416,7 @@ void *aes_encrypt_init(const u8 *key, size_t len)
+     return aes_crypt_init(MBEDTLS_AES_ENCRYPT, key, len);
+ }
+ 
+-int aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
++int wpa_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
+ {
+     return aes_crypt(ctx, MBEDTLS_AES_ENCRYPT, plain, crypt);
+ }
+diff --git a/components/wpa_supplicant/src/ap/comeback_token.c b/components/wpa_supplicant/src/ap/comeback_token.c
+index f6693e8a51..22e826749a 100644
+--- a/components/wpa_supplicant/src/ap/comeback_token.c
++++ b/components/wpa_supplicant/src/ap/comeback_token.c
+@@ -21,7 +21,7 @@ int comeback_token_hash(const u8 *comeback_key, const u8 *addr, u8 *idx)
+ {
+     u8 hash[SHA256_MAC_LEN];
+ 
+-    if (hmac_sha256(comeback_key, COMEBACK_KEY_SIZE,
++    if (wpa_hmac_sha256(comeback_key, COMEBACK_KEY_SIZE,
+             addr, ETH_ALEN, hash) < 0)
+         return -1;
+     *idx = hash[0];
+@@ -56,7 +56,7 @@ int check_comeback_token(const u8 *comeback_key,
+     len[0] = ETH_ALEN;
+     addrs[1] = token;
+     len[1] = 2;
+-    if (hmac_sha256_vector(comeback_key, COMEBACK_KEY_SIZE,
++    if (wpa_hmac_sha256_vector(comeback_key, COMEBACK_KEY_SIZE,
+                            2, addrs, len, mac) < 0 ||
+         os_memcmp_const(token + 2, &mac[2], SHA256_MAC_LEN - 2) != 0) {
+         return -1;
+@@ -129,7 +129,7 @@ auth_build_token_req(struct os_reltime *last_comeback_key_update,
+     len[0] = ETH_ALEN;
+     addrs[1] = idx;
+     len[1] = sizeof(idx);
+-    if (hmac_sha256_vector(comeback_key, COMEBACK_KEY_SIZE,
++    if (wpa_hmac_sha256_vector(comeback_key, COMEBACK_KEY_SIZE,
+                    2, addrs, len, token) < 0) {
+         wpabuf_free(buf);
+         return NULL;
+diff --git a/components/wpa_supplicant/src/ap/wpa_auth.c b/components/wpa_supplicant/src/ap/wpa_auth.c
+index 58748a85ff..dedd74f41b 100644
+--- a/components/wpa_supplicant/src/ap/wpa_auth.c
++++ b/components/wpa_supplicant/src/ap/wpa_auth.c
+@@ -301,7 +301,7 @@ static int wpa_group_init_gmk_and_counter(struct wpa_authenticator *wpa_auth,
+     if (os_get_random(rkey, sizeof(rkey)) < 0)
+         return -1;
+ 
+-    if (sha1_prf(rkey, sizeof(rkey), "Init Counter", buf, sizeof(buf),
++    if (wpa_sha1_prf(rkey, sizeof(rkey), "Init Counter", buf, sizeof(buf),
+             group->Counter, WPA_NONCE_LEN) < 0)
+         return -1;
+     wpa_hexdump_key(MSG_DEBUG, "Key Counter",
+@@ -993,9 +993,9 @@ static int wpa_gmk_to_gtk(const u8 *gmk, const char *label, const u8 *addr,
+         ret = -1;
+ 
+ #ifdef CONFIG_IEEE80211W
+-    sha256_prf(gmk, WPA_GMK_LEN, label, data, sizeof(data), gtk, gtk_len);
++    wpa_sha256_prf(gmk, WPA_GMK_LEN, label, data, sizeof(data), gtk, gtk_len);
+ #else /* CONFIG_IEEE80211W */
+-    if (sha1_prf(gmk, WPA_GMK_LEN, label, data, sizeof(data), gtk, gtk_len) < 0)
++    if (wpa_sha1_prf(gmk, WPA_GMK_LEN, label, data, sizeof(data), gtk, gtk_len) < 0)
+         ret = -1;
+ #endif /* CONFIG_IEEE80211W */
+ 
 diff --git a/components/wpa_supplicant/src/common/dpp.c b/components/wpa_supplicant/src/common/dpp.c
-index 899e0c06c4..c97399d88c 100644
+index 7fa67d10fa..b979870a54 100644
 --- a/components/wpa_supplicant/src/common/dpp.c
 +++ b/components/wpa_supplicant/src/common/dpp.c
-@@ -153,7 +153,7 @@ static int dpp_hmac(size_t hash_len, const u8 *key, size_t key_len,
+@@ -3246,7 +3246,7 @@ int dpp_get_config_obj_hash(char *signed1, size_t signed1_len,
+ 	len[1] = 1;
+ 	addr[2] = (unsigned char *)signed2;
+ 	len[2] = signed2_len;
+-	ret = sha256_vector(3, addr, len, hash);
++	ret = wpa_sha256_vector(3, addr, len, hash);
+ 
+ 	return ret;
+ }
+@@ -3358,11 +3358,11 @@ skip_groups:
+ 	json_value_sep(jws_prot_hdr);
+ 	json_add_string(jws_prot_hdr, "alg", curve->jws_alg);
+ 	json_end_object(jws_prot_hdr);
+-	signed1 = base64_url_encode(wpabuf_head(jws_prot_hdr),
++	signed1 = wpa_base64_url_encode(wpabuf_head(jws_prot_hdr),
+ 				    wpabuf_len(jws_prot_hdr),
+ 				    &signed1_len);
+ 	wpabuf_free(jws_prot_hdr);
+-	signed2 = base64_url_encode(wpabuf_head(dppcon), wpabuf_len(dppcon),
++	signed2 = wpa_base64_url_encode(wpabuf_head(dppcon), wpabuf_len(dppcon),
+ 				    &signed2_len);
+ 	if (!signed1 || !signed2)
+ 		goto fail;
+@@ -3389,7 +3389,7 @@ skip_groups:
+ 	signature_len = 2 * curve->prime_len;
+ 	wpa_hexdump(MSG_DEBUG, "DPP: signedConnector ECDSA signature (raw r,s)",
+ 		    signature, signature_len);
+-	signed3 = base64_url_encode(signature, signature_len, &signed3_len);
++	signed3 = wpa_base64_url_encode(signature, signature_len, &signed3_len);
+ 	if (!signed3)
+ 		goto fail;
+ 
+@@ -4609,13 +4609,13 @@ dpp_keygen_configurator(const char *curve, u8 *privkey,
+ 	/* kid = SHA256(ANSI X9.63 uncompressed C-sign-key) */
+ 	addr[0] = wpabuf_head(csign_pub);
+ 	len[0] = wpabuf_len(csign_pub);
+-	if (sha256_vector(1, addr, len, kid_hash) < 0) {
++	if (wpa_sha256_vector(1, addr, len, kid_hash) < 0) {
+ 		wpa_printf(MSG_DEBUG,
+ 			   "DPP: Failed to derive kid for C-sign-key");
+ 		goto fail;
+ 	}
+ 
+-	conf->kid = base64_url_encode(kid_hash, sizeof(kid_hash), NULL);
++	conf->kid = wpa_base64_url_encode(kid_hash, sizeof(kid_hash), NULL);
+ 	if (!conf->kid)
+ 		goto fail;
+ out:
+@@ -4771,7 +4771,7 @@ struct json_token * dpp_parse_own_connector(const char *own_connector)
+                 wpa_printf(MSG_DEBUG, "DPP: Own connector is missing second dot (.)");
+                 return NULL;
+         }
+-        own_conn = base64_url_decode(pos, end - pos, &own_conn_len);
++        own_conn = wpa_base64_url_decode(pos, end - pos, &own_conn_len);
+         if (!own_conn) {
+                 wpa_printf(MSG_DEBUG,
+                            "DPP: Failed to base64url decode own signedConnectior JWS Payload");
+diff --git a/components/wpa_supplicant/src/common/dpp_crypto.c b/components/wpa_supplicant/src/common/dpp_crypto.c
+index b95584e8e1..67eb811936 100644
+--- a/components/wpa_supplicant/src/common/dpp_crypto.c
++++ b/components/wpa_supplicant/src/common/dpp_crypto.c
+@@ -90,12 +90,12 @@ int dpp_hash_vector(const struct dpp_curve_params *curve,
+ 			   u8 *mac)
+ {
+ 	if (curve->hash_len == 32)
+-		return sha256_vector(num_elem, addr, len, mac);
++		return wpa_sha256_vector(num_elem, addr, len, mac);
+ #ifndef ESP_SUPPLICANT
+ 	if (curve->hash_len == 48)
+-		return sha384_vector(num_elem, addr, len, mac);
++		return wpa_sha384_vector(num_elem, addr, len, mac);
+ 	if (curve->hash_len == 64)
+-		return sha512_vector(num_elem, addr, len, mac);
++		return wpa_sha512_vector(num_elem, addr, len, mac);
+ #endif
+ 	return -1;
+ }
+@@ -105,16 +105,16 @@ int dpp_hkdf_expand(size_t hash_len, const u8 *secret, size_t secret_len,
+ 		    const char *label, u8 *out, size_t outlen)
+ {
+ 	if (hash_len == 32)
+-		return hmac_sha256_kdf(secret, secret_len, NULL,
++		return wpa_hmac_sha256_kdf(secret, secret_len, NULL,
+ 				       (const u8 *) label, os_strlen(label),
+ 				       out, outlen);
+ #ifndef ESP_SUPPLICANT
+ 	if (hash_len == 48)
+-		return hmac_sha384_kdf(secret, secret_len, NULL,
++		return wpa_hmac_sha384_kdf(secret, secret_len, NULL,
+ 				       (const u8 *) label, os_strlen(label),
+ 				       out, outlen);
+ 	if (hash_len == 64)
+-		return hmac_sha512_kdf(secret, secret_len, NULL,
++		return wpa_hmac_sha512_kdf(secret, secret_len, NULL,
+ 				       (const u8 *) label, os_strlen(label),
+ 				       out, outlen);
+ #endif
+@@ -127,14 +127,14 @@ int dpp_hmac_vector(size_t hash_len, const u8 *key, size_t key_len,
+ 		    u8 *mac)
+ {
+ 	if (hash_len == 32)
+-		return hmac_sha256_vector(key, key_len, num_elem, addr, len,
++		return wpa_hmac_sha256_vector(key, key_len, num_elem, addr, len,
+ 					  mac);
+ #ifndef ESP_SUPPLICANT
+ 	if (hash_len == 48)
+-		return hmac_sha384_vector(key, key_len, num_elem, addr, len,
++		return wpa_hmac_sha384_vector(key, key_len, num_elem, addr, len,
+ 					  mac);
+ 	if (hash_len == 64)
+-		return hmac_sha512_vector(key, key_len, num_elem, addr, len,
++		return wpa_hmac_sha512_vector(key, key_len, num_elem, addr, len,
+ 					  mac);
+ #endif
+ 	return -1;
+@@ -145,12 +145,12 @@ int dpp_hmac(size_t hash_len, const u8 *key, size_t key_len,
  		    const u8 *data, size_t data_len, u8 *mac)
  {
  	if (hash_len == 32)
@@ -45,25 +356,272 @@ index 899e0c06c4..c97399d88c 100644
 +		return wpa_hmac_sha256(key, key_len, data, data_len, mac);
  #ifndef ESP_SUPPLICANT
  	if (hash_len == 48)
- 		return hmac_sha384(key, key_len, data, data_len, mac);
+-		return hmac_sha384(key, key_len, data, data_len, mac);
++		return wpa_hmac_sha384(key, key_len, data, data_len, mac);
+ 	if (hash_len == 64)
+-		return hmac_sha512(key, key_len, data, data_len, mac);
++		return wpa_hmac_sha512(key, key_len, data, data_len, mac);
+ #endif
+ 	return -1;
+ }
+@@ -226,7 +226,7 @@ int dpp_bi_pubkey_hash(struct dpp_bootstrap_info *bi,
+ 
+ 	addr[0] = data;
+ 	len[0] = data_len;
+-	if (sha256_vector(1, addr, len, bi->pubkey_hash) < 0)
++	if (wpa_sha256_vector(1, addr, len, bi->pubkey_hash) < 0)
+ 		return -1;
+ 	wpa_hexdump(MSG_DEBUG, "DPP: Public key hash",
+ 		    bi->pubkey_hash, SHA256_MAC_LEN);
+@@ -235,7 +235,7 @@ int dpp_bi_pubkey_hash(struct dpp_bootstrap_info *bi,
+ 	len[0] = 5;
+ 	addr[1] = data;
+ 	len[1] = data_len;
+-	if (sha256_vector(2, addr, len, bi->pubkey_hash_chirp) < 0)
++	if (wpa_sha256_vector(2, addr, len, bi->pubkey_hash_chirp) < 0)
+ 		return -1;
+ 	wpa_hexdump(MSG_DEBUG, "DPP: Public key hash (chirp)",
+ 		    bi->pubkey_hash_chirp, SHA256_MAC_LEN);
+@@ -614,7 +614,7 @@ int dpp_check_pubkey_match(struct crypto_ec_key *pub, struct wpabuf *r_hash)
+ 	len[0] = wpabuf_len(uncomp);
+ 	wpa_hexdump(MSG_DEBUG, "DPP: Uncompressed public key",
+ 		    addr[0], len[0]);
+-	res = sha256_vector(1, addr, len, hash);
++	res = wpa_sha256_vector(1, addr, len, hash);
+ 	wpabuf_free(uncomp);
+ 	if (res < 0)
+ 		return -1;
+@@ -655,7 +655,7 @@ dpp_process_signed_connector(struct dpp_signed_connector_info *info,
+ 		ret = DPP_STATUS_INVALID_CONNECTOR;
+ 		goto fail;
+ 	}
+-	prot_hdr = base64_url_decode(pos, end - pos, &prot_hdr_len);
++	prot_hdr = wpa_base64_url_decode(pos, end - pos, &prot_hdr_len);
+ 	if (!prot_hdr) {
+ 		wpa_printf(MSG_DEBUG,
+ 			   "DPP: Failed to base64url decode signedConnector JWS Protected Header");
+@@ -687,7 +687,7 @@ dpp_process_signed_connector(struct dpp_signed_connector_info *info,
+ 		goto fail;
+ 	}
+ 	signed_end = end - 1;
+-	info->payload = base64_url_decode(pos, end - pos, &info->payload_len);
++	info->payload = wpa_base64_url_decode(pos, end - pos, &info->payload_len);
+ 	if (!info->payload) {
+ 		wpa_printf(MSG_DEBUG,
+ 			   "DPP: Failed to base64url decode signedConnector JWS Payload");
+@@ -698,7 +698,7 @@ dpp_process_signed_connector(struct dpp_signed_connector_info *info,
+ 			  "DPP: signedConnector - JWS Payload",
+ 			  (u8 *)info->payload, info->payload_len);
+ 	pos = end + 1;
+-	signature = base64_url_decode(pos, os_strlen(pos), &signature_len);
++	signature = wpa_base64_url_decode(pos, os_strlen(pos), &signature_len);
+ 	if (!signature) {
+ 		wpa_printf(MSG_DEBUG,
+ 			"DPP: Failed to base64url decode signedConnector signature");
+@@ -729,7 +729,7 @@ dpp_process_signed_connector(struct dpp_signed_connector_info *info,
+ 	}
+ 
+ 	if (hash_func == CRYPTO_HASH_ALG_SHA256) {
+-		if ((sha256_vector(1, (const u8 **) &signed_start, &signed_len, hash)) != 0) {
++		if ((wpa_sha256_vector(1, (const u8 **) &signed_start, &signed_len, hash)) != 0) {
+ 			goto fail;
+ 		}
+ 	} else {
+@@ -1115,7 +1115,7 @@ int dpp_derive_pmkid(const struct dpp_curve_params *curve,
+ 	}
+ 	wpa_hexdump(MSG_DEBUG, "DPP: PMKID hash payload 1", addr[0], len[0]);
+ 	wpa_hexdump(MSG_DEBUG, "DPP: PMKID hash payload 2", addr[1], len[1]);
+-	res = sha256_vector(2, addr, len, hash);
++	res = wpa_sha256_vector(2, addr, len, hash);
+ 	if (res < 0)
+ 		goto fail;
+ 	wpa_hexdump(MSG_DEBUG, "DPP: PMKID hash output", hash, SHA256_MAC_LEN);
+@@ -1157,7 +1157,7 @@ char * dpp_corrupt_connector_signature(const char *connector)
+ 
+ 	wpa_printf(MSG_DEBUG, "DPP: Original base64url encoded signature: %s",
+ 		   pos);
+-	signature = base64_url_decode(pos, os_strlen(pos), &signature_len);
++	signature = wpa_base64_url_decode(pos, os_strlen(pos), &signature_len);
+ 	if (!signature || signature_len == 0)
+ 		goto fail;
+ 	wpa_hexdump(MSG_DEBUG, "DPP: Original Connector signature",
+@@ -1165,7 +1165,7 @@ char * dpp_corrupt_connector_signature(const char *connector)
+ 	signature[signature_len - 1] ^= 0x01;
+ 	wpa_hexdump(MSG_DEBUG, "DPP: Corrupted Connector signature",
+ 		    signature, signature_len);
+-	signed3 = base64_url_encode(signature, signature_len, &signed3_len);
++	signed3 = wpa_base64_url_encode(signature, signature_len, &signed3_len);
+ 	if (!signed3)
+ 		goto fail;
+ 	os_memcpy(pos, signed3, signed3_len);
 diff --git a/components/wpa_supplicant/src/common/sae.c b/components/wpa_supplicant/src/common/sae.c
-index ec65605337..00eb2f6c21 100644
+index 363aa0c4fe..afb2db7b0d 100644
 --- a/components/wpa_supplicant/src/common/sae.c
 +++ b/components/wpa_supplicant/src/common/sae.c
-@@ -827,7 +827,7 @@ static int sae_derive_keys(struct sae_data *sae, const u8 *k)
- 	 */
+@@ -146,7 +146,7 @@ static int sae_test_pwd_seed_ecc(struct sae_data *sae, const u8 *pwd_seed,
  
- 	os_memset(null_key, 0, sizeof(null_key));
--	hmac_sha256(null_key, sizeof(null_key), k, sae->tmp->prime_len,
-+	wpa_hmac_sha256(null_key, sizeof(null_key), k, sae->tmp->prime_len,
- 		    keyseed);
- 	wpa_hexdump_key(MSG_DEBUG, "SAE: keyseed", keyseed, sizeof(keyseed));
+ 	/* pwd-value = KDF-z(pwd-seed, "SAE Hunting and Pecking", p) */
+ 	bits = crypto_ec_prime_len_bits(sae->tmp->ec);
+-	if (sha256_prf_bits(pwd_seed, SHA256_MAC_LEN, "SAE Hunting and Pecking",
++	if (wpa_sha256_prf_bits(pwd_seed, SHA256_MAC_LEN, "SAE Hunting and Pecking",
+ 			    prime, sae->tmp->prime_len, pwd_value, bits) < 0)
+ 		return ESP_FAIL;
+ 	if (bits % 8)
+@@ -196,7 +196,7 @@ static int sae_test_pwd_seed_ffc(struct sae_data *sae, const u8 *pwd_seed,
+ 	wpa_hexdump_key(MSG_DEBUG, "SAE: pwd-seed", pwd_seed, SHA256_MAC_LEN);
  
+ 	/* pwd-value = KDF-z(pwd-seed, "SAE Hunting and Pecking", p) */
+-	if (sha256_prf_bits(pwd_seed, SHA256_MAC_LEN, "SAE Hunting and Pecking",
++	if (wpa_sha256_prf_bits(pwd_seed, SHA256_MAC_LEN, "SAE Hunting and Pecking",
+ 			    sae->tmp->dh->prime, sae->tmp->prime_len, pwd_value,
+ 			    bits) < 0)
+ 		return ESP_FAIL;
+@@ -350,7 +350,7 @@ static int sae_derive_pwe_ecc(struct sae_data *sae, const u8 *addr1,
+ 		wpa_printf(MSG_MSGDUMP, "SAE: counter = %03u", counter);
+ 		const_time_select_bin(found, stub_password, password,
+ 				      password_len, tmp_password);
+-		if (hmac_sha256_vector(addrs, sizeof(addrs), 2,
++		if (wpa_hmac_sha256_vector(addrs, sizeof(addrs), 2,
+ 				       addr, len, pwd_seed) < 0)
+ 			break;
+ 
+@@ -489,7 +489,7 @@ static int sae_derive_pwe_ffc(struct sae_data *sae, const u8 *addr1,
+ 		}
+ 
+ 		wpa_printf(MSG_DEBUG, "SAE: counter = %02u", counter);
+-		if (hmac_sha256_vector(addrs, sizeof(addrs), 2,
++		if (wpa_hmac_sha256_vector(addrs, sizeof(addrs), 2,
+ 				       addr, len, pwd_seed) < 0)
+ 			break;
+ 		res = sae_test_pwd_seed_ffc(sae, pwd_seed, pwe);
+@@ -527,7 +527,7 @@ static int hkdf_extract(size_t hash_len, const u8 *salt, size_t salt_len,
+ 			u8 *prk)
+ {
+ 	if (hash_len == 32)
+-		return hmac_sha256_vector(salt, salt_len, num_elem, addr, len,
++		return wpa_hmac_sha256_vector(salt, salt_len, num_elem, addr, len,
+ 					  prk);
+ 	return -1;
+ }
+@@ -539,7 +539,7 @@ static int hkdf_expand(size_t hash_len, const u8 *prk, size_t prk_len,
+ 	size_t info_len = os_strlen(info);
+ 
+ 	if (hash_len == 32)
+-		return hmac_sha256_kdf(prk, prk_len, NULL,
++		return wpa_hmac_sha256_kdf(prk, prk_len, NULL,
+ 				       (const u8 *) info, info_len,
+ 				       okm, okm_len);
+ 	return -1;
+@@ -1455,7 +1455,7 @@ static int sae_kdf_hash(size_t hash_len, const u8 *k, const char *label,
+ 			u8 *out, size_t out_len)
+ {
+ 	if (hash_len == 32)
+-		return sha256_prf(k, hash_len, label,
++		return wpa_sha256_prf(k, hash_len, label,
+ 				  context, context_len, out, out_len);
+ 	return -1;
+ }
+diff --git a/components/wpa_supplicant/src/common/sae_pk.c b/components/wpa_supplicant/src/common/sae_pk.c
+index 472ef03d2c..1baba9ff6c 100644
+--- a/components/wpa_supplicant/src/common/sae_pk.c
++++ b/components/wpa_supplicant/src/common/sae_pk.c
+@@ -462,16 +462,16 @@ static size_t sae_group_2_hash_len(int group)
+ int sae_hash(size_t hash_len, const u8 *data, size_t len, u8 *hash)
+ {
+ 	if (hash_len == 32) {
+-		return sha256_vector(1, &data, &len, hash);
++		return wpa_sha256_vector(1, &data, &len, hash);
+ 	}
+ #ifdef CONFIG_SHA384
+ 	if (hash_len == 48) {
+-		return sha384_vector(1, &data, &len, hash);
++		return wpa_sha384_vector(1, &data, &len, hash);
+ 	}
+ #endif /* CONFIG_SHA384 */
+ #ifdef CONFIG_SHA512
+ 	if (hash_len == 64) {
+-		return sha512_vector(1, &data, &len, hash);
++		return wpa_sha512_vector(1, &data, &len, hash);
+ 	}
+ #endif /* CONFIG_SHA512 */
+ 	return -1;
 diff --git a/components/wpa_supplicant/src/common/wpa_common.c b/components/wpa_supplicant/src/common/wpa_common.c
-index 070ba0887e..36b230a9cc 100644
+index faa0be573c..a8181a1e12 100644
 --- a/components/wpa_supplicant/src/common/wpa_common.c
 +++ b/components/wpa_supplicant/src/common/wpa_common.c
-@@ -467,7 +467,7 @@ int wpa_eapol_key_mic(const u8 *key, size_t key_len, int akmp, int ver,
+@@ -705,7 +705,7 @@ void wpa_derive_pmk_r0(const u8 *xxkey, size_t xxkey_len,
+ 	os_memcpy(pos, s0kh_id, ETH_ALEN);
+ 	pos += ETH_ALEN;
+ 
+-	sha256_prf(xxkey, xxkey_len, "FT-R0", buf, pos - buf,
++	wpa_sha256_prf(xxkey, xxkey_len, "FT-R0", buf, pos - buf,
+ 		   r0_key_data, sizeof(r0_key_data));
+ 	os_memcpy(pmk_r0, r0_key_data, PMK_LEN);
+ 
+@@ -717,7 +717,7 @@ void wpa_derive_pmk_r0(const u8 *xxkey, size_t xxkey_len,
+ 	addr[1] = r0_key_data + PMK_LEN;
+ 	len[1] = 16;
+ 
+-	sha256_vector(2, addr, len, hash);
++    wpa_sha256_vector(2, addr, len, hash);
+ 	os_memcpy(pmk_r0_name, hash, WPA_PMK_NAME_LEN);
+ }
+ 
+@@ -747,7 +747,7 @@ void wpa_derive_pmk_r1_name(const u8 *pmk_r0_name, const u8 *r1kh_id,
+ 	addr[3] = s1kh_id;
+ 	len[3] = ETH_ALEN;
+ 
+-	sha256_vector(4, addr, len, hash);
++    wpa_sha256_vector(4, addr, len, hash);
+ 	os_memcpy(pmk_r1_name, hash, WPA_PMK_NAME_LEN);
+ }
+ 
+@@ -771,7 +771,7 @@ void wpa_derive_pmk_r1(const u8 *pmk_r0, const u8 *pmk_r0_name,
+ 	os_memcpy(pos, s1kh_id, ETH_ALEN);
+ 	pos += ETH_ALEN;
+ 
+-	sha256_prf(pmk_r0, PMK_LEN, "FT-R1", buf, pos - buf, pmk_r1, PMK_LEN);
++	wpa_sha256_prf(pmk_r0, PMK_LEN, "FT-R1", buf, pos - buf, pmk_r1, PMK_LEN);
+ 
+ 	wpa_derive_pmk_r1_name(pmk_r0_name, r1kh_id, s1kh_id, pmk_r1_name);
+ }
+@@ -813,7 +813,7 @@ int wpa_pmk_r1_to_ptk(const u8 *pmk_r1, const u8 *snonce, const u8 *anonce,
+ 	ptk->tk_len = wpa_cipher_key_len(cipher);
+ 	ptk_len = ptk->kck_len + ptk->kek_len + ptk->tk_len;
+ 
+-	sha256_prf(pmk_r1, PMK_LEN, "FT-PTK", buf, pos - buf, tmp, ptk_len);
++	wpa_sha256_prf(pmk_r1, PMK_LEN, "FT-PTK", buf, pos - buf, tmp, ptk_len);
+ 
+ 	/*
+ 	 * PTKName = Truncate-128(SHA-256(PMKR1Name || "FT-PTKN" || SNonce ||
+@@ -832,7 +832,7 @@ int wpa_pmk_r1_to_ptk(const u8 *pmk_r1, const u8 *snonce, const u8 *anonce,
+ 	addr[5] = sta_addr;
+ 	len[5] = ETH_ALEN;
+ 
+-	sha256_vector(6, addr, len, hash);
++    wpa_sha256_vector(6, addr, len, hash);
+ 	os_memcpy(ptk_name, hash, WPA_PMK_NAME_LEN);
+ 
+ 	os_memcpy(ptk->kck, tmp, ptk->kck_len);
+@@ -916,7 +916,7 @@ int wpa_eapol_key_mic(const u8 *key, size_t key_len, int akmp, int ver,
+ 	case WPA_KEY_INFO_TYPE_HMAC_MD5_RC4:
+ 		return hmac_md5(key, key_len, buf, len, mic);
+ 	case WPA_KEY_INFO_TYPE_HMAC_SHA1_AES:
+-		if (hmac_sha1(key, key_len, buf, len, hash))
++		if (wpa_hmac_sha1(key, key_len, buf, len, hash))
+ 			return -1;
+ 		os_memcpy(mic, hash, MD5_MAC_LEN);
+ 		break;
+@@ -933,7 +933,7 @@ int wpa_eapol_key_mic(const u8 *key, size_t key_len, int akmp, int ver,
+ 				   "WPA: EAPOL-Key MIC using HMAC-SHA%u (AKM-defined - SAE-EXT-KEY)",
+ 				   (unsigned int) key_len * 8 * 2);
+ 			if (key_len == 128 / 8) {
+-				if (hmac_sha256(key, key_len, buf, len, hash))
++				if (wpa_hmac_sha256(key, key_len, buf, len, hash))
+ 					return -1;
+ 			} else {
+ 				wpa_printf(MSG_INFO,
+@@ -946,14 +946,14 @@ int wpa_eapol_key_mic(const u8 *key, size_t key_len, int akmp, int ver,
  #endif /* CONFIG_WPA3_SAE */
  #ifdef CONFIG_SUITEB
  		case WPA_KEY_MGMT_IEEE8021X_SUITE_B:
@@ -72,30 +630,151 @@ index 070ba0887e..36b230a9cc 100644
  				return -1;
  			os_memcpy(mic, hash, MD5_MAC_LEN);
  			break;
+ #endif /* CONFIG_SUITEB */
+ #ifdef CONFIG_SUITEB192
+ 		case WPA_KEY_MGMT_IEEE8021X_SUITE_B_192:
+-			if (hmac_sha384(key, key_len, buf, len, hash))
++			if (wpa_hmac_sha384(key, key_len, buf, len, hash))
+ 				return -1;
+ 			os_memcpy(mic, hash, 24);
+ 			break;
+@@ -964,7 +964,7 @@ int wpa_eapol_key_mic(const u8 *key, size_t key_len, int akmp, int ver,
+ 			"WPA: EAPOL-Key MIC using HMAC-SHA%u (AKM-defined - OWE)",
+ 			(unsigned int) key_len * 8 * 2);
+ 			if (key_len == 128 / 8) {
+-				if (hmac_sha256(key, key_len, buf, len, hash))
++				if (wpa_hmac_sha256(key, key_len, buf, len, hash))
+ 					return -1;
+ 			} else {
+ 				wpa_printf(MSG_INFO,"OWE: Unsupported KCK length: %u",
+@@ -981,7 +981,7 @@ int wpa_eapol_key_mic(const u8 *key, size_t key_len, int akmp, int ver,
+                                    "WPA: EAPOL-Key MIC using HMAC-SHA%u (AKM-defined - DPP)",
+                                    (unsigned int) key_len * 8 * 2);
+                         if (key_len == 128 / 8) {
+-                                if (hmac_sha256(key, key_len, buf, len, hash))
++                                if (wpa_hmac_sha256(key, key_len, buf, len, hash))
+                                         return -1;
+                         } else {
+                                 wpa_printf(MSG_INFO,
+@@ -1099,7 +1099,7 @@ int rsn_pmkid_suite_b(const u8 *kck, size_t kck_len, const u8 *aa,
+ 	addr[1] = aa;
+ 	addr[2] = spa;
+ 
+-	if (hmac_sha256_vector(kck, kck_len, 3, addr, len, hash) < 0)
++	if (wpa_hmac_sha256_vector(kck, kck_len, 3, addr, len, hash) < 0)
+ 		return -1;
+ 	os_memcpy(pmkid, hash, PMKID_LEN);
+ 	return 0;
+@@ -1131,7 +1131,7 @@ int rsn_pmkid_suite_b_192(const u8 *kck, size_t kck_len, const u8 *aa,
+ 	addr[1] = aa;
+ 	addr[2] = spa;
+ 
+-	if (hmac_sha384_vector(kck, kck_len, 3, addr, len, hash) < 0)
++	if (wpa_hmac_sha384_vector(kck, kck_len, 3, addr, len, hash) < 0)
+ 		return -1;
+ 	os_memcpy(pmkid, hash, PMKID_LEN);
+ 	return 0;
+@@ -1230,20 +1230,20 @@ int wpa_pmk_to_ptk(const u8 *pmk, size_t pmk_len, const char *label,
+ #if defined(CONFIG_SUITEB192)
+ 	if (wpa_key_mgmt_sha384(akmp)) {
+ 		wpa_printf(MSG_DEBUG, "WPA: PTK derivation using PRF(SHA384)");
+-		if (sha384_prf(pmk, pmk_len, label, data, data_len,
++		if (wpa_sha384_prf(pmk, pmk_len, label, data, data_len,
+ 					tmp, ptk_len) < 0)
+ 			return -1;
+ 	} else
+ #endif
+ 	if (wpa_key_mgmt_sha256(akmp)) {
+-		sha256_prf(pmk, pmk_len, label, data, data_len,
++		wpa_sha256_prf(pmk, pmk_len, label, data, data_len,
+ 			   tmp, ptk_len);
+ #ifdef CONFIG_WPA3_SAE
+ 	} else if (wpa_key_mgmt_sae_ext_key(akmp)) {
+ 		if (pmk_len == 32) {
+ 			wpa_printf(MSG_DEBUG,
+ 				   "SAE: PTK derivation using PRF(SHA256)");
+-			if (sha256_prf(pmk, pmk_len, label, data, data_len,
++			if (wpa_sha256_prf(pmk, pmk_len, label, data, data_len,
+ 				       tmp, ptk_len) < 0)
+ 				return -1;
+ 		} else {
+@@ -1253,7 +1253,7 @@ int wpa_pmk_to_ptk(const u8 *pmk, size_t pmk_len, const char *label,
+ 		}
+ #endif /* CONFIG_WPA3_SAE */
+ 	} else {
+-		sha1_prf(pmk, pmk_len, label, data, data_len, tmp, ptk_len);
++	    wpa_sha1_prf(pmk, pmk_len, label, data, data_len, tmp, ptk_len);
+ 	}
+ 	wpa_printf(MSG_DEBUG, "WPA: PTK derivation - A1=" MACSTR " A2=" MACSTR"\n",
+ 		   MAC2STR(addr1), MAC2STR(addr2));
+@@ -1301,12 +1301,12 @@ void rsn_pmkid(const u8 *pmk, size_t pmk_len, const u8 *aa, const u8 *spa,
+ #ifdef CONFIG_IEEE80211W
+ 	if (wpa_key_mgmt_sha256(akmp)) {
+ 		wpa_printf(MSG_DEBUG, "RSN: Derive PMKID using HMAC-SHA-256");
+-		hmac_sha256_vector(pmk, pmk_len, 3, addr, len, hash);
++	    wpa_hmac_sha256_vector(pmk, pmk_len, 3, addr, len, hash);
+ 	} else
+ #endif /* CONFIG_IEEE80211W */
+ 	{
+ 		wpa_printf(MSG_DEBUG, "RSN: Derive PMKID using HMAC-SHA-1");
+-		hmac_sha1_vector(pmk, pmk_len, 3, addr, len, hash);
++	    wpa_hmac_sha1_vector(pmk, pmk_len, 3, addr, len, hash);
+ 	}
+ 	os_memcpy(pmkid, hash, PMKID_LEN);
+ }
 diff --git a/components/wpa_supplicant/src/crypto/aes-cbc.c b/components/wpa_supplicant/src/crypto/aes-cbc.c
-index 0835f2cfb7..fa01d4083a 100644
+index 0835f2cfb7..c5ce6f2bf7 100644
 --- a/components/wpa_supplicant/src/crypto/aes-cbc.c
 +++ b/components/wpa_supplicant/src/crypto/aes-cbc.c
-@@ -40,7 +40,7 @@ int aes_128_cbc_encrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
+@@ -31,7 +31,7 @@ int aes_128_cbc_encrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
+ 	if (TEST_FAIL())
+ 		return -1;
+ 
+-	ctx = aes_encrypt_init(key, 16);
++	ctx = wpa_aes_encrypt_init(key, 16);
+ 	if (ctx == NULL)
+ 		return -1;
+ 	os_memcpy(cbc, iv, AES_BLOCK_SIZE);
+@@ -40,11 +40,11 @@ int aes_128_cbc_encrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
  	for (i = 0; i < blocks; i++) {
  		for (j = 0; j < AES_BLOCK_SIZE; j++)
  			cbc[j] ^= pos[j];
 -		aes_encrypt(ctx, cbc, cbc);
-+		wpa_aes_encrypt(ctx, cbc, cbc);
++	    wpa_aes_encrypt(ctx, cbc, cbc);
  		os_memcpy(pos, cbc, AES_BLOCK_SIZE);
  		pos += AES_BLOCK_SIZE;
  	}
-@@ -75,7 +75,7 @@ int aes_128_cbc_decrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
+-	aes_encrypt_deinit(ctx);
++    wpa_aes_encrypt_deinit(ctx);
+ 	return 0;
+ }
+ 
+@@ -67,7 +67,7 @@ int aes_128_cbc_decrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
+ 	if (TEST_FAIL())
+ 		return -1;
+ 
+-	ctx = aes_decrypt_init(key, 16);
++	ctx = wpa_aes_decrypt_init(key, 16);
+ 	if (ctx == NULL)
+ 		return -1;
+ 	os_memcpy(cbc, iv, AES_BLOCK_SIZE);
+@@ -75,12 +75,12 @@ int aes_128_cbc_decrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
  	blocks = data_len / AES_BLOCK_SIZE;
  	for (i = 0; i < blocks; i++) {
  		os_memcpy(tmp, pos, AES_BLOCK_SIZE);
 -		aes_decrypt(ctx, pos, pos);
-+		wpa_aes_decrypt(ctx, pos, pos);
++	    wpa_aes_decrypt(ctx, pos, pos);
  		for (j = 0; j < AES_BLOCK_SIZE; j++)
  			pos[j] ^= cbc[j];
  		os_memcpy(cbc, tmp, AES_BLOCK_SIZE);
+ 		pos += AES_BLOCK_SIZE;
+ 	}
+-	aes_decrypt_deinit(ctx);
++    wpa_aes_decrypt_deinit(ctx);
+ 	return 0;
+ }
 diff --git a/components/wpa_supplicant/src/crypto/aes-ccm.c b/components/wpa_supplicant/src/crypto/aes-ccm.c
-index e5bb94ca08..2a837463be 100644
+index e5bb94ca08..bd0ba71ba3 100644
 --- a/components/wpa_supplicant/src/crypto/aes-ccm.c
 +++ b/components/wpa_supplicant/src/crypto/aes-ccm.c
 @@ -42,7 +42,7 @@ static void aes_ccm_auth_start(void *aes, size_t M, size_t L, const u8 *nonce,
@@ -103,7 +782,7 @@ index e5bb94ca08..2a837463be 100644
  
  	wpa_hexdump_key(MSG_DEBUG, "CCM B_0", b, AES_BLOCK_SIZE);
 -	aes_encrypt(aes, b, x); /* X_1 = E(K, B_0) */
-+	wpa_aes_encrypt(aes, b, x); /* X_1 = E(K, B_0) */
++    wpa_aes_encrypt(aes, b, x); /* X_1 = E(K, B_0) */
  
  	if (!aad_len)
  		return;
@@ -112,13 +791,13 @@ index e5bb94ca08..2a837463be 100644
  
  	xor_aes_block(aad_buf, x);
 -	aes_encrypt(aes, aad_buf, x); /* X_2 = E(K, X_1 XOR B_1) */
-+	wpa_aes_encrypt(aes, aad_buf, x); /* X_2 = E(K, X_1 XOR B_1) */
++    wpa_aes_encrypt(aes, aad_buf, x); /* X_2 = E(K, X_1 XOR B_1) */
  
  	if (aad_len > AES_BLOCK_SIZE - 2) {
  		xor_aes_block(&aad_buf[AES_BLOCK_SIZE], x);
  		/* X_3 = E(K, X_2 XOR B_2) */
 -		aes_encrypt(aes, &aad_buf[AES_BLOCK_SIZE], x);
-+		wpa_aes_encrypt(aes, &aad_buf[AES_BLOCK_SIZE], x);
++	    wpa_aes_encrypt(aes, &aad_buf[AES_BLOCK_SIZE], x);
  	}
  }
  
@@ -127,14 +806,14 @@ index e5bb94ca08..2a837463be 100644
  		xor_aes_block(x, data);
  		data += AES_BLOCK_SIZE;
 -		aes_encrypt(aes, x, x);
-+		wpa_aes_encrypt(aes, x, x);
++	    wpa_aes_encrypt(aes, x, x);
  	}
  	if (last) {
  		/* XOR zero-padded last block */
  		for (i = 0; i < last; i++)
  			x[i] ^= *data++;
 -		aes_encrypt(aes, x, x);
-+		wpa_aes_encrypt(aes, x, x);
++	    wpa_aes_encrypt(aes, x, x);
  	}
  }
  
@@ -143,7 +822,7 @@ index e5bb94ca08..2a837463be 100644
  		WPA_PUT_BE16(&a[AES_BLOCK_SIZE - 2], i);
  		/* S_i = E(K, A_i) */
 -		aes_encrypt(aes, a, out);
-+		wpa_aes_encrypt(aes, a, out);
++	    wpa_aes_encrypt(aes, a, out);
  		xor_aes_block(out, in);
  		out += AES_BLOCK_SIZE;
  		in += AES_BLOCK_SIZE;
@@ -151,7 +830,7 @@ index e5bb94ca08..2a837463be 100644
  	if (last) {
  		WPA_PUT_BE16(&a[AES_BLOCK_SIZE - 2], i);
 -		aes_encrypt(aes, a, out);
-+		wpa_aes_encrypt(aes, a, out);
++	    wpa_aes_encrypt(aes, a, out);
  		/* XOR zero-padded last block */
  		for (i = 0; i < last; i++)
  			*out++ ^= *in++;
@@ -160,7 +839,7 @@ index e5bb94ca08..2a837463be 100644
  	/* U = T XOR S_0; S_0 = E(K, A_0) */
  	WPA_PUT_BE16(&a[AES_BLOCK_SIZE - 2], 0);
 -	aes_encrypt(aes, a, tmp);
-+	wpa_aes_encrypt(aes, a, tmp);
++    wpa_aes_encrypt(aes, a, tmp);
  	for (i = 0; i < M; i++)
  		auth[i] = x[i] ^ tmp[i];
  	wpa_hexdump_key(MSG_DEBUG, "CCM U", auth, M);
@@ -169,25 +848,77 @@ index e5bb94ca08..2a837463be 100644
  	/* U = T XOR S_0; S_0 = E(K, A_0) */
  	WPA_PUT_BE16(&a[AES_BLOCK_SIZE - 2], 0);
 -	aes_encrypt(aes, a, tmp);
-+	wpa_aes_encrypt(aes, a, tmp);
++    wpa_aes_encrypt(aes, a, tmp);
  	for (i = 0; i < M; i++)
  		t[i] = auth[i] ^ tmp[i];
  	wpa_hexdump_key(MSG_DEBUG, "CCM T", t, M);
+@@ -157,7 +157,7 @@ int aes_ccm_ae(const u8 *key, size_t key_len, const u8 *nonce,
+ 	if (aad_len > 30 || M > AES_BLOCK_SIZE)
+ 		return -1;
+ 
+-	aes = aes_encrypt_init(key, key_len);
++	aes = wpa_aes_encrypt_init(key, key_len);
+ 	if (aes == NULL)
+ 		return -1;
+ 
+@@ -169,7 +169,7 @@ int aes_ccm_ae(const u8 *key, size_t key_len, const u8 *nonce,
+ 	aes_ccm_encr(aes, L, plain, plain_len, crypt, a);
+ 	aes_ccm_encr_auth(aes, M, x, a, auth);
+ 
+-	aes_encrypt_deinit(aes);
++    wpa_aes_encrypt_deinit(aes);
+ 
+ 	return 0;
+ }
+@@ -188,7 +188,7 @@ int aes_ccm_ad(const u8 *key, size_t key_len, const u8 *nonce,
+ 	if (aad_len > 30 || M > AES_BLOCK_SIZE)
+ 		return -1;
+ 
+-	aes = aes_encrypt_init(key, key_len);
++	aes = wpa_aes_encrypt_init(key, key_len);
+ 	if (aes == NULL)
+ 		return -1;
+ 
+@@ -202,7 +202,7 @@ int aes_ccm_ad(const u8 *key, size_t key_len, const u8 *nonce,
+ 	aes_ccm_auth_start(aes, M, L, nonce, aad, aad_len, crypt_len, x);
+ 	aes_ccm_auth(aes, plain, crypt_len, x);
+ 
+-	aes_encrypt_deinit(aes);
++    wpa_aes_encrypt_deinit(aes);
+ 
+ 	if (os_memcmp_const(x, t, M) != 0) {
+ 		wpa_printf(MSG_DEBUG, "CCM: Auth mismatch");
 diff --git a/components/wpa_supplicant/src/crypto/aes-ctr.c b/components/wpa_supplicant/src/crypto/aes-ctr.c
-index 8ce05b894d..0647706306 100644
+index 8ce05b894d..88d64e5841 100644
 --- a/components/wpa_supplicant/src/crypto/aes-ctr.c
 +++ b/components/wpa_supplicant/src/crypto/aes-ctr.c
-@@ -37,7 +37,7 @@ int aes_ctr_encrypt(const u8 *key, size_t key_len, const u8 *nonce,
+@@ -31,13 +31,13 @@ int aes_ctr_encrypt(const u8 *key, size_t key_len, const u8 *nonce,
+ 	u8 *pos = data;
+ 	u8 counter[AES_BLOCK_SIZE], buf[AES_BLOCK_SIZE];
+ 
+-	ctx = aes_encrypt_init(key, key_len);
++	ctx = wpa_aes_encrypt_init(key, key_len);
+ 	if (ctx == NULL)
+ 		return -1;
  	os_memcpy(counter, nonce, AES_BLOCK_SIZE);
  
  	while (left > 0) {
 -		aes_encrypt(ctx, counter, buf);
-+		wpa_aes_encrypt(ctx, counter, buf);
++	    wpa_aes_encrypt(ctx, counter, buf);
  
  		len = (left < AES_BLOCK_SIZE) ? left : AES_BLOCK_SIZE;
  		for (j = 0; j < len; j++)
+@@ -51,7 +51,7 @@ int aes_ctr_encrypt(const u8 *key, size_t key_len, const u8 *nonce,
+ 				break;
+ 		}
+ 	}
+-	aes_encrypt_deinit(ctx);
++    wpa_aes_encrypt_deinit(ctx);
+ 	return 0;
+ }
+ 
 diff --git a/components/wpa_supplicant/src/crypto/aes-gcm.c b/components/wpa_supplicant/src/crypto/aes-gcm.c
-index 84294d2d10..9b2f18df02 100644
+index 84294d2d10..6420c67edf 100644
 --- a/components/wpa_supplicant/src/crypto/aes-gcm.c
 +++ b/components/wpa_supplicant/src/crypto/aes-gcm.c
 @@ -155,7 +155,7 @@ static void aes_gctr(void *aes, const u8 *icb, const u8 *x, size_t xlen, u8 *y)
@@ -195,7 +926,7 @@ index 84294d2d10..9b2f18df02 100644
  	/* Full blocks */
  	for (i = 0; i < n; i++) {
 -		aes_encrypt(aes, cb, ypos);
-+		wpa_aes_encrypt(aes, cb, ypos);
++	    wpa_aes_encrypt(aes, cb, ypos);
  		xor_block(ypos, xpos);
  		xpos += AES_BLOCK_SIZE;
  		ypos += AES_BLOCK_SIZE;
@@ -204,23 +935,66 @@ index 84294d2d10..9b2f18df02 100644
  	if (last) {
  		/* Last, partial block */
 -		aes_encrypt(aes, cb, tmp);
-+		wpa_aes_encrypt(aes, cb, tmp);
++	    wpa_aes_encrypt(aes, cb, tmp);
  		for (i = 0; i < last; i++)
  			*ypos++ = *xpos++ ^ tmp[i];
  	}
-@@ -182,7 +182,7 @@ static void * aes_gcm_init_hash_subkey(const u8 *key, size_t key_len, u8 *H)
+@@ -176,13 +176,13 @@ static void * aes_gcm_init_hash_subkey(const u8 *key, size_t key_len, u8 *H)
+ {
+ 	void *aes;
+ 
+-	aes = aes_encrypt_init(key, key_len);
++	aes = wpa_aes_encrypt_init(key, key_len);
+ 	if (aes == NULL)
+ 		return NULL;
  
  	/* Generate hash subkey H = AES_K(0^128) */
  	os_memset(H, 0, AES_BLOCK_SIZE);
 -	aes_encrypt(aes, H, H);
-+	wpa_aes_encrypt(aes, H, H);
++    wpa_aes_encrypt(aes, H, H);
  	wpa_hexdump_key(MSG_EXCESSIVE, "Hash subkey H for GHASH",
  			H, AES_BLOCK_SIZE);
  	return aes;
+@@ -276,7 +276,7 @@ int aes_gcm_ae(const u8 *key, size_t key_len, const u8 *iv, size_t iv_len,
+ 
+ 	/* Return (C, T) */
+ 
+-	aes_encrypt_deinit(aes);
++    wpa_aes_encrypt_deinit(aes);
+ 
+ 	return 0;
+ }
+@@ -308,7 +308,7 @@ int aes_gcm_ad(const u8 *key, size_t key_len, const u8 *iv, size_t iv_len,
+ 	/* T' = MSB_t(GCTR_K(J_0, S)) */
+ 	aes_gctr(aes, J0, S, sizeof(S), T);
+ 
+-	aes_encrypt_deinit(aes);
++    wpa_aes_encrypt_deinit(aes);
+ 
+ 	if (os_memcmp_const(tag, T, 16) != 0) {
+ 		wpa_printf(MSG_EXCESSIVE, "GCM: Tag mismatch");
 diff --git a/components/wpa_supplicant/src/crypto/aes-internal-dec.c b/components/wpa_supplicant/src/crypto/aes-internal-dec.c
-index 7482295949..f72742cf59 100644
+index 7482295949..5c5171123e 100644
 --- a/components/wpa_supplicant/src/crypto/aes-internal-dec.c
 +++ b/components/wpa_supplicant/src/crypto/aes-internal-dec.c
+@@ -31,7 +31,7 @@ static int rijndaelKeySetupDec(u32 rk[], const u8 cipherKey[], int keyBits)
+ 	u32 temp;
+ 
+ 	/* expand the cipher key: */
+-	Nr = rijndaelKeySetupEnc(rk, cipherKey, keyBits);
++	Nr = wpa_rijndaelKeySetupEnc(rk, cipherKey, keyBits);
+ 	if (Nr < 0)
+ 		return Nr;
+ 	/* invert the order of the round keys: */
+@@ -56,7 +56,7 @@ static int rijndaelKeySetupDec(u32 rk[], const u8 cipherKey[], int keyBits)
+ 	return Nr;
+ }
+ 
+-void * aes_decrypt_init(const u8 *key, size_t len)
++void * wpa_aes_decrypt_init(const u8 *key, size_t len)
+ {
+ 	u32 *rk;
+ 	int res;
 @@ -148,7 +148,7 @@ d##3 = TD0(s##3) ^ TD1(s##2) ^ TD2(s##1) ^ TD3(s##0) ^ rk[4 * i + 3]
  }
  
@@ -230,10 +1004,37 @@ index 7482295949..f72742cf59 100644
  {
  	u32 *rk = ctx;
  	rijndaelDecrypt(ctx, rk[AES_PRIV_NR_POS], crypt, plain);
+@@ -156,7 +156,7 @@ int aes_decrypt(void *ctx, const u8 *crypt, u8 *plain)
+ }
+ 
+ 
+-void aes_decrypt_deinit(void *ctx)
++void wpa_aes_decrypt_deinit(void *ctx)
+ {
+ 	os_memset(ctx, 0, AES_PRIV_SIZE);
+ 	os_free(ctx);
 diff --git a/components/wpa_supplicant/src/crypto/aes-internal-enc.c b/components/wpa_supplicant/src/crypto/aes-internal-enc.c
-index baeffcaf63..a856dc9f3f 100644
+index baeffcaf63..2e00ba9a6e 100644
 --- a/components/wpa_supplicant/src/crypto/aes-internal-enc.c
 +++ b/components/wpa_supplicant/src/crypto/aes-internal-enc.c
+@@ -95,7 +95,7 @@ d##3 = TE0(s##3) ^ TE1(s##0) ^ TE2(s##1) ^ TE3(s##2) ^ rk[4 * i + 3]
+ }
+ 
+ 
+-void * aes_encrypt_init(const u8 *key, size_t len)
++void * wpa_aes_encrypt_init(const u8 *key, size_t len)
+ {
+ 	u32 *rk;
+ 	int res;
+@@ -106,7 +106,7 @@ void * aes_encrypt_init(const u8 *key, size_t len)
+ 	rk = os_malloc(AES_PRIV_SIZE);
+ 	if (rk == NULL)
+ 		return NULL;
+-	res = rijndaelKeySetupEnc(rk, key, len * 8);
++	res = wpa_rijndaelKeySetupEnc(rk, key, len * 8);
+ 	if (res < 0) {
+ 		os_free(rk);
+ 		return NULL;
 @@ -116,7 +116,7 @@ void * aes_encrypt_init(const u8 *key, size_t len)
  }
  
@@ -243,82 +1044,220 @@ index baeffcaf63..a856dc9f3f 100644
  {
  	u32 *rk = ctx;
  	rijndaelEncrypt(ctx, rk[AES_PRIV_NR_POS], plain, crypt);
+@@ -124,7 +124,7 @@ int aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
+ }
+ 
+ 
+-void aes_encrypt_deinit(void *ctx)
++void wpa_aes_encrypt_deinit(void *ctx)
+ {
+ 	os_memset(ctx, 0, AES_PRIV_SIZE);
+ 	os_free(ctx);
+diff --git a/components/wpa_supplicant/src/crypto/aes-internal.c b/components/wpa_supplicant/src/crypto/aes-internal.c
+index bd4535d209..6b646027c8 100644
+--- a/components/wpa_supplicant/src/crypto/aes-internal.c
++++ b/components/wpa_supplicant/src/crypto/aes-internal.c
+@@ -776,7 +776,7 @@ const u8 rcons[] = {
+  *
+  * @return	the number of rounds for the given cipher key size.
+  */
+-int rijndaelKeySetupEnc(u32 rk[], const u8 cipherKey[], int keyBits)
++int wpa_rijndaelKeySetupEnc(u32 rk[], const u8 cipherKey[], int keyBits)
+ {
+ 	int i;
+ 	u32 temp;
 diff --git a/components/wpa_supplicant/src/crypto/aes-omac1.c b/components/wpa_supplicant/src/crypto/aes-omac1.c
-index 8642516340..21ba314ae0 100644
+index 8642516340..bfc118afca 100644
 --- a/components/wpa_supplicant/src/crypto/aes-omac1.c
 +++ b/components/wpa_supplicant/src/crypto/aes-omac1.c
+@@ -51,7 +51,7 @@ int omac1_aes_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 	if (TEST_FAIL())
+ 		return -1;
+ 
+-	ctx = aes_encrypt_init(key, key_len);
++	ctx = wpa_aes_encrypt_init(key, key_len);
+ 	if (ctx == NULL)
+ 		return -1;
+ 	os_memset(cbc, 0, AES_BLOCK_SIZE);
 @@ -82,12 +82,12 @@ int omac1_aes_vector(const u8 *key, size_t key_len, size_t num_elem,
  			}
  		}
  		if (left > AES_BLOCK_SIZE)
 -			aes_encrypt(ctx, cbc, cbc);
-+			wpa_aes_encrypt(ctx, cbc, cbc);
++		    wpa_aes_encrypt(ctx, cbc, cbc);
  		left -= AES_BLOCK_SIZE;
  	}
  
  	os_memset(pad, 0, AES_BLOCK_SIZE);
 -	aes_encrypt(ctx, pad, pad);
-+	wpa_aes_encrypt(ctx, pad, pad);
++    wpa_aes_encrypt(ctx, pad, pad);
  	gf_mulx(pad);
  
  	if (left || total_len == 0) {
-@@ -111,7 +111,7 @@ int omac1_aes_vector(const u8 *key, size_t key_len, size_t num_elem,
+@@ -111,8 +111,8 @@ int omac1_aes_vector(const u8 *key, size_t key_len, size_t num_elem,
  
  	for (i = 0; i < AES_BLOCK_SIZE; i++)
  		pad[i] ^= cbc[i];
 -	aes_encrypt(ctx, pad, mac);
-+	wpa_aes_encrypt(ctx, pad, mac);
- 	aes_encrypt_deinit(ctx);
+-	aes_encrypt_deinit(ctx);
++    wpa_aes_encrypt(ctx, pad, mac);
++    wpa_aes_encrypt_deinit(ctx);
  	return 0;
  }
+ 
 diff --git a/components/wpa_supplicant/src/crypto/aes-unwrap.c b/components/wpa_supplicant/src/crypto/aes-unwrap.c
-index ec793d9dbf..08aedc12de 100644
+index ec793d9dbf..704f62cb0a 100644
 --- a/components/wpa_supplicant/src/crypto/aes-unwrap.c
 +++ b/components/wpa_supplicant/src/crypto/aes-unwrap.c
-@@ -58,7 +58,7 @@ int aes_unwrap(const u8 *kek, size_t kek_len, int n, const u8 *cipher,
+@@ -36,7 +36,7 @@ int aes_unwrap(const u8 *kek, size_t kek_len, int n, const u8 *cipher,
+ 	r = plain;
+ 	os_memcpy(r, cipher + 8, 8 * n);
+ 
+-	ctx = aes_decrypt_init(kek, kek_len);
++	ctx = wpa_aes_decrypt_init(kek, kek_len);
+ 	if (ctx == NULL)
+ 		return -1;
+ 
+@@ -58,13 +58,13 @@ int aes_unwrap(const u8 *kek, size_t kek_len, int n, const u8 *cipher,
  			b[4] ^= t >> 24;
  
  			os_memcpy(b + 8, r, 8);
 -			aes_decrypt(ctx, b, b);
-+			wpa_aes_decrypt(ctx, b, b);
++		    wpa_aes_decrypt(ctx, b, b);
  			os_memcpy(a, b, 8);
  			os_memcpy(r, b + 8, 8);
  			r -= 8;
+ 		}
+ 	}
+-	aes_decrypt_deinit(ctx);
++    wpa_aes_decrypt_deinit(ctx);
+ 
+ 	/* 3) Output results.
+ 	 *
 diff --git a/components/wpa_supplicant/src/crypto/aes-wrap.c b/components/wpa_supplicant/src/crypto/aes-wrap.c
-index 7ed34e803e..49621d2231 100644
+index 7ed34e803e..fec086c815 100644
 --- a/components/wpa_supplicant/src/crypto/aes-wrap.c
 +++ b/components/wpa_supplicant/src/crypto/aes-wrap.c
+@@ -37,7 +37,7 @@ int aes_wrap(const u8 *kek, size_t kek_len, int n, const u8 *plain, u8 *cipher)
+ 	os_memset(a, 0xa6, 8);
+ 	os_memcpy(r, plain, 8 * n);
+ 
+-	ctx = aes_encrypt_init(kek, kek_len);
++	ctx = wpa_aes_encrypt_init(kek, kek_len);
+ 	if (ctx == NULL)
+ 		return -1;
+ 
 @@ -53,7 +53,7 @@ int aes_wrap(const u8 *kek, size_t kek_len, int n, const u8 *plain, u8 *cipher)
  		for (i = 1; i <= n; i++) {
  			os_memcpy(b, a, 8);
  			os_memcpy(b + 8, r, 8);
 -			aes_encrypt(ctx, b, b);
-+			wpa_aes_encrypt(ctx, b, b);
++		    wpa_aes_encrypt(ctx, b, b);
  			os_memcpy(a, b, 8);
  			t = n * j + i;
  			a[7] ^= t;
+@@ -64,7 +64,7 @@ int aes_wrap(const u8 *kek, size_t kek_len, int n, const u8 *plain, u8 *cipher)
+ 			r += 8;
+ 		}
+ 	}
+-	aes_encrypt_deinit(ctx);
++    wpa_aes_encrypt_deinit(ctx);
+ 
+ 	/* 3) Output the results.
+ 	 *
 diff --git a/components/wpa_supplicant/src/crypto/aes.h b/components/wpa_supplicant/src/crypto/aes.h
-index 8ab3de2ee8..fe04fc4b2b 100644
+index 8ab3de2ee8..3352e345dd 100644
 --- a/components/wpa_supplicant/src/crypto/aes.h
 +++ b/components/wpa_supplicant/src/crypto/aes.h
-@@ -12,10 +12,10 @@
+@@ -11,11 +11,11 @@
+ 
  #define AES_BLOCK_SIZE 16
  
- void * aes_encrypt_init(const u8 *key, size_t len);
+-void * aes_encrypt_init(const u8 *key, size_t len);
 -int aes_encrypt(void *ctx, const u8 *plain, u8 *crypt);
-+int wpa_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt);
- void aes_encrypt_deinit(void *ctx);
- void * aes_decrypt_init(const u8 *key, size_t len);
+-void aes_encrypt_deinit(void *ctx);
+-void * aes_decrypt_init(const u8 *key, size_t len);
 -int aes_decrypt(void *ctx, const u8 *crypt, u8 *plain);
+-void aes_decrypt_deinit(void *ctx);
++void * wpa_aes_encrypt_init(const u8 *key, size_t len);
++int wpa_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt);
++void wpa_aes_encrypt_deinit(void *ctx);
++void * wpa_aes_decrypt_init(const u8 *key, size_t len);
 +int wpa_aes_decrypt(void *ctx, const u8 *crypt, u8 *plain);
- void aes_decrypt_deinit(void *ctx);
++void wpa_aes_decrypt_deinit(void *ctx);
  
  #endif /* AES_H */
+diff --git a/components/wpa_supplicant/src/crypto/aes_i.h b/components/wpa_supplicant/src/crypto/aes_i.h
+index b20ec92203..52f4c82cc0 100644
+--- a/components/wpa_supplicant/src/crypto/aes_i.h
++++ b/components/wpa_supplicant/src/crypto/aes_i.h
+@@ -120,6 +120,6 @@ static inline u32 rotr(u32 val, int bits)
+ #define AES_PRIV_SIZE (4 * 4 * 15 + 4)
+ #define AES_PRIV_NR_POS (4 * 15)
+ 
+-int rijndaelKeySetupEnc(u32 rk[], const u8 cipherKey[], int keyBits);
++int wpa_rijndaelKeySetupEnc(u32 rk[], const u8 cipherKey[], int keyBits);
+ 
+ #endif /* AES_I_H */
 diff --git a/components/wpa_supplicant/src/crypto/crypto.h b/components/wpa_supplicant/src/crypto/crypto.h
-index 9a43c9bfd9..f87a21872b 100644
+index 183cbf590f..780478e828 100644
 --- a/components/wpa_supplicant/src/crypto/crypto.h
 +++ b/components/wpa_supplicant/src/crypto/crypto.h
-@@ -125,7 +125,7 @@ void * aes_encrypt_init(const u8 *key, size_t len);
+@@ -51,7 +51,7 @@ int md5_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac);
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 on failure
+  */
+-int sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		u8 *mac);
+ 
+ /**
+@@ -77,7 +77,7 @@ int __must_check fips186_2_prf(const u8 *seed, size_t seed_len, u8 *x,
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 on failure
+  */
+-int sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		  u8 *mac);
+ 
+ /**
+@@ -88,7 +88,7 @@ int sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 on failure
+  */
+-int sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		  u8 *mac);
+ 
+ /**
+@@ -99,7 +99,7 @@ int sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 on failure
+  */
+-int sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		  u8 *mac);
+ 
+ /**
+@@ -112,50 +112,50 @@ int sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ int des_encrypt(const u8 *clear, const u8 *key, u8 *cypher);
+ 
+ /**
+- * aes_encrypt_init - Initialize AES for encryption
++ * wpa_aes_encrypt_init - Initialize AES for encryption
+  * @key: Encryption key
+  * @len: Key length in bytes (usually 16, i.e., 128 bits)
+  * Returns: Pointer to context data or %NULL on failure
+  */
+-void * aes_encrypt_init(const u8 *key, size_t len);
++void * wpa_aes_encrypt_init(const u8 *key, size_t len);
+ 
+ /**
+- * aes_encrypt - Encrypt one AES block
+- * @ctx: Context pointer from aes_encrypt_init()
++ * wpa_aes_encrypt - Encrypt one AES block
++ * @ctx: Context pointer from wpa_aes_encrypt_init()
+  * @plain: Plaintext data to be encrypted (16 bytes)
   * @crypt: Buffer for the encrypted data (16 bytes)
   * Returns: 0 on success, -1 on failure
   */
@@ -326,8 +1265,30 @@ index 9a43c9bfd9..f87a21872b 100644
 +int wpa_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt);
  
  /**
-  * aes_encrypt_deinit - Deinitialize AES encryption
-@@ -148,7 +148,7 @@ void * aes_decrypt_init(const u8 *key, size_t len);
+- * aes_encrypt_deinit - Deinitialize AES encryption
+- * @ctx: Context pointer from aes_encrypt_init()
++ * wpa_aes_encrypt_deinit - Deinitialize AES encryption
++ * @ctx: Context pointer from wpa_aes_encrypt_init()
+  */
+-void aes_encrypt_deinit(void *ctx);
++void wpa_aes_encrypt_deinit(void *ctx);
+ 
+ /**
+- * aes_decrypt_init - Initialize AES for decryption
++ * wpa_aes_decrypt_init - Initialize AES for decryption
+  * @key: Decryption key
+  * @len: Key length in bytes (usually 16, i.e., 128 bits)
+  * Returns: Pointer to context data or %NULL on failure
+  */
+-void * aes_decrypt_init(const u8 *key, size_t len);
++void * wpa_aes_decrypt_init(const u8 *key, size_t len);
+ 
+ /**
+- * aes_decrypt - Decrypt one AES block
+- * @ctx: Context pointer from aes_encrypt_init()
++ * wpa_aes_decrypt - Decrypt one AES block
++ * @ctx: Context pointer from wpa_aes_encrypt_init()
+  * @crypt: Encrypted data (16 bytes)
   * @plain: Buffer for the decrypted data (16 bytes)
   * Returns: 0 on success, -1 on failure
   */
@@ -335,17 +1296,44 @@ index 9a43c9bfd9..f87a21872b 100644
 +int wpa_aes_decrypt(void *ctx, const u8 *crypt, u8 *plain);
  
  /**
-  * aes_decrypt_deinit - Deinitialize AES decryption
+- * aes_decrypt_deinit - Deinitialize AES decryption
+- * @ctx: Context pointer from aes_encrypt_init()
++ * wpa_aes_decrypt_deinit - Deinitialize AES decryption
++ * @ctx: Context pointer from wpa_aes_encrypt_init()
+  */
+-void aes_decrypt_deinit(void *ctx);
++void wpa_aes_decrypt_deinit(void *ctx);
+ 
+ 
+ enum crypto_hash_alg {
 diff --git a/components/wpa_supplicant/src/crypto/crypto_internal-cipher.c b/components/wpa_supplicant/src/crypto/crypto_internal-cipher.c
-index ad0930a5a9..4887fd36c6 100644
+index ad0930a5a9..e3f5794cf7 100644
 --- a/components/wpa_supplicant/src/crypto/crypto_internal-cipher.c
 +++ b/components/wpa_supplicant/src/crypto/crypto_internal-cipher.c
+@@ -62,14 +62,14 @@ struct crypto_cipher * crypto_cipher_init(enum crypto_cipher_alg alg,
+ 		os_memcpy(ctx->u.rc4.key, key, key_len);
+ 		break;
+ 	case CRYPTO_CIPHER_ALG_AES:
+-		ctx->u.aes.ctx_enc = aes_encrypt_init(key, key_len);
++		ctx->u.aes.ctx_enc = wpa_aes_encrypt_init(key, key_len);
+ 		if (ctx->u.aes.ctx_enc == NULL) {
+ 			os_free(ctx);
+ 			return NULL;
+ 		}
+-		ctx->u.aes.ctx_dec = aes_decrypt_init(key, key_len);
++		ctx->u.aes.ctx_dec = wpa_aes_decrypt_init(key, key_len);
+ 		if (ctx->u.aes.ctx_dec == NULL) {
+-			aes_encrypt_deinit(ctx->u.aes.ctx_enc);
++		    wpa_aes_encrypt_deinit(ctx->u.aes.ctx_enc);
+ 			os_free(ctx);
+ 			return NULL;
+ 		}
 @@ -120,7 +120,7 @@ int crypto_cipher_encrypt(struct crypto_cipher *ctx, const u8 *plain,
  		for (i = 0; i < blocks; i++) {
  			for (j = 0; j < AES_BLOCK_SIZE; j++)
  				ctx->u.aes.cbc[j] ^= plain[j];
 -			aes_encrypt(ctx->u.aes.ctx_enc, ctx->u.aes.cbc,
-+			wpa_aes_encrypt(ctx->u.aes.ctx_enc, ctx->u.aes.cbc,
++		    wpa_aes_encrypt(ctx->u.aes.ctx_enc, ctx->u.aes.cbc,
  				    ctx->u.aes.cbc);
  			os_memcpy(crypt, ctx->u.aes.cbc, AES_BLOCK_SIZE);
  			plain += AES_BLOCK_SIZE;
@@ -354,15 +1342,26 @@ index ad0930a5a9..4887fd36c6 100644
  		for (i = 0; i < blocks; i++) {
  			os_memcpy(tmp, crypt, AES_BLOCK_SIZE);
 -			aes_decrypt(ctx->u.aes.ctx_dec, crypt, plain);
-+			wpa_aes_decrypt(ctx->u.aes.ctx_dec, crypt, plain);
++		    wpa_aes_decrypt(ctx->u.aes.ctx_dec, crypt, plain);
  			for (j = 0; j < AES_BLOCK_SIZE; j++)
  				plain[j] ^= ctx->u.aes.cbc[j];
  			os_memcpy(ctx->u.aes.cbc, tmp, AES_BLOCK_SIZE);
+@@ -231,8 +231,8 @@ void crypto_cipher_deinit(struct crypto_cipher *ctx)
+ {
+ 	switch (ctx->alg) {
+ 	case CRYPTO_CIPHER_ALG_AES:
+-		aes_encrypt_deinit(ctx->u.aes.ctx_enc);
+-		aes_decrypt_deinit(ctx->u.aes.ctx_dec);
++	    wpa_aes_encrypt_deinit(ctx->u.aes.ctx_enc);
++	    wpa_aes_decrypt_deinit(ctx->u.aes.ctx_dec);
+ 		break;
+ 	case CRYPTO_CIPHER_ALG_3DES:
+ 		break;
 diff --git a/components/wpa_supplicant/src/crypto/crypto_internal.c b/components/wpa_supplicant/src/crypto/crypto_internal.c
-index 3d14babe5a..d1426a8feb 100644
+index aad40af16e..ed74dd2a4f 100644
 --- a/components/wpa_supplicant/src/crypto/crypto_internal.c
 +++ b/components/wpa_supplicant/src/crypto/crypto_internal.c
-@@ -57,7 +57,7 @@ struct crypto_hash * crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
+@@ -59,17 +59,17 @@ struct crypto_hash * crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
  		break;
  #ifdef CONFIG_SHA256
  	case CRYPTO_HASH_ALG_SHA256:
@@ -371,96 +1370,399 @@ index 3d14babe5a..d1426a8feb 100644
  		break;
  #endif /* CONFIG_SHA256 */
  #ifdef CONFIG_INTERNAL_SHA384
-@@ -111,7 +111,7 @@ struct crypto_hash * crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
+ 	case CRYPTO_HASH_ALG_SHA384:
+-		sha384_init(&ctx->u.sha384);
++		wpa_sha384_init(&ctx->u.sha384);
+ 		break;
+ #endif /* CONFIG_INTERNAL_SHA384 */
+ #ifdef CONFIG_INTERNAL_SHA512
+ 	case CRYPTO_HASH_ALG_SHA512:
+-		sha512_init(&ctx->u.sha512);
++		wpa_sha512_init(&ctx->u.sha512);
+ 		break;
+ #endif /* CONFIG_INTERNAL_SHA512 */
+ 	case CRYPTO_HASH_ALG_HMAC_MD5:
+@@ -113,9 +113,9 @@ struct crypto_hash * crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
  #ifdef CONFIG_SHA256
  	case CRYPTO_HASH_ALG_HMAC_SHA256:
  		if (key_len > sizeof(k_pad)) {
 -			sha256_init(&ctx->u.sha256);
+-			sha256_process(&ctx->u.sha256, key, key_len);
+-			sha256_done(&ctx->u.sha256, tk);
 +			wpa_sha256_init(&ctx->u.sha256);
- 			sha256_process(&ctx->u.sha256, key, key_len);
- 			sha256_done(&ctx->u.sha256, tk);
++			wpa_sha256_process(&ctx->u.sha256, key, key_len);
++			wpa_sha256_done(&ctx->u.sha256, tk);
  			key = tk;
-@@ -125,7 +125,7 @@ struct crypto_hash * crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
+ 			key_len = 32;
+ 		}
+@@ -127,8 +127,8 @@ struct crypto_hash * crypto_hash_init(enum crypto_hash_alg alg, const u8 *key,
  			os_memset(k_pad + key_len, 0, sizeof(k_pad) - key_len);
  		for (i = 0; i < sizeof(k_pad); i++)
  			k_pad[i] ^= 0x36;
 -		sha256_init(&ctx->u.sha256);
+-		sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
 +		wpa_sha256_init(&ctx->u.sha256);
- 		sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
++		wpa_sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
  		break;
  #endif /* CONFIG_SHA256 */
-@@ -295,7 +295,7 @@ int crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
+ 	default:
+@@ -157,17 +157,17 @@ void crypto_hash_update(struct crypto_hash *ctx, const u8 *data, size_t len)
+ #ifdef CONFIG_SHA256
+ 	case CRYPTO_HASH_ALG_SHA256:
+ 	case CRYPTO_HASH_ALG_HMAC_SHA256:
+-		sha256_process(&ctx->u.sha256, data, len);
++		wpa_sha256_process(&ctx->u.sha256, data, len);
+ 		break;
+ #endif /* CONFIG_SHA256 */
+ #ifdef CONFIG_INTERNAL_SHA384
+ 	case CRYPTO_HASH_ALG_SHA384:
+-		sha384_process(&ctx->u.sha384, data, len);
++		wpa_sha384_process(&ctx->u.sha384, data, len);
+ 		break;
+ #endif /* CONFIG_INTERNAL_SHA384 */
+ #ifdef CONFIG_INTERNAL_SHA512
+ 	case CRYPTO_HASH_ALG_SHA512:
+-		sha512_process(&ctx->u.sha512, data, len);
++		wpa_sha512_process(&ctx->u.sha512, data, len);
+ 		break;
+ #endif /* CONFIG_INTERNAL_SHA512 */
+ 	default:
+@@ -216,7 +216,7 @@ int crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
+ 			return -1;
+ 		}
+ 		*len = 32;
+-		sha256_done(&ctx->u.sha256, mac);
++		wpa_sha256_done(&ctx->u.sha256, mac);
+ 		break;
+ #endif /* CONFIG_SHA256 */
+ #ifdef CONFIG_INTERNAL_SHA384
+@@ -227,7 +227,7 @@ int crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
+ 			return -1;
+ 		}
+ 		*len = 48;
+-		sha384_done(&ctx->u.sha384, mac);
++		wpa_sha384_done(&ctx->u.sha384, mac);
+ 		break;
+ #endif /* CONFIG_INTERNAL_SHA384 */
+ #ifdef CONFIG_INTERNAL_SHA512
+@@ -238,7 +238,7 @@ int crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
+ 			return -1;
+ 		}
+ 		*len = 64;
+-		sha512_done(&ctx->u.sha512, mac);
++		wpa_sha512_done(&ctx->u.sha512, mac);
+ 		break;
+ #endif /* CONFIG_INTERNAL_SHA512 */
+ 	case CRYPTO_HASH_ALG_HMAC_MD5:
+@@ -290,17 +290,17 @@ int crypto_hash_finish(struct crypto_hash *ctx, u8 *mac, size_t *len)
+ 		}
+ 		*len = 32;
+ 
+-		sha256_done(&ctx->u.sha256, mac);
++		wpa_sha256_done(&ctx->u.sha256, mac);
+ 
+ 		os_memcpy(k_pad, ctx->key, ctx->key_len);
+ 		os_memset(k_pad + ctx->key_len, 0,
  			  sizeof(k_pad) - ctx->key_len);
  		for (i = 0; i < sizeof(k_pad); i++)
  			k_pad[i] ^= 0x5c;
 -		sha256_init(&ctx->u.sha256);
+-		sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
+-		sha256_process(&ctx->u.sha256, mac, 32);
+-		sha256_done(&ctx->u.sha256, mac);
 +		wpa_sha256_init(&ctx->u.sha256);
- 		sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
- 		sha256_process(&ctx->u.sha256, mac, 32);
- 		sha256_done(&ctx->u.sha256, mac);
-diff --git a/components/wpa_supplicant/src/crypto/crypto_mbedtls.c b/components/wpa_supplicant/src/crypto/crypto_mbedtls.c
-index d640a64189..d32321657a 100644
---- a/components/wpa_supplicant/src/crypto/crypto_mbedtls.c
-+++ b/components/wpa_supplicant/src/crypto/crypto_mbedtls.c
-@@ -239,7 +239,7 @@ int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
- 			   len, mac);
- }
- 
--int hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
-+int wpa_hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
- 		size_t data_len, u8 *mac)
- {
- 	return hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
-@@ -312,7 +312,7 @@ void *aes_encrypt_init(const u8 *key, size_t len)
- 	return aes_crypt_init(MBEDTLS_AES_ENCRYPT, key, len);
- }
- 
--int aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
-+int wpa_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
- {
- 	return aes_crypt(ctx, MBEDTLS_AES_ENCRYPT, plain, crypt);
- }
-@@ -327,7 +327,7 @@ void * aes_decrypt_init(const u8 *key, size_t len)
- 	return aes_crypt_init(MBEDTLS_AES_DECRYPT, key, len);
- }
- 
--int aes_decrypt(void *ctx, const u8 *crypt, u8 *plain)
-+int wpa_aes_decrypt(void *ctx, const u8 *crypt, u8 *plain)
- {
- 	return aes_crypt(ctx, MBEDTLS_AES_DECRYPT, crypt, plain);
- }
++		wpa_sha256_process(&ctx->u.sha256, k_pad, sizeof(k_pad));
++		wpa_sha256_process(&ctx->u.sha256, mac, 32);
++		wpa_sha256_done(&ctx->u.sha256, mac);
+ 		break;
+ #endif /* CONFIG_SHA256 */
+ 	default:
 diff --git a/components/wpa_supplicant/src/crypto/crypto_ops.c b/components/wpa_supplicant/src/crypto/crypto_ops.c
-index d4aff08787..16b1364373 100644
+index 0346d17f5c..88af2421dd 100644
 --- a/components/wpa_supplicant/src/crypto/crypto_ops.c
 +++ b/components/wpa_supplicant/src/crypto/crypto_ops.c
-@@ -28,12 +28,12 @@ static int esp_aes_unwrap(const u8 *kek, int n, const u8 *cipher, u8 *plain)
+@@ -36,7 +36,7 @@ static int esp_aes_gmac(const u8 *key, size_t key_len, const u8 *iv, size_t iv_l
+ const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs = {
+     .size = sizeof(wpa_crypto_funcs_t),
+     .version = ESP_WIFI_CRYPTO_VERSION,
+-    .hmac_sha256_vector = (esp_hmac_sha256_vector_t)hmac_sha256_vector,
++    .hmac_sha256_vector = (esp_hmac_sha256_vector_t)wpa_hmac_sha256_vector,
+     .pbkdf2_sha1 = (esp_pbkdf2_sha1_t)pbkdf2_sha1,
+     .aes_128_encrypt = (esp_aes_128_encrypt_t)aes_128_cbc_encrypt,
+     .aes_128_decrypt = (esp_aes_128_decrypt_t)aes_128_cbc_decrypt,
+@@ -44,7 +44,7 @@ const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs = {
+     .ccmp_decrypt = (esp_ccmp_decrypt_t)ccmp_decrypt,
+     .ccmp_encrypt = (esp_ccmp_encrypt_t)ccmp_encrypt,
+     .aes_gmac = (esp_aes_gmac_t)esp_aes_gmac,
+-    .sha256_vector = (esp_sha256_vector_t)sha256_vector,
++    .sha256_vector = (esp_sha256_vector_t)wpa_sha256_vector,
+ };
  
- static void esp_aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
- {
--	aes_encrypt(ctx, plain, crypt);
-+	wpa_aes_encrypt(ctx, plain, crypt);
+ const mesh_crypto_funcs_t g_wifi_default_mesh_crypto_funcs = {
+diff --git a/components/wpa_supplicant/src/crypto/ms_funcs.c b/components/wpa_supplicant/src/crypto/ms_funcs.c
+index aff7d33f4e..a2e1ce799a 100644
+--- a/components/wpa_supplicant/src/crypto/ms_funcs.c
++++ b/components/wpa_supplicant/src/crypto/ms_funcs.c
+@@ -92,7 +92,7 @@ int challenge_hash(const u8 *peer_challenge, const u8 *auth_challenge,
+ 	addr[2] = username;
+ 	len[2] = username_len;
+ 
+-	if (sha1_vector(3, addr, len, hash))
++	if (wpa_sha1_vector(3, addr, len, hash))
+ 		return -1;
+ 	os_memcpy(challenge, hash, 8);
+ 	return 0;
+@@ -259,11 +259,11 @@ int generate_authenticator_response_pwhash(
+ 	addr2[2] = magic2;
+ 
+ 	if (hash_nt_password_hash(password_hash, password_hash_hash) ||
+-	    sha1_vector(3, addr1, len1, response) ||
++	    wpa_sha1_vector(3, addr1, len1, response) ||
+ 	    challenge_hash(peer_challenge, auth_challenge, username,
+ 			   username_len, challenge))
+ 		return -1;
+-	return sha1_vector(3, addr2, len2, response);
++	return wpa_sha1_vector(3, addr2, len2, response);
  }
  
- static void esp_aes_decrypt(void *ctx, const u8 *crypt, u8 *plain)
- {
--	aes_decrypt(ctx, crypt, plain);
-+	wpa_aes_decrypt(ctx, crypt, plain);
- }
  
- static int esp_aes_gmac(const u8 *key, size_t key_len, const u8 *iv, size_t iv_len,
+@@ -338,7 +338,7 @@ int get_master_key(const u8 *password_hash_hash, const u8 *nt_response,
+ 	addr[1] = nt_response;
+ 	addr[2] = magic1;
+ 
+-	if (sha1_vector(3, addr, len, hash))
++	if (wpa_sha1_vector(3, addr, len, hash))
+ 		return -1;
+ 	os_memcpy(master_key, hash, 16);
+ 	return 0;
+@@ -406,7 +406,7 @@ int get_asymetric_start_key(const u8 *master_key, u8 *session_key,
+ 	}
+ 	addr[3] = shs_pad2;
+ 
+-	if (sha1_vector(4, addr, len, digest))
++	if (wpa_sha1_vector(4, addr, len, digest))
+ 		return -1;
+ 
+ 	if (session_key_len > SHA1_MAC_LEN)
+diff --git a/components/wpa_supplicant/src/crypto/sha1-internal.c b/components/wpa_supplicant/src/crypto/sha1-internal.c
+index ffa04df017..f792cad221 100644
+--- a/components/wpa_supplicant/src/crypto/sha1-internal.c
++++ b/components/wpa_supplicant/src/crypto/sha1-internal.c
+@@ -28,7 +28,7 @@ void SHA1Transform(u32 state[5], const unsigned char buffer[64]);
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 of failure
+  */
+-int sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
++int wpa_sha1_vector(size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
+ {
+ 	SHA1_CTX ctx;
+ 	size_t i;
+diff --git a/components/wpa_supplicant/src/crypto/sha1-pbkdf2.c b/components/wpa_supplicant/src/crypto/sha1-pbkdf2.c
+index 8effe2fe06..d3e86f0d5f 100644
+--- a/components/wpa_supplicant/src/crypto/sha1-pbkdf2.c
++++ b/components/wpa_supplicant/src/crypto/sha1-pbkdf2.c
+@@ -37,13 +37,13 @@ static int pbkdf2_sha1_f(const char *passphrase, const u8 *ssid,
+ 	count_buf[1] = (count >> 16) & 0xff;
+ 	count_buf[2] = (count >> 8) & 0xff;
+ 	count_buf[3] = count & 0xff;
+-	if (hmac_sha1_vector((u8 *) passphrase, passphrase_len, 2, addr, len,
++	if (wpa_hmac_sha1_vector((u8 *) passphrase, passphrase_len, 2, addr, len,
+ 			     tmp))
+ 		return -1;
+ 	os_memcpy(digest, tmp, SHA1_MAC_LEN);
+ 
+ 	for (i = 1; i < iterations; i++) {
+-		if (hmac_sha1((u8 *) passphrase, passphrase_len, tmp,
++		if (wpa_hmac_sha1((u8 *) passphrase, passphrase_len, tmp,
+ 			      SHA1_MAC_LEN, tmp2))
+ 			return -1;
+ 		os_memcpy(tmp, tmp2, SHA1_MAC_LEN);
+diff --git a/components/wpa_supplicant/src/crypto/sha1-prf.c b/components/wpa_supplicant/src/crypto/sha1-prf.c
+index 13851494fb..3b44d9a26e 100644
+--- a/components/wpa_supplicant/src/crypto/sha1-prf.c
++++ b/components/wpa_supplicant/src/crypto/sha1-prf.c
+@@ -27,7 +27,7 @@
+  * This function is used to derive new, cryptographically separate keys from a
+  * given key (e.g., PMK in IEEE 802.11i).
+  */
+-int sha1_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha1_prf(const u8 *key, size_t key_len, const char *label,
+ 	     const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
+ {
+ 	u8 counter = 0;
+@@ -48,12 +48,12 @@ int sha1_prf(const u8 *key, size_t key_len, const char *label,
+ 	while (pos < buf_len) {
+ 		plen = buf_len - pos;
+ 		if (plen >= SHA1_MAC_LEN) {
+-			if (hmac_sha1_vector(key, key_len, 3, addr, len,
++			if (wpa_hmac_sha1_vector(key, key_len, 3, addr, len,
+ 					     &buf[pos]))
+ 				return -1;
+ 			pos += SHA1_MAC_LEN;
+ 		} else {
+-			if (hmac_sha1_vector(key, key_len, 3, addr, len,
++			if (wpa_hmac_sha1_vector(key, key_len, 3, addr, len,
+ 					     hash))
+ 				return -1;
+ 			os_memcpy(&buf[pos], hash, plen);
+diff --git a/components/wpa_supplicant/src/crypto/sha1-tlsprf.c b/components/wpa_supplicant/src/crypto/sha1-tlsprf.c
+index 5e8d15920c..c5a04b2b2a 100644
+--- a/components/wpa_supplicant/src/crypto/sha1-tlsprf.c
++++ b/components/wpa_supplicant/src/crypto/sha1-tlsprf.c
+@@ -69,7 +69,7 @@ int tls_prf_sha1_md5(const u8 *secret, size_t secret_len, const char *label,
+ 	}
+ 
+ 	hmac_md5_vector(S1, L_S1, 2, &MD5_addr[1], &MD5_len[1], A_MD5);
+-	hmac_sha1_vector(S2, L_S2, 2, &SHA1_addr[1], &SHA1_len[1], A_SHA1);
++    wpa_hmac_sha1_vector(S2, L_S2, 2, &SHA1_addr[1], &SHA1_len[1], A_SHA1);
+ 
+ 	MD5_pos = MD5_MAC_LEN;
+ 	SHA1_pos = SHA1_MAC_LEN;
+@@ -80,10 +80,10 @@ int tls_prf_sha1_md5(const u8 *secret, size_t secret_len, const char *label,
+ 			hmac_md5(S1, L_S1, A_MD5, MD5_MAC_LEN, A_MD5);
+ 		}
+ 		if (SHA1_pos == SHA1_MAC_LEN) {
+-			hmac_sha1_vector(S2, L_S2, 3, SHA1_addr, SHA1_len,
++		    wpa_hmac_sha1_vector(S2, L_S2, 3, SHA1_addr, SHA1_len,
+ 					 P_SHA1);
+ 			SHA1_pos = 0;
+-			hmac_sha1(S2, L_S2, A_SHA1, SHA1_MAC_LEN, A_SHA1);
++		    wpa_hmac_sha1(S2, L_S2, A_SHA1, SHA1_MAC_LEN, A_SHA1);
+ 		}
+ 
+ 		out[i] = P_MD5[MD5_pos] ^ P_SHA1[SHA1_pos];
+diff --git a/components/wpa_supplicant/src/crypto/sha1-tprf.c b/components/wpa_supplicant/src/crypto/sha1-tprf.c
+index c3acf19750..d0518e1eaa 100644
+--- a/components/wpa_supplicant/src/crypto/sha1-tprf.c
++++ b/components/wpa_supplicant/src/crypto/sha1-tprf.c
+@@ -26,7 +26,7 @@
+  * This function is used to derive new, cryptographically separate keys from a
+  * given key for EAP-FAST. T-PRF is defined in RFC 4851, Section 5.5.
+  */
+-int sha1_t_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha1_t_prf(const u8 *key, size_t key_len, const char *label,
+ 	       const u8 *seed, size_t seed_len, u8 *buf, size_t buf_len)
+ {
+ 	unsigned char counter = 0;
+@@ -54,7 +54,7 @@ int sha1_t_prf(const u8 *key, size_t key_len, const char *label,
+ 	while (pos < buf_len) {
+ 		counter++;
+ 		plen = buf_len - pos;
+-		if (hmac_sha1_vector(key, key_len, 5, addr, len, hash))
++		if (wpa_hmac_sha1_vector(key, key_len, 5, addr, len, hash))
+ 			return -1;
+ 		if (plen >= SHA1_MAC_LEN) {
+ 			os_memcpy(&buf[pos], hash, SHA1_MAC_LEN);
+diff --git a/components/wpa_supplicant/src/crypto/sha1.c b/components/wpa_supplicant/src/crypto/sha1.c
+index 76d7a68f26..127aa9cc1c 100644
+--- a/components/wpa_supplicant/src/crypto/sha1.c
++++ b/components/wpa_supplicant/src/crypto/sha1.c
+@@ -23,7 +23,7 @@
+  * @mac: Buffer for the hash (20 bytes)
+  * Returns: 0 on success, -1 on failure
+  */
+-int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 		     const u8 *addr[], const size_t *len, u8 *mac)
+ {
+ 	unsigned char k_pad[64]; /* padding - key XORd with ipad/opad */
+@@ -42,7 +42,7 @@ int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 
+         /* if key is longer than 64 bytes reset it to key = SHA1(key) */
+         if (key_len > 64) {
+-		if (sha1_vector(1, &key, &key_len, tk))
++		if (wpa_sha1_vector(1, &key, &key_len, tk))
+ 			return -1;
+ 		key = tk;
+ 		key_len = 20;
+@@ -71,7 +71,7 @@ int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 		_addr[i + 1] = addr[i];
+ 		_len[i + 1] = len[i];
+ 	}
+-	if (sha1_vector(1 + num_elem, _addr, _len, mac))
++	if (wpa_sha1_vector(1 + num_elem, _addr, _len, mac))
+ 		return -1;
+ 
+ 	os_memset(k_pad, 0, sizeof(k_pad));
+@@ -85,7 +85,7 @@ int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 	_len[0] = 64;
+ 	_addr[1] = mac;
+ 	_len[1] = SHA1_MAC_LEN;
+-	ret = sha1_vector(2, _addr, _len, mac);
++	ret = wpa_sha1_vector(2, _addr, _len, mac);
+ 	forced_memzero(k_pad, sizeof(k_pad));
+ 	forced_memzero(tk, sizeof(tk));
+ 	return ret;
+@@ -101,8 +101,8 @@ int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+  * @mac: Buffer for the hash (20 bytes)
+  * Returns: 0 on success, -1 of failure
+  */
+-int hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
++int wpa_hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
+ 	       u8 *mac)
+ {
+-	return hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
++	return wpa_hmac_sha1_vector(key, key_len, 1, &data, &data_len, mac);
+ }
+diff --git a/components/wpa_supplicant/src/crypto/sha1.h b/components/wpa_supplicant/src/crypto/sha1.h
+index 933cd81b95..cdf39f840a 100644
+--- a/components/wpa_supplicant/src/crypto/sha1.h
++++ b/components/wpa_supplicant/src/crypto/sha1.h
+@@ -11,13 +11,13 @@
+ 
+ #define SHA1_MAC_LEN 20
+ 
+-int hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha1_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 		     const u8 *addr[], const size_t *len, u8 *mac);
+-int hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
++int wpa_hmac_sha1(const u8 *key, size_t key_len, const u8 *data, size_t data_len,
+ 	       u8 *mac);
+-int sha1_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha1_prf(const u8 *key, size_t key_len, const char *label,
+ 	     const u8 *data, size_t data_len, u8 *buf, size_t buf_len);
+-int sha1_t_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha1_t_prf(const u8 *key, size_t key_len, const char *label,
+ 	       const u8 *seed, size_t seed_len, u8 *buf, size_t buf_len);
+ int __must_check tls_prf_sha1_md5(const u8 *secret, size_t secret_len,
+ 				  const char *label, const u8 *seed,
 diff --git a/components/wpa_supplicant/src/crypto/sha256-internal.c b/components/wpa_supplicant/src/crypto/sha256-internal.c
-index ff1e2ba168..d763fa6f06 100644
+index ff1e2ba168..bc9370d0a7 100644
 --- a/components/wpa_supplicant/src/crypto/sha256-internal.c
 +++ b/components/wpa_supplicant/src/crypto/sha256-internal.c
-@@ -31,7 +31,7 @@ int sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+@@ -22,7 +22,7 @@
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 of failure
+  */
+-int sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		  u8 *mac)
+ {
+ 	struct sha256_state ctx;
+@@ -31,11 +31,11 @@ int sha256_vector(size_t num_elem, const u8 *addr[], const size_t *len,
  	if (TEST_FAIL())
  		return -1;
  
 -	sha256_init(&ctx);
 +	wpa_sha256_init(&ctx);
  	for (i = 0; i < num_elem; i++)
- 		if (sha256_process(&ctx, addr[i], len[i]))
+-		if (sha256_process(&ctx, addr[i], len[i]))
++		if (wpa_sha256_process(&ctx, addr[i], len[i]))
  			return -1;
+-	if (sha256_done(&ctx, mac))
++	if (wpa_sha256_done(&ctx, mac))
+ 		return -1;
+ 	return 0;
+ }
+@@ -81,7 +81,7 @@ static const unsigned long K[64] = {
+ #endif
+ 
+ /* compress 512-bits */
+-static int sha256_compress(struct sha256_state *md, unsigned char *buf)
++static int wpa_sha256_compress(struct sha256_state *md, unsigned char *buf)
+ {
+ 	u32 S[8], W[64], t0, t1;
+ 	u32 t;
 @@ -124,7 +124,7 @@ static int sha256_compress(struct sha256_state *md, unsigned char *buf)
  
  
@@ -470,13 +1772,148 @@ index ff1e2ba168..d763fa6f06 100644
  {
  	md->curlen = 0;
  	md->length = 0;
+@@ -145,7 +145,7 @@ void sha256_init(struct sha256_state *md)
+    @param inlen  The length of the data (octets)
+    @return CRYPT_OK if successful
+ */
+-int sha256_process(struct sha256_state *md, const unsigned char *in,
++int wpa_sha256_process(struct sha256_state *md, const unsigned char *in,
+ 		   unsigned long inlen)
+ {
+ 	unsigned long n;
+@@ -155,7 +155,7 @@ int sha256_process(struct sha256_state *md, const unsigned char *in,
+ 
+ 	while (inlen > 0) {
+ 		if (md->curlen == 0 && inlen >= SHA256_BLOCK_SIZE) {
+-			if (sha256_compress(md, (unsigned char *) in) < 0)
++			if (wpa_sha256_compress(md, (unsigned char *) in) < 0)
+ 				return -1;
+ 			md->length += SHA256_BLOCK_SIZE * 8;
+ 			in += SHA256_BLOCK_SIZE;
+@@ -167,7 +167,7 @@ int sha256_process(struct sha256_state *md, const unsigned char *in,
+ 			in += n;
+ 			inlen -= n;
+ 			if (md->curlen == SHA256_BLOCK_SIZE) {
+-				if (sha256_compress(md, md->buf) < 0)
++				if (wpa_sha256_compress(md, md->buf) < 0)
+ 					return -1;
+ 				md->length += 8 * SHA256_BLOCK_SIZE;
+ 				md->curlen = 0;
+@@ -185,7 +185,7 @@ int sha256_process(struct sha256_state *md, const unsigned char *in,
+    @param out [out] The destination of the hash (32 bytes)
+    @return CRYPT_OK if successful
+ */
+-int sha256_done(struct sha256_state *md, unsigned char *out)
++int wpa_sha256_done(struct sha256_state *md, unsigned char *out)
+ {
+ 	int i;
+ 
+@@ -206,7 +206,7 @@ int sha256_done(struct sha256_state *md, unsigned char *out)
+ 		while (md->curlen < SHA256_BLOCK_SIZE) {
+ 			md->buf[md->curlen++] = (unsigned char) 0;
+ 		}
+-		sha256_compress(md, md->buf);
++		wpa_sha256_compress(md, md->buf);
+ 		md->curlen = 0;
+ 	}
+ 
+@@ -217,7 +217,7 @@ int sha256_done(struct sha256_state *md, unsigned char *out)
+ 
+ 	/* store length */
+ 	WPA_PUT_BE64(md->buf + 56, md->length);
+-	sha256_compress(md, md->buf);
++	wpa_sha256_compress(md, md->buf);
+ 
+ 	/* copy output */
+ 	for (i = 0; i < 8; i++)
+diff --git a/components/wpa_supplicant/src/crypto/sha256-kdf.c b/components/wpa_supplicant/src/crypto/sha256-kdf.c
+index 5a6b744552..271981157c 100644
+--- a/components/wpa_supplicant/src/crypto/sha256-kdf.c
++++ b/components/wpa_supplicant/src/crypto/sha256-kdf.c
+@@ -29,7 +29,7 @@
+  * with label = NULL and seed = info, this matches HKDF-Expand() defined in
+  * RFC 5869, Chapter 2.3.
+  */
+-int hmac_sha256_kdf(const u8 *secret, size_t secret_len,
++int wpa_hmac_sha256_kdf(const u8 *secret, size_t secret_len,
+ 		    const char *label, const u8 *seed, size_t seed_len,
+ 		    u8 *out, size_t outlen)
+ {
+@@ -53,7 +53,7 @@ int hmac_sha256_kdf(const u8 *secret, size_t secret_len,
+ 	addr[3] = &iter;
+ 	len[3] = 1;
+ 
+-	if (hmac_sha256_vector(secret, secret_len, 3, &addr[1], &len[1], T) < 0)
++	if (wpa_hmac_sha256_vector(secret, secret_len, 3, &addr[1], &len[1], T) < 0)
+ 		return -1;
+ 
+ 	pos = 0;
+@@ -74,7 +74,7 @@ int hmac_sha256_kdf(const u8 *secret, size_t secret_len,
+ 		}
+ 		iter++;
+ 
+-		if (hmac_sha256_vector(secret, secret_len, 4, addr, len, T) < 0)
++		if (wpa_hmac_sha256_vector(secret, secret_len, 4, addr, len, T) < 0)
+ 		{
+ 			os_memset(out, 0, outlen);
+ 			forced_memzero(T, SHA256_MAC_LEN);
+diff --git a/components/wpa_supplicant/src/crypto/sha256-prf.c b/components/wpa_supplicant/src/crypto/sha256-prf.c
+index d665a9983c..99371a92a0 100644
+--- a/components/wpa_supplicant/src/crypto/sha256-prf.c
++++ b/components/wpa_supplicant/src/crypto/sha256-prf.c
+@@ -27,10 +27,10 @@
+  * This function is used to derive new, cryptographically separate keys from a
+  * given key.
+  */
+-int sha256_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha256_prf(const u8 *key, size_t key_len, const char *label,
+ 		const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
+ {
+-	return sha256_prf_bits(key, key_len, label, data, data_len, buf,
++	return wpa_sha256_prf_bits(key, key_len, label, data, data_len, buf,
+ 			       buf_len * 8);
+ }
+ 
+@@ -51,7 +51,7 @@ int sha256_prf(const u8 *key, size_t key_len, const char *label,
+  * significant 1-7 bits of the last octet in the output are not part of the
+  * requested output.
+  */
+-int sha256_prf_bits(const u8 *key, size_t key_len, const char *label,
++int wpa_sha256_prf_bits(const u8 *key, size_t key_len, const char *label,
+ 		    const u8 *data, size_t data_len, u8 *buf,
+ 		    size_t buf_len_bits)
+ {
+@@ -78,12 +78,12 @@ int sha256_prf_bits(const u8 *key, size_t key_len, const char *label,
+ 		plen = buf_len - pos;
+ 		WPA_PUT_LE16(counter_le, counter);
+ 		if (plen >= SHA256_MAC_LEN) {
+-			if (hmac_sha256_vector(key, key_len, 4, addr, len,
++			if (wpa_hmac_sha256_vector(key, key_len, 4, addr, len,
+ 					       &buf[pos]) < 0)
+ 				return -1;
+ 			pos += SHA256_MAC_LEN;
+ 		} else {
+-			if (hmac_sha256_vector(key, key_len, 4, addr, len,
++			if (wpa_hmac_sha256_vector(key, key_len, 4, addr, len,
+ 					       hash) < 0)
+ 				return -1;
+ 			os_memcpy(&buf[pos], hash, plen);
 diff --git a/components/wpa_supplicant/src/crypto/sha256-tlsprf.c b/components/wpa_supplicant/src/crypto/sha256-tlsprf.c
-index 9045cd36b4..4d0c57e79e 100644
+index 9045cd36b4..0848667c41 100644
 --- a/components/wpa_supplicant/src/crypto/sha256-tlsprf.c
 +++ b/components/wpa_supplicant/src/crypto/sha256-tlsprf.c
-@@ -57,7 +57,7 @@ int tls_prf_sha256(const u8 *secret, size_t secret_len, const char *label,
+@@ -50,14 +50,14 @@ int tls_prf_sha256(const u8 *secret, size_t secret_len, const char *label,
+ 	 * PRF(secret, label, seed) = P_SHA256(secret, label + seed)
+ 	 */
+ 
+-	if (hmac_sha256_vector(secret, secret_len, 2, &addr[1], &len[1], A) < 0)
++	if (wpa_hmac_sha256_vector(secret, secret_len, 2, &addr[1], &len[1], A) < 0)
+ 		return -1;
+ 
+ 	pos = 0;
  	while (pos < outlen) {
- 		if (hmac_sha256_vector(secret, secret_len, 3, addr, len, P) <
+-		if (hmac_sha256_vector(secret, secret_len, 3, addr, len, P) <
++		if (wpa_hmac_sha256_vector(secret, secret_len, 3, addr, len, P) <
  		    0 ||
 -		    hmac_sha256(secret, secret_len, A, SHA256_MAC_LEN, A) < 0)
 +		    wpa_hmac_sha256(secret, secret_len, A, SHA256_MAC_LEN, A) < 0)
@@ -484,10 +1921,46 @@ index 9045cd36b4..4d0c57e79e 100644
  
  		clen = outlen - pos;
 diff --git a/components/wpa_supplicant/src/crypto/sha256.c b/components/wpa_supplicant/src/crypto/sha256.c
-index 17af964ad0..0fac0dd52d 100644
+index 17af964ad0..72f88b0501 100644
 --- a/components/wpa_supplicant/src/crypto/sha256.c
 +++ b/components/wpa_supplicant/src/crypto/sha256.c
-@@ -97,7 +97,7 @@ int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+@@ -23,7 +23,7 @@
+  * @mac: Buffer for the hash (32 bytes)
+  * Returns: 0 on success, -1 on failure
+  */
+-int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 		       const u8 *addr[], const size_t *len, u8 *mac)
+ {
+ 	unsigned char k_pad[64]; /* padding - key XORd with ipad/opad */
+@@ -41,7 +41,7 @@ int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 
+         /* if key is longer than 64 bytes reset it to key = SHA256(key) */
+         if (key_len > 64) {
+-		if (sha256_vector(1, &key, &key_len, tk) < 0)
++		if (wpa_sha256_vector(1, &key, &key_len, tk) < 0)
+ 			return -1;
+ 		key = tk;
+ 		key_len = 32;
+@@ -70,7 +70,7 @@ int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 		_addr[i + 1] = addr[i];
+ 		_len[i + 1] = len[i];
+ 	}
+-	if (sha256_vector(1 + num_elem, _addr, _len, mac) < 0)
++	if (wpa_sha256_vector(1 + num_elem, _addr, _len, mac) < 0)
+ 		return -1;
+ 
+ 	os_memset(k_pad, 0, sizeof(k_pad));
+@@ -84,7 +84,7 @@ int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 	_len[0] = 64;
+ 	_addr[1] = mac;
+ 	_len[1] = SHA256_MAC_LEN;
+-	return sha256_vector(2, _addr, _len, mac);
++	return wpa_sha256_vector(2, _addr, _len, mac);
+ }
+ 
+ 
+@@ -97,8 +97,8 @@ int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
   * @mac: Buffer for the hash (32 bytes)
   * Returns: 0 on success, -1 on failure
   */
@@ -495,76 +1968,1014 @@ index 17af964ad0..0fac0dd52d 100644
 +int wpa_hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
  		size_t data_len, u8 *mac)
  {
- 	return hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
+-	return hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
++	return wpa_hmac_sha256_vector(key, key_len, 1, &data, &data_len, mac);
+ }
 diff --git a/components/wpa_supplicant/src/crypto/sha256.h b/components/wpa_supplicant/src/crypto/sha256.h
-index 8054bbe5c5..7ce7ddebe9 100644
+index 8054bbe5c5..4f9b652aac 100644
 --- a/components/wpa_supplicant/src/crypto/sha256.h
 +++ b/components/wpa_supplicant/src/crypto/sha256.h
-@@ -13,7 +13,7 @@
+@@ -11,19 +11,19 @@
  
- int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
+ #define SHA256_MAC_LEN 32
+ 
+-int hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha256_vector(const u8 *key, size_t key_len, size_t num_elem,
  		       const u8 *addr[], const size_t *len, u8 *mac);
 -int hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
 +int wpa_hmac_sha256(const u8 *key, size_t key_len, const u8 *data,
  		size_t data_len, u8 *mac);
- int sha256_prf(const u8 *key, size_t key_len, const char *label,
+-int sha256_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha256_prf(const u8 *key, size_t key_len, const char *label,
  	       const u8 *data, size_t data_len, u8 *buf, size_t buf_len);
+-int sha256_prf_bits(const u8 *key, size_t key_len, const char *label,
++int wpa_sha256_prf_bits(const u8 *key, size_t key_len, const char *label,
+ 		    const u8 *data, size_t data_len, u8 *buf,
+ 		    size_t buf_len_bits);
+ int tls_prf_sha256(const u8 *secret, size_t secret_len,
+ 		   const char *label, const u8 *seed, size_t seed_len,
+ 		   u8 *out, size_t outlen);
+-int hmac_sha256_kdf(const u8 *secret, size_t secret_len,
++int wpa_hmac_sha256_kdf(const u8 *secret, size_t secret_len,
+ 		    const char *label, const u8 *seed, size_t seed_len,
+ 		    u8 *out, size_t outlen);
+ 
 diff --git a/components/wpa_supplicant/src/crypto/sha256_i.h b/components/wpa_supplicant/src/crypto/sha256_i.h
-index a502d2ba5d..c53558abd8 100644
+index a502d2ba5d..84b1ccce1a 100644
 --- a/components/wpa_supplicant/src/crypto/sha256_i.h
 +++ b/components/wpa_supplicant/src/crypto/sha256_i.h
-@@ -17,7 +17,7 @@ struct sha256_state {
+@@ -17,9 +17,9 @@ struct sha256_state {
  	u8 buf[SHA256_BLOCK_SIZE];
  };
  
 -void sha256_init(struct sha256_state *md);
+-int sha256_process(struct sha256_state *md, const unsigned char *in,
 +void wpa_sha256_init(struct sha256_state *md);
- int sha256_process(struct sha256_state *md, const unsigned char *in,
++int wpa_sha256_process(struct sha256_state *md, const unsigned char *in,
  		   unsigned long inlen);
- int sha256_done(struct sha256_state *md, unsigned char *out);
-diff --git a/components/wpa_supplicant/src/wps/wps_attr_build.c b/components/wpa_supplicant/src/wps/wps_attr_build.c
-index c61114bdb2..ce74875dab 100644
---- a/components/wpa_supplicant/src/wps/wps_attr_build.c
-+++ b/components/wpa_supplicant/src/wps/wps_attr_build.c
-@@ -324,7 +324,7 @@ int wps_build_key_wrap_auth(struct wps_data *wps, struct wpabuf *msg)
- 	u8 hash[SHA256_MAC_LEN];
+-int sha256_done(struct sha256_state *md, unsigned char *out);
++int wpa_sha256_done(struct sha256_state *md, unsigned char *out);
  
- 	wpa_printf(MSG_DEBUG,  "WPS:  * Key Wrap Authenticator");
--	hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, wpabuf_head(msg),
-+	wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, wpabuf_head(msg),
- 		            wpabuf_len(msg), hash);
- 	wpabuf_put_be16(msg, ATTR_KEY_WRAP_AUTH);
- 	wpabuf_put_be16(msg, WPS_KWA_LEN);
-diff --git a/components/wpa_supplicant/src/wps/wps_attr_process.c b/components/wpa_supplicant/src/wps/wps_attr_process.c
-index c298df3f69..880cacd8ae 100644
---- a/components/wpa_supplicant/src/wps/wps_attr_process.c
-+++ b/components/wpa_supplicant/src/wps/wps_attr_process.c
-@@ -68,7 +68,7 @@ int wps_process_key_wrap_auth(struct wps_data *wps, struct wpabuf *msg,
+ #endif /* SHA256_I_H */
+diff --git a/components/wpa_supplicant/src/crypto/sha384-internal.c b/components/wpa_supplicant/src/crypto/sha384-internal.c
+index 646f72979c..8577897d41 100644
+--- a/components/wpa_supplicant/src/crypto/sha384-internal.c
++++ b/components/wpa_supplicant/src/crypto/sha384-internal.c
+@@ -21,17 +21,17 @@
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 of failure
+  */
+-int sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		  u8 *mac)
+ {
+ 	struct sha384_state ctx;
+ 	size_t i;
+ 
+-	sha384_init(&ctx);
++	wpa_sha384_init(&ctx);
+ 	for (i = 0; i < num_elem; i++)
+-		if (sha384_process(&ctx, addr[i], len[i]))
++		if (wpa_sha384_process(&ctx, addr[i], len[i]))
+ 			return -1;
+-	if (sha384_done(&ctx, mac))
++	if (wpa_sha384_done(&ctx, mac))
+ 		return -1;
+ 	return 0;
+ }
+@@ -49,7 +49,7 @@ int sha384_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+    @param md   The hash state you wish to initialize
+    @return CRYPT_OK if successful
+ */
+-void sha384_init(struct sha384_state *md)
++void wpa_sha384_init(struct sha384_state *md)
+ {
+ 	md->curlen = 0;
+ 	md->length = 0;
+@@ -63,10 +63,10 @@ void sha384_init(struct sha384_state *md)
+ 	md->state[7] = CONST64(0x47b5481dbefa4fa4);
+ }
+ 
+-int sha384_process(struct sha384_state *md, const unsigned char *in,
++int wpa_sha384_process(struct sha384_state *md, const unsigned char *in,
+ 		   unsigned long inlen)
+ {
+-	return sha512_process(md, in, inlen);
++	return wpa_sha512_process(md, in, inlen);
+ }
+ 
+ /**
+@@ -75,14 +75,14 @@ int sha384_process(struct sha384_state *md, const unsigned char *in,
+    @param out [out] The destination of the hash (48 bytes)
+    @return CRYPT_OK if successful
+ */
+-int sha384_done(struct sha384_state *md, unsigned char *out)
++int wpa_sha384_done(struct sha384_state *md, unsigned char *out)
+ {
+ 	unsigned char buf[64];
+ 
+ 	if (md->curlen >= sizeof(md->buf))
+ 		return -1;
+ 
+-	if (sha512_done(md, buf) != 0)
++	if (wpa_sha512_done(md, buf) != 0)
+ 		return -1;
+ 
+ 	os_memcpy(out, buf, 48);
+diff --git a/components/wpa_supplicant/src/crypto/sha384-prf.c b/components/wpa_supplicant/src/crypto/sha384-prf.c
+index 420e78c380..4f1b6d555a 100644
+--- a/components/wpa_supplicant/src/crypto/sha384-prf.c
++++ b/components/wpa_supplicant/src/crypto/sha384-prf.c
+@@ -27,10 +27,10 @@
+  * This function is used to derive new, cryptographically separate keys from a
+  * given key.
+  */
+-int sha384_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha384_prf(const u8 *key, size_t key_len, const char *label,
+ 	       const u8 *data, size_t data_len, u8 *buf, size_t buf_len)
+ {
+-	return sha384_prf_bits(key, key_len, label, data, data_len, buf,
++	return wpa_sha384_prf_bits(key, key_len, label, data, data_len, buf,
+ 			       buf_len * 8);
+ }
+ 
+@@ -51,7 +51,7 @@ int sha384_prf(const u8 *key, size_t key_len, const char *label,
+  * significant 1-7 bits of the last octet in the output are not part of the
+  * requested output.
+  */
+-int sha384_prf_bits(const u8 *key, size_t key_len, const char *label,
++int wpa_sha384_prf_bits(const u8 *key, size_t key_len, const char *label,
+ 		    const u8 *data, size_t data_len, u8 *buf,
+ 		    size_t buf_len_bits)
+ {
+@@ -78,12 +78,12 @@ int sha384_prf_bits(const u8 *key, size_t key_len, const char *label,
+ 		plen = buf_len - pos;
+ 		WPA_PUT_LE16(counter_le, counter);
+ 		if (plen >= SHA384_MAC_LEN) {
+-			if (hmac_sha384_vector(key, key_len, 4, addr, len,
++			if (wpa_hmac_sha384_vector(key, key_len, 4, addr, len,
+ 					       &buf[pos]) < 0)
+ 				return -1;
+ 			pos += SHA384_MAC_LEN;
+ 		} else {
+-			if (hmac_sha384_vector(key, key_len, 4, addr, len,
++			if (wpa_hmac_sha384_vector(key, key_len, 4, addr, len,
+ 					       hash) < 0)
+ 				return -1;
+ 			os_memcpy(&buf[pos], hash, plen);
+diff --git a/components/wpa_supplicant/src/crypto/sha384-tlsprf.c b/components/wpa_supplicant/src/crypto/sha384-tlsprf.c
+index 9ff96ac2c7..a45d529c63 100644
+--- a/components/wpa_supplicant/src/crypto/sha384-tlsprf.c
++++ b/components/wpa_supplicant/src/crypto/sha384-tlsprf.c
+@@ -50,14 +50,14 @@ int tls_prf_sha384(const u8 *secret, size_t secret_len, const char *label,
+ 	 * PRF(secret, label, seed) = P_SHA384(secret, label + seed)
+ 	 */
+ 
+-	if (hmac_sha384_vector(secret, secret_len, 2, &addr[1], &len[1], A) < 0)
++	if (wpa_hmac_sha384_vector(secret, secret_len, 2, &addr[1], &len[1], A) < 0)
+ 		return -1;
+ 
+ 	pos = 0;
+ 	while (pos < outlen) {
+-		if (hmac_sha384_vector(secret, secret_len, 3, addr, len, P) <
++		if (wpa_hmac_sha384_vector(secret, secret_len, 3, addr, len, P) <
+ 		    0 ||
+-		    hmac_sha384(secret, secret_len, A, SHA384_MAC_LEN, A) < 0)
++		    wpa_hmac_sha384(secret, secret_len, A, SHA384_MAC_LEN, A) < 0)
+ 			return -1;
+ 
+ 		clen = outlen - pos;
+diff --git a/components/wpa_supplicant/src/crypto/sha384.h b/components/wpa_supplicant/src/crypto/sha384.h
+index 1a2c1edffb..1259540534 100644
+--- a/components/wpa_supplicant/src/crypto/sha384.h
++++ b/components/wpa_supplicant/src/crypto/sha384.h
+@@ -12,19 +12,19 @@
+ #define SHA384_MAC_LEN 48
+ #define SHA512_MAC_LEN 64
+ 
+-int hmac_sha384_vector(const u8 *key, size_t key_len, size_t num_elem,
++int wpa_hmac_sha384_vector(const u8 *key, size_t key_len, size_t num_elem,
+ 		       const u8 *addr[], const size_t *len, u8 *mac);
+-int hmac_sha384(const u8 *key, size_t key_len, const u8 *data,
++int wpa_hmac_sha384(const u8 *key, size_t key_len, const u8 *data,
+ 		size_t data_len, u8 *mac);
+-int sha384_prf(const u8 *key, size_t key_len, const char *label,
++int wpa_sha384_prf(const u8 *key, size_t key_len, const char *label,
+ 	       const u8 *data, size_t data_len, u8 *buf, size_t buf_len);
+-int sha384_prf_bits(const u8 *key, size_t key_len, const char *label,
++int wpa_sha384_prf_bits(const u8 *key, size_t key_len, const char *label,
+ 		    const u8 *data, size_t data_len, u8 *buf,
+ 		    size_t buf_len_bits);
+ int tls_prf_sha384(const u8 *secret, size_t secret_len,
+ 		   const char *label, const u8 *seed, size_t seed_len,
+ 		   u8 *out, size_t outlen);
+-int hmac_sha384_kdf(const u8 *secret, size_t secret_len,
++int wpa_hmac_sha384_kdf(const u8 *secret, size_t secret_len,
+ 		    const char *label, const u8 *seed, size_t seed_len,
+ 		    u8 *out, size_t outlen);
+ 
+diff --git a/components/wpa_supplicant/src/crypto/sha384_i.h b/components/wpa_supplicant/src/crypto/sha384_i.h
+index a00253ff2c..a56c9656dc 100644
+--- a/components/wpa_supplicant/src/crypto/sha384_i.h
++++ b/components/wpa_supplicant/src/crypto/sha384_i.h
+@@ -15,9 +15,9 @@
+ 
+ #define sha384_state sha512_state
+ 
+-void sha384_init(struct sha384_state *md);
+-int sha384_process(struct sha384_state *md, const unsigned char *in,
++void wpa_sha384_init(struct sha384_state *md);
++int wpa_sha384_process(struct sha384_state *md, const unsigned char *in,
+ 		   unsigned long inlen);
+-int sha384_done(struct sha384_state *md, unsigned char *out);
++int wpa_sha384_done(struct sha384_state *md, unsigned char *out);
+ 
+ #endif /* SHA384_I_H */
+diff --git a/components/wpa_supplicant/src/crypto/sha512-internal.c b/components/wpa_supplicant/src/crypto/sha512-internal.c
+index c0263941c1..b8fb97ddfe 100644
+--- a/components/wpa_supplicant/src/crypto/sha512-internal.c
++++ b/components/wpa_supplicant/src/crypto/sha512-internal.c
+@@ -21,17 +21,17 @@
+  * @mac: Buffer for the hash
+  * Returns: 0 on success, -1 of failure
+  */
+-int sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
++int wpa_sha512_vector(size_t num_elem, const u8 *addr[], const size_t *len,
+ 		  u8 *mac)
+ {
+ 	struct sha512_state ctx;
+ 	size_t i;
+ 
+-	sha512_init(&ctx);
++	wpa_sha512_init(&ctx);
+ 	for (i = 0; i < num_elem; i++)
+-		if (sha512_process(&ctx, addr[i], len[i]))
++		if (wpa_sha512_process(&ctx, addr[i], len[i]))
+ 			return -1;
+-	if (sha512_done(&ctx, mac))
++	if (wpa_sha512_done(&ctx, mac))
+ 		return -1;
+ 	return 0;
+ }
+@@ -107,7 +107,7 @@ static const u64 K[80] = {
+       CONST64(0xFFFFFFFFFFFFFFFF))
+ 
+ /* compress 1024-bits */
+-static int sha512_compress(struct sha512_state *md, unsigned char *buf)
++static int wpa_sha512_compress(struct sha512_state *md, unsigned char *buf)
+ {
+ 	u64 S[8], t0, t1;
+ 	u64 *W;
+@@ -161,7 +161,7 @@ static int sha512_compress(struct sha512_state *md, unsigned char *buf)
+    @param md   The hash state you wish to initialize
+    @return CRYPT_OK if successful
+ */
+-void sha512_init(struct sha512_state *md)
++void wpa_sha512_init(struct sha512_state *md)
+ {
+ 	md->curlen = 0;
+ 	md->length = 0;
+@@ -183,7 +183,7 @@ void sha512_init(struct sha512_state *md)
+    @param inlen  The length of the data (octets)
+    @return CRYPT_OK if successful
+ */
+-int sha512_process(struct sha512_state *md, const unsigned char *in,
++int wpa_sha512_process(struct sha512_state *md, const unsigned char *in,
+ 		   unsigned long inlen)
+ {
+ 	unsigned long n;
+@@ -193,7 +193,7 @@ int sha512_process(struct sha512_state *md, const unsigned char *in,
+ 
+ 	while (inlen > 0) {
+ 		if (md->curlen == 0 && inlen >= SHA512_BLOCK_SIZE) {
+-			if (sha512_compress(md, (unsigned char *) in) < 0)
++			if (wpa_sha512_compress(md, (unsigned char *) in) < 0)
+ 				return -1;
+ 			md->length += SHA512_BLOCK_SIZE * 8;
+ 			in += SHA512_BLOCK_SIZE;
+@@ -205,7 +205,7 @@ int sha512_process(struct sha512_state *md, const unsigned char *in,
+ 			in += n;
+ 			inlen -= n;
+ 			if (md->curlen == SHA512_BLOCK_SIZE) {
+-				if (sha512_compress(md, md->buf) < 0)
++				if (wpa_sha512_compress(md, md->buf) < 0)
+ 					return -1;
+ 				md->length += 8 * SHA512_BLOCK_SIZE;
+ 				md->curlen = 0;
+@@ -223,7 +223,7 @@ int sha512_process(struct sha512_state *md, const unsigned char *in,
+    @param out [out] The destination of the hash (64 bytes)
+    @return CRYPT_OK if successful
+ */
+-int sha512_done(struct sha512_state *md, unsigned char *out)
++int wpa_sha512_done(struct sha512_state *md, unsigned char *out)
+ {
+ 	int i;
+ 
+@@ -244,7 +244,7 @@ int sha512_done(struct sha512_state *md, unsigned char *out)
+ 		while (md->curlen < 128) {
+ 			md->buf[md->curlen++] = (unsigned char) 0;
+ 		}
+-		sha512_compress(md, md->buf);
++	    wpa_sha512_compress(md, md->buf);
+ 		md->curlen = 0;
+ 	}
+ 
+@@ -258,7 +258,7 @@ int sha512_done(struct sha512_state *md, unsigned char *out)
+ 
+ 	/* store length */
+ 	WPA_PUT_BE64(md->buf + 120, md->length);
+-	sha512_compress(md, md->buf);
++    wpa_sha512_compress(md, md->buf);
+ 
+ 	/* copy output */
+ 	for (i = 0; i < 8; i++)
+diff --git a/components/wpa_supplicant/src/crypto/sha512_i.h b/components/wpa_supplicant/src/crypto/sha512_i.h
+index 108958911e..1100b8eae8 100644
+--- a/components/wpa_supplicant/src/crypto/sha512_i.h
++++ b/components/wpa_supplicant/src/crypto/sha512_i.h
+@@ -17,9 +17,9 @@ struct sha512_state {
+ 	u8 buf[SHA512_BLOCK_SIZE];
+ };
+ 
+-void sha512_init(struct sha512_state *md);
+-int sha512_process(struct sha512_state *md, const unsigned char *in,
++void wpa_sha512_init(struct sha512_state *md);
++int wpa_sha512_process(struct sha512_state *md, const unsigned char *in,
+ 		   unsigned long inlen);
+-int sha512_done(struct sha512_state *md, unsigned char *out);
++int wpa_sha512_done(struct sha512_state *md, unsigned char *out);
+ 
+ #endif /* SHA512_I_H */
+diff --git a/components/wpa_supplicant/src/eap_peer/eap_fast.c b/components/wpa_supplicant/src/eap_peer/eap_fast.c
+index 2031c53933..833c487d7e 100644
+--- a/components/wpa_supplicant/src/eap_peer/eap_fast.c
++++ b/components/wpa_supplicant/src/eap_peer/eap_fast.c
+@@ -630,7 +630,7 @@ static void eap_fast_write_crypto_binding(
+ 	rbind->subtype = EAP_TLV_CRYPTO_BINDING_SUBTYPE_RESPONSE;
+ 	os_memcpy(rbind->nonce, _bind->nonce, sizeof(_bind->nonce));
+ 	inc_byte_array(rbind->nonce, sizeof(rbind->nonce));
+-	hmac_sha1(cmk, EAP_FAST_CMK_LEN, (u8 *) rbind, sizeof(*rbind),
++    wpa_hmac_sha1(cmk, EAP_FAST_CMK_LEN, (u8 *) rbind, sizeof(*rbind),
+ 		  rbind->compound_mac);
+ 
+ 	wpa_printf(MSG_DEBUG, "EAP-FAST: Reply Crypto-Binding TLV: Version %d "
+@@ -709,7 +709,7 @@ static int eap_fast_get_cmk(struct eap_sm *sm, struct eap_fast_data *data,
+ 	if (eap_fast_get_phase2_key(sm, data, isk, sizeof(isk)) < 0)
+ 		return -1;
+ 	wpa_hexdump_key(MSG_MSGDUMP, "EAP-FAST: ISK[j]", isk, sizeof(isk));
+-	if (sha1_t_prf(data->simck, EAP_FAST_SIMCK_LEN,
++	if (wpa_sha1_t_prf(data->simck, EAP_FAST_SIMCK_LEN,
+ 		       "Inner Methods Compound Keys",
+ 		       isk, sizeof(isk), imck, sizeof(imck)) < 0)
+ 		return -1;
+@@ -771,7 +771,7 @@ static struct wpabuf * eap_fast_process_crypto_binding(
+ 	os_memset(_bind->compound_mac, 0, sizeof(cmac));
+ 	wpa_hexdump(MSG_MSGDUMP, "EAP-FAST: Crypto-Binding TLV for Compound "
+ 		    "MAC calculation", (u8 *) _bind, bind_len);
+-	hmac_sha1(cmk, EAP_FAST_CMK_LEN, (u8 *) _bind, bind_len,
++    wpa_hmac_sha1(cmk, EAP_FAST_CMK_LEN, (u8 *) _bind, bind_len,
+ 		  _bind->compound_mac);
+ 	res = os_memcmp_const(cmac, _bind->compound_mac, sizeof(cmac));
+ 	wpa_hexdump(MSG_DEBUG, "EAP-FAST: Received Compound MAC",
+diff --git a/components/wpa_supplicant/src/eap_peer/eap_fast_common.c b/components/wpa_supplicant/src/eap_peer/eap_fast_common.c
+index bb64ca750b..675f16dac5 100644
+--- a/components/wpa_supplicant/src/eap_peer/eap_fast_common.c
++++ b/components/wpa_supplicant/src/eap_peer/eap_fast_common.c
+@@ -84,7 +84,7 @@ void eap_fast_derive_master_secret(const u8 *pac_key, const u8 *server_random,
+ 	 */
+ 	os_memcpy(seed, server_random, TLS_RANDOM_LEN);
+ 	os_memcpy(seed + TLS_RANDOM_LEN, client_random, TLS_RANDOM_LEN);
+-	sha1_t_prf(pac_key, EAP_FAST_PAC_KEY_LEN,
++	wpa_sha1_t_prf(pac_key, EAP_FAST_PAC_KEY_LEN,
+ 		   "PAC to master secret label hash",
+ 		   seed, sizeof(seed), master_secret, TLS_MASTER_SECRET_LEN);
+ 
+@@ -117,7 +117,7 @@ int eap_fast_derive_eap_msk(const u8 *simck, u8 *msk)
+ 	 * MSK = T-PRF(S-IMCK[j], "Session Key Generating Function", 64)
+ 	 */
+ 
+-	if (sha1_t_prf(simck, EAP_FAST_SIMCK_LEN,
++	if (wpa_sha1_t_prf(simck, EAP_FAST_SIMCK_LEN,
+ 		       "Session Key Generating Function", (u8 *) "", 0,
+ 		       msk, EAP_FAST_KEY_LEN) < 0)
+ 		return -1;
+@@ -135,7 +135,7 @@ int eap_fast_derive_eap_emsk(const u8 *simck, u8 *emsk)
+ 	 *        "Extended Session Key Generating Function", 64)
+ 	 */
+ 
+-	if (sha1_t_prf(simck, EAP_FAST_SIMCK_LEN,
++	if (wpa_sha1_t_prf(simck, EAP_FAST_SIMCK_LEN,
+ 		       "Extended Session Key Generating Function", (u8 *) "", 0,
+ 		       emsk, EAP_EMSK_LEN) < 0)
+ 		return -1;
+diff --git a/components/wpa_supplicant/src/eap_peer/eap_peap.c b/components/wpa_supplicant/src/eap_peer/eap_peap.c
+index 312536a880..1c7075e6c0 100644
+--- a/components/wpa_supplicant/src/eap_peer/eap_peap.c
++++ b/components/wpa_supplicant/src/eap_peer/eap_peap.c
+@@ -363,7 +363,7 @@ eap_tlv_add_cryptobinding(struct eap_sm *sm,
+ 		    addr[0], len[0]);
+ 	wpa_hexdump(MSG_MSGDUMP, "EAP-PEAP: Compound_MAC data 2",
+ 		    addr[1], len[1]);
+-	hmac_sha1_vector(data->cmk, 20, 2, addr, len, mac);
++    wpa_hmac_sha1_vector(data->cmk, 20, 2, addr, len, mac);
+ 	wpa_hexdump(MSG_MSGDUMP, "EAP-PEAP: Compound_MAC", mac, SHA1_MAC_LEN);
+ 	data->crypto_binding_used = 1;
+ 
+@@ -458,7 +458,7 @@ eap_tlv_validate_cryptobinding(struct eap_sm *sm,
+ 	buf[60] = EAP_TYPE_PEAP;
+ 	wpa_hexdump(MSG_DEBUG, "EAP-PEAP: Compound_MAC data",
+ 		    buf, sizeof(buf));
+-	hmac_sha1(data->cmk, 20, buf, sizeof(buf), mac);
++    wpa_hmac_sha1(data->cmk, 20, buf, sizeof(buf), mac);
+ 
+ 	if (os_memcmp(mac, pos, SHA1_MAC_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "EAP-PEAP: Invalid Compound_MAC in "
+diff --git a/components/wpa_supplicant/src/eap_peer/eap_peap_common.c b/components/wpa_supplicant/src/eap_peer/eap_peap_common.c
+index 2cafe71975..2d078ceb89 100644
+--- a/components/wpa_supplicant/src/eap_peer/eap_peap_common.c
++++ b/components/wpa_supplicant/src/eap_peer/eap_peap_common.c
+@@ -72,7 +72,7 @@ peap_prfplus(int version, const u8 *key, size_t key_len,
+ 	while (pos < buf_len) {
+ 		counter++;
+ 		plen = buf_len - pos;
+-		if (hmac_sha1_vector(key, key_len, 5, addr, len, hash) < 0)
++		if (wpa_hmac_sha1_vector(key, key_len, 5, addr, len, hash) < 0)
+ 			return -1;
+ 		if (plen >= SHA1_MAC_LEN) {
+ 			os_memcpy(&buf[pos], hash, SHA1_MAC_LEN);
+diff --git a/components/wpa_supplicant/src/eap_server/eap_server.c b/components/wpa_supplicant/src/eap_server/eap_server.c
+index a0aaf8e652..a6ba3c3ee5 100644
+--- a/components/wpa_supplicant/src/eap_server/eap_server.c
++++ b/components/wpa_supplicant/src/eap_server/eap_server.c
+@@ -462,7 +462,7 @@ static void eap_server_erp_init(struct eap_sm *sm)
+ 	wpa_hexdump_key(MSG_DEBUG, "EAP: EMSK", emsk, emsk_len);
+ 
+ 	WPA_PUT_BE16(len, EAP_EMSK_NAME_LEN);
+-	if (hmac_sha256_kdf(sm->eap_if.eapSessionId, sm->eap_if.eapSessionIdLen,
++	if (wpa_hmac_sha256_kdf(sm->eap_if.eapSessionId, sm->eap_if.eapSessionIdLen,
+ 			    "EMSK", len, sizeof(len),
+ 			    EMSKname, EAP_EMSK_NAME_LEN) < 0) {
+ 		wpa_printf(MSG_DEBUG, "EAP: Could not derive EMSKname");
+@@ -476,7 +476,7 @@ static void eap_server_erp_init(struct eap_sm *sm)
+ 	os_memcpy(&erp->keyname_nai[pos + 1], domain, domain_len);
+ 
+ 	WPA_PUT_BE16(len, emsk_len);
+-	if (hmac_sha256_kdf(emsk, emsk_len,
++	if (wpa_hmac_sha256_kdf(emsk, emsk_len,
+ 			    "EAP Re-authentication Root Key@ietf.org",
+ 			    len, sizeof(len), erp->rRK, emsk_len) < 0) {
+ 		wpa_printf(MSG_DEBUG, "EAP: Could not derive rRK for ERP");
+@@ -487,7 +487,7 @@ static void eap_server_erp_init(struct eap_sm *sm)
+ 
+ 	ctx[0] = EAP_ERP_CS_HMAC_SHA256_128;
+ 	WPA_PUT_BE16(&ctx[1], erp->rRK_len);
+-	if (hmac_sha256_kdf(erp->rRK, erp->rRK_len,
++	if (wpa_hmac_sha256_kdf(erp->rRK, erp->rRK_len,
+ 			    "Re-authentication Integrity Key@ietf.org",
+ 			    ctx, sizeof(ctx), erp->rIK, erp->rRK_len) < 0) {
+ 		wpa_printf(MSG_DEBUG, "EAP: Could not derive rIK for ERP");
+@@ -743,7 +743,7 @@ static void erp_send_finish_reauth(struct eap_sm *sm,
+ 
+ 	if (erp) {
+ 		wpabuf_put_u8(msg, erp->cryptosuite);
+-		if (hmac_sha256(erp->rIK, erp->rIK_len,
++		if (wpa_hmac_sha256(erp->rIK, erp->rIK_len,
+ 				wpabuf_head(msg), wpabuf_len(msg), hash) < 0) {
+ 			wpabuf_free(msg);
+ 			return;
+@@ -776,7 +776,7 @@ static void erp_send_finish_reauth(struct eap_sm *sm,
+ 
+ 	WPA_PUT_BE16(seed, seq);
+ 	WPA_PUT_BE16(&seed[2], erp->rRK_len);
+-	if (hmac_sha256_kdf(erp->rRK, erp->rRK_len,
++	if (wpa_hmac_sha256_kdf(erp->rRK, erp->rRK_len,
+ 			    "Re-authentication Master Session Key@ietf.org",
+ 			    seed, sizeof(seed),
+ 			    sm->eap_if.eapKeyData, erp->rRK_len) < 0) {
+@@ -928,7 +928,7 @@ SM_STATE(EAP, INITIATE_RECEIVED)
+ 	}
+ 
+ 	if (hash_len) {
+-		if (hmac_sha256(erp->rIK, erp->rIK_len, hdr,
++		if (wpa_hmac_sha256(erp->rIK, erp->rIK_len, hdr,
+ 				end - hdr - hash_len, hash) < 0)
+ 			goto fail;
+ 		if (os_memcmp(end - hash_len, hash, hash_len) != 0) {
+@@ -941,7 +941,7 @@ SM_STATE(EAP, INITIATE_RECEIVED)
+ 	/* Check if any supported CS results in matching tag */
+ 	if (!hash_len && max_len >= 1 + 32 &&
+ 	    end[-33] == EAP_ERP_CS_HMAC_SHA256_256) {
+-		if (hmac_sha256(erp->rIK, erp->rIK_len, hdr,
++		if (wpa_hmac_sha256(erp->rIK, erp->rIK_len, hdr,
+ 				end - hdr - 32, hash) < 0)
+ 			goto fail;
+ 		if (os_memcmp(end - 32, hash, 32) == 0) {
+@@ -953,7 +953,7 @@ SM_STATE(EAP, INITIATE_RECEIVED)
+ 	}
+ 
+ 	if (!hash_len && end[-17] == EAP_ERP_CS_HMAC_SHA256_128) {
+-		if (hmac_sha256(erp->rIK, erp->rIK_len, hdr,
++		if (wpa_hmac_sha256(erp->rIK, erp->rIK_len, hdr,
+ 				end - hdr - 16, hash) < 0)
+ 			goto fail;
+ 		if (os_memcmp(end - 16, hash, 16) == 0) {
+diff --git a/components/wpa_supplicant/src/rsn_supp/wpa.c b/components/wpa_supplicant/src/rsn_supp/wpa.c
+index aef17fc9c0..0ead21a2c8 100644
+--- a/components/wpa_supplicant/src/rsn_supp/wpa.c
++++ b/components/wpa_supplicant/src/rsn_supp/wpa.c
+@@ -2945,7 +2945,7 @@ int owe_process_assoc_resp(const u8 *rsn_ie, size_t rsn_len, const uint8_t *dh_i
+     addr[1] = dh_ie + 2;
+     len[1] = dh_len - 2;
+ 
+-    int res = sha256_vector(2, addr, len, pmkid);
++    int res = wpa_sha256_vector(2, addr, len, pmkid);
+     if (res < 0 ) {
+         goto fail;
+     }
+@@ -2969,7 +2969,7 @@ int owe_process_assoc_resp(const u8 *rsn_ie, size_t rsn_len, const uint8_t *dh_i
+     wpabuf_put_data(hkey, dh_ie + 2, dh_len - 2); /* A */
+     wpabuf_put_le16(hkey, sm->owe_group); /* group */
+ 
+-    res = hmac_sha256(wpabuf_head(hkey), wpabuf_len(hkey), wpabuf_head(sh_secret), wpabuf_len(sh_secret), prk);
++    res = wpa_hmac_sha256(wpabuf_head(hkey), wpabuf_len(hkey), wpabuf_head(sh_secret), wpabuf_len(sh_secret), prk);
+     if (res < 0 ) {
+         goto fail;
+     }
+@@ -2982,7 +2982,7 @@ int owe_process_assoc_resp(const u8 *rsn_ie, size_t rsn_len, const uint8_t *dh_i
+     wpa_hexdump_key(MSG_DEBUG, "OWE: prk", prk, hash_len);
+ 
+     /* PMK = HKDF-expand(prk, "OWE Key Generation", n) */
+-    res = hmac_sha256_kdf(prk, hash_len, NULL, (const u8 *)info,
++    res = wpa_hmac_sha256_kdf(prk, hash_len, NULL, (const u8 *)info,
+     os_strlen(info), pmk, hash_len);
+     if (res < 0 ) {
+         goto fail;
+diff --git a/components/wpa_supplicant/src/tls/pkcs5.c b/components/wpa_supplicant/src/tls/pkcs5.c
+index 7bef89b4fd..ccee6d78e6 100644
+--- a/components/wpa_supplicant/src/tls/pkcs5.c
++++ b/components/wpa_supplicant/src/tls/pkcs5.c
+@@ -444,13 +444,13 @@ static int pkcs12_key_gen(const u8 *pw, size_t pw_len, const u8 *salt,
+ 		len[0] = v;
+ 		addr[1] = I;
+ 		len[1] = S_len + P_len;
+-		if (sha1_vector(2, addr, len, hash) < 0)
++		if (wpa_sha1_vector(2, addr, len, hash) < 0)
+ 			goto done;
+ 
+ 		addr[0] = hash;
+ 		len[0] = SHA1_MAC_LEN;
+ 		for (i = 1; i < iter; i++) {
+-			if (sha1_vector(1, addr, len, hash) < 0)
++			if (wpa_sha1_vector(1, addr, len, hash) < 0)
+ 				goto done;
+ 		}
+ 
+diff --git a/components/wpa_supplicant/src/tls/tlsv1_client_ocsp.c b/components/wpa_supplicant/src/tls/tlsv1_client_ocsp.c
+index 128f4b5b9e..c4d06c3de9 100644
+--- a/components/wpa_supplicant/src/tls/tlsv1_client_ocsp.c
++++ b/components/wpa_supplicant/src/tls/tlsv1_client_ocsp.c
+@@ -55,7 +55,7 @@ static int ocsp_responder_id_match(struct x509_certificate *signer,
+ 		const u8 *addr[1] = { signer->public_key };
+ 		size_t len[1] = { signer->public_key_len };
+ 
+-		if (sha1_vector(1, addr, len, hash) < 0)
++		if (wpa_sha1_vector(1, addr, len, hash) < 0)
+ 			return 0;
+ 		return os_memcmp(hash, key_hash, SHA1_MAC_LEN) == 0;
+ 	}
+@@ -72,28 +72,28 @@ static unsigned int ocsp_hash_data(struct asn1_oid *alg, const u8 *data,
+ 	char buf[100];
+ 
+ 	if (x509_sha1_oid(alg)) {
+-		if (sha1_vector(1, addr, len, hash) < 0)
++		if (wpa_sha1_vector(1, addr, len, hash) < 0)
+ 			return 0;
+ 		wpa_hexdump(MSG_MSGDUMP, "OCSP: Hash (SHA1)", hash, 20);
+ 		return 20;
+ 	}
+ 
+ 	if (x509_sha256_oid(alg)) {
+-		if (sha256_vector(1, addr, len, hash) < 0)
++		if (wpa_sha256_vector(1, addr, len, hash) < 0)
+ 			return 0;
+ 		wpa_hexdump(MSG_MSGDUMP, "OCSP: Hash (SHA256)", hash, 32);
+ 		return 32;
+ 	}
+ 
+ 	if (x509_sha384_oid(alg)) {
+-		if (sha384_vector(1, addr, len, hash) < 0)
++		if (wpa_sha384_vector(1, addr, len, hash) < 0)
+ 			return 0;
+ 		wpa_hexdump(MSG_MSGDUMP, "OCSP: Hash (SHA384)", hash, 48);
+ 		return 48;
+ 	}
+ 
+ 	if (x509_sha512_oid(alg)) {
+-		if (sha512_vector(1, addr, len, hash) < 0)
++		if (wpa_sha512_vector(1, addr, len, hash) < 0)
+ 			return 0;
+ 		wpa_hexdump(MSG_MSGDUMP, "OCSP: Hash (SHA512)", hash, 64);
+ 		return 64;
+diff --git a/components/wpa_supplicant/src/tls/tlsv1_client_read.c b/components/wpa_supplicant/src/tls/tlsv1_client_read.c
+index 3394873655..e13a7fc8dc 100644
+--- a/components/wpa_supplicant/src/tls/tlsv1_client_read.c
++++ b/components/wpa_supplicant/src/tls/tlsv1_client_read.c
+@@ -304,7 +304,7 @@ static void tls_peer_cert_event(struct tlsv1_client *conn, int depth,
+ 		size_t len[1];
+ 		addr[0] = wpabuf_head(cert_buf);
+ 		len[0] = wpabuf_len(cert_buf);
+-		if (sha256_vector(1, addr, len, hash) == 0) {
++		if (wpa_sha256_vector(1, addr, len, hash) == 0) {
+ 			ev.peer_cert.hash = hash;
+ 			ev.peer_cert.hash_len = sizeof(hash);
+ 		}
+@@ -519,7 +519,7 @@ static int tls_process_certificate(struct tlsv1_client *conn, u8 ct,
+ 			   "TLSv1: Validate server certificate hash");
+ 		x509_name_string(&chain->subject, buf, sizeof(buf));
+ 		wpa_printf(MSG_DEBUG, "TLSv1: 0: %s", buf);
+-		if (sha256_vector(1, &chain->cert_start, &chain->cert_len,
++		if (wpa_sha256_vector(1, &chain->cert_start, &chain->cert_len,
+ 				  hash) < 0 ||
+ 		    os_memcmp(conn->cred->srv_cert_hash, hash,
+ 			      SHA256_MAC_LEN) != 0) {
+diff --git a/components/wpa_supplicant/src/tls/tlsv1_cred.c b/components/wpa_supplicant/src/tls/tlsv1_cred.c
+index 1310f4e10e..0cee09749d 100644
+--- a/components/wpa_supplicant/src/tls/tlsv1_cred.c
++++ b/components/wpa_supplicant/src/tls/tlsv1_cred.c
+@@ -130,7 +130,7 @@ static int tlsv1_add_cert(struct x509_certificate **chain,
+ 			return -1;
+ 		}
+ 
+-		der = base64_decode((const char *) pos, end - pos, &der_len);
++		der = wpa_base64_decode((const char *) pos, end - pos, &der_len);
+ 		if (der == NULL) {
+ 			wpa_printf(MSG_INFO, "TLSv1: Could not decode PEM "
+ 				   "certificate");
+@@ -293,7 +293,7 @@ static struct crypto_private_key * tlsv1_set_key_pem(const u8 *key, size_t len)
+ 		}
+ 	}
+ 
+-	der = base64_decode((const char *) pos, end - pos, &der_len);
++	der = wpa_base64_decode((const char *) pos, end - pos, &der_len);
+ 	if (!der)
+ 		return NULL;
+ 	pkey = crypto_private_key_import(der, der_len, NULL);
+@@ -321,7 +321,7 @@ static struct crypto_private_key * tlsv1_set_key_enc_pem(const u8 *key,
+ 	if (!end)
+ 		return NULL;
+ 
+-	der = base64_decode((const char *) pos, end - pos, &der_len);
++	der = wpa_base64_decode((const char *) pos, end - pos, &der_len);
+ 	if (!der)
+ 		return NULL;
+ 	pkey = crypto_private_key_import(der, der_len, passwd);
+@@ -1158,7 +1158,7 @@ static int tlsv1_set_dhparams_blob(struct tlsv1_credentials *cred,
  		return -1;
  	}
  
--	hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, head, len, hash);
-+	wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, head, len, hash);
- 	if (os_memcmp(hash, key_wrap_auth, WPS_KWA_LEN) != 0) {
- 		wpa_printf(MSG_DEBUG,  "WPS: Invalid KWA");
+-	der = base64_decode((const char *) pos, end - pos, &der_len);
++	der = wpa_base64_decode((const char *) pos, end - pos, &der_len);
+ 	if (der == NULL) {
+ 		wpa_printf(MSG_INFO, "TLSv1: Could not decode PEM dhparams");
+ 		return -1;
+diff --git a/components/wpa_supplicant/src/tls/x509v3.c b/components/wpa_supplicant/src/tls/x509v3.c
+index 1bbd80ade8..4057e40b03 100644
+--- a/components/wpa_supplicant/src/tls/x509v3.c
++++ b/components/wpa_supplicant/src/tls/x509v3.c
+@@ -2047,25 +2047,25 @@ skip_digest_oid:
+ 			    hash, hash_len);
+ 		break;
+ 	case 5: /* sha-1WithRSAEncryption */
+-		sha1_vector(1, addr, len, hash);
++		wpa_sha1_vector(1, addr, len, hash);
+ 		hash_len = 20;
+ 		wpa_hexdump(MSG_MSGDUMP, "X509: Certificate hash (SHA1)",
+ 			    hash, hash_len);
+ 		break;
+ 	case 11: /* sha256WithRSAEncryption */
+-		sha256_vector(1, addr, len, hash);
++	    wpa_sha256_vector(1, addr, len, hash);
+ 		hash_len = 32;
+ 		wpa_hexdump(MSG_MSGDUMP, "X509: Certificate hash (SHA256)",
+ 			    hash, hash_len);
+ 		break;
+ 	case 12: /* sha384WithRSAEncryption */
+-		sha384_vector(1, addr, len, hash);
++	    wpa_sha384_vector(1, addr, len, hash);
+ 		hash_len = 48;
+ 		wpa_hexdump(MSG_MSGDUMP, "X509: Certificate hash (SHA384)",
+ 			    hash, hash_len);
+ 		break;
+ 	case 13: /* sha512WithRSAEncryption */
+-		sha512_vector(1, addr, len, hash);
++		wpa_sha512_vector(1, addr, len, hash);
+ 		hash_len = 64;
+ 		wpa_hexdump(MSG_MSGDUMP, "X509: Certificate hash (SHA512)",
+ 			    hash, hash_len);
+diff --git a/components/wpa_supplicant/src/utils/base64.c b/components/wpa_supplicant/src/utils/base64.c
+index a17d2d36dc..ac347ce00f 100644
+--- a/components/wpa_supplicant/src/utils/base64.c
++++ b/components/wpa_supplicant/src/utils/base64.c
+@@ -151,7 +151,7 @@ static unsigned char * base64_gen_decode(const char *src, size_t len,
+ 
+ 
+ /**
+- * base64_encode - Base64 encode
++ * wpa_base64_encode - Base64 encode
+  * @src: Data to be encoded
+  * @len: Length of the data to be encoded
+  * @out_len: Pointer to output length variable, or %NULL if not used
+@@ -162,20 +162,20 @@ static unsigned char * base64_gen_decode(const char *src, size_t len,
+  * nul terminated to make it easier to use as a C string. The nul terminator is
+  * not included in out_len.
+  */
+-char * base64_encode(const void *src, size_t len, size_t *out_len)
++char * wpa_base64_encode(const void *src, size_t len, size_t *out_len)
+ {
+ 	return base64_gen_encode(src, len, out_len, base64_table, 1);
+ }
+ 
+ 
+-char * base64_url_encode(const void *src, size_t len, size_t *out_len)
++char * wpa_base64_url_encode(const void *src, size_t len, size_t *out_len)
+ {
+ 	return base64_gen_encode(src, len, out_len, base64_url_table, 0);
+ }
+ 
+ 
+ /**
+- * base64_decode - Base64 decode
++ * wpa_base64_decode - Base64 decode
+  * @src: Data to be decoded
+  * @len: Length of the data to be decoded
+  * @out_len: Pointer to output length variable
+@@ -184,13 +184,13 @@ char * base64_url_encode(const void *src, size_t len, size_t *out_len)
+  *
+  * Caller is responsible for freeing the returned buffer.
+  */
+-unsigned char * base64_decode(const char *src, size_t len, size_t *out_len)
++unsigned char * wpa_base64_decode(const char *src, size_t len, size_t *out_len)
+ {
+ 	return base64_gen_decode(src, len, out_len, base64_table);
+ }
+ 
+ 
+-unsigned char * base64_url_decode(const char *src, size_t len, size_t *out_len)
++unsigned char * wpa_base64_url_decode(const char *src, size_t len, size_t *out_len)
+ {
+ 	return base64_gen_decode(src, len, out_len, base64_url_table);
+ }
+diff --git a/components/wpa_supplicant/src/utils/base64.h b/components/wpa_supplicant/src/utils/base64.h
+index 6216f44e55..be380ee1ca 100644
+--- a/components/wpa_supplicant/src/utils/base64.h
++++ b/components/wpa_supplicant/src/utils/base64.h
+@@ -6,12 +6,12 @@
+  * See README for more details.
+  */
+ 
+-#ifndef BASE64_H
+-#define BASE64_H
++#ifndef WPA_BASE64_H
++#define WPA_BASE64_H
+ 
+-char * base64_encode(const void *src, size_t len, size_t *out_len);
+-unsigned char * base64_decode(const char *src, size_t len, size_t *out_len);
+-char * base64_url_encode(const void *src, size_t len, size_t *out_len);
+-unsigned char * base64_url_decode(const char *src, size_t len, size_t *out_len);
++char * wpa_base64_encode(const void *src, size_t len, size_t *out_len);
++unsigned char * wpa_base64_decode(const char *src, size_t len, size_t *out_len);
++char * wpa_base64_url_encode(const void *src, size_t len, size_t *out_len);
++unsigned char * wpa_base64_url_decode(const char *src, size_t len, size_t *out_len);
+ 
+-#endif /* BASE64_H */
++#endif /* WPA_BASE64_H */
+diff --git a/components/wpa_supplicant/src/utils/json.c b/components/wpa_supplicant/src/utils/json.c
+index 5a0edf2114..58093c6b8e 100644
+--- a/components/wpa_supplicant/src/utils/json.c
++++ b/components/wpa_supplicant/src/utils/json.c
+@@ -516,7 +516,7 @@ struct wpabuf * json_get_member_base64url(struct json_token *json,
+ 	token = json_get_member(json, name);
+ 	if (!token || token->type != JSON_STRING)
+ 		return NULL;
+-	buf = base64_url_decode(token->string, os_strlen(token->string),
++	buf = wpa_base64_url_decode(token->string, os_strlen(token->string),
+ 				&buflen);
+ 	if (!buf)
+ 		return NULL;
+@@ -611,7 +611,7 @@ int json_add_base64url(struct wpabuf *json, const char *name, const void *val,
+ {
+ 	char *b64;
+ 
+-	b64 = base64_url_encode(val, len, NULL);
++	b64 = wpa_base64_url_encode(val, len, NULL);
+ 	if (!b64)
+ 		return -1;
+ 	json_add_string(json, name, b64);
+diff --git a/components/wpa_supplicant/src/wps/wps_attr_build.c b/components/wpa_supplicant/src/wps/wps_attr_build.c
+index c7d739a0c3..b4609ec647 100644
+--- a/components/wpa_supplicant/src/wps/wps_attr_build.c
++++ b/components/wpa_supplicant/src/wps/wps_attr_build.c
+@@ -181,7 +181,7 @@ int wps_build_authenticator(struct wps_data *wps, struct wpabuf *msg)
+ 	len[0] = wpabuf_len(wps->last_msg);
+ 	addr[1] = wpabuf_head(msg);
+ 	len[1] = wpabuf_len(msg);
+-	if (hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 2, addr, len,
++	if (wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 2, addr, len,
+ 			       hash) < 0)
+ 		return -1;
+ 
+@@ -385,7 +385,7 @@ int wps_build_key_wrap_auth(struct wps_data *wps, struct wpabuf *msg)
+ 	u8 hash[SHA256_MAC_LEN];
+ 
+ 	wpa_printf(MSG_DEBUG, "WPS:  * Key Wrap Authenticator");
+-	if (hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, wpabuf_head(msg),
++	if (wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, wpabuf_head(msg),
+ 			wpabuf_len(msg), hash) < 0)
+ 		return -1;
+ 
+@@ -438,7 +438,7 @@ int wps_build_oob_dev_pw(struct wpabuf *msg, u16 dev_pw_id,
+ 		   dev_pw_id);
+ 	addr[0] = wpabuf_head(pubkey);
+ 	hash_len = wpabuf_len(pubkey);
+-	if (sha256_vector(1, addr, &hash_len, pubkey_hash) < 0)
++	if (wpa_sha256_vector(1, addr, &hash_len, pubkey_hash) < 0)
+ 		return -1;
+ #ifdef CONFIG_WPS_TESTING
+ 	if (wps_corrupt_pkhash) {
+diff --git a/components/wpa_supplicant/src/wps/wps_attr_process.c b/components/wpa_supplicant/src/wps/wps_attr_process.c
+index 44436a4862..9eca971ae9 100644
+--- a/components/wpa_supplicant/src/wps/wps_attr_process.c
++++ b/components/wpa_supplicant/src/wps/wps_attr_process.c
+@@ -40,7 +40,7 @@ int wps_process_authenticator(struct wps_data *wps, const u8 *authenticator,
+ 	addr[1] = wpabuf_head(msg);
+ 	len[1] = wpabuf_len(msg) - 4 - WPS_AUTHENTICATOR_LEN;
+ 
+-	if (hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 2, addr, len,
++	if (wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 2, addr, len,
+ 			       hash) < 0 ||
+ 	    os_memcmp_const(hash, authenticator, WPS_AUTHENTICATOR_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "WPS: Incorrect Authenticator");
+@@ -71,7 +71,7 @@ int wps_process_key_wrap_auth(struct wps_data *wps, struct wpabuf *msg,
+ 		return -1;
+ 	}
+ 
+-	if (hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, head, len, hash) < 0 ||
++	if (wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, head, len, hash) < 0 ||
+ 	    os_memcmp_const(hash, key_wrap_auth, WPS_KWA_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "WPS: Invalid KWA");
  		return -1;
 diff --git a/components/wpa_supplicant/src/wps/wps_common.c b/components/wpa_supplicant/src/wps/wps_common.c
-index ead31af3e0..dcbf39aff8 100644
+index 7d4288c7c6..89fe937d68 100644
 --- a/components/wpa_supplicant/src/wps/wps_common.c
 +++ b/components/wpa_supplicant/src/wps/wps_common.c
-@@ -139,10 +139,10 @@ void wps_derive_psk(struct wps_data *wps, const u8 *dev_passwd,
+@@ -48,7 +48,7 @@ void wps_kdf(const u8 *key, const u8 *label_prefix, size_t label_prefix_len,
+ 
+ 	for (i = 1; i <= iter; i++) {
+ 		WPA_PUT_BE32(i_buf, i);
+-		hmac_sha256_vector(key, SHA256_MAC_LEN, 4, addr, len, hash);
++	    wpa_hmac_sha256_vector(key, SHA256_MAC_LEN, 4, addr, len, hash);
+ 		if (i < iter) {
+ 			os_memcpy(opos, hash, SHA256_MAC_LEN);
+ 			opos += SHA256_MAC_LEN;
+@@ -104,7 +104,7 @@ int wps_derive_keys(struct wps_data *wps)
+ 	/* DHKey = SHA-256(g^AB mod p) */
+ 	addr[0] = wpabuf_head(dh_shared);
+ 	len[0] = wpabuf_len(dh_shared);
+-	sha256_vector(1, addr, len, dhkey);
++    wpa_sha256_vector(1, addr, len, dhkey);
+ 	wpa_hexdump_key(MSG_DEBUG, "WPS: DHKey", dhkey, sizeof(dhkey));
+ 	wpabuf_clear_free(dh_shared);
+ 
+@@ -115,7 +115,7 @@ int wps_derive_keys(struct wps_data *wps)
+ 	len[1] = ETH_ALEN;
+ 	addr[2] = wps->nonce_r;
+ 	len[2] = WPS_NONCE_LEN;
+-	hmac_sha256_vector(dhkey, sizeof(dhkey), 3, addr, len, kdk);
++    wpa_hmac_sha256_vector(dhkey, sizeof(dhkey), 3, addr, len, kdk);
+ 	wpa_hexdump_key(MSG_DEBUG, "WPS: KDK", kdk, sizeof(kdk));
+ 
+ 	wps_kdf(kdk, NULL, 0, "Wi-Fi Easy and Secure Key Derivation",
+@@ -140,11 +140,11 @@ int wps_derive_psk(struct wps_data *wps, const u8 *dev_passwd,
  {
  	u8 hash[SHA256_MAC_LEN];
  
--	hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, dev_passwd,
-+	wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, dev_passwd,
- 		                             (dev_passwd_len + 1) / 2, hash);
+-	if (hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, dev_passwd,
++	if (wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN, dev_passwd,
+ 			(dev_passwd_len + 1) / 2, hash) < 0)
+ 		return -1;
  	os_memcpy(wps->psk1, hash, WPS_PSK_LEN);
--	hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN,
-+	wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN,
- 		            dev_passwd + (dev_passwd_len + 1) / 2,
- 		            dev_passwd_len / 2, hash);
- 	os_memcpy(wps->psk2, hash, WPS_PSK_LEN);
+-	if (hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN,
++	if (wpa_hmac_sha256(wps->authkey, WPS_AUTHKEY_LEN,
+ 			dev_passwd + (dev_passwd_len + 1) / 2,
+ 			dev_passwd_len / 2, hash) < 0)
+ 		return -1;
+diff --git a/components/wpa_supplicant/src/wps/wps_enrollee.c b/components/wpa_supplicant/src/wps/wps_enrollee.c
+index 2f8e1aacfd..973c939733 100644
+--- a/components/wpa_supplicant/src/wps/wps_enrollee.c
++++ b/components/wpa_supplicant/src/wps/wps_enrollee.c
+@@ -65,7 +65,7 @@ static int wps_build_e_hash(struct wps_data *wps, struct wpabuf *msg)
+ 	len[2] = wpabuf_len(wps->dh_pubkey_e);
+ 	addr[3] = wpabuf_head(wps->dh_pubkey_r);
+ 	len[3] = wpabuf_len(wps->dh_pubkey_r);
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 	wpa_hexdump(MSG_DEBUG, "WPS: E-Hash1", hash, SHA256_MAC_LEN);
+ 
+ 	wpa_printf(MSG_DEBUG, "WPS:  * E-Hash2");
+@@ -75,7 +75,7 @@ static int wps_build_e_hash(struct wps_data *wps, struct wpabuf *msg)
+ 	/* E-Hash2 = HMAC_AuthKey(E-S2 || PSK2 || PK_E || PK_R) */
+ 	addr[0] = wps->snonce + WPS_SECRET_NONCE_LEN;
+ 	addr[1] = wps->psk2;
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 	wpa_hexdump(MSG_DEBUG, "WPS: E-Hash2", hash, SHA256_MAC_LEN);
+ 
+ 	return 0;
+@@ -576,7 +576,7 @@ static int wps_process_pubkey(struct wps_data *wps, const u8 *pk,
+ 
+ 	if (wps->peer_pubkey_hash_set) {
+ 		u8 hash[WPS_HASH_LEN];
+-		sha256_vector(1, &pk, &pk_len, hash);
++	    wpa_sha256_vector(1, &pk, &pk_len, hash);
+ 		if (os_memcmp_const(hash, wps->peer_pubkey_hash,
+ 				    WPS_OOB_PUBKEY_HASH_LEN) != 0) {
+ 			wpa_printf(MSG_ERROR, "WPS: Public Key hash mismatch");
+@@ -655,7 +655,7 @@ static int wps_process_r_snonce1(struct wps_data *wps, const u8 *r_snonce1)
+ 	len[2] = wpabuf_len(wps->dh_pubkey_e);
+ 	addr[3] = wpabuf_head(wps->dh_pubkey_r);
+ 	len[3] = wpabuf_len(wps->dh_pubkey_r);
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 
+ 	if (os_memcmp_const(wps->peer_hash1, hash, WPS_HASH_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "WPS: R-Hash1 derived from R-S1 does "
+@@ -695,7 +695,7 @@ static int wps_process_r_snonce2(struct wps_data *wps, const u8 *r_snonce2)
+ 	len[2] = wpabuf_len(wps->dh_pubkey_e);
+ 	addr[3] = wpabuf_head(wps->dh_pubkey_r);
+ 	len[3] = wpabuf_len(wps->dh_pubkey_r);
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 
+ 	if (os_memcmp_const(wps->peer_hash2, hash, WPS_HASH_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "WPS: R-Hash2 derived from R-S2 does "
+diff --git a/components/wpa_supplicant/src/wps/wps_registrar.c b/components/wpa_supplicant/src/wps/wps_registrar.c
+index a7edf79ff6..4424e9ba45 100644
+--- a/components/wpa_supplicant/src/wps/wps_registrar.c
++++ b/components/wpa_supplicant/src/wps/wps_registrar.c
+@@ -1499,7 +1499,7 @@ static int wps_build_r_hash(struct wps_data *wps, struct wpabuf *msg)
+ 	len[2] = wpabuf_len(wps->dh_pubkey_e);
+ 	addr[3] = wpabuf_head(wps->dh_pubkey_r);
+ 	len[3] = wpabuf_len(wps->dh_pubkey_r);
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 	wpa_hexdump(MSG_DEBUG, "WPS: R-Hash1", hash, SHA256_MAC_LEN);
+ 
+ 	wpa_printf(MSG_DEBUG, "WPS:  * R-Hash2");
+@@ -1509,7 +1509,7 @@ static int wps_build_r_hash(struct wps_data *wps, struct wpabuf *msg)
+ 	/* R-Hash2 = HMAC_AuthKey(R-S2 || PSK2 || PK_E || PK_R) */
+ 	addr[0] = wps->snonce + WPS_SECRET_NONCE_LEN;
+ 	addr[1] = wps->psk2;
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 	wpa_hexdump(MSG_DEBUG, "WPS: R-Hash2", hash, SHA256_MAC_LEN);
+ 
+ 	return 0;
+@@ -1748,7 +1748,7 @@ int wps_build_cred(struct wps_data *wps, struct wpabuf *msg)
+ 			return -1;
+ 		}
+ 		os_free(wps->new_psk);
+-		wps->new_psk = (u8 *) base64_encode(r, sizeof(r),
++		wps->new_psk = (u8 *) wpa_base64_encode(r, sizeof(r),
+ 						    &wps->new_psk_len);
+ 		if (wps->new_psk == NULL)
+ 			return -1;
+@@ -2329,7 +2329,7 @@ static int wps_process_e_snonce1(struct wps_data *wps, const u8 *e_snonce1)
+ 	len[2] = wpabuf_len(wps->dh_pubkey_e);
+ 	addr[3] = wpabuf_head(wps->dh_pubkey_r);
+ 	len[3] = wpabuf_len(wps->dh_pubkey_r);
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 
+ 	if (os_memcmp_const(wps->peer_hash1, hash, WPS_HASH_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "WPS: E-Hash1 derived from E-S1 does "
+@@ -2369,7 +2369,7 @@ static int wps_process_e_snonce2(struct wps_data *wps, const u8 *e_snonce2)
+ 	len[2] = wpabuf_len(wps->dh_pubkey_e);
+ 	addr[3] = wpabuf_head(wps->dh_pubkey_r);
+ 	len[3] = wpabuf_len(wps->dh_pubkey_r);
+-	hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
++    wpa_hmac_sha256_vector(wps->authkey, WPS_AUTHKEY_LEN, 4, addr, len, hash);
+ 
+ 	if (os_memcmp_const(wps->peer_hash2, hash, WPS_HASH_LEN) != 0) {
+ 		wpa_printf(MSG_DEBUG, "WPS: E-Hash2 derived from E-S2 does "
+@@ -2721,7 +2721,7 @@ static enum wps_process_res wps_process_m1(struct wps_data *wps,
+ 
+ 			addr[0] = attr->public_key;
+ 			len = attr->public_key_len;
+-			sha256_vector(1, addr, &len, hash);
++		    wpa_sha256_vector(1, addr, &len, hash);
+ 			if (os_memcmp_const(hash,
+ 					    wps->nfc_pw_token->pubkey_hash,
+ 					    WPS_OOB_PUBKEY_HASH_LEN) != 0) {
 -- 
-2.17.1
+2.34.1
 

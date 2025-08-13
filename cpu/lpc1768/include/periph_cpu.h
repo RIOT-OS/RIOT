@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_lpc1768
  * @{
@@ -16,9 +18,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <stdint.h>
 
@@ -91,5 +90,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

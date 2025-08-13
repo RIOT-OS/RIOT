@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp8266_sdk
  * @{
@@ -16,9 +18,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-
-#ifndef SYSTEM_H
-#define SYSTEM_H
 
 #ifndef DOXYGEN
 
@@ -55,4 +54,3 @@ extern void system_restart(void);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYSTEM_H */

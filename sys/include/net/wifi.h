@@ -20,7 +20,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
 
-
 #include <inttypes.h>
 
 #ifdef __cplusplus

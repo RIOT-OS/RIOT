@@ -19,7 +19,6 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -21,7 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-
 #include <stdint.h>
 
 #include "usb/usbus/hid.h"

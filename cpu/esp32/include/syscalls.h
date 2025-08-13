@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_esp32
  * @{
@@ -18,9 +20,6 @@
  * @}
  */
 
-#ifndef SYSCALLS_H
-#define SYSCALLS_H
-
 #include "syscalls_common.h"
 
 #ifdef __cplusplus
@@ -28,7 +27,7 @@ extern "C" {
 #endif
 
 /** Time since boot in us (64bit version) */
-int64_t system_get_time_64 (void);
+uint64_t system_get_time_64 (void);
 
 /** initialize system watchdog timer and start it */
 void system_wdt_init (void);
@@ -45,5 +44,3 @@ void system_wdt_feed (void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYSCALLS_H */

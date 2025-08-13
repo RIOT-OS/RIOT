@@ -22,7 +22,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>

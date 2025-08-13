@@ -22,7 +22,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-
 #include "board.h"
 #include "lcd.h"
 #include "st7735_params.h"
@@ -203,7 +202,6 @@ extern "C" {
                                       ST77XX_PARAM_IF_SPI \
                                       ST77XX_PARAM_IF_PAR \
                                       ST77XX_PARAM_IF_PAR_16BIT \
-                                      .cntrl = ST77XX_PARAM_CNTRL, \
                                       .cs_pin = ST77XX_PARAM_CS, \
                                       .dcx_pin = ST77XX_PARAM_DCX, \
                                       .rst_pin = ST77XX_PARAM_RST, \
@@ -214,6 +212,7 @@ extern "C" {
                                       .rotation = ST77XX_PARAM_ROTATION, \
                                       .offset_x = ST77XX_PARAM_OFFSET_X, \
                                       .offset_y = ST77XX_PARAM_OFFSET_Y, \
+                                      .cntrl = ST77XX_PARAM_CNTRL, \
                                     }
 #endif /* ST77XX_PARAMS */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_esp32c3
@@ -20,9 +19,6 @@
  * @file
  * @{
  */
-
-#ifndef PERIPH_CONF_COMMON_ESP32C3_H
-#define PERIPH_CONF_COMMON_ESP32C3_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,5 +41,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_ESP32C3_H */
 /** @} */

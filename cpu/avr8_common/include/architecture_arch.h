@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     cpu_avr8_common
  * @{
@@ -18,9 +20,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
-
-#ifndef ARCHITECTURE_ARCH_H
-#define ARCHITECTURE_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,4 +39,3 @@ typedef uint32_t   uinttxtptr_t;
 #endif
 
 /** @} */
-#endif /* ARCHITECTURE_ARCH_H */

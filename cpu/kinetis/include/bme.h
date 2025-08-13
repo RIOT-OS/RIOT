@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    cpu_kinetis_bme Kinetis Bit Manipulation Engine (BME)
  * @ingroup     cpu_kinetis
@@ -18,9 +20,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef BME_H
-#define BME_H
 
 #include <stdint.h>
 
@@ -250,7 +249,5 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* BME_H */
 
 /** @} */

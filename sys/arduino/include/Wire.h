@@ -16,7 +16,6 @@
  * @{
  */
 
-
 #ifndef MODULE_PERIPH_I2C
 #error "No I2C support on your board"
 #endif

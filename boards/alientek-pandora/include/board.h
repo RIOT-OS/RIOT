@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Luo Jia (HUST IoT Security Lab)
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Luo Jia (HUST IoT Security Lab)
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_alientek-pandora
@@ -15,9 +14,6 @@
  *
  * @author      Luo Jia <luojia@hust.edu.cn>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -68,5 +64,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

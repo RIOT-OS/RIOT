@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #include "priority_queue.h"
 #include "thread.h"
 
@@ -175,7 +174,6 @@ bool __pthread_rwlock_blocked_writingly(const pthread_rwlock_t *rwlock);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

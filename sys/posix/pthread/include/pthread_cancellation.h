@@ -17,7 +17,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,7 +67,6 @@ void pthread_testcancel(void);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

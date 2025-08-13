@@ -18,7 +18,6 @@
  * @author      Silke Hofstra <silke@slxh.eu>
  */
 
-
 #include "board.h"
 #include "epd_bw_spi.h"
 

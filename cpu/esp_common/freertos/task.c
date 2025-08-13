@@ -148,6 +148,17 @@ void vTaskSuspend(TaskHandle_t xTaskToSuspend)
     }
 }
 
+static bool _suspend_all = false;
+
+void vTaskSuspendAll(void)
+{
+    /* TODO:
+     * It has to be implemented once there is a mechanism in RIOT to suspend
+     * the scheduler without disabling interrupts. At the moment it is a
+     * placeholder to make the linker happy. */
+    _suspend_all = true;
+}
+
 void vTaskResume(TaskHandle_t xTaskToResume)
 {
     extern volatile thread_t *sched_active_thread;
@@ -157,6 +168,25 @@ void vTaskResume(TaskHandle_t xTaskToResume)
     assert(pid_is_valid(pid));
     thread_wakeup (pid);
 }
+
+BaseType_t xTaskResumeAll(void)
+{
+    /* TODO */
+    _suspend_all = false;
+    return pdFALSE;
+}
+
+BaseType_t xTaskGetSchedulerState(void)
+{
+    if (thread_get_active() == KERNEL_PID_UNDEF) {
+        return taskSCHEDULER_NOT_STARTED;
+    }
+    else if (_suspend_all) {
+        return taskSCHEDULER_SUSPENDED;
+    }
+
+    return taskSCHEDULER_RUNNING;
+};
 
 void vTaskDelay(const TickType_t xTicksToDelay)
 {

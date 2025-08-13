@@ -16,7 +16,6 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-
 #include <errno.h>
 
 #ifdef __cplusplus
@@ -79,7 +78,6 @@ int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
 #ifdef __cplusplus
 }
 #endif
-
 
 /**
  * @}

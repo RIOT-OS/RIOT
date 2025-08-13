@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_lora-e5-dev
@@ -16,9 +15,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -155,7 +151,6 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
-
 /**
  * @name   ADC configuration
  * @{
@@ -170,10 +165,8 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

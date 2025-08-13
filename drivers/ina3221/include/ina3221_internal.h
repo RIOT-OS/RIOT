@@ -19,7 +19,6 @@
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
-
 #include <assert.h>
 #include "ina3221_defines.h"
 #include "ina3221.h"

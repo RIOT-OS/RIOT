@@ -18,7 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-
 #include "board.h"
 #include "cc2420.h"
 

@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         cpu_atmega8
  * @{
@@ -19,9 +21,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
-
-#ifndef DEFAULT_TIMER_CONFIG_H
-#define DEFAULT_TIMER_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,5 +41,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */
