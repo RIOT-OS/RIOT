@@ -43,6 +43,7 @@ uint16_t _cst816s_height(const touch_dev_t *touch_dev)
 {
     const cst816s_t *dev = (const cst816s_t *)touch_dev;
     assert(dev);
+    (void)dev;  /* avoid compilation problems with NDEBUG */
 
     return CST816S_YMAX;
 }
@@ -51,6 +52,7 @@ uint16_t _cst816s_width(const touch_dev_t *touch_dev)
 {
     const cst816s_t *dev = (const cst816s_t *)touch_dev;
     assert(dev);
+    (void)dev;  /* avoid compilation problems with NDEBUG */
 
     return CST816S_XMAX;
 }

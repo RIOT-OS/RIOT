@@ -38,6 +38,7 @@ psa_status_t psa_aead_aes_128_ccm_encrypt(const psa_key_attributes_t *attributes
     (void)key_buffer_length;
     /* This should already have been checked by PSA. */
     assert(ciphertext_size >= plaintext_length + tag_length);
+    (void)ciphertext_size;  /* avoid compilation problems with NDEBUG */
 
     if (!cryptocell_310_data_within_ram(nonce) ||
         !cryptocell_310_data_within_ram(key_buffer) ||
