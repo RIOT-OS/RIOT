@@ -29,6 +29,8 @@
 #define LED0_TOGGLE     gpio_toggle(LED0_PIN_ID)
 #define LED0_NAME       "LED(Green)"
 
+#define OSC_DEBUG_PIN_ID 15u
+
 #ifdef __cplusplus
 extern "C" {
 #endif

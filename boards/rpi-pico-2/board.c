@@ -12,4 +12,6 @@ void board_init(void) {
      * This is needed, esp. when the LED is used via
      * the define macros */
     gpio_init(LED0_PIN_ID, GPIO_OUT);
+
+    gpio_init(OSC_DEBUG_PIN_ID, GPIO_OUT);
 }

@@ -18,6 +18,8 @@
 
 #include "RP2350.h"
 #include "board.h"
+#include "clock_conf.h"
+#include "cpu_conf_common.h"
 #include "kernel_init.h"
 #include "macros/units.h"
 #include "periph/gpio.h"
@@ -26,6 +28,7 @@
 #include "periph_cpu.h"
 #include "stdio_base.h"
 
+#include <stdint.h>
 #include <stdio.h>
 
 #define DEBUG_WITH_OSC
@@ -35,13 +38,21 @@ void gpio_reset(void) {
     reset_component(RESET_IO_BANK0, RESET_IO_BANK0);
 }
 
-void core1_main() {
-    while (1) {
-        for (int i = 0; i < 100; i++) {
-            __NOP();
-        }
-        LED0_ON;
-    }
+void core1_main(void) {
+    //printf("HELLLLLLLLLLLLLLLLO\n\nAAAAAA");
+
+    __asm__ volatile (
+        "labelCool: \n"
+        "mov.w r3, #3489660928 \n"
+        "mov.w r2, #32768 \n"
+        "str r2, [r3, #40] \n"
+        "b labelCool"
+    );
+
+    // while (1) {
+    //     for (volatile int i = 0; i < 200; i++) {};
+    //     gpio_toggle(OSC_DEBUG_PIN_ID);
+    // }
 }
 
 /* Table 37 FIFO_ST, 1 if not empty*/
@@ -49,9 +60,14 @@ void core1_main() {
 /* TABLE 37, 1 if not full */
 #define SIO_FIFO_SEND_READY_BIT 1
 #define core1_psm_bit 24
-extern uint32_t _estack;  /* End of stack based on cortex_m.ld */
 
-void core1_init() {
+extern uint32_t _estack;  /* End of stack based on cortex_m.ld */
+extern uint32_t _sstack; /* Start of stack based on cortex_m.ld */
+extern uint32_t _isr_vectors;
+
+static uint32_t core_1_stack[16*THREAD_STACKSIZE_DEFAULT];
+
+void core1_init(void) {
     /* First we need to get core1 out of reset (See 5.3)
      * for that we need to get it out of reset (See 7.4.4)
      * this allows proc1 to power on */
@@ -71,22 +87,24 @@ void core1_init() {
     * I still can't find the exact reason for the first 3 values though?
     */
    const uint32_t cmd_sequence[] = {
-    0,
-    0,
-    1,
-    /**
-     * This might be a really bad way to do this but I'm a bit unsure how else
-     * to tackle it, the vector_table uses macro magic and I'm unsure how to
-     * get the address, however, the vector table should sit right at the front
-     * of the ROM so *technically* it might be fine
-     */
-    (uint32_t)  SCB->VTOR,
-    /**
-     * The stack pointer position should begin right after the
-     */
-    (uint32_t) ((uint32_t)&_estack) - 0x100,
-    /** Pointer to main function for core1 */
-    (uint32_t) core1_main
+        0,
+        0,
+        1,
+        /**
+        * This might be a really bad way to do this but I'm a bit unsure how else
+        * to tackle it, the vector_table uses macro magic and I'm unsure how to
+        * get the address, however, the vector table should sit right at the front
+        * of the ROM so *technically* it might be fine
+        */
+        (uint32_t) &_isr_vectors,
+        /**
+        * We allocate a stack "locally" instead of in the linker script
+        * since that would require changes to the base cortexm script
+        * which sound complicated to do on a per-cpu basis
+        */
+        (uint32_t) &core_1_stack[0],
+        /** Pointer to main function for core1 */
+        (uint32_t) core1_main
     };
 
     uint32_t seq = 0;
@@ -163,9 +181,6 @@ void cpu_init(void) {
     /* initialize the CPU clock */
     cpu_clock_init();
 
-    /* Init Core 1 */
-    core1_init();
-
     /* initialize the early peripherals */
     early_init();
 
@@ -174,6 +189,18 @@ void cpu_init(void) {
 
     /* initialize the board */
     board_init();
+
+    /* Init Core 1 */
+    core1_init();
+    /* Init Core 1 */
+    core1_init();
+
+    while(1) {
+
+    }
+
+    printf("The stack size is %d, stack start: %p, stack end: %p", ((uint32_t) &_estack - (uint32_t) &_sstack), &_sstack, &_estack);
+
 }
 
 /** @} */
