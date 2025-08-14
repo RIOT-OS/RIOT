@@ -20,7 +20,7 @@ priority queues), a shell and more. RIOT supports a wide range of
 microcontroller architectures, radio drivers, sensors, and configurations for
 entire platforms, e.g. Atmel SAM R21 Xplained Pro, Zolertia Z1, STM32 Discovery
 Boards etc. (see the list of
-[supported boards](https://www.riot-os.org/boards.html).
+[supported boards](https://www.riot-os.org/boards.html)).
 Across all supported hardware (32-bit, 16-bit, and 8-bit platforms), RIOT
 provides a consistent API and enables C and C++ application programming,
 with multithreading, IPC, system timers, mutexes etc.
