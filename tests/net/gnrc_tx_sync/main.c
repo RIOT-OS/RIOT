@@ -116,7 +116,7 @@ static int netdev_get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
     (void)dev;
     const uint16_t pdu_size_ethernet = 1500;
     const uint16_t pdu_size_6lo = 96;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         memcpy(value, &pdu_size_6lo, sizeof(pdu_size_6lo));
     }

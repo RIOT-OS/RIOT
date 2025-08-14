@@ -43,6 +43,7 @@ int ifconfig_list(int idx)
     printf("Iface %3d  HWaddr: ", idx);
     res = dev->driver->get(dev, NETOPT_ADDRESS, addr, sizeof(addr));
     assert(res > 0);
+    (void)res;  /* fix compilation problems with NDEBUG */
     l2util_addr_to_str(addr, ETHERNET_ADDR_LEN, addr_str);
     printf("%s\n", addr_str);
 

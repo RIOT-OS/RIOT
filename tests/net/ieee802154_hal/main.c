@@ -422,12 +422,12 @@ int _test_states(int argc, char **argv)
 
     /* Force transition to IDLE */
     res = ieee802154_radio_set_idle(&_radio, true);
-    assert(res == 0);
+    expect(res == 0);
 
     printf("Testing TX<->RX transition time: ");
     a = xtimer_now();
     res = ieee802154_radio_set_rx(&_radio);
-    assert(res == 0);
+    expect(res == 0);
     usecs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
     printf("%" PRIu32 " us (%s)\n", usecs, usecs > MAX_TX_RX_TURNAROUND
                                            ? "FAIL"
@@ -436,7 +436,7 @@ int _test_states(int argc, char **argv)
     printf("Testing RX<->TX transition time: ");
     a = xtimer_now();
     res = ieee802154_radio_set_idle(&_radio, true);
-    assert(res == 0);
+    expect(res == 0);
     usecs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
     printf("%" PRIu32 " us (%s)\n", usecs, usecs > MAX_TX_RX_TURNAROUND
                                            ? "FAIL"
