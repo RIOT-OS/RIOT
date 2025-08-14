@@ -30,6 +30,7 @@
 #define LED0_NAME       "LED(Green)"
 
 #define OSC_DEBUG_PIN_ID 15u
+#define OSC_DEBUG_PIN_ID_2 14u
 
 #ifdef __cplusplus
 extern "C" {

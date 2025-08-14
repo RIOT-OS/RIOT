@@ -14,4 +14,5 @@ void board_init(void) {
     gpio_init(LED0_PIN_ID, GPIO_OUT);
 
     gpio_init(OSC_DEBUG_PIN_ID, GPIO_OUT);
+    gpio_init(OSC_DEBUG_PIN_ID_2, GPIO_OUT);
 }
