@@ -73,6 +73,7 @@ static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
                            uint8_t nblocks)
 {
     ieee802154_dev_t *hal = dev->ctx;
+
     at86rf2xx_aes_cbc_encrypt(hal->priv,
                               (aes_block_t *)cipher,
                               NULL,
@@ -95,6 +96,7 @@ static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev,
                            uint8_t nblocks)
 {
     ieee802154_dev_t *hal = dev->ctx;
+
     at86rf2xx_aes_ecb_encrypt(hal->priv,
                               (aes_block_t *)cipher,
                               NULL,
@@ -228,8 +230,8 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
             uint64_t res = SC_TO_NS * (uint64_t)rx_sc;
             netdev_ieee802154_rx_info_set_timestamp(info, res);
             DEBUG("[at86rf2xx] CS: %" PRIu32 " timestamp: %" PRIu32 ".%09" PRIu32 " ",
-                    rx_sc, (uint32_t)(info->timestamp / NS_PER_SEC),
-                           (uint32_t)(info->timestamp % NS_PER_SEC));
+                  rx_sc, (uint32_t)(info->timestamp / NS_PER_SEC),
+                  (uint32_t)(info->timestamp % NS_PER_SEC));
         }
 #endif
     }
@@ -271,12 +273,12 @@ static int _confirm_on(ieee802154_dev_t *hal)
     at86rf2xx_t *dev = hal->priv;
     mutex_lock(&dev->lock);
     int status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-               & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+                 & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
 
-     if (status != AT86RF2XX_TRX_STATUS__TRX_OFF) {
-         mutex_unlock(&dev->lock);
-         return -EAGAIN;
-     }
+    if (status != AT86RF2XX_TRX_STATUS__TRX_OFF) {
+        mutex_unlock(&dev->lock);
+        return -EAGAIN;
+    }
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
     mutex_unlock(&dev->lock);
     return 0;
@@ -354,6 +356,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     at86rf2xx_t *dev = hal->priv;
 
     int res = -ENOTSUP;
+
     mutex_lock(&dev->lock);
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
@@ -369,7 +372,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         res = _request_set_rx(dev);
         break;
     case IEEE802154_HAL_OP_SET_IDLE:
-        res = _request_set_tx(dev, *((bool*) ctx));
+        res = _request_set_tx(dev, *((bool *)ctx));
         break;
     case IEEE802154_HAL_OP_CCA:
         res = _request_cca(dev);
@@ -392,27 +395,27 @@ static int _confirm_transmit(at86rf2xx_t *dev, ieee802154_tx_info_t *info)
 
     if (info) {
         uint8_t trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
-                            & AT86RF2XX_TRX_STATE_MASK__TRAC;
+                              & AT86RF2XX_TRX_STATE_MASK__TRAC;
 #if AT86RF2XX_HAVE_RETRIES && AT86RF2XX_HAVE_RETRIES_REG
         info->retrans = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
                          & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK)
                         >> AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
 #endif
         switch (trac_status) {
-            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-                info->status = TX_STATUS_SUCCESS;
-                break;
-            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                info->status = TX_STATUS_FRAME_PENDING;
-                break;
-            case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-                info->status = TX_STATUS_MEDIUM_BUSY;
-                break;
-            case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-                info->status = TX_STATUS_NO_ACK;
-                break;
-            default:
-                DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n", trac_status >> 5);
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+            info->status = TX_STATUS_SUCCESS;
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+            info->status = TX_STATUS_FRAME_PENDING;
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+            info->status = TX_STATUS_MEDIUM_BUSY;
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+            info->status = TX_STATUS_NO_ACK;
+            break;
+        default:
+            DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n", trac_status >> 5);
         }
     }
     return 0;
@@ -449,6 +452,7 @@ static int _confirm_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
 {
     at86rf2xx_t *dev = hal->priv;
     int res = -ENOTSUP;
+
     mutex_lock(&dev->lock);
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
@@ -483,11 +487,11 @@ static int _set_cca_threshold(ieee802154_dev_t *hal, int8_t threshold)
 
 static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
 {
-    (void) hal;
+    (void)hal;
     if (mode != IEEE802154_CCA_MODE_ED_THRESHOLD) {
         DEBUG("at86rf2xx_rf_ops: CCA mode not supported\n");
         return -ENOTSUP;
-     }
+    }
     DEBUG("at86rf2xx_rf_ops: set_cca_mode to ED Threshold\n");
     return 0;
 }
@@ -495,6 +499,7 @@ static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
 static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 {
     at86rf2xx_t *dev = hal->priv;
+
     if (conf->pow < 0 || conf->pow > AT86RF2XX_TXPOWER_MAX) {
         return -EINVAL;
     }
@@ -508,7 +513,7 @@ static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *b
 {
     DEBUG("at86rf2xx_rf_ops: set_csma_params.");
     at86rf2xx_t *dev = hal->priv;
-    retries = MIN(retries, 5);  /* valid values: 0-5 */
+    retries = MIN(retries, 5);              /* valid values: 0-5 */
     retries = (retries < 0) ? 7 : retries;  /* max < 0 => disable CSMA (set to 7) */
     DEBUG("Retries: %i ", retries);
     mutex_lock(&dev->lock);
@@ -539,6 +544,7 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
     const uint16_t *pan_id = value;
     const network_uint16_t *short_addr = value;
     const eui64_t *ext_addr = value;
+
     DEBUG("at86rf2xx_rf_ops: set_hw_addr_filter.\n");
     mutex_lock(&dev->lock);
     switch (cmd) {
@@ -564,7 +570,7 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
         DEBUG("PANID: %04x\n", *pan_id);
     }
-        break;
+    break;
     case IEEE802154_AF_PAN_COORD:
         mutex_unlock(&dev->lock);
         return -ENOTSUP;
@@ -574,21 +580,23 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
     return 0;
 }
 
-static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t cmd, const void *value)
+static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t cmd,
+                                  const void *value)
 {
 
     at86rf2xx_t *dev = hal->priv;
     int res;
+
     mutex_lock(&dev->lock);
     switch (cmd) {
-        case IEEE802154_SRC_MATCH_EN: {
-            const bool en = *((const bool*) value);
-            at86rf2xx_set_option(dev, AT86RF2XX_OPT_ACK_PENDING, en);
-            res = 0;
-            break;
-        }
-        default:
-            res = -ENOTSUP;
+    case IEEE802154_SRC_MATCH_EN: {
+        const bool en = *((const bool *)value);
+        at86rf2xx_set_option(dev, AT86RF2XX_OPT_ACK_PENDING, en);
+        res = 0;
+        break;
+    }
+    default:
+        res = -ENOTSUP;
     }
     mutex_unlock(&dev->lock);
     return res;
@@ -599,16 +607,17 @@ static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
 
     at86rf2xx_t *dev = hal->priv;
     bool promisc = false;
-    switch(mode) {
-        case IEEE802154_FILTER_ACCEPT:
-            promisc = false;
-            break;
-        case IEEE802154_FILTER_PROMISC:
-            promisc = true;
-            break;
-        case IEEE802154_FILTER_ACK_ONLY:
-        case IEEE802154_FILTER_SNIFFER:
-            return -ENOTSUP;
+
+    switch (mode) {
+    case IEEE802154_FILTER_ACCEPT:
+        promisc = false;
+        break;
+    case IEEE802154_FILTER_PROMISC:
+        promisc = true;
+        break;
+    case IEEE802154_FILTER_ACK_ONLY:
+    case IEEE802154_FILTER_SNIFFER:
+        return -ENOTSUP;
     }
 
     DEBUG("[at86rf2xx] set promiscuous to %i\n", promisc);
@@ -618,16 +627,18 @@ static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
     return 0;
 }
 
-int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee802154_dev_t *hal, void (*cb)(void*), void *ctx)
+int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee802154_dev_t *hal,
+                   void (*cb)(void *), void *ctx)
 {
     uint8_t tmp;
-    (void) tmp;
 
-    (void) at86rf2xx_periph;
+    (void)tmp;
+
+    (void)at86rf2xx_periph;
     mutex_init(&dev->lock);
     mutex_lock(&dev->lock);
 #if AT86RF2XX_IS_PERIPH
-    (void) params;
+    (void)params;
     /* set all interrupts off */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
     at86rf2xx_periph = hal;
@@ -682,7 +693,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
     /* enable TX start interrupt for retry counter */
 #if AT86RF2XX_HAVE_TX_START_IRQ
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
-                             AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
+                        AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
 #endif
 
     /* clear interrupt flags */
@@ -705,6 +716,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
 static void _dispatch_event(ieee802154_dev_t *hal, ieee802154_trx_ev_t ev)
 {
     at86rf2xx_t *dev = hal->priv;
+
     mutex_unlock(&dev->lock);
     hal->cb(hal, ev);
     mutex_lock(&dev->lock);
@@ -738,21 +750,21 @@ void at86rf2xx_irq_handler(ieee802154_dev_t *hal)
     uint8_t state;
 
     /* Read the state before locking the mutex to capture the current state of the radio.
-    * This operation should be fine, because it only performs a reading operation and doesn't change the radio state.
-    * This solves the bug where the radio thread is blocked by the submac thread:
-    * The radio is in RX and still hasn't received the IRQ for RX_DONE. When the radio
-    * isn't busy anymore, it could happen that the submac is able to get the mutex before the
-    * IRQ arrives and the radio thread is blocked because of the mutex even with higher priority. After the submac is done, the
-    * radio thread is unlocked but the radio is in the TX state instead of RX. Therefore the radio
-    * dispatches a CONFIRM_TX_DONE event which is actually an RX_DONE event, which causes an assertion in the submac.
-    */
+     * This operation should be fine, because it only performs a reading operation and doesn't change the radio state.
+     * This solves the bug where the radio thread is blocked by the submac thread:
+     * The radio is in RX and still hasn't received the IRQ for RX_DONE. When the radio
+     * isn't busy anymore, it could happen that the submac is able to get the mutex before the
+     * IRQ arrives and the radio thread is blocked because of the mutex even with higher priority. After the submac is done, the
+     * radio thread is unlocked but the radio is in the TX state instead of RX. Therefore the radio
+     * dispatches a CONFIRM_TX_DONE event which is actually an RX_DONE event, which causes an assertion in the submac.
+     */
     state = at86rf2xx_get_status(dev);
     /* If transceiver is sleeping register access is impossible and frames are
      * lost anyway, so return immediately.
      */
-     if (state == AT86RF2XX_STATE_SLEEP) {
-         return;
-     }
+    if (state == AT86RF2XX_STATE_SLEEP) {
+        return;
+    }
     mutex_lock(&dev->lock);
 
     /* read (consume) device status */
@@ -783,12 +795,14 @@ static void _event_handler(event_t *event)
 {
     at86rf2xx_bhp_ev_t *bhp = container_of(event, at86rf2xx_bhp_ev_t, ev);
     ieee802154_dev_t *hal = bhp->hal;
+
     at86rf2xx_irq_handler(hal);
 }
 
 void _irq_handler(void *ctx)
 {
     at86rf2xx_bhp_ev_t *bhp = ctx;
+
     event_post(bhp->evq, &bhp->ev);
 }
 
@@ -804,17 +818,17 @@ int at86rf2xx_init_event(at86rf2xx_bhp_ev_t *bhp, const at86rf2xx_params_t *para
 
 static const ieee802154_radio_ops_t at86rf2xx_ops = {
     .caps =  IEEE802154_CAP_24_GHZ
-          | IEEE802154_CAP_IRQ_CRC_ERROR
-          | IEEE802154_CAP_IRQ_RX_START
-          | IEEE802154_CAP_IRQ_TX_DONE
-#if !IS_ACTIVE(AT86RF2XX_BASIC_MODE)
-          | IEEE802154_CAP_FRAME_RETRANS
+            | IEEE802154_CAP_IRQ_CRC_ERROR
+            | IEEE802154_CAP_IRQ_RX_START
+            | IEEE802154_CAP_IRQ_TX_DONE
+#if ! IS_ACTIVE(AT86RF2XX_BASIC_MODE)
+            | IEEE802154_CAP_FRAME_RETRANS
 #if AT86RF2XX_HAVE_RETRIES
-          | IEEE802154_CAP_FRAME_RETRANS_INFO
+            | IEEE802154_CAP_FRAME_RETRANS_INFO
 #endif
 #endif
-          | IEEE802154_CAP_PHY_OQPSK
-          | IEEE802154_CAP_REG_RETENTION,
+            | IEEE802154_CAP_PHY_OQPSK
+            | IEEE802154_CAP_REG_RETENTION,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
@@ -852,7 +866,7 @@ ISR(TRX24_TX_START_vect){
      * thread_yield and the interrupt can not be interrupted by an other ISR */
     at86rf2xx_t *dev = at86rf2xx_periph->priv;
 
-    dev->tx_retries++;
+    dev->tx_retries ++;
 }
 #endif
 
