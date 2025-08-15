@@ -1,12 +1,6 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2015 Ell-i open source co-operative
- *               2015-2017 Freie Universität Berlin
- *               2014 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
