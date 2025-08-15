@@ -178,8 +178,6 @@ typedef enum {
     IEEE802154_SUBMAC_FSM_RETURN_HANDLED,       /**< Event was handled */
     IEEE802154_SUBMAC_FSM_RETURN_TRANSITION,    /**< Event has caused a transition */
     IEEE802154_SUBMAC_FSM_RETURN_IGNORED,       /**< Event was ignored, no action was performed*/
-    IEEE802154_SUBMAC_FSM_RETURN_BUSY,          /**< Event shouldn't be processed at that time */
-    IEEE802154_SUBMAC_FSM_RETURN_ALREADY,       /**< Event shouldn't be processed in this state*/
 } ieee802154_submac_fsm_return_status_t;
 
 /**
@@ -217,6 +215,7 @@ struct ieee802154_submac {
     uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
     int8_t tx_pow;                      /**< Transmission power (in dBm) */
     ieee802154_fsm_t fsm;               /**< FSM of the SubMAC */
+    int32_t fsm_context_res;            /**< Result of the proceeded fsm action */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     const iolist_t *psdu;               /**< stores the current PSDU */
 };
