@@ -3,7 +3,7 @@ RIOTMAKE  ?= $(RIOTBASE)/makefiles
 RIOTTOOLS ?= $(RIOTBASE)/dist/tools
 
 .PHONY: install
-install:
+install: integrate_outside_files
 	@echo "Installing starlight..."
 	@npm install --prefix $(CURDIR) --prefer-offline
 	@echo "Starlight installed successfully."
@@ -18,5 +18,20 @@ dev: install
 	@echo "Starting starlight live server..."
 	@npm run dev --prefix $(CURDIR)
 
+.PHONY: clean
 clean:
 	-@rm -rf node_modules .astro dist
+
+.PHONY: integrate_outside_files
+integrate_outside_files: code_of_conduct governance
+
+.PHONY: code_of_conduct
+code_of_conduct: ../../CODE_OF_CONDUCT.md
+	-@mkdir -p ../guides/generated
+	-@echo "Generating Code of Conduct documentation..."
+	-@sed '1,2d' $< | cat ./templates/CODE_OF_CONDUCT.template.md - > ../guides/generated/CODE_OF_CONDUCT.md
+
+.PHONY: governance
+governance: ../../GOVERNANCE.md
+	-@echo "Generating Governance documentation..."
+	-@sed '1,2d' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' | cat ./templates/GOVERNANCE.template.md - > ../guides/generated/GOVERNANCE.md
