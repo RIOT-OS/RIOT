@@ -432,6 +432,128 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 }
 
 /*
+ * macAckWaitDuration [symbol periods] =
+ * aUnitBackoffPeriod + aTurnaroundTime + phySHRDuration + 6 x phySymbolsPerOctet
+ *
+ *  54 symbols
+ */
+static inline uint16_t _oqpsk_ack_timeout_symbols(const ieee802154_oqpsk_conf_t *conf)
+{
+    (void)conf;
+    return IEEE802154_AUNITBACKOFF_PERIOD_IN_SYMBOLS +
+           IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS +
+           10 + /* SHR: 32bit preamble + 8 bit SFD => 40 bit => 10 symbols */
+           6 * 2; /* 2 symbols per octet and 4 bit per symbol */
+}
+
+/*
+ * macAckWaitDuration [us] = macAckWaitDuration [symbol periods] * symbol duration [us]
+ *
+ * IEEE 802.15.4-2006, 6.1.2.2 Channel pages, Table 2—Channel page and channel number
+ */
+static inline uint16_t _oqpsk_ack_timeout_us(const ieee802154_oqpsk_conf_t *conf)
+{
+    if (conf->super.page == 2 && conf->super.channel == 0) {
+        /* 868 MHz */
+        return _oqpsk_ack_timeout_symbols(conf) * IEEE802154_OQPSK_868_SYMBOL_TIME_US;
+    }
+    else if (conf->super.page == 2 && conf->super.channel >= 1 && conf->super.channel <= 10) {
+        /* 915 MHz */
+        return _oqpsk_ack_timeout_symbols(conf) * IEEE802154_OQPSK_915_SYMBOL_TIME_US;
+    }
+    else if (conf->super.page == 0 && conf->super.channel >= 11 && conf->super.channel <= 26) {
+        /* 2.4 GHz */
+        return _oqpsk_ack_timeout_symbols(conf) * IEEE802154_OQPSK_2450_SYMBOL_TIME_US;
+    }
+    else {
+        /* invalid */
+        return 0;
+    }
+}
+
+/*
+ * macAckWaitDuration [symbol periods] =
+ * aUnitBackoffPeriod + aTurnaroundTime + phySHRDuration + 6 x phySymbolsPerOctet
+ *
+ * 120 symbols
+ */
+static inline uint16_t _bpsk_ack_timeout_symbols(const ieee802154_bpsk_conf_t *conf)
+{
+    (void)conf;
+    return IEEE802154_AUNITBACKOFF_PERIOD_IN_SYMBOLS +
+           IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS +
+           40 + /* SHR: 32bit preamble + 8 bit SFD => 40 bit => 40 symbols */
+           6 * 8; /* 8 symbols per octet and 1 bit per symbol */
+}
+
+/*
+ * macAckWaitDuration [us] = macAckWaitDuration [symbol periods] * symbol duration [us]
+ *
+ * IEEE 802.15.4-2006, 6.1.2.2 Channel pages, Table 2—Channel page and channel number
+ */
+static inline uint16_t _bpsk_ack_timeout_us(const ieee802154_bpsk_conf_t *conf)
+{
+    if (conf->super.page == 0 && conf->super.channel == 0) {
+        /* 868 MHz */
+        return _bpsk_ack_timeout_symbols(conf) * IEEE802154_BPSK_868_SYMBOL_TIME_US;
+    }
+    else if (conf->super.page == 0 && conf->super.channel >= 1 && conf->super.channel <= 10) {
+        /* 915 MHz */
+        return _bpsk_ack_timeout_symbols(conf) * IEEE802154_BPSK_915_SYMBOL_TIME_US;
+    }
+    else {
+        /* invalid */
+        return 0;
+    }
+}
+
+/**
+ * macAckWaitDuration [symbol periods] =
+ * aUnitBackoffPeriod + aTurnaroundTime + phySHRDuration + 6 x phySymbolsPerOctet
+ *
+ * IEEE 802.15.4-2006, Section 6.3 PPDU format
+ * SHR duration is different for 868 MHz and 915 MHz
+ *
+ * IEEE 802.15.4-2006, 6.1.2.2 Channel pages, Table 2—Channel page and channel number
+ * Page 1, Channel 0: 868 MHz
+ * Page 1, Channel 1-10: 915 MHz
+ */
+static inline uint16_t _ask_ack_timeout_symbols(const ieee802154_ask_conf_t *conf)
+{
+    (void)conf;
+    return IEEE802154_AUNITBACKOFF_PERIOD_IN_SYMBOLS +
+           IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS +
+           conf->super.page == 1 && conf->super.channel == 0
+            /* 868 MHz */
+            ? 3 + /* SHR: 2 symbols preamble + 1 symbol SFD */
+              (uint16_t)(6 * 0.4f + 0.5f) /* 0.4 symbols per octet (+0.5 to round up)*/
+            /* 915 MHz */
+            : 7 + /* SHR: 6 symbols preamble + 1 symbol SFD */
+              (uint16_t)(6 * 1.6f + 0.5f); /* 1.6 symbols per octet (+0.5 to round up)*/
+}
+
+/*
+ * macAckWaitDuration [us] = macAckWaitDuration [symbol periods] * symbol duration [us]
+ *
+ * IEEE 802.15.4-2006, 6.1.2.2 Channel pages, Table 2—Channel page and channel number
+ */
+static inline uint16_t _ask_ack_timeout_us(const ieee802154_ask_conf_t *conf)
+{
+    if (conf->super.page == 1 && conf->super.channel == 0) {
+        /* 868 MHz */
+        return _ask_ack_timeout_symbols(conf) * IEEE802154_ASK_868_SYMBOL_TIME_US;
+    }
+    else if (conf->super.page == 1 && conf->super.channel >= 1 && conf->super.channel <= 10) {
+        /* 915 MHz */
+        return _ask_ack_timeout_symbols(conf) * IEEE802154_ASK_915_SYMBOL_TIME_US;
+    }
+    else {
+        /* invalid */
+        return 0;
+    }
+}
+
+/*
  * MR-OQPSK timing calculations
  *
  * The standard unfortunately does not list the formula, instead it has to be pieced together
@@ -599,36 +721,46 @@ static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *co
 }
 
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
-                                        const ieee802154_phy_conf_t *conf)
+                                        ieee802154_phy_conf_t *conf)
 {
+    conf->res.ack_timeout_us = ACK_TIMEOUT_US;
+    conf->res.csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
     switch (conf->phy_mode) {
+    case IEEE802154_PHY_BPSK:
+        conf->res.ack_timeout_us = _bpsk_ack_timeout_us((void *)conf);
+        conf->res.csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+        break;
+    case IEEE802154_PHY_ASK:
+        conf->res.ack_timeout_us = _ask_ack_timeout_us((void *)conf);
+        conf->res.csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+        break;
     case IEEE802154_PHY_OQPSK:
-        submac->ack_timeout_us = ACK_TIMEOUT_US;
-        submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+        conf->res.ack_timeout_us = _oqpsk_ack_timeout_us((void *)conf);
+        conf->res.csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
         break;
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
-        submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
+        conf->res.ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
+        conf->res.csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
         break;
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
     case IEEE802154_PHY_MR_OFDM:
-        submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
+        conf->res.ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
+        conf->res.csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
         break;
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
     case IEEE802154_PHY_MR_FSK:
-        submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
+        conf->res.ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
+        conf->res.csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
         break;
 #endif
     case IEEE802154_PHY_NO_OP:
     case IEEE802154_PHY_DISABLED:
-        break;
     default:
-        return -EINVAL;
+        /* device driver may set ACK timeout and CSMA backoff */
+        break;
     }
 
     return ieee802154_radio_config_phy(&submac->dev, conf);
@@ -714,6 +846,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
         ieee802154_mr_fsk_conf_t mr_fsk;
 #endif
     } conf;
+    memset(&conf, 0, sizeof(conf));
 
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     if (submac->phy_mode == IEEE802154_PHY_MR_OQPSK) {
@@ -740,10 +873,14 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     conf.super.channel = submac->channel_num;
     conf.super.page = submac->channel_page;
     conf.super.pow = submac->tx_pow;
-
-    ieee802154_submac_config_phy(submac, &conf.super);
-    ieee802154_radio_set_cca_threshold(dev,
-                                       CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+    if (ieee802154_submac_config_phy(submac, &conf.super) >= 0) {
+        submac->channel_num = conf.super.channel;
+        submac->channel_page = conf.super.page;
+        submac->tx_pow = conf.super.pow;
+        submac->ack_timeout_us = conf.super.res.ack_timeout_us;
+        submac->csma_backoff_us = conf.super.res.csma_backoff_us;
+    }
+    ieee802154_radio_set_cca_threshold(dev, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     assert(res >= 0);
 
     while (ieee802154_radio_set_rx(dev) < 0) {}
@@ -751,7 +888,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     return res;
 }
 
-int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_conf_t *conf)
+int ieee802154_set_phy_conf(ieee802154_submac_t *submac, ieee802154_phy_conf_t *conf)
 {
     ieee802154_dev_t *dev = &submac->dev;
     int res;
@@ -775,6 +912,8 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
         submac->channel_num = conf->channel;
         submac->channel_page = conf->page;
         submac->tx_pow = conf->pow;
+        submac->ack_timeout_us = conf->res.ack_timeout_us;
+        submac->csma_backoff_us = conf->res.csma_backoff_us;
         if (conf->phy_mode != IEEE802154_PHY_NO_OP) {
             submac->phy_mode = conf->phy_mode;
         }
