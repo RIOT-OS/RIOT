@@ -1,6 +1,7 @@
 PKG_NAME=picotool
 PKG_URL=https://github.com/raspberrypi/picotool.git
-PKG_VERSION=de8ae5ac334e1126993f72a5c67949712fd1e1a4
+# Version 2.2.0-a4
+PKG_VERSION=25aa087b2c517b4901874a99536e869d4d27b678
 PKG_LICENSE=BSD-3-Clause
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
