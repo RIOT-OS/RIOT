@@ -56,8 +56,8 @@ extern "C" {
 #define ARDUINO_PIN_12          GPIO_PIN(PORT_A, 6)
 #define ARDUINO_PIN_13          GPIO_PIN(PORT_A, 5)
 
-#define ARDUINO_PIN_14          GPIO_PIN(PORT_B, 8)
-#define ARDUINO_PIN_15          GPIO_PIN(PORT_B, 9)
+#define ARDUINO_PIN_14          GPIO_PIN(PORT_B, 9)
+#define ARDUINO_PIN_15          GPIO_PIN(PORT_B, 8)
 
 #define ARDUINO_PIN_16          GPIO_PIN(PORT_A, 3)
 #define ARDUINO_PIN_17          GPIO_PIN(PORT_C, 0)
