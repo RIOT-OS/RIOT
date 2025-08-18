@@ -85,6 +85,7 @@ FEATURES_EXISTING := \
     cpu_nrf53 \
     cpu_nrf9160 \
     cpu_qn908x \
+    cpu_rp2350 \
     cpu_rpx0xx \
     cpu_sam3 \
     cpu_sam4s \
@@ -114,9 +115,8 @@ FEATURES_EXISTING := \
     efm32_coretemp \
     emulator_renode \
     esp_ble \
-    esp_ble_esp32 \
-    esp_ble_esp32c3 \
     esp_hw_counter \
+    esp_ieee802154 \
     esp_jtag \
     esp_now \
     esp_rmt \

@@ -121,6 +121,9 @@ static inline void _irq_enable(tim_t tim)
             case 3:
                 irqn = GPTIMER_3A_IRQn;
                 break;
+            default:
+                assume(0);
+                return;
         }
         NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(irqn);

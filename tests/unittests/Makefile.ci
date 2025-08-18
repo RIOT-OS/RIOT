@@ -79,6 +79,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     pba-d-01-kw2x \
     remote-pa \
     remote-reva \
+    remote-revb \
     samd10-xmini \
     samd20-xpro \
     samd21-xpro \

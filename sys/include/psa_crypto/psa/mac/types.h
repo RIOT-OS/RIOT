@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "psa/algorithm.h"
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -26,12 +28,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   Structure storing a MAC operation context
- *
- * @note    Not yet implemented
+ * @brief   Structure containing a MAC operation context
  */
 struct psa_mac_operation_s {
-    int dummy;  /**< Not yet implemented */
+    psa_algorithm_t alg;    /**< MAC algorithm used for multi-part MAC operations */
 };
 
 /**

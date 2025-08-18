@@ -66,7 +66,14 @@ extern "C" {
 /**
  * @brief   Length of the CPU_ID in octets
  */
-#define CPUID_LEN               (6U)
+#if defined(CPU_FAM_ESP32H2) && defined(CONFIG_IEEE802154_ENABLED)
+/* ESP32H2 has IEEE802.15.4 radio which has an EUI64 address. Function
+ * esp_efuse_mac_get_default will return this 8 byte address if
+ * CONFIG_IEEE802154_ENABLED */
+#  define CPUID_LEN             (8U)
+#else
+#  define CPUID_LEN             (6U)
+#endif
 
 /**
  * @name   GPIO configuration
@@ -1037,6 +1044,8 @@ typedef enum {
 #  include "periph_cpu_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #  include "periph_cpu_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "periph_cpu_esp32c6.h"
 #elif defined(CPU_FAM_ESP32H2)
 #  include "periph_cpu_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)

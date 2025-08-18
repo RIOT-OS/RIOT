@@ -189,6 +189,7 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *
                                                     size_t plaintext_size,
                                                     size_t *plaintext_length);
 #endif /* MODULE_PSA_AEAD */
+
 #if IS_USED(MODULE_PSA_MAC)
 /**
  * @brief   Dispatch a mac computation function to a specific backend.
@@ -202,7 +203,68 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
                                                 uint8_t *mac,
                                                 size_t mac_size,
                                                 size_t *mac_length);
-#endif
+
+/**
+ * @brief   Dispatch a mac verification function to a specific backend.
+ *          See @ref psa_mac_verify()
+ */
+psa_status_t psa_algorithm_dispatch_mac_verify(const psa_key_attributes_t *attributes,
+                                               psa_algorithm_t alg,
+                                               const psa_key_slot_t *slot,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               const uint8_t *mac,
+                                               size_t mac_length);
+
+/**
+ * @brief   Dispatch call of a mac sign setup function to a specific backend.
+ *          See @ref psa_mac_sign_setup()
+ */
+psa_status_t psa_algorithm_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
+                                                   const psa_key_attributes_t *attributes,
+                                                   const psa_key_slot_t *slot,
+                                                   psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a mac verify setup function to a specific backend.
+ *          See @ref psa_mac_verify_setup()
+ */
+psa_status_t psa_algorithm_dispatch_mac_verify_setup(psa_mac_operation_t *operation,
+                                                     const psa_key_attributes_t *attributes,
+                                                     const psa_key_slot_t *slot,
+                                                     psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a mac update function to a specific backend.
+ *          See @ref psa_mac_update()
+ */
+psa_status_t psa_algorithm_dispatch_mac_update(psa_mac_operation_t *operation,
+                                               const uint8_t *input,
+                                               size_t input_length);
+
+/**
+ * @brief   Dispatch call of a mac sign finish function to a specific backend.
+ *          See @ref psa_mac_sign_finish()
+ */
+psa_status_t psa_algorithm_dispatch_mac_sign_finish(psa_mac_operation_t *operation,
+                                                    uint8_t *mac,
+                                                    size_t mac_size,
+                                                    size_t *mac_length);
+
+/**
+ * @brief   Dispatch call of a mac verify finish function to a specific backend.
+ *          See @ref psa_mac_verify_finish()
+ */
+psa_status_t psa_algorithm_dispatch_mac_verify_finish(psa_mac_operation_t *operation,
+                                                      const uint8_t *mac,
+                                                      size_t mac_length);
+
+/**
+ * @brief   Dispatch call of a mac abort function to a specific backend.
+ *          See @ref psa_mac_abort()
+ */
+psa_status_t psa_algorithm_dispatch_mac_abort(psa_mac_operation_t *operation);
+#endif /* MODULE_PSA_MAC */
 
 #ifdef __cplusplus
 }

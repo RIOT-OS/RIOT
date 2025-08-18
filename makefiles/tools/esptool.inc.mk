@@ -1,11 +1,12 @@
+ESPTOOL_VERSION = 5.0.0
+ESPTOOL_VENV = $(RIOTTOOLS)/esptools/venv
+ESPTOOL = $(ESPTOOL_VENV)/bin/esptool
+
 # ESP-IDF uses dio as flash mode for esptool.py when qout or qio mode are
 # configured to always boot in dual SPI mode
 ifneq (,$(filter qout qio,$(FLASH_MODE)))
   FLASH_MODE = dio
 endif
-
-ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
-ESPTOOL_FLASH ?= $(ESPTOOL)
 
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
@@ -14,30 +15,32 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   FLASHDEPS += esp-qemu
 else
   PROGRAMMER_SPEED ?= 460800
-  FLASHER = $(ESPTOOL_FLASH)
+  FLASHER = $(ESPTOOL)
   FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
-  FFLAGS += --before default_reset write_flash -z
-  FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
-  FFLAGS += --flash_size detect
+  FFLAGS += --before default-reset write-flash -z
+  FFLAGS += --flash-mode $(FLASH_MODE) --flash-freq $(FLASH_FREQ)
+  FFLAGS += --flash-size detect
   FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
   FFLAGS += $(FLASHFILE_POS) $(FLASHFILE)
-  FLASHDEPS += esptool_flash
+  FLASHDEPS += esptool
 endif
 
-.PHONY: esp-qemu esptool_flash clean
+.PHONY: esp-qemu esptool
+
+all: esptool
 
 esp-qemu: $(FLASHFILE)
 ifeq (esp32,$(CPU))
 	$(Q)echo \
-		"--flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ) " \
-		"--flash_size $(FLASH_SIZE)MB" \
+		"--flash-mode $(FLASH_MODE) --flash-freq $(FLASH_FREQ) " \
+		"--flash-size $(FLASH_SIZE)MB" \
 		"$(BOOTLOADER_POS) $(BOOTLOADER_BIN)" \
 		"0x8000 $(BINDIR)/partitions.bin" \
 		"$(FLASHFILE_POS) $(FLASHFILE)" > $(BINDIR)/qemu_flash_args
 	$(Q)$(ESPTOOL) \
-		--chip $(CPU_FAM) merge_bin \
-		--fill-flash-size 4MB \
+		--chip $(CPU_FAM) merge-bin \
+		--pad-to-size 4MB \
 		-o $(BINDIR)/qemu_flash_image.bin @$(BINDIR)/qemu_flash_args
 	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
 	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
@@ -53,11 +56,14 @@ else
 		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
 endif
 
-esptool_flash: $(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py
+esptool: $(ESPTOOL_VENV)/.version_$(ESPTOOL_VERSION)
 
-$(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py:
-	python3 -m venv $(PKGDIRBASE)/esptool/venv_flash
-	$(PKGDIRBASE)/esptool/venv_flash/bin/pip install esptool
+$(ESPTOOL_VENV)/.version_$(ESPTOOL_VERSION):
+	$(Q)echo "Installing esptool version $(ESPTOOL_VERSION) in a virtual Python environment"
+	$(Q)test -d $(ESPTOOL_VENV) || python3 -m venv $(ESPTOOL_VENV)
+	$(Q)rm -f $(ESPTOOL_VENV)/.version_*
+	$(Q)$(ESPTOOL_VENV)/bin/pip install -q esptool==$(ESPTOOL_VERSION)
+	$(Q)touch $(ESPTOOL_VENV)/.version_$(ESPTOOL_VERSION)
 
 # reset tool configuration
 RESET ?= $(RIOTTOOLS)/esptools/espreset.py

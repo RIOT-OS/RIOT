@@ -1,5 +1,6 @@
 PKG_NAME      = driver_cryptocell_310
-PKG_URL       = https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5/Binaries
+# upstream at https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5/Binaries sends 403 Forbidden
+PKG_URL       = https://download.riot-os.org
 PKG_VERSION   = 17.1.0_ddde560
 PKG_DIR_NAME  = nRF5_SDK
 PKG_EXT       = zip

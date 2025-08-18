@@ -32,9 +32,9 @@ extern "C" {
  * @{
  */
 typedef enum {
-    NETSTATS_NB_BUSY,       /**< Failed due to medium busy */
-    NETSTATS_NB_NOACK,      /**< Failed due to no ack received */
-    NETSTATS_NB_SUCCESS,    /**< Successful transmission */
+    NETSTATS_NB_SUCCESS = 0,    /**< Successful transmission */
+    NETSTATS_NB_NOACK,          /**< Failed due to no ack received */
+    NETSTATS_NB_BUSY,           /**< Failed due to medium busy */
 } netstats_nb_result_t;
 /** @} */
 

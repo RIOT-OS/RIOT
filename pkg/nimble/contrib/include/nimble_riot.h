@@ -22,6 +22,7 @@
 #ifndef NIMBLE_RIOT_H
 #define NIMBLE_RIOT_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "kernel_defines.h"
 
@@ -60,8 +61,6 @@ extern "C" {
 #endif
 #endif
 
-
-
 /**
  * @brief   Stacksize used for NimBLE's host thread
  */
@@ -87,6 +86,21 @@ typedef enum {
  * @brief   Export our own address type for later usage
  */
 extern uint8_t nimble_riot_own_addr_type;
+
+/**
+ * @brief   Indicates whether Setup NimBLE's controller has been initialized
+ *
+ * `nimble_port_initialized` is false by default and is set to true as soon as
+ * `nimble_port_init` has been called by nimble_riot_init, i.e. that the NimBLE
+ * stack has been initialized.
+ *
+ * The variable can be used to decide whether events from the low-level
+ * BLE controller driver should be forwarded to the NimBLE stack. It is
+ * necessary to avoid crashes in the case that the higher-prioritized thread
+ * of the low-level BLE controller driver starts sending events to the host
+ * before the NimBLE stack has been initialized by the lower-prioritized
+ * host thread. */
+extern bool nimble_port_initialized;
 
 /**
  * @brief   Setup and run NimBLE's controller and host threads

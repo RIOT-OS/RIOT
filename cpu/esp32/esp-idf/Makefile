@@ -36,6 +36,10 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
   DIRS += heap
 endif
 
+ifneq (,$(filter esp_idf_ieee802154,$(USEMODULE)))
+  DIRS += ieee802154
+endif
+
 ifneq (,$(filter esp_idf_lcd,$(USEMODULE)))
   DIRS += lcd
 endif

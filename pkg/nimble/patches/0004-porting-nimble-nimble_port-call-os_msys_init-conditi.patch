@@ -1,0 +1,28 @@
+From 9c2896697b2fbd3f7aaec87f55bdc20cfea591d5 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 17 Apr 2025 14:40:51 +0200
+Subject: [PATCH 4/4] porting/nimble/nimble_port: call os_msys_init
+ conditionally
+
+BLE library for ESP32x implements its own version of `os_msys_init`, which is used by the BLE controller implementation for ESP32x and is implicitly called when the BLE controller is enabled.
+---
+ porting/nimble/src/nimble_port.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/porting/nimble/src/nimble_port.c b/porting/nimble/src/nimble_port.c
+index 1bd57f2b..5e180206 100644
+--- a/porting/nimble/src/nimble_port.c
++++ b/porting/nimble/src/nimble_port.c
+@@ -39,7 +39,9 @@ nimble_port_init(void)
+     ble_npl_eventq_init(&g_eventq_dflt);
+     /* Initialize the global memory pool */
+     os_mempool_module_init();
++#if !NIMBLE_OS_MSYS_INIT_IN_CONTROLLER
+     os_msys_init();
++#endif
+     /* Initialize transport */
+     ble_transport_init();
+     /* Initialize the host */
+-- 
+2.34.1
+

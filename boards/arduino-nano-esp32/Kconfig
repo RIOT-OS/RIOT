@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2025 Gunar Schorcht
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "arduino-nano-esp32" if BOARD_ARDUINO_NANO_ESP32
+
+config BOARD_ARDUINO_NANO_ESP32
+    bool
+    default y
+    select BOARD_COMMON_ESP32S3
+    select CPU_MODEL_ESP32S3_R8
+
+source "$(RIOTBOARD)/common/esp32s3/Kconfig"

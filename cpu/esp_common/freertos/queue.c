@@ -564,8 +564,10 @@ BaseType_t IRAM_ATTR xQueueReceiveFromISR (QueueHandle_t xQueue,
                                0, pxHigherPriorityTaskWoken);
 }
 
-UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue )
+UBaseType_t uxQueueMessagesWaiting(QueueHandle_t xQueue)
 {
+    DEBUG("%s queue=%p isr=%d\n", __func__, xQueue, irq_is_in());
+
     assert(xQueue != NULL);
 
     _queue_t* queue = (_queue_t*)xQueue;
@@ -581,6 +583,23 @@ BaseType_t xQueueGiveFromISR (QueueHandle_t xQueue,
 
     return _queue_generic_send(xQueue, NULL, queueSEND_TO_BACK,
                                0, pxHigherPriorityTaskWoken);
+}
+
+UBaseType_t uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue)
+{
+    return uxQueueMessagesWaiting(xQueue);
+}
+
+BaseType_t xQueueIsQueueEmpty(const QueueHandle_t xQueue)
+{
+    DEBUG("%s queue=%p isr=%d\n", __func__, xQueue, irq_is_in());
+    return uxQueueMessagesWaitingFromISR(xQueue) == 0;
+}
+
+BaseType_t xQueueIsQueueEmptyFromISR(const QueueHandle_t xQueue)
+{
+    DEBUG("%s queue=%p\n", __func__, xQueue);
+    return xQueueIsQueueEmpty(xQueue);
 }
 
 #endif /* DOXYGEN */

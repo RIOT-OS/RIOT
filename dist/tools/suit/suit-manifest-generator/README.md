@@ -2,21 +2,6 @@
 
 This repository contains a tool to generate manifests following the specification in https://tools.ietf.org/html/draft-ietf-suit-manifest-09.
 
-# Installing
-
-First clone this repo:
-
-```
-$ git clone https://github.com/ARMmbed/suit-manifest-generator.git
-```
-
-Next, use pip to install the repo:
-
-```
-$ cd suit-manifest-generator
-$ python3 -m pip install --user --upgrade .
-```
-
 # Input File Description
 
 The input file is organised into four high-level elements:

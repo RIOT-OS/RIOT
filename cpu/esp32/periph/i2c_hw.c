@@ -171,6 +171,7 @@ void i2c_init(i2c_t dev)
         default:
             LOG_TAG_ERROR("i2c", "Invalid speed value in %s\n", __func__);
             assert(0);
+            return;
     }
 
     _i2c_bus[dev].clk_freq = clk_speed;

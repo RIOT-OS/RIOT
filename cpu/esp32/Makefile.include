@@ -14,7 +14,7 @@ ifeq (esp32,$(CPU_FAM))
   export FLASH_FREQ ?= 40m
   export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x1000
-else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+else ifneq (,$(filter esp32c3 esp32c6 esp32s3,$(CPU_FAM)))
   export FLASH_MODE ?= dio
   export FLASH_FREQ ?= 80m
   export FLASH_SIZE ?= 2
@@ -60,6 +60,11 @@ else ifeq (esp32c3,$(CPU_FAM))
   # used as instruction cache via the instruction bus.
   RAM_LEN = 320K
   RAM_START_ADDR = 0x3FC80000
+else ifeq (esp32c6,$(CPU_FAM))
+  # ESP32-C6 has 512 kByte RAM but the 2nd stage bootloader starts at 0x4086E610
+  # so that there are only 452.112 byte (about 441 kByte) remaining
+  RAM_LEN = 441K
+  RAM_START_ADDR = 0x40800000
 else ifeq (esp32h2,$(CPU_FAM))
   # ESP32-H2 has 320 kByte RAM but the 2nd stage bootloader starts at 0x4083EFD0
   # so that there are only 258,000 byte (about 250 kByte) remaining
@@ -101,11 +106,6 @@ ifneq (,$(filter periph_flashpage,$(USEMODULE)))
 endif
 
 FLASHFILE_POS ?= 0x10000
-
-ifeq (,$(ESPTOOL))
-  ESPTOOL ?= $(PKGDIRBASE)/esptool/venv/bin/esptool.py
-  ESPTOOL_FLASH ?= $(PKGDIRBASE)/esptool/venv_flash/bin/esptool.py
-endif
 
 include $(RIOTCPU)/esp_common/Makefile.include
 
@@ -178,12 +178,15 @@ ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
 endif
 
 ifneq (,$(filter esp_ble,$(USEMODULE)))
-  ifneq (,$(filter esp32 esp32h2,$(CPU_FAM)))
+  ifneq (,$(filter esp32 esp32c6 esp32h2,$(CPU_FAM)))
     INCLUDES += -I$(ESP32_SDK_DIR)/components/bt/include/$(CPU_FAM)/include
   else ifneq (,$(filter esp32s3 esp32c3,$(CPU_FAM)))
     INCLUDES += -I$(ESP32_SDK_DIR)/components/bt/include/esp32c3/include
   endif
-  ifeq (esp32h2,$(CPU_FAM))
+  ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
+    CFLAGS += -Ddefault_RNG_defined=0
+    CFLAGS += -DNIMBLE_OS_MSYS_INIT_IN_CONTROLLER=1
+    CFLAGS += -DNIMBLE_G_MSYS_POOL_LIST_IN_CONTROLLER=1
     INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
   endif
 endif
@@ -211,6 +214,7 @@ endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_partition/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
   CFLAGS += -DMBEDTLS_CIPHER_MODE_XTS
 endif
 
@@ -241,6 +245,12 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
+endif
+
+ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-ieee802154
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/ieee802154/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
 endif
 
 ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
@@ -318,7 +328,7 @@ ifneq (,$(filter riscv%,$(TARGET_ARCH)))
   ifeq (esp32c3,$(CPU_FAM))
     CFLAGS += -march=rv32imc_zicsr_zifencei
     LINKFLAGS += -march=rv32imc_zicsr_zifencei
-  else ifeq (esp32h2,$(CPU_FAM))
+  else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
     CFLAGS += -march=rv32imac_zicsr_zifencei
     LINKFLAGS += -march=rv32imac_zicsr_zifencei
   else
@@ -361,6 +371,12 @@ else ifeq (esp32c3,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.bt_funcs.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3.ld
+else ifeq (esp32c6,$(CPU_FAM))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.coexist.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.pp.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.phy.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.net80211.ld
 else ifeq (esp32h2,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
 else
@@ -395,13 +411,28 @@ endif
 # Libraries needed when using esp_ble
 ifneq (,$(filter esp_ble,$(USEMODULE)))
   LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
-  LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
-  ARCHIVES += -lbtdm_app
   ARCHIVES += -lphy -lstdc++
+  ifneq (,$(filter esp32 esp32c3 esp32s3,$(CPU_FAM)))
+    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
+    ARCHIVES += -lbtdm_app
+  else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
+    LINKFLAGS += -L$(ESP32_SDK_LIB_COEXIST_DIR)/$(CPU_FAM)
+    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)
+    ARCHIVES += -lble_app -lcoexist
+  endif
   ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
-  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+  else ifneq (,$(filter esp32c3 esp32c6 esp32h2 esp32s3,$(CPU_FAM)))
     ARCHIVES += -lbtbb
+  endif
+endif
+
+ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
+  ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
+    LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
+    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)
+    ARCHIVES += -lbtbb
+    ARCHIVES += -lphy
   endif
 endif
 

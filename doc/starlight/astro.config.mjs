@@ -17,7 +17,7 @@ export default defineConfig({
         {
           icon: "mastodon",
           label: "Mastodon",
-          href: "https://fosstodon.org/@RIOT_OS",
+          href: "https://floss.social/@RIOT_OS",
         },
         {
           icon: "matrix",
@@ -71,6 +71,13 @@ export default defineConfig({
                 "c_tutorials/threads",
                 "c_tutorials/gpio",
                 "c_tutorials/saul",
+              ],
+            },
+            {
+              label: "Rust Basics",
+              items: [
+                "rust_tutorials/rust_in_riot",
+                "rust_tutorials/create_project",
               ],
             },
           ],

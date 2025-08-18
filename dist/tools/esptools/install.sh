@@ -98,7 +98,7 @@ install_arch()
             TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
-        esp32c3|esp32h2)
+        esp32c3|esp32c6|esp32h2)
             TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
@@ -236,11 +236,11 @@ if [ -z "$1" ]; then
     echo "       install.sh gdb <platform>"
     echo "       install.sh qemu <platform>"
     echo "<tool> = all | esptool | gdb | openocd | qemu |"
-    echo "         esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3"
+    echo "         esp8266 | esp32 | esp32c3 | esp32c6 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
     exit 1
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32h2 esp32s2 esp32s3"
+    ARCH_ALL="esp8266 esp32 esp32c3 esp32c6 esp32h2 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         install_arch "$arch"
     done
@@ -264,4 +264,4 @@ else
 fi
 
 echo "Use following command to extend the PATH variable:"
-echo ". $(dirname "$0")/export.sh $1"
+echo ". $(dirname "$0")/export.sh $1 $2"

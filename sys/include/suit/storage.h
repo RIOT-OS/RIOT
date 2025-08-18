@@ -543,8 +543,8 @@ static inline bool suit_storage_has_location(suit_storage_t *storage,
  * @returns     True if the location matches the offset,
  * @returns     False otherwise
  */
-static inline int suit_storage_match_offset(const suit_storage_t *storage,
-                                            size_t offset)
+static inline bool suit_storage_match_offset(const suit_storage_t *storage,
+                                             size_t offset)
 {
     return storage->driver->match_offset(storage, offset);
 }

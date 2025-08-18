@@ -138,12 +138,10 @@ PROGRAMMERS_SUPPORTED += esptool
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 FLASHFILE ?= $(ELFFILE).bin
 
-ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
-
 # This is the binary that ends up programmed in the flash.
 $(ELFFILE).bin: $(ELFFILE)
-	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
-		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
+	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash-mode $(FLASH_MODE) \
+		--flash-size $(FLASH_SIZE)MB --flash-freq $(FLASH_FREQ) $(FLASH_OPTS) \
 		-o $@ $<
 
 # Convert .elf and .csv to .bin files at build time, but make them available for
