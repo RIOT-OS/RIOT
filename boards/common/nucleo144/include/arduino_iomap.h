@@ -30,11 +30,17 @@ extern "C" {
  * @{
  */
 #if defined(CPU_MODEL_STM32F303ZE)
-#define ARDUINO_PIN_0           GPIO_PIN(PORT_C, 5)
-#define ARDUINO_PIN_1           GPIO_PIN(PORT_C, 4)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_C, 5)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_C, 4)
+#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_D, 9)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_D, 8)
+#elif defined(CPU_FAM_STM32U5)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_G, 8)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_G, 7)
 #else
-#define ARDUINO_PIN_0           GPIO_PIN(PORT_G, 9)
-#define ARDUINO_PIN_1           GPIO_PIN(PORT_G, 14)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_G, 9)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_G, 14)
 #endif
 #define ARDUINO_PIN_2           GPIO_PIN(PORT_F, 15)
 #define ARDUINO_PIN_3           GPIO_PIN(PORT_E, 13)
