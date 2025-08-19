@@ -111,6 +111,7 @@ struct ztimer64_clock {
     ztimer_clock_t *base_clock;     /**< 32bit clock backend                */
     ztimer_t base_timer;            /**< 32bit backend timer                */
     uint64_t checkpoint;            /**< lower timer checkpoint offset      */
+    uint64_t offset;                /**< offset of now() to reference time  */
     uint16_t adjust_set;            /**< will be subtracted on every set()  */
     uint16_t adjust_sleep;          /**< will be subtracted on every sleep(),
                                          in addition to adjust_set          */
@@ -496,6 +497,41 @@ void ztimer64_init(void);
  * @param[in]       base_clock  Base clock to use
  */
 void ztimer64_clock_init(ztimer64_clock_t *clock, ztimer_clock_t *base_clock);
+
+/**
+ * @brief           Set @p clock offset to time reference
+ *
+ * This sets an offset that will be added to all ztimer64_now() calls.
+ *
+ * @param[in,out]   clock       Clock to configure
+ * @param[in]       offset      Offset to configure
+ */
+static inline void ztimer64_clock_offset_set(ztimer64_clock_t *clock, uint64_t offset)
+{
+    /* TODO: handle timers in list */
+    clock->offset = offset;
+}
+
+/**
+ * @brief           Adjust @p clock offset to time reference
+ * @param[in,out]   clock       Clock to configure
+ * @param[in]       offset      Offset to configure
+ */
+static inline void ztimer64_clock_adjust(ztimer64_clock_t *clock, int64_t adjust_value)
+{
+    /* TODO: check for overflow? */
+    ztimer64_clock_offset_set(clock, clock->offset + adjust_value);
+}
+
+/**
+ * @brief           Get @p clock offset to time reference
+ * @param[in,out]   clock       Clock to work on
+ * returns  current clock offset
+ */
+static inline uint64_t ztimer64_offset_get(const ztimer64_clock_t *clock)
+{
+    return clock->offset;
+}
 
 /* default ztimer virtual devices */
 /**
