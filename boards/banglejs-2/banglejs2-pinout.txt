@@ -1,0 +1,102 @@
+Bangle.js 2 - Pinout
+--------------------
+
+Pin		Connected				State
+0	P0.00	32876 oscillator
+1	P0.01	32876 oscillator
+2	P0.02	pressure SCL				SCL
+3	P0.03	battery voltage analog			GND-[1M]-D3-[3M]-VBATT
+4	P0.04
+5	P0.05	memlcd CS				out
+6	P0.06	memlcd EXTCOMIN				out, needs to be toggled at 5ms or 250ms in sleep all the time
+7	P0.07	memlcd DISP 1=disp on, 0=disp off	out
+8	P0.08	backlight, high active			out
+9	P0.09
+10	P0.10
+11	P0.11
+12	P0.12
+13	P0.13	Flash MISO				MISO
+14	P0.14	Flash CS				out
+15	P0.15	Flash MOSI				MOSI
+16	P0.16	Flash SCK				SCK (in,pullup ?)
+17	P0.17	push button				in, pullup, edge detect
+18	P0.18
+19	P0.19	vibrate, active=1			out
+20	P0.20
+21	P0.21	HRM power, active=1			out
+22	P0.22	HRM INT#				in
+23	P0.23	charging#				in, pullup
+24	P0.24	HRM SDA					SDA
+25	P0.25	Charging complete			in
+26	P0.26	memlcd SCK				SCK
+27	P0.27	memlcd MOSI				MOSI
+28	P0.28
+29	P0.29	GPS power, active=1			out
+30	P0.30	GPS TXD (rx on nRF)			in
+31	P0.31	GPS RXD (tx on nRF)			out
+32	P1.00	HRM SCL					SCL
+33	P1.01	touch SDA				SDA
+34	P1.02	touch SCL				SCL
+35	P1.03	touch RESET# (active low)		out
+36	P1.04	touch INT# (active low)			in
+37	P1.05	accel SCL				SCL
+38	P1.06	accel SDA				SDA
+39	P1.07	accel INT#				in
+40	P1.08
+41	P1.09
+42	P1.10
+43	P1.11
+44	P1.12	magnetometer SDA			SDA
+45	P1.13	magnetometer SCL			SCL
+46	P1.14
+47	P1.15	pressure SDA				SDA
+
+
+Peripherals
+-----------
+memlcd		LPM013M126, 8 color RGB 3bpp
+HRM		VC31					addr: 0x33
+touch		CST816S					addr: 0x15
+accel		KX023					addr: 0x1e
+pressure	BMP280, v2.1 uses Goertek SPL06-001	addr: 0x76
+megneto		???, not GMC303				addr: 0x0C
+GPS		AT6558, Casic URANUS
+SPI-Flash	XT25F64B, 4096*2048
+
+
+VC31
+	http://www.vcaresensor.com/vc31.html
+	https://github.com/espruino/Espruino/blob/master/libs/misc/hrm_vc31.c
+
+Hynitron CST816S
+	https://wiki.pine64.org/index.php/PineTime#Touch_panel
+	Can write  0x03,0xe5 to turn off
+
+Kionix KX022/KX023
+	https://kionixfs.azureedge.net/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
+
+magneto
+	not GMC303
+	https://github.com/GlobalMEMS/Datasheets/blob/master/GMC303A%20Datasheet%20V1.3.pdf
+	https://raw.githubusercontent.com/GlobalMEMS/Datasheets/master/GMC303A%20Datasheet%20V1.3.pdf
+	https://github.com/GlobalMEMS/GMC303-Example-Code-AT-START-F403/tree/master/LibGMEMS/GMC303
+
+	0x00	0x02 0x03
+	0x01	0x12 0x13
+	From Espruino:
+	0x3e	read -> start single measurement, always returns 0x22
+	0x4e	status
+	// &0x02 seems always set
+	// &0x16 seems set if we read twice
+	// &0x32 might be reading in progress
+	0x4f	Yh
+	0x50	Yl
+	0x51	Xh
+	0x52	Xl
+	0x53	Zh
+	0x54	Zl
+
+BMP280
+	https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/
+	https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf
+	https://github.com/BoschSensortec/BMP2-Sensor-API
