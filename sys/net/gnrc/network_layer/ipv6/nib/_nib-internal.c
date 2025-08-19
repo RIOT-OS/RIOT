@@ -30,6 +30,9 @@
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+#include "_nib-slaac.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -682,6 +685,10 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
     _evtimer_del(&nib_offl->pfx_timeout);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    /* remove temporary address timer (not present if not a temporary address) */
+    _evtimer_del(&nib_offl->regen_temp_addr);
+#endif
     _nib_offl_remove(nib_offl, _PL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     unsigned idx = _idx_dsts(nib_offl);
@@ -705,21 +712,45 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
 {
     gnrc_netif_t *netif;
 
-    /* remove prefix timer */
-    evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
-
     /* get interface associated with prefix */
     netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
+    /* back up values */
+    uint8_t pfx_len = pfx->pfx_len;
+    ipv6_addr_t pfx_value = pfx->pfx;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    bool is_slaac_prefix = (pfx->flags & _PFX_SLAAC);
+#endif
+
+    /* remove prefix timer */
+    evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    /* remove temporary address timer (not present if not a temporary address) */
+    evtimer_del(&_nib_evtimer, &pfx->regen_temp_addr.event);
+#endif
+
+    /* remove prefix */
+    _nib_pl_remove(pfx);
 
     if (netif != NULL) {
-        uint8_t best_match_len = pfx->pfx_len;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        if (is_slaac_prefix) {
+            /* remove prefixes that manage a temporary address */
+            ipv6_addr_t temp_addr;
+            void *state = NULL;
+            while (_iter_slaac_prefix_to_temp_addr(netif, &pfx_value, state, &temp_addr)) {
+                gnrc_ipv6_nib_pl_del(netif->pid, &temp_addr, IPV6_ADDR_BIT_LEN);
+            }
+        }
+#endif
+
+        uint8_t best_match_len = pfx_len;
         ipv6_addr_t *best_match = NULL;
 
         /* remove address associated with prefix */
         for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
             if (ipv6_addr_match_prefix(&netif->ipv6.addrs[i],
-                                       &pfx->pfx) >= best_match_len) {
-                best_match_len = pfx->pfx_len;
+                                       &pfx_value) >= best_match_len) {
+                best_match_len = pfx_len;
                 best_match = &netif->ipv6.addrs[i];
             }
         }
@@ -728,9 +759,6 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
                                                  best_match);
         }
     }
-
-    /* remove prefix */
-    _nib_pl_remove(pfx);
 }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
