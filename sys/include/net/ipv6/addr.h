@@ -464,6 +464,18 @@ bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b);
 uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
 
 /**
+ * @brief   Checks if the bits set in @p mask are equal in two addresses
+ *
+ * @param[in] a     An IPv6 address.
+ * @param[in] b     Another IPv6 address.
+ * @param[in] mask  Bitmask with bits set that are to be compared
+ *
+ * @return  True if the bits matching @p mask are equal in @p a and @p b
+ */
+bool ipv6_addr_match_mask(const ipv6_addr_t *a, const ipv6_addr_t *b,
+                          const ipv6_addr_t *mask);
+
+/**
  * @brief   Sets IPv6 address @p out with the first @p bits taken
  *          from @p prefix and leaves the remaining bits untouched.
  *
