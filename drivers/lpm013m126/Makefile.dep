@@ -1,0 +1,4 @@
+FEATURES_REQUIRED += periph_spi
+FEATURES_REQUIRED += periph_gpio
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
