@@ -121,6 +121,7 @@ jobs:
         sudo apt-get install lib32asan6
     - name: Run release tests
       timeout-minutes: 350
+      shell: /usr/bin/bash {0}
       run: |
         RIOTBASE="$GITHUB_WORKSPACE/RIOT"
         TOX_ARGS=""
@@ -133,6 +134,8 @@ jobs:
         fi
 
         cd Release-Specs
+        # avoid exiting on non-zero exit code
+        set +e
         # definition in env does not work since $GITHUB_WORKSPACE seems not to
         # be accessible
         ${{ matrix.sudo }} \
@@ -155,6 +158,15 @@ jobs:
           RIOTBASE=${RIOTBASE} \
           $(which tox) -e test -- ${TOX_ARGS} \
             ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
+        TEST_RESULT=$?
+        # check for success or empty test selection
+        # https://docs.pytest.org/en/7.1.x/reference/exit-codes.html
+        if [ ${TEST_RESULT} -eq 0 ] || [ ${TEST_RESULT} -eq 5 ]; then
+          exit 0
+        else
+          exit 1
+        fi
+
     - name: junit2html and XML deploy
       if: always()
       run: |
