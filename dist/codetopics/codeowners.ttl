@@ -1,0 +1,5 @@
+@prefix ont: <ontology.ttl#>.
+@prefix topic: <topics.ttl#>.
+@prefix user: <runtime-mappings.ttl#user->.
+
+topic:board-microbit-v2 ont:codeowner user:chrysn.
