@@ -20,6 +20,7 @@
  *
  * @author      Luminița Lăzărescu <cluminita.lazarescu@gmail.com>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
+ * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 
 #include <stdint.h>
