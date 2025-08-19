@@ -514,8 +514,6 @@ export CCACHE_CPP2=yes
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
     RIOT_VERSION ?= buildtest
-    # set a dummy version number
-    RIOT_VERSION_CODE ?= $(RIOT_VERSION_DUMMY_CODE)
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         RIOTNOLINK:=1
     endif
@@ -560,7 +558,8 @@ include $(RIOTMAKE)/cflags.inc.mk
 -include $(RIOTBASE)/EXTRAVERSION
 
 include $(RIOTMAKE)/git_version.inc.mk
-RIOT_VERSION ?= $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
+RIOT_VERSION_GIT := $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
+RIOT_VERSION ?= $(RIOT_VERSION_GIT)
 RIOT_EXTRAVERSION ?= 0
 
 # Deprecate using RIOT_VERSION_OVERRIDE but currently keep the behavior
@@ -570,7 +569,7 @@ ifneq (,$(RIOT_VERSION_OVERRIDE))
 endif
 
 # Generate machine readable RIOT VERSION macro
-RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \
+RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION_GIT) | \
                       sed -E 's/([0-9]+)\.([0-9]+)\.?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,$(RIOT_EXTRAVERSION)\\\)/' | \
                       grep RIOT_VERSION_NUM || echo "$(RIOT_VERSION_DUMMY_CODE)")
 
