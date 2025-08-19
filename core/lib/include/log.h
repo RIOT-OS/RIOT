@@ -53,6 +53,9 @@ extern "C" {
  */
 enum {
     LOG_NONE,       /**< Lowest log level, will output nothing */
+    LOG_WTF,        /**< What a Terrible Failure log level, will print
+                         only critical, non-recoverable errors that should never
+                         ever happen. Turns the system off. */
     LOG_ERROR,      /**< Error log level, will print only critical,
                          non-recoverable errors like hardware initialization
                          failures */
@@ -102,6 +105,7 @@ enum {
  * @name Logging convenience defines
  * @{
  */
+#define LOG_WTF(...) LOG(LOG_WTF, __VA_ARGS__)          /**< log a terrible failure */
 #define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)      /**< log an error */
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)  /**< log a warning */
 #define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)        /**< for the curious */
@@ -127,10 +131,12 @@ enum {
 #else
 #include <stdio.h>
 
+#include "periph/pm.h"
+
 /**
  * @brief Default log_write function, just maps to printf
  */
-#define log_write(level, ...) printf(__VA_ARGS__)
+#define log_write(level, ...) do { printf(__VA_ARGS__); if (level == LOG_WTF) pm_off(); } while (0U)
 #endif
 
 #ifdef __cplusplus

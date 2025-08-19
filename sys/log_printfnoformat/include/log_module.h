@@ -25,6 +25,9 @@
 
 #include <stdio.h>
 
+#include "periph/pm.h"
+#include "log.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,12 +38,16 @@ extern "C" {
  * This example function will only print the log's format string.
  * Use it where printf might be too heavy.
  *
- * @param[in] level (unused)
+ * @param[in] level
  * @param[in] format String that the function will print
  */
-static inline void log_write(unsigned level, const char *format, ...) {
-    (void)level;
+static inline void log_write(unsigned level, const char *format, ...)
+{
     puts(format);
+
+    if (level == LOG_WTF) {
+        pm_off();
+    }
 }
 
 #ifdef __cplusplus
