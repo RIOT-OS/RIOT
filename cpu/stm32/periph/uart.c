@@ -432,7 +432,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
-        dev(uart)->CR1 |= (USART_CR1_TCIE);
+        dev(uart)->CR1 |= (USART_CR1_TXEIE);
         if (irq_is_in() || __get_PRIMASK()) {
             /* if ring buffer is full free up a spot */
             if (tsrb_full(&uart_tx_rb[uart])) {
@@ -497,7 +497,7 @@ static inline void irq_handler_tx(uart_t uart)
 
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uart])) {
-        dev(uart)->CR1 &= ~(USART_CR1_TCIE);
+        dev(uart)->CR1 &= ~(USART_CR1_TXEIE);
     }
 }
 #endif
@@ -507,7 +507,7 @@ static inline void irq_handler(uart_t uart)
     uint32_t status = dev(uart)->ISR_REG;
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
-    if (status & ISR_TC) {
+    if (status & ISR_TXE) {
         irq_handler_tx(uart);
     }
 #endif
