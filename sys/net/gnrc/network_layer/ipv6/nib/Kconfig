@@ -38,6 +38,14 @@ config GNRC_IPV6_NIB_SLAAC
     default n if USEMODULE_GNRC_IPV6_NIB_6LR || USEMODULE_GNRC_IPV6_NIB_6LN
     default y
 
+config GNRC_IPV6_STABLE_PRIVACY
+    bool "Use stable privacy addresses (rfc7217)"
+    depends on GNRC_IPV6_NIB_SLAAC
+    help
+        Generate semantically opaque interface identifiers
+        (i.e. L2ADDR is not embedded)
+        for SLAAC IPv6 addresses
+
 config GNRC_IPV6_NIB_QUEUE_PKT
     bool "Use packet queue with address resolution"
     default n if USEMODULE_GNRC_IPV6_NIB_6LN || GNRC_IPV6_NIB_6LN
