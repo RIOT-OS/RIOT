@@ -59,6 +59,15 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @name    Properties of the systick_gpio_ll backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_SYSTICK_GPIO_LL
+#define WS281X_HAVE_INIT                    (1)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

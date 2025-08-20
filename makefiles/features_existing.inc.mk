@@ -235,6 +235,7 @@ FEATURES_EXISTING := \
     periph_spi_on_qspi \
     periph_spi_reconfigure \
     periph_spi_stmod \
+    periph_systick \
     periph_temperature \
     periph_timer \
     periph_timer_periodic \

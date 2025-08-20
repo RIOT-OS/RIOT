@@ -503,6 +503,8 @@ groups:
           only provided by some STM32 MCUs.)
   - name: periph_pio
     help: A Programmable IO (PIO) is present. (Currently only RP2040)
+  - name: periph_systick
+    help: A SysTick timer is present. (All Cortex M MCUs)
 
   groups:
   - title: General-Purpose Input/Output (GPIO)
