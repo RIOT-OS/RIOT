@@ -74,7 +74,7 @@
  *
  * # Implementation Hints
  *
- * All peripheral drivers need to make sure to that they contain matching pairs
+ * All peripheral drivers need to make sure that they contain matching pairs
  * of @ref pm_block and @ref pm_unblock to prevent the MCU from entering power
  * modes that are incompatible with correct operation of the peripheral as
  * currently configured. If e.g. the timer peripheral in the example above is
