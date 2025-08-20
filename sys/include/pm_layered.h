@@ -18,7 +18,8 @@
  * This module provides a base infrastructure that MCU's may use to implement
  * periph/pm. It assumes that power modes are strictly ordered like a ladder.
  *
- * In order to use this module, you'll need to implement pm_set().
+ * In order to use this module, a port of RIOT to a new MCU family needs to
+ * implement @ref pm_set (ideally in `cpu/<family>/pm.c`).
  *
  * # Power Mangament Model in Detail
  *
