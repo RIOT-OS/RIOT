@@ -95,7 +95,7 @@
  * power mode.
  *
  * @ref pm_set must ignore any power mode that does not have full RAM retention,
- * as loosing data whenever no (non-idle) thread is runnable is not acceptable.
+ * as losing data whenever no (non-idle) thread is runnable is not acceptable.
  * A RIOT port however may provide CPU specific interfaces to allow an
  * application to explicitly enter deep sleep modes without RAM retention.
  *
