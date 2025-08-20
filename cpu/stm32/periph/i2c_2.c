@@ -206,22 +206,8 @@ static void _init(i2c_t dev)
     I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     uint32_t ccr = 0;
-    /* read speed configuration */
-    switch (i2c_config[dev].speed) {
-        case I2C_SPEED_LOW:
-            /* 10Kbit/s */
-            ccr = i2c_config[dev].clk / 20000;
-            break;
-
-        case I2C_SPEED_NORMAL:
-            /* 100Kbit/s */
-            ccr = i2c_config[dev].clk / 200000;
-            break;
-
-        case I2C_SPEED_FAST:
-            ccr = i2c_config[dev].clk / 800000;
-            break;
-    }
+    /* apply speed configuration */
+    ccr = i2c_config[dev].clk / (i2c_config[dev].speed << 1);
 
     /* make peripheral soft reset */
     i2c->CR1 |= I2C_CR1_SWRST;
