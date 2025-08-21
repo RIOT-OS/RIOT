@@ -1,19 +1,18 @@
-/*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2018 Gunar Schorcht
 
-/**
- * @defgroup    cpu_esp_common_esp_now ESP-NOW netdev interface
- * @ingroup     cpu_esp_common
- * @ingroup     cpu_esp32
- * @ingroup     cpu_esp8266
- * @brief       WiFi based ESP-NOW network device driver
- *
- * @author      Gunar Schorcht <gunar@schorcht.net>
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   cpu_esp_common_esp_now ESP-NOW netdev interface
+@ingroup    cpu_esp_common
+@ingroup    cpu_esp32
+@ingroup    cpu_esp8266
+@brief      WiFi based ESP-NOW network device driver
+
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 This module realizes a netdev interface using Espressif's ESP-NOW technology which uses the built-in WiFi module.
 
@@ -48,5 +47,3 @@ a mesh network which uses ESP-NOW.
 In this case the ESP-NOW interface must use the same channel as the AP of the
 infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
 the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
-
- */

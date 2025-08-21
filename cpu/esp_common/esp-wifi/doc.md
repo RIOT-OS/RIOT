@@ -1,20 +1,18 @@
-/*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+Copyright (C) 2019 Gunar Schorcht
 
-/**
- * @defgroup    cpu_esp_common_esp_wifi ESP-WiFi netdev interface
- * @ingroup     cpu_esp_common
- * @ingroup     cpu_esp32
- * @ingroup     cpu_esp8266
- * @brief       Network device driver for the ESP SoC WiFi interface
- *
- * @author      Gunar Schorcht <gunar@schorcht.net>
- */
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License v2.1. See the file LICENSE in the top level
+directory for more details.
+-->
+
+@defgroup   cpu_esp_common_esp_wifi ESP-WiFi netdev interface
+@ingroup    cpu_esp_common
+@ingroup    cpu_esp32
+@ingroup    cpu_esp8266
+@brief      Network device driver for the ESP SoC WiFi interface
+
+@author     Gunar Schorcht <gunar@schorcht.net>
 
 This module realizes a `netdev` interface for the built-in WiFi interface of
 ESP SoCs.
@@ -117,5 +115,3 @@ a mesh network which uses ESP-NOW.
 In this case the ESP-NOW interface must use the same channel as the AP of the
 infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
 the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
-
- */
