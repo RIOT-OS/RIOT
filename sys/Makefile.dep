@@ -134,11 +134,8 @@ endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires 64bit ftimestamps
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter sock_%,$(USEMODULE)))
