@@ -14,6 +14,8 @@
  * @brief       The NTP packet module provides functionality to manipulate the NTP header
  * @{
  *
+ * @see         An implementation of Simple NTP can be found in @ref net_sntp.
+ *
  * @file
  * @brief       NTP packet definitions
  *
@@ -46,7 +48,7 @@ extern "C" {
 #define NTP_PORT             (123U)     /**< NTP port number */
 
 /**
- * @brief   Offset in seconds of NTP timestamp (seconds from 1990-01-01 00:00:00 UTC)
+ * @brief   Offset in seconds of NTP timestamp (seconds from 1900-01-01 00:00:00 UTC)
  *          to UNIX timestamp (seconds from 1970-01-01 00:00:00 UTC).
  */
 #define NTP_UNIX_OFFSET      (2208988800)
