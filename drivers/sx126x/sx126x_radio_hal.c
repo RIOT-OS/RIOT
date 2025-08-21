@@ -559,6 +559,24 @@ static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
     return 0;
 }
 
+static int _get_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_t *mode)
+{
+    sx126x_t* dev = hal->priv;
+
+    if (dev->ack_filter) {
+        *mode = IEEE802154_FILTER_ACK_ONLY;
+    }
+    else if (dev->promisc) {
+        *mode = IEEE802154_FILTER_PROMISC;
+    }
+    else {
+        *mode = IEEE802154_FILTER_ACCEPT;
+    }
+
+    SX126X_DEBUG(dev, "hal: get_frame_filter_mode %d\n", *mode);
+    return 0;
+}
+
 static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *bd, int8_t retries)
 {
     (void)hal;
@@ -573,7 +591,8 @@ static const ieee802154_radio_ops_t _sx126x_ops = {
           | IEEE802154_CAP_IRQ_CRC_ERROR
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_DONE
-          | IEEE802154_CAP_IRQ_CCA_DONE,
+          | IEEE802154_CAP_IRQ_CCA_DONE
+          | IEEE802154_CAP_PHY_LORA,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
@@ -589,6 +608,7 @@ static const ieee802154_radio_ops_t _sx126x_ops = {
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
+    .get_frame_filter_mode = _get_frame_filter_mode,
 };
 
 #endif /* IS_USED(MODULE_SX126X_IEEE802154) */

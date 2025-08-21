@@ -80,7 +80,7 @@ void auto_init_sx126x(void)
         }
         else if(IS_USED(MODULE_SX126X_IEEE802154)) {
             netdev_register(&sx126x_netdev[i].dev.netdev, NETDEV_SX126X, i);
-            netdev_ieee802154_submac_init(&sx126x_netdev[i]);
+            netdev_ieee802154_submac_init(&sx126x_netdev[i], &sx126x_devs[i].netdev);
             bhp_event_init(&sx126x_bhp[i], &_netif[i].evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], _bhp_cb, &sx126x_netdev[i].submac.dev);
             sx126x_hal_setup(&sx126x_devs[i], &sx126x_params[i], i,
                              &sx126x_netdev[i].submac.dev, bhp_event_isr_cb, &sx126x_bhp[i]);
