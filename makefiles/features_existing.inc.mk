@@ -44,6 +44,7 @@ FEATURES_EXISTING := \
     ble_phy_coded \
     board_bat_voltage \
     bootloader_stm32 \
+    bug_newlib_broken_stdio \
     can_rx_mailbox \
     cortexm_fpu \
     cortexm_mpu \
