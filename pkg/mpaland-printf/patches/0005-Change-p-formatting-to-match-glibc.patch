@@ -1,0 +1,105 @@
+From 101d684f1759aa8aef4d49bbb1e2eebdbaa41afb Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Fri, 22 Aug 2025 10:32:04 +0200
+Subject: [PATCH] Change %p formatting to match glibc
+
+Taken from https://github.com/mpaland/printf/pull/90
+---
+ printf.c            | 24 +++++++++++++++---------
+ test/test_suite.cpp | 19 +++++++++++--------
+ 2 files changed, 26 insertions(+), 17 deletions(-)
+
+diff --git a/printf.c b/printf.c
+index efdee81..50a4ddf 100644
+--- a/printf.c
++++ b/printf.c
+@@ -824,19 +824,25 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
+       }
+ 
+       case 'p' : {
+-        width = sizeof(void*) * 2U;
+-        flags |= FLAGS_ZEROPAD | FLAGS_UPPERCASE;
++        width = sizeof(void*) * 2U + 2;
++        flags |= FLAGS_ZEROPAD | FLAGS_HASH;
++        uintptr_t value = (uintptr_t)va_arg(va, void*);
++        
++        if (value == 0) {
++          idx = _out_rev(out, buffer, idx, maxlen, ")lin(", 5, width, flags);
++        } else {
+ #if defined(PRINTF_SUPPORT_LONG_LONG)
+-        const bool is_ll = sizeof(uintptr_t) == sizeof(long long);
+-        if (is_ll) {
+-          idx = _ntoa_long_long(out, buffer, idx, maxlen, (uintptr_t)va_arg(va, void*), false, 16U, precision, width, flags);
+-        }
+-        else {
++          const bool is_ll = sizeof(uintptr_t) == sizeof(long long);
++          if (is_ll) {
++            idx = _ntoa_long_long(out, buffer, idx, maxlen, value, false, 16U, precision, width, flags);
++          }
++          else {
+ #endif
+-          idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned long)((uintptr_t)va_arg(va, void*)), false, 16U, precision, width, flags);
++            idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned long)value, false, 16U, precision, width, flags);
+ #if defined(PRINTF_SUPPORT_LONG_LONG)
+-        }
++          }
+ #endif
++        }
+         format++;
+         break;
+       }
+diff --git a/test/test_suite.cpp b/test/test_suite.cpp
+index 5507c3b..740771a 100644
+--- a/test/test_suite.cpp
++++ b/test/test_suite.cpp
+@@ -1361,36 +1361,39 @@ TEST_CASE("pointer", "[]" ) {
+ 
+   test::sprintf(buffer, "%p", (void*)0x1234U);
+   if (sizeof(void*) == 4U) {
+-    REQUIRE(!strcmp(buffer, "00001234"));
++    REQUIRE(!strcmp(buffer, "0x00001234"));
+   }
+   else {
+-    REQUIRE(!strcmp(buffer, "0000000000001234"));
++    REQUIRE(!strcmp(buffer, "0x0000000000001234"));
+   }
+ 
+   test::sprintf(buffer, "%p", (void*)0x12345678U);
+   if (sizeof(void*) == 4U) {
+-    REQUIRE(!strcmp(buffer, "12345678"));
++    REQUIRE(!strcmp(buffer, "0x12345678"));
+   }
+   else {
+-    REQUIRE(!strcmp(buffer, "0000000012345678"));
++    REQUIRE(!strcmp(buffer, "0x0000000012345678"));
+   }
+ 
+   test::sprintf(buffer, "%p-%p", (void*)0x12345678U, (void*)0x7EDCBA98U);
+   if (sizeof(void*) == 4U) {
+-    REQUIRE(!strcmp(buffer, "12345678-7EDCBA98"));
++    REQUIRE(!strcmp(buffer, "0x12345678-0x7edcba98"));
+   }
+   else {
+-    REQUIRE(!strcmp(buffer, "0000000012345678-000000007EDCBA98"));
++    REQUIRE(!strcmp(buffer, "0x0000000012345678-0x000000007edcba98"));
+   }
+ 
+   if (sizeof(uintptr_t) == sizeof(uint64_t)) {
+     test::sprintf(buffer, "%p", (void*)(uintptr_t)0xFFFFFFFFU);
+-    REQUIRE(!strcmp(buffer, "00000000FFFFFFFF"));
++    REQUIRE(!strcmp(buffer, "0x00000000ffffffff"));
+   }
+   else {
+     test::sprintf(buffer, "%p", (void*)(uintptr_t)0xFFFFFFFFU);
+-    REQUIRE(!strcmp(buffer, "FFFFFFFF"));
++    REQUIRE(!strcmp(buffer, "0xffffffff"));
+   }
++
++  test::sprintf(buffer, "%p", nullptr);
++  REQUIRE(!strcmp(buffer, "(nil)"));
+ }
+ 
+ 
+-- 
+2.43.0
+
