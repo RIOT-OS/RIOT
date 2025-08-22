@@ -143,7 +143,6 @@ $(MODULE).cleanup:
 	$(Q)# cleanup non selected source files objects
 	$(Q)$(RM) $(OBJECTS_TO_REMOVE)
 
-CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 # compile and generate dependency info
