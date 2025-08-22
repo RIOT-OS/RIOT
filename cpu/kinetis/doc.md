@@ -1,14 +1,11 @@
-/* Kinetis specific information for the periph drivers */
-/**
-
-@defgroup    cpu_kinetis NXP Kinetis
-@ingroup     cpu
-@brief       NXP Kinetis Cortex-M MCU specific implementation
+@defgroup   cpu_kinetis NXP Kinetis
+@ingroup    cpu
+@brief      NXP Kinetis Cortex-M MCU specific implementation
 
 
-@defgroup    cpu_kinetis_adc Kinetis ADC
-@ingroup     cpu_kinetis
-@brief       Kinetis ADC driver
+@defgroup   cpu_kinetis_adc Kinetis ADC
+@ingroup    cpu_kinetis
+@brief      Kinetis ADC driver
 
 ### ADC configuration example (for periph_conf.h) ###
 
@@ -25,25 +22,24 @@
     #define ADC_NUMOF           ARRAYSIZE(adc_config)
 
 
-@defgroup    cpu_kinetis_cpuid Kinetis CPUID
-@ingroup     cpu_kinetis
-@brief       Kinetis CPUID driver
+@defgroup   cpu_kinetis_cpuid Kinetis CPUID
+@ingroup    cpu_kinetis
+@brief      Kinetis CPUID driver
 
 No configuration is necessary.
 
-
-@defgroup    cpu_kinetis_gpio Kinetis GPIO
-@ingroup     cpu_kinetis
-@brief       Kinetis GPIO driver
+@defgroup   cpu_kinetis_gpio Kinetis GPIO
+@ingroup    cpu_kinetis
+@brief      Kinetis GPIO driver
 
 The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
 
 No configuration is necessary.
 
 
-@defgroup    cpu_kinetis_i2c Kinetis I2C
-@ingroup     cpu_kinetis
-@brief       Kinetis I2C driver
+@defgroup   cpu_kinetis_i2c Kinetis I2C
+@ingroup    cpu_kinetis
+@brief      Kinetis I2C driver
 
 ### I2C configuration example (for periph_conf.h) ###
 
@@ -63,9 +59,9 @@ No configuration is necessary.
     #define I2C_0_ISR           (isr_i2c0)
 
 
-@defgroup    cpu_kinetis_pwm Kinetis PWM
-@ingroup     cpu_kinetis
-@brief       Kinetis PWM driver
+@defgroup   cpu_kinetis_pwm Kinetis PWM
+@ingroup    cpu_kinetis
+@brief      Kinetis PWM driver
 
 ### PWM configuration example (for periph_conf.h) ###
 
@@ -91,9 +87,9 @@ No configuration is necessary.
     #define PWM_0_PIN_AF_CH1    4
 
 
-@defgroup    cpu_kinetis_rnga Kinetis RNGA
-@ingroup     cpu_kinetis
-@brief       Kinetis RNGA driver
+@defgroup   cpu_kinetis_rnga Kinetis RNGA
+@ingroup    cpu_kinetis
+@brief      Kinetis RNGA driver
 
 RNGA generates data that looks random. Reference Manual recommends to use the
 RNGA as an entropy source for PRNGs.
@@ -106,9 +102,9 @@ RNGA as an entropy source for PRNGs.
     #define RANDOM_CLKDIS()      (SIM->SCGC6 &= ~(1 << 9))
 
 
-@defgroup    cpu_kinetis_rtc Kinetis RTC
-@ingroup     cpu_kinetis
-@brief       Kinetis RTC driver
+@defgroup   cpu_kinetis_rtc Kinetis RTC
+@ingroup    cpu_kinetis
+@brief      Kinetis RTC driver
 
 RTC is clocked by a 32.768 kHz clock.
 
@@ -129,9 +125,9 @@ Optional settings to configure internal load capacitors (see reference manual):
     #define RTC_LOAD_CAP_BITS   0
 
 
-@defgroup    cpu_kinetis_spi Kinetis SPI
-@ingroup     cpu_kinetis
-@brief       Kinetis SPI driver
+@defgroup   cpu_kinetis_spi Kinetis SPI
+@ingroup    cpu_kinetis
+@brief      Kinetis SPI driver
 
 The SPI baud rate and other timings are generated from the bus clock via
 prescalers, the hardware module allows for very detailed timing configuration,
@@ -197,9 +193,9 @@ because of the additional overhead of calling gpio_set/clear at every transfer.
     #define SPI_NUMOF           ARRAYSIZE(spi_config)
 
 
-@defgroup    cpu_kinetis_timer Kinetis Timer
-@ingroup     cpu_kinetis
-@brief       Periodic Interrupt Timer (PIT) and Low-Power Timer (LPTMR) driver.
+@defgroup   cpu_kinetis_timer Kinetis Timer
+@ingroup    cpu_kinetis
+@brief      Periodic Interrupt Timer (PIT) and Low-Power Timer (LPTMR) driver.
 
 The PIT is a count down timer, in order to use it with riot-os
 a count up timer will be simulated. The PIT has four channels,
@@ -242,9 +238,9 @@ CPU and the 32kHz reference clock for the LPTMR counter.
     #define LPTMR_ISR_0             isr_lptmr0
 
 
-@defgroup    cpu_kinetis_uart Kinetis UART
-@ingroup     cpu_kinetis
-@brief       Kinetis UART driver
+@defgroup   cpu_kinetis_uart Kinetis UART
+@ingroup    cpu_kinetis
+@brief      Kinetis UART driver
 
 There are different implementations of the UART interface. The treatment of
 interrupts is also slightly different. The register UARTx_BDH to UARTx_C4 look
@@ -281,5 +277,3 @@ available.
         },
     };
     #define UART_NUMOF          ARRAYSIZE(uart_config)
-
-*/

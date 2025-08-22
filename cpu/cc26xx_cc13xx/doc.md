@@ -1,7 +1,6 @@
-/**
-@defgroup        cpu_cc26xx_cc13xx CC26xx/CC13xx common
-@ingroup         cpu
-@brief           Common code for TI cc26xx/cc13xx family
+@defgroup       cpu_cc26xx_cc13xx CC26xx/CC13xx common
+@ingroup        cpu
+@brief          Common code for TI cc26xx/cc13xx family
 
 This module contains code common to all cc26xx/cc13xx cpus
 supported by RIOT: @ref cpu_cc26x0_cc13x0, @ref cpu_cc26x2_cc13x2
@@ -171,14 +170,9 @@ programmer, if it's not the case for an external board, you can always use
 uniflash by setting this environment variable `PROGRAMMER=uniflash` to change
 the default programmer.
 
-*/
+@defgroup       cpu_cc26xx_cc13xx_definitions CC26xx/CC13xx common
+@ingroup        cpu
+@brief          Common definitions for TI cc26xx/cc13xx family
 
-/**
- * @defgroup        cpu_cc26xx_cc13xx_definitions CC26xx/CC13xx common
- * @ingroup         cpu
- * @brief           Common definitions for TI cc26xx/cc13xx family
- *
- * This module contains definitions common to all cc26xx/cc13xx cpus
- * supported by RIOT: @ref cpu_cc26x0_cc13x0, @ref cpu_cc26x2_cc13x2
- *
- */
+This module contains definitions common to all cc26xx/cc13xx cpus
+supported by RIOT: @ref cpu_cc26x0_cc13x0, @ref cpu_cc26x2_cc13x2

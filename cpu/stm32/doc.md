@@ -1,7 +1,6 @@
-/**
-@defgroup        cpu_stm32 STM32
-@ingroup         cpu
-@brief           All STM32 families code and definitions
+@defgroup       cpu_stm32 STM32
+@ingroup        cpu
+@brief          All STM32 families code and definitions
 
 This module contains the code and definitions for STM32 cpu
 families supported by RIOT: F0, F1, F2, F3, F4, F7, G0, G4, L0, L1, L4, L5 and WB.
@@ -93,4 +92,3 @@ For stm32f[2|4|7], clock outputs can be configured as follows:
   `CONFIG_CLOCK_MCO1_USE_HSE`, `CONFIG_CLOCK_MCO1_USE_SYSCLK`,
   `CONFIG_CLOCK_MCO1_USE_PLLI2S` or `CONFIG_CLOCK_MCO1_USE_PLL` to select the
   source;
- */

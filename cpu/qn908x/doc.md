@@ -1,9 +1,6 @@
-/* NXP QN908x specific information for the `periph` drivers */
-/**
-
-@defgroup    cpu_qn908x NXP QN908x
-@ingroup     cpu
-@brief       NXP QN908x BLE-enabled Cortex-M4F MCU specific implementation
+@defgroup   cpu_qn908x NXP QN908x
+@ingroup    cpu
+@brief      NXP QN908x BLE-enabled Cortex-M4F MCU specific implementation
 
 The NXP QN908x family of chips such as the QN9080 feature a Cortex-M4F,
 Bluetooth Low Energy, USB 2.0 and in some SKUs like the QN9080SIP NFC as well.
@@ -12,9 +9,9 @@ applications with small battery capacity. It includes an optional DC-DC and LDO,
 low power sleep timers, I2C, SPI, ADC, SPIFI and several other peripherals.
 
 
-@defgroup    cpu_qn908x_cpuid NXP QN908x CPUID
-@ingroup     cpu_qn908x
-@brief       NXP QN908x CPUID driver
+@defgroup   cpu_qn908x_cpuid NXP QN908x CPUID
+@ingroup    cpu_qn908x
+@brief      NXP QN908x CPUID driver
 
 No configuration is necessary. The CPUID value is based on the factory assigned
 default Bluetooth address in the read-only flash section which may not be the
@@ -22,17 +19,17 @@ Bluetooth address used by the Bluetooth module if a different one was programmed
 there.
 
 
-@defgroup    cpu_qn908x_gpio NXP QN908x GPIO
-@ingroup     cpu_qn908x
-@brief       NXP QN908x GPIO driver
+@defgroup   cpu_qn908x_gpio NXP QN908x GPIO
+@ingroup    cpu_qn908x
+@brief      NXP QN908x GPIO driver
 
 The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
 
 No configuration is necessary.
 
-@defgroup    cpu_qn908x_adc NXP QN908x ADC - Analog to Digital converter
-@ingroup     cpu_qn908x
-@brief       NXP QN908x ADC driver
+@defgroup   cpu_qn908x_adc NXP QN908x ADC - Analog to Digital converter
+@ingroup    cpu_qn908x
+@brief      NXP QN908x ADC driver
 
 This ADC is a differential sigma-delta ADC. There are 9 external signals
 named ADC0 to ADC7 and ADC_VREFI that can be connected to specific external GPIO
@@ -108,9 +105,9 @@ the + side level is as low as Vss.
 @endcode
 
 
-@defgroup    cpu_qn908x_i2c NXP QN908x I2C
-@ingroup     cpu_qn908x
-@brief       NXP QN908x I2C driver
+@defgroup   cpu_qn908x_i2c NXP QN908x I2C
+@ingroup    cpu_qn908x
+@brief      NXP QN908x I2C driver
 
 There are several FLEXCOMM interfaces in this chip, but only two of these
 support I2C (FLEXCOMM1 and FLEXCOMM2) which are mapped as I2C0 and I2C1,
@@ -137,9 +134,9 @@ same time since they are both the same FLEXCOMM1 interface.
     #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 
 
-@defgroup    cpu_qn908x_spi NXP QN908x Serial Peripheral Interface (SPI)
-@ingroup     cpu_qn908x
-@brief       NXP QN908x timer driver
+@defgroup   cpu_qn908x_spi NXP QN908x Serial Peripheral Interface (SPI)
+@ingroup    cpu_qn908x
+@brief      NXP QN908x timer driver
 
 Two of the FLEXCOMM interfaces in this chip can be used as SPI interfaces named
 SPI0 and SPI1, which correspond to FLEXCOMM2 and FLEXCOMM3. Note that FLEXCOMM2
@@ -186,9 +183,9 @@ CS line selected by software it is also possible to pass a @ref GPIO_PIN pin.
 @endcode
 
 
-@defgroup    cpu_qn908x_timer NXP QN908x Standard counter/timers (CTIMER)
-@ingroup     cpu_qn908x
-@brief       NXP QN908x timer driver
+@defgroup   cpu_qn908x_timer NXP QN908x Standard counter/timers (CTIMER)
+@ingroup    cpu_qn908x
+@brief      NXP QN908x timer driver
 
 The QN908x have 4 standard counter/timers (CTIMER). These timers allow to count
 clock cycles from the APB clock with a 32-bit prescaler, effectively dividing
@@ -285,5 +282,3 @@ configured CONFIG_WDT_WARNING_PERIOD the CPU will continue executing the code
 before the WDT interrupt occurred. If this is not desired, an infinite loop at
 the end of the WDT callback, after the safety operations have been performed is
 advisable.
-
-*/
