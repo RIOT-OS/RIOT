@@ -108,7 +108,9 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--leak-check=full --track-origins=yes --fullpath-after=$(RIOTBASE) \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
-term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
+term-gprof: TERMPROG = $(ELFFILE)
+term-gprof: TERMENV += GMON_OUT_PREFIX=gmon.out
+
 all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
 all-valgrind: NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-gprof: CFLAGS += -pg
