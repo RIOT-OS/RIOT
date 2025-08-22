@@ -23,6 +23,7 @@ printf 'SET(CMAKE_RANLIB [==[%s]==] CACHE STRING "")\n' "${RANLIB}"
 # disable linker test
 printf 'SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)\n'
 printf 'SET(CMAKE_C_FLAGS [==[%s]==] CACHE STRING "")\n' "${CFLAGS}"
+printf 'SET(CMAKE_CXX_FLAGS [==[%s]==] CACHE STRING "")\n' "${CXXFLAGS}"
 printf 'SET(CMAKE_EXE_LINKER_FLAGS [==[%s]==] CACHE STRING "")\n' "${LFLAGS}"
 # search for programs in the build host directories
 printf 'SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)\n'
