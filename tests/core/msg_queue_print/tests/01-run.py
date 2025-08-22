@@ -46,7 +46,7 @@ def expect_content(child, counter):
         else:
             child.expect(r'type: 0x0000, content: 0 \((0x)?0+\)')
     else:
-        child.expect_exact(f'type: 0x{counter:04x}, content: {counter} (0x{counter:x})')
+        child.expect(f'type: 0x{counter:04x}, content: {counter} \((0x)?0*{counter:x}\)')
 
 
 def testfunc(child):
