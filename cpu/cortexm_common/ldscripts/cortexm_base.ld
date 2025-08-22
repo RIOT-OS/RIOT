@@ -233,6 +233,7 @@ SECTIONS
     .backup.noinit (NOLOAD) : ALIGN(4) {
         _sbackup_noinit = .;
         *(.backup.noinit)
+        . = ALIGN(4);
         _ebackup_noinit = .;
     } > bkup_ram
 
