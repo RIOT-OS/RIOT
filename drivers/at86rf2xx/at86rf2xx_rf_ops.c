@@ -127,9 +127,9 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *psdu)
     /* load packet data into FIFO */
     for (const iolist_t *iol = psdu; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
-        if ((len + iol->iol_len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
+        if ((len + iol->iol_len + IEEE802154_FCS_LEN) > AT86RF2XX_MAX_PKT_LENGTH) {
             DEBUG("[at86rf2xx] error: packet too large (%" PRIuSIZE
-                  " byte) to be send\n", len + 2);
+                  " byte) to be send\n", len + IEEE802154_FCS_LEN);
 
             mutex_unlock(&dev->lock);
             return -EOVERFLOW;
@@ -164,7 +164,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
     phr = at86rf2xx_get_rx_len(dev);
 
     /* ignore MSB (refer p.80) and subtract length of FCS field */
-    pkt_len = (phr & 0x7f) - 2;
+    pkt_len = (phr & 0x7f) - IEEE802154_FCS_LEN;
 
     /* not enough space in buf */
     if (pkt_len > size) {
@@ -184,8 +184,8 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
 
     /* Ignore FCS but advance fb read - we must give a temporary buffer here,
      * as we are not allowed to issue SPI transfers without any buffer */
-    uint8_t tmp[2];
-    at86rf2xx_fb_read(dev, tmp, 2);
+    uint8_t tmp[IEEE802154_FCS_LEN];
+    at86rf2xx_fb_read(dev, tmp, IEEE802154_FCS_LEN);
     (void)tmp;
 
     /* AT86RF212B RSSI_BASE_VAL + 1.03 * ED, base varies for diff. modulation and datarates
