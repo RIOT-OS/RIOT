@@ -36,5 +36,4 @@ The application comes with 3 Python scripts:
   ```
   will just train the model.
 - `generate_model.py` is used to generate the `model.h` header file from the
-  `model` binary file. The script is called automatically by the build system
-  when the `model` binary file is updated.
+  `model` binary file.
