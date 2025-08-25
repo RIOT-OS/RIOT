@@ -1,0 +1,6 @@
+@defgroup   cpu_atmega8 Atmel ATmega8
+@ingroup    cpu
+@brief      Implementation of Atmel's ATmega8 MCU
+
+@defgroup   cpu_atmega8_definitions Atmel ATmega8 Definitions
+@ingroup    cpu_atmega8
