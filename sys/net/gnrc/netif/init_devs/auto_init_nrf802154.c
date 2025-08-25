@@ -63,7 +63,7 @@ void auto_init_nrf802154(void)
                                  NRF802154_MAC_PRIO, "nrf802154",
                                  (netdev_t*) &nrf802154_netdev.submac.dev);
 #else
-        netdev_ieee802154_submac_init(&nrf802154_netdev);
+        netdev_ieee802154_submac_init(&nrf802154_netdev, NULL);
         nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
         gnrc_netif_ieee802154_create(&_netif, _stack,
                                  NRF802154_MAC_STACKSIZE,

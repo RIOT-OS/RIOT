@@ -36,6 +36,10 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifndef SOCKET_ZEP_AUTO_ACK
+#define SOCKET_ZEP_AUTO_ACK 1
+#endif
+
 #define _UNIX_NTP_ERA_OFFSET    (2208988800U)
 /* can't use timex.h's US_PER_SEC as timeval's tv_usec is signed long
  * (https://pubs.opengroup.org/onlinepubs/9699919799.2016edition/basedefs/time.h.html) */
@@ -257,6 +261,7 @@ static void _send_zep_hello(socket_zep_t *dev)
     }
 }
 
+MAYBE_UNUSED
 static void _send_ack(void *arg)
 {
     ieee802154_dev_t *dev = arg;
@@ -359,6 +364,7 @@ static void _socket_isr(int fd, void *arg)
     zepdev->rcv_len = res;
     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
 
+#if SOCKET_ZEP_AUTO_ACK
     /* send ACK after 192 µs */
     if ((((uint8_t *)(zep + 1))[0] & IEEE802154_FCF_ACK_REQ) != 0) {
         zepdev->ack_timer.callback = _send_ack;
@@ -366,6 +372,9 @@ static void _socket_isr(int fd, void *arg)
     } else {
         dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
     }
+#else
+    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+#endif
 
     return;
 out:
@@ -459,7 +468,7 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
     return 0;
 }
 
-static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
+static int _config_phy(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf)
 {
     socket_zep_t *zepdev = dev->priv;
 
@@ -505,6 +514,13 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
     return 0;
 }
 
+static int _get_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode)
+{
+    socket_zep_t *zepdev = dev->priv;
+    *mode = zepdev->filter_mode;
+    return 0;
+}
+
 static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 {
     socket_zep_t *zepdev = dev->priv;
@@ -544,7 +560,7 @@ static int _request_transmit(ieee802154_dev_t *dev)
     zepdev->state = ZEPDEV_STATE_TX;
 
     /* 8 bit are mapped to 2 symbols */
-    unsigned time_tx = 2 * zepdev->snd_len * IEEE802154_SYMBOL_TIME_US;
+    unsigned time_tx = 2 * (zepdev->snd_len - sizeof(zep_v2_data_hdr_t)) * IEEE802154_SYMBOL_TIME_US;
     DEBUG("socket_zep::request_transmit(%u bytes, %u µs)\n", zepdev->snd_len, time_tx);
 
     dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
@@ -560,7 +576,14 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 {
     (void) dev;
 
+    socket_zep_t *zepdev = dev->priv;
+
+    if (zepdev->state == ZEPDEV_STATE_TX) {
+        DEBUG("socket_zep::confirm_transmit: still in TX state\n");
+        return -EAGAIN; /* TX is still in progress */
+    }
     if (info) {
+        DEBUG("socket_zep::confirm_transmit: success\n");
         info->status = TX_STATUS_SUCCESS;
     }
 
@@ -628,6 +651,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
         if (zepdev->state != ZEPDEV_STATE_IDLE) {
+            DEBUG("socket_zep::request_op: request TX in state %u (busy)\n", zepdev->state);
             return -EBUSY;
         }
         res = _request_transmit(dev);
@@ -659,6 +683,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
             ztimer_remove(ZTIMER_USEC, &zepdev->ack_timer);
             zepdev->state = ZEPDEV_STATE_IDLE;
         } else {
+            DEBUG("socket_zep::request_op: request IDLE in state TX\n");
             return -EBUSY;
         }
 
@@ -703,6 +728,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 static const ieee802154_radio_ops_t socket_zep_rf_ops = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_AUTO_CSMA
+          | (IS_ACTIVE(SOCKET_ZEP_AUTO_ACK) ? IEEE802154_CAP_AUTO_ACK : 0)
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_TX_START
           | IEEE802154_CAP_IRQ_RX_START
@@ -723,6 +749,7 @@ static const ieee802154_radio_ops_t socket_zep_rf_ops = {
     .config_src_addr_match = _config_src_addr_match,
     .set_csma_params = _set_csma_params,
     .set_frame_filter_mode = _set_frame_filter_mode,
+    .get_frame_filter_mode = _get_frame_filter_mode,
 };
 
 void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal)
