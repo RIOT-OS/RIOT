@@ -63,7 +63,18 @@ extern "C" {
 #  define SX126X_PARAM_DIO1                 GPIO_PIN(1, 4)  /* D5 */
 #endif
 
-#ifndef SX126X_PARAM_REGULATOR
+#if !defined(SX126X_PARAM_DIO1_IRQ_MASK) || defined(DOXYGEN)
+/**
+ * @brief   Interrupt mask of events that should trigger an interrupt on DIO1
+ */
+#  define SX126X_PARAM_DIO1_IRQ_MASK        SX126X_IRQ_MASK_ALL
+#endif
+
+#if !defined(SX126X_PARAM_REGULATOR) || defined(DOXYGEN)
+/**
+ * @brief   Regulator type which can be
+ *          SX126X_REG_MODE_LDO or SX126X_REG_MODE_DCDC
+ */
 #  define SX126X_PARAM_REGULATOR            SX126X_REG_MODE_DCDC
 #endif
 
@@ -73,6 +84,68 @@ extern "C" {
 
 #ifndef SX126X_PARAM_TX_PA_MODE
 #  define SX126X_PARAM_TX_PA_MODE           SX126X_RF_MODE_TX_LPA
+#endif
+
+#if !defined(SX126X_PARAM_DIO2_MODE) || defined(DOXYGEN)
+/**
+ * @brief   DIO2 pin mode which can be
+ *          SX126X_DIO2_UNUSED or SX126X_DIO2_IRQ or SX126X_DIO2_RF_SWITCH
+ */
+#  define SX126X_PARAM_DIO2_MODE            SX126X_DIO2_IRQ
+#endif
+
+#if !defined(SX126X_PARAM_DIO2) || defined(DOXYGEN)
+/**
+ * @brief   DIO2 pin if mode is SX126X_DIO2_IRQ or SX126X_DIO2_RF_SWITCH
+ */
+#  define SX126X_PARAM_DIO2                 GPIO_UNDEF
+#endif
+
+#if !defined(SX126X_PARAM_DIO2_IRQ_MASK) || defined(DOXYGEN)
+/**
+ * @brief   Interrupt mask of events that should trigger an interrupt on DIO2
+ *          if mode is SX126X_DIO2_IRQ
+ */
+#  define SX126X_PARAM_DIO2_IRQ_MASK        SX126X_IRQ_MASK_ALL
+#endif
+
+#if !defined(SX126X_PARAM_DIO2_ARG) || defined(DOXYGEN)
+/**
+ * @brief   DIO2 argument if mode is SX126X_DIO2_IRQ or SX126X_DIO2_RF_SWITCH
+ */
+#  define SX126X_PARAM_DIO2_ARG             { .dio2_pin = SX126X_PARAM_DIO2, \
+                                              .dio2_irq_mask = SX126X_PARAM_DIO2_IRQ_MASK }
+#endif
+
+#if !defined(SX126X_PARAM_DIO3_MODE) || defined(DOXYGEN)
+/**
+ * @brief   DIO3 pin mode which can be
+ *          SX126X_DIO3_UNUSED or SX126X_DIO3_IRQ or SX126X_DIO3_TCXO
+ */
+#  define SX126X_PARAM_DIO3_MODE            SX126X_DIO3_IRQ
+#endif
+
+#if !defined(SX126X_PARAM_DIO3) || defined(DOXYGEN)
+/**
+ * @brief   DIO3 pin if mode is SX126X_DIO3_IRQ or SX126X_DIO3_TCXO
+ */
+#  define SX126X_PARAM_DIO3                 GPIO_UNDEF
+#endif
+
+#if !defined(SX126X_PARAM_DIO3_IRQ_MASK) || defined(DOXYGEN)
+/**
+ * @brief   Interrupt mask of events that should trigger an interrupt on DIO3
+ *          if mode is SX126X_DIO3_IRQ
+ */
+#  define SX126X_PARAM_DIO3_IRQ_MASK        SX126X_IRQ_MASK_ALL
+#endif
+
+#if !defined(SX126X_PARAM_DIO3_ARG) || defined(DOXYGEN)
+/**
+ * @brief   DIO3 argument if mode is SX126X_DIO3_IRQ or SX126X_DIO3_TCXO
+ */
+#  define SX126X_PARAM_DIO3_ARG             { .dio3_pin = SX126X_PARAM_DIO3, \
+                                              .dio3_irq_mask = SX126X_PARAM_DIO3_IRQ_MASK }
 #endif
 
 #ifndef SX126X_PARAM_TYPE
@@ -93,22 +166,56 @@ extern "C" {
 
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
 #  define SX126X_SET_RF_MODE  .set_rf_mode = SX126X_PARAM_SET_RF_MODE_CB,
-#  define SX126X_TX_PA_MODE   .tx_pa_mode = SX126X_PARAM_TX_PA_MODE
+#  define SX126X_TX_PA_MODE   .tx_pa_mode = SX126X_PARAM_TX_PA_MODE,
 #else
 #  define SX126X_SET_RF_MODE
 #  define SX126X_TX_PA_MODE
 #endif
 
+#if IS_USED(MODULE_SX126X_DIO2) || defined(DOXYGEN)
+/**
+ * @brief   DIO2 pin mode
+ */
+#define SX126X_DIO2_MODE        .dio2_mode = SX126X_PARAM_DIO2_MODE,
+/**
+ * @brief   DIO2 pin argument
+ */
+#define SX126X_DIO2_PIN         .u_dio2_arg = SX126X_PARAM_DIO2_ARG,
+#else
+#define SX126X_DIO2_MODE
+#define SX126X_DIO2_PIN
+#endif
+
+#if IS_USED(MODULE_SX126X_DIO3) || defined(DOXYGEN)
+/**
+ * @brief   DIO3 pin mode
+ */
+#define SX126X_DIO3_MODE        .dio3_mode = SX126X_PARAM_DIO3_MODE,
+/**
+ * @brief   DIO3 pin argument
+ */
+#define SX126X_DIO3_PIN         .u_dio3_arg = SX126X_PARAM_DIO3_ARG,
+#else
+#define SX126X_DIO3_MODE
+#define SX126X_DIO3_PIN
+#endif
+
 #ifndef SX126X_PARAMS
-#  define SX126X_PARAMS           { .spi = SX126X_PARAM_SPI,            \
-                                    .nss_pin = SX126X_PARAM_SPI_NSS,    \
-                                    .reset_pin = SX126X_PARAM_RESET,    \
-                                    .busy_pin = SX126X_PARAM_BUSY,      \
-                                    .dio1_pin = SX126X_PARAM_DIO1,      \
-                                    .type     = SX126X_PARAM_TYPE,      \
-                                    .regulator = SX126X_PARAM_REGULATOR, \
-                                    SX126X_SET_RF_MODE \
-                                    SX126X_TX_PA_MODE}
+#  define SX126X_PARAMS           { .spi = SX126X_PARAM_SPI,                      \
+                                    .nss_pin = SX126X_PARAM_SPI_NSS,              \
+                                    .reset_pin = SX126X_PARAM_RESET,              \
+                                    .busy_pin = SX126X_PARAM_BUSY,                \
+                                    .dio1_pin = SX126X_PARAM_DIO1,                \
+                                    .dio1_irq_mask = SX126X_PARAM_DIO1_IRQ_MASK,  \
+                                    .type     = SX126X_PARAM_TYPE,                \
+                                    .regulator = SX126X_PARAM_REGULATOR,          \
+                                    SX126X_SET_RF_MODE                            \
+                                    SX126X_TX_PA_MODE                             \
+                                    SX126X_DIO2_MODE                              \
+                                    SX126X_DIO2_PIN                               \
+                                    SX126X_DIO3_MODE                              \
+                                    SX126X_DIO3_PIN                               \
+                                   }
 #endif
 
 /**@}*/
