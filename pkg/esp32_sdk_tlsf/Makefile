@@ -1,7 +1,7 @@
 PKG_NAME=esp32_sdk_tlsf
 PKG_URL=https://github.com/espressif/tlsf
 PKG_VERSION=ba64d198a845df70b481e2c55004521ca643dea6
-PKG_LICENSE=BSD
+PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
