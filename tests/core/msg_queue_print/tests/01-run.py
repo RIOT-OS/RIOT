@@ -41,12 +41,12 @@ def expect_some(child, size, avail, range_start):
 
 def expect_content(child, counter):
     if counter == 0:
-        if os.environ.get('BOARD') in ['native', 'native32', 'native64']:
-            child.expect_exact('type: 0x0000, content: 0 ((nil))')
-        else:
-            child.expect(r'type: 0x0000, content: 0 \((0x)?0+\)')
+        child.expect(r'type: 0x0000, content: 0 \(\(nil\)|(0x)?0+\)')
     else:
-        child.expect(f'type: 0x{counter:04x}, content: {counter} \((0x)?0*{counter:x}\)')
+        child.expect(r'type: (0x[a-fA-F0-9]+), content: (\d+) \(((0x)?[a-fA-Z0-9]+)\)')
+        assert int(child.match.group(1), 16) == counter, f"Expected {counter:x} as type, got child.match.group(1)"
+        assert int(child.match.group(2)) == counter, f"Expected {counter} as content, got child.match.group(2)"
+        assert int(child.match.group(3), 16) == counter, f"Expected {counter:x} as ptr, got child.match.group(3)"
 
 
 def testfunc(child):
