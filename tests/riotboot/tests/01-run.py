@@ -66,9 +66,9 @@ class RiotbootDevice:
         # Ask for data of all slots
         child.expect_exact('>')
         child.sendline("dumpaddrs")
-        child.expect(r"slot 0: metadata: 0x[0-9a-fA-F]{1,8} "
+        child.expect(r"slot 0: metadata: (0x)?[0-9a-fA-F]{1,8} "
                      r"image: 0x[0-9a-fA-F]{8}\r\n")
-        child.expect(r"slot 1: metadata: 0x[0-9a-fA-F]{1,8} "
+        child.expect(r"slot 1: metadata: (0x)?[0-9a-fA-F]{1,8} "
                      r"image: 0x[0-9a-fA-F]{8}\r\n")
         child.expect_exact('>')
 

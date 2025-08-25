@@ -22,10 +22,10 @@ def testfunc(child):
         for test in range(number_of_tests):
             child.expect_exact("TEST #{}:".format(test + 1))
             for i in range(max_number_blocks):
-                child.expect(r'\({}, @@@@@@@\) Allocated \d+ Bytes at 0x[a-z0-9]+,'
+                child.expect(r'\({}, @@@@@@@\) Allocated \d+ Bytes at (0x)?[a-zA-Z0-9]+,'
                              r' total [0-9]+\r\n'.format(i))
             for i in range(max_number_blocks):
-                child.expect(r'Free \({}\) \d+ Bytes at 0x[a-z0-9]+,'
+                child.expect(r'Free \({}\) \d+ Bytes at (0x)?[a-zA-Z0-9]+,'
                              ' total [0-9]+\r\n'.format(i))
 
     child.expect_exact("Extend and reduce tests")
