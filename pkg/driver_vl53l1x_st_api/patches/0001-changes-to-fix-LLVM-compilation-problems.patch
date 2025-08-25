@@ -1,0 +1,61 @@
+From ada1a360d8869188ecb4caf7852a8e4973c47269 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 7 Aug 2025 09:12:50 +0200
+Subject: [PATCH 1/1] changes to fix LLVM compilation problems
+
+---
+ core/VL53L1X_api.h | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/core/VL53L1X_api.h b/core/VL53L1X_api.h
+index 5d862f6..3f14441 100644
+--- a/core/VL53L1X_api.h
++++ b/core/VL53L1X_api.h
+@@ -143,7 +143,7 @@ VL53L1X_ERROR VL53L1X_StopRanging(uint16_t dev);
+ 
+ /**
+  * @brief This function checks if the new ranging data is available by polling the dedicated register.
+- * @param : isDataReady==0 -> not ready; isDataReady==1 -> ready
++ * @param isDataReady 0 -> not ready; 1 -> ready
+  */
+ VL53L1X_ERROR VL53L1X_CheckForDataReady(uint16_t dev, uint8_t *isDataReady);
+ 
+@@ -237,7 +237,7 @@ VL53L1X_ERROR VL53L1X_GetResult(uint16_t dev, VL53L1X_Result_t *pResult);
+ 
+ /**
+  * @brief This function programs the offset correction in mm
+- * @param OffsetValue:the offset correction value to program in mm
++ * @param OffsetValue the offset correction value to program in mm
+  */
+ VL53L1X_ERROR VL53L1X_SetOffset(uint16_t dev, int16_t OffsetValue);
+ 
+@@ -264,11 +264,11 @@ VL53L1X_ERROR VL53L1X_GetXtalk(uint16_t dev, uint16_t *Xtalk);
+  * VL53L1X_SetDistanceThreshold(dev,100,300,1,1): Above 300 \n
+  * VL53L1X_SetDistanceThreshold(dev,100,300,2,1): Out of window \n
+  * VL53L1X_SetDistanceThreshold(dev,100,300,3,1): In window \n
+- * @param   dev : device address
+- * @param  	ThreshLow(in mm) : the threshold under which one the device raises an interrupt if Window = 0
+- * @param 	ThreshHigh(in mm) :  the threshold above which one the device raises an interrupt if Window = 1
+- * @param   Window detection mode : 0=below, 1=above, 2=out, 3=in
+- * @param   IntOnNoTarget = 0 (No longer used - just use 0)
++ * @param   dev device address
++ * @param  	ThreshLow   in mm, the threshold under which one the device raises an interrupt if Window = 0
++ * @param 	ThreshHigh  in mm, the threshold above which one the device raises an interrupt if Window = 1
++ * @param   Window detection mode 0=below, 1=above, 2=out, 3=in
++ * @param   IntOnNoTarget 0 (No longer used - just use 0)
+  */
+ VL53L1X_ERROR VL53L1X_SetDistanceThreshold(uint16_t dev, uint16_t ThreshLow,
+ 			      uint16_t ThreshHigh, uint8_t Window,
+@@ -293,7 +293,8 @@ VL53L1X_ERROR VL53L1X_GetDistanceThresholdHigh(uint16_t dev, uint16_t *high);
+  * @brief This function programs the ROI (Region of Interest)\n
+  * The ROI position is centered, only the ROI size can be reprogrammed.\n
+  * The smallest acceptable ROI size = 4\n
+- * @param X:ROI Width; Y=ROI Height
++ * @param X ROI Width
++ * @param Y ROI Height
+  */
+ VL53L1X_ERROR VL53L1X_SetROI(uint16_t dev, uint16_t X, uint16_t Y);
+ 
+-- 
+2.34.1
+
