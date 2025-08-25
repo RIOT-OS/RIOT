@@ -12,6 +12,7 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
   FEATURES_REQUIRED += radio_nrf802154
   USEMODULE += luid
+  USEMODULE += ieee802154
   ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
   endif
