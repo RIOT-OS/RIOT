@@ -771,6 +771,18 @@ static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv
     return true;
 }
 
+/**
+ * @brief   Updates a DODAG with the info from a recieved DIO packet.
+ *
+ * @param[in] inst      The @p RPL instance of the DODAG that the DIO belongs to.
+ * @param[in] dio       The @p DIO packet.
+ * @param[in] src       The address of the sender.
+ * @param[in] len       The length of the whole DIO packet.
+ * @param[in] is_new    Whether the DIO belongs to an existing or newly created DODAG.
+ *
+ * @returns             True, on success.
+ * @returns             False, otherwise.
+ */
 static bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
                                    uint16_t len, bool is_new)
 {
