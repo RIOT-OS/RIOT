@@ -834,7 +834,7 @@ static bool _update_dodag_from_DIO(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *di
         return false;
     }
 
-    if (!_handle_DIO_opts(inst, dio, src, len, false)) {
+    if (!_handle_DIO_opts(inst, dio, src, len, is_new)) {
         DEBUG("RPL: Error encountered during DIO option parsing\n");
         return false;
     }
