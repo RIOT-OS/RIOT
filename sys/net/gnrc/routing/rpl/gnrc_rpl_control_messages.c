@@ -965,6 +965,15 @@ static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio
     _update_dodag_from_DIO(inst, dio, src, len, false);
 }
 
+/**
+ * @brief   Handles a received DIO message.
+ *
+ * @param[in] dio       The received @p DIO packet.
+ * @param[in] iface     The interface that the DIO was received on.
+ * @param[in] src       The source address of the received packet.
+ * @param[in] dst       The destination address of the received packet.
+ * @param[in] len       The length of the DIO packet.
+ */
 void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                        uint16_t len)
 {
