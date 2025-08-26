@@ -742,6 +742,19 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
     }
 }
 
+/**
+ * @brief   Handles the options from a received DIO packet.
+ *
+ * @param[in] inst      The @p RPL instance that the DIO belongs to.
+ * @param[in] dio       The @p DIO packet.
+ * @param[in] src       The address of the sender.
+ * @param[in] len       The length of the whole DIO packet.
+ * @param[in] is_new    Whether the DIO belongs to an existing or newly created DODAG.
+ *
+ * @returns             True, on success.
+ * @returns             False, if parsing of the options failed.
+ * @returns             False, if the DODAG is new and the GNRC_RPL_OPT_DODAG_CONF option is required but missing.
+ */
 static bool _handle_DIO_opts(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ipv6_addr_t *src,
                              uint16_t len, bool is_new)
 {
