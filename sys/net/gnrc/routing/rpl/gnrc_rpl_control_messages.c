@@ -870,6 +870,14 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
 
 }
 
+/**
+ * @brief   Handles a received DIO message for an existing DODAG.
+ *
+ * @param[in] inst      The @p RPL instance of the DODAG.
+ * @param[in] dio       The received @p DIO packet.
+ * @param[in] src       The address of the sender.
+ * @param[in] len       The length of the DIO packet.
+ */
 static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
                                          ipv6_addr_t *src, uint16_t len)
 {
