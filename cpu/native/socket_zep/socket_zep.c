@@ -36,10 +36,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef SOCKET_ZEP_AUTO_ACK
-#define SOCKET_ZEP_AUTO_ACK 1
-#endif
-
 #define _UNIX_NTP_ERA_OFFSET    (2208988800U)
 /* can't use timex.h's US_PER_SEC as timeval's tv_usec is signed long
  * (https://pubs.opengroup.org/onlinepubs/9699919799.2016edition/basedefs/time.h.html) */
@@ -261,38 +257,6 @@ static void _send_zep_hello(socket_zep_t *dev)
     }
 }
 
-MAYBE_UNUSED
-static void _send_ack(void *arg)
-{
-    ieee802154_dev_t *dev = arg;
-    socket_zep_t *zepdev = dev->priv;
-    const uint8_t *rxbuf = &zepdev->rcv_buf[sizeof(zep_v2_data_hdr_t)];
-    uint8_t ack[3];
-    zep_v2_data_hdr_t hdr;
-
-    /* sending ACK should only happen if we received a frame */
-    assert(zepdev->state == ZEPDEV_STATE_RX_RECV);
-    /* ACK request bit should be set if we get here */
-    assert((rxbuf[0] & IEEE802154_FCF_ACK_REQ) != 0);
-
-    DEBUG("socket_zep::send_ack: seq_no: %u\n", rxbuf[2]);
-
-    _zep_hdr_fill(zepdev, &hdr.hdr, sizeof(ack) + IEEE802154_FCF_LEN);
-
-    ack[0] = IEEE802154_FCF_TYPE_ACK; /* FCF */
-    ack[1] = 0; /* FCF */
-    ack[2] = rxbuf[2];  /* SeqNum */
-
-    /* calculate checksum */
-    uint16_t chksum = crc16_ccitt_false_update(0, ack, 3);
-
-    real_send(zepdev->sock_fd, &hdr, sizeof(hdr), MSG_MORE);
-    real_send(zepdev->sock_fd, ack, sizeof(ack), MSG_MORE);
-    real_send(zepdev->sock_fd, &chksum, sizeof(chksum), 0);
-
-    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-}
-
 static void _send_frame(void *arg)
 {
     ieee802154_dev_t *dev = arg;
@@ -364,17 +328,7 @@ static void _socket_isr(int fd, void *arg)
     zepdev->rcv_len = res;
     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
 
-#if SOCKET_ZEP_AUTO_ACK
-    /* send ACK after 192 µs */
-    if ((((uint8_t *)(zep + 1))[0] & IEEE802154_FCF_ACK_REQ) != 0) {
-        zepdev->ack_timer.callback = _send_ack;
-        ztimer_set(ZTIMER_USEC, &zepdev->ack_timer, ACK_DELAY_US);
-    } else {
-        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-    }
-#else
     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-#endif
 
     return;
 out:
@@ -728,7 +682,6 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 static const ieee802154_radio_ops_t socket_zep_rf_ops = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_AUTO_CSMA
-          | (IS_ACTIVE(SOCKET_ZEP_AUTO_ACK) ? IEEE802154_CAP_AUTO_ACK : 0)
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_TX_START
           | IEEE802154_CAP_IRQ_RX_START
