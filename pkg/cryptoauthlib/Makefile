@@ -1,7 +1,7 @@
 PKG_NAME=cryptoauthlib
 PKG_URL=https://github.com/MicrochipTech/cryptoauthlib
 PKG_VERSION=055dd4afafb019db1f4d61880aa441832139faa2
-PKG_LICENSE=LGPL-2.1
+PKG_LICENSE=LGPL-2.1-only
 PKG_TEST_NAME=cryptoauthlib_test
 
 include $(RIOTBASE)/pkg/pkg.mk
