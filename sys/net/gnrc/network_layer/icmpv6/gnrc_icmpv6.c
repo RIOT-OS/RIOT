@@ -48,7 +48,8 @@ static inline uint16_t _calc_csum(gnrc_pktsnip_t *hdr,
     }
 
     csum = inet_csum(csum, hdr->data, hdr->size);
-    csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_ICMPV6, len);
+    csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data,
+                            gnrc_nettype_to_protnum(pseudo_hdr->next->type), len);
 
     return ~csum;
 }
@@ -77,8 +78,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     /* Note: size will be checked again in packet handlers */
 
     hdr = (icmpv6_hdr_t *)icmpv6->data;
-
-    if (_calc_csum(icmpv6, ipv6, pkt)) {
+    if (pkt != icmpv6 && _calc_csum(icmpv6, ipv6, pkt)) {
         DEBUG("icmpv6: wrong checksum.\n");
         gnrc_pktbuf_release(pkt);
         return;
