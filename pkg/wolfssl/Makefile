@@ -17,6 +17,7 @@ CFLAGS += -Wno-maybe-uninitialized
 # code it looks like the buffers are correctly aligned, so
 # this is a false positive.
 CFLAGS += -Wno-cast-align
+CFLAGS += -Wno-unused-parameter
 
 .PHONY: wolfcrypt%
 
