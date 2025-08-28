@@ -173,6 +173,19 @@ static void _add_static_lladdr(gnrc_netif_t *netif)
 #endif
 }
 
+void gnrc_ipv6_nib_start_search_rtr(gnrc_netif_t *netif)
+{
+    uint32_t next_rs_time = random_uint32_range(0, NDP_MAX_RS_MS_DELAY);
+
+    _evtimer_add(netif, GNRC_IPV6_NIB_SEARCH_RTR, &netif->ipv6.search_rtr,
+                 next_rs_time);
+}
+
+void gnrc_ipv6_nib_stop_search_rtr(gnrc_netif_t *netif)
+{
+    _evtimer_del(&netif->ipv6.search_rtr);
+}
+
 void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
@@ -191,11 +204,9 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     }
     _add_static_lladdr(netif);
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
-    if (_should_search_rtr(netif)) {
-        uint32_t next_rs_time = random_uint32_range(0, NDP_MAX_RS_MS_DELAY);
 
-        _evtimer_add(netif, GNRC_IPV6_NIB_SEARCH_RTR, &netif->ipv6.search_rtr,
-                     next_rs_time);
+    if (_should_search_rtr(netif)) {
+        gnrc_ipv6_nib_start_search_rtr(netif);
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     else {
@@ -214,7 +225,7 @@ void gnrc_ipv6_nib_iface_down(gnrc_netif_t *netif, bool send_final_ra)
 
     _deinit_iface_arsm(netif);
     if (_should_search_rtr(netif)) {
-        _evtimer_del(&netif->ipv6.search_rtr);
+        gnrc_ipv6_nib_stop_search_rtr(netif);
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     else {
@@ -790,7 +801,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     else {
         dr = _nib_drl_get(&ipv6->src, netif->pid);
 
-        DEBUG("nib: router lifetime was 0. Removing router and routes via it.");
+        DEBUG("nib: router lifetime was 0. Removing router and routes via it.\n");
         if (dr != NULL) {
             _handle_rtr_timeout(dr);
         }
@@ -917,7 +928,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
-        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)) {
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C_AUTO_ADV)) {
             _set_rtr_adv(netif);
         }
         /* but re-fetch information from router in time */
