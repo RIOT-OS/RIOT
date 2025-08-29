@@ -84,6 +84,44 @@ static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt
 }
 #endif
 
+
+int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *data)
+{
+    int status = 0;
+
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
+    switch (sendto->type) {
+    case GNRC_NETREG_TYPE_DEFAULT:
+        if (_gnrc_netapi_send_recv(sendto->target.pid, data,
+                                   cmd) < 1) {
+            /* unable to dispatch packet */
+            status = -EIO;
+        }
+        break;
+#ifdef MODULE_GNRC_NETAPI_MBOX
+    case GNRC_NETREG_TYPE_MBOX:
+        if (_snd_rcv_mbox(sendto->target.mbox, cmd, data) < 1) {
+            /* unable to dispatch packet */
+            status = -EIO;
+        }
+        break;
+#endif
+#ifdef MODULE_GNRC_NETAPI_CALLBACKS
+    case GNRC_NETREG_TYPE_CB:
+        sendto->target.cbd->cb(cmd, data, sendto->target.cbd->ctx);
+        break;
+#endif
+    default:
+        /* unknown dispatch type */
+        status = -ECANCELED;
+        break;
+    }
+#else
+    status = _gnrc_netapi_send_recv(sendto->target.pid, data, cmd);
+#endif
+    return status;
+}
+
 int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                          uint16_t cmd, gnrc_pktsnip_t *pkt)
 {
@@ -98,43 +136,10 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
         gnrc_pktbuf_hold(pkt, numof - 1);
 
         while (sendto) {
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
-            uint32_t status = 0;
-            switch (sendto->type) {
-                case GNRC_NETREG_TYPE_DEFAULT:
-                    if (_gnrc_netapi_send_recv(sendto->target.pid, pkt,
-                                               cmd) < 1) {
-                        /* unable to dispatch packet */
-                        status = EIO;
-                    }
-                    break;
-#ifdef MODULE_GNRC_NETAPI_MBOX
-                case GNRC_NETREG_TYPE_MBOX:
-                    if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
-                        /* unable to dispatch packet */
-                        status = EIO;
-                    }
-                    break;
-#endif
-#ifdef MODULE_GNRC_NETAPI_CALLBACKS
-                case GNRC_NETREG_TYPE_CB:
-                    sendto->target.cbd->cb(cmd, pkt, sendto->target.cbd->ctx);
-                    break;
-#endif
-                default:
-                    /* unknown dispatch type */
-                    status = ECANCELED;
-                    break;
-            }
-            if (status != 0) {
+            int status = _dispatch_single(sendto, cmd, pkt);
+            if (status < 0) {
                 gnrc_pktbuf_release_error(pkt, status);
             }
-#else
-            if (_gnrc_netapi_send_recv(sendto->target.pid, pkt, cmd) < 1) {
-                /* unable to dispatch packet */
-                gnrc_pktbuf_release_error(pkt, EIO);
-            }
-#endif
             sendto = gnrc_netreg_getnext(sendto);
         }
     }
@@ -153,11 +158,6 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t 
         ._data_len = data_len,
     };
 
-    msg_t cmd = {
-        .type = GNRC_NETAPI_MSG_TYPE_NOTIFY,
-        .content.ptr = (void *)&notify,
-    };
-
     gnrc_netreg_acquire_shared();
 
     int numof = gnrc_netreg_num(type, demux_ctx);
@@ -171,11 +171,11 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t 
 
         /* Dispatch to all registered threads sequentially. */
         while (sendto) {
-            msg_send(&cmd, sendto->target.pid);
+            uint32_t status = _dispatch_single(sendto, GNRC_NETAPI_MSG_TYPE_NOTIFY, &notify);
 
             /* Need to wait for an ACK to ensure that the data was read and that
                there won't be any dangling pointers after the function returned. */
-            if (data != NULL) {
+            if (data != NULL && status == 0) {
                 thread_flags_wait_all(NETAPI_NOTIFY_FLAG_ACK);
             }
 
