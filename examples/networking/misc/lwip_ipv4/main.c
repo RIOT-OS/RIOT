@@ -23,14 +23,25 @@
 #include "thread.h"
 #include "mutex.h"
 
+#include "ztimer.h"
+#include "lwip/netif.h"
+#include <arpa/inet.h>
+
 #ifndef CONFIG_CLIENT_TIMEOUT_SEC
 #define CONFIG_CLIENT_TIMEOUT_SEC 3
 #endif
 
+#ifndef CONFIG_DHCP_TIMEOUT_SEC
+#define CONFIG_DHCP_TIMEOUT_SEC 10
+#endif
+
+#ifndef SERVER_PORT
+#define SERVER_PORT 4444
+#endif
+
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
-static mutex_t server_mutex = MUTEX_INIT;
-static int server_running = 0;
-static uint16_t server_port;
+
+#define SERVER_PORT 4444
 
 static int _client_cmd(int argc, char **argv)
 {
@@ -86,7 +97,7 @@ void *server_thread(void *arg)
     (void)arg;
     sock_udp_t sock;
     sock_udp_ep_t local = { .family = AF_INET,
-                            .port = server_port };
+                            .port = SERVER_PORT };
     sock_udp_ep_t remote;
     int result;
     int error;
@@ -96,11 +107,6 @@ void *server_thread(void *arg)
     if (res) {
         printf("Sock_udp_create error!\n");
         printf("Server stopped.\n");
-
-        mutex_lock(&server_mutex);
-        server_running = 0;
-        mutex_unlock(&server_mutex);
-
         return NULL;
     }
 
@@ -109,23 +115,15 @@ void *server_thread(void *arg)
     while (1) {
         if ((result = sock_udp_recv(&sock, buffer, sizeof(buffer) - 1, SOCK_NO_TIMEOUT, &remote)) < 0) {
             printf("sock_udp_recv() failed with %d\n", result);
-            printf("Server stopped.\n");
-
-            sock_udp_close(&sock);
-
-            mutex_lock(&server_mutex);
-            server_running = 0;
-            mutex_unlock(&server_mutex);
-
-            return NULL;
         }
+        else {
+            buffer[result] = 0;
+            printf("Received %d bytes - %s\n", result, buffer);
 
-        buffer[result] = 0;
-        printf("Received %d bytes - %s\n", result, buffer);
-
-        error = sock_udp_send(&sock, buffer, result, &remote);
-        if (error < 0) {
-            printf("sock_udp_send() failed with %d\n", error);
+            error = sock_udp_send(&sock, buffer, result, &remote);
+            if (error < 0) {
+                printf("sock_udp_send() failed with %d\n", error);
+            }
         }
     }
 
@@ -134,39 +132,34 @@ void *server_thread(void *arg)
     return NULL;
 }
 
-static int _server_cmd(int argc, char **argv)
-{
-    int is_running;
-    if (argc < 2) {
-        printf("usage: %s <port>\n", argv[0]);
-        return -1;
-    }
-
-    mutex_lock(&server_mutex);
-    is_running = server_running;
-    mutex_unlock(&server_mutex);
-
-    if (is_running == 1) {
-        printf("Server already running!\n");
-        return -1;
-    }
-
-    server_port = atoi(argv[1]);
-
-    mutex_lock(&server_mutex);
-    server_running = 1;
-    mutex_unlock(&server_mutex);
-
-    thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1, 0, server_thread, NULL, "server");
-
-    return -1;
-}
-
-SHELL_COMMAND(server, "Starts server which receives UDP datagrams", _server_cmd);
+#define _TEST_ADDR4_LOCAL  (0x0b64a8c0U)   /* 192.168.100.11 */
+#define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
 
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
+
+    sys_lock_tcpip_core();
+    struct netif *iface = netif_find("ET0");
+
+#ifndef MODULE_LWIP_DHCP_AUTO
+    ip4_addr_t ip, subnet;
+    ip.addr = _TEST_ADDR4_LOCAL;
+    subnet.addr = _TEST_ADDR4_MASK;
+    netif_set_addr(iface, &ip, &subnet, NULL);
+#else
+    printf("Waiting for DHCP address autoconfiguration ...\n");
+    ztimer_sleep(ZTIMER_MSEC, CONFIG_DHCP_TIMEOUT_SEC * MS_PER_SEC);
+#endif
+
+    /* print network addresses */
+    printf("{\"IPv4 addresses\": [\"");
+    char buffer[16];
+    inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
+    sys_unlock_tcpip_core();
+    printf("%s\"]}\n", buffer);
+
+    thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1, 0, server_thread, NULL, "server");
 
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
