@@ -27,7 +27,8 @@
 #include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
-#include "thread.h"
+#include "cond.h"
+#include "mutex.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -152,10 +153,16 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t event,
                        void *data, size_t data_len)
 {
+    gnrc_netapi_notify_ack_t ack = {
+        .counter = 0,
+        .cond = COND_INIT,
+        .lock = MUTEX_INIT,
+    };
     gnrc_netapi_notify_t notify = {
         .event = event,
         ._data = data,
         ._data_len = data_len,
+        .ack = &ack
     };
 
     gnrc_netreg_acquire_shared();
@@ -166,24 +173,27 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t 
         /* Look up the registered threads for this message type. */
         gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
 
-        /* Make sure the ACK flag isn't already set. */
-        thread_flags_clear(NETAPI_NOTIFY_FLAG_ACK);
-
         /* Dispatch to all registered threads sequentially. */
         while (sendto) {
-            uint32_t status = _dispatch_single(sendto, GNRC_NETAPI_MSG_TYPE_NOTIFY, &notify);
-
-            /* Need to wait for an ACK to ensure that the data was read and that
-               there won't be any dangling pointers after the function returned. */
-            if (data != NULL && status == 0) {
-                thread_flags_wait_all(NETAPI_NOTIFY_FLAG_ACK);
+            int status = _dispatch_single(sendto, GNRC_NETAPI_MSG_TYPE_NOTIFY, &notify);
+            if (status < 0) {
+                numof--;
             }
-
             sendto = gnrc_netreg_getnext(sendto);
         }
     }
 
     gnrc_netreg_release_shared();
+
+    if (data != NULL) {
+        /* Wait for ACK from all receivers to ensure that the data was read and
+           that there won't be any dangling pointers after the function returned. */
+        mutex_lock(&ack.lock);
+        while (ack.counter < numof) {
+            cond_wait(&ack.cond, &ack.lock);
+        }
+        mutex_unlock(&ack.lock);
+    }
 
     return numof;
 }

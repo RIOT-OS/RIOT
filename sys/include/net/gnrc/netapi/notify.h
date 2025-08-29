@@ -26,10 +26,9 @@
  *
  * @note    Notification events are associated with type-dependent event data.
  *          Receivers should not access the data directly, but instead use the
- *          the dedicated API functions.
- *          If the data is read directly, the receiver is responsible for setting
- *          the @ref NETAPI_NOTIFY_FLAG_ACK flag for the sending thread.
- *
+ *          the dedicated API functions to copy the data from the sender's.
+ *          If the data is read manually, the receiver is responsible for
+ *          calling @ref gnrc_netapi_notify_ack to unblock the sender.
  *
  * @author  Elena Frank <elena.frank@tu-dresden.de>
  */
@@ -39,23 +38,15 @@ extern "C" {
 #endif
 
 #include "net/ipv6/addr.h"
-#include "sched.h"
-
-/**
- * @brief   Thread flag for acknowledging a received notify even.
- *
- * @note    The flag should only be set after all event data was copied
- *          by receiver and can be freed by the sender.
- */
-#define NETAPI_NOTIFY_FLAG_ACK         (1u << 10)
+#include "cond.h"
+#include "mutex.h"
 
 /**
  * @brief   Definition of notification event types in the network stack.
  *
  * @note    Expand at will.
  *          If event data is associated with the type, a helper function must also
- *          be added for parsing the data and setting the @ref NETAPI_NOTIFY_FLAG_ACK
- *          on the sender.
+ *          be added for parsing the data and calling @ref gnrc_netapi_notify_ack.
  */
 typedef enum {
     NETAPI_NOTIFY_L2_CONNECTED,     /**< Connection established on layer 2. */
@@ -65,12 +56,22 @@ typedef enum {
 } netapi_notify_t;
 
 /**
+ * @brief   Data structure to acknowledge netapi notification events.
+ */
+typedef struct {
+    int counter;        /**< ACK counter */
+    cond_t cond;        /**< condition variable to signal change in count */
+    mutex_t lock;       /**< lock for counter */
+} gnrc_netapi_notify_ack_t;
+
+/**
  * @brief   Data structure to be sent for netapi notification events.
  */
 typedef struct {
-    netapi_notify_t event;      /**< the type of event */
-    void *_data;                /**< associated event data. */
-    uint16_t _data_len;         /**< size of the event data */
+    netapi_notify_t event;          /**< the type of event */
+    void *_data;                    /**< associated event data. */
+    uint16_t _data_len;             /**< size of the event data */
+    gnrc_netapi_notify_ack_t *ack;  /**< acknowledge event */
 } gnrc_netapi_notify_t;
 
 /**
@@ -84,12 +85,25 @@ typedef struct {
 } netapi_notify_l2_connection_t;
 
 /**
+ * @brief   Acknowledge that a notify event was received and its data read.
+ *
+ * @param[in] ack           Pointer to the event's acknowledgment structure.
+ */
+static inline void gnrc_netapi_notify_ack(gnrc_netapi_notify_ack_t *ack)
+{
+    mutex_lock(&ack->lock);
+    ack->counter++;
+    /* Signal that the counter changed. */
+    cond_signal(&ack->cond);
+    mutex_unlock(&ack->lock);
+}
+
+/**
  * @brief   Parse the connection event data associated with @ref NETAPI_NOTIFY_L2_CONNECTED
  *          and @ref NETAPI_NOTIFY_L2_DISCONNECTED events.
  *
- * @note    This will set the @ref NETAPI_NOTIFY_FLAG_ACK for the sending thread.
+ * @note    This will call @ref gnrc_netapi_notify_ack.
  *
- * @param[in] sender_pid    PID of the netapi sender.
  * @param[in] notify        Pointer to the received notify event.
  * @param[out] data         Connection data received in the @p notify event.
  *                          data.l2addr_len should be set to the size of the l2addr buffer.
@@ -99,24 +113,21 @@ typedef struct {
  * @retval                  -ENOBUFS if the length of l2addr in @p data is smaller than the
  *                          received l2addr.
  */
-uint8_t gnrc_netapi_notify_copy_l2_connection_data(kernel_pid_t sender_pid,
-                                                   gnrc_netapi_notify_t *notify,
+uint8_t gnrc_netapi_notify_copy_l2_connection_data(gnrc_netapi_notify_t *notify,
                                                    netapi_notify_l2_connection_t *data);
 /**
  * @brief   Parse the ipv6 address associated with @ref NETAPI_NOTIFY_L3_DISCOVERED and
  *          @ref NETAPI_NOTIFY_L3_UNREACHABLE events.
  *
- * @note    This will set the @ref NETAPI_NOTIFY_FLAG_ACK for the sending thread.
+ * @note    This will call @ref gnrc_netapi_notify_ack.
  *
- * @param[in] sender_pid    PID of the netapi sender.
  * @param[in] notify        Pointer to the received notify event.
  * @param[out] addr         IPv6 address of the remote.
  *
  * @retval                  sizeof(ipv6_addr_t) on success.
  * @retval                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
  */
-int gnrc_netapi_notify_copy_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
-                                       ipv6_addr_t *addr);
+int gnrc_netapi_notify_copy_l3_address(gnrc_netapi_notify_t *notify, ipv6_addr_t *addr);
 
 #ifdef __cplusplus
 }

@@ -314,13 +314,12 @@ static inline void _handle_unreachable_neighbor(ipv6_addr_t *addr)
  *
  * @param[in] notify    The type of notification.
  */
-static inline void _netapi_notify_event(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify)
+static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
 {
     ipv6_addr_t neigh_addr;
     netapi_notify_t type = notify->event;
 
-    if (gnrc_netapi_notify_copy_l3_address(sender_pid, notify,
-                                           &neigh_addr) != sizeof(ipv6_addr_t)) {
+    if (gnrc_netapi_notify_copy_l3_address(notify, &neigh_addr) != sizeof(ipv6_addr_t)) {
         DEBUG("RPL: Received invalid data for netapi notify event.\n");
         return;
     }
@@ -408,7 +407,7 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_NOTIFY:
                 DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
-                _netapi_notify_event(msg.sender_pid, msg.content.ptr);
+                _netapi_notify_event(msg.content.ptr);
                 break;
             default:
                 break;

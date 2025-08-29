@@ -241,7 +241,7 @@ static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uin
  *
  * @param[in] notify    The type of notification.
  */
-static inline void _netapi_notify_event(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify)
+static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
 {
     uint8_t l2addr[CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
     netapi_notify_l2_connection_t data = {
@@ -251,7 +251,7 @@ static inline void _netapi_notify_event(kernel_pid_t sender_pid, gnrc_netapi_not
     };
     netapi_notify_t type = notify->event;
 
-    if (gnrc_netapi_notify_copy_l2_connection_data(sender_pid, notify, &data) <= 0) {
+    if (gnrc_netapi_notify_copy_l2_connection_data(notify, &data) <= 0) {
         DEBUG("ipv6: invalid data on netapi notify event.\n");
         return;
     }
@@ -320,7 +320,7 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_NOTIFY:
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
-                _netapi_notify_event(msg.sender_pid, msg.content.ptr);
+                _netapi_notify_event(msg.content.ptr);
                 break;
 
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG

@@ -16,12 +16,8 @@
 
 #include "net/gnrc/netapi/notify.h"
 #include "net/ipv6/addr.h"
-#include "sched.h"
-#include "thread.h"
-#include <sys/errno.h>
 
-uint8_t gnrc_netapi_notify_copy_l2_connection_data(kernel_pid_t sender_pid,
-                                                   gnrc_netapi_notify_t *notify,
+uint8_t gnrc_netapi_notify_copy_l2_connection_data(gnrc_netapi_notify_t *notify,
                                                    netapi_notify_l2_connection_t *data)
 {
     int data_len;
@@ -51,14 +47,13 @@ uint8_t gnrc_netapi_notify_copy_l2_connection_data(kernel_pid_t sender_pid,
         break;
     }
 
-    /* Unblock the sending thread now that all data was copied over. */
-    thread_flags_set(thread_get(sender_pid), NETAPI_NOTIFY_FLAG_ACK);
+    /* Acknowledge the read data */
+    gnrc_netapi_notify_ack(notify->ack);
 
     return data_len;
 }
 
-int gnrc_netapi_notify_copy_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
-                                       ipv6_addr_t *addr)
+int gnrc_netapi_notify_copy_l3_address(gnrc_netapi_notify_t *notify, ipv6_addr_t *addr)
 {
     int data_len;
 
@@ -77,8 +72,8 @@ int gnrc_netapi_notify_copy_l3_address(kernel_pid_t sender_pid, gnrc_netapi_noti
         break;
     }
 
-    /* Unblock the sending thread now that all data was copied over. */
-    thread_flags_set(thread_get(sender_pid), NETAPI_NOTIFY_FLAG_ACK);
+    /* Acknowledge the read data */
+    gnrc_netapi_notify_ack(notify->ack);
 
     return data_len;
 }
