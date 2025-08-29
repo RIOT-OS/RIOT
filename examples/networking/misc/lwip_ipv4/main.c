@@ -23,14 +23,22 @@
 #include "thread.h"
 #include "mutex.h"
 
+#include "ztimer.h"
+#include "lwip/netif.h"
+#include <arpa/inet.h>
+
 #ifndef CONFIG_CLIENT_TIMEOUT_SEC
 #define CONFIG_CLIENT_TIMEOUT_SEC 3
+#endif
+
+#ifndef CONFIG_DHCP_TIMEOUT_SEC
+#define CONFIG_DHCP_TIMEOUT_SEC 10
 #endif
 
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
 static mutex_t server_mutex = MUTEX_INIT;
 static int server_running = 0;
-static uint16_t server_port;
+static uint16_t server_port = 4444;
 
 static int _client_cmd(int argc, char **argv)
 {
@@ -164,9 +172,37 @@ static int _server_cmd(int argc, char **argv)
 
 SHELL_COMMAND(server, "Starts server which receives UDP datagrams", _server_cmd);
 
+#define _TEST_ADDR4_LOCAL  (0x0b64a8c0U)   /* 192.168.100.11 */
+#define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
+
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
+
+    sys_lock_tcpip_core();
+    struct netif *iface = netif_find("ET0");
+    sys_unlock_tcpip_core();
+
+#ifndef MODULE_LWIP_DHCP_AUTO
+    ip4_addr_t ip, subnet;
+    ip.addr = _TEST_ADDR4_LOCAL;
+    subnet.addr = _TEST_ADDR4_MASK;
+    sys_lock_tcpip_core();
+    netif_set_addr(iface, &ip, &subnet, NULL);
+    sys_unlock_tcpip_core();
+#else
+    printf("Waiting for DHCP address autoconfiguration ...\n");
+    ztimer_sleep(ZTIMER_MSEC, CONFIG_DHCP_TIMEOUT_SEC * MS_PER_SEC);
+#endif
+
+    /* print network addresses */
+    printf("{\"IPv4 addresses\": [\"");
+    char buffer[16];
+    inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
+    printf("%s\"]}\n", buffer);
+
+    server_running = 1;
+    thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1, 0, server_thread, NULL, "server");
 
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
