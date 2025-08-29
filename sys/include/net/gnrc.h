@@ -288,6 +288,7 @@
 
 #include "net/netopt.h"
 #include "net/gnrc/netapi.h"
+#include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/netif.h"
