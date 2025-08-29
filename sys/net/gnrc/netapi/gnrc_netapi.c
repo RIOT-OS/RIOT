@@ -150,7 +150,7 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t 
     gnrc_netapi_notify_t notify = {
         .event = event,
         ._data = data,
-        .data_len = data_len,
+        ._data_len = data_len,
     };
 
     msg_t cmd = {

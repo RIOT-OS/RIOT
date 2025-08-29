@@ -68,9 +68,9 @@ typedef enum {
  * @brief   Data structure to be sent for netapi notification events.
  */
 typedef struct {
-    netapi_notify_t event;          /**< the type of event */
+    netapi_notify_t event;      /**< the type of event */
     void *_data;                /**< associated event data. */
-    uint16_t data_len;          /**< size of the event data */
+    uint16_t _data_len;         /**< size of the event data */
 } gnrc_netapi_notify_t;
 
 /**
@@ -92,13 +92,16 @@ typedef struct {
  * @param[in] sender_pid    PID of the netapi sender.
  * @param[in] notify        Pointer to the received notify event.
  * @param[out] l2addr       L2 address of the node on the connection.
+ * @param[in] l2addr_len    Size of the @p l2addr buffer.
  * @param[out] if_pid       PID of the network interface to the node.
  *
- * @return                  Length of @p l2addr on success.
- * @return                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
+ * @retval                  Length of @p l2addr on success.
+ * @retval                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
  */
-uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
-                                              uint8_t *l2addr, kernel_pid_t *if_pid);
+uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid,
+                                                  gnrc_netapi_notify_t *notify,
+                                                  uint8_t *l2addr, uint8_t l2addr_len,
+                                                  kernel_pid_t *if_pid);
 
 /**
  * @brief   Parse the ipv6 address associated with @ref NETAPI_NOTIFY_L3_DISCOVERED and
@@ -110,11 +113,11 @@ uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid, gnrc_
  * @param[in] notify        Pointer to the received notify event.
  * @param[out] addr         IPv6 address of the remote.
  *
- * @return                  sizeof(ipv6_addr_t) on success.
- * @return                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
+ * @retval                  sizeof(ipv6_addr_t) on success.
+ * @retval                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
  */
 int gnrc_netapi_notify_get_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
-                                  ipv6_addr_t *addr);
+                                      ipv6_addr_t *addr);
 
 #ifdef __cplusplus
 }
