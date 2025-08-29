@@ -25,10 +25,17 @@ USEMODULE += ipv4_addr
 USEMODULE += lwip_arp
 USEMODULE += lwip_ipv4
 
+# If this module will be disabled, example set IPv4 192.168.100.11 address.
+# Enable next two line to use DHCP
+#USEMODULE += lwip_dhcp_auto
+#CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+
 #enables UDP LWIP sockets
 USEMODULE += sock_udp
 
 #nables ifconfig command, which allows IPv4 address configuration
 USEMODULE += shell_cmds_default
+
+USEMODULE += ztimer_sec
 
 include $(RIOTBASE)/Makefile.include
