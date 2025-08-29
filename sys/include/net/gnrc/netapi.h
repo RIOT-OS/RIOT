@@ -60,7 +60,7 @@
 
 #include "thread.h"
 #include "net/netopt.h"
-#include "net/gnrc/netapi/netnotify.h"
+#include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
@@ -204,7 +204,7 @@ static inline int gnrc_netapi_dispatch_send(gnrc_nettype_t type, uint32_t demux_
  *
  * @return Number of subscribers to (@p type, @p demux_ctx).
  */
-int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netnotify_t event,
+int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t event,
                        void *data, size_t data_len);
 
 /**

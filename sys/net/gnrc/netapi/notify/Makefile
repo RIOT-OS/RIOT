@@ -1,3 +1,3 @@
-MODULE = gnrc_netnotify
+MODULE = gnrc_netapi_notify
 
 include $(RIOTBASE)/Makefile.base

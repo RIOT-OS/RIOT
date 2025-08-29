@@ -14,23 +14,23 @@
 
 #include <errno.h>
 
-#include "net/gnrc/netapi/netnotify.h"
+#include "net/gnrc/netapi/notify.h"
 #include "net/ipv6/addr.h"
 #include "sched.h"
 #include "thread.h"
 
-uint8_t gnrc_netnotify_get_l2_connection_data(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
+uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
                                               uint8_t *l2addr, kernel_pid_t *if_pid)
 {
     int data_len;
 
     switch (notify->event) {
-    case NETNOTIFY_L2_CONNECTED:
-    case NETNOTIFY_L2_DISCONNECTED:
-        assert(notify->data_len == sizeof(netnotify_l2_connection_t));
+    case NETAPI_NOTIFY_L2_CONNECTED:
+    case NETAPI_NOTIFY_L2_DISCONNECTED:
+        assert(notify->data_len == sizeof(netapi_notify_l2_connection_t));
 
         /* Parse event data.*/
-        netnotify_l2_connection_t *data = notify->_data;
+        netapi_notify_l2_connection_t *data = notify->_data;
         memcpy(l2addr, data->l2addr, data->l2addr_len);
         *if_pid = data->if_pid;
 
@@ -42,20 +42,20 @@ uint8_t gnrc_netnotify_get_l2_connection_data(kernel_pid_t sender_pid, gnrc_neta
     }
 
     /* Unblock the sending thread now that all data was copied over. */
-    thread_flags_set(thread_get(sender_pid), NETNOTIFY_FLAG_ACK);
+    thread_flags_set(thread_get(sender_pid), NETAPI_NOTIFY_FLAG_ACK);
 
     return data_len;
 }
 
-int gnrc_netnotify_get_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
+int gnrc_netapi_notify_get_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
                                   ipv6_addr_t *addr)
 {
     int data_len;
     *addr = ipv6_addr_unspecified;
 
     switch (notify->event) {
-    case NETNOTIFY_L3_DISCOVERED:
-    case NETNOTIFY_L3_UNREACHABLE:
+    case NETAPI_NOTIFY_L3_DISCOVERED:
+    case NETAPI_NOTIFY_L3_UNREACHABLE:
         assert(notify->data_len == sizeof(ipv6_addr_t));
         memcpy(addr, notify->_data, sizeof(ipv6_addr_t));
 
@@ -67,7 +67,7 @@ int gnrc_netnotify_get_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t 
     }
 
     /* Unblock the sending thread now that all data was copied over. */
-    thread_flags_set(thread_get(sender_pid), NETNOTIFY_FLAG_ACK);
+    thread_flags_set(thread_get(sender_pid), NETAPI_NOTIFY_FLAG_ACK);
 
     return data_len;
 }

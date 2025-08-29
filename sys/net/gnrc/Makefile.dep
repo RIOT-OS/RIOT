@@ -55,7 +55,7 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netnotify gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netapi_notify gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
@@ -442,7 +442,7 @@ endif
 
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
-  USEMODULE += gnrc_netnotify
+  USEMODULE += gnrc_netapi_notify
   USEMODULE += gnrc_netreg
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
