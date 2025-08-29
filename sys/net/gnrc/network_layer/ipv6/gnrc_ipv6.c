@@ -244,25 +244,24 @@ static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uin
 static inline void _netapi_notify_event(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify)
 {
     uint8_t l2addr[CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
-    uint8_t l2addr_len;
-    kernel_pid_t if_pid = KERNEL_PID_UNDEF;
+    netapi_notify_l2_connection_t data = {
+        .l2addr = l2addr,
+        .l2addr_len = CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN,
+        .if_pid = KERNEL_PID_UNDEF
+    };
     netapi_notify_t type = notify->event;
 
-    l2addr_len = gnrc_netapi_notify_get_l2_connection_data(sender_pid, notify, l2addr,
-                                                           CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN,
-                                                           &if_pid);
-
-    if (l2addr_len <= 0) {
+    if (gnrc_netapi_notify_copy_l2_connection_data(sender_pid, notify, &data) <= 0) {
         DEBUG("ipv6: invalid data on netapi notify event.\n");
         return;
     }
 
     switch (type) {
     case NETAPI_NOTIFY_L2_CONNECTED:
-        _on_l2_connected(if_pid, l2addr, l2addr_len);
+        _on_l2_connected(data.if_pid, data.l2addr, data.l2addr_len);
         break;
     case NETAPI_NOTIFY_L2_DISCONNECTED:
-        _on_l2_disconnected(if_pid, l2addr, l2addr_len);
+        _on_l2_disconnected(data.if_pid, data.l2addr, data.l2addr_len);
         break;
     default:
         break;

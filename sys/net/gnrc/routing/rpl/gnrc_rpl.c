@@ -319,7 +319,8 @@ static inline void _netapi_notify_event(kernel_pid_t sender_pid, gnrc_netapi_not
     ipv6_addr_t neigh_addr;
     netapi_notify_t type = notify->event;
 
-    if (gnrc_netapi_notify_get_l3_address(sender_pid, notify, &neigh_addr) != sizeof(ipv6_addr_t)) {
+    if (gnrc_netapi_notify_copy_l3_address(sender_pid, notify,
+                                           &neigh_addr) != sizeof(ipv6_addr_t)) {
         DEBUG("RPL: Received invalid data for netapi notify event.\n");
         return;
     }

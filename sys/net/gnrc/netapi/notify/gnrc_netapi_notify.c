@@ -20,10 +20,9 @@
 #include "thread.h"
 #include <sys/errno.h>
 
-uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid,
-                                                  gnrc_netapi_notify_t *notify,
-                                                  uint8_t *l2addr, uint8_t l2addr_len,
-                                                  kernel_pid_t *if_pid)
+uint8_t gnrc_netapi_notify_copy_l2_connection_data(kernel_pid_t sender_pid,
+                                                   gnrc_netapi_notify_t *notify,
+                                                   netapi_notify_l2_connection_t *data)
 {
     int data_len;
 
@@ -33,18 +32,19 @@ uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid,
         assert(notify->_data_len == sizeof(netapi_notify_l2_connection_t));
 
         /* Parse event data.*/
-        netapi_notify_l2_connection_t *data = notify->_data;
+        netapi_notify_l2_connection_t *recv_data = notify->_data;
 
         /* l2addr must fit in the provided buffer */
-        if (l2addr_len < data->l2addr_len) {
+        if (data->l2addr_len < recv_data->l2addr_len) {
             data_len = -EINVAL;
             break;
         }
 
-        memcpy(l2addr, data->l2addr, data->l2addr_len);
-        *if_pid = data->if_pid;
+        memcpy(data->l2addr, recv_data->l2addr, recv_data->l2addr_len);
+        data->l2addr_len = recv_data->l2addr_len;
+        data->if_pid = recv_data->if_pid;
 
-        data_len = data->l2addr_len;
+        data_len = sizeof(netapi_notify_l2_connection_t);
         break;
     default:
         data_len = -EINVAL;
@@ -57,8 +57,8 @@ uint8_t gnrc_netapi_notify_get_l2_connection_data(kernel_pid_t sender_pid,
     return data_len;
 }
 
-int gnrc_netapi_notify_get_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
-                                      ipv6_addr_t *addr)
+int gnrc_netapi_notify_copy_l3_address(kernel_pid_t sender_pid, gnrc_netapi_notify_t *notify,
+                                       ipv6_addr_t *addr)
 {
     int data_len;
 
