@@ -56,6 +56,10 @@ int native_cli_get_eui64(uint8_t index, eui64_t *addr)
     for (list_node_t *e = head.next; e != NULL; e = e->next) {
         if (cnt++ == index) {
             *addr = container_of(e, native_eui64_list_t, node)->addr;
+
+            eui64_set_local(addr);
+            eui64_clear_group(addr);
+
             return 0;
         }
     }
