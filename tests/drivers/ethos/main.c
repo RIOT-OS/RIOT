@@ -21,9 +21,9 @@
 #include <stdio.h>
 
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "test_utils/netdev_eth_minimal.h"
 #include "init_dev.h"
-#include "assert.h"
 #include "ethos.h"
 #include "ethos_params.h"
 
@@ -42,7 +42,7 @@ int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
 
         /* initialize the device driver */
         int res = device->driver->init(device);
-        assert(!res);
+        expect(!res);
     }
 
     return 0;

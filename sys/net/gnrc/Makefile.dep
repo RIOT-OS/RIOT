@@ -10,15 +10,6 @@ ifneq (,$(filter sock_async,$(USEMODULE)))
   USEMODULE += gnrc_sock_async
 endif
 
-ifneq (,$(filter gnrc_mac,$(USEMODULE)))
-  USEMODULE += gnrc_priority_pktqueue
-  USEMODULE += csma_sender
-  USEMODULE += evtimer
-  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
-    USEMODULE += gnrc_netif_mac
-  endif
-endif
-
 ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += random
@@ -498,12 +489,4 @@ endif
 
 ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
   USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_nettype_lwmac
-  USEMODULE += gnrc_mac
-  USEMODULE += xtimer
-  FEATURES_REQUIRED += periph_rtt
 endif

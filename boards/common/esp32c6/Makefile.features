@@ -1,0 +1,3 @@
+CPU_FAM = esp32c6
+
+include $(RIOTBOARD)/common/esp32x/Makefile.features

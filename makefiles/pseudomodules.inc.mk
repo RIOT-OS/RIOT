@@ -130,7 +130,6 @@ PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_timestamp
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
-PSEUDOMODULES += gnrc_netif_mac
 PSEUDOMODULES += gnrc_netif_single
 PSEUDOMODULES += gnrc_netif_dedup
 
@@ -170,12 +169,6 @@ PSEUDOMODULES += gnrc_nettype_ipv6_ext
 ##              This module will be removed after 2024.10 release.
 ## @{
 PSEUDOMODULES += gnrc_nettype_lorawan
-## @}
-
-## @defgroup 	net_gnrc_nettype_lwmac      gnrc_nettype_lwmac
-## Enables @ref GNRC_NETTYPE_LWMAC
-## @{
-PSEUDOMODULES += gnrc_nettype_lwmac
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn
@@ -429,6 +422,7 @@ PSEUDOMODULES += shell_cmd_iw
 PSEUDOMODULES += shell_cmd_lwip_netif
 PSEUDOMODULES += shell_cmd_mci
 PSEUDOMODULES += shell_cmd_md5sum
+PSEUDOMODULES += shell_cmd_mtd
 PSEUDOMODULES += shell_cmd_nanocoap_vfs
 PSEUDOMODULES += shell_cmd_netstats_neighbor
 PSEUDOMODULES += shell_cmd_nice
@@ -450,6 +444,7 @@ PSEUDOMODULES += shell_cmd_sntp
 PSEUDOMODULES += shell_cmd_suit
 PSEUDOMODULES += shell_cmd_sys
 PSEUDOMODULES += shell_cmd_udptty
+PSEUDOMODULES += shell_cmd_xipfs
 PSEUDOMODULES += shell_cmd_vfs
 PSEUDOMODULES += shell_cmds_default
 PSEUDOMODULES += shell_hooks

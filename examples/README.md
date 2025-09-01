@@ -141,6 +141,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [twr_aloha](./advanced/twr_aloha/README.md) | This example allows testing different two-way ranging algorithms between two boards supporting a dw1000 device. This makes use of the uwb-core pkg. |
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
+| [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
 
 ## Examples from Guides
 

@@ -112,6 +112,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t pwm)
 {
+    (void)pwm;  /* avoid compilation problems with NDEBUG */
     assert(pwm < PWM_NUMOF);
     return PWM_CHANNEL_NUMOF;
 }

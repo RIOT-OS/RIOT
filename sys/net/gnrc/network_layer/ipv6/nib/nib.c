@@ -304,102 +304,105 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
 
     DEBUG("nib: get next hop link-layer address of %s%%%u\n",
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
-          (netif != NULL) ? (unsigned)netif->pid : 0U);
+          netif ? (unsigned)netif->pid : 0);
+
     gnrc_netif_acquire(netif);
     _nib_acquire();
-    do {    /* XXX: hidden goto ;-) */
-        _nib_onl_entry_t *node = _nib_onl_nc_get(dst,
-                                                 (netif == NULL) ? 0 : netif->pid);
-        /* consider neighbor cache entries first */
-        unsigned iface = (node == NULL) ? 0 : _nib_onl_get_if(node);
 
-        if ((node != NULL) || _on_link(dst, &iface)) {
-            DEBUG("nib: %s is %s, start address resolution\n",
-                  ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
-                  node ? "in NC" : "on-link");
-            /* on-link prefixes return their interface */
-            if (!ipv6_addr_is_link_local(dst) && (iface != 0)) {
-                /* release pre-assumed netif */
-                gnrc_netif_release(netif);
-                netif = _acquire_new_iface(iface);
-                /* get node from proper interface */
-                if (netif != NULL) {
-                    node = _nib_onl_nc_get(dst, netif->pid);
-                }
-            }
-            if ((netif == NULL) ||
-                !_resolve_addr(dst, netif, pkt, nce, node)) {
-                DEBUG("nib: host unreachable\n");
-                /* _resolve_addr releases pkt only if not queued (in which case
-                 * we also shouldn't release), but if netif is not defined we
-                 * should release in any case. */
-                if ((netif == NULL) && (pkt != NULL)) {
-                    gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
-                                                   pkt);
-                    gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
-                }
-                res = -EHOSTUNREACH;
-                break;
+    _nib_onl_entry_t *node = _nib_onl_nc_get(dst, netif ? netif->pid : 0);
+    /* consider neighbor cache entries first */
+    unsigned iface = (node == NULL) ? 0 : _nib_onl_get_if(node);
+
+    if ((node != NULL) || _on_link(dst, &iface)) {
+        DEBUG("nib: %s is %s, start address resolution\n",
+              ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
+              node ? "in NC" : "on-link");
+        /* on-link prefixes return their interface */
+        if (!ipv6_addr_is_link_local(dst) && (iface != 0)) {
+            /* release pre-assumed netif */
+            gnrc_netif_release(netif);
+            netif = _acquire_new_iface(iface);
+            /* get node from proper interface */
+            if (netif != NULL) {
+                node = _nib_onl_nc_get(dst, netif->pid);
             }
         }
-        else {
-            gnrc_ipv6_nib_ft_t route;
+        if ((netif == NULL) ||
+            !_resolve_addr(dst, netif, pkt, nce, node)) {
+            DEBUG("nib: host unreachable\n");
+            /* _resolve_addr releases pkt only if not queued (in which case
+             * we also shouldn't release), but if netif is not defined we
+             * should release in any case. */
+            if ((netif == NULL) && (pkt != NULL)) {
+                gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
+                                               pkt);
+                gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
+            }
+            res = -EHOSTUNREACH;
+        }
+        goto out;
+    }
 
-            DEBUG("nib: %s is off-link, resolve route\n",
-                  ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
-            res = _nib_get_route(dst, pkt, &route);
-            if ((res < 0) || ipv6_addr_is_unspecified(&route.next_hop)) {
-                DEBUG("nib: no route to %s found or is prefix list entry, "
-                      "search neighbor cache\n",
-                      ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+    gnrc_ipv6_nib_ft_t route;
 
-                if ((res == 0) &&
-                    /* If ARSM is not active only use link-local as next hop */
-                    (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) ||
-                     ipv6_addr_is_link_local(dst))) {
-                    DEBUG("nib: prefix list entry => taking dst as next hop\n");
-                    memcpy(&route.next_hop, dst, sizeof(route.next_hop));
-                }
-                else {
-                    res = -ENETUNREACH;
-                    if (pkt != NULL) {
-                        gnrc_icmpv6_error_dst_unr_send(
-                                ICMPV6_ERROR_DST_UNR_NO_ROUTE,
-                                pkt
-                            );
-                        gnrc_pktbuf_release_error(pkt, ENETUNREACH);
-                    }
-                    break;
-                }
-            }
-            if ((netif != NULL) && (netif->pid != (int)route.iface)) {
-                /* release pre-assumed netif */
-                gnrc_netif_release(netif);
-            }
-            if ((netif == NULL) || (netif->pid != (int)route.iface)) {
-                /* get actual netif */
-                netif = _acquire_new_iface(route.iface);
-            }
-            node = _nib_onl_nc_get(&route.next_hop,
-                                   (netif != NULL) ? netif->pid : 0);
-            if (_resolve_addr(&route.next_hop, netif, pkt, nce, node)) {
-                _call_route_info_cb(netif,
-                                    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
-                                    &route.dst,
-                                    (void *)((intptr_t)route.dst_len));
+    DEBUG("nib: %s is off-link, resolve route\n",
+          ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+    res = _nib_get_route(dst, pkt, &route);
+
+   /* If ARSM is not active only use link-local as next hop */
+   if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) &&
+        ipv6_addr_is_unspecified(&route.next_hop) &&
+        !ipv6_addr_is_link_local(dst)) {
+        res = -ENETUNREACH;
+    }
+
+    if (res < 0) {
+        DEBUG("nib: no route to %s found or is prefix list entry, "
+              "search neighbor cache\n",
+              ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+
+        if (pkt != NULL) {
+            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_NO_ROUTE, pkt);
+            gnrc_pktbuf_release_error(pkt, ENETUNREACH);
+        }
+        res = -ENETUNREACH;
+        goto out;
+    }
+
+    if (ipv6_addr_is_unspecified(&route.next_hop)) {
+        DEBUG("nib: prefix list entry => taking dst as next hop\n");
+        memcpy(&route.next_hop, dst, sizeof(route.next_hop));
+    }
+
+    if ((netif != NULL) && (netif->pid != (int)route.iface)) {
+        /* release pre-assumed netif */
+        gnrc_netif_release(netif);
+    }
+    if ((netif == NULL) || (netif->pid != (int)route.iface)) {
+        /* get actual netif */
+        netif = _acquire_new_iface(route.iface);
+    }
+
+    node = _nib_onl_nc_get(&route.next_hop, netif ? netif->pid : 0);
+    if (_resolve_addr(&route.next_hop, netif, pkt, nce, node)) {
+        _call_route_info_cb(netif,
+                            GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
+                            &route.dst,
+                            (void *)((intptr_t)route.dst_len));
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC)
-                _nib_dc_add(&route.next_hop, netif->pid, dst);
+        _nib_dc_add(&route.next_hop, netif->pid, dst);
 #endif  /* CONFIG_GNRC_IPV6_NIB_DC */
-            }
-            else {
-                /* _resolve_addr releases pkt if not queued (in which case
-                 * we also shouldn't release */
-                res = -EHOSTUNREACH;
-            }
-        }
-    } while (0);
+    }
+    else {
+        /* _resolve_addr releases pkt if not queued (in which case
+         * we also shouldn't release */
+        res = -EHOSTUNREACH;
+    }
+
+out:
     _nib_release();
     gnrc_netif_release(netif);
+
     return res;
 }
 

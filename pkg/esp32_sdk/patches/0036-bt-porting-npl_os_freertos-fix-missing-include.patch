@@ -1,0 +1,24 @@
+From 9df2d320e918e2e39fcb3b47fca67301804f8a9b Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 17 Apr 2025 14:19:11 +0200
+Subject: [PATCH 36/36] bt/porting/npl_os_freertos: fix missing include
+
+---
+ components/bt/porting/npl/freertos/src/npl_os_freertos.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/bt/porting/npl/freertos/src/npl_os_freertos.c b/components/bt/porting/npl/freertos/src/npl_os_freertos.c
+index 9e5c9863c3..f7552ee4e1 100644
+--- a/components/bt/porting/npl/freertos/src/npl_os_freertos.c
++++ b/components/bt/porting/npl/freertos/src/npl_os_freertos.c
+@@ -19,6 +19,7 @@
+ 
+ #include "os/os_mempool.h"
+ #include "esp_log.h"
++#include "esp_idf_version.h"
+ #include "soc/soc_caps.h"
+ #include "esp_bt.h"
+ #include "bt_osi_mem.h"
+-- 
+2.34.1
+

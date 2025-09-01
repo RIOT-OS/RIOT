@@ -113,6 +113,18 @@
 #endif
 
 /**
+ * ESP32-H2 IEEE 802.15.4 driver configuration (DO NOT CHANGE)
+ */
+#if MODULE_ESP_IEEE802154
+#  define CONFIG_IEEE802154_ENABLED             1
+#  define CONFIG_IEEE802154_CCA_ED              1
+#  define CONFIG_IEEE802154_CCA_MODE            1
+#  define CONFIG_IEEE802154_CCA_THRESHOLD       -60
+#  define CONFIG_IEEE802154_PENDING_TABLE_SIZE  20
+#  define CONFIG_IEEE802154_RX_BUFFER_SIZE      20
+#endif
+
+/**
  * SPI RAM configuration (DO NOT CHANGE)
  */
 #if MODULE_ESP_SPI_RAM
@@ -299,6 +311,8 @@
 #  include "sdkconfig_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #  include "sdkconfig_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "sdkconfig_esp32c6.h"
 #elif defined(CPU_FAM_ESP32H2)
 #  include "sdkconfig_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)

@@ -134,11 +134,8 @@ endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires 64bit ftimestamps
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_usec
 endif
 
 ifneq (,$(filter sock_%,$(USEMODULE)))
@@ -227,6 +224,13 @@ ifneq (,$(filter newlib,$(USEMODULE)))
         # requires 64bit timestamps
         USEMODULE += ztimer64_xtimer_compat
       endif
+    endif
+  endif
+  ifneq (,$(filter bug_newlib_broken_stdio,$(FEATURES_USED)))
+    # work around broken newlib stdio by using alternative stdio implementation,
+    # unless stdio_null is used, which is inherently thread-safe :)
+    ifeq (,$(filter stdio_null,$(USEMODULE)))
+      USEPKG += mpaland-printf
     endif
   endif
 endif

@@ -83,6 +83,12 @@ ifneq (,$(filter lwext%_vfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter xipfs,$(USEMODULE)))
+  USEPKG += xipfs
+  USEMODULE += vfs
+  USEMODULE += xipfs_fs
+endif
+
 ifneq (,$(filter nimble_%,$(USEMODULE)))
   USEPKG += nimble
 endif

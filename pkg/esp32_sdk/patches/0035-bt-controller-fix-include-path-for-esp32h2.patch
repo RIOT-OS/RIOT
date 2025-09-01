@@ -1,0 +1,25 @@
+From 1357b5b40f12686aa0265df131c43c9a87bb8897 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 30 Mar 2025 13:07:34 +0200
+Subject: [PATCH 35/35] bt/controller: fix include path for esp32h2
+
+---
+ components/bt/include/esp32h2/include/esp_bt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/bt/include/esp32h2/include/esp_bt.h b/components/bt/include/esp32h2/include/esp_bt.h
+index c21a1bc854..ff047aace5 100644
+--- a/components/bt/include/esp32h2/include/esp_bt.h
++++ b/components/bt/include/esp32h2/include/esp_bt.h
+@@ -14,7 +14,7 @@
+ #include "esp_task.h"
+ 
+ #include "nimble/nimble_npl.h"
+-#include "../../../../controller/esp32h2/esp_bt_cfg.h"
++#include "../../../controller/esp32h2/esp_bt_cfg.h"
+ #include "esp_private/esp_modem_clock.h"
+ 
+ #ifdef CONFIG_BT_LE_HCI_INTERFACE_USE_UART
+-- 
+2.34.1
+

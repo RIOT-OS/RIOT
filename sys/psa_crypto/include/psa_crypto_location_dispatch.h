@@ -81,8 +81,8 @@ psa_status_t psa_location_dispatch_verify_message(const psa_key_attributes_t *at
 
 #if IS_USED(MODULE_PSA_MAC)
 /**
- * @brief   Dispatch call of a mac computation function to a location specific backend.
- *          See psa_mac_compute()
+ * @brief   Dispatch call of a mac computation function to a location-specific backend.
+ *          See @ref psa_mac_compute()
  */
 psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
@@ -92,7 +92,68 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
                                                uint8_t *mac,
                                                size_t mac_size,
                                                size_t *mac_length);
-#endif
+
+/**
+ * @brief   Dispatch call of a mac verification function to a location-specific backend.
+ *          See @ref psa_mac_verify()
+ */
+psa_status_t psa_location_dispatch_mac_verify(const psa_key_attributes_t *attributes,
+                                              psa_algorithm_t alg,
+                                              const psa_key_slot_t *slot,
+                                              const uint8_t *input,
+                                              size_t input_length,
+                                              const uint8_t *mac,
+                                              size_t mac_length);
+
+/**
+ * @brief   Dispatch call of a mac sign setup function to a location-specific backend.
+ *          See @ref psa_mac_sign_setup()
+ */
+psa_status_t psa_location_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
+                                                  const psa_key_attributes_t *attributes,
+                                                  const psa_key_slot_t *slot,
+                                                  psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a mac verify setup function to a location-specific backend.
+ *          See @ref psa_mac_verify_setup()
+ */
+psa_status_t psa_location_dispatch_mac_verify_setup(psa_mac_operation_t *operation,
+                                                    const psa_key_attributes_t *attributes,
+                                                    const psa_key_slot_t *slot,
+                                                    psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a mac update function to a location-specific backend.
+ *          See @ref psa_mac_update()
+ */
+psa_status_t psa_location_dispatch_mac_update(psa_mac_operation_t *operation,
+                                              const uint8_t *input,
+                                              size_t input_length);
+
+/**
+ * @brief   Dispatch call of a mac sign finish function to a location-specific backend.
+ *          See @ref psa_mac_sign_finish()
+ */
+psa_status_t psa_location_dispatch_mac_sign_finish(psa_mac_operation_t *operation,
+                                                   uint8_t *mac,
+                                                   size_t mac_size,
+                                                   size_t *mac_length);
+
+/**
+ * @brief   Dispatch call of a mac verify finish function to a location-specific backend.
+ *          See @ref psa_mac_verify_finish()
+ */
+psa_status_t psa_location_dispatch_mac_verify_finish(psa_mac_operation_t *operation,
+                                                     const uint8_t *mac,
+                                                     size_t mac_length);
+
+/**
+ * @brief   Dispatch call of a mac abort function to a location-specific backend.
+ *          See @ref psa_mac_abort()
+ */
+psa_status_t psa_location_dispatch_mac_abort(psa_mac_operation_t *operation);
+#endif /* MODULE_PSA_MAC */
 
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 /**

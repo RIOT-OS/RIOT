@@ -59,7 +59,7 @@ static void assert_options_data(const unicoap_options_t* options)
 
 static void test_in_order(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 100);
     TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), 0);
     TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "leds"), 0);
     TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON), 0);
@@ -71,7 +71,7 @@ static void test_in_order(void)
 
 static void test_out_of_order(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 100);
     TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
     TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), 0);
     TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_query_string(&options, "color=g"), 0);
@@ -83,7 +83,7 @@ static void test_out_of_order(void)
 
 static void test_idempotent(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 100);
     TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
     TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
     TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), 0);
@@ -112,7 +112,7 @@ static void _populate(unicoap_options_t* options)
 
 static void test_extended_uint_shifts(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 2100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
     /* options blob, from nanoCoAP */
@@ -180,7 +180,7 @@ static void test_extended_uint_shifts(void)
 
 static void test_remove_leading(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 2100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
     TEST_ASSERT_EQUAL_INT(unicoap_options_remove(&options, 1), 0);
@@ -250,7 +250,7 @@ static void test_remove_leading(void)
 
 static void test_remove_trailing(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 2100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
     TEST_ASSERT_EQUAL_INT(unicoap_options_remove(&options, 70), 0);
@@ -320,7 +320,7 @@ static void test_remove_trailing(void)
 
 static void test_remove_multiple(void)
 {
-    UNICOAP_OPTIONS_ALLOC(options, 2100);
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
     TEST_ASSERT_EQUAL_INT(unicoap_options_remove(&options, 12), 0);

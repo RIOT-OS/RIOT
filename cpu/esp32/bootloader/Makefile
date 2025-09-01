@@ -8,6 +8,7 @@ MODULE = esp_bootloader
 NO_AUTO_SRC = 1
 
 include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/tools/esptool.inc.mk
 
 # Bootloader baudrate, set to the application defined one if any or the default
 # in serial.inc.mk
@@ -175,13 +176,29 @@ else ifeq (esp32c3,$(CPU_FAM))
     components/soc/$(CPU_FAM)/gdma_periph.c \
     components/soc/$(CPU_FAM)/temperature_sensor_periph.c \
     #
+else ifeq (esp32c6,$(CPU_FAM))
+  ESP_SDK_BOOTLOADER_SRCS += \
+    components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c \
+    components/efuse/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_init.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_param.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_sleep.c \
+    components/esp_rom/patches/esp_rom_hp_regi2c_$(CPU_FAM).c \
+    components/esp_rom/patches/esp_rom_systimer.c \
+    components/esp_rom/patches/esp_rom_wdt.c \
+    components/hal/cache_hal.c \
+    components/hal/wdt_hal_iram.c \
+    components/hal/lp_timer_hal.c \
+    #
+ESP_SDK_BOOTLOADER_SRCS += components/bootloader_support/src/$(CPU_FAM)/bootloader_ecdsa.c
+
 else ifeq (esp32h2,$(CPU_FAM))
   ESP_SDK_BOOTLOADER_SRCS += \
     components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c \
     components/efuse/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c \
-    components/esp_hw_support/port/esp32h2/pmu_init.c \
-    components/esp_hw_support/port/esp32h2/pmu_param.c \
-    components/esp_hw_support/port/esp32h2/pmu_sleep.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_init.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_param.c \
+    components/esp_hw_support/port/$(CPU_FAM)/pmu_sleep.c \
     components/esp_rom/patches/esp_rom_regi2c_$(CPU_FAM).c \
     components/esp_rom/patches/esp_rom_systimer.c \
     components/esp_rom/patches/esp_rom_wdt.c \
@@ -259,7 +276,7 @@ ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
 
   ifeq (esp32c3,$(CPU_FAM))
     CFLAGS += -march=rv32imc_zicsr_zifencei
-  else ifeq (esp32h2,$(CPU_FAM))
+  else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
     CFLAGS += -march=rv32imac_zicsr_zifencei
   else
       $(error Missing -march option for ESP32x RISC-V SoC variant: $(CPU_FAM))
@@ -351,6 +368,13 @@ else ifneq (,$(filter esp32c3,$(CPU_FAM)))
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.bt_funcs.ld \
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3.ld \
     -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3_bt_funcs.ld \
+    #
+else ifneq (,$(filter esp32c6,$(CPU_FAM)))
+  LINKFLAGS += -nostartfiles
+  LINKFLAGS += --specs=nosys.specs
+  ESP_SDK_BOOTLOADER_ADD_LINK_FLAGS += \
+    -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld \
+    -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.version.ld \
     #
 else ifneq (,$(filter esp32h2,$(CPU_FAM)))
   LINKFLAGS += -nostartfiles
@@ -453,7 +477,7 @@ $(ESP_SDK_BOOTLOADER_ELF): \
 	$(Q)$(CC) -o $@ $(LINKFLAGS) -Wl,-Map=$(@:%.elf=%.map)
 
 FLASH_CHIP = $(CPU_FAM)
-ESPTOOL ?= $(PKGDIRBASE)/esptool/venv/bin/esptool.py
+
 # TODO: These should be exported/configurable from the app side. That would
 # require to export these values.
 FLASH_MODE ?= dio   # ESP-IDF uses dio as default flash mode for the bootloader
@@ -464,6 +488,7 @@ FLASH_SIZE ?= 2     # smallesrt size all ESP32x SoC support
 # like the regular objdump binary file but it contains a 16 byte header which
 # specifies the flash size, mode and speed that the ROM bootloader uses to load
 # this second-stage bootloader image.
-$(ESP_SDK_BOOTLOADER_BIN): $(ESP_SDK_BOOTLOADER_ELF)
-	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
-	  --flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) -o $@ $<
+$(ESP_SDK_BOOTLOADER_BIN): esptool $(ESP_SDK_BOOTLOADER_ELF)
+	$(Q)echo "Generating bootloader image $(ESP_SDK_BOOTLOADER_BIN)"
+	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash-mode $(FLASH_MODE) \
+	  --flash-size $(FLASH_SIZE)MB --flash-freq $(FLASH_FREQ) -o $@ $(ESP_SDK_BOOTLOADER_ELF)

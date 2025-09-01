@@ -49,14 +49,8 @@ endif
 ifneq (,$(filter gnrc_netreg,$(USEMODULE)))
   DIRS += netreg
 endif
-ifneq (,$(filter gnrc_mac,$(USEMODULE)))
-  DIRS += link_layer/mac
-endif
 ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
   DIRS += pkt
-endif
-ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
-  DIRS += link_layer/lwmac
 endif
 ifneq (,$(filter gnrc_pktbuf_malloc,$(USEMODULE)))
     DIRS += pktbuf_malloc

@@ -41,6 +41,7 @@ config CPU_CORE
 rsource "Kconfig.esp32x"
 rsource "Kconfig.esp32"
 rsource "Kconfig.esp32c3"
+rsource "Kconfig.esp32c6"
 rsource "Kconfig.esp32h2"
 rsource "Kconfig.esp32s3"
 rsource "Kconfig.esp32s2"

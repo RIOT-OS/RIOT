@@ -28,6 +28,7 @@
 #include "net/eui_provider.h"
 
 #include "periph/gpio.h"
+#include "xtimer.h"
 #include "ztimer.h"
 
 #include "sam0_eth_netdev.h"
@@ -153,6 +154,10 @@ static inline void _setup_phy_irq(gpio_cb_t cb, void *arg)
 
 static int _sam0_eth_init(netdev_t *netdev)
 {
+    /* HACK: without the delay we see random hard faults or no sent/received
+       frames after boot. */
+    xtimer_msleep(10);
+
     sam0_eth_init();
     eui48_t hwaddr;
     netdev_eui48_get(netdev, &hwaddr);

@@ -16,8 +16,36 @@ waiting for the timer to expire instead of constantly checking if the timer has 
 
 ## Step 1: Using Timers
 
-In the hello world program we created in the previous tutorial,
-we used the `ztimer` module to sleep for 3 seconds before printing "Hello World!" to the console.
+Before we can even use timers we first need to import the module. To do that go into
+your `Makefile` and add a new `USEMODULE += ztimer_sec` into it.
+
+```make {6-7} title="Makefile"
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
+# Import the ztimer_sec module so we can sleep
+USEMODULE += ztimer_sec
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+```
+
+Generally there are various levels of accuracy that ztimer offers,
+such as `ztimer_usec`, `ztimer_msec` or `ztimer_sec` as we use here.
+Always keep in mind that you are working on quite constrained devices so
+the difference between a `ztimer_usec` accuracy versus `ztimer_sec` accuracy
+can have massive performance impact on your device, possibly even preventing
+your device from entering a low-power/sleep state,
+thus drastically increasing energy usage.
+As such it is most often not worth it unless you specifically need the precision.
+For more details you can visit the
+[ztimer API documentation](https://doc.riot-os.org/group__sys__ztimer.html).
+
+This allows us to do a simple `ztimer_sleep(ZTIMER_SEC, 5);` which we will
+also use soon. Using `ztimer_sleep(ZTIMER_SEC, 5);` we simply wait for around
+5 seconds in this case.
 
 But what if we want to do something else while waiting for the timer to expire?
 Let's take a closer look at how we can use timers in RIOT.

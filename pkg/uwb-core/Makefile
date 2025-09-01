@@ -24,6 +24,10 @@ ifneq (,$(filter llvm,$(TOOLCHAIN)))
   CFLAGS += -Wno-microsoft-anon-tag
 endif
 
+ifneq (,$(filter -DNDEBUG,$(CFLAGS)))
+  CFLAGS += -Wno-sometimes-uninitialized
+endif
+
 IGNORE_MODULES := uwb-core_dpl \
                   uwb-core_config \
                   uwb-core_contrib \

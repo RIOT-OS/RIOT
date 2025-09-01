@@ -43,7 +43,7 @@
 
 #if defined(PWM0_GPIOS) || defined(PWM1_GPIOS) || defined(PWM2_GPIOS) || defined(PWM3_GPIOS)
 
-/* Ensure that the SPIn_* symbols define SPI_DEV(n) */
+/* Ensure that the PWMn_* symbols define PWM_DEV(n) */
 #if defined(PWM1_GPIOS) && !defined(PWM0_GPIOS)
 #error "PWM1_GPIOS is used but PWM0_GPIOS is not defined"
 #elif defined(PWM2_GPIOS) && !defined(PWM1_GPIOS)

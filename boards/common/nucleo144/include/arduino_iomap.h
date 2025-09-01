@@ -1,9 +1,6 @@
 /*
- * Copyright (C)  2017 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -29,15 +26,53 @@ extern "C" {
 #endif
 
 /**
+ * @name    Arduino's UART devices
+ * @{
+ */
+#define ARDUINO_UART_D0D1       UART_DEV(1)
+/** @} */
+
+/**
+ * @name    Arduino's SPI buses
+ * @{
+ */
+#if !defined(ARDUINO_SPI_D11D12D13) && defined(SPI_NUMOF)
+/**
+ * @brief   SPI_DEV(0) is connected to D11/D12/D13 for most Nucleo-144 boards
+ *
+ * This can be overwritten in `boards/nucleo-<foobar>/include/periph_conf.h` by
+ * providing a custom `ARDUINO_SPI_D11D12D13`.
+ */
+#  define ARDUINO_SPI_D11D12D13 SPI_DEV(0)
+#endif
+/** @} */
+
+/**
+ * @name    Arduino's I2C buses
+ * @{
+ */
+/**
+ * @brief   The first I2C bus is where shields for the Arduino UNO expect it
+ */
+#define ARDUINO_I2C_UNO         I2C_DEV(0)
+/** @} */
+
+/**
  * @name    Mapping of MCU pins to Arduino pins
  * @{
  */
 #if defined(CPU_MODEL_STM32F303ZE)
-#define ARDUINO_PIN_0           GPIO_PIN(PORT_C, 5)
-#define ARDUINO_PIN_1           GPIO_PIN(PORT_C, 4)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_C, 5)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_C, 4)
+#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_D, 9)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_D, 8)
+#elif defined(CPU_FAM_STM32U5)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_G, 8)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_G, 7)
 #else
-#define ARDUINO_PIN_0           GPIO_PIN(PORT_G, 9)
-#define ARDUINO_PIN_1           GPIO_PIN(PORT_G, 14)
+#  define ARDUINO_PIN_0         GPIO_PIN(PORT_G, 9)
+#  define ARDUINO_PIN_1         GPIO_PIN(PORT_G, 14)
 #endif
 #define ARDUINO_PIN_2           GPIO_PIN(PORT_F, 15)
 #define ARDUINO_PIN_3           GPIO_PIN(PORT_E, 13)
@@ -53,25 +88,34 @@ extern "C" {
 #define ARDUINO_PIN_12          GPIO_PIN(PORT_A, 6)
 #define ARDUINO_PIN_13          GPIO_PIN(PORT_A, 5)
 
-#define ARDUINO_PIN_14          GPIO_PIN(PORT_B, 8)
-#define ARDUINO_PIN_15          GPIO_PIN(PORT_B, 9)
+#define ARDUINO_PIN_14          GPIO_PIN(PORT_B, 9)
+#define ARDUINO_PIN_15          GPIO_PIN(PORT_B, 8)
 
-#define ARDUINO_PIN_16          GPIO_PIN(PORT_A, 3)
-#define ARDUINO_PIN_17          GPIO_PIN(PORT_C, 0)
-#define ARDUINO_PIN_18          GPIO_PIN(PORT_C, 3)
-#if defined(CPU_MODEL_STM32F413ZH) || defined(CPU_MODEL_STM32F412ZG) || \
-    defined(CPU_MODEL_STM32L496ZG)
-#  define ARDUINO_PIN_19        GPIO_PIN(PORT_C, 1)
-#  define ARDUINO_PIN_20        GPIO_PIN(PORT_C, 4)
-#  define ARDUINO_PIN_21        GPIO_PIN(PORT_C, 5)
-#elif defined(CPU_MODEL_STM32F303ZE)
-#  define ARDUINO_PIN_19        GPIO_PIN(PORT_D, 11)
-#  define ARDUINO_PIN_20        GPIO_PIN(PORT_D, 12)
-#  define ARDUINO_PIN_21        GPIO_PIN(PORT_D, 13)
+#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5)
+#  define ARDUINO_PIN_16        GPIO_PIN(PORT_A, 3)
+#  define ARDUINO_PIN_17        GPIO_PIN(PORT_A, 2)
+#  define ARDUINO_PIN_18        GPIO_PIN(PORT_C, 3)
+#  define ARDUINO_PIN_19        GPIO_PIN(PORT_B, 0)
+#  define ARDUINO_PIN_20        GPIO_PIN(PORT_C, 1)
+#  define ARDUINO_PIN_21        GPIO_PIN(PORT_C, 0)
 #else
-#  define ARDUINO_PIN_19        GPIO_PIN(PORT_F, 3)
-#  define ARDUINO_PIN_20        GPIO_PIN(PORT_F, 5)
-#  define ARDUINO_PIN_21        GPIO_PIN(PORT_F, 10)
+#  define ARDUINO_PIN_16        GPIO_PIN(PORT_A, 3)
+#  define ARDUINO_PIN_17        GPIO_PIN(PORT_C, 0)
+#  define ARDUINO_PIN_18        GPIO_PIN(PORT_C, 3)
+#  if defined(CPU_MODEL_STM32F413ZH) || defined(CPU_MODEL_STM32F412ZG) || \
+      defined(CPU_FAM_STM32L4)
+#    define ARDUINO_PIN_19      GPIO_PIN(PORT_C, 1)
+#    define ARDUINO_PIN_20      GPIO_PIN(PORT_C, 4)
+#    define ARDUINO_PIN_21      GPIO_PIN(PORT_C, 5)
+#  elif defined(CPU_MODEL_STM32F303ZE)
+#    define ARDUINO_PIN_19      GPIO_PIN(PORT_D, 11)
+#    define ARDUINO_PIN_20      GPIO_PIN(PORT_D, 12)
+#    define ARDUINO_PIN_21      GPIO_PIN(PORT_D, 13)
+#  else
+#    define ARDUINO_PIN_19      GPIO_PIN(PORT_F, 3)
+#    define ARDUINO_PIN_20      GPIO_PIN(PORT_F, 5)
+#    define ARDUINO_PIN_21      GPIO_PIN(PORT_F, 10)
+#  endif
 #endif
 
 #define ARDUINO_PIN_LAST        21
