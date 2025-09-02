@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 /**
@@ -5,12 +10,11 @@
  * @{
  *
  * @file
- * @brief       Common Registers definition for ADS101xx/111x devices
+ * @brief       Internal definitions for ADS101x/111x devices
  *
  * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
  *
  */
-
 
 #ifdef __cplusplus
 extern "C" {

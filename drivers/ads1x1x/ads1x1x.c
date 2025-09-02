@@ -4,10 +4,12 @@
  */
 
 /**
- * @ingroup     drivers_ads1115
+ * @ingroup     drivers_ads1x1x
  * @{
+ *
  * @file
- * @brief       ADS1115 Analog-to-digital converter driver
+ * @brief       ADS101x/111x Analog-to-digital converter driver
+ *
  * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
  * @}
  */
@@ -57,6 +59,14 @@ static uint16_t _build_config_reg(const ads1x1x_params_t *params)
     return (msb << 8) | lsb;
 }
 
+/**
+ * @brief Test the ADS1X1X I2C communication
+ *
+ * @param[in] i2c   I2C device
+ * @param[in] addr  I2C address
+ *
+ * @return zero on success, non zero on error
+ */
 static int _ads1x1x_init_test(i2c_t i2c, uint8_t addr)
 {
     uint16_t reg;
@@ -127,10 +137,11 @@ int ads1x1x_set_mux_gain(ads1x1x_t *dev, uint8_t mux_gain)
         return ADS1X1X_NOI2C;
     }
 
-    /* Update MUX bits */
+    /* Update MUX & Gain bits */
     uint16_t conf = ntohs(reg);
     conf &= ~(ADS1X1X_MUX_MASK << 8);   /* Clear MUX bits */
-    conf |= (mux_gain << 8);            /* Set new MUX */
+    conf &= ~(ADS1X1X_PGA_MASK << 8);   /* Clear Programmable Gain bits */
+    conf |= (mux_gain << 8);            /* Set new MUX & Gain */
 
     /* Write back updated configuration */
     reg = htons(conf);
@@ -142,7 +153,7 @@ int ads1x1x_set_mux_gain(ads1x1x_t *dev, uint8_t mux_gain)
 
     i2c_release(DEV);
 
-    /** Update only after successful I2C write */
+    /* Update only after successful I2C write */
     dev->params.mux_gain = mux_gain;
     return ADS1X1X_OK;
 }
@@ -235,7 +246,7 @@ int ads1x1x_set_alert_parameters(ads1x1x_alert_t *dev, const ads1x1x_alert_param
 
     i2c_release(params->i2c);
 
-    /** Update only after successful I2C write */
+    /* Update only after successful I2C write */
     dev->params = *params;
     return ADS1X1X_OK;
 }

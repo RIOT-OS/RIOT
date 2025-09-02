@@ -80,7 +80,7 @@ typedef struct ads1x1x_alert {
 int ads1x1x_init(ads1x1x_t *dev, const ads1x1x_params_t *params);
 
 /**
- * @brief   Set parameters
+ * @brief   Set ADS101x/111x parameters
  *
  * @param[in,out] dev      device descriptor
  * @param[in] params       device configuration

@@ -1,23 +1,18 @@
 /*
- * Copyright (C) 2017 OTA keys S.A.
- *               2018 Acutam Automation, LLC
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
- * @ingroup     drivers_ads101x
+ * @ingroup     drivers_ads1x1x
  * @{
  *
  * @file
  * @brief       Default configuration for ADS101x/111x devices
  *
- * @author      Vincent Dupont <vincent@otakeys.com>
- * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
  */
 
 #include "periph/i2c.h"
