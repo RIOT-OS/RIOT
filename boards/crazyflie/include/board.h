@@ -50,7 +50,7 @@ extern "C" {
 #define LED3_PORT_NUM       PORT_C
 
 #define LED4_IS_INVERTED    1
-#define LED4_PIN_NUM        1 /* LED top right green */
+#define LED4_PIN_NUM        1 /* LED top left green */
 #define LED4_PORT           GPIO_PORT_C
 #define LED4_PORT_NUM       PORT_C
 /** @} */
