@@ -25,7 +25,7 @@ enum {
 typedef struct {
     i2c_t i2c;                          /**< I2C device */
     uint8_t addr;                       /**< I2C address */
-    uint8_t mux_gain;                   /**< Input multiplexer configuration */
+    uint8_t mux;                        /**< Input multiplexer configuration */
     uint8_t pga;                        /**< Programmable gain amplifier configuration */
     uint8_t mode;                       /**< Device mode */
     uint8_t dr;                         /**< Data rate configuration */
@@ -101,7 +101,7 @@ int ads1x1x_alert_init(ads1x1x_alert_t *dev,
                        const ads1x1x_alert_params_t *params);
 
 /**
- * @brief   Set mux and gain
+ * @brief   Set mux
  *
  * Mux settings have no effect on ADS1013-4 and ADS1113-4.
  * Gain settings have no effect on ADS1013 and ADS1113.
@@ -111,7 +111,7 @@ int ads1x1x_alert_init(ads1x1x_alert_t *dev,
  *
  * @return zero on successful read, non zero on error
  */
-int ads1x1x_set_mux_gain(ads1x1x_t *dev, uint8_t mux_gain);
+int ads1x1x_set_mux(ads1x1x_t *dev, uint8_t mux);
 
 /**
  * @brief   Read a raw ADC value
