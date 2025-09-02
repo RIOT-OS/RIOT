@@ -252,6 +252,11 @@ static int _closedir(vfs_DIR *dirp)
     return real_closedir(DIRP(dirp));
 }
 
+static int _fcntl(vfs_file_t *filp, int cmd, int arg)
+{
+    return real_fcntl(FD(filep), cmd, arg);
+}
+
 static const vfs_file_system_ops_t native_fs_ops = {
     .mount = _mount,
     .umount = _unmount,
@@ -271,6 +276,7 @@ static const vfs_file_ops_t native_file_ops = {
     .lseek = _lseek,
     .fstat = _fstat,
     .fsync = _fsync,
+    .fcntl = _fcntl,
 };
 
 static const vfs_dir_ops_t native_dir_ops = {

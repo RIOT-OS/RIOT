@@ -10,6 +10,12 @@ else
   DEBUGGER ?= gdb
 endif
 
+FS_NATIVE_MOUNT := $(CURDIR)/native
+CFLAGS += -DFS_NATIVE_MOUNT=\"$(FS_NATIVE_MOUNT)\"
+FS_NATIVE_DIR := $(FS_NATIVE_MOUNT)
+CFLAGS+=-DFS_NATIVE_DIR=\"$(FS_NATIVE_DIR)\"
+export GCOV_PREFIX=$(abspath $(FS_NATIVE_MOUNT))
+export GCOV_PREFIX_STRIP=$(words $(subst /, ,$(BINDIR)))
 GCOV_DIR := $(BINDIR)/gcov_files
 
 export VALGRIND ?= valgrind
