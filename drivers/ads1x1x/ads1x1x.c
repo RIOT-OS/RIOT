@@ -20,10 +20,16 @@
 #include "ads1x1x_internal.h"
 
 #include "periph/i2c.h"
+#include "periph/gpio.h"
+#include "ztimer.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
+
+#ifndef ADS1X1X_READ_DELAY_MS
+#define ADS1X1X_READ_DELAY_MS           8   /* compatible with 128SPS */
+#endif
 
 #define DEV (dev->params.i2c)
 #define ADDR (dev->params.addr)
@@ -52,7 +58,7 @@ static inline int _ads1x1x_get_pga_voltage(uint8_t pga)
  */
 static uint16_t _build_config_reg(const ads1x1x_params_t *params)
 {
-    uint8_t msb = params->mux_gain | params->pga | params->mode;
+    uint8_t msb = params->mux | params->pga | params->mode;
     uint8_t lsb = params->dr | params->comp_mode | params->comp_polarity | params->comp_latch |
                   params->comp_queue;
 
@@ -124,7 +130,7 @@ int ads1x1x_set_parameters(ads1x1x_t *dev, const ads1x1x_params_t *params)
     return ADS1X1X_OK;
 }
 
-int ads1x1x_set_mux_gain(ads1x1x_t *dev, uint8_t mux_gain)
+int ads1x1x_set_mux(ads1x1x_t *dev, uint8_t mux)
 {
     assert(dev);
 
@@ -137,11 +143,10 @@ int ads1x1x_set_mux_gain(ads1x1x_t *dev, uint8_t mux_gain)
         return ADS1X1X_NOI2C;
     }
 
-    /* Update MUX & Gain bits */
+    /* Update MUX bits */
     uint16_t conf = ntohs(reg);
     conf &= ~(ADS1X1X_MUX_MASK << 8);   /* Clear MUX bits */
-    conf &= ~(ADS1X1X_PGA_MASK << 8);   /* Clear Programmable Gain bits */
-    conf |= (mux_gain << 8);            /* Set new MUX & Gain */
+    conf |= (mux << 8);            /* Set new MUX */
 
     /* Write back updated configuration */
     reg = htons(conf);
@@ -154,7 +159,7 @@ int ads1x1x_set_mux_gain(ads1x1x_t *dev, uint8_t mux_gain)
     i2c_release(DEV);
 
     /* Update only after successful I2C write */
-    dev->params.mux_gain = mux_gain;
+    dev->params.mux = mux;
     return ADS1X1X_OK;
 }
 
@@ -162,12 +167,34 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
 {
     assert(dev && raw);
 
-    uint16_t buf;
+    uint16_t reg;
 
     i2c_acquire(DEV);
 
-    /* Read conversion register */
-    if (i2c_read_regs(DEV, ADDR, ADS1X1X_CONV_RES_ADDR, &buf, sizeof(buf), 0) < 0) {
+    /* Read config register */
+    if (i2c_read_regs(DEV, ADDR, ADS1X1X_CONF_ADDR, &reg, sizeof(reg), 0) < 0) {
+        i2c_release(DEV);
+        return ADS1X1X_NOI2C;
+    }
+
+    reg = ntohs(reg);
+
+    /* Single-Shot mode */
+    if ((reg & (ADS1X1X_MODE_MASK << 8)) == (ADS1X1X_MODE_SINGLE << 8)) {
+        
+        /* Tell the ADC to acquire a single-shot sample */
+        reg |= ADS1X1X_CONF_OS_CONV << 8;
+        if (i2c_write_regs(DEV, ADDR, ADS1X1X_CONF_ADDR, &reg, sizeof(reg), 0) < 0) {
+            i2c_release(DEV);
+            return ADS1X1X_NOI2C;
+        }
+
+        /* Wait for the sample to be acquired */
+        ztimer_sleep(ZTIMER_MSEC, ADS1X1X_READ_DELAY_MS);
+    }
+
+    /* Read the sample */
+    if (i2c_read_regs(DEV, ADDR, ADS1X1X_CONV_RES_ADDR, &reg, sizeof(reg), 0) < 0) {
         i2c_release(DEV);
         return ADS1X1X_NOI2C;
     }
@@ -175,7 +202,7 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
     i2c_release(DEV);
 
     /* Combine bytes into a single value */
-    *raw = ntohs(buf);
+    *raw = ntohs(reg);
     return ADS1X1X_OK;
 }
 
@@ -248,5 +275,32 @@ int ads1x1x_set_alert_parameters(ads1x1x_alert_t *dev, const ads1x1x_alert_param
 
     /* Update only after successful I2C write */
     dev->params = *params;
+    return ADS1X1X_OK;
+}
+
+int ads1x1x_enable_alert(ads1x1x_alert_t *dev,
+                         ads1x1x_alert_cb_t cb, void *arg)
+{
+    uint8_t regs[2];
+
+    if (!gpio_is_valid(dev->params.alert_pin)) {
+        return ADS1X1X_OK;
+    }
+
+    /* Read control register */
+    i2c_acquire(DEV);
+    i2c_read_regs(DEV, ADDR, ADS1X1X_CONF_ADDR, &regs, 2, 0x0);
+
+    /* Enable alert comparator */
+    regs[1] &= ~ADS1X1X_CONF_COMP_DIS;
+    i2c_write_regs(DEV, ADDR, ADS1X1X_CONF_ADDR, &regs, 2, 0x0);
+
+    i2c_release(DEV);
+
+    /* Enable interrupt */
+    dev->arg = arg;
+    dev->cb = cb;
+    gpio_init_int(dev->params.alert_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+
     return ADS1X1X_OK;
 }

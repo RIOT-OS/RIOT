@@ -49,8 +49,8 @@ extern "C" {
  * @def ADS1X1X_PARAM_MUX
  * @brief Default multiplexer configuration
  */
-#ifndef ADS1X1X_PARAM_MUX_GAIN
-#   define ADS1X1X_PARAM_MUX_GAIN   (ADS1X1X_AIN0_DIFFM_AIN1)
+#ifndef ADS1X1X_PARAM_MUX
+#   define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_DIFFM_AIN1)
 #endif
 
 /**
@@ -151,7 +151,7 @@ extern "C" {
 #ifndef ADS1X1X_PARAMS
 #define ADS1X1X_PARAMS          { .i2c        = ADS1X1X_PARAM_I2C,        \
                                   .addr       = ADS1X1X_PARAM_ADDR,       \
-                                  .mux_gain   = ADS1X1X_PARAM_MUX_GAIN,   \
+                                  .mux        = ADS1X1X_PARAM_MUX,        \
                                   .pga        = ADS1X1X_PARAM_PGA,        \
                                   .mode       = ADS1X1X_PARAM_MODE,       \
                                   .dr         = ADS1X1X_PARAM_DR,         \

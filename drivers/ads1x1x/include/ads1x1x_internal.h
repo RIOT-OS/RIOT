@@ -107,9 +107,9 @@ extern "C" {
  * @def ADS1X1X_MODE
  * @brief Operating mode configuration
  */
-#define ADS1X1X_MODE_MASK         (1 << 8)
-#define ADS1X1X_MODE_SINGLE       (0 << 8)
-#define ADS1X1X_MODE_CONTINUOUS   (1 << 8)
+#define ADS1X1X_MODE_MASK         (1 << 0)
+#define ADS1X1X_MODE_SINGLE       (0 << 0)
+#define ADS1X1X_MODE_CONTINUOUS   (1 << 0)
 
 /**
  * @def ADS1X1X_COMP_MODE
@@ -139,9 +139,11 @@ extern "C" {
  * @def ADS1X1X_COMP_QUEUE
  * @brief Comparator queue configuration
  */
-#define ADS1X1X_COMP_QUEUE_MASK    (1 << 1)
-#define ADS1X1X_COMP_QUEUE_DISABLE (0 << 1)
-#define ADS1X1X_COMP_QUEUE_ENABLE  (1 << 1)
+#define ADS1X1X_COMP_QUEUE_MASK    (1 << 1) | (1 << 0)
+#define ADS1X1X_COMP_QUEUE_1        (0 << 0) | (1 << 0) /**< Assert after one conversion */
+#define ADS1X1X_COMP_QUEUE_2        (1 << 0) | (1 << 1) /**< Assert after two conversions */
+#define ADS1X1X_COMP_QUEUE_4        (1 << 0) | (1 << 1) | (1 << 2) /**< Assert after four conversions */
+#define ADS1X1X_COMP_QUEUE_DISABLE  (0 << 0) | (0 << 1) | (0 << 2) /**< Disable comparator queue */
 
 #ifdef __cplusplus
 }
