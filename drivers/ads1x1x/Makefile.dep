@@ -1,0 +1,7 @@
+FEATURES_REQUIRED += periph_i2c
+FEATURES_REQUIRED += periph_gpio_irq
+
+ifeq (,$(filter ads1013 ads1014 ads1015 ads1113 ads1114 ads1115,$(USEMODULE)))
+  # enable ads1113 as default if no other module is enabled
+  USEMODULE += ads1113
+endif
