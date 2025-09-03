@@ -5,8 +5,8 @@
 ### General information
 
 The Crazyflie 2.1 is an open source flying development platform produced by bitcraze.
-It has two oboard microcontrollers, a nRF51822 used for radio communication and power management and
-a STM32F405 (this board) used for running the main application.
+It has two onboard microcontrollers, an nRF51822 used for radio communication and power management and
+an STM32F405 (this board definition) used for running the main application.
 
 ### Pinout
 
