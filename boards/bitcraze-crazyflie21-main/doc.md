@@ -1,6 +1,6 @@
-@defgroup    boards_crazyflie Crazyflie 2.1
+@defgroup    boards_bitcraze_crazyflie21_main bitcraze Crazyflie 2.1 Main Application MCU
 @ingroup     boards
-@brief       Support for the Crazyflie 2.1 board.
+@brief       Support for the main application MCU of the bitcraze Crazyflie 2.1 board.
 
 ### General information
 
@@ -65,7 +65,7 @@ In order to use STDIO over UART connect your UART adapter as follows:
 
 Now flash the board with stdio over UART:
 ```
-USEMODULE=stdio_uart BOARD=crazyflie make all flash
+USEMODULE=stdio_uart BOARD=bitcraze-crazyflie21-main make all flash
 ```
 
 ### Known Issues

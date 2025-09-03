@@ -6,11 +6,11 @@
 #pragma once
 
 /**
- * @ingroup     boards_crazyflie
+ * @ingroup     boards_bitcraze_crazyflie21_main
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Crazyflie 2.1
+ * @brief       Board specific definitions for the Crazyflie 2.1 main application MCU
  *
  * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  */

@@ -6,11 +6,11 @@
 #pragma once
 
 /**
- * @ingroup     boards_crazyflie
+ * @ingroup     boards_bitcraze_crazyflie21_main
  * @{
  *
  * @file
- * @brief       Configuration of CPU peripherals for Crazyflie 2.1 board
+ * @brief       Configuration of CPU peripherals for Crazyflie 2.1 main application MCU
  *
  * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  */
