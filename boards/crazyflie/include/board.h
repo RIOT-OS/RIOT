@@ -21,7 +21,6 @@
 #include "cpu.h"
 #include "motor_driver.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -124,7 +123,6 @@ static const motor_driver_config_t motor_driver_config[] = {
 
 #define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
-
 
 #ifdef __cplusplus
 }
