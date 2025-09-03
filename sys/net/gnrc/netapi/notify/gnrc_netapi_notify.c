@@ -8,8 +8,12 @@
 
 /**
  * @{
- *
+ * @ingroup     net_gnrc_netapi_notify
  * @file
+ * @brief       Helpher functions to extract data from netapi notify events.
+ *
+ * @author      Elena Frank <elena.frank@tu-dresden.de>
+ * @}
  */
 
 #include <errno.h>

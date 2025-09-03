@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    net_gnrc_netapi_notify  Notification events for network APIs.
- * @ingroup     net_gnrc
+ * @ingroup     net_gnrc_netapi
  * @brief       Network event notification types.
  * @{
  *
