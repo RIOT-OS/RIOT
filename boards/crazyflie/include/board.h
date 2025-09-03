@@ -15,7 +15,7 @@
  * @file
  * @brief       Board specific definitions for the Crazyflie 2.1
  *
- * @author      LeonardHerbst <leonard.herbst@tu-dresden.de>
+ * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  */
 
 #include "cpu.h"

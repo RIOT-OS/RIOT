@@ -15,7 +15,7 @@
  * @file
  * @brief       Configuration of CPU peripherals for Crazyflie 2.1 board
  *
- * @author      LeonardHerbst <leonard.herbst@tu-dresden.de>
+ * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  */
 
 /* This board provides an HSE */
