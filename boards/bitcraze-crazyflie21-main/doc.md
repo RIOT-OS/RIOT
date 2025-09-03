@@ -41,17 +41,17 @@ The [Board Schematics][board-schematics] show which pins are connected to the mo
 
 ### Flash the board
 Prerequisites:
-- the crazyflie NRF firmware runs on the NRF [instructions](https://www.bitcraze.io/documentation/repository/crazyflie2-nrf-firmware/master/build/build/)
-- the original crazyflie bootloader runs on the STM32 [instructions](https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/development/dfu/#bootloader-recovery)
+- the Crazyflie NRF firmware runs on the NRF [instructions](https://www.bitcraze.io/documentation/repository/crazyflie2-nrf-firmware/master/build/build/)
+- the original Crazyflie bootloader runs on the STM32 [instructions](https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/development/dfu/#bootloader-recovery)
 - `dfu-util` is installed
-- crazyflie battery is disconnected
+- the Crazyflie's battery is disconnected
 
 To flash the board:
 - navigate to the folder of the app you want to flash
-- Hold down the power button on the crazyflie
+- Hold down the power button on the Crazyflie
 - connect via usb to your computer
 - keep holding down the button for four seconds until the blink rate changes (the mcu is now in DFU mode)
-- flash the board by running `BOARD=crazyflie make all flash`
+- flash the board by running `BOARD=bitcraze-crazyflie21-main make all flash`
 
 ### STDIO
 By default, STDIO is implemented via the native USB interface.
