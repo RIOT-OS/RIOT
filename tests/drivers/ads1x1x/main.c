@@ -12,10 +12,13 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
  * @}
  */
 
 #include <stdio.h>
+
+#define ADS1X1X_PARAM_HIGH_LIMIT 10000
 
 #include "ztimer.h"
 #include "ads1x1x.h"
@@ -61,7 +64,7 @@ int main(void)
     }
 
     printf("Enabling alert interrupt: ");
-    if (ads1x1x_enable_alert(&alert_dev, alert_cb, NULL) == ADS1X1X_OK) {
+    if (ads1x1x_enable_alert(&alert_dev, alert_cb, NULL, 4) == ADS1X1X_OK) {
         puts("[OK]");
     }
     else {

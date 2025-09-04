@@ -39,10 +39,10 @@ typedef struct {
 typedef struct ads1x1x_alert_params {
     i2c_t i2c;              /**< i2c device */
     uint8_t addr;           /**< i2c address */
-    uint8_t comp_mode;       /**< Comparator mode */
-    uint8_t comp_polarity;   /**< Comparator polarity */
-    uint8_t comp_latch;      /**< Comparator latch */
-    uint8_t comp_queue;      /**< Comparator queue */
+    uint8_t comp_mode;      /**< Comparator mode */
+    uint8_t comp_polarity;  /**< Comparator polarity */
+    uint8_t comp_latch;     /**< Comparator latch */
+    uint8_t comp_queue;     /**< Comparator queue */
     gpio_t alert_pin;       /**< alert pin (GPIO_UNDEF if not connected) */
     int16_t low_limit;      /**< alert low value */
     int16_t high_limit;     /**< alert high value */
@@ -167,7 +167,7 @@ int ads1x1x_convert_to_mv(ads1x1x_t *dev, int16_t value);
  * Performs a general i2c call to reset the devices.
  *
  * @param[in] i2c   I2C device
- * 
+ *
  * @return zero on success, non zero on error
  */
 int ads1x1x_reset(i2c_t i2c);
