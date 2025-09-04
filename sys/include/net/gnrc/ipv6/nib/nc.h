@@ -243,11 +243,11 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
  * @param[in] l2addr_len    Length of @p l2addr.
  *
  * @retval  0 on success.
- * @retval  -ENOTSUP, if the interface does not represent a 6LN or when
+ * @retval  -ENOTSUP if the interface does not represent a 6LN or when
  *           gnrc_netif_t::device_type of the iface does not support IID conversion.
- * @retval  -EINVAL, when @p addr_len is invalid for the
+ * @retval  -EINVAL when @p addr_len is invalid for the
  *          gnrc_netif_t::device_type of @p netif.
- * @retval  -ENOMEM, if no space is left in neighbor cache.
+ * @retval  -ENOMEM if no space is left in neighbor cache.
  */
 int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
                              size_t l2addr_len);
