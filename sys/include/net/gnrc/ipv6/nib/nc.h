@@ -285,8 +285,8 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
  *
  * If the @p l2addr can't be found for a neighbor in the NIB nothing happens.
  *
- * @retval  True, if a neighbor with @p l2addr existed.
- * @retval  False, otherwise.
+ * @retval  True if a neighbor with @p l2addr existed.
+ * @retval  False otherwise.
  */
 bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2addr_len);
 
