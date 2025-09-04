@@ -16,6 +16,8 @@
  *
  */
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -84,11 +86,11 @@ extern "C" {
  * - @ref ADS1X1X_MODE_SINGLE : Single-shot (default), powers down after each conversion.
  * - @ref ADS1X1X_MODE_CONTINUOUS : Continuous conversions.
  *
- * @{
+ * @{9
  */
 #define ADS1X1X_MODE_MASK         (1 << 0)
-#define ADS1X1X_MODE_SINGLE       (0 << 0)  /**< Single-shot / power-down */
-#define ADS1X1X_MODE_CONTINUOUS   (1 << 0)  /**< Continuous conversion */
+#define ADS1X1X_MODE_SINGLE       (1 << 0)  /**< Single-shot / power-down */
+#define ADS1X1X_MODE_CONTINUOUS   (0 << 0)  /**< Continuous conversion */
 /** @} */
 
 /**
@@ -99,7 +101,7 @@ extern "C" {
  *
  * @{
  */
-#ifdef ADS101X
+#ifdef MODULE_ADS101X
 #   define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))
 #   define ADS1X1X_DATAR_128     ((0 << 7) | (0 << 6) | (0 << 5))  /**< 128 SPS */
 #   define ADS1X1X_DATAR_250     ((0 << 7) | (0 << 6) | (1 << 5))  /**< 250 SPS */
@@ -112,11 +114,12 @@ extern "C" {
 #   define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))
 #   define ADS1X1X_DATAR_8       ((0 << 7) | (0 << 6) | (0 << 5))  /**< 8 SPS */
 #   define ADS1X1X_DATAR_16      ((0 << 7) | (0 << 6) | (1 << 5))  /**< 16 SPS */
-#   define ADS1X1X_DATAR_64      ((0 << 7) | (1 << 6) | (0 << 5))  /**< 64 SPS */
-#   define ADS1X1X_DATAR_128     ((0 << 7) | (1 << 6) | (1 << 5))  /**< 128 SPS */
-#   define ADS1X1X_DATAR_250     ((1 << 7) | (0 << 6) | (0 << 5))  /**< 250 SPS */
-#   define ADS1X1X_DATAR_475     ((1 << 7) | (0 << 6) | (1 << 5))  /**< 475 SPS */
-#   define ADS1X1X_DATAR_860     ((1 << 7) | (1 << 6) | (0 << 5))  /**< 860 SPS (default) */
+#   define ADS1X1X_DATAR_32      ((0 << 7) | (1 << 6) | (0 << 5))  /**< 32 SPS */
+#   define ADS1X1X_DATAR_64      ((0 << 7) | (1 << 6) | (1 << 5))  /**< 64 SPS */
+#   define ADS1X1X_DATAR_128     ((1 << 7) | (0 << 6) | (0 << 5))  /**< 128 SPS (default) */
+#   define ADS1X1X_DATAR_250     ((1 << 7) | (0 << 6) | (1 << 5))  /**< 250 SPS */
+#   define ADS1X1X_DATAR_475     ((1 << 7) | (1 << 6) | (0 << 5))  /**< 475 SPS */
+#   define ADS1X1X_DATAR_860     ((1 << 7) | (1 << 6) | (1 << 5))  /**< 860 SPS */
 #endif
 /** @} */
 
@@ -169,6 +172,39 @@ extern "C" {
 #define ADS1X1X_COMP_QUEUE_4          ((1 << 1) | (0 << 0))              /**< Assert after 4 conversions */
 #define ADS1X1X_COMP_QUEUE_DISABLE    ((1 << 1) | (1 << 0))              /**< Disable comparator */
 /** @} */
+
+/**
+ * @name    ADS101x/111x alert configuration mask
+ *
+ * Mask for all alert-related configuration bits in the config register
+ * (comparator mode, polarity, latch, queue).
+ * This has no effect on ADS1113/1013.
+ *
+ * @{
+ */
+#define ADS1X1X_ALERT_MASK (ADS1X1X_COMP_QUEUE_MASK | ADS1X1X_COMP_LATCH_MASK | \
+                            ADS1X1X_COMP_POLARITY_MASK | ADS1X1X_COMP_MODE_MASK)
+/** @} */
+
+/**
+ * @brief Get the voltage reference for a given PGA setting
+ *
+ * @param[in] pga  PGA setting
+ *
+ * @return Voltage reference in millivolts
+ */
+static inline int _ads1x1x_get_pga_voltage(uint8_t pga)
+{
+    switch (pga) {
+    case ADS1X1X_PGA_FSR_6V144: return 6144;
+    case ADS1X1X_PGA_FSR_4V096: return 4096;
+    case ADS1X1X_PGA_FSR_2V048: return 2048;
+    case ADS1X1X_PGA_FSR_1V024: return 1024;
+    case ADS1X1X_PGA_FSR_0V512: return 512;
+    case ADS1X1X_PGA_FSR_0V256: return 256;
+    default: return 0;
+    }
+}
 
 #ifdef __cplusplus
 }
