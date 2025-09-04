@@ -96,7 +96,7 @@ extern "C" {
 /**
  * @brief   @ref core_msg type for sending event notifications to the network stack.
  */
-#define GNRC_NETAPI_MSG_TYPE_NOTIFY      (0x0207)
+#define GNRC_NETAPI_MSG_TYPE_NOTIFY     (0x0207)
 
 /**
  * @brief   Data structure to be send for setting (@ref GNRC_NETAPI_MSG_TYPE_SET)

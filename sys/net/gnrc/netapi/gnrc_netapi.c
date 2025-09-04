@@ -85,7 +85,6 @@ static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt
 }
 #endif
 
-
 int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *data)
 {
     int status = 0;
@@ -99,19 +98,19 @@ int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *data)
             status = -EIO;
         }
         break;
-#ifdef MODULE_GNRC_NETAPI_MBOX
+#  ifdef MODULE_GNRC_NETAPI_MBOX
     case GNRC_NETREG_TYPE_MBOX:
         if (_snd_rcv_mbox(sendto->target.mbox, cmd, data) < 1) {
             /* unable to dispatch packet */
             status = -EIO;
         }
         break;
-#endif
-#ifdef MODULE_GNRC_NETAPI_CALLBACKS
+#  endif
+#  ifdef MODULE_GNRC_NETAPI_CALLBACKS
     case GNRC_NETREG_TYPE_CB:
         sendto->target.cbd->cb(cmd, data, sendto->target.cbd->ctx);
         break;
-#endif
+#  endif
     default:
         /* unknown dispatch type */
         status = -ECANCELED;

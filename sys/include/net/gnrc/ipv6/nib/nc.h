@@ -242,20 +242,24 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
  * @param[in] l2addr        The neighbor's layer 2 address.
  * @param[in] l2addr_len    Length of @p l2addr.
  *
- * @return  0 on success.
- * @return  -ENOTSUP, if the interface does not represent a 6LN or when
+ * @retval  0 on success.
+ * @retval  -ENOTSUP, if the interface does not represent a 6LN or when
  *           gnrc_netif_t::device_type of the iface does not support IID conversion.
- * @return  -EINVAL, when @p addr_len is invalid for the
+ * @retval  -EINVAL, when @p addr_len is invalid for the
  *          gnrc_netif_t::device_type of @p netif.
- * @return  -ENOMEM, if no space is left in neighbor cache.
+ * @retval  -ENOMEM, if no space is left in neighbor cache.
  */
 int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
-                                 size_t l2addr_len);
+                             size_t l2addr_len);
 #else /* CONFIG_GNRC_IPV6_NIB_6LN */
 static inline int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
-                                 size_t l2addr_len)
+                                           size_t l2addr_len)
 {
-   return -ENOTSUP;
+    (void)iface;
+    (void)l2addr;
+    (void)l2addr_len;
+
+    return -ENOTSUP;
 }
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
@@ -281,8 +285,8 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
  *
  * If the @p l2addr can't be found for a neighbor in the NIB nothing happens.
  *
- * @return  True, if a neighbor with @p l2addr existed.
- * @return  False, otherwise.
+ * @retval  True, if a neighbor with @p l2addr existed.
+ * @retval  False, otherwise.
  */
 bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2addr_len);
 

@@ -10,10 +10,9 @@
  * @{
  * @ingroup     net_gnrc_netapi_notify
  * @file
- * @brief       Helpher functions to extract data from netapi notify events.
+ * @brief       Helper functions to extract data from netapi notify events.
  *
  * @author      Elena Frank <elena.frank@tu-dresden.de>
- * @}
  */
 
 #include <errno.h>
@@ -31,7 +30,7 @@ uint8_t gnrc_netapi_notify_copy_l2_connection_data(gnrc_netapi_notify_t *notify,
     case NETAPI_NOTIFY_L2_DISCONNECTED:
         assert(notify->_data_len == sizeof(netapi_notify_l2_connection_t));
 
-        /* Parse event data.*/
+        /* Parse event data */
         netapi_notify_l2_connection_t *recv_data = notify->_data;
 
         /* l2addr must fit in the provided buffer */

@@ -290,7 +290,6 @@ static inline void _handle_discovered_neighbor(ipv6_addr_t *addr)
     gnrc_rpl_send_DIS(NULL, addr, NULL, 0);
 }
 
-
 /**
  * @brief   Handles the event that a neighbor became unreachable.
  *

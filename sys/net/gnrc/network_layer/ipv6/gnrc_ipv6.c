@@ -178,8 +178,8 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
  * @param[in] l2addr_len    Length of @p l2addr.
  * @param[out] ipv6         IPv6 address of the neighbor or NULL.
  *
- * @return  True, if a neighbor with @p l2addr was found in the nc.
- * @return  False, otherwise.
+ * @retval  True, if a neighbor with @p l2addr was found in the nc.
+ * @retval  False, otherwise.
  */
 static inline bool _find_entry_in_nc(uint8_t *l2addr, uint8_t l2addr_len, ipv6_addr_t *ipv6)
 {
