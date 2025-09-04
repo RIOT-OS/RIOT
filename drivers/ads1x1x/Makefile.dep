@@ -3,7 +3,7 @@ FEATURES_REQUIRED += periph_i2c
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 
-ifeq (,$(filter ads1013 ads1014 ads1015 ads1113 ads1114 ads1115,$(USEMODULE)))
-  # enable ads1113 as default if no other module is enabled
-  USEMODULE += ads1013
+ifeq (,$(filter ads111x ads101x,$(USEMODULE)))
+  # enable ads101x as default if no other module is enabled
+  USEMODULE += ads101x
 endif
