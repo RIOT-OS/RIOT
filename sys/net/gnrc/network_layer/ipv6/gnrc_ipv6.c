@@ -204,6 +204,8 @@ static inline bool _find_entry_in_nc(uint8_t *l2addr, uint8_t l2addr_len, ipv6_a
  */
 static inline void _on_l2_connected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_t l2addr_len)
 {
+    (void)if_pid;
+
     ipv6_addr_t ipv6;
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
