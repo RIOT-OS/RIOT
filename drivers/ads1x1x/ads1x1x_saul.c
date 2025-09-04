@@ -23,13 +23,11 @@
 #include "saul.h"
 #include "ads1x1x.h"
 #include "ads1x1x_internal.h"
+#include "ads1x1x_params.h"
 
 static int read_adc(const void *dev, phydat_t *res)
 {
     const ads1x1x_t *mydev = dev;
-
-    /* Change the mux channel */
-    ads1x1x_set_mux(mydev, mydev->params.mux);
 
     /* Read raw value */
     if (ads1x1x_read_raw(mydev, res->val) < 0) {

@@ -81,7 +81,7 @@ extern "C" {
  * @def ADS1X1X_BITS_RES
  * @brief Default bit resolution
  */
-#ifdef ADS101X
+#if MODULE_ADS101X
 #   define ADS1X1X_BITS_RES  (12)
 #else /**<ADS111X */
 #   define ADS1X1X_BITS_RES  (16)
@@ -100,11 +100,13 @@ extern "C" {
  * @def ADS1X1X_PARAM_DR
  * @brief Default data rate configuration
  */
-#ifdef ADS101X
-#   define ADS1X1X_PARAM_DR   (ADS1X1X_DATAR_1600)
+#if MODULE_ADS101X
+#   define ADS1X1X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
 #else /**<ADS111X */
-#   define ADS1X1X_PARAM_DR   (ADS1X1X_DATAR_128)
+#   define ADS1X1X_PARAM_DATAR  (ADS1X1X_DATAR_128)
 #endif
+
+
 
 /**
  * @def ADS1X1X_PARAM_MODE
@@ -154,17 +156,17 @@ extern "C" {
                                   .mux        = ADS1X1X_PARAM_MUX,        \
                                   .pga        = ADS1X1X_PARAM_PGA,        \
                                   .mode       = ADS1X1X_PARAM_MODE,       \
-                                  .dr         = ADS1X1X_PARAM_DR,         \
-                                  .comp_mode  = ADS1X1X_PARAM_COMP_MODE,  \
-                                  .comp_polarity = ADS1X1X_PARAM_COMP_POLARITY, \
-                                  .comp_latch = ADS1X1X_PARAM_COMP_LATCH,  \
-                                  .comp_queue = ADS1X1X_PARAM_COMP_QUEUE }
+                                  .dr         = ADS1X1X_PARAM_DATAR        }
 
 #endif
 
 #ifndef ADS1X1X_ALERT_PARAMS
 #define ADS1X1X_ALERT_PARAMS    { .i2c        = ADS1X1X_PARAM_I2C,        \
                                   .addr       = ADS1X1X_PARAM_ADDR,       \
+                                  .comp_mode  = ADS1X1X_PARAM_COMP_MODE,  \
+                                  .comp_polarity = ADS1X1X_PARAM_COMP_POLARITY, \
+                                  .comp_latch = ADS1X1X_PARAM_COMP_LATCH,  \
+                                  .comp_queue = ADS1X1X_PARAM_COMP_QUEUE,  \
                                   .alert_pin  = ADS1X1X_PARAM_ALERT_PIN,  \
                                   .low_limit  = ADS1X1X_PARAM_LOW_LIMIT,  \
                                   .high_limit = ADS1X1X_PARAM_HIGH_LIMIT }
@@ -175,7 +177,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   ADS1x1X defaults if not defined for a board or application
+ * @brief   ADS1X1X defaults if not defined for a board or application
  */
 static const ads1x1x_params_t ads1x1x_params[] =
 {
@@ -183,7 +185,7 @@ static const ads1x1x_params_t ads1x1x_params[] =
 };
 
 /**
- * @brief   ADS1x1X alert defaults if not defined for a board or application
+ * @brief   ADS1X1X alert defaults if not defined for a board or application
  */
 static const ads1x1x_alert_params_t ads1x1x_alert_params[] =
 {
