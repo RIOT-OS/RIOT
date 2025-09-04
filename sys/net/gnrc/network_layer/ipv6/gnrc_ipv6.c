@@ -198,7 +198,9 @@ static inline bool _find_entry_in_nc(uint8_t *l2addr, uint8_t l2addr_len, ipv6_a
 /**
  * @brief   Handle a link-layer connection-established event.
  *
- * @param[in] connect   Netapi connection event.
+ * @param[in] if_pid        Network interface of the connection.
+ * @param[in] l2addr        L2 address of the node on the connection.
+ * @param[in] l2addr_len    Length of @p l2addr.
  */
 static inline void _on_l2_connected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_t l2addr_len)
 {
@@ -219,7 +221,9 @@ static inline void _on_l2_connected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_
 /**
  * @brief   Handle a link-layer connection-closed event.
  *
- * @param[in] connect   Netapi connection event.
+ * @param[in] if_pid        Network interface of the connection.
+ * @param[in] l2addr        L2 address of the node on the connection.
+ * @param[in] l2addr_len    Length of @p l2addr.
  */
 static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_t l2addr_len)
 {
