@@ -778,6 +778,9 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                    ntohs(pkt->hdr->id));
     len += payload_len;
 
+    /* HACK: many CoAP handlers assume that the pkt buffer is also used for the response */
+    pkt->hdr = (void *)rbuf;
+
     return len;
 }
 
