@@ -39,7 +39,7 @@ extern "C" {
  *
  * @{
  */
-#define ADS1X1X_CONF_OS_CONV_MASK         (1 << 15)
+#define ADS1X1X_CONF_OS_CONV_MASK         (1 << 7)
 
 /** @} */
 
