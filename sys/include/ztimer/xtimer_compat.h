@@ -69,8 +69,9 @@ extern "C" {
  * @brief   Generate a link-time failure if a function is used that can not be
  *          implemented with the selected backends.
  */
-#define _XTIMER_BACKEND_NOT_IMPLEMENTED extern void xtimer_function_called_but_no_backend_available(void); \
-                                        xtimer_function_called_but_no_backend_available()
+#define _XTIMER_BACKEND_NOT_IMPLEMENTED \
+            extern void xtimer_function_called_but_no_backend_available(void); \  
+            xtimer_function_called_but_no_backend_available()
 
 typedef ztimer_t xtimer_t;
 typedef uint32_t xtimer_ticks32_t;
