@@ -194,6 +194,20 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Commas are always followed by a space.
 * For complex statements it is always good to use more parentheses - or split up
   the statement and simplify it.
+* Switch cases are an exception, the `case` statement is supposed to be on
+  the same indentation level as the `switch`:
+```c
+    switch(foo) {
+    case BAR:
+        printf("Hello");
+        break;
+    case PUB:
+        printf("World");
+        break;
+    default:
+        break;
+    }
+```
 
 ## Indentation of Preprocessor Directives
 
@@ -426,6 +440,19 @@ An exemplary doxygen documentation in a header file can look like this.
  * @return 1 if setting the state was successful, 0 otherwise.
  */
  int set_foobar(int state, int *old_state);
+
+/**
+ * @brief   Document multiple return values.
+ *
+ * You can use the `@return` command to specify the general kind of return
+ * value and the `@retval` commands to specify distinct values that will be
+ * returned by your function.
+ *
+ * @return  Length of FOO on success or an error code on failure.
+ * @retval  -EIO on Input Output Errors
+ * @retval  -ENOMEM on small microcontrollers with little RAM
+ */
+int get_foolength(void);
 ```
 
 ### SPDX
