@@ -32,7 +32,6 @@ extern "C" {
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
-
 /**
  * @brief Named return values
  */
@@ -44,7 +43,6 @@ enum {
     ADS1X1X_INVALID_ARG = -4,   /**< Invalid argument */
     ADS1X1X_GPIO_ERROR  = -5    /**< GPIO error */
 };
-
 
 /**
  * @brief   ADS101x/111x params
@@ -73,14 +71,12 @@ typedef struct ads1x1x_alert_params {
     int16_t high_limit;     /**< alert high value */
 } ads1x1x_alert_params_t;
 
-
 /**
  * @brief   ADS101x/111x device descriptor
  */
 typedef struct ads1x1x {
     ads1x1x_params_t params;    /**< device driver configuration */
 } ads1x1x_t;
-
 
 /**
  * @brief   ADS101x/111x alert callback
@@ -134,7 +130,7 @@ int ads1x1x_alert_init(ads1x1x_alert_t *dev,
  * Gain settings have no effect on ADS1013 and ADS1113.
  *
  * @param[in] dev       device descriptor
- * @param[in] mux_gain  mux and gain boolean values
+ * @param[in] mux       mux bits
  *
  * @return zero on successful read, non zero on error
  */
