@@ -1,4 +1,29 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
+
+/**
+ * @defgroup   drivers_ads1x1x ADS101x/111x ADC device driver
+ * @ingroup    drivers_sensors
+ * @ingroup    drivers_saul
+ * @brief      I2C Analog-to-Digital Converter device driver
+ *
+ * This driver works with ADS1013-4-5 and ADS1113-4-5.
+ *
+ * This driver provides @ref drivers_saul capabilities.
+ * @{
+ *
+ * @file
+ * @brief      ADS101x/111x ADC device driver
+ *
+ * ADC and alert functionality are separated into two devices to
+ * prevent wasteful representations on muxed devices.
+ *
+ * @author     Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ */
 
 #ifdef __cplusplus
 extern "C" {
