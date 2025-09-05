@@ -102,7 +102,7 @@ extern "C" {
  */
 #if MODULE_ADS101X
 #  define ADS1X1X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
-#else /**<ADS111X */
+#elif defined(MODULE_ADS111X) 
 #  define ADS1X1X_PARAM_DATAR  (ADS1X1X_DATAR_128)
 #endif
 
