@@ -18,23 +18,23 @@ The [Board Schematics][board-schematics] show which pins are connected to the mo
 
 ### MCU
 
-| MCU                  | STM32F405RG                               |
-|:---------------------|:------------------------------------------|
-| Family               | ARM Cortex-M4                             |
-| Vendor               | ST Microelectronics                       |
-| Package              | LQFP64                                    |
-| RAM                  | 192 KiB (128 KiB RAM + 64 KiB CCMRAM)     |
-| Flash                | 1024 KiB                                  |
-| Frequency            | up to 168 MHz                             |
-| FPU                  | yes                                       |
-| Timers               | 14    (12× 16bit, 2× 32bit [TIM2 + TIM5]) |
-| ADCs                 | 3× 16 channel 6 to 12-bit                 |
-| UARTs                | 6                                         |
-| SPIs                 | 3                                         |
-| I2Cs                 | 3                                         |
-| Vcc                  | 2.0 V - 3.6 V                             |
-| MCU Datasheet        | [MCU Datasheet][mcu-datasheet]            |
-| MCU Reference Manual | [MCU Reference Manual][mcu-ref]           |
+| MCU                  | STM32F405RG                                 |
+|:---------------------|:--------------------------------------------|
+| Family               | ARM Cortex-M4                               |
+| Vendor               | ST Microelectronics                         |
+| Package              | LQFP64                                      |
+| RAM                  | 192 KiB (128 KiB RAM + 64 KiB CCMRAM)       |
+| Flash                | 1024 KiB                                    |
+| Frequency            | up to 168 MHz (running at 168 MHz)          |
+| FPU                  | yes                                         |
+| Timers               | 14    (12× 16bit, 2× 32bit [TIM2 + TIM5])   |
+| ADCs                 | 3× 16 channel 6 to 12-bit                   |
+| UARTs                | 6                                           |
+| SPIs                 | 3                                           |
+| I2Cs                 | 3                                           |
+| Vcc                  | 2.0 V - 3.6 V                               |
+| MCU Datasheet        | [MCU Datasheet][mcu-datasheet]              |
+| MCU Reference Manual | [MCU Reference Manual][mcu-ref]             |
 
 [mcu-datasheet]: https://www.st.com/resource/en/datasheet/stm32f405rg.pdf
 [mcu-ref]: https://www.st.com/resource/en/reference_manual/dm00031020-stm32f405-415-stm32f407-417-stm32f427-437-and-stm32f429-439-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf
