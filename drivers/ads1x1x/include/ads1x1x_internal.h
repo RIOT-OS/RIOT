@@ -101,8 +101,8 @@ extern "C" {
  *
  * @{
  */
+#define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))
 #ifdef MODULE_ADS101X
-#   define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))
 #   define ADS1X1X_DATAR_128     ((0 << 7) | (0 << 6) | (0 << 5))  /**< 128 SPS */
 #   define ADS1X1X_DATAR_250     ((0 << 7) | (0 << 6) | (1 << 5))  /**< 250 SPS */
 #   define ADS1X1X_DATAR_490     ((0 << 7) | (1 << 6) | (0 << 5))  /**< 490 SPS */
@@ -110,7 +110,7 @@ extern "C" {
 #   define ADS1X1X_DATAR_1600    ((1 << 7) | (0 << 6) | (0 << 5))  /**< 1600 SPS (default) */
 #   define ADS1X1X_DATAR_2400    ((1 << 7) | (0 << 6) | (1 << 5))  /**< 2400 SPS */
 #   define ADS1X1X_DATAR_3300    ((1 << 7) | (1 << 6) | (0 << 5))  /**< 3300 SPS */
-#else /* ADS111X */
+#elif defined(MODULE_ADS111X)
 #   define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))
 #   define ADS1X1X_DATAR_8       ((0 << 7) | (0 << 6) | (0 << 5))  /**< 8 SPS */
 #   define ADS1X1X_DATAR_16      ((0 << 7) | (0 << 6) | (1 << 5))  /**< 16 SPS */
