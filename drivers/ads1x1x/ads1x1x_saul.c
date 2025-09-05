@@ -41,7 +41,6 @@ static int read_adc(const void *dev, phydat_t *res)
     return 1;
 }
 
-
 const saul_driver_t ads1x1x_saul_driver = {
     .read = read_adc,
     .write = saul_write_notsup,
