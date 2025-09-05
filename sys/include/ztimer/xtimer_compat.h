@@ -136,6 +136,7 @@ static inline xtimer_ticks32_t xtimer_now(void)
         return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
     }
     else {
+        _XTIMER_BACKEND_NOT_IMPLEMENTED;
         return 0;
     }
 }
@@ -149,6 +150,7 @@ static inline uint32_t xtimer_now_usec(void)
         return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
     }
     else {
+        _XTIMER_BACKEND_NOT_IMPLEMENTED;
         return 0;
     }
 }
