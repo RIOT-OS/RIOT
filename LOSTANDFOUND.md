@@ -252,6 +252,17 @@ Author(s):
 Reason for removal:
 - Outdated, unmaintained and no longer working
 
+### pkg/qdsa [cc357f9638ce22a39eab8f79055f1154388ccb74]
+Author(s):
+- Kaspar Schleiser <kaspar@schleiser.de> (integration into RIOT as package)
+- Joost Renes <joost.renes@nxp.com> (upstream code)
+
+Reason for removal:
+- No users besides the test
+- The qDSA signature does not seem to have received the level of attention and
+  scrutiny by the crypto community that would justify inclusion in a general
+  purpose OS
+
 ### gnrc_pktbuf_replace_snip() [72821a502f073006643cb4ef7815fc8c42563ce6]
 Author(s):
 - Joakim Nohlgård <joakim.nohlgard@eistec.se>
@@ -347,3 +358,4 @@ Reason for removal:
 [81458c8eed8949c686d5ded652dbee10748e860b]: https://github.com/RIOT-OS/RIOT/commit/81458c8eed8949c686d5ded652dbee10748e860b
 [2b8a0d48940517f7df4e78c7a0b16024f46a8694]: https://github.com/RIOT-OS/RIOT/commit/2b8a0d48940517f7df4e78c7a0b16024f46a8694
 [4953ba8e6759d2b1a1a1ea497a4ad1e71489195a]: https://github.com/RIOT-OS/RIOT/commit/4953ba8e6759d2b1a1a1ea497a4ad1e71489195a
+[cc357f9638ce22a39eab8f79055f1154388ccb74]: https://github.com/RIOT-OS/RIOT/commit/cc357f9638ce22a39eab8f79055f1154388ccb74
