@@ -4,7 +4,7 @@ ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   PSEUDOMODULES += xtimer
 
   ifeq (,$(filter ztimer_usec,$(USEMODULE)))
-    $(info $(COLOR_YELLOW)WARNING! xtimer compat without ztimer_usec may be inaccurate$(COLOR_RESET))
+    $(info $(COLOR_YELLOW)WARNING! xtimer_compat without ztimer_usec may be inaccurate$(COLOR_RESET))
   endif
 endif
 
