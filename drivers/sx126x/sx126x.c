@@ -184,6 +184,14 @@ int sx126x_init(sx126x_t *dev)
     /* Reset the device */
     sx126x_reset(dev);
 
+    /* read status to verify device presence */
+    sx126x_chip_status_t radio_status;
+    sx126x_get_status(dev, &radio_status);
+    if (!radio_status.chip_mode) {
+        DEBUG("[sx126x] error: no device found\n");
+        return -ENODEV;
+    }
+
     /* Configure the power regulator mode */
     sx126x_set_reg_mode(dev, dev->params->regulator);
 
