@@ -21,6 +21,7 @@
 #include "ot.h"
 #include "random.h"
 #include "thread.h"
+#include "event/thread.h"
 
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
@@ -59,7 +60,8 @@ static netdev_ieee802154_submac_t cc2538_rf_netdev;
 #endif
 
 #ifdef MODULE_AT86RF2XX
-static at86rf2xx_t at86rf2xx_dev;
+static at86rf2xx_bhp_ev_t at86rf2xx_bhp;
+static netdev_ieee802154_submac_t at86rf2xx_netdev;
 #endif
 
 #ifdef MODULE_KW41ZRF
@@ -78,8 +80,10 @@ void openthread_bootstrap(void)
 {
     /* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
-    at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
-    netdev_t *netdev = &at86rf2xx_dev.netdev.netdev;
+    at86rf2xx_init_event(&at86rf2xx_bhp, &at86rf2xx_params[0], &at86rf2xx_netdev.submac.dev, EVENT_PRIO_HIGHEST);
+    netdev_register(&at86rf2xx_netdev.dev.netdev, NETDEV_AT86RF2XX, 0);
+    netdev_ieee802154_submac_init(&at86rf2xx_netdev);
+    netdev_t *netdev = &at86rf2xx_netdev.dev.netdev;
 #endif
 #ifdef MODULE_KW41ZRF
     kw41zrf_setup(&kw41z_dev, 0);
