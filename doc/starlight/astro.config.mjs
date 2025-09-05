@@ -96,7 +96,7 @@ export default defineConfig({
           items: ["misc/how_to_doc"],
         },
       ],
-      customCss: [],
+      customCss: ["./src/styles/custom.css", "./src/fonts/font-face.css"],
       logo: {
         src: "./src/assets/riot-logo.svg",
         replacesTitle: true,
@@ -107,4 +107,11 @@ export default defineConfig({
       },
     }),
   ],
+  vite: {
+    server: {
+      fs: {
+        allow: ["./", "../doxygen"],
+      },
+    },
+  },
 });
