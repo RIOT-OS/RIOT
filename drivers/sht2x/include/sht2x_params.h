@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2016,2017,2018 Kees Bakker, SODAQ
- * Copyright (C) 2017 George Psimenos
- * Copyright (C) 2018 Steffen Robertz
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016,2017,2018 Kees Bakker, SODAQ
+ * SPDX-FileCopyrightText: 2017 George Psimenos
+ * SPDX-FileCopyrightText: 2018 Steffen Robertz
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
