@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @ingroup     boards_common_particle-mesh
+ * @ingroup     boards_feather-m0
  * @{
  *
  * @file
@@ -38,7 +38,7 @@ static const saul_bat_voltage_params_t saul_bat_voltage_params[] =
     {
         .name = "BAT",
         .phydat_scale = -3,
-        .line = ADC_LINE(3),
+        .line = ADC_LINE(6),
         .res = ADC_RES_10BIT,
         .convert = saul_bat_voltage_convert,
     },
