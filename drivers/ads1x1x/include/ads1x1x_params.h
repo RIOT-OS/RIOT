@@ -87,7 +87,6 @@ extern "C" {
 #  define ADS1X1X_BITS_RES  (16)
 #endif
 
-
 /**
  * @def ADS1X1X_PARAM_PGA
  * @brief Default programmable gain amplifier configuration
@@ -97,16 +96,13 @@ extern "C" {
 #endif
 
 /**
- * @def ADS1X1X_PARAM_DR
  * @brief Default data rate configuration
  */
 #if MODULE_ADS101X
 #  define ADS1X1X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
-#elif defined(MODULE_ADS111X) 
+#elif defined(MODULE_ADS111X)
 #  define ADS1X1X_PARAM_DATAR  (ADS1X1X_DATAR_128)
 #endif
-
-
 
 /**
  * @def ADS1X1X_PARAM_MODE
@@ -123,7 +119,6 @@ extern "C" {
 #ifndef ADS1X1X_PARAM_COMP_MODE
 #  define ADS1X1X_PARAM_COMP_MODE  (ADS1X1X_COMP_MODE_TRADITIONAL)
 #endif
-
 
 /**
  * @def ADS1X1X_PARAM_COMP_POLARITY
@@ -149,29 +144,40 @@ extern "C" {
 #  define ADS1X1X_PARAM_COMP_QUEUE (ADS1X1X_COMP_QUEUE_DISABLE)
 #endif
 
-
+/**
+ * @def ADS1X1X_PARAMS
+ * @brief Default ADS1X1X parameters structure
+ */
 #ifndef ADS1X1X_PARAMS
-#define ADS1X1X_PARAMS          { .i2c        = ADS1X1X_PARAM_I2C,        \
-                                  .addr       = ADS1X1X_PARAM_ADDR,       \
-                                  .mux        = ADS1X1X_PARAM_MUX,        \
-                                  .pga        = ADS1X1X_PARAM_PGA,        \
-                                  .mode       = ADS1X1X_PARAM_MODE,       \
-                                  .dr         = ADS1X1X_PARAM_DATAR        }
+#define ADS1X1X_PARAMS          { .i2c = ADS1X1X_PARAM_I2C,        \
+                                  .addr = ADS1X1X_PARAM_ADDR,       \
+                                  .mux = ADS1X1X_PARAM_MUX,        \
+                                  .pga = ADS1X1X_PARAM_PGA,        \
+                                  .mode = ADS1X1X_PARAM_MODE,       \
+                                  .dr = ADS1X1X_PARAM_DATAR        }
 
 #endif
 
+/**
+ * @def ADS1X1X_ALERT_PARAMS
+ * @brief Default ADS1X1X alert parameters structure
+ */
 #ifndef ADS1X1X_ALERT_PARAMS
-#define ADS1X1X_ALERT_PARAMS    { .i2c        = ADS1X1X_PARAM_I2C,        \
-                                  .addr       = ADS1X1X_PARAM_ADDR,       \
-                                  .comp_mode  = ADS1X1X_PARAM_COMP_MODE,  \
+#define ADS1X1X_ALERT_PARAMS    { .i2c = ADS1X1X_PARAM_I2C,        \
+                                  .addr = ADS1X1X_PARAM_ADDR,       \
+                                  .comp_mode = ADS1X1X_PARAM_COMP_MODE,  \
                                   .comp_polarity = ADS1X1X_PARAM_COMP_POLARITY, \
                                   .comp_latch = ADS1X1X_PARAM_COMP_LATCH,  \
                                   .comp_queue = ADS1X1X_PARAM_COMP_QUEUE,  \
-                                  .alert_pin  = ADS1X1X_PARAM_ALERT_PIN,  \
-                                  .low_limit  = ADS1X1X_PARAM_LOW_LIMIT,  \
+                                  .alert_pin = ADS1X1X_PARAM_ALERT_PIN,  \
+                                  .low_limit = ADS1X1X_PARAM_LOW_LIMIT,  \
                                   .high_limit = ADS1X1X_PARAM_HIGH_LIMIT }
 #endif
 
+/**
+ * @def ADS1X1X_SAUL_INFO
+ * @brief Additional SAUL registry information
+ */
 #ifndef ADS1X1X_SAUL_INFO
   #define ADS1X1X_SAUL_INFO       { .name = "ads1x1x" }
 #endif

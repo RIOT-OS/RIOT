@@ -15,4 +15,3 @@ endif
 ifneq (,$(filter ads111%,$(USEMODULE)))
   USEMODULE += ads1x1x
 endif
-

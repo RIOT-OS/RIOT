@@ -24,7 +24,7 @@
 #include "ztimer.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef ADS1X1X_READ_DELAY_MS
@@ -260,7 +260,6 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
 
     /* Single-Shot mode */
     if ((reg & (ADS1X1X_MODE_MASK << 8)) == (ADS1X1X_MODE_SINGLE << 8)) {
-
 
         /* Tell the ADC to acquire a single-shot sample */
         reg |= (ADS1X1X_CONF_OS_CONV_MASK << 8);
