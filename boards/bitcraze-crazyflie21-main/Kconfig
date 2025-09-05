@@ -12,6 +12,18 @@ config BOARD_BITCRAZE_CRAZYFLIE21_MAIN
     default y
     select CPU_MODEL_STM32F405RG
 
-    # Put defined MCU peripherals here (in alphabetical order)
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
 
-    # Put other features for this board (in alphabetical order)
+config CLOCK_HSE
+    default 8000000
+
+config CLOCK_PLL_M
+    default 8
+
+config CLOCK_PLL_N
+    default 336 if USEMODULE_PERIPH_USBDEV_CLK
+    default 360
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
