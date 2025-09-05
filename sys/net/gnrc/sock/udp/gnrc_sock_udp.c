@@ -189,29 +189,6 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
     return 0;
 }
 
-ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
-                         uint32_t timeout, sock_udp_ep_t *remote,
-                         sock_udp_aux_rx_t *aux)
-{
-    void *pkt = NULL, *ctx = NULL;
-    uint8_t *ptr = data;
-    ssize_t res, ret = 0;
-    bool nobufs = false;
-
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote,
-                                        aux)) > 0) {
-        if (res > (ssize_t)max_len) {
-            nobufs = true;
-            continue;
-        }
-        memcpy(ptr, pkt, res);
-        ptr += res;
-        ret += res;
-    }
-    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
-}
-
 static bool _accept_remote(const sock_udp_t *sock, const udp_hdr_t *hdr,
                            const sock_ip_ep_t *remote)
 {

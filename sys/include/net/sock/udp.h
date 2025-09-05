@@ -488,6 +488,7 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  * @return  -ENOBUFS, if buffer space is not large enough to store received
  *          data.
  * @return  -ENOMEM, if no memory was available to receive @p data.
+ *          The first @p max_len bytes of the packet are stored in @p data.
  * @return  -EPROTO, if source address of received packet did not equal
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
