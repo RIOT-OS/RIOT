@@ -98,6 +98,10 @@ def fix_headerguard(filename):
         print("%s: #pragma once and classic header guards used in the same file" %
               filename, file=sys.stderr)
         return False
+    elif (pragma_once_found > 1):
+        print("%s: More than one #pragma once in the same file" %
+              filename, file=sys.stderr)
+        return False
     else:
         print("%s: broken header guard" % filename, file=sys.stderr)
         return False
