@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2021 ML!PA Consulting GmbH
- *
+ * SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: NONE
  */
 
 #pragma once
