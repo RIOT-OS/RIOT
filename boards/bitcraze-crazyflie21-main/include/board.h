@@ -55,6 +55,7 @@ extern "C" {
  * @name Describe DC motors with PWM channel and GPIOs
  * @{
  */
+/** Motor driver config. Two driver with three and one motor attached respectively */
 static const motor_driver_config_t motor_driver_config[] = {
     {
         .pwm_dev = 1,
@@ -118,6 +119,7 @@ static const motor_driver_config_t motor_driver_config[] = {
     }
 };
 
+/** Number of motor drivers */
 #define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
 
