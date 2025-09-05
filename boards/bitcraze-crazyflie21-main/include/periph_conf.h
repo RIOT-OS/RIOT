@@ -125,13 +125,16 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 0 },
-    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
-    { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
-    { .pin = GPIO_PIN(PORT_C, 4), .dev = 1, .chan = 14 },
-    { .pin = GPIO_PIN(PORT_C, 5), .dev = 1, .chan = 15 },
+    { .pin = GPIO_PIN(PORT_A, 2), .dev = 0, .chan = 2 },
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan = 3 },
+    { .pin = GPIO_PIN(PORT_A, 5), .dev = 1, .chan = 5 },
+    { .pin = GPIO_PIN(PORT_A, 6), .dev = 1, .chan = 6 },
+    { .pin = GPIO_PIN(PORT_A, 7), .dev = 1, .chan = 7 },
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 0}, /* VBAT */
 };
 
+/* The radio MCU takes care of power management -> adc line without proper pin. */
+#define VBAT_ADC            ADC_LINE(5) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
