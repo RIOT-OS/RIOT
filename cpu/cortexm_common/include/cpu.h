@@ -245,6 +245,11 @@ static inline uint32_t cpu_get_image_baseaddr(void)
  */
 bool cpu_check_address(volatile const char *address);
 
+/**
+ * @brief Init all noinit and backup sections on next reset.
+ */
+void cpu_invalidate_persistent_ram(void);
+
 #ifdef __cplusplus
 }
 #endif
