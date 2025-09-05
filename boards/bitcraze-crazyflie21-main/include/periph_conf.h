@@ -17,19 +17,18 @@
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
-#	define CONFIG_BOARD_HAS_LSE 	1
+#    define CONFIG_BOARD_HAS_LSE 1
 #endif
 
 /* This board provides an HSE */
 #ifndef CONFIG_BOARD_HAS_HSE
-#    define CONFIG_BOARD_HAS_HSE 	1
+#    define CONFIG_BOARD_HAS_HSE 1
 #endif
 
 /* The HSE provides a 8MHz clock */
 #ifndef CONFIG_CLOCK_HSE
-#	define CONFIG_CLOCK_HSE 		MHZ(8)
+#    define CONFIG_CLOCK_HSE               MHZ(8)
 #endif
-
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
