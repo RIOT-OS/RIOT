@@ -109,7 +109,7 @@ static inline uint32_t xtimer_usec_from_ticks(xtimer_ticks32_t ticks)
 
 static inline uint32_t xtimer_msec_from_ticks(xtimer_ticks32_t ticks)
 {
-    return ticks * US_PER_MS;
+    return _div_round_up(ticks, US_PER_MS);
 }
 
 static inline uint64_t xtimer_usec_from_ticks64(xtimer_ticks64_t ticks)
@@ -315,10 +315,10 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
         assert(us <= UINT32_MAX);
         res = ztimer_mutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us);
     }
-    else if (IS_USED(MODULE_ZTIMER_USEC)) {
+    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
         us = _div_round_up64(us, US_PER_MS);
         assert(us <= UINT32_MAX);
-        res = ztimer_mutex_lock_timeout(ZTIMER_SEC, mutex, (uint32_t)us);
+        res = ztimer_mutex_lock_timeout(ZTIMER_MSEC, mutex, (uint32_t)us);
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
@@ -337,10 +337,10 @@ static inline int xtimer_rmutex_lock_timeout(rmutex_t *mutex, uint64_t us)
         assert(us <= UINT32_MAX);
         res = ztimer_rmutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us);
     }
-    else if (IS_USED(MODULE_ZTIMER_USEC)) {
+    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
         us = _div_round_up64(us, US_PER_MS);
         assert(us <= UINT32_MAX);
-        res = ztimer_rmutex_lock_timeout(ZTIMER_SEC, mutex, (uint32_t)us);
+        res = ztimer_rmutex_lock_timeout(ZTIMER_MSEC, mutex, (uint32_t)us);
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
@@ -356,8 +356,8 @@ static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
     if (IS_USED(MODULE_ZTIMER_USEC)) {
         ztimer_set_timeout_flag(ZTIMER_USEC, t, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_USEC)) {
-        ztimer_set_timeout_flag(ZTIMER_USEC, t, _div_round_up(timeout, US_PER_MS));
+    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        ztimer_set_timeout_flag(ZTIMER_MSEC, t, _div_round_up(timeout, US_PER_MS));
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
