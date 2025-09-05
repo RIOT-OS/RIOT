@@ -34,7 +34,7 @@ extern "C" {
  * @brief Default I2C bus
  */
 #ifndef ADS1X1X_PARAM_I2C
-#   define ADS1X1X_PARAM_I2C       (I2C_DEV(0))
+#  define ADS1X1X_PARAM_I2C       (I2C_DEV(0))
 #endif
 
 /**
@@ -42,7 +42,7 @@ extern "C" {
  * @brief Default I2C address
  */
 #ifndef ADS1X1X_PARAM_ADDR
-#   define ADS1X1X_PARAM_ADDR       (0x48)
+#  define ADS1X1X_PARAM_ADDR       (0x48)
 #endif
 
 /**
@@ -50,7 +50,7 @@ extern "C" {
  * @brief Default multiplexer configuration
  */
 #ifndef ADS1X1X_PARAM_MUX
-#   define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_DIFFM_AIN1)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_DIFFM_AIN1)
 #endif
 
 /**
@@ -58,7 +58,7 @@ extern "C" {
  * @brief Default alert pin configuration
  */
 #ifndef ADS1X1X_PARAM_ALERT_PIN
-#   define ADS1X1X_PARAM_ALERT_PIN  (GPIO_UNDEF)
+#  define ADS1X1X_PARAM_ALERT_PIN  (GPIO_UNDEF)
 #endif
 
 /**
@@ -66,7 +66,7 @@ extern "C" {
  * @brief Default low limit for alert
  */
 #ifndef ADS1X1X_PARAM_LOW_LIMIT
-#   define ADS1X1X_PARAM_LOW_LIMIT  (10000U)
+#  define ADS1X1X_PARAM_LOW_LIMIT  (10000U)
 #endif
 
 /**
@@ -74,7 +74,7 @@ extern "C" {
  * @brief Default high limit for alert
  */
 #ifndef ADS1X1X_PARAM_HIGH_LIMIT
-#   define ADS1X1X_PARAM_HIGH_LIMIT (20000U)
+#  define ADS1X1X_PARAM_HIGH_LIMIT (20000U)
 #endif
 
 /**
@@ -82,9 +82,9 @@ extern "C" {
  * @brief Default bit resolution
  */
 #if MODULE_ADS101X
-#   define ADS1X1X_BITS_RES  (12)
+#  define ADS1X1X_BITS_RES  (12)
 #else /**<ADS111X */
-#   define ADS1X1X_BITS_RES  (16)
+#  define ADS1X1X_BITS_RES  (16)
 #endif
 
 
@@ -93,7 +93,7 @@ extern "C" {
  * @brief Default programmable gain amplifier configuration
  */
 #ifndef ADS1X1X_PARAM_PGA
-#   define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_2V048)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_2V048)
 #endif
 
 /**
@@ -101,9 +101,9 @@ extern "C" {
  * @brief Default data rate configuration
  */
 #if MODULE_ADS101X
-#   define ADS1X1X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
+#  define ADS1X1X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
 #else /**<ADS111X */
-#   define ADS1X1X_PARAM_DATAR  (ADS1X1X_DATAR_128)
+#  define ADS1X1X_PARAM_DATAR  (ADS1X1X_DATAR_128)
 #endif
 
 
@@ -171,8 +171,9 @@ extern "C" {
                                   .low_limit  = ADS1X1X_PARAM_LOW_LIMIT,  \
                                   .high_limit = ADS1X1X_PARAM_HIGH_LIMIT }
 #endif
+
 #ifndef ADS1X1X_SAUL_INFO
-#define ADS1X1X_SAUL_INFO       { .name = "ads1x1x" }
+  #define ADS1X1X_SAUL_INFO       { .name = "ads1x1x" }
 #endif
 /** @} */
 
