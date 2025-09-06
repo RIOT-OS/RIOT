@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef UTILITIES_H
-#define UTILITIES_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -40,5 +40,4 @@ size_t hex2ints(uint8_t *out, const char *in);
 }
 #endif
 
-#endif /* UTILITIES_H */
 /** @} */

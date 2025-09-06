@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef TESTS_DIV_H
-#define TESTS_DIV_H
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -39,5 +40,4 @@ Test *tests_div_tests(void);
 }
 #endif
 
-#endif /* TESTS_DIV_H */
 /** @} */

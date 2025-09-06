@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    tests_gnrc_ipv6_nib Common header for GNRC's NIB tests
  * @ingroup     tests
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef COMMON_H
-#define COMMON_H
 
 #include "net/gnrc/netif.h"
 
@@ -106,5 +106,4 @@ void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */

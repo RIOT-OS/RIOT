@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef TESTS_BCD_H
-#define TESTS_BCD_H
 
 #include "embUnit/embUnit.h"
 
@@ -40,5 +40,4 @@ Test *tests_bcd_tests(void);
 }
 #endif
 
-#endif /* TESTS_BCD_H */
 /** @} */

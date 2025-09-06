@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef LOGO_H
-#define LOGO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1186,5 +1185,3 @@ static const uint8_t logo[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* LOGO_H */

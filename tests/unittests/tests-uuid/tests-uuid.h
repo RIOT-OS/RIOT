@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  * @brief       Unittests for the uuid module
  *
  */
-#ifndef TESTS_UUID_H
-#define TESTS_UUID_H
 
 #include "embUnit/embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_uuid(void);
 }
 #endif
 
-#endif /* TESTS_UUID_H */
 /** @} */

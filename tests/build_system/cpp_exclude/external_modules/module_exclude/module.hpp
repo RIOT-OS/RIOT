@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef MODULE_H
-#define MODULE_H
 
 #include <cstdio>
 
@@ -43,4 +42,3 @@ public:
 };
 
 /** @} */
-#endif /* MODULE_H */

@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef XFATEST_H
-#define XFATEST_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,5 +25,3 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* XFATEST_H */

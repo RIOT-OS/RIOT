@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         tests
  * @{
@@ -13,9 +15,6 @@
  * @file
  * @brief           CNN weights
  */
-
-#ifndef WEIGHTS_H
-#define WEIGHTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1768,5 +1767,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* WEIGHTS_H */
 /** @} */

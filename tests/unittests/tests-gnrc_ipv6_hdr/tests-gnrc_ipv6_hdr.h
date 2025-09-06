@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_GNRC_IPV6_HDR_H
-#define TESTS_GNRC_IPV6_HDR_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_gnrc_ipv6_hdr(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_IPV6_HDR_H */
 /** @} */

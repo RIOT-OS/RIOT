@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup
  * @defgroup       <name> <description>
@@ -17,9 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef TESTS_PSA_CBOR_ENC_DEC_H
-#define TESTS_PSA_CBOR_ENC_DEC_H
 
 #include <stdint.h>
 #include "embUnit.h"
@@ -67,5 +66,4 @@ Test* tests_psa_crypto_enc_dec_protected_key(void);
 }
 #endif
 
-#endif /* TESTS_PSA_CBOR_ENC_DEC_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @brief       Util functions for test application for the BQ24298x device
@@ -13,9 +15,6 @@
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  * @file
  */
-
-#ifndef PRIV_UTIL_H
-#define PRIV_UTIL_H
 
 #include <assert.h>
 #include "bq2429x.h"
@@ -208,5 +207,3 @@ static inline const char *_util_chrg_fault_to_str(bq2429x_chrg_fault_t fault)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PRIV_UTIL_H */

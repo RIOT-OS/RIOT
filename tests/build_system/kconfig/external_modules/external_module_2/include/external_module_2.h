@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup
  * @ingroup
@@ -20,9 +22,6 @@
  * @}
  */
 
-#ifndef EXTERNAL_MODULE_2_H
-#define EXTERNAL_MODULE_2_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,4 +35,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* EXTERNAL_MODULE_2_H */
