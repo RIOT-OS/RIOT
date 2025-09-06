@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_nimble_scanner Scanner Helper
  * @ingroup     pkg_nimble
@@ -17,9 +19,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_SCANNER_H
-#define NIMBLE_SCANNER_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -170,5 +169,4 @@ void nimble_scanner_set_scan_duration(int32_t duration_ms);
 }
 #endif
 
-#endif /* NIMBLE_SCANNER_H */
 /** @} */

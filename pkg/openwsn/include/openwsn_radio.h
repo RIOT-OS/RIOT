@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -45,9 +47,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-#ifndef OPENWSN_RADIO_H
-#define OPENWSN_RADIO_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,5 +82,4 @@ typedef struct {
 }
 #endif
 
-#endif /* OPENWSN_RADIO_H */
 /** @} */

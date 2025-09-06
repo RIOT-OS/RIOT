@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_ipso_sensor_base IPSO Sensor base object
@@ -39,9 +41,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef OBJECTS_IPSO_SENSOR_BASE_H
-#define OBJECTS_IPSO_SENSOR_BASE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -198,5 +197,4 @@ void lwm2m_object_ipso_sensor_base_update_value(const lwm2m_client_data_t *clien
 }
 #endif
 
-#endif /* OBJECTS_IPSO_SENSOR_BASE_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_humidity Humidity
@@ -89,9 +91,6 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
-#ifndef OBJECTS_HUMIDITY_H
-#define OBJECTS_HUMIDITY_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -158,5 +157,4 @@ void lwm2m_object_humidity_update_value(const lwm2m_client_data_t *client_data,
 }
 #endif
 
-#endif /* OBJECTS_HUMIDITY_H */
 /** @} */

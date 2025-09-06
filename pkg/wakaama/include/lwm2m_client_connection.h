@@ -16,6 +16,9 @@
 *    Christian Manal - Ported to RIOT OS
 *
 *******************************************************************************/
+
+#pragma once
+
 /*
  * Copyright (C) 2018 Beduino Master Projekt - University of Bremen
  * Copyright (C) 2019 HAW Hamburg
@@ -36,9 +39,6 @@
  * @author      Christian Manal <manal@uni-bremen.de>
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef LWM2M_CLIENT_CONNECTION_H
-#define LWM2M_CLIENT_CONNECTION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,5 +86,4 @@ int lwm2m_connection_handle_packet(lwm2m_client_connection_t *conn,
 }
 #endif
 
-#endif /* LWM2M_CLIENT_CONNECTION_H */
 /** @} */

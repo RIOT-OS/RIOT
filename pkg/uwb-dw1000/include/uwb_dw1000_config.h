@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef UWB_DW1000_CONFIG_H
-#define UWB_DW1000_CONFIG_H
 
 #include "dw1000/dw1000_regs.h"
 
@@ -269,5 +268,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* UWB_DW1000_CONFIG_H */
