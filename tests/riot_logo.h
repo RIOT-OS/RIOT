@@ -6,8 +6,7 @@
  * more details.
  */
 
-#ifndef RIOT_LOGO_H
-#define RIOT_LOGO_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -1057,5 +1056,3 @@ const uint16_t picture[RIOT_LOGO_HEIGHT][RIOT_LOGO_WIDTH] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* RIOT_LOGO_H */

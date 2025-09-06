@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @brief
@@ -17,8 +19,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @}
  */
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,5 +52,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CONSTANTS_H */

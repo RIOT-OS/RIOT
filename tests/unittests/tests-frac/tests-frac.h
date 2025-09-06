@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,7 +17,8 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef TESTS_FRAC_H
+
+
 #define TESTS_FRAC_H
 #include "embUnit/embUnit.h"
 
@@ -39,5 +42,4 @@ Test *tests_frac_tests(void);
 }
 #endif
 
-#endif /* TESTS_FRAC_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @brief       Common definitions for GNRC's NIB tests
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef COMMON_H
-#define COMMON_H
 
 #include "net/gnrc/netif.h"
 
@@ -95,5 +95,4 @@ extern "C" {
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */

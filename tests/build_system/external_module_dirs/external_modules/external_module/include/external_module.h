@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup
  * @ingroup
@@ -17,8 +19,6 @@
  *
  * @author  Gaëtan Harter <gaetan.harter@fu-berlin.de>
  */
-#ifndef EXTERNAL_MODULE_H
-#define EXTERNAL_MODULE_H
 
 #include <stdbool.h>
 
@@ -47,4 +47,3 @@ void auto_init_external_module(void);
 #endif
 
 /** @} */
-#endif /* EXTERNAL_MODULE_H */

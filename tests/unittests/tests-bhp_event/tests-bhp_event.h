@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      José I. Álamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef TESTS_BHP_EVENT_H
-#define TESTS_BHP_EVENT_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_bhp_event(void);
 }
 #endif
 
-#endif /* TESTS_BHP_EVENT_H */
 /** @} */

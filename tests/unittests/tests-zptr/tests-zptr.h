@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef TESTS_ZPTR_H
-#define TESTS_ZPTR_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_zptr(void);
 }
 #endif
 
-#endif /* TESTS_ZPTR_H */
 /** @} */

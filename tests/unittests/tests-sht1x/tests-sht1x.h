@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-#ifndef TESTS_SHT1X_H
-#define TESTS_SHT1X_H
 
 #include "embUnit.h"
 
@@ -32,5 +32,4 @@ void tests_sht1x(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* TESTS_SHT1X_H */
 /** @} */

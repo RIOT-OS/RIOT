@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_L2CAP_TEST_CONF_H
-#define NIMBLE_L2CAP_TEST_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,5 +56,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NIMBLE_L2CAP_TEST_CONF_H */
 /** @} */

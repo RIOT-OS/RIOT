@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -16,7 +18,6 @@
  * @author      Juan Carrano <j.carrano@fu-berlin.de>
  */
 
-#ifndef TESTS_SCANF_FLOAT_H
 #define TESTS_SCANF_FLOAT_H
 #include "embUnit.h"
 
@@ -34,5 +35,3 @@ Test *tests_scanf_float_tests(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TESTS_SCANF_FLOAT_H */

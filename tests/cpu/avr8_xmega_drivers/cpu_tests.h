@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -17,8 +19,6 @@
  *
  * @}
  */
-#ifndef CPU_TESTS_H
-#define CPU_TESTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,5 +29,3 @@ void ebi_tests(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CPU_TESTS_H */

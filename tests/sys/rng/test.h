@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TEST_H
-#define TEST_H
+#pragma once
 
 #include <stdint.h>
 
@@ -132,5 +131,4 @@ void test_speed_range(uint32_t duration, uint32_t a, uint32_t b);
 }
 #endif
 
-#endif /* TEST_H */
 /** @} */

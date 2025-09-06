@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-#ifndef TESTS_SIXLOWPAN_H
-#define TESTS_SIXLOWPAN_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_sixlowpan(void);
 }
 #endif
 
-#endif /* TESTS_SIXLOWPAN_H */
 /** @} */

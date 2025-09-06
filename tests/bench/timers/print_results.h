@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef PRINT_RESULTS_H
-#define PRINT_RESULTS_H
 
 #include "matstat.h"
 
@@ -59,5 +58,3 @@ void print_results(const result_presentation_t *pres, const matstat_state_t *ref
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PRINT_RESULTS_H */

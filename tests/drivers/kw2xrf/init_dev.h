@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-#ifndef INIT_DEV_H
-#define INIT_DEV_H
 
 #include "kernel_defines.h"
 #include "kw2xrf_params.h"
@@ -36,5 +36,4 @@ extern "C" {
 }
 #endif
 
-#endif /* INIT_DEV_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests_periph_uart_locate_pins
  * @{
@@ -18,9 +20,6 @@
  *
  * @}
  */
-
-#ifndef SOFT_UART_PARAMS_H
-#define SOFT_UART_PARAMS_H
 
 #include "soft_uart.h"
 
@@ -39,5 +38,4 @@ extern soft_uart_conf_t soft_uart_config[];
 }
 #endif
 
-#endif /* SOFT_UART_PARAMS_H */
 /** @} */

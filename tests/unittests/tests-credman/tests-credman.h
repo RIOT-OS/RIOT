@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -16,7 +18,6 @@
  * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  */
 
-#ifndef TESTS_CREDMAN_H
 #define TESTS_CREDMAN_H
 #include "embUnit/embUnit.h"
 
@@ -40,5 +41,4 @@ Test *tests_credman_tests(void);
 }
 #endif
 
-#endif /* TESTS_CREDMAN_H */
 /** @} */

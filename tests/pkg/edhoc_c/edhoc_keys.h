@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -21,9 +23,6 @@
  *
  * @}
  */
-
-#ifndef EDHOC_KEYS_H
-#define EDHOC_KEYS_H
 
 #include <inttypes.h>
 
@@ -170,5 +169,3 @@ static const cred_db_entry_t cred_db[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* EDHOC_KEYS_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_external_native
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gaëtan Harter <gaetan.harter@fu-berlin.de>
  */
-
-#ifndef EXTERNAL_NATIVE_H
-#define EXTERNAL_NATIVE_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -32,5 +31,4 @@ extern char* external_native_board_description;
 }
 #endif
 
-#endif /* EXTERNAL_NATIVE_H */
 /** @} */

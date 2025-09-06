@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  */
-#ifndef TESTS_PRIORITY_PKTQUEUE_H
-#define TESTS_PRIORITY_PKTQUEUE_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_priority_pktqueue(void);
 }
 #endif
 
-#endif /* TESTS_PRIORITY_PKTQUEUE_H */
 /** @} */

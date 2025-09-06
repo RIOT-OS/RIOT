@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup tests
  *
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef TINYDTLS_COMMON_H
-#define TINYDTLS_COMMON_H
 
 #include "event.h"
 
@@ -36,4 +36,3 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* TINYDTLS_COMMON_H */

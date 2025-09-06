@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -16,8 +18,6 @@
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
-#ifndef TESTS_CRYPTO_H
-#define TESTS_CRYPTO_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -68,5 +68,4 @@ Test* tests_crypto_modes_ctr_tests(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H */
 /** @} */

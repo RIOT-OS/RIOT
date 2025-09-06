@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef TESTS_MATSTAT_H
-#define TESTS_MATSTAT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,5 +38,4 @@ Test *tests_matstat_tests(void);
 }
 #endif
 
-#endif /* TESTS_MATSTAT_H */
 /** @} */
