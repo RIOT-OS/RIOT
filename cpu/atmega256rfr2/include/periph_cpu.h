@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Josua Arndt, Steffen Robertz 2017 RWTH Aachen
+ * Copyright (C) 2017 Josua Arndt Steffen Robertz RWTH Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
