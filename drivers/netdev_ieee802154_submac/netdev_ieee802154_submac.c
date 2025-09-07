@@ -296,7 +296,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         netdev_rx_info->lqi = rx_info.lqi;
     }
-#if !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE)
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_SOFT_ACK)
     const uint8_t *mhr = buf;
     if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
         (mhr[0] & IEEE802154_FCF_ACK_REQ)) {
