@@ -62,8 +62,8 @@ typedef struct {
 } gnrc_netapi_notify_t;
 
 /**
- * @brief   L2 connection event data associated with @ref NETAPI_NOTIFY_L2_CONNECTED or
- *          @ref NETAPI_NOTIFY_L2_DISCONNECTED events.
+ * @brief   L2 connection event data associated with @ref NETAPI_NOTIFY_L2_NEIGH_CONNECTED or
+ *          @ref NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED events.
  */
 typedef struct {
     uint8_t *l2addr;            /**< L2 address of the node */
@@ -82,8 +82,8 @@ static inline void gnrc_netapi_notify_ack(sema_inv_t *ack)
 }
 
 /**
- * @brief   Parse the connection event data associated with @ref NETAPI_NOTIFY_L2_CONNECTED
- *          and @ref NETAPI_NOTIFY_L2_DISCONNECTED events.
+ * @brief   Parse the connection event data associated with @ref NETAPI_NOTIFY_L2_NEIGH_CONNECTED
+ *          and @ref NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED events.
  *
  * @note    This will call @ref gnrc_netapi_notify_ack.
  *

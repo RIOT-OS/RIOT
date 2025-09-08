@@ -91,8 +91,7 @@ int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *data)
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
     switch (sendto->type) {
     case GNRC_NETREG_TYPE_DEFAULT:
-        if (_gnrc_netapi_send_recv(sendto->target.pid, data,
-                                   cmd) < 1) {
+        if (_gnrc_netapi_send_recv(sendto->target.pid, data, cmd) < 1) {
             /* unable to dispatch packet */
             status = -EIO;
         }

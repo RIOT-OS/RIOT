@@ -23,8 +23,8 @@ uint8_t gnrc_netapi_notify_copy_l2_connection_data(gnrc_netapi_notify_t *notify,
     int data_len;
 
     switch (notify->event) {
-    case NETAPI_NOTIFY_L2_CONNECTED:
-    case NETAPI_NOTIFY_L2_DISCONNECTED:
+    case NETAPI_NOTIFY_L2_NEIGH_CONNECTED:
+    case NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED:
         assert(notify->_data_len == sizeof(netapi_notify_l2_connection_t));
 
         /* Parse event data */
