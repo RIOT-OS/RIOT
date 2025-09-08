@@ -367,7 +367,7 @@ static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
             conn->state |= NIMBLE_NETIF_L2CAP_CLIENT;
             conn->state &= ~NIMBLE_NETIF_CONNECTING;
             _notify(handle, NIMBLE_NETIF_CONNECTED_MASTER, conn->addr);
-            _dispatch_connection_event(NETAPI_NOTIFY_L2_CONNECTED, conn->addr);
+            _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_CONNECTED, conn->addr);
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             assert(conn->state & NIMBLE_NETIF_L2CAP_CLIENT);
@@ -423,7 +423,7 @@ static int _on_l2cap_server_evt(struct ble_l2cap_event *event, void *arg)
             }
 
             _notify(handle, NIMBLE_NETIF_CONNECTED_SLAVE, conn->addr);
-            _dispatch_connection_event(NETAPI_NOTIFY_L2_CONNECTED, conn->addr);
+            _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_CONNECTED, conn->addr);
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             conn = nimble_netif_conn_from_gaphandle(event->disconnect.conn_handle);
@@ -518,7 +518,7 @@ static int _on_gap_master_evt(struct ble_gap_event *event, void *arg)
             nimble_netif_conn_free(handle, addr);
             thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
-            _dispatch_connection_event(NETAPI_NOTIFY_L2_DISCONNECTED, addr);
+            _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED, addr);
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
@@ -563,7 +563,7 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
             nimble_netif_conn_free(handle, addr);
             thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
-            _dispatch_connection_event(NETAPI_NOTIFY_L2_DISCONNECTED, addr);
+            _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED, addr);
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
