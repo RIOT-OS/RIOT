@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,7 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef TESTS_ANALOG_UTIL_H
-#define TESTS_ANALOG_UTIL_H
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -32,5 +33,4 @@ void tests_adc_util(void);
 }
 #endif
 
-#endif /* TESTS_ANALOG_UTIL_H */
 /** @} */

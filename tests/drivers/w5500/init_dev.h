@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
-#ifndef INIT_DEV_H
-#define INIT_DEV_H
 
 #include <stdint.h>
 
@@ -41,5 +41,4 @@ extern "C" {
 }
 #endif
 
-#endif /* INIT_DEV_H */
 /** @} */

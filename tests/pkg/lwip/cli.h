@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef CLI_H
-#define CLI_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -89,5 +89,4 @@ int udp_cmd(int argc, char **argv);
 }
 #endif
 
-#endif /* CLI_H */
 /** @} */

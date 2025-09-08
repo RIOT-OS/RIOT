@@ -5,8 +5,8 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-#ifndef APP_H
-#define APP_H
+
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,5 +22,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* APP_H */

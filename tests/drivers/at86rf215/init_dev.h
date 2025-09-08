@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-#ifndef INIT_DEV_H
-#define INIT_DEV_H
 
 #include "at86rf215_params.h"
 #include "kernel_defines.h"
@@ -33,5 +33,4 @@ extern "C" {
 }
 #endif
 
-#endif /* INIT_DEV_H */
 /** @} */

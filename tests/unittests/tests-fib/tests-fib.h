@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,7 @@
  *
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
-#ifndef TESTS_FIB_H
-#define TESTS_FIB_H
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -39,5 +40,4 @@ Test *tests_fib_tests(void);
 }
 #endif
 
-#endif /* TESTS_FIB_H */
 /** @} */

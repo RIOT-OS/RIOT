@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup   tests
  * @{
@@ -15,9 +17,6 @@
  *
  * @author    Víctor Ariño <victor.arino@triagnosys.com>
  */
-
-#ifndef PN532_PARAMS_H
-#define PN532_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,5 +44,4 @@ static const pn532_params_t pn532_conf[] = {
 }
 #endif
 
-#endif /* PN532_PARAMS_H */
 /** @} */

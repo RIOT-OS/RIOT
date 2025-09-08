@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -16,8 +18,6 @@
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  * @author      Daniel Jentsch <d.jentsch@fu-berlin.de>
  */
-#ifndef TESTS_TIMEX_H
-#define TESTS_TIMEX_H
 
 #include "embUnit.h"
 
@@ -41,5 +41,4 @@ Test *tests_timex_tests(void);
 }
 #endif
 
-#endif /* TESTS_TIMEX_H */
 /** @} */

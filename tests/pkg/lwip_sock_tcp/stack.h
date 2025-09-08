@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     tests
  * @brief
@@ -17,8 +19,6 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @}
  */
-#ifndef STACK_H
-#define STACK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,5 +32,3 @@ void _net_init(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* STACK_H */

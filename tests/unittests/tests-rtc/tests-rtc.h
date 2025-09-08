@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef TESTS_RTC_H
-#define TESTS_RTC_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_rtc(void);
 }
 #endif
 
-#endif /* TESTS_RTC_H */
 /** @} */

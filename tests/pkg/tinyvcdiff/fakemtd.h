@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @{
  *
@@ -15,8 +17,6 @@
  *
  * @author   Juergen Fitschen <me@jue.yt>
  */
-#ifndef FAKEMTD_H
-#define FAKEMTD_H
 
 #include "mtd.h"
 
@@ -72,5 +72,4 @@ typedef struct {
 }
 #endif
 
-#endif /* FAKEMTD_H */
 /** @} */
