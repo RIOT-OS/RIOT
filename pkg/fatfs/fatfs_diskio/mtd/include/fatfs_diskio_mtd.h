@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_fatfs
  * @brief
@@ -14,9 +16,6 @@
  * @brief       Common defines for fatfs low-level diskio defines
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef FATFS_DISKIO_MTD_H
-#define FATFS_DISKIO_MTD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,5 +41,4 @@ extern "C" {
 }
 #endif
 
-#endif /* FATFS_DISKIO_MTD_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup      pkg_wakaama
  * @ingroup      config
@@ -22,9 +24,6 @@
  * @author      Christian Manal <manal@uni-bremen.de>
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef LWM2M_CLIENT_CONFIG_H
-#define LWM2M_CLIENT_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,5 +108,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* LWM2M_CLIENT_CONFIG_H */
 /** @} */

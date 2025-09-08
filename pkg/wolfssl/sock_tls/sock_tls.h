@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /* @defgroup    module sock_tls
  * @ingroup     pkg_wolfssl
  * @brief       Sock submodule for TLS/DTLS sessions
@@ -227,8 +229,6 @@
 #include <net/sock.h>
 #include <wolfssl/ssl.h>
 
-#ifndef SOCK_TLS_H
-#define SOCK_TLS_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -337,5 +337,3 @@ void sock_dtls_close(sock_tls_t *sk);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SOCK_TLS_H */

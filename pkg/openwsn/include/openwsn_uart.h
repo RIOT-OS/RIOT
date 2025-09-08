@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -22,9 +24,6 @@
  *
  * @}
  */
-
-#ifndef OPENWSN_UART_H
-#define OPENWSN_UART_H
 
 #include "stdint.h"
 #include "board.h"
@@ -138,5 +137,3 @@ void    uart_clearTxInterrupts(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OPENWSN_UART_H */

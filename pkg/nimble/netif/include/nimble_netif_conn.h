@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_nimble_netif_conn Connection State Management for netif
  * @ingroup     pkg_nimble_netif
@@ -18,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_NETIF_CONN_H
-#define NIMBLE_NETIF_CONN_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -287,5 +286,4 @@ static inline int nimble_netif_conn_is_adv(void)
 }
 #endif
 
-#endif /* NIMBLE_NETIF_CONN_H */
 /** @} */

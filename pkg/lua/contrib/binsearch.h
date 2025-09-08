@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @internal
  * @file
@@ -40,9 +42,6 @@
  * Where stride=12 bytes and offset = 4 bytes.
  * @{
  */
-
-#ifndef BINSEARCH_H
-#define BINSEARCH_H
 
 #include <stdint.h>
 #include <errno.h>
@@ -133,6 +132,5 @@ const void *binsearch_str_p(const void *start, size_t offset, size_t stride,
 }
 #endif
 
-#endif /* BINSEARCH_H */
 /** @internal
  * @} */

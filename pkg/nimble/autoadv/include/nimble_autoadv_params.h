@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_nimble_autoadv
  *
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef NIMBLE_AUTOADV_PARAMS_H
-#define NIMBLE_AUTOADV_PARAMS_H
 
 #include "nimble_autoadv.h"
 #include "nimble_riot.h"
@@ -80,5 +79,4 @@ static const nimble_autoadv_cfg_t nimble_autoadv_cfg =
 }
 #endif
 
-#endif /* NIMBLE_AUTOADV_PARAMS_H */
 /** @} */

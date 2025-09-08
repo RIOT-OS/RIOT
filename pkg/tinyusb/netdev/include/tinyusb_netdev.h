@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_tinyusb_netdev TinyUSB netdev driver
  * @ingroup     pkg_tinyusb
@@ -56,9 +58,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef TINYUSB_NETDEV_H
-#define TINYUSB_NETDEV_H
-
 #include "net/ethernet.h"
 #include "net/netdev.h"
 #include "mutex.h"
@@ -88,5 +87,4 @@ typedef struct {
 }
 #endif
 
-#endif /* TINYUSB_NETDEV_H */
 /** @} */
