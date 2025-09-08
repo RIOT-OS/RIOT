@@ -76,8 +76,6 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
 int _build_ll_ipv6_from_addr(gnrc_netif_t *netif, const uint8_t *l2addr, uint8_t l2addr_len,
                              ipv6_addr_t *ipv6addr)
 {
-    *ipv6addr = ipv6_addr_unspecified;
-
     /* Reverse of _resolve_addr_from_ipv6. */
 
     if (netif == NULL) {
@@ -89,15 +87,15 @@ int _build_ll_ipv6_from_addr(gnrc_netif_t *netif, const uint8_t *l2addr, uint8_t
         return -ENOTSUP;
     }
 
+    /* Set IPv6 link-local prefix. */
+    *ipv6addr = ipv6_addr_link_local_prefix;
+
     /* Build interface identifier based on l2 address. */
     int res = gnrc_netif_ipv6_iid_from_addr(netif, l2addr, l2addr_len,
                                             (eui64_t *)&ipv6addr->u64[1]);
     if (res < 0) {
         return res;
     }
-
-    /* Add IPv6 link-local prefix. */
-    ipv6_addr_set_link_local_prefix(ipv6addr);
 
     return sizeof(ipv6_addr_t);
 }

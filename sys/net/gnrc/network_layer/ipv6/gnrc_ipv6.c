@@ -263,10 +263,10 @@ static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
     }
 
     switch (type) {
-    case NETAPI_NOTIFY_L2_CONNECTED:
+    case NETAPI_NOTIFY_L2_NEIGH_CONNECTED:
         _on_l2_connected(data.if_pid, data.l2addr, data.l2addr_len);
         break;
-    case NETAPI_NOTIFY_L2_DISCONNECTED:
+    case NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED:
         _on_l2_disconnected(data.if_pid, data.l2addr, data.l2addr_len);
         break;
     default:
@@ -280,10 +280,10 @@ static void *_event_loop(void *args)
 
     /* Register entry for messages in IPv6 context. */
     gnrc_netreg_entry_t me_ipv6_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                            thread_getpid());
+                                                                 thread_getpid());
     /* Register entry for messages in L2 discovery context. */
     gnrc_netreg_entry_t me_discovery_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                            thread_getpid());
+                                                                      thread_getpid());
 
     (void)args;
     msg_init_queue(_msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
