@@ -27,8 +27,7 @@
 #include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
-#include "cond.h"
-#include "mutex.h"
+#include "sema_inv.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -152,34 +151,35 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
 int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t event,
                        void *data, size_t data_len)
 {
-    gnrc_netapi_notify_ack_t ack = {
-        .counter = 0,
-        .cond = COND_INIT,
-        .lock = MUTEX_INIT,
-    };
+    gnrc_netreg_acquire_shared();
+
+    int numof = gnrc_netreg_num(type, demux_ctx);
+    if (numof <= 0) {
+        gnrc_netreg_release_shared();
+        return numof;
+    }
+
     gnrc_netapi_notify_t notify = {
         .event = event,
         ._data = data,
         ._data_len = data_len,
-        .ack = &ack
     };
 
-    gnrc_netreg_acquire_shared();
+    /* Use inverse semaphore to count the acknowledgments from the receivers. */
+    sema_inv_init(&notify.ack, numof);
 
-    int numof = gnrc_netreg_num(type, demux_ctx);
+    /* Look up the registered threads for this message type. */
+    gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
 
-    if (numof != 0) {
-        /* Look up the registered threads for this message type. */
-        gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
-
-        /* Dispatch to all registered threads sequentially. */
-        while (sendto) {
-            int status = _dispatch_single(sendto, GNRC_NETAPI_MSG_TYPE_NOTIFY, &notify);
-            if (status < 0) {
-                numof--;
-            }
-            sendto = gnrc_netreg_getnext(sendto);
+    /* Dispatch to all registered threads. */
+    while (sendto) {
+        int status = _dispatch_single(sendto, GNRC_NETAPI_MSG_TYPE_NOTIFY, &notify);
+        if (status < 0) {
+            numof--;
+            /* Decrease semaphore counter manually when sending failed. */
+            sema_inv_post(&notify.ack);
         }
+        sendto = gnrc_netreg_getnext(sendto);
     }
 
     gnrc_netreg_release_shared();
@@ -187,11 +187,7 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t 
     if (data != NULL) {
         /* Wait for ACK from all receivers to ensure that the data was read and
            that there won't be any dangling pointers after the function returned. */
-        mutex_lock(&ack.lock);
-        while (ack.counter < numof) {
-            cond_wait(&ack.cond, &ack.lock);
-        }
-        mutex_unlock(&ack.lock);
+        sema_inv_try_wait(&notify.ack);
     }
 
     return numof;

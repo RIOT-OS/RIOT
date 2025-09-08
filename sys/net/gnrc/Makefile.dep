@@ -461,6 +461,10 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter gnrc_netapi_notify,$(USEMODULE)))
+  USEMODULE += sema_inv
+endif
+
 ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
   ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static

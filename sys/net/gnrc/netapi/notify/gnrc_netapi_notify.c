@@ -48,7 +48,7 @@ uint8_t gnrc_netapi_notify_copy_l2_connection_data(gnrc_netapi_notify_t *notify,
     }
 
     /* Acknowledge the read data */
-    gnrc_netapi_notify_ack(notify->ack);
+    gnrc_netapi_notify_ack(&notify->ack);
 
     return data_len;
 }
@@ -73,7 +73,7 @@ int gnrc_netapi_notify_copy_l3_address(gnrc_netapi_notify_t *notify, ipv6_addr_t
     }
 
     /* Acknowledge the read data */
-    gnrc_netapi_notify_ack(notify->ack);
+    gnrc_netapi_notify_ack(&notify->ack);
 
     return data_len;
 }

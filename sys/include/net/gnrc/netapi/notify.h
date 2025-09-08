@@ -35,8 +35,7 @@ extern "C" {
 #endif
 
 #include "net/ipv6/addr.h"
-#include "cond.h"
-#include "mutex.h"
+#include "sema_inv.h"
 
 /**
  * @brief   Definition of notification event types in the network stack.
@@ -53,22 +52,13 @@ typedef enum {
 } netapi_notify_t;
 
 /**
- * @brief   Data structure to acknowledge netapi notification events.
- */
-typedef struct {
-    int counter;        /**< ACK counter */
-    cond_t cond;        /**< condition variable to signal change in count */
-    mutex_t lock;       /**< lock for counter */
-} gnrc_netapi_notify_ack_t;
-
-/**
  * @brief   Data structure to be sent for netapi notification events.
  */
 typedef struct {
     netapi_notify_t event;          /**< the type of event */
     void *_data;                    /**< associated event data. */
     uint16_t _data_len;             /**< size of the event data */
-    gnrc_netapi_notify_ack_t *ack;  /**< acknowledge event */
+    sema_inv_t ack;                 /**< inverse semaphore for collecting ack's */
 } gnrc_netapi_notify_t;
 
 /**
@@ -84,15 +74,11 @@ typedef struct {
 /**
  * @brief   Acknowledge that a notify event was received and its data read.
  *
- * @param[in] ack           Pointer to the event's acknowledgment structure.
+ * @param[in] ack           Pointer to semaphore that is used to collect ack's.
  */
-static inline void gnrc_netapi_notify_ack(gnrc_netapi_notify_ack_t *ack)
+static inline void gnrc_netapi_notify_ack(sema_inv_t *ack)
 {
-    mutex_lock(&ack->lock);
-    ack->counter++;
-    /* Signal that the counter changed. */
-    cond_signal(&ack->cond);
-    mutex_unlock(&ack->lock);
+    sema_inv_post(ack);
 }
 
 /**
