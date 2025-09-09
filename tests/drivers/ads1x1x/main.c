@@ -1,4 +1,6 @@
 /*
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-FileCopyrightText: 2018 Acutam Automation, LLC
  * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */

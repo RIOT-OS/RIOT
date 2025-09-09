@@ -1,4 +1,6 @@
 /*
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-FileCopyrightText: 2018 Acutam Automation, LLC
  * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
@@ -22,7 +24,9 @@
  * ADC and alert functionality are separated into two devices to
  * prevent wasteful representations on muxed devices.
  *
- * @author     Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
 #ifdef __cplusplus
