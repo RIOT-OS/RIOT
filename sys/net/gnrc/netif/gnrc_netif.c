@@ -1961,11 +1961,11 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         /* new API *and* send() was a success --> block netif and memorize
          * frame to free memory later */
         netif->tx_pkt = pkt;
-    }
 
-    gnrc_pkt_append(pkt, tx_sync);
-    if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
-        netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
+        gnrc_pkt_append(pkt, tx_sync);
+        if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
+            netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
+        }
     }
 #endif
 }
