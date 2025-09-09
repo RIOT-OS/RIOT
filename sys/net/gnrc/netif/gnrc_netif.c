@@ -1950,8 +1950,9 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     int res = netif->ops->send(netif, pkt);
 
     /* For legacy netdevs (no confirm_send) TX is blocking, thus it is always
-     * completed. For new netdevs (with confirm_send), TX is async. It is only
-     * done if TX failed right away (res < 0).
+     * completed. For new netdevs (with confirm_send), TX is usually async (res == 0).
+     * It is only done if TX failed right away (res < 0) or if the driver signaled
+     * that the transmission already completed (res > 0).
      */
     if (gnrc_netif_netdev_legacy_api(netif) || (res != 0)) {
         _tx_done(netif, pkt, tx_sync, res, push_back);
@@ -1961,11 +1962,11 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         /* new API *and* send() was a success --> block netif and memorize
          * frame to free memory later */
         netif->tx_pkt = pkt;
-    }
 
-    gnrc_pkt_append(pkt, tx_sync);
-    if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
-        netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
+        gnrc_pkt_append(pkt, tx_sync);
+        if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
+            netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
+        }
     }
 #endif
 }
