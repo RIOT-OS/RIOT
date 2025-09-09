@@ -184,7 +184,7 @@ int ads1x1x_set_alert_parameters(ads1x1x_alert_t *dev, const ads1x1x_alert_param
  *
  * @return Converted value in millivolts
  */
-int ads1x1x_convert_to_mv(ads1x1x_t *dev, int16_t value);
+int ads1x1x_convert_to_mv(const ads1x1x_t *dev, int16_t value);
 
 /**
  * Reset the ADS1X1X devices on the I2C bus

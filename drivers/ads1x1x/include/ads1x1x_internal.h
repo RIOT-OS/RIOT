@@ -167,7 +167,7 @@ extern "C" {
  *
  * @return Voltage reference in millivolts
  */
-static inline int _ads1x1x_get_pga_voltage(uint8_t pga)
+static inline uint16_t _ads1x1x_get_pga_voltage(uint8_t pga)
 {
     switch (pga) {
     case ADS1X1X_PGA_FSR_6V144: return 6144;

@@ -289,9 +289,10 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
     return ADS1X1X_OK;
 }
 
-int ads1x1x_convert_to_mv(ads1x1x_t *dev, int16_t raw)
+int ads1x1x_convert_to_mv(const ads1x1x_t *dev, int16_t raw)
 {
     assert(dev);
+    /* Normalize signed ADC code: range = [-2^(N-1), 2^(N-1)-1] */
     return ((int32_t)raw * _ads1x1x_get_pga_voltage(dev->params.pga))
            / (1 << (ADS1X1X_BITS_RES - 1));
 }
