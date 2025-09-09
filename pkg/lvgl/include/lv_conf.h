@@ -30,7 +30,7 @@ extern "C" {
  *====================*/
 
 /* Color depth:
- * - 1:  1 byte per pixel
+ * - 1:  1 bit per pixel
  * - 8:  RGB233
  * - 16: RGB565
  * - 32: ARGB8888
