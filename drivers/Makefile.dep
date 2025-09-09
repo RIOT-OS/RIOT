@@ -4,10 +4,6 @@ ifneq (,$(filter adc%1c,$(USEMODULE)))
   USEMODULE += adcxx1c
 endif
 
-ifneq (,$(filter ads101%,$(USEMODULE)))
-  USEMODULE += ads101x
-endif
-
 ifneq (,$(filter apds99%,$(USEMODULE)))
   USEMODULE += apds99xx
 endif
