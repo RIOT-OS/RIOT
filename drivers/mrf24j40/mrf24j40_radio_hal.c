@@ -343,6 +343,7 @@ int _set_frame_retrans(ieee802154_dev_t *hal, uint8_t retrans)
 
 static const ieee802154_radio_ops_t mrf24j40_ops = {
     .caps =  IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_AUTO_ACK
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_FRAME_RETRANS
           | IEEE802154_CAP_FRAME_RETRANS_INFO
