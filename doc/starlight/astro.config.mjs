@@ -96,7 +96,7 @@ export default defineConfig({
         },
         {
           label: "Miscellaneous",
-          items: ["misc/how_to_doc"],
+          items: ["misc/release_cycle", "misc/how_to_doc"],
         },
       ],
       customCss: ["./src/styles/custom.css", "./src/fonts/font-face.css"],
