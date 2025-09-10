@@ -49,26 +49,214 @@
 #define CONFIG_SX126X_RAMP_TIME_DEFAULT         (SX126X_RAMP_10_US)
 #endif
 
-const sx126x_pa_cfg_params_t sx1268_pa_cfg = {
-    .pa_duty_cycle = 0x04,
-    .hp_max = 0x06,
-    .device_sel = 0x00,
-    .pa_lut = 0x01
+#if IS_USED(MODULE_SX1268)
+/* sx1268 */
+const sx126x_pa_cfg_params_t sx1268_pa_cfg[] = {
+    /* 10 dBm */
+    {
+        .pa_duty_cycle = 0x00,
+        .hp_max = 0x03,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 14 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x06,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 17 dBm */
+    {
+        .pa_duty_cycle = 0x02,
+        .hp_max = 0x03,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 20 dBm */
+    {
+        .pa_duty_cycle = 0x03,
+        .hp_max = 0x05,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 22 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x07,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
 };
+#endif
 
-const sx126x_pa_cfg_params_t lpa_cfg = {
-    .pa_duty_cycle = 0x04,
-    .hp_max = 0x00,
-    .device_sel = 0x01,
-    .pa_lut = 0x01
+#if IS_USED(MODULE_SX1261) || IS_USED(MODULE_SX126X_STM32WL)
+/* sx1261 */
+const sx126x_pa_cfg_params_t lpa_cfg[] = {
+    /* 10 dBm */
+    {
+        .pa_duty_cycle = 0x01,
+        .hp_max = 0x00,
+        .device_sel = 0x01,
+        .pa_lut = 0x01
+    },
+    /* 14 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x00,
+        .device_sel = 0x01,
+        .pa_lut = 0x01
+    },
+    /* 15 dBm */
+    {
+        .pa_duty_cycle = 0x06,
+        .hp_max = 0x00,
+        .device_sel = 0x01,
+        .pa_lut = 0x01
+    },
 };
+#endif
 
-const sx126x_pa_cfg_params_t hpa_cfg = {
-    .pa_duty_cycle = 0x02,
-    .hp_max = 0x02,
-    .device_sel = 0x00,
-    .pa_lut = 0x01
+#if IS_USED(MODULE_SX1262) || IS_USED(MODULE_LLCC68) || IS_USED(MODULE_SX126X_STM32WL)
+/* sx1262, llcc68 */
+const sx126x_pa_cfg_params_t hpa_cfg[] = {
+    /* 14 dBm */
+    {
+        .pa_duty_cycle = 0x02,
+        .hp_max = 0x02,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 17 dBm */
+    {
+        .pa_duty_cycle = 0x02,
+        .hp_max = 0x03,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 20 dBm */
+    {
+        .pa_duty_cycle = 0x03,
+        .hp_max = 0x05,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    },
+    /* 22 dBm */
+    {
+        .pa_duty_cycle = 0x04,
+        .hp_max = 0x07,
+        .device_sel = 0x00,
+        .pa_lut = 0x01
+    }
 };
+#endif
+
+/* Configure PA optimal settings for maximum output power.
+ * These values are defined by Semtech in the respective IC datasheet,
+ * section 13.1.14 SetPaConfig.
+ * and are optimal for respectively desired TX output power. */
+
+static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
+                             const sx126x_pa_cfg_params_t **pa_cfg)
+{
+#if IS_USED(MODULE_SX126X_STM32WL)
+    if (sx126x_is_stm32wl(dev)) {
+        if (tx_power_dbm <= 10) {
+            *pa_cfg = &lpa_cfg[0];
+            return 10;
+        }
+        else if (tx_power_dbm <= 14) {
+#if IS_USED(MODULE_SX126X_RF_SWITCH)
+            /* Only lora-e5 and nucleo-wl55jc are using this module
+            I think the parameter was introduced because 14dbm can be
+            achieved with both LPA and HPA settings. */
+            if (dev->params->tx_pa_mode == SX126X_RF_MODE_TX_LPA) {
+                *pa_cfg = &lpa_cfg[1];
+            }
+            else {
+                *pa_cfg = &hpa_cfg[0];
+            }
+#else
+            *pa_cfg = &hpa_cfg[0];
+            return 14;
+#endif
+        }
+        else if (tx_power_dbm <= 17) {
+            *pa_cfg = &hpa_cfg[1];
+            return 17;
+        }
+        else if (tx_power_dbm <= 20) {
+            *pa_cfg = &hpa_cfg[2];
+            return 20;
+        }
+        else {
+            *pa_cfg = &hpa_cfg[3];
+            return 22;
+        }
+    }
+#endif
+#if IS_USED(MODULE_SX1261)
+    if (sx126x_is_sx1261(dev)) {
+        if (tx_power_dbm <= 10) {
+            *pa_cfg = &lpa_cfg[0];
+            return 10;
+        }
+        else if (tx_power_dbm <= 14) {
+            *pa_cfg = &lpa_cfg[1];
+            return 14;
+        }
+        else {
+            *pa_cfg = &lpa_cfg[2];
+            return 15;
+        }
+    }
+#endif
+#if IS_USED(MODULE_SX1262) || IS_USED(MODULE_LLCC68)
+    if (sx126x_is_sx1262(dev) || sx126x_is_llcc68(dev)) {
+        if (tx_power_dbm <= 14) {
+            *pa_cfg = &hpa_cfg[0];
+            return 14;
+        }
+        else if (tx_power_dbm <= 17) {
+            *pa_cfg = &hpa_cfg[1];
+            return 17;
+        }
+        else if (tx_power_dbm <= 20) {
+            *pa_cfg = &hpa_cfg[2];
+            return 20;
+        }
+        else {
+            *pa_cfg = &hpa_cfg[3];
+            return 22;
+        }
+    }
+#endif
+#if IS_USED(MODULE_SX1268)
+    if (sx126x_is_sx1268(dev)) {
+        if (tx_power_dbm <= 10) {
+            *pa_cfg = &sx1268_pa_cfg[0];
+            return 10;
+        }
+        else if (tx_power_dbm <= 14) {
+            *pa_cfg = &sx1268_pa_cfg[1];
+            return 14;
+        }
+        else if (tx_power_dbm <= 17) {
+            *pa_cfg = &sx1268_pa_cfg[2];
+            return 17;
+        }
+        else if (tx_power_dbm <= 20) {
+            *pa_cfg = &sx1268_pa_cfg[3];
+            return 20;
+        }
+        else {
+            *pa_cfg = &sx1268_pa_cfg[4];
+            return 22;
+        }
+    }
+#endif
+    return -1; /* should not be return if any available driver is used */
+}
 
 void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
 {
@@ -102,28 +290,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
     /* packet type must be set first */
     sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
     sx126x_set_channel(dev, CONFIG_SX126X_CHANNEL_DEFAULT);
-
-    /* Configure PA optimal settings for maximum output power
-     * Values used here comes from the datasheet, section 13.1.14 SetPaConfig
-     * and are optimal for a TX output power of 14dBm.
-     */
-    if (sx126x_is_llcc68(dev) || sx126x_is_sx1262(dev)) {
-        sx126x_set_pa_cfg(dev, &hpa_cfg);
-    }
-    else if (sx126x_is_sx1268(dev)) {
-        sx126x_set_pa_cfg(dev, &sx1268_pa_cfg);
-    }
-    else if (sx126x_is_sx1261(dev)) {
-        sx126x_set_pa_cfg(dev, &lpa_cfg);
-    }
-#if IS_USED(MODULE_SX126X_RF_SWITCH)
-    if (dev->params->tx_pa_mode == SX126X_RF_MODE_TX_LPA){
-        sx126x_set_pa_cfg(dev, &lpa_cfg);
-    } else {
-        sx126x_set_pa_cfg(dev, &hpa_cfg);
-    }
-#endif
-    sx126x_set_tx_params(dev, CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
+    sx126x_set_tx_power(dev,  CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
 
     dev->mod_params.bw = (sx126x_lora_bw_t)(CONFIG_LORA_BW_DEFAULT + SX126X_LORA_BW_125);
     dev->mod_params.sf = (sx126x_lora_sf_t)CONFIG_LORA_SF_DEFAULT;
@@ -312,6 +479,17 @@ void sx126x_set_coding_rate(sx126x_t *dev, uint8_t cr)
     DEBUG("[sx126x]: sx126x_set_coding_rate %01x\n", cr);
     dev->mod_params.cr = (sx126x_lora_cr_t)cr;
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
+}
+
+void sx126x_set_tx_power(sx126x_t *dev, int8_t power_dbm, sx126x_ramp_time_t ramp_time)
+{
+    DEBUG("[sx126x]: sx126x_set_tx_power %ddBm\n", power_dbm);
+    const sx126x_pa_cfg_params_t *pa_cfg;
+    int8_t pow = _select_pa_cfg(dev, power_dbm, &pa_cfg);
+    if (pow > 0) {
+        sx126x_set_pa_cfg(dev, pa_cfg);
+        sx126x_set_tx_params(dev, pow, ramp_time);
+    }
 }
 
 uint8_t sx126x_get_lora_payload_length(const sx126x_t *dev)
