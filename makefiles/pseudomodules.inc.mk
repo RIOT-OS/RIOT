@@ -70,6 +70,7 @@ PSEUDOMODULES += dhcpv6_client_ia_na
 PSEUDOMODULES += dhcpv6_client_mud_url
 PSEUDOMODULES += dhcpv6_relay
 PSEUDOMODULES += dns_cache
+PSEUDOMODULES += dns_cbor
 PSEUDOMODULES += dns_msg
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += ethos_stdio

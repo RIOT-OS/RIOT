@@ -11,16 +11,17 @@
 /**
  * @defgroup    net_dns DNS defines
  * @ingroup     net
- * @brief       Generic DNS values
+ * @brief       Generic DNS functions and values
  * @{
  *
  * @file
- * @brief   Generic DNS values
+ * @brief   Generic DNS functions
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include "modules.h"
+#include "net/dns/types.h"
 #include "net/sock/dns.h"
 #include "net/sock/dodtls.h"
 #include "net/gcoap/dns.h"
@@ -28,25 +29,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name DNS defines
- * @{
- */
-#define DNS_TYPE_A              (1)
-#define DNS_TYPE_AAAA           (28)
-#define DNS_CLASS_IN            (1)
-/** @} */
-
-/**
- * @name    Field lengths
- * @{
- */
-#define RR_TYPE_LENGTH      (2U)
-#define RR_CLASS_LENGTH     (2U)
-#define RR_TTL_LENGTH       (4U)
-#define RR_RDLENGTH_LENGTH  (2U)
-/** @} */
 
 /**
  * @brief Get IP address for DNS name
