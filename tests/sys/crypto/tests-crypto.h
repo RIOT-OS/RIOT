@@ -62,6 +62,7 @@ Test* tests_crypto_modes_ccm_tests(void);
 Test* tests_crypto_modes_ocb_tests(void);
 Test* tests_crypto_modes_ecb_tests(void);
 Test* tests_crypto_modes_cbc_tests(void);
+Test* tests_crypto_modes_cbc_pkcs7_tests(void);
 Test* tests_crypto_modes_ctr_tests(void);
 
 #ifdef __cplusplus
