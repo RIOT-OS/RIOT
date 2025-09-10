@@ -493,7 +493,6 @@ void isr_radio(void)
         case STATE_RX:
             if (NRF_RADIO->CRCSTATUS) {
                 bool l2filter_passed = _l2filter(rxbuf+1);
-                bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
                 bool is_ack = rxbuf[1] & IEEE802154_FCF_TYPE_ACK;
                 bool ack_req = rxbuf[1] & IEEE802154_FCF_ACK_REQ;
 
