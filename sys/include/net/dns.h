@@ -21,10 +21,19 @@
  */
 
 #include "modules.h"
-#include "net/hosts.h"
-#include "net/sock/dns.h"
-#include "net/sock/dodtls.h"
-#include "net/gcoap/dns.h"
+#include "net/af.h"
+#if IS_USED(MODULE_HOSTS)
+#  include "net/hosts.h"
+#endif
+#if IS_USED(MODULE_SOCK_DNS) || IS_USED(MODULE_SOCK_DNS_MOCK)
+#  include "net/sock/dns.h"
+#endif
+#if IS_USED(MODULE_SOCK_DODTLS)
+#  include "net/sock/dodtls.h"
+#endif
+#if IS_USED(MODULE_GCOAP_DNS)
+#  include "net/gcoap/dns.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +82,9 @@ extern "C" {
  */
 static inline int dns_query(const char *domain_name, void *addr_out, int family)
 {
+    (void)domain_name;
+    (void)addr_out;
+
     int res = -ENOTSUP;
 
     if (family == AF_UNSPEC) {
@@ -84,18 +96,26 @@ static inline int dns_query(const char *domain_name, void *addr_out, int family)
         }
     }
 
-    if (res <= 0 && IS_USED(MODULE_HOSTS)) {
+#if IS_USED(MODULE_HOSTS)
+    if (res <= 0) {
         res = hosts_query(domain_name, addr_out, family);
     }
-    if (res <= 0 && IS_USED(MODULE_GCOAP_DNS)) {
+#endif
+#if IS_USED(MODULE_GCOAP_DNS)
+    if (res <= 0) {
         res = gcoap_dns_query(domain_name, addr_out, family);
     }
-    if (res <= 0 && IS_USED(MODULE_SOCK_DODTLS)) {
+#endif
+#if IS_USED(MODULE_SOCK_DODTLS)
+    if (res <= 0) {
         res = sock_dodtls_query(domain_name, addr_out, family);
     }
-    if (res <= 0 && (IS_USED(MODULE_SOCK_DNS) || IS_USED(MODULE_SOCK_DNS_MOCK))) {
+#endif
+#if IS_USED(MODULE_SOCK_DNS) || IS_USED(MODULE_SOCK_DNS_MOCK)
+    if (res <= 0) {
         res = sock_dns_query(domain_name, addr_out, family);
     }
+#endif
 
     return res;
 }
