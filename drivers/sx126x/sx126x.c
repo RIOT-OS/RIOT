@@ -359,6 +359,13 @@ int sx126x_init(sx126x_t *dev)
         return -ENODEV;
     }
 
+    if (sx126x_is_sx1262(dev)) {
+        /*  Workaround for SX1262, during the chip initialization.
+            Calling this function optimizes the PA clamping threshold.
+            The call must be done after a Power On Reset or a wake-up from cold start */
+        sx126x_cfg_tx_clamp(dev);
+    }
+
     /* Configure the power regulator mode */
     sx126x_set_reg_mode(dev, dev->params->regulator);
 
