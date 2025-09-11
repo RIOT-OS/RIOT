@@ -45,9 +45,14 @@
 
 #include <stdint.h>
 
+#include "kernel_defines.h"
 #include "ztimer.h"
 #include "net/ble.h"
 #include "net/netdev/ble.h"
+
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB)
+#  include "event.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,15 +73,40 @@ typedef struct {
 } skald_uuid_t;
 
 /**
+ * @brief   Forward declaration
+ */
+typedef struct skald_ctx skald_ctx_t;
+
+/**
  * @brief   Advertising context holding the advertising data and state
  */
-typedef struct {
-    netdev_ble_pkt_t pkt;   /**< packet holding the advertisement (GAP) data */
-    ztimer_t timer;         /**< timer for scheduling advertising events */
-    ztimer_now_t last;      /**< last timer trigger (for offset compensation) */
-    uint8_t cur_chan;       /**< keep track of advertising channels */
-    uint32_t adv_itvl_ms;   /**< advertising interval [ms] */
-} skald_ctx_t;
+struct skald_ctx {
+    netdev_ble_pkt_t pkt;               /**< packet holding the advertisement (GAP) data */
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB) || defined(DOXYGEN)
+    /**
+     * @brief callback to update packet on periodic advertisements
+     *
+     * Requires module `skald_pkt_update_cb`.
+     */
+    void (*update_pkt)(skald_ctx_t *);
+    /**
+     * @brief   Event queue to send periodic advertisements from
+     *
+     * Only available and needed with module `skald_pkt_update_cb`.
+     */
+    event_queue_t queue;
+    /**
+     * @brief   The event to trigger to send periodic advertisements
+     *
+     * Only available and needed with module `skald_pkt_update_cb`.
+     */
+    event_t event;
+#endif
+    ztimer_t timer;                     /**< timer for scheduling advertising events */
+    ztimer_now_t last;                  /**< last timer trigger (for offset compensation) */
+    uint8_t cur_chan;                   /**< keep track of advertising channels */
+    uint32_t adv_itvl_ms;               /**< advertising interval [ms] */
+};
 
 /**
  * @brief   Initialize Skald and the underlying radio
