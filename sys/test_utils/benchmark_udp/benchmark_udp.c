@@ -27,6 +27,10 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifndef RECORD_CACHE_SIZE
+#  define RECORD_CACHE_SIZE (4)
+#endif
+
 static sock_udp_t sock;
 static uint32_t delay_us = US_PER_SEC;
 static uint16_t payload_size = 32;
@@ -43,34 +47,26 @@ static sema_inv_t thread_sync;
 struct {
     uint32_t seq_no;
     uint32_t time_tx_us;
-} record_tx[4];
+} record_tx[RECORD_CACHE_SIZE];
 
 static uint32_t _get_rtt(uint32_t seq_num, uint32_t prev)
 {
-    for (unsigned i = 0; i < ARRAY_SIZE(record_tx); ++i) {
-        if (record_tx[i].seq_no == seq_num) {
-            return xtimer_now_usec() - record_tx[i].time_tx_us;
-        }
+    uint32_t idx = seq_num % RECORD_CACHE_SIZE;
+
+    if (record_tx[idx].seq_no == seq_num) {
+        return xtimer_now_usec() - record_tx[idx].time_tx_us;
     }
 
     return prev;
 }
 
-static void _put_rtt(uint32_t seq_num) {
-    uint8_t oldest = 0;
-    uint32_t oldest_diff = 0;
+static void _put_rtt(uint32_t seq_num)
+{
     uint32_t now = xtimer_now_usec();
+    uint32_t idx = seq_num % RECORD_CACHE_SIZE;
 
-    for (unsigned i = 0; i < ARRAY_SIZE(record_tx); ++i) {
-        uint32_t diff = now - record_tx[i].time_tx_us;
-        if (diff > oldest_diff) {
-            oldest_diff = diff;
-            oldest = i;
-        }
-    }
-
-    record_tx[oldest].seq_no = seq_num;
-    record_tx[oldest].time_tx_us = now;
+    record_tx[idx].seq_no = seq_num;
+    record_tx[idx].time_tx_us = now;
 }
 
 static void *_listen_thread(void *ctx)
