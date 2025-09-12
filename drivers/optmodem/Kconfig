@@ -1,0 +1,5 @@
+menu "Optical modem driver"
+config MODULE_OPTMODEM
+    bool "optmodem (optical modem) driver"
+    select MODULE_PERIPH_UART
+endmenu
