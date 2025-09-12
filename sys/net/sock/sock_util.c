@@ -438,3 +438,29 @@ int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
     return res;
 }
 #endif
+
+#if defined(MODULE_SOCK_UDP)
+ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
+                         uint32_t timeout, sock_udp_ep_t *remote,
+                         sock_udp_aux_rx_t *aux)
+{
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote,
+                                        aux)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            res = max_len;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+        max_len -= res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+#endif
