@@ -174,7 +174,11 @@ ifneq (,$(filter uf2conv,$(PROGRAMMER)))
 	sleep $(PREFLASH_DELAY)
   flash: riotboot/flash-slot0-remount
 else
-  FLASHFILE = $(RIOTBOOT_EXTENDED_BIN)
+  ifeq (1, $(FAST_FLASH))
+    FLASHFILE = $(RIOTBOOT_COMBINED_BIN)
+  else
+    FLASHFILE = $(RIOTBOOT_EXTENDED_BIN)
+  endif
 endif
 
 else
