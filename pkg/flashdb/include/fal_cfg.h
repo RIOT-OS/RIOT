@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_flashdb
  * @{
@@ -21,9 +23,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef FAL_CFG_H
-#define FAL_CFG_H
 
 #include "board.h"
 #include "macros/units.h"
@@ -195,5 +194,4 @@ extern struct fal_flash_dev mtd_flash0;
 #ifdef __cplusplus
 }
 #endif
-#endif /* FAL_CFG_H */
 /** @} */

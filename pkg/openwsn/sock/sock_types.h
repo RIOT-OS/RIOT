@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup pkg_openwsn_sock OpenWSN-specific implementation of the sock API
  * @ingroup  pkg_openwsn
@@ -19,9 +21,6 @@
  * @author  Timothy Claeys <timothy.claeys@inria.fr>
  * @author  Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef SOCK_TYPES_H
-#define SOCK_TYPES_H
 
 #include "mbox.h"
 #include "net/af.h"
@@ -94,5 +93,4 @@ struct sock_udp {
 }
 #endif
 
-#endif /* SOCK_TYPES_H */
 /** @} */

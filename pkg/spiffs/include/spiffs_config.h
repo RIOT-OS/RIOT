@@ -21,15 +21,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#pragma once
+
 /*
  * spiffs_config.h
  *
  *  Created on: Jul 3, 2013
  *      Author: petera
  */
-
-#ifndef SPIFFS_CONFIG_H
-#define SPIFFS_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -349,5 +348,3 @@ typedef int16_t s16_t;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SPIFFS_CONFIG_H */

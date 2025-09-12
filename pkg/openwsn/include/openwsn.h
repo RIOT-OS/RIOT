@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  *
@@ -17,8 +19,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-#ifndef OPENWSN_H
-#define OPENWSN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +61,4 @@ kernel_pid_t openwsn_get_pid(void);
 }
 #endif
 
-#endif /* OPENWSN_H */
 /** @} */

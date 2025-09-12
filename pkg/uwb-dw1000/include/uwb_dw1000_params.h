@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_dw1000
  *
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef UWB_DW1000_PARAMS_H
-#define UWB_DW1000_PARAMS_H
 
 #include "board.h"
 #include "uwb_dw1000.h"
@@ -92,5 +91,4 @@ static const dw1000_params_t dw1000_params[] =
 }
 #endif
 
-#endif /* UWB_DW1000_PARAMS_H */
 /** @} */

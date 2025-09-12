@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_cryptoauthlib
  * @{
@@ -16,9 +18,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef ATCA_PARAMS_H
-#define ATCA_PARAMS_H
 
 #include "board.h"
 #include "periph/i2c.h"
@@ -124,5 +123,4 @@ extern ATCADevice atca_devs_ptr[ATCA_NUMOF];
 }
 #endif
 
-#endif /* ATCA_PARAMS_H */
 /** @} */
