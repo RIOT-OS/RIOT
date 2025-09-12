@@ -1,8 +1,5 @@
-Code of Conduct Information    {#coc-info}
+Code of Conduct Information (Deprecated)    {#coc-info}
 ===========================
 
-The following documents are describing all matters around our code of conduct:
-
-- The \subpage coc itself,
-- The \subpage coc-reporting-guide, and
-- The \subpage coc-faq
+@deprecated Guides have moved to the [Guide Site](https://guide.riot-os.org/general/code_of_conduct/).
+This page will be removed after release 2026.04.

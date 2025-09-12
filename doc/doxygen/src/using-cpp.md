@@ -1,4 +1,4 @@
-Using C++ in RIOT    {#using-cpp}
+Using C++ in RIOT (Deprecated)    {#using-cpp}
 ==================
 
 @deprecated Guides have moved to the [Guide Site](https://guide.riot-os.org/c_tutorials/using_cpp/).

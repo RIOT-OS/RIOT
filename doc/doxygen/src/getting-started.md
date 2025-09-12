@@ -25,7 +25,8 @@ subset of modules).
 
 For instructions on how to configure via `CFLAGS` check the
 @ref config "identified compile-time configurations". To learn how to use
-Kconfig in RIOT, please refer to the @ref kconfig-users-guide.
+Kconfig in RIOT, please refer to the
+[User's guide to configure with Kconfig](https://guide.riot-os.org/build-system/kconfig/#configure-using-menuconfig).
 
 Default configurations                                 {#default-configurations}
 ----------------------

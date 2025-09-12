@@ -13,8 +13,9 @@
  *
  * How To Use
  * ----------
- * First you need to @ref including-modules "include" a module that implements
- * this API in your application's Makefile.
+ * First you need to
+ * [include](https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules)
+ * a module that implements this API in your application's Makefile.
  *
  * The `sock_tls` module requires the `wolfssl` package.
  *
@@ -108,7 +109,8 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Above you see a simple DTLS echo server. It is important to at least include
- * @ref including-modules "include" the IPv6 module of your networking
+ * [include](https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules)
+ * the IPv6 module of your networking
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  * A separate file should define the buffers used as certificate and private key,

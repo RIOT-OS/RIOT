@@ -1,4 +1,4 @@
-Release cycle                                                   {#release-cycle}
+Release cycle (Deprecated)                                     {#release-cycle}
 =============
 
 @deprecated Guides have moved to the [Guide Site](https://guide.riot-os.org/misc/release_cycle/).

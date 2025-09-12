@@ -1,4 +1,4 @@
-Using Rust in RIOT    {#using-rust}
+Using Rust in RIOT (Deprecated)    {#using-rust}
 ==================
 
 @deprecated Guides have moved to the [Guide Site](https://guide.riot-os.org/).
