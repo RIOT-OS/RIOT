@@ -22,7 +22,6 @@
 #include <errno.h>
 
 #include "cpu.h"
-#include "luid.h"
 #include "nrf_clock.h"
 
 #include "net/ieee802154.h"
@@ -207,7 +206,7 @@ static void _disable_blocking(void)
 
 static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
-    (void) dev;
+    (void)dev;
 
     int res = -EBUSY;
     int state = STATE_IDLE;
@@ -264,7 +263,7 @@ end:
 
 static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
-    (void) dev;
+    (void)dev;
     bool eagain;
     ieee802154_tx_info_t *info = ctx;
     int state = _state;
@@ -315,19 +314,10 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     return 0;
 }
 
-/**
- * @brief   Convert from the internal representation to dBm, when the
- *          radio operates as a IEEE802.15.4 transceiver.
- */
-static inline int8_t _hwval_to_ieee802154_dbm(uint8_t hwval)
-{
-    return (ED_RSSISCALE * hwval) + ED_RSSIOFFS;
-}
-
 static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
                           ieee802154_rx_info_t *info)
 {
-    (void) dev;
+    (void)dev;
     size_t pktlen = (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
     int res = -ENOBUFS;
 
@@ -335,26 +325,25 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
         DEBUG("[nrf802154] recv: buffer is to small\n");
         return res;
     }
-    else {
-        DEBUG("[nrf802154] recv: reading packet of length %i\n", pktlen);
-        if (info != NULL) {
-            ieee802154_rx_info_t *radio_info = info;
-            /* Hardware link quality indicator */
-            uint8_t hwlqi = rxbuf[pktlen + 1];
-            /* Convert to 802.15.4 LQI (page 319 of product spec v1.1) */
-            radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
-                                       ? UINT8_MAX
-                                       : hwlqi * ED_RSSISCALE);
-            /* Converting the hardware-provided LQI value back to the
-               original RSSI value is not properly documented in the PS.
-               The linear mapping used here has been found empirically
-               through comparison with the RSSI value provided by NRF_RADIO->RSSISAMPLE
-               after enabling the ADDRESS_RSSISTART short. */
-            int8_t rssi_dbm = hwlqi + ED_RSSIOFFS - 1;
-            radio_info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
-        }
-        memcpy(buf, &rxbuf[1], pktlen);
+
+    DEBUG("[nrf802154] recv: reading packet of length %i\n", pktlen);
+    if (info != NULL) {
+        ieee802154_rx_info_t *radio_info = info;
+        /* Hardware link quality indicator */
+        uint8_t hwlqi = rxbuf[pktlen + 1];
+        /* Convert to 802.15.4 LQI (page 319 of product spec v1.1) */
+        radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
+                                   ? UINT8_MAX
+                                   : hwlqi * ED_RSSISCALE);
+        /* Converting the hardware-provided LQI value back to the
+           original RSSI value is not properly documented in the PS.
+           The linear mapping used here has been found empirically
+           through comparison with the RSSI value provided by NRF_RADIO->RSSISAMPLE
+           after enabling the ADDRESS_RSSISTART short. */
+        int16_t rssi_dbm = hwlqi + ED_RSSIOFFS - 1;
+        radio_info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
     }
+    memcpy(buf, &rxbuf[1], pktlen);
 
     return pktlen;
 }
@@ -370,7 +359,7 @@ static inline uint8_t _dbm_to_ieee802154_hwval(int8_t dbm)
 
 static int set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
 {
-    (void) dev;
+    (void)dev;
 
     if (threshold < ED_RSSIOFFS) {
         return -EINVAL;
@@ -532,7 +521,7 @@ void isr_radio(void)
                 bool is_ack = rxbuf[1] & IEEE802154_FCF_TYPE_ACK;
                 bool ack_req = rxbuf[1] & IEEE802154_FCF_ACK_REQ;
 
-                /* If radio is in promiscuos mode, indicate packet and
+                /* If radio is in promiscuous mode, indicate packet and
                  * don't event think of sending an ACK frame :) */
                 if (cfg.promisc) {
                     DEBUG("[nrf802154] Promiscuous mode is enabled.\n");
@@ -594,13 +583,13 @@ void isr_radio(void)
 
 static int _confirm_on(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     return 0;
 }
 
 static int _request_on(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     _state = STATE_IDLE;
     DEBUG("[nrf802154]: Request to turn on\n");
     _power_on();
@@ -641,7 +630,7 @@ static int _request_on(ieee802154_dev_t *dev)
 
 static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 {
-    (void) dev;
+    (void)dev;
     int8_t pow = conf->pow;
 
     if (pow < TX_POWER_MIN || pow > TX_POWER_MAX) {
@@ -666,7 +655,7 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 
 static int _off(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     DEBUG("[nrf802154] Turning off the radio\n");
     _power_off();
     return 0;
@@ -674,14 +663,14 @@ static int _off(ieee802154_dev_t *dev)
 
 int _len(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     DEBUG("[nrf802154] Length of frame is %i\n", (size_t)rxbuf[0] - IEEE802154_FCS_LEN);
     return (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
 }
 
 int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 {
-    (void) dev;
+    (void)dev;
 
     NRF_RADIO->CCACTRL &= RADIO_CCACTRL_CCAMODE_Msk;
     uint8_t tmp = 0;
@@ -712,9 +701,9 @@ int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 
 static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value)
 {
-    (void) dev;
+    (void)dev;
     const uint16_t *pan_id = value;
-    switch(cmd) {
+    switch (cmd) {
         case IEEE802154_AF_SHORT_ADDR:
             memcpy(nrf802154_short_addr, value, IEEE802154_SHORT_ADDRESS_LEN);
             break;
@@ -731,10 +720,11 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
     return 0;
 }
 
-static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd, const void *value)
+static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
+                                  const void *value)
 {
-    (void) dev;
-    switch(cmd) {
+    (void)dev;
+    switch (cmd) {
         case IEEE802154_SRC_MATCH_EN:
             cfg.pending = *((const bool*) value);
             break;
@@ -746,7 +736,7 @@ static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t 
 
 static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
 {
-    (void) dev;
+    (void)dev;
 
     bool ackf = true;
     bool _promisc = false;
@@ -773,8 +763,8 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
 static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                             int8_t retries)
 {
-    (void) dev;
-    (void) bd;
+    (void)dev;
+    (void)bd;
 
     if (retries > 0) {
         return -ENOTSUP;
@@ -787,7 +777,7 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 void nrf802154_setup(nrf802154_t *dev)
 {
-    (void) dev;
+    (void)dev;
     nrf802154_init();
 }
 
