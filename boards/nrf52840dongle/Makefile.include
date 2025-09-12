@@ -1,10 +1,26 @@
 # This board uses the vendor's serial bootloader
 
-PROGRAMMER ?= nrfutil
+PROGRAMMER ?= nrfdfu
 
 ifeq (nrfutil,$(PROGRAMMER))
+  USING_NRF_BOOTLOADER = 1
 
-  # Using nrfutil implies using the Nordic bootloader described at
+  FLASHFILE = $(HEXFILE)
+  FLASHDEPS += $(HEXFILE).zip
+  FLASHER = nrfutil
+  FFLAGS = dfu usb-serial --port=${PORT} --package=$(HEXFILE).zip
+endif
+
+ifeq (nrfdfu,$(PROGRAMMER))
+  USING_NRF_BOOTLOADER = 1
+
+  FLASHFILE = $(ELFFILE)
+  FLASHER = nrfdfu
+  FFLAGS = $(FLASHFILE)
+endif
+
+ifeq (1,$(USING_NRF_BOOTLOADER))
+  # Using an nrfutil style flasher implies using the Nordic bootloader described at
   # <https://devzone.nordicsemi.com/nordic/short-range-guides/b/getting-started/posts/nrf52840-dongle-programming-tutorial>.
   #
   # It has a static MBR at the first 4k, and an ample 128k Open USB Bootloader at
@@ -14,15 +30,10 @@ ifeq (nrfutil,$(PROGRAMMER))
   ROM_OFFSET = 0x1000
   ROM_LEN = 0xdf000
 
-  FLASHFILE = $(HEXFILE)
-  FLASHDEPS += $(HEXFILE).zip
-  FLASHER = nrfutil
-  FFLAGS = dfu usb-serial --port=${PORT} --package=$(HEXFILE).zip
-
   include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
 
-PROGRAMMERS_SUPPORTED += nrfutil
+PROGRAMMERS_SUPPORTED += nrfutil nrfdfu
 
 %.hex.zip: %.hex
 	$(call check_cmd,$(FLASHER),Flash program and preparation tool)
