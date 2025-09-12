@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2025 TU Dresden
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "bitcraze-crazyflie21-main" if BOARD_BITCRAZE_CRAZYFLIE21_MAIN
+
+config BOARD_BITCRAZE_CRAZYFLIE21_MAIN
+    bool
+    default y
+    select CPU_MODEL_STM32F405RG
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+config CLOCK_HSE
+    default 8000000
+
+config CLOCK_PLL_M
+    default 8
+
+config CLOCK_PLL_N
+    default 336 if USEMODULE_PERIPH_USBDEV_CLK
+    default 360
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
