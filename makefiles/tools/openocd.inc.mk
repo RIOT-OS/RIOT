@@ -18,7 +18,19 @@ ifneq (,$(OPENOCD_DEBUG_ADAPTER))
   endif
 endif
 
-OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
+# Use the board's custom OpenOCD by default, if present in the file system.
+OPENOCD_CONFIG ?= $(wildcard $(BOARDDIR)/dist/openocd.cfg)
+
+# Still no config?
+ifeq (,$(OPENOCD_CONFIG))
+  # MCU is STM32 based?
+  ifeq (stm32,$(CPU))
+    # Then use the common OpenOCD config for the STM32 family in use
+    OPENOCD_CONFIG := $(RIOTBASE)/boards/common/stm32/dist/stm32$(CPU_FAM).cfg
+  else
+    $(warning "Even though PROGRAMMER is openocd, no OPENOCD_CONFIG is specified. Flashing and debugging won't work.")
+  endif
+endif
 
 OPENOCD_TARGETS = debug% flash% reset
 
