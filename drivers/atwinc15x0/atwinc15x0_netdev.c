@@ -530,11 +530,13 @@ static void _atwinc15x0_wifi_cb(uint8_t type, void *msg)
 
 static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
 {
-    atwinc15x0_t *dev = (atwinc15x0_t *)netdev;
+    atwinc15x0_t *dev = container_of(netdev, atwinc15x0_t, netdev);
 
     assert(dev);
     assert(dev == atwinc15x0);
     assert(iolist);
+
+    dev->tx_result = -EAGAIN;
 
     /* send wakes from standby but not from sleep */
     if (_atwinc15x0_is_sleeping(dev)) {
@@ -570,20 +572,23 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
 
     /* send the packet */
     if (m2m_wifi_send_ethernet_pkt(atwinc15x0_eth_buf, tx_len) == M2M_SUCCESS) {
-        return tx_len;
+        dev->tx_result = tx_len;
     }
     else {
         DEBUG("%s sending WiFi packet failed", __func__);
-        return -EIO;
+        dev->tx_result = -EIO;
     }
+
+    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    return 0;
 }
 
 static int _confirm_send(netdev_t *netdev, void *info)
 {
-    (void)netdev;
     (void)info;
 
-    return -EOPNOTSUPP;
+    atwinc15x0_t *dev = container_of(netdev, atwinc15x0_t, netdev);
+    return dev->tx_result;
 }
 
 static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
