@@ -92,7 +92,7 @@ typedef struct atwinc15x0 {
     int8_t rssi;                /**< RSSI last measured by the WiFi module */
 
     uint8_t* rx_buf;            /**< Incoming packet in receive buffer */
-    int tx_result;              /**< value to resturn in confirm_send() */
+    int tx_result;              /**< value to return in confirm_send() */
     uint16_t rx_len;            /**< Length of an incoming packet, if there
                                      is no packet in the buffer, it is 0 */
 
