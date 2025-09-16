@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2025 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -67,12 +64,12 @@ static int _mock_nrfble_get(netdev_t *dev, netopt_t opt, void *val, size_t max_l
     (void)max_len;
 
     switch (opt) {
-        case NETOPT_DEVICE_TYPE:
-            assert(max_len >= sizeof(uint16_t));
-            *((uint16_t *)val) = NETDEV_TYPE_BLE;
-            return sizeof(uint16_t);
-        default:
-            return -ENOTSUP;
+    case NETOPT_DEVICE_TYPE:
+        assert(max_len >= sizeof(uint16_t));
+        *((uint16_t *)val) = NETDEV_TYPE_BLE;
+        return sizeof(uint16_t);
+    default:
+        return -ENOTSUP;
     }
 }
 
@@ -83,13 +80,13 @@ static int _mock_nrfble_set(netdev_t *dev, netopt_t opt, const void *val, size_t
     (void)len;
 
     switch (opt) {
-        case NETOPT_BLE_CTX:
-            return sizeof(netdev_ble_ctx_t);
-        case NETOPT_TX_POWER:
-            assert(len == sizeof(int16_t));
-            return sizeof(int16_t);
-        default:
-            return -ENOTSUP;
+    case NETOPT_BLE_CTX:
+        return sizeof(netdev_ble_ctx_t);
+    case NETOPT_TX_POWER:
+        assert(len == sizeof(int16_t));
+        return sizeof(int16_t);
+    default:
+        return -ENOTSUP;
     }
 }
 
