@@ -7,7 +7,7 @@ export default defineConfig({
   site: "https://guide.riot-os.org",
   integrations: [
     starlight({
-      title: "Riot Documentation",
+      title: "RIOT Documentation",
       social: [
         {
           icon: "github",
