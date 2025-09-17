@@ -24,6 +24,11 @@ export default defineConfig({
           label: "Matrix",
           href: "https://matrix.to/#/#riot-os:matrix.org",
         },
+        {
+          icon: "discourse",
+          label: "Forum",
+          href: "https://forum.riot-os.org",
+        },
       ],
       sidebar: [
         {
