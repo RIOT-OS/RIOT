@@ -129,6 +129,7 @@ FEATURES_EXISTING := \
     esp_wifi_ap \
     esp_wifi_enterprise \
     feather_shield \
+    float_math \
     gecko_sdk_librail_fpu \
     gecko_sdk_librail_nonfpu \
     highlevel_stdio \
