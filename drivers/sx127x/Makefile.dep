@@ -1,3 +1,4 @@
+FEATURES_REQUIRED += float_math
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi
