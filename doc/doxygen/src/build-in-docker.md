@@ -1,4 +1,4 @@
-# Build In Docker                                       {#build-in-docker}
+# Build In Docker (Deprecated)                                       {#build-in-docker}
 
 @deprecated This page is deprecated.
 See [Build in Docker](https://guide.riot-os.org/build-system/build-in-docker/)

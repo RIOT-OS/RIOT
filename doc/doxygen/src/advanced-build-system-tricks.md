@@ -1,4 +1,4 @@
-Advanced build system tricks                    {#advanced-build-system-tricks}
+Advanced build system tricks (Deprecated)                    {#advanced-build-system-tricks}
 ============================
 
 @deprecated See [Advanced Build System Tricks](https://guide.riot-os.org/build-system/advanced_build_system_tricks/)

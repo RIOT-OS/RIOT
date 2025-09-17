@@ -1,4 +1,4 @@
-# Build System Basics                                       {#build-system-basics}
+# Build System Basics (Deprecated)                                       {#build-system-basics}
 
 @deprecated See [Build System Basics](https://guide.riot-os.org/build-system/build_system_basics/)
 on the RIOT Guide Site for the latest information.
