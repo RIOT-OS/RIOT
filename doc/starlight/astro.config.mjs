@@ -20,14 +20,24 @@ export default defineConfig({
           href: "https://floss.social/@RIOT_OS",
         },
         {
-          icon: "matrix",
-          label: "Matrix",
-          href: "https://matrix.to/#/#riot-os:matrix.org",
+          icon: "blueSky",
+          label: "Bluesky",
+          href: "https://bsky.app/profile/riot-os.org",
+        },
+        {
+          icon: "youtube",
+          label: "YouTube",
+          href: "https://www.youtube.com/c/RIOT-IoT",
         },
         {
           icon: "discourse",
           label: "Forum",
           href: "https://forum.riot-os.org",
+        },
+        {
+          icon: "matrix",
+          label: "Matrix",
+          href: "https://matrix.to/#/#riot-os:matrix.org",
         },
       ],
       sidebar: [
