@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "fmt.h"
+#include "modules.h"
 
 int main(void)
 {
@@ -43,7 +44,12 @@ int main(void)
     print_str("\n");
     print_s64_dec(0x8000000000000000);
     print_str("\n");
-    print_float(1.2345, 5);
+    if (IS_USED(MODULE_FLOAT_MATH)) {
+        print_float(1.2345, 5);
+    }
+    else {
+        print_str("print_float() disabled, feature `float_math` not used.");
+    }
     print_str("\n");
     print_bytes_hex("0123456789", 10);
     print_str("\n");

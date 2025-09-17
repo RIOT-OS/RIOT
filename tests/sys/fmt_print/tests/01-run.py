@@ -14,7 +14,7 @@ def testfunc(child):
     child.expect_exact('123456789ABCDEF0')
     child.expect_exact('18446744073709551615')
     child.expect_exact('-9223372036854775808')
-    child.expect_exact('1.23450')
+    child.expect(r'(1.23450)|(print_float\(\) disabled, feature `float_math` not used.)')
     child.expect_exact('30313233343536373839')
     child.expect_exact('Test successful.')
 

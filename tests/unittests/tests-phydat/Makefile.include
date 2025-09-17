@@ -1,1 +1,3 @@
+FEATURES_OPTIONAL += float_math
+
 USEMODULE += phydat
