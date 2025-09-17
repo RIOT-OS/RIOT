@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += sema
 USEMODULE += ztimer64_msec
 USEMODULE += ztimer_usec

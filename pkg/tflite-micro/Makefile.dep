@@ -1,9 +1,10 @@
-USEMODULE += cpp11-compat
+FEATURES_REQUIRED += float_math
 
 USEPKG += flatbuffers
 USEPKG += gemmlowp
 USEPKG += ruy
 
+USEMODULE += cpp11-compat
 USEMODULE += tflite-c
 USEMODULE += tflite-core-api
 USEMODULE += tflite-core-c

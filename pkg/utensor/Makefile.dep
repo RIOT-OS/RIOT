@@ -1,4 +1,5 @@
 FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += float_math
 FEATURES_REQUIRED += libstdcpp
 
 USEMODULE += utensor-ops
