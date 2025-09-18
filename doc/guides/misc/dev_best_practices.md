@@ -145,7 +145,5 @@ If you want to analyze the static memory consumption of your code you can use
 * Code can request the amount of memory it needs on runtime
 * On most platforms: the size of the heap is `sizeof(<RAM>)-sizeof(<static memory>)`
   * If you reduce your usage of static memory your heap gets bigger
-* On some platforms calling  `free()` will not or not always make heap memory available again
-  (see [Oneway Malloc on MSP430](https://doc.riot-os.org/group__oneway__malloc.html))
 * Programmer needs to handle failed memory allocation calls at runtime
 * Static code analysis is unable to find errors regarding memory management
