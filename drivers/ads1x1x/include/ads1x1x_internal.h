@@ -87,28 +87,22 @@ extern "C" {
 /**
  * @name ADS101x/111x data rate settings
  * Configures the data rate (samples per second).
- * Values differ between ADS101x and ADS111x families.
  * @{
  */
 #define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))      /**< Mask for data rate bits */
-#ifdef MODULE_ADS101X
-#   define ADS1X1X_DATAR_128     ((0 << 7) | (0 << 6) | (0 << 5))   /**< 128 SPS */
-#   define ADS1X1X_DATAR_250     ((0 << 7) | (0 << 6) | (1 << 5))   /**< 250 SPS */
-#   define ADS1X1X_DATAR_490     ((0 << 7) | (1 << 6) | (0 << 5))   /**< 490 SPS */
-#   define ADS1X1X_DATAR_920     ((0 << 7) | (1 << 6) | (1 << 5))   /**< 920 SPS */
-#   define ADS1X1X_DATAR_1600    ((1 << 7) | (0 << 6) | (0 << 5))   /**< 1600 SPS (default) */
-#   define ADS1X1X_DATAR_2400    ((1 << 7) | (0 << 6) | (1 << 5))   /**< 2400 SPS */
-#   define ADS1X1X_DATAR_3300    ((1 << 7) | (1 << 6) | (0 << 5))   /**< 3300 SPS */
-#elif defined(MODULE_ADS111X)
-#   define ADS1X1X_DATAR_8       ((0 << 7) | (0 << 6) | (0 << 5))   /**< 8 SPS */
-#   define ADS1X1X_DATAR_16      ((0 << 7) | (0 << 6) | (1 << 5))   /**< 16 SPS */
-#   define ADS1X1X_DATAR_32      ((0 << 7) | (1 << 6) | (0 << 5))   /**< 32 SPS */
-#   define ADS1X1X_DATAR_64      ((0 << 7) | (1 << 6) | (1 << 5))   /**< 64 SPS */
-#   define ADS1X1X_DATAR_128     ((1 << 7) | (0 << 6) | (0 << 5))   /**< 128 SPS (default) */
-#   define ADS1X1X_DATAR_250     ((1 << 7) | (0 << 6) | (1 << 5))   /**< 250 SPS */
-#   define ADS1X1X_DATAR_475     ((1 << 7) | (1 << 6) | (0 << 5))   /**< 475 SPS */
-#   define ADS1X1X_DATAR_860     ((1 << 7) | (1 << 6) | (1 << 5))   /**< 860 SPS */
-#endif
+#define ADS1X1X_DATAR_8       ((0 << 7) | (0 << 6) | (0 << 5))   /**< 8 SPS */
+#define ADS1X1X_DATAR_16      ((0 << 7) | (0 << 6) | (1 << 5))   /**< 16 SPS */
+#define ADS1X1X_DATAR_32      ((0 << 7) | (1 << 6) | (0 << 5))   /**< 32 SPS */
+#define ADS1X1X_DATAR_64      ((0 << 7) | (1 << 6) | (1 << 5))   /**< 64 SPS */
+#define ADS1X1X_DATAR_128     ((1 << 7) | (0 << 6) | (0 << 5))   /**< 128 SPS (default) */
+#define ADS1X1X_DATAR_250     ((1 << 7) | (0 << 6) | (1 << 5))   /**< 250 SPS */
+#define ADS1X1X_DATAR_475     ((1 << 7) | (1 << 6) | (0 << 5))   /**< 475 SPS */
+#define ADS1X1X_DATAR_490     ((0 << 7) | (1 << 6) | (0 << 5))   /**< 490 SPS */
+#define ADS1X1X_DATAR_860     ((1 << 7) | (1 << 6) | (1 << 5))   /**< 860 SPS */
+#define ADS1X1X_DATAR_920     ((0 << 7) | (1 << 6) | (1 << 5))   /**< 920 SPS */
+#define ADS1X1X_DATAR_1600    ((1 << 7) | (0 << 6) | (0 << 5))   /**< 1600 SPS */
+#define ADS1X1X_DATAR_2400    ((1 << 7) | (0 << 6) | (1 << 5))   /**< 2400 SPS */
+#define ADS1X1X_DATAR_3300    ((1 << 7) | (1 << 6) | (0 << 5))   /**< 3300 SPS */
 /** @} */
 
 /**

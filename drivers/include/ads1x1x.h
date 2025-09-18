@@ -58,6 +58,7 @@ typedef struct {
     uint8_t pga;                        /**< Programmable gain amplifier configuration */
     uint8_t mode;                       /**< Device mode */
     uint8_t dr;                         /**< Data rate configuration */
+    uint8_t bits_res;                   /**< Bit resolution (12 or 16 bits) */
 } ads1x1x_params_t;
 
 /**

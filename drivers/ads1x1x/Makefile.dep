@@ -2,16 +2,3 @@ FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_i2c
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
-
-ifeq (,$(filter ads111% ads101%,$(USEMODULE)))
-  # enable ads101x as default if no other module is enabled
-  USEMODULE += ads101x
-endif
-
-ifneq (,$(filter ads101%,$(USEMODULE)))
-  USEMODULE += ads1x1x
-endif
-
-ifneq (,$(filter ads111%,$(USEMODULE)))
-  USEMODULE += ads1x1x
-endif

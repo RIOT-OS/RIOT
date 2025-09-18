@@ -292,9 +292,15 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
 int ads1x1x_convert_to_mv(const ads1x1x_t *dev, int16_t raw)
 {
     assert(dev);
+    uint8_t bits_res;
+#if MODULE_ADS101X && defined(MODULE_ADS111X)
+    bits_res = dev->params.bits_res;
+#else
+    bits_res = ADS1X1X_PARAM_BITS_RES;
+#endif
     /* Normalize signed ADC code: range = [-2^(N-1), 2^(N-1)-1] */
     return ((int32_t)raw * _ads1x1x_get_pga_voltage(dev->params.pga))
-           / (1 << (ADS1X1X_BITS_RES - 1));
+           / (1 << (bits_res - 1));
 }
 
 int ads1x1x_alert_init(ads1x1x_alert_t *dev,
