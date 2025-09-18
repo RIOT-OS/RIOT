@@ -27,6 +27,8 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+USEMODULE += printf_float
+
 # Features required
 FEATURES_REQUIRED += cpp # basic C++ support
 FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)

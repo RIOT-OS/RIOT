@@ -7,6 +7,9 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../..
 
+# Needed for print_float()
+FEATURES_REQUIRED += float_math
+
 # Define modules that are used
 USEMODULE += gnrc
 USEMODULE += netdev_default
