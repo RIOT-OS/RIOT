@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="245.79939mm"
+   height="24.209375mm"
+   viewBox="0 0 245.79939 24.209375"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="kconfig_integration.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.99508277"
+     inkscape:cx="397.95684"
+     inkscape:cy="551.21043"
+     inkscape:window-width="2560"
+     inkscape:window-height="1368"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0.23629884,-2.7317763)">
+    <g
+       id="g16"
+       transform="matrix(0.26458333,0,0,0.26458333,1.4849785,2.864068)">
+      <rect
+         x="1"
+         y="1"
+         width="120"
+         height="60"
+         rx="9"
+         ry="9"
+         fill="#275a4b"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="rect1" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g1">
+        <switch
+           id="switch1">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 118px; height: 1px; padding-top: 31px; margin-left: 2px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 15px; font-family: Courier New; color: #000000; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:font
+                     color="#ffffff"
+                     style="font-size: 15px">
+                    <xhtml:span
+                       style="font-size: 15px">$(USEMODULE)<xhtml:br
+   style="font-size: 15px" />
+$(USEPKG)<xhtml:br
+   style="font-size: 15px" />
+</xhtml:span>
+                  </xhtml:font>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="61"
+             y="36"
+             fill="#000000"
+             font-family="'Courier New'"
+             font-size="15px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text1">$(USEMODULE)...</text>
+        </switch>
+      </g>
+      <rect
+         x="201"
+         y="1"
+         width="120"
+         height="60"
+         rx="9"
+         ry="9"
+         fill="#275a4b"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="rect2" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g2">
+        <switch
+           id="switch2">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 118px; height: 1px; padding-top: 31px; margin-left: 202px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 15px; font-family: Courier New; color: #000000; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:font
+                     color="#ffffff"
+                     style="font-size: 15px">
+                    <xhtml:span
+                       style="font-size: 15px">Kconfig.dep</xhtml:span>
+                  </xhtml:font>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="261"
+             y="36"
+             fill="#000000"
+             font-family="'Courier New'"
+             font-size="15px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text2">Kconfig.dep</text>
+        </switch>
+      </g>
+      <rect
+         x="401"
+         y="1"
+         width="120"
+         height="60"
+         rx="9"
+         ry="9"
+         fill="#275a4b"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="rect3" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g3">
+        <switch
+           id="switch3">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 118px; height: 1px; padding-top: 31px; margin-left: 402px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 15px; font-family: Courier New; color: #000000; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:font
+                     color="#ffffff"
+                     style="font-size: 15px">
+                    <xhtml:span
+                       style="font-size: 15px">out.config</xhtml:span>
+                  </xhtml:font>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="461"
+             y="36"
+             fill="#000000"
+             font-family="'Courier New'"
+             font-size="15px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text3">out.config</text>
+        </switch>
+      </g>
+      <rect
+         x="601"
+         y="1"
+         width="120"
+         height="60"
+         rx="9"
+         ry="9"
+         fill="#3f9179"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-dasharray="3, 3"
+         pointer-events="all"
+         id="rect4" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g4">
+        <switch
+           id="switch4">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 118px; height: 1px; padding-top: 31px; margin-left: 602px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 15px; font-family: Courier New; color: #000000; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:font
+                     color="#ffffff"
+                     style="font-size: 15px">
+                    <xhtml:span
+                       style="font-size: 15px">menuconfig<xhtml:br
+   style="font-size: 15px" />
+</xhtml:span>
+                  </xhtml:font>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="661"
+             y="36"
+             fill="#000000"
+             font-family="'Courier New'"
+             font-size="15px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text4">menuconfig</text>
+        </switch>
+      </g>
+      <path
+         d="m 124,31 h 64.65"
+         fill="none"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="stroke"
+         id="path4" />
+      <circle
+         cx="121"
+         cy="31"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="ellipse4"
+         r="3" />
+      <path
+         d="m 197.65,31 -9,4.5 v -9 z"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path5" />
+      <path
+         d="m 324,30.72 64.65,0.24"
+         fill="none"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="stroke"
+         id="path6" />
+      <circle
+         cx="321"
+         cy="30.709999"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="ellipse6"
+         r="3" />
+      <path
+         d="m 397.65,30.99 -9.02,4.47 0.03,-9 z"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path7" />
+      <path
+         d="m 524,30.72 64.65,0.24"
+         fill="none"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="stroke"
+         id="path8" />
+      <circle
+         cx="521"
+         cy="30.709999"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="ellipse8"
+         r="3" />
+      <path
+         d="m 597.65,30.99 -9.02,4.47 0.03,-9 z"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path9" />
+      <rect
+         x="801"
+         y="1"
+         width="120"
+         height="60"
+         rx="9"
+         ry="9"
+         fill="#275a4b"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="rect9" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g9">
+        <switch
+           id="switch9">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 118px; height: 1px; padding-top: 31px; margin-left: 802px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 15px; font-family: Courier New; color: #000000; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:font
+                     color="#ffffff"
+                     style="font-size: 15px">
+                    <xhtml:span
+                       style="font-size: 15px">autoconf.h<xhtml:br
+   style="font-size: 15px" />
+</xhtml:span>
+                  </xhtml:font>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="861"
+             y="36"
+             fill="#000000"
+             font-family="'Courier New'"
+             font-size="15px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text9">autoconf.h</text>
+        </switch>
+      </g>
+      <path
+         d="m 724,30.72 64.65,0.24"
+         fill="none"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="stroke"
+         id="path10" />
+      <circle
+         cx="721"
+         cy="30.709999"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         pointer-events="all"
+         id="ellipse10"
+         r="3" />
+      <path
+         d="m 797.65,30.99 -9.02,4.47 0.03,-9 z"
+         fill="#3fa687"
+         stroke="#3fa687"
+         stroke-width="3"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path11" />
+      <rect
+         x="41"
+         y="71"
+         width="40"
+         height="20"
+         fill="none"
+         stroke="none"
+         pointer-events="all"
+         id="rect11" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g11">
+        <switch
+           id="switch11">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 38px; height: 1px; padding-top: 81px; margin-left: 42px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: Courier New; color: #333333; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:span>
+                    <xhtml:font
+                       style="font-size: 15px"
+                       color="#666666">0</xhtml:font>
+                  </xhtml:span>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="61"
+             y="85"
+             fill="#333333"
+             font-family="'Courier New'"
+             font-size="12px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text11">0</text>
+        </switch>
+      </g>
+      <rect
+         x="241"
+         y="71"
+         width="40"
+         height="20"
+         fill="none"
+         stroke="none"
+         pointer-events="all"
+         id="rect12" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g12">
+        <switch
+           id="switch12">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 38px; height: 1px; padding-top: 81px; margin-left: 242px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: Courier New; color: #333333; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:span>
+                    <xhtml:font
+                       style="font-size: 15px"
+                       color="#666666">1</xhtml:font>
+                  </xhtml:span>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="261"
+             y="85"
+             fill="#333333"
+             font-family="'Courier New'"
+             font-size="12px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text12">1</text>
+        </switch>
+      </g>
+      <rect
+         x="441"
+         y="71"
+         width="40"
+         height="20"
+         fill="none"
+         stroke="none"
+         pointer-events="all"
+         id="rect13" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g13">
+        <switch
+           id="switch13">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 38px; height: 1px; padding-top: 81px; margin-left: 442px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: Courier New; color: #333333; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:span>
+                    <xhtml:font
+                       style="font-size: 15px"
+                       color="#666666">2</xhtml:font>
+                  </xhtml:span>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="461"
+             y="85"
+             fill="#333333"
+             font-family="'Courier New'"
+             font-size="12px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text13">2</text>
+        </switch>
+      </g>
+      <rect
+         x="641"
+         y="71"
+         width="40"
+         height="20"
+         fill="none"
+         stroke="none"
+         pointer-events="all"
+         id="rect14" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g14">
+        <switch
+           id="switch14">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 38px; height: 1px; padding-top: 81px; margin-left: 642px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: Courier New; color: #333333; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:span>
+                    <xhtml:font
+                       style="font-size: 15px"
+                       color="#666666">3</xhtml:font>
+                  </xhtml:span>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="661"
+             y="85"
+             fill="#333333"
+             font-family="'Courier New'"
+             font-size="12px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text14">3</text>
+        </switch>
+      </g>
+      <rect
+         x="841"
+         y="71"
+         width="40"
+         height="20"
+         fill="none"
+         stroke="none"
+         pointer-events="all"
+         id="rect15" />
+      <g
+         transform="translate(-0.5,-0.5)"
+         id="g15">
+        <switch
+           id="switch15">
+          <foreignObject
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 38px; height: 1px; padding-top: 81px; margin-left: 842px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: Courier New; color: #333333; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">
+                  <xhtml:span>
+                    <xhtml:font
+                       style="font-size: 15px"
+                       color="#666666">4</xhtml:font>
+                  </xhtml:span>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <text
+             x="861"
+             y="85"
+             fill="#333333"
+             font-family="'Courier New'"
+             font-size="12px"
+             text-anchor="middle"
+             font-weight="bold"
+             id="text15">4</text>
+        </switch>
+      </g>
+    </g>
+  </g>
+</svg>
