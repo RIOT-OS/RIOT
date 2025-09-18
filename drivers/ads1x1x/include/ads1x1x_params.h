@@ -82,16 +82,6 @@ extern "C" {
 #endif
 
 /**
- * @def ADS1X1X_BITS_RES
- * @brief Default bit resolution
- */
-#if MODULE_ADS101X
-#  define ADS1X1X_BITS_RES  (12)
-#else /**<ADS111X */
-#  define ADS1X1X_BITS_RES  (16)
-#endif
-
-/**
  * @def ADS1X1X_PARAM_PGA
  * @brief Default programmable gain amplifier configuration
  */
@@ -102,10 +92,12 @@ extern "C" {
 /**
  * @brief Default data rate configuration
  */
-#if MODULE_ADS101X
-#  define ADS1X1X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
-#elif defined(MODULE_ADS111X)
-#  define ADS1X1X_PARAM_DATAR  (ADS1X1X_DATAR_128)
+#if MODULE_ADS111X
+#  define ADS111X_PARAM_DATAR   (ADS1X1X_DATAR_128)
+#  define ADS1X1X_PARAM_DATAR   (ADS111X_PARAM_DATAR)
+#elif defined(MODULE_ADS101X)
+#  define ADS101X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
+#  define ADS1X1X_PARAM_DATAR  (ADS101X_PARAM_DATAR)
 #endif
 
 /**
@@ -149,17 +141,39 @@ extern "C" {
 #endif
 
 /**
+ * @def ADS1X1X_PARAM_BITS_RES
+ * @brief Resolution in bits of the ADC
+ */
+#if MODULE_ADS101X
+#  define ADS101X_PARAM_BITS_RES  (12)
+#  define ADS1X1X_PARAM_BITS_RES  ADS101X_PARAM_BITS_RES
+#elif defined(MODULE_ADS111X)
+#  define ADS111X_PARAM_BITS_RES  (16)
+#  define ADS1X1X_PARAM_BITS_RES  ADS111X_PARAM_BITS_RES
+#endif
+
+/**
  * @def ADS1X1X_PARAMS
  * @brief Default ADS1X1X parameters structure
+ *
+ * @note The default parameter set defined here can only be used if a single type of
+ *       ADS101x/111x device is used. If devices of both types are used together, a
+ *       user-defined parameter set must be provided via @ref ADS1X1X_PARAMS.
+ *
+ *       In this case, you must configure the parameters according to the device type:
+ *       - @ref ads1x1x_params_t::bits_res must be set to either
+ *         ADS101X_PARAM_BITS_RES or ADS111X_PARAM_BITS_RES.
+ *       - @ref ads1x1x_params_t::dr must also be set to either
+ *         ADS101X_PARAM_DATAR or ADS111X_PARAM_DATAR.
  */
 #ifndef ADS1X1X_PARAMS
-#define ADS1X1X_PARAMS          { .i2c = ADS1X1X_PARAM_I2C,        \
+#  define ADS1X1X_PARAMS          { .i2c = ADS1X1X_PARAM_I2C,        \
                                   .addr = ADS1X1X_PARAM_ADDR,       \
                                   .mux = ADS1X1X_PARAM_MUX,        \
                                   .pga = ADS1X1X_PARAM_PGA,        \
                                   .mode = ADS1X1X_PARAM_MODE,       \
-                                  .dr = ADS1X1X_PARAM_DATAR        }
-
+                                  .dr = ADS1X1X_PARAM_DATAR,      \
+                                  .bits_res = ADS1X1X_PARAM_BITS_RES }
 #endif
 
 /**
@@ -167,7 +181,7 @@ extern "C" {
  * @brief Default ADS1X1X alert parameters structure
  */
 #ifndef ADS1X1X_ALERT_PARAMS
-#define ADS1X1X_ALERT_PARAMS    { .i2c = ADS1X1X_PARAM_I2C,        \
+#  define ADS1X1X_ALERT_PARAMS    { .i2c = ADS1X1X_PARAM_I2C,        \
                                   .addr = ADS1X1X_PARAM_ADDR,       \
                                   .comp_mode = ADS1X1X_PARAM_COMP_MODE,  \
                                   .comp_polarity = ADS1X1X_PARAM_COMP_POLARITY, \
