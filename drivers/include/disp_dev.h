@@ -94,7 +94,7 @@ typedef struct {
     /**
      * @brief   Invert the display device colors
      *
-     * @param[in] dev       Network device descriptor
+     * @param[in] dev       Pointer to the display device
      * @param[in] invert    Invert mode (true if invert, false otherwise)
      */
     void (*set_invert)(const disp_dev_t *dev, bool invert);
