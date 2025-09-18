@@ -57,13 +57,21 @@ export default defineConfig({
           ],
         },
         {
+          label: "Code of Conduct",
+          collapsed: true,
+          items: [
+            "general/code_of_conduct",
+            "general/code_of_conduct/faq",
+            "general/code_of_conduct/reporting",
+          ],
+        },
+        {
           label: "RIOT in a Nutshell",
           items: [
             { label: "Introduction", slug: "index" },
             "general/structure",
             "general/vision",
             "general/governance",
-            "general/code_of_conduct",
           ],
         },
         {
@@ -98,6 +106,15 @@ export default defineConfig({
                 "rust_tutorials/create_project",
               ],
             },
+            {
+              label: "Advanced",
+              items: [
+                "advanced_tutorials/creating_application",
+                "advanced_tutorials/creating_modules",
+                "advanced_tutorials/device_drivers",
+                "advanced_tutorials/porting_boards",
+              ],
+            },
           ],
         },
         {
@@ -105,13 +122,24 @@ export default defineConfig({
           items: [
             "build-system/build_system",
             "build-system/build_system_basics",
+            "build-system/kconfig",
+            "build-system/flashing",
             "build-system/build-in-docker",
             "build-system/advanced_build_system_tricks",
+            "build-system/debugging_aids",
           ],
         },
         {
           label: "Miscellaneous",
-          items: ["misc/release_cycle", "misc/how_to_doc"],
+          items: [
+            "misc/dev_best_practices",
+            "misc/io_mapping_and_shields",
+            "misc/roadmap",
+            "misc/release_cycle",
+            "misc/emulators",
+            "misc/terminal_config",
+            "misc/how_to_doc",
+          ],
         },
       ],
       customCss: ["./src/styles/custom.css", "./src/fonts/font-face.css"],

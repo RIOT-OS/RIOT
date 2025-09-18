@@ -55,7 +55,9 @@
  *
  * ## Makefile Includes
  *
- * First, we need to [include](@ref including-modules) a module that implements
+ * First, we need to
+ * [include](https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules)
+ * a module that implements
  * this API in our applications Makefile. For example the module that
  * implements this API for [tinydtls](@ref pkg_tinydtls) is called
  * `tinydtls_sock_dtls'.
