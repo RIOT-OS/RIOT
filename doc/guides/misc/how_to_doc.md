@@ -13,7 +13,7 @@ For RIOT Starlight is meant to exclusively host guides while the API documentati
 Where Doxygen has a very automated approach to generating documentation, Starlight is meant to be more flexible and allow for a more human touch that is needed for tutorials and guides,
 which means that we both have the control over the content and layout but at the same time have to put more active effort into the UX of the documentation itself. At the same time writing guides in Markdown allows us to keep the guides readable in the repository itself, which is a big plus.
 
-## How to run the site locally
+## How to run the Site locally
 
 To run the site locally, you need to have [Node.js](https://nodejs.org/) installed.
 It is highly recommended to use a version manager such as [NVM](https://github.com/nvm-sh/nvm) to manage your Node.js versions.
@@ -70,7 +70,7 @@ Generally, there are two folders that are important for the guides:
 
 We will go into more detail about how to create a new guide in the next section, but for now, it is important to understand that the guides are located in the `doc/guides/` folder and the configuration files are located in the `doc/starlight/` folder.
 
-## How to create a new guide
+## How to Create a new Guide
 
 Now that we understand how to run the site locally, let's look at how to create a new guide.
 The first step is to create a Markdown file within `doc/guides/` with the following structure:
@@ -106,7 +106,7 @@ Please always keep in mind that the more non-standard Markdown you write, the mo
 If you are targeting an experienced audience, a lot of them will be reading the guides locally within their IDE and not in a browser.
 :::
 
-### Placing the guide
+### Placing the Guide
 
 One last manual step is to add the new guide to the navigation. This is done in the `doc/starlight/astro.config.mjs` file.
 
@@ -122,7 +122,7 @@ You can either add your guide to an existing section or create a new section. In
 There is one exception to this rule, if your file is called index.md, the slug will be the name of the folder it is in. For example `doc/guides/test/index.md` will have the slug `test`.
 :::
 
-### Creating a new section
+### Creating a new Section
 
 Generally, we want to avoid creating new sections unless absolutely necessary. For example, if you create a totally new tutorial that spans multiple files, it might make sense to create a new section.
 In this case, you can create a new section by adding a new entry to the `sidebar` array in the `astro.config.mjs` file. The entry should look like this:

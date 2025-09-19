@@ -1,5 +1,5 @@
 ---
-title: Terminal programs configuration
+title: Terminal Programs Configuration
 description: How to configure popular terminal programs for correct display of newlines
 ---
 
@@ -16,7 +16,7 @@ character (0x0D, 0x0A). See https://en.wikipedia.org/wiki/Newline for background
 This page tries to collect the necessary settings for common terminal programs
 that will make them correctly display newlines.
 
-## gtkterm
+## GTKTerm
 
 - Graphical method:
     - Open the configuration menu.
@@ -25,7 +25,7 @@ that will make them correctly display newlines.
     - Edit the file `~/.gtktermrc`.
     - Change value of ***crlfauto*** option to `True`.
 
-## minicom
+## Minicom
 
 - Interactive method:
     - Press ***Ctrl+A u***.
@@ -34,7 +34,7 @@ that will make them correctly display newlines.
     - Add the following line:
     `pu addcarreturn     Yes`
 
-## miniterm
+## Miniterm
 
 - Generic method:
     - Start with `--eol CR` parameter.
@@ -48,7 +48,7 @@ that will make them correctly display newlines.
 - Via RIOT build system:
     - `RIOT_TERMINAL=picocom make term`
 
-## putty
+## PuTTY
 
 - Graphical method:
     - Go to configuration tree and choose `Terminal` branch.

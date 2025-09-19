@@ -282,7 +282,7 @@ when starting to port a board: all required files are generated with
 copyright headers, doxygen groups, etc, so you can concentrate on the port.
 The board source files are created in the `boards/<board name>` directory.
 
-## Usage:
+## Usage
 
 From the RIOT base directory, run:
 

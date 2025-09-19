@@ -1,5 +1,5 @@
 ---
-title: Creating modules
+title: Creating Modules
 description: Guide on how to create modules in RIOT-OS
 ---
 

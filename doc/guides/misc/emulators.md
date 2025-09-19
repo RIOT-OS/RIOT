@@ -79,7 +79,7 @@ Qemu is usually available via the package manager of common Linux distributions.
 Depending on your local system, the installation procedure is described on the
 [qemu website](https://www.qemu.org/download/).
 
-## Boards supported
+## Supported Boards
 
 So far, in RIOT, only the
 [BBC micro:bit](https://doc.riot-os.org/group__boards__microbit.html)
@@ -105,7 +105,7 @@ hardware - but with more possibilities.
 
 ## Installation
 
-### From package
+### From Package
 
 Packages for macOS, deb-based and rpm-based systems, for Windows and for Arch
 Linux are available on [GitHub](https://github.com/renode/renode/releases/latest).
