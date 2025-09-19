@@ -63,7 +63,7 @@ This should be clearly stated in the device driver's documentation so that
 anyone wanting to use the driver can find out the supported features without
 having to scan through the code.
 
-## Device descriptor and parameter configuration
+## Device Descriptor and Parameter Configuration
 
 Each device MUST supply a data structure, holding the devices state and
 configuration, using the naming scheme of `DEVNAME_t` (e.g. `dht_t`, or
@@ -108,7 +108,7 @@ configuration data that is only used once can be read directly from ROM, while
 often used fields (e.g. used peripherals) are stored directly in the device
 descriptor and one saves hereby one de-referencing step when accessing them.
 
-## Default device configuration
+## Default Device Configuration
 
 Each device driver in RIOT MUST supply a default configuration file, named
 `DEVNAME_params.h`. This file should be located in the `RIOT/drivers/...`. The
@@ -201,7 +201,7 @@ Third, we can define more than a single device in the board configuration
 And finally, we can simply override the `tmpabc_params.h` file as described
 above.
 
-## Compile-time configuration documentation
+## Compile-time Configuration Documentation
 
 The macros that configure the driver during compilation is added to the listing
 for [Compile time configurations](https://doc.riot-os.org/group__config.html). Refer to the following example
@@ -322,9 +322,9 @@ one of them - whatever makes most sense for a given function.
 - *MUST*: use `const devab_t *dev` when the device descriptor can be access
   read-only
 
-## Build system integration
+## Build System Integration
 
-### Internal include files
+### Internal Include Files
 
 If the driver contains internal include files, a `Makefile.include` must be
 added in the driver implementation directory, with the following content
@@ -335,7 +335,7 @@ USEMODULE_INCLUDES_<driver name> := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_<driver name>)
 ```
 
-### External dependencies
+### External Dependencies
 
 If the driver has other module or CPU features dependencies (like `xtimer` or
 `periph_i2c`), they must be added in the `$(RIOTBASE)/drivers/Makefile.dep`
@@ -351,7 +351,7 @@ endif
 
 **Warning:** Please be careful with alphabetical order when modifying this file.
 
-## Helper tools
+## Helper Tools
 
 To help you start writing a device driver, the RIOT build system provides the
 `generate-driver` make target. It is a wrapper around the
@@ -422,9 +422,9 @@ int tmpabc_init(tmpabc_t *dev, const tmpabc_params_t *params);
 
 After this function is called, the device MUST be running and usable.
 
-## Value handling
+## Value Handling
 
-### Value semantics
+### Value Semantics
 
 All sensors in RIOT MUST return their reading results as real physical values.
 When working with sensor data, these are the values of interest, and the
@@ -459,7 +459,7 @@ just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 - *SHOULD*: the driver exports functions for putting it to sleep and waking up
   the device
 
-# Network devices
+# Network Devices
 
 ## Initialization
 

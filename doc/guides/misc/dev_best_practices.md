@@ -90,7 +90,7 @@ int bar(foo_t v) {
    Use internal functions to this end.
  * Don't mix up logical and bitwise operations (`!` vs `~`, or `&&` vs `&`)
 
-## Methodology: emulator first, target IoT hardware last!
+## Methodology: Emulator first, Target IoT Hardware last!
 
 The below methodology is recommended, using well-known de facto standard tools from the FLOSS community that are
 compatible with RIOT. Using the below workflow improves time-to-running-code compared to typical IoT software
@@ -133,13 +133,13 @@ Both ways have some drawbacks which are listed here.
 If you want to analyze the static memory consumption of your code you can use
 [otm](https://github.com/LudwigOrtmann/otm) or `make cosy`.
 
-### Static memory
+### Static Memory
 * Access the memory in one operation O(1) ⇒ real time condition
 * Programmer needs to know the amount of memory on compile time
   * Leads to over and undersized buffers
 * Forces the programmer to think about the amount of need memory at compile time
 
-### Dynamic memory
+### Dynamic Memory
 * `malloc()` and `free()` are implemented in your `libc` (RIOT on ARM: `newlib`/`picolib`)
   * Runtime behavior is not predictable
 * Code can request the amount of memory it needs on runtime

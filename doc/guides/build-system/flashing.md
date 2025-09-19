@@ -356,7 +356,7 @@ So the current filename should be higher than 60-serial.rules
 If for some reason re-writing the serial is needed there is a windows tool:
   https://remoteqth.com/wiki/index.php?page=How+to+set+usb+device+SerialNumber
 
-## Documentation:
+## Documentation
 * The whole documentation
   http://reactivated.net/writing_udev_rules.html#udevinfo
 * Udev manpage

@@ -44,7 +44,7 @@ maintained in coordination with the riot-wrappers crate.
 [riot-module-examples]: https://gitlab.com/etonomy/riot-module-examples
 [additional examples]: https://gitlab.com/etonomy/riot-examples/
 
-## IDE / editor setup
+## IDE / Editor Setup
 
 Users of Rust often take advantage of autocompletion or inline help.
 To use this on RIOT projects,
@@ -53,7 +53,7 @@ which are listed by `make info-rust`.
 These can be configured in the IDE's project setup
 or exported as environment variables.
 
-## How it works
+## How it Works
 
 The easy part of the story is that Rust code gets compiled into a static library
 which is then linked together with the rest of the RIOT code,
@@ -95,7 +95,7 @@ The wrappers are [documented together with riot-sys and some of the examples].
 [I2CDevice]: https://rustdoc.etonomy.org/riot_wrappers/i2c/struct.I2CDevice.html
 [corresponding embedded-hal I2C traits]: https://rustdoc.etonomy.org/embedded_hal/blocking/i2c/index.html
 
-## Library components in Rust
+## Library Components in Rust
 
 It is possible to use Rust in different modules than the application itself.
 

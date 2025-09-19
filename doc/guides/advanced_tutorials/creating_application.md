@@ -1,6 +1,6 @@
 ---
-title: Creating an application
-description: How to create your own application for RIOT-OS
+title: Creating an Application
+description: How to create your own application for RIOT
 ---
 
 To create your own application you need to create a directory containing one or
@@ -58,7 +58,7 @@ RIOTBASE ?= $(CURDIR)/../../RIOT
 include $(RIOTBASE)/Makefile.include
 ```
 
-### How to handle unsupported boards?
+### How to handle Unsupported Boards?
 
 Sometimes it is necessary to exclude boards because they don't provide a
 required functionality or don't have sufficient memory. RIOT's build system
@@ -143,7 +143,7 @@ on the module implementation.
 For applications, the `Makefile` is generated with the dependencies (modules,
 packages, required features) included.
 
-## Usage:
+## Usage
 
 To generate an example application, e.g in the `examples` directory, from the
 RIOT base directory, run:
