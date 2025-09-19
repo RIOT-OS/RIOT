@@ -21,8 +21,9 @@
  * of the program. A return value of 0 indicates that the program has finished
  * successfully.
  */
-int main(void) {
-  puts("Hello World!");
+int main(void)
+{
+    puts("Hello World!");
 
-  return 0;
+    return 0;
 }
