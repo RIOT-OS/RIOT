@@ -3,7 +3,7 @@ title: Flashing via RIOT's Build System
 description: Guide on how to flash boards using RIOT's build system
 ---
 
-# General Approach
+## General Approach
 
 In general, flashing a board from RIOT is as straight forward as typing in a
 shell (with the application directory as current working directory):
@@ -22,7 +22,7 @@ make BOARD=<BOARD-TO-FLASH> PROGRAMMER=stm32flash flash
 
 To flash without rebuilding use `flash-only` as target instead of `flash`.
 
-# Supported Tools
+## Supported Tools
 
 RIOT supports plenty of flashing tools, that are below grouped into general
 flashing tools that support multiple MCU families, and specialized tools that
@@ -36,7 +36,7 @@ the board due to a missing board feature, bootloader, or similar.
 To ease use the programmers are given by the value to pass via
 `PROGRAMMER=<value>`, rather than the official spelling of the programmer.
 
-## Compatibility Matrix of Generic Tools
+### Compatibility Matrix of Generic Tools
 
 <!-- Note: Add flashers that theoretically support multiple platforms here,
      even if RIOT does only have integration for one platform. The missing
@@ -71,73 +71,73 @@ Remarks:
 
 1. Requires a patched version of the programmer tool
 
-## Specialized Flashing Tools Per Platform
+### Specialized Flashing Tools Per Platform
 
 The following list only contains single-platform flashing tools. Tools that
 support multiple platforms are given in section above.
 
-### AVR
+#### AVR
 
 - `avrdude`
 
-### CC13xx / CC26xx
+#### CC13xx / CC26xx
 
 - `uniflash`
 
-### CC2538
+#### CC2538
 
 - `cc2538-bsl`
 
-### ESP8266 / ESP32 (Xtensa) / ESP32 (RISC-V)
+#### ESP8266 / ESP32 (Xtensa) / ESP32 (RISC-V)
 
 - `esptool`
 
-### LPC23xx
+#### LPC23xx
 
 - `lpc2k_pgm`
 
-### MSP430
+#### MSP430
 
 - `mspdebug`
 - `goodfet`
 
-### nRF52
+#### nRF52
 
 - `adafruit-nrfutil`, `uf2conv` (requires Adafruit bootloader),
 see [Adafruit nRF52 Bootloader Common](https://doc.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html)
 - `nrfutil` (required nRF bootloader)
 - `nrfjprog` (requires a separate J-Link debugger)
 
-### RP2040 / RP2350
+#### RP2040 / RP2350
 
 - `picotool`
 
-### SAM
+#### SAM
 
 - `bossa`
 - `edbg`
 
-### STM32
+#### STM32
 
 - `stm32flash`
 - `stm32loader`
 - `cpy2remed` (requires integrated ST-Link programmer, e.g. Nucleo boards)
 - `robotis-loader` (requires robotis bootloader, only one board supported)
 
-# Programmer Configuration
+## Programmer Configuration
 
 This section will list additional configuration options to control the behavior
 of a programming tool, such as selecting the hardware adapter used for
 programming.
 
-## OpenOCD Configuration
+### OpenOCD Configuration
 
-### OPENOCD_DEBUG_ADAPTER
+#### OPENOCD_DEBUG_ADAPTER
 
 `OPENOCD_DEBUG_ADAPTER` can be set via command line or as environment variable
 to use non-default flashing hardware.
 
-### OPENOCD_RESET_USE_CONNECT_ASSERT_SRST
+#### OPENOCD_RESET_USE_CONNECT_ASSERT_SRST
 
 `OPENOCD_RESET_USE_CONNECT_ASSERT_SRST` can be set via command line or as
 environment variable to `0` to disable resetting the board via the `SRST` line.
@@ -147,19 +147,19 @@ not be possible to attach the debugger while the MCU is in deep sleeping mode.
 If this is set to `0` by the user, the user may need a carefully timed reset
 button press to be able to flash the board.
 
-### OPENOCD_PRE_FLASH_CMDS
+#### OPENOCD_PRE_FLASH_CMDS
 
 `OPENOCD_PRE_FLASH_CMDS` can be set as environment variable to pass additional
 commands to OpenOCD prior to flashing, e.g. to disable flash write protection.
 
-### OPENOCD_PRE_VERIFY_CMDS
+#### OPENOCD_PRE_VERIFY_CMDS
 
 `OPENOCD_PRE_VERIFY_CMDS` can be set as environment variable to pass additional
 flags to OpenOCD prior to verifying the flashed firmware. E.g. this is used
 in the `pba-d-01-kw2x` to disable the watchdog to prevent it from disrupting
 the verification process.
 
-### OPENOCD_PRE_FLASH_CHECK_SCRIPT
+#### OPENOCD_PRE_FLASH_CHECK_SCRIPT
 
 `OPENOCD_PRE_FLASH_CHECK_SCRIPT` can be set via command line or as
 environment variable to execute a script before OpenOCD starts flashing. It is
@@ -169,12 +169,12 @@ magic value in the flash configuration field protection bits.
 The script is expected to exit with code `0` if flashing should resume, or with
 exit code `1` if flashing should be aborted.
 
-### OPENOCD_CONFIG
+#### OPENOCD_CONFIG
 
 `OPENOCD_DEBUG_ADAPTER` can be set via command line or as environment variable
 to use non-default OpenOCD configuration file.
 
-### OPENOCD_TRANSPORT
+#### OPENOCD_TRANSPORT
 
 `OPENOCD_TRANSPORT` can be set via command line or as environment variable to
 select a non-default transport protocol. E.g. to use JTAG rather than SWD for a
@@ -189,7 +189,7 @@ JTAG. Also JTAG requires more signal lines to be connected compared to SWD and
 some internal programmers only have the SWD signal lines connected, so that
 JTAG will not be possible.
 
-## stm32flash Configuration
+### stm32flash Configuration
 
 It is possible to automatically boot the STM32 board into the in-ROM bootloader
 that `stm32flash` communicates with for flashing by connecting the RST pin to
@@ -209,7 +209,7 @@ now, `STM32FLASH_RESET_INVERT` is by default `1`. This may change if it
 becomes evident that non-inverted TTL adapters are in fact more common than
 inverted adapters.
 
-## MSPDEBUG Configuration
+### MSPDEBUG Configuration
 
 All options can be passed as environment variables or as make arguments.
 All options except for `DEBUGSERVER_PORT` apply to both debugging and flashing
@@ -233,7 +233,7 @@ options is typically not needed.
 `DEBUGSERVER_PORT` is used to specify the TCP port to listen for GDB to
 connect to. It defaults to 2000.
 
-## Handling Multiple Boards with UDEV-Rules
+### Handling Multiple Boards with UDEV-Rules
 
 When developing and working with multiple boards the default `PORT`
 configuration for a particular board might not apply anymore, so `PORT` will need
@@ -247,7 +247,7 @@ boards serial port (`riot/tty-<board-name>`) and the actual serial port
 `dev` information (`DEBUG_ADAPTER_ID`, `PORT`, etc.) to always flash and open a
 terminal on the correct port.
 
-### Procedure
+#### Procedure
 
 - use `udevadm info /dev/ttyACM0` to query the udev database for information on
   device on port `/dev/ttyACM0`.
@@ -300,7 +300,7 @@ endif
 ```
 :::
 
-## Handling Multiple Versions of the same BOARD
+### Handling Multiple Versions of the same BOARD
 
 The above procedure works fine when handling different boards, but not
 multiple times the same board, e.g: multiple `samr21-xpro`.
@@ -347,7 +347,7 @@ BOARD=samr21-xpro BOARD_NUM=n make flash term
 In the end, this would be the same as using the serial, but a simple number might
 be easier to handle.
 
-## Notes
+### Notes
 Udev only parses SUBSYSTEM and one parent. For others, we will rely on ENV
 variables defined by 60-serial.rules
 
@@ -356,13 +356,13 @@ So the current filename should be higher than 60-serial.rules
 If for some reason re-writing the serial is needed there is a windows tool:
   https://remoteqth.com/wiki/index.php?page=How+to+set+usb+device+SerialNumber
 
-## Documentation
+### Documentation
 * The whole documentation
   http://reactivated.net/writing_udev_rules.html#udevinfo
 * Udev manpage
   http://manpages.ubuntu.com/manpages/eoan/en/man7/udev.7.html
 
-# Handling Multiple Boards without UDEV-Rules
+## Handling Multiple Boards without UDEV-Rules
 
 This is a simpler approach than the above mentioned issue. The solution here only
 uses a Makefile for selecting the debugger and serial port. No
@@ -430,7 +430,7 @@ most recently added interface (out of those matching the filtering by vendor,
 model, etc.). The `--format path` argument will result in only the device path
 being printed for convenient use in scripts.
 
-# Handling Multiple Boards: Simplest Approach
+## Handling Multiple Boards: Simplest Approach
 
 Passing `MOST_RECENT_PORT=1` as environment variable or as parameter to
 make will result in the most recently connected board being preferred over the
@@ -446,7 +446,7 @@ allows to always reliably identify them correctly (e.g. the firmware on the
 ATmega16U2 used as USB to UART converter on Arduino Mega2560 will provide
 identification data unique to that board).
 
-## Adding Board Filters
+### Adding Board Filters
 
 After connecting as many variants of the board you target (and maybe some others
 to test that the filter actually filters out non-matching boards). Then first
@@ -481,7 +481,7 @@ TTY_BOARD_FILTER := --vendor 'Arduino' --model-db 'Mega 2560|Mega ADK'
 Note that also matching the `R3` in `Mega 2560 R3` would prevent matching older
 or newer revisions than R3, so we don't add that to the regex.
 
-## Advances Board Filters
+### Advances Board Filters
 
 In most cases, just adding a simple `TTY_BOARD_FILTER` is sufficient. If we
 however have wildly different flavors of the same board (e.g. genuine Arduino

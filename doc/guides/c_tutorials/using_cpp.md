@@ -3,7 +3,7 @@ title: Using C++ in RIOT
 description: This document explains how to use C++ in RIOT, including levels of support and requirements for C++ code.
 ---
 
-# Levels of Support
+## Levels of Support
 
 A CPU in RIOT can have three levels of support for C++ code:
 
@@ -21,7 +21,7 @@ can be one (or more) of the following:
     (such as constructor guards for the thread safe initialization of statically
     allocated instances) or hooks in the startup process to perform initialization
 
-# Using C++
+## Using C++
 
 In order for C++ code to compile with RIOT, the following needs to be done:
 

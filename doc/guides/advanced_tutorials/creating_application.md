@@ -132,7 +132,7 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
 endif
 ```
 
-# Helper Tools
+## Helper Tools
 
 To help you start writing an application within RIOT, the build system provides
 the `generate-example` and `generate-test` make targets. These targets are wrappers
@@ -142,8 +142,6 @@ generated with copyright headers, doxygen groups, etc, so you can concentrate
 on the module implementation.
 For applications, the `Makefile` is generated with the dependencies (modules,
 packages, required features) included.
-
-## Usage
 
 To generate an example application, e.g in the `examples` directory, from the
 RIOT base directory, run:
@@ -181,7 +179,7 @@ target used.
 **Testrunner:** when using the `make generate-test`, you can also automatically
 add a testrunner Python script. Just answer 'y' when prompted.
 
-# Creating an Out of Tree Application Structure
+## Creating an Out of Tree Application Structure
 
 Applications written for RIOT do not have to reside in the RIOT tree. Out of
 tree applications, modules and boards are supported.
@@ -237,7 +235,7 @@ inside a modules os boards directory. The RIOT build system has both
 `EXTERNAL_MODULE_DIRS` and `EXTERNAL_BOARD_DIRS` variables to specify
 directories that contain extra modules and extra boards.
 
-## External Boards
+### External Boards
 
 External boards can be ported in an identical way as porting a regular board to
 RIOT, see [Porting Boards](/advanced_tutorials/porting_boards/).
@@ -250,7 +248,7 @@ configuration (e.g. configuring some of the pins configured as ADC as
 additional PWM outputs instead) a copy of the upstream board that is then
 customized to the application needs is the best course of action.
 
-## External Modules
+### External Modules
 
 Similar to the external boards, external modules can be written in a similar way
 as regular in-tree modules.
@@ -268,7 +266,7 @@ Note that the make variable (here `USEMODULE_INCLUDES_my_module`) must be unique
 for every module to make this work. Including the module name here is usually
 sufficient.
 
-## Extra Makefile Scaffolding
+### Extra Makefile Scaffolding
 
 A bit of extra, but optional, Makefile scaffolding can help to keep the project
 easy to maintain. An extra `Makefile.include` in the root directory of the

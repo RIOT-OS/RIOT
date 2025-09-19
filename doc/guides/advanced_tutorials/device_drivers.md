@@ -11,7 +11,7 @@ peripherals itself are in RIOT not considered to be device drivers, but
 peripheral or low-level drivers. Typical devices are network devices like
 radios, Ethernet adapters, sensors, and actuators.
 
-# General Design Objectives
+## General Design Objectives
 
 Device drivers should be as easy to use as possible. This implies an
 'initialize->ready' paradigm, meaning, that device drivers should be ready to use
@@ -53,9 +53,9 @@ Sixth, device drivers SHOULD be implemented independent of any CPU/board code.
 To achieve this, the driver implementations should strictly be based on
 platform independent interfaces as the peripheral drivers, xtimer, etc.
 
-# General
+## General
 
-## Documentation
+### Documentation
 
 Document what your driver does! Most devices come with a very large number of
 features, while the corresponding device driver only supports a subset of them.
@@ -63,7 +63,7 @@ This should be clearly stated in the device driver's documentation so that
 anyone wanting to use the driver can find out the supported features without
 having to scan through the code.
 
-## Device Descriptor and Parameter Configuration
+### Device Descriptor and Parameter Configuration
 
 Each device MUST supply a data structure, holding the devices state and
 configuration, using the naming scheme of `DEVNAME_t` (e.g. `dht_t`, or
@@ -108,7 +108,7 @@ configuration data that is only used once can be read directly from ROM, while
 often used fields (e.g. used peripherals) are stored directly in the device
 descriptor and one saves hereby one de-referencing step when accessing them.
 
-## Default Device Configuration
+### Default Device Configuration
 
 Each device driver in RIOT MUST supply a default configuration file, named
 `DEVNAME_params.h`. This file should be located in the `RIOT/drivers/...`. The
@@ -201,7 +201,7 @@ Third, we can define more than a single device in the board configuration
 And finally, we can simply override the `tmpabc_params.h` file as described
 above.
 
-## Compile-time Configuration Documentation
+### Compile-time Configuration Documentation
 
 The macros that configure the driver during compilation is added to the listing
 for [Compile time configurations](https://doc.riot-os.org/group__config.html). Refer to the following example
@@ -230,7 +230,7 @@ to [sensors group](https://doc.riot-os.org/group__config__drivers__sensors.htmls
 Sub-groups defined for different types of drivers can be found in
 [drivers/doc.txt](https://github.com/RIOT-OS/RIOT/blob/master/drivers/doc.txt)
 
-## Initialization
+### Initialization
 
 In general, the initialization functions should do the following:
 
@@ -250,7 +250,7 @@ For more detailed information on how the signature of the init functions should
 look like, please refer below to the specific requirements for network devices
 and sensors.
 
-## Return Values
+### Return Values
 
 As stated above, we check communication of a device during initialization and
 handle error return values from the lower layers, where they exist. To prevent
@@ -299,7 +299,7 @@ negative return value indicates an error without exceptions. E.g. like this:
 int foo_humidity(const foo_t *dev);
 ```
 
-### Documenting Return Values
+#### Documenting Return Values
 
 With the exception of functions returning `void`, all return values have to be
 documented. Use the `return` Doxygen command to describe what is returned. In
@@ -309,7 +309,7 @@ argument (no spaces in the value allowed!), and a description (spaces allowed
 here) as second. It is safe to use both `return` and `retval` commands, or just
 one of them - whatever makes most sense for a given function.
 
-## General Device Driver Checklist
+### General Device Driver Checklist
 
 - *MUST*: the supported feature set and any custom behavior is clearly
   documented
@@ -322,9 +322,9 @@ one of them - whatever makes most sense for a given function.
 - *MUST*: use `const devab_t *dev` when the device descriptor can be access
   read-only
 
-## Build System Integration
+### Build System Integration
 
-### Internal Include Files
+#### Internal Include Files
 
 If the driver contains internal include files, a `Makefile.include` must be
 added in the driver implementation directory, with the following content
@@ -335,7 +335,7 @@ USEMODULE_INCLUDES_<driver name> := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_<driver name>)
 ```
 
-### External Dependencies
+#### External Dependencies
 
 If the driver has other module or CPU features dependencies (like `xtimer` or
 `periph_i2c`), they must be added in the `$(RIOTBASE)/drivers/Makefile.dep`
@@ -351,7 +351,7 @@ endif
 
 **Warning:** Please be careful with alphabetical order when modifying this file.
 
-## Helper Tools
+### Helper Tools
 
 To help you start writing a device driver, the RIOT build system provides the
 `generate-driver` make target. It is a wrapper around the
@@ -359,8 +359,6 @@ To help you start writing a device driver, the RIOT build system provides the
 when starting to implement a driver: all minimum files are generated with
 copyright headers, doxygen groups, etc, so you can concentrate on the driver
 implementation.
-
-**Usage:**
 
 From the RIOT base directory, run:
 ```
@@ -379,9 +377,9 @@ Then answer a few questions about the driver:
 Other global information (author name, email, organization) should be retrieved
 automatically from your git configuration.
 
-# Sensors
+## Sensors
 
-## SAUL
+### SAUL
 
 All sensor drivers SHOULD implement the SAUL interface. It is however
 recommended, that the drivers are written in a way, that the drivers do not
@@ -410,7 +408,7 @@ int saul_read(saul_t *dev, phydat_t *data)
 This ensures the versatility of the device driver, having in mind that one might
 want to use the driver without SAUL or maybe in a context without RIOT.
 
-## Initialization
+### Initialization
 
 Sensor device drivers are expected to implement a single initialization
 function, `DEVNAME_init`, taking the device descriptor and the device's
@@ -422,15 +420,15 @@ int tmpabc_init(tmpabc_t *dev, const tmpabc_params_t *params);
 
 After this function is called, the device MUST be running and usable.
 
-## Value Handling
+### Value Handling
 
-### Value Semantics
+#### Value Semantics
 
 All sensors in RIOT MUST return their reading results as real physical values.
 When working with sensor data, these are the values of interest, and the
 overhead of the conversion is normally neglectable.
 
-### Typing
+#### Typing
 
 All values SHOULD be returned using integer types, with `int16_t` being the
 preferred type where applicable.
@@ -441,7 +439,7 @@ directly while using their fraction. The recommended way to solve this is by
 scaling the result value using decimal fixed point arithmetic, in other words,
 just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 
-## Additional Sensor Driver Checklist
+### Additional Sensor Driver Checklist
 
 - *MUST*: mandatory device parameters are configurable through this file, e.g.
   sampling rate, resolution, sensitivity
@@ -459,9 +457,9 @@ just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 - *SHOULD*: the driver exports functions for putting it to sleep and waking up
   the device
 
-# Network Devices
+## Network Devices
 
-## Initialization
+### Initialization
 
 The initialization process MUST be split into 2 steps: first, initialize the
 device descriptor and if applicable the used peripherals, and secondly do the
@@ -478,7 +476,7 @@ void netabc_setup(netabc_t *dev, const netabc_params_t *params);
 int netabs_init(netabc_t *dev);
 ```
 
-## netdev
+### netdev
 
 Device driver for network device SHOULD implement the `netdev` interface. It is
 up to the implementer, if the device driver also offers a device specific
@@ -486,7 +484,7 @@ interface which is then mapped to the `netdev` interface, or if the device
 driver can be purely interfaced using `netdev`. While the second option is
 recommended for efficiency reasons, this is not mandatory.
 
-## Additional Network Device Driver Checklist
+### Additional Network Device Driver Checklist
 
 - *MUST*: a setup function in the style of
   `int devab_setup(devab_t *dev, const devab_params_t *params);` exists
@@ -494,7 +492,7 @@ recommended for efficiency reasons, this is not mandatory.
   exists
 - *SHOULD*: the driver implements 'netdev' [if applicable]
 
-# TODO
+## TODO
 
 Add some information about how to handle multiple threads, when to use mutexes,
 and how to deal with interrupts?  And especially patterns for being nice from

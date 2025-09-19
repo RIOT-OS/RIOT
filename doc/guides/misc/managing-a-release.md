@@ -3,19 +3,19 @@ title: Managing a Release
 description: This page describes the process of managing a release.
 ---
 
-# Contents
+## Contents
 
-1. [Checklist](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#1-checklist)
-2. [Preparation](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#2-preparation)
-3. [Feature Freeze and Testing](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#3-feature-freeze-and-testing)
-4. [Drafting Release Notes](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#4-Drafting-Release-Notes)
-5. [Actual Release](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#5-actual-release)
-6. [Other Repositories](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#6-Other-repositories)
-7. [Important Fixes after Release](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#7-important-fixes-after-release)
-8. [Resources](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#8-resources)
-9. [Forum post templates](https://github.com/RIOT-OS/RIOT/wiki/Managing-a-Release#9-forum-post-templates)
+1. [Checklist](#1-checklist)
+2. [Preparation](#2-preparation)
+3. [Feature Freeze and Testing](#3-feature-freeze-and-testing)
+4. [Drafting Release Notes](#4-drafting-release-notes)
+5. [Actual Release](#5-actual-release)
+6. [Other Repositories](#6-other-repositories)
+7. [Important Fixes after Release](#7-important-fixes-after-release)
+8. [Resources](#8-resources)
+9. [Forum post templates](#9-forum-post-templates)
 
-# 1. Checklist
+## 1. Checklist
 
 Steps marked with a :scroll: icon can also be automated with the release manager script.
 
@@ -31,7 +31,7 @@ Steps marked with a :scroll: icon can also be automated with the release manager
 - [ ] Go through list of deprecated features and make sure pending removals are applied
 - [ ] Familiarise with release specs and tests, incl open issues, deprecations, api changes, and PRs
 
-**Soft feature freeze**
+**Soft Feature Freeze**
 - [ ] Post about soft feature freeze to the forum
 - [ ] Check that there are no pending Rust changes (`find -name Cargo.toml -exec cargo update --manifest-path "{}" --package riot-wrappers --package riot-sys ";"` should be a no-op), otherwise poke Rust using maintainers
 - [ ] Familiarise with nearly-merged, high impact PRs, and contact the contributors to ask them to hold
@@ -57,7 +57,7 @@ Do the below actions iteratively, generating new release candidates, until all r
 - [ ] Inform about the release on the forum
 - [ ] Update the [release statistics](https://github.com/RIOT-OS/RIOT/wiki/release-statistics)
 
-# 2. Preparation
+## 2. Preparation
 
 A good time to start preparing for the release is two months before the intended release date. Keep track of open pull requests and issues, especially of those marked with the Milestone label for the imminent release. This is a good time to clean up the GitHub repository and get rid of outdated, redundant or already fixed pull requests and issues.
 
@@ -71,7 +71,7 @@ GitHub's [hub](https://github.com/github/hub) command line tool is useful to col
 
 Also review PRs tagged for the milestone that have not been updated in a long time. This state arises when a PR was tagged for a particular milestone, but was not merged in time and so the release manager tagged it for the _next_ milestone. As a guideline, if a PR already has been tagged for three milestones, then simply remove the milestone rather than advancing it to the next. After this removal, either the PR gets some attention or the stale bot eventually will close it.
 
-# 3. Feature Freeze and Testing
+## 3. Feature Freeze and Testing
 
 There are two feature freezes: soft and hard.
 
@@ -82,21 +82,21 @@ Hard feature freeze is the date at which the release branch gets created. When h
 Any bugfixes should be merged into RIOT master and backported into the release branch by creating an identical PR against it. The backport_pr tool in the RIOT repo can be used to do this automatically. To coordinate testing, you can use the checkboxes and the discussion in the release candidate's issue, and/or the release tracking spreadsheet, at your discretion. Once all bugfixes addressing test failures have been merged and backported, a new release candidate is generated and testing begins again. This happens iteratively until we get a release candidate which passes all the tests without any further bugfixes. As there are "always" known issues, and deadlines need to be satisfied, it is possible to abstain at some point from backporting and re-testing iteratively, and list the issue as known in the release notes.
 
 
-## Automatic freezing and release candidate generation
+### Automatic Freezing and Release Candidate Generation
 
 First create a [classic Token](https://github.com/settings/tokens) and supply it to the `riot-release-manager` script with the `-t <token>` parameter.
 
-**Feature freeze:**
+**Feature Freeze:**
 ```bash
 riot-release-manager feature-freeze yyyy.mm
 ```
-**Generating a new release candidate:**
+**Generating a new Release Candidate:**
 ```bash
 riot-release-manager rc yyyy.mm
 ```
 
 
-## Manual freezing and release candidate generation
+### Manual Freezing and Release Candidate Generation
 
 Even if you're using the release manager script, it's worth reading this section so you know what's going on.
 
@@ -115,18 +115,18 @@ In the RIOT [Release Specs](https://github.com/RIOT-OS/Release-Specs/issues) rep
 
 When generating a new release candidate, the release candidate needs to be tagged, a new issue needs to be created in the [Release Specs repository](https://github.com/RIOT-OS/Release-Specs/issues) and testing starts from the beginning (as described above).
 
-# 4. Drafting Release Notes
+## 4. Drafting Release Notes
 
 
-## Automatic draft release note generation
+### Automatic Draft Release Note Generation
 
-**Setting milestones :**
+**Setting Milestones :**
 This allows the release-notes script to understand which PRs were merged for this release.
 ```bash
 riot-release-manager set-milestones yyyy.mm --execute
 ```
 
-**Draft release notes :**
+**Draft Release Notes :**
 ```bash
 riot-release-manager release-notes yyyy.mm
 ```
@@ -135,11 +135,11 @@ Then review the output to sort potential mismatch in categories where different 
 
 A key part of the notes, however, is the selected highlights, which are not be generated automatically, and which you must draft manually.
 
-## Manually drafting release note
+### Manually Drafting Release Note
 
 Obviously, you can also choose to do the above by hand.
 
-# 5. Actual Release
+## 5. Actual Release
 
 Once a release candidate passed all tests you are ready to create the release notes. Open an etherpad and list new features, major improvements and features as well as known issues as done in [previous releases](https://github.com/RIOT-OS/RIOT/blob/master/release-notes.txt). Make sure the line length is about 90 characters. You should share this pad with other maintainers and give them some time for review. Alternatively you can open a pull request with your notes and discuss there. But the former has proven well so far.
 
@@ -158,7 +158,7 @@ We maintain a Release statistic where you should add numbers from the previously
 
 After you have released, be sure to inform all RIOTers about the release via mail on all lists and RIOT forum (under Announcements).
 
-## Automatic releasing
+### Automatic Releasing
 
 Run the command
 
@@ -166,7 +166,7 @@ Run the command
 riot-release-manager release yyyy.mm
 ```
 
-## Manual releasing
+### Manual Releasing
 
 Again, it's worth reading this section even if you're using the release manager tool.
 
@@ -174,11 +174,11 @@ Tag this release as you did for the release candidate, except that you should si
 
 Now that everything is ready, create the release. This can easily be done via GitHubs web interface. In the [RIOT](https://github.com/RIOT-OS/RIOT) repository click on *Releases->Draft a new release*. Assign the tag you previously created and signed, set title `RIOT-<yyyy-mm> and paste the release notes below. Et voilà, that's the release.
 
-# 6. Other repositories
+## 6. Other Repositories
 
 Don't forget to update the submodule in the [applications repository](https://github.com/RIOT-OS/applications) and [Tutorials repository](https://github.com/RIOT-OS/Tutorials) and test if the applications still work.
 
-# 7. Important Fixes after Release
+## 7. Important Fixes after Release
 
 After the release, issues may arise that are important enough to warrant an update to the release. As a first step, such issues should be backported to the release branch. If a single issue represents a critical fix, or if a number of lesser backported issues accumulate, then a bugfix or point release should be created.
 
@@ -186,7 +186,7 @@ For example, after the 2019.10 release [#12653](https://github.com/RIOT-OS/RIOT/
 
 A point release for a critical issue is best limited to a small number of changes to the original release to reduce the amount of testing required and also reduce the introduction of new bugs. We do not have a policy on who should manage a point release, but the previous release manager at least should consult on the point release since they are most familiar with the previous release.
 
-# 8. Resources
+## 8. Resources
 
 | Description | Location |
 |-------------|----------|
@@ -201,11 +201,11 @@ A point release for a critical issue is best limited to a small number of change
 | Release test tracking spreadsheet | https://drive.google.com/open?id=0B384VtEXbD_HRzJSY1NGdnFpWERxb2JFeGdaS09iUjV0TGhN |
 
 
-# 9. Forum post templates
+## 9. Forum Post Templates
 
 These templates are suggestions, if useful. Whatever the phrasing, posts with similar content should be made to the forum at various stages of the release process.
 
-## Date announcement and feature request
+### Date Announcement and Feature Request
 **Subject**
 Release [YYYY.MM] - dates and feature requests
 
@@ -230,7 +230,7 @@ Best regards, and happy hacking!
 [Name]
 ```
 
-## Soft feature freeze announcement
+### Soft Feature Freeze Announcement
 **Subject**
 Release [YYYY.MM] - Soft feature freeze now effective
 
@@ -246,7 +246,7 @@ Wishing you a happy code/polish/review/merge sprint,
 [Name]
 ```
 
-## Hard feature freeze announcement
+### Hard Feature Freeze Announcement
 **Subject**
 Release [YYYY.MM] - Hard feature freeze now effective
 
@@ -277,7 +277,7 @@ Best regards,
 [2] https://github.com/RIOT-OS/Release-Specs#pytest-runner
 ```
 
-### Release announcement
+#### Release Announcement
 **Subject**
 Release [YYYY.MM]
 

@@ -170,7 +170,7 @@ See `sys/ztimer/Makefile` for an example in code.
 `SUBMODULES` can also be true-pseudomodules, or become one by conditionally excluding
 the source files by adding them to `SUBMODULES_NO_SRC`.
 
-# Helper Tools
+## Helper Tools
 
 To help you start writing a module, the RIOT build system provides the
 `generate-module` make target. It is a wrapper around the
@@ -179,8 +179,6 @@ when starting to implement a module: all required files are generated with
 copyright headers, doxygen groups, etc, so you can concentrate on the module
 implementation.
 The module source files are created in the `sys` directory.
-
-## Usage
 
 From the RIOT base directory, run:
 ```sh

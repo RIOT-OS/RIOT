@@ -8,7 +8,7 @@ For each area, some near-future plans and concrete next steps are indicated.
 The text and items below are tentative, up for discussion, to be updated by regular pull requests.
 
 
-# Network Stack High Layers
+## Network Stack High Layers
 (contact/steering: [Martine](https://github.com/miri64))
 
 - ICN stack support clean-up
@@ -20,19 +20,19 @@ The text and items below are tentative, up for discussion, to be updated by regu
   - [ ] in legacy networks (eg. by means of tunneling)
   - [ ] with configurable on-by-default fallbacks
 
-# Network Stack Low Layers
+## Network Stack Low Layers
 (contact/steering: [Peter](https://github.com/PeterKietzmann))
 
 - Point-to-Point Protocol (PPP): finalize and merge `gnrc_ppp`
 
 
-# Integrations
+## Integrations
 (contact/steering: [Teufelchen](https://github.com/teufelchen1))
 
 - [Home-Assistant](https://www.home-assistant.io/) BTHome integration
 - [Home-Assistant](https://www.home-assistant.io/) integration via [MQTT Discovery](https://www.home-assistant.io/integrations/mqtt#mqtt-discovery)
 
-# Power Modes
+## Power Modes
 (contact/steering: [benpicco](https://github.com/benpicco))
 
 - concept to fix shell usage issue while LPM activated
@@ -42,17 +42,17 @@ The text and items below are tentative, up for discussion, to be updated by regu
 
 
 
-# Peripheral Drivers
+## Peripheral Drivers
 (contact/steering: [maribu](https://github.com/maribu))
 
-## Timers
+### Timers
 
 (contact/steering: [kaspar030](https://github.com/kaspar030), [benpicco](https://github.com/benpicco), [maribu](https://github.com/maribu))
 
 - cleanup and unification of low-level timer interfaces (`timer`, `rtt`, `rtc`)
 - implement capture mode
 
-## SPI
+### SPI
 
 - introduction of `spi_slave` interface
 - transition to `spi_clk_t` being the frequency in Hz, not an `enum` constant, to allow arbitrary frequencies
@@ -60,12 +60,12 @@ The text and items below are tentative, up for discussion, to be updated by regu
 - allow a way to detect the actual frequency an SPI bus is running at
     - see https://github.com/RIOT-OS/RIOT/pull/16727 for one proposal
 
-## I2C
+### I2C
 
 - introduction of `i2c_slave` interface
     - see https://github.com/RIOT-OS/RIOT/issues/19560 for a discussion
 
-## GPIO
+### GPIO
 
 (contact/steering: [gschorcht](https://github.com/gschorcht), [maribu](https://github.com/maribu))
 
@@ -74,7 +74,7 @@ The text and items below are tentative, up for discussion, to be updated by regu
     - many MCUs still need an implementation
 - add a high level API that unifies external and internal GPIOs on top
 
-## ADC
+### ADC
 
 (contact/steering: [benpicco](https://github.com/benpicco), [kfessel](https://github.com/kfessel), [gschorcht](https://github.com/gschorcht), [maribu](https://github.com/maribu))
 
@@ -87,7 +87,7 @@ The text and items below are tentative, up for discussion, to be updated by regu
 
 
 
-# Software Updates
+## Software Updates
 (contact/steering: [Emmanuel](https://github.com/emmanuelsearch))
 
 - Modularize to provide toolbox supporting other image storing (e.g. support external flash), transport (other than CoAP), crypto (e.g. secure element).
@@ -95,14 +95,14 @@ The text and items below are tentative, up for discussion, to be updated by regu
 
 
 
-# Documentation
+## Documentation
 (contact/steering: [Emmanuel](https://github.com/emmanuelsearch))
 
 - Write and publish more RDMs
 
 
 
-# Low-Level Hardware Support
+## Low-Level Hardware Support
 (contact/steering: [Alex](https://github.com/aabadie))
 
 - radio support for TI SensorTag
@@ -110,21 +110,21 @@ The text and items below are tentative, up for discussion, to be updated by regu
 
 
 
-# Testing
+## Testing
 (contact/steering: [Kaspar](https://github.com/kaspar030))
 
 - automated network functionality tests (e.g. RPL + UDP/PING tests through border router, multi-hop) in IoTLAB dev sites?
 
 
 
-# Security
+## Security
 (contact/steering: [Kaspar](https://github.com/kaspar030))
 
 - RNG unified (secure, or basic), seeding
 - RIOT default configuration = secure configuration (that's our goal/motto)
 
 
-## 802.15.4 Link Layer Security
+### 802.15.4 Link Layer Security
 (contact/steering: [chrysn](https://github.com/chrysn))
 
 Current status: RIOT supports application provided keys,

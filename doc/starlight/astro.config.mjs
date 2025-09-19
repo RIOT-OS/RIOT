@@ -136,6 +136,7 @@ export default defineConfig({
             "misc/io_mapping_and_shields",
             "misc/roadmap",
             "misc/release_cycle",
+            "misc/managing-a-release",
             "misc/emulators",
             "misc/terminal_config",
             "misc/how_to_doc",

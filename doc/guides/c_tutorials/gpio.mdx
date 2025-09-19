@@ -29,6 +29,30 @@ To do this we adapt the `BOARD` variable in our `Makefile` to the board we are u
 BOARD ?= arduino-feather-nrf52840-sense
 ```
 
+```makefile title="Makefile" {5}
+# name of your application
+APPLICATION = gpio_example
+
+# Change this to your board if you want to build for a different board
+BOARD ?= arduino-feather-nrf52840-sense
+
+# This has to be the absolute path to the RIOT base directory:
+# If you are following the tutorial, your RIOT base directory will
+# most likely be something like RIOTBASE ?= $(CURDIR)/RIOT
+# instead of this
+RIOTBASE ?= $(CURDIR)/../../..
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
+include $(RIOTBASE)/Makefile.include
+```
+
 :::tip
 If you ever want to just quickly test something
 on a board without having to change the `Makefile`,
@@ -36,8 +60,6 @@ you can also set the `BOARD` variable in the terminal before running `make`.
 ```bash
 BOARD=arduino-feather-nrf52840-sense make all
 ```
-
-![The board variable in Visual Studio Code](img/gpio/01_define_board.png)
 
 First we want to make sure that we can build the code for the board.
 To do this we can simply run `make all` in the terminal,
@@ -107,7 +129,37 @@ USEMODULE += ztimer
 USEMODULE += ztimer_msec
 ```
 
-![The Makefile with the GPIO modules](img/gpio/03_gpio_modules.png)
+```makefile title="Makefile" {18-24}
+# name of your application
+APPLICATION = gpio_example
+
+# Change this to your board if you want to build for a different board
+BOARD ?= arduino-feather-nrf52840-sense
+
+# This has to be the absolute path to the RIOT base directory:
+# If you are following the tutorial, your RIOT base directory will
+# most likely be something like RIOTBASE ?= $(CURDIR)/RIOT
+# instead of this
+RIOTBASE ?= $(CURDIR)/../../..
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
+# Add the gpio module to the build
+USEMODULE += periph_gpio
+USEMODULE += periph_gpio_irq
+
+# Enable the milliseconds timer.
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
+include $(RIOTBASE)/Makefile.include
+```
 
 This allows us to both control the GPIO pins and timers.
 
@@ -118,7 +170,7 @@ In this case, we also need the `ztimer_msec` module to use the millisecond timer
 
 Now we need to actually define the pin that we want to control in our code.
 To do this include the following lines **before** the `main` function.
-{/*<!--skip ci-->*/}
+
 ```c
 #include "board.h"
 #include "periph/gpio.h"
@@ -134,16 +186,17 @@ and afterwards we turn the LED off by clearing the pin.
 
 {/*<!--skip ci-->*/}
 ```c
-int main(void) {
-  /* Initialize the LED0 pin */
-  gpio_init(led0, led0_mode);
-  /* Turn off the LED0 pin */
-  gpio_clear(led0);
+int main(void)
+{
+    /* Initialize the LED0 pin */
+    gpio_init(led0, led0_mode);
+    /* Turn off the LED0 pin */
+    gpio_clear(led0);
 
-  /* Loop forever */
-  while (1) {
+    /* Loop forever */
+    while (1) {
 
-  }
+    }
 }
 ```
 
@@ -151,15 +204,41 @@ Turning the LED off when the board starts is quite boring,
 so let's make it blink by adding a delay and toggling the LED.
 
 ```c
-  /* Loop forever */
-  while (1) {
-    /* Toggle the LED0 pin every 500 milliseconds */
-    gpio_toggle(led0);
-    ztimer_sleep(ZTIMER_MSEC, 500);
-  }
+    /* Loop forever */
+    while (1) {
+        /* Toggle the LED0 pin every 500 milliseconds */
+        gpio_toggle(led0);
+        ztimer_sleep(ZTIMER_MSEC, 500);
+    }
 ```
 
-![The Code in Visual Studio Code](img/gpio/04_code.png)
+The full code should now look like this:
+
+{/*<!--skip ci-->*/}
+```c title="main.c" {16-21}
+#include "board.h"
+#include "periph/gpio.h"
+#include "ztimer.h"
+
+/* Define the LED0 pin and mode */
+gpio_t led0 = GPIO_PIN(1, 9);
+gpio_mode_t led0_mode = GPIO_OUT;
+
+int main(void)
+{
+    /* Initialize the LED0 pin */
+    gpio_init(led0, led0_mode);
+    /* Turn off the LED0 pin */
+    gpio_clear(led0);
+
+    /* Loop forever */
+    while (1) {
+        /* Toggle the LED0 pin every 500 milliseconds */
+        gpio_toggle(led0);
+        ztimer_sleep(ZTIMER_MSEC, 500);
+    }
+}
+```
 
 If we now `make flash` and then `make term` we should see the LED blinking.
 
@@ -183,22 +262,32 @@ that will be called when the button is pressed.
 
 ```c title="Define the button callback function"
 /* This callback function will be called when the button state changes */
-void button_callback(void *arg) {
-  /* the argument is not used */
-  (void)arg;
+void button_callback(void *arg)
+{
+    /* the argument is not used */
+    (void)arg;
 
-  /* Toggle the LED1 pin based on the button state */
-  if (gpio_read(button)) {
-    gpio_clear(led1);
-  } else {
-    gpio_set(led1);
-  }
+    /* Toggle the LED1 pin based on the button state */
+    if (gpio_read(button)) {
+        gpio_clear(led1);
+    }
+    else {
+        gpio_set(led1);
+    }
 }
 ```
 
 Now we need to define the button and led1 pin and mode and initialize it.
 
-```c {1-6, 27-33}
+```c title="main.c" {9-14, 38-44}
+#include "board.h"
+#include "periph/gpio.h"
+#include "ztimer.h"
+
+/* Define the LED0 pin and mode */
+gpio_t led0 = GPIO_PIN(1, 9);
+gpio_mode_t led0_mode = GPIO_OUT;
+
 /* Define the LED1 pin and mode */
 gpio_t led1 = GPIO_PIN(1, 10);
 gpio_mode_t led1_mode = GPIO_OUT;
@@ -207,45 +296,46 @@ gpio_mode_t led1_mode = GPIO_OUT;
 gpio_t button = GPIO_PIN(1, 2);
 
 /* This callback function will be called when the button state changes */
-void button_callback(void *arg) {
-  /* the argument is not used */
-  (void)arg;
+void button_callback(void *arg)
+{
+    /* the argument is not used */
+    (void)arg;
 
-  /* Toggle the LED1 pin based on the button state */
-  if (gpio_read(button)) {
-    gpio_clear(led1);
-  } else {
-    gpio_set(led1);
-  }
+    /* Toggle the LED1 pin based on the button state */
+    if (gpio_read(button)) {
+        gpio_clear(led1);
+    }
+    else {
+        gpio_set(led1);
+    }
 }
 
-int main(void) {
-  /* Initialize the LED0 pin */
-  gpio_init(led0, led0_mode);
-  /* Turn off the LED0 pin */
-  gpio_clear(led0);
+int main(void)
+{
+    /* Initialize the LED0 pin */
+    gpio_init(led0, led0_mode);
+    /* Turn off the LED0 pin */
+    gpio_clear(led0);
 
-  /* Initialize the LED1 pin */
-  gpio_init(led1, led1_mode);
-  /* Turn off the LED1 pin */
-  gpio_clear(led1);
+    /* Initialize the LED1 pin */
+    gpio_init(led1, led1_mode);
+    /* Turn off the LED1 pin */
+    gpio_clear(led1);
 
-  /* Initialize the button pin */
-  gpio_init_int(button, GPIO_IN_PU, GPIO_BOTH, button_callback, NULL);
+    /* Initialize the button pin */
+    gpio_init_int(button, GPIO_IN_PU, GPIO_BOTH, button_callback, NULL);
 
-  /* Loop forever */
-  while (1) {
-    /* Toggle the LED0 pin every 500 milliseconds */
-    gpio_toggle(led0);
-    ztimer_sleep(ZTIMER_MSEC, 500);
-  }
+    /* Loop forever */
+    while (1) {
+        /* Toggle the LED0 pin every 500 milliseconds */
+        gpio_toggle(led0);
+        ztimer_sleep(ZTIMER_MSEC, 500);
+    }
 }
 ```
 
 This code will initialize the button pin and call the `button_callback`
 function whenever the button is pressed.
-
-![Full Code in Visual Studio Code](img/gpio/07_full_code.png)
 
 If we now `make flash` and then `make term` we should see the LED turn on
 when the button is pressed.
@@ -278,18 +368,19 @@ Using this define, we can simplify our code to the following:
 
 {/*<!--skip ci-->*/}
 ```c title="Using the LED0_TOGGLE define"
-int main(void) {
-  /* Initialize the LED0 pin */
-  gpio_init(led0, led0_mode);
-  /* Turn off the LED0 pin */
-  gpio_clear(led0);
+int main(void)
+{
+    /* Initialize the LED0 pin */
+    gpio_init(led0, led0_mode);
+    /* Turn off the LED0 pin */
+    gpio_clear(led0);
 
-  /* Loop forever */
-  while (1) {
-    /* Toggle the LED0 pin every 500 milliseconds */
-    LED0_TOGGLE;
-    ztimer_sleep(ZTIMER_MSEC, 500);
-  }
+    /* Loop forever */
+    while (1) {
+        /* Toggle the LED0 pin every 500 milliseconds */
+        LED0_TOGGLE;
+        ztimer_sleep(ZTIMER_MSEC, 500);
+    }
 }
 ```
 

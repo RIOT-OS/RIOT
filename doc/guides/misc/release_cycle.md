@@ -16,7 +16,7 @@ are backported from `master` to the release branch, and new release candidates m
 when certain milestones are reached. Once all major bugs are fixed, the new RIOT release
 is signed off by the appointed release manager, typically within 2 weeks after the feature freeze.
 For more details and instructions for release managers, see the
-[managing a release guide](https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/managing-a-release).
+[managing a release guide](https://guide.riot-os.org/misc/managing-a-release/).
 
 RIOT follows a rolling release cycle, meaning support and bug fixes are only provided
 for the most current release.
