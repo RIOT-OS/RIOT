@@ -16,7 +16,8 @@ undefined behavior (UB).
 E.g., the following code might trigger UB for some parameters:
 
 ```c
-void test(int foo) {
+void test(int foo)
+{
     return (foo << 24);
 }
 ```

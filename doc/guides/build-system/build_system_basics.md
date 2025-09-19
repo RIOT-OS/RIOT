@@ -22,9 +22,10 @@ The fact that many `FEATURES` translate directly into a `MODULE` is only by
 convenience.
 
 e.g.
-
-    # all periph features correspond to a periph submodule
-    USEMODULE += $(filter periph_%,$(FEATURES_USED))
+```makefile
+# all periph features correspond to a periph submodule
+USEMODULE += $(filter periph_%,$(FEATURES_USED))
+```
 
 ### Providing a FEATURE
 
@@ -136,7 +137,7 @@ regarding these subjects.
 
 ## Avoid Unnecessary Export
 
-```
+```makefile
 export OUTPUT = $(shell some-command)
 ```
 
@@ -158,7 +159,7 @@ This is why global variables need clear documentation.
 
 ### Recursively Expanded Variable
 
-```
+```makefile
 OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))
 ```
 
@@ -177,7 +178,7 @@ OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))
 
 ### Simply Expanded Variable
 
-```
+```makefile
 OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))
 ```
 
@@ -195,7 +196,7 @@ OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))
 
 ### Memoized
 
-```
+```makefile
 OUTPUT = $(call memoized,OUTPUT,$(shell some-command))
 ```
 

@@ -94,7 +94,7 @@ You can see a full list of the supported features in the [Starlight documentatio
 
 MDX is a superset of Markdown that allows you to use JSX components within your Markdown file. This means that you can do things such as importing reusable components. One component that is/should be used frequently is the `Contact` component, which adds a small little note explaining some ways of getting help from the RIOT community. This component is imported like this:
 
-```markdown title="doc/guides/test/hello_world.mdx"
+```mdx title="doc/guides/test/hello_world.mdx"
 import Contact from '@components/contact.astro';
 
 <Contact/>

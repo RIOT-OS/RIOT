@@ -63,7 +63,7 @@ but will need to be prefixed with `-e` (see [option-summary]).
 
 e.g.:
 
-```
+```shell
 DOCKER_ENVIRONMENT_CMDLINE='-e BEER_TYPE="imperial stout"' BUILD_IN_DOCKER=1 make -C examples/basic/hello-world/
 docker run --rm -t -u "$(id -u)" \
     ...
@@ -105,7 +105,7 @@ A subset of these variables, namely variables relating to dependency resolution
 are therefore unconditionally passed to docker. The complete list can be found
 under `DOCKER_ENV_VARS_ALWAYS`.
 
-#### CFLAGS
+### CFLAGS
 
 CFLAGS are not automatically passed to docker because they might contain spaces,
 '"' or other characters that will require escaping. The solution is to pass it with
@@ -113,10 +113,15 @@ CFLAGS are not automatically passed to docker because they might contain spaces,
 
 e.g: if wanting to override STRING_WITH_SPACES
 
-```
-# normal build
+#### Normal Build
+
+```shell
 CFLAGS=-DSTRING_WITH_SPACES='\"with space\" make
-# in docker
+```
+
+#### In Docker
+
+```shell
 DOCKER_ENVIRONMENT_CMDLINE='-e CFLAGS=-DSTRING_WITH_SPACES=\'\\\"with\ space\\\"\'' \
   BUILD_IN_DOCKER=1 make
 ```

@@ -32,19 +32,19 @@ although not all of the subdirectories or Makefiles have to be present for
 a board implementation to work.
 
 ```
-  board-foo/
-  |----dist/
-      |----scripts
-  |----board.c
-  |----doc.md
-  |----include/
-      |----periph_conf.h
-      |----board.h
-      |----gpio_params.h
-  |----Makefile
-  |----Makefile.dep
-  |----Makefile.features
-  |----Makefile.include
+board-foo
+├── dist
+│   └── scripts
+├── board.c
+├── doc.md
+├── include
+│   ├── periph_conf.h
+│   ├── board.h
+│   └── gpio_params.h
+├── Makefile
+├── Makefile.dep
+├── Makefile.features
+└── Makefile.include
 ```
 
 ## Source Files
@@ -170,7 +170,7 @@ The default serial port configuration is provided by
 `makefiles/tools/serial.inc.mk` and defines the following values for the serial
 port (depending on the host OS):
 
-```
+```makefile
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 ```
@@ -201,6 +201,10 @@ It can be measured by running `tests/sys/ztimer_overhead` on your board, i.e:
 
 ```bash
 $ BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
+```
+
+This should give the following output:
+```
 main(): This is RIOT!
 ZTIMER_USEC auto_adjust params:
     ZTIMER_USEC->adjust_set = xx
@@ -346,23 +350,23 @@ commonly be done in your application `Makefile` or your environment). You can
 specify multiple directories separated by spaces.
 
 ```
-/home/
-|----RIOT/
-    |---- ...
-|----external-boards/
-    |----board-foo/
-        |----dist/
-            |----scripts
-        |----board.c
-        |----doc.md
-        |----include/
-            |----periph_conf.h
-            |----board.h
-            |----gpio_params.h
-        |----Makefile
-        |----Makefile.dep
-        |----Makefile.features
-        |----Makefile.include
+/home
+├── RIOT
+│   └── ...
+└── external-boards
+    └── board-foo
+        ├── dist
+        │   └── scripts
+        ├── board.c
+        ├── doc.md
+        ├── include
+        │   ├── periph_conf.h
+        │   ├── board.h
+        │   └── gpio_params.h
+        ├── Makefile
+        ├── Makefile.dep
+        ├── Makefile.features
+        └── Makefile.include
 ```
 
 If the external `BOARD` is very similar to a `BOARD` already present in
@@ -378,7 +382,7 @@ In this case some special considerations must be taken with the makefiles:
     one):
 
 ```makefile
-      DIRS += $(RIOTBOARD)/foo-parent
+DIRS += $(RIOTBOARD)/foo-parent
 ```
 
 - `Makefile.include`
