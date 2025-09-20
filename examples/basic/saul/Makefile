@@ -13,7 +13,7 @@ USEMODULE += saul_default
 USEMODULE += shell_cmds_default
 # additional modules for debugging:
 USEMODULE += ps
-
+USEMODULE += ads1x1x
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
