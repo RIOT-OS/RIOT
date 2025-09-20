@@ -85,24 +85,45 @@ extern "C" {
 /** @} */
 
 /**
- * @name ADS101x/111x data rate settings
- * Configures the data rate (samples per second).
+ * @name ADS101x/ADS111x Data Rate Settings
+ * @brief Register bit definitions for configuring data rate (samples per second).
  * @{
  */
-#define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5))      /**< Mask for data rate bits */
-#define ADS1X1X_DATAR_8       ((0 << 7) | (0 << 6) | (0 << 5))   /**< 8 SPS */
-#define ADS1X1X_DATAR_16      ((0 << 7) | (0 << 6) | (1 << 5))   /**< 16 SPS */
-#define ADS1X1X_DATAR_32      ((0 << 7) | (1 << 6) | (0 << 5))   /**< 32 SPS */
-#define ADS1X1X_DATAR_64      ((0 << 7) | (1 << 6) | (1 << 5))   /**< 64 SPS */
-#define ADS1X1X_DATAR_128     ((1 << 7) | (0 << 6) | (0 << 5))   /**< 128 SPS (default) */
-#define ADS1X1X_DATAR_250     ((1 << 7) | (0 << 6) | (1 << 5))   /**< 250 SPS */
-#define ADS1X1X_DATAR_475     ((1 << 7) | (1 << 6) | (0 << 5))   /**< 475 SPS */
-#define ADS1X1X_DATAR_490     ((0 << 7) | (1 << 6) | (0 << 5))   /**< 490 SPS */
-#define ADS1X1X_DATAR_860     ((1 << 7) | (1 << 6) | (1 << 5))   /**< 860 SPS */
-#define ADS1X1X_DATAR_920     ((0 << 7) | (1 << 6) | (1 << 5))   /**< 920 SPS */
-#define ADS1X1X_DATAR_1600    ((1 << 7) | (0 << 6) | (0 << 5))   /**< 1600 SPS */
-#define ADS1X1X_DATAR_2400    ((1 << 7) | (0 << 6) | (1 << 5))   /**< 2400 SPS */
-#define ADS1X1X_DATAR_3300    ((1 << 7) | (1 << 6) | (0 << 5))   /**< 3300 SPS */
+
+#define ADS1X1X_DATAR_UNDEF   (0xFF)   /**< Undefined / invalid data rate */
+#define ADS1X1X_DATAR_MASK    ((1 << 7) | (1 << 6) | (1 << 5)) /**< Bit mask for data rate field */
+
+/**
+ * @name ADS111x Data Rates
+ * @brief Valid data rates for ADS111x (in SPS).
+ * @{
+ */
+#if MODULE_ADS111X
+#  define ADS111X_DATAR_8       ((0 << 7) | (0 << 6) | (0 << 5)) /**< 8 SPS */
+#  define ADS111X_DATAR_16      ((0 << 7) | (0 << 6) | (1 << 5)) /**< 16 SPS */
+#  define ADS111X_DATAR_64      ((0 << 7) | (1 << 6) | (0 << 5)) /**< 64 SPS */
+#  define ADS111X_DATAR_128     ((0 << 7) | (1 << 6) | (1 << 5)) /**< 128 SPS (default) */
+#  define ADS111X_DATAR_250     ((1 << 7) | (0 << 6) | (0 << 5)) /**< 250 SPS */
+#  define ADS111X_DATAR_475     ((1 << 7) | (0 << 6) | (1 << 5)) /**< 475 SPS */
+#  define ADS111X_DATAR_860     ((1 << 7) | (1 << 6) | (0 << 5)) /**< 860 SPS (max) */
+#endif
+/** @} */
+
+/**
+ * @name ADS101x Data Rates
+ * @brief Valid data rates for ADS101x (in SPS).
+ * @{
+ */
+#if MODULE_ADS101X
+#  define ADS101X_DATAR_128     ((0 << 7) | (0 << 6) | (0 << 5)) /**< 128 SPS */
+#  define ADS101X_DATAR_250     ((0 << 7) | (0 << 6) | (1 << 5)) /**< 250 SPS */
+#  define ADS101X_DATAR_490     ((0 << 7) | (1 << 6) | (0 << 5)) /**< 490 SPS */
+#  define ADS101X_DATAR_920     ((0 << 7) | (1 << 6) | (1 << 5)) /**< 920 SPS */
+#  define ADS101X_DATAR_1600    ((1 << 7) | (0 << 6) | (0 << 5)) /**< 1600 SPS (default) */
+#  define ADS101X_DATAR_2400    ((1 << 7) | (0 << 6) | (1 << 5)) /**< 2400 SPS */
+#  define ADS101X_DATAR_3300    ((1 << 7) | (1 << 6) | (0 << 5)) /**< 3300 SPS (max) */
+#endif
+/** @} */
 /** @} */
 
 /**
@@ -145,6 +166,27 @@ extern "C" {
 #define ADS1X1X_COMP_QUEUE_2          ((0 << 1) | (1 << 0)) /**< Assert after 2 conversions */
 #define ADS1X1X_COMP_QUEUE_4          ((1 << 1) | (0 << 0)) /**< Assert after 4 conversions */
 #define ADS1X1X_COMP_QUEUE_DISABLE    ((1 << 1) | (1 << 0)) /**< Disable comparator (default) */
+/** @} */
+
+/**
+ * @name ADS101x/111x bit resolution
+ * @{
+ */
+#define ADS1X1X_BITS_RES_UNDEF (0)  /**< Undefined resolution */
+
+/**
+ * @brief ADS101x 12-bit resolution
+ */
+#if MODULE_ADS101X
+#  define ADS101X_BITS_RES    (12) /**< 12-bit resolution */
+#endif
+
+/**
+ * @brief ADS111x 16-bit resolution
+ */
+#if MODULE_ADS111X
+#  define ADS111X_BITS_RES    (16) /**< 16-bit resolution */
+#endif
 /** @} */
 
 /**
