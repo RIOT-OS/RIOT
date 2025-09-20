@@ -90,14 +90,11 @@ extern "C" {
 #endif
 
 /**
- * @brief Default data rate configuration
+ * @def ADS1X1X_PARAM_DATAR
+ * @brief Default data rate configuration set to undefined
  */
-#if MODULE_ADS111X
-#  define ADS111X_PARAM_DATAR   (ADS1X1X_DATAR_128)
-#  define ADS1X1X_PARAM_DATAR   (ADS111X_PARAM_DATAR)
-#elif defined(MODULE_ADS101X)
-#  define ADS101X_PARAM_DATAR   (ADS1X1X_DATAR_1600)
-#  define ADS1X1X_PARAM_DATAR  (ADS101X_PARAM_DATAR)
+#ifndef ADS1X1X_PARAM_DATAR
+#  define ADS1X1X_PARAM_DATAR  ADS1X1X_DATAR_UNDEF
 #endif
 
 /**
@@ -142,29 +139,33 @@ extern "C" {
 
 /**
  * @def ADS1X1X_PARAM_BITS_RES
- * @brief Resolution in bits of the ADC
+ * @brief Default bit resolution set to undefined
  */
-#if MODULE_ADS101X
-#  define ADS101X_PARAM_BITS_RES  (12)
-#  define ADS1X1X_PARAM_BITS_RES  ADS101X_PARAM_BITS_RES
-#elif defined(MODULE_ADS111X)
-#  define ADS111X_PARAM_BITS_RES  (16)
-#  define ADS1X1X_PARAM_BITS_RES  ADS111X_PARAM_BITS_RES
+#ifndef ADS1X1X_PARAM_BITS_RES
+#  define ADS1X1X_PARAM_BITS_RES  (ADS1X1X_BITS_RES_UNDEF)
 #endif
 
 /**
  * @def ADS1X1X_PARAMS
- * @brief Default ADS1X1X parameters structure
+ * @brief Default configuration parameters structure for ADS1X1X ADC devices
  *
- * @note The default parameter set defined here can only be used if a single type of
- *       ADS101x/111x device is used. If devices of both types are used together, a
- *       user-defined parameter set must be provided via @ref ADS1X1X_PARAMS.
+ * This macro defines the default parameter structure used to initialize ADS1X1X
+ * analog-to-digital converter devices. The structure contains all necessary
+ * configuration options including resolution, data rate, gain, and operational modes.
  *
- *       In this case, you must configure the parameters according to the device type:
- *       - @ref ads1x1x_params_t::bits_res must be set to either
- *         ADS101X_PARAM_BITS_RES or ADS111X_PARAM_BITS_RES.
- *       - @ref ads1x1x_params_t::dr must also be set to either
- *         ADS101X_PARAM_DATAR or ADS111X_PARAM_DATAR.
+ * @warning The following parameters are mandatory and must be explicitly configured:
+ *          - @ref ads1x1x_params_t::bits_res - ADC resolution, must be set to either:
+ *            * ADS101X_BITS_RES for 12-bit resolution (ADS101x series)
+ *            * ADS111X_BITS_RES for 16-bit resolution (ADS111x series)
+ *          - @ref ads1x1x_params_t::dr - Data rate configuration, must be set to a
+ *            valid sampling rate value appropriate for the selected device variant
+ *
+ * @note Other parameters in the structure have sensible defaults but can be
+ *       customized based on application requirements such as input multiplexer
+ *       configuration, programmable gain amplifier settings, and comparator modes.
+ *
+ * @see ads1x1x_params_t for detailed parameter structure definition
+ * @see ads1x1x_init() for device initialization using these parameters
  */
 #ifndef ADS1X1X_PARAMS
 #  define ADS1X1X_PARAMS          { .i2c = ADS1X1X_PARAM_I2C,        \

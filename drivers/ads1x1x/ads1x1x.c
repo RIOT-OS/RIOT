@@ -31,7 +31,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef ADS1X1X_READ_DELAY_MS
+#ifndef ADS1X1X_READ_DELAY_MS //TODO: optim
 #define ADS1X1X_READ_DELAY_MS           8   /* compatible with 128SPS */
 #endif
 
@@ -200,6 +200,7 @@ int ads1x1x_init(ads1x1x_t *dev, const ads1x1x_params_t *params)
 int ads1x1x_set_parameters(ads1x1x_t *dev, const ads1x1x_params_t *params)
 {
     assert(dev && params);
+    assert(params->bits_res != ADS1X1X_BITS_RES_UNDEF && params->dr != ADS1X1X_DATAR_UNDEF);
 
     i2c_acquire(params->i2c);
 
