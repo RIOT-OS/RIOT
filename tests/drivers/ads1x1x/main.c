@@ -19,14 +19,14 @@
 #include <stdio.h>
 
 #include "ztimer.h"
-#include "ads101x.h"
-#include "ads101x_params.h"
-#include "ads101x_regs.h"
+#include "ads1x1x.h"
+#include "ads1x1x_params.h"
+#include "ads1x1x_internal.h"
 
 #define SLEEP_MSEC      100
 
-static ads101x_t dev;
-static ads101x_alert_t alert_dev;
+static ads1x1x_t dev;
+static ads1x1x_alert_t alert_dev;
 
 static void alert_cb(void *arg)
 {
@@ -38,11 +38,11 @@ int main(void)
 {
     int16_t data;
 
-    puts("ADS101X analog to digital driver test application\n");
+    puts("ADS1X1X analog to digital driver test application\n");
     printf("Initializing ADS101x analog to digital at I2C_DEV(%i)... ",
-           ads101x_params->i2c);
+           ads1x1x_params->i2c);
 
-    if (ads101x_init(&dev, ads101x_params) == ADS101X_OK) {
+    if (ads1x1x_init(&dev, ads1x1x_params) == ADS1X1X_OK) {
         puts("[OK]");
     }
     else {
@@ -50,10 +50,10 @@ int main(void)
         return -1;
     }
 
-    printf("Initializing ADS101x alert at I2C_DEV(%i)... ",
-           ads101x_alert_params->i2c);
+    printf("Initializing ADS1X1X alert at I2C_DEV(%i)... ",
+           ads1x1x_alert_params->i2c);
 
-    if (ads101x_alert_init(&alert_dev, ads101x_alert_params) == ADS101X_OK) {
+    if (ads1x1x_alert_init(&alert_dev, ads1x1x_alert_params) == ADS1X1X_OK) {
         puts("[OK]");
     }
     else {
@@ -62,7 +62,7 @@ int main(void)
     }
 
     printf("Enabling alert interrupt: ");
-    if (ads101x_enable_alert(&alert_dev, alert_cb, NULL) == ADS101X_OK) {
+    if (ads1x1x_enable_alert(&alert_dev, alert_cb, NULL) == ADS1X1X_OK) {
         puts("[OK]");
     }
     else {
@@ -72,8 +72,8 @@ int main(void)
 
     while (1) {
         printf("Raw analog read. CH0: ");
-        ads101x_set_mux_gain(&dev, ADS101X_AIN0_SINGM | ADS101X_PGA_FSR_2V048);
-        if (ads101x_read_raw(&dev, &data) == ADS101X_OK) {
+        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN0_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
         else {
@@ -82,8 +82,8 @@ int main(void)
         }
 
         printf(" CH1: ");
-        ads101x_set_mux_gain(&dev, ADS101X_AIN1_SINGM | ADS101X_PGA_FSR_2V048);
-        if (ads101x_read_raw(&dev, &data) == ADS101X_OK) {
+        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN1_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
         else {
@@ -92,8 +92,8 @@ int main(void)
         }
 
         printf(" CH2: ");
-        ads101x_set_mux_gain(&dev, ADS101X_AIN2_SINGM | ADS101X_PGA_FSR_2V048);
-        if (ads101x_read_raw(&dev, &data) == ADS101X_OK) {
+        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN2_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
         else {
@@ -102,8 +102,8 @@ int main(void)
         }
 
         printf(" CH3: ");
-        ads101x_set_mux_gain(&dev, ADS101X_AIN3_SINGM | ADS101X_PGA_FSR_2V048);
-        if (ads101x_read_raw(&dev, &data) == ADS101X_OK) {
+        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN3_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
         else {

@@ -5,7 +5,11 @@ ifneq (,$(filter adc%1c,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ads101%,$(USEMODULE)))
-  USEMODULE += ads101x
+  $(error "Module ads101x got renamed to ads1x1x.")
+endif
+
+ifneq (,$(filter ads1x1%,$(USEMODULE)))
+  USEMODULE += ads1x1x
 endif
 
 ifneq (,$(filter apds99%,$(USEMODULE)))
