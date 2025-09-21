@@ -110,6 +110,21 @@ avr_libc_version() {
 }
 
 printf "\n"
+printf "%s\n" "RIOT version information"
+printf "%s\n" "----------------------------"
+if [ -d .git ]; then
+    RIOT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    RIOT_COMMIT_HASH=$(git rev-parse HEAD)
+    RIOT_COMMIT_DATE=$(git log -1 --format=%cd --date=short)
+else
+    RIOT_BRANCH="unknown (not a git repository)"
+    RIOT_COMMIT_HASH="unknown (not a git repository)"
+    RIOT_COMMIT_DATE="unknown (not a git repository)"
+fi
+printf "%25s: %s\n" "RIOT branch" "$RIOT_BRANCH"
+printf "%25s: %s\n" "RIOT commit hash" "$RIOT_COMMIT_HASH"
+printf "%25s: %s\n" "RIOT commit date" "$RIOT_COMMIT_DATE"
+printf "\n"
 # print operating system information
 printf "%s\n" "Operating System Environment"
 printf "%s\n" "----------------------------"
@@ -171,6 +186,12 @@ for c in \
          python \
          python2 \
          python3 \
+         rustup \
+         cargo \
+         rustc \
+         c2rust \
+         node \
+         npm \
          ; do
     printf "%25s: %s\n" "$c" "$(get_cmd_version "${c}")"
 done
