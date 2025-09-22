@@ -96,7 +96,14 @@ export default defineConfig({
                 "c_tutorials/threads",
                 "c_tutorials/gpio",
                 "c_tutorials/saul",
-                "c_tutorials/using_cpp",
+                "c_tutorials/coding_conventions",
+              ],
+            },
+            {
+              label: "C++ Basics",
+              items: [
+                "cpp_tutorials/using_cpp",
+                "cpp_tutorials/coding_conventions",
               ],
             },
             {
