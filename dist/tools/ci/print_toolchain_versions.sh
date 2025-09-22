@@ -144,6 +144,7 @@ for p in \
          riscv-none-elf \
          riscv64-unknown-elf \
          riscv32-esp-elf \
+         riscv32-unknown-elf \
          xtensa-esp32-elf \
          xtensa-esp32s2-elf \
          xtensa-esp32s3-elf \
@@ -162,6 +163,7 @@ for p in \
          riscv-none-elf \
          riscv64-unknown-elf \
          riscv32-esp-elf \
+         riscv32-unknown-elf \
          xtensa-esp32-elf \
          xtensa-esp32s2-elf \
          xtensa-esp32s3-elf \
