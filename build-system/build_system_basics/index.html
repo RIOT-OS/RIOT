@@ -88,7 +88,7 @@ with the same name. There could be many implementations for the same <code dir="
 The fact that many <code dir="auto">FEATURES</code> translate directly into a <code dir="auto">MODULE</code> is only by
 convenience.</p>
 <p>e.g.</p>
-<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.tm3va.css"><script type="module" src="/_astro/ec.8zarh.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53"># all periph features correspond to a periph submodule</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">USEMODULE += $(filter periph_%,$(FEATURES_USED))</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="# all periph features correspond to a periph submoduleUSEMODULE += $(filter periph_%,$(FEATURES_USED))"><div></div></button></div></figure></div>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.tm3va.css"><script type="module" src="/_astro/ec.8zarh.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5F636F"># all periph features correspond to a periph submodule</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">USEMODULE</span><span style="--0:#D6DEEB;--1:#403F53"> += </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">filter</span><span style="--0:#ECC48D"> periph_</span><span style="--0:#82AAFF">%</span><span style="--0:#ECC48D">,$(</span><span style="--0:#C5E478">FEATURES_USED</span><span style="--0:#ECC48D">))</span></span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="# all periph features correspond to a periph submoduleUSEMODULE += $(filter periph_%,$(FEATURES_USED))"><div></div></button></div></figure></div>
 <h3 id="providing-a-feature">Providing a FEATURE</h3>
 <p>For a <code dir="auto">FEATURE</code> to be provided by a <code dir="auto">board</code> it must meet 2 criteria, and for
 <code dir="auto">periph_%</code> and other <em>hw</em> (hardware) related <code dir="auto">FEATURES</code> it must follow a 3rd criteria.</p>
@@ -219,7 +219,7 @@ summarizes some of the pros and cons as well as specifies good and bad patterns
 in our build system. You might want to refer to <code dir="auto">gnu make</code> documentation
 regarding these subjects.</p>
 <h2 id="avoid-unnecessary-export">Avoid Unnecessary Export</h2>
-<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">export OUTPUT = $(shell some-command)</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="export OUTPUT = $(shell some-command)"><div></div></button></div></figure></div>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">export</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#C5E478;--1:#3B61B0">OUTPUT</span><span style="--0:#D6DEEB;--1:#403F53"> = </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">shell</span><span style="--0:#ECC48D"> some-command)</span></span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="export OUTPUT = $(shell some-command)"><div></div></button></div></figure></div>
 <p>Exporting a variable means it will be evaluated on every <code dir="auto">target</code> call, which
 slows down the build system. Always avoid exporting a variable if unneeded.</p>
 <p>If an export is actually needed by a <code dir="auto">sub-make</code> then export the variable only for
@@ -232,7 +232,7 @@ This is why global variables need clear documentation.</p>
 <p><a href="https://www.gnu.org/software/make/manual/html_node/Variables_002fRecursion.html">gnumake doc</a></p>
 <h2 id="use-memoized-for-variables-referencing-a-function-or-command">Use Memoized for Variables Referencing a Function or Command</h2>
 <h3 id="recursively-expanded-variable">Recursively Expanded Variable</h3>
-<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))"><div></div></button></div></figure></div>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">OUTPUT</span><span style="--0:#D6DEEB;--1:#403F53"> = </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">shell</span><span style="--0:#ECC48D"> some-command $(</span><span style="--0:#C5E478">ANOTHER_VARIABLE</span><span style="--0:#ECC48D">))</span></span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))"><div></div></button></div></figure></div>
 <ul>
 <li>
 <p>When using <code dir="auto">=</code> the value of the variable is only declared, but not set,
@@ -252,7 +252,7 @@ is none.</p>
 </li>
 </ul>
 <h3 id="simply-expanded-variable">Simply Expanded Variable</h3>
-<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))"><div></div></button></div></figure></div>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">OUTPUT</span><span style="--0:#D6DEEB;--1:#403F53"> := </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">shell</span><span style="--0:#ECC48D"> some-command $(</span><span style="--0:#C5E478">ANOTHER_VARIABLE</span><span style="--0:#ECC48D">))</span></span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))"><div></div></button></div></figure></div>
 <ul>
 <li>
 <p>When using <code dir="auto">:=</code> the value is only expanded once, expanding any reference to
@@ -271,7 +271,7 @@ tool is defined with <code dir="auto">:=</code> but you don’t have the tool an
 </li>
 </ul>
 <h3 id="memoized">Memoized</h3>
-<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">OUTPUT = $(call memoized,OUTPUT,$(shell some-command))</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="OUTPUT = $(call memoized,OUTPUT,$(shell some-command))"><div></div></button></div></figure></div>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">OUTPUT</span><span style="--0:#D6DEEB;--1:#403F53"> = </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">call</span><span style="--0:#ECC48D"> memoized,OUTPUT,$(</span><span style="--0:#C5E478">shell</span><span style="--0:#ECC48D"> some-command))</span></span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="OUTPUT = $(call memoized,OUTPUT,$(shell some-command))"><div></div></button></div></figure></div>
 <ul>
 <li><code dir="auto">memoized</code> is a RIOT defined function that combines characteristics from
 both <code dir="auto">=</code> and <code dir="auto">:=</code>.
