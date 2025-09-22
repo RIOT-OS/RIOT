@@ -116,14 +116,13 @@ e.g: if wanting to override STRING_WITH_SPACES
 #### Normal Build
 
 ```shell
-CFLAGS=-DSTRING_WITH_SPACES='\"with space\" make
+CFLAGS='-DSTRING_WITH_SPACES="\"with space\""' make
 ```
 
 #### In Docker
 
 ```shell
-DOCKER_ENVIRONMENT_CMDLINE='-e CFLAGS=-DSTRING_WITH_SPACES=\'\\\"with\ space\\\"\'' \
-  BUILD_IN_DOCKER=1 make
+DOCKER_ENVIRONMENT_CMDLINE="-e CFLAGS='-DSTRING_WITH_SPACES=\\\"with\ space\\\"'" BUILD_IN_DOCKER=1 make
 ```
 
 Alternatively, it is often easier to define the CFLAGS in the Makefile which gets
