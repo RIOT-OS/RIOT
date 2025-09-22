@@ -135,6 +135,7 @@ export default defineConfig({
             "misc/dev_best_practices",
             "misc/io_mapping_and_shields",
             "misc/roadmap",
+            "misc/lost_and_found",
             "misc/release_cycle",
             "misc/emulators",
             "misc/terminal_config",

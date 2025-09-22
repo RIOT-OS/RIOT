@@ -23,7 +23,7 @@ clean:
 	-@rm -rf node_modules .astro dist
 
 .PHONY: integrate_outside_files
-integrate_outside_files: code_of_conduct governance
+integrate_outside_files: code_of_conduct governance lostandfound
 
 .PHONY: code_of_conduct
 code_of_conduct: ../../CODE_OF_CONDUCT.md
@@ -35,3 +35,8 @@ code_of_conduct: ../../CODE_OF_CONDUCT.md
 governance: ../../GOVERNANCE.md
 	-@echo "Generating Governance documentation..."
 	-@sed '1,2d' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' | cat ./templates/GOVERNANCE.template.md - > ../guides/generated/GOVERNANCE.md
+
+.PHONY: lostandfound
+lostandfound: ../../LOSTANDFOUND.md
+	-@echo "Generating Lost and Found documentation..."
+	-@sed '1,2d' $< | cat ./templates/LOSTANDFOUND.template.md - > ../guides/generated/LOSTANDFOUND.md
