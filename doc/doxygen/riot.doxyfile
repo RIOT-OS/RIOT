@@ -893,7 +893,7 @@ INPUT                  = ../../doc.txt \
                          src/release-cycle.md \
                          src/io-mapping-and-shields.md \
                          src/changelog.md \
-                         ../../LOSTANDFOUND.md \
+                         src/LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
                          ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c \
