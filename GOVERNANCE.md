@@ -259,7 +259,7 @@ Computing Foundation (CNCF).
 [maintainers GitHub team]: https://github.com/orgs/RIOT-OS/teams/maintainers
 [managing a release]: https://github.com/RIOT-OS/RIOT/blob/master/doc/guides/managing-a-release/README.md
 [maintaining guidelines]: https://github.com/RIOT-OS/RIOT/blob/master/MAINTAINING.md
-[Code of Conduct]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
-[Code of Conduct reporting guidance]: https://doc.riot-os.org/coc-reporting-guide.html
+[Code of Conduct]: https://guide.riot-os.org/general/code_of_conduct/
+[Code of Conduct reporting guidance]: https://guide.riot-os.org/general/code_of_conduct/reporting/
 [security policy]: https://github.com/RIOT-OS/RIOT/blob/master/SECURITY.md
 [GOVERNANCE-maintainer.md template]: https://github.com/cncf/project-template/blob/main/GOVERNANCE-maintainer.md
