@@ -866,10 +866,10 @@ INPUT                  = ../../doc.txt \
                          src/ \
                          src/mainpage.md \
                          src/vision.md \
-                         src/governance.md \
+                         src/governance-deprecated.md \
                          src/roadmap.md \
                          src/coc-info.md \
-                         src/coc.md \
+                         src/coc-deprecated.md \
                          src/coc-reporting-guide.md \
                          src/coc-faq.md \
                          src/creating-modules.md \
@@ -893,7 +893,7 @@ INPUT                  = ../../doc.txt \
                          src/release-cycle.md \
                          src/io-mapping-and-shields.md \
                          src/changelog.md \
-                         ../../LOSTANDFOUND.md \
+                         src/LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
                          ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c \

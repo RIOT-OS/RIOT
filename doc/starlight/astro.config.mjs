@@ -96,7 +96,14 @@ export default defineConfig({
                 "c_tutorials/threads",
                 "c_tutorials/gpio",
                 "c_tutorials/saul",
-                "c_tutorials/using_cpp",
+                "c_tutorials/coding_conventions",
+              ],
+            },
+            {
+              label: "C++ Basics",
+              items: [
+                "cpp_tutorials/using_cpp",
+                "cpp_tutorials/coding_conventions",
               ],
             },
             {
@@ -135,6 +142,7 @@ export default defineConfig({
             "misc/dev_best_practices",
             "misc/io_mapping_and_shields",
             "misc/roadmap",
+            "misc/lost_and_found",
             "misc/release_cycle",
             "misc/managing-a-release",
             "misc/emulators",

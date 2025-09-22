@@ -23,7 +23,7 @@ clean:
 	-@rm -rf node_modules .astro dist
 
 .PHONY: integrate_outside_files
-integrate_outside_files: code_of_conduct governance
+integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp
 
 .PHONY: code_of_conduct
 code_of_conduct: ../../CODE_OF_CONDUCT.md
@@ -35,3 +35,18 @@ code_of_conduct: ../../CODE_OF_CONDUCT.md
 governance: ../../GOVERNANCE.md
 	-@echo "Generating Governance documentation..."
 	-@sed '1,2d' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' | cat ./templates/GOVERNANCE.template.md - > ../guides/generated/GOVERNANCE.md
+
+.PHONY: lostandfound
+lostandfound: ../../LOSTANDFOUND.md
+	-@echo "Generating Lost and Found documentation..."
+	-@sed '1,2d' $< | cat ./templates/LOSTANDFOUND.template.md - > ../guides/generated/LOSTANDFOUND.md
+
+.PHONY: coding_conventions
+coding_conventions: ../../CODING_CONVENTIONS.md
+	-@echo "Generating Lost and Found documentation..."
+	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS.template.md - > ../guides/generated/CODING_CONVENTIONS.md
+
+.PHONY: coding_conventions_cpp
+coding_conventions_cpp: ../../CODING_CONVENTIONS_C++.md
+	-@echo "Generating Lost and Found documentation..."
+	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS_CPP.template.md - > ../guides/generated/CODING_CONVENTIONS_CPP.md
