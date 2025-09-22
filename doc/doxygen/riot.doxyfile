@@ -866,7 +866,7 @@ INPUT                  = ../../doc.txt \
                          src/ \
                          src/mainpage.md \
                          src/vision.md \
-                         src/governance.md \
+                         src/governance-info.md \
                          src/roadmap.md \
                          src/coc-info.md \
                          src/coc.md \
