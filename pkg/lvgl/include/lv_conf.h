@@ -30,13 +30,17 @@ extern "C" {
  *====================*/
 
 /* Color depth:
- * - 1:  1 byte per pixel
+ * - 1:  1 bit per pixel
  * - 8:  RGB233
  * - 16: RGB565
  * - 32: ARGB8888
  */
 #ifndef LV_COLOR_DEPTH
-#define LV_COLOR_DEPTH     16
+#  if IS_USED(MODULE_U8G2_DISP_DEV)
+#    define LV_COLOR_DEPTH     1
+#  else
+#    define LV_COLOR_DEPTH     16
+#  endif
 #endif
 
 /* Swap the 2 bytes of RGB565 color.
