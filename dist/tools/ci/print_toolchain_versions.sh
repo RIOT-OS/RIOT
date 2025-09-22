@@ -186,8 +186,10 @@ for c in \
          python \
          python2 \
          python3 \
+         rustup \
          cargo \
          rustc \
+         c2rust \
          node \
          npm \
          ; do
