@@ -259,10 +259,10 @@ terminal on the correct port.
   matching rule in `/etc/udev/rules.d/70-riotboards.rules`.
 
 ```
-    # samr21-xpro
-    SUBSYSTEM=="tty", SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", \
-    ATTRS{idProduct}=="2111", ATTRS{manufacturer}=="Atmel Corp.", \
-    ATTRS{serial}=="ATML2127031800004957", SYMLINK+="riot/tty-samr21-xpro"
+# samr21-xpro
+SUBSYSTEM=="tty", SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", \
+ATTRS{idProduct}=="2111", ATTRS{manufacturer}=="Atmel Corp.", \
+ATTRS{serial}=="ATML2127031800004957", SYMLINK+="riot/tty-samr21-xpro"
 ```
 
 - reload rules: `udevadm control --reload-rules`
@@ -273,17 +273,17 @@ terminal on the correct port.
   `DEBUG_ADAPTER_ID` from the `SYMLINK` info
 
 ```makefile
-    PORT = /dev/riot/tty-$(BOARD)
-    DEBUG_ADAPTER_ID = $(\
-        shell udevadm info -q property $(PORT) |\
-        sed -n '/ID_SERIAL_SHORT/ {s/ID_SERIAL_SHORT=//p}')
+PORT = /dev/riot/tty-$(BOARD)
+DEBUG_ADAPTER_ID = $(\
+  shell udevadm info -q property $(PORT) |\
+  sed -n '/ID_SERIAL_SHORT/ {s/ID_SERIAL_SHORT=//p}')
 ```
 
 - You can now add `makefile.pre` to `RIOT_MAKEFILES_GLOBAL_PRE` as an environment
   variable or on each `make` call:
 
 ```sh
-    $ RIOT_MAKEFILES_GLOBAL_PRE=/path/to/makefile.pre make -C examples/basic/hello-world flash term
+$ RIOT_MAKEFILES_GLOBAL_PRE=/path/to/makefile.pre make -C examples/basic/hello-world flash term
 ```
 
 :::note
@@ -292,10 +292,10 @@ terminal on the correct port.
 
 ```makefile
 ifeq (1,$(ENABLE_LOCAL_BOARDS))
-    PORT = /dev/riot/tty-$(BOARD)
-    DEBUG_ADAPTER_ID = $(\
-        shell udevadm info -q property $(PORT) |\
-        sed -n '/ID_SERIAL_SHORT/ {s/ID_SERIAL_SHORT=//p}')
+  PORT = /dev/riot/tty-$(BOARD)
+  DEBUG_ADAPTER_ID = $(\
+    shell udevadm info -q property $(PORT) |\
+    sed -n '/ID_SERIAL_SHORT/ {s/ID_SERIAL_SHORT=//p}')
 endif
 ```
 :::
@@ -320,28 +320,28 @@ to use. Another option would be to add some kind of numbering and defining
 multiple symlinks for each board. e.g. for `samr21-xpro` number `n`:
 
 ```
-    # samr21-xpro
-    SUBSYSTEM=="tty", SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", \
-    ATTRS{idProduct}=="2111", ATTRS{manufacturer}=="Atmel Corp.", \
-    ATTRS{serial}=="ATML2127031800004957", SYMLINK+="riot/tty-samr21-xpro", \
-    SYMLINK+="riot/tty-samr21-xpro-n"
+# samr21-xpro
+SUBSYSTEM=="tty", SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", \
+ATTRS{idProduct}=="2111", ATTRS{manufacturer}=="Atmel Corp.", \
+ATTRS{serial}=="ATML2127031800004957", SYMLINK+="riot/tty-samr21-xpro", \
+SYMLINK+="riot/tty-samr21-xpro-n"
 ```
 
 Then, when flashing, the number can be specified and the parsing adapted:
 
 ```makefile
-    ifneq(,$(BOARD_NUM))
-      PORT = /dev/riot/tty-$(BOARD)-$(BOARD_NUM)
-    else
-      PORT = /dev/riot/tty-$(BOARD)
-    endif
-    DEBUG_ADAPTER_ID = $(\
-      shell udevadm info -q property $(PORT) |\
-      sed -n '/ID_SERIAL_SHORT/ {s/ID_SERIAL_SHORT=//p}')
+ifneq (,$(BOARD_NUM))
+  PORT = /dev/riot/tty-$(BOARD)-$(BOARD_NUM)
+else
+  PORT = /dev/riot/tty-$(BOARD)
+endif
+DEBUG_ADAPTER_ID = $(\
+  shell udevadm info -q property $(PORT) |\
+  sed -n '/ID_SERIAL_SHORT/ {s/ID_SERIAL_SHORT=//p}')
 ```
 
 ```sh
-    BOARD=samr21-xpro BOARD_NUM=n make flash term
+BOARD=samr21-xpro BOARD_NUM=n make flash term
 ```
 
 In the end, this would be the same as using the serial, but a simple number might
@@ -377,31 +377,31 @@ left as an exercise to the reader.
 The following Make snippet is used:
 
 ```makefile
-    LOCAL_BOARD_MAP ?= 1
+LOCAL_BOARD_MAP ?= 1
 
-    # Adapt this list to your board collection
-    SERIAL_nucleo-f103rb ?= 066BFF343633464257254156
-    SERIAL_same54-xpro ?= ATML2748051800005053
-    SERIAL_samr21-xpro ?= ATML2127031800008360
-    SERIAL_nrf52dk ?= 000682223007
+# Adapt this list to your board collection
+SERIAL_nucleo-f103rb ?= 066BFF343633464257254156
+SERIAL_same54-xpro ?= ATML2748051800005053
+SERIAL_samr21-xpro ?= ATML2127031800008360
+SERIAL_nrf52dk ?= 000682223007
 
-    ifeq (1,$(LOCAL_BOARD_MAP))
+ifeq (1,$(LOCAL_BOARD_MAP))
 
-      # Retrieve the serial of the selected board
-      BOARD_SERIAL = $(SERIAL_$(BOARD))
+  # Retrieve the serial of the selected board
+  BOARD_SERIAL = $(SERIAL_$(BOARD))
 
-      # Check if there is a serial for the board
-      ifneq (,$(BOARD_SERIAL))
+  # Check if there is a serial for the board
+  ifneq (,$(BOARD_SERIAL))
 
-        # Set the variables used by various debug tools to the selected serial
-        SERIAL ?= $(BOARD_SERIAL)
-        DEBUG_ADAPTER_ID ?= $(BOARD_SERIAL)
-        JLINK_SERIAL ?= $(BOARD_SERIAL)
+    # Set the variables used by various debug tools to the selected serial
+    SERIAL ?= $(BOARD_SERIAL)
+    DEBUG_ADAPTER_ID ?= $(BOARD_SERIAL)
+    JLINK_SERIAL ?= $(BOARD_SERIAL)
 
-        # Use the existing script to grab the matching /dev/ttyACM* device
-        PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py --most-recent --format path --serial $(SERIAL))
-      endif
-    endif
+    # Use the existing script to grab the matching /dev/ttyACM* device
+    PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py --most-recent --format path --serial $(SERIAL))
+  endif
+endif
 ```
 
 The array of board serial numbers has to be edited to match your local boards.
@@ -494,13 +494,13 @@ was found. We can still use the `ttys.py` script to detect all Arduino Mega
 selecting cheap USB UART bridges when that fails using the `||` shell operator:
 
 ```makefile
-  TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
-                    --most-recent \
-                    --format path serial \
-                    --vendor 'Arduino' \
-                    --model-db 'Mega 2560|Mega ADK' || \
-                    $(RIOTTOOLS)/usb-serial/ttys.py \
-                    --most-recent \
-                    --format path serial \
-                    --driver 'cp210x'
+TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
+                  --most-recent \
+                  --format path serial \
+                  --vendor 'Arduino' \
+                  --model-db 'Mega 2560|Mega ADK' || \
+                  $(RIOTTOOLS)/usb-serial/ttys.py \
+                  --most-recent \
+                  --format path serial \
+                  --driver 'cp210x'
 ```

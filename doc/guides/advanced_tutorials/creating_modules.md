@@ -114,47 +114,47 @@ These modules appear in RIOT under two forms:
 
 1. Conditionally included source files:
 
-  ```
-    foo/
-    |----foo_bar.c
-    |----foo.c
-    |----Makefile
-  ```
+```
+foo
+├── foo_bar.c
+├── foo.c
+└── Makefile
+```
 
 In `foo/Makefile` you add the source file to the `SRC` variable, conditioned on
 the Pseudomodule inclusion
 
-  ```makefile
-  ifneq (,$(filter foo_bar,$(USEMODULE)))
-    SRC += foo_bar.c
-  endif
-  ```
+```makefile
+ifneq (,$(filter foo_bar,$(USEMODULE)))
+  SRC += foo_bar.c
+endif
+```
 
 See `sys/net/ble/skald` for an example in code.
 
 2. Using the `SUBMODULES` mechanism:
 
-  ```
-    foo/
-    |----spam.c
-    |----ham.c
-    |----eggs.c
-    |----Makefile
-  ```
+```
+foo
+├── spam.c
+├── ham.c
+├── eggs.c
+└── Makefile
+```
 
-  ```makefile
-  # make all code end up in "foo_bar.a", this can be any name
-  MODULE := foo_bar
+```makefile
+# make all code end up in "foo_bar.a", this can be any name
+MODULE := foo_bar
 
-  # ensure that "foo_ham" or "bar_foo_ham" builds "foo_ham.c".
-  BASE_MODULE := foo
+# ensure that "foo_ham" or "bar_foo_ham" builds "foo_ham.c".
+BASE_MODULE := foo
 
-  # list of source files that are not SUBMODULES
-  SRC := spam.c
+# list of source files that are not SUBMODULES
+SRC := spam.c
 
-  # enable submodules by setting SUBMODULES = 1
-  SUBMODULES = 1
-  ```
+# enable submodules by setting SUBMODULES = 1
+SUBMODULES = 1
+```
 
 When using `SUBMODULES` in a `MODULE` all `SRC` file excluded from `foo/Makefile`
 will be considered `SUBMODULES`. In the example above `ham.c` and `eggs.c`.
