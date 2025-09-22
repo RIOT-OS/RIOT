@@ -7,7 +7,7 @@ When contributing source code, please adhere to the following coding style,
 which is loosely based on the [Google C++ Style Guide] and the coding
  conventions used by the C++ Standard Library. Based on the [CAF coding style].
 
-[C Conventions]: http://localhost:4321/c_tutorials/coding_conventions/
+[C Conventions]: https://guide.riot-os.org/c_tutorials/coding_conventions/
 [Google C++ Style Guide]: https://google.github.io/styleguide/cppguide.html
 [CAF coding style]: https://github.com/actor-framework/actor-framework/blob/master/CONTRIBUTING.md
 
