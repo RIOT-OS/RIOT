@@ -1,8 +1,8 @@
-# ZBOSS Zigbee ZLL example
+# ZBOSS Zigbee remote control example
 
 RIOT integrates ZBOSS, the open source ZigBee stack. This example is used for
-controlling ZigBee devices using Touchlink Commissioning, Permit Joining and
-the ZigBee Cluster Library.
+controlling ZigBee devices using Touchlink Commissioning and the
+ZigBee Cluster Library.
 
 ## Commands for Touchlink Initiator
 
