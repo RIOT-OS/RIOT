@@ -1,6 +1,8 @@
 /*
 
-Copyright (c) 2010 - 2020, Nordic Semiconductor ASA All rights reserved.
+Copyright (c) 2010 - 2025, Nordic Semiconductor ASA All rights reserved.
+
+SPDX-License-Identifier: BSD-3-Clause
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -308,6 +310,51 @@ POSSIBILITY OF SUCH DAMAGE.
 /* ARM TrustZone Cryptocell 310 */
 #define CRYPTOCELL_PRESENT
 #define CRYPTOCELL_COUNT 1
+#define CRYPTOCELL_VERSION 310
+
+/*CRYPTOCELL AES engine*/
+#define CC_AES_PRESENT
+#define CC_AES_COUNT 1
+
+/*CRYPTOCELL CHACHA engine*/
+#define CC_CHACHA_PRESENT
+#define CC_CHACHA_COUNT 1
+
+/*CRYPTOCELL CTL interface*/
+#define CC_CTL_PRESENT
+#define CC_CTL_COUNT 1
+
+/*CRYPTOCELL Data IN interface*/
+#define CC_DIN_PRESENT
+#define CC_DIN_COUNT 1
+
+/*CRYPTOCELL Data OUT interface*/
+#define CC_DOUT_PRESENT
+#define CC_DOUT_COUNT 1
+
+/*CRYPTOCELL HASH engine*/
+#define CC_HASH_PRESENT
+#define CC_HASH_COUNT 1
+
+/*CRYPTOCELL HOST register interface*/
+#define CC_HOST_RGF_PRESENT
+#define CC_HOST_RGF_COUNT 1
+
+/*CRYPTOCELL MISC interface*/
+#define CC_MISC_PRESENT
+#define CC_MISC_COUNT 1
+
+/*CRYPTOCELL PKA engine*/
+#define CC_PKA_PRESENT
+#define CC_PKA_COUNT 1
+
+/*CRYPTOCELL RNG engine*/
+#define CC_RNG_PRESENT
+#define CC_RNG_COUNT 1
+
+/*CRYPTOCELL RNG SRAM interface*/
+#define CC_RNG_SRAM_PRESENT
+#define CC_RNG_SRAM_COUNT 1
 
 /* Quad SPI */
 #define QSPI_PRESENT
