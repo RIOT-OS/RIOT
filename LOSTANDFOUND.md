@@ -17,7 +17,7 @@ things like the first `netdev` should not be put in this list, as a successor
 For each high-level feature removed there should be one entry in this list. The
 entries should comply to the following template:
 
-~~~~~~~~~~~~~~~~~~~ {.md}
+```markdown
 ### path/feature_name [HASH of removal commit]
 Author(s):
 - author 1 <foo.bar@abc.com>
@@ -29,7 +29,7 @@ Reason for removal:
 - feature is not maintained anymore
 - lack of hardware so feature can not be tested (anymore)
 - feature was never used and there is no reason for keeping it
-~~~~~~~~~~~~~~~~~~~
+```
 
 Additionally, a link reference for the commit on GitHub is added to the bottom of this document.
 
@@ -40,7 +40,7 @@ Listing the authors of the removed code is done for appreciation of their work.
 This way, their names are never removed from the RIOT repository.
 
 
-# Removed Features
+## Removed Features
 
 ### cpu/mips* [6cad5d24771ba6199228351a11b5062cd2e9b36d]
 
