@@ -1,12 +1,15 @@
-You should check out the [C Conventions](CODING_CONVENTIONS.md) as some section
+# Coding Conventions C++
+
+You should check out the [C Conventions] as some section
 still apply (Documentation, Git, Travis).
 
 When contributing source code, please adhere to the following coding style,
 which is loosely based on the [Google C++ Style Guide] and the coding
  conventions used by the C++ Standard Library. Based on the [CAF coding style].
 
-[Google C++ Style Guide]: (https://google.github.io/styleguide/cppguide.html)
-[CAF coding style]: (https://github.com/actor-framework/actor-framework/blob/master/CONTRIBUTING.md)
+[C Conventions]: http://localhost:4321/c_tutorials/coding_conventions/
+[Google C++ Style Guide]: https://google.github.io/styleguide/cppguide.html
+[CAF coding style]: https://github.com/actor-framework/actor-framework/blob/master/CONTRIBUTING.md
 
 ## Example for the Impatient
 
@@ -233,7 +236,6 @@ void my_class::do_something_else() {
   }
   ```
 
-
 ## Headers
 
 - Each `.cpp` file has an associated `.hpp` file.
@@ -257,7 +259,6 @@ void my_class::do_something_else() {
   main page for the documentation and includes all headers for the user API.
 
 - Use `inline` for small functions (rule of thumb: 10 lines or less).
-
 
 ## Breaking Statements
 
@@ -294,7 +295,6 @@ void my_class::do_something_else() {
       // ...
   }
   ```
-
 
 ## Template Metaprogramming
 
@@ -340,14 +340,12 @@ extra rules for formatting metaprogramming code.
                                                ResponseHandleTag>;
   ```
 
-
 ## Preprocessor Macros
 
 - Use macros if and only if you can't get the same result by using inline
   functions or proper constants.
 
 - Macro names use the form `RIOT_<COMPONENT>_<NAME>`.
-
 
 ## Comments
 
