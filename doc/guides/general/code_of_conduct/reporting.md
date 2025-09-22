@@ -3,7 +3,7 @@ title: Reporting Guidelines
 description: How to report violations of the RIOT Code of Conduct
 ---
 
-If you believe someone is violating the [code of conduct](/general/code_of_conduct/)
+If you believe someone is violating the [Code of Conduct](/general/code_of_conduct/)
 we ask that you report it to us by emailing <conduct@riot-os.org>.
 Currently, the recipients of
 this email address are [\@OlegHahm](https://github.com/OlegHahm) (Oleg Hahm) and
@@ -48,7 +48,7 @@ much quicker than that).
 They will review the incident and determine:
 
 -   What happened.
--   Whether this event constitutes a code of conduct violation.
+-   Whether this event constitutes a Code of Conduct violation.
 -   Who the bad actor was.
 -   Whether this is an ongoing situation, or if there is a threat to anyone's
     physical safety.
