@@ -869,7 +869,7 @@ INPUT                  = ../../doc.txt \
                          src/governance-deprecated.md \
                          src/roadmap.md \
                          src/coc-info.md \
-                         src/coc.md \
+                         src/coc-deprecated.md \
                          src/coc-reporting-guide.md \
                          src/coc-faq.md \
                          src/creating-modules.md \
