@@ -1,6 +1,6 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
-import { LinkCard } from "@astrojs/starlight/components";
+import { LinkButton, LinkCard } from "@astrojs/starlight/components";
 import { getCollection } from "astro:content";
 
 const changelog = await getCollection("changelog");
@@ -12,6 +12,15 @@ const changelog = await getCollection("changelog");
     description: "Complete version history and release notes for RIOT",
   }}
 >
+  <LinkButton
+    href="/misc/changelog/rss.xml"
+    variant="secondary"
+    icon="rss"
+    iconPlacement="start"
+  >
+    Subscribe to RSS Feed
+  </LinkButton>
+  <div style={{ height: "0.5rem" }}></div>
   {
     changelog.map((entry) => (
       <LinkCard
