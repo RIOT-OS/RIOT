@@ -1,0 +1,27 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const changelog = await getCollection("changelog");
+
+  return changelog.map((entry) => ({
+    params: {
+      version: entry.data.slug,
+    },
+    props: {
+      entry: entry,
+    },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<StarlightPage
+  frontmatter={{
+    title: entry.data.title,
+  }}
+  ><Content />
+</StarlightPage>

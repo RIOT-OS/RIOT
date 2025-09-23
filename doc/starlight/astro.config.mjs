@@ -1,10 +1,14 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import rehypeGithubEmoji from "rehype-github-emoji";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://guide.riot-os.org",
+  markdown: {
+    rehypePlugins: [rehypeGithubEmoji],
+  },
   integrations: [
     starlight({
       title: "RIOT Documentation",
@@ -145,6 +149,10 @@ export default defineConfig({
             "misc/lost_and_found",
             "misc/release_cycle",
             "misc/managing-a-release",
+            {
+              label: "Changelog",
+              link: "misc/changelog",
+            },
             "misc/emulators",
             "misc/terminal_config",
             "misc/how_to_doc",
@@ -165,7 +173,7 @@ export default defineConfig({
   vite: {
     server: {
       fs: {
-        allow: ["./", "../doxygen"],
+        allow: ["./", "../doxygen", "../../release-notes.txt"],
       },
     },
   },

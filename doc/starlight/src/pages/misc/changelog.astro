@@ -1,0 +1,23 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { LinkCard } from "@astrojs/starlight/components";
+import { getCollection } from "astro:content";
+
+const changelog = await getCollection("changelog");
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Changelog",
+    description: "Complete version history and release notes for RIOT",
+  }}
+>
+  {
+    changelog.map((entry) => (
+      <LinkCard
+        title={entry.data.title}
+        href={`/misc/changelog/${entry.data.slug}`}
+      />
+    ))
+  }
+</StarlightPage>
