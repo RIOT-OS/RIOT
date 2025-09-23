@@ -19,10 +19,10 @@ We assume here that your `CPU` and `CPU_MODEL` is already supported
 in `RIOT` so no peripheral or cpu implementation is needed.
 :::
 
-# Porting Flowchart
+## Porting Flowchart
 ![Porting flowchart](img/porting-boards.svg)
 
-# General Structure
+## General Structure
 
 Like [applications](/advanced_tutorials/creating_applications/) or
 [modules](/advanced_tutorials/creating_modules),
@@ -47,7 +47,7 @@ board-foo
 └── Makefile.include
 ```
 
-## Source Files
+### Source Files
 
 Header files in `board-foo/include` define physical mappings or
 configurations. e.g:
@@ -86,9 +86,9 @@ void board_init(void)
 }
 ```
 
-## Makefiles
+### Makefiles
 
-### Makefile
+#### Makefile
 
 A board's Makefile just needs to include `Makefile.base` in the RIOT
 repository and define the `MODULE` as `board` (see
@@ -100,7 +100,7 @@ MODULE = board
 include $(RIOTBASE)/Makefile.base
 ```
 
-### Makefile.dep
+#### Makefile.dep
 
 Dependencies on other `MODULES` or `FEATURES` can be defined here. This might
 specify `MODULES` or dependencies that need to be pulled under specific
@@ -118,7 +118,7 @@ the dependency block for your board *before* its dependencies pull in their own
 dependencies.
 :::
 
-#### Default Configurations
+##### Default Configurations
 There are two pseudomodules that are used to indicate that certain drivers of devices
 present in the platform should be enabled. Each board (or CPU) has knowledge as
 to which drivers should be enabled in each case.
@@ -142,7 +142,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 ```
 
-### Makefile.features
+#### Makefile.features
 
 This file defines all the features provided by the BOARD. These features
 might also need to be supported by the `CPU`. Here, define the `CPU` and
@@ -161,7 +161,7 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_uart
 ```
 
-### Makefile.include
+#### Makefile.include
 
 This file contains BSP or toolchain configurations for the `BOARD`. It
 should at least define the configuration needed for flashing (i.e. specify a
@@ -191,7 +191,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 PROGRAMMER ?= openocd
 ```
 
-## Timer Configurations
+### Timer Configurations
 
 When using the high level timer `ztimer` there is an overhead in calling the
 [ztimer_sleep](https://doc.riot-os.org/group__sys__ztimer.html#gade98636e198f2d571c8acd861d29d360)
@@ -235,7 +235,7 @@ Alternatively, the pseudomodule [ztimer_auto_adjust](https://doc.riot-os.org/gro
 can be used in an application to enable automatic timer offset compensation at board startup.
 This however incurs overhead both in the text segment and at bootup time.
 
-## doc.md
+### doc.md
 
 Although not explicitly needed, if upstreamed and as a general good
 practice, this file holds all `BOARD` documentation. This can include
@@ -251,15 +251,15 @@ any browser.
 @brief       Support for the foo board
 @author      FooName BarName <foo.bar@baz.com>
 
-### User Interface
+#### User Interface
 
   ...
 
-### Using UART
+#### Using UART
 
   ...
 
-### Flashing the device
+#### Flashing the device
 
   ...
 ```
@@ -277,7 +277,7 @@ the latest version with
 pip install --upgrade riotgen
 ```
 
-# Helper Tools
+## Helper Tools
 
 To help you start porting a board, the RIOT build system provides the
 `generate-board` make target. It is a wrapper around the
@@ -285,8 +285,6 @@ To help you start porting a board, the RIOT build system provides the
 when starting to port a board: all required files are generated with
 copyright headers, doxygen groups, etc, so you can concentrate on the port.
 The board source files are created in the `boards/<board name>` directory.
-
-## Usage
 
 From the RIOT base directory, run:
 
@@ -306,7 +304,7 @@ Then answer a few questions about the driver:
 Other global information (author name, email, organization) should be retrieved
 automatically from your git configuration.
 
-# Using Common Code
+## Using Common Code
 
 To avoid code duplication, common code across boards has been grouped in
 `boards/common`. e.g. `BOARD`s based on the same cpu (`boards/common/nrf52`) or
@@ -338,7 +336,7 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 ```
 
-# Boards Outside of RIOTBASE
+## Boards Outside of RIOTBASE
 
 All `BOARD`s in RIOT reside in `RIOTBOARD` (`RIOTBOARD` being a make variable
 set to `$(RIOTBOARD)/boards`).
@@ -402,7 +400,7 @@ DIRS += $(RIOTBOARD)/foo-parent
 An example can be found in
 [`tests/build_system/external_board_native`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_board_native).
 
-# Board Names and Aliases
+## Board Names and Aliases
 
 New boards should be named according to
 [RDM0003](https://github.com/RIOT-OS/RIOT/blob/master/doc/memos/rdm0003.md).
@@ -418,7 +416,7 @@ resolves to either [`native32`](https://doc.riot-os.org/group__boards__native32.
 or [`native64`](https://doc.riot-os.org/group__boards__native64.html)
 depending on the host architecture.
 
-# Tools
+## Tools
 
 Some scripts and tools available to ease `BOARD` porting and testing:
 
@@ -430,7 +428,7 @@ Some scripts and tools available to ease `BOARD` porting and testing:
   - Run `dist/tools/compile_and_test_for_board/compile_and_test_for_board.py . <board> --with-test-only`
     to run all automated tests on the new board.
 
-# Further Reference
+## Further Reference
 
 - [In her blog](https://blog.martine-lenders.eu/riot-board-en.html), Martine Lenders documented her approach of
   porting the [Adafruit Feather nRF52840 Express](https://doc.riot-os.org/group__boards__adafruit-feather-nrf52840-express.html)

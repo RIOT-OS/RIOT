@@ -15,12 +15,12 @@ We rather would like you to think of it as a guide to enrich our community and
 the technical community in general with new knowledge and perspectives by
 allowing everyone to participate.
 
-This code of conduct applies to all spaces managed by the RIOT community. This
+This Code of Conduct applies to all spaces managed by the RIOT community. This
 includes any communication within the RIOT community, both online and face to
 face. In addition, violations of this code outside these spaces may also
 affect a person's ability to participate within them.
 
-If you believe someone is violating the code of conduct, we ask that you report
+If you believe someone is violating the Code of Conduct, we ask that you report
 it by emailing <conduct@riot-os.org>. For more details please see our [Reporting
 Guidelines][reporting-guidelines].
 

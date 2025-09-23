@@ -57,7 +57,7 @@ Sadly, not everyone knows this.
 
 However, even if everyone was kind, everyone was compassionate, and everyone was
 familiar with codes of conduct it would still be incumbent upon our community to
-publish our own. Maintaining a code of conduct forces us to consider and
+publish our own. Maintaining a Code of Conduct forces us to consider and
 articulate what kind of community we want to be, and serves as a constant
 reminder to put our best foot forward. But most importantly, it serves as a
 signpost to people looking to join our community that we feel these values are

@@ -41,7 +41,7 @@ i.e., including the modules that are part of RIOT itself.
 
 If not manually specified via `SRC`, all source files which reside
 directly in the module's directory are considered part of the module.
-RIOT modules are also described in greater detail [in the documentation](https://doc.riot-os.org/creating-modules.html).
+RIOT modules are also described in greater detail [in the documentation](https://guide.riot-os.org/advanced_tutorials/creating_modules/).
 
 Two lines need to be added to the application's Makefile in order to compile and use the module:
 
@@ -52,7 +52,7 @@ USEMODULE += module
 
 The path added to `EXTERNAL_MODULE_DIRS` is the parent directory of the external module,
 while the string added to `USEMODULE` has to match the module's directory name.
-External modules are described in greater detail [in the documentation](https://doc.riot-os.org/creating-an-application.html#autotoc_md2308).
+External modules are described in greater detail [in the documentation](https://guide.riot-os.org/advanced_tutorials/creating_application/#external-modules).
 
 
 ### Subfolders

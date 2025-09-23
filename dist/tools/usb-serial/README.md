@@ -77,7 +77,7 @@ By adding
 
 to the `Makefile.include` of your board, running `make MOST_RECENT_PORT=1 term`
 will connect to the most recently connected board matching the provided
-filters. Refer to https://api.riot-os.org/flashing.html#multiple-boards-simple
+filters. Refer to https://guide.riot-os.org/build-system/flashing/#handling-multiple-boards-simplest-approach
 for more details.
 
 `list-ttys.sh`
