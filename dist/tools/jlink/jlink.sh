@@ -186,7 +186,10 @@ flash_common() {
     test_serial
     test_version
     if [ -n "${JLINK_POST_FLASH}" ]; then
-        printf "%s\n" "${JLINK_POST_FLASH}" >> "${BINDIR}/burn.seg"
+        eval "set -- ${JLINK_POST_FLASH}"
+        for cmd in "$@"; do
+            printf "%s\n" "$cmd"
+        done >> "${BINDIR}/burn.seg"
     fi
     cat "${JLINK_RESET_FILE}" >> "${BINDIR}/burn.seg"
     # flash device
