@@ -38,12 +38,6 @@ menu "CoAP Unified Suite (unicoap)"
 
     menu "Behaviors"
 
-        config UNICOAP_NO_AUTO_INIT
-            bool "Automatically initialize unicoap on startup"
-            default y
-            help
-                If automatic initialization is disabled, you will need to call unicoap_init manually.
-
         config CONFIG_UNICOAP_CREATE_THREAD
             bool "Create dedicated thread for unicoap"
             default y
