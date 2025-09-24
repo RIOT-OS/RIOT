@@ -460,8 +460,7 @@ struct unicoap_listener {
      * @note Leaving this `NULL` selects the default strategy that picks
      * handlers by matching their `Uri-Path` to resource paths (as per
      * the documentation of the @ref resources and @ref resource_count
-     * fields). Alternative handlers may cast the @ref resources and
-     * @ref resource_count fields to fit their needs.
+     * fields).
      */
     unicoap_request_matcher_t request_matcher;
 
