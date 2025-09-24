@@ -127,7 +127,7 @@ There are multiple techniques for responding.
   You may also directly return the result of @ref unicoap_send_response.
   Please be aware any processing performed inside this handler is executed in the server's
   processing loop and will thus block it. Given an expensive operation, we encourage you to switch
-  to the third technique. Nevertheless, this should be the preferred response technique for all
+  to the third technique. Nevertheless, this should be the preferred response technique for most
   applications.
 
    ```c
