@@ -194,7 +194,8 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * **Default**: 128
  *
  * @note In certain situations, such as when sending a request unreliably,
- * this limit has no effect. Internally, it is used for, but not limited to, retransmission copies.
+ * this limit has no effect. Internally, it is used for, but is, in the future, not limited to,
+ * retransmission copies.
  */
 #if !defined(CONFIG_UNICOAP_PDU_SIZE_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_PDU_SIZE_MAX (128)
