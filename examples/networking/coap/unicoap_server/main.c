@@ -191,6 +191,7 @@ UNICOAP_RESOURCE(greeting) {
 };
 
 int main(void) {
+#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
     /* You can access the underlying transport handle. In the case of UDP,
      * this will be a UDP sock provided by the sock API. */
     sock_udp_t* udp_socket = unicoap_transport_udp_get_socket();
@@ -209,6 +210,7 @@ int main(void) {
      * a debug description from it. */
     unicoap_print_endpoint(&udp_local);
     printf("\n");
+#  endif
 
     /* If DTLS is enabled, the CoAP over DTLS driver needs to be told
      * at least one DTLS credential. */
