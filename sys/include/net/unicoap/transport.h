@@ -145,6 +145,9 @@ typedef enum {
  *
  * Used for enabling the Block-wise Extension for Reliable Transports (BERT).
  *
+ * @param proto Protocol number for transport
+ * @returns A boolean value determining whether the transport is considered reliable
+ *
  * @note BERT allows multiple blocks of size 1024 bytes to be included in a single CoAP message.
  */
 static inline bool unicoap_transport_is_reliable(unicoap_proto_t proto)
@@ -154,6 +157,9 @@ static inline bool unicoap_transport_is_reliable(unicoap_proto_t proto)
 
 /**
  * @brief Determines whether the given transport driver uses a transport layer socket in RIOT
+ *
+ * @param proto Protocol number for transport
+ * @returns A boolean value indicating whether the transport uses a transport layer socket in RIOT
  *
  * Used when parsing URIs and when printing an endpoint. If true, the socket endpoint can be
  * casted to `struct _sock_tl_ep*`.
