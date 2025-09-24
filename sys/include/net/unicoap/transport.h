@@ -123,7 +123,7 @@ extern "C" {
 #define UNICOAP_PROTO_UNSPECIFIED             (0)
 
 /**
- * @brief Protocol number flag indicating the underlying endpoint inherits from @ref _sock_tl_ep
+ * @brief Protocol number flag indicating the transport is considered reliable on its own.
  */
 #define UNICOAP_PROTO_FLAG_RELIABLE_TRANSPORT (1)
 
