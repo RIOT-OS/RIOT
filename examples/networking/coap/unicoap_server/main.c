@@ -124,6 +124,7 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
 
     if ((res = unicoap_options_get_first_uri_query_by_name(message->options, "name", &name)) < 0) {
         printf("error: could not get 'name' query: %" PRIdSIZE " (%s)\n", res, strerror(-res));
+        /* Returning a status code here will result in a response being sent automatically. */
         return UNICOAP_STATUS_BAD_REQUEST;
     }
 
@@ -135,7 +136,8 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
 
     /* Now we can craft out response. Let's start with the part that can fail. */
 
-    /* Allocate options. Provide the size of the buffer that will contain the response options. */
+    /* Allocate options on the stack. Provide the size of the buffer that will contain the
+     * response options. */
     UNICOAP_OPTIONS_ALLOC(options, 2);
 
     /* Set Content-Format option to text/plain */
@@ -189,26 +191,37 @@ UNICOAP_RESOURCE(greeting) {
 };
 
 int main(void) {
+    /* You can access the underlying transport handle. In the case of UDP,
+     * this will be a UDP sock provided by the sock API. */
     sock_udp_t* udp_socket = unicoap_transport_udp_get_socket();
     assert(udp_socket);
 
+    /* An endpoint abstracts the transport handle. */
     unicoap_endpoint_t udp_local = {
         .proto = UNICOAP_PROTO_UDP,
     };
 
+    /* We can set the endpoint's UDP handle to the actual one. */
     sock_udp_get_local(udp_socket, &udp_local.udp_ep);
 
     printf("app: listening at ");
+    /* Because we're in posession of an endpoint now, we can print
+     * a debug description from it. */
     unicoap_print_endpoint(&udp_local);
     printf("\n");
 
+    /* If DTLS is enabled, the CoAP over DTLS driver needs to be told
+     * at least one DTLS credential. */
 #  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+    /* credman is a utility that manages DTLS credentials. */
     int res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
-        /* ignore duplicate credentials */
+        /* Here we ignore duplicate credentials. */
         printf("app: cannot add credential to system: %d\n", res);
         return 1;
     }
+
+    /* Just like with UDP, we can access the DTLS transport handle. */
     sock_dtls_t* dtls_socket = unicoap_transport_dtls_get_socket();
     assert(dtls_socket);
 
@@ -222,6 +235,9 @@ int main(void) {
     unicoap_print_endpoint(&dtls_local);
     printf("\n");
 
+    /* Here we tell the DTLS socket to use the credential known by the specified
+     * tag. Internally, the socket will retrieve the corresponding credential through
+     * the credential manager. */
     if ((res = sock_dtls_add_credential(dtls_socket, EXAMPLE_DTLS_CREDENTIAL_TAG)) < 0) {
         printf("app: cannot add credential to DTLS sock: %d\n", res);
         return 1;
