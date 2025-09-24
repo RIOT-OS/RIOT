@@ -29,15 +29,6 @@
 #  include "net/sock/dtls.h"
 #endif
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-#  if !SOCK_HAS_ASYNC
-#    error "currently enabled unicoap drivers require SOCK_HAS_ASYNC"
-#  endif
-#  if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS) && !IS_USED(MODULE_SOCK_AUX_LOCAL)
-#    error "CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS requires sock_aux_local module"
-#  endif
-#endif
-
 /* MARK: unicoap_driver_extension_point */
 
 #include "net/unicoap/message.h"
