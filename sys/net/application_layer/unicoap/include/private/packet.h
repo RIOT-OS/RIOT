@@ -57,14 +57,14 @@ typedef struct {
     const unicoap_endpoint_t* local;
 
     union {
-  #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
         /**
          * @brief DTLS session
          *
          * Stored here to avoid looking up sessions in digital session management (DSM)
          */
         const sock_dtls_session_t* dtls_session;
-#  endif
+#endif
 
         /* MARK: unicoap_driver_extension_point */
     };
@@ -101,12 +101,12 @@ static inline unicoap_proto_t unicoap_packet_proto(const unicoap_packet_t* packe
  */
 static inline const void* _packet_get_dtls_session(unicoap_packet_t* packet)
 {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     return packet->dtls_session;
-#  else
+#else
     (void)packet;
     return NULL;
-#  endif
+#endif
 }
 
 /**
@@ -118,12 +118,12 @@ static inline const void* _packet_get_dtls_session(unicoap_packet_t* packet)
 static inline void _packet_set_dtls_session(unicoap_packet_t* packet,
                                             const unicoap_sock_dtls_session_t* dtls_session)
 {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     packet->dtls_session = dtls_session;
-#  else
+#else
     (void)packet;
     (void)dtls_session;
-#  endif
+#endif
 }
 
 #ifdef __cplusplus
