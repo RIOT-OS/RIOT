@@ -158,11 +158,11 @@ int unicoap_init_udp(event_queue_t* queue)
     sock_udp_ep_t local = {
     /* FIXME: Once the problems with IPv4/IPv6 dual stack use in RIOT are fixed, adapt these lines
          *        (and e.g. use AF_UNSPEC) */
-#     if defined(SOCK_HAS_IPV6)
+#if defined(SOCK_HAS_IPV6)
         .family = AF_INET6,
-#     elif defined(SOCK_HAS_IPV4)
+#elif defined(SOCK_HAS_IPV4)
         .family = AF_INET,
-#     endif
+#endif
         .netif = SOCK_ADDR_ANY_NETIF,
         .port = CONFIG_UNICOAP_UDP_PORT
     };
