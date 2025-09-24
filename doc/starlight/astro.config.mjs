@@ -12,6 +12,17 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "RIOT Documentation",
+      head: [
+        {
+          tag: "link",
+          attrs: {
+            rel: "alternate",
+            type: "application/rss+xml",
+            title: "RIOT Changelog",
+            href: "/changelog/rss.xml",
+          },
+        },
+      ],
       social: [
         {
           icon: "github",
