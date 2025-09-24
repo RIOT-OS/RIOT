@@ -378,6 +378,14 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
  *
  * Used for retransmitting `CON` messages, and storing `ACK` messages when deduplicating.
  * **Default**: 2
+ *
+ * ## Guidance on common scenarios
+ * Developers of apps that serve responses reliably should consider how many clients will request
+ * the same resource at a time. `CON` responses will need to cached, i.e., a carbon copy will be
+ * created. If the client acknowledges the response directly and no retransmission is needed,
+ * the copy will be deleted. Otherwise, the copy is kept until an `ACK` arrives or the
+ * retransmission counter exceeds @ref CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX.
+ *
  */
 #if !defined(CONFIG_UNICOAP_CARBON_COPIES_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_CARBON_COPIES_MAX (2)
