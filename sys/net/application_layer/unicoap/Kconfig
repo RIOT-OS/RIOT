@@ -71,7 +71,7 @@ menu "CoAP Unified Suite (unicoap)"
         config UNICOAP_SOCK_ZERO_COPY_GUARANTEES
             bool "Zero-copy sock guarantees"
             help
-                 If enables, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf. Default value: gnrc_sock_udp is used.
+                 If enabled, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf. Default value: gnrc_sock_udp is used.
 
         config UNICOAP_GET_LOCAL_ENDPOINTS
             bool "Retrieve local endpoint"
