@@ -99,7 +99,7 @@ static inline unicoap_proto_t unicoap_packet_proto(const unicoap_packet_t* packe
  *
  * @returns Transport session
  */
-static inline const void* _packet_get_session(unicoap_packet_t* packet)
+static inline const void* _packet_get_dtls_session(unicoap_packet_t* packet)
 {
 #  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     return packet->dtls_session;

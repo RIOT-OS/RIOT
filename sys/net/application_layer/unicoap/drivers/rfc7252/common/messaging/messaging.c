@@ -242,9 +242,9 @@ static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
      * if we already have a session,
      * reuse that session here. If we don't have one, the DTLS driver will _initialize_ one.
      * we still have to store one by value */
-    if (_packet_get_session(packet)) {
+    if (_packet_get_dtls_session(packet)) {
         /* got session, copy into transmission for later retransmission */
-        _transmission_set_session(transmission, _packet_get_session(packet));
+        _transmission_set_session(transmission, _packet_get_dtls_session(packet));
     }
     else {
         /* transmission is memset' to all zero in _transmission_free,
@@ -376,7 +376,7 @@ static ssize_t _build_and_send_pdu(unicoap_packet_t* packet, uint8_t* carbon_cop
         }
     }
 
-    if ((res = _sendv(&lists[0], packet->remote, packet->local, _packet_get_session(packet))) < 0) {
+    if ((res = _sendv(&lists[0], packet->remote, packet->local, _packet_get_dtls_session(packet))) < 0) {
         return res;
     }
     return size;
