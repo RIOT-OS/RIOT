@@ -1,4 +1,4 @@
-g@defgroup net_unicoap_drivers_dtls CoAP over DTLS Driver
+@defgroup net_unicoap_drivers_dtls CoAP over DTLS Driver
 @ingroup net_unicoap_drivers
 @brief Use CoAP over DTLS, with optional reliability
 @{
