@@ -7,12 +7,12 @@ Sample code. Find the sample code in `examples/networking/coap/unicoap_server`.
 
 In this tutorial, you will learn how you can create a simple CoAP server with `unicoap`.
 We will support CoAP over UDP and DTLS and try out the application using RIOT's native board.
-Hence, you will need Linux host and support for tuntap (tap interfaces). Our goal is to create
+Hence, you will need a Linux host and support for tuntap (tap interfaces). Our goal is to create
 a server that greets its users.
 
 ## Getting Started
 
-To start, we will create Makefile and add `unicoap` as a dependency. Because we want to support UDP
+To start, we will create a Makefile and add `unicoap` as a dependency. Because we want to support UDP
 and DTLS, we need to add the respective drivers in the `Makefile`.
 
 ```makefile
@@ -22,7 +22,7 @@ USEMODULE += unicoap_driver_dtls
 ```
 
 Because RIOT allows you to switch the network backend, we need to specify one.
-In this tutorial, we choose GNRC.
+In this tutorial, we choose @ref net_gnrc.
 
 ```makefile
 # Include packages that pull up and auto-init the link layer.
