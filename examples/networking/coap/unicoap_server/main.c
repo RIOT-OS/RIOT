@@ -150,16 +150,16 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
     /* Now, we create our payload. In theory, we could write "Hello, ", then the name, and then
      * "! ..." into that buffer. Instead, we can use a vectored payload. */
 
-    #define static_strlen(string) sizeof(string) - 1
+#define static_strlen(string) sizeof(string) - 1
 
     /* These are going to be the first and last payload chunks. */
-    #define PREFIX "Hello, "
+#define PREFIX "Hello, "
     iolist_t list = {
         .iol_base = PREFIX,
         .iol_len = static_strlen(PREFIX),
     };
 
-    #define SUFFIX "! Welcome to our itsy bitsy tiny CoAP server!"
+#define SUFFIX "! Welcome to our itsy bitsy tiny CoAP server!"
     iolist_t suffix = {
         .iol_base = SUFFIX,
         .iol_len = static_strlen(SUFFIX)
