@@ -114,13 +114,13 @@ typedef void (*unicoap_event_callback_t)(unicoap_scheduled_event_t* event);
  * @param[in] callback Function pointer to be called on the internal queue after @p duration ms have elapses
  * @param duration Number of milliseconds to wait
  */
-void unicoap_event_schedule(unicoap_scheduled_event_t* event, event_handler_t callback,
+void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
                             uint32_t duration);
 
 /**
  * @brief Discards the currently set timeout, and reschedules the event to be posted in @p duration ms
  *
- * Use this method rerun the timer with the same callbacks but a new timeout value.
+ * Use this method to rerun the timer with the same callbacks but a new timeout value.
  * E.g., the RFC 7252 driver utilizes this method for setting the next acknowledgement timeout.
  *
  * @param[in] event Scheduled event you want to reschedule
@@ -137,7 +137,7 @@ static inline void unicoap_event_reschedule(unicoap_scheduled_event_t* event, ui
  * Internally, the timer is removed from the clock.
  *
  * @note If the event has already been posted on the queue, this method will try to remove
- * the cancel the @ref event_t posted on the queue.
+ * the cancel the event that has already been posted to the queue.
  */
 void unicoap_event_cancel(unicoap_scheduled_event_t* event);
 /** @} */
