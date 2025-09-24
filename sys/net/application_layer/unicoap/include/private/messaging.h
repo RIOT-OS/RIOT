@@ -262,6 +262,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
  *
  * @param[in,out] packet Packet to send
  * @param flags Messaging flags
+ * @returns Zero on success or negative error value. See @ref unicoap_messaging_send_rfc7252.
  */
 int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags);
 
@@ -317,16 +318,16 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
  * @param[in,out] packet Packet that will be processed by the server
  * @param[in,out] resource Resource
  *
- * @return `0` on success
- * @returns Negative errno on failure
+ * @retval `0` on success
+ * @retval Negative errno on failure
  */
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource);
 
 /**
  * @brief Sends entire response body, may be split into parts and then sent
  *
- * @param packet Response packet to send
- * @param resource mandatory resource which is sending this response
+ * @param[in,out] packet Response packet to send
+ * @param[in] resource mandatory resource which is sending this response
  *
  * @returns Zero on success, negative integer otherwise
  */
