@@ -221,8 +221,8 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
     ssize_t res = 0;
 
     if (!session) {
-        //        (void)_dtls_authenticate;
-        if ((res = _dtls_authenticate(remote, session, CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS)) < 0) {
+        if ((res = _dtls_authenticate(remote, session, CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS))
+            < 0) {
             return res;
         }
     }
@@ -257,7 +257,8 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
     return 0;
 }
 
-static int _add_socket(event_queue_t* queue, sock_dtls_t* socket, sock_udp_t* base_socket, sock_udp_ep_t* local)
+static int _add_socket(event_queue_t* queue, sock_dtls_t* socket, sock_udp_t* base_socket,
+                       sock_udp_ep_t* local)
 {
     DTLS_DEBUG("creating DTLS sock, port=%" PRIu16 " if=%" PRIu16 " family=%s\n", local->port,
                local->netif,
