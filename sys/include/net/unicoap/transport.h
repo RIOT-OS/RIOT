@@ -156,7 +156,7 @@ static inline bool unicoap_transport_is_reliable(unicoap_proto_t proto)
  * @brief Determines whether the given transport driver uses a transport layer socket in RIOT
  *
  * Used when parsing URIs and when printing an endpoint. If true, the socket endpoint can be
- * casted `struct _sock_tl_ep*`.
+ * casted to `struct _sock_tl_ep*`.
  *
  * ### Examples
  * - @ref sock_udp
@@ -183,7 +183,7 @@ typedef struct {
     union {
         /* union members are guaranteed to start at offset zero */
 
-#     if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
         /** @brief Transport layer endpoint */
         struct _sock_tl_ep _tl_ep;
 
@@ -194,7 +194,7 @@ typedef struct {
 
         /** @brief RIOT sock DTLS endpoint */
         sock_udp_ep_t dtls_ep;
-#      endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
 
         /* MARK: unicoap_driver_extension_point */
     };
