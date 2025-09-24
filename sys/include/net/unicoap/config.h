@@ -49,7 +49,7 @@
 /**
  * @brief Enables debug logging in all `unicoap` source files, except where locally overwritten
  *
- * **Default**: enabled
+ * **Default**: disabled
  */
 #if !defined(CONFIG_UNICOAP_DEBUG_LOGGING) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_DEBUG_LOGGING 0
