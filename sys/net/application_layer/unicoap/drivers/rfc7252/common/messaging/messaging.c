@@ -86,7 +86,7 @@ typedef struct {
     uint8_t remaining_retransmissions : 5;
 
     bool is_used : 1;
-} transmission_t;
+} _transmission_t;
 
 typedef struct {
     /** @brief Message ID unicoap is going to use for the next outbound request or response */
@@ -98,11 +98,11 @@ typedef struct {
 #  endif
 
 #  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
-    transmission_t transmissions[CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX];
+    _transmission_t transmissions[CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX];
 #  endif
 } _state_t;
 
-static inline void* _transmission_get_session(transmission_t* transmission)
+static inline void* _transmission_get_session(_transmission_t* transmission)
 {
 #  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     return &transmission->dtls_session;
@@ -112,7 +112,7 @@ static inline void* _transmission_get_session(transmission_t* transmission)
 #  endif
 }
 
-static inline void _transmission_set_session(transmission_t* transmission,
+static inline void _transmission_set_session(_transmission_t* transmission,
                                              const unicoap_sock_dtls_session_t* dtls_session)
 {
 #  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
@@ -148,7 +148,7 @@ static inline void _set_type(unicoap_packet_t* packet, unicoap_rfc7252_message_t
     packet->properties.rfc7252.type = type;
 }
 
-static inline const unicoap_endpoint_t* _transmission_get_endpoint(const transmission_t* transmission) {
+static inline const unicoap_endpoint_t* _transmission_get_endpoint(const _transmission_t* transmission) {
     return &transmission->endpoint;
 }
 
@@ -206,7 +206,7 @@ static inline void _carbon_copy_free(uint8_t* carbon_copy)
     *carbon_copy = 0;
 }
 
-static inline transmission_t* _transmission_alloc_unsafe(void)
+static inline _transmission_t* _transmission_alloc_unsafe(void)
 {
 #  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     /* Find empty slot in list of open requests. */
@@ -222,13 +222,13 @@ static inline transmission_t* _transmission_alloc_unsafe(void)
     return NULL;
 }
 
-static transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
+static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
                                             unicoap_packet_t* packet)
 {
     assert(packet);
 
     unicoap_state_lock();
-    transmission_t* transmission = _transmission_alloc_unsafe();
+    _transmission_t* transmission = _transmission_alloc_unsafe();
     unicoap_state_unlock();
     if (!transmission) {
         return NULL;
@@ -261,13 +261,13 @@ static transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
     return transmission;
 }
 
-static transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, uint16_t id)
+static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, uint16_t id)
 {
     (void)endpoint;
     (void)id;
 #  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
-        transmission_t* transmission = &_state.transmissions[i];
+        _transmission_t* transmission = &_state.transmissions[i];
         if (transmission->is_used &&
             transmission->id == id &&
             unicoap_endpoint_is_equal(&transmission->endpoint, endpoint)
@@ -279,14 +279,14 @@ static transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, ui
     return NULL;
 }
 
-static inline void _transmission_free(transmission_t* transmission)
+static inline void _transmission_free(_transmission_t* transmission)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "transmission ended\n", transmission->id);
     if (transmission->pdu) {
         _carbon_copy_free(transmission->pdu);
     }
     unicoap_event_cancel(&transmission->ack_timeout);
-    memset(transmission, 0, sizeof(transmission_t));
+    memset(transmission, 0, sizeof(_transmission_t));
 }
 
 static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoap_endpoint_t* local,
@@ -387,7 +387,7 @@ static inline void _handle_ack(const unicoap_endpoint_t* remote, uint16_t id)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "received ACK, ", id);
 
-    transmission_t* transmission = _transmission_find(remote, id);
+    _transmission_t* transmission = _transmission_find(remote, id);
     if (transmission) {
         DEBUG("stopping retransmission\n");
         _transmission_free(transmission);
@@ -401,7 +401,7 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "received RST", id);
 
-    transmission_t* transmission = _transmission_find(remote, id);
+    _transmission_t* transmission = _transmission_find(remote, id);
 
     if (transmission) {
         DEBUG("\n");
@@ -414,7 +414,7 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 
 static void _on_ack_timeout(event_t* _event)
 {
-    transmission_t* transmission = container_of(_event, transmission_t, ack_timeout.super);
+    _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout.super);
     assert(transmission);
     assert(transmission->pdu);
     assert(transmission->pdu_size > 0);
@@ -616,7 +616,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
     /* This is a response the exchange layer expected.
      * We may have attached a transmission, free that transmission here. */
     case UNICOAP_PREPROCESSING_SUCCESS_RESPONSE: {
-        transmission_t* transmission = _transmission_find(packet->remote, _get_id(packet));
+        _transmission_t* transmission = _transmission_find(packet->remote, _get_id(packet));
         if (transmission) {
             _transmission_free(transmission);
 
@@ -711,7 +711,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     int res = 0;
     uint8_t* carbon_copy = NULL;
     size_t* carbon_copy_size = NULL;
-    transmission_t* transmission = NULL;
+    _transmission_t* transmission = NULL;
 
     if (packet->properties.is_notification) {
         /* notification, always use separate response style */
@@ -793,7 +793,7 @@ void unicoap_messaging_print_rfc7252_state(void)
 
 #  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     for (size_t i = 0; i < ARRAY_SIZE(_state.transmissions); i += 1) {
-        transmission_t* transmission = &_state.transmissions[i];
+        _transmission_t* transmission = &_state.transmissions[i];
         printf("\t\t- transmission #%" PRIuSIZE "\n", i);
 
         if (!transmission->is_used) {
