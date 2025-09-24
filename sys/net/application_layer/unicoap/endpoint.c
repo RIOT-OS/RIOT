@@ -129,7 +129,7 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint)
 #else
         UNICOAP_DEBUG("UDP/DTLS driver is missing, cannot check if multicast addr\n");
         return false;
-endif
+#  endif
     /* MARK: unicoap_driver_extension_point */
     default:
         assert(false);

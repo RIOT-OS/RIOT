@@ -340,6 +340,8 @@ void* unicoap_transport_udp_get_socket(void)
  * @param[in]     local  Initialized endpoint, does not need to outlive this function call
  *
  * You can call this function at any time after `unicoap` has been initialized.
+ *
+ * @returns `0` on success or negative error value otherwise.
  */
 #  if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
 int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local);
@@ -359,6 +361,7 @@ int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local)
  * @param[in,out] socket The socket pointer you have previously passed to
  *                       @ref unicoap_transport_udp_add_socket
  *
+ * @returns `0`, indicating a success. Future versions of this API may return a negative error.
  */
 #  if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
 int unicoap_transport_udp_remove_socket(sock_udp_t* socket);
@@ -408,6 +411,9 @@ void* unicoap_transport_dtls_get_socket(void)
  * @param[in]     local       Initialized endpoint, does not need to outlive this function call
  *
  * You can call this function at any time after `unicoap` has been initialized.
+ *
+ * @returns `0` on success or negative error value otherwise. The error value depends on the
+ * DTLS implementation.
  */
 #  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
 int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_socket,
@@ -429,6 +435,8 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
  *
  * @param[in,out] socket The socket pointer you have previously passed to
  *                       @ref unicoap_transport_dtls_add_socket
+ *
+ * @returns `0`, indicating a success. Future versions of this API may return a negative error.
  *
  */
 #  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
