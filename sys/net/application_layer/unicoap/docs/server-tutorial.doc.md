@@ -90,7 +90,7 @@ unencrypted UDP.
 ```c
 UNICOAP_RESOURCE(hello) {
     // ...
-    .protocols = UNICOAP_PROTOCOLS(UNICOAP_PROTO_DTLS),
+    .protocols = UNICOAP_PROTOCOLS(UNICOAP_PROTO_DTLS, UNICOAP_PROTO_UDP),
     // ...
 };
 ```
