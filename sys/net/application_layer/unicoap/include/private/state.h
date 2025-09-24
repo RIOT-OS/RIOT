@@ -101,7 +101,7 @@ typedef struct unicoap_memo unicoap_memo_t;
  * @brief Scheduled event callback
  *
  * Use the @p event parameter and the @ref container_of macro to get a pointer
- * the parent structure.
+ * to the parent structure.
  *
  * @param[in] event pointer to event
  */
