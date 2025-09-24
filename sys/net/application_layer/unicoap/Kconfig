@@ -38,7 +38,7 @@ menu "CoAP Unified Suite (unicoap)"
 
     menu "Behaviors"
 
-        config CONFIG_UNICOAP_CREATE_THREAD
+        config UNICOAP_CREATE_THREAD
             bool "Create dedicated thread for unicoap"
             default y
             help
