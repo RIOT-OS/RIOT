@@ -3,4 +3,4 @@
 @deprecated This page is deprecated.
 See [Changelog](https://guide.riot-os.org/misc/changelog)
 on the RIOT Guide Site for the latest information.
-This page will be removed after release 2026.01.
+This page will be removed after release 2026.04.
