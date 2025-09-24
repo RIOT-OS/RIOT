@@ -261,8 +261,7 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
  * @brief Returns scheme from protocol number
  *
  * @param proto Protocol number
- * @returns Null-terminated transport description, such as `"UDP"` or `"DTLS"`
- * @returns `"?"` if protocol number is unknown
+ * @returns Null-terminated transport description, or `NULL` if there is no such protocol number
  */
 const char* unicoap_string_from_proto(unicoap_proto_t proto);
 
