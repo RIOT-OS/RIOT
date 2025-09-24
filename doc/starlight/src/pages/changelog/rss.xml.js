@@ -16,7 +16,7 @@ export async function GET(context) {
     // See "Generating items" section for examples using content collections and glob imports
     items: changelog.map((entry) => ({
       title: entry.data.title,
-      link: `/misc/changelog/${entry.data.slug}`,
+      link: `/changelog/${entry.data.slug}`,
     })),
   });
 }
