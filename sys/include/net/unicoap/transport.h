@@ -281,7 +281,7 @@ bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* source,
  * @brief Determines whether the given endpoint is a multicast endpoint
  *
  * @param[in] endpoint Endpoint to check
- * @returns A boolean value indicating whether the endpoints is considered a multicast endpoint
+ * @returns A boolean value indicating whether the endpoint is considered a multicast endpoint
  */
 bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint);
 
@@ -334,7 +334,7 @@ void* unicoap_transport_udp_get_socket(void)
 
 /**
  * @brief Adds UDP socket for client and server functionality
- * @pre Socket must be pre-allocated and must remain allocated until the UDP driver has been
+ * @pre @p socket must be pre-allocated and must remain allocated until the UDP driver has been
  * deinitialized or the socket is closed by you.
  *
  * @param[in,out] socket Pre-allocated socket to use
@@ -385,15 +385,15 @@ int unicoap_transport_udp_remove_socket(sock_udp_t* socket)
  * @{
  */
 /** @brief Returns the internal DTLS socket */
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
 sock_dtls_t* unicoap_transport_dtls_get_socket(void);
-#  else
+#else
 static inline
 void* unicoap_transport_dtls_get_socket(void)
 {
     return NULL;
 }
-#  endif
+#endif
 
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
 /* sock_udp_t requires an implementation which is not present if someone uses unicoap
