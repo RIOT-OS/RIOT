@@ -17,6 +17,7 @@ export async function GET(context) {
     items: changelog.map((entry) => ({
       title: entry.data.title,
       link: `/changelog/${entry.data.slug}`,
+      pubDate: entry.data.date,
     })),
   });
 }

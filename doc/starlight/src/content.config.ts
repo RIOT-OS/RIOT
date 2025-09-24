@@ -41,6 +41,8 @@ export function changelogLoader(): Loader {
           "-"
         );
 
+        const date = new Date(slug);
+
         // Extract current release markdown
         // and remove h1 heading (frontmatter already specifies the heading)
         const markdown = text
@@ -55,6 +57,7 @@ export function changelogLoader(): Loader {
           data: {
             title: heading,
             slug: slug,
+            date: date,
             markdown: markdown,
           },
           rendered: await context.renderMarkdown(markdown),
