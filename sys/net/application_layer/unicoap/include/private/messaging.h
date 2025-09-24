@@ -71,7 +71,7 @@ extern "C" {
  * assumptions on their value.
  *
  * These flags are intended for messaging and transmission options. Messaging options may change
- * the behavior the CoAP message flow (e.g., waiting for an acknowledgement) or transmission
+ * the CoAP message flow (e.g., waiting for an acknowledgement) or transmission
  * behavior (e.g., using an optional reliability layer of the underlying transport protocol or
  * implementation).
  *
@@ -96,7 +96,7 @@ typedef enum {
      * The RFC 7252 (CoAP over UDP and DTLS) supports optional reliability in the form of
      * confirmable message. In contrast to non-confirmable messages, confirmable messages
      * elicit an acknowledgement message sent by the receiver. The sender retransmits the original
-     * confirmable messgage using an exponential back-of mechanism until it receives the
+     * confirmable message using an exponential back-of mechanism until it receives the
      * acknowledgement.
      */
     UNICOAP_MESSAGING_FLAG_RELIABLE = 0x01,
@@ -141,23 +141,21 @@ typedef enum {
     UNICOAP_PREPROCESSING_ERROR_UNSUPPORTED = -0x1002,
 
     /**
-     * @brief The given message is unknown and cannot be processed
+     * @brief The given message is unexpected and cannot be processed
      *
      * There's no known client exchange running.
      */
     UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED = -0x1004,
 
     /**
-     * @brief Unknown notification, no known client exchange (observation)
+     * @brief Unexpected notification, no known client exchange (observation)
      *
      * There's no known client exchange, i.e., observation, running.
      */
     UNICOAP_PREPROCESSING_ERROR_NOTIFICATION_UNEXPECTED = -0x100c,
 
     /**
-     * @brief The given message is unknown and cannot be processed
-     *
-     * There's no known client exchange running.
+     * @brief The given message is truncated and can thus not be handled.
      */
     UNICOAP_PREPROCESSING_ERROR_TRUNCATED = -0x1010,
 
@@ -251,6 +249,8 @@ void unicoap_exchange_forget_failed_endpoint(const unicoap_endpoint_t* endpoint)
 int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
                                       unicoap_packet_t* packet);
 
+/* MARK: unicoap_driver_extension_point */
+
 /**
  * @brief Forwards packet to messaging layer and the corresponding driver for further message
  * processing, encoding, and transport I/O.
@@ -268,17 +268,6 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
 
 /** @brief Sends CoAP over UDP or DTLS packet, see @ref unicoap_messaging_send */
 int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_flags_t flags);
-/**
- * @brief Releases all buffers and state allocated in connection with the given endpoint
- *
- * Call this function from your driver if you encounter a severe error with a given endpoint
- *
- * @warning Do not call this function from within the exchange layer as messaging-layer state
- * will not be released by this function.
- *
- * @param[in] endpoint Remote endpoint to release buffers for
- */
-void unicoap_exchange_forget_endpoint(const unicoap_endpoint_t* endpoint);
 
 /**
  * @brief Generates new token
