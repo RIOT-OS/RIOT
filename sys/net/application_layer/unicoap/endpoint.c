@@ -75,12 +75,12 @@ void unicoap_print_endpoint(const unicoap_endpoint_t* endpoint)
 {
     printf("%s ", unicoap_string_from_proto(endpoint->proto));
 
-#  if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
         unicoap_print_sock_tl_ep(&endpoint->_tl_ep);
         return;
     }
-#  endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
 
     printf("<endpoint (unprintable) proto=%u>", endpoint->proto);
 }
@@ -107,11 +107,11 @@ bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* source,
         return false;
     }
     switch (source->proto) {
-#  if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
         return sock_tl_ep_equal(&source->_tl_ep, &destination->_tl_ep);
-#  endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
     /* MARK: unicoap_driver_extension_point */
     default:
         assert(false);
@@ -124,12 +124,12 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint)
     switch (endpoint->proto) {
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
-#  if IS_USED(MODULE_SOCK_UDP)
+#if IS_USED(MODULE_SOCK_UDP)
         return sock_udp_ep_is_multicast(&endpoint->udp_ep);
-#  else
+#else
         UNICOAP_DEBUG("UDP/DTLS driver is missing, cannot check if multicast addr\n");
         return false;
-#  endif
+endif
     /* MARK: unicoap_driver_extension_point */
     default:
         assert(false);
