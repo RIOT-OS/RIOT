@@ -211,7 +211,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
  * @param[in] path Path
  * @param[in] path_length Number of UTF-8 characters in @p path (excluding null-terminator)
  * @param[in] listener Listener
- * @param[in] resource_ptr Pointer to a resource variable
+ * @param[out] resource_ptr Pointer to a resource variable
  * @param[in] request Request message
  * @param[in] endpoint Remote endpoint the request originates from
  *
