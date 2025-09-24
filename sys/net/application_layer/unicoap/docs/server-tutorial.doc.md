@@ -95,7 +95,7 @@ UNICOAP_RESOURCE(hello) {
 };
 ```
 
-Next, we want to make sure our greeting arrives a the client. Since we are using CoAP over UDP (or
+Next, we want to make sure our greeting arrives at the client. Since we are using CoAP over UDP (or
 CoAP over DTLS, which relies on UDP for that matter), we instruct `unicoap` to send confirmable
 responses. `unicoap` will retransmit our response until the client has acknowledged it.
 To do this, we pass the @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag.
@@ -149,6 +149,9 @@ This version of the resource is going to be very simple. The root resource will 
 with a `Hello, World!` string. For static null-terminated strings, `unicoap` provides
 convenience initializers. Note that we can reuse the memory of the `message` parameter.
 Finally, we respond. You do not necessarily need to return the result of @ref unicoap_send_response.
+However, the return value is always supposed to indicate a success (zero) or an error (negative
+integer). Invoking send_response before and returning a status code, as well as not calling
+send_response before and not returning a status code are treated as fatal errors.
 
 ```c
 unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, "Hello, World!");
@@ -202,7 +205,8 @@ client the query value was invalid by leveraging the @ref unicoap_send_response 
 dedicated error message.
 
 ```c
-// Validate any input. Here, we apply a 30 UTF-8 character limit.
+// Validate any input. Here, we apply a 30 UTF-8 character limit. You should perform UTF-8
+// validation (is_valid_name). This also includes checking if there's a premature null terminator.
 if (res > 30 || !is_valid_name(name, res)) {
     unicoap_response_init_string(message, UNICOAP_STATUS_BAD_REQUEST, "invalid 'name' query");
     return unicoap_send_response(message, ctx);
@@ -212,7 +216,7 @@ if (res > 30 || !is_valid_name(name, res)) {
 Now we can craft our response. Proper responses have their `Content-Format` option set accordingly,
 in our case `text/plain`. Setting options can fail, e.g., due to insufficient buffer capacity, hence
 we do that first.
-We allocate options through @ref UNICOAP_OPTIONS_ALLOC and set the format with
+We allocate options on the stack through @ref UNICOAP_OPTIONS_ALLOC and set the format with
 @ref unicoap_options_set_content_format.
 
 @remark
@@ -341,7 +345,7 @@ Now, your server is also reachable over an encrypted DTLS connection. Time to te
 The sample code includes a `client.py` script that uses [aiocoap](https://aiocoap.readthedocs.io).
 To use it we need to compile the server, run it and then send a CoAP request to it. We're going to
 use RIOT's `native` board for this, i.e., both the client and server will run on your linux host
-and there will be no IEEE 802.15.4 network involved — no antenna needed.
+and there will be no wireless network involved — no antenna needed.
 To compile and run the app, run this shell command:
 
 ```sh
@@ -349,7 +353,7 @@ cd RIOT/examples/networking/coap/unicoap_server
 BOARD=native make -j flash term
 ```
 
-This should log something similar to this:
+This should show something similar to this:
 
 ```
 RIOT/dist/tools/pyterm/pyterm

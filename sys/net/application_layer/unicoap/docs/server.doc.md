@@ -119,7 +119,7 @@ There are multiple techniques for responding.
 
 2. **Call send**: Initialize a response message with the status code, and
   optionally, also payload and options. You can repurpose the memory used by the `message`
-  parameter for the response, but you must not write into the payload buffer of mutate options.
+  parameter for the response, but you must not write into the payload buffer or mutate options.
   If you do want to send options, please allocate options using @ref UNICOAP_OPTIONS_ALLOC.
   Then, pass the message and the response context you were
   given as part of the handler parameters to @ref unicoap_send_response. Finally, you may inspect
