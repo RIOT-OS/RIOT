@@ -63,9 +63,9 @@ typedef struct {
      */
     unicoap_endpoint_t endpoint;
 
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     unicoap_sock_dtls_session_t dtls_session;
-#  endif
+#endif
 
     /**
      * @brief Copy of confirmable message PDU for retransmission
@@ -92,35 +92,35 @@ typedef struct {
     /** @brief Message ID unicoap is going to use for the next outbound request or response */
     atomic_uint next_message_id;
 
-#  if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
+#if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     /** @brief Copy of PDU sent, used for retransmission and deduplication */
     uint8_t carbon_copies[CONFIG_UNICOAP_CARBON_COPIES_MAX][CONFIG_UNICOAP_PDU_SIZE_MAX];
-#  endif
+#endif
 
-#  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     _transmission_t transmissions[CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX];
-#  endif
+#endif
 } _state_t;
 
 static inline void* _transmission_get_session(_transmission_t* transmission)
 {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     return &transmission->dtls_session;
-#  else
+#else
     (void)transmission;
     return NULL;
-#  endif
+#endif
 }
 
 static inline void _transmission_set_session(_transmission_t* transmission,
                                              const unicoap_sock_dtls_session_t* dtls_session)
 {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     transmission->dtls_session = *dtls_session;
-#  else
+#else
     (void)transmission;
     (void)dtls_session;
-#  endif
+#endif
 }
 
 static inline uint16_t _get_id(const unicoap_packet_t* packet)
@@ -177,7 +177,7 @@ static uint16_t _generate_message_id(void)
 
 static uint8_t* _carbon_copy_alloc_unsafe(void)
 {
-#  if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
+#if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     /* Find empty slot in list of open requests. */
     for (int i = 0; i < (int)ARRAY_SIZE(_state.carbon_copies); i += 1) {
         /* Will never be zero due to CoAP version 1 bit. Zero indicates 'free' buffer */
@@ -187,7 +187,7 @@ static uint8_t* _carbon_copy_alloc_unsafe(void)
             return _state.carbon_copies[i];
         }
     }
-#  endif
+#endif
     MESSAGING_7252_DEBUG("no space to alloc PDU copy\n");
     return NULL;
 }
@@ -208,7 +208,7 @@ static inline void _carbon_copy_free(uint8_t* carbon_copy)
 
 static inline _transmission_t* _transmission_alloc_unsafe(void)
 {
-#  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     /* Find empty slot in list of open requests. */
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
         /* will never be zero due to CoAP version 1 bit */
@@ -217,7 +217,7 @@ static inline _transmission_t* _transmission_alloc_unsafe(void)
             return &_state.transmissions[i];
         }
     }
-#  endif
+#endif
     MESSAGING_7252_DEBUG("no space to alloc transmission state\n");
     return NULL;
 }
@@ -265,7 +265,7 @@ static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, u
 {
     (void)endpoint;
     (void)id;
-#  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
         _transmission_t* transmission = &_state.transmissions[i];
         if (transmission->is_used &&
@@ -275,7 +275,7 @@ static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, u
             return transmission;
         }
     }
-#  endif
+#endif
     return NULL;
 }
 
@@ -299,7 +299,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     assert(remote);
 
     switch (remote->proto) {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
     case UNICOAP_PROTO_UDP: {
         extern int unicoap_transport_sendv_udp(iolist_t * iolist, const sock_udp_ep_t* remote,
                                                const sock_udp_ep_t* local);
@@ -307,9 +307,9 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
             list, unicoap_endpoint_get_udp((unicoap_endpoint_t*)remote),
             local ? unicoap_endpoint_get_udp((unicoap_endpoint_t*)local) : NULL);
     }
-#  endif
+#endif
 
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     case UNICOAP_PROTO_DTLS: {
         extern int unicoap_transport_sendv_dtls(iolist_t * iolist, const sock_udp_ep_t* remote,
                                                 const sock_udp_ep_t* local,
@@ -319,7 +319,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
             local ? unicoap_endpoint_get_udp((unicoap_endpoint_t*)local) : NULL,
             (unicoap_sock_dtls_session_t*)dtls_session);
     }
-#  endif
+#endif
 
     default:
         MESSAGING_7252_DEBUG("unsupported protocol number\n");
@@ -787,7 +787,7 @@ error:
 
 void unicoap_messaging_print_rfc7252_state(void)
 {
-# if ENABLE_DEBUG
+#if ENABLE_DEBUG
     printf("\n\t- RFC 7252 transmissions (%" PRIuSIZE " total):\n",
            (size_t)CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX);
 
@@ -816,5 +816,5 @@ void unicoap_messaging_print_rfc7252_state(void)
                (size_t)CONFIG_UNICOAP_PDU_SIZE_MAX, *_state.carbon_copies[i] != 0);
     }
 #  endif
-# endif
+#endif
 }
