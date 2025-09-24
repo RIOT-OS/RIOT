@@ -47,18 +47,16 @@ void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep)
 #  if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR)
         ipv6_addr_print((ipv6_addr_t*)ep->addr.ipv6);
 #  else
-        UNICOAP_DEBUG("SOCK_HAS_IPV6: v6 missing\n");
-        assert(false);
+        UNICOAP_DEBUG("SOCK_HAS_IPV6: v6 support missing, cannot print\n");
         printf("?");
 #  endif /* SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
         break;
     case AF_INET:
         printf("ipv4=");
-#  if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV4_ADDR)
+#  if SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR)
         ipv4_addr_print((ipv4_addr_t*)ep->addr.ipv4);
 #  else
-        UNICOAP_DEBUG("SOCK_HAS_IPV4: v4 missing\n");
-        assert(false);
+        UNICOAP_DEBUG("SOCK_HAS_IPV4: v4 support missing, cannot print\n");
         printf("?");
 #  endif /* SOCK_HAS_IPV6 && IS_USED(MODULE_IPV4_ADDR) */
         break;
@@ -69,7 +67,7 @@ void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep)
     }
     printf(">");
 }
-#endif
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
 
 void unicoap_print_endpoint(const unicoap_endpoint_t* endpoint)
 {

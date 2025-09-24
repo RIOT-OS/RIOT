@@ -361,17 +361,17 @@ static ssize_t _build_and_send_pdu(unicoap_packet_t* packet, uint8_t* carbon_cop
     if (carbon_copy) {
         if ((size = unicoap_pdu_build_rfc7252(carbon_copy, sizeof(_state.carbon_copies[0]),
                                               packet->message, &packet->properties)) < 0) {
-            lists->iol_base = NULL;
-            lists->iol_len = 0;
+            lists[0].iol_base = NULL;
+            lists[0].iol_len = 0;
             return size;
         }
 
-        lists->iol_base = carbon_copy;
-        lists->iol_len = size;
-        lists->iol_next = NULL;
+        lists[0].iol_base = carbon_copy;
+        lists[0].iol_len = size;
+        lists[0].iol_next = NULL;
     } else {
         if ((size = unicoap_pdu_buildv_rfc7252(header, sizeof(header), packet->message,
-                                               &packet->properties, &lists[0])) < 0) {
+                                               &packet->properties, lists)) < 0) {
             return size;
         }
     }
@@ -595,7 +595,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
         return res;
     }
 
-    /* Successfully parsed message, i.e., truncated message could be parsed to
+    /* Successfully parsed message, i.e., truncated message could be parsed
      * to a certain degree (cutoff directly after an option or somewhere in
      * payload). The exchange (request/response) layer will discard that
      * message anyway, but in case of truncated requests, the next layer will
@@ -623,7 +623,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
                 MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
                                      "sending empty ACK for expected response\n", _get_id(packet));
 
-                /* We're goint to need the response below, don't override it. */
+                /* We're going to need the response below, don't override it. */
                 unicoap_message_t* message = packet->message;
                 unicoap_message_t m = *packet->message;
                 packet->message = &m;
@@ -709,7 +709,6 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     assert(packet->remote);
     int res = 0;
     uint8_t* carbon_copy = NULL;
-    size_t* carbon_copy_size = NULL;
     _transmission_t* transmission = NULL;
 
     if (packet->properties.is_notification) {
@@ -717,6 +716,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         _format_separate(packet, flags);
     }
     else if (unicoap_message_is_response(packet->message->code) &&
+             /* Message properties in the packet are still those of the request (ID, token, type) */
              _get_type(packet) == UNICOAP_TYPE_CON) {
         /* piggybacked response, immediate response style */
         _set_type(packet, UNICOAP_TYPE_ACK);
@@ -745,10 +745,6 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         transmission->remaining_retransmissions = CONFIG_UNICOAP_RETRANSMISSIONS_MAX;
         transmission->pdu = carbon_copy;
 
-        /* need to know the total size of the PDU we are going to build
-         * down below, PDU builder writes size into this location */
-        carbon_copy_size = &transmission->pdu_size;
-
         uint32_t duration = CONFIG_UNICOAP_TIMEOUT_ACK_MS;
         if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
             duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER);
@@ -770,9 +766,9 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         goto error;
     }
 
-    if (carbon_copy_size) {
+    if (transmission) {
         MESSAGING_7252_DEBUG("<carbon_copy size=%i>\n", res);
-        *carbon_copy_size = res;
+        transmission->pdu_size = res;
     }
     return 0;
 
@@ -804,7 +800,7 @@ void unicoap_messaging_print_rfc7252_state(void)
         printf("\t\t\t- pdu=<carbon_copy at %p>\n", transmission->pdu);
         printf("\t\t\t- pdu_size=%" PRIuSIZE "\n", transmission->pdu_size);
     }
-#  endif
+#endif /* CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0 */
 
     printf("\n\t- RFC 7252 carbon copies (%" PRIuSIZE " total):\n",
            (size_t)CONFIG_UNICOAP_CARBON_COPIES_MAX);
@@ -814,6 +810,6 @@ void unicoap_messaging_print_rfc7252_state(void)
         printf("\t\t- carbon_copy #%" PRIuSIZE " capacity=%" PRIuSIZE "B used=%u\n", i,
                (size_t)CONFIG_UNICOAP_PDU_SIZE_MAX, *_state.carbon_copies[i] != 0);
     }
-#  endif
-#endif
+#  endif /* CONFIG_UNICOAP_CARBON_COPIES_MAX > 0 */
+#endif /* ENABLE_DEBUG */
 }
