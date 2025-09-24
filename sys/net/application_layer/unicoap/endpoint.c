@@ -96,19 +96,19 @@ const char* unicoap_string_from_proto(unicoap_proto_t proto)
     }
 }
 
-bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* source,
-                               const unicoap_endpoint_t* destination)
+bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* lhs,
+                               const unicoap_endpoint_t* rhs)
 {
-    (void)source;
-    (void)destination;
-    if (source->proto != destination->proto) {
+    (void)lhs;
+    (void)rhs;
+    if (lhs->proto != rhs->proto) {
         return false;
     }
-    switch (source->proto) {
+    switch (lhs->proto) {
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
-        return sock_tl_ep_equal(&source->_tl_ep, &destination->_tl_ep);
+        return sock_tl_ep_equal(&lhs->_tl_ep, &rhs->_tl_ep);
 #endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
     /* MARK: unicoap_driver_extension_point */
     default:
