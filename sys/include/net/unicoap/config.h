@@ -407,7 +407,7 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 #endif
 
 /**
- * @brief   Number of minimum available sessions. If the count of available
+ * @brief   Number of minimum available session slots. If the count of available
  *          sessions falls below this threshold, the oldest used session will be
  *          closed after a timeout time. Set to 0 to deactivate this feature.
  *
