@@ -202,7 +202,7 @@ static uint8_t* _carbon_copy_alloc(void)
 
 static inline void _carbon_copy_free(uint8_t* carbon_copy)
 {
-    /* Freeing does not require lock. We have unique access until the following line. */
+    /* Freeing does not require lock. We have sole access until the following line. */
     *carbon_copy = 0;
 }
 
@@ -211,7 +211,6 @@ static inline _transmission_t* _transmission_alloc_unsafe(void)
 #if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
     /* Find empty slot in list of open requests. */
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
-        /* will never be zero due to CoAP version 1 bit */
         if (!_state.transmissions[i].is_used) {
             _state.transmissions[i].is_used = true;
             return &_state.transmissions[i];
