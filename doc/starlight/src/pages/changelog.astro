@@ -13,7 +13,7 @@ const changelog = await getCollection("changelog");
   }}
 >
   <LinkButton
-    href="/misc/changelog/rss.xml"
+    href="/changelog/rss.xml"
     variant="secondary"
     icon="rss"
     iconPlacement="start"
@@ -25,7 +25,7 @@ const changelog = await getCollection("changelog");
     changelog.map((entry) => (
       <LinkCard
         title={entry.data.title}
-        href={`/misc/changelog/${entry.data.slug}`}
+        href={`/changelog/${entry.data.slug}`}
       />
     ))
   }

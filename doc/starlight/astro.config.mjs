@@ -149,14 +149,14 @@ export default defineConfig({
             "misc/lost_and_found",
             "misc/release_cycle",
             "misc/managing-a-release",
-            {
-              label: "Changelog",
-              link: "misc/changelog",
-            },
             "misc/emulators",
             "misc/terminal_config",
             "misc/how_to_doc",
           ],
+        },
+        {
+          label: "Changelog",
+          link: "changelog",
         },
       ],
       customCss: ["./src/styles/custom.css", "./src/fonts/font-face.css"],
