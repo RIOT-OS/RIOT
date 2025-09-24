@@ -13,7 +13,7 @@ description: This page describes the process of managing a release.
 6. [Other Repositories](#6-other-repositories)
 7. [Important Fixes after Release](#7-important-fixes-after-release)
 8. [Resources](#8-resources)
-9. [Forum post templates](#9-forum-post-templates)
+9. [Forum Post Templates](#9-forum-post-templates)
 
 ## 1. Checklist
 
@@ -194,9 +194,9 @@ A point release for a critical issue is best limited to a small number of change
 | Release manager tool | https://github.com/RIOT-OS/RIOT-release-manager |
 | Test automation helper scripts | https://github.com/RIOT-OS/Release-Specs?tab=readme-ov-file#pytest-runner |
 | Pending changes to test automation helper scripts | https://github.com/jia200x/Release-Specs/pulls |
-| Backport automation script | {RIOTBASE}/dist/tools/backport_pr |
+| Backport automation script | https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/backport_pr |
 | Release statistics wiki | https://github.com/RIOT-OS/RIOT/wiki/release-statistics |
-| Release stats script | {RIOTBASE}/dist/tools/release-stats |
+| Release stats script | https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/release-stats |
 | Release management org spreadsheet | https://drive.google.com/open?id=1rKYswFgQGYj4jSA4TBHjg980pAGoaKPj |
 | Release test tracking spreadsheet | https://drive.google.com/open?id=0B384VtEXbD_HRzJSY1NGdnFpWERxb2JFeGdaS09iUjV0TGhN |
 
