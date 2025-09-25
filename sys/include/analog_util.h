@@ -47,6 +47,9 @@ int32_t adc_util_map(int sample, adc_res_t res, int32_t min, int32_t max);
  * @brief   Map a sampled ADC value to a given range (using floating point
  *          arithmetic)
  *
+ * @warning This function is only available when the features `float_math`
+ *          is used.
+ *
  * @see adc_util_map
  *
  * @param[in] sample        sampled ADC value
@@ -74,6 +77,9 @@ uint16_t dac_util_map(int value, int min, int max);
 
 /**
  * @brief Helper function to map a given float value range to a valid DAC value.
+ *
+ * @warning This function is only available when the features `float_math`
+ *          is used.
  *
  * @see dac_util_map
  *

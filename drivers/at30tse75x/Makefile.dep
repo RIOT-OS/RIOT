@@ -1,2 +1,4 @@
-USEMODULE += ztimer_usec
+FEATURES_REQUIRED += float_math
 FEATURES_REQUIRED += periph_i2c
+
+USEMODULE += ztimer_usec
