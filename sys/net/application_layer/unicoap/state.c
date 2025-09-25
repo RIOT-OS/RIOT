@@ -85,9 +85,11 @@ static void _scheduled_event_callback(void* scheduled_event)
 void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
                             uint32_t duration)
 {
-    event->ztimer.callback = (unicoap_event_callback_t)_scheduled_event_callback;
+    event->ztimer.callback = _scheduled_event_callback;
     event->ztimer.arg = (void*)event;
-    event->super.handler = callback;
+    /* This cast is fine because (a) the return types are identical and the function argument is
+     * a pointer to a struct, too. */
+    event->super.handler = (event_handler_t)callback;
     ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
 }
 

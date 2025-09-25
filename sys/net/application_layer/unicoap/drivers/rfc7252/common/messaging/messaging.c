@@ -411,9 +411,9 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
     }
 }
 
-static void _on_ack_timeout(event_t* _event)
+static void _on_ack_timeout(unicoap_scheduled_event_t* _event)
 {
-    _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout.super);
+    _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout);
     assert(transmission);
     assert(transmission->pdu);
     assert(transmission->pdu_size > 0);

@@ -44,7 +44,7 @@ extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bo
                                              unicoap_packet_t* packet);
 
 /* Timeout function to free a session when too many session slots are occupied */
-static void _dtls_session_triage(event_t* event)
+static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 {
     (void)event;
     sock_dtls_session_t session;

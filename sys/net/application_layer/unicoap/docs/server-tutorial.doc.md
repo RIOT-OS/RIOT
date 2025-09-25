@@ -371,6 +371,7 @@ Type '/exit' to exit.
 # app: listening at UDP <sock_tl_ep port=5683 netif=0 ipv6=::>
 # app: listening at DTLS <sock_tl_ep port=5684 netif=0 ipv6=::>
 # app: using credential: type=PSK id=Client_identity key=secretPSK
+# app: IPv6 address: fe80::c0:ff:ee
 ```
 
 @remark
@@ -387,7 +388,7 @@ sudo ip link set tap0 up
 In a second terminal session, run
 
 ```sh
-python3 client.py -m GET -u "coap://[fe80::c0:ff:ee%tap0]/greeting?name=RIOTeer"
+python3 client.py -m GET -u "coap://[fe80::c0:ff:ee%tap0]/greeting?name=RIOTer"
 ```
 
 where `fe80::c0:ff:ee` is the IPv6 address of the RIOT interface behind the tap interface.
@@ -398,7 +399,7 @@ You should see a number of debug logs from that script culminating in:
 
 ```
 response: 2.05 Content
-b'Hello, RIOTeer! Welcome to our itsy bitsy tiny CoAP server!'
+b'Hello, RIOTer! Welcome to our itsy bitsy tiny CoAP server!'
 ```
 
 Congrats, your server is working!

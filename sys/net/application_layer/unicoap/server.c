@@ -41,7 +41,10 @@ bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
     assert(resource);
     assert(options);
     unicoap_options_iterator_t iterator;
-    unicoap_options_iterator_init(&iterator, options);
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
 
     char* cursor = (char*)resource->path;
     const char* end = resource->path + strlen(resource->path);
