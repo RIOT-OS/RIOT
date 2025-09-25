@@ -23,6 +23,7 @@ const { Content, headings } = await render(entry);
   frontmatter={{
     title: entry.data.title,
     description: "List of all changes in this release",
+    pagefind: false, // We don't want to pollute our search with release-notes entries
   }}
   headings={headings}
   ><Content />
