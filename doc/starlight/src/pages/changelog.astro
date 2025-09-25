@@ -25,7 +25,7 @@ const changelog = await getCollection("changelog");
   {
     changelog.map((entry) => (
       <LinkCard
-        title={entry.data.title}
+        title={`${entry.data.release}${entry.data.codeName ? ` "${entry.data.codeName}"` : ""}`}
         href={`/changelog/${entry.data.slug}`}
       />
     ))

@@ -16,7 +16,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 ---
 
 <StarlightPage
@@ -24,5 +24,6 @@ const { Content } = await render(entry);
     title: entry.data.title,
     description: "List of all changes in this release",
   }}
+  headings={headings}
   ><Content />
 </StarlightPage>
