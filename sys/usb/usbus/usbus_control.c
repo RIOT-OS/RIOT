@@ -336,7 +336,7 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
 {
     usb_setup_t *pkt = &handler->setup;
 
-    DEBUG("usbus_control: Received setup %x %x @ %d\n", pkt->type,
+    DEBUG("usbus_control: Received setup %x %x @ %hu\n", pkt->type,
           pkt->request, pkt->length);
     int res = 0;
 
