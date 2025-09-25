@@ -26,13 +26,28 @@
 #include "private.h"
 
 bool unicoap_resource_match_path_string(const unicoap_resource_t* resource,
-                                        const char* path, size_t length)
+                                        const char* lhs_path, size_t lhs_length)
 {
     assert(resource);
-    assert(path);
+    assert(lhs_path);
 
-    return strncmp(path, resource->path, resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ?
-                   strlen(resource->path) : length) == 0;
+    /* We are comparing the left-hand side (path from request) to the right-hand side (resource). */
+
+    size_t rhs_length = strlen(resource->path);
+
+    if (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
+        /* The actual path (LHS) length may be longer. If it is shorter, bail out. */
+        if (lhs_length < rhs_length) {
+            return false;
+        }
+    } else {
+        /* The actual path (LHS) length must match. If it is unequal, bail out. */
+        if (lhs_length != rhs_length) {
+            return false;
+        }
+    }
+
+    return strncmp(lhs_path, resource->path, lhs_length) == 0; /* rhs is null-terminated */
 }
 
 bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
