@@ -54,13 +54,14 @@ export function changelogLoader(): Loader {
           lines[index + 1] = "";
         }
 
-        // Check if current line is a RIOT release heading or if we have reached the last line of the file
-        // In this case we have either found the first release heading
-        // Or we have reached the end of the current changelog and will now push it to the content collection
+        // Check if the current line is a RIOT release heading
+        // or if we have reached the last line of the file.
         if (
           /(RIOT-.*? - Release Notes)|(Release 2013\.08)/.test(line) ||
           index == lines.length - 1
         ) {
+          // If we already found a release heading before we now
+          // reached the end of its changelog
           if (currentReleaseHeading && currentReleaseHeadingIndex) {
             // Extract the release (YYYY.MM.*) from the release heading
             const release =
