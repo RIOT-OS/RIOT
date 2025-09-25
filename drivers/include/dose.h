@@ -204,6 +204,7 @@ typedef struct {
     ztimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
     uint32_t timeout_base;                  /**< Base timeout in us */
     uart_t uart;                            /**< UART device to use */
+    int tx_result;                          /**< return code for confirm_send() */
     uint8_t uart_octet;                     /**< Last received octet */
     uint8_t flags;                          /**< Several flags */
 } dose_t;
