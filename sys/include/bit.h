@@ -207,6 +207,8 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
  *
  * @param[in]  ptr pointer to target word
  * @param[in]  bit bit number within the word
+ *
+ * @return True if the bit was set, false otherwise.
  */
 static inline bool bit_check32(volatile uint32_t *ptr, uint8_t bit)
 {
@@ -224,6 +226,8 @@ static inline bool bit_check32(volatile uint32_t *ptr, uint8_t bit)
  *
  * @param[in]  ptr pointer to target word
  * @param[in]  bit bit number within the word
+ *
+ * @return True if the bit was set, false otherwise.
  */
 static inline bool bit_check16(volatile uint16_t *ptr, uint8_t bit)
 {
@@ -241,6 +245,8 @@ static inline bool bit_check16(volatile uint16_t *ptr, uint8_t bit)
  *
  * @param[in]  ptr pointer to target byte
  * @param[in]  bit bit number within the byte
+ *
+ * @return True if the bit was set, false otherwise.
  */
 static inline bool bit_check8(volatile uint8_t *ptr, uint8_t bit)
 {
