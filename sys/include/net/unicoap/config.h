@@ -271,11 +271,11 @@ static_assert(CONFIG_UNIOCOAP_PATH_LENGTH_MAX > 0,
  * @brief See @ref  CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH
  */
 #if (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 3)
-#  define UNICOAP_OBS_TICK_EXPONENT (0)
+#  define UNICOAP_OBSERVE_TICK_EXPONENT (0)
 #elif (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 2)
-#  define UNICOAP_OBS_TICK_EXPONENT (6)
+#  define UNICOAP_OBSERVE_TICK_EXPONENT (6)
 #elif (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 1)
-#  define UNICOAP_OBS_TICK_EXPONENT (14)
+#  define UNICOAP_OBSERVE_TICK_EXPONENT (14)
 #else
 #  error CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH must not exceed 3
 #endif
@@ -462,7 +462,7 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 /**
  * @brief Block size unicoap will suggest for Block1 and Block2 transfers
  *
- * **Default**: 64 bytes
+ * **Default**: 32 bytes
  */
 #if !defined(CONFIG_UNICOAP_BLOCK_SIZE) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_BLOCK_SIZE (32)

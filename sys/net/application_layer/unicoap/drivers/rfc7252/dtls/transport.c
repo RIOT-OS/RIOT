@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2024-2025 Carl Seifert
  * Copyright (C) 2024-2025 TU Dresden
  *
@@ -67,7 +67,6 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
                                      sizeof(unicoap_receiver_buffer),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS);
         _UNICOAP_DEBUG_HEX(unicoap_receiver_buffer, res);
-        DEBUG("^ this really looks like a PDU...\n");
 
         if (res != -SOCK_DTLS_HANDSHAKE) {
             DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
@@ -78,7 +77,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         dsm_state_t prev_state = dsm_store(sock, &session, SESSION_STATE_ESTABLISHED, false);
 
         /* If session is already stored and the state was SESSION_STATE_HANDSHAKE
-         before, the handshake has been initiated internally by a gcoap client request
+         before, the handshake has been initiated internally by a client request
          and another thread is waiting for the handshake. Send message to the
          waiting thread to inform about established session */
         if (prev_state == SESSION_STATE_HANDSHAKE) {
@@ -118,7 +117,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
-        unicoap_exchange_forget_failed_endpoint(&endpoint);
+        unicoap_exchange_forget_endpoint(&endpoint);
     }
 
     if (type & SOCK_ASYNC_MSG_RECV) {
@@ -146,7 +145,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
 
 #if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
-        unicoap_endpoint_t local = { .proto = UNICOAP_PROTO_UDP };
+        unicoap_endpoint_t local = { .proto = UNICOAP_PROTO_DTLS };
         packet.local = &local;
 
         if (aux_rx.local.family != AF_UNSPEC) {
@@ -177,7 +176,7 @@ static ssize_t _dtls_authenticate(const sock_udp_ep_t* remote, sock_dtls_session
     }
     if (session_state == NO_SPACE) {
         DTLS_DEBUG("auth: no space in DTLS session mgmt\n");
-        return -ENOTCONN;
+        return -ENOBUFS;
     }
 
     /* start handshake */
@@ -265,7 +264,7 @@ static int _add_socket(event_queue_t* queue, sock_dtls_t* socket, sock_udp_t* ba
                local->family == AF_INET6 ? "inet6" : (local->family == AF_INET ? "inet" : "?"));
 
     if (sock_udp_create(base_socket, local, NULL, 0)) {
-        DTLS_DEBUG("error creating DTLS transport sock\n");
+        DTLS_DEBUG("error creating DTLS base (UDP) sock\n");
         return 0;
     }
     if (sock_dtls_create(socket, base_socket, CREDMAN_TAG_EMPTY, SOCK_DTLS_1_2,

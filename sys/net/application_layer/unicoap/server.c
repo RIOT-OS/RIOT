@@ -15,8 +15,6 @@
  */
 
 #include <string.h>
-#include <errno.h>
-#include <alloca.h>
 
 #include "thread.h"
 #include "compiler_hints.h"
@@ -38,7 +36,7 @@ bool unicoap_resource_match_path_string(const unicoap_resource_t* resource,
 }
 
 bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
-                                         unicoap_options_t* options)
+                                         const unicoap_options_t* options)
 {
     assert(resource);
     assert(options);
@@ -121,23 +119,22 @@ int unicoap_resource_match_request_default(const char* path, size_t path_length,
 ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* buffer,
                                      size_t capacity, unicoap_link_encoder_ctx_t* context)
 {
+    assert(buffer);
     size_t path_len = strlen(resource->path);
     /* count target separators and any link separator */
     size_t exp_size = path_len + 2 + (context->uninitialized ? 0 : 1);
 
-    if (buffer) {
-        unsigned pos = 0;
-        if (exp_size > capacity) {
-            return -1;
-        }
-
-        if (!context->uninitialized) {
-            buffer[pos++] = ',';
-        }
-        buffer[pos++] = '<';
-        memcpy(&buffer[pos], resource->path, path_len);
-        buffer[pos + path_len] = '>';
+    unsigned pos = 0;
+    if (exp_size > capacity) {
+        return -ENOBUFS;
     }
+
+    if (!context->uninitialized) {
+        buffer[pos++] = ',';
+    }
+    buffer[pos++] = '<';
+    memcpy(&buffer[pos], resource->path, path_len);
+    buffer[pos + path_len] = '>';
 
     return exp_size;
 }
@@ -184,46 +181,44 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     SERVER_DEBUG("invoking handler\n");
     res = resource->handler(message, &aux, &context, resource->handler_arg);
 
-    if (context.resource) {
-        if (res > 0) {
-            SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
-                         " from return value\n",
-                         unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
+    if (res > 0) {
+        SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
+                     " from return value\n",
+                     unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
 
-            if (IS_ACTIVE(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES)) {
-                if (unicoap_response_is_optional(message->options, (unicoap_status_t)res)) {
-                    SERVER_DEBUG("response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
-                                 " is optional, not responding\n",
-                                 unicoap_code_class((uint8_t)res),
-                                 unicoap_code_detail((uint8_t)res));
-                    return 0;
-                }
+        if (IS_ACTIVE(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES)) {
+            if (unicoap_response_is_optional(message->options, (unicoap_status_t)res)) {
+                SERVER_DEBUG("response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
+                             " is optional, not responding\n",
+                             unicoap_code_class((uint8_t)res),
+                             unicoap_code_detail((uint8_t)res));
+                return 0;
             }
-
-            unicoap_response_init_empty(message, (unicoap_status_t)res);
-            return unicoap_server_send_response_body(packet, resource);
         }
-        else if (context._packet) {
-            /* application didn't send a response or deferred response,
-             * otherwise, _packet would be NULL here */
-            if (res != UNICOAP_IGNORING_REQUEST) {
-                /* handler does not want to send response (provided, No-Response is set at all) */
-                /* the decision whether to honour No-Response must be made by the handler */
 
-                if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
-                    unicoap_assist(API_MISUSE("handler did not respond")
-                                   FIXIT("set USEMODULE += unicoap_deferred_response and"
-                                         "call unicoap_defer_response")
-                                   FIXIT("ignore request by returning UNICOAP_IGNORING_REQUEST"));
-                    unicoap_response_init_string(message, UNICOAP_STATUS_INTERNAL_SERVER_ERROR,
-                                                 "application");
-                    goto error;
-                }
+        unicoap_response_init_empty(message, (unicoap_status_t)res);
+        return unicoap_server_send_response_body(packet, resource);
+    }
+    else if (context._packet) {
+        /* application didn't send a response or deferred response,
+         * otherwise, _packet would be NULL here */
+        if (res != UNICOAP_IGNORING_REQUEST) {
+            /* handler does not want to send response (provided, No-Response is set at all) */
+            /* the decision whether to honour No-Response must be made by the handler */
+
+            if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+                unicoap_assist(API_MISUSE("handler did not respond")
+                               FIXIT("set USEMODULE += unicoap_deferred_response and"
+                                     "call unicoap_defer_response")
+                               FIXIT("ignore request by returning UNICOAP_IGNORING_REQUEST"));
+                unicoap_response_init_string(message, UNICOAP_STATUS_INTERNAL_SERVER_ERROR,
+                                             "application");
+                goto error;
             }
-
-            /* TODO: Advanced server features: Free exchange-layer state */
-            return 0;
         }
+
+        /* TODO: Advanced server features: Free exchange-layer state */
+        return 0;
     }
     return 0;
 
@@ -250,7 +245,7 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
     return 0;
 
 error:
-    SERVER_DEBUG("failed to send response, trying to send 5.05\n");
+    SERVER_DEBUG("failed to send response, trying to send 5.05 unreliably\n");
 
     /* try to send 5.05,  */
     unicoap_response_init_empty(packet->message, UNICOAP_STATUS_INTERNAL_SERVER_ERROR);

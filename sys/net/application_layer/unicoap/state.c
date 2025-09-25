@@ -31,19 +31,18 @@ UNICOAP_DECL_RECEIVER_STORAGE;
 
 /* Internal variables */
 const unicoap_resource_t _unicoap_default_resources[] = {
-#  if CONFIG_UNICOAP_WELL_KNOWN_CORE
+#if CONFIG_UNICOAP_WELL_KNOWN_CORE
     /* (unicoap_resource_t) */ { .path = "/.well-known/core",
                                  .handler = unicoap_resource_handle_well_known_core,
                                  .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET) }
-#  endif
-
+#endif
 };
 
 static unicoap_listener_t _default_listener = {
     .resources = _unicoap_default_resources,
     .resource_count = ARRAY_SIZE(_unicoap_default_resources),
     .request_matcher = unicoap_resource_match_request_default,
-    .link_encoder = NULL,
+    .link_encoder = unicoap_resource_encode_link,
     .next = NULL,
 };
 
@@ -55,7 +54,6 @@ static unicoap_state_t _state = { .listeners = &_default_listener };
 
 kernel_pid_t _unicoap_pid = KERNEL_PID_UNDEF;
 static event_queue_t _queue;
-static char _thread_message_stack[UNICOAP_STACK_SIZE];
 
 static inline void _lock(void)
 {
@@ -84,10 +82,10 @@ static void _scheduled_event_callback(void* scheduled_event)
     event_post(&_queue, (event_t*)scheduled_event);
 }
 
-void unicoap_event_schedule(unicoap_scheduled_event_t* event, event_handler_t callback,
+void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
                             uint32_t duration)
 {
-    event->ztimer.callback = _scheduled_event_callback;
+    event->ztimer.callback = (unicoap_event_callback_t)_scheduled_event_callback;
     event->ztimer.arg = (void*)event;
     event->super.handler = callback;
     ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
@@ -108,21 +106,21 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event)
 static inline int _init_drivers(event_queue_t* queue)
 {
     (void)queue;
-#  if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
     if (unicoap_init_rfc7252_common(queue) < 0) {
         return -1;
     }
-#  endif
-#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#endif
+#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
     if (unicoap_init_udp(queue) < 0) {
         return -1;
     }
-#  endif
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#endif
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     if (unicoap_init_dtls(queue) < 0) {
         return -1;
     }
-#  endif
+#endif
     /* MARK: unicoap_driver_extension_point */
     return 0;
 }
@@ -130,26 +128,30 @@ static inline int _init_drivers(event_queue_t* queue)
 static inline int _deinit_drivers(event_queue_t* queue)
 {
     (void)queue;
-#  if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
-    unicoap_deinit_rfc7252_common(queue);
-#  endif
-#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
-    unicoap_deinit_udp(queue);
-#  endif
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
-    unicoap_deinit_dtls(queue);
-#  endif
+    int res = 0;
+#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+    res += unicoap_deinit_rfc7252_common(queue);
+#endif
+#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+    res += unicoap_deinit_udp(queue);
+#endif
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+    res += unicoap_deinit_dtls(queue);
+#endif
     /* MARK: unicoap_driver_extension_point */
-    return 0;
+    return res;
 }
 
 void* _unicoap_loop_run(void* arg)
 {
     (void)arg;
 
-    /* Either someone wants to run the unicoap loop on their own thread or
+    /* Either someone wants to run the unicoap loop on their own thread
+     *    (_unicoap_pid == KERNEL_PID_UNDEF); or
      * we came here via thread_create in unicoap_init (CONFIG_UNICOAP_CREATE_THREAD is
-     * enabled is enabled in that case). */
+     * enabled is enabled in that case)
+     *    (_unicoap_pid == thread_getpid(), so we're on that thread right now).
+     */
     assert(_unicoap_pid == KERNEL_PID_UNDEF || _unicoap_pid == thread_getpid());
     event_queue_init(&_queue);
     if (_init_drivers(&_queue) < 0) {
@@ -174,15 +176,9 @@ kernel_pid_t unicoap_init(void)
         return -EEXIST;
     }
 
-    /* don't need to zero-initialize arrays as we use designated initializer
-     * ensuring these are zeroed by default */
-
     mutex_init(&_state.lock);
-    _state.listeners = &_default_listener;
-    /* we don't need to memset arrays in _state as we're using the designated
-     * initializer*/
 
-#  if IS_USED(MODULE_UNICOAP_RESOURCES_XFA)
+#if IS_USED(MODULE_UNICOAP_RESOURCES_XFA)
     /* add CoAP resources from XFA */
     XFA_USE_CONST(unicoap_resource_t, unicoap_resources_xfa);
     static unicoap_listener_t _xfa_listener = {
@@ -192,13 +188,14 @@ kernel_pid_t unicoap_init(void)
     _xfa_listener.resource_count = XFA_LEN(unicoap_resource_t, unicoap_resources_xfa);
     unicoap_listener_register(&_xfa_listener);
     UNICOAP_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
-#  endif
+#endif
 
-#  if IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
-    _unicoap_pid = thread_create(_thread_message_stack, sizeof(_thread_message_stack),
-                                 THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST, _unicoap_loop_run,
+#if IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
+    static char _unicoap_thread_stack[UNICOAP_STACK_SIZE];
+    _unicoap_pid = thread_create(_unicoap_thread_stack, sizeof(_unicoap_thread_stack),
+                                 THREAD_PRIORITY_MAIN - 1, 0, _unicoap_loop_run,
                                  NULL, UNICOAP_THREAD_IDENTIFIER);
-#  endif
+#endif
 
     return _unicoap_pid;
 }
@@ -395,19 +392,12 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
     }
 }
 
-void unicoap_exchange_forget_failed_endpoint(const unicoap_endpoint_t* endpoint)
+void unicoap_exchange_forget_endpoint(const unicoap_endpoint_t* endpoint)
 {
     (void)endpoint;
     /* TODO: Client and advanced server features: Elaborate state management */
     /* TODO: Observe: Remove potential registrations */
     return;
-}
-
-int unicoap_options_set_observe_generated(unicoap_options_t* options)
-{
-    /* generate initial notification value */
-    return unicoap_options_set_observe(
-        options, (ztimer_now(ZTIMER_MSEC) >> UNICOAP_OBS_TICK_EXPONENT) & 0xFFFFFF);
 }
 
 /* These must be in state.c as it reads the _state object. */
@@ -420,10 +410,11 @@ ssize_t unicoap_resource_core_link_format_build(char* buffer, size_t capacity,
     char* out = (char*)buffer;
     size_t pos = 0;
 
-    unicoap_link_encoder_ctx_t ctx;
-    ctx.content_format = UNICOAP_FORMAT_LINK;
-    /* indicate initial link for the list */
-    ctx.uninitialized = true;
+    unicoap_link_encoder_ctx_t ctx = {
+        .content_format = UNICOAP_FORMAT_LINK,
+        /* indicate initial link for the list */
+        .uninitialized = true,
+    };
 
     /* write payload */
     for (; listener != NULL; listener = listener->next) {

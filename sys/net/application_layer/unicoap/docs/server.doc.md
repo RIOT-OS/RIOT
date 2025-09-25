@@ -145,10 +145,9 @@ There are multiple techniques for responding.
 
 
 @remark
-`unicoap` runs a CoAP server for you in the background. Each driver asynchronously forwards packets
-to that server. Thus, there is no technical limitation in the number of sockets or ports. If
-multiple sockets or ports (or, 'inputs') are supported, this would be indicated on the respective
-driver's documentation page.
+There is no architectural limitation in the number of sockets or ports. If
+multiple sockets or ports (depending on the transport, the term _handle_ or _input_ might be more
+adequate) are supported. This would be indicated on the respective driver's documentation page.
 
 
 @}

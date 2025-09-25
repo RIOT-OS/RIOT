@@ -106,6 +106,8 @@ static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
         if (IS_ACTIVE(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES)) {
             received = sock_udp_recv_buf_aux(sock, &stackbuf, &buffer_ctx, 0,
                                              unicoap_endpoint_get_udp(&remote), &aux_rx);
+            /* If the networking backends holds its zero-copy guarantee, then trying to read
+             * another chunk must not yield any more data. */
             assert(received == 0);
         }
     }

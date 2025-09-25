@@ -404,6 +404,8 @@ typedef ssize_t (*unicoap_link_encoder_t)(const unicoap_resource_t* resource, ch
  * @param capacity The capacity of @p buffer in bytes
  * @param[in,out] context Encoding context
  *
+ * @pre @p buffer must no be `NULL`.
+ *
  * @returns Length of encoded resource string in bytes or negative integer on error
  * @retval `ENOBUFS` Buffer too small to encode resources in link format.
  */
@@ -526,7 +528,7 @@ void unicoap_listener_deregister(unicoap_listener_t* listener);
  *
  * @see @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE
  *
- * @return > 0 if resource paths match
+ * @returns A boolean value indicating whether the specified path matches the resource definition.
  */
 bool unicoap_resource_match_path_string(const unicoap_resource_t* resource, const char* path, size_t length);
 
