@@ -29,6 +29,10 @@
 #include "clic.h"
 #include "architecture.h"
 
+#if MODULE_PERIPH_XH3IRQ || DOXYGEN
+#   include "xh3irq.h"
+#endif
+
 #include "vendor/riscv_csr.h"
 
 /* Default state of mstatus register */

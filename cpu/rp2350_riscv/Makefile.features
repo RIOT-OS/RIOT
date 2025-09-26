@@ -1,0 +1,8 @@
+CPU_CORE := rv32imac
+CPU_FAM  := RP2350
+
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_xh3irq
+
+include $(RIOTCPU)/riscv_common/Makefile.features
