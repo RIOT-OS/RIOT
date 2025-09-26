@@ -62,7 +62,10 @@ export function changelogLoader(): Loader {
         ) {
           // If we already found a release heading before we now
           // reached the end of its changelog
-          if (currentReleaseHeading && currentReleaseHeadingIndex) {
+          if (
+            currentReleaseHeading != null &&
+            currentReleaseHeadingIndex != null
+          ) {
             // Extract the release (YYYY.MM.*) from the release heading
             const release =
               currentReleaseHeading.match(/(\d{4}\.\d{2}(\.\d+)?)/)?.[1] || "";
