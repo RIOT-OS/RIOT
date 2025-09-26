@@ -41,6 +41,13 @@ SECTIONS
 
   .text           :
   {
+    /*
+     * Keep picobin block used by RP2350.
+     * This gives the Pico2 bootloader metadata about the
+     * exact configuration we are trying to run.
+     * E.g. secure mode, riscv, arm, etc.
+     */
+    KEEP(*(SORT(.picobin_block*)))
     *(.text.unlikely .text.unlikely.*)
     *(.text.startup .text.startup.*)
     *(.text .text.*)
