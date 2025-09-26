@@ -46,7 +46,7 @@ export function changelogLoader(): Loader {
         // Convert all headings to be one level lower
         // h1 => h2, h2 => h3, h3 => h4
         // This is necessary, because the heading levels of this file are wrong (for markdown)
-        // We cannot have more han one h1 per document etc.
+        // We cannot have more than one h1 per document etc.
         // Check if next line contains only "=" characters
         if (/^=+$/.test(nextLine)) {
           // If yes add a "##" to the current lines beginning
@@ -68,7 +68,7 @@ export function changelogLoader(): Loader {
           /(RIOT-.*? - Release Notes)|(Release 2013\.08)/.test(line) ||
           index == lines.length - 1
         ) {
-          // If we already found a release heading before we now
+          // If we already found a release heading before, we now
           // reached the end of its changelog
           if (
             currentReleaseHeading != null &&
