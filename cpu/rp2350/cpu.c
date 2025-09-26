@@ -18,12 +18,19 @@
 
 #include "RP2350.h"
 #include "board.h"
+#include "clock_conf.h"
+#include "cpu_conf_common.h"
+#include "helpers.h"
 #include "kernel_init.h"
 #include "macros/units.h"
 #include "periph/gpio.h"
+#include "periph/uart.h"
 #include "periph/init.h"
 #include "periph_cpu.h"
 #include "stdio_base.h"
+
+#include <stdint.h>
+#include <stdio.h>
 
 #define DEBUG_WITH_OSC
 
@@ -35,7 +42,7 @@ void gpio_reset(void) {
 void cpu_init(void) {
     /* initialize the Cortex-M core, once UART support is moved
      * to shared driver as currently this will cause unhandled interrupts */
-    /* cortexm_init(); */
+    cortexm_init();
 
     /* Reset GPIO state */
     gpio_reset();
