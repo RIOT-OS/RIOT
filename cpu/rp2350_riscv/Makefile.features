@@ -1,0 +1,7 @@
+CPU_CORE := rv32imac
+
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_xh3irq
+
+include $(RIOTCPU)/riscv_common/Makefile.features

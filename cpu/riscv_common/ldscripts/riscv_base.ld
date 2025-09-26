@@ -41,6 +41,7 @@ SECTIONS
 
   .text           :
   {
+    KEEP(*(SORT(.picobin_block*))) /* Keep picobin block used by RP2350 */
     *(.text.unlikely .text.unlikely.*)
     *(.text.startup .text.startup.*)
     *(.text .text.*)
