@@ -1,0 +1,33 @@
+CFLAGS += -Wno-pedantic
+
+ROM_LEN         ?= 2097152    # = 2 MiB used in the RPi Pico
+ROM_OFFSET      := 0          # bootloader size
+RAM_LEN         := 0x82000    # 520kB = 532479 used in the RPi Pico 2350
+ROM_START_ADDR  := 0x10000000 # XIP Non-Secure address for rp2350
+RAM_START_ADDR  := 0x20000000 # Non-Secure RAM address for rp2350
+
+INCLUDES += -I$(RIOTCPU)/rp2350_riscv/include
+INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2_common/cmsis/stub/CMSIS/Core/Include
+INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
+INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2350/hardware_regs/include/hardware
+
+# CPU and architecture specific flags
+CFLAGS += -D$(CPU_MODEL)
+CFLAGS += -DROM_START_ADDR=$(ROM_START_ADDR)
+CFLAGS += -DRAM_START_ADDR=$(RAM_START_ADDR)
+CFLAGS += -Wno-error
+CFLAGS += -march=rv32imac_zicsr_zifencei_zba_zbb_zbkb_zbs
+CFLAGS += -mabi=lp64
+
+# Linker flags
+LINKFLAGS += -mcpu=$(CPU_ARCH)
+LINKFLAGS += -Wl,--gc-sections
+LINKFLAGS += -Wl,--start-group -lc -lm -Wl,--end-group
+LINKFLAGS += -march=rv32imac_zicsr_zifencei_zba_zbb_zbkb_zbs
+
+# Supported programmers and debuggers
+PROGRAMMERS_SUPPORTED := picotool openocd jlink
+PROGRAMMER ?= picotool
+OPENOCD_DEBUG_ADAPTER ?= dap
+
+include $(RIOTCPU)/riscv_common/Makefile.include
