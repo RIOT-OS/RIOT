@@ -206,16 +206,11 @@ static void _isr(netdev_t *netdev)
 
 static int _get_state(sx126x_t *dev, void *val)
 {
-    sx126x_chip_status_t radio_status;
-
-    sx126x_get_status(dev, &radio_status);
-    netopt_state_t state = NETOPT_STATE_OFF;
-
-    switch (radio_status.chip_mode) {
-    case SX126X_CHIP_MODE_RFU:
-    case SX126X_CHIP_MODE_STBY_RC:
-    case SX126X_CHIP_MODE_STBY_XOSC:
-        state = NETOPT_STATE_STANDBY;
+    netopt_state_t state;
+    sx126x_chip_modes_t mode = sx126x_get_state(dev);
+    switch (mode) {
+    case SX126X_CHIP_MODE_FS:
+        state = NETOPT_STATE_IDLE;
         break;
 
     case SX126X_CHIP_MODE_TX:
@@ -227,6 +222,7 @@ static int _get_state(sx126x_t *dev, void *val)
         break;
 
     default:
+        state = NETOPT_STATE_STANDBY;
         break;
     }
     memcpy(val, &state, sizeof(netopt_state_t));
@@ -312,7 +308,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
     switch (state) {
     case NETOPT_STATE_STANDBY:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_STANDBY state\n");
-        sx126x_set_standby(dev, SX126X_CHIP_MODE_STBY_XOSC);
+        sx126x_set_state(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
     case NETOPT_STATE_IDLE:
@@ -324,14 +320,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
             dev->params->set_rf_mode(dev, SX126X_RF_MODE_RX);
         }
 #endif
-        sx126x_cfg_rx_boosted(dev, true);
-        int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
-        if (_timeout != 0) {
-            sx126x_set_rx(dev, _timeout);
-        }
-        else {
-            sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
-        }
+        sx126x_set_state(dev, SX126X_CHIP_MODE_RX);
         break;
 
     case NETOPT_STATE_TX:
@@ -341,7 +330,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
         }
 #endif
-        sx126x_set_tx(dev, 0);
+        sx126x_set_state(dev, SX126X_CHIP_MODE_TX);
         break;
 
     case NETOPT_STATE_RESET:

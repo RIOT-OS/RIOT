@@ -427,6 +427,38 @@ int sx126x_init(sx126x_t *dev)
     return res;
 }
 
+sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev)
+{
+    sx126x_chip_status_t radio_status;
+    sx126x_get_status(dev, &radio_status);
+    return radio_status.chip_mode;
+}
+
+void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
+{
+    switch (state) {
+    case SX126X_CHIP_MODE_TX:
+        sx126x_set_tx(dev, 0); /* no TX frame timeout */
+        break;
+    case SX126X_CHIP_MODE_RX: {
+        int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
+        sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
+        if (timeout > 0) {
+            sx126x_set_rx(dev, timeout);
+        }
+        else {
+            sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
+        }
+    } break;
+    case SX126X_CHIP_MODE_STBY_RC:
+    case SX126X_CHIP_MODE_STBY_XOSC:
+        sx126x_set_standby(dev, state);
+        break;
+    default:
+        break;
+    }
+}
+
 uint32_t sx126x_get_channel(const sx126x_t *dev)
 {
     DEBUG("[sx126x]: sx126x_get_radio_status \n");
