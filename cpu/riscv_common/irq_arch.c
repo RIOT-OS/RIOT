@@ -27,16 +27,15 @@
 #include "sched.h"
 #include "plic.h"
 #include "clic.h"
+#include "xh3irq.h"
 #include "architecture.h"
 
-#if MODULE_PERIPH_XH3IRQ || DOXYGEN
-#   include "xh3irq.h"
-#endif
+#include "xh3irq.h"
 
 #include "vendor/riscv_csr.h"
 
 /* Default state of mstatus register */
-#define MSTATUS_DEFAULT     (MSTATUS_MPP | MSTATUS_MPIE)
+#define MSTATUS_DEFAULT (MSTATUS_MPP | MSTATUS_MPIE)
 
 volatile int riscv_in_isr = 0;
 
@@ -84,8 +83,7 @@ void riscv_irq_init(void)
 /**
  * @brief Global trap and interrupt handler
  */
-__attribute((used))
-static void handle_trap(uword_t mcause)
+__attribute((used)) static void handle_trap(uword_t mcause)
 {
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
@@ -93,11 +91,49 @@ static void handle_trap(uword_t mcause)
 
     uword_t trap = mcause & CPU_CSR_MCAUSE_CAUSE_MSK;
 
-    /* Check for INT or TRAP */
-    if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
+    /* Check if this is an interrupt or a trap, indicated by the left most bit */
+    bool is_interrupt = (mcause & MCAUSE_INT) == MCAUSE_INT;
+
+#ifdef DEVELHELP
+    printf("Trap: mcause=0x%" PRIx32 " mepc=0x%lx mtval=0x%lx\n",
+           (uint32_t)mcause, read_csr(mepc), read_csr(mtval));
+
+    if (!is_interrupt) {
+        const char *error_messages[] = {
+            "Instruction address misaligned",
+            "Instruction access fault",
+            "Illegal instruction",
+            "Breakpoint",
+            "Load address misaligned",
+            "Load access fault",
+            "Store/AMO address misaligned",
+            "Store/AMO access fault",
+            "Environment call from U-mode",
+            "Environment call from S-mode",
+            "Reserved",
+            "Environment call from M-mode",
+            "Instruction page fault",
+            "Load page fault",
+            "Reserved",
+            "Store/AMO page fault",
+            "Double trap",
+            "Reserved",
+            "Software check",
+            "Hardware error"
+        };
+
+        if (trap < ARRAY_SIZE(error_messages)) {
+            printf("Machine Cause Error 0x%lx: %s\n", trap, error_messages[trap]);
+        }
+        else {
+            printf("Machine Cause Error 0x%lx: Reserved / Custom\n", trap);
+        }
+    }
+#endif
+
+    if (is_interrupt) {
         /* Cause is an interrupt - determine type */
         switch (mcause & MCAUSE_CAUSE) {
-
 #ifdef MODULE_PERIPH_CORETIMER
         case IRQ_M_TIMER:
             /* Handle timer interrupt */
@@ -108,6 +144,9 @@ static void handle_trap(uword_t mcause)
             /* Handle external interrupt */
             if (IS_ACTIVE(MODULE_PERIPH_PLIC)) {
                 plic_isr_handler();
+            }
+            if (IS_ACTIVE(MODULE_PERIPH_XH3IRQ)) {
+                xh3irq_handler();
             }
             break;
 
