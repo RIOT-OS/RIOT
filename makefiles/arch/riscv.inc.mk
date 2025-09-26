@@ -52,6 +52,7 @@ endif
 GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= 0
 
 CFLAGS_CPU := -march=rv32imac -mabi=ilp32
+ASFLAGS := $(CFLAGS_CPU)
 
 # Since RISC-V ISA specifications 20191213 instructions previously included in
 # rv32imac have been moved to the ZICSR extension. See

@@ -285,6 +285,8 @@ groups:
           help: The MCU is part of the Raspberry PI RPx0xx family.
         - name: cpu_rp2350
           help: The MCU is a Raspberry Pi RP2350
+        - name: cpu_rp2350_riscv
+          help: The MCU is a Raspberry Pi RP2350 RISCV
 
       - title: Silicon Laboratories EFM32 Grouping
         features:
