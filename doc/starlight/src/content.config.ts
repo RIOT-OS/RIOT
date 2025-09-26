@@ -43,23 +43,29 @@ export function changelogLoader(): Loader {
       for (const [index, line] of lines.entries()) {
         const nextLine = lines[index + 1];
 
-        // Convert all headings to be one level lower
-        // h1 => h2, h2 => h3, h3 => h4
-        // This is necessary, because the heading levels of this file are wrong (for markdown)
-        // We cannot have more than one h1 per document etc.
+        // Convert "Setext Style" headings "ATX Style" headings
+        // This is necessary to support heading nesting higher than h1 and h2
         // Check if next line contains only "=" characters
         if (/^=+$/.test(nextLine)) {
           // If yes add a "##" to the current lines beginning
-          lines[index] = `## ${line}`;
+          lines[index] = `# ${line}`;
           // Remove the next lines content
           lines[index + 1] = "";
         }
         // Check if next line contains only "-" characters
         if (/^-+$/.test(nextLine)) {
           // If yes add a "###" to the current lines beginning
-          lines[index] = `### ${line}`;
+          lines[index] = `## ${line}`;
           // Remove the next lines content
           lines[index + 1] = "";
+        }
+
+        // Convert all headings to be one level lower
+        // h1 => h2, h2 => h3, h3 => h4 etc.
+        // This is necessary, because the heading levels of this file are wrong (for markdown)
+        // We cannot have more than one h1 per document etc.
+        if (lines[index].startsWith("#")) {
+          lines[index] = `#${lines[index]}`;
         }
 
         // Check if the current line is a RIOT release heading
