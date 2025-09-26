@@ -1,4 +1,4 @@
-import { defineCollection } from "astro:content";
+import { defineCollection, z } from "astro:content";
 import { glob, type Loader } from "astro/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 import { promises as fs } from "node:fs";
@@ -10,6 +10,14 @@ export const collections = {
   }),
   changelog: defineCollection({
     loader: changelogLoader(),
+    schema: z.object({
+      title: z.string(),
+      release: z.string(),
+      codeName: z.string(),
+      slug: z.string(),
+      date: z.date(),
+      markdown: z.string(),
+    }),
   }),
 };
 
