@@ -1,13 +1,9 @@
 /*
- * Copyright (C) 2014-2017 Freie Universität Berlin
- *               2015 Jan Wagner <mail@jwagner.eu>
- *               2018 Inria
- *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
- *
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014-2017 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2015 Jan Wagner <mail@jwagner.eu>
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-FileCopyrightText: 2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
