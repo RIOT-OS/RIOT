@@ -258,6 +258,7 @@ FEATURES_EXISTING := \
     periph_wdt \
     periph_wdt_cb \
     periph_wdt_warning_period \
+    periph_xh3irq \
     picolibc \
     pio_i2c \
     puf_sram \
