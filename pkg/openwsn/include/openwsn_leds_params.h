@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -17,8 +19,6 @@
  *
  * @}
  */
-#ifndef OPENWSN_LEDS_PARAMS_H
-#define OPENWSN_LEDS_PARAMS_H
 
 #include "board.h"
 
@@ -92,5 +92,3 @@ static const leds_config_t openwsn_leds_params[] =
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OPENWSN_LEDS_PARAMS_H */

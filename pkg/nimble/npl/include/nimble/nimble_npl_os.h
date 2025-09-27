@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_nimble
  * @{
@@ -16,9 +18,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
-
-#ifndef NIMBLE_NIMBLE_NPL_OS_H
-#define NIMBLE_NIMBLE_NPL_OS_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -587,5 +586,3 @@ nrf52_clock_hfxo_release(void)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* NIMBLE_NIMBLE_NPL_OS_H */
