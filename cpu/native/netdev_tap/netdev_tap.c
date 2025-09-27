@@ -1,12 +1,9 @@
 /*
- * Copyright (C) 2015 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>,
- *                    Martine Lenders <mlenders@inf.fu-berlin.de>
- *                    Kaspar Schleiser <kaspar@schleiser.de>
- *                    Ell-i open source co-operative
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2015 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>,
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2015 Ell-i open source co-operative
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
