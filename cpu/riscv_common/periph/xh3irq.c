@@ -2,15 +2,15 @@
 #include <stdio.h>
 
 uint32_t xh3irq_has_pending(void) {
-    // Get MEIP at 0x344 which is the external interrupt pending bit
+    /* Get MEIP at 0x344 which is the external interrupt pending bit */
     uint32_t meip = (read_csr(0x344) >> 11) & 0x1;
 
     return (meip != 0);
 }
 
 void xh3irq_handler(void) {
-    /* Get MEINEXT at 0xbe4 which is the next highest interrupt to handle (Bit 2-10) */
-    /* This will also automagically clear the interrupt (See 3.8.6.1.2.) */
+    /* Get MEINEXT at 0xbe4 which is the next highest interrupt to handle (Bit 2-10).
+     * This will also automagically clear the interrupt (See 3.8.6.1.2.) */
     uint32_t meinext = (read_csr(0xbe4) >> 2) & 0x1ff;
 
     void (*isr)(void) = (void (*)(void))vector_cpu[meinext];

@@ -68,9 +68,6 @@ extern "C" {
 /** Isolation bits for PADS_BANK0 */
 #define PADS_BANK0_ISO_BITS (1u << 8u)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @brief   Calculate the address of the GPIO pad register for a given pin
@@ -90,7 +87,7 @@ static inline uint32_t calculate_gpio_pad_register_addr(gpio_t pin) {
  * @return  The address of the GPIO IO status register for the given pin
  */
 static uint32_t calculate_gpio_io_status_register_addr(gpio_t pin) {
-    /* Each status register is followed by a ctrl register, */
+    /* Each status register is followed by a ctrl register */
     return IO_BANK0_BASE + 8 * pin;
 }
 
@@ -108,7 +105,6 @@ static inline uint32_t calculate_gpio_io_ctrl_register_addr(gpio_t pin) {
 }
 
 
-/** @} */
 
 #ifdef __cplusplus
 }

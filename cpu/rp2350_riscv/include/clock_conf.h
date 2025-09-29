@@ -89,7 +89,7 @@
  * clock */
 #define CLK_SYS_PERI_CTRL_ENABLE_BIT (1u << 0u)
 /** Selected field value for the system clock control register
-* to select the peripheral clock */
+ * to select the peripheral clock */
 #define CLK_SYS_SELECTED_PERI_FIELD_VALUE 2u
 /** RIOT core clock frequency defined as the CPU frequency */
 #define CLOCK_CORECLOCK MHZ(12u)

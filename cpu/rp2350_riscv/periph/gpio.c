@@ -42,7 +42,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
         volatile uint32_t* pad_reg =
         (uint32_t*)calculate_gpio_pad_register_addr(pin);
 
-        /* We clear all bits except the drive strength bit
+        /* We clear all bits except the drive strength bit.
          * We set that to the highest one possible (12mA)
          * to mimic the behavior of the pico1 GPIO driver
          * (Not too sure why we do this, but it seems to be the standard) */
