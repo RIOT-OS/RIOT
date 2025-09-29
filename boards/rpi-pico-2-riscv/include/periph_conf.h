@@ -59,3 +59,5 @@ static const uart_conf_t uart_config[] = {
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */
