@@ -30,11 +30,8 @@
 #include "sched.h"
 #include "plic.h"
 #include "clic.h"
-#include "architecture.h"
-
-#if MODULE_PERIPH_XH3IRQ || DOXYGEN
 #include "xh3irq.h"
-#endif
+#include "architecture.h"
 
 #include "vendor/riscv_csr.h"
 

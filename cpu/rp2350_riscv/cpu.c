@@ -38,12 +38,6 @@ void gpio_reset(void)
  */
 void cpu_init(void)
 {
-    riscv_init();
-
-    uint32_t ra_register = 0;
-
-    __asm__ volatile ("mv %0, ra" : "=r"(ra_register));
-
     /* Reset GPIO state */
     gpio_reset();
 
@@ -52,6 +46,12 @@ void cpu_init(void)
 
     /* initialize the CPU clock */
     cpu_clock_init();
+
+    riscv_init();
+
+    uint32_t ra_register = 0;
+
+    __asm__ volatile ("mv %0, ra" : "=r"(ra_register));
 
     /* initialize the early peripherals */
     early_init();
