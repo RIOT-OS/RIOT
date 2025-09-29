@@ -1,9 +1,9 @@
-@defgroup    boards_rpi_pico_2 Raspberry Pi Pico 2
+@defgroup    boards_rpi_pico_2_riscv Raspberry Pi Pico 2
 @ingroup     boards
-@brief       Support for the RP2350 based Raspberry Pi Pico board
+@brief       Support for the RP2350 RISCV based Raspberry Pi Pico board
 
 @warning The support for the Raspberry Pi Pico 2 is still in a very early stage!
-See [Known Issues](#rpi_pico_2_known_issues).
+See [Known Issues](#rpi_pico_2_riscv_known_issues).
 
 ## Overview
 
@@ -100,7 +100,7 @@ However, it does not allow for debugging using GDB.
 RIOT will download and install the Picotool locally in the RIOT folder.
 This process will take some minutes to complete.
 
-## Known Issues {#rpi_pico_2_known_issues}
+## Known Issues {#rpi_pico_2_riscv_known_issues}
 
 Currently RP2350 support is rather minimal,
 as such peripheral support is extremely limited.

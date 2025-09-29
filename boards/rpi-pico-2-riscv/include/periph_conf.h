@@ -6,6 +6,17 @@
 
 #pragma once
 
+/**
+ * @ingroup         boards_rpi_pico_2_riscv
+ * @{
+ *
+ * @file
+ * @brief           Board specific periph definitions
+ *                  for the Raspberry Pi Pico 2
+ *
+ * @author          Tom Hert <git@annsann.eu>
+ */
+
 #include "kernel_defines.h"
 #include <stdint.h>
 #include "periph_cpu.h"
