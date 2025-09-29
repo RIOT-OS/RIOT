@@ -65,6 +65,8 @@ include $(RIOTMAKE)/board_alias.inc.mk
 
 BINDIR                          ?= $(BINDIRBASE)/$(BOARD)
 
+CFLAGS :=
+
 # include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
 -include Makefile.ci
 
