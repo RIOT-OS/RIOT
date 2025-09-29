@@ -23,8 +23,6 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
-#include "stdio_uart.h"
-#include <stdio.h>
 #include <sys/unistd.h>
 
 void gpio_reset(void)
@@ -47,11 +45,8 @@ void cpu_init(void)
     /* initialize the CPU clock */
     cpu_clock_init();
 
+    /* initialize the RISC-V core */
     riscv_init();
-
-    uint32_t ra_register = 0;
-
-    __asm__ volatile ("mv %0, ra" : "=r"(ra_register));
 
     /* initialize the early peripherals */
     early_init();
@@ -59,12 +54,6 @@ void cpu_init(void)
     /* trigger static peripheral initialization */
     periph_init();
 
+    /* initialize the board */
     board_init();
-
-    xosc_sleep(1000);
-    printf("Enabling IRQ 50\n");
-
-    printf("ra register at start of cpu_init: 0x%lx\n", ra_register);
-
-    __asm__ volatile ("nop");
 }
