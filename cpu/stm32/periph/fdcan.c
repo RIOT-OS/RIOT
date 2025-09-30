@@ -80,19 +80,19 @@ static const struct can_bittiming_const bittiming_const = {
     .tseg1_max = 256,
     .tseg2_min = 1,
     .tseg2_max = 128,
-    .sjw_max = 1,
+    .sjw_max = 128,
     .brp_min = 1,
-    .brp_max = 1024,
+    .brp_max = 512,
     .brp_inc = 1,
 };
 
 /* FDCAN data bittiming */
 static const struct can_bittiming_const fd_data_bittiming_const = {
     .tseg1_min = 1,
-    .tseg1_max = 16,
+    .tseg1_max = 31,
     .tseg2_min = 1,
-    .tseg2_max = 8,
-    .sjw_max = 1,
+    .tseg2_max = 16,
+    .sjw_max = 16,
     .brp_min = 1,
     .brp_max = 32,
     .brp_inc = 1,
