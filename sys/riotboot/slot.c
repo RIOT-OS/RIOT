@@ -49,7 +49,7 @@ const unsigned riotboot_slot_numof = ARRAY_SIZE(riotboot_slots);
 
 static void _riotboot_slot_jump_to_image(const riotboot_hdr_t *hdr)
 {
-    cpu_jump_to_image(hdr->start_addr);
+    cpu_jump_to_image(riotboot_hdr_get_start_addr(hdr));
 }
 
 int riotboot_slot_current(void)
@@ -58,7 +58,7 @@ int riotboot_slot_current(void)
 
     for (unsigned i = 0; i < riotboot_slot_numof; i++) {
         const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(i);
-        if (base_addr == hdr->start_addr) {
+        if (base_addr == riotboot_hdr_get_start_addr(hdr)) {
             return i;
         }
     }
@@ -78,7 +78,7 @@ void riotboot_slot_jump(unsigned slot)
 
 uint32_t riotboot_slot_get_image_startaddr(unsigned slot)
 {
-    return riotboot_slot_get_hdr(slot)->start_addr;
+    return riotboot_hdr_get_start_addr(riotboot_slot_get_hdr(slot));
 }
 
 void riotboot_slot_dump_addrs(void)
@@ -88,7 +88,7 @@ void riotboot_slot_dump_addrs(void)
 
         printf("slot %u: metadata: %p image: 0x%08" PRIx32 "\n", slot,
                hdr,
-               hdr->start_addr);
+               riotboot_hdr_get_start_addr(hdr));
     }
 }
 

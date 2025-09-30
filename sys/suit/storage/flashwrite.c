@@ -101,7 +101,19 @@ static int _flashwrite_install(suit_storage_t *storage,
     (void)manifest;
     suit_storage_flashwrite_t *fw = _get_fw(storage);
 
-    return riotboot_flashwrite_finish(&fw->writer);
+    int fin = riotboot_flashwrite_finish(&fw->writer);
+    if (fin < 0) {
+        return SUIT_ERR_STORAGE;
+    }
+#if IS_USED(MODULE_RIOTBOOT_HDR_AUTO_ACTIVATE)
+    riotboot_hdr_t hdr = *riotboot_slot_get_hdr(fw->writer.target_slot);
+    if (riotboot_hdr_is_v2(&hdr)) {
+        riotboot_hdr_set_img_state(&hdr, RIOTBOOT_HDR_IMG_STATE_ACTIVATED);
+        flashpage_write(flashpage_addr(flashpage_page(riotboot_slot_get_hdr(fw->writer.target_slot))),
+                        &hdr.v2, sizeof(hdr.v2));
+    }
+#endif
+    return fin;
 }
 
 static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
@@ -196,8 +208,8 @@ static int _flashwrite_get_seq_no(const suit_storage_t *storage,
             /* skip slot if metadata broken */
             continue;
         }
-        if (!valid || riot_hdr->version > max_seq_no) {
-            max_seq_no = riot_hdr->version;
+        if (!valid || riotboot_hdr_get_version(riot_hdr) > max_seq_no) {
+            max_seq_no = riotboot_hdr_get_version(riot_hdr);
             valid = true;
         }
     }
@@ -216,7 +228,7 @@ static int _flashwrite_set_seq_no(suit_storage_t *storage,
     int target_slot = riotboot_slot_other();
     const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(target_slot);
 
-    if (hdr->version == seq_no) {
+    if (riotboot_hdr_get_version(hdr) == seq_no) {
         return SUIT_OK;
     }
 

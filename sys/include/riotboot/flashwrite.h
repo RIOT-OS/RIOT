@@ -211,7 +211,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
  * @brief   Finish a firmware update (riotboot version)
  *
  * This function finishes a firmware update by re-writing the first header so
- * it includes riotboot's magic number ("RIOT").
+ * it includes riotboot's magic number.
  *
  * @param[in]   state       ptr to previously used state structure
  *
@@ -219,7 +219,8 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
  */
 static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
 {
-    return riotboot_flashwrite_finish_raw(state, (const uint8_t *)"RIOT",
+    uint32_t magic = RIOTBOOT_MAGIC;
+    return riotboot_flashwrite_finish_raw(state, (const uint8_t *)&magic,
                                           RIOTBOOT_FLASHWRITE_SKIPLEN);
 }
 

@@ -140,7 +140,14 @@ int suit_handle_manifest_buf(const uint8_t *buffer, size_t size)
     riotboot_hdr_print(hdr);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
-    return riotboot_hdr_validate(hdr);
+    if ((res = riotboot_hdr_validate(hdr)) < 0) {
+        LOG_INFO("suit_worker: target slot header invalid\n");
+        res = -EINVAL;
+    }
+    else if (riotboot_hdr_get_flags(hdr) != UINT32_MAX) {
+        LOG_INFO("suit_worker: target slot header flags invalid\n");
+        res = -EINVAL;
+    }
 #endif
 
     return res;
