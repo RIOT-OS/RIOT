@@ -36,12 +36,6 @@ void gpio_reset(void)
  */
 void cpu_init(void)
 {
-    riscv_init();
-
-    uint32_t ra_register = 0;
-
-    __asm__ volatile ("mv %0, ra" : "=r"(ra_register));
-
     /* Reset GPIO state */
     gpio_reset();
 
@@ -51,18 +45,15 @@ void cpu_init(void)
     /* initialize the CPU clock */
     cpu_clock_init();
 
+    /* initialize the RISC-V core */
+    riscv_init();
+
     /* initialize the early peripherals */
     early_init();
 
     /* trigger static peripheral initialization */
     periph_init();
 
+    /* initialize the board */
     board_init();
-
-    xosc_sleep(1000);
-    printf("Enabling IRQ 50\n");
-
-    printf("ra register at start of cpu_init: 0x%lx\n", ra_register);
-
-    __asm__ volatile ("nop");
 }

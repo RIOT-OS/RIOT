@@ -27,7 +27,6 @@
 #include "sched.h"
 #include "plic.h"
 #include "clic.h"
-#include "xh3irq.h"
 #include "architecture.h"
 
 #include "xh3irq.h"
