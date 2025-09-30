@@ -1142,6 +1142,7 @@ void ISR_CAN0(void)
     if (_can_0->candev.event_callback) {
         _can_0->candev.event_callback(&(_can_0->candev), CANDEV_EVENT_ISR, NULL);
     }
+    cortexm_isr_end();
 }
 #endif
 
@@ -1155,6 +1156,6 @@ void ISR_CAN1(void)
     if (_can_1->candev.event_callback) {
         _can_1->candev.event_callback(&(_can_1->candev), CANDEV_EVENT_ISR, NULL);
     }
-
+   cortexm_isr_end();
 }
 #endif
