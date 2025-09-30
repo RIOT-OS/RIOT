@@ -22,10 +22,17 @@ TEST_DEPS += $(TERMDEPS)
 TEST_EXECUTOR ?=
 TEST_EXECUTOR_FLAGS ?=
 
+# Are tests going to be run in docker and we are not yet in docker?
+ifeq (0-test,$(INSIDE_DOCKER)-$(filter test,$(DOCKER_MAKECMDGOALS)))
+# Yes --> defer test execution to docker
+test: ..in-docker-container
+else
+# No --> run test in this context
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$(TEST_EXECUTOR) $(TEST_EXECUTOR_FLAGS) $$t || exit 1; \
 	done
+endif
 
 test/available:
 ifneq (,$(TEST_ON_CI_WHITELIST))

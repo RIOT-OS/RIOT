@@ -19,13 +19,20 @@ DEPS_FOR_RUNNING_DOCKER :=
 DOCKER ?= docker
 
 # List of Docker-enabled make goals
-export DOCKER_MAKECMDGOALS_POSSIBLE = \
+DOCKER_MAKECMDGOALS_POSSIBLE := \
   all \
   scan-build \
   scan-build-analyze \
   tests-% \
   #
-export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
+
+# On native, we also can run the test in docker
+ifneq (, $(filter native%,$(BOARD)))
+  DOCKER_MAKECMDGOALS_POSSIBLE += test
+endif
+
+export DOCKER_MAKECMDGOALS_POSSIBLE
+export DOCKER_MAKECMDGOALS := $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
 
 # Docker creates the files .dockerinit and .dockerenv in the root directory of
 # the container, we check for the files to determine if we are inside a container.
