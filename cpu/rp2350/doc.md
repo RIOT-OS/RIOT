@@ -1,4 +1,4 @@
-@defgroup        cpu_rp2350 RP2350 MCUs
+@defgroup        cpu_rp2350_arm RP2350 MCUs
 @ingroup         cpu
 @brief           RP2350 MCU code and definitions
 
