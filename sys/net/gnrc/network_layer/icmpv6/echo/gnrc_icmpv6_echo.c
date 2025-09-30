@@ -80,6 +80,7 @@ void gnrc_icmpv6_echo_req_handle(gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
     else {
         hdr = gnrc_ipv6_hdr_build(pkt, &ipv6_hdr->dst, &ipv6_hdr->src);
     }
+    ((ipv6_hdr_t *)hdr->data)->nh = PROTNUM_ICMPV6;
 
     if (hdr == NULL) {
         DEBUG("icmpv6_echo: no space left in packet buffer\n");
@@ -170,6 +171,7 @@ int gnrc_icmpv6_echo_send(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
     }
     pkt = tmp;
     ipv6 = pkt->data;
+    ipv6->nh = PROTNUM_ICMPV6;
     /* if ttl is unset (i.e. 0) gnrc_ipv6 will select hop limit */
     ipv6->hl = ttl;
     if (netif != NULL) {
