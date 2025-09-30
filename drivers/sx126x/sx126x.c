@@ -22,9 +22,9 @@
 
 #include "sx126x_netdev.h"
 
+#include "macros/units.h"
 #include "net/lora.h"
 #include "periph/spi.h"
-#include "units.h"
 
 #include "sx126x.h"
 #include "sx126x_regs.h"
