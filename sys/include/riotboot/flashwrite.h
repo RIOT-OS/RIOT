@@ -150,7 +150,7 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
  * @brief   Initialize firmware update (riotboot version)
  *
  * This function initializes a firmware update, skipping riotboot's magic
- * number ("RIOT") by calling @ref riotboot_flashwrite_init_raw() with an
+ * number by calling @ref riotboot_flashwrite_init_raw() with an
  * offset of RIOTBOOT_FLASHWRITE_SKIPLEN (4). This ensures that riotboot will
  * ignore the slot until the magic number has been restored, e.g., through @ref
  * riotboot_flashwrite_finish().
@@ -163,7 +163,7 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 static inline int riotboot_flashwrite_init(riotboot_flashwrite_t *state,
                                            int target_slot)
 {
-    /* initialize state, but skip "RIOT" */
+    /* initialize state, but skip magic number */
     return riotboot_flashwrite_init_raw(state, target_slot,
                                         RIOTBOOT_FLASHWRITE_SKIPLEN);
 }
@@ -211,7 +211,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
  * @brief   Finish a firmware update (riotboot version)
  *
  * This function finishes a firmware update by re-writing the first header so
- * it includes riotboot's magic number ("RIOT").
+ * it includes riotboot's magic number.
  *
  * @param[in]   state       ptr to previously used state structure
  *
@@ -219,7 +219,8 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
  */
 static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
 {
-    return riotboot_flashwrite_finish_raw(state, (const uint8_t *)"RIOT",
+    uint32_t magic = RIOTBOOT_MAGIC;
+    return riotboot_flashwrite_finish_raw(state, (const uint8_t *)&magic,
                                           RIOTBOOT_FLASHWRITE_SKIPLEN);
 }
 
