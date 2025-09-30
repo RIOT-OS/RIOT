@@ -441,26 +441,16 @@ void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
     case SX126X_CHIP_MODE_TX:
         sx126x_set_tx(dev, 0); /* no TX frame timeout */
         break;
-    case SX126X_CHIP_MODE_RX:
-        if (dev->rx_timeout >= 0) {
-            int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
-            sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
-            if (timeout > 0) {
-                sx126x_set_rx(dev, timeout);
-            }
-            else {
-                sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
-            }
+    case SX126X_CHIP_MODE_RX: {
+        int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
+        sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
+        if (timeout > 0) {
+            sx126x_set_rx(dev, timeout);
         }
         else {
-            /* By default, the radio will always return in STDBY_RC
-               unless the configuration is changed by using this command.
-               Changing the default mode from STDBY_RC to STDBY_XOSC or FS
-               will only have an impact on the switching time of the radio */
-            sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_FS);
-            sx126x_set_rx_with_timeout_in_rtc_step(dev, SX126X_RX_CONTINUOUS);
+            sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
         }
-        break;
+    } break;
     case SX126X_CHIP_MODE_STBY_RC:
     case SX126X_CHIP_MODE_STBY_XOSC:
         sx126x_set_standby(dev, state);
