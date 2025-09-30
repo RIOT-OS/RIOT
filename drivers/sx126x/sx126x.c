@@ -481,23 +481,23 @@ static void _cal_img(sx126x_t *dev, uint32_t freq)
 {
     sx126x_chip_modes_t state = sx126x_get_state(dev);
     /* don't know what to do with frequencies that don't fit in the intervals from the datasheet */
-    if (freq <= MHZ(928) && freq >= MHZ(902)) {
+    if (freq >= MHZ(902) && freq <= MHZ(928)) {
         /* 902 - 928 MHz band and anything upper */
         sx126x_cal_img_in_mhz(dev, 902, 928);
     }
-    else if (freq <= MHZ(870) && freq >= MHZ(863)) {
+    else if (freq >= MHZ(863) && freq <= MHZ(870)) {
         /* 863 - 870 MHz band */
         sx126x_cal_img_in_mhz(dev, 863, 870);
     }
-    else if (freq <= MHZ(787) && freq >= MHZ(779)) {
+    else if (freq >= MHZ(779) && freq <= MHZ(787)) {
         /* 779 - 787 MHz band */
         sx126x_cal_img_in_mhz(dev, 779, 787);
     }
-    else if (freq <= MHZ(510) && freq >= MHZ(470)) {
+    else if (freq >= MHZ(470) && freq <= MHZ(510)) {
         /* 470 - 510 MHz band */
         sx126x_cal_img_in_mhz(dev, 470, 510);
     }
-    else if (freq <= MHZ(440) && freq >= MHZ(430)) {
+    else if (freq >= MHZ(430) && freq <= MHZ(440)) {
         /* 430 - 440 MHz band and anything lower */
         sx126x_cal_img_in_mhz(dev, 430, 440);
     }
