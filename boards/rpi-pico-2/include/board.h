@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @ingroup         boards_rpi_pico_2
+ * @ingroup         boards_rpi_pico_2_arm
  * @{
  *
  * @file
@@ -16,11 +16,10 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
-#include "RP2350.h"
 #include "cpu.h"
-#include "cpu_conf.h"
 #include "periph_conf.h"
-#include "periph_cpu.h"
+
+#include "periph/gpio.h"
 
 /** GPIO Pin ID for the onboard LED */
 #define LED0_PIN_ID 25u

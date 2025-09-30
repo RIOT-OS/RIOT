@@ -1,1 +1,1 @@
-CPU := rp2350
+CPU := rp2350_arm
