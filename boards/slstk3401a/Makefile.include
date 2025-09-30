@@ -1,5 +1,5 @@
 # setup JLink for flashing
-JLINK_PRE_FLASH = r
+JLINK_PRE_FLASH += r
 
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include

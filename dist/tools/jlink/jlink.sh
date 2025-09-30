@@ -186,7 +186,10 @@ flash_common() {
     test_serial
     test_version
     if [ -n "${JLINK_POST_FLASH}" ]; then
-        printf "%s\n" "${JLINK_POST_FLASH}" >> "${BINDIR}/burn.seg"
+        eval "set -- ${JLINK_POST_FLASH}"
+        for cmd in "$@"; do
+            printf "%s\n" "$cmd"
+        done >> "${BINDIR}/burn.seg"
     fi
     cat "${JLINK_RESET_FILE}" >> "${BINDIR}/burn.seg"
     # flash device
@@ -210,7 +213,10 @@ do_flash_bin() {
     truncate -s 0 "${BINDIR}/burn.seg"
     # create temporary burn file
     if [ -n "${JLINK_PRE_FLASH}" ]; then
-        printf "%s\n" "${JLINK_PRE_FLASH}" >> "${BINDIR}/burn.seg"
+        eval "set -- ${JLINK_PRE_FLASH}"
+        for cmd in "$@"; do
+            printf "%s\n" "$cmd"
+        done >> "${BINDIR}/burn.seg"
     fi
     # address to flash is hex formatted, as required by JLink
     ADDR_TO_FLASH="$(printf "0x%08x\n" "$((FLASH_ADDR + IMAGE_OFFSET))")"
@@ -225,7 +231,10 @@ do_flash_elf() {
     truncate -s 0 "${BINDIR}/burn.seg"
     # create temporary burn file
     if [ -n "${JLINK_PRE_FLASH}" ]; then
-        printf "%s\n" "${JLINK_PRE_FLASH}" >> "${BINDIR}/burn.seg"
+        eval "set -- ${JLINK_PRE_FLASH}"
+        for cmd in "$@"; do
+            printf "%s\n" "$cmd"
+        done >> "${BINDIR}/burn.seg"
     fi
     echo "loadfile ${ELFFILE}" >> "${BINDIR}/burn.seg"
     flash_common
