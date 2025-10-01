@@ -108,8 +108,8 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 {
     /* if sleeping immediately return state */
-    if (dev->state == AT86RF2XX_STATE_SLEEP) {
-        return dev->state;
+    if (dev->sleep) {
+        return AT86RF2XX_STATE_SLEEP;
     }
 
     return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
@@ -118,6 +118,7 @@ uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 
 void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
+    uint8_t state;
     if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
         /* wake up and wait for transition to TRX_OFF */
 #if AT86RF2XX_IS_PERIPH
@@ -135,14 +136,15 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
          * Spin until we are actually awake
          */
         do {
-            dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+            state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
                          & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-        } while (dev->state != AT86RF2XX_TRX_STATUS__TRX_OFF);
+        } while (state != AT86RF2XX_TRX_STATUS__TRX_OFF);
     }
 }
 
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 {
+    uint8_t state;
     /* trigger hardware reset */
 #if AT86RF2XX_IS_PERIPH
     /* set reset Bit */
@@ -158,10 +160,10 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
      * it remains P_ON. Otherwise, it should go to TRX_OFF
      */
     do {
-        dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+        state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
                      & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
-    } while ((dev->state != AT86RF2XX_STATE_TRX_OFF)
-             && (dev->state != AT86RF2XX_STATE_P_ON));
+    } while ((state != AT86RF2XX_STATE_TRX_OFF)
+             && (state != AT86RF2XX_STATE_P_ON));
 }
 
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR
@@ -186,7 +188,7 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, size_t len)
 #endif
 
 #if !AT86RF2XX_IS_PERIPH
-void at86rf2xx_spi_init(at86rf2xx_t *dev, void (*irq_handler)(void *arg))
+void at86rf2xx_spi_init(at86rf2xx_t *dev, void (*irq_handler)(void *arg), void *ctx)
 {
     /* initialize GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
@@ -194,7 +196,7 @@ void at86rf2xx_spi_init(at86rf2xx_t *dev, void (*irq_handler)(void *arg))
     gpio_clear(dev->params.sleep_pin);
     gpio_init(dev->params.reset_pin, GPIO_OUT);
     gpio_set(dev->params.reset_pin);
-    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, irq_handler, dev);
+    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, irq_handler, ctx);
 
     /* Intentionally check if bus can be acquired, if assertions are on */
     if (!IS_ACTIVE(NDEBUG)) {
