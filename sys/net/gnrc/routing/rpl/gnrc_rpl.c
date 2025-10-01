@@ -15,6 +15,7 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include "net/ipv6/addr.h"
 #include <assert.h>
 #include <string.h>
 #include "kernel_defines.h"
@@ -318,7 +319,9 @@ static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
     ipv6_addr_t neigh_addr;
     netapi_notify_t type = notify->event;
 
-    if (gnrc_netapi_notify_copy_l3_address(notify, &neigh_addr) != sizeof(ipv6_addr_t)) {
+    int res = gnrc_netapi_notify_copy_event_data(notify, sizeof(ipv6_addr_t), &neigh_addr);
+
+    if (res != sizeof(ipv6_addr_t)) {
         DEBUG("RPL: Received invalid data for netapi notify event.\n");
         return;
     }

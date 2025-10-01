@@ -39,6 +39,7 @@
 #include "host/ble_gap.h"
 #include "host/util/util.h"
 #include "mem/mem.h"
+#include <string.h>
 
 #define ENABLE_DEBUG            0
 #include "debug.h"
@@ -340,10 +341,11 @@ end:
 static inline void _dispatch_connection_event(netapi_notify_t notify, uint8_t *addr)
 {
     netapi_notify_l2_connection_t event = {
-        .l2addr = addr,
         .l2addr_len = BLE_ADDR_LEN,
         .if_pid = _netif.pid,
     };
+
+    memcpy(event.l2addr, addr, BLE_ADDR_LEN);
 
     gnrc_netapi_notify(GNRC_NETTYPE_L2_DISCOVERY, GNRC_NETREG_DEMUX_CTX_ALL,
                        notify, &event, sizeof(netapi_notify_l2_connection_t));

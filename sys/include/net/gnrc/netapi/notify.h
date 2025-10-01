@@ -30,11 +30,12 @@
  * @author  Elena Frank <elena.frank@tu-dresden.de>
  */
 
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "net/ipv6/addr.h"
+#include "net/gnrc/netif/conf.h"
 #include "sema_inv.h"
 
 /**
@@ -66,9 +67,9 @@ typedef struct {
  *          @ref NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED events.
  */
 typedef struct {
-    uint8_t *l2addr;            /**< L2 address of the node */
-    uint8_t l2addr_len;         /**< length of L2 address in byte */
-    kernel_pid_t if_pid;        /**< PID of network interface */
+    uint8_t l2addr[GNRC_NETIF_L2ADDR_MAXLEN];   /**< L2 address of the node */
+    uint8_t l2addr_len;                         /**< length of L2 address in byte */
+    kernel_pid_t if_pid;                        /**< PID of network interface */
 } netapi_notify_l2_connection_t;
 
 /**
@@ -82,35 +83,19 @@ static inline void gnrc_netapi_notify_ack(sema_inv_t *ack)
 }
 
 /**
- * @brief   Parse the connection event data associated with @ref NETAPI_NOTIFY_L2_NEIGH_CONNECTED
- *          and @ref NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED events.
+ * @brief   Copy the connection event data associated with a @ref gnrc_netapi_notify_t event.
  *
  * @note    This will call @ref gnrc_netapi_notify_ack.
  *
  * @param[in] notify        Pointer to the received notify event.
+ * @param[in] data_len      Size of the expected data type.
  * @param[out] data         Connection data received in the @p notify event.
- *                          data.l2addr_len should be set to the size of the l2addr buffer.
  *
- * @retval                  sizeof(netapi_notify_l2_connection_t) on success.
- * @retval                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
- * @retval                  -ENOBUFS if the length of l2addr in @p data is smaller than the
- *                          received l2addr.
+ * @retval                  Size of the data type on success.
+ * @retval                  -EINVAL if the data in @p notify is invalid or doesn't match the expected
+ *                          data length.
  */
-uint8_t gnrc_netapi_notify_copy_l2_connection_data(gnrc_netapi_notify_t *notify,
-                                                   netapi_notify_l2_connection_t *data);
-/**
- * @brief   Parse the ipv6 address associated with @ref NETAPI_NOTIFY_L3_DISCOVERED and
- *          @ref NETAPI_NOTIFY_L3_UNREACHABLE events.
- *
- * @note    This will call @ref gnrc_netapi_notify_ack.
- *
- * @param[in] notify        Pointer to the received notify event.
- * @param[out] addr         IPv6 address of the remote.
- *
- * @retval                  sizeof(ipv6_addr_t) on success.
- * @retval                  -EINVAL if @p notify is of a wrong @ref netapi_notify_t type.
- */
-int gnrc_netapi_notify_copy_l3_address(gnrc_netapi_notify_t *notify, ipv6_addr_t *addr);
+int gnrc_netapi_notify_copy_event_data(gnrc_netapi_notify_t *notify, uint8_t data_len, void *data);
 
 #ifdef __cplusplus
 }

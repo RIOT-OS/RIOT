@@ -11,6 +11,7 @@
  *
  * @file
  */
+#include "net/gnrc/netapi/notify.h"
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -249,15 +250,11 @@ static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uin
  */
 static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
 {
-    uint8_t l2addr[CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
-    netapi_notify_l2_connection_t data = {
-        .l2addr = l2addr,
-        .l2addr_len = CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN,
-        .if_pid = KERNEL_PID_UNDEF
-    };
+    netapi_notify_l2_connection_t data;
     netapi_notify_t type = notify->event;
 
-    if (gnrc_netapi_notify_copy_l2_connection_data(notify, &data) <= 0) {
+    if (gnrc_netapi_notify_copy_event_data(notify, sizeof(netapi_notify_l2_connection_t),
+                                           &data) <= 0) {
         DEBUG("ipv6: invalid data on netapi notify event.\n");
         return;
     }
