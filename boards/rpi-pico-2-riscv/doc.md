@@ -55,6 +55,12 @@ If you are using picotool, you need to hold the bootselect button
 your computer via USB. This will put the board into bootloader mode,
 allowing you to flash it.
 
+Generally while Picotool is the easiest way to flash the board,
+it does not allow for debugging using GDB.
+
+It does tend to be more reliable than OpenOCD though,
+especially when switching between RISC-V and ARM cores.
+
 ### Flashing using OpenOCD
 
 If you have two Raspberry Pi Pico boards,
@@ -79,10 +85,22 @@ and use the following command:
 PROGRAMMER=openocd BOARD=rpi-pico-2-riscv make flash
 ```
 
+or, if you want to use the CortexM:
+
+```bash
+PROGRAMMER=openocd BOARD=rpi-pico-2-arm make flash
+```
+
 You can then debug your application using GDB with the following command:
 
 ```bash
 PROGRAMMER=openocd BOARD=rpi-pico-2-riscv make debug
+```
+
+or, if you want to use the CortexM:
+
+```bash
+PROGRAMMER=openocd BOARD=rpi-pico-2-arm make debug
 ```
 
 ### Flashing using Picotool
@@ -91,6 +109,12 @@ Simply connect the board to your computer via USB and use the following command:
 
 ```bash
 BOARD=rpi-pico-2-riscv make flash
+```
+
+or, if you want to use the CortexM:
+
+```bash
+BOARD=rpi-pico-2-arm make flash
 ```
 
 This is the default method for flashing the Raspberry Pi Pico 2.
@@ -106,11 +130,10 @@ Currently RP2350 support is rather minimal,
 as such peripheral support is extremely limited.
 The following peripherals are supported:
 
+- XH3IRQ RISC-V Interrupt Controller (CortexM Interrupts also work)
 - GPIO
-- Non-configurable write-only UART (UART0 using Pin 0 and 1)
+- UART
     - The UART Baudrate is set to 115200.
     - UART does not work via USB, you need to connect it directly to the GPIO pins.
 
 More peripherals will be added in the future.
-It should also be noted that we currently only support the Cortex M33 cores,
-not the RISC-V Hazard cores.
