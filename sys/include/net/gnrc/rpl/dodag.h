@@ -80,11 +80,8 @@ bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id);
  * @brief   Remove a RPL instance with the pointer @p inst.
  *
  * @param[in] inst     Pointer to the RPL instance to remove.
- *
- * @return  true, on success.
- * @return  false, otherwise.
  */
-bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
+void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
 
 /**
  * @brief   Get the RPL instance with the id @p instance_id.
