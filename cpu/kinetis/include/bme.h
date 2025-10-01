@@ -28,7 +28,7 @@ extern "C"
 /**
  * @brief Tell bit.h that we provide CPU specific bit manipulation functions
  */
-#define BITBAND_FUNCTIONS_PROVIDED 1
+#define BITBAND_FUNCTIONS_PROVIDED 0
 
 #define BME_AND_MASK        (1 << 26) /**< AND decoration bitmask */
 #define BME_OR_MASK         (1 << 27) /**< OR decoration bitmask */
@@ -121,6 +121,7 @@ static inline volatile uint8_t *bme_bitfield8(volatile uint8_t *ptr, uint8_t bit
     return (volatile uint8_t *)(bme_bf_addr(ptr, bit, width));
 }
 
+#if BITBAND_FUNCTIONS_PROVIDED
 /* For compatibility with the M3/M4 bitbanding macros: */
 
 /**
@@ -242,6 +243,8 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
 {
     *((volatile uint8_t *)(((uintptr_t)ptr) | BME_AND_MASK)) = (uint8_t)(~(1ul << bit));
 }
+
+#endif /* BITBAND_FUNCTIONS_PROVIDED */
 
 #ifdef __cplusplus
 }
