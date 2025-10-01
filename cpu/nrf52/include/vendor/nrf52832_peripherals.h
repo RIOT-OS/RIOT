@@ -1,6 +1,8 @@
 /*
 
-Copyright (c) 2010 - 2020, Nordic Semiconductor ASA All rights reserved.
+Copyright (c) 2010 - 2025, Nordic Semiconductor ASA All rights reserved.
+
+SPDX-License-Identifier: BSD-3-Clause
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -43,7 +45,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define POWER_COUNT 1
 
 #define POWER_FEATURE_RAM_REGISTERS_PRESENT
-#define POWER_FEATURE_RAM_REGISTERS_COUNT       8
+#if defined(CPU_MODEL_NRF52832XXAA)
+    #define POWER_FEATURE_RAM_REGISTERS_COUNT 8
+#elif defined(CPU_MODEL_NRF52832XXAB)
+    #define POWER_FEATURE_RAM_REGISTERS_COUNT 4
+#endif
 
 /* Non-Volatile Memory Controller */
 #define NVMC_PRESENT
@@ -79,7 +85,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #define BPROT_PRESENT
 
 #define BPROT_REGIONS_SIZE 4096
-#define BPROT_REGIONS_NUM 128
+
+#if defined(CPU_MODEL_NRF52832XXAA)
+    #define BPROT_REGIONS_NUM 128
+#elif defined(CPU_MODEL_NRF52832XXAB)
+    #define BPROT_REGIONS_NUM 64
+#endif
 
 /* Radio */
 #define RADIO_PRESENT
