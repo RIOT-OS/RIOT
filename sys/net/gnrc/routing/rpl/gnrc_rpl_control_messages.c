@@ -620,7 +620,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
 
             /* check the DODAG ID */
             if (sol->VID_flags & GNRC_RPL_DIS_SOLICITED_INFO_FLAG_D) {
-                if (memcmp(&sol->dodag_id, &inst->dodag.dodag_id, sizeof(ipv6_addr_t)) != 0) {
+                if (!ipv6_addr_equal(&sol->dodag_id, &inst->dodag.dodag_id)) {
                     DEBUG("RPL: RPL SOLICITED INFO option, ignore DIS cause: DODAGID mismatch\n");
                     return false;
                 }
@@ -912,7 +912,7 @@ static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio
 
     /* ignore dodags with other dodag_id's for now */
     /* TODO: choose DODAG with better rank */
-    if (memcmp(&dodag->dodag_id, &dio->dodag_id, sizeof(ipv6_addr_t)) != 0) {
+    if (!ipv6_addr_equal(&dodag->dodag_id, &dio->dodag_id)) {
         DEBUG("RPL: DIO received from another DODAG, but same instance - ignore\n");
         return;
     }
@@ -1248,7 +1248,7 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
 
     /* check if the D flag is set before accessing the DODAG id */
     if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
-        if (memcmp(&dodag->dodag_id, (ipv6_addr_t *)(dao + 1), sizeof(ipv6_addr_t)) != 0) {
+        if (!ipv6_addr_equal(&dodag->dodag_id, (ipv6_addr_t *)(dao + 1))) {
             DEBUG("RPL: DAO with unknown DODAG id (%s)\n", _ip_addr_str((ipv6_addr_t *)(dao + 1)));
             return;
         }
@@ -1311,7 +1311,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
 
     /* check if the D flag is set before accessing the DODAG id */
     if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
-        if (memcmp(&dodag->dodag_id, (ipv6_addr_t *)(dao_ack + 1), sizeof(ipv6_addr_t)) != 0) {
+        if (!ipv6_addr_equal(&dodag->dodag_id, (ipv6_addr_t *)(dao_ack + 1))) {
             DEBUG("RPL: DAO-ACK with unknown DODAG id (%s)\n",
                   _ip_addr_str((ipv6_addr_t *)(dao_ack + 1)));
             return;
