@@ -89,12 +89,14 @@ extern "C" {
 #define GNRC_NETAPI_MSG_TYPE_GET        (0x0204)
 
 /**
- * @brief   @ref core_msg type for replying to get/set option, and notify messages.
+ * @brief   @ref core_msg type for replying to get/set option, and notify messages
  */
 #define GNRC_NETAPI_MSG_TYPE_ACK        (0x0205)
 
 /**
- * @brief   @ref core_msg type for sending event notifications to the network stack.
+ * @brief   @ref core_msg type for sending a general event notifications to one or more subscribers
+ *
+ * This sends back a @ref GNRC_NETAPI_MSG_TYPE_ACK, so it should be used with `msg_send_receive()`.
  */
 #define GNRC_NETAPI_MSG_TYPE_NOTIFY     (0x0207)
 
