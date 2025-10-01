@@ -35,6 +35,7 @@
 #include "net/gnrc.h"
 #include "net/eui64.h"
 #include "gnrc_rpl_internal/globals.h"
+#include "of0.h"
 
 #ifdef MODULE_NETSTATS_RPL
 #include "gnrc_rpl_internal/netstats.h"
@@ -898,6 +899,42 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
 }
 
 /**
+ * @brief   Handles a received DIO message for a DODAG that is different from the
+ *          one we currently participate in.
+ *
+ * @param[in] inst      The @p RPL instance of the current DODAG.
+ * @param[in] dio       The @p DIO packet for the other DODAG.
+ * @param[in] src       The address of the sender.
+ * @param[in] len       The length of the DIO packet.
+ */
+static void _recv_DIO_for_different_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
+                                          kernel_pid_t iface,
+                                          ipv6_addr_t *src, uint16_t len)
+{
+    /* DIO received from a different DODAG */
+    DEBUG("RPL: DIO received from another DODAG, but same instance.\n");
+
+    gnrc_rpl_dodag_t *dodag = &inst->dodag;
+
+    /* clear parent from old dodag if present */
+    gnrc_rpl_parent_t *parent = dodag->parents;
+    while (parent) {
+        if (ipv6_addr_equal(&parent->addr, src)) {
+            gnrc_rpl_parent_remove(parent);
+            break;
+        }
+        parent = parent->next;
+    }
+
+    /* decide between old and new dodag */
+    if (gnrc_rpl_get_of0()->which_dodag(dodag, dio) > 0) {
+        DEBUG("RPL: switch to new DODAG.\n");
+        gnrc_rpl_dodag_remove(dodag);
+        _recv_DIO_for_new_dodag(inst, dio, iface, src, len);
+    }
+}
+
+/**
  * @brief   Handles a received DIO message for an existing DODAG.
  *
  * @param[in] inst      The @p RPL instance of the DODAG.
@@ -906,16 +943,10 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
  * @param[in] len       The length of the DIO packet.
  */
 static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio,
-                                         ipv6_addr_t *src, uint16_t len)
+                                         ipv6_addr_t *src,
+                                         uint16_t len)
 {
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
-
-    /* ignore dodags with other dodag_id's for now */
-    /* TODO: choose DODAG with better rank */
-    if (!ipv6_addr_equal(&dodag->dodag_id, &dio->dodag_id)) {
-        DEBUG("RPL: DIO received from another DODAG, but same instance - ignore\n");
-        return;
-    }
 
     if (inst->mop != ((dio->g_mop_prf >> GNRC_RPL_MOP_SHIFT) & GNRC_RPL_SHIFTED_MOP_MASK)) {
         DEBUG("RPL: invalid MOP for this instance.\n");
@@ -928,21 +959,6 @@ static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio
         return;
     }
 #endif
-
-    if (GNRC_RPL_COUNTER_GREATER_THAN(dio->version_number, dodag->version)) {
-        if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
-            dodag->version = GNRC_RPL_COUNTER_INCREMENT(dio->version_number);
-            trickle_reset_timer(&dodag->trickle);
-        }
-        else {
-            dodag->version = dio->version_number;
-            gnrc_rpl_local_repair(dodag);
-        }
-    }
-    else if (GNRC_RPL_COUNTER_GREATER_THAN(dodag->version, dio->version_number)) {
-        trickle_reset_timer(&dodag->trickle);
-        return;
-    }
 
     if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
         if (byteorder_ntohs(dio->rank) != GNRC_RPL_INFINITE_RANK) {
@@ -987,6 +1003,11 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
     }
     else if (inst == NULL) {
         DEBUG("RPL: Could not allocate a new instance.\n");
+    }
+    else if (!ipv6_addr_equal(&inst->dodag.dodag_id, &dio->dodag_id)
+             || (inst->dodag.version != dio->version_number)) {
+
+        _recv_DIO_for_different_dodag(inst, dio, iface, src, len);
     }
     else {
         _recv_DIO_for_existing_dodag(inst, dio, src, len);
