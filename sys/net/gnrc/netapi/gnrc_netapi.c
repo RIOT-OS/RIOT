@@ -186,7 +186,7 @@ int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t 
     if (data != NULL) {
         /* Wait for ACK from all receivers to ensure that the data was read and
            that there won't be any dangling pointers after the function returned. */
-        sema_inv_try_wait(&notify.ack);
+        sema_inv_wait(&notify.ack);
     }
 
     return numof;
