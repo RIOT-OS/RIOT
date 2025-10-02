@@ -57,6 +57,7 @@ PERIPH_IGNORE_MODULES := \
   periph_uart_rxstart_irq \
   periph_wdog \
   periph_wdt_auto_start \
+  periph_xh3irq \
   #
 PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\
                                $(filter periph_%,$(USEMODULE)))
