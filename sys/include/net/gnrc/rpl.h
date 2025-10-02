@@ -446,10 +446,26 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define GNRC_RPL_OPT_DODAG_CONF           (4)
 #define GNRC_RPL_OPT_TARGET               (5)
 #define GNRC_RPL_OPT_TRANSIT              (6)
+#define GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT (7)
+#define GNRC_RPL_OPT_TRANSIT_E_FLAG       (1 << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT)
 #define GNRC_RPL_OPT_SOLICITED_INFO       (7)
 #define GNRC_RPL_OPT_PREFIX_INFO          (8)
+#define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT  (1 << 6)
 #define GNRC_RPL_OPT_TARGET_DESC          (9)
 /** @} */
+
+/**
+ * @name RPL DIO Base Object fields
+ *  @see <a href="https://tools.ietf.org/html/rfc6550#section-6.3">
+ *          DODAG Information Object (DIO)
+ *      </a>
+ * @{
+ */
+#define GNRC_RPL_GROUNDED_SHIFT             (7)
+#define GNRC_RPL_MOP_SHIFT                  (3)
+#define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
+#define GNRC_RPL_PRF_MASK                   (0x7)
+
 
 /**
  * @brief Rank of the root node
@@ -567,14 +583,6 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 #ifndef CONFIG_GNRC_RPL_DEFAULT_NETIF
 #define CONFIG_GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
 #endif
-
-#define GNRC_RPL_GROUNDED_SHIFT             (7)
-#define GNRC_RPL_MOP_SHIFT                  (3)
-#define GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT   (7)
-#define GNRC_RPL_OPT_TRANSIT_E_FLAG         (1 << GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT)
-#define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
-#define GNRC_RPL_PRF_MASK                   (0x7)
-#define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
 
 /**
  * @brief Initialization of the RPL thread.

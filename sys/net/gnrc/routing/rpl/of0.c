@@ -89,7 +89,7 @@ int parent_cmp(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2)
 
 int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
 {
-    /* parent set must not be emtpy */
+    /* parent set must not be empty */
     if ((d1->node_status != GNRC_RPL_ROOT_NODE) && !d1->parents) {
         return 1;
     }
@@ -124,7 +124,7 @@ int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
     }
 
     /* prefer dodag with lesser resulting rank */
-    // TODO: calc rank properly
+    /* TODO: calc rank properly */
     int d1_rank = d1->parents->rank;
     int d2_rank = byteorder_ntohs(dio->rank);
     if (d1_rank < d2_rank) {
