@@ -115,24 +115,29 @@ bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id)
 {
     for(uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].id == instance_id) {
-            return gnrc_rpl_instance_remove(&gnrc_rpl_instances[i]);
+            gnrc_rpl_instance_remove(&gnrc_rpl_instances[i]);
+            return true;
         }
     }
     return false;
 }
 
-bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
+void gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag)
 {
-    gnrc_rpl_dodag_t *dodag = &inst->dodag;
 #ifdef MODULE_GNRC_RPL_P2P
     gnrc_rpl_p2p_ext_remove(dodag);
 #endif
     gnrc_rpl_dodag_remove_all_parents(dodag);
     trickle_stop(&dodag->trickle);
     evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);
-    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&inst->cleanup_event);
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->instance->cleanup_event);
+
+}
+
+void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
+{
+    gnrc_rpl_dodag_remove(&inst->dodag);
     memset(inst, 0, sizeof(gnrc_rpl_instance_t));
-    return true;
 }
 
 gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
