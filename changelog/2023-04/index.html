@@ -1,0 +1,697 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-bguv2lll"> <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>RIOT-2023.04 - Release Notes | RIOT Documentation</title><link rel="canonical" href="https://guide.riot-os.org/changelog/2023-04/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="alternate" type="application/rss+xml" title="RIOT Changelog" href="/changelog/rss.xml"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v5.14.0"/><meta name="generator" content="Starlight v0.36.0"/><meta property="og:title" content="RIOT-2023.04 - Release Notes"/><meta property="og:type" content="article"/><meta property="og:url" content="https://guide.riot-os.org/changelog/2023-04/"/><meta property="og:locale" content="en"/><meta property="og:description" content="List of all changes in this release"/><meta property="og:site_name" content="RIOT Documentation"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="List of all changes in this release"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.DNXP8c50.css" media="print"><link rel="stylesheet" href="/_astro/changelog.DqGAGYsk.css">
+<style>@layer starlight.components{:root{--sl-badge-default-border: var(--sl-color-accent);--sl-badge-default-bg: var(--sl-color-accent-low);--sl-badge-default-text: #fff;--sl-badge-note-border: var(--sl-color-blue);--sl-badge-note-bg: var(--sl-color-blue-low);--sl-badge-note-text: #fff;--sl-badge-danger-border: var(--sl-color-red);--sl-badge-danger-bg: var(--sl-color-red-low);--sl-badge-danger-text: #fff;--sl-badge-success-border: var(--sl-color-green);--sl-badge-success-bg: var(--sl-color-green-low);--sl-badge-success-text: #fff;--sl-badge-caution-border: var(--sl-color-orange);--sl-badge-caution-bg: var(--sl-color-orange-low);--sl-badge-caution-text: #fff;--sl-badge-tip-border: var(--sl-color-purple);--sl-badge-tip-bg: var(--sl-color-purple-low);--sl-badge-tip-text: #fff}[data-theme=light]:root{--sl-badge-default-bg: var(--sl-color-accent-high);--sl-badge-note-bg: var(--sl-color-blue-high);--sl-badge-danger-bg: var(--sl-color-red-high);--sl-badge-success-bg: var(--sl-color-green-high);--sl-badge-caution-bg: var(--sl-color-orange-high);--sl-badge-tip-bg: var(--sl-color-purple-high)}.sl-badge:where(.astro-avdet4wd){display:inline-block;border:1px solid var(--sl-color-border-badge);border-radius:.25rem;font-family:var(--sl-font-system-mono);line-height:normal;color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere}.sidebar-content .sl-badge:where(.astro-avdet4wd){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-avdet4wd){--sl-color-bg-badge: transparent;--sl-color-border-badge: currentColor;color:inherit}.default:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-default-bg);--sl-color-border-badge: var(--sl-badge-default-border);--sl-color-text-badge: var(--sl-badge-default-text)}.note:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-note-bg);--sl-color-border-badge: var(--sl-badge-note-border);--sl-color-text-badge: var(--sl-badge-note-text)}.danger:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-danger-bg);--sl-color-border-badge: var(--sl-badge-danger-border);--sl-color-text-badge: var(--sl-badge-danger-text)}.success:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-success-bg);--sl-color-border-badge: var(--sl-badge-success-border);--sl-color-text-badge: var(--sl-badge-success-text)}.tip:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-tip-bg);--sl-color-border-badge: var(--sl-badge-tip-border);--sl-color-text-badge: var(--sl-badge-tip-text)}.caution:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-caution-bg);--sl-color-border-badge: var(--sl-badge-caution-border);--sl-color-text-badge: var(--sl-badge-caution-text)}.small:where(.astro-avdet4wd){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-avdet4wd){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-avdet4wd){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-avdet4wd){vertical-align:middle}}
+@layer starlight.components{svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}}
+@layer starlight.components{.sl-link-card:where(.astro-mf7fz2mj){display:grid;grid-template-columns:1fr auto;gap:.5rem;border:1px solid var(--sl-color-gray-5);border-radius:.5rem;padding:1rem;box-shadow:var(--sl-shadow-sm);position:relative}a:where(.astro-mf7fz2mj){text-decoration:none;line-height:var(--sl-line-height-headings)}a:where(.astro-mf7fz2mj):before{content:"";position:absolute;inset:0}.stack:where(.astro-mf7fz2mj){flex-direction:column;gap:.5rem}.title:where(.astro-mf7fz2mj){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-mf7fz2mj){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-mf7fz2mj){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-mf7fz2mj):hover{background:var(--sl-color-gray-7, var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-mf7fz2mj):hover .icon:where(.astro-mf7fz2mj){color:var(--sl-color-white)}}
+@layer starlight.components{.sl-steps{--bullet-size: calc(var(--sl-line-height) * 1rem);--bullet-margin: .375rem;list-style:none;counter-reset:steps-counter var(--sl-steps-start, 0);padding-inline-start:0}.sl-steps>li{counter-increment:steps-counter;position:relative;padding-inline-start:calc(var(--bullet-size) + 1rem);padding-bottom:1px;min-height:calc(var(--bullet-size) + var(--bullet-margin))}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);position:absolute;top:0;inset-inline-start:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);font-weight:600;text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);border-radius:99rem;box-shadow:inset 0 0 0 1px var(--sl-color-gray-5)}.sl-steps>li:after{--guide-width: 1px;content:"";position:absolute;top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2);width:var(--guide-width);background-color:var(--sl-color-hairline-light)}}@layer starlight.content{.sl-steps>li>:first-child{--lh: calc(1em * var(--sl-line-height));--shift-y: calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh: calc(1em * var(--sl-line-height-headings))}@supports (--prop: 1lh){.sl-steps>li>:first-child{--lh: 1lh}}}
+@layer starlight.components{.sl-link-button:where(.astro-xwgiixxa){align-items:center;border:1px solid transparent;border-radius:999rem;display:inline-flex;font-size:var(--sl-text-sm);gap:.5em;line-height:1.1875;outline-offset:.25rem;padding:.4375rem 1.125rem;text-decoration:none}.sl-link-button:where(.astro-xwgiixxa).primary{background:var(--sl-color-text-accent);border-color:var(--sl-color-text-accent);color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).primary:hover{color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).secondary{border-color:inherit;color:var(--sl-color-white)}.sl-link-button:where(.astro-xwgiixxa).minimal{color:var(--sl-color-white);padding-inline:0}.sl-link-button:where(.astro-xwgiixxa) svg{flex-shrink:0}@media (min-width: 50rem){.sl-link-button:where(.astro-xwgiixxa){font-size:var(--sl-text-base);padding:.9375rem 1.25rem}}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa){margin-inline-end:1rem}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa):not(:where(p *)){margin-block:1rem}}
+</style><script type="module" src="/_astro/page.7qqag-5g.js"></script></head> <body class="astro-bguv2lll"> <a href="#_top" class="astro-7q3lir66">Skip to content</a>  <div class="page sl-flex astro-vrdttmbt"> <header class="header astro-vrdttmbt"><div class="header astro-kmkmnagf"> <div class="title-wrapper sl-flex astro-kmkmnagf"> <a href="/" class="site-title sl-flex astro-m46x6ez3">  <img class="astro-m46x6ez3" alt src="/_astro/riot-logo.DB44Jy2T.svg" width="101" height="55">  <span class="sr-only astro-m46x6ez3" translate="no"> RIOT Documentation </span> </a>  </div> <div class="sl-flex print:hidden astro-kmkmnagf"> <site-search class="astro-kmkmnagf astro-v37mnknz" data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}"> <button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-v37mnknz"> <svg aria-hidden="true" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg> <span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span> <kbd class="sl-hidden md:sl-flex astro-v37mnknz" style="display: none;"> <kbd class="astro-v37mnknz">Ctrl</kbd><kbd class="astro-v37mnknz">K</kbd> </kbd> </button> <dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"> <div class="dialog-frame sl-flex astro-v37mnknz">  <button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz"> Cancel </button> <div class="search-container astro-v37mnknz"> <div id="starlight__search" class="astro-v37mnknz"></div> </div> </div> </dialog> </site-search>  <script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script> <script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.DMZ5WJ-J.js"></script>   </div> <div class="sl-hidden md:sl-flex print:hidden right-group astro-kmkmnagf"> <div class="sl-flex social-icons astro-kmkmnagf"> <a href="https://github.com/riot-os/riot" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://floss.social/@RIOT_OS" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Mastodon</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M16.45 17.77c2.77-.33 5.18-2.03 5.49-3.58.47-2.45.44-5.97.44-5.97 0-4.77-3.15-6.17-3.15-6.17-1.58-.72-4.3-1.03-7.13-1.05h-.07c-2.83.02-5.55.33-7.13 1.05 0 0-3.14 1.4-3.14 6.17v.91c-.01.88-.02 1.86 0 2.88.12 4.67.87 9.27 5.2 10.4 2 .53 3.72.64 5.1.57 2.51-.14 3.92-.9 3.92-.9l-.08-1.8s-1.8.56-3.8.5c-2-.08-4.1-.22-4.43-2.66a4.97 4.97 0 0 1-.04-.68s1.96.48 4.44.59c1.51.07 2.94-.09 4.38-.26Zm2.22-3.4h-2.3v-5.6c0-1.19-.5-1.79-1.5-1.79-1.1 0-1.66.71-1.66 2.12v3.07h-2.3V9.1c0-1.4-.55-2.12-1.65-2.12-1 0-1.5.6-1.5 1.78v5.61h-2.3V8.6c0-1.18.3-2.12.9-2.81a3.17 3.17 0 0 1 2.47-1.05c1.18 0 2.07.45 2.66 1.35l.57.96.58-.96a2.97 2.97 0 0 1 2.66-1.35c1.01 0 1.83.36 2.46 1.05.6.7.9 1.63.9 2.81v5.78Z"/></svg></a><a href="https://bsky.app/profile/riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Bluesky</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 10.8c-1-2.1-4-6-6.8-8C2.6 1 1.6 1.3.9 1.6.1 1.9 0 3 0 3.8c0 .7.4 5.6.6 6.4C1.4 13 4.3 14 7 13.6h.4H7c-4 .6-7.4 2-2.8 7 5 5.3 6.8-1 7.8-4.2 1 3.2 2 9.3 7.7 4.3 4.3-4.3 1.2-6.5-2.7-7a9 9 0 0 1-.4-.1h.4c2.7.3 5.6-.6 6.4-3.4.2-.8.6-5.7.6-6.4 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.7-4.3 1.2-2.8 2-5.7 5.9-6.8 8"/></svg></a><a href="https://www.youtube.com/c/RIOT-IoT" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">YouTube</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M23.5 6.2A3 3 0 0 0 21.4 4c-1.9-.5-9.4-.5-9.4-.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.3C0 8 0 12 0 12s0 4 .5 5.8A3 3 0 0 0 2.6 20c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2c.5-2 .5-5.9.5-5.9s0-4-.5-5.8zm-14 9.4V8.4l6.3 3.6-6.3 3.6z"/></svg></a><a href="https://forum.riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Forum</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12.102 0h-.081C5.462 0 .13 5.252.001 11.779v.012L.007 24l12.097-.01c6.582-.055 11.897-5.404 11.897-11.995S18.686.056 12.109 0h-.005zM12 18.857h-.015a6.778 6.778 0 0 1-2.94-.666l.041.018-4.345 1.077 1.227-4.018a6.78 6.78 0 0 1-.83-3.27A6.86 6.86 0 1 1 12 18.857z"/></svg></a><a href="https://matrix.to/#/#riot-os:matrix.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Matrix</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M22.5 1.5v21h-2.25V24H24V0h-3.75v1.5h2.25ZM7.46 7.95V9.1h.04a3.02 3.02 0 0 1 2.61-1.39c.54 0 1.03.1 1.48.32.44.2.78.58 1.01 1.1.26-.37.6-.7 1.03-.99.44-.28.95-.43 1.55-.43.45 0 .87.06 1.26.17.38.11.71.29.99.53.27.24.49.56.64.95.15.4.23.86.23 1.42v5.72h-2.34v-4.85c0-.29-.01-.56-.04-.8a1.73 1.73 0 0 0-.18-.67 1.1 1.1 0 0 0-.44-.45 1.6 1.6 0 0 0-.78-.16c-.33 0-.6.06-.8.19-.2.12-.37.29-.48.5a2 2 0 0 0-.23.69c-.04.26-.06.52-.06.78v4.77H10.6v-4.8l-.01-.75a2.29 2.29 0 0 0-.14-.69c-.08-.2-.23-.38-.42-.5a1.5 1.5 0 0 0-.85-.2c-.15.01-.3.04-.44.08-.19.06-.37.15-.52.28-.18.14-.32.34-.44.6-.12.26-.18.6-.18 1.02v4.96H5.25V7.94h2.21ZM1.5 1.5v21h2.25V24H0V0h3.75v1.5H1.5Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script> <script type="module">const r="starlight-theme",o=e=>e==="auto"||e==="dark"||e==="light"?e:"auto",c=()=>o(typeof localStorage<"u"&&localStorage.getItem(r));function n(e){typeof localStorage<"u"&&localStorage.setItem(r,e==="light"||e==="dark"?e:"")}const l=()=>matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";function t(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e==="auto"?l():e,n(e)}matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{c()==="auto"&&t("auto")});class s extends HTMLElement{constructor(){super(),t(c()),this.querySelector("select")?.addEventListener("change",a=>{a.currentTarget instanceof HTMLSelectElement&&t(o(a.currentTarget.value))})}}customElements.define("starlight-theme-select",s);</script> <script type="module">class s extends HTMLElement{constructor(){super();const e=this.querySelector("select");e&&(e.addEventListener("change",t=>{t.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=t.currentTarget.value)}),window.addEventListener("pageshow",t=>{if(!t.persisted)return;const n=e.querySelector("option[selected]")?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}}customElements.define("starlight-lang-select",s);</script> </div> </div> </header> <nav class="sidebar print:hidden astro-vrdttmbt" aria-label="Main"> <starlight-menu-button class="print:hidden astro-jif73yzw"> <button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"> <svg aria-hidden="true" class="open-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg> <svg aria-hidden="true" class="close-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg> </button> </starlight-menu-button> <script type="module">class s extends HTMLElement{constructor(){super(),this.btn=this.querySelector("button"),this.btn.addEventListener("click",()=>this.toggleExpanded());const t=this.closest("nav");t&&t.addEventListener("keyup",e=>this.closeOnEscape(e))}setExpanded(t){this.setAttribute("aria-expanded",String(t)),document.body.toggleAttribute("data-mobile-menu-expanded",t)}toggleExpanded(){this.setExpanded(this.getAttribute("aria-expanded")!=="true")}closeOnEscape(t){t.code==="Escape"&&(this.setExpanded(!1),this.btn.focus())}}customElements.define("starlight-menu-button",s);</script>   <div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"> <div class="sidebar-content sl-flex astro-vrdttmbt"> <sl-sidebar-state-persist data-hash="1ofdkcf" class="astro-kku4brbg"> <script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script>  <ul class="top-level astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">External Documentation</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="0"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="https://doc.riot-os.org" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">API Documentation</span> <span class="sl-badge tip small  astro-3ii7xxms astro-avdet4wd">Doxygen</span> </a> </li><li class="astro-3ii7xxms"> <a href="https://doc.riot-os.org/rustdoc/latest/riot_doc_helpers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Rust Documentation</span> <span class="sl-badge tip small  astro-3ii7xxms astro-avdet4wd">Rustdoc</span> </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Code of Conduct</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="1"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/general/code_of_conduct/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Code of Conduct</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/code_of_conduct/faq/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">FAQ</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/code_of_conduct/reporting/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Reporting Guidelines</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">RIOT in a Nutshell</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="2"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/structure/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Structure</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/vision/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Vision</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/governance/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Governance</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Tutorials</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="3"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Getting Started</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="4"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/getting-started/install-wsl/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Installing WSL (Windows-only)</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/installing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Setup Development Environment</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/flashing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Flashing a RIOT Application</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/building_example/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Building an Example</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/finding_modules/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Finding and Using Modules</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">C Basics</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="5"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/c_tutorials/create_project/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating a Project</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/timers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Timers and Callbacks</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/shell/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Shell Commands</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/threads/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Threads</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/gpio/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">GPIO &amp; Real Boards</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/saul/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Sensors/Actuators using SAUL</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/coding_conventions/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Coding Conventions</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">C++ Basics</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="6"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/cpp_tutorials/using_cpp/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Using C++ in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/cpp_tutorials/coding_conventions/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Coding Conventions C++</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Rust Basics</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="7"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/rust_tutorials/rust_in_riot/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Rust in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/rust_tutorials/create_project/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating a Project</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Advanced</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="8"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/advanced_tutorials/creating_application/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating an Application</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/advanced_tutorials/creating_modules/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating Modules</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/advanced_tutorials/device_drivers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Writing a Device Driver in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/advanced_tutorials/porting_boards/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Porting Boards</span>  </a> </li> </ul>  </details> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Build System</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="9"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/build-system/build_system/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">The Build System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/build_system_basics/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Build System Basics</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/kconfig/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Kconfig in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/flashing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Flashing via RIOT&#39;s Build System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/build-in-docker/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Build in Docker</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/advanced_build_system_tricks/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Advanced Build System Tricks</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/debugging_aids/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Debugging Tools</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Miscellaneous</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="10"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/misc/dev_best_practices/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Hints for quicker &amp; better RIOT development</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/io_mapping_and_shields/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">IO-Mapping and Shields</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/roadmap/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Roadmap</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/lost_and_found/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Removed Features and Modules</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/release_cycle/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Release Cycle</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/managing-a-release/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Managing a Release</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/emulators/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Emulators</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/terminal_config/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Terminal Programs Configuration</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/how_to_doc/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating Guides &amp; How Starlight Works</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <a href="/changelog" aria-current="false" class="large astro-3ii7xxms"> <span class="astro-3ii7xxms">Changelog</span>  </a> </li> </ul>   <script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script> </sl-sidebar-state-persist>  <div class="md:sl-hidden"> <div class="mobile-preferences sl-flex astro-wu23bvmt"> <div class="social-icons astro-wu23bvmt"> <a href="https://github.com/riot-os/riot" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://floss.social/@RIOT_OS" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Mastodon</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M16.45 17.77c2.77-.33 5.18-2.03 5.49-3.58.47-2.45.44-5.97.44-5.97 0-4.77-3.15-6.17-3.15-6.17-1.58-.72-4.3-1.03-7.13-1.05h-.07c-2.83.02-5.55.33-7.13 1.05 0 0-3.14 1.4-3.14 6.17v.91c-.01.88-.02 1.86 0 2.88.12 4.67.87 9.27 5.2 10.4 2 .53 3.72.64 5.1.57 2.51-.14 3.92-.9 3.92-.9l-.08-1.8s-1.8.56-3.8.5c-2-.08-4.1-.22-4.43-2.66a4.97 4.97 0 0 1-.04-.68s1.96.48 4.44.59c1.51.07 2.94-.09 4.38-.26Zm2.22-3.4h-2.3v-5.6c0-1.19-.5-1.79-1.5-1.79-1.1 0-1.66.71-1.66 2.12v3.07h-2.3V9.1c0-1.4-.55-2.12-1.65-2.12-1 0-1.5.6-1.5 1.78v5.61h-2.3V8.6c0-1.18.3-2.12.9-2.81a3.17 3.17 0 0 1 2.47-1.05c1.18 0 2.07.45 2.66 1.35l.57.96.58-.96a2.97 2.97 0 0 1 2.66-1.35c1.01 0 1.83.36 2.46 1.05.6.7.9 1.63.9 2.81v5.78Z"/></svg></a><a href="https://bsky.app/profile/riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Bluesky</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 10.8c-1-2.1-4-6-6.8-8C2.6 1 1.6 1.3.9 1.6.1 1.9 0 3 0 3.8c0 .7.4 5.6.6 6.4C1.4 13 4.3 14 7 13.6h.4H7c-4 .6-7.4 2-2.8 7 5 5.3 6.8-1 7.8-4.2 1 3.2 2 9.3 7.7 4.3 4.3-4.3 1.2-6.5-2.7-7a9 9 0 0 1-.4-.1h.4c2.7.3 5.6-.6 6.4-3.4.2-.8.6-5.7.6-6.4 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.7-4.3 1.2-2.8 2-5.7 5.9-6.8 8"/></svg></a><a href="https://www.youtube.com/c/RIOT-IoT" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">YouTube</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M23.5 6.2A3 3 0 0 0 21.4 4c-1.9-.5-9.4-.5-9.4-.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.3C0 8 0 12 0 12s0 4 .5 5.8A3 3 0 0 0 2.6 20c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2c.5-2 .5-5.9.5-5.9s0-4-.5-5.8zm-14 9.4V8.4l6.3 3.6-6.3 3.6z"/></svg></a><a href="https://forum.riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Forum</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12.102 0h-.081C5.462 0 .13 5.252.001 11.779v.012L.007 24l12.097-.01c6.582-.055 11.897-5.404 11.897-11.995S18.686.056 12.109 0h-.005zM12 18.857h-.015a6.778 6.778 0 0 1-2.94-.666l.041.018-4.345 1.077 1.227-4.018a6.78 6.78 0 0 1-.83-3.27A6.86 6.86 0 1 1 12 18.857z"/></svg></a><a href="https://matrix.to/#/#riot-os:matrix.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Matrix</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M22.5 1.5v21h-2.25V24H24V0h-3.75v1.5h2.25ZM7.46 7.95V9.1h.04a3.02 3.02 0 0 1 2.61-1.39c.54 0 1.03.1 1.48.32.44.2.78.58 1.01 1.1.26-.37.6-.7 1.03-.99.44-.28.95-.43 1.55-.43.45 0 .87.06 1.26.17.38.11.71.29.99.53.27.24.49.56.64.95.15.4.23.86.23 1.42v5.72h-2.34v-4.85c0-.29-.01-.56-.04-.8a1.73 1.73 0 0 0-.18-.67 1.1 1.1 0 0 0-.44-.45 1.6 1.6 0 0 0-.78-.16c-.33 0-.6.06-.8.19-.2.12-.37.29-.48.5a2 2 0 0 0-.23.69c-.04.26-.06.52-.06.78v4.77H10.6v-4.8l-.01-.75a2.29 2.29 0 0 0-.14-.69c-.08-.2-.23-.38-.42-.5a1.5 1.5 0 0 0-.85-.2c-.15.01-.3.04-.44.08-.19.06-.37.15-.52.28-.18.14-.32.34-.44.6-.12.26-.18.6-.18 1.02v4.96H5.25V7.94h2.21ZM1.5 1.5v21h2.25V24H0V0h3.75v1.5H1.5Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script>   </div>  </div> </div> </div> </nav> <div class="main-frame astro-vrdttmbt">  <script type="module">const a=document.getElementById("starlight__sidebar"),n=a?.querySelector("sl-sidebar-state-persist"),o="sl-sidebar-state",i=()=>{let t=[];const e=n?.dataset.hash||"";try{const s=sessionStorage.getItem(o),r=JSON.parse(s||"{}");Array.isArray(r.open)&&r.hash===e&&(t=r.open)}catch{}return{hash:e,open:t,scroll:a?.scrollTop||0}},c=t=>{try{sessionStorage.setItem(o,JSON.stringify(t))}catch{}},d=()=>c(i()),l=(t,e)=>{const s=i();s.open[e]=t,c(s)};n?.addEventListener("click",t=>{if(!(t.target instanceof Element))return;const e=t.target.closest("summary")?.closest("details");if(!e)return;const s=e.querySelector("sl-sidebar-restore"),r=parseInt(s?.dataset.index||"");isNaN(r)||l(!e.open,r)});addEventListener("visibilitychange",()=>{document.visibilityState==="hidden"&&d()});addEventListener("pageHide",d);</script> <div class="lg:sl-flex astro-67yu43on"> <aside class="right-sidebar-container print:hidden astro-67yu43on"> <div class="right-sidebar astro-67yu43on"> <div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><span class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#about-this-release" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">About this release</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#notations-used-below" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Notations used below</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#new-features-and-changes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">New features and changes</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#core" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Core</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#system-libraries" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">System Libraries</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#networking" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Networking</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#packages" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Packages</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#boards" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Boards</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#cpu" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">CPU</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#device-drivers" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Device Drivers</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#documentation" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Documentation</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system--tooling" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build System / Tooling</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#kconfig" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Kconfig</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#examples" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Examples</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#testing" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Testing</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#api-changes" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">API Changes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#uncategorized" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Uncategorized</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#bug-fixes-53" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Bug fixes (53)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#known-issues" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Known issues</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#network-related-issues-52" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Network related issues (52)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#timer-related-issues-9" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Timer related issues (9)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#drivers-related-issues-16" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Drivers related issues (16)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#native-related-issues-4" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Native related issues (4)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-platforms-related-issues-16" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other platforms related issues (16)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system-related-issues-11" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build system related issues (11)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-issues-48" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other issues (48)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#fixed-issues-since-the-last-release-202301" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Fixed Issues since the last release (2023.01)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#boards-tested-during-this-release" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Boards tested during this release</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#acknowledgements" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Acknowledgements</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#more-information" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">More information</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#matrix-and-forum" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Matrix and Forum</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#license" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">License</span> </a>  </li> </ul> </div></details></nav></mobile-starlight-toc><script type="module" src="/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C181hMzK.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#about-this-release" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">About this release</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#notations-used-below" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Notations used below</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#new-features-and-changes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">New features and changes</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#core" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Core</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#system-libraries" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">System Libraries</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#networking" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Networking</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#packages" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Packages</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#boards" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Boards</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#cpu" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">CPU</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#device-drivers" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Device Drivers</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#documentation" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Documentation</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system--tooling" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build System / Tooling</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#kconfig" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Kconfig</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#examples" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Examples</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#testing" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Testing</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#api-changes" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">API Changes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#uncategorized" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Uncategorized</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#bug-fixes-53" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Bug fixes (53)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#known-issues" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Known issues</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#network-related-issues-52" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Network related issues (52)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#timer-related-issues-9" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Timer related issues (9)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#drivers-related-issues-16" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Drivers related issues (16)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#native-related-issues-4" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Native related issues (4)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-platforms-related-issues-16" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other platforms related issues (16)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system-related-issues-11" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build system related issues (11)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-issues-48" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other issues (48)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#fixed-issues-since-the-last-release-202301" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Fixed Issues since the last release (2023.01)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#boards-tested-during-this-release" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Boards tested during this release</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#acknowledgements" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Acknowledgements</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#more-information" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">More information</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#matrix-and-forum" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Matrix and Forum</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#license" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">License</span> </a>  </li> </ul> </nav></starlight-toc><script type="module" src="/_astro/TableOfContents.astro_astro_type_script_index_0_lang.CKWWgpjV.js"></script></div></div> </div> </aside> <div class="main-pane astro-67yu43on">  <main class="astro-bguv2lll" lang="en" dir="ltr">    <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <h1 id="_top" class="astro-j6tvhyss">RIOT-2023.04 - Release Notes</h1>  </div> </div>  <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="sl-markdown-content"> <p>RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.</p>
+<p>RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).</p>
+<p>RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.</p>
+<h2 id="about-this-release">About this release</h2>
+<p>The 2023.04 release includes:</p>
+<ul>
+<li>Mass Storage Class Support in USBUS</li>
+<li>Initial support for libSCHC</li>
+<li>FlashDB support</li>
+<li>BLE downlink in GNRC Border Router</li>
+<li>DTLS support for nanoCoAP in client mode</li>
+<li>Congestion control for 6LoWPAN Selective Fragment Recovery</li>
+<li>avr/flash_utils: strings (and other const data) no longer needs to be copied
+to RAM</li>
+<li>New boards:
+<ul>
+<li>esp32c3-wemos-mini</li>
+<li>esp32s2-lilygo-ttgo-t8</li>
+<li>esp32s2-wemos-mini</li>
+<li>esp32s3-pros3</li>
+<li>rpi-pico-w</li>
+<li>sipeed-longan-nano</li>
+</ul>
+</li>
+<li>New device drivers:
+<ul>
+<li>Black/white e-Paper/e-Ink display</li>
+<li>RFID reader (MFRC522)</li>
+<li>ST VL53L1X Time-of-Flight sensor</li>
+</ul>
+</li>
+</ul>
+<p>280 pull requests, composed of 595 commits, have been merged since the
+last release, and 3 issues have been solved. 27 people contributed with
+code in 83 days. 1246 files have been touched with 177090 (+) insertions and
+36429 deletions (-).</p>
+<h2 id="notations-used-below">Notations used below</h2>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">+ means new feature/item</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">* means modified feature/item</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">- means removed feature/item</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="+ means new feature/item* means modified feature/item- means removed feature/item"><div></div></button></div></figure></div>
+<h2 id="new-features-and-changes">New features and changes</h2>
+<h3 id="core">Core</h3>
+<ul>
+<li>core/compiler_hints: add likely() / unlikely() hints (#19156)</li>
+</ul>
+<ul>
+<li>core/xfa: disable asan on llvm (#19271)</li>
+<li>pkg/libfixmath: bump version (#19182)</li>
+</ul>
+<h3 id="system-libraries">System Libraries</h3>
+<ul>
+<li>drivers/wdt: add periph_wdt_auto_start for early watchdog (#18257)</li>
+<li>fuzzing: Add uri_parser setup (#19057)</li>
+<li>Revert “sys/pm_layered: pm_(un)block add attribute optimize(3)” (#19155)</li>
+<li>sys/coding: add XOR based coding module (#17045)</li>
+<li>sys/event: add event sources (#18758)</li>
+<li>sys/irq: Add C++ wrapper using RAII (#17066)</li>
+<li>sys/phydat: add functions for Unix time conversion to phydat (#19080)</li>
+<li>sys/trickle: cleanup deps (#19404)</li>
+<li>sys/vfs: add force option to vfs_umount() (#19320)</li>
+<li>usbus/msc: add CONFIG_USBUS_MSC_AUTO_MTD option to create LUNs on
+init (#19356)</li>
+<li>usbus/msc: add initial Mass Storage Class support (#19242)</li>
+<li>USBUS: Add URB support (#17091)</li>
+<li>ztimer: add ztimer_stopwatch convenience functions (#19343)</li>
+</ul>
+<ul>
+<li>bootloaders: fix bootloader button logic (#19365)</li>
+<li>makefiles/suit: make it possible to accept multiple SUIT keys (#18459)</li>
+<li>sys/bitfield: don’t touch unrelated bits in bf_{set, clear}_all() (#19400)</li>
+<li>sys/cpp11-compat: Remove xtimer deps (#19369)</li>
+<li>sys/fmt: optimize scn_u32_dec scn_u32_hex (#19027)</li>
+<li>sys/fmt: use <code>fflush(); stdio_write()</code> instead of <code>fwrite()</code> (#19250)</li>
+<li>sys/shell_lock: do not call strlen, less jumpy (#19157)</li>
+<li>sys/tiny_strerror: make use of flash_utils.h (#19332)</li>
+<li>test_utils/print_stack_usage: use thread.h API (#19226)</li>
+<li>usbus/dfu: do not create alt interface if NUM_SLOTS=1 (#19386)</li>
+</ul>
+<h3 id="networking">Networking</h3>
+<ul>
+<li>gcoap/fileserver: add event callbacks (#18414)</li>
+<li>gnrc_sixlowpan_frag_sfr_congure: optional congestion control support
+(#16171, #16159, #16170, #16158)</li>
+<li>gnrc_static: add static network configuration (#18477)</li>
+<li>nanocoap_link_format: add helper function to parse Link Format (#18134)</li>
+<li>pkg/tinyusb: add tinyUSB netdev driver (#18903)</li>
+</ul>
+<ul>
+<li>cord: bump reference from draft to rfc (#19367)</li>
+<li>cord: convert to ztimer (#19391)</li>
+<li>gnrc_ipv6_nib: clean up _resolve_addr() (#18939)</li>
+<li>nanocoap_sock: ensure response address is the same as request address (#19361)</li>
+<li>nanocoap_sock: implement DTLS socket (#18724)</li>
+<li>nanocoap_sock: implement nanocoap_sock_delete() (#18738)</li>
+<li>nanocoap_sock: store message ID in nanocoap_sock_t (#19178)</li>
+<li>pkg/tinydtls: Reduce default verbosity, increase default sizes when CoAP is
+used (#19331)</li>
+<li>shell/cmds: GNRC: replace puts() with printf() (#19327)</li>
+<li>shell/gnrc_icmpv6_echo: separate ICMPv6 echo sending / parsing from
+shell command (#18934)</li>
+<li>sock_dtls: move common code into sock_dtls_establish_session() (#19142)</li>
+<li>sys/net/gnrc/netif: fixing no global address wait (#19402)</li>
+<li>sys/net/grnc/netreg: avoid creating an infinite loop (#19238)</li>
+</ul>
+<h3 id="packages">Packages</h3>
+<ul>
+<li>libschc: initial import as package (#18515)</li>
+<li>pkg/arduino_adafruit_sensor: add Adafruit Unified Sensor Driver as
+package (#17460)</li>
+<li>pkg/wolfssl: Update wolfSSL to 5.5.4 and add DTLS 1.3 support (#19302)</li>
+<li>pkg: add FlashDB (#17612)</li>
+</ul>
+<ul>
+<li>pkg/fatfs: bump to r0.15 (#19347)</li>
+<li>pkg/lz4: bump version to 1.9.4 (#19180)</li>
+<li>pkg/minmea: bump version (#19183)</li>
+<li>pkg/nanopb: bump version to 0.4.7 (#19179)</li>
+<li>pkg/tinydtls: bump version (#19184)</li>
+<li>pkg/tinydtls: drop libc_gettimeofday dependency (#19247)</li>
+<li>pkg/tinyusb: bump to 0.15 (#19276)</li>
+<li>pkg/u8g2: bump version (#19285)</li>
+<li>pkg/wolfssl: Fix memory leaks in wolfSSL sock_tls (#19190)</li>
+<li>tests/pkg_nanors: use static allocation (#19382)</li>
+</ul>
+<ul>
+<li>pkg/tinyusb: add GD32VF103 support (#19256)</li>
+<li>pkg/lwext4: add lightweight implementation of the ext2/3/4 filesystem (#18682)</li>
+</ul>
+<h3 id="boards">Boards</h3>
+<ul>
+<li>boards/esp32c3-wemos-mini: add support for Wemos ESP32-C3 mini (#19417)</li>
+<li>boards/esp32s2-mini: add definition for ESP32 S2 Mini (#18863)</li>
+<li>boards/nucleo64: Add pinout diagrams from UM1724 (#19406)</li>
+<li>boards/seeedstudio-gd32: add mtd_sdcard_default (#19293)</li>
+<li>boards/seeedstudio-gd32: complete and improve board definition (#19166)</li>
+<li>boards/sipeed-longan-nano: add BOOT as user button (#19419)</li>
+<li>boards/sipeed-longan-nano: add definition for the Sipeed Longan Nano
+GD32VF103 board (#19170)</li>
+<li>boards: add esp32s3-pros3 support (#19088)</li>
+<li>boards: support for the LILYGO TTGO T8 ESP32-S2 board (#19284)</li>
+<li>cpu/native: implement periph_rtc_ms (#19340)</li>
+<li>drivers/mrf24j40: add support for IEEE 802.15.4 Radio HAL (#18472)</li>
+<li>drivers/mtd_sdcard: add mtd_sdcard_default module (#19216)</li>
+<li>makefiles/tools/serial.inc.mk: Allow detection of debug adapter (#19119)</li>
+</ul>
+<ul>
+<li>boards/adafruit-itsybitsy-m4: turn off APA102 LED on startup (#19357)</li>
+<li>boards/esp*: complete SD Card MTD config (#19255)</li>
+<li>boards/esp32: enable RGB LED support (#19408)</li>
+<li>boards/gd32v: improve board definitions (#19249)</li>
+<li>boards/rpi-pico-w: fix too large board image (#19159)</li>
+<li>boards/rpi-pico-w: initial support for rpi pico W board (#19071)</li>
+<li>boards/sipeed-longan-nano: default to flashing via DFU (#19204)</li>
+<li>boards/stm32f4discovery: default to stdio via CDC ACM (#19259)</li>
+<li>boards: common: stdio_cdc_acm: let tests wait a bit for serial port (#19128)</li>
+<li>cpu/rpx0xx/cmsis: Update vendor header files (#19416)</li>
+</ul>
+<h3 id="cpu">CPU</h3>
+<ul>
+<li>bootloaders/riotboot: add tinyUSB DFU support (#19010)</li>
+<li>core/init: add early_init() (#19082)</li>
+<li>cpu/esp32: add periph_flashpage support (#19079)</li>
+<li>cpu/gd32v: add periph_adc support (#19188)</li>
+<li>cpu/gd32v: add periph_dac support (#19248)</li>
+<li>cpu/gd32v: add periph_gpio_irq support (#19185)</li>
+<li>cpu/gd32v: add periph_gpio_ll and periph_gpio_ll_irq support (#19243)</li>
+<li>cpu/gd32v: add periph_i2c support (#19201)</li>
+<li>cpu/gd32v: add periph_pwm support (#19209)</li>
+<li>cpu/gd32v: add periph_rtc support (#19186)</li>
+<li>cpu/gd32v: add periph_rtc_mem support (#19254)</li>
+<li>cpu/gd32v: add periph_rtt support (#19202)</li>
+<li>cpu/gd32v: add periph_spi support (#19214)</li>
+<li>cpu/gd32v: add pm_layered support in periph_pm (#19187)</li>
+<li>cpu/stm32/periph: Add GPIO LL IRQ support for STM32F1 (#19412)</li>
+<li>cpu/stm32/periph: Implement GPIO LL for STM32F1 without IRQ support
+(yet) (#19407)</li>
+<li>picolibc: add support for picolibc >= 1.8 (#19341)</li>
+<li>sys/stdio_udp: add stdio over UDP (#19081)</li>
+</ul>
+<ul>
+<li>cpu/esp32: cleanup of ESP-IDF interface API (module <code>esp_idf_api</code>) (#19426)</li>
+<li>cpu/esp_common: use generic WIFI_SSID/WIFI_PASS defines (#19286)</li>
+<li>cpu/gd32v/periph_i2c: interrupt based driver (#19269)</li>
+<li>cpu/native: Switch to ztimer for gettimeofday (#19349)</li>
+<li>cpu/riscv_common: convert to uword_t usage (#19345)</li>
+<li>cpu/sam0_common: adc: implement 16 bit mode by oversampling (#19165)</li>
+<li>cpu/stm32/periph/i2c: export PERIPH_I2C_MAX_BYTES_PER_FRAME (#19279)</li>
+<li>cpu/stm32/periph/timer: don’t stop counter (#19263)</li>
+<li>cpu/stm32/periph/timer: fix clobered IRQ flag (#19385)</li>
+<li>cpu/stm32/usbdev_fs: fix ep registration and EP_REG assignments
+[backport 2023.04] (#19462)</li>
+<li>drivers/at24cxxx: implement _mtd_at24cxxx_read_page (#19270)</li>
+<li>Fix stm32 timer periodic (#19363)</li>
+<li>sam0/usbdev: partial revert of #17086 (#19384)</li>
+<li>sys/usbus: check for the number of required and provided EPs in
+static configurations (#19371)</li>
+</ul>
+<h3 id="device-drivers">Device Drivers</h3>
+<ul>
+<li>black/white e-Paper/e-Ink display driver (#12509)</li>
+<li>drivers/mfrc522: add new driver (#16782)</li>
+<li>drivers/servo: reimplement with high level interface (#18392)</li>
+<li>drivers/usbdev_synopsys_dwc2: add ESP32x power management (#19399)</li>
+<li>drivers: add driver for ST VL6180X ranging and ambient light sensor (#10462)</li>
+</ul>
+<ul>
+<li>drivers/at24cxxx: merge mtd driver with at24cxxx.c (#19281)</li>
+<li>drivers/periph_common/flashpage: fix silent error (#19175)</li>
+<li>drivers/slipdev: implement sleep states (#17810)</li>
+<li>drivers/ws281x: improve timing for ESP32x (#19422)</li>
+</ul>
+<ul>
+<li>drivers/ws281x: add RMT hardware support for ESP32x SoCs (#19424)</li>
+</ul>
+<h3 id="documentation">Documentation</h3>
+<ul>
+<li>doc: Add out of tree RIOT app documentation (#19324)</li>
+</ul>
+<ul>
+<li>blobs: include documentation in doxygen (#19200)</li>
+<li>doc/porting-boards.md: fix code snippets in md view (#19206)</li>
+<li>Doc: document generate-makefile.ci (#19239)</li>
+<li>doccheck: avoid generating dot or html (#19228)</li>
+</ul>
+<h3 id="build-system--tooling">Build System / Tooling</h3>
+<ul>
+<li>tools/compile_like_murdock: Add features (#19351)</li>
+<li>tools/doccheck: add simple exclude to doccheck (#19240)</li>
+<li>tools/renode: add support for target reset (#19375)</li>
+</ul>
+<ul>
+<li>build system: Fix linker feature test with newlib 4.3.0 (#19232)</li>
+<li>ci/print_versions: print all ESP32 toolchains (#19309)</li>
+<li>dist/tools/doccheck: Fix grep warning (#19220)</li>
+<li>dist/tools/insufficient_memory: Improve and clean up script (#19291)</li>
+<li>esptools/install.sh: Fix shellcheck issues (#19325)</li>
+<li>Fix <code>compile_like_murdock.py</code> when board is empty (#19370)</li>
+<li>make: pass make jobserver to cargo (#19203)</li>
+<li>Makefile.dep: pull in FEATURES_REQUIRED for periph (#19234)</li>
+<li>toolchain/gnu.inc.mk: don’t check version if CC is not installed (#19137)</li>
+</ul>
+<h3 id="kconfig">Kconfig</h3>
+<ul>
+<li>drivers/sx126x: make MODULE_SX126X_RF_SWITCH hidden in kconfig (#19194)</li>
+<li>Fix SX126X-STM32WL module in Kconfig (#19191)</li>
+</ul>
+<h3 id="examples">Examples</h3>
+<ul>
+<li>examples/gnrc_border_router: add BLE as downlink option (#19321)</li>
+</ul>
+<h3 id="testing">Testing</h3>
+<ul>
+<li>bors.yaml: re-activate labels check + add block_labels (#19161)</li>
+<li>CI: re-add “synchronize” event to check-labels (#19136)</li>
+<li>gh-actions: report release-tests result to Matrix (#19102)</li>
+</ul>
+<ul>
+<li>CI: .murdock: fix bors fast build (#19241)</li>
+<li>CI: .murdock: use build checkout for ccache tmp (#19274)</li>
+<li>CI: separate check-labels and check-commits workflows (#19120)</li>
+<li>CI: update check-labels-action (#19101)</li>
+<li>test/periph_rtc: reset struct tm time between tests (#19344)</li>
+<li>tests/gnrc_rpl: Disable CI test for native (#19171)</li>
+<li>tests/periph_flashpage_unittest: enable periph_flashpage (#19215)</li>
+</ul>
+<h3 id="api-changes">API Changes</h3>
+<ul>
+<li>usbdev: Add dedicated stall functions (#17086)</li>
+</ul>
+<ul>
+<li>drivers/mtd_flashpage: implement pagewise API, don’t use raw
+addresses (#19258)</li>
+<li>gcoap: Finish the gcoap_get_resource_list_tl ->
+gcoap_get_resource_list renaming (#19295)</li>
+</ul>
+<ul>
+<li>drivers/servo: reimplement with high level interface (#18392)</li>
+</ul>
+<ul>
+<li>cpu/esp_common: use generic WIFI_SSID/WIFI_PASS defines (#19286)</li>
+</ul>
+<ul>
+<li>sys/vfs: add force option to vfs_umount() (#19320)</li>
+</ul>
+<h3 id="uncategorized">Uncategorized</h3>
+<ul>
+<li>MAINTAINING.md: add some notes on Bors (#19329)</li>
+<li>RDM: The 802.15.4 Radio HAL (#13943)</li>
+</ul>
+<ul>
+<li>SECURITY: Describe that declassification is an option (#19149)</li>
+<li>SUBSYSTEMS.md: migrate subsystem list from wiki (#19060)</li>
+</ul>
+<p>And 57 minor changes.</p>
+<h2 id="bug-fixes-53">Bug fixes (53)</h2>
+<ul>
+<li>boards/common: add common timer config for GD32VF103 boards (#19205)</li>
+<li>cpu/esp_common: Add missing disconnect reasons (#19381)</li>
+<li>Make: Add generate-Makefile.ci (#19244)</li>
+<li>usbus: Add support for full speed with high speed phy (#19438)</li>
+<li>boards/common/cc26xx cc13xx: clean up and fix flash configs (#19050)</li>
+<li>boards/esp32s2-lilygo-ttgo-t8: fix STDIO selection in Kconfig (#19287)</li>
+<li>boards/remote-*: drop custom led_init() (#19348)</li>
+<li>boards/seeedstudio-gd32: fix HXTAL clock in Kconfig (#19129)</li>
+<li>boards/stm32f4discovery: use default port to access stdio via cdc acm (#19376)</li>
+<li>boards: fix USB configuration for stm32f429i-disco (#19437)</li>
+<li>cord: include gcoap_req_send returning 0 in error (#19383)</li>
+<li>cpu/esp32: fix and improve UART initialization (#19146)</li>
+<li>cpu/esp32: fix stdio_usb_serial_jtag for ESP32-C3 (#19415)</li>
+<li>cpu/esp32: fixes for boot issues and crashes on ESP32 (#19192)</li>
+<li>cpu/esp32: use ets_printf instead of puts in startup (#19420)</li>
+<li>cpu/gd32v: fix gpio_read in periph_gpio (#19418)</li>
+<li>cpu/gd32v: move board dependent RTT configs to board config (#19211)</li>
+<li>cpu/stm32: Fix periph_spi operation in non-DMA mode (#19431)</li>
+<li>dist/tools/esptools/export.sh: fixes IDF_TOOLS_PATH default setting (#19125)</li>
+<li>dist/tools/openocd: fix problems with riotboot caused by _flash_addr
+function for OpenOCD v0.12 (#19409)</li>
+<li>driver/usbdev_synopsys_dwc2: use correct number of EPs (#19380)</li>
+<li>drivers/at86rf2xx: fix default page being ignored [backport 2023.04] (#19473)</li>
+<li>drivers/usbdev_synopsys_dwc2: disable DMA mode (#19388)</li>
+<li>drivers/usbdev_synopsys_dwc2: fix and re-enable DMA mode (#19397)</li>
+<li>drivers/usbus_synopsys_dwc2: fix interrupt handling in DMA mode
+[backport 2023.04] (#19472)</li>
+<li>efm32/dac: Shift instead of masking (#19318)</li>
+<li>gcoap: Do not send responses from multicast addresses (#19272)</li>
+<li>gh-actions: check-labels: move to upstream fix (#19160)</li>
+<li>gnrc_netif: set lower bound for IEEE802154_STACKSIZE_DEFAULT (#19339)</li>
+<li>gnrc_static: don’t parse address as prefix (#19313)</li>
+<li>makefiles/boards/stm32: fix DFU_USB_ID handling (#19374)</li>
+<li>makefiles/tools/serial.inc.mk: Handle new miniterm versions [backport
+2023.04] (#19489)</li>
+<li>matrix keypad: Fix memcpy bug in initialization (#19162)</li>
+<li>nanocoap_sock: don’t include token in empty ACK response (#19366)</li>
+<li>native/stdio: Explicitly provide getchar (#19330)</li>
+<li>pkg/esp8266_sdk: fix version string generation (#19123)</li>
+<li>pkg/nimble/autoadv: fix flag comparisons (#19235)</li>
+<li>pkg/tinyusb: fix default VID/PID configuration (#19377)</li>
+<li>release-tests: fix PASSED chat message (#19145)</li>
+<li>security fixes [backport 2023.04] (#19497)</li>
+<li>shell/gnrc_icmpv6_echo: acquire ZTIMER_USEC clock for time
+measurement (#19055)</li>
+<li>socket_zep: only report size of single datagram (#19121)</li>
+<li>sys/clif: Fixing out of bounds read under certain conditions (#18746)</li>
+<li>sys/net/dhcpv6: include IA Prefix Option in SOLICIT (#19225)</li>
+<li>sys/phydat: Fix unit confusion (#19292)</li>
+<li>sys/shell: don’t include suit command by default (#19294)</li>
+<li>sys/suit: Ensure previous thread is stopped before reusing its stack (#19199)</li>
+<li>sys/usbus/cdc/ecm: fix High-Speed mode (#19358)</li>
+<li>sys/usbus: handle exceeding number of endpoints (#19362)</li>
+<li>sys/ztimer: ztimer_mock: guard ztimer_ondemand static functions (#19118)</li>
+<li>tests/driver_dac_dds: fix output of sine and saw functions (#19251)</li>
+<li>tests/{sys_fido2_ctap/usbus_board_reset}: fix stdio_usb_serial_jtag
+dependency (#19261)</li>
+<li>usbus/msc: fixes for synopsys dwc2 [backport 2023.04] (#19456)</li>
+</ul>
+<h2 id="known-issues">Known issues</h2>
+<h3 id="network-related-issues-52">Network related issues (52)</h3>
+<ul>
+<li>6lo: RIOT does not receive packets from Linux when short_addr is set (#11033)</li>
+<li>[gcoap-dtls] Posting a message yields a stack overflow on the
+<code>samr21-xpro</code> with ECC (#18292)</li>
+<li>Address registration handling inappropriate (#15867)</li>
+<li>app/netdev: application stops working after receiving frames with
+assertion or completely without error (#8271)</li>
+<li>at86rf2xx: Dead lock when sending while receiving (#8242)</li>
+<li>CC2538 RF overlapping PIN usage (#8779)</li>
+<li>cpu/esp8266: Tracking open problems of esp_wifi netdev driver (#10861)</li>
+<li>dist/tools/sliptty/start_network.sh: IPv6 connectivity is broken on
+PC (#14689)</li>
+<li>driver/mrf24j40: blocks shell input with auto_init_gnrc_netif (#12943)</li>
+<li>drivers/at86rf215: Incorrect channel number set for subGHz (#15906)</li>
+<li>DTLS examples cannot send message to localhost (#14315)</li>
+<li>Emcute cannot create a double-byte name (#12642)</li>
+<li>ethernet: Missing multicast addr assignment (#13493)</li>
+<li>ethos: fails to respond to first message. (#11988)</li>
+<li>ethos: Unable to choose global source address. (#13745)</li>
+<li>ethos: Unable to handle fragmented IPv6 packets from Linux kernel (#12264)</li>
+<li>examples/cord_ep: Dead lock when (re-)registering in callback
+function (#12884)</li>
+<li>examples/gnrc_border_router: esp_wifi crashes on disconnect (#14679)</li>
+<li>Forwarding a packet back to its link layer source should not be
+allowed (#5051)</li>
+<li>gcoap example request on tap I/F fails with NIB issue (#8199)</li>
+<li>gcoap: Suspected crosstalk between requests (possible NULL call) (#14390)</li>
+<li>gnrc ipv6: multicast packets are not dispatched to the upper layers (#5230)</li>
+<li>gnrc_border_router stops routing after a while (#16398)</li>
+<li>gnrc_icmpv6_echo: flood-pinging another node leads to leaks in own
+packet buffer (#12565)</li>
+<li>gnrc_ipv6: Multicast is not forwarded if routing node listens to the
+address (#4527)</li>
+<li>gnrc_netif_pktq leaks memory (#17924)</li>
+<li>gnrc_rpl: missing bounds checks in _parse_options (#16085)</li>
+<li>gnrc_rpl: nib route not updated when topology / DODAG changes (#17327)</li>
+<li>gnrc_rpl: takes unusually long time to start routing packets (#19147)</li>
+<li>gnrc_sock_udp: Possible Race condition on copy in application buffer (#10389)</li>
+<li>gnrc_tcp: gnrc_tcp_recv() never generates -ECONNABORTED (#17896)</li>
+<li>gomach: Resetting netif with cli doesn’t return (#10370)</li>
+<li>ieee802154_submac: IPv6 fragmentation broken (#16998)</li>
+<li>LoRaWan node ISR stack overflowed (#14962)</li>
+<li>lwip_sock_tcp / sock_async: received events before calling
+sock_accept() are lost due to race condition. (#16303)</li>
+<li>Missing drop implementations in netdev_driver_t::recv (#10410)</li>
+<li>Neighbor Discovery not working after router reboot when using SLAAC (#11038)</li>
+<li>netdev_ieee802154: Mismatch between radio ll address and in memory
+address (#10380)</li>
+<li>nrf52: Not able to add global or ULA address to interface (#13280)</li>
+<li>nrfmin: communication not possible after multicast ping with no
+interval (#11405)</li>
+<li>ping6 is failing when testing with cc2538dk (#13997)</li>
+<li>pkg/tinydtls: auxiliary data API does not work for async sockets (#16054)</li>
+<li>Possible memory leak in RIOT/build/pkg/ndn-riot/app.c (#15638)</li>
+<li>Riot-os freezes with lwip + enc28j60 + stm32L4 (#13088)</li>
+<li>samr30 xpro doesn’t seem to use its radio ok (#12761)</li>
+<li>scan-build errors found during 2019.07 testing (#11852)</li>
+<li>send data with UDP at 10HZ, the program die (#11860)</li>
+<li>stale border router does not get replaced (#12210)</li>
+<li>test/lwip: enabling both, IPv4 and IPv6, results in unexpected
+behavior (#18097)</li>
+<li>tests/lwip: does not compile for IPv4 on 6LoWPAN-based boards. (#17162)</li>
+<li>two nodes livelock sending neighbor solicitations back and forth
+between each other (#16670)</li>
+<li>xbee: setting PAN ID sometimes fails (#10338)</li>
+</ul>
+<h3 id="timer-related-issues-9">Timer related issues (9)</h3>
+<ul>
+<li>cpu/native: timer interrupt issue (#6442)</li>
+<li>misc issues with tests/trickle (#9052)</li>
+<li>MSP430: periph_timer clock config wrong (#8251)</li>
+<li>periph/timer: <code>timer_set()</code> underflow safety check (tracking issue) (#13072)</li>
+<li>periph_timer: systematic proportional error in timer_set (#10545)</li>
+<li>saml21 system time vs rtc (#10523)</li>
+<li>Sleep mode for Arduino (#13321)</li>
+<li>stm32_common/periph/rtc: current implementation broken/poor accuracy (#8746)</li>
+<li>sys/newlib: gettimeofday() returns time since boot, not current wall
+time. (#9187)</li>
+</ul>
+<h3 id="drivers-related-issues-16">Drivers related issues (16)</h3>
+<ul>
+<li>adc is not a ADC-Driver but a analog pin abstraction (#14424)</li>
+<li>at86rf2xx: Simultaneous use of different transceiver types is not
+supported (#4876)</li>
+<li>cpu/msp430: GPIO driver doesn’t work properly (#9419)</li>
+<li>driver/hts221: Temperature and Humidity readings incorrect (#12445)</li>
+<li>examples/dtls-wolfssl not working on pba-d-01-kw2x (#13527)</li>
+<li>fail to send data to can bus (#12371)</li>
+<li>floats and doubles being used all over the place. (#12045)</li>
+<li>mdt_erase success, but vfs_format resets board (esp32-heltec-
+lora32-v2) (#14506)</li>
+<li>periph/spi: Switching between CPOL=0,1 problems on Kinetis with
+software CS (#6567)</li>
+<li>periph: GPIO drivers are not thread safe (#4866)</li>
+<li>Potential security and safety race conditions on attached devices (#13444)</li>
+<li>PWM: Single-phase initialization creates flicker (#15121)</li>
+<li>STM32: SPI clock not returning to idle state and generating
+additional clock cycles (#11104)</li>
+<li>TCP client  cannot  send read only data (#16541)</li>
+<li>tests/periph_flashpage: unexpected behavior on nucleo-l4r5zi (#17599)</li>
+<li>Two bugs may lead to NULL dereference. (#15006)</li>
+</ul>
+<h3 id="native-related-issues-4">Native related issues (4)</h3>
+<ul>
+<li>examples/micropython: floating point exception while testing on
+native (#15870)</li>
+<li>native getchar is blocking RIOT (#16834)</li>
+<li>native not float safe (#495)</li>
+<li>native: tlsf: early malloc will lead to a crash (#5796)</li>
+</ul>
+<h3 id="other-platforms-related-issues-16">Other platforms related issues (16)</h3>
+<ul>
+<li>Failing tests on FE310 (Hifive1b) (#13086)</li>
+<li>[TRACKING] Fixes for automatic tests of ESP32 boards. (#12763)</li>
+<li>boards/hifive1: flashing issue (#13104)</li>
+<li>Cannot use LLVM with Cortex-M boards (#13390)</li>
+<li>cpu/sam0: flashpage write / read cycle produces different results
+depending on code layout in flash (#14929)</li>
+<li>cpu/stm32f1: CPU hangs after wake-up from STOP power mode (#13918)</li>
+<li>esp32-wroom-32: tests/netstats_l2 failing sometimes (#14237)</li>
+<li>examples/gnrc_border_router: esp_wifi_init failed with return value
+257 on ESP32-C3 with nimble_rpble (#19319)</li>
+<li>gcoap/esp8266: Stack overflow with gcoap example (#13606)</li>
+<li>MPU doesn’t work on cortex-m0+ (#14822)</li>
+<li>newlib-nano: Printf formatting does not work properly for some
+numeric types (#1891)</li>
+<li>periph_timer: Test coverage &#x26; broken on STM32F767ZI (#15072)</li>
+<li>riscv: ISR stack is too small for ENABLE_DEBUG in core files (#16395)</li>
+<li>stm32152re: hardfault when DBGMCU_CR_DBG* bits are set and branch
+after __WFI() (#14015)</li>
+<li>stm32f7: Large performance difference between stm32f746 and stm32f767 (#14728)</li>
+<li>sys/riotboot/flashwrite: unaligned write when skipping
+<code>RIOTBOOT_MAGIC</code> on stm32wb (#15917)</li>
+</ul>
+<h3 id="build-system-related-issues-11">Build system related issues (11)</h3>
+<ul>
+<li><code>buildtest</code> uses wrong build directory (#9742)</li>
+<li><code>make -j flash</code> fails due to missing make dependencies or <code>make flash-only</code> rebuilds the .elf (#16385)</li>
+<li>Build dependencies - processing order issues (#9913)</li>
+<li>build: info-build doesn’t work with boards without port set (#15185)</li>
+<li>BUILD_IN_DOCKER ignores USEMODULE (#14504)</li>
+<li>dist/tools/cppcheck/cppchck.sh: errors when running with Cppcheck
+1.89 (#12771)</li>
+<li>doxygen: riot.css modified by ‘make doc’ (#8122)</li>
+<li>macros: RIOT_FILE_RELATIVE printing wrong file name for headers (#4053)</li>
+<li>make: ccache leads to differing binaries (#14264)</li>
+<li>make: use of immediate value of variables before they have their
+final value (#8913)</li>
+<li>Tracking: remove harmful use of <code>export</code> in make and immediate
+evaluation (#10850)</li>
+</ul>
+<h3 id="other-issues-48">Other issues (48)</h3>
+<ul>
+<li>2023.04 release bug tracking (#19469)</li>
+<li>[TRACKING] sys/shell refactoring. (#12105)</li>
+<li>_NVIC_SystemReset stuck in infinite loop when calling pm_reboot
+through shell after flashing with J-Link (#13044)</li>
+<li><code>make term</code> no longer works with JLinkExe v6.94 (#16022)</li>
+<li>Basic test for periph/rtt introduced in #15431 is incorrect (#15940)</li>
+<li>boards/esp32-wroom-32: tests/mtd_raw flakey (#16130)</li>
+<li>Bug: openocd 0.10.0-6  Ubuntu dies while debugging with -rtos auto (#13285)</li>
+<li>Can’t build relic with benchmarks or tests (#12897)</li>
+<li>CC2538DK board docs: broken links (#12889)</li>
+<li>cpu/stm32/periph/rtc overflow error (#16574)</li>
+<li>cpu/stm32: some tests are failing on CM33 (l5, u5) (#17439)</li>
+<li>doc/LOSTANDFOUND: not rendered as expected (#17063)</li>
+<li>edbg: long lines flooded over serial become garbled (#14548)</li>
+<li>examples / tests: LoRa tests fail on platforms that don’t support
+LoRa (#14520)</li>
+<li>feather-m0: <code>make flash</code> reports “device unsupported” (#17722)</li>
+<li>flashing issue on frdm-k64f (#15903)</li>
+<li>frdm-k22f failing tests/periph_flashpage (#17057)</li>
+<li>I2C not working under RIOT with U8G2 pkg (#16381)</li>
+<li>ieee802154_security: Nonce is reused after reboot (#16844)</li>
+<li>lwip: drivers/at86rf2xx/at86rf2xx_netdev.c invalid state during TCP
+disconnect (#17209)</li>
+<li>lwip: invalid state transition on ieee802154_submac users (#17208)</li>
+<li>Making the newlib thread-safe (#4488)</li>
+<li>mcuboot: flashes but no output (#17524)</li>
+<li>nanocoap: incomplete response to /.well-known/core request (#10731)</li>
+<li>newlib-nano: Printf formatting does not work properly with <code>"PRIu8"</code> (#17083)</li>
+<li>Order of auto_init functions (#13541)</li>
+<li>pkg/tinydtls: Multiple issues (#16108)</li>
+<li>pkg_libhydrogen tests fail / update libhydrogen (#18508)</li>
+<li>Potential race condition in compile_and_test_for_board.py (#12621)</li>
+<li>RIOT is saw-toothing in energy consumption (even when idling) (#5009)</li>
+<li>riotboot/nrf52840dk: flashing slot1 with JLINK fails (#14576)</li>
+<li>riotboot: ECC faults (eg. in STM32L5 or STM32WB) not handled
+gracefully (#17874)</li>
+<li>rust-gcoap example is incompatible with littlefs2 (#17817)</li>
+<li>SPI access in LoRa-e5 and im880b? (#19025)</li>
+<li>stdio_ethos: infinite shell loop (#17972)</li>
+<li>stdio_tinyusb_cdc_acm hangs with picolibc (#19277)</li>
+<li>sys/riotboot: documentation issues (#11243)</li>
+<li>sys/stdio_uart: dropped data when received at once (#10639)</li>
+<li>tests/cpp11_*: failing on i-nucleo-lrwan1 (#14578)</li>
+<li>tests/lwip target board for python test is hardcoded to native (#6533)</li>
+<li>tests/periph_flashpage: failing on stm32l475ve (#17280)</li>
+<li>tests/pkg_libhydrogen: test fails on master for the samr21-xpro with
+LLVM (#15066)</li>
+<li>tests/pkg_libschc: Failing test_reassemble_success_ack_always (#19445)</li>
+<li>tests/test_tools: test fails while testing on samr21-xpro/iotlab-m3 (#15888)</li>
+<li>tests: broken with stdio_rtt if auto_init is disabled (#13120)</li>
+<li>tests: some tests don’t work with <code>newlib</code> lock functions. (#12732)</li>
+<li>usbus/msc: wrong error handling and behavior after usb reset (#19478)</li>
+<li>Use of multiple CAN bus on compatible boards (#14801)</li>
+</ul>
+<p>There are 156 known issues in this release</p>
+<h2 id="fixed-issues-since-the-last-release-202301">Fixed Issues since the last release (2023.01)</h2>
+<ul>
+<li>bootloader: BTN_BOOTLOADER_INVERTED doesn’t work as expected. (#19364)</li>
+<li>Race condition in SUIT around threads terminating (#19195)</li>
+<li>socket_zep: fragmentation broken if destination is multicast /
+ACK_REQ not set (#19117)</li>
+</ul>
+<p>3 fixed issues since last release (2023.01)</p>
+<h2 id="boards-tested-during-this-release">Boards tested during this release</h2>
+<ul>
+<li><code>esp32-wroom-32</code>    PASS</li>
+<li><code>nrf52840dk</code>        PASS</li>
+<li><code>nucleo-f429zi</code>     PASS</li>
+<li><code>samr21-xpro</code>       PASS</li>
+<li><code>arduino-mega2560</code>  FAIL</li>
+<li><code>b-l072z-lrwan1</code>    FAIL</li>
+<li><code>b-l475e-iot01a</code>    FAIL</li>
+<li><code>dwm1001</code>           FAIL</li>
+<li><code>frdm-kw41z</code>        FAIL</li>
+<li><code>iotlab-m3</code>         FAIL</li>
+<li><code>nrf52dk</code>           FAIL</li>
+<li><code>nucleo-l452re</code>     FAIL</li>
+<li><code>nucleo-wl55jc</code>     FAIL</li>
+<li><code>remote-revb</code>       FAIL</li>
+<li><code>saml10-xpro</code>       FAIL</li>
+<li><code>samr34-xpro</code>       FAIL</li>
+</ul>
+<p>See the release tracking issue (#19469) for more details.</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>We would like to thank all companies that provided us with hardware for porting
+and testing RIOT-OS. Further thanks go to companies and institutions that
+directly sponsored development time. And finally, big thanks to all of you
+contributing in so many different ways to make RIOT worthwhile!</p>
+<h2 id="more-information">More information</h2>
+<p><a href="http://www.riot-os.org">http://www.riot-os.org</a></p>
+<h2 id="matrix-and-forum">Matrix and Forum</h2>
+<ul>
+<li>Join the RIOT Matrix room at: #riot-os:matrix.org</li>
+<li>Join the RIOT Forum at: forum.riot-os.org</li>
+</ul>
+<h2 id="license">License</h2>
+<ul>
+<li>The code developed by the RIOT community is licensed under the GNU Lesser
+General Public License (LGPL) version 2.1 as published by the Free Software
+Foundation.</li>
+<li>Some external sources and packages are published under a separate license.</li>
+</ul>
+<p>All code files contain licensing information.</p>  </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n">   </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr">   </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>

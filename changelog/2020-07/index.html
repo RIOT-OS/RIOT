@@ -1,0 +1,1425 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-bguv2lll"> <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>RIOT-2020.07 - Release Notes | RIOT Documentation</title><link rel="canonical" href="https://guide.riot-os.org/changelog/2020-07/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="alternate" type="application/rss+xml" title="RIOT Changelog" href="/changelog/rss.xml"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v5.14.0"/><meta name="generator" content="Starlight v0.36.0"/><meta property="og:title" content="RIOT-2020.07 - Release Notes"/><meta property="og:type" content="article"/><meta property="og:url" content="https://guide.riot-os.org/changelog/2020-07/"/><meta property="og:locale" content="en"/><meta property="og:description" content="List of all changes in this release"/><meta property="og:site_name" content="RIOT Documentation"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="List of all changes in this release"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.DNXP8c50.css" media="print"><link rel="stylesheet" href="/_astro/changelog.DqGAGYsk.css">
+<style>@layer starlight.components{:root{--sl-badge-default-border: var(--sl-color-accent);--sl-badge-default-bg: var(--sl-color-accent-low);--sl-badge-default-text: #fff;--sl-badge-note-border: var(--sl-color-blue);--sl-badge-note-bg: var(--sl-color-blue-low);--sl-badge-note-text: #fff;--sl-badge-danger-border: var(--sl-color-red);--sl-badge-danger-bg: var(--sl-color-red-low);--sl-badge-danger-text: #fff;--sl-badge-success-border: var(--sl-color-green);--sl-badge-success-bg: var(--sl-color-green-low);--sl-badge-success-text: #fff;--sl-badge-caution-border: var(--sl-color-orange);--sl-badge-caution-bg: var(--sl-color-orange-low);--sl-badge-caution-text: #fff;--sl-badge-tip-border: var(--sl-color-purple);--sl-badge-tip-bg: var(--sl-color-purple-low);--sl-badge-tip-text: #fff}[data-theme=light]:root{--sl-badge-default-bg: var(--sl-color-accent-high);--sl-badge-note-bg: var(--sl-color-blue-high);--sl-badge-danger-bg: var(--sl-color-red-high);--sl-badge-success-bg: var(--sl-color-green-high);--sl-badge-caution-bg: var(--sl-color-orange-high);--sl-badge-tip-bg: var(--sl-color-purple-high)}.sl-badge:where(.astro-avdet4wd){display:inline-block;border:1px solid var(--sl-color-border-badge);border-radius:.25rem;font-family:var(--sl-font-system-mono);line-height:normal;color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere}.sidebar-content .sl-badge:where(.astro-avdet4wd){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-avdet4wd){--sl-color-bg-badge: transparent;--sl-color-border-badge: currentColor;color:inherit}.default:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-default-bg);--sl-color-border-badge: var(--sl-badge-default-border);--sl-color-text-badge: var(--sl-badge-default-text)}.note:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-note-bg);--sl-color-border-badge: var(--sl-badge-note-border);--sl-color-text-badge: var(--sl-badge-note-text)}.danger:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-danger-bg);--sl-color-border-badge: var(--sl-badge-danger-border);--sl-color-text-badge: var(--sl-badge-danger-text)}.success:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-success-bg);--sl-color-border-badge: var(--sl-badge-success-border);--sl-color-text-badge: var(--sl-badge-success-text)}.tip:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-tip-bg);--sl-color-border-badge: var(--sl-badge-tip-border);--sl-color-text-badge: var(--sl-badge-tip-text)}.caution:where(.astro-avdet4wd){--sl-color-bg-badge: var(--sl-badge-caution-bg);--sl-color-border-badge: var(--sl-badge-caution-border);--sl-color-text-badge: var(--sl-badge-caution-text)}.small:where(.astro-avdet4wd){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-avdet4wd){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-avdet4wd){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-avdet4wd){vertical-align:middle}}
+@layer starlight.components{svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}}
+@layer starlight.components{.sl-link-card:where(.astro-mf7fz2mj){display:grid;grid-template-columns:1fr auto;gap:.5rem;border:1px solid var(--sl-color-gray-5);border-radius:.5rem;padding:1rem;box-shadow:var(--sl-shadow-sm);position:relative}a:where(.astro-mf7fz2mj){text-decoration:none;line-height:var(--sl-line-height-headings)}a:where(.astro-mf7fz2mj):before{content:"";position:absolute;inset:0}.stack:where(.astro-mf7fz2mj){flex-direction:column;gap:.5rem}.title:where(.astro-mf7fz2mj){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-mf7fz2mj){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-mf7fz2mj){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-mf7fz2mj):hover{background:var(--sl-color-gray-7, var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-mf7fz2mj):hover .icon:where(.astro-mf7fz2mj){color:var(--sl-color-white)}}
+@layer starlight.components{.sl-steps{--bullet-size: calc(var(--sl-line-height) * 1rem);--bullet-margin: .375rem;list-style:none;counter-reset:steps-counter var(--sl-steps-start, 0);padding-inline-start:0}.sl-steps>li{counter-increment:steps-counter;position:relative;padding-inline-start:calc(var(--bullet-size) + 1rem);padding-bottom:1px;min-height:calc(var(--bullet-size) + var(--bullet-margin))}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);position:absolute;top:0;inset-inline-start:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);font-weight:600;text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);border-radius:99rem;box-shadow:inset 0 0 0 1px var(--sl-color-gray-5)}.sl-steps>li:after{--guide-width: 1px;content:"";position:absolute;top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2);width:var(--guide-width);background-color:var(--sl-color-hairline-light)}}@layer starlight.content{.sl-steps>li>:first-child{--lh: calc(1em * var(--sl-line-height));--shift-y: calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh: calc(1em * var(--sl-line-height-headings))}@supports (--prop: 1lh){.sl-steps>li>:first-child{--lh: 1lh}}}
+@layer starlight.components{.sl-link-button:where(.astro-xwgiixxa){align-items:center;border:1px solid transparent;border-radius:999rem;display:inline-flex;font-size:var(--sl-text-sm);gap:.5em;line-height:1.1875;outline-offset:.25rem;padding:.4375rem 1.125rem;text-decoration:none}.sl-link-button:where(.astro-xwgiixxa).primary{background:var(--sl-color-text-accent);border-color:var(--sl-color-text-accent);color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).primary:hover{color:var(--sl-color-black)}.sl-link-button:where(.astro-xwgiixxa).secondary{border-color:inherit;color:var(--sl-color-white)}.sl-link-button:where(.astro-xwgiixxa).minimal{color:var(--sl-color-white);padding-inline:0}.sl-link-button:where(.astro-xwgiixxa) svg{flex-shrink:0}@media (min-width: 50rem){.sl-link-button:where(.astro-xwgiixxa){font-size:var(--sl-text-base);padding:.9375rem 1.25rem}}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa){margin-inline-end:1rem}.sl-markdown-content .sl-link-button:where(.astro-xwgiixxa):not(:where(p *)){margin-block:1rem}}
+</style><script type="module" src="/_astro/page.7qqag-5g.js"></script></head> <body class="astro-bguv2lll"> <a href="#_top" class="astro-7q3lir66">Skip to content</a>  <div class="page sl-flex astro-vrdttmbt"> <header class="header astro-vrdttmbt"><div class="header astro-kmkmnagf"> <div class="title-wrapper sl-flex astro-kmkmnagf"> <a href="/" class="site-title sl-flex astro-m46x6ez3">  <img class="astro-m46x6ez3" alt src="/_astro/riot-logo.DB44Jy2T.svg" width="101" height="55">  <span class="sr-only astro-m46x6ez3" translate="no"> RIOT Documentation </span> </a>  </div> <div class="sl-flex print:hidden astro-kmkmnagf"> <site-search class="astro-kmkmnagf astro-v37mnknz" data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}"> <button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-v37mnknz"> <svg aria-hidden="true" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg> <span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span> <kbd class="sl-hidden md:sl-flex astro-v37mnknz" style="display: none;"> <kbd class="astro-v37mnknz">Ctrl</kbd><kbd class="astro-v37mnknz">K</kbd> </kbd> </button> <dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"> <div class="dialog-frame sl-flex astro-v37mnknz">  <button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz"> Cancel </button> <div class="search-container astro-v37mnknz"> <div id="starlight__search" class="astro-v37mnknz"></div> </div> </div> </dialog> </site-search>  <script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script> <script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.DMZ5WJ-J.js"></script>   </div> <div class="sl-hidden md:sl-flex print:hidden right-group astro-kmkmnagf"> <div class="sl-flex social-icons astro-kmkmnagf"> <a href="https://github.com/riot-os/riot" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://floss.social/@RIOT_OS" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Mastodon</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M16.45 17.77c2.77-.33 5.18-2.03 5.49-3.58.47-2.45.44-5.97.44-5.97 0-4.77-3.15-6.17-3.15-6.17-1.58-.72-4.3-1.03-7.13-1.05h-.07c-2.83.02-5.55.33-7.13 1.05 0 0-3.14 1.4-3.14 6.17v.91c-.01.88-.02 1.86 0 2.88.12 4.67.87 9.27 5.2 10.4 2 .53 3.72.64 5.1.57 2.51-.14 3.92-.9 3.92-.9l-.08-1.8s-1.8.56-3.8.5c-2-.08-4.1-.22-4.43-2.66a4.97 4.97 0 0 1-.04-.68s1.96.48 4.44.59c1.51.07 2.94-.09 4.38-.26Zm2.22-3.4h-2.3v-5.6c0-1.19-.5-1.79-1.5-1.79-1.1 0-1.66.71-1.66 2.12v3.07h-2.3V9.1c0-1.4-.55-2.12-1.65-2.12-1 0-1.5.6-1.5 1.78v5.61h-2.3V8.6c0-1.18.3-2.12.9-2.81a3.17 3.17 0 0 1 2.47-1.05c1.18 0 2.07.45 2.66 1.35l.57.96.58-.96a2.97 2.97 0 0 1 2.66-1.35c1.01 0 1.83.36 2.46 1.05.6.7.9 1.63.9 2.81v5.78Z"/></svg></a><a href="https://bsky.app/profile/riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Bluesky</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 10.8c-1-2.1-4-6-6.8-8C2.6 1 1.6 1.3.9 1.6.1 1.9 0 3 0 3.8c0 .7.4 5.6.6 6.4C1.4 13 4.3 14 7 13.6h.4H7c-4 .6-7.4 2-2.8 7 5 5.3 6.8-1 7.8-4.2 1 3.2 2 9.3 7.7 4.3 4.3-4.3 1.2-6.5-2.7-7a9 9 0 0 1-.4-.1h.4c2.7.3 5.6-.6 6.4-3.4.2-.8.6-5.7.6-6.4 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.7-4.3 1.2-2.8 2-5.7 5.9-6.8 8"/></svg></a><a href="https://www.youtube.com/c/RIOT-IoT" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">YouTube</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M23.5 6.2A3 3 0 0 0 21.4 4c-1.9-.5-9.4-.5-9.4-.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.3C0 8 0 12 0 12s0 4 .5 5.8A3 3 0 0 0 2.6 20c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2c.5-2 .5-5.9.5-5.9s0-4-.5-5.8zm-14 9.4V8.4l6.3 3.6-6.3 3.6z"/></svg></a><a href="https://forum.riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Forum</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12.102 0h-.081C5.462 0 .13 5.252.001 11.779v.012L.007 24l12.097-.01c6.582-.055 11.897-5.404 11.897-11.995S18.686.056 12.109 0h-.005zM12 18.857h-.015a6.778 6.778 0 0 1-2.94-.666l.041.018-4.345 1.077 1.227-4.018a6.78 6.78 0 0 1-.83-3.27A6.86 6.86 0 1 1 12 18.857z"/></svg></a><a href="https://matrix.to/#/#riot-os:matrix.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Matrix</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M22.5 1.5v21h-2.25V24H24V0h-3.75v1.5h2.25ZM7.46 7.95V9.1h.04a3.02 3.02 0 0 1 2.61-1.39c.54 0 1.03.1 1.48.32.44.2.78.58 1.01 1.1.26-.37.6-.7 1.03-.99.44-.28.95-.43 1.55-.43.45 0 .87.06 1.26.17.38.11.71.29.99.53.27.24.49.56.64.95.15.4.23.86.23 1.42v5.72h-2.34v-4.85c0-.29-.01-.56-.04-.8a1.73 1.73 0 0 0-.18-.67 1.1 1.1 0 0 0-.44-.45 1.6 1.6 0 0 0-.78-.16c-.33 0-.6.06-.8.19-.2.12-.37.29-.48.5a2 2 0 0 0-.23.69c-.04.26-.06.52-.06.78v4.77H10.6v-4.8l-.01-.75a2.29 2.29 0 0 0-.14-.69c-.08-.2-.23-.38-.42-.5a1.5 1.5 0 0 0-.85-.2c-.15.01-.3.04-.44.08-.19.06-.37.15-.52.28-.18.14-.32.34-.44.6-.12.26-.18.6-.18 1.02v4.96H5.25V7.94h2.21ZM1.5 1.5v21h2.25V24H0V0h3.75v1.5H1.5Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script> <script type="module">const r="starlight-theme",o=e=>e==="auto"||e==="dark"||e==="light"?e:"auto",c=()=>o(typeof localStorage<"u"&&localStorage.getItem(r));function n(e){typeof localStorage<"u"&&localStorage.setItem(r,e==="light"||e==="dark"?e:"")}const l=()=>matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";function t(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e==="auto"?l():e,n(e)}matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{c()==="auto"&&t("auto")});class s extends HTMLElement{constructor(){super(),t(c()),this.querySelector("select")?.addEventListener("change",a=>{a.currentTarget instanceof HTMLSelectElement&&t(o(a.currentTarget.value))})}}customElements.define("starlight-theme-select",s);</script> <script type="module">class s extends HTMLElement{constructor(){super();const e=this.querySelector("select");e&&(e.addEventListener("change",t=>{t.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=t.currentTarget.value)}),window.addEventListener("pageshow",t=>{if(!t.persisted)return;const n=e.querySelector("option[selected]")?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}}customElements.define("starlight-lang-select",s);</script> </div> </div> </header> <nav class="sidebar print:hidden astro-vrdttmbt" aria-label="Main"> <starlight-menu-button class="print:hidden astro-jif73yzw"> <button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"> <svg aria-hidden="true" class="open-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg> <svg aria-hidden="true" class="close-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg> </button> </starlight-menu-button> <script type="module">class s extends HTMLElement{constructor(){super(),this.btn=this.querySelector("button"),this.btn.addEventListener("click",()=>this.toggleExpanded());const t=this.closest("nav");t&&t.addEventListener("keyup",e=>this.closeOnEscape(e))}setExpanded(t){this.setAttribute("aria-expanded",String(t)),document.body.toggleAttribute("data-mobile-menu-expanded",t)}toggleExpanded(){this.setExpanded(this.getAttribute("aria-expanded")!=="true")}closeOnEscape(t){t.code==="Escape"&&(this.setExpanded(!1),this.btn.focus())}}customElements.define("starlight-menu-button",s);</script>   <div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"> <div class="sidebar-content sl-flex astro-vrdttmbt"> <sl-sidebar-state-persist data-hash="1ofdkcf" class="astro-kku4brbg"> <script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script>  <ul class="top-level astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">External Documentation</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="0"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="https://doc.riot-os.org" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">API Documentation</span> <span class="sl-badge tip small  astro-3ii7xxms astro-avdet4wd">Doxygen</span> </a> </li><li class="astro-3ii7xxms"> <a href="https://doc.riot-os.org/rustdoc/latest/riot_doc_helpers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Rust Documentation</span> <span class="sl-badge tip small  astro-3ii7xxms astro-avdet4wd">Rustdoc</span> </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Code of Conduct</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="1"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/general/code_of_conduct/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Code of Conduct</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/code_of_conduct/faq/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">FAQ</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/code_of_conduct/reporting/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Reporting Guidelines</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">RIOT in a Nutshell</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="2"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/structure/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Structure</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/vision/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Vision</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/general/governance/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Governance</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Tutorials</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="3"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Getting Started</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="4"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/getting-started/install-wsl/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Installing WSL (Windows-only)</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/installing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Setup Development Environment</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/flashing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Flashing a RIOT Application</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/building_example/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Building an Example</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/getting-started/finding_modules/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Finding and Using Modules</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">C Basics</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="5"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/c_tutorials/create_project/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating a Project</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/timers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Timers and Callbacks</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/shell/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Shell Commands</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/threads/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Threads</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/gpio/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">GPIO &amp; Real Boards</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/saul/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Sensors/Actuators using SAUL</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/c_tutorials/coding_conventions/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Coding Conventions</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">C++ Basics</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="6"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/cpp_tutorials/using_cpp/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Using C++ in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/cpp_tutorials/coding_conventions/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Coding Conventions C++</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Rust Basics</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="7"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/rust_tutorials/rust_in_riot/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Rust in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/rust_tutorials/create_project/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating a Project</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Advanced</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="8"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/advanced_tutorials/creating_application/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating an Application</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/advanced_tutorials/creating_modules/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating Modules</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/advanced_tutorials/device_drivers/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Writing a Device Driver in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/advanced_tutorials/porting_boards/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Porting Boards</span>  </a> </li> </ul>  </details> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Build System</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="9"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/build-system/build_system/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">The Build System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/build_system_basics/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Build System Basics</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/kconfig/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Kconfig in RIOT</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/flashing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Flashing via RIOT&#39;s Build System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/build-in-docker/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Build in Docker</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/advanced_build_system_tricks/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Advanced Build System Tricks</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/build-system/debugging_aids/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Debugging Tools</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Miscellaneous</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="10"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/misc/dev_best_practices/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Hints for quicker &amp; better RIOT development</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/io_mapping_and_shields/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">IO-Mapping and Shields</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/roadmap/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Roadmap</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/lost_and_found/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Removed Features and Modules</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/release_cycle/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Release Cycle</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/managing-a-release/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Managing a Release</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/emulators/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Emulators</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/terminal_config/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Terminal Programs Configuration</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/misc/how_to_doc/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Creating Guides &amp; How Starlight Works</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <a href="/changelog" aria-current="false" class="large astro-3ii7xxms"> <span class="astro-3ii7xxms">Changelog</span>  </a> </li> </ul>   <script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script> </sl-sidebar-state-persist>  <div class="md:sl-hidden"> <div class="mobile-preferences sl-flex astro-wu23bvmt"> <div class="social-icons astro-wu23bvmt"> <a href="https://github.com/riot-os/riot" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://floss.social/@RIOT_OS" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Mastodon</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M16.45 17.77c2.77-.33 5.18-2.03 5.49-3.58.47-2.45.44-5.97.44-5.97 0-4.77-3.15-6.17-3.15-6.17-1.58-.72-4.3-1.03-7.13-1.05h-.07c-2.83.02-5.55.33-7.13 1.05 0 0-3.14 1.4-3.14 6.17v.91c-.01.88-.02 1.86 0 2.88.12 4.67.87 9.27 5.2 10.4 2 .53 3.72.64 5.1.57 2.51-.14 3.92-.9 3.92-.9l-.08-1.8s-1.8.56-3.8.5c-2-.08-4.1-.22-4.43-2.66a4.97 4.97 0 0 1-.04-.68s1.96.48 4.44.59c1.51.07 2.94-.09 4.38-.26Zm2.22-3.4h-2.3v-5.6c0-1.19-.5-1.79-1.5-1.79-1.1 0-1.66.71-1.66 2.12v3.07h-2.3V9.1c0-1.4-.55-2.12-1.65-2.12-1 0-1.5.6-1.5 1.78v5.61h-2.3V8.6c0-1.18.3-2.12.9-2.81a3.17 3.17 0 0 1 2.47-1.05c1.18 0 2.07.45 2.66 1.35l.57.96.58-.96a2.97 2.97 0 0 1 2.66-1.35c1.01 0 1.83.36 2.46 1.05.6.7.9 1.63.9 2.81v5.78Z"/></svg></a><a href="https://bsky.app/profile/riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Bluesky</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 10.8c-1-2.1-4-6-6.8-8C2.6 1 1.6 1.3.9 1.6.1 1.9 0 3 0 3.8c0 .7.4 5.6.6 6.4C1.4 13 4.3 14 7 13.6h.4H7c-4 .6-7.4 2-2.8 7 5 5.3 6.8-1 7.8-4.2 1 3.2 2 9.3 7.7 4.3 4.3-4.3 1.2-6.5-2.7-7a9 9 0 0 1-.4-.1h.4c2.7.3 5.6-.6 6.4-3.4.2-.8.6-5.7.6-6.4 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.7-4.3 1.2-2.8 2-5.7 5.9-6.8 8"/></svg></a><a href="https://www.youtube.com/c/RIOT-IoT" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">YouTube</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M23.5 6.2A3 3 0 0 0 21.4 4c-1.9-.5-9.4-.5-9.4-.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.3C0 8 0 12 0 12s0 4 .5 5.8A3 3 0 0 0 2.6 20c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2c.5-2 .5-5.9.5-5.9s0-4-.5-5.8zm-14 9.4V8.4l6.3 3.6-6.3 3.6z"/></svg></a><a href="https://forum.riot-os.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Forum</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12.102 0h-.081C5.462 0 .13 5.252.001 11.779v.012L.007 24l12.097-.01c6.582-.055 11.897-5.404 11.897-11.995S18.686.056 12.109 0h-.005zM12 18.857h-.015a6.778 6.778 0 0 1-2.94-.666l.041.018-4.345 1.077 1.227-4.018a6.78 6.78 0 0 1-.83-3.27A6.86 6.86 0 1 1 12 18.857z"/></svg></a><a href="https://matrix.to/#/#riot-os:matrix.org" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Matrix</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M22.5 1.5v21h-2.25V24H24V0h-3.75v1.5h2.25ZM7.46 7.95V9.1h.04a3.02 3.02 0 0 1 2.61-1.39c.54 0 1.03.1 1.48.32.44.2.78.58 1.01 1.1.26-.37.6-.7 1.03-.99.44-.28.95-.43 1.55-.43.45 0 .87.06 1.26.17.38.11.71.29.99.53.27.24.49.56.64.95.15.4.23.86.23 1.42v5.72h-2.34v-4.85c0-.29-.01-.56-.04-.8a1.73 1.73 0 0 0-.18-.67 1.1 1.1 0 0 0-.44-.45 1.6 1.6 0 0 0-.78-.16c-.33 0-.6.06-.8.19-.2.12-.37.29-.48.5a2 2 0 0 0-.23.69c-.04.26-.06.52-.06.78v4.77H10.6v-4.8l-.01-.75a2.29 2.29 0 0 0-.14-.69c-.08-.2-.23-.38-.42-.5a1.5 1.5 0 0 0-.85-.2c-.15.01-.3.04-.44.08-.19.06-.37.15-.52.28-.18.14-.32.34-.44.6-.12.26-.18.6-.18 1.02v4.96H5.25V7.94h2.21ZM1.5 1.5v21h2.25V24H0V0h3.75v1.5H1.5Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script>   </div>  </div> </div> </div> </nav> <div class="main-frame astro-vrdttmbt">  <script type="module">const a=document.getElementById("starlight__sidebar"),n=a?.querySelector("sl-sidebar-state-persist"),o="sl-sidebar-state",i=()=>{let t=[];const e=n?.dataset.hash||"";try{const s=sessionStorage.getItem(o),r=JSON.parse(s||"{}");Array.isArray(r.open)&&r.hash===e&&(t=r.open)}catch{}return{hash:e,open:t,scroll:a?.scrollTop||0}},c=t=>{try{sessionStorage.setItem(o,JSON.stringify(t))}catch{}},d=()=>c(i()),l=(t,e)=>{const s=i();s.open[e]=t,c(s)};n?.addEventListener("click",t=>{if(!(t.target instanceof Element))return;const e=t.target.closest("summary")?.closest("details");if(!e)return;const s=e.querySelector("sl-sidebar-restore"),r=parseInt(s?.dataset.index||"");isNaN(r)||l(!e.open,r)});addEventListener("visibilitychange",()=>{document.visibilityState==="hidden"&&d()});addEventListener("pageHide",d);</script> <div class="lg:sl-flex astro-67yu43on"> <aside class="right-sidebar-container print:hidden astro-67yu43on"> <div class="right-sidebar astro-67yu43on"> <div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><span class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#about-this-release" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">About this release:</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#notations-used-below" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Notations used below:</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#new-features-and-changes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">New features and changes</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#core" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Core</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#system-libraries" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">System libraries</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#networking" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Networking</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#packages" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Packages</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#boards" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Boards</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#cpu" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">CPU</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#device-drivers" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Device Drivers</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system--tooling" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build System / Tooling</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#testing" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Testing</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#kconfig-migration" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Kconfig migration</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#api-changes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">API Changes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#deprecations" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Deprecations</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#warnings" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Warnings</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#removals" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Removals</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#known-issues" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Known issues</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#networking-related-issues-44" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Networking related issues (44)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#timer-related-issues-17" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Timer related issues (17)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#drivers-related-issues-13" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Drivers related issues (13)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#native-related-issues-3" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Native related issues (3)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-platforms-related-issues-19" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other platforms related issues (19)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system-related-issues-13" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build system related issues (13)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-issues-41" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other issues (41)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#fixed-issues-since-the-last-release-202004" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Fixed Issues since the last release (2020.04)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#acknowledgements" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Acknowledgements</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#more-information" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">More information</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#mailing-lists" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Mailing lists</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#irc" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">IRC</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#license" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">License</span> </a>  </li> </ul> </div></details></nav></mobile-starlight-toc><script type="module" src="/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C181hMzK.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Overview</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#about-this-release" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">About this release:</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#notations-used-below" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Notations used below:</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#new-features-and-changes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">New features and changes</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#core" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Core</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#system-libraries" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">System libraries</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#networking" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Networking</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#packages" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Packages</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#boards" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Boards</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#cpu" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">CPU</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#device-drivers" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Device Drivers</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system--tooling" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build System / Tooling</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#testing" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Testing</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#kconfig-migration" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Kconfig migration</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#api-changes" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">API Changes</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#deprecations" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Deprecations</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#warnings" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Warnings</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#removals" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Removals</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#known-issues" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Known issues</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#networking-related-issues-44" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Networking related issues (44)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#timer-related-issues-17" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Timer related issues (17)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#drivers-related-issues-13" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Drivers related issues (13)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#native-related-issues-3" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Native related issues (3)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-platforms-related-issues-19" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other platforms related issues (19)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#build-system-related-issues-13" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Build system related issues (13)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#other-issues-41" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Other issues (41)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#fixed-issues-since-the-last-release-202004" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Fixed Issues since the last release (2020.04)</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#acknowledgements" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Acknowledgements</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#more-information" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">More information</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#mailing-lists" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Mailing lists</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#irc" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">IRC</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#license" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">License</span> </a>  </li> </ul> </nav></starlight-toc><script type="module" src="/_astro/TableOfContents.astro_astro_type_script_index_0_lang.CKWWgpjV.js"></script></div></div> </div> </aside> <div class="main-pane astro-67yu43on">  <main class="astro-bguv2lll" lang="en" dir="ltr">    <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <h1 id="_top" class="astro-j6tvhyss">RIOT-2020.07 - Release Notes</h1>  </div> </div>  <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="sl-markdown-content"> <p>RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.</p>
+<p>RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).</p>
+<p>RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.</p>
+<h2 id="about-this-release">About this release:</h2>
+<p>The 2020.07 release puts a focus on the improvement of automated testing. In
+that vein, various new CI integrations such as CircleCI for documentation
+building and online presentation, and Github Actions to check the tooling of
+RIOT when merged. The <code>riotctrl_shell</code> python module allows to abstract shell
+commands as python methods for testing using the newly created <code>riotctrl</code>
+python package <a href="https://pypi.org/project/riotctrl/">1</a>. Kconfig migration reached phase 2 with various board
+features being exposed to Kconfig. New network protocols were ported for RIOT
+such as MQTT (in form of the <code>paho-mqtt</code> package) and the lookup client
+component for CoRE RD <code>cord_lc</code>. The OpenWSN network stack with 6TiSCH support
+was reintegrated into RIOT. Support for several new boards and new sensors was
+added. Additionally, this release contains a number of bug fixes and test
+improvements.</p>
+<p>546 pull requests, composed of 10452 commits, have been merged since the
+last release, and 84 issues have been solved. 64 people contributed with
+code in 106 days. 2371 files have been touched with 822149 (+) insertions and
+700313 deletions (-).</p>
+<h2 id="notations-used-below">Notations used below:</h2>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">+ means new feature/item</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">* means modified feature/item</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">- means removed feature/item</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="+ means new feature/item* means modified feature/item- means removed feature/item"><div></div></button></div></figure></div>
+<h2 id="new-features-and-changes">New features and changes</h2>
+<h3 id="core">Core</h3>
+<ul>
+<li>core: make idle thread optional</li>
+</ul>
+<ul>
+<li>macros/units: add unit conversion helper macros</li>
+<li>msg: add message bus</li>
+</ul>
+<ul>
+<li>panic: launch USB bootloader on crash for easy recovery</li>
+</ul>
+<h3 id="system-libraries">System libraries</h3>
+<ul>
+<li>auto_init: automatically determine auto_init_*.c</li>
+<li>base64: Clean up / improve implementation</li>
+</ul>
+<ul>
+<li>hashes: add sha224 and reuse sha256 code</li>
+<li>luid: provide luid_get_lb()</li>
+<li>phydat: added phydat to JSON converter</li>
+<li>posix: initial import of select() function (only support sockets for now)</li>
+</ul>
+<ul>
+<li>ps: show free stack space in addition to used and total</li>
+<li>shell:
+<ul>
+<li>add optional hooks for shell commands</li>
+</ul>
+<ul>
+<li>native: stop RIOT when the shell reads EOF</li>
+<li>refactor readline function</li>
+<li>refactor tokenizer code</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>shell_commands:
+<ul>
+<li>alias ping=ping6</li>
+</ul>
+<ul>
+<li>provide command to reboot to bootloader</li>
+</ul>
+</li>
+<li>stdio_semihosting: Initial include of Semihosting-based STDIO</li>
+<li>touch_dev: add generic API for touch device</li>
+<li>trace: add trace module</li>
+<li>pm: Add pm_get_blocker()</li>
+</ul>
+<ul>
+<li>random:
+<ul>
+<li>add option to use HWRNG as source of randomness</li>
+</ul>
+<ul>
+<li>optimize sha1prng</li>
+</ul>
+</li>
+<li>usb:
+<ul>
+<li>allow for boards to define default custom VID/PID</li>
+<li>warn on test-ID usage in a unified location</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>xtimer: xtimer_rmutex_lock_timeout</li>
+</ul>
+<ul>
+<li>ztimer:
+<ul>
+<li>add power management for ztimer clocks</li>
+</ul>
+<ul>
+<li>expose ZTIMER_MSEC/USEC_BASE</li>
+</ul>
+</li>
+</ul>
+<h3 id="networking">Networking</h3>
+<ul>
+<li>cord: add CoRE RD lookup client implementation</li>
+<li>gcoap: add CoAP ping request</li>
+</ul>
+<ul>
+<li>gnrc:
+<ul>
+<li>gnrc_ipv6_ext_opt: initial import of hop-by-hop and destination option
+handling</li>
+</ul>
+<ul>
+<li>gnrc_netif:
+<ul>
+<li>add IPv6 event bus</li>
+<li>add option for non-std 6lo MTU</li>
+<li>add support for internal event loop</li>
+</ul>
+<ul>
+<li>use gnrc_netif-submodules to pull in upper-layer struct members</li>
+</ul>
+</li>
+<li>gnrc_nettype: indirect NETTYPE definition via pseudo-modules</li>
+<li>gnrc_pktdump: fix dependencies</li>
+<li>gnrc_tcp:
+<ul>
+<li>add retransmission timer</li>
+</ul>
+<ul>
+<li>rewrite API internal messaging</li>
+<li>rewrite recv buffer allocation/returning</li>
+</ul>
+</li>
+<li>use exponent to configure message queue sizes</li>
+</ul>
+</li>
+<li>nanocoap: allow coap_opt_add_string() for non-zero-terminated strings</li>
+</ul>
+<ul>
+<li>netif: add functions to get and get by identifier</li>
+<li>sock_dtls: provide getter function for UDP sock</li>
+</ul>
+<ul>
+<li>sock_util: add interface descriptor parsing to str2ep</li>
+</ul>
+<h3 id="packages">Packages</h3>
+<ul>
+<li>pkg: rework checkout process
+<ul>
+<li>avoid copying Makefiles in package source when possible</li>
+<li>store packages sources in a global package directory</li>
+</ul>
+</li>
+<li>pkg: cleanup build system integration for
+<ul>
+<li>cryptoauthlib, openthread, semtech-loramac, tinydtls, wakaama, u8g2,
+ucglib, wolfssl</li>
+</ul>
+</li>
+<li>pkg: tools: ensure cmake based packages/tools are built out-of-source</li>
+</ul>
+<ul>
+<li>cryptoauthlib: wake pulse implementation for CPUs supporting
+<code>periph_i2c_reconfigure</code></li>
+<li>emlearn: add support to RIOT</li>
+</ul>
+<ul>
+<li>gecko_sdk: update to v2.7.6</li>
+<li>lwip:
+<ul>
+<li>add IPv4 support for <code>netdev_tap</code></li>
+<li>add support for nrf802154</li>
+<li>enable IPv4/IPv6 dual stack mode</li>
+</ul>
+<ul>
+<li>lwip_sock: provide implementation for <code>sock_*_recv_buf()</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>lua: remove unnecessary patch</li>
+</ul>
+<ul>
+<li>paho-mqtt: add package and example</li>
+</ul>
+<ul>
+<li>nimble:
+<ul>
+<li>add static connection manager <code>statconn</code></li>
+</ul>
+<ul>
+<li>netif:
+<ul>
+<li>set host thread prio to 1</li>
+<li>simplify mbuf pool initialization</li>
+</ul>
+</li>
+<li>update NimBLE ver (cd7d7aa286) + timing param cleanup</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>openwsn: re-integrate the network stack as a package</li>
+</ul>
+<ul>
+<li>tinydtls:
+<ul>
+<li>add <code>sock_async</code> support for <code>sock_dtls</code></li>
+<li>use latest development version (eda63f000c)</li>
+</ul>
+</li>
+<li>ucglib: refactoring and fixes</li>
+</ul>
+<h3 id="boards">Boards</h3>
+<ul>
+<li>cc1352p-launchpad: add support</li>
+</ul>
+<ul>
+<li>common/blxxxpill:
+<ul>
+<li>provide periph_rtt</li>
+</ul>
+<ul>
+<li>improve adc</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>dwm1001: add support to Decawave DWM1001 dev board</li>
+<li>mcb2388: misc enhancements</li>
+<li>nrf52840-dongle: add support</li>
+<li>nrf52840dk: Add MTD configuration</li>
+<li>nucleo-g474re: add support</li>
+</ul>
+<ul>
+<li>pic32-clicker: rename to 6lowpan-clicker</li>
+</ul>
+<ul>
+<li>samr30-xpro: add SPI dev for ext pin header</li>
+<li>samr3x-xpro: add riotboot feature</li>
+<li>serpente: add support</li>
+<li>sltb001a: enable CCS811 sensor</li>
+<li>sodaq-sff: add support for SODAQ SFF</li>
+<li>stm32f429i-disco: add support</li>
+<li>weact-f411ce: add support</li>
+<li>wemos-zero: add support</li>
+</ul>
+<h3 id="cpu">CPU</h3>
+<ul>
+<li>arm7_common: Update to inlineable IRQ API</li>
+<li>atmega_common: Update to inlineable IRQ API</li>
+<li>cortexm:
+<ul>
+<li>allow to define reserved fields in CortexM vector table</li>
+</ul>
+<ul>
+<li>“free” SVC</li>
+</ul>
+</li>
+<li>cc26x2_cc13x2:
+<ul>
+<li>add oscillator switching functions</li>
+<li>add periph_i2c implementation</li>
+<li>trim device registers on <code>cpu_init</code></li>
+</ul>
+</li>
+<li>esp32:
+<ul>
+<li>support of multiple heaps for newlib malloc</li>
+<li>replace RTC implementation by RTT implementation</li>
+</ul>
+</li>
+<li>fe310: migrate to inlined IRQ API</li>
+</ul>
+<ul>
+<li>kinetis: implement power modes for pm_layered</li>
+</ul>
+<ul>
+<li>lpc2387:
+<ul>
+<li>pm: enable SLEEP &#x26; POWERDOWN mode</li>
+<li>timer: use lpc2387_pclk_scale()</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>mips_pic32_common: Implement GPIO IRQ</li>
+<li>native:
+<ul>
+<li>add periph_eeprom driver implementation</li>
+</ul>
+<ul>
+<li>rename trace -> backtrace</li>
+</ul>
+</li>
+<li>nrf52:
+<ul>
+<li>add black magic probe config</li>
+<li>add missing vendor files</li>
+<li>implement EasyDMA-based SPI peripheral implementation</li>
+</ul>
+</li>
+<li>nrf52811: initial support</li>
+</ul>
+<ul>
+<li>nrf5x_common:
+<ul>
+<li>add configurable RTT_FREQUENCY</li>
+<li>enable bias correction in hwrng</li>
+</ul>
+</li>
+<li>sam0_common:
+<ul>
+<li>add DMA peripheral driver</li>
+<li>add PWM support for saml21, samd5x</li>
+<li>implement periph/dac</li>
+</ul>
+<ul>
+<li>make SPI peripheral DMA compatible</li>
+<li>move PWM to common code</li>
+<li>spi: move clk pin muxing into spi_acquire / spi_release</li>
+</ul>
+<ul>
+<li>UART: implement inverted RX &#x26; TX</li>
+</ul>
+</li>
+<li>samd21: PWM don’t hard-code number of channels to 3</li>
+<li>samd5x: allow to use XOSC as clock source</li>
+<li>saml1x: pm: set deep flag</li>
+</ul>
+<ul>
+<li>stm32:
+<ul>
+<li>add QDEC support for CPU_FAM_STM32F1</li>
+<li>add non-blocking UART</li>
+</ul>
+<ul>
+<li>decrease latency in SPI DMA path</li>
+</ul>
+<ul>
+<li>implement reset to bootloader</li>
+</ul>
+<ul>
+<li>filter availability of RNG by CPU not by board</li>
+<li>stm32_common: make RTT_FREQUENCY configurable</li>
+</ul>
+<ul>
+<li>stm32f4: Add DMA config for SPI</li>
+<li>stm32g4: add support</li>
+</ul>
+</li>
+</ul>
+<h3 id="device-drivers">Device Drivers</h3>
+<ul>
+<li>atwinc15x0: add WiFi netdev driver</li>
+<li>at: Add at_urc_isr module to process URCs upon arrival</li>
+<li>at24cxxx: MTD wrapper for at24cxxx</li>
+<li>at86rf215:
+<ul>
+<li>implement MR-O-QPSK</li>
+<li>implement MR-OFDM</li>
+</ul>
+</li>
+<li>at86rf2xx: add support for high data rates</li>
+<li>dfplayer: New driver for the DFPlayer Mini MP3 player</li>
+</ul>
+<ul>
+<li>ethos: use luid_get_eui48()</li>
+</ul>
+<ul>
+<li>edbg_eui: add driver to get MAC address from Atmel EDBG</li>
+<li>mhz19: initial support</li>
+<li>mrf24j40: add Turbo Mode</li>
+<li>mtd_spi_eeprom: add MTD wrapper for AT25XXX EEPROMs</li>
+<li>pca9633: add new driver</li>
+<li>periph/timer: add timer_set_periodic()</li>
+<li>periph/i2c: add periph_i2c_reconfigure feature &#x26; implementation for sam0</li>
+<li>periph/rtt: introduce RTT_MIN_OFFSET</li>
+<li>periph/spi: add periph_spi_reconfigure feature &#x26; implementation for sam0</li>
+</ul>
+<ul>
+<li>pulse_counter: Use C11 atomics &#x26; bugfix</li>
+</ul>
+<ul>
+<li>sdp3x : Add driver for sdp3x sensor</li>
+</ul>
+<h3 id="build-system--tooling">Build System / Tooling</h3>
+<ul>
+<li>make:
+<ul>
+<li>add code generator targets</li>
+<li>add JLink support for stm32</li>
+</ul>
+<ul>
+<li>docker.inc.mk: add and use generic docker_run_make</li>
+</ul>
+<ul>
+<li>allow multiple external board dirs</li>
+<li>info-global.inc.mk: add info-boards-features-blacklisted</li>
+</ul>
+<ul>
+<li>resolve dependencies before Makefile.include</li>
+</ul>
+</li>
+<li>riotctrl_shell:
+<ul>
+<li>initial import of shell interaction spawn</li>
+<li>provide ipv6_nib interactions and parsers</li>
+<li>provide netif interactions and parsers</li>
+</ul>
+</li>
+<li>tools:
+<ul>
+<li>add script to run radvd on a tun interface</li>
+<li>provide tool to parse <code>pktbuf</code> output</li>
+</ul>
+<ul>
+<li>kconfiglib:
+<ul>
+<li>add riot_kconfig to override default behaviours</li>
+<li>kconfiglib: bump to v14.1.0</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="testing">Testing</h3>
+<ul>
+<li>fuzzing framework:
+<ul>
+<li>add AFL-based fuzzing setup for network modules</li>
+<li>add fuzzing application for gcoap</li>
+</ul>
+</li>
+<li>ci: setup github actions</li>
+<li>sys/test_utils/dummy_thread: initial commit</li>
+<li>tests/irq_disable_restore: Add test for irq_disable() / irq_restore()</li>
+<li>tests/periph_spi: add benchmark for acquire / release</li>
+<li>tests/periph_spi_dma: Add test for SPI with DMA</li>
+<li>uncrustify: add auto uncrustify with blacklist</li>
+</ul>
+<h3 id="kconfig-migration">Kconfig migration</h3>
+<ul>
+<li>armv7_m/cortexm: declare CPU_ARCH and CPU_CORE</li>
+<li>boards: Model features in Kconfig
+<ul>
+<li>arduino-leonardo, arduino-mega2560, atmega128x-based, atmega256rfr2-based,
+atmega328p-based, cc2538-based, cc26xx_cc13xx-based, efm32-based, esp-based,
+fe310-based, kinetis-based, msp430-based, samr21-xpro, slwstk6220a</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>kconfig: Declare common feature symbols</li>
+</ul>
+<ul>
+<li>drivers: Expose Configurations to Kconfig
+<ul>
+<li>ads101x, at, at86rf215, bmx055, cc110x, dose.h, fxos8700, hdc1000, isl29020,
+l3g4200d, lpsxxx, mag3110, mma8x5x, motor_driver, mtd_sdcard, opt3001,
+pn532, rn2xx3, slipdev, sps30, tcs37727, tmp00x</li>
+</ul>
+</li>
+<li>networking: Expose configurations to Kconfig
+<ul>
+<li>asymcute, coap, csma</li>
+<li>gnrc:
+<ul>
+<li>gomach, lwmac, mac, pktdump, pktbuf, rpl, tcp</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>usbus/cdc/ecm: Expose configurations to Kconfig</li>
+</ul>
+<h2 id="api-changes">API Changes</h2>
+<ul>
+<li>
+<p>cpu/sam0_common: drop prescaler from timer config</p>
+</li>
+<li>
+<p>cpu/sam0_common: PWM config now requires GCLK source</p>
+</li>
+<li>
+<p>drivers/mtd: Change API to return 0 on success</p>
+</li>
+<li>
+<p>drivers/mtd_mapper: count offset in sectors</p>
+</li>
+<li>
+<p>net/sock_dtls: provide getter function for UDP sock</p>
+</li>
+<li>
+<p>net/sock_dtls: add timeout to sock_dtls_send and add sock_dtls_session_init</p>
+<p>diff —git a/sys/include/net/sock/dtls.h b/sys/include/net/sock/dtls.h
+index 96569723fc..6e66048bd4 100644
+--- a/sys/include/net/sock/dtls.h
++++ b/sys/include/net/sock/dtls.h
+@@ -476,6 +485,13 @@
+extern “C” {
+#endif</p>
+<p>+#ifndef DTLS_HANDSHAKE_BUFSIZE
++#define DTLS_HANDSHAKE_BUFSIZE  (256)   /**&#x3C; Size buffer used in handshake to</p>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                                        </span></span><span style="--0:#d6deeb;--1:#403f53">hold credentials */</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                                        hold credentials */"><div></div></button></div></figure></div>
+</li>
+</ul>
+<p>+#endif
++
++#define SOCK_DTLS_HANDSHAKE     (EXDEV) /**&#x3C; Return value for a successful</p>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                                        </span></span><span style="--0:#d6deeb;--1:#403f53">handshake */</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                                        handshake */"><div></div></button></div></figure></div>
+</li>
+<li></li>
+</ul>
+<p>/**
+* @brief DTLS version number
+@@ -546,26 +564,26 @@ void sock_dtls_init(void);
+int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
+credman_tag_t tag, unsigned version, unsigned role);</p>
+<ul>
+<li></li>
+</ul>
+<p>/**</p>
+<ul>
+<li>
+<ul>
+<li>@brief Creates a new DTLS session</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@brief Initialize session handshake.</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>Initializes handshake process with a DTLS server  at @p ep.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in]  sock     DLTS sock to use</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in]  ep       Remote endpoint of the session</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[out] remote   The created session, cannot be NULL</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>Sends a ClientHello message to initialize the handshake. Call</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@ref sock_dtls_recv() to finish the handshake.</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@return  0 on success</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -EAGAIN, if DTLS_HANDSHAKE_TIMEOUT is <code>0</code> and no data is available.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -EINVAL, if @p remote is invalid or @p sock is not properly</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">initialized (or closed while sock_udp_recv() blocks).</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     initialized (or closed while sock_udp_recv() blocks)."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -ENOBUFS, if buffer space is not large enough to store received</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">credentials.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     credentials."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -ETIMEDOUT, if timed out when trying to create session.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@param[in] sock      DTLS sock to use</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in] ep        Remote endpoint to start a handshake with</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[out] remote   Resulting session</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return 1, if new handshake is started</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return 0, if there is an existing session</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return -ENOMEM, not enough memory to allocate for new peer</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return -EINVAL, if @p remote is invalid or @p sock is not properly</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">initialized (or closed while sock_udp_recv() blocks).</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="    initialized (or closed while sock_udp_recv() blocks)."><div></div></button></div></figure></div>
+</li>
+</ul>
+*/
+-int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,</li>
+</ul>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                        </span></span><span style="--0:#d6deeb;--1:#403f53">sock_dtls_session_t *remote);</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                        sock_dtls_session_t *remote);"><div></div></button></div></figure></div>
+</li>
+</ul>
+<p>+int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,</p>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                      </span></span><span style="--0:#d6deeb;--1:#403f53">sock_dtls_session_t *remote);</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                      sock_dtls_session_t *remote);"><div></div></button></div></figure></div>
+</li>
+</ul>
+<p>/**
+* @brief Destroys an existing DTLS session
+@@ -578,7 +596,7 @@ int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
+void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);</p>
+<p>/**</p>
+<ul>
+<li>
+<ul>
+<li>@brief Decrypts and reads a message from a remote peer.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@brief Receive handshake messages and application data from remote peer.</li>
+<li></li>
+<li>@param[in] sock      DTLS sock to use.</li>
+<li>@param[out] remote   Remote DTLS session of the received data.
+@@ -593,7 +611,8 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);</li>
+<li></li>
+<li>@note Function may block if data is not available and @p timeout != 0</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@return The number of bytes received on success</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@return  The number of bytes received on success</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -SOCK_DTLS_HANDSHAKE when new handshake is completed</li>
+<li>@return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.</li>
+<li>@return  -EAGAIN, if @p timeout is <code>0</code> and no data is available.</li>
+<li>@return  -EINVAL, if @p remote is invalid or @p sock is not properly
+@@ -657,28 +676,32 @@ ssize_t sock_dtls_recv_buf(sock_dtls_t *sock, sock_dtls_session_t *remote,</li>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">if no session exist between client and server.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 if no session exist between client and server."><div></div></button></div></figure></div>
+</li>
+<li>@param[in] data      Pointer where the data to be send are stored</li>
+<li>@param[in] len       Length of @p data to be send</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in] timeout   Handshake timeout in microseconds.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">If `timeout > 0`, will start a new handshake if no</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 If &#x60;timeout > 0&#x60;, will start a new handshake if no"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">session exists yet. The function will block until</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 session exists yet. The function will block until"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">handshake completed or timed out.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 handshake completed or timed out."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">May be SOCK_NO_TIMEOUT to block indefinitely until</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 May be SOCK_NO_TIMEOUT to block indefinitely until"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">handshake complete.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 handshake complete."><div></div></button></div></figure></div>
+</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@note Function may block until a session is created if there is no</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">  </span></span><span style="--0:#d6deeb;--1:#403f53">existing session with @p remote.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="  existing session with @p remote."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@note Initiating a session through this function will require</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@ref sock_dtls_recv() called from another thread to receive the handshake</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>messages.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@note    When blocking, we will need an extra thread to call</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">@ref sock_dtls_recv() function to handle the incoming handshake</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     @ref sock_dtls_recv() function to handle the incoming handshake"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">messages.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     messages."><div></div></button></div></figure></div>
+</li>
+<li></li>
+<li>@return The number of bytes sent on success</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -ENOTCONN, if <code>timeout == 0</code> and no existing session exists with</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">@p remote</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     @p remote"><div></div></button></div></figure></div>
+</li>
+<li>@return  -EADDRINUSE, if sock_dtls_t::udp_sock has no local end-point.</li>
+<li>@return  -EAFNOSUPPORT, if <code>remote->ep != NULL</code> and</li>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">sock_dtls_session_t::ep::family of @p remote is != AF_UNSPEC and</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     sock_dtls_session_t::ep::family of @p remote is != AF_UNSPEC and"><div></div></button></div></figure></div>
+</li>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">not supported.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     not supported."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@return  -EHOSTUNREACH, if sock_dtls_session_t::ep of @p remote is not</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">reachable.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     reachable."><div></div></button></div></figure></div>
+</li>
+<li>@return  -EINVAL, if sock_udp_ep_t::addr of @p remote->ep is an</li>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">invalid address.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     invalid address."><div></div></button></div></figure></div>
+</li>
+<li>@return  -EINVAL, if sock_udp_ep_t::port of @p remote->ep is 0.</li>
+<li>@return  -ENOMEM, if no memory was available to send @p data.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<ul>
+<li>@return  -ETIMEDOUT, <code>0 &#x3C; timeout &#x3C; SOCK_NO_TIMEOUT</code> and timed out.
+*/
+ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                  </span></span><span style="--0:#d6deeb;--1:#403f53">const void *data, size_t len);</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                  const void *data, size_t len);"><div></div></button></div></figure></div>
+</li>
+</ul>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                  </span></span><span style="--0:#d6deeb;--1:#403f53">const void *data, size_t len, uint32_t timeout);</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                  const void *data, size_t len, uint32_t timeout);"><div></div></button></div></figure></div>
+</li>
+</ul>
+<p>/**
+* @brief Closes a DTLS sock
+@@ -694,6 +717,47 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
+*/
+void sock_dtls_close(sock_dtls_t *sock);</p>
+<p>+/**</p>
+<ul>
+<li>
+<ul>
+<li>@brief Creates a new DTLS session</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Initiates a handshake with a DTLS server at @p ep and wait until it</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>completes or timed out.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@deprecated Will not be available after the 2020.10 release.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">        </span></span><span style="--0:#d6deeb;--1:#403f53">Please use @ref sock_dtls_session_init() and</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="        Please use @ref sock_dtls_session_init() and"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">        </span></span><span style="--0:#d6deeb;--1:#403f53">@ref sock_dtls_recv() instead.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="        @ref sock_dtls_recv() instead."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in]  sock     DLTS sock to use</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in]  ep       Remote endpoint of the session</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[out] remote   The created session, cannot be NULL</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@param[in]  timeout  Timeout to wait for handshake to finish.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">Returns immediately if 0.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 Returns immediately if 0."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">May be SOCK_NO_TIMEOUT to wait indefinitely until</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 May be SOCK_NO_TIMEOUT to wait indefinitely until"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                 </span></span><span style="--0:#d6deeb;--1:#403f53">handshake complete.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                 handshake complete."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<ul>
+<li></li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  0 on success</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -ENOMEM, if no memory to allocate for new peer</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>@return  -EINVAL, if @p remote is invalid or @p sock is not properly</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">     </span></span><span style="--0:#d6deeb;--1:#403f53">initialized (or closed while sock_udp_recv() blocks).</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="     initialized (or closed while sock_udp_recv() blocks)."><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>*/
++static inline int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,</li>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                               </span></span><span style="--0:#d6deeb;--1:#403f53">sock_dtls_session_t *remote, unsigned timeout)</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                               sock_dtls_session_t *remote, unsigned timeout)"><div></div></button></div></figure></div>
+</li>
+</ul>
+<p>+{</p>
+<ul>
+<li>int res;</li>
+<li>uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];</li>
+<li></li>
+<li>assert(sock);</li>
+<li>assert(remote);</li>
+<li></li>
+<li>res = sock_dtls_session_init(sock, ep, remote);</li>
+<li>if (res &#x3C;= 0) {</li>
+<li>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">   </span></span><span style="--0:#d6deeb;--1:#403f53">return res;</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="   return res;"><div></div></button></div></figure></div>
+</li>
+<li>}</li>
+<li></li>
+<li>return sock_dtls_recv(sock, remote, buf, sizeof(buf), timeout);
++}</li>
+<li></li>
+</ul>
+<p>#include “sock_dtls_types.h”</p>
+<p>#ifdef __cplusplus</p>
+</li>
+</ul>
+<h2 id="deprecations">Deprecations</h2>
+<h3 id="warnings">Warnings</h3>
+<ul>
+<li>GNRC_MAC_ENABLE_DUTYCYCLE_RECORD: Will be removed after 2021.01 release. Use
+inverse CONFIG_GNRC_MAC_DISABLE_DUTYCYCLE_RECORD instead.</li>
+<li>saul_reg_rm(): will be removed at a future date</li>
+<li>sock_dtls_session_create(): will be removed after 2020.10 release. Please
+use sock_dtls_session_init() and sock_dtls_recv() instead</li>
+<li>pkg/nordic_softdevice_ble: will be removed after the 2020.10 release</li>
+</ul>
+<h3 id="removals">Removals</h3>
+<ul>
+<li>netdev: remove NETOPT_IPV6_IID support for network devices</li>
+</ul>
+<h2 id="known-issues">Known issues</h2>
+<h3 id="networking-related-issues-44">Networking related issues (44)</h3>
+<p>##13997: ping6 is failing when testing with cc2538dk
+##13745: ethos: Unable to choose global source address.
+##13496: cpu/stm32/eth, board/nucleo-f767z1: ethernet buffering issue (ping >1s)
+after debug break
+##13493: ethernet: Missing multicast addr assignment
+##13490: cpu/stm32/eth, board/nucleo-f767z1: ethernet initialisation fails
+sometimes
+##13280: nrf52: Not able to add global or ULA address to interface
+##13088: Riot-os freezes with lwip + enc28j60 + stm32L4
+##12943: driver/mrf24j40: blocks shell input with auto_init_gnrc_netif
+##12884: examples/cord_ep: Dead lock when (re-)registering in callback function
+##12857: examples/gnrc_networking_mac broken on ATmega
+##12761: samr30 xpro doesn’t seem to use its radio ok
+##12642: Emcute cannot create a double-byte name
+##12565: gnrc_icmpv6_echo: flood-pinging another node leads to leaks in own
+packet buffer
+##12264: ethos: Unable to handle fragmented IPv6 packets from Linux kernel
+##12210: stale border router does not get replaced
+##11988: ethos: fails to respond to first message.
+##11860: send data with UDP at 10HZ, the program die
+##11852: scan-build errors found during 2019.07 testing
+##11405: nrfmin: communication not possible after multicast ping with no interval
+##11033: 6lo: RIOT does not receive packets from Linux when short_addr is set
+##10969: net: netdev_driver_t::send() doc unclear
+##10861: cpu/esp8266: Tracking open problems of esp_wifi netdev driver
+##10809: openthread: does not build on current Arch
+##10410: Missing drop implementations in netdev_driver_t::recv
+##10389: gnrc_sock_udp: Possible Race condition on copy in application buffer
+##10380: netdev_ieee802154: Mismatch between radio ll address and in memory
+address
+##10370: gomach: Resetting netif with cli doesn’t return
+##10338: xbee: setting PAN ID sometimes fails
+##9709: examples: failed assertion in dtls-echo example
+##9656: gnrc/netif: various problems after resetting interface a second time
+##8779: CC2538 RF overlapping PIN usage
+##8752: mrf24j40: does not link for examples/default
+##8271: app/netdev: application stops working after receiving frames with
+assertion or completely without error
+##8242: at86rf2xx: Dead lock when sending while receiving
+##8199: gcoap example request on tap I/F fails with NIB issue
+##7737: pkg: libcoap is partially broken and outdated
+##7474: 6lo gnrc fragmentation expects driver to block on TX
+##7304: General 802.15.4/CC2538 RF driver dislikes fast ACKs
+##6018: nRF52: gnrc_6lowpan_ble: memory leak with nordic_softdevice_ble
+##5863: OSX +  SAMR21-xpro: shell cannot handle command inputs larger than 64
+chars
+##5486: at86rf2xx: lost interrupts
+##5230: gnrc ipv6: multicast packets are not dispatched to the upper layers
+##5051: Forwarding a packet back to its link layer source should not be allowed
+##4527: gnrc_ipv6: Multicast is not forwarded if routing node listens to the
+address</p>
+<h3 id="timer-related-issues-17">Timer related issues (17)</h3>
+<p>##14217: tests/periph_timer_periodic is failing
+##13321: Sleep mode for Arduino
+##13204: xtimer problem with nucleo32 boards
+##13072: periph/timer: <code>timer_set()</code> underflow safety check (tracking issue)
+##10545: periph_timer: systematic proportional error in timer_set
+##10523: saml21 system time vs rtc
+##10510: xtimer_set_msg: crash when using same message for 2 timers
+##10073: xtimer_usleep wrong delay time
+##9187: sys/newlib: gettimeofday() returns time since boot, not current wall
+time.
+##9052: misc issues with tests/trickle
+##9049: xtimer mis-scaling with long sleep times
+##8746: stm32_common/periph/rtc: current implementation broken/poor accuracy
+##8251: MSP430: periph_timer clock config wrong
+##7347: xtimer_usleep stuck for small values
+##7114: xtimer: add’s items to the wrong list if the timer overflows between
+_xtimer_now()  and irq_disable()
+##6442: cpu/native: timer interrupt issue
+##6052: tests: xtimer_drift gets stuck on native</p>
+<h3 id="drivers-related-issues-13">Drivers related issues (13)</h3>
+<p>##14506: mdt_erase success, but vfs_format resets board (esp32-heltec-lora32-v2)
+##14439: (almost solved) SPI SD-Card driver: SPI initialisation freeze until
+timeout
+##14424: adc is not a ADC-Driver but a analog pin abstraction
+##13527: examples/dtls-wolfssl not working on pba-d-01-kw2x
+##13444: Potential security and safety race conditions on attached devices
+##13079: drivers/srf04: incorrect values on ATmega based platforms
+##12445: driver/hts221: Temperature and Humidity readings incorrect
+##12371: fail to send data to can bus
+##12057: ESP32 + DHT + SAUL reading two endpoints causes freeze.
+##12045: floats and doubles being used all over the place.
+##11104: STM32: SPI clock not returning to idle state and generating additional
+clock cycles
+##9419: cpu/msp430: GPIO driver doesn’t work properly
+##4876: at86rf2xx: Simultaneous use of different transceiver types is not
+supported</p>
+<h3 id="native-related-issues-3">Native related issues (3)</h3>
+<p>##13501: SDL2 does not work due to missing getpid
+##5796: native: tlsf: early malloc will lead to a crash
+##495: native not float safe</p>
+<h3 id="other-platforms-related-issues-19">Other platforms related issues (19)</h3>
+<p>##14572: tests/mpu_noexec_ram: fails on  i-nucleo-lrwan1
+##14410: MIPS: toolchain objcopy doesn’t work and no .bin can be generated
+##14237: esp32-wroom-32: tests/netstats_l2 failing sometimes
+##14015: stm32152re: hardfault when DBGMCU_CR_DBG* bits are set and branch after
+__WFI()
+##13606: gcoap/esp8266: Stack overflow with gcoap example
+##13390: Cannot use LLVM with Cortex-M boards
+##13267: Failing tests on MSP430 (z1)
+##13104: boards/hifive1: flashing issue
+##13086:  Failing tests on FE310 (Hifive1b)
+##12763: [TRACKING] Fixes for automatic tests of ESP32 boards.
+##12651: Failing tests on AVR (tested with atmega256rfr2-xpro)
+##12168: pkg/libb2: blake2s doesn’t work on AVR
+##11885: arm7: printf() with float/double not working
+##10258: Incorrect default $PORT building for esp32-wroom-32 on macOS
+##10122: Indeterministic hard fault in _mutex_lock(), with nRF52 SoftDevice
+##10076: cpu/cortexm_common: irq_enable returns the current state of interrupts
+(not previous)
+##8408: pkg/fatfs: linker error when build tests/pkg_fatfs_vfs for msb430 based
+boards
+##6567: periph/spi: Switching between CPOL=0,1 problems on Kinetis with software
+CS
+##4954: chronos: compiling with -O0 breaks</p>
+<h3 id="build-system-related-issues-13">Build system related issues (13)</h3>
+<p>##14504: BUILD_IN_DOCKER ignores USEMODULE
+##14288: pkg/ccn-lite: unable to <code>make -j -C examples/ccn-lite-relay</code>
+##14264: make: ccache leads to differing binaries
+##13492: make -j flash broken on esp* (will always flash the previous binary)
+##12771: dist/tools/cppcheck/cppchck.sh: errors when running with Cppcheck 1.89
+##10850: Tracking: remove harmful use of <code>export</code> in make and immediate
+evaluation
+##9913: Build dependencies - processing order issues
+##9742: <code>buildtest</code> uses wrong build directory
+##9645: Different build behavior between <code>murdock</code> and <code>riot/riotbuild:latest</code>
+image
+##8913: make: use of immediate value of variables before they have their final
+value
+##8122: doxygen: riot.css modified by ‘make doc’
+##6120: Windows AVR Mega development makefile Error
+##4053: macros: RIOT_FILE_RELATIVE printing wrong file name for headers</p>
+<h3 id="other-issues-41">Other issues (41)</h3>
+<p>##14578: tests/cpp11_%: failing on i-nucleo-lrwan1
+##14576: riotboot/nrf52840dk: flashing slot1 with JLINK fails
+##14568: tests/pkg_libfixmath_unittests: failing on multiple platforms
+##14548: edbg: long lines flooded over serial become garbled
+##14520: examples / tests: LoRa tests fail on platforms that don’t support LoRa
+##14514: Uncrustify enforces deviation of coding convention
+##14466: Linking C++
+##14390: gcoap: Suspected crosstalk between requests (possible NULL call)
+##14315: DTLS examples cannot send message to localhost
+##14169: Gcoap does not handle separate responses
+##14167: Gcoap drops long packages instead of gracefully erring out
+##13918: cpu/stm32f1: CPU hangs after wake-up from STOP power mode
+##13541: Order of auto_init functions
+##13345: sys/xtimer: segmentation fault: in function xtimer_msg_received_timeout
+##13285: Bug: openocd 0.10.0-6  Ubuntu dies while debugging with -rtos auto
+##13277: Y2038 tracking issue / strategy
+##13133: tests/pkg_tensorflow-lite: tests randomly failing on nrf52dk and
+esp32-wroom-32
+##13120: tests: broken with stdio_rtt if auto_init is disabled
+##13044: _NVIC_SystemReset stuck in infinite loop when calling pm_reboot through
+shell after flashing with J-Link
+##12897: Can’t build relic with benchmarks or tests
+##12889: CC2538DK board docs: broken links
+##12732: tests: some tests don’t work with <code>newlib</code> lock functions.
+##12621: Potential race condition in compile_and_test_for_board.py
+##12108: <code>make term</code> output is inconsistent between boards, <code>ethos</code> and <code>native</code>
+##12105: [TRACKING] sys/shell refactoring.
+##11243: sys/riotboot: documentation issues
+##10751: Possible memset optimized out in crypto code
+##10731: nanocoap: incomplete response to /.well-known/core request
+##10639: sys/stdio_uart: dropped data when received at once
+##10121: RIOT cannot compile with the latest version of macOS (10.14) and Xcode
+10
+##9882: sys/tsrb is not thread safe
+##9518: periph/i2c: tracking bugs and untested acks
+##9371: assert: c99 static_assert macro doesn’t function for multiple
+static_asserts in the same scope
+##7365: scheduler: priority inversion problem
+##7220: sys/fmt: Missing tests for fmt_float, fmt_lpad
+##6533: tests/lwip target board for python test is hardcoded to native
+##5009: RIOT is saw-toothing in energy consumption (even when idling)
+##4866: periph: GPIO drivers are not thread safe
+##4488: Making the newlib thread-safe
+##3256: make: Setting constants on compile time doesn’t really set them
+everywhere
+##2346: Tracker: Reduce scope on unintended COMMON variables</p>
+<p>There are 150 known issues in this release</p>
+<h2 id="fixed-issues-since-the-last-release-202004">Fixed Issues since the last release (2020.04)</h2>
+<p>##14521: tests/test_tools: fails on <code>iotlab-m3</code> due to <code>core</code>/<code>cpu</code> regression
+##14415: Flashing nrf52dk with bmp breaks board
+##14409: doc/search: hitting return while searching on api.riot-os.org reloads
+current page
+##14407: gnrc/RPL: instance ID not updated on reconnect
+##14399: cord_ep example timed out when registering to a resource directory
+##14380: dist/tools/flatc: cloning of the tool sporadically fails on the CI
+##14361: Bug : bad assertion in cpu/stm32/periph/pwm.c
+##14330: Improve driver implementation documentation
+##14328: sam0_common: make debug broken for boards using EDBG
+##14184: Part of puts/printf output is skipped
+##14164: Failed assertion when using netdev_ieee802154_mr_fsk
+##14158: kconfig is broken on case-insensitive file systems
+##14074: Memory read beyond input buffer boundaries in nanocoap packet parser
+##14035: I can’t use w5100 to work on Release-2020.04 by using
+RIOT/examples/emcute_mqttsn/.
+##14034: gcoap server breaks or becomes very unresponsive (sock_async related?)
+##13984: tests/pkg_ubasic: failing on esp32-wroom-32
+##13920: stm32: ztimer RTT backend overflow
+##13838: Global Address remains in state TNT[3] forever
+##13834: DHCPv6 client ends up in busy loop after a while
+##13419: Can’t use nimble as prefix for modules
+##13209: examples/gnrc_border_router is crashing after some time
+##12909: Bug: Unexpected behavior with xtimer_periodic_wakeup() for large periods
+on Nucleo-f401re
+##12858: KW2XRF: Broken network communication without netstats-l2
+##12205: core: atomic: Unable to compile starting with gcc 9.1.0
+##11859: examples: dtls-echo fails silently when DTLS_ECC flag enabled
+##11795: gnrc_tftp: string functions on non-null terminated input
+##11523: xtimer_periodic_wakeup crashing at high frequencies on frdm-kw41z
+##11472: Warnings from objcopy and size (binutils 2.32)
+##11388: SD card initialization: timeouts effectively blocking
+##11212: POSIX sockets + lwIP: bad file descriptor
+##11149: xtimer: hang on xtimer_spin_until (corner case)
+##10367: sam0.inc.mk: Did not find a device with serial ATML21xxxxxxxx
+##8589: Why using -F in avrdude?
+##8436: Kinetis PhyNode: failed to flash binary > 256K
+##8172: gnrc_netif, gnrc_uhcpc: Replacing prefix on border router results in no
+configured prefix
+##8086: gnrc_rpl_p2p: port to nib and fix compile errors
+##8045: stm32/periph/uart: extra byte transmitted on first transmission
+##7753: pic32-wifire: race-condition when linking in concurrent build
+##5775: cpu: cortex-m: compiling vectors.c with LTO triggers compiler bug
+##5774: cpu: cortexm_common: context switching code breaks when compiling with
+LTO
+##5769: Possible problem in scheduler
+##5748: gnrc: nodes crashing with too small packet buffer</p>
+<p>42 fixed issues since last release (2020.04)</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>We would like to thank all companies that provided us with hardware for porting
+and testing RIOT-OS. Further thanks go to companies and institutions that
+directly sponsored development time. And finally, big thanks to all of you
+contributing in so many different ways to make RIOT worthwhile!</p>
+<h2 id="more-information">More information</h2>
+<p><a href="http://www.riot-os.org">http://www.riot-os.org</a></p>
+<h3 id="mailing-lists">Mailing lists</h3>
+<ul>
+<li>RIOT OS kernel developers list
+<a href="mailto:devel@riot-os.org">devel@riot-os.org</a> (<a href="http://lists.riot-os.org/mailman/listinfo/devel">http://lists.riot-os.org/mailman/listinfo/devel</a>)</li>
+<li>RIOT OS users list
+<a href="mailto:users@riot-os.org">users@riot-os.org</a> (<a href="http://lists.riot-os.org/mailman/listinfo/users">http://lists.riot-os.org/mailman/listinfo/users</a>)</li>
+<li>RIOT commits
+<a href="mailto:commits@riot-os.org">commits@riot-os.org</a> (<a href="http://lists.riot-os.org/mailman/listinfo/commits">http://lists.riot-os.org/mailman/listinfo/commits</a>)</li>
+<li>Github notifications
+<a href="mailto:notifications@riot-os.org">notifications@riot-os.org</a> (<a href="http://lists.riot-os.org/mailman/listinfo/notifications">http://lists.riot-os.org/mailman/listinfo/notifications</a>)</li>
+</ul>
+<h3 id="irc">IRC</h3>
+<ul>
+<li>Join the RIOT IRC channel at: irc.freenode.net, #riot-os</li>
+</ul>
+<h2 id="license">License</h2>
+<ul>
+<li>The code developed by the RIOT community is licensed under the GNU Lesser
+General Public License (LGPL) version 2.1 as published by the Free Software
+Foundation.</li>
+<li>Some external sources and packages are published under a separate license.</li>
+</ul>
+<p>All code files contain licensing information.</p>  </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n">   </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr">   </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
