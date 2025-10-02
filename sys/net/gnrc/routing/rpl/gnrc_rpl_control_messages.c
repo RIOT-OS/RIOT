@@ -928,7 +928,7 @@ static void _recv_DIO_for_different_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_di
 
     /* decide between old and new dodag */
     if (gnrc_rpl_get_of0()->which_dodag(dodag, dio) > 0) {
-        DEBUG("RPL: switch do new DODAG.\n");
+        DEBUG("RPL: switch to new DODAG.\n");
         gnrc_rpl_dodag_remove(dodag);
         _recv_DIO_for_new_dodag(inst, dio, iface, src, len);
     }
