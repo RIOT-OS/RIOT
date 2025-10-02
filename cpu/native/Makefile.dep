@@ -37,6 +37,7 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += ieee802154
   ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
+    USEMODULE += netdev_ieee802154_submac_soft_ack
   endif
 endif
 
