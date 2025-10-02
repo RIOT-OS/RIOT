@@ -18,6 +18,7 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "cpu.h"
 
