@@ -892,7 +892,7 @@ INPUT                  = ../../doc.txt \
                          src/emulators.md \
                          src/release-cycle.md \
                          src/io-mapping-and-shields.md \
-                         src/changelog.md \
+                         src/changelog-deprecated.md \
                          src/LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
