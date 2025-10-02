@@ -29,22 +29,39 @@
 
 static char *execute_file_handler_args[XIPFS_EXEC_ARGC_MAX];
 
+static void print_execute_file_usage(void) {
+    printf("Usage : execute [-p] xipfs_executable_filename [arg0] [arg1] ... [arg%d]\n",
+           (XIPFS_EXEC_ARGC_MAX - 1));
+    printf("OPTION:\n");
+    printf("\t-p\n");
+    printf("\t\tRun the file with Memory Protection Unit.\n");
+}
+
 static int _execute_file_handler(int argc, char **argv) {
+    int exe_filename_arg_pos = 1;
+    const char *exe_filename;
+
     if ( (argc == 1) || (argc > XIPFS_EXEC_ARGC_MAX) ) {
-        printf("Usage %s xipfs_executable_filename [arg0] [arg1] ... [arg%d]\n",
-               argv[0], (XIPFS_EXEC_ARGC_MAX - 1));
-        printf("\t- xipfs_executable_filename : filename of the desired XIPFS file to execute\n");
+        print_execute_file_usage();
         return 1;
     }
 
+    if ((argv[1][0] == '-') && argv[1][1] == 'p')
+        exe_filename_arg_pos = 2;
+
+    exe_filename = argv[exe_filename_arg_pos];
+
     memset(execute_file_handler_args, 0, sizeof(execute_file_handler_args));
-    for (int i = 1; i <argc; ++i) {
-        execute_file_handler_args[i-1] = argv[i];
+    for (int i = exe_filename_arg_pos; i < argc; ++i) {
+        execute_file_handler_args[i - exe_filename_arg_pos] = argv[i];
     }
 
-    int ret = xipfs_extended_driver_execv(argv[1], execute_file_handler_args);
-    if (ret != 0) {
-        printf("Failed to execute '%s', error=%d\n", argv[1], ret);
+    int ret = (exe_filename_arg_pos == 2) ?
+            xipfs_extended_driver_safe_execv(exe_filename, execute_file_handler_args)
+        :   xipfs_extended_driver_execv(exe_filename, execute_file_handler_args);
+    if (ret < 0) {
+        printf("Failed to execute '%s', error=%d (%s)\n",
+               argv[exe_filename_arg_pos], ret, strerror(-ret));
         return 2;
     }
 

@@ -97,6 +97,10 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+#include "include/xipfs.h"
+#endif
+
 extern uint32_t _estack;
 extern uint32_t _sstack;
 
@@ -272,6 +276,11 @@ void *thread_isr_stack_pointer(void)
 void *thread_isr_stack_start(void)
 {
     return (void *)&_sstack;
+}
+
+void *thread_isr_stack_end(void)
+{
+    return (void *)&_estack;
 }
 
 void NORETURN cpu_switch_context_exit(void)
@@ -488,6 +497,11 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
+#if (defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__)) && \
+    defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+#undef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
+#endif
+
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 {
     /* stack frame:
@@ -513,6 +527,19 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
         case 1: /* SVC number used by cpu_switch_context_exit */
             SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             break;
+#if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+        case XIPFS_ENTER_SVC_NUMBER: {
+            void *crt0_ctx = (void *)svc_args[0];
+            void *entry_point = (void *)svc_args[1];
+            void *stack_top = (void *)svc_args[2];
+            xipfs_safe_exec_enter(crt0_ctx, entry_point, stack_top);
+            break;
+        }
+        case XIPFS_SYSCALL_SVC_NUMBER: {
+            xipfs_syscall_dispatcher(svc_args);
+            break;
+        }
+#endif
         default:
             DEBUG("svc: unhandled SVC #%u\n", svc_number);
             break;

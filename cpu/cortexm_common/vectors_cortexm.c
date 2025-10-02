@@ -37,6 +37,9 @@
 #ifdef MODULE_DBGPIN
 #include "dbgpin.h"
 #endif
+#if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+#include "include/xipfs.h"
+#endif
 
 #ifndef SRAM_BASE
 #define SRAM_BASE 0
@@ -472,8 +475,22 @@ void hard_fault_default(void)
 #if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
     defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
     defined(CPU_CORE_CORTEX_M7)
+
+#if (defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__)) && \
+    defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+#undef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
+#endif
+
 void mem_manage_default(void)
 {
+#  if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+    uint32_t mmfar = SCB->MMFAR;
+    uint32_t cfsr = SCB->CFSR;
+    uintptr_t psp = __get_PSP();
+    if (xipfs_mem_manage_handler((void *)psp, mmfar, cfsr) == 0) {
+        return;
+    }
+#  endif
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
 }
 

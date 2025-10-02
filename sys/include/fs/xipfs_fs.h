@@ -115,7 +115,7 @@ int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path,
  *
  * Allows to create a regular or executable new file within XiPFS.
  *
- * @param full_path A full path such as `/dev/nvme0p0/my_new_file`
+ * @param full_path A full path such as `/nvme0p0/my_new_file`
  *
  * @param size The file size in bytes.
  *
@@ -129,7 +129,7 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_
 /**
  * @brief Executes an executable file with arguments.
  *
- * @param full_path A full path such as `/dev/nvme0p0/my_executable_file`
+ * @param full_path A full path such as `/nvme0p0/my_executable_file`
  *
  * @param argv Executable arguments. Cannot be NULL, argv[0] contains the executable filename.
  *
@@ -137,6 +137,18 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_
  * @retval 0 on success.
  */
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
+
+/**
+ * @brief Executes safely an executable file with arguments.
+ *
+ * @param full_path A full path such as `/nvme0p0/my_executable_file`
+ *
+ * @param argv Executable arguments. Cannot be NULL, argv[0] contains the executable filename.
+ *
+ * @retval Less than 0 on errors.
+ * @retval 0 on success.
+ */
+int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[]);
 
 #ifdef __cplusplus
 }

@@ -652,7 +652,7 @@ static int get_file_size(const char *full_path, size_t *size) {
     return 0;
 }
 
-static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
+static int copy_file(const char *full_path, void *buf, size_t nbyte) {
     xipfs_mount_t mp;
     const char *path;
     xipfs_file_desc_t desc;
@@ -663,9 +663,15 @@ static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
     if (ret < 0) {
         return ret;
     }
+
+    if ((file_size == 0) || (nbyte < file_size)) {
+        return -EINVAL;
+    }
+
     if (nbyte > file_size) {
         nbyte = file_size;
     }
+
     if (full_path == NULL) {
         return -EFAULT;
     }
@@ -675,7 +681,6 @@ static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
     if ((path = get_rel_path(&mp, full_path)) == NULL) {
         return -EIO;
     }
-
     ret = xipfs_open(&mp, &desc, path, O_RDONLY, 0);
     if (ret < 0) {
         return ret;
@@ -719,6 +724,29 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
 
     mutex_lock(mp.execution_mutex);
     ret = xipfs_execv(&mp, path, argv, xipfs_user_syscalls_table);
+    mutex_unlock(mp.execution_mutex);
+
+    return ret;
+}
+
+int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
+{
+    xipfs_mount_t mp;
+    const char *path;
+    int ret;
+
+    if (full_path == NULL) {
+        return -EFAULT;
+    }
+    if ((ret = get_xipfs_mp(full_path, &mp)) < 0) {
+        return ret;
+    }
+    if ((path = get_rel_path(&mp, full_path)) == NULL) {
+        return -EIO;
+    }
+
+    mutex_lock(mp.execution_mutex);
+    ret = xipfs_safe_execv(&mp, path, argv, xipfs_user_syscalls_table);
     mutex_unlock(mp.execution_mutex);
 
     return ret;
