@@ -43,10 +43,10 @@ lostandfound: ../../LOSTANDFOUND.md
 
 .PHONY: coding_conventions
 coding_conventions: ../../CODING_CONVENTIONS.md
-	-@echo "Generating Lost and Found documentation..."
+	-@echo "Generating Coding Conventions documentation..."
 	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS.template.md - > ../guides/generated/CODING_CONVENTIONS.md
 
 .PHONY: coding_conventions_cpp
 coding_conventions_cpp: ../../CODING_CONVENTIONS_C++.md
-	-@echo "Generating Lost and Found documentation..."
+	-@echo "Generating C++ Coding Conventions documentation..."
 	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS_CPP.template.md - > ../guides/generated/CODING_CONVENTIONS_CPP.md
