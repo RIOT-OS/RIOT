@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_on_off-switch On/Off Switch
@@ -77,9 +79,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef OBJECTS_ON_OFF_SWITCH_H
-#define OBJECTS_ON_OFF_SWITCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -200,5 +199,4 @@ int lwm2m_object_on_off_switch_update_app_type(uint16_t instance_id, const char 
 }
 #endif
 
-#endif /* OBJECTS_ON_OFF_SWITCH_H */
 /** @} */

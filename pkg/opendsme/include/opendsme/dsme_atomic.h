@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_opendsme
  *
@@ -15,9 +17,6 @@
  *
  * @author      José I. Álamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef OPENDSME_DSME_ATOMIC_H
-#define OPENDSME_DSME_ATOMIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +36,6 @@ extern "C" {
  */
 #define dsme_atomicEnd()
 
-#endif /* OPENDSME_DSME_ATOMIC_H */
 
 #ifdef __cplusplus
 }

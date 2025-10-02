@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_openthread_cli   OpenThread
  * @ingroup     pkg_openthread
@@ -49,9 +51,6 @@
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
-
-#ifndef OT_H
-#define OT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -168,5 +167,4 @@ void ot_random_init(void);
 }
 #endif
 
-#endif /* OT_H */
 /** @} */

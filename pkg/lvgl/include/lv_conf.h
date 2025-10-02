@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_lvgl
  * @brief       LVGL configuration macros
@@ -13,9 +15,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef LV_CONF_H
-#define LV_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -556,5 +555,4 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 }
 #endif
 
-#endif /* LV_CONF_H */
 /** @} */

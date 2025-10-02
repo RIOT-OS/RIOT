@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  pkg_lwip_sys
  * @brief       Describes compiler and processor to lwIP
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef ARCH_CC_H
-#define ARCH_CC_H
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -107,5 +107,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARCH_CC_H */
 /** @} */

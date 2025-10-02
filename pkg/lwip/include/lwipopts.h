@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_lwip_opts   lwIP options
  * @ingroup     pkg_lwip
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIPOPTS_H
-#define LWIPOPTS_H
 
 #include "thread.h"
 #include "net/gnrc/netif/hdr.h"
@@ -186,5 +186,4 @@ bool sys_check_core_locked(void);
 }
 #endif
 
-#endif /* LWIPOPTS_H */
 /** @} */
