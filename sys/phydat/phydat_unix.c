@@ -7,8 +7,9 @@
  */
 
 #include <stdint.h>
-#include <math.h>
 
+#include "macros/math.h"
+#include "container.h"
 #include "phydat.h"
 
 /**
@@ -18,14 +19,36 @@
 static int16_t month_to_yday[] = { 0,      31, -306, -275, -245, -214,
                                    -184, -153, -122,  -92,  -61,  -31 };
 
-static inline int16_t phydat_unscale(int16_t value, int16_t scale)
+static int16_t phydat_unscale(int16_t value, int16_t scale)
 {
+    static const int16_t tenmap[] = {10, 100, 1000, 10000 };
+
+    if (value == 0) {
+        return 0;
+    }
+
+    /* when out of range anyway, we just saturate to max */
+    if (scale > (int16_t)ARRAY_SIZE(tenmap)) {
+        return INT16_MAX;
+    }
+
+    /* same, but lower end of the range */
+    if (scale < -(int16_t)ARRAY_SIZE(tenmap)) {
+        return 0;
+    }
+
     if (scale > 0) {
-        return value * pow(10, scale);
+        size_t idx = scale - 1;
+        if (__builtin_mul_overflow(value, tenmap[idx], &value)) {
+            /* result would overflow, returning INT16_MAX instead */
+            return INT16_MAX;
+        }
+        return value;
     }
 
     if (scale < 0) {
-        return value / pow(10, -scale);
+        size_t idx = (-scale) - 1;
+        return DIV_ROUND(value, tenmap[idx]);
     }
 
     return value;
