@@ -92,8 +92,9 @@ static const file_to_drop_t files_to_drop[2] = {
 };
 
 static int drop_file(const file_to_drop_t *file_to_drop) {
-    if (file_to_drop == NULL)
+    if (file_to_drop == NULL) {
         return EXIT_FAILURE;
+    }
 
     int file_handle = vfs_open(file_to_drop->filename, O_RDONLY, 0);
     if (file_handle < 0) {
@@ -143,9 +144,10 @@ int drop_files_handler(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
-    for(unsigned int i = 0; i < sizeof(files_to_drop)/sizeof(files_to_drop[0]); ++i) {
-        if (drop_file(&files_to_drop[i]) != EXIT_SUCCESS)
+    for (unsigned int i = 0; i < ARRAY_SIZE(files_to_drop); ++i) {
+        if (drop_file(&files_to_drop[i]) != EXIT_SUCCESS) {
             return EXIT_FAILURE;
+        }
     }
 
     return EXIT_SUCCESS;

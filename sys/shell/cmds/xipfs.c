@@ -46,8 +46,9 @@ static int _execute_file_handler(int argc, char **argv) {
         return 1;
     }
 
-    if ((argv[1][0] == '-') && argv[1][1] == 'p')
+    if ((argv[1][0] == '-') && argv[1][1] == 'p') {
         exe_filename_arg_pos = 2;
+    }
 
     exe_filename = argv[exe_filename_arg_pos];
 
