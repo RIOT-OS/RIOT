@@ -122,6 +122,15 @@ typedef enum {
 
     /**
      * @{
+     * @name Protocol-independent network events.
+     * }
+     */
+    GNRC_NETTYPE_L2_DISCOVERY,  /**< Layer 2 node discovery */
+    GNRC_NETTYPE_L3_ROUTING,    /**< Layer 3 routing info */
+    /** @} */
+
+    /**
+     * @{
      * @name Testing
      */
 #ifdef TEST_SUITES
