@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2024-2025 Carl Seifert
  * Copyright (C) 2024-2025 TU Dresden
  *

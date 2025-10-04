@@ -206,8 +206,8 @@ int main(void) {
     sock_udp_get_local(udp_socket, &udp_local.udp_ep);
 
     printf("app: listening at ");
-    /* Because we're in posession of an endpoint now, we can print
-     * a debug description from it. */
+    /* Because we're in possession of an endpoint now, we can print
+     * a debug description of it. */
     unicoap_print_endpoint(&udp_local);
     printf("\n");
 #endif
