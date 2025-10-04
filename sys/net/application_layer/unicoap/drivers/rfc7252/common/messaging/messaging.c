@@ -89,7 +89,12 @@ typedef struct {
 } _transmission_t;
 
 typedef struct {
-    /** @brief Message ID unicoap is going to use for the next outbound request or response */
+    /**
+     * @brief Message ID unicoap is going to use for the next outbound request or response
+     *
+     * May be accessed from user thread (client request) or thread running unicoap processing loop
+     * for inbound messages.
+     */
     atomic_uint next_message_id;
 
 #if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
