@@ -539,8 +539,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] psdu PSDU frame to be sent
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*write)(ieee802154_dev_t *dev, const iolist_t *psdu);
 
@@ -579,8 +579,8 @@ struct ieee802154_radio_ops {
      * @param[in] info information of the received frame (LQI, RSSI). Can be
      *            NULL if this information is not needed.
      *
-     * @return number of bytes written in @p buffer (0 if @p buf == NULL)
-     * @return -ENOBUFS if the frame doesn't fit in @p
+     * @retval number of bytes written in @p buffer (0 if @p buf == NULL)
+     * @retval -ENOBUFS if the frame doesn't fit in @p buf
      */
     int (*read)(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info);
     /**
@@ -592,8 +592,8 @@ struct ieee802154_radio_ops {
      *
      * @post the device is off
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*off)(ieee802154_dev_t *dev);
 
@@ -607,8 +607,8 @@ struct ieee802154_radio_ops {
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*request_on)(ieee802154_dev_t *dev);
 
@@ -634,9 +634,9 @@ struct ieee802154_radio_ops {
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
-     * @return 0 if the device is on
-     * @return -EAGAIN if the device is still busy turning on
-     * @return negative errno on error
+     * @retval 0 if the device is on
+     * @retval -EAGAIN if the device is still busy turning on
+     * @retval negative errno on error
      */
     int (*confirm_on)(ieee802154_dev_t *dev);
 
@@ -681,8 +681,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] threshold the threshold in dBm.
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*set_cca_threshold)(ieee802154_dev_t *dev, int8_t threshold);
 
@@ -696,9 +696,9 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode the CCA mode
      *
-     * @return 0 on success
-     * @return -ENOTSUP if the mode is not supported
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval -ENOTSUP if the mode is not supported
+     * @retval negative errno on error
      */
     int (*set_cca_mode)(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode);
 
@@ -717,9 +717,9 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] conf the PHY configuration
      *
-     * @return 0        on success
-     * @return -EINVAL  if the configuration is not valid for the device.
-     * @return <0       error, return value is negative errno indicating the cause.
+     * @retval 0        on success
+     * @retval -EINVAL  if the configuration is not valid for the device.
+     * @retval <0       error, return value is negative errno indicating the cause.
      */
     int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
 
@@ -734,8 +734,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] retrans the number of retransmissions attempts.
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*set_frame_retrans)(ieee802154_dev_t *dev, uint8_t retrans);
 
@@ -753,9 +753,9 @@ struct ieee802154_radio_ops {
      *                    ieee802154_radio_request_transmit function is
      *                    equivalent to CCA send.
      *
-     * @return 0 on success
-     * @return -EINVAL if the settings are not supported.
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval -EINVAL if the settings are not supported.
+     * @retval negative errno on error
      */
     int (*set_csma_params)(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                            int8_t retries);
@@ -768,8 +768,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode address filter mode
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*set_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode);
 
@@ -781,8 +781,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[out] mode address filter mode
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*get_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode);
 
@@ -798,8 +798,8 @@ struct ieee802154_radio_ops {
      * @param[in] cmd command for the address filter
      * @param[in] value value for @p cmd.
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*config_addr_filter)(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value);
 
@@ -818,8 +818,8 @@ struct ieee802154_radio_ops {
      * @param[in] cmd command for the source address match configuration
      * @param[in] value value associated to @p cmd.
      *
-     * @return 0 on success
-     * @return negative errno on error
+     * @retval 0 on success
+     * @retval negative errno on error
      */
     int (*config_src_addr_match)(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
                                  const void *value);
