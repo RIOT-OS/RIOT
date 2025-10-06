@@ -54,6 +54,7 @@ ifneq (0,$(ENABLE_DNS))
   ifneq (0,$(ENABLE_DNS_CACHING))
     USEMODULE += dns_cache             # cache DNS responses
   endif
+  USEMODULE += hosts                 # enable static hostnames
 endif
 
 # When using a regular network uplink we should use DHCPv6
