@@ -49,11 +49,7 @@ extern "C" {
  * @{
  */
 #ifndef ISR_STACKSIZE
-#   if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
-#       define ISR_STACKSIZE            (1024U)
-#else
-#       define ISR_STACKSIZE            (512U)
-#   endif
+#define ISR_STACKSIZE                   (512U)
 #endif
 /** @} */
 

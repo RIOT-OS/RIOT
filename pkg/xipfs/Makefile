@@ -1,6 +1,6 @@
 PKG_NAME=xipfs
 PKG_URL=https://github.com/2xs/xipfs.git
-PKG_VERSION=837e15fb85bd3fc0fbc87d39a692ebf5c2cc9a5f
+PKG_VERSION=22ff164f1fb9097f272540836c3f111ecf8cde10
 PKG_LICENSE=CeCILL-2.1
 
 include $(RIOTBASE)/pkg/pkg.mk

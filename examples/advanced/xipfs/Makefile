@@ -33,6 +33,9 @@ FEATURES_REQUIRED += cortexm_mpu
 # Use xipfs file system
 USEMODULE += xipfs
 
+# XIPFS MPU support
 CFLAGS += -DXIPFS_ENABLE_SAFE_EXEC_SUPPORT
+# XIPFS MPU ISR stack requirement
+CFLAGS += -DISR_STACKSIZE=1024
 
 include $(RIOTBASE)/Makefile.include

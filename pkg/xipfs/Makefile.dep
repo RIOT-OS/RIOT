@@ -12,5 +12,5 @@ ifeq (,$(filter xipfs_fs,$(DISABLE_MODULE)))
   USEMODULE += mtd_flashpage
   USEMODULE += vfs
   USEMODULE += shell_cmd_xipfs
-  USE_MODULE += cortexm_svc
+  USEMODULE += cortexm_svc
 endif
