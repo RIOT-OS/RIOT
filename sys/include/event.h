@@ -116,18 +116,24 @@ extern "C" {
 /**
  * @brief   Thread flag use to notify available events in an event queue
  */
-#define THREAD_FLAG_EVENT   (0x1)
+#  define THREAD_FLAG_EVENT (0x1)
 #endif
 
 /**
  * @brief   event_queue_t static initializer
  */
-#define EVENT_QUEUE_INIT    { .waiter = thread_get_active() }
+#define EVENT_QUEUE_INIT              \
+    {                                 \
+        .waiter = thread_get_active() \
+    }
 
 /**
  * @brief   static initializer for detached event queues
  */
-#define EVENT_QUEUE_INIT_DETACHED   { .waiter = NULL }
+#define EVENT_QUEUE_INIT_DETACHED \
+    {                             \
+        .waiter = NULL            \
+    }
 
 /**
  * @brief   event structure forward declaration
@@ -143,16 +149,16 @@ typedef void (*event_handler_t)(event_t *);
  * @brief   event structure
  */
 struct event {
-    clist_node_t list_node;     /**< event queue list entry             */
-    event_handler_t handler;    /**< pointer to event handler function  */
+    clist_node_t list_node;  /**< event queue list entry             */
+    event_handler_t handler; /**< pointer to event handler function  */
 };
 
 /**
  * @brief   event queue structure
  */
 typedef struct PTRTAG {
-    clist_node_t event_list;    /**< list of queued events              */
-    thread_t *waiter;           /**< thread owning event queue          */
+    clist_node_t event_list; /**< list of queued events              */
+    thread_t *waiter;        /**< thread owning event queue          */
 } event_queue_t;
 
 /**
@@ -164,7 +170,7 @@ typedef struct PTRTAG {
  * @param[in]   n_queues    number of queues in @p queues
  */
 static inline void event_queues_init(event_queue_t *queues,
-                                          size_t n_queues)
+                                     size_t n_queues)
 {
     assert(queues && n_queues);
     thread_t *me = thread_get_active();
@@ -193,7 +199,7 @@ static inline void event_queue_init(event_queue_t *queue)
  * @param[in]   n_queues    number of queues in @p queues
  */
 static inline void event_queues_init_detached(event_queue_t *queues,
-                                             size_t n_queues)
+                                              size_t n_queues)
 {
     assert(queues);
     for (size_t i = 0; i < n_queues; i++) {
