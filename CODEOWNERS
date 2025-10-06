@@ -145,7 +145,7 @@ Cargo.*                                     @chrysn
 /tests/pkg/lwip*                            @miri64
 /tests/pkg/libschc/                         @miri64
 /tests/net/slip/                            @miri64
-/tests/unittests                            @miri64
+/tests/unittests                            @miri64 @teufelchen1
 /tests/*/tests/*.py                         @miri64
 /tests/cpu/efm32_features/                  @basilfx
 
