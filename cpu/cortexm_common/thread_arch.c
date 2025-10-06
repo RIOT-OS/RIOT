@@ -497,11 +497,6 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
-#if (defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__)) && \
-    defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
-#undef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
-#endif
-
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 {
     /* stack frame:
