@@ -406,6 +406,19 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
 #endif
 
 /**
+ * @brief Threshold in microseconds below which event_handler
+ *        are not printed while debugging.
+ *
+ * This can be used for debugging event loops. Setting a value
+ * other than zero will also remove the event_handler start message.
+ *
+ * Use this to prevent *a lot* of output when debugging.
+ */
+#ifndef CONFIG_EVENT_LOOP_DEBUG_THRESHOLD_US
+#  define CONFIG_EVENT_LOOP_DEBUG_THRESHOLD_US (0)
+#endif
+
+/**
  * @brief   Simple event loop with multiple queues
  *
  * This function will forever sit in a loop, waiting for events to be queued
@@ -438,21 +451,28 @@ static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
     while (1) {
         event_t *event = event_wait_multi(queues, n_queues);
         if (IS_USED(MODULE_EVENT_LOOP_DEBUG)) {
-            uint32_t now;
             ztimer_acquire(ZTIMER_USEC);
 
-            void _event_callback_handler(event_t *event);
-            if (!IS_USED(MODULE_EVENT_CALLBACK) ||
-                event->handler != _event_callback_handler) {
+            void _event_callback_handler(event_t * event);
+            if ((CONFIG_EVENT_LOOP_DEBUG_THRESHOLD_US == 0) &&
+                (!IS_USED(MODULE_EVENT_CALLBACK) ||
+                 event->handler != _event_callback_handler)) {
                 printf("event: executing %p->%p\n",
                        (void *)event, (void *)(uintptr_t)event->handler);
             }
-            now = ztimer_now(ZTIMER_USEC);
+            uint32_t now = ztimer_now(ZTIMER_USEC);
+            /* events might modify themself */
+            void *handler_ptr = (void *)(uintptr_t)event->handler;
 
             event->handler(event);
 
-            printf("event: %p took %" PRIu32 " µs\n",
-                   (void *)event, ztimer_now(ZTIMER_USEC) - now);
+            uint32_t dt = ztimer_now(ZTIMER_USEC) - now;
+
+            if ((CONFIG_EVENT_LOOP_DEBUG_THRESHOLD_US == 0) ||
+                dt > CONFIG_EVENT_LOOP_DEBUG_THRESHOLD_US) {
+                printf("event: %p->%p ran: %" PRIu32 " usec\n",
+                       (void *)event, handler_ptr, dt);
+            }
             ztimer_release(ZTIMER_USEC);
         }
         else {
