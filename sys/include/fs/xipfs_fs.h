@@ -139,7 +139,7 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
 
 /**
- * @brief Executes safely an executable file with arguments.
+ * @brief Runs an executable file according to arguments with MPU-based memory isolation.
  *
  * @param full_path A full path such as `/nvme0p0/my_executable_file`
  *

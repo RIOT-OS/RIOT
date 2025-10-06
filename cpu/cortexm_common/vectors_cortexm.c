@@ -483,14 +483,14 @@ void hard_fault_default(void)
 
 void mem_manage_default(void)
 {
-#  if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
+#if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
     uint32_t mmfar = SCB->MMFAR;
     uint32_t cfsr = SCB->CFSR;
     uintptr_t psp = __get_PSP();
     if (xipfs_mem_manage_handler((void *)psp, mmfar, cfsr) == 0) {
         return;
     }
-#  endif
+#endif
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
 }
 

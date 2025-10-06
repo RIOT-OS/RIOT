@@ -5,9 +5,12 @@ ifeq (,$(filter xipfs_fs,$(DISABLE_MODULE)))
   # xipfs only makes sense if the flash memory is addressable
   FEATURES_REQUIRED += periph_flashpage_in_address_space
   FEATURES_REQUIRED += arch_32bit arch_arm
+  # xipfs safe execution feature relies on MPU.
+  FEATURES_REQUIRED += cortexm_mpu
   FEATURES_OPTIONAL += periph_flashpage_aux
   USEMODULE += periph_flashpage
   USEMODULE += mtd_flashpage
   USEMODULE += vfs
   USEMODULE += shell_cmd_xipfs
+  USE_MODULE += cortexm_svc
 endif
