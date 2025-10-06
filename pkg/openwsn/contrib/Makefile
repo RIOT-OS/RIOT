@@ -14,8 +14,4 @@ ifneq (,$(filter openwsn_radio_hal,$(USEMODULE)))
   SRC += radio_hal.c
 endif
 
-ifneq (,$(filter openwsn_radio_netdev,$(USEMODULE)))
-  SRC += radio_netdev.c
-endif
-
 include $(RIOTBASE)/Makefile.base
