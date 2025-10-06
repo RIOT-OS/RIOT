@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import rehypeGithubEmoji from "rehype-github-emoji";
+import starlightImageZoom from "starlight-image-zoom";
 
 // https://astro.build/config
 export default defineConfig({
@@ -175,7 +176,7 @@ export default defineConfig({
         src: "./src/assets/riot-logo.svg",
         replacesTitle: true,
       },
-      plugins: [],
+      plugins: [starlightImageZoom()],
       editLink: {
         baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
       },
