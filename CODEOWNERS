@@ -37,6 +37,7 @@ Cargo.*                                     @chrysn
 /boards/stk3*00/                            @basilfx
 /boards/openmote*/                          @MrKevinWeiss
 /boards/atxmega*/                           @nandojve
+/boards/rpi-pico-2*/                        @AnnsAnns
 
 /core/                                      @kaspar030
 
@@ -60,8 +61,9 @@ Cargo.*                                     @chrysn
 /cpu/stm32*/                                @aabadie @vincent-d
 /cpu/stm32/periph/eth*                      @maribu
 /cpu/stm32/periph/ptp.c                     @maribu
+/cpu/rp2350*/                               @AnnsAnns
 
-/doc/                                       @aabadie @jia200x
+/doc/                                       @aabadie @jia200x @AnnsAnns
 
 /dist/tools/sliptty/                        @miri64
 /dist/tools/dhcpv6-pd_ia/                   @miri64
