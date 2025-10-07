@@ -304,7 +304,9 @@ Then answer a few questions about the driver:
 Other global information (author name, email, organization) should be retrieved
 automatically from your git configuration.
 
-## Using Common Code
+## Common Board Directories
+
+### Using Common Code
 
 To avoid code duplication, common code across boards has been grouped in
 `boards/common`. e.g. `BOARD`s based on the same cpu (`boards/common/nrf52`) or
@@ -335,6 +337,125 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 ```
+
+#### New Style Common Code
+
+The common board definitions of RIOT are currently being reworked to make the
+usage of common code easier and less error prone. For example, if you want
+to use the common code for the Adafruit nRF52 Bootloader that is used
+by many of the nRF52 based boards from Adafruit, you simply have to add the
+following line to the `Makefile.dep` of your board. Everything else
+will be automatically included by the build system.
+
+```makefile
+USEMODULE += boards_common_adafruit-nrf52-bootloader
+```
+
+Not all common code is migrated to the new style yet, so if you are unsure
+whether it is or not, you can check if the `boards/Makefile` already
+includes a reference to the common code you want to use. If you are still
+unsure, you can still use the Old Style Common Code or ask the
+community.
+
+#### Old Style Common Code
+
+If you want to use common makefiles, include them at the end of the specific
+`Makefile`, e.g. for a `Makefile.features`:
+
+```makefile
+CPU = foo
+CPU_MODEL = foobar
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart
+include $(RIOTBOARD)/common/foo_common/Makefile.features
+```
+
+If the common code includes source files, it might be necessary
+to explicitly include the directory in your `Makefile` so the Make system
+finds all the necessary files:
+
+```makefile
+MODULE = board
+
+DIRS += $(RIOTBOARD)/common/myCommonFolder
+
+include $(RIOTBASE)/Makefile.base
+```
+
+If possible, you should use the New Style Common Code though.
+
+### Moving Common Code to a Dedicated Folder
+
+If you port a board that is very similar to an already existing board, it might
+make sense to move the shared code to a common directory located in
+`boards/common` to use it as described in the previous section.
+
+The directory structure of a common folder is very similar to the board
+folder structure and not all files and folders have to be present except for
+the main `Makefile`.
+
+```
+RIOT
+└── boards
+    └── common
+        └── adafruit-nrf52-bootloader
+            ├── board.c
+            ├── doc.md
+            ├── include
+            │   ├── periph_conf.h
+            │   ├── board.h
+            │   └── gpio_params.h
+            ├── Makefile
+            ├── Makefile.dep
+            ├── Makefile.features
+            └── Makefile.include
+```
+
+The main `Makefile` defines the module name for the common board module and
+should follow the general naming scheme of `boards_common_awesome-common-stuff`.
+
+```makefile
+MODULE = boards_common_adafruit-nrf52-bootloader
+
+include $(RIOTBASE)/Makefile.base
+```
+
+The `Makefile.dep`, `Makefile.features` and `Makefile.include` are optional
+and work the same way as their normal board pendants.
+
+To inform the build system about the common folders and Makefiles, the
+`boards/Makefile`, `boards/Makefile.dep`, `boards/Makefile.features` and
+`boards/Makefile.include` files have to be modified.
+
+The `boards/Makefile` contains the directory entries for the common files.
+The entries should check if the common module is used and conditionally add
+the directory to the `DIRS` variable.
+Please note that the entries should be sorted alphabetically.
+```makefile
+# SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+...
+ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
+  DIRS += $(RIOTBOARD)/common/adafruit-nrf52-bootloader
+endif
+...
+```
+
+The `boards/Makefile.dep`, `boards/Makefile.features` and
+`boards/Makefile.include` just include their common counterparts. As an
+example, an entry of the `boards/Makefile.dep` is shown:
+```makefile
+# SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+...
+ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
+  include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep
+endif
+...
+```
+
+You only have to add entries to the `board/Makefile`s if your common code
+actually has the regarding Makefile-type.
 
 ## Boards Outside of RIOTBASE
 
@@ -433,5 +554,5 @@ Some scripts and tools available to ease `BOARD` porting and testing:
 - [In her blog](https://blog.martine-lenders.eu/riot-board-en.html), Martine Lenders documented her approach of
   porting the [Adafruit Feather nRF52840 Express](https://doc.riot-os.org/group__boards__adafruit-feather-nrf52840-express.html)
   in February 2020.
-- [Over at HackMD][https://hackmd.io/njFHwQ33SNS3sQKAkLkNtQ], Akshai M documented his approach of
+- [Over at HackMD](https://hackmd.io/njFHwQ33SNS3sQKAkLkNtQ), Akshai M documented his approach of
   porting the [Silicon Labs SLSTK3400A starter kit](https://doc.riot-os.org/group__boards__slstk3400a.html) in July 2020.
