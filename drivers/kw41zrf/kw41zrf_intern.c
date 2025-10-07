@@ -180,22 +180,20 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
         back_to_sleep = 1;
         seq = XCVSEQ_IDLE;
     }
-    else if ((seq == XCVSEQ_RECEIVE) && dev->recv_blocked) {
-        /* Wait in standby until recv has been called to avoid corrupting the RX
-         * buffer before the frame has been received by the higher layers */
-        seq = XCVSEQ_IDLE;
-    }
-    uint32_t seq_old = ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK;
-    if (seq_old != XCVSEQ_IDLE && seq_old != XCVSEQ_RECEIVE) {
-        LOG_ERROR("[kw41zrf] seq not idle: 0x%" PRIu32 "\n", seq_old);
-        assert(0);
-    }
 
-    kw41zrf_abort_sequence(dev);
+    if (seq == XCVSEQ_IDLE) {
+        kw41zrf_abort_sequence(dev);
+        if (back_to_sleep) {
+            kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
+        }
+        return;
+    }
 
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL & ~(ZLL_PHY_CTRL_XCVSEQ_MASK | ZLL_PHY_CTRL_SEQMSK_MASK)) | seq;
+
     while (((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK) >>
         ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_SHIFT) != (ZLL_PHY_CTRL_XCVSEQ_MASK & seq)) {}
+
     if (back_to_sleep) {
         kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
     }

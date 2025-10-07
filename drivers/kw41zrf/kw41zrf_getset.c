@@ -18,6 +18,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdint.h>
 #include <string.h>
 #include "log.h"
 #include "bit.h"
@@ -59,6 +60,7 @@ static const uint8_t tx_power_dbm_to_pa_pwr[29] = {
 
 void kw41zrf_set_tx_power(kw41zrf_t *dev, int16_t txpower_dbm)
 {
+    (void)dev;
     if (txpower_dbm < KW41ZRF_OUTPUT_POWER_MIN) {
         txpower_dbm = KW41ZRF_OUTPUT_POWER_MIN;
     }
@@ -115,6 +117,16 @@ void kw41zrf_set_pan(kw41zrf_t *dev, uint16_t pan)
     DEBUG("[kw41zrf] set pan to: 0x%x\n", pan);
 }
 
+void kw41zrf_set_pan_coord(uint8_t is_coord)
+{
+    if (is_coord) {
+        bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_PANCORDNTR0_SHIFT);
+    }
+    else {
+        bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_PANCORDNTR0_SHIFT);
+    }
+}
+
 void kw41zrf_set_addr_short(kw41zrf_t *dev, const network_uint16_t *addr)
 {
     (void) dev;
@@ -163,17 +175,22 @@ void kw41zrf_set_cca_threshold(kw41zrf_t *dev, int8_t value)
         ZLL_CCA_LQI_CTRL_CCA1_THRESH(value);
 }
 
-void kw41zrf_set_cca_mode(kw41zrf_t *dev, uint8_t mode)
+void kw41zrf_set_cca_type(kw41zrf_t *dev, uint8_t type)
 {
     (void) dev;
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL & ~ZLL_PHY_CTRL_CCATYPE_MASK) |
-        ZLL_PHY_CTRL_CCATYPE(mode);
+        ZLL_PHY_CTRL_CCATYPE(type);
 }
 
-uint8_t kw41zrf_get_cca_mode(kw41zrf_t *dev)
+uint8_t kw41zrf_get_cca_type(kw41zrf_t *dev)
 {
     (void) dev;
     return (ZLL->PHY_CTRL & ZLL_PHY_CTRL_CCATYPE_MASK) >> ZLL_PHY_CTRL_CCATYPE_SHIFT;
+}
+
+void kw41zrf_set_cca3_mode(uint8_t mode) {
+    ZLL->CCA_LQI_CTRL = (ZLL->CCA_LQI_CTRL & ~ZLL_CCA_LQI_CTRL_CCA3_AND_NOT_OR_MASK) |
+                        ZLL_CCA_LQI_CTRL_CCA3_AND_NOT_OR(mode);
 }
 
 int8_t kw41zrf_get_ed_level(kw41zrf_t *dev)
@@ -186,13 +203,13 @@ int8_t kw41zrf_get_ed_level(kw41zrf_t *dev)
 void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
 {
     DEBUG("[kw41zrf] set option 0x%04x to %x\n", option, state);
-
+    (void)dev;
     if (kw41zrf_is_dsm()) {
         /* Transceiver is sleeping */
         switch (option) {
             /* Modifying these options require that the transceiver is not in
              * deep sleep mode */
-            case KW41ZRF_OPT_CSMA:
+            case KW41ZRF_OPT_CCA_BEFORE_TX:
             case KW41ZRF_OPT_PROMISCUOUS:
             case KW41ZRF_OPT_AUTOACK:
             case KW41ZRF_OPT_ACK_PENDING:
@@ -208,12 +225,10 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
 
     /* set option field */
     if (state) {
-        dev->flags |= option;
-
         /* trigger option specific actions */
         switch (option) {
-            case KW41ZRF_OPT_CSMA:
-                DEBUG("[kw41zrf] enable: CSMA\n");
+            case KW41ZRF_OPT_CCA_BEFORE_TX:
+                DEBUG("[kw41zrf] enable: CCA before TX\n");
                 bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_CCABFRTX_SHIFT);
                 break;
 
@@ -240,11 +255,10 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
         }
     }
     else {
-        dev->flags &= ~(option);
         /* trigger option specific actions */
         switch (option) {
-            case KW41ZRF_OPT_CSMA:
-                DEBUG("[kw41zrf] disable: CSMA\n");
+            case KW41ZRF_OPT_CCA_BEFORE_TX:
+                DEBUG("[kw41zrf] disable: CCA before TX\n");
                 bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_CCABFRTX_SHIFT);
                 break;
 
@@ -260,10 +274,8 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
                 break;
 
             case KW41ZRF_OPT_ACK_PENDING:
-                DEBUG("[kw41zrf] disable: PENDING_BIT\n");
-                bit_clear32(&ZLL->SAM_TABLE, ZLL_SAM_TABLE_ACK_FRM_PND_SHIFT);
+                DEBUG("[kw41zrf] disable: PENDING_BIT\n"); bit_clear32(&ZLL->SAM_TABLE, ZLL_SAM_TABLE_ACK_FRM_PND_SHIFT);
                 break;
-
             default:
                 /* do nothing */
                 break;
@@ -275,4 +287,30 @@ void kw41zrf_set_rx_watermark(kw41zrf_t *dev, uint8_t value)
 {
     (void) dev;
     ZLL->RX_WTR_MARK = ZLL_RX_WTR_MARK_RX_WTR_MARK(value);
+}
+
+void kw41zrf_set_partition_enable(uint8_t en, uint8_t partition_shift)
+{
+    if (en) {
+        bit_set32(&ZLL->SAM_CTRL, partition_shift);
+    }
+    else {
+        bit_clear32(&ZLL->SAM_CTRL, partition_shift);
+    }
+}
+
+uint8_t kw41zrf_get_partition_enable(uint32_t partition_mask, uint8_t partition_shift)
+{
+    return (ZLL->SAM_CTRL & partition_mask) >> partition_shift;
+}
+
+uint8_t kw41zrf_get_partition_start(uint32_t partition_mask, uint8_t partition_shift)
+{
+    return (ZLL->SAM_CTRL & partition_mask) >> partition_shift;
+}
+
+uint8_t kw41zrf_get_1st_free_idx_sap0(void)
+{
+    return (ZLL->SAM_FREE_IDX & ZLL_SAM_FREE_IDX_SAP0_1ST_FREE_IDX_MASK)
+    >> ZLL_SAM_FREE_IDX_SAP0_1ST_FREE_IDX_SHIFT;
 }
