@@ -162,10 +162,26 @@ int kw41zrf_can_switch_to_idle(kw41zrf_t *dev);
 /**
  * @brief   Set sequence state of device
  *
+ * @note    Setting any sequence before the radio is in SEQ_IDLE has no effect.
+ *          Setting IDLE will properly abort any ongoing sequence.
+ *
  * @param[in] dev       kw41zrf device descriptor
  * @param[in] seq       sequence
  */
 void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq);
+
+/**
+ * @brief   Get the current state of device
+ *
+ * @param[in] dev   kw41zrf device descriptor
+ *
+ * @return current state
+ */
+static inline uint8_t kw41zrf_get_sequence(kw41zrf_t *dev)
+{
+    (void)dev;
+    return (ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) >> ZLL_PHY_CTRL_XCVSEQ_SHIFT;
+}
 
 /**
  * @brief Abort the current autosequence
@@ -187,6 +203,18 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
     /* Clear interrupt flags */
     uint32_t irqsts = ZLL->IRQSTS;
     ZLL->IRQSTS = irqsts;
+}
+
+/**
+ * @brief   Abort current sequence and set new sequence state
+ *
+ * @param[in] dev       kw41zrf device descriptor
+ * @param[in] seq       new sequence state to set
+ */
+static inline void kw41zrf_set_sequence_abort(kw41zrf_t *dev, uint32_t seq)
+{
+    kw41zrf_abort_sequence(dev);
+    kw41zrf_set_sequence(dev, seq);
 }
 
 /**
@@ -272,6 +300,12 @@ static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
 {
     (void) dev;
     return ZLL->TIMESTAMP;
+}
+
+static inline uint8_t kw41zrf_ack_requested(kw41zrf_t *dev)
+{
+        (void) dev;
+        return (ZLL->PHY_CTRL & ZLL_PHY_CTRL_RXACKRQD_MASK);
 }
 
 #ifdef __cplusplus
