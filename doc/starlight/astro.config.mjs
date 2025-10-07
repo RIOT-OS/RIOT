@@ -153,6 +153,12 @@ export default defineConfig({
           ],
         },
         {
+          label: "Board Specific",
+          items: [
+            "board_specific/stm32"
+          ],
+        },
+        {
           label: "Miscellaneous",
           items: [
             "misc/dev_best_practices",
