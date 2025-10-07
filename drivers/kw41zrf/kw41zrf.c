@@ -15,6 +15,7 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @}
  */
+#include "net/netdev/ieee802154_submac.h"
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
@@ -36,74 +37,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void kw41zrf_set_address(kw41zrf_t *dev)
-{
-    DEBUG("[kw41zrf] Set MAC address\n");
-
-    /* set short and long address */
-    kw41zrf_set_addr_long(dev, (eui64_t *)&dev->netdev.long_addr);
-    kw41zrf_set_addr_short(dev, (network_uint16_t *)&dev->netdev.short_addr);
-}
-
-void kw41zrf_setup(kw41zrf_t *dev, uint8_t index)
-{
-    netdev_t *netdev = &dev->netdev.netdev;
-
-    netdev->driver = &kw41zrf_driver;
-
-    /* register with netdev */
-    netdev_register(netdev, NETDEV_KW41ZRF, index);
-
-    /* get unique IDs to use as hardware addresses */
-    netdev_ieee802154_setup(&dev->netdev);
-
-    /* initialize device descriptor */
-    dev->idle_seq = XCVSEQ_RECEIVE;
-    dev->pm_blocked = 0;
-    dev->recv_blocked = 0;
-    /* Set default parameters according to STD IEEE802.15.4-2015 */
-    dev->csma_max_be = 5;
-    dev->csma_min_be = 3;
-    dev->max_retrans = 3;
-    dev->csma_max_backoffs = 4;
-
-    DEBUG("[kw41zrf] setup finished\n");
-}
-
 /* vendor routine to initialize the radio core */
 int kw41zrf_xcvr_init(kw41zrf_t *dev);
-
-int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
-{
-    if (dev == NULL) {
-        return -EINVAL;
-    }
-
-    /* Save a copy of the RF_OSC_EN setting to use when the radio is in deep sleep */
-    dev->rf_osc_en_idle = RSIM->CONTROL & RSIM_CONTROL_RF_OSC_EN_MASK;
-    kw41zrf_mask_irqs();
-    kw41zrf_set_irq_callback(cb, dev);
-
-    /* Perform clean reset of the radio modules. */
-    int res = kw41zrf_reset(dev);
-    if (res < 0) {
-        /* initialization error signaled from vendor driver */
-        /* Restore saved RF_OSC_EN setting */
-        RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | dev->rf_osc_en_idle;
-        return res;
-    }
-    /* Radio is now on and idle */
-
-    /* Allow radio interrupts */
-    kw41zrf_unmask_irqs();
-
-    DEBUG("[kw41zrf] enabling RX start IRQs\n");
-    bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_RX_WMRK_MSK_SHIFT);
-
-    DEBUG("[kw41zrf] init finished\n");
-
-    return 0;
-}
 
 int kw41zrf_reset_hardware(kw41zrf_t *dev)
 {
@@ -197,72 +132,4 @@ int kw41zrf_reset_hardware(kw41zrf_t *dev)
     return 0;
 }
 
-int kw41zrf_reset(kw41zrf_t *dev)
-{
-    kw41zrf_mask_irqs();
 
-    /* Sometimes (maybe 1 in 30 reboots) there is a failure in the vendor
-     * routines in kw41zrf_rx_bba_dcoc_dac_trim_DCest() that can be worked
-     * around by retrying. Clearly this is not ideal.
-     */
-    for (int retries = 0; ; retries++) {
-        int res = kw41zrf_reset_hardware(dev);
-        if (!res) {
-            if (retries) {
-                LOG_WARNING("kw41zrf_reset_hardware() needed %i retries\n",
-                            retries);
-            }
-            break;
-        }
-        if (retries == 9) {
-            LOG_ERROR("kw41zrf_reset_hardware() returned %i\n", res);
-            kw41zrf_unmask_irqs();
-            return res;
-        }
-    }
-
-    /* Compute warmup times (scaled to 16us) */
-    dev->rx_warmup_time =
-        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
-        XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
-    dev->tx_warmup_time =
-        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_MASK) >>
-        XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
-
-    /* divide by 16 and round up */
-    dev->rx_warmup_time = (dev->rx_warmup_time + 15) / 16;
-    dev->tx_warmup_time = (dev->tx_warmup_time + 15) / 16;
-
-    /* Reset software link layer driver state */
-    netdev_ieee802154_reset(&dev->netdev);
-
-    dev->tx_power = KW41ZRF_DEFAULT_TX_POWER;
-    dev->idle_seq = XCVSEQ_RECEIVE;
-    kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-    kw41zrf_abort_sequence(dev);
-    kw41zrf_set_tx_power(dev, dev->tx_power);
-
-    kw41zrf_set_channel(dev, KW41ZRF_DEFAULT_CHANNEL);
-
-    kw41zrf_set_address(dev);
-
-    kw41zrf_set_cca_mode(dev, 1);
-
-    kw41zrf_set_rx_watermark(dev, 1);
-
-    kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK, 1);
-    kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, 1);
-
-    static const netopt_enable_t ack_req =
-        IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                          &ack_req, sizeof(ack_req));
-
-    kw41zrf_abort_sequence(dev);
-    kw41zrf_set_sequence(dev, dev->idle_seq);
-    kw41zrf_unmask_irqs();
-
-    DEBUG("[kw41zrf] reset radio and set to channel %d.\n",
-          KW41ZRF_DEFAULT_CHANNEL);
-    return 0;
-}
