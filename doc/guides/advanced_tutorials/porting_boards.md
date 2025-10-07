@@ -304,7 +304,9 @@ Then answer a few questions about the driver:
 Other global information (author name, email, organization) should be retrieved
 automatically from your git configuration.
 
-## Using Common Code
+## Common Board Directories
+
+### Using Common Code
 
 To avoid code duplication, common code across boards has been grouped in
 `boards/common`. e.g. `BOARD`s based on the same cpu (`boards/common/nrf52`) or
@@ -335,6 +337,77 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 ```
+
+### Moving Common Code to a Dedicated Folder
+
+If you port a board that is very similar to an already existing board, it might
+make sense to move the shared code to a common directory located in
+`boards/common` to use it as described in the previous section.
+
+The directory structure of a common folder is very similar to the board
+folder structure and not all files and folders have to be present except for
+the main `Makefile`.
+
+```
+RIOT
+└── boards
+    └── common
+        └── adafruit-nrf52-bootloader
+            ├── board.c
+            ├── doc.md
+            ├── include
+            │   ├── periph_conf.h
+            │   ├── board.h
+            │   └── gpio_params.h
+            ├── Makefile
+            ├── Makefile.dep
+            ├── Makefile.features
+            └── Makefile.include
+```
+
+The main `Makefile` defines the module name for the common board module and
+should follow the general naming scheme of `boards_common_awesome-common-stuff`.
+
+```makefile
+MODULE = boards_common_adafruit-nrf52-bootloader
+
+include $(RIOTBASE)/Makefile.base
+```
+
+The `Makefile.dep`, `Makefile.features` and `Makefile.include` are optional
+and work the same way as their normal board pendants.
+
+To inform the build system about the common folders and Makefiles, the
+`boards/Makefile`, `boards/Makefile.dep`, `boards/Makefile.features` and
+`boards/Makefile.include` files have to be modified.
+
+The `boards/Makefile` contains the directory entries for the common files.
+The entries should check if the common module is used and conditionally add
+the directory to the `DIRS` variable.
+Please note that the entries should be sorted alphabetically.
+```makefile
+# SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+...
+ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
+  DIRS += $(RIOTBOARD)/common/adafruit-nrf52-bootloader
+endif
+...
+```
+
+The `boards/Makefile.dep`, `boards/Makefile.features` and
+`boards/Makefile.include` just include their common counterparts. As an
+example, an entry of the `boards/Makefile.dep` is shown:
+```makefile
+# SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+...
+ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
+  include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep
+endif
+...
+```
+
+You only have to add entries to the `board/Makefile`s if your common code
+actually has the regarding Makefile-type.
 
 ## Boards Outside of RIOTBASE
 
