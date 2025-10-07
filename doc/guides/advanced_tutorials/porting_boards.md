@@ -433,5 +433,5 @@ Some scripts and tools available to ease `BOARD` porting and testing:
 - [In her blog](https://blog.martine-lenders.eu/riot-board-en.html), Martine Lenders documented her approach of
   porting the [Adafruit Feather nRF52840 Express](https://doc.riot-os.org/group__boards__adafruit-feather-nrf52840-express.html)
   in February 2020.
-- [Over at HackMD][https://hackmd.io/njFHwQ33SNS3sQKAkLkNtQ], Akshai M documented his approach of
+- [Over at HackMD](https://hackmd.io/njFHwQ33SNS3sQKAkLkNtQ), Akshai M documented his approach of
   porting the [Silicon Labs SLSTK3400A starter kit](https://doc.riot-os.org/group__boards__slstk3400a.html) in July 2020.
