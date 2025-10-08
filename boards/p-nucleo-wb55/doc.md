@@ -47,8 +47,8 @@ with 256KB of RAM and 1MB of ROM Flash.
 
 ## Flashing the Board
 
-A detailed description about the flashing process can be found at the
-common [Flashing the Nucleo](@ref boards_common_nucleo_flashing) page.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
 The board name for the P-Nucleo-WB55 is `p-nucleo-wb55`.
 
 
