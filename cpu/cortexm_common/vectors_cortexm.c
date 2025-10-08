@@ -476,11 +476,6 @@ void hard_fault_default(void)
     defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
     defined(CPU_CORE_CORTEX_M7)
 
-#if (defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__)) && \
-    defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
-#undef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
-#endif
-
 void mem_manage_default(void)
 {
 #if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
