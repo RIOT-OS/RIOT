@@ -36,11 +36,11 @@ int gpio_init(gpio_t pin, gpio_mode_t mode) {
 
     switch (mode) {
         case GPIO_OUT:
-        *(uint32_t*)calculate_gpio_io_ctrl_register_addr(pin) =
+        *calculate_gpio_io_ctrl_register_addr(pin) =
         FUNCTION_SELECT_SIO;
 
         volatile uint32_t* pad_reg =
-        (uint32_t*)calculate_gpio_pad_register_addr(pin);
+        calculate_gpio_pad_register_addr(pin);
 
         /* We clear all bits except the drive strength bit.
          * We set that to the highest one possible (12mA)
