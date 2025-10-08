@@ -1,5 +1,3 @@
-USEMODULE += periph
-
 FEATURES_REQUIRED += periph_xh3irq
-
+include $(RIOTCPU)/rp2350_common/Makefile.dep
 include $(RIOTCPU)/riscv_common/Makefile.dep

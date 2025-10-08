@@ -25,35 +25,13 @@
  #include "periph/uart.h"
  #include "periph_conf.h"
 
-void gpio_reset(void)
-{
-    reset_component(RESET_PADS_BANK0, RESET_PADS_BANK0);
-    reset_component(RESET_IO_BANK0, RESET_IO_BANK0);
-}
-
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral
  */
 void cpu_init(void)
 {
-    /* Reset GPIO state */
-    gpio_reset();
-
-    /* Reset clock to default state */
-    clock_reset();
-
-    /* initialize the CPU clock */
-    cpu_clock_init();
-
-    /* initialize the RISC-V core */
+    /* rp2350 common startup routine */
+    rp2350_init();
+    /* initialize the RISC-V core (Interrupts, FPU, etc) */
     riscv_init();
-
-    /* initialize the early peripherals */
-    early_init();
-
-    /* trigger static peripheral initialization */
-    periph_init();
-
-    /* initialize the board */
-    board_init();
 }

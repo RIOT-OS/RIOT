@@ -1,4 +1,3 @@
-CPU_MODEL       := RP2350_RISCV
 PORT_LINUX      ?= /dev/ttyACM0
 
 # JLink has unresolved bugs regarding the RP2350 (as of 23.02.2026)
