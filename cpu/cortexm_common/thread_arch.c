@@ -97,10 +97,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
-#include "include/xipfs.h"
-#endif
-
 extern uint32_t _estack;
 extern uint32_t _sstack;
 
@@ -497,6 +493,41 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
+static svc_dispatch_handler_t _svc_dispatch_handler = NULL;
+
+#ifndef NDEBUG
+const char *_free_svc_dispatch_handler_last_file = NULL;
+
+void assert_free_svc_dispatch_handler_ex(const char *file, int line) {
+    if (_svc_dispatch_handler != NULL) {
+        printf( "SVC dispatch handler is not free : assertion from "
+                "file %s at line %d, previously from file %s\n",
+                file, line,
+                _free_svc_dispatch_handler_last_file);
+
+        for(;;);
+    }
+}
+
+#endif
+
+int set_svc_dispatch_handler(svc_dispatch_handler_t handler) {
+    if (handler == NULL)
+        return -1;
+    if (_svc_dispatch_handler != NULL)
+        return -1;
+    _svc_dispatch_handler = handler;
+    return 0;
+}
+
+void remove_svc_dispatch_handler(void) {
+    _svc_dispatch_handler = NULL;
+#ifndef NDEBUG
+    _free_svc_dispatch_handler_last_file = NULL;
+#endif
+}
+
+
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 {
     /* stack frame:
@@ -522,20 +553,12 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
         case 1: /* SVC number used by cpu_switch_context_exit */
             SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             break;
-#if defined(MODULE_XIPFS) && defined(XIPFS_ENABLE_SAFE_EXEC_SUPPORT)
-        case XIPFS_ENTER_SVC_NUMBER: {
-            void *crt0_ctx = (void *)svc_args[0];
-            void *entry_point = (void *)svc_args[1];
-            void *stack_top = (void *)svc_args[2];
-            xipfs_safe_exec_enter(crt0_ctx, entry_point, stack_top);
-            break;
-        }
-        case XIPFS_SYSCALL_SVC_NUMBER: {
-            xipfs_syscall_dispatcher(svc_args);
-            break;
-        }
-#endif
         default:
+            if (_svc_dispatch_handler != NULL) {
+                if (_svc_dispatch_handler(svc_number, svc_args) >= 0) {
+                    return;
+                }
+            }
             DEBUG("svc: unhandled SVC #%u\n", svc_number);
             break;
     }

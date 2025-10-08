@@ -47,6 +47,8 @@
 #include "debug.h"
 #include "fs/xipfs_fs.h"
 #include "periph/flashpage.h"
+#include "vectors_cortexm.h"
+#include "thread_arch.h"
 
 #include "saul_reg.h"
 
@@ -729,6 +731,35 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
     return ret;
 }
 
+int xipfs_memory_manage_handler(void) {
+    uint32_t mmfar = SCB->MMFAR;
+    uint32_t cfsr = SCB->CFSR;
+    uintptr_t psp = __get_PSP();
+    if (xipfs_mem_manage_handler((void *)psp, mmfar, cfsr) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int xipfs_svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args) {
+    switch (svc_number) {
+        case XIPFS_ENTER_SVC_NUMBER: {
+            void *crt0_ctx = (void *)svc_args[0];
+            void *entry_point = (void *)svc_args[1];
+            void *stack_top = (void *)svc_args[2];
+            xipfs_safe_exec_enter(crt0_ctx, entry_point, stack_top);
+            return 0;
+        }
+        case XIPFS_SYSCALL_SVC_NUMBER: {
+            xipfs_syscall_dispatcher(svc_args);
+            return 0;
+        }
+        default:
+            return -ENOTSUP;
+    }
+}
+
 int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
 {
     xipfs_mount_t mp;
@@ -746,7 +777,18 @@ int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
     }
 
     mutex_lock(mp.execution_mutex);
+
+    assert_free_mem_manage_handler();
+    set_memory_manage_handler(xipfs_memory_manage_handler);
+
+    assert_free_svc_dispatch_handler();
+    set_svc_dispatch_handler(xipfs_svc_dispatch_handler);
+
     ret = xipfs_safe_execv(&mp, path, argv, xipfs_user_syscalls_table);
+
+    remove_memory_manage_handler();
+    remove_svc_dispatch_handler();
+
     mutex_unlock(mp.execution_mutex);
 
     return ret;
