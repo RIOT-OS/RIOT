@@ -3,18 +3,6 @@ title: Managing a Release
 description: This page describes the process of managing a release.
 ---
 
-## Contents
-
-1. [Checklist](#1-checklist)
-2. [Preparation](#2-preparation)
-3. [Feature Freeze and Testing](#3-feature-freeze-and-testing)
-4. [Drafting Release Notes](#4-drafting-release-notes)
-5. [Actual Release](#5-actual-release)
-6. [Other Repositories](#6-other-repositories)
-7. [Important Fixes after Release](#7-important-fixes-after-release)
-8. [Resources](#8-resources)
-9. [Forum Post Templates](#9-forum-post-templates)
-
 ## 1. Checklist
 
 Steps marked with a :scroll: icon can also be automated with the release manager script.
