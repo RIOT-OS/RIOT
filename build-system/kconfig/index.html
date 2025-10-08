@@ -89,8 +89,8 @@ compile-time. This means having a standard way of:</p>
 </li>
 <li>Applying the selected configuration</li>
 </ul>
-<h2 id="overview">Overview</h2>
-<h3 id="exposure">Exposure</h3>
+<div class="sl-heading-wrapper level-h2"><h2 id="overview">Overview</h2><a class="sl-anchor-link" href="#overview"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Overview”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="exposure">Exposure</h3><a class="sl-anchor-link" href="#exposure"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Exposure”</span></a></div>
 <p>Modules in RIOT expose their configurable parameters via
 Kconfig files (for more information on Kconfig syntax check
 <a href="https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html">the specification</a>).
@@ -99,20 +99,20 @@ be expressed.</p>
 <p>Kconfig files are structured through the file system mirroring the current
 module distribution. In time, all modules will have Kconfig files to make
 themselves configurable through this system.</p>
-<h3 id="assignment">Assignment</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="assignment">Assignment</h3><a class="sl-anchor-link" href="#assignment"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Assignment”</span></a></div>
 <p>The user can assign values to the exposed parameters, either by manually writing
 ‘.config’ files or using an interface such as Menuconfig. Parameters with no
 assigned values will take the default ones. For a detailed distinction between
 Kconfig and ‘.config’ files see <a href="#appendix-b-difference-between-kconfig-and-config-files">Appendix B</a>.</p>
-<h3 id="verification-and-application">Verification and Application</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="verification-and-application">Verification and Application</h3><a class="sl-anchor-link" href="#verification-and-application"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Verification and Application”</span></a></div>
 <p>Using ‘.config’ and Kconfig files the build system takes care of doing the
 necessary checks on the values according to the parameter definition. After
-that, the <code>autoconf.h</code> header file is generated, it contains all the
-configurations in the form of (<code>CONFIG_</code> prefixed) macros.</p>
-<h2 id="user-guide-to-configure-with-kconfig">User Guide to Configure with Kconfig</h2>
-<h3 id="configure-using-menuconfig">Configure using menuconfig</h3>
+that, the <code dir="auto">autoconf.h</code> header file is generated, it contains all the
+configurations in the form of (<code dir="auto">CONFIG_</code> prefixed) macros.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="user-guide-to-configure-with-kconfig">User Guide to Configure with Kconfig</h2><a class="sl-anchor-link" href="#user-guide-to-configure-with-kconfig"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “User Guide to Configure with Kconfig”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="configure-using-menuconfig">Configure using menuconfig</h3><a class="sl-anchor-link" href="#configure-using-menuconfig"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Configure using menuconfig”</span></a></div>
 <p>In order to use the graphical interface menuconfig to configure the
-application, run <code>make menuconfig</code> in the application’s folder. All available
+application, run <code dir="auto">make menuconfig</code> in the application’s folder. All available
 configurations (based on the used modules) for the particular platform will be
 presented. By default, the configuration of a module via Kconfig is not enabled.
 In order to activate the configuration via Kconfig, the corresponding option
@@ -120,168 +120,168 @@ should be selected. That will enable the configuration of all inner options, if
 available.</p>
 <p>Once the desired configuration is achieved, save the configuration to the
 default proposed path and exit. The saved configuration will be applied when
-the code is compiled (<code>make all</code>).</p>
+the code is compiled (<code dir="auto">make all</code>).</p>
 <p>If the current configuration should be used in the future, it can be saved in the
-application’s folder as <code>user.config</code>, using the ‘Save’ option in menuconfig.
+application’s folder as <code dir="auto">user.config</code>, using the ‘Save’ option in menuconfig.
 This way it will be persistent after cleaning the application directory
-(<code>make clean</code>).</p>
-<h3 id="configure-using-config-files">Configure using ‘.config’ Files</h3>
+(<code dir="auto">make clean</code>).</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="configure-using-config-files">Configure using ‘.config’ Files</h3><a class="sl-anchor-link" href="#configure-using-config-files"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Configure using ‘.config’ Files”</span></a></div>
 <p>The second way to configure the application is by directly writing ‘.config’
 files. Two files will be sources of configuration during the generation of the
-final header file: <code>app.config</code> and <code>user.config</code>, which should be placed
-inside the application’s folder. <code>app.config</code> sets default configuration
+final header file: <code dir="auto">app.config</code> and <code dir="auto">user.config</code>, which should be placed
+inside the application’s folder. <code dir="auto">app.config</code> sets default configuration
 values for the particular application, the user can override them by setting
-them in <code>user.config</code>. Additionally, further <code>.config</code> files can be added to
-the variable <code>KCONFIG_ADD_CONFIG</code>, which will be applied <em>after</em> default CPU and
-board configurations, <code>app.config</code> and <code>user.config</code>. This means that they will
+them in <code dir="auto">user.config</code>. Additionally, further <code dir="auto">.config</code> files can be added to
+the variable <code dir="auto">KCONFIG_ADD_CONFIG</code>, which will be applied <em>after</em> default CPU and
+board configurations, <code dir="auto">app.config</code> and <code dir="auto">user.config</code>. This means that they will
 have priority.</p>
-<p>Let’s say that the <code>SOCK_UTIL_SCHEME_MAXLEN</code> symbol in <code>sock_util</code> module needs
-to be configured. The <code>user.config</code> file could look like:</p>
+<p>Let’s say that the <code dir="auto">SOCK_UTIL_SCHEME_MAXLEN</code> symbol in <code dir="auto">sock_util</code> module needs
+to be configured. The <code dir="auto">user.config</code> file could look like:</p>
 <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5F636F"># activate configuration of sock_util using Kconfig</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">CONFIG_KCONFIG_MODULE_SOCK_UTIL</span><span style="--0:#D6DEEB;--1:#403F53">=y</span></div></div><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5F636F"># change scheme part length</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">CONFIG_SOCK_UTIL_SCHEME_MAXLEN</span><span style="--0:#D6DEEB;--1:#403F53">=24</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="# activate configuration of sock_util using KconfigCONFIG_KCONFIG_MODULE_SOCK_UTIL=y# change scheme part lengthCONFIG_SOCK_UTIL_SCHEME_MAXLEN=24"><div></div></button></div></figure></div>
 <p>In this case, there is no need for using menuconfig. It’s enough just to call
-<code>make all</code> in the application folder, as this configuration will be read and
+<code dir="auto">make all</code> in the application folder, as this configuration will be read and
 applied. Note that if any dependency issue occurs, warnings will be generated
 (e.g. not enabling the configuration of a module via Kconfig).</p>
-<h3 id="application-configuration-with-kconfig">Application Configuration with Kconfig</h3>
-<p>To expose application-specific configuration options a <code>Kconfig</code> file can
+<div class="sl-heading-wrapper level-h3"><h3 id="application-configuration-with-kconfig">Application Configuration with Kconfig</h3><a class="sl-anchor-link" href="#application-configuration-with-kconfig"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Application Configuration with Kconfig”</span></a></div>
+<p>To expose application-specific configuration options a <code dir="auto">Kconfig</code> file can
 be placed in the application’s folder. For an example of this you can check
 the <a href="https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/kconfig">tests/build_system/kconfig</a>
 application.</p>
-<h3 id="configuration-via-environment-variables">Configuration via Environment Variables</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="configuration-via-environment-variables">Configuration via Environment Variables</h3><a class="sl-anchor-link" href="#configuration-via-environment-variables"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Configuration via Environment Variables”</span></a></div>
 <p>For easy debugging of configurations or testing new modules by compiling them
 into existing applications, one can also use environment variables prefixed by
-<code>RIOT_CONFIG_</code>. To achieve the same configuration exemplified in
+<code dir="auto">RIOT_CONFIG_</code>. To achieve the same configuration exemplified in
 <a href="#configure-using-config-files">Configure using ‘.config’ files</a>, e.g., you could also use</p>
 <div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">RIOT_CONFIG_KCONFIG_MODULE_SOCK_UTIL</span><span style="--0:#C792EA;--1:#8844AE">=</span><span style="--0:#ECC48D;--1:#3B61B0">1</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">\</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">RIOT_CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24 </span><span style="--0:#F78C6C;--1:#AA0982">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#ECC48D;--1:#3B61B0">make</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="RIOT_CONFIG_KCONFIG_MODULE_SOCK_UTIL=1 \RIOT_CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24 \    make"><div></div></button></div></figure></div>
-<p>All the checks that apply for <code>.config</code> files also are done with this approach.</p>
+<p>All the checks that apply for <code dir="auto">.config</code> files also are done with this approach.</p>
 <p>Mind that this is only meant to be used during development. In production,
-please set the configuration via <code>.config</code> files.</p>
-<h3 id="a-note-on-the-usage-of-cflags">A Note on the Usage of CFLAGS</h3>
+please set the configuration via <code dir="auto">.config</code> files.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="a-note-on-the-usage-of-cflags">A Note on the Usage of CFLAGS</h3><a class="sl-anchor-link" href="#a-note-on-the-usage-of-cflags"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “A Note on the Usage of CFLAGS”</span></a></div>
 <p>When a certain module is being configured via Kconfig, the configuration macro
 will no longer be overridable by means of CFLAGS (e.g. set on the
 compilation command or on a Makefile). Consider this if you are getting a
 ‘redefined warning’.</p>
 <hr>
-<h2 id="integration-into-the-build-system">Integration into the Build System</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="integration-into-the-build-system">Integration into the Build System</h2><a class="sl-anchor-link" href="#integration-into-the-build-system"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Integration into the Build System”</span></a></div>
 <p>The integration of Kconfig into the build system is mainly done in
-<code>makefiles/kconfig.mk</code>.</p>
-<h3 id="steps-during-the-build-process">Steps during the Build Process</h3>
+<code dir="auto">makefiles/kconfig.mk</code>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="steps-during-the-build-process">Steps during the Build Process</h3><a class="sl-anchor-link" href="#steps-during-the-build-process"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Steps during the Build Process”</span></a></div>
 <p><starlight-image-zoom-zoomable><img alt="Output of every step of the build process" loading="lazy" decoding="async" fetchpriority="auto" width="929" height="92" src="/_astro/kconfig_integration.B1QC8yvd_1kVSaR.svg" ><button aria-label="Zoom image: Output of every step of the build process" class="starlight-image-zoom-control"><svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><use href="#starlight-image-zoom-icon-zoom"></use></svg></button></starlight-image-zoom-zoomable></p>
-<h4 id="0-module-dependency-resolution">0. Module Dependency Resolution</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="0-module-dependency-resolution">0. Module Dependency Resolution</h4><a class="sl-anchor-link" href="#0-module-dependency-resolution"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “0. Module Dependency Resolution”</span></a></div>
 <p>The resolution of module dependencies is performed by the build
-system where all the used modules and packages end up listed in the <code>USEMODULE</code>
-or <code>USEPKG</code> make variables.</p>
-<h5 id="input">Input</h5>
+system where all the used modules and packages end up listed in the <code dir="auto">USEMODULE</code>
+or <code dir="auto">USEPKG</code> make variables.</p>
+<div class="sl-heading-wrapper level-h5"><h5 id="input">Input</h5><a class="sl-anchor-link" href="#input"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Input”</span></a></div>
 <ul>
 <li>Makefiles.</li>
 </ul>
-<h5 id="output">Output</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="output">Output</h5><a class="sl-anchor-link" href="#output"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Output”</span></a></div>
 <ul>
-<li><code>USEMODULE</code> and <code>USEPKG</code> variables.</li>
+<li><code dir="auto">USEMODULE</code> and <code dir="auto">USEPKG</code> variables.</li>
 </ul>
-<h4 id="1-module-listing">1. Module Listing</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="1-module-listing">1. Module Listing</h4><a class="sl-anchor-link" href="#1-module-listing"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “1. Module Listing”</span></a></div>
 <p>The list of modules needed for the particular build is dumped into the
-<code>$ (GENERATED_DIR)/Kconfig.dep</code> file, where each module is translated into a
+<code dir="auto">$ (GENERATED_DIR)/Kconfig.dep</code> file, where each module is translated into a
 Kconfig symbol as documented in <a href="#appendix-a-check-if-a-module-or-package-is-used">Appendix A</a>.</p>
-<h5 id="input-1">Input</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="input-1">Input</h5><a class="sl-anchor-link" href="#input-1"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Input”</span></a></div>
 <ul>
-<li><code>USEMODULE</code> and <code>USEPKG</code> variables</li>
+<li><code dir="auto">USEMODULE</code> and <code dir="auto">USEPKG</code> variables</li>
 </ul>
-<h5 id="output-1">Output</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="output-1">Output</h5><a class="sl-anchor-link" href="#output-1"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Output”</span></a></div>
 <ul>
-<li><code>$ (GENERATED_DIR)/Kconfig.dep</code> file</li>
+<li><code dir="auto">$ (GENERATED_DIR)/Kconfig.dep</code> file</li>
 </ul>
-<h4 id="2-merging-all-configuration-sources">2. Merging all Configuration Sources</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="2-merging-all-configuration-sources">2. Merging all Configuration Sources</h4><a class="sl-anchor-link" href="#2-merging-all-configuration-sources"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “2. Merging all Configuration Sources”</span></a></div>
 <p>In this step configuration values are taken from multiple sources and merged
-into a single <code>out.config</code> configuration file. This file is temporary and is
+into a single <code dir="auto">out.config</code> configuration file. This file is temporary and is
 removed on cleanup. If the user needs to save a particular configuration
 set, a backup has to be saved (this can be done using the menuconfig interface)
 so it can be loaded later in this step.</p>
-<p>To accomplish merging of multiple input files, the <code>genconfig</code> script is
+<p>To accomplish merging of multiple input files, the <code dir="auto">genconfig</code> script is
 used. Note that <strong>the order matters</strong>: existing configuration values are
 merged in the order expressed in the input section, where the last value
 assigned to a parameter has the highest priority. If no configuration files are
 available, all default values will be applied.</p>
-<p><code>out.config</code> is the only configuration input for the <code>autoconf.h</code> in the
+<p><code dir="auto">out.config</code> is the only configuration input for the <code dir="auto">autoconf.h</code> in the
 <a href="#4-generation-of-the-autoconfh-header">generation step</a>.</p>
-<p>Additionally this step generates a file <code>out.config.d</code> which holds the
+<p>Additionally this step generates a file <code dir="auto">out.config.d</code> which holds the
 information of all the used Kconfig files in Makefile format. This file is
 included by the build system and allows to re-trigger the generation of
-<code>out.conf</code> whenever a Kconfig file is modified.</p>
-<h5 id="input-2">Input</h5>
+<code dir="auto">out.conf</code> whenever a Kconfig file is modified.</p>
+<div class="sl-heading-wrapper level-h5"><h5 id="input-2">Input</h5><a class="sl-anchor-link" href="#input-2"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Input”</span></a></div>
 <ul>
 <li>Optional:
 <ul>
-<li><code>$ (APPDIR)/app.config</code>: Application specific default configurations.</li>
-<li><code>$ (APPDIR)/user.config</code>: Configurations saved by user.</li>
+<li><code dir="auto">$ (APPDIR)/app.config</code>: Application specific default configurations.</li>
+<li><code dir="auto">$ (APPDIR)/user.config</code>: Configurations saved by user.</li>
 </ul>
 </li>
 </ul>
-<h5 id="output-2">Output</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="output-2">Output</h5><a class="sl-anchor-link" href="#output-2"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Output”</span></a></div>
 <ul>
-<li><code>$ (GENERATED_DIR)/out.config</code> file.</li>
+<li><code dir="auto">$ (GENERATED_DIR)/out.config</code> file.</li>
 </ul>
-<h4 id="3-menuconfig-execution-optional">3. Menuconfig Execution (optional)</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="3-menuconfig-execution-optional">3. Menuconfig Execution (optional)</h4><a class="sl-anchor-link" href="#3-menuconfig-execution-optional"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “3. Menuconfig Execution (optional)”</span></a></div>
 <p>Menuconfig is a graphical interface for software configuration. It is, for example, used for
 the configuration of the Linux kernel. This section explains the process
 that occurs when RIOT is being configured using the menuconfig interface.</p>
-<p>The main <code>Kconfig</code> file is used in this step to show the configurable
+<p>The main <code dir="auto">Kconfig</code> file is used in this step to show the configurable
 parameters of the system. Kconfig will filter inapplicable parameters (i.e.
 parameters exposed by modules that are not being used) based on the file
-<code>$ (GENERATED_DIR)/Kconfig.dep</code> generated in step 1.</p>
+<code dir="auto">$ (GENERATED_DIR)/Kconfig.dep</code> generated in step 1.</p>
 <p>Note that if Kconfig is not used to configure a module, the corresponding
 header files default values will be used.</p>
-<p><code>out.config</code> is one of the inputs for menuconfig. This means that any
-configuration that the application defines in the <code>app.config</code> or a backup
-configuration from the user in <code>user.config</code> are taken into account on the
+<p><code dir="auto">out.config</code> is one of the inputs for menuconfig. This means that any
+configuration that the application defines in the <code dir="auto">app.config</code> or a backup
+configuration from the user in <code dir="auto">user.config</code> are taken into account on the
 first run (see <a href="#appendix-c-pitfall-when-using-different-configuration-interfaces">Appendix C</a>).</p>
 <p>In this step the user chooses configuration values (or selects the minimal
-configuration) and saves it to the <code>out.config</code> file. Here the user can
+configuration) and saves it to the <code dir="auto">out.config</code> file. Here the user can
 choose to save a backup configuration file for later at a different location
-(e.g. a <code>user.config</code> file in the application folder).</p>
-<p>If any changes occur to <code>out.config</code>, the
+(e.g. a <code dir="auto">user.config</code> file in the application folder).</p>
+<p>If any changes occur to <code dir="auto">out.config</code>, the
 <a href="#4-generation-of-the-autoconfh-header">generation of autoconf.h</a> is executed automatically.</p>
-<h5 id="input-3">Input</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="input-3">Input</h5><a class="sl-anchor-link" href="#input-3"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Input”</span></a></div>
 <ul>
-<li><code>/Kconfig</code> file.</li>
+<li><code dir="auto">/Kconfig</code> file.</li>
 <li>Optional:
 <ul>
-<li><code>$ (APPDIR)/app.config</code></li>
-<li><code>$ (APPDIR)/user.config</code></li>
-<li><code>$ (GENERATED_DIR)/out.config</code></li>
+<li><code dir="auto">$ (APPDIR)/app.config</code></li>
+<li><code dir="auto">$ (APPDIR)/user.config</code></li>
+<li><code dir="auto">$ (GENERATED_DIR)/out.config</code></li>
 </ul>
 </li>
 </ul>
-<h5 id="output-3">Output</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="output-3">Output</h5><a class="sl-anchor-link" href="#output-3"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Output”</span></a></div>
 <ul>
-<li>Updated <code>$ (GENERATED_DIR)/out.config</code> file.</li>
-<li><code>$ (GENERATED_DIR)/out.config.old</code> backup file.</li>
+<li>Updated <code dir="auto">$ (GENERATED_DIR)/out.config</code> file.</li>
+<li><code dir="auto">$ (GENERATED_DIR)/out.config.old</code> backup file.</li>
 </ul>
-<h4 id="4-generation-of-the-autoconfh-header">4. Generation of the autoconf.h Header</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="4-generation-of-the-autoconfh-header">4. Generation of the autoconf.h Header</h4><a class="sl-anchor-link" href="#4-generation-of-the-autoconfh-header"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “4. Generation of the autoconf.h Header”</span></a></div>
 <p>With the addition of Kconfig, a dependency has been added to the build
-process: the <code>$ (GENERATED_DIR)/autoconf.h</code> header file. This header file is
+process: the <code dir="auto">$ (GENERATED_DIR)/autoconf.h</code> header file. This header file is
 the main output from the Kconfig configuration system. It holds all the macros
 that should be used to configure modules in RIOT:
-<code>CONFIG_&#x3C;module>_&#x3C;parameter></code>.</p>
-<p>In order to generate the <code>autoconf.h</code> file, the <code>genconfig</code> script is used.
-Inputs for this script are the main <code>Kconfig</code> file and <code>out.config</code>
+<code dir="auto">CONFIG_&#x3C;module>_&#x3C;parameter></code>.</p>
+<p>In order to generate the <code dir="auto">autoconf.h</code> file, the <code dir="auto">genconfig</code> script is used.
+Inputs for this script are the main <code dir="auto">Kconfig</code> file and <code dir="auto">out.config</code>
 configuration file, which holds the selected values for the exposed parameters.</p>
-<h5 id="input-4">Input:</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="input-4">Input:</h5><a class="sl-anchor-link" href="#input-4"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Input:”</span></a></div>
 <ul>
-<li><code>$ (GENERATED_DIR)/out.config</code> file.</li>
-<li>Main <code>Kconfig</code> file exposing configuration of modules.</li>
+<li><code dir="auto">$ (GENERATED_DIR)/out.config</code> file.</li>
+<li>Main <code dir="auto">Kconfig</code> file exposing configuration of modules.</li>
 </ul>
-<h5 id="output-4">Output:</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="output-4">Output:</h5><a class="sl-anchor-link" href="#output-4"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Output:”</span></a></div>
 <ul>
-<li><code>$ (GENERATED_DIR)/autoconf.h</code> configuration header file.</li>
+<li><code dir="auto">$ (GENERATED_DIR)/autoconf.h</code> configuration header file.</li>
 <li>Optional:
 <ul>
-<li><code>$ (GENERATED_DIR)/deps/*/*.h</code> header files that allow incremental builds</li>
+<li><code dir="auto">$ (GENERATED_DIR)/deps/*/*.h</code> header files that allow incremental builds</li>
 </ul>
 </li>
 </ul>
-<h4 id="summary-of-files">Summary of Files</h4>
-<p>These files are defined in <code>kconfig.mk</code>.</p>
+<div class="sl-heading-wrapper level-h4"><h4 id="summary-of-files">Summary of Files</h4><a class="sl-anchor-link" href="#summary-of-files"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Summary of Files”</span></a></div>
+<p>These files are defined in <code dir="auto">kconfig.mk</code>.</p>
 
 
 
@@ -319,115 +319,115 @@ configuration file, which holds the selected values for the exposed parameters.<
 
 
 
-<table><thead><tr><th>File</th><th>Description</th></tr></thead><tbody><tr><td><code>Kconfig</code></td><td>Defines configuration options of modules.</td></tr><tr><td><code>Kconfig.dep</code></td><td>Holds a list of the modules that are being compiled.</td></tr><tr><td><code>app.config</code></td><td>Holds default application configuration values.</td></tr><tr><td><code>user.config</code></td><td>Holds configuration values applied by the user.</td></tr><tr><td><code>out.config</code></td><td>Configuration file containing all the symbols defined in <code>autoconf.h</code>.</td></tr><tr><td><code>out.config.d</code></td><td>Dependency file of <code>out.config</code> containing the list of Kconfig files used to generate it.</td></tr><tr><td><code>autoconf.h</code></td><td>Header file containing the macros that applied the selected configuration.</td></tr></tbody></table>
-<h3 id="kconfig-symbols-in-makefiles">Kconfig Symbols in Makefiles</h3>
-<p>As <code>.config</code> files have Makefile syntax, they can be included when building,
+<table><thead><tr><th>File</th><th>Description</th></tr></thead><tbody><tr><td><code dir="auto">Kconfig</code></td><td>Defines configuration options of modules.</td></tr><tr><td><code dir="auto">Kconfig.dep</code></td><td>Holds a list of the modules that are being compiled.</td></tr><tr><td><code dir="auto">app.config</code></td><td>Holds default application configuration values.</td></tr><tr><td><code dir="auto">user.config</code></td><td>Holds configuration values applied by the user.</td></tr><tr><td><code dir="auto">out.config</code></td><td>Configuration file containing all the symbols defined in <code dir="auto">autoconf.h</code>.</td></tr><tr><td><code dir="auto">out.config.d</code></td><td>Dependency file of <code dir="auto">out.config</code> containing the list of Kconfig files used to generate it.</td></tr><tr><td><code dir="auto">autoconf.h</code></td><td>Header file containing the macros that applied the selected configuration.</td></tr></tbody></table>
+<div class="sl-heading-wrapper level-h3"><h3 id="kconfig-symbols-in-makefiles">Kconfig Symbols in Makefiles</h3><a class="sl-anchor-link" href="#kconfig-symbols-in-makefiles"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Kconfig Symbols in Makefiles”</span></a></div>
+<p>As <code dir="auto">.config</code> files have Makefile syntax, they can be included when building,
 which allows to access the applied configuration from the build system.</p>
 <p>During migration this is also useful, as it gives the ability to check whether a
-parameter is being configured via Kconfig or a default value via <code>CFLAGS</code> could
+parameter is being configured via Kconfig or a default value via <code dir="auto">CFLAGS</code> could
 be injected. For example:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">ifndef</span><span style="--0:#D6DEEB;--1:#403F53"> CONFIG_USB_VID</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#C5E478;--1:#3B61B0">CFLAGS</span><span style="--0:#D6DEEB;--1:#403F53"> += -DCONFIG_USB_VID=0x1209</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">endif</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="ifndef CONFIG_USB_VID  CFLAGS += -DCONFIG_USB_VID=0x1209endif"><div></div></button></div></figure></div>
 <p>Symbols will have the same name as the configuration macros (thus will always
-have the <code>CONFIG_</code> prefix). As the configuration file is loaded in
-<code>Makefile.include</code>, care should be taken when performing checks in the
+have the <code dir="auto">CONFIG_</code> prefix). As the configuration file is loaded in
+<code dir="auto">Makefile.include</code>, care should be taken when performing checks in the
 application’s Makefile. The symbols will not be defined until after including
-<code>Makefile.include</code>.</p>
+<code dir="auto">Makefile.include</code>.</p>
 <hr>
-<h2 id="transition-phase">Transition Phase</h2>
-<h3 id="making-configuration-via-kconfig-optional">Making Configuration via Kconfig optional</h3>
+<div class="sl-heading-wrapper level-h2"><h2 id="transition-phase">Transition Phase</h2><a class="sl-anchor-link" href="#transition-phase"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Transition Phase”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="making-configuration-via-kconfig-optional">Making Configuration via Kconfig optional</h3><a class="sl-anchor-link" href="#making-configuration-via-kconfig-optional"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Making Configuration via Kconfig optional”</span></a></div>
 <p>During transition to the usage of Kconfig as the main configuration tool for
 RIOT, the default behavior will be the traditional one: expose configuration
 options in header files and use CFLAGS as inputs. To allow optional
 configuration via Kconfig, a convention will be used when writing Kconfig files.</p>
-<p>Modules should be contained in their own <code>menu</code> entries, this way the user
+<p>Modules should be contained in their own <code dir="auto">menu</code> entries, this way the user
 can choose to enable the configuration via Kconfig for an specific module.
 These entries should define a dependency on the module they configure (see
 <a href="#appendix-a-check-if-a-module-or-package-is-used">Appendix A</a> to see how to
 check if a module is being used).</p>
 <p>The module configuration must be enabled via make dependency modelling.</p>
-<h3 id="modelling-cpus-and-boards">Modelling CPUs and Boards</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="modelling-cpus-and-boards">Modelling CPUs and Boards</h3><a class="sl-anchor-link" href="#modelling-cpus-and-boards"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Modelling CPUs and Boards”</span></a></div>
 <p>CPUs and boards are being modelled in Kconfig. The following part is a guide on how to
 organize and name the symbols.</p>
-<h4 id="cpus">CPUs</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="cpus">CPUs</h4><a class="sl-anchor-link" href="#cpus"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “CPUs”</span></a></div>
 <p>The proposed hierarchy for the classification of CPUs is as follows:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                    </span></span><span style="--0:#d6deeb;--1:#403f53">+------------+</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">More Specific       | CPU_MODEL  |</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">+             +------------+</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|             +------------+</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|             |  CPU_FAM   |</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|             +------------+</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|             +------------+</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|             |  CPU_CORE  |</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|             +------------+</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">|</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">      </span></span><span style="--0:#d6deeb;--1:#403f53">v             +------------+</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">Less Specific       |  CPU_ARCH  |</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">                    </span></span><span style="--0:#d6deeb;--1:#403f53">+------------+</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="                    +------------+More Specific       | CPU_MODEL  |      +             +------------+      |      |      |             +------------+      |             |  CPU_FAM   |      |             +------------+      |      |      |             +------------+      |             |  CPU_CORE  |      |             +------------+      |      |      v             +------------+Less Specific       |  CPU_ARCH  |                    +------------+"><div></div></button></div></figure></div>
 <p>Where each hierarchy is defined as:</p>
 <ul>
-<li><code>CPU_MODEL</code>: The specific identifier of the used CPU, used for some CPU
+<li><code dir="auto">CPU_MODEL</code>: The specific identifier of the used CPU, used for some CPU
 implementations to differentiate between different memory
 layouts.</li>
-<li><code>CPU_FAM</code>: An intermediate identifier between CPU and CPU_MODEL that
+<li><code dir="auto">CPU_FAM</code>: An intermediate identifier between CPU and CPU_MODEL that
 represents a sub-group of a manufacturers CPUs.</li>
-<li><code>CPU_CORE</code>: The specific identifier of the core present in the CPU.</li>
-<li><code>CPU_ARCH</code>: The specific identifier of the architecture of the core defined
-in <code>CPU_CORE</code>.</li>
+<li><code dir="auto">CPU_CORE</code>: The specific identifier of the core present in the CPU.</li>
+<li><code dir="auto">CPU_ARCH</code>: The specific identifier of the architecture of the core defined
+in <code dir="auto">CPU_CORE</code>.</li>
 </ul>
 <p>In order to model the hierarchies, a hidden boolean symbol must be declared for
 each. The name of the symbol must begin with the correspondent prefix and must
 be followed by the specific value. For instance, the ‘samd21’ family symbol is
-named <code>CPU_FAM_SAMD21</code>.</p>
+named <code dir="auto">CPU_FAM_SAMD21</code>.</p>
 <p>In addition, a default value to the corresponding common symbol must be defined.
 The default value must be guarded by the boolean symbol corresponding to the
 hierarchy.</p>
 <p>Features may be provided by any hierarchy symbol. Usually symbols are selected
-from more specific to less specific. This means that a <code>CPU_MODEL_&#x3C;model></code>
-symbol usually would select the corresponding <code>CPU_FAM_&#x3C;family></code> symbol,
-which would in turn select the <code>CPU_CORE_&#x3C;core></code>. This may change in some cases
-where <code>CPU_COMMON_</code> symbols are defined to avoid repetition. For convenience and
+from more specific to less specific. This means that a <code dir="auto">CPU_MODEL_&#x3C;model></code>
+symbol usually would select the corresponding <code dir="auto">CPU_FAM_&#x3C;family></code> symbol,
+which would in turn select the <code dir="auto">CPU_CORE_&#x3C;core></code>. This may change in some cases
+where <code dir="auto">CPU_COMMON_</code> symbols are defined to avoid repetition. For convenience and
 if it makes sense within a CPU vendor family, it’s also allowed to use
-intermediate grouping levels, like <code>CPU_LINE_&#x3C;xxx></code> used for STM32.</p>
+intermediate grouping levels, like <code dir="auto">CPU_LINE_&#x3C;xxx></code> used for STM32.</p>
 <p>In addition to the symbols of the hierarchy described above, a default value
-to the <code>CPU</code> symbol should be assigned, which will match the value of the <code>CPU</code>
+to the <code dir="auto">CPU</code> symbol should be assigned, which will match the value of the <code dir="auto">CPU</code>
 Makefile variable in the build system.</p>
-<p>The declaration of the symbols should be placed in a <code>Kconfig</code> file in the
+<p>The declaration of the symbols should be placed in a <code dir="auto">Kconfig</code> file in the
 folder that corresponds to the hierarchy. When the symbols are scattered into
 multiple files, it is responsibility of file containing the most specific
-symbols to <code>source</code> the less specific. Keep in mind that only the file located
-in <code>/cpu/&#x3C;CPU>/Kconfig</code> will be included by the root <code>/Kconfig</code> file.</p>
-<h5 id="example">Example</h5>
+symbols to <code dir="auto">source</code> the less specific. Keep in mind that only the file located
+in <code dir="auto">/cpu/&#x3C;CPU>/Kconfig</code> will be included by the root <code dir="auto">/Kconfig</code> file.</p>
+<div class="sl-heading-wrapper level-h5"><h5 id="example">Example</h5><a class="sl-anchor-link" href="#example"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Example”</span></a></div>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53"># This is the most specific symbol (selected by the board)</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53"># The CPU model selects the family it belongs to</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config CPU_MODEL_SAMR21G18A</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">bool</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">select CPU_FAM_SAMD21</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53"># In this case the family selects a common 'sam0' symbol (which provides some</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53"># features), and the core it has (cortex-m0+)</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config CPU_FAM_SAMD21</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">bool</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">select CPU_COMMON_SAM0</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">select CPU_CORE_CORTEX_M0PLUS</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53"># The value of the common value depends on the selected model</span></div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config CPU_MODEL</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samd21e18a" if CPU_MODEL_SAMD21E18A</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samd21g18a" if CPU_MODEL_SAMD21G18A</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samd21j18a" if CPU_MODEL_SAMD21J18A</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samr21e18a" if CPU_MODEL_SAMR21E18A</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samr21g18a" if CPU_MODEL_SAMR21G18A</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config CPU_FAM</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samd21" if CPU_FAM_SAMD21</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="# This is the most specific symbol (selected by the board)# The CPU model selects the family it belongs toconfig CPU_MODEL_SAMR21G18A    bool    select CPU_FAM_SAMD21# In this case the family selects a common &#x27;sam0&#x27; symbol (which provides some# features), and the core it has (cortex-m0+)config CPU_FAM_SAMD21    bool    select CPU_COMMON_SAM0    select CPU_CORE_CORTEX_M0PLUS# The value of the common value depends on the selected modelconfig CPU_MODEL    default &#x22;samd21e18a&#x22; if CPU_MODEL_SAMD21E18A    default &#x22;samd21g18a&#x22; if CPU_MODEL_SAMD21G18A    default &#x22;samd21j18a&#x22; if CPU_MODEL_SAMD21J18A    default &#x22;samr21e18a&#x22; if CPU_MODEL_SAMR21E18A    default &#x22;samr21g18a&#x22; if CPU_MODEL_SAMR21G18Aconfig CPU_FAM    default &#x22;samd21&#x22; if CPU_FAM_SAMD21"><div></div></button></div></figure></div>
-<h4 id="boards">Boards</h4>
-<p>Boards must be modelled as hidden boolean symbols with the prefix <code>BOARD_</code> which
-default to <code>y</code> and are placed in <code>/boards/&#x3C;BOARD>/Kconfig</code>. This file will be
-<code>source</code>d from the main <code>/Kconfig</code> file. The board symbol must select the
-<code>CPU_MODEL_&#x3C;model></code> symbol that corresponds to the CPU model present on the
+<div class="sl-heading-wrapper level-h4"><h4 id="boards">Boards</h4><a class="sl-anchor-link" href="#boards"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Boards”</span></a></div>
+<p>Boards must be modelled as hidden boolean symbols with the prefix <code dir="auto">BOARD_</code> which
+default to <code dir="auto">y</code> and are placed in <code dir="auto">/boards/&#x3C;BOARD>/Kconfig</code>. This file will be
+<code dir="auto">source</code>d from the main <code dir="auto">/Kconfig</code> file. The board symbol must select the
+<code dir="auto">CPU_MODEL_&#x3C;model></code> symbol that corresponds to the CPU model present on the
 board. The board symbol must also select the symbols that correspond to the
 features it provides.</p>
-<p>In the same <code>Kconfig</code> file a default value must be assigned to the
-common <code>BOARD</code> symbol. It must be guarded by the board’s symbol, so it only
+<p>In the same <code dir="auto">Kconfig</code> file a default value must be assigned to the
+common <code dir="auto">BOARD</code> symbol. It must be guarded by the board’s symbol, so it only
 applies in that case.</p>
 <p>There are cases when grouping common code for multiple boards helps to avoid
 unnecessary repetition. In the case features are provided in a common board
-folder (e.g. <code>/boards/common/arduino-atmega</code>) a symbol should be declared to
-model this in Kconfig. Symbols for common boards must have the <code>BOARD_COMMON_</code>
+folder (e.g. <code dir="auto">/boards/common/arduino-atmega</code>) a symbol should be declared to
+model this in Kconfig. Symbols for common boards must have the <code dir="auto">BOARD_COMMON_</code>
 prefix, and must select the common provided features.</p>
-<h5 id="example-1">Example</h5>
-<p>The samr21-xpro has a <code>samr21g18a</code> CPU and provides multiple features. Its
+<div class="sl-heading-wrapper level-h5"><h5 id="example-1">Example</h5><a class="sl-anchor-link" href="#example-1"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Example”</span></a></div>
+<p>The samr21-xpro has a <code dir="auto">samr21g18a</code> CPU and provides multiple features. Its
 symbol is modelled as following:</p>
 <div class="expressive-code"><figure class="frame has-title not-content"><figcaption class="header"><span class="title">/boards/samr21-xpro/Kconfig</span></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config BOARD</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default "samr21-xpro" if BOARD_SAMR21_XPRO</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config BOARD_SAMR21_XPRO</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">bool</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default y</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">select CPU_MODEL_SAMR21G18A</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="config BOARD    default &#x22;samr21-xpro&#x22; if BOARD_SAMR21_XPROconfig BOARD_SAMR21_XPRO    bool    default y    select CPU_MODEL_SAMR21G18A"><div></div></button></div></figure></div>
-<h4 id="default-configurations">Default Configurations</h4>
+<div class="sl-heading-wrapper level-h4"><h4 id="default-configurations">Default Configurations</h4><a class="sl-anchor-link" href="#default-configurations"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Default Configurations”</span></a></div>
 <p>Boards, common board directories, CPUs and common CPU directories may need to
 override default configuration values. Visible configuration symbols are
-configurable by the user and show on the menuconfig interface. <code>.config</code> files
-are used to set their values. To allow multiple sources of <code>.config</code> files,
-there are two Makefile variables developers should use: <code>KCONFIG_CPU_CONFIG</code> for
-sources added by the CPU or common CPU directories, and <code>KCONFIG_BOARD_CONFIG</code>
+configurable by the user and show on the menuconfig interface. <code dir="auto">.config</code> files
+are used to set their values. To allow multiple sources of <code dir="auto">.config</code> files,
+there are two Makefile variables developers should use: <code dir="auto">KCONFIG_CPU_CONFIG</code> for
+sources added by the CPU or common CPU directories, and <code dir="auto">KCONFIG_BOARD_CONFIG</code>
 for sources added by the board or common board directories. This ensures the
 correct priority of the configurations.</p>
-<p>The <code>Makefile.features</code> infrastructure is used to populate the
-configuration sources. As the order in which <code>.config</code> files are merged matters,
+<p>The <code dir="auto">Makefile.features</code> infrastructure is used to populate the
+configuration sources. As the order in which <code dir="auto">.config</code> files are merged matters,
 configuration sources should be ordered from more generic to more specific.
-Because the board’s <code>Makefile.features</code> is included before the CPU’s <code>Makefile.features</code>
+Because the board’s <code dir="auto">Makefile.features</code> is included before the CPU’s <code dir="auto">Makefile.features</code>
 it is important to utilize two different lists of configuration sources. For
-instance, if <code>cpu/cortexm_common</code> adds its configuration, <code>cpu/stm32</code> should add
-its configuration after it, and <code>boards/stm32f769i-disco</code> after it.</p>
+instance, if <code dir="auto">cpu/cortexm_common</code> adds its configuration, <code dir="auto">cpu/stm32</code> should add
+its configuration after it, and <code dir="auto">boards/stm32f769i-disco</code> after it.</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">include</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">RIOTCPU</span><span style="--0:#ECC48D">)</span></span><span style="--0:#D6DEEB;--1:#403F53">/cortexm_common/Makefile.features</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5F636F"># Add stm32 configs after including cortexm_common so stm32 takes precedence</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">KCONFIG_CPU_CONFIG</span><span style="--0:#D6DEEB;--1:#403F53"> += </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">RIOTCPU</span><span style="--0:#ECC48D">)</span></span><span style="--0:#D6DEEB;--1:#403F53">/stm32/stm32.config</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="include $(RIOTCPU)/cortexm_common/Makefile.features# Add stm32 configs after including cortexm_common so stm32 takes precedenceKCONFIG_CPU_CONFIG += $(RIOTCPU)/stm32/stm32.config"><div></div></button></div></figure></div>
-<h3 id="summary-of-reserved-kconfig-prefixes">Summary of Reserved Kconfig Prefixes</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="summary-of-reserved-kconfig-prefixes">Summary of Reserved Kconfig Prefixes</h3><a class="sl-anchor-link" href="#summary-of-reserved-kconfig-prefixes"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Summary of Reserved Kconfig Prefixes”</span></a></div>
 <p>The following symbol prefixes have been assigned particular semantics and are
 reserved for the cases described below:</p>
 <!-- Keep the table in alphabetical order -->
@@ -476,27 +476,27 @@ reserved for the cases described below:</p>
 
 
 
-<table><thead><tr><th align="left">Prefix</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left"><code>BOARD_</code></td><td align="left">Models a board</td></tr><tr><td align="left"><code>BOARD_COMMON_</code></td><td align="left">Used for common symbols used by multiple boards</td></tr><tr><td align="left"><code>CPU_ARCH_</code></td><td align="left">Models a CPU architecture</td></tr><tr><td align="left"><code>CPU_COMMON_</code></td><td align="left">Used for common symbols used by multiple CPUs</td></tr><tr><td align="left"><code>CPU_CORE_</code></td><td align="left">Models a CPU core</td></tr><tr><td align="left"><code>CPU_FAM_</code></td><td align="left">Models a family of CPUs</td></tr><tr><td align="left"><code>CPU_MODEL_</code></td><td align="left">Models a particular model of CPU</td></tr><tr><td align="left"><code>USEMODULE_</code></td><td align="left">Models a <a href="https://guide.riot-os.org/advanced_tutorials/creating_modules/">RIOT module</a>. Generated from <code>USEMODULE</code> variable</td></tr><tr><td align="left"><code>USEPKG_</code></td><td align="left">Models an <a href="https://doc.riot-os.org/group__pkg.html">external package</a>. Generated from <code>USEPKG</code> variable</td></tr></tbody></table>
+<table><thead><tr><th align="left">Prefix</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left"><code dir="auto">BOARD_</code></td><td align="left">Models a board</td></tr><tr><td align="left"><code dir="auto">BOARD_COMMON_</code></td><td align="left">Used for common symbols used by multiple boards</td></tr><tr><td align="left"><code dir="auto">CPU_ARCH_</code></td><td align="left">Models a CPU architecture</td></tr><tr><td align="left"><code dir="auto">CPU_COMMON_</code></td><td align="left">Used for common symbols used by multiple CPUs</td></tr><tr><td align="left"><code dir="auto">CPU_CORE_</code></td><td align="left">Models a CPU core</td></tr><tr><td align="left"><code dir="auto">CPU_FAM_</code></td><td align="left">Models a family of CPUs</td></tr><tr><td align="left"><code dir="auto">CPU_MODEL_</code></td><td align="left">Models a particular model of CPU</td></tr><tr><td align="left"><code dir="auto">USEMODULE_</code></td><td align="left">Models a <a href="https://guide.riot-os.org/advanced_tutorials/creating_modules/">RIOT module</a>. Generated from <code dir="auto">USEMODULE</code> variable</td></tr><tr><td align="left"><code dir="auto">USEPKG_</code></td><td align="left">Models an <a href="https://doc.riot-os.org/group__pkg.html">external package</a>. Generated from <code dir="auto">USEPKG</code> variable</td></tr></tbody></table>
 <hr>
-<h2 id="appendices">Appendices</h2>
-<h3 id="appendix-a-check-if-a-module-or-package-is-used">Appendix A: Check if a Module or Package is used</h3>
+<div class="sl-heading-wrapper level-h2"><h2 id="appendices">Appendices</h2><a class="sl-anchor-link" href="#appendices"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Appendices”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="appendix-a-check-if-a-module-or-package-is-used">Appendix A: Check if a Module or Package is used</h3><a class="sl-anchor-link" href="#appendix-a-check-if-a-module-or-package-is-used"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Appendix A: Check if a Module or Package is used”</span></a></div>
 <p>In order to show only the relevant configuration parameters to the user with
 respect to a given application and board selection, Kconfig needs knowledge
 about all modules and packages to be used for a compilation. The dependency
 handling among modules is performed by the build system (via
-<code>Makefile.dep</code> files). The interface defined to declare the used modules and
-packages is the <code>$ (GENERATED_DIR)/Kconfig.dep</code> file.</p>
+<code dir="auto">Makefile.dep</code> files). The interface defined to declare the used modules and
+packages is the <code dir="auto">$ (GENERATED_DIR)/Kconfig.dep</code> file.</p>
 <p>There will be a symbol for every used module (i.e. every module in
-<code>USEMODULE</code> make variable) and package. The names in the symbols will be
-uppercase and separated by <code>_</code>. Based on these symbols, configurability is
+<code dir="auto">USEMODULE</code> make variable) and package. The names in the symbols will be
+uppercase and separated by <code dir="auto">_</code>. Based on these symbols, configurability is
 decided.</p>
 <p>The following is an example of how to use these symbols in Kconfig files to
-configure compile-time configurations with <code>USEMODULE</code> dependencies:</p>
+configure compile-time configurations with <code dir="auto">USEMODULE</code> dependencies:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">menu "Configure Sock Utilities"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">depends on USEMODULE_SOCK_UTIL</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config SOCK_UTIL_SCHEME_MAXLEN</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">int "Maximum length of the scheme part for sock_urlsplit"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default 16</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">...</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">endmenu # Configure Sock Utilities</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="menu &#x22;Configure Sock Utilities&#x22;    depends on USEMODULE_SOCK_UTILconfig SOCK_UTIL_SCHEME_MAXLEN    int &#x22;Maximum length of the scheme part for sock_urlsplit&#x22;    default 16...endmenu # Configure Sock Utilities"><div></div></button></div></figure></div>
-<h3 id="appendix-b-difference-between-kconfig-and-config-files">Appendix B: Difference between ‘Kconfig’ and ‘.config’ Files</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="appendix-b-difference-between-kconfig-and-config-files">Appendix B: Difference between ‘Kconfig’ and ‘.config’ Files</h3><a class="sl-anchor-link" href="#appendix-b-difference-between-kconfig-and-config-files"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Appendix B: Difference between ‘Kconfig’ and ‘.config’ Files”</span></a></div>
 <p>Kconfig files describe a configuration database, which is a collection of
 configuration options organized in a tree structure. Configuration options may
 have dependencies (among other attributes), which are used to determine their
@@ -505,39 +505,39 @@ visibility.</p>
 <a href="https://www.kernel.org/doc/Documentation/kbuild/kconfig-language.txt">Kconfig language</a>
 defined in the Linux kernel. Configuration options have attributes such as
 types, prompts and default values.</p>
-<h5 id="kconfig-file">Kconfig File</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="kconfig-file">Kconfig File</h5><a class="sl-anchor-link" href="#kconfig-file"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Kconfig File”</span></a></div>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">menu "Buffer Sizes"</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">config GCOAP_PDU_BUF_SIZE</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">int "Request or response buffer size"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#d6deeb;--1:#403f53">    </span></span><span style="--0:#d6deeb;--1:#403f53">default 128</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#d6deeb;--1:#403f53">endmenu</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="menu &#x22;Buffer Sizes&#x22;config GCOAP_PDU_BUF_SIZE    int &#x22;Request or response buffer size&#x22;    default 128endmenu"><div></div></button></div></figure></div>
 <p>On the other hand configuration files contain assignment of values to
 configuration options and use Makefile syntax. They can also be used to save a
 set of configuration values as backup.</p>
-<h5 id="config-file">’.config’ File</h5>
+<div class="sl-heading-wrapper level-h5"><h5 id="config-file">’.config’ File</h5><a class="sl-anchor-link" href="#config-file"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “’.config’ File”</span></a></div>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="makefile"><code><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5F636F"># enable Kconfig configuration for gcoap</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">CONFIG_KCONFIG_MODULE_GCOAP</span><span style="--0:#D6DEEB;--1:#403F53">=y</span></div></div><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5F636F"># set the value</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">CONFIG_GCOAP_PDU_BUF_SIZE</span><span style="--0:#D6DEEB;--1:#403F53">=12345</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="# enable Kconfig configuration for gcoapCONFIG_KCONFIG_MODULE_GCOAP=y# set the valueCONFIG_GCOAP_PDU_BUF_SIZE=12345"><div></div></button></div></figure></div>
 <p>In other words: Kconfig files describe configuration options and ‘.config’ files
 assign their values.</p>
-<h3 id="appendix-c-pitfall-when-using-different-configuration-interfaces">Appendix C: Pitfall when using Different Configuration Interfaces</h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="appendix-c-pitfall-when-using-different-configuration-interfaces">Appendix C: Pitfall when using Different Configuration Interfaces</h3><a class="sl-anchor-link" href="#appendix-c-pitfall-when-using-different-configuration-interfaces"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Appendix C: Pitfall when using Different Configuration Interfaces”</span></a></div>
 <p>In the current configuration flow the user can choose to configure RIOT using
 the menuconfig graphical interface or writing ‘.config’ files by hand.</p>
 <p>As explained in the
 <a href="#2-merging-all-configuration-sources">‘Configuration sources merging step’</a>
 of the configuration process, configuration from multiple sources are loaded to
-create a single <code>out.config</code> file, and the order of merging matters: last
+create a single <code dir="auto">out.config</code> file, and the order of merging matters: last
 file has priority.</p>
-<p>While editing values directly via ‘.config’ files, <code>out.config</code> will be
+<p>While editing values directly via ‘.config’ files, <code dir="auto">out.config</code> will be
 re-built. The user can also use the menuconfig interface to modify the configuration
 file (this is the recommended way, as it gives access to much more information
 regarding dependencies and default values of the symbols). Menuconfig will
-change <code>out.config</code> directly (a backup file <code>out.config.old</code> will be kept).</p>
+change <code dir="auto">out.config</code> directly (a backup file <code dir="auto">out.config.old</code> will be kept).</p>
 <p><strong>It is recommended to save backups of the configurations, as any change on the
 configuration sources would re-trigger the merging process and overwrite
-<code>out.config</code>.</strong></p>
-<h3 id="appendix-d-a-few-key-aspects-while-exposing-a-macro-to-kconfig">Appendix D: A few Key Aspects while Exposing a Macro to Kconfig</h3>
-<p>A macro that holds a 0 or 1 is modelled in Kconfig as a <code>bool</code> symbol. References to this macro
+<code dir="auto">out.config</code>.</strong></p>
+<div class="sl-heading-wrapper level-h3"><h3 id="appendix-d-a-few-key-aspects-while-exposing-a-macro-to-kconfig">Appendix D: A few Key Aspects while Exposing a Macro to Kconfig</h3><a class="sl-anchor-link" href="#appendix-d-a-few-key-aspects-while-exposing-a-macro-to-kconfig"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Appendix D: A few Key Aspects while Exposing a Macro to Kconfig”</span></a></div>
+<p>A macro that holds a 0 or 1 is modelled in Kconfig as a <code dir="auto">bool</code> symbol. References to this macro
 can then make use of IS_ACTIVE macro from kernel_defines.h with C conditionals
 for conditional compilation.
 <a href="https://github.com/RIOT-OS/RIOT/pull/13914">FXOS8700 driver exposure to Kconfig</a>
-can be considered as an example. If the macro is defined as <code>TRUE</code> by default,
+can be considered as an example. If the macro is defined as <code dir="auto">TRUE</code> by default,
 a new symbol gets introduced to invert the semantics. The recommended
 practice is to add a new symbol and expose it to Kconfig while the old one is
 tagged to be deprecated. The process is documented in this
@@ -547,9 +547,9 @@ tagged to be deprecated. The process is documented in this
 in such a way that a new macro is introduced to hold the restricted figures
 while operators are added to arrive at the desired value. The process is
 documented in this <a href="https://github.com/RIOT-OS/RIOT/pull/14086">pull request.</a></p>
-<h2 id="useful-references">Useful References</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="useful-references">Useful References</h2><a class="sl-anchor-link" href="#useful-references"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Useful References”</span></a></div>
 <ul>
 <li><a href="https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html">Kconfig language specification</a></li>
 <li><a href="https://www.kernel.org/doc/html/latest/kbuild/kconfig-macro-language.html">Kconfig macro language specification</a></li>
 <li><a href="https://docs.zephyrproject.org/latest/guides/kconfig/tips.html">Kconfig - Tips and Best Practices</a></li>
-</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/build-system/kconfig.md" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/build-system/build_system_basics/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Build System Basics</span> </span> </a> <a href="/build-system/flashing/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Flashing via RIOT&#39;s Build System</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
+</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/src/content/docs/build-system/kconfig.md" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/build-system/build_system_basics/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Build System Basics</span> </span> </a> <a href="/build-system/flashing/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Flashing via RIOT&#39;s Build System</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>

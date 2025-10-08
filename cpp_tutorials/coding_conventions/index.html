@@ -81,7 +81,7 @@ still apply (Documentation, Git, Travis).</p>
 <p>When contributing source code, please adhere to the following coding style,
 which is loosely based on the <a href="https://google.github.io/styleguide/cppguide.html">Google C++ Style Guide</a> and the coding
 conventions used by the C++ Standard Library. Based on the <a href="https://github.com/actor-framework/actor-framework/blob/master/CONTRIBUTING.md">CAF coding style</a>.</p>
-<h2 id="example-for-the-impatient">Example for the Impatient</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="example-for-the-impatient">Example for the Impatient</h2><a class="sl-anchor-link" href="#example-for-the-impatient"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Example for the Impatient”</span></a></div>
 <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame has-title not-content"><figcaption class="header"><span class="title">module/riot/example/my_class.hpp</span></figcaption><pre data-language="cpp"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">#ifndef</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#7FDBCA;--1:#096E72">RIOT_EXAMPLE_MY_CLASS_HPP</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">#define</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#7FDBCA;--1:#096E72">RIOT_EXAMPLE_MY_CLASS_HPP</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">#include</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">&#x3C;</span><span style="--0:#ECC48D;--1:#984E4D">string</span><span style="--0:#D9F5DD;--1:#111111">></span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5D6376">// use "//" for regular comments and "///" for doxygen</span></div></div><div class="ec-line"><div class="code">
@@ -108,7 +108,7 @@ conventions used by the C++ Standard Library. Based on the <a href="https://gith
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">void</span><span style="--0:#D6DEEB;--1:#403F53"> my_class::</span><span style="--0:#82AAFF;--1:#3B61B0">do_something</span><span style="--0:#D6DEEB;--1:#403F53">() {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#C792EA;--1:#8844AE">if</span><span style="--0:#D6DEEB;--1:#403F53"> (</span><span style="--0:#82AAFF;--1:#3B61B0">name</span><span style="--0:#D6DEEB;--1:#403F53">() </span><span style="--0:#C792EA;--1:#8844AE">==</span><span style="--0:#D6DEEB;--1:#403F53"> default_name) {</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">        </span></span><span style="--0:#D6DEEB;--1:#403F53">std::cout </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">You didn't gave me a proper name, so I </span><span style="--0:#D9F5DD;--1:#111111">"</span></div></div><div class="ec-line"><div class="code"><span class="indent">                  </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">refuse to do something.</span><span style="--0:#D9F5DD;--1:#111111">"</span></div></div><div class="ec-line"><div class="code"><span class="indent">                  </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> std::endl;</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">} </span><span style="--0:#C792EA;--1:#8844AE">else</span><span style="--0:#D6DEEB;--1:#403F53"> {</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">        </span></span><span style="--0:#D6DEEB;--1:#403F53">std::cout </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">You gave me the name </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">name</span><span style="--0:#D6DEEB;--1:#403F53">()</span></div></div><div class="ec-line"><div class="code"><span class="indent">                  </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">... Do you really think I'm willing to do something </span><span style="--0:#D9F5DD;--1:#111111">"</span></div></div><div class="ec-line"><div class="code"><span class="indent">                     </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">for you after insulting me like that?</span><span style="--0:#D9F5DD;--1:#111111">"</span></div></div><div class="ec-line"><div class="code"><span class="indent">                  </span><span style="--0:#C792EA;--1:#8844AE">&#x3C;&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53"> std::endl;</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">void</span><span style="--0:#D6DEEB;--1:#403F53"> my_class::</span><span style="--0:#82AAFF;--1:#3B61B0">do_something_else</span><span style="--0:#D6DEEB;--1:#403F53">() {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#C792EA;--1:#8844AE">switch</span><span style="--0:#D6DEEB;--1:#403F53"> (</span><span style="--0:#C5E478;--1:#3B61B0">default_name</span><span style="--0:#D6DEEB;--1:#403F53">[</span><span style="--0:#F78C6C;--1:#AA0982">0</span><span style="--0:#D6DEEB;--1:#403F53">]) {</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">case</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">'</span><span style="--0:#ECC48D;--1:#984E4D">a</span><span style="--0:#D9F5DD;--1:#111111">'</span><span style="--0:#D6DEEB;--1:#403F53">:</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#919F9F;--1:#5D6376">            </span></span><span style="--0:#919F9F;--1:#5D6376">// handle a</span></div></div><div class="ec-line"><div class="code"><span class="indent">            </span><span style="--0:#C792EA;--1:#8844AE">break</span><span style="--0:#D6DEEB;--1:#403F53">;</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">case</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">'</span><span style="--0:#ECC48D;--1:#984E4D">b</span><span style="--0:#D9F5DD;--1:#111111">'</span><span style="--0:#D6DEEB;--1:#403F53">:</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#919F9F;--1:#5D6376">            </span></span><span style="--0:#919F9F;--1:#5D6376">// handle b</span></div></div><div class="ec-line"><div class="code"><span class="indent">            </span><span style="--0:#C792EA;--1:#8844AE">break</span><span style="--0:#D6DEEB;--1:#403F53">;</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">default</span><span style="--0:#D6DEEB;--1:#403F53">:</span></div></div><div class="ec-line"><div class="code"><span class="indent">          </span><span style="--0:#82AAFF;--1:#3B61B0">handle_default</span><span style="--0:#D6DEEB;--1:#403F53">();</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">}</span><span style="--0:#919F9F;--1:#5D6376"> // namespace example</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">}</span><span style="--0:#919F9F;--1:#5D6376"> // namespace riot</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="#include &#x22;riot/example/my_class.hpp&#x22;#include <iostream>namespace riot {namespace example {namespace {constexpr const char default_name[] = &#x22;my object&#x22;;} // namespace <anonymous>my_class::my_class() : name_(default_name) {    // nop}my_class::~my_class() {    // nop}void my_class::print_name() const {    std::cout << name() << std::endl;}void my_class::do_something() {    if (name() == default_name) {        std::cout << &#x22;You didn&#x27;t gave me a proper name, so I &#x22;                  << &#x22;refuse to do something.&#x22;                  << std::endl;    } else {        std::cout << &#x22;You gave me the name &#x22; << name()                  << &#x22;... Do you really think I&#x27;m willing to do something &#x22;                     &#x22;for you after insulting me like that?&#x22;                  << std::endl;    }}void my_class::do_something_else() {    switch (default_name[0]) {        case &#x27;a&#x27;:            // handle a            break;        case &#x27;b&#x27;:            // handle b            break;        default:          handle_default();    }}} // namespace example} // namespace riot"><div></div></button></div></figure></div>
-<h2 id="general">General</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="general">General</h2><a class="sl-anchor-link" href="#general"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “General”</span></a></div>
 <ul>
 <li>
 <p>Use 4 spaces per indentation level.</p>
@@ -127,35 +127,35 @@ conventions used by the C++ Standard Library. Based on the <a href="https://gith
 use comments to document logical blocks.</p>
 </li>
 <li>
-<p>Header filenames end in <code>.hpp</code>, implementation files end in <code>.cpp</code>.</p>
+<p>Header filenames end in <code dir="auto">.hpp</code>, implementation files end in <code dir="auto">.cpp</code>.</p>
 </li>
 <li>
 <p>Never declare more than one variable per line.</p>
 </li>
 <li>
-<p><code>*</code> and <code>&#x26;</code> bind to the <em>type</em>, e.g., <code>const std::string&#x26; arg</code>.</p>
+<p><code dir="auto">*</code> and <code dir="auto">&#x26;</code> bind to the <em>type</em>, e.g., <code dir="auto">const std::string&#x26; arg</code>.</p>
 </li>
 <li>
-<p>Namespaces and access modifiers (e.g., <code>public</code>) do not increase the
+<p>Namespaces and access modifiers (e.g., <code dir="auto">public</code>) do not increase the
 indentation level.</p>
 </li>
 <li>
-<p>In a class, use the order <code>public</code>, <code>protected</code>, and then <code>private</code>.</p>
+<p>In a class, use the order <code dir="auto">public</code>, <code dir="auto">protected</code>, and then <code dir="auto">private</code>.</p>
 </li>
 <li>
-<p>Always use <code>auto</code> to declare a variable unless you cannot initialize it
+<p>Always use <code dir="auto">auto</code> to declare a variable unless you cannot initialize it
 immediately or if you actually want a type conversion. In the latter case,
 provide a comment why this conversion is necessary.</p>
 </li>
 <li>
-<p>Never use unwrapped, manual resource management such as <code>new</code> and <code>delete</code>.</p>
+<p>Never use unwrapped, manual resource management such as <code dir="auto">new</code> and <code dir="auto">delete</code>.</p>
 </li>
 <li>
-<p>Never use <code>typedef</code>; always write <code>using T = X</code> in favor of <code>typedef X T</code>.</p>
+<p>Never use <code dir="auto">typedef</code>; always write <code dir="auto">using T = X</code> in favor of <code dir="auto">typedef X T</code>.</p>
 </li>
 <li>
-<p>Keywords are always followed by a whitespace: <code>if (...)</code>, <code>template &#x3C;...></code>,
-<code>while (...)</code>, etc.</p>
+<p>Keywords are always followed by a whitespace: <code dir="auto">if (...)</code>, <code dir="auto">template &#x3C;...></code>,
+<code dir="auto">while (...)</code>, etc.</p>
 </li>
 <li>
 <p>Opening braces belong to the same line:</p>
@@ -170,8 +170,8 @@ libraries, other libraries, (your) RIOT headers:</p>
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">#include</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">3rd/party.h</span><span style="--0:#D9F5DD;--1:#111111">"</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">#include</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#D9F5DD;--1:#111111">"</span><span style="--0:#ECC48D;--1:#984E4D">riot/fwd.hpp</span><span style="--0:#D9F5DD;--1:#111111">"</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="// some .hpp file#include <sys/types.h>#include <vector>#include &#x22;3rd/party.h&#x22;#include &#x22;riot/fwd.hpp&#x22;"><div></div></button></div></figure></div>
 <p>RIOT includes should always be in doublequotes, whereas system-wide
-includes in angle brackets. In a <code>.cpp</code> file, the implemented header always
-comes first and the header <code>riot/config.hpp</code> can be included second if you
+includes in angle brackets. In a <code dir="auto">.cpp</code> file, the implemented header always
+comes first and the header <code dir="auto">riot/config.hpp</code> can be included second if you
 need platform-dependent headers.</p>
 </li>
 <li>
@@ -179,11 +179,11 @@ need platform-dependent headers.</p>
 This follows the parameter order from the STL.</p>
 </li>
 <li>
-<p>Protect single-argument constructors with <code>explicit</code> to avoid implicit
+<p>Protect single-argument constructors with <code dir="auto">explicit</code> to avoid implicit
 conversions.</p>
 </li>
 </ul>
-<h2 id="naming">Naming</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="naming">Naming</h2><a class="sl-anchor-link" href="#naming"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Naming”</span></a></div>
 <ul>
 <li>
 <p>All names except macros and template parameters should be
@@ -195,55 +195,55 @@ lower case and delimited by underscores.</p>
 <li>
 <p>Types and variables should be nouns, while functions performing an action
 should be “command” verbs. Classes used to implement metaprogramming
-functions also should use verbs, e.g., <code>remove_const</code>.</p>
+functions also should use verbs, e.g., <code dir="auto">remove_const</code>.</p>
 </li>
 <li>
-<p>Private and protected member variables use the suffix <code>_</code> while getter <em>and</em>
+<p>Private and protected member variables use the suffix <code dir="auto">_</code> while getter <em>and</em>
 setter functions use the name without suffix:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="cpp"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">class</span><span style="--0:#D6DEEB;--1:#403F53"> person {</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">public:</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#C792EA;--1:#8844AE">const</span><span style="--0:#D6DEEB;--1:#403F53"> std::string</span><span style="--0:#C792EA;--1:#8844AE">&#x26;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">name</span><span style="--0:#D6DEEB;--1:#403F53">() </span><span style="--0:#C792EA;--1:#8844AE">const</span><span style="--0:#D6DEEB;--1:#403F53"> {</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">return</span><span style="--0:#D6DEEB;--1:#403F53"> name_</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#C792EA;--1:#8844AE">void</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">name</span><span style="--0:#D6DEEB;--1:#403F53">(</span><span style="--0:#C792EA;--1:#8844AE">const</span><span style="--0:#D6DEEB;--1:#403F53"> std::string</span><span style="--0:#C792EA;--1:#8844AE">&#x26;</span><span style="--1:#403F53"><span style="--0:#D6DEEB"> </span><span style="--0:#D7DBE0">new_name</span><span style="--0:#D6DEEB">) {</span></span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">        </span></span><span style="--0:#D6DEEB;--1:#403F53">name_ </span><span style="--0:#C792EA;--1:#8844AE">=</span><span style="--0:#D6DEEB;--1:#403F53"> new_name;</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">private:</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">std::string name_;</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">};</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="class person {public:    const std::string&#x26; name() const {        return name_    }    void name(const std::string&#x26; new_name) {        name_ = new_name;    }private:    std::string name_;};"><div></div></button></div></figure></div>
 </li>
 <li>
-<p>Use <code>T</code> for generic, unconstrained template parameters and <code>x</code>
-for generic function arguments. Suffix both with <code>s</code> for
+<p>Use <code dir="auto">T</code> for generic, unconstrained template parameters and <code dir="auto">x</code>
+for generic function arguments. Suffix both with <code dir="auto">s</code> for
 template parameter packs:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="cpp"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">template</span><span style="--0:#D6DEEB;--1:#403F53"> &#x3C;</span><span style="--0:#C792EA;--1:#8844AE">class</span><span style="--0:#D6DEEB;--1:#403F53">... Ts></span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">void</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">print</span><span style="--0:#D6DEEB;--1:#403F53">(</span><span style="--0:#C792EA;--1:#8844AE">const</span><span style="--0:#D6DEEB;--1:#403F53"> Ts</span><span style="--0:#C792EA;--1:#8844AE">&#x26;</span><span style="--1:#403F53"><span style="--0:#D6DEEB">... </span><span style="--0:#D7DBE0">xs</span><span style="--0:#D6DEEB">) {</span></span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#919F9F;--1:#5D6376">    </span></span><span style="--0:#919F9F;--1:#5D6376">// ...</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="template <class... Ts>void print(const Ts&#x26;... xs) {    // ...}"><div></div></button></div></figure></div>
 </li>
 </ul>
-<h2 id="headers">Headers</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="headers">Headers</h2><a class="sl-anchor-link" href="#headers"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Headers”</span></a></div>
 <ul>
 <li>
-<p>Each <code>.cpp</code> file has an associated <code>.hpp</code> file.
-Exceptions to this rule are unit tests and <code>main.cpp</code> files.</p>
+<p>Each <code dir="auto">.cpp</code> file has an associated <code dir="auto">.hpp</code> file.
+Exceptions to this rule are unit tests and <code dir="auto">main.cpp</code> files.</p>
 </li>
 <li>
 <p>Each class has its own pair of header and implementation
 files and the relative path for the header file is derived from its full name.
-For example, the header file for <code>riot::example::my_class</code> of module
-<code>my_module</code> is located at <code>path/to/my_module/riot/example/my_class.hpp</code>
-and the source file at <code>path/to/my_module/my_class.cpp</code>.</p>
+For example, the header file for <code dir="auto">riot::example::my_class</code> of module
+<code dir="auto">my_module</code> is located at <code dir="auto">path/to/my_module/riot/example/my_class.hpp</code>
+and the source file at <code dir="auto">path/to/my_module/my_class.cpp</code>.</p>
 </li>
 <li>
-<p>All header files should use <code>#define</code> guards to prevent multiple inclusion.
-The symbol name is <code>&#x3C;RELATIVE>_&#x3C;PATH>_&#x3C;TO>_&#x3C;FILE>_HPP</code>.</p>
+<p>All header files should use <code dir="auto">#define</code> guards to prevent multiple inclusion.
+The symbol name is <code dir="auto">&#x3C;RELATIVE>_&#x3C;PATH>_&#x3C;TO>_&#x3C;FILE>_HPP</code>.</p>
 </li>
 <li>
-<p>Do not <code>#include</code> when a forward declaration suffices.</p>
+<p>Do not <code dir="auto">#include</code> when a forward declaration suffices.</p>
 </li>
 <li>
-<p>Each library component must provide a <code>fwd.hpp</code> header providing forward
+<p>Each library component must provide a <code dir="auto">fwd.hpp</code> header providing forward
 declarations for all types used in the user API.</p>
 </li>
 <li>
-<p>Each library component must provide an <code>all.hpp</code> header that contains the
+<p>Each library component must provide an <code dir="auto">all.hpp</code> header that contains the
 main page for the documentation and includes all headers for the user API.</p>
 </li>
 <li>
-<p>Use <code>inline</code> for small functions (rule of thumb: 10 lines or less).</p>
+<p>Use <code dir="auto">inline</code> for small functions (rule of thumb: 10 lines or less).</p>
 </li>
 </ul>
-<h2 id="breaking-statements">Breaking Statements</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="breaking-statements">Breaking Statements</h2><a class="sl-anchor-link" href="#breaking-statements"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Breaking Statements”</span></a></div>
 <ul>
 <li>
 <p>Break constructor initializers after the comma, use four spaces for
@@ -260,7 +260,7 @@ need to break at all):</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="cpp"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">if</span><span style="--0:#D6DEEB;--1:#403F53"> (</span><span style="--0:#82AAFF;--1:#3B61B0">today_is_a_sunny_day</span><span style="--0:#D6DEEB;--1:#403F53">()</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#C792EA;--1:#8844AE">&#x26;&#x26;</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">it_is_not_too_hot_to_go_swimming</span><span style="--0:#D6DEEB;--1:#403F53">()) {</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#919F9F;--1:#5D6376">    </span></span><span style="--0:#919F9F;--1:#5D6376">// ...</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="if (today_is_a_sunny_day()    &#x26;&#x26; it_is_not_too_hot_to_go_swimming()) {    // ...}"><div></div></button></div></figure></div>
 </li>
 </ul>
-<h2 id="template-metaprogramming">Template Metaprogramming</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="template-metaprogramming">Template Metaprogramming</h2><a class="sl-anchor-link" href="#template-metaprogramming"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Template Metaprogramming”</span></a></div>
 <p>Despite its power, template metaprogramming came to the language pretty
 much by accident. Templates were never meant to be used for compile-time
 algorithms and type transformations. This is why C++ punishes metaprogramming
@@ -269,49 +269,49 @@ templates. To keep the code readable despite all the syntax noise, we have some
 extra rules for formatting metaprogramming code.</p>
 <ul>
 <li>
-<p>Brake <code>using name = ...</code> statements always directly after <code>=</code> if it
+<p>Brake <code dir="auto">using name = ...</code> statements always directly after <code dir="auto">=</code> if it
 does not fit in one line.</p>
 </li>
 <li>
 <p>Consider the <em>semantics</em> of a metaprogramming function. For example,
-<code>std::conditional</code> is an if-then-else construct. Hence, place the if-clause
+<code dir="auto">std::conditional</code> is an if-then-else construct. Hence, place the if-clause
 on its own line and do the same for the two cases.</p>
 </li>
 <li>
-<p>Use one level of indentation per “open” template and place the closing <code>></code>,
-<code>>::type</code> or <code>>::value</code> on its own line. For example:</p>
+<p>Use one level of indentation per “open” template and place the closing <code dir="auto">></code>,
+<code dir="auto">>::type</code> or <code dir="auto">>::value</code> on its own line. For example:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="cpp"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">using</span><span style="--0:#D6DEEB;--1:#403F53"> optional_result_type </span><span style="--0:#C792EA;--1:#8844AE">=</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">typename std::conditional</span><span style="--0:#C792EA;--1:#8844AE">&#x3C;</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">        </span></span><span style="--0:#D6DEEB;--1:#403F53">std::is_same&#x3C;result_type, </span><span style="--0:#C792EA;--1:#8844AE">void</span><span style="--0:#D6DEEB;--1:#403F53">>::value,</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">bool</span><span style="--0:#D6DEEB;--1:#403F53">,</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">        </span></span><span style="--0:#D6DEEB;--1:#403F53">optional</span><span style="--0:#C792EA;--1:#8844AE">&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53">result_type</span><span style="--0:#C792EA;--1:#8844AE">></span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#C792EA;--1:#8844AE">></span><span style="--0:#D6DEEB;--1:#403F53">::type;</span></div></div><div class="ec-line"><div class="code"><span style="--0:#919F9F;--1:#5D6376">// think of it as the following (not valid C++):</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">auto</span><span style="--0:#D6DEEB;--1:#403F53"> optional_result_type </span><span style="--0:#C792EA;--1:#8844AE">=</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">conditional {</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">if</span><span style="--0:#D6DEEB;--1:#403F53">   result_type </span><span style="--0:#C792EA;--1:#8844AE">==</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#C792EA;--1:#8844AE">void</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">        </span></span><span style="--0:#D6DEEB;--1:#403F53">then </span><span style="--0:#C792EA;--1:#8844AE">bool</span></div></div><div class="ec-line"><div class="code"><span class="indent">        </span><span style="--0:#C792EA;--1:#8844AE">else</span><span style="--0:#D6DEEB;--1:#403F53"> optional</span><span style="--0:#C792EA;--1:#8844AE">&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53">result_type</span><span style="--0:#C792EA;--1:#8844AE">></span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">    </span></span><span style="--0:#D6DEEB;--1:#403F53">};</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="using optional_result_type =    typename std::conditional<        std::is_same<result_type, void>::value,        bool,        optional<result_type>    >::type;// think of it as the following (not valid C++):auto optional_result_type =    conditional {        if   result_type == void        then bool        else optional<result_type>    };"><div></div></button></div></figure></div>
 </li>
 <li>
 <p>Note that this is not necessary when simply defining a type alias.
 When dealing with “ordinary” templates, indenting based on the position of
-the opening <code>&#x3C;</code> is ok, e.g.:</p>
+the opening <code dir="auto">&#x3C;</code> is ok, e.g.:</p>
 <div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="cpp"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">using</span><span style="--0:#D6DEEB;--1:#403F53"> response_handle_type </span><span style="--0:#C792EA;--1:#8844AE">=</span><span style="--0:#D6DEEB;--1:#403F53"> response_handle</span><span style="--0:#C792EA;--1:#8844AE">&#x3C;</span><span style="--0:#D6DEEB;--1:#403F53">Subtype, message,</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB;--1:#403F53">                                             </span></span><span style="--0:#D6DEEB;--1:#403F53">ResponseHandleTag</span><span style="--0:#C792EA;--1:#8844AE">></span><span style="--0:#D6DEEB;--1:#403F53">;</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="using response_handle_type = response_handle<Subtype, message,                                             ResponseHandleTag>;"><div></div></button></div></figure></div>
 </li>
 </ul>
-<h2 id="preprocessor-macros">Preprocessor Macros</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="preprocessor-macros">Preprocessor Macros</h2><a class="sl-anchor-link" href="#preprocessor-macros"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Preprocessor Macros”</span></a></div>
 <ul>
 <li>
 <p>Use macros if and only if you can’t get the same result by using inline
 functions or proper constants.</p>
 </li>
 <li>
-<p>Macro names use the form <code>RIOT_&#x3C;COMPONENT>_&#x3C;NAME></code>.</p>
+<p>Macro names use the form <code dir="auto">RIOT_&#x3C;COMPONENT>_&#x3C;NAME></code>.</p>
 </li>
 </ul>
-<h2 id="comments">Comments</h2>
+<div class="sl-heading-wrapper level-h2"><h2 id="comments">Comments</h2><a class="sl-anchor-link" href="#comments"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Comments”</span></a></div>
 <ul>
 <li>
-<p>Doxygen comments start with <code>///</code>.</p>
+<p>Doxygen comments start with <code dir="auto">///</code>.</p>
 </li>
 <li>
 <p>Use Markdown instead of Doxygen formatters.</p>
 </li>
 <li>
-<p>Use <code>@cmd</code> rather than <code>\cmd</code>.</p>
+<p>Use <code dir="auto">@cmd</code> rather than <code dir="auto">\cmd</code>.</p>
 </li>
 <li>
-<p>Use <code>//</code> to define basic comments that should not be
+<p>Use <code dir="auto">//</code> to define basic comments that should not be
 swallowed by Doxygen.</p>
 </li>
-</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/generated/CODING_CONVENTIONS_CPP.md" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/cpp_tutorials/using_cpp/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Using C++ in RIOT</span> </span> </a> <a href="/rust_tutorials/rust_in_riot/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Rust in RIOT</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
+</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/src/content/docs/generated/CODING_CONVENTIONS_CPP.md" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/cpp_tutorials/using_cpp/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Using C++ in RIOT</span> </span> </a> <a href="/rust_tutorials/rust_in_riot/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Rust in RIOT</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>

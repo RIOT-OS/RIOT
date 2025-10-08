@@ -83,20 +83,20 @@ the future, if new interest arises or a new maintainer is found.</p>
 <p>This list is <strong>not</strong> supposed to contain a change log of all the things that are
 being removed from RIOT, but should contain only full modules that are
 removed without any alternative being merged at the same time. For example
-things like the first <code>netdev</code> should not be put in this list, as a successor
-(former <code>netdev2</code>) has been merged.</p>
-<h2 id="how-to-read-this-list">How to read this list</h2>
+things like the first <code dir="auto">netdev</code> should not be put in this list, as a successor
+(former <code dir="auto">netdev2</code>) has been merged.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="how-to-read-this-list">How to read this list</h2><a class="sl-anchor-link" href="#how-to-read-this-list"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “How to read this list”</span></a></div>
 <p>For each high-level feature removed there should be one entry in this list. The
 entries should be ordered alphabetically and comply to the following template:</p>
 <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="markdown"><code><div class="ec-line"><div class="code"><span style="--0:#82B1FF;--1:#3B61B0">### path/feature_name [HASH of removal commit]</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">Author(s):</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> author 1 &#x3C;</span><span style="--0:#FF869A;--0td:underline;--1:#954F5A;--1td:underline">foo.bar@abc.com</span><span style="--0:#D6DEEB;--1:#403F53">></span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> author 2 &#x3C;</span><span style="--0:#FF869A;--0td:underline;--1:#954F5A;--1td:underline">a.b@c.net</span><span style="--0:#D6DEEB;--1:#403F53">></span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB;--1:#403F53">Reason for removal:</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> give a short and comprehensive reasoning why this feature was removed</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> typical reasons are:</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> feature is not maintained anymore</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> lack of hardware so feature can not be tested (anymore)</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D9F5DD;--1:#111111">-</span><span style="--0:#D6DEEB;--1:#403F53"> feature was never used and there is no reason for keeping it</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="### path/feature_name [HASH of removal commit]Author(s):- author 1 <foo.bar@abc.com>- author 2 <a.b@c.net>Reason for removal:- give a short and comprehensive reasoning why this feature was removed- typical reasons are:- feature is not maintained anymore- lack of hardware so feature can not be tested (anymore)- feature was never used and there is no reason for keeping it"><div></div></button></div></figure></div>
 <p>Additionally, a link reference for the commit on GitHub is added to the bottom of this document.</p>
 <p>By putting the name of the removed feature and the commit hash in the same line,
-one can very quickly find the commit using <code>git grep</code>.</p>
+one can very quickly find the commit using <code dir="auto">git grep</code>.</p>
 <p>Listing the authors of the removed code is done for appreciation of their work.
 This way, their names are never removed from the RIOT repository.</p>
-<h2 id="removed-features">Removed Features</h2>
-<h3 id="boardschronos-ed3887ac5c1e95308c2827bce3cdca8b0f146c22">boards/chronos <a href="https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22">ed3887ac5c1e95308c2827bce3cdca8b0f146c22</a></h3>
+<div class="sl-heading-wrapper level-h2"><h2 id="removed-features">Removed Features</h2><a class="sl-anchor-link" href="#removed-features"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Removed Features”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardschronos-ed3887ac5c1e95308c2827bce3cdca8b0f146c22">boards/chronos <a href="https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22">ed3887ac5c1e95308c2827bce3cdca8b0f146c22</a></h3><a class="sl-anchor-link" href="#boardschronos-ed3887ac5c1e95308c2827bce3cdca8b0f146c22"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/chronos ed3887ac5c1e95308c2827bce3cdca8b0f146c22”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Oliver Hahm <a href="mailto:oliver.hahm@inria.fr">oliver.hahm@inria.fr</a></li>
@@ -110,7 +110,7 @@ This way, their names are never removed from the RIOT repository.</p>
 <li>the onboard radio has been unsupported for a while</li>
 <li>no one seems to use the board, no one seems to maintain it</li>
 </ul>
-<h3 id="boardsfox-81458c8eed8949c686d5ded652dbee10748e860b">boards/fox <a href="https://github.com/RIOT-OS/RIOT/commit/81458c8eed8949c686d5ded652dbee10748e860b">81458c8eed8949c686d5ded652dbee10748e860b</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsfox-81458c8eed8949c686d5ded652dbee10748e860b">boards/fox <a href="https://github.com/RIOT-OS/RIOT/commit/81458c8eed8949c686d5ded652dbee10748e860b">81458c8eed8949c686d5ded652dbee10748e860b</a></h3><a class="sl-anchor-link" href="#boardsfox-81458c8eed8949c686d5ded652dbee10748e860b"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/fox 81458c8eed8949c686d5ded652dbee10748e860b”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Thomas Eichinger <a href="mailto:thomas.eichinger@fu-berlin.de">thomas.eichinger@fu-berlin.de</a></li>
@@ -119,7 +119,7 @@ This way, their names are never removed from the RIOT repository.</p>
 <ul>
 <li>Hardware not available so can’t be tested</li>
 </ul>
-<h3 id="boardsjiminy-mega256rfr2-232aed3e18118624b862d36bfec7cd1c21ca2d26">boards/jiminy-mega256rfr2 <a href="https://github.com/RIOT-OS/RIOT/commit/232aed3e18118624b862d36bfec7cd1c21ca2d26">232aed3e18118624b862d36bfec7cd1c21ca2d26</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsjiminy-mega256rfr2-232aed3e18118624b862d36bfec7cd1c21ca2d26">boards/jiminy-mega256rfr2 <a href="https://github.com/RIOT-OS/RIOT/commit/232aed3e18118624b862d36bfec7cd1c21ca2d26">232aed3e18118624b862d36bfec7cd1c21ca2d26</a></h3><a class="sl-anchor-link" href="#boardsjiminy-mega256rfr2-232aed3e18118624b862d36bfec7cd1c21ca2d26"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/jiminy-mega256rfr2 232aed3e18118624b862d36bfec7cd1c21ca2d26”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Josua Arndt <a href="mailto:jarndt@ias.rwth-aachen.de">jarndt@ias.rwth-aachen.de</a></li>
@@ -133,7 +133,7 @@ access to the hardware</li>
 <li>Various refactoring PRs affected the ATmega CPU family have not been tested,
 it is unclear if the board is actually usable with RIOT</li>
 </ul>
-<h3 id="boardsmips-malta-ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7">boards/mips-malta <a href="https://github.com/RIOT-OS/RIOT/commit/ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7">ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsmips-malta-ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7">boards/mips-malta <a href="https://github.com/RIOT-OS/RIOT/commit/ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7">ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7</a></h3><a class="sl-anchor-link" href="#boardsmips-malta-ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/mips-malta ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Neil Jones <a href="mailto:neil.jones@imgtec.com">neil.jones@imgtec.com</a></li>
@@ -144,7 +144,7 @@ it is unclear if the board is actually usable with RIOT</li>
 <li>Hardware not available for testing and not available for purchase either.</li>
 <li>Not actively maintained / broken for some time.</li>
 </ul>
-<h3 id="boardsnrf6310-4953ba8e6759d2b1a1a1ea497a4ad1e71489195a">boards/nrf6310 <a href="https://github.com/RIOT-OS/RIOT/commit/4953ba8e6759d2b1a1a1ea497a4ad1e71489195a">4953ba8e6759d2b1a1a1ea497a4ad1e71489195a</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsnrf6310-4953ba8e6759d2b1a1a1ea497a4ad1e71489195a">boards/nrf6310 <a href="https://github.com/RIOT-OS/RIOT/commit/4953ba8e6759d2b1a1a1ea497a4ad1e71489195a">4953ba8e6759d2b1a1a1ea497a4ad1e71489195a</a></h3><a class="sl-anchor-link" href="#boardsnrf6310-4953ba8e6759d2b1a1a1ea497a4ad1e71489195a"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/nrf6310 4953ba8e6759d2b1a1a1ea497a4ad1e71489195a”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Christian Kühling <a href="mailto:kuehling@zedat.fu-berlin.de">kuehling@zedat.fu-berlin.de</a></li>
@@ -154,11 +154,11 @@ it is unclear if the board is actually usable with RIOT</li>
 <p>Reason for removal:</p>
 <ul>
 <li>this was an early development board by Nordic which was discontinued
-(successor: <code>nrf51dk</code>)</li>
-<li>also for a <code>BLE DEVKIT.N</code> board from Mommosoft, which was discontinued as well</li>
+(successor: <code dir="auto">nrf51dk</code>)</li>
+<li>also for a <code dir="auto">BLE DEVKIT.N</code> board from Mommosoft, which was discontinued as well</li>
 <li>no hardware available anymore for testing, many exclusions from CI</li>
 </ul>
-<h3 id="boardspca10000-9447cb303426d7c6348bb84999f88bf929cd6263">boards/pca10000 <a href="https://github.com/RIOT-OS/RIOT/commit/9447cb303426d7c6348bb84999f88bf929cd6263">9447cb303426d7c6348bb84999f88bf929cd6263</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardspca10000-9447cb303426d7c6348bb84999f88bf929cd6263">boards/pca10000 <a href="https://github.com/RIOT-OS/RIOT/commit/9447cb303426d7c6348bb84999f88bf929cd6263">9447cb303426d7c6348bb84999f88bf929cd6263</a></h3><a class="sl-anchor-link" href="#boardspca10000-9447cb303426d7c6348bb84999f88bf929cd6263"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/pca10000 9447cb303426d7c6348bb84999f88bf929cd6263”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Christian Kühling <a href="mailto:kuehling@zedat.fu-berlin.de">kuehling@zedat.fu-berlin.de</a></li>
@@ -167,10 +167,10 @@ it is unclear if the board is actually usable with RIOT</li>
 </ul>
 <p>Reason for removal:</p>
 <ul>
-<li>this was an early development board by Nordic which was discontinued (successor: <code>nrf51dongle</code>)</li>
+<li>this was an early development board by Nordic which was discontinued (successor: <code dir="auto">nrf51dongle</code>)</li>
 <li>no hardware available anymore for testing</li>
 </ul>
-<h3 id="boardspca10005-ea73cc49eacd45640b9660134c4c92b887cb2716">boards/pca10005 <a href="https://github.com/RIOT-OS/RIOT/commit/ea73cc49eacd45640b9660134c4c92b887cb2716">ea73cc49eacd45640b9660134c4c92b887cb2716</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardspca10005-ea73cc49eacd45640b9660134c4c92b887cb2716">boards/pca10005 <a href="https://github.com/RIOT-OS/RIOT/commit/ea73cc49eacd45640b9660134c4c92b887cb2716">ea73cc49eacd45640b9660134c4c92b887cb2716</a></h3><a class="sl-anchor-link" href="#boardspca10005-ea73cc49eacd45640b9660134c4c92b887cb2716"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/pca10005 ea73cc49eacd45640b9660134c4c92b887cb2716”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Christian Kühling <a href="mailto:kuehling@zedat.fu-berlin.de">kuehling@zedat.fu-berlin.de</a></li>
@@ -179,10 +179,10 @@ it is unclear if the board is actually usable with RIOT</li>
 </ul>
 <p>Reason for removal:</p>
 <ul>
-<li>this was an early development board by Nordic which was discontinued (successor: <code>nrf51dk</code>)</li>
+<li>this was an early development board by Nordic which was discontinued (successor: <code dir="auto">nrf51dk</code>)</li>
 <li>no hardware available anymore for testing</li>
 </ul>
-<h3 id="boardsqemu-i386-99009af25e201bbc182d376e99df34133417be6c">boards/qemu-i386 <a href="https://github.com/RIOT-OS/RIOT/commit/99009af25e201bbc182d376e99df34133417be6c">99009af25e201bbc182d376e99df34133417be6c</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsqemu-i386-99009af25e201bbc182d376e99df34133417be6c">boards/qemu-i386 <a href="https://github.com/RIOT-OS/RIOT/commit/99009af25e201bbc182d376e99df34133417be6c">99009af25e201bbc182d376e99df34133417be6c</a></h3><a class="sl-anchor-link" href="#boardsqemu-i386-99009af25e201bbc182d376e99df34133417be6c"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/qemu-i386 99009af25e201bbc182d376e99df34133417be6c”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>René Kijewski <a href="mailto:rene.kijewski@fu-berlin.de">rene.kijewski@fu-berlin.de</a></li>
@@ -192,7 +192,7 @@ it is unclear if the board is actually usable with RIOT</li>
 <li>code broken and excluded from all tests for a long time</li>
 <li>no maintainer available</li>
 </ul>
-<h3 id="boardsslwstk6220a-cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9">boards/slwstk6220a <a href="https://github.com/RIOT-OS/RIOT/commit/cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9">cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsslwstk6220a-cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9">boards/slwstk6220a <a href="https://github.com/RIOT-OS/RIOT/commit/cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9">cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9</a></h3><a class="sl-anchor-link" href="#boardsslwstk6220a-cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/slwstk6220a cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Hauke Petersen <a href="mailto:hauke.petersen@fu-berlin.de">hauke.petersen@fu-berlin.de</a></li>
@@ -200,13 +200,13 @@ it is unclear if the board is actually usable with RIOT</li>
 </ul>
 <p>Reason for removal:</p>
 <ul>
-<li>The old implementation of the SLWSTK6220A based on <code>cpu/ezr32wg</code> did not use
+<li>The old implementation of the SLWSTK6220A based on <code dir="auto">cpu/ezr32wg</code> did not use
 the Gecko SDK, that other EFM32-based boards do use</li>
 <li>The old implementation had limited peripherals supported</li>
-<li>New implementation (with the same name) that is based on <code>cpu/efm32</code> was
+<li>New implementation (with the same name) that is based on <code dir="auto">cpu/efm32</code> was
 added in commit <a href="https://github.com/RIOT-OS/RIOT/commit/fe941ac9fe3f81c0f08ff3b8564cf439639abcda">fe941ac9fe3f81c0f08ff3b8564cf439639abcda</a></li>
 </ul>
-<h3 id="boardswaspmote-pro-2b8a0d48940517f7df4e78c7a0b16024f46a8694">boards/waspmote-pro <a href="https://github.com/RIOT-OS/RIOT/commit/2b8a0d48940517f7df4e78c7a0b16024f46a8694">2b8a0d48940517f7df4e78c7a0b16024f46a8694</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardswaspmote-pro-2b8a0d48940517f7df4e78c7a0b16024f46a8694">boards/waspmote-pro <a href="https://github.com/RIOT-OS/RIOT/commit/2b8a0d48940517f7df4e78c7a0b16024f46a8694">2b8a0d48940517f7df4e78c7a0b16024f46a8694</a></h3><a class="sl-anchor-link" href="#boardswaspmote-pro-2b8a0d48940517f7df4e78c7a0b16024f46a8694"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/waspmote-pro 2b8a0d48940517f7df4e78c7a0b16024f46a8694”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Hinnerk van Bruinehsen</li>
@@ -223,7 +223,7 @@ therefore, have no interest in supporting this board. As result, none of the
 RIOT core contributors has access to the hardware, preventing us from doing the
 necessary testing for maintaining this board.</li>
 </ul>
-<h3 id="boardsweio-cfa9580f319508f858c8fe30ecce8b2b59b6caa3">boards/weio <a href="https://github.com/RIOT-OS/RIOT/commit/cfa9580f319508f858c8fe30ecce8b2b59b6caa3">cfa9580f319508f858c8fe30ecce8b2b59b6caa3</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsweio-cfa9580f319508f858c8fe30ecce8b2b59b6caa3">boards/weio <a href="https://github.com/RIOT-OS/RIOT/commit/cfa9580f319508f858c8fe30ecce8b2b59b6caa3">cfa9580f319508f858c8fe30ecce8b2b59b6caa3</a></h3><a class="sl-anchor-link" href="#boardsweio-cfa9580f319508f858c8fe30ecce8b2b59b6caa3"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/weio cfa9580f319508f858c8fe30ecce8b2b59b6caa3”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Paul Rathgeb <a href="mailto:paul.rathgeb@skynet.be">paul.rathgeb@skynet.be</a></li>
@@ -233,7 +233,7 @@ necessary testing for maintaining this board.</li>
 <li>hardware not available to the community for testing</li>
 <li>original author and maintainer won’t be able to maintain the code</li>
 </ul>
-<h3 id="boardswsn430-v1_3b-boardswsn430-v1_4-e63cd54f3b1e002a7895bb7c46af889b341c1a15">boards/wsn430-v1_3b, boards/wsn430-v1_4 <a href="https://github.com/RIOT-OS/RIOT/commit/e63cd54f3b1e002a7895bb7c46af889b341c1a15">e63cd54f3b1e002a7895bb7c46af889b341c1a15</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardswsn430-v1_3b-boardswsn430-v1_4-e63cd54f3b1e002a7895bb7c46af889b341c1a15">boards/wsn430-v1_3b, boards/wsn430-v1_4 <a href="https://github.com/RIOT-OS/RIOT/commit/e63cd54f3b1e002a7895bb7c46af889b341c1a15">e63cd54f3b1e002a7895bb7c46af889b341c1a15</a></h3><a class="sl-anchor-link" href="#boardswsn430-v1_3b-boardswsn430-v1_4-e63cd54f3b1e002a7895bb7c46af889b341c1a15"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/wsn430-v1_3b, boards/wsn430-v1_4 e63cd54f3b1e002a7895bb7c46af889b341c1a15”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Hauke Petersen <a href="mailto:hauke.petersen@fu-berlin.de">hauke.petersen@fu-berlin.de</a></li>
@@ -245,7 +245,7 @@ necessary testing for maintaining this board.</li>
 <ul>
 <li>no longer accessible on the IoT-LAB testbed</li>
 </ul>
-<h3 id="boardsx86-multiboot-common-b3eb9b8cf23f0702fa725d536df6ad6528f84189">boards/x86-multiboot-common <a href="https://github.com/RIOT-OS/RIOT/commit/b3eb9b8cf23f0702fa725d536df6ad6528f84189">b3eb9b8cf23f0702fa725d536df6ad6528f84189</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="boardsx86-multiboot-common-b3eb9b8cf23f0702fa725d536df6ad6528f84189">boards/x86-multiboot-common <a href="https://github.com/RIOT-OS/RIOT/commit/b3eb9b8cf23f0702fa725d536df6ad6528f84189">b3eb9b8cf23f0702fa725d536df6ad6528f84189</a></h3><a class="sl-anchor-link" href="#boardsx86-multiboot-common-b3eb9b8cf23f0702fa725d536df6ad6528f84189"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “boards/x86-multiboot-common b3eb9b8cf23f0702fa725d536df6ad6528f84189”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>René Kijewski <a href="mailto:rene.kijewski@fu-berlin.de">rene.kijewski@fu-berlin.de</a></li>
@@ -255,7 +255,7 @@ necessary testing for maintaining this board.</li>
 <li>code broken and excluded from all tests for a long time</li>
 <li>no maintainer available</li>
 </ul>
-<h3 id="cpulpc11u34-7bc271807cecbffbb01a37c56a367b98fb823573">cpu/lpc11u34 <a href="https://github.com/RIOT-OS/RIOT/commit/7bc271807cecbffbb01a37c56a367b98fb823573">7bc271807cecbffbb01a37c56a367b98fb823573</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="cpulpc11u34-7bc271807cecbffbb01a37c56a367b98fb823573">cpu/lpc11u34 <a href="https://github.com/RIOT-OS/RIOT/commit/7bc271807cecbffbb01a37c56a367b98fb823573">7bc271807cecbffbb01a37c56a367b98fb823573</a></h3><a class="sl-anchor-link" href="#cpulpc11u34-7bc271807cecbffbb01a37c56a367b98fb823573"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “cpu/lpc11u34 7bc271807cecbffbb01a37c56a367b98fb823573”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Paul Rathgeb <a href="mailto:paul.rathgeb@skynet.be">paul.rathgeb@skynet.be</a></li>
@@ -265,7 +265,7 @@ necessary testing for maintaining this board.</li>
 <li>hardware not available to the community for testing</li>
 <li>original author and maintainer won’t be able to maintain the code</li>
 </ul>
-<h3 id="cpumips32r2_generic-a2bcd7539ce1931b7aec0077ea71dadd62c96edd">cpu/mips32r2_generic <a href="https://github.com/RIOT-OS/RIOT/commit/a2bcd7539ce1931b7aec0077ea71dadd62c96edd">a2bcd7539ce1931b7aec0077ea71dadd62c96edd</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="cpumips32r2_generic-a2bcd7539ce1931b7aec0077ea71dadd62c96edd">cpu/mips32r2_generic <a href="https://github.com/RIOT-OS/RIOT/commit/a2bcd7539ce1931b7aec0077ea71dadd62c96edd">a2bcd7539ce1931b7aec0077ea71dadd62c96edd</a></h3><a class="sl-anchor-link" href="#cpumips32r2_generic-a2bcd7539ce1931b7aec0077ea71dadd62c96edd"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “cpu/mips32r2_generic a2bcd7539ce1931b7aec0077ea71dadd62c96edd”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>
@@ -278,7 +278,7 @@ necessary testing for maintaining this board.</li>
 <p>(Same reasons as mips-malta)</p>
 </li>
 </ul>
-<h3 id="cpumips-6cad5d24771ba6199228351a11b5062cd2e9b36d">cpu/mips* <a href="https://github.com/RIOT-OS/RIOT/commit/6cad5d24771ba6199228351a11b5062cd2e9b36d">6cad5d24771ba6199228351a11b5062cd2e9b36d</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="cpumips-6cad5d24771ba6199228351a11b5062cd2e9b36d">cpu/mips* <a href="https://github.com/RIOT-OS/RIOT/commit/6cad5d24771ba6199228351a11b5062cd2e9b36d">6cad5d24771ba6199228351a11b5062cd2e9b36d</a></h3><a class="sl-anchor-link" href="#cpumips-6cad5d24771ba6199228351a11b5062cd2e9b36d"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “cpu/mips* 6cad5d24771ba6199228351a11b5062cd2e9b36d”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Neil Jones <a href="mailto:Neil.Jones@imgtec.com">Neil.Jones@imgtec.com</a></li>
@@ -288,7 +288,7 @@ necessary testing for maintaining this board.</li>
 <li>Not maintained anymore</li>
 <li>Current state is not very useful and nobody claimed to use it</li>
 </ul>
-<h3 id="cpux86-fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836">cpu/x86 <a href="https://github.com/RIOT-OS/RIOT/commit/fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836">fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="cpux86-fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836">cpu/x86 <a href="https://github.com/RIOT-OS/RIOT/commit/fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836">fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836</a></h3><a class="sl-anchor-link" href="#cpux86-fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “cpu/x86 fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>René Kijewski <a href="mailto:rene.kijewski@fu-berlin.de">rene.kijewski@fu-berlin.de</a></li>
@@ -298,7 +298,7 @@ necessary testing for maintaining this board.</li>
 <li>code broken and excluded from all tests for a long time</li>
 <li>no maintainer available</li>
 </ul>
-<h3 id="gnrc_nettype_iovec-4f243c52eabefe709d78560ce7f1d502d737a999">GNRC_NETTYPE_IOVEC <a href="https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999">4f243c52eabefe709d78560ce7f1d502d737a999</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="gnrc_nettype_iovec-4f243c52eabefe709d78560ce7f1d502d737a999">GNRC_NETTYPE_IOVEC <a href="https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999">4f243c52eabefe709d78560ce7f1d502d737a999</a></h3><a class="sl-anchor-link" href="#gnrc_nettype_iovec-4f243c52eabefe709d78560ce7f1d502d737a999"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “GNRC_NETTYPE_IOVEC 4f243c52eabefe709d78560ce7f1d502d737a999”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Martine S. Lenders <a href="mailto:m.lenders@fu-berlin.de">m.lenders@fu-berlin.de</a></li>
@@ -308,7 +308,7 @@ necessary testing for maintaining this board.</li>
 <ul>
 <li>Unused since <a href="https://github.com/RIOT-OS/RIOT/commit/9fb2f541baca469e34fa01b004d6f19385700ce9">9fb2f541baca469e34fa01b004d6f19385700ce9</a></li>
 </ul>
-<h3 id="gnrc_pktbuf_duplicate_upto-b83430aa625a1d42f11f9badf5e5cfbb8efacd99">gnrc_pktbuf_duplicate_upto() <a href="https://github.com/RIOT-OS/RIOT/commit/b83430aa625a1d42f11f9badf5e5cfbb8efacd99">b83430aa625a1d42f11f9badf5e5cfbb8efacd99</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="gnrc_pktbuf_duplicate_upto-b83430aa625a1d42f11f9badf5e5cfbb8efacd99">gnrc_pktbuf_duplicate_upto() <a href="https://github.com/RIOT-OS/RIOT/commit/b83430aa625a1d42f11f9badf5e5cfbb8efacd99">b83430aa625a1d42f11f9badf5e5cfbb8efacd99</a></h3><a class="sl-anchor-link" href="#gnrc_pktbuf_duplicate_upto-b83430aa625a1d42f11f9badf5e5cfbb8efacd99"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “gnrc_pktbuf_duplicate_upto() b83430aa625a1d42f11f9badf5e5cfbb8efacd99”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Takuo Yonezawa <a href="mailto:yonezawa.t2@gmail.com">yonezawa.t2@gmail.com</a></li>
@@ -316,12 +316,12 @@ necessary testing for maintaining this board.</li>
 </ul>
 <p>Reason for removal:</p>
 <ul>
-<li>broke the abstraction of <code>gnrc_pktbuf</code></li>
-<li>its only user within the RIOT code base <code>gnrc_ipv6_ext</code> was reworked in
+<li>broke the abstraction of <code dir="auto">gnrc_pktbuf</code></li>
+<li>its only user within the RIOT code base <code dir="auto">gnrc_ipv6_ext</code> was reworked in
 <a href="https://github.com/RIOT-OS/RIOT/commit/f671a87fe2c539c3aecd595ae03fa4f6f209d042">f671a87fe2c539c3aecd595ae03fa4f6f209d042</a> so it is not needed anymore.</li>
 <li>the function was deprecated in <a href="https://github.com/RIOT-OS/RIOT/commit/f2760c033c5f332be076b25aa212aca4007c3d65">f2760c033c5f332be076b25aa212aca4007c3d65</a></li>
 </ul>
-<h3 id="gnrc_pktbuf_replace_snip-72821a502f073006643cb4ef7815fc8c42563ce6">gnrc_pktbuf_replace_snip() <a href="https://github.com/RIOT-OS/RIOT/commit/72821a502f073006643cb4ef7815fc8c42563ce6">72821a502f073006643cb4ef7815fc8c42563ce6</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="gnrc_pktbuf_replace_snip-72821a502f073006643cb4ef7815fc8c42563ce6">gnrc_pktbuf_replace_snip() <a href="https://github.com/RIOT-OS/RIOT/commit/72821a502f073006643cb4ef7815fc8c42563ce6">72821a502f073006643cb4ef7815fc8c42563ce6</a></h3><a class="sl-anchor-link" href="#gnrc_pktbuf_replace_snip-72821a502f073006643cb4ef7815fc8c42563ce6"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “gnrc_pktbuf_replace_snip() 72821a502f073006643cb4ef7815fc8c42563ce6”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Joakim Nohlgård <a href="mailto:joakim.nohlgard@eistec.se">joakim.nohlgard@eistec.se</a></li>
@@ -331,7 +331,7 @@ necessary testing for maintaining this board.</li>
 <ul>
 <li>Unused, untested and no longer needed</li>
 </ul>
-<h3 id="pkgemb6-4f243c52eabefe709d78560ce7f1d502d737a999">pkg/emb6 <a href="https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999">4f243c52eabefe709d78560ce7f1d502d737a999</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="pkgemb6-4f243c52eabefe709d78560ce7f1d502d737a999">pkg/emb6 <a href="https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999">4f243c52eabefe709d78560ce7f1d502d737a999</a></h3><a class="sl-anchor-link" href="#pkgemb6-4f243c52eabefe709d78560ce7f1d502d737a999"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “pkg/emb6 4f243c52eabefe709d78560ce7f1d502d737a999”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Martine S. Lenders <a href="mailto:m.lenders@fu-berlin.de">m.lenders@fu-berlin.de</a></li>
@@ -342,7 +342,7 @@ necessary testing for maintaining this board.</li>
 <li>Ported version even older (last update Feb 2016)</li>
 <li>Updating to more recent version would be more effort than its worth</li>
 </ul>
-<h3 id="pkglibcoap-d83d08f0995a88f399e70a7d07b44dd780082436">pkg/libcoap <a href="https://github.com/RIOT-OS/RIOT/commit/d83d08f0995a88f399e70a7d07b44dd780082436">d83d08f0995a88f399e70a7d07b44dd780082436</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="pkglibcoap-d83d08f0995a88f399e70a7d07b44dd780082436">pkg/libcoap <a href="https://github.com/RIOT-OS/RIOT/commit/d83d08f0995a88f399e70a7d07b44dd780082436">d83d08f0995a88f399e70a7d07b44dd780082436</a></h3><a class="sl-anchor-link" href="#pkglibcoap-d83d08f0995a88f399e70a7d07b44dd780082436"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “pkg/libcoap d83d08f0995a88f399e70a7d07b44dd780082436”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Martine Lenders <a href="mailto:mlenders@inf.fu-berlin.de">mlenders@inf.fu-berlin.de</a></li>
@@ -352,7 +352,7 @@ necessary testing for maintaining this board.</li>
 <li>Not maintained anymore, no updates for 8 years</li>
 <li>Upstream libcoap allows building with RIOT, so there is a migration path for users</li>
 </ul>
-<h3 id="pkgnordic_softdevice_ble-35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34">pkg/nordic_softdevice_ble <a href="https://github.com/RIOT-OS/RIOT/commit/35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34">35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="pkgnordic_softdevice_ble-35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34">pkg/nordic_softdevice_ble <a href="https://github.com/RIOT-OS/RIOT/commit/35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34">35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34</a></h3><a class="sl-anchor-link" href="#pkgnordic_softdevice_ble-35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “pkg/nordic_softdevice_ble 35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Hauke Petersen <a href="mailto:hauke.petersen@fu-berlin.de">hauke.petersen@fu-berlin.de</a></li>
@@ -364,7 +364,7 @@ necessary testing for maintaining this board.</li>
 <ul>
 <li>Outdated, unmaintained and no longer working</li>
 </ul>
-<h3 id="pkgoonf_api-c829f820ee870bffc60c7df688d2da8373553212">pkg/oonf_api <a href="https://github.com/RIOT-OS/RIOT/commit/c829f820ee870bffc60c7df688d2da8373553212">c829f820ee870bffc60c7df688d2da8373553212</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="pkgoonf_api-c829f820ee870bffc60c7df688d2da8373553212">pkg/oonf_api <a href="https://github.com/RIOT-OS/RIOT/commit/c829f820ee870bffc60c7df688d2da8373553212">c829f820ee870bffc60c7df688d2da8373553212</a></h3><a class="sl-anchor-link" href="#pkgoonf_api-c829f820ee870bffc60c7df688d2da8373553212"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “pkg/oonf_api c829f820ee870bffc60c7df688d2da8373553212”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Benjamin Valentin <a href="mailto:benpicco@googlemail.com">benpicco@googlemail.com</a></li>
@@ -375,7 +375,7 @@ necessary testing for maintaining this board.</li>
 <li>Tests were never integrated to the CI.</li>
 <li>NHDP, which was the only upstream user, has been removed.</li>
 </ul>
-<h3 id="pkgqdsa-cc357f9638ce22a39eab8f79055f1154388ccb74">pkg/qdsa <a href="https://github.com/RIOT-OS/RIOT/commit/cc357f9638ce22a39eab8f79055f1154388ccb74">cc357f9638ce22a39eab8f79055f1154388ccb74</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="pkgqdsa-cc357f9638ce22a39eab8f79055f1154388ccb74">pkg/qdsa <a href="https://github.com/RIOT-OS/RIOT/commit/cc357f9638ce22a39eab8f79055f1154388ccb74">cc357f9638ce22a39eab8f79055f1154388ccb74</a></h3><a class="sl-anchor-link" href="#pkgqdsa-cc357f9638ce22a39eab8f79055f1154388ccb74"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “pkg/qdsa cc357f9638ce22a39eab8f79055f1154388ccb74”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Kaspar Schleiser <a href="mailto:kaspar@schleiser.de">kaspar@schleiser.de</a> (integration into RIOT as package)</li>
@@ -388,17 +388,17 @@ necessary testing for maintaining this board.</li>
 scrutiny by the crypto community that would justify inclusion in a general
 purpose OS</li>
 </ul>
-<h3 id="sysirq_handler-a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2">sys/irq_handler <a href="https://github.com/RIOT-OS/RIOT/commit/a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2">a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="sysirq_handler-a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2">sys/irq_handler <a href="https://github.com/RIOT-OS/RIOT/commit/a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2">a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2</a></h3><a class="sl-anchor-link" href="#sysirq_handler-a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “sys/irq_handler a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>Gunar Schorcht <a href="mailto:gunar@schorcht.net">gunar@schorcht.net</a></li>
 </ul>
 <p>Reason for removal:</p>
 <ul>
-<li>Provides some feature as <code>sys/event_thread</code></li>
+<li>Provides some feature as <code dir="auto">sys/event_thread</code></li>
 <li>Has been deprecated directly in the first release it was provided</li>
 </ul>
-<h3 id="sysnetgnrcapplication_layertftp-0e2a62078850e1ecc74db2db4d639cf2d8fb96d3">sys/net/gnrc/application_layer/tftp <a href="https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3">0e2a62078850e1ecc74db2db4d639cf2d8fb96d3</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="sysnetgnrcapplication_layertftp-0e2a62078850e1ecc74db2db4d639cf2d8fb96d3">sys/net/gnrc/application_layer/tftp <a href="https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3">0e2a62078850e1ecc74db2db4d639cf2d8fb96d3</a></h3><a class="sl-anchor-link" href="#sysnetgnrcapplication_layertftp-0e2a62078850e1ecc74db2db4d639cf2d8fb96d3"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “sys/net/gnrc/application_layer/tftp 0e2a62078850e1ecc74db2db4d639cf2d8fb96d3”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>DipSwitch <a href="mailto:dipswitch@ownage4u.nl">dipswitch@ownage4u.nl</a></li>
@@ -408,7 +408,7 @@ purpose OS</li>
 <li>Not maintained anymore.</li>
 <li>Existing quality and security defects.</li>
 </ul>
-<h3 id="sysnetgnrcnettest-cdc252ab7bd4161cc046bf93a3e55995704b24d4">sys/net/gnrc/nettest <a href="https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4">cdc252ab7bd4161cc046bf93a3e55995704b24d4</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="sysnetgnrcnettest-cdc252ab7bd4161cc046bf93a3e55995704b24d4">sys/net/gnrc/nettest <a href="https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4">cdc252ab7bd4161cc046bf93a3e55995704b24d4</a></h3><a class="sl-anchor-link" href="#sysnetgnrcnettest-cdc252ab7bd4161cc046bf93a3e55995704b24d4"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “sys/net/gnrc/nettest cdc252ab7bd4161cc046bf93a3e55995704b24d4”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Martine Lenders <a href="mailto:mlenders@inf.fu-berlin.de">mlenders@inf.fu-berlin.de</a></li>
@@ -418,7 +418,7 @@ purpose OS</li>
 <li>Not maintained anymore</li>
 <li>Not used in GNRC</li>
 </ul>
-<h3 id="sysnetroutingnhdp-9026823bb906f64168d7d38e52be92f390353dc8">sys/net/routing/nhdp <a href="https://github.com/RIOT-OS/RIOT/commit/9026823bb906f64168d7d38e52be92f390353dc8">9026823bb906f64168d7d38e52be92f390353dc8</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="sysnetroutingnhdp-9026823bb906f64168d7d38e52be92f390353dc8">sys/net/routing/nhdp <a href="https://github.com/RIOT-OS/RIOT/commit/9026823bb906f64168d7d38e52be92f390353dc8">9026823bb906f64168d7d38e52be92f390353dc8</a></h3><a class="sl-anchor-link" href="#sysnetroutingnhdp-9026823bb906f64168d7d38e52be92f390353dc8"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “sys/net/routing/nhdp 9026823bb906f64168d7d38e52be92f390353dc8”</span></a></div>
 <p>Author:</p>
 <ul>
 <li>Fabian Nack <a href="mailto:nack@inf.fu-berlin.de">nack@inf.fu-berlin.de</a></li>
@@ -428,7 +428,7 @@ purpose OS</li>
 <li>Not maintained anymore.</li>
 <li>Does not comply with the current RIOT programming practices.</li>
 </ul>
-<h3 id="sysubjson-bea30c3f8949ebd9fdf4a9bf0a987652889930f5">sys/ubjson <a href="https://github.com/RIOT-OS/RIOT/commit/bea30c3f8949ebd9fdf4a9bf0a987652889930f5">bea30c3f8949ebd9fdf4a9bf0a987652889930f5</a></h3>
+<div class="sl-heading-wrapper level-h3"><h3 id="sysubjson-bea30c3f8949ebd9fdf4a9bf0a987652889930f5">sys/ubjson <a href="https://github.com/RIOT-OS/RIOT/commit/bea30c3f8949ebd9fdf4a9bf0a987652889930f5">bea30c3f8949ebd9fdf4a9bf0a987652889930f5</a></h3><a class="sl-anchor-link" href="#sysubjson-bea30c3f8949ebd9fdf4a9bf0a987652889930f5"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “sys/ubjson bea30c3f8949ebd9fdf4a9bf0a987652889930f5”</span></a></div>
 <p>Author(s):</p>
 <ul>
 <li>René Kijewski <a href="mailto:rene.kijewski@fu-berlin.de">rene.kijewski@fu-berlin.de</a></li>
@@ -438,4 +438,4 @@ purpose OS</li>
 <li>Unsafe code.</li>
 <li>Did not comply with RIOT standards.</li>
 <li>More standard alternatives available (such as CBOR).</li>
-</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/generated/LOSTANDFOUND.md" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/misc/roadmap/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Roadmap</span> </span> </a> <a href="/misc/release_cycle/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Release Cycle</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
+</ul> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/src/content/docs/generated/LOSTANDFOUND.md" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/misc/roadmap/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Roadmap</span> </span> </a> <a href="/misc/release_cycle/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Release Cycle</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
