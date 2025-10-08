@@ -53,6 +53,12 @@
 #define BACKUP_RAM      __attribute__((section(".noinit")))
 #endif
 
+/* don't attempt to retain time across reboots */
+#if IS_ACTIVE(CONFIG_RTT_RTC_NO_RETAIN)
+#undef BACKUP_RAM
+#define BACKUP_RAM
+#endif
+
 static uint32_t rtc_now BACKUP_RAM;         /**< The RTC timestamp when the last RTT alarm triggered */
 static uint32_t last_alarm BACKUP_RAM;      /**< The RTT timestamp of the last alarm */
 
