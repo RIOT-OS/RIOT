@@ -124,6 +124,8 @@ see [Adafruit nRF52 Bootloader Common](https://doc.riot-os.org/group__boards__co
 - `cpy2remed` (requires integrated ST-Link programmer, e.g. Nucleo boards)
 - `robotis-loader` (requires robotis bootloader, only one board supported)
 
+See also: [STM32 Flashing Guide](/board_specific/stm32)
+
 ## Programmer Configuration
 
 This section will list additional configuration options to control the behavior
@@ -188,26 +190,6 @@ Note that the OpenOCD configuration file of a given board may only support SWD o
 JTAG. Also JTAG requires more signal lines to be connected compared to SWD and
 some internal programmers only have the SWD signal lines connected, so that
 JTAG will not be possible.
-
-### stm32flash Configuration
-
-It is possible to automatically boot the STM32 board into the in-ROM bootloader
-that `stm32flash` communicates with for flashing by connecting the RST pin to
-DTR and the BOOT pin (or BOOT0 for STM32 MCU families with BOOT0 and BOOT1 pins)
-to RTS of the TTL adapter. In addition, set `STM32FLASH_RESET` to `1` via
-environment or command line to actually issue a reset with BOOT (or BOOT0)
-pulled high prior flashing to enter the bootloader, and a second reset with BOOT
-(or BOOT0) pulled low to reboot into the application. `STM32FLASH_RESET`
-defaults to `0` as of know, as with `PROGRAMMER=stm32flash STM32FLASH_RESET=1`
-additional terminal flags are set, so that `make term` doesn't accidentally
-keeps the reset signal pulled low or boot the board into the bootloader.
-
-The TTL adapter this was tested with had inverted RTS and DTR signal. By setting
-`STM32FLASH_RESET_INVERT` to `1` RIOT will assume RTS and DTR signals to be
-inverted, by setting it to `0` non-inverted signals will be generated. As of
-now, `STM32FLASH_RESET_INVERT` is by default `1`. This may change if it
-becomes evident that non-inverted TTL adapters are in fact more common than
-inverted adapters.
 
 ### MSPDEBUG Configuration
 
