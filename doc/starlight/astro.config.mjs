@@ -155,14 +155,14 @@ export default defineConfig({
         {
           label: "Board Specific",
           items: [
-            "board_specific/stm32"
+            "board_specific/stm32",
+            "board_specific/io_mapping_and_shields",
           ],
         },
         {
           label: "Miscellaneous",
           items: [
             "misc/dev_best_practices",
-            "misc/io_mapping_and_shields",
             "misc/roadmap",
             "misc/lost_and_found",
             "misc/release_cycle",
@@ -188,6 +188,9 @@ export default defineConfig({
       },
     }),
   ],
+  redirects: {
+    "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
+  },
   vite: {
     server: {
       fs: {
