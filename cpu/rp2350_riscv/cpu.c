@@ -1,19 +1,17 @@
 /*
- * Copyright (C) 2017, 2019 Ken Rabold, JP Bonn
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_rp2350_riscv
  * @{
  *
  * @file        cpu.c
- * @brief       Implementation of the CPU initialization for SiFive FE310
+ * @brief       Implementation of the CPU initialization for RP2350
  *
- * @author      Ken Rabold
+ * @author      Tom Hert <git@annsann.eu>
  * @}
  */
 

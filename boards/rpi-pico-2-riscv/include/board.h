@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @ingroup         boards_rpi_pico_2
+ * @ingroup         boards_rpi_pico_2_riscv
  * @{
  *
  * @file
@@ -27,9 +27,6 @@
 #define LED0_OFF        gpio_clear(LED0_PIN_ID)
 #define LED0_TOGGLE     gpio_toggle(LED0_PIN_ID)
 #define LED0_NAME       "LED(Green)"
-
-#define OSC_DEBUG_PIN_ID 15u
-#define OSC_DEBUG_PIN_ID_2 14u
 
 #ifdef __cplusplus
 extern "C" {

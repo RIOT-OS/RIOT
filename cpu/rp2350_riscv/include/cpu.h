@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_rp2350_riscv
  * @{
  *
  * @file

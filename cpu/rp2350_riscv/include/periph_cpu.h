@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2017 Ken Rabold
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
- * @ingroup         cpu_fe310
+ * @ingroup         cpu_rp2350_riscv
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief           Peripheral CPU definitions for the RP2350
  *
- * @author          Ken Rabold
+ * @author          Tom Hert <git@annsann.eu>
  */
 
 #include <inttypes.h>
@@ -24,10 +22,14 @@
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
 
-/* Im currently copying the original rp2040 def but this causes the other port to not be addressable (I think)*/
+/**
+ * @brief Macro to create a GPIO pin identifier
+ * @param port  The GPIO port (Currently only GPIO0)
+ * @param pin   The GPIO pin number
+ */
 #define GPIO_PIN(port, pin)     (((port) & 0) | (pin))
 
-/* This is a define used throughout the pico sdk */
+/** This is a define used throughout the pico sdk */
 #define _u(x) ((uint32_t)(x))
 
 #include "periph_cpu_common.h"
@@ -68,9 +70,6 @@ extern "C" {
 /** Isolation bits for PADS_BANK0 */
 #define PADS_BANK0_ISO_BITS (1u << 8u)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @brief   Calculate the address of the GPIO pad register for a given pin
@@ -90,7 +89,7 @@ static inline uint32_t calculate_gpio_pad_register_addr(gpio_t pin) {
  * @return  The address of the GPIO IO status register for the given pin
  */
 static uint32_t calculate_gpio_io_status_register_addr(gpio_t pin) {
-    /* Each status register is followed by a ctrl register, */
+    /* Each status register is followed by a ctrl register */
     return IO_BANK0_BASE + 8 * pin;
 }
 
@@ -108,7 +107,6 @@ static inline uint32_t calculate_gpio_io_ctrl_register_addr(gpio_t pin) {
 }
 
 
-/** @} */
 
 #ifdef __cplusplus
 }

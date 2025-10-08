@@ -831,7 +831,7 @@ groups:
       help: A RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
     - name: periph_xh3irq
       help: An XH3IRQ peripheral is present. This is a special interrupt controller
-            for the Hazard3 used by the RP2350
+            for the Hazard3 used by the RP2350.
 
   - title: Cryptographic Features
     help: Hardware acceleration for cryptographic primitives, hardware random

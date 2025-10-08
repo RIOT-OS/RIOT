@@ -17,6 +17,7 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
+#include "kernel_defines.h"
 #include <stdint.h>
 
 #include "kernel_defines.h"
@@ -59,3 +60,5 @@ static const uart_conf_t uart_config[] = {
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */
