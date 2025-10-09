@@ -478,7 +478,8 @@ static mem_manage_handler_t _mem_manage_handler = NULL;
 #ifndef NDEBUG
 const char *_free_mem_manage_handler_last_file = NULL;
 
-void assert_free_mem_manage_handler_ex(const char *file, int line) {
+void assert_free_mem_manage_handler_ex(const char *file, int line)
+{
     if (_mem_manage_handler != NULL) {
         printf( "Memory manage handler is not free : assertion from "
                 "file %s at line %d, previously from file %s\n",
@@ -491,7 +492,8 @@ void assert_free_mem_manage_handler_ex(const char *file, int line) {
 
 #endif
 
-int set_memory_manage_handler(mem_manage_handler_t handler) {
+int set_memory_manage_handler(mem_manage_handler_t handler)
+{
     if (handler == NULL) {
         return -1;
     }
@@ -502,7 +504,8 @@ int set_memory_manage_handler(mem_manage_handler_t handler) {
     return 0;
 }
 
-void remove_memory_manage_handler(void) {
+void remove_memory_manage_handler(void)
+{
     _mem_manage_handler = NULL;
 #ifndef NDEBUG
     _free_mem_manage_handler_last_file = NULL;
@@ -512,8 +515,9 @@ void remove_memory_manage_handler(void) {
 void mem_manage_default(void)
 {
     if (_mem_manage_handler != NULL) {
-        if (_mem_manage_handler() == 1)
+        if (_mem_manage_handler() == 1) {
             return;
+        }
     }
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
 }

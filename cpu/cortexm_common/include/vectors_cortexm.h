@@ -97,9 +97,7 @@ void hard_fault_default(void);
 typedef int (*mem_manage_handler_t)(void);
 
 #ifdef NDEBUG
-
-#   define assert_free_mem_manage_handler() do {} while (0)
-
+#  define assert_free_mem_manage_handler() do {} while (0)
 #else
 
 /**
@@ -110,8 +108,8 @@ extern const char *_free_mem_manage_handler_last_file;
 /**
  * @brief Asserts that memory manage handler is free.
  *
- * @param file Calling file.
- * @param line Line in calling file.
+ * @param[in] file Calling file.
+ * @param[in] line Line in calling file.
  *
  * @see assert_free_mem_manage_handler
  */

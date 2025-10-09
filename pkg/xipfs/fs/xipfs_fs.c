@@ -733,7 +733,8 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
 
 #ifdef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
 
-int xipfs_memory_manage_handler(void) {
+int xipfs_memory_manage_handler(void)
+{
     uint32_t mmfar = SCB->MMFAR;
     uint32_t cfsr = SCB->CFSR;
     uintptr_t psp = __get_PSP();
@@ -744,7 +745,8 @@ int xipfs_memory_manage_handler(void) {
     return 0;
 }
 
-int xipfs_svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args) {
+int xipfs_svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
+{
     switch (svc_number) {
         case XIPFS_ENTER_SVC_NUMBER: {
             void *crt0_ctx = (void *)svc_args[0];

@@ -143,9 +143,9 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
 /**
  * @brief Runs an executable file according to arguments with MPU-based memory isolation.
  *
- * @param full_path A full path such as `/nvme0p0/my_executable_file`
+ * @param[in] full_path A full path such as `/nvme0p0/my_executable_file`
  *
- * @param argv Executable arguments. Cannot be NULL, argv[0] contains the executable filename.
+ * @param[in] argv Executable arguments. Cannot be NULL, argv[0] contains the executable filename.
  *
  * @retval Less than 0 on errors.
  * @retval 0 on success.

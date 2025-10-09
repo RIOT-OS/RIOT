@@ -45,9 +45,7 @@ typedef int (*svc_dispatch_handler_t)(
     unsigned int svc_number, unsigned int *svc_args);
 
 #ifdef NDEBUG
-
-#   define assert_svc_dispatch_manage_handler() do {} while (0)
-
+#  define assert_svc_dispatch_manage_handler() do {} while (0)
 #else
 
 /**
@@ -58,8 +56,8 @@ extern const char *_free_svc_dispatch_handler_last_file;
 /**
  * @brief Asserts that SVC dispatch handler is free.
  *
- * @param file Calling file.
- * @param line Line in calling file.
+ * @param file[in] Calling file.
+ * @param line[in] Line in calling file.
  *
  * @see assert_free_svc_dispatch_handler
  */

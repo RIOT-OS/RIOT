@@ -498,7 +498,8 @@ static svc_dispatch_handler_t _svc_dispatch_handler = NULL;
 #ifndef NDEBUG
 const char *_free_svc_dispatch_handler_last_file = NULL;
 
-void assert_free_svc_dispatch_handler_ex(const char *file, int line) {
+void assert_free_svc_dispatch_handler_ex(const char *file, int line)
+{
     if (_svc_dispatch_handler != NULL) {
         printf( "SVC dispatch handler is not free : assertion from "
                 "file %s at line %d, previously from file %s\n",
@@ -511,7 +512,8 @@ void assert_free_svc_dispatch_handler_ex(const char *file, int line) {
 
 #endif
 
-int set_svc_dispatch_handler(svc_dispatch_handler_t handler) {
+int set_svc_dispatch_handler(svc_dispatch_handler_t handler)
+{
     if (handler == NULL) {
         return -1;
     }
@@ -522,7 +524,8 @@ int set_svc_dispatch_handler(svc_dispatch_handler_t handler) {
     return 0;
 }
 
-void remove_svc_dispatch_handler(void) {
+void remove_svc_dispatch_handler(void)
+{
     _svc_dispatch_handler = NULL;
 #ifndef NDEBUG
     _free_svc_dispatch_handler_last_file = NULL;
