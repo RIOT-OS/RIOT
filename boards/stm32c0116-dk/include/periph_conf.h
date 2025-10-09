@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024 BISSELL Homecare, Inc.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 BISSELL Homecare, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -16,8 +13,7 @@
  * @author      Jason Parker <Jason.Parker@bissell.com>
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
+#pragma once
 
 #include <stdint.h>
 
@@ -47,6 +43,8 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR         isr_tim3
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
+
+#define TIMER_0_MAX_VALUE   0x0000FFFFUL /* the STM32C011 doesn't have a 32-bit timer */
 /** @} */
 
 /**
@@ -54,7 +52,17 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    {
+    { /* this USART is connected to the ST-Link */
+        .dev        = USART1,
+        .rcc_mask   = RCC_APBENR2_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10), /* These are actually PA12 and PA11, which are */
+        .tx_pin     = GPIO_PIN(PORT_A, 9),  /* remapped to PA10 and PA9. */
+        .rx_af      = GPIO_AF1,
+        .tx_af      = GPIO_AF1,
+        .bus        = APB12,
+        .irqn       = USART1_IRQn,
+    },
+    { /* this USART is connected to the Morpho Connector */
         .dev        = USART2,
         .rcc_mask   = RCC_APBENR1_USART2EN,
         .rx_pin     = GPIO_PIN(PORT_A, 3),
@@ -63,10 +71,11 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF1,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-    }
+    },
 };
 
-#define UART_0_ISR          (isr_usart2)
+#define UART_0_ISR          (isr_usart1)
+#define UART_1_ISR          (isr_usart2)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
@@ -75,5 +84,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */
