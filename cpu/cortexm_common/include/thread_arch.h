@@ -60,11 +60,18 @@ extern const char *_free_svc_dispatch_handler_last_file;
  *
  * @param file Calling file.
  * @param line Line in calling file.
+ *
+ * @see assert_free_svc_dispatch_handler
  */
 void assert_free_svc_dispatch_handler_ex(const char *file, int line);
 
 /**
+ * @brief Asserts that SVC dispatch handler is free.
  *
+ * To be used in files using set_memory_manage_handler.
+ *
+ * @see set_svc_dispatch_handler
+ * @see assert_free_svc_dispatch_handler_ex
  */
 #define assert_free_svc_dispatch_handler()                        \
     assert_free_svc_dispatch_handler_ex(__FILE__, __LINE__); \

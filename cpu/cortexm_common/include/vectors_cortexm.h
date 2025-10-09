@@ -103,20 +103,27 @@ typedef int (*mem_manage_handler_t)(void);
 #else
 
 /**
- * @brief Last file that asserted mem manage handler was free.
+ * @brief Last file that asserted memory manage handler was free.
  */
 extern const char *_free_mem_manage_handler_last_file;
 
 /**
- * @brief Asserts that mem manage handler is free.
+ * @brief Asserts that memory manage handler is free.
  *
  * @param file Calling file.
  * @param line Line in calling file.
+ *
+ * @see assert_free_mem_manage_handler
  */
 void assert_free_mem_manage_handler_ex(const char *file, int line);
 
 /**
+ * @brief Asserts that memory manage handler is free.
  *
+ * To be used in files using set_memory_manage_handler.
+ *
+ * @see set_memory_manage_handler
+ * @see assert_free_mem_manage_handler_ex
  */
 #define assert_free_mem_manage_handler()                   \
     assert_free_mem_manage_handler_ex(__FILE__, __LINE__); \
