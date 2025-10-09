@@ -12,7 +12,7 @@ with 8KB of RAM and 32KB of ROM Flash.
 
 See [this application note as reference](https://www.st.com/resource/en/application_note/an5673-getting-started-with-stm32c0-mcu-hardware-development-stmicroelectronics.pdf).
 This means the responsibility is on the firmware configurer to take special
-care when configureing IO, ensuring that ports are not conflicting on each pin.
+care when configuring IO, ensuring that ports are not conflicting on each pin.
 
 ### Flashing the Board
 
