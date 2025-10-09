@@ -541,10 +541,12 @@ depending on the host architecture.
 
 Some scripts and tools available to ease `BOARD` porting and testing:
 
-  - Run `dist/tools/insufficient_memory/add_insufficient_memory_board.sh <board>`
+  - Run `dist/tools/insufficient_memory/update_insufficient_memory_board.sh <board>`
     if your board has little memory. This updates the `Makefile.ci` lists to
     exclude the `BOARD` from automated compile-tests of applications that do
     not fit on the `BOARD`s `CPU`.
+    Please keep in mind that this will take quite a while depending on your
+    system!
 
   - Run `dist/tools/compile_and_test_for_board/compile_and_test_for_board.py . <board> --with-test-only`
     to run all automated tests on the new board.
