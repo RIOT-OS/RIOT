@@ -1,0 +1,29 @@
+@defgroup    boards_stm32c0316-dk STM32C0316-DK
+@ingroup     boards
+@brief       Support for the STM32C0316-DK board.
+
+### General information
+
+The ST [STM32C0316-DK](https://www.st.com/en/evaluation-tools/stm32c0316-dk.html)
+is an evaluation board supporting a ARM Cortex-M0 STM32C031C6 microcontroller
+with 8KB of RAM and 32KB of ROM Flash.
+
+### Pinout
+
+See [this application note as reference](https://www.st.com/resource/en/application_note/an5673-getting-started-with-stm32c0-mcu-hardware-development-stmicroelectronics.pdf).
+This means the responsibility is on the firmware configurer to take special
+care when configureing IO, ensuring that ports are not conflicting on each pin.
+
+### Flashing the Board
+
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32C0316-DK is `stm32c0316-dk` and the default
+programmer is OpenOCD.
+
+### UART Terminal Interaction
+
+Due to the limited number of pins, to get stdio UART traffic, use a USB->UART adapter
+like the CP2104 from Adafruit (http://adafru.it/954).  Connect the adapter's TX line
+to the MCU RX pin (PB6, Pin 8) and the adapter's RX line to the MCU's TX pin -
+(PB7, pin 1)
