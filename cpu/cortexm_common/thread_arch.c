@@ -505,17 +505,19 @@ void assert_free_svc_dispatch_handler_ex(const char *file, int line) {
                 file, line,
                 _free_svc_dispatch_handler_last_file);
 
-        for(;;);
+        for (;;) {}
     }
 }
 
 #endif
 
 int set_svc_dispatch_handler(svc_dispatch_handler_t handler) {
-    if (handler == NULL)
+    if (handler == NULL) {
         return -1;
-    if (_svc_dispatch_handler != NULL)
+    }
+    if (_svc_dispatch_handler != NULL) {
         return -1;
+    }
     _svc_dispatch_handler = handler;
     return 0;
 }
@@ -526,7 +528,6 @@ void remove_svc_dispatch_handler(void) {
     _free_svc_dispatch_handler_last_file = NULL;
 #endif
 }
-
 
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 {

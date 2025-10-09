@@ -731,6 +731,8 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
     return ret;
 }
 
+#ifdef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
+
 int xipfs_memory_manage_handler(void) {
     uint32_t mmfar = SCB->MMFAR;
     uint32_t cfsr = SCB->CFSR;
@@ -793,6 +795,8 @@ int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
 
     return ret;
 }
+
+#endif /* XIPFS_ENABLE_SAFE_EXEC_SUPPORT */
 
 /*
  * File system driver structures

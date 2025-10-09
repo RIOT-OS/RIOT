@@ -46,7 +46,7 @@ typedef int (*svc_dispatch_handler_t)(
 
 #ifdef NDEBUG
 
-#   define assert_svc_dispatch_manage_handler() do {} while(0)
+#   define assert_svc_dispatch_manage_handler() do {} while (0)
 
 #else
 

@@ -98,7 +98,7 @@ typedef int (*mem_manage_handler_t)(void);
 
 #ifdef NDEBUG
 
-#   define assert_free_mem_manage_handler() do {} while(0)
+#   define assert_free_mem_manage_handler() do {} while (0)
 
 #else
 

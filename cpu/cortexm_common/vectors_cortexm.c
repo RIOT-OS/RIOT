@@ -485,17 +485,19 @@ void assert_free_mem_manage_handler_ex(const char *file, int line) {
                 file, line,
                 _free_mem_manage_handler_last_file);
 
-        for(;;);
+        for (;;) {}
     }
 }
 
 #endif
 
 int set_memory_manage_handler(mem_manage_handler_t handler) {
-    if (handler == NULL)
+    if (handler == NULL) {
         return -1;
-    if (_mem_manage_handler != NULL)
+    }
+    if (_mem_manage_handler != NULL) {
         return -1;
+    }
     _mem_manage_handler = handler;
     return 0;
 }

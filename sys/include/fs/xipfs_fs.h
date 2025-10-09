@@ -138,6 +138,8 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size, uint32_
  */
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
 
+#ifdef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
+
 /**
  * @brief Runs an executable file according to arguments with MPU-based memory isolation.
  *
@@ -149,6 +151,8 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
  * @retval 0 on success.
  */
 int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[]);
+
+#endif /* XIPFS_ENABLE_SAFE_EXEC_SUPPORT */
 
 #ifdef __cplusplus
 }
