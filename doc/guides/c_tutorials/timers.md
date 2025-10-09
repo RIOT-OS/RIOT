@@ -50,7 +50,7 @@ also use soon. Using `ztimer_sleep(ZTIMER_SEC, 5);` we simply wait for around
 But what if we want to do something else while waiting for the timer to expire?
 Let's take a closer look at how we can use timers in RIOT.
 
-### Step 1: Creating a Callback
+## Step 2: Creating a Callback
 
 Timers are a way to schedule tasks to be executed at a later time.
 In RIOT, you have to tell the timers two things:
@@ -76,7 +76,7 @@ and prints the string to the console. Congrats, you have created a callback func
 now all that is left is to create the timer and schedule it.
 To do that lets restructure our `main` function to use the timer.
 
-### Step 2: Scheduling the Timer
+## Step 3: Scheduling the Timer
 
 Go into your `main` function and include the following code:
 
@@ -102,7 +102,7 @@ This code tells the timer to fire in 3 seconds.
 The first argument specifies which type of clock we want to use,
 the second argument is the timer we created, and the third argument is the time in seconds.
 
-### Step 3: Running the Program
+## Step 4: Running the Program
 
 Now that we have created the timer and scheduled it, we can run the program.
 Compile the program using `make` and flash it to your board using `make flash`.
