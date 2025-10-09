@@ -358,10 +358,12 @@ depending on the host architecture.</p>
 <p>Some scripts and tools available to ease <code dir="auto">BOARD</code> porting and testing:</p>
 <ul>
 <li>
-<p>Run <code dir="auto">dist/tools/insufficient_memory/add_insufficient_memory_board.sh &#x3C;board></code>
+<p>Run <code dir="auto">dist/tools/insufficient_memory/update_insufficient_memory_board.sh &#x3C;board></code>
 if your board has little memory. This updates the <code dir="auto">Makefile.ci</code> lists to
 exclude the <code dir="auto">BOARD</code> from automated compile-tests of applications that do
-not fit on the <code dir="auto">BOARD</code>s <code dir="auto">CPU</code>.</p>
+not fit on the <code dir="auto">BOARD</code>s <code dir="auto">CPU</code>.
+Please keep in mind that this will take quite a while depending on your
+system!</p>
 </li>
 <li>
 <p>Run <code dir="auto">dist/tools/compile_and_test_for_board/compile_and_test_for_board.py . &#x3C;board> --with-test-only</code>
