@@ -99,6 +99,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     spark-core \
     stk3200 \
     stk3600 \
+    stm32c0116-dk \
+    stm32c0316-dk \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32f3discovery \
