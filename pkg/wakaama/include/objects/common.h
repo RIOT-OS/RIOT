@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_wakaama
  * @defgroup    lwm2m_objects_common Common LwM2M Object functionalities
@@ -16,9 +18,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef OBJECTS_COMMON_H
-#define OBJECTS_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -511,5 +510,4 @@ int lwm2m_set_objlink_by_path(lwm2m_client_data_t *client_data, const char *path
 }
 #endif
 
-#endif /* OBJECTS_COMMON_H */
 /** @} */

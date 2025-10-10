@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_nimble_netif GNRC netif Implementation
  * @ingroup     pkg_nimble
@@ -62,9 +64,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_NETIF_H
-#define NIMBLE_NETIF_H
 
 #include <stdint.h>
 #include <errno.h>
@@ -336,5 +335,4 @@ int nimble_netif_used_chanmap(int handle, uint8_t map[5]);
 }
 #endif
 
-#endif /* NIMBLE_NETIF_H */
 /** @} */
