@@ -183,6 +183,7 @@ export default defineConfig({
         replacesTitle: true,
       },
       plugins: [starlightImageZoom()],
+      routeMiddleware: "./src/routeData.ts",
       editLink: {
         baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
       },
