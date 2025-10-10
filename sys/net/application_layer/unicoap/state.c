@@ -147,29 +147,17 @@ static inline int _deinit_drivers(event_queue_t* queue)
 void* _unicoap_loop_run(void* arg)
 {
     (void)arg;
-
-    /* Either someone wants to run the unicoap loop on their own thread
-     *    (_unicoap_pid == KERNEL_PID_UNDEF); or
-     * we came here via thread_create in unicoap_init (CONFIG_UNICOAP_CREATE_THREAD is
-     * enabled is enabled in that case)
-     *    (_unicoap_pid == thread_getpid(), so we're on that thread right now).
-     */
-    assert(_unicoap_pid == KERNEL_PID_UNDEF || _unicoap_pid == thread_getpid());
-    event_queue_init(&_queue);
-    if (_init_drivers(&_queue) < 0) {
-        UNICOAP_DEBUG("driver initialization failed\n");
-        return NULL;
-    }
+    /* Now we set the already-initialized queue's waiter thread. See unicoap_init below. */
+    assert(_queue.waiter == NULL);
+    _queue.waiter = thread_get_active();
     _unicoap_pid = thread_getpid();
     event_loop(&_queue);
     return &_queue;
 }
 
-static void* _event_loop_stop(void)
-{
-    _deinit_drivers(&_queue);
-    /* TODO: Figure out how to die. */
-    return NULL;
+int unicoap_loop_enqueue(event_t* event) {
+    assert(_queue.waiter);
+    event_post(&_queue, event);
 }
 
 kernel_pid_t unicoap_init(void)
@@ -192,6 +180,19 @@ kernel_pid_t unicoap_init(void)
     UNICOAP_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
 #endif
 
+    event_queue_init(&_queue);
+
+    /* The waiter thread will be in _unicoap_event_loop_run.
+     * The queue needs to be initialized to initialize drivers.
+     * As preventative measure, we set waiter to NULL until the real, but currently unknown
+     * thread is known. */
+    _queue.waiter = NULL;
+
+    if (_init_drivers(&_queue) < 0) {
+        UNICOAP_DEBUG("driver initialization failed\n");
+        return -1;
+    }
+
 #if IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
     static char _unicoap_thread_stack[UNICOAP_STACK_SIZE];
     _unicoap_pid = thread_create(_unicoap_thread_stack, sizeof(_unicoap_thread_stack),
@@ -208,11 +209,11 @@ int unicoap_deinit(void)
         return -ENOENT;
     }
 
-    _event_loop_stop();
-    _unicoap_pid = KERNEL_PID_UNDEF;
-
     _deinit_drivers(&_queue);
+    /* TODO: Thread: Figure out how to die properly, in an orderly fashion. */
+    _unicoap_pid = KERNEL_PID_UNDEF;
     memset(&_state, 0, sizeof(_state));
+    memset(&_queue, 0, sizeof(_queue));
 
     return 0;
 }

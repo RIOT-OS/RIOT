@@ -191,6 +191,15 @@ UNICOAP_RESOURCE(greeting) {
 };
 
 int main(void) {
+    /* By default, unicoap_init() is automatically called for you before main().
+     * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.
+     * You can opt out of this default behavior by setting DISABLE_MODULE += auto_init_unicoap.
+     * However, then you need to call unicoap_init() yourself. */
+#if !IS_USED(MODULE_AUTO_INIT_UNICOAP)
+    if (unicoap_init() < 0) {
+        printf("app: failed to initialize unicoap\n");
+    }
+#endif
 #if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
     /* You can access the underlying transport handle. In the case of UDP,
      * this will be a UDP sock provided by the sock API. */
@@ -210,6 +219,31 @@ int main(void) {
      * a debug description of it. */
     unicoap_print_endpoint(&udp_local);
     printf("\n");
+
+    /* You can also add another socket to listen and send from another socket. */
+    sock_udp_t other_udp_socket = { 0 };
+    unicoap_endpoint_t other_endpoint = {
+        .proto = UNICOAP_PROTO_UDP,
+        .udp_ep = {
+#if defined(SOCK_HAS_IPV6)
+            .family = AF_INET6,
+#elif defined(SOCK_HAS_IPV4)
+            .family = AF_INET,
+#endif
+            .netif = SOCK_ADDR_ANY_NETIF,
+            .port = 5682
+        }
+    };
+
+    if (unicoap_transport_udp_add_socket(&other_udp_socket, &other_endpoint.udp_ep) < 0) {
+        printf("app: failed to add 2nd socket\n");
+    } else {
+        printf("app: also listening ");
+        /* Because we're in possession of an endpoint now, we can print
+         * a debug description of it. */
+        unicoap_print_endpoint(&other_endpoint);
+        printf("\n");
+    }
 #endif
 
     /* If DTLS is enabled, the CoAP over DTLS driver needs to be told
@@ -245,13 +279,24 @@ int main(void) {
         return 1;
     }
 
-    printf("app: using credential: "
-           "type=PSK id=%s key=%s\n",
+    printf("app: using credential: type=PSK id=%s key=%s\n",
            (char*)credential.params.psk.id.s,
            (char*)credential.params.psk.key.s);
 #endif
 
-    printf("app: IPv6 address: ");
+    printf("app: interfaces have ipv6=[ ");
     netifs_print_ipv6(", ");
-    printf("\n");
+    printf(" ]\n");
+
+    /* By default, unicoap_init() will create a background thread. If you do not want that,
+     * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.
+     * Note that this function is not available when CONFIG_UNICOAP_CREATE_THREAD is 1. Multiple
+     * unicoap instances are not allowed. Note too that you can add multiple ports instead. */
+#if !IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
+#  error Congrats, you successfully disabled CONFIG_UNICOAP_CREATE_THREAD.
+    printf("app: CONFIG_UNICOAP_CREATE_THREAD disabled, running unicoap loop on main thread\n");
+    unicoap_loop_run();
+#else
+#  error Sorry, CONFIG_UNICOAP_CREATE_THREAD is still enabled
+#endif
 }
