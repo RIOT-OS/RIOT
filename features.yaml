@@ -671,6 +671,8 @@ groups:
       help: CAN controller RX mailbox is supported
     - name: periph_eth
       help: An Ethernet peripheral is present.
+    - name: periph_nfct
+      help: A Near Field Communication Tag (NFCT) peripheral is present.
 
   - title: SD / MMC Card Features
     features:
