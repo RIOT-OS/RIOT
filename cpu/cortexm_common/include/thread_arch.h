@@ -39,58 +39,17 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 #endif /* DOXYGEN */
 
 /**
- * @brief All svc dispatch handlers have this type.
- */
-typedef int (*svc_dispatch_handler_t)(
-    unsigned int svc_number, unsigned int *svc_args);
-
-#ifdef NDEBUG
-#  define assert_svc_dispatch_manage_handler() do {} while (0)
-#else
-
-/**
- * @brief Last file that asserted svc dispatch handler was free.
- */
-extern const char *_free_svc_dispatch_handler_last_file;
-
-/**
- * @brief Asserts that SVC dispatch handler is free.
+ * @brief Default SVC dispatch handler (weak function).
  *
- * @param file[in] Calling file.
- * @param line[in] Line in calling file.
+ * @param[in] svc_number The svc number to handle.
+ * @param[in] svc_args Supervisor call arguments.
  *
- * @see assert_free_svc_dispatch_handler
+ * @retval >= 0 when svc_number has been handled.
+ * @retval < 0 otherwise.
+ *
+ * @see _svc_dispatch
  */
-void assert_free_svc_dispatch_handler_ex(const char *file, int line);
-
-/**
- * @brief Asserts that SVC dispatch handler is free.
- *
- * To be used in files using set_memory_manage_handler.
- *
- * @see set_svc_dispatch_handler
- * @see assert_free_svc_dispatch_handler_ex
- */
-#define assert_free_svc_dispatch_handler()                        \
-    assert_free_svc_dispatch_handler_ex(__FILE__, __LINE__); \
-    _free_svc_dispatch_handler_last_file = __FILE__
-
-#endif /* NDEBUG */
-
-/**
- * @brief SVC dispatch handler setter.
- *
- * @param handler Handler to set
- *
- * @retval < 0 on NULL handler or if a handler has already been set
- * @retval >= 0 otherwise
- */
-int set_svc_dispatch_handler(svc_dispatch_handler_t handler);
-
-/**
- * @brief SVC dispatch handler cleaner.
- */
-void remove_svc_dispatch_handler(void);
+int svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args);
 
 #ifdef __cplusplus
 }

@@ -92,57 +92,12 @@ void hard_fault_default(void);
     defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
 
 /**
- * @brief All mem manage handlers have this type.
- */
-typedef int (*mem_manage_handler_t)(void);
-
-#ifdef NDEBUG
-#  define assert_free_mem_manage_handler() do {} while (0)
-#else
-
-/**
- * @brief Last file that asserted memory manage handler was free.
- */
-extern const char *_free_mem_manage_handler_last_file;
-
-/**
- * @brief Asserts that memory manage handler is free.
+ * @brief Default memory manager behavior callback (weak function)
  *
- * @param[in] file Calling file.
- * @param[in] line Line in calling file.
- *
- * @see assert_free_mem_manage_handler
+ * @retval 1 when the memory fault has been handled,
+ * @retval 0 otherwise.
  */
-void assert_free_mem_manage_handler_ex(const char *file, int line);
-
-/**
- * @brief Asserts that memory manage handler is free.
- *
- * To be used in files using set_memory_manage_handler.
- *
- * @see set_memory_manage_handler
- * @see assert_free_mem_manage_handler_ex
- */
-#define assert_free_mem_manage_handler()                   \
-    assert_free_mem_manage_handler_ex(__FILE__, __LINE__); \
-    _free_mem_manage_handler_last_file = __FILE__
-
-#endif /* NDEBUG */
-
-/**
- * @brief Memory manage handler setter.
- *
- * @param handler Handler to set
- *
- * @retval < 0 on NULL handler or if a handler has already been set
- * @retval >= 0 otherwise
- */
-int set_memory_manage_handler(mem_manage_handler_t handler);
-
-/**
- * @brief Memory manage handler cleaner.
- */
-void remove_memory_manage_handler(void);
+int mem_manage_handler(void);
 
 /**
  * @brief   Memory management exception handler

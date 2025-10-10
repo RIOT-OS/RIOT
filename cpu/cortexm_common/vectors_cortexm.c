@@ -473,51 +473,15 @@ void hard_fault_default(void)
     defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
     defined(CPU_CORE_CORTEX_M7)
 
-static mem_manage_handler_t _mem_manage_handler = NULL;
-
-#ifndef NDEBUG
-const char *_free_mem_manage_handler_last_file = NULL;
-
-void assert_free_mem_manage_handler_ex(const char *file, int line)
+__attribute__((weak))int mem_manage_handler(void)
 {
-    if (_mem_manage_handler != NULL) {
-        printf( "Memory manage handler is not free : assertion from "
-                "file %s at line %d, previously from file %s\n",
-                file, line,
-                _free_mem_manage_handler_last_file);
-
-        for (;;) {}
-    }
-}
-
-#endif
-
-int set_memory_manage_handler(mem_manage_handler_t handler)
-{
-    if (handler == NULL) {
-        return -1;
-    }
-    if (_mem_manage_handler != NULL) {
-        return -1;
-    }
-    _mem_manage_handler = handler;
     return 0;
-}
-
-void remove_memory_manage_handler(void)
-{
-    _mem_manage_handler = NULL;
-#ifndef NDEBUG
-    _free_mem_manage_handler_last_file = NULL;
-#endif
 }
 
 void mem_manage_default(void)
 {
-    if (_mem_manage_handler != NULL) {
-        if (_mem_manage_handler() == 1) {
-            return;
-        }
+    if (mem_manage_handler() == 1) {
+        return;
     }
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
 }

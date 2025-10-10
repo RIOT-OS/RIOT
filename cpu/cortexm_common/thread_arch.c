@@ -493,43 +493,12 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
-static svc_dispatch_handler_t _svc_dispatch_handler = NULL;
-
-#ifndef NDEBUG
-const char *_free_svc_dispatch_handler_last_file = NULL;
-
-void assert_free_svc_dispatch_handler_ex(const char *file, int line)
+__attribute__((weak))int
+svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
 {
-    if (_svc_dispatch_handler != NULL) {
-        printf( "SVC dispatch handler is not free : assertion from "
-                "file %s at line %d, previously from file %s\n",
-                file, line,
-                _free_svc_dispatch_handler_last_file);
-
-        for (;;) {}
-    }
-}
-
-#endif
-
-int set_svc_dispatch_handler(svc_dispatch_handler_t handler)
-{
-    if (handler == NULL) {
-        return -1;
-    }
-    if (_svc_dispatch_handler != NULL) {
-        return -1;
-    }
-    _svc_dispatch_handler = handler;
+    (void)svc_number;
+    (void)svc_args;
     return 0;
-}
-
-void remove_svc_dispatch_handler(void)
-{
-    _svc_dispatch_handler = NULL;
-#ifndef NDEBUG
-    _free_svc_dispatch_handler_last_file = NULL;
-#endif
 }
 
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
@@ -558,10 +527,8 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
             SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             break;
         default:
-            if (_svc_dispatch_handler != NULL) {
-                if (_svc_dispatch_handler(svc_number, svc_args) >= 0) {
-                    return;
-                }
+            if (svc_dispatch_handler(svc_number, svc_args) >= 0) {
+                return;
             }
             DEBUG("svc: unhandled SVC #%u\n", svc_number);
             break;
