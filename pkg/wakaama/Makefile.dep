@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += wakaama_core wakaama_core_coap wakaama_core_coap13 wakaama_data wakaama_client
 
 # include contrib code (platform adaption and client implementation)

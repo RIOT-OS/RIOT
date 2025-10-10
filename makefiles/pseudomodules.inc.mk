@@ -79,6 +79,7 @@ PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fdcan
+PSEUDOMODULES += float_math
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_forward_proxy_thread

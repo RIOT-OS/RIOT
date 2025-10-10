@@ -1,3 +1,4 @@
+FEATURES_REQUIRED += float_math
 USEPKG += driver_bme680
 
 ifneq (,$(filter saul%,$(USEMODULE)))
