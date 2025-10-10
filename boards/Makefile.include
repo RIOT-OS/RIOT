@@ -2,6 +2,9 @@
 ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
   include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.include
 endif
+ifneq (,$(filter boards_common_rpi_pico_2,$(USEMODULE)))
+  include $(RIOTBOARD)/common/rpi-pico-2/Makefile.include
+endif
 ifneq (,$(filter boards_common_seeedstudio-xiao-nrf52840,$(USEMODULE)))
   include $(RIOTBOARD)/common/seeedstudio-xiao-nrf52840/Makefile.include
 endif

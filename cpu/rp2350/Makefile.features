@@ -1,9 +1,0 @@
-CPU_CORE    := cortex-m33
-CPU_FAM     := RP2350
-CPU_ARCH    = armv8m
-CPU_MODEL   = rp2350
-
-include $(RIOTCPU)/cortexm_common/Makefile.features
-
-FEATURES_PROVIDED += periph_gpio
-FEATURES_PROVIDED += periph_uart
