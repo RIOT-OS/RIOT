@@ -472,8 +472,17 @@ void hard_fault_default(void)
 #if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
     defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
     defined(CPU_CORE_CORTEX_M7)
+
+__attribute__((weak))int mem_manage_handler(void)
+{
+    return 0;
+}
+
 void mem_manage_default(void)
 {
+    if (mem_manage_handler() == 1) {
+        return;
+    }
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
 }
 

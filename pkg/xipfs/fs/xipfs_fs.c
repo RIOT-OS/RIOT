@@ -47,6 +47,8 @@
 #include "debug.h"
 #include "fs/xipfs_fs.h"
 #include "periph/flashpage.h"
+#include "vectors_cortexm.h"
+#include "thread_arch.h"
 
 #include "saul_reg.h"
 
@@ -652,7 +654,7 @@ static int get_file_size(const char *full_path, size_t *size) {
     return 0;
 }
 
-static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
+static int copy_file(const char *full_path, void *buf, size_t nbyte) {
     xipfs_mount_t mp;
     const char *path;
     xipfs_file_desc_t desc;
@@ -663,9 +665,15 @@ static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
     if (ret < 0) {
         return ret;
     }
+
+    if ((file_size == 0) || (nbyte < file_size)) {
+        return -EINVAL;
+    }
+
     if (nbyte > file_size) {
         nbyte = file_size;
     }
+
     if (full_path == NULL) {
         return -EFAULT;
     }
@@ -675,7 +683,6 @@ static ssize_t copy_file(const char *full_path, void *buf, size_t nbyte) {
     if ((path = get_rel_path(&mp, full_path)) == NULL) {
         return -EIO;
     }
-
     ret = xipfs_open(&mp, &desc, path, O_RDONLY, 0);
     if (ret < 0) {
         return ret;
@@ -723,6 +730,64 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
 
     return ret;
 }
+
+#ifdef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
+
+int mem_manage_handler(void)
+{
+    uint32_t mmfar = SCB->MMFAR;
+    uint32_t cfsr = SCB->CFSR;
+    uintptr_t psp = __get_PSP();
+    if (xipfs_mem_manage_handler((void *)psp, mmfar, cfsr) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
+{
+    switch (svc_number) {
+        case XIPFS_ENTER_SVC_NUMBER: {
+            void *crt0_ctx = (void *)svc_args[0];
+            void *entry_point = (void *)svc_args[1];
+            void *stack_top = (void *)svc_args[2];
+            xipfs_safe_exec_enter(crt0_ctx, entry_point, stack_top);
+            return 0;
+        }
+        case XIPFS_SYSCALL_SVC_NUMBER: {
+            xipfs_syscall_dispatcher(svc_args);
+            return 0;
+        }
+        default:
+            return -ENOTSUP;
+    }
+}
+
+int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
+{
+    xipfs_mount_t mp;
+    const char *path;
+    int ret;
+
+    if (full_path == NULL) {
+        return -EFAULT;
+    }
+    if ((ret = get_xipfs_mp(full_path, &mp)) < 0) {
+        return ret;
+    }
+    if ((path = get_rel_path(&mp, full_path)) == NULL) {
+        return -EIO;
+    }
+
+    mutex_lock(mp.execution_mutex);
+    ret = xipfs_safe_execv(&mp, path, argv, xipfs_user_syscalls_table);
+    mutex_unlock(mp.execution_mutex);
+
+    return ret;
+}
+
+#endif /* XIPFS_ENABLE_SAFE_EXEC_SUPPORT */
 
 /*
  * File system driver structures

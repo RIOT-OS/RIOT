@@ -38,6 +38,19 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 
 #endif /* DOXYGEN */
 
+/**
+ * @brief Default SVC dispatch handler (weak function).
+ *
+ * @param[in] svc_number The svc number to handle.
+ * @param[in] svc_args Supervisor call arguments.
+ *
+ * @retval >= 0 when svc_number has been handled.
+ * @retval < 0 otherwise.
+ *
+ * @see _svc_dispatch
+ */
+int svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args);
+
 #ifdef __cplusplus
 }
 #endif

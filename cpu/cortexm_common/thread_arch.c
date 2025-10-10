@@ -274,6 +274,11 @@ void *thread_isr_stack_start(void)
     return (void *)&_sstack;
 }
 
+void *thread_isr_stack_end(void)
+{
+    return (void *)&_estack;
+}
+
 void NORETURN cpu_switch_context_exit(void)
 {
 #ifdef MODULE_CORTEXM_FPU
@@ -488,6 +493,14 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
+__attribute__((weak))int
+svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
+{
+    (void)svc_number;
+    (void)svc_args;
+    return 0;
+}
+
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 {
     /* stack frame:
@@ -514,6 +527,9 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
             SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             break;
         default:
+            if (svc_dispatch_handler(svc_number, svc_args) >= 0) {
+                return;
+            }
             DEBUG("svc: unhandled SVC #%u\n", svc_number);
             break;
     }
