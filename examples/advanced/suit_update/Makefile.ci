@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     gd32vf103c-start \
     lsn50 \
     nucleo-c031c6 \
+    nucleo-c071rb \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \

@@ -14,10 +14,18 @@ config CPU_LINE_STM32C031XX
     bool
     select CPU_FAM_C0
 
+config CPU_LINE_STM32C051XX
+    bool
+    select CPU_FAM_C0
+
 config CPU_LINE_STM32C071XX
     bool
     select CPU_FAM_C0
 
 config CPU_LINE_STM32C091XX
+    bool
+    select CPU_FAM_C0
+
+config CPU_LINE_STM32C092XX
     bool
     select CPU_FAM_C0
