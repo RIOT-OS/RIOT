@@ -118,8 +118,8 @@ typedef struct {
  * an `Internal Server Error` response will be sent.
  *
  * @return `0`, status code or errno.
- * @retval @ref UNICOAP_IGNORING_REQUEST iff you don't want to respond
- * @retval @ref unicoap_status_t for an otherwise empty response
+ * @retval UNICOAP_IGNORING_REQUEST iff you don't want to respond
+ * @retval unicoap_status_t for an otherwise empty response
  *
  */
 typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unicoap_aux_t* aux,

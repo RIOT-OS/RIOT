@@ -74,6 +74,46 @@ static inline void unicoap_loop_run(void)
 }
 #endif
 
+/** @brief A job that can be enqueued and executed by the `unicoap` message processing loop. */
+typedef struct {
+    /**
+     * @brief Event that is posted on internal queue
+     * @warning Do not read or write.
+     * @internal
+     */
+    event_t super;
+} unicoap_job_t;
+
+#ifndef DOXYGEN
+#  if defined(__has_builtin) && __has_builtin(__builtin_types_compatible_p) && __has_builtin(__builtin_choose_expr)
+#    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
+        __builtin_choose_expr( \
+            __builtin_types_compatible_p(typeof(void (unicoap_job_t* job)), typeof(func)), \
+                (void (*)(event_t*))func, \
+            ((void)0))
+#  else
+#    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
+#  endif
+#endif
+
+/**
+ * @brief Initializes a @ref unicoap_job_t.
+ *
+ * @param function A function that must be of type `void (unicoap_job_t* job)`.
+ * @returns Designated initializer for @ref unicoap_job_t
+ */
+#define UNICOAP_JOB(func) { \
+    .super = { \
+        .handler = _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
+    } \
+}
+
+#ifndef DOXYGEN
+static inline void (*unicoap_typecheck_job_func(typeof(void (unicoap_job_t* job)) func))(event_t* e) {
+    return (void(*)(event_t*))func;
+}
+#endif
+
 /**
  * @brief Schedules @p event to be run in the internal processing loop
  *        at the next possible instance
@@ -91,10 +131,10 @@ static inline void unicoap_loop_run(void)
  * this will be after you have called @ref unicoap_loop_run, which blocks.
  *
  * ```
- * static event_t sample = { .handler = send_my_request };
+ * static unicoap_job_t sample = UNICOAP_JOB(my_handler);
  * ```
  */
-int unicoap_loop_enqueue(event_t* event);
+int unicoap_loop_enqueue(unicoap_job_t* job);
 /** @} */
 
 #ifdef __cplusplus

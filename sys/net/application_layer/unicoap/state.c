@@ -155,8 +155,8 @@ void* _unicoap_loop_run(void* arg)
     return &_queue;
 }
 
-int unicoap_loop_enqueue(event_t* event) {
-    event_post(&_queue, event);
+int unicoap_loop_enqueue(unicoap_job_t* job) {
+    event_post(&_queue, &job->super);
     return 0;
 }
 

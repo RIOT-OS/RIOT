@@ -190,12 +190,12 @@ UNICOAP_RESOURCE(greeting) {
     .handler_arg = NULL
 };
 
-static void sample(event_t* e) {
-    (void)e;
-    printf("hello from queue\n");
+static void say_hello_job(unicoap_job_t* job) {
+    (void)job;
+    printf("hello synchronized with processing loop\n");
 }
 
-static event_t sample_event = { .handler = sample };
+static unicoap_job_t job = UNICOAP_JOB(say_hello_job);
 
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
@@ -295,7 +295,7 @@ int main(void) {
     netifs_print_ipv6(", ");
     printf(" ]\n");
 
-    unicoap_loop_enqueue(&sample_event);
+    unicoap_loop_enqueue(&job);
 
     /* By default, unicoap_init() will create a background thread. If you do not want that,
      * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.
@@ -304,7 +304,5 @@ int main(void) {
 #if !CONFIG_UNICOAP_CREATE_THREAD
     printf("app: running unicoap loop on main thread\n");
     unicoap_loop_run();
-#else
-#  error Sorry, CONFIG_UNICOAP_CREATE_THREAD is still enabled
 #endif
 }
