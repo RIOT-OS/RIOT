@@ -99,7 +99,7 @@ typedef struct {
 /**
  * @brief Initializes a @ref unicoap_job_t.
  *
- * @param function A function that must be of type `void (unicoap_job_t* job)`.
+ * @param func A function that must be of type `void (unicoap_job_t* job)`.
  * @returns Designated initializer for @ref unicoap_job_t
  */
 #define UNICOAP_JOB(func) { \
@@ -112,7 +112,7 @@ typedef struct {
  * @brief Schedules @p event to be run in the internal processing loop
  *        at the next possible instance
  *
- * @param[in,out] event Event with function to be run in `unicoap` message processing loop
+ * @param[in,out] job Job to run on `unicoap` message processing loop
  *
  * @returns Negative error number in case of failure or zero on success.
  *
