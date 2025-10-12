@@ -106,7 +106,7 @@ typedef struct {
     .super = { \
         .handler = _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
     } \
-}gi
+}
 
 /**
  * @brief Schedules @p event to be run in the internal processing loop
