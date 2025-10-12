@@ -190,6 +190,13 @@ UNICOAP_RESOURCE(greeting) {
     .handler_arg = NULL
 };
 
+static void sample(event_t* e) {
+    (void)e;
+    printf("hello from queue\n");
+}
+
+static event_t sample_event = { .handler = sample };
+
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
      * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.
@@ -288,13 +295,14 @@ int main(void) {
     netifs_print_ipv6(", ");
     printf(" ]\n");
 
+    unicoap_loop_enqueue(&sample_event);
+
     /* By default, unicoap_init() will create a background thread. If you do not want that,
      * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.
      * Note that this function is not available when CONFIG_UNICOAP_CREATE_THREAD is 1. Multiple
      * unicoap instances are not allowed. Note too that you can add multiple ports instead. */
-#if !IS_ACTIVE(CONFIG_UNICOAP_CREATE_THREAD)
-#  error Congrats, you successfully disabled CONFIG_UNICOAP_CREATE_THREAD.
-    printf("app: CONFIG_UNICOAP_CREATE_THREAD disabled, running unicoap loop on main thread\n");
+#if !CONFIG_UNICOAP_CREATE_THREAD
+    printf("app: running unicoap loop on main thread\n");
     unicoap_loop_run();
 #else
 #  error Sorry, CONFIG_UNICOAP_CREATE_THREAD is still enabled
