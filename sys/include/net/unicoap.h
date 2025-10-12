@@ -90,7 +90,7 @@ typedef struct {
         __builtin_choose_expr( \
             __builtin_types_compatible_p(typeof(void (unicoap_job_t* job)), typeof(func)), \
                 (void (*)(event_t*))func, \
-            ((void)0))
+            ((void)0)/* unicoap_job func has incompatible type, must be void (unicoap_job_t* job) */)
 #  else
 #    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
 #  endif
@@ -106,13 +106,7 @@ typedef struct {
     .super = { \
         .handler = _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
     } \
-}
-
-#ifndef DOXYGEN
-static inline void (*unicoap_typecheck_job_func(typeof(void (unicoap_job_t* job)) func))(event_t* e) {
-    return (void(*)(event_t*))func;
-}
-#endif
+}gi
 
 /**
  * @brief Schedules @p event to be run in the internal processing loop
