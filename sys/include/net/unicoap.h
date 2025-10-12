@@ -73,6 +73,28 @@ static inline void unicoap_loop_run(void)
     _unicoap_loop_run(NULL);
 }
 #endif
+
+/**
+ * @brief Schedules @p event to be run in the internal processing loop
+ *        at the next possible instance
+ *
+ * @param[in,out] event Event with function to be run in `unicoap` message processing loop
+ *
+ * @returns Negative error number in case of failure or zero on success.
+ *
+ * This function facilitates running client requests when @ref CONFIG_UNICOAP_CREATE_THREAD is
+ * disabled.
+ *
+ * @remark You can start enqueuing jobs even before the `unicoap` processing loop has been started.
+ * The jobs will become eligible for execution once the loop starts running, which usually is when
+ * the `unicoap` thread has been created. If `CONFIG_UNICOAP_CREATE_THREAD` is disabled,
+ * this will be after you have called @ref unicoap_loop_run, which blocks.
+ *
+ * ```
+ * static event_t sample = { .handler = send_my_request };
+ * ```
+ */
+int unicoap_loop_enqueue(event_t* event);
 /** @} */
 
 #ifdef __cplusplus

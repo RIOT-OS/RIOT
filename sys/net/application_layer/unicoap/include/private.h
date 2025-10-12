@@ -113,12 +113,7 @@ extern "C" {
 /**
  * @brief Emit a diagnostic stating that a driver is missing
  */
-#if IS_ACTIVE(CONFIG_UNICOAP_ASSIST)
 void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto);
-#else
-static inline
-void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {}
-#endif
 /** @} */
 
 /* MARK: - Thread */

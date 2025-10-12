@@ -156,8 +156,8 @@ void* _unicoap_loop_run(void* arg)
 }
 
 int unicoap_loop_enqueue(event_t* event) {
-    assert(_queue.waiter);
     event_post(&_queue, event);
+    return 0;
 }
 
 kernel_pid_t unicoap_init(void)
