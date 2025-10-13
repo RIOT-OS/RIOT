@@ -73,6 +73,33 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
     return res;
 }
 
+int _build_ll_ipv6_from_addr(gnrc_netif_t *netif, const uint8_t *l2addr, uint8_t l2addr_len,
+                             ipv6_addr_t *ipv6addr)
+{
+    /* Reverse of _resolve_addr_from_ipv6. */
+
+    if (netif == NULL) {
+        return -ENOENT;
+    }
+
+    /* Only supported for 6LN nodes. */
+    if (!gnrc_netif_is_6ln(netif)) {
+        return -ENOTSUP;
+    }
+
+    /* Set IPv6 link-local prefix. */
+    *ipv6addr = ipv6_addr_link_local_prefix;
+
+    /* Build interface identifier based on l2 address. */
+    int res = gnrc_netif_ipv6_iid_from_addr(netif, l2addr, l2addr_len,
+                                            (eui64_t *)&ipv6addr->u64[1]);
+    if (res < 0) {
+        return res;
+    }
+
+    return sizeof(ipv6_addr_t);
+}
+
 uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     const icmpv6_hdr_t *icmpv6,
                     const sixlowpan_nd_opt_ar_t *aro, const ndp_opt_t *sl2ao,
