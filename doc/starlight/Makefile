@@ -10,11 +10,22 @@ install: integrate_outside_files
 
 .PHONY: build
 build: install
+	@echo "Copying RIOT documentation source files..."
+	@echo "See: https://github.com/withastro/starlight/issues/3470"
+	@rm -rf $(CURDIR)/src/content/docs
+	@cp -r $(RIOTBASE)/doc/guides $(CURDIR)/src/content/docs
 	@npm run build --prefix $(CURDIR)
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/starlight/dist/index.html"
 
+.PHONY: preview
+preview: build
+	@npm run preview --prefix $(CURDIR)
+
 .PHONY: dev
 dev: install
+	@echo "Linking RIOT documentation source files..."
+	@rm -rf $(CURDIR)/src/content/docs
+	@ln -s ../../../guides $(CURDIR)/src/content/docs
 	@echo "Starting starlight live server..."
 	@npm run dev --prefix $(CURDIR)
 
