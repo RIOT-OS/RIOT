@@ -80,37 +80,37 @@
 simplest way to compile and link an application with RIOT, is to set up a
 Makefile providing at least the following variables:</p>
 <ul>
-<li><code>APPLICATION</code>: should contain the (unique) name of your application</li>
-<li><code>BOARD</code>: specifies the platform the application should be built for by
+<li><code dir="auto">APPLICATION</code>: should contain the (unique) name of your application</li>
+<li><code dir="auto">BOARD</code>: specifies the platform the application should be built for by
 default</li>
-<li><code>RIOTBASE</code>: specifies the path to your copy of the RIOT repository (note,
-that you may want to use <code>$(CURDIR)</code> here, to give a relative path)</li>
+<li><code dir="auto">RIOTBASE</code>: specifies the path to your copy of the RIOT repository (note,
+that you may want to use <code dir="auto">$(CURDIR)</code> here, to give a relative path)</li>
 </ul>
-<p>Additionally it has to include the <code>Makefile.include</code>, located in RIOT’s root
+<p>Additionally it has to include the <code dir="auto">Makefile.include</code>, located in RIOT’s root
 directory:</p>
 <div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.v4551.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame has-title not-content"><figcaption class="header"><span class="title">a minimal application Makefile</span></figcaption><pre data-language="make"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">APPLICATION</span><span style="--0:#D6DEEB;--1:#403F53"> = mini-makefile</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">BOARD</span><span style="--0:#D6DEEB;--1:#403F53"> ?= native</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--1:#3B61B0">RIOTBASE</span><span style="--0:#D6DEEB;--1:#403F53"> ?= </span><span style="--0:#ECC48D;--1:#3B61B0">$(</span><span style="--0:#7FDBCA;--1:#096E72">CURDIR</span><span style="--0:#ECC48D;--1:#3B61B0">)</span><span style="--0:#D6DEEB;--1:#403F53">/../RIOT</span></div></div><div class="ec-line"><div class="code">
 </div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--1:#8844AE">include</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--1:#3B61B0"><span style="--0:#ECC48D">$(</span><span style="--0:#C5E478">RIOTBASE</span><span style="--0:#ECC48D">)</span></span><span style="--0:#D6DEEB;--1:#403F53">/Makefile.include</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="APPLICATION = mini-makefileBOARD ?= nativeRIOTBASE ?= $(CURDIR)/../RIOTinclude $(RIOTBASE)/Makefile.include"><div></div></button></div></figure></div>
-<p>You can use Make’s <code>?=</code> operator in order to allow overwriting
+<p>You can use Make’s <code dir="auto">?=</code> operator in order to allow overwriting
 variables from the command line. For example, you can easily specify the target
 platform, using the sample Makefile, by invoking make like this:</p>
 <div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="shell"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">make</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">BOARD=iotlab-m3</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="make BOARD=iotlab-m3"><div></div></button></div></figure></div>
-<p>Besides typical targets like <code>clean</code>, <code>all</code>, or <code>doc</code>, RIOT provides the
-special targets <code>flash</code> and <code>term</code> to invoke the configured flashing and
+<p>Besides typical targets like <code dir="auto">clean</code>, <code dir="auto">all</code>, or <code dir="auto">doc</code>, RIOT provides the
+special targets <code dir="auto">flash</code> and <code dir="auto">term</code> to invoke the configured flashing and
 terminal tools for the specified platform. These targets use the variable
-<code>PORT</code> for the serial communication to the device. Neither this variable nor
-the targets <code>flash</code> and <code>term</code> are mandatory for the native port.</p>
-<p>For the native port, <code>PORT</code> has a special meaning: it is used to identify the
-tap interface if the <code>netdev_tap</code> module is used. The target <code>debug</code> can be
+<code dir="auto">PORT</code> for the serial communication to the device. Neither this variable nor
+the targets <code dir="auto">flash</code> and <code dir="auto">term</code> are mandatory for the native port.</p>
+<p>For the native port, <code dir="auto">PORT</code> has a special meaning: it is used to identify the
+tap interface if the <code dir="auto">netdev_tap</code> module is used. The target <code dir="auto">debug</code> can be
 used to invoke a debugger on some platforms. For the native port the additional
-targets such as <code>all-valgrind</code> and <code>valgrind</code> exist. Refer to
-<code>cpu/native/README.md</code> for additional information</p>
-<p>Some RIOT directories contain special Makefiles like <code>Makefile.base</code>,
-<code>Makefile.include</code> or <code>Makefile.dep</code>. The first one can be included into other
-Makefiles to define some standard targets. The files called <code>Makefile.include</code>
-are used in <code>boards</code> and <code>cpu</code> to append target specific information to
-variables like <code>INCLUDES</code>, setting the include paths. <code>Makefile.dep</code> serves to
+targets such as <code dir="auto">all-valgrind</code> and <code dir="auto">valgrind</code> exist. Refer to
+<code dir="auto">cpu/native/README.md</code> for additional information</p>
+<p>Some RIOT directories contain special Makefiles like <code dir="auto">Makefile.base</code>,
+<code dir="auto">Makefile.include</code> or <code dir="auto">Makefile.dep</code>. The first one can be included into other
+Makefiles to define some standard targets. The files called <code dir="auto">Makefile.include</code>
+are used in <code dir="auto">boards</code> and <code dir="auto">cpu</code> to append target specific information to
+variables like <code dir="auto">INCLUDES</code>, setting the include paths. <code dir="auto">Makefile.dep</code> serves to
 define dependencies.</p>
 <p>Unless specified otherwise, make will create an elf-file as well as an Intel
-hex file in the <code>bin</code> folder of your application directory.</p>
+hex file in the <code dir="auto">bin</code> folder of your application directory.</p>
 <p>Learn more about the build system in the
 <a href="https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System">Wiki</a></p> </div> <footer class="sl-flex astro-3yyafb3n"> <div class="meta sl-flex astro-3yyafb3n"> <a href="https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/build-system/build_system.mdx" class="sl-flex print:hidden astro-eez2twj6"><svg aria-hidden="true" class="astro-eez2twj6 astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a>  </div> <div class="pagination-links print:hidden astro-u2l5gyhi" dir="ltr"> <a href="/advanced_tutorials/porting_boards/" rel="prev" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg> <span class="astro-u2l5gyhi"> Previous <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Porting Boards</span> </span> </a> <a href="/build-system/build_system_basics/" rel="next" class="astro-u2l5gyhi"> <svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg> <span class="astro-u2l5gyhi"> Next <br class="astro-u2l5gyhi"> <span class="link-title astro-u2l5gyhi">Build System Basics</span> </span> </a> </div>   </footer>  </div> </div>   </main> </div> </div>  </div> </div>  </body></html>
