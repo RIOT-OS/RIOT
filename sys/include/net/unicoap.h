@@ -85,13 +85,17 @@ typedef struct {
 } unicoap_job_t;
 
 #ifndef DOXYGEN
-#  if defined(__has_builtin) && __has_builtin(__builtin_types_compatible_p) && __has_builtin(__builtin_choose_expr)
-#    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
-        __builtin_choose_expr( \
-            __builtin_types_compatible_p(typeof(void (unicoap_job_t* job)), typeof(func)), \
-                (void (*)(event_t*))func, \
-            ((void)0)/* unicoap_job func has incompatible type, must be void (unicoap_job_t* job) */)
-#  else
+#  if defined(__has_builtin)
+#    if __has_builtin(__builtin_types_compatible_p) && __has_builtin(__builtin_choose_expr)
+#      define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
+          __builtin_choose_expr( \
+              __builtin_types_compatible_p(typeof(void (unicoap_job_t* job)), typeof(func)), \
+                  (void (*)(event_t*))func, \
+              ((void)0)/* unicoap_job func has incompatible type, must be void (unicoap_job_t* job) */)
+#    endif
+#  endif
+
+#  if !defined(_UNICOAP_TRY_TYPECHECK_JOB_FUNC)
 #    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
 #  endif
 #endif
