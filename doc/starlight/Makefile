@@ -5,7 +5,7 @@ RIOTTOOLS ?= $(RIOTBASE)/dist/tools
 .PHONY: install
 install: integrate_outside_files
 	@echo "Installing starlight..."
-	@npm install --prefix $(CURDIR) --prefer-offline
+	@npm ci --prefix $(CURDIR) --prefer-offline
 	@echo "Starlight installed successfully."
 
 .PHONY: build
