@@ -17,6 +17,10 @@ build: install
 	@npm run build --prefix $(CURDIR)
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/starlight/dist/index.html"
 
+.PHONY: preview
+preview: build
+	@npm run preview --prefix $(CURDIR)
+
 .PHONY: dev
 dev: install
 	@echo "Linking RIOT documentation source files..."
