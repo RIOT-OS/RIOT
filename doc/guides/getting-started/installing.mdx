@@ -107,6 +107,22 @@ The app should behave the same when run on real hardware.
     2. With the `Ctrl`-key still held, press the `C`-key
     3. Release both keys
 
+## Generating compile_commands.json e.g. for Code Completion in IDEs
+
+This target will honor the variables controlling the build process such as `BOARD`, `TOOLCHAIN`,
+`DEVELHELP`, etc. just like the usual build process. This works without actual compilation. By
+default, the `compile_commands.json` is placed in the RIOT base directory. This behavior can be
+overwritten using the `COMPILE_COMMANDS_PATH` variable by specifying the full absolute path
+(including file name) of the `compile_commands.json` instead.
+
+:::note
+By default, the built-in include search directories of GCC will be explicitly added
+and flags incompatible with `clangd` will be dropped. This will allow using `clangd` as language
+server out of the box. If this is not desired, run `export COMPILE_COMMANDS_FLAGS=""` to turn
+modification of the compile commands off. For a list of available flags, run
+`./dist/tools/compile_commands/compile_commands.py --help` in the RIOT base directory.
+:::
+
 ## Using VS Code for Development
 
 - If not already open, open the terminal
@@ -116,7 +132,7 @@ The app should behave the same when run on real hardware.
     - If the blue string is not `~/RIOT/examples/basic/hello-world`, type
       `cd ~/RIOT/examples/basic/hello-world` to enter that path
 - Inside `~/RIOT/examples/basic/hello-world` run the command `make compile-commands`
-- The output should look like above
+- The output should look like below
 
 ![Ubuntu terminal running `make compile-commands` in the `hello-world` app](img/06-Use_VS_Code-01.png)
 
