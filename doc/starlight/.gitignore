@@ -20,4 +20,4 @@ pnpm-debug.log*
 .DS_Store
 
 # Don't show copied files
-src/content/docs/**
+src/content
