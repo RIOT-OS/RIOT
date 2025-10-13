@@ -12,9 +12,6 @@
 # shellcheck disable=SC2164
 SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)"
 RIOTBASE="$(cd "${SCRIPTDIR}"/../../..; pwd)"
-EXCLUDE_SIMPLE_FILE="${SCRIPTDIR}/exclude_simple"
-EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/exclude_patterns"
-GENERIC_EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/generic_exclude_patterns"
 
 if [[ -z ${DOCUMENTATION_FORMAT+x} ]]; then
 export DOCUMENTATION_FORMAT=check
@@ -33,8 +30,7 @@ else
     CWARN=
     CRESET=
 fi
-DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1| grep -Fvf "${EXCLUDE_SIMPLE_FILE}" )
-DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Evf "${EXCLUDE_PATTERN_FILE}" | grep -Evf "${GENERIC_EXCLUDE_PATTERN_FILE}")
+DOXY_OUTPUT="$(make -C "${RIOTBASE}" doc 2>&1)"
 DOXY_ERRCODE=$?
 RESULT=0
 
