@@ -3,6 +3,15 @@ title: STM32 Flashing
 description: Guide on how to flash STM32 boards
 ---
 
+## General
+
+The Nucleos often ship with very old ST-Link Firmware.
+If the flash operation fails for some reason, it is possible that
+the embedded ST-Link firmware is either too old or has bugs that have been
+fixed in the meantime. You can find updates for the ST-Link on
+[this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+You can also use the `STM32CubeProgrammer` software to update the firmware.
+
 ## Flashing the Board Using OpenOCD
 
 The ST Nucleo32, 64 and 144 boards include an on-board ST-LINK programmer
@@ -24,7 +33,35 @@ select it by explicitly setting the `PROGRAMMER` variable:
 make BOARD=xxxxx PROGARMMER=openocd flash
 ```
 
+:::note
+The OpenOCD release cycle is quite slow and newly released chips might not be
+supported by the latest release. For example the STM32C0 series is not yet
+supported by OpenOCD 0.12.0, resulting in the following error message:
+`Warn : Cannot identify target as an STM32G0/G4/L4/L4+/L5/U5/WB/WL family device.`.
+
+Furthermore, some distributions ship even older versions, which might not have
+support for new devices or for the ST-Link V3 that is built-in on new
+generation Nucleos, resulting in a diffuse LibUSB error message such as this:
+`Error: libusb_open() failed with LIBUSB_ERROR_ACCESS`.
+If you have a recent OpenOCD version, you can check if your user is
+in the `dialout` and/or `plugdev` group and therefore has the appropriate
+access rights.
+
+In either of the first two cases you have to compile the latest OpenOCD
+sources for your system and manually update the
+`/etc/udev/rules.d/60-openocd.rules` file with the
+file provided in the `contrib` subfolder of the OpenOCD repository.
+Please refer to the OpenOCD documentation for further information.
+:::
+
 ## Flashing the Board Using the ST-LINK Mass Storage Device
+
+:::note
+This method does not (easily) work with WSL, as the standard kernel provided
+does not support Mass Storage Devices. While you can access the MSD through
+e.g. `/mnt/d/` if the ST-Link is mounted under Windows, you can not use the
+VCP (Virtual COM Port) via `usbipd` inside of WSL at the same time.
+:::
 
 The on-board ST-Link programmer found on all Nucleo32, 64 and 144 boards
 will show up as a mass storage device when plugged in via USB.
@@ -36,13 +73,6 @@ you can use the following command:
 ```shell
 make BOARD=nucleo-xxxx PROGRAMMER=cpy2remed flash
 ```
-
-:::note
-If the flash operation fails for some reason, it is possible that
-the embedded ST-Link firmware is either too old or has bugs that have been
-fixed in the meantime. You can find updates for the ST-Link on
-[this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-:::
 
 ## Flashing the Board using stm32flash
 
