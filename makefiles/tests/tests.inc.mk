@@ -23,7 +23,7 @@ TEST_EXECUTOR ?=
 TEST_EXECUTOR_FLAGS ?=
 
 # Are tests going to be run in docker and we are not yet in docker?
-ifeq (0-test,$(INSIDE_DOCKER)-$(filter test,$(DOCKER_MAKECMDGOALS)))
+ifeq (1-0-test,$(BUILD_IN_DOCKER)-$(INSIDE_DOCKER)-$(filter test,$(DOCKER_MAKECMDGOALS)))
 # Yes --> defer test execution to docker
 test: ..in-docker-container
 else
