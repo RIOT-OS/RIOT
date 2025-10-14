@@ -58,7 +58,51 @@ config CPU_MODEL_STM32C031K6
     bool
     select CPU_MODEL_STM32C031XX
 
+config CPU_MODEL_STM32C051C6
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051C8
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051D8
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051F6
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051F8
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051G6
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051G8
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051K6
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C051K8
+    bool
+    select CPU_MODEL_STM32C051XX
+
+config CPU_MODEL_STM32C071C8
+    bool
+    select CPU_MODEL_STM32C071XX
+
 config CPU_MODEL_STM32C071CB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C071F8
     bool
     select CPU_MODEL_STM32C071XX
 
@@ -66,7 +110,15 @@ config CPU_MODEL_STM32C071FB
     bool
     select CPU_MODEL_STM32C071XX
 
+config CPU_MODEL_STM32C071G8
+    bool
+    select CPU_MODEL_STM32C071XX
+
 config CPU_MODEL_STM32C071GB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C071K8
     bool
     select CPU_MODEL_STM32C071XX
 
@@ -74,11 +126,23 @@ config CPU_MODEL_STM32C071KB
     bool
     select CPU_MODEL_STM32C071XX
 
+config CPU_MODEL_STM32C071R8
+    bool
+    select CPU_MODEL_STM32C071XX
+
 config CPU_MODEL_STM32C071RB
     bool
     select CPU_MODEL_STM32C071XX
 
+config CPU_MODEL_STM32C091CB
+    bool
+    select CPU_MODEL_STM32C091XX
+
 config CPU_MODEL_STM32C091CC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C091FB
     bool
     select CPU_MODEL_STM32C091XX
 
@@ -86,7 +150,15 @@ config CPU_MODEL_STM32C091FC
     bool
     select CPU_MODEL_STM32C091XX
 
+config CPU_MODEL_STM32C091GB
+    bool
+    select CPU_MODEL_STM32C091XX
+
 config CPU_MODEL_STM32C091GC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C091KB
     bool
     select CPU_MODEL_STM32C091XX
 
@@ -94,9 +166,57 @@ config CPU_MODEL_STM32C091KC
     bool
     select CPU_MODEL_STM32C091XX
 
+config CPU_MODEL_STM32C091RB
+    bool
+    select CPU_MODEL_STM32C091XX
+
 config CPU_MODEL_STM32C091RC
     bool
     select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C092CB
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092CC
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092EC
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092FB
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092FC
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092GB
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092GC
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092KB
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092KC
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092RB
+    bool
+    select CPU_MODEL_STM32C092XX
+
+config CPU_MODEL_STM32C092RC
+    bool
+    select CPU_MODEL_STM32C092XX
 
 # Configure CPU model
 config CPU_MODEL
@@ -113,13 +233,43 @@ config CPU_MODEL
     default "stm32c031g6" if CPU_MODEL_STM32C031G6
     default "stm32c031k4" if CPU_MODEL_STM32C031K4
     default "stm32c031k6" if CPU_MODEL_STM32C031K6
+    default "stm32c051c6" if CPU_MODEL_STM32C051C6
+    default "stm32c051c8" if CPU_MODEL_STM32C051C8
+    default "stm32c051d8" if CPU_MODEL_STM32C051D8
+    default "stm32c051f6" if CPU_MODEL_STM32C051F6
+    default "stm32c051f8" if CPU_MODEL_STM32C051F8
+    default "stm32c051g6" if CPU_MODEL_STM32C051G6
+    default "stm32c051g8" if CPU_MODEL_STM32C051G8
+    default "stm32c051k6" if CPU_MODEL_STM32C051K6
+    default "stm32c051k8" if CPU_MODEL_STM32C051K8
+    default "stm32c071c8" if CPU_MODEL_STM32C071C8
     default "stm32c071cb" if CPU_MODEL_STM32C071CB
+    default "stm32c071f8" if CPU_MODEL_STM32C071F8
     default "stm32c071fb" if CPU_MODEL_STM32C071FB
+    default "stm32c071g8" if CPU_MODEL_STM32C071G8
     default "stm32c071gb" if CPU_MODEL_STM32C071GB
+    default "stm32c071k8" if CPU_MODEL_STM32C071K8
     default "stm32c071kb" if CPU_MODEL_STM32C071KB
+    default "stm32c071r8" if CPU_MODEL_STM32C071R8
     default "stm32c071rb" if CPU_MODEL_STM32C071RB
+    default "stm32c091cb" if CPU_MODEL_STM32C091CB
     default "stm32c091cc" if CPU_MODEL_STM32C091CC
+    default "stm32c091fb" if CPU_MODEL_STM32C091FB
     default "stm32c091fc" if CPU_MODEL_STM32C091FC
+    default "stm32c091gb" if CPU_MODEL_STM32C091GB
     default "stm32c091gc" if CPU_MODEL_STM32C091GC
+    default "stm32c091kb" if CPU_MODEL_STM32C091KB
     default "stm32c091kc" if CPU_MODEL_STM32C091KC
+    default "stm32c091rb" if CPU_MODEL_STM32C091RB
     default "stm32c091rc" if CPU_MODEL_STM32C091RC
+    default "stm32c092cb" if CPU_MODEL_STM32C092CB
+    default "stm32c092cc" if CPU_MODEL_STM32C092CC
+    default "stm32c092ec" if CPU_MODEL_STM32C092EC
+    default "stm32c092fb" if CPU_MODEL_STM32C092FB
+    default "stm32c092fc" if CPU_MODEL_STM32C092FC
+    default "stm32c092gb" if CPU_MODEL_STM32C092GB
+    default "stm32c092gc" if CPU_MODEL_STM32C092GC
+    default "stm32c092kb" if CPU_MODEL_STM32C092KB
+    default "stm32c092kc" if CPU_MODEL_STM32C092KC
+    default "stm32c092rb" if CPU_MODEL_STM32C092RB
+    default "stm32c092rc" if CPU_MODEL_STM32C092RC
