@@ -84,6 +84,23 @@
  */
 #define UNICOAP_BITFIELD(...) __unicoap_create_bitfield(__VA_ARGS__,,,,,,,,,,,,,,,) 0
 
+#ifndef DOXYGEN
+#  if defined(__has_builtin)
+#    if __has_builtin(__builtin_types_compatible_p) && __has_builtin(__builtin_choose_expr)
+#      define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
+          __builtin_choose_expr( \
+              __builtin_types_compatible_p(__typeof__(void (unicoap_job_t* job)), __typeof__(func)), \
+                  (void (*)(event_t*))func, \
+              ((void)0)/* unicoap_job func has incompatible type, must be void (unicoap_job_t* job) */)
+#    endif
+#  endif
+
+#  if !defined(_UNICOAP_TRY_TYPECHECK_JOB_FUNC)
+#    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
+#  endif
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {}
 #endif
