@@ -66,7 +66,7 @@ int tsrb_get(tsrb_t *rb, uint8_t *dst, size_t n)
         cnt++;
     }
     irq_restore(irq_state);
-    return (cnt);
+    return cnt;
 }
 
 int tsrb_peek(tsrb_t *rb, uint8_t *dst, size_t n)
