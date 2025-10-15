@@ -196,7 +196,7 @@ static int _send(netdev_t *netdev, const iolist_t *pkt)
          * inside the TX Done callback */
         netdev_submac->ev = NETDEV_EVENT_TX_STARTED;
     }
-    if(res == 0){
+    if (res == 0) {
         unsigned int len = 0;
 
         /* calculate package size */
@@ -207,7 +207,7 @@ static int _send(netdev_t *netdev, const iolist_t *pkt)
         }
         netdev_submac->bytes_tx = len + IEEE802154_FCS_LEN;
     }
-    
+
     return res;
 }
 
