@@ -191,50 +191,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 PROGRAMMER ?= openocd
 ```
 
-### Timer Configurations
-
-When using the high level timer `ztimer` there is an overhead in calling the
-[ztimer_sleep](https://doc.riot-os.org/group__sys__ztimer.html#gade98636e198f2d571c8acd861d29d360)
-and [ztimer_set](https://doc.riot-os.org/group__sys__ztimer.html#ga8934a79a89e35d58673418a1e4a2e69c)
-functions. This offset can be compensated for.
-It can be measured by running `tests/sys/ztimer_overhead` on your board, i.e:
-
-```bash
-$ BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
-```
-
-This should give the following output:
-```
-main(): This is RIOT!
-ZTIMER_USEC auto_adjust params:
-    ZTIMER_USEC->adjust_set = xx
-    ZTIMER_USEC->adjust_sleep = xx
-ZTIMER_USEC auto_adjust params cleared
-zitmer_overhead_set...
-min=6 max=7 avg_diff=6
-zitmer_overhead_sleep...
-min=21 max=21 avg_diff=21
-ZTIMER_USEC adjust params for my-new-board:
-    CONFIG_ZTIMER_USEC_ADJUST_SET    6
-    CONFIG_ZTIMER_USEC_ADJUST_SLEEP  21
-```
-
-The last two lines can be added as defines to the new board `board.h`:
-
-```c
-/**
- * @name    ztimer configuration values
- * @{
- */
-#define CONFIG_ZTIMER_USEC_ADJUST_SET     6
-#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   21
-/** @} */
-```
-
-Alternatively, the pseudomodule [ztimer_auto_adjust](https://doc.riot-os.org/group__pseudomodule__ztimer__auto__adjust.html)
-can be used in an application to enable automatic timer offset compensation at board startup.
-This however incurs overhead both in the text segment and at bootup time.
-
 ### doc.md
 
 Although not explicitly needed, if upstreamed and as a general good
@@ -276,6 +232,84 @@ the latest version with
 ```bash
 pip install --upgrade riotgen
 ```
+
+## Timer Configuration
+
+### Timer Width
+
+The `ztimer` driver assumes a timer register bit-width of 32-bits by default.
+If your microcontroller has a smaller  timer register (e.g. 16-bits), you have
+to explicitly specify the maximum value the timer register can hold with the
+`TIMER_0_MAX_VALUE` define.
+This is the same value that is put in the `max` field of the `timer_config`
+structure.
+Typical values are `0x0000FFFFUL` for 16-bit wide timers, `0x00FFFFFFUL` for
+24-bit wide timers and `0xFFFFFFFFUL` for 32-bit wide timers.
+
+```c
+static const timer_conf_t timer_config[] = {
+    {
+        [...]
+        .max      = 0x0000ffff,
+        [...]
+    }
+};
+
+#define TIMER_0_MAX_VALUE   0x0000FFFFUL
+```
+
+:::caution
+`ztimer` does not automatically check if the `max` field and the
+`TIMER_0_MAX_VALUE` definition match!
+
+For example: If you observe "erratic" blinking patterns in
+`examples/basic/blinky`, make sure to check if the sizes match.
+:::
+
+### Overhead Calibration
+
+When using the high level timer `ztimer` there is an overhead in calling the
+[ztimer_sleep](https://doc.riot-os.org/group__sys__ztimer.html#gade98636e198f2d571c8acd861d29d360)
+and [ztimer_set](https://doc.riot-os.org/group__sys__ztimer.html#ga8934a79a89e35d58673418a1e4a2e69c)
+functions. This offset can be compensated for.
+It can be measured by running `tests/sys/ztimer_overhead` on your board, i.e:
+
+```bash
+$ BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
+```
+
+This should give the following output:
+```
+main(): This is RIOT!
+ZTIMER_USEC auto_adjust params:
+    ZTIMER_USEC->adjust_set = xx
+    ZTIMER_USEC->adjust_sleep = xx
+ZTIMER_USEC auto_adjust params cleared
+zitmer_overhead_set...
+min=6 max=7 avg_diff=6
+zitmer_overhead_sleep...
+min=21 max=21 avg_diff=21
+ZTIMER_USEC adjust params for my-new-board:
+    CONFIG_ZTIMER_USEC_ADJUST_SET    6
+    CONFIG_ZTIMER_USEC_ADJUST_SLEEP  21
+```
+
+The last two lines can be added as defines to the new board `board.h`:
+
+```c
+/**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     6
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   21
+/** @} */
+```
+
+Alternatively, the pseudomodule
+[ztimer_auto_adjust](https://doc.riot-os.org/group__pseudomodule__ztimer__auto__adjust.html)
+can be used in an application to enable automatic timer offset compensation at board startup.
+This however incurs overhead both in the text segment and at bootup time.
 
 ## Helper Tools
 
