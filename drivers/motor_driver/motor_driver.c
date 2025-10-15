@@ -29,14 +29,9 @@
 #define ENABLE_DEBUG 0
 #include <debug.h>
 
-int motor_driver_init(motor_driver_t motor_driver)
+int motor_driver_init(const motor_driver_config_t* motor_driver_conf)
 {
     int err = 0;
-
-    assert(motor_driver < MOTOR_DRIVER_NUMOF);
-
-    const motor_driver_config_t *motor_driver_conf = \
-        &motor_driver_config[motor_driver];
 
     pwm_t pwm_dev = motor_driver_conf->pwm_dev;
     pwm_mode_t mode = motor_driver_conf->pwm_mode;
@@ -72,7 +67,7 @@ int motor_driver_init(motor_driver_t motor_driver)
                 LOG_ERROR("gpio_enable init failed\n");
                 goto motor_init_err;
             }
-            motor_enable(motor_driver, i);
+            motor_enable(motor_driver_conf, i);
         }
     }
 
@@ -82,15 +77,11 @@ motor_init_err:
     return -err;
 }
 
-int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
+int motor_set(const motor_driver_config_t *motor_driver_conf, \
+              uint8_t motor_id, \
               int32_t pwm_duty_cycle)
 {
     int err = 0;
-
-    assert(motor_driver < MOTOR_DRIVER_NUMOF);
-
-    const motor_driver_config_t *motor_driver_conf =
-        &motor_driver_config[motor_driver];
 
     assert(motor_id < motor_driver_conf->nb_motors);
 
@@ -177,7 +168,7 @@ int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
 
     motor_driver_cb_t cb = motor_driver_conf->cb;
     if (cb) {
-        cb(motor_driver, motor_id, pwm_duty_cycle);
+        cb(motor_driver_conf, motor_id, pwm_duty_cycle);
     }
 
     return 0;
@@ -186,14 +177,9 @@ motor_set_err:
     return -err;
 }
 
-int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id)
+int motor_brake(const motor_driver_config_t *motor_driver_conf, uint8_t motor_id)
 {
     int err = 0;
-
-    assert(motor_driver < MOTOR_DRIVER_NUMOF);
-
-    const motor_driver_config_t *motor_driver_conf =
-        &motor_driver_config[motor_driver];
 
     assert(motor_id < motor_driver_conf->nb_motors);
 
@@ -245,13 +231,8 @@ motor_brake_err:
     return -err;
 }
 
-void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id)
+void motor_enable(const motor_driver_config_t *motor_driver_conf, uint8_t motor_id)
 {
-    assert(motor_driver < MOTOR_DRIVER_NUMOF);
-
-    const motor_driver_config_t *motor_driver_conf =
-        &motor_driver_config[motor_driver];
-
     assert(motor_id < motor_driver_conf->nb_motors);
 
     const motor_t *dev = &motor_driver_conf->motors[motor_id];
@@ -261,13 +242,8 @@ void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id)
     gpio_write(dev->gpio_enable, 1 ^ dev->gpio_enable_invert);
 }
 
-void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id)
+void motor_disable(const motor_driver_config_t *motor_driver_conf, uint8_t motor_id)
 {
-    assert(motor_driver < MOTOR_DRIVER_NUMOF);
-
-    const motor_driver_config_t *motor_driver_conf =
-        &motor_driver_config[motor_driver];
-
     assert(motor_id < motor_driver_conf->nb_motors);
 
     const motor_t *dev = &motor_driver_conf->motors[motor_id];

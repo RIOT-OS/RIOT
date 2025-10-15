@@ -21,20 +21,26 @@
 #include <board.h>
 #include <log.h>
 
+#include "motor_config.h"
+
 #ifdef MODULE_PERIPH_QDEC
 
 extern int32_t qdecs_value[QDEC_NUMOF];
 
 void native_motor_driver_qdec_simulation(
-    const motor_driver_t motor_driver, uint8_t motor_id,
+    const motor_driver_config_t *motor_driver_conf, uint8_t motor_id,
     int32_t pwm_duty_cycle)
 {
     uint32_t id = 0;
 
-    for (uint32_t i = 0; i < motor_driver; i++) {
-        const motor_driver_config_t motor_driver_conf =
-            motor_driver_config[motor_driver];
-        id += motor_driver_conf.nb_motors;
+    uint32_t i; /* retain the index outside */
+    for (i = 0; i < (uint32_t)MOTOR_DRIVER_NUMOF; i++) {
+        id += motor_driver_conf->nb_motors;
+
+        /* we don't know the index, so we have to compare the struct addresses */
+        if (&motor_driver_config[i] == motor_driver_conf) {
+            break;
+        }
     }
     id += motor_id;
 
@@ -46,13 +52,13 @@ void native_motor_driver_qdec_simulation(
             "    PWM_VALUE = %d"                \
             "    QDEC_ID = %"PRIu32""           \
             "    QDEC_VALUE = %d\n",            \
-            motor_driver, motor_id, pwm_duty_cycle, id, pwm_duty_cycle);
+            i, motor_id, pwm_duty_cycle, id, pwm_duty_cycle);
     }
     else {
         LOG_ERROR("MOTOR-DRIVER=%u"             \
             "    MOTOR_ID = %u"                 \
             "    no QDEC device associated\n",  \
-            motor_driver, motor_id);
+            i, motor_id);
     }
 }
 

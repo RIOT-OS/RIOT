@@ -99,7 +99,7 @@ extern "C" {
  * @brief Maximum number of motors by motor driver
  */
 #ifndef CONFIG_MOTOR_DRIVER_MAX
-#define CONFIG_MOTOR_DRIVER_MAX    (2)
+#  define CONFIG_MOTOR_DRIVER_MAX  (2)
 #endif
 /** @} */
 
@@ -155,16 +155,21 @@ typedef struct {
 typedef unsigned int motor_driver_t;
 
 /**
+ * @brief Forward declaration of the motor_driver_config struct.
+ */
+typedef struct motor_driver_config motor_driver_config_t;
+
+/**
  * @brief   Motor callback. It is called at end of motor_set()
  */
-typedef void (*motor_driver_cb_t)(const motor_driver_t motor_driver,
+typedef void (*motor_driver_cb_t)(const motor_driver_config_t *motor_driver_conf,
                                   uint8_t motor_id,
                                   int32_t pwm_duty_cycle);
 
 /**
  * @brief Describe DC motor driver with PWM device and motors array
  */
-typedef struct {
+struct motor_driver_config {
     pwm_t pwm_dev;                          /**< PWM device driving motors */
     motor_driver_mode_t mode;               /**< driver mode */
     motor_driver_mode_brake_t mode_brake;   /**< driver brake mode */
@@ -174,57 +179,63 @@ typedef struct {
     uint8_t nb_motors;                      /**< number of moros */
     motor_t motors[CONFIG_MOTOR_DRIVER_MAX];       /**< motors array */
     motor_driver_cb_t cb;                   /**< callback on motor_set */
-} motor_driver_config_t;
+};
 
 /**
  * @brief Initialize DC motor driver board
  *
- * @param[out] motor_driver     motor driver to initialize
+ * @param[in] motor_driver_conf board-dependent hardware configuration of the
+ *                              motor driver to which the motor is attached
  *
  * @return                      0 on success
  * @return                      -1 on error with errno set
  */
-int motor_driver_init(const motor_driver_t motor_driver);
+int motor_driver_init(const motor_driver_config_t *motor_driver_conf);
 
 /**
  * @brief Set motor speed and direction
  *
- * @param[in] motor_driver      motor driver to which motor is attached
+ * @param[in] motor_driver_conf board-dependent hardware configuration of the
+ *                              motor driver to which the motor is attached
  * @param[in] motor_id          motor ID on driver
  * @param[in] pwm_duty_cycle    Signed PWM duty_cycle to set motor speed and direction
  *
  * @return                      0 on success
  * @return                      -1 on error with errno set
  */
-int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
+int motor_set(const motor_driver_config_t *motor_driver_conf, uint8_t motor_id, \
               int32_t pwm_duty_cycle);
 
 /**
  * @brief Brake the motor of a given motor driver
  *
- * @param[in] motor_driver      motor driver to which motor is attached
+ * @param[in] motor_driver_conf board-dependent hardware configuration of the
+ *                              motor driver to which the motor is attached
  * @param[in] motor_id          motor ID on driver
  *
  * @return                      0 on success
  * @return                      -1 on error with errno set
  */
-int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id);
+int motor_brake(const motor_driver_config_t *motor_driver_conf, uint8_t motor_id);
 
 /**
  * @brief Enable a motor of a given motor driver
  *
- * @param[in] motor_driver      motor driver to which motor is attached
+ * @param[in] motor_driver_conf board-dependent hardware configuration of the motor driver to
+ *                              which the motor is attached
  * @param[in] motor_id          motor ID on driver
  */
-void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id);
+void motor_enable(const motor_driver_config_t *motor_driver_conf, \
+                  uint8_t motor_id);
 
 /**
  * @brief Disable a motor of a given motor driver
  *
- * @param[in] motor_driver      motor driver to which motor is attached
+ * @param[in] motor_driver_conf board-dependent hardware configuration of the
+ *                              motor driver to which the motor is attached
  * @param[in] motor_id          motor ID on driver
  */
-void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id);
+void motor_disable(const motor_driver_config_t *motor_driver_conf, uint8_t motor_id);
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,6 @@
 
 #include "board_nucleo.h"
 #include "arduino_pinmap.h"
-#include "motor_driver.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,37 +51,6 @@ extern "C" {
 #else
 #define BTN0_MODE           GPIO_IN_PU
 #endif
-/** @} */
-
-/**
- * @name Describe DC motors with PWM channel and GPIOs
- * @{
- */
-static const motor_driver_config_t motor_driver_config[] = {
-    {
-        .pwm_dev         = 1,
-        .mode            = MOTOR_DRIVER_1_DIR,
-        .mode_brake      = MOTOR_BRAKE_HIGH,
-        .pwm_mode        = PWM_LEFT,
-        .pwm_frequency   = 20000U,
-        .pwm_resolution  = 2250U,
-        .nb_motors       = 1,
-        .motors          = {
-            {
-                .pwm_channel            = 0,
-                .gpio_enable            = 0,
-                .gpio_dir0              = ARDUINO_PIN_15,
-                .gpio_dir1_or_brake     = 0,
-                .gpio_dir_reverse       = 0,
-                .gpio_enable_invert     = 0,
-                .gpio_brake_invert      = 0,
-            },
-        },
-        .cb = NULL,
-    },
-};
-
-#define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
 
 /**

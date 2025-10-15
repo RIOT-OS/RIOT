@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "motor_config.h"
+
 /* RIOT includes */
 #include "log.h"
 #include "motor_driver.h"
@@ -45,11 +47,13 @@ void motors_control(int32_t duty_cycle)
 
     printf("Duty cycle = %" PRId32 "   Direction = %s\n", duty_cycle, str);
 
-    if (motor_set(MOTOR_DRIVER_DEV(0), MOTOR_0_ID, duty_cycle)) {
+    if (motor_set(&motor_driver_config[MOTOR_DRIVER_DEV(0)],
+                  MOTOR_0_ID, duty_cycle)) {
         printf("Cannot set PWM duty cycle for motor %" PRIu32 "\n", \
                (uint32_t)MOTOR_0_ID);
     }
-    if (motor_set(MOTOR_DRIVER_DEV(0), MOTOR_1_ID, duty_cycle)) {
+    if (motor_set(&motor_driver_config[MOTOR_DRIVER_DEV(0)],
+                  MOTOR_1_ID, duty_cycle)) {
         printf("Cannot set PWM duty cycle for motor %" PRIu32 "\n", \
                (uint32_t)MOTOR_1_ID);
     }
@@ -59,10 +63,10 @@ void motors_brake(void)
 {
     puts("Brake motors !!!");
 
-    if (motor_brake(MOTOR_DRIVER_DEV(0), MOTOR_0_ID)) {
+    if (motor_brake(&motor_driver_config[MOTOR_DRIVER_DEV(0)], MOTOR_0_ID)) {
         printf("Cannot brake motor %" PRIu32 "\n", (uint32_t)MOTOR_0_ID);
     }
-    if (motor_brake(MOTOR_DRIVER_DEV(0), MOTOR_1_ID)) {
+    if (motor_brake(&motor_driver_config[MOTOR_DRIVER_DEV(0)], MOTOR_1_ID)) {
         printf("Cannot brake motor %" PRIu32 "\n", (uint32_t)MOTOR_1_ID);
     }
 }
@@ -74,7 +78,7 @@ void motion_control(void)
     xtimer_ticks32_t last_wakeup /*, start*/;
     int32_t pwm_res = motor_driver_config[MOTOR_DRIVER_DEV(0)].pwm_resolution;
 
-    ret = motor_driver_init(MOTOR_DRIVER_DEV(0));
+    ret = motor_driver_init(&motor_driver_config[MOTOR_DRIVER_DEV(0)]);
     if (ret) {
         LOG_ERROR("motor_driver_init failed with error code %d\n", ret);
     }
@@ -94,11 +98,11 @@ void motion_control(void)
         /* Disable motor during INTERVAL µs (motor driver must have enable
            feature */
         last_wakeup = xtimer_now();
-        motor_disable(MOTOR_DRIVER_DEV(0), MOTOR_0_ID);
-        motor_disable(MOTOR_DRIVER_DEV(0), MOTOR_1_ID);
+        motor_disable(&motor_driver_config[MOTOR_DRIVER_DEV(0)], MOTOR_0_ID);
+        motor_disable(&motor_driver_config[MOTOR_DRIVER_DEV(0)], MOTOR_1_ID);
         xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
-        motor_enable(MOTOR_DRIVER_DEV(0), MOTOR_0_ID);
-        motor_enable(MOTOR_DRIVER_DEV(0), MOTOR_1_ID);
+        motor_enable(&motor_driver_config[MOTOR_DRIVER_DEV(0)], MOTOR_0_ID);
+        motor_enable(&motor_driver_config[MOTOR_DRIVER_DEV(0)], MOTOR_1_ID);
 
         /* CW - duty cycle 100% */
         last_wakeup = xtimer_now();
