@@ -19,6 +19,7 @@
  * @brief       Thread-unsafe ringbuffer interface definition
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Karl Fessel <karl.fessel@ml-pa.com>
  */
 
 #include "tsrb.h"
@@ -147,12 +148,12 @@ static inline int turb_peek_one(tsrb_t *rb)
  */
 static inline int turb_get(tsrb_t *rb, uint8_t *dst, size_t n)
 {
-    size_t ret = 0;
+    size_t cnt = 0;
     while (n-- && !turb_empty(rb)) {
         *dst++ = _turb_pop(rb);
-        ret++;
+        cnt++;
     }
-    return (int) ret;
+    return (int) cnt;
 }
 
 /**
@@ -182,12 +183,12 @@ static inline int turb_peek(tsrb_t *rb, uint8_t *dst, size_t n)
  */
 static inline int turb_drop(tsrb_t *rb, size_t n)
 {
-    size_t ret = 0;
+    size_t cnt = 0;
     while (n-- && !turb_empty(rb)) {
         _turb_pop(rb);
-        ret++;
+        cnt++;
     }
-    return (int) ret;
+    return (int) cnt;
 }
 
 /**
