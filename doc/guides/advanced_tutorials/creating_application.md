@@ -95,6 +95,60 @@ USEMODULE += gnrc_udp
 
 Modules typically pull in all required dependencies themselves.
 
+### Configuring an Application
+
+Many modules in RIOT offer configuration options that will be considered during
+compile-time. They are modeled as macros that can be overridden by the user.
+Currently there are three ways of doing this: Using `CFLAGS`, `pseudomodules`
+and [Kconfig](https://guide.riot-os.org/build-system/kconfig) (the last one is
+currently only possible for a subset of modules).
+
+#### CFLAGS
+
+`CFLAGS` can be set in your `Makefile` to configure the values of `defines`.
+Make sure to not override the `CFLAGS` variable and only extend it using
+the `+=` operator.
+
+For example, to increase the stack size of the main thread,
+your Makefile needs to contain this line:
+
+```makefile
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+```
+
+For a list of all compile time configurations check the
+[API Documentation](https://doc.riot-os.org/group__config.html).
+
+#### Kconfig
+
+To learn how to use [Kconfig](https://guide.riot-os.org/build-system/kconfig)
+in RIOT, please refer to the
+[User Guide to Configure with Kconfig](https://guide.riot-os.org/build-system/kconfig/#user-guide-to-configure-with-kconfig).
+
+#### Pseudomodules
+
+When devices have a common access interface, having a default configuration to
+enable them across platforms, without having to explicitly specify which modules
+to include, comes in handy. For this, `pseudomodules` are defined:
+
+##### SAUL Default
+
+Will enable all the drivers of sensors and actuators that are
+present in the target platform.
+
+```makefile
+USEMODULE += saul_default
+```
+
+##### Netdev Default
+
+Will enable all the drivers of network devices
+present in the target platform.
+
+```makefile
+USEMODULE += netdev_default
+```
+
 ## Including Source Files in Subfolders
 
 By default, all source files in an application's (or any RIOT module's) directory

@@ -112,6 +112,7 @@ export default defineConfig({
                 "c_tutorials/threads",
                 "c_tutorials/gpio",
                 "c_tutorials/saul",
+                "c_tutorials/coap",
                 "c_tutorials/coding_conventions",
               ],
             },
