@@ -75,7 +75,7 @@ void motion_control(void)
 {
     int8_t dir = 1;
     int ret = 0;
-    xtimer_ticks32_t last_wakeup /*, start*/;
+    xtimer_ticks32_t last_wakeup;
     int32_t pwm_res = motor_driver_config[MOTOR_DRIVER_DEV(0)].pwm_resolution;
 
     ret = motor_driver_init(&motor_driver_config[MOTOR_DRIVER_DEV(0)]);
