@@ -1,0 +1,10 @@
+# Mirror mbedtls RNG options as in mbedtls_config.h
+# Please keep the order
+
+ifneq (,$(filter mbedtls_ctr_drbg,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_CTR_DRBG=1
+endif
+
+ifneq (,$(filter mbedtls_hmac_drbg,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_HMAC_DRBG=1
+endif

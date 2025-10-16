@@ -47,7 +47,7 @@ int mbedtls_platform_mutex_unlock(mbedtls_threading_mutex_t *mutex)
     return 0;
 }
 
-void auto_init_mbedtls(void)
+void threading_mbedtls_riot_init(void)
 {
     /* Configure mbedTLS to use RIOT specific threading functions. */
     mbedtls_threading_set_alt( mbedtls_platform_mutex_init,

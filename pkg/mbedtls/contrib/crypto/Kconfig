@@ -1,0 +1,302 @@
+# Copyright (c) 2023 ML!PA Consulting Gmbh
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "mbed TLS cryptopgraphy"
+    depends on USEMODULE_MBEDTLS_CRYPTO
+
+config MBEDTLS_SHA256_ALT
+    bool "Enable to let mbed TLS use an alternate SHA2xx core implementation"
+    default y
+    help
+        In case you enable MBEDTLS_SHA256_ALT, mbed TLS
+        will no longer provide the "struct
+        mbedtls_sha256_context" definition and omit the
+        base function declarations and implementations.
+        "sha256_alt.h" will be included from "sha256.h"
+        to include the new function definitions.
+
+config MBEDTLS_ECDSA_DETERMINISTIC
+    bool "Enable deterministic ECDSA (RFC 6979)"
+    select MBEDTLS_HMAC_DRBG
+    help
+        Standard ECDSA is "fragile" in the sense that lack of entropy when signing
+        may result in a compromise of the long-term signing key. This is avoided by
+        the deterministic variant.
+
+config MBEDTLS_PKCS1_V15
+    bool "Enable support for PKCS#1 v1.5 encoding"
+    select MBEDTLS_RSA
+    help
+        This enables support for PKCS#1 v1.5 operations.
+
+config MBEDTLS_PKCS1_V21
+    bool "Enable support for PKCS#1 v2.1 encoding"
+    select MBEDTLS_RSA
+    select MBEDTLS_MD
+    help
+        This enables support for RSAES-OAEP and RSASSA-PSS operations.
+
+config MBEDTLS_SHA512_NO_SHA384
+    bool "Disable the SHA-384 option of the SHA-512 module"
+    select MBEDTLS_SHA512
+    help
+        Use this to save some code size on devices that don't use SHA-384.
+
+config MBEDTLS_AES
+    bool "Enable the AES block cipher"
+    help
+        This module enables the following ciphersuites (if other requisites are enabled as well):
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_DHE_PSK_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_DHE_PSK_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_DHE_PSK_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_DHE_PSK_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_DHE_PSK_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_DHE_PSK_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_RSA_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_RSA_WITH_AES_256_CBC_SHA256
+        MBEDTLS_TLS_RSA_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_RSA_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_RSA_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_RSA_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_RSA_PSK_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_RSA_PSK_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_RSA_PSK_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_RSA_PSK_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_RSA_PSK_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_RSA_PSK_WITH_AES_128_CBC_SHA
+        MBEDTLS_TLS_PSK_WITH_AES_256_GCM_SHA384
+        MBEDTLS_TLS_PSK_WITH_AES_256_CBC_SHA384
+        MBEDTLS_TLS_PSK_WITH_AES_256_CBC_SHA
+        MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256
+        MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA256
+        MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA.
+
+config MBEDTLS_BASE64
+    bool "Enable the Base64 module"
+
+config MBEDTLS_CAMELLIA
+    bool "Enable the multi-precision integer library"
+
+config MBEDTLS_ARIA
+    bool "Enable the ARIA block cipher"
+
+config MBEDTLS_CCM
+    bool "Enable the Counter with CBC-MAC (CCM) mode for 128-bit block cipher"
+    select MBEDTLS_CIPHER
+
+if MBEDTLS_CCM
+
+choice
+    bool "MBEDTLS_CCM requires AES or CAMELLIA"
+    default MBEDTLS_CCM_AES
+
+config MBEDTLS_CCM_AES
+    bool "AES"
+    select MBEDTLS_AES
+
+config MBEDTLS_CCM_CAMELLIA
+    bool "CAMELLIA"
+    select MBEDTLS_CAMELLIA
+
+endchoice
+
+endif # MBEDTLS_CCM
+
+config MBEDTLS_CIPHER
+    bool "Enable the generic cipher layer"
+
+config MBEDTLS_CMAC
+    bool "Enable the CMAC (Cipher-based Message Authentication Code) mode for block ciphers"
+
+if MBEDTLS_CMAC
+
+choice
+    bool "MBEDTLS_CMAC requires AES or DES"
+    default MBEDTLS_CMAC_AES
+
+config MBEDTLS_CMAC_AES
+    bool "AES"
+    select MBEDTLS_AES
+
+config MBEDTLS_CMAC_DES
+    bool "DES"
+    select MBEDTLS_DES
+
+endchoice
+
+endif # MBEDTLS_CMAC
+
+config MBEDTLS_DES
+    bool "Enable the DES block cipher"
+    help
+        This module enables the following ciphersuites (if other requisites are enabled as well):
+        MBEDTLS_TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_RSA_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA
+        MBEDTLS_TLS_PSK_WITH_3DES_EDE_CBC_SHA.
+
+config MBEDTLS_DHM
+    bool "Enable the Diffie-Hellman-Merkle module"
+    help
+        This module is used by the following key exchanges:
+        DHE-RSA, DHE-PSK.
+
+        Using DHE constitutes a security risk as it
+        is not possible to validate custom DH parameters.
+        If possible, it is recommended users should consider
+        preferring other methods of key exchange.
+        See dhm.h for more details.
+
+config MBEDTLS_ECDH
+    bool "Enable the elliptic curve Diffie-Hellman library"
+    help
+        This module is used by the following key exchanges:
+        ECDHE-ECDSA, ECDHE-RSA, DHE-PSK.
+
+config MBEDTLS_ECDSA
+    bool "Enable the elliptic curve DSA library"
+    select MBEDTLS_ECP
+    select MBEDTLS_ASN1_WRITE
+    select MBEDTLS_ASN1_PARSE
+    help
+        This module is used by the following key exchanges:
+        ECDHE-ECDSA.
+
+config MBEDTLS_ECJPAKE
+    bool "Enable the elliptic curve J-PAKE library"
+    select MBEDTLS_ECP
+    select MBEDTLS_MD
+    help
+        This module is used by the following key exchanges:
+        ECJPAKE.
+
+config MBEDTLS_ECP
+    bool "Enable the elliptic curve over GF(p) library"
+    select MBEDTLS_BIGNUM
+
+config MBEDTLS_GCM
+    bool "Enable the Galois/Counter Mode (GCM)"
+    select MBEDTLS_CIPHER
+
+if MBEDTLS_GCM
+
+choice
+    bool "MBEDTLS_GCM requires AES or CAMELLIA or ARIA"
+    default MBEDTLS_GCM_AES
+
+config MBEDTLS_GCM_AES
+    bool "AES"
+    select MBEDTLS_AES
+
+config MBEDTLS_GCM_CAMELLIA
+    bool "CAMELLIA"
+    select MBEDTLS_CAMELLIA
+
+config MBEDTLS_GCM_ARIA
+    bool "ARIA"
+    select MBEDTLS_ARIA
+
+endchoice
+
+endif # MBEDTLS_GCM
+
+config MBEDTLS_HKDF
+    bool "Enable the HKDF algorithm (RFC 5869)"
+    select MBEDTLS_MD
+    help
+        This module adds support for the Hashed Message Authentication Code
+        (HMAC)-based key derivation function (HKDF).
+
+config MBEDTLS_NIST_KW
+    bool "Enable the Key Wrapping mode for 128-bit block ciphers, as defined in NIST SP 800-38F"
+    select MBEDTLS_AES
+    select MBEDTLS_CIPHER
+    help
+        Only KW and KWP modes are supported. At the moment, only AES is approved by NIST.
+
+config MBEDTLS_MD
+    bool "Enable the generic message digest layer"
+
+config MBEDTLS_MD2
+    bool "Enable the MD2 hash algorithm"
+
+config MBEDTLS_MD4
+    bool "Enable the MD4 hash algorithm"
+
+config MBEDTLS_MD5
+    bool "Enable the MD5 hash algorithm"
+    help
+        This module is required for SSL/TLS up to version 1.1, and for TLS 1.2
+        depending on the handshake parameters. Further, it is used for checking
+        MD5-signed certificates, and for PBKDF1 when decrypting PEM-encoded
+        encrypted keys.
+
+        MD5 is considered a weak message digest and its use constitutes a
+        security risk. If possible, we recommend avoiding dependencies on
+        it, and considering stronger message digests instead.
+
+config MBEDTLS_RSA
+    bool "Enable the RSA public-key cryptosystem"
+    select MBEDTLS_BIGNUM
+    select MBEDTLS_OID
+    help
+        This module is used by the following key exchanges:
+        RSA, DHE-RSA, ECDHE-RSA, RSA-PSK.
+
+config MBEDTLS_SHA256
+    bool "Enable the SHA-224 and SHA-256 cryptographic hash algorithms"
+    default y
+    select MBEDTLS_SHA256_ALT
+    help
+        This module adds support for SHA-224 and SHA-256.
+        This module is required for the SSL/TLS 1.2 PRF function.
+
+config MBEDTLS_SHA512
+    bool "Enable the SHA-384 and SHA-512 cryptographic hash algorithms"
+    help
+        This module adds support for SHA-384 and SHA-512.
+
+endmenu # mbed TLS cryptography

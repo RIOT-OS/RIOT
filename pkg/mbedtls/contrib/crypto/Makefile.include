@@ -1,0 +1,122 @@
+# Mirror mbedtls crypto options as in mbedtls_config.h
+# Please keep the order
+
+ifneq (,$(filter mbedtls_sha256_alt,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SHA256_ALT=1
+endif
+
+ifneq (,$(filter mbedtls_ecdsa_deterministic,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ECDSA_DETERMINISTIC=1
+endif
+
+ifneq (,$(filter mbedtls_pkcs1_v15,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PKCS1_V15=1
+endif
+
+ifneq (,$(filter mbedtls_pkcs1_v21,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PKCS1_V21=1
+endif
+
+ifneq (,$(filter mbedtls_sha512_no_sha384,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SHA512_NO_SHA384=1
+endif
+
+ifneq (,$(filter mbedtls_aes,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_AES=1
+endif
+
+ifneq (,$(filter mbedtls_base64,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_BASE64=1
+endif
+
+ifneq (,$(filter mbedtls_bignum,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_BIGNUM=1
+endif
+
+ifneq (,$(filter mbedtls_camellia,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_CAMELLIA=1
+endif
+
+ifneq (,$(filter mbedtls_aria,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ARIA=1
+endif
+
+ifneq (,$(filter mbedtls_ccm,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_CCM=1
+endif
+
+ifneq (,$(filter mbedtls_cipher,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_CIPHER=1
+endif
+
+ifneq (,$(filter mbedtls_cmac,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_CMAC=1
+endif
+
+ifneq (,$(filter mbedtls_des,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_DES=1
+endif
+
+ifneq (,$(filter mbedtls_dhm,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_DHM=1
+endif
+
+ifneq (,$(filter mbedtls_ecdh,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ECDH=1
+endif
+
+ifneq (,$(filter mbedtls_ecdsa,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLF_ECDSA=1
+endif
+
+ifneq (,$(filter mbedtls_ecjpake,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ECJPAKE=1
+endif
+
+ifneq (,$(filter mbedtls_ecp,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ECP=1
+endif
+
+ifneq (,$(filter mbedtls_gcm,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_GCM=1
+endif
+
+ifneq (,$(filter mbedtls_hkdf,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_HKDF=1
+endif
+
+ifneq (,$(filter mbedtls_nist_kw,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_NIST_KW=1
+endif
+
+ifneq (,$(filter mbedtls_md,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_MD=1
+endif
+
+ifneq (,$(filter mbedtls_md2,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_MD2=1
+endif
+
+ifneq (,$(filter mbedtls_md4,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_MD4=1
+endif
+
+ifneq (,$(filter mbedtls_md5,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_MD5=1
+endif
+
+ifneq (,$(filter mbedtls_rsa,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_RSA=1
+endif
+
+ifneq (,$(filter mbedtls_sha1,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SHA1=1
+endif
+
+ifneq (,$(filter mbedtls_sha256,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SHA256=1
+endif
+
+ifneq (,$(filter mbedtls_sha512,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SHA512=1
+endif

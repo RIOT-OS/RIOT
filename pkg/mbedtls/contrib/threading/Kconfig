@@ -1,0 +1,16 @@
+# Copyright (c) 2023 ML!PA Consulting Gmbh
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "mbed TLS threading"
+    depends on USEMODULE_MBEDTLS_THREADING
+
+config MBEDTLS_THREADING_ALT
+    bool "Provide your own alternate threading implementation"
+    default y if MBEDTLS_THREADING
+    help
+        This allows your own alternate threading implementation.
+
+endmenu # mbed TLS threading
