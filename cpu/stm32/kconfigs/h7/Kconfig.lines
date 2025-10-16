@@ -1,0 +1,95 @@
+# SPDX-FileCopyrightText: 2025 Inria
+# SPDX-License-Identifier: LGPL-2.1-only
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU lines
+config CPU_LINE_STM32H723XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H725XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H730XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H730XXQ
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H733XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H735XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H742XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H743XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H745XG
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H745XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H747XG
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H747XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H750XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H753XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H755XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H757XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H7A3XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H7A3XXQ
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H7B0XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H7B0XXQ
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H7B3XX
+    bool
+    select CPU_FAM_H7
+
+config CPU_LINE_STM32H7B3XXQ
+    bool
+    select CPU_FAM_H7

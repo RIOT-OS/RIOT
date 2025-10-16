@@ -1,0 +1,29 @@
+From 72d9a6768285916332447c42c392f7ec1cf334ac Mon Sep 17 00:00:00 2001
+From: Jay R Vaghela <jay.vaghela@tuhh.de>
+Date: Wed, 4th Feb 2026 20:40:00 +0200
+Subject: [PATCH] stm32h7xx: remove ErrorStatus
+
+---
+ Include/stm32h7xx.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Include/stm32h7xx.h b/Include/stm32h7xx.h
+index 265e8c0..529j980 100644
+--- a/Include/stm32h7xx.h
++++ b/Include/stm32h7xx.h
+@@ -191,12 +191,6 @@ typedef enum
+ } FunctionalState;
+ #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+ 
+-typedef enum
+-{
+-  SUCCESS = 0,
+-  ERROR = !SUCCESS
+-} ErrorStatus;
+-
+ /**
+   * @}
+   */
+-- 
+2.30.2
+

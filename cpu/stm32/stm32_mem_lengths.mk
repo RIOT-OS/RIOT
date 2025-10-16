@@ -206,6 +206,16 @@ else ifeq ($(STM32_TYPE), G)
       CCMRAM_LEN = 32K
     endif
   endif
+else ifeq ($(STM32_TYPE), H)
+  RAM_START_ADDR = 0x24000000
+  ifeq ($(STM32_MODEL), 723)
+    RAM_LEN = 320K
+  else ifeq ($(STM32_MODEL), 753)
+    RAM_LEN = 512K
+    ROM_LEN = 2048K     # 2 MB Flash
+    BACKUP_RAM_ADDR = 0x38800000
+    BACKUP_RAM_LEN = 0x4K
+  endif
 else ifeq ($(STM32_TYPE), L)
   ifeq ($(STM32_FAMILY), 0)
     ifeq ($(STM32_MODEL2), 1)
