@@ -8,7 +8,8 @@
 #  - STM32_PINCOUNT: R (64)
 #  - STM32_ROMSIZE: G (1024K)
 CPU_MODEL_UPPERCASE = $(call uppercase,$(CPU_MODEL))
-STM32_INFO     := $(shell echo $(CPU_MODEL_UPPERCASE) | sed -E -e 's/^STM32(F|L|W|G|MP|U|C)([0-7]|B|L)([A-Z0-9])([0-9])(.)(.)?(_A)?/\1 \2 \2\3\4 \3 \4 \5 \6 \7/')
+STM32_INFO     := $(shell echo $(CPU_MODEL_UPPERCASE) | sed -E -e \
+'s/^STM32(F|H|L|W|G|MP|U|C)([0-7]|B|L)([A-Z0-9])([0-9])(.)(.)?(_A)?/\1 \2 \2\3\4 \3 \4 \5 \6 \7/')
 STM32_TYPE     = $(word 1, $(STM32_INFO))
 STM32_FAMILY   = $(word 2, $(STM32_INFO))
 STM32_MODEL    = $(word 3, $(STM32_INFO))
@@ -38,7 +39,7 @@ else ifneq (,$(filter $(CPU_FAM),f3 f4 l4 mp1))
   CPU_CORE = cortex-m4f
 else ifneq (,$(filter $(CPU_FAM),g4 wb wl))
   CPU_CORE = cortex-m4
-else ifeq (f7,$(CPU_FAM))
+else ifeq (,$(filter $(CPU_FAM),f7 h7))
   CPU_CORE = cortex-m7
 else ifneq (,$(filter $(CPU_FAM),g0 l0 c0))
   CPU_CORE = cortex-m0plus
