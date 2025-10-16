@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "ztimer.h" /* needed for generating observe value */
 #include "byteorder.h"
 #include "compiler_hints.h"
 
@@ -971,6 +972,13 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
 {
     size_t size = _encode_variable_uint(&value);
     return unicoap_options_add(options, number, (uint8_t*)&value, size);
+}
+
+int unicoap_options_set_observe_generated(unicoap_options_t* options)
+{
+    /* generate initial notification value */
+    return unicoap_options_set_observe(
+        options, (ztimer_now(ZTIMER_MSEC) >> UNICOAP_OBSERVE_TICK_EXPONENT) & 0xFFFFFF);
 }
 
 ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destination,
