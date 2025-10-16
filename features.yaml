@@ -316,6 +316,8 @@ groups:
           help: The MCU has an STM32 G0 MCU
         - name: cpu_stm32g4
           help: The MCU has an STM32 G4 MCU
+        - name: cpu_stm32h7
+          help: The MCU has an STM32 H7 MCU
         - name: cpu_stm32l0
           help: The MCU has an STM32 L0 MCU
         - name: cpu_stm32l1
