@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Université de Lille
+ * Copyright (C) 2024-2025 Université de Lille
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -99,7 +99,7 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
     int file_handle = vfs_open(file_to_drop->filename, O_RDONLY, 0);
     if (file_handle < 0) {
 
-        /** There's no executable file yet, let's drop one */
+        /* There's no executable file yet, let's drop one */
         int ret = xipfs_extended_driver_new_file(
             file_to_drop->filename, file_to_drop->bytesize, file_to_drop->is_executable
         );
@@ -109,7 +109,7 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
             return EXIT_FAILURE;
         }
 
-        /**
+        /*
          * Fill it with data
          * Take care : vfs does not support O_APPEND with vfs_write, only O_WRONLY or O_RDWR
          */

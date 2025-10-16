@@ -88,6 +88,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 
 #include "sched.h"
 #include "thread.h"
@@ -493,12 +494,12 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
-__attribute__((weak))int
+__attribute__((weak)) int
 svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
 {
     (void)svc_number;
     (void)svc_args;
-    return 0;
+    return -ENOTSUP;
 }
 
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)

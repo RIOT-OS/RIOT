@@ -94,8 +94,8 @@ void hard_fault_default(void);
 /**
  * @brief Default memory manager behavior callback (weak function)
  *
- * @retval 1 when the memory fault has been handled,
- * @retval 0 otherwise.
+ * @retval >=0 when the memory fault has been handled,
+ * @retval < 0 otherwise.
  */
 int mem_manage_handler(void);
 

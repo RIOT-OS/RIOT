@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -473,14 +474,14 @@ void hard_fault_default(void)
     defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
     defined(CPU_CORE_CORTEX_M7)
 
-__attribute__((weak))int mem_manage_handler(void)
+__attribute__((weak)) int mem_manage_handler(void)
 {
-    return 0;
+    return -ENOTSUP;
 }
 
 void mem_manage_default(void)
 {
-    if (mem_manage_handler() == 1) {
+    if (mem_manage_handler() >= 0) {
         return;
     }
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");

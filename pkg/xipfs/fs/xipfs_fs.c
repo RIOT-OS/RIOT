@@ -739,28 +739,28 @@ int mem_manage_handler(void)
     uint32_t cfsr = SCB->CFSR;
     uintptr_t psp = __get_PSP();
     if (xipfs_mem_manage_handler((void *)psp, mmfar, cfsr) == 0) {
-        return 1;
+        return 0;
     }
 
-    return 0;
+    return -EINVAL;
 }
 
 int svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
 {
     switch (svc_number) {
-        case XIPFS_ENTER_SVC_NUMBER: {
-            void *crt0_ctx = (void *)svc_args[0];
-            void *entry_point = (void *)svc_args[1];
-            void *stack_top = (void *)svc_args[2];
-            xipfs_safe_exec_enter(crt0_ctx, entry_point, stack_top);
-            return 0;
-        }
-        case XIPFS_SYSCALL_SVC_NUMBER: {
-            xipfs_syscall_dispatcher(svc_args);
-            return 0;
-        }
-        default:
-            return -ENOTSUP;
+    case XIPFS_ENTER_SVC_NUMBER: {
+        void *crt0_ctx = (void *)svc_args[0];
+        void *entry_point = (void *)svc_args[1];
+        void *stack_top = (void *)svc_args[2];
+        xipfs_safe_exec_enter(crt0_ctx, entry_point, stack_top);
+        return 0;
+    }
+    case XIPFS_SYSCALL_SVC_NUMBER: {
+        xipfs_syscall_dispatcher(svc_args);
+        return 0;
+    }
+    default:
+        return -ENOTSUP;
     }
 }
 
