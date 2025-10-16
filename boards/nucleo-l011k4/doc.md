@@ -7,6 +7,9 @@
 The Nucleo-L011K4 is a board from ST's Nucleo family supporting ARM-Cortex-M0+
 STM32L011K4 microcontroller with 2KiB of RAM and 16KiB of Flash.
 
+You can find general information about the Nucleo32 boards on the
+@ref boards_common_nucleo32 page.
+
 ## Pinout
 
 @image html pinouts/nucleo-l432kc-and-more.svg "Pinout for the Nucleo-L011K4 (from STM user manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 32)" width=25%

@@ -7,6 +7,9 @@
 The Nucleo-G071RB is a board from ST's Nucleo family supporting a ARM
 Cortex-M0+ STM32G071RB microcontroller with 36KiB of RAM and 128KiB of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Pinout
 
 @image html pinouts/nucleo-g070rb-and-g071rb.svg "Pinout for the Nucleo-G071RG (from STM user manual UM2324, https://www.st.com/resource/en/user_manual/um2324-stm32-nucleo64-boards-mb1360-stmicroelectronics.pdf, page 34)" width=50%
@@ -31,17 +34,8 @@ Cortex-M0+ STM32G071RB microcontroller with 36KiB of RAM and 128KiB of Flash.
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0223-stm32-cortexm0-mcus-programming-manual-stmicroelectronics.pdf)|
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um2324-stm32-nucleo64-boards-mb1360-stmicroelectronics.pdf)|
 
-## Flashing the Board Using ST-LINK Removable Media
+## Flashing the Board
 
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-
-```
-make BOARD=nucleo-g071rb PROGRAMMER=cpy2remed flash
-```
-
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-G071RB is `nucleo-g071rb`.

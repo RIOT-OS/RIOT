@@ -8,6 +8,9 @@ The Nucleo-U575ZI-Q is a board from ST's Nucleo family supporting the ARM Cortex
 STM32U575ZIT6Q ultra-low-power microcontroller with TrustZone, 768KiB of RAM and 2MiB
 of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Hardware
 
 ![Nucleo144 U575ZI-Q](https://www.st.com/bin/ecommerce/api/image.PF271812.en.fea
@@ -33,23 +36,11 @@ ture-description-include-personalized-no-cpn-medium.jpg)
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0264-stm32-cortexm33-mcus-programming-manual-stmicroelectronics.pdf)|
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um2861-stm32u5-nucleo144-board-mb1549-stmicroelectronics.pdf)|
 
-## Flashing the device
+## Flashing the Board
 
-### Flashing the Board Using OpenOCD
-
-The ST Nucleo-U575ZI-Q board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD.
-
-Once OpenOCD is installed, you can flash the board simply by typing
-
-```
-make BOARD=nucleo-u575zi-q flash
-```
-
-and debug via GDB by simply typing
-```
-make BOARD=nucleo-u575zi-q debug
-```
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-U575ZI-Q is `nucleo-u575zi-q`.
 
 ## Accessing RIOT shell
 

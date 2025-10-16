@@ -4699,8 +4699,8 @@ warning: Member MODULE_PIN_P6 (macro definition) of file board_module.h is not d
 warning: Member MODULE_PIN_P7 (macro definition) of file board_module.h is not documented.
 warning: Member MODULE_PIN_P8 (macro definition) of file board_module.h is not documented.
 warning: Member MODULE_PIN_P9 (macro definition) of file board_module.h is not documented.
-warning: Member motor_driver_config[] (variable) of group boards_common_nucleo64 is not documented.
-warning: Member MOTOR_DRIVER_NUMOF (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member motor_driver_config[] (variable) of file board.h is not documented.
+warning: Member MOTOR_DRIVER_NUMOF (macro definition) of file board.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_ALT (macro definition) of file mpl3115a2_reg.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_OS_MASK (macro definition) of file mpl3115a2_reg.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_OS_SHIFT (macro definition) of file mpl3115a2_reg.h is not documented.
@@ -4871,17 +4871,17 @@ warning: Member MRF24J40_PACON2_TXONTS1 (macro definition) of file mrf24j40_regi
 warning: Member MRF24J40_PACON2_TXONTS2 (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_PACON2_TXONTS3 (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_PARAM_CS (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_CS (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_CS (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_INT (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_INT (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_INT (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_RESET (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_RESET (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_RESET (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAMS (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAMS (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAMS (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_SPI_CLK (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_SPI_CLK (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_SPI_CLK (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_SPI (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_SPI (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_SPI (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_REG_ACKTMOUT (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_REG_ASSOEADR0 (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_REG_ASSOEADR1 (macro definition) of file mrf24j40_registers.h is not documented.

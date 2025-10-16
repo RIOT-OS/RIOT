@@ -7,6 +7,9 @@
 The Nucleo-G431RB is a board from ST's Nucleo family supporting a ARM
 Cortex-M4 STM32G431RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Pinout
 
 @image html pinouts/nucleo-g431rb-and-more.svg "Pinout for the Nucleo-G431RB (from STM user manual UM2505, https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf, page 29)" width=50%
@@ -31,39 +34,8 @@ Cortex-M4 STM32G431RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0214-stm32-cortexm4-mcus-and-mpus-programming-manual-stmicroelectronics.pdf)|
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf)|
 
-## Flashing the device
+## Flashing the Board
 
-### Flashing the Board Using OpenOCD
-
-The ST Nucleo-G431RB board includes an on-board ST-LINK V3 programmer. The
-easiest way to program the board is to use OpenOCD. Once you have installed
-OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
-installation instructions), you can flash the board simply by typing
-
-```
-make BOARD=nucleo-g431rb flash
-```
-and debug via GDB by simply typing
-```
-make BOARD=nucleo-g431rb debug
-```
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-g431re PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
-
-## Supported Toolchains
-
-For using the ST Nucleo-G431RB board we recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-G431RB is `nucleo-g431rb`.
