@@ -1,0 +1,10 @@
+# sys/net/sock/tls/Makefile.dep
+
+ifneq (,$(filter sock_tls,$(USEMODULE)))
+  # Only generic dependencies:
+  USEMODULE += sock_tcp
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+
+endif
+
