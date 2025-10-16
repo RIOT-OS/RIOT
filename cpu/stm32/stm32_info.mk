@@ -39,7 +39,7 @@ else ifneq (,$(filter $(CPU_FAM),f3 f4 l4 mp1))
   CPU_CORE = cortex-m4f
 else ifneq (,$(filter $(CPU_FAM),g4 wb wl))
   CPU_CORE = cortex-m4
-else ifeq (,$(filter $(CPU_FAM),f7 h7))
+else ifneq (,$(filter $(CPU_FAM),f7 h7))
   CPU_CORE = cortex-m7
 else ifneq (,$(filter $(CPU_FAM),g0 l0 c0))
   CPU_CORE = cortex-m0plus

@@ -1,0 +1,414 @@
+# SPDX-FileCopyrightText: 2025 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+if CPU_FAM_H7
+
+menu "STM32H753 Clock Configuration"
+
+#----------------------
+# 1. Clock Source Selection
+#----------------------
+menu "Clock Source Configuration"
+
+choice
+    prompt "Select main clock source"
+    default USE_HSI_DIRECT
+    help
+      Only one main clock source can be active:
+      - HSI direct (no PLL)
+      - HSE direct (no PLL)
+      - CSI direct (no PLL)
+      - HSI + PLL
+      - CSI + PLL
+      - HSE + PLL
+
+config USE_HSI_DIRECT
+    bool "Use HSI direct (no PLL)"
+    help
+      Use HSI RC oscillator directly as SYSCLK.
+      SYSCLK = HSI / HSI_DIV.
+
+config USE_HSE_DIRECT
+    bool "Use HSE direct (no PLL)"
+    help
+      Use HSE RC oscillator directly as SYSCLK.
+      SYSCLK = HSE.
+
+config USE_CSI_DIRECT
+    bool "Use CSI direct (no PLL)"
+    help
+      Use CSI oscillator directly as SYSCLK.
+      SYSCLK = CSI.
+
+config USE_HSI_PLL
+    bool "Use HSI + PLL"
+    help
+      Use HSI RC as PLL input to generate SYSCLK.
+      SYSCLK = PLL1_P output.
+
+config USE_CSI_PLL
+    bool "Use CSI + PLL"
+    help
+        Use CSI as PLL input to generate SYSCLK.
+        SYSCLK = PLL1_P output.
+
+config USE_HSE_PLL
+    bool "Use HSE + PLL"
+    help
+      Use an external crystal (HSE) as PLL input to generate SYSCLK.
+      SYSCLK = PLL1_P output.
+endchoice
+
+#----------------------
+# HSI settings
+#----------------------
+config CLOCK_HSI
+    int "HSI frequency (MHz)"
+    default 64
+    help
+      Internal HSI RC frequency before divider (64 MHz).
+
+config CLOCK_HSI_DIV
+    int "HSI divider"
+    default 1
+    help
+      Divider applied to HSI before SYSCLK or PLL.
+
+#----------------------
+# HSE settings
+#----------------------
+config CLOCK_HSE
+    int "HSE frequency (MHz)"
+    default 8
+    depends on USE_HSE_DIRECT || USE_HSE_PLL
+    help
+      External crystal frequency in MHz.
+      Typical values: 8, 25.
+
+config CLOCK_HSE_MIN
+    int "HSE minimum frequency (MHz)"
+    default 4
+    depends on USE_HSE_DIRECT || USE_HSE_PLL
+    help
+      Minimum HSE frequency allowed.
+
+config CLOCK_HSE_MAX
+    int "HSE maximum frequency (MHz)"
+    default 50
+    depends on USE_HSE_DIRECT || USE_HSE_PLL
+    help
+      Maximum HSE frequency allowed.
+
+#----------------------
+# CSI clock
+#----------------------
+config CLOCK_CSI
+    int "CSI frequency (MHz)"
+    default 4
+    depends on USE_CSI_DIRECT || USE_CSI_PLL
+    help
+      Frequency of the CSI clock source in MHz.
+
+endmenu # Clock Source Selection
+
+
+#----------------------
+# 2. LSE / LSI clocks
+#----------------------
+menu "Configure LSI/LSE"
+
+config USE_LSE
+    bool "Enable LSE"
+    default n
+    help
+      Enable LSE oscillator.
+
+config CLOCK_LSE
+    int "LSE frequency (Hz)"
+    default 32768
+    depends on USE_LSE
+    help
+      External low-speed 32.768 kHz crystal for RTC.
+
+config USE_LSI
+    bool "Enable LSI"
+    default y
+    help
+      Enable LSI oscillator.
+
+config CLOCK_LSI
+    int "LSI frequency (Hz)"
+    default 32000
+    depends on USE_LSI
+    help
+      Internal low-speed RC oscillator (~32 kHz).
+
+endmenu     #  LSI/LSE
+
+#----------------------
+# 3. PLLx Setting
+#----------------------
+menu "Configure PLLx"
+    depends on USE_HSI_PLL || USE_HSE_PLL || USE_CSI_PLL
+
+menu "Set Parameters PLL1"
+
+config CLOCK_PLL1_M
+    int "PLL1 input divider M"
+    default 8
+    help
+      PLL1 input divider (M).
+
+config CLOCK_PLL1_N
+    int "PLL1 multiplier N"
+    default 120
+    help
+      PLL1 VCO multiplier (N).
+
+config CLOCK_PLL1_P
+    int "PLL1 output P divider"
+    default 2
+    help
+      PLL1_P output divider (SYSCLK).
+
+config CLOCK_PLL1_Q
+    int "PLL1 output Q divider"
+    default 20
+    help
+      PLL1_Q output divider (USB/SDMMC/RNG).
+
+config CLOCK_PLL1_R
+    int "PLL1 output R divider"
+    default 2
+    help
+      PLL1_R optional output divider (optional peripherals).
+
+endmenu     # PLL1
+
+#----------------------
+# PLL2 settings
+#----------------------
+menu "Set Parameters PLL2"
+
+config CLOCK_PLL2_M
+    int "PLL2 input divider M"
+    default 8
+    help
+      PLL2 input divider (M).
+
+config CLOCK_PLL2_N
+    int "PLL2 multiplier N"
+    default 120
+    help
+      PLL2 VCO multiplier (N).
+
+config CLOCK_PLL2_P
+    int "PLL2 output P divider"
+    default 2
+    help
+      PLL2_P output divider.
+
+config CLOCK_PLL2_Q
+    int "PLL2 output Q divider"
+    default 20
+    help
+      PLL2_Q output divider.
+
+config CLOCK_PLL2_R
+    int "PLL2 output R divider"
+    default 2
+    help
+      PLL2_R optional output divider.
+
+endmenu     # PLL2
+
+#----------------------
+# PLL3 settings
+#----------------------
+menu "Set Parameters PLL3"
+
+config CLOCK_PLL3_M
+    int "PLL3 input divider M"
+    default 8
+    help
+      PLL3 input divider (M).
+
+config CLOCK_PLL3_N
+    int "PLL3 multiplier N"
+    default 120
+    help
+      PLL3 VCO multiplier (N).
+
+config CLOCK_PLL3_P
+    int "PLL3 output P divider"
+    default 2
+    help
+      PLL3_P output divider.
+
+config CLOCK_PLL3_Q
+    int "PLL3 output Q divider"
+    default 20
+    help
+      PLL3_Q output divider.
+
+config CLOCK_PLL3_R
+    int "PLL3 output R divider"
+    default 2
+    help
+      PLL1_R optional output divider.
+
+endmenu     # PLL3
+
+endmenu     # Configure PLLx
+
+#----------------------------
+# 4. Core and bus prescalers
+#----------------------------
+menu "Core and Bus Prescalers"
+
+config CLOCK_CORECLOCK_DIV
+    int "Core clock divider"
+    default 1
+    help
+      Divider applied to SYSCLK to generate CPU core clock.
+
+config CLOCK_AHB_DIV
+    int "AHB prescaler"
+    default 2
+    help
+      Divide core clock for AHB bus.
+
+config CLOCK_APB1_DIV
+    int "APB1 prescaler"
+    default 2
+    help
+      Divide AHB clock for APB1 (max 120 MHz).
+
+config CLOCK_APB2_DIV
+    int "APB2 prescaler"
+    default 2
+    help
+      Divide AHB clock for APB2 (max 120 MHz).
+
+config CLOCK_APB3_DIV
+    int "APB3 prescaler"
+    default 2
+    help
+      Divide AHB clock for APB3 (max 120 MHz).
+
+config CLOCK_APB4_DIV
+    int "APB4 prescaler"
+    default 2
+    help
+      Divide AHB clock for APB4 (max 120 MHz).
+
+
+endmenu  # Core and Bus Prescalers
+
+#----------------------------
+# 5. MCO Configurator
+#----------------------------
+menu "MCO Configurator"
+
+menu "MCO1"
+
+config CLOCK_ENABLE_MCO1
+    bool "Enable MCO1"
+    default n
+    help
+        MCO1 as clock output for external devices.
+
+config CLOCK_MCO1_PRE
+    int "MCO1 prescaler"
+    default 1
+    help
+        Prescaler range 1 to 5.
+
+menu "MCO1 clock source"
+
+config CLOCK_MCO1_USE_PLL1_Q
+    bool "Use PLL1_Q as clock source"
+    default y
+    depends on CLOCK_ENABLE_MCO1
+    help
+        Default clock source for MCO1.
+
+config CLOCK_MCO1_USE_HSE
+    bool "Use HSE as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO1
+
+config CLOCK_MCO1_USE_HSI
+    bool "Use HSI as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO1
+
+config CLOCK_MCO1_USE_LSE
+    bool "Use LSE as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO1
+
+config CLOCK_MCO1_USE_HSI48
+    bool "Use HSI48 as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO1
+
+endmenu # MCO1 clock source
+endmenu # MCO1
+
+menu "MCO2"
+
+config CLOCK_ENABLE_MCO2
+    bool "Enable MCO2"
+    default n
+    help
+        MCO2 as clock output for external devices.
+
+config CLOCK_MCO2_PRE
+    int "MCO2 prescaler"
+    default 1
+    help
+        Prescaler range 1 to 5.
+
+menu "MCO2 clock source"
+
+config CLOCK_MCO2_USE_PLL1_P
+    bool "Use PLL1_P as clock source"
+    default y
+    depends on CLOCK_ENABLE_MCO2
+    help
+        Default clock source for MCO2.
+
+config CLOCK_MCO2_USE_PLL2_Q
+    bool "Use PLL2_Q as clock source"
+    default n
+    depends on CLOCK_ENABLE_MCO2
+
+config CLOCK_MCO2_USE_HSE
+    bool "Use HSE as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO2
+
+config CLOCK_MCO2_USE_LSI
+    bool "Use LSI as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO2
+
+config CLOCK_MCO2_USE_CSI
+    bool "Use CSI as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO2
+
+config CLOCK_MCO2_USE_SYSCLK
+    bool "Use HSI48 as clock source"
+    default N
+    depends on CLOCK_ENABLE_MCO2
+
+endmenu # MCO2 clock source
+endmenu # MCO2
+
+endmenu # MCO Configurator
+
+endmenu  # STM32H753 Clock Configuration
+
+endif # CPU_FAM_H7

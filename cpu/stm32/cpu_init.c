@@ -24,7 +24,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Oleg Artamonov <oleg@unwds.com>
  * @author      Francisco Molina <francisco.molina@inria.cl>
- *
  * @}
  */
 
@@ -44,6 +43,8 @@
 #define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
 #elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define BIT_APB_PWREN       RCC_APBENR1_PWREN
+#elif defined (CPU_FAM_STM32H7)
+#define BIT_APB_PWREN       RCC_APB1HENR_CRSEN
 #elif !defined(CPU_FAM_STM32MP1)
 #define BIT_APB_PWREN       RCC_APB1ENR_PWREN
 #endif

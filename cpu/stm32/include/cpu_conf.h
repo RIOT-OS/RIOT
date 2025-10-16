@@ -45,6 +45,9 @@
 #elif CPU_FAM_STM32G0
 #include "stm32g0xx.h"
 #include "irqs/g0/irqs.h"
+#elif CPU_FAM_STM32H7
+#include "stm32h7xx.h"
+#include "irqs/h7/irqs.h"
 #elif CPU_FAM_STM32C0
 #include "stm32c0xx.h"
 #include "irqs/c0/irqs.h"
@@ -113,6 +116,16 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (150U)
 #endif
 /** @} */
+
+/* Provide a CPU_IRQ_NUMOF for STM32H7 family ---
+ * The H7 family typically exposes up to 150 maskable interrupt lines
+ * (NVIC external interrupts). Defining this prevents undefined behavior
+ * where code expects CPU_IRQ_NUMOF to be present.
+ * NOTE: we only add this define; existing logic is left untouched.
+ */
+#if defined(CPU_FAM_STM32H7) && !defined(CPU_IRQ_NUMOF)
+#  define CPU_IRQ_NUMOF                   (150U)
+#endif
 
 /**
  * @brief   Flash page configuration
