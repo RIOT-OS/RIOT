@@ -6,6 +6,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+# shellcheck source=/dev/null
 . "$(dirname "$0")/../ci/github_annotate.sh"
 
 github_annotate_setup
@@ -13,7 +14,7 @@ github_annotate_setup
 MSG_MAX_LENGTH=50
 MSG_STRETCH_LENGTH=72
 
-if tput colors 2> /dev/null > /dev/null && [ $(tput colors) -ge 8 ]; then
+if tput colors 2> /dev/null > /dev/null && [ "$(tput colors)" -ge 8 ]; then
     CERROR1="\033[1;31m"
     CWARN1="\033[1;33m"
     CERROR2="\033[0;31m"
@@ -31,14 +32,14 @@ if [ -n "${BASH_VERSION}" ]; then
     # properly in _escape
     ECHO_ESC='echo -e'
 else
-    ECHO='echo'
+    ECHO_ESC='echo'
 fi
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
 BRANCH="${1}"
 if echo "${BRANCH}" | grep -q '^-'; then
-    if [ $(git rev-parse --abbrev-ref HEAD) != "master" ]; then
+    if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then
         BRANCH="master"
     else
         BRANCH=""
@@ -55,13 +56,13 @@ if [ -z "${BRANCH}" ]; then
 fi
 
 ERROR="$(git log \
-    --no-merges --pretty=format:'%s' $(git merge-base ${BRANCH} HEAD)..HEAD | \
-    while read msg; do
-        msg_length=$(echo "${msg}" | awk '{print length($0)}')
+    --no-merges --pretty=format:'%s' "$(git merge-base "${BRANCH}" HEAD)"..HEAD | \
+    while read -r msg; do
+        msg_length="$(echo "${msg}" | awk '{print length($0)}')"
 
-        if [ ${msg_length} -gt ${MSG_MAX_LENGTH} ]; then
+        if [ "${msg_length}" -gt "${MSG_MAX_LENGTH}" ]; then
             ERROR=0
-            if [ ${msg_length} -gt ${MSG_STRETCH_LENGTH} ]; then
+            if [ "${msg_length}" -gt "${MSG_STRETCH_LENGTH}" ]; then
                 MSG="Commit message is longer than ${MSG_STRETCH_LENGTH} characters:"
                 ERROR=1
                 echo "error"
