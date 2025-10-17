@@ -189,7 +189,7 @@ void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
     } else if (res == -EHOSTUNREACH) {
         otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NO_ACK);
     } else {
-        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_FAILED);
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_ABORT);
     }
 }
 #else
