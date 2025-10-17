@@ -120,6 +120,20 @@ void rtc_poweroff(void)
     _native_rtc_powered = 0;
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *ttime)
 {
     DEBUG_PUTS("rtc_set_time()");
@@ -151,6 +165,10 @@ int rtc_set_time(struct tm *ttime)
     clock_gettime(NATIVE_RTC_SOURCE, &tv);
     _native_syscall_leave();
 
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, &itime);
+
     _native_rtc_offset = tnew - tv.tv_sec;
 
     if (_native_rtc_alarm_callback) {
@@ -158,6 +176,7 @@ int rtc_set_time(struct tm *ttime)
                 _native_rtc_timer.arg);
     }
 
+    rtc_post_set_time(&old_time, &itime);
     return 0;
 }
 
