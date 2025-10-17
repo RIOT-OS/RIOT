@@ -1,0 +1,10 @@
+ifneq (,$(filter inc_encoder_hardware,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_qdec
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter inc_encoder_software,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += ztimer_usec
+endif

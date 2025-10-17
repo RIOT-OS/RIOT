@@ -28,6 +28,9 @@ endif
 ifneq (,$(filter bme680,$(DRIVERS)))
   USEMODULE += bme680_i2c
 endif
+ifneq (,$(filter inc_encoder,$(DRIVERS)))
+  USEMODULE += inc_encoder_software
+endif
 ifneq (,$(filter lm75,$(DRIVERS)))
   USEMODULE += tmp1075
 endif
