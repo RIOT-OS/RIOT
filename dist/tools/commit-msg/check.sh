@@ -62,10 +62,12 @@ fi
 ERROR="$(git log \
     --no-merges --pretty=format:'%s' "$(git merge-base "${BRANCH}" HEAD)"..HEAD | \
     while read -r msg; do
-        msg_length="$(echo "${msg}" | awk '{print length($0)}')"
+        ERROR=0
+        MSG=""
 
+        # Check if the message is too long.
+        msg_length="$(echo "${msg}" | awk '{print length($0)}')"
         if [ "${msg_length}" -gt "${MSG_MAX_LENGTH}" ]; then
-            ERROR=0
             if [ "${msg_length}" -gt "${MSG_STRETCH_LENGTH}" ]; then
                 MSG="Commit message is longer than ${MSG_STRETCH_LENGTH} characters:"
                 ERROR=1
@@ -74,6 +76,30 @@ ERROR="$(git log \
                 MSG="Commit message is longer than ${MSG_MAX_LENGTH}"
                 MSG="${MSG} (but < ${MSG_STRETCH_LENGTH}) characters:"
             fi
+        fi
+
+        # Check if the message has a no-merge keyword.
+        if keyword_match=$(printf '%s\n' "$msg" | grep -iFf "$NOMERGE_KEYWORD_FILE"); then
+            MSG="Commit message contains no-merge keyword: '$keyword_match'"
+            ERROR=1
+            echo "error"
+        fi
+
+        # Check if the message has a colon and if the first colon is followed
+        # by a space.
+        if echo "$msg" | grep -q ":"; then
+            if ! echo "$msg" | grep -Eq '^[^:]*: '; then
+                MSG="The colon after the area designation is not followed by"
+                MSG="${MSG} a space."
+            fi
+        else
+            MSG="The commit message is missing a colon after the area"
+            MSG="${MSG} designation."
+            ERROR=1
+            echo "error"
+        fi
+
+        if [ ! -z "${MSG}" ]; then
             if github_annotate_is_on; then
                 if [ ${ERROR} -eq 1 ]; then
                     github_annotate_error_no_file "${MSG} \"${msg}\""
@@ -85,23 +111,6 @@ ERROR="$(git log \
                     ${ECHO_ESC} "${CERROR1}Error:${CERROR2} ${MSG}${CRESET}" >&2
                 else
                     ${ECHO_ESC} "${CWARN1}Warning:${CWARN2} ${MSG}${CRESET}" >&2
-                fi
-                echo "    \"${msg}\"" >&2
-            fi
-            continue
-        fi
-
-        if keyword_match=$(printf '%s\n' "$msg" | grep -iFf "$NOMERGE_KEYWORD_FILE"); then
-            MSG="Commit message contains no-merge keyword: '$keyword_match'"
-            ERROR=1
-            echo "error"
-            if github_annotate_is_on; then
-                if [ ${ERROR} -eq 1 ]; then
-                    github_annotate_error_no_file "${MSG} \"${msg}\""
-                fi
-            else
-                if [ ${ERROR} -eq 1 ]; then
-                    ${ECHO_ESC} "${CERROR1}Error:${CERROR2} ${MSG}${CRESET}" >&2
                 fi
                 echo "    \"${msg}\"" >&2
             fi
