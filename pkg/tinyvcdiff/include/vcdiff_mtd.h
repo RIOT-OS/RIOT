@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @{
  *
@@ -14,9 +16,6 @@
  *
  * @author  Juergen Fitschen <me@jue.yt>
  */
-
-#ifndef VCDIFF_MTD_H
-#define VCDIFF_MTD_H
 
 #include "vcdiff.h"
 #include "mtd.h"
@@ -71,5 +70,4 @@ typedef struct {
 }
 #endif
 
-#endif /* VCDIFF_MTD_H */
 /** @} */

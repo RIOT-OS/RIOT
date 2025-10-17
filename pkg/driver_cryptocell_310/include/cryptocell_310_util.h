@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_driver_cryptocell_310
  * @{
@@ -16,8 +18,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-#ifndef CRYPTOCELL_310_UTIL_H
-#define CRYPTOCELL_310_UTIL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,5 +68,4 @@ void driver_cryptocell_310_terminate(void);
 }
 #endif
 
-#endif /* CRYPTOCELL_310_UTIL_H */
 /** @} */

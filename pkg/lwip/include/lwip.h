@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_lwip
  *
@@ -16,8 +18,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef LWIP_H
-#define LWIP_H
 
 #include "event.h"
 
@@ -42,5 +42,4 @@ void lwip_bootstrap(void);
 }
 #endif
 
-#endif /* LWIP_H */
 /** @} */

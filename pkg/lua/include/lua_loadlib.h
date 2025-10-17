@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup  pkg_lua
  * @{
@@ -14,9 +17,6 @@
  * @author  Juan Carrano <j.carrano@fu-berlin.de>
  *
  */
-
-#ifndef LUA_LOADLIB_H
-#define LUA_LOADLIB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +52,5 @@ int lua_riot_getloader(lua_State *L, const char *name);
 extern "C"
 }
 #endif
-
-#endif /* LUA_LOADLIB_H */
 
 /** @} */

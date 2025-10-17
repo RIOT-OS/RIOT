@@ -6,15 +6,14 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    nanocbor_config NanoCBOR configuration header
  * @ingroup     pkg_nanocbor
  * @ingroup     config
  * @brief       Provides compile-time configuration for nanocbor
  */
-
-#ifndef NANOCBOR_CONFIG_H
-#define NANOCBOR_CONFIG_H
 
 #include <stdint.h>
 
@@ -79,5 +78,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* NANOCBOR_CONFIG_H */

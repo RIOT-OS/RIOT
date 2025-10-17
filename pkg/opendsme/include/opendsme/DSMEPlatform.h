@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_opendsme_dsmeplatform DSME Platform interface implementation.
  * @ingroup     pkg_opendsme
@@ -18,9 +20,6 @@
  *
  * @author  José I. Álamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef OPENDSME_DSMEPLATFORM_H
-#define OPENDSME_DSMEPLATFORM_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -542,5 +541,4 @@ protected:
 }
 #endif
 
-#endif /* OPENDSME_DSMEPLATFORM_H */
 /** @} */
