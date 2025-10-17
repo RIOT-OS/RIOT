@@ -10,15 +10,16 @@ menu "Hall Effect RPM Driver"
     depends on USEMODULE_HALL_EFFECT
 
     config HALL_EFFECT_GEAR_RED_RATIO
-        int "gear reduction ratio"
+        int "gear reduction ratio (in tenths)"
         default 204
         help
-            Defines the gear reduction ratio.
+            Defines the gear reduction ratio. For example a gear reduction ratio
+            of 1:20.4 would result in a value of 204.
 
     config HALL_EFFECT_PPR
-        int "Pulses per rotation"
+        int "Pulses per revolution"
         default 13
         help
-            Number of high flanks per rotation.
+            Number of high flanks per revolution.
 
 endmenu # Hall Effect Driver

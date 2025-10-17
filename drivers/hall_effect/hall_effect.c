@@ -23,9 +23,11 @@
 #include "ztimer.h"
 #include "time_units.h"
 
+/* Prototypes */
+
 static void _pulse_callback(void *arg);
-static void read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter);
-static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool *clock_wise);
+static void _read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter);
+static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool *ccw);
 
 /* Public API */
 
@@ -39,7 +41,7 @@ int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params)
     }
 
     dev->delta_t = 0;
-    dev->clock_wise = false;
+    dev->ccw = false;
     dev->stale = false;
     dev->pulse_counter = 0;
     dev->last_read_time = ztimer_now(ZTIMER_USEC);
@@ -55,28 +57,28 @@ int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params)
 int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm)
 {
     uint32_t delta_t;
-    bool clock_wise;
-    if(!_read_delta_t_direction(dev, &delta_t, &clock_wise)) {
+    bool ccw;
+    if (!_read_delta_t_direction(dev, &delta_t, &ccw)) {
         *rpm = 0;
         return 0;
     }
 
-    /* delta_t represents the number of micro seconds since last readout.
-     * Invert and devide by the number of micro seconds per minute
+    /* delta_t represents the number of micro seconds since the last pulse.
+     * Invert and divide by the number of micro seconds per minute
      * to obtain the rpm. Apply scaling factors like gear reduction
-     * or pulses per rotation.
+     * or pulses per revolution.
      */
     *rpm = SEC_PER_MIN * US_PER_SEC * 10
            / (delta_t * CONFIG_HALL_EFFECT_PPR * CONFIG_HALL_EFFECT_GEAR_RED_RATIO);
-    if (!clock_wise) {
+    if (ccw) {
         *rpm *= -1;
     }
     return 0;
 }
 
-int hall_effect_read_reset_revolutions_hundreths(hall_effect_t *dev, int32_t *pulse_counter)
+int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter)
 {
-    read_reset_pulse_counter(dev, pulse_counter);
+    _read_reset_pulse_counter(dev, pulse_counter);
     *pulse_counter *= 1000;
     *pulse_counter /= CONFIG_HALL_EFFECT_PPR;
     *pulse_counter /= CONFIG_HALL_EFFECT_GEAR_RED_RATIO;
@@ -85,20 +87,28 @@ int hall_effect_read_reset_revolutions_hundreths(hall_effect_t *dev, int32_t *pu
 
 /* Private API */
 
+/* Triggered on the high flank of a pulse */
 static void _pulse_callback(void *arg)
 {
     hall_effect_t *dev = (hall_effect_t *) arg;
 
     uint32_t now = ztimer_now(ZTIMER_USEC);
 
-    dev->clock_wise = gpio_read(dev->params.direction);
-    dev->delta_t = now - dev->last_read_time;
+    /* Reading the shifted phase: low -> cw, high -> ccw */
+    dev->ccw = gpio_read(dev->params.direction);
+    if (now < dev->last_read_time) {
+        /* timer had an overflow */
+        dev->delta_t = UINT32_MAX - dev->last_read_time + now + 1;
+    } else {
+        dev->delta_t = now - dev->last_read_time;
+    }
     dev->last_read_time = now;
-    dev->pulse_counter += dev->clock_wise ? 1 : -1;
+    dev->pulse_counter += dev->ccw ? -1 : 1;
+    /* data is no longer stale */
     dev->stale= false;
 }
 
-static void read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter)
+static void _read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter)
 {
     int irq_state = irq_disable();
     *pulse_counter = dev->pulse_counter;
@@ -106,24 +116,33 @@ static void read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter)
     irq_restore(irq_state);
 }
 
-static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool *clock_wise)
+static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool *ccw)
 {
     int irq_state = irq_disable();
-    /* If the last data we read is stale we can just return false*/
+    /* There have been no pulses for a while -> rotation probably stopped. */
     if (dev->stale) {
         irq_restore(irq_state);
         return false;
     }
     uint32_t now = ztimer_now(ZTIMER_USEC);
-    if (now - dev->last_read_time >= dev->delta_t) {
-        /* we have been waiting for an update longer than the last delta t
-         * the rotation stopped we canmark the data as stale for optimizations */
-        *delta_t = now - dev->last_read_time;
+    uint32_t pulse_age;
+
+    if (now < dev->last_read_time) {
+        /* the timer had an overflow */
+        pulse_age = UINT32_MAX - dev->last_read_time + now + 1;
+    } else {
+        pulse_age = now - dev->last_read_time;
+    }
+    if (pulse_age >= dev->delta_t) {
+        /* Data is stale if the time elapsed since the last pulse
+         * is longer than delta_t */
+        *delta_t = pulse_age;
         dev->stale= true;
     } else {
         *delta_t = dev->delta_t;
     }
-    *clock_wise = dev->clock_wise;
+    *ccw = dev->ccw;
+
     irq_restore(irq_state);
     return true;
 }

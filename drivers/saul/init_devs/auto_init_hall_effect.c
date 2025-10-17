@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-
 /**
  * @ingroup     drivers_hall_effect
  * @{
@@ -26,7 +25,7 @@
 #define HALL_EFFECT_NUM    ARRAY_SIZE(hall_effect_params)
 
 /**
- * @brief Allocate memory for the device descriptors
+ * @brief Memory for the device descriptors
  */
 static hall_effect_t hall_effect_devs[HALL_EFFECT_NUM];
 

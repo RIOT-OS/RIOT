@@ -37,7 +37,7 @@ static int read_rpm(const void *dev, phydat_t *res) {
 static int read_reset_pulse_counter(const void *dev, phydat_t *res) {
     hall_effect_t *d = (hall_effect_t *)dev;
     int32_t counter;
-    if (hall_effect_read_reset_revolutions_hundreths(d, &counter)) {
+    if (hall_effect_read_reset_ceti_revs(d, &counter)) {
         /* Read failure */
         return -ECANCELED;
     }

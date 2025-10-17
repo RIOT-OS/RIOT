@@ -11,15 +11,21 @@
  * @brief       Generic hall effect sensor to measur rpm and rotation count.
  *
  * ## Description
- * This is a driver for a generic Hall effect sensor.
- * The sensor produces a fixed number of pulses per rotation on two output pins.
- * The phases are slightly offset, allowing the detection of rotation direction.
+ * This is a driver for a generic Hall effect sensor. These sensors are most often
+ * used with motors.
+ * The sensor generates a fixed number of pulses per rotation on two output pins.
+ * These signals are phase-shifted slightly, enabling the detection of rotation direction.
  *
- * This driver provides functions to read the current RPM
- * and the total number of rotations (in hundredths) since the last measurement.
+ * The driver provides functions to read the current RPM
+ * and the total number of revolutions (in hundredths) since the last measurement.
  *
  * Configuration options are available via Kconfig to specify
- * the number of pulses per rotation and the gear reduction ratio.
+ * the number of pulses per rotation and the gear reduction ratio (in tenths).
+ *
+ * @note After approximately 327 revolutions without reading and resetting
+ *       the revolution counter, the `phydat` value will overflow.
+ *       Use the regular driver interface instead of SAUL if necessary.
+ *
  * @{
  *
  * @file
@@ -37,20 +43,20 @@ extern "C" {
  * @brief Device initialization parameters
  */
 typedef struct {
-    gpio_t interrupt; /**< Interrupt pin */
-    gpio_t direction; /**< Pin used to determine the direction */
+    gpio_t interrupt; /**< Interrupt pin (first phase) */
+    gpio_t direction; /**< Pin used to determine the direction (shifted phase) */
 } hall_effect_params_t;
 
 /**
  * @brief Device descriptor for the driver
  */
 typedef struct {
-    hall_effect_params_t params;         /**< configuration parameters */
-    uint32_t             delta_t;        /**< time delta since the last read */
-    int32_t              pulse_counter;  /**< number of pulses since last read */
-    uint32_t             last_read_time; /**< time of the last read */
-    bool                 clock_wise;     /**< was the rotation clock wise */
-    bool                 stale;          /**< if data is stale we can just return 0 rpm */
+    hall_effect_params_t params;          /**< configuration parameters */
+    uint32_t             delta_t;         /**< time delta since the last read */
+    int32_t              pulse_counter;   /**< number of pulses since last read */
+    uint32_t             last_read_time;  /**< time of the last read */
+    bool                 ccw;             /**< counter clock wise rotation */
+    bool                 stale;           /**< indicates that there is no new data to be read */
 } hall_effect_t;
 
 /**
@@ -76,15 +82,15 @@ int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params);
 int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm);
 
 /**
- * @brief        Read number of revolutions since the last read in hundredths.
+ * @brief        Read and reset number of revolutions since the last readout in hundredths.
  *
  * @param[in]    dev        Device descriptor of hall effect sensor
- * @param[out]   rpm        Number of rotation since the last read in hundredths.
- *                          Negative rotation means counter clock wise rotation.
+ * @param[out]   rpm        Number of revolutions since the last read in hundredths.
+ *                          Negative revolutions signal counter clock wise rotations.
  *
  * @return       0          on success
  */
-int hall_effect_read_reset_revolutions_hundreths(hall_effect_t *dev, int32_t *pulse_counter);
+int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter);
 
 #ifdef __cplusplus
 }

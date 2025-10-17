@@ -73,7 +73,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Hall effect sensor configuraiton
+ * @brief Hall effect sensor configuration
  */
 static const hall_effect_params_t hall_effect_params[] =
 {

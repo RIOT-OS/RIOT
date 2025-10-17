@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-
 /**
  * @ingroup tests
  * @{
@@ -43,7 +42,7 @@ int main(void)
         int32_t rpm;
         int32_t pulses;
         if (hall_effect_read_rpm(&dev, &rpm)
-			|| hall_effect_read_pulse_counter_hundreths(&dev, &pulses)) {
+            || hall_effect_read_reset_ceti_revs(&dev, &pulses)) {
             puts("[Failed]");
             return 1;
         }
