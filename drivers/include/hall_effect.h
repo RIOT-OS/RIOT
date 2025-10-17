@@ -16,6 +16,20 @@
  * The sensor generates a fixed number of pulses per rotation on two output pins.
  * These signals are phase-shifted slightly, enabling the detection of rotation direction.
  *
+ * These encoders typically have four wires:
+ *  - GNR (Ground)
+ *  - VCC (Power)
+ *  - Phase A
+ *  - Phase B
+ *
+ * Phase A should be connected to the pin configured as the interrupt pin,
+ * while Phase B (the shifted signal) should be connected to the direction pin.
+ *
+ * If the Phase A and Phase B connections are swapped, the detected rotation direction will be reversed.
+ * When only Phase A is connected, the encoder will still report movement,
+ * but there will be no distinction between counter clock wise and clock wise rotation.
+ * An example for such an encoder can be found [here](https://www.dfrobot.com/product-1617.html)
+ *
  * The driver provides functions to read the current RPM
  * and the total number of revolutions (in hundredths) since the last measurement.
  *
