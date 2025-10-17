@@ -47,7 +47,7 @@ int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params)
 
     dev->delta_t = 0;
     dev->ccw = false;
-    dev->stale = false;
+    dev->stale = true;
     dev->pulse_counter = 0;
     dev->last_read_time = ztimer_now(ZTIMER_USEC);
 
@@ -68,9 +68,9 @@ int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm)
         return 0;
     }
 
-    /* delta_t represents the number of micro seconds since the last pulse.
+    /* delta_t represents the number of microseconds since the last pulse.
      * Invert and divide by the number of micro seconds per minute
-     * to obtain the rpm. Apply scaling factors like gear reduction
+     * to obtain the RPM. Apply scaling factors like gear reduction
      * or pulses per revolution.
      */
     *rpm = SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE
@@ -92,7 +92,7 @@ int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter)
 
 /* Private API */
 
-/* Triggered on the high flank of a pulse */
+/* Triggered on the rising edge of a pulse */
 static void _pulse_callback(void *arg)
 {
     hall_effect_t *dev = (hall_effect_t *) arg;
@@ -104,7 +104,8 @@ static void _pulse_callback(void *arg)
     if (now < dev->last_read_time) {
         /* timer had an overflow */
         dev->delta_t = UINT32_MAX - dev->last_read_time + now + 1;
-    } else {
+    }
+    else {
         dev->delta_t = now - dev->last_read_time;
     }
     dev->last_read_time = now;
@@ -135,7 +136,8 @@ static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool 
     if (now < dev->last_read_time) {
         /* the timer had an overflow */
         pulse_age = UINT32_MAX - dev->last_read_time + now + 1;
-    } else {
+    }
+    else {
         pulse_age = now - dev->last_read_time;
     }
     if (pulse_age >= dev->delta_t) {
@@ -143,7 +145,8 @@ static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool 
          * is longer than delta_t */
         *delta_t = pulse_age;
         dev->stale= true;
-    } else {
+    }
+    else {
         *delta_t = dev->delta_t;
     }
     *ccw = dev->ccw;

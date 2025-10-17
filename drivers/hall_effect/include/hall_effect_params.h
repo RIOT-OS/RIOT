@@ -65,7 +65,7 @@ extern "C" {
 /**@}*/
 
 /**
- * @brief SAUL info for the rpm and pulse count driver
+ * @brief SAUL info for the RPM and pulse count driver
  */
 #ifndef HALL_EFFECT_SAUL_INFO
 #  define HALL_EFFECT_SAUL_INFO { { .name = "Hall Effect RPM Sensor" }, \

@@ -8,7 +8,7 @@
 /**
  * @defgroup    drivers_hall_effect Generic Hall Effect Sensor
  * @ingroup     drivers_sensors
- * @brief       Generic hall effect sensor to measur rpm and rotation count.
+ * @brief       Generic hall effect sensor to measur RPM and rotation count.
  *
  * ## Description
  * This is a driver for a generic Hall effect sensor. These sensors are most often
@@ -33,7 +33,10 @@
  * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  */
 
+#include <stdint.h>
+
 #include "periph/gpio.h"
+#include "irq.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,11 +74,11 @@ typedef struct {
 int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params);
 
 /**
- * @brief        Read the current rpm of the motor.
+ * @brief        Read the current RPM of the motor.
  *
  * @param[in]    dev        Device descriptor of hall effect sensor
  * @param[out]   rpm        Revolutions per minute.
- *                          Negative rpm responds to counter clock wise rotation.
+ *                          Negative RPM responds to counter clock wise rotation.
  *
  * @return       0          on success
  */

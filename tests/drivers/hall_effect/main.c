@@ -16,6 +16,7 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "hall_effect.h"
 #include "hall_effect_params.h"
@@ -26,9 +27,6 @@ static hall_effect_t dev;
 int main(void)
 {
     puts("Generic hall effect sensor test application\n");
-    printf("Initializing hall effect sensor with the interrupt pin at "
-           "GPIO_%d and the direction pin at GPIO_%d...\n",
-           HALL_EFFECT_INTERRUPT, HALL_EFFECT_DIRECTION);
     if (hall_effect_init(&dev, &hall_effect_params[0]) == 0) {
         puts("[OK]\n");
     }
@@ -46,7 +44,7 @@ int main(void)
             puts("[Failed]");
             return 1;
         }
-        printf("SENSOR DATA:\n\tRPM: %ld\n\tPULSES: %ld\n", rpm, pulses);
+        printf("SENSOR DATA:\n\tRPM: %ld\n\tPULSES: %ld\n", (long) rpm, (long) pulses);
         ztimer_sleep(ZTIMER_SEC, 1);
     }
 }
