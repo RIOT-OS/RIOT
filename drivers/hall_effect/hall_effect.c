@@ -23,6 +23,11 @@
 #include "ztimer.h"
 #include "time_units.h"
 
+/**
+ * @brief Scaling factor to apply to adjust for the gear reduction ratio being in tenths.
+ */
+#define GEAR_RED_RATIO_SCALE 10
+
 /* Prototypes */
 
 static void _pulse_callback(void *arg);
@@ -68,7 +73,7 @@ int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm)
      * to obtain the rpm. Apply scaling factors like gear reduction
      * or pulses per revolution.
      */
-    *rpm = SEC_PER_MIN * US_PER_SEC * 10
+    *rpm = SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE
            / (delta_t * CONFIG_HALL_EFFECT_PPR * CONFIG_HALL_EFFECT_GEAR_RED_RATIO);
     if (ccw) {
         *rpm *= -1;
@@ -79,7 +84,7 @@ int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm)
 int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter)
 {
     _read_reset_pulse_counter(dev, pulse_counter);
-    *pulse_counter *= 1000;
+    *pulse_counter *= 100 * GEAR_RED_RATIO_SCALE;
     *pulse_counter /= CONFIG_HALL_EFFECT_PPR;
     *pulse_counter /= CONFIG_HALL_EFFECT_GEAR_RED_RATIO;
     return 0;
