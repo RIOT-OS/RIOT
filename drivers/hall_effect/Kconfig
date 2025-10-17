@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2025 TU Dresden
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config MODULE_HALL_EFFECT
+    bool "Hall Effect RPM Sensor"
+    depends on TEST_KCONFIG
+
+
+menu "Hall Effect RPM Driver"
+    depends on USEMODULE_HALL_EFFECT
+
+    config HALL_EFFECT_GEAR_RED_RATIO
+        int "gear reduction ratio"
+        default 204
+        help
+            Defines the gear reduction ratio.
+
+    config HALL_EFFECT_PPR
+        int "Pulses per rotation"
+        default 13
+        help
+            Number of high flanks per rotation.
+
+endmenu # Hall Effect Driver

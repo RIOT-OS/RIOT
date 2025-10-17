@@ -14,6 +14,8 @@ USEMODULE += shell_cmds_default
 # additional modules for debugging:
 USEMODULE += ps
 
+USEMODULE += hall_effect
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
