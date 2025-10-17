@@ -13,6 +13,10 @@ github_annotate_setup
 MSG_MAX_LENGTH=50
 MSG_STRETCH_LENGTH=72
 
+# Keywords that should trigger the commit message check and prevent an accidental
+# merge of something not meant to be merged.
+NOMERGE_KEYWORD_FILE="$(dirname "$0")/nomerge_keywords"
+
 if tput colors 2> /dev/null > /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR1="\033[1;31m"
     CWARN1="\033[1;33m"
@@ -80,6 +84,23 @@ ERROR="$(git log \
                     ${ECHO_ESC} "${CERROR1}Error:${CERROR2} ${MSG}${CRESET}" >&2
                 else
                     ${ECHO_ESC} "${CWARN1}Warning:${CWARN2} ${MSG}${CRESET}" >&2
+                fi
+                echo "    \"${msg}\"" >&2
+            fi
+            continue
+        fi
+
+        if keyword_match=$(printf '%s\n' "$msg" | grep -iFf "$NOMERGE_KEYWORD_FILE"); then
+            MSG="Commit message contains no-merge keyword: '$keyword_match'"
+            ERROR=1
+            echo "error"
+            if github_annotate_is_on; then
+                if [ ${ERROR} -eq 1 ]; then
+                    github_annotate_error_no_file "${MSG} \"${msg}\""
+                fi
+            else
+                if [ ${ERROR} -eq 1 ]; then
+                    ${ECHO_ESC} "${CERROR1}Error:${CERROR2} ${MSG}${CRESET}" >&2
                 fi
                 echo "    \"${msg}\"" >&2
             fi
