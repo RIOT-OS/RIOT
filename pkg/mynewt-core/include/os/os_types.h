@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef OS_OS_TYPES_H
-#define OS_OS_TYPES_H
 
 #include <stdint.h>
 
@@ -55,5 +54,3 @@ typedef char os_stack_t;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OS_OS_TYPES_H */

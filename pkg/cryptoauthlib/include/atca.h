@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_cryptoauthlib
  * @{
@@ -16,9 +18,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef ATCA_H
-#define ATCA_H
 
 #include "periph/i2c.h"
 #include "cryptoauthlib.h"
@@ -74,5 +73,4 @@ typedef struct {
 }
 #endif
 
-#endif /* ATCA_H */
 /** @} */

@@ -6,6 +6,8 @@
 * directory for more details.
 */
 
+#pragma once
+
 /**
 * @ingroup     pkg_etl
 * @brief
@@ -18,8 +20,6 @@
 *              This is configured by compiler defines the in Makefile.include
 * @author      Jens Wetterich <jens@wetterich-net.de>
 */
-#ifndef ETL_PROFILE_H
-#define ETL_PROFILE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,5 +50,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ETL_PROFILE_H */
 /** @} */

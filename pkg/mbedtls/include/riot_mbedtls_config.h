@@ -28,8 +28,7 @@
  *  limitations under the License.
  */
 
-#ifndef RIOT_MBEDTLS_CONFIG_H
-#define RIOT_MBEDTLS_CONFIG_H
+#pragma once
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
 #define _CRT_SECURE_NO_DEPRECATE 1
@@ -235,5 +234,4 @@ extern "C" {
 }
 #endif
 
-#endif /* RIOT_MBEDTLS_CONFIG_H */
 /** @} */

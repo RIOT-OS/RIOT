@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mbedtls
  *
@@ -15,9 +17,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
  */
-
-#ifndef SHA256_ALT_H
-#define SHA256_ALT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,4 +43,3 @@ typedef struct {
 }
 #endif
 /** @} */
-#endif /* SHA256_ALT_H */

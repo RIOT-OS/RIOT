@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_nimble_rpble
  *
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_RPBLE_PARAMS_H
-#define NIMBLE_RPBLE_PARAMS_H
 
 #include "nimble_rpble.h"
 
@@ -103,5 +102,4 @@ static const nimble_rpble_cfg_t nimble_rpble_params = NIMBLE_RPBLE_PARAMS;
 }
 #endif
 
-#endif /* NIMBLE_RPBLE_PARAMS_H */
 /** @} */

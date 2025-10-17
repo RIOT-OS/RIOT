@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_tinyusb_dfu
  * @{
@@ -14,9 +16,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef TINYUSB_DFU_H
-#define TINYUSB_DFU_H
 
 #include "riotboot/flashwrite.h"
 
@@ -44,5 +43,4 @@ void tinyusb_dfu_init(void);
 }
 #endif
 
-#endif /* TINYUSB_DFU_H */
 /** @} */

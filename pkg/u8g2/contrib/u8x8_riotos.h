@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_u8g2
  * @{
@@ -18,9 +20,6 @@
  *
  * @}
  */
-
-#ifndef U8X8_RIOTOS_H
-#define U8X8_RIOTOS_H
 
 #include "u8x8.h"
 
@@ -66,5 +65,3 @@ uint8_t u8x8_byte_hw_i2c_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* U8X8_RIOTOS_H */

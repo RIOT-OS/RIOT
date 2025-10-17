@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_dw1000
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef HAL_HAL_SPI_H
-#define HAL_HAL_SPI_H
 
 #include "periph/spi.h"
 
@@ -165,5 +164,3 @@ int hal_spi_txrx_noblock(int spi_num, void *txbuf, void *rxbuf, int cnt);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* HAL_HAL_SPI_H */
