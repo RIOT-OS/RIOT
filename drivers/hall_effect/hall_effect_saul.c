@@ -21,7 +21,8 @@
 #include "saul.h"
 #include "hall_effect.h"
 
-static int read_rpm(const void *dev, phydat_t *res) {
+static int read_rpm(const void *dev, phydat_t *res)
+{
     hall_effect_t *d = (hall_effect_t *) dev;
     int32_t rpm;
     if (hall_effect_read_rpm(d, &rpm)) {
@@ -34,7 +35,8 @@ static int read_rpm(const void *dev, phydat_t *res) {
     return 1;
 }
 
-static int read_reset_pulse_counter(const void *dev, phydat_t *res) {
+static int read_reset_pulse_counter(const void *dev, phydat_t *res)
+{
     hall_effect_t *d = (hall_effect_t *)dev;
     int32_t counter;
     if (hall_effect_read_reset_ceti_revs(d, &counter)) {

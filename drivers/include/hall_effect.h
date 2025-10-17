@@ -65,33 +65,33 @@ typedef struct {
 /**
  * @brief        Initialize the given device
  *
- * @param[inout] dev        Device descriptor of hall effect sensor
- * @param[in]    params     Initialization parameters
+ * @param[inout] dev            Device descriptor of hall effect sensor
+ * @param[in]    params         Initialization parameters
  *
- * @retval       0          on success
- * @retval       -EIO       on failure setting up the pins
+ * @retval       0              on success
+ * @retval       -EIO           on failure setting up the pins
  */
 int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params);
 
 /**
  * @brief        Read the current RPM of the motor.
  *
- * @param[in]    dev        Device descriptor of hall effect sensor
- * @param[out]   rpm        Revolutions per minute.
- *                          Negative RPM responds to counter clock wise rotation.
+ * @param[in]    dev            Device descriptor of hall effect sensor
+ * @param[out]   rpm            Revolutions per minute.
+ *                              Negative RPM responds to counter clock wise rotation.
  *
- * @return       0          on success
+ * @return       0              on success
  */
 int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm);
 
 /**
  * @brief        Read and reset number of revolutions since the last readout in hundredths.
  *
- * @param[in]    dev        Device descriptor of hall effect sensor
- * @param[out]   rpm        Number of revolutions since the last read in hundredths.
- *                          Negative revolutions signal counter clock wise rotations.
+ * @param[in]    dev            Device descriptor of hall effect sensor
+ * @param[out]   pulse_counter  Number of revolutions since the last read in hundredths.
+ *                              Negative revolutions signal counter clock wise rotations.
  *
- * @return       0          on success
+ * @return       0              on success
  */
 int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter);
 
