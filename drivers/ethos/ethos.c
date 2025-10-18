@@ -278,14 +278,14 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    ethos_t * dev = (ethos_t *) netdev;
-    (void)dev;
+    ethos_t * dev = container_of(netdev, ethos_t, netdev);
 
     /* count total packet length */
     size_t pktlen = iolist_count_total(iolist);
 
     /* lock line in order to prevent multiple writes */
     mutex_lock(&dev->out_mutex);
+    dev->tx_result = -EAGAIN;
 
     /* send start-frame-delimiter */
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
@@ -302,9 +302,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     uart_write(dev->uart, &frame_delim, 1);
 
+    dev->tx_result = (int)pktlen;
     mutex_unlock(&dev->out_mutex);
 
-    return pktlen;
+    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    return 0;
 }
 
 static void _get_mac_addr(netdev_t *encdev, uint8_t* buf)
@@ -356,8 +358,8 @@ unsigned ethos_unstuff_readbyte(uint8_t *buf, uint8_t byte, bool *escaped, uint8
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
 {
-    (void) info;
-    ethos_t * dev = (ethos_t *) netdev;
+    (void)info;
+    ethos_t * dev = container_of(netdev, ethos_t, netdev);
     int res = 0;
 
     if (buf) {
@@ -417,7 +419,10 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
             res = (int)tsrb_avail(&dev->inbuf);
         }
     }
-    return res;
+
+    dev->tx_result = res;
+    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    return 0;
 }
 
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
@@ -442,11 +447,11 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     return res;
 }
 
-static int _confirm_send(netdev_t *dev, void *info)
+static int _confirm_send(netdev_t *netdev, void *info)
 {
-    (void)dev;
     (void)info;
-    return -EOPNOTSUPP;
+    ethos_t * dev = container_of(netdev, ethos_t, netdev);
+    return dev->tx_result;
 }
 
 /* netdev interface */
