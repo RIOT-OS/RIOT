@@ -1,0 +1,153 @@
+From 96c6236beca93c4e59c67fae3f760cd5e675fe05 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Thu, 16 Oct 2025 17:13:00 +0200
+Subject: [PATCH 2/2] RIOT specific changes
+
+---
+ mdk/nrf52.h                | 2 +-
+ mdk/nrf52805.h             | 2 +-
+ mdk/nrf52810.h             | 3 ++-
+ mdk/nrf52811.h             | 2 +-
+ mdk/nrf52820.h             | 2 +-
+ mdk/nrf52832_peripherals.h | 8 ++++----
+ mdk/nrf52833.h             | 2 +-
+ mdk/nrf52840.h             | 3 ++-
+ 8 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/mdk/nrf52.h b/mdk/nrf52.h
+index 8f0ee64..6de6308 100644
+--- a/mdk/nrf52.h
++++ b/mdk/nrf52.h
+@@ -142,7 +142,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52.h"                       /*!< nrf52 System                                                              */
++/*#include "system_nrf52.h"*/                       /*!< nrf52 System                                                              */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+diff --git a/mdk/nrf52805.h b/mdk/nrf52805.h
+index 6de19ae..c9c7ae9 100644
+--- a/mdk/nrf52805.h
++++ b/mdk/nrf52805.h
+@@ -129,7 +129,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52805.h"                    /*!< nrf52805 System                                                           */
++/*#include "system_nrf52805.h"*/                    /*!< nrf52805 System                                                           */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+diff --git a/mdk/nrf52810.h b/mdk/nrf52810.h
+index ccdb0da..c3e053b 100644
+--- a/mdk/nrf52810.h
++++ b/mdk/nrf52810.h
+@@ -57,6 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.\n
+ extern "C" {
+ #endif
+
++#include "vendor/nrf52810_name_change.h"
+
+ /** @addtogroup Configuration_of_CMSIS
+   * @{
+@@ -132,7 +133,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52810.h"                    /*!< nrf52810 System                                                           */
++/*#include "system_nrf52810.h"*/                    /*!< nrf52810 System                                                           */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+diff --git a/mdk/nrf52811.h b/mdk/nrf52811.h
+index cbc77d0..3eb547b 100644
+--- a/mdk/nrf52811.h
++++ b/mdk/nrf52811.h
+@@ -132,7 +132,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52811.h"                    /*!< nrf52811 System                                                           */
++/*#include "system_nrf52811.h"*/                    /*!< nrf52811 System                                                           */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+diff --git a/mdk/nrf52820.h b/mdk/nrf52820.h
+index 99d8ec6..b1e7b77 100644
+--- a/mdk/nrf52820.h
++++ b/mdk/nrf52820.h
+@@ -131,7 +131,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52820.h"                    /*!< nrf52820 System                                                           */
++/*#include "system_nrf52820.h"*/                    /*!< nrf52820 System                                                           */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+diff --git a/mdk/nrf52832_peripherals.h b/mdk/nrf52832_peripherals.h
+index 814b468..4d5d386 100644
+--- a/mdk/nrf52832_peripherals.h
++++ b/mdk/nrf52832_peripherals.h
+@@ -45,9 +45,9 @@ POSSIBILITY OF SUCH DAMAGE.
+ #define POWER_COUNT 1
+
+ #define POWER_FEATURE_RAM_REGISTERS_PRESENT
+-#if defined(NRF52832_XXAA)
++#if defined(CPU_MODEL_NRF52832XXAA)
+     #define POWER_FEATURE_RAM_REGISTERS_COUNT 8
+-#elif defined(NRF52832_XXAB)
++#elif defined(CPU_MODEL_NRF52832XXAB)
+     #define POWER_FEATURE_RAM_REGISTERS_COUNT 4
+ #endif
+
+@@ -86,9 +86,9 @@ POSSIBILITY OF SUCH DAMAGE.
+
+ #define BPROT_REGIONS_SIZE 4096
+
+-#if defined(NRF52832_XXAA)
++#if defined(CPU_MODEL_NRF52832XXAA)
+     #define BPROT_REGIONS_NUM 128
+-#elif defined(NRF52832_XXAB)
++#elif defined(CPU_MODEL_NRF52832XXAB)
+     #define BPROT_REGIONS_NUM 64
+ #endif
+
+diff --git a/mdk/nrf52833.h b/mdk/nrf52833.h
+index b43f551..f2b74eb 100644
+--- a/mdk/nrf52833.h
++++ b/mdk/nrf52833.h
+@@ -146,7 +146,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52833.h"                    /*!< nrf52833 System                                                           */
++/*#include "system_nrf52833.h"*/                    /*!< nrf52833 System                                                           */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+diff --git a/mdk/nrf52840.h b/mdk/nrf52840.h
+index 778cc7d..b6a6929 100644
+--- a/mdk/nrf52840.h
++++ b/mdk/nrf52840.h
+@@ -57,6 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
+ extern "C" {
+ #endif
+
++#include "vendor/nrf52840_name_change.h"
+
+ /** @addtogroup Configuration_of_CMSIS
+   * @{
+@@ -149,7 +150,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm4.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
+-#include "system_nrf52840.h"                    /*!< nrf52840 System                                                           */
++/*#include "system_nrf52840.h"*/                    /*!< nrf52840 System                                                           */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+--
+2.43.0
