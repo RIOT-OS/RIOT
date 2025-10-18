@@ -515,6 +515,7 @@ int accept(int socket, struct sockaddr *restrict address,
     switch (s->type) {
     case SOCK_STREAM:
         new_s = _get_free_socket();
+        mutex_unlock(&_socket_pool_mutex);
         if (new_s == NULL) {
             errno = ENFILE;
             res = -1;
