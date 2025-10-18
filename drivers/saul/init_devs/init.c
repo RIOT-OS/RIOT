@@ -123,6 +123,10 @@ void saul_init_devs(void)
         extern void auto_init_grove_ledbar(void);
         auto_init_grove_ledbar();
     }
+    if (IS_USED(MODULE_HALL_EFFECT)) {
+        extern void auto_init_hall_effect(void);
+        auto_init_hall_effect();
+    }
     if (IS_USED(MODULE_HMC5883L)) {
         extern void auto_init_hmc5883l(void);
         auto_init_hmc5883l();
