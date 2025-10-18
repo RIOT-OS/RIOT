@@ -27,7 +27,10 @@ uint16_t dac_util_map(int value, int min, int max)
     return (uint16_t)(((value - min) * UINT16_MAX) / (max - min));
 }
 
+/* only provide dac_util_mapf when floating point arithmetic is available */
+#if MODULE_FLOAT_MATH
 uint16_t dac_util_mapf(float value, float min, float max)
 {
     return (uint16_t)(((value - min) * UINT16_MAX) / (max - min));
 }
+#endif
