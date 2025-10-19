@@ -220,7 +220,6 @@ static ssize_t _dtls_authenticate(const sock_udp_ep_t* remote, sock_dtls_session
 int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
                                  const sock_udp_ep_t* local, sock_dtls_session_t* session)
 {
-    assert(session);
     assert(remote);
     ssize_t res = 0;
 
