@@ -125,7 +125,7 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint)
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
         return sock_udp_ep_is_multicast(&endpoint->udp_ep);
 #else
-        UNICOAP_DEBUG("CoAP over UDP and DTLS drivers are missing, cannot check if multicast addr\n");
+        UNICOAP_DEBUG("sock support is missing, cannot check if multicast addr, driver missing?\n");
         return false;
 #endif
     /* MARK: unicoap_driver_extension_point */
