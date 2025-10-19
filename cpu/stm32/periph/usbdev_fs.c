@@ -354,6 +354,7 @@ static void _usbdev_init(usbdev_t *dev)
     /* Block STOP/STANDBY */
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
+    pm_block(STM32_PM_IDLE);
 
 #if defined(RCC_CFGR_USBPRE)
     /* If `RCC_CFGR_USBPRE` is defined, the USB device FS clock of 48 MHz is
