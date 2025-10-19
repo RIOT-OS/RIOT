@@ -25,8 +25,26 @@
 #include "debug.h"
 #include "private.h"
 
+
+/** @brief Returns new length of path excluding trailing slashes */
+static inline size_t _trim_trailing_slashes(const char* path, size_t length) {
+    if (length > 0) {
+        size_t i = length - 1;
+        while (i > 0) {
+            if (path[i] == '/') {
+                i -= 1;
+            } else {
+                break;
+            }
+        }
+        return i + 1;
+    } else {
+        return length;
+    }
+}
+
 bool unicoap_resource_match_path_string(const unicoap_resource_t* resource,
-                                        const char* lhs_path, size_t lhs_length)
+                                        const char* lhs_path, size_t _lhs_length)
 {
     assert(resource);
     assert(lhs_path);
@@ -34,20 +52,43 @@ bool unicoap_resource_match_path_string(const unicoap_resource_t* resource,
     /* We are comparing the left-hand side (path from request) to the right-hand side (resource). */
 
     size_t rhs_length = strlen(resource->path);
+    assert(rhs_length > 0);
+    size_t lhs_length = _trim_trailing_slashes(lhs_path, _lhs_length);
 
     if (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
         /* The actual path (LHS) length may be longer. If it is shorter, bail out. */
         if (lhs_length < rhs_length) {
             return false;
         }
+
+        /* The actual path (LHS) is now either as long or longer. If it is longer, then we
+         * expect a slash to indicate a subtree. Either the RHS path already ends with a slash
+         * or the LHS has a slash that succeeds the last RHS character.
+         *
+         * Examples:
+         *
+         * LHS: /a   -> RHS ends in slash, every path that is longer than RHS is a subpath
+         * RHS: /
+         *
+         * LHS: /a/a -> RHS ends in slash, every path that is longer than RHS is a subpath
+         * RHS: /a/
+         *
+         * LHS: /a/a -> RHS does not end in slash, so we need to require one to indicate subpath
+         * RHS: /a
+         */
+        if (lhs_length > rhs_length && !(lhs_path[rhs_length] == '/' || resource->path[rhs_length - 1] == '/'))  {
+            return false;
+        }
+
+        return strncmp(lhs_path, resource->path, rhs_length) == 0; /* RHS is null-terminated */
     } else {
         /* The actual path (LHS) length must match. If it is unequal, bail out. */
         if (lhs_length != rhs_length) {
             return false;
         }
-    }
 
-    return strncmp(lhs_path, resource->path, lhs_length) == 0; /* rhs is null-terminated */
+        return strncmp(lhs_path, resource->path, lhs_length) == 0; /* RHS is null-terminated */
+    }
 }
 
 bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
@@ -63,38 +104,64 @@ bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
 
     char* cursor = (char*)resource->path;
     const char* end = resource->path + strlen(resource->path);
+
+    /* Skip multiple successive slashes.
+     * https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap03.html#tag_03_266
+     */
     while (*cursor == '/') {
         cursor += 1;
     }
     char* start = cursor;
+    const char* component = NULL;
+
+    /* You might think, why not check cursor < end. To remove the need for end - 1 and bounds
+     * checks, we use cursor <= end and treat that case as if the NULL-terminator were a slash.
+     * The slash/NULL-terminator signals to the loop that it is supposed to compare the
+     * sequence of characters it has read since the last slash to the current Uri-Path option. */
     while (cursor <= end) {
+        /* Found the end of a path component.
+         * That may either be a slash or the end of the string. */
         if ((*cursor == '/') || ((cursor != start) && (cursor == end))) {
-            const char* component;
 
             int res = -1;
             if ((res = unicoap_options_get_next_uri_path_component(&iterator, &component)) < 0) {
                 break;
             }
+            /* Cursor points to the element with the index one greater than the last character. */
             size_t size = (uintptr_t)cursor - (uintptr_t)start;
+
+            /* Compare Uri-Path component with string path component. */
             if (((size_t)res != size) || (strncmp(start, component, size) != 0)) {
                 return false;
             }
 
+            /* Skip multiple successive slashes. */
             while (*cursor == '/') {
                 cursor += 1;
             }
             start = cursor;
         }
         else {
+            /* Skip over path component characters. */
             cursor += 1;
         }
     }
 
+    if (cursor != end + 1) {
+        /* If the resource's path is longer than the actual path, the paths definitely don't match.
+         * The end + 1 comparison is justified as we treat the NULL-terminator like a trailing
+         * slash. See above. */
+        return false;
+    }
+
     if (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
+        /* There may be more Uri-Path options. But this is fine as subpaths are allowed. */
         return true;
     }
     else {
-        return cursor == (end + 1);
+        /* Make sure we read all options, i.e., the actual path is not longer than the resource's.
+         */
+        return unicoap_options_get_next_uri_path_component(&iterator, &component) == -1;
     }
 }
 

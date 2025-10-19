@@ -263,6 +263,8 @@ struct unicoap_resource {
      * @brief Resource path
      *
      * Must be a null-terminated string with slash-separated path components
+     *
+     * @warning This path must not have any trailing slash separators, apart from the root path `/`
      */
     const char* path;
 

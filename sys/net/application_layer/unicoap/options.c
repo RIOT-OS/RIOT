@@ -863,20 +863,20 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
                                                unicoap_option_number_t number, const char* name,
                                                const char** value)
 {
-    char* _name = NULL;
-    const char* component = NULL;
+    const uint8_t* _name = NULL;
+    const uint8_t* component = NULL;
     ssize_t res = -1;
     while ((res =unicoap_options_get_next_by_number(iterator, number,
                                                     (const uint8_t**)&component)) >= 0) {
         assert(component);
-        _name = (char*)component;
+        _name = component;
 
         while (res > 0 && *component != '=') {
             component += 1;
             res -= 1;
         }
 
-        if (strncmp(name, _name, (uintptr_t)component - (uintptr_t)_name) != 0) {
+        if (strncmp(name, (char*)_name, (uintptr_t)component - (uintptr_t)_name) != 0) {
             continue;
         }
 
@@ -884,7 +884,7 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
             assert(*component == '=');
             component += 1;
             res -= 1;
-            *value = component;
+            *value = (const char*)component;
         }
         else {
             *value = NULL;
