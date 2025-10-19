@@ -518,8 +518,10 @@ void unicoap_listener_register(unicoap_listener_t* listener);
  * @pre @p listener is a valid pointer to a single listener
  *
  * @param[in] listener  Listener containing the resources.
+ * @returns Negative integer on error, zero on success.
+ * @retval `-ENOENT` if the given listener is not registered with `unicoap`.
  */
-void unicoap_listener_deregister(unicoap_listener_t* listener);
+int unicoap_listener_deregister(unicoap_listener_t* listener);
 
 /**
  * @brief Determines whether the complete Uri-Path matches the resources path.

@@ -204,7 +204,6 @@ int unicoap_deinit(void)
     }
 
     _deinit_drivers(&_queue);
-    /* TODO: Thread: Figure out how to die properly, in an orderly fashion. */
     _unicoap_pid = KERNEL_PID_UNDEF;
     memset(&_state, 0, sizeof(_state));
     memset(&_queue, 0, sizeof(_queue));
@@ -245,7 +244,7 @@ void unicoap_listener_register(unicoap_listener_t* listener)
     }
 }
 
-void unicoap_listener_deregister(unicoap_listener_t* listener)
+int unicoap_listener_deregister(unicoap_listener_t* listener)
 {
     assert(listener);
 
@@ -253,10 +252,11 @@ void unicoap_listener_deregister(unicoap_listener_t* listener)
     while (l) {
         if (l->next == listener) {
             l->next = listener->next;
-            break;
+            return 0;
         }
         l = l->next;
     }
+    return -ENOENT;
 }
 
 /* MARK: - Intersection with messaging */
@@ -333,7 +333,8 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
             unicoap_options_set_size1(&response_options, CONFIG_UNICOAP_BLOCK_SIZE);
             unicoap_response_init_with_options(message, UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE,
                                                NULL, 0, &response_options);
-            goto server_prewarming_error;
+            unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT);
+            return UNICOAP_PREPROCESSING_ERROR_REQUEST;
         }
 
         const unicoap_resource_t* resource = NULL;
@@ -341,15 +342,12 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
         if ((res = unicoap_resource_find(packet, &resource, &listener)) != 0) {
             unicoap_response_init_empty(message, res < 0 ? UNICOAP_STATUS_INTERNAL_SERVER_ERROR :
                                                            (unicoap_status_t)res);
-            goto server_prewarming_error;
+            unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT);
+            return UNICOAP_PREPROCESSING_ERROR_REQUEST;
         }
         arg->resource = resource;
         *flags = _messaging_flags_resource(resource->flags);
         return UNICOAP_PREPROCESSING_SUCCESS_REQUEST;
-
-server_prewarming_error:
-        unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT);
-        return UNICOAP_PREPROCESSING_ERROR_REQUEST;
     }
 
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
