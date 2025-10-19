@@ -63,12 +63,13 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
     sock_dtls_session_t session = { 0 };
 
     if (type & SOCK_ASYNC_CONN_RECV) {
+        DTLS_DEBUG("establishing session...\n");
         ssize_t res = sock_dtls_recv(sock, &session, unicoap_receiver_buffer,
                                      sizeof(unicoap_receiver_buffer),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS);
         _UNICOAP_DEBUG_HEX(unicoap_receiver_buffer, res);
 
-        if (res != -SOCK_DTLS_HANDSHAKE) {
+        if (-res != SOCK_DTLS_HANDSHAKE) {
             DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
                        strerror(-(int)res));
             goto error;
@@ -118,6 +119,10 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
         unicoap_exchange_forget_endpoint(&endpoint);
+    }
+
+    if (type & SOCK_ASYNC_CONN_RDY) {
+        DTLS_DEBUG("connection ready\n");
     }
 
     if (type & SOCK_ASYNC_MSG_RECV) {
