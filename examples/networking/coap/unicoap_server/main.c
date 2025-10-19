@@ -190,13 +190,6 @@ UNICOAP_RESOURCE(greeting) {
     .handler_arg = NULL
 };
 
-static void say_hello_job(unicoap_job_t* job) {
-    (void)job;
-    printf("hello synchronized with processing loop\n");
-}
-
-static unicoap_job_t job = UNICOAP_JOB(say_hello_job);
-
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
      * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.
@@ -294,8 +287,6 @@ int main(void) {
     printf("app: interfaces have ipv6=[ ");
     netifs_print_ipv6(", ");
     printf(" ]\n");
-
-    unicoap_loop_enqueue(&job);
 
     /* By default, unicoap_init() will create a background thread. If you do not want that,
      * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.
