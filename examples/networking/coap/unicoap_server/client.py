@@ -50,7 +50,7 @@ async def main():
         required=True)
 
     parser.add_argument(
-        "-t", "--type",
+        "-mt", "--type",
         help='NON|CON',
         default="NON")
 
@@ -72,7 +72,7 @@ async def main():
         default=None)
 
     parser.add_argument(
-        "-s", "--timeout",
+        "-to", "--timeout",
         type=float,
         help='Request timeout',
         default="4")
