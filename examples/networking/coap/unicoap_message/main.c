@@ -26,10 +26,10 @@
 
 static void _example_handle_message(const unicoap_message_t* message)
 {
-    /* Use unicoap_message_is_request, unicoap_message_is_response, unicoap_message_is_signal
-     * to determine what class of message you are dealing with.
+    /* Use unicoap_message_code_is_request, unicoap_message_code_is_response,
+     * unicoap_message_code_is_signal to determine what class of message you are dealing with.
      * In this case, we expect a request. */
-    assert(unicoap_message_is_request(message->code));
+    assert(unicoap_message_code_is_request(message->code));
 
     /* The unicoap message type supports different typed views of the CoAP message code:
      * message->method, message->status, and message->signal.

@@ -52,9 +52,9 @@ printf("CoAP over UDP/DTLS has id=%i type=%s\n",
 ### Inspecting a Message
 
 You use the
-@ref unicoap_message_is_request,
-@ref unicoap_message_is_response, and
-@ref unicoap_message_is_signal
+@ref unicoap_message_code_is_request,
+@ref unicoap_message_code_is_response, and
+@ref unicoap_message_code_is_signal
 methods to check whether a given message is a request, response, or signaling message.
 
 The corresponding typed view of the code is accessible through

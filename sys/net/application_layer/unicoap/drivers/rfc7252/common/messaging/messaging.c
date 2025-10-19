@@ -525,7 +525,7 @@ static int _process_messaging_layer(unicoap_packet_t* packet)
             return _IGNORED;
         }
 
-        else if (!unicoap_message_is_response(message->code)) {
+        else if (!unicoap_message_code_is_response(message->code)) {
             MESSAGING_7252_DEBUG(
                 UNICOAP_MESSAGE_ID_FORMAT
                 "received ACK, expected code 0.00 or response code, got "
@@ -720,7 +720,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         /* notification, always use separate response style */
         _format_separate(packet, flags);
     }
-    else if (unicoap_message_is_response(packet->message->code) &&
+    else if (unicoap_message_code_is_response(packet->message->code) &&
              /* Message properties in the packet are still those of the request (ID, token, type) */
              _get_type(packet) == UNICOAP_TYPE_CON) {
         /* piggybacked response, immediate response style */

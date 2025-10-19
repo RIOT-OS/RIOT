@@ -207,7 +207,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     }
 }
 
-bool unicoap_message_is_response(uint8_t code)
+bool unicoap_message_code_is_response(uint8_t code)
 {
     switch (unicoap_code_class(code)) {
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
