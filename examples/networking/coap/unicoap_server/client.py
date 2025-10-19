@@ -6,8 +6,6 @@ from argparse import ArgumentParser
 
 from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
 import aiocoap.resource as resource
-import aiocoap
-from aiocoap.numbers.constants import TransportTuning
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -95,9 +93,6 @@ async def main():
     print(f"using {message_type(args.type)} {method(args.method)} request")
     print(f"timeout set to {args.timeout}s")
 
-    TransportTuning.REQUEST_TIMEOUT = args.timeout;
-    tuning = TransportTuning()
-
     port = 5600
     protocol = await Context.create_server_context(bind=("::", port), site=resource.Site())
     protocol.client_credentials.load_from_dict({
@@ -114,15 +109,15 @@ async def main():
         code=method(args.method),
         uri=args.uri,
         payload=bytes(args.payload, 'utf-8') if args.payload else "",
-        observe=observeValue,
-        transport_tuning=tuning
+        observe=observeValue
     )
 
     try:
         pr = protocol.request(request)
 
-        r = await pr.response
-        print("response: %s\n%r" % (r.code, r.payload))
+        async with asyncio.timeout(args.timeout):
+            r = await pr.response
+            print("response: %s\n%r" % (r.code, r.payload))
 
         if args.observe:
             print("waiting for resource notifications")
@@ -130,6 +125,9 @@ async def main():
             async for r in pr.observation:
                 print("notification: %s\n%r" % (r, r.payload))
                 break
+
+    except TimeoutError:
+        print(f"error: timeout exceeded after waiting {args.timeout}s")
 
     except Exception as e:
         print("error:")
