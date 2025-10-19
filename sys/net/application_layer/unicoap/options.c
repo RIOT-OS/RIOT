@@ -976,7 +976,7 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
 
 int unicoap_options_set_observe_generated(unicoap_options_t* options)
 {
-    /* generate initial notification value */
+    /* generate notification value */
     return unicoap_options_set_observe(
         options, (ztimer_now(ZTIMER_MSEC) >> UNICOAP_OBSERVE_TICK_EXPONENT) & 0xFFFFFF);
 }
