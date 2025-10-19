@@ -84,6 +84,24 @@
  */
 #define UNICOAP_BITFIELD(...) __unicoap_create_bitfield(__VA_ARGS__,,,,,,,,,,,,,,,) 0
 
+/* unicoap_job_t wraps event_t so that changing the internal event loop to something else later
+ * won't induce a source-breaking change. Hence, an initializer is required to hide that complexity.
+ * To allow compile-time initialization, we use a UNICOAP_JOB macro. A static inline function
+ * won't work as such a function won't be able to produce a constant expression.
+ *
+ * Because unicoap_job_t uses an event_t internally, the event callback must be casted. Since
+ * the only argument is a pointer and the return type is void, that cast can be considered safe.
+ * The problem that arises is that deviant function pointers will silently be casted to the
+ * same function prototype. Since we cannot use a static inline function to typecheck the
+ * function pointer, we had to come up with a macro that typechecks the argument to detect
+ * mismatches in the function pointer type. This is what the following macro does.
+ *
+ * It uses __builtin_choose_expr as a compile-time ternary expression and
+ * __builtin_types_compatible_p to verify that the given argument really matches the expected
+ * type. What is not possible, however, is diagnosing the error.
+ * FIXME: _UNICOAP_TRY_TYPECHECK_JOB_FUNC: Emit diagnostic in case of type mismatch.
+ *
+ */
 #ifndef DOXYGEN
 #  if defined(__has_builtin)
 #    if __has_builtin(__builtin_types_compatible_p) && __has_builtin(__builtin_choose_expr)
@@ -99,7 +117,6 @@
 #    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
 #  endif
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {}
