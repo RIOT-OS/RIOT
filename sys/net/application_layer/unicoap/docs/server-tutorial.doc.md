@@ -391,10 +391,6 @@ In a second terminal session, run
 python3 client.py -m GET -u "coap://[fe80::c0:ff:ee%tap0]/greeting?name=RIOTer"
 ```
 
-where `fe80::c0:ff:ee` is the IPv6 address of the RIOT interface behind the tap interface.
-If you run the `examples/networking/gnrc/gnrc_networking` shell application and type `ifconfig`
-you should see a list of interfaces and their addresses.
-
 You should see a number of debug logs from that script culminating in:
 
 ```
