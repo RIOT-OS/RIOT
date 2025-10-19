@@ -251,7 +251,6 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     assert(packet);
     assert(packet->remote);
     int res = 0;
-    unicoap_message_t* message = packet->message;
 
     unicoap_request_context_t context = {
         .resource = resource, ._packet = packet
@@ -264,7 +263,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     };
 
     SERVER_DEBUG("invoking handler\n");
-    res = resource->handler(message, &aux, &context, resource->handler_arg);
+    res = resource->handler(packet->message, &aux, &context, resource->handler_arg);
 
     if (res > 0) {
         SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
@@ -272,7 +271,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
                      unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
 
         if (IS_ACTIVE(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES)) {
-            if (unicoap_response_is_optional(message->options, (unicoap_status_t)res)) {
+            if (unicoap_response_is_optional(packet->message->options, (unicoap_status_t)res)) {
                 SERVER_DEBUG("response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
                              " is optional, not responding\n",
                              unicoap_code_class((uint8_t)res),
@@ -281,7 +280,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             }
         }
 
-        unicoap_response_init_empty(message, (unicoap_status_t)res);
+        unicoap_response_init_empty(packet->message, (unicoap_status_t)res);
         return unicoap_server_send_response_body(packet, resource);
     }
     else if (context._packet) {
@@ -296,8 +295,8 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
                                FIXIT("set USEMODULE += unicoap_deferred_response and"
                                      "call unicoap_defer_response")
                                FIXIT("ignore request by returning UNICOAP_IGNORING_REQUEST"));
-                unicoap_response_init_string(message, UNICOAP_STATUS_INTERNAL_SERVER_ERROR,
-                                             "application");
+                unicoap_response_init_string(packet->message,
+                                             UNICOAP_STATUS_INTERNAL_SERVER_ERROR, "application");
                 goto error;
             }
         }
