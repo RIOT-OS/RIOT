@@ -6,6 +6,8 @@ from argparse import ArgumentParser
 
 from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
 import aiocoap.resource as resource
+import aiocoap
+from aiocoap.numbers.constants import TransportTuning
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -71,12 +73,18 @@ async def main():
         help='Payload',
         default=None)
 
+    parser.add_argument(
+        "-s", "--timeout",
+        type=float,
+        help='Request timeout',
+        default="4")
+
     args = parser.parse_args()
 
     observeValue = None
 
     if args.observe and args.observe_cancel:
-        raise ValueError("Cannot register for and cancel notifications")
+        raise ValueError("cannot register for and cancel notifications")
 
     if args.observe:
         observeValue = 0
@@ -85,6 +93,10 @@ async def main():
         observeValue = 1
 
     print(f"using {message_type(args.type)} {method(args.method)} request")
+    print(f"timeout set to {args.timeout}s")
+
+    TransportTuning.REQUEST_TIMEOUT = args.timeout;
+    tuning = TransportTuning()
 
     port = 5600
     protocol = await Context.create_server_context(bind=("::", port), site=resource.Site())
@@ -102,7 +114,8 @@ async def main():
         code=method(args.method),
         uri=args.uri,
         payload=bytes(args.payload, 'utf-8') if args.payload else "",
-        observe=observeValue
+        observe=observeValue,
+        transport_tuning=tuning
     )
 
     try:
