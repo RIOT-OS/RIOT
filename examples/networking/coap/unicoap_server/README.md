@@ -19,7 +19,7 @@ To try this example on your host, run:
 BOARD=native make flash term
 ```
 This will compile and run the application.
-The application will print a link-layer address.
+The application will print a network-layer address.
 
 In a second terminal session, you can run
 
