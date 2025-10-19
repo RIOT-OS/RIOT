@@ -148,8 +148,8 @@ void* _unicoap_loop_run(void* arg)
 {
     (void)arg;
     /* Now we set the already-initialized queue's waiter thread. See unicoap_init below. */
-    assert(_queue.waiter == NULL);
-    _queue.waiter = thread_get_active();
+   /* _queue.waiter == NULL is asserted by event_queue_claim */
+    event_queue_claim(&_queue);
     _unicoap_pid = thread_getpid();
     event_loop(&_queue);
     return &_queue;
@@ -180,13 +180,7 @@ kernel_pid_t unicoap_init(void)
     UNICOAP_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
 #endif
 
-    event_queue_init(&_queue);
-
-    /* The waiter thread will be in _unicoap_event_loop_run.
-     * The queue needs to be initialized to initialize drivers.
-     * As preventative measure, we set waiter to NULL until the real, but currently unknown
-     * thread is known. */
-    _queue.waiter = NULL;
+    event_queue_init_detached(&_queue);
 
     if (_init_drivers(&_queue) < 0) {
         UNICOAP_DEBUG("driver initialization failed\n");
