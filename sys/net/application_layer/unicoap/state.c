@@ -148,7 +148,7 @@ void* _unicoap_loop_run(void* arg)
 {
     (void)arg;
     /* Now we set the already-initialized queue's waiter thread. See unicoap_init below. */
-   /* _queue.waiter == NULL is asserted by event_queue_claim */
+    /* _queue.waiter == NULL is asserted by event_queue_claim */
     event_queue_claim(&_queue);
     _unicoap_pid = thread_getpid();
     event_loop(&_queue);
