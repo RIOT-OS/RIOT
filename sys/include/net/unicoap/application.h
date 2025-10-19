@@ -528,6 +528,9 @@ void unicoap_listener_deregister(unicoap_listener_t* listener);
  *
  * @see @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE
  *
+ * @note Multiple consecutive slashes are treated as one.
+ * https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap03.html#tag_03_266
+ *
  * @returns A boolean value indicating whether the specified path matches the resource definition.
  */
 bool unicoap_resource_match_path_string(const unicoap_resource_t* resource, const char* path, size_t length);
