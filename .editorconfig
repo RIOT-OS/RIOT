@@ -14,3 +14,9 @@ indent_size = 2
 tab_size = 2
 trim_trailing_whitespace = true
 insert_final_newline = true
+
+[*{.astro, .js, .ts, .mjs, .json}]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
