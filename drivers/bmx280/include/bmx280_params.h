@@ -24,6 +24,7 @@
 
 #include "board.h"
 #include "bmx280.h"
+#include "kernel_defines.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus

@@ -22,6 +22,7 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
+#include "kernel_defines.h"
 #include "sht2x.h"
 #include "saul_reg.h"
 
