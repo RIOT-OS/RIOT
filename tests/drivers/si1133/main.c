@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#include "kernel_defines.h"
 #include "si1133.h"
 #include "si1133_params.h"
 #include "board.h"
