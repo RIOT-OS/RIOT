@@ -351,7 +351,7 @@ static void _usbdev_init(usbdev_t *dev)
     const stm32_usbdev_fs_config_t *conf = usbdev->config;
 
     DEBUG_PUTS("usbdev_fs: initialization");
-    /* Block STOP/STANDBY */
+    /* Block STOP + STANDBY + IDLE */
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
     pm_block(STM32_PM_IDLE);
