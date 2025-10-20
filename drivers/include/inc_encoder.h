@@ -25,7 +25,8 @@
  * Phase A should be connected to the pin configured as the interrupt pin,
  * while Phase B (the shifted signal) should be connected to the direction pin.
  *
- * If the Phase A and Phase B connections are swapped, the detected rotation direction will be reversed.
+ * If the Phase A and Phase B connections are swapped,
+ * the detected rotation direction will be reversed.
  * When only Phase A is connected, the encoder will still report movement,
  * but there will be no distinction between counter clock wise and clock wise rotation.
  * An example for such an encoder can be found [here](https://www.dfrobot.com/product-1617.html)
