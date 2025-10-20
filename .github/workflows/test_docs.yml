@@ -5,6 +5,12 @@ on:
         paths:
             - 'doc/guides/**'
             - 'doc/starlight/**'
+            - 'CODE_OF_CONDUCT.md'
+            - 'GOVERNANCE.md'
+            - 'CONTRIBUTING.md'
+            - 'CODING_CONVENTIONS_C++.md'
+            - 'CODING_CONVENTIONS.md'
+            - 'release-notes.txt'
 
 jobs:
     build-docs:
