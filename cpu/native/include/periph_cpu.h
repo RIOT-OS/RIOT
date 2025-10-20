@@ -68,13 +68,21 @@ extern "C" {
  * @brief Pull-down
  */
 #  if !defined(GPIOHANDLE_REQUEST_PULL_DOWN) || defined(DOXYGEN)
-#    define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
+#    if defined(GPIOHANDLE_REQUEST_BIAS_PULL_DOWN)
+#      define GPIOHANDLE_REQUEST_PULL_DOWN    GPIOHANDLE_REQUEST_BIAS_PULL_DOWN
+#    else
+#      define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
+#    endif
 #  endif
 /**
  * @brief Pull-up
  */
 #  if !defined(GPIOHANDLE_REQUEST_PULL_UP) || defined(DOXYGEN)
-#   define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
+#    if defined(GPIOHANDLE_REQUEST_BIAS_PULL_UP)
+#      define GPIOHANDLE_REQUEST_PULL_UP      GPIOHANDLE_REQUEST_BIAS_PULL_UP
+#    else
+#      define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
+#    endif
 #  endif
 
 /**
