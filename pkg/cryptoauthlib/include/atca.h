@@ -19,6 +19,7 @@
  *
  */
 
+#include "modules.h"
 #include "periph/i2c.h"
 #include "cryptoauthlib.h"
 
