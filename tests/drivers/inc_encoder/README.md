@@ -1,5 +1,5 @@
 # About
-This is a manual test application for a generic hall effect sensor.
+This is a manual test application for a generic incremental rotary encoder.
 
 # Usage
 Connect a sensor - like a magnetic rotary encoder found on some dc motors - to your mcu.

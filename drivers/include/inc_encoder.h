@@ -6,12 +6,12 @@
 #pragma once
 
 /**
- * @defgroup    drivers_hall_effect Generic Hall Effect Sensor
+ * @defgroup    drivers_inc_encoder Generic Incremental Rotary Encoder
  * @ingroup     drivers_sensors
- * @brief       Generic hall effect sensor to measur RPM and rotation count.
+ * @brief       Generic incremental rotary encoder to measur RPM and rotation count.
  *
  * ## Description
- * This is a driver for a generic Hall effect sensor. These sensors are most often
+ * This is a driver for a generic incremental rotary encoder. These sensors are most often
  * used with motors.
  * The sensor generates a fixed number of pulses per rotation on two output pins.
  * These signals are phase-shifted slightly, enabling the detection of rotation direction.
@@ -36,7 +36,7 @@
  * Configuration options are available via Kconfig to specify
  * the number of pulses per rotation and the gear reduction ratio (in tenths).
  *
- * @note After approximately 327 revolutions without reading and resetting
+ * @note After 327 revolutions without reading and resetting
  *       the revolution counter, the `phydat` value will overflow.
  *       Use the regular driver interface instead of SAUL if necessary.
  *
@@ -62,52 +62,52 @@ extern "C" {
 typedef struct {
     gpio_t interrupt; /**< Interrupt pin (first phase) */
     gpio_t direction; /**< Pin used to determine the direction (shifted phase) */
-} hall_effect_params_t;
+} inc_encoder_params_t;
 
 /**
  * @brief Device descriptor for the driver
  */
 typedef struct {
-    hall_effect_params_t params;          /**< configuration parameters */
+    inc_encoder_params_t params;  /**< configuration parameters */
     uint32_t             delta_t;         /**< time delta since the last read */
     int32_t              pulse_counter;   /**< number of pulses since last read */
     uint32_t             last_read_time;  /**< time of the last read */
     bool                 ccw;             /**< counter clock wise rotation */
     bool                 stale;           /**< indicates that there is no new data to be read */
-} hall_effect_t;
+} inc_encoder_t;
 
 /**
- * @brief        Initialize the given device
+ * @brief          Initialize the given device
  *
- * @param[inout] dev            Device descriptor of hall effect sensor
- * @param[in]    params         Initialization parameters
+ * @param[in, out] dev            Device descriptor of incremental rotary encoder
+ * @param[in]      params         Initialization parameters
  *
- * @retval       0              on success
- * @retval       -EIO           on failure setting up the pins
+ * @retval         0              on success
+ * @retval         -EIO           on failure setting up the pins
  */
-int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params);
+int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params);
 
 /**
- * @brief        Read the current RPM of the motor.
+ * @brief          Read the current RPM of the motor.
  *
- * @param[in]    dev            Device descriptor of hall effect sensor
- * @param[out]   rpm            Revolutions per minute.
- *                              Negative RPM responds to counter clock wise rotation.
+ * @param[in]      dev            Device descriptor of incremental rotary encoder
+ * @param[out]     rpm            Revolutions per minute.
+ *                                Negative RPM responds to counter clock wise rotation.
  *
- * @return       0              on success
+ * @return         0              on success
  */
-int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm);
+int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm);
 
 /**
- * @brief        Read and reset number of revolutions since the last readout in hundredths.
+ * @brief          Read and reset number of revolutions since the last readout in hundredths.
  *
- * @param[in]    dev            Device descriptor of hall effect sensor
- * @param[out]   pulse_counter  Number of revolutions since the last read in hundredths.
- *                              Negative revolutions signal counter clock wise rotations.
+ * @param[in]      dev            Device descriptor of incremental rotary encoder
+ * @param[out]     pulse_counter  Number of revolutions since the last read in hundredths.
+ *                                Negative revolutions signal counter clock wise rotations.
  *
- * @return       0              on success
+ * @return         0              on success
  */
-int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter);
+int inc_encoder_read_reset_ceti_revs(inc_encoder_t *dev, int32_t *pulse_counter);
 
 #ifdef __cplusplus
 }

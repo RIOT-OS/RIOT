@@ -1,25 +1,25 @@
 # SPDX-FileCopyrightText: 2025 TU Dresden
 # SPDX-License-Identifier: LGPL-2.1-only
 
-config MODULE_HALL_EFFECT
-    bool "Hall Effect RPM Sensor"
+config MODULE_INC_ENCODER
+    bool "Incremental Rotary Encoder"
     depends on TEST_KCONFIG
 
 
-menu "Hall Effect RPM Driver"
-    depends on USEMODULE_HALL_EFFECT
+menu "Incremental Rotary Encoder Driver"
+    depends on USEMODULE_INC_ENCODER
 
-    config HALL_EFFECT_GEAR_RED_RATIO
+    config INC_ENCODER_GEAR_RED_RATIO
         int "Gear Reduction Ratio (in tenths)"
         default 204
         help
             Defines the gear reduction ratio. For example a gear reduction ratio
             of 1:20.4 would result in a value of 204.
 
-    config HALL_EFFECT_PPR
+    config INC_ENCODER_PPR
         int "Pulses per Revolution"
         default 13
         help
             Number of Rising Edges per Revolution.
 
-endmenu # Hall Effect Driver
+endmenu # Incremental Encoder Driver

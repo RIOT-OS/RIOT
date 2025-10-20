@@ -1,6 +1,6 @@
 include ../Makefile.drivers_common
 
-USEMODULE += hall_effect
+USEMODULE += inc_encoder
 USEMODULE += ztimer_sec
 
 include $(RIOTBASE)/Makefile.include

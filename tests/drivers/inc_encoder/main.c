@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       Test application for a generic hall effect sensor
+ * @brief       Test application for a generic incremental rotary encoder
  *
  * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  *
@@ -18,16 +18,16 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "hall_effect.h"
-#include "hall_effect_params.h"
+#include "inc_encoder.h"
+#include "inc_encoder_params.h"
 #include "ztimer.h"
 
-static hall_effect_t dev;
+static inc_encoder_t dev;
 
 int main(void)
 {
-    puts("Generic hall effect sensor test application\n");
-    if (hall_effect_init(&dev, &hall_effect_params[0]) == 0) {
+    puts("Generic incremental rotary encoder test application\n");
+    if (inc_encoder_init(&dev, &inc_encoder_params[0]) == 0) {
         puts("[OK]\n");
     }
     else {
@@ -39,8 +39,8 @@ int main(void)
     while (1) {
         int32_t rpm;
         int32_t pulses;
-        if (hall_effect_read_rpm(&dev, &rpm)
-            || hall_effect_read_reset_ceti_revs(&dev, &pulses)) {
+        if (inc_encoder_read_rpm(&dev, &rpm)
+            || inc_encoder_read_reset_ceti_revs(&dev, &pulses)) {
             puts("[Failed]");
             return 1;
         }

@@ -4,19 +4,19 @@
  */
 
 /**
- * @ingroup     drivers_hall_effect
+ * @ingroup     drivers_inc_encoder
  * @{
  *
  * @file
- * @brief       Device driver implementation for a generic hall effect sensor
+ * @brief       Device driver implementation for a generic incremental rotary encoder
  *
  * @author      Leonard Herbst <leonard.herbst@tu-dresden.de>
  *
  * @}
  */
 
-#include "hall_effect.h"
-#include "hall_effect_params.h"
+#include "inc_encoder.h"
+#include "inc_encoder_params.h"
 
 #include <errno.h>
 #include "log.h"
@@ -31,17 +31,17 @@
 /* Prototypes */
 
 static void _pulse_callback(void *arg);
-static void _read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter);
-static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool *ccw);
+static void _read_reset_pulse_counter(inc_encoder_t *dev, int32_t *pulse_counter);
+static bool _read_delta_t_direction(inc_encoder_t *dev, uint32_t *delta_t, bool *ccw);
 
 /* Public API */
 
-int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params)
+int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params)
 {
     dev->params = *params;
 
     if (gpio_init(dev->params.direction, GPIO_IN)) {
-        LOG_ERROR("[hall_effect] Failed configuring the direction pin as an input!\n");
+        LOG_ERROR("[inc_encoder] Failed configuring the direction pin as an input!\n");
         return -EIO;
     }
 
@@ -52,14 +52,14 @@ int hall_effect_init(hall_effect_t *dev, const hall_effect_params_t *params)
     dev->last_read_time = ztimer_now(ZTIMER_USEC);
 
     if (gpio_init_int(dev->params.interrupt, GPIO_IN, GPIO_RISING, _pulse_callback, (void *) dev)) {
-        LOG_ERROR("[hall_effect] Failed configuring the interrupt pin!\n");
+        LOG_ERROR("[inc_encoder] Failed configuring the interrupt pin!\n");
         return -EIO;
     }
 
     return 0;
 }
 
-int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm)
+int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm)
 {
     uint32_t delta_t;
     bool ccw;
@@ -74,19 +74,19 @@ int hall_effect_read_rpm(hall_effect_t *dev, int32_t *rpm)
      * or pulses per revolution.
      */
     *rpm = SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE
-           / (delta_t * CONFIG_HALL_EFFECT_PPR * CONFIG_HALL_EFFECT_GEAR_RED_RATIO);
+           / (delta_t * CONFIG_INC_ENCODER_PPR * CONFIG_INC_ENCODER_GEAR_RED_RATIO);
     if (ccw) {
         *rpm *= -1;
     }
     return 0;
 }
 
-int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter)
+int inc_encoder_read_reset_ceti_revs(inc_encoder_t *dev, int32_t *pulse_counter)
 {
     _read_reset_pulse_counter(dev, pulse_counter);
     *pulse_counter *= 100 * GEAR_RED_RATIO_SCALE;
-    *pulse_counter /= CONFIG_HALL_EFFECT_PPR;
-    *pulse_counter /= CONFIG_HALL_EFFECT_GEAR_RED_RATIO;
+    *pulse_counter /= CONFIG_INC_ENCODER_PPR;
+    *pulse_counter /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
     return 0;
 }
 
@@ -95,7 +95,7 @@ int hall_effect_read_reset_ceti_revs(hall_effect_t *dev, int32_t *pulse_counter)
 /* Triggered on the rising edge of a pulse */
 static void _pulse_callback(void *arg)
 {
-    hall_effect_t *dev = (hall_effect_t *) arg;
+    inc_encoder_t *dev = (inc_encoder_t *) arg;
 
     uint32_t now = ztimer_now(ZTIMER_USEC);
 
@@ -114,7 +114,7 @@ static void _pulse_callback(void *arg)
     dev->stale= false;
 }
 
-static void _read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter)
+static void _read_reset_pulse_counter(inc_encoder_t *dev, int32_t *pulse_counter)
 {
     int irq_state = irq_disable();
     *pulse_counter = dev->pulse_counter;
@@ -122,7 +122,7 @@ static void _read_reset_pulse_counter(hall_effect_t *dev, int32_t *pulse_counter
     irq_restore(irq_state);
 }
 
-static bool _read_delta_t_direction(hall_effect_t *dev, uint32_t *delta_t, bool *ccw)
+static bool _read_delta_t_direction(inc_encoder_t *dev, uint32_t *delta_t, bool *ccw)
 {
     int irq_state = irq_disable();
     /* There have been no pulses for a while -> rotation probably stopped. */
