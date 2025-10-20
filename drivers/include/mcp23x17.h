@@ -346,6 +346,7 @@
 extern "C" {
 #endif
 
+#include "modules.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 #include "periph/spi.h"
