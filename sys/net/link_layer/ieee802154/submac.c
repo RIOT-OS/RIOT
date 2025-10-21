@@ -289,7 +289,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
         }
         else if (ftype == IEEE802154_FCF_TYPE_ACK) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
-            ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
+            ztimer_sleep(ZTIMER_USEC, submac->sifs_period_us);
         }
 
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
