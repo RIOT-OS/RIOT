@@ -34,6 +34,14 @@
 /* 12 symbols -> 12 * 16us = 192us */
 #define SIFS_PERIOD_US                      (192U)
 
+/* internal type for IEEE 802.15.4 frame control field */
+enum ieee802154_fcf {
+    _FCF_BEACON     = IEEE802154_FCF_TYPE_BEACON,
+    _FCF_DATA       = IEEE802154_FCF_TYPE_DATA,
+    _FCF_ACK        = IEEE802154_FCF_TYPE_ACK,
+    _FCF_MACCMD     = IEEE802154_FCF_TYPE_MACCMD
+};
+
 static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "INVALID",
     "RX",
@@ -135,7 +143,8 @@ static int _handle_fsm_ev_request_tx(ieee802154_submac_t *submac)
 }
 
 static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
-                                                 ieee802154_fsm_ev_t ev);
+                                                 ieee802154_fsm_ev_t ev,
+                                                 enum ieee802154_fcf ftype);
 
 static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
                                             ieee802154_fsm_ev_t ev);
@@ -153,7 +162,7 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac)
         return res;
     }
     /* skip async Tx request */
-    _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH);
+    _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH, IEEE802154_FCF_TYPE_ACK);
     /* wait for Tx done */
     while (_fsm_state_tx(submac, IEEE802154_FSM_EV_TX_DONE) == IEEE802154_FSM_STATE_INVALID) {
         DEBUG("IEEE802154 submac: wait until ACK sent\n");
@@ -258,13 +267,15 @@ static ieee802154_fsm_state_t _fsm_state_idle(ieee802154_submac_t *submac, ieee8
 }
 
 static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
-                                                 ieee802154_fsm_ev_t ev)
+                                                 ieee802154_fsm_ev_t ev,
+                                                 enum ieee802154_fcf ftype)
 {
     ieee802154_dev_t *dev = &submac->dev;
 
     switch (ev) {
     case IEEE802154_FSM_EV_BH:
-        if (!_does_handle_csma(dev)) {
+        if (ftype == IEEE802154_FCF_TYPE_DATA
+            && !_does_handle_csma(dev)) {
             /* delay for an adequate random backoff period */
             uint32_t bp = (random_uint32() & submac->backoff_mask) *
                           submac->csma_backoff_us;
@@ -275,6 +286,10 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
             if (curr_be < submac->be.max) {
                 submac->backoff_mask = (submac->backoff_mask << 1) | 1;
             }
+        }
+        else if (ftype == IEEE802154_FCF_TYPE_ACK) {
+            /* no backoff for ACK frames but wait for SIFSPeriod */
+            ztimer_sleep(ZTIMER_USEC, submac->sifs_period_us);
         }
 
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
@@ -427,7 +442,7 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
         break;
     case IEEE802154_FSM_STATE_PREPARE:
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_PREPARE + %s\n", str_ev[ev]);
-        new_state = _fsm_state_prepare(submac, ev);
+        new_state = _fsm_state_prepare(submac, ev, IEEE802154_FCF_TYPE_DATA);
         break;
     case IEEE802154_FSM_STATE_TX:
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_TX + %s\n", str_ev[ev]);
