@@ -55,11 +55,12 @@ SQUASH_COMMITS="$(git log "$(git merge-base HEAD "${RIOT_MASTER}")"...HEAD --pre
 if [ -n "${SQUASH_COMMITS}" ]; then
     if github_annotate_is_on; then
         ANNOTATION=""
-        echo "${SQUASH_COMMITS}" | while read -r commit; do
-            ANNOTATION="${ANNOTATION}Commit needs to be squashed or contains a no-merge keyword: \"${commit}\""
-        done
+        while read -r commit; do
+            ANNOTATION="${ANNOTATION}Commit needs to be squashed or contains a no-merge keyword: \"${commit}\"\n"
+        done < <(echo "${SQUASH_COMMITS}")
+
         if [ -n "${ANNOTATION}" ]; then
-            ANNOTATION="${ANNOTATION}\n\nPLEASE ONLY SQUASH WHEN ASKED BY A "
+            ANNOTATION="${ANNOTATION}\nPLEASE ONLY SQUASH WHEN ASKED BY A "
             ANNOTATION="${ANNOTATION}MAINTAINER!"
             ANNOTATION="${ANNOTATION}\nSee: "
             ANNOTATION="${ANNOTATION}https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md#squash-commits-after-review\n"
