@@ -179,8 +179,8 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
             }
 #else
             *pa_cfg = &hpa_cfg[0];
-            return 14;
 #endif
+            return 14;
         }
         else if (tx_power_dbm <= 17) {
             *pa_cfg = &hpa_cfg[1];
