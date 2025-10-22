@@ -60,7 +60,6 @@
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
 
-#define MAC_TIMER_CHAN_ACK  (0U)    /**< MAC timer channel for transmitting an ACK frame */
 #define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
@@ -69,7 +68,6 @@ static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 typedef enum {
     STATE_IDLE,
     STATE_TX,
-    STATE_ACK,
     STATE_RX,
     STATE_CCA_CLEAR,
     STATE_CCA_BUSY,
@@ -514,16 +512,6 @@ void isr_radio(void)
                 DEBUG("[nrf802154] CRC fail.\n");
                 dev->cb(dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
             }
-            break;
-        case STATE_ACK:
-            _state = STATE_IDLE;
-
-            /* We disable the radio to avoid unwanted emissions (see ERRATA
-             * ID 204, "Switching between TX and RX causes unwanted emissions")
-             */
-            _disable();
-            DEBUG("[nrf52840] TX ACK done.");
-            _set_ifs_timer(false);
             break;
         default:
             assert(false);
