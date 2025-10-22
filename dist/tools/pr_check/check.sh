@@ -66,7 +66,7 @@ if [ -n "${SQUASH_COMMITS}" ]; then
             github_annotate_error_no_file "${ANNOTATION}"
         fi
     else
-        echo -e "${CERROR}Pull request needs squashing:${CRESET}" 1>&2
+        echo -e "${CERROR}Pull request needs squashing or contains no-merge keywords:${CRESET}" 1>&2
         echo -e "${SQUASH_COMMITS}"
     fi
     EXIT_CODE=1
