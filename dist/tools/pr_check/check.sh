@@ -38,7 +38,15 @@ keyword_filter() {
         -e "^    [0-9a-f]\+ .\{0,2\}SQUASH" \
         -e "^    [0-9a-f]\+ .\{0,2\}FIX" \
         -e "^    [0-9a-f]\+ .\{0,2\}REMOVE *ME" \
-        -e "^    [0-9a-f]\+ .\{0,2\}Update"
+        -e "^    [0-9a-f]\+ .\{0,2\}Update" \
+	-e "^    [0-9a-f]\+ .\{0,2\}DONOTMERGE" \
+	-e "^    [0-9a-f]\+ .\{0,2\}DO NOT MERGE" \
+	-e "^    [0-9a-f]\+ .\{0,2\}DON'T MERGE" \
+	-e "^    [0-9a-f]\+ .\{0,2\}NO MERGE" \
+	-e "^    [0-9a-f]\+ .\{0,2\}DELETE ME" \
+	-e "^    [0-9a-f]\+ .\{0,2\}DELETEME" \
+	-e "^    [0-9a-f]\+ .\{0,2\}WIP" \
+	-e "^    [0-9a-f]\+ .\{0,2\}TEMP"
 }
 
 SQUASH_COMMITS="$(git log "$(git merge-base HEAD "${RIOT_MASTER}")"...HEAD --pretty=format:"    %h %s" | \
