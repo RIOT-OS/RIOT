@@ -21,14 +21,12 @@ else ifeq (nrf52, $(CPU_FAM))
 
   PKG_SPARSE_PATHS += mdk/nrf52811.h
   PKG_SPARSE_PATHS += mdk/nrf52811_bitfields.h
-  PKG_SPARSE_PATHS += mdk/nrf52811_name_change.h
   PKG_SPARSE_PATHS += mdk/nrf52811_peripherals.h
 
   PKG_SPARSE_PATHS += mdk/nrf52832_peripherals.h
 
   PKG_SPARSE_PATHS += mdk/nrf52833.h
   PKG_SPARSE_PATHS += mdk/nrf52833_bitfields.h
-  PKG_SPARSE_PATHS += mdk/nrf52833_name_change.h
   PKG_SPARSE_PATHS += mdk/nrf52833_peripherals.h
 
   PKG_SPARSE_PATHS += mdk/nrf52840.h
@@ -48,13 +46,23 @@ else ifneq (nrf53%, $(CPU_FAM))
 
 endif
 
-PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk/$(CPU_FAM)
-PKG_PATCH_DIR = $(RIOTCPU)/nrf5x_common/include/vendor/patches/$(CPU_FAM)
+# The rust implementation of git-cache is the only one doing
+# a sparse checkout. The others do a full clone, which we need to
+# consider here.
+ifneq (,$(GIT_CACHE_RS))
+  PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk/$(CPU_FAM)
+  VENDOR_FOLDER = $(PKG_SOURCE_DIR)/vendor
+else
+  PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk
+  VENDOR_FOLDER = $(PKG_SOURCE_DIR)/$(CPU_FAM)/vendor
+endif
+
+PKG_PATCH_DIR = $(RIOTCPU)/nrf5x_common/include/vendor/patches
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-# The sparse checkout keeps the path, but we need to have the header in a
+# The sparse checkout keeps the path, but we need to have the headers in a
 # subfolder called "vendor".
 all:
-	@mkdir -p $(PKG_SOURCE_DIR)/vendor
-	@cp $(PKG_SOURCE_DIR)/mdk/* $(PKG_SOURCE_DIR)/vendor
+	@mkdir -p $(VENDOR_FOLDER)
+	@cp $(addprefix $(PKG_SOURCE_DIR)/, $(PKG_SPARSE_PATHS)) $(VENDOR_FOLDER)
