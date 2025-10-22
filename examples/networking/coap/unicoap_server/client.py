@@ -118,6 +118,9 @@ async def main():
         async with asyncio.timeout(args.timeout):
             r = await pr.response
             print("response: %s\n%r" % (r.code, r.payload))
+            if isinstance(r.remote, DTLSClientConnection):
+                print("note: currently, aiocoap emits an error when communicating over DTLS -- "
+                      + "this is expected.")
 
         if args.observe:
             print("waiting for resource notifications")
