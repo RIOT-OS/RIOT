@@ -68,7 +68,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
                                      sizeof(unicoap_receiver_buffer),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS);
 
-        if (-res != SOCK_DTLS_HANDSHAKE) {
+        if (res != -SOCK_DTLS_HANDSHAKE) {
             DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
                        strerror(-(int)res));
             goto error;
@@ -77,21 +77,21 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         dsm_state_t prev_state = dsm_store(sock, &session, SESSION_STATE_ESTABLISHED, false);
 
         /* If session is already stored and the state was SESSION_STATE_HANDSHAKE
-         before, the handshake has been initiated internally by a client request
-         and another thread is waiting for the handshake. Send message to the
-         waiting thread to inform about established session */
+         * before, the handshake has been initiated internally by a client request
+         * and another thread is waiting for the handshake. Send message to the
+         * waiting thread to inform about established session */
         if (prev_state == SESSION_STATE_HANDSHAKE) {
             msg_t msg = { .type = DTLS_EVENT_CONNECTED };
             msg_send(&msg, _dtls_auth_waiting_thread);
         }
         else if (prev_state == NO_SPACE) {
             /* No space in session management. Should not happen. If it occurs,
-             we lost track of sessions */
-            DTLS_DEBUG("no space in session management, lost track of sessions\n");
+             * we lost track of sessions. */
+            DTLS_DEBUG("no space in session management\n");
             goto error;
         }
 
-        /* If not enough session slots left: set timeout to free session */
+        /* If not enough session slots left: set timeout to free session. */
         if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS) {
             DTLS_DEBUG("session triage: fewer than %u session slots available in session mgmt,"
                        " limiting session lifespan to %" PRIu32 " ms\n",
