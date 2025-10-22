@@ -476,7 +476,6 @@ void isr_radio(void)
             break;
         case STATE_RX:
             if (NRF_RADIO->CRCSTATUS) {
-                bool l2filter_passed = _l2filter(rxbuf+1);
                 bool is_ack = rxbuf[1] & IEEE802154_FCF_TYPE_ACK;
 
                 /* If radio is in promiscuous mode, indicate packet and
@@ -486,18 +485,16 @@ void isr_radio(void)
                     _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
-                /* If the L2 filter passes, device if the frame is indicated
-                 * directly or if the driver should send an ACK frame before
-                 * the indication */
-                else if (l2filter_passed) {
-                    DEBUG("[nrf802154] RX frame doesn't require ACK frame.\n");
-                    _state = STATE_IDLE;
-                    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-                }
                 /* In case the packet is an ACK and the ACK filter is disabled,
                  * indicate the frame reception */
                 else if (is_ack && !cfg.ack_filter) {
                     DEBUG("[nrf802154] Received ACK.\n");
+                    _state = STATE_IDLE;
+                    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+                }
+                /* If the L2 filter passes the frame is indicated directly */
+                else if (_l2filter(rxbuf+1)) {
+                    DEBUG("[nrf802154] RX data frame.\n");
                     _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
