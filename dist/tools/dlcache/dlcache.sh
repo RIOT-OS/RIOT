@@ -13,13 +13,13 @@ if [ "$(uname)" = Darwin ]; then
         local lockfile="$1"
         shift
 
-        while ! shlock -p $$ -f $lockfile; do
+        while ! shlock -p "$$" -f "$lockfile"; do
             sleep 0.2
         done
 
-        $*
+        "$@"
 
-        rm $lockfile
+        rm "$lockfile"
     }
 else
     _locked() {
@@ -28,7 +28,7 @@ else
 
         (
         flock -w 600 9 || exit 1
-        $*
+        "$@"
         ) 9>"$lockfile"
     }
 fi
@@ -42,17 +42,17 @@ fi
 calcmd5() {
     local file="$1"
     local md5="$2"
-
-    local file_md5=$(${MD5} "$file" | cut -d\  -f1)
+    local file_md5
+    file_md5=$(${MD5} "$file" | cut -d\  -f1)
 
     test "$md5" = "$file_md5"
 }
 
 downloader() {
     if [ -n "$(command -v wget)" ]; then
-        wget -nv "$1" -O $2
+        wget -nv "$1" -O "$2"
     elif [ -n "$(command -v curl)" ]; then
-        curl -L $1 -o $2
+        curl -L "$1" -o "$2"
     else
         _echo "$0: neither wget nor curl available!"
         return 1
@@ -62,8 +62,9 @@ downloader() {
 download() {
     local url="$1"
     local _md5="$2"
-    local basename_url=$(basename ${url})
-    local target="${3:-${basename_url}}"
+    local basename_url
+    basename_url="$(basename "${url}")"
+    local target="${3:-"${basename_url}"}"
 
     [ -f "$target" ] && {
         # if our target file exists, check it's md5.
@@ -73,7 +74,8 @@ download() {
         }
     }
 
-    local filename="$(basename $url)"
+    local filename
+    filename="$(basename "$url")"
     [ -f "$DLCACHE_DIR/$filename" ] && {
         # if the file exists in cache, check it's md5 and possibly remove it.
         if calcmd5 "$DLCACHE_DIR/$filename" "$_md5"; then
@@ -105,4 +107,4 @@ download() {
     fi
 }
 
-_locked "$DLCACHE_DIR/$(basename $1).locked" download "$@"
+_locked "$DLCACHE_DIR/$(basename "$1").locked" download "$@"
