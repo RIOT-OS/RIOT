@@ -88,7 +88,7 @@ ERROR="$(git log \
             echo "error"
         fi
 
-        if [ ! -z "${MSG}" ]; then
+        if [ -n "${MSG}" ]; then
             if github_annotate_is_on; then
                 if [ ${ERROR} -eq 1 ]; then
                     github_annotate_error_no_file "${MSG} \"${msg}\""
