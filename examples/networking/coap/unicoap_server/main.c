@@ -77,8 +77,11 @@ UNICOAP_RESOURCE(hello) {
     .path = "/",
 
     /* Since we are using CoAP over UDP (or CoAP over DTLS, which relies on UDP for that matter),
-     * we instruct `unicoap` to send confirmable responses. To do this, we pass the
-     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. Don't want to loose our greeting along the way. */
+     * we can instruct `unicoap` to send confirmable responses. This is optional. For other
+     * transports, @ref UNICOAP_RESOURCE_FLAG_RELIABLE does not have an effect.
+     * In this case, we don't want to loose our precious greeting along the way.
+     * To send confirmable messages (CON) over UDP or DTLS, we pass the
+     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. */
     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
 
     /* You must declare what CoAP methods you want to allow for each resource. */
