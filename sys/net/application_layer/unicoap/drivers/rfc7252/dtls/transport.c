@@ -67,7 +67,6 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         ssize_t res = sock_dtls_recv(sock, &session, unicoap_receiver_buffer,
                                      sizeof(unicoap_receiver_buffer),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS);
-        _UNICOAP_DEBUG_HEX(unicoap_receiver_buffer, res);
 
         if (-res != SOCK_DTLS_HANDSHAKE) {
             DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
@@ -144,7 +143,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         assert(pdu);
 
-        unicoap_endpoint_t remote = { 0 };
+        unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&remote));
 
         unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
@@ -161,6 +160,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         /* Truncated DTLS messages would already have gotten lost at verification */
         unicoap_messaging_process_rfc7252((uint8_t*)pdu, received, false, &packet);
     }
+
+    return;
 
 error:
     sock_dtls_session_destroy(sock, &session);
