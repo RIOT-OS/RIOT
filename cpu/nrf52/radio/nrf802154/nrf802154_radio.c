@@ -413,6 +413,15 @@ static void _set_ifs_timer(bool lifs)
     timer_start(NRF802154_TIMER);
 }
 
+static void _timer_cb(void *arg, int chan)
+{
+    (void)arg;
+    if (chan == MAC_TIMER_CHAN_IFS) {
+        cfg.ifs = false;
+    }
+    timer_stop(NRF802154_TIMER);
+}
+
 /**
  * @brief   Set radio into DISABLED state
  */
@@ -422,6 +431,12 @@ int nrf802154_init(void)
     /* reset buffer */
     rxbuf[0] = 0;
     txbuf[0] = 0;
+
+    int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
+    assert(result >= 0);
+    (void)result;
+    timer_stop(NRF802154_TIMER);
+
     /* power off peripheral (but do not release the HFXO as we never requested
      * it so far) */
     NRF_RADIO->POWER = 0;
