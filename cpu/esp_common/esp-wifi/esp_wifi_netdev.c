@@ -901,6 +901,62 @@ static wifi_config_t wifi_config_ap = {
 };
 #endif /* (defined(CPU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP) */
 
+
+#if (defined(MCU_ESP32) && defined(MODULE_ESP_WIFI_CSI))
+void __attribute__((weak)) esp_wifi_csi_rx_cb(void *ctx, wifi_csi_info_t *info)
+{
+    if (!info || !info->buf) {
+        ESP_WIFI_LOG_ERROR("ERROR: esp_wifi_csi_rx_cb missing info or buf");
+        return;
+    }
+    printf("{\n");
+    printf("  \"mac\": \"" MAC_STR "\",\n", MAC_STR_ARG(info->mac));
+#ifdef MODULE_ESP_WIFI_CSI_METADATA
+    printf("  \"rssi\": %d,\n", info->rx_ctrl.rssi);
+    printf("  \"rate\": %d,\n", info->rx_ctrl.rate);
+    printf("  \"sig_mode\": %d,\n", info->rx_ctrl.sig_mode);
+    printf("  \"mcs\": %d,\n", info->rx_ctrl.mcs);
+    printf("  \"cwb\": %d,\n", info->rx_ctrl.cwb);
+    printf("  \"smoothing\": %d,\n", info->rx_ctrl.smoothing);
+    printf("  \"not_sounding\": %d,\n", info->rx_ctrl.not_sounding);
+    printf("  \"aggregation\": %d,\n", info->rx_ctrl.aggregation);
+    printf("  \"stbc\": %d,\n", info->rx_ctrl.stbc);
+    printf("  \"fec_coding\": %d,\n", info->rx_ctrl.fec_coding);
+    printf("  \"sgi\": %d,\n", info->rx_ctrl.sgi);
+    printf("  \"noise_floor\": %d,\n", info->rx_ctrl.noise_floor);
+    printf("  \"ampdu_cnt\": %d,\n", info->rx_ctrl.ampdu_cnt);
+    printf("  \"channel\": %d,\n", info->rx_ctrl.channel);
+    printf("  \"secondary_channel\": %d,\n", info->rx_ctrl.secondary_channel);
+    printf("  \"timestamp\": %d,\n", info->rx_ctrl.timestamp);
+    printf("  \"ant\": %d,\n", info->rx_ctrl.ant);
+    printf("  \"sig_len\": %d,\n", info->rx_ctrl.sig_len);
+    printf("  \"rx_state\": %d,\n", info->rx_ctrl.rx_state);
+#endif
+    printf("  \"first_word_invalid\": %d,\n", info->first_word_invalid);
+
+    printf("  \"buf\": [");
+    for (int i = 0; i < info->len; i++) {
+        printf("%u", (uint8_t)info->buf[i]);
+        if (i < info->len - 1) {
+            printf(",");
+        }
+    }
+    printf("]\n");
+    puts("}");
+
+}
+
+static wifi_csi_config_t wifi_config_csi = {
+    .lltf_en = true,
+    .htltf_en = true,
+    .stbc_htltf2_en = true,
+    .ltf_merge_en = true,
+    .channel_filter_en = true,
+    .manu_scale = false,
+    .shift = 0,
+};
+#endif /* (defined(MCU_ESP32) && defined(MODULE_ESP_WIFI_CSI)) */
+
 void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
     ESP_WIFI_DEBUG("dev=%p", dev);
@@ -1045,6 +1101,13 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #endif /* MODULE_ESP_WIFI_AP */
 
     netdev_register(&dev->netdev, NETDEV_ESP_WIFI, 0);
+
+#if (defined(MCU_ESP32) && defined(MODULE_ESP_WIFI_CSI))
+    esp_wifi_set_csi_config(&wifi_config_csi);
+    esp_wifi_set_csi_rx_cb(esp_wifi_csi_rx_cb, NULL);
+    esp_wifi_set_csi(true);
+    esp_wifi_set_promiscuous(true);
+#endif /* (defined(MCU_ESP32) && defined(MODULE_ESP_WIFI_CSI)) */
 }
 
 #endif /* MODULE_ESP_WIFI */
