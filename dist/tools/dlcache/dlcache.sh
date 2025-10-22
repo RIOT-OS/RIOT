@@ -33,19 +33,16 @@ else
     }
 fi
 
-if [ "$(uname)" = Darwin ]; then
-    MD5="md5 -r"
-else
-    MD5=md5sum
-fi
+# shasum is supported on Linux and Darwin
+SHA512="shasum -a 512"
 
-calcmd5() {
+calcsha512() {
     local file="$1"
-    local md5="$2"
-    local file_md5
-    file_md5=$(${MD5} "$file" | cut -d\  -f1)
+    local sha512="$2"
+    local file_sha512
+    file_sha512=$(${SHA512} "$file" | cut -d\  -f1)
 
-    test "$md5" = "$file_md5"
+    test "$sha512" = "$file_sha512"
 }
 
 downloader() {
@@ -60,28 +57,28 @@ downloader() {
 }
 
 download() {
-    local url="$1"
-    local _md5="$2"
+    local url="$2"
+    local _sha512="$3"
     local basename_url
     basename_url="$(basename "${url}")"
-    local target="${3:-"${basename_url}"}"
+    local target="${1:-"${basename_url}"}"
 
-    [ -f "$target" ] && {
-        # if our target file exists, check it's md5.
-        calcmd5 "$target" "$_md5" && {
-            _echo "$0: target exists, md5 matches."
+    if [ -f "$target" ] && [ -n "$_sha512" ]; then
+        # if our target file exists and an SHA512 sum was given, check it's SHA512
+        calcsha512 "$target" "$_sha512" && {
+            _echo "$0: target exists, SHA512 matches."
             exit 0
         }
-    }
+    fi
 
     local filename
     filename="$(basename "$url")"
     [ -f "$DLCACHE_DIR/$filename" ] && {
-        # if the file exists in cache, check it's md5 and possibly remove it.
-        if calcmd5 "$DLCACHE_DIR/$filename" "$_md5"; then
+        # if the file exists in cache, check it's SHA512 and possibly remove it.
+        if calcsha512 "$DLCACHE_DIR/$filename" "$_sha512"; then
             _echo "$0: getting \"$url\" from cache"
         else
-            _echo "$0: \"$DLCACHE_DIR/$filename\" has wrong checksum, re-downloading"
+            _echo "$0: \"$DLCACHE_DIR/$filename\" has wrong or no checksum, re-downloading"
             rm "$DLCACHE_DIR/$filename"
         fi
     }
@@ -95,10 +92,13 @@ download() {
         _echo "$0: done downloading \"$url\""
     }
 
-    calcmd5 "$DLCACHE_DIR/$filename" "$_md5" || {
-        _echo "$0: checksum mismatch!"
-        exit 1
-    }
+    # only try to calculate the checksum if a checksum was given
+    if [ -n "$_sha512" ]; then
+        calcsha512 "$DLCACHE_DIR/$filename" "$_sha512" || {
+            _echo "$0: checksum mismatch!"
+            exit 1
+        }
+    fi
 
     if [ "$target" = "-" ]; then
         cat "$DLCACHE_DIR/$filename"

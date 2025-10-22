@@ -352,7 +352,7 @@ ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
     DOWNLOAD_TO_STDOUT ?= $(if $(CURL),$(CURL) -s,$(WGET) -q -O-)
   endif
   ifeq (,$(DOWNLOAD_TO_FILE))
-    DOWNLOAD_TO_FILE ?= $(if $(WGET),$(WGET) -nv -c -O,$(CURL) -s -o)
+    DOWNLOAD_TO_FILE ?= $(DLCACHE)
   endif
 endif
 
