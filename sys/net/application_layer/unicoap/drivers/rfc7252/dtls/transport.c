@@ -58,12 +58,12 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 }
 
 static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg)
-{
+{DTLS_DEBUG("received event from network backend %x\n", type);
     (void)arg;
     sock_dtls_session_t session = { 0 };
 
     if (type & SOCK_ASYNC_CONN_RECV) {
-        DTLS_DEBUG("establishing session...\n");
+        DTLS_DEBUG("establishing session\n");
         ssize_t res = sock_dtls_recv(sock, &session, unicoap_receiver_buffer,
                                      sizeof(unicoap_receiver_buffer),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS);
@@ -103,8 +103,9 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
     }
 
     if (type & SOCK_ASYNC_CONN_FIN) {
+        DTLS_DEBUG("closing session\n");
         if (sock_dtls_get_event_session(sock, &session)) {
-            /* Session is already destroyed, only remove it from dsm */
+            /* Session is already destroyed, only remove it from session mgmt. */
             dsm_remove(sock, &session);
         }
         else {
@@ -117,7 +118,9 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
-        unicoap_exchange_forget_endpoint(&endpoint);
+        unicoap_exchange_release_endpoint_state(&endpoint);
+        /* It is safe to ignore the result of exchange_release_endpoint state as this logic follows
+         * a best-effort philosophy. */
     }
 
     if (type & SOCK_ASYNC_CONN_RDY) {
@@ -125,6 +128,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
     }
 
     if (type & SOCK_ASYNC_MSG_RECV) {
+        DTLS_DEBUG("received encrypted datagram\n");
         sock_dtls_aux_rx_t aux_rx = {
             .flags = IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS) ? SOCK_AUX_GET_LOCAL : 0,
         };
@@ -137,6 +141,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
             DTLS_DEBUG("recv failure: %" PRIdSIZE "\n", received);
             return;
         }
+//        sock->buf_ctx = NULL;
         if (received == 0) {
             return;
         }
@@ -237,6 +242,8 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
         return -1;
     }
 
+    DTLS_DEBUG("started sending\n");
+
     if (unlikely(local)) {
         sock_dtls_aux_tx_t aux_tx = { .flags = SOCK_AUX_SET_LOCAL, .local = *local };
         res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, SOCK_NO_TIMEOUT, &aux_tx);
@@ -244,6 +251,7 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
     else {
         res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, SOCK_NO_TIMEOUT, NULL);
     }
+    DTLS_DEBUG("done sending\n");
 
     switch (res) {
     case -EHOSTUNREACH:
