@@ -19,6 +19,9 @@ EXIT_CODE=0
 
 # Keywords that should trigger the commit message check and prevent an accidental
 # merge of something not meant to be merged.
+# The pretty-print format of the commit messages is always the following:
+# `    a5e4f038b8 commit message`
+# This has to be reflected in the RegEx matching pattern.
 NOMERGE_KEYWORD_FILE="$(dirname "$0")/no_merge_keywords"
 
 github_annotate_setup
