@@ -17,6 +17,10 @@ cd "$RIOTBASE" || exit
 
 EXIT_CODE=0
 
+# Keywords that should trigger the commit message check and prevent an accidental
+# merge of something not meant to be merged.
+NOMERGE_KEYWORD_FILE="$(dirname "$0")/no_merge_keywords"
+
 github_annotate_setup
 
 if tput colors &> /dev/null && [ "$(tput colors)" -ge 8 ]; then
@@ -33,24 +37,8 @@ else
     RIOT_MASTER="master"
 fi
 
-keyword_filter() {
-    grep -i \
-        -e "^    [0-9a-f]\+ .\{0,2\}SQUASH" \
-        -e "^    [0-9a-f]\+ .\{0,2\}FIX" \
-        -e "^    [0-9a-f]\+ .\{0,2\}REMOVE *ME" \
-        -e "^    [0-9a-f]\+ .\{0,2\}Update" \
-        -e "^    [0-9a-f]\+ .\{0,2\}DONOTMERGE" \
-        -e "^    [0-9a-f]\+ .\{0,2\}DO NOT MERGE" \
-        -e "^    [0-9a-f]\+ .\{0,2\}DON'T MERGE" \
-        -e "^    [0-9a-f]\+ .\{0,2\}NO MERGE" \
-        -e "^    [0-9a-f]\+ .\{0,2\}DELETE ME" \
-        -e "^    [0-9a-f]\+ .\{0,2\}DELETEME" \
-        -e "^    [0-9a-f]\+ .\{0,2\}WIP" \
-        -e "^    [0-9a-f]\+ .\{0,2\}TEMP"
-}
-
 SQUASH_COMMITS="$(git log "$(git merge-base HEAD "${RIOT_MASTER}")"...HEAD --pretty=format:"    %h %s" | \
-                  keyword_filter)"
+                grep -i -f "${NOMERGE_KEYWORD_FILE}")"
 
 if [ -n "${SQUASH_COMMITS}" ]; then
     if github_annotate_is_on; then
