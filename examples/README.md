@@ -143,6 +143,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 | [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
 | [registry_core](./advanced/registry/registry_core/README.md) | This example demonstrates the most basic usage of the RIOT Registry. |
+| [registry_cli](./advanced/registry/registry_cli/README.md) | This example demonstrates the most basic usage of the RIOT Registry CLI. |
 
 ## Examples from Guides
 
