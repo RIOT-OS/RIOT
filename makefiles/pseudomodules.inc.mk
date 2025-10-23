@@ -354,6 +354,7 @@ PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
 PSEUDOMODULES += registry_%
 NO_PSEUDOMODULES += registry_namespace_sys
+NO_PSEUDOMODULES += registry_storage
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
