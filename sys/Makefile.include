@@ -213,6 +213,10 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.include
 endif
 
+ifneq (,$(filter registry%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/registry/Makefile.include
+endif
+
 ifneq (,$(filter event,$(USEMODULE)))
   include $(RIOTBASE)/sys/event/Makefile.include
 endif
