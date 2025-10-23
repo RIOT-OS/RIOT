@@ -110,7 +110,7 @@ typedef struct {
 static inline void* _transmission_get_session(_transmission_t* transmission)
 {
 #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
-    return &transmission->dtls_session;
+    return transmission->endpoint.proto == UNICOAP_PROTO_DTLS ? &transmission->dtls_session : NULL;
 #else
     (void)transmission;
     return NULL;
@@ -256,7 +256,7 @@ static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
          * thus DTLS sessions stored by value is, too.
          * We didn't get an existing session (likely a client request, so no session exists),
          * so give the transport layer a transmission to initialize (remember, memset' to 0)
-         * This also has the benefit not needing to copy the sessions into the transmission
+         * This also has the benefit of not needing to copy the sessions into the transmission
          * afterwards, because the transport layer already initialized that memory region.
          * Sounds more complicated than it is. */
         _packet_set_dtls_session(packet, _transmission_get_session(transmission));
@@ -291,6 +291,8 @@ static inline void _transmission_free(_transmission_t* transmission)
     }
     unicoap_event_cancel(&transmission->ack_timeout);
     memset(transmission, 0, sizeof(_transmission_t));
+    /* DTLS session gets purged automatically after a period of time. This avoids successive
+     * session establishments. */
 }
 
 static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoap_endpoint_t* local,
@@ -772,7 +774,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     }
 
     if (transmission) {
-        MESSAGING_7252_DEBUG("<carbon_copy size=%i>\n", res);
+        MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
         transmission->pdu_size = res;
     }
     return 0;

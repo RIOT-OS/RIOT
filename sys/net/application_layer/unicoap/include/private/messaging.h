@@ -225,10 +225,10 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
  *
  * @param[in] endpoint Remote endpoint to release buffers for
  *
- * @warning This function must not be called from the exchange layer as it does not release buffers
- * in drivers.
+ * @return Negative error integer or zero on success.
+ * @retval `-ENOENT` if no state is currently associated with the given endpoint
  */
-void unicoap_exchange_forget_endpoint(const unicoap_endpoint_t* endpoint);
+int unicoap_exchange_release_endpoint_state(const unicoap_endpoint_t* endpoint);
 
 /**
  * @brief Internal RFC 7252 messaging inbound processor

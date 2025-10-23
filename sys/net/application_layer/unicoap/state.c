@@ -177,7 +177,7 @@ kernel_pid_t unicoap_init(void)
 
     _xfa_listener.resource_count = XFA_LEN(unicoap_resource_t, unicoap_resources_xfa);
     unicoap_listener_register(&_xfa_listener);
-    UNICOAP_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
+    SERVER_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
 #endif
 
     event_queue_init_detached(&_queue);
@@ -300,14 +300,15 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
     _debug_packet(packet);
 
     switch (unicoap_packet_proto(packet)) {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
         return unicoap_messaging_send_rfc7252(packet, flags);
-#  endif
+#endif
     /* MARK: unicoap_driver_extension_point */
     default:
-        MESSAGING_DEBUG("missing driver for proto\n");
+        MESSAGING_DEBUG("missing driver for proto %s\n",
+                        unicoap_string_from_proto(unicoap_packet_proto(packet)));
         unicoap_assist_emit_diagnostic_missing_driver(packet->remote->proto);
         return -ENOTSUP;
     }
@@ -387,12 +388,12 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
     }
 }
 
-void unicoap_exchange_forget_endpoint(const unicoap_endpoint_t* endpoint)
+int unicoap_exchange_release_endpoint_state(const unicoap_endpoint_t* endpoint)
 {
     (void)endpoint;
     /* TODO: Client and advanced server features: Elaborate state management */
     /* TODO: Observe: Remove potential registrations */
-    return;
+    return -ENOENT;
 }
 
 /* These must be in state.c as it reads the _state object. */
