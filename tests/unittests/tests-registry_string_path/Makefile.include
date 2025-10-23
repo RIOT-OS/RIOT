@@ -1,0 +1,3 @@
+USEMODULE +=  registry_string_path
+
+USEMODULE += tests-registry-namespace
