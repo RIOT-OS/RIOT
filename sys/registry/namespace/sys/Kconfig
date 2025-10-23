@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2023-2025 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2023-2025 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menuconfig MODULE_REGISTRY_NAMESPACE_SYS
+    bool "REGISTRY_NAMESPACE_SYS"
+    depends on MODULE_REGISTRY_NAMESPACE
+    help
+        Namespace Sys module providing common sys configuration schemas for the RIOT Registry sys module.
+
+if MODULE_REGISTRY_NAMESPACE_SYS
+
+config MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED
+    bool "RGB LED schema"
+
+endif # MODULE_REGISTRY_NAMESPACE_SYS
