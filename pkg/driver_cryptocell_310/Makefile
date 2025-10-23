@@ -15,7 +15,7 @@ PKG_ZIP_URL = $(PKG_URL)/$(PKG_DIR_NAME)_$(PKG_VERSION).$(PKG_EXT)
 NRF_CC310_PATH = external/nrf_cc310
 
 ifneq ($(RIOTBASE),)
-include $(RIOTBASE)/Makefile.base
+  include $(RIOTBASE)/Makefile.base
 endif
 
 .PHONY: all clean distclean
@@ -34,7 +34,7 @@ $(PKG_SOURCE_DIR)/: $(PKG_ZIPFILE)
 
 $(PKG_ZIPFILE):
 	$(QQ)mkdir -p $(PKGDIRBASE)
-	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_ZIP_URL)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_ZIP_URL) $(PKG_SHA512)
 
 clean::
 	rm -rf $(PKG_SOURCE_DIR)
