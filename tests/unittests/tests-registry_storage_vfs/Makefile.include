@@ -1,0 +1,10 @@
+CFLAGS += -DCONFIG_REGISTRY_ENABLE_META_NAME=1
+
+USEMODULE += littlefs2
+USEMODULE += mtd
+USEMODULE += vfs
+
+USEMODULE +=  registry_storage_vfs
+USEMODULE +=  registry_int_path
+
+USEMODULE += tests-registry-namespace
