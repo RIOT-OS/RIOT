@@ -8,8 +8,7 @@ on:
             - 'CODE_OF_CONDUCT.md'
             - 'GOVERNANCE.md'
             - 'CONTRIBUTING.md'
-            - 'CODING_CONVENTIONS_C++.md'
-            - 'CODING_CONVENTIONS.md'
+            - 'CODING_CONVENTIONS*.md'
             - 'release-notes.txt'
 
 jobs:
