@@ -4,6 +4,9 @@ include ../Makefile.sys_common
 MAIN_THREAD_SIZE = THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF+256
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\($(MAIN_THREAD_SIZE)\)
 
+# Using floating point arithmetic, e.g. log2f(), for entropy estimation
+FEATURES_REQUIRED += float_math
+
 # override PRNG if desired (see sys/random for alternatives)
 # USEMODULE += prng_minstd
 

@@ -326,6 +326,9 @@ size_t fmt_s32_dfp(char *out, int32_t val, int scale);
 /**
  * @brief Format float to string
  *
+ * @warning This function is only available when the features `float_math`
+ *          is used.
+ *
  * Converts float value @p f to string
  *
  * If @p out is NULL, will only return the number of characters that would have

@@ -1,5 +1,7 @@
 include ../Makefile.core_common
 
+FEATURES_REQUIRED += float_math
+
 USEMODULE += printf_float
 
 # On ESP* a custom sched_task_exit() is used that does not implement

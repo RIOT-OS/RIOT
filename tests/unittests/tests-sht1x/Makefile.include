@@ -1,1 +1,3 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += sht1x
