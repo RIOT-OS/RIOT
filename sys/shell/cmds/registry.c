@@ -109,7 +109,7 @@ static registry_error_t _export_cb(const registry_node_t *node, const void *cont
     /* calculate the indentation based on the the exported data type */
     /* fallthrough switch is intentional */
     /* the more nesting we have, the more indentation we need. => highest nesting level first */
-    size_t indentation = 0;
+    int indentation = 0;
 
     switch (node->type) {
     case REGISTRY_NODE_PARAMETER:
@@ -364,7 +364,7 @@ static int _registry(int argc, char **argv)
 #endif
 
 help_error:
-    printf("usage: %s {get|set|commit|export|load|save}\n", argv[0]);
+    printf("usage: %s {get|set|apply|export|load|save}\n", argv[0]);
 
     return 1;
 }
