@@ -83,7 +83,7 @@ static int _init(int argc, char** argv)
 {
     if (argc != 5) {
         printf("usage: %s <dev> <mode> <frequency> <resolution>\n", argv[0]);
-        printf("\tdev: device by number between 0 and %u\n", PCA9685_NUMOF - 1);
+        printf("\tdev: device by number between 0 and %zu\n", PCA9685_NUMOF - 1);
         puts("\tmode:\n");
         puts("\t\t0: left aligned\n");
         puts("\t\t1: right aligned\n");
@@ -131,7 +131,7 @@ static int _set(int argc, char**argv)
 {
     if (argc != 4) {
         printf("usage: %s <dev> <ch> <val>\n", argv[0]);
-        printf("\tdev: device by number between 0 and %d\n", PCA9685_NUMOF - 1);
+        printf("\tdev: device by number between 0 and %zu\n", PCA9685_NUMOF - 1);
         puts("\tch: channel of device (if 16, all channels are set)\n");
         puts("\tval: duty cycle\n");
         return 1;
@@ -170,7 +170,7 @@ static int _oscillate(int argc, char** argv)
     puts("\nRIOT PWM test");
     puts("Connect an LED or scope to PWM pins to see something.\n");
 
-    printf("Available PWM device between 0 and %d\n", PCA9685_NUMOF - 1);
+    printf("Available PWM device between 0 and %zu\n", PCA9685_NUMOF - 1);
     for (unsigned i = 0; i < PCA9685_NUMOF; i++) {
         uint32_t real_f = pca9685_pwm_init(&pca9685_dev[i], OSC_MODE, OSC_FREQU, OSC_STEPS);
         if (real_f == 0) {
@@ -205,7 +205,7 @@ static int _power(int argc, char** argv)
 {
     if (argc != 3) {
         printf("usage: %s <dev> <state>\n", argv[0]);
-        printf("\tdev: device by number between 0 and %d\n", PCA9685_NUMOF - 1);
+        printf("\tdev: device by number between 0 and %zu\n", PCA9685_NUMOF - 1);
         puts("\tstate:\n");
         puts("\t\t0: power off\n");
         puts("\t\t1: power on\n");
@@ -237,7 +237,7 @@ static int _power_test(int argc, char** argv)
 {
     if (argc != 2) {
         printf("usage: %s <dev>\n", argv[0]);
-        printf("\tdev: device by number between 0 and %d\n", PCA9685_NUMOF - 1);
+        printf("\tdev: device by number between 0 and %zu\n", PCA9685_NUMOF - 1);
         return 1;
     }
 
