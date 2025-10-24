@@ -196,7 +196,14 @@ static int _send(netdev_t *netdev, const iolist_t *pkt)
          * inside the TX Done callback */
         netdev_submac->ev = NETDEV_EVENT_TX_STARTED;
     }
-    netdev_submac->bytes_tx = res;
+    if (res == 0) {
+        uint8_t len = iolist_size(pkt);
+        if (len > 0) {
+            len += IEEE802154_FCS_LEN;
+        }
+        netdev_submac->bytes_tx = len;
+    }
+
     return res;
 }
 
