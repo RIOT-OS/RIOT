@@ -66,7 +66,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         DTLS_DEBUG("establishing session\n");
         ssize_t res = sock_dtls_recv(sock, &session, unicoap_receiver_buffer,
                                      sizeof(unicoap_receiver_buffer),
-                                     CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS);
+                                     CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS);
 
         if (res != -SOCK_DTLS_HANDSHAKE) {
             DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
@@ -249,7 +249,8 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
         res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, SOCK_NO_TIMEOUT, &aux_tx);
     }
     else {
-        res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, SOCK_NO_TIMEOUT, NULL);
+        res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist,
+                                  CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS, NULL);
     }
     DTLS_DEBUG("done sending\n");
 
