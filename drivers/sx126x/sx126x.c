@@ -292,6 +292,9 @@ static void sx126x_init_default_config(sx126x_t *dev)
     sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
     sx126x_set_channel(dev, CONFIG_SX126X_CHANNEL_DEFAULT);
     sx126x_set_tx_power(dev,  CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
+#ifdef CONFIG_SX126X_DEFAULT_SYNC_WORD
+    sx126x_set_lora_sync_word(dev, CONFIG_SX126X_DEFAULT_SYNC_WORD);
+#endif
 
     dev->mod_params.bw = (sx126x_lora_bw_t)(CONFIG_LORA_BW_DEFAULT + SX126X_LORA_BW_125);
     dev->mod_params.sf = (sx126x_lora_sf_t)CONFIG_LORA_SF_DEFAULT;
