@@ -1,0 +1,2 @@
+USEMODULE += registry
+USEMODULE += tests-registry-namespace
