@@ -97,6 +97,13 @@ export function changelogLoader(): Loader {
               .slice(currentReleaseHeadingIndex + 1, index)
               .join("\n");
 
+            // Replace #ID entries with links to GitHub issues
+            // Github treats both PRs and Issues the same way regarding links
+            const contentWithGithubLinks = currentReleaseContent.replace(
+              /#(\d+)/g,
+              "[#$1](https://github.com/RIOT-OS/RIOT/issues/$1)",
+            );
+
             // Add entry to content collection
             context.store.set({
               id: slug,
@@ -108,9 +115,9 @@ export function changelogLoader(): Loader {
                 codeName: codeName,
                 slug: slug,
                 date: date,
-                markdown: currentReleaseContent,
+                markdown: contentWithGithubLinks,
               },
-              rendered: await context.renderMarkdown(currentReleaseContent),
+              rendered: await context.renderMarkdown(contentWithGithubLinks),
             });
           }
 
