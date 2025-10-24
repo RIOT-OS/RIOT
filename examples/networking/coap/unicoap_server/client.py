@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 
 from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
 import aiocoap.resource as resource
+from aiocoap.transports.tinydtls import DTLSClientConnection
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -118,9 +119,6 @@ async def main():
         async with asyncio.timeout(args.timeout):
             r = await pr.response
             print("response: %s\n%r" % (r.code, r.payload))
-            if isinstance(r.remote, DTLSClientConnection):
-                print("note: currently, aiocoap emits an error when communicating over DTLS -- "
-                      + "this is expected.")
 
         if args.observe:
             print("waiting for resource notifications")
@@ -128,6 +126,8 @@ async def main():
             async for r in pr.observation:
                 print("notification: %s\n%r" % (r, r.payload))
                 break
+
+        await protocol.shutdown()
 
     except TimeoutError:
         print(f"error: timeout exceeded after waiting {args.timeout}s")
