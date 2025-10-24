@@ -20,7 +20,7 @@ EXIT_CODE=0
 # Keywords that should trigger the commit message check and prevent an accidental
 # merge of something not meant to be merged.
 # The pretty-print format of the commit messages is always the following:
-# `    a5e4f038b8 commit message`
+# `a5e4f038b8 commit message`
 # This has to be reflected in the RegEx matching pattern.
 NOMERGE_KEYWORD_FILE="$(dirname "$0")/no_merge_keywords"
 
@@ -40,7 +40,7 @@ else
     RIOT_MASTER="master"
 fi
 
-SQUASH_COMMITS="$(git log "$(git merge-base HEAD "${RIOT_MASTER}")"...HEAD --pretty=format:"    %h %s" | \
+SQUASH_COMMITS="$(git log "$(git merge-base HEAD "${RIOT_MASTER}")"...HEAD --pretty=format:"%h %s" | \
                 grep -i -f "${NOMERGE_KEYWORD_FILE}")"
 
 if [ -n "${SQUASH_COMMITS}" ]; then
@@ -59,7 +59,9 @@ if [ -n "${SQUASH_COMMITS}" ]; then
         fi
     else
         echo -e "${CERROR}Pull request needs squashing or contains no-merge keywords:${CRESET}" 1>&2
-        echo -e "${SQUASH_COMMITS}"
+        while IFS= read -r line; do
+            echo -e "    ${line}"
+        done <<< "${SQUASH_COMMITS}"
     fi
     EXIT_CODE=1
 fi
