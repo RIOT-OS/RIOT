@@ -141,7 +141,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
             DTLS_DEBUG("recv failure: %" PRIdSIZE "\n", received);
             return;
         }
-//        sock->buf_ctx = NULL;
+     g   /* FIXME: sock_dtls_recv_buf_aux fails on second read due to sock->buf_ctx not being NULL */
+        // sock->buf_ctx = NULL;
         if (received == 0) {
             return;
         }
