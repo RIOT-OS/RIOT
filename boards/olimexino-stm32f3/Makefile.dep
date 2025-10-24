@@ -1,0 +1,17 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+include  $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
+
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  # The Mask-ROM bootloader provides USB-DFU capability
+  FEATURES_REQUIRED += bootloader_stm32
+  USEMODULE += usb_board_reset
+endif
+
+# default to using fatfs on SD card
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += fatfs_vfs
+  USEMODULE += mtd
+endif
