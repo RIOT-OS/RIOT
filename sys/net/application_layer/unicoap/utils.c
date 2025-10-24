@@ -207,7 +207,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     }
 }
 
-bool unicoap_message_is_response(uint8_t code)
+bool unicoap_message_code_is_response(uint8_t code)
 {
     switch (unicoap_code_class(code)) {
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
@@ -466,5 +466,64 @@ void unicoap_options_dump_all(const unicoap_options_t* options)
             printf("%02X", value[i]);
         }
         printf(">\n");
+    }
+}
+
+void unicoap_print_protocols(unicoap_proto_set_t protocols)
+{
+    if (likely(protocols == UNICOAP_PROTOCOLS_ALLOW_ALL)) {
+        printf("<all>");
+    }
+    else {
+        printf("[ ");
+        for (unicoap_proto_t p = 1; p < (sizeof(unicoap_proto_t) * 8); p += 1) {
+            if (protocols & UNICOAP_PROTOCOL_FLAG(p)) {
+                printf("%s ", unicoap_string_from_proto(p));
+            }
+        }
+        printf("]");
+    }
+}
+
+void unicoap_print_methods(unicoap_method_set_t methods)
+{
+    printf("[ ");
+    for (unicoap_method_t m = 1; m < (sizeof(unicoap_method_t) * 8); m += 1) {
+        if (methods & UNICOAP_METHOD_FLAG(m)) {
+            printf("%s ", unicoap_string_from_method(m));
+        }
+    }
+    printf("]");
+}
+
+void unicoap_print_resource_flags(unicoap_resource_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_RESOURCE_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    if (flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
+        printf("MATCH_SUBTREE ");
+    }
+    printf("]");
+}
+
+void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto)
+{
+    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+        switch (proto) {
+        case UNICOAP_PROTO_UDP:
+            unicoap_assist(API_ERROR("CoAP over UDP driver missing")
+                           FIXIT("USEMODULE += unicoap_driver_udp"));
+            break;
+
+        case UNICOAP_PROTO_DTLS:
+            unicoap_assist(API_ERROR("CoAP over DTLS driver missing")
+                           FIXIT("USEMODULE += unicoap_driver_dtls"));
+            break;
+
+        default:
+            break;
+        }
     }
 }
