@@ -1,5 +1,6 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { LinkCard } from "@astrojs/starlight/components";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -26,5 +27,11 @@ const { Content, headings } = await render(entry);
     pagefind: false, // We don't want to pollute our search with release-notes entries
   }}
   headings={headings}
-  ><Content />
+>
+  <LinkCard
+    title="View on GitHub"
+    href={`https://github.com/RIOT-OS/RIOT/releases/tag/${entry.data.slug.replaceAll("-", ".")}`}
+    description="The changelog can also be found on GitHub."
+  />
+  <Content />
 </StarlightPage>
