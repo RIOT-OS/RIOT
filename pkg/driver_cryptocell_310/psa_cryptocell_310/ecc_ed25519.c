@@ -79,7 +79,8 @@ psa_status_t psa_derive_ecc_ed25519_public_key( const uint8_t *priv_key_buffer,
                                             pub_key_buffer, &pub_key_size, &tmp);
     cryptocell_310_disable();
     if (ret != CRYS_OK) {
-        DEBUG("CRYS_ECEDW_SeedKeyPair failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
+        DEBUG("CRYS_ECEDW_SeedKeyPair failed with %s\n",
+            cryptocell310_status_to_humanly_readable(ret));
         goto done;
     }
 
@@ -116,7 +117,8 @@ psa_status_t psa_ecc_ed25519_sign_message(const uint8_t *priv_key_buffer,
     size_t signature_size = 64;
 
     cryptocell_310_enable();
-    ret = CRYS_ECEDW_Sign(signature, &signature_size, input, input_length, secret_key, sizeof(secret_key), &tmp);
+    ret = CRYS_ECEDW_Sign(signature, &signature_size, input, input_length,
+                          secret_key, sizeof(secret_key), &tmp);
     cryptocell_310_disable();
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECEDW_Sign failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
@@ -147,7 +149,8 @@ psa_status_t psa_ecc_ed25519_verify_message(const uint8_t *pub_key_buffer,
     }
 
     cryptocell_310_enable();
-    ret = CRYS_ECEDW_Verify(signature, 64, pub_key_buffer, 32, (uint8_t *)input, input_length, &tmp);
+    ret = CRYS_ECEDW_Verify(signature, 64, pub_key_buffer, 32,
+                            (uint8_t *)input, input_length, &tmp);
     cryptocell_310_disable();
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECEDW_Verify failed with %s\n", cryptocell310_status_to_humanly_readable(ret));

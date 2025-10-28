@@ -368,7 +368,9 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
         psa_get_public_key_data_from_key_slot(slot, &pub_key_data, &pub_key_bytes);
         assert(*key_bytes == 32);
         assert(*pub_key_bytes == 32);
-        if (signature_size < 64) return PSA_ERROR_BUFFER_TOO_SMALL;
+        if (signature_size < 64) {
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
         *signature_length = 64;
         return psa_ecc_ed25519_sign_message(key_data, pub_key_data,
                                             input, input_length, signature);
@@ -471,7 +473,9 @@ psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *a
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
     case PSA_ECC_ED25519:
         assert(*pubkey_data_len == 32);
-        if (signature_length < 64) return PSA_ERROR_INVALID_SIGNATURE;
+        if (signature_length < 64) {
+            return PSA_ERROR_INVALID_SIGNATURE;
+        }
         return psa_ecc_ed25519_verify_message(pubkey_data, input, input_length, signature);
 #endif
     default:
@@ -590,7 +594,9 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            if (data_length < 32) return PSA_ERROR_INVALID_ARGUMENT;
+            if (data_length < 32) {
+                return PSA_ERROR_INVALID_ARGUMENT;
+            }
             ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data);
             *pubkey_data_len = 32;
             break;
