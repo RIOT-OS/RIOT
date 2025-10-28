@@ -17,21 +17,17 @@
 #include "string_utils.h"
 
 #include "psa/crypto.h"
+#include "psa_ecc.h"
 #include "monocypher-ed25519.h"
 #include "random.h"
 
 psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer,
                                                 uint8_t *pub_key_buffer)
 {
-    uint8_t priv_and_pub_key[64] = { 0 };
-
-    // todo: maybe this should usa psa_random instead
+    /* todo: maybe this should use psa_random instead */
     random_bytes(priv_key_buffer, 32);
-    crypto_ed25519_key_pair(priv_and_pub_key, pub_key_buffer, priv_key_buffer);
 
-    explicit_bzero(priv_and_pub_key, 64);
-
-    return PSA_SUCCESS;
+    return psa_derive_ecc_ed25519_public_key(priv_key_buffer, pub_key_buffer);
 }
 
 psa_status_t psa_derive_ecc_ed25519_public_key( const uint8_t *priv_key_buffer,
