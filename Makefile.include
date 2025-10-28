@@ -333,28 +333,7 @@ APPLICATION := $(strip $(APPLICATION))
 
 # provide common external programs for `Makefile.include`s
 
-ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
-  ifeq (,$(WGET))
-    ifeq (0,$(shell which wget > /dev/null 2>&1 ; echo $$?))
-      WGET = $(call memoized,WGET,$(shell which wget))
-    endif
-  endif
-  ifeq (,$(CURL))
-    ifeq (0,$(shell which curl > /dev/null 2>&1 ; echo $$?))
-      CURL = $(call memoized,CURL,$(shell which curl))
-    endif
-  endif
-  ifeq (,$(WGET)$(CURL))
-    $(warning Neither wget nor curl is installed!)
-  endif
-
-  ifeq (,$(DOWNLOAD_TO_STDOUT))
-    DOWNLOAD_TO_STDOUT ?= $(if $(CURL),$(CURL) -s,$(WGET) -q -O-)
-  endif
-  ifeq (,$(DOWNLOAD_TO_FILE))
-    DOWNLOAD_TO_FILE ?= $(DLCACHE)
-  endif
-endif
+DOWNLOAD_TO_FILE ?= $(DLCACHE)
 
 ifeq (,$(UNZIP_HERE))
   ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
