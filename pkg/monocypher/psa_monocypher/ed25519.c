@@ -63,7 +63,7 @@ psa_status_t psa_ecc_ed25519_verify_message(const uint8_t *pub_key_buffer,
                                             const uint8_t *input, size_t input_length,
                                             const uint8_t *signature)
 {
-    if (!crypto_ed25519_check(signature, pub_key_buffer, input, input_length)) {
+    if (crypto_ed25519_check(signature, pub_key_buffer, input, input_length) != 0) {
         return PSA_ERROR_INVALID_SIGNATURE;
     }
 
