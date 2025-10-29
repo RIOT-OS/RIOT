@@ -1,32 +1,28 @@
-/*
- * Copyright (C) 2024 Isikcan 'Jon' Yilmaz
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
+<!--
+SPDX-FileCopyrightText: 2024 Isikcan 'Jon' Yilmaz
+SPDX-License-Identifier: LGPL-2.1-only
+-->
 
-/**
- * @defgroup    boards_esp32s3_seeedstudio ESP32 Seeed Studio XIAO Board
- * @ingroup     boards_esp32s3
- * @brief       Support for the Seeed Studio Xiao ESP32S3
- * @author      Isikcan 'Jon' Yilmaz <can158@gmail.com>
+@defgroup    boards_seeedstudio-xiao-esp32s3 Seeed Studio XIAO ESP32S3 Board
+@ingroup     boards_esp32s3
+@brief       Support for the Seeed Studio Xiao ESP32S3
+@author      Isikcan 'Jon' Yilmaz <can158@gmail.com>
 
-\section esp32s3_seeedstudio Seeed Studio Xiao ESP32
+\section esp32s3_seeedstudio Seeed Studio Xiao ESP32S3
 
 ## Table of Contents {#esp32s3_seeedstudio_toc}
 
-1. [Overview](#esp32s3_seeedstudio_overview)
-2. [Hardware](#esp32s3_seeedstudio_hardware)
-    1. [MCU](#esp32s3_seeedstudio_mcu)
-    2. [Board Configuration](#esp32s3_seeedstudio_board_configuration)
-    3. [Board Pinout](#esp32s3_seeedstudio_pinout)
-3. [Flashing the Device](#esp32s3_seeedstudio_flashing)
-4. [Using STDIO](#esp32s3_seeedstudio_stdio)
+-# [Overview](#esp32s3_seeedstudio_overview)
+-# [Hardware](#esp32s3_seeedstudio_hardware)
+    -# [MCU](#esp32s3_seeedstudio_mcu)
+    -# [Board Configuration](#esp32s3_seeedstudio_board_configuration)
+    -# [Board Pinout](#esp32s3_seeedstudio_pinout)
+-# [Flashing the Device](#esp32s3_seeedstudio_flashing)
+-# [Using STDIO](#esp32s3_seeedstudio_stdio)
 
 ## Overview {#esp32s3_seeedstudio_overview}
 
-The Seeed Studio ESP32S3 is one of the ESP32-S3 boards from Seeed Studio.
+The Seeed Studio Xiao ESP32S3 is one of the ESP32-S3 boards from Seeed Studio.
 \image html https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/img/xiaoesp32s3.jpg "Seeed Studio ESP32S3" width=800px
 
 Vendor's info page for the board [here](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)
@@ -61,7 +57,8 @@ see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
 ### Board Configuration {#esp32s3_seeedstudio_board_configuration}
 
-Seeed Studio Xiao ESP32S3 boards have no special hardware on board, besides a yellow LED connected to GPIO21.
+Seeed Studio Xiao ESP32S3 boards have no special hardware on board,
+besides a yellow LED connected to GPIO21.
 
 The default board configuration provides:
 
@@ -78,7 +75,8 @@ boards, see section \ref esp32_peripherals "Common Peripherals".
 
 ### Board Pinout {#esp32s3_seeedstudio_pinout}
 
-The following figure shows the pinout as configured by board definition (excluding the camera module).
+The following figure shows the pinout as configured by board definition
+(excluding the camera module).
 
 @image html https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/img/2.jpg "Seeed Studio Xiao ESP32S3 Pinout" width=900px
 
@@ -93,7 +91,7 @@ Since the board does not have a USB-to-Serial chip, the easiest way to flash
 the board is using the USB Serial/JTAG interface. Just connect the board to
 your host computer and use the following command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=esp32s3-seeedstudio make flash ...
+BOARD=seeedstudio-xiao-esp32s3 make flash ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note Usually the make system resets the board before flashing to enable the
@@ -130,7 +128,5 @@ via the USB CDC ACM interface.
 Alternatively, the UART interface could be used with an external USB-to-Serial
 adapter. Simply add `stdio_uart` to the list of used modules for this purpose:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=esp32s3-seeedstudio USEMODULE=stdio_uart make flash ...
+BOARD=seeedstudio-xiao-esp32s3 USEMODULE=stdio_uart make flash ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- */

@@ -1,16 +1,12 @@
 /*
- * Copyright (C) 2024 Isikcan 'Jon' Yilmaz
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 Isikcan 'Jon' Yilmaz
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
+#pragma once
 
 /**
- * @ingroup     boards_esp32s3_seeedstudio
+ * @ingroup     boards_seeedstudio-xiao-esp32s3
  * @brief       Board specific configuration of direct mapped GPIOs
  * @file
  * @author      Isikcan 'Jon' Yilmaz <can158@gmail.com>
@@ -46,6 +42,4 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* GPIO_PARAMS_H */
 /** @} */

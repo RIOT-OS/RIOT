@@ -1,13 +1,12 @@
 /*
- * Copyright (C) 2024 Isikcan 'Jon' Yilmaz
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 Isikcan 'Jon' Yilmaz
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
- * @ingroup     boards_esp32s3_seeedstudio
+ * @ingroup     boards_seeedstudio-xiao-esp32s3
  * @brief       Board definitions for Seeed Studio Xiao ESP32S3 board
  * @{
  *
@@ -20,9 +19,6 @@
  * @file
  * @author      Isikcan 'Jon' Yilmaz <can158@gmail.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -47,13 +43,13 @@
  * Since the GPIO of the button is pulled up with an external resistor, the
  * mode for the GPIO pin has to be GPIO_IN.
  */
-#define BTN0_MODE       GPIO_IN_PU
+#define BTN0_MODE       GPIO_IN
 
 /**
  * @brief   Default interrupt flank definition for the button GPIO
  */
 #ifndef BTN0_INT_FLANK
-#define BTN0_INT_FLANK  GPIO_FALLING
+#  define BTN0_INT_FLANK    GPIO_FALLING
 #endif
 
 /**
@@ -71,8 +67,8 @@
  */
 /** @} */
 #ifndef LED0_PIN
-#define LED0_PIN        GPIO21
-#define LED0_ACTIVE     (0)
+#  define LED0_PIN      GPIO21
+#  define LED0_ACTIVE   (0)
 #endif
 
 /* include common board definitions as last step */
@@ -85,6 +81,4 @@ extern "C" {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
-
-#endif /* BOARD_H */
 /** @} */
