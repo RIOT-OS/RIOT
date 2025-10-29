@@ -921,7 +921,13 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
             *data = sock->buffer.data;
             sock->buffer.data = NULL;
             _copy_session(sock, remote);
-
+#ifdef SOCK_HAS_ASYNC
+            /* only overwrite buf_ctx if used below during call to dtls_handle_message */
+            if (*buf_ctx == NULL) {
+                *buf_ctx = sock->buf_ctx;
+                sock->buf_ctx = NULL;
+            }
+#endif /* SOCK_HAS_ASYNC */
             return sock->buffer.datalen;
         }
         /* Crude way to somewhat test that `sock_dtls_aux_rx_t` and
