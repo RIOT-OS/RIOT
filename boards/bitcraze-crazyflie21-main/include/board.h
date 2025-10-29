@@ -16,7 +16,6 @@
  */
 
 #include "cpu.h"
-#include "motor_driver.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,78 +48,6 @@ extern "C" {
 #define LED4_PIN_NUM        1 /* LED top left green */
 #define LED4_PORT           GPIO_PORT_C
 #define LED4_PORT_NUM       PORT_C
-/** @} */
-
-/**
- * @name Describe DC motors with PWM channel and GPIOs
- * @{
- */
-/** Motor driver config. Two driver with three and one motor attached respectively */
-static const motor_driver_config_t motor_driver_config[] = {
-    {
-        .pwm_dev = 1,
-        .mode = MOTOR_DRIVER_1_DIR,
-        .mode_brake = MOTOR_BRAKE_HIGH,
-        .pwm_mode = PWM_LEFT,
-        .pwm_frequency = 20000U,
-        .pwm_resolution = 4200U,
-        .nb_motors = 3,
-        .motors = {
-            {
-                .pwm_channel = 1,
-                .gpio_enable = 0,
-                .gpio_dir0 = 0,
-                .gpio_dir1_or_brake = 0,
-                .gpio_dir_reverse = 0,
-                .gpio_enable_invert = 0,
-                .gpio_brake_invert = 0,
-            },
-            {
-                .pwm_channel = 3,
-                .gpio_enable = 0,
-                .gpio_dir0 = 0,
-                .gpio_dir1_or_brake = 0,
-                .gpio_dir_reverse = 0,
-                .gpio_enable_invert = 0,
-                .gpio_brake_invert = 0,
-            },
-            {
-                .pwm_channel = 0,
-                .gpio_enable = 0,
-                .gpio_dir0 = 0,
-                .gpio_dir1_or_brake = 0,
-                .gpio_dir_reverse = 0,
-                .gpio_enable_invert = 0,
-                .gpio_brake_invert = 0,
-            },
-        },
-        .cb = NULL,
-    },
-    {
-        .pwm_dev = 2,
-        .mode = MOTOR_DRIVER_1_DIR,
-        .mode_brake = MOTOR_BRAKE_HIGH,
-        .pwm_mode = PWM_LEFT,
-        .pwm_frequency = 20000U,
-        .pwm_resolution = 4200U,
-        .nb_motors = 1,
-        .motors = {
-            {
-                .pwm_channel = 0,
-                .gpio_enable = 0,
-                .gpio_dir0 = 0,
-                .gpio_dir1_or_brake = 0,
-                .gpio_dir_reverse = 0,
-                .gpio_enable_invert = 0,
-                .gpio_brake_invert = 0,
-            },
-        },
-        .cb = NULL,
-    }
-};
-
-/** Number of motor drivers */
-#define MOTOR_DRIVER_NUMOF           ARRAY_SIZE(motor_driver_config)
 /** @} */
 
 #ifdef __cplusplus
