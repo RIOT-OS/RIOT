@@ -149,6 +149,8 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
         }
     }
     if (!level && (code != DTLS_EVENT_CONNECT)) {
+        /* TODO: dTLS alerts and events other than DTLS_EVENT_CONNECTED
+         * are currently silently ignored on the receiving side */
         mbox_put(&sock->mbox, &msg);
     }
 
@@ -845,12 +847,16 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         uint32_t start_recv = ztimer_now(ZTIMER_USEC);
         msg_t msg;
 
+        /* Check whether there is a session establishment to be acked. */
+        while (mbox_try_get(&sock->mbox, &msg)) {
+            if (msg.type == DTLS_EVENT_CONNECTED) {
+                return _complete_handshake(sock, remote, msg.content.ptr);
+            }
+            /* silently ignore other potential mbox messages */
+        }
+        /* Check whether there is decrypted data available */
         if (sock->buffer.data != NULL) {
             return _copy_buffer(sock, remote, data, max_len);
-        }
-        else if (mbox_try_get(&sock->mbox, &msg) &&
-                 msg.type == DTLS_EVENT_CONNECTED) {
-            return _complete_handshake(sock, remote, msg.content.ptr);
         }
         /* Crude way to somewhat test that `sock_dtls_aux_rx_t` and
          * `sock_udp_aux_rx_t` remain compatible: */
@@ -903,16 +909,20 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         uint32_t start_recv = ztimer_now(ZTIMER_USEC);
         msg_t msg;
 
+        /* Check whether there is a session establishment to be acked. */
+        while (mbox_try_get(&sock->mbox, &msg)) {
+            if (msg.type == DTLS_EVENT_CONNECTED) {
+                return _complete_handshake(sock, remote, msg.content.ptr);
+            }
+            /* silently ignore other potential mbox messages */
+        }
+        /* Check whether there is decrypted data available */
         if (sock->buffer.data != NULL) {
             *data = sock->buffer.data;
             sock->buffer.data = NULL;
             _copy_session(sock, remote);
 
             return sock->buffer.datalen;
-        }
-        else if (mbox_try_get(&sock->mbox, &msg) &&
-                 msg.type == DTLS_EVENT_CONNECTED) {
-            return _complete_handshake(sock, remote, msg.content.ptr);
         }
         /* Crude way to somewhat test that `sock_dtls_aux_rx_t` and
          * `sock_udp_aux_rx_t` remain compatible: */
@@ -1058,7 +1068,9 @@ void _udp_cb(sock_udp_t *udp_sock, sock_async_flags_t flags, void *ctx)
         sock->buf_ctx = data_ctx;
         res = dtls_handle_message(sock->dtls_ctx, &remote,
                                   data, res);
-        if (sock->buffer.data == NULL) {
+        if (res < 0 || sock->buffer.data == NULL) {
+            /* buffer.data will point to decrypted application data, if available.
+             * if not or on failure, drop potential remaining udp chunks */
             _check_more_chunks(udp_sock, &data, &data_ctx, &remote_ep);
             sock->buf_ctx = NULL;
         }
