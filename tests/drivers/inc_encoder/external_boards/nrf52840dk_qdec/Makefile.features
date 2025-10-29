@@ -1,0 +1,3 @@
+FEATURES_PROVIDED += periph_qdec
+
+include $(RIOTBOARD)/nrf52840dk/Makefile.features

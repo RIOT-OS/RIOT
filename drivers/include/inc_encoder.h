@@ -13,8 +13,10 @@
  * ## Description
  * This is a driver for a generic incremental rotary encoder. These sensors are most often
  * used with motors.
+ * An example of such an encoder can be found [here](https://www.dfrobot.com/product-1617.html)
+ *
  * The sensor generates a fixed number of pulses per rotation on two output pins.
- * These signals are phase-shifted slightly, enabling the detection of rotation direction.
+ * These signals are phase-shifted by 90 degrees, enabling the detection of rotation direction.
  *
  * These encoders typically have four wires:
  *  - GNR (Ground)
@@ -22,20 +24,51 @@
  *  - Phase A
  *  - Phase B
  *
- * Phase A should be connected to the pin configured as the interrupt pin,
- * while Phase B (the shifted signal) should be connected to the direction pin.
- *
+ * Phase A should be connected to the pin configured as the interrupt pin or the QDEC A pin,
+ * while Phase B (the shifted signal) should be connected to the direction pin or QDEC B pin.
  * If the Phase A and Phase B connections are swapped,
  * the detected rotation direction will be reversed.
- * When only Phase A is connected, the encoder will still report movement,
- * but there will be no distinction between counter clock wise and clock wise rotation.
- * An example for such an encoder can be found [here](https://www.dfrobot.com/product-1617.html)
  *
  * The driver provides functions to read the current RPM
  * and the total number of revolutions (in hundredths) since the last measurement.
  *
  * Configuration options are available via Kconfig to specify
- * the number of pulses per rotation and the gear reduction ratio (in tenths).
+ * the number of pulses per rotation, the maximum RPM, and the gear reduction ratio (in tenths).
+ *
+ * ## Backends
+ * This driver supports two backends for reading the encoder signals:
+ *  - Hardware accelerated using the QDEC peripheral
+ *  - Software based using GPIO interrupts
+ *
+ * To use either of the backends add the corresponding module to your application Makefile:
+ * ```
+ * USEMODULE += inc_encoder_hardware
+ * ```
+ * or
+ * ```
+ * USEMODULE += inc_encoder_software
+ * ```
+ *
+ * ### GPIO Interrupt Backend
+ * The GPIO interrupt backend uses interrupts to count the number of rising edges on Phase A and
+ * determines the rotation direction based on the state of Phase B.
+ * The RPM calculation is done based on the delta time between the last two rising edges.
+ * If only one phase is connected, the driver will still count the pulses,
+ * but there will be no direction detection.
+ *
+ * ### QDEC Backend
+ * The QDEC backend uses the microcontroller's Quadrature Decoder peripheral to handle the counting
+ * and direction detection in hardware.
+ * The RPM calculation is done periodically based on the
+ * pulse count provided by the QDEC peripheral.
+ * If only one phase is connected, the QDEC peripheral will not count any pulses.
+ * The period for RPM calculation can be configured via Kconfig.
+ *
+ * ## SAUL Interface
+ * This driver implements the SAUL sensor interface.
+ * It provides two SAUL devices:
+ *  - One for reading the current RPM
+ *  - One for reading the total number of revolutions in hundredths since the last read.
  *
  * @note After 327 revolutions without reading and resetting
  *       the revolution counter, the `phydat` value will overflow.
@@ -52,6 +85,10 @@
 
 #include "periph/gpio.h"
 #include "irq.h"
+#include "periph/qdec.h"
+#include "ztimer.h"
+#include "ztimer/periodic.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,20 +98,32 @@ extern "C" {
  * @brief Device initialization parameters
  */
 typedef struct {
+#if IS_USED(MODULE_INC_ENCODER_HARDWARE)
+    qdec_t qdec_dev;  /**< QDEC device used for hardware decoding */
+#elif IS_USED(MODULE_INC_ENCODER_SOFTWARE)
     gpio_t interrupt; /**< Interrupt pin (first phase) */
     gpio_t direction; /**< Pin used to determine the direction (shifted phase) */
+#endif
 } inc_encoder_params_t;
 
 /**
  * @brief Device descriptor for the driver
  */
 typedef struct {
-    inc_encoder_params_t params;  /**< configuration parameters */
-    uint32_t             delta_t;         /**< time delta since the last read */
+    inc_encoder_params_t params;          /**< configuration parameters */
+#if IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+    uint32_t             delta_t;         /**< time delta since the last pulse */
     int32_t              pulse_counter;   /**< number of pulses since last read */
     uint32_t             last_read_time;  /**< time of the last read */
-    bool                 ccw;             /**< counter clock wise rotation */
+    bool                 cw;              /**< clock wise rotation */
     bool                 stale;           /**< indicates that there is no new data to be read */
+#elif IS_USED(MODULE_INC_ENCODER_HARDWARE)
+    int32_t              extended_count;  /**< accumulated count of pulse overflows */
+    int32_t              prev_count;      /**< number of pulses at last rpm calculation */
+    int32_t              leftover_count;  /**< leftover from last reset */
+    int32_t              last_rpm;        /**< last calculated RPM value */
+    ztimer_periodic_t    rpm_timer;       /**< timer used to periodically calculate RPM */
+#endif
 } inc_encoder_t;
 
 /**
@@ -85,6 +134,7 @@ typedef struct {
  *
  * @retval         0              on success
  * @retval         -EIO           on failure setting up the pins
+ * @retval         -EINVAL        on invalid qdec configuration
  */
 int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params);
 

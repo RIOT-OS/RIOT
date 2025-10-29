@@ -38,29 +38,58 @@ extern "C" {
 #endif
 
 /**
- * @name    default configuration parameters for a generic incremental rotary encoder
- * @{
+ * @brief Default number of pulses per revolution
  */
-/**
- * @brief Default pin of the first phase used to trigger the interrupt
- */
-#ifndef INC_ENCODER_INTERRUPT
-#  define INC_ENCODER_INTERRUPT GPIO_PIN(1, 1)
+#if IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#  ifndef CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS
+#    define CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS 200
+#  endif
 #endif
 
 /**
- * @brief Default pin of the second (shifted) phase used to determine the direction
+ * @name    default configuration parameters for a generic incremental rotary encoder
+ * @{
  */
-#ifndef INC_ENCODER_DIRECTION
-#  define INC_ENCODER_DIRECTION GPIO_PIN(1, 2)
+#if IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+/**
+ * @brief Default pin of the first phase used to trigger the interrupt for software decoding
+ */
+#  ifndef INC_ENCODER_INTERRUPT
+#    define INC_ENCODER_INTERRUPT GPIO_PIN(1, 10)
+#  endif
+
+/**
+ * @brief Default pin of the second (shifted) phase used to determine
+ *        the direction for software decoding
+ */
+#  ifndef INC_ENCODER_DIRECTION
+#    define INC_ENCODER_DIRECTION GPIO_PIN(1, 11)
+#  endif
+#endif /* IS_USED(MODULE_INC_ENCODER_SOFTWARE) */
+
+#if IS_USED(MODULE_INC_ENCODER_HARDWARE)
+/**
+ * @brief Default QDEC device used for hardware decoding
+ */
+#ifndef INC_ENCODER_QDEC_DEV
+#  define INC_ENCODER_QDEC_DEV QDEC_DEV(0)
 #endif
+#endif /* IS_USED(MODULE_INC_ENCODER_HARDWARE) */
 
 /**
  * @brief Default parameters
  */
-#ifndef INC_ENCODER_PARAMS
-#  define INC_ENCODER_PARAMS { .interrupt = INC_ENCODER_INTERRUPT, \
-                               .direction = INC_ENCODER_DIRECTION }
+#if IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+#  ifndef INC_ENCODER_PARAMS
+#    define INC_ENCODER_PARAMS { .interrupt = INC_ENCODER_INTERRUPT, \
+                                 .direction = INC_ENCODER_DIRECTION }
+#  endif
+#elif IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#  ifndef INC_ENCODER_PARAMS
+#    define INC_ENCODER_PARAMS { .qdec_dev = INC_ENCODER_QDEC_DEV }
+#  endif
+#else
+#  define INC_ENCODER_PARAMS {}
 #endif
 /**@}*/
 

@@ -44,7 +44,7 @@ int main(void)
             puts("[Failed]");
             return 1;
         }
-        printf("SENSOR DATA:\n\tRPM: %ld\n\tPULSES: %ld\n", (long) rpm, (long) pulses);
+        printf("SENSOR DATA:\n\tRPM  : %ld\n\tCREVS: %ld\n", (long) rpm, (long) pulses);
         ztimer_sleep(ZTIMER_SEC, 1);
     }
 }
