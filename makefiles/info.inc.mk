@@ -110,8 +110,9 @@ info-build:
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
 	@echo
+	@echo 'DLCACHE:            $(DLCACHE)'
+	@echo 'DLCACHE_DIR:        $(DLCACHE_DIR)'
 	@echo 'DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE)'
-	@echo 'DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT)'
 	@echo 'UNZIP_HERE:         $(UNZIP_HERE)'
 	@echo ''
 	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'

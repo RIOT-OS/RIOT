@@ -128,10 +128,14 @@ export DEVELHELP             # Set to 1 to spend ROM, RAM and CPU time for help 
 # USE_PROGRAMMER_WRAPPER_SCRIPT     # Use the programmer wrapper Python script. Default is 0 (wrapper not used).
 
 
-export DLCACHE               # directory used to cache http downloads
-export DOWNLOAD_TO_FILE      # Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL)` to download `$(URL)` to `$(DESTINATION)`.
-export DOWNLOAD_TO_STDOUT    # Use `$(DOWNLOAD_TO_STDOUT) $(URL)` to download `$(URL)` output `$(URL)` to stdout, e.g. to be piped into `tar xz`.
-export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FILE)` to extract the contents of the zip file `$(SOME_FILE)` into `$(SOME_FOLDER)`.
+export DLCACHE               # Use `$(DLCACHE) $(DESTINATION) $(URL) [$(SHA512)]` to
+                             # download `$(URL)` to `$(DESTINATION)` but keep a copy in cache
+                             # with an `$(SHA512)` checksum. If no checksum is given, the
+                             # URL will just be downloaded, not cached.
+export DOWNLOAD_TO_FILE      # Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL) [$(SHA512)]` to
+                             # download `$(URL)` to `$(DESTINATION)`. Alias for $(DLCACHE).
+export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FILE)` to extract
+                             # the contents of the zip file `$(SOME_FILE)` into `$(SOME_FOLDER)`.
 
 export LAZYSPONGE            # Command saving stdin to a file only on content update.
 export LAZYSPONGE_FLAGS      # Parameters supplied to LAZYSPONGE.
