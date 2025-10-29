@@ -1688,7 +1688,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\"' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -1745,7 +1745,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_enterprise \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_EAP_ID=\"anonymous\" -DWIFI_EAP_USER=\"MyUserName\" -DWIFI_EAP_PASS=\"MyPassphrase\"' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -1797,7 +1797,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
