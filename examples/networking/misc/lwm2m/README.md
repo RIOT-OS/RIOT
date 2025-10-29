@@ -89,7 +89,7 @@ The server address is set by the application, during the instantiation of the Se
 It can be set via `menuconfig` or the environmental variable `LWM2M_SERVER_URI`. It should be
 reachable from the node, e.g. either running on native with a tap interface or as a mote connected
 to a
-[border router](https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc_border_router).
+[border router](https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/border_router).
 
 Also, if a bootstrap server is being used, it should be configured in the application via
 `menuconfig` or setting the environmental variable `LWM2M_SERVER_BOOTSTRAP` to 1. This information
