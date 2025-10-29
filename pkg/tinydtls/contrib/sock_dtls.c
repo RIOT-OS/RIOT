@@ -97,6 +97,12 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, s
 {
     sock_dtls_t *sock = dtls_get_app_data(ctx);
 
+    if (sock->buffer.data != NULL) {
+        DEBUG("sock_dtls: dropping decrypted message\n");
+        /* anyhow ignored by tinydtls */
+        return -ENOBUFS;
+    }
+
     DEBUG("sock_dtls: decrypted message arrived\n");
     sock->buffer.data = buf;
     sock->buffer.datalen = len;
