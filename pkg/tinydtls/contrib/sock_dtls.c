@@ -733,7 +733,7 @@ ssize_t sock_dtls_sendv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
 #if SOCK_HAS_ASYNC
 /**
  * @brief   Checks for and iterates for more data chunks within the network
- *          stacks anternal packet buffer
+ *          stacks internal packet buffer
  *
  * When no more chunks exists, `data_ctx` assures cleaning up the internal
  * buffer state and `sock_udp_recv_buf()` returns 0.
@@ -896,7 +896,7 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     sock_udp_ep_t ep;
 
     /* 2nd call to the function (with ctx set) will free the data */
-    if (*buf_ctx) {
+    if (*buf_ctx != NULL) {
         int res = sock_udp_recv_buf_aux(sock->udp_sock, data, buf_ctx,
                                         timeout, &ep, (sock_udp_aux_rx_t *)aux);
         assert(res == 0);
