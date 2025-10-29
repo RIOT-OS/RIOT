@@ -24,9 +24,9 @@ As a reminder, all contributors are expected to follow our
 If you are just beginning to work with RIOT you might first want to read our
 [documentation]. Especially the following sections might be of interest to you
 
-- [Getting Started](https://doc.riot-os.org/getting-started.html)
-- [Creating modules](https://doc.riot-os.org/creating-modules.html)
-- [Creating an application](https://doc.riot-os.org/creating-an-application.html)
+- [Getting Started](https://guide.riot-os.org/getting-started/installing/)
+- [Creating modules](https://guide.riot-os.org/advanced_tutorials/creating_modules/)
+- [Creating an application](https://guide.riot-os.org/advanced_tutorials/creating_application/)
 
 [documentation]: https://doc.riot-os.org
 
@@ -234,7 +234,7 @@ In this section, we give the bare minimum for a better experience with our
 development workflow on GitHub.
 
 [try-github-io]: https://try.github.io/
-[git-scm-getting-started]: https://git-scm.com/book/en/v2/Getting-Started-Git-Basics
+[git-scm-getting-started]: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
 
 ### Setup your local RIOT repository
 
