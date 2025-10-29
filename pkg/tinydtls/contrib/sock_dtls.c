@@ -167,6 +167,7 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
             break;
         case DTLS_EVENT_CONNECTED:
             /* we received a session handshake initialization */
+            memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
             sock->async_cb(sock, SOCK_ASYNC_CONN_RECV,
                            sock->async_cb_arg);
             break;
