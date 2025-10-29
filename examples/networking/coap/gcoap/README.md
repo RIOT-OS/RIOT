@@ -93,5 +93,5 @@ implementations:
 
 
 [1]: https://tools.ietf.org/html/rfc7252    "CoAP spec"
-[2]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/gnrc_networking    "instructions"
-[3]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/gnrc_border_router    "SLIP instructions"
+[2]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/networking    "instructions"
+[3]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/border_router    "SLIP instructions"
