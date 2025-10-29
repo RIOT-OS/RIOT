@@ -781,18 +781,6 @@ static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
         _copy_session(sock, remote);
         _check_more_chunks(sock->udp_sock, (void **)&buf, &sock->buf_ctx,
                            &ep);
-        if (sock->async_cb &&
-            /* is there a message in the sock's mbox? */
-            mbox_avail(&sock->mbox)) {
-            if (sock->buffer.data) {
-                sock->async_cb(sock, SOCK_ASYNC_MSG_RECV,
-                               sock->async_cb_arg);
-            }
-            else {
-                sock->async_cb(sock, SOCK_ASYNC_CONN_RECV,
-                               sock->async_cb_arg);
-            }
-        }
         return buflen;
     }
 #else
@@ -809,25 +797,8 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
                                    sock_dtls_session_t *remote,
                                    const session_t *session)
 {
-    memcpy(&remote->dtls_session, session, sizeof(remote->dtls_session));
-#ifdef SOCK_HAS_ASYNC
-    if (sock->async_cb) {
-        sock_async_flags_t flags = SOCK_ASYNC_CONN_RDY;
-
-        if (mbox_avail(&sock->mbox)) {
-            if (sock->buffer.data) {
-                flags |= SOCK_ASYNC_MSG_RECV;
-            }
-            else {
-                flags |= SOCK_ASYNC_CONN_RECV;
-            }
-        }
-        memcpy(&sock->async_cb_session, session, sizeof(session_t));
-        sock->async_cb(sock, flags, sock->async_cb_arg);
-    }
-#else
     (void)sock;
-#endif
+    memcpy(&remote->dtls_session, session, sizeof(remote->dtls_session));
     return -SOCK_DTLS_HANDSHAKE;
 }
 
