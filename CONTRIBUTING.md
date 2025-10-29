@@ -149,6 +149,10 @@ It is possible to check if your code follows these conventions:
   simple as it is.
   ```
 
+* The commit message is automatically checked by the static tests for keywords
+  that prevent a merge, for example "fixup" or "DONOTMERGE". The full list
+  of these keywords is stored in `dist/tools/pr_check/no_merge_keywords`.
+
 ### Pull Requests
 [pull requests]: #pull-requests
 
@@ -304,6 +308,9 @@ $ git commit --fixup <prefix2 commit hash>
 
 ### Squash commits after review
 
+*** Note: If the static tests warn you about a no-merge keyword, please look
+at [our commit conventions][commit-conventions].
+
 Squashing a commit is done using the rebase subcommand of git in interactive
 mode:
 
@@ -323,7 +330,7 @@ phase, squashing commits can be performed in a single command:
 $ git rebase -i --autosquash
 ```
 
-**Watch out: Don't squash your commit until a maintainer asks you to do it.**
+***Watch out: Don't squash your commit until a maintainer asks you to do it.***
 
 Otherwise the history of review changes is lost and for large PRs, it
 makes it difficult for the reviewer to follow them. It might also happen that
