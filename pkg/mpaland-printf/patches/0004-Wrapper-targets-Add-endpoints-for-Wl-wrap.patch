@@ -1,15 +1,15 @@
-From adf017ec04c42a615b536ee035db6d3f1eebdb31 Mon Sep 17 00:00:00 2001
+From a01af4cb4991f6d5f0320f03d1f1d918df07caec Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 17:51:38 +0200
-Subject: [PATCH 4/4] Wrapper targets: Add endpoints for -Wl,wrap=...
+Subject: [PATCH] Wrapper targets: Add endpoints for -Wl,wrap=...
 
 This adds aliases needed to wrap printf() and friends.
 ---
- printf.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+ printf.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
 diff --git a/printf.c b/printf.c
-index 7c1ac61..8a1311c 100644
+index edf41d1..e00c3e5 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -32,6 +32,9 @@
@@ -22,7 +22,7 @@ index 7c1ac61..8a1311c 100644
  
  #include "printf.h"
  #include "stdio_base.h"
-@@ -920,3 +923,87 @@ static void _putchar(char character)
+@@ -920,3 +923,99 @@ static void _putchar(char character)
  {
    stdio_write(&character, sizeof(character));
  }
@@ -54,6 +54,18 @@ index 7c1ac61..8a1311c 100644
 +  _putchar((char)c);
 +  return 1;
 +}
++
++
++int __wrap_putc(int c, FILE *stream)
++{
++  (void)stream;
++  _putchar((char)c);
++  return 1;
++}
++
++
++__attribute__((alias("__wrap_putc")))
++int __wrap_fputc(int c, FILE *stream);
 +
 +
 +int __wrap_puts(const char *s)

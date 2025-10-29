@@ -11,6 +11,8 @@ LINKFLAGS += -Wl,-wrap=vdprintf
 LINKFLAGS += -Wl,-wrap=vsprintf
 LINKFLAGS += -Wl,-wrap=vsnprintf
 LINKFLAGS += -Wl,-wrap=putchar
+LINKFLAGS += -Wl,-wrap=putc
+LINKFLAGS += -Wl,-wrap=fputc
 LINKFLAGS += -Wl,-wrap=puts
 
 # By wrapping the newlib only `_printf_common` symbol to the undefined
