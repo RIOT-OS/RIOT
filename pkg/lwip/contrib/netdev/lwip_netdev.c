@@ -276,11 +276,11 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
 {
     lwip_netif_dev_acquire(netif);
 
-    err_t res;
+    int res;
     if (is_netdev_legacy_api(netdev)) {
-        res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+        res = netdev->driver->send(netdev, iolist);
         lwip_netif_dev_release(netif);
-        return res;
+        return res > 0 ? ERR_OK : ERR_BUF;
     }
 
     unsigned irq_state;
@@ -332,9 +332,9 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
 static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t *iolist)
 {
     lwip_netif_dev_acquire(netif);
-    err_t res = (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+    int res = netdev->driver->send(netdev, iolist);
     lwip_netif_dev_release(netif);
-    return res;
+    return res > 0 ? ERR_OK : ERR_BUF;
 }
 #endif
 
