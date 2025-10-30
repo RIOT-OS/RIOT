@@ -8,7 +8,11 @@ ISR_STACKSIZE_VAL := $(shell echo "$(CFLAGS)" | sed -n 's/.*-DISR_STACKSIZE=\([0
 
 # set it to the desired value if it is unset or check if it is big enough
 ifeq (,$(ISR_STACKSIZE_VAL))
-  CFLAGS += "-DISR_STACKSIZE=1024"
+  ifeq (xtensa,$(CPU_ARCH))
+    CFLAGS += "-DISR_STACKSIZE=2048"
+  else
+    CFLAGS += "-DISR_STACKSIZE=1024"
+  endif
 else
   ifeq (NOT_OK,$(shell sh [ $(ISR_STACKSIZE_VAL) -ge 1024 ] && echo OK || echo NOT_OK))
     $(error ISR_STACKSIZE = $(ISR_STACKSIZE_VAL) smaller than 1024, insufficient for stdio_nimble)
