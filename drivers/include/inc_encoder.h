@@ -119,7 +119,7 @@ typedef struct {
     bool                 stale;           /**< indicates that there is no new data to be read */
 #elif IS_USED(MODULE_INC_ENCODER_HARDWARE)
     int32_t              extended_count;  /**< accumulated count of pulse overflows */
-    int32_t              prev_count;      /**< number of pulses at last rpm calculation */
+    int32_t              prev_count;      /**< number of pulses at last RPM calculation */
     int32_t              leftover_count;  /**< leftover from last reset */
     int32_t              last_rpm;        /**< last calculated RPM value */
     ztimer_periodic_t    rpm_timer;       /**< timer used to periodically calculate RPM */

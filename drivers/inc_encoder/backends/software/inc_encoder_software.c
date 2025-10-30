@@ -74,7 +74,7 @@ int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm)
     }
 
     /* delta_t represents the number of microseconds since the last pulse.
-     * Invert and divide by the number of micro seconds per minute
+     * Invert and divide by the number of microseconds per minute
      * to obtain the RPM. Apply scaling factors like gear reduction
      * or pulses per revolution. */
     *rpm = SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE
