@@ -50,19 +50,6 @@ extern "C" {
 #define TIMER_CHANNEL_NUMOF    (1U)    /**< Number of timer channels */
 /** @} */
 
-/* MARK: - xtimer configuration */
-/**
- * @name `xtimer` configuration
- * @{
- *
- * @ref timer_set_absolute has a high margin for possible underflow if set with
- * value not far in the future. To prevent this, we set high backoff values
- * here.
- */
-#define XTIMER_BACKOFF      200
-#define XTIMER_ISR_BACKOFF  200
-/** @} */
-
 /**
  * @brief UART configuration
  */

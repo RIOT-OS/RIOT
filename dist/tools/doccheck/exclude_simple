@@ -18,8 +18,6 @@ warning: found documented return type for mcp47xx_dac_get that does not return a
 warning: found documented return type for mcp47xx_dac_poweroff that does not return anything
 warning: found documented return type for mcp47xx_dac_poweron that does not return anything
 warning: found documented return type for mcp47xx_dac_set that does not return anything
-warning: found documented return type for motor_disable that does not return anything
-warning: found documented return type for motor_enable that does not return anything
 warning: found documented return type for pthread_exit that does not return anything
 warning: found documented return type for senml_set_duration_ms that does not return anything
 warning: found documented return type for senml_set_duration_us that does not return anything
@@ -4699,8 +4697,6 @@ warning: Member MODULE_PIN_P6 (macro definition) of file board_module.h is not d
 warning: Member MODULE_PIN_P7 (macro definition) of file board_module.h is not documented.
 warning: Member MODULE_PIN_P8 (macro definition) of file board_module.h is not documented.
 warning: Member MODULE_PIN_P9 (macro definition) of file board_module.h is not documented.
-warning: Member motor_driver_config[] (variable) of file board.h is not documented.
-warning: Member MOTOR_DRIVER_NUMOF (macro definition) of file board.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_ALT (macro definition) of file mpl3115a2_reg.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_OS_MASK (macro definition) of file mpl3115a2_reg.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_OS_SHIFT (macro definition) of file mpl3115a2_reg.h is not documented.
