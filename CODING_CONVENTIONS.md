@@ -391,14 +391,33 @@ int timeout = TIMEOUT_INTERVAL * USEC_PER_SEC;
 ```
 ## Comments
 * All comments should be written as C-style comments.
+* Long multi-Line comments should have a leading asterisk for the second and
+  following lines. The first and last lines should be left empty and not contain
+  any comment text.
+  See also: [Linux Kernel Coding Style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html#commenting).
+* For short multi-line comments of two or three lines, a shorter style is
+  also permissible, where the first and last line do not need to be left empty.
 
 E.g:
 ```c
 /* This is a C-style comment */
+
+/* This is a short
+ * multi-line comment (max 2-3 lines). */
+
+/*
+ * This is a long multi-
+ * line comment for more
+ * than three lines of
+ * comment text.
+ */
 ```
 Wrong:
 ```c
 // C++ comment here
+
+/* This is a multi-line comment
+   without leading asterisk. */
 ```
 
 ## Documentation
