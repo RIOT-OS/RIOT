@@ -1,3 +1,1 @@
 PORT_LINUX ?= /dev/ttyACM0
-
-include $(RIOTBOARD)/common/esp32c3/Makefile.include
