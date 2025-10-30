@@ -1,5 +1,5 @@
-include $(RIOTBOARD)/common/esp32c3/Makefile.dep
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+USEMODULE += boards_common_esp32c3

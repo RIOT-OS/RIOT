@@ -1,1 +1,0 @@
-include $(RIOTBOARD)/common/esp32/Makefile.include

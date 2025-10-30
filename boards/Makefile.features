@@ -1,4 +1,25 @@
 # SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+ifneq (,$(filter boards_common_esp32,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32/Makefile.features
+endif
+ifneq (,$(filter boards_common_esp32c3,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32c3/Makefile.features
+endif
+ifneq (,$(filter boards_common_esp32c6,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32c6/Makefile.features
+endif
+ifneq (,$(filter boards_common_esp32h2,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32h2/Makefile.features
+endif
+ifneq (,$(filter boards_common_esp32s2,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32s2/Makefile.features
+endif
+ifneq (,$(filter boards_common_esp32s3,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32s3/Makefile.features
+endif
+ifneq (,$(filter boards_common_esp32x,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32x/Makefile.features
+endif
 ifneq (,$(filter boards_common_seeedstudio-xiao-nrf52840,$(USEMODULE)))
   include $(RIOTBOARD)/common/seeedstudio-xiao-nrf52840/Makefile.features
 endif
