@@ -1,10 +1,6 @@
 include ../Makefile.drivers_common
 
-EXTERNAL_BOARD_DIRS = $(CURDIR)/external_boards
-
-
-BOARD ?= nrf52840dk_qdec
-
+BOARD ?= nucleo-f401re
 
 USEMODULE += inc_encoder
 #USEMODULE += inc_encoder_software
