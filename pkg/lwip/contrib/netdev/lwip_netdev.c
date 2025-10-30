@@ -37,6 +37,7 @@
 #include "netif/lowpan6.h"
 #include "thread.h"
 #include "thread_flags.h"
+#include "tiny_strerror.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG                0
@@ -295,6 +296,7 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
         irq_state = irq_disable();
         compat_netif->thread_doing_tx = NULL;
         irq_restore(irq_state);
+        DEBUG("[lwip_netdev] send() returned %s\n", tiny_strerror(res));
         return ERR_IF;
     }
 
@@ -320,6 +322,7 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
     lwip_netif_dev_release(netif);
 
     if (res < 0) {
+        DEBUG("[lwip_netdev] confirm_send() returned %s\n", tiny_strerror(res));
         return ERR_IF;
     }
 
