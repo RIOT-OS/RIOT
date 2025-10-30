@@ -65,9 +65,27 @@ void rtc_init(void)
     RTCC_Enable(true);
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
     rtc_tm_normalize(time);
+
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
 
     RTCC_DateSet(
         RTCC_Year2BCD(time->tm_year - RTC_YEAR_OFFSET) |
@@ -79,6 +97,7 @@ int rtc_set_time(struct tm *time)
         RTCC_Minute2BCD(time->tm_min) |
         RTCC_Second2BCD(time->tm_sec));
 
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 

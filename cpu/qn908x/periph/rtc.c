@@ -69,9 +69,27 @@ void rtc_init(void)
     NVIC_EnableIRQ(RTC_SEC_IRQn);
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
     uint32_t ts = rtc_mktime(time);
+
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
 
     DEBUG("rtc_set_time(%" PRIu32 ")\n", ts);
     /* Writing 1 to CFG in CTRL register sets the CNT 0 timer to 0, resetting
@@ -81,6 +99,8 @@ int rtc_set_time(struct tm *time)
     RTC->SEC = ts;
     while (RTC->STATUS &
            (RTC_STATUS_SEC_SYNC_MASK | RTC_STATUS_CTRL_SYNC_MASK)) {}
+
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 
