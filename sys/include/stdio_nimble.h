@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -12,15 +9,16 @@
  * @defgroup     sys_stdio_nimble STDIO over NimBLE
  * @ingroup      sys_stdio
  *
- * @experimental This feature is experimental as some use-cases, such as examples/advanced/twr_aloha, show
- *               unexpected behaviour.
+ * @experimental This feature is experimental as some use-cases, such as
+ *               examples/advanced/twr_aloha, show unexpected behaviour.
  *
  * @brief        Standard input/output backend using NimBLE.
  *
  * @note         'stdio_read' blocks until at least one character was read.
  *
- * @note         'stdio_write' is non-blocking. Characters are written in FIFO mode. Characters
- *               that do not fit in the buffer will be dropped.
+ * @note         'stdio_write' is non-blocking. Characters are written in
+ *               FIFO mode. Characters that do not fit in the buffer
+ *               will be dropped.
  *
  * This module uses NimBLE for stdio. The bluetooth characteristic for
  * stdin is writable and the characteristic for stdout uses the indicate
@@ -193,7 +191,7 @@ extern "C" {
  *        not. Defaults to false.
  */
 #ifndef CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT
-#define CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT 0
+#  define CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT 0
 #endif
 
 /**
@@ -202,7 +200,7 @@ extern "C" {
  * @note Must be a power of two!
  */
 #ifndef CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE
-#define CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE 1024
+#  define CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE 1024
 #endif
 
 /**
@@ -211,7 +209,7 @@ extern "C" {
  * @note Must be a power of two!
  */
 #ifndef CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE
-#define CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE 2048
+#  define CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE 2048
 #endif
 
 #ifdef __cplusplus

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -36,9 +33,9 @@
 #include "services/gatt/ble_svc_gatt.h"
 
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
-#include <stdarg.h>
-#include "stdio_uart.h"
-#include "periph/uart.h"
+#  include <stdarg.h>
+#  include "stdio_uart.h"
+#  include "periph/uart.h"
 #endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
 
 #include "stdio_base.h"
@@ -83,7 +80,7 @@ static char _debug_printf_buf[DEBUG_PRINTF_BUFSIZE];
 #endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
 
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
-#define _debug_printf(...) \
+#  define _debug_printf(...) \
     do { \
         unsigned state = irq_disable(); \
         int rc = snprintf(_debug_printf_buf, DEBUG_PRINTF_BUFSIZE, __VA_ARGS__); \
@@ -91,7 +88,7 @@ static char _debug_printf_buf[DEBUG_PRINTF_BUFSIZE];
         irq_restore(state); \
     } while (0)
 #else
-#define _debug_printf(...) (void)0
+#  define _debug_printf(...) (void)0
 #endif
 
 /**
@@ -143,8 +140,7 @@ static int gatt_svr_chr_access_noop(
  */
 static const struct ble_gatt_svc_def _gatt_svr_svcs[] =
 {
-    /*
-     * access_cb defines a callback for read and write access events on
+    /* access_cb defines a callback for read and write access events on
      * given characteristics
      */
     {
@@ -282,7 +278,7 @@ static int _gap_event_cb(struct ble_gap_event *event, void *arg)
                 _conn_handle = event->subscribe.conn_handle;
 
                 /* NimBLE is not actually done with the configuration at this point,
-                   so a delay has to be introduced */
+                 * so a delay has to be introduced */
                 if (!ztimer_is_set(ZTIMER_MSEC, &_send_stdout_timer)) {
                     ztimer_set(ZTIMER_MSEC, &_send_stdout_timer, 500);
                 }
