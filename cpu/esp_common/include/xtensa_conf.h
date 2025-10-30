@@ -23,7 +23,9 @@ extern "C" {
  * @brief   Xtensa ASM code specific default stack sizes
  * @{
  */
-#define ISR_STACKSIZE                 (2048)
+#ifndef ISR_STACKSIZE
+#  define ISR_STACKSIZE               (2048)
+#endif
 /** @} */
 
 #ifdef __cplusplus
