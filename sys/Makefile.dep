@@ -29,6 +29,10 @@ ifneq (,$(filter auto_init_sock_dns,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter color,$(USEMODULE)))
+  FEATURES_REQUIRED += float_math
+endif
+
 ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
@@ -257,6 +261,10 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += vfs
   USEMODULE += posix_headers
+endif
+
+ifneq (,$(filter printf_float,$(USEMODULE)))
+  FEATURES_REQUIRED += float_math
 endif
 
 ifneq (,$(filter shell_cmd%,$(USEMODULE)))

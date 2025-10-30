@@ -1,2 +1,4 @@
+FEATURES_REQUIRED += float_math
+
 # emlearn is not compatible with MSP430
 FEATURES_BLACKLIST += arch_msp430

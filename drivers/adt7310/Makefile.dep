@@ -1,1 +1,2 @@
+FEATURES_REQUIRED += float_math
 FEATURES_REQUIRED += periph_spi

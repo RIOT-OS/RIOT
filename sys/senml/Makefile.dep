@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 ifneq (,$(filter senml_saul,$(USEMODULE)))
   USEMODULE += senml_cbor
   USEMODULE += senml_phydat

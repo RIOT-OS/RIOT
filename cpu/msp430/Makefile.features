@@ -17,13 +17,13 @@ FEATURES_PROVIDED += arch_msp430
 FEATURES_PROVIDED += bug_newlib_broken_stdio
 FEATURES_PROVIDED += cpu_$(CPU_FAM)
 FEATURES_PROVIDED += dbgpin
+FEATURES_PROVIDED += float_math
 FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
-FEATURES_PROVIDED += periph_pm
-FEATURES_PROVIDED += periph_timer_query_freqs
-
 FEATURES_PROVIDED += periph_gpio_ll
 FEATURES_PROVIDED += periph_gpio_ll_irq
 FEATURES_PROVIDED += periph_gpio_ll_switch_dir
+FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_timer_query_freqs

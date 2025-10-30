@@ -1,2 +1,4 @@
 # tinycbor is only supported by 32 bit architectures
 FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
+
+FEATURES_REQUIRED += float_math

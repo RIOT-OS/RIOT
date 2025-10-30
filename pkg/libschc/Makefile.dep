@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 ifneq (,$(filter libschc_%,$(USEMODULE)))
   USEPKG += libschc
 endif
