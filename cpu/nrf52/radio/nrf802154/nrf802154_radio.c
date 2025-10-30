@@ -580,7 +580,7 @@ static int _request_on(ieee802154_dev_t *dev)
     return 0;
 }
 
-static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
+static int _config_phy(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf)
 {
     (void)dev;
     int8_t pow = conf->pow;
