@@ -266,7 +266,7 @@ static void _hr_update(event_t *e)
     /* send heart rate data notification to GATT client */
     om = ble_hs_mbuf_from_flat(&_hr_data, sizeof(_hr_data));
     assert(om != NULL);
-    int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
+    int res = ble_gatts_notify_custom(_conn_handle, _hrs_val_handle, om);
     assert(res == 0);
     (void)res;
 

@@ -195,7 +195,7 @@ static void _send_stdout(struct ble_npl_event *ev)
         if (to_send > 0) {
             struct os_mbuf *om = ble_hs_mbuf_from_flat(_stdout_write_buf, to_send);
             if (om != NULL) {
-                int rc = ble_gattc_indicate_custom(_conn_handle, _val_handle_stdout, om);
+                int rc = ble_gatts_indicate_custom(_conn_handle, _val_handle_stdout, om);
                 if (rc == 0) {
                     /* bytes were successfully sent, so drop them from the buffer */
                     tsrb_drop(&_tsrb_stdout, to_send);
