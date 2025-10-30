@@ -516,9 +516,17 @@ static int _request_transmit(ieee802154_dev_t *dev)
 
     dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
 
-    /* delay transmission to simulate airtime */
-    zepdev->ack_timer.callback = _send_frame;
-    ztimer_set(ZTIMER_USEC, &zepdev->ack_timer, time_tx);
+    /* native overhead prevents short timers from triggering in time,
+       send directly if delay is less than 200 µs */
+    if (time_tx <= 200) {
+        _send_frame(zepdev->ack_timer.arg);
+    }
+    else {
+        time_tx -= 200;
+        /* delay transmission to simulate airtime */
+        zepdev->ack_timer.callback = _send_frame;
+        ztimer_set(ZTIMER_USEC, &zepdev->ack_timer, time_tx);
+    }
 
     return 0;
 }
