@@ -242,6 +242,7 @@ void rtc_unlock(void)
 
 static inline void rtc_enter_init_mode(void)
 {
+    rtc_unlock();
     /* enter RTC init mode */
     RTC_REG_ISR |= RTC_ISR_INIT;
     while (!(RTC_REG_ISR & RTC_ISR_INITF)) {}
@@ -252,6 +253,7 @@ static inline void rtc_exit_init_mode(void)
     /* exit RTC init mode */
     RTC_REG_ISR &= ~RTC_ISR_INIT;
     while (RTC_REG_ISR & RTC_ISR_INITF) {}
+    rtc_lock();
 }
 
 void rtc_lock(void)
@@ -302,14 +304,12 @@ void rtc_init(void)
 
     if (!(RTC_REG_ISR & RTC_ISR_INITS))
     {
-        rtc_unlock();
+        rtc_enter_init_mode();
         /* reset configuration */
         RTC->CR = 0;
-        rtc_enter_init_mode();
         /* configure prescaler (RTC PRER) */
         RTC->PRER = (PRE_SYNC | (PRE_ASYNC << 16));
         rtc_exit_init_mode();
-        rtc_lock();
     }
 
     /* configure the EXTI channel, as RTC interrupts are routed through it.
@@ -329,7 +329,6 @@ int rtc_set_time(struct tm *time)
     /* normalize input */
     rtc_tm_normalize(time);
 
-    rtc_unlock();
     rtc_enter_init_mode();
     RTC->DR = (val2bcd((time->tm_year - YEAR_OFFSET), RTC_DR_YU_Pos, DR_Y_MASK) |
                val2bcd(time->tm_mon + 1,  RTC_DR_MU_Pos, DR_M_MASK) |
@@ -338,7 +337,6 @@ int rtc_set_time(struct tm *time)
                val2bcd(time->tm_min,  RTC_TR_MNU_Pos, TR_M_MASK) |
                val2bcd(time->tm_sec,  RTC_TR_SU_Pos, TR_S_MASK));
     rtc_exit_init_mode();
-    rtc_lock();
     while (!(RTC_REG_ISR & RTC_ISR_RSF)) {}
 
     return 0;
