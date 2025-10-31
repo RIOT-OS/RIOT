@@ -345,15 +345,15 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time(struct tm *time)
 {
-#if defined(CPU_FAM_STM32WL)
-    /* after waking up from standby, the RSF flag has to be manually cleared */
+    /* After waking up from standby, the RSF flag has to be manually cleared.
+     * To be safe, we do it every time even though we might not have been in
+     * standby before . */
     rtc_unlock();
-    RTC->ICSR &= ~RTC_ICSR_RSF;
+    RTC_REG_ISR &= ~RTC_ISR_RSF;
     rtc_lock();
 
     /* waiting for the RSF bit to be set again before accessing the time */
-    while (!(RTC_REG_ISR & RTC_ICSR_RSF)) {};
-#endif
+    while (!(RTC_REG_ISR & RTC_ISR_RSF)) {};
 
     /* save current time */
     uint32_t tr = RTC->TR;
