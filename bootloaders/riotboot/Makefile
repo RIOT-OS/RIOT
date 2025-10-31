@@ -3,6 +3,8 @@ APPLICATION = riotboot
 
 # Include riotboot flash partition functionality
 USEMODULE += riotboot_slot
+USEMODULE += riotboot_flashwrite
+USEMODULE += riotboot_wdt
 
 # We don't want to re-configure any hardware
 CFLAGS += -DDISABLE_BOARD_INIT=1
