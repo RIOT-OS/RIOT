@@ -35,7 +35,8 @@ ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
 endif
 
 ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u5 wb wl))
-  CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070%
+  CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070% \
+                                 stm32f302%
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_RTC_BKPR),$(CPU_MODEL)))
     FEATURES_PROVIDED += periph_rtc_mem
   endif
