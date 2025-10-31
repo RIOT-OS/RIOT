@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2024 Technische Universität Dresden
+# SPDX-FileCopyrightText: 2024 Isikcan 'Jon' Yilmaz
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "seeedstudio-xiao-esp32s3" if BOARD_SEEEDSTUDIO_XIAO_ESP32S3
+
+config BOARD_SEEEDSTUDIO_XIAO_ESP32S3
+    bool
+    default y
+    select BOARD_COMMON_ESP32S3
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8R8
+
+source "$(RIOTBOARD)/common/esp32s3/Kconfig"
