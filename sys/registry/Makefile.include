@@ -1,0 +1,3 @@
+ifneq (,$(filter registry_string_path%,$(USEMODULE)))
+    CFLAGS += -DCONFIG_REGISTRY_ENABLE_META_NAME
+endif
