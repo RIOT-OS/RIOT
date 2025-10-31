@@ -305,9 +305,10 @@ void rtc_init(void)
         rtc_unlock();
         /* reset configuration */
         RTC->CR = 0;
-        RTC_REG_ISR = RTC_ISR_INIT;
+        rtc_enter_init_mode();
         /* configure prescaler (RTC PRER) */
         RTC->PRER = (PRE_SYNC | (PRE_ASYNC << 16));
+        rtc_exit_init_mode();
         rtc_lock();
     }
 
@@ -347,7 +348,7 @@ int rtc_get_time(struct tm *time)
 {
     /* After waking up from standby, the RSF flag has to be manually cleared.
      * To be safe, we do it every time even though we might not have been in
-     * standby before . */
+     * standby before. */
     rtc_unlock();
     RTC_REG_ISR &= ~RTC_ISR_RSF;
     rtc_lock();
@@ -450,7 +451,8 @@ void rtc_poweroff(void)
 
 void ISR_NAME(void)
 {
-#if !(defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32U5))
+#if !(defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32G0) || \
+      defined(CPU_FAM_STM32U5))
     if (RTC_REG_ISR & RTC_ISR_ALRAF) {
         if (isr_ctx.cb != NULL) {
             isr_ctx.cb(isr_ctx.arg);
