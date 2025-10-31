@@ -275,29 +275,33 @@ void rtc_init(void)
         RTC->BKP0R = MAGIC_CLCK_NUMBER; /* Store the new magic number */
     }
 #endif
-    stmclk_dbp_lock();
+    /* enable low frequency clock */
+    stmclk_enable_lfclk();
+
+    /* select input clock and enable the RTC */
+    stmclk_dbp_unlock();
+#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
+    periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
+#elif defined(CPU_FAM_STM32G0)
+    periph_clk_en(APB1, RCC_APBENR1_RTCAPBEN);
+#elif defined(CPU_FAM_STM32U5)
+    periph_clk_en(APB3, RCC_APB3ENR_RTCAPBEN);
+#endif
+
+#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
+    if ((EN_REG & (CLKSEL_MASK | EN_BIT)) != (CLKSEL_LSE | EN_BIT)) {
+        EN_REG &= ~(CLKSEL_MASK);
+        EN_REG |= (CLKSEL_LSE | EN_BIT);
+    }
+#else
+    if ((EN_REG & (CLKSEL_MASK | EN_BIT)) != (CLKSEL_LSI | EN_BIT)) {
+        EN_REG &= ~(CLKSEL_MASK);
+        EN_REG |= (CLKSEL_LSI | EN_BIT);
+    }
+#endif
 
     if (!(RTC_REG_ISR & RTC_ISR_INITS))
     {
-        /* enable low frequency clock */
-        stmclk_enable_lfclk();
-
-        /* select input clock and enable the RTC */
-        stmclk_dbp_unlock();
-#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
-        periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
-#elif defined(CPU_FAM_STM32G0)
-        periph_clk_en(APB1, RCC_APBENR1_RTCAPBEN);
-#elif defined(CPU_FAM_STM32U5)
-        periph_clk_en(APB3, RCC_APB3ENR_RTCAPBEN);
-#endif
-        EN_REG &= ~(CLKSEL_MASK);
-#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
-        EN_REG |= (CLKSEL_LSE | EN_BIT);
-#else
-        EN_REG |= (CLKSEL_LSI | EN_BIT);
-#endif
-
         rtc_unlock();
         /* reset configuration */
         RTC->CR = 0;
