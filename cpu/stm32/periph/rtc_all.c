@@ -326,6 +326,21 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time(struct tm *time)
 {
+#if defined(CPU_FAM_STM32WL)
+    stmclk_dbp_unlock();
+    /* unlock RTC */
+    RTC->WPR = WPK1;
+    RTC->WPR = WPK2;
+
+    RTC->ICSR &= ~RTC_ICSR_RSF;
+
+    RTC->WPR = 0xff;
+    stmclk_dbp_lock();
+
+    /* waiting for the RSF bit to be set again */
+    while (!(RTC_REG_ISR & RTC_ICSR_RSF)) {};
+#endif
+
     /* save current time */
     uint32_t tr = RTC->TR;
     uint32_t dr = RTC->DR;
