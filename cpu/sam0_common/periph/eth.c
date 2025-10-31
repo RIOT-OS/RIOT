@@ -355,6 +355,9 @@ bool sam0_eth_has_queued_pkt(void)
 
 int sam0_eth_init(void)
 {
+    /* HACK: interrupting the init sequence leads to strange hangs */
+    unsigned state = irq_disable();
+
     /* Enable clocks */
     _enable_clock();
     /* Initialize GPIOs */
@@ -412,6 +415,8 @@ int sam0_eth_init(void)
     NVIC_EnableIRQ(GMAC_IRQn);
     /* Enable both receiver and transmitter */
     GMAC->NCR.reg |= GMAC_NCR_TXEN | GMAC_NCR_RXEN;
+
+    irq_restore(state);
 
     return 0;
 }
