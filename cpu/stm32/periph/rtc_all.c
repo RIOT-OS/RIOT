@@ -68,6 +68,7 @@
 #  define RTC_ISR_RSF       RTC_ICSR_RSF
 #  define RTC_ISR_INIT      RTC_ICSR_INIT
 #  define RTC_ISR_INITF     RTC_ICSR_INITF
+#  define RTC_ISR_INITS     RTC_ICSR_INITS
 #  define RTC_ISR_ALRAWF    RTC_ICSR_ALRAWF
 #  define RTC_ISR_ALRAF     RTC_SR_ALRAF
 #elif defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
@@ -77,6 +78,7 @@
 #  define RTC_ISR_RSF       RTC_ICSR_RSF
 #  define RTC_ISR_INIT      RTC_ICSR_INIT
 #  define RTC_ISR_INITF     RTC_ICSR_INITF
+#  define RTC_ISR_INITS     RTC_ICSR_INITS
 #elif defined(CPU_FAM_STM32U5)
 #  define RTC_REG_ISR       RTC->ICSR
 #  define RTC_REG_SR        RTC->SR
@@ -84,6 +86,7 @@
 #  define RTC_ISR_RSF       RTC_ICSR_RSF
 #  define RTC_ISR_INIT      RTC_ICSR_INIT
 #  define RTC_ISR_INITF     RTC_ICSR_INITF
+#  define RTC_ISR_INITS     RTC_ICSR_INITS
 #  define RTC_ISR_ALRAF     RTC_SR_ALRAF
 #else
 #  define RTC_REG_ISR       RTC->ISR
@@ -251,7 +254,7 @@ static inline void rtc_exit_init_mode(void)
     while (RTC_REG_ISR & RTC_ISR_INITF) {}
 }
 
-static inline void rtc_lock(void)
+void rtc_lock(void)
 {
     /* lock RTC device */
     RTC->WPR = 0xff;
@@ -339,17 +342,12 @@ int rtc_set_time(struct tm *time)
 int rtc_get_time(struct tm *time)
 {
 #if defined(CPU_FAM_STM32WL)
-    stmclk_dbp_unlock();
-    /* unlock RTC */
-    RTC->WPR = WPK1;
-    RTC->WPR = WPK2;
-
+    /* after waking up from standby, the RSF flag has to be manually cleared */
+    rtc_unlock();
     RTC->ICSR &= ~RTC_ICSR_RSF;
+    rtc_lock();
 
-    RTC->WPR = 0xff;
-    stmclk_dbp_lock();
-
-    /* waiting for the RSF bit to be set again */
+    /* waiting for the RSF bit to be set again before accessing the time */
     while (!(RTC_REG_ISR & RTC_ICSR_RSF)) {};
 #endif
 
