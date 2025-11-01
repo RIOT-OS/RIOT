@@ -71,6 +71,27 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                              gnrc_ipv6_nib_nc_t *nce);
 
 /**
+ * @brief   Build a link-local ipv6 address statically from the L2 address by
+ *          translating the hardware address to an EUI-64 and adding the link-local
+ *          IPv6 prefix.
+ *
+ * @note    Reverse of _resolve_addr_from_ipv6.
+ *
+ * @param[in] netif      The interface to @p l2addr.
+ * @param[in] l2addr     Layer 2 address.
+ * @param[in] l2addr_len Length of the layer 2 address.
+ * @param[out] ipv6addr  The resulting IPv6 address.
+ *
+ * @retval  sizeof(ipv6_addr_t) on success.
+ * @retval  `-ENOTSUP` if the interface does not represent a 6LN or when
+ *           gnrc_netif_t::device_type of @p netif does not support IID conversion.
+ * @retval  `-EINVAL` when @p addr_len is invalid for the
+ *          gnrc_netif_t::device_type of @p netif.
+ */
+int _build_ll_ipv6_from_addr(gnrc_netif_t *netif, const uint8_t *l2addr,
+                             uint8_t l2addr_len, ipv6_addr_t *ipv6addr);
+
+/**
  * @brief   Calculates exponential backoff for RS retransmissions
  *
  * @see [RFC 6775, section 5.3](https://tools.ietf.org/html/rfc6775#section-5.3)
@@ -137,6 +158,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN) */
 #else   /* CONFIG_GNRC_IPV6_NIB_6LN || defined(DOXYGEN) */
 #define _resolve_addr_from_ipv6(dst, netif, nce)    (false)
+#define _build_ll_ipv6_from_addr(netif, l2addr, l2addr_len, ipv6addr)    (-ENOTSUP)
 /* _handle_aro() doesn't make sense without 6LR so don't even use it
  * => throw error in case it is compiled in => don't define it here as NOP macro
  */
