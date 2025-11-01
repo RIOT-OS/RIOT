@@ -71,7 +71,21 @@ extern "C" {
 #  define QDEC_NUMOF (8U)
 #endif
 
-/* MARK: - SPI configuration (Linux host only) */
+/* MARK: - I2C configuration (mock implementation) */
+/**
+ * @name I2C configuration (mock implementation)
+ * @{
+ */
+#if !defined(I2C_NUMOF) || defined(DOXYGEN)
+/**
+ * @brief Amount of I2C devices
+ *
+ * Can be overridden during compile time with `CFLAGS+=-DI2C_NUMOF=n`.
+ */
+#  define I2C_NUMOF   1
+#endif
+/** @} */
+
 /**
  * @name SPI configuration (Linux host only)
  * @{
