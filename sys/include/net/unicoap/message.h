@@ -139,7 +139,7 @@ typedef struct {
          * @brief CoAP request method
          *
          * @pre Check if this is a request message before reading this property using
-         * @ref unicoap_message_is_request.
+         * @ref unicoap_message_code_is_request.
          */
         unicoap_method_t method;
 
@@ -147,7 +147,7 @@ typedef struct {
          * @brief CoAP response status
          *
          * @pre Check if this is a response message before reading this property using
-         * @ref unicoap_message_is_response.
+         * @ref unicoap_message_code_is_response.
          */
         unicoap_status_t status;
 
@@ -155,7 +155,7 @@ typedef struct {
          * @brief CoAP signal
          *
          * Check if this is a signaling message before reading this property using
-         * @ref unicoap_message_is_signal.
+         * @ref unicoap_message_code_is_signal.
          */
         unicoap_signal_t signal;
     };
@@ -634,7 +634,7 @@ unicoap_message_t unicoap_message_alloc_string_with_options(uint8_t code,
  *
  * @return A boolean value indicating whether the given message is a signal
  */
-static inline bool unicoap_message_is_signal(uint8_t code)
+static inline bool unicoap_message_code_is_signal(uint8_t code)
 {
     return unicoap_code_class(code) == UNICOAP_CODE_CLASS_SIGNAL;
 }
@@ -687,7 +687,7 @@ const char* unicoap_string_from_signal(unicoap_signal_t signal);
  * @param code Message code
  * @return A boolean value indicating whether the given message is a request
  */
-static inline bool unicoap_message_is_request(uint8_t code)
+static inline bool unicoap_message_code_is_request(uint8_t code)
 {
     return unicoap_code_class(code) == UNICOAP_CODE_CLASS_REQUEST;
 }
@@ -893,7 +893,7 @@ unicoap_message_t unicoap_request_alloc_string_with_options(unicoap_method_t met
  *
  * @return A boolean value indicating whether the given message is a response
  */
-bool unicoap_message_is_response(uint8_t code);
+bool unicoap_message_code_is_response(uint8_t code);
 
 /**
  * @brief Obtains response status from the given message's code
