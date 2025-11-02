@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <inttypes.h>
 
 #include "kernel_defines.h"
