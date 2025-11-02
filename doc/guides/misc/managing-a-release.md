@@ -72,7 +72,7 @@ Any bugfixes should be merged into RIOT master and backported into the release b
 
 ### Automatic Freezing and Release Candidate Generation
 
-First create a [classic Token](https://github.com/settings/tokens) and supply it to the `riot-release-manager` script with the `-t <token>` parameter.
+First create a [classic Token](https://github.com/settings/tokens) with the 'repo' permission and supply it to the `riot-release-manager` script with the `-t <token>` parameter.
 
 **Feature Freeze:**
 ```bash
