@@ -27,9 +27,12 @@ $(BINDIR)/ccn-lite.a: $(PKG_BUILD_DIR)/lib/libccnl-riot.a
 $(PKG_BUILD_DIR)/lib/libccnl-riot.a: $(PKG_BUILD_DIR)/Makefile
 	$(MAKE) -C $(PKG_BUILD_DIR)
 
+# TODO: Drop `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` once upstream is compatible
+#       with newer cmake (e.g. compilation still succeeds with cmake 4.x)
 $(PKG_BUILD_DIR)/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
 	cmake -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR)/src \
 	      -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+	      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 	      -DCCNL_RIOT=1 -DRIOT_CFLAGS="$(RIOT_CFLAGS)" -DBUILD_TESTING=OFF
 
 $(TOOLCHAIN_FILE): FORCE
