@@ -45,6 +45,21 @@
 /* i2c_buf is global to reduce stack memory consumption */
 static uint8_t i2c_buf[BUFSIZE];
 
+#if IS_USED(MODULE_PERIPH_I2C_MOCK)
+/* The write function of periph_i2c_mock is usually a complete no-op. This
+ * function illustrates how the mock functions are customized. */
+int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
+  uint8_t flags)
+{
+    (void)dev;
+    (void)addr;
+    (void)data;
+    (void)flags;
+    printf("Mock write intercepted; this write of %"PRIu32" byte(s) is still ignored.\n", (uint32_t)len);
+    return 0;
+}
+#endif
+
 static inline void _print_i2c_read(i2c_t dev, uint16_t *reg, uint8_t *buf,
     int len)
 {

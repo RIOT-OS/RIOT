@@ -68,13 +68,21 @@ extern "C" {
  * @brief Pull-down
  */
 #  if !defined(GPIOHANDLE_REQUEST_PULL_DOWN) || defined(DOXYGEN)
-#    define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
+#    if defined(GPIOHANDLE_REQUEST_BIAS_PULL_DOWN)
+#      define GPIOHANDLE_REQUEST_PULL_DOWN    GPIOHANDLE_REQUEST_BIAS_PULL_DOWN
+#    else
+#      define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
+#    endif
 #  endif
 /**
  * @brief Pull-up
  */
 #  if !defined(GPIOHANDLE_REQUEST_PULL_UP) || defined(DOXYGEN)
-#   define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
+#    if defined(GPIOHANDLE_REQUEST_BIAS_PULL_UP)
+#      define GPIOHANDLE_REQUEST_PULL_UP      GPIOHANDLE_REQUEST_BIAS_PULL_UP
+#    else
+#      define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
+#    endif
 #  endif
 
 /**
@@ -169,6 +177,27 @@ typedef gpio_mock_t* gpio_t;
 #define PROVIDES_PM_OFF
 #define PROVIDES_PM_SET_LOWEST
 /** @} */
+
+/**
+ * @name I2C Configuration
+ *
+ * The common I2C implementation is requested to provide the default implementations of the
+ * `i2c_{read,write}_{reg,regs}` functions.
+ */
+
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+
+#if defined(MODULE_PERIPH_I2C_MOCK) || defined(DOXYGEN)
+/**
+ * @brief   I2C configuration structure type
+ */
+typedef struct {
+    void *dummy;    /**< dummy attribute */
+} i2c_conf_t;
+#endif
 
 /* Configuration for the wrapper around the Linux SPI API (periph_spidev_linux)
  *
