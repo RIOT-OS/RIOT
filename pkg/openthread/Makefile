@@ -64,6 +64,8 @@ $(BINDIR)/openthread-$(TD).a: $(OT_CORE_LIB_DIR)/libopenthread-$(TD).a
 $(OT_CORE_LIB_DIR)/libopenthread-$(TD).a: $(PKG_BUILD_DIR)/Makefile
 	$(QQ)"$(MAKE)" -C $(PKG_BUILD_DIR) $(OT_MODULES)
 
+# TODO: Drop `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` once upstream is compatible
+#       with newer cmake (e.g. compilation still succeeds with cmake 4.x)
 $(PKG_BUILD_DIR)/Makefile:
 	cmake -Wno-dev -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR) \
 	 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
@@ -75,6 +77,7 @@ $(PKG_BUILD_DIR)/Makefile:
 	 -DCMAKE_CXX_FLAGS="$(OT_C_FLAGS) $(OT_CXXFLAGS) -fno-exceptions -fno-rtti" \
 	 -DCMAKE_NM="$(NM)" \
 	 -DCMAKE_STRIP="$(STRIP)" \
+	 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 	 -DOT_PLATFORM=NO \
 	 -DOT_CONFIG="$(RIOTBASE)/pkg/openthread/include/platform_config.h" \
 	 -DOT_APP_CLI=$(OT_APP_CLI) \
