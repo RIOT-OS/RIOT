@@ -34,6 +34,9 @@
 #include "net/loramac.h"
 #include "net/netif.h"
 #include "shell.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+#include "../../net/gnrc/network_layer/ipv6/nib/_nib-slaac.h"
+#endif
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -581,7 +584,7 @@ static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
 }
 
 #ifdef MODULE_IPV6
-static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
+static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags, netif_t *netif)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -621,6 +624,14 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
             break;
         }
     }
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    const gnrc_netif_t *gnrc_netif = container_of(netif, gnrc_netif_t, netif);
+    if (is_temporary_addr(gnrc_netif, addr)) {
+        printf(" TMP");
+    }
+#else
+    (void)netif;
+#endif
 #else
     (void)flags;
 #endif
@@ -918,7 +929,7 @@ static void _netif_list(netif_t *iface)
                       sizeof(ipv6_addrs_flags));
         /* yes, the res of NETOPT_IPV6_ADDR is meant to be here ;-) */
         for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
-            _netif_list_ipv6(&ipv6_addrs[i], ipv6_addrs_flags[i]);
+            _netif_list_ipv6(&ipv6_addrs[i], ipv6_addrs_flags[i], iface);
         }
     }
     res = netif_get_opt(iface, NETOPT_IPV6_GROUP, 0, ipv6_groups,
