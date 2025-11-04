@@ -28,7 +28,9 @@ extern "C" {
 /**
  * @brief   Default CoAP port
  */
+#ifndef COAP_PORT
 #define COAP_PORT               (5683)
+#endif
 
 /**
  * @brief   Default CoAP DTLS port
