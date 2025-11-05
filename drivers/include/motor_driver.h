@@ -68,12 +68,9 @@
  * - CCW (Counter ClockWise)
  * and a brake capability
  *
- * BRAKE LOW is functionally the same than BRAKE HIGH but some H-bridge only
- * brake on BRAKE HIGH due to hardware.
- * In case of single direction GPIO, there is no BRAKE.
- *
- * In case of brake, PWM duty cycle is always set to 0.
-
+ * Most H-bridges brake in both BRAKE HIGH and BRAKE LOW states,
+ * but some only support BRAKE HIGH due to hardware
+ * When breaking the PWM duty cycle is set to 0.
  * @{
  * @file
  * @brief       High-level driver for DC motors

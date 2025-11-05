@@ -168,7 +168,6 @@ int motor_set(const motor_driver_t *motor_driver, uint8_t motor_id, \
     switch (motor_driver->params->mode) {
     /* Two direction GPIO, handling brake */
     case MOTOR_DRIVER_2_DIRS:
-        _motor_brake_two_dirs(motor, motor_driver->params->brake_inverted);
         break;
     case MOTOR_DRIVER_1_DIR:
         break;
