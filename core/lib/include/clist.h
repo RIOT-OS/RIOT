@@ -62,20 +62,21 @@
  *
  * Or use the clist_foreach() helper function, e.g.,:
  *
- *    static int _print_node(clist_node_t *node)
- *    {
- *        printf("0x%08x ", (unsigned)node);
- *        return 0;
- *    }
+ *     static int _print_node(clist_node_t *node, void *arg)
+ *     {
+ *         (void) arg; // unused optional argument
+ *         printf("0x%08x ", (unsigned)node);
+ *         return 0;
+ *     }
  *
- *    [...]
- *    clist_foreach(&list, _print_node);
+ *     [...]
+ *     clist_foreach(&list, _print_node, NULL);
  *
  * To use clist as a queue, use clist_rpush() for adding elements and clist_lpop()
  * for removal. Using clist_lpush() and clist_rpop() is inefficient due to
  * clist_rpop()'s O(n) runtime.
  *
- * To use clist as stack, use clist_lpush()/clist_lpop().
+ * To use clist as stack, use clist_lpush() / clist_lpop().
  *
  * Implementation details:
  *
