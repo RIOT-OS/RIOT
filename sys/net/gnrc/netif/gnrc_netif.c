@@ -1922,11 +1922,6 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             /* try to send anyway */
         }
     }
-    /* hold in case device was busy to not having to rewrite *all* the link
-     * layer implementations in case `gnrc_netif_pktq` is included */
-    if (gnrc_netif_netdev_legacy_api(netif)) {
-        gnrc_pktbuf_hold(pkt, 1);
-    }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
     /* Record send in neighbor statistics if destination is unicast */
@@ -1947,6 +1942,13 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     /* Split off the TX sync snip */
     gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
                             ? gnrc_tx_sync_split(pkt) : NULL;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    /* hold in case device was busy to not having to rewrite *all* the link
+     * layer implementations in case `gnrc_netif_pktq` is included */
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        gnrc_pktbuf_hold(pkt, 1);
+    }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     int res = netif->ops->send(netif, pkt);
 
     /* For legacy netdevs (no confirm_send) TX is blocking, thus it is always
