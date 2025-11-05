@@ -481,6 +481,10 @@ void gpio_irq_enable(gpio_t pin)
 
     /* enable wake from deep sleep */
     _set_extwake(pin, true);
+
+    if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)) {
+        rtc_tamper_pin_enable(pin);
+    }
 }
 
 void gpio_irq_disable(gpio_t pin)
@@ -502,6 +506,10 @@ void gpio_irq_disable(gpio_t pin)
 
     /* disable wake from deep sleep */
     _set_extwake(pin, false);
+
+    if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)) {
+        rtc_tamper_pin_disable(pin);
+    }
 }
 
 #if defined(CPU_COMMON_SAML1X)
