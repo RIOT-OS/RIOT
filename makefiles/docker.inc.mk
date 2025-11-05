@@ -7,10 +7,23 @@
 # provide the latest values to verify and fill in.
 DOCKER_TESTED_IMAGE_REPO_DIGEST := 08fa7da2c702ac4db7cf57c23fc46c1971f3bffc4a6eff129793f853ec808736
 
-DOCKER_PULL_IDENTIFIER := docker.io/riot/riotbuild@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
-export DOCKER_IMAGE ?= $(DOCKER_PULL_IDENTIFIER)
+DOCKER_PULL_IDENTIFIER := docker.io/riot/DOCKER_IMAGE_VARIANT@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
+
+# By default the image variant is tinybuild if not already set to something else yet.
+# However, if rust or C++ is used, we have to select smallbuild.
+# C++ modules have `FEATURES_REQUIRED = cpp` set.
+# Rust modules use the `APPLICATION_RUST_MODULE` variable.
+DOCKER_IMAGE_VARIANT ?= tinybuild # default to tinybuild if not set yet
+
+ifneq (riotbuild,$(DOCKER_IMAGE_VARIANT)) # don't do the evaluation if the legacy system was already selected
+  ifneq (,$(APPLICATION_RUST_MODULE))
+    DOCKER_IMAGE_VARIANT = smallbuild
+  else ifneq (,$(filter cpp,$(FEATURES_REQUIRED)))
+    DOCKER_IMAGE_VARIANT = smallbuild
+  endif
+endif
 
 # These targets need to be run before docker can be run
 DEPS_FOR_RUNNING_DOCKER :=
@@ -387,7 +400,45 @@ $(HOME)/.cargo/registry:
 # The `flash`, `term`, `debugserver` etc. targets usually require access to
 # hardware which may not be reachable from inside the container.
 ..in-docker-container: $(DEPS_FOR_RUNNING_DOCKER)
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
 	@mkdir -p $(HOME)/.cargo/git
 	@mkdir -p $(HOME)/.cargo/registry
-	$(call docker_run_make,$(DOCKER_MAKECMDGOALS),$(DOCKER_IMAGE),,$(DOCKER_MAKE_ARGS))
+	@DOCKER_IMAGE_VARIANT=$$( \
+	  if [ "$(DOCKER_IMAGE_VARIANT)" = "riotbuild" ]; then \
+	    echo "riotbuild"; \
+	  else \
+	    case "$${CPU_ARCH}" in \
+	      "armv4m"|"native32"|"xtensa") \
+	        echo "riotbuild"; \
+	        ;; \
+	      "msp430") \
+	        echo "$(strip $(DOCKER_IMAGE_VARIANT))-msp430"; \
+	        ;; \
+	      "armv6m"|"armv7m"|"armv8m") \
+	        echo "$(strip $(DOCKER_IMAGE_VARIANT))-arm"; \
+	        ;; \
+	      "avr8") \
+	        echo "$(strip $(DOCKER_IMAGE_VARIANT))-avr"; \
+	        ;; \
+	      "native64") \
+	        echo "$(strip $(DOCKER_IMAGE_VARIANT))-native64"; \
+	        ;; \
+	      "rv32") \
+	        if echo "$${USEMODULE}" | grep -q "esp_riscv"; then \
+	          echo "riotbuild"; \
+	        else \
+	          echo "$(strip $(DOCKER_IMAGE_VARIANT))-risc-v"; \
+	        fi \
+	        ;; \
+	      *) \
+	        echo "riotbuild"; \
+	        ;; \
+	    esac; \
+	  fi \
+	); \
+	if [ -z "$(DOCKER_IMAGE)" ]; then \
+	  DOCKER_IMAGE=$$(echo "$(DOCKER_PULL_IDENTIFIER)" | sed "s|DOCKER_IMAGE_VARIANT|$${DOCKER_IMAGE_VARIANT}|"); \
+	else \
+	  DOCKER_IMAGE=$(DOCKER_IMAGE); \
+  fi; \
+	$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "'$${DOCKER_IMAGE}'".$(COLOR_RESET)'; \
+	$(call docker_run_make,$(DOCKER_MAKECMDGOALS),'$${DOCKER_IMAGE}',,$(DOCKER_MAKE_ARGS))
