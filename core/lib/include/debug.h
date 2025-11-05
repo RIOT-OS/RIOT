@@ -29,33 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @def DEBUG_PRINT
- *
- * @brief Print debug information if the calling thread stack is large enough
- *
- * Use this macro the same as `printf`. When `DEVELHELP` is defined inside an
- * implementation file, all usages of ::DEBUG_PRINT will print the given
- * information to stdout after verifying the stack is big enough. If `DEVELHELP`
- * is not set, this check is not performed. (CPU exception may occur)
- */
-#ifdef DEVELHELP
-#  include "cpu_conf.h"
-#  define DEBUG_PRINT(...)                                                         \
-      do {                                                                         \
-          if ((thread_get_active() == NULL) ||                                     \
-              (thread_get_active()->stack_size >=                                  \
-               THREAD_EXTRA_STACKSIZE_PRINTF)) {                                   \
-              printf(__VA_ARGS__);                                                 \
-          }                                                                        \
-          else {                                                                   \
-              puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-          }                                                                        \
-      } while (0)
-#else
-#  define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#endif
-
-/**
  * @def DEBUG_BREAKPOINT
  *
  * @brief Set a debug breakpoint
@@ -109,6 +82,11 @@ extern "C" {
  *
  * @brief Print debug information to stdout
  *
+ * Use this macro the same as `printf`. When `DEVELHELP` is defined inside an
+ * implementation file, all usages of ::DEBUG_PRINT will print the given
+ * information to stdout after verifying the stack is big enough. If `DEVELHELP`
+ * is not set, this check is not performed. (CPU exception may occur)
+ *
  * @note    This looks similar to the @ref LOG_DEBUG() function. However, it is
  *          enabled on a per-file basis. Prefer @ref DEBUG for debug output
  *          relevant for debugging a module in RIOT. Prefer @ref LOG_DEBUG() for
@@ -118,11 +96,18 @@ extern "C" {
  * @details If a variable is only accessed by `DEBUG()`, the compiler will
  *          warn about unused variables when `ENABLE_DEBUG` is set to `0`.
  */
-#define DEBUG(...)                    \
-    do {                              \
-        if (ENABLE_DEBUG) {           \
-            DEBUG_PRINT(__VA_ARGS__); \
-        }                             \
+#define DEBUG(...)                                                                      \
+    do {                                                                                \
+        if (ENABLE_DEBUG) {                                                             \
+            if (IS_ACTIVE(DEVELHELP) &&                                                 \
+                ((thread_get_active() == NULL) ||                                       \
+                 (thread_get_active()->stack_size >= THREAD_EXTRA_STACKSIZE_PRINTF))) { \
+                printf(__VA_ARGS__);                                                    \
+            }                                                                           \
+            else {                                                                      \
+                puts("Cannot debug, stack too small. Consider using DEBUG_PUTS().");    \
+            }                                                                           \
+        }                                                                               \
     } while (0)
 
 /**
@@ -138,6 +123,13 @@ extern "C" {
         }                   \
     } while (0)
 /** @} */
+
+/**
+ * @def DEBUG_PRINT
+ *
+ * @deprecated use @ref DEBUG instead. will be removed after release 2026.04
+ */
+#define DEBUG_PRINT(...) DEBUG(__VA_ARGS__)
 
 /**
  * @def DEBUG_EXTRA_STACKSIZE
