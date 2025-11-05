@@ -166,6 +166,7 @@ void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind)
     (void)ind;
 }
 
+__attribute__((weak))
 void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
 {
     (void)mac;
