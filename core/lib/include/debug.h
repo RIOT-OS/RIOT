@@ -39,20 +39,20 @@ extern "C" {
  * is not set, this check is not performed. (CPU exception may occur)
  */
 #ifdef DEVELHELP
-#include "cpu_conf.h"
-#define DEBUG_PRINT(...) \
-    do { \
-        if ((thread_get_active() == NULL) || \
-            (thread_get_active()->stack_size >= \
-             THREAD_EXTRA_STACKSIZE_PRINTF)) { \
-            printf(__VA_ARGS__); \
-        } \
-        else { \
-            puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-        } \
-    } while (0)
+#  include "cpu_conf.h"
+#  define DEBUG_PRINT(...)                                                         \
+      do {                                                                         \
+          if ((thread_get_active() == NULL) ||                                     \
+              (thread_get_active()->stack_size >=                                  \
+               THREAD_EXTRA_STACKSIZE_PRINTF)) {                                   \
+              printf(__VA_ARGS__);                                                 \
+          }                                                                        \
+          else {                                                                   \
+              puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
+          }                                                                        \
+      } while (0)
 #else
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#  define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #endif
 
 /**
@@ -70,10 +70,10 @@ extern "C" {
  * @param val   Breakpoint context for debugger, usually ignored.
  */
 #ifdef DEVELHELP
-#include "architecture.h"
-#define DEBUG_BREAKPOINT(val)   ARCHITECTURE_BREAKPOINT(val)
+#  include "architecture.h"
+#  define DEBUG_BREAKPOINT(val) ARCHITECTURE_BREAKPOINT(val)
 #else
-#define DEBUG_BREAKPOINT(val)   (void)0
+#  define DEBUG_BREAKPOINT(val) (void)0
 #endif
 
 /**
@@ -85,7 +85,7 @@ extern "C" {
  *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
  */
 #if !defined(ENABLE_DEBUG) || defined(DOXYGEN)
-#define ENABLE_DEBUG 0
+#  define ENABLE_DEBUG 0
 #endif
 
 /**
@@ -94,15 +94,15 @@ extern "C" {
  * @brief   Contains the function name if given compiler supports it.
  *          Otherwise it is an empty string.
  */
-# if defined(__cplusplus) && defined(__GNUC__)
+#if defined(__cplusplus) && defined(__GNUC__)
 #  define DEBUG_FUNC __PRETTY_FUNCTION__
-# elif __STDC_VERSION__ >= 199901L
+#elif __STDC_VERSION__ >= 199901L
 #  define DEBUG_FUNC __func__
-# elif __GNUC__ >= 2
+#elif __GNUC__ >= 2
 #  define DEBUG_FUNC __FUNCTION__
-# else
+#else
 #  define DEBUG_FUNC ""
-# endif
+#endif
 
 /**
  * @def DEBUG
@@ -118,7 +118,12 @@ extern "C" {
  * @details If a variable is only accessed by `DEBUG()`, the compiler will
  *          warn about unused variables when `ENABLE_DEBUG` is set to `0`.
  */
-#define DEBUG(...) do { if (ENABLE_DEBUG) { DEBUG_PRINT(__VA_ARGS__); } } while (0)
+#define DEBUG(...)                    \
+    do {                              \
+        if (ENABLE_DEBUG) {           \
+            DEBUG_PRINT(__VA_ARGS__); \
+        }                             \
+    } while (0)
 
 /**
  * @def DEBUG_PUTS
@@ -126,7 +131,12 @@ extern "C" {
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
  */
-#define DEBUG_PUTS(str) do { if (ENABLE_DEBUG) { puts(str); } } while (0)
+#define DEBUG_PUTS(str)     \
+    do {                    \
+        if (ENABLE_DEBUG) { \
+            puts(str);      \
+        }                   \
+    } while (0)
 /** @} */
 
 /**
@@ -135,9 +145,9 @@ extern "C" {
  * @brief Extra stacksize needed when ENABLE_DEBUG==1
  */
 #if ENABLE_DEBUG
-#define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
+#  define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
 #else
-#define DEBUG_EXTRA_STACKSIZE (0)
+#  define DEBUG_EXTRA_STACKSIZE (0)
 #endif
 
 #ifdef __cplusplus
