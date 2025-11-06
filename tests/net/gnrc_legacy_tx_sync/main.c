@@ -89,7 +89,7 @@ int main(void)
 
     /* Cancel error message and send success message */
     if (ztimer_remove(ZTIMER_SEC, &timer)) {
-        /* Sucessfully removed error message, not too late to send success */
+        /* Successfully removed error message, not too late to send success */
         msg_send(&success_msg, pid);
     }
 
