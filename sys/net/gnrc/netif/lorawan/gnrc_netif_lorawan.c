@@ -160,6 +160,7 @@ release:
     gnrc_pktbuf_release(pkt);
 }
 
+__attribute__((weak))
 void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind)
 {
     (void)mac;
