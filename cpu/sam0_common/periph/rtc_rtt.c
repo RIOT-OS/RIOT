@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "atomic_utils.h"
 #include "pm_layered.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
@@ -501,6 +502,30 @@ int rtc_tamper_register(gpio_t pin, gpio_flank_t flank)
     }
 
     return 0;
+}
+
+int rtc_tamper_pin_enable(gpio_t pin)
+{
+    int in = _rtc_pin(pin);
+
+    if (in < 0) {
+        return -1;
+    }
+
+    atomic_set_bit_u32(atomic_bit_u32(&tampctr, 2 * in));
+
+    return 0;
+}
+
+void rtc_tamper_pin_disable(gpio_t pin)
+{
+    int in = _rtc_pin(pin);
+
+    if (in < 0) {
+        return;
+    }
+
+    atomic_clear_bit_u32(atomic_bit_u32(&tampctr, 2 * in));
 }
 
 void rtc_tamper_enable(void)
