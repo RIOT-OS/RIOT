@@ -355,11 +355,22 @@ int sx126x_init(sx126x_t *dev)
     /* Reset the device */
     sx126x_reset(dev);
 
-    /* read status to verify device presence */
-    sx126x_chip_status_t radio_status;
+    /* Read status and packet type to verify device presence. Just reading the
+     * status can lead incorrectly detecting the chip to be present, e.g. when
+     * CIPO (a.k.a. MISO) is pulled high. The packet type after reset should be
+     * valid. The chance of it not being valid is quite good on floating SPI.
+     * If CIPO is pulled down, `radio_status.chip_mode` will be zero, if CIPO
+     * is pulled high, `pkt_type` will be `UINT8_MAX`. So in those two cases,
+     * an unconnected chip will be detected reliably.
+     */
+    sx126x_pkt_type_t pkt_type = UINT8_MAX;
+    sx126x_chip_status_t radio_status = { 0 };
+    sx126x_get_pkt_type(dev, &pkt_type);
     sx126x_get_status(dev, &radio_status);
-    if (!radio_status.chip_mode) {
+    if ((pkt_type > SX126X_PKT_TYPE_LR_FHSS) || !radio_status.chip_mode) {
         DEBUG("[sx126x] error: no device found\n");
+        printf("pkt_type = %x, radio_status.chip_mode = %u\n",
+               (unsigned)pkt_type, (unsigned)radio_status.chip_mode);
         return -ENODEV;
     }
 
