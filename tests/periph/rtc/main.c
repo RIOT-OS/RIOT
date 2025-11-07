@@ -138,7 +138,7 @@ int main(void)
     }
 
     time = (struct tm){
-        .tm_year = 2020 - 1900,   /* years are counted from 1900 */
+        .tm_year = 2025 - 1900,   /* years are counted from 1900 */
         .tm_mon  =  1,            /* 0 = January, 11 = December */
         .tm_mday = 28,
         .tm_hour = 23,
