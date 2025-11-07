@@ -71,6 +71,24 @@ typedef void(*rtc_alarm_cb_t)(void *arg);
 void rtc_init(void);
 
 /**
+ * @brief   Hook to be implemented by the application to prepare for a time travel
+ *
+ * @param[in] old_time      Pointer to the struct holding the old time.
+ * @param[in] new_time      Pointer to the struct holding the new time.
+ */
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time);
+
+/**
+ * @brief   Hook to be implemented by the application to react to a time travel
+ *
+ * @param[in] old_time      Pointer to the struct holding the old time.
+ * @param[in] new_time      Pointer to the struct holding the new time.
+ */
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time);
+
+/**
  * @brief Set RTC to given time.
  *
  * @param[in] time          Pointer to the struct holding the time to set.

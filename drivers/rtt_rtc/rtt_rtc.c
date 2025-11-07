@@ -122,6 +122,20 @@ void rtc_init(void)
     _set_alarm(last_alarm, TICKS(RTT_SECOND_MAX));
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
     rtc_tm_normalize(time);
@@ -129,12 +143,17 @@ int rtc_set_time(struct tm *time)
     /* disable alarm to prevent race condition */
     rtt_clear_alarm();
 
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
+
     uint32_t now = rtt_get_counter();
     rtc_now      = rtc_mktime(time);
 
     /* calculate next wake-up period */
     _update_alarm(now);
 
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 

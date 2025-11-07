@@ -36,12 +36,31 @@ void rtc_init(void)
     rtt_init();
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
+
     uint32_t t = rtc_mktime(time);
 
     rtt_set_counter(t);
 
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 

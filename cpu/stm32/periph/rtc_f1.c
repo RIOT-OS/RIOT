@@ -143,14 +143,33 @@ void rtc_init(void)
     }
 }
 
+__attribute__((weak))
+void rtc_pre_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
+__attribute__((weak))
+void rtc_post_set_time(struct tm *old_time, const struct tm *new_time)
+{
+    (void)old_time;
+    (void)new_time;
+}
+
 int rtc_set_time(struct tm *time)
 {
     uint32_t timestamp = rtc_mktime(time);
+
+    struct tm old_time;
+    rtc_get_time(&old_time);
+    rtc_pre_set_time(&old_time, time);
 
     _rtc_set_time(timestamp);
 
     DEBUG("%s timestamp=%"PRIu32"\n", __func__, timestamp);
 
+    rtc_post_set_time(&old_time, time);
     return 0;
 }
 
