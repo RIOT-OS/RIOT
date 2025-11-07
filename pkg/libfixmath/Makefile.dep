@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   # libfixmath unittests use shift operand incompatible with 8bit
   # architecture int type.

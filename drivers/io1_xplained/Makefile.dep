@@ -1,4 +1,6 @@
-FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += float_math
 FEATURES_REQUIRED += periph_adc
+FEATURES_REQUIRED += periph_gpio
+
 USEMODULE += at30tse75x
 USEMODULE += sdcard_spi

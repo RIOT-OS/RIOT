@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += posix_headers
 
 # CN-CBOR is only supported by 32 bit architectures

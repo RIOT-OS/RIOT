@@ -37,19 +37,6 @@ extern ssize_t stdio_write(const void* buffer, size_t len);
 NONSTRING
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
-static const uint32_t _tenmap[] = {
-    0,
-    10LU,
-    100LU,
-    1000LU,
-    10000LU,
-    100000LU,
-    1000000LU,
-    10000000LU,
-};
-
-#define TENMAP_SIZE  ARRAY_SIZE(_tenmap)
-
 static inline char _to_lower(char c)
 {
     return 'a' + (c - 'A');
@@ -377,6 +364,21 @@ size_t fmt_s32_dfp(char *out, int32_t val, int scale)
 
     return pos;
 }
+
+#if MODULE_FLOAT_MATH
+static const uint32_t _tenmap[] = {
+    0,
+    10LU,
+    100LU,
+    1000LU,
+    10000LU,
+    100000LU,
+    1000000LU,
+    10000000LU,
+};
+
+#  define TENMAP_SIZE    ARRAY_SIZE(_tenmap)
+
 /* this is very probably not the most efficient implementation, as it at least
  * pulls in floating point math.  But it works, and it's always nice to have
  * low hanging fruits when optimizing. (Kaspar)
@@ -415,6 +417,7 @@ size_t fmt_float(char *out, float f, unsigned precision)
 
     return res;
 }
+#endif
 
 size_t fmt_lpad(char *out, size_t in_len, size_t pad_len, char pad_char)
 {

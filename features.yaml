@@ -468,6 +468,9 @@ groups:
           a mandatory requirement to build Rust code.
   - name: emulator_renode
     help: The platform is compatible with the Renode emulator.
+  - name: float_math
+    help: The use of float point math is possible. This requires either a
+          hardware FPU or a working software FPU.
 
 - title: Peripheral Features
   help: These features indicate presence of peripheral IP block, presence of

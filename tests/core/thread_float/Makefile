@@ -1,5 +1,7 @@
 include ../Makefile.core_common
 
+FEATURES_REQUIRED += float_math
+
 USEMODULE += printf_float
 USEMODULE += ztimer_usec
 

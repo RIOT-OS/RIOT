@@ -66,7 +66,10 @@ int32_t adc_util_map(int sample, adc_res_t res, int32_t min, int32_t max)
     return (min + scaled);
 }
 
+/* only pro adc_util_mapf if float_math is in use */
+#if MODULE_FLOAT_MATH
 float adc_util_mapf(int sample, adc_res_t res, float min, float max)
 {
     return ((((max - min) * sample) / ((int32_t)1L << _adc_res_bits(res))) + min);
 }
+#endif

@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += jerryscript-port-default
 USEMODULE += jerryscript-ext
 

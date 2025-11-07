@@ -8,15 +8,14 @@ ifeq (, $(UNIT_TESTS))
     # the $(dir) Makefile function leaves a trailing slash after the directory
     # name, therefore we use patsubst instead.
     UNIT_TESTS := $(patsubst %/Makefile,%,$(wildcard tests-*/Makefile))
+
+		# Ignore tests needing floats on native
+    ifneq (,$(filter native%,$(BOARD)))
+			UNIT_TESTS := $(filter-out tests-color tests-scanf_float tests-sht1x tests-printf_float,$(UNIT_TESTS))
+    endif
   else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
   endif
-endif
-
-ifeq (llvm,$(TOOLCHAIN))
-  # the floating point exception bug is more likely to trigger when build
-  # with LLVM, so we just disable LLVM on native as a work around
-  TEST_ON_CI_BLACKLIST += native32 native64
 endif
 
 DISABLE_MODULE += auto_init auto_init_%

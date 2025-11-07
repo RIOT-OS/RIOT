@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += lvgl
 USEMODULE += lvgl_core
 USEMODULE += lvgl_draw

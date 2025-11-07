@@ -1,3 +1,5 @@
+FEATURES_REQUIRED += float_math
+
 USEMODULE += ccn-lite-utils
 USEMODULE += gnrc_nettype_ccn
 USEMODULE += evtimer

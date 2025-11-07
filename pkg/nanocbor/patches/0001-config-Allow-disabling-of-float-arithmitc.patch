@@ -1,0 +1,109 @@
+From e29136bb10b7d763d633341e213112759c6893a0 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Wed, 17 Sep 2025 21:36:01 +0200
+Subject: [PATCH] config: Allow disabling of float arithmitc
+
+This can be useful for toolchains that cannot compile with any float
+arithmetic included. Otherwise with -ffunction-sections the linker would
+garbage collect unused float support anyway.
+---
+ examples/pretty-printer/main.c | 4 ++++
+ include/nanocbor/config.h      | 7 +++++++
+ src/decoder.c                  | 2 ++
+ src/encoder.c                  | 3 +++
+ 4 files changed, 16 insertions(+)
+
+diff --git a/examples/pretty-printer/main.c b/examples/pretty-printer/main.c
+index 9508ecf..1811f0a 100644
+--- a/examples/pretty-printer/main.c
++++ b/examples/pretty-printer/main.c
+@@ -144,6 +144,7 @@ static int _print_enter_array(nanocbor_value_t *value, unsigned indent)
+     return -1;
+ }
+ 
++#if NANOCBOR_ENABLE_FLOAT
+ static int _print_float(nanocbor_value_t *value)
+ {
+     bool test = false;
+@@ -173,6 +174,7 @@ static int _print_float(nanocbor_value_t *value)
+     }
+     return 0;
+ }
++#endif /* NANOCBOR_ENABLE_FLOAT */
+ 
+ /* NOLINTNEXTLINE(misc-no-recursion, readability-function-cognitive-complexity) */
+ static int _parse_type(nanocbor_value_t *value, unsigned indent)
+@@ -228,9 +230,11 @@ static int _parse_type(nanocbor_value_t *value, unsigned indent)
+     case NANOCBOR_TYPE_MAP: {
+         res = _print_enter_map(value, indent);
+     } break;
++#if NANOCBOR_ENABLE_FLOAT
+     case NANOCBOR_TYPE_FLOAT: {
+         res = _print_float(value);
+     } break;
++#endif /* NANOCBOR_ENABLE_FLOAT */
+     case NANOCBOR_TYPE_TAG: {
+         uint32_t tag = 0;
+         int res = nanocbor_get_tag(value, &tag);
+diff --git a/include/nanocbor/config.h b/include/nanocbor/config.h
+index a9e5463..bf4e135 100644
+--- a/include/nanocbor/config.h
++++ b/include/nanocbor/config.h
+@@ -79,6 +79,13 @@ extern "C" {
+ #endif
+ #endif
+ 
++/**
++ * @brief enable/disable support for float/double values
++ */
++#ifndef NANOCBOR_ENABLE_FLOAT
++#define NANOCBOR_ENABLE_FLOAT 1
++#endif
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/decoder.c b/src/decoder.c
+index 5820659..4a59e01 100644
+--- a/src/decoder.c
++++ b/src/decoder.c
+@@ -368,6 +368,7 @@ int nanocbor_get_simple(nanocbor_value_t *cvalue, uint8_t *value)
+     return res;
+ }
+ 
++#if NANOCBOR_ENABLE_FLOAT
+ /* float bit mask related defines */
+ #define FLOAT_EXP_OFFSET (127U)
+ #define FLOAT_SIZE (32U)
+@@ -475,6 +476,7 @@ int nanocbor_get_double(nanocbor_value_t *cvalue, double *value)
+     }
+     return _decode_double(cvalue, value);
+ }
++#endif /* NANOCBOR_ENABLE_FLOAT */
+ 
+ static int _enter_container(const nanocbor_value_t *it,
+                             nanocbor_value_t *container, uint8_t type)
+diff --git a/src/encoder.c b/src/encoder.c
+index ec0a4f6..c548fbd 100644
+--- a/src/encoder.c
++++ b/src/encoder.c
+@@ -230,6 +230,8 @@ int nanocbor_fmt_null(nanocbor_encoder_t *enc)
+     return _fmt_single(enc, NANOCBOR_MASK_FLOAT | NANOCBOR_SIMPLE_NULL);
+ }
+ 
++#if NANOCBOR_TYPE_FLOAT
++
+ /* Double bit mask related defines */
+ #define DOUBLE_EXP_OFFSET (1023U)
+ #define DOUBLE_SIZE (64U)
+@@ -393,6 +395,7 @@ int nanocbor_fmt_double(nanocbor_encoder_t *enc, double num)
+     return res;
+ #endif
+ }
++#endif /* NANOCBOR_TYPE_FLOAT */
+ 
+ int nanocbor_fmt_decimal_frac(nanocbor_encoder_t *enc, int32_t e, int32_t m)
+ {
+-- 
+2.43.0
+

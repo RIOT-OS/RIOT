@@ -1,2 +1,7 @@
 INCLUDES += -I$(RIOTPKG)/nanocbor/include
 INCLUDES += -I$(PKGDIRBASE)/nanocbor/include
+
+# Disable float functions if no float support is available
+ifneq (,$(filter float_math,$(FEATURES_USED)))
+  CFLAGS += -DNANOCBOR_ENABLE_FLOAT=0
+endif

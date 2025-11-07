@@ -37,3 +37,22 @@ ifeq ($(USE_LIBUCONTEXT),1)
   CFLAGS += $(pkg-config libucontext --cflags) -DUSE_LIBUCONTEXT=1
   LINKFLAGS += $(shell pkg-config libucontext --libs)
 endif
+
+ifeq (x86_64,$(OS_ARCH))
+  # Disable use of FPU/SSE registers if FPU is not used. This prevents radom
+  # stack corruptions and floating point exceptions to not occur during
+  # context switching.
+	ifeq (,$(filter float_math,$(FEATURES_USED)))
+		# FPU/SSE registers are not reliably saved and restored in glibc's ucontext
+		# implementation (see https://github.com/RIOT-OS/RIOT/issues/495) and not at
+		# all in libucontext's (but there at least this is documented). So we force
+		# the compiler to only use registers known to be properly backed up and
+		# restored during context switching
+		CFLAGS += -mgeneral-regs-only
+
+		# Since we disabled the use of non-general registers (such as FPU registers),
+		# we need to use a soft FPU
+		CFLAGS += -msoft-float
+		LINKFLAGS += -msoft-float
+	endif
+endif
