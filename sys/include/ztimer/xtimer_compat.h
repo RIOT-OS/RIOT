@@ -34,6 +34,7 @@
 #endif /* MODULE_CORE_MSG */
 #include "mutex.h"
 #include "sched.h"
+#include "macros/math.h"
 
 #include "ztimer.h"
 
@@ -70,22 +71,12 @@ extern "C" {
  *          implemented with the selected backends.
  */
 #define _XTIMER_BACKEND_NOT_IMPLEMENTED \
-            extern void xtimer_function_called_but_no_backend_available(void); \  
-            xtimer_function_called_but_no_backend_available()
+        extern void xtimer_function_called_but_no_backend_available(void); \
+        xtimer_function_called_but_no_backend_available()
 
 typedef ztimer_t xtimer_t;
 typedef uint32_t xtimer_ticks32_t;
 typedef uint64_t xtimer_ticks64_t;
-
-static inline uint32_t _div_round_up(uint32_t a, uint32_t b)
-{
-    return (a + b - 1) / b;
-}
-
-static inline uint32_t _div_round_up64(uint64_t a, uint32_t b)
-{
-    return (a + b - 1) / b;
-}
 
 static inline void xtimer_init(void)
 {
@@ -109,7 +100,7 @@ static inline uint32_t xtimer_usec_from_ticks(xtimer_ticks32_t ticks)
 
 static inline uint32_t xtimer_msec_from_ticks(xtimer_ticks32_t ticks)
 {
-    return _div_round_up(ticks, US_PER_MS);
+    return DIV_ROUND_UP(ticks, US_PER_MS);
 }
 
 static inline uint64_t xtimer_usec_from_ticks64(xtimer_ticks64_t ticks)
@@ -198,7 +189,7 @@ static inline void xtimer_usleep(uint32_t microseconds)
         ztimer_sleep(ZTIMER_USEC, microseconds);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        ztimer_sleep(ZTIMER_MSEC, _div_round_up(microseconds, US_PER_MS));
+        ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(microseconds, US_PER_MS));
     }
     else {
         busy_wait_us(microseconds);
@@ -233,7 +224,7 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
         ztimer_set(ZTIMER_USEC, timer, offset);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        ztimer_set(ZTIMER_MSEC, timer, _div_round_up(offset, US_PER_MS));
+        ztimer_set(ZTIMER_MSEC, timer, DIV_ROUND_UP(offset, US_PER_MS));
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
@@ -260,7 +251,7 @@ static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
         ztimer_set_msg(ZTIMER_USEC, timer, offset, msg, target_pid);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        ztimer_set_msg(ZTIMER_MSEC, timer, _div_round_up(offset, US_PER_MS),
+        ztimer_set_msg(ZTIMER_MSEC, timer, DIV_ROUND_UP(offset, US_PER_MS),
                        msg, target_pid);
     }
     else {
@@ -275,7 +266,7 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
         ztimer_periodic_wakeup(ZTIMER_USEC, last_wakeup, period);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        ztimer_periodic_wakeup(ZTIMER_MSEC, last_wakeup, _div_round_up(period, US_PER_MS));
+        ztimer_periodic_wakeup(ZTIMER_MSEC, last_wakeup, DIV_ROUND_UP(period, US_PER_MS));
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
@@ -288,7 +279,7 @@ static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
         return ztimer_msg_receive_timeout(ZTIMER_USEC, msg, timeout);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        return ztimer_msg_receive_timeout(ZTIMER_MSEC, msg, _div_round_up(timeout, US_PER_MS));
+        return ztimer_msg_receive_timeout(ZTIMER_MSEC, msg, DIV_ROUND_UP(timeout, US_PER_MS));
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
@@ -302,7 +293,7 @@ static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset,
         ztimer_set_wakeup(ZTIMER_USEC, timer, offset, pid);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        ztimer_set_wakeup(ZTIMER_MSEC, timer, _div_round_up(offset, US_PER_MS), pid);
+        ztimer_set_wakeup(ZTIMER_MSEC, timer, DIV_ROUND_UP(offset, US_PER_MS), pid);
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
@@ -318,7 +309,7 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
         res = ztimer_mutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        us = _div_round_up64(us, US_PER_MS);
+        us = DIV_ROUND_UP(us, US_PER_MS);
         assert(us <= UINT32_MAX);
         res = ztimer_mutex_lock_timeout(ZTIMER_MSEC, mutex, (uint32_t)us);
     }
@@ -340,7 +331,7 @@ static inline int xtimer_rmutex_lock_timeout(rmutex_t *mutex, uint64_t us)
         res = ztimer_rmutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        us = _div_round_up64(us, US_PER_MS);
+        us = DIV_ROUND_UP(us, US_PER_MS);
         assert(us <= UINT32_MAX);
         res = ztimer_rmutex_lock_timeout(ZTIMER_MSEC, mutex, (uint32_t)us);
     }
@@ -359,7 +350,7 @@ static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
         ztimer_set_timeout_flag(ZTIMER_USEC, t, timeout);
     }
     else if (IS_USED(MODULE_ZTIMER_MSEC)) {
-        ztimer_set_timeout_flag(ZTIMER_MSEC, t, _div_round_up(timeout, US_PER_MS));
+        ztimer_set_timeout_flag(ZTIMER_MSEC, t, DIV_ROUND_UP(timeout, US_PER_MS));
     }
     else {
         _XTIMER_BACKEND_NOT_IMPLEMENTED;
