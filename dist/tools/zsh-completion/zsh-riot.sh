@@ -1,3 +1,5 @@
+OPENOCD_SCRIPTS_PATH=${OPENOCD_SCRIPTS_PATH:-/usr/share/openocd/scripts/}
+
 function _boards {
     local -a _boards_available
     local -a _board_dirs
@@ -78,6 +80,11 @@ function _hw_programmers {
     _describe 'hw_programmer' _hw_programmer_vals
 }
 
+function _ftdi_adapter {
+    local -a _adapter_vals=($(find "$OPENOCD_SCRIPTS_PATH"/interface/ftdi -type f -name '*.cfg' -exec basename --suffix=.cfg {} \;))
+    _describe 'ftdi_adapter' _adapter_vals
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -130,6 +137,7 @@ function _riot {
         'RIOT_CI_BUILD[Behave as in the CI: Less verbose output, reproducible builds, ...]:bool:_bools'
         'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
         'OPENOCD_DEBUG_ADAPTER[Select the programmer hardware to use with OpenOCD]:hw_programmer:_hw_programmers'
+        'OPENOCD_FTDI_ADAPTER[Select the FTDI adapter config to use with OpenOCD]:ftdi_adapter:_ftdi_adapter'
         'OPENOCD_RESET_USE_CONNECT_ASSERT_SRST[Let OpenOCD attach while reset signal is asserted]:bool:_bools'
         'STATIC_ANALYSIS[Enable static analysis for modules that claim support]:bool:_bools'
     )
