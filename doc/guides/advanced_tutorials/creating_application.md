@@ -343,3 +343,11 @@ APPLICATION = my_app
 PROJECT_BASE ?= $(CURDIR)/../..
 include $(PROJECT_BASE)/Makefile.include
 ```
+
+### Unit Tests for External Modules
+
+When writing external modules, it can be helpful to make use of the existing
+unit test infrastructure in `tests/unittests` to run both upstream unit tests
+as well as downstream project-specific unit tests in a single app. For this the
+environment variable `EXTERNAL_UNITTEST_DIRS` can be used to list directories
+(separated by a space) to additional unit tests.
