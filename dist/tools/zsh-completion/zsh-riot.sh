@@ -1,4 +1,5 @@
 OPENOCD_SCRIPTS_PATH=${OPENOCD_SCRIPTS_PATH:-/usr/share/openocd/scripts/}
+DOCKER=${DOCKER:-docker}
 
 function _boards {
     local -a _boards_available
@@ -85,6 +86,11 @@ function _ftdi_adapter {
     _describe 'ftdi_adapter' _adapter_vals
 }
 
+function _docker_image {
+    local -a _docker_image_vals=($("$DOCKER" image ls --format '{{.Repository}}'))
+    _describe 'docker_image' _docker_image_vals
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -130,6 +136,7 @@ function _riot {
         'BOARD[Select the board to build for]:board:_boards'
         'TOOLCHAIN[Select the toolchain to use]:toolcahin:_toolchains'
         'BUILD_IN_DOCKER[Build inside docker container]:bool:_bools'
+        'DOCKER_IMAGE[The docker image to use with BUILD_IN_DOCKER=1]:docker_image:_docker_image'
         'LTO[Enable link time optimization]:bool:_bools'
         'VERBOSE_ASSERT[Print source file and line on blown assertion]:bool:_bools'
         'QUIET[Reduce verbosity of build output]:bool:_bools'
