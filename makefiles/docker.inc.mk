@@ -401,6 +401,10 @@ $(HOME)/.cargo/registry:
 # Tinybuild is the default choice, smallbuild is selected when C++ or Rust are
 # used and the legacy riotbuild is the fallback for anything not covered by
 # the former two.
+#
+# REMOVE WHEN FIXED: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=119953
+# The upstream g++ currently does not support MSP430, so we fallback to
+# riotbuild if C++ is used.
 ..in-docker-container: $(DEPS_FOR_RUNNING_DOCKER)
 	@mkdir -p $(HOME)/.cargo/git
 	@mkdir -p $(HOME)/.cargo/registry
@@ -435,7 +439,11 @@ $(HOME)/.cargo/registry:
 	      echo "riotbuild"; \
 	      ;; \
 	    "msp430") \
-	      echo "$${DOCKER_IMAGE_VARIANT}-msp430"; \
+	      if echo "$${USEMODULE}" | grep -q "cpp"; then \
+	        echo "riotbuild"; \
+	      else \
+	        echo "$${DOCKER_IMAGE_VARIANT}-msp430"; \
+	      fi; \
 	      ;; \
 	    "armv6m"|"armv7m"|"armv8m") \
 	      echo "$${DOCKER_IMAGE_VARIANT}-arm"; \
