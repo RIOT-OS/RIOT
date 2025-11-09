@@ -75,3 +75,8 @@ $(RIOTTOOLS)/pioasm/pioasm: $(RIOTTOOLS)/pioasm/Makefile
 	@echo "[INFO] pioasm not found - fetching it from GitHub now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/pioasm
 	@echo "[INFO] pioasm successfully fetched!"
+
+$(RIOTTOOLS)/PyCortexMDebug/checkout: $(RIOTTOOLS)/PyCortexMDebug/Makefile
+	@echo "[INFO] PyCortexMDebug not found - fetching it from GitHub now"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/PyCortexMDebug
+	@echo "[INFO] PyCortexMDebug successfully fetched!"
