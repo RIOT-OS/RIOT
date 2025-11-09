@@ -29,6 +29,7 @@ else
 endif
 
 CPU_FAM = $(call lowercase,$(STM32_TYPE)$(STM32_FAMILY))
+SVD_VENDOR := STMicro
 
 ifeq (f0,$(CPU_FAM))
   CPU_CORE = cortex-m0
@@ -40,6 +41,7 @@ else ifneq (,$(filter $(CPU_FAM),g4 wb wl))
   CPU_CORE = cortex-m4
 else ifeq (f7,$(CPU_FAM))
   CPU_CORE = cortex-m7
+	SVD_MODEL := STM32F7x$(STM32_MODEL3)
 else ifneq (,$(filter $(CPU_FAM),g0 l0 c0))
   CPU_CORE = cortex-m0plus
 else ifneq (,$(filter $(CPU_FAM),l5 u5))
