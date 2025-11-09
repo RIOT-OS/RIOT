@@ -1,3 +1,6 @@
+OPENOCD_SCRIPTS_PATH=${OPENOCD_SCRIPTS_PATH:-/usr/share/openocd/scripts/}
+DOCKER=${DOCKER:-docker}
+
 function _boards {
     local -a _boards_available
     local -a _board_dirs
@@ -78,6 +81,16 @@ function _hw_programmers {
     _describe 'hw_programmer' _hw_programmer_vals
 }
 
+function _ftdi_adapter {
+    local -a _adapter_vals=($(find "$OPENOCD_SCRIPTS_PATH"/interface/ftdi -type f -name '*.cfg' -exec basename --suffix=.cfg {} \;))
+    _describe 'ftdi_adapter' _adapter_vals
+}
+
+function _docker_image {
+    local -a _docker_image_vals=($("$DOCKER" image ls --format '{{.Repository}}'))
+    _describe 'docker_image' _docker_image_vals
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -123,6 +136,7 @@ function _riot {
         'BOARD[Select the board to build for]:board:_boards'
         'TOOLCHAIN[Select the toolchain to use]:toolcahin:_toolchains'
         'BUILD_IN_DOCKER[Build inside docker container]:bool:_bools'
+        'DOCKER_IMAGE[The docker image to use with BUILD_IN_DOCKER=1]:docker_image:_docker_image'
         'LTO[Enable link time optimization]:bool:_bools'
         'VERBOSE_ASSERT[Print source file and line on blown assertion]:bool:_bools'
         'QUIET[Reduce verbosity of build output]:bool:_bools'
@@ -130,6 +144,7 @@ function _riot {
         'RIOT_CI_BUILD[Behave as in the CI: Less verbose output, reproducible builds, ...]:bool:_bools'
         'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
         'OPENOCD_DEBUG_ADAPTER[Select the programmer hardware to use with OpenOCD]:hw_programmer:_hw_programmers'
+        'OPENOCD_FTDI_ADAPTER[Select the FTDI adapter config to use with OpenOCD]:ftdi_adapter:_ftdi_adapter'
         'OPENOCD_RESET_USE_CONNECT_ASSERT_SRST[Let OpenOCD attach while reset signal is asserted]:bool:_bools'
         'STATIC_ANALYSIS[Enable static analysis for modules that claim support]:bool:_bools'
     )
