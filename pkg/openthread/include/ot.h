@@ -163,6 +163,12 @@ int openthread_netdev_init(char *stack, int stacksize, char priority, const char
  */
 void ot_random_init(void);
 
+/**
+ * @brief   Init shell for OpenThread CLI
+ * @todo    Make conditional?
+ */
+void ot_shell_init(otInstance *aInstance);
+
 #ifdef __cplusplus
 }
 #endif
