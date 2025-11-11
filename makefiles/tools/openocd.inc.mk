@@ -1,3 +1,5 @@
+include $(RIOTMAKE)/tools/dbg_common.inc.mk
+
 FLASHER ?= $(RIOTTOOLS)/openocd/openocd.sh
 DEBUGGER ?= $(RIOTTOOLS)/openocd/openocd.sh
 DEBUGSERVER ?= $(RIOTTOOLS)/openocd/openocd.sh
@@ -76,6 +78,11 @@ OPENOCD_DEBUG_TARGETS = debug debugr debug-server debug-client
 ifneq (,$(OPENOCD_DBG_EXTRA_CMD))
   # Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
   $(call target-export-variables,$(OPENOCD_DEBUG_TARGETS),OPENOCD_DBG_EXTRA_CMD)
+endif
+
+ifneq (,$(DBG_EXTRA_FLAGS))
+  # Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
+  $(call target-export-variables,$(OPENOCD_DEBUG_TARGETS),DBG_EXTRA_FLAGS)
 endif
 
 OPENOCD_FLASH_TARGETS = flash flash-only flashr
