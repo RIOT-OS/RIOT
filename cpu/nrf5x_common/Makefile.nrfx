@@ -65,4 +65,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 # subfolder called "vendor".
 all:
 	@mkdir -p $(VENDOR_FOLDER)
-	@cp $(addprefix $(PKG_SOURCE_DIR)/, $(PKG_SPARSE_PATHS)) $(VENDOR_FOLDER)
+	@cp -u $(addprefix $(PKG_SOURCE_DIR)/, $(PKG_SPARSE_PATHS)) $(VENDOR_FOLDER)
