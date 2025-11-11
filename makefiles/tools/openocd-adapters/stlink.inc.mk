@@ -7,13 +7,9 @@ STLINK_VERSION ?= 2-1
 # Also pass the correct version of the ST-Link adapter to the script.
 OPENOCD_ADAPTER_INIT ?= -c 'set stlink_version $(STLINK_VERSION);source $(RIOTBASE)/dist/tools/openocd/adapters/stlink.cfg'
 
-# If swd / jtag is selected by the board, prefix it with hla_
-ifneq (,$(filter swd jtag,$(OPENOCD_TRANSPORT)))
-  OPENOCD_TRANSPORT := hla_$(OPENOCD_TRANSPORT)
-endif
-
-# All ST-Link adapters support hla_swd, so use that for simplicity
-OPENOCD_TRANSPORT ?= hla_swd
+# Let OpenOCD decide which transport to select, as there is
+# an incompatibility with different versions of OpenOCD
+OPENOCD_TRANSPORT ?=
 
 # Add serial matching command, only if DEBUG_ADAPTER_ID was specified
 ifneq (,$(DEBUG_ADAPTER_ID))
