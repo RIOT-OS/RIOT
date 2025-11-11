@@ -523,7 +523,7 @@ dependencies = [
 [[package]]
 name = "riot-sys"
 version = "0.7.15"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#4f83b534fee5e8d68881a79236e70fa38d313ee1"
+source = "git+https://github.com/RIOT-OS/rust-riot-sys#88d87768c8046878a927e792f0540f61f7acb999"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
