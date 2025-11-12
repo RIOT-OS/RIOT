@@ -24,7 +24,7 @@ endif
 # Check that the doxygen version is not too old to avoid
 # certain bugs that were fixed in later revisions. Especially
 # Debian-based distributions tend to have very old versions.
-DOXYGEN_MIN_VERSION = 1.13.2
+DOXYGEN_MIN_VERSION = 1.15.0
 
 # Set the Doxygen binary if not already set
 DOXYGEN ?= doxygen
