@@ -24,7 +24,11 @@ endif
 # Check that the doxygen version is not too old to avoid
 # certain bugs that were fixed in later revisions. Especially
 # Debian-based distributions tend to have very old versions.
+# When updating the version, make sure to update the SHA512 checksum
+# of the doxygen-x.xx.x.linux.bin.tar.gz archive accordingly to avoid cache
+# misses.
 DOXYGEN_MIN_VERSION = 1.15.0
+DOXYGEN_TGZ_SHA512 = 0e99fb9a65f9fada2fe90ea0d1f940b8e58d62801f880614b440b9f3a9f82a5c1a8dd1d0719ee6a46f9612ea7447655d5c8494f63463fe7f1222987bdb1485a9
 
 # Set the Doxygen binary if not already set
 DOXYGEN ?= doxygen
@@ -69,7 +73,7 @@ graphviz-check:
 
 .PHONY: doc-ci
 doc-ci: $(RIOTTOOLS)/doxygen/Makefile
-	@PKG_VERSION=$(DOXYGEN_VERSION) $(MAKE) -C $(RIOTTOOLS)/doxygen all --no-print-directory
+	@PKG_VERSION=$(DOXYGEN_VERSION) PKG_SHA512=$(DOXYGEN_TGZ_SHA512) $(MAKE) -C $(RIOTTOOLS)/doxygen all --no-print-directory
 	@$(MAKE) -BC $(CURDIR) DOXYGEN=$(RIOTTOOLS)/doxygen/doxygen doc
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
