@@ -23,8 +23,7 @@
 static int ot_console_cb(const char *abuf, uint16_t bufsize, void *context)
 {
     (void) context;
-    if (bufsize > 0)
-    {
+    if (bufsize > 0) {
         printf("%.*s", bufsize, abuf);
     }
     return 0;
@@ -32,22 +31,14 @@ static int ot_console_cb(const char *abuf, uint16_t bufsize, void *context)
 
 static int ot_cmd(int argc, char **argv)
 {
-    char command[SHELL_DEFAULT_BUFSIZE];
-    for (int i = 1; i < argc; i++){
-        if (i == 1)
-        {
-            strncpy(command, argv[i], SHELL_DEFAULT_BUFSIZE-1);
-        }
-        else
-        {
-            strncat(command, " ", SHELL_DEFAULT_BUFSIZE-strlen(command)-1);
-            strncat(command, argv[i], SHELL_DEFAULT_BUFSIZE-strlen(command)-1);
-        }
+    for (int i = 1; i < argc - 1; i++) {
+        char *arg = argv[i];
+        arg += strlen(arg);
+        *arg = ' ';
     }
 
-    if (strlen(command) != 0)
-    {
-        otCliConsoleInputLine(command, SHELL_DEFAULT_BUFSIZE);
+    if (strlen(argv[0]) != 0) {
+        otCliConsoleInputLine(argv[1], strlen(argv[1]));
     }
     return 0;
 }
