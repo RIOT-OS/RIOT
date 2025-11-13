@@ -14,6 +14,9 @@
 PKG_NAME=doxygen
 PKG_LICENSE=GPL-2.0
 
+RIOTTOOLS=$(CURDIR)/..
+DLCACHE=$(RIOTTOOLS)/dlcache/dlcache.sh
+
 # optionally add the "clean" target to delete the binary and force a rebuild
 REBUILD=
 
@@ -77,7 +80,7 @@ $(CURDIR)/doxygen: $(REBUILD)
 
 download_binary: distclean
 	@echo "[INFO] Downloading Doxygen binary..."
-	@wget -q -O $(CURDIR)/$(BIN_PKG_TAR) $(BIN_PKG_DOWNLOAD_URL) || \
+	@$(DLCACHE) $(CURDIR)/$(BIN_PKG_TAR) $(BIN_PKG_DOWNLOAD_URL) $(PKG_SHA512) || \
 	  { echo "[ERROR] Failed to download binary"; exit 1; }
 	@echo "[INFO] Unpacking Doxygen..."
 	@tar -xf $(CURDIR)/$(BIN_PKG_TAR)
