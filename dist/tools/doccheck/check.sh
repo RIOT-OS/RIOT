@@ -20,6 +20,8 @@ if [[ -z ${DOCUMENTATION_FORMAT+x} ]]; then
 export DOCUMENTATION_FORMAT=check
 fi
 
+# not running shellcheck with -x in the CI --> disable SC1091
+# shellcheck disable=SC1091
 . "${RIOTBASE}"/dist/tools/ci/github_annotate.sh
 
 github_annotate_setup
