@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "mutex.h"
@@ -28,14 +29,10 @@
 #include "net/ipv6/addr.h"
 #include "net/cord/ep.h"
 #include "net/cord/common.h"
-#include "net/cord/config.h"
 
 #ifdef MODULE_CORD_EP_STANDALONE
 #include "net/cord/ep_standalone.h"
 #endif
-
-#define ENABLE_DEBUG        0
-#include "debug.h"
 
 #define FLAG_SUCCESS        (0x0001)
 #define FLAG_TIMEOUT        (0x0002)
@@ -87,7 +84,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     thread_flags_t flag = FLAG_ERR;
 
     if ((memo->state == GCOAP_MEMO_RESP) &&
-        (pdu->hdr->code == COAP_CODE_CREATED)) {
+        (coap_get_code_raw(pdu) == COAP_CODE_CREATED)) {
         /* read the location header and save the RD details on success */
         if (coap_get_location_path(pdu, (uint8_t *)_rd_loc,
                                    sizeof(_rd_loc)) > 0) {
@@ -110,7 +107,7 @@ static void _on_update_remove(unsigned req_state, coap_pkt_t *pdu, uint8_t code)
 {
     thread_flags_t flag = FLAG_ERR;
 
-    if ((req_state == GCOAP_MEMO_RESP) && (pdu->hdr->code == code)) {
+    if ((req_state == GCOAP_MEMO_RESP) && (coap_get_code_raw(pdu) == code)) {
         flag = FLAG_SUCCESS;
     }
     else if (req_state == GCOAP_MEMO_TIMEOUT) {
@@ -147,7 +144,7 @@ static int _update_remove(unsigned code, gcoap_resp_handler_t handle)
     if (res < 0) {
         return CORD_EP_ERR;
     }
-    coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
+    coap_pkt_set_type(&pkt, COAP_TYPE_CON);
     ssize_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
 
     /* send request */
@@ -223,7 +220,7 @@ static int _discover_internal(const sock_udp_ep_t *remote,
     if (res < 0) {
         return CORD_EP_ERR;
     }
-    coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
+    coap_pkt_set_type(&pkt, COAP_TYPE_CON);
     coap_opt_add_uri_query(&pkt, "rt", "core.rd");
     size_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     res = gcoap_req_send(buf, pkt_len, remote, NULL, _on_discover, NULL, GCOAP_SOCKET_TYPE_UNDEF);
@@ -277,7 +274,7 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
         goto end;
     }
     /* set some packet options and write query string */
-    coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
+    coap_pkt_set_type(&pkt, COAP_TYPE_CON);
     coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_LINK);
     res = cord_common_add_qstring(&pkt);
     if (res < 0) {
