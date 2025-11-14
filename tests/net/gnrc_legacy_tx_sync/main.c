@@ -26,11 +26,7 @@
 #include "ztimer.h"
 #include "thread.h"
 
-static uint8_t result_thread_stack[THREAD_STACKSIZE_MAIN];
-
-msg_t error_msg = { .content.value = 0 };
-msg_t success_msg = { .content.value = 1 };
-static gnrc_netif_t *netif;
+static char result_thread_stack[THREAD_STACKSIZE_MAIN];
 
 static const char test_msg[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU"
                                "VWXYZ0123456789.,:;!?@#$%^&*()[]{}-_=+/<>`~\'\""
@@ -64,9 +60,12 @@ int main(void)
         "tx_sync will only fail if gnrc_netif_pktq is used with a legacy driver.\n"
         "If tx_sync does not finish in one second, the test will fail.\n"
     );
+    
+    msg_t error_msg = { .content.value = 0 };
+    msg_t success_msg = { .content.value = 1 };
 
     /* Preparing the gnrc message */
-    netif = gnrc_netif_iter(NULL);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, test_msg, sizeof(test_msg),
                                                         GNRC_NETTYPE_UNDEF);
     gnrc_tx_sync_t tx_sync;
