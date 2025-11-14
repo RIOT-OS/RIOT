@@ -26,7 +26,7 @@
 #include "ztimer.h"
 #include "thread.h"
 
-char result_thread_stack[THREAD_STACKSIZE_MAIN];
+static uint8_t result_thread_stack[THREAD_STACKSIZE_MAIN];
 
 msg_t error_msg = { .content.value = 0 };
 msg_t success_msg = { .content.value = 1 };
