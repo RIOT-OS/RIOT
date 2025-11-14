@@ -1,0 +1,23 @@
+ifneq (,$(filter registry_namespace%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/registry/namespace/Makefile.dep
+endif
+
+ifneq (,$(filter registry_storage%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/registry/storage/Makefile.dep
+endif
+
+ifneq (,$(filter registry_int_path%,$(USEMODULE)))
+  USEMODULE += registry_find
+endif
+
+ifneq (,$(filter registry_string_path%,$(USEMODULE)))
+  USEMODULE += registry_find
+endif
+
+ifneq (,$(filter registry_util%,$(USEMODULE)))
+  USEMODULE += base64
+endif
+
+ifneq (,$(filter registry_%,$(USEMODULE)))
+  USEMODULE += registry
+endif
