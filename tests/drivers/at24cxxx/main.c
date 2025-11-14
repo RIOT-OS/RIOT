@@ -18,12 +18,12 @@
  * @}
  */
 
+#include <inttypes.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "xtimer.h"
-
+#include "architecture.h"
 #include "at24cxxx.h"
 #include "at24cxxx_params.h"
 
