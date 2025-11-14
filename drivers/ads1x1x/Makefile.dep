@@ -1,0 +1,12 @@
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+ifneq (,$(filter ads101%,$(USEMODULE)))
+  USEMODULE += ads1x1x
+endif
+
+ifneq (,$(filter ads111%,$(USEMODULE)))
+  USEMODULE += ads1x1x
+endif
