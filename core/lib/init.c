@@ -30,7 +30,10 @@
 #include "periph/pm.h"
 #include "thread.h"
 #include "stdio_base.h"
-
+#if IS_USED(MODULE_RIOTBOOT)
+#  include "riotboot/slot.h"
+#  include "riotboot/wdt.h"
+#endif
 #if IS_USED(MODULE_VFS)
 #include "vfs.h"
 #endif
@@ -60,6 +63,14 @@ static void *main_trampoline(void *arg)
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
     }
 
+#if IS_USED(MODULE_RIOTBOOT)
+    if (IS_USED(MODULE_RIOTBOOT_HDR_AUTO_CONFIRM)) {
+        riotboot_slot_confirm();
+        if (IS_USED(MODULE_RIOTBOOT_WDT)) {
+            riotboot_wdt_stop();
+        }
+    }
+#endif
     int res = main();
 
     if (IS_USED(MODULE_TEST_UTILS_MAIN_EXIT_CB)) {
