@@ -405,6 +405,7 @@
 #if IS_USED(MODULE_GCOAP_DTLS)
 #include "net/sock/dtls.h"
 #endif
+#include "net/coap.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap/cache.h"
 #include "timex.h"
@@ -423,13 +424,13 @@ extern "C" {
  * @brief   Server port; use RFC 7252 default if not defined
  */
 #ifndef CONFIG_GCOAP_PORT
-#define CONFIG_GCOAP_PORT              (5683)
+#define CONFIG_GCOAP_PORT              (COAP_PORT)
 #endif
 /**
  * @brief   Secure Server port; use RFC 7252 default if not defined
  */
 #ifndef CONFIG_GCOAPS_PORT
-#define CONFIG_GCOAPS_PORT             (5684)
+#define CONFIG_GCOAPS_PORT             (COAPS_PORT)
 #endif
 
 /**
