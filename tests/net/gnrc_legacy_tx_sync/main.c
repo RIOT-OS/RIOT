@@ -30,8 +30,6 @@ char result_thread_stack[THREAD_STACKSIZE_MAIN];
 
 msg_t error_msg = { .content.value = 0 };
 msg_t success_msg = { .content.value = 1 };
-
-
 static gnrc_netif_t *netif;
 
 static const char test_msg[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU"
