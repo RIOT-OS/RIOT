@@ -26,25 +26,14 @@
 #include "ztimer.h"
 #include "thread.h"
 
-static char result_thread_stack[THREAD_STACKSIZE_MAIN];
-
 static const char test_msg[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU"
                                "VWXYZ0123456789.,:;!?@#$%^&*()[]{}-_=+/<>`~\'\""
                                "\\";
 
-void *result_thread(void *arg)
+void print_failed(void *arg)
 {
     (void)arg;
-    /* Only receiving one message ever */
-    msg_t msg;
-    msg_receive(&msg);
-    if (msg.content.value) {
-        puts("TEST PASSED");
-    }
-    else {
-        puts("TEST FAILED");
-    }
-    return NULL;
+    puts("TEST FAILED");
 }
 
 int main(void)
@@ -60,9 +49,6 @@ int main(void)
         "tx_sync will only fail if gnrc_netif_pktq is used with a legacy driver.\n"
         "If tx_sync does not finish in one second, the test will fail.\n"
     );
-    
-    msg_t error_msg = { .content.value = 0 };
-    msg_t success_msg = { .content.value = 1 };
 
     /* Preparing the gnrc message */
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
@@ -71,24 +57,20 @@ int main(void)
     gnrc_tx_sync_t tx_sync;
     gnrc_tx_sync_append(pkt, &tx_sync);
 
-    /* Starting the result thread */
-    pid_t pid = thread_create(result_thread_stack, sizeof(result_thread_stack),
-                                THREAD_PRIORITY_MAIN - 1, 0, result_thread, NULL,
-                                "result_thread");
-
     /* Set timeout message in case tx sync fails */
-    ztimer_t timer;
-    ztimer_set_msg(ZTIMER_SEC, &timer, 1, &error_msg, pid);
+    ztimer_t timer = {
+        .callback = print_failed,
+        .arg = NULL,
+    };
+    ztimer_set(ZTIMER_SEC, &timer, 1);
 
     /* Sending and waiting */
     gnrc_netapi_send(netif->pid, pkt);
     gnrc_tx_sync(&tx_sync);
 
-    /* Cancel error message and send success message */
-    if (ztimer_remove(ZTIMER_SEC, &timer)) {
-        /* Successfully removed error message, not too late to send success */
-        msg_send(&success_msg, pid);
-    }
+    /* Cancel error message and print success message */
+    ztimer_remove(ZTIMER_SEC, &timer);
+    puts("TEST PASSED");
 
     return 0;
 }
