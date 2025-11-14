@@ -81,5 +81,6 @@ $(PKG_BUILD_DIR)/Makefile:
 	 -DOT_PLATFORM=NO \
 	 -DOT_CONFIG="$(RIOTBASE)/pkg/openthread/include/platform_config.h" \
 	 -DOT_APP_CLI=$(OT_APP_CLI) \
+	 -DOT_CLI_TRANSPORT=CONSOLE \
 	 -DOT_JOINER=$(OT_JOINER) \
 	 -DOT_COAP=$(OT_COAP)

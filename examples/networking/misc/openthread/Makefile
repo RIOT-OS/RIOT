@@ -20,6 +20,7 @@ BOARD_WHITELIST := \
                     openmote-cc2538 \
                     nrf52840dk \
                     nrf52840-mdk \
+                    adafruit-feather-nrf52840-sense \
                     reel \
                     #
 

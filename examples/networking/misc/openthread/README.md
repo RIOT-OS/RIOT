@@ -6,7 +6,7 @@ open source implementation of [Thread](https://threadgroup.org/) on RIOT.
 The [Command Line Interface](https://github.com/openthread/openthread/blob/master/examples/apps/cli/README.md) of
 OpenThread was ported. Please check the
 [full documentation](https://github.com/openthread/openthread/blob/master/src/cli/README.md)
-of the CLI for usage information.
+of the CLI for usage information. Commands start with prefix 'ot'.
 
 You can either build a FTD or MTD firmware:
 - MTD: A Minimal Thread Device does not have router functionality compiled in.
@@ -40,13 +40,13 @@ make BOARD=<target> clean all flash OPENTHREAD_TYPE=mtd
 make BOARD=<target> clean all flash OPENTHREAD_TYPE=ftd
 ```
 
-2. Check the state of the node with `state`. In the beginning, it should be
+2. Check the state of the node with `ot state`. In the beginning, it should be
 `detached`, but after some seconds it should become `leader`
 
 3. Start another node and check that it becomes `router`. There is only one
 leader in a Thread network.
 
-4. Get the mesh IP address of a node with `ipaddr`.
+4. Get the mesh IP address of a node with `ot ipaddr`.
 ```
 ipaddr
    fdde:ad00:beef::ff:fe00:8000
@@ -59,9 +59,9 @@ ipaddr
 ping fdde:ad00:beef:0:946a:c722:a5d9:848
 ```
 
-6. You can try IEEE802.15.4 scan with `scan` command
+6. You can try IEEE802.15.4 scan with `ot scan` command
 
-7. You can also check other commands with `help`
+7. You can also check other commands with `ot help`
 
 
 ## OpenThread port on RIOT status
