@@ -1,0 +1,48 @@
+From ac99966860b9101739361412e1374cdd3e4fadf0 Mon Sep 17 00:00:00 2001
+From: AnnsAnn <git@annsann.eu>
+Date: Thu, 2 Oct 2025 15:31:10 +0200
+Subject: [PATCH] Remove the evil lines
+
+---
+ .../stub/CMSIS/Device/RP2350/Include/RP2350.h | 25 -------------------
+ 1 file changed, 25 deletions(-)
+
+diff --git a/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include/RP2350.h b/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include/RP2350.h
+index ba5d206..154e7c4 100644
+--- a/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include/RP2350.h
++++ b/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include/RP2350.h
+@@ -671,31 +671,6 @@ typedef struct {                                /*!< HSTX_FIFO Structure
+ 
+ 
+ 
+-/* =========================================================================================================================== */
+-/* ================                                         HSTX_CTRL                                         ================ */
+-/* =========================================================================================================================== */
+-
+-
+-/**
+-  * @brief Control interface to HSTX. For FIFO write access and status, see the HSTX_FIFO register block. (HSTX_CTRL)
+-  */
+-
+-typedef struct {                                /*!< HSTX_CTRL Structure                                                       */
+-  __IOM uint32_t  CSR;                          /*!< CSR                                                                       */
+-  __IOM uint32_t  BIT0;                         /*!< Data control register for output bit 0                                    */
+-  __IOM uint32_t  BIT1;                         /*!< Data control register for output bit 1                                    */
+-  __IOM uint32_t  BIT2;                         /*!< Data control register for output bit 2                                    */
+-  __IOM uint32_t  BIT3;                         /*!< Data control register for output bit 3                                    */
+-  __IOM uint32_t  BIT4;                         /*!< Data control register for output bit 4                                    */
+-  __IOM uint32_t  BIT5;                         /*!< Data control register for output bit 5                                    */
+-  __IOM uint32_t  BIT6;                         /*!< Data control register for output bit 6                                    */
+-  __IOM uint32_t  BIT7;                         /*!< Data control register for output bit 7                                    */
+-  __IOM uint32_t  EXPAND_SHIFT;                 /*!< Configure the optional shifter inside the command expander                */
+-  __IOM uint32_t  EXPAND_TMDS;                  /*!< Configure the optional TMDS encoder inside the command expander           */
+-} HSTX_CTRL_Type;                               /*!< Size = 44 (0x2c)                                                          */
+-
+-
+-
+ /* =========================================================================================================================== */
+ /* ================                                           EPPB                                            ================ */
+ /* =========================================================================================================================== */
+-- 
+2.51.0
+
