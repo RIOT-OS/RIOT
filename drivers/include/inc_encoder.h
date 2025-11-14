@@ -30,7 +30,8 @@
  * the detected rotation direction will be reversed.
  *
  * The driver provides functions to read the current RPM
- * and the total number of revolutions (in hundredths) since the last measurement.
+ * and the total number of revolutions since the last measurement. The number of revolutions
+ * is provided in millirevolutions (thousandths of a full revolution) to allow for higher precision.
  *
  * Configuration options are available via Kconfig to specify
  * the number of pulses per rotation, the maximum RPM, and the gear reduction ratio (in tenths).
@@ -68,7 +69,7 @@
  * This driver implements the SAUL sensor interface.
  * It provides two SAUL devices:
  *  - One for reading the current RPM
- *  - One for reading the total number of revolutions in hundredths since the last read.
+ *  - One for reading the total number of revolutions since the last read.
  *
  * @note After 327 revolutions without reading and resetting
  *       the revolution counter, the `phydat` value will overflow.
@@ -150,15 +151,16 @@ int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params);
 int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm);
 
 /**
- * @brief          Read and reset number of revolutions since the last readout in hundredths.
+ * @brief          Read and reset number of revolutions since the last readout in
+ *                 thousands of a full revolution.
  *
  * @param[in]      dev            Device descriptor of incremental rotary encoder
- * @param[out]     pulse_counter  Number of revolutions since the last read in hundredths.
+ * @param[out]     rev_counter    Number of millirevolutions since the last read.
  *                                Negative revolutions signal counter clock wise rotations.
  *
  * @return         0              on success
  */
-int inc_encoder_read_reset_ceti_revs(inc_encoder_t *dev, int32_t *pulse_counter);
+int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter);
 
 #ifdef __cplusplus
 }

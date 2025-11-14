@@ -1,9 +1,13 @@
-ifneq (,$(filter inc_encoder_hardware,$(USEMODULE)))
-  DIRS += backends/hardware
+SUBMODULES := 1
+
+# Since we have submodules we need to manually handle saul instead of
+# including driver_with_saul.mk
+MODULE ?= $(shell basename $(CURDIR))
+SAUL_INTERFACE ?= $(MODULE)_saul.c
+
+# only include <module>_saul.c if saul module is used
+ifneq (,$(filter saul,$(USEMODULE)))
+  SRC += $(SAUL_INTERFACE)
 endif
 
-ifneq (,$(filter inc_encoder_software,$(USEMODULE)))
-  DIRS += backends/software
-endif
-
-include $(RIOTMAKE)/driver_with_saul.mk
+include $(RIOTBASE)/Makefile.base

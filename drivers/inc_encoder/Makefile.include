@@ -1,4 +1,7 @@
-ifneq (1,$(words $(filter inc_encoder_%,$(USEMODULE))))
+PSEUDOMODULES += inc_encoder_hardware
+PSEUDOMODULES += inc_encoder_software
+
+ifneq (1,$(words $(filter inc_encoder_hardware inc_encoder_software,$(USEMODULE))))
   $(error "Please specify exactly one inc_encoder backend: \
            inc_encoder_hardware or inc_encoder_software!")
 endif

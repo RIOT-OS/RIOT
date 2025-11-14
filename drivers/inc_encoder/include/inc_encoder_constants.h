@@ -25,9 +25,9 @@ extern "C" {
 #define GEAR_RED_RATIO_SCALE 10
 
 /**
- * @brief Scaling factor to convert revolutions per minute to hundredths of revolutions per minute.
+ * @brief Scaling factor to convert revolutions per minute to millirevolutions per minute.
  */
-#define UNIT_SCALE 100
+#define UNIT_SCALE 1000
 
 #ifdef __cplusplus
 }

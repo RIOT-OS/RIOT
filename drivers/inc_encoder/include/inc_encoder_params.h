@@ -85,11 +85,10 @@ extern "C" {
                                  .direction = INC_ENCODER_DIRECTION }
 #  endif
 #elif IS_USED(MODULE_INC_ENCODER_HARDWARE)
+
 #  ifndef INC_ENCODER_PARAMS
 #    define INC_ENCODER_PARAMS { .qdec_dev = INC_ENCODER_QDEC_DEV }
 #  endif
-#else
-#  define INC_ENCODER_PARAMS {}
 #endif
 /**@}*/
 

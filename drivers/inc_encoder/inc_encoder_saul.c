@@ -35,17 +35,17 @@ static int read_rpm(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_reset_pulse_counter(const void *dev, phydat_t *res)
+static int read_reset_rev_counter(const void *dev, phydat_t *res)
 {
     inc_encoder_t *d = (inc_encoder_t *)dev;
-    int32_t counter;
-    if (inc_encoder_read_reset_ceti_revs(d, &counter)) {
+    int32_t rev_counter;
+    if (inc_encoder_read_reset_milli_revs(d, &rev_counter)) {
         /* Read failure */
         return -ECANCELED;
     }
-    res->val[0] = (int16_t) counter;
+    res->val[0] = (int16_t) rev_counter;
     res->unit = UNIT_CTS;
-    res->scale = -2;
+    res->scale = -3; /* millirevolutions */
     return 1;
 }
 
@@ -55,8 +55,8 @@ const saul_driver_t inc_encoder_rpm_saul_driver = {
     .type = SAUL_SENSE_SPEED,
 };
 
-const saul_driver_t inc_encoder_pulse_count_saul_driver = {
-    .read = read_reset_pulse_counter,
+const saul_driver_t inc_encoder_rev_count_saul_driver = {
+    .read = read_reset_rev_counter,
     .write = saul_write_notsup,
     .type = SAUL_SENSE_COUNT,
 };

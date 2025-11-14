@@ -60,8 +60,8 @@ int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params)
     dev->last_rpm       = 0;
 
     /* Task to periodically calculate RPM */
-    ztimer_periodic_init(ZTIMER_USEC, &dev->rpm_timer, _rpm_calc_timer_cb, (void *) dev,
-                         CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS * US_PER_MS);
+    ztimer_periodic_init(ZTIMER_MSEC, &dev->rpm_timer, _rpm_calc_timer_cb, (void *) dev,
+                         CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS);
 
     ztimer_periodic_start(&dev->rpm_timer);
 
@@ -76,7 +76,7 @@ int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm)
     return 0;
 }
 
-int inc_encoder_read_reset_ceti_revs(inc_encoder_t *dev, int32_t *pulse_counter)
+int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter)
 {
     int32_t total_count;
     int32_t delta_count;
@@ -94,11 +94,11 @@ int inc_encoder_read_reset_ceti_revs(inc_encoder_t *dev, int32_t *pulse_counter)
     irq_restore(irq_state);
 
     /* The 4X mode counts all falling and rising edges */
-    *pulse_counter =  (int32_t) total_count / 4;
+    *rev_counter =  (int32_t) total_count / 4;
 
-    *pulse_counter *= UNIT_SCALE * GEAR_RED_RATIO_SCALE;
-    *pulse_counter /= CONFIG_INC_ENCODER_PPR;
-    *pulse_counter /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
+    *rev_counter *= UNIT_SCALE * GEAR_RED_RATIO_SCALE;
+    *rev_counter /= CONFIG_INC_ENCODER_PPR;
+    *rev_counter /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
     return 0;
 }
 

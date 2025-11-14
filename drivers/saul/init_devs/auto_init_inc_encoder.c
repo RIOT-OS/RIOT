@@ -35,7 +35,7 @@ static inc_encoder_t inc_encoder_devs[INC_ENCODER_NUM];
 static saul_reg_t saul_entries[INC_ENCODER_NUM * 2];
 
 extern saul_driver_t inc_encoder_rpm_saul_driver;
-extern saul_driver_t inc_encoder_pulse_count_saul_driver;
+extern saul_driver_t inc_encoder_rev_count_saul_driver;
 
 void auto_init_inc_encoder(void)
 {
@@ -56,7 +56,7 @@ void auto_init_inc_encoder(void)
         /* Pulse Count */
         saul_entries[(i * 2) + 1].dev = &(inc_encoder_devs[i]);
         saul_entries[(i * 2) + 1].name = inc_encoder_saul_info[i][1].name;
-        saul_entries[(i * 2) + 1].driver = &inc_encoder_pulse_count_saul_driver;
+        saul_entries[(i * 2) + 1].driver = &inc_encoder_rev_count_saul_driver;
 
         saul_reg_add(&(saul_entries[(i * 2)]));
         saul_reg_add(&(saul_entries[(i * 2) + 1]));
