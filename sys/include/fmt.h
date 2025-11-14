@@ -475,6 +475,48 @@ uint32_t scn_u32_hex(const char *str, size_t n);
 ssize_t scn_buf_hex(void *dest, size_t dest_len, const char *hex, size_t hex_len);
 
 /**
+ * @brief   Convert an ISO 8601 time string to time structure
+ *
+ * This function parses a string in the format YYYY-MM-DD.
+ *
+ * A terminating '\0' is not required.
+ *
+ * This function does only take care of format validity
+ * and not of date validity.
+ *
+ * @note    This function will keep unrelated fields of @p tm intact.
+ *
+ * @param[out]  tm          Pointer to time structure
+ * @param[in]   str         Pointer to string to read from
+ *
+ * @return  Number of characters read from @p str on success (10)
+ *
+ * @retval      -EINVAL     if @p str has an invalid format
+ */
+int scn_time_tm_iso8601_date(struct tm *tm, const char *str);
+
+/**
+ * @brief   Convert an ISO 8601 date string to time structure
+ *
+ * This function parses a string in the format HH:MM:SS
+ *
+ * A terminating '\0' is not required.
+ *
+ * This function does only take care of format validity
+ * and not of time validity.
+ *
+ * @note    This function will keep unrelated fields of @p tm intact.
+ *
+ * @param[out]  tm          Pointer to time structure
+ * @param[in]   str         Pointer to string to read from
+ *
+ * @return  Number of characters read from @p str on success (8)
+ *
+ * @retval      -EINVAL     if @p str has an invalid format
+ */
+int scn_time_tm_iso8601_time(struct tm *tm, const char *str);
+
+/**
  * @brief   Convert an ISO 8601 string to time structure
  *
  * This function parses a string in the format
@@ -484,6 +526,8 @@ ssize_t scn_buf_hex(void *dest, size_t dest_len, const char *hex, size_t hex_len
  *
  * This function does only take care of format validity
  * and not of date/time validity.
+ *
+ * @note    This function will overwrite all fields of @p tm
  *
  * @param[out]  tm          Pointer to time structure
  * @param[in]   str         Pointer to string to read from
