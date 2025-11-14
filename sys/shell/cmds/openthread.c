@@ -31,14 +31,18 @@ static int ot_console_cb(const char *abuf, uint16_t bufsize, void *context)
 
 static int ot_cmd(int argc, char **argv)
 {
+    /* Join all arguments after "ot" into a single space-separated string */
     for (int i = 1; i < argc - 1; i++) {
         char *arg = argv[i];
         arg += strlen(arg);
         *arg = ' ';
     }
 
-    if (strlen(argv[0]) != 0) {
+    if (strlen(argv[1]) != 0) {
         otCliConsoleInputLine(argv[1], strlen(argv[1]));
+    }
+    else {
+        otCliConsoleInputLine("help", strlen("help"));
     }
     return 0;
 }
