@@ -1,5 +1,3 @@
-include $(RIOTBOARD)/common/esp32c3/Makefile.include
-
 # Only consider TTYs matching the following filter when auto-selecting the TTY
 # with `MOST_RECENT_PORT=1`.
 TTY_BOARD_FILTER := --driver 'cp210x' --vendor 'Silicon Labs' --model 'CP2102N USB to UART Bridge Controller'
