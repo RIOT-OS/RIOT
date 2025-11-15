@@ -631,3 +631,13 @@ static inline int _wait_for_response(SercomI2cm *dev,
 
     return 0;
 }
+
+gpio_t i2c_pin_sda(i2c_t dev)
+{
+    return i2c_config[dev].sda_pin;
+}
+
+gpio_t i2c_pin_scl(i2c_t dev)
+{
+    return i2c_config[dev].scl_pin;
+}

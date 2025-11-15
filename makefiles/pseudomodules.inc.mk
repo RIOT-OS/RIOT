@@ -467,6 +467,11 @@ PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
 PSEUDOMODULES += socket_zep_hello
+## @defgroup drivers_soft_i2c_as_periph_i2c Use `soft_i2c` to provide `periph_i2c`
+## @ingroup drivers_soft_i2c
+## @{
+PSEUDOMODULES += soft_i2c_as_periph_i2c
+## @}
 PSEUDOMODULES += soft_uart_modecfg
 PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_available

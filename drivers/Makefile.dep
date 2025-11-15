@@ -242,6 +242,10 @@ ifneq (,$(filter slipdev_%,$(USEMODULE)))
   USEMODULE += slipdev
 endif
 
+ifneq (,$(filter soft_i2c_as_periph_i2c%,$(USEMODULE)))
+  USEMODULE += soft_i2c
+endif
+
 ifneq (,$(filter stmpe811_%,$(USEMODULE)))
   USEMODULE += stmpe811
 endif
