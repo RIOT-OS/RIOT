@@ -9,7 +9,6 @@ include $(RIOTBASE)/pkg/pkg.mk
 # Enable code forcing aligned reads
 CFLAGS += -DCBOR_ALIGN_READS
 CFLAGS += -Wno-return-local-addr
-CFLAGS += -Wno-cast-align
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

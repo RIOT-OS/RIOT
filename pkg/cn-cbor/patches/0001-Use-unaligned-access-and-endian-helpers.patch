@@ -1,0 +1,40 @@
+From b0200fe47803508dffd5ef08989a0b0a6f14a41b Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sat, 15 Nov 2025 23:52:14 +0100
+Subject: [PATCH] Use unaligned access and endian helpers.
+
+This makes the code readable and correct.
+---
+ src/cn-encoder.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/src/cn-encoder.c b/src/cn-encoder.c
+index d5b5bf0..e4c3a15 100644
+--- a/src/cn-encoder.c
++++ b/src/cn-encoder.c
+@@ -29,16 +29,13 @@ extern "C" {
+ #include "cn-cbor/cn-cbor.h"
+ #include "cbor.h"
+ 
++#include "endian.h"
++#include "unaligned.h"
++
+ #define hton8p(p) (*(uint8_t*)(p))
+-#define hton16p(p) (htons(*(uint16_t*)(p)))
+-#define hton32p(p) (htonl(*(uint32_t*)(p)))
+-static uint64_t hton64p(const uint8_t *p) {
+-  /* TODO: does this work on both BE and LE systems? */
+-  uint64_t ret = hton32p(p);
+-  ret <<= 32;
+-  ret |= hton32p(p+4);
+-  return ret;
+-}
++#define hton16p(p) (htobe16(unaligned_get_u16(p)))
++#define hton32p(p) (htobe32(unaligned_get_u32(p)))
++#define hton64p(p) (htobe64(unaligned_get_u64(p)))
+ 
+ typedef struct _write_state
+ {
+-- 
+2.51.2
+
