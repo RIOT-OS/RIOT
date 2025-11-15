@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -12,21 +9,21 @@
  * @defgroup     sys_stdio_nimble STDIO over NimBLE
  * @ingroup      sys_stdio
  *
- * @experimental This feature is experimental as some use-cases, such as examples/advanced/twr_aloha, show
- *               unexpected behaviour.
+ * @experimental This feature is experimental as some use-cases, such as
+ *               examples/advanced/twr_aloha, show unexpected behaviour.
  *
  * @brief        Standard input/output backend using NimBLE.
  *
  * @note         'stdio_read' blocks until at least one character was read.
  *
- * @note         'stdio_write' is considered non-blocking even though it uses a mutex to protect the
- *               write buffer since only 'stdio_write' uses this mutex. Characters will be written
- *               in FIFO mode. Characters that do not fit in the buffer will be dropped.
+ * @note         'stdio_write' is non-blocking. Characters are written in
+ *               FIFO mode. Characters that do not fit in the buffer
+ *               will be dropped.
  *
  * This module uses NimBLE for stdio. The bluetooth characteristic for
  * stdin is writable and the characteristic for stdout uses the indicate
  * mechanism to publish the system's output to a connected device. Data will be
- * sent out asynchronously via callout functions.
+ * sent out asynchronously and automatically split into BLE packets.
  *
  * To use this module, add
  * ```
@@ -43,10 +40,10 @@
  *
  * **NOTE:** These values must be a power of two!
  *
- * By default, stdin and stdout buffers are cleared on a connect event. To keep the
- * content add the following to your makefile:
+ * By default, stdin and stdout buffers are not cleared on a connect event.
+ * To discard the buffer content add the following line to your makefile:
  * ```
- * CFLAGS += -DCONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT=0
+ * CFLAGS += -DCONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT=1
  * ```
  *
  * For automatic bluetooth advertising a module is provided: *nimble_autoadv*.
@@ -157,6 +154,26 @@
  * >
  * ```
  *
+ * ## Debugging
+ *
+ * The `stdio_nimble` module provides a pseudomodule for debugging called `stdio_nimble_debug`.
+ * It can be used by adding the following line to the Makefile:
+ * ```make
+ * USEMODULE += stdio_nimble_debug
+ * ```
+ *
+ * The debug module will output all data going out through `STDOUT` and all data coming in from
+ * `STDIN` to the `stdio` UART. It also prints BLE GAP events such as
+ * `BLE_GAP_EVENT_CONNECT` and `BLE_GAP_EVENT_SUBSCRIBE`, which can be used to debug the
+ * establishing of a BLE connection.
+ *
+ * On most boards, the `stdio` UART is `UART(0)`. For example for the Nordic Semiconductor
+ * nRF52840DK development board, this is the UART connected to the built-in J-Link
+ * programmer and can be used with the `make term` target.
+ *
+ * **NOTE:** The debug module uses `printf` and therefore might require more stack. If you
+ * experience unexpected behavior or crashes, try increasing the stack size.
+ *
  * @{
  * @file
  *
@@ -171,10 +188,10 @@ extern "C" {
 
 /**
  * @brief Whether to clear the buffers when establishing a new connection or
- *        not. Defaults to true.
+ *        not. Defaults to false.
  */
 #ifndef CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT
-#define CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT 1
+#  define CONFIG_STDIO_NIMBLE_CLEAR_BUFFER_ON_CONNECT 0
 #endif
 
 /**
@@ -183,7 +200,7 @@ extern "C" {
  * @note Must be a power of two!
  */
 #ifndef CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE
-#define CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE 1024
+#  define CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE 1024
 #endif
 
 /**
@@ -192,7 +209,7 @@ extern "C" {
  * @note Must be a power of two!
  */
 #ifndef CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE
-#define CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE 2048
+#  define CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE 2048
 #endif
 
 #ifdef __cplusplus

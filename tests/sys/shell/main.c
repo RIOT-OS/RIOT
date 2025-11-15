@@ -101,7 +101,14 @@ static int print_empty(int argc, char **argv)
     return 0;
 }
 
-static char _stack[THREAD_STACKSIZE_SMALL];
+/* The debug feature uses printf and needs more stack */
+#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
+#  define STACKSIZE (THREAD_STACKSIZE_SMALL + THREAD_EXTRA_STACKSIZE_PRINTF)
+#else
+#  define STACKSIZE (THREAD_STACKSIZE_SMALL)
+#endif
+static char _stack[STACKSIZE];
+
 static struct {
     uint16_t period_ms;
     uint16_t reps;
