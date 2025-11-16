@@ -172,6 +172,7 @@
 #  endif
 #endif
 
+NONSTRING
 static const char testdata[8] = "Selftest";
 static const spi_t spi_buses[] = {
 #ifdef ARDUINO_SPI_D11D12D13
