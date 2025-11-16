@@ -22,36 +22,9 @@
  */
 
 #include "cpu.h"
-#include "panic.h"
+#include "riotboot/bootloader.h"
 #include "riotboot/slot.h"
 #include "riotboot/serial.h"
-
-static int _get_slot(void)
-{
-    uint32_t version = 0;
-    int slot = -1;
-
-    if (!IS_USED(MODULE_RIOTBOOT_SLOT)) {
-        return -1;
-    }
-
-    for (unsigned i = 0; i < riotboot_slot_numof; i++) {
-        const riotboot_hdr_t *riot_hdr = riotboot_slot_get_hdr(i);
-        if (riotboot_slot_validate(i)) {
-            /* skip slot if metadata broken */
-            continue;
-        }
-        if (riot_hdr->start_addr != riotboot_slot_get_image_startaddr(i)) {
-            continue;
-        }
-        if (slot == -1 || riot_hdr->version > version) {
-            version = riot_hdr->version;
-            slot = i;
-        }
-    }
-
-    return slot;
-}
 
 static void _boot_default(int slot)
 {
@@ -62,7 +35,8 @@ static void _boot_default(int slot)
     }
 
     if (slot == -1) {
-        slot = _get_slot();
+        riotboot_hdr_t riot_hdr;
+        slot = riotboot_bootloader_get_slot(&riot_hdr);
     }
 
     if (slot != -1) {
@@ -85,9 +59,3 @@ void kernel_init(void)
     while (1) {}
 }
 
-NORETURN void core_panic(core_panic_t crash_code, const char *message)
-{
-    (void)crash_code;
-    (void)message;
-    while (1) {}
-}
