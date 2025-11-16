@@ -47,7 +47,7 @@ extern "C" {
  *        zero byte.)
  */
 #ifndef NONSTRING
-#  if (__GNUC__ >= 15)
+#  if ((__GNUC__ >= 15) || (__clang_major__ >= 21))
 #    define NONSTRING __attribute__((nonstring))
 #  else
 #    define NONSTRING
