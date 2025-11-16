@@ -261,15 +261,6 @@ TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 8, ~) /* __atomic_nand_fetch_8 */
 
 /* ***** Generic versions below ***** */
 
-/* Clang objects if you redefine a builtin.  This little hack allows us to
- * define a function with the same name as an intrinsic. */
-/* Hack origin: http://llvm.org/svn/llvm-project/compiler-rt/trunk/lib/builtins/atomic.c */
-#pragma redefine_extname __atomic_load_c __atomic_load
-#pragma redefine_extname __atomic_store_c __atomic_store
-#pragma redefine_extname __atomic_exchange_c __atomic_exchange
-#pragma redefine_extname __atomic_compare_exchange_c __atomic_compare_exchange
-#pragma redefine_extname __atomic_test_and_set_c __atomic_test_and_set
-
 /**
  * @brief Atomic generic load
  *
@@ -382,8 +373,7 @@ bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
  * This built-in function performs an atomic test-and-set operation on the byte
  * at *ptr. The byte is set to some implementation defined nonzero “set” value
  * and the return value is true if and only if the previous contents were “set”.
- * It should be only used for operands of type bool or char. For other types
- * only part of the value may be set.
+ * It should be only used for operands of type bool.
  *
  * All memory orders are valid.
  *
@@ -420,4 +410,15 @@ void __sync_synchronize(void)
     __asm__ volatile ("" : : : "memory");
 }
 #endif
+
+/* Clang objects if you redefine a builtin. This little hack allows us to
+ * define a function with the same name as an intrinsic. */
+/* Hack origin: http://llvm.org/svn/llvm-project/compiler-rt/trunk/lib/builtins/atomic.c */
+/* Note: The rename must come *after* the declaration of the symbol to work in
+ *       GCC. */
+#pragma redefine_extname __atomic_load_c __atomic_load
+#pragma redefine_extname __atomic_store_c __atomic_store
+#pragma redefine_extname __atomic_exchange_c __atomic_exchange
+#pragma redefine_extname __atomic_compare_exchange_c __atomic_compare_exchange
+#pragma redefine_extname __atomic_test_and_set_c __atomic_test_and_set
 /** @} */
