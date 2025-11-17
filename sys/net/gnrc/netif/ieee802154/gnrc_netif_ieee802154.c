@@ -252,16 +252,12 @@ static int _send_raw(gnrc_netif_t *netif, iolist_t *iolist)
     netdev_t *dev = netif->dev;
     int res;
 
-#ifdef MODULE_GNRC_MAC
-    if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
-        res = csma_sender_csma_ca_send(dev, iolist, &netif->mac.csma_conf);
-    } else {
-        res = dev->driver->send(dev, iolist);
-    }
-#else
     res = dev->driver->send(dev, iolist);
-#endif
 
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        /* only for legacy drivers we need to release pkt here */
+        gnrc_pktbuf_release((gnrc_pktsnip_t *)iolist);
+    }
     return res;
 }
 
@@ -410,10 +406,6 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     }
 #endif
     res = _send_raw(netif, &iolist_header);
-    if (gnrc_netif_netdev_legacy_api(netif)) {
-        /* only for legacy drivers we need to release pkt here */
-        gnrc_pktbuf_release(pkt);
-    }
     return res;
 }
 /** @} */
