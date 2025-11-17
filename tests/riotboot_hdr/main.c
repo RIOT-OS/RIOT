@@ -22,24 +22,30 @@
 #include "embUnit.h"
 
 const riotboot_hdr_t riotboot_hdr_good = {
-    .magic_number = RIOTBOOT_MAGIC,
-    .version = 0x5bd19bff,
-    .start_addr = 0x00001100,
-    .chksum = 0x02eda672
+    .v1 = {
+        .magic_number = RIOTBOOT_MAGIC_V1,
+        .version = 0x5bd19bff,
+        .start_addr = 0x00001100,
+        .chksum = 0x02eda672
+    }
 };
 
 const riotboot_hdr_t riotboot_hdr_bad_magic = {
-    .magic_number = 0x12345678,
-    .version = 0x5bd19bff,
-    .start_addr = 0x00001100,
-    .chksum = 0x02eda672
+    .v1 = {
+        .magic_number = 0x12345678,
+        .version = 0x5bd19bff,
+        .start_addr = 0x00001100,
+        .chksum = 0x02eda672
+    }
 };
 
 const riotboot_hdr_t riotboot_hdr_bad_chksum = {
-    .magic_number = RIOTBOOT_MAGIC,
-    .version = 0x5bd19bff,
-    .start_addr = 0x00001100,
-    .chksum = 0x02000000
+    .v1 = {
+        .magic_number = RIOTBOOT_MAGIC_V1,
+        .version = 0x5bd19bff,
+        .start_addr = 0x00001100,
+        .chksum = 0x02000000
+    }
 };
 
 static void test_riotboot_hdr_01(void)
