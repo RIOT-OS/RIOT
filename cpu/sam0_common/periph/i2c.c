@@ -107,7 +107,7 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
 {
     const i2c_conf_t *dev_conf = &i2c_config[dev_id];
 
-    /* power of SERCOM and reconfigure pins to gpio for testing */
+    /* power off SERCOM and reconfigure pins to GPIO for testing */
     _i2c_poweroff(dev_id);
     gpio_disable_mux(dev_conf->sda_pin);
     gpio_disable_mux(dev_conf->scl_pin);
