@@ -7,18 +7,22 @@ BOARD ?= nrf52840dk
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../..
 
-
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += luid
-USEPKG += zboss
+
 USEMODULE += periph_gpio
 USEMODULE += periph_gpio_irq
 USEMODULE += ws281x
+
+USEPKG += zboss
+
+# Speficy the required features that a board has to have
 FEATURES_REQUIRED += periph_flashpage_in_address_space
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
