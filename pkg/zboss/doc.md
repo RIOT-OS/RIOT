@@ -8,7 +8,7 @@
 This package is based on an [old fork of ZBOSS](https://github.com/niclash/zboss/).
 In an attempt to revieve ZBOSS, this package was born. However a closed source
 version is also developed by [DSR-IoT](https://dsr-iot.com/solutions/zboss/).
-In it current state, the MAC-Layer is completly managed by ZBOSS and workarounds
+In it current state, the MAC-Layer is completely managed by ZBOSS and workarounds
 for RIOT's submac are present. Future plans include to properly utilize
 @ref net_ieee802154_submac or even switch to @ref pkg_opendsme if possible.
 

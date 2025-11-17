@@ -11,7 +11,6 @@ USEMODULE += zboss-unix
 USEMODULE += memarray
 USEMODULE += ztimer
 USEMODULE += netdev_default
-USEMODULE += gnrc_mac
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_tx_sync
 
