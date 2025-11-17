@@ -1,4 +1,12 @@
-USEMODULE += zboss zboss-aps zboss-common zboss-mac zboss-nwk zboss-secur zboss-zcl zboss-zdo zboss-unix
+USEMODULE += zboss
+USEMODULE += zboss-aps
+USEMODULE += zboss-common
+USEMODULE += zboss-mac
+USEMODULE += zboss-nwk
+USEMODULE += zboss-secur
+USEMODULE += zboss-zcl
+USEMODULE += zboss-zdo
+USEMODULE += zboss-unix
 
 USEMODULE += memarray
 USEMODULE += ztimer
