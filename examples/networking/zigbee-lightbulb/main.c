@@ -137,7 +137,7 @@ int main(void)
     basic_attrs.manufacturer_name_len = sizeof(manufacturer);
     ZB_MEMCPY(basic_attrs.manufacturer_name, manufacturer, sizeof(manufacturer));
 
-    char model_id[] = "nRF52840DK";
+    char model_id[] = RIOT_BOARD;
     basic_attrs.model_id_len = sizeof(model_id);
     ZB_MEMCPY(basic_attrs.model_id, model_id, sizeof(model_id));
 
