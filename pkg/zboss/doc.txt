@@ -1,4 +1,0 @@
-@defgroup pkg_zboss  ZBOSS Zigbee Stack
-@ingroup  pkg
-@brief    Open Source Zigbee Stack for Embedded Devices
-@see      https://github.com/Lukas-Luger/zboss

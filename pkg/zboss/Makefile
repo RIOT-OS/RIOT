@@ -1,6 +1,6 @@
 PKG_NAME=zboss
 PKG_URL=https://github.com/Lukas-Luger/zboss.git
-PKG_VERSION=781eff877cf975daa73b8cbc674d0e7814cecad5
+PKG_VERSION=e045d943f9bc76bd233b8e150c7de6048c38d4d8
 PKG_LICENSE=GPL-2
 
 include $(RIOTBASE)/pkg/pkg.mk
