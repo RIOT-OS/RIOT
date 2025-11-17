@@ -39,8 +39,10 @@ int main(void)
 
     /* fill message queue */
     for (uintptr_t i = 0; i < QUEUE_SIZE; i++) {
-        msg.type = i;
-        msg.content.ptr = (void *) i;
+        msg = (msg_t) {
+            .type = i,
+            .content.ptr = (void *)i,
+        };
         msg_send_to_self(&msg);
     }
 
@@ -55,8 +57,10 @@ int main(void)
 
     /* fill up message queue again */
     for (uintptr_t i = QUEUE_SIZE; i < QUEUE_SIZE + QUEUE_SIZE/2; i++) {
-        msg.type = i;
-        msg.content.ptr = (void *) i;
+        msg = (msg_t) {
+            .type = i,
+            .content.ptr = (void *)i,
+        };
         msg_send_to_self(&msg);
     }
 
