@@ -58,4 +58,3 @@ void kernel_init(void)
     /* serious trouble! nothing to boot */
     while (1) {}
 }
-
