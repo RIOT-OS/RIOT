@@ -22,7 +22,6 @@
 #include "zb_common.h"
 #include "zb_aps.h"
 
-
 static bool zboss_start_successful;
 
 void zb_data_indication(zb_uint8_t param)
