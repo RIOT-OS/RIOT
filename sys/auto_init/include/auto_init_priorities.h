@@ -398,7 +398,7 @@ extern "C" {
 /**
  * @brief    ZBOSS-Stack priority
  */
-#define AUTO_INIT_PRIO_MOD_ZBOSS                        1600
+#  define AUTO_INIT_PRIO_MOD_ZBOSS                      1600
 #endif
 #ifdef __cplusplus
 }
