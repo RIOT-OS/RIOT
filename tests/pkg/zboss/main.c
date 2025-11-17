@@ -32,13 +32,13 @@ void zb_data_indication(zb_uint8_t param)
                                                     zb_apsde_data_indication_t);
 
     switch (ind->clusterid) {
-        case 0x0019: /* zdo start */
-            zboss_start_successful = true;
-            /* don't free buf */
-            break;
+    case 0x0019: /* zdo start */
+        zboss_start_successful = true;
+        /* don't free buf */
+        break;
 
-        default:
-            zb_free_buf(buf);
+    default:
+        zb_free_buf(buf);
     }
 }
 
