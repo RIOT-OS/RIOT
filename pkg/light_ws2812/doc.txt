@@ -1,0 +1,15 @@
+/**
+ * @defgroup pkg_light_ws2812   light_ws2812
+ * @ingroup  pkg
+ * @brief    lightweight ws2811/2812 driver
+ *
+ * # Introduction
+ *
+ * Lightweight package for controlling ws281x LEDs
+ *
+ * # License
+ *
+ * Licensed under GPL-3.
+ *
+ * @see      https://github.com/cpldcpu/light_ws2812.git
+ */
