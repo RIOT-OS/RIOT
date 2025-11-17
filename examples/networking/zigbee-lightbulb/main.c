@@ -24,7 +24,7 @@
 #include "led.h"
 #include "board.h"
 #include "periph/gpio.h"
-#include <ws281x.h>
+#include "ws281x.h"
 
 #include "zb_common.h"
 #include "zb_aps.h"
