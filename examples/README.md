@@ -131,7 +131,8 @@ Here is a quick overview of the examples available in the RIOT:
 
 | Example | Description |
 |---------|-------------|
-| [zigbee-zll](./networking/zigbee-zll/README.md) | This application demonstrates the current state of ZBOSS in RIOT. |
+| [zigbee-lightbulb](./networking/zigbee-lightbulb/README.md) | This application allows a microcontroller to perform as a lightbulb using ZBOSS in RIOT. |
+| [zigbee-remote](./networking/zigbee-remote/README.md) | This application allows a microcontroller to perform as a remote control using ZBOSS in RIOT. |
 
 ## Advanced Examples
 

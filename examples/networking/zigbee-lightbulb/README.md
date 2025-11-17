@@ -1,13 +1,13 @@
 # ZBOSS Zigbee lightbulb example
 
 RIOT integrates ZBOSS, the open source ZigBee stack. This example is used for
-controling the integrated LED from external Zigbee devices using Touchlink Commissioning,
+controlling the integrated LED from external Zigbee devices using Touchlink Commissioning,
 Permit Joining and the ZigBee Cluster Library.
 
 ## Commands
 
 - ```zconfig``` shows a more detailed state of ZBOSS.
-- ```reset``` resets persistant storage and reboots the Microcontroller.
+- ```reset``` resets persistent storage and reboots the Microcontroller.
 - ```zigp <hex bytes>``` takes a Zigbee packet and injects it into ZBOSS (as if it was received).
 - ```inj <hex bytes>``` takes a Zigbee packet and sends it out the transmitter.
 

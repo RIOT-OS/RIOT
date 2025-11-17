@@ -31,6 +31,7 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# ZigBee device role (see pkg/zboss/doc.md)
 CFLAGS += -DZB_ED_ROLE
 include $(RIOTBASE)/Makefile.include
 

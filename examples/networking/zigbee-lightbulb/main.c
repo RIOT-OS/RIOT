@@ -39,6 +39,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define APPLICATION_ENDPOINT 11
+
 #define MAIN_QUEUE_SIZE (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 ws281x_t led_dev;
@@ -110,18 +112,17 @@ int main(void)
     ZB_DECLARE_SIMPLE_DESC(3/* in clusters. Groups, basic, on-off */, 1/* out clusters. on-off */);
     static zb_af_simple_desc_3_1_t desc;
     zb_set_simple_descriptor((zb_af_simple_desc_1_1_t *)&desc,
-                              11, /* endpoint */
+                              APPLICATION_ENDPOINT, /* endpoint */
                               ZB_HA_PROFILE_ID,
                               ZB_HA_ON_OFF_LIGHT_DEV_ID,
                               1, /* app version */
                               3, /* input_cl count*/
-                              1 /* output_cl count*/
+                              0 /* output_cl count*/
                             );
+    /* input clusters are typically servers -> call *_srv_setup*/
     zb_set_input_cluster_id((zb_af_simple_desc_1_1_t *)&desc, 0, ZB_BASIC_CLUSTER_ID);
     zb_set_input_cluster_id((zb_af_simple_desc_1_1_t *)&desc, 1, ZB_GROUPS_CLUSTER_ID);
     zb_set_input_cluster_id((zb_af_simple_desc_1_1_t *)&desc, 2, ZB_ON_OFF_CLUSTER_ID);
-
-    zb_set_output_cluster_id((zb_af_simple_desc_1_1_t *)&desc, 0, ZB_ON_OFF_CLUSTER_ID);
 
     zb_add_simple_descriptor((zb_af_simple_desc_1_1_t *)&desc);
 
@@ -157,9 +158,9 @@ int main(void)
     basic_attrs.software_build_id_len = sizeof(RIOT_VERSION);
     ZB_MEMCPY(basic_attrs.software_build_id, RIOT_VERSION, sizeof(RIOT_VERSION));
 
-    zb_zcl_on_off_srv_setup(11, &on_off_attrs);
-    zb_zcl_groups_srv_setup(11, &group_attrs);
-    zb_zcl_basic_srv_setup(11, &basic_attrs);
+    zb_zcl_on_off_srv_setup(APPLICATION_ENDPOINT, &on_off_attrs);
+    zb_zcl_groups_srv_setup(APPLICATION_ENDPOINT, &group_attrs);
+    zb_zcl_basic_srv_setup(APPLICATION_ENDPOINT, &basic_attrs);
 
     zb_zcl_zll_target_setup();
 

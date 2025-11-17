@@ -14,7 +14,7 @@ possible to the Microcontroller.
 ## Other Commands
 
 - ```zconfig``` shows a more detailed state of ZBOSS.
-- ```reset``` resets persistant storage and reboots the Microcontroller.
+- ```reset``` resets persistent storage and reboots the Microcontroller.
 - ```zigp <hex bytes>``` takes a Zigbee packet and injects it into ZBOSS (as if it was received).
 - ```inj <hex bytes>``` takes a Zigbee packet and sends it out the transmitter.
 
