@@ -14,6 +14,7 @@ LINKFLAGS += -Wl,-wrap=putchar
 LINKFLAGS += -Wl,-wrap=putc
 LINKFLAGS += -Wl,-wrap=fputc
 LINKFLAGS += -Wl,-wrap=puts
+LINKFLAGS += -Wl,-wrap=fputs
 
 # By wrapping the newlib only `_printf_common` symbol to the undefined
 # `__wrap__printf_common` symbol, linking will fail if any reference to
