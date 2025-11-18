@@ -41,6 +41,8 @@
  */
 
 #include <stdint.h>
+#include <unistd.h>
+
 #include "usb/cdc.h"
 #include "usb/usbus.h"
 #include "tsrb.h"
@@ -198,9 +200,10 @@ void usbus_cdc_acm_init(usbus_t *usbus, usbus_cdcacm_device_t *cdcacm,
  * @param[in]   buf         buffer to submit
  * @param[in]   len         length of the submitted buffer
  *
- * @return                  Number of bytes added to the CDC ACM ring buffer
+ * @retval      -ECONNRESET Failed to sub data
+ * @retval      >=0         Number of bytes added to the CDC ACM ring buffer
  */
-size_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm,
+ssize_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm,
                            const uint8_t *buf, size_t len);
 
 /**
