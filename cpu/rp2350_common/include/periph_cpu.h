@@ -43,6 +43,7 @@ typedef uint32_t gpio_t;
 #include "gpio_conf.h"
 #include "clock_conf.h"
 #include "uart_conf.h"
+#include "multicore.h"
 
 #if !(defined(RP2350_USE_ARM) || defined(RP2350_USE_RISCV))
 #  error "Either RP2350_USE_ARM or RP2350_USE_RISCV must be defined"

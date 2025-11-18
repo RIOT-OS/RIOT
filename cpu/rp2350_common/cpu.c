@@ -15,6 +15,7 @@
  * @}
  */
 
+#include "multicore.h"
 #include <sys/unistd.h>
 
 #include "board.h"
