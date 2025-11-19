@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2014 Martin Lenders
+ * SPDX-FileCopyrightText: 2014 Martine Lenders
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
