@@ -1,9 +1,5 @@
 /*
- * Copyright (C) 2013 RIOT OS
- *
- * All Rights Reserved.
- * See: https://www.riot-os.org/branding.html
- *
+ * SPDX-FileCopyrightText: 2013 RIOT OS, All Rights Reserved.
  */
 
 #pragma once
