@@ -43,7 +43,7 @@ int registry_util_convert_str_to_value(
     assert(src != NULL);
     assert(dest != NULL);
 
-    char *eptr = '\0';
+    char *eptr = NULL;
 
     if (!src) {
         return -EINVAL;
@@ -128,7 +128,7 @@ int registry_util_convert_str_to_value(
     }
     }
 
-    if (*eptr != '\0') {
+    if (eptr != NULL && *eptr != '\0') {
         return -EINVAL;
     }
 
