@@ -162,6 +162,14 @@
 #endif
 
 /**
+ * @brief   If the prefix changes, maximal difference in bits to find the
+ *          previous prefix and remove it.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_DIFF_MAX
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_DIFF_MAX (4)
+#endif
+
+/**
  * @brief Number of subnets that can be configured.
  *
  *        This is not needed when using the `gnrc_ipv6_auto_subnets_simple` module
@@ -349,6 +357,12 @@ static uint8_t _init_sub_prefix_eui(ipv6_addr_t *out,
     return MIN(64, bits_total);
 }
 
+static inline uint8_t _absdiff(uint8_t a, uint8_t b)
+{
+    return a > b ? a - b
+                 : b - a;
+}
+
 /* returns true if a new prefix was added, false if nothing changed */
 static bool _remove_old_prefix(gnrc_netif_t *netif,
                                const ipv6_addr_t *pfx, uint8_t pfx_len,
@@ -358,7 +372,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     gnrc_pktsnip_t *tmp;
     void *state = NULL;
     ipv6_addr_t old_pfx;
-    uint8_t old_pfx_len = CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN;
+    uint8_t old_pfx_len = 0;
 
     /* iterate prefix list to see if the prefix already exists */
     while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &entry)) {
@@ -370,14 +384,15 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
         }
 
         /* find prefix that is closest to the new prefix */
-        if (match_len > old_pfx_len) {
+        if (match_len > old_pfx_len &&
+            _absdiff(pfx_len, entry.pfx_len) <= CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_DIFF_MAX) {
             old_pfx_len = entry.pfx_len;
             old_pfx = entry.pfx;
         }
     }
 
     /* no prefix found */
-    if (old_pfx_len == CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN) {
+    if (old_pfx_len == 0) {
         return true;
     }
 
