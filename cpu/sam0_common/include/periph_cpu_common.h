@@ -899,6 +899,8 @@ typedef struct {
 #ifdef ADC0
     Adc *dev;               /**< ADC device descriptor */
 #endif
+    uint32_t R_src;         /**< Resistance in Ω between the voltage
+                                 to measure and the ADC pin */
 } adc_conf_chan_t;
 
 /**
