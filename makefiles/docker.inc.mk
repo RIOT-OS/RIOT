@@ -99,7 +99,7 @@ export DOCKER_ENV_VARS += \
 # List of all exported environment variables that shall be passed on to the
 # Docker container since they might have been set through the command line
 # and environment.
-# Their origin cannot be checked since they are often redefined or overriden
+# Their origin cannot be checked since they are often redefined or overridden
 # in Makefile/Makefile.include, etc. and their origin is changed to file
 export DOCKER_ENV_VARS_ALWAYS += \
   DISABLE_MODULE \
@@ -191,7 +191,7 @@ DOCKER_MAKE_ARGS += $(DOCKER_MAKE_JOBS)
 #   the variable is mapped to a path inside `DOCKER_RIOTBASE` in the container.
 #
 # * if the directory is not contained in the `RIOT` repository,
-#   the directory must be mounted in the countainer.
+#   the directory must be mounted in the container.
 #   The variable and directory are mapped to a path outside `DOCKER_RIOTBASE`.
 #   Some variables have hardwritten mapping directories (`RIOTCPU` for example),
 #   and other have a mapping directory based on their directory name.
@@ -214,7 +214,7 @@ define dir_is_outside_riotbase
 $(filter $(abspath $1)/,$(patsubst $(RIOTBASE)/%,%,$(abspath $1)/))
 endef
 
-# Mapping of directores inside docker
+# Mapping of directories inside docker
 #
 # Return the path of directories from the host within the container
 #
@@ -302,9 +302,9 @@ DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_DIR,,build)
 
-# Prevent recursive invocation of docker by explicitely disabling docker via env variable,
+# Prevent recursive invocation of docker by explicitly disabling docker via env variable,
 # overwriting potential default in application Makefile
-DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_IN_DOCKER,,0)
+DOCKER_VOLUMES_AND_ENV += -e 'BUILD_IN_DOCKER=0'
 
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTPROJECT,,riotproject)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTCPU,,riotcpu)
