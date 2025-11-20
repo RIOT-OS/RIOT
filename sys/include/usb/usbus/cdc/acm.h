@@ -200,7 +200,7 @@ void usbus_cdc_acm_init(usbus_t *usbus, usbus_cdcacm_device_t *cdcacm,
  * @param[in]   buf         buffer to submit
  * @param[in]   len         length of the submitted buffer
  *
- * @retval      -ECONNRESET Failed to sub data
+ * @retval      -ECONNRESET Failed to submit data
  * @retval      >=0         Number of bytes added to the CDC ACM ring buffer
  */
 ssize_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm,
