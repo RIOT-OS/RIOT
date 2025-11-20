@@ -177,18 +177,20 @@ static int _query_server(nanocoap_sock_t *sock, const char *path,
     uint8_t *buf = _buf;
 
     coap_pkt_t pkt = {
-        .hdr = (void *)buf,
+        .buf = buf,
     };
 
     uint16_t lastonum = 0;
 
-    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
-                          nanocoap_sock_next_msg_id(sock));
+    ssize_t hdr_len = coap_build_udp_hdr(_buf, sizeof(_buf), COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
+                                         nanocoap_sock_next_msg_id(sock));
+    assume(hdr_len > 0);
+    buf += hdr_len;
     buf += coap_opt_put_uri_pathquery(buf, &lastonum, path);
     buf += coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2, 0);
     buf += coap_opt_put_uint(buf, COAP_OPT_BLOCK2, COAP_OPT_SIZE2, 0);
 
-    assert((uintptr_t)buf - (uintptr_t)pkt.hdr < sizeof(_buf));
+    assert((uintptr_t)buf - (uintptr_t)_buf < sizeof(_buf));
 
     pkt.payload = buf;
     pkt.payload_len = 0;

@@ -94,8 +94,7 @@ static int _cmd_client(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = {"get", "post", "put"};
-    unsigned buflen = 128;
-    uint8_t buf[buflen];
+    uint8_t buf[128];
     coap_pkt_t pkt;
     size_t len;
 
@@ -114,14 +113,14 @@ static int _cmd_client(int argc, char **argv)
         goto end;
     }
 
-    pkt.hdr = (coap_hdr_t *)buf;
+    pkt.buf = buf;
 
     /* parse options */
     if (argc == 5 || argc == 6) {
-        ssize_t hdrlen = coap_build_hdr(pkt.hdr, COAP_TYPE_CON,
-                                        _client_token, _client_token_len,
-                                        code_pos+1, 1);
-        coap_pkt_init(&pkt, &buf[0], buflen, hdrlen);
+        ssize_t hdrlen = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_CON,
+                                            _client_token, _client_token_len,
+                                            code_pos + 1, 1);
+        coap_pkt_init(&pkt, &buf[0], sizeof(buf), hdrlen);
         coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, argv[4], '/');
         if (argc == 6) {
             coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_TEXT);
@@ -138,7 +137,7 @@ static int _cmd_client(int argc, char **argv)
         printf("nanocli: sending msg ID %u, %" PRIuSIZE " bytes\n", coap_get_id(&pkt),
                len);
 
-        ssize_t res = _send(&pkt, buflen, argv[2], argv[3]);
+        ssize_t res = _send(&pkt, sizeof(buf), argv[2], argv[3]);
         if (res < 0) {
             printf("nanocli: msg send failed: %" PRIdSIZE "\n", res);
         }
