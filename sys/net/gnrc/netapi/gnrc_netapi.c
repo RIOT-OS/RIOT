@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "log.h"
 #include "mbox.h"
 #include "msg.h"
 #include "net/gnrc/netreg.h"
@@ -53,14 +54,15 @@ int _gnrc_netapi_get_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
 
 int _gnrc_netapi_send_recv(kernel_pid_t pid, gnrc_pktsnip_t *pkt, uint16_t type)
 {
-    msg_t msg;
     /* set the outgoing message's fields */
-    msg.type = type;
-    msg.content.ptr = (void *)pkt;
+    msg_t msg = {
+        .type = type,
+        .content.ptr = pkt,
+    };
     /* send message */
     int ret = msg_try_send(&msg, pid);
     if (ret < 1) {
-        DEBUG("gnrc_netapi: dropped message to %" PRIkernel_pid " (%s)\n", pid,
+        LOG_WARNING("gnrc_netapi: dropped message to %" PRIkernel_pid " (%s)\n", pid,
               (ret == 0) ? "receiver queue is full" : "invalid receiver");
     }
     return ret;
@@ -69,14 +71,15 @@ int _gnrc_netapi_send_recv(kernel_pid_t pid, gnrc_pktsnip_t *pkt, uint16_t type)
 #ifdef MODULE_GNRC_NETAPI_MBOX
 static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt)
 {
-    msg_t msg;
     /* set the outgoing message's fields */
-    msg.type = type;
-    msg.content.ptr = (void *)pkt;
+    msg_t msg = {
+        .type = type,
+        .content.ptr = pkt,
+    };
     /* send message */
     int ret = mbox_try_put(mbox, &msg);
     if (ret < 1) {
-        DEBUG("gnrc_netapi: dropped message to %p (was full)\n", (void*)mbox);
+        LOG_WARNING("gnrc_netapi: dropped message to %p (was full)\n", (void*)mbox);
     }
     return ret;
 }
