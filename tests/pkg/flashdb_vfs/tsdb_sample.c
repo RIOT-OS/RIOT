@@ -29,6 +29,7 @@ struct env_status {
 static bool query_cb(fdb_tsl_t tsl, void *arg);
 static bool query_by_time_cb(fdb_tsl_t tsl, void *arg);
 static bool set_status_cb(fdb_tsl_t tsl, void *arg);
+extern const char *resstr(bool condition);
 
 void tsdb_sample(fdb_tsdb_t tsdb)
 {
@@ -42,13 +43,15 @@ void tsdb_sample(fdb_tsdb_t tsdb)
         /* append new log to TSDB */
         status.temp = 36;
         status.humi = 85;
-        fdb_tsl_append(tsdb, fdb_blob_make(&blob, &status, sizeof(status)));
-        printf("append the new status.temp (%d) and status.humi (%d)\n", status.temp, status.humi);
+        fdb_err_t res = fdb_tsl_append(tsdb, fdb_blob_make(&blob, &status, sizeof(status)));
+        printf("append the new status.temp (%d) and status.humi (%d) %s\n", status.temp, status.humi,
+               resstr(res == FDB_NO_ERR));
 
         status.temp = 38;
         status.humi = 90;
-        fdb_tsl_append(tsdb, fdb_blob_make(&blob, &status, sizeof(status)));
-        printf("append the new status.temp (%d) and status.humi (%d)\n", status.temp, status.humi);
+        res = fdb_tsl_append(tsdb, fdb_blob_make(&blob, &status, sizeof(status)));
+        printf("append the new status.temp (%d) and status.humi (%d) %s\n", status.temp, status.humi,
+               resstr(res == FDB_NO_ERR));
     }
 
     { /* QUERY the TSDB */
@@ -90,8 +93,9 @@ static bool query_cb(fdb_tsl_t tsl, void *arg)
     struct env_status status = {0};
     fdb_tsdb_t db = arg;
 
-    fdb_blob_read((fdb_db_t) db, fdb_tsl_to_blob(tsl, fdb_blob_make(&blob, &status, sizeof(status))));
-    printf("[query_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d\n", tsl->time, status.temp, status.humi);
+    size_t len = fdb_blob_read((fdb_db_t) db, fdb_tsl_to_blob(tsl, fdb_blob_make(&blob, &status, sizeof(status))));
+    printf("[query_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d %s\n", tsl->time, status.temp, status.humi,
+            resstr(len == sizeof(status)));
 
     return false;
 }
@@ -102,8 +106,9 @@ static bool query_by_time_cb(fdb_tsl_t tsl, void *arg)
     struct env_status status = {0};
     fdb_tsdb_t db = arg;
 
-    fdb_blob_read((fdb_db_t) db, fdb_tsl_to_blob(tsl, fdb_blob_make(&blob, &status, sizeof(status))));
-    printf("[query_by_time_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d\n", tsl->time, status.temp, status.humi);
+    size_t len = fdb_blob_read((fdb_db_t) db, fdb_tsl_to_blob(tsl, fdb_blob_make(&blob, &status, sizeof(status))));
+    printf("[query_by_time_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d %s\n", tsl->time, status.temp, status.humi,
+            resstr(len == sizeof(status)));
 
     return false;
 }
@@ -112,9 +117,9 @@ static bool set_status_cb(fdb_tsl_t tsl, void *arg)
 {
     fdb_tsdb_t db = arg;
 
-    printf("set the TSL (time %"PRId32") status from %d to %d\n", tsl->time, tsl->status, FDB_TSL_USER_STATUS1);
-    fdb_tsl_set_status(db, tsl, FDB_TSL_USER_STATUS1);
-
+    fdb_err_t res = fdb_tsl_set_status(db, tsl, FDB_TSL_USER_STATUS1);
+    printf("set the TSL (time %"PRId32") status from %d to %d %s\n", tsl->time, tsl->status, FDB_TSL_USER_STATUS1,
+           resstr(res == FDB_NO_ERR));
     return false;
 }
 

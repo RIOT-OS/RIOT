@@ -34,6 +34,9 @@
 #define FDB_DIR     VFS_DEFAULT_DATA
 #endif
 
+#define KVDB_DIR    (FDB_DIR "/fdb_kvdb1")
+#define TSDB_DIR    (FDB_DIR "/fdb_tsdb1")
+
 static mutex_t kv_locker, ts_locker;
 static uint32_t boot_count = 0;
 static time_t boot_time[10] = {0, 1, 2, 3};
